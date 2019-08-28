@@ -1,0 +1,2244 @@
+game: oware
+seed: 1875058860
+
+GameType.chance_mode = ChanceMode.DETERMINISTIC
+GameType.dynamics = Dynamics.SEQUENTIAL
+GameType.information = Information.PERFECT_INFORMATION
+GameType.long_name = "Oware"
+GameType.max_num_players = 2
+GameType.min_num_players = 2
+GameType.parameter_specification = ["num_houses_per_player", "num_seeds_per_house"]
+GameType.provides_information_state = False
+GameType.provides_information_state_as_normalized_vector = False
+GameType.provides_observation = True
+GameType.provides_observation_as_normalized_vector = True
+GameType.reward_model = RewardModel.TERMINAL
+GameType.short_name = "oware"
+GameType.utility = Utility.ZERO_SUM
+
+NumDistinctActions() = 6
+MaxChanceOutcomes() = 0
+GetParameters() = {num_houses_per_player=6,num_seeds_per_house=4}
+NumPlayers() = 2
+MinUtility() = -1.0
+MaxUtility() = 1.0
+UtilitySum() = 0.0
+ObservationNormalizedVectorShape() = [14]
+ObservationNormalizedVectorSize() = 14
+MaxGameLength() = 1000
+ToString() = "oware()"
+
+# State 0
+IsTerminal() = False
+ToString() = "Player 1 score = 0\n  f  e  d  c  b  a\n  4  4  4  4  4  4\n  4  4  4  4  4  4\n  A  B  C  D  E  F\nPlayer 0 score = 0 [PLAYING]\n"
+History() = []
+HistoryString() = ""
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Observation(0) = "0 | 0 0 | 4 4 4 4 4 4 4 4 4 4 4 4"
+Observation(1) = "0 | 0 0 | 4 4 4 4 4 4 4 4 4 4 4 4"
+ObservationAsNormalizedVector(0) = [0.08333, 0.08333, 0.08333, 0.08333, 0.08333, 0.08333, 0.08333, 0.08333, 0.08333, 0.08333, 0.08333, 0.08333, 0.0, 0.0]
+ObservationAsNormalizedVector(1) = [0.08333, 0.08333, 0.08333, 0.08333, 0.08333, 0.08333, 0.08333, 0.08333, 0.08333, 0.08333, 0.08333, 0.08333, 0.0, 0.0]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 3, 4, 5]
+StringLegalActions() = ["A", "B", "C", "D", "E", "F"]
+
+# Apply action "C"
+action: 2
+
+# State 1
+IsTerminal() = False
+ToString() = "Player 1 score = 0 [PLAYING]\n  f  e  d  c  b  a\n  4  4  4  4  4  5\n  4  4  0  5  5  5\n  A  B  C  D  E  F\nPlayer 0 score = 0\n"
+History() = [2]
+HistoryString() = "2"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Observation(0) = "1 | 0 0 | 4 4 0 5 5 5 5 4 4 4 4 4"
+Observation(1) = "1 | 0 0 | 4 4 0 5 5 5 5 4 4 4 4 4"
+ObservationAsNormalizedVector(0) = [0.08333, 0.08333, 0.0, 0.10417, 0.10417, 0.10417, 0.10417, 0.08333, 0.08333, 0.08333, 0.08333, 0.08333, 0.0, 0.0]
+ObservationAsNormalizedVector(1) = [0.08333, 0.08333, 0.0, 0.10417, 0.10417, 0.10417, 0.10417, 0.08333, 0.08333, 0.08333, 0.08333, 0.08333, 0.0, 0.0]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 3, 4, 5]
+StringLegalActions() = ["a", "b", "c", "d", "e", "f"]
+
+# Apply action "f"
+action: 5
+
+# State 2
+IsTerminal() = False
+ToString() = "Player 1 score = 0\n  f  e  d  c  b  a\n  0  4  4  4  4  5\n  5  5  1  6  5  5\n  A  B  C  D  E  F\nPlayer 0 score = 0 [PLAYING]\n"
+History() = [2, 5]
+HistoryString() = "2 5"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Observation(0) = "0 | 0 0 | 5 5 1 6 5 5 5 4 4 4 4 0"
+Observation(1) = "0 | 0 0 | 5 5 1 6 5 5 5 4 4 4 4 0"
+ObservationAsNormalizedVector(0) = [0.10417, 0.10417, 0.02083, 0.125, 0.10417, 0.10417, 0.10417, 0.08333, 0.08333, 0.08333, 0.08333, 0.0, 0.0, 0.0]
+ObservationAsNormalizedVector(1) = [0.10417, 0.10417, 0.02083, 0.125, 0.10417, 0.10417, 0.10417, 0.08333, 0.08333, 0.08333, 0.08333, 0.0, 0.0, 0.0]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 3, 4, 5]
+StringLegalActions() = ["A", "B", "C", "D", "E", "F"]
+
+# Apply action "C"
+action: 2
+
+# State 3
+IsTerminal() = False
+ToString() = "Player 1 score = 0 [PLAYING]\n  f  e  d  c  b  a\n  0  4  4  4  4  5\n  5  5  0  7  5  5\n  A  B  C  D  E  F\nPlayer 0 score = 0\n"
+History() = [2, 5, 2]
+HistoryString() = "2 5 2"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Observation(0) = "1 | 0 0 | 5 5 0 7 5 5 5 4 4 4 4 0"
+Observation(1) = "1 | 0 0 | 5 5 0 7 5 5 5 4 4 4 4 0"
+ObservationAsNormalizedVector(0) = [0.10417, 0.10417, 0.0, 0.14583, 0.10417, 0.10417, 0.10417, 0.08333, 0.08333, 0.08333, 0.08333, 0.0, 0.0, 0.0]
+ObservationAsNormalizedVector(1) = [0.10417, 0.10417, 0.0, 0.14583, 0.10417, 0.10417, 0.10417, 0.08333, 0.08333, 0.08333, 0.08333, 0.0, 0.0, 0.0]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 3, 4]
+StringLegalActions() = ["a", "b", "c", "d", "e"]
+
+# Apply action "b"
+action: 1
+
+# State 4
+IsTerminal() = False
+ToString() = "Player 1 score = 0\n  f  e  d  c  b  a\n  1  5  5  5  0  5\n  5  5  0  7  5  5\n  A  B  C  D  E  F\nPlayer 0 score = 0 [PLAYING]\n"
+History() = [2, 5, 2, 1]
+HistoryString() = "2 5 2 1"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Observation(0) = "0 | 0 0 | 5 5 0 7 5 5 5 0 5 5 5 1"
+Observation(1) = "0 | 0 0 | 5 5 0 7 5 5 5 0 5 5 5 1"
+ObservationAsNormalizedVector(0) = [0.10417, 0.10417, 0.0, 0.14583, 0.10417, 0.10417, 0.10417, 0.0, 0.10417, 0.10417, 0.10417, 0.02083, 0.0, 0.0]
+ObservationAsNormalizedVector(1) = [0.10417, 0.10417, 0.0, 0.14583, 0.10417, 0.10417, 0.10417, 0.0, 0.10417, 0.10417, 0.10417, 0.02083, 0.0, 0.0]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 3, 4, 5]
+StringLegalActions() = ["A", "B", "D", "E", "F"]
+
+# Apply action "B"
+action: 1
+
+# State 5
+IsTerminal() = False
+ToString() = "Player 1 score = 0 [PLAYING]\n  f  e  d  c  b  a\n  1  5  5  5  0  6\n  5  0  1  8  6  6\n  A  B  C  D  E  F\nPlayer 0 score = 0\n"
+History() = [2, 5, 2, 1, 1]
+HistoryString() = "2 5 2 1 1"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Observation(0) = "1 | 0 0 | 5 0 1 8 6 6 6 0 5 5 5 1"
+Observation(1) = "1 | 0 0 | 5 0 1 8 6 6 6 0 5 5 5 1"
+ObservationAsNormalizedVector(0) = [0.10417, 0.0, 0.02083, 0.16667, 0.125, 0.125, 0.125, 0.0, 0.10417, 0.10417, 0.10417, 0.02083, 0.0, 0.0]
+ObservationAsNormalizedVector(1) = [0.10417, 0.0, 0.02083, 0.16667, 0.125, 0.125, 0.125, 0.0, 0.10417, 0.10417, 0.10417, 0.02083, 0.0, 0.0]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 2, 3, 4, 5]
+StringLegalActions() = ["a", "c", "d", "e", "f"]
+
+# Apply action "c"
+action: 2
+
+# State 6
+IsTerminal() = False
+ToString() = "Player 1 score = 0\n  f  e  d  c  b  a\n  2  6  6  0  0  6\n  6  1  1  8  6  6\n  A  B  C  D  E  F\nPlayer 0 score = 0 [PLAYING]\n"
+History() = [2, 5, 2, 1, 1, 2]
+HistoryString() = "2 5 2 1 1 2"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Observation(0) = "0 | 0 0 | 6 1 1 8 6 6 6 0 0 6 6 2"
+Observation(1) = "0 | 0 0 | 6 1 1 8 6 6 6 0 0 6 6 2"
+ObservationAsNormalizedVector(0) = [0.125, 0.02083, 0.02083, 0.16667, 0.125, 0.125, 0.125, 0.0, 0.0, 0.125, 0.125, 0.04167, 0.0, 0.0]
+ObservationAsNormalizedVector(1) = [0.125, 0.02083, 0.02083, 0.16667, 0.125, 0.125, 0.125, 0.0, 0.0, 0.125, 0.125, 0.04167, 0.0, 0.0]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 3, 4, 5]
+StringLegalActions() = ["A", "B", "C", "D", "E", "F"]
+
+# Apply action "C"
+action: 2
+
+# State 7
+IsTerminal() = False
+ToString() = "Player 1 score = 0 [PLAYING]\n  f  e  d  c  b  a\n  2  6  6  0  0  6\n  6  1  0  9  6  6\n  A  B  C  D  E  F\nPlayer 0 score = 0\n"
+History() = [2, 5, 2, 1, 1, 2, 2]
+HistoryString() = "2 5 2 1 1 2 2"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Observation(0) = "1 | 0 0 | 6 1 0 9 6 6 6 0 0 6 6 2"
+Observation(1) = "1 | 0 0 | 6 1 0 9 6 6 6 0 0 6 6 2"
+ObservationAsNormalizedVector(0) = [0.125, 0.02083, 0.0, 0.1875, 0.125, 0.125, 0.125, 0.0, 0.0, 0.125, 0.125, 0.04167, 0.0, 0.0]
+ObservationAsNormalizedVector(1) = [0.125, 0.02083, 0.0, 0.1875, 0.125, 0.125, 0.125, 0.0, 0.0, 0.125, 0.125, 0.04167, 0.0, 0.0]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 3, 4, 5]
+StringLegalActions() = ["a", "d", "e", "f"]
+
+# Apply action "d"
+action: 3
+
+# State 8
+IsTerminal() = False
+ToString() = "Player 1 score = 0\n  f  e  d  c  b  a\n  3  7  0  0  0  6\n  7  2  1 10  6  6\n  A  B  C  D  E  F\nPlayer 0 score = 0 [PLAYING]\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3]
+HistoryString() = "2 5 2 1 1 2 2 3"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Observation(0) = "0 | 0 0 | 7 2 1 10 6 6 6 0 0 0 7 3"
+Observation(1) = "0 | 0 0 | 7 2 1 10 6 6 6 0 0 0 7 3"
+ObservationAsNormalizedVector(0) = [0.14583, 0.04167, 0.02083, 0.20833, 0.125, 0.125, 0.125, 0.0, 0.0, 0.0, 0.14583, 0.0625, 0.0, 0.0]
+ObservationAsNormalizedVector(1) = [0.14583, 0.04167, 0.02083, 0.20833, 0.125, 0.125, 0.125, 0.0, 0.0, 0.0, 0.14583, 0.0625, 0.0, 0.0]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 3, 4, 5]
+StringLegalActions() = ["A", "B", "C", "D", "E", "F"]
+
+# Apply action "F"
+action: 5
+
+# State 9
+IsTerminal() = False
+ToString() = "Player 1 score = 0 [PLAYING]\n  f  e  d  c  b  a\n  4  8  1  1  1  7\n  7  2  1 10  6  0\n  A  B  C  D  E  F\nPlayer 0 score = 0\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5]
+HistoryString() = "2 5 2 1 1 2 2 3 5"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Observation(0) = "1 | 0 0 | 7 2 1 10 6 0 7 1 1 1 8 4"
+Observation(1) = "1 | 0 0 | 7 2 1 10 6 0 7 1 1 1 8 4"
+ObservationAsNormalizedVector(0) = [0.14583, 0.04167, 0.02083, 0.20833, 0.125, 0.0, 0.14583, 0.02083, 0.02083, 0.02083, 0.16667, 0.08333, 0.0, 0.0]
+ObservationAsNormalizedVector(1) = [0.14583, 0.04167, 0.02083, 0.20833, 0.125, 0.0, 0.14583, 0.02083, 0.02083, 0.02083, 0.16667, 0.08333, 0.0, 0.0]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 3, 4, 5]
+StringLegalActions() = ["a", "b", "c", "d", "e", "f"]
+
+# Apply action "e"
+action: 4
+
+# State 10
+IsTerminal() = False
+ToString() = "Player 1 score = 0\n  f  e  d  c  b  a\n  5  0  1  1  1  8\n  8  3  2 11  7  1\n  A  B  C  D  E  F\nPlayer 0 score = 0 [PLAYING]\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Observation(0) = "0 | 0 0 | 8 3 2 11 7 1 8 1 1 1 0 5"
+Observation(1) = "0 | 0 0 | 8 3 2 11 7 1 8 1 1 1 0 5"
+ObservationAsNormalizedVector(0) = [0.16667, 0.0625, 0.04167, 0.22917, 0.14583, 0.02083, 0.16667, 0.02083, 0.02083, 0.02083, 0.0, 0.10417, 0.0, 0.0]
+ObservationAsNormalizedVector(1) = [0.16667, 0.0625, 0.04167, 0.22917, 0.14583, 0.02083, 0.16667, 0.02083, 0.02083, 0.02083, 0.0, 0.10417, 0.0, 0.0]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 3, 4, 5]
+StringLegalActions() = ["A", "B", "C", "D", "E", "F"]
+
+# Apply action "C"
+action: 2
+
+# State 11
+IsTerminal() = False
+ToString() = "Player 1 score = 0 [PLAYING]\n  f  e  d  c  b  a\n  5  0  1  1  1  8\n  8  3  0 12  8  1\n  A  B  C  D  E  F\nPlayer 0 score = 0\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Observation(0) = "1 | 0 0 | 8 3 0 12 8 1 8 1 1 1 0 5"
+Observation(1) = "1 | 0 0 | 8 3 0 12 8 1 8 1 1 1 0 5"
+ObservationAsNormalizedVector(0) = [0.16667, 0.0625, 0.0, 0.25, 0.16667, 0.02083, 0.16667, 0.02083, 0.02083, 0.02083, 0.0, 0.10417, 0.0, 0.0]
+ObservationAsNormalizedVector(1) = [0.16667, 0.0625, 0.0, 0.25, 0.16667, 0.02083, 0.16667, 0.02083, 0.02083, 0.02083, 0.0, 0.10417, 0.0, 0.0]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 3, 5]
+StringLegalActions() = ["a", "b", "c", "d", "f"]
+
+# Apply action "d"
+action: 3
+
+# State 12
+IsTerminal() = False
+ToString() = "Player 1 score = 0\n  f  e  d  c  b  a\n  5  1  0  1  1  8\n  8  3  0 12  8  1\n  A  B  C  D  E  F\nPlayer 0 score = 0 [PLAYING]\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Observation(0) = "0 | 0 0 | 8 3 0 12 8 1 8 1 1 0 1 5"
+Observation(1) = "0 | 0 0 | 8 3 0 12 8 1 8 1 1 0 1 5"
+ObservationAsNormalizedVector(0) = [0.16667, 0.0625, 0.0, 0.25, 0.16667, 0.02083, 0.16667, 0.02083, 0.02083, 0.0, 0.02083, 0.10417, 0.0, 0.0]
+ObservationAsNormalizedVector(1) = [0.16667, 0.0625, 0.0, 0.25, 0.16667, 0.02083, 0.16667, 0.02083, 0.02083, 0.0, 0.02083, 0.10417, 0.0, 0.0]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 3, 4, 5]
+StringLegalActions() = ["A", "B", "D", "E", "F"]
+
+# Apply action "D"
+action: 3
+
+# State 13
+IsTerminal() = False
+ToString() = "Player 1 score = 0 [PLAYING]\n  f  e  d  c  b  a\n  6  2  1  2  2  9\n  9  4  1  0 10  2\n  A  B  C  D  E  F\nPlayer 0 score = 0\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Observation(0) = "1 | 0 0 | 9 4 1 0 10 2 9 2 2 1 2 6"
+Observation(1) = "1 | 0 0 | 9 4 1 0 10 2 9 2 2 1 2 6"
+ObservationAsNormalizedVector(0) = [0.1875, 0.08333, 0.02083, 0.0, 0.20833, 0.04167, 0.1875, 0.04167, 0.04167, 0.02083, 0.04167, 0.125, 0.0, 0.0]
+ObservationAsNormalizedVector(1) = [0.1875, 0.08333, 0.02083, 0.0, 0.20833, 0.04167, 0.1875, 0.04167, 0.04167, 0.02083, 0.04167, 0.125, 0.0, 0.0]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 3, 4, 5]
+StringLegalActions() = ["a", "b", "c", "d", "e", "f"]
+
+# Apply action "e"
+action: 4
+
+# State 14
+IsTerminal() = False
+ToString() = "Player 1 score = 0\n  f  e  d  c  b  a\n  7  0  1  2  2  9\n 10  4  1  0 10  2\n  A  B  C  D  E  F\nPlayer 0 score = 0 [PLAYING]\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Observation(0) = "0 | 0 0 | 10 4 1 0 10 2 9 2 2 1 0 7"
+Observation(1) = "0 | 0 0 | 10 4 1 0 10 2 9 2 2 1 0 7"
+ObservationAsNormalizedVector(0) = [0.20833, 0.08333, 0.02083, 0.0, 0.20833, 0.04167, 0.1875, 0.04167, 0.04167, 0.02083, 0.0, 0.14583, 0.0, 0.0]
+ObservationAsNormalizedVector(1) = [0.20833, 0.08333, 0.02083, 0.0, 0.20833, 0.04167, 0.1875, 0.04167, 0.04167, 0.02083, 0.0, 0.14583, 0.0, 0.0]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 4, 5]
+StringLegalActions() = ["A", "B", "C", "E", "F"]
+
+# Apply action "A"
+action: 0
+
+# State 15
+IsTerminal() = False
+ToString() = "Player 1 score = 0 [PLAYING]\n  f  e  d  c  b  a\n  7  1  2  3  3 10\n  0  5  2  1 11  3\n  A  B  C  D  E  F\nPlayer 0 score = 0\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Observation(0) = "1 | 0 0 | 0 5 2 1 11 3 10 3 3 2 1 7"
+Observation(1) = "1 | 0 0 | 0 5 2 1 11 3 10 3 3 2 1 7"
+ObservationAsNormalizedVector(0) = [0.0, 0.10417, 0.04167, 0.02083, 0.22917, 0.0625, 0.20833, 0.0625, 0.0625, 0.04167, 0.02083, 0.14583, 0.0, 0.0]
+ObservationAsNormalizedVector(1) = [0.0, 0.10417, 0.04167, 0.02083, 0.22917, 0.0625, 0.20833, 0.0625, 0.0625, 0.04167, 0.02083, 0.14583, 0.0, 0.0]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 3, 4, 5]
+StringLegalActions() = ["a", "b", "c", "d", "e", "f"]
+
+# Apply action "b"
+action: 1
+
+# State 16
+IsTerminal() = False
+ToString() = "Player 1 score = 0\n  f  e  d  c  b  a\n  7  2  3  4  0 10\n  0  5  2  1 11  3\n  A  B  C  D  E  F\nPlayer 0 score = 0 [PLAYING]\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Observation(0) = "0 | 0 0 | 0 5 2 1 11 3 10 0 4 3 2 7"
+Observation(1) = "0 | 0 0 | 0 5 2 1 11 3 10 0 4 3 2 7"
+ObservationAsNormalizedVector(0) = [0.0, 0.10417, 0.04167, 0.02083, 0.22917, 0.0625, 0.20833, 0.0, 0.08333, 0.0625, 0.04167, 0.14583, 0.0, 0.0]
+ObservationAsNormalizedVector(1) = [0.0, 0.10417, 0.04167, 0.02083, 0.22917, 0.0625, 0.20833, 0.0, 0.08333, 0.0625, 0.04167, 0.14583, 0.0, 0.0]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [1, 2, 3, 4, 5]
+StringLegalActions() = ["B", "C", "D", "E", "F"]
+
+# Apply action "D"
+action: 3
+
+# State 17
+IsTerminal() = False
+ToString() = "Player 1 score = 0 [PLAYING]\n  f  e  d  c  b  a\n  7  2  3  4  0 10\n  0  5  2  0 12  3\n  A  B  C  D  E  F\nPlayer 0 score = 0\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Observation(0) = "1 | 0 0 | 0 5 2 0 12 3 10 0 4 3 2 7"
+Observation(1) = "1 | 0 0 | 0 5 2 0 12 3 10 0 4 3 2 7"
+ObservationAsNormalizedVector(0) = [0.0, 0.10417, 0.04167, 0.0, 0.25, 0.0625, 0.20833, 0.0, 0.08333, 0.0625, 0.04167, 0.14583, 0.0, 0.0]
+ObservationAsNormalizedVector(1) = [0.0, 0.10417, 0.04167, 0.0, 0.25, 0.0625, 0.20833, 0.0, 0.08333, 0.0625, 0.04167, 0.14583, 0.0, 0.0]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 2, 3, 4, 5]
+StringLegalActions() = ["a", "c", "d", "e", "f"]
+
+# Apply action "a"
+action: 0
+
+# State 18
+IsTerminal() = False
+ToString() = "Player 1 score = 0\n  f  e  d  c  b  a\n  8  3  4  5  1  0\n  1  6  3  1 13  3\n  A  B  C  D  E  F\nPlayer 0 score = 0 [PLAYING]\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Observation(0) = "0 | 0 0 | 1 6 3 1 13 3 0 1 5 4 3 8"
+Observation(1) = "0 | 0 0 | 1 6 3 1 13 3 0 1 5 4 3 8"
+ObservationAsNormalizedVector(0) = [0.02083, 0.125, 0.0625, 0.02083, 0.27083, 0.0625, 0.0, 0.02083, 0.10417, 0.08333, 0.0625, 0.16667, 0.0, 0.0]
+ObservationAsNormalizedVector(1) = [0.02083, 0.125, 0.0625, 0.02083, 0.27083, 0.0625, 0.0, 0.02083, 0.10417, 0.08333, 0.0625, 0.16667, 0.0, 0.0]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 3, 4, 5]
+StringLegalActions() = ["A", "B", "C", "D", "E", "F"]
+
+# Apply action "C"
+action: 2
+
+# State 19
+IsTerminal() = False
+ToString() = "Player 1 score = 0 [PLAYING]\n  f  e  d  c  b  a\n  8  3  4  5  1  0\n  1  6  0  2 14  4\n  A  B  C  D  E  F\nPlayer 0 score = 0\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Observation(0) = "1 | 0 0 | 1 6 0 2 14 4 0 1 5 4 3 8"
+Observation(1) = "1 | 0 0 | 1 6 0 2 14 4 0 1 5 4 3 8"
+ObservationAsNormalizedVector(0) = [0.02083, 0.125, 0.0, 0.04167, 0.29167, 0.08333, 0.0, 0.02083, 0.10417, 0.08333, 0.0625, 0.16667, 0.0, 0.0]
+ObservationAsNormalizedVector(1) = [0.02083, 0.125, 0.0, 0.04167, 0.29167, 0.08333, 0.0, 0.02083, 0.10417, 0.08333, 0.0625, 0.16667, 0.0, 0.0]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [1, 2, 3, 4, 5]
+StringLegalActions() = ["b", "c", "d", "e", "f"]
+
+# Apply action "c"
+action: 2
+
+# State 20
+IsTerminal() = False
+ToString() = "Player 1 score = 0\n  f  e  d  c  b  a\n  9  4  5  0  1  0\n  2  7  0  2 14  4\n  A  B  C  D  E  F\nPlayer 0 score = 0 [PLAYING]\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Observation(0) = "0 | 0 0 | 2 7 0 2 14 4 0 1 0 5 4 9"
+Observation(1) = "0 | 0 0 | 2 7 0 2 14 4 0 1 0 5 4 9"
+ObservationAsNormalizedVector(0) = [0.04167, 0.14583, 0.0, 0.04167, 0.29167, 0.08333, 0.0, 0.02083, 0.0, 0.10417, 0.08333, 0.1875, 0.0, 0.0]
+ObservationAsNormalizedVector(1) = [0.04167, 0.14583, 0.0, 0.04167, 0.29167, 0.08333, 0.0, 0.02083, 0.0, 0.10417, 0.08333, 0.1875, 0.0, 0.0]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 3, 4, 5]
+StringLegalActions() = ["A", "B", "D", "E", "F"]
+
+# Apply action "E"
+action: 4
+
+# State 21
+IsTerminal() = False
+ToString() = "Player 1 score = 0 [PLAYING]\n  f  e  d  c  b  a\n 10  5  6  1  0  0\n  3  8  1  3  0  6\n  A  B  C  D  E  F\nPlayer 0 score = 5\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Observation(0) = "1 | 5 0 | 3 8 1 3 0 6 0 0 1 6 5 10"
+Observation(1) = "1 | 5 0 | 3 8 1 3 0 6 0 0 1 6 5 10"
+ObservationAsNormalizedVector(0) = [0.0625, 0.16667, 0.02083, 0.0625, 0.0, 0.125, 0.0, 0.0, 0.02083, 0.125, 0.10417, 0.20833, 0.10417, 0.0]
+ObservationAsNormalizedVector(1) = [0.0625, 0.16667, 0.02083, 0.0625, 0.0, 0.125, 0.0, 0.0, 0.02083, 0.125, 0.10417, 0.20833, 0.10417, 0.0]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [2, 3, 4, 5]
+StringLegalActions() = ["c", "d", "e", "f"]
+
+# Apply action "c"
+action: 2
+
+# State 22
+IsTerminal() = False
+ToString() = "Player 1 score = 0\n  f  e  d  c  b  a\n 10  5  7  0  0  0\n  3  8  1  3  0  6\n  A  B  C  D  E  F\nPlayer 0 score = 5 [PLAYING]\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Observation(0) = "0 | 5 0 | 3 8 1 3 0 6 0 0 0 7 5 10"
+Observation(1) = "0 | 5 0 | 3 8 1 3 0 6 0 0 0 7 5 10"
+ObservationAsNormalizedVector(0) = [0.0625, 0.16667, 0.02083, 0.0625, 0.0, 0.125, 0.0, 0.0, 0.0, 0.14583, 0.10417, 0.20833, 0.10417, 0.0]
+ObservationAsNormalizedVector(1) = [0.0625, 0.16667, 0.02083, 0.0625, 0.0, 0.125, 0.0, 0.0, 0.0, 0.14583, 0.10417, 0.20833, 0.10417, 0.0]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 3, 5]
+StringLegalActions() = ["A", "B", "C", "D", "F"]
+
+# Apply action "C"
+action: 2
+
+# State 23
+IsTerminal() = False
+ToString() = "Player 1 score = 0 [PLAYING]\n  f  e  d  c  b  a\n 10  5  7  0  0  0\n  3  8  0  4  0  6\n  A  B  C  D  E  F\nPlayer 0 score = 5\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Observation(0) = "1 | 5 0 | 3 8 0 4 0 6 0 0 0 7 5 10"
+Observation(1) = "1 | 5 0 | 3 8 0 4 0 6 0 0 0 7 5 10"
+ObservationAsNormalizedVector(0) = [0.0625, 0.16667, 0.0, 0.08333, 0.0, 0.125, 0.0, 0.0, 0.0, 0.14583, 0.10417, 0.20833, 0.10417, 0.0]
+ObservationAsNormalizedVector(1) = [0.0625, 0.16667, 0.0, 0.08333, 0.0, 0.125, 0.0, 0.0, 0.0, 0.14583, 0.10417, 0.20833, 0.10417, 0.0]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [3, 4, 5]
+StringLegalActions() = ["d", "e", "f"]
+
+# Apply action "e"
+action: 4
+
+# State 24
+IsTerminal() = False
+ToString() = "Player 1 score = 0\n  f  e  d  c  b  a\n 11  0  7  0  0  0\n  4  9  1  5  0  6\n  A  B  C  D  E  F\nPlayer 0 score = 5 [PLAYING]\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Observation(0) = "0 | 5 0 | 4 9 1 5 0 6 0 0 0 7 0 11"
+Observation(1) = "0 | 5 0 | 4 9 1 5 0 6 0 0 0 7 0 11"
+ObservationAsNormalizedVector(0) = [0.08333, 0.1875, 0.02083, 0.10417, 0.0, 0.125, 0.0, 0.0, 0.0, 0.14583, 0.0, 0.22917, 0.10417, 0.0]
+ObservationAsNormalizedVector(1) = [0.08333, 0.1875, 0.02083, 0.10417, 0.0, 0.125, 0.0, 0.0, 0.0, 0.14583, 0.0, 0.22917, 0.10417, 0.0]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 3, 5]
+StringLegalActions() = ["A", "B", "C", "D", "F"]
+
+# Apply action "D"
+action: 3
+
+# State 25
+IsTerminal() = False
+ToString() = "Player 1 score = 0 [PLAYING]\n  f  e  d  c  b  a\n 11  0  7  1  1  1\n  4  9  1  0  1  7\n  A  B  C  D  E  F\nPlayer 0 score = 5\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Observation(0) = "1 | 5 0 | 4 9 1 0 1 7 1 1 1 7 0 11"
+Observation(1) = "1 | 5 0 | 4 9 1 0 1 7 1 1 1 7 0 11"
+ObservationAsNormalizedVector(0) = [0.08333, 0.1875, 0.02083, 0.0, 0.02083, 0.14583, 0.02083, 0.02083, 0.02083, 0.14583, 0.0, 0.22917, 0.10417, 0.0]
+ObservationAsNormalizedVector(1) = [0.08333, 0.1875, 0.02083, 0.0, 0.02083, 0.14583, 0.02083, 0.02083, 0.02083, 0.14583, 0.0, 0.22917, 0.10417, 0.0]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 3, 5]
+StringLegalActions() = ["a", "b", "c", "d", "f"]
+
+# Apply action "d"
+action: 3
+
+# State 26
+IsTerminal() = False
+ToString() = "Player 1 score = 2\n  f  e  d  c  b  a\n 12  1  0  1  1  1\n  5 10  2  1  0  7\n  A  B  C  D  E  F\nPlayer 0 score = 5 [PLAYING]\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Observation(0) = "0 | 5 2 | 5 10 2 1 0 7 1 1 1 0 1 12"
+Observation(1) = "0 | 5 2 | 5 10 2 1 0 7 1 1 1 0 1 12"
+ObservationAsNormalizedVector(0) = [0.10417, 0.20833, 0.04167, 0.02083, 0.0, 0.14583, 0.02083, 0.02083, 0.02083, 0.0, 0.02083, 0.25, 0.10417, 0.04167]
+ObservationAsNormalizedVector(1) = [0.10417, 0.20833, 0.04167, 0.02083, 0.0, 0.14583, 0.02083, 0.02083, 0.02083, 0.0, 0.02083, 0.25, 0.10417, 0.04167]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 3, 5]
+StringLegalActions() = ["A", "B", "C", "D", "F"]
+
+# Apply action "A"
+action: 0
+
+# State 27
+IsTerminal() = False
+ToString() = "Player 1 score = 2 [PLAYING]\n  f  e  d  c  b  a\n 12  1  0  1  1  1\n  0 11  3  2  1  8\n  A  B  C  D  E  F\nPlayer 0 score = 5\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Observation(0) = "1 | 5 2 | 0 11 3 2 1 8 1 1 1 0 1 12"
+Observation(1) = "1 | 5 2 | 0 11 3 2 1 8 1 1 1 0 1 12"
+ObservationAsNormalizedVector(0) = [0.0, 0.22917, 0.0625, 0.04167, 0.02083, 0.16667, 0.02083, 0.02083, 0.02083, 0.0, 0.02083, 0.25, 0.10417, 0.04167]
+ObservationAsNormalizedVector(1) = [0.0, 0.22917, 0.0625, 0.04167, 0.02083, 0.16667, 0.02083, 0.02083, 0.02083, 0.0, 0.02083, 0.25, 0.10417, 0.04167]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 4, 5]
+StringLegalActions() = ["a", "b", "c", "e", "f"]
+
+# Apply action "e"
+action: 4
+
+# State 28
+IsTerminal() = False
+ToString() = "Player 1 score = 2\n  f  e  d  c  b  a\n 13  0  0  1  1  1\n  0 11  3  2  1  8\n  A  B  C  D  E  F\nPlayer 0 score = 5 [PLAYING]\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Observation(0) = "0 | 5 2 | 0 11 3 2 1 8 1 1 1 0 0 13"
+Observation(1) = "0 | 5 2 | 0 11 3 2 1 8 1 1 1 0 0 13"
+ObservationAsNormalizedVector(0) = [0.0, 0.22917, 0.0625, 0.04167, 0.02083, 0.16667, 0.02083, 0.02083, 0.02083, 0.0, 0.0, 0.27083, 0.10417, 0.04167]
+ObservationAsNormalizedVector(1) = [0.0, 0.22917, 0.0625, 0.04167, 0.02083, 0.16667, 0.02083, 0.02083, 0.02083, 0.0, 0.0, 0.27083, 0.10417, 0.04167]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [1, 2, 3, 4, 5]
+StringLegalActions() = ["B", "C", "D", "E", "F"]
+
+# Apply action "F"
+action: 5
+
+# State 29
+IsTerminal() = False
+ToString() = "Player 1 score = 2 [PLAYING]\n  f  e  d  c  b  a\n 14  1  1  2  2  2\n  1 12  3  2  1  0\n  A  B  C  D  E  F\nPlayer 0 score = 5\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Observation(0) = "1 | 5 2 | 1 12 3 2 1 0 2 2 2 1 1 14"
+Observation(1) = "1 | 5 2 | 1 12 3 2 1 0 2 2 2 1 1 14"
+ObservationAsNormalizedVector(0) = [0.02083, 0.25, 0.0625, 0.04167, 0.02083, 0.0, 0.04167, 0.04167, 0.04167, 0.02083, 0.02083, 0.29167, 0.10417, 0.04167]
+ObservationAsNormalizedVector(1) = [0.02083, 0.25, 0.0625, 0.04167, 0.02083, 0.0, 0.04167, 0.04167, 0.04167, 0.02083, 0.02083, 0.29167, 0.10417, 0.04167]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 3, 4, 5]
+StringLegalActions() = ["a", "b", "c", "d", "e", "f"]
+
+# Apply action "b"
+action: 1
+
+# State 30
+IsTerminal() = False
+ToString() = "Player 1 score = 2\n  f  e  d  c  b  a\n 14  1  2  3  0  2\n  1 12  3  2  1  0\n  A  B  C  D  E  F\nPlayer 0 score = 5 [PLAYING]\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Observation(0) = "0 | 5 2 | 1 12 3 2 1 0 2 0 3 2 1 14"
+Observation(1) = "0 | 5 2 | 1 12 3 2 1 0 2 0 3 2 1 14"
+ObservationAsNormalizedVector(0) = [0.02083, 0.25, 0.0625, 0.04167, 0.02083, 0.0, 0.04167, 0.0, 0.0625, 0.04167, 0.02083, 0.29167, 0.10417, 0.04167]
+ObservationAsNormalizedVector(1) = [0.02083, 0.25, 0.0625, 0.04167, 0.02083, 0.0, 0.04167, 0.0, 0.0625, 0.04167, 0.02083, 0.29167, 0.10417, 0.04167]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 3, 4]
+StringLegalActions() = ["A", "B", "C", "D", "E"]
+
+# Apply action "A"
+action: 0
+
+# State 31
+IsTerminal() = False
+ToString() = "Player 1 score = 2 [PLAYING]\n  f  e  d  c  b  a\n 14  1  2  3  0  2\n  0 13  3  2  1  0\n  A  B  C  D  E  F\nPlayer 0 score = 5\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Observation(0) = "1 | 5 2 | 0 13 3 2 1 0 2 0 3 2 1 14"
+Observation(1) = "1 | 5 2 | 0 13 3 2 1 0 2 0 3 2 1 14"
+ObservationAsNormalizedVector(0) = [0.0, 0.27083, 0.0625, 0.04167, 0.02083, 0.0, 0.04167, 0.0, 0.0625, 0.04167, 0.02083, 0.29167, 0.10417, 0.04167]
+ObservationAsNormalizedVector(1) = [0.0, 0.27083, 0.0625, 0.04167, 0.02083, 0.0, 0.04167, 0.0, 0.0625, 0.04167, 0.02083, 0.29167, 0.10417, 0.04167]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 2, 3, 4, 5]
+StringLegalActions() = ["a", "c", "d", "e", "f"]
+
+# Apply action "e"
+action: 4
+
+# State 32
+IsTerminal() = False
+ToString() = "Player 1 score = 2\n  f  e  d  c  b  a\n 15  0  2  3  0  2\n  0 13  3  2  1  0\n  A  B  C  D  E  F\nPlayer 0 score = 5 [PLAYING]\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Observation(0) = "0 | 5 2 | 0 13 3 2 1 0 2 0 3 2 0 15"
+Observation(1) = "0 | 5 2 | 0 13 3 2 1 0 2 0 3 2 0 15"
+ObservationAsNormalizedVector(0) = [0.0, 0.27083, 0.0625, 0.04167, 0.02083, 0.0, 0.04167, 0.0, 0.0625, 0.04167, 0.0, 0.3125, 0.10417, 0.04167]
+ObservationAsNormalizedVector(1) = [0.0, 0.27083, 0.0625, 0.04167, 0.02083, 0.0, 0.04167, 0.0, 0.0625, 0.04167, 0.0, 0.3125, 0.10417, 0.04167]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [1, 2, 3, 4]
+StringLegalActions() = ["B", "C", "D", "E"]
+
+# Apply action "E"
+action: 4
+
+# State 33
+IsTerminal() = False
+ToString() = "Player 1 score = 2 [PLAYING]\n  f  e  d  c  b  a\n 15  0  2  3  0  2\n  0 13  3  2  0  1\n  A  B  C  D  E  F\nPlayer 0 score = 5\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Observation(0) = "1 | 5 2 | 0 13 3 2 0 1 2 0 3 2 0 15"
+Observation(1) = "1 | 5 2 | 0 13 3 2 0 1 2 0 3 2 0 15"
+ObservationAsNormalizedVector(0) = [0.0, 0.27083, 0.0625, 0.04167, 0.0, 0.02083, 0.04167, 0.0, 0.0625, 0.04167, 0.0, 0.3125, 0.10417, 0.04167]
+ObservationAsNormalizedVector(1) = [0.0, 0.27083, 0.0625, 0.04167, 0.0, 0.02083, 0.04167, 0.0, 0.0625, 0.04167, 0.0, 0.3125, 0.10417, 0.04167]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 2, 3, 5]
+StringLegalActions() = ["a", "c", "d", "f"]
+
+# Apply action "a"
+action: 0
+
+# State 34
+IsTerminal() = False
+ToString() = "Player 1 score = 2\n  f  e  d  c  b  a\n 15  0  2  4  1  0\n  0 13  3  2  0  1\n  A  B  C  D  E  F\nPlayer 0 score = 5 [PLAYING]\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Observation(0) = "0 | 5 2 | 0 13 3 2 0 1 0 1 4 2 0 15"
+Observation(1) = "0 | 5 2 | 0 13 3 2 0 1 0 1 4 2 0 15"
+ObservationAsNormalizedVector(0) = [0.0, 0.27083, 0.0625, 0.04167, 0.0, 0.02083, 0.0, 0.02083, 0.08333, 0.04167, 0.0, 0.3125, 0.10417, 0.04167]
+ObservationAsNormalizedVector(1) = [0.0, 0.27083, 0.0625, 0.04167, 0.0, 0.02083, 0.0, 0.02083, 0.08333, 0.04167, 0.0, 0.3125, 0.10417, 0.04167]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [1, 2, 3, 5]
+StringLegalActions() = ["B", "C", "D", "F"]
+
+# Apply action "F"
+action: 5
+
+# State 35
+IsTerminal() = False
+ToString() = "Player 1 score = 2 [PLAYING]\n  f  e  d  c  b  a\n 15  0  2  4  1  1\n  0 13  3  2  0  0\n  A  B  C  D  E  F\nPlayer 0 score = 5\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Observation(0) = "1 | 5 2 | 0 13 3 2 0 0 1 1 4 2 0 15"
+Observation(1) = "1 | 5 2 | 0 13 3 2 0 0 1 1 4 2 0 15"
+ObservationAsNormalizedVector(0) = [0.0, 0.27083, 0.0625, 0.04167, 0.0, 0.0, 0.02083, 0.02083, 0.08333, 0.04167, 0.0, 0.3125, 0.10417, 0.04167]
+ObservationAsNormalizedVector(1) = [0.0, 0.27083, 0.0625, 0.04167, 0.0, 0.0, 0.02083, 0.02083, 0.08333, 0.04167, 0.0, 0.3125, 0.10417, 0.04167]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 3, 5]
+StringLegalActions() = ["a", "b", "c", "d", "f"]
+
+# Apply action "b"
+action: 1
+
+# State 36
+IsTerminal() = False
+ToString() = "Player 1 score = 2\n  f  e  d  c  b  a\n 15  0  2  5  0  1\n  0 13  3  2  0  0\n  A  B  C  D  E  F\nPlayer 0 score = 5 [PLAYING]\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Observation(0) = "0 | 5 2 | 0 13 3 2 0 0 1 0 5 2 0 15"
+Observation(1) = "0 | 5 2 | 0 13 3 2 0 0 1 0 5 2 0 15"
+ObservationAsNormalizedVector(0) = [0.0, 0.27083, 0.0625, 0.04167, 0.0, 0.0, 0.02083, 0.0, 0.10417, 0.04167, 0.0, 0.3125, 0.10417, 0.04167]
+ObservationAsNormalizedVector(1) = [0.0, 0.27083, 0.0625, 0.04167, 0.0, 0.0, 0.02083, 0.0, 0.10417, 0.04167, 0.0, 0.3125, 0.10417, 0.04167]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [1, 2, 3]
+StringLegalActions() = ["B", "C", "D"]
+
+# Apply action "B"
+action: 1
+
+# State 37
+IsTerminal() = False
+ToString() = "Player 1 score = 2 [PLAYING]\n  f  e  d  c  b  a\n 16  1  3  6  1  2\n  1  0  5  4  1  1\n  A  B  C  D  E  F\nPlayer 0 score = 5\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Observation(0) = "1 | 5 2 | 1 0 5 4 1 1 2 1 6 3 1 16"
+Observation(1) = "1 | 5 2 | 1 0 5 4 1 1 2 1 6 3 1 16"
+ObservationAsNormalizedVector(0) = [0.02083, 0.0, 0.10417, 0.08333, 0.02083, 0.02083, 0.04167, 0.02083, 0.125, 0.0625, 0.02083, 0.33333, 0.10417, 0.04167]
+ObservationAsNormalizedVector(1) = [0.02083, 0.0, 0.10417, 0.08333, 0.02083, 0.02083, 0.04167, 0.02083, 0.125, 0.0625, 0.02083, 0.33333, 0.10417, 0.04167]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 3, 4, 5]
+StringLegalActions() = ["a", "b", "c", "d", "e", "f"]
+
+# Apply action "e"
+action: 4
+
+# State 38
+IsTerminal() = False
+ToString() = "Player 1 score = 2\n  f  e  d  c  b  a\n 17  0  3  6  1  2\n  1  0  5  4  1  1\n  A  B  C  D  E  F\nPlayer 0 score = 5 [PLAYING]\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Observation(0) = "0 | 5 2 | 1 0 5 4 1 1 2 1 6 3 0 17"
+Observation(1) = "0 | 5 2 | 1 0 5 4 1 1 2 1 6 3 0 17"
+ObservationAsNormalizedVector(0) = [0.02083, 0.0, 0.10417, 0.08333, 0.02083, 0.02083, 0.04167, 0.02083, 0.125, 0.0625, 0.0, 0.35417, 0.10417, 0.04167]
+ObservationAsNormalizedVector(1) = [0.02083, 0.0, 0.10417, 0.08333, 0.02083, 0.02083, 0.04167, 0.02083, 0.125, 0.0625, 0.0, 0.35417, 0.10417, 0.04167]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 2, 3, 4, 5]
+StringLegalActions() = ["A", "C", "D", "E", "F"]
+
+# Apply action "A"
+action: 0
+
+# State 39
+IsTerminal() = False
+ToString() = "Player 1 score = 2 [PLAYING]\n  f  e  d  c  b  a\n 17  0  3  6  1  2\n  0  1  5  4  1  1\n  A  B  C  D  E  F\nPlayer 0 score = 5\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Observation(0) = "1 | 5 2 | 0 1 5 4 1 1 2 1 6 3 0 17"
+Observation(1) = "1 | 5 2 | 0 1 5 4 1 1 2 1 6 3 0 17"
+ObservationAsNormalizedVector(0) = [0.0, 0.02083, 0.10417, 0.08333, 0.02083, 0.02083, 0.04167, 0.02083, 0.125, 0.0625, 0.0, 0.35417, 0.10417, 0.04167]
+ObservationAsNormalizedVector(1) = [0.0, 0.02083, 0.10417, 0.08333, 0.02083, 0.02083, 0.04167, 0.02083, 0.125, 0.0625, 0.0, 0.35417, 0.10417, 0.04167]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 3, 5]
+StringLegalActions() = ["a", "b", "c", "d", "f"]
+
+# Apply action "d"
+action: 3
+
+# State 40
+IsTerminal() = False
+ToString() = "Player 1 score = 2\n  f  e  d  c  b  a\n 18  1  0  6  1  2\n  1  1  5  4  1  1\n  A  B  C  D  E  F\nPlayer 0 score = 5 [PLAYING]\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Observation(0) = "0 | 5 2 | 1 1 5 4 1 1 2 1 6 0 1 18"
+Observation(1) = "0 | 5 2 | 1 1 5 4 1 1 2 1 6 0 1 18"
+ObservationAsNormalizedVector(0) = [0.02083, 0.02083, 0.10417, 0.08333, 0.02083, 0.02083, 0.04167, 0.02083, 0.125, 0.0, 0.02083, 0.375, 0.10417, 0.04167]
+ObservationAsNormalizedVector(1) = [0.02083, 0.02083, 0.10417, 0.08333, 0.02083, 0.02083, 0.04167, 0.02083, 0.125, 0.0, 0.02083, 0.375, 0.10417, 0.04167]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 3, 4, 5]
+StringLegalActions() = ["A", "B", "C", "D", "E", "F"]
+
+# Apply action "D"
+action: 3
+
+# State 41
+IsTerminal() = False
+ToString() = "Player 1 score = 2 [PLAYING]\n  f  e  d  c  b  a\n 18  1  0  6  0  0\n  1  1  5  0  2  2\n  A  B  C  D  E  F\nPlayer 0 score = 10\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Observation(0) = "1 | 10 2 | 1 1 5 0 2 2 0 0 6 0 1 18"
+Observation(1) = "1 | 10 2 | 1 1 5 0 2 2 0 0 6 0 1 18"
+ObservationAsNormalizedVector(0) = [0.02083, 0.02083, 0.10417, 0.0, 0.04167, 0.04167, 0.0, 0.0, 0.125, 0.0, 0.02083, 0.375, 0.20833, 0.04167]
+ObservationAsNormalizedVector(1) = [0.02083, 0.02083, 0.10417, 0.0, 0.04167, 0.04167, 0.0, 0.0, 0.125, 0.0, 0.02083, 0.375, 0.20833, 0.04167]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [2, 4, 5]
+StringLegalActions() = ["c", "e", "f"]
+
+# Apply action "e"
+action: 4
+
+# State 42
+IsTerminal() = False
+ToString() = "Player 1 score = 2\n  f  e  d  c  b  a\n 19  0  0  6  0  0\n  1  1  5  0  2  2\n  A  B  C  D  E  F\nPlayer 0 score = 10 [PLAYING]\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Observation(0) = "0 | 10 2 | 1 1 5 0 2 2 0 0 6 0 0 19"
+Observation(1) = "0 | 10 2 | 1 1 5 0 2 2 0 0 6 0 0 19"
+ObservationAsNormalizedVector(0) = [0.02083, 0.02083, 0.10417, 0.0, 0.04167, 0.04167, 0.0, 0.0, 0.125, 0.0, 0.0, 0.39583, 0.20833, 0.04167]
+ObservationAsNormalizedVector(1) = [0.02083, 0.02083, 0.10417, 0.0, 0.04167, 0.04167, 0.0, 0.0, 0.125, 0.0, 0.0, 0.39583, 0.20833, 0.04167]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 4, 5]
+StringLegalActions() = ["A", "B", "C", "E", "F"]
+
+# Apply action "B"
+action: 1
+
+# State 43
+IsTerminal() = False
+ToString() = "Player 1 score = 2 [PLAYING]\n  f  e  d  c  b  a\n 19  0  0  6  0  0\n  1  0  6  0  2  2\n  A  B  C  D  E  F\nPlayer 0 score = 10\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Observation(0) = "1 | 10 2 | 1 0 6 0 2 2 0 0 6 0 0 19"
+Observation(1) = "1 | 10 2 | 1 0 6 0 2 2 0 0 6 0 0 19"
+ObservationAsNormalizedVector(0) = [0.02083, 0.0, 0.125, 0.0, 0.04167, 0.04167, 0.0, 0.0, 0.125, 0.0, 0.0, 0.39583, 0.20833, 0.04167]
+ObservationAsNormalizedVector(1) = [0.02083, 0.0, 0.125, 0.0, 0.04167, 0.04167, 0.0, 0.0, 0.125, 0.0, 0.0, 0.39583, 0.20833, 0.04167]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [2, 5]
+StringLegalActions() = ["c", "f"]
+
+# Apply action "f"
+action: 5
+
+# State 44
+IsTerminal() = False
+ToString() = "Player 1 score = 2\n  f  e  d  c  b  a\n  0  1  1  7  2  2\n  3  2  8  2  4  4\n  A  B  C  D  E  F\nPlayer 0 score = 10 [PLAYING]\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Observation(0) = "0 | 10 2 | 3 2 8 2 4 4 2 2 7 1 1 0"
+Observation(1) = "0 | 10 2 | 3 2 8 2 4 4 2 2 7 1 1 0"
+ObservationAsNormalizedVector(0) = [0.0625, 0.04167, 0.16667, 0.04167, 0.08333, 0.08333, 0.04167, 0.04167, 0.14583, 0.02083, 0.02083, 0.0, 0.20833, 0.04167]
+ObservationAsNormalizedVector(1) = [0.0625, 0.04167, 0.16667, 0.04167, 0.08333, 0.08333, 0.04167, 0.04167, 0.14583, 0.02083, 0.02083, 0.0, 0.20833, 0.04167]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 3, 4, 5]
+StringLegalActions() = ["A", "B", "C", "D", "E", "F"]
+
+# Apply action "D"
+action: 3
+
+# State 45
+IsTerminal() = False
+ToString() = "Player 1 score = 2 [PLAYING]\n  f  e  d  c  b  a\n  0  1  1  7  2  2\n  3  2  8  0  5  5\n  A  B  C  D  E  F\nPlayer 0 score = 10\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Observation(0) = "1 | 10 2 | 3 2 8 0 5 5 2 2 7 1 1 0"
+Observation(1) = "1 | 10 2 | 3 2 8 0 5 5 2 2 7 1 1 0"
+ObservationAsNormalizedVector(0) = [0.0625, 0.04167, 0.16667, 0.0, 0.10417, 0.10417, 0.04167, 0.04167, 0.14583, 0.02083, 0.02083, 0.0, 0.20833, 0.04167]
+ObservationAsNormalizedVector(1) = [0.0625, 0.04167, 0.16667, 0.0, 0.10417, 0.10417, 0.04167, 0.04167, 0.14583, 0.02083, 0.02083, 0.0, 0.20833, 0.04167]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 3, 4]
+StringLegalActions() = ["a", "b", "c", "d", "e"]
+
+# Apply action "c"
+action: 2
+
+# State 46
+IsTerminal() = False
+ToString() = "Player 1 score = 2\n  f  e  d  c  b  a\n  1  2  2  0  2  2\n  4  3  9  1  5  5\n  A  B  C  D  E  F\nPlayer 0 score = 10 [PLAYING]\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Observation(0) = "0 | 10 2 | 4 3 9 1 5 5 2 2 0 2 2 1"
+Observation(1) = "0 | 10 2 | 4 3 9 1 5 5 2 2 0 2 2 1"
+ObservationAsNormalizedVector(0) = [0.08333, 0.0625, 0.1875, 0.02083, 0.10417, 0.10417, 0.04167, 0.04167, 0.0, 0.04167, 0.04167, 0.02083, 0.20833, 0.04167]
+ObservationAsNormalizedVector(1) = [0.08333, 0.0625, 0.1875, 0.02083, 0.10417, 0.10417, 0.04167, 0.04167, 0.0, 0.04167, 0.04167, 0.02083, 0.20833, 0.04167]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 3, 4, 5]
+StringLegalActions() = ["A", "B", "C", "D", "E", "F"]
+
+# Apply action "A"
+action: 0
+
+# State 47
+IsTerminal() = False
+ToString() = "Player 1 score = 2 [PLAYING]\n  f  e  d  c  b  a\n  1  2  2  0  2  2\n  0  4 10  2  6  5\n  A  B  C  D  E  F\nPlayer 0 score = 10\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Observation(0) = "1 | 10 2 | 0 4 10 2 6 5 2 2 0 2 2 1"
+Observation(1) = "1 | 10 2 | 0 4 10 2 6 5 2 2 0 2 2 1"
+ObservationAsNormalizedVector(0) = [0.0, 0.08333, 0.20833, 0.04167, 0.125, 0.10417, 0.04167, 0.04167, 0.0, 0.04167, 0.04167, 0.02083, 0.20833, 0.04167]
+ObservationAsNormalizedVector(1) = [0.0, 0.08333, 0.20833, 0.04167, 0.125, 0.10417, 0.04167, 0.04167, 0.0, 0.04167, 0.04167, 0.02083, 0.20833, 0.04167]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 3, 4, 5]
+StringLegalActions() = ["a", "b", "d", "e", "f"]
+
+# Apply action "d"
+action: 3
+
+# State 48
+IsTerminal() = False
+ToString() = "Player 1 score = 2\n  f  e  d  c  b  a\n  2  3  0  0  2  2\n  0  4 10  2  6  5\n  A  B  C  D  E  F\nPlayer 0 score = 10 [PLAYING]\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Observation(0) = "0 | 10 2 | 0 4 10 2 6 5 2 2 0 0 3 2"
+Observation(1) = "0 | 10 2 | 0 4 10 2 6 5 2 2 0 0 3 2"
+ObservationAsNormalizedVector(0) = [0.0, 0.08333, 0.20833, 0.04167, 0.125, 0.10417, 0.04167, 0.04167, 0.0, 0.0, 0.0625, 0.04167, 0.20833, 0.04167]
+ObservationAsNormalizedVector(1) = [0.0, 0.08333, 0.20833, 0.04167, 0.125, 0.10417, 0.04167, 0.04167, 0.0, 0.0, 0.0625, 0.04167, 0.20833, 0.04167]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [1, 2, 3, 4, 5]
+StringLegalActions() = ["B", "C", "D", "E", "F"]
+
+# Apply action "F"
+action: 5
+
+# State 49
+IsTerminal() = False
+ToString() = "Player 1 score = 2 [PLAYING]\n  f  e  d  c  b  a\n  2  4  1  1  3  3\n  0  4 10  2  6  0\n  A  B  C  D  E  F\nPlayer 0 score = 10\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Observation(0) = "1 | 10 2 | 0 4 10 2 6 0 3 3 1 1 4 2"
+Observation(1) = "1 | 10 2 | 0 4 10 2 6 0 3 3 1 1 4 2"
+ObservationAsNormalizedVector(0) = [0.0, 0.08333, 0.20833, 0.04167, 0.125, 0.0, 0.0625, 0.0625, 0.02083, 0.02083, 0.08333, 0.04167, 0.20833, 0.04167]
+ObservationAsNormalizedVector(1) = [0.0, 0.08333, 0.20833, 0.04167, 0.125, 0.0, 0.0625, 0.0625, 0.02083, 0.02083, 0.08333, 0.04167, 0.20833, 0.04167]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 3, 4, 5]
+StringLegalActions() = ["a", "b", "c", "d", "e", "f"]
+
+# Apply action "f"
+action: 5
+
+# State 50
+IsTerminal() = False
+ToString() = "Player 1 score = 2\n  f  e  d  c  b  a\n  0  4  1  1  3  3\n  1  5 10  2  6  0\n  A  B  C  D  E  F\nPlayer 0 score = 10 [PLAYING]\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Observation(0) = "0 | 10 2 | 1 5 10 2 6 0 3 3 1 1 4 0"
+Observation(1) = "0 | 10 2 | 1 5 10 2 6 0 3 3 1 1 4 0"
+ObservationAsNormalizedVector(0) = [0.02083, 0.10417, 0.20833, 0.04167, 0.125, 0.0, 0.0625, 0.0625, 0.02083, 0.02083, 0.08333, 0.0, 0.20833, 0.04167]
+ObservationAsNormalizedVector(1) = [0.02083, 0.10417, 0.20833, 0.04167, 0.125, 0.0, 0.0625, 0.0625, 0.02083, 0.02083, 0.08333, 0.0, 0.20833, 0.04167]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 3, 4]
+StringLegalActions() = ["A", "B", "C", "D", "E"]
+
+# Apply action "B"
+action: 1
+
+# State 51
+IsTerminal() = False
+ToString() = "Player 1 score = 2 [PLAYING]\n  f  e  d  c  b  a\n  0  4  1  1  3  4\n  1  0 11  3  7  1\n  A  B  C  D  E  F\nPlayer 0 score = 10\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Observation(0) = "1 | 10 2 | 1 0 11 3 7 1 4 3 1 1 4 0"
+Observation(1) = "1 | 10 2 | 1 0 11 3 7 1 4 3 1 1 4 0"
+ObservationAsNormalizedVector(0) = [0.02083, 0.0, 0.22917, 0.0625, 0.14583, 0.02083, 0.08333, 0.0625, 0.02083, 0.02083, 0.08333, 0.0, 0.20833, 0.04167]
+ObservationAsNormalizedVector(1) = [0.02083, 0.0, 0.22917, 0.0625, 0.14583, 0.02083, 0.08333, 0.0625, 0.02083, 0.02083, 0.08333, 0.0, 0.20833, 0.04167]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 3, 4]
+StringLegalActions() = ["a", "b", "c", "d", "e"]
+
+# Apply action "b"
+action: 1
+
+# State 52
+IsTerminal() = False
+ToString() = "Player 1 score = 2\n  f  e  d  c  b  a\n  0  5  2  2  0  4\n  1  0 11  3  7  1\n  A  B  C  D  E  F\nPlayer 0 score = 10 [PLAYING]\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Observation(0) = "0 | 10 2 | 1 0 11 3 7 1 4 0 2 2 5 0"
+Observation(1) = "0 | 10 2 | 1 0 11 3 7 1 4 0 2 2 5 0"
+ObservationAsNormalizedVector(0) = [0.02083, 0.0, 0.22917, 0.0625, 0.14583, 0.02083, 0.08333, 0.0, 0.04167, 0.04167, 0.10417, 0.0, 0.20833, 0.04167]
+ObservationAsNormalizedVector(1) = [0.02083, 0.0, 0.22917, 0.0625, 0.14583, 0.02083, 0.08333, 0.0, 0.04167, 0.04167, 0.10417, 0.0, 0.20833, 0.04167]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 2, 3, 4, 5]
+StringLegalActions() = ["A", "C", "D", "E", "F"]
+
+# Apply action "D"
+action: 3
+
+# State 53
+IsTerminal() = False
+ToString() = "Player 1 score = 2 [PLAYING]\n  f  e  d  c  b  a\n  0  5  2  2  0  5\n  1  0 11  0  8  2\n  A  B  C  D  E  F\nPlayer 0 score = 10\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Observation(0) = "1 | 10 2 | 1 0 11 0 8 2 5 0 2 2 5 0"
+Observation(1) = "1 | 10 2 | 1 0 11 0 8 2 5 0 2 2 5 0"
+ObservationAsNormalizedVector(0) = [0.02083, 0.0, 0.22917, 0.0, 0.16667, 0.04167, 0.10417, 0.0, 0.04167, 0.04167, 0.10417, 0.0, 0.20833, 0.04167]
+ObservationAsNormalizedVector(1) = [0.02083, 0.0, 0.22917, 0.0, 0.16667, 0.04167, 0.10417, 0.0, 0.04167, 0.04167, 0.10417, 0.0, 0.20833, 0.04167]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 2, 3, 4]
+StringLegalActions() = ["a", "c", "d", "e"]
+
+# Apply action "c"
+action: 2
+
+# State 54
+IsTerminal() = False
+ToString() = "Player 1 score = 2\n  f  e  d  c  b  a\n  0  6  3  0  0  5\n  1  0 11  0  8  2\n  A  B  C  D  E  F\nPlayer 0 score = 10 [PLAYING]\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Observation(0) = "0 | 10 2 | 1 0 11 0 8 2 5 0 0 3 6 0"
+Observation(1) = "0 | 10 2 | 1 0 11 0 8 2 5 0 0 3 6 0"
+ObservationAsNormalizedVector(0) = [0.02083, 0.0, 0.22917, 0.0, 0.16667, 0.04167, 0.10417, 0.0, 0.0, 0.0625, 0.125, 0.0, 0.20833, 0.04167]
+ObservationAsNormalizedVector(1) = [0.02083, 0.0, 0.22917, 0.0, 0.16667, 0.04167, 0.10417, 0.0, 0.0, 0.0625, 0.125, 0.0, 0.20833, 0.04167]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 2, 4, 5]
+StringLegalActions() = ["A", "C", "E", "F"]
+
+# Apply action "C"
+action: 2
+
+# State 55
+IsTerminal() = False
+ToString() = "Player 1 score = 2 [PLAYING]\n  f  e  d  c  b  a\n  1  7  4  1  1  6\n  2  1  0  1  9  3\n  A  B  C  D  E  F\nPlayer 0 score = 10\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Observation(0) = "1 | 10 2 | 2 1 0 1 9 3 6 1 1 4 7 1"
+Observation(1) = "1 | 10 2 | 2 1 0 1 9 3 6 1 1 4 7 1"
+ObservationAsNormalizedVector(0) = [0.04167, 0.02083, 0.0, 0.02083, 0.1875, 0.0625, 0.125, 0.02083, 0.02083, 0.08333, 0.14583, 0.02083, 0.20833, 0.04167]
+ObservationAsNormalizedVector(1) = [0.04167, 0.02083, 0.0, 0.02083, 0.1875, 0.0625, 0.125, 0.02083, 0.02083, 0.08333, 0.14583, 0.02083, 0.20833, 0.04167]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 3, 4, 5]
+StringLegalActions() = ["a", "b", "c", "d", "e", "f"]
+
+# Apply action "d"
+action: 3
+
+# State 56
+IsTerminal() = False
+ToString() = "Player 1 score = 7\n  f  e  d  c  b  a\n  2  8  0  1  1  6\n  0  0  0  1  9  3\n  A  B  C  D  E  F\nPlayer 0 score = 10 [PLAYING]\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Observation(0) = "0 | 10 7 | 0 0 0 1 9 3 6 1 1 0 8 2"
+Observation(1) = "0 | 10 7 | 0 0 0 1 9 3 6 1 1 0 8 2"
+ObservationAsNormalizedVector(0) = [0.0, 0.0, 0.0, 0.02083, 0.1875, 0.0625, 0.125, 0.02083, 0.02083, 0.0, 0.16667, 0.04167, 0.20833, 0.14583]
+ObservationAsNormalizedVector(1) = [0.0, 0.0, 0.0, 0.02083, 0.1875, 0.0625, 0.125, 0.02083, 0.02083, 0.0, 0.16667, 0.04167, 0.20833, 0.14583]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [3, 4, 5]
+StringLegalActions() = ["D", "E", "F"]
+
+# Apply action "F"
+action: 5
+
+# State 57
+IsTerminal() = False
+ToString() = "Player 1 score = 7 [PLAYING]\n  f  e  d  c  b  a\n  2  8  0  0  0  7\n  0  0  0  1  9  0\n  A  B  C  D  E  F\nPlayer 0 score = 14\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Observation(0) = "1 | 14 7 | 0 0 0 1 9 0 7 0 0 0 8 2"
+Observation(1) = "1 | 14 7 | 0 0 0 1 9 0 7 0 0 0 8 2"
+ObservationAsNormalizedVector(0) = [0.0, 0.0, 0.0, 0.02083, 0.1875, 0.0, 0.14583, 0.0, 0.0, 0.0, 0.16667, 0.04167, 0.29167, 0.14583]
+ObservationAsNormalizedVector(1) = [0.0, 0.0, 0.0, 0.02083, 0.1875, 0.0, 0.14583, 0.0, 0.0, 0.0, 0.16667, 0.04167, 0.29167, 0.14583]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 4, 5]
+StringLegalActions() = ["a", "e", "f"]
+
+# Apply action "f"
+action: 5
+
+# State 58
+IsTerminal() = False
+ToString() = "Player 1 score = 7\n  f  e  d  c  b  a\n  0  8  0  0  0  7\n  1  1  0  1  9  0\n  A  B  C  D  E  F\nPlayer 0 score = 14 [PLAYING]\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Observation(0) = "0 | 14 7 | 1 1 0 1 9 0 7 0 0 0 8 0"
+Observation(1) = "0 | 14 7 | 1 1 0 1 9 0 7 0 0 0 8 0"
+ObservationAsNormalizedVector(0) = [0.02083, 0.02083, 0.0, 0.02083, 0.1875, 0.0, 0.14583, 0.0, 0.0, 0.0, 0.16667, 0.0, 0.29167, 0.14583]
+ObservationAsNormalizedVector(1) = [0.02083, 0.02083, 0.0, 0.02083, 0.1875, 0.0, 0.14583, 0.0, 0.0, 0.0, 0.16667, 0.0, 0.29167, 0.14583]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 3, 4]
+StringLegalActions() = ["A", "B", "D", "E"]
+
+# Apply action "E"
+action: 4
+
+# State 59
+IsTerminal() = False
+ToString() = "Player 1 score = 7 [PLAYING]\n  f  e  d  c  b  a\n  1  9  1  1  1  8\n  2  2  0  1  0  1\n  A  B  C  D  E  F\nPlayer 0 score = 14\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Observation(0) = "1 | 14 7 | 2 2 0 1 0 1 8 1 1 1 9 1"
+Observation(1) = "1 | 14 7 | 2 2 0 1 0 1 8 1 1 1 9 1"
+ObservationAsNormalizedVector(0) = [0.04167, 0.04167, 0.0, 0.02083, 0.0, 0.02083, 0.16667, 0.02083, 0.02083, 0.02083, 0.1875, 0.02083, 0.29167, 0.14583]
+ObservationAsNormalizedVector(1) = [0.04167, 0.04167, 0.0, 0.02083, 0.0, 0.02083, 0.16667, 0.02083, 0.02083, 0.02083, 0.1875, 0.02083, 0.29167, 0.14583]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 3, 4, 5]
+StringLegalActions() = ["a", "b", "c", "d", "e", "f"]
+
+# Apply action "f"
+action: 5
+
+# State 60
+IsTerminal() = False
+ToString() = "Player 1 score = 10\n  f  e  d  c  b  a\n  0  9  1  1  1  8\n  0  2  0  1  0  1\n  A  B  C  D  E  F\nPlayer 0 score = 14 [PLAYING]\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Observation(0) = "0 | 14 10 | 0 2 0 1 0 1 8 1 1 1 9 0"
+Observation(1) = "0 | 14 10 | 0 2 0 1 0 1 8 1 1 1 9 0"
+ObservationAsNormalizedVector(0) = [0.0, 0.04167, 0.0, 0.02083, 0.0, 0.02083, 0.16667, 0.02083, 0.02083, 0.02083, 0.1875, 0.0, 0.29167, 0.20833]
+ObservationAsNormalizedVector(1) = [0.0, 0.04167, 0.0, 0.02083, 0.0, 0.02083, 0.16667, 0.02083, 0.02083, 0.02083, 0.1875, 0.0, 0.29167, 0.20833]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [1, 3, 5]
+StringLegalActions() = ["B", "D", "F"]
+
+# Apply action "D"
+action: 3
+
+# State 61
+IsTerminal() = False
+ToString() = "Player 1 score = 10 [PLAYING]\n  f  e  d  c  b  a\n  0  9  1  1  1  8\n  0  2  0  0  1  1\n  A  B  C  D  E  F\nPlayer 0 score = 14\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Observation(0) = "1 | 14 10 | 0 2 0 0 1 1 8 1 1 1 9 0"
+Observation(1) = "1 | 14 10 | 0 2 0 0 1 1 8 1 1 1 9 0"
+ObservationAsNormalizedVector(0) = [0.0, 0.04167, 0.0, 0.0, 0.02083, 0.02083, 0.16667, 0.02083, 0.02083, 0.02083, 0.1875, 0.0, 0.29167, 0.20833]
+ObservationAsNormalizedVector(1) = [0.0, 0.04167, 0.0, 0.0, 0.02083, 0.02083, 0.16667, 0.02083, 0.02083, 0.02083, 0.1875, 0.0, 0.29167, 0.20833]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 3, 4]
+StringLegalActions() = ["a", "b", "c", "d", "e"]
+
+# Apply action "d"
+action: 3
+
+# State 62
+IsTerminal() = False
+ToString() = "Player 1 score = 10\n  f  e  d  c  b  a\n  0 10  0  1  1  8\n  0  2  0  0  1  1\n  A  B  C  D  E  F\nPlayer 0 score = 14 [PLAYING]\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Observation(0) = "0 | 14 10 | 0 2 0 0 1 1 8 1 1 0 10 0"
+Observation(1) = "0 | 14 10 | 0 2 0 0 1 1 8 1 1 0 10 0"
+ObservationAsNormalizedVector(0) = [0.0, 0.04167, 0.0, 0.0, 0.02083, 0.02083, 0.16667, 0.02083, 0.02083, 0.0, 0.20833, 0.0, 0.29167, 0.20833]
+ObservationAsNormalizedVector(1) = [0.0, 0.04167, 0.0, 0.0, 0.02083, 0.02083, 0.16667, 0.02083, 0.02083, 0.0, 0.20833, 0.0, 0.29167, 0.20833]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [1, 4, 5]
+StringLegalActions() = ["B", "E", "F"]
+
+# Apply action "B"
+action: 1
+
+# State 63
+IsTerminal() = False
+ToString() = "Player 1 score = 10 [PLAYING]\n  f  e  d  c  b  a\n  0 10  0  1  1  8\n  0  0  1  1  1  1\n  A  B  C  D  E  F\nPlayer 0 score = 14\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Observation(0) = "1 | 14 10 | 0 0 1 1 1 1 8 1 1 0 10 0"
+Observation(1) = "1 | 14 10 | 0 0 1 1 1 1 8 1 1 0 10 0"
+ObservationAsNormalizedVector(0) = [0.0, 0.0, 0.02083, 0.02083, 0.02083, 0.02083, 0.16667, 0.02083, 0.02083, 0.0, 0.20833, 0.0, 0.29167, 0.20833]
+ObservationAsNormalizedVector(1) = [0.0, 0.0, 0.02083, 0.02083, 0.02083, 0.02083, 0.16667, 0.02083, 0.02083, 0.0, 0.20833, 0.0, 0.29167, 0.20833]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 4]
+StringLegalActions() = ["a", "b", "c", "e"]
+
+# Apply action "e"
+action: 4
+
+# State 64
+IsTerminal() = False
+ToString() = "Player 1 score = 10\n  f  e  d  c  b  a\n  1  0  0  2  2  9\n  1  1  2  2  2  2\n  A  B  C  D  E  F\nPlayer 0 score = 14 [PLAYING]\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Observation(0) = "0 | 14 10 | 1 1 2 2 2 2 9 2 2 0 0 1"
+Observation(1) = "0 | 14 10 | 1 1 2 2 2 2 9 2 2 0 0 1"
+ObservationAsNormalizedVector(0) = [0.02083, 0.02083, 0.04167, 0.04167, 0.04167, 0.04167, 0.1875, 0.04167, 0.04167, 0.0, 0.0, 0.02083, 0.29167, 0.20833]
+ObservationAsNormalizedVector(1) = [0.02083, 0.02083, 0.04167, 0.04167, 0.04167, 0.04167, 0.1875, 0.04167, 0.04167, 0.0, 0.0, 0.02083, 0.29167, 0.20833]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 3, 4, 5]
+StringLegalActions() = ["A", "B", "C", "D", "E", "F"]
+
+# Apply action "D"
+action: 3
+
+# State 65
+IsTerminal() = False
+ToString() = "Player 1 score = 10 [PLAYING]\n  f  e  d  c  b  a\n  1  0  0  2  2  9\n  1  1  2  0  3  3\n  A  B  C  D  E  F\nPlayer 0 score = 14\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Observation(0) = "1 | 14 10 | 1 1 2 0 3 3 9 2 2 0 0 1"
+Observation(1) = "1 | 14 10 | 1 1 2 0 3 3 9 2 2 0 0 1"
+ObservationAsNormalizedVector(0) = [0.02083, 0.02083, 0.04167, 0.0, 0.0625, 0.0625, 0.1875, 0.04167, 0.04167, 0.0, 0.0, 0.02083, 0.29167, 0.20833]
+ObservationAsNormalizedVector(1) = [0.02083, 0.02083, 0.04167, 0.0, 0.0625, 0.0625, 0.1875, 0.04167, 0.04167, 0.0, 0.0, 0.02083, 0.29167, 0.20833]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 5]
+StringLegalActions() = ["a", "b", "c", "f"]
+
+# Apply action "b"
+action: 1
+
+# State 66
+IsTerminal() = False
+ToString() = "Player 1 score = 10\n  f  e  d  c  b  a\n  1  0  1  3  0  9\n  1  1  2  0  3  3\n  A  B  C  D  E  F\nPlayer 0 score = 14 [PLAYING]\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Observation(0) = "0 | 14 10 | 1 1 2 0 3 3 9 0 3 1 0 1"
+Observation(1) = "0 | 14 10 | 1 1 2 0 3 3 9 0 3 1 0 1"
+ObservationAsNormalizedVector(0) = [0.02083, 0.02083, 0.04167, 0.0, 0.0625, 0.0625, 0.1875, 0.0, 0.0625, 0.02083, 0.0, 0.02083, 0.29167, 0.20833]
+ObservationAsNormalizedVector(1) = [0.02083, 0.02083, 0.04167, 0.0, 0.0625, 0.0625, 0.1875, 0.0, 0.0625, 0.02083, 0.0, 0.02083, 0.29167, 0.20833]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 4, 5]
+StringLegalActions() = ["A", "B", "C", "E", "F"]
+
+# Apply action "F"
+action: 5
+
+# State 67
+IsTerminal() = False
+ToString() = "Player 1 score = 10 [PLAYING]\n  f  e  d  c  b  a\n  1  0  1  4  1 10\n  1  1  2  0  3  0\n  A  B  C  D  E  F\nPlayer 0 score = 14\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Observation(0) = "1 | 14 10 | 1 1 2 0 3 0 10 1 4 1 0 1"
+Observation(1) = "1 | 14 10 | 1 1 2 0 3 0 10 1 4 1 0 1"
+ObservationAsNormalizedVector(0) = [0.02083, 0.02083, 0.04167, 0.0, 0.0625, 0.0, 0.20833, 0.02083, 0.08333, 0.02083, 0.0, 0.02083, 0.29167, 0.20833]
+ObservationAsNormalizedVector(1) = [0.02083, 0.02083, 0.04167, 0.0, 0.0625, 0.0, 0.20833, 0.02083, 0.08333, 0.02083, 0.0, 0.02083, 0.29167, 0.20833]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 3, 5]
+StringLegalActions() = ["a", "b", "c", "d", "f"]
+
+# Apply action "b"
+action: 1
+
+# State 68
+IsTerminal() = False
+ToString() = "Player 1 score = 10\n  f  e  d  c  b  a\n  1  0  1  5  0 10\n  1  1  2  0  3  0\n  A  B  C  D  E  F\nPlayer 0 score = 14 [PLAYING]\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Observation(0) = "0 | 14 10 | 1 1 2 0 3 0 10 0 5 1 0 1"
+Observation(1) = "0 | 14 10 | 1 1 2 0 3 0 10 0 5 1 0 1"
+ObservationAsNormalizedVector(0) = [0.02083, 0.02083, 0.04167, 0.0, 0.0625, 0.0, 0.20833, 0.0, 0.10417, 0.02083, 0.0, 0.02083, 0.29167, 0.20833]
+ObservationAsNormalizedVector(1) = [0.02083, 0.02083, 0.04167, 0.0, 0.0625, 0.0, 0.20833, 0.0, 0.10417, 0.02083, 0.0, 0.02083, 0.29167, 0.20833]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 4]
+StringLegalActions() = ["A", "B", "C", "E"]
+
+# Apply action "E"
+action: 4
+
+# State 69
+IsTerminal() = False
+ToString() = "Player 1 score = 10 [PLAYING]\n  f  e  d  c  b  a\n  1  0  1  5  1 11\n  1  1  2  0  0  1\n  A  B  C  D  E  F\nPlayer 0 score = 14\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Observation(0) = "1 | 14 10 | 1 1 2 0 0 1 11 1 5 1 0 1"
+Observation(1) = "1 | 14 10 | 1 1 2 0 0 1 11 1 5 1 0 1"
+ObservationAsNormalizedVector(0) = [0.02083, 0.02083, 0.04167, 0.0, 0.0, 0.02083, 0.22917, 0.02083, 0.10417, 0.02083, 0.0, 0.02083, 0.29167, 0.20833]
+ObservationAsNormalizedVector(1) = [0.02083, 0.02083, 0.04167, 0.0, 0.0, 0.02083, 0.22917, 0.02083, 0.10417, 0.02083, 0.0, 0.02083, 0.29167, 0.20833]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 3, 5]
+StringLegalActions() = ["a", "b", "c", "d", "f"]
+
+# Apply action "d"
+action: 3
+
+# State 70
+IsTerminal() = False
+ToString() = "Player 1 score = 10\n  f  e  d  c  b  a\n  1  1  0  5  1 11\n  1  1  2  0  0  1\n  A  B  C  D  E  F\nPlayer 0 score = 14 [PLAYING]\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Observation(0) = "0 | 14 10 | 1 1 2 0 0 1 11 1 5 0 1 1"
+Observation(1) = "0 | 14 10 | 1 1 2 0 0 1 11 1 5 0 1 1"
+ObservationAsNormalizedVector(0) = [0.02083, 0.02083, 0.04167, 0.0, 0.0, 0.02083, 0.22917, 0.02083, 0.10417, 0.0, 0.02083, 0.02083, 0.29167, 0.20833]
+ObservationAsNormalizedVector(1) = [0.02083, 0.02083, 0.04167, 0.0, 0.0, 0.02083, 0.22917, 0.02083, 0.10417, 0.0, 0.02083, 0.02083, 0.29167, 0.20833]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 5]
+StringLegalActions() = ["A", "B", "C", "F"]
+
+# Apply action "B"
+action: 1
+
+# State 71
+IsTerminal() = False
+ToString() = "Player 1 score = 10 [PLAYING]\n  f  e  d  c  b  a\n  1  1  0  5  1 11\n  1  0  3  0  0  1\n  A  B  C  D  E  F\nPlayer 0 score = 14\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Observation(0) = "1 | 14 10 | 1 0 3 0 0 1 11 1 5 0 1 1"
+Observation(1) = "1 | 14 10 | 1 0 3 0 0 1 11 1 5 0 1 1"
+ObservationAsNormalizedVector(0) = [0.02083, 0.0, 0.0625, 0.0, 0.0, 0.02083, 0.22917, 0.02083, 0.10417, 0.0, 0.02083, 0.02083, 0.29167, 0.20833]
+ObservationAsNormalizedVector(1) = [0.02083, 0.0, 0.0625, 0.0, 0.0, 0.02083, 0.22917, 0.02083, 0.10417, 0.0, 0.02083, 0.02083, 0.29167, 0.20833]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 4, 5]
+StringLegalActions() = ["a", "b", "c", "e", "f"]
+
+# Apply action "f"
+action: 5
+
+# State 72
+IsTerminal() = False
+ToString() = "Player 1 score = 12\n  f  e  d  c  b  a\n  0  1  0  5  1 11\n  0  0  3  0  0  1\n  A  B  C  D  E  F\nPlayer 0 score = 14 [PLAYING]\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Observation(0) = "0 | 14 12 | 0 0 3 0 0 1 11 1 5 0 1 0"
+Observation(1) = "0 | 14 12 | 0 0 3 0 0 1 11 1 5 0 1 0"
+ObservationAsNormalizedVector(0) = [0.0, 0.0, 0.0625, 0.0, 0.0, 0.02083, 0.22917, 0.02083, 0.10417, 0.0, 0.02083, 0.0, 0.29167, 0.25]
+ObservationAsNormalizedVector(1) = [0.0, 0.0, 0.0625, 0.0, 0.0, 0.02083, 0.22917, 0.02083, 0.10417, 0.0, 0.02083, 0.0, 0.29167, 0.25]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [2, 5]
+StringLegalActions() = ["C", "F"]
+
+# Apply action "C"
+action: 2
+
+# State 73
+IsTerminal() = False
+ToString() = "Player 1 score = 12 [PLAYING]\n  f  e  d  c  b  a\n  0  1  0  5  1 11\n  0  0  0  1  1  2\n  A  B  C  D  E  F\nPlayer 0 score = 14\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Observation(0) = "1 | 14 12 | 0 0 0 1 1 2 11 1 5 0 1 0"
+Observation(1) = "1 | 14 12 | 0 0 0 1 1 2 11 1 5 0 1 0"
+ObservationAsNormalizedVector(0) = [0.0, 0.0, 0.0, 0.02083, 0.02083, 0.04167, 0.22917, 0.02083, 0.10417, 0.0, 0.02083, 0.0, 0.29167, 0.25]
+ObservationAsNormalizedVector(1) = [0.0, 0.0, 0.0, 0.02083, 0.02083, 0.04167, 0.22917, 0.02083, 0.10417, 0.0, 0.02083, 0.0, 0.29167, 0.25]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 4]
+StringLegalActions() = ["a", "b", "c", "e"]
+
+# Apply action "b"
+action: 1
+
+# State 74
+IsTerminal() = False
+ToString() = "Player 1 score = 12\n  f  e  d  c  b  a\n  0  1  0  6  0 11\n  0  0  0  1  1  2\n  A  B  C  D  E  F\nPlayer 0 score = 14 [PLAYING]\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Observation(0) = "0 | 14 12 | 0 0 0 1 1 2 11 0 6 0 1 0"
+Observation(1) = "0 | 14 12 | 0 0 0 1 1 2 11 0 6 0 1 0"
+ObservationAsNormalizedVector(0) = [0.0, 0.0, 0.0, 0.02083, 0.02083, 0.04167, 0.22917, 0.0, 0.125, 0.0, 0.02083, 0.0, 0.29167, 0.25]
+ObservationAsNormalizedVector(1) = [0.0, 0.0, 0.0, 0.02083, 0.02083, 0.04167, 0.22917, 0.0, 0.125, 0.0, 0.02083, 0.0, 0.29167, 0.25]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [3, 4, 5]
+StringLegalActions() = ["D", "E", "F"]
+
+# Apply action "F"
+action: 5
+
+# State 75
+IsTerminal() = False
+ToString() = "Player 1 score = 12 [PLAYING]\n  f  e  d  c  b  a\n  0  1  0  6  1 12\n  0  0  0  1  1  0\n  A  B  C  D  E  F\nPlayer 0 score = 14\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Observation(0) = "1 | 14 12 | 0 0 0 1 1 0 12 1 6 0 1 0"
+Observation(1) = "1 | 14 12 | 0 0 0 1 1 0 12 1 6 0 1 0"
+ObservationAsNormalizedVector(0) = [0.0, 0.0, 0.0, 0.02083, 0.02083, 0.0, 0.25, 0.02083, 0.125, 0.0, 0.02083, 0.0, 0.29167, 0.25]
+ObservationAsNormalizedVector(1) = [0.0, 0.0, 0.0, 0.02083, 0.02083, 0.0, 0.25, 0.02083, 0.125, 0.0, 0.02083, 0.0, 0.29167, 0.25]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 4]
+StringLegalActions() = ["a", "b", "c", "e"]
+
+# Apply action "b"
+action: 1
+
+# State 76
+IsTerminal() = False
+ToString() = "Player 1 score = 12\n  f  e  d  c  b  a\n  0  1  0  7  0 12\n  0  0  0  1  1  0\n  A  B  C  D  E  F\nPlayer 0 score = 14 [PLAYING]\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Observation(0) = "0 | 14 12 | 0 0 0 1 1 0 12 0 7 0 1 0"
+Observation(1) = "0 | 14 12 | 0 0 0 1 1 0 12 0 7 0 1 0"
+ObservationAsNormalizedVector(0) = [0.0, 0.0, 0.0, 0.02083, 0.02083, 0.0, 0.25, 0.0, 0.14583, 0.0, 0.02083, 0.0, 0.29167, 0.25]
+ObservationAsNormalizedVector(1) = [0.0, 0.0, 0.0, 0.02083, 0.02083, 0.0, 0.25, 0.0, 0.14583, 0.0, 0.02083, 0.0, 0.29167, 0.25]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [3, 4]
+StringLegalActions() = ["D", "E"]
+
+# Apply action "D"
+action: 3
+
+# State 77
+IsTerminal() = False
+ToString() = "Player 1 score = 12 [PLAYING]\n  f  e  d  c  b  a\n  0  1  0  7  0 12\n  0  0  0  0  2  0\n  A  B  C  D  E  F\nPlayer 0 score = 14\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Observation(0) = "1 | 14 12 | 0 0 0 0 2 0 12 0 7 0 1 0"
+Observation(1) = "1 | 14 12 | 0 0 0 0 2 0 12 0 7 0 1 0"
+ObservationAsNormalizedVector(0) = [0.0, 0.0, 0.0, 0.0, 0.04167, 0.0, 0.25, 0.0, 0.14583, 0.0, 0.02083, 0.0, 0.29167, 0.25]
+ObservationAsNormalizedVector(1) = [0.0, 0.0, 0.0, 0.0, 0.04167, 0.0, 0.25, 0.0, 0.14583, 0.0, 0.02083, 0.0, 0.29167, 0.25]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 2, 4]
+StringLegalActions() = ["a", "c", "e"]
+
+# Apply action "c"
+action: 2
+
+# State 78
+IsTerminal() = False
+ToString() = "Player 1 score = 12\n  f  e  d  c  b  a\n  1  2  1  0  0 12\n  1  1  1  1  2  0\n  A  B  C  D  E  F\nPlayer 0 score = 14 [PLAYING]\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Observation(0) = "0 | 14 12 | 1 1 1 1 2 0 12 0 0 1 2 1"
+Observation(1) = "0 | 14 12 | 1 1 1 1 2 0 12 0 0 1 2 1"
+ObservationAsNormalizedVector(0) = [0.02083, 0.02083, 0.02083, 0.02083, 0.04167, 0.0, 0.25, 0.0, 0.0, 0.02083, 0.04167, 0.02083, 0.29167, 0.25]
+ObservationAsNormalizedVector(1) = [0.02083, 0.02083, 0.02083, 0.02083, 0.04167, 0.0, 0.25, 0.0, 0.0, 0.02083, 0.04167, 0.02083, 0.29167, 0.25]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 3, 4]
+StringLegalActions() = ["A", "B", "C", "D", "E"]
+
+# Apply action "C"
+action: 2
+
+# State 79
+IsTerminal() = False
+ToString() = "Player 1 score = 12 [PLAYING]\n  f  e  d  c  b  a\n  1  2  1  0  0 12\n  1  1  0  2  2  0\n  A  B  C  D  E  F\nPlayer 0 score = 14\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Observation(0) = "1 | 14 12 | 1 1 0 2 2 0 12 0 0 1 2 1"
+Observation(1) = "1 | 14 12 | 1 1 0 2 2 0 12 0 0 1 2 1"
+ObservationAsNormalizedVector(0) = [0.02083, 0.02083, 0.0, 0.04167, 0.04167, 0.0, 0.25, 0.0, 0.0, 0.02083, 0.04167, 0.02083, 0.29167, 0.25]
+ObservationAsNormalizedVector(1) = [0.02083, 0.02083, 0.0, 0.04167, 0.04167, 0.0, 0.25, 0.0, 0.0, 0.02083, 0.04167, 0.02083, 0.29167, 0.25]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 3, 4, 5]
+StringLegalActions() = ["a", "d", "e", "f"]
+
+# Apply action "f"
+action: 5
+
+# State 80
+IsTerminal() = False
+ToString() = "Player 1 score = 14\n  f  e  d  c  b  a\n  0  2  1  0  0 12\n  0  1  0  2  2  0\n  A  B  C  D  E  F\nPlayer 0 score = 14 [PLAYING]\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Observation(0) = "0 | 14 14 | 0 1 0 2 2 0 12 0 0 1 2 0"
+Observation(1) = "0 | 14 14 | 0 1 0 2 2 0 12 0 0 1 2 0"
+ObservationAsNormalizedVector(0) = [0.0, 0.02083, 0.0, 0.04167, 0.04167, 0.0, 0.25, 0.0, 0.0, 0.02083, 0.04167, 0.0, 0.29167, 0.29167]
+ObservationAsNormalizedVector(1) = [0.0, 0.02083, 0.0, 0.04167, 0.04167, 0.0, 0.25, 0.0, 0.0, 0.02083, 0.04167, 0.0, 0.29167, 0.29167]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [1, 3, 4]
+StringLegalActions() = ["B", "D", "E"]
+
+# Apply action "E"
+action: 4
+
+# State 81
+IsTerminal() = False
+ToString() = "Player 1 score = 14 [PLAYING]\n  f  e  d  c  b  a\n  0  2  1  0  0 13\n  0  1  0  2  0  1\n  A  B  C  D  E  F\nPlayer 0 score = 14\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Observation(0) = "1 | 14 14 | 0 1 0 2 0 1 13 0 0 1 2 0"
+Observation(1) = "1 | 14 14 | 0 1 0 2 0 1 13 0 0 1 2 0"
+ObservationAsNormalizedVector(0) = [0.0, 0.02083, 0.0, 0.04167, 0.0, 0.02083, 0.27083, 0.0, 0.0, 0.02083, 0.04167, 0.0, 0.29167, 0.29167]
+ObservationAsNormalizedVector(1) = [0.0, 0.02083, 0.0, 0.04167, 0.0, 0.02083, 0.27083, 0.0, 0.0, 0.02083, 0.04167, 0.0, 0.29167, 0.29167]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 3, 4]
+StringLegalActions() = ["a", "d", "e"]
+
+# Apply action "e"
+action: 4
+
+# State 82
+IsTerminal() = False
+ToString() = "Player 1 score = 14\n  f  e  d  c  b  a\n  1  0  1  0  0 13\n  1  1  0  2  0  1\n  A  B  C  D  E  F\nPlayer 0 score = 14 [PLAYING]\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Observation(0) = "0 | 14 14 | 1 1 0 2 0 1 13 0 0 1 0 1"
+Observation(1) = "0 | 14 14 | 1 1 0 2 0 1 13 0 0 1 0 1"
+ObservationAsNormalizedVector(0) = [0.02083, 0.02083, 0.0, 0.04167, 0.0, 0.02083, 0.27083, 0.0, 0.0, 0.02083, 0.0, 0.02083, 0.29167, 0.29167]
+ObservationAsNormalizedVector(1) = [0.02083, 0.02083, 0.0, 0.04167, 0.0, 0.02083, 0.27083, 0.0, 0.0, 0.02083, 0.0, 0.02083, 0.29167, 0.29167]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 3, 5]
+StringLegalActions() = ["A", "B", "D", "F"]
+
+# Apply action "D"
+action: 3
+
+# State 83
+IsTerminal() = False
+ToString() = "Player 1 score = 14 [PLAYING]\n  f  e  d  c  b  a\n  1  0  1  0  0 13\n  1  1  0  0  1  2\n  A  B  C  D  E  F\nPlayer 0 score = 14\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Observation(0) = "1 | 14 14 | 1 1 0 0 1 2 13 0 0 1 0 1"
+Observation(1) = "1 | 14 14 | 1 1 0 0 1 2 13 0 0 1 0 1"
+ObservationAsNormalizedVector(0) = [0.02083, 0.02083, 0.0, 0.0, 0.02083, 0.04167, 0.27083, 0.0, 0.0, 0.02083, 0.0, 0.02083, 0.29167, 0.29167]
+ObservationAsNormalizedVector(1) = [0.02083, 0.02083, 0.0, 0.0, 0.02083, 0.04167, 0.27083, 0.0, 0.0, 0.02083, 0.0, 0.02083, 0.29167, 0.29167]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 3, 5]
+StringLegalActions() = ["a", "d", "f"]
+
+# Apply action "d"
+action: 3
+
+# State 84
+IsTerminal() = False
+ToString() = "Player 1 score = 14\n  f  e  d  c  b  a\n  1  1  0  0  0 13\n  1  1  0  0  1  2\n  A  B  C  D  E  F\nPlayer 0 score = 14 [PLAYING]\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Observation(0) = "0 | 14 14 | 1 1 0 0 1 2 13 0 0 0 1 1"
+Observation(1) = "0 | 14 14 | 1 1 0 0 1 2 13 0 0 0 1 1"
+ObservationAsNormalizedVector(0) = [0.02083, 0.02083, 0.0, 0.0, 0.02083, 0.04167, 0.27083, 0.0, 0.0, 0.0, 0.02083, 0.02083, 0.29167, 0.29167]
+ObservationAsNormalizedVector(1) = [0.02083, 0.02083, 0.0, 0.0, 0.02083, 0.04167, 0.27083, 0.0, 0.0, 0.0, 0.02083, 0.02083, 0.29167, 0.29167]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 4, 5]
+StringLegalActions() = ["A", "B", "E", "F"]
+
+# Apply action "B"
+action: 1
+
+# State 85
+IsTerminal() = False
+ToString() = "Player 1 score = 14 [PLAYING]\n  f  e  d  c  b  a\n  1  1  0  0  0 13\n  1  0  1  0  1  2\n  A  B  C  D  E  F\nPlayer 0 score = 14\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Observation(0) = "1 | 14 14 | 1 0 1 0 1 2 13 0 0 0 1 1"
+Observation(1) = "1 | 14 14 | 1 0 1 0 1 2 13 0 0 0 1 1"
+ObservationAsNormalizedVector(0) = [0.02083, 0.0, 0.02083, 0.0, 0.02083, 0.04167, 0.27083, 0.0, 0.0, 0.0, 0.02083, 0.02083, 0.29167, 0.29167]
+ObservationAsNormalizedVector(1) = [0.02083, 0.0, 0.02083, 0.0, 0.02083, 0.04167, 0.27083, 0.0, 0.0, 0.0, 0.02083, 0.02083, 0.29167, 0.29167]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 4, 5]
+StringLegalActions() = ["a", "e", "f"]
+
+# Apply action "a"
+action: 0
+
+# State 86
+IsTerminal() = False
+ToString() = "Player 1 score = 14\n  f  e  d  c  b  a\n  2  2  1  2  2  0\n  2  1  2  1  2  3\n  A  B  C  D  E  F\nPlayer 0 score = 14 [PLAYING]\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Observation(0) = "0 | 14 14 | 2 1 2 1 2 3 0 2 2 1 2 2"
+Observation(1) = "0 | 14 14 | 2 1 2 1 2 3 0 2 2 1 2 2"
+ObservationAsNormalizedVector(0) = [0.04167, 0.02083, 0.04167, 0.02083, 0.04167, 0.0625, 0.0, 0.04167, 0.04167, 0.02083, 0.04167, 0.04167, 0.29167, 0.29167]
+ObservationAsNormalizedVector(1) = [0.04167, 0.02083, 0.04167, 0.02083, 0.04167, 0.0625, 0.0, 0.04167, 0.04167, 0.02083, 0.04167, 0.04167, 0.29167, 0.29167]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 3, 4, 5]
+StringLegalActions() = ["A", "B", "C", "D", "E", "F"]
+
+# Apply action "E"
+action: 4
+
+# State 87
+IsTerminal() = False
+ToString() = "Player 1 score = 14 [PLAYING]\n  f  e  d  c  b  a\n  2  2  1  2  2  1\n  2  1  2  1  0  4\n  A  B  C  D  E  F\nPlayer 0 score = 14\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Observation(0) = "1 | 14 14 | 2 1 2 1 0 4 1 2 2 1 2 2"
+Observation(1) = "1 | 14 14 | 2 1 2 1 0 4 1 2 2 1 2 2"
+ObservationAsNormalizedVector(0) = [0.04167, 0.02083, 0.04167, 0.02083, 0.0, 0.08333, 0.02083, 0.04167, 0.04167, 0.02083, 0.04167, 0.04167, 0.29167, 0.29167]
+ObservationAsNormalizedVector(1) = [0.04167, 0.02083, 0.04167, 0.02083, 0.0, 0.08333, 0.02083, 0.04167, 0.04167, 0.02083, 0.04167, 0.04167, 0.29167, 0.29167]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 3, 4, 5]
+StringLegalActions() = ["a", "b", "c", "d", "e", "f"]
+
+# Apply action "a"
+action: 0
+
+# State 88
+IsTerminal() = False
+ToString() = "Player 1 score = 14\n  f  e  d  c  b  a\n  2  2  1  2  3  0\n  2  1  2  1  0  4\n  A  B  C  D  E  F\nPlayer 0 score = 14 [PLAYING]\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Observation(0) = "0 | 14 14 | 2 1 2 1 0 4 0 3 2 1 2 2"
+Observation(1) = "0 | 14 14 | 2 1 2 1 0 4 0 3 2 1 2 2"
+ObservationAsNormalizedVector(0) = [0.04167, 0.02083, 0.04167, 0.02083, 0.0, 0.08333, 0.0, 0.0625, 0.04167, 0.02083, 0.04167, 0.04167, 0.29167, 0.29167]
+ObservationAsNormalizedVector(1) = [0.04167, 0.02083, 0.04167, 0.02083, 0.0, 0.08333, 0.0, 0.0625, 0.04167, 0.02083, 0.04167, 0.04167, 0.29167, 0.29167]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 3, 5]
+StringLegalActions() = ["A", "B", "C", "D", "F"]
+
+# Apply action "C"
+action: 2
+
+# State 89
+IsTerminal() = False
+ToString() = "Player 1 score = 14 [PLAYING]\n  f  e  d  c  b  a\n  2  2  1  2  3  0\n  2  1  0  2  1  4\n  A  B  C  D  E  F\nPlayer 0 score = 14\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Observation(0) = "1 | 14 14 | 2 1 0 2 1 4 0 3 2 1 2 2"
+Observation(1) = "1 | 14 14 | 2 1 0 2 1 4 0 3 2 1 2 2"
+ObservationAsNormalizedVector(0) = [0.04167, 0.02083, 0.0, 0.04167, 0.02083, 0.08333, 0.0, 0.0625, 0.04167, 0.02083, 0.04167, 0.04167, 0.29167, 0.29167]
+ObservationAsNormalizedVector(1) = [0.04167, 0.02083, 0.0, 0.04167, 0.02083, 0.08333, 0.0, 0.0625, 0.04167, 0.02083, 0.04167, 0.04167, 0.29167, 0.29167]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [1, 2, 3, 4, 5]
+StringLegalActions() = ["b", "c", "d", "e", "f"]
+
+# Apply action "b"
+action: 1
+
+# State 90
+IsTerminal() = False
+ToString() = "Player 1 score = 14\n  f  e  d  c  b  a\n  2  3  2  3  0  0\n  2  1  0  2  1  4\n  A  B  C  D  E  F\nPlayer 0 score = 14 [PLAYING]\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Observation(0) = "0 | 14 14 | 2 1 0 2 1 4 0 0 3 2 3 2"
+Observation(1) = "0 | 14 14 | 2 1 0 2 1 4 0 0 3 2 3 2"
+ObservationAsNormalizedVector(0) = [0.04167, 0.02083, 0.0, 0.04167, 0.02083, 0.08333, 0.0, 0.0, 0.0625, 0.04167, 0.0625, 0.04167, 0.29167, 0.29167]
+ObservationAsNormalizedVector(1) = [0.04167, 0.02083, 0.0, 0.04167, 0.02083, 0.08333, 0.0, 0.0, 0.0625, 0.04167, 0.0625, 0.04167, 0.29167, 0.29167]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 3, 4, 5]
+StringLegalActions() = ["A", "B", "D", "E", "F"]
+
+# Apply action "F"
+action: 5
+
+# State 91
+IsTerminal() = False
+ToString() = "Player 1 score = 14 [PLAYING]\n  f  e  d  c  b  a\n  2  3  0  4  1  1\n  2  1  0  2  1  0\n  A  B  C  D  E  F\nPlayer 0 score = 17\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Observation(0) = "1 | 17 14 | 2 1 0 2 1 0 1 1 4 0 3 2"
+Observation(1) = "1 | 17 14 | 2 1 0 2 1 0 1 1 4 0 3 2"
+ObservationAsNormalizedVector(0) = [0.04167, 0.02083, 0.0, 0.04167, 0.02083, 0.0, 0.02083, 0.02083, 0.08333, 0.0, 0.0625, 0.04167, 0.35417, 0.29167]
+ObservationAsNormalizedVector(1) = [0.04167, 0.02083, 0.0, 0.04167, 0.02083, 0.0, 0.02083, 0.02083, 0.08333, 0.0, 0.0625, 0.04167, 0.35417, 0.29167]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 4, 5]
+StringLegalActions() = ["a", "b", "c", "e", "f"]
+
+# Apply action "a"
+action: 0
+
+# State 92
+IsTerminal() = False
+ToString() = "Player 1 score = 14\n  f  e  d  c  b  a\n  2  3  0  4  2  0\n  2  1  0  2  1  0\n  A  B  C  D  E  F\nPlayer 0 score = 17 [PLAYING]\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Observation(0) = "0 | 17 14 | 2 1 0 2 1 0 0 2 4 0 3 2"
+Observation(1) = "0 | 17 14 | 2 1 0 2 1 0 0 2 4 0 3 2"
+ObservationAsNormalizedVector(0) = [0.04167, 0.02083, 0.0, 0.04167, 0.02083, 0.0, 0.0, 0.04167, 0.08333, 0.0, 0.0625, 0.04167, 0.35417, 0.29167]
+ObservationAsNormalizedVector(1) = [0.04167, 0.02083, 0.0, 0.04167, 0.02083, 0.0, 0.0, 0.04167, 0.08333, 0.0, 0.0625, 0.04167, 0.35417, 0.29167]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 3, 4]
+StringLegalActions() = ["A", "B", "D", "E"]
+
+# Apply action "D"
+action: 3
+
+# State 93
+IsTerminal() = False
+ToString() = "Player 1 score = 14 [PLAYING]\n  f  e  d  c  b  a\n  2  3  0  4  2  0\n  2  1  0  0  2  1\n  A  B  C  D  E  F\nPlayer 0 score = 17\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5 0 3"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Observation(0) = "1 | 17 14 | 2 1 0 0 2 1 0 2 4 0 3 2"
+Observation(1) = "1 | 17 14 | 2 1 0 0 2 1 0 2 4 0 3 2"
+ObservationAsNormalizedVector(0) = [0.04167, 0.02083, 0.0, 0.0, 0.04167, 0.02083, 0.0, 0.04167, 0.08333, 0.0, 0.0625, 0.04167, 0.35417, 0.29167]
+ObservationAsNormalizedVector(1) = [0.04167, 0.02083, 0.0, 0.0, 0.04167, 0.02083, 0.0, 0.04167, 0.08333, 0.0, 0.0625, 0.04167, 0.35417, 0.29167]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [1, 2, 4, 5]
+StringLegalActions() = ["b", "c", "e", "f"]
+
+# Apply action "e"
+action: 4
+
+# State 94
+IsTerminal() = False
+ToString() = "Player 1 score = 19\n  f  e  d  c  b  a\n  3  0  0  4  2  0\n  0  0  0  0  2  1\n  A  B  C  D  E  F\nPlayer 0 score = 17 [PLAYING]\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5 0 3 4"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Observation(0) = "0 | 17 19 | 0 0 0 0 2 1 0 2 4 0 0 3"
+Observation(1) = "0 | 17 19 | 0 0 0 0 2 1 0 2 4 0 0 3"
+ObservationAsNormalizedVector(0) = [0.0, 0.0, 0.0, 0.0, 0.04167, 0.02083, 0.0, 0.04167, 0.08333, 0.0, 0.0, 0.0625, 0.35417, 0.39583]
+ObservationAsNormalizedVector(1) = [0.0, 0.0, 0.0, 0.0, 0.04167, 0.02083, 0.0, 0.04167, 0.08333, 0.0, 0.0, 0.0625, 0.35417, 0.39583]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [4, 5]
+StringLegalActions() = ["E", "F"]
+
+# Apply action "F"
+action: 5
+
+# State 95
+IsTerminal() = False
+ToString() = "Player 1 score = 19 [PLAYING]\n  f  e  d  c  b  a\n  3  0  0  4  2  1\n  0  0  0  0  2  0\n  A  B  C  D  E  F\nPlayer 0 score = 17\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5 0 3 4 5"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Observation(0) = "1 | 17 19 | 0 0 0 0 2 0 1 2 4 0 0 3"
+Observation(1) = "1 | 17 19 | 0 0 0 0 2 0 1 2 4 0 0 3"
+ObservationAsNormalizedVector(0) = [0.0, 0.0, 0.0, 0.0, 0.04167, 0.0, 0.02083, 0.04167, 0.08333, 0.0, 0.0, 0.0625, 0.35417, 0.39583]
+ObservationAsNormalizedVector(1) = [0.0, 0.0, 0.0, 0.0, 0.04167, 0.0, 0.02083, 0.04167, 0.08333, 0.0, 0.0, 0.0625, 0.35417, 0.39583]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 5]
+StringLegalActions() = ["a", "b", "c", "f"]
+
+# Apply action "f"
+action: 5
+
+# State 96
+IsTerminal() = False
+ToString() = "Player 1 score = 19\n  f  e  d  c  b  a\n  0  0  0  4  2  1\n  1  1  1  0  2  0\n  A  B  C  D  E  F\nPlayer 0 score = 17 [PLAYING]\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5 0 3 4 5 5"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Observation(0) = "0 | 17 19 | 1 1 1 0 2 0 1 2 4 0 0 0"
+Observation(1) = "0 | 17 19 | 1 1 1 0 2 0 1 2 4 0 0 0"
+ObservationAsNormalizedVector(0) = [0.02083, 0.02083, 0.02083, 0.0, 0.04167, 0.0, 0.02083, 0.04167, 0.08333, 0.0, 0.0, 0.0, 0.35417, 0.39583]
+ObservationAsNormalizedVector(1) = [0.02083, 0.02083, 0.02083, 0.0, 0.04167, 0.0, 0.02083, 0.04167, 0.08333, 0.0, 0.0, 0.0, 0.35417, 0.39583]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 4]
+StringLegalActions() = ["A", "B", "C", "E"]
+
+# Apply action "B"
+action: 1
+
+# State 97
+IsTerminal() = False
+ToString() = "Player 1 score = 19 [PLAYING]\n  f  e  d  c  b  a\n  0  0  0  4  2  1\n  1  0  2  0  2  0\n  A  B  C  D  E  F\nPlayer 0 score = 17\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5 0 3 4 5 5 1"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Observation(0) = "1 | 17 19 | 1 0 2 0 2 0 1 2 4 0 0 0"
+Observation(1) = "1 | 17 19 | 1 0 2 0 2 0 1 2 4 0 0 0"
+ObservationAsNormalizedVector(0) = [0.02083, 0.0, 0.04167, 0.0, 0.04167, 0.0, 0.02083, 0.04167, 0.08333, 0.0, 0.0, 0.0, 0.35417, 0.39583]
+ObservationAsNormalizedVector(1) = [0.02083, 0.0, 0.04167, 0.0, 0.04167, 0.0, 0.02083, 0.04167, 0.08333, 0.0, 0.0, 0.0, 0.35417, 0.39583]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2]
+StringLegalActions() = ["a", "b", "c"]
+
+# Apply action "b"
+action: 1
+
+# State 98
+IsTerminal() = False
+ToString() = "Player 1 score = 19\n  f  e  d  c  b  a\n  0  0  1  5  0  1\n  1  0  2  0  2  0\n  A  B  C  D  E  F\nPlayer 0 score = 17 [PLAYING]\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5 0 3 4 5 5 1 1"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Observation(0) = "0 | 17 19 | 1 0 2 0 2 0 1 0 5 1 0 0"
+Observation(1) = "0 | 17 19 | 1 0 2 0 2 0 1 0 5 1 0 0"
+ObservationAsNormalizedVector(0) = [0.02083, 0.0, 0.04167, 0.0, 0.04167, 0.0, 0.02083, 0.0, 0.10417, 0.02083, 0.0, 0.0, 0.35417, 0.39583]
+ObservationAsNormalizedVector(1) = [0.02083, 0.0, 0.04167, 0.0, 0.04167, 0.0, 0.02083, 0.0, 0.10417, 0.02083, 0.0, 0.0, 0.35417, 0.39583]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 2, 4]
+StringLegalActions() = ["A", "C", "E"]
+
+# Apply action "A"
+action: 0
+
+# State 99
+IsTerminal() = False
+ToString() = "Player 1 score = 19 [PLAYING]\n  f  e  d  c  b  a\n  0  0  1  5  0  1\n  0  1  2  0  2  0\n  A  B  C  D  E  F\nPlayer 0 score = 17\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1, 0]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5 0 3 4 5 5 1 1 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Observation(0) = "1 | 17 19 | 0 1 2 0 2 0 1 0 5 1 0 0"
+Observation(1) = "1 | 17 19 | 0 1 2 0 2 0 1 0 5 1 0 0"
+ObservationAsNormalizedVector(0) = [0.0, 0.02083, 0.04167, 0.0, 0.04167, 0.0, 0.02083, 0.0, 0.10417, 0.02083, 0.0, 0.0, 0.35417, 0.39583]
+ObservationAsNormalizedVector(1) = [0.0, 0.02083, 0.04167, 0.0, 0.04167, 0.0, 0.02083, 0.0, 0.10417, 0.02083, 0.0, 0.0, 0.35417, 0.39583]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 2, 3]
+StringLegalActions() = ["a", "c", "d"]
+
+# Apply action "a"
+action: 0
+
+# State 100
+IsTerminal() = False
+ToString() = "Player 1 score = 19\n  f  e  d  c  b  a\n  0  0  1  5  1  0\n  0  1  2  0  2  0\n  A  B  C  D  E  F\nPlayer 0 score = 17 [PLAYING]\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1, 0, 0]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5 0 3 4 5 5 1 1 0 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Observation(0) = "0 | 17 19 | 0 1 2 0 2 0 0 1 5 1 0 0"
+Observation(1) = "0 | 17 19 | 0 1 2 0 2 0 0 1 5 1 0 0"
+ObservationAsNormalizedVector(0) = [0.0, 0.02083, 0.04167, 0.0, 0.04167, 0.0, 0.0, 0.02083, 0.10417, 0.02083, 0.0, 0.0, 0.35417, 0.39583]
+ObservationAsNormalizedVector(1) = [0.0, 0.02083, 0.04167, 0.0, 0.04167, 0.0, 0.0, 0.02083, 0.10417, 0.02083, 0.0, 0.0, 0.35417, 0.39583]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [1, 2, 4]
+StringLegalActions() = ["B", "C", "E"]
+
+# Apply action "E"
+action: 4
+
+# State 101
+IsTerminal() = False
+ToString() = "Player 1 score = 19 [PLAYING]\n  f  e  d  c  b  a\n  0  0  1  5  1  1\n  0  1  2  0  0  1\n  A  B  C  D  E  F\nPlayer 0 score = 17\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1, 0, 0, 4]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5 0 3 4 5 5 1 1 0 0 4"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Observation(0) = "1 | 17 19 | 0 1 2 0 0 1 1 1 5 1 0 0"
+Observation(1) = "1 | 17 19 | 0 1 2 0 0 1 1 1 5 1 0 0"
+ObservationAsNormalizedVector(0) = [0.0, 0.02083, 0.04167, 0.0, 0.0, 0.02083, 0.02083, 0.02083, 0.10417, 0.02083, 0.0, 0.0, 0.35417, 0.39583]
+ObservationAsNormalizedVector(1) = [0.0, 0.02083, 0.04167, 0.0, 0.0, 0.02083, 0.02083, 0.02083, 0.10417, 0.02083, 0.0, 0.0, 0.35417, 0.39583]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 3]
+StringLegalActions() = ["a", "b", "c", "d"]
+
+# Apply action "c"
+action: 2
+
+# State 102
+IsTerminal() = False
+ToString() = "Player 1 score = 21\n  f  e  d  c  b  a\n  1  1  2  0  1  1\n  1  0  2  0  0  1\n  A  B  C  D  E  F\nPlayer 0 score = 17 [PLAYING]\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1, 0, 0, 4, 2]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5 0 3 4 5 5 1 1 0 0 4 2"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Observation(0) = "0 | 17 21 | 1 0 2 0 0 1 1 1 0 2 1 1"
+Observation(1) = "0 | 17 21 | 1 0 2 0 0 1 1 1 0 2 1 1"
+ObservationAsNormalizedVector(0) = [0.02083, 0.0, 0.04167, 0.0, 0.0, 0.02083, 0.02083, 0.02083, 0.0, 0.04167, 0.02083, 0.02083, 0.35417, 0.4375]
+ObservationAsNormalizedVector(1) = [0.02083, 0.0, 0.04167, 0.0, 0.0, 0.02083, 0.02083, 0.02083, 0.0, 0.04167, 0.02083, 0.02083, 0.35417, 0.4375]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 2, 5]
+StringLegalActions() = ["A", "C", "F"]
+
+# Apply action "C"
+action: 2
+
+# State 103
+IsTerminal() = False
+ToString() = "Player 1 score = 21 [PLAYING]\n  f  e  d  c  b  a\n  1  1  2  0  1  1\n  1  0  0  1  1  1\n  A  B  C  D  E  F\nPlayer 0 score = 17\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1, 0, 0, 4, 2, 2]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5 0 3 4 5 5 1 1 0 0 4 2 2"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Observation(0) = "1 | 17 21 | 1 0 0 1 1 1 1 1 0 2 1 1"
+Observation(1) = "1 | 17 21 | 1 0 0 1 1 1 1 1 0 2 1 1"
+ObservationAsNormalizedVector(0) = [0.02083, 0.0, 0.0, 0.02083, 0.02083, 0.02083, 0.02083, 0.02083, 0.0, 0.04167, 0.02083, 0.02083, 0.35417, 0.4375]
+ObservationAsNormalizedVector(1) = [0.02083, 0.0, 0.0, 0.02083, 0.02083, 0.02083, 0.02083, 0.02083, 0.0, 0.04167, 0.02083, 0.02083, 0.35417, 0.4375]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 3, 4, 5]
+StringLegalActions() = ["a", "b", "d", "e", "f"]
+
+# Apply action "e"
+action: 4
+
+# State 104
+IsTerminal() = False
+ToString() = "Player 1 score = 21\n  f  e  d  c  b  a\n  2  0  2  0  1  1\n  1  0  0  1  1  1\n  A  B  C  D  E  F\nPlayer 0 score = 17 [PLAYING]\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1, 0, 0, 4, 2, 2, 4]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5 0 3 4 5 5 1 1 0 0 4 2 2 4"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Observation(0) = "0 | 17 21 | 1 0 0 1 1 1 1 1 0 2 0 2"
+Observation(1) = "0 | 17 21 | 1 0 0 1 1 1 1 1 0 2 0 2"
+ObservationAsNormalizedVector(0) = [0.02083, 0.0, 0.0, 0.02083, 0.02083, 0.02083, 0.02083, 0.02083, 0.0, 0.04167, 0.0, 0.04167, 0.35417, 0.4375]
+ObservationAsNormalizedVector(1) = [0.02083, 0.0, 0.0, 0.02083, 0.02083, 0.02083, 0.02083, 0.02083, 0.0, 0.04167, 0.0, 0.04167, 0.35417, 0.4375]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 3, 4, 5]
+StringLegalActions() = ["A", "D", "E", "F"]
+
+# Apply action "A"
+action: 0
+
+# State 105
+IsTerminal() = False
+ToString() = "Player 1 score = 21 [PLAYING]\n  f  e  d  c  b  a\n  2  0  2  0  1  1\n  0  1  0  1  1  1\n  A  B  C  D  E  F\nPlayer 0 score = 17\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1, 0, 0, 4, 2, 2, 4, 0]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5 0 3 4 5 5 1 1 0 0 4 2 2 4 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Observation(0) = "1 | 17 21 | 0 1 0 1 1 1 1 1 0 2 0 2"
+Observation(1) = "1 | 17 21 | 0 1 0 1 1 1 1 1 0 2 0 2"
+ObservationAsNormalizedVector(0) = [0.0, 0.02083, 0.0, 0.02083, 0.02083, 0.02083, 0.02083, 0.02083, 0.0, 0.04167, 0.0, 0.04167, 0.35417, 0.4375]
+ObservationAsNormalizedVector(1) = [0.0, 0.02083, 0.0, 0.02083, 0.02083, 0.02083, 0.02083, 0.02083, 0.0, 0.04167, 0.0, 0.04167, 0.35417, 0.4375]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 3, 5]
+StringLegalActions() = ["a", "b", "d", "f"]
+
+# Apply action "f"
+action: 5
+
+# State 106
+IsTerminal() = False
+ToString() = "Player 1 score = 23\n  f  e  d  c  b  a\n  0  0  2  0  1  1\n  1  0  0  1  1  1\n  A  B  C  D  E  F\nPlayer 0 score = 17 [PLAYING]\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1, 0, 0, 4, 2, 2, 4, 0, 5]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5 0 3 4 5 5 1 1 0 0 4 2 2 4 0 5"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Observation(0) = "0 | 17 23 | 1 0 0 1 1 1 1 1 0 2 0 0"
+Observation(1) = "0 | 17 23 | 1 0 0 1 1 1 1 1 0 2 0 0"
+ObservationAsNormalizedVector(0) = [0.02083, 0.0, 0.0, 0.02083, 0.02083, 0.02083, 0.02083, 0.02083, 0.0, 0.04167, 0.0, 0.0, 0.35417, 0.47917]
+ObservationAsNormalizedVector(1) = [0.02083, 0.0, 0.0, 0.02083, 0.02083, 0.02083, 0.02083, 0.02083, 0.0, 0.04167, 0.0, 0.0, 0.35417, 0.47917]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 3, 4, 5]
+StringLegalActions() = ["A", "D", "E", "F"]
+
+# Apply action "D"
+action: 3
+
+# State 107
+IsTerminal() = False
+ToString() = "Player 1 score = 23 [PLAYING]\n  f  e  d  c  b  a\n  0  0  2  0  1  1\n  1  0  0  0  2  1\n  A  B  C  D  E  F\nPlayer 0 score = 17\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1, 0, 0, 4, 2, 2, 4, 0, 5, 3]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5 0 3 4 5 5 1 1 0 0 4 2 2 4 0 5 3"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Observation(0) = "1 | 17 23 | 1 0 0 0 2 1 1 1 0 2 0 0"
+Observation(1) = "1 | 17 23 | 1 0 0 0 2 1 1 1 0 2 0 0"
+ObservationAsNormalizedVector(0) = [0.02083, 0.0, 0.0, 0.0, 0.04167, 0.02083, 0.02083, 0.02083, 0.0, 0.04167, 0.0, 0.0, 0.35417, 0.47917]
+ObservationAsNormalizedVector(1) = [0.02083, 0.0, 0.0, 0.0, 0.04167, 0.02083, 0.02083, 0.02083, 0.0, 0.04167, 0.0, 0.0, 0.35417, 0.47917]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 3]
+StringLegalActions() = ["a", "b", "d"]
+
+# Apply action "d"
+action: 3
+
+# State 108
+IsTerminal() = False
+ToString() = "Player 1 score = 23\n  f  e  d  c  b  a\n  1  1  0  0  1  1\n  1  0  0  0  2  1\n  A  B  C  D  E  F\nPlayer 0 score = 17 [PLAYING]\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1, 0, 0, 4, 2, 2, 4, 0, 5, 3, 3]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5 0 3 4 5 5 1 1 0 0 4 2 2 4 0 5 3 3"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Observation(0) = "0 | 17 23 | 1 0 0 0 2 1 1 1 0 0 1 1"
+Observation(1) = "0 | 17 23 | 1 0 0 0 2 1 1 1 0 0 1 1"
+ObservationAsNormalizedVector(0) = [0.02083, 0.0, 0.0, 0.0, 0.04167, 0.02083, 0.02083, 0.02083, 0.0, 0.0, 0.02083, 0.02083, 0.35417, 0.47917]
+ObservationAsNormalizedVector(1) = [0.02083, 0.0, 0.0, 0.0, 0.04167, 0.02083, 0.02083, 0.02083, 0.0, 0.0, 0.02083, 0.02083, 0.35417, 0.47917]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 4, 5]
+StringLegalActions() = ["A", "E", "F"]
+
+# Apply action "F"
+action: 5
+
+# State 109
+IsTerminal() = False
+ToString() = "Player 1 score = 23 [PLAYING]\n  f  e  d  c  b  a\n  1  1  0  0  1  0\n  1  0  0  0  2  0\n  A  B  C  D  E  F\nPlayer 0 score = 19\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1, 0, 0, 4, 2, 2, 4, 0, 5, 3, 3, 5]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5 0 3 4 5 5 1 1 0 0 4 2 2 4 0 5 3 3 5"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Observation(0) = "1 | 19 23 | 1 0 0 0 2 0 0 1 0 0 1 1"
+Observation(1) = "1 | 19 23 | 1 0 0 0 2 0 0 1 0 0 1 1"
+ObservationAsNormalizedVector(0) = [0.02083, 0.0, 0.0, 0.0, 0.04167, 0.0, 0.0, 0.02083, 0.0, 0.0, 0.02083, 0.02083, 0.39583, 0.47917]
+ObservationAsNormalizedVector(1) = [0.02083, 0.0, 0.0, 0.0, 0.04167, 0.0, 0.0, 0.02083, 0.0, 0.0, 0.02083, 0.02083, 0.39583, 0.47917]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [1, 4, 5]
+StringLegalActions() = ["b", "e", "f"]
+
+# Apply action "f"
+action: 5
+
+# State 110
+IsTerminal() = True
+ToString() = "[FINISHED]\nPlayer 1 score = 25\n  f  e  d  c  b  a\n  0  1  0  0  1  0\n  0  0  0  0  2  0\n  A  B  C  D  E  F\nPlayer 0 score = 19\n"
+History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1, 0, 0, 4, 2, 2, 4, 0, 5, 3, 3, 5, 5]
+HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5 0 3 4 5 5 1 1 0 0 4 2 2 4 0 5 3 3 5 5"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = -4
+Observation(0) = "0 | 19 25 | 0 0 0 0 2 0 0 1 0 0 1 0"
+Observation(1) = "0 | 19 25 | 0 0 0 0 2 0 0 1 0 0 1 0"
+ObservationAsNormalizedVector(0) = [0.0, 0.0, 0.0, 0.0, 0.04167, 0.0, 0.0, 0.02083, 0.0, 0.0, 0.02083, 0.0, 0.39583, 0.52083]
+ObservationAsNormalizedVector(1) = [0.0, 0.0, 0.0, 0.0, 0.04167, 0.0, 0.0, 0.02083, 0.0, 0.0, 0.02083, 0.0, 0.39583, 0.52083]
+Rewards() = [-1.0, 1.0]
+Returns() = [-1.0, 1.0]

@@ -1,0 +1,1104 @@
+// Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#include "open_spiel/games/backgammon.h"
+
+#include <algorithm>
+#include <cstdlib>
+#include <set>
+#include <utility>
+#include <vector>
+
+#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/spiel.h"
+#include "open_spiel/spiel_utils.h"
+
+namespace open_spiel {
+namespace backgammon {
+namespace {
+const std::vector<std::pair<Action, double>> kChanceOutcomes = {
+    std::pair<Action, double>(0, 1.0 / 18),
+    std::pair<Action, double>(1, 1.0 / 18),
+    std::pair<Action, double>(2, 1.0 / 18),
+    std::pair<Action, double>(3, 1.0 / 18),
+    std::pair<Action, double>(4, 1.0 / 18),
+    std::pair<Action, double>(5, 1.0 / 18),
+    std::pair<Action, double>(6, 1.0 / 18),
+    std::pair<Action, double>(7, 1.0 / 18),
+    std::pair<Action, double>(8, 1.0 / 18),
+    std::pair<Action, double>(9, 1.0 / 18),
+    std::pair<Action, double>(10, 1.0 / 18),
+    std::pair<Action, double>(11, 1.0 / 18),
+    std::pair<Action, double>(12, 1.0 / 18),
+    std::pair<Action, double>(13, 1.0 / 18),
+    std::pair<Action, double>(14, 1.0 / 18),
+    std::pair<Action, double>(15, 1.0 / 36),
+    std::pair<Action, double>(16, 1.0 / 36),
+    std::pair<Action, double>(17, 1.0 / 36),
+    std::pair<Action, double>(18, 1.0 / 36),
+    std::pair<Action, double>(19, 1.0 / 36),
+    std::pair<Action, double>(20, 1.0 / 36),
+};
+
+const std::vector<std::vector<int>> kChanceOutcomeValues = {
+    {1, 2}, {1, 3}, {1, 4}, {1, 5}, {1, 6}, {2, 3}, {2, 4},
+    {2, 5}, {2, 6}, {3, 4}, {3, 5}, {3, 6}, {4, 5}, {4, 6},
+    {5, 6}, {1, 1}, {2, 2}, {3, 3}, {4, 4}, {5, 5}, {6, 6}};
+
+// Facts about the game
+const GameType kGameType{
+    /*short_name=*/"backgammon",
+    /*long_name=*/"Backgammon",
+    GameType::Dynamics::kSequential,
+    GameType::ChanceMode::kExplicitStochastic,
+    GameType::Information::kPerfectInformation,
+    GameType::Utility::kZeroSum,
+    GameType::RewardModel::kTerminal,
+    /*min_num_players=*/2,
+    /*max_num_players=*/2,
+    /*provides_information_state=*/true,
+    /*provides_information_state_as_normalized_vector=*/true,
+    /*provides_observation=*/false,
+    /*provides_observation_as_normalized_vector=*/false,
+    /*parameter_specification=*/
+    {{"scoring_type", {GameParameter::Type::kString, false}}}};
+
+static std::unique_ptr<Game> Factory(const GameParameters& params) {
+  return std::unique_ptr<Game>(new BackgammonGame(params));
+}
+
+REGISTER_SPIEL_GAME(kGameType, Factory);
+}  // namespace
+
+ScoringType ParseScoringType(const std::string& st_str) {
+  if (st_str == "winloss_scoring") {
+    return ScoringType::kWinLossScoring;
+  } else if (st_str == "enable_gammons") {
+    return ScoringType::kEnableGammons;
+  } else if (st_str == "full_scoring") {
+    return ScoringType::kFullScoring;
+  } else {
+    SpielFatalError("Unrecognized scoring_type parameter: " + st_str);
+  }
+}
+
+std::string PositionToString(int pos) {
+  switch (pos) {
+    case kBarPos:
+      return "Bar";
+    case kScorePos:
+      return "Score";
+    case -1:
+      return "Pass";
+    default:
+      return absl::StrCat(pos);
+  }
+}
+
+std::string BackgammonState::ActionToString(int player, Action move_id) const {
+  if (player == kChancePlayerId) {
+    return absl::StrCat("chance outcome ", move_id,
+                        " (roll: ", kChanceOutcomeValues[move_id][0],
+                        kChanceOutcomeValues[move_id][1], ")");
+  } else {
+    std::vector<CheckerMove> cmoves = SpielMoveToCheckerMoves(player, move_id);
+    return absl::StrCat(move_id, " (", PositionToString(cmoves[0].pos), "-",
+                        cmoves[0].num, cmoves[0].hit ? "*" : "", " ",
+                        PositionToString(cmoves[1].pos), "-", cmoves[1].num,
+                        cmoves[1].hit ? "*" : "", ")");
+  }
+}
+
+std::string BackgammonState::InformationState(int player) const {
+  return ToString();
+}
+
+void BackgammonState::InformationStateAsNormalizedVector(
+    int player, std::vector<double>* values) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LE(player, 1);
+  int opponent = Opponent(player);
+  values->clear();
+  // The format of this vector is described in Section 3.4 of "G. Tesauro,
+  // Practical issues in temporal-difference learning, 1994."
+  // https://link.springer.com/article/10.1007/BF00992697
+  for (int count : board_[player]) {
+    values->push_back((count == 1) ? 1 : 0);
+    values->push_back((count == 2) ? 1 : 0);
+    values->push_back((count == 3) ? 1 : 0);
+    values->push_back((count > 3) ? (count - 3) : 0);
+  }
+  for (int count : board_[opponent]) {
+    values->push_back((count == 1) ? 1 : 0);
+    values->push_back((count == 2) ? 1 : 0);
+    values->push_back((count == 3) ? 1 : 0);
+    values->push_back((count > 3) ? (count - 3) : 0);
+  }
+  values->push_back(bar_[player]);
+  values->push_back(scores_[player]);
+  values->push_back((cur_player_ == player) ? 1 : 0);
+
+  values->push_back(bar_[opponent]);
+  values->push_back(scores_[opponent]);
+  values->push_back((cur_player_ == opponent) ? 1 : 0);
+
+  SPIEL_CHECK_EQ(kStateEncodingSize, values->size());
+}
+
+BackgammonState::BackgammonState(int num_distinct_actions, int num_players,
+                                 ScoringType scoring_type)
+    : State(num_distinct_actions, num_players),
+      scoring_type_(scoring_type),
+      cur_player_(kChancePlayerId),
+      prev_player_(kChancePlayerId),
+      turns_(-1),
+      x_turns_(0),
+      o_turns_(0),
+      double_turn_(false),
+      dice_({}),
+      bar_({0, 0}),
+      scores_({0, 0}),
+      board_(
+          {std::vector<int>(kNumPoints, 0), std::vector<int>(kNumPoints, 0)}),
+      turn_history_info_({}) {
+  // Setup the board. First, XPlayer.
+  board_[kXPlayerId][0] = 2;
+  board_[kXPlayerId][11] = 5;
+  board_[kXPlayerId][16] = 3;
+  board_[kXPlayerId][18] = 5;
+  // OPlayer.
+  board_[kOPlayerId][23] = 2;
+  board_[kOPlayerId][12] = 5;
+  board_[kOPlayerId][7] = 3;
+  board_[kOPlayerId][5] = 5;
+}
+
+int BackgammonState::board(int player, int pos) const {
+  if (pos == kBarPos) {
+    return bar_[player];
+  } else {
+    SPIEL_CHECK_GE(pos, 0);
+    SPIEL_CHECK_LT(pos, kNumPoints);
+    return board_[player][pos];
+  }
+}
+
+int BackgammonState::CurrentPlayer() const {
+  return IsTerminal() ? kTerminalPlayerId : cur_player_;
+}
+
+int BackgammonState::Opponent(int player) const { return 1 - player; }
+
+void BackgammonState::RollDice(int outcome) {
+  dice_.push_back(kChanceOutcomeValues[outcome][0]);
+  dice_.push_back(kChanceOutcomeValues[outcome][1]);
+}
+
+int BackgammonState::DiceValue(int i) const {
+  SPIEL_CHECK_GE(i, 0);
+  SPIEL_CHECK_LT(i, dice_.size());
+
+  if (dice_[i] >= 1 && dice_[i] <= 6) {
+    return dice_[i];
+  } else if (dice_[i] >= 7 && dice_[i] <= 12) {
+    // This die is marked as chosen, so return its proper value.
+    // Note: dice are only marked as chosen during the legal moves enumeration.
+    return dice_[i] - 6;
+  } else {
+    SpielFatalError(absl::StrCat("Bad dice value: ", dice_[i]));
+  }
+}
+
+void BackgammonState::DoApplyAction(Action move) {
+  if (IsChanceNode()) {
+    turn_history_info_.push_back(TurnHistoryInfo(kChancePlayerId, prev_player_,
+                                                 dice_, move, double_turn_,
+                                                 false, false));
+
+    if (turns_ == -1 && dice_.size() < 4) {
+      // Initial dice roll to determine who starts.
+      RollDice(move);
+      return;
+    } else if (turns_ == -1 && dice_.size() == 4) {
+      // Start of game: see who won the toss (on a single dice).
+      if (dice_[0] == dice_[2]) {
+        // Tie. Start again!
+        dice_.clear();
+        RollDice(move);
+        return;
+      }
+      // Using the 3rd outcome to get 2 unbiased numbers for the first move.
+      RollDice(move);
+      if (dice_[4] == dice_[5]) {
+        // Tie. Start again! We should not start with doubles.
+        dice_.clear();
+        return;
+      }
+      // The dice_[0] vs dice_[2] will determine the starting player.
+      // The dice_[4] and dice_[5] will be be used for the first move,
+      // because they include a lower number and a higher number.
+      if (dice_[0] > dice_[2]) {
+        // X starts.
+        cur_player_ = prev_player_ = kXPlayerId;
+      } else if (dice_[0] < dice_[2]) {
+        // O starts.
+        cur_player_ = prev_player_ = kOPlayerId;
+      }
+      // Keeping just the 3rd outcome.
+      dice_[0] = dice_[4];
+      dice_[1] = dice_[5];
+      dice_.pop_back();
+      dice_.pop_back();
+      dice_.pop_back();
+      dice_.pop_back();
+      turns_ = 0;
+      return;
+    } else {
+      // Normal chance node.
+      SPIEL_CHECK_TRUE(dice_.empty());
+      RollDice(move);
+      cur_player_ = Opponent(prev_player_);
+      return;
+    }
+  }
+
+  // Normal move action.
+  std::vector<CheckerMove> moves = SpielMoveToCheckerMoves(cur_player_, move);
+  bool first_move_hit = ApplyCheckerMove(cur_player_, moves[0]);
+  bool second_move_hit = ApplyCheckerMove(cur_player_, moves[1]);
+
+  turn_history_info_.push_back(
+      TurnHistoryInfo(cur_player_, prev_player_, dice_, move, double_turn_,
+                      first_move_hit, second_move_hit));
+
+  if (!double_turn_) {
+    turns_++;
+    if (cur_player_ == kXPlayerId) {
+      x_turns_++;
+    } else if (cur_player_ == kOPlayerId) {
+      o_turns_++;
+    }
+  }
+
+  prev_player_ = cur_player_;
+
+  // Check for doubles.
+  bool extra_turn = false;
+  if (!double_turn_ && dice_[0] == dice_[1]) {
+    // Check the dice, and unuse them if they are used.
+    int dice_used = 0;
+    for (int i = 0; i < 2; i++) {
+      if (dice_[i] > 6) {
+        dice_[i] -= 6;
+        dice_used++;
+      }
+      SPIEL_CHECK_GE(dice_[i], 1);
+      SPIEL_CHECK_LE(dice_[i], 6);
+    }
+
+    if (dice_used == 2) {
+      extra_turn = true;
+    }
+  }
+
+  if (extra_turn) {
+    // Dice have been unused above.
+    double_turn_ = true;
+  } else {
+    cur_player_ = kChancePlayerId;
+    dice_.clear();
+    double_turn_ = false;
+  }
+}
+
+void BackgammonState::UndoAction(int player, Action action) {
+  {
+    const TurnHistoryInfo& thi = turn_history_info_.back();
+    SPIEL_CHECK_EQ(thi.player, player);
+    SPIEL_CHECK_EQ(action, thi.action);
+    cur_player_ = thi.player;
+    prev_player_ = thi.prev_player;
+    dice_ = thi.dice;
+    double_turn_ = thi.double_turn;
+    if (player != kChancePlayerId) {
+      std::vector<CheckerMove> moves = SpielMoveToCheckerMoves(player, action);
+      SPIEL_CHECK_EQ(moves.size(), 2);
+      moves[0].hit = thi.first_move_hit;
+      moves[1].hit = thi.second_move_hit;
+      UndoCheckerMove(player, moves[1]);
+      UndoCheckerMove(player, moves[0]);
+      turns_--;
+      if (!double_turn_) {
+        if (player == kXPlayerId) {
+          x_turns_--;
+        } else if (player == kOPlayerId) {
+          o_turns_--;
+        }
+      }
+    }
+  }
+  turn_history_info_.pop_back();
+  history_.pop_back();
+}
+
+Action BackgammonState::TranslateAction(int from1, int from2,
+                                        bool use_high_die_first) const {
+  int player = CurrentPlayer();
+  int opponent = Opponent(player);
+  int num1 = use_high_die_first ? dice_.at(1) : dice_.at(0);
+  int num2 = use_high_die_first ? dice_.at(0) : dice_.at(1);
+  bool hit1 = false;
+  bool hit2 = false;
+
+  if (from1 != kPassPos) {
+    int to1 = PositionFrom(player, from1, num1);
+    if (to1 != kScorePos && board(opponent, to1) == 1) {
+      hit1 = true;
+    }
+  }
+
+  if (from2 != kPassPos) {
+    int to2 = PositionFrom(player, from2, num2);
+    if (to2 != kScorePos && board(opponent, to2) == 1) {
+      hit2 = true;
+    }
+  }
+
+  std::vector<CheckerMove> moves = {{from1, num1, hit1}, {from2, num2, hit2}};
+  return CheckerMovesToSpielMove(moves);
+}
+
+Action BackgammonState::EncodedBarMove() const { return 24; }
+
+Action BackgammonState::EncodedPassMove() const { return 25; }
+
+Action BackgammonState::CheckerMovesToSpielMove(
+    const std::vector<CheckerMove>& moves) const {
+  int dig0 = EncodedPassMove();
+  int dig1 = EncodedPassMove();
+  int pos1 = moves[0].pos;
+  int num1 = moves[0].num;
+  int pos2 = moves[1].pos;
+  if (pos1 == kBarPos) {
+    pos1 = EncodedBarMove();
+  }
+  if (pos2 == kBarPos) {
+    pos2 = EncodedBarMove();
+  }
+
+  bool high_roll_first = false;
+  int high_roll = DiceValue(0) >= DiceValue(1) ? DiceValue(0) : DiceValue(1);
+
+  if (!moves.empty() && pos1 != kPassPos) {
+    dig0 = pos1;
+    high_roll_first = num1 == high_roll;
+  }
+
+  if (moves.size() > 1 && pos2 != kPassPos) {
+    dig1 = pos2;
+  }
+
+  Action move = dig1 * 26 + dig0;
+  if (!high_roll_first) {
+    move += 676;  // 26**2
+  }
+  SPIEL_CHECK_GE(move, 0);
+  SPIEL_CHECK_LT(move, kNumDistinctActions);
+  return move;
+}
+
+std::vector<CheckerMove> BackgammonState::SpielMoveToCheckerMoves(
+    int player, Action spiel_move) const {
+  SPIEL_CHECK_GE(spiel_move, 0);
+  SPIEL_CHECK_LT(spiel_move, kNumDistinctActions);
+
+  bool high_roll_first = spiel_move < 676;
+  if (!high_roll_first) {
+    spiel_move -= 676;
+  }
+
+  std::vector<Action> digits = {spiel_move % 26, spiel_move / 26};
+  std::vector<CheckerMove> cmoves;
+  int high_roll = DiceValue(0) >= DiceValue(1) ? DiceValue(0) : DiceValue(1);
+  int low_roll = DiceValue(0) < DiceValue(1) ? DiceValue(0) : DiceValue(1);
+
+  for (int i = 0; i < 2; ++i) {
+    SPIEL_CHECK_GE(digits[i], 0);
+    SPIEL_CHECK_LE(digits[i], 25);
+
+    int num = -1;
+    if (i == 0) {
+      num = high_roll_first ? high_roll : low_roll;
+    } else {
+      num = high_roll_first ? low_roll : high_roll;
+    }
+    SPIEL_CHECK_GE(num, 1);
+    SPIEL_CHECK_LE(num, 6);
+
+    if (digits[i] == EncodedPassMove()) {
+      cmoves.push_back(CheckerMove(kPassPos, -1, false));
+    } else {
+      cmoves.push_back(CheckerMove(
+          digits[i] == EncodedBarMove() ? kBarPos : digits[i], num, false));
+    }
+  }
+  return cmoves;
+}
+
+bool BackgammonState::IsPosInHome(int player, int pos) const {
+  switch (player) {
+    case kXPlayerId:
+      return (pos >= 18 && pos <= 23);
+    case kOPlayerId:
+      return (pos >= 0 && pos <= 5);
+    default:
+      SpielFatalError(absl::StrCat("Unknown player ID: ", player));
+  }
+}
+
+int BackgammonState::CheckersInHome(int player) const {
+  int c = 0;
+  for (int i = 0; i < 6; i++) {
+    c += board(player, (player == kXPlayerId ? (23 - i) : i));
+  }
+  return c;
+}
+
+bool BackgammonState::AllInHome(int player) const {
+  if (bar_[player] > 0) {
+    return false;
+  }
+
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LE(player, 1);
+
+  // Looking for any checkers outside home.
+  // --> XPlayer scans 0-17.
+  // --> OPlayer scans 6-23.
+  int scan_start = (player == kXPlayerId ? 0 : 6);
+  int scan_end = (player == kXPlayerId ? 17 : 23);
+
+  for (int i = scan_start; i <= scan_end; ++i) {
+    if (board_[player][i] > 0) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+int BackgammonState::HighestUsableDiceOutcome() const {
+  if (UsableDiceOutcome(dice_[1])) {
+    return dice_[1];
+  } else if (UsableDiceOutcome(dice_[0])) {
+    return dice_[0];
+  } else {
+    return -1;
+  }
+}
+
+int BackgammonState::FurthestCheckerInHome(int player) const {
+  // Looking for any checkers in home.
+  // --> XPlayer scans 23 -> 18
+  // --> OPlayer scans  0 -> 5
+  int scan_start = (player == kXPlayerId ? 23 : 0);
+  int scan_end = (player == kXPlayerId ? 17 : 6);
+  int inc = (player == kXPlayerId ? -1 : 1);
+
+  int furthest = (player == kXPlayerId ? 24 : -1);
+
+  for (int i = scan_start; i != scan_end; i += inc) {
+    if (board_[player][i] > 0) {
+      furthest = i;
+    }
+  }
+
+  if (furthest == 24 || furthest == -1) {
+    return -1;
+  } else {
+    return furthest;
+  }
+}
+
+bool BackgammonState::UsableDiceOutcome(int outcome) const {
+  return (outcome >= 1 && outcome <= 6);
+}
+
+int BackgammonState::PositionFromBar(int player, int spaces) const {
+  if (player == kXPlayerId) {
+    return -1 + spaces;
+  } else if (player == kOPlayerId) {
+    return 24 - spaces;
+  } else {
+    SpielFatalError(absl::StrCat("Invalid player: ", player));
+  }
+}
+
+int BackgammonState::PositionFrom(int player, int pos, int spaces) const {
+  if (pos == kBarPos) {
+    return PositionFromBar(player, spaces);
+  }
+
+  if (player == kXPlayerId) {
+    int new_pos = pos + spaces;
+    return (new_pos > 23 ? kScorePos : new_pos);
+  } else if (player == kOPlayerId) {
+    int new_pos = pos - spaces;
+    return (new_pos < 0 ? kScorePos : new_pos);
+  } else {
+    SpielFatalError(absl::StrCat("Invalid player: ", player));
+  }
+}
+
+int BackgammonState::NumOppCheckers(int player, int pos) const {
+  return board_[Opponent(player)][pos];
+}
+
+int BackgammonState::GetDistance(int player, int from, int to) const {
+  SPIEL_CHECK_NE(from, kScorePos);
+  SPIEL_CHECK_NE(to, kScorePos);
+  if (from == kBarPos && player == kXPlayerId) {
+    from = -1;
+  } else if (from == kBarPos && player == kOPlayerId) {
+    from = 24;
+  }
+  return std::abs(to - from);
+}
+
+bool BackgammonState::IsOff(int player, int pos) const {
+  // Returns if an absolute position is off the board.
+  return ((player == kXPlayerId && pos > 23) ||
+          (player == kOPlayerId && pos < 0));
+}
+
+bool BackgammonState::IsFurther(int player, int pos1, int pos2) const {
+  if (pos1 == pos2) {
+    return false;
+  }
+
+  if (pos1 == kBarPos) {
+    return true;
+  }
+
+  if (pos2 == kBarPos) {
+    return false;
+  }
+
+  if (pos1 == kPassPos) {
+    return false;
+  }
+
+  if (pos2 == kPassPos) {
+    return false;
+  }
+
+  return ((player == kXPlayerId && pos1 < pos2) ||
+          (player == kOPlayerId && pos1 > pos2));
+}
+
+int BackgammonState::GetToPos(int player, int from_pos, int pips) const {
+  if (player == kXPlayerId) {
+    return (from_pos == kBarPos ? -1 : from_pos) + pips;
+  } else if (player == kOPlayerId) {
+    return (from_pos == kBarPos ? 24 : from_pos) - pips;
+  } else {
+    SpielFatalError(absl::StrCat("Player (", player, ") unrecognized."));
+  }
+}
+
+// Basic from_to check (including bar checkers).
+bool BackgammonState::IsLegalFromTo(int player, int from_pos, int to_pos,
+                                    int my_checkers_from,
+                                    int opp_checkers_to) const {
+  // Must have at least one checker the from position.
+  if (my_checkers_from == 0) {
+    return false;
+  }
+
+  if (opp_checkers_to > 1) {
+    return false;
+  }
+
+  // Quick validity checks out of the way. This appears to be a valid move.
+  // Now, must check: if there are moves on this player's bar, they must move
+  // them first, and if there are no legal moves out of the bar, the player
+  // loses their turn.
+  int my_bar_checkers = board(player, kBarPos);
+  if (my_bar_checkers > 0 && from_pos != kBarPos) {
+    return false;
+  }
+
+  // If this is a scoring move, then check that all this player's checkers are
+  // either scored or home.
+  if (to_pos < 0 || to_pos > 23) {
+    if ((CheckersInHome(player) + scores_[player]) != 15) {
+      return false;
+    }
+
+    // If it's not *exactly* the right amount, then we have to do a check to see
+    // if there exist checkers further from home, as those must be moved first.
+    if (player == kXPlayerId && to_pos > 24) {
+      for (int pos = from_pos - 1; pos >= 18; pos--) {
+        if (board(player, pos) > 0) {
+          return false;
+        }
+      }
+    } else if (player == kOPlayerId && to_pos < -1) {
+      for (int pos = from_pos + 1; pos <= 5; pos++) {
+        if (board(player, pos) > 0) {
+          return false;
+        }
+      }
+    }
+  }
+
+  return true;
+}
+
+std::string BackgammonState::DiceToString(int outcome) const {
+  if (outcome > 6) {
+    return std::to_string(outcome - 6) + "u";
+  } else {
+    return std::to_string(outcome);
+  }
+}
+
+int BackgammonState::CountTotalCheckers(int player) const {
+  int total = 0;
+  for (int i = 0; i < 24; ++i) {
+    SPIEL_CHECK_GE(board_[player][i], 0);
+    total += board_[player][i];
+  }
+  SPIEL_CHECK_GE(bar_[player], 0);
+  total += bar_[player];
+  SPIEL_CHECK_GE(scores_[player], 0);
+  total += scores_[player];
+  return total;
+}
+
+int BackgammonState::IsGammoned(int player) const {
+  // Does the player not have any checkers borne off?
+  return scores_[player] == 0;
+}
+
+int BackgammonState::IsBackgammoned(int player) const {
+  // Does the player not have any checkers borne off and either has a checker
+  // still in the bar or still in the opponent's home?
+  if (scores_[player] > 0) {
+    return false;
+  }
+
+  if (bar_[player] > 0) {
+    return true;
+  }
+
+  // XPlayer scans 0-5.
+  // OPlayer scans 18-23.
+  int scan_start = (player == kXPlayerId ? 0 : 18);
+  int scan_end = (player == kXPlayerId ? 5 : 23);
+
+  for (int i = scan_start; i <= scan_end; ++i) {
+    if (board_[player][i] > 0) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+std::set<CheckerMove> BackgammonState::LegalCheckerMoves(int player) const {
+  std::set<CheckerMove> moves;
+
+  if (bar_[player] > 0) {
+    // If there are any checkers are the bar, must move them out first.
+    for (int outcome : dice_) {
+      if (UsableDiceOutcome(outcome)) {
+        int pos = PositionFromBar(player, outcome);
+        if (NumOppCheckers(player, pos) <= 1) {
+          bool hit = NumOppCheckers(player, pos) == 1;
+          moves.insert(CheckerMove(kBarPos, outcome, hit));
+        }
+      }
+    }
+    return moves;
+  }
+
+  // Regular board moves.
+  bool all_in_home = AllInHome(player);
+  for (int i = 0; i < kNumPoints; ++i) {
+    if (board_[player][i] > 0) {
+      for (int outcome : dice_) {
+        if (UsableDiceOutcome(outcome)) {
+          int pos = PositionFrom(player, i, outcome);
+          if (pos == kScorePos && all_in_home) {
+            // Check whether a bear off move is legal.
+
+            // It is ok to bear off if all the checkers are at home and the
+            // point being used to move from exactly matches the distance from
+            // just stepping off the board.
+            if ((player == kXPlayerId && i + outcome == 24) ||
+                (player == kOPlayerId && i - outcome == -1)) {
+              moves.insert(CheckerMove(i, outcome, false));
+            } else {
+              // Otherwise, a die can only be used to move a checker off if
+              // there are no checkers further than it in the player's home.
+              if (i == FurthestCheckerInHome(player)) {
+                moves.insert(CheckerMove(i, outcome, false));
+              }
+            }
+          } else if (pos != kScorePos && NumOppCheckers(player, pos) <= 1) {
+            // Regular move.
+            bool hit = NumOppCheckers(player, pos) == 1;
+            moves.insert(CheckerMove(i, outcome, hit));
+          }
+        }
+      }
+    }
+  }
+  return moves;
+}
+
+bool BackgammonState::ApplyCheckerMove(int player, const CheckerMove& move) {
+  // Pass does nothing.
+  if (move.pos < 0) {
+    return false;
+  }
+
+  // First, remove the checker.
+  int next_pos = -1;
+  if (move.pos == kBarPos) {
+    bar_[player]--;
+    next_pos = PositionFromBar(player, move.num);
+  } else {
+    board_[player][move.pos]--;
+    next_pos = PositionFrom(player, move.pos, move.num);
+  }
+
+  // Mark the die as used.
+  for (int i = 0; i < 2; ++i) {
+    if (dice_[i] == move.num) {
+      dice_[i] += 6;
+      break;
+    }
+  }
+
+  // Now add the checker (or score).
+  if (next_pos == kScorePos) {
+    scores_[player]++;
+  } else {
+    board_[player][next_pos]++;
+  }
+
+  bool hit = false;
+  // If there was a hit, remove opponent's piece and add to bar.
+  // Note: the move.hit will only be properly set during the legal moves search,
+  // so we have to also check here if there is a hit candidate.
+  if (move.hit ||
+      (next_pos != kScorePos && board_[Opponent(player)][next_pos] == 1)) {
+    hit = true;
+    board_[Opponent(player)][next_pos]--;
+    bar_[Opponent(player)]++;
+  }
+
+  return hit;
+}
+
+// Undoes a checker move. Important note: this checkermove needs to have
+// move.hit set from the history to properly undo a move (this information is
+// not tracked in the action value).
+void BackgammonState::UndoCheckerMove(int player, const CheckerMove& move) {
+  // Undoing a pass does nothing
+  if (move.pos < 0) {
+    return;
+  }
+
+  // First, figure out the next position.
+  int next_pos = -1;
+  if (move.pos == kBarPos) {
+    next_pos = PositionFromBar(player, move.num);
+  } else {
+    next_pos = PositionFrom(player, move.pos, move.num);
+  }
+
+  // If there was a hit, take it out of the opponent's bar and put it back
+  // onto the next position.
+  if (move.hit) {
+    bar_[Opponent(player)]--;
+    board_[Opponent(player)][next_pos]++;
+  }
+
+  // Remove the moved checker or decrement score.
+  if (next_pos == kScorePos) {
+    scores_[player]--;
+  } else {
+    board_[player][next_pos]--;
+  }
+
+  // Mark the die as unused.
+  for (int i = 0; i < 2; ++i) {
+    if (dice_[i] == move.num + 6) {
+      dice_[i] -= 6;
+      break;
+    }
+  }
+
+  // Finally, return back the checker to its original position.
+  if (move.pos == kBarPos) {
+    bar_[player]++;
+  } else {
+    board_[player][move.pos]++;
+  }
+}
+
+// Returns the maximum move size (2, 1, or 0)
+int BackgammonState::RecLegalMoves(
+    std::vector<CheckerMove> moveseq,
+    std::set<std::vector<CheckerMove>>* movelist) {
+  if (moveseq.size() == 2) {
+    movelist->insert(moveseq);
+    return moveseq.size();
+  }
+
+  std::set<CheckerMove> moves_here = LegalCheckerMoves(cur_player_);
+
+  if (moves_here.empty()) {
+    movelist->insert(moveseq);
+    return moveseq.size();
+  }
+
+  int max_moves = -1;
+  for (const auto& move : moves_here) {
+    moveseq.push_back(move);
+    ApplyCheckerMove(cur_player_, move);
+    int child_max = RecLegalMoves(moveseq, movelist);
+    UndoCheckerMove(cur_player_, move);
+    max_moves = std::max(child_max, max_moves);
+    moveseq.pop_back();
+  }
+
+  return max_moves;
+}
+
+std::vector<Action> BackgammonState::ProcessLegalMoves(
+    int max_moves, const std::set<std::vector<CheckerMove>>& movelist) const {
+  if (max_moves == 0) {
+    SPIEL_CHECK_EQ(movelist.size(), 1);
+    SPIEL_CHECK_TRUE(movelist.begin()->empty());
+
+    // Passing is always a legal move!
+    return {CheckerMovesToSpielMove(
+        {{kPassPos, -1, false}, {kPassPos, -1, false}})};
+  }
+
+  // Rule 2 in Movement of Checkers:
+  // A player must use both numbers of a roll if this is legally possible (or
+  // all four numbers of a double). When only one number can be played, the
+  // player must play that number. Or if either number can be played but not
+  // both, the player must play the larger one. When neither number can be used,
+  // the player loses his turn. In the case of doubles, when all four numbers
+  // cannot be played, the player must play as many numbers as he can.
+  std::vector<Action> legal_actions;
+  int max_roll = -1;
+  for (const auto& move : movelist) {
+    if (max_moves == 2) {
+      // Only add moves that are size 2.
+      if (move.size() == 2) {
+        legal_actions.push_back(CheckerMovesToSpielMove(move));
+      }
+    } else if (max_moves == 1) {
+      // We are just finding the maximum roll.
+      max_roll = std::max(max_roll, move[0].num);
+    }
+  }
+
+  if (max_moves == 1) {
+    // Another round to add those that have the max die roll.
+    for (const auto& move : movelist) {
+      if (move[0].num == max_roll) {
+        legal_actions.push_back(CheckerMovesToSpielMove(move));
+      }
+    }
+  }
+
+  SPIEL_CHECK_FALSE(legal_actions.empty());
+  return legal_actions;
+}
+
+std::vector<Action> BackgammonState::LegalActions() const {
+  if (IsChanceNode()) return LegalChanceOutcomes();
+
+  SPIEL_CHECK_EQ(CountTotalCheckers(kXPlayerId), kNumCheckersPerPlayer);
+  SPIEL_CHECK_EQ(CountTotalCheckers(kOPlayerId), kNumCheckersPerPlayer);
+
+  std::unique_ptr<State> cstate = this->Clone();
+  BackgammonState* state = dynamic_cast<BackgammonState*>(cstate.get());
+  std::set<std::vector<CheckerMove>> movelist;
+  int max_moves = state->RecLegalMoves({}, &movelist);
+  SPIEL_CHECK_GE(max_moves, 0);
+  SPIEL_CHECK_LE(max_moves, 2);
+  std::vector<Action> legal_actions = ProcessLegalMoves(max_moves, movelist);
+  return legal_actions;
+}
+
+std::vector<std::pair<Action, double>> BackgammonState::ChanceOutcomes() const {
+  SPIEL_CHECK_TRUE(IsChanceNode());
+  return kChanceOutcomes;
+}
+
+std::string BackgammonState::ToString() const {
+  std::vector<std::string> board_array = {
+      "+------|------+", "|......|......|", "|......|......|",
+      "|......|......|", "|......|......|", "|......|......|",
+      "|      |      |", "|......|......|", "|......|......|",
+      "|......|......|", "|......|......|", "|......|......|",
+      "+------|------+"};
+
+  // Fill the board.
+  for (int pos = 0; pos < 24; pos++) {
+    if (board_[kXPlayerId][pos] > 0 || board_[kOPlayerId][pos] > 0) {
+      int start_row = (pos < 12 ? 11 : 1);
+      int col = (pos < 12 ? (pos >= 6 ? 12 - pos : 13 - pos)
+                          : (pos < 18 ? pos - 11 : pos - 10));
+
+      int row_offset = (pos < 12 ? -1 : 1);
+
+      int owner = board_[kXPlayerId][pos] > 0 ? kXPlayerId : kOPlayerId;
+      char piece = (owner == kXPlayerId ? 'x' : 'o');
+      int my_checkers = board_[owner][pos];
+
+      for (int i = 0; i < 5 && i < my_checkers; i++) {
+        board_array[start_row + i * row_offset][col] = piece;
+      }
+
+      // Check for special display of >= 10 and >5 pieces
+      if (my_checkers >= 10) {
+        char lsd = std::to_string(my_checkers % 10)[0];
+        // Make sure it reads downward.
+        if (pos < 12) {
+          board_array[start_row + row_offset][col] = '1';
+          board_array[start_row][col] = lsd;
+        } else {
+          board_array[start_row][col] = '1';
+          board_array[start_row + row_offset][col] = lsd;
+        }
+      } else if (my_checkers > 5) {
+        board_array[start_row][col] = std::to_string(my_checkers)[0];
+      }
+    }
+  }
+
+  std::string board_str = absl::StrJoin(board_array, "\n") + "\n";
+
+  // Extra info like whose turn it is etc.
+  absl::StrAppend(&board_str, "Turn: ");
+  absl::StrAppend(&board_str, cur_player_ == kXPlayerId ? "x" : "o");
+  absl::StrAppend(&board_str, "\n");
+  absl::StrAppend(&board_str, "Dice: ");
+  absl::StrAppend(&board_str, !dice_.empty() ? DiceToString(dice_[0]) : "");
+  absl::StrAppend(&board_str, dice_.size() > 1 ? DiceToString(dice_[1]) : "");
+  absl::StrAppend(&board_str, "\n");
+  absl::StrAppend(&board_str, "Bar:");
+  absl::StrAppend(&board_str,
+                  (bar_[kXPlayerId] > 0 || bar_[kOPlayerId] > 0 ? " " : ""));
+  for (int p = 0; p < 2; p++) {
+    for (int n = 0; n < bar_[p]; n++) {
+      absl::StrAppend(&board_str, (p == kXPlayerId ? "x" : "o"));
+    }
+  }
+  absl::StrAppend(&board_str, "\n");
+  absl::StrAppend(&board_str, "Scores, X: ", scores_[kXPlayerId]);
+  absl::StrAppend(&board_str, ", O: ", scores_[kOPlayerId], "\n");
+
+  return board_str;
+}
+
+bool BackgammonState::IsTerminal() const {
+  return (scores_[kXPlayerId] == 15 || scores_[kOPlayerId] == 15);
+}
+
+std::vector<double> BackgammonState::Returns() const {
+  int winner = -1;
+  int loser = -1;
+  if (scores_[kXPlayerId] == 15) {
+    winner = kXPlayerId;
+    loser = kOPlayerId;
+  } else if (scores_[kOPlayerId] == 15) {
+    winner = kOPlayerId;
+    loser = kXPlayerId;
+  } else {
+    return {0.0, 0.0};
+  }
+
+  // Magnify the util based on the scoring rules for this game.
+  int util_mag = 1;
+  switch (scoring_type_) {
+    case ScoringType::kWinLossScoring:
+    default:
+      break;
+
+    case ScoringType::kEnableGammons:
+      util_mag = (IsGammoned(loser) ? 2 : 1);
+      break;
+
+    case ScoringType::kFullScoring:
+      util_mag = (IsBackgammoned(loser) ? 3 : IsGammoned(loser) ? 2 : 1);
+      break;
+  }
+
+  std::vector<double> returns(kNumPlayers);
+  returns[winner] = util_mag;
+  returns[loser] = -util_mag;
+  return returns;
+}
+
+std::unique_ptr<State> BackgammonState::Clone() const {
+  return std::unique_ptr<State>(new BackgammonState(*this));
+}
+
+void BackgammonState::SetState(int cur_player, bool double_turn,
+                               const std::vector<int>& dice,
+                               const std::vector<int>& bar,
+                               const std::vector<int>& scores,
+                               const std::vector<std::vector<int>>& board) {
+  cur_player_ = cur_player;
+  double_turn_ = double_turn;
+  dice_ = dice;
+  bar_ = bar;
+  scores_ = scores;
+  board_ = board;
+
+  SPIEL_CHECK_EQ(CountTotalCheckers(kXPlayerId), kNumCheckersPerPlayer);
+  SPIEL_CHECK_EQ(CountTotalCheckers(kOPlayerId), kNumCheckersPerPlayer);
+}
+
+BackgammonGame::BackgammonGame(const GameParameters& params)
+    : Game(kGameType, params),
+      scoring_type_(ParseScoringType(
+          ParameterValue<std::string>("scoring_type", kDefaultScoringType))) {}
+
+double BackgammonGame::MaxUtility() const {
+  switch (scoring_type_) {
+    case ScoringType::kWinLossScoring:
+      return 1;
+    case ScoringType::kEnableGammons:
+      return 2;
+    case ScoringType::kFullScoring:
+      return 3;
+    default:
+      SpielFatalError("Unknown scoring_type");
+  }
+}
+
+}  // namespace backgammon
+}  // namespace open_spiel

@@ -1,0 +1,144 @@
+game: leduc_poker
+seed: 773740114
+
+GameType.chance_mode = ChanceMode.EXPLICIT_STOCHASTIC
+GameType.dynamics = Dynamics.SEQUENTIAL
+GameType.information = Information.IMPERFECT_INFORMATION
+GameType.long_name = "Leduc Poker"
+GameType.max_num_players = 10
+GameType.min_num_players = 2
+GameType.parameter_specification = ["players"]
+GameType.provides_information_state = True
+GameType.provides_information_state_as_normalized_vector = True
+GameType.provides_observation = True
+GameType.provides_observation_as_normalized_vector = True
+GameType.reward_model = RewardModel.TERMINAL
+GameType.short_name = "leduc_poker"
+GameType.utility = Utility.ZERO_SUM
+
+NumDistinctActions() = 3
+MaxChanceOutcomes() = 6
+GetParameters() = {players=2}
+NumPlayers() = 2
+MinUtility() = -13.0
+MaxUtility() = 13.0
+UtilitySum() = 0.0
+InformationStateNormalizedVectorShape() = [30]
+InformationStateNormalizedVectorSize() = 30
+ObservationNormalizedVectorShape() = [16]
+ObservationNormalizedVectorSize() = 16
+MaxGameLength() = 8
+ToString() = "leduc_poker()"
+
+# State 0
+IsTerminal() = False
+ToString() = "Round: 1\nPlayer: -1\nPot: 2\nMoney (p1 p2 ...): 99 99\nCards (public p1 p2 ...): -10000 -10000 -10000 \nRound 1 sequence: \nRound 2 sequence: \n"
+History() = []
+HistoryString() = ""
+IsChanceNode() = True
+IsSimultaneousNode() = False
+CurrentPlayer() = -1
+InformationState(0) = "[Round 1][Player: -1][Pot: 2][Money: 99 99[Private: -10000]][Round1]: [Public: -10000]\nRound 2 sequence: "
+InformationState(1) = "[Round 1][Player: -1][Pot: 2][Money: 99 99[Private: -10000]][Round1]: [Public: -10000]\nRound 2 sequence: "
+InformationStateAsNormalizedVector(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+InformationStateAsNormalizedVector(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+Observation(0) = "[Round 1][Player: -1][Pot: 2][Money: 99 99[Private: -10000][Ante: 1 1]"
+Observation(1) = "[Round 1][Player: -1][Pot: 2][Money: 99 99[Private: -10000][Ante: 1 1]"
+ObservationAsNormalizedVector(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0]
+ObservationAsNormalizedVector(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0]
+ChanceOutcomes() = [{0, 0.166666666667}, {1, 0.166666666667}, {2, 0.166666666667}, {3, 0.166666666667}, {4, 0.166666666667}, {5, 0.166666666667}]
+LegalActions() = [0, 1, 2, 3, 4, 5]
+StringLegalActions() = ["Chance outcome:0", "Chance outcome:1", "Chance outcome:2", "Chance outcome:3", "Chance outcome:4", "Chance outcome:5"]
+
+# Apply action "Chance outcome:0"
+action: 0
+
+# State 1
+IsTerminal() = False
+ToString() = "Round: 1\nPlayer: -1\nPot: 2\nMoney (p1 p2 ...): 99 99\nCards (public p1 p2 ...): -10000 0 -10000 \nRound 1 sequence: \nRound 2 sequence: \n"
+History() = [0]
+HistoryString() = "0"
+IsChanceNode() = True
+IsSimultaneousNode() = False
+CurrentPlayer() = -1
+InformationState(0) = "[Round 1][Player: -1][Pot: 2][Money: 99 99[Private: 0]][Round1]: [Public: -10000]\nRound 2 sequence: "
+InformationState(1) = "[Round 1][Player: -1][Pot: 2][Money: 99 99[Private: -10000]][Round1]: [Public: -10000]\nRound 2 sequence: "
+InformationStateAsNormalizedVector(0) = [1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+InformationStateAsNormalizedVector(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+Observation(0) = "[Round 1][Player: -1][Pot: 2][Money: 99 99[Private: 0][Ante: 1 1]"
+Observation(1) = "[Round 1][Player: -1][Pot: 2][Money: 99 99[Private: -10000][Ante: 1 1]"
+ObservationAsNormalizedVector(0) = [1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0]
+ObservationAsNormalizedVector(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0]
+ChanceOutcomes() = [{1, 0.200000000000}, {2, 0.200000000000}, {3, 0.200000000000}, {4, 0.200000000000}, {5, 0.200000000000}]
+LegalActions() = [1, 2, 3, 4, 5]
+StringLegalActions() = ["Chance outcome:1", "Chance outcome:2", "Chance outcome:3", "Chance outcome:4", "Chance outcome:5"]
+
+# Apply action "Chance outcome:3"
+action: 3
+
+# State 2
+IsTerminal() = False
+ToString() = "Round: 1\nPlayer: 0\nPot: 2\nMoney (p1 p2 ...): 99 99\nCards (public p1 p2 ...): -10000 0 3 \nRound 1 sequence: \nRound 2 sequence: \n"
+History() = [0, 3]
+HistoryString() = "0 3"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationState(0) = "[Round 1][Player: 0][Pot: 2][Money: 99 99[Private: 0]][Round1]: [Public: -10000]\nRound 2 sequence: "
+InformationState(1) = "[Round 1][Player: 0][Pot: 2][Money: 99 99[Private: 3]][Round1]: [Public: -10000]\nRound 2 sequence: "
+InformationStateAsNormalizedVector(0) = [1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+InformationStateAsNormalizedVector(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+Observation(0) = "[Round 1][Player: 0][Pot: 2][Money: 99 99[Private: 0][Ante: 1 1]"
+Observation(1) = "[Round 1][Player: 0][Pot: 2][Money: 99 99[Private: 3][Ante: 1 1]"
+ObservationAsNormalizedVector(0) = [1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0]
+ObservationAsNormalizedVector(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [1, 2]
+StringLegalActions() = ["Call", "Raise"]
+
+# Apply action "Raise"
+action: 2
+
+# State 3
+IsTerminal() = False
+ToString() = "Round: 1\nPlayer: 1\nPot: 4\nMoney (p1 p2 ...): 97 99\nCards (public p1 p2 ...): -10000 0 3 \nRound 1 sequence: 2\nRound 2 sequence: \n"
+History() = [0, 3, 2]
+HistoryString() = "0 3 2"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationState(0) = "[Round 1][Player: 1][Pot: 4][Money: 97 99[Private: 0]][Round1]: 2[Public: -10000]\nRound 2 sequence: "
+InformationState(1) = "[Round 1][Player: 1][Pot: 4][Money: 97 99[Private: 3]][Round1]: 2[Public: -10000]\nRound 2 sequence: "
+InformationStateAsNormalizedVector(0) = [1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+InformationStateAsNormalizedVector(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+Observation(0) = "[Round 1][Player: 1][Pot: 4][Money: 97 99[Private: 0][Ante: 3 1]"
+Observation(1) = "[Round 1][Player: 1][Pot: 4][Money: 97 99[Private: 3][Ante: 3 1]"
+ObservationAsNormalizedVector(0) = [1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 3.0, 1.0]
+ObservationAsNormalizedVector(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 3.0, 1.0]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2]
+StringLegalActions() = ["Fold", "Call", "Raise"]
+
+# Apply action "Fold"
+action: 0
+
+# State 4
+IsTerminal() = True
+ToString() = "Round: 1\nPlayer: 1\nPot: 0\nMoney (p1 p2 ...): 101 99\nCards (public p1 p2 ...): -10000 0 3 \nRound 1 sequence: 2 0\nRound 2 sequence: \n"
+History() = [0, 3, 2, 0]
+HistoryString() = "0 3 2 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = -4
+InformationState(0) = "[Round 1][Player: 1][Pot: 0][Money: 101 99[Private: 0]][Round1]: 2 0[Public: -10000]\nRound 2 sequence: "
+InformationState(1) = "[Round 1][Player: 1][Pot: 0][Money: 101 99[Private: 3]][Round1]: 2 0[Public: -10000]\nRound 2 sequence: "
+InformationStateAsNormalizedVector(0) = [1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+InformationStateAsNormalizedVector(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+Observation(0) = "[Round 1][Player: 1][Pot: 0][Money: 101 99[Private: 0][Ante: 3 1]"
+Observation(1) = "[Round 1][Player: 1][Pot: 0][Money: 101 99[Private: 3][Ante: 3 1]"
+ObservationAsNormalizedVector(0) = [1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 3.0, 1.0]
+ObservationAsNormalizedVector(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 3.0, 1.0]
+Rewards() = [1.0, -1.0]
+Returns() = [1.0, -1.0]

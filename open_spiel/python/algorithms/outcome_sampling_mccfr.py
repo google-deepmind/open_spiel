@@ -1,0 +1,200 @@
+# Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""Python implementation for Monte Carlo Counterfactual Regret Minimization."""
+
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
+import numpy as np
+
+# Indices in the information sets for the regrets and average policy sums.
+_REGRET_INDEX = 0
+_AVG_POLICY_INDEX = 1
+
+
+class OutcomeSamplingSolver(object):
+  """An implementation of outcome sampling MCCFR.
+
+  Uses stochastically-weighted averaging.
+
+  For details, see Chapter 4 (p. 49) of:
+  http://mlanctot.info/files/papers/PhD_Thesis_MarcLanctot.pdf
+  (Lanctot, 2013. "Monte Carlo Sampling and Regret Minimization for Equilibrium
+  Computation and Decision-Making in Games")
+  """
+
+  def __init__(self, game):
+    self._game = game
+    self._infostates = {}  # infostate keys -> [regrets, avg strat]
+    self._num_players = game.num_players()
+    # This is the epsilon exploration factor. When sampling episodes, the
+    # updating player will sampling according to expl * uniform + (1 - expl) *
+    # current_policy.
+    self._expl = 0.6
+
+  def iteration(self):
+    """Performs one iteration of outcome sampling.
+
+    An iteration consists of one episode for each player as the update player.
+    """
+    for update_player in range(self._num_players):
+      state = self._game.new_initial_state()
+      self._episode(
+          state, update_player, my_reach=1.0, opp_reach=1.0, sample_reach=1.0)
+
+  def _lookup_infostate_info(self, info_state_key, num_legal_actions):
+    """Looks up an information set table for the given key.
+
+    Args:
+      info_state_key: information state key (string identifier).
+      num_legal_actions: number of legal actions at this information state.
+
+    Returns:
+      A list of:
+        - the average regrets as a numpy array of shape [num_legal_actions]
+        - the average strategy as a numpy array of shape [num_legal_actions].
+          The average is weighted using `my_reach`
+    """
+    retrieved_infostate = self._infostates.get(info_state_key, None)
+    if retrieved_infostate is not None:
+      return retrieved_infostate
+
+    # Start with a small amount of regret and total accumulation, to give a
+    # uniform policy: this will get erased fast.
+    self._infostates[info_state_key] = [
+        np.ones(num_legal_actions, dtype=np.float64) / 1000.0,
+        np.ones(num_legal_actions, dtype=np.float64) / 1000.0,
+    ]
+    return self._infostates[info_state_key]
+
+  def _add_regret(self, info_state_key, action_idx, amount):
+    self._infostates[info_state_key][_REGRET_INDEX][action_idx] += amount
+
+  def _add_avstrat(self, info_state_key, action_idx, amount):
+    self._infostates[info_state_key][_AVG_POLICY_INDEX][action_idx] += amount
+
+  def callable_avg_policy(self):
+    """Returns the average joint policy as a callable.
+
+    The callable has a signature of the form string (information
+    state key) -> list of (action, prob).
+    """
+
+    def wrap(state):
+      info_state_key = state.information_state(state.current_player())
+      legal_actions = state.legal_actions()
+      infostate_info = self._lookup_infostate_info(info_state_key,
+                                                   len(legal_actions))
+      avstrat = (
+          infostate_info[_AVG_POLICY_INDEX] /
+          infostate_info[_AVG_POLICY_INDEX].sum())
+      return [(legal_actions[i], avstrat[i]) for i in range(len(legal_actions))]
+
+    return wrap
+
+  def _regret_matching(self, regrets, num_legal_actions):
+    """Applies regret matching to get a policy.
+
+    Args:
+      regrets: numpy array of regrets for each action.
+      num_legal_actions: number of legal actions at this state.
+
+    Returns:
+      numpy array of the policy indexed by the index of legal action in the
+      list.
+    """
+    positive_regrets = np.maximum(regrets,
+                                  np.zeros(num_legal_actions, dtype=np.float64))
+    sum_pos_regret = positive_regrets.sum()
+    if sum_pos_regret <= 0:
+      return np.ones(num_legal_actions, dtype=np.float64) / num_legal_actions
+    else:
+      return positive_regrets / sum_pos_regret
+
+  def _episode(self, state, update_player, my_reach, opp_reach, sample_reach):
+    """Runs an episode of outcome sampling.
+
+    Args:
+      state: the open spiel state to run from (will be modified in-place).
+      update_player: the player to update regrets for (the other players update
+        average strategies)
+      my_reach: reach probability of the update player
+      opp_reach: reach probability of all the opponents (including chance)
+      sample_reach: reach probability of the sampling (behavior) policy
+
+    Returns:
+      A tuple of (util, reach_tail), where:
+        - util is the utility of the update player divided by the sample reach
+          of the trajectory, and
+        - reach_tail is the product of all players' reach probabilities
+          to the terminal state (from the state that was passed in).
+    """
+    if state.is_terminal():
+      return state.player_return(update_player) / sample_reach, 1.0
+
+    if state.is_chance_node():
+      outcomes, probs = zip(*state.chance_outcomes())
+      outcome = np.random.choice(outcomes, p=probs)
+      state.apply_action(outcome)
+      return self._episode(state, update_player, my_reach, opp_reach,
+                           sample_reach)
+
+    cur_player = state.current_player()
+    info_state_key = state.information_state(cur_player)
+    legal_actions = state.legal_actions()
+    num_legal_actions = len(legal_actions)
+    infostate_info = self._lookup_infostate_info(info_state_key,
+                                                 num_legal_actions)
+    policy = self._regret_matching(infostate_info[_REGRET_INDEX],
+                                   num_legal_actions)
+    if cur_player == update_player:
+      uniform_policy = (
+          np.ones(num_legal_actions, dtype=np.float64) / num_legal_actions)
+      sampling_policy = (
+          self._expl * uniform_policy + (1.0 - self._expl) * policy)
+    else:
+      sampling_policy = policy
+    sampled_action_idx = np.random.choice(
+        np.arange(num_legal_actions), p=sampling_policy)
+    if cur_player == update_player:
+      new_my_reach = my_reach * policy[sampled_action_idx]
+      new_opp_reach = opp_reach
+    else:
+      new_my_reach = my_reach
+      new_opp_reach = opp_reach * policy[sampled_action_idx]
+    new_sample_reach = sample_reach * sampling_policy[sampled_action_idx]
+    state.apply_action(legal_actions[sampled_action_idx])
+    util, reach_tail = self._episode(state, update_player, new_my_reach,
+                                     new_opp_reach, new_sample_reach)
+    new_reach_tail = policy[sampled_action_idx] * reach_tail
+    # The following updates are based on equations 4.9 - 4.15 (Sec 4.2) of
+    # http://mlanctot.info/files/papers/PhD_Thesis_MarcLanctot.pdf
+    if cur_player == update_player:
+      # update regrets. Note the w here already includes the sample reach of the
+      # trajectory (from root to terminal) in util due to the base case above.
+      w = util * opp_reach
+      for action_idx in range(num_legal_actions):
+        if action_idx == sampled_action_idx:
+          self._add_regret(info_state_key, action_idx,
+                           w * (reach_tail - new_reach_tail))
+        else:
+          self._add_regret(info_state_key, action_idx, -w * new_reach_tail)
+    else:
+      # update avg strat
+      for action_idx in range(num_legal_actions):
+        self._add_avstrat(info_state_key, action_idx,
+                          opp_reach * policy[action_idx] / sample_reach)
+    return util, new_reach_tail

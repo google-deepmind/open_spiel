@@ -1,0 +1,278 @@
+game: tiny_bridge_4p
+seed: 4133439701
+
+GameType.chance_mode = ChanceMode.DETERMINISTIC
+GameType.dynamics = Dynamics.SEQUENTIAL
+GameType.information = Information.PERFECT_INFORMATION
+GameType.long_name = "Tiny Bridge (Contested)"
+GameType.max_num_players = 4
+GameType.min_num_players = 4
+GameType.parameter_specification = []
+GameType.provides_information_state = True
+GameType.provides_information_state_as_normalized_vector = False
+GameType.provides_observation = False
+GameType.provides_observation_as_normalized_vector = False
+GameType.reward_model = RewardModel.TERMINAL
+GameType.short_name = "tiny_bridge_4p"
+GameType.utility = Utility.ZERO_SUM
+
+NumDistinctActions() = 9
+MaxChanceOutcomes() = 28
+GetParameters() = {}
+NumPlayers() = 4
+MinUtility() = -12.0
+MaxUtility() = 12.0
+UtilitySum() = 0.0
+MaxGameLength() = 57
+ToString() = "tiny_bridge_4p()"
+
+# State 0
+IsTerminal() = False
+ToString() = "W:?? N:?? E:?? S:??"
+History() = []
+HistoryString() = ""
+IsChanceNode() = True
+IsSimultaneousNode() = False
+CurrentPlayer() = -1
+InformationState(0) = "??"
+InformationState(1) = "??"
+InformationState(2) = "??"
+InformationState(3) = "??"
+ChanceOutcomes() = [{8, 0.035714285714}, {16, 0.035714285714}, {24, 0.035714285714}, {32, 0.035714285714}, {40, 0.035714285714}, {48, 0.035714285714}, {56, 0.035714285714}, {17, 0.035714285714}, {25, 0.035714285714}, {33, 0.035714285714}, {41, 0.035714285714}, {49, 0.035714285714}, {57, 0.035714285714}, {26, 0.035714285714}, {34, 0.035714285714}, {42, 0.035714285714}, {50, 0.035714285714}, {58, 0.035714285714}, {35, 0.035714285714}, {43, 0.035714285714}, {51, 0.035714285714}, {59, 0.035714285714}, {44, 0.035714285714}, {52, 0.035714285714}, {60, 0.035714285714}, {53, 0.035714285714}, {61, 0.035714285714}, {62, 0.035714285714}]
+LegalActions() = [8, 16, 24, 32, 40, 48, 56, 17, 25, 33, 41, 49, 57, 26, 34, 42, 50, 58, 35, 43, 51, 59, 44, 52, 60, 53, 61, 62]
+StringLegalActions() = ["HJHQ", "HJHK", "HJHA", "HJSJ", "HJSQ", "HJSK", "HJSA", "HQHK", "HQHA", "HQSJ", "HQSQ", "HQSK", "HQSA", "HKHA", "HKSJ", "HKSQ", "HKSK", "HKSA", "HASJ", "HASQ", "HASK", "HASA", "SJSQ", "SJSK", "SJSA", "SQSK", "SQSA", "SKSA"]
+
+# Apply action "HJSA"
+action: 56
+
+# State 1
+IsTerminal() = False
+ToString() = "W:HJSA N:?? E:?? S:??"
+History() = [56]
+HistoryString() = "56"
+IsChanceNode() = True
+IsSimultaneousNode() = False
+CurrentPlayer() = -1
+InformationState(0) = "HJSA"
+InformationState(1) = "??"
+InformationState(2) = "??"
+InformationState(3) = "??"
+ChanceOutcomes() = [{17, 0.066666666667}, {25, 0.066666666667}, {33, 0.066666666667}, {41, 0.066666666667}, {49, 0.066666666667}, {26, 0.066666666667}, {34, 0.066666666667}, {42, 0.066666666667}, {50, 0.066666666667}, {35, 0.066666666667}, {43, 0.066666666667}, {51, 0.066666666667}, {44, 0.066666666667}, {52, 0.066666666667}, {53, 0.066666666667}]
+LegalActions() = [17, 25, 33, 41, 49, 26, 34, 42, 50, 35, 43, 51, 44, 52, 53]
+StringLegalActions() = ["HQHK", "HQHA", "HQSJ", "HQSQ", "HQSK", "HKHA", "HKSJ", "HKSQ", "HKSK", "HASJ", "HASQ", "HASK", "SJSQ", "SJSK", "SQSK"]
+
+# Apply action "HQHA"
+action: 25
+
+# State 2
+IsTerminal() = False
+ToString() = "W:HJSA N:HQHA E:?? S:??"
+History() = [56, 25]
+HistoryString() = "56 25"
+IsChanceNode() = True
+IsSimultaneousNode() = False
+CurrentPlayer() = -1
+InformationState(0) = "HJSA"
+InformationState(1) = "HQHA"
+InformationState(2) = "??"
+InformationState(3) = "??"
+ChanceOutcomes() = [{34, 0.166666666667}, {42, 0.166666666667}, {50, 0.166666666667}, {44, 0.166666666667}, {52, 0.166666666667}, {53, 0.166666666667}]
+LegalActions() = [34, 42, 50, 44, 52, 53]
+StringLegalActions() = ["HKSJ", "HKSQ", "HKSK", "SJSQ", "SJSK", "SQSK"]
+
+# Apply action "HKSK"
+action: 50
+
+# State 3
+IsTerminal() = False
+ToString() = "W:HJSA N:HQHA E:HKSK S:??"
+History() = [56, 25, 50]
+HistoryString() = "56 25 50"
+IsChanceNode() = True
+IsSimultaneousNode() = False
+CurrentPlayer() = -1
+InformationState(0) = "HJSA"
+InformationState(1) = "HQHA"
+InformationState(2) = "HKSK"
+InformationState(3) = "??"
+ChanceOutcomes() = [{44, 1.000000000000}]
+LegalActions() = [44]
+StringLegalActions() = ["SJSQ"]
+
+# Apply action "SJSQ"
+action: 44
+
+# State 4
+IsTerminal() = False
+ToString() = "W:HJSA N:HQHA E:HKSK S:SJSQ"
+History() = [56, 25, 50, 44]
+HistoryString() = "56 25 50 44"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationState(0) = "HJSA"
+InformationState(1) = "HQHA"
+InformationState(2) = "HKSK"
+InformationState(3) = "SJSQ"
+Rewards() = [0.0, 0.0, 0.0, 0.0]
+Returns() = [0.0, 0.0, 0.0, 0.0]
+LegalActions() = [0, 1, 2, 3, 4, 5, 6]
+StringLegalActions() = ["Pass", "1H", "1S", "1NT", "2H", "2S", "2NT"]
+
+# Apply action "2H"
+action: 4
+
+# State 5
+IsTerminal() = False
+ToString() = "W:HJSA N:HQHA E:HKSK S:SJSQ 2H"
+History() = [56, 25, 50, 44, 4]
+HistoryString() = "56 25 50 44 4"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationState(0) = "HJSA 2H"
+InformationState(1) = "HQHA 2H"
+InformationState(2) = "HKSK 2H"
+InformationState(3) = "SJSQ 2H"
+Rewards() = [0.0, 0.0, 0.0, 0.0]
+Returns() = [0.0, 0.0, 0.0, 0.0]
+LegalActions() = [0, 5, 6, 7]
+StringLegalActions() = ["Pass", "2S", "2NT", "Dbl"]
+
+# Apply action "2S"
+action: 5
+
+# State 6
+IsTerminal() = False
+ToString() = "W:HJSA N:HQHA E:HKSK S:SJSQ 2H-2S"
+History() = [56, 25, 50, 44, 4, 5]
+HistoryString() = "56 25 50 44 4 5"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 2
+InformationState(0) = "HJSA 2H-2S"
+InformationState(1) = "HQHA 2H-2S"
+InformationState(2) = "HKSK 2H-2S"
+InformationState(3) = "SJSQ 2H-2S"
+Rewards() = [0.0, 0.0, 0.0, 0.0]
+Returns() = [0.0, 0.0, 0.0, 0.0]
+LegalActions() = [0, 6, 7]
+StringLegalActions() = ["Pass", "2NT", "Dbl"]
+
+# Apply action "2NT"
+action: 6
+
+# State 7
+IsTerminal() = False
+ToString() = "W:HJSA N:HQHA E:HKSK S:SJSQ 2H-2S-2NT"
+History() = [56, 25, 50, 44, 4, 5, 6]
+HistoryString() = "56 25 50 44 4 5 6"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 3
+InformationState(0) = "HJSA 2H-2S-2NT"
+InformationState(1) = "HQHA 2H-2S-2NT"
+InformationState(2) = "HKSK 2H-2S-2NT"
+InformationState(3) = "SJSQ 2H-2S-2NT"
+Rewards() = [0.0, 0.0, 0.0, 0.0]
+Returns() = [0.0, 0.0, 0.0, 0.0]
+LegalActions() = [0, 7]
+StringLegalActions() = ["Pass", "Dbl"]
+
+# Apply action "Dbl"
+action: 7
+
+# State 8
+IsTerminal() = False
+ToString() = "W:HJSA N:HQHA E:HKSK S:SJSQ 2H-2S-2NT-Dbl"
+History() = [56, 25, 50, 44, 4, 5, 6, 7]
+HistoryString() = "56 25 50 44 4 5 6 7"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationState(0) = "HJSA 2H-2S-2NT-Dbl"
+InformationState(1) = "HQHA 2H-2S-2NT-Dbl"
+InformationState(2) = "HKSK 2H-2S-2NT-Dbl"
+InformationState(3) = "SJSQ 2H-2S-2NT-Dbl"
+Rewards() = [0.0, 0.0, 0.0, 0.0]
+Returns() = [0.0, 0.0, 0.0, 0.0]
+LegalActions() = [0, 8]
+StringLegalActions() = ["Pass", "RDbl"]
+
+# Apply action "RDbl"
+action: 8
+
+# State 9
+IsTerminal() = False
+ToString() = "W:HJSA N:HQHA E:HKSK S:SJSQ 2H-2S-2NT-Dbl-RDbl"
+History() = [56, 25, 50, 44, 4, 5, 6, 7, 8]
+HistoryString() = "56 25 50 44 4 5 6 7 8"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationState(0) = "HJSA 2H-2S-2NT-Dbl-RDbl"
+InformationState(1) = "HQHA 2H-2S-2NT-Dbl-RDbl"
+InformationState(2) = "HKSK 2H-2S-2NT-Dbl-RDbl"
+InformationState(3) = "SJSQ 2H-2S-2NT-Dbl-RDbl"
+Rewards() = [0.0, 0.0, 0.0, 0.0]
+Returns() = [0.0, 0.0, 0.0, 0.0]
+LegalActions() = [0]
+StringLegalActions() = ["Pass"]
+
+# Apply action "Pass"
+action: 0
+
+# State 10
+IsTerminal() = False
+ToString() = "W:HJSA N:HQHA E:HKSK S:SJSQ 2H-2S-2NT-Dbl-RDbl-Pass"
+History() = [56, 25, 50, 44, 4, 5, 6, 7, 8, 0]
+HistoryString() = "56 25 50 44 4 5 6 7 8 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 2
+InformationState(0) = "HJSA 2H-2S-2NT-Dbl-RDbl-Pass"
+InformationState(1) = "HQHA 2H-2S-2NT-Dbl-RDbl-Pass"
+InformationState(2) = "HKSK 2H-2S-2NT-Dbl-RDbl-Pass"
+InformationState(3) = "SJSQ 2H-2S-2NT-Dbl-RDbl-Pass"
+Rewards() = [0.0, 0.0, 0.0, 0.0]
+Returns() = [0.0, 0.0, 0.0, 0.0]
+LegalActions() = [0]
+StringLegalActions() = ["Pass"]
+
+# Apply action "Pass"
+action: 0
+
+# State 11
+IsTerminal() = False
+ToString() = "W:HJSA N:HQHA E:HKSK S:SJSQ 2H-2S-2NT-Dbl-RDbl-Pass-Pass"
+History() = [56, 25, 50, 44, 4, 5, 6, 7, 8, 0, 0]
+HistoryString() = "56 25 50 44 4 5 6 7 8 0 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 3
+InformationState(0) = "HJSA 2H-2S-2NT-Dbl-RDbl-Pass-Pass"
+InformationState(1) = "HQHA 2H-2S-2NT-Dbl-RDbl-Pass-Pass"
+InformationState(2) = "HKSK 2H-2S-2NT-Dbl-RDbl-Pass-Pass"
+InformationState(3) = "SJSQ 2H-2S-2NT-Dbl-RDbl-Pass-Pass"
+Rewards() = [0.0, 0.0, 0.0, 0.0]
+Returns() = [0.0, 0.0, 0.0, 0.0]
+LegalActions() = [0]
+StringLegalActions() = ["Pass"]
+
+# Apply action "Pass"
+action: 0
+
+# State 12
+IsTerminal() = True
+ToString() = "W:HJSA N:HQHA E:HKSK S:SJSQ 2H-2S-2NT-Dbl-RDbl-Pass-Pass-Pass"
+History() = [56, 25, 50, 44, 4, 5, 6, 7, 8, 0, 0, 0]
+HistoryString() = "56 25 50 44 4 5 6 7 8 0 0 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = -4
+InformationState(0) = "HJSA 2H-2S-2NT-Dbl-RDbl-Pass-Pass-Pass"
+InformationState(1) = "HQHA 2H-2S-2NT-Dbl-RDbl-Pass-Pass-Pass"
+InformationState(2) = "HKSK 2H-2S-2NT-Dbl-RDbl-Pass-Pass-Pass"
+InformationState(3) = "SJSQ 2H-2S-2NT-Dbl-RDbl-Pass-Pass-Pass"
+Rewards() = [-4.0, 4.0, -4.0, 4.0]
+Returns() = [-4.0, 4.0, -4.0, 4.0]
