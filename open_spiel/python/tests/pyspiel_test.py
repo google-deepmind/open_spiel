@@ -36,6 +36,7 @@ class PyspielTest(unittest.TestCase):
         "blotto",
         "breakthrough",
         "bridge_uncontested_bidding",
+        "catch",
         "chess",
         "coin_game",
         "connect_four",

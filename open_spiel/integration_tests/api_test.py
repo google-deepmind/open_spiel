@@ -68,6 +68,7 @@ _GAMES_TO_TEST = list(set(pyspiel.registered_names()) - set(_EXCLUDED_GAMES))
 # The list of game instances to test on the full tree as tuples
 # (name to display, string to pass to load_game).
 _GAMES_FULL_TREE_TRAVERSAL_TESTS = [
+    ("catch", "catch"),
     ("kuhn_poker", "kuhn_poker"),
     ("leduc_poker", "leduc_poker"),
     # Disabled as this slows down the test significantly. (12s to 150s).
@@ -80,10 +81,11 @@ _GAMES_FULL_TREE_TRAVERSAL_TESTS = [
 ]
 
 # Games from the above to exempt from the constant-sum tests.
-_GENERAL_SUM_GAMES = ["first_sealed_auction"]
+_GENERAL_SUM_GAMES = ["catch", "first_sealed_auction"]
 
 TOTAL_NUM_STATES = {
     # This maps the game name to (chance, playable, terminal)
+    "catch": (1, 30435, 52745),
     "kuhn_poker": (4, 24, 30),
     "leduc_poker": (157, 3780, 5520),
     "liars_dice": (7, 147456, 147420),
@@ -95,6 +97,7 @@ TOTAL_NUM_STATES = {
 # This is kept to ensure non-regression, but we would like to remove that
 # when we can interpret what are these numbers.
 PERFECT_RECALL_NUM_STATES = {
+    "catch": 30435,
     "kuhn_poker": 12,
     "leduc_poker": 936,
     "liars_dice": 24576,

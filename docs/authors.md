@@ -18,6 +18,7 @@ Names are ordered lexicographically. Typo or similar contributors are omitted.
 -   Julian Schrittwieser
 -   Julien Perolat
 -   Karl Tuyls
+-   Manuel Kroiss
 -   Marc Lanctot <lanctot@google.com>
 -   Matthew Lai
 -   Paul Muller

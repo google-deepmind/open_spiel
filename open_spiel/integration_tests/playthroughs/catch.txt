@@ -1,0 +1,245 @@
+game: catch
+seed: 3025732062
+
+GameType.chance_mode = ChanceMode.DETERMINISTIC
+GameType.dynamics = Dynamics.SEQUENTIAL
+GameType.information = Information.PERFECT_INFORMATION
+GameType.long_name = "Catch"
+GameType.max_num_players = 1
+GameType.min_num_players = 1
+GameType.parameter_specification = ["columns", "rows"]
+GameType.provides_information_state = True
+GameType.provides_information_state_as_normalized_vector = True
+GameType.provides_observation = True
+GameType.provides_observation_as_normalized_vector = True
+GameType.reward_model = RewardModel.TERMINAL
+GameType.short_name = "catch"
+GameType.utility = Utility.GENERAL_SUM
+
+NumDistinctActions() = 3
+MaxChanceOutcomes() = 5
+GetParameters() = {columns=5,rows=10}
+NumPlayers() = 1
+MinUtility() = -1.0
+MaxUtility() = 1.0
+UtilitySum() = None
+InformationStateNormalizedVectorShape() = [10, 5]
+InformationStateNormalizedVectorSize() = 50
+ObservationNormalizedVectorShape() = [10, 5]
+ObservationNormalizedVectorSize() = 50
+MaxGameLength() = 10
+ToString() = "catch()"
+
+# State 0
+IsTerminal() = False
+ToString() = ".....\n.....\n.....\n.....\n.....\n.....\n.....\n.....\n.....\n.....\n"
+History() = []
+HistoryString() = ""
+IsChanceNode() = True
+IsSimultaneousNode() = False
+CurrentPlayer() = -1
+InformationState(0) = ""
+InformationStateAsNormalizedVector(0) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+Observation(0) = ".....\n.....\n.....\n.....\n.....\n.....\n.....\n.....\n.....\n.....\n"
+ObservationAsNormalizedVector(0) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ChanceOutcomes() = [{0, 0.200000000000}, {1, 0.200000000000}, {2, 0.200000000000}, {3, 0.200000000000}, {4, 0.200000000000}]
+LegalActions() = [0, 1, 2, 3, 4]
+StringLegalActions() = ["Initialized ball to 0", "Initialized ball to 1", "Initialized ball to 2", "Initialized ball to 3", "Initialized ball to 4"]
+
+# Apply action "Initialized ball to 1"
+action: 1
+
+# State 1
+IsTerminal() = False
+ToString() = ".o...\n.....\n.....\n.....\n.....\n.....\n.....\n.....\n.....\n..x..\n"
+History() = [1]
+HistoryString() = "1"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationState(0) = "1"
+InformationStateAsNormalizedVector(0) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0]
+Observation(0) = ".o...\n.....\n.....\n.....\n.....\n.....\n.....\n.....\n.....\n..x..\n"
+ObservationAsNormalizedVector(0) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0]
+Rewards() = [0.0]
+Returns() = [0.0]
+LegalActions() = [0, 1, 2]
+StringLegalActions() = ["LEFT", "STAY", "RIGHT"]
+
+# Apply action "STAY"
+action: 1
+
+# State 2
+IsTerminal() = False
+ToString() = ".....\n.o...\n.....\n.....\n.....\n.....\n.....\n.....\n.....\n..x..\n"
+History() = [1, 1]
+HistoryString() = "1 1"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationState(0) = "1 1"
+InformationStateAsNormalizedVector(0) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0]
+Observation(0) = ".....\n.o...\n.....\n.....\n.....\n.....\n.....\n.....\n.....\n..x..\n"
+ObservationAsNormalizedVector(0) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0]
+Rewards() = [0.0]
+Returns() = [0.0]
+LegalActions() = [0, 1, 2]
+StringLegalActions() = ["LEFT", "STAY", "RIGHT"]
+
+# Apply action "STAY"
+action: 1
+
+# State 3
+IsTerminal() = False
+ToString() = ".....\n.....\n.o...\n.....\n.....\n.....\n.....\n.....\n.....\n..x..\n"
+History() = [1, 1, 1]
+HistoryString() = "1 1 1"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationState(0) = "1 1 1"
+InformationStateAsNormalizedVector(0) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0]
+Observation(0) = ".....\n.....\n.o...\n.....\n.....\n.....\n.....\n.....\n.....\n..x..\n"
+ObservationAsNormalizedVector(0) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0]
+Rewards() = [0.0]
+Returns() = [0.0]
+LegalActions() = [0, 1, 2]
+StringLegalActions() = ["LEFT", "STAY", "RIGHT"]
+
+# Apply action "LEFT"
+action: 0
+
+# State 4
+IsTerminal() = False
+ToString() = ".....\n.....\n.....\n.o...\n.....\n.....\n.....\n.....\n.....\n.x...\n"
+History() = [1, 1, 1, 0]
+HistoryString() = "1 1 1 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationState(0) = "1 1 1 0"
+InformationStateAsNormalizedVector(0) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0]
+Observation(0) = ".....\n.....\n.....\n.o...\n.....\n.....\n.....\n.....\n.....\n.x...\n"
+ObservationAsNormalizedVector(0) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0]
+Rewards() = [0.0]
+Returns() = [0.0]
+LegalActions() = [0, 1, 2]
+StringLegalActions() = ["LEFT", "STAY", "RIGHT"]
+
+# Apply action "LEFT"
+action: 0
+
+# State 5
+IsTerminal() = False
+ToString() = ".....\n.....\n.....\n.....\n.o...\n.....\n.....\n.....\n.....\nx....\n"
+History() = [1, 1, 1, 0, 0]
+HistoryString() = "1 1 1 0 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationState(0) = "1 1 1 0 0"
+InformationStateAsNormalizedVector(0) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0]
+Observation(0) = ".....\n.....\n.....\n.....\n.o...\n.....\n.....\n.....\n.....\nx....\n"
+ObservationAsNormalizedVector(0) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0]
+Rewards() = [0.0]
+Returns() = [0.0]
+LegalActions() = [1, 2]
+StringLegalActions() = ["STAY", "RIGHT"]
+
+# Apply action "RIGHT"
+action: 2
+
+# State 6
+IsTerminal() = False
+ToString() = ".....\n.....\n.....\n.....\n.....\n.o...\n.....\n.....\n.....\n.x...\n"
+History() = [1, 1, 1, 0, 0, 2]
+HistoryString() = "1 1 1 0 0 2"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationState(0) = "1 1 1 0 0 2"
+InformationStateAsNormalizedVector(0) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0]
+Observation(0) = ".....\n.....\n.....\n.....\n.....\n.o...\n.....\n.....\n.....\n.x...\n"
+ObservationAsNormalizedVector(0) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0]
+Rewards() = [0.0]
+Returns() = [0.0]
+LegalActions() = [0, 1, 2]
+StringLegalActions() = ["LEFT", "STAY", "RIGHT"]
+
+# Apply action "RIGHT"
+action: 2
+
+# State 7
+IsTerminal() = False
+ToString() = ".....\n.....\n.....\n.....\n.....\n.....\n.o...\n.....\n.....\n..x..\n"
+History() = [1, 1, 1, 0, 0, 2, 2]
+HistoryString() = "1 1 1 0 0 2 2"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationState(0) = "1 1 1 0 0 2 2"
+InformationStateAsNormalizedVector(0) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0]
+Observation(0) = ".....\n.....\n.....\n.....\n.....\n.....\n.o...\n.....\n.....\n..x..\n"
+ObservationAsNormalizedVector(0) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0]
+Rewards() = [0.0]
+Returns() = [0.0]
+LegalActions() = [0, 1, 2]
+StringLegalActions() = ["LEFT", "STAY", "RIGHT"]
+
+# Apply action "RIGHT"
+action: 2
+
+# State 8
+IsTerminal() = False
+ToString() = ".....\n.....\n.....\n.....\n.....\n.....\n.....\n.o...\n.....\n...x.\n"
+History() = [1, 1, 1, 0, 0, 2, 2, 2]
+HistoryString() = "1 1 1 0 0 2 2 2"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationState(0) = "1 1 1 0 0 2 2 2"
+InformationStateAsNormalizedVector(0) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0]
+Observation(0) = ".....\n.....\n.....\n.....\n.....\n.....\n.....\n.o...\n.....\n...x.\n"
+ObservationAsNormalizedVector(0) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0]
+Rewards() = [0.0]
+Returns() = [0.0]
+LegalActions() = [0, 1, 2]
+StringLegalActions() = ["LEFT", "STAY", "RIGHT"]
+
+# Apply action "STAY"
+action: 1
+
+# State 9
+IsTerminal() = False
+ToString() = ".....\n.....\n.....\n.....\n.....\n.....\n.....\n.....\n.o...\n...x.\n"
+History() = [1, 1, 1, 0, 0, 2, 2, 2, 1]
+HistoryString() = "1 1 1 0 0 2 2 2 1"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationState(0) = "1 1 1 0 0 2 2 2 1"
+InformationStateAsNormalizedVector(0) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0]
+Observation(0) = ".....\n.....\n.....\n.....\n.....\n.....\n.....\n.....\n.o...\n...x.\n"
+ObservationAsNormalizedVector(0) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0]
+Rewards() = [0.0]
+Returns() = [0.0]
+LegalActions() = [0, 1, 2]
+StringLegalActions() = ["LEFT", "STAY", "RIGHT"]
+
+# Apply action "RIGHT"
+action: 2
+
+# State 10
+IsTerminal() = True
+ToString() = ".....\n.....\n.....\n.....\n.....\n.....\n.....\n.....\n.....\n.o..x\n"
+History() = [1, 1, 1, 0, 0, 2, 2, 2, 1, 2]
+HistoryString() = "1 1 1 0 0 2 2 2 1 2"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = -4
+InformationState(0) = "1 1 1 0 0 2 2 2 1 2"
+InformationStateAsNormalizedVector(0) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0]
+Observation(0) = ".....\n.....\n.....\n.....\n.....\n.....\n.....\n.....\n.....\n.o..x\n"
+ObservationAsNormalizedVector(0) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0]
+Rewards() = [-1.0]
+Returns() = [-1.0]
