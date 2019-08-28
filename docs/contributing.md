@@ -21,7 +21,7 @@ around two major important design criteria:
 
 Contributions to this project must be accompanied by a Contributor License
 Agreement (CLA). See
-[CONTRIBUTING.md](https://github.com/deepmind/open_spiel/CONTRIBUTING.md) for
+[CONTRIBUTING.md](https://github.com/deepmind/open_spiel/blob/master/CONTRIBUTING.md) for
 the details.
 
 Here, we outline our intentions for the future, giving an overview of what we
