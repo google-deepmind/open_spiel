@@ -1,0 +1,27 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# virtualenv
+.venv
+venv/
+ENV/
+
+# OSX specific
+.DS_Store
+
+# Build products
+build_python_*/
+build/
+
+# External git modules
+open_spiel/abseil-cpp/
+open_spiel/games/bridge/double_dummy_solver/
+pybind11/
