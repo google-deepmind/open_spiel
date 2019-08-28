@@ -105,7 +105,7 @@ class EVAAgent(object):
                epsilon_end=0.1,
                epsilon_decay_duration=int(1e4),
                embedding_as_parametric_input=False):
-    """Initialize the Ephemeral Value Adtustment algorithm.
+    """Initialize the Ephemeral VAlue Adjustment algorithm.
 
     Args:
       session: (tf.Session) TensorFlow session.
@@ -324,7 +324,7 @@ class EVAAgent(object):
     Args:
       trajectories: Current OpenSpiel game state.
     """
-    # Calculate non-parametric values over the trajectoies.
+    # Calculate non-parametric values over the trajectories.
     # Iterate backward through trajectories
     for t in range(len(trajectories) - 1, 0, -1):
       elem = trajectories[t][1]

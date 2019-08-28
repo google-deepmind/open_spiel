@@ -129,7 +129,7 @@ class XFPSolver(object):
     Arguments:
       game: the open_spiel game object.
       save_oracles: a boolean, indicating whether or not to save all the BR
-        policies along the way (including the initial unifom policy). This could
+        policies along the way (including the initial uniform policy). This could
         take up some space, and is only used when generating the meta-game for
         analysis.
     """

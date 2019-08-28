@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit test for unform random bot."""
+"""Unit test for uniform random bot."""
 
 from __future__ import absolute_import
 from __future__ import division

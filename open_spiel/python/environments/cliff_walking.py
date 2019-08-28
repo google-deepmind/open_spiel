@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""A cliff walking single agent refinforcement learning environment."""
+"""A cliff walking single agent reinforcement learning environment."""
 
 from __future__ import absolute_import
 from __future__ import division
