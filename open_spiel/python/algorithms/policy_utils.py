@@ -14,13 +14,6 @@
 
 """Adds useful functions for working with dictionaries representing policies."""
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import google_type_annotations
-from __future__ import print_function
-
-import numpy as np
-from typing import Dict, List, Tuple, Text
 from open_spiel.python.algorithms import get_all_states
 
 
@@ -67,8 +60,7 @@ def policy_to_dict(player_policy,
   return tabular_policy
 
 
-def get_best_response_actions_as_string(
-    best_response_actions: Dict[bytes, int]) -> Text:
+def get_best_response_actions_as_string(best_response_actions):
   """Turns a dict<bytes, int> into a bytestring compatible with C++.
 
   i.e. the bytestring can be copy-pasted as the brace initialization for a
@@ -88,8 +80,7 @@ def get_best_response_actions_as_string(
   return "{%s}" % (", ".join(best_response_strings))
 
 
-def tabular_policy_to_cpp_map(
-    policy: Dict[bytes, List[Tuple[int, np.float64]]]) -> Text:
+def tabular_policy_to_cpp_map(policy):
   """Turns a policy into a C++ compatible bytestring for brace-initializing.
 
   Args:
