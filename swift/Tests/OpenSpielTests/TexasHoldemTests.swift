@@ -274,12 +274,7 @@ final class TexasHoldemTests: XCTestCase {
       stepCount += 1
       assert(state.legalActions.count > 0, "\(state)\n\n\(state.legalActions)")
       let action = state.legalActions.randomElement()!
-      switch action {
-      case .raise:
-        state.apply(.raise(2))
-      default:
-        state.apply(action)
-      }
+      state.apply(action)
     }
     XCTAssert(state.isTerminal, "The state should be terminal.")
     XCTAssertLessThan(
