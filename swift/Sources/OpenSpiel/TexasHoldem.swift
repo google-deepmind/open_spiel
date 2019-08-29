@@ -197,26 +197,37 @@ extension TexasHoldem.State {
   }
 
   /// The legal actions to be made in this state.
+  ///
+  /// The entries in the mask correspond to the actions defined on the game:
+  ///    [.fold, .call, .allin, raiseAmounts...]
   public var legalActionsMask: [Bool] {
     switch currentPlayer {
     case .chance:
       fatalError("legalActionsMask not available when currentPlayer == .chance!")
     case let .player(playerID):
       assert(!folded[playerID])
+      // Player is all-in; all they can do is call.
       if money[playerID] == 0 {
         var mask = Array(repeating: false, count: game.allActions.count)
         mask[1] = true  // .call
         return mask
       }
+      let isSomeoneAllIn = betLevel == game.initialMoney
+      let isCurrentPlayerAtBetLevel = (game.initialMoney - money[playerID]) == betLevel
       let allowedRaiseAmounts = game.betDiscretization.map { potFraction -> Bool in
+        // Betting for a given pot fraction is allowed only if all of the following conditions are
+        // true:
+        // - The chip amount corresponding to the pot fraction is above the minimum bet amount.
+        // - The player has enough money to afford the bet.
+        // - No player has gone all in. (Otherwise, the only options are to call or to fold.)
         let chipAmount = Int(potFraction * Double(pot))
-        return chipAmount > minimumBetAmount && chipAmount < game.initialMoney
+        return chipAmount > minimumBetAmount && chipAmount < money[playerID] && !isSomeoneAllIn
       }
-      if (game.initialMoney - money[playerID]) == betLevel {
-        let base = [false, true, true]  // .fold disallowed, .call and .allIn allowed.
-        return base + allowedRaiseAmounts
-      }
-      return [true, true, true] + allowedRaiseAmounts
+      // Rules in this state:
+      // - Fold is allowed iff player is not at bet level.
+      // - Call is always allowed (because players start with the same initial money).
+      // - "All in" is allowed iff no one else has gone all in yet.
+      return [!isCurrentPlayerAtBetLevel, true, !isSomeoneAllIn] + allowedRaiseAmounts
     default:
       fatalError("Invalid current player \(currentPlayer).")
     }

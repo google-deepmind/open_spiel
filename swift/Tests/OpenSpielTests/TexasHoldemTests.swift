@@ -135,6 +135,16 @@ final class TexasHoldemTests: XCTestCase {
     XCTAssertEqual(state.utility(for: .player(1)), 600)
   }
 
+  func testAllIn() {
+    let game = TexasHoldem(playerCount: 2)
+    var state = game.initialState
+    dealCards(&state, expected: 4)
+
+    state.apply(.call)
+    state.apply(.allIn)
+    XCTAssertEqual(state.legalActions, [.fold, .call], "State: \(state)")
+  }
+
   func testRevealWinnerComputation() {
     let game = TexasHoldem(playerCount: 2)
     var state = game.initialState
@@ -304,6 +314,7 @@ final class TexasHoldemTests: XCTestCase {
 
 extension TexasHoldemTests {
   static var allTests = [
+    ("testAllIn", testAllIn),
     ("testRandomGameplay", testRandomGameplay),
     ("testSimpleTwoPlayerGame", testSimpleTwoPlayerGame),
     ("testRevealWinnerComputation", testRevealWinnerComputation),
