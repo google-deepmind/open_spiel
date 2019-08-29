@@ -19,7 +19,7 @@
 /// On saeta@'s desktop machine, performance numbers are as follows (be sure to
 /// build with optimizations on!):
 ///   - Random games: 115 +/- 51 usec per game
-///   - Fixed games:  8.4 +/- 0.5 usec per game
+///   - Fixed games:  4.7 +/- 0.4 usec per game
 
 import Dispatch
 import Foundation

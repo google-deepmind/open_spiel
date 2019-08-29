@@ -15,7 +15,7 @@
 /// A full 52 card deck used for poker.
 
 /// The suit of a card.
-public enum Suit: UInt8 {
+public enum Suit: UInt8, CaseIterable {
   case clubs, diamonds, hearts, spades
 }
 
@@ -35,7 +35,7 @@ extension Suit: CustomStringConvertible {
 }
 
 /// The rank of the card.
-public enum Rank: UInt8 {
+public enum Rank: UInt8, CaseIterable {
   case two = 2, three, four, five, six, seven, eight, nine, ten, jack, queen, king, ace
 }
 
@@ -275,13 +275,13 @@ extension PokerHandRank {
     // Sort the cards in ascending order.
     let sorted = cards.sorted { $0.index < $1.index }
     // Look for #'s-of-a-kind & flushes.
-    var suitCount = [Suit: Int]()
-    var rankCount = [Rank: Int]()
+    var suitCount = Array(repeating: 0, count: Suit.allCases.count)
+    var rankCount = Array(repeating: 0, count: Rank.allCases.count + 2)
     for card in sorted {
-      suitCount[card.suit, default: 0] += 1
-      rankCount[card.rank, default: 0] += 1
+      suitCount[Int(card.suit.rawValue)] += 1
+      rankCount[Int(card.rank.rawValue)] += 1
     }
-    let flushSuit = suitCount.first { $0.1 > 4 }?.key
+    let flushSuit = suitCount.firstIndex { $0 > 4 }.map { Suit(rawValue: UInt8($0)) }
     let straightRank = PokerHandRank.findStraight(in: sorted)
     // Check for straight flush / royal flush
     if straightRank != nil, let flushSuit = flushSuit {
@@ -292,17 +292,34 @@ extension PokerHandRank {
         return
       }
     }
-    // Check for four of a kind.
-    if let fourOfAKindRank = rankCount.first(where: { $0.value == 4 })?.key {
+    // Iterate through the array looking for n-of-a-kinds. We iterate in forward order, and look at
+    // the last element(s) of the resulting arrays for the highest ranks.
+    var fourOfAKinds = [Rank]()
+    var threeOfAKinds = [Rank]()
+    var pairs = [Rank]()
+    for (rawRank, count) in rankCount.enumerated() {
+      if rawRank == 0 || rawRank == 1 { continue }  // invalid ranks
+      let rank = Rank(rawValue: UInt8(rawRank))!
+      switch count {
+      case 0: break
+      case 1: break
+      case 2:
+        pairs.append(rank)
+      case 3:
+        threeOfAKinds.append(rank)
+      case 4:
+        fourOfAKinds.append(rank)
+      default:
+        fatalError("Unexpected count (\(count)) for rank \(rank).")
+      }
+    }
+    if let fourOfAKindRank = fourOfAKinds.last {
       let kicker = sorted.reversed().first { $0.rank != fourOfAKindRank }!
       self = .fourOfAKind(fourOfAKindRank, kicker: kicker.rank)
       return
     }
-    // Note: we reverse sort the ranks in triples and pairs to get high ranks first.
-    let triples = rankCount.filter { $0.1 == 3 }.keys.sorted { $0.rawValue > $1.rawValue }
-    let pairs = rankCount.filter { $0.1 == 2 }.keys.sorted { $0.rawValue > $1.rawValue }
     // Check for full house.
-    if let tripleRank = triples.first, let pairRank = pairs.first {
+    if let tripleRank = threeOfAKinds.last, let pairRank = pairs.last {
       self = .fullHouse(tripleRank, pairRank)
       return
     }
@@ -316,18 +333,19 @@ extension PokerHandRank {
       self = .straight(straightRank)
       return
     }
-    if let threeOfAKind = triples.first {
+    if let threeOfAKind = threeOfAKinds.last {
       let kickers = sorted.reversed().filter { $0.rank != threeOfAKind }
       self = .threeOfAKind(threeOfAKind, kickers: kickers[0].rank, kickers[1].rank)
       return
     }
     if pairs.count > 1 {
+      pairs.reverse()
       let kicker = sorted.reversed().first { $0.rank != pairs[0] && $0.rank != pairs[1] }!.rank
       self = .twoPair(pairs[0], pairs[1],
                       kicker: kicker)
       return
     }
-    if let pairRank = pairs.first {
+    if let pairRank = pairs.last {
       let kickers = sorted.reversed().filter { $0.rank != pairRank }
       self = .pair(pairRank, kickers: kickers[0].rank, kickers[1].rank, kickers[2].rank)
       return
