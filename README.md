@@ -96,6 +96,16 @@ For all subsequent pushes:
 
 -   Run `copybara copy.bara.sky piper_to_gob`.
 
+If you get an error claiming that the commit message is empty (like this:
+https://paste.googleplex.com/5354562577760256) then, for every CL that causes
+this, it was necessary to force the commit message using:
+
+`copybara copy.bara.sky piper_to_gob --force-message "BEGIN_PUBLIC\nInternal
+change\nEND_PUBLIC\n" --iterative-limit-changes 1`
+
+that I found here:
+https://groups.google.com/a/google.com/forum/#!msg/copybara-users/E-XdD0KsAQs/rIMyEh_QAwAJ
+
 ### Pushing to Github
 
 First, you will need to have write permissions on
