@@ -44,6 +44,9 @@ class PyspielTest(unittest.TestCase):
         "first_sealed_auction",
         "go",
         "goofspiel",
+        # BEGIN GOOGLE-INTERNAL
+        "hanabi",
+        # END GOOGLE-INTERNAL
         "havannah",
         "hex",
         "kuhn_poker",
@@ -64,6 +67,9 @@ class PyspielTest(unittest.TestCase):
         "pentago",
         "phantom_ttt",
         "pig",
+        # BEGIN GOOGLE-INTERNAL
+        "stratego",
+        # END GOOGLE-INTERNAL
         "tic_tac_toe",
         "tiny_bridge_2p",
         "tiny_bridge_4p",

@@ -90,7 +90,7 @@ class PhantomTTTState : public State {
 
   tic_tac_toe::TicTacToeState state_;
   ObservationType obs_type_;
-  // TODO: Use the base class history_ instead.
+  // TODO(jblespiau): Use the base class history_ instead.
   std::vector<std::pair<int, Action>> action_sequence_;
   std::array<tic_tac_toe::CellState, tic_tac_toe::kNumCells> x_view_;
   std::array<tic_tac_toe::CellState, tic_tac_toe::kNumCells> o_view_;

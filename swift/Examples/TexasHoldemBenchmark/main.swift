@@ -26,6 +26,11 @@ import Foundation
 import TensorFlow
 import OpenSpiel
 
+// BEGIN GOOGLE-INTERNAL
+import base_swift_base
+
+Google.initialize()
+// END GOOGLE-INTERNAL
 
 func time(_ benchmarkName: String, _ f: () -> ()) {
   // Warm up

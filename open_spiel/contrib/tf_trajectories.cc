@@ -21,6 +21,9 @@
 #include <random>
 #include <vector>
 
+// BEGIN GOOGLE-INTERNAL
+#include "base/timer.h"
+// END GOOGLE-INTERNAL
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
 #include "third_party/eigen3/unsupported/Eigen/CXX11/src/Tensor/TensorMap.h"
 #include "open_spiel/spiel_optional.h"
@@ -164,12 +167,19 @@ void TFBatchTrajectoryRecorder::GetNextStatesTF() {
 }
 
 void TFBatchTrajectoryRecorder::Record() {
+  // BEGIN GOOGLE-INTERNAL
+  WallTimer timer;
+  timer.Start();
+  // END GOOGLE-INTERNAL
   int steps = 0;
   Reset();
   while (num_terminals_ < batch_size_) {
     steps++;
     GetNextStatesTF();
   }
+  // BEGIN GOOGLE-INTERNAL
+  timer.Stop();
+  // END GOOGLE-INTERNAL
 }
 
 }  // namespace algorithms

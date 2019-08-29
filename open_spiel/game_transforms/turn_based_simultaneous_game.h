@@ -24,7 +24,7 @@
 // This wrapper turns any n-player simultaneous move game into an equivalent
 // turn-based game where simultaneous move nodes are encoded as n turns.
 //
-// TODO: implement UndoAction for these games.
+// TODO(lanctot): implement UndoAction for these games.
 
 namespace open_spiel {
 

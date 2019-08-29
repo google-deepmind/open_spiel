@@ -343,7 +343,7 @@ class UniformRandomPolicy(Policy):
     return {action: probability for action in legal_actions}
 
 
-# TODO - retire this by changing call-sites to create policies directly
+# TODO(locked) - retire this by changing call-sites to create policies directly
 class PolicyFromCallable(Policy):
   """For backwards-compatibility reasons, create a policy from a callable."""
 

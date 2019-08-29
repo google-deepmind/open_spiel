@@ -27,7 +27,7 @@
 namespace open_spiel {
 namespace algorithms {
 
-// TODO: See if it's possible to remove any fields here.
+// TODO(finbarrtimbers): See if it's possible to remove any fields here.
 // Stores all information relevant to exploitability calculation for each
 // history in the game.
 class HistoryNode {

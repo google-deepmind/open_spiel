@@ -536,4 +536,4 @@ def iterated_dominance(game_or_payoffs, mode, tol=1e-7):
     return payoffs, live_actions
 
 
-# TODO: add a function for sequential games using sequence-form LPs.
+# TODO(lanctot): add a function for sequential games using sequence-form LPs.

@@ -287,7 +287,7 @@ void PentagoState::DoApplyAction(Action action) {
 
 void PentagoState::UndoAction(int player, Action move) {
   SpielFatalError("PentagoState::UndoAction Not Implemented");
-  // TODO: Undo the placement and rotation.
+  // TODO(tewalds): Undo the placement and rotation.
 }
 
 std::unique_ptr<State> PentagoState::Clone() const {

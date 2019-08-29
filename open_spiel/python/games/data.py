@@ -14,7 +14,7 @@
 
 """Numerical information about some games or some specific settings of games.
 
-TODO: Ideally, this should also be available from C++.
+TODO(jblespiau): Ideally, this should also be available from C++.
 """
 
 from __future__ import absolute_import
