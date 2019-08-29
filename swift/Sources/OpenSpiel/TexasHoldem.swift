@@ -221,7 +221,11 @@ extension TexasHoldem.State {
         // - The player has enough money to afford the bet.
         // - No player has gone all in. (Otherwise, the only options are to call or to fold.)
         let chipAmount = Int(potFraction * Double(pot))
-        return chipAmount > minimumBetAmount && chipAmount < money[playerID] && !isSomeoneAllIn
+        let newBetLevel = betLevel + chipAmount
+        return chipAmount > minimumBetAmount &&
+                   chipAmount < money[playerID] &&
+                   newBetLevel < game.initialMoney &&
+                   !isSomeoneAllIn
       }
       // Rules in this state:
       // - Fold is allowed iff player is not at bet level.
@@ -465,7 +469,7 @@ extension TexasHoldem.State: CustomStringConvertible {
     }
 
     return """
-      Round: \(round) Current player: \(currentPlayer). Players: \
+      Round: \(round), bet level: \(betLevel), current player: \(currentPlayer). Players: \
       \((0..<game.playerCount).map(describePlayer)); Community Cards: \
       \(communityCards) Pot: \(pot). History: \(nonChanceActions)
       """
