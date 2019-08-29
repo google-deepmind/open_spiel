@@ -27,8 +27,9 @@ Names are ordered lexicographically. Typo or similar contributors are omitted.
 -   Sebastian Borgeaud
 -   Shayegan Omidshafiei
 -   Srinivasan Sriram
--   Timo Ewalds <tewalds@google.com>
 -   Thomas Anthony
+-   Thomas Köppe
+-   Timo Ewalds <tewalds@google.com>
 -   Vinicius Zambaldi <vzambaldi@google.com>
 
 ## OpenSpiel with Swift for Tensorflow
