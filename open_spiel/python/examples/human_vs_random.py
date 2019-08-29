@@ -38,7 +38,8 @@ def main(unused_argv):
   uct_c = 2
   game = pyspiel.load_game(FLAGS.game)
   state = game.new_initial_state()
-  print("Initial state: ", str(state))
+  print("Initial state: ")
+  print(str(state))
 
   # Check that the games satisfies the conditions for the implemented MCTS
   # algorithm
