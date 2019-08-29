@@ -20,6 +20,8 @@ import XCTest
       testCase(BreakthroughTests.allTests),
       testCase(KuhnPokerTests.allTests),
       testCase(LeducPokerTests.allTests),
+      testCase(PokerDeckTests.allTests),
+      testCase(TexasHoldemTests.allTests),
       testCase(ExploitabilityTests.allTests),
       testCase(TicTacToeTests.allTests),
       testCase(GoPointTests.allTests),
