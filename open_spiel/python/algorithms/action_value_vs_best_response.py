@@ -23,6 +23,7 @@ import numpy as np
 
 from open_spiel.python import policy
 from open_spiel.python.algorithms import get_all_states
+from open_spiel.python.algorithms import policy_utils
 import pyspiel
 
 
@@ -151,11 +152,9 @@ class Calculator(object):
             state: self._all_states[state].information_state()
             for state in self._all_states
         }
-      tabular_policy = dict()
-      for state in self._all_states:
-        information_state = self._state_to_information_state[state]
-        tabular_policy[information_state] = list(
-            player_policy.action_probabilities(self._all_states[state]).items())
+      tabular_policy = policy_utils.policy_to_dict(
+          player_policy, self.game, self._all_states,
+          self._state_to_information_state)
 
     # When constructed, TabularBestResponse does a lot of work; we can save that
     # work by caching it.
