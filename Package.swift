@@ -27,6 +27,9 @@ let package = Package(
     .executable(
       name: "KuhnPokerExample",
       targets: ["KuhnPokerExample"]),
+    .executable(
+      name: "TexasHoldemBenchmark",
+      targets: ["TexasHoldemBenchmark"]),
   ],
   targets: [
     .target(
@@ -41,5 +44,9 @@ let package = Package(
       name: "KuhnPokerExample",
       dependencies: ["OpenSpiel"],
       path: "swift/Examples/KuhnPoker"),
+    .target(
+      name: "TexasHoldemBenchmark",
+      dependencies: ["OpenSpiel"],
+      path: "swift/Examples/TexasHoldemBenchmark"),
   ]
 )
