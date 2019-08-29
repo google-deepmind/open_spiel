@@ -52,6 +52,14 @@ class HumanBot(pyspiel.Bot):
       return [], pyspiel.INVALID_ACTION
     p = 1 / len(legal_actions)
     policy = [(action, p) for action in legal_actions]
-    action = legal_actions[0]
-    # action = self._rng.choice(legal_actions)
-    return policy, action
+    print("Legal actions(s):")
+    for action in legal_actions:
+        print(" ", action, "=", state.action_to_string(state.current_player(), action))
+    while True:
+        aStr = input("Choose an action: ")
+        if not aStr:
+            continue
+        a = int(aStr)
+        if a in legal_actions:
+            return policy, a
+
