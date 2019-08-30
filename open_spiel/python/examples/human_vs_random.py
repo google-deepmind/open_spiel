@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""MCTS example."""
+"""Human vs random example (heavily inspired by mcts.py)."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -27,9 +27,7 @@ from open_spiel.python.bots import uniform_random
 import pyspiel
 
 flags.DEFINE_string("game", "tic_tac_toe", "Name of the game.")
-flags.DEFINE_integer("human_player", 0, "Which player uses MCTS.")
-flags.DEFINE_integer("rollout_count", 100, "How many rollouts to do.")
-flags.DEFINE_integer("max_search_nodes", 10000, "How many nodes to expand.")
+flags.DEFINE_integer("human_player", 0, "Which player is human.")
 
 FLAGS = flags.FLAGS
 
@@ -40,14 +38,6 @@ def main(unused_argv):
   state = game.new_initial_state()
   print("Initial state: ")
   print(str(state))
-
-  # Check that the games satisfies the conditions for the implemented MCTS
-  # algorithm
-  if game.num_players() not in (1, 2):
-    raise ValueError("Game must be a 1-player game or 2-player zero-sum game")
-  if (game.num_players() == 2 and
-      game.get_type().utility != pyspiel.GameType.Utility.ZERO_SUM):
-    raise ValueError("Game must be a 1-player game or 2-player zero-sum game")
 
   # Create human bot
   human_bot = human.HumanBot(game, FLAGS.human_player)
@@ -78,7 +68,7 @@ def main(unused_argv):
     else:
       # Decision node: sample action for the single current player
       _, action = bots[state.current_player()].step(state)
-      print("Player ", state.current_player(), ", randomly sampled action: ",
+      print("Player ", state.current_player(), ", chose action: ",
             state.action_to_string(state.current_player(), action))
       state.apply_action(action)
 
