@@ -48,7 +48,7 @@ void TestGameTree() {
     for (int player_id : {0, 1}) {
       HistoryTree tree(game->NewInitialState(), player_id);
       if (tree.NumHistories() != num_histories[game_name]) {
-        // TODO(b/126764761): Replace calls to SpielFatalError with more
+        // TODO: Replace calls to SpielFatalError with more
         // appropriate test macros once they support logging.
         SpielFatalError(absl::StrCat(
             "In the game ", game_name,

@@ -14,9 +14,6 @@
 
 #include "open_spiel/contrib/tf_trajectories.h"
 
-// BEGIN GOOGLE-INTERNAL
-#include "base/init_google.h"
-// END GOOGLE-INTERNAL
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
@@ -44,9 +41,6 @@ void DoubleRecordTFTrajectoryExample(const std::string& game_name) {
 namespace algorithms = open_spiel::algorithms;
 
 int main(int argc, char** argv) {
-  // BEGIN GOOGLE-INTERNAL
-  InitGoogle("", &argc, &argv, false);
-  // END GOOGLE-INTERNAL
   // Batch size 32:
   //   32 games with uniform policy (no tensorflow): 5 ms
   //   32 games with TF policy: 180 ms  (~178 episodes / sec)

@@ -15,12 +15,6 @@ issues (or would like to share your successes), please reach out to the Swift
 for TensorFlow community at
 [`swift@tensorflow.org`](https://groups.google.com/a/tensorflow.org/forum/#!forum/swift).
 
-BEGIN GOOGLE-INTERNAL
-
-If you're interested in using Swift OpenSpiel within Google, please reach out to
-<tf-swift-team@google.com> so we can appropriately support you!
-
-END GOOGLE-INTERNAL
 
 ## Building
 
@@ -53,60 +47,3 @@ If you have any questions about Swift for TensorFlow (or would like to share
 your work or research with the community), please join our mailing list
 [`swift@tensorflow.org`](https://groups.google.com/a/tensorflow.org/forum/#!forum/swift).
 
-BEGIN GOOGLE-INTERNAL
-
-## Building within Google
-
-Within Google, there are two ways to build Swift OpenSpiel. We currently
-recommend building with an open source Swift for TensorFlow toolchain on your
-local desktop, as this enables fast incremental development. Alternatively, you
-can use `blaze`.
-
-### Using a local toolchain (open source style)
-
-To build Swift OpenSpiel using a local toolchain (assuming you are running on
-gLinux), follow these steps.
-
- 1. Copy a Swift for TensorFlow toolchain to your corp desktop (or
-    CloudTop VM):
-    ```
-    fileutil cp /placer/prod/home/kokoro-dedicated/build_artifacts/prod/s4tf/toolchain-ubuntu-docker/release-rodete/268/20190523-061232/swift-tensorflow-DEVELOPMENT-rodete.tar.gz .
-    ```
-
-    > Note: you can find newer toolchain versions by going to [Fusion](https://fusion.corp.google.com/projectanalysis/summary/KOKORO/prod:s4tf%2Ftoolchain-ubuntu-docker%2Frelease-rodete) and clicking on the "Placer" link for a recent
-    green build.
-
- 2. Untar the file:
-    ```
-    tar -zxf swift-tensorflow-DEVELOPMENT-rodete.tar.gz
-    ```
-
- 3. Add `usr/bin` to your `PATH` environment variable.
-    ```
-    export PATH=$PATH:`pwd`/usr/bin
-    ```
-
- 4. Go to the OpenSpiel source code:
-    ```
-    g4d -f openspiel
-    cd third_party/open_spiel/swift
-    ```
-
- 5. Build and test!
-    ```
-    swift build
-    swift test
-    ```
-
-### Using the Google3 / Forge Toolchain
-
-To build Swift OpenSpiel using the Google3 / Forge toolchain, simply create a
-citc client and use `blaze` normally:
-
-```
-g4d -f openspiel
-blaze build //third_party/open_spiel/swift/...
-blaze test //third_party/open_spiel/swift/...
-```
-
-END GOOGLE-INTERNAL

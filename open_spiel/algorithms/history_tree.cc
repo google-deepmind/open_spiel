@@ -185,7 +185,7 @@ ActionsAndProbs GetSuccessorsWithProbs(const State& state,
   }
 }
 
-// TODO(finbarrtimbers): If this is a bottleneck, it should be possible
+// TODO: If this is a bottleneck, it should be possible
 // to pass the probabilities-so-far into the call, and get everything right
 // the first time, without recursion. The recursion is simpler, however.
 std::vector<std::pair<std::unique_ptr<State>, double>> DecisionNodes(

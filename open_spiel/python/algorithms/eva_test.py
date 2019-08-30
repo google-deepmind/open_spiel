@@ -100,7 +100,7 @@ class QueryableFixedSizeRingBufferTest(tf.test.TestCase):
     self.assertIn("entry2", samples)
     self.assertIn("entry3", samples)
 
-  # TODO(rfaulk) Test knn query.
+  # TODO Test knn query.
 
 
 if __name__ == "__main__":

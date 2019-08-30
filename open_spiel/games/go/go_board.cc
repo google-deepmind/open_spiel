@@ -469,7 +469,7 @@ std::ostream& operator<<(std::ostream& os, const GoBoard& board) {
     }
   }
 
-  // TODO(swj): Make this a public URL.
+  // TODO: Make this a public URL.
   os << "http://jumper/goboard/" << encoded << "&size=" << board.board_size()
      << std::endl;
 

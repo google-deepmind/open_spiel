@@ -42,7 +42,7 @@ namespace leduc_poker {
 
 // Default parameters.
 
-// TODO(b/127425075): Use absl::optional instead of sentinel values once absl is
+// TODO: Use absl::optional instead of sentinel values once absl is
 // added as a dependency.
 constexpr int kInvalidCard = -10000;
 constexpr int kDefaultPlayers = 2;

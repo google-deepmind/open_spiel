@@ -18,16 +18,6 @@ r"""Two BlueChip bridge bots bid with each other.
 The bot_cmd FLAG should contain a command-line to launch an external bot, e.g.
 `Wbridge5 Autoconnect {port}`.
 
-BEGIN GOOGLE-INTERNAL
-Example invocation (requires wine to be installed: sudo apt-get install wine).
-
-blaze run \
-//third_party/open_spiel/python/examples:bridge_uncontested_bidding_bluechip_example
-\
- -c opt -- --num_deals=2 --bot_cmd \
- 'wine /google/data/ro/users/lo/locked/wbridge5/Wbridge5.exe Autoconnect {port}'
-
-END GOOGLE-INTERNAL
 """
 # pylint: enable=line-too-long
 

@@ -884,7 +884,7 @@ void ChessBoard<kBoardSize>::ApplyMove(const Move &move) {
     SetCastlingRight(to_play_, CastlingDirection::kRight, false);
   }
   if (moving_piece.type == PieceType::kRook) {
-    // TODO(matthewlai): Fix this for Chess960, which requires storing initial
+    // TODO: Fix this for Chess960, which requires storing initial
     // positions of rooks.
     if ((to_play_ == Color::kWhite && move.from == Square{0, 0}) ||
         (to_play_ == Color::kBlack && move.from == Square{0, 7})) {
@@ -912,7 +912,7 @@ void ChessBoard<kBoardSize>::ApplyMove(const Move &move) {
     if (to_play_ == Color::kWhite) {
       if (move.to == Square{2, 0}) {
         // left castle
-        // TODO(matthewlai): In Chess960, rooks can be anywhere, so delete the
+        // TODO: In Chess960, rooks can be anywhere, so delete the
         // correct squares.
         set_square(Square{0, 0}, kEmptyPiece);
         set_square(Square{2, 0}, Piece{Color::kWhite, PieceType::kKing});

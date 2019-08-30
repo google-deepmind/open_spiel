@@ -28,7 +28,7 @@ from open_spiel.python.algorithms import projected_replicator_dynamics
 import pyspiel
 
 
-# TODO(pmuller): Use C++ interface for (~10x) speedups in computing trajectories
+# TODO: Use C++ interface for (~10x) speedups in computing trajectories
 def sample_episode(state, policies):
   """Samples an episode according to the policies, starting from state.
 

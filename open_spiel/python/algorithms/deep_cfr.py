@@ -42,7 +42,7 @@ StrategyMemory = collections.namedtuple(
     "StrategyMemory", "info_state iteration strategy_action_probs")
 
 
-# TODO(vzambaldi) Refactor into data structures lib.
+# TODO Refactor into data structures lib.
 class FixedSizeRingBuffer(object):
   """ReplayBuffer of fixed size with a FIFO replacement policy.
 
@@ -149,7 +149,7 @@ class DeepCFRSolver(policy.Policy):
     self._batch_size_strategy = batch_size_strategy
     self._num_players = game.num_players()
     self._root_node = self._game.new_initial_state()
-    # TODO(rfaulk) Allow embedding size (and network) to be specified.
+    # TODO Allow embedding size (and network) to be specified.
     self._embedding_size = len(
         self._root_node.information_state_as_normalized_vector(0))
     self._num_iterations = num_iterations

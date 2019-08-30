@@ -177,12 +177,6 @@ class State {
   // sampling of and outcome should be done in this function and then applied.
   //
   // Games should implement DoApplyAction.
-  // BEGIN GOOGLE-INTERNAL
-  // This may store duplicate information as some games do already store
-  // the history. If you insist not to have this duplication, there are
-  // possible alternatives not implying to make this method public.
-  // Speak to jblespiau@
-  // END GOOGLE-INTERNAL
   virtual void ApplyAction(Action action_id) {
     // history_ needs to be modified *after* DoApplyAction which could
     // be using it.

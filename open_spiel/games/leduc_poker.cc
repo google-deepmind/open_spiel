@@ -279,7 +279,7 @@ std::vector<double> LeducState::Returns() const {
 std::string LeducState::InformationState(int player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
-  // TODO(finbarrtimbers): Fix typos in InformationState string.
+  // TODO: Fix typos in InformationState string.
   return absl::StrFormat(
       "[Round %i][Player: %i][Pot: %i][Money: %s[Private: %i]][Round1]: "
       "%s[Public: %i]\nRound 2 sequence: %s",

@@ -29,7 +29,7 @@ import numpy as np
 from open_spiel.python.algorithms.psro_variations import abstract_meta_trainer
 
 
-# TODO(pmuller) : put all PSRO files in separate folder.
+# TODO : put all PSRO files in separate folder.
 class AbstractOracle(object):
   """The abstract class representing oracles, a hidden optimization process."""
 
