@@ -33,3 +33,7 @@ Please choose among the following options:
 *   [Swift OpenSpiel](docs/swift.md)
 *   [Authors](docs/authors.md)
 
+For a longer introduction to the core concepts, formalisms, and terminology,
+including an overview of the algorithms and some results, please see
+[OpenSpiel: A Framework for Reinforcement Learning in Games](https://arxiv.org/abs/1908.09453).
+
