@@ -18,7 +18,7 @@
 3.  Build and run tests to check everything works:
 
     ```bash
-    ./open_spiel/scripts/build_and_run_tests.sh
+    source open_spiel/scripts/build_and_run_tests.sh
     ```
 
 4.  Add
