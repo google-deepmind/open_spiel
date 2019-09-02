@@ -43,7 +43,7 @@ struct SearchNode {
     // The "greedy-value" of choosing a given child is always with respect to
     // the current player for this node.
     return player_sign * child.total_reward / child.explore_count +
-           uct_c * sqrt(log(child.explore_count) / child.explore_count);
+           uct_c * sqrt(log(explore_count) / child.explore_count);
   }
 
   // Returns the most visited action in this node.
