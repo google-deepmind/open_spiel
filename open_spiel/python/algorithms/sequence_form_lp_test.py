@@ -60,7 +60,7 @@ class SFLPTest(unittest.TestCase):
     self.assertAlmostEqual(val1, 0)
     self.assertAlmostEqual(val2, 0)
 
-  # TODO: currently does not work because TTT's information state is
+  # TODO(author5): currently does not work because TTT's information state is
   # not perfect recall. Enable this test when fixed.
   # def test_tictactoe(self):
   #   game = pyspiel.load_game("tic_tac_toe")

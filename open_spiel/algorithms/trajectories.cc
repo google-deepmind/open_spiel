@@ -82,7 +82,7 @@ void BatchedTrajectory::ResizeFields(int length) {
   // Only works for batches with at least one trajectory as otherwise we can't
   // infer the field size.
   SPIEL_CHECK_GT(batch_size, 0);
-  // TODO: Replace this with a multi-threaded version.
+  // TODO(author1): Replace this with a multi-threaded version.
   for (int i = 0; i < batch_size; ++i) {
     // Each field has shape [B, T, field_size], where N is a parameter that is
     // fixed for each (game, field) pair. We thus have to get the size of N from
@@ -118,7 +118,7 @@ BatchedTrajectory RecordBatchedTrajectory(
   SPIEL_CHECK_GT(batch_size, 0);
   if (state_to_index.empty()) SPIEL_CHECK_TRUE(include_full_observations);
   BatchedTrajectory batched_trajectory(batch_size);
-  // TODO: Replace this with a multi-threaded version.
+  // TODO(author1): Replace this with a multi-threaded version.
   for (int i = 0; i < batch_size; ++i) {
     BatchedTrajectory trajectory =
         RecordTrajectory(game, policies, initial_state, state_to_index,

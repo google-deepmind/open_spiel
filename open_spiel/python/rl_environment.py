@@ -319,10 +319,10 @@ class Environment(object):
 
   def set_state(self, unused_new_state):
     """Updates the game state."""
-    # TODO: add set/get state methods
+    # TODO(author3): add set/get state methods
     pass
 
   @property
   def get_state(self):
-    # TODO: add set/get state methods
+    # TODO(author3): add set/get state methods
     pass

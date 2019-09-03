@@ -39,7 +39,7 @@ else
 fi
 
 git clone -b 'v2.2.4' --single-branch --depth 1 https://github.com/pybind/pybind11.git
-# TODO: Point to the official  https://github.com/dds-bridge/dds.git
+# TODO(author2): Point to the official  https://github.com/dds-bridge/dds.git
 # when pull requests are in
 git clone -b 'develop' --single-branch --depth 1 https://github.com/jblespiau/dds.git  open_spiel/games/bridge/double_dummy_solver
 git clone -b 'master' --single-branch --depth 1 https://github.com/abseil/abseil-cpp.git open_spiel/abseil-cpp

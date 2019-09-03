@@ -28,10 +28,10 @@ import numpy as np
 from open_spiel.python.algorithms import get_all_states
 import pyspiel
 
-# TODO: Test all games.
+# TODO(author2): Test all games.
 _EXCLUDED_GAMES = [
     # Simultaneous games
-    # TODO: the tests are now failing because the empty legal actions
+    # TODO(author2): the tests are now failing because the empty legal actions
     # for not the current player is being tested on simultaneous games (we
     # should skip that test in thoses cases)
     "coin_game",  # Too big, number of states with depth 5 is ~10^9
@@ -318,7 +318,7 @@ def _assert_properties_recursive(state, assert_functions):
     assert_function(state)
 
   # Recursion
-  # TODO: We often use a `give me the next node` function and we
+  # TODO(author2): We often use a `give me the next node` function and we
   # probably want a utility method for that, which works for all games.
   if state.is_terminal():
     return
@@ -473,7 +473,7 @@ def _assert_is_perfect_recall_recursive(state, current_history,
 
   # Recursion
 
-  # TODO: We often use a `give me the next node` function and we
+  # TODO(author2): We often use a `give me the next node` function and we
   # probably want a utility method for that, which works for all games.
   if state.is_terminal():
     return

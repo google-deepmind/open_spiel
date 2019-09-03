@@ -196,7 +196,7 @@ std::vector<Action> HexState::LegalActions() const {
 
 std::string HexState::ActionToString(int player, Action action_id) const {
   // This does not comply with the Hex Text Protocol
-  // TODO: Make compliant with HTP
+  // TODO(author8): Make compliant with HTP
   return absl::StrCat(StateToString(PlayerAndActionToState(player, action_id)),
                       "(", action_id % board_size_, ",",
                       action_id / board_size_, ")");
@@ -262,7 +262,7 @@ std::string HexState::Observation(int player) const {
 
 void HexState::ObservationAsNormalizedVector(
     int player, std::vector<double>* values) const {
-  // TODO: Make an option to not expose connection info
+  // TODO(author8): Make an option to not expose connection info
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   values->resize(board_.size() * kCellStates);
@@ -276,7 +276,7 @@ void HexState::ObservationAsNormalizedVector(
 
 void HexState::UndoAction(int player, Action move) {
   SpielFatalError("HexState::UndoAction Not Implemented");
-  // TODO: Implement this by replaying the game
+  // TODO(author8): Implement this by replaying the game
 }
 
 std::unique_ptr<State> HexState::Clone() const {

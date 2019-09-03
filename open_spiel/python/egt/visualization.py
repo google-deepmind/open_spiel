@@ -526,7 +526,7 @@ class Dynamics3x3Axes(axes.Axes):
                                  [eps / 2., eps / 2., 1. - eps]])
       initial_points = np.vstack(
           (initial_points, utils.sample_from_simplex(100)))
-      # TODO: add heuristic for initial points
+      # TODO(author10): add heuristic for initial points
 
     else:
       initial_points = np.array(initial_points)

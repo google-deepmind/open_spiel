@@ -86,7 +86,7 @@ def _projected_replicator_dynamics_step(payoff_tensors, strategies, dt, gamma):
     A list of updated strategies for each player.
   """
 
-  # TODO: Investigate whether this update could be fully vectorized.
+  # TODO(author4): Investigate whether this update could be fully vectorized.
   new_strategies = []
   for player in range(len(payoff_tensors)):
     current_payoff_tensor = payoff_tensors[player]
