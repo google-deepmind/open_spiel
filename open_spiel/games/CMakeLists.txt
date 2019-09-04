@@ -58,6 +58,8 @@ add_library (games OBJECT
   phantom_ttt.h
   pig.cc
   pig.h
+  quoridor.cc
+  quoridor.h
   tic_tac_toe.cc
   tic_tac_toe.h
   tiny_bridge.cc
@@ -240,6 +242,10 @@ add_test(phantom_ttt_test phantom_ttt_test)
 add_executable(pig_test pig_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(pig_test pig_test)
+
+add_executable(quoridor_test quoridor_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(quoridor_test quoridor_test)
 
 add_executable(tic_tac_toe_test tic_tac_toe_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
