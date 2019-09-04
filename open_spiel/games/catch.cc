@@ -161,8 +161,10 @@ void CatchState::ObservationAsNormalizedVector(
 
   values->resize(game_.NumRows() * game_.NumColumns());
   std::fill(values->begin(), values->end(), 0.);
-  (*values)[ball_row_ * game_.NumColumns() + ball_col_] = 1.0;
-  (*values)[(game_.NumRows() - 1) * game_.NumColumns() + paddle_col_] = 1.0;
+  if (initialized_) {
+    (*values)[ball_row_ * game_.NumColumns() + ball_col_] = 1.0;
+    (*values)[(game_.NumRows() - 1) * game_.NumColumns() + paddle_col_] = 1.0;
+  }
 }
 
 void CatchState::InformationStateAsNormalizedVector(
@@ -171,10 +173,13 @@ void CatchState::InformationStateAsNormalizedVector(
 
   values->resize(game_.NumColumns() + kNumActions * game_.NumRows());
   std::fill(values->begin(), values->end(), 0.);
-  (*values)[ball_col_] = 1;
-  int offset = history_.size() - ball_row_ - 1;
-  for (int i = 0; i < ball_row_; i++) {
-    (*values)[game_.NumColumns() + i * kNumActions + history_[offset + i]] = 1;
+  if (initialized_) {
+    (*values)[ball_col_] = 1;
+    int offset = history_.size() - ball_row_ - 1;
+    for (int i = 0; i < ball_row_; i++) {
+      (*values)[game_.NumColumns() + i * kNumActions + history_[offset + i]] =
+          1;
+    }
   }
 }
 
