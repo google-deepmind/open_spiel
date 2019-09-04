@@ -119,8 +119,8 @@ bool ConnectFourState::HasLineFrom(int player, int row, int col) const {
 
 bool ConnectFourState::HasLineFromInDirection(int player, int row, int col,
                                               int drow, int dcol) const {
-  if (row + 4 * drow >= kRows || col + 4 * dcol >= kCols ||
-      row + 4 * drow < 0 || col + 4 * dcol < 0)
+  if (row + 3 * drow >= kRows || col + 3 * dcol >= kCols ||
+      row + 3 * drow < 0 || col + 3 * dcol < 0)
     return false;
   CellState c = PlayerToState(player);
   for (int i = 0; i < 4; ++i) {
