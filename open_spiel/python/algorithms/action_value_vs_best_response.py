@@ -28,7 +28,7 @@ import pyspiel
 
 
 def _transitions(state, policies):
-  """Returns a list of (action, prob) pairs from the specifed state."""
+  """Returns a list of (action, prob) pairs from the specified state."""
   if state.is_chance_node():
     return state.chance_outcomes()
   else:

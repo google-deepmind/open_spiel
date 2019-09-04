@@ -15,7 +15,7 @@
 """Example of Generalized PSRO Usage.
 
 We test a generalization of PSRO on kuhn poker. This generalization is capable
-of handling N players, assymetric, general sum games. It also supports
+of handling N players, asymmetric, general sum games. It also supports
 Uniform Response, Nash Response and Restricted Nash Response, and new
 selection methods can be added easily.
 

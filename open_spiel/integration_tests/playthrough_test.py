@@ -25,7 +25,7 @@ from absl.testing import absltest
 
 from open_spiel.python.algorithms import generate_playthrough
 
-_DATA_DIR = "google3/third_party/open_spiel/integration_tests/playthroughs/"
+_DATA_DIR = "open_spiel/integration_tests/playthroughs/"
 
 
 class PlaythroughTest(absltest.TestCase):

@@ -330,7 +330,7 @@ class DeepCFRSolver(policy.Policy):
     return advantages, matched_regrets
 
   def action_probabilities(self, state):
-    """Returns action probabilites dict for a single batch."""
+    """Returns action probabilities dict for a single batch."""
     info_state_vector = np.array(state.information_state_as_normalized_vector())
     if len(info_state_vector.shape) == 1:
       info_state_vector = np.expand_dims(info_state_vector, axis=0)

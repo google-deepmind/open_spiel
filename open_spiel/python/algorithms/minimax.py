@@ -41,7 +41,7 @@ def _alpha_beta(state, depth, alpha, beta, value_function,
       alpha, the MAX player will avoid it).
     beta: the best value that the MIN currently can guarantee (if the value is
       >= than beta, the MIN player will avoid it).
-    value_function: An optional functioon mapping a Spiel `State` to a numerical
+    value_function: An optional function mapping a Spiel `State` to a numerical
       value, to be used as the value of the maximizing player for a node when we
       reach `maximum_depth` and the node is not terminal.
     maximizing_player_id: The id of the MAX player. The other player is assumed

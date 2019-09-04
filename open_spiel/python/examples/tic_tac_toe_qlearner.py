@@ -18,7 +18,7 @@ Two Q-Learning agents are trained by playing against each other. Then, the game
 can be played against the agents from the command line.
 
 After about 10**5 training episodes, the agents reach a good policy: win rate
-against random oponents is around 99% for player 0 and 92% for player 1.
+against random opponents is around 99% for player 0 and 92% for player 1.
 """
 
 from __future__ import absolute_import
