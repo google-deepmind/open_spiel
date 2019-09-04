@@ -8,9 +8,12 @@ Any Python library found with CMake modules FindPython2/FindPython3 that \
 agrees  with the major version and is at least as high for minor version and \
 patch number is accepted. If the variable is not set, we use the FindPython \
 module which favours Python 3 over Python 2 if both are available.")
-set (CMAKE_CXX_COMPILER "/usr/bin/g++")
 set (CMAKE_CXX_STANDARD 11)
-set (CMAKE_CXX_FLAGS "-Werror")
+if(APPLE)
+  set (CMAKE_CXX_FLAGS "-Werror -undefined dynamic_lookup")
+else()
+  set (CMAKE_CXX_FLAGS "-Werror")
+endif()
 
 # Position-independent code is needed for Python extension modules.
 set (CMAKE_POSITION_INDEPENDENT_CODE ON)
