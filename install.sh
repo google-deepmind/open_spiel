@@ -29,7 +29,7 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
   fi
 elif [[ "$OSTYPE" == "darwin"* ]]; then  # Mac OSX
   [[ -x "$(type python3)" ]] || brew install python3 || echo "** Warning: failed 'brew install python3' -- continuing"
-  # [[ -x "${type g++-7)" ]] || brew install gcc@7 || echo "** Warning: failed 'brew install gcc@7' -- continuing"
+  [[ -x "$(type g++-7)" ]] || brew install gcc@7 || echo "** Warning: failed 'brew install gcc@7' -- continuing"
   curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
   python3 get-pip.py
   pip3 install virtualenv
