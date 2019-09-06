@@ -147,7 +147,7 @@ void ChanceOutcomesTest(const Game& game) {
 
 void TestUndo(std::unique_ptr<State> state,
               const std::vector<HistoryItem>& history) {
-  // TODO: We can just check each UndoAction.
+  // TODO(author2): We can just check each UndoAction.
   for (auto prev = history.rbegin(); prev != history.rend(); ++prev) {
     state->UndoAction(prev->player, prev->action);
     SPIEL_CHECK_EQ(state->ToString(), prev->state->ToString());

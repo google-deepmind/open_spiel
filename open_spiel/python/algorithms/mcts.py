@@ -90,7 +90,7 @@ class SearchNode(object):
 
     return (
         self.player_sign * child.total_reward / child.explore_count +
-        uct_c * math.sqrt(math.log(child.explore_count) / child.explore_count))
+        uct_c * math.sqrt(math.log(self.explore_count) / child.explore_count))
 
   def most_visited_action(self):
     """Returns the most visited action from this node."""

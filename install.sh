@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,8 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-#!/usr/bin/env bash
 
 
 # The following should be easy to setup as a submodule:
@@ -28,7 +28,8 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
     sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python${OS_PYTHON_VERSION} 10
   fi
 elif [[ "$OSTYPE" == "darwin"* ]]; then  # Mac OSX
-  brew install python3 gcc@7
+  [[ -x "$(type python3)" ]] || brew install python3 || echo "** Warning: failed 'brew install python3' -- continuing"
+  [[ -x "$(type g++-7)" ]] || brew install gcc@7 || echo "** Warning: failed 'brew install gcc@7' -- continuing"
   curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
   python3 get-pip.py
   pip3 install virtualenv
@@ -38,8 +39,12 @@ else
   exit 1
 fi
 
-git clone -b 'v2.2.4' --single-branch --depth 1 https://github.com/pybind/pybind11.git
-# TODO: Point to the official  https://github.com/dds-bridge/dds.git
-# when pull requests are in
-git clone -b 'develop' --single-branch --depth 1 https://github.com/jblespiau/dds.git  open_spiel/games/bridge/double_dummy_solver
-git clone -b 'master' --single-branch --depth 1 https://github.com/abseil/abseil-cpp.git open_spiel/abseil-cpp
+[[ -d "./pybind11" ]] || git clone -b 'v2.2.4' --single-branch --depth 1 https://github.com/pybind/pybind11.git
+# The official https://github.com/dds-bridge/dds.git seems to not accept PR,
+# so we have forked it.
+[[ -d open_spiel/games/bridge/double_dummy_solver ]] || \
+  git clone -b 'develop' --single-branch --depth 1 https://github.com/jblespiau/dds.git  \
+  open_spiel/games/bridge/double_dummy_solver
+[[ -d open_spiel/abseil-cpp ]] || \
+  git clone -b 'master' --single-branch --depth 1 https://github.com/abseil/abseil-cpp.git \
+  open_spiel/abseil-cpp

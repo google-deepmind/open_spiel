@@ -45,7 +45,7 @@ ReplayBufferElement = collections.namedtuple(
     "is_final_step legal_actions_mask")
 
 
-# TODO Refactor into data structures lib.
+# TODO(author3) Refactor into data structures lib.
 class QueryableFixedSizeRingBuffer(dqn.ReplayBuffer):
   """ReplayBuffer of fixed size with a FIFO replacement policy.
 
@@ -105,7 +105,7 @@ class EVAAgent(object):
                epsilon_end=0.1,
                epsilon_decay_duration=int(1e4),
                embedding_as_parametric_input=False):
-    """Initialize the Ephemeral Value Adtustment algorithm.
+    """Initialize the Ephemeral VAlue Adjustment algorithm.
 
     Args:
       session: (tf.Session) TensorFlow session.
@@ -274,7 +274,7 @@ class EVAAgent(object):
 
       # Take a step with the parametric model and get q-values. Use embedding as
       # input to the parametric meodel.
-      # TODO Recompute embeddings for buffers on learning steps.
+      # TODO(author6) Recompute embeddings for buffers on learning steps.
       if self._embedding_as_parametric_input:
         last_time_step_copy = copy.deepcopy(self._last_time_step)
         last_time_step_copy.observations["info_state"][
@@ -324,7 +324,7 @@ class EVAAgent(object):
     Args:
       trajectories: Current OpenSpiel game state.
     """
-    # Calculate non-parametric values over the trajectoies.
+    # Calculate non-parametric values over the trajectories.
     # Iterate backward through trajectories
     for t in range(len(trajectories) - 1, 0, -1):
       elem = trajectories[t][1]
@@ -400,7 +400,7 @@ class EVAAgent(object):
 
   def action_probabilities(self, state):
     """Returns action probabilites dict for a single batch."""
-    # TODO: Refactor this to expect pre-normalized form.
+    # TODO(author3, author6): Refactor this to expect pre-normalized form.
     if hasattr(state, "information_state_as_normalized_vector"):
       state_rep = tuple(
           state.information_state_as_normalized_vector(self.player_id))

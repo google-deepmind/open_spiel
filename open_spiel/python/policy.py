@@ -69,7 +69,7 @@ class Policy(object):
     Args:
       state: A `pyspiel.State` object.
       player_id: Optional, the player id for whom we want an action. Optional
-        unless this is a simultabeous state at which multiple players can act.
+        unless this is a simultaneous state at which multiple players can act.
 
     Returns:
       A `dict` of `{action: probability}` for the specified player in the
@@ -94,7 +94,7 @@ class Policy(object):
     Args:
       state: The current state of the game.
       player_id: Optional, the player id for whom we want an action. Optional
-        unless this is a simultabeous state at which multiple players can act.
+        unless this is a simultaneous state at which multiple players can act.
 
     Returns:
       Dictionary of action: probability.
@@ -224,7 +224,7 @@ class TabularPolicy(Policy):
     Args:
       state: A `pyspiel.State` object.
       player_id: Optional, the player id for which we want an action. Optional
-        unless this is a simultabeous state at which multiple players can act.
+        unless this is a simultaneous state at which multiple players can act.
 
     Returns:
       A `dict` of `{action: probability}` for the specified player in the
@@ -343,7 +343,6 @@ class UniformRandomPolicy(Policy):
     return {action: probability for action in legal_actions}
 
 
-# TODO - retire this by changing call-sites to create policies directly
 class PolicyFromCallable(Policy):
   """For backwards-compatibility reasons, create a policy from a callable."""
 

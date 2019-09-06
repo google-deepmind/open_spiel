@@ -1,3 +1,5 @@
+#!/bin/sh
+
 # Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,8 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-#!/bin/sh
 
 # Generates a playthrough for a new game with optional parameters.
 # This script exists mainly as a reminder for the command to run.

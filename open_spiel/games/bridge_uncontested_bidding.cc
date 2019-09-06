@@ -21,6 +21,12 @@
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
+// For compatibility with versions of the double dummy solver code which
+// don't amend exported names.
+#ifndef DDS_EXTERNAL
+#define DDS_EXTERNAL(x) x
+#endif
+
 namespace open_spiel {
 namespace bridge {
 namespace {
@@ -257,14 +263,14 @@ void UncontestedBiddingState::ScoreDeal() {
     }
 
     // Analyze the deal.
-    SetMaxThreads(0);
+    DDS_EXTERNAL(SetMaxThreads)(0);
     struct ddTableResults results;
-    const int return_code = CalcDDtable(dd_table_deal, &results);
+    const int return_code = DDS_EXTERNAL(CalcDDtable)(dd_table_deal, &results);
 
     // Check for errors.
     if (return_code != RETURN_NO_FAULT) {
       char error_message[80];
-      ErrorMessage(return_code, error_message);
+      DDS_EXTERNAL(ErrorMessage)(return_code, error_message);
       SpielFatalError(absl::StrCat("double_dummy_solver:", error_message));
     }
 

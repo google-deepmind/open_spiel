@@ -60,7 +60,7 @@ class SFLPTest(unittest.TestCase):
     self.assertAlmostEqual(val1, 0)
     self.assertAlmostEqual(val2, 0)
 
-  # TODO: currently does not work because TTT's information state is
+  # TODO(author5): currently does not work because TTT's information state is
   # not perfect recall. Enable this test when fixed.
   # def test_tictactoe(self):
   #   game = pyspiel.load_game("tic_tac_toe")
@@ -72,7 +72,7 @@ class SFLPTest(unittest.TestCase):
   # supported within google's internal cvxopt import. When solving via glpk,
   # (locally, outside of google's testing framework), the test takes >300
   # seconds, so it is disabled by default, but still left here for reference.
-  # Note, value is taken from an indepedent implementation but also found in
+  # Note, value is taken from an independent implementation but also found in
   # Neller & Lanctot 2013, An Introduction to Counterfactual Regret Minimization
   # http://modelai.gettysburg.edu/2013/cfr/cfr.pdf
   #

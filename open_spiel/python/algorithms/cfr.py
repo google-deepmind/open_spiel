@@ -43,7 +43,7 @@ def _initialize_uniform_policy(state, cumulative_regret, cumulative_policy):
   Args:
     state: The current state in the tree walk. This should be the root node when
       we call this function from a CFR solver.
-    cumulative_regret: The dictionnary mapping infostates, to
+    cumulative_regret: The dictionary mapping infostates, to
       {action: cumulative regrets}.
     cumulative_policy: Save as above for the cumulative policy.
   """
@@ -104,14 +104,14 @@ class _CFRSolver(object):
       initialize_cumulative_values: Whether to initialize the average policy to
         the uniform policy (and the initial cumulative regret to an epsilon
         value). This is independent of the first CFR iteration, which, when the
-        policy is fized during traversal and we perform non alternating updates,
+        policy is fixed during traversal and we perform non alternating updates,
         will also compute the uniform policy and add it to the average of
         policies.
       alternating_updates: If `True`, alternating updates are performed: for
         each player, we compute and update the cumulative regrets and policies.
         In that case, and when the policy is frozen during tree traversal, the
         cache is reset after each update for one player.
-        Otherwise, the update is simulatenous.
+        Otherwise, the update is simultaneous.
       linear_averaging: Whether to use linear averaging, i.e.
         cumulative_policy[info_state][action] += (
           iteration_number * reach_prob * action_prob)
@@ -270,7 +270,7 @@ class _CFRSolver(object):
 
     # If we are performing alternating updates, and the current player is not
     # the current_player, we skip the cumulative values update.
-    # If we are performing simulatenous updates, we do update the cumulative
+    # If we are performing simultaneous updates, we do update the cumulative
     # values.
     simulatenous_updates = player is None
     if not simulatenous_updates and current_player != player:
@@ -346,7 +346,7 @@ class CFRPlusSolver(_CFRSolver):
 
   CFR+ is CFR with the following modifications:
   - use Regret Matching+ instead of Regret Matching.
-  - use alternating updates instead of simulatneous updates.
+  - use alternating updates instead of simultaneous updates.
   - use linear averaging.
 
   Usage:

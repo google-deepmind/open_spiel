@@ -497,14 +497,14 @@ class Dynamics3x3Axes(axes.Axes):
                  **kwargs):
     """Visualizes the dynamics as a streamline plot.
 
-    Mimics the visuales of `Axes.streamplot` for simplex plots.
+    Mimics the visuals of `Axes.streamplot` for simplex plots.
 
     Args:
       dynamics: Population dynamics of type `dynamics.SinglePopulationDynamics`.
       initial_points: Starting points for streamlines
       dt: Integration step.
       density: Controls the density of streamlines in the plot.
-      min_length: Streamslines with length < min_length will be discarded.
+      min_length: Streamlines with length < min_length will be discarded.
       linewidth: In `{None, float, "velocity"}`, optional, default: None. If
         `linewidth="velocity"`, line width is scaled by the velocity of the
         dynamics. Defaults to `rcParams` if `linewidth=None`.
@@ -526,7 +526,7 @@ class Dynamics3x3Axes(axes.Axes):
                                  [eps / 2., eps / 2., 1. - eps]])
       initial_points = np.vstack(
           (initial_points, utils.sample_from_simplex(100)))
-      # TODO: add heuristic for initial points
+      # TODO(author10): add heuristic for initial points
 
     else:
       initial_points = np.array(initial_points)

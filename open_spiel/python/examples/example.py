@@ -83,7 +83,7 @@ def main(_):
       # Simultaneous node: sample actions for all players.
       chosen_actions = [
           random.choice(state.legal_actions(pid))
-          for pid in xrange(game.num_players())
+          for pid in range(game.num_players())
       ]
       print("Chosen actions: ", [
           state.action_to_string(pid, action)

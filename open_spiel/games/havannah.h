@@ -28,7 +28,7 @@
 //
 // Parameters:
 //   "board_size"        int     radius of the board   (default = 8)
-//   "ansi_color_output" bool    Whether to color the output for a termainl.
+//   "ansi_color_output" bool    Whether to color the output for a terminal.
 
 namespace open_spiel {
 namespace havannah {
@@ -52,7 +52,7 @@ enum MoveSpecial {
   kMoveOffset = -3,
 };
 
-int CalcXY(int x, int y, int board_size) {
+inline int CalcXY(int x, int y, int board_size) {
   int diameter = board_size * 2 - 1;
   if (x >= 0 && y >= 0 && x < diameter && y < diameter &&
       (y - x < board_size) && (x - y < board_size)) {
@@ -135,7 +135,6 @@ class HavannahState : public State {
   HavannahState(int board_size, bool ansi_color_output = false);
 
   HavannahState(const HavannahState&) = default;
-  HavannahState& operator=(const HavannahState&) = default;
 
   int CurrentPlayer() const override {
     return IsTerminal() ? kTerminalPlayerId : static_cast<int>(current_player_);
@@ -149,7 +148,6 @@ class HavannahState : public State {
   void ObservationAsNormalizedVector(
       int player, std::vector<double>* values) const override;
   std::unique_ptr<State> Clone() const override;
-  void UndoAction(int player, Action move) override;
   std::vector<Action> LegalActions() const override;
 
  protected:

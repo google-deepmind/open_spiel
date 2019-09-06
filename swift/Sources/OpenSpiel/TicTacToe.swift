@@ -52,7 +52,7 @@ public class TicTacToe: GameProtocol {
     public var currentPlayer: Player = .player(0)
     public var winner: Player?
     public func utility(for player: Player) -> Double {
-      if !isTerminal { return 0 }
+      if winner == nil { return 0 }
       if winner == player {
         return 1
       } else {
@@ -166,6 +166,9 @@ extension TicTacToe.State {
       winner = currentPlayer
       currentPlayer = .terminal
       return
+    }
+    if history.count == (game.boardSize * game.boardSize) {
+      currentPlayer = .terminal
     }
   }
 

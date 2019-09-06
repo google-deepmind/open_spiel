@@ -28,10 +28,10 @@ import numpy as np
 from open_spiel.python.algorithms import get_all_states
 import pyspiel
 
-# TODO: Test all games.
+# TODO(author2): Test all games.
 _EXCLUDED_GAMES = [
     # Simultaneous games
-    # TODO: the tests are now failing because the empty legal actions
+    # TODO(author2): the tests are now failing because the empty legal actions
     # for not the current player is being tested on simultaneous games (we
     # should skip that test in thoses cases)
     "coin_game",  # Too big, number of states with depth 5 is ~10^9
@@ -57,6 +57,7 @@ _EXCLUDED_GAMES = [
     "chess",
     "go",
     "pentago",
+    "quoridor",
     # Mandatory parameters
     "misere",
     "turn_based_simultaneous_game",
@@ -68,6 +69,7 @@ _GAMES_TO_TEST = list(set(pyspiel.registered_names()) - set(_EXCLUDED_GAMES))
 # The list of game instances to test on the full tree as tuples
 # (name to display, string to pass to load_game).
 _GAMES_FULL_TREE_TRAVERSAL_TESTS = [
+    ("catch", "catch(rows=6,columns=3)"),
     ("kuhn_poker", "kuhn_poker"),
     ("leduc_poker", "leduc_poker"),
     # Disabled as this slows down the test significantly. (12s to 150s).
@@ -80,10 +82,11 @@ _GAMES_FULL_TREE_TRAVERSAL_TESTS = [
 ]
 
 # Games from the above to exempt from the constant-sum tests.
-_GENERAL_SUM_GAMES = ["first_sealed_auction"]
+_GENERAL_SUM_GAMES = ["catch", "first_sealed_auction"]
 
 TOTAL_NUM_STATES = {
     # This maps the game name to (chance, playable, terminal)
+    "catch": (1, 363, 729),
     "kuhn_poker": (4, 24, 30),
     "leduc_poker": (157, 3780, 5520),
     "liars_dice": (7, 147456, 147420),
@@ -95,6 +98,7 @@ TOTAL_NUM_STATES = {
 # This is kept to ensure non-regression, but we would like to remove that
 # when we can interpret what are these numbers.
 PERFECT_RECALL_NUM_STATES = {
+    "catch": 363,
     "kuhn_poker": 12,
     "leduc_poker": 936,
     "liars_dice": 24576,
@@ -315,7 +319,7 @@ def _assert_properties_recursive(state, assert_functions):
     assert_function(state)
 
   # Recursion
-  # TODO: We often use a `give me the next node` function and we
+  # TODO(author2): We often use a `give me the next node` function and we
   # probably want a utility method for that, which works for all games.
   if state.is_terminal():
     return
@@ -470,7 +474,7 @@ def _assert_is_perfect_recall_recursive(state, current_history,
 
   # Recursion
 
-  # TODO: We often use a `give me the next node` function and we
+  # TODO(author2): We often use a `give me the next node` function and we
   # probably want a utility method for that, which works for all games.
   if state.is_terminal():
     return

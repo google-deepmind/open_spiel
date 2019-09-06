@@ -14,13 +14,6 @@
 
 #include <unordered_map>
 
-#include "open_spiel/policy.h"
-#include "open_spiel/spiel_utils.h"
-#include "pybind11/include/pybind11//pybind11.h"
-#include "pybind11/include/pybind11/stl.h"
-
-namespace py = pybind11;
-
 #include "open_spiel/algorithms/evaluate_bots.h"
 #include "open_spiel/algorithms/matrix_game_utils.h"
 #include "open_spiel/algorithms/tabular_exploitability.h"
@@ -28,25 +21,23 @@ namespace py = pybind11;
 #include "open_spiel/game_transforms/turn_based_simultaneous_game.h"
 #include "open_spiel/matrix_game.h"
 #include "open_spiel/normal_form_game.h"
+#include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_bots.h"
+#include "open_spiel/spiel_utils.h"
+#include "pybind11/include/pybind11/pybind11.h"
+#include "pybind11/include/pybind11/stl.h"
 
-using open_spiel::Action;
-using open_spiel::ActionsAndProbs;
-using open_spiel::Bot;
-using open_spiel::Game;
-using open_spiel::GameParameter;
-using open_spiel::GameParameters;
-using open_spiel::GameRegisterer;
-using open_spiel::GameType;
-using open_spiel::Policy;
-using open_spiel::State;
-using open_spiel::algorithms::Exploitability;
-using open_spiel::algorithms::NashConv;
-using open_spiel::algorithms::TabularBestResponse;
-using open_spiel::matrix_game::MatrixGame;
-
+namespace open_spiel {
 namespace {
+
+using ::open_spiel::algorithms::Exploitability;
+using ::open_spiel::algorithms::NashConv;
+using ::open_spiel::algorithms::TabularBestResponse;
+using ::open_spiel::matrix_game::MatrixGame;
+
+namespace py = ::pybind11;
+
 // This exception class is used to forward errors from Spiel to Python.
 // Do not create exceptions of this type directly! Instead, call
 // SpielFatalError, which will raise a Python exception when called from
@@ -101,7 +92,6 @@ class PyBot : public Bot {
     );
   }
 };
-}  // namespace
 
 // Definintion of our Python module.
 PYBIND11_MODULE(pyspiel, m) {
@@ -477,3 +467,6 @@ PYBIND11_MODULE(pyspiel, m) {
   open_spiel::SetErrorHandler(
       [](const std::string& string) { throw SpielException(string); });
 }
+
+}  // namespace
+}  // namespace open_spiel

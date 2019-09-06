@@ -78,7 +78,7 @@ def qpg(state, fitness):
 
 
 class SinglePopulationDynamics(object):
-  """Continious-time single population dynamics.
+  """Continuous-time single population dynamics.
 
   Attributes:
     payoff_matrix: The payoff matrix as an `numpy.ndarray` of shape `[2, k_1,
