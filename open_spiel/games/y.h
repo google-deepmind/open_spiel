@@ -28,7 +28,7 @@
 //
 // Parameters:
 //   "board_size"        int     size of the board   (default = 19)
-//   "ansi_color_output" bool    Whether to color the output for a termainl.
+//   "ansi_color_output" bool    Whether to color the output for a terminal.
 
 namespace open_spiel {
 namespace y_game {
@@ -117,7 +117,6 @@ class YState : public State {
   YState(int board_size, bool ansi_color_output = false);
 
   YState(const YState&) = default;
-  YState& operator=(const YState&) = default;
 
   int CurrentPlayer() const override {
     return IsTerminal() ? kTerminalPlayerId : static_cast<int>(current_player_);
@@ -131,7 +130,6 @@ class YState : public State {
   void ObservationAsNormalizedVector(
       int player, std::vector<double>* values) const override;
   std::unique_ptr<State> Clone() const override;
-  void UndoAction(int player, Action move) override;
   std::vector<Action> LegalActions() const override;
 
  protected:

@@ -64,7 +64,6 @@ class HexState : public State {
   HexState(int board_size);
 
   HexState(const HexState&) = default;
-  HexState& operator=(const HexState&) = default;
 
   int CurrentPlayer() const override {
     return IsTerminal() ? kTerminalPlayerId : current_player_;
@@ -78,7 +77,6 @@ class HexState : public State {
   void ObservationAsNormalizedVector(
       int player, std::vector<double>* values) const override;
   std::unique_ptr<State> Clone() const override;
-  void UndoAction(int player, Action move) override;
   std::vector<Action> LegalActions() const override;
   CellState BoardAt(int cell) const { return board_[cell]; }
 

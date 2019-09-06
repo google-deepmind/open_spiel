@@ -382,11 +382,6 @@ bool HavannahState::CheckRingDFS(const Move& move, int left, int right) {
   return success;
 }
 
-void HavannahState::UndoAction(int player, Action move) {
-  SpielFatalError("HavannahState::UndoAction Not Implemented");
-  // TODO(author7): Implement this by replaying the game.
-}
-
 std::unique_ptr<State> HavannahState::Clone() const {
   return std::unique_ptr<State>(new HavannahState(*this));
 }

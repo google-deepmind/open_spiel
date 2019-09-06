@@ -304,11 +304,6 @@ bool YState::JoinGroups(int cell_a, int cell_b) {
   return false;
 }
 
-void YState::UndoAction(int player, Action move) {
-  SpielFatalError("YState::UndoAction Not Implemented");
-  // TODO(author7): Implement this by replaying the game.
-}
-
 std::unique_ptr<State> YState::Clone() const {
   return std::unique_ptr<State>(new YState(*this));
 }
