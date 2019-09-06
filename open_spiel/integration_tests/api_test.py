@@ -57,6 +57,7 @@ _EXCLUDED_GAMES = [
     "chess",
     "go",
     "pentago",
+    "quoridor",
     # Mandatory parameters
     "misere",
     "turn_based_simultaneous_game",

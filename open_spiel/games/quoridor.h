@@ -1,0 +1,183 @@
+// Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#ifndef THIRD_PARTY_OPEN_SPIEL_GAMES_QUORIDOR_H_
+#define THIRD_PARTY_OPEN_SPIEL_GAMES_QUORIDOR_H_
+
+#include <cstdint>
+#include <string>
+#include <vector>
+
+#include "open_spiel/spiel.h"
+
+// https://en.wikipedia.org/wiki/Quoridor
+//
+// Parameters:
+//   "board_size"        int     Size of the board (default = 9)
+//   "wall_count"        int     How many walls per side (default = size^2/8)
+//   "ansi_color_output" bool    Whether to color the output for a terminal.
+
+namespace open_spiel {
+namespace quoridor {
+
+constexpr int kNumPlayers = 2;
+constexpr int kDefaultBoardSize = 9;
+constexpr int kMinBoardSize = 3;
+constexpr int kMaxBoardSize = 25;
+constexpr int kMaxGameLengthFactor = 4;
+constexpr int kCellStates = 1 + kNumPlayers;
+
+enum Player : uint8_t {
+  kPlayer1,
+  kPlayer2,
+  kPlayerWall,
+  kPlayerNone,
+  kPlayerDraw,
+};
+
+
+struct Offset {
+  int8_t x, y;
+
+  Offset() : x(0), y(0) {}
+  Offset(int x_, int y_) : x(x_), y(y_){}
+
+  Offset operator+(const Offset& o) const { return Offset(x + o.x, y + o.y); }
+  Offset operator-(const Offset& o) const { return Offset(x - o.x, y - o.y); }
+  Offset operator*(const int i) const { return Offset(x * i, y * i); }
+  Offset rotate_left() const { return Offset(-y, x); }
+  Offset rotate_right() const { return Offset(y, -x); }
+};
+
+struct Move {
+  int8_t x, y;
+  int16_t xy;  // Precomputed x + y * size.
+  int8_t size;
+
+  Move() : x(0), y(0), xy(-1), size(-1) {}
+  Move(int x_, int y_, int size_)
+      : x(x_), y(y_), xy(x_ + (y_ * size_)), size(size_) {}
+
+  std::string ToString() const;
+
+  bool IsValid() const { return x >= 0 && y >= 0 && x < size && y < size; }
+  bool IsWall() const { return x & 1 || y & 1; }
+  bool IsHorizontalWall() const { return y & 1; }
+  bool IsVerticalWall() const { return x & 1; }
+
+  bool operator==(const Move& b) const { return xy == b.xy; }
+  bool operator!=(const Move& b) const { return xy != b.xy; }
+  bool operator<(const Move& b) const { return xy < b.xy; }
+
+  Move operator+(const Offset& o) const { return Move(x + o.x, y + o.y, size); }
+  Move operator-(const Offset& o) const { return Move(x - o.x, y - o.y, size); }
+};
+
+// State of an in-play game.
+class QuoridorState : public State {
+ public:
+  QuoridorState(int board_size, int wall_count, bool ansi_color_output = false);
+
+  QuoridorState(const QuoridorState&) = default;
+
+  int CurrentPlayer() const override {
+    return IsTerminal() ? kTerminalPlayerId : static_cast<int>(current_player_);
+  }
+  std::string ActionToString(int player, Action action_id) const override;
+  std::string ToString() const override;
+  bool IsTerminal() const override { return outcome_ != kPlayerNone; }
+  std::vector<double> Returns() const override;
+  std::string InformationState(int player) const override;
+  std::string Observation(int player) const override;
+  void ObservationAsNormalizedVector(
+      int player, std::vector<double>* values) const override;
+  std::unique_ptr<State> Clone() const override;
+  std::vector<Action> LegalActions() const override;
+
+ protected:
+  void DoApplyAction(Action action) override;
+
+  void AddActions(Move cur, Offset offset, std::vector<Action> *moves) const;
+  bool IsValidWall(Move m) const;
+  bool SearchEndZone(Player p, Move wall1, Move wall2) const;
+
+  // Turn an action id into a `Move`.
+  Move ActionToMove(Action action_id) const;
+
+  Move GetMove(int x, int y) const { return Move(x, y, board_diameter_); }
+  bool IsWall(Move m) const {
+    return m.IsValid() ? board_[m.xy] == kPlayerWall : true;
+  }
+  Player GetPlayer(Move m) const {
+    return m.IsValid() ? board_[m.xy] : kPlayerWall;
+  }
+  void SetPlayer(Move m, Player p, Player old) {
+    SPIEL_CHECK_TRUE(m.IsValid());
+    SPIEL_CHECK_EQ(board_[m.xy], old);
+    board_[m.xy] = p;
+  }
+
+ private:
+  std::vector<Player> board_;
+  int wall_count_[kNumPlayers];
+  int end_zone_[kNumPlayers];
+  Move player_loc_[kNumPlayers];
+  Player current_player_ = kPlayer1;
+  Player outcome_ = kPlayerNone;
+  int moves_made_ = 0;
+  const int board_size_;
+  const int board_diameter_;
+  const bool ansi_color_output_;
+};
+
+// Game object.
+class QuoridorGame : public Game {
+ public:
+  explicit QuoridorGame(const GameParameters& params);
+
+  int NumDistinctActions() const override {
+    return Diameter() * Diameter();
+  }
+  std::unique_ptr<State> NewInitialState() const override {
+    return std::unique_ptr<State>(
+        new QuoridorState(board_size_, wall_count_, ansi_color_output_));
+  }
+  int NumPlayers() const override { return kNumPlayers; }
+  double MinUtility() const override { return -1; }
+  double UtilitySum() const override { return 0; }
+  double MaxUtility() const override { return 1; }
+  std::unique_ptr<Game> Clone() const override {
+    return std::unique_ptr<Game>(new QuoridorGame(*this));
+  }
+  std::vector<int> ObservationNormalizedVectorShape() const override {
+    return {kCellStates + kNumPlayers, Diameter(), Diameter()};
+  }
+  int MaxGameLength() const {
+    // There's no anti-repetition rule, so this could be infinite, but no sane
+    // agent would take more moves than placing all the walls and visiting
+    // all squares.
+    return kMaxGameLengthFactor * board_size_ * board_size_;
+  }
+
+ private:
+  int Diameter() const { return board_size_ * 2 - 1; }
+  const int board_size_;
+  const int wall_count_;
+  const bool ansi_color_output_ = false;
+};
+
+}  // namespace quoridor
+}  // namespace open_spiel
+
+#endif  // THIRD_PARTY_OPEN_SPIEL_GAMES_QUORIDOR_H_
