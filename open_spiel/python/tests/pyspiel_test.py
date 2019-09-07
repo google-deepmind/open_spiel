@@ -64,6 +64,7 @@ class PyspielTest(unittest.TestCase):
         "pentago",
         "phantom_ttt",
         "pig",
+        "quoridor",
         "tic_tac_toe",
         "tiny_bridge_2p",
         "tiny_bridge_4p",

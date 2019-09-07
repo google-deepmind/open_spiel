@@ -27,6 +27,9 @@
 // column of the ball is decided by chance. Each turn, the ball moves downwards
 // while remaining in the initial column.
 //
+// Please note: In each turn, all actions (left, stay, right) are legal. This
+// is different to the Python implementation of the game.
+//
 // References:
 // a) Recurrent models of visual attention, 2014, Minh et al.
 //    (Advances in Neural Information Processing Systems 27, pages 2204–2212.)
@@ -104,7 +107,7 @@ class CatchGame : public Game {
     return {num_rows_, num_columns_};
   }
   std::vector<int> InformationStateNormalizedVectorShape() const override {
-    return ObservationNormalizedVectorShape();
+    return {num_columns_ + kNumActions * num_rows_};
   }
 
   int NumDistinctActions() const override { return kNumActions; }

@@ -337,7 +337,7 @@ class PolicyGradient(rl_agent.AbstractAgent):
     Returns:
       The average Critic loss obtained on this batch.
     """
-    # TODO: illegal action handling.
+    # TODO(author3): illegal action handling.
     critic_loss, _ = self._session.run(
         [self._critic_loss, self._critic_learn_step],
         feed_dict={
@@ -354,7 +354,7 @@ class PolicyGradient(rl_agent.AbstractAgent):
     Returns:
       The average Pi loss obtained on this batch.
     """
-    # TODO: illegal action handling.
+    # TODO(author3): illegal action handling.
     pi_loss, _ = self._session.run(
         [self._pi_loss, self._pi_learn_step],
         feed_dict={

@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,8 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-#!/bin/bash
 
 # The following builds open_spiel and executes the tests using the `python`
 # command. The version under 'python' is automatically detected.
@@ -29,13 +29,14 @@ set -e  # exit when any command fails
 set -x
 
 CXX=g++
+NPROC=nproc
 if [[ "$OSTYPE" == "darwin"* ]]; then  # Mac OSX
-  alias nproc="sysctl -n hw.physicalcpu"
+  NPROC="sysctl -n hw.physicalcpu"
   CXX=/usr/local/bin/g++-7
 fi
 
-MAKE_NUM_PROCS=$(nproc)
-let TEST_NUM_PROCS=4*$(nproc)
+MAKE_NUM_PROCS=$(${NPROC})
+let TEST_NUM_PROCS=4*${MAKE_NUM_PROCS}
 
 PYVERSION=$(python3 -c 'import sys; print(sys.version.split(" ")[0])')
 PY_VERSION_MAJOR=$(python3 -c 'import sys; print(sys.version_info.major)')

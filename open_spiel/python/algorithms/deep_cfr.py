@@ -42,7 +42,7 @@ StrategyMemory = collections.namedtuple(
     "StrategyMemory", "info_state iteration strategy_action_probs")
 
 
-# TODO Refactor into data structures lib.
+# TODO(author3) Refactor into data structures lib.
 class FixedSizeRingBuffer(object):
   """ReplayBuffer of fixed size with a FIFO replacement policy.
 
@@ -149,7 +149,7 @@ class DeepCFRSolver(policy.Policy):
     self._batch_size_strategy = batch_size_strategy
     self._num_players = game.num_players()
     self._root_node = self._game.new_initial_state()
-    # TODO Allow embedding size (and network) to be specified.
+    # TODO(author6) Allow embedding size (and network) to be specified.
     self._embedding_size = len(
         self._root_node.information_state_as_normalized_vector(0))
     self._num_iterations = num_iterations
@@ -330,7 +330,7 @@ class DeepCFRSolver(policy.Policy):
     return advantages, matched_regrets
 
   def action_probabilities(self, state):
-    """Returns action probabilites dict for a single batch."""
+    """Returns action probabilities dict for a single batch."""
     info_state_vector = np.array(state.information_state_as_normalized_vector())
     if len(info_state_vector.shape) == 1:
       info_state_vector = np.expand_dims(info_state_vector, axis=0)

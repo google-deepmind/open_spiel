@@ -385,28 +385,32 @@ Action BackgammonState::EncodedPassMove() const { return 25; }
 
 Action BackgammonState::CheckerMovesToSpielMove(
     const std::vector<CheckerMove>& moves) const {
+  SPIEL_CHECK_LE(moves.size(), 2);
   int dig0 = EncodedPassMove();
   int dig1 = EncodedPassMove();
-  int pos1 = moves[0].pos;
-  int num1 = moves[0].num;
-  int pos2 = moves[1].pos;
-  if (pos1 == kBarPos) {
-    pos1 = EncodedBarMove();
-  }
-  if (pos2 == kBarPos) {
-    pos2 = EncodedBarMove();
-  }
-
   bool high_roll_first = false;
   int high_roll = DiceValue(0) >= DiceValue(1) ? DiceValue(0) : DiceValue(1);
 
-  if (!moves.empty() && pos1 != kPassPos) {
-    dig0 = pos1;
-    high_roll_first = num1 == high_roll;
+  if (!moves.empty()) {
+    int pos1 = moves[0].pos;
+    if (pos1 == kBarPos) {
+      pos1 = EncodedBarMove();
+    }
+    if (pos1 != kPassPos) {
+      int num1 = moves[0].num;
+      dig0 = pos1;
+      high_roll_first = num1 == high_roll;
+    }
   }
 
-  if (moves.size() > 1 && pos2 != kPassPos) {
-    dig1 = pos2;
+  if (moves.size() > 1) {
+    int pos2 = moves[1].pos;
+    if (pos2 == kBarPos) {
+      pos2 = EncodedBarMove();
+    }
+    if (pos2 != kPassPos) {
+      dig1 = pos2;
+    }
   }
 
   Action move = dig1 * 26 + dig0;

@@ -32,7 +32,8 @@ void BasicCatchTests() {
 }
 
 void GetAllStatesTest() {
-  auto states = algorithms::GetAllStates(*LoadGame("catch"),
+  auto catch_game = LoadGame("catch");
+  auto states = algorithms::GetAllStates(*catch_game,
                                          /*depth_limit=*/-1,
                                          /*include_terminals=*/true,
                                          /*include_chance_states=*/false);

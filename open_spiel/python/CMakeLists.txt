@@ -1,13 +1,13 @@
-if(${Python_TARGET_VERSION} STREQUAL "")
+if(Python_TARGET_VERSION STREQUAL "")
   find_package(Python COMPONENTS Development)
   include_directories(SYSTEM ${Python_INCLUDE_DIRS})
-elseif(${Python_TARGET_VERSION} VERSION_LESS "3.0.0")
+elseif(Python_TARGET_VERSION VERSION_LESS "3.0.0")
   message(FATAL_ERROR
     "Only Python 3 is supported, not ${Python_TARGET_VERSION}")
-elseif(${Python_TARGET_VERSION} VERSION_GREATER_EQUAL "3.0.0")
+elseif(Python_TARGET_VERSION VERSION_GREATER_EQUAL "3.0.0")
   find_package(Python3 COMPONENTS Development)
   include_directories(SYSTEM ${Python3_INCLUDE_DIRS})
-  if(${Python3_VERSION} VERSION_LESS ${Python_TARGET_VERSION})
+  if(Python3_VERSION VERSION_LESS Python_TARGET_VERSION)
     message(FATAL_ERROR
       "Python found ${Python3_VERSION} < ${Python_TARGET_VERSION}")
   endif()

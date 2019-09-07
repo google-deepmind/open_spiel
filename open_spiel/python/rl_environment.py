@@ -32,14 +32,14 @@ field from `TimeSpec`, containing the following members:
 
 At each `step` call, the environment expects a singleton list with the action
 (as it's a turn-based game), e.g.: [1]. This (zero-based) action must correspond
-to the player speficied at `current_player`. The game (which is at decision
+to the player specified at `current_player`. The game (which is at decision
 node) will process the action and take as many steps necessary to cover chance
 nodes, halting at a new decision or final node. Finally, a new `TimeStep`is
 returned to the agent.
 
-Simutaneous-move games follow analogous dynamics. The only differences is the
+Simultaneous-move games follow analogous dynamics. The only differences is the
 environment expects a list of actions, one per player. Note the `current_player`
-field is "irrelevant" here, admiting a constant value defined in spiel.h, which
+field is "irrelevant" here, admitting a constant value defined in spiel.h, which
 defaults to -2 (module level constant `SIMULTANEOUS_PLAYER_ID`).
 
 See open_spiel/python/examples/rl_example.py for example usages.
@@ -319,10 +319,10 @@ class Environment(object):
 
   def set_state(self, unused_new_state):
     """Updates the game state."""
-    # TODO: add set/get state methods
+    # TODO(author3): add set/get state methods
     pass
 
   @property
   def get_state(self):
-    # TODO: add set/get state methods
+    # TODO(author3): add set/get state methods
     pass
