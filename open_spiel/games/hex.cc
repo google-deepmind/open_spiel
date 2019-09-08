@@ -274,11 +274,6 @@ void HexState::ObservationAsNormalizedVector(
   }
 }
 
-void HexState::UndoAction(int player, Action move) {
-  SpielFatalError("HexState::UndoAction Not Implemented");
-  // TODO(author8): Implement this by replaying the game
-}
-
 std::unique_ptr<State> HexState::Clone() const {
   return std::unique_ptr<State>(new HexState(*this));
 }

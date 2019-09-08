@@ -27,7 +27,7 @@
 // Does not implement pie rule to balance the game
 //
 // Parameters:
-//   "ansi_color_output" bool    Whether to color the output for a termainl.
+//   "ansi_color_output" bool    Whether to color the output for a terminal.
 
 namespace open_spiel {
 namespace pentago {
@@ -53,7 +53,6 @@ class PentagoState : public State {
   PentagoState(bool ansi_color_output = false);
 
   PentagoState(const PentagoState&) = default;
-  PentagoState& operator=(const PentagoState&) = default;
 
   int CurrentPlayer() const override {
     return IsTerminal() ? kTerminalPlayerId : static_cast<int>(current_player_);
@@ -67,7 +66,6 @@ class PentagoState : public State {
   void ObservationAsNormalizedVector(
       int player, std::vector<double>* values) const override;
   std::unique_ptr<State> Clone() const override;
-  void UndoAction(int player, Action move) override;
   std::vector<Action> LegalActions() const override;
 
  protected:

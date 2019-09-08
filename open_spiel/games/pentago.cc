@@ -285,11 +285,6 @@ void PentagoState::DoApplyAction(Action action) {
   current_player_ = (current_player_ == kPlayer1 ? kPlayer2 : kPlayer1);
 }
 
-void PentagoState::UndoAction(int player, Action move) {
-  SpielFatalError("PentagoState::UndoAction Not Implemented");
-  // TODO(author7): Undo the placement and rotation.
-}
-
 std::unique_ptr<State> PentagoState::Clone() const {
   return std::unique_ptr<State>(new PentagoState(*this));
 }
