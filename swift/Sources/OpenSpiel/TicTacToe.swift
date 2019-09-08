@@ -46,6 +46,7 @@ public class TicTacToe: GameProtocol {
 
   /// A State represents a time during the game.
   public struct State: StateProtocol {
+    var descriptionStr: String
     public let game: TicTacToe
     public var history: [Action] = []
     public var board: [Player?]
@@ -116,6 +117,8 @@ extension TicTacToe.State {
   init(_ game: TicTacToe) {
     self.game = game
     self.board = Array(repeating: nil, count: game.boardSize * game.boardSize)
+    self.descriptionStr = ""
+    generateDescription()
   }
 
   public var isTerminal: Bool {
@@ -128,6 +131,7 @@ extension TicTacToe.State {
     }
     set {
       board[action.x * game.boardSize + action.y] = newValue
+      generateDescription()  // Invalidate hash cache
     }
   }
 
@@ -139,6 +143,7 @@ extension TicTacToe.State {
     if !isTerminal {
       currentPlayer = currentPlayer.otherPlayer
     }
+    generateDescription()  // Invalidate hash cache
   }
 
   public var legalActionsMask: [Bool] {
@@ -205,19 +210,32 @@ extension TicTacToe.State {
     }
     return true
   }
+  
+  mutating func generateDescription() {
+    var description = "TicTacToe: [current: \(self.currentPlayer)]\n"
+      for i in 0..<3 {
+        for j in 0..<3 {
+          let coordinate = TicTacToe.Action(x: i, y: j)
+          description.append(" \(self[coordinate].ticTacToeDescription)")
+        }
+        description.append("\n")
+      }
+      self.descriptionStr = description
+    }
 }
 
 extension TicTacToe.State: CustomStringConvertible {
   public var description: String {
-    var description = "TicTacToe: [current: \(currentPlayer)]\n"
-    for i in 0..<3 {
-      for j in 0..<3 {
-        let coordinate = TicTacToe.Action(x: i, y: j)
-        description.append(" \(self[coordinate].ticTacToeDescription)")
-      }
-      description.append("\n")
-    }
-    return description
+    return descriptionStr
+  }
+  
+  /// Markov property fulfilled by marker configuration on board, not the history of actions.
+  public func hash(into hasher: inout Hasher) {
+    hasher.combine(self.description)
+  }
+  
+  public static func == (lhs: Self, rhs: Self) -> Bool {
+    return lhs.description == rhs.description
   }
 }
 

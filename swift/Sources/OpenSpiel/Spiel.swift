@@ -211,19 +211,15 @@ public extension StateProtocol {
   var legalActionsMaskAsTensor: Tensor<Double> {
     return Tensor(legalActionsMask.map { $0 ? 0 : -Double.infinity })
   }
-}
-
-public extension Equatable where Self: StateProtocol {
-  static func == (lhs: Self, rhs: Self) -> Bool {
-    return lhs.history == rhs.history
-  }
-}
-
-public extension Hashable where Self: StateProtocol {
+  
   /// Given a game instance, `State`s can be identified by their history.
   /// Some games (e.g., with cycles) may choose to override this.
   func hash(into hasher: inout Hasher) {
     hasher.combine(history)
+  }
+  
+  static func == (lhs: Self, rhs: Self) -> Bool {
+    return lhs.history == rhs.history
   }
 }
 
