@@ -2,9 +2,10 @@
 
 ## Summary
 
-1.  Run `./install.sh` once to install system packages and download some
+1.  `git clone --recursive git@github.com:deepmind/open_spiel.git`
+2.  Run `./install.sh` once to install system packages and download some
     dependencies.
-2.  Install your Python dependencies, e.g. in Python 3 using
+3.  Install your Python dependencies, e.g. in Python 3 using
     [`virtualenv`](https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/):
 
     ```bash
@@ -15,13 +16,13 @@
 
     Use `deactivate` to quit the virtual environment.
 
-3.  Build and run tests to check everything works:
+4.  Build and run tests to check everything works:
 
     ```bash
     ./open_spiel/scripts/build_and_run_tests.sh
     ```
 
-4.  Add
+5.  Add
 
     ```bash
     # For the python modules in open_spiel.

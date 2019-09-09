@@ -38,13 +38,3 @@ else
        "Feel free to contribute the install for a new OS."
   exit 1
 fi
-
-[[ -d "./pybind11" ]] || git clone -b 'v2.2.4' --single-branch --depth 1 https://github.com/pybind/pybind11.git
-# The official https://github.com/dds-bridge/dds.git seems to not accept PR,
-# so we have forked it.
-[[ -d open_spiel/games/bridge/double_dummy_solver ]] || \
-  git clone -b 'develop' --single-branch --depth 1 https://github.com/jblespiau/dds.git  \
-  open_spiel/games/bridge/double_dummy_solver
-[[ -d open_spiel/abseil-cpp ]] || \
-  git clone -b 'master' --single-branch --depth 1 https://github.com/abseil/abseil-cpp.git \
-  open_spiel/abseil-cpp
