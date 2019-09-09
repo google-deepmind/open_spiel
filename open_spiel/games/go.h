@@ -73,6 +73,7 @@ class GoState : public State {
   bool IsTerminal() const override;
 
   std::string InformationState(int player) const override;
+  std::string Observation(int player) const override;
 
   std::vector<double> Returns() const override;
 
