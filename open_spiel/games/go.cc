@@ -86,6 +86,10 @@ GoState::GoState(int board_size, float komi, int handicap)
   ResetBoard();
 }
 
+std::string GoState::InformationState(int player) const {
+  return ToString();
+}
+
 std::vector<Action> GoState::LegalActions() const {
   std::vector<Action> actions = {kPass};
 

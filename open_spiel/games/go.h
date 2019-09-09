@@ -72,6 +72,8 @@ class GoState : public State {
 
   bool IsTerminal() const override;
 
+  std::string InformationState(int player) const override;
+
   std::vector<double> Returns() const override;
 
   std::unique_ptr<State> Clone() const override;
