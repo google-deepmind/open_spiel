@@ -2,8 +2,13 @@
 
 ## Summary
 
-1.  Run `./install.sh` once to install system packages and download some
-    dependencies.
+1.  Install system packages and download some dependencies. Only needs to be
+    run once.
+
+    ```bash
+    ./install.sh
+    ```
+
 2.  Install your Python dependencies, e.g. in Python 3 using
     [`virtualenv`](https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/):
 
