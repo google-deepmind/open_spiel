@@ -103,7 +103,9 @@ class PolicyGradient(rl_agent.AbstractAgent):
                pi_learning_rate=0.001,
                entropy_cost=0.01,
                num_critic_before_pi=8,
-               additional_discount_factor=1.0):
+               additional_discount_factor=1.0,
+               max_gradient_norm=10.0
+               ):
     """Initialize the PolicyGradient agent.
 
     Args:
@@ -200,7 +202,19 @@ class PolicyGradient(rl_agent.AbstractAgent):
               labels=self._return_ph, predictions=value_predictions))
     critic_optimizer = tf.train.GradientDescentOptimizer(
         learning_rate=critic_learning_rate)
-    self._critic_learn_step = critic_optimizer.minimize(self._critic_loss)
+
+    def minimize_with_clipping(optimizer, loss):
+      def clip(grad):
+        if max_gradient_norm is not None and grad is not None:
+          return tf.clip_by_norm(grad, max_gradient_norm)
+        else:
+          return grad
+
+      grads_and_vars = optimizer.compute_gradients(loss)
+      clipped_grads_and_vars = [(clip(grad), var) for grad, var in grads_and_vars]
+      return optimizer.apply_gradients(clipped_grads_and_vars)
+
+    self._critic_learn_step = minimize_with_clipping(critic_optimizer, self._critic_loss)
 
     # Pi loss
     pg_class = loss_class(entropy_cost=entropy_cost)
@@ -215,7 +229,8 @@ class PolicyGradient(rl_agent.AbstractAgent):
           policy_logits=self._policy_logits, action_values=self._q_values)
     pi_optimizer = tf.train.GradientDescentOptimizer(
         learning_rate=pi_learning_rate)
-    self._pi_learn_step = pi_optimizer.minimize(self._pi_loss)
+
+    self._pi_learn_step = minimize_with_clipping(pi_optimizer, self._pi_loss)
 
   def _get_loss_class(self, loss_str):
     if loss_str == "rpg":
