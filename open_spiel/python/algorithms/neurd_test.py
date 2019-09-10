@@ -16,6 +16,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import unittest
 from absl.testing import absltest
 
 import tensorflow as tf
@@ -44,6 +45,8 @@ class NeurdTest(tf.test.TestCase):
     super(NeurdTest, self).setUp()
     tf.set_random_seed(42)
 
+  @unittest.skip('Does not run in the open-source world. See '
+                 'https://github.com/deepmind/open_spiel/issues/18')
   def test_neurd(self):
     num_iterations = 2
     models = [_new_model() for _ in range(_GAME.num_players())]
