@@ -38,9 +38,10 @@ flags.DEFINE_enum("player1", "mcts", _KNOWN_PLAYERS, "Who controls player 1.")
 flags.DEFINE_enum("player2", "random", _KNOWN_PLAYERS, "Who controls player 2.")
 flags.DEFINE_integer("uct_c", 2, "UCT's exploration constant.")
 flags.DEFINE_integer("rollout_count", 10, "How many rollouts to do.")
-flags.DEFINE_integer("max_search_nodes", 10000, "How many nodes to expand.")
+flags.DEFINE_integer("max_simulations", 10000, "How many nodes to expand.")
 flags.DEFINE_integer("num_games", 1, "How many games to play.")
 flags.DEFINE_bool("quiet", False, "Don't show the moves as they're played.")
+flags.DEFINE_bool("verbose", False, "Show the MCTS stats of possible moves.")
 
 FLAGS = flags.FLAGS
 
@@ -55,7 +56,7 @@ def _init_bot(bot_type, game, player_id):
   if bot_type == "mcts":
     evaluator = mcts.RandomRolloutEvaluator(FLAGS.rollout_count)
     return mcts.MCTSBot(game, player_id, FLAGS.uct_c,
-                        FLAGS.max_search_nodes, evaluator)
+                        FLAGS.max_simulations, evaluator, FLAGS.verbose)
   if bot_type == "random":
     return uniform_random.UniformRandomBot(game, player_id, np.random)
   if bot_type == "human":
@@ -101,7 +102,7 @@ def _play_game(game):
       diff = time.time() - t1
       if isinstance(bot, mcts.MCTSBot):
         _opt_print("Took %.3f secs, %.1f rollouts/s" % (
-            diff, (FLAGS.rollout_count * FLAGS.max_search_nodes) / diff))
+            diff, (FLAGS.rollout_count * FLAGS.max_simulations) / diff))
       history.append(action_str)
       state.apply_action(action)
 
