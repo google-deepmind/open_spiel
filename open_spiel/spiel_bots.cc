@@ -23,7 +23,7 @@ namespace {
 
 class UniformRandomBot : public Bot {
  public:
-  UniformRandomBot(const Game& game, int player_id, int seed)
+  UniformRandomBot(const Game& game, Player player_id, int seed)
       : Bot(game, player_id), rng_(seed) {}
 
   std::pair<ActionsAndProbs, Action> Step(const State& state) override {
@@ -44,7 +44,7 @@ class UniformRandomBot : public Bot {
 }  // namespace
 
 // A uniform random bot, for test purposes.
-std::unique_ptr<Bot> MakeUniformRandomBot(const Game& game, int player_id,
+std::unique_ptr<Bot> MakeUniformRandomBot(const Game& game, Player player_id,
                                           int seed) {
   return std::unique_ptr<Bot>(new UniformRandomBot(game, player_id, seed));
 }
@@ -53,7 +53,7 @@ namespace {
 
 class FixedActionPreferenceBot : public Bot {
  public:
-  FixedActionPreferenceBot(const Game& game, int player_id,
+  FixedActionPreferenceBot(const Game& game, Player player_id,
                            const std::vector<Action>& actions)
       : Bot(game, player_id), actions_(actions) {}
 
@@ -77,7 +77,7 @@ class FixedActionPreferenceBot : public Bot {
 // A bot with a fixed action preference, for test purposes.
 // Picks the first legal action found in the list of actions.
 std::unique_ptr<Bot> MakeFixedActionPreferenceBot(
-    const Game& game, int player_id, const std::vector<Action>& actions) {
+    const Game& game, Player player_id, const std::vector<Action>& actions) {
   return std::unique_ptr<Bot>(
       new FixedActionPreferenceBot(game, player_id, actions));
 }

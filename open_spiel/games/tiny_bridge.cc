@@ -201,14 +201,14 @@ std::unique_ptr<State> TinyBridgePlayGame::NewInitialState() const {
       NumDistinctActions(), NumPlayers(), trumps, leader, holder));
 }
 
-std::string TinyBridgeAuctionState::HandString(int player) const {
+std::string TinyBridgeAuctionState::HandString(Player player) const {
   if (player >= actions_.size()) return "??";
   return ActionToString(kChancePlayerId, actions_[player]);
 }
 
 std::string TinyBridgeAuctionState::DealString() const {
   std::string deal;
-  for (int player = 0; player < num_players_; ++player) {
+  for (auto player = Player{0}; player < num_players_; ++player) {
     int hand = (num_players_ == 2) ? (2 * player) : player;
     if (player != 0) deal.push_back(' ');
     deal.append(
@@ -359,7 +359,7 @@ std::vector<std::pair<Action, double>> TinyBridgeAuctionState::ChanceOutcomes()
   return outcomes;
 }
 
-std::string TinyBridgeAuctionState::ActionToString(int player,
+std::string TinyBridgeAuctionState::ActionToString(Player player,
                                                    Action action_id) const {
   if (player == kChancePlayerId) {
     const int card1 = action_id % kNumCards;
@@ -409,7 +409,7 @@ std::vector<double> TinyBridgeAuctionState::Returns() const {
   }
 }
 
-std::string TinyBridgeAuctionState::InformationState(int player) const {
+std::string TinyBridgeAuctionState::InformationState(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
@@ -425,7 +425,7 @@ std::unique_ptr<State> TinyBridgeAuctionState::Clone() const {
   return std::unique_ptr<State>{new TinyBridgeAuctionState(*this)};
 }
 
-void TinyBridgeAuctionState::UndoAction(int player, Action action) {
+void TinyBridgeAuctionState::UndoAction(Player player, Action action) {
   actions_.pop_back();
   is_terminal_ = false;
 }
@@ -476,7 +476,7 @@ int TinyBridgePlayState::CurrentHand() const {
   return ((actions_.size() < 4 ? leader_ : winner_[0]) + actions_.size()) % 4;
 }
 
-std::string TinyBridgePlayState::ActionToString(int player,
+std::string TinyBridgePlayState::ActionToString(Player player,
                                                 Action action_id) const {
   return CardString(action_id);
 }
@@ -501,7 +501,7 @@ std::unique_ptr<State> TinyBridgePlayState::Clone() const {
   return std::unique_ptr<State>{new TinyBridgePlayState(*this)};
 }
 
-void TinyBridgePlayState::UndoAction(int player, Action action) {
+void TinyBridgePlayState::UndoAction(Player player, Action action) {
   actions_.pop_back();
   history_.pop_back();
 }

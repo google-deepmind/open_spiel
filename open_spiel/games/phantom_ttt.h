@@ -58,35 +58,35 @@ class PhantomTTTState : public State {
   PhantomTTTState(int num_distinct_actions, ObservationType obs_type);
 
   // Forward to underlying game state
-  int CurrentPlayer() const override { return state_.CurrentPlayer(); }
-  std::string ActionToString(int player, Action action_id) const {
+  Player CurrentPlayer() const override { return state_.CurrentPlayer(); }
+  std::string ActionToString(Player player, Action action_id) const {
     return state_.ActionToString(player, action_id);
   }
   std::string ToString() const override { return state_.ToString(); }
   bool IsTerminal() const override { return state_.IsTerminal(); }
   std::vector<double> Returns() const override { return state_.Returns(); }
-  std::string Observation(int player) const override {
+  std::string Observation(Player player) const override {
     return state_.Observation(player);
   }
   void ObservationAsNormalizedVector(
-      int player, std::vector<double>* values) const override {
+      Player player, std::vector<double>* values) const override {
     state_.ObservationAsNormalizedVector(player, values);
   }
 
   // These are implemented for phantom games
-  std::string InformationState(int player) const override;
+  std::string InformationState(Player player) const override;
   void InformationStateAsNormalizedVector(
-      int player, std::vector<double>* values) const override;
+      Player player, std::vector<double>* values) const override;
   std::unique_ptr<State> Clone() const override;
-  void UndoAction(int player, Action move) override;
+  void UndoAction(Player player, Action move) override;
   std::vector<Action> LegalActions() const override;
 
  protected:
   void DoApplyAction(Action move) override;
 
  private:
-  std::string ViewToString(int player) const;
-  std::string ActionSequenceToString(int player) const;
+  std::string ViewToString(Player player) const;
+  std::string ActionSequenceToString(Player player) const;
 
   tic_tac_toe::TicTacToeState state_;
   ObservationType obs_type_;

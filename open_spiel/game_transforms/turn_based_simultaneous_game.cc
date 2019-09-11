@@ -61,7 +61,7 @@ TurnBasedSimultaneousState::TurnBasedSimultaneousState(
   action_vector_.resize(num_players);
 }
 
-int TurnBasedSimultaneousState::CurrentPlayer() const {
+Player TurnBasedSimultaneousState::CurrentPlayer() const {
   return current_player_;
 }
 
@@ -69,7 +69,7 @@ void TurnBasedSimultaneousState::DetermineWhoseTurn() {
   if (state_->CurrentPlayer() == kSimultaneousPlayerId) {
     // When the underlying game's node is at a simultaneous move node, they get
     // rolled out as turn-based, starting with player 0.
-    current_player_ = 0;
+    current_player_ = Player{0};
     rollout_mode_ = true;
   } else {
     // Otherwise, just execute it normally.
@@ -123,7 +123,7 @@ std::vector<Action> TurnBasedSimultaneousState::LegalActions() const {
   return state_->LegalActions(CurrentPlayer());
 }
 
-std::string TurnBasedSimultaneousState::ActionToString(int player,
+std::string TurnBasedSimultaneousState::ActionToString(Player player,
                                                        Action action_id) const {
   return state_->ActionToString(player, action_id);
 }
@@ -132,7 +132,7 @@ std::string TurnBasedSimultaneousState::ToString() const {
   std::string partial_action = "";
   if (rollout_mode_) {
     partial_action = "Partial joint action: ";
-    for (int p = 0; p < current_player_; ++p) {
+    for (auto p = Player{0}; p < current_player_; ++p) {
       absl::StrAppend(&partial_action, action_vector_[p]);
       partial_action.push_back(' ');
     }
@@ -149,7 +149,7 @@ std::vector<double> TurnBasedSimultaneousState::Returns() const {
   return state_->Returns();
 }
 
-std::string TurnBasedSimultaneousState::InformationState(int player) const {
+std::string TurnBasedSimultaneousState::InformationState(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
@@ -169,7 +169,7 @@ std::string TurnBasedSimultaneousState::InformationState(int player) const {
 }
 
 void TurnBasedSimultaneousState::InformationStateAsNormalizedVector(
-    int player, std::vector<double>* values) const {
+    Player player, std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
@@ -177,10 +177,10 @@ void TurnBasedSimultaneousState::InformationStateAsNormalizedVector(
 
   // First, get the 2 * num_players bits to encode whose turn it is and who
   // the observer is.
-  for (int p = 0; p < num_players_; ++p) {
+  for (auto p = Player{0}; p < num_players_; ++p) {
     values->push_back(p == current_player_ ? 1 : 0);
   }
-  for (int p = 0; p < num_players_; ++p) {
+  for (auto p = Player{0}; p < num_players_; ++p) {
     values->push_back(p == player ? 1 : 0);
   }
 

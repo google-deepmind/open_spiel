@@ -106,7 +106,7 @@ std::string PositionToString(int pos) {
   }
 }
 
-std::string BackgammonState::ActionToString(int player, Action move_id) const {
+std::string BackgammonState::ActionToString(Player player, Action move_id) const {
   if (player == kChancePlayerId) {
     return absl::StrCat("chance outcome ", move_id,
                         " (roll: ", kChanceOutcomeValues[move_id][0],
@@ -120,12 +120,12 @@ std::string BackgammonState::ActionToString(int player, Action move_id) const {
   }
 }
 
-std::string BackgammonState::InformationState(int player) const {
+std::string BackgammonState::InformationState(Player player) const {
   return ToString();
 }
 
 void BackgammonState::InformationStateAsNormalizedVector(
-    int player, std::vector<double>* values) const {
+    Player player, std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LE(player, 1);
   int opponent = Opponent(player);
@@ -194,8 +194,8 @@ int BackgammonState::board(int player, int pos) const {
   }
 }
 
-int BackgammonState::CurrentPlayer() const {
-  return IsTerminal() ? kTerminalPlayerId : cur_player_;
+Player BackgammonState::CurrentPlayer() const {
+  return IsTerminal() ? kTerminalPlayerId : Player{cur_player_};
 }
 
 int BackgammonState::Opponent(int player) const { return 1 - player; }

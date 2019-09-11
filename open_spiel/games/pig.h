@@ -41,15 +41,15 @@ class PigState : public State {
   PigState(int num_distinct_actions, int num_players, int dice_outcomes,
            int horizon, int win_score);
 
-  int CurrentPlayer() const override;
-  std::string ActionToString(int player, Action move_id) const override;
+  Player CurrentPlayer() const override;
+  std::string ActionToString(Player player, Action move_id) const override;
   std::vector<std::pair<Action, double>> ChanceOutcomes() const override;
   std::string ToString() const override;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
-  std::string InformationState(int player) const override;
+  std::string InformationState(Player player) const override;
   void InformationStateAsNormalizedVector(
-      int player, std::vector<double>* values) const override;
+      Player player, std::vector<double>* values) const override;
 
   std::unique_ptr<State> Clone() const override;
 
@@ -67,7 +67,7 @@ class PigState : public State {
   int win_score_ = 0;
 
   int total_moves_ = -1;  // Total num moves taken during the game.
-  int cur_player_ = -1;   // Player to play.
+  Player cur_player_ = -1;   // Player to play.
   int turn_player_ = -1;  // Whose actual turn is it. At chance nodes, we need
                           // to remember whose is playing for next turns (while
                           // cur_player will be the chance player's id.)

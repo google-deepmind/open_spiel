@@ -225,7 +225,7 @@ bool QuoridorState::SearchEndZone(Player p, Move wall1, Move wall2) const {
   return false;
 }
 
-std::string QuoridorState::ActionToString(int player, Action action_id) const {
+std::string QuoridorState::ActionToString(Player player, Action action_id) const {
   return ActionToMove(action_id).ToString();
 }
 
@@ -297,18 +297,18 @@ std::vector<double> QuoridorState::Returns() const {
   return {0, 0};  // Unfinished
 }
 
-std::string QuoridorState::InformationState(int player) const {
+std::string QuoridorState::InformationState(Player player) const {
   return HistoryString();
 }
 
-std::string QuoridorState::Observation(int player) const {
+std::string QuoridorState::Observation(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   return ToString();
 }
 
 void QuoridorState::ObservationAsNormalizedVector(
-    int player, std::vector<double>* values) const {
+    Player player, std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 

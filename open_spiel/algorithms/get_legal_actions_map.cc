@@ -22,7 +22,7 @@ namespace {
 // search of all the subtrees to fill the map for all the information states.
 void FillMap(const State& state,
              std::unordered_map<std::string, std::vector<Action>>* map,
-             int depth_limit, int depth, int player) {
+             int depth_limit, int depth, Player player) {
   if (state.IsTerminal()) {
     return;
   }
@@ -35,7 +35,7 @@ void FillMap(const State& state,
     // Do nothing at chance nodes (no information states).
   } else if (state.IsSimultaneousNode()) {
     // Many players can play at this node.
-    for (int p = 0; p < state.NumPlayers(); ++p) {
+    for (auto p = Player{0}; p < state.NumPlayers(); ++p) {
       if (player == kInvalidPlayer || p == player) {
         std::string info_state = state.InformationState(p);
         if (map->find(info_state) == map->end()) {
@@ -67,7 +67,7 @@ void FillMap(const State& state,
 }  // namespace
 
 std::unordered_map<std::string, std::vector<Action>> GetLegalActionsMap(
-    const Game& game, int depth_limit, int player) {
+    const Game& game, int depth_limit, Player player) {
   std::unordered_map<std::string, std::vector<Action>> map;
   std::unique_ptr<State> initial_state = game.NewInitialState();
   FillMap(*initial_state, &map, depth_limit, 0, player);

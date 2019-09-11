@@ -41,9 +41,9 @@ constexpr int kInvalidHistoryAction = -301;
 // (state_1, state_1.CurrentPlayer(), action2), ...
 struct HistoryItem {
   std::unique_ptr<State> state;
-  int player;
+  Player player;
   Action action;
-  HistoryItem(std::unique_ptr<State> _state, int _player, int _action)
+  HistoryItem(std::unique_ptr<State> _state, Player _player, int _action)
       : state(std::move(_state)), player(_player), action(_action) {}
 };
 
@@ -80,8 +80,8 @@ void LegalActionsIsEmptyForOtherPlayers(const Game& game, State& state) {
     return;
   }
 
-  int current_player = state.CurrentPlayer();
-  for (int player = 0; player < game.NumPlayers(); ++player) {
+  Player current_player = state.CurrentPlayer();
+  for (Player player = 0; player < game.NumPlayers(); ++player) {
     if (state.IsChanceNode()) {
       continue;
     }
@@ -236,7 +236,7 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo) {
     } else if (state->CurrentPlayer() == open_spiel::kSimultaneousPlayerId) {
       std::vector<double> rewards = state->Rewards();
       std::cout << "Rewards: " << absl::StrJoin(rewards, " ") << std::endl;
-      for (int p = 0; p < game.NumPlayers(); ++p) {
+      for (auto p = Player{0}; p < game.NumPlayers(); ++p) {
         episode_returns[p] += rewards[p];
       }
 
@@ -244,7 +244,7 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo) {
       std::vector<Action> joint_action;
 
       // Sample a action for each player
-      for (int p = 0; p < game.NumPlayers(); p++) {
+      for (auto p = Player{0}; p < game.NumPlayers(); p++) {
         std::vector<Action> actions;
         actions = state->LegalActions(p);
         std::uniform_int_distribution<> dis(0, actions.size() - 1);
@@ -271,12 +271,12 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo) {
     } else {
       std::vector<double> rewards = state->Rewards();
       std::cout << "Rewards: " << absl::StrJoin(rewards, " ") << std::endl;
-      for (int p = 0; p < game.NumPlayers(); ++p) {
+      for (auto p = Player{0}; p < game.NumPlayers(); ++p) {
         episode_returns[p] += rewards[p];
       }
 
       // Decision node.
-      int player = state->CurrentPlayer();
+      Player player = state->CurrentPlayer();
 
       // First, check the information state vector, if supported.
       if (infostate_vector_size > 0) {
@@ -323,7 +323,7 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo) {
 
   // Check the information state of the terminal, too. This is commonly needed,
   // for example, as a final observation in an RL environment.
-  for (int p = 0; p < game.NumPlayers(); p++) {
+  for (auto p = Player{0}; p < game.NumPlayers(); p++) {
     if (infostate_vector_size > 0) {
       std::vector<double> infostate_vector;
       state->InformationStateAsNormalizedVector(p, &infostate_vector);
@@ -332,7 +332,7 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo) {
   }
 
   auto returns = state->Returns();
-  for (int player = 0; player < game.NumPlayers(); player++) {
+  for (Player player = 0; player < game.NumPlayers(); player++) {
     double final_return = returns[player];
     SPIEL_CHECK_FLOAT_EQ(final_return, state->PlayerReturn(player));
     SPIEL_CHECK_GE(final_return, game.MinUtility());

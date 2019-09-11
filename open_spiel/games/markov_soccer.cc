@@ -76,7 +76,7 @@ MarkovSoccerState::MarkovSoccerState(const MarkovSoccerGame& parent_game)
     : SimMoveState(parent_game.NumDistinctActions(), parent_game.NumPlayers()),
       parent_game_(parent_game) {}
 
-std::string MarkovSoccerState::ActionToString(int player,
+std::string MarkovSoccerState::ActionToString(Player player,
                                               Action action_id) const {
   if (player == kSimultaneousPlayerId)
     return FlatJointActionToString(action_id);
@@ -158,7 +158,7 @@ bool MarkovSoccerState::InBounds(int r, int c) const {
   return (r >= 0 && c >= 0 && r < kRows && c < kCols);
 }
 
-void MarkovSoccerState::ResolveMove(int player, int move) {
+void MarkovSoccerState::ResolveMove(Player player, int move) {
   int old_row = player_row_[player - 1];
   int old_col = player_col_[player - 1];
   int new_row = old_row + row_offsets[move];
@@ -242,7 +242,7 @@ void MarkovSoccerState::DoApplyAction(Action action_id) {
   total_moves_++;
 }
 
-std::vector<Action> MarkovSoccerState::LegalActions(int player) const {
+std::vector<Action> MarkovSoccerState::LegalActions(Player player) const {
   if (IsChanceNode()) {
     if (total_moves_ == 0) {
       return {kChanceLoc1, kChanceLoc2};
@@ -328,7 +328,7 @@ int MarkovSoccerState::observation_plane(int r, int c) const {
 }
 
 void MarkovSoccerState::InformationStateAsNormalizedVector(
-    int player, std::vector<double>* values) const {
+    Player player, std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 

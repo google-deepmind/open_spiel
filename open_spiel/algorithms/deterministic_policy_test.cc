@@ -26,13 +26,13 @@ void KuhnDeterministicPolicyTest() {
   int p0_policies = 1;
   int p1_policies = 1;
 
-  DeterministicTabularPolicy p0_policy(kuhn_game, 0);
+  DeterministicTabularPolicy p0_policy(kuhn_game, Player{0});
   while (p0_policy.NextPolicy()) {
     p0_policies += 1;
   }
   SPIEL_CHECK_EQ(p0_policies, 64);  // 2^6
 
-  DeterministicTabularPolicy p1_policy(kuhn_game, 1);
+  DeterministicTabularPolicy p1_policy(kuhn_game, Player{1});
   while (p1_policy.NextPolicy()) {
     p1_policies += 1;
   }

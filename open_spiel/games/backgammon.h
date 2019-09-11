@@ -110,17 +110,17 @@ class BackgammonState : public State {
   BackgammonState(int num_distinct_actions, int num_players,
                   ScoringType scoring_type);
 
-  int CurrentPlayer() const override;
-  void UndoAction(int player, Action action) override;
+  Player CurrentPlayer() const override;
+  void UndoAction(Player player, Action action) override;
   std::vector<Action> LegalActions() const override;
-  std::string ActionToString(int player, Action move_id) const override;
+  std::string ActionToString(Player player, Action move_id) const override;
   std::vector<std::pair<Action, double>> ChanceOutcomes() const override;
   std::string ToString() const override;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
-  std::string InformationState(int player) const override;
+  std::string InformationState(Player player) const override;
   void InformationStateAsNormalizedVector(
-      int player, std::vector<double>* values) const override;
+      Player player, std::vector<double>* values) const override;
   std::unique_ptr<State> Clone() const override;
 
   // Setter function used for debugging and tests. Note: this does not set the
@@ -213,8 +213,8 @@ class BackgammonState : public State {
 
   ScoringType scoring_type_;  // Which rules apply when scoring the game.
 
-  int cur_player_;
-  int prev_player_;
+  Player cur_player_;
+  Player prev_player_;
   int turns_;
   int x_turns_;
   int o_turns_;

@@ -32,9 +32,9 @@ void BotTest_RandomVsRandom() {
   for (int iteration = 0; iteration < num_iters; ++iteration) {
     auto this_results = EvaluateBots(game->NewInitialState().get(), bot_ptrs,
                                      /*seed=*/iteration);
-    for (int i = 0; i < num_players; ++i) average_results[i] += this_results[i];
+    for (auto i = Player{0}; i < num_players; ++i) average_results[i] += this_results[i];
   }
-  for (int i = 0; i < num_players; ++i) average_results[i] /= num_iters;
+  for (auto i = Player{0}; i < num_players; ++i) average_results[i] /= num_iters;
 
   SPIEL_CHECK_FLOAT_NEAR(average_results[0], 0.125, 0.01);
   SPIEL_CHECK_FLOAT_NEAR(average_results[1], -0.125, 0.01);

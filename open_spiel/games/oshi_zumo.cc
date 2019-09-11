@@ -111,10 +111,10 @@ void OshiZumoState::DoApplyActions(const std::vector<Action>& actions) {
   total_moves_++;
 }
 
-std::vector<Action> OshiZumoState::LegalActions(int player) const {
+std::vector<Action> OshiZumoState::LegalActions(Player player) const {
   if (player == kSimultaneousPlayerId) return LegalFlatJointActions();
   SPIEL_CHECK_FALSE(IsChanceNode());
-  SPIEL_CHECK_TRUE(player == 0 || player == 1);
+  SPIEL_CHECK_TRUE(player == Player{0} || player == Player{1});
 
   std::vector<Action> movelist;
   for (int bet = 0; bet <= coins_[player]; bet++) {
@@ -123,7 +123,7 @@ std::vector<Action> OshiZumoState::LegalActions(int player) const {
   return movelist;
 }
 
-std::string OshiZumoState::ActionToString(int player, Action action_id) const {
+std::string OshiZumoState::ActionToString(Player player, Action action_id) const {
   if (player == kSimultaneousPlayerId)
     return FlatJointActionToString(action_id);
   SPIEL_CHECK_GE(action_id, 0);
@@ -182,14 +182,14 @@ std::vector<double> OshiZumoState::Returns() const {
   }
 }
 
-std::string OshiZumoState::InformationState(int player) const {
+std::string OshiZumoState::InformationState(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   return ToString();  // All the information is public.
 }
 
 void OshiZumoState::InformationStateAsNormalizedVector(
-    int player, std::vector<double>* values) const {
+    Player player, std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 

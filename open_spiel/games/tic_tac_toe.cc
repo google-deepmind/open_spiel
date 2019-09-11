@@ -51,7 +51,7 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 
 }  // namespace
 
-CellState PlayerToState(int player) {
+CellState PlayerToState(Player player) {
   switch (player) {
     case 0:
       return CellState::kCross;
@@ -94,12 +94,12 @@ std::vector<Action> TicTacToeState::LegalActions() const {
   return moves;
 }
 
-std::string TicTacToeState::ActionToString(int player, Action action_id) const {
+std::string TicTacToeState::ActionToString(Player player, Action action_id) const {
   return absl::StrCat(StateToString(PlayerToState(player)), "(",
                       action_id % kNumCols, ",", action_id / kNumCols, ")");
 }
 
-bool TicTacToeState::HasLine(int player) const {
+bool TicTacToeState::HasLine(Player player) const {
   CellState c = PlayerToState(player);
   return (board_[0] == c && board_[1] == c && board_[2] == c) ||
          (board_[3] == c && board_[4] == c && board_[5] == c) ||
@@ -150,18 +150,18 @@ std::vector<double> TicTacToeState::Returns() const {
   }
 }
 
-std::string TicTacToeState::InformationState(int player) const {
+std::string TicTacToeState::InformationState(Player player) const {
   return HistoryString();
 }
 
-std::string TicTacToeState::Observation(int player) const {
+std::string TicTacToeState::Observation(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   return ToString();
 }
 
 void TicTacToeState::ObservationAsNormalizedVector(
-    int player, std::vector<double>* values) const {
+    Player player, std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
@@ -172,7 +172,7 @@ void TicTacToeState::ObservationAsNormalizedVector(
   }
 }
 
-void TicTacToeState::UndoAction(int player, Action move) {
+void TicTacToeState::UndoAction(Player player, Action move) {
   board_[move] = CellState::kEmpty;
   current_player_ = player;
   history_.pop_back();

@@ -52,16 +52,16 @@ class OshiZumoState : public SimMoveState {
  public:
   explicit OshiZumoState(const OshiZumoGame& parent_game);
 
-  int CurrentPlayer() const override;
-  std::string ActionToString(int player, Action action_id) const override;
+  Player CurrentPlayer() const override;
+  std::string ActionToString(Player player, Action action_id) const override;
   std::string ToString() const override;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
-  std::string InformationState(int player) const override;
+  std::string InformationState(Player player) const override;
   void InformationStateAsNormalizedVector(
-      int player, std::vector<double>* values) const override;
+      Player player, std::vector<double>* values) const override;
   std::unique_ptr<State> Clone() const override;
-  std::vector<Action> LegalActions(int player) const override;
+  std::vector<Action> LegalActions(Player player) const override;
 
  protected:
   void DoApplyActions(const std::vector<Action>& actions) override;

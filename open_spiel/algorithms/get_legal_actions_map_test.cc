@@ -35,17 +35,17 @@ void KuhnTest() {
 
   LegalActionsMap map_p0 = algorithms::GetLegalActionsMap(game,
                                                           /*depth_limit=*/-1,
-                                                          /*player=*/0);
+                                                          open_spiel::Player{0});
   SPIEL_CHECK_EQ(map_p0.size(), kuhn_poker::kNumInfoStatesP0);
 
   LegalActionsMap map_p1 = algorithms::GetLegalActionsMap(game,
                                                           /*depth_limit=*/-1,
-                                                          /*player=*/1);
+                                                          open_spiel::Player{1});
   SPIEL_CHECK_EQ(map_p1.size(), kuhn_poker::kNumInfoStatesP1);
 
   LegalActionsMap map_both =
       algorithms::GetLegalActionsMap(game, /*depth_limit=*/-1,
-                                     /*player=*/open_spiel::kInvalidPlayer);
+                                     open_spiel::kInvalidPlayer);
   SPIEL_CHECK_EQ(map_both.size(),
                  kuhn_poker::kNumInfoStatesP0 + kuhn_poker::kNumInfoStatesP1);
   // They should all have two legal actions: pass and bet.
@@ -58,7 +58,7 @@ void LeducTest() {
   leduc_poker::LeducGame game({});
   LegalActionsMap map_both =
       algorithms::GetLegalActionsMap(game, /*depth_limit=*/-1,
-                                     /*player=*/open_spiel::kInvalidPlayer);
+                                     open_spiel::kInvalidPlayer);
   SPIEL_CHECK_EQ(map_both.size(), leduc_poker::kNumInfoStates);
 }
 
@@ -66,7 +66,7 @@ void GoofspielTest() {
   goofspiel::GoofspielGame game({{"num_cards", open_spiel::GameParameter(3)}});
   LegalActionsMap map_both =
       algorithms::GetLegalActionsMap(game, /*depth_limit=*/-1,
-                                     /*player=*/open_spiel::kInvalidPlayer);
+                                     open_spiel::kInvalidPlayer);
   SPIEL_CHECK_GT(map_both.size(), 0);
 }
 

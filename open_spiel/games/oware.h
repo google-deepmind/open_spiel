@@ -57,18 +57,18 @@ class OwareState : public State {
   // Custom board setup to support testing.
   explicit OwareState(const OwareBoard& board);
 
-  int CurrentPlayer() const override {
+  Player CurrentPlayer() const override {
     return IsTerminal() ? kTerminalPlayerId : board_.current_player;
   }
 
   std::vector<Action> LegalActions() const override;
-  std::string ActionToString(int player, Action action_id) const override;
+  std::string ActionToString(Player player, Action action_id) const override;
   std::string ToString() const override;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
   std::unique_ptr<State> Clone() const override;
   const OwareBoard& Board() const { return board_; }
-  std::string Observation(int player) const override;
+  std::string Observation(Player player) const override;
 
   // The game board is provided as a vector, encoding the players' seeds
   // and their score, as a fraction of the number of total number of seeds in
@@ -76,13 +76,13 @@ class OwareState : public State {
   // training, although the given representation is not necessary the best
   // for that purpose.
   void ObservationAsNormalizedVector(
-      int player, std::vector<double>* values) const override;
+      Player player, std::vector<double>* values) const override;
 
  protected:
   void DoApplyAction(Action action) override;
 
  private:
-  void WritePlayerScore(std::ostringstream& out, int player) const;
+  void WritePlayerScore(std::ostringstream& out, Player player) const;
 
   // Collects the seeds from the given house and distributes them
   // counterclockwise, skipping the starting position in all cases.
@@ -114,11 +114,11 @@ class OwareState : public State {
     return LowerHouse(house) + num_houses_per_player_ - 1;
   }
 
-  int PlayerLowerHouse(int player) const {
+  int PlayerLowerHouse(Player player) const {
     return player * num_houses_per_player_;
   }
 
-  int PlayerUpperHouse(int player) const {
+  int PlayerUpperHouse(Player player) const {
     return player * num_houses_per_player_ + num_houses_per_player_ - 1;
   }
 
@@ -130,7 +130,7 @@ class OwareState : public State {
     return house % num_houses_per_player_;
   }
 
-  int ActionToHouse(int player, Action action) const {
+  int ActionToHouse(Player player, Action action) const {
     return player * num_houses_per_player_ + action;
   }
 

@@ -24,8 +24,8 @@
 int main(int argc, char** argv) {
   std::string game_name =
       open_spiel::ParseCmdLineArgDefault(argc, argv, "game", "tic_tac_toe");
-  int mcts_player = std::stoi(
-      open_spiel::ParseCmdLineArgDefault(argc, argv, "mcts_player", "0"));
+  auto mcts_player = open_spiel::Player{std::stoi(
+      open_spiel::ParseCmdLineArgDefault(argc, argv, "mcts_player", "0"))};
   int rollout_count = std::stoi(
       open_spiel::ParseCmdLineArgDefault(argc, argv, "rollout_count", "100"));
   int max_search_nodes = std::stoi(open_spiel::ParseCmdLineArgDefault(
@@ -56,10 +56,10 @@ int main(int argc, char** argv) {
 
   // Create Random Bot
   std::shared_ptr<open_spiel::Bot> random_bot =
-      open_spiel::MakeUniformRandomBot(*game, 1 - mcts_player, /*seed=*/1234);
+      open_spiel::MakeUniformRandomBot(*game, open_spiel::Player{1 - mcts_player}, /*seed=*/1234);
 
   open_spiel::Bot* bots[2];
-  if (mcts_player == 0) {
+  if (mcts_player == open_spiel::Player{0}) {
     bots[0] = &mcts_bot;
     bots[1] = random_bot.get();
   } else {
@@ -88,7 +88,7 @@ int main(int argc, char** argv) {
           "MCTS not supported for games with simultaneous actions.");
     } else {
       // Decision node, ask the right bot to make its action
-      int player = state->CurrentPlayer();
+      open_spiel::Player player = state->CurrentPlayer();
       if (game->GetType().provides_information_state_as_normalized_vector) {
         std::vector<double> infostate;
         state->InformationStateAsNormalizedVector(player, &infostate);

@@ -54,7 +54,7 @@ void SimulateGames(std::mt19937* rng, const Game& game, State* sim_state,
       std::vector<Action> joint_action;
 
       // Sample a action for each player
-      for (int p = 0; p < game.NumPlayers(); p++) {
+      for (auto p = Player{0}; p < game.NumPlayers(); p++) {
         // Check the information states to each player are consistent.
         SPIEL_CHECK_EQ(sim_state->InformationState(p),
                        wrapped_sim_state->InformationState(p));
@@ -84,7 +84,7 @@ void SimulateGames(std::mt19937* rng, const Game& game, State* sim_state,
   auto sim_returns = sim_state->Returns();
   auto turn_returns = turn_based_state->Returns();
 
-  for (int player = 0; player < game.NumPlayers(); player++) {
+  for (auto player = Player{0}; player < game.NumPlayers(); player++) {
     double utility = sim_returns[player];
     SPIEL_CHECK_GE(utility, game.MinUtility());
     SPIEL_CHECK_LE(utility, game.MaxUtility());

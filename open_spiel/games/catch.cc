@@ -104,7 +104,7 @@ CellState CatchState::BoardAt(int row, int column) const {
   return CellState::kEmpty;
 }
 
-std::string CatchState::ActionToString(int player, Action action_id) const {
+std::string CatchState::ActionToString(Player player, Action action_id) const {
   if (player == kChancePlayerId)
     return absl::StrCat("Initialized ball to ", action_id);
   SPIEL_CHECK_EQ(player, 0);
@@ -145,18 +145,18 @@ std::vector<double> CatchState::Returns() const {
   }
 }
 
-std::string CatchState::InformationState(int player) const {
+std::string CatchState::InformationState(Player player) const {
   SPIEL_CHECK_EQ(player, 0);
   return HistoryString();
 }
 
-std::string CatchState::Observation(int player) const {
+std::string CatchState::Observation(Player player) const {
   SPIEL_CHECK_EQ(player, 0);
   return ToString();
 }
 
 void CatchState::ObservationAsNormalizedVector(
-    int player, std::vector<double>* values) const {
+    Player player, std::vector<double>* values) const {
   SPIEL_CHECK_EQ(player, 0);
 
   values->resize(game_.NumRows() * game_.NumColumns());
@@ -168,7 +168,7 @@ void CatchState::ObservationAsNormalizedVector(
 }
 
 void CatchState::InformationStateAsNormalizedVector(
-    int player, std::vector<double>* values) const {
+    Player player, std::vector<double>* values) const {
   SPIEL_CHECK_EQ(player, 0);
 
   values->resize(game_.NumColumns() + kNumActions * game_.NumRows());
@@ -183,7 +183,7 @@ void CatchState::InformationStateAsNormalizedVector(
   }
 }
 
-void CatchState::UndoAction(int player, Action move) {
+void CatchState::UndoAction(Player player, Action move) {
   if (player == kChancePlayerId) {
     initialized_ = false;
     return;

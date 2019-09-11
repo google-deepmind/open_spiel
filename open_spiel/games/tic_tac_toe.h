@@ -55,19 +55,19 @@ class TicTacToeState : public State {
   TicTacToeState(const TicTacToeState&) = default;
   TicTacToeState& operator=(const TicTacToeState&) = default;
 
-  int CurrentPlayer() const override {
+  Player CurrentPlayer() const override {
     return IsTerminal() ? kTerminalPlayerId : current_player_;
   }
-  std::string ActionToString(int player, Action action_id) const override;
+  std::string ActionToString(Player player, Action action_id) const override;
   std::string ToString() const override;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
-  std::string InformationState(int player) const override;
-  std::string Observation(int player) const override;
+  std::string InformationState(Player player) const override;
+  std::string Observation(Player player) const override;
   void ObservationAsNormalizedVector(
-      int player, std::vector<double>* values) const override;
+      Player player, std::vector<double>* values) const override;
   std::unique_ptr<State> Clone() const override;
-  void UndoAction(int player, Action move) override;
+  void UndoAction(Player player, Action move) override;
   std::vector<Action> LegalActions() const override;
   CellState BoardAt(int cell) const { return board_[cell]; }
   CellState BoardAt(int row, int column) const {
@@ -79,9 +79,9 @@ class TicTacToeState : public State {
   void DoApplyAction(Action move) override;
 
  private:
-  bool HasLine(int player) const;  // Does this player have a line?
+  bool HasLine(Player player) const;  // Does this player have a line?
   bool IsFull() const;             // Is the board full?
-  int current_player_ = 0;         // Player zero goes first
+  Player current_player_ = 0;         // Player zero goes first
 };
 
 // Game object.
@@ -105,7 +105,7 @@ class TicTacToeGame : public Game {
   int MaxGameLength() const { return kNumCells; }
 };
 
-CellState PlayerToState(int player);
+CellState PlayerToState(Player player);
 std::string StateToString(CellState state);
 
 inline std::ostream& operator<<(std::ostream& stream, const CellState& state) {

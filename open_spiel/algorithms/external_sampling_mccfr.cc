@@ -37,7 +37,7 @@ ExternalSamplingMCCFRSolver::ExternalSamplingMCCFRSolver(const Game& game,
 void ExternalSamplingMCCFRSolver::RunIteration() { RunIteration(rng_.get()); }
 
 void ExternalSamplingMCCFRSolver::RunIteration(std::mt19937* rng) {
-  for (int p = 0; p < game_->NumPlayers(); ++p) {
+  for (auto p = Player{0}; p < game_->NumPlayers(); ++p) {
     UpdateRegrets(*game_->NewInitialState(), p, rng);
   }
 
@@ -48,7 +48,7 @@ void ExternalSamplingMCCFRSolver::RunIteration(std::mt19937* rng) {
 }
 
 double ExternalSamplingMCCFRSolver::UpdateRegrets(const State& state,
-                                                  int player,
+                                                  Player player,
                                                   std::mt19937* rng) {
   if (state.IsTerminal()) {
     return state.PlayerReturn(player);
@@ -61,7 +61,7 @@ double ExternalSamplingMCCFRSolver::UpdateRegrets(const State& state,
         "TurnBasedSimultaneousGame to convert the game first.");
   }
 
-  int cur_player = state.CurrentPlayer();
+  Player cur_player = state.CurrentPlayer();
   std::string is_key = state.InformationState(cur_player);
   std::vector<Action> legal_actions = state.LegalActions();
 
@@ -131,7 +131,7 @@ void ExternalSamplingMCCFRSolver::FullUpdateAverage(
   double sum = std::accumulate(reach_probs.begin(), reach_probs.end(), 0.0);
   if (sum == 0.0) return;
 
-  int cur_player = state.CurrentPlayer();
+  Player cur_player = state.CurrentPlayer();
   std::string is_key = state.InformationState(cur_player);
   std::vector<Action> legal_actions = state.LegalActions();
 

@@ -25,7 +25,7 @@ void BasicLeducTests() {
   testing::LoadGameTest("leduc_poker");
   testing::ChanceOutcomesTest(*LoadGame("leduc_poker"));
   testing::RandomSimTest(*LoadGame("leduc_poker"), 100);
-  for (int players = 3; players <= 5; players++) {
+  for (Player players = 3; players <= 5; players++) {
     testing::RandomSimTest(
         *LoadGame("leduc_poker", {{"players", GameParameter(players)}}), 100);
   }

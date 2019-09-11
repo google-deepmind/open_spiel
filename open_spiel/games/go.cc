@@ -98,7 +98,7 @@ std::vector<Action> GoState::LegalActions() const {
   return actions;
 }
 
-std::string GoState::ActionToString(int player, Action action) const {
+std::string GoState::ActionToString(Player player, Action action) const {
   return absl::StrCat(GoColorToString(static_cast<GoColor>(player)), " ",
                       GoPointToString(action));
 }
@@ -150,7 +150,7 @@ std::unique_ptr<State> GoState::Clone() const {
   return std::unique_ptr<State>(new GoState(*this));
 }
 
-void GoState::UndoAction(int player, Action action) {
+void GoState::UndoAction(Player player, Action action) {
   // We don't have direct undo functionality, but copying the board and
   // replaying all actions is still pretty fast (> 1 million undos/second).
   history_.pop_back();

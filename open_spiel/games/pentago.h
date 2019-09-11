@@ -40,7 +40,7 @@ constexpr int kPossibleActions = kBoardPositions * kPossibleRotations;
 constexpr int kPossibleWinConditions = 32;
 constexpr int kCellStates = 1 + kNumPlayers;
 
-enum Player {
+enum PentagoPlayer {
   kPlayer1,
   kPlayer2,
   kPlayerNone,
@@ -54,30 +54,30 @@ class PentagoState : public State {
 
   PentagoState(const PentagoState&) = default;
 
-  int CurrentPlayer() const override {
+  Player CurrentPlayer() const override {
     return IsTerminal() ? kTerminalPlayerId : static_cast<int>(current_player_);
   }
-  std::string ActionToString(int player, Action action_id) const override;
+  std::string ActionToString(Player player, Action action_id) const override;
   std::string ToString() const override;
   bool IsTerminal() const override { return outcome_ != kPlayerNone; }
   std::vector<double> Returns() const override;
-  std::string InformationState(int player) const override;
-  std::string Observation(int player) const override;
+  std::string InformationState(Player player) const override;
+  std::string Observation(Player player) const override;
   void ObservationAsNormalizedVector(
-      int player, std::vector<double>* values) const override;
+      Player player, std::vector<double>* values) const override;
   std::unique_ptr<State> Clone() const override;
   std::vector<Action> LegalActions() const override;
 
  protected:
   void DoApplyAction(Action action) override;
 
-  Player get(int x, int y) const { return get(x + y * kBoardSize); }
-  Player get(int i) const;
+  PentagoPlayer get(int x, int y) const { return get(x + y * kBoardSize); }
+  PentagoPlayer get(int i) const;
 
  private:
   std::array<uint64_t, kNumPlayers> board_;
-  Player current_player_ = kPlayer1;
-  Player outcome_ = kPlayerNone;
+  PentagoPlayer current_player_ = kPlayer1;
+  PentagoPlayer outcome_ = kPlayerNone;
   int moves_made_ = 0;
   const bool ansi_color_output_;
 };

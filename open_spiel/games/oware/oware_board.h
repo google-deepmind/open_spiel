@@ -19,6 +19,7 @@
 #include <vector>
 
 #include "open_spiel/spiel_utils.h"
+#include "open_spiel/spiel.h"
 namespace open_spiel {
 namespace oware {
 
@@ -29,7 +30,7 @@ struct OwareBoard {
  public:
   OwareBoard(int num_houses_per_player, int num_seeds_per_house);
   // Custom board setup to support testing.
-  OwareBoard(int current_player, const std::vector<int>& score,
+  OwareBoard(Player current_player, const std::vector<int>& score,
              const std::vector<int>& seeds);
   OwareBoard(const OwareBoard&) = default;
   OwareBoard& operator=(const OwareBoard&) = default;
@@ -42,7 +43,7 @@ struct OwareBoard {
   // captured and the ones still in play.
   int TotalSeeds() const;
 
-  int current_player;
+  Player current_player;
   // The number of seeds each player has in their score house, one entry
   // for each player.
   std::vector<int> score;

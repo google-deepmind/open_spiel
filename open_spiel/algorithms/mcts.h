@@ -71,7 +71,7 @@ Action MCTSearch(const State& state, double uct_c, int max_search_nodes,
 // A SpielBot that uses the MCTS algorithm as its policy.
 class MCTSBot : public Bot {
  public:
-  MCTSBot(const Game& game, int player, double uct_c, int max_search_nodes,
+  MCTSBot(const Game& game, Player player, double uct_c, int max_search_nodes,
           const Evaluator& evaluator)
       : Bot{game, player},
         uct_c_{uct_c},

@@ -158,15 +158,15 @@ class UncontestedBiddingState : public State {
   }
   UncontestedBiddingState(const UncontestedBiddingState&) = default;
 
-  int CurrentPlayer() const override;
-  std::string ActionToString(int player, Action action_id) const override;
+  Player CurrentPlayer() const override;
+  std::string ActionToString(Player player, Action action_id) const override;
   std::string AuctionString() const;
   std::string ToString() const override;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
-  std::string InformationState(int player) const override;
+  std::string InformationState(Player player) const override;
   void InformationStateAsNormalizedVector(
-      int player, std::vector<double>* values) const override;
+      Player player, std::vector<double>* values) const override;
   std::unique_ptr<State> Clone() const override;
   std::vector<Action> LegalActions() const override;
   std::vector<std::pair<Action, double>> ChanceOutcomes() const override;

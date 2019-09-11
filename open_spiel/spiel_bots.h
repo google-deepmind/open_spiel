@@ -25,7 +25,7 @@ namespace open_spiel {
 
 class Bot {
  public:
-  Bot(const Game& game, int player_id) : game_(game), player_id_(player_id) {}
+  Bot(const Game& game, Player player_id) : game_(game), player_id_(player_id) {}
   virtual ~Bot() = default;
 
   // Override the bot's action choice.
@@ -36,7 +36,7 @@ class Bot {
   virtual std::pair<ActionsAndProbs, Action> Step(const State& state) = 0;
 
   // Which player this bot acts as.
-  int PlayerId() const { return player_id_; }
+  Player PlayerId() const { return player_id_; }
 
   // Restart at a given state of the game.
   // In general, bots can rely on states being presented sequentially as the
@@ -47,17 +47,17 @@ class Bot {
 
  protected:
   const Game& game_;
-  int player_id_;
+  Player player_id_;
 };
 
 // A uniform random bot, for test purposes.
-std::unique_ptr<Bot> MakeUniformRandomBot(const Game& game, int player_id,
+std::unique_ptr<Bot> MakeUniformRandomBot(const Game& game, Player player_id,
                                           int seed);
 
 // A both with a fixed action preference, for test purposes.
 // Picks the first legal action found in the list of actions.
 std::unique_ptr<Bot> MakeFixedActionPreferenceBot(
-    const Game& game, int player_id, const std::vector<Action>& actions);
+    const Game& game, Player player_id, const std::vector<Action>& actions);
 
 }  // namespace open_spiel
 

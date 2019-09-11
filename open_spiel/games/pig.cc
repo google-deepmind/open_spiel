@@ -65,7 +65,7 @@ static std::unique_ptr<Game> Factory(const GameParameters& params) {
 REGISTER_SPIEL_GAME(kGameType, Factory);
 }  // namespace
 
-std::string PigState::ActionToString(int player, Action move_id) const {
+std::string PigState::ActionToString(Player player, Action move_id) const {
   if (player == kChancePlayerId) {
     return absl::StrCat("chance outcome ", move_id);
   } else if (move_id == kRoll) {
@@ -80,7 +80,7 @@ bool PigState::IsTerminal() const {
     return true;
   }
 
-  for (int p = 0; p < num_players_; p++) {
+  for (auto p = Player{0}; p < num_players_; p++) {
     if (scores_[p] >= win_score_) {
       return true;
     }
@@ -96,7 +96,7 @@ std::vector<double> PigState::Returns() const {
   // For (n>2)-player games, must keep it zero-sum.
   std::vector<double> returns(num_players_, -1.0 / (num_players_ - 1));
 
-  for (int player = 0; player < num_players_; ++player) {
+  for (auto player = Player{0}; player < num_players_; ++player) {
     if (scores_[player] >= win_score_) {
       returns[player] = 1.0;
       return returns;
@@ -107,7 +107,7 @@ std::vector<double> PigState::Returns() const {
   return std::vector<double>(0.0, num_players_);
 }
 
-std::string PigState::InformationState(int player) const {
+std::string PigState::InformationState(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   return ToString();
@@ -119,7 +119,7 @@ std::vector<int> PigGame::InformationStateNormalizedVectorShape() const {
 }
 
 void PigState::InformationStateAsNormalizedVector(
-    int player, std::vector<double>* values) const {
+    Player player, std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
@@ -151,7 +151,7 @@ void PigState::InformationStateAsNormalizedVector(
   pos += num_bins;
 
   // Find the right bin for each player.
-  for (int p = 0; p < num_players_; p++) {
+  for (auto p = Player{0}; p < num_players_; p++) {
     bin = scores_[p] / kBinSize;
     if (bin >= num_bins) {
       // When the value is too large, use last bin.
