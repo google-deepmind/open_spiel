@@ -19,13 +19,14 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from google3.testing.pybase import googletest
+import unittest
+
 from open_spiel.python import policy
 from open_spiel.python.algorithms import best_response as pyspiel_best_response
 import pyspiel
 
 
-class BestResponseTest(googletest.TestCase):
+class BestResponseTest(unittest.TestCase):
 
   def test_best_response_is_a_policy(self):
     game = pyspiel.load_game("kuhn_poker")
@@ -50,4 +51,4 @@ class BestResponseTest(googletest.TestCase):
 
 
 if __name__ == "__main__":
-  googletest.main()
+  unittest.main()
