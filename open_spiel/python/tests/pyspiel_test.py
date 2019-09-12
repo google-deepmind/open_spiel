@@ -47,6 +47,7 @@ class PyspielTest(unittest.TestCase):
         "havannah",
         "hex",
         "kuhn_poker",
+        "laser_tag",
         "leduc_poker",
         "liars_dice",
         "markov_soccer",
