@@ -56,7 +56,7 @@ def _init_bot(bot_type, game, player_id):
   if bot_type == "mcts":
     evaluator = mcts.RandomRolloutEvaluator(FLAGS.rollout_count)
     return mcts.MCTSBot(game, player_id, FLAGS.uct_c,
-                        FLAGS.max_simulations, evaluator, FLAGS.verbose)
+                        FLAGS.max_simulations, evaluator, verbose=FLAGS.verbose)
   if bot_type == "random":
     return uniform_random.UniformRandomBot(game, player_id, np.random)
   if bot_type == "human":

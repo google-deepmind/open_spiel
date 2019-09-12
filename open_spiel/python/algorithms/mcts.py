@@ -19,7 +19,6 @@ from __future__ import division
 from __future__ import print_function
 
 import math
-import random
 import numpy as np
 
 import pyspiel
@@ -33,7 +32,7 @@ class Evaluator(object):
   the game for the specified player.
   """
 
-  def evaluate(self, state, player):
+  def evaluate(self, state, player, random_state):
     """Returns evaluation on given state."""
     raise NotImplementedError
 
@@ -49,7 +48,7 @@ class RandomRolloutEvaluator(Evaluator):
   def __init__(self, n_rollouts):
     self.n_rollouts = n_rollouts
 
-  def evaluate(self, state, player):
+  def evaluate(self, state, player, random_state):
     """Returns evaluation on given state."""
     result = 0.0
     for _ in range(self.n_rollouts):
@@ -58,11 +57,10 @@ class RandomRolloutEvaluator(Evaluator):
         if working_state.is_chance_node():
           outcomes = working_state.chance_outcomes()
           action_list, prob_list = zip(*outcomes)
-          action = np.random.choice(action_list, p=prob_list)
-          working_state.apply_action(action)
+          action = random_state.choice(action_list, p=prob_list)
         else:
-          action = random.choice(working_state.legal_actions())
-          working_state.apply_action(action)
+          action = random_state.choice(working_state.legal_actions())
+        working_state.apply_action(action)
       result += working_state.player_return(player)
 
     return result / self.n_rollouts
@@ -143,7 +141,7 @@ class MCTSBot(pyspiel.Bot):
   """Bot that uses Monte-Carlo Tree Search algorithm."""
 
   def __init__(self, game, player, uct_c, max_simulations, evaluator,
-               verbose=False):
+               random_state=None, verbose=False):
     """Initializes a MCTS Search algorithm in the form of a bot.
 
     Args:
@@ -156,6 +154,7 @@ class MCTSBot(pyspiel.Bot):
       How many nodes in the search tree should be evaluated.
         This is correlated with memory size and tree depth.
       evaluator: A `Evaluator` object to use to evaluate a leaf node.
+      random_state: An optional numpy RandomState to make it deterministic.
       verbose: Whether to print information about the search tree before
         returning the action. Useful for confirming the search is working
         sensibly.
@@ -167,6 +166,7 @@ class MCTSBot(pyspiel.Bot):
     self.child_default_value = float("inf")
     self.player = player
     self.verbose = verbose
+    self._random_state = random_state or np.random.RandomState()
 
   def step(self, state):
     """Returns bot's policy and action at given state."""
@@ -198,7 +198,8 @@ class MCTSBot(pyspiel.Bot):
       if not current_node.children:
         # For a new node, initialize its state, then choose a child as normal.
         legal_actions = working_state.legal_actions()
-        random.shuffle(legal_actions)  # Reduce bias from move generation order.
+        # Reduce bias from move generation order.
+        self._random_state.shuffle(legal_actions)
         player_sign = -1 if working_state.current_player() != self.player else 1
         current_node.children = [SearchNode(action, player_sign)
                                  for action in legal_actions]
@@ -208,7 +209,7 @@ class MCTSBot(pyspiel.Bot):
         # distribution
         outcomes = working_state.chance_outcomes()
         action_list, prob_list = zip(*outcomes)
-        action = np.random.choice(action_list, p=prob_list)
+        action = self._random_state.choice(action_list, p=prob_list)
         chosen_child = next(c for c in current_node.children
                             if c.action == action)
       else:
@@ -257,7 +258,8 @@ class MCTSBot(pyspiel.Bot):
       if working_state.is_terminal():
         node_value = working_state.player_return(self.player)
       else:
-        node_value = self.evaluator.evaluate(working_state, self.player)
+        node_value = self.evaluator.evaluate(
+            working_state, self.player, self._random_state)
 
       for node in visit_path:
         node.total_reward += node_value * node.player_sign
