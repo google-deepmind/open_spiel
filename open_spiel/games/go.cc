@@ -35,9 +35,9 @@ const GameType kGameType{
     GameType::RewardModel::kTerminal,
     /*max_num_players=*/2,
     /*min_num_players=*/2,
-    /*provides_information_state=*/false,
+    /*provides_information_state=*/true,
     /*provides_information_state_as_normalized_vector=*/false,
-    /*provides_observation=*/false,
+    /*provides_observation=*/true,
     /*provides_observation_as_normalized_vector=*/false,
     /*parameter_specification=*/
     {
@@ -84,6 +84,14 @@ GoState::GoState(int board_size, float komi, int handicap)
       handicap_(handicap),
       to_play_(GoColor::kBlack) {
   ResetBoard();
+}
+
+std::string GoState::InformationState(int player) const {
+  return HistoryString();
+}
+
+std::string GoState::Observation(int player) const {
+  return ToString();
 }
 
 std::vector<Action> GoState::LegalActions() const {
