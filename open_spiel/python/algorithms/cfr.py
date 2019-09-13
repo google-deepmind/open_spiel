@@ -302,34 +302,35 @@ class _CFRSolver(object):
     if retrieved_state is not None:
       return self._policy[info_state]
 
-    policy_for_state = self._regret_matching(info_state, legal_actions)
+    policy_for_state = _regret_matching(
+        self._cumulative_regret[info_state], legal_actions)
     self._policy[info_state] = policy_for_state
     return policy_for_state
 
-  def _regret_matching(self, info_state, legal_actions):
-    """Returns an info state policy by applying regret-matching.
 
-    Args:
-      info_state: a string key for the information set.
-      legal_actions: the list of legal actions at this state.
+def _regret_matching(cumulative_regrets, legal_actions):
+  """Returns an info state policy by applying regret-matching.
 
-    Returns:
-      info_state_policy: a dict of action -> prob for all legal actions.
-    """
-    regrets = self._cumulative_regret[info_state].values()
-    sum_positive_regrets = sum((regret for regret in regrets if regret > 0))
+  Args:
+    cumulative_regrets: A {action: cumulative_regret} dictionary.
+    legal_actions: the list of legal actions at this state.
 
-    info_state_policy = {}
-    if sum_positive_regrets > 0:
-      for action in legal_actions:
-        positive_action_regret = max(
-            0.0, self._cumulative_regret[info_state][action])
-        info_state_policy[action] = (
-            positive_action_regret / sum_positive_regrets)
-    else:
-      for action in legal_actions:
-        info_state_policy[action] = 1.0 / len(legal_actions)
-    return info_state_policy
+  Returns:
+    A dict of action -> prob for all legal actions.
+  """
+  regrets = cumulative_regrets.values()
+  sum_positive_regrets = sum((regret for regret in regrets if regret > 0))
+
+  info_state_policy = {}
+  if sum_positive_regrets > 0:
+    for action in legal_actions:
+      positive_action_regret = max(0.0, cumulative_regrets[action])
+      info_state_policy[action] = (
+          positive_action_regret / sum_positive_regrets)
+  else:
+    for action in legal_actions:
+      info_state_policy[action] = 1.0 / len(legal_actions)
+  return info_state_policy
 
 
 class CFRPlusSolver(_CFRSolver):
