@@ -27,6 +27,7 @@ from __future__ import division
 from __future__ import print_function
 
 import collections
+import attr
 import numpy as np
 
 from open_spiel.python import policy
@@ -34,37 +35,57 @@ from open_spiel.python import policy
 _INITIAL_POSITIVE_VALUE = 1e-15
 
 
-def _initialize_uniform_policy(state, cumulative_regret, cumulative_policy):
-  """Initializes `cumulative_regret` and `cumulative_policy`.
+@attr.s
+class _InfoStateNode(object):
+  """An object wrapping values associated to an information state."""
+  # The list of the legal actions.
+  legal_actions = attr.ib()
+  # Map from information states string representations and actions to the
+  # counterfactual regrets, accumulated over the policy iterations
+  cumulative_regret = attr.ib(factory=lambda: collections.defaultdict(float))
+  # Same as above for the cumulative of the policy probabilities computed
+  # during the policy iterations
+  cumulative_policy = attr.ib(factory=lambda: collections.defaultdict(float))
+
+
+def _initialize_info_state_nodes(state, info_state_nodes,
+                                 initial_positive_value):
+  """Initializes info_state_nodes.
 
   Set `cumulative_regret` and `cumulative_policy` to _INITIAL_POSITIVE_VALUE
-  for all (infostate, action).
+  for all (info_state, action). Also set the the legal_actions list.
 
   Args:
     state: The current state in the tree walk. This should be the root node when
       we call this function from a CFR solver.
-    cumulative_regret: The dictionary mapping infostates, to
-      {action: cumulative regrets}.
-    cumulative_policy: Save as above for the cumulative policy.
+    info_state_nodes: The dictionary `info_state_str` to `_InfoStateNode` to
+      fill in-place.
+    initial_positive_value: The initial value to use for both the cumulative
+      regret and cumulative policy for all state-actions.
   """
   if state.is_terminal():
     return
 
   if state.is_chance_node():
     for action, unused_action_prob in state.chance_outcomes():
-      _initialize_uniform_policy(
-          state.child(action), cumulative_regret, cumulative_policy)
+      _initialize_info_state_nodes(
+          state.child(action), info_state_nodes, initial_positive_value)
     return
 
   current_player = state.current_player()
   info_state = state.information_state(current_player)
-  legal_actions = state.legal_actions(current_player)
 
-  for action in legal_actions:
-    cumulative_policy[info_state][action] = _INITIAL_POSITIVE_VALUE
-    cumulative_regret[info_state][action] = _INITIAL_POSITIVE_VALUE
-    _initialize_uniform_policy(
-        state.child(action), cumulative_regret, cumulative_policy)
+  info_state_node = info_state_nodes.get(info_state)
+  if info_state_node is None:
+    legal_actions = state.legal_actions(current_player)
+    info_state_node = _InfoStateNode(legal_actions=legal_actions)
+    info_state_nodes[info_state] = info_state_node
+
+  for action in info_state_node.legal_actions:
+    info_state_node.cumulative_policy[action] = initial_positive_value
+    info_state_node.cumulative_regret[action] = initial_positive_value
+    _initialize_info_state_nodes(
+        state.child(action), info_state_nodes, initial_positive_value)
 
 
 class _CFRSolver(object):
@@ -129,17 +150,15 @@ class _CFRSolver(object):
     self._num_players = game.num_players()
     self._root_node = self._game.new_initial_state()
 
-    # Map from information states string representations and actions to the
-    # counterfactual regrets, accumulated over the policy iterations
-    self._cumulative_regret = collections.defaultdict(
-        lambda: collections.defaultdict(float))
-    # Same as above for the cumulative of the policy probabilities computed
-    # during the policy iterations
-    self._cumulative_policy = collections.defaultdict(
-        lambda: collections.defaultdict(float))
     if initialize_cumulative_values:
-      _initialize_uniform_policy(self._root_node, self._cumulative_regret,
-                                 self._cumulative_policy)
+      initial_positive_value = _INITIAL_POSITIVE_VALUE
+    else:
+      initial_positive_value = 0
+    self._info_state_nodes = {}
+    _initialize_info_state_nodes(
+        self._root_node,
+        info_state_nodes=self._info_state_nodes,
+        initial_positive_value=initial_positive_value)
 
     self._policy = {}
 
@@ -164,7 +183,8 @@ class _CFRSolver(object):
     done during the tree traversal (which is done on histories). It is thus
     performed as an additional step.
     """
-    for action_to_cum_regret in self._cumulative_regret.values():
+    for info_state_node in self._info_state_nodes.values():
+      action_to_cum_regret = info_state_node.cumulative_regret
       for action, cumulative_regret in action_to_cum_regret.items():
         if cumulative_regret < 0:
           action_to_cum_regret[action] = 0
@@ -199,11 +219,17 @@ class _CFRSolver(object):
     Returns:
       A `policy.TabularPolicy` object, giving the policy for both players.
     """
-    for info_state, info_state_policies_sum in self._cumulative_policy.items():
+    for info_state, info_state_node in self._info_state_nodes.items():
+      info_state_policies_sum = info_state_node.cumulative_policy
       state_policy = self._average_policy.policy_for_key(info_state)
       probabilities_sum = sum(info_state_policies_sum.values())
-      for action, action_prob_sum in info_state_policies_sum.items():
-        state_policy[action] = action_prob_sum / probabilities_sum
+      if probabilities_sum == 0:
+        num_actions = len(info_state_node.legal_actions)
+        for action in info_state_node.legal_actions:
+          state_policy[action] = 1 / num_actions
+      else:
+        for action, action_prob_sum in info_state_policies_sum.items():
+          state_policy[action] = action_prob_sum / probabilities_sum
     return self._average_policy
 
   def _compute_counterfactual_regret_for_player(self, state,
@@ -286,12 +312,13 @@ class _CFRSolver(object):
       cfr_regret = counterfactual_reach_prob * (
           children_utilities[action][current_player] - state_value_for_player)
 
-      self._cumulative_regret[info_state][action] += cfr_regret
+      info_state_node = self._info_state_nodes[info_state]
+      info_state_node.cumulative_regret[action] += cfr_regret
       if self._linear_averaging:
-        self._cumulative_policy[info_state][
+        info_state_node.cumulative_policy[
             action] += self._iteration * reach_prob * action_prob
       else:
-        self._cumulative_policy[info_state][action] += reach_prob * action_prob
+        info_state_node.cumulative_policy[action] += reach_prob * action_prob
 
     return state_value
 
@@ -303,7 +330,7 @@ class _CFRSolver(object):
       return self._policy[info_state]
 
     policy_for_state = _regret_matching(
-        self._cumulative_regret[info_state], legal_actions)
+        self._info_state_nodes[info_state].cumulative_regret, legal_actions)
     self._policy[info_state] = policy_for_state
     return policy_for_state
 
