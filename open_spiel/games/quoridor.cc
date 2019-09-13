@@ -82,13 +82,13 @@ QuoridorState::QuoridorState(int board_size, int wall_count,
   board_.resize(board_diameter_ * board_diameter_, kPlayerNone);
   wall_count_[kPlayer1] = wall_count;
   wall_count_[kPlayer2] = wall_count;
-  int start = board_size - (board_size % 2);
-  player_loc_[kPlayer1] = GetMove(start, 0);
-  player_loc_[kPlayer2] = GetMove(start, board_diameter_ - 1);
+  int start_x = board_size - (board_size % 2);
+  player_loc_[kPlayer1] = GetMove(start_x, board_diameter_ - 1);
+  player_loc_[kPlayer2] = GetMove(start_x, 0);
   SetPlayer(player_loc_[kPlayer1], kPlayer1, kPlayerNone);
   SetPlayer(player_loc_[kPlayer2], kPlayer2, kPlayerNone);
-  end_zone_[kPlayer1] = board_diameter_ - 1;
-  end_zone_[kPlayer2] = 0;
+  end_zone_[kPlayer1] = player_loc_[kPlayer2].y;
+  end_zone_[kPlayer2] = player_loc_[kPlayer1].y;
 }
 
 Move QuoridorState::ActionToMove(Action action_id) const {
@@ -203,7 +203,8 @@ bool QuoridorState::IsValidWall(Move m) const {
 bool QuoridorState::SearchEndZone(Player p, Move wall1, Move wall2) const {
   std::vector<bool> mark(board_diameter_ * board_diameter_, false);
   Offset dir(1, 0);  // Direction is arbitrary. Queue will make it fast.
-  int goal_dir = (p == kPlayer1 ? 1 : -1);  // For proper sorting.
+  int goal = end_zone_[p];
+  int goal_dir = (goal == 0 ? 1 : -1);  // Sort for shortest dist in a max-heap.
   std::priority_queue<std::pair<int, Move>> queue;  // <distance to goal, move>
   queue.push(std::make_pair(0, player_loc_[p]));
   while (!queue.empty()) {
@@ -215,9 +216,9 @@ bool QuoridorState::SearchEndZone(Player p, Move wall1, Move wall2) const {
       Move wall = c + dir;
       Move move = c + dir * 2;
       if (!IsWall(wall) && wall != wall1 && wall != wall2 && !mark[move.xy]) {
-        if (move.y == end_zone_[p])
+        if (move.y == goal)
           return true;
-        queue.push(std::make_pair(goal_dir * (move.y - end_zone_[p]), move));
+        queue.push(std::make_pair(goal_dir * (goal - move.y), move));
       }
       dir = dir.rotate_left();
     }
