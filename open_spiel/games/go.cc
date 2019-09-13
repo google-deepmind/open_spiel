@@ -95,14 +95,13 @@ std::string GoState::Observation(int player) const {
 }
 
 std::vector<Action> GoState::LegalActions() const {
-  std::vector<Action> actions = {kPass};
-
+  std::vector<Action> actions{};
   for (GoPoint p : BoardPoints(board_.board_size())) {
     if (board_.IsLegalMove(p, to_play_)) {
       actions.push_back(p);
     }
   }
-
+  actions.push_back(kPass);
   return actions;
 }
 

@@ -99,6 +99,18 @@ void LegalActionsIsEmptyForOtherPlayers(const Game& game, State& state) {
   }
 }
 
+// Check that the legal actions list is sorted.
+
+void LegalActionsAreSorted(const Game& game, State& state) {
+  if (state.IsChanceNode()) return;
+  for (int player = 0; player < game.NumPlayers(); ++player) {
+    auto actions = state.LegalActions(player);
+    for (int i = 1; i < actions.size(); ++i) {
+      SPIEL_CHECK_LT(actions[i - 1], actions[i]);
+    }
+  }
+}
+
 void LegalActionsMaskTest(const Game& game, const State& state,
                           const std::vector<Action>& legal_actions) {
   std::vector<int> legal_actions_mask =
@@ -208,6 +220,7 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo) {
     std::cout << "player " << state->CurrentPlayer() << std::endl;
 
     LegalActionsIsEmptyForOtherPlayers(game, *state);
+    LegalActionsAreSorted(game, *state);
 
     // Test cloning the state.
     std::unique_ptr<open_spiel::State> state_copy = state->Clone();

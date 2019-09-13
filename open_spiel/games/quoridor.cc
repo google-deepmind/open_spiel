@@ -128,6 +128,7 @@ std::vector<Action> QuoridorState::LegalActions() const {
     }
   }
 
+  std::sort(moves.begin(), moves.end());
   return moves;
 }
 
