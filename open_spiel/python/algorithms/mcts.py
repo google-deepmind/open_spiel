@@ -131,7 +131,8 @@ class SearchNode(object):
               if state else str(self.action))
     return "{:>3}: sign: {}, value: {:6.1f} / {:4d} = {:6.3f}, {:3d} children".format(
         action, self.player_sign, self.total_reward, self.explore_count,
-        self.total_reward / self.explore_count, len(self.children))
+        self.explore_count and self.total_reward / self.explore_count,
+        len(self.children))
 
   def __str__(self):
     return self.to_str(None)
