@@ -77,12 +77,14 @@ class QuoridorState::SearchQueue {
     if (!mark_[move.xy]) {
       mark_[move.xy] = true;
       pqueue_.emplace_back(dist, move);
-      std::push_heap(pqueue_.begin(), pqueue_.end());
+      std::push_heap(pqueue_.begin(), pqueue_.end(),
+                     std::greater<std::pair<int, Move>>());
     }
   }
 
   Move Pop() {
-    std::pop_heap(pqueue_.begin(), pqueue_.end());
+    std::pop_heap(pqueue_.begin(), pqueue_.end(),
+                  std::greater<std::pair<int, Move>>());
     Move move = pqueue_.back().second;
     pqueue_.pop_back();
     return move;
@@ -242,7 +244,7 @@ bool QuoridorState::SearchEndZone(Player p, Move wall1, Move wall2,
   search_queue->Init(board_diameter_);
   Offset dir(1, 0);  // Direction is arbitrary. Queue will make it fast.
   int goal = end_zone_[p];
-  int goal_dir = (goal == 0 ? 1 : -1);  // Sort for shortest dist in a max-heap.
+  int goal_dir = (goal == 0 ? -1 : 1);  // Sort for shortest dist in a min-heap.
   search_queue->Push(0, player_loc_[p]);
   while (!search_queue->IsEmpty()) {
     Move c = search_queue->Pop();
