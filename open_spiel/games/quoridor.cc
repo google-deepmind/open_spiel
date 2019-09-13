@@ -16,7 +16,6 @@
 
 #include <algorithm>
 #include <memory>
-#include <queue>
 #include <utility>
 #include <vector>
 
@@ -57,6 +56,43 @@ std::unique_ptr<Game> Factory(const GameParameters& params) {
 REGISTER_SPIEL_GAME(kGameType, Factory);
 
 }  // namespace
+
+class QuoridorState::SearchQueue {
+ public:
+  // Init is not the constructor so it can be called repeatedly, and to avoid
+  // the initialization overhead of allocation if it ends up not being needed.
+  void Init(int board_diameter) {
+    if (mark_.empty()) {  // First initialization.
+      mark_.resize(board_diameter * board_diameter, false);
+      pqueue_.reserve(board_diameter * board_diameter);
+    } else {  // Reset to initial state.
+      std::fill(mark_.begin(), mark_.end(), false);
+      pqueue_.clear();
+    }
+  }
+
+  bool IsEmpty() const { return pqueue_.empty(); }
+
+  void Push(int dist, Move move) {
+    if (!mark_[move.xy]) {
+      mark_[move.xy] = true;
+      pqueue_.emplace_back(dist, move);
+      std::push_heap(pqueue_.begin(), pqueue_.end());
+    }
+  }
+
+  Move Pop() {
+    std::pop_heap(pqueue_.begin(), pqueue_.end());
+    Move move = pqueue_.back().second;
+    pqueue_.pop_back();
+    return move;
+  }
+
+ private:
+  std::vector<std::pair<int, Move>> pqueue_;  // <distance to goal, move>
+  std::vector<bool> mark_;  // Whether this position has been pushed before.
+};
+
 
 std::string Move::ToString() const {
   std::string out = absl::StrCat(
@@ -114,14 +150,15 @@ std::vector<Action> QuoridorState::LegalActions() const {
 
   // Wall placements.
   if (wall_count_[current_player_] > 0) {
+    SearchQueue search_queue;
     for (int y = 0; y < board_diameter_ - 2; y += 2) {
       for (int x = 0; x < board_diameter_ - 2; x += 2) {
         Move h = GetMove(x, y + 1);
-        if (IsValidWall(h)) {
+        if (IsValidWall(h, &search_queue)) {
           moves.push_back(h.xy);
         }
         Move v = GetMove(x + 1, y);
-        if (IsValidWall(v)) {
+        if (IsValidWall(v, &search_queue)) {
           moves.push_back(v.xy);
         }
       }
@@ -167,7 +204,7 @@ void QuoridorState::AddActions(Move cur, Offset offset,
   }
 }
 
-bool QuoridorState::IsValidWall(Move m) const {
+bool QuoridorState::IsValidWall(Move m, SearchQueue* search_queue) const {
   Offset offset = (m.IsHorizontalWall() ? Offset(1, 0) : Offset(0, 1));
 
   if (IsWall(m + offset * 0) ||
@@ -196,29 +233,27 @@ bool QuoridorState::IsValidWall(Move m) const {
     return true;
 
   // Do a full search to verify both players can get to their respective goals.
-  return (SearchEndZone(kPlayer1, m, m + offset * 2) &&
-          SearchEndZone(kPlayer2, m, m + offset * 2));
+  return (SearchEndZone(kPlayer1, m, m + offset * 2, search_queue) &&
+          SearchEndZone(kPlayer2, m, m + offset * 2, search_queue));
 }
 
-bool QuoridorState::SearchEndZone(Player p, Move wall1, Move wall2) const {
-  std::vector<bool> mark(board_diameter_ * board_diameter_, false);
+bool QuoridorState::SearchEndZone(Player p, Move wall1, Move wall2,
+                                  SearchQueue* search_queue) const {
+  search_queue->Init(board_diameter_);
   Offset dir(1, 0);  // Direction is arbitrary. Queue will make it fast.
   int goal = end_zone_[p];
   int goal_dir = (goal == 0 ? 1 : -1);  // Sort for shortest dist in a max-heap.
-  std::priority_queue<std::pair<int, Move>> queue;  // <distance to goal, move>
-  queue.push(std::make_pair(0, player_loc_[p]));
-  while (!queue.empty()) {
-    // Ignore the distance. It is only for sorting.
-    Move c = queue.top().second;
-    queue.pop();
-    mark[c.xy] = true;
+  search_queue->Push(0, player_loc_[p]);
+  while (!search_queue->IsEmpty()) {
+    Move c = search_queue->Pop();
     for (int i = 0; i < 4; i++) {
       Move wall = c + dir;
-      Move move = c + dir * 2;
-      if (!IsWall(wall) && wall != wall1 && wall != wall2 && !mark[move.xy]) {
-        if (move.y == goal)
+      if (!IsWall(wall) && wall != wall1 && wall != wall2) {
+        Move move = c + dir * 2;
+        if (move.y == goal) {
           return true;
-        queue.push(std::make_pair(goal_dir * (goal - move.y), move));
+        }
+        search_queue->Push(goal_dir * (goal - move.y), move);
       }
       dir = dir.rotate_left();
     }

@@ -108,10 +108,6 @@ class QuoridorState : public State {
  protected:
   void DoApplyAction(Action action) override;
 
-  void AddActions(Move cur, Offset offset, std::vector<Action> *moves) const;
-  bool IsValidWall(Move m) const;
-  bool SearchEndZone(Player p, Move wall1, Move wall2) const;
-
   // Turn an action id into a `Move`.
   Move ActionToMove(Action action_id) const;
 
@@ -129,6 +125,12 @@ class QuoridorState : public State {
   }
 
  private:
+  // Helpers for `LegaLActions`.
+  class SearchQueue;  // Hide the details in the CC, aka: C++ pimpl.
+  void AddActions(Move cur, Offset offset, std::vector<Action> *moves) const;
+  bool IsValidWall(Move m, SearchQueue*) const;
+  bool SearchEndZone(Player p, Move wall1, Move wall2, SearchQueue*) const;
+
   std::vector<Player> board_;
   int wall_count_[kNumPlayers];
   int end_zone_[kNumPlayers];
