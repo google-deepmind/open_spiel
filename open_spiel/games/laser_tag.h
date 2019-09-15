@@ -22,9 +22,9 @@
 #include "open_spiel/simultaneous_move_game.h"
 #include "open_spiel/spiel.h"
 
-// This is the soccer game from the MinimaxQ paper. See
-// "Markov Games as a Framework for Reinforcement Learning", Littman '94.
-// http://www.cs.duke.edu/courses/spring07/cps296.3/littman94markov.pdf
+// This is the laser tag game. See
+// "A unified Game-Theoretic Approach to Multiagent Reinforcement Learning", Lanctot et al. 2017.
+// https://arxiv.org/pdf/1711.00832.pdf
 //
 // Parameters:
 //       "horizon"    int     max number of moves before draw  (default = 1000)
@@ -80,7 +80,7 @@ class LaserTagState : public SimMoveState {
   int horizon_ = -1;
   std::array<int, 2> player_row_ = {{-1, -1}};  // Players' rows.
   std::array<int, 2> player_col_ = {{-1, -1}};  // Players' cols.
-  std::array<int, 2> player_facing_={{1,1}};  // Player facing direction.
+  std::array<int, 2> player_facing_ = {{1, 1}};  // Player facing direction.
   int ball_row_ = -1;
   int ball_col_ = -1;
   std::array<int, 2> moves_ = {{-1, -1}};  // Moves taken.

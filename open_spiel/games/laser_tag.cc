@@ -208,40 +208,40 @@ void LaserTagState::ResolveMove(int player, int move) {
   
   char from_piece = field(old_row, old_col);
 
-  if(move==0){  //turn left
-    player_facing_[player-1]=leftMapping.find(current_orientation)->second;
+  if(move == kLeftTurn){  //turn left
+    player_facing_[player-1] = leftMapping.find(current_orientation)->second;
     return;
-  } else if (move==1){  //turn right
-    player_facing_[player-1]=rightMapping.find(current_orientation)->second;
+  } else if (move == kRightTurn){  //turn right
+    player_facing_[player-1] = rightMapping.find(current_orientation)->second;
     return;
-  } else if(move==2 || move==3 || move == 4 || move == 5 || move == 7 || move == 8){  //move left or right or forward or backward if able
+  } else if(move == kForwardMove || move == kBackwardMove || move == kStepLeft || move == kStepLeft || move == kForwardLeft || move == kForwardRight){  //move left or right or forward or backward if able
 
-    if(field(new_row,new_col)=='.'){
+    if(field(new_row,new_col) == '.'){
       SetField(old_row,old_col,'.');
       SetField(new_row,new_col,from_piece);
       
       // move and also turn
-      if(move == 7){
-        player_facing_[player-1]=leftMapping.find(current_orientation)->second;
-      } else if(move == 8){
-        player_facing_[player-1]=rightMapping.find(current_orientation)->second;
+      if(move == kForwardLeft){
+        player_facing_[player-1] = leftMapping.find(current_orientation)->second;
+      } else if(move == kForwardRight){
+        player_facing_[player-1] = rightMapping.find(current_orientation)->second;
       }
     }
 
     return;
-  } else if(move==9){  //fire!
+  } else if(move == kFire){  //fire!
 
     int cur_row = old_row;
     int cur_col = new_col;
 
     //laser goes in direction agent is facing
-    if(current_orientation==kNorth){
+    if(current_orientation == kNorth){
       cur_row--;
-    } else if (current_orientation==kSouth){
+    } else if (current_orientation == kSouth){
       cur_row++;
-    } else if (current_orientation==kEast){
+    } else if (current_orientation == kEast){
       cur_col++;
-    } else if (current_orientation==kWest){
+    } else if (current_orientation == kWest){
       cur_col--;
     }
 
@@ -249,24 +249,24 @@ void LaserTagState::ResolveMove(int player, int move) {
       
       char fired_upon = field(cur_row,cur_col);
 
-      if(fired_upon== 'A'){  //A was hit!
-        winner_=1;
+      if(fired_upon == 'A'){  //A was hit!
+        winner_ = 1;
         return;        
-      } else if(fired_upon=='B'){  //B was hit!
-        winner_=0;
+      } else if(fired_upon == 'B'){  //B was hit!
+        winner_ = 0;
         return;
-      } else if (fired_upon=='*'){  //obstacle was hit so do nothing
+      } else if (fired_upon == '*'){  //obstacle was hit so do nothing
         return;
       } 
 
       //laser goes in direction agent is facing
-      if(current_orientation==kNorth){
+      if(current_orientation == kNorth){
         cur_row--;
-      } else if (current_orientation==kSouth){
+      } else if (current_orientation == kSouth){
         cur_row++;
-      } else if (current_orientation==kEast){
+      } else if (current_orientation == kEast){
         cur_col++;
-      } else if (current_orientation==kWest){
+      } else if (current_orientation == kWest){
         cur_col--;
       }
 
