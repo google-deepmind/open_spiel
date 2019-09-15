@@ -65,8 +65,8 @@ enum MovementType { kLeftTurn = 0, kRightTurn = 1, kForwardMove = 2, kBackwardMo
 enum Orientation{kNorth = 0, kSouth=1, kEast=2, kWest=3};
 
 // mapping of start and end orientations for left and right turn
-std::map<int,int> leftMapping = {{0,3},{1,2},{2,0},{3,1}};
-std::map<int,int> rightMapping = {{0,2},{1,3},{2,1},{3,0}};
+std::map<int,int> leftMapping = {{0, 3}, {1, 2}, {2, 0}, {3, 1}};
+std::map<int,int> rightMapping = {{0, 2}, {1, 3}, {2, 1}, {3, 0}};
 
 // Chance outcomes.
 enum ChanceOutcome {
@@ -79,8 +79,8 @@ enum ChanceOutcome {
 };
 
 //for directions N,S,E,W
-constexpr std::array<std::array<int,10>,4> row_offsets = {{{0,0,-1,1,0,0,0,-1,-1,0},{0,0,1,-1,0,0,0,1,1,0},{0,0,0,0,-1,1,0,0,0,0},{0,0,0,0,1,-1,0,0,0,0}}};
-constexpr std::array<std::array<int,10>,4> col_offsets = {{{0,0,0,0,-1,1,0,0,0,0},{0,0,0,0,1,-1,0,0,0,0},{0,0,1,-1,0,0,0,1,1,0},{0,0,-1,1,0,0,0,-1,-1,0}}};
+constexpr std::array<std::array<int,10>,4> row_offsets = {{{0, 0, -1, 1, 0, 0, 0, -1, -1, 0}, {0, 0, 1, -1, 0, 0, 0, 1, 1, 0}, {0, 0, 0, 0, -1, 1, 0, 0, 0, 0}, {0, 0, 0, 0, 1, -1, 0, 0, 0, 0}}};
+constexpr std::array<std::array<int,10>,4> col_offsets = {{{0, 0, 0, 0, -1, 1, 0, 0, 0, 0}, {0, 0, 0, 0, 1, -1, 0, 0, 0, 0}, {0, 0, 1, -1, 0, 0, 0, 1, 1, 0}, {0, 0, -1, 1, 0, 0, 0, -1, -1, 0}}};
 
 
 // Default parameters.
