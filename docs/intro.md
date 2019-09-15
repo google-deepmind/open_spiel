@@ -30,8 +30,8 @@ bindings.
 
 The methods names are in `CamelCase` in C++ and `snake_case` in Python (e.g.
 `state.ApplyAction` in C++ will be `state.apply_action` in Python). See the
-[pybind11](python/pybind11/pyspiel.cc) definition in
-`open_spiel/python/pybind11/pyspel.cc` for the full mapping between names.
+pybind11 definition in `open_spiel/python/pybind11/pyspel.cc` for the full
+mapping between names.
 
 For algorithms, many are written in both languages, even if some are only
 available from Python.
