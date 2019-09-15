@@ -313,12 +313,12 @@ void LaserTagState::DoApplyAction(Action action_id) {
 std::vector<Action> LaserTagState::LegalActions(int player) const {
   if (IsChanceNode()) {
     if (total_moves_ == 0) {
-      return {kChanceLoc1, kChanceLoc2,kChanceLoc3,kChanceLoc4};
+      return {kChanceLoc1, kChanceLoc2, kChanceLoc3, kChanceLoc4};
     } else {
       return {kChanceInit1, kChanceInit2};
     }
   } else {
-    return {kLeftTurn , kRightTurn , kForwardMove , kBackwardMove , kStepLeft , kStepRight , kStand ,kForwardLeft, kForwardRight, kFire };
+    return {kLeftTurn, kRightTurn, kForwardMove, kBackwardMove, kStepLeft, kStepRight, kStand, kForwardLeft, kForwardRight, kFire};
   }
 }
 
