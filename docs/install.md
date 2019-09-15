@@ -32,7 +32,7 @@
     # For the python modules in open_spiel.
     export PYTHONPATH=$PYTHONPATH:/<path_to_open_spiel>
     # For the Python bindings of Pyspiel
-    export PYTHONPATH=$PYTHONPATH:/<path_to_open_spiel>/build/python
+    export PYTHONPATH=$PYTHONPATH:/<path_to_open_spiel>/build_python_3/python
     ```
 
     to `./venv/bin/activate` or your `~/.bashrc` to be able to import OpenSpiel
@@ -111,7 +111,7 @@ or `.profile`.
 # For the python modules in open_spiel.
 export PYTHONPATH=$PYTHONPATH:/<path_to_open_spiel>
 # For the Python bindings of Pyspiel
-export PYTHONPATH=$PYTHONPATH:/<path_to_open_spiel>/build/python
+export PYTHONPATH=$PYTHONPATH:/<path_to_open_spiel>/build_python_3/python
 ```
 
 # Running the first example
