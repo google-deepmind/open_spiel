@@ -23,7 +23,6 @@ namespace open_spiel {
 namespace quoridor {
 namespace {
 
-
 // Facts about the game.
 const GameType kGameType{
     /*short_name=*/"quoridor",
@@ -57,6 +56,9 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 
 }  // namespace
 
+using DistanceAndMove = std::pair<int, Move>;
+constexpr auto MinHeapComparer = std::greater<DistanceAndMove>();
+
 class QuoridorState::SearchQueue {
  public:
   // Init is not the constructor so it can be called repeatedly, and to avoid
@@ -77,21 +79,19 @@ class QuoridorState::SearchQueue {
     if (!mark_[move.xy]) {
       mark_[move.xy] = true;
       pqueue_.emplace_back(dist, move);
-      std::push_heap(pqueue_.begin(), pqueue_.end(),
-                     std::greater<std::pair<int, Move>>());
+      std::push_heap(pqueue_.begin(), pqueue_.end(), MinHeapComparer);
     }
   }
 
   Move Pop() {
-    std::pop_heap(pqueue_.begin(), pqueue_.end(),
-                  std::greater<std::pair<int, Move>>());
+    std::pop_heap(pqueue_.begin(), pqueue_.end(), MinHeapComparer);
     Move move = pqueue_.back().second;
     pqueue_.pop_back();
     return move;
   }
 
  private:
-  std::vector<std::pair<int, Move>> pqueue_;  // <distance to goal, move>
+  std::vector<DistanceAndMove> pqueue_;  // <distance to goal, move>
   std::vector<bool> mark_;  // Whether this position has been pushed before.
 };
 
@@ -248,7 +248,7 @@ bool QuoridorState::SearchEndZone(Player p, Move wall1, Move wall2,
   search_queue->Push(0, player_loc_[p]);
   while (!search_queue->IsEmpty()) {
     Move c = search_queue->Pop();
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 4; ++i) {
       Move wall = c + dir;
       if (!IsWall(wall) && wall != wall1 && wall != wall2) {
         Move move = c + dir * 2;
@@ -299,12 +299,12 @@ std::string QuoridorState::ToString() const {
       << ", " << wall_count_[kPlayer2] << "\n";
 
   // Top x coords.
-  for (int x = 0; x < board_size_; x++) {
+  for (int x = 0; x < board_size_; ++x) {
     out << "   " << coord << static_cast<char>('a' + x);
   }
   out << reset << '\n';
 
-  for (int y = 0; y < board_diameter_; y++) {
+  for (int y = 0; y < board_diameter_; ++y) {
     if (y % 2 == 0) {
       if (y / 2 + 1 < 10) out <<  " ";
       out << coord << (y / 2 + 1) << reset;  // Leading y coord.
@@ -312,7 +312,7 @@ std::string QuoridorState::ToString() const {
       out << "  ";  // Wall lines.
     }
 
-    for (int x = 0; x < board_diameter_; x++) {
+    for (int x = 0; x < board_diameter_; ++x) {
       Player p = GetPlayer(GetMove(x, y));
       if (x % 2 == 0 && y % 2 == 0) {
         out << (p == kPlayer1 ? white : p == kPlayer2 ? black : " . ");
@@ -390,7 +390,7 @@ void QuoridorState::DoApplyAction(Action action) {
     }
   }
 
-  moves_made_++;
+  ++moves_made_;
   if (moves_made_ >= kMaxGameLengthFactor * board_size_ * board_size_) {
     outcome_ = kPlayerDraw;
   }
