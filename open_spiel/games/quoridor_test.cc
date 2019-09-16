@@ -43,6 +43,10 @@ void BasicQuoridorTests() {
       3);
   testing::RandomSimTest(
       *LoadGame("quoridor(board_size=5,ansi_color_output=True)"), 3);
+
+  testing::RandomSimBenchmark("quoridor(board_size=5)", 1000);
+  testing::RandomSimBenchmark("quoridor(board_size=9)", 100);
+  testing::RandomSimBenchmark("quoridor(board_size=19)", 10);
 }
 
 }  // namespace
