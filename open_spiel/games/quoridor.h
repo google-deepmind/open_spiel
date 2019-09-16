@@ -128,6 +128,7 @@ class QuoridorState : public State {
   void AddActions(Move cur, Offset offset, std::vector<Action> *moves) const;
   bool IsValidWall(Move m, SearchQueue*) const;
   bool SearchEndZone(Player p, Move wall1, Move wall2, SearchQueue*) const;
+  void SearchShortestPath(Player p, SearchQueue* search_queue) const;
 
   std::vector<Player> board_;
   int wall_count_[kNumPlayers];
