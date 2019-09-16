@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <iostream>
+
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/tests/basic_tests.h"
@@ -44,8 +46,13 @@ void BasicQuoridorTests() {
   testing::RandomSimTest(
       *LoadGame("quoridor(board_size=5,ansi_color_output=True)"), 3);
 
+  std::cout << "Benchmark warmup:" << std::endl;
   testing::RandomSimBenchmark("quoridor(board_size=5)", 1000);
-  testing::RandomSimBenchmark("quoridor(board_size=9)", 100);
+  std::cout << std::endl;
+
+  std::cout << "Real:" << std::endl;
+  testing::RandomSimBenchmark("quoridor(board_size=5)", 10000);
+  testing::RandomSimBenchmark("quoridor(board_size=9)", 1000);
   testing::RandomSimBenchmark("quoridor(board_size=19)", 10);
 }
 
