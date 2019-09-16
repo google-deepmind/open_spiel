@@ -207,6 +207,19 @@ class _CFRSolver(object):
 
     self._policy.clear()
 
+  def policy(self):
+    """Returns the current policy (no convergence guarantees).
+
+    This function exists to have access to the policy, but one should use
+    `average_policy` for a Nash-Equilibrium converging sequence.
+    """
+    current_policy = {}
+    for info_state, info_state_node in self._info_state_nodes.items():
+      current_policy[info_state] = _regret_matching(
+          info_state_node.cumulative_regret, info_state_node.legal_actions)
+
+    return current_policy
+
   def average_policy(self):
     """Returns the average of all policies iterated.
 
