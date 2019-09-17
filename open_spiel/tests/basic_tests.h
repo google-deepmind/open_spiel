@@ -43,6 +43,11 @@ void RandomSimTest(const Game& game, int num_sims);
 // is very slow! Please use sparingly.
 void RandomSimTestWithUndo(const Game& game, int num_sims);
 
+// Perform num_sims random simulations of the specified game, without any
+// additional validation, and outputs the time taken.
+void RandomSimBenchmark(const std::string& game_def, int num_sims,
+                        bool verbose = false);
+
 // Check that chance outcomes are valid and consistent.
 // Performs an exhaustive search of the game tree, so should only be
 // used for smallish games.

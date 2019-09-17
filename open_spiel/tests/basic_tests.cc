@@ -19,6 +19,7 @@
 #include <set>
 #include <string>
 
+#include "open_spiel/abseil-cpp/absl/time/clock.h"
 #include "open_spiel/game_transforms/turn_based_simultaneous_game.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
@@ -99,6 +100,18 @@ void LegalActionsIsEmptyForOtherPlayers(const Game& game, State& state) {
   }
 }
 
+// Check that the legal actions list is sorted.
+
+void LegalActionsAreSorted(const Game& game, State& state) {
+  if (state.IsChanceNode()) return;
+  for (int player = 0; player < game.NumPlayers(); ++player) {
+    auto actions = state.LegalActions(player);
+    for (int i = 1; i < actions.size(); ++i) {
+      SPIEL_CHECK_LT(actions[i - 1], actions[i]);
+    }
+  }
+}
+
 void LegalActionsMaskTest(const Game& game, const State& state,
                           const std::vector<Action>& legal_actions) {
   std::vector<int> legal_actions_mask =
@@ -124,8 +137,8 @@ void LegalActionsMaskTest(const Game& game, const State& state,
 bool IsPowerOfTwo(int n) { return n == 0 || (n & (n - 1)) == 0; }
 
 }  // namespace
-// Checks that the game can be loaded.
 
+// Checks that the game can be loaded.
 void LoadGameTest(const std::string& game_name) {
   std::unique_ptr<Game> game = LoadGame(game_name);
   SPIEL_CHECK_TRUE(game != nullptr);
@@ -175,6 +188,89 @@ void TestHistoryContainsActions(const Game& game,
   }
 }
 
+// Run a random game with no additional verifications. Meant for benchmarking.
+int RandomSimulationFast(std::mt19937* rng, const Game& game, bool verbose) {
+  std::unique_ptr<open_spiel::State> state = game.NewInitialState();
+
+  if (verbose) {
+    std::cout << "Initial state:" << std::endl
+              << "State:" << std::endl << state->ToString() << std::endl;
+  }
+
+  int game_length = 0;
+  while (!state->IsTerminal()) {
+    ++game_length;
+    if (state->IsChanceNode()) {
+      // Chance node; sample one according to underlying distribution
+      std::vector<std::pair<Action, double>> outcomes = state->ChanceOutcomes();
+      Action action = open_spiel::SampleChanceOutcome(
+          outcomes, std::uniform_real_distribution<double>(0.0, 1.0)(*rng));
+      if (verbose) {
+        std::cout << "Sampled outcome: " << state->ActionToString(
+            kChancePlayerId, action) << std::endl;
+      }
+      state->ApplyAction(action);
+    } else if (state->CurrentPlayer() == open_spiel::kSimultaneousPlayerId) {
+      // Sample an action for each player
+      std::vector<Action> joint_action;
+      for (int p = 0; p < game.NumPlayers(); p++) {
+        std::vector<Action> actions;
+        actions = state->LegalActions(p);
+        std::uniform_int_distribution<> dis(0, actions.size() - 1);
+        Action action = actions[dis(*rng)];
+        joint_action.push_back(action);
+        if (verbose) {
+          std::cout << "Player " << p << " chose action:"
+                    << state->ActionToString(p, action) << std::endl;
+        }
+      }
+      state->ApplyActions(joint_action);
+    } else {
+      // Sample an action uniformly.
+      std::vector<Action> actions = state->LegalActions();
+      std::uniform_int_distribution<> dis(0, actions.size() - 1);
+      Action action = actions[dis(*rng)];
+      if (verbose) {
+        int p = state->CurrentPlayer();
+        std::cout << "Player " << p << " chose action: "
+                  << state->ActionToString(p, action) << std::endl;
+      }
+      state->ApplyAction(action);
+    }
+    if (verbose) {
+      std::cout << "State: " << std::endl << state->ToString() << std::endl;
+    }
+  }
+  return game_length;
+}
+
+// Perform num_sims random simulations of the specified game, and output the
+// time taken.
+void RandomSimBenchmark(const std::string& game_def, int num_sims,
+                        bool verbose) {
+  std::mt19937 rng;
+  std::cout  << "RandomSimBenchmark, game = " << game_def
+            << ", num_sims = " << num_sims << ". ";
+
+  auto game = LoadGame(game_def);
+
+  absl::Time start = absl::Now();
+  int num_moves = 0;
+  for (int sim = 0; sim < num_sims; ++sim) {
+    num_moves += RandomSimulationFast(&rng, *game, verbose);
+  }
+  absl::Time end = absl::Now();
+  double seconds = absl::ToDoubleSeconds(end - start);
+
+  int default_precision = std::cout.precision();
+  std::cout.precision(1);
+  std::cout << std::fixed << "Finished in " << (seconds * 1000) << " ms, "
+            << (num_sims / seconds) << " sims/s, "
+            << (num_moves / seconds) << " moves/s"
+            << std::defaultfloat << std::endl;
+  std::cout.precision(default_precision);  // Reset.
+}
+
 void RandomSimulation(std::mt19937* rng, const Game& game, bool undo) {
   std::vector<HistoryItem> history;
   std::vector<double> episode_returns(game.NumPlayers(), 0);
@@ -208,6 +304,7 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo) {
     std::cout << "player " << state->CurrentPlayer() << std::endl;
 
     LegalActionsIsEmptyForOtherPlayers(game, *state);
+    LegalActionsAreSorted(game, *state);
 
     // Test cloning the state.
     std::unique_ptr<open_spiel::State> state_copy = state->Clone();
@@ -243,7 +340,7 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo) {
       // Players choose simultaneously.
       std::vector<Action> joint_action;
 
-      // Sample a action for each player
+      // Sample an action for each player
       for (int p = 0; p < game.NumPlayers(); p++) {
         std::vector<Action> actions;
         actions = state->LegalActions(p);
@@ -285,7 +382,7 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo) {
         SPIEL_CHECK_EQ(infostate_vector.size(), infostate_vector_size);
       }
 
-      // Sample a action uniformly.
+      // Sample an action uniformly.
       std::vector<Action> actions = state->LegalActions();
       LegalActionsMaskTest(game, *state, actions);
       if (state->IsTerminal())

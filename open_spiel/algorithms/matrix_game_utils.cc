@@ -94,14 +94,10 @@ std::unique_ptr<MatrixGame> ExtensiveToMatrixGame(const Game& game) {
 
   std::vector<std::string> row_names;
   std::vector<std::string> col_names;
-  std::vector<double> row_utils;
-  std::vector<double> col_utils;
+  std::vector<std::vector<double>> row_player_utils;
+  std::vector<std::vector<double>> col_player_utils;
 
   GameType type = game.GetType();
-  type.min_num_players = 2;
-  type.max_num_players = 2;
-  type.dynamics = GameType::Dynamics::kSimultaneous;
-  type.information = GameType::Information::kOneShot;
 
   std::vector<DeterministicTabularPolicy> policies = {
       DeterministicTabularPolicy(game, 0), DeterministicTabularPolicy(game, 1)};
@@ -110,6 +106,8 @@ std::unique_ptr<MatrixGame> ExtensiveToMatrixGame(const Game& game) {
   do {
     policies[1].ResetDefaultPolicy();
     row_names.push_back(policies[0].ToString(" --- "));
+    std::vector<double> row_utils;
+    std::vector<double> col_utils;
     do {
       if (first_row) {
         col_names.push_back(policies[1].ToString(" --- "));
@@ -121,10 +119,13 @@ std::unique_ptr<MatrixGame> ExtensiveToMatrixGame(const Game& game) {
       col_utils.push_back(returns[1]);
     } while (policies[1].NextPolicy());
     first_row = false;
+    row_player_utils.push_back(row_utils);
+    col_player_utils.push_back(col_utils);
   } while (policies[0].NextPolicy());
 
-  return std::unique_ptr<MatrixGame>(
-      new MatrixGame(type, {}, row_names, col_names, row_utils, col_utils));
+  return matrix_game::CreateMatrixGame(type.short_name, type.long_name,
+                                       row_names, col_names,
+                                       row_player_utils, col_player_utils);
 }
 
 }  // namespace algorithms

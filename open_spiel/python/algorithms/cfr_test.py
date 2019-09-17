@@ -119,6 +119,15 @@ class CFRTest(parameterized.TestCase, unittest.TestCase):
     np.testing.assert_allclose(cfr_solver.average_policy().policy_for_key("1b"),
                                [0.5 / normalization, (0.5 + 1) / normalization])
 
+  def test_policy(self):
+    game = pyspiel.load_game("kuhn_poker")
+    solver = cfr.CFRPlusSolver(game)
+
+    policy = solver.policy()
+    self.assertLen(policy, 12)
+    for values in policy.values():
+      self.assertEqual({0: 0.5, 1: 0.5}, values)
+
 
 if __name__ == "__main__":
   unittest.main()

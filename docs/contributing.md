@@ -137,10 +137,6 @@ release!). Contributions are certainly not limited to these suggestions!
     [An evolutionary game-theoretic analysis of poker strategies](https://www.sciencedirect.com/science/article/pii/S1875952109000056),
     [Ref4](https://arxiv.org/abs/1803.06376).
 
--   **MacOS support**. We would like to officially support MacOS, if possible.
-    We do not anticipate any problems, as all the dependencies are available via
-    `brew`, but we have not tested this yet.
-
 -   **Minimax-Q and other classic MARL algorithms**. Minimax-Q is a classic
     multiagent reinforcement learning algorithm
     ([Markov games as a framework for multi-agent reinforcement learning](https://www2.cs.duke.edu/courses/spring07/cps296.3/littman94markov.pdf).

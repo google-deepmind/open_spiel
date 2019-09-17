@@ -18,7 +18,27 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import math
+import os
+
 import pyspiel
+
+_MAX_WIDTH = int(os.getenv("COLUMNS", 80))  # Get your TTY width.
+
+
+def _print_columns(strings):
+  """Prints a list of strings in columns."""
+  padding = 2
+  longest = max(len(s) for s in strings)
+  max_columns = math.floor((_MAX_WIDTH - 1) / (longest + 2 * padding))
+  rows = math.ceil(len(strings) / max_columns)
+  columns = math.ceil(len(strings) / rows)  # Might not fill all max_columns.
+  for r in range(rows):
+    for c in range(columns):
+      i = r + c * rows
+      if i < len(strings):
+        print(" " * padding + strings[i].ljust(longest + padding), end="")
+    print()
 
 
 class HumanBot(pyspiel.Bot):
@@ -32,19 +52,30 @@ class HumanBot(pyspiel.Bot):
     p = 1 / len(legal_actions)
     policy = [(action, p) for action in legal_actions]
 
-    print("Legal actions(s):")
-    for action in legal_actions:
-      print(" ", action, "=",
-            state.action_to_string(state.current_player(), action))
-    action = -1
+    action_map = {state.action_to_string(state.current_player(), action): action
+                  for action in legal_actions}
+
     while True:
-      action_str = input("Choose an action: ")
+      action_str = input("Choose an action (empty to print legal actions): ")
+
+      if not action_str:
+        print("Legal actions(s):")
+        longest_num = max(len(str(action)) for action in legal_actions)
+        _print_columns(
+            ["{}: {}".format(str(action).rjust(longest_num), action_str)
+             for action_str, action in sorted(action_map.items())])
+        continue
+
+      if action_str in action_map:
+        return policy, action_map[action_str]
+
       try:
         action = int(action_str)
       except ValueError:
-        print("Could not parse the action {}.".format(action_str))
+        print("Could not parse the action:", action_str)
+        continue
 
       if action in legal_actions:
-        break
-      print("Illegal action ({}) selected.".format(action))
-    return policy, action
+        return policy, action
+
+      print("Illegal action selected:", action_str)

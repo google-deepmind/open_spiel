@@ -186,6 +186,7 @@ class State {
 
   // `LegalActions(int player)` is valid for all nodes in all games, returning
   // an empty list for players who don't act at this state.
+  // The actions should be returned in ascending order.
   //
   // This default implementation is fine for turn-based games, but should
   // be overridden by simultaneous-move games.
@@ -203,6 +204,7 @@ class State {
   // `LegalActions()` returns the actions for the current player (including at
   // chance nodes). All games should implement this function.
   // For any action `a`, it must hold that 0 <= `a` < NumDistinctActions().
+  // The actions should be returned in ascending order.
   // If the state is non-terminal, there must be at least one legal action.
   //
   // In simultaneous-move games, the abstract base class implements it in

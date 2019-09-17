@@ -154,6 +154,12 @@ void LiarsDiceState::DoApplyAction(Action action) {
       }
     }
   } else {
+    // Check for legal actions.
+    if (!bidseq_.empty() && action <= bidseq_.back()) {
+      SpielFatalError(absl::StrCat("Illegal action. ", action,
+                                   " should be strictly higher than ",
+                                   bidseq_.back()));
+    }
     if (action == total_num_dice_ * kDiceSides) {
       // This was the calling bid, game is over.
       bidseq_.push_back(action);

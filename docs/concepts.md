@@ -29,10 +29,10 @@ players. Transitions are actions taken by players (in case of a simultaneous
 node, the transition is composed of the actions for all players).
 
 Note that in most games, we deal with chance (i.e. any source of randomness)
-using a an explicit player (the "chance" player, which internally has id -1").
-For example, in Poker, the root state would just be the players without any
-cards, and the first transitions will be chance nodes to deal the cards to the
-players (in practice once card is dealt per transition).
+using a an explicit player (the "chance" player, which has id
+`kChancePlayerId`). For example, in Poker, the root state would just be the
+players without any cards, and the first transitions will be chance nodes to
+deal the cards to the players (in practice once card is dealt per transition).
 
 See `spiel.h` for the full API description. For example,
 `game.NewInitialState()` will return the root `State`. Then,
@@ -53,8 +53,8 @@ defaults). There are 2 ways to create a game:
     Python, is a dictionary from argument name to
     `pyspiel.GameParameter`-wrapped values e.g. `{"players":
     pyspiel.GameParameter(3)}`), with `LoadGame`.
-*   Using a string representation such as `kugn_poker(players=3)`, giving
-    `LoadGame(kugn_poker(players=3))`. See `open_spiel/game_parameters.cc` for
+*   Using a string representation such as `kuhn_poker(players=3)`, giving
+    `LoadGame(kuhn_poker(players=3))`. See `open_spiel/game_parameters.cc` for
     the exact syntax.
 
 #### Creating sequential games from simultaneous games

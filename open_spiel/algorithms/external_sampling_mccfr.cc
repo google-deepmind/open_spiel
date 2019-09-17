@@ -99,10 +99,10 @@ double ExternalSamplingMCCFRSolver::UpdateRegrets(const State& state,
     }
   }
 
-  // Standard average does averaging on the opponent node. To do this in a game
+  // Simple average does averaging on the opponent node. To do this in a game
   // with more than two players, we only update the player + 1 mod num_players,
   // which reduces to the standard rule in 2 players.
-  if (avg_type_ == AverageType::kStandard &&
+  if (avg_type_ == AverageType::kSimple &&
       cur_player == ((player + 1) % game_->NumPlayers())) {
     for (int aidx = 0; aidx < legal_actions.size(); ++aidx) {
       info_state.cumulative_policy[aidx] += info_state_copy.cached_policy[aidx];

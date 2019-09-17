@@ -42,6 +42,7 @@ namespace go {
 constexpr int NumPlayers() { return 2; }
 constexpr double LossUtility() { return -1; }
 constexpr double WinUtility() { return 1; }
+constexpr int CellStates() { return 3; }  // Black, white, empty.
 
 // Go can only end in a draw when using a round komi.
 // We also treat superko as a draw.
@@ -71,6 +72,14 @@ class GoState : public State {
   std::string ToString() const override;
 
   bool IsTerminal() const override;
+
+  std::string InformationState(int player) const override;
+  std::string Observation(int player) const override;
+
+  // Four planes: black, white, empty, and a bias plane of bits indicating komi
+  // (whether white is to play).
+  void ObservationAsNormalizedVector(
+      int player, std::vector<double>* values) const override;
 
   std::vector<double> Returns() const override;
 
@@ -116,6 +125,12 @@ class GoGame : public Game {
 
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(new GoState(board_size_, komi_, handicap_));
+  }
+
+  std::vector<int> ObservationNormalizedVectorShape() const override {
+    // Planes: black, white, empty, and a bias plane indicating komi (whether
+    // white is to play).
+    return {CellStates() + 1, board_size_, board_size_};
   }
 
   int NumPlayers() const override { return go::NumPlayers(); }

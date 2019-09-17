@@ -28,7 +28,7 @@ public class TicTacToe: GameProtocol {
     information: .perfect,
     utility: .zeroSum,
     rewardModel: .terminal,
-    maxPlayers: 10,
+    maxPlayers: 2,
     minPlayers: 2,
     providesInformationState: true,
     providesInformationStateAsNormalizedVector: true

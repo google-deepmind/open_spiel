@@ -16,6 +16,8 @@ natural extensions. The core API and games are implemented in C++ and exposed to
 Python. Algorithms and tools are written both in C++ and Python. There is also a
 branch of pure Swift in the `swift` subdirectory.
 
+To try OpenSpiel in Google Colaboratory, please refer to `open_spiel/colabs` subdirectory or start [here](https://colab.research.google.com/github/deepmind/open_spiel/blob/master/open_spiel/colabs/install_open_spiel.ipynb).
+
 <p align="center">
   <img src="docs/_static/OpenSpielB.png" alt="OpenSpiel visual asset">
 </p>
