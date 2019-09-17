@@ -43,12 +43,12 @@ class LaserTagState : public SimMoveState {
   std::string ToString() const override;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
-  std::string InformationState(int player) const {
+  std::string Observation(int player) const {
     SPIEL_CHECK_GE(player, 0);
     SPIEL_CHECK_LT(player, num_players_);
     return ToString();
   }
-  void InformationStateAsNormalizedVector(int player,
+  void ObservationAsNormalizedVector(int player,
                                           std::vector<double>* values) const;
   int CurrentPlayer() const override {
     return IsTerminal() ? kTerminalPlayerId : cur_player_;
@@ -100,7 +100,7 @@ class LaserTagGame : public SimMoveGame {
   std::unique_ptr<Game> Clone() const override {
     return std::unique_ptr<Game>(new LaserTagGame(*this));
   }
-  std::vector<int> InformationStateNormalizedVectorShape() const override;
+  std::vector<int> ObservationNormalizedVectorShape() const override;
   int MaxGameLength() const override { return horizon_; }
 
  private:

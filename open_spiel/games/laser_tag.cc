@@ -17,7 +17,6 @@
 #include <memory>
 #include <utility>
 #include <map>
-#include <iostream>
 
 #include "open_spiel/spiel.h"
 
@@ -36,10 +35,10 @@ const GameType kGameType{
     GameType::RewardModel::kTerminal,
     /*max_num_players=*/2,
     /*min_num_players=*/2,
-    /*provides_information_state=*/true,
-    /*provides_information_state_as_normalized_vector=*/true,
-    /*provides_observation=*/false,
-    /*provides_observation_as_normalized_vector=*/false,
+    /*provides_information_state=*/false,
+    /*provides_information_state_as_normalized_vector=*/false,
+    /*provides_observation=*/true,
+    /*provides_observation_as_normalized_vector=*/true,
     /*parameter_specification=*/
     {{"horizon", {GameParameter::Type::kInt, false}}}};
 
@@ -65,8 +64,8 @@ enum MovementType { kLeftTurn = 0, kRightTurn = 1, kForwardMove = 2, kBackwardMo
 enum Orientation{kNorth = 0, kSouth=1, kEast=2, kWest=3};
 
 // mapping of start and end orientations for left and right turn
-std::map<int,int> leftMapping = {{0, 3}, {1, 2}, {2, 0}, {3, 1}};
-std::map<int,int> rightMapping = {{0, 2}, {1, 3}, {2, 1}, {3, 0}};
+std::map<int, int> leftMapping = {{0, 3}, {1, 2}, {2, 0}, {3, 1}};
+std::map<int, int> rightMapping = {{0, 2}, {1, 3}, {2, 1}, {3, 0}};
 
 // Chance outcomes.
 enum ChanceOutcome {
@@ -79,8 +78,8 @@ enum ChanceOutcome {
 };
 
 //for directions N,S,E,W
-constexpr std::array<std::array<int,10>,4> row_offsets = {{{0, 0, -1, 1, 0, 0, 0, -1, -1, 0}, {0, 0, 1, -1, 0, 0, 0, 1, 1, 0}, {0, 0, 0, 0, -1, 1, 0, 0, 0, 0}, {0, 0, 0, 0, 1, -1, 0, 0, 0, 0}}};
-constexpr std::array<std::array<int,10>,4> col_offsets = {{{0, 0, 0, 0, -1, 1, 0, 0, 0, 0}, {0, 0, 0, 0, 1, -1, 0, 0, 0, 0}, {0, 0, 1, -1, 0, 0, 0, 1, 1, 0}, {0, 0, -1, 1, 0, 0, 0, -1, -1, 0}}};
+constexpr std::array<std::array<int, 10>, 4> row_offsets = {{{0, 0, -1, 1, 0, 0, 0, -1, -1, 0}, {0, 0, 1, -1, 0, 0, 0, 1, 1, 0}, {0, 0, 0, 0, -1, 1, 0, 0, 0, 0}, {0, 0, 0, 0, 1, -1, 0, 0, 0, 0}}};
+constexpr std::array<std::array<int, 10>, 4> col_offsets = {{{0, 0, 0, 0, -1, 1, 0, 0, 0, 0}, {0, 0, 0, 0, 1, -1, 0, 0, 0, 0}, {0, 0, 1, -1, 0, 0, 0, 1, 1, 0}, {0, 0, -1, 1, 0, 0, 0, -1, -1, 0}}};
 
 
 // Default parameters.
@@ -162,15 +161,15 @@ void LaserTagState::Reset(int horizon) {
   field_.resize(kRows * kCols, '.');
 
   //set obstacles
-  SetField(2,2,'*');
-  SetField(3,2,'*');
-  SetField(4,2,'*');
-  SetField(3,1,'*');
+  SetField(2, 2, '*');
+  SetField(3, 2, '*');
+  SetField(4, 2, '*');
+  SetField(3, 1, '*');
 
-  SetField(2,4,'*');
-  SetField(3,4,'*');
-  SetField(4,4,'*');
-  SetField(3,5,'*');
+  SetField(2, 4, '*');
+  SetField(3, 4, '*');
+  SetField(4, 4, '*');
+  SetField(3, 5, '*');
 
   cur_player_ = kChancePlayerId;
   winner_ = kInvalidPlayer;
@@ -216,9 +215,9 @@ void LaserTagState::ResolveMove(int player, int move) {
     return;
   } else if(move == kForwardMove || move == kBackwardMove || move == kStepLeft || move == kStepLeft || move == kForwardLeft || move == kForwardRight){  //move left or right or forward or backward if able
 
-    if(field(new_row,new_col) == '.'){
-      SetField(old_row,old_col,'.');
-      SetField(new_row,new_col,from_piece);
+    if(field(new_row, new_col) == '.'){
+      SetField(old_row, old_col, '.');
+      SetField(new_row, new_col, from_piece);
       
       // move and also turn
       if(move == kForwardLeft){
@@ -245,9 +244,9 @@ void LaserTagState::ResolveMove(int player, int move) {
       cur_col--;
     }
 
-    while(InBounds(cur_row,cur_col)){  //shoot and track laser while it is in bounds
+    while(InBounds(cur_row, cur_col)){  //shoot and track laser while it is in bounds
       
-      char fired_upon = field(cur_row,cur_col);
+      char fired_upon = field(cur_row, cur_col);
 
       if(fired_upon == 'A'){  //A was hit!
         winner_ = 1;
@@ -288,15 +287,15 @@ void LaserTagState::DoApplyAction(Action action_id) {
   //spawn locations and move resolve order
   if (action_id == kChanceLoc1) {
     SetField(0, 0, 'A');
-    SetField(6,6,'B');
+    SetField(6, 6, 'B');
   } else if (action_id == kChanceLoc2) {
     SetField(0, 6, 'A');
-    SetField(6,0,'B');
+    SetField(6, 0, 'B');
   } else if(action_id==kChanceLoc3){
-    SetField(6,0,'B');
+    SetField(6, 0, 'B');
     SetField(6, 6, 'A');
   } else if(action_id==kChanceLoc4){
-    SetField(0,6,'B');
+    SetField(0, 6, 'B');
     SetField(0, 0, 'A');
   }else if (action_id == kChanceInit1) {
     ResolveMove(1, moves_[0]);
@@ -392,12 +391,12 @@ int LaserTagState::observation_plane(int r, int c) const {
   return plane;
 }
 
-void LaserTagState::InformationStateAsNormalizedVector(
+void LaserTagState::ObservationAsNormalizedVector(
     int player, std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  values->resize(parent_game_.InformationStateNormalizedVectorSize());
+  values->resize(parent_game_.ObservationNormalizedVectorSize());
   std::fill(values->begin(), values->end(), 0.);
   int plane_size = kRows * kCols;
 
@@ -420,7 +419,7 @@ std::unique_ptr<State> LaserTagGame::NewInitialState() const {
   return state;
 }
 
-std::vector<int> LaserTagGame::InformationStateNormalizedVectorShape()
+std::vector<int> LaserTagGame::ObservationNormalizedVectorShape()
     const {
   return {kCellStates, kRows, kCols};
 }
