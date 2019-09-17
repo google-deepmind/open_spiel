@@ -126,10 +126,6 @@ release!). Contributions are certainly not limited to these suggestions!
     and Gathering from [Ref1](https://arxiv.org/abs/1711.00832)
     [Ref2](https://arxiv.org/abs/1702.03037).
 
--   **Hanabi Learning Environment Wrapper**. Provide a game that wraps the
-    [Hanabi Learning Environment](https://arxiv.org/abs/1902.00506). We do have
-    a working prototype, but is not yet ready for release.
-
 -   **Heuristic Payoff Tables and Empirical Game-Theoretic Analysis**. Methods
     found in
     [Analyzing Complex Strategic Interactions in Multi-Agent Systems](https://www.semanticscholar.org/paper/Analyzing-Complex-Strategic-Interactions-in-Systems-Walsh-Das/43f70c076dbf53023df9f1337ee024f590779f75),

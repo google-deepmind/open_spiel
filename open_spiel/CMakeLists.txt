@@ -60,6 +60,7 @@ set (OPEN_SPIEL_OBJECTS
   $<TARGET_OBJECTS:games>
   $<TARGET_OBJECTS:game_transforms>
   $<TARGET_OBJECTS:bridge_double_dummy_solver>
+  # $<TARGET_OBJECTS:hanabi_learning_environment>
   $<TARGET_OBJECTS:algorithms>
 )
 

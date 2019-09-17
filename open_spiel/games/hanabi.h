@@ -19,10 +19,21 @@
 // https://en.wikipedia.org/wiki/Hanabi_(card_game)
 //
 // See https://arxiv.org/abs/1902.00506 for a motivation of Hanabi as an AI
-// challenge and some initial results.
+// challenge and some initial results. Please cite this paper if you use this
+// Hanabi wrapper for any research results.
 //
 // This implementation is a wrapper for the Hanabi Learning Environment, which
 // can be found here: https://github.com/deepmind/hanabi-learning-environment
+//
+// Since Hanabi relies on an (optional) external dependency, it is not included
+// in the list of compiled games by default. To enable it, follow these steps:
+//   1. git clone the Hanabi Learning Environment above (e.g. in $HOME)
+//   2. Set the path of HANABI_HOME in games/hanabi/CMakeLists.txt
+//   3. Uncomment hanabi.cc, hanabi.h, and the add_subdirectory (hanabi) in
+//      games/CMakeLists.txt
+//   4. Uncomment the $<TARGET_OBJECTS:hanabi_learning_environment> in the
+//      top-level CMakeLists.txt
+//   5. Enjoy the fireworks!
 
 #include "open_spiel/spiel.h"
 #include "hanabi_lib/canonical_encoders.h"
@@ -60,9 +71,9 @@ class OpenSpielHanabiGame : public Game {
 class OpenSpielHanabiState : public State {
  public:
   explicit OpenSpielHanabiState(const OpenSpielHanabiGame* game);
-  int CurrentPlayer() const override;
+  Player CurrentPlayer() const override;
   std::vector<Action> LegalActions() const override;
-  std::string ActionToString(int player, Action action_id) const override;
+  std::string ActionToString(Player player, Action action_id) const override;
   std::vector<double> Rewards() const override;
   std::vector<double> Returns() const override;
 
@@ -70,8 +81,8 @@ class OpenSpielHanabiState : public State {
   // state would have to include the entire history of the game, and is
   // impractically large.
   // The observation by default includes knowledge inferred from past hints.
-  std::string Observation(int player) const override;
-  void ObservationAsNormalizedVector(int player,
+  std::string Observation(Player player) const override;
+  void ObservationAsNormalizedVector(Player player,
                                      std::vector<double>* values) const;
 
   std::unique_ptr<State> Clone() const override;

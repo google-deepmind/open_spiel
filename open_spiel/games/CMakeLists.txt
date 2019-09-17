@@ -31,6 +31,9 @@ add_library (games OBJECT
   go/go_board.h
   goofspiel.cc
   goofspiel.h
+  # Uncomment to enable Hanabi.
+  # hanabi.cc
+  # hanabi.h
   havannah.cc
   havannah.h
   hex.cc
@@ -68,6 +71,9 @@ add_library (games OBJECT
   y.h
 )
 target_include_directories (games PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
+# Uncomment to enable Hanabi.
+# add_subdirectory (hanabi)
 
 add_library(bridge_double_dummy_solver OBJECT
   bridge/double_dummy_solver/include/dll.h

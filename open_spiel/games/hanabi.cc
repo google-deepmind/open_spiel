@@ -142,7 +142,7 @@ int OpenSpielHanabiGame::MaxGameLength() const {
          + game_.MaxDeckSize() + game_.MaxInformationTokens();  // Hints given
 }
 
-int OpenSpielHanabiState::CurrentPlayer() const {
+Player OpenSpielHanabiState::CurrentPlayer() const {
   return state_.IsTerminal() ? kTerminalPlayerId : state_.CurPlayer();
 }
 
@@ -166,7 +166,7 @@ std::vector<Action> OpenSpielHanabiState::LegalActions() const {
   }
 }
 
-std::string OpenSpielHanabiState::ActionToString(int player,
+std::string OpenSpielHanabiState::ActionToString(Player player,
                                                  Action action_id) const {
   if (player == kChancePlayerId)
     return game_->HanabiGame().GetChanceOutcome(action_id).ToString();
@@ -193,12 +193,12 @@ void OpenSpielHanabiState::DoApplyAction(Action action) {
   }
 }
 
-std::string OpenSpielHanabiState::Observation(int player) const {
+std::string OpenSpielHanabiState::Observation(Player player) const {
   return hanabi_learning_env::HanabiObservation(state_, player).ToString();
 }
 
 void OpenSpielHanabiState::ObservationAsNormalizedVector(
-    int player, std::vector<double>* values) const {
+    Player player, std::vector<double>* values) const {
   auto obs = game_->Encoder().Encode(
       hanabi_learning_env::HanabiObservation(state_, player));
   values->resize(obs.size());
