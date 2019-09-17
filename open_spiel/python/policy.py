@@ -148,7 +148,8 @@ class TabularPolicy(Policy):
     states: A `list` of the states as ordered in the `action_probability_array`.
     state_in: array of shape `(num_states, state_vector_size)` containing the
       normalised vector representation of each information state. Populated only
-      for games which support information_state_as_normalized_vector().
+      for games which support information_state_as_normalized_vector(), and is
+      None otherwise.
     game_type: The game attributes as returned by `Game::GetType`; used to
       determine whether to use information state or observation as the key in
       the tabular policy.
@@ -196,6 +197,7 @@ class TabularPolicy(Policy):
 
     # Put legal action masks in a numpy array and create the uniform random
     # policy.
+    self.state_in = None
     if state_in_list:
       self.state_in = np.array(state_in_list)
     self.legal_actions_mask = np.array(legal_actions_list)

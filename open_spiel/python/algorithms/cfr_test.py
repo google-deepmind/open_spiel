@@ -19,8 +19,8 @@ from __future__ import division
 from __future__ import print_function
 
 import itertools
-import unittest
 
+from absl.testing import absltest
 from absl.testing import parameterized
 import numpy as np
 
@@ -29,7 +29,7 @@ from open_spiel.python.algorithms import expected_game_score
 import pyspiel
 
 
-class CFRTest(parameterized.TestCase, unittest.TestCase):
+class CFRTest(parameterized.TestCase, absltest.TestCase):
 
   def test_cfr_kuhn_poker(self):
     game = pyspiel.load_game("kuhn_poker")
@@ -123,11 +123,29 @@ class CFRTest(parameterized.TestCase, unittest.TestCase):
     game = pyspiel.load_game("kuhn_poker")
     solver = cfr.CFRPlusSolver(game)
 
-    policy = solver.policy()
-    self.assertLen(policy, 12)
-    for values in policy.values():
-      self.assertEqual({0: 0.5, 1: 0.5}, values)
+    tabular_policy = solver.policy()
+    self.assertLen(tabular_policy.state_lookup, 12)
+    for info_state_str in tabular_policy.state_lookup.keys():
+      np.testing.assert_equal(
+          np.asarray([0.5, 0.5]), tabular_policy.policy_for_key(info_state_str))
+
+
+class CFRBRTest(absltest.TestCase):
+
+  def test_policy_and_average_policy(self):
+    game = pyspiel.load_game("kuhn_poker")
+    cfrbr_solver = cfr.CFRBRSolver(game)
+    for _ in range(300):
+      cfrbr_solver.evaluate_and_update_policy()
+    average_policy = cfrbr_solver.average_policy()
+    average_policy_values = expected_game_score.policy_value(
+        game.new_initial_state(), [average_policy] * 2)
+    # 1/18 is the Nash value. See https://en.wikipedia.org/wiki/Kuhn_poker
+    np.testing.assert_allclose(
+        average_policy_values, [-1 / 18, 1 / 18], atol=1e-3)
+
+    cfrbr_solver.policy()
 
 
 if __name__ == "__main__":
-  unittest.main()
+  absltest.main()
