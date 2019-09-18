@@ -37,7 +37,7 @@ const GameType kGameType{
     /*min_num_players=*/2,
     /*provides_information_state=*/false,
     /*provides_information_state_as_normalized_vector=*/false,
-    /*provides_observation=*/true,
+    /*provides_observation=*/false,
     /*provides_observation_as_normalized_vector=*/true,
     /*parameter_specification=*/
     {{"horizon", {GameParameter::Type::kInt, false}}}};
