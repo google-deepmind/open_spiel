@@ -428,5 +428,5 @@ LaserTagGame::LaserTagGame(const GameParameters& params)
     : SimMoveGame(kGameType, params),
       horizon_(ParameterValue<int>("horizon", kDefaultHorizon)) {}
 
-}  // namespace markov_soccer
+}  // namespace laser_tag
 }  // namespace open_spiel
