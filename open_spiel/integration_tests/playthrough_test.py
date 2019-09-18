@@ -24,8 +24,25 @@ from absl import logging
 from absl.testing import absltest
 
 from open_spiel.python.algorithms import generate_playthrough
+import pyspiel
 
 _DATA_DIR = "open_spiel/integration_tests/playthroughs/"
+
+_OPTIONAL_GAMES = set(["hanabi"])
+_AVAILABLE_GAMES = set(pyspiel.registered_names())
+
+
+def _is_optional_game(basename):
+  """Returns (bool, game_name or None).
+
+  Args:
+    basename: The basename of the file. It is assumed it starts with the
+      game name.
+  """
+  for game_name in _OPTIONAL_GAMES:
+    if basename.startswith(game_name):
+      return True, game_name
+  return False, None
 
 
 class PlaythroughTest(absltest.TestCase):
@@ -34,19 +51,29 @@ class PlaythroughTest(absltest.TestCase):
     test_srcdir = os.environ.get("TEST_SRCDIR", "")
     path = os.path.join(test_srcdir, _DATA_DIR)
 
-    file_paths = list(os.listdir(path))
-    self.assertGreaterEqual(len(file_paths), 5)
+    basenames = list(os.listdir(path))
+    self.assertGreaterEqual(len(basenames), 40)
 
-    for filename in file_paths:
-      file_path = os.path.join(path, filename)
-      logging.info(filename)
+    for basename in basenames:
+      file_path = os.path.join(path, basename)
+      logging.info(basename)
+
+      # We check whether the game is optional, and if it is, whether we do
+      # have the game.
+      is_optional, game_name = _is_optional_game(basename)
+      if is_optional:
+        if game_name not in _AVAILABLE_GAMES:
+          logging.info("Skipping %s because %s is not built in.", basename,
+                       game_name)
+          continue
+
       expected, actual = generate_playthrough.replay(file_path)
       for expected_line, actual_line in zip(
           expected.split("\n"), actual.split("\n")):
         self.assertEqual(expected_line, actual_line)
 
       self.assertMultiLineEqual(
-          expected, actual, msg="Issue with filename {}".format(filename))
+          expected, actual, msg="Issue with basename {}".format(basename))
 
 
 if __name__ == "__main__":
