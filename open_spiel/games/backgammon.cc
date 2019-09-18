@@ -952,6 +952,7 @@ std::vector<Action> BackgammonState::LegalActions() const {
   SPIEL_CHECK_GE(max_moves, 0);
   SPIEL_CHECK_LE(max_moves, 2);
   std::vector<Action> legal_actions = ProcessLegalMoves(max_moves, movelist);
+  std::sort(legal_actions.begin(), legal_actions.end());
   return legal_actions;
 }
 

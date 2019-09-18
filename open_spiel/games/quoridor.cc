@@ -16,14 +16,12 @@
 
 #include <algorithm>
 #include <memory>
-#include <queue>
 #include <utility>
 #include <vector>
 
 namespace open_spiel {
 namespace quoridor {
 namespace {
-
 
 // Facts about the game.
 const GameType kGameType{
@@ -58,6 +56,63 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 
 }  // namespace
 
+constexpr int undefined_distance = -1;
+using DistanceAndMove = std::pair<int, Move>;
+constexpr auto MinHeapComparer = std::greater<DistanceAndMove>();
+
+class QuoridorState::SearchQueue {
+ public:
+  explicit SearchQueue(int board_diameter) {
+    int size = board_diameter * board_diameter;
+    mark_.resize(size, false);
+    on_shortest_path_.resize(size, false);
+    distance_.resize(size, undefined_distance);
+    pqueue_.reserve(size);
+  }
+
+  bool IsEmpty() const { return pqueue_.empty(); }
+
+  void ClearQueue() { pqueue_.clear(); }
+
+  bool Push(int dist, Move move) {
+    if (!mark_[move.xy]) {
+      mark_[move.xy] = true;
+      pqueue_.emplace_back(dist, move);
+      std::push_heap(pqueue_.begin(), pqueue_.end(), MinHeapComparer);
+      return true;
+    }
+    return false;
+  }
+
+  Move Pop() {
+    std::pop_heap(pqueue_.begin(), pqueue_.end(), MinHeapComparer);
+    Move move = pqueue_.back().second;
+    pqueue_.pop_back();
+    return move;
+  }
+
+  void ResetQueue() {
+    std::fill(mark_.begin(), mark_.end(), false);
+    pqueue_.clear();
+  }
+
+  void ResetDists() {
+    std::fill(distance_.begin(), distance_.end(), undefined_distance);
+  }
+
+  void SetDist(Move move, int dist) { distance_[move.xy] = dist; }
+  int GetDist(Move move) const { return distance_[move.xy]; }
+  void SetOnShortestPath(Move move) { on_shortest_path_[move.xy] = true; }
+  bool IsOnShortestPath(Move move) const { return on_shortest_path_[move.xy]; }
+
+ private:
+  std::vector<DistanceAndMove> pqueue_;  // <distance to goal, move>
+  std::vector<bool> mark_;  // Whether this position has been pushed before.
+  std::vector<int> distance_;  // Distance from player.
+  std::vector<bool> on_shortest_path_;  // Is this position on a shortest path?
+};
+
+
 std::string Move::ToString() const {
   std::string out = absl::StrCat(
       std::string(1, static_cast<char>('a' + (x / 2))), (y / 2) + 1);
@@ -82,13 +137,13 @@ QuoridorState::QuoridorState(int board_size, int wall_count,
   board_.resize(board_diameter_ * board_diameter_, kPlayerNone);
   wall_count_[kPlayer1] = wall_count;
   wall_count_[kPlayer2] = wall_count;
-  int start = board_size - (board_size % 2);
-  player_loc_[kPlayer1] = GetMove(start, 0);
-  player_loc_[kPlayer2] = GetMove(start, board_diameter_ - 1);
+  int start_x = board_size - (board_size % 2);
+  player_loc_[kPlayer1] = GetMove(start_x, board_diameter_ - 1);
+  player_loc_[kPlayer2] = GetMove(start_x, 0);
   SetPlayer(player_loc_[kPlayer1], kPlayer1, kPlayerNone);
   SetPlayer(player_loc_[kPlayer2], kPlayer2, kPlayerNone);
-  end_zone_[kPlayer1] = board_diameter_ - 1;
-  end_zone_[kPlayer2] = 0;
+  end_zone_[kPlayer1] = player_loc_[kPlayer2].y;
+  end_zone_[kPlayer2] = player_loc_[kPlayer1].y;
 }
 
 Move QuoridorState::ActionToMove(Action action_id) const {
@@ -114,20 +169,24 @@ std::vector<Action> QuoridorState::LegalActions() const {
 
   // Wall placements.
   if (wall_count_[current_player_] > 0) {
+    SearchQueue search_queue(board_diameter_);
+    SearchShortestPath(kPlayer1, &search_queue);
+    SearchShortestPath(kPlayer2, &search_queue);
     for (int y = 0; y < board_diameter_ - 2; y += 2) {
       for (int x = 0; x < board_diameter_ - 2; x += 2) {
         Move h = GetMove(x, y + 1);
-        if (IsValidWall(h)) {
+        if (IsValidWall(h, &search_queue)) {
           moves.push_back(h.xy);
         }
         Move v = GetMove(x + 1, y);
-        if (IsValidWall(v)) {
+        if (IsValidWall(v, &search_queue)) {
           moves.push_back(v.xy);
         }
       }
     }
   }
 
+  std::sort(moves.begin(), moves.end());
   return moves;
 }
 
@@ -166,7 +225,7 @@ void QuoridorState::AddActions(Move cur, Offset offset,
   }
 }
 
-bool QuoridorState::IsValidWall(Move m) const {
+bool QuoridorState::IsValidWall(Move m, SearchQueue* search_queue) const {
   Offset offset = (m.IsHorizontalWall() ? Offset(1, 0) : Offset(0, 1));
 
   if (IsWall(m + offset * 0) ||
@@ -174,6 +233,14 @@ bool QuoridorState::IsValidWall(Move m) const {
       IsWall(m + offset * 2)) {
     // Already blocked by a wall.
     return false;
+  }
+
+  // Any wall that doesn't intersect with a shortest path is clearly legal.
+  // Walls that do intersect might still be legal because there's another way
+  // around, but that's more expensive to check.
+  if (!search_queue->IsOnShortestPath(m) &&
+      !search_queue->IsOnShortestPath(m + offset * 2)) {
+    return true;
   }
 
   // If this wall doesn't connect two existing walls/edges, then it can't cut
@@ -195,34 +262,87 @@ bool QuoridorState::IsValidWall(Move m) const {
     return true;
 
   // Do a full search to verify both players can get to their respective goals.
-  return (SearchEndZone(kPlayer1, m, m + offset * 2) &&
-          SearchEndZone(kPlayer2, m, m + offset * 2));
+  return (SearchEndZone(kPlayer1, m, m + offset * 2, search_queue) &&
+          SearchEndZone(kPlayer2, m, m + offset * 2, search_queue));
 }
 
-bool QuoridorState::SearchEndZone(Player p, Move wall1, Move wall2) const {
-  std::vector<bool> mark(board_diameter_ * board_diameter_, false);
+bool QuoridorState::SearchEndZone(Player p, Move wall1, Move wall2,
+                                  SearchQueue* search_queue) const {
+  search_queue->ResetQueue();
   Offset dir(1, 0);  // Direction is arbitrary. Queue will make it fast.
-  int goal_dir = (p == kPlayer1 ? 1 : -1);  // For proper sorting.
-  std::priority_queue<std::pair<int, Move>> queue;  // <distance to goal, move>
-  queue.push(std::make_pair(0, player_loc_[p]));
-  while (!queue.empty()) {
-    // Ignore the distance. It is only for sorting.
-    Move c = queue.top().second;
-    queue.pop();
-    mark[c.xy] = true;
-    for (int i = 0; i < 4; i++) {
+  int goal = end_zone_[p];
+  int goal_dir = (goal == 0 ? -1 : 1);  // Sort for shortest dist in a min-heap.
+  search_queue->Push(0, player_loc_[p]);
+  while (!search_queue->IsEmpty()) {
+    Move c = search_queue->Pop();
+    for (int i = 0; i < 4; ++i) {
       Move wall = c + dir;
-      Move move = c + dir * 2;
-      if (!IsWall(wall) && wall != wall1 && wall != wall2 && !mark[move.xy]) {
-        if (move.y == end_zone_[p])
+      if (!IsWall(wall) && wall != wall1 && wall != wall2) {
+        Move move = c + dir * 2;
+        if (move.y == goal) {
           return true;
-        queue.push(std::make_pair(goal_dir * (move.y - end_zone_[p]), move));
+        }
+        search_queue->Push(goal_dir * (goal - move.y), move);
       }
       dir = dir.rotate_left();
     }
   }
 
   return false;
+}
+
+void QuoridorState::SearchShortestPath(Player p,
+                                       SearchQueue* search_queue) const {
+  search_queue->ResetQueue();
+  search_queue->ResetDists();
+  Offset dir(1, 0);  // Direction is arbitrary. Queue will make it fast.
+  int goal = end_zone_[p];
+  int goal_dir = (goal == 0 ? -1 : 1);  // Sort for shortest dist in a min-heap.
+  search_queue->Push(0, player_loc_[p]);
+  search_queue->SetDist(player_loc_[p], 0);
+  Move goal_found = GetMove(-1, -1);  // invalid
+
+  // A* search for the end-zone, keeping distances to each cell.
+  while (!search_queue->IsEmpty()) {
+    Move c = search_queue->Pop();
+    int dist = search_queue->GetDist(c);
+    for (int i = 0; i < 4; ++i) {
+      Move wall = c + dir;
+      if (!IsWall(wall)) {
+        Move move = c + dir * 2;
+        if (move.y == goal) {
+          search_queue->SetDist(move, dist + 1);
+          search_queue->ClearQueue();  // Break out of the search.
+          goal_found = move;
+          break;
+        }
+        if (search_queue->Push(dist + 1 + goal_dir * (goal - move.y), move)) {
+          search_queue->SetDist(move, dist + 1);
+        }
+      }
+      dir = dir.rotate_left();
+    }
+  }
+
+  // Trace the way back, setting them to be on a shortest path.
+  Move current = goal_found;
+  int dist = search_queue->GetDist(current);
+  while (current != player_loc_[p]) {
+    for (int i = 0; i < 4; ++i) {
+      Move wall = current + dir;
+      if (!IsWall(wall)) {
+        Move move = current + dir * 2;
+        int dist2 = search_queue->GetDist(move);
+        if (dist2 != undefined_distance && dist2 + 1 == dist) {
+          search_queue->SetOnShortestPath(wall);
+          current = move;
+          dist = dist2;
+          break;
+        }
+      }
+      dir = dir.rotate_left();
+    }
+  }
 }
 
 std::string QuoridorState::ActionToString(int player, Action action_id) const {
@@ -260,12 +380,12 @@ std::string QuoridorState::ToString() const {
       << ", " << wall_count_[kPlayer2] << "\n";
 
   // Top x coords.
-  for (int x = 0; x < board_size_; x++) {
+  for (int x = 0; x < board_size_; ++x) {
     out << "   " << coord << static_cast<char>('a' + x);
   }
   out << reset << '\n';
 
-  for (int y = 0; y < board_diameter_; y++) {
+  for (int y = 0; y < board_diameter_; ++y) {
     if (y % 2 == 0) {
       if (y / 2 + 1 < 10) out <<  " ";
       out << coord << (y / 2 + 1) << reset;  // Leading y coord.
@@ -273,7 +393,7 @@ std::string QuoridorState::ToString() const {
       out << "  ";  // Wall lines.
     }
 
-    for (int x = 0; x < board_diameter_; x++) {
+    for (int x = 0; x < board_diameter_; ++x) {
       Player p = GetPlayer(GetMove(x, y));
       if (x % 2 == 0 && y % 2 == 0) {
         out << (p == kPlayer1 ? white : p == kPlayer2 ? black : " . ");
@@ -351,7 +471,7 @@ void QuoridorState::DoApplyAction(Action action) {
     }
   }
 
-  moves_made_++;
+  ++moves_made_;
   if (moves_made_ >= kMaxGameLengthFactor * board_size_ * board_size_) {
     outcome_ = kPlayerDraw;
   }

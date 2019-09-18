@@ -46,12 +46,10 @@ enum Player : uint8_t {
   kPlayerDraw,
 };
 
-
 struct Offset {
-  int8_t x, y;
+  int x, y;
 
-  Offset() : x(0), y(0) {}
-  Offset(int x_, int y_) : x(x_), y(y_){}
+  Offset(int x_, int y_) : x(x_), y(y_) {}
 
   Offset operator+(const Offset& o) const { return Offset(x + o.x, y + o.y); }
   Offset operator-(const Offset& o) const { return Offset(x - o.x, y - o.y); }
@@ -61,9 +59,9 @@ struct Offset {
 };
 
 struct Move {
-  int8_t x, y;
-  int16_t xy;  // Precomputed x + y * size.
-  int8_t size;
+  int x, y;
+  int xy;  // Precomputed x + y * size.
+  int size;
 
   Move() : x(0), y(0), xy(-1), size(-1) {}
   Move(int x_, int y_, int size_)
@@ -108,10 +106,6 @@ class QuoridorState : public State {
  protected:
   void DoApplyAction(Action action) override;
 
-  void AddActions(Move cur, Offset offset, std::vector<Action> *moves) const;
-  bool IsValidWall(Move m) const;
-  bool SearchEndZone(Player p, Move wall1, Move wall2) const;
-
   // Turn an action id into a `Move`.
   Move ActionToMove(Action action_id) const;
 
@@ -129,6 +123,13 @@ class QuoridorState : public State {
   }
 
  private:
+  // Helpers for `LegaLActions`.
+  class SearchQueue;  // Hide the details in the CC, aka: C++ pimpl.
+  void AddActions(Move cur, Offset offset, std::vector<Action> *moves) const;
+  bool IsValidWall(Move m, SearchQueue*) const;
+  bool SearchEndZone(Player p, Move wall1, Move wall2, SearchQueue*) const;
+  void SearchShortestPath(Player p, SearchQueue* search_queue) const;
+
   std::vector<Player> board_;
   int wall_count_[kNumPlayers];
   int end_zone_[kNumPlayers];

@@ -35,10 +35,10 @@ const GameType kGameType{
     GameType::RewardModel::kTerminal,
     /*max_num_players=*/2,
     /*min_num_players=*/2,
-    /*provides_information_state=*/false,
+    /*provides_information_state=*/true,
     /*provides_information_state_as_normalized_vector=*/false,
-    /*provides_observation=*/false,
-    /*provides_observation_as_normalized_vector=*/false,
+    /*provides_observation=*/true,
+    /*provides_observation_as_normalized_vector=*/true,
     /*parameter_specification=*/
     {
         {"komi", GameType::ParameterSpec{GameParameter::Type::kDouble, false}},
@@ -86,15 +86,45 @@ GoState::GoState(int board_size, float komi, int handicap)
   ResetBoard();
 }
 
-std::vector<Action> GoState::LegalActions() const {
-  std::vector<Action> actions = {kPass};
+std::string GoState::InformationState(int player) const {
+  return HistoryString();
+}
 
+std::string GoState::Observation(int player) const {
+  return ToString();
+}
+
+void GoState::ObservationAsNormalizedVector(int player,
+                                            std::vector<double>* values) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+
+  int num_cells = board_.board_size() * board_.board_size();
+  values->resize(num_cells * (CellStates() + 1));
+  std::fill(values->begin(), values->end(), 0.);
+
+  // Add planes: black, white, empty.
+  int cell = 0;
+  for (GoPoint p : BoardPoints(board_.board_size())) {
+    int color_val = static_cast<int>(board_.PointColor(p));
+    (*values)[num_cells * color_val + cell] = 1.0;
+    ++cell;
+  }
+  SPIEL_CHECK_EQ(cell, num_cells);
+
+  // Add a fourth binary plane for komi (whether white is to play).
+  std::fill(values->begin() + (CellStates() * num_cells), values->end(),
+            (to_play_ == GoColor::kWhite ? 1.0 : 0.0));
+}
+
+std::vector<Action> GoState::LegalActions() const {
+  std::vector<Action> actions{};
   for (GoPoint p : BoardPoints(board_.board_size())) {
     if (board_.IsLegalMove(p, to_play_)) {
       actions.push_back(p);
     }
   }
-
+  actions.push_back(kPass);
   return actions;
 }
 

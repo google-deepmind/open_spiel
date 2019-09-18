@@ -106,6 +106,7 @@ std::vector<Action> ChessState::LegalActions() const {
     actions.push_back(MoveToAction(move));
     return true;
   });
+  std::sort(actions.begin(), actions.end());
   return actions;
 }
 
