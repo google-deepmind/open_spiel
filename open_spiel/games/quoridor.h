@@ -38,7 +38,7 @@ constexpr int kMaxBoardSize = 25;
 constexpr int kMaxGameLengthFactor = 4;
 constexpr int kCellStates = 1 + kNumPlayers;
 
-enum Player : uint8_t {
+enum QuoridorPlayer : uint8_t {
   kPlayer1,
   kPlayer2,
   kPlayerWall,
@@ -89,17 +89,17 @@ class QuoridorState : public State {
 
   QuoridorState(const QuoridorState&) = default;
 
-  int CurrentPlayer() const override {
+  Player CurrentPlayer() const override {
     return IsTerminal() ? kTerminalPlayerId : static_cast<int>(current_player_);
   }
-  std::string ActionToString(int player, Action action_id) const override;
+  std::string ActionToString(Player player, Action action_id) const override;
   std::string ToString() const override;
   bool IsTerminal() const override { return outcome_ != kPlayerNone; }
   std::vector<double> Returns() const override;
-  std::string InformationState(int player) const override;
-  std::string Observation(int player) const override;
+  std::string InformationState(Player player) const override;
+  std::string Observation(Player player) const override;
   void ObservationAsNormalizedVector(
-      int player, std::vector<double>* values) const override;
+      Player player, std::vector<double>* values) const override;
   std::unique_ptr<State> Clone() const override;
   std::vector<Action> LegalActions() const override;
 
@@ -113,10 +113,10 @@ class QuoridorState : public State {
   bool IsWall(Move m) const {
     return m.IsValid() ? board_[m.xy] == kPlayerWall : true;
   }
-  Player GetPlayer(Move m) const {
+  QuoridorPlayer GetPlayer(Move m) const {
     return m.IsValid() ? board_[m.xy] : kPlayerWall;
   }
-  void SetPlayer(Move m, Player p, Player old) {
+  void SetPlayer(Move m, QuoridorPlayer p, Player old) {
     SPIEL_CHECK_TRUE(m.IsValid());
     SPIEL_CHECK_EQ(board_[m.xy], old);
     board_[m.xy] = p;
@@ -127,15 +127,17 @@ class QuoridorState : public State {
   class SearchQueue;  // Hide the details in the CC, aka: C++ pimpl.
   void AddActions(Move cur, Offset offset, std::vector<Action> *moves) const;
   bool IsValidWall(Move m, SearchQueue*) const;
-  bool SearchEndZone(Player p, Move wall1, Move wall2, SearchQueue*) const;
-  void SearchShortestPath(Player p, SearchQueue* search_queue) const;
+  bool SearchEndZone(QuoridorPlayer p, Move wall1, Move wall2,
+                     SearchQueue*) const;
+  void SearchShortestPath(QuoridorPlayer p, SearchQueue* search_queue) const;
 
-  std::vector<Player> board_;
+  std::vector<QuoridorPlayer> board_;
+
   int wall_count_[kNumPlayers];
   int end_zone_[kNumPlayers];
   Move player_loc_[kNumPlayers];
-  Player current_player_ = kPlayer1;
-  Player outcome_ = kPlayerNone;
+  QuoridorPlayer current_player_ = kPlayer1;
+  QuoridorPlayer outcome_ = kPlayerNone;
   int moves_made_ = 0;
   const int board_size_;
   const int board_diameter_;

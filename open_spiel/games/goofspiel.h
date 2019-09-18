@@ -65,19 +65,19 @@ class GoofspielState : public SimMoveState {
                           int num_cards, PointsOrder points_order,
                           bool impinfo);
 
-  int CurrentPlayer() const override;
-  std::string ActionToString(int player, Action action_id) const override;
+  Player CurrentPlayer() const override;
+  std::string ActionToString(Player player, Action action_id) const override;
   std::string ToString() const override;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
-  std::string InformationState(int player) const override;
+  std::string InformationState(Player player) const override;
 
   void InformationStateAsNormalizedVector(
-      int player, std::vector<double>* values) const override;
+      Player player, std::vector<double>* values) const override;
   std::unique_ptr<State> Clone() const override;
   std::vector<std::pair<Action, double>> ChanceOutcomes() const override;
 
-  std::vector<Action> LegalActions(int player) const override;
+  std::vector<Action> LegalActions(Player player) const override;
 
  protected:
   void DoApplyAction(Action action_id) override;
@@ -88,7 +88,7 @@ class GoofspielState : public SimMoveState {
   PointsOrder points_order_;
   bool impinfo_;
 
-  int current_player_;
+  Player current_player_;
   std::set<int> winners_;
   int turns_;
   int point_card_index_;

@@ -266,7 +266,7 @@ bool QuoridorState::IsValidWall(Move m, SearchQueue* search_queue) const {
           SearchEndZone(kPlayer2, m, m + offset * 2, search_queue));
 }
 
-bool QuoridorState::SearchEndZone(Player p, Move wall1, Move wall2,
+bool QuoridorState::SearchEndZone(QuoridorPlayer p, Move wall1, Move wall2,
                                   SearchQueue* search_queue) const {
   search_queue->ResetQueue();
   Offset dir(1, 0);  // Direction is arbitrary. Queue will make it fast.
@@ -291,7 +291,7 @@ bool QuoridorState::SearchEndZone(Player p, Move wall1, Move wall2,
   return false;
 }
 
-void QuoridorState::SearchShortestPath(Player p,
+void QuoridorState::SearchShortestPath(QuoridorPlayer p,
                                        SearchQueue* search_queue) const {
   search_queue->ResetQueue();
   search_queue->ResetDists();
@@ -345,7 +345,8 @@ void QuoridorState::SearchShortestPath(Player p,
   }
 }
 
-std::string QuoridorState::ActionToString(int player, Action action_id) const {
+std::string QuoridorState::ActionToString(Player player,
+                                          Action action_id) const {
   return ActionToMove(action_id).ToString();
 }
 
@@ -394,7 +395,7 @@ std::string QuoridorState::ToString() const {
     }
 
     for (int x = 0; x < board_diameter_; ++x) {
-      Player p = GetPlayer(GetMove(x, y));
+      QuoridorPlayer p = GetPlayer(GetMove(x, y));
       if (x % 2 == 0 && y % 2 == 0) {
         out << (p == kPlayer1 ? white : p == kPlayer2 ? black : " . ");
       } else if (x % 2 == 1 && y % 2 == 1) {
@@ -417,18 +418,18 @@ std::vector<double> QuoridorState::Returns() const {
   return {0, 0};  // Unfinished
 }
 
-std::string QuoridorState::InformationState(int player) const {
+std::string QuoridorState::InformationState(Player player) const {
   return HistoryString();
 }
 
-std::string QuoridorState::Observation(int player) const {
+std::string QuoridorState::Observation(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   return ToString();
 }
 
 void QuoridorState::ObservationAsNormalizedVector(
-    int player, std::vector<double>* values) const {
+    Player player, std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 

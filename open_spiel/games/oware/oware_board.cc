@@ -18,11 +18,11 @@ namespace open_spiel {
 namespace oware {
 
 OwareBoard::OwareBoard(int num_houses_per_player, int num_seeds_per_house)
-    : current_player(0),
+    : current_player(Player{0}),
       score(kNumPlayers, 0),
       seeds(kNumPlayers * num_houses_per_player, num_seeds_per_house) {}
 
-OwareBoard::OwareBoard(int current_player, const std::vector<int>& score,
+OwareBoard::OwareBoard(Player current_player, const std::vector<int>& score,
                        const std::vector<int>& seeds)
     : current_player(current_player), score(score), seeds(seeds) {
   SPIEL_CHECK_EQ(score.size(), kNumPlayers);

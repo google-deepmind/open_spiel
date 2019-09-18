@@ -93,7 +93,7 @@ constexpr int Level(Action bid) { return 1 + (bid - 1) / kNumDenominations; }
 constexpr char kRankChar[] = "23456789TJQKA";
 constexpr char kSuitChar[] = "CDHSN";
 
-std::string UncontestedBiddingState::ActionToString(int player,
+std::string UncontestedBiddingState::ActionToString(Player player,
                                                     Action action_id) const {
   if (player == kChancePlayerId) return "Deal";
   if (action_id == kPass) return "Pass";
@@ -169,14 +169,14 @@ std::string UncontestedBiddingState::AuctionString() const {
   return actions;
 }
 
-std::string UncontestedBiddingState::InformationState(int player) const {
+std::string UncontestedBiddingState::InformationState(Player player) const {
   if (!dealt_) return "";
   return absl::StrCat(deal_.HandString(player * 13, (player + 1) * 13), " ",
                       AuctionString());
 }
 
 void UncontestedBiddingState::InformationStateAsNormalizedVector(
-    int player, std::vector<double>* values) const {
+    Player player, std::vector<double>* values) const {
   values->resize(kStateSize);
   std::fill(values->begin(), values->end(), 0.);
   auto ptr = values->begin();
@@ -234,7 +234,7 @@ void UncontestedBiddingState::ScoreDeal() {
 
   // Populate East-West cards
   ddTableDeal dd_table_deal{};
-  for (int player = 0; player < kNumPlayers; ++player) {
+  for (Player player = 0; player < kNumPlayers; ++player) {
     for (int i = kNumCardsPerHand * player; i < kNumCardsPerHand * (1 + player);
          ++i) {
       dd_table_deal.cards[player * 2][deal_.Suit(i)] += 1
@@ -380,7 +380,7 @@ std::unique_ptr<State> UncontestedBiddingGame::DeserializeState(
                  kNumPlayers * (kNumCardsPerHand + kNumSuits) - 1);
   std::array<int, kNumCards> cards{};
   std::array<int, kNumCards> cards_dealt{};
-  for (int player = 0; player < kNumPlayers; ++player) {
+  for (Player player = 0; player < kNumPlayers; ++player) {
     int suit = 0;
     int start = player * (kNumCardsPerHand + kNumSuits);
     for (int i = 0; i < kNumCardsPerHand; ++i) {

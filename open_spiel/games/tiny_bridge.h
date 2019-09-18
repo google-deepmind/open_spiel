@@ -128,18 +128,18 @@ class TinyBridgeAuctionState : public State {
       : State(num_distinct_actions, num_players) {}
   TinyBridgeAuctionState(const TinyBridgeAuctionState&) = default;
 
-  int CurrentPlayer() const override;
+  Player CurrentPlayer() const override;
   std::vector<Action> LegalActions() const override;
-  std::string ActionToString(int player, Action action_id) const override;
+  std::string ActionToString(Player player, Action action_id) const override;
   std::string ToString() const override;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
-  std::string InformationState(int player) const override;
+  std::string InformationState(Player player) const override;
   std::unique_ptr<State> Clone() const override;
-  void UndoAction(int player, Action action) override;
+  void UndoAction(Player player, Action action) override;
   std::vector<std::pair<Action, double>> ChanceOutcomes() const override;
   std::string AuctionString() const;
-  std::string HandString(int player) const;
+  std::string HandString(Player player) const;
   std::string DealString() const;
 
  protected:
@@ -173,14 +173,14 @@ class TinyBridgePlayState : public State {
         holder_(holder) {}
   TinyBridgePlayState(const TinyBridgePlayState&) = default;
 
-  int CurrentPlayer() const { return CurrentHand() % 2; }
+  Player CurrentPlayer() const { return CurrentHand() % 2; }
   int CurrentHand() const;
 
-  std::string ActionToString(int player, Action action_id) const override;
+  std::string ActionToString(Player player, Action action_id) const override;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
   std::unique_ptr<State> Clone() const override;
-  void UndoAction(int player, Action action) override;
+  void UndoAction(Player player, Action action) override;
   std::string ToString() const override;
   std::vector<Action> LegalActions() const override;
 

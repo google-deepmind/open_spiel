@@ -64,19 +64,19 @@ class CatchState : public State {
   CatchState(const CatchGame& parent_game);
   CatchState(const CatchState&) = default;
 
-  int CurrentPlayer() const override;
-  std::string ActionToString(int player, Action action_id) const override;
+  Player CurrentPlayer() const override;
+  std::string ActionToString(Player player, Action action_id) const override;
   std::string ToString() const override;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
-  std::string InformationState(int player) const override;
-  std::string Observation(int player) const override;
+  std::string InformationState(Player player) const override;
+  std::string Observation(Player player) const override;
   void ObservationAsNormalizedVector(
-      int player, std::vector<double>* values) const override;
+      Player player, std::vector<double>* values) const override;
   void InformationStateAsNormalizedVector(
-      int player, std::vector<double>* values) const override;
+      Player player, std::vector<double>* values) const override;
   std::unique_ptr<State> Clone() const override;
-  void UndoAction(int player, Action move) override;
+  void UndoAction(Player player, Action move) override;
   std::vector<Action> LegalActions() const override;
   ActionsAndProbs ChanceOutcomes() const override;
   CellState BoardAt(int row, int column) const;

@@ -45,7 +45,7 @@ void TestGameTree() {
 
   for (const auto& game_name : game_names) {
     std::unique_ptr<Game> game = LoadGame(game_name);
-    for (int player_id : {0, 1}) {
+    for (Player player_id : {Player{0}, Player{1}}) {
       HistoryTree tree(game->NewInitialState(), player_id);
       if (tree.NumHistories() != num_histories[game_name]) {
         // TODO(b/126764761): Replace calls to SpielFatalError with more
@@ -131,10 +131,10 @@ void TestInfoSetsHaveRightNumberOfGameStates() {
   std::unique_ptr<Game> game = LoadGame("kuhn_poker");
   std::unique_ptr<State> state = game->NewInitialState();
   TabularPolicy policy = GetUniformPolicy(*game);
-  int best_responder_id = 0;
-  HistoryTree tree(game->NewInitialState(), best_responder_id);
-  auto infosets = GetAllInfoSets(game->NewInitialState(), best_responder_id,
-                                 &policy, &tree);
+  auto best_responder = Player{0};
+  HistoryTree tree(game->NewInitialState(), best_responder);
+  auto infosets =
+      GetAllInfoSets(game->NewInitialState(), best_responder, &policy, &tree);
   for (const auto& kv : infosets) {
     const std::string& infostate = kv.first;
     const std::vector<std::pair<HistoryNode*, double>>& histories = kv.second;
@@ -162,10 +162,10 @@ void TestGetAllInfoSetsMatchesInfoStates() {
   std::unique_ptr<Game> game = LoadGame("kuhn_poker");
   std::unique_ptr<State> state = game->NewInitialState();
   TabularPolicy policy = GetUniformPolicy(*game);
-  for (const auto& best_responder_id : {0, 1}) {
-    HistoryTree tree(game->NewInitialState(), best_responder_id);
-    auto infosets = GetAllInfoSets(game->NewInitialState(), best_responder_id,
-                                   &policy, &tree);
+  for (const auto& best_responder : {Player{0}, Player{1}}) {
+    HistoryTree tree(game->NewInitialState(), best_responder);
+    auto infosets =
+        GetAllInfoSets(game->NewInitialState(), best_responder, &policy, &tree);
     for (const auto& kv : infosets) {
       const std::string& infostate = kv.first;
       for (const auto& state_and_prob : kv.second) {
@@ -179,7 +179,7 @@ void TestGetAllInfoSetsMatchesInfoStates() {
         }
         State* node_state = node->GetState();
         std::string state_infostate =
-            node_state->InformationState(best_responder_id);
+            node_state->InformationState(best_responder);
         if (node_infostate != state_infostate) {
           SpielFatalError(
               absl::StrCat("infostate stored in node (", node_infostate, ") ",
@@ -187,18 +187,18 @@ void TestGetAllInfoSetsMatchesInfoStates() {
                            "stored in node (", state_infostate, ")."));
         }
         if (node->GetType() == StateType::kDecision) {
-          if (node_state->CurrentPlayer() != best_responder_id) {
+          if (node_state->CurrentPlayer() != best_responder) {
             SpielFatalError(
                 absl::StrCat("CurrentPlayer for state stored in node (",
                              node_state->CurrentPlayer(), ") does not match ",
-                             "best_responder_id (", best_responder_id, ")."));
+                             "best_responder (", best_responder, ")."));
           }
         } else if (node->GetType() == StateType::kDecision) {
-          if (node_state->CurrentPlayer() == best_responder_id) {
+          if (node_state->CurrentPlayer() == best_responder) {
             SpielFatalError(absl::StrCat(
                 "CurrentPlayer for state stored in node (",
-                node_state->CurrentPlayer(), ") matches best_responder_id (",
-                best_responder_id, ") but has type kDecision."));
+                node_state->CurrentPlayer(), ") matches best_responder (",
+                best_responder, ") but has type kDecision."));
           }
         }
         std::vector<Action> child_actions_vector = node->GetChildActions();
@@ -217,9 +217,9 @@ void TestGetAllInfoSetsMatchesInfoStates() {
             SpielFatalError("Legal action found that's not a child action.");
           }
           std::unique_ptr<State> child = node_state->Child(legal_action);
-          HistoryNode child_node = HistoryNode(0, std::move(child));
+          HistoryNode child_node = HistoryNode(Player{0}, std::move(child));
           if (node->GetType() != StateType::kChance) {
-            int child_player = child_node.GetState()->CurrentPlayer();
+            Player child_player = child_node.GetState()->CurrentPlayer();
             if (node_state->CurrentPlayer() == child_player) {
               SpielFatalError(absl::StrCat(
                   "Child and parent have the same current player (",
@@ -241,13 +241,13 @@ void TestHistoryTreeIsSubsetOfGetAllInfoSets() {
   std::unique_ptr<Game> game = LoadGame("kuhn_poker");
   std::unique_ptr<State> state = game->NewInitialState();
   TabularPolicy policy = GetUniformPolicy(*game);
-  for (const auto& best_responder_id : {0, 1}) {
-    HistoryTree tree(game->NewInitialState(), best_responder_id);
-    auto infosets = GetAllInfoSets(game->NewInitialState(), best_responder_id,
-                                   &policy, &tree);
+  for (const auto& best_responder : {Player{0}, Player{1}}) {
+    HistoryTree tree(game->NewInitialState(), best_responder);
+    auto infosets =
+        GetAllInfoSets(game->NewInitialState(), best_responder, &policy, &tree);
     for (const auto& history : tree.GetHistories()) {
       HistoryNode* node = tree.GetByHistory(history);
-      if (node->GetState()->CurrentPlayer() == best_responder_id &&
+      if (node->GetState()->CurrentPlayer() == best_responder &&
           node->GetType() != StateType::kTerminal &&
           infosets.count(node->GetInfoState()) == 0) {
         SpielFatalError(absl::StrCat("Infoset ", node->GetInfoState(),
@@ -260,14 +260,14 @@ void TestHistoryTreeIsSubsetOfGetAllInfoSets() {
 // This is a common test that we want to make. We want to validate the
 // counter-factual probabilities produced by this implementation against the
 // golden values produced by existing implementations.
-// best_responder_id is the player from who's view the infostate strings are
+// best_responder is the player from who's view the infostate strings are
 // calculated from, and represents the player for whom we are calculating a
 // best response as. It can be any value in the range [0, game.NumPlayers()).
 void CheckCounterFactualProbs(
     const Game& game, const TabularPolicy& policy,
     const std::unordered_map<std::string, double>& histories_and_probs,
-    int best_responder_id) {
-  HistoryTree tree(game.NewInitialState(), best_responder_id);
+    Player best_responder) {
+  HistoryTree tree(game.NewInitialState(), best_responder);
 
   // Infosets maps infostate strings to a list of all histories that map to that
   // same infostate, along with corresponding counter-factual reach
@@ -282,11 +282,11 @@ void CheckCounterFactualProbs(
   //   probability by the probability that player makes that decision (taken
   //   here from their policy).
   // Infostate strings here are assumed to be those that are returned from
-  // open_spiel::State::InformationState(best_responder_id), which are
+  // open_spiel::State::InformationState(best_responder), which are
   // equivalent to those returned by HistoryNode::GetInfoState.
   std::unordered_map<std::string, std::vector<std::pair<HistoryNode*, double>>>
-      infosets = GetAllInfoSets(game.NewInitialState(), best_responder_id,
-                                &policy, &tree);
+      infosets = GetAllInfoSets(game.NewInitialState(), best_responder, &policy,
+                                &tree);
 
   // We check this for every infoset in the game.
   for (const auto& infoset : infosets) {
@@ -299,7 +299,7 @@ void CheckCounterFactualProbs(
       // failures (as the probability would be wrong at a different decision
       // node iff the probability is wrong at a decision node where the best
       // responder is playing).
-      if (node->GetState()->CurrentPlayer() != best_responder_id) continue;
+      if (node->GetState()->CurrentPlayer() != best_responder) continue;
       double prob = state_and_prob.second;
       auto it = histories_and_probs.find(node->GetHistory());
       if (it == histories_and_probs.end())
@@ -330,7 +330,7 @@ void TestGetAllInfoSetsHasRightCounterFactualProbsUniformPolicyPid0() {
   std::unique_ptr<Game> game = LoadGame("kuhn_poker");
   TabularPolicy policy = GetUniformPolicy(*game);
   CheckCounterFactualProbs(*game, policy, histories_and_probs,
-                           /*best_responder_id=*/0);
+                           /*best_responder=*/Player{0});
 }
 
 // Verifies that GetAllInfoSets returns the correct counter-factual
@@ -347,7 +347,7 @@ void TestGetAllInfoSetsHasRightCounterFactualProbsUniformPolicyPid1() {
   std::unique_ptr<Game> game = LoadGame("kuhn_poker");
   TabularPolicy policy = GetUniformPolicy(*game);
   CheckCounterFactualProbs(*game, policy, histories_and_probs,
-                           /*best_responder_id=*/1);
+                           /*best_responder=*/Player{1});
 }
 
 // Verifies that GetAllInfoSets returns the correct counter-factual
@@ -366,7 +366,7 @@ void TestGetAllInfoSetsHasRightCounterFactualProbsAlwaysFoldPid0() {
   std::unique_ptr<Game> game = LoadGame("kuhn_poker");
   TabularPolicy policy = GetFirstActionPolicy(*game);
   CheckCounterFactualProbs(*game, policy, histories_and_probs,
-                           /*best_responder_id=*/0);
+                           /*best_responder=*/Player{0});
 }
 
 // Verifies that GetAllInfoSets returns the correct counter-factual
@@ -383,7 +383,7 @@ void TestGetAllInfoSetsHasRightCounterFactualProbsAlwaysFoldPid1() {
   std::unique_ptr<Game> game = LoadGame("kuhn_poker");
   TabularPolicy policy = GetFirstActionPolicy(*game);
   CheckCounterFactualProbs(*game, policy, histories_and_probs,
-                           /*best_responder_id=*/1);
+                           /*best_responder=*/Player{1});
 }
 
 // The optimal Kuhn policy is taken directly from the Python implementation in
@@ -426,7 +426,7 @@ void TestGetAllInfoSetsHasRightCounterFactualProbsOptimalPid0() {
   std::unique_ptr<Game> game = LoadGame("kuhn_poker");
   TabularPolicy policy = GetOptimalKuhnPolicy(/*alpha=*/0.2);
   CheckCounterFactualProbs(*game, policy, histories_and_probs,
-                           /*best_responder_id=*/0);
+                           /*best_responder=*/Player{0});
 }
 
 // Verifies that GetAllInfoSets returns the correct counter-factual
@@ -443,7 +443,7 @@ void TestGetAllInfoSetsHasRightCounterFactualProbsOptimalPid1() {
   std::unique_ptr<Game> game = LoadGame("kuhn_poker");
   TabularPolicy policy = GetOptimalKuhnPolicy(/*alpha=*/0.2);
   CheckCounterFactualProbs(*game, policy, histories_and_probs,
-                           /*best_responder_id=*/1);
+                           /*best_responder=*/Player{1});
 }
 
 }  // namespace

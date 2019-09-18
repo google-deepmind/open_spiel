@@ -39,18 +39,18 @@ class MarkovSoccerState : public SimMoveState {
   explicit MarkovSoccerState(const MarkovSoccerGame& parent_game);
   MarkovSoccerState(const MarkovSoccerState&) = default;
 
-  std::string ActionToString(int player, Action action_id) const override;
+  std::string ActionToString(Player player, Action action_id) const override;
   std::string ToString() const override;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
-  std::string InformationState(int player) const {
+  std::string InformationState(Player player) const {
     SPIEL_CHECK_GE(player, 0);
     SPIEL_CHECK_LT(player, num_players_);
     return ToString();
   }
-  void InformationStateAsNormalizedVector(int player,
+  void InformationStateAsNormalizedVector(Player player,
                                           std::vector<double>* values) const;
-  int CurrentPlayer() const override {
+  Player CurrentPlayer() const override {
     return IsTerminal() ? kTerminalPlayerId : cur_player_;
   }
   std::unique_ptr<State> Clone() const override;
@@ -58,7 +58,7 @@ class MarkovSoccerState : public SimMoveState {
   ActionsAndProbs ChanceOutcomes() const;
 
   void Reset(int horizon);
-  std::vector<Action> LegalActions(int player) const override;
+  std::vector<Action> LegalActions(Player player) const override;
 
  protected:
   void DoApplyAction(Action action_id) override;
@@ -67,7 +67,7 @@ class MarkovSoccerState : public SimMoveState {
  private:
   void SetField(int r, int c, char v);
   char field(int r, int c) const;
-  void ResolveMove(int player, int move);
+  void ResolveMove(Player player, int move);
   bool InBounds(int r, int c) const;
   int observation_plane(int r, int c) const;
 
@@ -75,7 +75,7 @@ class MarkovSoccerState : public SimMoveState {
 
   // Fields set to bad values. Use Game::NewInitialState().
   int winner_ = -1;
-  int cur_player_ = -1;  // Could be chance's turn.
+  Player cur_player_ = -1;  // Could be chance's turn.
   int total_moves_ = -1;
   int horizon_ = -1;
   std::array<int, 2> player_row_ = {{-1, -1}};  // Players' rows.

@@ -52,7 +52,7 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 
 }  // namespace
 
-CellState HexState::PlayerAndActionToState(int player, Action move) const {
+CellState HexState::PlayerAndActionToState(Player player, Action move) const {
   // This function returns the CellState resulting from the given move.
   // The cell state tells us:
   // - The colour of the stone.
@@ -194,7 +194,7 @@ std::vector<Action> HexState::LegalActions() const {
   return moves;
 }
 
-std::string HexState::ActionToString(int player, Action action_id) const {
+std::string HexState::ActionToString(Player player, Action action_id) const {
   // This does not comply with the Hex Text Protocol
   // TODO(author8): Make compliant with HTP
   return absl::StrCat(StateToString(PlayerAndActionToState(player, action_id)),
@@ -250,18 +250,18 @@ std::vector<double> HexState::Returns() const {
   return {result_black_perspective_, -result_black_perspective_};
 }
 
-std::string HexState::InformationState(int player) const {
+std::string HexState::InformationState(Player player) const {
   return HistoryString();
 }
 
-std::string HexState::Observation(int player) const {
+std::string HexState::Observation(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   return ToString();
 }
 
 void HexState::ObservationAsNormalizedVector(
-    int player, std::vector<double>* values) const {
+    Player player, std::vector<double>* values) const {
   // TODO(author8): Make an option to not expose connection info
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);

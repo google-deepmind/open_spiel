@@ -184,7 +184,8 @@ std::vector<Action> HavannahState::LegalActions() const {
   return moves;
 }
 
-std::string HavannahState::ActionToString(int player, Action action_id) const {
+std::string HavannahState::ActionToString(Player player,
+                                          Action action_id) const {
   return ActionToMove(action_id).ToString();
 }
 
@@ -270,18 +271,18 @@ std::vector<double> HavannahState::Returns() const {
   return {0, 0};  // Unfinished
 }
 
-std::string HavannahState::InformationState(int player) const {
+std::string HavannahState::InformationState(Player player) const {
   return HistoryString();
 }
 
-std::string HavannahState::Observation(int player) const {
+std::string HavannahState::Observation(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   return ToString();
 }
 
 void HavannahState::ObservationAsNormalizedVector(
-    int player, std::vector<double>* values) const {
+    Player player, std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 

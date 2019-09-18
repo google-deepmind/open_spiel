@@ -34,14 +34,14 @@ class TurnBasedSimultaneousState : public State {
                              std::unique_ptr<State> state);
   TurnBasedSimultaneousState(const TurnBasedSimultaneousState& other);
 
-  int CurrentPlayer() const override;
-  std::string ActionToString(int player, Action action_id) const override;
+  Player CurrentPlayer() const override;
+  std::string ActionToString(Player player, Action action_id) const override;
   std::string ToString() const override;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
-  std::string InformationState(int player) const override;
+  std::string InformationState(Player player) const override;
   void InformationStateAsNormalizedVector(
-      int player, std::vector<double>* values) const override;
+      Player player, std::vector<double>* values) const override;
   std::unique_ptr<State> Clone() const override;
   std::vector<std::pair<Action, double>> ChanceOutcomes() const override;
 
@@ -64,7 +64,7 @@ class TurnBasedSimultaneousState : public State {
   std::vector<Action> action_vector_;
 
   // The current player (which will never be kSimultaneousPlayerId).
-  int current_player_;
+  Player current_player_;
 
   // Are we currently rolling out a simultaneous move node?
   bool rollout_mode_;

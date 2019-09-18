@@ -217,7 +217,7 @@ std::vector<Action> LeducState::LegalActions() const {
   return movelist;
 }
 
-std::string LeducState::ActionToString(int player, Action move) const {
+std::string LeducState::ActionToString(Player player, Action move) const {
   if (player == kChancePlayerId)
     return absl::StrCat("Chance outcome:", move);
   else if (move == ActionType::kFold)
@@ -238,11 +238,11 @@ std::string LeducState::ToString() const {
 
   absl::StrAppend(&result, "Round: ", round_, "\nPlayer: ", cur_player_,
                   "\nPot: ", pot_, "\nMoney (p1 p2 ...):");
-  for (int p = 0; p < num_players_; p++) {
+  for (auto p = Player{0}; p < num_players_; p++) {
     absl::StrAppend(&result, " ", money_[p]);
   }
   absl::StrAppend(&result, "\nCards (public p1 p2 ...): ", public_card_, " ");
-  for (int player_index = 0; player_index < num_players_; player_index++) {
+  for (Player player_index = 0; player_index < num_players_; player_index++) {
     absl::StrAppend(&result, private_cards_[player_index], " ");
   }
 
@@ -267,7 +267,7 @@ std::vector<double> LeducState::Returns() const {
   }
 
   std::vector<double> returns(num_players_);
-  for (int player = 0; player < num_players_; ++player) {
+  for (auto player = Player{0}; player < num_players_; ++player) {
     // Money vs money at start.
     returns[player] = money_[player] - kStartingMoney;
   }
@@ -276,7 +276,7 @@ std::vector<double> LeducState::Returns() const {
 }
 
 // Information state is card then bets.
-std::string LeducState::InformationState(int player) const {
+std::string LeducState::InformationState(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   // TODO(author1): Fix typos in InformationState string.
@@ -289,14 +289,14 @@ std::string LeducState::InformationState(int player) const {
 }
 
 // Observation is card then contribution of each players to the pot.
-std::string LeducState::Observation(int player) const {
+std::string LeducState::Observation(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   std::string result;
 
   absl::StrAppend(&result, "[Round ", round_, "][Player: ", cur_player_,
                   "][Pot: ", pot_, "][Money:");
-  for (int p = 0; p < num_players_; p++) {
+  for (auto p = Player{0}; p < num_players_; p++) {
     absl::StrAppend(&result, " ", money_[p]);
   }
   // Add the player's private cards
@@ -305,7 +305,7 @@ std::string LeducState::Observation(int player) const {
   }
   // Adding the contribution of each players to the pot
   absl::StrAppend(&result, "[Ante:");
-  for (int p = 0; p < num_players_; p++) {
+  for (auto p = Player{0}; p < num_players_; p++) {
     absl::StrAppend(&result, " ", ante_[p]);
   }
   absl::StrAppend(&result, "]");
@@ -314,7 +314,7 @@ std::string LeducState::Observation(int player) const {
 }
 
 void LeducState::InformationStateAsNormalizedVector(
-    int player, std::vector<double>* values) const {
+    Player player, std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
@@ -371,7 +371,7 @@ void LeducState::InformationStateAsNormalizedVector(
 }
 
 void LeducState::ObservationAsNormalizedVector(
-    int player, std::vector<double>* values) const {
+    Player player, std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
@@ -400,7 +400,7 @@ void LeducState::ObservationAsNormalizedVector(
   }
   offset += deck_.size();
   // Adding the contribution of each players to the pot.
-  for (int p = 0; p < num_players_; p++) {
+  for (auto p = Player{0}; p < num_players_; p++) {
     (*values)[offset + p] = ante_[p];
   }
 }
@@ -431,7 +431,7 @@ int LeducState::NextPlayer() const {
   }
   // Go to the next player who's still in.
   for (int i = 1; i < num_players_; ++i) {
-    int player = (current_real_player + i) % num_players_;
+    Player player = (current_real_player + i) % num_players_;
 
     SPIEL_CHECK_TRUE(player >= 0);
     SPIEL_CHECK_TRUE(player < num_players_);
@@ -443,7 +443,7 @@ int LeducState::NextPlayer() const {
   SpielFatalError("Error in LeducState::NextPlayer(), should not get here.");
 }
 
-int LeducState::RankHand(int player) const {
+int LeducState::RankHand(Player player) const {
   int hand[] = {public_card_, private_cards_[player]};
   // Put the lower card in slot 0, the higher in slot 1.
   if (hand[0] > hand[1]) {
@@ -470,7 +470,7 @@ void LeducState::ResolveWinner() {
 
   if (remaining_players_ == 1) {
     // Only one left in? They get the pot!
-    for (int player_index = 0; player_index < num_players_; player_index++) {
+    for (Player player_index = 0; player_index < num_players_; player_index++) {
       if (!folded_[player_index]) {
         num_winners_ = 1;
         winner_[player_index] = true;
@@ -488,7 +488,7 @@ void LeducState::ResolveWinner() {
     num_winners_ = 0;
     std::fill(winner_.begin(), winner_.end(), false);
 
-    for (int player_index = 0; player_index < num_players_; player_index++) {
+    for (Player player_index = 0; player_index < num_players_; player_index++) {
       if (!folded_[player_index]) {
         int rank = RankHand(player_index);
         if (rank > best_hand_rank) {
@@ -507,7 +507,7 @@ void LeducState::ResolveWinner() {
 
     // Split the pot among the winners (possibly only one).
     SPIEL_CHECK_TRUE(1 <= num_winners_ && num_winners_ <= num_players_);
-    for (int player_index = 0; player_index < num_players_; player_index++) {
+    for (Player player_index = 0; player_index < num_players_; player_index++) {
       if (winner_[player_index]) {
         // Give this player their share.
         money_[player_index] += static_cast<double>(pot_) / num_winners_;
@@ -539,7 +539,7 @@ void LeducState::SequenceAppendMove(int move) {
   }
 }
 
-void LeducState::Ante(int player, int amount) {
+void LeducState::Ante(Player player, int amount) {
   pot_ += amount;
   ante_[player] += amount;
   money_[player] -= amount;

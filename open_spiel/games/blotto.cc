@@ -77,7 +77,7 @@ void BlottoState::DoApplyActions(const std::vector<Action>& actions) {
     int winner = 0;
     int max_value = -1;
 
-    for (int p = 0; p < num_players_; ++p) {
+    for (auto p = Player{0}; p < num_players_; ++p) {
       // Get the expanded action if necessary.
       if (p >= player_actions.size()) {
         player_actions.push_back(action_map_->at(joint_action_[p]));
@@ -101,7 +101,7 @@ void BlottoState::DoApplyActions(const std::vector<Action>& actions) {
   // Find the global winner(s).
   std::set<int> winners;
   int max_points = 0;
-  for (int p = 0; p < num_players_; ++p) {
+  for (auto p = Player{0}; p < num_players_; ++p) {
     if (scores[p] > max_points) {
       max_points = scores[p];
       winners = {p};
@@ -112,7 +112,7 @@ void BlottoState::DoApplyActions(const std::vector<Action>& actions) {
 
   // Finally, assign returns. Each winner gets 1/num_winners, each loser gets
   // -1 / num_losers.
-  for (int p = 0; p < num_players_; ++p) {
+  for (auto p = Player{0}; p < num_players_; ++p) {
     if (winners.size() == num_players_) {
       // All players won same number of fields. Draw.
       returns_[p] = 0;
@@ -126,11 +126,11 @@ void BlottoState::DoApplyActions(const std::vector<Action>& actions) {
   }
 }
 
-std::vector<Action> BlottoState::LegalActions(int player) const {
+std::vector<Action> BlottoState::LegalActions(Player player) const {
   return (*legal_actions_);
 }
 
-std::string BlottoState::ActionToString(int player, Action move_id) const {
+std::string BlottoState::ActionToString(Player player, Action move_id) const {
   return "[" + absl::StrJoin(action_map_->at(move_id), ",") + "]";
 }
 

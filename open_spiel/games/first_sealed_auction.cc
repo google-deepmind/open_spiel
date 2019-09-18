@@ -69,7 +69,7 @@ int FPSBAState::CurrentPlayer() const {
 std::vector<Action> FPSBAState::EligibleWinners() const {
   int max_bid = *std::max_element(bids_.begin(), bids_.end());
   std::vector<Action> eligibles;
-  for (int player = 0; player < num_players_; player++) {
+  for (auto player = Player{0}; player < num_players_; player++) {
     if (bids_[player] == max_bid) {
       eligibles.push_back(player);
     }
@@ -94,7 +94,7 @@ std::vector<Action> FPSBAState::LegalActions() const {
   return {};
 }
 
-std::string FPSBAState::ActionToString(int player, Action action_id) const {
+std::string FPSBAState::ActionToString(Player player, Action action_id) const {
   if (player != kChancePlayerId) {
     return absl::StrCat("Player ", player, " bid: ", action_id);
   } else if (valuations_.size() < num_players_) {
@@ -137,7 +137,7 @@ void FPSBAState::DoApplyAction(Action action_id) {
   }
 }
 
-std::string FPSBAState::InformationState(int player) const {
+std::string FPSBAState::InformationState(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   if (valuations_.size() <= player) return absl::StrCat("p", player);
@@ -148,7 +148,7 @@ std::string FPSBAState::InformationState(int player) const {
 }
 
 void FPSBAState::InformationStateAsNormalizedVector(
-    int player, std::vector<double>* values) const {
+    Player player, std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   values->resize(2 * max_value_ + num_players_);
@@ -167,7 +167,7 @@ void FPSBAState::InformationStateAsNormalizedVector(
   SPIEL_CHECK_EQ(cursor - values->begin(), values->size());
 }
 
-std::string FPSBAState::Observation(int player) const {
+std::string FPSBAState::Observation(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   if (valuations_.size() <= player) return "";
@@ -175,7 +175,7 @@ std::string FPSBAState::Observation(int player) const {
 }
 
 void FPSBAState::ObservationAsNormalizedVector(
-    int player, std::vector<double>* values) const {
+    Player player, std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   values->resize(max_value_);
@@ -194,7 +194,7 @@ ActionsAndProbs FPSBAState::ChanceOutcomes() const {
   } else if (bids_.size() == num_players_ && winner_ == kInvalidPlayer) {
     int max_bid = *std::max_element(bids_.begin(), bids_.end());
     int num_tie = std::count(bids_.begin(), bids_.end(), max_bid);
-    for (int player = 0; player < num_players_; player++) {
+    for (auto player = Player{0}; player < num_players_; player++) {
       if (bids_[player] == max_bid) {
         valuesAndProbs.push_back(std::make_pair(player, 1. / num_tie));
       }

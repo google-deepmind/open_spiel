@@ -81,6 +81,7 @@ std::string SpielStrCat(Args&&... args) {
 
 }  // namespace internal
 
+using Player = int;
 using Action = int64_t;
 
 // Floating point comparisons use this as a multiplier on the larger of the two
@@ -113,10 +114,10 @@ void UnrankActionMixedBase(Action action, const std::vector<int>& bases,
                            std::vector<int>* digits);
 
 // Helper function to determine the next player in a round robin.
-int NextPlayerRoundRobin(int player, int nplayers);
+int NextPlayerRoundRobin(Player player, int nplayers);
 
 // Helper function to determine the previous player in a round robin.
-int PreviousPlayerRoundRobin(int player, int nplayers);
+int PreviousPlayerRoundRobin(Player player, int nplayers);
 
 // Returns whether the absolute difference between floating point values a and
 // b is less than or equal to FloatingPointThresholdRatio() * max(|a|, |b|).

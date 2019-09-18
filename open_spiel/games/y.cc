@@ -142,7 +142,7 @@ std::vector<Action> YState::LegalActions() const {
   return moves;
 }
 
-std::string YState::ActionToString(int player, Action action_id) const {
+std::string YState::ActionToString(Player player, Action action_id) const {
   return ActionToMove(action_id).ToString();
 }
 
@@ -224,17 +224,17 @@ std::vector<double> YState::Returns() const {
   return {0, 0};  // Unfinished
 }
 
-std::string YState::InformationState(int player) const {
+std::string YState::InformationState(Player player) const {
   return HistoryString();
 }
 
-std::string YState::Observation(int player) const {
+std::string YState::Observation(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   return ToString();
 }
 
-void YState::ObservationAsNormalizedVector(int player,
+void YState::ObservationAsNormalizedVector(Player player,
                                            std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);

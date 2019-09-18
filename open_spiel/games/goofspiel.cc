@@ -85,7 +85,7 @@ GoofspielState::GoofspielState(int num_distinct_actions, int num_players,
 
   // Player hands.
   player_hands_.clear();
-  for (int p = 0; p < num_players_; ++p) {
+  for (auto p = Player{0}; p < num_players_; ++p) {
     std::vector<bool> hand(num_cards_, true);
     player_hands_.push_back(hand);
   }
@@ -127,7 +127,7 @@ void GoofspielState::DoApplyAction(Action action_id) {
 void GoofspielState::DoApplyActions(const std::vector<Action>& actions) {
   // Check the actions are valid.
   SPIEL_CHECK_EQ(actions.size(), num_players_);
-  for (int p = 0; p < num_players_; ++p) {
+  for (auto p = Player{0}; p < num_players_; ++p) {
     const int action = actions[p];
     SPIEL_CHECK_GE(action, 0);
     SPIEL_CHECK_LT(action, num_cards_);
@@ -162,7 +162,7 @@ void GoofspielState::DoApplyActions(const std::vector<Action>& actions) {
   actions_history_.push_back(actions);
 
   // Remove the cards from the player's hands.
-  for (int p = 0; p < num_players_; ++p) {
+  for (auto p = Player{0}; p < num_players_; ++p) {
     player_hands_[p][actions[p]] = false;
   }
 
@@ -192,7 +192,7 @@ void GoofspielState::DoApplyActions(const std::vector<Action>& actions) {
 
     // Each player plays their last card
     std::vector<Action> actions(num_players_);
-    for (int p = 0; p < num_players_; ++p) {
+    for (auto p = Player{0}; p < num_players_; ++p) {
       auto legal_actions = LegalActions(p);
       SPIEL_CHECK_EQ(legal_actions.size(), 1);
       actions[p] = legal_actions[0];
@@ -201,7 +201,7 @@ void GoofspielState::DoApplyActions(const std::vector<Action>& actions) {
   } else if (turns_ == num_cards_) {
     // Game over - determine winner.
     int max_points = -1;
-    for (int p = 0; p < num_players_; ++p) {
+    for (auto p = Player{0}; p < num_players_; ++p) {
       if (points_[p] > max_points) {
         winners_.clear();
         max_points = points_[p];
@@ -222,7 +222,7 @@ std::vector<std::pair<Action, double>> GoofspielState::ChanceOutcomes() const {
   return outcomes;
 }
 
-std::vector<Action> GoofspielState::LegalActions(int player) const {
+std::vector<Action> GoofspielState::LegalActions(Player player) const {
   if (player == kSimultaneousPlayerId) return LegalFlatJointActions();
   if (player == kChancePlayerId) return LegalChanceOutcomes();
   if (player == kTerminalPlayerId) return std::vector<Action>();
@@ -238,7 +238,8 @@ std::vector<Action> GoofspielState::LegalActions(int player) const {
   return movelist;
 }
 
-std::string GoofspielState::ActionToString(int player, Action action_id) const {
+std::string GoofspielState::ActionToString(Player player,
+                                           Action action_id) const {
   if (player == kSimultaneousPlayerId)
     return FlatJointActionToString(action_id);
   SPIEL_CHECK_GE(action_id, 0);
@@ -252,7 +253,7 @@ std::string GoofspielState::ToString() const {
   std::string points_line = "Points: ";
   std::string result = "";
 
-  for (int p = 0; p < num_players_; ++p) {
+  for (auto p = Player{0}; p < num_players_; ++p) {
     absl::StrAppend(&points_line, points_[p]);
     absl::StrAppend(&points_line, " ");
     absl::StrAppend(&result, "P");
@@ -269,7 +270,7 @@ std::string GoofspielState::ToString() const {
 
   // In imperfect information, the full state depends on both betting sequences
   if (impinfo_) {
-    for (int p = 0; p < num_players_; ++p) {
+    for (auto p = Player{0}; p < num_players_; ++p) {
       absl::StrAppend(&result, "P", p, " actions: ");
       for (int i = 0; i < actions_history_.size(); ++i) {
         absl::StrAppend(&result, actions_history_[i][p]);
@@ -308,7 +309,7 @@ std::vector<double> GoofspielState::Returns() const {
   }
 }
 
-std::string GoofspielState::InformationState(int player) const {
+std::string GoofspielState::InformationState(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
@@ -322,7 +323,7 @@ std::string GoofspielState::InformationState(int player) const {
     // Only know the observing player's action sequence.
     // Know the win-loss outcome of each step.
 
-    for (int p = 0; p < num_players_; ++p) {
+    for (auto p = Player{0}; p < num_players_; ++p) {
       absl::StrAppend(&points_line, points_[p]);
       absl::StrAppend(&points_line, " ");
 
@@ -371,19 +372,19 @@ std::string GoofspielState::InformationState(int player) const {
 }
 
 void GoofspielState::InformationStateAsNormalizedVector(
-    int player, std::vector<double>* values) const {
+    Player player, std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
   values->clear();
 
   // 1-hot vector for the observing player.
-  for (int p = 0; p < num_players_; ++p) {
+  for (auto p = Player{0}; p < num_players_; ++p) {
     values->push_back(p == player ? 1 : 0);
   }
 
   // Point totals: one-hot vector encoding points, per player.
-  for (int p = 0; p < num_players_; ++p) {
+  for (auto p = Player{0}; p < num_players_; ++p) {
     // Cards numbered 1 .. K
     int max_points_slots = (num_cards_ * (num_cards_ + 1)) / 2 + 1;
     for (int i = 0; i < max_points_slots; ++i) {
@@ -399,7 +400,7 @@ void GoofspielState::InformationStateAsNormalizedVector(
 
     // Sequence of who won each trick.
     for (int i = 0; i < win_sequence_.size(); ++i) {
-      for (int p = 0; p < num_players_; ++p) {
+      for (auto p = Player{0}; p < num_players_; ++p) {
         values->push_back(win_sequence_[i] == p ? 1 : 0);
       }
     }
@@ -420,7 +421,7 @@ void GoofspielState::InformationStateAsNormalizedVector(
 
   } else {
     // Bit vectors encoding all players' hands.
-    for (int p = 0; p < num_players_; ++p) {
+    for (auto p = Player{0}; p < num_players_; ++p) {
       for (int c = 0; c < num_cards_; ++c) {
         values->push_back(player_hands_[p][c] ? 1 : 0);
       }

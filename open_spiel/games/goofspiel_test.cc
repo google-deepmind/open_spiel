@@ -29,7 +29,7 @@ void BasicGoofspielTests() {
   testing::LoadGameTest("goofspiel");
   testing::ChanceOutcomesTest(*LoadGame("goofspiel"));
   testing::RandomSimTest(*LoadGame("goofspiel"), 100);
-  for (int players = 3; players <= 5; players++) {
+  for (Player players = 3; players <= 5; players++) {
     testing::RandomSimTest(
         *LoadGame("goofspiel", {{"players", GameParameter(players)}}), 100);
   }

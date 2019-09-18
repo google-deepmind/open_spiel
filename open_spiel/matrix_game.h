@@ -93,10 +93,10 @@ class MatrixGame : public NormalFormGame {
   double ColUtility(int row, int col) const {
     return col_utilities_[Index(row, col)];
   }
-  double PlayerUtility(int player, int row, int col) {
-    SPIEL_CHECK_TRUE(player == 0 || player == 1);
-    return (player == 0 ? row_utilities_[Index(row, col)]
-                        : col_utilities_[Index(row, col)]);
+  double PlayerUtility(Player player, int row, int col) {
+    SPIEL_CHECK_TRUE(player == Player{0} || player == Player{1});
+    return (player == Player{0} ? row_utilities_[Index(row, col)]
+                                : col_utilities_[Index(row, col)]);
   }
   const std::string& RowActionName(int row) const {
     return row_action_names_[row];
@@ -118,7 +118,7 @@ class MatrixState : public NFGState {
   explicit MatrixState(const MatrixGame& game);
   MatrixState(const MatrixState&) = default;
 
-  virtual std::vector<Action> LegalActions(int player) const {
+  virtual std::vector<Action> LegalActions(Player player) const {
     if (player == kSimultaneousPlayerId) {
       return LegalFlatJointActions();
     } else {
@@ -131,7 +131,7 @@ class MatrixState : public NFGState {
 
   std::string ToString() const override;
 
-  virtual std::string ActionToString(int player, Action action_id) const {
+  virtual std::string ActionToString(Player player, Action action_id) const {
     if (player == kSimultaneousPlayerId)
       return FlatJointActionToString(action_id);
     else if (player == kRowPlayer)

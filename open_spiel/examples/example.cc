@@ -24,7 +24,8 @@ const char* kUsageStr =
     "example --game=<shortname> [--players=<num>] "
     "[--show_infostate] [--seed=<num>] [--show_legals=<true/false>]";
 
-void PrintLegalActions(const open_spiel::State& state, int player,
+void PrintLegalActions(const open_spiel::State& state,
+                       open_spiel::Player player,
                        const std::vector<open_spiel::Action>& movelist) {
   std::cerr << "Legal moves for player " << player << ":" << std::endl;
   for (open_spiel::Action action : movelist) {
@@ -35,8 +36,8 @@ void PrintLegalActions(const open_spiel::State& state, int player,
 int main(int argc, char** argv) {
   std::string game_name =
       open_spiel::ParseCmdLineArgDefault(argc, argv, "game", "");
-  int players =
-      std::stoi(open_spiel::ParseCmdLineArgDefault(argc, argv, "players", "0"));
+  auto players = open_spiel::Player{std::stoi(
+      open_spiel::ParseCmdLineArgDefault(argc, argv, "players", "0"))};
   bool show_infostate = open_spiel::ParseCmdLineArgDefault(
                             argc, argv, "show_infostate", "false") == "true";
   std::pair<bool, std::string> seed =
@@ -95,12 +96,13 @@ int main(int argc, char** argv) {
                 << std::endl;
       state->ApplyAction(action);
     } else if (state->IsSimultaneousNode()) {
-      // Players choose simultaneously?
+      // open_spiel::Players choose simultaneously?
       std::vector<open_spiel::Action> joint_action;
       std::vector<double> infostate;
 
       // Sample a action for each player
-      for (int player = 0; player < game->NumPlayers(); ++player) {
+      for (auto player = open_spiel::Player{0}; player < game->NumPlayers();
+           ++player) {
         if (show_infostate) {
           if (game->GetType().provides_information_state_as_normalized_vector) {
             state->InformationStateAsNormalizedVector(player, &infostate);
@@ -128,7 +130,7 @@ int main(int argc, char** argv) {
       state->ApplyActions(joint_action);
     } else {
       // Decision node, sample one uniformly.
-      int player = state->CurrentPlayer();
+      auto player = state->CurrentPlayer();
       if (show_infostate) {
         if (game->GetType().provides_information_state_as_normalized_vector) {
           std::vector<double> infostate;
@@ -158,7 +160,7 @@ int main(int argc, char** argv) {
   }
 
   auto returns = state->Returns();
-  for (int p = 0; p < game->NumPlayers(); p++) {
+  for (auto p = open_spiel::Player{0}; p < game->NumPlayers(); p++) {
     std::cerr << "Final return to player " << p << " is " << returns[p]
               << std::endl;
   }

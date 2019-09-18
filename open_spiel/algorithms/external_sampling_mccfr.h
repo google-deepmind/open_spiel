@@ -80,7 +80,7 @@ class ExternalSamplingMCCFRSolver {
   }
 
  private:
-  double UpdateRegrets(const State& state, int player, std::mt19937* rng);
+  double UpdateRegrets(const State& state, Player player, std::mt19937* rng);
   void FullUpdateAverage(const State& state,
                          const std::vector<double>& reach_probs);
 

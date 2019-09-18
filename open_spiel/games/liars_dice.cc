@@ -81,7 +81,8 @@ LiarsDiceState::LiarsDiceState(int num_distinct_actions, int num_players,
   }
 }
 
-std::string LiarsDiceState::ActionToString(int player, Action action_id) const {
+std::string LiarsDiceState::ActionToString(Player player,
+                                           Action action_id) const {
   if (player != kChancePlayerId) {
     if (action_id == total_num_dice_ * kDiceSides) {
       return "Liar";
@@ -109,7 +110,7 @@ void LiarsDiceState::ResolveWinner() {
 
   // Count all the matches among all dice from all the players
   // kDiceSides (e.g. 6) is wild, so it always matches.
-  for (int p = 0; p < num_players_; p++) {
+  for (auto p = Player{0}; p < num_players_; p++) {
     for (int d = 0; d < num_dice_[p]; d++) {
       if (dice_outcomes_[p][d] == face || dice_outcomes_[p][d] == kDiceSides) {
         matches++;
@@ -148,7 +149,7 @@ void LiarsDiceState::DoApplyAction(Action action) {
         // Time to start playing!
         cur_player_ = 0;
         // Sort all players' rolls
-        for (int p = 0; p < num_players_; p++) {
+        for (auto p = Player{0}; p < num_players_; p++) {
           std::sort(dice_outcomes_[p].begin(), dice_outcomes_[p].end());
         }
       }
@@ -217,7 +218,7 @@ std::vector<std::pair<Action, double>> LiarsDiceState::ChanceOutcomes() const {
   return outcomes;
 }
 
-std::string LiarsDiceState::InformationState(int player) const {
+std::string LiarsDiceState::InformationState(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
@@ -236,7 +237,7 @@ std::string LiarsDiceState::InformationState(int player) const {
 std::string LiarsDiceState::ToString() const {
   std::string result = "";
 
-  for (int p = 0; p < num_players_; p++) {
+  for (auto p = Player{0}; p < num_players_; p++) {
     if (p != 0) absl::StrAppend(&result, " ");
     for (int d = 0; d < num_dice_[p]; d++) {
       absl::StrAppend(&result, dice_outcomes_[p][d]);
@@ -276,7 +277,7 @@ std::vector<double> LiarsDiceState::Returns() const {
 }
 
 void LiarsDiceState::InformationStateAsNormalizedVector(
-    int player, std::vector<double>* values) const {
+    Player player, std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
@@ -330,7 +331,7 @@ LiarsDiceGame::LiarsDiceGame(const GameParameters& params)
   total_num_dice_ = 0;
   num_dice_.resize(num_players_, 0);
 
-  for (int p = 0; p < num_players_; p++) {
+  for (auto p = Player{0}; p < num_players_; p++) {
     std::string key = absl::StrCat("numdice", p);
 
     int my_num_dice = def_num_dice;

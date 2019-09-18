@@ -30,7 +30,8 @@ namespace {
 // information state.
 std::vector<double> ExpectedReturnsImpl(
     const State& state,
-    const std::function<ActionsAndProbs(int, const std::string&)>& policy_func,
+    const std::function<ActionsAndProbs(Player, const std::string&)>&
+        policy_func,
     int depth_limit) {
   if (state.IsTerminal() || depth_limit == 0) {
     return state.Rewards();
@@ -44,7 +45,7 @@ std::vector<double> ExpectedReturnsImpl(
       std::unique_ptr<State> child = state.Child(action_and_prob.first);
       std::vector<double> child_values =
           ExpectedReturnsImpl(*child, policy_func, depth_limit - 1);
-      for (int p = 0; p < num_players; ++p) {
+      for (auto p = Player{0}; p < num_players; ++p) {
         values[p] += action_and_prob.second * child_values[p];
       }
     }
@@ -55,7 +56,7 @@ std::vector<double> ExpectedReturnsImpl(
     auto smstate = dynamic_cast<const SimMoveState*>(&state);
     SPIEL_CHECK_TRUE(smstate != nullptr);
     std::vector<ActionsAndProbs> state_policies(num_players);
-    for (int p = 0; p < num_players; ++p) {
+    for (auto p = Player{0}; p < num_players; ++p) {
       state_policies[p] = policy_func(p, state.InformationState(p));
       if (state_policies[p].empty()) {
         SpielFatalError("Error in ExpectedReturnsImpl; infostate not found.");
@@ -65,7 +66,7 @@ std::vector<double> ExpectedReturnsImpl(
       std::vector<Action> actions =
           smstate->FlatJointActionToActions(flat_action);
       double joint_action_prob = 1.0;
-      for (int p = 0; p < num_players; ++p) {
+      for (auto p = Player{0}; p < num_players; ++p) {
         double player_action_prob = GetProb(state_policies[p], actions[p]);
         SPIEL_CHECK_GE(player_action_prob, 0.0);
         SPIEL_CHECK_LE(player_action_prob, 1.0);
@@ -80,14 +81,14 @@ std::vector<double> ExpectedReturnsImpl(
         child->ApplyActions(actions);
         std::vector<double> child_values =
             ExpectedReturnsImpl(*child, policy_func, depth_limit - 1);
-        for (int p = 0; p < num_players; ++p) {
+        for (auto p = Player{0}; p < num_players; ++p) {
           values[p] += joint_action_prob * child_values[p];
         }
       }
     }
   } else {
     // Turn-based decision node.
-    int player = state.CurrentPlayer();
+    Player player = state.CurrentPlayer();
     ActionsAndProbs state_policy =
         policy_func(player, state.InformationState());
     if (state_policy.empty()) {
@@ -102,7 +103,7 @@ std::vector<double> ExpectedReturnsImpl(
       if (action_prob > 0.0) {
         std::vector<double> child_values =
             ExpectedReturnsImpl(*child, policy_func, depth_limit - 1);
-        for (int p = 0; p < num_players; ++p) {
+        for (auto p = Player{0}; p < num_players; ++p) {
           values[p] += action_prob * child_values[p];
         }
       }
@@ -118,7 +119,7 @@ std::vector<double> ExpectedReturns(const State& state,
                                     int depth_limit) {
   return ExpectedReturnsImpl(
       state,
-      [&policies](int player, const std::string& info_state) {
+      [&policies](Player player, const std::string& info_state) {
         return policies[player]->GetStatePolicy(info_state);
       },
       depth_limit);
@@ -129,7 +130,7 @@ std::vector<double> ExpectedReturns(const State& state,
                                     int depth_limit) {
   return ExpectedReturnsImpl(
       state,
-      [&joint_policy](int player, const std::string& info_state) {
+      [&joint_policy](Player player, const std::string& info_state) {
         return joint_policy.GetStatePolicy(info_state);
       },
       depth_limit);

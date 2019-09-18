@@ -68,7 +68,7 @@ inline int ColorToPlayer(Color c) {
   }
 }
 
-inline int OtherPlayer(int player) { return player == 0 ? 1 : 0; }
+inline int OtherPlayer(Player player) { return player == Player{0} ? 1 : 0; }
 
 // Action encoding (must be changed to support larger boards):
 // bits 0-5: from square (0-64)
@@ -178,11 +178,11 @@ class ChessState : public State {
 
   ChessState& operator=(const ChessState&) = default;
 
-  int CurrentPlayer() const override {
+  Player CurrentPlayer() const override {
     return IsTerminal() ? kTerminalPlayerId : ColorToPlayer(Board().ToPlay());
   }
   std::vector<Action> LegalActions() const override;
-  std::string ActionToString(int player, Action action) const override;
+  std::string ActionToString(Player player, Action action) const override;
   std::string ToString() const override;
 
   bool IsTerminal() const override {
@@ -191,11 +191,11 @@ class ChessState : public State {
 
   std::vector<double> Returns() const override;
 
-  std::string InformationState(int player) const override;
+  std::string InformationState(Player player) const override;
   void InformationStateAsNormalizedVector(
-      int player, std::vector<double>* values) const override;
+      Player player, std::vector<double>* values) const override;
   std::unique_ptr<State> Clone() const override;
-  void UndoAction(int player, Action action) override;
+  void UndoAction(Player player, Action action) override;
 
   // Current board.
   StandardChessBoard& Board() { return current_board_; }

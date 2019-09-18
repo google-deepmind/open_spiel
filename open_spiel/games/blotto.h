@@ -48,8 +48,8 @@ class BlottoState : public NFGState {
               const ActionMap* action_map,
               const std::vector<Action>* legal_actions_);
 
-  std::vector<Action> LegalActions(int player) const override;
-  std::string ActionToString(int player, Action move_id) const override;
+  std::vector<Action> LegalActions(Player player) const override;
+  std::string ActionToString(Player player, Action move_id) const override;
   std::string ToString() const override;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;

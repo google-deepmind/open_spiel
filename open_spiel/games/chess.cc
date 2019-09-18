@@ -110,7 +110,7 @@ std::vector<Action> ChessState::LegalActions() const {
   return actions;
 }
 
-std::string ChessState::ActionToString(int player, Action action) const {
+std::string ChessState::ActionToString(Player player, Action action) const {
   Move move = ActionToMove(action);
   return move.ToSAN(Board());
 }
@@ -126,12 +126,12 @@ std::vector<double> ChessState::Returns() const {
   }
 }
 
-std::string ChessState::InformationState(int player) const {
+std::string ChessState::InformationState(Player player) const {
   return ToString();
 }
 
 void ChessState::InformationStateAsNormalizedVector(
-    int player, std::vector<double>* values) const {
+    Player player, std::vector<double>* values) const {
   SPIEL_CHECK_NE(player, kChancePlayerId);
 
   std::size_t vector_size = 1;
@@ -181,7 +181,7 @@ std::unique_ptr<State> ChessState::Clone() const {
   return std::unique_ptr<State>(new ChessState(*this));
 }
 
-void ChessState::UndoAction(int player, Action action) {
+void ChessState::UndoAction(Player player, Action action) {
   // TODO: Make this fast by storing undo info in another stack.
   SPIEL_CHECK_GE(moves_history_.size(), 1);
   --repetitions_[current_board_.HashValue()];
