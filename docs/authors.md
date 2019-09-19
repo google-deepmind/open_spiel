@@ -37,3 +37,8 @@ Names are ordered lexicographically. Typo or similar contributors are omitted.
 -   James Bradbury <jekbradbury@google.com>
 -   Brennan Saeta <saeta@google.com>
 -   Dan Zheng <danielzheng@google.com>
+
+## External contributors
+
+See
+[https://github.com/deepmind/open_spiel/graphs/contributors](https://github.com/deepmind/open_spiel/graphs/contributors).
