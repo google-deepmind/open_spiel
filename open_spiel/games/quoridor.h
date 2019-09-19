@@ -123,16 +123,19 @@ class QuoridorState : public State {
   }
 
  private:
+  // SearchState contains details that are only used in the .cc file.
+  // A different technique in the same area is called pimpl (pointer to
+  // implementation).
+  class SearchState;
+
   // Helpers for `LegaLActions`.
-  class SearchQueue;  // Hide the details in the CC, aka: C++ pimpl.
   void AddActions(Move cur, Offset offset, std::vector<Action> *moves) const;
-  bool IsValidWall(Move m, SearchQueue*) const;
+  bool IsValidWall(Move m, SearchState*) const;
   bool SearchEndZone(QuoridorPlayer p, Move wall1, Move wall2,
-                     SearchQueue*) const;
-  void SearchShortestPath(QuoridorPlayer p, SearchQueue* search_queue) const;
+                     SearchState*) const;
+  void SearchShortestPath(QuoridorPlayer p, SearchState* search_state) const;
 
   std::vector<QuoridorPlayer> board_;
-
   int wall_count_[kNumPlayers];
   int end_zone_[kNumPlayers];
   Move player_loc_[kNumPlayers];
