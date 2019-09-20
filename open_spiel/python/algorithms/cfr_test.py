@@ -24,12 +24,40 @@ from absl.testing import absltest
 from absl.testing import parameterized
 import numpy as np
 
+from open_spiel.python import policy
 from open_spiel.python.algorithms import cfr
 from open_spiel.python.algorithms import expected_game_score
 import pyspiel
 
+_KUHN_UNIFORM_POLICY = policy.TabularPolicy(pyspiel.load_game("kuhn_poker"))
+_LEDUC_UNIFORM_POLICY = policy.TabularPolicy(pyspiel.load_game("leduc_poker"))
+
 
 class CFRTest(parameterized.TestCase, absltest.TestCase):
+
+  @parameterized.parameters(
+      list(
+          itertools.product([True, False], [True, False], [True, False],
+                            [True, False])))
+  def test_policy_zero_is_uniform(self, initialize_cumulative_values,
+                                  linear_averaging, regret_matching_plus,
+                                  alternating_updates):
+    # We use Leduc and not Kuhn, because Leduc has illegal actions and Kuhn does
+    # not.
+    game = pyspiel.load_game("leduc_poker")
+    cfr_solver = cfr._CFRSolver(
+        game,
+        initialize_cumulative_values=initialize_cumulative_values,
+        regret_matching_plus=regret_matching_plus,
+        linear_averaging=linear_averaging,
+        alternating_updates=alternating_updates)
+
+    np.testing.assert_array_equal(
+        _LEDUC_UNIFORM_POLICY.action_probability_array,
+        cfr_solver.policy().action_probability_array)
+    np.testing.assert_array_equal(
+        _LEDUC_UNIFORM_POLICY.action_probability_array,
+        cfr_solver.average_policy().action_probability_array)
 
   def test_cfr_kuhn_poker(self):
     game = pyspiel.load_game("kuhn_poker")
@@ -94,10 +122,10 @@ class CFRTest(parameterized.TestCase, absltest.TestCase):
         alternating_updates=False)
 
     def check_avg_policy_is_uniform_random():
-      policy = cfr_solver.average_policy()
-      for player_info_states in policy.states_per_player:
+      avg_policy = cfr_solver.average_policy()
+      for player_info_states in avg_policy.states_per_player:
         for info_state in player_info_states:
-          state_policy = policy.policy_for_key(info_state)
+          state_policy = avg_policy.policy_for_key(info_state)
           np.testing.assert_allclose(state_policy, [1.0 / len(state_policy)] *
                                      len(state_policy))
 
@@ -130,7 +158,25 @@ class CFRTest(parameterized.TestCase, absltest.TestCase):
           np.asarray([0.5, 0.5]), tabular_policy.policy_for_key(info_state_str))
 
 
-class CFRBRTest(absltest.TestCase):
+class CFRBRTest(parameterized.TestCase, absltest.TestCase):
+
+  @parameterized.parameters(
+      list(itertools.product([True, False], [True, False], [True, False])))
+  def test_policy_zero_is_uniform(self, initialize_cumulative_values,
+                                  linear_averaging, regret_matching_plus):
+    game = pyspiel.load_game("leduc_poker")
+    cfr_solver = cfr.CFRBRSolver(
+        game,
+        initialize_cumulative_values=initialize_cumulative_values,
+        regret_matching_plus=regret_matching_plus,
+        linear_averaging=linear_averaging)
+
+    np.testing.assert_array_equal(
+        _LEDUC_UNIFORM_POLICY.action_probability_array,
+        cfr_solver.policy().action_probability_array)
+    np.testing.assert_array_equal(
+        _LEDUC_UNIFORM_POLICY.action_probability_array,
+        cfr_solver.average_policy().action_probability_array)
 
   def test_policy_and_average_policy(self):
     game = pyspiel.load_game("kuhn_poker")
