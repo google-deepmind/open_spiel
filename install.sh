@@ -21,9 +21,53 @@
 set -e  # exit when any command fails
 set -x
 
+# 1. Clone the external dependencies before installing systen packages, to make
+# sure they are present even if later commands fail.
+#
+# We do not use submodules because the CL versions are stored within Git
+# metadata and we do not use Git within DeepMind, so it's hard to maintain.
+
+# Note that this needs Git intalled, so we check for that.
+
+git --version 2>&1 >/dev/null
+GIT_IS_AVAILABLE=$?
+if [ $GIT_IS_AVAILABLE -ne 0 ]; then #...
+  if [[ "$OSTYPE" == "linux-gnu" ]]; then
+    sudo apt-get install git
+  elif [[ "$OSTYPE" == "darwin"* ]]; then  # Mac OSX
+    brew install git
+  else
+    echo "The OS '$OSTYPE' is not supported (Only Linux and MacOS is). " \
+         "Feel free to contribute the install for a new OS."
+    exit 1
+  fi
+fi
+
+[[ -d "./pybind11" ]] || git clone -b 'v2.2.4' --single-branch --depth 1 https://github.com/pybind/pybind11.git
+# The official https://github.com/dds-bridge/dds.git seems to not accept PR,
+# so we have forked it.
+[[ -d open_spiel/games/bridge/double_dummy_solver ]] || \
+  git clone -b 'develop' --single-branch --depth 1 https://github.com/jblespiau/dds.git  \
+  open_spiel/games/bridge/double_dummy_solver
+# `master` is a moving branch, but we never had issues. Let's use it and
+# checkout a specific commit only if an issue occur one day.
+[[ -d open_spiel/abseil-cpp ]] || \
+  git clone -b 'master' --single-branch --depth 1 https://github.com/abseil/abseil-cpp.git \
+  open_spiel/abseil-cpp
+
+
+# 2. Install other required system-wide dependencies
 if [[ "$OSTYPE" == "linux-gnu" ]]; then
+  EXT_DEPS="virtualenv cmake python3 python3-dev python3-pip python3-setuptools python3-wheel"
+  APT_GET=`which apt-get`
+  if [ "$APT_GET" = "" ]
+  then
+     echo "This script assumes a Debian-based Linux distribution. Please install these packages manually or using your distribution's package manager:"
+     echo "$EXT_DEPS"
+     exit 1
+  fi
   sudo apt-get update
-  sudo apt-get install git virtualenv cmake python3 python3-dev python3-pip python3-setuptools python3-wheel
+  sudo apt-get install $EXT_DEPS
   if [[ "$TRAVIS" ]]; then
     sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python${OS_PYTHON_VERSION} 10
   fi
@@ -39,12 +83,4 @@ else
   exit 1
 fi
 
-[[ -d "./pybind11" ]] || git clone -b 'v2.2.4' --single-branch --depth 1 https://github.com/pybind/pybind11.git
-# The official https://github.com/dds-bridge/dds.git seems to not accept PR,
-# so we have forked it.
-[[ -d open_spiel/games/bridge/double_dummy_solver ]] || \
-  git clone -b 'develop' --single-branch --depth 1 https://github.com/jblespiau/dds.git  \
-  open_spiel/games/bridge/double_dummy_solver
-[[ -d open_spiel/abseil-cpp ]] || \
-  git clone -b 'master' --single-branch --depth 1 https://github.com/abseil/abseil-cpp.git \
-  open_spiel/abseil-cpp
+
