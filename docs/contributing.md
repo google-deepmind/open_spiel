@@ -17,6 +17,44 @@ around two major important design criteria:
     justification, we tend to avoid introducing dependencies to keep things easy
     to install and more portable.
 
+# Support expectations
+
+We, the OpenSpiel authors, definitely engage in supporting the community. As it
+can be time-consuming, we try to find a good balance between ensuring we are
+responsive and being able to continue to do our day-to-day work and research.
+
+Generally speaking, if you are willing to get a specific feature implemented,
+the most effective way is to implement it and send a Pull Request. For large
+changes, or ones involving design decisions, open a bug to check the idea is ok
+first.
+
+The higher the quality, the easier it will be to be accepted. For instance,
+following the
+[C++ Google style guide](https://google.github.io/styleguide/cppguide.html) and
+[Python Google style guide](http://google.github.io/styleguide/pyguide.html)
+will help with the integration.
+
+As examples, MacOS support, Window support, example improvements, various
+bug-fixes or new games has been straightforward to be included and we are very
+thankful to everyone who helped.
+
+## Bugs
+
+We aim to answer bugs at a reasonable pace, several times a week. However, for
+bugs involving large changes (e.g. adding new games, adding public state
+supports) we cannot commit to implementing it and encourage everyone to
+contribute directly.
+
+## Pull requests
+
+You can expect us to answer/comment back and you will know from the comment if
+it will be merged as is or if it will need additional work.
+
+For pull requests, they are merged as batches to be more efficient, at least
+every two weeks (for bug fixes, it will likely be faster to be integrated). So
+you may need to wait a little after it has been approved to actually see it
+merged.
+
 # Roadmap and Call for Contributions
 
 Contributions to this project must be accompanied by a Contributor License
