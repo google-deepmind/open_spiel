@@ -97,10 +97,16 @@ std::string PositionToString(int pos) {
   switch (pos) {
     case kBarPos:
       return "Bar";
+	case 25:
+	  return "Bar";
     case kScorePos:
       return "Score";
     case -1:
       return "Pass";
+	case -2:
+	  return "Off";
+
+
     default:
       return absl::StrCat(pos);
   }
@@ -114,10 +120,62 @@ std::string BackgammonState::ActionToString(Player player,
                         kChanceOutcomeValues[move_id][1], ")");
   } else {
     std::vector<CheckerMove> cmoves = SpielMoveToCheckerMoves(player, move_id);
-    return absl::StrCat(move_id, " (", PositionToString(cmoves[0].pos), "-",
-                        cmoves[0].num, cmoves[0].hit ? "*" : "", " ",
-                        PositionToString(cmoves[1].pos), "-", cmoves[1].num,
-                        cmoves[1].hit ? "*" : "", ")");
+	int cmove0_start;
+	int cmove1_start;
+	if (player == kOPlayerId)
+	{
+		cmove0_start = (cmoves[0].pos == kBarPos ? 25 : cmoves[0].pos + 1);
+		cmove1_start = (cmoves[1].pos == kBarPos ? 25 : cmoves[1].pos + 1);
+	}
+	else //swap the board numbering round for Player X so player is moving from 24->0
+	{
+		cmove0_start = (cmoves[0].pos == kBarPos ? 25 : 24- cmoves[0].pos);
+		cmove1_start = (cmoves[1].pos == kBarPos ? 25 : 24 - cmoves[1].pos);
+	}
+	int cmove0_end= cmoves[0].num;
+	if (cmove0_end != kPassPos) //Not a pass, so work out where the piece finished
+	{
+		cmove0_end = cmove0_start - cmoves[0].num;
+		if (cmove0_end <= 0) cmove0_end = -2; //Off
+		else if (board_[Opponent(player)][player == kOPlayerId ? (cmove0_end-1) : (24- cmove0_end)] == 1) cmoves[0].hit = true; //Check to see if move is a hit
+	}
+	int cmove1_end = cmoves[1].num;
+	if (cmove1_end != kPassPos) //Not a pass, so work out where the piece finished
+	{
+		cmove1_end = cmove1_start - cmoves[1].num;
+		if (cmove1_end <= 0) cmove1_end = -2; //Off
+		else if (board_[Opponent(player)][player == kOPlayerId ? (cmove1_end - 1) : (24 - cmove1_end)] == 1) cmoves[1].hit = true; //Check to see if move is a hit
+	}
+	bool double_hit = (cmoves[1].hit && cmoves[0].hit && cmove1_end == cmove0_end); // check for 2 pieces hitting on the same point.
+	std::string returnVal = "";
+	if (cmove0_start == cmove1_start && cmove0_end == cmove1_end) // same move, show as (2). 
+	{
+		returnVal = absl::StrCat(move_id, " - ", PositionToString(cmove0_start), "/",
+			PositionToString(cmove0_end), cmoves[0].hit ? "*" : "", "(2)");
+	}
+	else if (cmove0_start < cmove1_start || (cmove0_start == cmove1_start && cmove0_end < cmove1_end)) // tradition to start with higher numbers first, so swap moves round if this not the case
+	{
+		if (cmove1_end == cmove0_start) // Check to see if the same piece is moving for both moves, as this changes the format of the output.
+			returnVal = absl::StrCat(move_id, " - ", PositionToString(cmove1_start), "/",
+				PositionToString(cmove1_end), cmoves[1].hit ? "*" : "", "/", PositionToString(cmove0_end),
+				cmoves[0].hit ? "*" : "");
+		else
+			returnVal = absl::StrCat(move_id, " - ", PositionToString(cmove1_start), "/", PositionToString(cmove1_end),
+				cmoves[1].hit ? "*" : "", " ", PositionToString(cmove0_start), "/",
+				PositionToString(cmove0_end), (cmoves[0].hit && !double_hit) ? "*" : "");
+	}
+	else
+	{
+		if (cmove0_end == cmove1_start) // Check to see if the same piece is moving for both moves, as this changes the format of the output.
+			returnVal = absl::StrCat(move_id, " - ", PositionToString(cmove0_start), "/",
+				PositionToString(cmove0_end), cmoves[0].hit ? "*" : "", "/", PositionToString(cmove1_end),
+				cmoves[1].hit ? "*" : "");
+		else
+			returnVal = absl::StrCat(move_id, " - ", PositionToString(cmove0_start), "/", PositionToString(cmove0_end),
+				cmoves[0].hit ? "*" : "", " ", PositionToString(cmove1_start), "/", 
+				PositionToString(cmove1_end),	(cmoves[1].hit && !double_hit) ? "*" : "");
+	}
+	return returnVal;
   }
 }
 
@@ -278,6 +336,7 @@ void BackgammonState::DoApplyAction(Action move) {
   std::vector<CheckerMove> moves = SpielMoveToCheckerMoves(cur_player_, move);
   bool first_move_hit = ApplyCheckerMove(cur_player_, moves[0]);
   bool second_move_hit = ApplyCheckerMove(cur_player_, moves[1]);
+
 
   turn_history_info_.push_back(
       TurnHistoryInfo(cur_player_, prev_player_, dice_, move, double_turn_,
