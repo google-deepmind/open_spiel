@@ -150,10 +150,13 @@ std::string BackgammonState::ActionToString(Player player,
 	std::string returnVal = "";
 	if (cmove0_start == cmove1_start && cmove0_end == cmove1_end) // same move, show as (2). 
 	{
-		returnVal = absl::StrCat(move_id, " - ", PositionToString(cmove0_start), "/",
+		if (cmoves[1].num == kPassPos) // Player can't move at all!
+			returnVal = "Pass";
+		else
+			returnVal = absl::StrCat(move_id, " - ", PositionToString(cmove0_start), "/",
 			PositionToString(cmove0_end), cmoves[0].hit ? "*" : "", "(2)");
 	}
-	else if (cmove0_start < cmove1_start || (cmove0_start == cmove1_start && cmove0_end < cmove1_end)) // tradition to start with higher numbers first, so swap moves round if this not the case
+	else if ((cmove0_start < cmove1_start || (cmove0_start == cmove1_start && cmove0_end < cmove1_end) || cmoves[0].num == kPassPos) && cmoves[1].num != kPassPos) // tradition to start with higher numbers first, so swap moves round if this not the case. If there is a pass move, put it last.
 	{
 		if (cmove1_end == cmove0_start) // Check to see if the same piece is moving for both moves, as this changes the format of the output.
 			returnVal = absl::StrCat(move_id, " - ", PositionToString(cmove1_start), "/",
@@ -161,7 +164,7 @@ std::string BackgammonState::ActionToString(Player player,
 				cmoves[0].hit ? "*" : "");
 		else
 			returnVal = absl::StrCat(move_id, " - ", PositionToString(cmove1_start), "/", PositionToString(cmove1_end),
-				cmoves[1].hit ? "*" : "", " ", PositionToString(cmove0_start), "/",
+				cmoves[1].hit ? "*" : "", " ", (cmoves[0].num != kPassPos) ? PositionToString(cmove0_start) : "", (cmoves[0].num != kPassPos) ? "/" : "",
 				PositionToString(cmove0_end), (cmoves[0].hit && !double_hit) ? "*" : "");
 	}
 	else
@@ -172,7 +175,7 @@ std::string BackgammonState::ActionToString(Player player,
 				cmoves[1].hit ? "*" : "");
 		else
 			returnVal = absl::StrCat(move_id, " - ", PositionToString(cmove0_start), "/", PositionToString(cmove0_end),
-				cmoves[0].hit ? "*" : "", " ", PositionToString(cmove1_start), "/", 
+				cmoves[0].hit ? "*" : "", " ", (cmoves[1].num != kPassPos) ? PositionToString(cmove1_start) : "", (cmoves[1].num != kPassPos) ? "/" : "",
 				PositionToString(cmove1_end),	(cmoves[1].hit && !double_hit) ? "*" : "");
 	}
 	return returnVal;
