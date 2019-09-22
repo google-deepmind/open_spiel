@@ -18,34 +18,34 @@ std::vector<std::string> Ludii::listGames(){
 
 	jclass gameLoader = env->FindClass("player/GameLoader");
 
-    //find the listGames method
-    jmethodID mid = env->GetStaticMethodID(gameLoader,"listGames","()[Ljava/lang/String;");
+    	//find the listGames method
+    	jmethodID mid = env->GetStaticMethodID(gameLoader,"listGames","()[Ljava/lang/String;");
 
-    //execute the listGames method
-    jobjectArray stringArray = (jobjectArray) env->CallStaticObjectMethod(gameLoader,mid);
+    	//execute the listGames method
+    	jobjectArray stringArray = (jobjectArray) env->CallStaticObjectMethod(gameLoader,mid);
 
-    //put list of games in vector
-    int stringCount = env->GetArrayLength(stringArray);
+    	//put list of games in vector
+    	int stringCount = env->GetArrayLength(stringArray);
 
 	for (int i=0; i<stringCount; i++) {
 		//get array element and convert it from jstrng
-        jstring string = (jstring) (env->GetObjectArrayElement(stringArray, i));
-        const char *rawString = env->GetStringUTFChars(string, 0);
+        	jstring string = (jstring) (env->GetObjectArrayElement(stringArray, i));
+        	const char *rawString = env->GetStringUTFChars(string, 0);
        
-       	std::string cppString(rawString);
-        gamesVector.push_back(cppString);
+       		std::string cppString(rawString);
+        	gamesVector.push_back(cppString);
 
-        env->ReleaseStringUTFChars(string, rawString);
-    }
+        	env->ReleaseStringUTFChars(string, rawString);
+    	}
 
 	return gamesVector;
 }
 
 void Ludii::loadGameAndDoStuff(std::string game_name){
 
-	//create game object i.e. `Game game = GameLoader.loadGameFromName`
+	//create game object i.e. `Game game = GameLoader.loadGameFromName()`
 	jclass gameLoader = env->FindClass("player/GameLoader");
-    jmethodID mid = env->GetStaticMethodID(gameLoader,"loadGameFromName","(Ljava/lang/String;)Lgame/Game;");
+    	jmethodID mid = env->GetStaticMethodID(gameLoader,"loadGameFromName","(Ljava/lang/String;)Lgame/Game;");
 
 	//convert game name to java string
 	char game_name_char[1024];
@@ -63,7 +63,7 @@ void Ludii::loadGameAndDoStuff(std::string game_name){
 	const char *strReturn = env->GetStringUTFChars(stringArray, 0);
 	std::cout<< "name() result: "<<strReturn<<std::endl;
     
-    env->ReleaseStringUTFChars(stringArray, strReturn);
+    	env->ReleaseStringUTFChars(stringArray, strReturn);
 }
 
 
