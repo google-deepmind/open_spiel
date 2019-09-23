@@ -158,11 +158,11 @@ release!). Contributions are certainly not limited to these suggestions!
     It is not currently ready for release, but should be possible in a future
     update.
 
--   **Grid Worlds**. There are currently three grid world games in OpenSpiel:
-    Markov soccer, the coin game, and cooperative box-pushing. There could be
-    more, especially ones that have been used in multiagent RL such as Laser Tag
-    and Gathering from [Ref1](https://arxiv.org/abs/1711.00832)
-    [Ref2](https://arxiv.org/abs/1702.03037).
+-   **Grid Worlds**. There are currently four grid world games in OpenSpiel:
+    Markov soccer, the coin game, cooperative box-pushing, and laser tag. There
+    could be more, especially ones that have been commonly used in multiagent
+    RL. Also, the current grid worlds can be improved: all use fixed grids and
+    are fully-observable.
 
 -   **Heuristic Payoff Tables and Empirical Game-Theoretic Analysis**. Methods
     found in

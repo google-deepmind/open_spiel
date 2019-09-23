@@ -40,6 +40,8 @@ add_library (games OBJECT
   hex.h
   kuhn_poker.cc
   kuhn_poker.h
+  laser_tag.cc
+  laser_tag.h
   leduc_poker.cc
   leduc_poker.h
   liars_dice.cc
@@ -256,6 +258,10 @@ add_test(quoridor_test quoridor_test)
 add_executable(tic_tac_toe_test tic_tac_toe_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(tic_tac_toe_test tic_tac_toe_test)
+
+add_executable(laser_tag_test laser_tag_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(laser_tag_test laser_tag_test)
 
 add_executable(tiny_bridge_test tiny_bridge_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>

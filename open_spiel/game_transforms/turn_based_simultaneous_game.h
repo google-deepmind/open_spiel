@@ -24,7 +24,12 @@
 // This wrapper turns any n-player simultaneous move game into an equivalent
 // turn-based game where simultaneous move nodes are encoded as n turns.
 //
-// TODO(author5): implement UndoAction for these games.
+// The underlying game must provide InformationState and
+// InformationStateAsNormalizedVector for the wrapped functions to work.
+//
+// TODO:
+//   - implement UndoAction for these games.
+//   - generalize to use Observation as well as Information state
 
 namespace open_spiel {
 

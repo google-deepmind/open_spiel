@@ -53,11 +53,13 @@ void SimulateGames(std::mt19937* rng, const Game& game, State* sim_state,
       // Players choose simultaneously.
       std::vector<Action> joint_action;
 
-      // Sample a action for each player
+      // Sample an action for each player
       for (auto p = Player{0}; p < game.NumPlayers(); p++) {
-        // Check the information states to each player are consistent.
-        SPIEL_CHECK_EQ(sim_state->InformationState(p),
-                       wrapped_sim_state->InformationState(p));
+        if (game.GetType().provides_information_state) {
+          // Check the information states to each player are consistent.
+          SPIEL_CHECK_EQ(sim_state->InformationState(p),
+                         wrapped_sim_state->InformationState(p));
+        }
 
         std::vector<Action> actions;
         actions = sim_state->LegalActions(p);

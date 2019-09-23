@@ -36,6 +36,7 @@ _EXCLUDED_GAMES = [
     # should skip that test in thoses cases)
     "coin_game",  # Too big, number of states with depth 5 is ~10^9
     "coop_box_pushing",
+    "laser_tag",
     "markov_soccer",
     "matching_pennies_3p",
     "matrix_cd",

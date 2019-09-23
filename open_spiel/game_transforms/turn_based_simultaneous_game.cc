@@ -41,8 +41,8 @@ const GameType kGameType{
     /*min_num_players=*/1,
     /*provides_information_state=*/true,
     /*provides_information_state_as_normalized_vector=*/true,
-    /*provides_observation=*/true,
-    /*provides_observation_as_normalized_vector=*/true,
+    /*provides_observation=*/false,
+    /*provides_observation_as_normalized_vector=*/false,
     {{"game", {GameParameter::Type::kGame, true}}}};
 
 std::unique_ptr<Game> Factory(const GameParameters& params) {
@@ -216,6 +216,8 @@ GameType ConvertType(GameType type) {
   type.short_name = kGameType.short_name;
   type.long_name = "Turn-based " + type.long_name;
   type.parameter_specification = kGameType.parameter_specification;
+  type.provides_observation = false;
+  type.provides_observation_as_normalized_vector = false;
   return type;
 }
 
