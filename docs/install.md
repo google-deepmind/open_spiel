@@ -1,5 +1,8 @@
 # Installation
 
+The instructions here are for Linux and MacOS. For installation on Windows, see
+[these separate installation instructions](windows.md).
+
 ## Summary
 
 1.  Install system packages and download some dependencies. Only needs to be

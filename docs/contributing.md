@@ -242,6 +242,3 @@ release!). Contributions are certainly not limited to these suggestions!
     of value iteration does not support simultaneous move games despite having
     the necessary LP-solving routines needed. This is a simple change to support
     solving simultaneous-move games.
-
--   **Windows Support**. We would like to officially support Windows, if
-    possible.

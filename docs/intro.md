@@ -38,8 +38,5 @@ available from Python.
 
 **Platforms**
 
-OpenSpiel has been tested on Linux (Debian 10 and Ubuntu 19.04). We have not
-tested on MacOS or Windows, but since the code uses freely available tools which
-are also available on MacOS and Windows, we do not anticipate any (major)
-problems compiling and running under those platforms. Patches and instructions
-would be much appreciated.
+OpenSpiel has been tested on Linux (Debian 10 and Ubuntu 19.04), MacOS, and
+[Windows 10 (through Windows Subsystem for Linux)](windows.md).
