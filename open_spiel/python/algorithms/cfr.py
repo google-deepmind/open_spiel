@@ -53,7 +53,7 @@ def _initialize_info_state_nodes(state, info_state_nodes,
                                  initial_positive_value):
   """Initializes info_state_nodes.
 
-  Set `cumulative_regret` and `cumulative_policy` to _INITIAL_POSITIVE_VALUE
+  Set `cumulative_regret` to _INITIAL_POSITIVE_VALUE
   for all (info_state, action). Also set the the legal_actions list.
 
   Args:
@@ -83,8 +83,8 @@ def _initialize_info_state_nodes(state, info_state_nodes,
     info_state_nodes[info_state] = info_state_node
 
   for action in info_state_node.legal_actions:
-    info_state_node.cumulative_policy[action] = initial_positive_value
     info_state_node.cumulative_regret[action] = initial_positive_value
+    info_state_node.cumulative_policy[action] = 0
     _initialize_info_state_nodes(
         state.child(action), info_state_nodes, initial_positive_value)
 
@@ -449,7 +449,7 @@ class CFRPlusSolver(_CFRSolver):
   def __init__(self, game):
     super(CFRPlusSolver, self).__init__(
         game,
-        initialize_cumulative_values=True,
+        initialize_cumulative_values=False,
         regret_matching_plus=True,
         alternating_updates=True,
         linear_averaging=True)
@@ -504,7 +504,7 @@ class CFRBRSolver(object):
 
   def __init__(self,
                game,
-               initialize_cumulative_values=True,
+               initialize_cumulative_values=False,
                linear_averaging=True,
                regret_matching_plus=True):
     # pyformat: disable
