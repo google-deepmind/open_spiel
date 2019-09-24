@@ -33,8 +33,6 @@ import numpy as np
 from open_spiel.python import policy
 from open_spiel.python.algorithms import exploitability
 
-_INITIAL_POSITIVE_VALUE = 1e-15
-
 
 @attr.s
 class _InfoStateNode(object):
@@ -49,28 +47,24 @@ class _InfoStateNode(object):
   cumulative_policy = attr.ib(factory=lambda: collections.defaultdict(float))
 
 
-def _initialize_info_state_nodes(state, info_state_nodes,
-                                 initial_positive_value):
+def _initialize_info_state_nodes(state, info_state_nodes):
   """Initializes info_state_nodes.
 
-  Set `cumulative_regret` to _INITIAL_POSITIVE_VALUE
-  for all (info_state, action). Also set the the legal_actions list.
+  Create one _InfoStateNode per infoset. We could also initialize the node
+  when we try to access it and it does not exist.
 
   Args:
     state: The current state in the tree walk. This should be the root node when
       we call this function from a CFR solver.
     info_state_nodes: The dictionary `info_state_str` to `_InfoStateNode` to
       fill in-place.
-    initial_positive_value: The initial value to use for both the cumulative
-      regret and cumulative policy for all state-actions.
   """
   if state.is_terminal():
     return
 
   if state.is_chance_node():
     for action, unused_action_prob in state.chance_outcomes():
-      _initialize_info_state_nodes(
-          state.child(action), info_state_nodes, initial_positive_value)
+      _initialize_info_state_nodes(state.child(action), info_state_nodes)
     return
 
   current_player = state.current_player()
@@ -83,10 +77,7 @@ def _initialize_info_state_nodes(state, info_state_nodes,
     info_state_nodes[info_state] = info_state_node
 
   for action in info_state_node.legal_actions:
-    info_state_node.cumulative_regret[action] = initial_positive_value
-    info_state_node.cumulative_policy[action] = 0
-    _initialize_info_state_nodes(
-        state.child(action), info_state_nodes, initial_positive_value)
+    _initialize_info_state_nodes(state.child(action), info_state_nodes)
 
 
 def _apply_regret_matching_plus_reset(info_state_nodes):
@@ -198,19 +189,13 @@ class _CFRSolver(object):
   ```
   """
 
-  def __init__(self, game, initialize_cumulative_values, alternating_updates,
-               linear_averaging, regret_matching_plus):
+  def __init__(self, game, alternating_updates, linear_averaging,
+               regret_matching_plus):
     # pyformat: disable
     """Initializer.
 
     Args:
       game: The `pyspiel.Game` to run on.
-      initialize_cumulative_values: Whether to initialize the average policy to
-        the uniform policy (and the initial cumulative regret to an epsilon
-        value). This is independent of the first CFR iteration, which, when the
-        policy is fixed during traversal and we perform non alternating updates,
-        will also compute the uniform policy and add it to the average of
-        policies.
       alternating_updates: If `True`, alternating updates are performed: for
         each player, we compute and update the cumulative regrets and policies.
         In that case, and when the policy is frozen during tree traversal, the
@@ -233,15 +218,8 @@ class _CFRSolver(object):
     self._num_players = game.num_players()
     self._root_node = self._game.new_initial_state()
 
-    if initialize_cumulative_values:
-      initial_positive_value = _INITIAL_POSITIVE_VALUE
-    else:
-      initial_positive_value = 0
     self._info_state_nodes = {}
-    _initialize_info_state_nodes(
-        self._root_node,
-        info_state_nodes=self._info_state_nodes,
-        initial_positive_value=initial_positive_value)
+    _initialize_info_state_nodes(self._root_node, self._info_state_nodes)
 
     self._policy_cache = {}
 
@@ -473,7 +451,6 @@ class CFRPlusSolver(_CFRSolver):
   def __init__(self, game):
     super(CFRPlusSolver, self).__init__(
         game,
-        initialize_cumulative_values=False,
         regret_matching_plus=True,
         alternating_updates=True,
         linear_averaging=True)
@@ -491,7 +468,6 @@ class CFRSolver(_CFRSolver):
   def __init__(self, game):
     super(CFRSolver, self).__init__(
         game,
-        initialize_cumulative_values=False,
         regret_matching_plus=False,
         alternating_updates=True,
         linear_averaging=False)
@@ -526,22 +502,12 @@ class CFRBRSolver(object):
   thus uses TabularPolicies. This will run only for smallish games.
   """
 
-  def __init__(self,
-               game,
-               initialize_cumulative_values=False,
-               linear_averaging=True,
-               regret_matching_plus=True):
+  def __init__(self, game, linear_averaging=True, regret_matching_plus=True):
     # pyformat: disable
     """Initializer.
 
     Args:
       game: The `pyspiel.Game` to run on.
-      initialize_cumulative_values: Whether to initialize the average policy to
-        the uniform policy (and the initial cumulative regret to an epsilon
-        value). This is independent of the first CFR iteration, which, when the
-        policy is fixed during traversal and we perform non alternating updates,
-        will also compute the uniform policy and add it to the average of
-        policies.
       linear_averaging: Whether to use linear averaging, i.e.
         cumulative_policy[info_state][action] += (
           iteration_number * reach_prob * action_prob)
@@ -562,15 +528,8 @@ class CFRBRSolver(object):
     self._num_players = game.num_players()
     self._root_node = self._game.new_initial_state()
 
-    if initialize_cumulative_values:
-      initial_positive_value = _INITIAL_POSITIVE_VALUE
-    else:
-      initial_positive_value = 0
     self._info_state_nodes = {}
-    _initialize_info_state_nodes(
-        self._root_node,
-        info_state_nodes=self._info_state_nodes,
-        initial_positive_value=initial_positive_value)
+    _initialize_info_state_nodes(self._root_node, self._info_state_nodes)
     self._policy_cache = {}
 
     self._root_node = self._game.new_initial_state()

@@ -74,18 +74,14 @@ class ModuleLevelFunctionTest(absltest.TestCase):
 class CFRTest(parameterized.TestCase, absltest.TestCase):
 
   @parameterized.parameters(
-      list(
-          itertools.product([True, False], [True, False], [True, False],
-                            [True, False])))
-  def test_policy_zero_is_uniform(self, initialize_cumulative_values,
-                                  linear_averaging, regret_matching_plus,
+      list(itertools.product([True, False], [True, False], [True, False])))
+  def test_policy_zero_is_uniform(self, linear_averaging, regret_matching_plus,
                                   alternating_updates):
     # We use Leduc and not Kuhn, because Leduc has illegal actions and Kuhn does
     # not.
     game = pyspiel.load_game("leduc_poker")
     cfr_solver = cfr._CFRSolver(
         game,
-        initialize_cumulative_values=initialize_cumulative_values,
         regret_matching_plus=regret_matching_plus,
         linear_averaging=linear_averaging,
         alternating_updates=alternating_updates)
@@ -122,19 +118,16 @@ class CFRTest(parameterized.TestCase, absltest.TestCase):
         average_policy_values, [-1 / 18, 1 / 18], atol=1e-3)
 
   @parameterized.parameters(
-      list(
-          itertools.product([True, False], [True, False], [True, False],
-                            [True, False])))
-  def test_cfr_kuhn_poker_runs_with_multiple_players(
-      self, initialize_cumulative_values, linear_averaging,
-      regret_matching_plus, alternating_updates):
+      list(itertools.product([True, False], [True, False], [True, False])))
+  def test_cfr_kuhn_poker_runs_with_multiple_players(self, linear_averaging,
+                                                     regret_matching_plus,
+                                                     alternating_updates):
     num_players = 3
 
     game = pyspiel.load_game("kuhn_poker",
                              {"players": pyspiel.GameParameter(num_players)})
     cfr_solver = cfr._CFRSolver(
         game,
-        initialize_cumulative_values=initialize_cumulative_values,
         regret_matching_plus=regret_matching_plus,
         linear_averaging=linear_averaging,
         alternating_updates=alternating_updates)
@@ -145,16 +138,14 @@ class CFRTest(parameterized.TestCase, absltest.TestCase):
         game.new_initial_state(), [average_policy] * num_players)
     del average_policy_values
 
-  @parameterized.parameters(
-      list(itertools.product([False, True], [False, True])))
+  @parameterized.parameters(list(itertools.product([False, True])))
   def test_simultaneous_two_step_avg_1b_seq_in_kuhn_poker(
-      self, regret_matching_plus, initialize_cumulative_values):
+      self, regret_matching_plus):
     num_players = 2
     game = pyspiel.load_game("kuhn_poker",
                              {"players": pyspiel.GameParameter(num_players)})
     cfr_solver = cfr._CFRSolver(
         game,
-        initialize_cumulative_values=initialize_cumulative_values,
         regret_matching_plus=regret_matching_plus,
         linear_averaging=False,
         alternating_updates=False)
@@ -199,13 +190,11 @@ class CFRTest(parameterized.TestCase, absltest.TestCase):
 class CFRBRTest(parameterized.TestCase, absltest.TestCase):
 
   @parameterized.parameters(
-      list(itertools.product([True, False], [True, False], [True, False])))
-  def test_policy_zero_is_uniform(self, initialize_cumulative_values,
-                                  linear_averaging, regret_matching_plus):
+      list(itertools.product([True, False], [True, False])))
+  def test_policy_zero_is_uniform(self, linear_averaging, regret_matching_plus):
     game = pyspiel.load_game("leduc_poker")
     cfr_solver = cfr.CFRBRSolver(
         game,
-        initialize_cumulative_values=initialize_cumulative_values,
         regret_matching_plus=regret_matching_plus,
         linear_averaging=linear_averaging)
 
@@ -229,6 +218,7 @@ class CFRBRTest(parameterized.TestCase, absltest.TestCase):
         average_policy_values, [-1 / 18, 1 / 18], atol=1e-3)
 
     cfrbr_solver.policy()
+
 
 if __name__ == "__main__":
   absltest.main()
