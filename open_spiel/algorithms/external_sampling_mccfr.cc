@@ -85,7 +85,7 @@ double ExternalSamplingMCCFRSolver::UpdateRegrets(const State& state,
     for (int aidx = 0; aidx < legal_actions.size(); ++aidx) {
       child_values[aidx] =
           UpdateRegrets(*state.Child(legal_actions[aidx]), player, rng);
-      value += info_state_copy.cached_policy[aidx] * child_values[aidx];
+      value += info_state_copy.current_policy[aidx] * child_values[aidx];
     }
   }
 
@@ -105,7 +105,8 @@ double ExternalSamplingMCCFRSolver::UpdateRegrets(const State& state,
   if (avg_type_ == AverageType::kSimple &&
       cur_player == ((player + 1) % game_->NumPlayers())) {
     for (int aidx = 0; aidx < legal_actions.size(); ++aidx) {
-      info_state.cumulative_policy[aidx] += info_state_copy.cached_policy[aidx];
+      info_state.cumulative_policy[aidx] +=
+          info_state_copy.current_policy[aidx];
     }
   }
 
@@ -145,7 +146,7 @@ void ExternalSamplingMCCFRSolver::FullUpdateAverage(
 
   for (int aidx = 0; aidx < legal_actions.size(); ++aidx) {
     std::vector<double> new_reach_probs = reach_probs;
-    new_reach_probs[cur_player] *= info_state_copy.cached_policy[aidx];
+    new_reach_probs[cur_player] *= info_state_copy.current_policy[aidx];
     FullUpdateAverage(*state.Child(legal_actions[aidx]), new_reach_probs);
   }
 
@@ -153,7 +154,7 @@ void ExternalSamplingMCCFRSolver::FullUpdateAverage(
   CFRInfoStateValues& info_state = info_states_[is_key];
   for (int aidx = 0; aidx < legal_actions.size(); ++aidx) {
     info_state.cumulative_policy[aidx] +=
-        (reach_probs[cur_player] * info_state_copy.cached_policy[aidx]);
+        (reach_probs[cur_player] * info_state_copy.current_policy[aidx]);
   }
 }
 

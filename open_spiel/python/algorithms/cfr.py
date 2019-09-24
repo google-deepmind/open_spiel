@@ -221,8 +221,6 @@ class _CFRSolver(object):
     self._info_state_nodes = {}
     _initialize_info_state_nodes(self._root_node, self._info_state_nodes)
 
-    self._policy_cache = {}
-
     self._root_node = self._game.new_initial_state()
 
     # This is for returning the current policy and average policy to a caller
@@ -244,14 +242,13 @@ class _CFRSolver(object):
             self._root_node, np.ones(self._game.num_players() + 1), player)
         if self._regret_matching_plus:
           _apply_regret_matching_plus_reset(self._info_state_nodes)
-        self._policy_cache.clear()
+        _update_current_policy(self._current_policy, self._info_state_nodes)
     else:
       self._compute_counterfactual_regret_for_player(
           self._root_node, np.ones(self._game.num_players() + 1), player=None)
       if self._regret_matching_plus:
         _apply_regret_matching_plus_reset(self._info_state_nodes)
-
-    self._policy_cache.clear()
+      _update_current_policy(self._current_policy, self._info_state_nodes)
 
   def policy(self):
     """Returns the current policy (TabularPolicy) (no convergence guarantees).
@@ -334,8 +331,7 @@ class _CFRSolver(object):
     # state. Therefore, the utilities are cached.
     children_utilities = {}
 
-    info_state_policy = self._compute_policy_or_get_it_from_cache(
-        info_state, legal_actions)
+    info_state_policy = self._get_infostate_policy(info_state, legal_actions)
     for action, action_prob in info_state_policy.items():
       new_state = state.child(action)
       new_reach_probabilities = reach_probabilities.copy()
@@ -374,17 +370,10 @@ class _CFRSolver(object):
 
     return state_value
 
-  def _compute_policy_or_get_it_from_cache(self, info_state, legal_actions):
+  def _get_infostate_policy(self, info_state, legal_actions):
     """Returns an {action: prob} dictionary for the policy on `info_state`."""
-    retrieved_state = self._policy_cache.get(info_state)
-
-    if retrieved_state is not None:
-      return self._policy_cache[info_state]
-
-    policy_for_state = _regret_matching(
-        self._info_state_nodes[info_state].cumulative_regret, legal_actions)
-    self._policy_cache[info_state] = policy_for_state
-    return policy_for_state
+    prob_vec = self._current_policy.policy_for_key(info_state)
+    return {action: prob_vec[action] for action in legal_actions}
 
 
 def _regret_matching(cumulative_regrets, legal_actions):
@@ -530,7 +519,6 @@ class CFRBRSolver(object):
 
     self._info_state_nodes = {}
     _initialize_info_state_nodes(self._root_node, self._info_state_nodes)
-    self._policy_cache = {}
 
     self._root_node = self._game.new_initial_state()
 
@@ -549,7 +537,7 @@ class CFRBRSolver(object):
     """Computes each player best-response against the pool of other players."""
     # pylint: disable=g-long-lambda
     current_policy = policy.PolicyFromCallable(
-        self._game, lambda state: self._compute_policy_or_get_it_from_cache(
+        self._game, lambda state: self._get_infostate_policy(
             state.information_state(), state.legal_actions()))
     # pylint: disable=g-long-lambda
 
@@ -573,7 +561,7 @@ class CFRBRSolver(object):
             lambda infostate_str, legal_actions, p=p:
             {self._best_responses[p]["best_response_action"][infostate_str]: 1})
         # pylint: enable=g-long-lambda
-      policies[player] = self._compute_policy_or_get_it_from_cache
+      policies[player] = self._get_infostate_policy
 
       self._compute_counterfactual_regret_for_player(
           state=self._root_node,
@@ -583,7 +571,7 @@ class CFRBRSolver(object):
 
       if self._regret_matching_plus:
         _apply_regret_matching_plus_reset(self._info_state_nodes)
-    self._policy_cache.clear()
+    _update_current_policy(self._current_policy, self._info_state_nodes)
 
   def policy(self):
     """Returns the current policy as a `policy.TabularPolicy` object.
@@ -704,14 +692,7 @@ class CFRBRSolver(object):
 
     return state_value
 
-  def _compute_policy_or_get_it_from_cache(self, info_state, legal_actions):
+  def _get_infostate_policy(self, info_state, legal_actions):
     """Returns an {action: prob} dictionary for the policy on `info_state`."""
-    retrieved_state = self._policy_cache.get(info_state)
-
-    if retrieved_state is not None:
-      return self._policy_cache[info_state]
-
-    policy_for_state = _regret_matching(
-        self._info_state_nodes[info_state].cumulative_regret, legal_actions)
-    self._policy_cache[info_state] = policy_for_state
-    return policy_for_state
+    prob_vec = self._current_policy.policy_for_key(info_state)
+    return {action: prob_vec[action] for action in legal_actions}

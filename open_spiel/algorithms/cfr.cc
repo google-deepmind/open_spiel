@@ -103,14 +103,14 @@ void CFRSolverBase::EvaluateAndUpdatePolicy() {
       if (regret_matching_plus_) {
         ApplyRegretMatchingPlusReset();
       }
-      ClearCachedPolicies();
+      ApplyRegretMatching();
     }
   } else {
     ComputeCounterFactualRegret(*root_state_, kNullopt, root_reach_probs_);
     if (regret_matching_plus_) {
       ApplyRegretMatchingPlusReset();
     }
-    ClearCachedPolicies();
+    ApplyRegretMatching();
   }
 }
 
@@ -164,8 +164,7 @@ std::vector<double> CFRSolverBase::ComputeCounterFactualRegret(
   int current_player = state.CurrentPlayer();
   std::string info_state = state.InformationState();
   std::vector<Action> legal_actions = state.LegalActions(current_player);
-  std::vector<double> info_state_policy =
-      ComputeOrGetPolicy(info_state, legal_actions);
+  std::vector<double> info_state_policy = GetPolicy(info_state, legal_actions);
 
   std::vector<double> child_utilities;
   child_utilities.reserve(legal_actions.size());
@@ -251,7 +250,7 @@ bool CFRSolverBase::AllPlayersHaveZeroReachProb(
   return true;
 }
 
-std::vector<double> CFRSolverBase::ComputeOrGetPolicy(
+std::vector<double> CFRSolverBase::GetPolicy(
     const std::string& info_state, const std::vector<Action>& legal_actions) {
   auto entry = info_states_.find(info_state);
   if (entry == info_states_.end()) {
@@ -261,12 +260,8 @@ std::vector<double> CFRSolverBase::ComputeOrGetPolicy(
 
   SPIEL_CHECK_FALSE(entry == info_states_.end());
   SPIEL_CHECK_FALSE(entry->second.empty());
-  if (!entry->second.cached_policy.empty()) {
-    return entry->second.cached_policy;
-  }
-
-  entry->second.ApplyRegretMatching();
-  return entry->second.cached_policy;
+  SPIEL_CHECK_FALSE(entry->second.current_policy.empty());
+  return entry->second.current_policy;
 }
 
 void CFRInfoStateValues::ApplyRegretMatching() {
@@ -277,24 +272,23 @@ void CFRInfoStateValues::ApplyRegretMatching() {
     }
   }
 
-  cached_policy.resize(legal_actions.size());
   for (int aidx = 0; aidx < num_actions(); ++aidx) {
     if (sum_positive_regrets > 0) {
-      cached_policy[aidx] =
+      current_policy[aidx] =
           cumulative_regrets[aidx] > 0
               ? cumulative_regrets[aidx] / sum_positive_regrets
               : 0;
     } else {
-      cached_policy[aidx] = 1.0 / legal_actions.size();
+      current_policy[aidx] = 1.0 / legal_actions.size();
     }
   }
 }
 
 int CFRInfoStateValues::SampleActionIndex(double epsilon, double z) {
   double sum = 0;
-  for (int aidx = 0; aidx < cached_policy.size(); ++aidx) {
-    double prob = epsilon * 1.0 / cached_policy.size() +
-                  (1.0 - epsilon) * cached_policy[aidx];
+  for (int aidx = 0; aidx < current_policy.size(); ++aidx) {
+    double prob = epsilon * 1.0 / current_policy.size() +
+                  (1.0 - epsilon) * current_policy[aidx];
     if (z >= sum && z < sum + prob) {
       return aidx;
     }
@@ -321,9 +315,9 @@ void CFRSolverBase::ApplyRegretMatchingPlusReset() {
   }
 }
 
-void CFRSolverBase::ClearCachedPolicies() {
+void CFRSolverBase::ApplyRegretMatching() {
   for (auto& entry : info_states_) {
-    entry.second.cached_policy.clear();
+    entry.second.ApplyRegretMatching();
   }
 }
 

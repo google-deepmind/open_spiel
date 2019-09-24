@@ -29,21 +29,21 @@ struct CFRInfoStateValues {
       : legal_actions(la),
         cumulative_regrets(la.size(), init_value),
         cumulative_policy(la.size(), init_value),
-        cached_policy({}) {}
+        current_policy(la.size(), 1.0 / la.size()) {}
   CFRInfoStateValues(std::vector<Action> la) : CFRInfoStateValues(la, 0) {}
 
-  void ApplyRegretMatching();  // Fills cached_policy.
-  bool empty() const { return legal_actions.size() == 0; }
+  void ApplyRegretMatching();  // Fills current_policy.
+  bool empty() const { return legal_actions.empty(); }
   int num_actions() const { return legal_actions.size(); }
 
-  // Samples from cached policy using randomly generated z, adding epsilon
+  // Samples from current policy using randomly generated z, adding epsilon
   // exploration (mixing in uniform).
   int SampleActionIndex(double epsilon, double z);
 
   std::vector<Action> legal_actions;
   std::vector<double> cumulative_regrets;
   std::vector<double> cumulative_policy;
-  std::vector<double> cached_policy;
+  std::vector<double> current_policy;
 };
 
 // A type for tables holding CFR values.
@@ -114,18 +114,19 @@ class CFRSolverBase {
 
   void InitializeUniformPolicy(const State& state);
 
-  std::vector<double> ComputeOrGetPolicy(
-      const std::string& info_state, const std::vector<Action>& legal_actions);
+  // Get the policy at this information state. The probabilities are ordered in
+  // the same order as legal_actions.
+  std::vector<double> GetPolicy(const std::string& info_state,
+                                const std::vector<Action>& legal_actions);
 
   void ApplyRegretMatchingPlusReset();
+  void ApplyRegretMatching();
 
   std::vector<double> RegretMatching(const std::string& info_state,
                                      const std::vector<Action>& legal_actions);
 
   bool AllPlayersHaveZeroReachProb(
       const std::vector<double>& reach_probabilities) const;
-
-  void ClearCachedPolicies();
 
   const Game& game_;
   const bool regret_matching_plus_;
