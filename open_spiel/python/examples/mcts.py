@@ -55,8 +55,13 @@ def _init_bot(bot_type, game, player_id):
   """Initializes a bot by type."""
   if bot_type == "mcts":
     evaluator = mcts.RandomRolloutEvaluator(FLAGS.rollout_count)
-    return mcts.MCTSBot(game, player_id, FLAGS.uct_c,
-                        FLAGS.max_simulations, evaluator, verbose=FLAGS.verbose)
+    return mcts.MCTSBot(
+        game,
+        player_id,
+        FLAGS.uct_c,
+        FLAGS.max_simulations,
+        evaluator,
+        verbose=FLAGS.verbose)
   if bot_type == "random":
     return uniform_random.UniformRandomBot(game, player_id, np.random)
   if bot_type == "human":
@@ -97,12 +102,12 @@ def _play_game(game):
       bot = bots[state.current_player()]
       _, action = bot.step(state)
       action_str = state.action_to_string(state.current_player(), action)
-      _opt_print("Player {} sampled action: {}".format(
-          state.current_player(), action_str))
+      _opt_print("Player {} sampled action: {}".format(state.current_player(),
+                                                       action_str))
       diff = time.time() - t1
       if isinstance(bot, mcts.MCTSBot):
-        _opt_print("Took %.3f secs, %.1f rollouts/s" % (
-            diff, (FLAGS.rollout_count * FLAGS.max_simulations) / diff))
+        _opt_print("Took %.3f secs, %.1f rollouts/s" %
+                   (diff, (FLAGS.rollout_count * FLAGS.max_simulations) / diff))
       history.append(action_str)
       state.apply_action(action)
 
@@ -110,8 +115,8 @@ def _play_game(game):
 
   # Game is now done. Print return for each player
   returns = state.returns()
-  print("Returns:", " ".join(map(str, returns)),
-        ", Game actions:", " ".join(history))
+  print("Returns:", " ".join(map(str, returns)), ", Game actions:",
+        " ".join(history))
   return returns, history
 
 

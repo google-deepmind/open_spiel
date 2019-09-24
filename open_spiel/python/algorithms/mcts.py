@@ -73,20 +73,21 @@ class SearchNode(object):
   represents a possible action, and the expected result from doing so.
 
   Attributes:
-    action: The action from the parent node's perspective. Not important for
-      the root node, as the actions that lead to it are in the past.
-    player_sign: +1 for moves by the root player or chance nodes,
-      -1 for the opponent. Needed to update the `total_reward` to reflect
-      the value of this move from the parent node's perspective.
+    action: The action from the parent node's perspective. Not important for the
+      root node, as the actions that lead to it are in the past.
+    player_sign: +1 for moves by the root player or chance nodes, -1 for the
+      opponent. Needed to update the `total_reward` to reflect the value of this
+      move from the parent node's perspective.
     explore_count: How many times this node was explored.
     total_reward: The sum of rewards of rollouts through this node, from the
       parent node's perspective. The average reward of this node is
       `total_reward / explore_count`
-    children: A list of SearchNodes representing the possible actions from
-      this node, along with their expected rewards.
+    children: A list of SearchNodes representing the possible actions from this
+      node, along with their expected rewards.
   """
   __slots__ = [
-      "action", "player_sign", "explore_count", "total_reward", "children"]
+      "action", "player_sign", "explore_count", "total_reward", "children"
+  ]
 
   def __init__(self, action, player_sign):
     self.action = action
@@ -108,7 +109,9 @@ class SearchNode(object):
     return max(self.children, key=lambda c: c.explore_count)
 
   def children_str(self, state=None):
-    """Returns the string repr. of all children, in decreasing explore count.
+    """Returns the string representation of all children.
+
+    They are ordered in decreasing explore count.
 
     Args:
       state: A `pyspiel.State` object, to be used to convert the action id into
@@ -116,10 +119,13 @@ class SearchNode(object):
     """
     return "".join([
         "  {}\n".format(c.to_str(state))
-        for c in sorted(self.children, key=lambda c: -c.explore_count)])
+        for c in sorted(self.children, key=lambda c: -c.explore_count)
+    ])
 
   def to_str(self, state=None):
-    """Returns the string repr. of this node children.
+    """Returns the string repr.
+
+    of this node children.
 
     Looks like: "d4h: sign: 1, value:  244.0 / 2017 =  0.121,  20 children"
 
@@ -127,8 +133,9 @@ class SearchNode(object):
       state: A `pyspiel.State` object, to be used to convert the action id into
         a human readable format. If None, the action integer id is used.
     """
-    action = (state.action_to_string(state.current_player(), self.action)
-              if state else str(self.action))
+    action = (
+        state.action_to_string(state.current_player(), self.action)
+        if state else str(self.action))
     return "{:>3}: sign: {}, value: {:6.1f} / {:4d} = {:6.3f}, {:3d} children".format(
         action, self.player_sign, self.total_reward, self.explore_count,
         self.explore_count and self.total_reward / self.explore_count,
@@ -141,8 +148,14 @@ class SearchNode(object):
 class MCTSBot(pyspiel.Bot):
   """Bot that uses Monte-Carlo Tree Search algorithm."""
 
-  def __init__(self, game, player, uct_c, max_simulations, evaluator,
-               random_state=None, verbose=False):
+  def __init__(self,
+               game,
+               player,
+               uct_c,
+               max_simulations,
+               evaluator,
+               random_state=None,
+               verbose=False):
     """Initializes a MCTS Search algorithm in the form of a bot.
 
     Args:
@@ -151,9 +164,9 @@ class MCTSBot(pyspiel.Bot):
       uct_c: The exploration constant for UCT.
       max_simulations: How many iterations of MCTS to perform. Each simulation
         will result in one call to the evaluator. Memory usage should grow
-        linearly with simulations * branching factor.
-      How many nodes in the search tree should be evaluated.
-        This is correlated with memory size and tree depth.
+        linearly with simulations * branching factor. How many nodes in the
+        search tree should be evaluated. This is correlated with memory size and
+        tree depth.
       evaluator: A `Evaluator` object to use to evaluate a leaf node.
       random_state: An optional numpy RandomState to make it deterministic.
       verbose: Whether to print information about the search tree before
@@ -202,8 +215,9 @@ class MCTSBot(pyspiel.Bot):
         # Reduce bias from move generation order.
         self._random_state.shuffle(legal_actions)
         player_sign = -1 if working_state.current_player() != self.player else 1
-        current_node.children = [SearchNode(action, player_sign)
-                                 for action in legal_actions]
+        current_node.children = [
+            SearchNode(action, player_sign) for action in legal_actions
+        ]
 
       if working_state.is_chance_node():
         # For chance nodes, rollout according to chance node's probability
@@ -211,14 +225,17 @@ class MCTSBot(pyspiel.Bot):
         outcomes = working_state.chance_outcomes()
         action_list, prob_list = zip(*outcomes)
         action = self._random_state.choice(action_list, p=prob_list)
-        chosen_child = next(c for c in current_node.children
-                            if c.action == action)
+        chosen_child = next(
+            c for c in current_node.children if c.action == action)
       else:
         # Otherwise choose node with largest UCT value
         chosen_child = max(
             current_node.children,
-            key=lambda c: c.uct_value(current_node.explore_count, self.uct_c,  # pylint: disable=g-long-lambda
-                                      self.child_default_value))
+            # pylint: disable=g-long-lambda
+            key=lambda c: c.uct_value(
+                current_node.explore_count,
+                self.uct_c,  # pylint: disable=g-long-lambda
+                self.child_default_value))
 
       working_state.apply_action(chosen_child.action)
       current_node = chosen_child
@@ -259,8 +276,8 @@ class MCTSBot(pyspiel.Bot):
       if working_state.is_terminal():
         node_value = working_state.player_return(self.player)
       else:
-        node_value = self.evaluator.evaluate(
-            working_state, self.player, self._random_state)
+        node_value = self.evaluator.evaluate(working_state, self.player,
+                                             self._random_state)
 
       for node in visit_path:
         node.total_reward += node_value * node.player_sign

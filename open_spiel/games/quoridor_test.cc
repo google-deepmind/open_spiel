@@ -35,8 +35,7 @@ void BasicQuoridorTests() {
         *LoadGame(absl::StrCat("quoridor(board_size=", i, ")")), 5);
   }
 
-  testing::RandomSimTest(
-      *LoadGame("quoridor(board_size=9,wall_count=5)"), 3);
+  testing::RandomSimTest(*LoadGame("quoridor(board_size=9,wall_count=5)"), 3);
 
   // Ansi colors!
   testing::RandomSimTest(

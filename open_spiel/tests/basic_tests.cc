@@ -194,7 +194,8 @@ int RandomSimulationFast(std::mt19937* rng, const Game& game, bool verbose) {
 
   if (verbose) {
     std::cout << "Initial state:" << std::endl
-              << "State:" << std::endl << state->ToString() << std::endl;
+              << "State:" << std::endl
+              << state->ToString() << std::endl;
   }
 
   int game_length = 0;
@@ -206,8 +207,9 @@ int RandomSimulationFast(std::mt19937* rng, const Game& game, bool verbose) {
       Action action = open_spiel::SampleChanceOutcome(
           outcomes, std::uniform_real_distribution<double>(0.0, 1.0)(*rng));
       if (verbose) {
-        std::cout << "Sampled outcome: " << state->ActionToString(
-            kChancePlayerId, action) << std::endl;
+        std::cout << "Sampled outcome: "
+                  << state->ActionToString(kChancePlayerId, action)
+                  << std::endl;
       }
       state->ApplyAction(action);
     } else if (state->CurrentPlayer() == open_spiel::kSimultaneousPlayerId) {
@@ -220,8 +222,9 @@ int RandomSimulationFast(std::mt19937* rng, const Game& game, bool verbose) {
         Action action = actions[dis(*rng)];
         joint_action.push_back(action);
         if (verbose) {
-          std::cout << "Player " << p << " chose action:"
-                    << state->ActionToString(p, action) << std::endl;
+          std::cout << "Player " << p
+                    << " chose action:" << state->ActionToString(p, action)
+                    << std::endl;
         }
       }
       state->ApplyActions(joint_action);
@@ -232,8 +235,9 @@ int RandomSimulationFast(std::mt19937* rng, const Game& game, bool verbose) {
       Action action = actions[dis(*rng)];
       if (verbose) {
         int p = state->CurrentPlayer();
-        std::cout << "Player " << p << " chose action: "
-                  << state->ActionToString(p, action) << std::endl;
+        std::cout << "Player " << p
+                  << " chose action: " << state->ActionToString(p, action)
+                  << std::endl;
       }
       state->ApplyAction(action);
     }
@@ -249,7 +253,7 @@ int RandomSimulationFast(std::mt19937* rng, const Game& game, bool verbose) {
 void RandomSimBenchmark(const std::string& game_def, int num_sims,
                         bool verbose) {
   std::mt19937 rng;
-  std::cout  << "RandomSimBenchmark, game = " << game_def
+  std::cout << "RandomSimBenchmark, game = " << game_def
             << ", num_sims = " << num_sims << ". ";
 
   auto game = LoadGame(game_def);
@@ -265,9 +269,8 @@ void RandomSimBenchmark(const std::string& game_def, int num_sims,
   int default_precision = std::cout.precision();
   std::cout.precision(1);
   std::cout << std::fixed << "Finished in " << (seconds * 1000) << " ms, "
-            << (num_sims / seconds) << " sims/s, "
-            << (num_moves / seconds) << " moves/s"
-            << std::defaultfloat << std::endl;
+            << (num_sims / seconds) << " sims/s, " << (num_moves / seconds)
+            << " moves/s" << std::defaultfloat << std::endl;
   std::cout.precision(default_precision);  // Reset.
 }
 

@@ -66,11 +66,11 @@ class PigState : public State {
   int nplayers_ = -1;
   int win_score_ = 0;
 
-  int total_moves_ = -1;  // Total num moves taken during the game.
+  int total_moves_ = -1;    // Total num moves taken during the game.
   Player cur_player_ = -1;  // Player to play.
-  int turn_player_ = -1;  // Whose actual turn is it. At chance nodes, we need
-                          // to remember whose is playing for next turns (while
-                          // cur_player will be the chance player's id.)
+  int turn_player_ = -1;    // Whose actual turn is it. At chance nodes, we need
+                            // to remember whose is playing for next turns
+                            // (cur_player will be the chance player's id.)
   std::vector<int> scores_;  // Score for each player.
   int turn_total_ = -1;
 };

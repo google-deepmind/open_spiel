@@ -96,7 +96,7 @@ class CoopBoxPushingState : public SimMoveState {
 
   // Fields sets to bad/invalid values. Use Game::NewInitialState().
   double total_rewards_ = -1;
-  int horizon_ = -1;     // Limit on the total number of moves.
+  int horizon_ = -1;        // Limit on the total number of moves.
   Player cur_player_ = -1;  // Could be chance's turn.
   int total_moves_ = 0;
   int initiative_;  // 0 = player initiative+1 goes first.

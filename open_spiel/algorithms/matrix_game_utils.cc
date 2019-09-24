@@ -124,8 +124,8 @@ std::unique_ptr<MatrixGame> ExtensiveToMatrixGame(const Game& game) {
   } while (policies[0].NextPolicy());
 
   return matrix_game::CreateMatrixGame(type.short_name, type.long_name,
-                                       row_names, col_names,
-                                       row_player_utils, col_player_utils);
+                                       row_names, col_names, row_player_utils,
+                                       col_player_utils);
 }
 
 }  // namespace algorithms

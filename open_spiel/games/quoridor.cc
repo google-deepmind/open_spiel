@@ -117,7 +117,7 @@ class QuoridorState::SearchState {
 
  private:
   SearchQueue queue_;
-  std::vector<bool> mark_;  // Whether this position has been pushed before.
+  std::vector<bool> mark_;     // Whether this position has been pushed before.
   std::vector<int> distance_;  // Distance from player.
   std::vector<bool> on_shortest_path_;  // Is this position on a shortest path?
 };
@@ -134,7 +134,6 @@ std::string Move::ToString() const {
   }
   return "invalid move";
 }
-
 
 QuoridorState::QuoridorState(int board_size, int wall_count,
                              bool ansi_color_output)
@@ -156,8 +155,7 @@ QuoridorState::QuoridorState(int board_size, int wall_count,
 }
 
 Move QuoridorState::ActionToMove(Action action_id) const {
-  return GetMove(action_id % board_diameter_,
-                 action_id / board_diameter_);
+  return GetMove(action_id % board_diameter_, action_id / board_diameter_);
 }
 
 std::vector<Action> QuoridorState::LegalActions() const {
@@ -200,7 +198,7 @@ std::vector<Action> QuoridorState::LegalActions() const {
 }
 
 void QuoridorState::AddActions(Move cur, Offset offset,
-                               std::vector<Action> *moves) const {
+                               std::vector<Action>* moves) const {
   SPIEL_CHECK_FALSE(cur.IsWall());
 
   if (IsWall(cur + offset)) {
@@ -237,8 +235,7 @@ void QuoridorState::AddActions(Move cur, Offset offset,
 bool QuoridorState::IsValidWall(Move m, SearchState* search_state) const {
   Offset offset = (m.IsHorizontalWall() ? Offset(1, 0) : Offset(0, 1));
 
-  if (IsWall(m + offset * 0) ||
-      IsWall(m + offset * 1) ||
+  if (IsWall(m + offset * 0) || IsWall(m + offset * 1) ||
       IsWall(m + offset * 2)) {
     // Already blocked by a wall.
     return false;
@@ -257,8 +254,7 @@ bool QuoridorState::IsValidWall(Move m, SearchState* search_state) const {
   // connecting them to anything else, can't cut any paths.
   int count = (
       // The 3 walls near the close end.
-      (IsWall(m - offset * 2) ||
-       IsWall(m - offset + offset.rotate_left()) ||
+      (IsWall(m - offset * 2) || IsWall(m - offset + offset.rotate_left()) ||
        IsWall(m - offset + offset.rotate_right())) +
       // The 3 walls near the far end.
       (IsWall(m + offset * 4) ||
@@ -267,8 +263,7 @@ bool QuoridorState::IsValidWall(Move m, SearchState* search_state) const {
       // The 2 walls in the middle.
       (IsWall(m + offset + offset.rotate_left()) ||
        IsWall(m + offset + offset.rotate_right())));
-  if (count <= 1)
-    return true;
+  if (count <= 1) return true;
 
   // Do a full search to verify both players can get to their respective goals.
   return (SearchEndZone(kPlayer1, m, m + offset * 2, search_state) &&
@@ -380,7 +375,7 @@ std::string QuoridorState::ToString() const {
   if (ansi_color_output_) {
     std::string esc = "\033";
     reset = esc + "[0m";
-    coord = esc + "[1;37m";  // bright white
+    coord = esc + "[1;37m";                  // bright white
     white = esc + "[1;33m" + " @ " + reset;  // bright yellow
     black = esc + "[1;34m" + " @ " + reset;  // bright blue
   }
@@ -397,7 +392,7 @@ std::string QuoridorState::ToString() const {
 
   for (int y = 0; y < board_diameter_; ++y) {
     if (y % 2 == 0) {
-      if (y / 2 + 1 < 10) out <<  " ";
+      if (y / 2 + 1 < 10) out << " ";
       out << coord << (y / 2 + 1) << reset;  // Leading y coord.
     } else {
       out << "  ";  // Wall lines.
@@ -496,10 +491,9 @@ std::unique_ptr<State> QuoridorState::Clone() const {
 QuoridorGame::QuoridorGame(const GameParameters& params)
     : Game(kGameType, params),
       board_size_(ParameterValue<int>("board_size", kDefaultBoardSize)),
-      wall_count_(ParameterValue<int>("wall_count",
-                                      board_size_ * board_size_ / 8)),
-      ansi_color_output_(ParameterValue<bool>("ansi_color_output", false)) {
-}
+      wall_count_(
+          ParameterValue<int>("wall_count", board_size_ * board_size_ / 8)),
+      ansi_color_output_(ParameterValue<bool>("ansi_color_output", false)) {}
 
 }  // namespace quoridor
 }  // namespace open_spiel

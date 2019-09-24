@@ -80,8 +80,8 @@ class TicTacToeState : public State {
 
  private:
   bool HasLine(Player player) const;  // Does this player have a line?
-  bool IsFull() const;             // Is the board full?
-  Player current_player_ = 0;      // Player zero goes first
+  bool IsFull() const;                // Is the board full?
+  Player current_player_ = 0;         // Player zero goes first
 };
 
 // Game object.

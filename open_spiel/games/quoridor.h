@@ -129,7 +129,7 @@ class QuoridorState : public State {
   class SearchState;
 
   // Helpers for `LegaLActions`.
-  void AddActions(Move cur, Offset offset, std::vector<Action> *moves) const;
+  void AddActions(Move cur, Offset offset, std::vector<Action>* moves) const;
   bool IsValidWall(Move m, SearchState*) const;
   bool SearchEndZone(QuoridorPlayer p, Move wall1, Move wall2,
                      SearchState*) const;
@@ -152,9 +152,7 @@ class QuoridorGame : public Game {
  public:
   explicit QuoridorGame(const GameParameters& params);
 
-  int NumDistinctActions() const override {
-    return Diameter() * Diameter();
-  }
+  int NumDistinctActions() const override { return Diameter() * Diameter(); }
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(
         new QuoridorState(board_size_, wall_count_, ansi_color_output_));

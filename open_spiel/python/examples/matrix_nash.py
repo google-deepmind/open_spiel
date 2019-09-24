@@ -56,7 +56,6 @@ from open_spiel.python.algorithms import lp_solver
 from open_spiel.python.egt import utils
 import pyspiel
 
-
 FLAGS = flags.FLAGS
 
 flags.DEFINE_string("game", "first_sealed_auction(max_value=6)",
@@ -90,6 +89,7 @@ def lrs_solve(row_payoffs, col_payoffs):
   Args:
     row_payoffs: payoffs for row player
     col_payoffs: payoffs for column player
+
   Yields:
     (row_mixture, col_mixture), numpy vectors of float64s.
   """
@@ -142,12 +142,14 @@ def lemke_howson_solve(row_payoffs, col_payoffs):
   Args:
     row_payoffs: payoffs for row player
     col_payoffs: payoffs for column player
+
   Yields:
     (row_mixture, col_mixture), numpy vectors of float64s.
   """
 
   showwarning = warnings.showwarning
   warned_degenerate = [False]
+
   def showwarning_check_degenerate(message, *args, **kwargs):
     if "Your game could be degenerate." in str(message):
       warned_degenerate[0] = True

@@ -79,7 +79,7 @@ class ConnectFourState : public State {
   bool HasLineFrom(Player player, int row, int col) const;
   bool HasLineFromInDirection(Player player, int row, int col, int drow,
                               int dcol) const;
-  bool IsFull() const;      // Is the board full?
+  bool IsFull() const;         // Is the board full?
   Player current_player_ = 0;  // Player zero goes first
   std::array<CellState, kNumCells> board_;
 };

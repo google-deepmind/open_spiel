@@ -90,9 +90,7 @@ std::string GoState::InformationState(int player) const {
   return HistoryString();
 }
 
-std::string GoState::Observation(int player) const {
-  return ToString();
-}
+std::string GoState::Observation(int player) const { return ToString(); }
 
 void GoState::ObservationAsNormalizedVector(int player,
                                             std::vector<double>* values) const {
