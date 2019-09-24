@@ -33,6 +33,44 @@ _KUHN_UNIFORM_POLICY = policy.TabularPolicy(pyspiel.load_game("kuhn_poker"))
 _LEDUC_UNIFORM_POLICY = policy.TabularPolicy(pyspiel.load_game("leduc_poker"))
 
 
+class ModuleLevelFunctionTest(absltest.TestCase):
+
+  def test__update_current_policy(self):
+    game = pyspiel.load_game("kuhn_poker")
+    tabular_policy = policy.TabularPolicy(game)
+
+    cumulative_regrets = np.arange(0, 12 * 2).reshape((12, 2))
+    expected_policy = cumulative_regrets / np.sum(
+        cumulative_regrets, axis=-1, keepdims=True)
+    nodes_indices = {
+        u"0": 0,
+        u"0pb": 1,
+        u"1": 2,
+        u"1pb": 3,
+        u"2": 4,
+        u"2pb": 5,
+        u"1p": 6,
+        u"1b": 7,
+        u"2p": 8,
+        u"2b": 9,
+        u"0p": 10,
+        u"0b": 11,
+    }
+    # pylint: disable=g-complex-comprehension
+    info_state_nodes = {
+        key: cfr._InfoStateNode(
+            legal_actions=[0, 1],
+            cumulative_regret=dict(enumerate(cumulative_regrets[index])),
+            cumulative_policy=None) for key, index in nodes_indices.items()
+    }
+    # pylint: enable=g-complex-comprehension
+
+    cfr._update_current_policy(tabular_policy, info_state_nodes)
+
+    np.testing.assert_array_equal(expected_policy,
+                                  tabular_policy.action_probability_array)
+
+
 class CFRTest(parameterized.TestCase, absltest.TestCase):
 
   @parameterized.parameters(
@@ -191,7 +229,6 @@ class CFRBRTest(parameterized.TestCase, absltest.TestCase):
         average_policy_values, [-1 / 18, 1 / 18], atol=1e-3)
 
     cfrbr_solver.policy()
-
 
 if __name__ == "__main__":
   absltest.main()

@@ -155,7 +155,7 @@ def _update_average_policy(average_policy, info_state_nodes):
 
 
 class _CFRSolver(object):
-  """Implements the Counterfactual Regret Minimization (CFR) algorithm.
+  r"""Implements the Counterfactual Regret Minimization (CFR) algorithm.
 
   The algorithm computes an approximate Nash policy for 2 player zero-sum games.
 
@@ -178,6 +178,23 @@ class _CFRSolver(object):
   policy) can be computed:
   ```python
         average_policy = cfr_solver.ComputeAveragePolicy()
+  ```
+
+  # Policy and average policy
+
+  policy(0) and average_policy(0) are not technically defined, but these
+  methods will return arbitrarily the uniform_policy.
+
+  Then, we are expected to have:
+
+  ```
+  for t in range(1, N):
+    cfr_solver.evaluate_and_update_policy()
+    policy(t) = RM or RM+ of cumulative regrets
+    avg_policy(t)(s, a) ~ \sum_{k=1}^t player_reach_prob(t)(s) * policy(k)(s, a)
+
+    With Linear Averaging, the avg_policy is proportional to:
+    \sum_{k=1}^t k * player_reach_prob(t)(s) * policy(k)(s, a)
   ```
   """
 
@@ -261,6 +278,9 @@ class _CFRSolver(object):
   def policy(self):
     """Returns the current policy (TabularPolicy) (no convergence guarantees).
 
+    WARNING: The same object, updated in-place will be returned! You can copy
+    it (or its `action_probability_array` field).
+
     This function exists to have access to the policy, but one should use
     `average_policy` for a Nash-Equilibrium converging sequence.
     """
@@ -270,6 +290,9 @@ class _CFRSolver(object):
   def average_policy(self):
     """Returns the average of all policies iterated.
 
+    WARNING: The same object, updated in-place will be returned! You can copy
+    it (or its `action_probability_array` field).
+
     This average policy converges to a Nash policy as the number of iterations
     increases.
 
@@ -277,7 +300,8 @@ class _CFRSolver(object):
     using `evaluate_and_update_policy`.
 
     Returns:
-      A `policy.TabularPolicy` object, giving the policy for both players.
+      A `policy.TabularPolicy` object (shared between calls) giving the policy
+      for both players.
     """
     _update_average_policy(self._average_policy, self._info_state_nodes)
     return self._average_policy
@@ -577,15 +601,14 @@ class CFRBRSolver(object):
   def evaluate_and_update_policy(self):
     """Performs a single step of policy evaluation and policy improvement."""
     self._iteration += 1
-    num_players = self._game.num_players()
 
     self._compute_best_responses()
 
-    for player in range(num_players):
+    for player in range(self._num_players):
       # We do not use policies, to not have to call `state.information_state`
       # several times (in here and within policy).
       policies = []
-      for p in range(num_players):
+      for p in range(self._num_players):
         # pylint: disable=g-long-lambda
         policies.append(
             lambda infostate_str, legal_actions, p=p:
@@ -594,9 +617,9 @@ class CFRBRSolver(object):
       policies[player] = self._compute_policy_or_get_it_from_cache
 
       self._compute_counterfactual_regret_for_player(
-          self._root_node,
-          policies,
-          reach_probabilities=np.ones(num_players + 1),
+          state=self._root_node,
+          policies=policies,
+          reach_probabilities=np.ones(self._num_players + 1),
           player=player)
 
       if self._regret_matching_plus:
@@ -604,21 +627,26 @@ class CFRBRSolver(object):
     self._policy_cache.clear()
 
   def policy(self):
-    """Returns the current policy as a `policy.TabularPolicy` object."""
+    """Returns the current policy as a `policy.TabularPolicy` object.
+
+    WARNING: The same object, updated in-place will be returned! You can copy
+    it (or its `action_probability_array` field).
+    """
     _update_current_policy(self._current_policy, self._info_state_nodes)
     return self._current_policy
 
   def average_policy(self):
-    """Returns the time average of all policies iterated.
+    r"""Returns the time average of all policies iterated.
+
+    WARNING: The same object, updated in-place will be returned! You can copy
+    it (or its `action_probability_array` field).
 
     This average policy converges to a Nash policy as the number of iterations
     increases.
 
-    The policy is computed using the accumulated policy probabilities computed
-    using `evaluate_and_update_policy`.
-
     Returns:
-      A `policy.TabularPolicy` object, giving the policy for both players.
+      A `policy.TabularPolicy` object (shared between calls) giving the policy
+      for both players.
     """
     _update_average_policy(self._average_policy, self._info_state_nodes)
     return self._average_policy
@@ -683,20 +711,17 @@ class CFRBRSolver(object):
       new_reach_probabilities = reach_probabilities.copy()
       new_reach_probabilities[current_player] *= action_prob
       child_utility = self._compute_counterfactual_regret_for_player(
-          new_state,
-          policies,
+          state=new_state,
+          policies=policies,
           reach_probabilities=new_reach_probabilities,
           player=player)
 
       state_value += action_prob * child_utility
       children_utilities[action] = child_utility
 
-    # If we are performing alternating updates, and the current player is not
-    # the current_player, we skip the cumulative values update.
-    # If we are performing simultaneous updates, we do update the cumulative
-    # values.
-    simulatenous_updates = player is None
-    if not simulatenous_updates and current_player != player:
+    # If the current player is not the current_player, we skip the cumulative
+    # values update.
+    if current_player != player:
       return state_value
 
     reach_prob = reach_probabilities[current_player]
@@ -705,17 +730,18 @@ class CFRBRSolver(object):
         np.prod(reach_probabilities[current_player + 1:]))
     state_value_for_player = state_value[current_player]
 
+    info_state_node = self._info_state_nodes[info_state]
     for action, action_prob in info_state_policy.items():
       cfr_regret = counterfactual_reach_prob * (
           children_utilities[action][current_player] - state_value_for_player)
 
-      info_state_node = self._info_state_nodes[info_state]
       info_state_node.cumulative_regret[action] += cfr_regret
       if self._linear_averaging:
-        info_state_node.cumulative_policy[
-            action] += self._iteration * reach_prob * action_prob
+
+        cumulative_policy_increment = self._iteration * reach_prob * action_prob
       else:
-        info_state_node.cumulative_policy[action] += reach_prob * action_prob
+        cumulative_policy_increment = reach_prob * action_prob
+      info_state_node.cumulative_policy[action] += cumulative_policy_increment
 
     return state_value
 
