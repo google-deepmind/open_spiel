@@ -1,6 +1,12 @@
 add_library (algorithms OBJECT
+  cfr.h
+  cfr.cc
+  cfr_br.h
+  cfr_br.cc
   deterministic_policy.h
   deterministic_policy.cc
+  evaluate_bots.h
+  evaluate_bots.cc
   expected_returns.h
   expected_returns.cc
   external_sampling_mccfr.h
@@ -9,24 +15,20 @@ add_library (algorithms OBJECT
   get_all_states.cc
   get_legal_actions_map.h
   get_legal_actions_map.cc
+  history_tree.h
+  history_tree.cc
   matrix_game_utils.h
   matrix_game_utils.cc
   mcts.h
   mcts.cc
   minimax.h
   minimax.cc
-  value_iteration.h
-  value_iteration.cc
-  evaluate_bots.h
-  evaluate_bots.cc
-  trajectories.h
-  trajectories.cc
   tabular_exploitability.h
   tabular_exploitability.cc
-  history_tree.h
-  history_tree.cc
-  cfr.h
-  cfr.cc
+  trajectories.h
+  trajectories.cc
+  value_iteration.h
+  value_iteration.cc
 )
 target_include_directories (algorithms PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -61,6 +63,10 @@ add_test(minimax_test minimax_test)
 add_executable(cfr_test cfr_test.cc
         $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})
 add_test(cfr_test cfr_test)
+
+add_executable(cfr_br_test cfr_br_test.cc
+        $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})
+add_test(cfr_br_test cfr_br_test)
 
 add_executable(trajectories_test trajectories_test.cc
         $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})

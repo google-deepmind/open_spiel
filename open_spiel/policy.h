@@ -99,6 +99,22 @@ class TabularPolicy : public Policy {
   TabularPolicy(const std::unordered_map<std::string, ActionsAndProbs>& table)
       : policy_table_(table) {}
 
+  // Creates a new TabularPolicy from a deterministic policy encoded as a
+  // {info_state_str -> action} dict. The dummy_policy is used to initialize
+  // the initial mapping.
+  TabularPolicy(const TabularPolicy& dummy_policy,
+                const std::unordered_map<std::string, Action>& action_map)
+      : policy_table_(dummy_policy.policy_table_) {
+    for (const auto& entry : action_map) {
+      std::string info_state = entry.first;
+      Action action_taken = action_map.at(entry.first);
+      for (auto& action_and_prob : policy_table_[info_state]) {
+        action_and_prob.second =
+          (action_and_prob.first == action_taken ? 1.0 : 0.0);
+      }
+    }
+  }
+
   ActionsAndProbs GetStatePolicy(const std::string& info_state) const override {
     auto iter = policy_table_.find(info_state);
     if (iter == policy_table_.end()) {

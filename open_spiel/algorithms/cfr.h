@@ -64,6 +64,22 @@ class CFRAveragePolicy : public Policy {
 
  private:
   const CFRInfoStateValuesTable& info_states_;
+  bool default_to_uniform_;
+  std::shared_ptr<TabularPolicy> default_policy_;
+};
+
+// A policy that extracts the current policy from the CFR table values.
+class CFRCurrentPolicy : public Policy {
+ public:
+  // Returns the current policy from the CFR values. If a default policy is
+  // passed in, then it means that it is used if the lookup fails (use nullptr
+  // to not use a default policy).
+  CFRCurrentPolicy(const CFRInfoStateValuesTable& info_states,
+                   std::shared_ptr<TabularPolicy> default_policy);
+  ActionsAndProbs GetStatePolicy(const std::string& info_state) const override;
+
+ private:
+  const CFRInfoStateValuesTable& info_states_;
   std::shared_ptr<TabularPolicy> default_policy_;
 };
 
@@ -86,9 +102,10 @@ class CFRSolverBase {
  public:
   CFRSolverBase(const Game& game, bool alternating_updates,
                 bool linear_averaging, bool regret_matching_plus);
+  virtual ~CFRSolverBase() = default;
 
   // Performs one step of the CFR algorithm.
-  void EvaluateAndUpdatePolicy();
+  virtual void EvaluateAndUpdatePolicy();
 
   // Computes the average policy, containing the policy for all players.
   // The returned policy instance should only be used during the lifetime of
@@ -97,19 +114,54 @@ class CFRSolverBase {
     return std::unique_ptr<Policy>(new CFRAveragePolicy(info_states_, nullptr));
   }
 
- private:
+  // Computes the current policy, containing the policy for all players.
+  // The returned policy instance should only be used during the lifetime of
+  // the CFRSolver object.
+  std::unique_ptr<Policy> CurrentPolicy() const {
+    return std::unique_ptr<Policy>(new CFRCurrentPolicy(info_states_, nullptr));
+  }
+
+ protected:
+  const Game& game_;
+
+  // Iteration to support linear_policy.
+  int iteration_ = 0;
+  CFRInfoStateValuesTable info_states_;
+  const std::unique_ptr<State> root_state_;
+  const std::vector<double> root_reach_probs_;
+
+  // Compute the counterfactual regret and update the average policy for the
+  // specified player.
+  // The optional `policy_overrides` can be used to specify for each player a
+  // policy to use instead of the current policy. `policy_overrides=nullptr`
+  // will disable this feature. Otherwise it should be a [num_players] vector,
+  // and if `policy_overrides[p] != nullptr` it will be used instead of the
+  // current policy. This feature exists to support CFR-BR.
   std::vector<double> ComputeCounterFactualRegret(
       const State& state, const Optional<int>& alternating_player,
-      const std::vector<double>& reach_probabilities);
+      const std::vector<double>& reach_probabilities,
+      const std::vector<const Policy*>* policy_overrides);
 
+  // Update the current policy for all information states.
+  void ApplyRegretMatching();
+
+ private:
   std::vector<double> ComputeCounterFactualRegretForActionProbs(
       const State& state, const Optional<int>& alternating_player,
       const std::vector<double>& reach_probabilities, const int current_player,
       const std::vector<double>& info_state_policy,
       const std::vector<Action>& legal_actions,
-      std::vector<double>* child_values_out = nullptr);
+      std::vector<double>* child_values_out,
+      const std::vector<const Policy*>* policy_overrides);
 
   void InitializeInfostateNodes(const State& state);
+
+  // Fills `info_state_policy` to be a [num_actions] vector of the probabilities
+  // found in `policy` at the given `info_state`.
+  void GetInfoStatePolicyFromPolicy(std::vector<double>* info_state_policy,
+                                    const std::vector<Action>& legal_actions,
+                                    const Policy* policy,
+                                    const std::string& info_state) const;
 
   // Get the policy at this information state. The probabilities are ordered in
   // the same order as legal_actions.
@@ -117,7 +169,6 @@ class CFRSolverBase {
                                 const std::vector<Action>& legal_actions);
 
   void ApplyRegretMatchingPlusReset();
-  void ApplyRegretMatching();
 
   std::vector<double> RegretMatching(const std::string& info_state,
                                      const std::vector<Action>& legal_actions);
@@ -125,18 +176,11 @@ class CFRSolverBase {
   bool AllPlayersHaveZeroReachProb(
       const std::vector<double>& reach_probabilities) const;
 
-  const Game& game_;
   const bool regret_matching_plus_;
   const bool alternating_updates_;
   const bool linear_averaging_;
 
   const int chance_player_;
-  const std::unique_ptr<State> root_state_;
-  const std::vector<double> root_reach_probs_;
-
-  // Iteration to support linear_policy.
-  int iteration_ = 0;
-  CFRInfoStateValuesTable info_states_;
 };
 
 // Standard CFR implementation.
