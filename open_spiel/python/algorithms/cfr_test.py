@@ -27,6 +27,7 @@ import numpy as np
 from open_spiel.python import policy
 from open_spiel.python.algorithms import cfr
 from open_spiel.python.algorithms import expected_game_score
+from open_spiel.python.algorithms import exploitability
 import pyspiel
 
 _KUHN_UNIFORM_POLICY = policy.TabularPolicy(pyspiel.load_game("kuhn_poker"))
@@ -185,6 +186,32 @@ class CFRTest(parameterized.TestCase, absltest.TestCase):
     for info_state_str in tabular_policy.state_lookup.keys():
       np.testing.assert_equal(
           np.asarray([0.5, 0.5]), tabular_policy.policy_for_key(info_state_str))
+
+  @parameterized.parameters([
+      (pyspiel.load_game("kuhn_poker"), pyspiel.CFRSolver, cfr.CFRSolver),
+      (pyspiel.load_game("leduc_poker"), pyspiel.CFRSolver, cfr.CFRSolver),
+      (pyspiel.load_game("kuhn_poker"), pyspiel.CFRPlusSolver,
+       cfr.CFRPlusSolver),
+      (pyspiel.load_game("leduc_poker"), pyspiel.CFRPlusSolver,
+       cfr.CFRPlusSolver),
+  ])
+  def test_cpp_algorithms_identical_to_python_algorithm(self, game, cpp_class,
+                                                        python_class):
+    cpp_solver = cpp_class(game)
+    python_solver = python_class(game)
+
+    for _ in range(5):
+      cpp_solver.evaluate_and_update_policy()
+      python_solver.evaluate_and_update_policy()
+
+      cpp_avg_policy = cpp_solver.average_policy()
+      python_avg_policy = python_solver.average_policy()
+
+      # We do not compare the policy directly as we do not have an easy way to
+      # convert one to the other, so we use the exploitability as a proxy.
+      cpp_expl = pyspiel.nash_conv(game, cpp_avg_policy)
+      python_expl = exploitability.nash_conv(game, python_avg_policy)
+      self.assertEqual(cpp_expl, python_expl)
 
 
 class CFRBRTest(parameterized.TestCase, absltest.TestCase):
