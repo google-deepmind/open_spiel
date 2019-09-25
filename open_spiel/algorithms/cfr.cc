@@ -45,7 +45,13 @@ ActionsAndProbs CFRAveragePolicy::GetStatePolicy(
   for (int aidx = 0; aidx < is_vals.num_actions(); ++aidx) {
     sum_prob += is_vals.cumulative_policy[aidx];
   }
+
   if (sum_prob == 0.0) {
+    // Return a uniform policy at this node
+    double prob = 1. / is_vals.num_actions();;
+    for (Action action : is_vals.legal_actions) {
+      actions_and_probs.push_back({action, prob});
+    }
     return actions_and_probs;
   }
 
@@ -56,10 +62,8 @@ ActionsAndProbs CFRAveragePolicy::GetStatePolicy(
   return actions_and_probs;
 }
 
-CFRSolverBase::CFRSolverBase(const Game& game,
-                             bool initialize_cumulative_values,
-                             bool alternating_updates, bool linear_averaging,
-                             bool regret_matching_plus)
+CFRSolverBase::CFRSolverBase(const Game& game, bool alternating_updates,
+                             bool linear_averaging, bool regret_matching_plus)
     : game_(game),
       regret_matching_plus_(regret_matching_plus),
       alternating_updates_(alternating_updates),
@@ -67,18 +71,16 @@ CFRSolverBase::CFRSolverBase(const Game& game,
       chance_player_(game.NumPlayers()),
       root_state_(game.NewInitialState()),
       root_reach_probs_(game_.NumPlayers() + 1, 1.0) {
-  if (initialize_cumulative_values) {
-    InitializeUniformPolicy(*root_state_);
-  }
+  InitializeInfostateNodes(*root_state_);
 }
 
-void CFRSolverBase::InitializeUniformPolicy(const State& state) {
+void CFRSolverBase::InitializeInfostateNodes(const State& state) {
   if (state.IsTerminal()) {
     return;
   }
   if (state.IsChanceNode()) {
     for (const auto& action_prob : state.ChanceOutcomes()) {
-      InitializeUniformPolicy(*state.Child(action_prob.first));
+      InitializeInfostateNodes(*state.Child(action_prob.first));
     }
     return;
   }
@@ -87,11 +89,11 @@ void CFRSolverBase::InitializeUniformPolicy(const State& state) {
   std::string info_state = state.InformationState(current_player);
   std::vector<Action> legal_actions = state.LegalActions();
 
-  CFRInfoStateValues is_vals(legal_actions, kInitialPositiveValue_);
+  CFRInfoStateValues is_vals(legal_actions);
   info_states_[info_state] = is_vals;
 
   for (const Action& action : legal_actions) {
-    InitializeUniformPolicy(*state.Child(action));
+    InitializeInfostateNodes(*state.Child(action));
   }
 }
 

@@ -54,16 +54,16 @@ using CFRInfoStateValuesTable =
 // can be passed to tabular exploitability.
 class CFRAveragePolicy : public Policy {
  public:
-  // Returns the average policy from the CFR values. If a default policy is
-  // passed in, then it means that it is used if the lookup fails (use nullptr
-  // to not use a default policy).
+  // Returns the average policy from the CFR values.
+  // If an info state is not found, return the default policy for the info state
+  // (or an empty policy if default_policy is nullptr). If an info state has
+  // zero cumulative regret for all actions, return a uniform policy.
   CFRAveragePolicy(const CFRInfoStateValuesTable& info_states,
                    std::shared_ptr<TabularPolicy> default_policy);
   ActionsAndProbs GetStatePolicy(const std::string& info_state) const override;
 
  private:
   const CFRInfoStateValuesTable& info_states_;
-  bool default_to_uniform_;
   std::shared_ptr<TabularPolicy> default_policy_;
 };
 
@@ -84,9 +84,8 @@ class CFRAveragePolicy : public Policy {
 //
 class CFRSolverBase {
  public:
-  CFRSolverBase(const Game& game, bool initialize_cumulative_values,
-                bool alternating_updates, bool linear_averaging,
-                bool regret_matching_plus);
+  CFRSolverBase(const Game& game, bool alternating_updates,
+                bool linear_averaging, bool regret_matching_plus);
 
   // Performs one step of the CFR algorithm.
   void EvaluateAndUpdatePolicy();
@@ -99,8 +98,6 @@ class CFRSolverBase {
   }
 
  private:
-  static constexpr double kInitialPositiveValue_ = 1e-5;
-
   std::vector<double> ComputeCounterFactualRegret(
       const State& state, const Optional<int>& alternating_player,
       const std::vector<double>& reach_probabilities);
@@ -112,7 +109,7 @@ class CFRSolverBase {
       const std::vector<Action>& legal_actions,
       std::vector<double>* child_values_out = nullptr);
 
-  void InitializeUniformPolicy(const State& state);
+  void InitializeInfostateNodes(const State& state);
 
   // Get the policy at this information state. The probabilities are ordered in
   // the same order as legal_actions.
@@ -148,7 +145,7 @@ class CFRSolverBase {
 class CFRSolver : public CFRSolverBase {
  public:
   explicit CFRSolver(const Game& game)
-      : CFRSolverBase(game, /*initialize_cumulative_values=*/false,
+      : CFRSolverBase(game,
                       /*alternating_updates=*/true,
                       /*linear_averaging=*/false,
                       /*regret_matching_plus=*/false) {}
@@ -165,7 +162,7 @@ class CFRSolver : public CFRSolverBase {
 class CFRPlusSolver : public CFRSolverBase {
  public:
   CFRPlusSolver(const Game& game)
-      : CFRSolverBase(game, /*initialize_cumulative_values=*/true,
+      : CFRSolverBase(game,
                       /*alternating_updates=*/true,
                       /*linear_averaging=*/true,
                       /*regret_matching_plus=*/true) {}
