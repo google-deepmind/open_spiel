@@ -97,6 +97,13 @@ CFRSolverBase::CFRSolverBase(const Game& game, bool alternating_updates,
       alternating_updates_(alternating_updates),
       linear_averaging_(linear_averaging),
       chance_player_(game.NumPlayers()) {
+  if (game_.GetType().dynamics != GameType::Dynamics::kSequential) {
+    SpielFatalError(
+        "CFR requires sequential games. If you're trying to run it "
+        "on a simultaneous (or normal-form) game, please first transform it "
+        "using turn_based_simultaneous_game.");
+  }
+
   InitializeInfostateNodes(*root_state_);
 }
 

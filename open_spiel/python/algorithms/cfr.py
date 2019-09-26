@@ -32,6 +32,7 @@ import numpy as np
 
 from open_spiel.python import policy
 from open_spiel.python.algorithms import exploitability
+import pyspiel
 
 
 @attr.s
@@ -214,6 +215,11 @@ class _CFRSolver(object):
         cumulative_regrets = cumulative_regrets + regrets
     """
     # pyformat: enable
+    assert game.get_type().dynamics == pyspiel.GameType.Dynamics.SEQUENTIAL, (
+        "CFR requires sequential games. If you're trying to run it " +
+        "on a simultaneous (or normal-form) game, please first transform it " +
+        "using turn_based_simultaneous_game.")
+
     self._game = game
     self._num_players = game.num_players()
     self._root_node = self._game.new_initial_state()
@@ -512,6 +518,11 @@ class CFRBRSolver(object):
     # pyformat: enable
     if game.num_players() != 2:
       raise ValueError("Game {} does not have {} players.".format(game, 2))
+
+    assert game.get_type().dynamics == pyspiel.GameType.Dynamics.SEQUENTIAL, (
+        "CFR requires sequential games. If you're trying to run it " +
+        "on a simultaneous (or normal-form) game, please first transform it " +
+        "using turn_based_simultaneous_game.")
 
     self._game = game
     self._num_players = game.num_players()
