@@ -88,7 +88,7 @@ class ConnectFourState : public State {
 class ConnectFourGame : public Game {
  public:
   explicit ConnectFourGame(const GameParameters& params);
-  int NumDistinctActions() const override { return kNumCells; }
+  int NumDistinctActions() const override { return kCols; }
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(new ConnectFourState(NumDistinctActions()));
   }
