@@ -27,6 +27,13 @@
 namespace open_spiel {
 namespace backgammon {
 namespace {
+
+// A few constants to help with the conversion to human-readable string formats.
+// TODO: remove these once we've changed kBarPos and kScorePos (see TODO in
+// header).
+constexpr int kNumBarPosHumanReadable = 25;
+constexpr int kNumOffPosHumanReadable = -2;
+
 const std::vector<std::pair<Action, double>> kChanceOutcomes = {
     std::pair<Action, double>(0, 1.0 / 18),
     std::pair<Action, double>(1, 1.0 / 18),
@@ -106,6 +113,33 @@ std::string PositionToString(int pos) {
   }
 }
 
+std::string PositionToStringHumanReadable(int pos) {
+  if (pos == kNumBarPosHumanReadable) {
+    return "Bar";
+  } else if (pos == kNumOffPosHumanReadable) {
+    return "Off";
+  } else {
+    return PositionToString(pos);
+  }
+}
+
+int BackgammonState::AugmentCheckerMove(CheckerMove* cmove, int player,
+                                        int start) const {
+  int end = cmove->num;
+  if (end != kPassPos) {
+    // Not a pass, so work out where the piece finished
+    end = start - cmove->num;
+    if (end <= 0) {
+      end = kNumOffPosHumanReadable;  // Off
+    } else if (board_[Opponent(player)]
+                     [player == kOPlayerId ? (end - 1)
+                                           : (kNumPoints - end)] == 1) {
+      cmove->hit = true;  // Check to see if move is a hit
+    }
+  }
+  return end;
+}
+
 std::string BackgammonState::ActionToString(Player player,
                                             Action move_id) const {
   if (player == kChancePlayerId) {
@@ -113,11 +147,111 @@ std::string BackgammonState::ActionToString(Player player,
                         " (roll: ", kChanceOutcomeValues[move_id][0],
                         kChanceOutcomeValues[move_id][1], ")");
   } else {
+    // Assemble a human-readable string representation of the move using
+    // standard backgammon notation:
+    //
+    // - Always show the numbering going from Bar->24->0->Off, irrespective of
+    //   which player is moving.
+    // - Show the start position followed by end position.
+    // - Show hits with an asterisk, e.g. 9/7*.
+    // - Order the moves by highest number first, e.g. 22/7 10/8 not 10/8 22/7.
+    //   Not an official requirement, but seems to be standard convention.
+    // - Show duplicate moves as 10/8(2).
+    // - Show moves on a single piece as 10/8/5 not 10/8 8/5
+    //
+    // Note that there are tests to ensure the ActionToString follows this
+    // output format. Any changes would need to be reflected in the tests as
+    // well.
     std::vector<CheckerMove> cmoves = SpielMoveToCheckerMoves(player, move_id);
-    return absl::StrCat(move_id, " (", PositionToString(cmoves[0].pos), "-",
-                        cmoves[0].num, cmoves[0].hit ? "*" : "", " ",
-                        PositionToString(cmoves[1].pos), "-", cmoves[1].num,
-                        cmoves[1].hit ? "*" : "", ")");
+
+    int cmove0_start;
+    int cmove1_start;
+    if (player == kOPlayerId) {
+      cmove0_start = (cmoves[0].pos == kBarPos ?
+                      kNumBarPosHumanReadable : cmoves[0].pos + 1);
+      cmove1_start = (cmoves[1].pos == kBarPos ?
+                      kNumBarPosHumanReadable : cmoves[1].pos + 1);
+    } else {
+      // swap the board numbering round for Player X so player is moving
+      // from 24->0
+      cmove0_start = (cmoves[0].pos == kBarPos ?
+                      kNumBarPosHumanReadable : kNumPoints - cmoves[0].pos);
+      cmove1_start = (cmoves[1].pos == kBarPos ?
+                      kNumBarPosHumanReadable : kNumPoints - cmoves[1].pos);
+    }
+
+    // Add hit information and compute whether the moves go off the board.
+    int cmove0_end = AugmentCheckerMove(&cmoves[0], player, cmove0_start);
+    int cmove1_end = AugmentCheckerMove(&cmoves[1], player, cmove1_start);
+
+    // check for 2 pieces hitting on the same point.
+    bool double_hit =
+        (cmoves[1].hit && cmoves[0].hit && cmove1_end == cmove0_end);
+
+    std::string returnVal = "";
+    if (cmove0_start == cmove1_start &&
+        cmove0_end == cmove1_end) {     // same move, show as (2).
+      if (cmoves[1].num == kPassPos) {  // Player can't move at all!
+        returnVal = "Pass";
+      } else {
+        returnVal = absl::StrCat(move_id, " - ",
+                                 PositionToStringHumanReadable(cmove0_start),
+                                 "/", PositionToStringHumanReadable(cmove0_end),
+                                 cmoves[0].hit ? "*" : "", "(2)");
+      }
+    } else if ((cmove0_start < cmove1_start ||
+                (cmove0_start == cmove1_start && cmove0_end < cmove1_end) ||
+                cmoves[0].num == kPassPos) &&
+               cmoves[1].num != kPassPos) {
+      // tradition to start with higher numbers first,
+      // so swap moves round if this not the case. If
+      // there is a pass move, put it last.
+      if (cmove1_end == cmove0_start) {
+        // Check to see if the same piece is moving for both
+        // moves, as this changes the format of the output.
+        returnVal = absl::StrCat(
+            move_id, " - ", PositionToStringHumanReadable(cmove1_start), "/",
+            PositionToStringHumanReadable(cmove1_end), cmoves[1].hit ? "*" : "",
+            "/", PositionToStringHumanReadable(cmove0_end),
+            cmoves[0].hit ? "*" : "");
+      } else {
+        returnVal = absl::StrCat(
+            move_id, " - ", PositionToStringHumanReadable(cmove1_start), "/",
+            PositionToStringHumanReadable(cmove1_end), cmoves[1].hit ? "*" : "",
+            " ",
+            (cmoves[0].num != kPassPos)
+                ? PositionToStringHumanReadable(cmove0_start)
+                : "",
+            (cmoves[0].num != kPassPos) ? "/" : "",
+            PositionToStringHumanReadable(cmove0_end),
+            (cmoves[0].hit && !double_hit) ? "*" : "");
+      }
+    } else {
+      if (cmove0_end == cmove1_start) {
+        // Check to see if the same piece is moving for both
+        // moves, as this changes the format of the output.
+        returnVal = absl::StrCat(move_id, " - ",
+                                 PositionToStringHumanReadable(cmove0_start),
+                                 "/", PositionToStringHumanReadable(cmove0_end),
+                                 cmoves[0].hit ? "*" : "", "/",
+                                 PositionToStringHumanReadable(cmove1_end),
+                                 cmoves[1].hit ? "*" : "");
+      } else {
+        returnVal =
+            absl::StrCat(move_id, " - ",
+                         PositionToStringHumanReadable(cmove0_start), "/",
+                         PositionToStringHumanReadable(cmove0_end),
+                         cmoves[0].hit ? "*" : "", " ",
+                         (cmoves[1].num != kPassPos)
+                             ? PositionToStringHumanReadable(cmove1_start)
+                             : "",
+                         (cmoves[1].num != kPassPos) ? "/" : "",
+                         PositionToStringHumanReadable(cmove1_end),
+                         (cmoves[1].hit && !double_hit) ? "*" : "");
+      }
+    }
+
+    return returnVal;
   }
 }
 

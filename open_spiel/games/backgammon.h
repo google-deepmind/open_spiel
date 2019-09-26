@@ -45,9 +45,13 @@ constexpr const int kNumDiceOutcomes = 6;
 constexpr const int kNumCheckersPerPlayer = 15;
 constexpr const int kXPlayerId = 0;
 constexpr const int kOPlayerId = 1;
+constexpr const int kPassPos = -1;
+
+// TODO: look into whether these can be set to 25 and -2 to avoid having a
+// separate helper function (PositionToStringHumanReadable) to convert moves
+// to strings.
 constexpr const int kBarPos = 100;
 constexpr const int kScorePos = 101;
-constexpr const int kPassPos = -1;
 
 // The action encoding stores a number in { 0, 1, ..., 1351 }. If the high
 // roll is to move first, then the number is encoded as a 2-digit number in
@@ -198,6 +202,10 @@ class BackgammonState : public State {
   int HighestUsableDiceOutcome() const;
   Action EncodedPassMove() const;
   Action EncodedBarMove() const;
+
+  // A helper function used by ActionToString to add necessary hit information
+  // and compute whether the move goes off the board.
+  int AugmentCheckerMove(CheckerMove* cmove, int player, int start) const;
 
   // Returns the position of the furthest checker in the home of this player.
   // Returns -1 if none found.
