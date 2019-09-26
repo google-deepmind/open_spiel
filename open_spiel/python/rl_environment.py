@@ -94,6 +94,9 @@ class TimeStep(
   def is_simultaneous_move(self):
     return self.observations["current_player"] == SIMULTANEOUS_PLAYER_ID
 
+  def current_player(self):
+    return self.observations["current_player"]
+
 
 class StepType(enum.Enum):
   """Defines the status of a `TimeStep` within a sequence."""

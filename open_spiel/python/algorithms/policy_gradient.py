@@ -250,11 +250,16 @@ class PolicyGradient(rl_agent.AbstractAgent):
     Returns:
       A `rl_agent.StepOutput` containing the action probs and chosen action.
     """
-    # Act step: don't act at terminal info states.
-    if not time_step.last():
+    # Act step: don't act at terminal info states or if its not our turn.
+    if (not time_step.last()) and (
+        time_step.is_simultaneous_move() or
+        self.player_id == time_step.current_player()):
       info_state = time_step.observations["info_state"][self.player_id]
       legal_actions = time_step.observations["legal_actions"][self.player_id]
       action, probs = self._act(info_state, legal_actions)
+    else:
+      action = None
+      probs = []
 
     if not is_evaluation:
       self._step_counter += 1
