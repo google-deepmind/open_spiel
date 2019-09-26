@@ -16,7 +16,7 @@ GameType.reward_model = RewardModel.TERMINAL
 GameType.short_name = "connect_four"
 GameType.utility = Utility.ZERO_SUM
 
-NumDistinctActions() = 42
+NumDistinctActions() = 7
 MaxChanceOutcomes() = 0
 GetParameters() = {}
 NumPlayers() = 2
