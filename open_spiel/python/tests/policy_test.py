@@ -278,5 +278,19 @@ class UniformRandomPolicyTest(absltest.TestCase):
         })
 
 
+class PoliciesConversions(absltest.TestCase):
+
+  def test_cpp_to_python_policy(self):
+    game = pyspiel.load_game("kuhn_poker")
+    pyspiel_policy = pyspiel.get_uniform_policy(game)
+    python_policy = policy.policy_from_pyspiel_policy(pyspiel_policy)
+
+    for info_state_str in policy.TabularPolicy(game).state_lookup.keys():
+      self.assertEqual({
+          0: 0.5,
+          1: 0.5
+      }, python_policy.action_probabilities(info_state_str))
+
+
 if __name__ == "__main__":
   absltest.main()

@@ -15,6 +15,7 @@
 #include <unordered_map>
 
 #include "open_spiel/algorithms/cfr.h"
+#include "open_spiel/algorithms/cfr_br.h"
 #include "open_spiel/algorithms/evaluate_bots.h"
 #include "open_spiel/algorithms/matrix_game_utils.h"
 #include "open_spiel/algorithms/tabular_exploitability.h"
@@ -307,24 +308,42 @@ PYBIND11_MODULE(pyspiel, m) {
   // [num_states, num_actions], while this is implemented as a map. It is
   // non-trivial to convert between the two, but we have a function that does so
   // in the open_spiel/python/policy.py file.
-  py::class_<open_spiel::TabularPolicy>(m, "TabularPolicy")
+  py::class_<open_spiel::Policy>(m, "Policy")
+      .def("get_state_policy_as_map",
+           (std::unordered_map<Action, double>(open_spiel::Policy::*)(
+               const open_spiel::State&) const) &
+               open_spiel::Policy::GetStatePolicyAsMap)
+      .def("get_state_policy_as_map",
+           (std::unordered_map<Action, double>(open_spiel::Policy::*)(
+               const std::string&) const) &
+               open_spiel::Policy::GetStatePolicyAsMap);
+
+  py::class_<open_spiel::TabularPolicy, open_spiel::Policy>(m, "TabularPolicy")
       .def(py::init<const std::unordered_map<std::string, ActionsAndProbs>&>())
       .def("get_state_policy", &open_spiel::TabularPolicy::GetStatePolicy);
 
   m.def("get_uniform_policy", &open_spiel::GetUniformPolicy);
 
-  py::class_<open_spiel::Policy> policy(m, "Policy");
-
   py::class_<open_spiel::algorithms::CFRSolver>(m, "CFRSolver")
       .def(py::init<const Game&>())
       .def("evaluate_and_update_policy",
            &open_spiel::algorithms::CFRSolver::EvaluateAndUpdatePolicy)
-      .def("average_policy",
-           &open_spiel::algorithms::CFRSolver::AveragePolicy);
+      .def("current_policy", &open_spiel::algorithms::CFRSolver::CurrentPolicy)
+      .def("average_policy", &open_spiel::algorithms::CFRSolver::AveragePolicy);
+
   py::class_<open_spiel::algorithms::CFRPlusSolver>(m, "CFRPlusSolver")
       .def(py::init<const Game&>())
       .def("evaluate_and_update_policy",
            &open_spiel::algorithms::CFRPlusSolver::EvaluateAndUpdatePolicy)
+      .def("current_policy", &open_spiel::algorithms::CFRSolver::CurrentPolicy)
+      .def("average_policy",
+           &open_spiel::algorithms::CFRPlusSolver::AveragePolicy);
+
+  py::class_<open_spiel::algorithms::CFRBRSolver>(m, "CFRBRSolver")
+      .def(py::init<const Game&>())
+      .def("evaluate_and_update_policy",
+           &open_spiel::algorithms::CFRPlusSolver::EvaluateAndUpdatePolicy)
+      .def("current_policy", &open_spiel::algorithms::CFRSolver::CurrentPolicy)
       .def("average_policy",
            &open_spiel::algorithms::CFRPlusSolver::AveragePolicy);
 

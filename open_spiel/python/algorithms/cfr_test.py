@@ -61,6 +61,7 @@ class ModuleLevelFunctionTest(absltest.TestCase):
     info_state_nodes = {
         key: cfr._InfoStateNode(
             legal_actions=[0, 1],
+            index_in_tabular_policy=None,
             cumulative_regret=dict(enumerate(cumulative_regrets[index])),
             cumulative_policy=None) for key, index in nodes_indices.items()
     }
@@ -89,7 +90,7 @@ class CFRTest(parameterized.TestCase, absltest.TestCase):
 
     np.testing.assert_array_equal(
         _LEDUC_UNIFORM_POLICY.action_probability_array,
-        cfr_solver.policy().action_probability_array)
+        cfr_solver.current_policy().action_probability_array)
     np.testing.assert_array_equal(
         _LEDUC_UNIFORM_POLICY.action_probability_array,
         cfr_solver.average_policy().action_probability_array)
@@ -181,7 +182,7 @@ class CFRTest(parameterized.TestCase, absltest.TestCase):
     game = pyspiel.load_game("kuhn_poker")
     solver = cfr.CFRPlusSolver(game)
 
-    tabular_policy = solver.policy()
+    tabular_policy = solver.current_policy()
     self.assertLen(tabular_policy.state_lookup, 12)
     for info_state_str in tabular_policy.state_lookup.keys():
       np.testing.assert_equal(
@@ -212,6 +213,13 @@ class CFRTest(parameterized.TestCase, absltest.TestCase):
       cpp_expl = pyspiel.nash_conv(game, cpp_avg_policy)
       python_expl = exploitability.nash_conv(game, python_avg_policy)
       self.assertEqual(cpp_expl, python_expl)
+    # Then we also check the CurrentPolicy, just to check it is giving the same
+    # results too
+    cpp_current_policy = cpp_solver.current_policy()
+    python_current_policy = python_solver.current_policy()
+    cpp_expl = pyspiel.nash_conv(game, cpp_current_policy)
+    python_expl = exploitability.nash_conv(game, python_current_policy)
+    self.assertEqual(cpp_expl, python_expl)
 
 
 class CFRBRTest(parameterized.TestCase, absltest.TestCase):
@@ -227,7 +235,7 @@ class CFRBRTest(parameterized.TestCase, absltest.TestCase):
 
     np.testing.assert_array_equal(
         _LEDUC_UNIFORM_POLICY.action_probability_array,
-        cfr_solver.policy().action_probability_array)
+        cfr_solver.current_policy().action_probability_array)
     np.testing.assert_array_equal(
         _LEDUC_UNIFORM_POLICY.action_probability_array,
         cfr_solver.average_policy().action_probability_array)
@@ -244,7 +252,7 @@ class CFRBRTest(parameterized.TestCase, absltest.TestCase):
     np.testing.assert_allclose(
         average_policy_values, [-1 / 18, 1 / 18], atol=1e-3)
 
-    cfrbr_solver.policy()
+    cfrbr_solver.current_policy()
 
 
 if __name__ == "__main__":

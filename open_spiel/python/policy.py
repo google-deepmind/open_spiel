@@ -349,7 +349,11 @@ class PolicyFromCallable(Policy):
   """For backwards-compatibility reasons, create a policy from a callable."""
 
   def __init__(self, game, callable_policy):
-    all_players = list(range(game.num_players()))
+    # When creating a Policy from a pyspiel_policy, we do not have the game.
+    if game is None:
+      all_players = None
+    else:
+      all_players = list(range(game.num_players()))
     super(PolicyFromCallable, self).__init__(game, all_players)
     self._callable_policy = callable_policy
 
@@ -398,3 +402,8 @@ def python_policy_to_pyspiel_policy(python_tabular_policy):
     probs = python_tabular_policy.policy_for_key(infostate)
     infostates_to_probabilities[infostate] = list(enumerate(probs))
   return pyspiel.TabularPolicy(infostates_to_probabilities)
+
+
+def policy_from_pyspiel_policy(pyspiel_policy):
+  """Returns a `policy.Policy` object from a `pyspiel.Policy` object."""
+  return PolicyFromCallable(None, pyspiel_policy.get_state_policy_as_map)
