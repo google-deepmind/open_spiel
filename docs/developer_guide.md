@@ -24,6 +24,14 @@ For Python you have:
 *   `open_spiel/python/examples`: The Python examples.
 *   `open_spiel/python/algorithms/`: The Python algorithms.
 
+## CPP and Python implementations.
+
+Some objects (e.g. `Policy`, `CFRSolver`, `BestResponse`) are available both in
+C++ and Python. The goal is to be able to use C++ objects in place of Python
+objects for most of the cases. In particular, for the objects that are well
+supported, expect to have in the test for the Python object, a test checking
+that both the C++ and the Python implementation behave the same.
+
 ## Adding a game
 
 We describe here only the simplest and fastest way to add a new game. It is
