@@ -18,9 +18,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import unittest
-
 from absl import logging
+from absl.testing import absltest
 from absl.testing import parameterized
 import numpy as np
 
@@ -29,7 +28,7 @@ from open_spiel.python.egt import utils
 import pyspiel
 
 
-class ModuleLevelTest(unittest.TestCase):
+class ModuleLevelTest(absltest.TestCase):
 
   def test__multinomial_coefficients(self):
     distributions = np.asarray([
@@ -156,4 +155,4 @@ class PayoffTableTest(parameterized.TestCase):
 
 
 if __name__ == "__main__":
-  unittest.main()
+  absltest.main()

@@ -18,13 +18,13 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import unittest
+from absl.testing import absltest
 
 from open_spiel.python.algorithms import lp_solver
 import pyspiel
 
 
-class MatrixGamesUtilsTest(unittest.TestCase):
+class MatrixGamesUtilsTest(absltest.TestCase):
 
   def test_extensive_to_matrix_game(self):
     kuhn_game = pyspiel.load_game("kuhn_poker")
@@ -59,4 +59,4 @@ class MatrixGamesUtilsTest(unittest.TestCase):
 
 
 if __name__ == "__main__":
-  unittest.main()
+  absltest.main()

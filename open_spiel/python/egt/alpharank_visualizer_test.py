@@ -18,7 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import unittest
+from absl.testing import absltest
 
 # pylint: disable=g-import-not-at-top
 import matplotlib
@@ -33,7 +33,7 @@ from open_spiel.python.egt import utils
 import pyspiel
 
 
-class AlpharankVisualizerTest(unittest.TestCase):
+class AlpharankVisualizerTest(absltest.TestCase):
 
   @mock.patch("%s.alpharank_visualizer.plt" % __name__)
   def test_plot_pi_vs_alpha(self, mock_plt):
@@ -70,4 +70,4 @@ class AlpharankVisualizerTest(unittest.TestCase):
 
 
 if __name__ == "__main__":
-  unittest.main()
+  absltest.main()

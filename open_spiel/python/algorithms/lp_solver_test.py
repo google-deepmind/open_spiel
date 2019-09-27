@@ -18,14 +18,14 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import unittest
+from absl.testing import absltest
 import numpy as np
 
 from open_spiel.python.algorithms import lp_solver
 import pyspiel
 
 
-class LPSolversTest(unittest.TestCase):
+class LPSolversTest(absltest.TestCase):
 
   def test_rock_paper_scissors(self):
     p0_sol, p1_sol, p0_sol_val, p1_sol_val = (
@@ -33,8 +33,8 @@ class LPSolversTest(unittest.TestCase):
             pyspiel.create_matrix_game(
                 [[0.0, -1.0, 1.0], [1.0, 0.0, -1.0], [-1.0, 1.0, 0.0]],
                 [[0.0, 1.0, -1.0], [-1.0, 0.0, 1.0], [1.0, -1.0, 0.0]])))
-    self.assertEqual(len(p0_sol), 3)
-    self.assertEqual(len(p1_sol), 3)
+    self.assertLen(p0_sol, 3)
+    self.assertLen(p1_sol, 3)
     for i in range(3):
       self.assertAlmostEqual(p0_sol[i], 1.0 / 3.0)
       self.assertAlmostEqual(p1_sol[i], 1.0 / 3.0)
@@ -50,8 +50,8 @@ class LPSolversTest(unittest.TestCase):
             pyspiel.create_matrix_game(
                 [[0.0, -0.25, 0.5], [0.25, 0.0, -0.05], [-0.5, 0.05, 0.0]],
                 [[0.0, 0.25, -0.5], [-0.25, 0.0, 0.05], [0.5, -0.05, 0.0]])))
-    self.assertEqual(len(p0_sol), 3)
-    self.assertEqual(len(p1_sol), 3)
+    self.assertLen(p0_sol, 3)
+    self.assertLen(p1_sol, 3)
     self.assertAlmostEqual(p0_sol[0], 1.0 / 16.0, places=4)
     self.assertAlmostEqual(p1_sol[0], 1.0 / 16.0, places=4)
     self.assertAlmostEqual(p0_sol[1], 10.0 / 16.0, places=4)
@@ -72,8 +72,8 @@ class LPSolversTest(unittest.TestCase):
         lp_solver.solve_zero_sum_matrix_game(
             pyspiel.create_matrix_game([[2.0, 1.0, 5.0], [-3.0, -4.0, -2.0]],
                                        [[-2.0, -1.0, -5.0], [3.0, 4.0, 2.0]])))
-    self.assertEqual(len(p0_sol), 2)
-    self.assertEqual(len(p1_sol), 3)
+    self.assertLen(p0_sol, 2)
+    self.assertLen(p1_sol, 3)
     self.assertAlmostEqual(p0_sol[0], 1.0)
     self.assertAlmostEqual(p0_sol[1], 0.0)
     self.assertAlmostEqual(p1_sol[0], 0.0)
@@ -85,8 +85,8 @@ class LPSolversTest(unittest.TestCase):
     blotto_matrix_game = pyspiel.load_matrix_game("blotto")
     p0_sol, p1_sol, p0_sol_val, p1_sol_val = (
         lp_solver.solve_zero_sum_matrix_game(blotto_matrix_game))
-    self.assertEqual(len(p0_sol), blotto_matrix_game.num_rows())
-    self.assertEqual(len(p1_sol), blotto_matrix_game.num_cols())
+    self.assertLen(p0_sol, blotto_matrix_game.num_rows())
+    self.assertLen(p1_sol, blotto_matrix_game.num_cols())
     # Symmetric game, must be zero
     self.assertAlmostEqual(p0_sol_val, 0.0)
     self.assertAlmostEqual(p1_sol_val, 0.0)
@@ -164,7 +164,7 @@ class LPSolversTest(unittest.TestCase):
       payoffs_shape = [2, reduced_game.num_rows(), reduced_game.num_cols()]
     else:
       payoffs_shape = list(reduced_game.shape)
-    self.assertEqual(payoffs_shape[0], len(live_actions))
+    self.assertLen(live_actions, payoffs_shape[0])
     self.assertListEqual(payoffs_shape[1:], [
         np.sum(live_actions_for_player)
         for live_actions_for_player in live_actions
@@ -239,4 +239,4 @@ class LPSolversTest(unittest.TestCase):
 
 
 if __name__ == "__main__":
-  unittest.main()
+  absltest.main()

@@ -18,7 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import unittest
+from absl.testing import absltest
 
 # pylint: disable=g-import-not-at-top
 import matplotlib
@@ -32,7 +32,7 @@ from open_spiel.python.egt import utils
 import pyspiel
 
 
-class AlphaRankTest(unittest.TestCase):
+class AlphaRankTest(absltest.TestCase):
 
   def test_stationary_distribution(self):
     """Tests stationary distribution using payoffs from Han et al., 2013."""
@@ -98,4 +98,4 @@ class AlphaRankTest(unittest.TestCase):
 
 
 if __name__ == "__main__":
-  unittest.main()
+  absltest.main()

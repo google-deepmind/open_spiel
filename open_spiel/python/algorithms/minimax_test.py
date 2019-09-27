@@ -18,13 +18,13 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import unittest
+from absl.testing import absltest
 
 from open_spiel.python.algorithms import minimax
 import pyspiel
 
 
-class MinimaxTest(unittest.TestCase):
+class MinimaxTest(absltest.TestCase):
 
   def test_compute_game_value(self):
     tic_tac_toe = pyspiel.load_game("tic_tac_toe")
@@ -70,4 +70,4 @@ class MinimaxTest(unittest.TestCase):
 
 
 if __name__ == "__main__":
-  unittest.main()
+  absltest.main()

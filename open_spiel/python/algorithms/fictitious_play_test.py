@@ -18,7 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import unittest
+from absl.testing import absltest
 import numpy as np
 from open_spiel.python import policy
 from open_spiel.python.algorithms import expected_game_score
@@ -27,7 +27,7 @@ from open_spiel.python.algorithms import fictitious_play
 import pyspiel
 
 
-class FictitiousPlayTest(unittest.TestCase):
+class FictitiousPlayTest(absltest.TestCase):
 
   def test_xfp(self):
     game = pyspiel.load_game("kuhn_poker")
@@ -127,4 +127,4 @@ class FictitiousPlayTest(unittest.TestCase):
 
 
 if __name__ == "__main__":
-  unittest.main()
+  absltest.main()

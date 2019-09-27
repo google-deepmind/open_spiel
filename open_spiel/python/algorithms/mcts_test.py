@@ -19,7 +19,7 @@ from __future__ import division
 from __future__ import print_function
 
 import math
-import unittest
+from absl.testing import absltest
 
 import numpy as np
 
@@ -28,7 +28,7 @@ from open_spiel.python.algorithms import mcts
 import pyspiel
 
 
-class MctsBotTest(unittest.TestCase):
+class MctsBotTest(absltest.TestCase):
 
   def test_can_play_tic_tac_toe(self):
     game = pyspiel.load_game("tic_tac_toe")
@@ -44,4 +44,4 @@ class MctsBotTest(unittest.TestCase):
 
 
 if __name__ == "__main__":
-  unittest.main()
+  absltest.main()

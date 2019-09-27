@@ -19,14 +19,14 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import unittest
+from absl.testing import absltest
 
 from open_spiel.python import policy
 from open_spiel.python.algorithms import best_response as pyspiel_best_response
 import pyspiel
 
 
-class BestResponseTest(unittest.TestCase):
+class BestResponseTest(absltest.TestCase):
 
   def test_best_response_is_a_policy(self):
     game = pyspiel.load_game("kuhn_poker")
@@ -51,4 +51,4 @@ class BestResponseTest(unittest.TestCase):
 
 
 if __name__ == "__main__":
-  unittest.main()
+  absltest.main()

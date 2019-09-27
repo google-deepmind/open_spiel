@@ -18,13 +18,13 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import unittest
+from absl.testing import absltest
 import numpy as np
 from open_spiel.python import rl_environment
 from open_spiel.python.algorithms import random_agent
 
 
-class RandomAgentTest(unittest.TestCase):
+class RandomAgentTest(absltest.TestCase):
 
   def test_step(self):
     agent = random_agent.RandomAgent(player_id=0, num_actions=10)
@@ -50,4 +50,4 @@ class RandomAgentTest(unittest.TestCase):
 
 
 if __name__ == "__main__":
-  unittest.main()
+  absltest.main()

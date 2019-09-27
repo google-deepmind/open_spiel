@@ -18,13 +18,13 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import unittest
+from absl.testing import absltest
 
 from open_spiel.python.algorithms import value_iteration
 import pyspiel
 
 
-class ValueIterationTest(unittest.TestCase):
+class ValueIterationTest(absltest.TestCase):
 
   def test_tic_tac_toe_number_states(self):
     game = pyspiel.load_game("tic_tac_toe")
@@ -40,4 +40,4 @@ class ValueIterationTest(unittest.TestCase):
 
 
 if __name__ == "__main__":
-  unittest.main()
+  absltest.main()

@@ -18,14 +18,14 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import unittest
+from absl.testing import absltest
 import six
 
 from open_spiel.python import policy
 import pyspiel
 
 
-class PyspielTest(unittest.TestCase):
+class PyspielTest(absltest.TestCase):
 
   def test_registered_names(self):
     game_names = pyspiel.registered_names()
@@ -72,7 +72,7 @@ class PyspielTest(unittest.TestCase):
         "turn_based_simultaneous_game",
         "y",
     ]
-    self.assertEqual(sorted(game_names), expected)
+    self.assertCountEqual(game_names, expected)
 
   def test_no_mandatory_parameters(self):
     # Games with mandatory parameters will be skipped by several standard
@@ -94,7 +94,7 @@ class PyspielTest(unittest.TestCase):
         "misere",
         "turn_based_simultaneous_game",
     ]
-    self.assertEqual(sorted(games_with_mandatory_parameters), expected)
+    self.assertCountEqual(games_with_mandatory_parameters, expected)
 
   def test_registered_game_attributes(self):
     games = {game.short_name: game for game in pyspiel.registered_games()}
@@ -190,4 +190,4 @@ class PyspielTest(unittest.TestCase):
 
 
 if __name__ == "__main__":
-  unittest.main()
+  absltest.main()

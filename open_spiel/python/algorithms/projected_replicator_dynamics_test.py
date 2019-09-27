@@ -18,13 +18,13 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import unittest
+from absl.testing import absltest
 import numpy as np
 
 from open_spiel.python.algorithms import projected_replicator_dynamics
 
 
-class ProjectedReplicatorDynamicsTest(unittest.TestCase):
+class ProjectedReplicatorDynamicsTest(absltest.TestCase):
 
   def test_two_players(self):
     test_a = np.array([[2, 1, 0], [0, -1, -2]])
@@ -38,7 +38,7 @@ class ProjectedReplicatorDynamicsTest(unittest.TestCase):
         prd_gamma=1e-8,
         average_over_last_n_strategies=10)
 
-    self.assertEqual(len(strategies), 2, "Wrong strategy length.")
+    self.assertLen(strategies, 2, "Wrong strategy length.")
     self.assertGreater(strategies[0][0], 0.999,
                        "Projected Replicator Dynamics failed in trivial case.")
 
@@ -54,10 +54,10 @@ class ProjectedReplicatorDynamicsTest(unittest.TestCase):
         prd_dt=1e-3,
         prd_gamma=1e-6,
         average_over_last_n_strategies=10)
-    self.assertEqual(len(strategies), 3, "Wrong strategy length.")
+    self.assertLen(strategies, 3, "Wrong strategy length.")
     self.assertGreater(strategies[0][0], 0.999,
                        "Projected Replicator Dynamics failed in trivial case.")
 
 
 if __name__ == "__main__":
-  unittest.main()
+  absltest.main()
