@@ -21,22 +21,22 @@ from __future__ import print_function
 from absl import app
 from absl import flags
 
-from open_spiel.python.algorithms import discounted_cfr
+from open_spiel.python.algorithms import cfr
 from open_spiel.python.algorithms import exploitability
 import pyspiel
 
 FLAGS = flags.FLAGS
 
-flags.DEFINE_integer("iterations", 300, "Number of iterations")
-flags.DEFINE_string("game", "turn_based_simultaneous_game(game=goofspiel(imp_info=True,num_cards=4,players=2,points_order=descending))", "Name of the game")
+flags.DEFINE_integer("iterations", 100, "Number of iterations")
+flags.DEFINE_string("game", "kuhn_poker", "Name of the game")
 flags.DEFINE_integer("players", 2, "Number of players")
 flags.DEFINE_integer("print_freq", 10, "How often to print the exploitability")
 
 
 def main(_):
-  game = pyspiel.load_game(FLAGS.game)
-  cfr_solver = discounted_cfr.DCFRSolver(game)
-
+  game = pyspiel.load_game(FLAGS.game,
+                           {"players": pyspiel.GameParameter(FLAGS.players)})
+  cfr_solver = cfr.CFRSolver(game)
 
   for i in range(FLAGS.iterations):
     cfr_solver.evaluate_and_update_policy()
