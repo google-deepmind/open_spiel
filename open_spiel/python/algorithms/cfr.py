@@ -496,6 +496,7 @@ class _DCFRSolver(_CFRSolver):
 
       info_state_node = self._info_state_nodes[info_state]
       info_state_node.cumulative_regret[action] += cfr_regret
+    # Multiplying accumulative positive and negative regret with different alpha and beta
       if info_state_node.cumulative_regret[action] >= 0:
         info_state_node.cumulative_regret[action] *= (self._iteration ** self.alpha / (self._iteration ** self.alpha + 1))
       else:
@@ -504,6 +505,7 @@ class _DCFRSolver(_CFRSolver):
       if self._linear_averaging:
         info_state_node.cumulative_policy[
           action] += reach_prob * action_prob
+    # Applying different weights of contribution to average strategy
         info_state_node.cumulative_policy[
           action] *= ((self._iteration / (self._iteration + 1)) ** self.gamma)
       else:
