@@ -19,6 +19,7 @@ from __future__ import division
 from __future__ import print_function
 
 import numpy as np
+import pyspiel
 
 # Indices in the information sets for the regrets and average policy sums.
 _REGRET_INDEX = 0
@@ -44,6 +45,11 @@ class OutcomeSamplingSolver(object):
     # updating player will sampling according to expl * uniform + (1 - expl) *
     # current_policy.
     self._expl = 0.6
+
+    assert game.get_type().dynamics == pyspiel.GameType.Dynamics.SEQUENTIAL, (
+        "MCCFR requires sequential games. If you're trying to run it " +
+        "on a simultaneous (or normal-form) game, please first transform it " +
+        "using turn_based_simultaneous_game.")
 
   def iteration(self):
     """Performs one iteration of outcome sampling.

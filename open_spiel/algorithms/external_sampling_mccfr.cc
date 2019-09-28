@@ -32,7 +32,14 @@ ExternalSamplingMCCFRSolver::ExternalSamplingMCCFRSolver(const Game& game,
       avg_type_(avg_type),
       dist_(0.0, 1.0),
       uniform_policy_(std::shared_ptr<TabularPolicy>(
-          new TabularPolicy(GetUniformPolicy(game)))) {}
+          new TabularPolicy(GetUniformPolicy(game)))) {
+  if (game_->GetType().dynamics != GameType::Dynamics::kSequential) {
+    SpielFatalError(
+        "MCCFR requires sequential games. If you're trying to run it "
+        "on a simultaneous (or normal-form) game, please first transform it "
+        "using turn_based_simultaneous_game.");
+  }
+}
 
 void ExternalSamplingMCCFRSolver::RunIteration() { RunIteration(rng_.get()); }
 

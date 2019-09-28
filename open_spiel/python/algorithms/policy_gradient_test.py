@@ -26,6 +26,7 @@ import tensorflow as tf
 from open_spiel.python import rl_environment
 from open_spiel.python.algorithms import policy_gradient
 from open_spiel.python.algorithms.losses import rl_losses
+import pyspiel
 
 
 class PolicyGradientTest(parameterized.TestCase, tf.test.TestCase):
@@ -65,6 +66,50 @@ class PolicyGradientTest(parameterized.TestCase, tf.test.TestCase):
 
         for agent in agents:
           agent.step(time_step)
+
+  def test_run_hanabi(self):
+    # Hanabi is an optional game, so check we have it before running the test.
+    game = "hanabi"
+    if game not in pyspiel.registered_names():
+      return
+
+    num_players = 3
+    env_configs = {
+        "players": num_players,
+        "max_life_tokens": 1,
+        "colors": 2,
+        "ranks": 3,
+        "hand_size": 2,
+        "max_information_tokens": 3,
+        "discount": 0.
+    }
+    env = rl_environment.Environment(game, **env_configs)
+    info_state_size = env.observation_spec()["info_state"][0]
+    num_actions = env.action_spec()["num_actions"]
+
+    with self.session() as sess:
+      agents = [
+          policy_gradient.PolicyGradient(  # pylint: disable=g-complex-comprehension
+              sess,
+              player_id=player_id,
+              info_state_size=info_state_size,
+              num_actions=num_actions,
+              hidden_layers_sizes=[8, 8],
+              batch_size=16,
+              entropy_cost=0.001,
+              critic_learning_rate=0.01,
+              pi_learning_rate=0.01,
+              num_critic_before_pi=4) for player_id in range(num_players)
+      ]
+      sess.run(tf.global_variables_initializer())
+      time_step = env.reset()
+      while not time_step.last():
+        current_player = time_step.observations["current_player"]
+        agent_output = [agent.step(time_step) for agent in agents]
+        time_step = env.step([agent_output[current_player].action])
+
+      for agent in agents:
+        agent.step(time_step)
 
   def test_loss_modes(self):
     loss_dict = {
