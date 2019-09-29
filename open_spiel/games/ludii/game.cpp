@@ -25,9 +25,9 @@ std::string Game::GetName(){
 	//convert jstring game name to char array
 	const char *strReturn = env->GetStringUTFChars(stringArray, 0);
 	std::string string_name(strReturn);
-    env->ReleaseStringUTFChars(stringArray, strReturn);
+    	env->ReleaseStringUTFChars(stringArray, strReturn);
 
-    return string_name;
+    	return string_name;
 }
 
 void Game::Create(int viewSize){

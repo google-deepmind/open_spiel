@@ -5,7 +5,7 @@ ChunkSet::ChunkSet(JNIEnv *env, jobject chunkset):env(env),chunkset(chunkset){}
 
 std::string ChunkSet::Print(){
 
-	jclass chunkSetClass = env->FindClass("util/ChunkSet");
+    jclass chunkSetClass = env->FindClass("util/ChunkSet");
     jmethodID tostring_id = env->GetMethodID(chunkSetClass,"toString","()Ljava/lang/String;");
     jstring string_obj = (jstring) env->CallObjectMethod(chunkset,tostring_id);
    
@@ -18,7 +18,7 @@ std::string ChunkSet::Print(){
 
 std::string ChunkSet::ToChunkString(){
 
-	jclass chunkSetClass = env->FindClass("util/ChunkSet");
+    jclass chunkSetClass = env->FindClass("util/ChunkSet");
     jmethodID toChunkString_id = env->GetMethodID(chunkSetClass,"toChunkString","()Ljava/lang/String;");
     jstring string_obj = (jstring) env->CallObjectMethod(chunkset,toChunkString_id);
    
