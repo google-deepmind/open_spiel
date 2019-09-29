@@ -171,6 +171,8 @@ release!). Contributions are certainly not limited to these suggestions!
     [An evolutionary game-theoretic analysis of poker strategies](https://www.sciencedirect.com/science/article/pii/S1875952109000056),
     [Ref4](https://arxiv.org/abs/1803.06376).
 
+-   **Monte Carlo Tree Search Solver**. General enhancement to monte carlo tree search, backpropagate proven wins and loses as far up as possible. [Monte-Carlo Tree Search Solver](https://dke.maastrichtuniversity.nl/m.winands/documents/uctloa.pdf)
+
 -   **Minimax-Q and other classic MARL algorithms**. Minimax-Q is a classic
     multiagent reinforcement learning algorithm
     ([Markov games as a framework for multi-agent reinforcement learning](https://www2.cs.duke.edu/courses/spring07/cps296.3/littman94markov.pdf).
