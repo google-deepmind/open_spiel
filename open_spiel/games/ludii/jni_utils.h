@@ -14,10 +14,10 @@ public:
 	JNIUtils(const std::string jar_location);
 	~JNIUtils();
 
-	JNIEnv * getEnv();
+	JNIEnv * GetEnv();
 
-	void initJVM(std::string jar_location);
-	void closeJVM();
+	void InitJVM(std::string jar_location);
+	void CloseJVM();
 
 private:
 

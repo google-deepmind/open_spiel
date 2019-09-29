@@ -4,18 +4,18 @@
 #include <cstring>
 
 JNIUtils::JNIUtils(std::string jar_location){
-	initJVM(jar_location);
+	InitJVM(jar_location);
 }
 
 JNIUtils::~JNIUtils(){
-	closeJVM();
+	CloseJVM();
 }
 
-JNIEnv * JNIUtils::getEnv(){
+JNIEnv * JNIUtils::GetEnv(){
 	return env;
 }
 
-void JNIUtils::initJVM(std::string jar_location){
+void JNIUtils::InitJVM(std::string jar_location){
 
 	std::cout << "intializing JVM" << std::endl;
 	#ifdef JNI_VERSION_1_2
@@ -46,7 +46,7 @@ void JNIUtils::initJVM(std::string jar_location){
 
 }
 
-void JNIUtils::closeJVM(){
+void JNIUtils::CloseJVM(){
 	std::cout << "destroying JVM" << std::endl;
 	jvm->DestroyJavaVM();
 }

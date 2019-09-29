@@ -12,7 +12,7 @@ public:
 
 	Context(JNIEnv *env,Game game, Trial trial);
 
-	jobject getContextObj();
+	jobject GetObj();
 
 private:
 

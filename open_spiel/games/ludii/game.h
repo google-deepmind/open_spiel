@@ -4,6 +4,8 @@
 #include "jni.h"
 #include <string>
 #include "mode.h"
+#include "moves.h"
+#include "move.h"
 
 class Context;
 
@@ -11,24 +13,30 @@ class Game{
 
 public:
 
-	Game(JNIEnv *env, jobject game_object, std::string game_path);
+	Game(JNIEnv *env, jobject game, std::string game_path);
 
-	std::string getPath();
+	std::string GetPath();
 
-	jobject getGameObj();
+	jobject GetObj();
 
-	std::string getName();
+	void Create(int viewSize);
 
-	int stateFlags();
+	std::string GetName();
 
-	Mode mode();
+	int StateFlags();
 
-	void start(Context context);
+	Mode GetMode();
+
+	void Start(Context context);
+
+	Moves GetMoves(Context context);
+
+	Move Apply(Context context, Move move);
 
 private:	
 
 	JNIEnv *env;
-	jobject game_object;
+	jobject game;
 	std::string game_path;
 
 };

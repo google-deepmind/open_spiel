@@ -6,14 +6,14 @@
 class Mode{
 
 public:
-	Mode(JNIEnv *env, jobject mode_object);
+	Mode(JNIEnv *env, jobject mode);
 
-	int numPlayers();
+	int NumPlayers();
 
 private:
 
 	JNIEnv *env;
-	jobject mode_object;
+	jobject mode;
 
 };
 

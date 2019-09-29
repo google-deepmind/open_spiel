@@ -3,6 +3,8 @@
 
 #include "jni.h"
 #include "game.h"
+#include "state.h"
+
 
 class Trial{
 
@@ -10,7 +12,12 @@ public:
 
 	Trial(JNIEnv *env, Game game);
 
-	jobject getTrialObj();
+	jobject GetObj();
+
+	State GetState();
+
+	bool Over();
+
 
 private:
 

@@ -6,23 +6,18 @@
 
 GameLoader::GameLoader(JNIEnv *env):env(env){}
 
-std::vector<std::string> GameLoader::listGames(){
+std::vector<std::string> GameLoader::ListGames(){
 
 	std::vector<std::string> gamesVector;
 
 	jclass gameLoader = env->FindClass("player/GameLoader");
-
-    //find the listGames method
     jmethodID mid = env->GetStaticMethodID(gameLoader,"listGames","()[Ljava/lang/String;");
-
-    //execute the listGames method
     jobjectArray stringArray = (jobjectArray) env->CallStaticObjectMethod(gameLoader,mid);
 
-    //put list of games in vector
     int stringCount = env->GetArrayLength(stringArray);
 
 	for (int i=0; i<stringCount; i++) {
-		//get array element and convert it from jstrng
+		//get array element and convert it from jstring
         jstring string = (jstring) (env->GetObjectArrayElement(stringArray, i));
         const char *rawString = env->GetStringUTFChars(string, 0);
        
@@ -35,7 +30,7 @@ std::vector<std::string> GameLoader::listGames(){
 	return gamesVector;
 }
 
-Game GameLoader::loadGame(std::string game_name){
+Game GameLoader::LoadGame(std::string game_name){
 
 	jclass gameLoader = env->FindClass("player/GameLoader");
     jmethodID mid = env->GetStaticMethodID(gameLoader,"loadGameFromName","(Ljava/lang/String;)Lgame/Game;");
