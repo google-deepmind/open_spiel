@@ -18,6 +18,8 @@
 
 #include <utility>
 
+#include "open_spiel/spiel.h"
+
 namespace open_spiel {
 namespace pig {
 
@@ -214,10 +216,15 @@ void PigState::DoApplyAction(Action move) {
 }
 
 std::vector<Action> PigState::LegalActions() const {
-  if (IsChanceNode())
+  if (IsChanceNode()) {
     return LegalChanceOutcomes();
-  else
-    return {kRoll, kStop};
+  } else {
+    if (scores_[cur_player_] + turn_total_ >= win_score_) {
+      return {kStop};
+    } else {
+      return {kRoll, kStop};
+    }
+  }
 }
 
 std::vector<std::pair<Action, double>> PigState::ChanceOutcomes() const {
@@ -235,9 +242,9 @@ std::vector<std::pair<Action, double>> PigState::ChanceOutcomes() const {
 
 std::string PigState::ToString() const {
   return absl::StrCat("Scores: ", absl::StrJoin(scores_, " "),
-                      ", Turn total:", turn_total_,
+                      ", Turn total: ", turn_total_,
                       "\nCurrent player: ", turn_player_,
-                      (cur_player_ == 0 ? ", rolling\n" : "\n"));
+                      (cur_player_ == kChancePlayerId ? " (rolling)\n" : "\n"));
 }
 
 std::unique_ptr<State> PigState::Clone() const {

@@ -7,7 +7,7 @@ GameType.information = Information.PERFECT_INFORMATION
 GameType.long_name = "Oshi Zumo"
 GameType.max_num_players = 2
 GameType.min_num_players = 2
-GameType.parameter_specification = ["alesia", "coins", "horizon", "size"]
+GameType.parameter_specification = ["alesia", "coins", "horizon", "min_bid", "size"]
 GameType.provides_information_state = True
 GameType.provides_information_state_as_normalized_vector = True
 GameType.provides_observation = False
@@ -18,7 +18,7 @@ GameType.utility = Utility.ZERO_SUM
 
 NumDistinctActions() = 11
 MaxChanceOutcomes() = 0
-GetParameters() = {alesia=False,coins=10,horizon=1000,size=3}
+GetParameters() = {alesia=False,coins=10,horizon=1000,min_bid=0,size=3}
 NumPlayers() = 2
 MinUtility() = -1.0
 MaxUtility() = 1.0

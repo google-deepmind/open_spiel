@@ -30,16 +30,16 @@ ToString() = "pig(horizon=10,players=4,winscore=10)"
 
 # State 0
 IsTerminal() = False
-ToString() = "Scores: 0 0 0 0, Turn total:0\nCurrent player: 0, rolling\n"
+ToString() = "Scores: 0 0 0 0, Turn total: 0\nCurrent player: 0\n"
 History() = []
 HistoryString() = ""
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationState(0) = "Scores: 0 0 0 0, Turn total:0\nCurrent player: 0, rolling\n"
-InformationState(1) = "Scores: 0 0 0 0, Turn total:0\nCurrent player: 0, rolling\n"
-InformationState(2) = "Scores: 0 0 0 0, Turn total:0\nCurrent player: 0, rolling\n"
-InformationState(3) = "Scores: 0 0 0 0, Turn total:0\nCurrent player: 0, rolling\n"
+InformationState(0) = "Scores: 0 0 0 0, Turn total: 0\nCurrent player: 0\n"
+InformationState(1) = "Scores: 0 0 0 0, Turn total: 0\nCurrent player: 0\n"
+InformationState(2) = "Scores: 0 0 0 0, Turn total: 0\nCurrent player: 0\n"
+InformationState(3) = "Scores: 0 0 0 0, Turn total: 0\nCurrent player: 0\n"
 InformationStateAsNormalizedVector(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 InformationStateAsNormalizedVector(1) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 InformationStateAsNormalizedVector(2) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
@@ -54,16 +54,16 @@ action: 0
 
 # State 1
 IsTerminal() = False
-ToString() = "Scores: 0 0 0 0, Turn total:0\nCurrent player: 0\n"
+ToString() = "Scores: 0 0 0 0, Turn total: 0\nCurrent player: 0 (rolling)\n"
 History() = [0]
 HistoryString() = "0"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
-InformationState(0) = "Scores: 0 0 0 0, Turn total:0\nCurrent player: 0\n"
-InformationState(1) = "Scores: 0 0 0 0, Turn total:0\nCurrent player: 0\n"
-InformationState(2) = "Scores: 0 0 0 0, Turn total:0\nCurrent player: 0\n"
-InformationState(3) = "Scores: 0 0 0 0, Turn total:0\nCurrent player: 0\n"
+InformationState(0) = "Scores: 0 0 0 0, Turn total: 0\nCurrent player: 0 (rolling)\n"
+InformationState(1) = "Scores: 0 0 0 0, Turn total: 0\nCurrent player: 0 (rolling)\n"
+InformationState(2) = "Scores: 0 0 0 0, Turn total: 0\nCurrent player: 0 (rolling)\n"
+InformationState(3) = "Scores: 0 0 0 0, Turn total: 0\nCurrent player: 0 (rolling)\n"
 InformationStateAsNormalizedVector(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 InformationStateAsNormalizedVector(1) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 InformationStateAsNormalizedVector(2) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
@@ -77,16 +77,16 @@ action: 2
 
 # State 2
 IsTerminal() = False
-ToString() = "Scores: 0 0 0 0, Turn total:3\nCurrent player: 0, rolling\n"
+ToString() = "Scores: 0 0 0 0, Turn total: 3\nCurrent player: 0\n"
 History() = [0, 2]
 HistoryString() = "0 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationState(0) = "Scores: 0 0 0 0, Turn total:3\nCurrent player: 0, rolling\n"
-InformationState(1) = "Scores: 0 0 0 0, Turn total:3\nCurrent player: 0, rolling\n"
-InformationState(2) = "Scores: 0 0 0 0, Turn total:3\nCurrent player: 0, rolling\n"
-InformationState(3) = "Scores: 0 0 0 0, Turn total:3\nCurrent player: 0, rolling\n"
+InformationState(0) = "Scores: 0 0 0 0, Turn total: 3\nCurrent player: 0\n"
+InformationState(1) = "Scores: 0 0 0 0, Turn total: 3\nCurrent player: 0\n"
+InformationState(2) = "Scores: 0 0 0 0, Turn total: 3\nCurrent player: 0\n"
+InformationState(3) = "Scores: 0 0 0 0, Turn total: 3\nCurrent player: 0\n"
 InformationStateAsNormalizedVector(0) = [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 InformationStateAsNormalizedVector(1) = [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 InformationStateAsNormalizedVector(2) = [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
@@ -101,16 +101,16 @@ action: 0
 
 # State 3
 IsTerminal() = False
-ToString() = "Scores: 0 0 0 0, Turn total:3\nCurrent player: 0\n"
+ToString() = "Scores: 0 0 0 0, Turn total: 3\nCurrent player: 0 (rolling)\n"
 History() = [0, 2, 0]
 HistoryString() = "0 2 0"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
-InformationState(0) = "Scores: 0 0 0 0, Turn total:3\nCurrent player: 0\n"
-InformationState(1) = "Scores: 0 0 0 0, Turn total:3\nCurrent player: 0\n"
-InformationState(2) = "Scores: 0 0 0 0, Turn total:3\nCurrent player: 0\n"
-InformationState(3) = "Scores: 0 0 0 0, Turn total:3\nCurrent player: 0\n"
+InformationState(0) = "Scores: 0 0 0 0, Turn total: 3\nCurrent player: 0 (rolling)\n"
+InformationState(1) = "Scores: 0 0 0 0, Turn total: 3\nCurrent player: 0 (rolling)\n"
+InformationState(2) = "Scores: 0 0 0 0, Turn total: 3\nCurrent player: 0 (rolling)\n"
+InformationState(3) = "Scores: 0 0 0 0, Turn total: 3\nCurrent player: 0 (rolling)\n"
 InformationStateAsNormalizedVector(0) = [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 InformationStateAsNormalizedVector(1) = [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 InformationStateAsNormalizedVector(2) = [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
@@ -124,16 +124,16 @@ action: 2
 
 # State 4
 IsTerminal() = False
-ToString() = "Scores: 0 0 0 0, Turn total:6\nCurrent player: 0, rolling\n"
+ToString() = "Scores: 0 0 0 0, Turn total: 6\nCurrent player: 0\n"
 History() = [0, 2, 0, 2]
 HistoryString() = "0 2 0 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationState(0) = "Scores: 0 0 0 0, Turn total:6\nCurrent player: 0, rolling\n"
-InformationState(1) = "Scores: 0 0 0 0, Turn total:6\nCurrent player: 0, rolling\n"
-InformationState(2) = "Scores: 0 0 0 0, Turn total:6\nCurrent player: 0, rolling\n"
-InformationState(3) = "Scores: 0 0 0 0, Turn total:6\nCurrent player: 0, rolling\n"
+InformationState(0) = "Scores: 0 0 0 0, Turn total: 6\nCurrent player: 0\n"
+InformationState(1) = "Scores: 0 0 0 0, Turn total: 6\nCurrent player: 0\n"
+InformationState(2) = "Scores: 0 0 0 0, Turn total: 6\nCurrent player: 0\n"
+InformationState(3) = "Scores: 0 0 0 0, Turn total: 6\nCurrent player: 0\n"
 InformationStateAsNormalizedVector(0) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 InformationStateAsNormalizedVector(1) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 InformationStateAsNormalizedVector(2) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
@@ -148,16 +148,16 @@ action: 1
 
 # State 5
 IsTerminal() = False
-ToString() = "Scores: 6 0 0 0, Turn total:0\nCurrent player: 1\n"
+ToString() = "Scores: 6 0 0 0, Turn total: 0\nCurrent player: 1\n"
 History() = [0, 2, 0, 2, 1]
 HistoryString() = "0 2 0 2 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationState(0) = "Scores: 6 0 0 0, Turn total:0\nCurrent player: 1\n"
-InformationState(1) = "Scores: 6 0 0 0, Turn total:0\nCurrent player: 1\n"
-InformationState(2) = "Scores: 6 0 0 0, Turn total:0\nCurrent player: 1\n"
-InformationState(3) = "Scores: 6 0 0 0, Turn total:0\nCurrent player: 1\n"
+InformationState(0) = "Scores: 6 0 0 0, Turn total: 0\nCurrent player: 1\n"
+InformationState(1) = "Scores: 6 0 0 0, Turn total: 0\nCurrent player: 1\n"
+InformationState(2) = "Scores: 6 0 0 0, Turn total: 0\nCurrent player: 1\n"
+InformationState(3) = "Scores: 6 0 0 0, Turn total: 0\nCurrent player: 1\n"
 InformationStateAsNormalizedVector(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 InformationStateAsNormalizedVector(1) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 InformationStateAsNormalizedVector(2) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
@@ -172,16 +172,16 @@ action: 1
 
 # State 6
 IsTerminal() = False
-ToString() = "Scores: 6 0 0 0, Turn total:0\nCurrent player: 2\n"
+ToString() = "Scores: 6 0 0 0, Turn total: 0\nCurrent player: 2\n"
 History() = [0, 2, 0, 2, 1, 1]
 HistoryString() = "0 2 0 2 1 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 2
-InformationState(0) = "Scores: 6 0 0 0, Turn total:0\nCurrent player: 2\n"
-InformationState(1) = "Scores: 6 0 0 0, Turn total:0\nCurrent player: 2\n"
-InformationState(2) = "Scores: 6 0 0 0, Turn total:0\nCurrent player: 2\n"
-InformationState(3) = "Scores: 6 0 0 0, Turn total:0\nCurrent player: 2\n"
+InformationState(0) = "Scores: 6 0 0 0, Turn total: 0\nCurrent player: 2\n"
+InformationState(1) = "Scores: 6 0 0 0, Turn total: 0\nCurrent player: 2\n"
+InformationState(2) = "Scores: 6 0 0 0, Turn total: 0\nCurrent player: 2\n"
+InformationState(3) = "Scores: 6 0 0 0, Turn total: 0\nCurrent player: 2\n"
 InformationStateAsNormalizedVector(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 InformationStateAsNormalizedVector(1) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 InformationStateAsNormalizedVector(2) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
@@ -196,16 +196,16 @@ action: 0
 
 # State 7
 IsTerminal() = False
-ToString() = "Scores: 6 0 0 0, Turn total:0\nCurrent player: 2\n"
+ToString() = "Scores: 6 0 0 0, Turn total: 0\nCurrent player: 2 (rolling)\n"
 History() = [0, 2, 0, 2, 1, 1, 0]
 HistoryString() = "0 2 0 2 1 1 0"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
-InformationState(0) = "Scores: 6 0 0 0, Turn total:0\nCurrent player: 2\n"
-InformationState(1) = "Scores: 6 0 0 0, Turn total:0\nCurrent player: 2\n"
-InformationState(2) = "Scores: 6 0 0 0, Turn total:0\nCurrent player: 2\n"
-InformationState(3) = "Scores: 6 0 0 0, Turn total:0\nCurrent player: 2\n"
+InformationState(0) = "Scores: 6 0 0 0, Turn total: 0\nCurrent player: 2 (rolling)\n"
+InformationState(1) = "Scores: 6 0 0 0, Turn total: 0\nCurrent player: 2 (rolling)\n"
+InformationState(2) = "Scores: 6 0 0 0, Turn total: 0\nCurrent player: 2 (rolling)\n"
+InformationState(3) = "Scores: 6 0 0 0, Turn total: 0\nCurrent player: 2 (rolling)\n"
 InformationStateAsNormalizedVector(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 InformationStateAsNormalizedVector(1) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 InformationStateAsNormalizedVector(2) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
@@ -219,16 +219,16 @@ action: 1
 
 # State 8
 IsTerminal() = False
-ToString() = "Scores: 6 0 0 0, Turn total:0\nCurrent player: 3\n"
+ToString() = "Scores: 6 0 0 0, Turn total: 0\nCurrent player: 3\n"
 History() = [0, 2, 0, 2, 1, 1, 0, 1]
 HistoryString() = "0 2 0 2 1 1 0 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 3
-InformationState(0) = "Scores: 6 0 0 0, Turn total:0\nCurrent player: 3\n"
-InformationState(1) = "Scores: 6 0 0 0, Turn total:0\nCurrent player: 3\n"
-InformationState(2) = "Scores: 6 0 0 0, Turn total:0\nCurrent player: 3\n"
-InformationState(3) = "Scores: 6 0 0 0, Turn total:0\nCurrent player: 3\n"
+InformationState(0) = "Scores: 6 0 0 0, Turn total: 0\nCurrent player: 3\n"
+InformationState(1) = "Scores: 6 0 0 0, Turn total: 0\nCurrent player: 3\n"
+InformationState(2) = "Scores: 6 0 0 0, Turn total: 0\nCurrent player: 3\n"
+InformationState(3) = "Scores: 6 0 0 0, Turn total: 0\nCurrent player: 3\n"
 InformationStateAsNormalizedVector(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 InformationStateAsNormalizedVector(1) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 InformationStateAsNormalizedVector(2) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
@@ -243,16 +243,16 @@ action: 1
 
 # State 9
 IsTerminal() = False
-ToString() = "Scores: 6 0 0 0, Turn total:0\nCurrent player: 0, rolling\n"
+ToString() = "Scores: 6 0 0 0, Turn total: 0\nCurrent player: 0\n"
 History() = [0, 2, 0, 2, 1, 1, 0, 1, 1]
 HistoryString() = "0 2 0 2 1 1 0 1 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationState(0) = "Scores: 6 0 0 0, Turn total:0\nCurrent player: 0, rolling\n"
-InformationState(1) = "Scores: 6 0 0 0, Turn total:0\nCurrent player: 0, rolling\n"
-InformationState(2) = "Scores: 6 0 0 0, Turn total:0\nCurrent player: 0, rolling\n"
-InformationState(3) = "Scores: 6 0 0 0, Turn total:0\nCurrent player: 0, rolling\n"
+InformationState(0) = "Scores: 6 0 0 0, Turn total: 0\nCurrent player: 0\n"
+InformationState(1) = "Scores: 6 0 0 0, Turn total: 0\nCurrent player: 0\n"
+InformationState(2) = "Scores: 6 0 0 0, Turn total: 0\nCurrent player: 0\n"
+InformationState(3) = "Scores: 6 0 0 0, Turn total: 0\nCurrent player: 0\n"
 InformationStateAsNormalizedVector(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 InformationStateAsNormalizedVector(1) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 InformationStateAsNormalizedVector(2) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
@@ -267,16 +267,16 @@ action: 0
 
 # State 10
 IsTerminal() = False
-ToString() = "Scores: 6 0 0 0, Turn total:0\nCurrent player: 0\n"
+ToString() = "Scores: 6 0 0 0, Turn total: 0\nCurrent player: 0 (rolling)\n"
 History() = [0, 2, 0, 2, 1, 1, 0, 1, 1, 0]
 HistoryString() = "0 2 0 2 1 1 0 1 1 0"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
-InformationState(0) = "Scores: 6 0 0 0, Turn total:0\nCurrent player: 0\n"
-InformationState(1) = "Scores: 6 0 0 0, Turn total:0\nCurrent player: 0\n"
-InformationState(2) = "Scores: 6 0 0 0, Turn total:0\nCurrent player: 0\n"
-InformationState(3) = "Scores: 6 0 0 0, Turn total:0\nCurrent player: 0\n"
+InformationState(0) = "Scores: 6 0 0 0, Turn total: 0\nCurrent player: 0 (rolling)\n"
+InformationState(1) = "Scores: 6 0 0 0, Turn total: 0\nCurrent player: 0 (rolling)\n"
+InformationState(2) = "Scores: 6 0 0 0, Turn total: 0\nCurrent player: 0 (rolling)\n"
+InformationState(3) = "Scores: 6 0 0 0, Turn total: 0\nCurrent player: 0 (rolling)\n"
 InformationStateAsNormalizedVector(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 InformationStateAsNormalizedVector(1) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 InformationStateAsNormalizedVector(2) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
@@ -290,16 +290,16 @@ action: 1
 
 # State 11
 IsTerminal() = False
-ToString() = "Scores: 6 0 0 0, Turn total:0\nCurrent player: 1\n"
+ToString() = "Scores: 6 0 0 0, Turn total: 0\nCurrent player: 1\n"
 History() = [0, 2, 0, 2, 1, 1, 0, 1, 1, 0, 1]
 HistoryString() = "0 2 0 2 1 1 0 1 1 0 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationState(0) = "Scores: 6 0 0 0, Turn total:0\nCurrent player: 1\n"
-InformationState(1) = "Scores: 6 0 0 0, Turn total:0\nCurrent player: 1\n"
-InformationState(2) = "Scores: 6 0 0 0, Turn total:0\nCurrent player: 1\n"
-InformationState(3) = "Scores: 6 0 0 0, Turn total:0\nCurrent player: 1\n"
+InformationState(0) = "Scores: 6 0 0 0, Turn total: 0\nCurrent player: 1\n"
+InformationState(1) = "Scores: 6 0 0 0, Turn total: 0\nCurrent player: 1\n"
+InformationState(2) = "Scores: 6 0 0 0, Turn total: 0\nCurrent player: 1\n"
+InformationState(3) = "Scores: 6 0 0 0, Turn total: 0\nCurrent player: 1\n"
 InformationStateAsNormalizedVector(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 InformationStateAsNormalizedVector(1) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 InformationStateAsNormalizedVector(2) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
@@ -314,16 +314,16 @@ action: 0
 
 # State 12
 IsTerminal() = False
-ToString() = "Scores: 6 0 0 0, Turn total:0\nCurrent player: 1\n"
+ToString() = "Scores: 6 0 0 0, Turn total: 0\nCurrent player: 1 (rolling)\n"
 History() = [0, 2, 0, 2, 1, 1, 0, 1, 1, 0, 1, 0]
 HistoryString() = "0 2 0 2 1 1 0 1 1 0 1 0"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
-InformationState(0) = "Scores: 6 0 0 0, Turn total:0\nCurrent player: 1\n"
-InformationState(1) = "Scores: 6 0 0 0, Turn total:0\nCurrent player: 1\n"
-InformationState(2) = "Scores: 6 0 0 0, Turn total:0\nCurrent player: 1\n"
-InformationState(3) = "Scores: 6 0 0 0, Turn total:0\nCurrent player: 1\n"
+InformationState(0) = "Scores: 6 0 0 0, Turn total: 0\nCurrent player: 1 (rolling)\n"
+InformationState(1) = "Scores: 6 0 0 0, Turn total: 0\nCurrent player: 1 (rolling)\n"
+InformationState(2) = "Scores: 6 0 0 0, Turn total: 0\nCurrent player: 1 (rolling)\n"
+InformationState(3) = "Scores: 6 0 0 0, Turn total: 0\nCurrent player: 1 (rolling)\n"
 InformationStateAsNormalizedVector(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 InformationStateAsNormalizedVector(1) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 InformationStateAsNormalizedVector(2) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
@@ -337,16 +337,16 @@ action: 4
 
 # State 13
 IsTerminal() = False
-ToString() = "Scores: 6 0 0 0, Turn total:5\nCurrent player: 1\n"
+ToString() = "Scores: 6 0 0 0, Turn total: 5\nCurrent player: 1\n"
 History() = [0, 2, 0, 2, 1, 1, 0, 1, 1, 0, 1, 0, 4]
 HistoryString() = "0 2 0 2 1 1 0 1 1 0 1 0 4"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationState(0) = "Scores: 6 0 0 0, Turn total:5\nCurrent player: 1\n"
-InformationState(1) = "Scores: 6 0 0 0, Turn total:5\nCurrent player: 1\n"
-InformationState(2) = "Scores: 6 0 0 0, Turn total:5\nCurrent player: 1\n"
-InformationState(3) = "Scores: 6 0 0 0, Turn total:5\nCurrent player: 1\n"
+InformationState(0) = "Scores: 6 0 0 0, Turn total: 5\nCurrent player: 1\n"
+InformationState(1) = "Scores: 6 0 0 0, Turn total: 5\nCurrent player: 1\n"
+InformationState(2) = "Scores: 6 0 0 0, Turn total: 5\nCurrent player: 1\n"
+InformationState(3) = "Scores: 6 0 0 0, Turn total: 5\nCurrent player: 1\n"
 InformationStateAsNormalizedVector(0) = [0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 InformationStateAsNormalizedVector(1) = [0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 InformationStateAsNormalizedVector(2) = [0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
@@ -361,16 +361,16 @@ action: 0
 
 # State 14
 IsTerminal() = False
-ToString() = "Scores: 6 0 0 0, Turn total:5\nCurrent player: 1\n"
+ToString() = "Scores: 6 0 0 0, Turn total: 5\nCurrent player: 1 (rolling)\n"
 History() = [0, 2, 0, 2, 1, 1, 0, 1, 1, 0, 1, 0, 4, 0]
 HistoryString() = "0 2 0 2 1 1 0 1 1 0 1 0 4 0"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
-InformationState(0) = "Scores: 6 0 0 0, Turn total:5\nCurrent player: 1\n"
-InformationState(1) = "Scores: 6 0 0 0, Turn total:5\nCurrent player: 1\n"
-InformationState(2) = "Scores: 6 0 0 0, Turn total:5\nCurrent player: 1\n"
-InformationState(3) = "Scores: 6 0 0 0, Turn total:5\nCurrent player: 1\n"
+InformationState(0) = "Scores: 6 0 0 0, Turn total: 5\nCurrent player: 1 (rolling)\n"
+InformationState(1) = "Scores: 6 0 0 0, Turn total: 5\nCurrent player: 1 (rolling)\n"
+InformationState(2) = "Scores: 6 0 0 0, Turn total: 5\nCurrent player: 1 (rolling)\n"
+InformationState(3) = "Scores: 6 0 0 0, Turn total: 5\nCurrent player: 1 (rolling)\n"
 InformationStateAsNormalizedVector(0) = [0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 InformationStateAsNormalizedVector(1) = [0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 InformationStateAsNormalizedVector(2) = [0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
@@ -384,40 +384,40 @@ action: 4
 
 # State 15
 IsTerminal() = False
-ToString() = "Scores: 6 0 0 0, Turn total:10\nCurrent player: 1\n"
+ToString() = "Scores: 6 0 0 0, Turn total: 10\nCurrent player: 1\n"
 History() = [0, 2, 0, 2, 1, 1, 0, 1, 1, 0, 1, 0, 4, 0, 4]
 HistoryString() = "0 2 0 2 1 1 0 1 1 0 1 0 4 0 4"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationState(0) = "Scores: 6 0 0 0, Turn total:10\nCurrent player: 1\n"
-InformationState(1) = "Scores: 6 0 0 0, Turn total:10\nCurrent player: 1\n"
-InformationState(2) = "Scores: 6 0 0 0, Turn total:10\nCurrent player: 1\n"
-InformationState(3) = "Scores: 6 0 0 0, Turn total:10\nCurrent player: 1\n"
+InformationState(0) = "Scores: 6 0 0 0, Turn total: 10\nCurrent player: 1\n"
+InformationState(1) = "Scores: 6 0 0 0, Turn total: 10\nCurrent player: 1\n"
+InformationState(2) = "Scores: 6 0 0 0, Turn total: 10\nCurrent player: 1\n"
+InformationState(3) = "Scores: 6 0 0 0, Turn total: 10\nCurrent player: 1\n"
 InformationStateAsNormalizedVector(0) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 InformationStateAsNormalizedVector(1) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 InformationStateAsNormalizedVector(2) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 InformationStateAsNormalizedVector(3) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 Rewards() = [0.0, 0.0, 0.0, 0.0]
 Returns() = []
-LegalActions() = [0, 1]
-StringLegalActions() = ["roll", "stop"]
+LegalActions() = [1]
+StringLegalActions() = ["stop"]
 
 # Apply action "stop"
 action: 1
 
 # State 16
 IsTerminal() = True
-ToString() = "Scores: 6 10 0 0, Turn total:0\nCurrent player: 2\n"
+ToString() = "Scores: 6 10 0 0, Turn total: 0\nCurrent player: 2\n"
 History() = [0, 2, 0, 2, 1, 1, 0, 1, 1, 0, 1, 0, 4, 0, 4, 1]
 HistoryString() = "0 2 0 2 1 1 0 1 1 0 1 0 4 0 4 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
-InformationState(0) = "Scores: 6 10 0 0, Turn total:0\nCurrent player: 2\n"
-InformationState(1) = "Scores: 6 10 0 0, Turn total:0\nCurrent player: 2\n"
-InformationState(2) = "Scores: 6 10 0 0, Turn total:0\nCurrent player: 2\n"
-InformationState(3) = "Scores: 6 10 0 0, Turn total:0\nCurrent player: 2\n"
+InformationState(0) = "Scores: 6 10 0 0, Turn total: 0\nCurrent player: 2\n"
+InformationState(1) = "Scores: 6 10 0 0, Turn total: 0\nCurrent player: 2\n"
+InformationState(2) = "Scores: 6 10 0 0, Turn total: 0\nCurrent player: 2\n"
+InformationState(3) = "Scores: 6 10 0 0, Turn total: 0\nCurrent player: 2\n"
 InformationStateAsNormalizedVector(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 InformationStateAsNormalizedVector(1) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 InformationStateAsNormalizedVector(2) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]

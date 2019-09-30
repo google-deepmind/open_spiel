@@ -34,6 +34,7 @@ constexpr int kDefaultHorizon = 1000;
 constexpr int kDefaultCoins = 50;
 constexpr int kDefaultSize = 3;
 constexpr bool kDefaultAlesia = false;
+constexpr int kDefaultMinBid = 0;
 
 const GameType kGameType{
     /*short_name=*/"oshi_zumo",
@@ -53,7 +54,8 @@ const GameType kGameType{
     {{"alesia", {GameParameter::Type::kBool, false}},
      {"coins", {GameParameter::Type::kInt, false}},
      {"size", {GameParameter::Type::kInt, false}},
-     {"horizon", {GameParameter::Type::kInt, false}}}};
+     {"horizon", {GameParameter::Type::kInt, false}},
+     {"min_bid", {GameParameter::Type::kInt, false}}}};
 
 std::unique_ptr<Game> Factory(const GameParameters& params) {
   return std::unique_ptr<Game>(new OshiZumoGame(params));
@@ -73,6 +75,7 @@ OshiZumoState::OshiZumoState(const OshiZumoGame& parent_game)
       starting_coins_(parent_game.starting_coins()),
       size_(parent_game.size()),
       alesia_(parent_game.alesia()),
+      min_bid_(parent_game.min_bid()),
       // pos 0 and pos 2*size_+2 are "off the edge".
       wrestler_pos_(size_ + 1),
       coins_({{starting_coins_, starting_coins_}})
@@ -117,9 +120,16 @@ std::vector<Action> OshiZumoState::LegalActions(Player player) const {
   SPIEL_CHECK_TRUE(player == Player{0} || player == Player{1});
 
   std::vector<Action> movelist;
-  for (int bet = 0; bet <= coins_[player]; bet++) {
+  for (int bet = min_bid_; bet <= coins_[player]; bet++) {
     movelist.push_back(bet);
   }
+
+  if (movelist.empty()) {
+    // Player does not have the minimum bid: force them to play what they have
+    // left.
+    movelist.push_back(coins_[player]);
+  }
+
   return movelist;
 }
 
@@ -220,7 +230,11 @@ OshiZumoGame::OshiZumoGame(const GameParameters& params)
       horizon_(ParameterValue<int>("horizon", kDefaultHorizon)),
       starting_coins_(ParameterValue<int>("coins", kDefaultCoins)),
       size_(ParameterValue<int>("size", kDefaultSize)),
-      alesia_(ParameterValue<bool>("alesia", kDefaultAlesia)) {}
+      alesia_(ParameterValue<bool>("alesia", kDefaultAlesia)),
+      min_bid_(ParameterValue<int>("min_bid", kDefaultMinBid)) {
+  SPIEL_CHECK_GE(min_bid_, 0);
+  SPIEL_CHECK_LE(min_bid_, starting_coins_);
+}
 
 std::unique_ptr<State> OshiZumoGame::NewInitialState() const {
   return std::unique_ptr<State>(new OshiZumoState(*this));

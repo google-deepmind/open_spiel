@@ -81,6 +81,12 @@ std::map<std::string, double> ValueIteration(const Game& game, int depth_limit,
     SPIEL_CHECK_EQ(game.GetType().utility, GameType::Utility::kZeroSum);
   }
 
+  // No support for simultaneous games (needs an LP solver). And so also must
+  // be a perfect information game.
+  SPIEL_CHECK_EQ(game.GetType().dynamics, GameType::Dynamics::kSequential);
+  SPIEL_CHECK_EQ(game.GetType().information,
+                 GameType::Information::kPerfectInformation);
+
   auto states = GetAllStates(game, depth_limit, /*include_terminals=*/true,
                              /*include_chance_states=*/false);
   std::map<std::string, double> values;
