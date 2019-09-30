@@ -12,9 +12,9 @@ public:
 
     ChunkSet(JNIEnv *env, jobject chunkset);
 
-    std::string Print();
+    std::string Print() const;
 
-    std::string ToChunkString();
+    std::string ToChunkString() const;
 
 private:
 

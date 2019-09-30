@@ -3,7 +3,7 @@
 
 ChunkSet::ChunkSet(JNIEnv *env, jobject chunkset): env(env), chunkset(chunkset) {}
 
-std::string ChunkSet::Print()
+std::string ChunkSet::Print() const
 {
 
     jclass chunkSetClass = env->FindClass("util/ChunkSet");
@@ -17,7 +17,7 @@ std::string ChunkSet::Print()
     return cppString;
 }
 
-std::string ChunkSet::ToChunkString()
+std::string ChunkSet::ToChunkString() const
 {
 
     jclass chunkSetClass = env->FindClass("util/ChunkSet");
