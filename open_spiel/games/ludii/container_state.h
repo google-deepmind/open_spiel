@@ -5,22 +5,23 @@
 #include "region.h"
 #include "chunk_set.h"
 
-class ContainerState{
-	
+class ContainerState
+{
+
 public:
 
-	ContainerState(JNIEnv *env, jobject container_state);
+    ContainerState(JNIEnv *env, jobject container_state);
 
-	Region Empty();
+    Region Empty() const;
 
-	ChunkSet CloneWho();
+    ChunkSet CloneWho() const;
 
-	ChunkSet CloneWhat();
-	
+    ChunkSet CloneWhat() const;
+
 private:
 
-	JNIEnv *env;
-	jobject container_state;
+    JNIEnv *env;
+    jobject container_state;
 
 };
 

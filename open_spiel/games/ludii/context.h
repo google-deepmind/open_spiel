@@ -5,19 +5,20 @@
 
 class Game;
 
-class Context{
+class Context
+{
 
 
 public:
 
-	Context(JNIEnv *env,Game game, Trial trial);
+    Context(JNIEnv *env, Game game, Trial trial);
 
-	jobject GetObj();
+    jobject GetObj() const;
 
 private:
 
-	JNIEnv *env;
-	jobject context;
+    JNIEnv *env;
+    jobject context;
 
 };
 

@@ -2,9 +2,10 @@
 
 
 
-Move::Move(JNIEnv *env, jobject move):env(env),move(move){}
+Move::Move(JNIEnv *env, jobject move): env(env), move(move) {}
 
 
-jobject Move::GetObj(){
-	return move;
+jobject Move::GetObj() const
+{
+    return move;
 }

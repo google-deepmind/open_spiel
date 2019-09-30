@@ -2,22 +2,22 @@
 #define MOVE_H_
 
 #include "jni.h"
-#include <iostream>
 #include <string>
 #include <vector>
 
-class Move{
+class Move
+{
 
 public:
 
-	Move(JNIEnv *env, jobject move);
+    Move(JNIEnv *env, jobject move);
 
-	jobject GetObj();
+    jobject GetObj() const;
 
 private:
 
-	JNIEnv *env;
-	jobject move;
+    JNIEnv *env;
+    jobject move;
 };
 
 #endif

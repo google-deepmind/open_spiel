@@ -2,24 +2,24 @@
 #define CHUNKSET_H_
 
 #include "jni.h"
-#include <iostream>
 #include <string>
 
 
-class ChunkSet{
+class ChunkSet
+{
 
 public:
 
-	ChunkSet(JNIEnv *env, jobject chunkset);
+    ChunkSet(JNIEnv *env, jobject chunkset);
 
-	std::string Print();
+    std::string Print();
 
-	std::string ToChunkString();
+    std::string ToChunkString();
 
 private:
 
-	JNIEnv *env;
-	jobject chunkset;
+    JNIEnv *env;
+    jobject chunkset;
 };
 
 #endif

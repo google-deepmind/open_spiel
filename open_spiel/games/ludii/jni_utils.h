@@ -1,29 +1,29 @@
 #ifndef JNIUTILS_H_
 #define JNIUTILS_H_
 
-#include <iostream>
 #include "jni.h"
 #include <string>
 #include <cstring>
 
 
-class JNIUtils{
+class JNIUtils
+{
 
 public:
 
-	JNIUtils(const std::string jar_location);
-	~JNIUtils();
+    JNIUtils(const std::string jar_location);
+    ~JNIUtils();
 
-	JNIEnv * GetEnv();
+    JNIEnv *GetEnv() const;
 
-	void InitJVM(std::string jar_location);
-	void CloseJVM();
+    void InitJVM(std::string jar_location);
+    void CloseJVM();
 
 private:
 
-	JavaVM *jvm;
-	JNIEnv *env;
-	jint res;
+    JavaVM *jvm;
+    JNIEnv *env;
+    jint res;
 
 };
 

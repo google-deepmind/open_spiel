@@ -5,20 +5,21 @@
 #include "container_state.h"
 #include <vector>
 
-class State{
-	
+class State
+{
+
 public:
 
-	State(JNIEnv *env, jobject state);
+    State(JNIEnv *env, jobject state);
 
-	std::vector<ContainerState> ContainerStates();
+    std::vector<ContainerState> ContainerStates() const;
 
-	int Mover();
-	
+    int Mover() const;
+
 private:
 
-	JNIEnv *env;
-	jobject state;
+    JNIEnv *env;
+    jobject state;
 
 };
 

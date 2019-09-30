@@ -6,23 +6,24 @@
 #include "state.h"
 
 
-class Trial{
+class Trial
+{
 
 public:
 
-	Trial(JNIEnv *env, Game game);
+    Trial(JNIEnv *env, Game game);
 
-	jobject GetObj();
+    jobject GetObj() const;
 
-	State GetState();
+    State GetState() const;
 
-	bool Over();
+    bool Over() const;
 
 
 private:
 
-	JNIEnv *env;
-	jobject trial;
+    JNIEnv *env;
+    jobject trial;
 };
 
 #endif

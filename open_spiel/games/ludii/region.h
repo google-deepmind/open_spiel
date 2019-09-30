@@ -4,18 +4,19 @@
 #include "jni.h"
 #include "chunk_set.h"
 
-class Region{
+class Region
+{
 
 public:
 
-	Region(JNIEnv *env, jobject region);
+    Region(JNIEnv *env, jobject region);
 
-	ChunkSet BitSet();
+    ChunkSet BitSet() const;
 
 private:
 
-	JNIEnv *env;
-	jobject region;
+    JNIEnv *env;
+    jobject region;
 };
 
 #endif

@@ -3,17 +3,18 @@
 
 #include "jni.h"
 
-class Mode{
+class Mode
+{
 
 public:
-	Mode(JNIEnv *env, jobject mode);
+    Mode(JNIEnv *env, jobject mode);
 
-	int NumPlayers();
+    int NumPlayers() const;
 
 private:
 
-	JNIEnv *env;
-	jobject mode;
+    JNIEnv *env;
+    jobject mode;
 
 };
 

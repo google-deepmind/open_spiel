@@ -9,35 +9,36 @@
 
 class Context;
 
-class Game{
+class Game
+{
 
 public:
 
-	Game(JNIEnv *env, jobject game, std::string game_path);
+    Game(JNIEnv *env, jobject game, std::string game_path);
 
-	std::string GetPath();
+    std::string GetPath() const;
 
-	jobject GetObj();
+    jobject GetObj() const;
 
-	void Create(int viewSize);
+    void Create(int viewSize) const;
 
-	std::string GetName();
+    std::string GetName() const;
 
-	int StateFlags();
+    int StateFlags() const;
 
-	Mode GetMode();
+    Mode GetMode() const;
 
-	void Start(Context context);
+    void Start(Context context) const;
 
-	Moves GetMoves(Context context);
+    Moves GetMoves(Context context) const;
 
-	Move Apply(Context context, Move move);
+    Move Apply(Context context, Move move) const;
 
-private:	
+private:
 
-	JNIEnv *env;
-	jobject game;
-	std::string game_path;
+    JNIEnv *env;
+    jobject game;
+    std::string game_path;
 
 };
 
