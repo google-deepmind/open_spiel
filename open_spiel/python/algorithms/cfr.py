@@ -302,7 +302,8 @@ class _CFRSolverBase(object):
       info_state_policy = self._get_infostate_policy(info_state)
     else:
       info_state_policy = policies[current_player](info_state)
-    for action, action_prob in info_state_policy.items():
+    for action in state.legal_actions():
+      action_prob = info_state_policy.get(action, 0.)
       new_state = state.child(action)
       new_reach_probabilities = reach_probabilities.copy()
       new_reach_probabilities[current_player] *= action_prob

@@ -30,8 +30,19 @@ from open_spiel.python.algorithms import expected_game_score
 from open_spiel.python.algorithms import exploitability
 import pyspiel
 
-_KUHN_UNIFORM_POLICY = policy.TabularPolicy(pyspiel.load_game("kuhn_poker"))
-_LEDUC_UNIFORM_POLICY = policy.TabularPolicy(pyspiel.load_game("leduc_poker"))
+_KUHN_GAME = pyspiel.load_game("kuhn_poker")
+_LEDUC_GAME = pyspiel.load_game("leduc_poker")
+
+_KUHN_UNIFORM_POLICY = policy.TabularPolicy(_KUHN_GAME)
+_LEDUC_UNIFORM_POLICY = policy.TabularPolicy(_LEDUC_GAME)
+_EXPECTED_EXPLOITABILITIES_CFRBR_KUHN = [
+    0.9166666666666666, 0.33333333333333337, 0.3194444444444445,
+    0.2604166666666667, 0.22666666666666674
+]
+_EXPECTED_EXPLOITABILITIES_CFRBR_LEDUC = [
+    4.747222222222222, 4.006867283950617, 3.4090489231017034,
+    2.8982539553095172, 2.5367193593344504
+]
 
 
 class ModuleLevelFunctionTest(absltest.TestCase):
@@ -255,45 +266,27 @@ class CFRBRTest(parameterized.TestCase, absltest.TestCase):
     cfrbr_solver.current_policy()
 
   @parameterized.parameters([
-      (pyspiel.load_game("kuhn_poker"), [
-          0.9166666666666666, 0.33333333333333337, 0.3194444444444445,
-          0.2604166666666667, 0.22666666666666674
-      ], [
-          0.9166666666666666, 0.5347222222222222, 0.45416666666666666,
-          0.42460317460317465, 0.421078431372549
-      ]),
-      (pyspiel.load_game("leduc_poker"), [
-          4.747222222222222, 4.006867283950617, 3.4090489231017034,
-          2.8982539553095172, 2.5367193593344504
-      ], [
-          4.747222222222222, 4.312546207222133, 4.132920085914224,
-          3.9821947822091044, 3.6596420594700976
-      ]),
+      (_KUHN_GAME, pyspiel.CFRBRSolver, _EXPECTED_EXPLOITABILITIES_CFRBR_KUHN),
+      (_KUHN_GAME, cfr.CFRBRSolver, _EXPECTED_EXPLOITABILITIES_CFRBR_KUHN),
+      (_LEDUC_GAME, pyspiel.CFRBRSolver,
+       _EXPECTED_EXPLOITABILITIES_CFRBR_LEDUC),
+      (_LEDUC_GAME, cfr.CFRBRSolver, _EXPECTED_EXPLOITABILITIES_CFRBR_LEDUC),
   ])
-  def test_cpp_cfr_br(self, game, cpp_expected, python_expected):
-    # This is currently a non-regression test, checking that the C++ version
-    # does not change.
-    cpp_solver = pyspiel.CFRBRSolver(game)
-    python_solver = cfr.CFRBRSolver(
-        game, regret_matching_plus=False, linear_averaging=False)
-
-    python_exploitabilities = []
-    cpp_exploitabilites = []
-    for _ in range(5):
-      cpp_solver.evaluate_and_update_policy()
-      cpp_avg_policy = cpp_solver.average_policy()
-
-      python_solver.evaluate_and_update_policy()
-      python_avg_policy = python_solver.average_policy()
+  def test_cpp_and_python_cfr_br(self, game, solver_cls,
+                                 expected_exploitability):
+    solver = solver_cls(game)
+    for step in range(5):
+      solver.evaluate_and_update_policy()
 
       # We do not compare the policy directly as we do not have an easy way to
       # convert one to the other, so we use the exploitability as a proxy.
-      cpp_exploitabilites.append(pyspiel.nash_conv(game, cpp_avg_policy))
-      python_exploitabilities.append(
-          exploitability.nash_conv(game, python_avg_policy))
+      avg_policy = solver.average_policy()
+      if solver_cls == pyspiel.CFRBRSolver:
+        exploitability_ = pyspiel.nash_conv(game, avg_policy)
+      else:
+        exploitability_ = exploitability.nash_conv(game, avg_policy)
 
-    self.assertEqual(cpp_expected, cpp_exploitabilites)
-    self.assertEqual(python_expected, python_exploitabilities)
+      self.assertEqual(expected_exploitability[step], exploitability_)
 
 
 if __name__ == "__main__":
