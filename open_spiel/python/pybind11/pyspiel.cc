@@ -14,6 +14,7 @@
 
 #include <unordered_map>
 
+#include "open_spiel/algorithms/best_response.h"
 #include "open_spiel/algorithms/cfr.h"
 #include "open_spiel/algorithms/cfr_br.h"
 #include "open_spiel/algorithms/evaluate_bots.h"
@@ -293,7 +294,10 @@ PYBIND11_MODULE(pyspiel, m) {
       .def(py::init<const open_spiel::Game&, int,
                     const std::unordered_map<std::string,
                                              open_spiel::ActionsAndProbs>&>())
+      .def(py::init<const open_spiel::Game&, int, const open_spiel::Policy*>())
       .def("value", &TabularBestResponse::Value)
+      .def("get_best_response_policy",
+           &TabularBestResponse::GetBestResponsePolicy)
       .def("get_best_response_actions",
            &TabularBestResponse::GetBestResponseActions)
       .def("set_policy",
@@ -309,7 +313,7 @@ PYBIND11_MODULE(pyspiel, m) {
   // non-trivial to convert between the two, but we have a function that does so
   // in the open_spiel/python/policy.py file.
   py::class_<open_spiel::Policy>(m, "Policy")
-      .def("get_state_policy_as_map",
+      .def("action_probabilities",
            (std::unordered_map<Action, double>(open_spiel::Policy::*)(
                const open_spiel::State&) const) &
                open_spiel::Policy::GetStatePolicyAsMap)
@@ -322,7 +326,7 @@ PYBIND11_MODULE(pyspiel, m) {
       .def(py::init<const std::unordered_map<std::string, ActionsAndProbs>&>())
       .def("get_state_policy", &open_spiel::TabularPolicy::GetStatePolicy);
 
-  m.def("get_uniform_policy", &open_spiel::GetUniformPolicy);
+  m.def("UniformRandomPolicy", &open_spiel::GetUniformPolicy);
 
   py::class_<open_spiel::algorithms::CFRSolver>(m, "CFRSolver")
       .def(py::init<const Game&>())

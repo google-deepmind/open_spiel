@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "open_spiel/algorithms/tabular_exploitability.h"
+#include "open_spiel/algorithms/best_response.h"
 
 #include <cmath>
 #include <cstddef>
@@ -20,7 +20,6 @@
 #include <iostream>
 #include <unordered_set>
 
-#include "open_spiel/algorithms/best_response.h"
 #include "open_spiel/algorithms/minimax.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/games/goofspiel.h"
@@ -444,41 +443,40 @@ void CheckBestResponseValuesAgainstGoldenValues(
   }
 }
 
-void TestLeducPolicyFindsIllegalAction() {
-  std::unique_ptr<Game> game = LoadGame("leduc_poker");
-  TabularPolicy policy = open_spiel::GetUniformPolicy(*game);
-  const std::string troublesome_infostate =
-      "[Round 2][Player: 0][Pot: 14][Money: 95 91[Private: 0]][Round1]: 1 "
-      "1[Public: 2]\nRound 2 sequence: 2 2";
-  policy.PolicyTable()[troublesome_infostate] =
-      ActionsAndProbs({{0, 0.5}, {1, 0.5}, {2, 0}});
-  double exploitability = Exploitability(*game, policy);
-  SPIEL_CHECK_GE(exploitability, 0);
+void KuhnPokerUniformValueTestPid0() {
+  std::unique_ptr<Game> game = LoadGame("kuhn_poker");
+  TabularPolicy policy = GetUniformPolicy(*game);
+  std::vector<std::pair<std::string, double>> histories_and_values =
+      GetKuhnUniformBestResponseValuesPid0();
+  CheckBestResponseValuesAgainstGoldenValues(
+      *game, /*best_responder=*/Player{0}, policy, histories_and_values);
 }
 
-void TestExploitability(
-    const std::string& game_name,
-    std::function<TabularPolicy(const Game& game)> policy_factory,
-    double expected_value) {
-  std::unique_ptr<Game> game = LoadGame(game_name);
-  TabularPolicy policy = policy_factory(*game);
-  double exploitability = Exploitability(*game, policy);
-  if (!Near(exploitability, expected_value)) {
-    SpielFatalError(absl::StrCat("Exploitability was ", exploitability,
-                                 " but expected ", expected_value));
-  }
+void KuhnPokerUniformValueTestPid1() {
+  std::unique_ptr<Game> game = LoadGame("kuhn_poker");
+  TabularPolicy policy = GetUniformPolicy(*game);
+  std::vector<std::pair<std::string, double>> histories_and_values =
+      GetKuhnUniformBestResponseValuesPid1();
+  CheckBestResponseValuesAgainstGoldenValues(
+      *game, /*best_responder=*/Player{1}, policy, histories_and_values);
 }
 
-void TestNashConv(const std::string& game_name,
-                  std::function<TabularPolicy(const Game&)> policy_factory,
-                  double expected_value) {
-  std::unique_ptr<Game> game = LoadGame(game_name);
-  TabularPolicy policy = policy_factory(*game);
-  double nash_conv = NashConv(*game, policy);
-  if (!Near(nash_conv, expected_value)) {
-    SpielFatalError(absl::StrCat("In game ", game_name, " NashConv was ",
-                                 nash_conv, " but expected ", expected_value));
-  }
+void KuhnPokerOptimalValueTestPid0() {
+  std::unique_ptr<Game> game = LoadGame("kuhn_poker");
+  TabularPolicy policy = GetOptimalKuhnPolicy(/*alpha=*/0.2);
+  std::vector<std::pair<std::string, double>> histories_and_values =
+      GetKuhnOptimalBestResponseValuesPid0();
+  CheckBestResponseValuesAgainstGoldenValues(
+      *game, /*best_responder=*/Player{0}, policy, histories_and_values);
+}
+
+void KuhnPokerOptimalValueTestPid1() {
+  std::unique_ptr<Game> game = LoadGame("kuhn_poker");
+  TabularPolicy policy = GetOptimalKuhnPolicy(/*alpha=*/0.2);
+  std::vector<std::pair<std::string, double>> histories_and_values =
+      GetKuhnOptimalBestResponseValuesPid1();
+  CheckBestResponseValuesAgainstGoldenValues(
+      *game, /*best_responder=*/Player{1}, policy, histories_and_values);
 }
 
 }  // namespace
@@ -486,39 +484,19 @@ void TestNashConv(const std::string& game_name,
 }  // namespace open_spiel
 
 int main(int argc, char** argv) {
-  // The optimal policy is a Nash equilibrium, so there are 0 gains available
-  // for either player by switching.
-  auto optimal_factory = [](const open_spiel::Game&) {
-    return open_spiel::algorithms::GetOptimalKuhnPolicy(/*alpha=*/0.2);
-  };
-  open_spiel::algorithms::TestExploitability("kuhn_poker", optimal_factory, 0.);
-  open_spiel::algorithms::TestNashConv("kuhn_poker", optimal_factory, 0.);
+  open_spiel::algorithms::KuhnPokerUniformBestResponsePid0();
+  open_spiel::algorithms::KuhnPokerUniformBestResponsePid1();
+  open_spiel::algorithms::KuhnPokerOptimalBestResponsePid0();
+  open_spiel::algorithms::KuhnPokerOptimalBestResponsePid1();
+  open_spiel::algorithms::
+      KuhnPokerExploitabilityDescentIteration4BestResponsePid0();
+  open_spiel::algorithms::KuhnPokerExploitabilityDescentMinimalSimulationPid0();
+  open_spiel::algorithms::KuhnPokerUniformValueTestPid0();
+  open_spiel::algorithms::KuhnPokerUniformValueTestPid1();
+  open_spiel::algorithms::KuhnPokerOptimalValueTestPid0();
+  open_spiel::algorithms::KuhnPokerOptimalValueTestPid1();
 
-  // Smoke tests to verify that we can calculate exploitability in Leduc; this
-  // is a regression test, as we previously had some bugs in Leduc.
-  open_spiel::algorithms::TestLeducPolicyFindsIllegalAction();
-
-  // NashConv values for the uniform policies verified against multiple
-  // existing implementations.
-  open_spiel::algorithms::TestExploitability(
-      "kuhn_poker", open_spiel::GetUniformPolicy, 0.4583333333333335);
-  open_spiel::algorithms::TestExploitability(
-      "leduc_poker", open_spiel::GetUniformPolicy, 2.373611111111111);
-  open_spiel::algorithms::TestNashConv(
-      "kuhn_poker", open_spiel::GetUniformPolicy, 0.916666666666667);
-  open_spiel::algorithms::TestNashConv(
-      "leduc_poker", open_spiel::GetUniformPolicy, 4.747222222222222);
-
-  // The first action policy is AlwaysFold in poker. If you always fold, you win
-  // 0 chips, but if you switch to AlwaysBet, you win 1 chip every time if
-  // playing against a player who always folds, so NashConv is 1 + 1 = 2,
-  // leading to exploitability of 2/2 = 1.
-  open_spiel::algorithms::TestExploitability(
-      "kuhn_poker", open_spiel::GetFirstActionPolicy, 1.);
-  open_spiel::algorithms::TestExploitability(
-      "leduc_poker", open_spiel::GetFirstActionPolicy, 1.);
-  open_spiel::algorithms::TestNashConv("kuhn_poker",
-                                       open_spiel::GetFirstActionPolicy, 2.);
-  open_spiel::algorithms::TestNashConv("leduc_poker",
-                                       open_spiel::GetFirstActionPolicy, 2.);
+  // Verifies that the code automatically generates the best response actions
+  // after swapping policies.
+  open_spiel::algorithms::KuhnPokerUniformBestResponseAfterSwitchingPolicies();
 }

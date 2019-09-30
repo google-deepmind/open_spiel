@@ -21,18 +21,19 @@ from __future__ import print_function
 
 from absl.testing import absltest
 
+from absl.testing import parameterized
 from open_spiel.python import policy
-from open_spiel.python.algorithms import best_response as pyspiel_best_response
+from open_spiel.python.algorithms import best_response
+from open_spiel.python.algorithms import get_all_states
 import pyspiel
 
 
-class BestResponseTest(absltest.TestCase):
+class BestResponseTest(parameterized.TestCase, absltest.TestCase):
 
   def test_best_response_is_a_policy(self):
     game = pyspiel.load_game("kuhn_poker")
     test_policy = policy.UniformRandomPolicy(game)
-    best_response = pyspiel_best_response.BestResponsePolicy(
-        game, policy=test_policy, player_id=0)
+    br = best_response.BestResponsePolicy(game, policy=test_policy, player_id=0)
     expected_policy = {
         "0": 1,  # Bet in case opponent folds when winning
         "1": 1,  # Bet in case opponent folds when winning
@@ -44,10 +45,40 @@ class BestResponseTest(absltest.TestCase):
         "2pb": 1,  # Call - we've won
     }
     self.assertEqual(
-        expected_policy, {
-            key: best_response.best_response_action(key)
-            for key in expected_policy.keys()
-        })
+        expected_policy,
+        {key: br.best_response_action(key) for key in expected_policy.keys()})
+
+  @parameterized.parameters(["kuhn_poker", "leduc_poker"])
+  def test_cpp_and_python_implementations_are_identical(self, game_name):
+    game = pyspiel.load_game(game_name)
+
+    python_policy = policy.UniformRandomPolicy(game)
+    pyspiel_policy = pyspiel.UniformRandomPolicy(game)
+
+    all_states = get_all_states.get_all_states(
+        game,
+        depth_limit=-1,
+        include_terminals=False,
+        include_chance_states=False,
+        to_string=lambda s: s.information_state())
+
+    for current_player in range(game.num_players()):
+      python_br = best_response.BestResponsePolicy(game, current_player,
+                                                   python_policy)
+      cpp_br = pyspiel.TabularBestResponse(
+          game, current_player, pyspiel_policy).get_best_response_policy()
+
+      for state in all_states.values():
+        if state.current_player() != current_player:
+          continue
+
+        # TODO(b/141737795): Decide what to do about this.
+        self.assertEqual(
+            python_br.action_probabilities(state), {
+                a: prob
+                for a, prob in cpp_br.action_probabilities(state).items()
+                if prob != 0
+            })
 
 
 if __name__ == "__main__":
