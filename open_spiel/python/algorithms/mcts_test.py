@@ -33,11 +33,11 @@ class MctsBotTest(absltest.TestCase):
   def test_can_play_tic_tac_toe(self):
     game = pyspiel.load_game("tic_tac_toe")
     uct_c = math.sqrt(2)
-    max_search_nodes = 100
+    max_simulations = 100
     evaluator = mcts.RandomRolloutEvaluator(n_rollouts=20)
     bots = [
-        mcts.MCTSBot(game, 0, uct_c, max_search_nodes, evaluator),
-        mcts.MCTSBot(game, 1, uct_c, max_search_nodes, evaluator),
+        mcts.MCTSBot(game, 0, uct_c, max_simulations, evaluator),
+        mcts.MCTSBot(game, 1, uct_c, max_simulations, evaluator),
     ]
     v = evaluate_bots.evaluate_bots(game.new_initial_state(), bots, np.random)
     self.assertEqual(v[0] + v[1], 0)
