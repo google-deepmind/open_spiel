@@ -92,6 +92,7 @@ void PhantomTTTState::DoApplyAction(Action move) {
 }
 
 std::vector<Action> PhantomTTTState::LegalActions() const {
+  if (IsTerminal()) return {};
   std::vector<Action> moves;
   const Player player = CurrentPlayer();
   const auto& cur_view = player == Player{0} ? x_view_ : o_view_;

@@ -214,6 +214,7 @@ std::string BreakthroughState::ActionToString(Player player,
 
 std::vector<Action> BreakthroughState::LegalActions() const {
   std::vector<Action> movelist;
+  if (IsTerminal()) return movelist;
   const Player player = CurrentPlayer();
   CellState mystate = PlayerToState(player);
   std::vector<int> action_bases = {rows_, cols_, kNumDirections, 2};

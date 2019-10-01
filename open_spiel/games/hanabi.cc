@@ -147,7 +147,9 @@ Player OpenSpielHanabiState::CurrentPlayer() const {
 }
 
 std::vector<Action> OpenSpielHanabiState::LegalActions() const {
-  if (IsChanceNode()) {
+  if (IsTerminal()) {
+    return {};
+  } else if (IsChanceNode()) {
     auto outcomes_and_probs = state_.ChanceOutcomes();
     const int n = outcomes_and_probs.first.size();
     std::vector<Action> chance_outcomes;

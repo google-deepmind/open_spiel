@@ -127,6 +127,7 @@ void BlottoState::DoApplyActions(const std::vector<Action>& actions) {
 }
 
 std::vector<Action> BlottoState::LegalActions(Player player) const {
+  if (IsTerminal()) return {};
   return (*legal_actions_);
 }
 

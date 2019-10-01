@@ -102,6 +102,7 @@ void ChessState::DoApplyAction(Action action) {
 
 std::vector<Action> ChessState::LegalActions() const {
   std::vector<Action> actions;
+  if (IsTerminal()) return actions;
   Board().GenerateLegalMoves([&actions](const Move& move) -> bool {
     actions.push_back(MoveToAction(move));
     return true;

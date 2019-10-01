@@ -139,6 +139,7 @@ PentagoState::PentagoState(bool ansi_color_output)
 std::vector<Action> PentagoState::LegalActions() const {
   // Can move in any empty cell, and do all rotations.
   std::vector<Action> moves;
+  if (IsTerminal()) return moves;
   moves.reserve((kBoardPositions - moves_made_) * kPossibleRotations);
   for (int y = 0; y < kBoardSize; y++) {
     for (int x = 0; x < kBoardSize; x++) {

@@ -186,6 +186,7 @@ void HexState::DoApplyAction(Action move) {
 std::vector<Action> HexState::LegalActions() const {
   // Can move in any empty cell.
   std::vector<Action> moves;
+  if (IsTerminal()) return moves;
   for (int cell = 0; cell < board_.size(); ++cell) {
     if (board_[cell] == CellState::kEmpty) {
       moves.push_back(cell);

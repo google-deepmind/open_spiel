@@ -133,6 +133,7 @@ Move YState::ActionToMove(Action action_id) const {
 std::vector<Action> YState::LegalActions() const {
   // Can move in any empty cell.
   std::vector<Action> moves;
+  if (IsTerminal()) return moves;
   moves.reserve(board_.size() - moves_made_);
   for (int cell = 0; cell < board_.size(); ++cell) {
     if (board_[cell].player == kPlayerNone) {

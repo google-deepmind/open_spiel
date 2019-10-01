@@ -392,6 +392,7 @@ void LaserTagState::DoApplyAction(Action action_id) {
 }
 
 std::vector<Action> LaserTagState::LegalActions(int player) const {
+  if (IsTerminal()) return {};
   if (IsChanceNode()) {
     if (!needs_respawn_.empty()) {
       return {kChanceLoc1, kChanceLoc2, kChanceLoc3, kChanceLoc4};
@@ -430,6 +431,7 @@ std::string LaserTagState::ToString() const {
 
   absl::StrAppend(&result, "Orientations: ", player_facing_[0], " ",
                   player_facing_[1], "\n");
+  if (IsChanceNode()) absl::StrAppend(&result, "Chance Node");
   return result;
 }
 

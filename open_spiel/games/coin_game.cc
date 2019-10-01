@@ -180,6 +180,7 @@ GamePhase CoinState::GetPhase() const {
 }
 
 std::vector<Action> CoinState::LegalActions() const {
+  if (IsTerminal()) return {};
   switch (GetPhase()) {
     case GamePhase::kAssignPreferences:
       return ActionRange(setup_.available_coin_colors_);
@@ -191,7 +192,6 @@ std::vector<Action> CoinState::LegalActions() const {
       return Range(offsets.size());
     default:
       SpielFatalError("Unknown phase.");
-      return {};
   }
 }
 

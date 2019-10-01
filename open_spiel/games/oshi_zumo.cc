@@ -115,6 +115,7 @@ void OshiZumoState::DoApplyActions(const std::vector<Action>& actions) {
 }
 
 std::vector<Action> OshiZumoState::LegalActions(Player player) const {
+  if (IsTerminal()) return {};
   if (player == kSimultaneousPlayerId) return LegalFlatJointActions();
   SPIEL_CHECK_FALSE(IsChanceNode());
   SPIEL_CHECK_TRUE(player == Player{0} || player == Player{1});

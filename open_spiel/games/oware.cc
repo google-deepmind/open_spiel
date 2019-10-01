@@ -71,6 +71,7 @@ OwareState::OwareState(const OwareBoard& board)
 
 std::vector<Action> OwareState::LegalActions() const {
   std::vector<Action> actions;
+  if (IsTerminal()) return actions;
   const Player lower = PlayerLowerHouse(board_.current_player);
   const Player upper = PlayerUpperHouse(board_.current_player);
   if (OpponentSeeds() == 0) {

@@ -1076,6 +1076,7 @@ std::vector<Action> BackgammonState::ProcessLegalMoves(
 
 std::vector<Action> BackgammonState::LegalActions() const {
   if (IsChanceNode()) return LegalChanceOutcomes();
+  if (IsTerminal()) return {};
 
   SPIEL_CHECK_EQ(CountTotalCheckers(kXPlayerId), kNumCheckersPerPlayer);
   SPIEL_CHECK_EQ(CountTotalCheckers(kOPlayerId), kNumCheckersPerPlayer);

@@ -42,6 +42,8 @@ class SimMoveState : public State {
   std::vector<Action> LegalActions() const override {
     if (IsSimultaneousNode()) {
       return LegalFlatJointActions();
+    } else if (IsTerminal()) {
+      return {};
     } else {
       SPIEL_CHECK_TRUE(IsChanceNode());
       return LegalChanceOutcomes();

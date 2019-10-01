@@ -99,6 +99,7 @@ void ConnectFourState::DoApplyAction(Action move) {
 std::vector<Action> ConnectFourState::LegalActions() const {
   // Can move in any non-full column.
   std::vector<Action> moves;
+  if (IsTerminal()) return moves;
   for (int col = 0; col < kCols; ++col) {
     if (CellAt(kRows - 1, col) == CellState::kEmpty) moves.push_back(col);
   }

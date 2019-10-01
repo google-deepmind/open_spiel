@@ -203,7 +203,9 @@ std::unique_ptr<State> UncontestedBiddingState::Clone() const {
 }
 
 std::vector<Action> UncontestedBiddingState::LegalActions() const {
-  if (dealt_) {
+  if (IsTerminal()) {
+    return {};
+  } else if (dealt_) {
     std::vector<Action> actions{kPass};
     const Action prev = actions_.empty() ? kPass : actions_.back();
     for (Action a = prev + 1; a < kNumActions; ++a) actions.push_back(a);

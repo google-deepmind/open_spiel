@@ -52,7 +52,7 @@ actions: [2, 0]
 
 # State 1
 IsTerminal() = True
-ToString() = "Terminal? true\nHistory: 2 0\nReturns: -1,1\nRow actions: Rock Paper Scissors \nCol actions: Rock Paper Scissors \nUtility matrix:\n0,0 -1,1 1,-1 \n1,-1 0,0 -1,1 \n-1,1 1,-1 0,0 \n"
+ToString() = "Terminal? true\nHistory: 2 0\nReturns: -1,1\nRow actions: \nCol actions: \nUtility matrix:\n0,0 -1,1 1,-1 \n1,-1 0,0 -1,1 \n-1,1 1,-1 0,0 \n"
 History() = [2, 0]
 HistoryString() = "2 0"
 IsChanceNode() = False

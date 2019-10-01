@@ -218,6 +218,8 @@ void PigState::DoApplyAction(Action move) {
 std::vector<Action> PigState::LegalActions() const {
   if (IsChanceNode()) {
     return LegalChanceOutcomes();
+  } else if (IsTerminal()) {
+    return {};
   } else {
     if (scores_[cur_player_] + turn_total_ >= win_score_) {
       return {kStop};

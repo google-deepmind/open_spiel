@@ -243,6 +243,7 @@ void MarkovSoccerState::DoApplyAction(Action action_id) {
 }
 
 std::vector<Action> MarkovSoccerState::LegalActions(Player player) const {
+  if (IsTerminal()) return {};
   if (IsChanceNode()) {
     if (total_moves_ == 0) {
       return {kChanceLoc1, kChanceLoc2};
@@ -276,7 +277,7 @@ std::string MarkovSoccerState::ToString() const {
 
     absl::StrAppend(&result, "\n");
   }
-
+  if (IsChanceNode()) absl::StrAppend(&result, "Chance Node");
   return result;
 }
 

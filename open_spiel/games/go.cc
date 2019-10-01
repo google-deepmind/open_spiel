@@ -117,6 +117,7 @@ void GoState::ObservationAsNormalizedVector(int player,
 
 std::vector<Action> GoState::LegalActions() const {
   std::vector<Action> actions{};
+  if (IsTerminal()) return actions;
   for (GoPoint p : BoardPoints(board_.board_size())) {
     if (board_.IsLegalMove(p, to_play_)) {
       actions.push_back(p);
