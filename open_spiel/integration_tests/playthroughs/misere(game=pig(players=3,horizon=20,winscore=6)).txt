@@ -43,7 +43,7 @@ InformationStateAsNormalizedVector(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0,
 InformationStateAsNormalizedVector(1) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 InformationStateAsNormalizedVector(2) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 Rewards() = [-0.0, -0.0, -0.0]
-Returns() = []
+Returns() = [-0.0, -0.0, -0.0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["roll", "stop"]
 
@@ -86,7 +86,7 @@ InformationStateAsNormalizedVector(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0,
 InformationStateAsNormalizedVector(1) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 InformationStateAsNormalizedVector(2) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 Rewards() = [-0.0, -0.0, -0.0]
-Returns() = []
+Returns() = [-0.0, -0.0, -0.0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["roll", "stop"]
 
@@ -129,7 +129,7 @@ InformationStateAsNormalizedVector(0) = [0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0,
 InformationStateAsNormalizedVector(1) = [0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 InformationStateAsNormalizedVector(2) = [0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 Rewards() = [-0.0, -0.0, -0.0]
-Returns() = []
+Returns() = [-0.0, -0.0, -0.0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["roll", "stop"]
 
@@ -151,7 +151,7 @@ InformationStateAsNormalizedVector(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0,
 InformationStateAsNormalizedVector(1) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 InformationStateAsNormalizedVector(2) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 Rewards() = [-0.0, -0.0, -0.0]
-Returns() = []
+Returns() = [-0.0, -0.0, -0.0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["roll", "stop"]
 
@@ -173,7 +173,7 @@ InformationStateAsNormalizedVector(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0,
 InformationStateAsNormalizedVector(1) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 InformationStateAsNormalizedVector(2) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 Rewards() = [-0.0, -0.0, -0.0]
-Returns() = []
+Returns() = [-0.0, -0.0, -0.0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["roll", "stop"]
 
@@ -195,7 +195,7 @@ InformationStateAsNormalizedVector(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0,
 InformationStateAsNormalizedVector(1) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 InformationStateAsNormalizedVector(2) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 Rewards() = [-0.0, -0.0, -0.0]
-Returns() = []
+Returns() = [-0.0, -0.0, -0.0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["roll", "stop"]
 
@@ -217,7 +217,7 @@ InformationStateAsNormalizedVector(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0,
 InformationStateAsNormalizedVector(1) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 InformationStateAsNormalizedVector(2) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 Rewards() = [-0.0, -0.0, -0.0]
-Returns() = []
+Returns() = [-0.0, -0.0, -0.0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["roll", "stop"]
 
@@ -260,7 +260,7 @@ InformationStateAsNormalizedVector(0) = [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0,
 InformationStateAsNormalizedVector(1) = [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 InformationStateAsNormalizedVector(2) = [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 Rewards() = [-0.0, -0.0, -0.0]
-Returns() = []
+Returns() = [-0.0, -0.0, -0.0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["roll", "stop"]
 
@@ -303,7 +303,7 @@ InformationStateAsNormalizedVector(0) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0,
 InformationStateAsNormalizedVector(1) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 InformationStateAsNormalizedVector(2) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 Rewards() = [-0.0, -0.0, -0.0]
-Returns() = []
+Returns() = [-0.0, -0.0, -0.0]
 LegalActions() = [1]
 StringLegalActions() = ["stop"]
 

@@ -92,7 +92,7 @@ bool PigState::IsTerminal() const {
 
 std::vector<double> PigState::Returns() const {
   if (!IsTerminal()) {
-    return std::vector<double>(0.0, num_players_);
+    return std::vector<double>(num_players_, 0.0);
   }
 
   // For (n>2)-player games, must keep it zero-sum.
@@ -106,7 +106,7 @@ std::vector<double> PigState::Returns() const {
   }
 
   // Nobody has won? (e.g. over horizon length.) Then everyone gets 0.
-  return std::vector<double>(0.0, num_players_);
+  return std::vector<double>(num_players_, 0.0);
 }
 
 std::string PigState::InformationState(Player player) const {
