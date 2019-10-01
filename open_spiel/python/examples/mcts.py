@@ -19,7 +19,6 @@ from __future__ import division
 from __future__ import print_function
 
 import collections
-import sys
 import time
 
 from absl import app
@@ -122,15 +121,6 @@ def _play_game(game):
 
 def main(unused_argv):
   game = pyspiel.load_game(FLAGS.game)
-
-  # Check that the games satisfies the conditions for the implemented MCTS
-  # algorithm.
-  if game.num_players() not in (1, 2):
-    sys.exit("Game must be a 1-player game or 2-player zero-sum game")
-  if (game.num_players() == 2 and
-      game.get_type().utility != pyspiel.GameType.Utility.ZERO_SUM):
-    sys.exit("Game must be a 1-player game or 2-player zero-sum game")
-
   histories = collections.defaultdict(int)
   overall_returns = [0, 0]
   overall_wins = [0, 0]

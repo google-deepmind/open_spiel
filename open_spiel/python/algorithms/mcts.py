@@ -172,7 +172,20 @@ class MCTSBot(pyspiel.Bot):
       verbose: Whether to print information about the search tree before
         returning the action. Useful for confirming the search is working
         sensibly.
+
+    Raises:
+      ValueError: if the number of players or game type isn't supported.
     """
+    # Check that the game satisfies the conditions for this MCTS implemention.
+    game_type = game.get_type()
+    if (game_type.reward_model != pyspiel.GameType.RewardModel.TERMINAL or
+        game.num_players() not in (1, 2) or
+        (game.num_players() == 2 and
+         (game_type.dynamics != pyspiel.GameType.Dynamics.SEQUENTIAL or
+          game_type.utility != pyspiel.GameType.Utility.ZERO_SUM))):
+      raise ValueError("Game must be a 1-player game or 2-player sequential "
+                       "game with terminal zero-sum rewards.")
+
     super(MCTSBot, self).__init__(game, player)
     self.uct_c = uct_c
     self.max_simulations = max_simulations

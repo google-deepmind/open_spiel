@@ -42,6 +42,21 @@ class MctsBotTest(absltest.TestCase):
     v = evaluate_bots.evaluate_bots(game.new_initial_state(), bots, np.random)
     self.assertEqual(v[0] + v[1], 0)
 
+  def test_can_play_single_player(self):
+    game = pyspiel.load_game("catch")
+    uct_c = math.sqrt(2)
+    max_simulations = 100
+    evaluator = mcts.RandomRolloutEvaluator(n_rollouts=20)
+    bots = [mcts.MCTSBot(game, 0, uct_c, max_simulations, evaluator)]
+    v = evaluate_bots.evaluate_bots(game.new_initial_state(), bots, np.random)
+    self.assertGreater(v[0], 0)
+
+  def test_throws_on_simultaneous_game(self):
+    game = pyspiel.load_game("matrix_mp")
+    evaluator = mcts.RandomRolloutEvaluator(n_rollouts=20)
+    with self.assertRaises(ValueError):
+      mcts.MCTSBot(game, 0, uct_c=1, max_simulations=100, evaluator=evaluator)
+
 
 if __name__ == "__main__":
   absltest.main()
