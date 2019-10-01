@@ -50,6 +50,17 @@ class SimMoveState : public State {
     }
   }
 
+  // We override this rather than DoApplyAction() since we want to prevent
+  // saving the flat action in the history.
+  void ApplyAction(Action action) override {
+    if (IsSimultaneousNode()) {
+      ApplyFlatJointAction(action);
+    } else {
+      DoApplyAction(action);
+      history_.push_back(action);
+    }
+  }
+
   // Convert a flat joint action to a list of actions.
   std::vector<Action> FlatJointActionToActions(Action flat_action) const;
 
@@ -93,10 +104,6 @@ class SimMoveState : public State {
   // Apply a flat joint action, updating the state.
   void ApplyFlatJointAction(Action flat_action);
 
-  void DoApplyAction(Action action) override {
-    SPIEL_CHECK_TRUE(IsSimultaneousNode());
-    ApplyFlatJointAction(action);
-  }
   void DoApplyActions(const std::vector<Action>& actions) override = 0;
 };
 

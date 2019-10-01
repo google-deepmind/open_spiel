@@ -173,6 +173,14 @@ class PyspielTest(absltest.TestCase):
       # We just test that we can create a tabular policy.
       policy.python_policy_to_pyspiel_policy(policy.TabularPolicy(game))
 
+  def test_simultaneous_game_history(self):
+    game = pyspiel.load_game("coop_box_pushing")
+    state = game.new_initial_state()
+    state.apply_action(0)
+    state2 = game.new_initial_state()
+    state2.apply_actions([0] * game.num_players())
+    self.assertEqual(state.history(), state2.history())
+
   def test_record_batched_trajectories(self):
     for game_name in ["kuhn_poker", "leduc_poker", "liars_dice"]:
       game = pyspiel.load_game(game_name)
