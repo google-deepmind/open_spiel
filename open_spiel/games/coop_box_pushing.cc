@@ -357,6 +357,8 @@ void CoopBoxPushingState::DoApplyAction(Action action) {
 std::vector<Action> CoopBoxPushingState::LegalActions(Player player) const {
   if (player == kSimultaneousPlayerId) {
     return LegalFlatJointActions();
+  } else if (IsTerminal()) {
+    return {};
   }
   // All the actions are legal at every state.
   return {0, 1, 2, 3};

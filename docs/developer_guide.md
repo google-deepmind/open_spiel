@@ -59,8 +59,6 @@ ideal to first be aware of the general API (see `spiel.h`).
     *   At the top of `new_game.cc`, change the short name to `new_game` and
         include the new game’s header.
 5.  Update Python integration tests:
-    *   Add the short name to the list of excluded games in
-        `integration_tests/api_test.py`.
     *   Add the short name to the list of expected games in
         `python/tests/pyspiel_test.py`.
 6.  You should now have a duplicate game of Tic-Tac-Toe under a different name.
