@@ -335,6 +335,7 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo) {
       }
     } else if (state->CurrentPlayer() == open_spiel::kSimultaneousPlayerId) {
       std::vector<double> rewards = state->Rewards();
+      SPIEL_CHECK_EQ(rewards.size(), game.NumPlayers());
       std::cout << "Rewards: " << absl::StrJoin(rewards, " ") << std::endl;
       for (auto p = Player{0}; p < game.NumPlayers(); ++p) {
         episode_returns[p] += rewards[p];
@@ -370,6 +371,7 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo) {
       game_length++;
     } else {
       std::vector<double> rewards = state->Rewards();
+      SPIEL_CHECK_EQ(rewards.size(), game.NumPlayers());
       std::cout << "Rewards: " << absl::StrJoin(rewards, " ") << std::endl;
       for (auto p = Player{0}; p < game.NumPlayers(); ++p) {
         episode_returns[p] += rewards[p];
@@ -432,6 +434,7 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo) {
   }
 
   auto returns = state->Returns();
+  SPIEL_CHECK_EQ(returns.size(), game.NumPlayers());
   for (Player player = 0; player < game.NumPlayers(); player++) {
     double final_return = returns[player];
     SPIEL_CHECK_FLOAT_EQ(final_return, state->PlayerReturn(player));
