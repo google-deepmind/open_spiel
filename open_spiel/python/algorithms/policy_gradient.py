@@ -104,8 +104,7 @@ class PolicyGradient(rl_agent.AbstractAgent):
                entropy_cost=0.01,
                num_critic_before_pi=8,
                additional_discount_factor=1.0,
-               max_gradient_norm=10.0
-               ):
+               max_global_gradient_norm=None):
     """Initialize the PolicyGradient agent.
 
     Args:
@@ -133,6 +132,8 @@ class PolicyGradient(rl_agent.AbstractAgent):
       additional_discount_factor: float, additional discount to compute returns.
         Defaults to 1.0, in which case, no extra discount is applied.  None that
         users must provide *only one of* `loss_str` or `loss_class`.
+      max_global_gradient_norm: float or None, maximum global norm of a gradient
+        to which the gradient is shrunk if its value is larger.
     """
     assert bool(loss_str) ^ bool(loss_class), "Please provide only one option."
     loss_class = loss_class if loss_class else self._get_loss_class(loss_str)
@@ -204,15 +205,13 @@ class PolicyGradient(rl_agent.AbstractAgent):
         learning_rate=critic_learning_rate)
 
     def minimize_with_clipping(optimizer, loss):
-      def clip(grad):
-        if max_gradient_norm is not None and grad is not None:
-          return tf.clip_by_norm(grad, max_gradient_norm)
-        else:
-          return grad
-
       grads_and_vars = optimizer.compute_gradients(loss)
-      clipped_grads_and_vars = [(clip(grad), var) for grad, var in grads_and_vars]
-      return optimizer.apply_gradients(clipped_grads_and_vars)
+      if max_global_gradient_norm is not None:
+        grads, vars = zip(*grads_and_vars)
+        grads, _ = tf.clip_by_global_norm(grads, max_global_gradient_norm)
+        grads_and_vars = list(zip(grads, vars))
+        
+      return optimizer.apply_gradients(grads_and_vars)
 
     self._critic_learn_step = minimize_with_clipping(critic_optimizer, self._critic_loss)
 
