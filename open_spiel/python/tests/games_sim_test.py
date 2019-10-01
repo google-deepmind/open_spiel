@@ -40,7 +40,8 @@ def _has_mandatory_params(game):
 SPIEL_LOADABLE_GAMES_LIST = [
     g for g in SPIEL_GAMES_LIST if not _has_mandatory_params(g)
 ]
-assert len(SPIEL_LOADABLE_GAMES_LIST) >= 40, len(SPIEL_LOADABLE_GAMES_LIST)
+# TODO(b/141950198): Stop hard-coding the number of loadable games.
+assert len(SPIEL_LOADABLE_GAMES_LIST) >= 38, len(SPIEL_LOADABLE_GAMES_LIST)
 
 # All simultaneous games.
 SPIEL_SIMULTANEOUS_GAMES_LIST = [
@@ -58,7 +59,7 @@ SPIEL_MULTIPLAYER_GAMES_LIST = [
     for p in range(max(g.min_num_players, 2), 1 + min(g.max_num_players, 6))
     if g.max_num_players > 2 and g.max_num_players > g.min_num_players
 ]
-assert len(SPIEL_MULTIPLAYER_GAMES_LIST) >= 39, len(
+assert len(SPIEL_MULTIPLAYER_GAMES_LIST) >= 35, len(
     SPIEL_MULTIPLAYER_GAMES_LIST)
 
 
