@@ -69,6 +69,8 @@ add_library (games OBJECT
   tic_tac_toe.h
   tiny_bridge.cc
   tiny_bridge.h
+  tiny_hanabi.cc
+  tiny_hanabi.h
   y.cc
   y.h
 )
@@ -267,6 +269,11 @@ add_executable(tiny_bridge_test tiny_bridge_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>
                $<TARGET_OBJECTS:algorithms>)
 add_test(tiny_bridge_test tiny_bridge_test)
+
+add_executable(tiny_hanabi_test tiny_hanabi_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>
+               $<TARGET_OBJECTS:algorithms>)
+add_test(tiny_hanabi_test tiny_hanabi_test)
 
 add_executable(y_test y_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
