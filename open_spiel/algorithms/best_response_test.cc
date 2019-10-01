@@ -391,6 +391,25 @@ void KuhnPokerOptimalBestResponsePid1() {
                                        policy, actual_best_responses);
 }
 
+void KuhnPokerFirstActionBestResponsePid0() {
+  std::unique_ptr<Game> game = LoadGame("kuhn_poker");
+  TabularPolicy policy = GetFirstActionPolicy(*game);
+  InfostatesAndActions actual_best_responses = {
+      {"0pb", 0}, {"1", 1}, {"2", 0}, {"0", 1}, {"1pb", 0}, {"2pb", 0}};
+  CheckBestResponseAgainstGoldenPolicy(*game, /*best_responder=*/Player{0},
+                                       policy, actual_best_responses);
+}
+
+void KuhnPokerFirstActionBestResponsePid1() {
+  std::unique_ptr<Game> game = LoadGame("kuhn_poker");
+  TabularPolicy policy = GetFirstActionPolicy(*game);
+  InfostatesAndActions actual_best_responses = {
+      {"1p", 1}, {"2p", 0}, {"0p", 1}, {"1b", 0}, {"2b", 0}, {"0b", 0}};
+  CheckBestResponseAgainstGoldenPolicy(*game, /*best_responder=*/Player{1},
+                                       policy, actual_best_responses);
+}
+
+
 void KuhnPokerExploitabilityDescentMinimalSimulationPid0() {
   std::unique_ptr<Game> game = LoadGame("kuhn_poker");
   auto best_responder = Player{1};
@@ -490,6 +509,8 @@ int main(int argc, char** argv) {
   open_spiel::algorithms::KuhnPokerOptimalBestResponsePid1();
   open_spiel::algorithms::
       KuhnPokerExploitabilityDescentIteration4BestResponsePid0();
+  open_spiel::algorithms::KuhnPokerFirstActionBestResponsePid0();
+  open_spiel::algorithms::KuhnPokerFirstActionBestResponsePid1();
   open_spiel::algorithms::KuhnPokerExploitabilityDescentMinimalSimulationPid0();
   open_spiel::algorithms::KuhnPokerUniformValueTestPid0();
   open_spiel::algorithms::KuhnPokerUniformValueTestPid1();
