@@ -66,8 +66,12 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
      echo "$EXT_DEPS"
      exit 1
   fi
-  sudo apt-get update
-  sudo apt-get install $EXT_DEPS
+
+  # We install the packages only if they are not present yet.
+  /usr/bin/dpkg-query --show --showformat='${db:Status-Status}\n' $EXT_DEPS || \
+    sudo apt-get update && \
+    sudo apt-get install $EXT_DEPS
+
   if [[ "$TRAVIS" ]]; then
     sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python${OS_PYTHON_VERSION} 10
   fi
