@@ -80,6 +80,18 @@ std::string CardString(int card) {
                       std::string(1, kRankChar[Rank(card)]));
 }
 
+// Requires card0 > card1
+int CardsToChanceOutcome(int card0, int card1) {
+  return (card0 * (card0 - 1)) / 2 + card1;
+}
+
+// Returns first > second
+std::pair<int, int> ChanceOutcomeToCards(int outcome) {
+  int card0 = 1;
+  while (CardsToChanceOutcome(card0 + 1, 0) <= outcome) ++card0;
+  return {card0, outcome - CardsToChanceOutcome(card0, 0)};
+}
+
 // Facts about the game
 const GameType kGameType2p{
     /*short_name=*/"tiny_bridge_2p",
@@ -263,10 +275,9 @@ std::array<int, kNumCards> TinyBridgeAuctionState::CardHolders() const {
   std::fill(holder.begin(), holder.end(), kInvalidPlayer);
   for (int i = 0; i < actions_.size() && i < num_players_; ++i) {
     int action_id = actions_[i];
-    const int card1 = action_id % kNumCards;
-    const int card2 = action_id / kNumCards;
-    holder[card1] = i;
-    holder[card2] = i;
+    const auto cards = ChanceOutcomeToCards(action_id);
+    holder[cards.first] = i;
+    holder[cards.second] = i;
   }
   return holder;
 }
@@ -350,7 +361,7 @@ std::vector<std::pair<Action, double>> TinyBridgeAuctionState::ChanceOutcomes()
     if (holder[card1] != kInvalidPlayer) continue;
     for (int card2 = card1 + 1; card2 < kNumCards; ++card2) {
       if (holder[card2] != kInvalidPlayer) continue;
-      actions.push_back(card2 * kNumCards + card1);
+      actions.push_back(CardsToChanceOutcome(card2, card1));
     }
   }
   const int num_actions = actions.size();
@@ -365,9 +376,8 @@ std::vector<std::pair<Action, double>> TinyBridgeAuctionState::ChanceOutcomes()
 std::string TinyBridgeAuctionState::ActionToString(Player player,
                                                    Action action_id) const {
   if (player == kChancePlayerId) {
-    const int card1 = action_id % kNumCards;
-    const int card2 = action_id / kNumCards;
-    return absl::StrCat(CardString(card1), CardString(card2));
+    auto cards = ChanceOutcomeToCards(action_id);
+    return absl::StrCat(CardString(cards.first), CardString(cards.second));
   } else {
     return kActionStr[action_id];
   }
@@ -471,9 +481,9 @@ void TinyBridgeAuctionState::InformationStateAsNormalizedVector(
   values->resize(kNumCards + kNumActions2p * 2);
   std::fill(values->begin(), values->end(), 0);
   if (IsDealt(player)) {
-    // The chance action is card_0 * kNumCards + card_1
-    values->at(actions_[player] % kNumCards) = 1;
-    values->at(actions_[player] / kNumCards) = 1;
+    const auto cards = ChanceOutcomeToCards(actions_[player]);
+    values->at(cards.first) = 1;
+    values->at(cards.second) = 1;
   }
   for (int i = num_players_; i < actions_.size(); ++i) {
     values->at(kNumCards + actions_[i] * 2 + (i - player) % num_players_) = 1;
@@ -492,9 +502,9 @@ void TinyBridgeAuctionState::ObservationAsNormalizedVector(
   values->resize(kNumCards + kNumActions2p);
   std::fill(values->begin(), values->end(), 0);
   if (IsDealt(player)) {
-    // The chance action is card_0 * kNumCards + card_1
-    values->at(actions_[player] % kNumCards) = 1;
-    values->at(actions_[player] / kNumCards) = 1;
+    const auto cards = ChanceOutcomeToCards(actions_[player]);
+    values->at(cards.first) = 1;
+    values->at(cards.second) = 1;
   }
   if (HasAuctionStarted()) {
     values->at(kNumCards + actions_.back()) = 1;
