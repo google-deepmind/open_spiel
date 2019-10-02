@@ -57,6 +57,19 @@ class MctsBotTest(absltest.TestCase):
     with self.assertRaises(ValueError):
       mcts.MCTSBot(game, 0, uct_c=1, max_simulations=100, evaluator=evaluator)
 
+  def test_can_play_three_player_game(self):
+    game = pyspiel.load_game("pig(players=3,winscore=20,horizon=30)")
+    uct_c = math.sqrt(2)
+    max_search_nodes = 100
+    evaluator = mcts.RandomRolloutEvaluator(n_rollouts=5)
+    bots = [
+        mcts.MCTSBot(game, 0, uct_c, max_search_nodes, evaluator),
+        mcts.MCTSBot(game, 1, uct_c, max_search_nodes, evaluator),
+        mcts.MCTSBot(game, 2, uct_c, max_search_nodes, evaluator),
+    ]
+    v = evaluate_bots.evaluate_bots(game.new_initial_state(), bots, np.random)
+    self.assertEqual(sum(v), 0)
+
 
 if __name__ == "__main__":
   absltest.main()
