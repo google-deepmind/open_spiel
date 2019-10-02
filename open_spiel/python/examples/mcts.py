@@ -19,6 +19,7 @@ from __future__ import division
 from __future__ import print_function
 
 import collections
+import sys
 import time
 
 from absl import app
@@ -68,7 +69,14 @@ def _init_bot(bot_type, game, player_id):
   raise ValueError("Invalid bot type: %s" % bot_type)
 
 
-def _play_game(game):
+def _get_action(state, action_str):
+  for action in state.legal_actions():
+    if action_str == state.action_to_string(state.current_player(), action):
+      return action
+  return None
+
+
+def _play_game(game, initial_actions):
   """Plays one game."""
   state = game.new_initial_state()
   _opt_print("Initial state: ", str(state))
@@ -79,6 +87,17 @@ def _play_game(game):
   ]
 
   history = []
+
+  for action_str in initial_actions:
+    action = _get_action(state, action_str)
+    if action is None:
+      sys.exit("Illegal action: {}".format(action_str))
+
+    history.append(action_str)
+    state.apply_action(action)  # pylint: disable=undefined-loop-variable
+    _opt_print("Forced action", action_str)
+    _opt_print("Next state: ", str(state))
+
   while not state.is_terminal():
     # The state can be three different types: chance node,
     # simultaneous node, or decision node
@@ -91,8 +110,6 @@ def _play_game(game):
       action = np.random.choice(action_list, p=prob_list)
       action_str = state.action_to_string(state.current_player(), action)
       _opt_print("Sampled outcome: ", action_str)
-      state.apply_action(action)
-      history.append(action_str)
     elif state.is_simultaneous_node():
       raise ValueError("Game cannot have simultaneous nodes.")
     else:
@@ -107,8 +124,8 @@ def _play_game(game):
       if isinstance(bot, mcts.MCTSBot):
         _opt_print("Took %.3f secs, %.1f rollouts/s" %
                    (diff, (FLAGS.rollout_count * FLAGS.max_simulations) / diff))
-      history.append(action_str)
-      state.apply_action(action)
+    history.append(action_str)
+    state.apply_action(action)
 
     _opt_print("Next state: ", str(state))
 
@@ -119,7 +136,7 @@ def _play_game(game):
   return returns, history
 
 
-def main(unused_argv):
+def main(argv):
   game = pyspiel.load_game(FLAGS.game)
   histories = collections.defaultdict(int)
   overall_returns = [0, 0]
@@ -127,7 +144,7 @@ def main(unused_argv):
   game_num = 0
   try:
     for game_num in range(FLAGS.num_games):
-      returns, history = _play_game(game)
+      returns, history = _play_game(game, argv[1:])
       histories[" ".join(history)] += 1
       for i, v in enumerate(returns):
         overall_returns[i] += v
