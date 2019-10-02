@@ -19,7 +19,6 @@
 #include <iostream>
 #include <map>
 #include <memory>
-#include <optional>
 #include <random>
 #include <sstream>
 #include <string>
@@ -27,7 +26,7 @@
 #include <utility>
 #include <vector>
 
-
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel_utils.h"
 
@@ -628,11 +627,11 @@ class Game {
 
   // Access to game parameters. Returns the value provided by the user. If not:
   // - Defaults to the value stored as the default in
-  // game_type.parameter_specification if the `default_value` is std::nullopt
+  // game_type.parameter_specification if the `default_value` is absl::nullopt
   // - Returns `default_value` if provided.
   template <typename T>
   T ParameterValue(const std::string& key,
-                   std::optional<T> default_value = std::nullopt) const;
+                   absl::optional<T> default_value = absl::nullopt) const;
 
   // The game type.
   GameType game_type_;
