@@ -17,6 +17,7 @@
 #include <cstring>
 
 #include "open_spiel/games/bridge/double_dummy_solver/include/dll.h"
+#include "open_spiel/game_parameters.h"
 #include "open_spiel/games/bridge/bridge_scoring.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
@@ -49,9 +50,9 @@ const GameType kGameType{
     /*provides_observation_as_normalized_vector=*/false,
     /*parameter_specification=*/
     {
-        {"subgame", {GameParameter::Type::kString, false}},
-        {"rng_seed", {GameParameter::Type::kInt, false}},
-        {"relative_scoring", {GameParameter::Type::kBool, false}},
+        {"subgame", GameParameter(static_cast<std::string>(""))},
+        {"rng_seed", GameParameter(0)},
+        {"relative_scoring", GameParameter(false)},
     }};
 
 std::unique_ptr<Game> Factory(const GameParameters& params) {
@@ -318,12 +319,12 @@ UncontestedBiddingGame::UncontestedBiddingGame(const GameParameters& params)
     : Game(kGameType, params),
       forced_actions_{},
       deal_filter_{NoFilter},
-      rng_seed_(ParameterValue<int>("rng_seed", 0)) {
-  std::string subgame = ParameterValue<std::string>("subgame", "");
+      rng_seed_(ParameterValue<int>("rng_seed")) {
+  std::string subgame = ParameterValue<std::string>("subgame");
   if (subgame == "2NT") {
     deal_filter_ = Is2NTDeal;
     forced_actions_ = {k2NT};
-    if (ParameterValue<bool>("relative_scoring", false)) {
+    if (ParameterValue<bool>("relative_scoring")) {
       reference_contracts_ = {
           {2, kNone, kUndoubled, 0},     {3, kClubs, kUndoubled, 1},
           {3, kDiamonds, kUndoubled, 0}, {3, kDiamonds, kUndoubled, 1},
@@ -346,7 +347,7 @@ UncontestedBiddingGame::UncontestedBiddingGame(const GameParameters& params)
     }
   } else {
     SPIEL_CHECK_EQ(subgame, "");
-    if (ParameterValue<bool>("relative_scoring", false)) {
+    if (ParameterValue<bool>("relative_scoring")) {
       reference_contracts_ = {
           {0, kNone, kUndoubled, 0},     {1, kClubs, kUndoubled, 0},
           {1, kClubs, kUndoubled, 1},    {1, kDiamonds, kUndoubled, 0},

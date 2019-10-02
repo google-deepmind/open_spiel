@@ -39,8 +39,8 @@ const GameType kGameType{
     /*provides_observation_as_normalized_vector=*/true,
     /*parameter_specification=*/
     {
-        {"players", {GameParameter::Type::kInt, false}},
-        {"max_value", {GameParameter::Type::kInt, false}},
+        {"players", GameParameter(kDefaultPlayers)},
+        {"max_value", GameParameter(kDefaultMaxValue)},
     }};
 
 std::unique_ptr<Game> Factory(const GameParameters& params) {
@@ -52,8 +52,8 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 
 FPSBAGame::FPSBAGame(const GameParameters& params)
     : Game(kGameType, params),
-      num_players_(ParameterValue<int>("players", kDefaultPlayers)),
-      max_value_(ParameterValue<int>("max_value", kDefaultMaxValue)) {}
+      num_players_(ParameterValue<int>("players" )),
+      max_value_(ParameterValue<int>("max_value")) {}
 
 FPSBAState::FPSBAState(int num_distinct_actions, int num_players)
     : State(num_distinct_actions, num_players),

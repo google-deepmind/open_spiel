@@ -19,6 +19,7 @@
 #include <string>
 #include <utility>
 
+#include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
 
 namespace open_spiel {
@@ -45,7 +46,7 @@ const GameType kGameType{
     /*provides_observation=*/true,
     /*provides_observation_as_normalized_vector=*/true,
     /*parameter_specification=*/
-    {{"players", {GameParameter::Type::kInt, false}}}};
+    {{"players", GameParameter(kDefaultPlayers)}}};
 
 std::unique_ptr<Game> Factory(const GameParameters& params) {
   return std::unique_ptr<Game>(new KuhnGame(params));
@@ -284,8 +285,7 @@ bool KuhnState::DidBet(Player player) const {
 }
 
 KuhnGame::KuhnGame(const GameParameters& params)
-    : Game(kGameType, params),
-      num_players_(ParameterValue<int>("players", kDefaultPlayers)) {
+    : Game(kGameType, params), num_players_(ParameterValue<int>("players")) {
   SPIEL_CHECK_GE(num_players_, kGameType.min_num_players);
   SPIEL_CHECK_LE(num_players_, kGameType.max_num_players);
 }

@@ -81,8 +81,8 @@ class PyspielTest(absltest.TestCase):
     # possible. We make a list of such games here in order to make implementors
     # think twice about adding mandatory parameters.
     def has_mandatory_params(game):
-      return any(
-          param.is_mandatory for param in game.parameter_specification.values())
+      return any(param.is_mandatory()
+                 for param in game.parameter_specification.values())
 
     games_with_mandatory_parameters = [
         game.short_name

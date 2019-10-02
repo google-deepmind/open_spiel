@@ -40,8 +40,7 @@ const GameType kGameType{
     /*provides_observation_as_normalized_vector=*/true,
     /*parameter_specification=*/
     {
-        {"ansi_color_output",
-         GameType::ParameterSpec{GameParameter::Type::kBool, false}},
+        {"ansi_color_output", GameParameter(false)},
     }};
 
 std::unique_ptr<Game> Factory(const GameParameters& params) {
@@ -293,7 +292,7 @@ std::unique_ptr<State> PentagoState::Clone() const {
 
 PentagoGame::PentagoGame(const GameParameters& params)
     : Game(kGameType, params),
-      ansi_color_output_(ParameterValue<bool>("ansi_color_output", false)) {}
+      ansi_color_output_(ParameterValue<bool>("ansi_color_output")) {}
 
 }  // namespace pentago
 }  // namespace open_spiel

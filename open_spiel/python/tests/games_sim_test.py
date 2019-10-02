@@ -33,7 +33,7 @@ SPIEL_GAMES_LIST = pyspiel.registered_games()
 
 # Check for mandatory parameters.
 def _has_mandatory_params(game):
-  return any(p.is_mandatory for p in game.parameter_specification.values())
+  return any(p.is_mandatory() for p in game.parameter_specification.values())
 
 
 # All games without mandatory parameters.

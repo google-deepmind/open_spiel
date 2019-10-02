@@ -24,6 +24,11 @@ namespace open_spiel {
 namespace laser_tag {
 
 namespace {
+
+// Default parameters.
+constexpr int kDefaultHorizon = 1000;
+constexpr bool kDefaultZeroSum = false;
+
 // Facts about the game
 const GameType kGameType{
     /*short_name=*/"laser_tag",
@@ -40,8 +45,8 @@ const GameType kGameType{
     /*provides_observation=*/true,
     /*provides_observation_as_normalized_vector=*/true,
     /*parameter_specification=*/
-    {{"horizon", {GameParameter::Type::kInt, false}},
-     {"zero_sum", {GameParameter::Type::kBool, false}}}};
+    {{"horizon", GameParameter(kDefaultHorizon)},
+     {"zero_sum", GameParameter(kDefaultZeroSum)}}};
 
 std::unique_ptr<Game> Factory(const GameParameters& params) {
   return std::unique_ptr<Game>(new LaserTagGame(params));
@@ -98,10 +103,6 @@ constexpr std::array<std::array<int, 10>, 4> col_offsets = {
      {0, 0, 0, 0, 1, -1, 0, 0, 0, 0},
      {0, 0, 1, -1, 0, 0, 0, 1, 1, 0},
      {0, 0, -1, 1, 0, 0, 0, -1, -1, 0}}};
-
-// Default parameters.
-constexpr int kDefaultHorizon = 1000;
-constexpr int kDefaultZeroSum = false;
 }  // namespace
 
 LaserTagState::LaserTagState(const LaserTagGame& parent_game)
@@ -518,8 +519,8 @@ std::vector<int> LaserTagGame::ObservationNormalizedVectorShape() const {
 
 LaserTagGame::LaserTagGame(const GameParameters& params)
     : SimMoveGame(kGameType, params),
-      horizon_(ParameterValue<int>("horizon", kDefaultHorizon)),
-      zero_sum_(ParameterValue<bool>("zero_sum", kDefaultZeroSum)) {}
+      horizon_(ParameterValue<int>("horizon")),
+      zero_sum_(ParameterValue<bool>("zero_sum")) {}
 
 }  // namespace laser_tag
 }  // namespace open_spiel

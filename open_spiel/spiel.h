@@ -19,12 +19,14 @@
 #include <iostream>
 #include <map>
 #include <memory>
+#include <optional>
 #include <random>
 #include <sstream>
 #include <string>
 #include <unordered_map>
 #include <utility>
 #include <vector>
+
 
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel_utils.h"
@@ -127,12 +129,7 @@ struct GameType {
   bool provides_observation;
   bool provides_observation_as_normalized_vector;
 
-  // The parameters that can be supplied when creating an instance of the game.
-  struct ParameterSpec {
-    GameParameter::Type type;  // Parameter type.
-    bool is_mandatory;         // True if the parameter must be supplied.
-  };
-  std::map<std::string, ParameterSpec> parameter_specification;
+  std::map<std::string, GameParameter> parameter_specification;
   bool ContainsRequiredParameters() const;
 };
 
@@ -625,14 +622,17 @@ class Game {
   Game(GameType game_type, GameParameters game_parameters)
       : game_type_(game_type), game_parameters_(game_parameters) {}
 
-  // Access to game parameters.
-  template <typename T>
-  T ParameterValue(const std::string& key) const;
+  // // Access to game parameters.
+  // template <typename T>
+  // T ParameterValue(const std::string& key) const;
 
-  // Access to game parameters; returns the default value if no parameter
-  // was specified, and records the value used.
+  // Access to game parameters. Returns the value provided by the user. If not:
+  // - Defaults to the value stored as the default in
+  // game_type.parameter_specification if the `default_value` is std::nullopt
+  // - Returns `default_value` if provided.
   template <typename T>
-  T ParameterValue(const std::string& key, T default_value) const;
+  T ParameterValue(const std::string& key,
+                   std::optional<T> default_value = std::nullopt) const;
 
   // The game type.
   GameType game_type_;

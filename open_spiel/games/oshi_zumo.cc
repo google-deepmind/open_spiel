@@ -18,6 +18,7 @@
 #include <memory>
 #include <utility>
 
+#include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
 
 namespace open_spiel {
@@ -51,11 +52,11 @@ const GameType kGameType{
     /*provides_observation=*/false,
     /*provides_observation_as_normalized_vector=*/false,
     /*parameter_specification=*/
-    {{"alesia", {GameParameter::Type::kBool, false}},
-     {"coins", {GameParameter::Type::kInt, false}},
-     {"size", {GameParameter::Type::kInt, false}},
-     {"horizon", {GameParameter::Type::kInt, false}},
-     {"min_bid", {GameParameter::Type::kInt, false}}}};
+    {{"alesia", GameParameter(kDefaultAlesia)},
+     {"coins", GameParameter(kDefaultCoins)},
+     {"size", GameParameter(kDefaultSize)},
+     {"horizon", GameParameter(kDefaultHorizon)},
+     {"min_bid", GameParameter(kDefaultMinBid)}}};
 
 std::unique_ptr<Game> Factory(const GameParameters& params) {
   return std::unique_ptr<Game>(new OshiZumoGame(params));
@@ -228,11 +229,11 @@ std::unique_ptr<State> OshiZumoState::Clone() const {
 
 OshiZumoGame::OshiZumoGame(const GameParameters& params)
     : Game(kGameType, params),
-      horizon_(ParameterValue<int>("horizon", kDefaultHorizon)),
-      starting_coins_(ParameterValue<int>("coins", kDefaultCoins)),
-      size_(ParameterValue<int>("size", kDefaultSize)),
-      alesia_(ParameterValue<bool>("alesia", kDefaultAlesia)),
-      min_bid_(ParameterValue<int>("min_bid", kDefaultMinBid)) {
+      horizon_(ParameterValue<int>("horizon")),
+      starting_coins_(ParameterValue<int>("coins")),
+      size_(ParameterValue<int>("size")),
+      alesia_(ParameterValue<bool>("alesia")),
+      min_bid_(ParameterValue<int>("min_bid")) {
   SPIEL_CHECK_GE(min_bid_, 0);
   SPIEL_CHECK_LE(min_bid_, starting_coins_);
 }

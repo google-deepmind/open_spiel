@@ -51,7 +51,7 @@ const GameType kGameType{
     /*provides_observation=*/true,
     /*provides_observation_as_normalized_vector=*/true,
     /*parameter_specification=*/
-    {{"obstype", {GameParameter::Type::kString, false}}}};
+    {{"obstype", GameParameter(static_cast<std::string>(kDefaultObsType))}}};
 
 std::unique_ptr<Game> Factory(const GameParameters& params) {
   return std::unique_ptr<Game>(new PhantomTTTGame(params));
@@ -217,7 +217,7 @@ void PhantomTTTState::UndoAction(Player player, Action move) {
 PhantomTTTGame::PhantomTTTGame(const GameParameters& params)
     : Game(kGameType, params), game_(GameParameters{}) {
   std::string obs_type =
-      ParameterValue<std::string>("obstype", kDefaultObsType);
+      ParameterValue<std::string>("obstype");
   if (obs_type == "reveal-nothing") {
     obs_type_ = ObservationType::kRevealNothing;
   } else if (obs_type == "reveal-numturns") {

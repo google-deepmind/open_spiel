@@ -21,6 +21,7 @@
 
 #include "open_spiel/abseil-cpp/absl/strings/str_format.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
+#include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
@@ -44,7 +45,7 @@ const GameType kGameType{
     /*provides_observation=*/true,
     /*provides_observation_as_normalized_vector=*/true,
     /*parameter_specification=*/
-    {{"players", {GameParameter::Type::kInt, false}}}};
+    {{"players", GameParameter(kDefaultPlayers)}}};
 
 std::unique_ptr<Game> Factory(const GameParameters& params) {
   return std::unique_ptr<Game>(new LeducGame(params));
@@ -561,7 +562,7 @@ std::vector<int> LeducState::padded_betting_sequence() const {
 
 LeducGame::LeducGame(const GameParameters& params)
     : Game(kGameType, params),
-      num_players_(ParameterValue<int>("players", kDefaultPlayers)),
+      num_players_(ParameterValue<int>("players")),
       total_cards_((num_players_ + 1) * kNumSuits) {
   SPIEL_CHECK_GE(num_players_, kGameType.min_num_players);
   SPIEL_CHECK_LE(num_players_, kGameType.max_num_players);

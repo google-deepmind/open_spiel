@@ -19,6 +19,8 @@
 #include <utility>
 #include <vector>
 
+#include "open_spiel/game_parameters.h"
+
 namespace open_spiel {
 namespace havannah {
 namespace {
@@ -40,10 +42,8 @@ const GameType kGameType{
     /*provides_observation_as_normalized_vector=*/true,
     /*parameter_specification=*/
     {
-        {"board_size",
-         GameType::ParameterSpec{GameParameter::Type::kInt, false}},
-        {"ansi_color_output",
-         GameType::ParameterSpec{GameParameter::Type::kBool, false}},
+        {"board_size", GameParameter(kDefaultBoardSize)},
+        {"ansi_color_output", GameParameter(false)},
     }};
 
 std::unique_ptr<Game> Factory(const GameParameters& params) {
@@ -390,8 +390,8 @@ std::unique_ptr<State> HavannahState::Clone() const {
 
 HavannahGame::HavannahGame(const GameParameters& params)
     : Game(kGameType, params),
-      board_size_(ParameterValue<int>("board_size", kDefaultBoardSize)),
-      ansi_color_output_(ParameterValue<bool>("ansi_color_output", false)) {}
+      board_size_(ParameterValue<int>("board_size")),
+      ansi_color_output_(ParameterValue<bool>("ansi_color_output")) {}
 
 }  // namespace havannah
 }  // namespace open_spiel

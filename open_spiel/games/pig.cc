@@ -18,6 +18,7 @@
 
 #include <utility>
 
+#include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
 
 namespace open_spiel {
@@ -54,10 +55,10 @@ const GameType kGameType{
     /*provides_observation_as_normalized_vector=*/false,
     /*parameter_specification=*/
     {
-        {"players", {GameParameter::Type::kInt, false}},
-        {"horizon", {GameParameter::Type::kInt, false}},
-        {"winscore", {GameParameter::Type::kInt, false}},
-        {"diceoutcomes", {GameParameter::Type::kInt, false}},
+        {"players", GameParameter(kDefaultPlayers)},
+        {"horizon", GameParameter(kDefaultHorizon)},
+        {"winscore", GameParameter(kDefaultWinScore)},
+        {"diceoutcomes", GameParameter(kDefaultDiceOutcomes)},
     }};
 
 static std::unique_ptr<Game> Factory(const GameParameters& params) {
@@ -255,10 +256,10 @@ std::unique_ptr<State> PigState::Clone() const {
 
 PigGame::PigGame(const GameParameters& params)
     : Game(kGameType, params),
-      dice_outcomes_(ParameterValue<int>("diceoutcomes", kDefaultDiceOutcomes)),
-      horizon_(ParameterValue<int>("horizon", kDefaultHorizon)),
-      num_players_(ParameterValue<int>("players", kDefaultPlayers)),
-      win_score_(ParameterValue<int>("winscore", kDefaultWinScore)) {}
+      dice_outcomes_(ParameterValue<int>("diceoutcomes")),
+      horizon_(ParameterValue<int>("horizon")),
+      num_players_(ParameterValue<int>("players")),
+      win_score_(ParameterValue<int>("winscore")) {}
 
 }  // namespace pig
 }  // namespace open_spiel

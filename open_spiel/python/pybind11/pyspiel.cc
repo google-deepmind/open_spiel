@@ -100,12 +100,20 @@ class PyBot : public Bot {
 PYBIND11_MODULE(pyspiel, m) {
   m.doc() = "Open Spiel";
 
+  py::enum_<open_spiel::GameParameter::Type>(m, "GameParameterType")
+      .value("UNSET", open_spiel::GameParameter::Type::kUnset)
+      .value("INT", open_spiel::GameParameter::Type::kInt)
+      .value("DOUBLE", open_spiel::GameParameter::Type::kDouble)
+      .value("STRING", open_spiel::GameParameter::Type::kString)
+      .value("BOOL", open_spiel::GameParameter::Type::kBool);
+
   py::class_<GameParameter> game_parameter(m, "GameParameter");
   game_parameter.def(py::init<double>())
       .def(py::init<std::string>())
       .def(py::init<bool>())
       .def(py::init<int>())
       .def(py::init<GameParameters>())
+      .def("is_mandatory", &GameParameter::is_mandatory)
       .def("__str__", &GameParameter::ToString)
       .def("__repr__", &GameParameter::ToReprString);
 
@@ -121,7 +129,7 @@ PYBIND11_MODULE(pyspiel, m) {
                     GameType::ChanceMode, GameType::Information,
                     GameType::Utility, GameType::RewardModel, int, int, bool,
                     bool, bool, bool,
-                    std::map<std::string, GameType::ParameterSpec>>())
+                    std::map<std::string, GameParameter>>())
       .def_readonly("short_name", &GameType::short_name)
       .def_readonly("long_name", &GameType::long_name)
       .def_readonly("dynamics", &GameType::dynamics)
@@ -229,16 +237,6 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("chance_outcomes", &State::ChanceOutcomes)
       .def("get_type", &State::GetType);
 
-  py::class_<GameType::ParameterSpec>(m, "ParameterSpec")
-      .def_readonly("type", &GameType::ParameterSpec::type)
-      .def_readonly("is_mandatory", &GameType::ParameterSpec::is_mandatory);
-
-  py::enum_<open_spiel::GameParameter::Type>(m, "GameParameterType")
-      .value("UNSET", open_spiel::GameParameter::Type::kUnset)
-      .value("INT", open_spiel::GameParameter::Type::kInt)
-      .value("DOUBLE", open_spiel::GameParameter::Type::kDouble)
-      .value("STRING", open_spiel::GameParameter::Type::kString)
-      .value("BOOL", open_spiel::GameParameter::Type::kBool);
 
   py::class_<Game> game(m, "Game");
   game.def("num_distinct_actions", &Game::NumDistinctActions)

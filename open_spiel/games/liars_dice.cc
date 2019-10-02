@@ -17,6 +17,7 @@
 #include <algorithm>
 #include <array>
 #include <utility>
+#include "open_spiel/game_parameters.h"
 
 namespace open_spiel {
 namespace liars_dice {
@@ -45,7 +46,8 @@ const GameType kGameType{
     /*provides_observation=*/false,
     /*provides_observation_as_normalized_vector=*/false,
     /*parameter_specification=*/
-    {{"players", {GameParameter::Type::kInt, false}}}};
+    {{"players", GameParameter(kDefaultPlayers)},
+     {"numdice", GameParameter(kDefaultNumDice)}}};
 
 std::unique_ptr<Game> Factory(const GameParameters& params) {
   return std::unique_ptr<Game>(new LiarsDiceGame(params));
@@ -320,11 +322,11 @@ std::unique_ptr<State> LiarsDiceState::Clone() const {
 
 LiarsDiceGame::LiarsDiceGame(const GameParameters& params)
     : Game(kGameType, params) {
-  num_players_ = ParameterValue<int>("players", kDefaultPlayers);
+  num_players_ = ParameterValue<int>("players");
   SPIEL_CHECK_GE(num_players_, kGameType.min_num_players);
   SPIEL_CHECK_LE(num_players_, kGameType.max_num_players);
 
-  int def_num_dice = ParameterValue<int>("numdice", kDefaultNumDice);
+  int def_num_dice = ParameterValue<int>("numdice");
 
   // Compute the number of dice for each player based on parameters,
   // and set default outcomes of unknown face values (-1).

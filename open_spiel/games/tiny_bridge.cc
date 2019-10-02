@@ -145,12 +145,18 @@ const GameType kGameTypePlay{
     /*provides_observation_as_normalized_vector=*/false,
     /*parameter_specification=*/
     {
-        {"trumps", {GameParameter::Type::kString, true}},
-        {"leader", {GameParameter::Type::kString, true}},
-        {"hand_W", {GameParameter::Type::kString, true}},
-        {"hand_N", {GameParameter::Type::kString, true}},
-        {"hand_E", {GameParameter::Type::kString, true}},
-        {"hand_S", {GameParameter::Type::kString, true}},
+        {"trumps",
+         GameParameter(GameParameter::Type::kString, /*is_mandatory=*/true)},
+        {"leader",
+         GameParameter(GameParameter::Type::kString, /*is_mandatory=*/true)},
+        {"hand_W",
+         GameParameter(GameParameter::Type::kString, /*is_mandatory=*/true)},
+        {"hand_N",
+         GameParameter(GameParameter::Type::kString, /*is_mandatory=*/true)},
+        {"hand_E",
+         GameParameter(GameParameter::Type::kString, /*is_mandatory=*/true)},
+        {"hand_S",
+         GameParameter(GameParameter::Type::kString, /*is_mandatory=*/true)},
     }};
 
 std::unique_ptr<Game> Factory2p(const GameParameters& params) {

@@ -40,8 +40,7 @@ const GameType kGameType{
     /*provides_observation_as_normalized_vector=*/true,
     /*parameter_specification=*/
     {
-        {"board_size",
-         GameType::ParameterSpec{GameParameter::Type::kInt, false}},
+        {"board_size", GameParameter(kDefaultBoardSize)},
     }};
 
 std::unique_ptr<Game> Factory(const GameParameters& params) {
@@ -280,7 +279,6 @@ std::unique_ptr<State> HexState::Clone() const {
 }
 
 HexGame::HexGame(const GameParameters& params)
-    : Game(kGameType, params),
-      board_size_(ParameterValue<int>("board_size", kDefaultBoardSize)) {}
+    : Game(kGameType, params), board_size_(ParameterValue<int>("board_size")) {}
 }  // namespace hex
 }  // namespace open_spiel
