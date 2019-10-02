@@ -23,6 +23,7 @@
 
 // A simple jeopardy dice game that includes chance nodes.
 // See http://cs.gettysburg.edu/projects/pig/index.html for details.
+// Also https://en.wikipedia.org/wiki/Pig_(dice_game)
 //
 // Parameters:
 //     "diceoutcomes"  int    number of outcomes of the dice  (default = 6)
