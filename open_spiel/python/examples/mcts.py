@@ -94,7 +94,7 @@ def _play_game(game, initial_actions):
       sys.exit("Illegal action: {}".format(action_str))
 
     history.append(action_str)
-    state.apply_action(action)  # pylint: disable=undefined-loop-variable
+    state.apply_action(action)
     _opt_print("Forced action", action_str)
     _opt_print("Next state: ", str(state))
 
