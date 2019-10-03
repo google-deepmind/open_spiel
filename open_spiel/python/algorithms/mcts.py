@@ -36,6 +36,10 @@ class Evaluator(object):
     """Returns evaluation on given state."""
     raise NotImplementedError
 
+  def prior(self, state, random_state):
+    """Returns a probability for each legal action in the given state."""
+    raise NotImplementedError
+
 
 class RandomRolloutEvaluator(Evaluator):
   """A simple evaluator doing random rollouts.
@@ -66,6 +70,15 @@ class RandomRolloutEvaluator(Evaluator):
 
     return result / self.n_rollouts
 
+  def prior(self, state, random_state):
+    """Returns equal probability for all actions."""
+    del random_state
+    if state.is_chance_node():
+      return state.chance_outcomes()
+    else:
+      legal_actions = state.legal_actions(state.current_player())
+      return [(action, 1.0 / len(legal_actions)) for action in legal_actions]
+
 
 class SearchNode(object):
   """A node in the search tree.
@@ -77,6 +90,7 @@ class SearchNode(object):
     action: The action from the parent node's perspective. Not important for the
       root node, as the actions that lead to it are in the past.
     player: Which player made this action.
+    prior: A prior probability for how likely this action will be selected.
     explore_count: How many times this node was explored.
     total_reward: The sum of rewards of rollouts through this node, from the
       parent node's perspective. The average reward of this node is
@@ -87,28 +101,27 @@ class SearchNode(object):
       node, along with their expected rewards.
   """
   __slots__ = [
-      "action", "player", "explore_count", "total_reward", "outcome",
+      "action", "player", "prior", "explore_count", "total_reward", "outcome",
       "children",
   ]
 
-  def __init__(self, action, player):
+  def __init__(self, action, player, prior):
     self.action = action
     self.player = player
+    self.prior = prior
     self.explore_count = 0
     self.total_reward = 0.0
     self.outcome = None
     self.children = []
 
-  def uct_value(self, parent_explore_count, uct_c, child_default_value):
-    """Returns the UCT value of child."""
+  def uct_value(self, parent_explore_count, uct_c):
+    """Returns the PUCT value of child."""
     if self.outcome is not None:
       return self.outcome[self.player]
 
-    if self.explore_count == 0:
-      return child_default_value
-
-    return self.total_reward / self.explore_count + uct_c * math.sqrt(
-        math.log(parent_explore_count) / self.explore_count)
+    return ((self.explore_count and self.total_reward / self.explore_count) +
+            uct_c * self.prior * math.sqrt(parent_explore_count) /
+            (self.explore_count + 1))
 
   def best_child(self):
     """Returns the best action from this node, either proven or most visited.
@@ -138,16 +151,12 @@ class SearchNode(object):
       state: A `pyspiel.State` object, to be used to convert the action id into
         a human readable format. If None, the action integer id is used.
     """
-    return "".join([
-        "  {}\n".format(c.to_str(state))
-        for c in sorted(self.children, key=lambda c: -c.explore_count)
-    ])
+    return "\n".join([
+        c.to_str(state)
+        for c in sorted(self.children, key=lambda c: -c.explore_count)])
 
   def to_str(self, state=None):
     """Returns the string representation of this node.
-
-    Looks like:
-    "d4h: player: 1, value:  244.0 / 2017 =  0.121, outcome:  1.0,  20 children"
 
     Args:
       state: A `pyspiel.State` object, to be used to convert the action id into
@@ -155,10 +164,11 @@ class SearchNode(object):
     """
     action = (state.action_to_string(state.current_player(), self.action)
               if state else str(self.action))
-    return ("{:>3}: player: {}, value: {:6.1f} / {:4d} = {:6.3f}, "
+    return ("{:>6}: player: {}, prior: {:5.3f}, value: {:6.3f}, sims: {:5d}, "
             "outcome: {}, {:3d} children").format(
-                action, self.player, self.total_reward, self.explore_count,
+                action, self.player, self.prior,
                 self.explore_count and self.total_reward / self.explore_count,
+                self.explore_count,
                 ("{:4.1f}".format(self.outcome[self.player])
                  if self.outcome else "none"),
                 len(self.children))
@@ -213,7 +223,6 @@ class MCTSBot(pyspiel.Bot):
     self.uct_c = uct_c
     self.max_simulations = max_simulations
     self.evaluator = evaluator
-    self.child_default_value = float("inf")
     self.player = player
     self.verbose = verbose
     self.solve = solve
@@ -227,12 +236,13 @@ class MCTSBot(pyspiel.Bot):
     best = root.best_child()
 
     if self.verbose:
-      print("Root:", root.to_str())
+      print("Root:")
+      print(root.to_str())
       print("Children:")
       print(root.children_str(state))
-      print("Children of chosen:")
       chosen_state = state.clone()
       chosen_state.apply_action(best.action)
+      print("Children of chosen:")
       print(best.children_str(chosen_state))
 
     mcts_action = best.action
@@ -263,12 +273,12 @@ class MCTSBot(pyspiel.Bot):
     while not working_state.is_terminal() and current_node.explore_count > 0:
       if not current_node.children:
         # For a new node, initialize its state, then choose a child as normal.
-        legal_actions = working_state.legal_actions()
+        legal_actions = self.evaluator.prior(working_state, self._random_state)
         # Reduce bias from move generation order.
         self._random_state.shuffle(legal_actions)
         player = working_state.current_player()
-        current_node.children = [SearchNode(action, player)
-                                 for action in legal_actions]
+        current_node.children = [SearchNode(action, player, prior)
+                                 for action, prior in legal_actions]
 
       if working_state.is_chance_node():
         # For chance nodes, rollout according to chance node's probability
@@ -282,11 +292,7 @@ class MCTSBot(pyspiel.Bot):
         # Otherwise choose node with largest UCT value
         chosen_child = max(
             current_node.children,
-            # pylint: disable=g-long-lambda
-            key=lambda c: c.uct_value(
-                current_node.explore_count,
-                self.uct_c,  # pylint: disable=g-long-lambda
-                self.child_default_value))
+            key=lambda c: c.uct_value(current_node.explore_count, self.uct_c))
 
       working_state.apply_action(chosen_child.action)
       current_node = chosen_child
@@ -301,12 +307,13 @@ class MCTSBot(pyspiel.Bot):
     At the leaf, the evaluator is called if the game state is not terminal.
     A total of max_simulations states are explored.
 
-    At every node, the algorithm chooses the action with the highest UCT value,
-    defined as: Q/N + c * sqrt(log(N) / N), where Q is the total reward after
-    the action, and N is the number of times the action was explored in this
-    position.  The input parameter c controls the balance between exploration
-    and exploitation; higher values of c encourage exploration of under-explored
-    nodes. Unseen actions are always explored first.
+    At every node, the algorithm chooses the action with the highest PUCT value,
+    defined as: `Q/N + c * prior * sqrt(parent_N) / N`, where Q is the total
+    reward after the action, and N is the number of times the action was
+    explored in this position. The input parameter c controls the balance
+    between exploration and exploitation; higher values of c encourage
+    exploration of under-explored nodes. Unseen actions are always explored
+    first.
 
     At the end of the search, the chosen action is the action that has been
     explored most often. This is the action that is returned.
@@ -323,6 +330,8 @@ class MCTSBot(pyspiel.Bot):
       https://web.cs.du.edu/~sturtevant/papers/multi-player_UCT.pdf
     - Nijssen, Monte-Carlo Tree Search for Multi-Player Games, 2013,
       https://project.dke.maastrichtuniversity.nl/games/files/phd/Nijssen_thesis.pdf
+    - Silver, AlphaGo Zero: Starting from scratch, 2017
+      https://deepmind.com/blog/article/alphago-zero-starting-scratch
 
     Arguments:
       state: pyspiel.State object, state to search from
@@ -331,7 +340,7 @@ class MCTSBot(pyspiel.Bot):
       The most visited move from the root node.
     """
     assert state.current_player() == self.player
-    root = SearchNode(None, state.current_player())
+    root = SearchNode(None, state.current_player(), 1)
     for _ in range(self.max_simulations):
       visit_path, working_state = self._apply_tree_policy(root, state)
       if working_state.is_terminal():
