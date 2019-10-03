@@ -68,9 +68,17 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
   fi
 
   # We install the packages only if they are not present yet.
-  /usr/bin/dpkg-query --show --showformat='${db:Status-Status}\n' $EXT_DEPS || \
-    sudo apt-get update && \
+  # See https://stackoverflow.com/questions/18621990/bash-get-exit-status-of-command-when-set-e-is-active
+  already_installed=0
+  /usr/bin/dpkg-query --show --showformat='${db:Status-Status}\n' $EXT_DEPS || already_installed=$?
+  if [ $already_installed -eq 0 ]
+  then
+    echo -e "\e[33mSystem wide packages already installed, skipping their installation.\e[0m"
+  else
+    echo "System wide packages missing. Installing them..."
+    sudo apt-get update
     sudo apt-get install $EXT_DEPS
+  fi
 
   if [[ "$TRAVIS" ]]; then
     sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python${OS_PYTHON_VERSION} 10
