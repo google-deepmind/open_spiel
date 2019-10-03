@@ -20,6 +20,8 @@
 #include <random>
 #include <string>
 
+#include "open_spiel/abseil-cpp/absl/random/uniform_int_distribution.h"
+
 namespace open_spiel {
 namespace chess_common {
 
@@ -116,7 +118,7 @@ class ZobristTable {
 
   ZobristTable(Generator::result_type seed) {
     Generator generator(seed);
-    std::uniform_int_distribution<Generator::result_type> dist;
+    absl::uniform_int_distribution<Generator::result_type> dist;
     data_.reserve(InnerDim);
     for (std::size_t i = 0; i < InnerDim; ++i) {
       data_.emplace_back(dist(generator));
@@ -139,7 +141,7 @@ class ZobristTable<T, InnerDim> {
 
   ZobristTable(Generator::result_type seed) : data_(InnerDim) {
     Generator generator(seed);
-    std::uniform_int_distribution<T> dist;
+    absl::uniform_int_distribution<T> dist;
     for (auto& field : data_) {
       field = dist(generator);
     }

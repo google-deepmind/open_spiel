@@ -16,6 +16,7 @@
 
 #include <algorithm>
 
+#include "open_spiel/abseil-cpp/absl/random/uniform_int_distribution.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
@@ -33,7 +34,7 @@ class UniformRandomBot : public Bot {
     const double p = 1.0 / num_legal_actions;
     for (auto action : legal_actions) policy.emplace_back(action, p);
     int selection =
-        std::uniform_int_distribution<int>(0, num_legal_actions - 1)(rng_);
+        absl::uniform_int_distribution<int>(0, num_legal_actions - 1)(rng_);
     return std::make_pair(policy, legal_actions[selection]);
   }
 

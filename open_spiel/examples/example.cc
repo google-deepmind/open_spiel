@@ -17,6 +17,7 @@
 #include <memory>
 #include <random>
 
+#include "open_spiel/abseil-cpp/absl/random/uniform_int_distribution.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
@@ -120,7 +121,7 @@ int main(int argc, char** argv) {
           PrintLegalActions(*state, player, actions);
         }
 
-        std::uniform_int_distribution<> dis(0, actions.size() - 1);
+        absl::uniform_int_distribution<> dis(0, actions.size() - 1);
         open_spiel::Action action = actions[dis(rng)];
         joint_action.push_back(action);
         std::cerr << "player " << player << " chose "
@@ -149,7 +150,7 @@ int main(int argc, char** argv) {
         PrintLegalActions(*state, player, actions);
       }
 
-      std::uniform_int_distribution<> dis(0, actions.size() - 1);
+      absl::uniform_int_distribution<> dis(0, actions.size() - 1);
       auto action = actions[dis(rng)];
       std::cerr << "chose action: " << state->ActionToString(player, action)
                 << std::endl;

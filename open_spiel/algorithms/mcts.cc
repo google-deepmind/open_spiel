@@ -18,6 +18,8 @@
 #include <limits>
 #include <random>
 
+#include "open_spiel/abseil-cpp/absl/random/uniform_int_distribution.h"
+
 namespace open_spiel {
 namespace algorithms {
 namespace {
@@ -130,7 +132,7 @@ double RandomRolloutEvaluator::evaluate(const State& state) const {
         working_state->ApplyAction(action);
       } else {
         auto actions = working_state->LegalActions();
-        std::uniform_int_distribution<int> dist(0, actions.size() - 1);
+        absl::uniform_int_distribution<int> dist(0, actions.size() - 1);
         int index = dist(rng_);
         working_state->ApplyAction(actions[index]);
       }

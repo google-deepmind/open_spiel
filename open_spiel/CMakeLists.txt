@@ -49,7 +49,7 @@ add_subdirectory (abseil-cpp)
 add_library(open_spiel_core OBJECT ${OPEN_SPIEL_CORE_FILES})
 target_include_directories (open_spiel_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} abseil-cpp)
 link_libraries(open_spiel_core absl::container absl::strings absl::str_format
-               absl::time absl::optional)
+               absl::time absl::optional absl::random_random)
 
 # Just the minimal base library: no games.
 set (OPEN_SPIEL_CORE_OBJECTS $<TARGET_OBJECTS:open_spiel_core>)

@@ -117,7 +117,7 @@ class Deal {
   Deal() { std::iota(std::begin(cards_), std::end(cards_), 0); }
   void Shuffle(std::mt19937* rng, int begin = 0, int end = kNumCards) {
     for (int i = begin; i < end - 1; ++i) {
-      // We don't use std::uniform_int_distribution because it behaves
+      // We don't use absl::uniform_int_distribution because it behaves
       // differently in different versions of C++, and we want reproducible
       // tests.
       int j = i + (*rng)() % (end - i);

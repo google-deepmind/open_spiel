@@ -19,6 +19,7 @@
 #include <set>
 #include <string>
 
+#include "open_spiel/abseil-cpp/absl/random/uniform_int_distribution.h"
 #include "open_spiel/abseil-cpp/absl/time/clock.h"
 #include "open_spiel/game_transforms/turn_based_simultaneous_game.h"
 #include "open_spiel/spiel.h"
@@ -218,7 +219,7 @@ int RandomSimulationFast(std::mt19937* rng, const Game& game, bool verbose) {
       for (int p = 0; p < game.NumPlayers(); p++) {
         std::vector<Action> actions;
         actions = state->LegalActions(p);
-        std::uniform_int_distribution<> dis(0, actions.size() - 1);
+        std::uniform_int_distribution<int> dis(0, actions.size() - 1);
         Action action = actions[dis(*rng)];
         joint_action.push_back(action);
         if (verbose) {
@@ -231,7 +232,7 @@ int RandomSimulationFast(std::mt19937* rng, const Game& game, bool verbose) {
     } else {
       // Sample an action uniformly.
       std::vector<Action> actions = state->LegalActions();
-      std::uniform_int_distribution<> dis(0, actions.size() - 1);
+      std::uniform_int_distribution<int> dis(0, actions.size() - 1);
       Action action = actions[dis(*rng)];
       if (verbose) {
         int p = state->CurrentPlayer();
@@ -348,7 +349,7 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo) {
       for (auto p = Player{0}; p < game.NumPlayers(); p++) {
         std::vector<Action> actions;
         actions = state->LegalActions(p);
-        std::uniform_int_distribution<> dis(0, actions.size() - 1);
+        std::uniform_int_distribution<int> dis(0, actions.size() - 1);
         Action action = actions[dis(*rng)];
         joint_action.push_back(action);
         if (p == 0) {
@@ -394,7 +395,7 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo) {
         SPIEL_CHECK_TRUE(actions.empty());
       else
         SPIEL_CHECK_FALSE(actions.empty());
-      std::uniform_int_distribution<> dis(0, actions.size() - 1);
+      std::uniform_int_distribution<int> dis(0, actions.size() - 1);
       Action action = actions[dis(*rng)];
 
       std::cout << "chose action: " << state->ActionToString(player, action)
