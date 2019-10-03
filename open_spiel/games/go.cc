@@ -18,7 +18,6 @@
 
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/games/go/go_board.h"
-#include "open_spiel/spiel_optional.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {

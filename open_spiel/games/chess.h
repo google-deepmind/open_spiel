@@ -23,7 +23,6 @@
 
 #include "open_spiel/games/chess/chess_board.h"
 #include "open_spiel/spiel.h"
-#include "open_spiel/spiel_optional.h"
 #include "open_spiel/spiel_utils.h"
 
 // Game of chess:
@@ -209,7 +208,7 @@ class ChessState : public State {
   // board position has already appeared twice in the history).
   bool IsRepetitionDraw() const;
 
-  Optional<std::vector<double>> MaybeFinalReturns() const;
+  absl::optional<std::vector<double>> MaybeFinalReturns() const;
 
   // We have to store every move made to check for repetitions and to implement
   // undo. We store the current board position as an optimization.

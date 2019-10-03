@@ -14,6 +14,7 @@
 
 #include "open_spiel/games/chess.h"
 
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/games/chess/chess_board.h"
 #include "open_spiel/spiel_utils.h"
 
@@ -200,7 +201,7 @@ bool ChessState::IsRepetitionDraw() const {
   return entry->second >= kNumRepetitionsToDraw;
 }
 
-Optional<std::vector<double>> ChessState::MaybeFinalReturns() const {
+absl::optional<std::vector<double>> ChessState::MaybeFinalReturns() const {
   if (Board().IrreversibleMoveCounter() >= kNumReversibleMovesToDraw) {
     // This is theoretically a draw that needs to be claimed, but we implement
     // it as a forced draw for now.
@@ -235,7 +236,7 @@ Optional<std::vector<double>> ChessState::MaybeFinalReturns() const {
     }
   }
 
-  return kNullopt;
+  return absl::nullopt;
 }
 
 ChessGame::ChessGame(const GameParameters& params) : Game(kGameType, params) {}

@@ -189,7 +189,7 @@ GameParameters Game::ParameterValue<GameParameters>(
     return iter->second.game_value();
   }
 
-  if (default_value == std::nullopt) {
+  if (default_value == absl::nullopt) {
     std::vector<std::string> available_keys;
     for (auto const& element : game_parameters_) {
       available_keys.push_back(element.first);

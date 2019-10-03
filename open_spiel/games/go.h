@@ -24,7 +24,6 @@
 
 #include "open_spiel/games/go/go_board.h"
 #include "open_spiel/spiel.h"
-#include "open_spiel/spiel_optional.h"
 #include "open_spiel/spiel_utils.h"
 
 // Game of Go:

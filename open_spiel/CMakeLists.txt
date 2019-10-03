@@ -38,8 +38,6 @@ set (OPEN_SPIEL_CORE_FILES
   policy.cc
   simultaneous_move_game.h
   simultaneous_move_game.cc
-  spiel_optional.h
-  spiel_optional.cc
   spiel_utils.h
   spiel_utils.cc
 )

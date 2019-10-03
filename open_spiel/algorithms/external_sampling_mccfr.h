@@ -22,7 +22,6 @@
 #include "open_spiel/algorithms/cfr.h"
 #include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"
-#include "open_spiel/spiel_optional.h"
 
 // An implementation of external sampling Monte Carlo Counterfactual Regret
 // Minimization (CFR). See Lanctot 2009 [0] and Chapter 4 of Lanctot 2013 [1]
