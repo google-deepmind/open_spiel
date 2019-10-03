@@ -621,10 +621,6 @@ class Game {
   Game(GameType game_type, GameParameters game_parameters)
       : game_type_(game_type), game_parameters_(game_parameters) {}
 
-  // // Access to game parameters.
-  // template <typename T>
-  // T ParameterValue(const std::string& key) const;
-
   // Access to game parameters. Returns the value provided by the user. If not:
   // - Defaults to the value stored as the default in
   // game_type.parameter_specification if the `default_value` is absl::nullopt

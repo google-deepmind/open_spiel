@@ -184,10 +184,21 @@ template <>
 GameParameters Game::ParameterValue<GameParameters>(
     const std::string& key,
     absl::optional<GameParameters> default_value) const {
-  if (default_value == absl::nullopt) {
-    SpielFatalError("Unexpected");
+  auto iter = game_parameters_.find(key);
+  if (iter != game_parameters_.end()) {
+    return iter->second.game_value();
   }
-  return game_parameters_.at(key).game_value();
+
+  if (default_value == std::nullopt) {
+    std::vector<std::string> available_keys;
+    for (auto const& element : game_parameters_) {
+      available_keys.push_back(element.first);
+    }
+    SpielFatalError(absl::StrCat("The parameter for ", key,
+                                 " is missing. Available keys are: ",
+                                 absl::StrJoin(available_keys, " ")));
+  }
+  return default_value.value();
 }
 
 template <>
