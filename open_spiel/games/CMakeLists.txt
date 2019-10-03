@@ -79,6 +79,9 @@ target_include_directories (games PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 # Uncomment to enable Hanabi.
 # add_subdirectory (hanabi)
 
+# Uncomment to build the Ludii demo
+# add_subdirectory (ludii)
+
 add_library(bridge_double_dummy_solver OBJECT
   bridge/double_dummy_solver/include/dll.h
   bridge/double_dummy_solver/include/portab.h
