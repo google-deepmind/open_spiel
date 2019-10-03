@@ -40,6 +40,7 @@ flags.DEFINE_integer("uct_c", 2, "UCT's exploration constant.")
 flags.DEFINE_integer("rollout_count", 10, "How many rollouts to do.")
 flags.DEFINE_integer("max_simulations", 10000, "How many nodes to expand.")
 flags.DEFINE_integer("num_games", 1, "How many games to play.")
+flags.DEFINE_bool("solve", True, "Whether to use MCTS-Solver.")
 flags.DEFINE_bool("quiet", False, "Don't show the moves as they're played.")
 flags.DEFINE_bool("verbose", False, "Show the MCTS stats of possible moves.")
 
@@ -61,6 +62,7 @@ def _init_bot(bot_type, game, player_id):
         FLAGS.uct_c,
         FLAGS.max_simulations,
         evaluator,
+        solve=FLAGS.solve,
         verbose=FLAGS.verbose)
   if bot_type == "random":
     return uniform_random.UniformRandomBot(game, player_id, np.random)

@@ -81,11 +81,14 @@ class SearchNode(object):
     total_reward: The sum of rewards of rollouts through this node, from the
       parent node's perspective. The average reward of this node is
       `total_reward / explore_count`
+    outcome: The rewards for all players if this is a terminal node or the
+      subtree has been proven, otherwise None.
     children: A list of SearchNodes representing the possible actions from this
       node, along with their expected rewards.
   """
   __slots__ = [
-      "action", "player", "explore_count", "total_reward", "children"
+      "action", "player", "explore_count", "total_reward", "outcome",
+      "children",
   ]
 
   def __init__(self, action, player):
@@ -93,22 +96,41 @@ class SearchNode(object):
     self.player = player
     self.explore_count = 0
     self.total_reward = 0.0
+    self.outcome = None
     self.children = []
 
   def uct_value(self, parent_explore_count, uct_c, child_default_value):
     """Returns the UCT value of child."""
+    if self.outcome is not None:
+      return self.outcome[self.player]
+
     if self.explore_count == 0:
       return child_default_value
 
     return self.total_reward / self.explore_count + uct_c * math.sqrt(
         math.log(parent_explore_count) / self.explore_count)
 
-  def most_visited_child(self):
-    """Returns the most visited action from this node."""
-    return max(self.children, key=lambda c: c.explore_count)
+  def best_child(self):
+    """Returns the best action from this node, either proven or most visited.
+
+    This ordering leads to choosing:
+    - Highest proven score > 0 over anything else, including a promising but
+      unproven action.
+    - A proven draw only if it has higher exploration than others that are
+      uncertain, or the others are losses.
+    - Uncertain action with most exploration over loss of any difficulty
+    - Hardest loss if everything is a loss
+    - Highest expected reward if explore counts are equal (unlikely).
+    - Longest win, if multiple are proven (unlikely due to early stopping).
+    """
+    def key(c):
+      return (0 if c.outcome is None else c.outcome[c.player],
+              c.explore_count, c.total_reward)
+
+    return max(self.children, key=key)
 
   def children_str(self, state=None):
-    """Returns the string representation of all children.
+    """Returns the string representation of this node's children.
 
     They are ordered in decreasing explore count.
 
@@ -122,11 +144,10 @@ class SearchNode(object):
     ])
 
   def to_str(self, state=None):
-    """Returns the string repr.
+    """Returns the string representation of this node.
 
-    of this node children.
-
-    Looks like: "d4h: player: 1, value:  244.0 / 2017 =  0.121,  20 children"
+    Looks like:
+    "d4h: player: 1, value:  244.0 / 2017 =  0.121, outcome:  1.0,  20 children"
 
     Args:
       state: A `pyspiel.State` object, to be used to convert the action id into
@@ -135,9 +156,11 @@ class SearchNode(object):
     action = (state.action_to_string(state.current_player(), self.action)
               if state else str(self.action))
     return ("{:>3}: player: {}, value: {:6.1f} / {:4d} = {:6.3f}, "
-            "{:3d} children").format(
+            "outcome: {}, {:3d} children").format(
                 action, self.player, self.total_reward, self.explore_count,
                 self.explore_count and self.total_reward / self.explore_count,
+                ("{:4.1f}".format(self.outcome[self.player])
+                 if self.outcome else "none"),
                 len(self.children))
 
   def __str__(self):
@@ -153,6 +176,7 @@ class MCTSBot(pyspiel.Bot):
                uct_c,
                max_simulations,
                evaluator,
+               solve=True,
                random_state=None,
                verbose=False):
     """Initializes a MCTS Search algorithm in the form of a bot.
@@ -170,6 +194,7 @@ class MCTSBot(pyspiel.Bot):
         search tree should be evaluated. This is correlated with memory size and
         tree depth.
       evaluator: A `Evaluator` object to use to evaluate a leaf node.
+      solve: Whether to back up solved states.
       random_state: An optional numpy RandomState to make it deterministic.
       verbose: Whether to print information about the search tree before
         returning the action. Useful for confirming the search is working
@@ -191,11 +216,27 @@ class MCTSBot(pyspiel.Bot):
     self.child_default_value = float("inf")
     self.player = player
     self.verbose = verbose
+    self.solve = solve
+    self.max_utility = game.max_utility()
     self._random_state = random_state or np.random.RandomState()
 
   def step(self, state):
     """Returns bot's policy and action at given state."""
-    mcts_action = self.mcts_search(state)
+    root = self.mcts_search(state)
+
+    best = root.best_child()
+
+    if self.verbose:
+      print("Root:", root.to_str())
+      print("Children:")
+      print(root.children_str(state))
+      print("Children of chosen:")
+      chosen_state = state.clone()
+      chosen_state.apply_action(best.action)
+      print(best.children_str(chosen_state))
+
+    mcts_action = best.action
+
     policy = [(action, (1.0 if action == mcts_action else 0.0))
               for action in state.legal_actions(self.player_id())]
 
@@ -295,22 +336,44 @@ class MCTSBot(pyspiel.Bot):
       visit_path, working_state = self._apply_tree_policy(root, state)
       if working_state.is_terminal():
         returns = working_state.returns()
+        visit_path[-1].outcome = returns
+        solved = self.solve
       else:
         returns = self.evaluator.evaluate(working_state, self._random_state)
+        solved = False
 
-      for node in visit_path:
+      for node in reversed(visit_path):
         node.total_reward += returns[node.player]
         node.explore_count += 1
 
-    most_visited = root.most_visited_child()
+        if solved and node.children:
+          player = node.children[0].player
+          if player == pyspiel.PlayerId.CHANCE:
+            # Only back up chance nodes if all have the same outcome.
+            # An alternative would be to back up the weighted average of
+            # outcomes if all children are solved, but that is less clear.
+            outcome = node.children[0].outcome
+            if (outcome is not None and
+                all(np.array_equal(c.outcome, outcome) for c in node.children)):
+              node.outcome = outcome
+            else:
+              solved = False
+          else:
+            # If any have max utility (won?), or all children are solved,
+            # choose the one best for the player choosing.
+            best = None
+            all_solved = True
+            for child in node.children:
+              if child.outcome is None:
+                all_solved = False
+              elif best is None or child.outcome[player] > best.outcome[player]:
+                best = child
+            if (best is not None and
+                (all_solved or best.outcome[player] == self.max_utility)):
+              node.outcome = best.outcome
+            else:
+              solved = False
+      if root.outcome is not None:
+        break
 
-    if self.verbose:
-      print("Root:", root.to_str())
-      print("Children:")
-      print(root.children_str(working_state))
-      print("Children of chosen:")
-      chosen_state = state.clone()
-      chosen_state.apply_action(most_visited.action)
-      print(most_visited.children_str(chosen_state))
-
-    return most_visited.action
+    return root
