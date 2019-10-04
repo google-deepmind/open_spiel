@@ -45,9 +45,13 @@ constexpr const int kNumDiceOutcomes = 6;
 constexpr const int kNumCheckersPerPlayer = 15;
 constexpr const int kXPlayerId = 0;
 constexpr const int kOPlayerId = 1;
+constexpr const int kPassPos = -1;
+
+// TODO: look into whether these can be set to 25 and -2 to avoid having a
+// separate helper function (PositionToStringHumanReadable) to convert moves
+// to strings.
 constexpr const int kBarPos = 100;
 constexpr const int kScorePos = 101;
-constexpr const int kPassPos = -1;
 
 // The action encoding stores a number in { 0, 1, ..., 1351 }. If the high
 // roll is to move first, then the number is encoded as a 2-digit number in
@@ -110,17 +114,17 @@ class BackgammonState : public State {
   BackgammonState(int num_distinct_actions, int num_players,
                   ScoringType scoring_type);
 
-  int CurrentPlayer() const override;
-  void UndoAction(int player, Action action) override;
+  Player CurrentPlayer() const override;
+  void UndoAction(Player player, Action action) override;
   std::vector<Action> LegalActions() const override;
-  std::string ActionToString(int player, Action move_id) const override;
+  std::string ActionToString(Player player, Action move_id) const override;
   std::vector<std::pair<Action, double>> ChanceOutcomes() const override;
   std::string ToString() const override;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
-  std::string InformationState(int player) const override;
+  std::string InformationState(Player player) const override;
   void InformationStateAsNormalizedVector(
-      int player, std::vector<double>* values) const override;
+      Player player, std::vector<double>* values) const override;
   std::unique_ptr<State> Clone() const override;
 
   // Setter function used for debugging and tests. Note: this does not set the
@@ -199,6 +203,10 @@ class BackgammonState : public State {
   Action EncodedPassMove() const;
   Action EncodedBarMove() const;
 
+  // A helper function used by ActionToString to add necessary hit information
+  // and compute whether the move goes off the board.
+  int AugmentCheckerMove(CheckerMove* cmove, int player, int start) const;
+
   // Returns the position of the furthest checker in the home of this player.
   // Returns -1 if none found.
   int FurthestCheckerInHome(int player) const;
@@ -213,8 +221,8 @@ class BackgammonState : public State {
 
   ScoringType scoring_type_;  // Which rules apply when scoring the game.
 
-  int cur_player_;
-  int prev_player_;
+  Player cur_player_;
+  Player prev_player_;
   int turns_;
   int x_turns_;
   int o_turns_;

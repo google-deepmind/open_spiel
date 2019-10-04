@@ -25,7 +25,7 @@ void BasicBlottoTests() {
   testing::LoadGameTest("blotto");
   testing::NoChanceOutcomesTest(*LoadGame("blotto"));
   testing::RandomSimTest(*LoadGame("blotto"), 100);
-  for (int players = 3; players <= 5; players++) {
+  for (Player players = 3; players <= 5; players++) {
     testing::RandomSimTest(
         *LoadGame("blotto", {{"players", GameParameter(players)}}), 100);
   }

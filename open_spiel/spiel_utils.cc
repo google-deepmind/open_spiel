@@ -19,7 +19,7 @@
 
 namespace open_spiel {
 
-int NextPlayerRoundRobin(int player, int nplayers) {
+int NextPlayerRoundRobin(Player player, int nplayers) {
   if (player + 1 < nplayers) {
     return player + 1;
   } else {
@@ -28,7 +28,7 @@ int NextPlayerRoundRobin(int player, int nplayers) {
 }
 
 // Helper function to determine the previous player in a round robin.
-int PreviousPlayerRoundRobin(int player, int nplayers) {
+int PreviousPlayerRoundRobin(Player player, int nplayers) {
   if (player - 1 >= 0) {
     return player - 1;
   } else {

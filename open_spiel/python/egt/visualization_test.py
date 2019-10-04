@@ -14,8 +14,12 @@
 
 """Tests for open_spiel.python.egt.visualization."""
 
-import unittest
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 from absl import logging
+from absl.testing import absltest
 
 # pylint: disable=g-import-not-at-top
 try:
@@ -57,7 +61,7 @@ def _identity_dynamics(x):
   return x
 
 
-class VisualizationTest(unittest.TestCase):
+class VisualizationTest(absltest.TestCase):
 
   def test_meshgrid(self):
     n = 10
@@ -108,4 +112,4 @@ class VisualizationTest(unittest.TestCase):
 
 
 if __name__ == "__main__":
-  unittest.main()
+  absltest.main()

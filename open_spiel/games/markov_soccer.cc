@@ -23,6 +23,10 @@ namespace open_spiel {
 namespace markov_soccer {
 
 namespace {
+
+// Default parameters.
+constexpr int kDefaultHorizon = 1000;
+
 // Facts about the game
 const GameType kGameType{
     /*short_name=*/"markov_soccer",
@@ -39,7 +43,7 @@ const GameType kGameType{
     /*provides_observation=*/false,
     /*provides_observation_as_normalized_vector=*/false,
     /*parameter_specification=*/
-    {{"horizon", {GameParameter::Type::kInt, false}}}};
+    {{"horizon", GameParameter(kDefaultHorizon)}}};
 
 std::unique_ptr<Game> Factory(const GameParameters& params) {
   return std::unique_ptr<Game>(new MarkovSoccerGame(params));
@@ -67,16 +71,13 @@ enum ChanceOutcome {
 
 constexpr std::array<int, 5> row_offsets = {{-1, 1, 0, 0, 0}};
 constexpr std::array<int, 5> col_offsets = {{0, 0, -1, 1, 0}};
-
-// Default parameters.
-constexpr int kDefaultHorizon = 1000;
 }  // namespace
 
 MarkovSoccerState::MarkovSoccerState(const MarkovSoccerGame& parent_game)
     : SimMoveState(parent_game.NumDistinctActions(), parent_game.NumPlayers()),
       parent_game_(parent_game) {}
 
-std::string MarkovSoccerState::ActionToString(int player,
+std::string MarkovSoccerState::ActionToString(Player player,
                                               Action action_id) const {
   if (player == kSimultaneousPlayerId)
     return FlatJointActionToString(action_id);
@@ -158,7 +159,7 @@ bool MarkovSoccerState::InBounds(int r, int c) const {
   return (r >= 0 && c >= 0 && r < kRows && c < kCols);
 }
 
-void MarkovSoccerState::ResolveMove(int player, int move) {
+void MarkovSoccerState::ResolveMove(Player player, int move) {
   int old_row = player_row_[player - 1];
   int old_col = player_col_[player - 1];
   int new_row = old_row + row_offsets[move];
@@ -242,7 +243,8 @@ void MarkovSoccerState::DoApplyAction(Action action_id) {
   total_moves_++;
 }
 
-std::vector<Action> MarkovSoccerState::LegalActions(int player) const {
+std::vector<Action> MarkovSoccerState::LegalActions(Player player) const {
+  if (IsTerminal()) return {};
   if (IsChanceNode()) {
     if (total_moves_ == 0) {
       return {kChanceLoc1, kChanceLoc2};
@@ -276,7 +278,7 @@ std::string MarkovSoccerState::ToString() const {
 
     absl::StrAppend(&result, "\n");
   }
-
+  if (IsChanceNode()) absl::StrAppend(&result, "Chance Node");
   return result;
 }
 
@@ -328,7 +330,7 @@ int MarkovSoccerState::observation_plane(int r, int c) const {
 }
 
 void MarkovSoccerState::InformationStateAsNormalizedVector(
-    int player, std::vector<double>* values) const {
+    Player player, std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
@@ -351,7 +353,7 @@ std::unique_ptr<State> MarkovSoccerState::Clone() const {
 
 std::unique_ptr<State> MarkovSoccerGame::NewInitialState() const {
   std::unique_ptr<MarkovSoccerState> state(new MarkovSoccerState(*this));
-  state->Reset(ParameterValue<int>("horizon", kDefaultHorizon));
+  state->Reset(ParameterValue<int>("horizon"));
   return state;
 }
 
@@ -362,7 +364,7 @@ std::vector<int> MarkovSoccerGame::InformationStateNormalizedVectorShape()
 
 MarkovSoccerGame::MarkovSoccerGame(const GameParameters& params)
     : SimMoveGame(kGameType, params),
-      horizon_(ParameterValue<int>("horizon", kDefaultHorizon)) {}
+      horizon_(ParameterValue<int>("horizon")) {}
 
 }  // namespace markov_soccer
 }  // namespace open_spiel

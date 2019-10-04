@@ -24,7 +24,6 @@
 
 #include "open_spiel/games/go/go_board.h"
 #include "open_spiel/spiel.h"
-#include "open_spiel/spiel_optional.h"
 #include "open_spiel/spiel_utils.h"
 
 // Game of Go:
@@ -64,11 +63,11 @@ class GoState : public State {
   // Constructs a Go state for the empty board.
   GoState(int board_size, float komi, int handicap);
 
-  int CurrentPlayer() const override {
+  Player CurrentPlayer() const override {
     return IsTerminal() ? kTerminalPlayerId : ColorToPlayer(to_play_);
   }
   std::vector<Action> LegalActions() const override;
-  std::string ActionToString(int player, Action action) const override;
+  std::string ActionToString(Player player, Action action) const override;
   std::string ToString() const override;
 
   bool IsTerminal() const override;
@@ -84,7 +83,7 @@ class GoState : public State {
   std::vector<double> Returns() const override;
 
   std::unique_ptr<State> Clone() const override;
-  void UndoAction(int player, Action action) override;
+  void UndoAction(Player player, Action action) override;
 
   const GoBoard& board() const { return board_; }
 

@@ -16,8 +16,8 @@
 
 #include <sstream>
 
+#include "open_spiel/game_parameters.h"
 #include "open_spiel/games/go/go_board.h"
-#include "open_spiel/spiel_optional.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
@@ -41,9 +41,9 @@ const GameType kGameType{
     /*provides_observation_as_normalized_vector=*/true,
     /*parameter_specification=*/
     {
-        {"komi", GameType::ParameterSpec{GameParameter::Type::kDouble, false}},
-        {"board_size",
-         GameType::ParameterSpec{GameParameter::Type::kInt, false}},
+        {"komi", GameParameter(7.5)},
+        {"board_size", GameParameter(19)},
+        {"handicap", GameParameter(0)},
     },
 };
 
@@ -90,9 +90,7 @@ std::string GoState::InformationState(int player) const {
   return HistoryString();
 }
 
-std::string GoState::Observation(int player) const {
-  return ToString();
-}
+std::string GoState::Observation(int player) const { return ToString(); }
 
 void GoState::ObservationAsNormalizedVector(int player,
                                             std::vector<double>* values) const {
@@ -119,6 +117,7 @@ void GoState::ObservationAsNormalizedVector(int player,
 
 std::vector<Action> GoState::LegalActions() const {
   std::vector<Action> actions{};
+  if (IsTerminal()) return actions;
   for (GoPoint p : BoardPoints(board_.board_size())) {
     if (board_.IsLegalMove(p, to_play_)) {
       actions.push_back(p);
@@ -128,7 +127,7 @@ std::vector<Action> GoState::LegalActions() const {
   return actions;
 }
 
-std::string GoState::ActionToString(int player, Action action) const {
+std::string GoState::ActionToString(Player player, Action action) const {
   return absl::StrCat(GoColorToString(static_cast<GoColor>(player)), " ",
                       GoPointToString(action));
 }
@@ -180,7 +179,7 @@ std::unique_ptr<State> GoState::Clone() const {
   return std::unique_ptr<State>(new GoState(*this));
 }
 
-void GoState::UndoAction(int player, Action action) {
+void GoState::UndoAction(Player player, Action action) {
   // We don't have direct undo functionality, but copying the board and
   // replaying all actions is still pretty fast (> 1 million undos/second).
   history_.pop_back();
@@ -219,9 +218,9 @@ void GoState::ResetBoard() {
 
 GoGame::GoGame(const GameParameters& params)
     : Game(kGameType, params),
-      komi_(ParameterValue<double>("komi", 7.5)),
-      board_size_(ParameterValue<int>("board_size", 19)),
-      handicap_(ParameterValue<int>("handicap", 0)) {}
+      komi_(ParameterValue<double>("komi")),
+      board_size_(ParameterValue<int>("board_size")),
+      handicap_(ParameterValue<int>("handicap")) {}
 
 }  // namespace go
 }  // namespace open_spiel

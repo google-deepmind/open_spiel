@@ -46,8 +46,8 @@ class MatchingPennies3pState : public NFGState {
  public:
   MatchingPennies3pState(int num_distinct_actions, int num_players);
 
-  std::vector<Action> LegalActions(int player) const override;
-  std::string ActionToString(int player, Action move_id) const override;
+  std::vector<Action> LegalActions(Player player) const override;
+  std::string ActionToString(Player player, Action move_id) const override;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
   std::unique_ptr<State> Clone() const override;

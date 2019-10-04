@@ -81,7 +81,7 @@ std::unique_ptr<State> ApplyTreePolicy(SearchNode* root,
         current_node->children.emplace_back();
       }
       current_node->player_sign =
-          (working_state->CurrentPlayer() == 0) ? 1 : -1;
+          (working_state->CurrentPlayer() == Player{0}) ? 1 : -1;
       return working_state;
     }
 
@@ -135,7 +135,7 @@ double RandomRolloutEvaluator::evaluate(const State& state) const {
         working_state->ApplyAction(actions[index]);
       }
     }
-    result += working_state->PlayerReturn(0);
+    result += working_state->PlayerReturn(Player{0});
   }
   return result / n_rollouts_;
 }
@@ -155,7 +155,7 @@ Action MCTSearch(const State& state, double uct_c, int max_search_nodes,
     // Now evaluate this node
     double node_value;
     if (working_state->IsTerminal())
-      node_value = working_state->PlayerReturn(0);
+      node_value = working_state->PlayerReturn(Player{0});
     else
       node_value = evaluator.evaluate(*working_state);
 

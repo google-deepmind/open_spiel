@@ -15,6 +15,7 @@
 #include "open_spiel/games/oware.h"
 
 #include <iomanip>
+#include "open_spiel/game_parameters.h"
 
 namespace open_spiel {
 namespace oware {
@@ -37,8 +38,8 @@ const GameType kGameType{
     /*provides_observation=*/true,
     /*provides_observation_as_normalized_vector=*/true,
     /*parameter_specification=*/
-    {{"num_houses_per_player", {GameParameter::Type::kInt, false}},
-     {"num_seeds_per_house", {GameParameter::Type::kInt, false}}}};
+    {{"num_houses_per_player", GameParameter(kDefaultHousesPerPlayer)},
+     {"num_seeds_per_house", GameParameter(kDdefaultSeedsPerHouse)}}};
 
 std::unique_ptr<Game> Factory(const GameParameters& params) {
   return std::unique_ptr<Game>(new OwareGame(params));
@@ -71,8 +72,9 @@ OwareState::OwareState(const OwareBoard& board)
 
 std::vector<Action> OwareState::LegalActions() const {
   std::vector<Action> actions;
-  const int lower = PlayerLowerHouse(board_.current_player);
-  const int upper = PlayerUpperHouse(board_.current_player);
+  if (IsTerminal()) return actions;
+  const Player lower = PlayerLowerHouse(board_.current_player);
+  const Player upper = PlayerUpperHouse(board_.current_player);
   if (OpponentSeeds() == 0) {
     // In case the opponent does not have any seeds, a player must make
     // a move which gives the opponent seeds.
@@ -92,11 +94,12 @@ std::vector<Action> OwareState::LegalActions() const {
   return actions;
 }
 
-std::string OwareState::ActionToString(int player, Action action) const {
-  return std::string(1, (player == 0 ? 'A' : 'a') + action);
+std::string OwareState::ActionToString(Player player, Action action) const {
+  return std::string(1, (player == Player{0} ? 'A' : 'a') + action);
 }
 
-void OwareState::WritePlayerScore(std::ostringstream& out, int player) const {
+void OwareState::WritePlayerScore(std::ostringstream& out,
+                                  Player player) const {
   out << "Player " << player << " score = " << board_.score[player];
   if (CurrentPlayer() == player) {
     out << " [PLAYING]" << std::endl;
@@ -212,7 +215,7 @@ bool OwareState::IsGrandSlam(int house) const {
 
 int OwareState::OpponentSeeds() const {
   int count = 0;
-  const int opponent = 1 - board_.current_player;
+  const Player opponent = 1 - board_.current_player;
   const int lower = PlayerLowerHouse(opponent);
   const int upper = PlayerUpperHouse(opponent);
   for (int house = lower; house <= upper; house++) {
@@ -263,23 +266,23 @@ void OwareState::DoApplyAction(Action action) {
 
 void OwareState::CollectAndTerminate() {
   for (int house = 0; house < NumHouses(); house++) {
-    const int player = house / num_houses_per_player_;
+    const Player player = house / num_houses_per_player_;
     board_.score[player] += board_.seeds[house];
     board_.seeds[house] = 0;
   }
 }
 
-std::string OwareState::Observation(int player) const {
+std::string OwareState::Observation(Player player) const {
   return board_.ToString();
 }
 
 void OwareState::ObservationAsNormalizedVector(
-    int player, std::vector<double>* values) const {
+    Player player, std::vector<double>* values) const {
   values->resize(/*seeds*/ NumHouses() + /*scores*/ kNumPlayers);
   for (int house = 0; house < NumHouses(); ++house) {
     (*values)[house] = ((double)board_.seeds[house]) / total_seeds_;
   }
-  for (int player = 0; player < kNumPlayers; ++player) {
+  for (Player player = 0; player < kNumPlayers; ++player) {
     (*values)[NumHouses() + player] =
         ((double)board_.score[player]) / total_seeds_;
   }
@@ -287,10 +290,10 @@ void OwareState::ObservationAsNormalizedVector(
 
 OwareGame::OwareGame(const GameParameters& params)
     : Game(kGameType, params),
-      num_houses_per_player_(ParameterValue<int>("num_houses_per_player",
-                                                 kDefaultHousesPerPlayer)),
+      num_houses_per_player_(ParameterValue<int>("num_houses_per_player"
+                                                 )),
       num_seeds_per_house_(
-          ParameterValue<int>("num_seeds_per_house", kDdefaultSeedsPerHouse)) {}
+          ParameterValue<int>("num_seeds_per_house")) {}
 
 std::vector<int> OwareGame::ObservationNormalizedVectorShape() const {
   return {/*seeds*/ num_houses_per_player_ * kNumPlayers +

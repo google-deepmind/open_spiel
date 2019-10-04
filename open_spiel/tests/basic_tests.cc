@@ -42,9 +42,9 @@ constexpr int kInvalidHistoryAction = -301;
 // (state_1, state_1.CurrentPlayer(), action2), ...
 struct HistoryItem {
   std::unique_ptr<State> state;
-  int player;
+  Player player;
   Action action;
-  HistoryItem(std::unique_ptr<State> _state, int _player, int _action)
+  HistoryItem(std::unique_ptr<State> _state, Player _player, int _action)
       : state(std::move(_state)), player(_player), action(_action) {}
 };
 
@@ -81,8 +81,8 @@ void LegalActionsIsEmptyForOtherPlayers(const Game& game, State& state) {
     return;
   }
 
-  int current_player = state.CurrentPlayer();
-  for (int player = 0; player < game.NumPlayers(); ++player) {
+  Player current_player = state.CurrentPlayer();
+  for (Player player = 0; player < game.NumPlayers(); ++player) {
     if (state.IsChanceNode()) {
       continue;
     }
@@ -194,7 +194,8 @@ int RandomSimulationFast(std::mt19937* rng, const Game& game, bool verbose) {
 
   if (verbose) {
     std::cout << "Initial state:" << std::endl
-              << "State:" << std::endl << state->ToString() << std::endl;
+              << "State:" << std::endl
+              << state->ToString() << std::endl;
   }
 
   int game_length = 0;
@@ -206,8 +207,9 @@ int RandomSimulationFast(std::mt19937* rng, const Game& game, bool verbose) {
       Action action = open_spiel::SampleChanceOutcome(
           outcomes, std::uniform_real_distribution<double>(0.0, 1.0)(*rng));
       if (verbose) {
-        std::cout << "Sampled outcome: " << state->ActionToString(
-            kChancePlayerId, action) << std::endl;
+        std::cout << "Sampled outcome: "
+                  << state->ActionToString(kChancePlayerId, action)
+                  << std::endl;
       }
       state->ApplyAction(action);
     } else if (state->CurrentPlayer() == open_spiel::kSimultaneousPlayerId) {
@@ -220,8 +222,9 @@ int RandomSimulationFast(std::mt19937* rng, const Game& game, bool verbose) {
         Action action = actions[dis(*rng)];
         joint_action.push_back(action);
         if (verbose) {
-          std::cout << "Player " << p << " chose action:"
-                    << state->ActionToString(p, action) << std::endl;
+          std::cout << "Player " << p
+                    << " chose action:" << state->ActionToString(p, action)
+                    << std::endl;
         }
       }
       state->ApplyActions(joint_action);
@@ -232,8 +235,9 @@ int RandomSimulationFast(std::mt19937* rng, const Game& game, bool verbose) {
       Action action = actions[dis(*rng)];
       if (verbose) {
         int p = state->CurrentPlayer();
-        std::cout << "Player " << p << " chose action: "
-                  << state->ActionToString(p, action) << std::endl;
+        std::cout << "Player " << p
+                  << " chose action: " << state->ActionToString(p, action)
+                  << std::endl;
       }
       state->ApplyAction(action);
     }
@@ -249,7 +253,7 @@ int RandomSimulationFast(std::mt19937* rng, const Game& game, bool verbose) {
 void RandomSimBenchmark(const std::string& game_def, int num_sims,
                         bool verbose) {
   std::mt19937 rng;
-  std::cout  << "RandomSimBenchmark, game = " << game_def
+  std::cout << "RandomSimBenchmark, game = " << game_def
             << ", num_sims = " << num_sims << ". ";
 
   auto game = LoadGame(game_def);
@@ -265,9 +269,8 @@ void RandomSimBenchmark(const std::string& game_def, int num_sims,
   int default_precision = std::cout.precision();
   std::cout.precision(1);
   std::cout << std::fixed << "Finished in " << (seconds * 1000) << " ms, "
-            << (num_sims / seconds) << " sims/s, "
-            << (num_moves / seconds) << " moves/s"
-            << std::defaultfloat << std::endl;
+            << (num_sims / seconds) << " sims/s, " << (num_moves / seconds)
+            << " moves/s" << std::defaultfloat << std::endl;
   std::cout.precision(default_precision);  // Reset.
 }
 
@@ -332,8 +335,9 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo) {
       }
     } else if (state->CurrentPlayer() == open_spiel::kSimultaneousPlayerId) {
       std::vector<double> rewards = state->Rewards();
+      SPIEL_CHECK_EQ(rewards.size(), game.NumPlayers());
       std::cout << "Rewards: " << absl::StrJoin(rewards, " ") << std::endl;
-      for (int p = 0; p < game.NumPlayers(); ++p) {
+      for (auto p = Player{0}; p < game.NumPlayers(); ++p) {
         episode_returns[p] += rewards[p];
       }
 
@@ -341,7 +345,7 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo) {
       std::vector<Action> joint_action;
 
       // Sample an action for each player
-      for (int p = 0; p < game.NumPlayers(); p++) {
+      for (auto p = Player{0}; p < game.NumPlayers(); p++) {
         std::vector<Action> actions;
         actions = state->LegalActions(p);
         std::uniform_int_distribution<> dis(0, actions.size() - 1);
@@ -367,13 +371,14 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo) {
       game_length++;
     } else {
       std::vector<double> rewards = state->Rewards();
+      SPIEL_CHECK_EQ(rewards.size(), game.NumPlayers());
       std::cout << "Rewards: " << absl::StrJoin(rewards, " ") << std::endl;
-      for (int p = 0; p < game.NumPlayers(); ++p) {
+      for (auto p = Player{0}; p < game.NumPlayers(); ++p) {
         episode_returns[p] += rewards[p];
       }
 
       // Decision node.
-      int player = state->CurrentPlayer();
+      Player player = state->CurrentPlayer();
 
       // First, check the information state vector, if supported.
       if (infostate_vector_size > 0) {
@@ -420,7 +425,7 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo) {
 
   // Check the information state of the terminal, too. This is commonly needed,
   // for example, as a final observation in an RL environment.
-  for (int p = 0; p < game.NumPlayers(); p++) {
+  for (auto p = Player{0}; p < game.NumPlayers(); p++) {
     if (infostate_vector_size > 0) {
       std::vector<double> infostate_vector;
       state->InformationStateAsNormalizedVector(p, &infostate_vector);
@@ -429,7 +434,8 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo) {
   }
 
   auto returns = state->Returns();
-  for (int player = 0; player < game.NumPlayers(); player++) {
+  SPIEL_CHECK_EQ(returns.size(), game.NumPlayers());
+  for (Player player = 0; player < game.NumPlayers(); player++) {
     double final_return = returns[player];
     SPIEL_CHECK_FLOAT_EQ(final_return, state->PlayerReturn(player));
     SPIEL_CHECK_GE(final_return, game.MinUtility());

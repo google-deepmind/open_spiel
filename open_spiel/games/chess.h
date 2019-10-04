@@ -23,7 +23,6 @@
 
 #include "open_spiel/games/chess/chess_board.h"
 #include "open_spiel/spiel.h"
-#include "open_spiel/spiel_optional.h"
 #include "open_spiel/spiel_utils.h"
 
 // Game of chess:
@@ -68,7 +67,7 @@ inline int ColorToPlayer(Color c) {
   }
 }
 
-inline int OtherPlayer(int player) { return player == 0 ? 1 : 0; }
+inline int OtherPlayer(Player player) { return player == Player{0} ? 1 : 0; }
 
 // Action encoding (must be changed to support larger boards):
 // bits 0-5: from square (0-64)
@@ -178,11 +177,11 @@ class ChessState : public State {
 
   ChessState& operator=(const ChessState&) = default;
 
-  int CurrentPlayer() const override {
+  Player CurrentPlayer() const override {
     return IsTerminal() ? kTerminalPlayerId : ColorToPlayer(Board().ToPlay());
   }
   std::vector<Action> LegalActions() const override;
-  std::string ActionToString(int player, Action action) const override;
+  std::string ActionToString(Player player, Action action) const override;
   std::string ToString() const override;
 
   bool IsTerminal() const override {
@@ -191,11 +190,11 @@ class ChessState : public State {
 
   std::vector<double> Returns() const override;
 
-  std::string InformationState(int player) const override;
+  std::string InformationState(Player player) const override;
   void InformationStateAsNormalizedVector(
-      int player, std::vector<double>* values) const override;
+      Player player, std::vector<double>* values) const override;
   std::unique_ptr<State> Clone() const override;
-  void UndoAction(int player, Action action) override;
+  void UndoAction(Player player, Action action) override;
 
   // Current board.
   StandardChessBoard& Board() { return current_board_; }
@@ -209,7 +208,7 @@ class ChessState : public State {
   // board position has already appeared twice in the history).
   bool IsRepetitionDraw() const;
 
-  Optional<std::vector<double>> MaybeFinalReturns() const;
+  absl::optional<std::vector<double>> MaybeFinalReturns() const;
 
   // We have to store every move made to check for repetitions and to implement
   // undo. We store the current board position as an optimization.

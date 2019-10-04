@@ -18,7 +18,6 @@ ENV/
 .DS_Store
 
  # Build products
-build_python_*/
 build/
 
  # External git modules

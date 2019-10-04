@@ -28,7 +28,7 @@ namespace open_spiel {
 namespace algorithms {
 namespace {
 std::string StateKey(const Game& game, const State& state,
-                     int player = kInvalidPlayer) {
+                     Player player = kInvalidPlayer) {
   if (game.GetType().provides_information_state) {
     if (player == kInvalidPlayer) return state.InformationState();
     return state.InformationState(player);

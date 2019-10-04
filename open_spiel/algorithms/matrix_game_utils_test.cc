@@ -30,8 +30,9 @@ void ConvertToMatrixGameTest() {
   SPIEL_CHECK_EQ(matrix_blotto->NumCols(), 66);
   std::cout << "Blotto 0,13 = " << matrix_blotto->RowActionName(0) << " vs "
             << matrix_blotto->ColActionName(13)
-            << " -> utils: " << matrix_blotto->PlayerUtility(0, 0, 13) << ","
-            << matrix_blotto->PlayerUtility(1, 0, 13) << std::endl;
+            << " -> utils: " << matrix_blotto->PlayerUtility(Player{0}, 0, 13)
+            << "," << matrix_blotto->PlayerUtility(Player{1}, 0, 13)
+            << std::endl;
 }
 
 void ExtensiveToMatrixGameTest() {

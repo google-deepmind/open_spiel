@@ -42,7 +42,7 @@ void KuhnTests() {
   RandomSimTest(*LoadGame("kuhn_poker"), /*num_sims=*/100);
 
   // More than two players.
-  for (int players = 3; players <= 5; players++) {
+  for (Player players = 3; players <= 5; players++) {
     RandomSimTest(
         *LoadGame("kuhn_poker", {{"players", GameParameter(players)}}),
         /*num_sims=*/100);
@@ -62,7 +62,7 @@ class FlatJointActionTestState : public SimMoveState {
       : SimMoveState(/*num_distinct_actions=*/8,
                      /*num_players=*/3) {}
   const std::vector<Action>& JointAction() const { return joint_action_; }
-  std::vector<Action> LegalActions(int player) const override {
+  std::vector<Action> LegalActions(Player player) const override {
     if (player == kSimultaneousPlayerId) return LegalFlatJointActions();
     switch (player) {
       case 0:
@@ -74,8 +74,8 @@ class FlatJointActionTestState : public SimMoveState {
     }
     SpielFatalError("Invalid player id");
   }
-  int CurrentPlayer() const override { return kSimultaneousPlayerId; }
-  std::string ActionToString(int player, Action action_id) const override {
+  Player CurrentPlayer() const override { return kSimultaneousPlayerId; }
+  std::string ActionToString(Player player, Action action_id) const override {
     if (player == kSimultaneousPlayerId)
       return FlatJointActionToString(action_id);
     return absl::StrCat("(p=", player, ",a=", action_id, ")");

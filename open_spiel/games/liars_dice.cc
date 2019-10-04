@@ -17,6 +17,7 @@
 #include <algorithm>
 #include <array>
 #include <utility>
+#include "open_spiel/game_parameters.h"
 
 namespace open_spiel {
 namespace liars_dice {
@@ -45,7 +46,8 @@ const GameType kGameType{
     /*provides_observation=*/false,
     /*provides_observation_as_normalized_vector=*/false,
     /*parameter_specification=*/
-    {{"players", {GameParameter::Type::kInt, false}}}};
+    {{"players", GameParameter(kDefaultPlayers)},
+     {"numdice", GameParameter(kDefaultNumDice)}}};
 
 std::unique_ptr<Game> Factory(const GameParameters& params) {
   return std::unique_ptr<Game>(new LiarsDiceGame(params));
@@ -81,7 +83,8 @@ LiarsDiceState::LiarsDiceState(int num_distinct_actions, int num_players,
   }
 }
 
-std::string LiarsDiceState::ActionToString(int player, Action action_id) const {
+std::string LiarsDiceState::ActionToString(Player player,
+                                           Action action_id) const {
   if (player != kChancePlayerId) {
     if (action_id == total_num_dice_ * kDiceSides) {
       return "Liar";
@@ -109,7 +112,7 @@ void LiarsDiceState::ResolveWinner() {
 
   // Count all the matches among all dice from all the players
   // kDiceSides (e.g. 6) is wild, so it always matches.
-  for (int p = 0; p < num_players_; p++) {
+  for (auto p = Player{0}; p < num_players_; p++) {
     for (int d = 0; d < num_dice_[p]; d++) {
       if (dice_outcomes_[p][d] == face || dice_outcomes_[p][d] == kDiceSides) {
         matches++;
@@ -148,7 +151,7 @@ void LiarsDiceState::DoApplyAction(Action action) {
         // Time to start playing!
         cur_player_ = 0;
         // Sort all players' rolls
-        for (int p = 0; p < num_players_; p++) {
+        for (auto p = Player{0}; p < num_players_; p++) {
           std::sort(dice_outcomes_[p].begin(), dice_outcomes_[p].end());
         }
       }
@@ -217,7 +220,7 @@ std::vector<std::pair<Action, double>> LiarsDiceState::ChanceOutcomes() const {
   return outcomes;
 }
 
-std::string LiarsDiceState::InformationState(int player) const {
+std::string LiarsDiceState::InformationState(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
@@ -236,7 +239,7 @@ std::string LiarsDiceState::InformationState(int player) const {
 std::string LiarsDiceState::ToString() const {
   std::string result = "";
 
-  for (int p = 0; p < num_players_; p++) {
+  for (auto p = Player{0}; p < num_players_; p++) {
     if (p != 0) absl::StrAppend(&result, " ");
     for (int d = 0; d < num_dice_[p]; d++) {
       absl::StrAppend(&result, dice_outcomes_[p][d]);
@@ -276,7 +279,7 @@ std::vector<double> LiarsDiceState::Returns() const {
 }
 
 void LiarsDiceState::InformationStateAsNormalizedVector(
-    int player, std::vector<double>* values) const {
+    Player player, std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
@@ -319,18 +322,18 @@ std::unique_ptr<State> LiarsDiceState::Clone() const {
 
 LiarsDiceGame::LiarsDiceGame(const GameParameters& params)
     : Game(kGameType, params) {
-  num_players_ = ParameterValue<int>("players", kDefaultPlayers);
+  num_players_ = ParameterValue<int>("players");
   SPIEL_CHECK_GE(num_players_, kGameType.min_num_players);
   SPIEL_CHECK_LE(num_players_, kGameType.max_num_players);
 
-  int def_num_dice = ParameterValue<int>("numdice", kDefaultNumDice);
+  int def_num_dice = ParameterValue<int>("numdice");
 
   // Compute the number of dice for each player based on parameters,
   // and set default outcomes of unknown face values (-1).
   total_num_dice_ = 0;
   num_dice_.resize(num_players_, 0);
 
-  for (int p = 0; p < num_players_; p++) {
+  for (auto p = Player{0}; p < num_players_; p++) {
     std::string key = absl::StrCat("numdice", p);
 
     int my_num_dice = def_num_dice;

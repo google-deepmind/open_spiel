@@ -45,14 +45,14 @@ class LiarsDiceState : public State {
   LiarsDiceState(const LiarsDiceState&) = default;
 
   void Reset(const GameParameters& params);
-  int CurrentPlayer() const override;
-  std::string ActionToString(int player, Action action_id) const override;
+  Player CurrentPlayer() const override;
+  std::string ActionToString(Player player, Action action_id) const override;
   std::string ToString() const override;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
-  std::string InformationState(int player) const override;
+  std::string InformationState(Player player) const override;
   void InformationStateAsNormalizedVector(
-      int player, std::vector<double>* values) const override;
+      Player player, std::vector<double>* values) const override;
   std::unique_ptr<State> Clone() const override;
   std::vector<std::pair<Action, double>> ChanceOutcomes() const override;
   std::vector<Action> LegalActions() const override;
@@ -64,8 +64,8 @@ class LiarsDiceState : public State {
   void ResolveWinner();
 
   // Initialized to invalid values. Use Game::NewInitialState().
-  int cur_player_;  // Player whose turn it is.
-  int cur_roller_;  // Player currently rolling dice.
+  Player cur_player_;  // Player whose turn it is.
+  int cur_roller_;     // Player currently rolling dice.
   int winner_;
   int loser_;
   int current_bid_;

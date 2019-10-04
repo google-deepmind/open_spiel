@@ -31,12 +31,17 @@ add_library (games OBJECT
   go/go_board.h
   goofspiel.cc
   goofspiel.h
+  # Uncomment to enable Hanabi.
+  # hanabi.cc
+  # hanabi.h
   havannah.cc
   havannah.h
   hex.cc
   hex.h
   kuhn_poker.cc
   kuhn_poker.h
+  laser_tag.cc
+  laser_tag.h
   leduc_poker.cc
   leduc_poker.h
   liars_dice.cc
@@ -64,10 +69,18 @@ add_library (games OBJECT
   tic_tac_toe.h
   tiny_bridge.cc
   tiny_bridge.h
+  tiny_hanabi.cc
+  tiny_hanabi.h
   y.cc
   y.h
 )
 target_include_directories (games PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
+# Uncomment to enable Hanabi.
+# add_subdirectory (hanabi)
+
+# Uncomment to build the Ludii demo
+# add_subdirectory (ludii)
 
 add_library(bridge_double_dummy_solver OBJECT
   bridge/double_dummy_solver/include/dll.h
@@ -251,10 +264,19 @@ add_executable(tic_tac_toe_test tic_tac_toe_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(tic_tac_toe_test tic_tac_toe_test)
 
+add_executable(laser_tag_test laser_tag_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(laser_tag_test laser_tag_test)
+
 add_executable(tiny_bridge_test tiny_bridge_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>
                $<TARGET_OBJECTS:algorithms>)
 add_test(tiny_bridge_test tiny_bridge_test)
+
+add_executable(tiny_hanabi_test tiny_hanabi_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>
+               $<TARGET_OBJECTS:algorithms>)
+add_test(tiny_hanabi_test tiny_hanabi_test)
 
 add_executable(y_test y_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)

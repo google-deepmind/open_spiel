@@ -16,8 +16,18 @@
 
 #include <array>
 
+#include "open_spiel/game_parameters.h"
+
 namespace open_spiel {
 namespace coin_game {
+
+// Defaults match the paper https://arxiv.org/pdf/1802.09640.pdf
+constexpr int kDefaultPlayers = 2;
+constexpr int kDefaultRows = 8;
+constexpr int kDefaultColumns = 8;
+constexpr int kDefaultExtraCoinColors = 1;
+constexpr int kDefaultCoinsPerColor = 4;
+constexpr int kDefaultEpisodeLength = 20;
 
 namespace {
 
@@ -43,14 +53,14 @@ const GameType kGameType{
     /*provides_observation_as_normalized_vector=*/false,
     /*parameter_specification=*/
     {
-        {"players", {GameParameter::Type::kInt, false}},
-        {"rows", {GameParameter::Type::kInt, false}},
-        {"columns", {GameParameter::Type::kInt, false}},
-        {"episode_length", {GameParameter::Type::kInt, false}},
+        {"players", GameParameter(kDefaultPlayers)},
+        {"rows", GameParameter(kDefaultRows)},
+        {"columns", GameParameter(kDefaultColumns)},
+        {"episode_length", GameParameter(kDefaultEpisodeLength)},
         // Number of extra coin colors to use apart from the
         // players' preferred color.
-        {"num_extra_coin_colors", {GameParameter::Type::kInt, false}},
-        {"num_coins_per_color", {GameParameter::Type::kInt, false}},
+        {"num_extra_coin_colors", GameParameter(kDefaultExtraCoinColors)},
+        {"num_coins_per_color", GameParameter(kDefaultCoinsPerColor)},
     }};
 
 std::unique_ptr<Game> Factory(const GameParameters& params) {
@@ -58,14 +68,6 @@ std::unique_ptr<Game> Factory(const GameParameters& params) {
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
-
-// Defaults match the paper https://arxiv.org/pdf/1802.09640.pdf
-constexpr int kDefaultPlayers = 2;
-constexpr int kDefaultRows = 8;
-constexpr int kDefaultColumns = 8;
-constexpr int kDefaultExtraCoinColors = 1;
-constexpr int kDefaultCoinsPerColor = 4;
-constexpr int kDefaultEpisodeLength = 20;
 
 std::string GamePhaseToString(GamePhase phase) {
   switch (phase) {
@@ -97,7 +99,9 @@ SymbolType GetSymbolType(char symbol) {
   SpielFatalError(absl::StrCat("Unexpected symbol: ", std::string(1, symbol)));
 }
 
-inline char PlayerSymbol(int player) { return '0' + static_cast<char>(player); }
+inline char PlayerSymbol(Player player) {
+  return '0' + static_cast<char>(player);
+}
 inline char CoinSymbol(int coin) { return 'a' + static_cast<char>(coin); }
 int CoinId(char symbol) { return symbol - 'a'; }
 
@@ -178,6 +182,7 @@ GamePhase CoinState::GetPhase() const {
 }
 
 std::vector<Action> CoinState::LegalActions() const {
+  if (IsTerminal()) return {};
   switch (GetPhase()) {
     case GamePhase::kAssignPreferences:
       return ActionRange(setup_.available_coin_colors_);
@@ -189,7 +194,6 @@ std::vector<Action> CoinState::LegalActions() const {
       return Range(offsets.size());
     default:
       SpielFatalError("Unknown phase.");
-      return {};
   }
 }
 
@@ -209,7 +213,7 @@ ActionsAndProbs CoinState::ChanceOutcomes() const {
   }
 }
 
-std::string CoinState::Observation(int player) const {
+std::string CoinState::Observation(Player player) const {
   std::ostringstream out;
   // A player only learns its own preference.
   SpielStrOut(out, player_preferences_[player], "\n");
@@ -309,15 +313,15 @@ void CoinState::DoApplyAction(Action action) {
   }
 }
 
-void CoinState::IncPlayerCoinCount(int player, int coin_color) {
+void CoinState::IncPlayerCoinCount(Player player, int coin_color) {
   player_coins_[player * game_.NumCoinColors() + coin_color]++;
 }
 
-int CoinState::GetPlayerCoinCount(int player, int coin_color) const {
+int CoinState::GetPlayerCoinCount(Player player, int coin_color) const {
   return player_coins_[player * game_.NumCoinColors() + coin_color];
 }
 
-std::string CoinState::ActionToString(int player, Action action_id) const {
+std::string CoinState::ActionToString(Player player, Action action_id) const {
   if (player == kChancePlayerId) {
     return absl::StrCat(action_id);
   } else {
@@ -345,7 +349,7 @@ void CoinState::PrintCoinsCollected(std::ostream& out) const {
     SpielStrOut(out, CoinSymbol(coint_color), " ");
   }
   SpielStrOut(out, "\n");
-  for (int player = 0; player < num_players_; player++) {
+  for (auto player = Player{0}; player < num_players_; player++) {
     SpielStrOut(out, "player", player, " ");
     for (int coint_color = 0; coint_color < game_.NumCoinColors();
          coint_color++) {
@@ -357,7 +361,7 @@ void CoinState::PrintCoinsCollected(std::ostream& out) const {
 
 void CoinState::PrintPreferences(std::ostream& out) const {
   SpielStrOut(out, "preferences=");
-  for (int player = 0; player < setup_.num_players_assigned_preference;
+  for (Player player = 0; player < setup_.num_players_assigned_preference;
        player++) {
     SpielStrOut(out, player, ":", CoinSymbol(player_preferences_[player]), " ");
   }
@@ -406,8 +410,8 @@ std::vector<double> CoinState::Returns() const {
   int collected_coins = 0;
   std::vector<int> coin_count(game_.NumCoinColors());
   for (int coin_color = 0; coin_color < game_.NumCoinColors(); coin_color++) {
-    for (int player = 0; player < num_players_; player++) {
-      int player_coins = GetPlayerCoinCount(player, coin_color);
+    for (auto player = Player{0}; player < num_players_; player++) {
+      Player player_coins = GetPlayerCoinCount(player, coin_color);
       coin_count[coin_color] += player_coins;
       collected_coins += player_coins;
     }
@@ -418,7 +422,7 @@ std::vector<double> CoinState::Returns() const {
   }
   const int bad_coins = collected_coins - good_coins;
   std::vector<double> rewards(num_players_);
-  for (int player = 0; player < num_players_; player++) {
+  for (auto player = Player{0}; player < num_players_; player++) {
     int self_coins = coin_count[player_preferences_[player]];
     int other_coins = good_coins - self_coins;
     rewards[player] = (std::pow(self_coins, 2) + std::pow(other_coins, 2) -
@@ -441,16 +445,13 @@ double CoinGame::MinUtility() const { return -MaxUtility(); }
 
 CoinGame::CoinGame(const GameParameters& params)
     : Game(kGameType, params),
-      num_players_(ParameterValue<int>("players", kDefaultPlayers)),
-      num_rows_(ParameterValue<int>("rows", kDefaultRows)),
-      num_columns_(ParameterValue<int>("columns", kDefaultColumns)),
-      episode_length_(
-          ParameterValue<int>("episode_length", kDefaultEpisodeLength)),
+      num_players_(ParameterValue<int>("players")),
+      num_rows_(ParameterValue<int>("rows")),
+      num_columns_(ParameterValue<int>("columns")),
+      episode_length_(ParameterValue<int>("episode_length")),
       num_coin_colors_(num_players_ +
-                       ParameterValue<int>("num_extra_coin_colors",
-                                           kDefaultExtraCoinColors)),
-      num_coins_per_color_(
-          ParameterValue<int>("num_coins_per_color", kDefaultCoinsPerColor)) {
+                       ParameterValue<int>("num_extra_coin_colors")),
+      num_coins_per_color_(ParameterValue<int>("num_coins_per_color")) {
   int total_items = num_players_ + num_coin_colors_ * num_coins_per_color_;
   SPIEL_CHECK_LE(total_items, num_rows_ * num_columns_);
 }

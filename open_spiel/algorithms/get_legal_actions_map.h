@@ -30,7 +30,7 @@ namespace algorithms {
 // bundle all the legal actions for all players in the same map, use
 // kInvalidPlayer.
 std::unordered_map<std::string, std::vector<Action>> GetLegalActionsMap(
-    const Game& game, int depth_limit, int player);
+    const Game& game, int depth_limit, Player player);
 
 }  // namespace algorithms
 }  // namespace open_spiel

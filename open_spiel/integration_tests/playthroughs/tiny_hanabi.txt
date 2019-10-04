@@ -1,0 +1,144 @@
+game: tiny_hanabi
+seed: 3811163648
+
+GameType.chance_mode = ChanceMode.EXPLICIT_STOCHASTIC
+GameType.dynamics = Dynamics.SEQUENTIAL
+GameType.information = Information.IMPERFECT_INFORMATION
+GameType.long_name = "Tiny Hanabi"
+GameType.max_num_players = 2
+GameType.min_num_players = 2
+GameType.parameter_specification = []
+GameType.provides_information_state = True
+GameType.provides_information_state_as_normalized_vector = True
+GameType.provides_observation = True
+GameType.provides_observation_as_normalized_vector = True
+GameType.reward_model = RewardModel.TERMINAL
+GameType.short_name = "tiny_hanabi"
+GameType.utility = Utility.IDENTICAL
+
+NumDistinctActions() = 3
+MaxChanceOutcomes() = 2
+GetParameters() = {}
+NumPlayers() = 2
+MinUtility() = 0.0
+MaxUtility() = 10.0
+UtilitySum() = None
+InformationStateNormalizedVectorShape() = [8]
+InformationStateNormalizedVectorSize() = 8
+ObservationNormalizedVectorShape() = [8]
+ObservationNormalizedVectorSize() = 8
+MaxGameLength() = 2
+ToString() = "tiny_hanabi()"
+
+# State 0
+IsTerminal() = False
+ToString() = ""
+History() = []
+HistoryString() = ""
+IsChanceNode() = True
+IsSimultaneousNode() = False
+CurrentPlayer() = -1
+InformationState(0) = "p0"
+InformationState(1) = "p1"
+InformationStateAsNormalizedVector(0) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+InformationStateAsNormalizedVector(1) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+Observation(0) = "p0"
+Observation(1) = "p1"
+ObservationAsNormalizedVector(0) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationAsNormalizedVector(1) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ChanceOutcomes() = [{0, 0.500000000000}, {1, 0.500000000000}]
+LegalActions() = [0, 1]
+StringLegalActions() = ["d0", "d1"]
+
+# Apply action "d1"
+action: 1
+
+# State 1
+IsTerminal() = False
+ToString() = "p0:d1"
+History() = [1]
+HistoryString() = "1"
+IsChanceNode() = True
+IsSimultaneousNode() = False
+CurrentPlayer() = -1
+InformationState(0) = "p0:d1"
+InformationState(1) = "p1"
+InformationStateAsNormalizedVector(0) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+InformationStateAsNormalizedVector(1) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+Observation(0) = "p0:d1"
+Observation(1) = "p1"
+ObservationAsNormalizedVector(0) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationAsNormalizedVector(1) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ChanceOutcomes() = [{0, 0.500000000000}, {1, 0.500000000000}]
+LegalActions() = [0, 1]
+StringLegalActions() = ["d0", "d1"]
+
+# Apply action "d1"
+action: 1
+
+# State 2
+IsTerminal() = False
+ToString() = "p0:d1 p1:d1"
+History() = [1, 1]
+HistoryString() = "1 1"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationState(0) = "p0:d1"
+InformationState(1) = "p1:d1"
+InformationStateAsNormalizedVector(0) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+InformationStateAsNormalizedVector(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+Observation(0) = "p0:d1"
+Observation(1) = "p1:d1"
+ObservationAsNormalizedVector(0) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationAsNormalizedVector(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2]
+StringLegalActions() = ["p0a0", "p0a1", "p0a2"]
+
+# Apply action "p0a2"
+action: 2
+
+# State 3
+IsTerminal() = False
+ToString() = "p0:d1 p1:d1 p0:a2"
+History() = [1, 1, 2]
+HistoryString() = "1 1 2"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationState(0) = "p0:d1 p0:a2"
+InformationState(1) = "p1:d1 p0:a2"
+InformationStateAsNormalizedVector(0) = [0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0]
+InformationStateAsNormalizedVector(1) = [0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0]
+Observation(0) = "p0:d1 p0:a2"
+Observation(1) = "p1:d1 p0:a2"
+ObservationAsNormalizedVector(0) = [0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationAsNormalizedVector(1) = [0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2]
+StringLegalActions() = ["p1a0", "p1a1", "p1a2"]
+
+# Apply action "p1a0"
+action: 0
+
+# State 4
+IsTerminal() = True
+ToString() = "p0:d1 p1:d1 p0:a2 p1:a0"
+History() = [1, 1, 2, 0]
+HistoryString() = "1 1 2 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = -4
+InformationState(0) = "p0:d1 p0:a2 p1:a0"
+InformationState(1) = "p1:d1 p0:a2 p1:a0"
+InformationStateAsNormalizedVector(0) = [0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0]
+InformationStateAsNormalizedVector(1) = [0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0]
+Observation(0) = "p0:d1 p0:a2 p1:a0"
+Observation(1) = "p1:d1 p0:a2 p1:a0"
+ObservationAsNormalizedVector(0) = [0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0]
+ObservationAsNormalizedVector(1) = [0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0]
+Rewards() = [10.0, 10.0]
+Returns() = [10.0, 10.0]

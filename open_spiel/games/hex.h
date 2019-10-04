@@ -65,17 +65,17 @@ class HexState : public State {
 
   HexState(const HexState&) = default;
 
-  int CurrentPlayer() const override {
+  Player CurrentPlayer() const override {
     return IsTerminal() ? kTerminalPlayerId : current_player_;
   }
-  std::string ActionToString(int player, Action action_id) const override;
+  std::string ActionToString(Player player, Action action_id) const override;
   std::string ToString() const override;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
-  std::string InformationState(int player) const override;
-  std::string Observation(int player) const override;
+  std::string InformationState(Player player) const override;
+  std::string Observation(Player player) const override;
   void ObservationAsNormalizedVector(
-      int player, std::vector<double>* values) const override;
+      Player player, std::vector<double>* values) const override;
   std::unique_ptr<State> Clone() const override;
   std::vector<Action> LegalActions() const override;
   CellState BoardAt(int cell) const { return board_[cell]; }
@@ -85,8 +85,8 @@ class HexState : public State {
   void DoApplyAction(Action move) override;
 
  private:
-  CellState PlayerAndActionToState(int player, Action move) const;
-  int current_player_ = 0;                         // Player zero goes first
+  CellState PlayerAndActionToState(Player player, Action move) const;
+  Player current_player_ = 0;                      // Player zero goes first
   double result_black_perspective_ = 0;            // 1 if Black (player 0) wins
   std::vector<int> AdjacentCells(int cell) const;  // Cells adjacent to cell
   const int board_size_;

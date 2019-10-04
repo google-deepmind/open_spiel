@@ -33,12 +33,12 @@ class NFGState : public SimMoveState {
       : SimMoveState(num_distinct_actions, num_players) {}
 
   // There are no chance nodes in a normal-form game (there is only one state),
-  int CurrentPlayer() const final {
+  Player CurrentPlayer() const final {
     return IsTerminal() ? kTerminalPlayerId : kSimultaneousPlayerId;
   }
 
   // Since there's only one state, we can implement the representations here.
-  std::string InformationState(int player) const override {
+  std::string InformationState(Player player) const override {
     std::string info_state = absl::StrCat("Observing player: ", player, ". ");
     if (!IsTerminal()) {
       absl::StrAppend(&info_state, "Non-terminal");
@@ -60,7 +60,7 @@ class NFGState : public SimMoveState {
     return result;
   }
 
-  void InformationStateAsNormalizedVector(int player,
+  void InformationStateAsNormalizedVector(Player player,
                                           std::vector<double>* values) const {
     values->resize(1);
     if (IsTerminal()) {

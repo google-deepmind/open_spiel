@@ -34,7 +34,7 @@ class SimMoveState : public State {
   SimMoveState(const SimMoveState&) = default;
 
   // Subclasses must implement a per-player LegalActions function.
-  virtual std::vector<Action> LegalActions(int player) const = 0;
+  virtual std::vector<Action> LegalActions(Player player) const = 0;
 
   // LegalActions() returns either the chance outcomes (at a chance node),
   // or a flattened form of the joint legal actions (at simultaneous move
@@ -42,9 +42,22 @@ class SimMoveState : public State {
   std::vector<Action> LegalActions() const override {
     if (IsSimultaneousNode()) {
       return LegalFlatJointActions();
+    } else if (IsTerminal()) {
+      return {};
     } else {
       SPIEL_CHECK_TRUE(IsChanceNode());
       return LegalChanceOutcomes();
+    }
+  }
+
+  // We override this rather than DoApplyAction() since we want to prevent
+  // saving the flat action in the history.
+  void ApplyAction(Action action) override {
+    if (IsSimultaneousNode()) {
+      ApplyFlatJointAction(action);
+    } else {
+      DoApplyAction(action);
+      history_.push_back(action);
     }
   }
 
@@ -91,10 +104,6 @@ class SimMoveState : public State {
   // Apply a flat joint action, updating the state.
   void ApplyFlatJointAction(Action flat_action);
 
-  void DoApplyAction(Action action) override {
-    SPIEL_CHECK_TRUE(IsSimultaneousNode());
-    ApplyFlatJointAction(action);
-  }
   void DoApplyActions(const std::vector<Action>& actions) override = 0;
 };
 

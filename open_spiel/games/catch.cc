@@ -17,6 +17,7 @@
 #include <algorithm>
 #include <utility>
 
+#include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
@@ -39,8 +40,8 @@ const GameType kGameType{
     /*provides_observation=*/true,
     /*provides_observation_as_normalized_vector=*/true,
     /*parameter_specification=*/
-    {{"rows", {GameParameter::Type::kInt, false}},
-     {"columns", {GameParameter::Type::kInt, false}}}};
+    {{"rows", GameParameter(kDefaultRows)},
+     {"columns", GameParameter(kDefaultColumns)}}};
 
 std::unique_ptr<Game> Factory(const GameParameters& params) {
   return std::unique_ptr<Game>(new CatchGame(params));
@@ -104,7 +105,7 @@ CellState CatchState::BoardAt(int row, int column) const {
   return CellState::kEmpty;
 }
 
-std::string CatchState::ActionToString(int player, Action action_id) const {
+std::string CatchState::ActionToString(Player player, Action action_id) const {
   if (player == kChancePlayerId)
     return absl::StrCat("Initialized ball to ", action_id);
   SPIEL_CHECK_EQ(player, 0);
@@ -145,18 +146,18 @@ std::vector<double> CatchState::Returns() const {
   }
 }
 
-std::string CatchState::InformationState(int player) const {
+std::string CatchState::InformationState(Player player) const {
   SPIEL_CHECK_EQ(player, 0);
   return HistoryString();
 }
 
-std::string CatchState::Observation(int player) const {
+std::string CatchState::Observation(Player player) const {
   SPIEL_CHECK_EQ(player, 0);
   return ToString();
 }
 
 void CatchState::ObservationAsNormalizedVector(
-    int player, std::vector<double>* values) const {
+    Player player, std::vector<double>* values) const {
   SPIEL_CHECK_EQ(player, 0);
 
   values->resize(game_.NumRows() * game_.NumColumns());
@@ -168,7 +169,7 @@ void CatchState::ObservationAsNormalizedVector(
 }
 
 void CatchState::InformationStateAsNormalizedVector(
-    int player, std::vector<double>* values) const {
+    Player player, std::vector<double>* values) const {
   SPIEL_CHECK_EQ(player, 0);
 
   values->resize(game_.NumColumns() + kNumActions * game_.NumRows());
@@ -183,7 +184,7 @@ void CatchState::InformationStateAsNormalizedVector(
   }
 }
 
-void CatchState::UndoAction(int player, Action move) {
+void CatchState::UndoAction(Player player, Action move) {
   if (player == kChancePlayerId) {
     initialized_ = false;
     return;
@@ -215,8 +216,8 @@ void CatchState::DoApplyAction(Action move) {
 
 CatchGame::CatchGame(const GameParameters& params)
     : Game(kGameType, params),
-      num_rows_(ParameterValue<int>("rows", kDefaultRows)),
-      num_columns_(ParameterValue<int>("columns", kDefaultColumns)) {}
+      num_rows_(ParameterValue<int>("rows")),
+      num_columns_(ParameterValue<int>("columns")) {}
 
 }  // namespace catch_
 }  // namespace open_spiel

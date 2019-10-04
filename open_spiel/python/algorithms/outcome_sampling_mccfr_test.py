@@ -18,7 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import unittest
+from absl.testing import absltest
 import numpy as np
 from open_spiel.python import policy
 from open_spiel.python.algorithms import exploitability
@@ -28,7 +28,7 @@ import pyspiel
 SEED = 39823987
 
 
-class OutcomeSamplingMCCFRTest(unittest.TestCase):
+class OutcomeSamplingMCCFRTest(absltest.TestCase):
 
   def test_outcome_sampling_leduc_2p(self):
     np.random.seed(SEED)
@@ -69,4 +69,4 @@ class OutcomeSamplingMCCFRTest(unittest.TestCase):
 
 
 if __name__ == "__main__":
-  unittest.main()
+  absltest.main()

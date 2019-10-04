@@ -14,6 +14,7 @@
 
 #include "open_spiel/games/chess.h"
 
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/games/chess/chess_board.h"
 #include "open_spiel/spiel_utils.h"
 
@@ -102,6 +103,7 @@ void ChessState::DoApplyAction(Action action) {
 
 std::vector<Action> ChessState::LegalActions() const {
   std::vector<Action> actions;
+  if (IsTerminal()) return actions;
   Board().GenerateLegalMoves([&actions](const Move& move) -> bool {
     actions.push_back(MoveToAction(move));
     return true;
@@ -110,7 +112,7 @@ std::vector<Action> ChessState::LegalActions() const {
   return actions;
 }
 
-std::string ChessState::ActionToString(int player, Action action) const {
+std::string ChessState::ActionToString(Player player, Action action) const {
   Move move = ActionToMove(action);
   return move.ToSAN(Board());
 }
@@ -126,12 +128,12 @@ std::vector<double> ChessState::Returns() const {
   }
 }
 
-std::string ChessState::InformationState(int player) const {
+std::string ChessState::InformationState(Player player) const {
   return ToString();
 }
 
 void ChessState::InformationStateAsNormalizedVector(
-    int player, std::vector<double>* values) const {
+    Player player, std::vector<double>* values) const {
   SPIEL_CHECK_NE(player, kChancePlayerId);
 
   std::size_t vector_size = 1;
@@ -181,7 +183,7 @@ std::unique_ptr<State> ChessState::Clone() const {
   return std::unique_ptr<State>(new ChessState(*this));
 }
 
-void ChessState::UndoAction(int player, Action action) {
+void ChessState::UndoAction(Player player, Action action) {
   // TODO: Make this fast by storing undo info in another stack.
   SPIEL_CHECK_GE(moves_history_.size(), 1);
   --repetitions_[current_board_.HashValue()];
@@ -199,7 +201,7 @@ bool ChessState::IsRepetitionDraw() const {
   return entry->second >= kNumRepetitionsToDraw;
 }
 
-Optional<std::vector<double>> ChessState::MaybeFinalReturns() const {
+absl::optional<std::vector<double>> ChessState::MaybeFinalReturns() const {
   if (Board().IrreversibleMoveCounter() >= kNumReversibleMovesToDraw) {
     // This is theoretically a draw that needs to be claimed, but we implement
     // it as a forced draw for now.
@@ -234,7 +236,7 @@ Optional<std::vector<double>> ChessState::MaybeFinalReturns() const {
     }
   }
 
-  return kNullopt;
+  return absl::nullopt;
 }
 
 ChessGame::ChessGame(const GameParameters& params) : Game(kGameType, params) {}

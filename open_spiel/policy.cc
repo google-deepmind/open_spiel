@@ -17,17 +17,18 @@
 #include <list>
 #include <memory>
 
+#include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
 
 double GetProb(const ActionsAndProbs& action_and_probs, Action action) {
-  for (const auto& action_and_prob : action_and_probs) {
-    if (action_and_prob.first == action) {
-      return action_and_prob.second;
-    }
-  }
-  return -1.0;
+  auto it = absl::c_find_if(action_and_probs,
+                            [&action](const std::pair<Action, double>& p) {
+                              return p.first == action;
+                            });
+  if (it == action_and_probs.end()) return -1.;
+  return it->second;
 }
 
 TabularPolicy::TabularPolicy(const Game& game)

@@ -148,7 +148,8 @@ class TabularPolicy(Policy):
     states: A `list` of the states as ordered in the `action_probability_array`.
     state_in: array of shape `(num_states, state_vector_size)` containing the
       normalised vector representation of each information state. Populated only
-      for games which support information_state_as_normalized_vector().
+      for games which support information_state_as_normalized_vector(), and is
+      None otherwise.
     game_type: The game attributes as returned by `Game::GetType`; used to
       determine whether to use information state or observation as the key in
       the tabular policy.
@@ -196,6 +197,7 @@ class TabularPolicy(Policy):
 
     # Put legal action masks in a numpy array and create the uniform random
     # policy.
+    self.state_in = None
     if state_in_list:
       self.state_in = np.array(state_in_list)
     self.legal_actions_mask = np.array(legal_actions_list)
@@ -347,7 +349,11 @@ class PolicyFromCallable(Policy):
   """For backwards-compatibility reasons, create a policy from a callable."""
 
   def __init__(self, game, callable_policy):
-    all_players = list(range(game.num_players()))
+    # When creating a Policy from a pyspiel_policy, we do not have the game.
+    if game is None:
+      all_players = None
+    else:
+      all_players = list(range(game.num_players()))
     super(PolicyFromCallable, self).__init__(game, all_players)
     self._callable_policy = callable_policy
 
@@ -396,3 +402,8 @@ def python_policy_to_pyspiel_policy(python_tabular_policy):
     probs = python_tabular_policy.policy_for_key(infostate)
     infostates_to_probabilities[infostate] = list(enumerate(probs))
   return pyspiel.TabularPolicy(infostates_to_probabilities)
+
+
+def policy_from_pyspiel_policy(pyspiel_policy):
+  """Returns a `policy.Policy` object from a `pyspiel.Policy` object."""
+  return PolicyFromCallable(None, pyspiel_policy.get_state_policy_as_map)

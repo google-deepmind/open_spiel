@@ -75,6 +75,7 @@ Here are for example the Python code to play one trajectory:
 ```python
 import random
 import pyspiel
+import numpy as np
 
 game = pyspiel.load_game("kuhn_poker")
 state = game.new_initial_state()

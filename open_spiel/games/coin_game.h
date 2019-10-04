@@ -70,16 +70,16 @@ class CoinState : public State {
   explicit CoinState(const CoinGame& parent_game);
   CoinState(const CoinState&) = default;
 
-  int CurrentPlayer() const override;
+  Player CurrentPlayer() const override;
   std::vector<Action> LegalActions() const override;
-  std::string ActionToString(int player, Action action_id) const override;
+  std::string ActionToString(Player player, Action action_id) const override;
   std::string ToString() const override;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
   std::unique_ptr<State> Clone() const override;
 
   ActionsAndProbs ChanceOutcomes() const override;
-  std::string Observation(int player) const override;
+  std::string Observation(Player player) const override;
 
  protected:
   void DoApplyAction(Action action) override;
@@ -90,8 +90,8 @@ class CoinState : public State {
   char GetField(Location loc) const;
   void SetField(Location loc, char symbol);
   bool InBounds(Location loc) const;
-  int GetPlayerCoinCount(int player, int coin_color) const;
-  void IncPlayerCoinCount(int player, int coin_color);
+  int GetPlayerCoinCount(Player player, int coin_color) const;
+  void IncPlayerCoinCount(Player player, int coin_color);
 
   void PrintCoinsCollected(std::ostream& out) const;
   void PrintPreferences(std::ostream& out) const;
@@ -105,7 +105,8 @@ class CoinState : public State {
 
   const CoinGame& game_;
   Setup setup_;
-  int cur_player_ = kChancePlayerId;  // Chance player for setting up the game.
+  Player cur_player_ =
+      kChancePlayerId;  // Chance player for setting up the game.
   int total_moves_ = 0;
   std::vector<int> player_preferences_;
   std::vector<Location> player_location_;

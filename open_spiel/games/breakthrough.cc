@@ -18,6 +18,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include "open_spiel/game_parameters.h"
 
 namespace open_spiel {
 namespace breakthrough {
@@ -52,8 +53,8 @@ const GameType kGameType{
     /*provides_observation=*/false,
     /*provides_observation_as_normalized_vector=*/false,
     /*parameter_specification=*/
-    {{"rows", {GameParameter::Type::kInt, false}},
-     {"columns", {GameParameter::Type::kInt, false}}}};
+    {{"rows", GameParameter(kDefaultRows)},
+     {"columns", GameParameter(kDefaultColumns)}}};
 
 std::unique_ptr<Game> Factory(const GameParameters& params) {
   return std::unique_ptr<Game>(new BreakthroughGame(params));
@@ -72,7 +73,7 @@ int StateToPlayer(CellState state) {
   }
 }
 
-CellState PlayerToState(int player) {
+CellState PlayerToState(Player player) {
   switch (player) {
     case 0:
       return CellState::kBlack;
@@ -189,7 +190,8 @@ void BreakthroughState::DoApplyAction(Action action) {
   total_moves_++;
 }
 
-std::string BreakthroughState::ActionToString(int player, Action action) const {
+std::string BreakthroughState::ActionToString(Player player,
+                                              Action action) const {
   std::vector<int> values(4, -1);
   UnrankActionMixedBase(action, {rows_, cols_, kNumDirections, 2}, &values);
   int r1 = values[0];
@@ -213,7 +215,8 @@ std::string BreakthroughState::ActionToString(int player, Action action) const {
 
 std::vector<Action> BreakthroughState::LegalActions() const {
   std::vector<Action> movelist;
-  const int player = CurrentPlayer();
+  if (IsTerminal()) return movelist;
+  const Player player = CurrentPlayer();
   CellState mystate = PlayerToState(player);
   std::vector<int> action_bases = {rows_, cols_, kNumDirections, 2};
   std::vector<int> action_values = {0, 0, 0, 0};
@@ -313,14 +316,14 @@ std::vector<double> BreakthroughState::Returns() const {
   }
 }
 
-std::string BreakthroughState::InformationState(int player) const {
+std::string BreakthroughState::InformationState(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   return ToString();
 }
 
 void BreakthroughState::InformationStateAsNormalizedVector(
-    int player, std::vector<double>* values) const {
+    Player player, std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
@@ -337,7 +340,7 @@ void BreakthroughState::InformationStateAsNormalizedVector(
   }
 }
 
-void BreakthroughState::UndoAction(int player, Action action) {
+void BreakthroughState::UndoAction(Player player, Action action) {
   std::vector<int> values(4, -1);
   UnrankActionMixedBase(action, {rows_, cols_, kNumDirections, 2}, &values);
   int r1 = values[0];
@@ -377,8 +380,8 @@ std::unique_ptr<State> BreakthroughState::Clone() const {
 
 BreakthroughGame::BreakthroughGame(const GameParameters& params)
     : Game(kGameType, params),
-      rows_(ParameterValue<int>("rows", kDefaultRows)),
-      cols_(ParameterValue<int>("columns", kDefaultColumns)) {}
+      rows_(ParameterValue<int>("rows")),
+      cols_(ParameterValue<int>("columns")) {}
 
 int BreakthroughGame::NumDistinctActions() const {
   return rows_ * cols_ * kNumDirections * 2;

@@ -18,13 +18,13 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import unittest
+from absl.testing import absltest
 
 from open_spiel.python.algorithms import sequence_form_lp
 import pyspiel
 
 
-class SFLPTest(unittest.TestCase):
+class SFLPTest(absltest.TestCase):
 
   def test_rock_paper_scissors(self):
     game = pyspiel.load_game_as_turn_based("matrix_rps")
@@ -84,4 +84,4 @@ class SFLPTest(unittest.TestCase):
 
 
 if __name__ == "__main__":
-  unittest.main()
+  absltest.main()

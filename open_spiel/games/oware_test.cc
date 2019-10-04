@@ -49,16 +49,16 @@ void LegalActionsLeaveTheOpponentSeedsTest() {
 
 void CaptureOpponentHousesTillBeginTest() {
   OwareState state(OwareBoard(0, {0, 0}, {0, 0, 8, 0, 0, 1, 1, 1, 1, 1, 2, 3}));
-  state.ApplyAction(2);
+  state.ApplyAction(2);  // Winning move
   SPIEL_CHECK_EQ(state.Board(),
-                 OwareBoard(1, {11, 0}, {0, 0, 0, 1, 1, 2, 0, 0, 0, 0, 0, 3}));
+                 OwareBoard(1, {15, 3}, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}));
 }
 
 void CaptureMostOpponentHousesTest() {
   OwareState state(OwareBoard(0, {0, 0}, {0, 0, 8, 0, 0, 1, 3, 1, 1, 1, 2, 0}));
-  state.ApplyAction(2);
+  state.ApplyAction(2);  // Winning move
   SPIEL_CHECK_EQ(state.Board(),
-                 OwareBoard(1, {9, 0}, {0, 0, 0, 1, 1, 2, 4, 0, 0, 0, 0, 0}));
+                 OwareBoard(1, {13, 4}, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}));
 }
 
 void NoCaptureBecauseTooFewSeedsTest() {

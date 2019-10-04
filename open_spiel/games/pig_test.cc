@@ -25,7 +25,7 @@ void BasicPigTests() {
   testing::LoadGameTest("pig");
   testing::ChanceOutcomesTest(*LoadGame("pig"));
   testing::RandomSimTest(*LoadGame("pig"), 100);
-  for (int players = 3; players <= 5; players++) {
+  for (Player players = 3; players <= 5; players++) {
     testing::RandomSimTest(
         *LoadGame("pig", {{"players", GameParameter(players)}}), 100);
   }

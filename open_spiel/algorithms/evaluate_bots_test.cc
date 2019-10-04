@@ -21,8 +21,8 @@ namespace {
 
 void BotTest_RandomVsRandom() {
   auto game = LoadGame("kuhn_poker");
-  auto bot0 = MakeUniformRandomBot(*game, /*player_id=*/0, /*seed=*/1234);
-  auto bot1 = MakeUniformRandomBot(*game, /*player_id=*/1, /*seed=*/4321);
+  auto bot0 = MakeUniformRandomBot(*game, Player{0}, /*seed=*/1234);
+  auto bot1 = MakeUniformRandomBot(*game, Player{1}, /*seed=*/4321);
   constexpr int num_players = 2;
   std::vector<double> average_results(num_players);
   constexpr int num_iters = 100000;
@@ -30,12 +30,12 @@ void BotTest_RandomVsRandom() {
     auto this_results =
         EvaluateBots(game->NewInitialState().get(), {bot0.get(), bot1.get()},
                      /*seed=*/iteration);
-    for (int i = 0; i < num_players; ++i) {
-      average_results[i] += this_results[i];
+    for (auto p = Player{0}; p < num_players; ++p) {
+      average_results[p] += this_results[p];
     }
   }
-  for (int i = 0; i < num_players; ++i) {
-    average_results[i] /= num_iters;
+  for (auto p = Player{0}; p < num_players; ++p) {
+    average_results[p] /= num_iters;
   }
 
   SPIEL_CHECK_FLOAT_NEAR(average_results[0], 0.125, 0.01);

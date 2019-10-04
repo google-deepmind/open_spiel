@@ -62,17 +62,17 @@ class LeducState : public State {
  public:
   explicit LeducState(int num_players, const LeducGame& parent);
 
-  int CurrentPlayer() const override;
-  std::string ActionToString(int player, Action move) const override;
+  Player CurrentPlayer() const override;
+  std::string ActionToString(Player player, Action move) const override;
   std::string ToString() const override;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
-  std::string InformationState(int player) const override;
-  std::string Observation(int player) const override;
+  std::string InformationState(Player player) const override;
+  std::string Observation(Player player) const override;
   void InformationStateAsNormalizedVector(
-      int player, std::vector<double>* values) const override;
+      Player player, std::vector<double>* values) const override;
   void ObservationAsNormalizedVector(
-      int player, std::vector<double>* values) const override;
+      Player player, std::vector<double>* values) const override;
   std::unique_ptr<State> Clone() const override;
   // The probability of taking each possible action in a particular info state.
   std::vector<std::pair<Action, double>> ChanceOutcomes() const override;
@@ -82,7 +82,7 @@ class LeducState : public State {
   int deck_size() const { return deck_size_; }
   int public_card() const { return public_card_; }
   int raises() const { return num_raises_; }
-  int private_card(int player) const { return private_cards_[player]; }
+  int private_card(Player player) const { return private_cards_[player]; }
   std::vector<Action> LegalActions() const override;
 
   // Returns a vector of MaxGameLength containing all of the betting actions
@@ -113,14 +113,14 @@ class LeducState : public State {
   void ResolveWinner();
   bool ReadyForNextRound() const;
   void NewRound();
-  int RankHand(int player) const;
+  int RankHand(Player player) const;
   void SequenceAppendMove(int move);
-  void Ante(int player, int amount);
+  void Ante(Player player, int amount);
 
   const LeducGame& parent_game_;
 
   // Fields sets to bad/invalid values. Use Game::NewInitialState().
-  int cur_player_;
+  Player cur_player_;
 
   int num_calls_;    // Number of calls this round (total, not per player).
   int num_raises_;   // Number of raises made in the round (not per player).

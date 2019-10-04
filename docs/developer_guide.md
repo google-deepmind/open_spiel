@@ -24,6 +24,14 @@ For Python you have:
 *   `open_spiel/python/examples`: The Python examples.
 *   `open_spiel/python/algorithms/`: The Python algorithms.
 
+## CPP and Python implementations.
+
+Some objects (e.g. `Policy`, `CFRSolver`, `BestResponse`) are available both in
+C++ and Python. The goal is to be able to use C++ objects in place of Python
+objects for most of the cases. In particular, for the objects that are well
+supported, expect to have in the test for the Python object, a test checking
+that both the C++ and the Python implementation behave the same.
+
 ## Adding a game
 
 We describe here only the simplest and fastest way to add a new game. It is
@@ -51,8 +59,6 @@ ideal to first be aware of the general API (see `spiel.h`).
     *   At the top of `new_game.cc`, change the short name to `new_game` and
         include the new game’s header.
 5.  Update Python integration tests:
-    *   Add the short name to the list of excluded games in
-        `integration_tests/api_test.py`.
     *   Add the short name to the list of expected games in
         `python/tests/pyspiel_test.py`.
 6.  You should now have a duplicate game of Tic-Tac-Toe under a different name.

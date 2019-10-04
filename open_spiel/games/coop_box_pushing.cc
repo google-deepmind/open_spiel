@@ -76,7 +76,7 @@ const GameType kGameType{
     /*provides_observation=*/false,
     /*provides_observation_as_normalized_vector=*/false,
     /*parameter_specification=*/
-    {{"horizon", {GameParameter::Type::kInt, false}}}};
+    {{"horizon", GameParameter(kDefaultHorizon)}}};
 
 std::unique_ptr<Game> Factory(const GameParameters& params) {
   return std::unique_ptr<Game>(new CoopBoxPushingGame(params));
@@ -171,7 +171,7 @@ CoopBoxPushingState::CoopBoxPushingState(int horizon)
   SetPlayer({6, 6}, 1, OrientationType::kWest);
 }
 
-std::string CoopBoxPushingState::ActionToString(int player,
+std::string CoopBoxPushingState::ActionToString(Player player,
                                                 Action action) const {
   return ::open_spiel::coop_box_pushing::ActionToString(action);
 }
@@ -180,14 +180,14 @@ void CoopBoxPushingState::SetField(std::pair<int, int> coord, char v) {
   field_[coord.first * kCols + coord.second] = v;
 }
 
-void CoopBoxPushingState::SetPlayer(std::pair<int, int> coord, int player,
+void CoopBoxPushingState::SetPlayer(std::pair<int, int> coord, Player player,
                                     OrientationType orientation) {
   SetField(coord, ToCharacter(orientation));
   player_coords_[player] = coord;
   player_orient_[player] = orientation;
 }
 
-void CoopBoxPushingState::SetPlayer(std::pair<int, int> coord, int player) {
+void CoopBoxPushingState::SetPlayer(std::pair<int, int> coord, Player player) {
   SetPlayer(coord, player, player_orient_[player]);
 }
 
@@ -208,7 +208,7 @@ bool CoopBoxPushingState::InBounds(std::pair<int, int> coord) const {
           coord.second < kCols);
 }
 
-void CoopBoxPushingState::MoveForward(int player) {
+void CoopBoxPushingState::MoveForward(Player player) {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LE(player, 1);
 
@@ -354,9 +354,11 @@ void CoopBoxPushingState::DoApplyAction(Action action) {
   }
 }
 
-std::vector<Action> CoopBoxPushingState::LegalActions(int player) const {
+std::vector<Action> CoopBoxPushingState::LegalActions(Player player) const {
   if (player == kSimultaneousPlayerId) {
     return LegalFlatJointActions();
+  } else if (IsTerminal()) {
+    return {};
   }
   // All the actions are legal at every state.
   return {0, 1, 2, 3};
@@ -409,12 +411,12 @@ std::vector<double> CoopBoxPushingState::Rewards() const {
 }
 
 bool CoopBoxPushingState::SameAsPlayer(std::pair<int, int> coord,
-                                       int player) const {
+                                       Player player) const {
   return coord == player_coords_[player];
 }
 
 int CoopBoxPushingState::ObservationPlane(std::pair<int, int> coord,
-                                          int player) const {
+                                          Player player) const {
   int plane = 0;
   switch (field(coord)) {
     case kField:
@@ -449,7 +451,7 @@ int CoopBoxPushingState::ObservationPlane(std::pair<int, int> coord,
 }
 
 void CoopBoxPushingState::InformationStateAsNormalizedVector(
-    int player, std::vector<double>* values) const {
+    Player player, std::vector<double>* values) const {
   values->resize(kCellStates * kRows * kCols);
   int plane_size = kRows * kCols;
 
@@ -468,7 +470,7 @@ std::unique_ptr<State> CoopBoxPushingState::Clone() const {
 
 CoopBoxPushingGame::CoopBoxPushingGame(const GameParameters& params)
     : SimMoveGame(kGameType, params),
-      horizon_(ParameterValue<int>("horizon", kDefaultHorizon)) {}
+      horizon_(ParameterValue<int>("horizon")) {}
 
 std::vector<int> CoopBoxPushingGame::InformationStateNormalizedVectorShape()
     const {

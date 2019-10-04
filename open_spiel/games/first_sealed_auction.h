@@ -47,19 +47,19 @@ class FPSBAState : public State {
   FPSBAState(int num_distinct_actions, int num_players);
   FPSBAState(const FPSBAState& other) = default;
 
-  int CurrentPlayer() const override;
+  Player CurrentPlayer() const override;
   std::vector<Action> LegalActions() const override;
-  std::string ActionToString(int player, Action action_id) const override;
+  std::string ActionToString(Player player, Action action_id) const override;
   std::string ToString() const override;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
   std::unique_ptr<State> Clone() const override;
-  std::string InformationState(int player) const override;
+  std::string InformationState(Player player) const override;
   void InformationStateAsNormalizedVector(
-      int player, std::vector<double>* values) const override;
-  std::string Observation(int player) const override;
+      Player player, std::vector<double>* values) const override;
+  std::string Observation(Player player) const override;
   void ObservationAsNormalizedVector(
-      int player, std::vector<double>* values) const override;
+      Player player, std::vector<double>* values) const override;
   ActionsAndProbs ChanceOutcomes() const override;
 
  protected:

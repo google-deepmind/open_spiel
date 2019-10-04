@@ -47,7 +47,7 @@ namespace algorithms {
 std::pair<double, Action> AlphaBetaSearch(
     const Game& game, const State* state,
     std::function<double(const State&)> value_function, int depth_limit,
-    int maximizing_player_id);
+    Player maximizing_player);
 
 }  // namespace algorithms
 }  // namespace open_spiel

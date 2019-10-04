@@ -40,8 +40,7 @@ const GameType kGameType{
     /*provides_observation_as_normalized_vector=*/true,
     /*parameter_specification=*/
     {
-        {"ansi_color_output",
-         GameType::ParameterSpec{GameParameter::Type::kBool, false}},
+        {"ansi_color_output", GameParameter(false)},
     }};
 
 std::unique_ptr<Game> Factory(const GameParameters& params) {
@@ -139,6 +138,7 @@ PentagoState::PentagoState(bool ansi_color_output)
 std::vector<Action> PentagoState::LegalActions() const {
   // Can move in any empty cell, and do all rotations.
   std::vector<Action> moves;
+  if (IsTerminal()) return moves;
   moves.reserve((kBoardPositions - moves_made_) * kPossibleRotations);
   for (int y = 0; y < kBoardSize; y++) {
     for (int x = 0; x < kBoardSize; x++) {
@@ -152,7 +152,8 @@ std::vector<Action> PentagoState::LegalActions() const {
   return moves;
 }
 
-std::string PentagoState::ActionToString(int player, Action action_id) const {
+std::string PentagoState::ActionToString(Player player,
+                                         Action action_id) const {
   Move m(action_id);
   return absl::StrCat(std::string(1, static_cast<char>('a' + m.x)),
                       std::string(1, static_cast<char>('1' + m.y)),
@@ -210,7 +211,7 @@ std::string PentagoState::ToString() const {
   return out.str();
 }
 
-Player PentagoState::get(int i) const {
+PentagoPlayer PentagoState::get(int i) const {
   return (board_[0] & xy_bit_mask[i]
               ? kPlayer1
               : board_[1] & xy_bit_mask[i] ? kPlayer2 : kPlayerNone);
@@ -223,18 +224,18 @@ std::vector<double> PentagoState::Returns() const {
   return {0, 0};  // Unfinished
 }
 
-std::string PentagoState::InformationState(int player) const {
+std::string PentagoState::InformationState(Player player) const {
   return HistoryString();
 }
 
-std::string PentagoState::Observation(int player) const {
+std::string PentagoState::Observation(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   return ToString();
 }
 
 void PentagoState::ObservationAsNormalizedVector(
-    int player, std::vector<double>* values) const {
+    Player player, std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
@@ -291,7 +292,7 @@ std::unique_ptr<State> PentagoState::Clone() const {
 
 PentagoGame::PentagoGame(const GameParameters& params)
     : Game(kGameType, params),
-      ansi_color_output_(ParameterValue<bool>("ansi_color_output", false)) {}
+      ansi_color_output_(ParameterValue<bool>("ansi_color_output")) {}
 
 }  // namespace pentago
 }  // namespace open_spiel

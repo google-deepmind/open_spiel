@@ -46,7 +46,7 @@ std::unique_ptr<Game> Factory(const GameParameters& params) {
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
 
-CellState PlayerToState(int player) {
+CellState PlayerToState(Player player) {
   switch (player) {
     case 0:
       return CellState::kCross;
@@ -99,25 +99,26 @@ void ConnectFourState::DoApplyAction(Action move) {
 std::vector<Action> ConnectFourState::LegalActions() const {
   // Can move in any non-full column.
   std::vector<Action> moves;
+  if (IsTerminal()) return moves;
   for (int col = 0; col < kCols; ++col) {
     if (CellAt(kRows - 1, col) == CellState::kEmpty) moves.push_back(col);
   }
   return moves;
 }
 
-std::string ConnectFourState::ActionToString(int player,
+std::string ConnectFourState::ActionToString(Player player,
                                              Action action_id) const {
   return absl::StrCat(StateToString(PlayerToState(player)), action_id);
 }
 
-bool ConnectFourState::HasLineFrom(int player, int row, int col) const {
+bool ConnectFourState::HasLineFrom(Player player, int row, int col) const {
   return HasLineFromInDirection(player, row, col, 0, 1) ||
          HasLineFromInDirection(player, row, col, -1, -1) ||
          HasLineFromInDirection(player, row, col, -1, 0) ||
          HasLineFromInDirection(player, row, col, -1, 1);
 }
 
-bool ConnectFourState::HasLineFromInDirection(int player, int row, int col,
+bool ConnectFourState::HasLineFromInDirection(Player player, int row, int col,
                                               int drow, int dcol) const {
   if (row + 3 * drow >= kRows || col + 3 * dcol >= kCols ||
       row + 3 * drow < 0 || col + 3 * dcol < 0)
@@ -131,7 +132,7 @@ bool ConnectFourState::HasLineFromInDirection(int player, int row, int col,
   return true;
 }
 
-bool ConnectFourState::HasLine(int player) const {
+bool ConnectFourState::HasLine(Player player) const {
   CellState c = PlayerToState(player);
   for (int col = 0; col < kCols; ++col) {
     for (int row = 0; row < kRows; ++row) {
@@ -173,14 +174,14 @@ std::vector<double> ConnectFourState::Returns() const {
   return {0.0, 0.0};
 }
 
-std::string ConnectFourState::InformationState(int player) const {
+std::string ConnectFourState::InformationState(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   return ToString();
 }
 
 void ConnectFourState::InformationStateAsNormalizedVector(
-    int player, std::vector<double>* values) const {
+    Player player, std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
@@ -191,7 +192,7 @@ void ConnectFourState::InformationStateAsNormalizedVector(
   }
 }
 
-void ConnectFourState::UndoAction(int player, Action move) {
+void ConnectFourState::UndoAction(Player player, Action move) {
   board_[move] = CellState::kEmpty;
   current_player_ = player;
   history_.pop_back();

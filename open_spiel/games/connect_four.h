@@ -57,17 +57,17 @@ class ConnectFourState : public State {
   ConnectFourState(const ConnectFourState& other) = default;
   explicit ConnectFourState(int num_distinct_actions, const std::string& str);
 
-  int CurrentPlayer() const override;
+  Player CurrentPlayer() const override;
   std::vector<Action> LegalActions() const override;
-  std::string ActionToString(int player, Action action_id) const override;
+  std::string ActionToString(Player player, Action action_id) const override;
   std::string ToString() const override;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
-  std::string InformationState(int player) const override;
+  std::string InformationState(Player player) const override;
   void InformationStateAsNormalizedVector(
-      int player, std::vector<double>* values) const override;
+      Player player, std::vector<double>* values) const override;
   std::unique_ptr<State> Clone() const override;
-  void UndoAction(int player, Action move) override;
+  void UndoAction(Player player, Action move) override;
 
  protected:
   void DoApplyAction(Action move) override;
@@ -75,12 +75,12 @@ class ConnectFourState : public State {
  private:
   CellState& CellAt(int row, int col);
   CellState CellAt(int row, int col) const;
-  bool HasLine(int player) const;  // Does this player have a line?
-  bool HasLineFrom(int player, int row, int col) const;
-  bool HasLineFromInDirection(int player, int row, int col, int drow,
+  bool HasLine(Player player) const;  // Does this player have a line?
+  bool HasLineFrom(Player player, int row, int col) const;
+  bool HasLineFromInDirection(Player player, int row, int col, int drow,
                               int dcol) const;
-  bool IsFull() const;      // Is the board full?
-  int current_player_ = 0;  // Player zero goes first
+  bool IsFull() const;         // Is the board full?
+  Player current_player_ = 0;  // Player zero goes first
   std::array<CellState, kNumCells> board_;
 };
 
@@ -88,7 +88,7 @@ class ConnectFourState : public State {
 class ConnectFourGame : public Game {
  public:
   explicit ConnectFourGame(const GameParameters& params);
-  int NumDistinctActions() const override { return kNumCells; }
+  int NumDistinctActions() const override { return kCols; }
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(new ConnectFourState(NumDistinctActions()));
   }

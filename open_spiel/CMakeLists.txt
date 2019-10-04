@@ -38,8 +38,6 @@ set (OPEN_SPIEL_CORE_FILES
   policy.cc
   simultaneous_move_game.h
   simultaneous_move_game.cc
-  spiel_optional.h
-  spiel_optional.cc
   spiel_utils.h
   spiel_utils.cc
 )
@@ -50,7 +48,8 @@ add_subdirectory (abseil-cpp)
 # Just the core without any of the games
 add_library(open_spiel_core OBJECT ${OPEN_SPIEL_CORE_FILES})
 target_include_directories (open_spiel_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} abseil-cpp)
-link_libraries(open_spiel_core absl::strings absl::str_format absl::time)
+link_libraries(open_spiel_core absl::container absl::strings absl::str_format
+               absl::time absl::optional)
 
 # Just the minimal base library: no games.
 set (OPEN_SPIEL_CORE_OBJECTS $<TARGET_OBJECTS:open_spiel_core>)
@@ -60,6 +59,7 @@ set (OPEN_SPIEL_OBJECTS
   $<TARGET_OBJECTS:games>
   $<TARGET_OBJECTS:game_transforms>
   $<TARGET_OBJECTS:bridge_double_dummy_solver>
+  # $<TARGET_OBJECTS:hanabi_learning_environment>
   $<TARGET_OBJECTS:algorithms>
 )
 

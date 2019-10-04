@@ -26,6 +26,7 @@
 #include <utility>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel_utils.h"
 
@@ -127,12 +128,7 @@ struct GameType {
   bool provides_observation;
   bool provides_observation_as_normalized_vector;
 
-  // The parameters that can be supplied when creating an instance of the game.
-  struct ParameterSpec {
-    GameParameter::Type type;  // Parameter type.
-    bool is_mandatory;         // True if the parameter must be supplied.
-  };
-  std::map<std::string, ParameterSpec> parameter_specification;
+  std::map<std::string, GameParameter> parameter_specification;
   bool ContainsRequiredParameters() const;
 };
 
@@ -164,7 +160,7 @@ class State {
   // Returns current player. Player numbers start from 0.
   // Negative numbers are for chance (-1) or simultaneous (-2).
   // kTerminalState should be returned on a TerminalNode().
-  virtual int CurrentPlayer() const = 0;
+  virtual Player CurrentPlayer() const = 0;
 
   // Change the state of the game by applying the specified action in turn-based
   // games. This function encodes the logic of the game rules. Returns true
@@ -184,16 +180,16 @@ class State {
     history_.push_back(action_id);
   }
 
-  // `LegalActions(int player)` is valid for all nodes in all games, returning
-  // an empty list for players who don't act at this state.
-  // The actions should be returned in ascending order.
+  // `LegalActions(Player player)` is valid for all nodes in all games,
+  // returning an empty list for players who don't act at this state. The
+  // actions should be returned in ascending order.
   //
   // This default implementation is fine for turn-based games, but should
   // be overridden by simultaneous-move games.
   //
   // Since games mostly override LegalActions(), this method will not be visible
   // in derived classes unless a using directive is added.
-  virtual std::vector<Action> LegalActions(int player) const {
+  virtual std::vector<Action> LegalActions(Player player) const {
     if (!IsTerminal() && player == CurrentPlayer()) {
       return IsChanceNode() ? LegalChanceOutcomes() : LegalActions();
     } else {
@@ -209,14 +205,14 @@ class State {
   //
   // In simultaneous-move games, the abstract base class implements it in
   // terms of LegalActions(player) and LegalChanceOutcomes(), and so derived
-  // classes only need to implement `LegalActions(int player)`.
+  // classes only need to implement `LegalActions(Player player)`.
   // This will result in LegalActions() being hidden unless a using directive
   // is added.
   virtual std::vector<Action> LegalActions() const = 0;
 
   // Returns a vector of length `game.NumDistinctActions()` containing 1 for
   // legal actions and 0 for illegal actions.
-  std::vector<int> LegalActionsMask(int player) const {
+  std::vector<int> LegalActionsMask(Player player) const {
     std::vector<int> mask(num_distinct_actions_, 0);
     std::vector<Action> legal_actions = LegalActions(player);
 
@@ -236,7 +232,7 @@ class State {
   // for chess the string "Nf3" would correspond to different starting squares
   // in different states (and hence probably different action ids).
   // This method will format chance outcomes if player == kChancePlayer
-  virtual std::string ActionToString(int player, Action action_id) const = 0;
+  virtual std::string ActionToString(Player player, Action action_id) const = 0;
 
   // Returns a string representation of the state. This has no particular
   // semantics and is targeting debugging code.
@@ -273,7 +269,7 @@ class State {
 
   // Returns Reward for one player (see above for definition). If Rewards for
   // multiple players are required it is more efficient to use Rewards() above.
-  virtual double PlayerReward(int player) const {
+  virtual double PlayerReward(Player player) const {
     auto rewards = Rewards();
     SPIEL_CHECK_LT(player, rewards.size());
     return rewards[player];
@@ -281,7 +277,7 @@ class State {
 
   // Returns Return for one player (see above for definition). If Returns for
   // multiple players are required it is more efficient to use Returns() above.
-  virtual double PlayerReturn(int player) const {
+  virtual double PlayerReturn(Player player) const {
     auto returns = Returns();
     SPIEL_CHECK_LT(player, returns.size());
     return returns[player];
@@ -333,7 +329,7 @@ class State {
 
   // There are currently no use-case for calling this function with
   // 'kChancePlayerId'. Thus, games are expected to raise an error in that case.
-  virtual std::string InformationState(int player) const {
+  virtual std::string InformationState(Player player) const {
     SpielFatalError("InformationState is not implemented.");
   }
 
@@ -352,12 +348,12 @@ class State {
   // There are currently no use-case for calling this function with
   // 'kChancePlayerId'. Thus, games are expected to raise an error in that case.
   virtual void InformationStateAsNormalizedVector(
-      int player, std::vector<double>* values) const {
+      Player player, std::vector<double>* values) const {
     SpielFatalError("InformationStateAsNormalizedVector unimplemented!");
   }
 
   virtual std::vector<double> InformationStateAsNormalizedVector(
-      int player) const {
+      Player player) const {
     std::vector<double> normalized_info_state;
     InformationStateAsNormalizedVector(player, &normalized_info_state);
     return normalized_info_state;
@@ -381,7 +377,7 @@ class State {
   // Note that neither of these are valid information states, since the same
   // observation may arise from two different observation histories (i.e. they
   // are not perfect recall).
-  virtual std::string Observation(int player) const {
+  virtual std::string Observation(Player player) const {
     SpielFatalError("Observation is not implemented.");
   }
 
@@ -390,11 +386,12 @@ class State {
   }
 
   virtual void ObservationAsNormalizedVector(
-      int player, std::vector<double>* values) const {
+      Player player, std::vector<double>* values) const {
     SpielFatalError("ObservationAsNormalizedVector unimplemented!");
   }
 
-  virtual std::vector<double> ObservationAsNormalizedVector(int player) const {
+  virtual std::vector<double> ObservationAsNormalizedVector(
+      Player player) const {
     std::vector<double> normalized_observation;
     ObservationAsNormalizedVector(player, &normalized_observation);
     return normalized_observation;
@@ -420,7 +417,7 @@ class State {
   // undo an action. It is only necessary for algorithms that need a fast undo
   // (e.g. minimax search).
   // One must call history_.pop_back() in the implementations.
-  virtual void UndoAction(int player, Action action) {
+  virtual void UndoAction(Player player, Action action) {
     SpielFatalError("UndoAction function is not overridden; not undoing.");
   }
 
@@ -529,7 +526,7 @@ class Game {
   virtual int NumPlayers() const = 0;
 
   // Utility range. These functions define the lower and upper bounds on the
-  // values returned by State::PlayerReturn(int player) over all valid player
+  // values returned by State::PlayerReturn(Player player) over all valid player
   // numbers. This range should be as tight as possible; the intention is to
   // give some information to algorithms that require it, and so their
   // performance may suffer if the range is not tight. Loss/win/draw outcomes
@@ -624,14 +621,13 @@ class Game {
   Game(GameType game_type, GameParameters game_parameters)
       : game_type_(game_type), game_parameters_(game_parameters) {}
 
-  // Access to game parameters.
+  // Access to game parameters. Returns the value provided by the user. If not:
+  // - Defaults to the value stored as the default in
+  // game_type.parameter_specification if the `default_value` is absl::nullopt
+  // - Returns `default_value` if provided.
   template <typename T>
-  T ParameterValue(const std::string& key) const;
-
-  // Access to game parameters; returns the default value if no parameter
-  // was specified, and records the value used.
-  template <typename T>
-  T ParameterValue(const std::string& key, T default_value) const;
+  T ParameterValue(const std::string& key,
+                   absl::optional<T> default_value = absl::nullopt) const;
 
   // The game type.
   GameType game_type_;

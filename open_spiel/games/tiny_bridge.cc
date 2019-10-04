@@ -14,6 +14,7 @@
 
 #include "open_spiel/games/tiny_bridge.h"
 
+#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/algorithms/minimax.h"
 #include "open_spiel/spiel.h"
 
@@ -44,16 +45,16 @@ int CharToRank(char c) {
   SpielFatalError(absl::StrCat("Unknown rank '", std::string(1, c), "'"));
 }
 
-int CharToSuit(char c) {
+int CharToTrumps(char c) {
   switch (c) {
     case 'H':
       return 0;
     case 'S':
       return 1;
-    case 'N':
+    case 'N':  // No-trump
       return 2;
   }
-  SpielFatalError(absl::StrCat("Unknown suit '", std::string(1, c), "'"));
+  SpielFatalError(absl::StrCat("Unknown trump suit '", std::string(1, c), "'"));
 }
 
 int CharToHand(char c) {
@@ -71,7 +72,7 @@ int CharToHand(char c) {
 }
 
 int StringToCard(const std::string& s) {
-  return CharToRank(s[1]) + kNumRanks * CharToSuit(s[0]);
+  return CharToRank(s[1]) + kNumRanks * CharToTrumps(s[0]);
 }
 
 std::string CardString(int card) {
@@ -79,21 +80,33 @@ std::string CardString(int card) {
                       std::string(1, kRankChar[Rank(card)]));
 }
 
+// Requires card0 > card1
+int CardsToChanceOutcome(int card0, int card1) {
+  return (card0 * (card0 - 1)) / 2 + card1;
+}
+
+// Returns first > second
+std::pair<int, int> ChanceOutcomeToCards(int outcome) {
+  int card0 = 1;
+  while (CardsToChanceOutcome(card0 + 1, 0) <= outcome) ++card0;
+  return {card0, outcome - CardsToChanceOutcome(card0, 0)};
+}
+
 // Facts about the game
 const GameType kGameType2p{
     /*short_name=*/"tiny_bridge_2p",
     /*long_name=*/"Tiny Bridge (Uncontested)",
     GameType::Dynamics::kSequential,
-    GameType::ChanceMode::kDeterministic,
-    GameType::Information::kPerfectInformation,
+    GameType::ChanceMode::kExplicitStochastic,
+    GameType::Information::kImperfectInformation,
     GameType::Utility::kIdentical,
     GameType::RewardModel::kTerminal,
     /*max_num_players=*/2,
     /*min_num_players=*/2,
     /*provides_information_state=*/true,
-    /*provides_information_state_as_normalized_vector=*/false,
-    /*provides_observation=*/false,
-    /*provides_observation_as_normalized_vector=*/false,
+    /*provides_information_state_as_normalized_vector=*/true,
+    /*provides_observation=*/true,
+    /*provides_observation_as_normalized_vector=*/true,
     /*parameter_specification=*/{}  // no parameters
 };
 
@@ -101,15 +114,15 @@ const GameType kGameType4p{
     /*short_name=*/"tiny_bridge_4p",
     /*long_name=*/"Tiny Bridge (Contested)",
     GameType::Dynamics::kSequential,
-    GameType::ChanceMode::kDeterministic,
-    GameType::Information::kPerfectInformation,
+    GameType::ChanceMode::kExplicitStochastic,
+    GameType::Information::kImperfectInformation,
     GameType::Utility::kZeroSum,
     GameType::RewardModel::kTerminal,
     /*max_num_players=*/4,
     /*min_num_players=*/4,
     /*provides_information_state=*/true,
     /*provides_information_state_as_normalized_vector=*/false,
-    /*provides_observation=*/false,
+    /*provides_observation=*/true,
     /*provides_observation_as_normalized_vector=*/false,
     /*parameter_specification=*/{}  // no parameters
 };
@@ -132,12 +145,18 @@ const GameType kGameTypePlay{
     /*provides_observation_as_normalized_vector=*/false,
     /*parameter_specification=*/
     {
-        {"trumps", {GameParameter::Type::kString, true}},
-        {"leader", {GameParameter::Type::kString, true}},
-        {"hand_W", {GameParameter::Type::kString, true}},
-        {"hand_N", {GameParameter::Type::kString, true}},
-        {"hand_E", {GameParameter::Type::kString, true}},
-        {"hand_S", {GameParameter::Type::kString, true}},
+        {"trumps",
+         GameParameter(GameParameter::Type::kString, /*is_mandatory=*/true)},
+        {"leader",
+         GameParameter(GameParameter::Type::kString, /*is_mandatory=*/true)},
+        {"hand_W",
+         GameParameter(GameParameter::Type::kString, /*is_mandatory=*/true)},
+        {"hand_N",
+         GameParameter(GameParameter::Type::kString, /*is_mandatory=*/true)},
+        {"hand_E",
+         GameParameter(GameParameter::Type::kString, /*is_mandatory=*/true)},
+        {"hand_S",
+         GameParameter(GameParameter::Type::kString, /*is_mandatory=*/true)},
     }};
 
 std::unique_ptr<Game> Factory2p(const GameParameters& params) {
@@ -186,7 +205,7 @@ TinyBridgePlayGame::TinyBridgePlayGame(const GameParameters& params)
     : Game(kGameTypePlay, params) {}
 
 std::unique_ptr<State> TinyBridgePlayGame::NewInitialState() const {
-  int trumps = CharToSuit(ParameterValue<std::string>("trumps")[0]);
+  int trumps = CharToTrumps(ParameterValue<std::string>("trumps")[0]);
   int leader = CharToHand(ParameterValue<std::string>("leader")[0]);
   std::array<int, kNumCards> holder;
   for (int i = 0; i < kNumHands; ++i) {
@@ -201,18 +220,16 @@ std::unique_ptr<State> TinyBridgePlayGame::NewInitialState() const {
       NumDistinctActions(), NumPlayers(), trumps, leader, holder));
 }
 
-std::string TinyBridgeAuctionState::HandString(int player) const {
-  if (player >= actions_.size()) return "??";
+std::string TinyBridgeAuctionState::HandString(Player player) const {
+  if (!IsDealt(player)) return "??";
   return ActionToString(kChancePlayerId, actions_[player]);
 }
 
 std::string TinyBridgeAuctionState::DealString() const {
   std::string deal;
-  for (int player = 0; player < num_players_; ++player) {
-    int hand = (num_players_ == 2) ? (2 * player) : player;
+  for (auto player = Player{0}; player < num_players_; ++player) {
     if (player != 0) deal.push_back(' ');
-    deal.append(
-        absl::StrCat(std::string(1, kHandChar[hand]), ":", HandString(player)));
+    absl::StrAppend(&deal, HandName(player), ":", HandString(player));
   }
   return deal;
 }
@@ -222,18 +239,18 @@ TinyBridgeAuctionState::AuctionState TinyBridgeAuctionState::AnalyzeAuction()
   AuctionState rv;
   rv.last_bid = Call::kPass;
   rv.last_bidder = kInvalidPlayer;
-  rv.doubled = false;
-  rv.redoubled = false;
+  rv.doubler = kInvalidPlayer;
+  rv.redoubler = kInvalidPlayer;
   for (int i = num_players_; i < actions_.size(); ++i) {
     if (actions_[i] == Call::kDouble) {
-      rv.doubled = true;
+      rv.doubler = i % num_players_;
     } else if (actions_[i] == Call::kRedouble) {
-      rv.redoubled = true;
+      rv.redoubler = i % num_players_;
     } else if (actions_[i] != Call::kPass) {
       rv.last_bid = actions_[i];
       rv.last_bidder = i % num_players_;
-      rv.doubled = false;
-      rv.redoubled = false;
+      rv.doubler = kInvalidPlayer;
+      rv.redoubler = kInvalidPlayer;
     }
   }
   return rv;
@@ -251,7 +268,8 @@ int TinyBridgeAuctionState::Score_p0(std::array<int, kNumCards> holder) const {
   const int tricks =
       algorithms::AlphaBetaSearch(game, &play, nullptr, -1, decl).first;
   const int declarer_score =
-      Score(state.last_bid, tricks, state.doubled, state.redoubled);
+      Score(state.last_bid, tricks, state.doubler != kInvalidPlayer,
+            state.redoubler != kInvalidPlayer);
   if (num_players_ == 2)
     return declarer_score;
   else
@@ -263,10 +281,9 @@ std::array<int, kNumCards> TinyBridgeAuctionState::CardHolders() const {
   std::fill(holder.begin(), holder.end(), kInvalidPlayer);
   for (int i = 0; i < actions_.size() && i < num_players_; ++i) {
     int action_id = actions_[i];
-    const int card1 = action_id % kNumCards;
-    const int card2 = action_id / kNumCards;
-    holder[card1] = i;
-    holder[card2] = i;
+    const auto cards = ChanceOutcomeToCards(action_id);
+    holder[cards.first] = i;
+    holder[cards.second] = i;
   }
   return holder;
 }
@@ -321,6 +338,8 @@ std::vector<Action> TinyBridgeAuctionState::LegalActions() const {
   std::vector<Action> actions;
   if (IsChanceNode()) {
     return LegalChanceOutcomes();
+  } else if (IsTerminal()) {
+    return {};
   } else {
     auto state = AnalyzeAuction();
     actions.push_back(Call::kPass);
@@ -329,9 +348,10 @@ std::vector<Action> TinyBridgeAuctionState::LegalActions() const {
     }
     if (num_players_ == 4 && state.last_bidder != kInvalidPlayer) {
       if (state.last_bidder % 2 != CurrentPlayer() % 2) {
-        if (!state.doubled) actions.push_back(Call::kDouble);
+        if (state.doubler == kInvalidPlayer) actions.push_back(Call::kDouble);
       } else {
-        if (state.doubled && !state.redoubled)
+        if (state.doubler != kInvalidPlayer &&
+            state.redoubler == kInvalidPlayer)
           actions.push_back(Call::kRedouble);
       }
     }
@@ -347,7 +367,7 @@ std::vector<std::pair<Action, double>> TinyBridgeAuctionState::ChanceOutcomes()
     if (holder[card1] != kInvalidPlayer) continue;
     for (int card2 = card1 + 1; card2 < kNumCards; ++card2) {
       if (holder[card2] != kInvalidPlayer) continue;
-      actions.push_back(card2 * kNumCards + card1);
+      actions.push_back(CardsToChanceOutcome(card2, card1));
     }
   }
   const int num_actions = actions.size();
@@ -359,12 +379,11 @@ std::vector<std::pair<Action, double>> TinyBridgeAuctionState::ChanceOutcomes()
   return outcomes;
 }
 
-std::string TinyBridgeAuctionState::ActionToString(int player,
+std::string TinyBridgeAuctionState::ActionToString(Player player,
                                                    Action action_id) const {
   if (player == kChancePlayerId) {
-    const int card1 = action_id % kNumCards;
-    const int card2 = action_id / kNumCards;
-    return absl::StrCat(CardString(card1), CardString(card2));
+    auto cards = ChanceOutcomeToCards(action_id);
+    return absl::StrCat(CardString(cards.first), CardString(cards.second));
   } else {
     return kActionStr[action_id];
   }
@@ -374,6 +393,15 @@ int TinyBridgeAuctionState::CurrentPlayer() const {
   if (IsTerminal()) return kTerminalPlayerId;
   return actions_.size() < num_players_ ? kChancePlayerId
                                         : actions_.size() % num_players_;
+}
+
+std::string TinyBridgeAuctionState::HandName(Player player) const {
+  if (num_players_ == 2)
+    return std::string(1, kHandChar[player * 2]);
+  else if (num_players_ == 4)
+    return std::string(1, kHandChar[player]);
+  else
+    SpielFatalError("Invalid number of players");
 }
 
 std::string TinyBridgeAuctionState::AuctionString() const {
@@ -409,11 +437,11 @@ std::vector<double> TinyBridgeAuctionState::Returns() const {
   }
 }
 
-std::string TinyBridgeAuctionState::InformationState(int player) const {
+std::string TinyBridgeAuctionState::InformationState(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  std::string hand = HandString(player);
+  std::string hand = absl::StrCat(HandName(player), ":", HandString(player));
   std::string auction = AuctionString();
   if (!auction.empty())
     return absl::StrCat(hand, " ", auction);
@@ -421,11 +449,79 @@ std::string TinyBridgeAuctionState::InformationState(int player) const {
     return hand;
 }
 
+// Observation string is the player's cards plus the most recent bid,
+// plus any doubles or redoubles. E.g. "W:HJSA 2NT:E Dbl:S RDbl:W"
+// This is an observation for West, who holds HJ and SA.
+// The most recent bid is 2NT by East, which has been doubled by South
+// and redoubled by West.
+std::string TinyBridgeAuctionState::Observation(Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+
+  std::string observation =
+      absl::StrCat(HandName(player), ":", HandString(player));
+  if (HasAuctionStarted()) {
+    auto state = AnalyzeAuction();
+    absl::StrAppend(&observation, " ",
+                    ActionToString(state.last_bidder, state.last_bid), ":",
+                    HandName(state.last_bidder));
+    if (state.doubler != kInvalidPlayer)
+      absl::StrAppend(&observation, " ", "Dbl:", HandName(state.doubler));
+    if (state.redoubler != kInvalidPlayer)
+      absl::StrAppend(&observation, " ", "RDbl:", HandName(state.redoubler));
+  }
+  return observation;
+}
+
+// Information state vector consists of:
+//   kNumCards bits showing which cards the observing player holds
+//   kNumActions2p*2 bits showing which actions have been taken in the game.
+//     For each action, the bits are [1, 0] if we took the action,
+//     [0, 1] if our partner took the action, and otherwise [0, 0].
+void TinyBridgeAuctionState::InformationStateAsNormalizedVector(
+    Player player, std::vector<double>* values) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+
+  SPIEL_CHECK_EQ(num_players_, 2);
+  values->resize(kNumCards + kNumActions2p * 2);
+  std::fill(values->begin(), values->end(), 0);
+  if (IsDealt(player)) {
+    const auto cards = ChanceOutcomeToCards(actions_[player]);
+    values->at(cards.first) = 1;
+    values->at(cards.second) = 1;
+  }
+  for (int i = num_players_; i < actions_.size(); ++i) {
+    values->at(kNumCards + actions_[i] * 2 + (i - player) % num_players_) = 1;
+  }
+}
+
+// Information state vector consists of:
+//   kNumCards bits showing which cards the observing player holds
+//   kNumActions2p bits showing the most recent action (one-hot)
+void TinyBridgeAuctionState::ObservationAsNormalizedVector(
+    Player player, std::vector<double>* values) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+
+  SPIEL_CHECK_EQ(num_players_, 2);
+  values->resize(kNumCards + kNumActions2p);
+  std::fill(values->begin(), values->end(), 0);
+  if (IsDealt(player)) {
+    const auto cards = ChanceOutcomeToCards(actions_[player]);
+    values->at(cards.first) = 1;
+    values->at(cards.second) = 1;
+  }
+  if (HasAuctionStarted()) {
+    values->at(kNumCards + actions_.back()) = 1;
+  }
+}
+
 std::unique_ptr<State> TinyBridgeAuctionState::Clone() const {
   return std::unique_ptr<State>{new TinyBridgeAuctionState(*this)};
 }
 
-void TinyBridgeAuctionState::UndoAction(int player, Action action) {
+void TinyBridgeAuctionState::UndoAction(Player player, Action action) {
   actions_.pop_back();
   is_terminal_ = false;
 }
@@ -476,7 +572,7 @@ int TinyBridgePlayState::CurrentHand() const {
   return ((actions_.size() < 4 ? leader_ : winner_[0]) + actions_.size()) % 4;
 }
 
-std::string TinyBridgePlayState::ActionToString(int player,
+std::string TinyBridgePlayState::ActionToString(Player player,
                                                 Action action_id) const {
   return CardString(action_id);
 }
@@ -501,7 +597,7 @@ std::unique_ptr<State> TinyBridgePlayState::Clone() const {
   return std::unique_ptr<State>{new TinyBridgePlayState(*this)};
 }
 
-void TinyBridgePlayState::UndoAction(int player, Action action) {
+void TinyBridgePlayState::UndoAction(Player player, Action action) {
   actions_.pop_back();
   history_.pop_back();
 }

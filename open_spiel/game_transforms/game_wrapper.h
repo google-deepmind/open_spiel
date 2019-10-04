@@ -30,9 +30,9 @@ class WrappedState : public State {
   WrappedState(const WrappedState& other)
       : State(other), state_(other.state_->Clone()) {}
 
-  int CurrentPlayer() const override { return state_->CurrentPlayer(); }
+  Player CurrentPlayer() const override { return state_->CurrentPlayer(); }
 
-  virtual std::vector<Action> LegalActions(int player) const {
+  virtual std::vector<Action> LegalActions(Player player) const {
     return state_->LegalActions(player);
   }
 
@@ -40,7 +40,7 @@ class WrappedState : public State {
     return state_->LegalActions();
   }
 
-  std::string ActionToString(int player, Action action_id) const override {
+  std::string ActionToString(Player player, Action action_id) const override {
     return state_->ActionToString(player, action_id);
   }
 
@@ -52,27 +52,27 @@ class WrappedState : public State {
 
   std::vector<double> Returns() const override { return state_->Returns(); }
 
-  std::string InformationState(int player) const override {
+  std::string InformationState(Player player) const override {
     return state_->InformationState(player);
   }
 
   void InformationStateAsNormalizedVector(
-      int player, std::vector<double>* values) const override {
+      Player player, std::vector<double>* values) const override {
     state_->InformationStateAsNormalizedVector(player, values);
   }
 
-  virtual std::string Observation(int player) const {
+  virtual std::string Observation(Player player) const {
     return state_->Observation(player);
   }
 
   virtual void ObservationAsNormalizedVector(
-      int player, std::vector<double>* values) const {
+      Player player, std::vector<double>* values) const {
     state_->ObservationAsNormalizedVector(player, values);
   }
 
   virtual std::unique_ptr<State> Clone() const = 0;
 
-  virtual void UndoAction(int player, Action action) {
+  virtual void UndoAction(Player player, Action action) {
     state_->UndoAction(player, action);
     history_.pop_back();
   }

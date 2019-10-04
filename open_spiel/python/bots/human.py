@@ -52,8 +52,10 @@ class HumanBot(pyspiel.Bot):
     p = 1 / len(legal_actions)
     policy = [(action, p) for action in legal_actions]
 
-    action_map = {state.action_to_string(state.current_player(), action): action
-                  for action in legal_actions}
+    action_map = {
+        state.action_to_string(state.current_player(), action): action
+        for action in legal_actions
+    }
 
     while True:
       action_str = input("Choose an action (empty to print legal actions): ")
@@ -61,9 +63,10 @@ class HumanBot(pyspiel.Bot):
       if not action_str:
         print("Legal actions(s):")
         longest_num = max(len(str(action)) for action in legal_actions)
-        _print_columns(
-            ["{}: {}".format(str(action).rjust(longest_num), action_str)
-             for action_str, action in sorted(action_map.items())])
+        _print_columns([
+            "{}: {}".format(str(action).rjust(longest_num), action_str)
+            for action_str, action in sorted(action_map.items())
+        ])
         continue
 
       if action_str in action_map:
