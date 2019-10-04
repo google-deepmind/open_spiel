@@ -182,14 +182,13 @@ std::unique_ptr<Game> LoadGame(GameParameters params) {
 
 template <>
 GameParameters Game::ParameterValue<GameParameters>(
-    const std::string& key,
-    absl::optional<GameParameters> default_value) const {
+    const std::string& key, std::optional<GameParameters> default_value) const {
   auto iter = game_parameters_.find(key);
   if (iter != game_parameters_.end()) {
     return iter->second.game_value();
   }
 
-  if (default_value == absl::nullopt) {
+  if (default_value == std::nullopt) {
     std::vector<std::string> available_keys;
     for (auto const& element : game_parameters_) {
       available_keys.push_back(element.first);
@@ -203,11 +202,11 @@ GameParameters Game::ParameterValue<GameParameters>(
 
 template <>
 int Game::ParameterValue<int>(const std::string& key,
-                              absl::optional<int> default_value) const {
+                              std::optional<int> default_value) const {
   auto iter = game_parameters_.find(key);
   if (iter == game_parameters_.end()) {
     GameParameter default_game_parameter;
-    if (default_value != absl::nullopt) {
+    if (default_value != std::nullopt) {
       default_game_parameter = GameParameter(default_value.value());
     } else {
       auto default_iter = game_type_.parameter_specification.find(key);
@@ -226,12 +225,12 @@ int Game::ParameterValue<int>(const std::string& key,
 }
 
 template <>
-double Game::ParameterValue<double>(
-    const std::string& key, absl::optional<double> default_value) const {
+double Game::ParameterValue<double>(const std::string& key,
+                                    std::optional<double> default_value) const {
   auto iter = game_parameters_.find(key);
   if (iter == game_parameters_.end()) {
     GameParameter default_game_parameter;
-    if (default_value != absl::nullopt) {
+    if (default_value != std::nullopt) {
       default_game_parameter = GameParameter(default_value.value());
     } else {
       auto default_iter = game_type_.parameter_specification.find(key);
@@ -251,11 +250,11 @@ double Game::ParameterValue<double>(
 
 template <>
 std::string Game::ParameterValue<std::string>(
-    const std::string& key, absl::optional<std::string> default_value) const {
+    const std::string& key, std::optional<std::string> default_value) const {
   auto iter = game_parameters_.find(key);
   if (iter == game_parameters_.end()) {
     GameParameter default_game_parameter;
-    if (default_value != absl::nullopt) {
+    if (default_value != std::nullopt) {
       default_game_parameter = GameParameter(default_value.value());
     } else {
       auto default_iter = game_type_.parameter_specification.find(key);
@@ -275,11 +274,11 @@ std::string Game::ParameterValue<std::string>(
 
 template <>
 bool Game::ParameterValue<bool>(const std::string& key,
-                                absl::optional<bool> default_value) const {
+                                std::optional<bool> default_value) const {
   auto iter = game_parameters_.find(key);
   if (iter == game_parameters_.end()) {
     GameParameter default_game_parameter;
-    if (default_value != absl::nullopt) {
+    if (default_value != std::nullopt) {
       default_game_parameter = GameParameter(default_value.value());
     } else {
       auto default_iter = game_type_.parameter_specification.find(key);

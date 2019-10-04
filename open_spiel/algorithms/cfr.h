@@ -137,7 +137,7 @@ class CFRSolverBase {
   // and if `policy_overrides[p] != nullptr` it will be used instead of the
   // current policy. This feature exists to support CFR-BR.
   std::vector<double> ComputeCounterFactualRegret(
-      const State& state, const absl::optional<int>& alternating_player,
+      const State& state, const std::optional<int>& alternating_player,
       const std::vector<double>& reach_probabilities,
       const std::vector<const Policy*>* policy_overrides);
 
@@ -146,7 +146,7 @@ class CFRSolverBase {
 
  private:
   std::vector<double> ComputeCounterFactualRegretForActionProbs(
-      const State& state, const absl::optional<int>& alternating_player,
+      const State& state, const std::optional<int>& alternating_player,
       const std::vector<double>& reach_probabilities, const int current_player,
       const std::vector<double>& info_state_policy,
       const std::vector<Action>& legal_actions,
