@@ -64,7 +64,16 @@ class Policy(object):
     self.player_ids = player_ids
 
   def action_probabilities(self, state, player_id=None):
-    """Returns the policy for a player in a state.
+    """Returns a dictionary {action: prob} for all legal actions.
+
+    IMPORTANT: We assume the following properties hold:
+    - All probabilities are >=0 and sum to 1
+    - Only legal actions are present in the mapping, but it does not have to
+      be exhaustive: missing actions are considered to be associated to a zero
+      probability. This means that one should not iterate over the returned
+      dictionary if they want to iteratve over the full history tree.
+      If bugs are caused by this, we can change it to force policies to
+      exhaustively give the probabilities for all legal actions.
 
     Args:
       state: A `pyspiel.State` object.
@@ -403,9 +412,15 @@ def tabular_policy_from_policy(game, policy):
 def python_policy_to_pyspiel_policy(python_tabular_policy):
   """Converts a TabularPolicy to a pyspiel.TabularPolicy."""
   infostates_to_probabilities = dict()
-  for infostate in python_tabular_policy.state_lookup:
-    probs = python_tabular_policy.policy_for_key(infostate)
-    infostates_to_probabilities[infostate] = list(enumerate(probs))
+  for infostate, index in python_tabular_policy.state_lookup.items():
+    probs = python_tabular_policy.action_probability_array[index]
+    legals = python_tabular_policy.legal_actions_mask[index]
+
+    action_probs = []
+    for action, (prob, is_legal) in enumerate(zip(probs, legals)):
+      if is_legal == 1:
+        action_probs.append((action, prob))
+    infostates_to_probabilities[infostate] = action_probs
   return pyspiel.TabularPolicy(infostates_to_probabilities)
 
 

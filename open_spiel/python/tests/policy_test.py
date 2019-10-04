@@ -23,6 +23,7 @@ from absl.testing import parameterized
 import numpy as np
 
 from open_spiel.python import policy
+from open_spiel.python.algorithms import get_all_states
 import pyspiel
 
 _TIC_TAC_TOE_STATES = [
@@ -48,6 +49,71 @@ _TIC_TAC_TOE_STATES = [
         "legal_actions": (0, 1, 2, 3, 4, 5, 6, 7, 8)
     }
 ]
+
+
+def test_policy_on_game(self, game, policy_object):
+  """Checks the policy conforms to the conventions.
+
+  Checks the Policy.action_probabilities contains only legal actions (but not
+  necessarily all).
+  Checks that the probabilities are positive and sum to 1.
+
+  Args:
+    self: The Test class. This methid targets as being used as a utility
+      function to test policies.
+    game: A `pyspiel.Game`, same as the one used in the policy.
+    policy_object: A `policy.Policy` object on `game`. to test.
+  """
+
+  all_states = get_all_states.get_all_states(
+      game,
+      depth_limit=-1,
+      include_terminals=False,
+      include_chance_states=False,
+      to_string=lambda s: s.information_state())
+
+  for state in all_states.values():
+    legal_actions = set(state.legal_actions())
+    action_probabilities = policy_object.action_probabilities(state)
+
+    for action in action_probabilities.keys():
+      # We want a clearer error message to be able to debug.
+      actions_missing = set(legal_actions) - set(action_probabilities.keys())
+      illegal_actions = set(action_probabilities.keys()) - set(legal_actions)
+      self.assertIn(
+          action,
+          legal_actions,
+          msg="The action {} is present in the policy but is not a legal "
+          "actions (these are {})\n"
+          "Legal actions missing from policy: {}\n"
+          "Illegal actions present in policy: {}".format(
+              action, legal_actions, actions_missing, illegal_actions))
+
+    sum_ = 0
+    for prob in action_probabilities.values():
+      sum_ += prob
+      self.assertGreaterEqual(prob, 0)
+    self.assertAlmostEqual(1, sum_)
+
+
+_LEDUC_POKER = pyspiel.load_game("leduc_poker")
+
+
+class CommonTest(parameterized.TestCase):
+
+  @parameterized.parameters([
+      policy.TabularPolicy(_LEDUC_POKER),
+      policy.UniformRandomPolicy(_LEDUC_POKER),
+      policy.FirstActionPolicy(_LEDUC_POKER),
+  ])
+  def test_policy_on_leduc(self, policy_object):
+    test_policy_on_game(self, _LEDUC_POKER, policy_object)
+
+  @parameterized.named_parameters([
+      ("pyspiel.UniformRandom", pyspiel.UniformRandomPolicy(_LEDUC_POKER)),
+  ])
+  def test_cpp_policies_on_leduc(self, policy_object):
+    test_policy_on_game(self, _LEDUC_POKER, policy_object)
 
 
 class TabularTicTacToePolicyTest(parameterized.TestCase):
