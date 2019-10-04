@@ -10,7 +10,10 @@ patch number is accepted. If the variable is not set, we use the FindPython \
 module which favours Python 3 over Python 2 if both are available.")
 set (CMAKE_CXX_STANDARD 17)
 if(APPLE)
-  set (CMAKE_CXX_FLAGS "-Werror -undefined dynamic_lookup")
+  # On MacOS:
+  #   -Werror causes problems with abseil on MacOS
+  #   -undefined dynamic_lookup is necessary for pybind11 linking
+  set (CMAKE_CXX_FLAGS "-w -undefined dynamic_lookup")
 else()
   set (CMAKE_CXX_FLAGS "-Werror")
 endif()
