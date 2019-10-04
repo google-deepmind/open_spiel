@@ -287,7 +287,10 @@ class TabularPolicy(Policy):
       result.action_probability_array = np.copy(self.action_probability_array)
     return result
 
-  def copy_with_noise(self, alpha=0.0, beta=0.0):
+  def copy_with_noise(self,
+                      alpha=0.0,
+                      beta=0.0,
+                      random_state=np.random.RandomState()):
     """Returns a copy of this policy perturbed with noise.
 
     Generates a new random distribution using a softmax on normal random
@@ -299,13 +302,15 @@ class TabularPolicy(Policy):
         alpha = 0: keep old table.
         alpha = 1: keep random table.
       beta: Temperature of the softmax. Makes for more extreme policies.
+      random_state: A numpy `RandomState` object. If not provided, a shared
+        random state will be used.
 
     Returns:
       Perturbed copy.
     """
     copied_instance = self.__copy__(False)
     probability_array = self.action_probability_array
-    noise_mask = np.random.normal(size=probability_array.shape)
+    noise_mask = random_state.normal(size=probability_array.shape)
     noise_mask = np.exp(beta * noise_mask) * self.legal_actions_mask
     noise_mask = noise_mask / (np.sum(noise_mask, axis=1).reshape(-1, 1))
     copied_instance.action_probability_array = (
