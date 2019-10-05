@@ -127,10 +127,6 @@ class GamesSimTest(parameterized.TestCase):
         # Apply the joint action and test cloning states.
         self.apply_action_test_clone(state, chosen_actions)
       else:
-        if state.is_terminal():
-          self.assertEmpty(state.legal_actions())
-          for player in range(game.num_players()):
-            self.assertEmpty(state.legal_actions(player))
         # Decision node: sample action for the single current player
         action = np.random.choice(state.legal_actions(state.current_player()))
         # Apply action and test state cloning.
@@ -142,6 +138,10 @@ class GamesSimTest(parameterized.TestCase):
 
     # Either the game is now done, or the maximum actions has been taken.
     if state.is_terminal():
+      # Check there are no legal actions.
+      self.assertEmpty(state.legal_actions())
+      for player in range(game.num_players()):
+        self.assertEmpty(state.legal_actions(player))
       # Print utilities for each player.
       utilities = state.returns()
       # Check that each one is in range

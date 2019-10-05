@@ -114,8 +114,8 @@ class WrappedGame : public Game {
 
   int MaxChanceOutcomes() const override { return game_->MaxChanceOutcomes(); }
   int NumPlayers() const override { return game_->NumPlayers(); }
-  double MinUtility() const override { return game_->MaxUtility(); }
-  double MaxUtility() const override { return game_->MinUtility(); }
+  double MinUtility() const override { return game_->MinUtility(); }
+  double MaxUtility() const override { return game_->MaxUtility(); }
   double UtilitySum() const override { return game_->UtilitySum(); }
 
   std::vector<int> InformationStateNormalizedVectorShape() const override {
