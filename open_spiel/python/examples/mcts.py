@@ -81,7 +81,7 @@ def _get_action(state, action_str):
 def _play_game(game, initial_actions):
   """Plays one game."""
   state = game.new_initial_state()
-  _opt_print("Initial state: ", str(state))
+  _opt_print("Initial state:\n{}".format(state))
 
   bots = [
       _init_bot(FLAGS.player1, game, 0),
@@ -98,7 +98,7 @@ def _play_game(game, initial_actions):
     history.append(action_str)
     state.apply_action(action)
     _opt_print("Forced action", action_str)
-    _opt_print("Next state: ", str(state))
+    _opt_print("Next state:\n{}".format(state))
 
   while not state.is_terminal():
     # The state can be three different types: chance node,
@@ -129,7 +129,7 @@ def _play_game(game, initial_actions):
     history.append(action_str)
     state.apply_action(action)
 
-    _opt_print("Next state: ", str(state))
+    _opt_print("Next state:\n{}".format(state))
 
   # Game is now done. Print return for each player
   returns = state.returns()
