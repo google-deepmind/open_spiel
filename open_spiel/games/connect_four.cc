@@ -93,6 +93,13 @@ void ConnectFourState::DoApplyAction(Action move) {
   int row = 0;
   while (CellAt(row, move) != CellState::kEmpty) ++row;
   CellAt(row, move) = PlayerToState(CurrentPlayer());
+
+  if (HasLine(current_player_)) {
+    outcome_ = static_cast<Outcome>(current_player_);
+  } else if (IsFull()) {
+    outcome_ = Outcome::kDraw;
+  }
+
   current_player_ = 1 - current_player_;
 }
 
@@ -165,12 +172,12 @@ std::string ConnectFourState::ToString() const {
   return str;
 }
 bool ConnectFourState::IsTerminal() const {
-  return HasLine(0) || HasLine(1) || IsFull();
+  return outcome_ != Outcome::kUnknown;
 }
 
 std::vector<double> ConnectFourState::Returns() const {
-  if (HasLine(0)) return {1.0, -1.0};
-  if (HasLine(1)) return {-1.0, 1.0};
+  if (outcome_ == Outcome::kPlayer1) return {1.0, -1.0};
+  if (outcome_ == Outcome::kPlayer2) return {-1.0, 1.0};
   return {0.0, 0.0};
 }
 
@@ -190,12 +197,6 @@ void ConnectFourState::InformationStateAsNormalizedVector(
   for (int cell = 0; cell < kNumCells; ++cell) {
     (*values)[kNumCells * static_cast<int>(board_[cell]) + cell] = 1.0;
   }
-}
-
-void ConnectFourState::UndoAction(Player player, Action move) {
-  board_[move] = CellState::kEmpty;
-  current_player_ = player;
-  history_.pop_back();
 }
 
 std::unique_ptr<State> ConnectFourState::Clone() const {
@@ -249,6 +250,14 @@ ConnectFourState::ConnectFourState(int num_distinct_actions,
   SPIEL_CHECK_TRUE(c == 0 &&
                    ("Problem parsing state (column value should be 0)"));
   current_player_ = (xs == os) ? 0 : 1;
+
+  if (HasLine(0)) {
+    outcome_ = Outcome::kPlayer1;
+  } else if (HasLine(1)) {
+    outcome_ = Outcome::kPlayer2;
+  } else if (IsFull()) {
+    outcome_ = Outcome::kDraw;
+  }
 }
 
 }  // namespace connect_four

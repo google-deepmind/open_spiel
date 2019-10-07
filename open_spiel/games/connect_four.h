@@ -40,6 +40,14 @@ constexpr int kCols = 7;
 constexpr int kNumCells = kRows * kCols;
 constexpr int kCellStates = 1 + kNumPlayers;  // player 0, player 1, empty
 
+// Outcome of the game.
+enum class Outcome {
+  kPlayer1 = 0,
+  kPlayer2 = 1,
+  kUnknown,
+  kDraw,
+};
+
 // State of a cell.
 enum class CellState {
   kEmpty,
@@ -64,7 +72,6 @@ class ConnectFourState : public State {
   void InformationStateAsNormalizedVector(
       Player player, std::vector<double>* values) const override;
   std::unique_ptr<State> Clone() const override;
-  void UndoAction(Player player, Action move) override;
 
  protected:
   void DoApplyAction(Action move) override;
@@ -78,6 +85,7 @@ class ConnectFourState : public State {
                               int dcol) const;
   bool IsFull() const;         // Is the board full?
   Player current_player_ = 0;  // Player zero goes first
+  Outcome outcome_ = Outcome::kUnknown;
   std::array<CellState, kNumCells> board_;
 };
 
