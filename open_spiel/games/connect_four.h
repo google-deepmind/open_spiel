@@ -40,9 +40,6 @@ constexpr int kCols = 7;
 constexpr int kNumCells = kRows * kCols;
 constexpr int kCellStates = 1 + kNumPlayers;  // player 0, player 1, empty
 
-// https://math.stackexchange.com/questions/485752/ConnectFour-state-space-choose-calculation/485852
-constexpr int kNumberStates = 5478;
-
 // State of a cell.
 enum class CellState {
   kEmpty,
