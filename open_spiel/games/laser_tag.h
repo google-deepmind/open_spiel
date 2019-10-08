@@ -28,7 +28,6 @@
 //
 // TODO:
 //   - implement partial observability (option for first-person observations)
-//   - generalize the implementation to allow any arbitrary map
 //
 // [1] Leibo et al. Multi-agent Reinforcement Learning in Sequential Social
 //     Dilemmas. https://arxiv.org/abs/1702.03037
@@ -121,6 +120,10 @@ class LaserTagGame : public SimMoveGame {
   }
   std::vector<int> ObservationNormalizedVectorShape() const override;
   int MaxGameLength() const override { return horizon_; }
+  int num_rows_;
+  int num_cols_;
+  std::vector<std::pair<int,int>> obstacles_;
+  std::vector<std::pair<int,int>> spawn_points_;
 
  private:
   int horizon_;

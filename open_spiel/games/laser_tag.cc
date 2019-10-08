@@ -26,8 +26,17 @@ namespace laser_tag {
 namespace {
 
 // Default parameters.
-constexpr int kDefaultHorizon = 1000;
+constexpr int kDefaultHorizon = 2;
 constexpr bool kDefaultZeroSum = false;
+const std::string kDefaultGrid = "......."
+                                 "......."
+                                 "..*.*.."
+                                 ".**.**."
+                                 "..*.*.."
+                                 "......."
+                                 ".......";
+constexpr int kNumRows = 7;
+constexpr int kNumCols = 7;
 
 // Facts about the game
 const GameType kGameType{
@@ -46,17 +55,16 @@ const GameType kGameType{
     /*provides_observation_as_normalized_vector=*/true,
     /*parameter_specification=*/
     {{"horizon", GameParameter(kDefaultHorizon)},
-     {"zero_sum", GameParameter(kDefaultZeroSum)}}};
+     {"zero_sum", GameParameter(kDefaultZeroSum)},
+     {"grid", GameParameter(kDefaultGrid)},
+     {"num_rows", GameParameter(kNumRows)},
+     {"num_cols", GameParameter(kNumCols)}}};
 
 std::unique_ptr<Game> Factory(const GameParameters& params) {
   return std::unique_ptr<Game>(new LaserTagGame(params));
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
-
-// Constants.
-constexpr int kRows = 7;
-constexpr int kCols = 7;
 
 // Valid characters: AB*.
 constexpr int kCellStates = 4;
@@ -158,7 +166,7 @@ std::string LaserTagState::ActionToString(int player, Action action_id) const {
 }
 
 void LaserTagState::SetField(int r, int c, char v) {
-  field_[r * kCols + c] = v;
+  field_[r * parent_game_.num_cols_ + c] = v;
 
   if (v == 'A') {
     player_row_[0] = r;
@@ -169,24 +177,18 @@ void LaserTagState::SetField(int r, int c, char v) {
   }
 }
 
-char LaserTagState::field(int r, int c) const { return field_[r * kCols + c]; }
+char LaserTagState::field(int r, int c) const { return field_[r * parent_game_.num_cols_ + c]; }
 
 void LaserTagState::Reset(int horizon, bool zero_sum) {
   num_tags_ = 0;
   horizon_ = horizon;
   zero_sum_rewards_ = zero_sum;
-  field_.resize(kRows * kCols, '.');
+  field_.resize(parent_game_.num_rows_ * parent_game_.num_cols_, '.');
 
-  // set obstacles
-  SetField(2, 2, '*');
-  SetField(3, 2, '*');
-  SetField(4, 2, '*');
-  SetField(3, 1, '*');
-
-  SetField(2, 4, '*');
-  SetField(3, 4, '*');
-  SetField(4, 4, '*');
-  SetField(3, 5, '*');
+  for (std::vector<std::pair<int,int>>::const_iterator i = parent_game_.obstacles_.begin();
+    i != parent_game_.obstacles_.end(); ++i){
+    SetField(i->first, i->second, '*');
+  }
 
   cur_player_ = kChancePlayerId;
   total_moves_ = 0;
@@ -205,7 +207,7 @@ void LaserTagState::DoApplyActions(const std::vector<Action>& moves) {
 }
 
 bool LaserTagState::InBounds(int r, int c) const {
-  return (r >= 0 && c >= 0 && r < kRows && c < kCols);
+  return (r >= 0 && c >= 0 && r < parent_game_.num_rows_ && c < parent_game_.num_cols_);
 }
 
 bool LaserTagState::ResolveMove(int player, int move) {
@@ -339,31 +341,31 @@ void LaserTagState::DoApplyAction(Action action_id) {
 
   if (action_id == kChanceLoc1) {
     SPIEL_CHECK_NE(spawning_player_char, ' ');
-    if (field(0, 0) != '.') {
+    if (field(parent_game_.spawn_points_[0].first, parent_game_.spawn_points_[0].second) != '.') {
       return;
     }
-    SetField(0, 0, spawning_player_char);
+    SetField(parent_game_.spawn_points_[0].first, parent_game_.spawn_points_[0].second, spawning_player_char);
     needs_respawn_.pop_back();
   } else if (action_id == kChanceLoc2) {
     SPIEL_CHECK_NE(spawning_player_char, ' ');
-    if (field(0, 6) != '.') {
+    if (field(parent_game_.spawn_points_[1].first, parent_game_.spawn_points_[1].second) != '.') {
       return;
     }
-    SetField(0, 6, spawning_player_char);
+    SetField(parent_game_.spawn_points_[1].first, parent_game_.spawn_points_[1].second, spawning_player_char);
     needs_respawn_.pop_back();
   } else if (action_id == kChanceLoc3) {
     SPIEL_CHECK_NE(spawning_player_char, ' ');
-    if (field(6, 0) != '.') {
+    if (field(parent_game_.spawn_points_[2].first, parent_game_.spawn_points_[2].second) != '.') {
       return;
     }
-    SetField(6, 0, spawning_player_char);
+    SetField(parent_game_.spawn_points_[2].first, parent_game_.spawn_points_[2].second, spawning_player_char);
     needs_respawn_.pop_back();
   } else if (action_id == kChanceLoc4) {
     SPIEL_CHECK_NE(spawning_player_char, ' ');
-    if (field(6, 6) != '.') {
+    if (field(parent_game_.spawn_points_[3].first, parent_game_.spawn_points_[3].second) != '.') {
       return;
     }
-    SetField(6, 6, spawning_player_char);
+    SetField(parent_game_.spawn_points_[3].first, parent_game_.spawn_points_[3].second, spawning_player_char);
     needs_respawn_.pop_back();
   } else if (action_id == kChanceInit1) {
     rewards_ = {0, 0};
@@ -422,8 +424,8 @@ std::vector<std::pair<Action, double>> LaserTagState::ChanceOutcomes() const {
 std::string LaserTagState::ToString() const {
   std::string result = "";
 
-  for (int r = 0; r < kRows; r++) {
-    for (int c = 0; c < kCols; c++) {
+  for (int r = 0; r < parent_game_.num_rows_; r++) {
+    for (int c = 0; c < parent_game_.num_cols_; c++) {
       result += field(r, c);
     }
 
@@ -476,13 +478,13 @@ void LaserTagState::ObservationAsNormalizedVector(
 
   values->resize(parent_game_.ObservationNormalizedVectorSize());
   std::fill(values->begin(), values->end(), 0.);
-  int plane_size = kRows * kCols;
+  int plane_size = parent_game_.num_rows_ * parent_game_.num_cols_;
 
-  for (int r = 0; r < kRows; r++) {
-    for (int c = 0; c < kCols; c++) {
+  for (int r = 0; r < parent_game_.num_rows_; r++) {
+    for (int c = 0; c < parent_game_.num_cols_; c++) {
       int plane = observation_plane(r, c);
       SPIEL_CHECK_TRUE(plane >= 0 && plane < kCellStates);
-      (*values)[plane * plane_size + r * kCols + c] = 1.0;
+      (*values)[plane * plane_size + r * parent_game_.num_cols_ + c] = 1.0;
     }
   }
 }
@@ -514,13 +516,55 @@ double LaserTagGame::MaxUtility() const {
 }
 
 std::vector<int> LaserTagGame::ObservationNormalizedVectorShape() const {
-  return {kCellStates, kRows, kCols};
+  return {kCellStates, num_rows_, num_cols_};
 }
 
 LaserTagGame::LaserTagGame(const GameParameters& params)
     : SimMoveGame(kGameType, params),
       horizon_(ParameterValue<int>("horizon")),
-      zero_sum_(ParameterValue<bool>("zero_sum")) {}
+      zero_sum_(ParameterValue<bool>("zero_sum")) {
+
+        std::string grid_param = ParameterValue<std::string>("grid");
+        int row_num_param = ParameterValue<int>("num_rows");
+        int col_num_param = ParameterValue<int>("num_cols");
+
+        // check grid dimensions are valid
+        SPIEL_CHECK_EQ(row_num_param*col_num_param, grid_param.length());
+
+        num_rows_ = row_num_param;
+        num_cols_ = col_num_param;
+
+        std::vector<std::pair<int, int>> open_spaces;
+        
+        for (std::string::iterator i = grid_param.begin(); i != grid_param.end(); ++i){
+          
+          // check grid values are valid
+          SPIEL_CHECK_TRUE(*i == '.' || *i == '*');
+
+          int char_idx = std::distance(grid_param.begin(), i);
+          int row_idx = char_idx / num_cols_;
+          int col_idx = char_idx % num_cols_;
+          std::pair<int, int> grid_idx(row_idx, col_idx);
+
+          if(*i == '*'){
+            obstacles_.push_back(grid_idx);
+          } else {
+            open_spaces.push_back(grid_idx);
+          }
+        }
+
+        int open_spaces_size = open_spaces.size();
+
+        // check there are at least 4 open spaces for the 4 spawn points
+        SPIEL_CHECK_GE(open_spaces_size, 4);
+
+        //tentative heuristic is to use 4 equidistant open space indices as spawn points
+        spawn_points_.push_back(open_spaces[0]);
+        spawn_points_.push_back(open_spaces[(open_spaces_size/3)-1]);
+        spawn_points_.push_back(open_spaces[(2*open_spaces_size/3)-1]);
+        spawn_points_.push_back(open_spaces[open_spaces_size-1]);
+
+      }
 
 }  // namespace laser_tag
 }  // namespace open_spiel
