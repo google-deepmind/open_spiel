@@ -58,25 +58,24 @@ const GameType kGameType{
      {"horizon", GameParameter(kDefaultHorizon)},
      {"min_bid", GameParameter(kDefaultMinBid)}}};
 
-std::unique_ptr<Game> Factory(const GameParameters& params) {
-  return std::unique_ptr<Game>(new OshiZumoGame(params));
+std::shared_ptr<const Game> Factory(const GameParameters& params) {
+  return std::shared_ptr<const Game>(new OshiZumoGame(params));
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
 }  // namespace
 
-OshiZumoState::OshiZumoState(const OshiZumoGame& parent_game)
-    : SimMoveState(parent_game.NumDistinctActions(), parent_game.NumPlayers()),
-      parent_game_(parent_game),
-
+OshiZumoState::OshiZumoState(std::shared_ptr<const Game> game)
+    : SimMoveState(game),
+      parent_game_(static_cast<const OshiZumoGame&>(*game)),
       // Fields set to bad values. Use Game::NewInitialState().
       winner_(kNoWinner),
       total_moves_(0),
-      horizon_(parent_game.horizon()),
-      starting_coins_(parent_game.starting_coins()),
-      size_(parent_game.size()),
-      alesia_(parent_game.alesia()),
-      min_bid_(parent_game.min_bid()),
+      horizon_(parent_game_.horizon()),
+      starting_coins_(parent_game_.starting_coins()),
+      size_(parent_game_.size()),
+      alesia_(parent_game_.alesia()),
+      min_bid_(parent_game_.min_bid()),
       // pos 0 and pos 2*size_+2 are "off the edge".
       wrestler_pos_(size_ + 1),
       coins_({{starting_coins_, starting_coins_}})
@@ -239,7 +238,7 @@ OshiZumoGame::OshiZumoGame(const GameParameters& params)
 }
 
 std::unique_ptr<State> OshiZumoGame::NewInitialState() const {
-  return std::unique_ptr<State>(new OshiZumoState(*this));
+  return std::unique_ptr<State>(new OshiZumoState(shared_from_this()));
 }
 
 std::vector<int> OshiZumoGame::InformationStateNormalizedVectorShape() const {

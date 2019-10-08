@@ -18,6 +18,7 @@
 #include <array>
 #include <cstdint>
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -50,7 +51,8 @@ enum PentagoPlayer {
 // State of an in-play game.
 class PentagoState : public State {
  public:
-  PentagoState(bool ansi_color_output = false);
+  PentagoState(std::shared_ptr<const Game> game,
+               bool ansi_color_output = false);
 
   PentagoState(const PentagoState&) = default;
 
@@ -89,14 +91,15 @@ class PentagoGame : public Game {
 
   int NumDistinctActions() const override { return kPossibleActions; }
   std::unique_ptr<State> NewInitialState() const override {
-    return std::unique_ptr<State>(new PentagoState(ansi_color_output_));
+    return std::unique_ptr<State>(
+        new PentagoState(shared_from_this(), ansi_color_output_));
   }
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override { return -1; }
   double UtilitySum() const override { return 0; }
   double MaxUtility() const override { return 1; }
-  std::unique_ptr<Game> Clone() const override {
-    return std::unique_ptr<Game>(new PentagoGame(*this));
+  std::shared_ptr<const Game> Clone() const override {
+    return std::shared_ptr<const Game>(new PentagoGame(*this));
   }
   std::vector<int> ObservationNormalizedVectorShape() const override {
     return {kCellStates, kBoardSize, kBoardSize};

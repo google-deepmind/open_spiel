@@ -83,7 +83,7 @@ class ExternalSamplingMCCFRSolver {
   void FullUpdateAverage(const State& state,
                          const std::vector<double>& reach_probs);
 
-  std::unique_ptr<Game> game_;
+  std::shared_ptr<const Game> game_;
   std::unique_ptr<std::mt19937> rng_;
   AverageType avg_type_;
   CFRInfoStateValuesTable info_states_;

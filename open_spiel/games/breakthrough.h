@@ -49,7 +49,8 @@ enum class CellState {
 
 class BreakthroughState : public State {
  public:
-  explicit BreakthroughState(int num_distinct_actions, int rows, int cols);
+  explicit BreakthroughState(std::shared_ptr<const Game> game, int rows,
+                             int cols);
   Player CurrentPlayer() const override;
   std::string ActionToString(Player player, Action action) const override;
   std::string ToString() const override;
@@ -92,14 +93,14 @@ class BreakthroughGame : public Game {
   int NumDistinctActions() const override;
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(
-        new BreakthroughState(NumDistinctActions(), rows_, cols_));
+        new BreakthroughState(shared_from_this(), rows_, cols_));
   }
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override { return -1; }
   double UtilitySum() const override { return 0; }
   double MaxUtility() const override { return 1; }
-  std::unique_ptr<Game> Clone() const override {
-    return std::unique_ptr<Game>(new BreakthroughGame(*this));
+  std::shared_ptr<const Game> Clone() const override {
+    return std::shared_ptr<const Game>(new BreakthroughGame(*this));
   }
   std::vector<int> InformationStateNormalizedVectorShape() const override {
     return {kCellStates, rows_, cols_};

@@ -55,8 +55,8 @@ TinyHanabiPayoffMatrix kDefaultPayoff{/*num_players=*/2,
                                        // Cards: 2, 2
                                        10, 0, 0, 4, 8, 4, 10, 0, 0}};
 
-std::unique_ptr<Game> Factory(const GameParameters& params) {
-  return std::unique_ptr<Game>(new TinyHanabiGame(params));
+std::shared_ptr<const Game> Factory(const GameParameters& params) {
+  return std::shared_ptr<const Game>(new TinyHanabiGame(params));
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
@@ -64,7 +64,8 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 }  // namespace
 
 std::unique_ptr<State> TinyHanabiGame::NewInitialState() const {
-  return std::unique_ptr<State>(new TinyHanabiState(payoff_));
+  return std::unique_ptr<State>(
+      new TinyHanabiState(shared_from_this(), payoff_));
 }
 
 TinyHanabiGame::TinyHanabiGame(const GameParameters& params)

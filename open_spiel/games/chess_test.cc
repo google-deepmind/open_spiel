@@ -14,6 +14,8 @@
 
 #include "open_spiel/games/chess.h"
 
+#include <memory>
+
 #include "open_spiel/games/chess/chess_board.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
@@ -35,7 +37,8 @@ int CountNumLegalMoves(const StandardChessBoard& board) {
 }
 
 void CheckUndo(const char* fen, const char* move_san, const char* fen_after) {
-  ChessState state(fen);
+  std::shared_ptr<const Game> game = LoadGame("chess");
+  ChessState state(game, fen);
   auto player = state.CurrentPlayer();
   auto maybe_move = state.Board().ParseSANMove(move_san);
   SPIEL_CHECK_TRUE(maybe_move);
@@ -65,23 +68,24 @@ void MoveGenerationTests() {
 }
 
 void TerminalReturnTests() {
+  std::shared_ptr<const Game> game = LoadGame("chess");
   ChessState checkmate_state(
-      "rnb1kbnr/pppp1ppp/8/4p3/6Pq/5P2/PPPPP2P/RNBQKBNR w KQkq -");
+      game, "rnb1kbnr/pppp1ppp/8/4p3/6Pq/5P2/PPPPP2P/RNBQKBNR w KQkq -");
   SPIEL_CHECK_EQ(checkmate_state.IsTerminal(), true);
   SPIEL_CHECK_EQ(checkmate_state.Returns(), (std::vector<double>{1.0, -1.0}));
 
-  ChessState stalemate_state("8/8/5k2/1r1r4/8/8/7r/2K5 w - -");
+  ChessState stalemate_state(game, "8/8/5k2/1r1r4/8/8/7r/2K5 w - -");
   SPIEL_CHECK_EQ(stalemate_state.IsTerminal(), true);
   SPIEL_CHECK_EQ(stalemate_state.Returns(), (std::vector<double>{0.0, 0.0}));
 
-  ChessState fifty_moves_state("8/8/5k2/8/8/8/7r/2K5 w - - 100 1");
+  ChessState fifty_moves_state(game, "8/8/5k2/8/8/8/7r/2K5 w - - 100 1");
   SPIEL_CHECK_EQ(fifty_moves_state.IsTerminal(), true);
   SPIEL_CHECK_EQ(fifty_moves_state.Returns(), (std::vector<double>{0.0, 0.0}));
 
-  ChessState ongoing_state("8/8/5k2/8/8/8/7r/2K5 w - - 99 1");
+  ChessState ongoing_state(game, "8/8/5k2/8/8/8/7r/2K5 w - - 99 1");
   SPIEL_CHECK_EQ(ongoing_state.IsTerminal(), false);
 
-  ChessState repetition_state("8/8/5k2/8/8/8/7r/2K5 w - - 50 1");
+  ChessState repetition_state(game, "8/8/5k2/8/8/8/7r/2K5 w - - 50 1");
   ApplySANMove("Kd1", &repetition_state);
   ApplySANMove("Ra2", &repetition_state);
   ApplySANMove("Kc1", &repetition_state);
@@ -119,9 +123,9 @@ double ValueAt(const std::vector<double>& v, const std::vector<int>& shape,
 }
 
 void InformationStateVectorTests() {
-  ChessGame game(GameParameters{});
-  ChessState initial_state;
-  auto shape = game.InformationStateNormalizedVectorShape();
+  std::shared_ptr<const Game> game = LoadGame("chess");
+  ChessState initial_state(game);
+  auto shape = game->InformationStateNormalizedVectorShape();
   std::vector<double> v;
   initial_state.InformationStateAsNormalizedVector(
       initial_state.CurrentPlayer(), &v);
@@ -189,7 +193,7 @@ void InformationStateVectorTests() {
 
   initial_state.InformationStateAsNormalizedVector(
       initial_state.CurrentPlayer(), &v);
-  SPIEL_CHECK_EQ(v.size(), game.InformationStateNormalizedVectorSize());
+  SPIEL_CHECK_EQ(v.size(), game->InformationStateNormalizedVectorSize());
 
   // Now it's black to move.
   SPIEL_CHECK_EQ(ValueAt(v, shape, 14, 0, 0), 0.0);

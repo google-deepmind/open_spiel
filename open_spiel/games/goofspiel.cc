@@ -46,8 +46,8 @@ const GameType kGameType{
      {"points_order",
       GameParameter(static_cast<std::string>(kDefaultPointsOrder))}}};
 
-std::unique_ptr<Game> Factory(const GameParameters& params) {
-  return std::unique_ptr<Game>(new GoofspielGame(params));
+std::shared_ptr<const Game> Factory(const GameParameters& params) {
+  return std::shared_ptr<const Game>(new GoofspielGame(params));
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
@@ -66,10 +66,9 @@ PointsOrder ParsePointsOrder(const std::string& po_str) {
 
 }  // namespace
 
-GoofspielState::GoofspielState(int num_distinct_actions, int num_players,
-                               int num_cards, PointsOrder points_order,
-                               bool impinfo)
-    : SimMoveState(num_distinct_actions, num_players),
+GoofspielState::GoofspielState(std::shared_ptr<const Game> game, int num_cards,
+                               PointsOrder points_order, bool impinfo)
+    : SimMoveState(game),
       num_cards_(num_cards),
       points_order_(points_order),
       impinfo_(impinfo),
@@ -445,7 +444,7 @@ GoofspielGame::GoofspielGame(const GameParameters& params)
 
 std::unique_ptr<State> GoofspielGame::NewInitialState() const {
   return std::unique_ptr<State>(new GoofspielState(
-      NumDistinctActions(), num_players_, num_cards_, points_order_, impinfo_));
+      shared_from_this(), num_cards_, points_order_, impinfo_));
 }
 
 int GoofspielGame::MaxChanceOutcomes() const {

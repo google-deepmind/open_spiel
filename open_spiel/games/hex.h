@@ -17,6 +17,7 @@
 
 #include <array>
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -61,7 +62,7 @@ enum class CellState {
 // State of an in-play game.
 class HexState : public State {
  public:
-  HexState(int board_size);
+  HexState(std::shared_ptr<const Game> game, int board_size);
 
   HexState(const HexState&) = default;
 
@@ -98,14 +99,15 @@ class HexGame : public Game {
   explicit HexGame(const GameParameters& params);
   int NumDistinctActions() const override { return board_size_ * board_size_; }
   std::unique_ptr<State> NewInitialState() const override {
-    return std::unique_ptr<State>(new HexState(board_size_));
+    return std::unique_ptr<State>(
+        new HexState(shared_from_this(), board_size_));
   }
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override { return -1; }
   double UtilitySum() const override { return 0; }
   double MaxUtility() const override { return 1; }
-  std::unique_ptr<Game> Clone() const override {
-    return std::unique_ptr<Game>(new HexGame(*this));
+  std::shared_ptr<const Game> Clone() const override {
+    return std::shared_ptr<const Game>(new HexGame(*this));
   }
   std::vector<int> ObservationNormalizedVectorShape() const override {
     return {kCellStates, board_size_, board_size_};

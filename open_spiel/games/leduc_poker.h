@@ -60,7 +60,7 @@ enum ActionType { kFold = 0, kCall = 1, kRaise = 2 };
 
 class LeducState : public State {
  public:
-  explicit LeducState(int num_players, const LeducGame& parent);
+  explicit LeducState(std::shared_ptr<const Game> game);
 
   Player CurrentPlayer() const override;
   std::string ActionToString(Player player, Action move) const override;
@@ -117,8 +117,6 @@ class LeducState : public State {
   void SequenceAppendMove(int move);
   void Ante(Player player, int amount);
 
-  const LeducGame& parent_game_;
-
   // Fields sets to bad/invalid values. Use Game::NewInitialState().
   Player cur_player_;
 
@@ -162,8 +160,8 @@ class LeducGame : public Game {
   double MinUtility() const override;
   double MaxUtility() const override;
   double UtilitySum() const override { return 0; }
-  std::unique_ptr<Game> Clone() const override {
-    return std::unique_ptr<Game>(new LeducGame(*this));
+  std::shared_ptr<const Game> Clone() const override {
+    return std::shared_ptr<const Game>(new LeducGame(*this));
   }
   std::vector<int> InformationStateNormalizedVectorShape() const override;
   std::vector<int> ObservationNormalizedVectorShape() const override;

@@ -17,6 +17,7 @@
 
 #include <array>
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -44,7 +45,7 @@ constexpr int kDefaultMaxValue = 10;
 // State of an in-play game.
 class FPSBAState : public State {
  public:
-  FPSBAState(int num_distinct_actions, int num_players);
+  FPSBAState(std::shared_ptr<const Game> game);
   FPSBAState(const FPSBAState& other) = default;
 
   Player CurrentPlayer() const override;
@@ -79,8 +80,7 @@ class FPSBAGame : public Game {
   explicit FPSBAGame(const GameParameters& params);
   int NumDistinctActions() const override { return max_value_; }
   std::unique_ptr<State> NewInitialState() const override {
-    return std::unique_ptr<State>(
-        new FPSBAState(NumDistinctActions(), NumPlayers()));
+    return std::unique_ptr<State>(new FPSBAState(shared_from_this()));
   }
   int MaxChanceOutcomes() const override {
     return std::max(max_value_, num_players_);
@@ -88,8 +88,8 @@ class FPSBAGame : public Game {
   int NumPlayers() const override { return num_players_; }
   double MinUtility() const override { return 0; }
   double MaxUtility() const override { return max_value_; }
-  std::unique_ptr<Game> Clone() const override {
-    return std::unique_ptr<Game>(new FPSBAGame(*this));
+  std::shared_ptr<const Game> Clone() const override {
+    return std::shared_ptr<const Game>(new FPSBAGame(*this));
   }
   int MaxGameLength() const override { return num_players_; }
   std::vector<int> InformationStateNormalizedVectorShape() const override {

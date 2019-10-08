@@ -136,19 +136,21 @@ class Deal {
 
 class UncontestedBiddingState : public State {
  public:
-  UncontestedBiddingState(std::vector<Contract> reference_contracts,
+  UncontestedBiddingState(std::shared_ptr<const Game> game,
+                          std::vector<Contract> reference_contracts,
                           std::function<bool(const Deal&)> deal_filter,
                           std::vector<Action> actions, int rng_seed)
-      : State(kNumActions, kNumPlayers),
+      : State(game),
         reference_contracts_(std::move(reference_contracts)),
         actions_(std::move(actions)),
         deal_filter_(deal_filter),
         rng_(rng_seed),
         dealt_(false) {}
-  UncontestedBiddingState(std::vector<Contract> reference_contracts,
+  UncontestedBiddingState(std::shared_ptr<const Game> game,
+                          std::vector<Contract> reference_contracts,
                           const Deal& deal, std::vector<Action> actions,
                           int rng_seed)
-      : State(kNumActions, kNumPlayers),
+      : State(game),
         reference_contracts_(std::move(reference_contracts)),
         actions_(std::move(actions)),
         rng_(rng_seed),
@@ -199,7 +201,8 @@ class UncontestedBiddingGame : public Game {
   int NumDistinctActions() const override { return kNumActions; }
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(new UncontestedBiddingState(
-        reference_contracts_, deal_filter_, forced_actions_, ++rng_seed_));
+        shared_from_this(), reference_contracts_, deal_filter_, forced_actions_,
+        ++rng_seed_));
   }
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override {
@@ -208,8 +211,8 @@ class UncontestedBiddingGame : public Game {
   double MaxUtility() const override {
     return reference_contracts_.empty() ? kMaxScore : 0;
   }
-  std::unique_ptr<Game> Clone() const override {
-    return std::unique_ptr<Game>(new UncontestedBiddingGame(*this));
+  std::shared_ptr<const Game> Clone() const override {
+    return std::shared_ptr<const Game>(new UncontestedBiddingGame(*this));
   }
   std::vector<int> InformationStateNormalizedVectorShape() const override {
     return {kStateSize};

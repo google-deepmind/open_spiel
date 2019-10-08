@@ -40,8 +40,8 @@ const GameType kGameType{
     /*parameter_specification=*/{}  // no parameters
 };
 
-std::unique_ptr<Game> Factory(const GameParameters& params) {
-  return std::unique_ptr<Game>(new ConnectFourGame(params));
+std::shared_ptr<const Game> Factory(const GameParameters& params) {
+  return std::shared_ptr<const Game>(new ConnectFourGame(params));
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
@@ -156,8 +156,8 @@ bool ConnectFourState::IsFull() const {
   return true;
 }
 
-ConnectFourState::ConnectFourState(int num_distinct_actions)
-    : State(num_distinct_actions, kNumPlayers) {
+ConnectFourState::ConnectFourState(std::shared_ptr<const Game> game)
+    : State(game) {
   std::fill(begin(board_), end(board_), CellState::kEmpty);
 }
 
@@ -212,13 +212,12 @@ ConnectFourGame::ConnectFourGame(const GameParameters& params)
 
 std::unique_ptr<State> ConnectFourGame::DeserializeState(
     const std::string& str) const {
-  return std::unique_ptr<State>(
-      new ConnectFourState(NumDistinctActions(), str));
+  return std::unique_ptr<State>(new ConnectFourState(shared_from_this(), str));
 }
 
-ConnectFourState::ConnectFourState(int num_distinct_actions,
+ConnectFourState::ConnectFourState(std::shared_ptr<const Game> game,
                                    const std::string& str)
-    : State(num_distinct_actions, kNumPlayers) {
+    : State(game) {
   int xs = 0;
   int os = 0;
   int r = 5;

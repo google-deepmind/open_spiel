@@ -17,6 +17,7 @@
 
 #include <array>
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -50,7 +51,7 @@ enum class CellState {
 // State of an in-play game.
 class TicTacToeState : public State {
  public:
-  TicTacToeState(int num_distinct_actions);
+  TicTacToeState(std::shared_ptr<const Game> game);
 
   TicTacToeState(const TicTacToeState&) = default;
   TicTacToeState& operator=(const TicTacToeState&) = default;
@@ -90,14 +91,14 @@ class TicTacToeGame : public Game {
   explicit TicTacToeGame(const GameParameters& params);
   int NumDistinctActions() const override { return kNumCells; }
   std::unique_ptr<State> NewInitialState() const override {
-    return std::unique_ptr<State>(new TicTacToeState(NumDistinctActions()));
+    return std::unique_ptr<State>(new TicTacToeState(shared_from_this()));
   }
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override { return -1; }
   double UtilitySum() const override { return 0; }
   double MaxUtility() const override { return 1; }
-  std::unique_ptr<Game> Clone() const override {
-    return std::unique_ptr<Game>(new TicTacToeGame(*this));
+  std::shared_ptr<const Game> Clone() const override {
+    return std::shared_ptr<const Game>(new TicTacToeGame(*this));
   }
   std::vector<int> ObservationNormalizedVectorShape() const override {
     return {kCellStates, kNumRows, kNumCols};

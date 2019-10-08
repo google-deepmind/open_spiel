@@ -42,7 +42,7 @@ int main(int argc, char** argv) {
 
   // Create the game
   open_spiel::GameParameters params;
-  std::unique_ptr<open_spiel::Game> game =
+  std::shared_ptr<const open_spiel::Game> game =
       open_spiel::LoadGame(game_name, params);
 
   std::unique_ptr<open_spiel::State> state = game->NewInitialState();

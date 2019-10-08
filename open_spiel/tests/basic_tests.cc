@@ -141,7 +141,7 @@ bool IsPowerOfTwo(int n) { return n == 0 || (n & (n - 1)) == 0; }
 
 // Checks that the game can be loaded.
 void LoadGameTest(const std::string& game_name) {
-  std::unique_ptr<Game> game = LoadGame(game_name);
+  std::shared_ptr<const Game> game = LoadGame(game_name);
   SPIEL_CHECK_TRUE(game != nullptr);
 }
 
@@ -172,8 +172,8 @@ void TestUndo(std::unique_ptr<State> state,
 
 void TestSerializeDeserialize(const Game& game, const State* state) {
   const std::string& ser_str = SerializeGameAndState(game, *state);
-  std::pair<std::unique_ptr<Game>, std::unique_ptr<State>> game_and_state =
-      DeserializeGameAndState(ser_str);
+  std::pair<std::shared_ptr<const Game>, std::unique_ptr<State>>
+      game_and_state = DeserializeGameAndState(ser_str);
   SPIEL_CHECK_EQ(game.ToString(), game_and_state.first->ToString());
   SPIEL_CHECK_EQ(state->ToString(), game_and_state.second->ToString());
 }

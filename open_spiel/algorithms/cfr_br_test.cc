@@ -35,7 +35,7 @@ void CheckNashValues(const Game& game, const Policy& policy,
 }
 
 void CFRBRTest_KuhnPoker() {
-  std::unique_ptr<Game> game = LoadGame("kuhn_poker");
+  std::shared_ptr<const Game> game = LoadGame("kuhn_poker");
   CFRBRSolver solver(*game);
   for (int i = 0; i < 300; i++) {
     solver.EvaluateAndUpdatePolicy();
@@ -47,7 +47,7 @@ void CFRBRTest_KuhnPoker() {
 }
 
 void CFRBRTest_LeducPoker() {
-  std::unique_ptr<Game> game = LoadGame("leduc_poker");
+  std::shared_ptr<const Game> game = LoadGame("leduc_poker");
   CFRBRSolver solver(*game);
   int num_iters = 100;
   for (int i = 0; i < num_iters; i++) {

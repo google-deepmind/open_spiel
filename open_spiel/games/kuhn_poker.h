@@ -46,7 +46,7 @@ class KuhnGame;
 
 class KuhnState : public State {
  public:
-  explicit KuhnState(int num_distinct_actions, int num_players);
+  explicit KuhnState(std::shared_ptr<const Game> game);
   KuhnState(const KuhnState&) = default;
 
   Player CurrentPlayer() const override;
@@ -98,8 +98,8 @@ class KuhnGame : public Game {
   double MinUtility() const override;
   double MaxUtility() const override;
   double UtilitySum() const override { return 0; }
-  std::unique_ptr<Game> Clone() const override {
-    return std::unique_ptr<Game>(new KuhnGame(*this));
+  std::shared_ptr<const Game> Clone() const override {
+    return std::shared_ptr<const Game>(new KuhnGame(*this));
   }
   std::vector<int> InformationStateNormalizedVectorShape() const override;
   std::vector<int> ObservationNormalizedVectorShape() const override;

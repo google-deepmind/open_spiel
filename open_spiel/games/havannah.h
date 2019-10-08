@@ -18,6 +18,7 @@
 #include <array>
 #include <cstdint>
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -132,7 +133,8 @@ class HavannahState : public State {
   };
 
  public:
-  HavannahState(int board_size, bool ansi_color_output = false);
+  HavannahState(std::shared_ptr<const Game> game, int board_size,
+                bool ansi_color_output = false);
 
   HavannahState(const HavannahState&) = default;
 
@@ -197,14 +199,14 @@ class HavannahGame : public Game {
   }
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(
-        new HavannahState(board_size_, ansi_color_output_));
+        new HavannahState(shared_from_this(), board_size_, ansi_color_output_));
   }
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override { return -1; }
   double UtilitySum() const override { return 0; }
   double MaxUtility() const override { return 1; }
-  std::unique_ptr<Game> Clone() const override {
-    return std::unique_ptr<Game>(new HavannahGame(*this));
+  std::shared_ptr<const Game> Clone() const override {
+    return std::shared_ptr<const Game>(new HavannahGame(*this));
   }
   std::vector<int> ObservationNormalizedVectorShape() const override {
     return {kCellStates, Diameter(), Diameter()};

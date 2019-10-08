@@ -16,6 +16,7 @@
 #define THIRD_PARTY_OPEN_SPIEL_GAMES_TINY_BRIDGE_H_
 
 #include <array>
+#include <memory>
 
 #include "open_spiel/spiel.h"
 
@@ -85,8 +86,8 @@ class TinyBridgeGame2p : public Game {
   double MaxUtility() const override { return 3; }
   int MaxGameLength() const override { return 8; }
   int MaxChanceOutcomes() const override { return 28; }
-  std::unique_ptr<Game> Clone() const override {
-    return std::unique_ptr<Game>(new TinyBridgeGame2p(*this));
+  std::shared_ptr<const Game> Clone() const override {
+    return std::shared_ptr<const Game>(new TinyBridgeGame2p(*this));
   }
   std::vector<int> InformationStateNormalizedVectorShape() const {
     return {kNumCards + kNumActions2p * 2};
@@ -108,8 +109,8 @@ class TinyBridgeGame4p : public Game {
   double MaxUtility() const override { return 12; }
   int MaxGameLength() const override { return 57; }
   int MaxChanceOutcomes() const override { return 28; }
-  std::unique_ptr<Game> Clone() const override {
-    return std::unique_ptr<Game>(new TinyBridgeGame4p(*this));
+  std::shared_ptr<const Game> Clone() const override {
+    return std::shared_ptr<const Game>(new TinyBridgeGame4p(*this));
   }
 };
 
@@ -123,16 +124,15 @@ class TinyBridgePlayGame : public Game {
   double MinUtility() const override { return 0; }
   double MaxUtility() const override { return kNumTricks; }
   int MaxGameLength() const override { return 8; }
-  std::unique_ptr<Game> Clone() const override {
-    return std::unique_ptr<Game>(new TinyBridgePlayGame(*this));
+  std::shared_ptr<const Game> Clone() const override {
+    return std::shared_ptr<const Game>(new TinyBridgePlayGame(*this));
   }
 };
 
 // State of an in-progress auction, either 2p or 4p.
 class TinyBridgeAuctionState : public State {
  public:
-  TinyBridgeAuctionState(int num_distinct_actions, int num_players)
-      : State(num_distinct_actions, num_players) {}
+  TinyBridgeAuctionState(std::shared_ptr<const Game> game) : State(game) {}
   TinyBridgeAuctionState(const TinyBridgeAuctionState&) = default;
 
   Player CurrentPlayer() const override;
@@ -180,12 +180,9 @@ class TinyBridgeAuctionState : public State {
 // State of in-progress play.
 class TinyBridgePlayState : public State {
  public:
-  TinyBridgePlayState(int num_distinct_actions, int num_players, int trumps,
-                      int leader, std::array<int, kNumCards> holder)
-      : State(num_distinct_actions, num_players),
-        trumps_(trumps),
-        leader_(leader),
-        holder_(holder) {}
+  TinyBridgePlayState(std::shared_ptr<const Game> game, int trumps, int leader,
+                      std::array<int, kNumCards> holder)
+      : State(game), trumps_(trumps), leader_(leader), holder_(holder) {}
   TinyBridgePlayState(const TinyBridgePlayState&) = default;
 
   Player CurrentPlayer() const { return CurrentHand() % 2; }

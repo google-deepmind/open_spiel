@@ -18,6 +18,7 @@
 #include <array>
 #include <cstdint>
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -114,7 +115,8 @@ class YState : public State {
   };
 
  public:
-  YState(int board_size, bool ansi_color_output = false);
+  YState(std::shared_ptr<const Game> game, int board_size,
+         bool ansi_color_output = false);
 
   YState(const YState&) = default;
 
@@ -167,14 +169,15 @@ class YGame : public Game {
     return board_size_ * board_size_;
   }
   std::unique_ptr<State> NewInitialState() const override {
-    return std::unique_ptr<State>(new YState(board_size_, ansi_color_output_));
+    return std::unique_ptr<State>(
+        new YState(shared_from_this(), board_size_, ansi_color_output_));
   }
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override { return -1; }
   double UtilitySum() const override { return 0; }
   double MaxUtility() const override { return 1; }
-  std::unique_ptr<Game> Clone() const override {
-    return std::unique_ptr<Game>(new YGame(*this));
+  std::shared_ptr<const Game> Clone() const override {
+    return std::shared_ptr<const Game>(new YGame(*this));
   }
   std::vector<int> ObservationNormalizedVectorShape() const override {
     return {kCellStates, board_size_, board_size_};

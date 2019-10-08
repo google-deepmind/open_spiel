@@ -83,7 +83,7 @@ void BasicBackgammonTestsDoNotStartWithDoubles() {
 // Bar:
 // Scores, X: 0, O: 12
 void BearOffFurthestFirstTest() {
-  std::unique_ptr<Game> game = LoadGame("backgammon");
+  std::shared_ptr<const Game> game = LoadGame("backgammon");
   std::unique_ptr<State> state = game->NewInitialState();
   BackgammonState* bstate = static_cast<BackgammonState*>(state.get());
   bstate->SetState(
@@ -124,7 +124,7 @@ void BearOffFurthestFirstTest() {
 // Bar:
 // Scores, X: 0, O: 8
 void NormalBearOffSituation() {
-  std::unique_ptr<Game> game = LoadGame("backgammon");
+  std::shared_ptr<const Game> game = LoadGame("backgammon");
   std::unique_ptr<State> state = game->NewInitialState();
   BackgammonState* bstate = static_cast<BackgammonState*>(state.get());
   bstate->SetState(
@@ -198,7 +198,7 @@ void NormalBearOffSituation() {
 // Bar:
 // Scores, X: 0, O: 0
 void NormalBearOffSituation2() {
-  std::unique_ptr<Game> game = LoadGame("backgammon");
+  std::shared_ptr<const Game> game = LoadGame("backgammon");
   std::unique_ptr<State> state = game->NewInitialState();
   BackgammonState* bstate = static_cast<BackgammonState*>(state.get());
   bstate->SetState(
@@ -248,7 +248,7 @@ void NormalBearOffSituation2() {
 // Bar:
 // Scores, X: 0, O: 0
 void BearOffOutsideHome() {
-  std::unique_ptr<Game> game = LoadGame("backgammon");
+  std::shared_ptr<const Game> game = LoadGame("backgammon");
   std::unique_ptr<State> state = game->NewInitialState();
   BackgammonState* bstate = static_cast<BackgammonState*>(state.get());
   bstate->SetState(
@@ -291,7 +291,7 @@ void BearOffOutsideHome() {
 // Bar:
 // Scores, X: 0, O: 0
 void DoublesBearOffOutsideHome() {
-  std::unique_ptr<Game> game = LoadGame("backgammon");
+  std::shared_ptr<const Game> game = LoadGame("backgammon");
   std::unique_ptr<State> state = game->NewInitialState();
   BackgammonState* bstate = static_cast<BackgammonState*>(state.get());
   bstate->SetState(
@@ -333,7 +333,7 @@ void DoublesBearOffOutsideHome() {
   SPIEL_CHECK_TRUE(ActionsContains(legal_actions, action));
 }
 void HumanReadableNotation() {
-  std::unique_ptr<Game> game = LoadGame("backgammon");
+  std::shared_ptr<const Game> game = LoadGame("backgammon");
   std::unique_ptr<State> state = game->NewInitialState();
   BackgammonState* bstate = static_cast<BackgammonState*>(state.get());
 

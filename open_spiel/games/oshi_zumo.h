@@ -16,6 +16,7 @@
 #define THIRD_PARTY_OPEN_SPIEL_GAMES_OSHI_ZUMO_H_
 
 #include <array>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -51,7 +52,7 @@ class OshiZumoGame;
 
 class OshiZumoState : public SimMoveState {
  public:
-  explicit OshiZumoState(const OshiZumoGame& parent_game);
+  explicit OshiZumoState(std::shared_ptr<const Game> game);
 
   Player CurrentPlayer() const override;
   std::string ActionToString(Player player, Action action_id) const override;
@@ -69,7 +70,6 @@ class OshiZumoState : public SimMoveState {
 
  private:
   const OshiZumoGame& parent_game_;
-
   int winner_;
   int total_moves_;
   int horizon_;
@@ -92,8 +92,8 @@ class OshiZumoGame : public Game {
   double MinUtility() const override { return -1; }
   double MaxUtility() const override { return +1; }
   double UtilitySum() const override { return 0; }
-  std::unique_ptr<Game> Clone() const override {
-    return std::unique_ptr<Game>(new OshiZumoGame(*this));
+  std::shared_ptr<const Game> Clone() const override {
+    return std::shared_ptr<const Game>(new OshiZumoGame(*this));
   }
   std::vector<int> InformationStateNormalizedVectorShape() const override;
   int MaxGameLength() const override { return horizon_; }

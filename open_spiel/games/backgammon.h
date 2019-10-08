@@ -111,8 +111,7 @@ class BackgammonGame;
 class BackgammonState : public State {
  public:
   BackgammonState(const BackgammonState&) = default;
-  BackgammonState(int num_distinct_actions, int num_players,
-                  ScoringType scoring_type);
+  BackgammonState(std::shared_ptr<const Game>, ScoringType scoring_type);
 
   Player CurrentPlayer() const override;
   void UndoAction(Player player, Action action) override;
@@ -242,7 +241,7 @@ class BackgammonGame : public Game {
 
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(
-        new BackgammonState(NumDistinctActions(), kNumPlayers, scoring_type_));
+        new BackgammonState(shared_from_this(), scoring_type_));
   }
 
   int MaxChanceOutcomes() const override { return kNumChanceOutcomes; }
@@ -254,8 +253,8 @@ class BackgammonGame : public Game {
   double MinUtility() const override { return -MaxUtility(); }
   double UtilitySum() const override { return 0; }
   double MaxUtility() const override;
-  std::unique_ptr<Game> Clone() const override {
-    return std::unique_ptr<Game>(new BackgammonGame(*this));
+  std::shared_ptr<const Game> Clone() const override {
+    return std::shared_ptr<const Game>(new BackgammonGame(*this));
   }
 
   std::vector<int> InformationStateNormalizedVectorShape() const override {

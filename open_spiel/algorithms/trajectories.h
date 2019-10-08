@@ -128,7 +128,7 @@ class TrajectoryRecorder {
   }
 
  private:
-  std::unique_ptr<Game> game_;
+  std::shared_ptr<const Game> game_;
 
   // Note: The key here depends on the game, and is implemented by the
   // StateKey method.

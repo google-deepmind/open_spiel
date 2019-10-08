@@ -100,7 +100,7 @@ GameRegisterer::GameRegisterer(const GameType& game_type, CreateFunc creator) {
   RegisterGame(game_type, creator);
 }
 
-std::unique_ptr<Game> GameRegisterer::CreateByName(
+std::shared_ptr<const Game> GameRegisterer::CreateByName(
     const std::string& short_name, const GameParameters& params) {
   auto iter = factories().find(short_name);
   if (iter == factories().end()) {
@@ -151,13 +151,13 @@ std::vector<GameType> RegisteredGameTypes() {
   return GameRegisterer::RegisteredGames();
 }
 
-std::unique_ptr<Game> LoadGame(const std::string& game_string) {
+std::shared_ptr<const Game> LoadGame(const std::string& game_string) {
   return LoadGame(GameParametersFromString(game_string));
 }
 
-std::unique_ptr<Game> LoadGame(const std::string& short_name,
-                               const GameParameters& params) {
-  std::unique_ptr<Game> result =
+std::shared_ptr<const Game> LoadGame(const std::string& short_name,
+                                     const GameParameters& params) {
+  std::shared_ptr<const Game> result =
       GameRegisterer::CreateByName(short_name, params);
   if (result == nullptr) {
     SpielFatalError(absl::StrCat("Unable to create game: ", short_name));
@@ -165,7 +165,7 @@ std::unique_ptr<Game> LoadGame(const std::string& short_name,
   return result;
 }
 
-std::unique_ptr<Game> LoadGame(GameParameters params) {
+std::shared_ptr<const Game> LoadGame(GameParameters params) {
   auto it = params.find("name");
   if (it == params.end()) {
     SpielFatalError(absl::StrCat("No 'name' parameter in params: ",
@@ -173,12 +173,18 @@ std::unique_ptr<Game> LoadGame(GameParameters params) {
   }
   std::string name = it->second.string_value();
   params.erase(it);
-  std::unique_ptr<Game> result = GameRegisterer::CreateByName(name, params);
+  std::shared_ptr<const Game> result =
+      GameRegisterer::CreateByName(name, params);
   if (result == nullptr) {
     SpielFatalError(absl::StrCat("Unable to create game: ", name));
   }
   return result;
 }
+
+State::State(std::shared_ptr<const Game> game)
+    : num_distinct_actions_(game->NumDistinctActions()),
+      num_players_(game->NumPlayers()),
+      game_(game) {}
 
 template <>
 GameParameters Game::ParameterValue<GameParameters>(
@@ -392,7 +398,7 @@ std::string SerializeGameAndState(const Game& game, const State& state) {
   return str;
 }
 
-std::pair<std::unique_ptr<Game>, std::unique_ptr<State>>
+std::pair<std::shared_ptr<const Game>, std::unique_ptr<State>>
 DeserializeGameAndState(const std::string& serialized_state) {
   std::vector<std::string> lines = absl::StrSplit(serialized_state, '\n');
 
@@ -402,7 +408,7 @@ DeserializeGameAndState(const std::string& serialized_state) {
 
   std::string game_string = "";
   std::string state_string = "";
-  std::unique_ptr<Game> game = nullptr;
+  std::shared_ptr<const Game> game = nullptr;
   std::unique_ptr<State> state = nullptr;
 
   for (int i = 0; i < lines.size(); ++i) {
@@ -437,8 +443,8 @@ DeserializeGameAndState(const std::string& serialized_state) {
   game = LoadGame(section_strings[kGame]);
   state = game->DeserializeState(section_strings[kState]);
 
-  return std::pair<std::unique_ptr<Game>, std::unique_ptr<State>>(
-      std::move(game), std::move(state));
+  return std::pair<std::shared_ptr<const Game>, std::unique_ptr<State>>(
+      game, std::move(state));
 }
 
 std::ostream& operator<<(std::ostream& stream, GameType::Dynamics value) {

@@ -39,8 +39,8 @@ class PigGame;
 class PigState : public State {
  public:
   PigState(const PigState&) = default;
-  PigState(int num_distinct_actions, int num_players, int dice_outcomes,
-           int horizon, int win_score);
+  PigState(std::shared_ptr<const Game> game, int dice_outcomes, int horizon,
+           int win_score);
 
   Player CurrentPlayer() const override;
   std::string ActionToString(Player player, Action move_id) const override;
@@ -82,9 +82,8 @@ class PigGame : public Game {
 
   int NumDistinctActions() const override { return 6; }
   std::unique_ptr<State> NewInitialState() const override {
-    return std::unique_ptr<State>(new PigState(NumDistinctActions(),
-                                               num_players_, dice_outcomes_,
-                                               horizon_, win_score_));
+    return std::unique_ptr<State>(
+        new PigState(shared_from_this(), dice_outcomes_, horizon_, win_score_));
   }
   int MaxChanceOutcomes() const override { return dice_outcomes_; }
 
@@ -95,8 +94,8 @@ class PigGame : public Game {
   double MinUtility() const override { return -1; }
   double UtilitySum() const override { return 0; }
   double MaxUtility() const override { return +1; }
-  std::unique_ptr<Game> Clone() const override {
-    return std::unique_ptr<Game>(new PigGame(*this));
+  std::shared_ptr<const Game> Clone() const override {
+    return std::shared_ptr<const Game>(new PigGame(*this));
   }
   std::vector<int> InformationStateNormalizedVectorShape() const override;
 

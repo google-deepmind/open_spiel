@@ -32,7 +32,7 @@ constexpr const int kSeed = 230398247;
 
 void MCCFR_2PGameTest(const std::string& game_name, std::mt19937* rng,
                       int iterations, double nashconv_upperbound) {
-  std::unique_ptr<Game> game = LoadGame(game_name);
+  std::shared_ptr<const Game> game = LoadGame(game_name);
   ExternalSamplingMCCFRSolver solver(*game);
   for (int i = 0; i < iterations; i++) {
     solver.RunIteration(rng);
@@ -45,7 +45,7 @@ void MCCFR_2PGameTest(const std::string& game_name, std::mt19937* rng,
 }
 
 void MCCFR_KuhnPoker3PTest(std::mt19937* rng) {
-  std::unique_ptr<Game> game = LoadGame("kuhn_poker(players=3)");
+  std::shared_ptr<const Game> game = LoadGame("kuhn_poker(players=3)");
   ExternalSamplingMCCFRSolver solver(*game);
   for (int i = 0; i < 1000; i++) {
     solver.RunIteration(rng);

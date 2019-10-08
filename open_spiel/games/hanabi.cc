@@ -50,8 +50,8 @@ const GameType kGameType{
         {"observation_type", GameParameter(GameParameter::Type::kString)},
     }};
 
-std::unique_ptr<Game> Factory(const GameParameters& params) {
-  return std::unique_ptr<Game>(new OpenSpielHanabiGame(params));
+std::shared_ptr<const Game> Factory(const GameParameters& params) {
+  return std::shared_ptr<const Game>(new OpenSpielHanabiGame(params));
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
@@ -113,7 +113,7 @@ OpenSpielHanabiGame::OpenSpielHanabiGame(const GameParameters& params)
 int OpenSpielHanabiGame::NumDistinctActions() const { return game_.MaxMoves(); }
 
 std::unique_ptr<State> OpenSpielHanabiGame::NewInitialState() const {
-  return std::unique_ptr<State>(new OpenSpielHanabiState(this));
+  return std::unique_ptr<State>(new OpenSpielHanabiState(shared_from_this()));
 }
 
 int OpenSpielHanabiGame::MaxChanceOutcomes() const {
@@ -128,8 +128,8 @@ double OpenSpielHanabiGame::MaxUtility() const {
   return game_.NumColors() * game_.NumRanks();
 }
 
-std::unique_ptr<Game> OpenSpielHanabiGame::Clone() const {
-  return std::unique_ptr<Game>(new OpenSpielHanabiGame(GetParameters()));
+std::shared_ptr<const Game> OpenSpielHanabiGame::Clone() const {
+  return std::shared_ptr<Game>(new OpenSpielHanabiGame(GetParameters()));
 }
 
 std::vector<int> OpenSpielHanabiGame::ObservationNormalizedVectorShape() const {
@@ -229,10 +229,10 @@ std::string OpenSpielHanabiState::ToString() const { return state_.ToString(); }
 
 bool OpenSpielHanabiState::IsTerminal() const { return state_.IsTerminal(); }
 
-OpenSpielHanabiState::OpenSpielHanabiState(OpenSpielHanabiGame const* game)
-    : State(game->NumDistinctActions(), game->NumPlayers()),
-      state_(&game->HanabiGame()),
-      game_(game),
+OpenSpielHanabiState::OpenSpielHanabiState(std::shared_ptr<const Game> game)
+    : State(game),
+      state_(&(static_cast<const OpenSpielHanabiGame&>(*game).HanabiGame())),
+      game_(static_cast<const OpenSpielHanabiGame*>(game.get())),
       prev_state_score_(0.) {}
 
 }  // namespace hanabi

@@ -108,8 +108,8 @@ void BasicTurnBasedSimultaneousTests() {
       if (type.dynamics == GameType::Dynamics::kSimultaneous) {
         std::cout << "TurnBasedSimultaneous: Testing " << name << std::endl;
         for (int i = 0; i < 100; ++i) {
-          std::unique_ptr<Game> sim_game = LoadGame(name);
-          std::unique_ptr<Game> turn_based_game =
+          std::shared_ptr<const Game> sim_game = LoadGame(name);
+          std::shared_ptr<const Game> turn_based_game =
               ConvertToTurnBased(*LoadGame(name));
           auto sim_state = sim_game->NewInitialState();
           auto turn_based_state = turn_based_game->NewInitialState();

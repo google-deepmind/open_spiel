@@ -18,6 +18,7 @@
 #include <array>
 #include <cstring>
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -168,11 +169,11 @@ inline Move ActionToMove(const Action& action) {
 class ChessState : public State {
  public:
   // Constructs a chess state at the standard start position.
-  ChessState();
+  ChessState(std::shared_ptr<const Game> game);
 
   // Constructs a chess state at the given position in Forsyth-Edwards Notation.
   // https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
-  ChessState(const std::string& fen);
+  ChessState(std::shared_ptr<const Game> game, const std::string& fen);
   ChessState(const ChessState&) = default;
 
   ChessState& operator=(const ChessState&) = default;
@@ -240,15 +241,18 @@ class ChessGame : public Game {
   int NumDistinctActions() const override {
     return chess::NumDistinctActions();
   }
+  std::unique_ptr<State> NewInitialState(const std::string& fen) const {
+    return std::unique_ptr<State>(new ChessState(shared_from_this(), fen));
+  }
   std::unique_ptr<State> NewInitialState() const override {
-    return std::unique_ptr<State>(new ChessState());
+    return std::unique_ptr<State>(new ChessState(shared_from_this()));
   }
   int NumPlayers() const override { return chess::NumPlayers(); }
   double MinUtility() const override { return LossUtility(); }
   double UtilitySum() const override { return DrawUtility(); }
   double MaxUtility() const override { return WinUtility(); }
-  std::unique_ptr<Game> Clone() const override {
-    return std::unique_ptr<Game>(new ChessGame(*this));
+  std::shared_ptr<const Game> Clone() const override {
+    return std::shared_ptr<const Game>(new ChessGame(*this));
   }
   std::vector<int> InformationStateNormalizedVectorShape() const override {
     return chess::InformationStateNormalizedVectorShape();
