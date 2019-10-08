@@ -38,21 +38,20 @@ constexpr const char* kSerializeStateSectionHeader = "[State]";
 // Check on supplied parameters for game creation.
 // Issues a SpielFatalError if any are missing, of the wrong type, or
 // unexpectedly present.
-void ValidateParams(
-    const GameParameters& params,
-    const std::map<std::string, GameType::ParameterSpec>& param_spec) {
+void ValidateParams(const GameParameters& params,
+                    const std::map<std::string, GameParameter>& param_spec) {
   // Check all supplied parameters are supported and of the right type.
   for (const auto& param : params) {
     const auto it = param_spec.find(param.first);
     if (it == param_spec.end())
       SpielFatalError(absl::StrCat("Unknown parameter ", param.first));
-    if (it->second.type != param.second.type()) {
+    if (it->second.type() != param.second.type()) {
       SpielFatalError(absl::StrCat("Wrong type for parameter ", param.first));
     }
   }
   // Check we aren't missing any mandatory parameters.
   for (const auto& param : param_spec) {
-    if (param.second.is_mandatory && !params.count(param.first)) {
+    if (param.second.is_mandatory() && !params.count(param.first)) {
       SpielFatalError(absl::StrCat("Missing parameter ", param.first));
     }
   }
@@ -90,7 +89,7 @@ StateType State::GetType() const {
 
 bool GameType::ContainsRequiredParameters() const {
   for (const auto& key_val : parameter_specification) {
-    if (key_val.second.is_mandatory) {
+    if (key_val.second.is_mandatory()) {
       return true;
     }
   }
@@ -182,37 +181,44 @@ std::unique_ptr<Game> LoadGame(GameParameters params) {
 }
 
 template <>
-int Game::ParameterValue<int>(const std::string& key) const {
-  return game_parameters_.at(key).int_value();
-}
-
-template <>
-double Game::ParameterValue<double>(const std::string& key) const {
-  return game_parameters_.at(key).double_value();
-}
-
-template <>
-std::string Game::ParameterValue<std::string>(const std::string& key) const {
-  return game_parameters_.at(key).string_value();
-}
-
-template <>
-bool Game::ParameterValue<bool>(const std::string& key) const {
-  return game_parameters_.at(key).bool_value();
-}
-
-template <>
 GameParameters Game::ParameterValue<GameParameters>(
-    const std::string& key) const {
-  return game_parameters_.at(key).game_value();
+    const std::string& key, std::optional<GameParameters> default_value) const {
+  auto iter = game_parameters_.find(key);
+  if (iter != game_parameters_.end()) {
+    return iter->second.game_value();
+  }
+
+  if (default_value == std::nullopt) {
+    std::vector<std::string> available_keys;
+    for (auto const& element : game_parameters_) {
+      available_keys.push_back(element.first);
+    }
+    SpielFatalError(absl::StrCat("The parameter for ", key,
+                                 " is missing. Available keys are: ",
+                                 absl::StrJoin(available_keys, " ")));
+  }
+  return default_value.value();
 }
 
 template <>
-int Game::ParameterValue<int>(const std::string& key, int default_value) const {
+int Game::ParameterValue<int>(const std::string& key,
+                              std::optional<int> default_value) const {
   auto iter = game_parameters_.find(key);
   if (iter == game_parameters_.end()) {
-    defaulted_parameters_[key] = GameParameter(default_value);
-    return default_value;
+    GameParameter default_game_parameter;
+    if (default_value != std::nullopt) {
+      default_game_parameter = GameParameter(default_value.value());
+    } else {
+      auto default_iter = game_type_.parameter_specification.find(key);
+      if (default_iter == game_type_.parameter_specification.end()) {
+        SpielFatalError(absl::StrCat("No default parameter for ", key,
+                                     " and it was not provided as an argument. "
+                                     "It is likely it should be mandatory."));
+      }
+      default_game_parameter = default_iter->second;
+    }
+    defaulted_parameters_[key] = default_game_parameter;
+    return default_game_parameter.int_value();
   } else {
     return iter->second.int_value();
   }
@@ -220,23 +226,47 @@ int Game::ParameterValue<int>(const std::string& key, int default_value) const {
 
 template <>
 double Game::ParameterValue<double>(const std::string& key,
-                                    double default_value) const {
+                                    std::optional<double> default_value) const {
   auto iter = game_parameters_.find(key);
   if (iter == game_parameters_.end()) {
-    defaulted_parameters_[key] = GameParameter(default_value);
-    return default_value;
+    GameParameter default_game_parameter;
+    if (default_value != std::nullopt) {
+      default_game_parameter = GameParameter(default_value.value());
+    } else {
+      auto default_iter = game_type_.parameter_specification.find(key);
+      if (default_iter == game_type_.parameter_specification.end()) {
+        SpielFatalError(absl::StrCat("No default parameter for ", key,
+                                     " and it was not provided as an argument. "
+                                     "It is likely it should be mandatory."));
+      }
+      default_game_parameter = default_iter->second;
+    }
+    defaulted_parameters_[key] = default_game_parameter;
+    return default_game_parameter.double_value();
   } else {
     return iter->second.double_value();
   }
 }
 
 template <>
-std::string Game::ParameterValue<std::string>(const std::string& key,
-                                              std::string default_value) const {
+std::string Game::ParameterValue<std::string>(
+    const std::string& key, std::optional<std::string> default_value) const {
   auto iter = game_parameters_.find(key);
   if (iter == game_parameters_.end()) {
-    defaulted_parameters_[key] = GameParameter(default_value);
-    return default_value;
+    GameParameter default_game_parameter;
+    if (default_value != std::nullopt) {
+      default_game_parameter = GameParameter(default_value.value());
+    } else {
+      auto default_iter = game_type_.parameter_specification.find(key);
+      if (default_iter == game_type_.parameter_specification.end()) {
+        SpielFatalError(absl::StrCat("No default parameter for ", key,
+                                     " and it was not provided as an argument. "
+                                     "It is likely it should be mandatory."));
+      }
+      default_game_parameter = default_iter->second;
+    }
+    defaulted_parameters_[key] = default_game_parameter;
+    return default_game_parameter.string_value();
   } else {
     return iter->second.string_value();
   }
@@ -244,11 +274,23 @@ std::string Game::ParameterValue<std::string>(const std::string& key,
 
 template <>
 bool Game::ParameterValue<bool>(const std::string& key,
-                                bool default_value) const {
+                                std::optional<bool> default_value) const {
   auto iter = game_parameters_.find(key);
   if (iter == game_parameters_.end()) {
-    defaulted_parameters_[key] = GameParameter(default_value);
-    return default_value;
+    GameParameter default_game_parameter;
+    if (default_value != std::nullopt) {
+      default_game_parameter = GameParameter(default_value.value());
+    } else {
+      auto default_iter = game_type_.parameter_specification.find(key);
+      if (default_iter == game_type_.parameter_specification.end()) {
+        SpielFatalError(absl::StrCat("No default parameter for ", key,
+                                     " and it was not provided as an argument. "
+                                     "It is likely it should be mandatory."));
+      }
+      default_game_parameter = default_iter->second;
+    }
+    defaulted_parameters_[key] = default_game_parameter;
+    return default_game_parameter.bool_value();
   } else {
     return iter->second.bool_value();
   }

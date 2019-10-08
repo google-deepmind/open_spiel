@@ -21,9 +21,9 @@
 #include <random>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/random/uniform_int_distribution.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
 #include "third_party/eigen3/unsupported/Eigen/CXX11/src/Tensor/TensorMap.h"
-#include "open_spiel/spiel_optional.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
@@ -83,7 +83,7 @@ void TFBatchTrajectoryRecorder::GetNextStatesUniform() {
   for (int b = 0; b < batch_size_; ++b) {
     if (!terminal_flags_[b]) {
       std::vector<Action> actions = states_[b]->LegalActions();
-      std::uniform_int_distribution<> dist(0, actions.size() - 1);
+      absl::uniform_int_distribution<> dist(0, actions.size() - 1);
       Action action = actions[dist(rng_)];
       states_[b]->ApplyAction(action);
       SampleChance(b);

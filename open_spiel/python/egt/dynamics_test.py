@@ -19,7 +19,7 @@ from __future__ import division
 from __future__ import print_function
 
 import math
-import unittest
+from absl.testing import absltest
 from absl.testing import parameterized
 
 import numpy as np
@@ -49,7 +49,7 @@ def _q_learning_dynamics(composition, payoff, temperature):
     composition * _sum_j_x_j_ln_x_j_over_x_i(composition)
 
 
-class _InternalTest(unittest.TestCase):
+class _InternalTest(absltest.TestCase):
 
   def test__sum_j_x_j_ln_x_j_over_x_i(self):
     # This tests a sub-function of `_q_learning_dynamics` to ensure its
@@ -143,4 +143,4 @@ class DynamicsTest(parameterized.TestCase):
 
 
 if __name__ == '__main__':
-  unittest.main()
+  absltest.main()

@@ -14,7 +14,9 @@
 
 #include <unordered_map>
 
+#include "open_spiel/algorithms/best_response.h"
 #include "open_spiel/algorithms/cfr.h"
+#include "open_spiel/algorithms/cfr_br.h"
 #include "open_spiel/algorithms/evaluate_bots.h"
 #include "open_spiel/algorithms/matrix_game_utils.h"
 #include "open_spiel/algorithms/tabular_exploitability.h"
@@ -98,12 +100,20 @@ class PyBot : public Bot {
 PYBIND11_MODULE(pyspiel, m) {
   m.doc() = "Open Spiel";
 
+  py::enum_<open_spiel::GameParameter::Type>(m, "GameParameterType")
+      .value("UNSET", open_spiel::GameParameter::Type::kUnset)
+      .value("INT", open_spiel::GameParameter::Type::kInt)
+      .value("DOUBLE", open_spiel::GameParameter::Type::kDouble)
+      .value("STRING", open_spiel::GameParameter::Type::kString)
+      .value("BOOL", open_spiel::GameParameter::Type::kBool);
+
   py::class_<GameParameter> game_parameter(m, "GameParameter");
   game_parameter.def(py::init<double>())
       .def(py::init<std::string>())
       .def(py::init<bool>())
       .def(py::init<int>())
       .def(py::init<GameParameters>())
+      .def("is_mandatory", &GameParameter::is_mandatory)
       .def("__str__", &GameParameter::ToString)
       .def("__repr__", &GameParameter::ToReprString);
 
@@ -119,7 +129,7 @@ PYBIND11_MODULE(pyspiel, m) {
                     GameType::ChanceMode, GameType::Information,
                     GameType::Utility, GameType::RewardModel, int, int, bool,
                     bool, bool, bool,
-                    std::map<std::string, GameType::ParameterSpec>>())
+                    std::map<std::string, GameParameter>>())
       .def_readonly("short_name", &GameType::short_name)
       .def_readonly("long_name", &GameType::long_name)
       .def_readonly("dynamics", &GameType::dynamics)
@@ -227,16 +237,6 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("chance_outcomes", &State::ChanceOutcomes)
       .def("get_type", &State::GetType);
 
-  py::class_<GameType::ParameterSpec>(m, "ParameterSpec")
-      .def_readonly("type", &GameType::ParameterSpec::type)
-      .def_readonly("is_mandatory", &GameType::ParameterSpec::is_mandatory);
-
-  py::enum_<open_spiel::GameParameter::Type>(m, "GameParameterType")
-      .value("UNSET", open_spiel::GameParameter::Type::kUnset)
-      .value("INT", open_spiel::GameParameter::Type::kInt)
-      .value("DOUBLE", open_spiel::GameParameter::Type::kDouble)
-      .value("STRING", open_spiel::GameParameter::Type::kString)
-      .value("BOOL", open_spiel::GameParameter::Type::kBool);
 
   py::class_<Game> game(m, "Game");
   game.def("num_distinct_actions", &Game::NumDistinctActions)
@@ -292,7 +292,10 @@ PYBIND11_MODULE(pyspiel, m) {
       .def(py::init<const open_spiel::Game&, int,
                     const std::unordered_map<std::string,
                                              open_spiel::ActionsAndProbs>&>())
+      .def(py::init<const open_spiel::Game&, int, const open_spiel::Policy*>())
       .def("value", &TabularBestResponse::Value)
+      .def("get_best_response_policy",
+           &TabularBestResponse::GetBestResponsePolicy)
       .def("get_best_response_actions",
            &TabularBestResponse::GetBestResponseActions)
       .def("set_policy",
@@ -307,24 +310,42 @@ PYBIND11_MODULE(pyspiel, m) {
   // [num_states, num_actions], while this is implemented as a map. It is
   // non-trivial to convert between the two, but we have a function that does so
   // in the open_spiel/python/policy.py file.
-  py::class_<open_spiel::TabularPolicy>(m, "TabularPolicy")
+  py::class_<open_spiel::Policy>(m, "Policy")
+      .def("action_probabilities",
+           (std::unordered_map<Action, double>(open_spiel::Policy::*)(
+               const open_spiel::State&) const) &
+               open_spiel::Policy::GetStatePolicyAsMap)
+      .def("get_state_policy_as_map",
+           (std::unordered_map<Action, double>(open_spiel::Policy::*)(
+               const std::string&) const) &
+               open_spiel::Policy::GetStatePolicyAsMap);
+
+  py::class_<open_spiel::TabularPolicy, open_spiel::Policy>(m, "TabularPolicy")
       .def(py::init<const std::unordered_map<std::string, ActionsAndProbs>&>())
       .def("get_state_policy", &open_spiel::TabularPolicy::GetStatePolicy);
 
-  m.def("get_uniform_policy", &open_spiel::GetUniformPolicy);
-
-  py::class_<open_spiel::Policy> policy(m, "Policy");
+  m.def("UniformRandomPolicy", &open_spiel::GetUniformPolicy);
 
   py::class_<open_spiel::algorithms::CFRSolver>(m, "CFRSolver")
       .def(py::init<const Game&>())
       .def("evaluate_and_update_policy",
            &open_spiel::algorithms::CFRSolver::EvaluateAndUpdatePolicy)
-      .def("average_policy",
-           &open_spiel::algorithms::CFRSolver::AveragePolicy);
+      .def("current_policy", &open_spiel::algorithms::CFRSolver::CurrentPolicy)
+      .def("average_policy", &open_spiel::algorithms::CFRSolver::AveragePolicy);
+
   py::class_<open_spiel::algorithms::CFRPlusSolver>(m, "CFRPlusSolver")
       .def(py::init<const Game&>())
       .def("evaluate_and_update_policy",
            &open_spiel::algorithms::CFRPlusSolver::EvaluateAndUpdatePolicy)
+      .def("current_policy", &open_spiel::algorithms::CFRSolver::CurrentPolicy)
+      .def("average_policy",
+           &open_spiel::algorithms::CFRPlusSolver::AveragePolicy);
+
+  py::class_<open_spiel::algorithms::CFRBRSolver>(m, "CFRBRSolver")
+      .def(py::init<const Game&>())
+      .def("evaluate_and_update_policy",
+           &open_spiel::algorithms::CFRPlusSolver::EvaluateAndUpdatePolicy)
+      .def("current_policy", &open_spiel::algorithms::CFRSolver::CurrentPolicy)
       .def("average_policy",
            &open_spiel::algorithms::CFRPlusSolver::AveragePolicy);
 

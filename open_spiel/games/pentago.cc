@@ -40,8 +40,7 @@ const GameType kGameType{
     /*provides_observation_as_normalized_vector=*/true,
     /*parameter_specification=*/
     {
-        {"ansi_color_output",
-         GameType::ParameterSpec{GameParameter::Type::kBool, false}},
+        {"ansi_color_output", GameParameter(false)},
     }};
 
 std::unique_ptr<Game> Factory(const GameParameters& params) {
@@ -139,6 +138,7 @@ PentagoState::PentagoState(bool ansi_color_output)
 std::vector<Action> PentagoState::LegalActions() const {
   // Can move in any empty cell, and do all rotations.
   std::vector<Action> moves;
+  if (IsTerminal()) return moves;
   moves.reserve((kBoardPositions - moves_made_) * kPossibleRotations);
   for (int y = 0; y < kBoardSize; y++) {
     for (int x = 0; x < kBoardSize; x++) {
@@ -292,7 +292,7 @@ std::unique_ptr<State> PentagoState::Clone() const {
 
 PentagoGame::PentagoGame(const GameParameters& params)
     : Game(kGameType, params),
-      ansi_color_output_(ParameterValue<bool>("ansi_color_output", false)) {}
+      ansi_color_output_(ParameterValue<bool>("ansi_color_output")) {}
 
 }  // namespace pentago
 }  // namespace open_spiel

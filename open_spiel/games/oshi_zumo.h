@@ -42,6 +42,7 @@
 //   "coins"      int     number of coins each player starts with (default: 50)
 //   "size"       int     size of the field (= 2*size + 1)        (default: 3)
 //   "horizon"    int     max number of moves before draw       (default: 1000)
+//   "min_bid"    int     minimum bid at each turn              (default: 0)
 
 namespace open_spiel {
 namespace oshi_zumo {
@@ -75,6 +76,7 @@ class OshiZumoState : public SimMoveState {
   int starting_coins_;
   int size_;
   bool alesia_;
+  int min_bid_;
   int wrestler_pos_;
   std::array<int, 2> coins_;
 };
@@ -101,12 +103,14 @@ class OshiZumoGame : public Game {
   int starting_coins() const { return starting_coins_; }
   int size() const { return size_; }
   bool alesia() const { return alesia_; }
+  int min_bid() const { return min_bid_; }
 
  private:
   int horizon_;
   int starting_coins_;
   int size_;
   bool alesia_;
+  int min_bid_;
 };
 
 }  // namespace oshi_zumo

@@ -14,6 +14,7 @@
 
 #include "open_spiel/games/hanabi.h"
 
+#include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
@@ -38,15 +39,15 @@ const GameType kGameType{
     /*provides_observation_as_normalized_vector=*/true,
     /*parameter_specification=*/
     {
-        {"players", {GameParameter::Type::kInt, false}},
-        {"colors", {GameParameter::Type::kInt, false}},
-        {"ranks", {GameParameter::Type::kInt, false}},
-        {"hand_size", {GameParameter::Type::kInt, false}},
-        {"max_information_tokens", {GameParameter::Type::kInt, false}},
-        {"max_life_tokens", {GameParameter::Type::kInt, false}},
-        {"seed", {GameParameter::Type::kInt, false}},
-        {"random_start_player", {GameParameter::Type::kBool, false}},
-        {"observation_type", {GameParameter::Type::kString, false}},
+        {"players", GameParameter(GameParameter::Type::kInt)},
+        {"colors", GameParameter(GameParameter::Type::kInt)},
+        {"ranks", GameParameter(GameParameter::Type::kInt)},
+        {"hand_size", GameParameter(GameParameter::Type::kInt)},
+        {"max_information_tokens", GameParameter(GameParameter::Type::kInt)},
+        {"max_life_tokens", GameParameter(GameParameter::Type::kInt)},
+        {"seed", GameParameter(GameParameter::Type::kInt)},
+        {"random_start_player", GameParameter(GameParameter::Type::kBool)},
+        {"observation_type", GameParameter(GameParameter::Type::kString)},
     }};
 
 std::unique_ptr<Game> Factory(const GameParameters& params) {
@@ -147,7 +148,9 @@ Player OpenSpielHanabiState::CurrentPlayer() const {
 }
 
 std::vector<Action> OpenSpielHanabiState::LegalActions() const {
-  if (IsChanceNode()) {
+  if (IsTerminal()) {
+    return {};
+  } else if (IsChanceNode()) {
     auto outcomes_and_probs = state_.ChanceOutcomes();
     const int n = outcomes_and_probs.first.size();
     std::vector<Action> chance_outcomes;

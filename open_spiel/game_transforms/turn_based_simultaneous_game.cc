@@ -43,7 +43,8 @@ const GameType kGameType{
     /*provides_information_state_as_normalized_vector=*/true,
     /*provides_observation=*/false,
     /*provides_observation_as_normalized_vector=*/false,
-    {{"game", {GameParameter::Type::kGame, true}}}};
+    {{"game",
+      GameParameter(GameParameter::Type::kGame, /*is_mandatory=*/true)}}};
 
 std::unique_ptr<Game> Factory(const GameParameters& params) {
   return ConvertToTurnBased(*LoadGame(params.at("game").game_value()));

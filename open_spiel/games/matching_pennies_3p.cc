@@ -55,7 +55,10 @@ MatchingPennies3pState::MatchingPennies3pState(int num_distinct_actions,
       returns_({0, 0, 0}) {}
 
 std::vector<Action> MatchingPennies3pState::LegalActions(Player player) const {
-  return {kHeadsActionId, kTailsActionId};  // Heads and Tails.
+  if (terminal_)
+    return {};
+  else
+    return {kHeadsActionId, kTailsActionId};
 }
 
 std::string MatchingPennies3pState::ActionToString(Player player,

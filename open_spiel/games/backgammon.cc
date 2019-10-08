@@ -21,6 +21,7 @@
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
@@ -79,7 +80,8 @@ const GameType kGameType{
     /*provides_observation=*/false,
     /*provides_observation_as_normalized_vector=*/false,
     /*parameter_specification=*/
-    {{"scoring_type", {GameParameter::Type::kString, false}}}};
+    {{"scoring_type",
+      GameParameter(static_cast<std::string>(kDefaultScoringType))}}};
 
 static std::unique_ptr<Game> Factory(const GameParameters& params) {
   return std::unique_ptr<Game>(new BackgammonGame(params));
@@ -1076,6 +1078,7 @@ std::vector<Action> BackgammonState::ProcessLegalMoves(
 
 std::vector<Action> BackgammonState::LegalActions() const {
   if (IsChanceNode()) return LegalChanceOutcomes();
+  if (IsTerminal()) return {};
 
   SPIEL_CHECK_EQ(CountTotalCheckers(kXPlayerId), kNumCheckersPerPlayer);
   SPIEL_CHECK_EQ(CountTotalCheckers(kOPlayerId), kNumCheckersPerPlayer);
@@ -1224,8 +1227,8 @@ void BackgammonState::SetState(int cur_player, bool double_turn,
 
 BackgammonGame::BackgammonGame(const GameParameters& params)
     : Game(kGameType, params),
-      scoring_type_(ParseScoringType(
-          ParameterValue<std::string>("scoring_type", kDefaultScoringType))) {}
+      scoring_type_(
+          ParseScoringType(ParameterValue<std::string>("scoring_type"))) {}
 
 double BackgammonGame::MaxUtility() const {
   switch (scoring_type_) {

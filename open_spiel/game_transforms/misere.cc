@@ -32,7 +32,8 @@ const GameType kGameType{
     /*provides_information_state_as_normalized_vector=*/true,
     /*provides_observation=*/true,
     /*provides_observation_as_normalized_vector=*/true,
-    {{"game", {GameParameter::Type::kGame, true}}}};
+    {{"game",
+      GameParameter(GameParameter::Type::kGame, /*is_mandatory=*/true)}}};
 
 GameType MisereGameType(GameType game_type) {
   game_type.short_name = kGameType.short_name;

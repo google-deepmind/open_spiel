@@ -73,7 +73,6 @@ std::string StateToString(CellState state) {
       return "x";
     default:
       SpielFatalError("Unknown state.");
-      return "This will never return.";
   }
 }
 
@@ -84,6 +83,7 @@ void TicTacToeState::DoApplyAction(Action move) {
 }
 
 std::vector<Action> TicTacToeState::LegalActions() const {
+  if (IsTerminal()) return {};
   // Can move in any empty cell.
   std::vector<Action> moves;
   for (int cell = 0; cell < kNumCells; ++cell) {

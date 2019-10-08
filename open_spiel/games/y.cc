@@ -18,6 +18,7 @@
 #include <memory>
 #include <utility>
 #include <vector>
+#include "open_spiel/game_parameters.h"
 
 namespace open_spiel {
 namespace y_game {
@@ -40,10 +41,8 @@ const GameType kGameType{
     /*provides_observation_as_normalized_vector=*/true,
     /*parameter_specification=*/
     {
-        {"board_size",
-         GameType::ParameterSpec{GameParameter::Type::kInt, false}},
-        {"ansi_color_output",
-         GameType::ParameterSpec{GameParameter::Type::kBool, false}},
+        {"board_size", GameParameter(kDefaultBoardSize)},
+        {"ansi_color_output", GameParameter(false)},
     }};
 
 std::unique_ptr<Game> Factory(const GameParameters& params) {
@@ -133,6 +132,7 @@ Move YState::ActionToMove(Action action_id) const {
 std::vector<Action> YState::LegalActions() const {
   // Can move in any empty cell.
   std::vector<Action> moves;
+  if (IsTerminal()) return moves;
   moves.reserve(board_.size() - moves_made_);
   for (int cell = 0; cell < board_.size(); ++cell) {
     if (board_[cell].player == kPlayerNone) {
@@ -310,8 +310,8 @@ std::unique_ptr<State> YState::Clone() const {
 
 YGame::YGame(const GameParameters& params)
     : Game(kGameType, params),
-      board_size_(ParameterValue<int>("board_size", kDefaultBoardSize)),
-      ansi_color_output_(ParameterValue<bool>("ansi_color_output", false)) {}
+      board_size_(ParameterValue<int>("board_size")),
+      ansi_color_output_(ParameterValue<bool>("ansi_color_output")) {}
 
 }  // namespace y_game
 }  // namespace open_spiel

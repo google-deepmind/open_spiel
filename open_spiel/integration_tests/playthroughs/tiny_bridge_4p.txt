@@ -1,16 +1,16 @@
 game: tiny_bridge_4p
 seed: 4133439701
 
-GameType.chance_mode = ChanceMode.DETERMINISTIC
+GameType.chance_mode = ChanceMode.EXPLICIT_STOCHASTIC
 GameType.dynamics = Dynamics.SEQUENTIAL
-GameType.information = Information.PERFECT_INFORMATION
+GameType.information = Information.IMPERFECT_INFORMATION
 GameType.long_name = "Tiny Bridge (Contested)"
 GameType.max_num_players = 4
 GameType.min_num_players = 4
 GameType.parameter_specification = []
 GameType.provides_information_state = True
 GameType.provides_information_state_as_normalized_vector = False
-GameType.provides_observation = False
+GameType.provides_observation = True
 GameType.provides_observation_as_normalized_vector = False
 GameType.reward_model = RewardModel.TERMINAL
 GameType.short_name = "tiny_bridge_4p"
@@ -34,86 +34,106 @@ HistoryString() = ""
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
-InformationState(0) = "??"
-InformationState(1) = "??"
-InformationState(2) = "??"
-InformationState(3) = "??"
-ChanceOutcomes() = [{8, 0.035714285714}, {16, 0.035714285714}, {24, 0.035714285714}, {32, 0.035714285714}, {40, 0.035714285714}, {48, 0.035714285714}, {56, 0.035714285714}, {17, 0.035714285714}, {25, 0.035714285714}, {33, 0.035714285714}, {41, 0.035714285714}, {49, 0.035714285714}, {57, 0.035714285714}, {26, 0.035714285714}, {34, 0.035714285714}, {42, 0.035714285714}, {50, 0.035714285714}, {58, 0.035714285714}, {35, 0.035714285714}, {43, 0.035714285714}, {51, 0.035714285714}, {59, 0.035714285714}, {44, 0.035714285714}, {52, 0.035714285714}, {60, 0.035714285714}, {53, 0.035714285714}, {61, 0.035714285714}, {62, 0.035714285714}]
-LegalActions() = [8, 16, 24, 32, 40, 48, 56, 17, 25, 33, 41, 49, 57, 26, 34, 42, 50, 58, 35, 43, 51, 59, 44, 52, 60, 53, 61, 62]
-StringLegalActions() = ["HJHQ", "HJHK", "HJHA", "HJSJ", "HJSQ", "HJSK", "HJSA", "HQHK", "HQHA", "HQSJ", "HQSQ", "HQSK", "HQSA", "HKHA", "HKSJ", "HKSQ", "HKSK", "HKSA", "HASJ", "HASQ", "HASK", "HASA", "SJSQ", "SJSK", "SJSA", "SQSK", "SQSA", "SKSA"]
+InformationState(0) = "W:??"
+InformationState(1) = "N:??"
+InformationState(2) = "E:??"
+InformationState(3) = "S:??"
+Observation(0) = "W:??"
+Observation(1) = "N:??"
+Observation(2) = "E:??"
+Observation(3) = "S:??"
+ChanceOutcomes() = [{0, 0.035714285714}, {1, 0.035714285714}, {3, 0.035714285714}, {6, 0.035714285714}, {10, 0.035714285714}, {15, 0.035714285714}, {21, 0.035714285714}, {2, 0.035714285714}, {4, 0.035714285714}, {7, 0.035714285714}, {11, 0.035714285714}, {16, 0.035714285714}, {22, 0.035714285714}, {5, 0.035714285714}, {8, 0.035714285714}, {12, 0.035714285714}, {17, 0.035714285714}, {23, 0.035714285714}, {9, 0.035714285714}, {13, 0.035714285714}, {18, 0.035714285714}, {24, 0.035714285714}, {14, 0.035714285714}, {19, 0.035714285714}, {25, 0.035714285714}, {20, 0.035714285714}, {26, 0.035714285714}, {27, 0.035714285714}]
+LegalActions() = [0, 1, 3, 6, 10, 15, 21, 2, 4, 7, 11, 16, 22, 5, 8, 12, 17, 23, 9, 13, 18, 24, 14, 19, 25, 20, 26, 27]
+StringLegalActions() = ["HQHJ", "HKHJ", "HAHJ", "SJHJ", "SQHJ", "SKHJ", "SAHJ", "HKHQ", "HAHQ", "SJHQ", "SQHQ", "SKHQ", "SAHQ", "HAHK", "SJHK", "SQHK", "SKHK", "SAHK", "SJHA", "SQHA", "SKHA", "SAHA", "SQSJ", "SKSJ", "SASJ", "SKSQ", "SASQ", "SASK"]
 
-# Apply action "HJSA"
-action: 56
+# Apply action "SAHJ"
+action: 21
 
 # State 1
 IsTerminal() = False
-ToString() = "W:HJSA N:?? E:?? S:??"
-History() = [56]
-HistoryString() = "56"
+ToString() = "W:SAHJ N:?? E:?? S:??"
+History() = [21]
+HistoryString() = "21"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
-InformationState(0) = "HJSA"
-InformationState(1) = "??"
-InformationState(2) = "??"
-InformationState(3) = "??"
-ChanceOutcomes() = [{17, 0.066666666667}, {25, 0.066666666667}, {33, 0.066666666667}, {41, 0.066666666667}, {49, 0.066666666667}, {26, 0.066666666667}, {34, 0.066666666667}, {42, 0.066666666667}, {50, 0.066666666667}, {35, 0.066666666667}, {43, 0.066666666667}, {51, 0.066666666667}, {44, 0.066666666667}, {52, 0.066666666667}, {53, 0.066666666667}]
-LegalActions() = [17, 25, 33, 41, 49, 26, 34, 42, 50, 35, 43, 51, 44, 52, 53]
-StringLegalActions() = ["HQHK", "HQHA", "HQSJ", "HQSQ", "HQSK", "HKHA", "HKSJ", "HKSQ", "HKSK", "HASJ", "HASQ", "HASK", "SJSQ", "SJSK", "SQSK"]
+InformationState(0) = "W:SAHJ"
+InformationState(1) = "N:??"
+InformationState(2) = "E:??"
+InformationState(3) = "S:??"
+Observation(0) = "W:SAHJ"
+Observation(1) = "N:??"
+Observation(2) = "E:??"
+Observation(3) = "S:??"
+ChanceOutcomes() = [{2, 0.066666666667}, {4, 0.066666666667}, {7, 0.066666666667}, {11, 0.066666666667}, {16, 0.066666666667}, {5, 0.066666666667}, {8, 0.066666666667}, {12, 0.066666666667}, {17, 0.066666666667}, {9, 0.066666666667}, {13, 0.066666666667}, {18, 0.066666666667}, {14, 0.066666666667}, {19, 0.066666666667}, {20, 0.066666666667}]
+LegalActions() = [2, 4, 7, 11, 16, 5, 8, 12, 17, 9, 13, 18, 14, 19, 20]
+StringLegalActions() = ["HKHQ", "HAHQ", "SJHQ", "SQHQ", "SKHQ", "HAHK", "SJHK", "SQHK", "SKHK", "SJHA", "SQHA", "SKHA", "SQSJ", "SKSJ", "SKSQ"]
 
-# Apply action "HQHA"
-action: 25
+# Apply action "HAHQ"
+action: 4
 
 # State 2
 IsTerminal() = False
-ToString() = "W:HJSA N:HQHA E:?? S:??"
-History() = [56, 25]
-HistoryString() = "56 25"
+ToString() = "W:SAHJ N:HAHQ E:?? S:??"
+History() = [21, 4]
+HistoryString() = "21 4"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
-InformationState(0) = "HJSA"
-InformationState(1) = "HQHA"
-InformationState(2) = "??"
-InformationState(3) = "??"
-ChanceOutcomes() = [{34, 0.166666666667}, {42, 0.166666666667}, {50, 0.166666666667}, {44, 0.166666666667}, {52, 0.166666666667}, {53, 0.166666666667}]
-LegalActions() = [34, 42, 50, 44, 52, 53]
-StringLegalActions() = ["HKSJ", "HKSQ", "HKSK", "SJSQ", "SJSK", "SQSK"]
+InformationState(0) = "W:SAHJ"
+InformationState(1) = "N:HAHQ"
+InformationState(2) = "E:??"
+InformationState(3) = "S:??"
+Observation(0) = "W:SAHJ"
+Observation(1) = "N:HAHQ"
+Observation(2) = "E:??"
+Observation(3) = "S:??"
+ChanceOutcomes() = [{8, 0.166666666667}, {12, 0.166666666667}, {17, 0.166666666667}, {14, 0.166666666667}, {19, 0.166666666667}, {20, 0.166666666667}]
+LegalActions() = [8, 12, 17, 14, 19, 20]
+StringLegalActions() = ["SJHK", "SQHK", "SKHK", "SQSJ", "SKSJ", "SKSQ"]
 
-# Apply action "HKSK"
-action: 50
+# Apply action "SKHK"
+action: 17
 
 # State 3
 IsTerminal() = False
-ToString() = "W:HJSA N:HQHA E:HKSK S:??"
-History() = [56, 25, 50]
-HistoryString() = "56 25 50"
+ToString() = "W:SAHJ N:HAHQ E:SKHK S:??"
+History() = [21, 4, 17]
+HistoryString() = "21 4 17"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
-InformationState(0) = "HJSA"
-InformationState(1) = "HQHA"
-InformationState(2) = "HKSK"
-InformationState(3) = "??"
-ChanceOutcomes() = [{44, 1.000000000000}]
-LegalActions() = [44]
-StringLegalActions() = ["SJSQ"]
+InformationState(0) = "W:SAHJ"
+InformationState(1) = "N:HAHQ"
+InformationState(2) = "E:SKHK"
+InformationState(3) = "S:??"
+Observation(0) = "W:SAHJ"
+Observation(1) = "N:HAHQ"
+Observation(2) = "E:SKHK"
+Observation(3) = "S:??"
+ChanceOutcomes() = [{14, 1.000000000000}]
+LegalActions() = [14]
+StringLegalActions() = ["SQSJ"]
 
-# Apply action "SJSQ"
-action: 44
+# Apply action "SQSJ"
+action: 14
 
 # State 4
 IsTerminal() = False
-ToString() = "W:HJSA N:HQHA E:HKSK S:SJSQ"
-History() = [56, 25, 50, 44]
-HistoryString() = "56 25 50 44"
+ToString() = "W:SAHJ N:HAHQ E:SKHK S:SQSJ"
+History() = [21, 4, 17, 14]
+HistoryString() = "21 4 17 14"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationState(0) = "HJSA"
-InformationState(1) = "HQHA"
-InformationState(2) = "HKSK"
-InformationState(3) = "SJSQ"
+InformationState(0) = "W:SAHJ"
+InformationState(1) = "N:HAHQ"
+InformationState(2) = "E:SKHK"
+InformationState(3) = "S:SQSJ"
+Observation(0) = "W:SAHJ"
+Observation(1) = "N:HAHQ"
+Observation(2) = "E:SKHK"
+Observation(3) = "S:SQSJ"
 Rewards() = [0.0, 0.0, 0.0, 0.0]
 Returns() = [0.0, 0.0, 0.0, 0.0]
 LegalActions() = [0, 1, 2, 3, 4, 5, 6]
@@ -124,16 +144,20 @@ action: 4
 
 # State 5
 IsTerminal() = False
-ToString() = "W:HJSA N:HQHA E:HKSK S:SJSQ 2H"
-History() = [56, 25, 50, 44, 4]
-HistoryString() = "56 25 50 44 4"
+ToString() = "W:SAHJ N:HAHQ E:SKHK S:SQSJ 2H"
+History() = [21, 4, 17, 14, 4]
+HistoryString() = "21 4 17 14 4"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationState(0) = "HJSA 2H"
-InformationState(1) = "HQHA 2H"
-InformationState(2) = "HKSK 2H"
-InformationState(3) = "SJSQ 2H"
+InformationState(0) = "W:SAHJ 2H"
+InformationState(1) = "N:HAHQ 2H"
+InformationState(2) = "E:SKHK 2H"
+InformationState(3) = "S:SQSJ 2H"
+Observation(0) = "W:SAHJ 2H:W"
+Observation(1) = "N:HAHQ 2H:W"
+Observation(2) = "E:SKHK 2H:W"
+Observation(3) = "S:SQSJ 2H:W"
 Rewards() = [0.0, 0.0, 0.0, 0.0]
 Returns() = [0.0, 0.0, 0.0, 0.0]
 LegalActions() = [0, 5, 6, 7]
@@ -144,16 +168,20 @@ action: 5
 
 # State 6
 IsTerminal() = False
-ToString() = "W:HJSA N:HQHA E:HKSK S:SJSQ 2H-2S"
-History() = [56, 25, 50, 44, 4, 5]
-HistoryString() = "56 25 50 44 4 5"
+ToString() = "W:SAHJ N:HAHQ E:SKHK S:SQSJ 2H-2S"
+History() = [21, 4, 17, 14, 4, 5]
+HistoryString() = "21 4 17 14 4 5"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 2
-InformationState(0) = "HJSA 2H-2S"
-InformationState(1) = "HQHA 2H-2S"
-InformationState(2) = "HKSK 2H-2S"
-InformationState(3) = "SJSQ 2H-2S"
+InformationState(0) = "W:SAHJ 2H-2S"
+InformationState(1) = "N:HAHQ 2H-2S"
+InformationState(2) = "E:SKHK 2H-2S"
+InformationState(3) = "S:SQSJ 2H-2S"
+Observation(0) = "W:SAHJ 2S:N"
+Observation(1) = "N:HAHQ 2S:N"
+Observation(2) = "E:SKHK 2S:N"
+Observation(3) = "S:SQSJ 2S:N"
 Rewards() = [0.0, 0.0, 0.0, 0.0]
 Returns() = [0.0, 0.0, 0.0, 0.0]
 LegalActions() = [0, 6, 7]
@@ -164,16 +192,20 @@ action: 6
 
 # State 7
 IsTerminal() = False
-ToString() = "W:HJSA N:HQHA E:HKSK S:SJSQ 2H-2S-2NT"
-History() = [56, 25, 50, 44, 4, 5, 6]
-HistoryString() = "56 25 50 44 4 5 6"
+ToString() = "W:SAHJ N:HAHQ E:SKHK S:SQSJ 2H-2S-2NT"
+History() = [21, 4, 17, 14, 4, 5, 6]
+HistoryString() = "21 4 17 14 4 5 6"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 3
-InformationState(0) = "HJSA 2H-2S-2NT"
-InformationState(1) = "HQHA 2H-2S-2NT"
-InformationState(2) = "HKSK 2H-2S-2NT"
-InformationState(3) = "SJSQ 2H-2S-2NT"
+InformationState(0) = "W:SAHJ 2H-2S-2NT"
+InformationState(1) = "N:HAHQ 2H-2S-2NT"
+InformationState(2) = "E:SKHK 2H-2S-2NT"
+InformationState(3) = "S:SQSJ 2H-2S-2NT"
+Observation(0) = "W:SAHJ 2NT:E"
+Observation(1) = "N:HAHQ 2NT:E"
+Observation(2) = "E:SKHK 2NT:E"
+Observation(3) = "S:SQSJ 2NT:E"
 Rewards() = [0.0, 0.0, 0.0, 0.0]
 Returns() = [0.0, 0.0, 0.0, 0.0]
 LegalActions() = [0, 7]
@@ -184,16 +216,20 @@ action: 7
 
 # State 8
 IsTerminal() = False
-ToString() = "W:HJSA N:HQHA E:HKSK S:SJSQ 2H-2S-2NT-Dbl"
-History() = [56, 25, 50, 44, 4, 5, 6, 7]
-HistoryString() = "56 25 50 44 4 5 6 7"
+ToString() = "W:SAHJ N:HAHQ E:SKHK S:SQSJ 2H-2S-2NT-Dbl"
+History() = [21, 4, 17, 14, 4, 5, 6, 7]
+HistoryString() = "21 4 17 14 4 5 6 7"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationState(0) = "HJSA 2H-2S-2NT-Dbl"
-InformationState(1) = "HQHA 2H-2S-2NT-Dbl"
-InformationState(2) = "HKSK 2H-2S-2NT-Dbl"
-InformationState(3) = "SJSQ 2H-2S-2NT-Dbl"
+InformationState(0) = "W:SAHJ 2H-2S-2NT-Dbl"
+InformationState(1) = "N:HAHQ 2H-2S-2NT-Dbl"
+InformationState(2) = "E:SKHK 2H-2S-2NT-Dbl"
+InformationState(3) = "S:SQSJ 2H-2S-2NT-Dbl"
+Observation(0) = "W:SAHJ 2NT:E Dbl:S"
+Observation(1) = "N:HAHQ 2NT:E Dbl:S"
+Observation(2) = "E:SKHK 2NT:E Dbl:S"
+Observation(3) = "S:SQSJ 2NT:E Dbl:S"
 Rewards() = [0.0, 0.0, 0.0, 0.0]
 Returns() = [0.0, 0.0, 0.0, 0.0]
 LegalActions() = [0, 8]
@@ -204,16 +240,20 @@ action: 8
 
 # State 9
 IsTerminal() = False
-ToString() = "W:HJSA N:HQHA E:HKSK S:SJSQ 2H-2S-2NT-Dbl-RDbl"
-History() = [56, 25, 50, 44, 4, 5, 6, 7, 8]
-HistoryString() = "56 25 50 44 4 5 6 7 8"
+ToString() = "W:SAHJ N:HAHQ E:SKHK S:SQSJ 2H-2S-2NT-Dbl-RDbl"
+History() = [21, 4, 17, 14, 4, 5, 6, 7, 8]
+HistoryString() = "21 4 17 14 4 5 6 7 8"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationState(0) = "HJSA 2H-2S-2NT-Dbl-RDbl"
-InformationState(1) = "HQHA 2H-2S-2NT-Dbl-RDbl"
-InformationState(2) = "HKSK 2H-2S-2NT-Dbl-RDbl"
-InformationState(3) = "SJSQ 2H-2S-2NT-Dbl-RDbl"
+InformationState(0) = "W:SAHJ 2H-2S-2NT-Dbl-RDbl"
+InformationState(1) = "N:HAHQ 2H-2S-2NT-Dbl-RDbl"
+InformationState(2) = "E:SKHK 2H-2S-2NT-Dbl-RDbl"
+InformationState(3) = "S:SQSJ 2H-2S-2NT-Dbl-RDbl"
+Observation(0) = "W:SAHJ 2NT:E Dbl:S RDbl:W"
+Observation(1) = "N:HAHQ 2NT:E Dbl:S RDbl:W"
+Observation(2) = "E:SKHK 2NT:E Dbl:S RDbl:W"
+Observation(3) = "S:SQSJ 2NT:E Dbl:S RDbl:W"
 Rewards() = [0.0, 0.0, 0.0, 0.0]
 Returns() = [0.0, 0.0, 0.0, 0.0]
 LegalActions() = [0]
@@ -224,16 +264,20 @@ action: 0
 
 # State 10
 IsTerminal() = False
-ToString() = "W:HJSA N:HQHA E:HKSK S:SJSQ 2H-2S-2NT-Dbl-RDbl-Pass"
-History() = [56, 25, 50, 44, 4, 5, 6, 7, 8, 0]
-HistoryString() = "56 25 50 44 4 5 6 7 8 0"
+ToString() = "W:SAHJ N:HAHQ E:SKHK S:SQSJ 2H-2S-2NT-Dbl-RDbl-Pass"
+History() = [21, 4, 17, 14, 4, 5, 6, 7, 8, 0]
+HistoryString() = "21 4 17 14 4 5 6 7 8 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 2
-InformationState(0) = "HJSA 2H-2S-2NT-Dbl-RDbl-Pass"
-InformationState(1) = "HQHA 2H-2S-2NT-Dbl-RDbl-Pass"
-InformationState(2) = "HKSK 2H-2S-2NT-Dbl-RDbl-Pass"
-InformationState(3) = "SJSQ 2H-2S-2NT-Dbl-RDbl-Pass"
+InformationState(0) = "W:SAHJ 2H-2S-2NT-Dbl-RDbl-Pass"
+InformationState(1) = "N:HAHQ 2H-2S-2NT-Dbl-RDbl-Pass"
+InformationState(2) = "E:SKHK 2H-2S-2NT-Dbl-RDbl-Pass"
+InformationState(3) = "S:SQSJ 2H-2S-2NT-Dbl-RDbl-Pass"
+Observation(0) = "W:SAHJ 2NT:E Dbl:S RDbl:W"
+Observation(1) = "N:HAHQ 2NT:E Dbl:S RDbl:W"
+Observation(2) = "E:SKHK 2NT:E Dbl:S RDbl:W"
+Observation(3) = "S:SQSJ 2NT:E Dbl:S RDbl:W"
 Rewards() = [0.0, 0.0, 0.0, 0.0]
 Returns() = [0.0, 0.0, 0.0, 0.0]
 LegalActions() = [0]
@@ -244,16 +288,20 @@ action: 0
 
 # State 11
 IsTerminal() = False
-ToString() = "W:HJSA N:HQHA E:HKSK S:SJSQ 2H-2S-2NT-Dbl-RDbl-Pass-Pass"
-History() = [56, 25, 50, 44, 4, 5, 6, 7, 8, 0, 0]
-HistoryString() = "56 25 50 44 4 5 6 7 8 0 0"
+ToString() = "W:SAHJ N:HAHQ E:SKHK S:SQSJ 2H-2S-2NT-Dbl-RDbl-Pass-Pass"
+History() = [21, 4, 17, 14, 4, 5, 6, 7, 8, 0, 0]
+HistoryString() = "21 4 17 14 4 5 6 7 8 0 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 3
-InformationState(0) = "HJSA 2H-2S-2NT-Dbl-RDbl-Pass-Pass"
-InformationState(1) = "HQHA 2H-2S-2NT-Dbl-RDbl-Pass-Pass"
-InformationState(2) = "HKSK 2H-2S-2NT-Dbl-RDbl-Pass-Pass"
-InformationState(3) = "SJSQ 2H-2S-2NT-Dbl-RDbl-Pass-Pass"
+InformationState(0) = "W:SAHJ 2H-2S-2NT-Dbl-RDbl-Pass-Pass"
+InformationState(1) = "N:HAHQ 2H-2S-2NT-Dbl-RDbl-Pass-Pass"
+InformationState(2) = "E:SKHK 2H-2S-2NT-Dbl-RDbl-Pass-Pass"
+InformationState(3) = "S:SQSJ 2H-2S-2NT-Dbl-RDbl-Pass-Pass"
+Observation(0) = "W:SAHJ 2NT:E Dbl:S RDbl:W"
+Observation(1) = "N:HAHQ 2NT:E Dbl:S RDbl:W"
+Observation(2) = "E:SKHK 2NT:E Dbl:S RDbl:W"
+Observation(3) = "S:SQSJ 2NT:E Dbl:S RDbl:W"
 Rewards() = [0.0, 0.0, 0.0, 0.0]
 Returns() = [0.0, 0.0, 0.0, 0.0]
 LegalActions() = [0]
@@ -264,15 +312,19 @@ action: 0
 
 # State 12
 IsTerminal() = True
-ToString() = "W:HJSA N:HQHA E:HKSK S:SJSQ 2H-2S-2NT-Dbl-RDbl-Pass-Pass-Pass"
-History() = [56, 25, 50, 44, 4, 5, 6, 7, 8, 0, 0, 0]
-HistoryString() = "56 25 50 44 4 5 6 7 8 0 0 0"
+ToString() = "W:SAHJ N:HAHQ E:SKHK S:SQSJ 2H-2S-2NT-Dbl-RDbl-Pass-Pass-Pass"
+History() = [21, 4, 17, 14, 4, 5, 6, 7, 8, 0, 0, 0]
+HistoryString() = "21 4 17 14 4 5 6 7 8 0 0 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
-InformationState(0) = "HJSA 2H-2S-2NT-Dbl-RDbl-Pass-Pass-Pass"
-InformationState(1) = "HQHA 2H-2S-2NT-Dbl-RDbl-Pass-Pass-Pass"
-InformationState(2) = "HKSK 2H-2S-2NT-Dbl-RDbl-Pass-Pass-Pass"
-InformationState(3) = "SJSQ 2H-2S-2NT-Dbl-RDbl-Pass-Pass-Pass"
+InformationState(0) = "W:SAHJ 2H-2S-2NT-Dbl-RDbl-Pass-Pass-Pass"
+InformationState(1) = "N:HAHQ 2H-2S-2NT-Dbl-RDbl-Pass-Pass-Pass"
+InformationState(2) = "E:SKHK 2H-2S-2NT-Dbl-RDbl-Pass-Pass-Pass"
+InformationState(3) = "S:SQSJ 2H-2S-2NT-Dbl-RDbl-Pass-Pass-Pass"
+Observation(0) = "W:SAHJ 2NT:E Dbl:S RDbl:W"
+Observation(1) = "N:HAHQ 2NT:E Dbl:S RDbl:W"
+Observation(2) = "E:SKHK 2NT:E Dbl:S RDbl:W"
+Observation(3) = "S:SQSJ 2NT:E Dbl:S RDbl:W"
 Rewards() = [-4.0, 4.0, -4.0, 4.0]
 Returns() = [-4.0, 4.0, -4.0, 4.0]

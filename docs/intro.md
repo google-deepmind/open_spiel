@@ -19,7 +19,7 @@ extensions.
 
 **Multi-language support**
 
-*   C++11
+*   C++17
 *   Python 3
 *   A subset of the features are available in Swift.
 

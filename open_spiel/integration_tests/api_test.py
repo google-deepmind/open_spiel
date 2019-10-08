@@ -18,6 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import random
 import unittest
 
 from absl.testing import absltest
@@ -28,44 +29,13 @@ import numpy as np
 from open_spiel.python.algorithms import get_all_states
 import pyspiel
 
-# TODO(author2): Test all games.
-_EXCLUDED_GAMES = [
-    # Simultaneous games
-    # TODO(author2): the tests are now failing because the empty legal actions
-    # for not the current player is being tested on simultaneous games (we
-    # should skip that test in thoses cases)
-    "coin_game",  # Too big, number of states with depth 5 is ~10^9
-    "coop_box_pushing",
-    "laser_tag",
-    "markov_soccer",
-    "matching_pennies_3p",
-    "matrix_cd",
-    "matrix_coordination",
-    "matrix_mp",
-    "matrix_pd",
-    "matrix_rps",
-    "matrix_sh",
-    "matrix_shapleys_game",
-    "oshi_zumo",
-    "goofspiel",
-    "blotto",
-    # Times out (to investigate)
-    "backgammon",  # Likely too large for depth limit 5 (huge branching factor).
-    "breakthrough",
-    "bridge_uncontested_bidding",
-    "havannah",
-    "hex",
-    "chess",
-    "go",
-    "pentago",
-    "quoridor",
-    # Mandatory parameters
+_MANDATORY_PARAMETERS_GAMES = [
     "misere",
     "turn_based_simultaneous_game",
-    "y",
 ]
 
-_GAMES_TO_TEST = list(set(pyspiel.registered_names()) - set(_EXCLUDED_GAMES))
+_GAMES_TO_TEST = list(
+    set(pyspiel.registered_names()) - set(_MANDATORY_PARAMETERS_GAMES))
 
 # The list of game instances to test on the full tree as tuples
 # (name to display, string to pass to load_game).
@@ -73,17 +43,16 @@ _GAMES_FULL_TREE_TRAVERSAL_TESTS = [
     ("catch", "catch(rows=6,columns=3)"),
     ("kuhn_poker", "kuhn_poker"),
     ("leduc_poker", "leduc_poker"),
-    # Disabled as this slows down the test significantly. (12s to 150s).
-    # Enable it to check the game when you modify it.
-    # ("liars_dice", "liars_dice"),
     ("iigoofspiel4", "turn_based_simultaneous_game(game=goofspiel("
      "imp_info=True,num_cards=4,points_order=descending))"),
     ("kuhn_poker3p", "kuhn_poker(players=3)"),
     ("first_sealed_auction", "first_sealed_auction(max_value=2)"),
+    ("tiny_hanabi", "tiny_hanabi"),
+    # Disabled by default - big games, slow tests.
+    # Uncomment to check the games if you modify them.
+    # ("liars_dice", "liars_dice"),
+    # ("tiny_bridge_2p", "tiny_bridge_2p"),
 ]
-
-# Games from the above to exempt from the constant-sum tests.
-_GENERAL_SUM_GAMES = ["catch", "first_sealed_auction"]
 
 TOTAL_NUM_STATES = {
     # This maps the game name to (chance, playable, terminal)
@@ -94,6 +63,8 @@ TOTAL_NUM_STATES = {
     "iigoofspiel4": (0, 501, 576),
     "kuhn_poker3p": (17, 288, 312),
     "first_sealed_auction": (12, 10, 14),
+    "tiny_bridge_2p": (29, 53760, 53340),
+    "tiny_hanabi": (3, 16, 36),
 }
 
 # This is kept to ensure non-regression, but we would like to remove that
@@ -106,6 +77,8 @@ PERFECT_RECALL_NUM_STATES = {
     "iigoofspiel4": 162,
     "kuhn_poker3p": 48,
     "first_sealed_auction": 4,
+    "tiny_bridge_2p": 3584,
+    "tiny_hanabi": 8,
 }
 
 
@@ -127,28 +100,7 @@ class EnforceAPIOnFullTreeBase(parameterized.TestCase):
             include_terminals=True,
             include_chance_states=True).values())
 
-  def test_legal_actions_returns_empty_list_on_opponent(self):
-    # We check we have some non-terminal non-random states
-    self.assertTrue(
-        any(not s.is_terminal() and not s.is_chance_node()
-            for s in self.all_states))
-
-    for state in self.all_states:
-      if not state.is_terminal():
-        self.assertNotEqual(state.get_type(), pyspiel.StateType.TERMINAL)
-        current_player = state.current_player()
-        for player in range(self.game.num_players()):
-          if player != current_player:
-            msg = ("The game {!r} does not return an empty list on "
-                   "legal_actions(<not current player>)").format(self.game_name)
-            # It is illegal to call legal_actions(player) on a chance node for
-            # a non chance player.
-            if not (state.is_chance_node() and player != current_player):
-              self.assertEmpty(state.legal_actions(player), msg=msg)
-      else:
-        self.assertEqual(state.get_type(), pyspiel.StateType.TERMINAL)
-
-  def test_legal_actions_returns_empty_list_on_terminal(self):
+  def test_legal_actions_empty(self):
     # We check we have some non-terminal non-random states
     self.assertTrue(
         any(not s.is_terminal() and not s.is_chance_node()
@@ -156,6 +108,7 @@ class EnforceAPIOnFullTreeBase(parameterized.TestCase):
 
     for state in self.all_states:
       if state.is_terminal():
+        # Empty on terminal
         msg = ("The game %s does not return an empty list on "
                "legal_actions() for state %s" % (self.game_name, str(state)))
         self.assertEmpty(state.legal_actions(), msg=msg)
@@ -164,6 +117,21 @@ class EnforceAPIOnFullTreeBase(parameterized.TestCase):
                  "legal_actions(%i) for state %s" %
                  (self.game_name, player, str(state)))
           self.assertEmpty(state.legal_actions(player), msg=msg)
+      elif state.is_simultaneous_node():
+        # TODO(open_spiel) - check simultaneous nodes
+        pass
+      elif state.is_chance_node():
+        # Would be an error to request legal actions for a non-chance player.
+        pass
+      else:
+        # Empty for players other than the current player
+        current_player = state.current_player()
+        for player in range(self.game.num_players()):
+          if player != current_player:
+            msg = ("The game {!r} does not return an empty list on "
+                   "legal_actions(<not current player>) in state {}".format(
+                       self.game_name, state))
+            self.assertEmpty(state.legal_actions(player), msg=msg)
 
   def test_number_of_nodes(self):
     expected_numbers = TOTAL_NUM_STATES[self.game_name]
@@ -208,31 +176,24 @@ class EnforceAPIOnFullTreeBase(parameterized.TestCase):
 
   def test_constant_sum(self):
     game_type = self.game.get_type()
-    is_constant = self.game_name not in _GENERAL_SUM_GAMES
-    num_players = self.game.num_players()
-
-    def sum_returns(state):
-      return sum([state.player_return(i) for i in range(num_players)])
-
-    terminal_states = [
-        state for state in self.all_states if state.is_terminal()
-    ]
-    terminal_sum_returns = {
-        state: sum_returns(state) for state in terminal_states
+    terminal_values = {
+        tuple(state.returns())
+        for state in self.all_states
+        if state.is_terminal()
     }
-    if is_constant:
-      self.assertIn(game_type.utility, [
-          pyspiel.GameType.Utility.ZERO_SUM,
-          pyspiel.GameType.Utility.CONSTANT_SUM
-      ])
-
-      constant_sum = self.game.utility_sum()
-
-      for unused_state, sum_returns in terminal_sum_returns.items():
-        self.assertEqual(sum_returns, constant_sum)
+    if game_type.utility in (pyspiel.GameType.Utility.ZERO_SUM,
+                             pyspiel.GameType.Utility.CONSTANT_SUM):
+      expected_sum = self.game.utility_sum()
+      for returns in terminal_values:
+        self.assertEqual(sum(returns), expected_sum)
+    elif game_type.utility == pyspiel.GameType.Utility.GENERAL_SUM:
+      all_sums = {sum(returns) for returns in terminal_values}
+      self.assertNotEqual(len(all_sums), 1)
+    elif game_type.utility == pyspiel.GameType.Utility.IDENTICAL:
+      for returns in terminal_values:
+        self.assertLen(set(returns), 1)
     else:
-      self.assertEqual(game_type.utility, pyspiel.GameType.Utility.GENERAL_SUM)
-      self.assertNotEqual(len(set(terminal_sum_returns.values())), 1)
+      raise AssertionError("Invalid utility type {}".format(game_type.utility))
 
   def test_information_state_functions_raises_on_chance_nodes(self):
 
@@ -284,6 +245,19 @@ class EnforceAPIOnFullTreeBase(parameterized.TestCase):
       self.assertLen(union, sum([len(x) for x in information_sets_per_player]))
 
 
+# Assembles all states seen in a specified number of game playthroughs.
+def _get_some_states(game, num_plays=10, include_terminals=True):
+  states = dict()
+  for _ in range(num_plays):
+    state = game.new_initial_state()
+    while not state.is_terminal():
+      states[state.history_str()] = state.clone()
+      state.apply_action(random.choice(state.legal_actions()))
+    if include_terminals:
+      states[state.history_str()] = state
+  return states
+
+
 class PartialEnforceAPIConventionsTest(parameterized.TestCase):
   """This only partially test some properties."""
 
@@ -291,27 +265,37 @@ class PartialEnforceAPIConventionsTest(parameterized.TestCase):
   def test_legal_actions_returns_empty_list_on_opponent(self, game_name):
     game = pyspiel.load_game(game_name)
 
-    some_states = get_all_states.get_all_states(
-        game, depth_limit=5, include_terminals=True, include_chance_states=True)
+    some_states = _get_some_states(game)
     # We check we have some non-terminal non-random states
     self.assertTrue(
         any(not s.is_terminal() and not s.is_chance_node()
             for s in some_states.values()))
 
     for state in some_states.values():
-      if not state.is_terminal():
-        self.assertNotEqual(state.get_type(), pyspiel.StateType.TERMINAL)
+      if state.is_terminal():
+        # Empty on terminal
+        msg = ("The game %s does not return an empty list on "
+               "legal_actions() for state %s" % (game, state))
+        self.assertEmpty(state.legal_actions(), msg=msg)
+        for player in range(game.num_players()):
+          msg = ("The game %s does not return an empty list on "
+                 "legal_actions(%i) for state %s" % (game, player, state))
+          self.assertEmpty(state.legal_actions(player), msg=msg)
+      elif state.is_simultaneous_node():
+        # TODO(open_spiel) - check simultaneous nodes
+        pass
+      elif state.is_chance_node():
+        # Would be an error to request legal actions for a non-chance player.
+        pass
+      else:
+        # Empty for players other than the current player
         current_player = state.current_player()
         for player in range(game.num_players()):
           if player != current_player:
             msg = ("The game {!r} does not return an empty list on "
-                   "legal_actions(<not current player>)").format(game_name)
-            # It is illegal to call legal_actions(player) on a chance node for
-            # a non chance player.
-            if not (state.is_chance_node() and player != current_player):
-              self.assertEmpty(state.legal_actions(player), msg=msg)
-      else:
-        self.assertEqual(state.get_type(), pyspiel.StateType.TERMINAL)
+                   "legal_actions(<not current player>) in state {}".format(
+                       game, state))
+            self.assertEmpty(state.legal_actions(player), msg=msg)
 
 
 def _assert_properties_recursive(state, assert_functions):

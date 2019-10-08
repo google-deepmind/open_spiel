@@ -16,8 +16,18 @@
 
 #include <array>
 
+#include "open_spiel/game_parameters.h"
+
 namespace open_spiel {
 namespace coin_game {
+
+// Defaults match the paper https://arxiv.org/pdf/1802.09640.pdf
+constexpr int kDefaultPlayers = 2;
+constexpr int kDefaultRows = 8;
+constexpr int kDefaultColumns = 8;
+constexpr int kDefaultExtraCoinColors = 1;
+constexpr int kDefaultCoinsPerColor = 4;
+constexpr int kDefaultEpisodeLength = 20;
 
 namespace {
 
@@ -43,14 +53,14 @@ const GameType kGameType{
     /*provides_observation_as_normalized_vector=*/false,
     /*parameter_specification=*/
     {
-        {"players", {GameParameter::Type::kInt, false}},
-        {"rows", {GameParameter::Type::kInt, false}},
-        {"columns", {GameParameter::Type::kInt, false}},
-        {"episode_length", {GameParameter::Type::kInt, false}},
+        {"players", GameParameter(kDefaultPlayers)},
+        {"rows", GameParameter(kDefaultRows)},
+        {"columns", GameParameter(kDefaultColumns)},
+        {"episode_length", GameParameter(kDefaultEpisodeLength)},
         // Number of extra coin colors to use apart from the
         // players' preferred color.
-        {"num_extra_coin_colors", {GameParameter::Type::kInt, false}},
-        {"num_coins_per_color", {GameParameter::Type::kInt, false}},
+        {"num_extra_coin_colors", GameParameter(kDefaultExtraCoinColors)},
+        {"num_coins_per_color", GameParameter(kDefaultCoinsPerColor)},
     }};
 
 std::unique_ptr<Game> Factory(const GameParameters& params) {
@@ -58,14 +68,6 @@ std::unique_ptr<Game> Factory(const GameParameters& params) {
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
-
-// Defaults match the paper https://arxiv.org/pdf/1802.09640.pdf
-constexpr int kDefaultPlayers = 2;
-constexpr int kDefaultRows = 8;
-constexpr int kDefaultColumns = 8;
-constexpr int kDefaultExtraCoinColors = 1;
-constexpr int kDefaultCoinsPerColor = 4;
-constexpr int kDefaultEpisodeLength = 20;
 
 std::string GamePhaseToString(GamePhase phase) {
   switch (phase) {
@@ -180,6 +182,7 @@ GamePhase CoinState::GetPhase() const {
 }
 
 std::vector<Action> CoinState::LegalActions() const {
+  if (IsTerminal()) return {};
   switch (GetPhase()) {
     case GamePhase::kAssignPreferences:
       return ActionRange(setup_.available_coin_colors_);
@@ -191,7 +194,6 @@ std::vector<Action> CoinState::LegalActions() const {
       return Range(offsets.size());
     default:
       SpielFatalError("Unknown phase.");
-      return {};
   }
 }
 
@@ -443,16 +445,13 @@ double CoinGame::MinUtility() const { return -MaxUtility(); }
 
 CoinGame::CoinGame(const GameParameters& params)
     : Game(kGameType, params),
-      num_players_(ParameterValue<int>("players", kDefaultPlayers)),
-      num_rows_(ParameterValue<int>("rows", kDefaultRows)),
-      num_columns_(ParameterValue<int>("columns", kDefaultColumns)),
-      episode_length_(
-          ParameterValue<int>("episode_length", kDefaultEpisodeLength)),
+      num_players_(ParameterValue<int>("players")),
+      num_rows_(ParameterValue<int>("rows")),
+      num_columns_(ParameterValue<int>("columns")),
+      episode_length_(ParameterValue<int>("episode_length")),
       num_coin_colors_(num_players_ +
-                       ParameterValue<int>("num_extra_coin_colors",
-                                           kDefaultExtraCoinColors)),
-      num_coins_per_color_(
-          ParameterValue<int>("num_coins_per_color", kDefaultCoinsPerColor)) {
+                       ParameterValue<int>("num_extra_coin_colors")),
+      num_coins_per_color_(ParameterValue<int>("num_coins_per_color")) {
   int total_items = num_players_ + num_coin_colors_ * num_coins_per_color_;
   SPIEL_CHECK_LE(total_items, num_rows_ * num_columns_);
 }

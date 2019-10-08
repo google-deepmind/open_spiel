@@ -147,7 +147,7 @@ void TestEveryInfostateInPolicy(PolicyGenerator policy_generator,
     }
     if (!state->IsChanceNode() && !state->IsTerminal()) {
       SPIEL_CHECK_EQ(policy.GetStatePolicy(state->InformationState()).size(),
-                     game.NumDistinctActions());
+                     state->LegalActions().size());
     }
   }
 }

@@ -14,6 +14,8 @@
 
 #include "open_spiel/games/chess.h"
 
+#include <optional>
+
 #include "open_spiel/games/chess/chess_board.h"
 #include "open_spiel/spiel_utils.h"
 
@@ -102,6 +104,7 @@ void ChessState::DoApplyAction(Action action) {
 
 std::vector<Action> ChessState::LegalActions() const {
   std::vector<Action> actions;
+  if (IsTerminal()) return actions;
   Board().GenerateLegalMoves([&actions](const Move& move) -> bool {
     actions.push_back(MoveToAction(move));
     return true;
@@ -199,7 +202,7 @@ bool ChessState::IsRepetitionDraw() const {
   return entry->second >= kNumRepetitionsToDraw;
 }
 
-Optional<std::vector<double>> ChessState::MaybeFinalReturns() const {
+std::optional<std::vector<double>> ChessState::MaybeFinalReturns() const {
   if (Board().IrreversibleMoveCounter() >= kNumReversibleMovesToDraw) {
     // This is theoretically a draw that needs to be claimed, but we implement
     // it as a forced draw for now.
@@ -234,7 +237,7 @@ Optional<std::vector<double>> ChessState::MaybeFinalReturns() const {
     }
   }
 
-  return kNullopt;
+  return std::nullopt;
 }
 
 ChessGame::ChessGame(const GameParameters& params) : Game(kGameType, params) {}

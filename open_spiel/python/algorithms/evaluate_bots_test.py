@@ -18,7 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import unittest
+from absl.testing import absltest
 
 import numpy as np
 
@@ -27,7 +27,7 @@ from open_spiel.python.bots import uniform_random
 import pyspiel
 
 
-class EvaluateBotsTest(unittest.TestCase):
+class EvaluateBotsTest(absltest.TestCase):
 
   def test_cpp_vs_python(self):
     game = pyspiel.load_game("kuhn_poker")
@@ -44,4 +44,4 @@ class EvaluateBotsTest(unittest.TestCase):
 
 
 if __name__ == "__main__":
-  unittest.main()
+  absltest.main()

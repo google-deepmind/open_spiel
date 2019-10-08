@@ -30,8 +30,11 @@ from open_spiel.python.algorithms import expected_game_score
 from open_spiel.python.algorithms import exploitability
 import pyspiel
 
-_KUHN_UNIFORM_POLICY = policy.TabularPolicy(pyspiel.load_game("kuhn_poker"))
-_LEDUC_UNIFORM_POLICY = policy.TabularPolicy(pyspiel.load_game("leduc_poker"))
+_KUHN_GAME = pyspiel.load_game("kuhn_poker")
+_LEDUC_GAME = pyspiel.load_game("leduc_poker")
+
+_KUHN_UNIFORM_POLICY = policy.TabularPolicy(_KUHN_GAME)
+_LEDUC_UNIFORM_POLICY = policy.TabularPolicy(_LEDUC_GAME)
 
 
 class ModuleLevelFunctionTest(absltest.TestCase):
@@ -61,6 +64,7 @@ class ModuleLevelFunctionTest(absltest.TestCase):
     info_state_nodes = {
         key: cfr._InfoStateNode(
             legal_actions=[0, 1],
+            index_in_tabular_policy=None,
             cumulative_regret=dict(enumerate(cumulative_regrets[index])),
             cumulative_policy=None) for key, index in nodes_indices.items()
     }
@@ -89,7 +93,7 @@ class CFRTest(parameterized.TestCase, absltest.TestCase):
 
     np.testing.assert_array_equal(
         _LEDUC_UNIFORM_POLICY.action_probability_array,
-        cfr_solver.policy().action_probability_array)
+        cfr_solver.current_policy().action_probability_array)
     np.testing.assert_array_equal(
         _LEDUC_UNIFORM_POLICY.action_probability_array,
         cfr_solver.average_policy().action_probability_array)
@@ -181,7 +185,7 @@ class CFRTest(parameterized.TestCase, absltest.TestCase):
     game = pyspiel.load_game("kuhn_poker")
     solver = cfr.CFRPlusSolver(game)
 
-    tabular_policy = solver.policy()
+    tabular_policy = solver.current_policy()
     self.assertLen(tabular_policy.state_lookup, 12)
     for info_state_str in tabular_policy.state_lookup.keys():
       np.testing.assert_equal(
@@ -212,39 +216,13 @@ class CFRTest(parameterized.TestCase, absltest.TestCase):
       cpp_expl = pyspiel.nash_conv(game, cpp_avg_policy)
       python_expl = exploitability.nash_conv(game, python_avg_policy)
       self.assertEqual(cpp_expl, python_expl)
-
-
-class CFRBRTest(parameterized.TestCase, absltest.TestCase):
-
-  @parameterized.parameters(
-      list(itertools.product([True, False], [True, False])))
-  def test_policy_zero_is_uniform(self, linear_averaging, regret_matching_plus):
-    game = pyspiel.load_game("leduc_poker")
-    cfr_solver = cfr.CFRBRSolver(
-        game,
-        regret_matching_plus=regret_matching_plus,
-        linear_averaging=linear_averaging)
-
-    np.testing.assert_array_equal(
-        _LEDUC_UNIFORM_POLICY.action_probability_array,
-        cfr_solver.policy().action_probability_array)
-    np.testing.assert_array_equal(
-        _LEDUC_UNIFORM_POLICY.action_probability_array,
-        cfr_solver.average_policy().action_probability_array)
-
-  def test_policy_and_average_policy(self):
-    game = pyspiel.load_game("kuhn_poker")
-    cfrbr_solver = cfr.CFRBRSolver(game)
-    for _ in range(300):
-      cfrbr_solver.evaluate_and_update_policy()
-    average_policy = cfrbr_solver.average_policy()
-    average_policy_values = expected_game_score.policy_value(
-        game.new_initial_state(), [average_policy] * 2)
-    # 1/18 is the Nash value. See https://en.wikipedia.org/wiki/Kuhn_poker
-    np.testing.assert_allclose(
-        average_policy_values, [-1 / 18, 1 / 18], atol=1e-3)
-
-    cfrbr_solver.policy()
+    # Then we also check the CurrentPolicy, just to check it is giving the same
+    # results too
+    cpp_current_policy = cpp_solver.current_policy()
+    python_current_policy = python_solver.current_policy()
+    cpp_expl = pyspiel.nash_conv(game, cpp_current_policy)
+    python_expl = exploitability.nash_conv(game, python_current_policy)
+    self.assertEqual(cpp_expl, python_expl)
 
 
 if __name__ == "__main__":

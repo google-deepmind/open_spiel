@@ -146,7 +146,7 @@ release!). Contributions are certainly not limited to these suggestions!
 -   **General Games Wrapper**. There are several general game engine languages
     and databases of general games that currently exist, for example within the
     [general game-playing project](http://www.ggp.org/) and the
-    [Ludii General Game System](http://www.ludii.games/index.html). A very nice
+    [Ludii General Game System](http://www.ludii.games/index.html) or [GAMUT](http://gamut.stanford.edu/) (a suite of normal-form game generators). A very nice
     addition to OpenSpiel would be a game that interprets games represented in
     these languages and presents them as OpenSpiel games. This could lead to the
     potential of evaluating learning agents on hundreds to thousands of games.
@@ -170,6 +170,10 @@ release!). Contributions are certainly not limited to these suggestions!
     [Methods for Empirical Game-Theoretic Analysis](https://www.semanticscholar.org/paper/Methods-for-Empirical-Game-Theoretic-Analysis-Wellman/39be2fc457124bae3141cfe458653bab9aece206),
     [An evolutionary game-theoretic analysis of poker strategies](https://www.sciencedirect.com/science/article/pii/S1875952109000056),
     [Ref4](https://arxiv.org/abs/1803.06376).
+
+-   **Monte Carlo Tree Search Solver**. General enhancement to Monte Carlo tree
+    search, backpropagate proven wins and loses as far up as possible. See
+    [Winands el al. '08](https://dke.maastrichtuniversity.nl/m.winands/documents/uctloa.pdf).
 
 -   **Minimax-Q and other classic MARL algorithms**. Minimax-Q is a classic
     multiagent reinforcement learning algorithm

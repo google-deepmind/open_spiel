@@ -17,11 +17,11 @@
 
 #include <memory>
 
+#include "open_spiel/algorithms/best_response.h"
 #include "open_spiel/algorithms/cfr.h"
 #include "open_spiel/algorithms/tabular_exploitability.h"
 #include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"
-#include "open_spiel/spiel_optional.h"
 
 // An implementation of CFR-BR (Johanson et al., "Finding Optimal Abstract
 // Strategies in Extensive-Form Games", 2012). In CFR-BR, at each iteration,

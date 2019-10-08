@@ -18,6 +18,7 @@
 #include <memory>
 #include <utility>
 
+#include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
 
 namespace open_spiel {
@@ -39,10 +40,11 @@ const GameType kGameType{
     /*provides_observation=*/false,
     /*provides_observation_as_normalized_vector=*/false,
     /*parameter_specification=*/
-    {{"imp_info", {GameParameter::Type::kBool, false}},
-     {"num_cards", {GameParameter::Type::kInt, false}},
-     {"players", {GameParameter::Type::kInt, false}},
-     {"points_order", {GameParameter::Type::kString, false}}}};
+    {{"imp_info", GameParameter(kDefaultImpInfo)},
+     {"num_cards", GameParameter(kDefaultNumCards)},
+     {"players", GameParameter(kDefaultNumPlayers)},
+     {"points_order",
+      GameParameter(static_cast<std::string>(kDefaultPointsOrder))}}};
 
 std::unique_ptr<Game> Factory(const GameParameters& params) {
   return std::unique_ptr<Game>(new GoofspielGame(params));
@@ -435,11 +437,11 @@ std::unique_ptr<State> GoofspielState::Clone() const {
 
 GoofspielGame::GoofspielGame(const GameParameters& params)
     : Game(kGameType, params),
-      num_cards_(ParameterValue<int>("num_cards", kDefaultNumCards)),
-      num_players_(ParameterValue<int>("players", kDefaultNumPlayers)),
-      points_order_(ParsePointsOrder(
-          ParameterValue<std::string>("points_order", kDefaultPointsOrder))),
-      impinfo_(ParameterValue<bool>("imp_info", kDefaultImpInfo)) {}
+      num_cards_(ParameterValue<int>("num_cards")),
+      num_players_(ParameterValue<int>("players")),
+      points_order_(
+          ParsePointsOrder(ParameterValue<std::string>("points_order"))),
+      impinfo_(ParameterValue<bool>("imp_info")) {}
 
 std::unique_ptr<State> GoofspielGame::NewInitialState() const {
   return std::unique_ptr<State>(new GoofspielState(

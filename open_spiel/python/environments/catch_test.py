@@ -19,7 +19,7 @@ from __future__ import division
 from __future__ import print_function
 
 import random
-import unittest
+from absl.testing import absltest
 
 from open_spiel.python import rl_environment
 from open_spiel.python.environments import catch
@@ -31,22 +31,22 @@ def _select_random_legal_action(time_step):
   return action
 
 
-class CatchEnvTest(unittest.TestCase):
+class CatchEnvTest(absltest.TestCase):
 
   def test_obs_spec(self):
     env = catch.Environment()
     obs_specs = env.observation_spec()
-    self.assertEqual(len(obs_specs), 3)
-    self.assertEqual(
-        sorted(obs_specs.keys()),
+    self.assertLen(obs_specs, 3)
+    self.assertCountEqual(
+        obs_specs.keys(),
         ["current_player", "info_state", "legal_actions"])
 
   def test_action_spec(self):
     env = catch.Environment()
     action_spec = env.action_spec()
-    self.assertEqual(len(action_spec), 4)
-    self.assertEqual(
-        sorted(action_spec.keys()), ["dtype", "max", "min", "num_actions"])
+    self.assertLen(action_spec, 4)
+    self.assertCountEqual(
+        action_spec.keys(), ["dtype", "max", "min", "num_actions"])
     self.assertEqual(action_spec["num_actions"], 3)
     self.assertEqual(action_spec["dtype"], int)
 
@@ -87,4 +87,4 @@ class CatchEnvTest(unittest.TestCase):
 
 
 if __name__ == "__main__":
-  unittest.main()
+  absltest.main()

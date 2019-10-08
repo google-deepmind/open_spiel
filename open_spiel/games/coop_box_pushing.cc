@@ -76,7 +76,7 @@ const GameType kGameType{
     /*provides_observation=*/false,
     /*provides_observation_as_normalized_vector=*/false,
     /*parameter_specification=*/
-    {{"horizon", {GameParameter::Type::kInt, false}}}};
+    {{"horizon", GameParameter(kDefaultHorizon)}}};
 
 std::unique_ptr<Game> Factory(const GameParameters& params) {
   return std::unique_ptr<Game>(new CoopBoxPushingGame(params));
@@ -357,6 +357,8 @@ void CoopBoxPushingState::DoApplyAction(Action action) {
 std::vector<Action> CoopBoxPushingState::LegalActions(Player player) const {
   if (player == kSimultaneousPlayerId) {
     return LegalFlatJointActions();
+  } else if (IsTerminal()) {
+    return {};
   }
   // All the actions are legal at every state.
   return {0, 1, 2, 3};
@@ -468,7 +470,7 @@ std::unique_ptr<State> CoopBoxPushingState::Clone() const {
 
 CoopBoxPushingGame::CoopBoxPushingGame(const GameParameters& params)
     : SimMoveGame(kGameType, params),
-      horizon_(ParameterValue<int>("horizon", kDefaultHorizon)) {}
+      horizon_(ParameterValue<int>("horizon")) {}
 
 std::vector<int> CoopBoxPushingGame::InformationStateNormalizedVectorShape()
     const {

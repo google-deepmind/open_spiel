@@ -88,20 +88,6 @@ using Action = int64_t;
 // numbers as the threshold.
 constexpr float FloatingPointDefaultThresholdRatio() { return 1e-5; }
 
-// Useful functions for parsing the command-line for arguments of the form
-// --name=value.
-
-// Returns (true, value) if command-line argument is found, or (false, "")
-// otherwise.
-std::pair<bool, std::string> ParseCmdLineArg(int argc, char** argv,
-                                             const std::string& name);
-
-// Returns the value of the command-line argument if found, otherwise returns
-// the default value.
-std::string ParseCmdLineArgDefault(int argc, char** argv,
-                                   const std::string& name,
-                                   const std::string& default_value);
-
 // Helpers used to convert actions represented as integers in mixed bases.
 // E.g. RankActionMixedBase({2, 3, 6}, {1, 1, 1}) = 1*18 + 1*6 + 1 = 25,
 // and UnrankActioMixedBase(25, {2, 3, 6}, &digits) sets digits to {1, 1, 1}.

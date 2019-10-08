@@ -21,6 +21,8 @@
 #include <utility>
 #include <vector>
 
+#include "open_spiel/game_parameters.h"
+
 namespace open_spiel {
 namespace quoridor {
 namespace {
@@ -42,12 +44,11 @@ const GameType kGameType{
     /*provides_observation_as_normalized_vector=*/true,
     /*parameter_specification=*/
     {
-        {"board_size",
-         GameType::ParameterSpec{GameParameter::Type::kInt, false}},
+        {"board_size", GameParameter(kDefaultBoardSize)},
+        // A default will be computed from the board_size
         {"wall_count",
-         GameType::ParameterSpec{GameParameter::Type::kInt, false}},
-        {"ansi_color_output",
-         GameType::ParameterSpec{GameParameter::Type::kBool, false}},
+         GameParameter(GameParameter::Type::kInt, /*is_mandatory=*/false)},
+        {"ansi_color_output", GameParameter(false)},
     }};
 
 std::unique_ptr<Game> Factory(const GameParameters& params) {
@@ -160,7 +161,7 @@ Move QuoridorState::ActionToMove(Action action_id) const {
 
 std::vector<Action> QuoridorState::LegalActions() const {
   std::vector<Action> moves;
-
+  if (IsTerminal()) return moves;
   int max_moves = 5;  // Max pawn moves, including jumps.
   if (wall_count_[current_player_] > 0) {
     max_moves += 2 * (board_size_ - 1) * (board_size_ - 1);  // Max wall moves.
@@ -490,10 +491,10 @@ std::unique_ptr<State> QuoridorState::Clone() const {
 
 QuoridorGame::QuoridorGame(const GameParameters& params)
     : Game(kGameType, params),
-      board_size_(ParameterValue<int>("board_size", kDefaultBoardSize)),
+      board_size_(ParameterValue<int>("board_size")),
       wall_count_(
           ParameterValue<int>("wall_count", board_size_ * board_size_ / 8)),
-      ansi_color_output_(ParameterValue<bool>("ansi_color_output", false)) {}
+      ansi_color_output_(ParameterValue<bool>("ansi_color_output")) {}
 
 }  // namespace quoridor
 }  // namespace open_spiel

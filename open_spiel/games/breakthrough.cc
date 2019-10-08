@@ -18,6 +18,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include "open_spiel/game_parameters.h"
 
 namespace open_spiel {
 namespace breakthrough {
@@ -52,8 +53,8 @@ const GameType kGameType{
     /*provides_observation=*/false,
     /*provides_observation_as_normalized_vector=*/false,
     /*parameter_specification=*/
-    {{"rows", {GameParameter::Type::kInt, false}},
-     {"columns", {GameParameter::Type::kInt, false}}}};
+    {{"rows", GameParameter(kDefaultRows)},
+     {"columns", GameParameter(kDefaultColumns)}}};
 
 std::unique_ptr<Game> Factory(const GameParameters& params) {
   return std::unique_ptr<Game>(new BreakthroughGame(params));
@@ -214,6 +215,7 @@ std::string BreakthroughState::ActionToString(Player player,
 
 std::vector<Action> BreakthroughState::LegalActions() const {
   std::vector<Action> movelist;
+  if (IsTerminal()) return movelist;
   const Player player = CurrentPlayer();
   CellState mystate = PlayerToState(player);
   std::vector<int> action_bases = {rows_, cols_, kNumDirections, 2};
@@ -378,8 +380,8 @@ std::unique_ptr<State> BreakthroughState::Clone() const {
 
 BreakthroughGame::BreakthroughGame(const GameParameters& params)
     : Game(kGameType, params),
-      rows_(ParameterValue<int>("rows", kDefaultRows)),
-      cols_(ParameterValue<int>("columns", kDefaultColumns)) {}
+      rows_(ParameterValue<int>("rows")),
+      cols_(ParameterValue<int>("columns")) {}
 
 int BreakthroughGame::NumDistinctActions() const {
   return rows_ * cols_ * kNumDirections * 2;

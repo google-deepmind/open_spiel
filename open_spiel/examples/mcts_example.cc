@@ -16,21 +16,27 @@
 #include <random>
 #include <string>
 
+#include "open_spiel/abseil-cpp/absl/flags/flag.h"
+#include "open_spiel/abseil-cpp/absl/flags/parse.h"
 #include "open_spiel/algorithms/mcts.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
+ABSL_FLAG(std::string, game, "tic_tac_toe", "The name of the game to play.");
+ABSL_FLAG(open_spiel::Player, mcts_player, 0, "The player to play with mcts.");
+ABSL_FLAG(int, rollout_count, 100, "How many rollouts per evaluation.");
+ABSL_FLAG(int, max_search_nodes, 100, "How many search nodes to expand.");
+
 // Example code for using MCTS agent to play a game
 int main(int argc, char** argv) {
-  std::string game_name =
-      open_spiel::ParseCmdLineArgDefault(argc, argv, "game", "tic_tac_toe");
-  auto mcts_player = open_spiel::Player{std::stoi(
-      open_spiel::ParseCmdLineArgDefault(argc, argv, "mcts_player", "0"))};
-  int rollout_count = std::stoi(
-      open_spiel::ParseCmdLineArgDefault(argc, argv, "rollout_count", "100"));
-  int max_search_nodes = std::stoi(open_spiel::ParseCmdLineArgDefault(
-      argc, argv, "max_search_nodes", "10000"));
+  absl::ParseCommandLine(argc, argv);
 
+  std::string game_name = absl::GetFlag(FLAGS_game);
+  auto mcts_player = absl::GetFlag(FLAGS_mcts_player);
+  int rollout_count = absl::GetFlag(FLAGS_rollout_count);
+  int max_search_nodes = absl::GetFlag(FLAGS_max_search_nodes);
+
+  std::cerr << "game: " << game_name << std::endl;
   // Exploration parameter for UCT
   const double uct_c = 2;
 

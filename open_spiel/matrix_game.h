@@ -119,6 +119,7 @@ class MatrixState : public NFGState {
   MatrixState(const MatrixState&) = default;
 
   virtual std::vector<Action> LegalActions(Player player) const {
+    if (IsTerminal()) return {};
     if (player == kSimultaneousPlayerId) {
       return LegalFlatJointActions();
     } else {

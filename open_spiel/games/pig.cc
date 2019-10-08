@@ -18,6 +18,9 @@
 
 #include <utility>
 
+#include "open_spiel/game_parameters.h"
+#include "open_spiel/spiel.h"
+
 namespace open_spiel {
 namespace pig {
 
@@ -52,10 +55,10 @@ const GameType kGameType{
     /*provides_observation_as_normalized_vector=*/false,
     /*parameter_specification=*/
     {
-        {"players", {GameParameter::Type::kInt, false}},
-        {"horizon", {GameParameter::Type::kInt, false}},
-        {"winscore", {GameParameter::Type::kInt, false}},
-        {"diceoutcomes", {GameParameter::Type::kInt, false}},
+        {"players", GameParameter(kDefaultPlayers)},
+        {"horizon", GameParameter(kDefaultHorizon)},
+        {"winscore", GameParameter(kDefaultWinScore)},
+        {"diceoutcomes", GameParameter(kDefaultDiceOutcomes)},
     }};
 
 static std::unique_ptr<Game> Factory(const GameParameters& params) {
@@ -90,7 +93,7 @@ bool PigState::IsTerminal() const {
 
 std::vector<double> PigState::Returns() const {
   if (!IsTerminal()) {
-    return std::vector<double>(0.0, num_players_);
+    return std::vector<double>(num_players_, 0.0);
   }
 
   // For (n>2)-player games, must keep it zero-sum.
@@ -104,7 +107,7 @@ std::vector<double> PigState::Returns() const {
   }
 
   // Nobody has won? (e.g. over horizon length.) Then everyone gets 0.
-  return std::vector<double>(0.0, num_players_);
+  return std::vector<double>(num_players_, 0.0);
 }
 
 std::string PigState::InformationState(Player player) const {
@@ -214,10 +217,17 @@ void PigState::DoApplyAction(Action move) {
 }
 
 std::vector<Action> PigState::LegalActions() const {
-  if (IsChanceNode())
+  if (IsChanceNode()) {
     return LegalChanceOutcomes();
-  else
-    return {kRoll, kStop};
+  } else if (IsTerminal()) {
+    return {};
+  } else {
+    if (scores_[cur_player_] + turn_total_ >= win_score_) {
+      return {kStop};
+    } else {
+      return {kRoll, kStop};
+    }
+  }
 }
 
 std::vector<std::pair<Action, double>> PigState::ChanceOutcomes() const {
@@ -235,9 +245,9 @@ std::vector<std::pair<Action, double>> PigState::ChanceOutcomes() const {
 
 std::string PigState::ToString() const {
   return absl::StrCat("Scores: ", absl::StrJoin(scores_, " "),
-                      ", Turn total:", turn_total_,
+                      ", Turn total: ", turn_total_,
                       "\nCurrent player: ", turn_player_,
-                      (cur_player_ == 0 ? ", rolling\n" : "\n"));
+                      (cur_player_ == kChancePlayerId ? " (rolling)\n" : "\n"));
 }
 
 std::unique_ptr<State> PigState::Clone() const {
@@ -246,10 +256,10 @@ std::unique_ptr<State> PigState::Clone() const {
 
 PigGame::PigGame(const GameParameters& params)
     : Game(kGameType, params),
-      dice_outcomes_(ParameterValue<int>("diceoutcomes", kDefaultDiceOutcomes)),
-      horizon_(ParameterValue<int>("horizon", kDefaultHorizon)),
-      num_players_(ParameterValue<int>("players", kDefaultPlayers)),
-      win_score_(ParameterValue<int>("winscore", kDefaultWinScore)) {}
+      dice_outcomes_(ParameterValue<int>("diceoutcomes")),
+      horizon_(ParameterValue<int>("horizon")),
+      num_players_(ParameterValue<int>("players")),
+      win_score_(ParameterValue<int>("winscore")) {}
 
 }  // namespace pig
 }  // namespace open_spiel

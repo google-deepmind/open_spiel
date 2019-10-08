@@ -17,6 +17,7 @@
 #include <random>
 #include <string>
 
+#include "open_spiel/abseil-cpp/absl/random/uniform_int_distribution.h"
 #include "open_spiel/spiel.h"
 
 namespace open_spiel {
@@ -63,7 +64,7 @@ void SimulateGames(std::mt19937* rng, const Game& game, State* sim_state,
 
         std::vector<Action> actions;
         actions = sim_state->LegalActions(p);
-        std::uniform_int_distribution<> dis(0, actions.size() - 1);
+        absl::uniform_int_distribution<> dis(0, actions.size() - 1);
         Action action = actions[dis(*rng)];
         joint_action.push_back(action);
         std::cout << "player " << p << " chose "

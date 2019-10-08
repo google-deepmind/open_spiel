@@ -15,6 +15,7 @@
 #include "open_spiel/games/oware.h"
 
 #include <iomanip>
+#include "open_spiel/game_parameters.h"
 
 namespace open_spiel {
 namespace oware {
@@ -37,8 +38,8 @@ const GameType kGameType{
     /*provides_observation=*/true,
     /*provides_observation_as_normalized_vector=*/true,
     /*parameter_specification=*/
-    {{"num_houses_per_player", {GameParameter::Type::kInt, false}},
-     {"num_seeds_per_house", {GameParameter::Type::kInt, false}}}};
+    {{"num_houses_per_player", GameParameter(kDefaultHousesPerPlayer)},
+     {"num_seeds_per_house", GameParameter(kDdefaultSeedsPerHouse)}}};
 
 std::unique_ptr<Game> Factory(const GameParameters& params) {
   return std::unique_ptr<Game>(new OwareGame(params));
@@ -71,6 +72,7 @@ OwareState::OwareState(const OwareBoard& board)
 
 std::vector<Action> OwareState::LegalActions() const {
   std::vector<Action> actions;
+  if (IsTerminal()) return actions;
   const Player lower = PlayerLowerHouse(board_.current_player);
   const Player upper = PlayerUpperHouse(board_.current_player);
   if (OpponentSeeds() == 0) {
@@ -288,10 +290,10 @@ void OwareState::ObservationAsNormalizedVector(
 
 OwareGame::OwareGame(const GameParameters& params)
     : Game(kGameType, params),
-      num_houses_per_player_(ParameterValue<int>("num_houses_per_player",
-                                                 kDefaultHousesPerPlayer)),
+      num_houses_per_player_(ParameterValue<int>("num_houses_per_player"
+                                                 )),
       num_seeds_per_house_(
-          ParameterValue<int>("num_seeds_per_house", kDdefaultSeedsPerHouse)) {}
+          ParameterValue<int>("num_seeds_per_house")) {}
 
 std::vector<int> OwareGame::ObservationNormalizedVectorShape() const {
   return {/*seeds*/ num_houses_per_player_ * kNumPlayers +

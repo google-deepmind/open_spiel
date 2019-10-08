@@ -23,6 +23,11 @@
 
 namespace open_spiel {
 
+// A GameParameter can be used in 2 contexts:
+// - when defining the parameters for a game, with their optional default value
+//   and whether they are mandatory or not.
+// - when specifying in Python a parameter value.
+//
 class GameParameter;
 using GameParameters = std::map<std::string, GameParameter>;
 std::string GameParametersToString(const GameParameters& game_params);
@@ -32,20 +37,30 @@ class GameParameter {
  public:
   enum class Type { kUnset = -1, kInt, kDouble, kString, kBool, kGame };
 
-  GameParameter() : type_(Type::kUnset) {}
+  explicit GameParameter(Type type = Type::kUnset, bool is_mandatory = false)
+      : is_mandatory_(is_mandatory), type_(type) {}
 
-  explicit GameParameter(int value) : int_value_(value), type_(Type::kInt) {}
+  explicit GameParameter(int value, bool is_mandatory = false)
+      : is_mandatory_(is_mandatory), int_value_(value), type_(Type::kInt) {}
 
-  explicit GameParameter(double value)
-      : double_value_(value), type_(Type::kDouble) {}
+  explicit GameParameter(double value, bool is_mandatory = false)
+      : is_mandatory_(is_mandatory),
+        double_value_(value),
+        type_(Type::kDouble) {}
 
-  explicit GameParameter(std::string value)
-      : string_value_(value), type_(Type::kString) {}
+  explicit GameParameter(std::string value, bool is_mandatory = false)
+      : is_mandatory_(is_mandatory),
+        string_value_(value),
+        type_(Type::kString) {}
 
-  explicit GameParameter(bool value) : bool_value_(value), type_(Type::kBool) {}
+  explicit GameParameter(bool value, bool is_mandatory = false)
+      : is_mandatory_(is_mandatory), bool_value_(value), type_(Type::kBool) {}
 
-  explicit GameParameter(std::map<std::string, GameParameter> value)
-      : game_value_(std::move(value)), type_(Type::kGame) {}
+  explicit GameParameter(std::map<std::string, GameParameter> value,
+                         bool is_mandatory = false)
+      : is_mandatory_(is_mandatory),
+        game_value_(std::move(value)),
+        type_(Type::kGame) {}
 
   bool has_int_value() const { return type_ == Type::kInt; }
   bool has_double_value() const { return type_ == Type::kDouble; }
@@ -53,6 +68,8 @@ class GameParameter {
   bool has_bool_value() const { return type_ == Type::kBool; }
   bool has_game_value() const { return type_ == Type::kGame; }
   Type type() const { return type_; }
+
+  bool is_mandatory() const { return is_mandatory_; }
 
   // A readable string format, for display purposes; does not distinguish
   // types in ambiguous cases, e.g. string True vs boolean True.
@@ -88,6 +105,8 @@ class GameParameter {
   }
 
  private:
+  bool is_mandatory_;
+
   int int_value_;
   double double_value_;
   std::string string_value_;

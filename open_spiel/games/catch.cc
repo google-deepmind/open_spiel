@@ -17,6 +17,7 @@
 #include <algorithm>
 #include <utility>
 
+#include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
@@ -39,8 +40,8 @@ const GameType kGameType{
     /*provides_observation=*/true,
     /*provides_observation_as_normalized_vector=*/true,
     /*parameter_specification=*/
-    {{"rows", {GameParameter::Type::kInt, false}},
-     {"columns", {GameParameter::Type::kInt, false}}}};
+    {{"rows", GameParameter(kDefaultRows)},
+     {"columns", GameParameter(kDefaultColumns)}}};
 
 std::unique_ptr<Game> Factory(const GameParameters& params) {
   return std::unique_ptr<Game>(new CatchGame(params));
@@ -215,8 +216,8 @@ void CatchState::DoApplyAction(Action move) {
 
 CatchGame::CatchGame(const GameParameters& params)
     : Game(kGameType, params),
-      num_rows_(ParameterValue<int>("rows", kDefaultRows)),
-      num_columns_(ParameterValue<int>("columns", kDefaultColumns)) {}
+      num_rows_(ParameterValue<int>("rows")),
+      num_columns_(ParameterValue<int>("columns")) {}
 
 }  // namespace catch_
 }  // namespace open_spiel
