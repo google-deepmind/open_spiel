@@ -29,10 +29,13 @@ void BasicLaserTagTests() {
   testing::RandomSimTest(*LoadGame("laser_tag"), 100);
 }
 
-void SimpleTagTests(int horizon, bool zero_sum) {
+void SimpleTagTests(int horizon, bool zero_sum, std::string grid, int num_rows, int num_cols) {
   std::unique_ptr<Game> game =
       LoadGame("laser_tag", {{"horizon", GameParameter(horizon)},
-                             {"zero_sum", GameParameter(zero_sum)}});
+                             {"zero_sum", GameParameter(zero_sum)},
+                             {"grid", GameParameter(grid)},
+                             {"num_rows", GameParameter(num_rows)},
+                             {"num_cols", GameParameter(num_cols)}});
   std::unique_ptr<State> state = game->NewInitialState();
   SPIEL_CHECK_TRUE(state->IsChanceNode());
   state->ApplyAction(1);  // Spawn B top-right
@@ -96,9 +99,33 @@ void SimpleTagTests(int horizon, bool zero_sum) {
 }  // namespace open_spiel
 
 int main(int argc, char **argv) {
-  open_spiel::laser_tag::SimpleTagTests(-1, true);
-  open_spiel::laser_tag::SimpleTagTests(-1, false);
-  open_spiel::laser_tag::SimpleTagTests(1000, true);
-  open_spiel::laser_tag::SimpleTagTests(1000, false);
+  open_spiel::laser_tag::SimpleTagTests(-1, true, "......."
+                                                  "......."
+                                                  "..*.*.."
+                                                  ".**.**."
+                                                  "..*.*.."
+                                                  "......."
+                                                  ".......", 7, 7);
+  open_spiel::laser_tag::SimpleTagTests(-1, false, "......."
+                                                   "......."
+                                                   "..*.*.."
+                                                   ".**.**."
+                                                   "..*.*.."
+                                                   "......."
+                                                   ".......", 7, 7);
+  open_spiel::laser_tag::SimpleTagTests(1000, true, "......."
+                                                    "......."
+                                                    "..*.*.."
+                                                    ".**.**."
+                                                    "..*.*.."
+                                                    "......."
+                                                    ".......", 7, 7);
+  open_spiel::laser_tag::SimpleTagTests(1000, false, "......."
+                                                     "......."
+                                                     "..*.*.."
+                                                     ".**.**."
+                                                     "..*.*.."
+                                                     "......."
+                                                     ".......", 7, 7);
   open_spiel::laser_tag::BasicLaserTagTests();
 }

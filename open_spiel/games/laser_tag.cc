@@ -26,7 +26,7 @@ namespace laser_tag {
 namespace {
 
 // Default parameters.
-constexpr int kDefaultHorizon = 2;
+constexpr int kDefaultHorizon = 1000;
 constexpr bool kDefaultZeroSum = false;
 const std::string kDefaultGrid = "......."
                                  "......."
