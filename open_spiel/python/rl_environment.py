@@ -134,11 +134,16 @@ class Environment(object):
     """
     self._rng = np.random.RandomState(seed)
 
-    game_settings = {
-        key: pyspiel.GameParameter(val) for (key, val) in kwargs.items()
-    }
-    logging.info("Using game settings: %s", game_settings)
-    self._game = pyspiel.load_game(game_name, game_settings)
+    if kwargs:
+      game_settings = {
+          key: pyspiel.GameParameter(val) for (key, val) in kwargs.items()
+      }
+      logging.info("Using game settings: %s", game_settings)
+      self._game = pyspiel.load_game(game_name, game_settings)
+    else:
+      logging.info("Using game string: %s", game_name)
+      self._game = pyspiel.load_game(game_name)
+
     self._num_players = self._game.num_players()
     self._state = None
     self._should_reset = True
