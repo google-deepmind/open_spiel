@@ -56,7 +56,7 @@ enum class AverageType {
 
 class ExternalSamplingMCCFRSolver {
  public:
-  static constexpr double kInitialTableValues = 0.000001;
+  static inline constexpr double kInitialTableValues = 0.000001;
 
   // Creates a solver with a specific seed and average type.
   ExternalSamplingMCCFRSolver(const Game& game, int seed = 0,

@@ -39,8 +39,8 @@ namespace open_spiel {
 namespace first_sealed_auction {
 
 // Constants.
-constexpr int kDefaultPlayers = 2;
-constexpr int kDefaultMaxValue = 10;
+inline constexpr int kDefaultPlayers = 2;
+inline constexpr int kDefaultMaxValue = 10;
 
 // State of an in-play game.
 class FPSBAState : public State {

@@ -39,14 +39,14 @@ namespace open_spiel {
 namespace go {
 
 // Constants.
-constexpr int NumPlayers() { return 2; }
-constexpr double LossUtility() { return -1; }
-constexpr double WinUtility() { return 1; }
-constexpr int CellStates() { return 3; }  // Black, white, empty.
+inline constexpr int NumPlayers() { return 2; }
+inline constexpr double LossUtility() { return -1; }
+inline constexpr double WinUtility() { return 1; }
+inline constexpr int CellStates() { return 3; }  // Black, white, empty.
 
 // Go can only end in a draw when using a round komi.
 // We also treat superko as a draw.
-constexpr double DrawUtility() { return 0; }
+inline constexpr double DrawUtility() { return 0; }
 
 // All actions must be in [0; NumDistinctActions).
 inline int NumDistinctActions(int board_size) { return kPass + 1; }

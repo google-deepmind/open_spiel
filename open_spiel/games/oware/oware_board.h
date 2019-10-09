@@ -23,7 +23,7 @@
 namespace open_spiel {
 namespace oware {
 
-constexpr int kNumPlayers = 2;
+inline constexpr int kNumPlayers = 2;
 
 // Simple Oware board struct storing the current player, scores and seeds.
 struct OwareBoard {

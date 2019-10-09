@@ -32,12 +32,12 @@
 namespace open_spiel {
 namespace quoridor {
 
-constexpr int kNumPlayers = 2;
-constexpr int kDefaultBoardSize = 9;
-constexpr int kMinBoardSize = 3;
-constexpr int kMaxBoardSize = 25;
-constexpr int kMaxGameLengthFactor = 4;
-constexpr int kCellStates = 1 + kNumPlayers;
+inline constexpr int kNumPlayers = 2;
+inline constexpr int kDefaultBoardSize = 9;
+inline constexpr int kMinBoardSize = 3;
+inline constexpr int kMaxBoardSize = 25;
+inline constexpr int kMaxGameLengthFactor = 4;
+inline constexpr int kCellStates = 1 + kNumPlayers;
 
 enum QuoridorPlayer : uint8_t {
   kPlayer1,

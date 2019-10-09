@@ -39,15 +39,15 @@
 namespace open_spiel {
 namespace oware {
 
-constexpr int kMinCapture = 2;
-constexpr int kMaxCapture = 3;
+inline constexpr int kMinCapture = 2;
+inline constexpr int kMaxCapture = 3;
 
-constexpr int kDefaultHousesPerPlayer = 6;
-constexpr int kDdefaultSeedsPerHouse = 4;
+inline constexpr int kDefaultHousesPerPlayer = 6;
+inline constexpr int kDdefaultSeedsPerHouse = 4;
 
 // Informed guess based on
 // https://mancala.fandom.com/wiki/Statistics
-constexpr int kMaxGameLength = 1000;
+inline constexpr int kMaxGameLength = 1000;
 
 class OwareState : public State {
  public:

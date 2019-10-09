@@ -33,13 +33,13 @@
 namespace open_spiel {
 namespace pentago {
 
-constexpr int kNumPlayers = 2;
-constexpr int kBoardSize = 6;
-constexpr int kBoardPositions = kBoardSize * kBoardSize;
-constexpr int kPossibleRotations = 8;
-constexpr int kPossibleActions = kBoardPositions * kPossibleRotations;
-constexpr int kPossibleWinConditions = 32;
-constexpr int kCellStates = 1 + kNumPlayers;
+inline constexpr int kNumPlayers = 2;
+inline constexpr int kBoardSize = 6;
+inline constexpr int kBoardPositions = kBoardSize * kBoardSize;
+inline constexpr int kPossibleRotations = 8;
+inline constexpr int kPossibleActions = kBoardPositions * kPossibleRotations;
+inline constexpr int kPossibleWinConditions = 32;
+inline constexpr int kCellStates = 1 + kNumPlayers;
 
 enum PentagoPlayer {
   kPlayer1,

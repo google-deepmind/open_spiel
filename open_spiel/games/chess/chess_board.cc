@@ -428,7 +428,7 @@ ChessBoard<kBoardSize>::BoardFromFEN(const std::string &fen) {
   }
 
   board.SetIrreversibleMoveCounter(std::stoi(fifty_clock));
-  board.SetMoveNumber(std::stoi(move_number));
+  board.SetMovenumber(std::stoi(move_number));
 
   return board;
 }
@@ -1512,7 +1512,7 @@ void ChessBoard<kBoardSize>::SetIrreversibleMoveCounter(int c) {
 }
 
 template <uint32_t kBoardSize>
-void ChessBoard<kBoardSize>::SetMoveNumber(int move_number) {
+void ChessBoard<kBoardSize>::SetMovenumber(int move_number) {
   move_number_ = move_number;
 }
 

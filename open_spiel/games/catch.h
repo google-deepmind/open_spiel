@@ -44,10 +44,10 @@ namespace open_spiel {
 namespace catch_ {
 
 // Constants.
-constexpr int kNumPlayers = 1;
-constexpr int kNumActions = 3;
-constexpr int kDefaultRows = 10;
-constexpr int kDefaultColumns = 5;
+inline constexpr int kNumPlayers = 1;
+inline constexpr int kNumActions = 3;
+inline constexpr int kDefaultRows = 10;
+inline constexpr int kDefaultColumns = 5;
 
 // State of a cell.
 enum class CellState {

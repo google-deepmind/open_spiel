@@ -53,7 +53,7 @@ struct Square {
   int8_t y;
 };
 
-constexpr Square InvalidSquare() { return Square{-1, -1}; }
+inline constexpr Square InvalidSquare() { return Square{-1, -1}; }
 
 inline std::string SquareToString(const Square& square) {
   if (square == InvalidSquare()) {

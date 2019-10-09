@@ -27,8 +27,8 @@
 namespace open_spiel {
 namespace matrix_game {
 
-constexpr int kRowPlayer = 0;
-constexpr int kColPlayer = 1;
+inline constexpr int kRowPlayer = 0;
+inline constexpr int kColPlayer = 1;
 
 // Return a flattened version of these vector of rows. This simply scans each
 // row in turn, appending each elements onto the end of a 1D vector. The rows

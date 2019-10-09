@@ -28,7 +28,7 @@ namespace open_spiel {
 namespace algorithms {
 namespace {
 
-constexpr const int kSeed = 230398247;
+constexpr int kSeed = 230398247;
 
 void MCCFR_2PGameTest(const std::string& game_name, std::mt19937* rng,
                       int iterations, double nashconv_upperbound) {

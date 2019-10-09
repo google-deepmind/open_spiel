@@ -35,11 +35,12 @@ namespace open_spiel {
 namespace connect_four {
 
 // Constants.
-constexpr int kNumPlayers = 2;
-constexpr int kRows = 6;
-constexpr int kCols = 7;
-constexpr int kNumCells = kRows * kCols;
-constexpr int kCellStates = 1 + kNumPlayers;  // player 0, player 1, empty
+inline constexpr int kNumPlayers = 2;
+inline constexpr int kRows = 6;
+inline constexpr int kCols = 7;
+inline constexpr int kNumCells = kRows * kCols;
+inline constexpr int kCellStates =
+    1 + kNumPlayers;  // player 0, player 1, empty
 
 // Outcome of the game.
 enum class Outcome {

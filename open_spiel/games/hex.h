@@ -33,11 +33,12 @@ namespace open_spiel {
 namespace hex {
 
 // Constants.
-constexpr int kNumPlayers = 2;
-constexpr int kDefaultBoardSize = 11;
-constexpr int kMaxNeighbours = 6;  // Maximum number of neighbours for a cell
-constexpr int kCellStates = 1 + 4 * kNumPlayers;
-constexpr int kMinValueCellState = -4;
+inline constexpr int kNumPlayers = 2;
+inline constexpr int kDefaultBoardSize = 11;
+inline constexpr int kMaxNeighbours =
+    6;  // Maximum number of neighbours for a cell
+inline constexpr int kCellStates = 1 + 4 * kNumPlayers;
+inline constexpr int kMinValueCellState = -4;
 // State of a cell.
 // Describes if a cell is
 //   - empty, black or white

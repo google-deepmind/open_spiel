@@ -45,7 +45,7 @@ enum PlayerId {
 };
 
 // Constant representing an invalid action.
-constexpr Action kInvalidAction = -1;
+inline constexpr Action kInvalidAction = -1;
 
 // Static information for a game. This will determine what algorithms are
 // applicable. For example, minimax search is only applicable to two-player,

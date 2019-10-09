@@ -35,17 +35,17 @@ namespace open_spiel {
 namespace chess {
 
 // Constants.
-constexpr int NumPlayers() { return 2; }
-constexpr double LossUtility() { return -1; }
-constexpr double DrawUtility() { return 0; }
-constexpr double WinUtility() { return 1; }
-constexpr int BoardSize() { return 8; }
+inline constexpr int NumPlayers() { return 2; }
+inline constexpr double LossUtility() { return -1; }
+inline constexpr double DrawUtility() { return 0; }
+inline constexpr double WinUtility() { return 1; }
+inline constexpr int BoardSize() { return 8; }
 
 // See action encoding below.
-constexpr int NumDistinctActions() { return (1 << 15); }
+inline constexpr int NumDistinctActions() { return (1 << 15); }
 
 // https://math.stackexchange.com/questions/194008/how-many-turns-can-a-chess-game-take-at-maximum
-constexpr int MaxGameLength() { return 17695; }
+inline constexpr int MaxGameLength() { return 17695; }
 
 inline const std::vector<int>& InformationStateNormalizedVectorShape() {
   static std::vector<int> shape{

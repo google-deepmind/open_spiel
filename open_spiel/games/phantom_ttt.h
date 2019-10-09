@@ -42,11 +42,11 @@
 namespace open_spiel {
 namespace phantom_ttt {
 
-constexpr const char* kDefaultObsType = "reveal-nothing";
+inline constexpr const char* kDefaultObsType = "reveal-nothing";
 
 // Longest sequence is 17 moves, e.g. 0011223344556677889
-constexpr int kLongestSequence = 2 * tic_tac_toe::kNumCells - 1;
-constexpr int kBitsPerAction = 10;  // Reserve 9 as "I don't know."
+inline constexpr int kLongestSequence = 2 * tic_tac_toe::kNumCells - 1;
+inline constexpr int kBitsPerAction = 10;  // Reserve 9 as "I don't know."
 
 enum class ObservationType {
   kRevealNothing,

@@ -98,19 +98,20 @@
 namespace open_spiel {
 namespace bridge {
 
-constexpr int kNumSuits = 4;
-constexpr int kNumDenominations = 1 + kNumSuits;
-constexpr int kMaxBid = 7;
-constexpr int kNumBids = kMaxBid * kNumDenominations;
-constexpr int kNumActions = kNumBids + 1;
-constexpr int kNumCardsPerSuit = 13;
-constexpr int kNumCards = kNumSuits * kNumCardsPerSuit;
-constexpr int kNumPlayers = 2;
-constexpr int kNumHands = 4;
-constexpr int kNumCardsPerHand = 13;
-constexpr int kMinScore = -650;  // 13 undertricks, at 50 each
-constexpr int kMaxScore = 1520;  // 7NT making
-constexpr int kStateSize = kNumCards + kNumPlayers * kNumActions + kNumPlayers;
+inline constexpr int kNumSuits = 4;
+inline constexpr int kNumDenominations = 1 + kNumSuits;
+inline constexpr int kMaxBid = 7;
+inline constexpr int kNumBids = kMaxBid * kNumDenominations;
+inline constexpr int kNumActions = kNumBids + 1;
+inline constexpr int kNumCardsPerSuit = 13;
+inline constexpr int kNumCards = kNumSuits * kNumCardsPerSuit;
+inline constexpr int kNumPlayers = 2;
+inline constexpr int kNumHands = 4;
+inline constexpr int kNumCardsPerHand = 13;
+inline constexpr int kMinScore = -650;  // 13 undertricks, at 50 each
+inline constexpr int kMaxScore = 1520;  // 7NT making
+inline constexpr int kStateSize =
+    kNumCards + kNumPlayers * kNumActions + kNumPlayers;
 
 class Deal {
  public:

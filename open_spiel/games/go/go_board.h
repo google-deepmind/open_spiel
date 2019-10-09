@@ -35,14 +35,15 @@ GoColor OppColor(GoColor c);
 // with a border of guard stones around all sides of the board.
 // This allows us to skip bounds checking.
 // We support boards up to size 19.
-constexpr int kMaxBoardSize = 19;
-constexpr int kVirtualBoardSize = kMaxBoardSize + 2;
-constexpr int kVirtualBoardPoints = kVirtualBoardSize * kVirtualBoardSize;
+inline constexpr int kMaxBoardSize = 19;
+inline constexpr int kVirtualBoardSize = kMaxBoardSize + 2;
+inline constexpr int kVirtualBoardPoints =
+    kVirtualBoardSize * kVirtualBoardSize;
 
 using GoPoint = uint16_t;
 
-constexpr GoPoint kInvalidPoint = 0;
-constexpr GoPoint kPass = kVirtualBoardPoints + 1;
+inline constexpr GoPoint kInvalidPoint = 0;
+inline constexpr GoPoint kPass = kVirtualBoardPoints + 1;
 
 // Returns the GoPoint corresponding to the provided coordinates, e.g. "d4" or
 // "f10".

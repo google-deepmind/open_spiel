@@ -37,8 +37,8 @@
 namespace open_spiel {
 namespace kuhn_poker {
 
-constexpr const int kNumInfoStatesP0 = 6;
-constexpr const int kNumInfoStatesP1 = 6;
+inline constexpr const int kNumInfoStatesP0 = 6;
+inline constexpr const int kNumInfoStatesP1 = 6;
 
 enum ActionType { kPass = 0, kBet = 1 };
 

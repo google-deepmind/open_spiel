@@ -33,12 +33,13 @@
 namespace open_spiel {
 namespace breakthrough {
 
-constexpr int kNumPlayers = 2;
-constexpr int kBlackPlayerId = 0;
-constexpr int kWhitePlayerId = 1;
-constexpr int kCellStates = 1 + kNumPlayers;  // player 0, player 1, empty.
-constexpr int kDefaultRows = 8;
-constexpr int kDefaultColumns = 8;
+inline constexpr int kNumPlayers = 2;
+inline constexpr int kBlackPlayerId = 0;
+inline constexpr int kWhitePlayerId = 1;
+inline constexpr int kCellStates =
+    1 + kNumPlayers;  // player 0, player 1, empty.
+inline constexpr int kDefaultRows = 8;
+inline constexpr int kDefaultColumns = 8;
 
 // State of a cell.
 enum class CellState {

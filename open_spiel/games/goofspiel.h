@@ -47,10 +47,10 @@
 namespace open_spiel {
 namespace goofspiel {
 
-constexpr int kDefaultNumPlayers = 2;
-constexpr int kDefaultNumCards = 13;
-constexpr const char* kDefaultPointsOrder = "random";
-constexpr const bool kDefaultImpInfo = false;
+inline constexpr int kDefaultNumPlayers = 2;
+inline constexpr int kDefaultNumCards = 13;
+inline constexpr const char* kDefaultPointsOrder = "random";
+inline constexpr const bool kDefaultImpInfo = false;
 
 enum class PointsOrder {
   kRandom,
@@ -58,7 +58,7 @@ enum class PointsOrder {
   kAscending,
 };
 
-constexpr const int kInvalidCard = -1;
+inline constexpr const int kInvalidCard = -1;
 
 class GoofspielState : public SimMoveState {
  public:

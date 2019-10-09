@@ -64,15 +64,15 @@
 namespace open_spiel {
 namespace tiny_bridge {
 
-constexpr int kNumBids = 6;       // 1H, 1S, 1NT, 2H, 2S, 2NT
-constexpr int kNumActions2p = 7;  // Plus Pass
-constexpr int kNumActions = 9;    // Plus Double, Redouble
+inline constexpr int kNumBids = 6;       // 1H, 1S, 1NT, 2H, 2S, 2NT
+inline constexpr int kNumActions2p = 7;  // Plus Pass
+inline constexpr int kNumActions = 9;    // Plus Double, Redouble
 enum Call { kPass = 0, k1H, k1S, k1NT, k2H, k2S, k2NT, kDouble, kRedouble };
-constexpr int kNumRanks = 4;
-constexpr int kNumSuits = 2;
-constexpr int kNumCards = kNumRanks * kNumSuits;
-constexpr int kNumHands = 4;
-constexpr int kNumTricks = kNumCards / kNumHands;
+inline constexpr int kNumRanks = 4;
+inline constexpr int kNumSuits = 2;
+inline constexpr int kNumCards = kNumRanks * kNumSuits;
+inline constexpr int kNumHands = 4;
+inline constexpr int kNumTricks = kNumCards / kNumHands;
 
 // Two-player game. Only one partnership gets to bid, so this
 // is a purely-cooperative two-player game.
