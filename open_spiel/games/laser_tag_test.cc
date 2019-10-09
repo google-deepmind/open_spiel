@@ -47,6 +47,22 @@ void SimpleTagTests(int horizon, bool zero_sum, std::string grid, int num_rows, 
   state->ApplyActions({0, 1});  // A: Turn left, B: Turn right.
   SPIEL_CHECK_TRUE(state->IsChanceNode());
   state->ApplyAction(4);  // chance node: player 0 resolved first
+
+  SPIEL_CHECK_FALSE(state->IsChanceNode());
+  state->ApplyActions({6, 1});  // A: Stand, B: Turn right.
+  SPIEL_CHECK_TRUE(state->IsChanceNode());
+  state->ApplyAction(4);  // chance node: player 0 resolved first
+
+  SPIEL_CHECK_FALSE(state->IsChanceNode());
+  state->ApplyActions({6, 2});  // A: Stand, B: Move forward.
+  SPIEL_CHECK_TRUE(state->IsChanceNode());
+  state->ApplyAction(4);  // chance node: player 0 resolved first
+
+  SPIEL_CHECK_FALSE(state->IsChanceNode());
+  state->ApplyActions({6, 0});  // A: Stand, B: Turn left.
+  SPIEL_CHECK_TRUE(state->IsChanceNode());
+  state->ApplyAction(4);  // chance node: player 0 resolved first
+
   SPIEL_CHECK_FALSE(state->IsChanceNode());
   state->ApplyActions({9, 9});  // stand-off!
   SPIEL_CHECK_TRUE(state->IsChanceNode());

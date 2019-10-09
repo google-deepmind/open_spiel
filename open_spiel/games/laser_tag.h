@@ -41,6 +41,11 @@
 //       "zero_sum"   bool    If set, rewards are +1 for a tag and -1 for being
 //                            tagged. Otherwise, there there is only positive
 //                            reward of +1 per tag. (default = false).
+//       "grid"       string  String representation of grid in row-major format.
+//                            Empty spaces are '.' and obstacles are '*'. (default = 
+//                            "................*.*...**.**...*.*................")
+//       "num_rows"   int     Number of rows in grid (default = 7).
+//       "num_cols"   int     Number of columns in grid (default = 7).
 
 namespace open_spiel {
 namespace laser_tag {
