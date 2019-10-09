@@ -16,12 +16,39 @@
 
 #include <numeric>
 
+#include "open_spiel/abseil-cpp/absl/strings/numbers.h"
 #include "open_spiel/spiel.h"
 
 namespace open_spiel {
 namespace tiny_hanabi {
 
 namespace {
+
+// This is the payoff matrix from the bayesian Action Decoder paper.
+constexpr char kDefaultPayoffString[] =
+    // Cards: 1, 1
+    "10;0;0;4;8;4;10;0;0;"
+    // Cards: 1, 2
+    "0;0;10;4;8;4;0;0;10;"
+    // Cards: 2, 1
+    "0;0;10;4;8;4;0;0;0;"
+    // Cards: 2, 2
+    "10;0;0;4;8;4;10;0;0";
+
+std::vector<int> ParsePayoffString(const std::string& str) {
+  std::vector<std::string> pieces = absl::StrSplit(str, ';');
+  std::vector<int> payoff;
+  for (const auto piece : pieces) {
+    int val;
+    if (!absl::SimpleAtoi(piece, &val)) {
+      SpielFatalError(absl::StrCat("Could not parse piece '", piece,
+                                   "' of payoff string '", str,
+                                   "' as an integer"));
+    }
+    payoff.push_back(val);
+  }
+  return payoff;
+}
 
 // Facts about the game
 const GameType kGameType{
@@ -32,28 +59,19 @@ const GameType kGameType{
     GameType::Information::kImperfectInformation,
     GameType::Utility::kIdentical,
     GameType::RewardModel::kTerminal,
-    /*max_num_players=*/2,
+    /*max_num_players=*/10,
     /*min_num_players=*/2,
     /*provides_information_state=*/true,
     /*provides_information_state_as_normalized_vector=*/true,
     /*provides_observation=*/true,
     /*provides_observation_as_normalized_vector=*/true,
-    /*parameter_specification=*/{}  // no parameters
-};
-
-// This is the payoff matrix from the bayesian Action Decoder paper.
-TinyHanabiPayoffMatrix kDefaultPayoff{/*num_players=*/2,
-                                      /*num_chance=*/2,
-                                      /*num_actions=*/3,
-                                      /*payoff=*/
-                                      {// Cards: 1, 1
-                                       10, 0, 0, 4, 8, 4, 10, 0, 0,
-                                       // Cards: 1, 2
-                                       0, 0, 10, 4, 8, 4, 0, 0, 10,
-                                       // Cards: 2, 1
-                                       0, 0, 10, 4, 8, 4, 0, 0, 0,
-                                       // Cards: 2, 2
-                                       10, 0, 0, 4, 8, 4, 10, 0, 0}};
+    /*parameter_specification=*/
+    {
+        {"num_players", GameParameter(2)},
+        {"num_chance", GameParameter(2)},
+        {"num_actions", GameParameter(3)},
+        {"payoff", GameParameter(std::string(kDefaultPayoffString))},
+    }};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new TinyHanabiGame(params));
@@ -69,7 +87,11 @@ std::unique_ptr<State> TinyHanabiGame::NewInitialState() const {
 }
 
 TinyHanabiGame::TinyHanabiGame(const GameParameters& params)
-    : Game(kGameType, params), payoff_(kDefaultPayoff) {}
+    : Game(kGameType, params),
+      payoff_(ParameterValue<int>("num_players"),
+              ParameterValue<int>("num_chance"),
+              ParameterValue<int>("num_actions"),
+              ParsePayoffString(ParameterValue<std::string>("payoff"))) {}
 
 Player TinyHanabiState::CurrentPlayer() const {
   const int history_size = history_.size();

@@ -5,9 +5,9 @@ GameType.chance_mode = ChanceMode.EXPLICIT_STOCHASTIC
 GameType.dynamics = Dynamics.SEQUENTIAL
 GameType.information = Information.IMPERFECT_INFORMATION
 GameType.long_name = "Tiny Hanabi"
-GameType.max_num_players = 2
+GameType.max_num_players = 10
 GameType.min_num_players = 2
-GameType.parameter_specification = []
+GameType.parameter_specification = ["num_actions", "num_chance", "num_players", "payoff"]
 GameType.provides_information_state = True
 GameType.provides_information_state_as_normalized_vector = True
 GameType.provides_observation = True
@@ -18,7 +18,7 @@ GameType.utility = Utility.IDENTICAL
 
 NumDistinctActions() = 3
 MaxChanceOutcomes() = 2
-GetParameters() = {}
+GetParameters() = {num_actions=3,num_chance=2,num_players=2,payoff=10;0;0;4;8;4;10;0;0;0;0;10;4;8;4;0;0;10;0;0;10;4;8;4;0;0;0;10;0;0;4;8;4;10;0;0}
 NumPlayers() = 2
 MinUtility() = 0.0
 MaxUtility() = 10.0
