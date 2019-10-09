@@ -275,7 +275,8 @@ void RandomSimBenchmark(const std::string& game_def, int num_sims,
   std::cout.precision(default_precision);  // Reset.
 }
 
-void RandomSimulation(std::mt19937* rng, const Game& game, bool undo) {
+void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
+                      bool serialize) {
   std::vector<HistoryItem> history;
   std::vector<double> episode_returns(game.NumPlayers(), 0);
 
@@ -315,7 +316,7 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo) {
     SPIEL_CHECK_EQ(state->ToString(), state_copy->ToString());
     SPIEL_CHECK_EQ(state->History(), state_copy->History());
 
-    if (history.size() < 10 || IsPowerOfTwo(history.size())) {
+    if (serialize && (history.size() < 10 || IsPowerOfTwo(history.size()))) {
       TestSerializeDeserialize(game, state.get());
     }
 
@@ -366,6 +367,13 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo) {
           state->InformationStateAsNormalizedVector(p, &infostate_vector);
           SPIEL_CHECK_EQ(infostate_vector.size(), infostate_vector_size);
         }
+
+        // Check the observation state vector, if supported.
+        if (observation_vector_size > 0) {
+          std::vector<double> obs_vector;
+          state->ObservationAsNormalizedVector(p, &obs_vector);
+          SPIEL_CHECK_EQ(obs_vector.size(), observation_vector_size);
+        }
       }
 
       ApplyActionTestClone(game, state.get(), joint_action);
@@ -386,6 +394,13 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo) {
         std::vector<double> infostate_vector;
         state->InformationStateAsNormalizedVector(player, &infostate_vector);
         SPIEL_CHECK_EQ(infostate_vector.size(), infostate_vector_size);
+      }
+
+      // Check the observation state vector, if supported.
+      if (observation_vector_size > 0) {
+        std::vector<double> obs_vector;
+        state->ObservationAsNormalizedVector(player, &obs_vector);
+        SPIEL_CHECK_EQ(obs_vector.size(), observation_vector_size);
       }
 
       // Sample an action uniformly.
@@ -454,7 +469,7 @@ void RandomSimTest(const Game& game, int num_sims) {
   std::cout << "\nRandomSimTest, game = " << game.GetType().short_name
             << ", num_sims = " << num_sims << std::endl;
   for (int sim = 0; sim < num_sims; ++sim) {
-    RandomSimulation(&rng, game, /*undo=*/false);
+    RandomSimulation(&rng, game, /*undo=*/false, /*serialize=*/true);
   }
 }
 
@@ -463,7 +478,16 @@ void RandomSimTestWithUndo(const Game& game, int num_sims) {
   std::cout << "RandomSimTestWithUndo, game = " << game.GetType().short_name
             << ", num_sims = " << num_sims << std::endl;
   for (int sim = 0; sim < num_sims; ++sim) {
-    RandomSimulation(&rng, game, /*undo=*/true);
+    RandomSimulation(&rng, game, /*undo=*/true, /*serialize=*/true);
+  }
+}
+
+void RandomSimTestNoSerialize(const Game& game, int num_sims) {
+  std::mt19937 rng;
+  std::cout << "RandomSimTestNoSerialize, game = " << game.GetType().short_name
+            << ", num_sims = " << num_sims << std::endl;
+  for (int sim = 0; sim < num_sims; ++sim) {
+    RandomSimulation(&rng, game, /*undo=*/false, /*serialize=*/false);
   }
 }
 
