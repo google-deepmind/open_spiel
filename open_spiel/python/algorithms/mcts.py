@@ -332,6 +332,14 @@ class MCTSBot(pyspiel.Bot):
     non-zero-sum games. It doesn't have any special handling for imperfect
     information games.
 
+    The implementation also supports backing up solved states, i.e. MCTS-Solver.
+    The implementation is general in that it is based on a max^n backup (each
+    player greedily chooses their maximum among proven children values, or there
+    exists one child whose proven value is game.max_utility()), so it will work
+    for multiplayer, general-sum, and arbitrary payoff games (not just win/loss/
+    draw games). Also chance nodes are considered proven only if all children
+    have the same value.
+
     Some references:
     - Sturtevant, An Analysis of UCT in Multi-Player Games,  2008,
       https://web.cs.du.edu/~sturtevant/papers/multi-player_UCT.pdf
@@ -339,6 +347,8 @@ class MCTSBot(pyspiel.Bot):
       https://project.dke.maastrichtuniversity.nl/games/files/phd/Nijssen_thesis.pdf
     - Silver, AlphaGo Zero: Starting from scratch, 2017
       https://deepmind.com/blog/article/alphago-zero-starting-scratch
+    - Winands, Bjornsson, and Saito, "Monte-Carlo Tree Search Solver", 2008.
+      https://dke.maastrichtuniversity.nl/m.winands/documents/uctloa.pdf
 
     Arguments:
       state: pyspiel.State object, state to search from
