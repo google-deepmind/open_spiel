@@ -30,6 +30,7 @@ Please choose among the following options:
 *   [Introduction to OpenSpiel](docs/intro.md)
 *   [API Overview and First Example](docs/concepts.md)
 *   [Overview of Implemented Games](docs/games.md)
+*   [Overview of Implemented Algorithms](docs/algorithms.md)
 *   [Developer Guide](docs/developer_guide.md)
 *   [Guidelines and Contributing](docs/contributing.md)
 *   [Swift OpenSpiel](docs/swift.md)
