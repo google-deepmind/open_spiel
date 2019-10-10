@@ -21,6 +21,39 @@
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_bots.h"
 
+// A vanilla Monte Carlo Tree Search algorithm.
+//
+// This algorithm searches the game tree from the given state.
+// At the leaf, the evaluator is called if the game state is not terminal.
+// A total of max_simulations states are explored.
+//
+// At every node, the algorithm chooses the action with the highest PUCT value
+// defined as: `Q/N + c * prior * sqrt(parent_N) / N`, where Q is the total
+// reward after the action, and N is the number of times the action was
+// explored in this position. The input parameter c controls the balance
+// between exploration and exploitation; higher values of c encourage
+// exploration of under-explored nodes. Unseen actions are always explored
+// first.
+//
+// At the end of the search, the chosen action is the action that has been
+// explored most often. This is the action that is returned.
+//
+// This implementation supports sequential n-player games, with or without
+// chance nodes. All players maximize their own reward and ignore the other
+// players' rewards. This corresponds to max^n for n-player games. It is the
+// norm for zero-sum games, but doesn't have any special handling for
+// non-zero-sum games. It doesn't have any special handling for imperfect
+// information games.
+//
+// Some references:
+// - Sturtevant, An Analysis of UCT in Multi-Player Games,  2008,
+//   https://web.cs.du.edu/~sturtevant/papers/multi-player_UCT.pdf
+// - Nijssen, Monte-Carlo Tree Search for Multi-Player Games, 2013,
+//   https://project.dke.maastrichtuniversity.nl/games/files/phd/Nijssen_thesis.pdf
+// - Silver, AlphaGo Zero: Starting from scratch, 2017
+//   https://deepmind.com/blog/article/alphago-zero-starting-scratch
+
+
 namespace open_spiel {
 namespace algorithms {
 
@@ -31,7 +64,12 @@ namespace algorithms {
 class Evaluator {
  public:
   virtual ~Evaluator() = default;
-  virtual double evaluate(const State& state) const = 0;
+
+  // Return a value of this state for each player.
+  virtual std::vector<double> evaluate(const State& state) const = 0;
+
+  // Return a policy: the probability of the current player playing each action.
+  virtual ActionsAndProbs Prior(const State& state) const = 0;
 };
 
 // A simple evaluator that returns the average outcome of playing random actions
@@ -39,50 +77,94 @@ class Evaluator {
 // n_rollouts is the number of random outcomes to be considered.
 class RandomRolloutEvaluator : public Evaluator {
  public:
-  explicit RandomRolloutEvaluator(int n_rollouts) : n_rollouts_{n_rollouts} {}
-  double evaluate(const State& state) const override;
+  explicit RandomRolloutEvaluator(int n_rollouts, int seed) :
+    n_rollouts_(n_rollouts), rng_(seed) {}
+
+  // Runs random games, returning the average returns.
+  std::vector<double> evaluate(const State& state) const override;
+
+  // Returns equal probability for each action.
+  ActionsAndProbs Prior(const State& state) const override;
 
  private:
   int n_rollouts_;
   mutable std::mt19937 rng_;
 };
 
-// A vanilla Monte-Carlo Tree Search algorithm.
-//
-// This algorithm searches the game tree from the given state.
-// At the leaf, the evaluator is called if the game state is not terminal.
-// A total of max_search_nodes states are explored.
-//
-// At every node, the algorithm chooses the action with the highest UCT value,
-// defined as: Q/N + c * sqrt(log(N) / N), where Q is the total reward after the
-// action, and N is the number of times the action was explored in this
-// position.  The input parameter c controls the balance between exploration and
-// exploitation; higher values of c encourage exploration of under-explored
-// nodes. Unseen actions are always explored first.
-//
-// At the end of the search, the chosen action is the action that has been
-// explored most often. This is the action that is returned.
-//
-// This implementation only supports sequential 1-player or 2-player zero-sum
-// games, with or without chance nodes.
-Action MCTSearch(const State& state, double uct_c, int max_search_nodes,
-                 const Evaluator& evaluator);
+// A node in the search tree for MCTS
+struct SearchNode {
+  Action action = 0;            // The action taken to get to this node.
+  double prior = 0;             // The prior probability of playing this action.
+  Player player = 0;            // Which player gets to make this action.
+  int explore_count = 0;        // Number of times this node was explored.
+  double total_reward = 0;      // Total reward passing through this node.
+  std::vector<double> outcome;  // The reward if each players plays perfectly.
+  std::vector<SearchNode> children;  // The successors to this state.
+
+  SearchNode(Action action_, Player player_, double prior_) :
+    action(action_), prior(prior_), player(player_) {}
+
+  // The value as returned by the UCT formula.
+  double Value(int parent_explore_count, double uct_c) const;
+
+  // The sort order for the BestChild.
+  bool CompareFinal(const SearchNode& b) const;
+  const SearchNode& BestChild() const;
+
+  // Return a string representation of this node, or all its children.
+  // The state is needed to convert the action to a string.
+  std::string ToString(const State& state) const;
+  std::string ChildrenStr(const State& state) const;
+};
+
 
 // A SpielBot that uses the MCTS algorithm as its policy.
 class MCTSBot : public Bot {
  public:
-  MCTSBot(const Game& game, Player player, double uct_c, int max_search_nodes,
-          const Evaluator& evaluator)
-      : Bot{game, player},
-        uct_c_{uct_c},
-        max_search_nodes_{max_search_nodes},
-        evaluator_{evaluator} {}
+  MCTSBot(
+      const Game& game,
+      Player player,
+      const Evaluator& evaluator,
+      double uct_c,
+      int max_simulations,
+      int64_t max_memory_mb,  // Max memory use in megabytes.
+      bool solve,  // Whether to back up solved states.
+      int seed,
+      bool verbose);
 
+  // Run MCTS for one step, choosing the action, and printing some information.
   std::pair<ActionsAndProbs, Action> Step(const State& state) override;
 
+  // Run MCTS on a given state, and return the resulting search tree.
+  std::unique_ptr<SearchNode> MCTSearch(const State& state);
+
  private:
+  // Applies the UCT policy to play the game until reaching a leaf node.
+  //
+  // A leaf node is defined as a node that is terminal or has not been evaluated
+  // yet. If it reaches a node that has been evaluated before but hasn't been
+  // expanded, then expand it's children and continue.
+  //
+  // Args:
+  //   root: The root node in the search tree.
+  //   state: The state of the game at the root node.
+  //   visit_path: A vector of nodes to be filled in descending from the root
+  //     node to a leaf node.
+  //
+  // Returns: The state of the game at the leaf node.
+  std::unique_ptr<State> ApplyTreePolicy(
+      SearchNode* root, const State& state,
+      std::vector<SearchNode*>* visit_path);
+
   double uct_c_;
-  int max_search_nodes_;
+  int max_simulations_;
+  int64_t max_memory_;  // Max memory allowed in the tree, in bytes.
+  int64_t memory_used_ = 0;  // Memory used in the tree, in bytes.
+  Player player_;
+  bool verbose_;
+  bool solve_;
+  double max_utility_;
+  std::mt19937 rng_;
   const Evaluator& evaluator_;
 };
 
