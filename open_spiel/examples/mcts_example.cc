@@ -142,7 +142,7 @@ std::pair<std::vector<double>, std::vector<std::string>> PlayGame(
 // Example code for using MCTS agent to play a game
 int main(int argc, char** argv) {
   std::vector<char*> positional_args = absl::ParseCommandLine(argc, argv);
-  std::mt19937 rng;  // Random number generator.
+  std::mt19937 rng(Seed());  // Random number generator.
 
   // Create the game
   std::string game_name = absl::GetFlag(FLAGS_game);
