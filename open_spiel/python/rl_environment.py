@@ -120,19 +120,36 @@ def registered_games():
   return pyspiel.registered_games()
 
 
+class ChanceEventSampler(object):
+  """Default sampler for external chance events."""
+
+  def __init__(self, seed=None):
+    self._rng = np.random.RandomState(seed)
+
+  def __call__(self, state):
+    """Sample a chance event in the given state."""
+    actions, probs = zip(*state.chance_outcomes())
+    return self._rng.choice(actions, p=probs)
+
+
 class Environment(object):
   """Open Spiel reinforcement learning environment class."""
 
-  def __init__(self, game_name, discount=1.0, seed=None, **kwargs):
+  def __init__(self,
+               game_name,
+               discount=1.0,
+               chance_event_sampler=None,
+               **kwargs):
     """Constructor.
 
     Args:
       game_name: string, Open Spiel game name.
       discount: float, discount used in non-initial steps. Defaults to 1.0.
-      seed: int, random number generator seed. Defaults to None.
+      chance_event_sampler: optional object with `sample_external_events` method
+        to sample chance events.
       **kwargs: dict, additional settings passed to the Open Spiel game.
     """
-    self._rng = np.random.RandomState(seed)
+    self._chance_event_sampler = chance_event_sampler or ChanceEventSampler()
 
     if kwargs:
       game_settings = {
@@ -253,11 +270,8 @@ class Environment(object):
   def _sample_external_events(self):
     """Sample chance events until we get to a decision node."""
     while self._state.is_chance_node():
-      if self._state.is_terminal():
-        return
-      actions, probs = zip(*self._state.chance_outcomes())
-      action = self._rng.choice(actions, p=probs)
-      self._state.apply_action(action)
+      outcome = self._chance_event_sampler(self._state)
+      self._state.apply_action(outcome)
 
   def observation_spec(self):
     """Defines the observation per player provided by the environment.
