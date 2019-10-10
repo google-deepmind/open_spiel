@@ -485,6 +485,17 @@ class State {
   // StateType definition for definitions of the different types.
   StateType GetType() const;
 
+  // Serializes a state into a string.
+  //
+  // The default implementation writes out a sequence of actions, one per line,
+  // taken from the initial state. Note: this default serialization scheme will
+  // not work games whose chance mode is kSampledStochastic, as there is
+  // currently no general way to set the state's seed to ensure that it samples
+  // the same chance event at chance nodes.
+  //
+  // If overridden, this must be the inverse of Game::DeserializeState.
+  virtual std::string Serialize() const;
+
  protected:
   // See ApplyAction.
   virtual void DoApplyAction(Action action_id) {
@@ -603,17 +614,6 @@ class Game : public std::enable_shared_from_this<Game> {
                          : std::accumulate(shape.begin(), shape.end(), 1,
                                            std::multiplies<double>());
   }
-
-  // Serializes a state into a string.
-  //
-  // The default implementation writes out a sequence of actions, one per line,
-  // taken from the initial state. Note: this default serialization scheme will
-  // not work games whose chance mode is kSampledStochastic, as there is
-  // currently no general way to set the state's seed to ensure that it samples
-  // the same chance event at chance nodes.
-  //
-  // If overridden, this must be the inverse of Game::DeserializeState.
-  virtual std::string SerializeState(const State& state) const;
 
   // Returns a newly allocated state built from a string. Caller takes ownership
   // of the state.

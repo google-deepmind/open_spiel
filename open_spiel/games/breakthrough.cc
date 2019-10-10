@@ -387,13 +387,11 @@ int BreakthroughGame::NumDistinctActions() const {
   return rows_ * cols_ * kNumDirections * 2;
 }
 
-std::string BreakthroughGame::SerializeState(const State& state) const {
+std::string BreakthroughState::Serialize() const {
   std::string str = "";
-  auto bstate = dynamic_cast<const BreakthroughState*>(&state);
-  SPIEL_CHECK_TRUE(bstate != nullptr);
   for (int r = 0; r < rows_; r++) {
     for (int c = 0; c < cols_; c++) {
-      absl::StrAppend(&str, CellToString(bstate->board(r, c)));
+      absl::StrAppend(&str, CellToString(board(r, c)));
     }
   }
   return str;

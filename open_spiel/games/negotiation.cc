@@ -554,20 +554,17 @@ int NegotiationGame::NumDistinctActions() const {
   }
 }
 
-std::string NegotiationGame::SerializeState(const State& state) const {
-  if (state.IsChanceNode()) {
+std::string NegotiationState::Serialize() const {
+  if (IsChanceNode()) {
     return "chance";
   } else {
-    const NegotiationState& nstate =
-        static_cast<const NegotiationState&>(state);
     std::string state_str = "";
-    absl::StrAppend(&state_str, nstate.MaxSteps(), "\n");
-    absl::StrAppend(&state_str, absl::StrJoin(nstate.ItemPool(), " "), "\n");
+    absl::StrAppend(&state_str, MaxSteps(), "\n");
+    absl::StrAppend(&state_str, absl::StrJoin(ItemPool(), " "), "\n");
     for (int p = 0; p < NumPlayers(); ++p) {
-      absl::StrAppend(&state_str, absl::StrJoin(nstate.AgentUtils()[p], " "),
-                      "\n");
+      absl::StrAppend(&state_str, absl::StrJoin(AgentUtils()[p], " "), "\n");
     }
-    absl::StrAppend(&state_str, nstate.HistoryString(), "\n");
+    absl::StrAppend(&state_str, HistoryString(), "\n");
     return state_str;
   }
 }

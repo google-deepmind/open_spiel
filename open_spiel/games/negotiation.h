@@ -98,6 +98,7 @@ class NegotiationState : public State {
   void SetCurrentPlayer(Player p) { cur_player_ = p; }
   int MaxSteps() const { return max_steps_; }
   void SetMaxSteps(int max_steps) { max_steps_ = max_steps; }
+  std::string Serialize() const override;
 
  protected:
   void DoApplyAction(Action move_id) override;
@@ -177,7 +178,6 @@ class NegotiationGame : public Game {
   }
   std::vector<int> ObservationNormalizedVectorShape() const override;
 
-  std::string SerializeState(const State& state) const override;
   std::unique_ptr<State> DeserializeState(
       const std::string& str) const override;
 

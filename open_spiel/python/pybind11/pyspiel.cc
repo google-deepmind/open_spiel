@@ -237,6 +237,7 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("num_players", &State::NumPlayers)
       .def("chance_outcomes", &State::ChanceOutcomes)
       .def("get_type", &State::GetType)
+      .def("serialize", &State::Serialize)
       .def(py::pickle(              // Pickle support
           [](const State& state) {  // __getstate__
             return SerializeGameAndState(*state.GetGame(), state);
@@ -265,7 +266,6 @@ PYBIND11_MODULE(pyspiel, m) {
            &Game::ObservationNormalizedVectorShape)
       .def("observation_normalized_vector_size",
            &Game::ObservationNormalizedVectorSize)
-      .def("serialize_state", &Game::SerializeState)
       .def("deserialize_state", &Game::DeserializeState)
       .def("max_game_length", &Game::MaxGameLength)
       .def("__str__", &Game::ToString)

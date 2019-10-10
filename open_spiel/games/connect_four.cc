@@ -203,9 +203,7 @@ std::unique_ptr<State> ConnectFourState::Clone() const {
   return std::unique_ptr<State>(new ConnectFourState(*this));
 }
 
-std::string ConnectFourGame::SerializeState(const State& state) const {
-  return state.ToString();
-}
+std::string ConnectFourState::Serialize() const { return ToString(); }
 
 ConnectFourGame::ConnectFourGame(const GameParameters& params)
     : Game(kGameType, params) {}

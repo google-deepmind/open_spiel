@@ -55,8 +55,7 @@ void FastLoss() {
 void BasicSerializationTest() {
   std::shared_ptr<const Game> game = LoadGame("connect_four");
   std::unique_ptr<State> state = game->NewInitialState();
-  std::unique_ptr<State> state2 =
-      game->DeserializeState(game->SerializeState(*state));
+  std::unique_ptr<State> state2 = game->DeserializeState(state->Serialize());
   SPIEL_CHECK_EQ(state->ToString(), state2->ToString());
 }
 

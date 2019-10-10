@@ -334,14 +334,14 @@ Action SampleChanceOutcome(const ActionsAndProbs& outcomes, double z) {
       absl::StrCat("Internal error: failed to sample an outcome; z=", z));
 }
 
-std::string Game::SerializeState(const State& state) const {
+std::string State::Serialize() const {
   // This simple serialization doesn't work for games with sampled chance
   // nodes, since the history doesn't give us enough information to reconstruct
   // the state. If you wish to serialize states in such games, you must
   // implement custom serialization and deserialization for the state.
-  SPIEL_CHECK_NE(game_type_.chance_mode,
+  SPIEL_CHECK_NE(game_->GetType().chance_mode,
                  GameType::ChanceMode::kSampledStochastic);
-  return absl::StrCat(absl::StrJoin(state.History(), "\n"), "\n");
+  return absl::StrCat(absl::StrJoin(History(), "\n"), "\n");
 }
 
 std::unique_ptr<State> Game::DeserializeState(const std::string& str) const {
@@ -393,7 +393,7 @@ std::string SerializeGameAndState(const Game& game, const State& state) {
 
   // State section.
   absl::StrAppend(&str, kSerializeStateSectionHeader, "\n");
-  absl::StrAppend(&str, game.SerializeState(state), "\n");
+  absl::StrAppend(&str, state.Serialize(), "\n");
 
   return str;
 }

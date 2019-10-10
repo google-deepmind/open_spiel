@@ -173,6 +173,7 @@ class UncontestedBiddingState : public State {
   std::unique_ptr<State> Clone() const override;
   std::vector<Action> LegalActions() const override;
   std::vector<std::pair<Action, double>> ChanceOutcomes() const override;
+  std::string Serialize() const override { return ToString(); }
 
  protected:
   void DoApplyAction(Action action_id) override;
@@ -219,9 +220,6 @@ class UncontestedBiddingGame : public Game {
     return {kStateSize};
   }
   int MaxGameLength() const override { return kNumActions; }
-  std::string SerializeState(const State& state) const override {
-    return state.ToString();
-  }
   std::unique_ptr<State> DeserializeState(
       const std::string& str) const override;
 
