@@ -20,7 +20,6 @@ from __future__ import print_function
 
 import collections
 import sys
-import time
 
 from absl import app
 from absl import flags
@@ -78,15 +77,10 @@ def _get_action(state, action_str):
   return None
 
 
-def _play_game(game, initial_actions):
+def _play_game(game, bots, initial_actions):
   """Plays one game."""
   state = game.new_initial_state()
   _opt_print("Initial state:\n{}".format(state))
-
-  bots = [
-      _init_bot(FLAGS.player1, game, 0),
-      _init_bot(FLAGS.player2, game, 1),
-  ]
 
   history = []
 
@@ -111,21 +105,17 @@ def _play_game(game, initial_actions):
       action_list, prob_list = zip(*outcomes)
       action = np.random.choice(action_list, p=prob_list)
       action_str = state.action_to_string(state.current_player(), action)
-      _opt_print("Sampled outcome: ", action_str)
+      _opt_print("Sampled action: ", action_str)
     elif state.is_simultaneous_node():
       raise ValueError("Game cannot have simultaneous nodes.")
     else:
-      t1 = time.time()
       # Decision node: sample action for the single current player
       bot = bots[state.current_player()]
       _, action = bot.step(state)
       action_str = state.action_to_string(state.current_player(), action)
       _opt_print("Player {} sampled action: {}".format(state.current_player(),
                                                        action_str))
-      diff = time.time() - t1
-      if isinstance(bot, mcts.MCTSBot):
-        _opt_print("Took %.3f secs, %.1f rollouts/s" %
-                   (diff, (FLAGS.rollout_count * FLAGS.max_simulations) / diff))
+
     history.append(action_str)
     state.apply_action(action)
 
@@ -140,13 +130,19 @@ def _play_game(game, initial_actions):
 
 def main(argv):
   game = pyspiel.load_game(FLAGS.game)
+  if game.num_players() > 2:
+    sys.exit("This game requires more players than the example can handle.")
+  bots = [
+      _init_bot(FLAGS.player1, game, 0),
+      _init_bot(FLAGS.player2, game, 1),
+  ]
   histories = collections.defaultdict(int)
   overall_returns = [0, 0]
   overall_wins = [0, 0]
   game_num = 0
   try:
     for game_num in range(FLAGS.num_games):
-      returns, history = _play_game(game, argv[1:])
+      returns, history = _play_game(game, bots, argv[1:])
       histories[" ".join(history)] += 1
       for i, v in enumerate(returns):
         overall_returns[i] += v
