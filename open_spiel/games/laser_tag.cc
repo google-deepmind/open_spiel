@@ -114,7 +114,8 @@ constexpr std::array<std::array<int, 10>, 4> col_offsets = {
 }  // namespace
 
 LaserTagState::LaserTagState(std::shared_ptr<const Game> game)
-    : SimMoveState(game) {}
+    : SimMoveState(game),
+      parent_game_(static_cast<const LaserTagGame&>(*game)) {}
 
 std::string LaserTagState::ActionToString(int player, Action action_id) const {
   if (player == kSimultaneousPlayerId)

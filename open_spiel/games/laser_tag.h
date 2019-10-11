@@ -91,6 +91,8 @@ class LaserTagState : public SimMoveState {
   bool InBounds(int r, int c) const;
   int observation_plane(int r, int c) const;
 
+  const LaserTagGame& parent_game_;
+
   // Fields set to bad values. Use Game::NewInitialState().
   int num_tags_ = 0;
   int cur_player_ = -1;  // Could be chance's turn.
