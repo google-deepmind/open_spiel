@@ -43,8 +43,8 @@ const GameType kGameType{
         {"max_value", GameParameter(kDefaultMaxValue)},
     }};
 
-std::unique_ptr<Game> Factory(const GameParameters& params) {
-  return std::unique_ptr<Game>(new FPSBAGame(params));
+std::shared_ptr<const Game> Factory(const GameParameters& params) {
+  return std::shared_ptr<const Game>(new FPSBAGame(params));
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
@@ -55,9 +55,8 @@ FPSBAGame::FPSBAGame(const GameParameters& params)
       num_players_(ParameterValue<int>("players" )),
       max_value_(ParameterValue<int>("max_value")) {}
 
-FPSBAState::FPSBAState(int num_distinct_actions, int num_players)
-    : State(num_distinct_actions, num_players),
-      max_value_(num_distinct_actions) {}
+FPSBAState::FPSBAState(std::shared_ptr<const Game> game)
+    : State(game), max_value_(game->NumDistinctActions()) {}
 
 int FPSBAState::CurrentPlayer() const {
   if (valuations_.size() < num_players_) return kChancePlayerId;

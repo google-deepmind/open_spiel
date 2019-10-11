@@ -17,6 +17,7 @@
 #include <random>
 #include <string>
 
+#include "open_spiel/abseil-cpp/absl/random/uniform_int_distribution.h"
 #include "open_spiel/spiel.h"
 
 namespace open_spiel {
@@ -63,7 +64,7 @@ void SimulateGames(std::mt19937* rng, const Game& game, State* sim_state,
 
         std::vector<Action> actions;
         actions = sim_state->LegalActions(p);
-        std::uniform_int_distribution<> dis(0, actions.size() - 1);
+        absl::uniform_int_distribution<> dis(0, actions.size() - 1);
         Action action = actions[dis(*rng)];
         joint_action.push_back(action);
         std::cout << "player " << p << " chose "
@@ -107,8 +108,8 @@ void BasicTurnBasedSimultaneousTests() {
       if (type.dynamics == GameType::Dynamics::kSimultaneous) {
         std::cout << "TurnBasedSimultaneous: Testing " << name << std::endl;
         for (int i = 0; i < 100; ++i) {
-          std::unique_ptr<Game> sim_game = LoadGame(name);
-          std::unique_ptr<Game> turn_based_game =
+          std::shared_ptr<const Game> sim_game = LoadGame(name);
+          std::shared_ptr<const Game> turn_based_game =
               ConvertToTurnBased(*LoadGame(name));
           auto sim_state = sim_game->NewInitialState();
           auto turn_based_state = turn_based_game->NewInitialState();

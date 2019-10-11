@@ -15,6 +15,8 @@
 #ifndef THIRD_PARTY_OPEN_SPIEL_GAMES_TINY_HANABI_H_
 #define THIRD_PARTY_OPEN_SPIEL_GAMES_TINY_HANABI_H_
 
+#include <memory>
+
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/spiel.h"
 
@@ -86,8 +88,8 @@ class TinyHanabiGame : public Game {
   double MaxUtility() const override { return payoff_.MaxUtility(); }
   int MaxGameLength() const override { return payoff_.NumPlayers(); }
   int MaxChanceOutcomes() const override { return payoff_.NumChance(); }
-  std::unique_ptr<Game> Clone() const override {
-    return std::unique_ptr<Game>(new TinyHanabiGame(*this));
+  std::shared_ptr<const Game> Clone() const override {
+    return std::shared_ptr<const Game>(new TinyHanabiGame(*this));
   }
   std::vector<int> InformationStateNormalizedVectorShape() const {
     return {payoff_.NumChance() + payoff_.NumActions() * payoff_.NumPlayers()};
@@ -103,8 +105,9 @@ class TinyHanabiGame : public Game {
 class TinyHanabiState : public State {
  public:
   TinyHanabiState(const TinyHanabiState&) = default;
-  TinyHanabiState(TinyHanabiPayoffMatrix payoff)
-      : State(payoff.NumActions(), payoff.NumPlayers()), payoff_(payoff) {}
+  TinyHanabiState(std::shared_ptr<const Game> game,
+                  TinyHanabiPayoffMatrix payoff)
+      : State(game), payoff_(payoff) {}
 
   Player CurrentPlayer() const override;
   std::string ActionToString(Player player, Action action) const override;

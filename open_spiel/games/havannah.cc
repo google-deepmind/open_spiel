@@ -46,8 +46,8 @@ const GameType kGameType{
         {"ansi_color_output", GameParameter(false)},
     }};
 
-std::unique_ptr<Game> Factory(const GameParameters& params) {
-  return std::unique_ptr<Game>(new HavannahGame(params));
+std::shared_ptr<const Game> Factory(const GameParameters& params) {
+  return std::shared_ptr<const Game>(new HavannahGame(params));
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
@@ -150,9 +150,9 @@ std::string Move::ToString() const {
 int HavannahState::Cell::NumCorners() const { return kBitsSetTable64[corner]; }
 int HavannahState::Cell::NumEdges() const { return kBitsSetTable64[edge]; }
 
-HavannahState::HavannahState(int board_size, bool ansi_color_output)
-    : State((board_size * 2 - 1) * (board_size * 2 - 1),  // Diameter squared.
-            kNumPlayers),
+HavannahState::HavannahState(std::shared_ptr<const Game> game, int board_size,
+                             bool ansi_color_output)
+    : State(game),
       board_size_(board_size),
       board_diameter_(board_size * 2 - 1),
       valid_cells_((board_size * 2 - 1) * (board_size * 2 - 1) -

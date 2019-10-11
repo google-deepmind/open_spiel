@@ -40,8 +40,8 @@ const GameType kGameType{
     /*parameter_specification=*/{}  // no parameters
 };
 
-std::unique_ptr<Game> Factory(const GameParameters& params) {
-  return std::unique_ptr<Game>(
+std::shared_ptr<const Game> Factory(const GameParameters& params) {
+  return std::shared_ptr<const Game>(
       new MatrixGame(kGameType, params, {"Heads", "Tails"}, {"Heads", "Tails"},
                      {1, -1, -1, 1}, {-1, 1, 1, -1}));
 }
@@ -67,8 +67,8 @@ const GameType kGameType{
     /*parameter_specification=*/{}  // no parameters
 };
 
-std::unique_ptr<Game> Factory(const GameParameters& params) {
-  return std::unique_ptr<Game>(new MatrixGame(
+std::shared_ptr<const Game> Factory(const GameParameters& params) {
+  return std::shared_ptr<const Game>(new MatrixGame(
       kGameType, params, {"Rock", "Paper", "Scissors"},
       {"Rock", "Paper", "Scissors"}, {0, -1, 1, 1, 0, -1, -1, 1, 0},
       {0, 1, -1, -1, 0, 1, 1, -1, 0}));
@@ -98,8 +98,8 @@ const GameType kGameType{
     /*parameter_specification=*/{}  // no parameters
 };
 
-std::unique_ptr<Game> Factory(const GameParameters& params) {
-  return std::unique_ptr<Game>(
+std::shared_ptr<const Game> Factory(const GameParameters& params) {
+  return std::shared_ptr<const Game>(
       new MatrixGame(kGameType, params, {"Rock", "Paper", "Scissors"},
                      {"Rock", "Paper", "Scissors"}, {0, 0, 1, 1, 0, 0, 0, 1, 0},
                      {0, 1, 0, 0, 0, 1, 1, 0, 0}));
@@ -125,8 +125,8 @@ const GameType kGameType{
     /*parameter_specification=*/{}  // no parameters
 };
 
-std::unique_ptr<Game> Factory(const GameParameters& params) {
-  return std::unique_ptr<Game>(
+std::shared_ptr<const Game> Factory(const GameParameters& params) {
+  return std::shared_ptr<const Game>(
       new MatrixGame(kGameType, params, {"Cooperate", "Defect"},
                      {"Cooperate", "Defect"}, {5, 0, 10, 1}, {5, 10, 0, 1}));
 }
@@ -151,8 +151,8 @@ const GameType kGameType{
     /*parameter_specification=*/{}  // no parameters
 };
 
-std::unique_ptr<Game> Factory(const GameParameters& params) {
-  return std::unique_ptr<Game>(
+std::shared_ptr<const Game> Factory(const GameParameters& params) {
+  return std::shared_ptr<const Game>(
       new MatrixGame(kGameType, params, {"Stag", "Hare"}, {"Stag", "Hare"},
                      {2, 0, 1, 1}, {2, 1, 0, 1}));
 }
@@ -177,8 +177,8 @@ const GameType kGameType{
     /*parameter_specification=*/{}  // no parameters
 };
 
-std::unique_ptr<Game> Factory(const GameParameters& params) {
-  return std::unique_ptr<Game>(
+std::shared_ptr<const Game> Factory(const GameParameters& params) {
+  return std::shared_ptr<const Game>(
       new MatrixGame(kGameType, params, {"Left", "Right"}, {"Left", "Right"},
                      {1, 0, 0, 1}, {1, 0, 0, 1}));
 }
@@ -204,8 +204,8 @@ const GameType kGameType{
     /*parameter_specification=*/{}  // no parameters
 };
 
-std::unique_ptr<Game> Factory(const GameParameters& params) {
-  return std::unique_ptr<Game>(
+std::shared_ptr<const Game> Factory(const GameParameters& params) {
+  return std::shared_ptr<const Game>(
       new MatrixGame(kGameType, params, {"Dare", "Chicken"},
                      {"Dare", "Chicken"}, {0, 4, 1, 3}, {0, 1, 4, 3}));
 }

@@ -16,6 +16,7 @@
 #define THIRD_PARTY_OPEN_SPIEL_GAMES_LASER_TAG_H_
 
 #include <array>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -54,7 +55,7 @@ class LaserTagGame;
 
 class LaserTagState : public SimMoveState {
  public:
-  explicit LaserTagState(const LaserTagGame& parent_game);
+  explicit LaserTagState(std::shared_ptr<const Game> game);
   LaserTagState(const LaserTagState&) = default;
 
   std::string ActionToString(int player, Action action_id) const override;
@@ -90,8 +91,6 @@ class LaserTagState : public SimMoveState {
   bool InBounds(int r, int c) const;
   int observation_plane(int r, int c) const;
 
-  const LaserTagGame& parent_game_;
-
   // Fields set to bad values. Use Game::NewInitialState().
   int num_tags_ = 0;
   int cur_player_ = -1;  // Could be chance's turn.
@@ -120,8 +119,8 @@ class LaserTagGame : public SimMoveGame {
   double MinUtility() const override;
   double MaxUtility() const override;
   double UtilitySum() const override { return 0; }
-  std::unique_ptr<Game> Clone() const override {
-    return std::unique_ptr<Game>(new LaserTagGame(*this));
+  std::shared_ptr<const Game> Clone() const override {
+    return std::shared_ptr<const Game>(new LaserTagGame(*this));
   }
   std::vector<int> ObservationNormalizedVectorShape() const override;
   int MaxGameLength() const override { return horizon_; }

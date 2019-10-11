@@ -30,8 +30,7 @@ void BasicLaserTagTests() {
 }
 
 void SimpleTagTests(int horizon, bool zero_sum, std::string grid, int num_rows, int num_cols) {
-  std::unique_ptr<Game> game =
-      LoadGame("laser_tag", {{"horizon", GameParameter(horizon)},
+  std::unique_ptr<Game> game = LoadGame("laser_tag", {{"horizon", GameParameter(horizon)},
                              {"zero_sum", GameParameter(zero_sum)},
                              {"grid", GameParameter(grid)},
                              {"num_rows", GameParameter(num_rows)},

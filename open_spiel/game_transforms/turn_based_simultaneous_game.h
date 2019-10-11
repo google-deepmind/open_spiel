@@ -35,7 +35,7 @@ namespace open_spiel {
 
 class TurnBasedSimultaneousState : public State {
  public:
-  TurnBasedSimultaneousState(int num_distinct_actions, int num_players,
+  TurnBasedSimultaneousState(std::shared_ptr<const Game> game,
                              std::unique_ptr<State> state);
   TurnBasedSimultaneousState(const TurnBasedSimultaneousState& other);
 
@@ -77,13 +77,11 @@ class TurnBasedSimultaneousState : public State {
 
 class TurnBasedSimultaneousGame : public Game {
  public:
-  explicit TurnBasedSimultaneousGame(std::unique_ptr<Game> game);
-  TurnBasedSimultaneousGame(const TurnBasedSimultaneousGame& other)
-      : Game(other), game_(other.game_->Clone()) {}
+  explicit TurnBasedSimultaneousGame(std::shared_ptr<const Game> game);
 
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(new TurnBasedSimultaneousState(
-        NumDistinctActions(), NumPlayers(), game_->NewInitialState()));
+        shared_from_this(), game_->NewInitialState()));
   }
 
   int NumDistinctActions() const override {
@@ -102,23 +100,23 @@ class TurnBasedSimultaneousGame : public Game {
   int MaxGameLength() const override {
     return game_->MaxGameLength() * NumPlayers();
   }
-  std::unique_ptr<Game> Clone() const override {
-    return std::unique_ptr<Game>(new TurnBasedSimultaneousGame(*this));
+  std::shared_ptr<const Game> Clone() const override {
+    return std::shared_ptr<const Game>(new TurnBasedSimultaneousGame(*this));
   }
 
  private:
-  std::unique_ptr<Game> game_;
+  std::shared_ptr<const Game> game_;
 };
 
 // Equivalent loader functions that return back the transformed game.
 // Important: takes ownership of the game that is passed in.
-std::unique_ptr<Game> ConvertToTurnBased(const Game& game);
+std::shared_ptr<const Game> ConvertToTurnBased(const Game& game);
 
 // These are equivalent to LoadGame but return a converted game. They are simple
 // wrappers provided for the Python API.
-std::unique_ptr<Game> LoadGameAsTurnBased(const std::string& name);
-std::unique_ptr<Game> LoadGameAsTurnBased(const std::string& name,
-                                          const GameParameters& params);
+std::shared_ptr<const Game> LoadGameAsTurnBased(const std::string& name);
+std::shared_ptr<const Game> LoadGameAsTurnBased(const std::string& name,
+                                                const GameParameters& params);
 
 }  // namespace open_spiel
 

@@ -38,32 +38,33 @@
 namespace open_spiel {
 namespace backgammon {
 
-constexpr const int kNumPlayers = 2;
-constexpr const int kNumChanceOutcomes = 21;
-constexpr const int kNumPoints = 24;
-constexpr const int kNumDiceOutcomes = 6;
-constexpr const int kNumCheckersPerPlayer = 15;
-constexpr const int kXPlayerId = 0;
-constexpr const int kOPlayerId = 1;
-constexpr const int kPassPos = -1;
+inline constexpr const int kNumPlayers = 2;
+inline constexpr const int kNumChanceOutcomes = 21;
+inline constexpr const int kNumPoints = 24;
+inline constexpr const int kNumDiceOutcomes = 6;
+inline constexpr const int kNumCheckersPerPlayer = 15;
+inline constexpr const int kXPlayerId = 0;
+inline constexpr const int kOPlayerId = 1;
+inline constexpr const int kPassPos = -1;
 
 // TODO: look into whether these can be set to 25 and -2 to avoid having a
 // separate helper function (PositionToStringHumanReadable) to convert moves
 // to strings.
-constexpr const int kBarPos = 100;
-constexpr const int kScorePos = 101;
+inline constexpr const int kBarPos = 100;
+inline constexpr const int kScorePos = 101;
 
 // The action encoding stores a number in { 0, 1, ..., 1351 }. If the high
 // roll is to move first, then the number is encoded as a 2-digit number in
 // base 26 ({0, 1, .., 23, kBarPos, Pass}) (=> first 676 numbers). Otherwise,
 // the low die is to move first and, 676 is subtracted and then again the
 // number is encoded as a 2-digit number in base 26.
-constexpr const int kNumDistinctActions = 1352;
+inline constexpr const int kNumDistinctActions = 1352;
 
 // See InformationStateNormalizedVectorShape for details.
-constexpr const int kBoardEncodingSize = 4 * kNumPoints * kNumPlayers;
-constexpr const int kStateEncodingSize = 3 * kNumPlayers + kBoardEncodingSize;
-constexpr const char* kDefaultScoringType = "winloss_scoring";
+inline constexpr const int kBoardEncodingSize = 4 * kNumPoints * kNumPlayers;
+inline constexpr const int kStateEncodingSize =
+    3 * kNumPlayers + kBoardEncodingSize;
+inline constexpr const char* kDefaultScoringType = "winloss_scoring";
 
 // Game scoring type, whether to score gammons/backgammons specially.
 enum class ScoringType {
@@ -111,8 +112,7 @@ class BackgammonGame;
 class BackgammonState : public State {
  public:
   BackgammonState(const BackgammonState&) = default;
-  BackgammonState(int num_distinct_actions, int num_players,
-                  ScoringType scoring_type);
+  BackgammonState(std::shared_ptr<const Game>, ScoringType scoring_type);
 
   Player CurrentPlayer() const override;
   void UndoAction(Player player, Action action) override;
@@ -242,7 +242,7 @@ class BackgammonGame : public Game {
 
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(
-        new BackgammonState(NumDistinctActions(), kNumPlayers, scoring_type_));
+        new BackgammonState(shared_from_this(), scoring_type_));
   }
 
   int MaxChanceOutcomes() const override { return kNumChanceOutcomes; }
@@ -254,8 +254,8 @@ class BackgammonGame : public Game {
   double MinUtility() const override { return -MaxUtility(); }
   double UtilitySum() const override { return 0; }
   double MaxUtility() const override;
-  std::unique_ptr<Game> Clone() const override {
-    return std::unique_ptr<Game>(new BackgammonGame(*this));
+  std::shared_ptr<const Game> Clone() const override {
+    return std::shared_ptr<const Game>(new BackgammonGame(*this));
   }
 
   std::vector<int> InformationStateNormalizedVectorShape() const override {

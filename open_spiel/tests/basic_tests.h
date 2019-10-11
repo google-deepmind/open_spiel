@@ -53,6 +53,13 @@ void RandomSimBenchmark(const std::string& game_def, int num_sims,
 // used for smallish games.
 void CheckChanceOutcomes(const Game& game);
 
+// Same as above but without checking the serialization functions. Every game
+// should support serialization: only use this function when developing a new
+// game, in order to test the implementation using the basic tests before having
+// to implement the custom serialization (only useful for games that have chance
+// mode kSampledStochastic).
+void RandomSimTestNoSerialize(const Game& game, int num_sims);
+
 }  // namespace testing
 }  // namespace open_spiel
 

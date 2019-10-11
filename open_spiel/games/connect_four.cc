@@ -40,8 +40,8 @@ const GameType kGameType{
     /*parameter_specification=*/{}  // no parameters
 };
 
-std::unique_ptr<Game> Factory(const GameParameters& params) {
-  return std::unique_ptr<Game>(new ConnectFourGame(params));
+std::shared_ptr<const Game> Factory(const GameParameters& params) {
+  return std::shared_ptr<const Game>(new ConnectFourGame(params));
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
@@ -93,6 +93,13 @@ void ConnectFourState::DoApplyAction(Action move) {
   int row = 0;
   while (CellAt(row, move) != CellState::kEmpty) ++row;
   CellAt(row, move) = PlayerToState(CurrentPlayer());
+
+  if (HasLine(current_player_)) {
+    outcome_ = static_cast<Outcome>(current_player_);
+  } else if (IsFull()) {
+    outcome_ = Outcome::kDraw;
+  }
+
   current_player_ = 1 - current_player_;
 }
 
@@ -149,8 +156,8 @@ bool ConnectFourState::IsFull() const {
   return true;
 }
 
-ConnectFourState::ConnectFourState(int num_distinct_actions)
-    : State(num_distinct_actions, kNumPlayers) {
+ConnectFourState::ConnectFourState(std::shared_ptr<const Game> game)
+    : State(game) {
   std::fill(begin(board_), end(board_), CellState::kEmpty);
 }
 
@@ -165,12 +172,12 @@ std::string ConnectFourState::ToString() const {
   return str;
 }
 bool ConnectFourState::IsTerminal() const {
-  return HasLine(0) || HasLine(1) || IsFull();
+  return outcome_ != Outcome::kUnknown;
 }
 
 std::vector<double> ConnectFourState::Returns() const {
-  if (HasLine(0)) return {1.0, -1.0};
-  if (HasLine(1)) return {-1.0, 1.0};
+  if (outcome_ == Outcome::kPlayer1) return {1.0, -1.0};
+  if (outcome_ == Outcome::kPlayer2) return {-1.0, 1.0};
   return {0.0, 0.0};
 }
 
@@ -192,32 +199,23 @@ void ConnectFourState::InformationStateAsNormalizedVector(
   }
 }
 
-void ConnectFourState::UndoAction(Player player, Action move) {
-  board_[move] = CellState::kEmpty;
-  current_player_ = player;
-  history_.pop_back();
-}
-
 std::unique_ptr<State> ConnectFourState::Clone() const {
   return std::unique_ptr<State>(new ConnectFourState(*this));
 }
 
-std::string ConnectFourGame::SerializeState(const State& state) const {
-  return state.ToString();
-}
+std::string ConnectFourState::Serialize() const { return ToString(); }
 
 ConnectFourGame::ConnectFourGame(const GameParameters& params)
     : Game(kGameType, params) {}
 
 std::unique_ptr<State> ConnectFourGame::DeserializeState(
     const std::string& str) const {
-  return std::unique_ptr<State>(
-      new ConnectFourState(NumDistinctActions(), str));
+  return std::unique_ptr<State>(new ConnectFourState(shared_from_this(), str));
 }
 
-ConnectFourState::ConnectFourState(int num_distinct_actions,
+ConnectFourState::ConnectFourState(std::shared_ptr<const Game> game,
                                    const std::string& str)
-    : State(num_distinct_actions, kNumPlayers) {
+    : State(game) {
   int xs = 0;
   int os = 0;
   int r = 5;
@@ -249,6 +247,14 @@ ConnectFourState::ConnectFourState(int num_distinct_actions,
   SPIEL_CHECK_TRUE(c == 0 &&
                    ("Problem parsing state (column value should be 0)"));
   current_player_ = (xs == os) ? 0 : 1;
+
+  if (HasLine(0)) {
+    outcome_ = Outcome::kPlayer1;
+  } else if (HasLine(1)) {
+    outcome_ = Outcome::kPlayer2;
+  } else if (IsFull()) {
+    outcome_ = Outcome::kDraw;
+  }
 }
 
 }  // namespace connect_four

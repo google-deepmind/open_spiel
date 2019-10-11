@@ -27,7 +27,6 @@ namespace testing = open_spiel::testing;
 void BasicQuoridorTests() {
   testing::LoadGameTest("quoridor(board_size=5)");
   testing::NoChanceOutcomesTest(*LoadGame("quoridor()"));
-
   testing::RandomSimTest(*LoadGame("quoridor"), 10);
 
   for (int i = 5; i <= 13; i++) {

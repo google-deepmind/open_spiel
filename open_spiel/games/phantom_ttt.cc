@@ -53,19 +53,17 @@ const GameType kGameType{
     /*parameter_specification=*/
     {{"obstype", GameParameter(static_cast<std::string>(kDefaultObsType))}}};
 
-std::unique_ptr<Game> Factory(const GameParameters& params) {
-  return std::unique_ptr<Game>(new PhantomTTTGame(params));
+std::shared_ptr<const Game> Factory(const GameParameters& params) {
+  return std::shared_ptr<const Game>(new PhantomTTTGame(params));
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
 
 }  // namespace
 
-PhantomTTTState::PhantomTTTState(int num_distinct_actions,
+PhantomTTTState::PhantomTTTState(std::shared_ptr<const Game> game,
                                  ObservationType obs_type)
-    : State(num_distinct_actions, tic_tac_toe::kNumPlayers),
-      state_(num_distinct_actions),
-      obs_type_(obs_type) {
+    : State(game), state_(game), obs_type_(obs_type) {
   std::fill(begin(x_view_), end(x_view_), CellState::kEmpty);
   std::fill(begin(o_view_), end(o_view_), CellState::kEmpty);
 }
@@ -215,7 +213,9 @@ void PhantomTTTState::UndoAction(Player player, Action move) {
 }
 
 PhantomTTTGame::PhantomTTTGame(const GameParameters& params)
-    : Game(kGameType, params), game_(GameParameters{}) {
+    : Game(kGameType, params),
+      game_(std::static_pointer_cast<const tic_tac_toe::TicTacToeGame>(
+          LoadGame("tic_tac_toe"))) {
   std::string obs_type =
       ParameterValue<std::string>("obstype");
   if (obs_type == "reveal-nothing") {

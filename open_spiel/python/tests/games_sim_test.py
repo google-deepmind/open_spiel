@@ -18,6 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import pickle
 from absl.testing import absltest
 from absl.testing import parameterized
 import numpy as np
@@ -58,6 +59,7 @@ SPIEL_MULTIPLAYER_GAMES_LIST = [
     for g in SPIEL_LOADABLE_GAMES_LIST
     for p in range(max(g.min_num_players, 2), 1 + min(g.max_num_players, 6))
     if g.max_num_players > 2 and g.max_num_players > g.min_num_players
+    and g.short_name != "tiny_hanabi"  # default payoff only works for 2p
 ]
 assert len(SPIEL_MULTIPLAYER_GAMES_LIST) >= 35, len(
     SPIEL_MULTIPLAYER_GAMES_LIST)
@@ -85,15 +87,25 @@ class GamesSimTest(parameterized.TestCase):
       self.apply_action(state, action)
 
   def serialize_deserialize(self, game, state):
+    # OpenSpiel native serialization
     ser_str = pyspiel.serialize_game_and_state(game, state)
     new_game, new_state = pyspiel.deserialize_game_and_state(ser_str)
     self.assertEqual(str(game), str(new_game))
     self.assertEqual(str(state), str(new_state))
+    # Pickle serialization + deserialization (of the state).
+    pickled_state = pickle.dumps(state)
+    unpickled_state = pickle.loads(pickled_state)
+    self.assertEqual(str(state), str(unpickled_state))
 
   def sim_game(self, game):
     min_utility = game.min_utility()
     max_utility = game.max_utility()
     self.assertLess(min_utility, max_utility)
+
+    # Pickle serialization + deserialization (of the game).
+    pickled_game = pickle.dumps(game)
+    unpickled_game = pickle.loads(pickled_game)
+    self.assertEqual(str(game), str(unpickled_game))
 
     # Get a new state
     state = game.new_initial_state()
@@ -127,10 +139,6 @@ class GamesSimTest(parameterized.TestCase):
         # Apply the joint action and test cloning states.
         self.apply_action_test_clone(state, chosen_actions)
       else:
-        if state.is_terminal():
-          self.assertEmpty(state.legal_actions())
-          for player in range(game.num_players()):
-            self.assertEmpty(state.legal_actions(player))
         # Decision node: sample action for the single current player
         action = np.random.choice(state.legal_actions(state.current_player()))
         # Apply action and test state cloning.
@@ -142,6 +150,10 @@ class GamesSimTest(parameterized.TestCase):
 
     # Either the game is now done, or the maximum actions has been taken.
     if state.is_terminal():
+      # Check there are no legal actions.
+      self.assertEmpty(state.legal_actions())
+      for player in range(game.num_players()):
+        self.assertEmpty(state.legal_actions(player))
       # Print utilities for each player.
       utilities = state.returns()
       # Check that each one is in range

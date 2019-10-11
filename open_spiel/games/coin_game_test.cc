@@ -39,7 +39,7 @@ void BasicCoinGameTests() {
 
 void GetAllStatesTest() {
   // Getting all states (on a small game) can find corner case bugs.
-  const std::unique_ptr<Game> game =
+  const std::shared_ptr<const Game> game =
       LoadGame("coin_game", {{"players", GameParameter(2)},
                              {"rows", GameParameter(2)},
                              {"columns", GameParameter(3)},

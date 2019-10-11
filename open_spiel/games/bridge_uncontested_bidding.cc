@@ -15,6 +15,7 @@
 #include "open_spiel/games/bridge_uncontested_bidding.h"
 
 #include <cstring>
+#include <memory>
 
 #include "open_spiel/games/bridge/double_dummy_solver/include/dll.h"
 #include "open_spiel/game_parameters.h"
@@ -55,8 +56,8 @@ const GameType kGameType{
         {"relative_scoring", GameParameter(false)},
     }};
 
-std::unique_ptr<Game> Factory(const GameParameters& params) {
-  return std::unique_ptr<Game>(new UncontestedBiddingGame(params));
+std::shared_ptr<const Game> Factory(const GameParameters& params) {
+  return std::shared_ptr<const Game>(new UncontestedBiddingGame(params));
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
@@ -420,8 +421,9 @@ std::unique_ptr<State> UncontestedBiddingGame::DeserializeState(
     SPIEL_CHECK_EQ(actions[i], forced_actions_[i]);
   }
 
-  return std::unique_ptr<State>(new UncontestedBiddingState(
-      reference_contracts_, Deal(cards), actions, ++rng_seed_));
+  return std::unique_ptr<State>(
+      new UncontestedBiddingState(shared_from_this(), reference_contracts_,
+                                  Deal(cards), actions, ++rng_seed_));
 }
 
 }  // namespace bridge

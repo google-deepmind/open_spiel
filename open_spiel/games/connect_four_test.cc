@@ -31,8 +31,8 @@ void BasicConnectFourTests() {
 }
 
 void FastLoss() {
-  ConnectFourGame game({});
-  auto state = game.NewInitialState();
+  std::shared_ptr<const Game> game = LoadGame("connect_four");
+  auto state = game->NewInitialState();
   state->ApplyAction(3);
   state->ApplyAction(3);
   state->ApplyAction(4);
@@ -53,16 +53,15 @@ void FastLoss() {
 }
 
 void BasicSerializationTest() {
-  ConnectFourGame game({});
-  std::unique_ptr<State> state = game.NewInitialState();
-  std::unique_ptr<State> state2 =
-      game.DeserializeState(game.SerializeState(*state));
+  std::shared_ptr<const Game> game = LoadGame("connect_four");
+  std::unique_ptr<State> state = game->NewInitialState();
+  std::unique_ptr<State> state2 = game->DeserializeState(state->Serialize());
   SPIEL_CHECK_EQ(state->ToString(), state2->ToString());
 }
 
 void DeserializeDraw() {
-  ConnectFourGame game({});
-  auto state = game.DeserializeState(
+  std::shared_ptr<const Game> game = LoadGame("connect_four");
+  auto state = game->DeserializeState(
       "ooxxxoo\n"
       "xxoooxx\n"
       "ooxxxoo\n"
@@ -80,6 +79,10 @@ void DeserializeDraw() {
   SPIEL_CHECK_EQ(state->Returns(), (std::vector<double>{0, 0}));
 }
 
+void Benchmark() {
+  testing::RandomSimBenchmark("connect_four", 10000);
+}
+
 }  // namespace
 }  // namespace connect_four
 }  // namespace open_spiel
@@ -89,4 +92,5 @@ int main(int argc, char **argv) {
   open_spiel::connect_four::FastLoss();
   open_spiel::connect_four::BasicSerializationTest();
   open_spiel::connect_four::DeserializeDraw();
+  open_spiel::connect_four::Benchmark();
 }

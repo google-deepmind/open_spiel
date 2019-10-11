@@ -48,21 +48,21 @@ const GameType kGameType{
     /*parameter_specification=*/
     {{"players", GameParameter(kDefaultPlayers)}}};
 
-std::unique_ptr<Game> Factory(const GameParameters& params) {
-  return std::unique_ptr<Game>(new KuhnGame(params));
+std::shared_ptr<const Game> Factory(const GameParameters& params) {
+  return std::shared_ptr<const Game>(new KuhnGame(params));
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
 }  // namespace
 
-KuhnState::KuhnState(int num_distinct_actions, int num_players)
-    : State(num_distinct_actions, num_players),
+KuhnState::KuhnState(std::shared_ptr<const Game> game)
+    : State(game),
       first_bettor_(kInvalidPlayer),
-      card_dealt_(num_players + 1, kInvalidPlayer),
+      card_dealt_(game->NumPlayers() + 1, kInvalidPlayer),
       winner_(kInvalidPlayer),
-      pot_(kAnte * num_players),
+      pot_(kAnte * game->NumPlayers()),
       // How much each player has contributed to the pot, indexed by pid.
-      ante_(num_players, kAnte) {}
+      ante_(game->NumPlayers(), kAnte) {}
 
 int KuhnState::CurrentPlayer() const {
   if (IsTerminal()) {
@@ -291,8 +291,7 @@ KuhnGame::KuhnGame(const GameParameters& params)
 }
 
 std::unique_ptr<State> KuhnGame::NewInitialState() const {
-  return std::unique_ptr<State>(
-      new KuhnState(NumDistinctActions(), num_players_));
+  return std::unique_ptr<State>(new KuhnState(shared_from_this()));
 }
 
 std::vector<int> KuhnGame::InformationStateNormalizedVectorShape() const {

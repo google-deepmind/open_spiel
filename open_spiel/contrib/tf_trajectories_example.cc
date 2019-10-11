@@ -22,13 +22,13 @@ namespace algorithms {
 namespace {
 
 void SimpleTFTrajectoryExample(const std::string& game_name) {
-  std::unique_ptr<Game> game = LoadGame(game_name);
+  std::shared_ptr<const Game> game = LoadGame(game_name);
   TFBatchTrajectoryRecorder recorder(*game, "/tmp/graph.pb", 1024);
   recorder.Record();
 }
 
 void DoubleRecordTFTrajectoryExample(const std::string& game_name) {
-  std::unique_ptr<Game> game = LoadGame(game_name);
+  std::shared_ptr<const Game> game = LoadGame(game_name);
   TFBatchTrajectoryRecorder recorder(*game, "/tmp/graph.pb", 1024);
   recorder.Record();
   recorder.Record();

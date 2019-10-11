@@ -21,8 +21,8 @@ namespace algorithms {
 namespace {
 
 void ConvertToMatrixGameTest() {
-  std::unique_ptr<Game> blotto = LoadGame("blotto");
-  std::unique_ptr<matrix_game::MatrixGame> matrix_blotto =
+  std::shared_ptr<const Game> blotto = LoadGame("blotto");
+  std::shared_ptr<const matrix_game::MatrixGame> matrix_blotto =
       AsMatrixGame(blotto.get());
   SPIEL_CHECK_GT(matrix_blotto->NumRows(), 0);
   SPIEL_CHECK_GT(matrix_blotto->NumCols(), 0);
@@ -39,8 +39,8 @@ void ExtensiveToMatrixGameTest() {
   // This just does a conversion and checks the sizes. The real test of this
   // method is currently in python/tests/matrix_utils_test, which solves the
   // converted game to ensure it has the same value.
-  std::unique_ptr<Game> kuhn_game = LoadGame("kuhn_poker");
-  std::unique_ptr<matrix_game::MatrixGame> kuhn_matrix_game =
+  std::shared_ptr<const Game> kuhn_game = LoadGame("kuhn_poker");
+  std::shared_ptr<const matrix_game::MatrixGame> kuhn_matrix_game =
       ExtensiveToMatrixGame(*kuhn_game);
   SPIEL_CHECK_EQ(kuhn_matrix_game->NumRows(), 64);
   SPIEL_CHECK_EQ(kuhn_matrix_game->NumCols(), 64);

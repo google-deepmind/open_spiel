@@ -83,8 +83,8 @@ const GameType kGameType{
     {{"scoring_type",
       GameParameter(static_cast<std::string>(kDefaultScoringType))}}};
 
-static std::unique_ptr<Game> Factory(const GameParameters& params) {
-  return std::unique_ptr<Game>(new BackgammonGame(params));
+static std::shared_ptr<const Game> Factory(const GameParameters& params) {
+  return std::shared_ptr<const Game>(new BackgammonGame(params));
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
@@ -293,9 +293,9 @@ void BackgammonState::InformationStateAsNormalizedVector(
   SPIEL_CHECK_EQ(kStateEncodingSize, values->size());
 }
 
-BackgammonState::BackgammonState(int num_distinct_actions, int num_players,
+BackgammonState::BackgammonState(std::shared_ptr<const Game> game,
                                  ScoringType scoring_type)
-    : State(num_distinct_actions, num_players),
+    : State(game),
       scoring_type_(scoring_type),
       cur_player_(kChancePlayerId),
       prev_player_(kChancePlayerId),

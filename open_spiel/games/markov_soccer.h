@@ -16,6 +16,7 @@
 #define THIRD_PARTY_OPEN_SPIEL_GAMES_MARKOV_SOCCER_H_
 
 #include <array>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -36,7 +37,7 @@ class MarkovSoccerGame;
 
 class MarkovSoccerState : public SimMoveState {
  public:
-  explicit MarkovSoccerState(const MarkovSoccerGame& parent_game);
+  explicit MarkovSoccerState(std::shared_ptr<const Game> game);
   MarkovSoccerState(const MarkovSoccerState&) = default;
 
   std::string ActionToString(Player player, Action action_id) const override;
@@ -71,8 +72,6 @@ class MarkovSoccerState : public SimMoveState {
   bool InBounds(int r, int c) const;
   int observation_plane(int r, int c) const;
 
-  const MarkovSoccerGame& parent_game_;
-
   // Fields set to bad values. Use Game::NewInitialState().
   int winner_ = -1;
   Player cur_player_ = -1;  // Could be chance's turn.
@@ -96,8 +95,8 @@ class MarkovSoccerGame : public SimMoveGame {
   double MinUtility() const override { return -1; }
   double MaxUtility() const override { return 1; }
   double UtilitySum() const override { return 0; }
-  std::unique_ptr<Game> Clone() const override {
-    return std::unique_ptr<Game>(new MarkovSoccerGame(*this));
+  std::shared_ptr<const Game> Clone() const override {
+    return std::shared_ptr<const Game>(new MarkovSoccerGame(*this));
   }
   std::vector<int> InformationStateNormalizedVectorShape() const override;
   int MaxGameLength() const override { return horizon_; }

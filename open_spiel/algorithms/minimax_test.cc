@@ -25,16 +25,15 @@ namespace algorithms {
 namespace {
 
 void AlphaBetaSearchTest_TicTacToe() {
-  tic_tac_toe::TicTacToeGame game({});
-
+  std::shared_ptr<const Game> game = LoadGame("tic_tac_toe");
   std::pair<double, Action> value_and_action =
-      AlphaBetaSearch(game, nullptr, {}, -1, kInvalidPlayer);
+      AlphaBetaSearch(*game, nullptr, {}, -1, kInvalidPlayer);
   SPIEL_CHECK_EQ(0.0, value_and_action.first);
 }
 
 void AlphaBetaSearchTest_TicTacToe_Win() {
-  tic_tac_toe::TicTacToeGame game({});
-  std::unique_ptr<State> state = game.NewInitialState();
+  std::shared_ptr<const Game> game = LoadGame("tic_tac_toe");
+  std::unique_ptr<State> state = game->NewInitialState();
   state->ApplyAction(4);
   state->ApplyAction(1);
 
@@ -43,13 +42,13 @@ void AlphaBetaSearchTest_TicTacToe_Win() {
   // .x.
   // ...
   std::pair<double, Action> value_and_action =
-      AlphaBetaSearch(game, state.get(), {}, -1, kInvalidPlayer);
+      AlphaBetaSearch(*game, state.get(), {}, -1, kInvalidPlayer);
   SPIEL_CHECK_EQ(1.0, value_and_action.first);
 }
 
 void AlphaBetaSearchTest_TicTacToe_Loss() {
-  tic_tac_toe::TicTacToeGame game({});
-  std::unique_ptr<State> state = game.NewInitialState();
+  std::shared_ptr<const Game> game = LoadGame("tic_tac_toe");
+  std::unique_ptr<State> state = game->NewInitialState();
 
   // Construct:
   // ...
@@ -61,7 +60,7 @@ void AlphaBetaSearchTest_TicTacToe_Loss() {
   state->ApplyAction(8);
 
   std::pair<double, Action> value_and_action =
-      AlphaBetaSearch(game, state.get(), {}, -1, kInvalidPlayer);
+      AlphaBetaSearch(*game, state.get(), {}, -1, kInvalidPlayer);
   SPIEL_CHECK_EQ(-1.0, value_and_action.first);
 }
 

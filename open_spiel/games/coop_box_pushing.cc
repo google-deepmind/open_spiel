@@ -78,8 +78,8 @@ const GameType kGameType{
     /*parameter_specification=*/
     {{"horizon", GameParameter(kDefaultHorizon)}}};
 
-std::unique_ptr<Game> Factory(const GameParameters& params) {
-  return std::unique_ptr<Game>(new CoopBoxPushingGame(params));
+std::shared_ptr<const Game> Factory(const GameParameters& params) {
+  return std::shared_ptr<const Game>(new CoopBoxPushingGame(params));
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
@@ -145,8 +145,9 @@ std::pair<int, int> NextCoord(std::pair<int, int> coord, int direction) {
 }
 }  // namespace
 
-CoopBoxPushingState::CoopBoxPushingState(int horizon)
-    : SimMoveState(kNumDistinctActions, kNumPlayers),
+CoopBoxPushingState::CoopBoxPushingState(std::shared_ptr<const Game> game,
+                                         int horizon)
+    : SimMoveState(game),
       total_rewards_(0),
       horizon_(horizon),
       cur_player_(kSimultaneousPlayerId),
@@ -484,7 +485,8 @@ int CoopBoxPushingGame::NumDistinctActions() const {
 int CoopBoxPushingGame::NumPlayers() const { return kNumPlayers; }
 
 std::unique_ptr<State> CoopBoxPushingGame::NewInitialState() const {
-  std::unique_ptr<State> state(new CoopBoxPushingState(horizon_));
+  std::unique_ptr<State> state(
+      new CoopBoxPushingState(shared_from_this(), horizon_));
   return state;
 }
 

@@ -47,38 +47,37 @@ const GameType kGameType{
     /*parameter_specification=*/
     {{"players", GameParameter(kDefaultPlayers)}}};
 
-std::unique_ptr<Game> Factory(const GameParameters& params) {
-  return std::unique_ptr<Game>(new LeducGame(params));
+std::shared_ptr<const Game> Factory(const GameParameters& params) {
+  return std::shared_ptr<const Game>(new LeducGame(params));
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
 
 }  // namespace
-LeducState::LeducState(int num_players, const LeducGame& parent)
-    : State(parent.NumDistinctActions(), num_players),
-      parent_game_(parent),
+LeducState::LeducState(std::shared_ptr<const Game> game)
+    : State(game),
       cur_player_(kChancePlayerId),
       num_calls_(0),
       num_raises_(0),
       round_(1),   // Round number (1 or 2).
       stakes_(1),  // The current 'level' of the bet.
       num_winners_(-1),
-      pot_(kAnte * num_players),  // Number of chips in the pot.
+      pot_(kAnte * game->NumPlayers()),  // Number of chips in the pot.
       public_card_(kInvalidCard),
       // Number of cards remaining; not equal deck_.size()!
-      deck_size_((num_players + 1) * kNumSuits),
+      deck_size_((game->NumPlayers() + 1) * kNumSuits),
       private_cards_dealt_(0),
-      remaining_players_(num_players_),
+      remaining_players_(game->NumPlayers()),
       // Is this player a winner? Indexed by pid.
-      winner_(num_players, false),
+      winner_(game->NumPlayers(), false),
       // Each player's single private card. Indexed by pid.
-      private_cards_(num_players, kInvalidCard),
+      private_cards_(game->NumPlayers(), kInvalidCard),
       // How much money each player has, indexed by pid.
-      money_(num_players, kStartingMoney - kAnte),
+      money_(game->NumPlayers(), kStartingMoney - kAnte),
       // How much each player has contributed to the pot, indexed by pid.
-      ante_(num_players, kAnte),
+      ante_(game->NumPlayers(), kAnte),
       // Flag for whether the player has folded, indexed by pid.
-      folded_(num_players, false),
+      folded_(game->NumPlayers(), false),
       // Sequence of actions for each round. Needed to report information state.
       round1_sequence_(),
       round2_sequence_() {
@@ -319,7 +318,7 @@ void LeducState::InformationStateAsNormalizedVector(
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  values->resize(parent_game_.InformationStateNormalizedVectorShape()[0]);
+  values->resize(game_->InformationStateNormalizedVectorShape()[0]);
   std::fill(values->begin(), values->end(), 0.);
 
   // Layout of observation:
@@ -367,7 +366,7 @@ void LeducState::InformationStateAsNormalizedVector(
     }
 
     // Move offset up to the next round: 2 bits per move.
-    offset += parent_game_.MaxGameLength();
+    offset += game_->MaxGameLength();
   }
 }
 
@@ -376,7 +375,7 @@ void LeducState::ObservationAsNormalizedVector(
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  values->resize(parent_game_.ObservationNormalizedVectorShape()[0]);
+  values->resize(game_->ObservationNormalizedVectorShape()[0]);
   std::fill(values->begin(), values->end(), 0.);
 
   // Layout of observation:
@@ -550,13 +549,13 @@ std::vector<int> LeducState::padded_betting_sequence() const {
   std::vector<int> history = round1_sequence_;
 
   // We pad the history to the end of the first round with kPaddingAction.
-  history.resize(parent_game_.MaxGameLength() / 2, kInvalidAction);
+  history.resize(game_->MaxGameLength() / 2, kInvalidAction);
 
   // We insert the actions that happened in the second round, and fill to
   // MaxGameLength.
   history.insert(history.end(), round2_sequence_.begin(),
                  round2_sequence_.end());
-  history.resize(parent_game_.MaxGameLength(), kInvalidAction);
+  history.resize(game_->MaxGameLength(), kInvalidAction);
   return history;
 }
 
@@ -569,7 +568,7 @@ LeducGame::LeducGame(const GameParameters& params)
 }
 
 std::unique_ptr<State> LeducGame::NewInitialState() const {
-  return std::unique_ptr<State>(new LeducState(num_players_, *this));
+  return std::unique_ptr<State>(new LeducState(shared_from_this()));
 }
 
 std::vector<int> LeducGame::InformationStateNormalizedVectorShape() const {

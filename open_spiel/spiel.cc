@@ -100,7 +100,7 @@ GameRegisterer::GameRegisterer(const GameType& game_type, CreateFunc creator) {
   RegisterGame(game_type, creator);
 }
 
-std::unique_ptr<Game> GameRegisterer::CreateByName(
+std::shared_ptr<const Game> GameRegisterer::CreateByName(
     const std::string& short_name, const GameParameters& params) {
   auto iter = factories().find(short_name);
   if (iter == factories().end()) {
@@ -151,13 +151,13 @@ std::vector<GameType> RegisteredGameTypes() {
   return GameRegisterer::RegisteredGames();
 }
 
-std::unique_ptr<Game> LoadGame(const std::string& game_string) {
+std::shared_ptr<const Game> LoadGame(const std::string& game_string) {
   return LoadGame(GameParametersFromString(game_string));
 }
 
-std::unique_ptr<Game> LoadGame(const std::string& short_name,
-                               const GameParameters& params) {
-  std::unique_ptr<Game> result =
+std::shared_ptr<const Game> LoadGame(const std::string& short_name,
+                                     const GameParameters& params) {
+  std::shared_ptr<const Game> result =
       GameRegisterer::CreateByName(short_name, params);
   if (result == nullptr) {
     SpielFatalError(absl::StrCat("Unable to create game: ", short_name));
@@ -165,7 +165,7 @@ std::unique_ptr<Game> LoadGame(const std::string& short_name,
   return result;
 }
 
-std::unique_ptr<Game> LoadGame(GameParameters params) {
+std::shared_ptr<const Game> LoadGame(GameParameters params) {
   auto it = params.find("name");
   if (it == params.end()) {
     SpielFatalError(absl::StrCat("No 'name' parameter in params: ",
@@ -173,23 +173,28 @@ std::unique_ptr<Game> LoadGame(GameParameters params) {
   }
   std::string name = it->second.string_value();
   params.erase(it);
-  std::unique_ptr<Game> result = GameRegisterer::CreateByName(name, params);
+  std::shared_ptr<const Game> result =
+      GameRegisterer::CreateByName(name, params);
   if (result == nullptr) {
     SpielFatalError(absl::StrCat("Unable to create game: ", name));
   }
   return result;
 }
 
+State::State(std::shared_ptr<const Game> game)
+    : num_distinct_actions_(game->NumDistinctActions()),
+      num_players_(game->NumPlayers()),
+      game_(game) {}
+
 template <>
 GameParameters Game::ParameterValue<GameParameters>(
-    const std::string& key,
-    absl::optional<GameParameters> default_value) const {
+    const std::string& key, std::optional<GameParameters> default_value) const {
   auto iter = game_parameters_.find(key);
   if (iter != game_parameters_.end()) {
     return iter->second.game_value();
   }
 
-  if (default_value == absl::nullopt) {
+  if (default_value == std::nullopt) {
     std::vector<std::string> available_keys;
     for (auto const& element : game_parameters_) {
       available_keys.push_back(element.first);
@@ -203,11 +208,11 @@ GameParameters Game::ParameterValue<GameParameters>(
 
 template <>
 int Game::ParameterValue<int>(const std::string& key,
-                              absl::optional<int> default_value) const {
+                              std::optional<int> default_value) const {
   auto iter = game_parameters_.find(key);
   if (iter == game_parameters_.end()) {
     GameParameter default_game_parameter;
-    if (default_value != absl::nullopt) {
+    if (default_value != std::nullopt) {
       default_game_parameter = GameParameter(default_value.value());
     } else {
       auto default_iter = game_type_.parameter_specification.find(key);
@@ -226,12 +231,12 @@ int Game::ParameterValue<int>(const std::string& key,
 }
 
 template <>
-double Game::ParameterValue<double>(
-    const std::string& key, absl::optional<double> default_value) const {
+double Game::ParameterValue<double>(const std::string& key,
+                                    std::optional<double> default_value) const {
   auto iter = game_parameters_.find(key);
   if (iter == game_parameters_.end()) {
     GameParameter default_game_parameter;
-    if (default_value != absl::nullopt) {
+    if (default_value != std::nullopt) {
       default_game_parameter = GameParameter(default_value.value());
     } else {
       auto default_iter = game_type_.parameter_specification.find(key);
@@ -251,11 +256,11 @@ double Game::ParameterValue<double>(
 
 template <>
 std::string Game::ParameterValue<std::string>(
-    const std::string& key, absl::optional<std::string> default_value) const {
+    const std::string& key, std::optional<std::string> default_value) const {
   auto iter = game_parameters_.find(key);
   if (iter == game_parameters_.end()) {
     GameParameter default_game_parameter;
-    if (default_value != absl::nullopt) {
+    if (default_value != std::nullopt) {
       default_game_parameter = GameParameter(default_value.value());
     } else {
       auto default_iter = game_type_.parameter_specification.find(key);
@@ -275,11 +280,11 @@ std::string Game::ParameterValue<std::string>(
 
 template <>
 bool Game::ParameterValue<bool>(const std::string& key,
-                                absl::optional<bool> default_value) const {
+                                std::optional<bool> default_value) const {
   auto iter = game_parameters_.find(key);
   if (iter == game_parameters_.end()) {
     GameParameter default_game_parameter;
-    if (default_value != absl::nullopt) {
+    if (default_value != std::nullopt) {
       default_game_parameter = GameParameter(default_value.value());
     } else {
       auto default_iter = game_type_.parameter_specification.find(key);
@@ -329,14 +334,14 @@ Action SampleChanceOutcome(const ActionsAndProbs& outcomes, double z) {
       absl::StrCat("Internal error: failed to sample an outcome; z=", z));
 }
 
-std::string Game::SerializeState(const State& state) const {
+std::string State::Serialize() const {
   // This simple serialization doesn't work for games with sampled chance
   // nodes, since the history doesn't give us enough information to reconstruct
   // the state. If you wish to serialize states in such games, you must
   // implement custom serialization and deserialization for the state.
-  SPIEL_CHECK_NE(game_type_.chance_mode,
+  SPIEL_CHECK_NE(game_->GetType().chance_mode,
                  GameType::ChanceMode::kSampledStochastic);
-  return absl::StrCat(absl::StrJoin(state.History(), "\n"), "\n");
+  return absl::StrCat(absl::StrJoin(History(), "\n"), "\n");
 }
 
 std::unique_ptr<State> Game::DeserializeState(const std::string& str) const {
@@ -388,12 +393,12 @@ std::string SerializeGameAndState(const Game& game, const State& state) {
 
   // State section.
   absl::StrAppend(&str, kSerializeStateSectionHeader, "\n");
-  absl::StrAppend(&str, game.SerializeState(state), "\n");
+  absl::StrAppend(&str, state.Serialize(), "\n");
 
   return str;
 }
 
-std::pair<std::unique_ptr<Game>, std::unique_ptr<State>>
+std::pair<std::shared_ptr<const Game>, std::unique_ptr<State>>
 DeserializeGameAndState(const std::string& serialized_state) {
   std::vector<std::string> lines = absl::StrSplit(serialized_state, '\n');
 
@@ -403,7 +408,7 @@ DeserializeGameAndState(const std::string& serialized_state) {
 
   std::string game_string = "";
   std::string state_string = "";
-  std::unique_ptr<Game> game = nullptr;
+  std::shared_ptr<const Game> game = nullptr;
   std::unique_ptr<State> state = nullptr;
 
   for (int i = 0; i < lines.size(); ++i) {
@@ -438,8 +443,8 @@ DeserializeGameAndState(const std::string& serialized_state) {
   game = LoadGame(section_strings[kGame]);
   state = game->DeserializeState(section_strings[kState]);
 
-  return std::pair<std::unique_ptr<Game>, std::unique_ptr<State>>(
-      std::move(game), std::move(state));
+  return std::pair<std::shared_ptr<const Game>, std::unique_ptr<State>>(
+      game, std::move(state));
 }
 
 std::ostream& operator<<(std::ostream& stream, GameType::Dynamics value) {

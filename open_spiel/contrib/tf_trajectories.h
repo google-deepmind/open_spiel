@@ -80,7 +80,7 @@ class TFBatchTrajectoryRecorder {
 
   void InitTF();
 
-  std::unique_ptr<Game> game_;
+  std::shared_ptr<const Game> game_;
   std::string graph_filename_;
 
   std::mt19937 rng_;
