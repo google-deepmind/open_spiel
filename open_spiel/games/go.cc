@@ -47,8 +47,8 @@ const GameType kGameType{
     },
 };
 
-std::unique_ptr<Game> Factory(const GameParameters& params) {
-  return std::unique_ptr<Game>(new GoGame(params));
+std::shared_ptr<const Game> Factory(const GameParameters& params) {
+  return std::shared_ptr<const Game>(new GoGame(params));
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
@@ -77,8 +77,9 @@ std::vector<GoPoint> HandicapStones(int num_handicap) {
 
 }  // namespace
 
-GoState::GoState(int board_size, float komi, int handicap)
-    : State(go::NumDistinctActions(board_size), go::NumPlayers()),
+GoState::GoState(std::shared_ptr<const Game> game, int board_size, float komi,
+                 int handicap)
+    : State(game),
       board_(board_size),
       komi_(komi),
       handicap_(handicap),

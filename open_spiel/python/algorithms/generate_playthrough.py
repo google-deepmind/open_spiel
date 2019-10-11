@@ -168,6 +168,8 @@ def playthrough_lines(game_string, seed, alsologtostdout=False):
             str(round(x, 5))
             for x in state.observation_as_normalized_vector(player))
         add_line("ObservationAsNormalizedVector({}) = [{}]".format(player, vec))
+    if game_type.chance_mode == pyspiel.GameType.ChanceMode.SAMPLED_STOCHASTIC:
+      add_line('SerializeState() = "{}"'.format(_escape(state.serialize())))
     if not state.is_chance_node():
       add_line("Rewards() = {}".format(state.rewards()))
       add_line("Returns() = {}".format(state.returns()))

@@ -44,15 +44,16 @@ namespace leduc_poker {
 
 // TODO(b/127425075): Use std::optional instead of sentinel values once absl is
 // added as a dependency.
-constexpr int kInvalidCard = -10000;
-constexpr int kDefaultPlayers = 2;
-constexpr int kNumSuits = 2;
-constexpr int kFirstRaiseAmount = 2;
-constexpr int kSecondRaiseAmount = 4;
-constexpr int kTotalRaisesPerRound = 2;
-constexpr int kMaxRaises = 2;
-constexpr int kStartingMoney = 100;
-constexpr int kNumInfoStates = 936;  // Number of info state in the 2P game.
+inline constexpr int kInvalidCard = -10000;
+inline constexpr int kDefaultPlayers = 2;
+inline constexpr int kNumSuits = 2;
+inline constexpr int kFirstRaiseAmount = 2;
+inline constexpr int kSecondRaiseAmount = 4;
+inline constexpr int kTotalRaisesPerRound = 2;
+inline constexpr int kMaxRaises = 2;
+inline constexpr int kStartingMoney = 100;
+inline constexpr int kNumInfoStates =
+    936;  // Number of info state in the 2P game.
 
 class LeducGame;
 
@@ -60,7 +61,7 @@ enum ActionType { kFold = 0, kCall = 1, kRaise = 2 };
 
 class LeducState : public State {
  public:
-  explicit LeducState(int num_players, const LeducGame& parent);
+  explicit LeducState(std::shared_ptr<const Game> game);
 
   Player CurrentPlayer() const override;
   std::string ActionToString(Player player, Action move) const override;
@@ -117,8 +118,6 @@ class LeducState : public State {
   void SequenceAppendMove(int move);
   void Ante(Player player, int amount);
 
-  const LeducGame& parent_game_;
-
   // Fields sets to bad/invalid values. Use Game::NewInitialState().
   Player cur_player_;
 
@@ -162,8 +161,8 @@ class LeducGame : public Game {
   double MinUtility() const override;
   double MaxUtility() const override;
   double UtilitySum() const override { return 0; }
-  std::unique_ptr<Game> Clone() const override {
-    return std::unique_ptr<Game>(new LeducGame(*this));
+  std::shared_ptr<const Game> Clone() const override {
+    return std::shared_ptr<const Game>(new LeducGame(*this));
   }
   std::vector<int> InformationStateNormalizedVectorShape() const override;
   std::vector<int> ObservationNormalizedVectorShape() const override;

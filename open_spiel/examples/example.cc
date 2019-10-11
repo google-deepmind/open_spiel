@@ -65,7 +65,7 @@ int main(int argc, char** argv) {
   if (players > 0) {
     params["players"] = open_spiel::GameParameter(players);
   }
-  std::unique_ptr<open_spiel::Game> game =
+  std::shared_ptr<const open_spiel::Game> game =
       open_spiel::LoadGame(game_name, params);
 
   if (!game) {

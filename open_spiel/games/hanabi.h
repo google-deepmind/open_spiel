@@ -35,6 +35,8 @@
 //      top-level CMakeLists.txt
 //   5. Enjoy the fireworks!
 
+#include <memory>
+
 #include "open_spiel/spiel.h"
 #include "hanabi_lib/canonical_encoders.h"
 #include "hanabi_lib/hanabi_game.h"
@@ -52,7 +54,7 @@ class OpenSpielHanabiGame : public Game {
   int NumPlayers() const override;
   double MinUtility() const override;
   double MaxUtility() const override;
-  std::unique_ptr<Game> Clone() const override;
+  std::shared_ptr<const Game> Clone() const override;
   std::vector<int> ObservationNormalizedVectorShape() const override;
   int MaxGameLength() const override;
 
@@ -70,7 +72,7 @@ class OpenSpielHanabiGame : public Game {
 
 class OpenSpielHanabiState : public State {
  public:
-  explicit OpenSpielHanabiState(const OpenSpielHanabiGame* game);
+  explicit OpenSpielHanabiState(std::shared_ptr<const Game> game);
   Player CurrentPlayer() const override;
   std::vector<Action> LegalActions() const override;
   std::string ActionToString(Player player, Action action_id) const override;

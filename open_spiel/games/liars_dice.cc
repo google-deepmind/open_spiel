@@ -49,17 +49,17 @@ const GameType kGameType{
     {{"players", GameParameter(kDefaultPlayers)},
      {"numdice", GameParameter(kDefaultNumDice)}}};
 
-std::unique_ptr<Game> Factory(const GameParameters& params) {
-  return std::unique_ptr<Game>(new LiarsDiceGame(params));
+std::shared_ptr<const Game> Factory(const GameParameters& params) {
+  return std::shared_ptr<const Game>(new LiarsDiceGame(params));
 }
 }  // namespace
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
 
-LiarsDiceState::LiarsDiceState(int num_distinct_actions, int num_players,
+LiarsDiceState::LiarsDiceState(std::shared_ptr<const Game> game,
                                int total_num_dice, int max_dice_per_player,
                                const std::vector<int>& num_dice)
-    : State(num_distinct_actions, num_players),
+    : State(game),
       cur_player_(kChancePlayerId),  // chance starts
       cur_roller_(0),                // first player starts rolling
       winner_(kInvalidPlayer),
@@ -70,11 +70,9 @@ LiarsDiceState::LiarsDiceState(int num_distinct_actions, int num_players,
       calling_player_(0),
       bidding_player_(0),
       max_dice_per_player_(max_dice_per_player),
-
       dice_outcomes_(),
       num_dice_(num_dice),
-      num_dice_rolled_(num_players, 0),
-
+      num_dice_rolled_(game->NumPlayers(), 0),
       bidseq_(),
       bidseq_str_() {
   for (int const& num_dices : num_dice_) {
@@ -360,12 +358,10 @@ int LiarsDiceGame::NumDistinctActions() const {
 
 std::unique_ptr<State> LiarsDiceGame::NewInitialState() const {
   std::unique_ptr<LiarsDiceState> state(
-      new LiarsDiceState(/*num_distinct_actions=*/NumDistinctActions(),
-                         /*num_players=*/num_players_,
+      new LiarsDiceState(shared_from_this(),
                          /*total_num_dice=*/total_num_dice_,
                          /*max_dice_per_player=*/max_dice_per_player_,
                          /*num_dice=*/num_dice_));
-
   return state;
 }
 

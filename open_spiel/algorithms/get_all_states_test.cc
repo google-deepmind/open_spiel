@@ -21,8 +21,9 @@ namespace algorithms = open_spiel::algorithms;
 namespace ttt = open_spiel::tic_tac_toe;
 
 int main(int argc, char **argv) {
-  ttt::TicTacToeGame game({});
-  auto states = algorithms::GetAllStates(game, -1, /*include_terminals=*/true,
+  std::shared_ptr<const open_spiel::Game> game =
+      open_spiel::LoadGame("tic_tac_toe");
+  auto states = algorithms::GetAllStates(*game, -1, /*include_terminals=*/true,
                                          /*include_chance_states=*/true);
   SPIEL_CHECK_EQ(states.size(), ttt::kNumberStates);
 }

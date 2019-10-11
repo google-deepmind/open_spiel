@@ -86,7 +86,7 @@ using Action = int64_t;
 
 // Floating point comparisons use this as a multiplier on the larger of the two
 // numbers as the threshold.
-constexpr float FloatingPointDefaultThresholdRatio() { return 1e-5; }
+inline constexpr float FloatingPointDefaultThresholdRatio() { return 1e-5; }
 
 // Helpers used to convert actions represented as integers in mixed bases.
 // E.g. RankActionMixedBase({2, 3, 6}, {1, 1, 1}) = 1*18 + 1*6 + 1 = 25,

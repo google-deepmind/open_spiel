@@ -43,8 +43,8 @@ const GameType kGameType{
     /*parameter_specification=*/{}  // no parameters
 };
 
-std::unique_ptr<Game> Factory(const GameParameters& params) {
-  return std::unique_ptr<Game>(new TicTacToeGame(params));
+std::shared_ptr<const Game> Factory(const GameParameters& params) {
+  return std::shared_ptr<const Game>(new TicTacToeGame(params));
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
@@ -119,8 +119,7 @@ bool TicTacToeState::IsFull() const {
   return true;
 }
 
-TicTacToeState::TicTacToeState(int num_distinct_actions)
-    : State(num_distinct_actions, kNumPlayers) {
+TicTacToeState::TicTacToeState(std::shared_ptr<const Game> game) : State(game) {
   std::fill(begin(board_), end(board_), CellState::kEmpty);
 }
 

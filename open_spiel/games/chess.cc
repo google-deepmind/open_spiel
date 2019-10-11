@@ -44,8 +44,8 @@ const GameType kGameType{
     /*parameter_specification=*/{}  // no parameters
 };
 
-std::unique_ptr<Game> Factory(const GameParameters& params) {
-  return std::unique_ptr<Game>(new ChessGame(params));
+std::shared_ptr<const Game> Factory(const GameParameters& params) {
+  return std::shared_ptr<const Game>(new ChessGame(params));
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
@@ -79,15 +79,15 @@ void AddBinaryPlane(bool val, std::vector<double>* values) {
 }
 }  // namespace
 
-ChessState::ChessState()
-    : State(chess::NumDistinctActions(), chess::NumPlayers()),
+ChessState::ChessState(std::shared_ptr<const Game> game)
+    : State(game),
       start_board_(MakeDefaultBoard()),
       current_board_(start_board_) {
   repetitions_[current_board_.HashValue()] = 1;
 }
 
-ChessState::ChessState(const std::string& fen)
-    : State(chess::NumDistinctActions(), chess::NumPlayers()) {
+ChessState::ChessState(std::shared_ptr<const Game> game, const std::string& fen)
+    : State(game) {
   auto maybe_board = StandardChessBoard::BoardFromFEN(fen);
   SPIEL_CHECK_TRUE(maybe_board);
   start_board_ = *maybe_board;

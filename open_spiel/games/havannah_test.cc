@@ -25,7 +25,6 @@ namespace testing = open_spiel::testing;
 void BasicHavannahTests() {
   testing::LoadGameTest("havannah(board_size=4)");
   testing::NoChanceOutcomesTest(*LoadGame("havannah(board_size=4)"));
-
   testing::RandomSimTest(*LoadGame("havannah"), 10);
 
   // All the sizes we care about.

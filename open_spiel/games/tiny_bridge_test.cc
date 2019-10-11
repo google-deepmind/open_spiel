@@ -39,9 +39,9 @@ void BasicTinyBridge4pTests() {
 }
 
 void CountStates2p() {
-  open_spiel::tiny_bridge::TinyBridgeGame2p game({});
+  std::shared_ptr<const Game> game = LoadGame("tiny_bridge_2p");
   auto states =
-      open_spiel::algorithms::GetAllStates(game, /*depth_limit=*/-1,
+      open_spiel::algorithms::GetAllStates(*game, /*depth_limit=*/-1,
                                            /*include_terminals=*/true,
                                            /*include_chance_states=*/false);
   // Chance nodes are not counted.

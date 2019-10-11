@@ -39,7 +39,11 @@ void BasicGoTests() {
 }
 
 void HandicapTest() {
-  GoState state(kBoardSize, kKomi, 2);
+  std::shared_ptr<const Game> game =
+      LoadGame("go", {{"board_size", open_spiel::GameParameter(kBoardSize)},
+                      {"komi", open_spiel::GameParameter(kKomi)},
+                      {"handicap", open_spiel::GameParameter(2)}});
+  GoState state(game, kBoardSize, kKomi, 2);
   SPIEL_CHECK_EQ(state.CurrentPlayer(), ColorToPlayer(GoColor::kWhite));
   SPIEL_CHECK_EQ(state.board().PointColor(MakePoint("d4")), GoColor::kBlack);
   SPIEL_CHECK_EQ(state.board().PointColor(MakePoint("q16")), GoColor::kBlack);

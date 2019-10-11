@@ -159,12 +159,12 @@ const GameType kGameTypePlay{
          GameParameter(GameParameter::Type::kString, /*is_mandatory=*/true)},
     }};
 
-std::unique_ptr<Game> Factory2p(const GameParameters& params) {
-  return std::unique_ptr<Game>(new TinyBridgeGame2p(params));
+std::shared_ptr<const Game> Factory2p(const GameParameters& params) {
+  return std::shared_ptr<const Game>(new TinyBridgeGame2p(params));
 }
 
-std::unique_ptr<Game> Factory4p(const GameParameters& params) {
-  return std::unique_ptr<Game>(new TinyBridgeGame4p(params));
+std::shared_ptr<const Game> Factory4p(const GameParameters& params) {
+  return std::shared_ptr<const Game>(new TinyBridgeGame4p(params));
 }
 
 REGISTER_SPIEL_GAME(kGameType2p, Factory2p);
@@ -189,16 +189,14 @@ TinyBridgeGame2p::TinyBridgeGame2p(const GameParameters& params)
     : Game(kGameType2p, params) {}
 
 std::unique_ptr<State> TinyBridgeGame2p::NewInitialState() const {
-  return std::unique_ptr<State>(
-      new TinyBridgeAuctionState(NumDistinctActions(), NumPlayers()));
+  return std::unique_ptr<State>(new TinyBridgeAuctionState(shared_from_this()));
 }
 
 TinyBridgeGame4p::TinyBridgeGame4p(const GameParameters& params)
     : Game(kGameType4p, params) {}
 
 std::unique_ptr<State> TinyBridgeGame4p::NewInitialState() const {
-  return std::unique_ptr<State>(
-      new TinyBridgeAuctionState(NumDistinctActions(), NumPlayers()));
+  return std::unique_ptr<State>(new TinyBridgeAuctionState(shared_from_this()));
 }
 
 TinyBridgePlayGame::TinyBridgePlayGame(const GameParameters& params)
@@ -216,8 +214,8 @@ std::unique_ptr<State> TinyBridgePlayGame::NewInitialState() const {
       holder[c] = i;
     }
   }
-  return std::unique_ptr<State>(new TinyBridgePlayState(
-      NumDistinctActions(), NumPlayers(), trumps, leader, holder));
+  return std::unique_ptr<State>(
+      new TinyBridgePlayState(shared_from_this(), trumps, leader, holder));
 }
 
 std::string TinyBridgeAuctionState::HandString(Player player) const {
@@ -258,15 +256,14 @@ TinyBridgeAuctionState::AuctionState TinyBridgeAuctionState::AnalyzeAuction()
 
 int TinyBridgeAuctionState::Score_p0(std::array<int, kNumCards> holder) const {
   auto state = AnalyzeAuction();
-  TinyBridgePlayGame game{{}};
+  std::shared_ptr<Game> game(new TinyBridgePlayGame({}));
   int trumps = (state.last_bid - 1) % 3;
   int leader = num_players_ == 2 ? (state.last_bidder * 2 + 1)
                                  : (state.last_bidder + 1) % 4;
   int decl = num_players_ == 2 ? 0 : state.last_bidder % 2;
-  TinyBridgePlayState play{num_distinct_actions_, num_players_, trumps, leader,
-                           holder};
+  TinyBridgePlayState play{game, trumps, leader, holder};
   const int tricks =
-      algorithms::AlphaBetaSearch(game, &play, nullptr, -1, decl).first;
+      algorithms::AlphaBetaSearch(*game, &play, nullptr, -1, decl).first;
   const int declarer_score =
       Score(state.last_bid, tricks, state.doubler != kInvalidPlayer,
             state.redoubler != kInvalidPlayer);

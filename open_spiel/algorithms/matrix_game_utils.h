@@ -25,16 +25,16 @@ namespace algorithms {
 
 // Similar to open_spiel::LoadGame but returns specifically a matrix game type
 // so that the subclass's specific methods are accessible.
-std::unique_ptr<matrix_game::MatrixGame> LoadMatrixGame(
+std::shared_ptr<const matrix_game::MatrixGame> LoadMatrixGame(
     const std::string& name);
 
 // Clones a two-player normal-form game and returns it as a MatrixGame. These
 // functions exist because some implementations are more general than
 // two-player, but there are tools designed specifically to work with matrix
 // games, and hence require conversion.
-std::unique_ptr<matrix_game::MatrixGame> AsMatrixGame(
+std::shared_ptr<const matrix_game::MatrixGame> AsMatrixGame(
     const NormalFormGame* game);
-std::unique_ptr<matrix_game::MatrixGame> AsMatrixGame(const Game* game);
+std::shared_ptr<const matrix_game::MatrixGame> AsMatrixGame(const Game* game);
 
 // Creates a two-player extensive-form game (EFG)'s equivalent matrix game.
 //
@@ -51,7 +51,7 @@ std::unique_ptr<matrix_game::MatrixGame> AsMatrixGame(const Game* game);
 //
 // Hence, this method should only be used for  small games! For example, Kuhn
 // poker has 64 deterministic policies, resulting in a 64-by-64 matrix.
-std::unique_ptr<matrix_game::MatrixGame> ExtensiveToMatrixGame(
+std::shared_ptr<const matrix_game::MatrixGame> ExtensiveToMatrixGame(
     const Game& game);
 
 }  // namespace algorithms

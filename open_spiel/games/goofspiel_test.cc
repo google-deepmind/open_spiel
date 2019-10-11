@@ -40,7 +40,7 @@ void LegalActionsValidAtEveryState() {
   params["imp_info"] = GameParameter(true);
   params["num_cards"] = GameParameter(4);
   params["points_order"] = GameParameter(std::string("descending"));
-  std::unique_ptr<Game> game = LoadGameAsTurnBased("goofspiel", params);
+  std::shared_ptr<const Game> game = LoadGameAsTurnBased("goofspiel", params);
   testing::RandomSimTest(*game, /*num_sims=*/10);
 }
 

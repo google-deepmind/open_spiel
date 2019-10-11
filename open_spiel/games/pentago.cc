@@ -43,8 +43,8 @@ const GameType kGameType{
         {"ansi_color_output", GameParameter(false)},
     }};
 
-std::unique_ptr<Game> Factory(const GameParameters& params) {
-  return std::unique_ptr<Game>(new PentagoGame(params));
+std::shared_ptr<const Game> Factory(const GameParameters& params) {
+  return std::shared_ptr<const Game>(new PentagoGame(params));
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
@@ -128,9 +128,9 @@ uint64_t rotate_quadrant_ccw(uint64_t b, int quadrant) {
 
 }  // namespace
 
-PentagoState::PentagoState(bool ansi_color_output)
-    : State(kPossibleActions, kNumPlayers),
-      ansi_color_output_(ansi_color_output) {
+PentagoState::PentagoState(std::shared_ptr<const Game> game,
+                           bool ansi_color_output)
+    : State(game), ansi_color_output_(ansi_color_output) {
   board_[0] = 0;
   board_[1] = 0;
 }

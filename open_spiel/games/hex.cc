@@ -43,8 +43,8 @@ const GameType kGameType{
         {"board_size", GameParameter(kDefaultBoardSize)},
     }};
 
-std::unique_ptr<Game> Factory(const GameParameters& params) {
-  return std::unique_ptr<Game>(new HexGame(params));
+std::shared_ptr<const Game> Factory(const GameParameters& params) {
+  return std::shared_ptr<const Game>(new HexGame(params));
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
@@ -220,8 +220,8 @@ std::vector<int> HexState::AdjacentCells(int cell) const {
   return neighbours;
 }
 
-HexState::HexState(int board_size)
-    : State(board_size * board_size, kNumPlayers), board_size_(board_size) {
+HexState::HexState(std::shared_ptr<const Game> game, int board_size)
+    : State(game), board_size_(board_size) {
   board_.resize(board_size * board_size, CellState::kEmpty);
 }
 

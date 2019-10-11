@@ -15,6 +15,8 @@
 #ifndef THIRD_PARTY_OPEN_SPIEL_NORMAL_FORM_GAME_H_
 #define THIRD_PARTY_OPEN_SPIEL_NORMAL_FORM_GAME_H_
 
+#include <memory>
+
 #include "open_spiel/simultaneous_move_game.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
@@ -29,8 +31,7 @@ namespace open_spiel {
 
 class NFGState : public SimMoveState {
  public:
-  NFGState(int num_distinct_actions, int num_players)
-      : SimMoveState(num_distinct_actions, num_players) {}
+  NFGState(std::shared_ptr<const Game> game) : SimMoveState(game) {}
 
   // There are no chance nodes in a normal-form game (there is only one state),
   Player CurrentPlayer() const final {

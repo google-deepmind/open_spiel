@@ -19,6 +19,8 @@ from __future__ import division
 from __future__ import print_function
 
 import math
+import time
+
 import numpy as np
 
 import pyspiel
@@ -123,7 +125,7 @@ class SearchNode(object):
             uct_c * self.prior * math.sqrt(parent_explore_count) /
             (self.explore_count + 1))
 
-  def best_child(self):
+  def sort_key(self):
     """Returns the best action from this node, either proven or most visited.
 
     This ordering leads to choosing:
@@ -136,16 +138,17 @@ class SearchNode(object):
     - Highest expected reward if explore counts are equal (unlikely).
     - Longest win, if multiple are proven (unlikely due to early stopping).
     """
-    def key(c):
-      return (0 if c.outcome is None else c.outcome[c.player],
-              c.explore_count, c.total_reward)
+    return (0 if self.outcome is None else self.outcome[self.player],
+            self.explore_count, self.total_reward)
 
-    return max(self.children, key=key)
+  def best_child(self):
+    """Returns the best child in order of the sort key."""
+    return max(self.children, key=SearchNode.sort_key)
 
   def children_str(self, state=None):
     """Returns the string representation of this node's children.
 
-    They are ordered in decreasing explore count.
+    They are ordered based on the sort key, so order of being chosen to play.
 
     Args:
       state: A `pyspiel.State` object, to be used to convert the action id into
@@ -153,7 +156,7 @@ class SearchNode(object):
     """
     return "\n".join([
         c.to_str(state)
-        for c in sorted(self.children, key=lambda c: -c.explore_count)])
+        for c in reversed(sorted(self.children, key=SearchNode.sort_key))])
 
   def to_str(self, state=None):
     """Returns the string representation of this node.
@@ -163,7 +166,7 @@ class SearchNode(object):
         a human readable format. If None, the action integer id is used.
     """
     action = (state.action_to_string(state.current_player(), self.action)
-              if state else str(self.action))
+              if state and self.action is not None else str(self.action))
     return ("{:>6}: player: {}, prior: {:5.3f}, value: {:6.3f}, sims: {:5d}, "
             "outcome: {}, {:3d} children").format(
                 action, self.player, self.prior,
@@ -231,13 +234,17 @@ class MCTSBot(pyspiel.Bot):
 
   def step(self, state):
     """Returns bot's policy and action at given state."""
+    t1 = time.time()
     root = self.mcts_search(state)
 
     best = root.best_child()
 
     if self.verbose:
+      seconds = time.time() - t1
+      print("Finished {} sims in {:.3f} secs, {:.1f} sims/s".format(
+          root.explore_count, seconds, root.explore_count / seconds))
       print("Root:")
-      print(root.to_str())
+      print(root.to_str(state))
       print("Children:")
       print(root.children_str(state))
       chosen_state = state.clone()
@@ -325,6 +332,14 @@ class MCTSBot(pyspiel.Bot):
     non-zero-sum games. It doesn't have any special handling for imperfect
     information games.
 
+    The implementation also supports backing up solved states, i.e. MCTS-Solver.
+    The implementation is general in that it is based on a max^n backup (each
+    player greedily chooses their maximum among proven children values, or there
+    exists one child whose proven value is game.max_utility()), so it will work
+    for multiplayer, general-sum, and arbitrary payoff games (not just win/loss/
+    draw games). Also chance nodes are considered proven only if all children
+    have the same value.
+
     Some references:
     - Sturtevant, An Analysis of UCT in Multi-Player Games,  2008,
       https://web.cs.du.edu/~sturtevant/papers/multi-player_UCT.pdf
@@ -332,6 +347,8 @@ class MCTSBot(pyspiel.Bot):
       https://project.dke.maastrichtuniversity.nl/games/files/phd/Nijssen_thesis.pdf
     - Silver, AlphaGo Zero: Starting from scratch, 2017
       https://deepmind.com/blog/article/alphago-zero-starting-scratch
+    - Winands, Bjornsson, and Saito, "Monte-Carlo Tree Search Solver", 2008.
+      https://dke.maastrichtuniversity.nl/m.winands/documents/uctloa.pdf
 
     Arguments:
       state: pyspiel.State object, state to search from

@@ -46,7 +46,7 @@ const GameType kGameType{
     {{"game",
       GameParameter(GameParameter::Type::kGame, /*is_mandatory=*/true)}}};
 
-std::unique_ptr<Game> Factory(const GameParameters& params) {
+std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return ConvertToTurnBased(*LoadGame(params.at("game").game_value()));
 }
 
@@ -54,12 +54,10 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 }  // namespace
 
 TurnBasedSimultaneousState::TurnBasedSimultaneousState(
-    int num_distinct_actions, int num_players, std::unique_ptr<State> state)
-    : State(num_distinct_actions, num_players),
-      state_(std::move(state)),
-      rollout_mode_(false) {
+    std::shared_ptr<const Game> game, std::unique_ptr<State> state)
+    : State(game), state_(std::move(state)), rollout_mode_(false) {
   DetermineWhoseTurn();
-  action_vector_.resize(num_players);
+  action_vector_.resize(game->NumPlayers());
 }
 
 Player TurnBasedSimultaneousState::CurrentPlayer() const {
@@ -229,23 +227,24 @@ GameParameters ConvertParams(const GameType& type, GameParameters params) {
 }
 }  // namespace
 
-TurnBasedSimultaneousGame::TurnBasedSimultaneousGame(std::unique_ptr<Game> game)
+TurnBasedSimultaneousGame::TurnBasedSimultaneousGame(
+    std::shared_ptr<const Game> game)
     : Game(ConvertType(game->GetType()),
            ConvertParams(game->GetType(), game->GetParameters())),
-      game_(std::move(game)) {}
+      game_(game) {}
 
-std::unique_ptr<Game> ConvertToTurnBased(const Game& game) {
+std::shared_ptr<const Game> ConvertToTurnBased(const Game& game) {
   SPIEL_CHECK_EQ(game.GetType().dynamics, GameType::Dynamics::kSimultaneous);
-  return std::unique_ptr<TurnBasedSimultaneousGame>(
+  return std::shared_ptr<const TurnBasedSimultaneousGame>(
       new TurnBasedSimultaneousGame(game.Clone()));
 }
 
-std::unique_ptr<Game> LoadGameAsTurnBased(const std::string& name) {
+std::shared_ptr<const Game> LoadGameAsTurnBased(const std::string& name) {
   return ConvertToTurnBased(*LoadGame(name));
 }
 
-std::unique_ptr<Game> LoadGameAsTurnBased(const std::string& name,
-                                          const GameParameters& params) {
+std::shared_ptr<const Game> LoadGameAsTurnBased(const std::string& name,
+                                                const GameParameters& params) {
   return ConvertToTurnBased(*LoadGame(name, params));
 }
 

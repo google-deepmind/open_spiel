@@ -47,19 +47,17 @@ const GameType kGameType{
      {"fields", GameParameter(kDefaultNumFields)},
      {"players", GameParameter(kDefaultNumPlayers)}}};
 
-
-
-std::unique_ptr<Game> Factory(const GameParameters& params) {
-  return std::unique_ptr<Game>(new BlottoGame(params));
+std::shared_ptr<const Game> Factory(const GameParameters& params) {
+  return std::shared_ptr<const Game>(new BlottoGame(params));
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
 }  // namespace
 
-BlottoState::BlottoState(int num_distinct_actions, int num_players, int coins,
+BlottoState::BlottoState(std::shared_ptr<const Game> game, int coins,
                          int fields, const ActionMap* action_map,
                          const std::vector<Action>* legal_actions)
-    : NFGState(num_distinct_actions, num_players),
+    : NFGState(game),
       coins_(coins),
       fields_(fields),
       joint_action_({}),

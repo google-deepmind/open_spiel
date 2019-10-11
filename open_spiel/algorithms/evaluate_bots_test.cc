@@ -40,7 +40,7 @@ void BotTest_RandomVsRandom() {
 
   SPIEL_CHECK_FLOAT_NEAR(average_results[0], 0.125, 0.01);
   SPIEL_CHECK_FLOAT_NEAR(average_results[1], -0.125, 0.01);
-}  // namespace
+}
 
 }  // namespace
 }  // namespace open_spiel

@@ -43,8 +43,8 @@ const GameType kGameType{
     {{"rows", GameParameter(kDefaultRows)},
      {"columns", GameParameter(kDefaultColumns)}}};
 
-std::unique_ptr<Game> Factory(const GameParameters& params) {
-  return std::unique_ptr<Game>(new CatchGame(params));
+std::shared_ptr<const Game> Factory(const GameParameters& params) {
+  return std::shared_ptr<const Game>(new CatchGame(params));
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
@@ -65,10 +65,11 @@ std::string StateToString(CellState state) {
 
 }  // namespace
 
-CatchState::CatchState(const CatchGame& game)
-    : State(/*num_distinct_actions=*/kNumActions,
-            /*num_players=*/kNumPlayers),
-      game_(game) {}
+CatchState::CatchState(std::shared_ptr<const Game> game) : State(game) {
+  const CatchGame& parent_game = static_cast<const CatchGame&>(*game);
+  num_rows_ = parent_game.NumRows();
+  num_columns_ = parent_game.NumColumns();
+}
 
 int CatchState::CurrentPlayer() const {
   if (!initialized_) return kChancePlayerId;
@@ -82,23 +83,23 @@ std::vector<Action> CatchState::LegalActions() const {
     return {0, 1, 2};  // Left, stay, right.
   }
   std::vector<Action> moves;
-  moves.reserve(game_.NumColumns());
-  for (int i = 0; i < game_.NumColumns(); i++) moves.push_back(i);
+  moves.reserve(num_columns_);
+  for (int i = 0; i < num_columns_; i++) moves.push_back(i);
   return moves;
 }
 
 ActionsAndProbs CatchState::ChanceOutcomes() const {
   SPIEL_CHECK_TRUE(!initialized_);
   ActionsAndProbs action_and_probs;
-  action_and_probs.reserve(game_.NumColumns());
-  for (int c = 0; c < game_.NumColumns(); c++) {
-    action_and_probs.emplace_back(c, 1. / game_.NumColumns());
+  action_and_probs.reserve(num_columns_);
+  for (int c = 0; c < num_columns_; c++) {
+    action_and_probs.emplace_back(c, 1. / num_columns_);
   }
   return action_and_probs;
 }
 
 CellState CatchState::BoardAt(int row, int column) const {
-  if (row == game_.NumRows() - 1 && column == paddle_col_)
+  if (row == num_rows_ - 1 && column == paddle_col_)
     return CellState::kPaddle;
   else if (row == ball_row_ && column == ball_col_)
     return CellState::kBall;
@@ -123,8 +124,8 @@ std::string CatchState::ActionToString(Player player, Action action_id) const {
 
 std::string CatchState::ToString() const {
   std::string str;
-  for (int r = 0; r < game_.NumRows(); ++r) {
-    for (int c = 0; c < game_.NumColumns(); ++c) {
+  for (int r = 0; r < num_rows_; ++r) {
+    for (int c = 0; c < num_columns_; ++c) {
       absl::StrAppend(&str, StateToString(BoardAt(r, c)));
     }
     absl::StrAppend(&str, "\n");
@@ -133,7 +134,7 @@ std::string CatchState::ToString() const {
 }
 
 bool CatchState::IsTerminal() const {
-  return initialized_ && ball_row_ >= game_.NumRows() - 1;
+  return initialized_ && ball_row_ >= num_rows_ - 1;
 }
 
 std::vector<double> CatchState::Returns() const {
@@ -160,11 +161,11 @@ void CatchState::ObservationAsNormalizedVector(
     Player player, std::vector<double>* values) const {
   SPIEL_CHECK_EQ(player, 0);
 
-  values->resize(game_.NumRows() * game_.NumColumns());
+  values->resize(num_rows_ * num_columns_);
   std::fill(values->begin(), values->end(), 0.);
   if (initialized_) {
-    (*values)[ball_row_ * game_.NumColumns() + ball_col_] = 1.0;
-    (*values)[(game_.NumRows() - 1) * game_.NumColumns() + paddle_col_] = 1.0;
+    (*values)[ball_row_ * num_columns_ + ball_col_] = 1.0;
+    (*values)[(num_rows_ - 1) * num_columns_ + paddle_col_] = 1.0;
   }
 }
 
@@ -172,14 +173,13 @@ void CatchState::InformationStateAsNormalizedVector(
     Player player, std::vector<double>* values) const {
   SPIEL_CHECK_EQ(player, 0);
 
-  values->resize(game_.NumColumns() + kNumActions * game_.NumRows());
+  values->resize(num_columns_ + kNumActions * num_rows_);
   std::fill(values->begin(), values->end(), 0.);
   if (initialized_) {
     (*values)[ball_col_] = 1;
     int offset = history_.size() - ball_row_ - 1;
     for (int i = 0; i < ball_row_; i++) {
-      (*values)[game_.NumColumns() + i * kNumActions + history_[offset + i]] =
-          1;
+      (*values)[num_columns_ + i * kNumActions + history_[offset + i]] = 1;
     }
   }
 }
@@ -191,7 +191,7 @@ void CatchState::UndoAction(Player player, Action move) {
   }
   int direction = move - 1;
   paddle_col_ =
-      std::min(std::max(paddle_col_ - direction, 0), game_.NumColumns() - 1);
+      std::min(std::max(paddle_col_ - direction, 0), num_columns_ - 1);
   --ball_row_;
   history_.pop_back();
 }
@@ -205,12 +205,12 @@ void CatchState::DoApplyAction(Action move) {
     initialized_ = true;
     ball_col_ = move;
     ball_row_ = 0;
-    paddle_col_ = game_.NumColumns() / 2;
+    paddle_col_ = num_columns_ / 2;
   } else {
     ball_row_++;
     int direction = move - 1;
     paddle_col_ =
-        std::min(std::max(paddle_col_ + direction, 0), game_.NumColumns() - 1);
+        std::min(std::max(paddle_col_ + direction, 0), num_columns_ - 1);
   }
 }
 

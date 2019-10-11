@@ -25,7 +25,7 @@ int main(int argc, char** argv) {
 
   // Create the game with its default parameter settings.
   std::cerr << "Creating game..\n" << std::endl;
-  std::unique_ptr<open_spiel::Game> game(
+  std::shared_ptr<const open_spiel::Game> game(
       new open_spiel::matrix_game::MatrixGame(
           {/*short_name=*/"matrix_pd",
            /*long_name=*/"Prisoner's Dilemma",

@@ -45,7 +45,7 @@ enum PlayerId {
 };
 
 // Constant representing an invalid action.
-constexpr Action kInvalidAction = -1;
+inline constexpr Action kInvalidAction = -1;
 
 // Static information for a game. This will determine what algorithms are
 // applicable. For example, minimax search is only applicable to two-player,
@@ -146,14 +146,23 @@ std::ostream& operator<<(std::ostream& stream, GameType::Utility value);
 // The probability of taking each possible action in a particular info state.
 using ActionsAndProbs = std::vector<std::pair<Action, double>>;
 
+// Forward declaration needed for the backpointer within State.
+class Game;
+
 // An abstract class that represents a state of the game.
 class State {
  public:
   virtual ~State() = default;
-  // Derived classes must call one of these constructors.
-  State(int num_distinct_actions, int num_players)
-      : num_distinct_actions_(num_distinct_actions),
-        num_players_(num_players) {}
+
+  // Derived classes must call one of these constructors. Note that a state must
+  // be passed a pointer to the game which created it. Some methods in some
+  // games rely on this and so it must correspond to a valid game object.
+  // The easiest way to ensure this is to use Game::NewInitialState to create
+  // new states, which will pass a pointer to the parent game object. Also,
+  // since this shared pointer to the parent is required, Game objects cannot
+  // be used as value types and should always be created via a shared pointer.
+  // See the documentation of the Game object for further details.
+  State(std::shared_ptr<const Game> game);
   State(const State&) = default;
 
   // Returns current player. Player numbers start from 0.
@@ -441,6 +450,9 @@ class State {
   // Returns the number of players in this game.
   int NumPlayers() const { return num_players_; }
 
+  // Get the game object that generated this state.
+  std::shared_ptr<const Game> GetGame() const { return game_; }
+
   // Get the chance outcomes and their probabilities.
   //
   // Chance actions do not have a separate UID space from regular actions.
@@ -473,11 +485,18 @@ class State {
   // StateType definition for definitions of the different types.
   StateType GetType() const;
 
- protected:
-  int num_distinct_actions_;
-  int num_players_;
-  std::vector<Action> history_;  // The list of actions leading to the state.
+  // Serializes a state into a string.
+  //
+  // The default implementation writes out a sequence of actions, one per line,
+  // taken from the initial state. Note: this default serialization scheme will
+  // not work games whose chance mode is kSampledStochastic, as there is
+  // currently no general way to set the state's seed to ensure that it samples
+  // the same chance event at chance nodes.
+  //
+  // If overridden, this must be the inverse of Game::DeserializeState.
+  virtual std::string Serialize() const;
 
+ protected:
   // See ApplyAction.
   virtual void DoApplyAction(Action action_id) {
     SpielFatalError("DoApplyAction is not implemented.");
@@ -486,11 +505,24 @@ class State {
   virtual void DoApplyActions(const std::vector<Action>& actions) {
     SpielFatalError("DoApplyActions is not implemented.");
   }
+
+  // Fields common to every game state.
+  int num_distinct_actions_;
+  int num_players_;
+  std::vector<Action> history_;  // The list of actions leading to the state.
+
+  // A pointer to the game that created this state.
+  std::shared_ptr<const Game> game_;
 };
 
 // A class that refers to a particular game instantiation, for example
 // Breakthrough(8x8).
-class Game {
+//
+// Important note: Game objects cannot be instantiated on the stack or via
+// unique_ptr, because shared pointers to the game object must be sent down to
+// the states that created them. So, they *must* be created via
+// shared_ptr<const Game> or via the LoadGame methods.
+class Game : public std::enable_shared_from_this<Game> {
  public:
   virtual ~Game() = default;
 
@@ -534,7 +566,7 @@ class Game {
   virtual double MaxUtility() const = 0;
 
   // Return a clone of this game.
-  virtual std::unique_ptr<Game> Clone() const = 0;
+  virtual std::shared_ptr<const Game> Clone() const = 0;
 
   // Static information on the game type. This should match the information
   // provided when registering the game.
@@ -582,17 +614,6 @@ class Game {
                          : std::accumulate(shape.begin(), shape.end(), 1,
                                            std::multiplies<double>());
   }
-
-  // Serializes a state into a string.
-  //
-  // The default implementation writes out a sequence of actions, one per line,
-  // taken from the initial state. Note: this default serialization scheme will
-  // not work games whose chance mode is kSampledStochastic, as there is
-  // currently no general way to set the state's seed to ensure that it samples
-  // the same chance event at chance nodes.
-  //
-  // If overridden, this must be the inverse of Game::DeserializeState.
-  virtual std::string SerializeState(const State& state) const;
 
   // Returns a newly allocated state built from a string. Caller takes ownership
   // of the state.
@@ -647,12 +668,12 @@ class Game {
 class GameRegisterer {
  public:
   using CreateFunc =
-      std::function<std::unique_ptr<Game>(const GameParameters& params)>;
+      std::function<std::shared_ptr<const Game>(const GameParameters& params)>;
 
   GameRegisterer(const GameType& game_type, CreateFunc creator);
 
-  static std::unique_ptr<Game> CreateByName(const std::string& short_name,
-                                            const GameParameters& params);
+  static std::shared_ptr<const Game> CreateByName(const std::string& short_name,
+                                                  const GameParameters& params);
 
   static std::vector<std::string> RegisteredNames();
   static std::vector<GameType> RegisteredGames();
@@ -681,16 +702,16 @@ std::vector<GameType> RegisteredGameTypes();
 
 // Returns a new game object from the specified string, which is the short
 // name plus optional parameters, e.g. "go(komi=4.5,board_size=19)"
-std::unique_ptr<Game> LoadGame(const std::string& game_string);
+std::shared_ptr<const Game> LoadGame(const std::string& game_string);
 
 // Returns a new game object with the specified parameters.
-std::unique_ptr<Game> LoadGame(const std::string& short_name,
-                               const GameParameters& params);
+std::shared_ptr<const Game> LoadGame(const std::string& short_name,
+                                     const GameParameters& params);
 
 // Returns a new game object with the specified parameters; reads the name
 // of the game from the 'name' parameter (which is not passed to the game
 // implementation).
-std::unique_ptr<Game> LoadGame(GameParameters params);
+std::shared_ptr<const Game> LoadGame(GameParameters params);
 
 // Used to sample a policy. Can also sample from chance outcomes.
 // Probabilities of the actions must sum to 1.
@@ -732,7 +753,7 @@ std::string SerializeGameAndState(const Game& game, const State& state);
 // Note: This serialization scheme will not work for games whose chance mode is
 // kSampledStochastic, as there is currently no general way to set the state's
 // seed.
-std::pair<std::unique_ptr<Game>, std::unique_ptr<State>>
+std::pair<std::shared_ptr<const Game>, std::unique_ptr<State>>
 DeserializeGameAndState(const std::string& serialized_state);
 
 }  // namespace open_spiel

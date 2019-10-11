@@ -61,8 +61,8 @@ const GameType kGameType{
         {"diceoutcomes", GameParameter(kDefaultDiceOutcomes)},
     }};
 
-static std::unique_ptr<Game> Factory(const GameParameters& params) {
-  return std::unique_ptr<Game>(new PigGame(params));
+static std::shared_ptr<const Game> Factory(const GameParameters& params) {
+  return std::shared_ptr<const Game>(new PigGame(params));
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
@@ -167,16 +167,16 @@ void PigState::InformationStateAsNormalizedVector(
   }
 }
 
-PigState::PigState(int num_distinct_actions, int num_players, int dice_outcomes,
+PigState::PigState(std::shared_ptr<const Game> game, int dice_outcomes,
                    int horizon, int win_score)
-    : State(num_distinct_actions, num_players),
+    : State(game),
       dice_outcomes_(dice_outcomes),
       horizon_(horizon),
       win_score_(win_score) {
   total_moves_ = 0;
   cur_player_ = 0;
   turn_player_ = 0;
-  scores_.resize(num_players, 0);
+  scores_.resize(game->NumPlayers(), 0);
   turn_total_ = 0;
 }
 

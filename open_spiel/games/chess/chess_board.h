@@ -66,13 +66,13 @@ enum class PieceType : int8_t {
   kPawn = 6
 };
 
-static constexpr std::array<PieceType, 6> kPieceTypes = {
+static inline constexpr std::array<PieceType, 6> kPieceTypes = {
     {PieceType::kKing, PieceType::kQueen, PieceType::kRook, PieceType::kBishop,
      PieceType::kKnight, PieceType::kPawn}};
 
 // In case all the pieces are represented in the same plane, these values are
 // used to represent each piece type.
-static constexpr std::array<float, 6> kPieceRepresentation = {
+static inline constexpr std::array<float, 6> kPieceRepresentation = {
     {1, 0.8, 0.6, 0.4, 0.2, 0.1}};
 
 // Tries to parse piece type from char ('K', 'Q', 'R', 'B', 'N', 'P').
@@ -97,7 +97,8 @@ struct Piece {
   PieceType type;
 };
 
-static constexpr Piece kEmptyPiece = Piece{Color::kEmpty, PieceType::kEmpty};
+static inline constexpr Piece kEmptyPiece =
+    Piece{Color::kEmpty, PieceType::kEmpty};
 
 inline std::ostream& operator<<(std::ostream& stream, const Piece& p) {
   return stream << p.ToString();
@@ -124,7 +125,7 @@ inline std::string FileToString(int8_t file) {
 }
 
 // Offsets for all possible knight moves.
-constexpr std::array<Offset, 8> kKnightOffsets = {
+inline constexpr std::array<Offset, 8> kKnightOffsets = {
     {{-2, -1}, {-2, 1}, {-1, -2}, {-1, 2}, {2, -1}, {2, 1}, {1, -2}, {1, 2}}};
 
 std::optional<Square> SquareFromString(const std::string& s);
@@ -242,7 +243,7 @@ class ChessBoard {
   void SetEpSquare(Square sq);
 
   int32_t IrreversibleMoveCounter() const { return irreversible_move_counter_; }
-  int32_t MoveNumber() const { return move_number_; }
+  int32_t Movenumber() const { return move_number_; }
 
   bool CastlingRight(Color side, CastlingDirection direction) const;
   void SetCastlingRight(Color side, CastlingDirection direction,
@@ -424,7 +425,7 @@ class ChessBoard {
                                 const YieldFn& yield) const;
 
   void SetIrreversibleMoveCounter(int c);
-  void SetMoveNumber(int move_number);
+  void SetMovenumber(int move_number);
 
   std::array<Piece, kBoardSize * kBoardSize> board_;
   Color to_play_;

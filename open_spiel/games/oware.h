@@ -15,6 +15,7 @@
 #ifndef THIRD_PARTY_OPEN_SPIEL_GAMES_OWARE_H_
 #define THIRD_PARTY_OPEN_SPIEL_GAMES_OWARE_H_
 
+#include <memory>
 #include <unordered_set>
 
 #include "open_spiel/games/oware/oware_board.h"
@@ -38,24 +39,26 @@
 namespace open_spiel {
 namespace oware {
 
-constexpr int kMinCapture = 2;
-constexpr int kMaxCapture = 3;
+inline constexpr int kMinCapture = 2;
+inline constexpr int kMaxCapture = 3;
 
-constexpr int kDefaultHousesPerPlayer = 6;
-constexpr int kDdefaultSeedsPerHouse = 4;
+inline constexpr int kDefaultHousesPerPlayer = 6;
+inline constexpr int kDdefaultSeedsPerHouse = 4;
 
 // Informed guess based on
 // https://mancala.fandom.com/wiki/Statistics
-constexpr int kMaxGameLength = 1000;
+inline constexpr int kMaxGameLength = 1000;
 
 class OwareState : public State {
  public:
-  OwareState(int num_houses_per_player, int num_seeds_per_house);
+  OwareState(std::shared_ptr<const Game> game, int num_houses_per_player,
+             int num_seeds_per_house);
 
   OwareState(const OwareState&) = default;
 
   // Custom board setup to support testing.
-  explicit OwareState(const OwareBoard& board);
+  explicit OwareState(std::shared_ptr<const Game> game,
+                      const OwareBoard& board);
 
   Player CurrentPlayer() const override {
     return IsTerminal() ? kTerminalPlayerId : board_.current_player;
@@ -160,15 +163,15 @@ class OwareGame : public Game {
   explicit OwareGame(const GameParameters& params);
   int NumDistinctActions() const override { return num_houses_per_player_; }
   std::unique_ptr<State> NewInitialState() const override {
-    return std::unique_ptr<State>(
-        new OwareState(num_houses_per_player_, num_seeds_per_house_));
+    return std::unique_ptr<State>(new OwareState(
+        shared_from_this(), num_houses_per_player_, num_seeds_per_house_));
   }
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override { return -1; }
   double UtilitySum() const override { return 0; }
   double MaxUtility() const override { return 1; }
-  std::unique_ptr<Game> Clone() const override {
-    return std::unique_ptr<Game>(new OwareGame(*this));
+  std::shared_ptr<const Game> Clone() const override {
+    return std::shared_ptr<const Game>(new OwareGame(*this));
   }
 
   int MaxGameLength() const override { return kMaxGameLength; }

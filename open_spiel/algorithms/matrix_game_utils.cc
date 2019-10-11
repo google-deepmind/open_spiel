@@ -14,6 +14,8 @@
 
 #include "open_spiel/algorithms/matrix_game_utils.h"
 
+#include <memory>
+
 #include "open_spiel/algorithms/deterministic_policy.h"
 #include "open_spiel/algorithms/expected_returns.h"
 #include "open_spiel/simultaneous_move_game.h"
@@ -24,30 +26,30 @@ namespace algorithms {
 
 using open_spiel::matrix_game::MatrixGame;
 
-std::unique_ptr<MatrixGame> LoadMatrixGame(const std::string& name) {
-  std::unique_ptr<Game> game = LoadGame(name);
+std::shared_ptr<const MatrixGame> LoadMatrixGame(const std::string& name) {
+  std::shared_ptr<const Game> game = LoadGame(name);
   // Make sure it is indeed a matrix game.
-  MatrixGame* matrix_game = dynamic_cast<MatrixGame*>(game.get());
+  const MatrixGame* matrix_game = dynamic_cast<const MatrixGame*>(game.get());
   if (matrix_game == nullptr) {
     // If it is not already a matrix game, check if it is a 2-player NFG.
     // If so, convert it.
-    NormalFormGame* nfg = dynamic_cast<NormalFormGame*>(game.get());
+    const NormalFormGame* nfg = dynamic_cast<const NormalFormGame*>(game.get());
     if (nfg != nullptr && nfg->NumPlayers() == 2) {
       return AsMatrixGame(nfg);
     } else {
       SpielFatalError(absl::StrCat("Cannot load ", name, " as a matrix game."));
     }
   }
-  return std::unique_ptr<MatrixGame>(dynamic_cast<MatrixGame*>(game.release()));
+  return std::static_pointer_cast<const MatrixGame>(game);
 }
 
-std::unique_ptr<MatrixGame> AsMatrixGame(const Game* game) {
+std::shared_ptr<const MatrixGame> AsMatrixGame(const Game* game) {
   const NormalFormGame* nfg = dynamic_cast<const NormalFormGame*>(game);
   SPIEL_CHECK_TRUE(nfg != nullptr);
   return AsMatrixGame(nfg);
 }
 
-std::unique_ptr<MatrixGame> AsMatrixGame(const NormalFormGame* game) {
+std::shared_ptr<const MatrixGame> AsMatrixGame(const NormalFormGame* game) {
   SPIEL_CHECK_EQ(game->NumPlayers(), 2);
   std::unique_ptr<State> initial_state = game->NewInitialState();
   std::vector<std::vector<Action>> legal_actions = {
@@ -85,11 +87,11 @@ std::unique_ptr<MatrixGame> AsMatrixGame(const NormalFormGame* game) {
     }
   }
 
-  return std::unique_ptr<MatrixGame>(
+  return std::shared_ptr<MatrixGame>(
       new MatrixGame(type, {}, row_names, col_names, row_utils, col_utils));
 }
 
-std::unique_ptr<MatrixGame> ExtensiveToMatrixGame(const Game& game) {
+std::shared_ptr<const MatrixGame> ExtensiveToMatrixGame(const Game& game) {
   SPIEL_CHECK_EQ(game.NumPlayers(), 2);
 
   std::vector<std::string> row_names;

@@ -16,6 +16,7 @@
 #define THIRD_PARTY_OPEN_SPIEL_GAMES_COOP_BOX_PUSHING_SOCCER_H_
 
 #include <array>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -53,7 +54,7 @@ enum class ActionType { kTurnLeft, kTurnRight, kMoveForward, kStay };
 
 class CoopBoxPushingState : public SimMoveState {
  public:
-  CoopBoxPushingState(int horizon);
+  CoopBoxPushingState(std::shared_ptr<const Game> game, int horizon);
 
   std::string ActionToString(Player player, Action action) const override;
   std::string ToString() const override;
@@ -125,8 +126,8 @@ class CoopBoxPushingGame : public SimMoveGame {
   int NumPlayers() const override;
   double MinUtility() const override;
   double MaxUtility() const override;
-  std::unique_ptr<Game> Clone() const override {
-    return std::unique_ptr<Game>(new CoopBoxPushingGame(*this));
+  std::shared_ptr<const Game> Clone() const override {
+    return std::shared_ptr<const Game>(new CoopBoxPushingGame(*this));
   }
   std::vector<int> InformationStateNormalizedVectorShape() const override;
   int MaxGameLength() const override { return horizon_; }

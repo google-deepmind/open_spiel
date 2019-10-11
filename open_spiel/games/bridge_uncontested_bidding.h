@@ -98,19 +98,20 @@
 namespace open_spiel {
 namespace bridge {
 
-constexpr int kNumSuits = 4;
-constexpr int kNumDenominations = 1 + kNumSuits;
-constexpr int kMaxBid = 7;
-constexpr int kNumBids = kMaxBid * kNumDenominations;
-constexpr int kNumActions = kNumBids + 1;
-constexpr int kNumCardsPerSuit = 13;
-constexpr int kNumCards = kNumSuits * kNumCardsPerSuit;
-constexpr int kNumPlayers = 2;
-constexpr int kNumHands = 4;
-constexpr int kNumCardsPerHand = 13;
-constexpr int kMinScore = -650;  // 13 undertricks, at 50 each
-constexpr int kMaxScore = 1520;  // 7NT making
-constexpr int kStateSize = kNumCards + kNumPlayers * kNumActions + kNumPlayers;
+inline constexpr int kNumSuits = 4;
+inline constexpr int kNumDenominations = 1 + kNumSuits;
+inline constexpr int kMaxBid = 7;
+inline constexpr int kNumBids = kMaxBid * kNumDenominations;
+inline constexpr int kNumActions = kNumBids + 1;
+inline constexpr int kNumCardsPerSuit = 13;
+inline constexpr int kNumCards = kNumSuits * kNumCardsPerSuit;
+inline constexpr int kNumPlayers = 2;
+inline constexpr int kNumHands = 4;
+inline constexpr int kNumCardsPerHand = 13;
+inline constexpr int kMinScore = -650;  // 13 undertricks, at 50 each
+inline constexpr int kMaxScore = 1520;  // 7NT making
+inline constexpr int kStateSize =
+    kNumCards + kNumPlayers * kNumActions + kNumPlayers;
 
 class Deal {
  public:
@@ -136,19 +137,21 @@ class Deal {
 
 class UncontestedBiddingState : public State {
  public:
-  UncontestedBiddingState(std::vector<Contract> reference_contracts,
+  UncontestedBiddingState(std::shared_ptr<const Game> game,
+                          std::vector<Contract> reference_contracts,
                           std::function<bool(const Deal&)> deal_filter,
                           std::vector<Action> actions, int rng_seed)
-      : State(kNumActions, kNumPlayers),
+      : State(game),
         reference_contracts_(std::move(reference_contracts)),
         actions_(std::move(actions)),
         deal_filter_(deal_filter),
         rng_(rng_seed),
         dealt_(false) {}
-  UncontestedBiddingState(std::vector<Contract> reference_contracts,
+  UncontestedBiddingState(std::shared_ptr<const Game> game,
+                          std::vector<Contract> reference_contracts,
                           const Deal& deal, std::vector<Action> actions,
                           int rng_seed)
-      : State(kNumActions, kNumPlayers),
+      : State(game),
         reference_contracts_(std::move(reference_contracts)),
         actions_(std::move(actions)),
         rng_(rng_seed),
@@ -170,6 +173,7 @@ class UncontestedBiddingState : public State {
   std::unique_ptr<State> Clone() const override;
   std::vector<Action> LegalActions() const override;
   std::vector<std::pair<Action, double>> ChanceOutcomes() const override;
+  std::string Serialize() const override { return ToString(); }
 
  protected:
   void DoApplyAction(Action action_id) override;
@@ -199,7 +203,8 @@ class UncontestedBiddingGame : public Game {
   int NumDistinctActions() const override { return kNumActions; }
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(new UncontestedBiddingState(
-        reference_contracts_, deal_filter_, forced_actions_, ++rng_seed_));
+        shared_from_this(), reference_contracts_, deal_filter_, forced_actions_,
+        ++rng_seed_));
   }
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override {
@@ -208,16 +213,13 @@ class UncontestedBiddingGame : public Game {
   double MaxUtility() const override {
     return reference_contracts_.empty() ? kMaxScore : 0;
   }
-  std::unique_ptr<Game> Clone() const override {
-    return std::unique_ptr<Game>(new UncontestedBiddingGame(*this));
+  std::shared_ptr<const Game> Clone() const override {
+    return std::shared_ptr<const Game>(new UncontestedBiddingGame(*this));
   }
   std::vector<int> InformationStateNormalizedVectorShape() const override {
     return {kStateSize};
   }
   int MaxGameLength() const override { return kNumActions; }
-  std::string SerializeState(const State& state) const override {
-    return state.ToString();
-  }
   std::unique_ptr<State> DeserializeState(
       const std::string& str) const override;
 

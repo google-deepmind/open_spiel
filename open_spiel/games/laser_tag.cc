@@ -48,8 +48,8 @@ const GameType kGameType{
     {{"horizon", GameParameter(kDefaultHorizon)},
      {"zero_sum", GameParameter(kDefaultZeroSum)}}};
 
-std::unique_ptr<Game> Factory(const GameParameters& params) {
-  return std::unique_ptr<Game>(new LaserTagGame(params));
+std::shared_ptr<const Game> Factory(const GameParameters& params) {
+  return std::shared_ptr<const Game>(new LaserTagGame(params));
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
@@ -105,9 +105,8 @@ constexpr std::array<std::array<int, 10>, 4> col_offsets = {
      {0, 0, -1, 1, 0, 0, 0, -1, -1, 0}}};
 }  // namespace
 
-LaserTagState::LaserTagState(const LaserTagGame& parent_game)
-    : SimMoveState(parent_game.NumDistinctActions(), parent_game.NumPlayers()),
-      parent_game_(parent_game) {}
+LaserTagState::LaserTagState(std::shared_ptr<const Game> game)
+    : SimMoveState(game) {}
 
 std::string LaserTagState::ActionToString(int player, Action action_id) const {
   if (player == kSimultaneousPlayerId)
@@ -474,7 +473,7 @@ void LaserTagState::ObservationAsNormalizedVector(
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  values->resize(parent_game_.ObservationNormalizedVectorSize());
+  values->resize(game_->ObservationNormalizedVectorSize());
   std::fill(values->begin(), values->end(), 0.);
   int plane_size = kRows * kCols;
 
@@ -492,7 +491,7 @@ std::unique_ptr<State> LaserTagState::Clone() const {
 }
 
 std::unique_ptr<State> LaserTagGame::NewInitialState() const {
-  std::unique_ptr<LaserTagState> state(new LaserTagState(*this));
+  std::unique_ptr<LaserTagState> state(new LaserTagState(shared_from_this()));
   state->Reset(horizon_, zero_sum_);
   return state;
 }

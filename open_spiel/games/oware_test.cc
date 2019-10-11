@@ -34,57 +34,70 @@ void BasicOwareTests() {
 }
 
 void LegalActionsNoConstraintsTest() {
-  OwareState state =
-      OwareState(OwareBoard(0, {0, 0}, {1, 0, 9, 0, 0, 1, 1, 0, 0, 0, 0, 0}));
+  std::shared_ptr<const Game> game = LoadGame("oware");
+  OwareState state = OwareState(
+      game, OwareBoard(0, {0, 0}, {1, 0, 9, 0, 0, 1, 1, 0, 0, 0, 0, 0}));
   SPIEL_CHECK_EQ(state.LegalActions(), std::vector<Action>({0, 2, 5}));
 }
 
 void LegalActionsLeaveTheOpponentSeedsTest() {
-  OwareState state =
-      OwareState(OwareBoard(0, {0, 0}, {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0}));
+  std::shared_ptr<const Game> game = LoadGame("oware");
+  OwareState state = OwareState(
+      game, OwareBoard(0, {0, 0}, {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0}));
   // Playing action 0 would leave the opponent with no seeds, which is not
   // allowed.
   SPIEL_CHECK_EQ(state.LegalActions(), std::vector<Action>({5}));
 }
 
 void CaptureOpponentHousesTillBeginTest() {
-  OwareState state(OwareBoard(0, {0, 0}, {0, 0, 8, 0, 0, 1, 1, 1, 1, 1, 2, 3}));
+  std::shared_ptr<const Game> game = LoadGame("oware");
+  OwareState state(game,
+                   OwareBoard(0, {0, 0}, {0, 0, 8, 0, 0, 1, 1, 1, 1, 1, 2, 3}));
   state.ApplyAction(2);  // Winning move
   SPIEL_CHECK_EQ(state.Board(),
                  OwareBoard(1, {15, 3}, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}));
 }
 
 void CaptureMostOpponentHousesTest() {
-  OwareState state(OwareBoard(0, {0, 0}, {0, 0, 8, 0, 0, 1, 3, 1, 1, 1, 2, 0}));
+  std::shared_ptr<const Game> game = LoadGame("oware");
+  OwareState state(game,
+                   OwareBoard(0, {0, 0}, {0, 0, 8, 0, 0, 1, 3, 1, 1, 1, 2, 0}));
   state.ApplyAction(2);  // Winning move
   SPIEL_CHECK_EQ(state.Board(),
                  OwareBoard(1, {13, 4}, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}));
 }
 
 void NoCaptureBecauseTooFewSeedsTest() {
-  OwareState state(OwareBoard(1, {0, 0}, {3, 1, 1, 1, 0, 0, 0, 0, 8, 0, 0, 1}));
+  std::shared_ptr<const Game> game = LoadGame("oware");
+  OwareState state(game,
+                   OwareBoard(1, {0, 0}, {3, 1, 1, 1, 0, 0, 0, 0, 8, 0, 0, 1}));
   state.ApplyAction(2);
   SPIEL_CHECK_EQ(state.Board(),
                  OwareBoard(0, {0, 0}, {4, 2, 2, 2, 1, 0, 0, 0, 0, 1, 1, 2}));
 }
 
 void NoCaptureBecauseTooManySeedsTest() {
-  OwareState state(OwareBoard(0, {0, 0}, {0, 0, 8, 0, 0, 1, 3, 1, 1, 1, 3, 0}));
+  std::shared_ptr<const Game> game = LoadGame("oware");
+  OwareState state(game,
+                   OwareBoard(0, {0, 0}, {0, 0, 8, 0, 0, 1, 3, 1, 1, 1, 3, 0}));
   state.ApplyAction(2);
   SPIEL_CHECK_EQ(state.Board(),
                  OwareBoard(1, {0, 0}, {0, 0, 0, 1, 1, 2, 4, 2, 2, 2, 4, 0}));
 }
 
 void NoCaptureBecauseGrandSlamTest() {
-  OwareState state(OwareBoard(1, {0, 0}, {1, 1, 1, 1, 1, 0, 0, 0, 8, 0, 0, 1}));
+  std::shared_ptr<const Game> game = LoadGame("oware");
+  OwareState state(game,
+                   OwareBoard(1, {0, 0}, {1, 1, 1, 1, 1, 0, 0, 0, 8, 0, 0, 1}));
   state.ApplyAction(2);
   SPIEL_CHECK_EQ(state.Board(),
                  OwareBoard(0, {0, 0}, {2, 2, 2, 2, 2, 0, 0, 0, 0, 1, 1, 2}));
 }
 
 void GameEndsByRepetitionTest() {
+  std::shared_ptr<const Game> game = LoadGame("oware");
   OwareState state(
-      OwareBoard(0, {23, 23}, {1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0}));
+      game, OwareBoard(0, {23, 23}, {1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0}));
 
   state.ApplyAction(0);  // Player 0.
   state.ApplyAction(0);  // Player 1.

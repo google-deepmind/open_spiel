@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <memory>
 #include <unordered_map>
 
 #include "open_spiel/algorithms/best_response.h"
@@ -235,10 +236,19 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("num_distinct_actions", &State::NumDistinctActions)
       .def("num_players", &State::NumPlayers)
       .def("chance_outcomes", &State::ChanceOutcomes)
-      .def("get_type", &State::GetType);
+      .def("get_type", &State::GetType)
+      .def("serialize", &State::Serialize)
+      .def(py::pickle(              // Pickle support
+          [](const State& state) {  // __getstate__
+            return SerializeGameAndState(*state.GetGame(), state);
+          },
+          [](const std::string& data) {  // __setstate__
+            std::pair<std::shared_ptr<const Game>, std::unique_ptr<State>>
+                game_and_state = DeserializeGameAndState(data);
+            return std::move(game_and_state.second);
+          }));
 
-
-  py::class_<Game> game(m, "Game");
+  py::class_<Game, std::shared_ptr<Game>> game(m, "Game");
   game.def("num_distinct_actions", &Game::NumDistinctActions)
       .def("new_initial_state", &Game::NewInitialState)
       .def("max_chance_outcomes", &Game::MaxChanceOutcomes)
@@ -256,15 +266,36 @@ PYBIND11_MODULE(pyspiel, m) {
            &Game::ObservationNormalizedVectorShape)
       .def("observation_normalized_vector_size",
            &Game::ObservationNormalizedVectorSize)
-      .def("serialize_state", &Game::SerializeState)
       .def("deserialize_state", &Game::DeserializeState)
       .def("max_game_length", &Game::MaxGameLength)
-      .def("__str__", &Game::ToString);
+      .def("__str__", &Game::ToString)
+      .def(py::pickle(                            // Pickle support
+          [](std::shared_ptr<const Game> game) {  // __getstate__
+            return game->ToString();
+          },
+          [](const std::string& data) {  // __setstate__
+            // Have to remove the const here for this to compile, presumably
+            // because the holder type is non-const. But seems like you can't
+            // set the holder type to std::shared_ptr<const Game> either.
+            return std::const_pointer_cast<Game>(LoadGame(data));
+          }));
 
-  py::class_<open_spiel::NormalFormGame> normal_form_game(m, "NormalFormGame",
-                                                          game);
+  py::class_<NormalFormGame, std::shared_ptr<NormalFormGame>> normal_form_game(
+      m, "NormalFormGame", game);
+  normal_form_game.def(py::pickle(                      // Pickle support
+      [](std::shared_ptr<const NormalFormGame> game) {  // __getstate__
+        return game->ToString();
+      },
+      [](const std::string& data) {  // __setstate__
+        // Have to remove the const here for this to compile, presumably
+        // because the holder type is non-const. But seems like you can't
+        // set the holder type to std::shared_ptr<const Game> either.
+        return std::const_pointer_cast<NormalFormGame>(
+            std::static_pointer_cast<const NormalFormGame>(LoadGame(data)));
+      }));
 
-  py::class_<MatrixGame> matrix_game(m, "MatrixGame", normal_form_game);
+  py::class_<MatrixGame, std::shared_ptr<MatrixGame>> matrix_game(
+      m, "MatrixGame", normal_form_game);
   matrix_game
       .def(py::init<GameType, GameParameters, std::vector<std::string>,
                     std::vector<std::string>, std::vector<double>,
@@ -279,7 +310,18 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("col_utility", &MatrixGame::ColUtility)
       .def("player_utility", &MatrixGame::PlayerUtility)
       .def("row_action_name", &MatrixGame::RowActionName)
-      .def("col_action_name", &MatrixGame::ColActionName);
+      .def("col_action_name", &MatrixGame::ColActionName)
+      .def(py::pickle(                                  // Pickle support
+          [](std::shared_ptr<const MatrixGame> game) {  // __getstate__
+            return game->ToString();
+          },
+          [](const std::string& data) {  // __setstate__
+            // Have to remove the const here for this to compile, presumably
+            // because the holder type is non-const. But seems like you can't
+            // set the holder type to std::shared_ptr<const Game> either.
+            return std::const_pointer_cast<MatrixGame>(
+                algorithms::LoadMatrixGame(data));
+          }));
 
   py::class_<Bot, PyBot> bot(m, "Bot");
   bot.def(py::init<const Game&, int>())
@@ -357,7 +399,7 @@ PYBIND11_MODULE(pyspiel, m) {
            &open_spiel::algorithms::TrajectoryRecorder::RecordBatch);
 
   m.def("create_matrix_game",
-        (std::unique_ptr<MatrixGame>(*)(
+        (std::shared_ptr<const MatrixGame>(*)(
             const std::string&, const std::string&,
             const std::vector<std::string>&, const std::vector<std::string>&,
             const std::vector<std::vector<double>>&,
@@ -365,32 +407,34 @@ PYBIND11_MODULE(pyspiel, m) {
             open_spiel::matrix_game::CreateMatrixGame,
         "Creates an arbitrary matrix game from named rows/cols and utilities.");
 
+  m.def("create_matrix_game",
+        (std::shared_ptr<const MatrixGame>(*)(
+            const std::vector<std::vector<double>>&,
+            const std::vector<std::vector<double>>&))
+            open_spiel::matrix_game::CreateMatrixGame,
+        "Creates an arbitrary matrix game from dimensions and utilities.");
+
   m.def(
-      "create_matrix_game",
-      (std::unique_ptr<MatrixGame>(*)(const std::vector<std::vector<double>>&,
-                                      const std::vector<std::vector<double>>&))
-          open_spiel::matrix_game::CreateMatrixGame,
-      "Creates an arbitrary matrix game from dimensions and utilities.");
+      "load_game",
+      (std::shared_ptr<const Game>(*)(const std::string&))open_spiel::LoadGame,
+      "Returns a new game object for the specified short name using default "
+      "parameters");
 
   m.def("load_game",
-        (std::unique_ptr<Game>(*)(const std::string&))open_spiel::LoadGame,
-        "Returns a new game object for the specified short name using default "
-        "parameters");
-
-  m.def("load_game",
-        (std::unique_ptr<Game>(*)(const std::string&,
-                                  const GameParameters&))open_spiel::LoadGame,
+        (std::shared_ptr<const Game>(*)(
+            const std::string&, const GameParameters&))open_spiel::LoadGame,
         "Returns a new game object for the specified short name using given "
         "parameters");
 
   m.def("load_game_as_turn_based",
-        (std::unique_ptr<Game>(*)(
+        (std::shared_ptr<const Game>(*)(
             const std::string&))open_spiel::LoadGameAsTurnBased,
         "Converts a simultaneous game into an turn-based game with infosets.");
 
   m.def("load_game_as_turn_based",
-        (std::unique_ptr<Game>(*)(const std::string&, const GameParameters&))
-            open_spiel::LoadGameAsTurnBased,
+        (std::shared_ptr<const Game>(*)(
+            const std::string&,
+            const GameParameters&))open_spiel::LoadGameAsTurnBased,
         "Converts a simultaneous game into an turn-based game with infosets.");
 
   m.def("load_matrix_game", open_spiel::algorithms::LoadMatrixGame,
