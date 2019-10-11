@@ -33,9 +33,9 @@ void BasicTinyHanabiTests() {
 }
 
 void CountStates() {
-  open_spiel::tiny_hanabi::TinyHanabiGame game({});
+  std::shared_ptr<const Game> game = LoadGame("tiny_hanabi");
   auto states =
-      open_spiel::algorithms::GetAllStates(game, /*depth_limit=*/-1,
+      open_spiel::algorithms::GetAllStates(*game, /*depth_limit=*/-1,
                                            /*include_terminals=*/true,
                                            /*include_chance_states=*/false);
   // 4 initial deals

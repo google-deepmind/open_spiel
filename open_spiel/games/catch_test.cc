@@ -71,8 +71,8 @@ void GetAllStatesTest() {
 }
 
 void PlayAndWinTest() {
-  CatchGame game({});
-  auto state = game.NewInitialState();
+  auto game = LoadGame("catch");
+  auto state = game->NewInitialState();
   SPIEL_CHECK_EQ(state->CurrentPlayer(), kChancePlayerId);
   state->ApplyAction(3);
   SPIEL_CHECK_EQ(state->CurrentPlayer(), 0);
@@ -86,8 +86,8 @@ void PlayAndWinTest() {
 }
 
 void ToStringTest() {
-  CatchGame game({});
-  auto state = game.NewInitialState();
+  auto game = LoadGame("catch");
+  auto state = game->NewInitialState();
   state->ApplyAction(3);
   SPIEL_CHECK_EQ(state->ToString(),
                  "...o.\n"

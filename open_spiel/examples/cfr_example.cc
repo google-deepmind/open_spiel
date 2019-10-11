@@ -21,7 +21,8 @@
 
 // Example code for using CFR+ to solve Kuhn Poker.
 int main(int argc, char** argv) {
-  std::unique_ptr<open_spiel::Game> game = open_spiel::LoadGame("kuhn_poker");
+  std::shared_ptr<const open_spiel::Game> game =
+      open_spiel::LoadGame("kuhn_poker");
   open_spiel::algorithms::CFRPlusSolver solver(*game);
   std::cerr << "Starting CFR and CFR+ on kuhn_poker..." << std::endl;
 

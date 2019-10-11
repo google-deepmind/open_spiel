@@ -41,17 +41,17 @@ const GameType kGameType{
     {{"num_houses_per_player", GameParameter(kDefaultHousesPerPlayer)},
      {"num_seeds_per_house", GameParameter(kDdefaultSeedsPerHouse)}}};
 
-std::unique_ptr<Game> Factory(const GameParameters& params) {
-  return std::unique_ptr<Game>(new OwareGame(params));
+std::shared_ptr<const Game> Factory(const GameParameters& params) {
+  return std::shared_ptr<const Game>(new OwareGame(params));
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
 
 }  // namespace
 
-OwareState::OwareState(int num_houses_per_player, int num_seeds_per_house)
-    : State(/*num_distinct_actions=*/num_houses_per_player,
-            /*num_players=*/kNumPlayers),
+OwareState::OwareState(std::shared_ptr<const Game> game,
+                       int num_houses_per_player, int num_seeds_per_house)
+    : State(game),
       num_houses_per_player_(num_houses_per_player),
       total_seeds_(kNumPlayers * num_seeds_per_house * num_houses_per_player),
       board_(/*num_houses_per_player=*/num_houses_per_player,
@@ -59,9 +59,9 @@ OwareState::OwareState(int num_houses_per_player, int num_seeds_per_house)
   boards_since_last_capture_.insert(board_);
 }
 
-OwareState::OwareState(const OwareBoard& board)
-    : State(/*num_distinct_actions=*/board.seeds.size() / kNumPlayers,
-            /*num_players=*/kNumPlayers),
+OwareState::OwareState(std::shared_ptr<const Game> game,
+                       const OwareBoard& board)
+    : State(game),
       num_houses_per_player_(board.seeds.size() / kNumPlayers),
       total_seeds_(board.TotalSeeds()),
       board_(board) {

@@ -45,8 +45,8 @@ const GameType kGameType{
         {"ansi_color_output", GameParameter(false)},
     }};
 
-std::unique_ptr<Game> Factory(const GameParameters& params) {
-  return std::unique_ptr<Game>(new YGame(params));
+std::shared_ptr<const Game> Factory(const GameParameters& params) {
+  return std::shared_ptr<const Game>(new YGame(params));
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
@@ -112,8 +112,9 @@ std::string Move::ToString() const {
   return absl::StrCat(std::string(1, static_cast<char>('a' + x)), y + 1);
 }
 
-YState::YState(int board_size, bool ansi_color_output)
-    : State(board_size * board_size, kNumPlayers),
+YState::YState(std::shared_ptr<const Game> game, int board_size,
+               bool ansi_color_output)
+    : State(game),
       board_size_(board_size),
       neighbors(get_neighbors(board_size)),
       ansi_color_output_(ansi_color_output) {

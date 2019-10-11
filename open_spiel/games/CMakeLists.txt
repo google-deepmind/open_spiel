@@ -51,6 +51,8 @@ add_library (games OBJECT
   matching_pennies_3p.cc
   matching_pennies_3p.h
   matrix_games.cc
+  negotiation.cc
+  negotiation.h
   oshi_zumo.cc
   oshi_zumo.h
   oware.cc
@@ -233,6 +235,11 @@ add_test(matching_pennies_3p_test matching_pennies_3p_test)
 add_executable(matrix_games_test matrix_games_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(matrix_games_test matrix_games_test)
+
+add_executable(negotiation_test negotiation_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>
+               $<TARGET_OBJECTS:algorithms>)
+add_test(negotiation_test negotiation_test)
 
 add_executable(oshi_zumo_test oshi_zumo_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>

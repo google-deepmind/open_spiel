@@ -86,21 +86,7 @@ using Action = int64_t;
 
 // Floating point comparisons use this as a multiplier on the larger of the two
 // numbers as the threshold.
-constexpr float FloatingPointDefaultThresholdRatio() { return 1e-5; }
-
-// Useful functions for parsing the command-line for arguments of the form
-// --name=value.
-
-// Returns (true, value) if command-line argument is found, or (false, "")
-// otherwise.
-std::pair<bool, std::string> ParseCmdLineArg(int argc, char** argv,
-                                             const std::string& name);
-
-// Returns the value of the command-line argument if found, otherwise returns
-// the default value.
-std::string ParseCmdLineArgDefault(int argc, char** argv,
-                                   const std::string& name,
-                                   const std::string& default_value);
+inline constexpr float FloatingPointDefaultThresholdRatio() { return 1e-5; }
 
 // Helpers used to convert actions represented as integers in mixed bases.
 // E.g. RankActionMixedBase({2, 3, 6}, {1, 1, 1}) = 1*18 + 1*6 + 1 = 25,

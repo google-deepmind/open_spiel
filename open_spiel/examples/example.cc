@@ -17,12 +17,17 @@
 #include <memory>
 #include <random>
 
+#include "open_spiel/abseil-cpp/absl/flags/flag.h"
+#include "open_spiel/abseil-cpp/absl/flags/parse.h"
+#include "open_spiel/abseil-cpp/absl/random/uniform_int_distribution.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
-const char* kUsageStr =
-    "example --game=<shortname> [--players=<num>] "
-    "[--show_infostate] [--seed=<num>] [--show_legals=<true/false>]";
+ABSL_FLAG(std::string, game, "tic_tac_toe", "The name of the game to play.");
+ABSL_FLAG(int, players, 0, "How many players in this game, 0 for default.");
+ABSL_FLAG(bool, show_infostate, false, "Show the information state.");
+ABSL_FLAG(int, seed, 0, "Seed for the random number generator. 0 for auto.");
+ABSL_FLAG(bool, show_legals, false, "Show the legal moves.");
 
 void PrintLegalActions(const open_spiel::State& state,
                        open_spiel::Player player,
@@ -34,16 +39,13 @@ void PrintLegalActions(const open_spiel::State& state,
 }
 
 int main(int argc, char** argv) {
-  std::string game_name =
-      open_spiel::ParseCmdLineArgDefault(argc, argv, "game", "");
-  auto players = open_spiel::Player{std::stoi(
-      open_spiel::ParseCmdLineArgDefault(argc, argv, "players", "0"))};
-  bool show_infostate = open_spiel::ParseCmdLineArgDefault(
-                            argc, argv, "show_infostate", "false") == "true";
-  std::pair<bool, std::string> seed =
-      open_spiel::ParseCmdLineArg(argc, argv, "seed");
-  bool show_legals = open_spiel::ParseCmdLineArgDefault(
-                         argc, argv, "show_legals", "false") == "true";
+  absl::ParseCommandLine(argc, argv);
+
+  std::string game_name = absl::GetFlag(FLAGS_game);
+  auto players = absl::GetFlag(FLAGS_players);
+  bool show_infostate = absl::GetFlag(FLAGS_show_infostate);
+  int seed = absl::GetFlag(FLAGS_seed);
+  bool show_legals = absl::GetFlag(FLAGS_show_legals);
 
   // Print out registered games.
   std::cerr << "Registered games:" << std::endl;
@@ -52,13 +54,8 @@ int main(int argc, char** argv) {
     std::cerr << name << std::endl;
   }
 
-  if (game_name.empty()) {
-    std::cerr << kUsageStr << std::endl;
-    return -1;
-  }
-
   // Random number generator.
-  std::mt19937 rng(seed.first ? std::stol(seed.second) : time(0));
+  std::mt19937 rng(seed ? seed : time(0));
 
   // Create the game.
   std::cerr << "Creating game..\n" << std::endl;
@@ -68,7 +65,7 @@ int main(int argc, char** argv) {
   if (players > 0) {
     params["players"] = open_spiel::GameParameter(players);
   }
-  std::unique_ptr<open_spiel::Game> game =
+  std::shared_ptr<const open_spiel::Game> game =
       open_spiel::LoadGame(game_name, params);
 
   if (!game) {
@@ -120,7 +117,7 @@ int main(int argc, char** argv) {
           PrintLegalActions(*state, player, actions);
         }
 
-        std::uniform_int_distribution<> dis(0, actions.size() - 1);
+        absl::uniform_int_distribution<> dis(0, actions.size() - 1);
         open_spiel::Action action = actions[dis(rng)];
         joint_action.push_back(action);
         std::cerr << "player " << player << " chose "
@@ -149,7 +146,7 @@ int main(int argc, char** argv) {
         PrintLegalActions(*state, player, actions);
       }
 
-      std::uniform_int_distribution<> dis(0, actions.size() - 1);
+      absl::uniform_int_distribution<> dis(0, actions.size() - 1);
       auto action = actions[dis(rng)];
       std::cerr << "chose action: " << state->ActionToString(player, action)
                 << std::endl;

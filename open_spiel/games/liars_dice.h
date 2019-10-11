@@ -39,8 +39,8 @@ class LiarsDiceGame;
 
 class LiarsDiceState : public State {
  public:
-  explicit LiarsDiceState(int num_distinct_actions, int num_players,
-                          int total_num_dice, int max_dice_per_player,
+  explicit LiarsDiceState(std::shared_ptr<const Game> game, int total_num_dice,
+                          int max_dice_per_player,
                           const std::vector<int>& num_dice);
   LiarsDiceState(const LiarsDiceState&) = default;
 
@@ -95,8 +95,8 @@ class LiarsDiceGame : public Game {
   double MinUtility() const override { return -1; }
   double MaxUtility() const override { return 1; }
   double UtilitySum() const override { return 0; }
-  std::unique_ptr<Game> Clone() const override {
-    return std::unique_ptr<Game>(new LiarsDiceGame(*this));
+  std::shared_ptr<const Game> Clone() const override {
+    return std::shared_ptr<const Game>(new LiarsDiceGame(*this));
   }
   std::vector<int> InformationStateNormalizedVectorShape() const override;
   int MaxGameLength() const override;

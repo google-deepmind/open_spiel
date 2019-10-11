@@ -41,19 +41,18 @@ GameType MisereGameType(GameType game_type) {
   return game_type;
 }
 
-std::unique_ptr<Game> Factory(const GameParameters& params) {
+std::shared_ptr<const Game> Factory(const GameParameters& params) {
   auto game = LoadGame(params.at("game").game_value());
   GameType game_type = MisereGameType(game->GetType());
-  return std::unique_ptr<Game>(
-      new MisereGame(std::move(game), game_type, params));
+  return std::shared_ptr<const Game>(new MisereGame(game, game_type, params));
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
 
 }  // namespace
 
-MisereGame::MisereGame(std::unique_ptr<Game> game, GameType game_type,
+MisereGame::MisereGame(std::shared_ptr<const Game> game, GameType game_type,
                        GameParameters game_parameters)
-    : WrappedGame(std::move(game), game_type, game_parameters) {}
+    : WrappedGame(game, game_type, game_parameters) {}
 
 }  // namespace open_spiel

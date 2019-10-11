@@ -315,7 +315,7 @@ InfostatesAndActions GetKuhnUniformBestResponsePid1() {
 // The best response values are taken from the existing Python implementation in
 // open_spiel/algorithms/exploitability.py.
 void KuhnPokerUniformBestResponsePid0() {
-  std::unique_ptr<Game> game = LoadGame("kuhn_poker");
+  std::shared_ptr<const Game> game = LoadGame("kuhn_poker");
   TabularPolicy policy = GetUniformPolicy(*game);
   CheckBestResponseAgainstGoldenPolicy(*game, /*best_responder=*/Player{0},
                                        policy,
@@ -325,7 +325,7 @@ void KuhnPokerUniformBestResponsePid0() {
 // The best response values are taken from the existing Python implementation in
 // open_spiel/algorithms/exploitability.py.
 void KuhnPokerUniformBestResponsePid1() {
-  std::unique_ptr<Game> game = LoadGame("kuhn_poker");
+  std::shared_ptr<const Game> game = LoadGame("kuhn_poker");
   TabularPolicy policy = GetUniformPolicy(*game);
   CheckBestResponseAgainstGoldenPolicy(*game, /*best_responder=*/Player{1},
                                        policy,
@@ -340,14 +340,14 @@ InfostatesAndActions GetExploitabilityDescentBestResponses() {
 }
 
 void KuhnPokerExploitabilityDescentIteration4BestResponsePid0() {
-  std::unique_ptr<Game> game = LoadGame("kuhn_poker");
+  std::shared_ptr<const Game> game = LoadGame("kuhn_poker");
   CheckBestResponseAgainstGoldenPolicy(*game, /*best_responder=*/Player{1},
                                        GetKuhnEdIter4Policy(),
                                        GetExploitabilityDescentBestResponses());
 }
 
 void KuhnPokerUniformBestResponseAfterSwitchingPolicies() {
-  std::unique_ptr<Game> game = LoadGame("kuhn_poker");
+  std::shared_ptr<const Game> game = LoadGame("kuhn_poker");
   TabularPolicy policy = GetKuhnEdIter4Policy();
   TabularBestResponse response(*game, Player{1}, &policy);
 
@@ -372,7 +372,7 @@ void KuhnPokerUniformBestResponseAfterSwitchingPolicies() {
 // The best response values are taken from the existing Python implementation in
 // open_spiel/algorithms/exploitability.py.
 void KuhnPokerOptimalBestResponsePid0() {
-  std::unique_ptr<Game> game = LoadGame("kuhn_poker");
+  std::shared_ptr<const Game> game = LoadGame("kuhn_poker");
   TabularPolicy policy = GetOptimalKuhnPolicy(/*alpha=*/0.2);
   InfostatesAndActions actual_best_responses = {
       {"0", 0}, {"0pb", 0}, {"1", 0}, {"1pb", 0}, {"2", 0}, {"2pb", 1}};
@@ -383,7 +383,7 @@ void KuhnPokerOptimalBestResponsePid0() {
 // The best response values are taken from the existing Python implementation in
 // open_spiel/algorithms/exploitability.py.
 void KuhnPokerOptimalBestResponsePid1() {
-  std::unique_ptr<Game> game = LoadGame("kuhn_poker");
+  std::shared_ptr<const Game> game = LoadGame("kuhn_poker");
   TabularPolicy policy = GetOptimalKuhnPolicy(/*alpha=*/0.2);
   InfostatesAndActions actual_best_responses = {
       {"0b", 0}, {"0p", 0}, {"1p", 0}, {"1b", 0}, {"2p", 1}, {"2b", 1}};
@@ -392,7 +392,7 @@ void KuhnPokerOptimalBestResponsePid1() {
 }
 
 void KuhnPokerFirstActionBestResponsePid0() {
-  std::unique_ptr<Game> game = LoadGame("kuhn_poker");
+  std::shared_ptr<const Game> game = LoadGame("kuhn_poker");
   TabularPolicy policy = GetFirstActionPolicy(*game);
   InfostatesAndActions actual_best_responses = {
       {"0pb", 0}, {"1", 1}, {"2", 0}, {"0", 1}, {"1pb", 0}, {"2pb", 0}};
@@ -401,7 +401,7 @@ void KuhnPokerFirstActionBestResponsePid0() {
 }
 
 void KuhnPokerFirstActionBestResponsePid1() {
-  std::unique_ptr<Game> game = LoadGame("kuhn_poker");
+  std::shared_ptr<const Game> game = LoadGame("kuhn_poker");
   TabularPolicy policy = GetFirstActionPolicy(*game);
   InfostatesAndActions actual_best_responses = {
       {"1p", 1}, {"2p", 0}, {"0p", 1}, {"1b", 0}, {"2b", 0}, {"0b", 0}};
@@ -411,7 +411,7 @@ void KuhnPokerFirstActionBestResponsePid1() {
 
 
 void KuhnPokerExploitabilityDescentMinimalSimulationPid0() {
-  std::unique_ptr<Game> game = LoadGame("kuhn_poker");
+  std::shared_ptr<const Game> game = LoadGame("kuhn_poker");
   auto best_responder = Player{1};
 
   // We create a best responder with one policy...
@@ -463,7 +463,7 @@ void CheckBestResponseValuesAgainstGoldenValues(
 }
 
 void KuhnPokerUniformValueTestPid0() {
-  std::unique_ptr<Game> game = LoadGame("kuhn_poker");
+  std::shared_ptr<const Game> game = LoadGame("kuhn_poker");
   TabularPolicy policy = GetUniformPolicy(*game);
   std::vector<std::pair<std::string, double>> histories_and_values =
       GetKuhnUniformBestResponseValuesPid0();
@@ -472,7 +472,7 @@ void KuhnPokerUniformValueTestPid0() {
 }
 
 void KuhnPokerUniformValueTestPid1() {
-  std::unique_ptr<Game> game = LoadGame("kuhn_poker");
+  std::shared_ptr<const Game> game = LoadGame("kuhn_poker");
   TabularPolicy policy = GetUniformPolicy(*game);
   std::vector<std::pair<std::string, double>> histories_and_values =
       GetKuhnUniformBestResponseValuesPid1();
@@ -481,7 +481,7 @@ void KuhnPokerUniformValueTestPid1() {
 }
 
 void KuhnPokerOptimalValueTestPid0() {
-  std::unique_ptr<Game> game = LoadGame("kuhn_poker");
+  std::shared_ptr<const Game> game = LoadGame("kuhn_poker");
   TabularPolicy policy = GetOptimalKuhnPolicy(/*alpha=*/0.2);
   std::vector<std::pair<std::string, double>> histories_and_values =
       GetKuhnOptimalBestResponseValuesPid0();
@@ -490,7 +490,7 @@ void KuhnPokerOptimalValueTestPid0() {
 }
 
 void KuhnPokerOptimalValueTestPid1() {
-  std::unique_ptr<Game> game = LoadGame("kuhn_poker");
+  std::shared_ptr<const Game> game = LoadGame("kuhn_poker");
   TabularPolicy policy = GetOptimalKuhnPolicy(/*alpha=*/0.2);
   std::vector<std::pair<std::string, double>> histories_and_values =
       GetKuhnOptimalBestResponseValuesPid1();

@@ -136,7 +136,8 @@ class TabularPolicy : public Policy {
 double GetProb(const ActionsAndProbs& action_and_probs, Action action);
 
 // Helper functions that generate policies for testing.
-TabularPolicy GetEmptyTabularPolicy(const Game& game);
+TabularPolicy GetEmptyTabularPolicy(const Game& game,
+                                    bool initialize_to_uniform = false);
 TabularPolicy GetUniformPolicy(const Game& game);
 TabularPolicy GetRandomPolicy(const Game& game, int seed = 0);
 TabularPolicy GetFirstActionPolicy(const Game& game);

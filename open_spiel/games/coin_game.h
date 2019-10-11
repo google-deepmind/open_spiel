@@ -15,6 +15,7 @@
 #ifndef THIRD_PARTY_OPEN_SPIEL_GAMES_COIN_GAME_H_
 #define THIRD_PARTY_OPEN_SPIEL_GAMES_COIN_GAME_H_
 
+#include <memory>
 #include <set>
 
 #include "open_spiel/spiel.h"
@@ -67,7 +68,7 @@ struct Setup {
 
 class CoinState : public State {
  public:
-  explicit CoinState(const CoinGame& parent_game);
+  explicit CoinState(std::shared_ptr<const Game> game);
   CoinState(const CoinState&) = default;
 
   Player CurrentPlayer() const override;
@@ -103,7 +104,8 @@ class CoinState : public State {
   void ApplyAssignPreferenceAction(Action coin_color);
   void ApplyPlayAction(Action move);
 
-  const CoinGame& game_;
+  const CoinGame& parent_game_;
+
   Setup setup_;
   Player cur_player_ =
       kChancePlayerId;  // Chance player for setting up the game.
@@ -126,7 +128,7 @@ class CoinGame : public Game {
   int NumPlayers() const override { return num_players_; }
   double MaxUtility() const override;
   double MinUtility() const override;
-  std::unique_ptr<Game> Clone() const override;
+  std::shared_ptr<const Game> Clone() const override;
   int MaxGameLength() const override;
 
   int NumRows() const { return num_rows_; }

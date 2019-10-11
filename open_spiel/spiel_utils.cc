@@ -36,31 +36,6 @@ int PreviousPlayerRoundRobin(Player player, int nplayers) {
   }
 }
 
-std::pair<bool, std::string> ParseCmdLineArg(int argc, char** argv,
-                                             const std::string& name) {
-  std::string prefix = "--" + name + "=";
-
-  for (int i = 0; i < argc; ++i) {
-    std::string arg = argv[i];
-    if (arg.find(prefix) == 0) {
-      return std::pair<bool, std::string>(true, arg.substr(prefix.length()));
-    }
-  }
-
-  return std::pair<bool, std::string>(false, "");
-}
-
-std::string ParseCmdLineArgDefault(int argc, char** argv,
-                                   const std::string& name,
-                                   const std::string& default_value) {
-  std::pair<bool, std::string> ret_value = ParseCmdLineArg(argc, argv, name);
-  if (ret_value.first) {
-    return ret_value.second;
-  } else {
-    return default_value;
-  }
-}
-
 // Used to convert actions represented as integers in mixed bases.
 Action RankActionMixedBase(const std::vector<int>& bases,
                            const std::vector<int>& digits) {

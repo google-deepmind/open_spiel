@@ -30,7 +30,7 @@ void BasicLaserTagTests() {
 }
 
 void SimpleTagTests(int horizon, bool zero_sum) {
-  std::unique_ptr<Game> game =
+  std::shared_ptr<const Game> game =
       LoadGame("laser_tag", {{"horizon", GameParameter(horizon)},
                              {"zero_sum", GameParameter(zero_sum)}});
   std::unique_ptr<State> state = game->NewInitialState();

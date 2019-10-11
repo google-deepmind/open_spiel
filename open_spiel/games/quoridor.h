@@ -16,6 +16,7 @@
 #define THIRD_PARTY_OPEN_SPIEL_GAMES_QUORIDOR_H_
 
 #include <cstdint>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -31,12 +32,12 @@
 namespace open_spiel {
 namespace quoridor {
 
-constexpr int kNumPlayers = 2;
-constexpr int kDefaultBoardSize = 9;
-constexpr int kMinBoardSize = 3;
-constexpr int kMaxBoardSize = 25;
-constexpr int kMaxGameLengthFactor = 4;
-constexpr int kCellStates = 1 + kNumPlayers;
+inline constexpr int kNumPlayers = 2;
+inline constexpr int kDefaultBoardSize = 9;
+inline constexpr int kMinBoardSize = 3;
+inline constexpr int kMaxBoardSize = 25;
+inline constexpr int kMaxGameLengthFactor = 4;
+inline constexpr int kCellStates = 1 + kNumPlayers;
 
 enum QuoridorPlayer : uint8_t {
   kPlayer1,
@@ -85,7 +86,8 @@ struct Move {
 // State of an in-play game.
 class QuoridorState : public State {
  public:
-  QuoridorState(int board_size, int wall_count, bool ansi_color_output = false);
+  QuoridorState(std::shared_ptr<const Game> game, int board_size,
+                int wall_count, bool ansi_color_output = false);
 
   QuoridorState(const QuoridorState&) = default;
 
@@ -154,15 +156,15 @@ class QuoridorGame : public Game {
 
   int NumDistinctActions() const override { return Diameter() * Diameter(); }
   std::unique_ptr<State> NewInitialState() const override {
-    return std::unique_ptr<State>(
-        new QuoridorState(board_size_, wall_count_, ansi_color_output_));
+    return std::unique_ptr<State>(new QuoridorState(
+        shared_from_this(), board_size_, wall_count_, ansi_color_output_));
   }
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override { return -1; }
   double UtilitySum() const override { return 0; }
   double MaxUtility() const override { return 1; }
-  std::unique_ptr<Game> Clone() const override {
-    return std::unique_ptr<Game>(new QuoridorGame(*this));
+  std::shared_ptr<const Game> Clone() const override {
+    return std::shared_ptr<const Game>(new QuoridorGame(*this));
   }
   std::vector<int> ObservationNormalizedVectorShape() const override {
     return {kCellStates + kNumPlayers, Diameter(), Diameter()};

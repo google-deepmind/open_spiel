@@ -63,8 +63,8 @@ const GameType kGameType{
         {"num_coins_per_color", GameParameter(kDefaultCoinsPerColor)},
     }};
 
-std::unique_ptr<Game> Factory(const GameParameters& params) {
-  return std::unique_ptr<Game>(new CoinGame(params));
+std::shared_ptr<const Game> Factory(const GameParameters& params) {
+  return std::shared_ptr<const Game>(new CoinGame(params));
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
@@ -155,17 +155,15 @@ Setup::Setup(int num_rows, int num_columns, int num_coin_colors)
     : available_coin_colors_(RangeAsSet(num_coin_colors)),
       available_positions_(RangeAsSet(num_rows * num_columns)) {}
 
-CoinState::CoinState(const CoinGame& parent_game)
-    : State(/*num_distinct_actions=*/parent_game.NumDistinctActions(),
-            /*num_players=*/parent_game.NumPlayers()),
-      game_(parent_game),
-      setup_(parent_game.NumRows(), parent_game.NumColumns(),
-             parent_game.NumCoinColors()),
-      player_preferences_(parent_game.NumPlayers()),
-      player_location_(parent_game.NumPlayers()),
-      field_(parent_game.NumRows() * parent_game.NumColumns(), kEmptySymbol),
-      player_coins_(parent_game.NumPlayers() * parent_game.NumCoinColors(), 0) {
-}
+CoinState::CoinState(std::shared_ptr<const Game> game)
+    : State(game),
+      parent_game_(static_cast<const CoinGame&>(*game)),
+      setup_(parent_game_.NumRows(), parent_game_.NumColumns(),
+             parent_game_.NumCoinColors()),
+      player_preferences_(game->NumPlayers()),
+      player_location_(game->NumPlayers()),
+      field_(parent_game_.NumRows() * parent_game_.NumColumns(), kEmptySymbol),
+      player_coins_(game->NumPlayers() * parent_game_.NumCoinColors(), 0) {}
 
 GamePhase CoinState::GetPhase() const {
   if (cur_player_ != kChancePlayerId) {
@@ -174,7 +172,7 @@ GamePhase CoinState::GetPhase() const {
     return GamePhase::kAssignPreferences;
   } else if (setup_.num_players_on_field < num_players_) {
     return GamePhase::kDeployPlayers;
-  } else if (setup_.num_coins_on_field < game_.TotalCoins()) {
+  } else if (setup_.num_coins_on_field < parent_game_.TotalCoins()) {
     return GamePhase::kDeployCoins;
   } else {
     SpielFatalError("Inconsistent setup versus current_player state");
@@ -225,24 +223,25 @@ std::string CoinState::Observation(Player player) const {
 }
 
 bool CoinState::InBounds(Location loc) const {
-  return (loc.first >= 0 && loc.second >= 0 && loc.first < game_.NumRows() &&
-          loc.second < game_.NumColumns());
+  return (loc.first >= 0 && loc.second >= 0 &&
+          loc.first < parent_game_.NumRows() &&
+          loc.second < parent_game_.NumColumns());
 }
 
 void CoinState::SetField(Location loc, char symbol) {
-  field_[loc.first * game_.NumColumns() + loc.second] = symbol;
+  field_[loc.first * parent_game_.NumColumns() + loc.second] = symbol;
 }
 
 char CoinState::GetField(Location loc) const {
-  return field_[loc.first * game_.NumColumns() + loc.second];
+  return field_[loc.first * parent_game_.NumColumns() + loc.second];
 }
 
 Location CoinState::LocationFromIndex(int index) const {
-  return {index / game_.NumColumns(), index % game_.NumColumns()};
+  return {index / parent_game_.NumColumns(), index % parent_game_.NumColumns()};
 }
 
 void CoinState::ApplyAssignPreferenceAction(Action coin_color) {
-  SPIEL_CHECK_LT(coin_color, game_.NumCoinColors());
+  SPIEL_CHECK_LT(coin_color, parent_game_.NumCoinColors());
   player_preferences_[setup_.num_players_assigned_preference] = coin_color;
   ++setup_.num_players_assigned_preference;
   setup_.available_coin_colors_.erase(coin_color);
@@ -261,12 +260,12 @@ void CoinState::ApplyDeployCoinsAction(Action index) {
   SPIEL_CHECK_LT(index, field_.size());
   SPIEL_CHECK_TRUE(GetSymbolType(field_[index]) == SymbolType::kEmpty);
 
-  int coin_color = setup_.num_coins_on_field / game_.NumCoinsPerColor();
+  int coin_color = setup_.num_coins_on_field / parent_game_.NumCoinsPerColor();
   field_[index] = CoinSymbol(coin_color);
   ++setup_.num_coins_on_field;
   setup_.available_positions_.erase(index);
 
-  if (setup_.num_coins_on_field == game_.TotalCoins()) {
+  if (setup_.num_coins_on_field == parent_game_.TotalCoins()) {
     // Switch to play phase.
     setup_.available_positions_.clear();    // Release memory.
     setup_.available_coin_colors_.clear();  // Release memory.
@@ -314,11 +313,11 @@ void CoinState::DoApplyAction(Action action) {
 }
 
 void CoinState::IncPlayerCoinCount(Player player, int coin_color) {
-  player_coins_[player * game_.NumCoinColors() + coin_color]++;
+  player_coins_[player * parent_game_.NumCoinColors() + coin_color]++;
 }
 
 int CoinState::GetPlayerCoinCount(Player player, int coin_color) const {
-  return player_coins_[player * game_.NumCoinColors() + coin_color];
+  return player_coins_[player * parent_game_.NumCoinColors() + coin_color];
 }
 
 std::string CoinState::ActionToString(Player player, Action action_id) const {
@@ -344,14 +343,14 @@ std::string CoinState::ActionToString(Player player, Action action_id) const {
 void CoinState::PrintCoinsCollected(std::ostream& out) const {
   // Prints table with players as rows and coin_colors as columns.
   SpielStrOut(out, "        ");
-  for (int coint_color = 0; coint_color < game_.NumCoinColors();
+  for (int coint_color = 0; coint_color < parent_game_.NumCoinColors();
        coint_color++) {
     SpielStrOut(out, CoinSymbol(coint_color), " ");
   }
   SpielStrOut(out, "\n");
   for (auto player = Player{0}; player < num_players_; player++) {
     SpielStrOut(out, "player", player, " ");
-    for (int coint_color = 0; coint_color < game_.NumCoinColors();
+    for (int coint_color = 0; coint_color < parent_game_.NumCoinColors();
          coint_color++) {
       SpielStrOut(out, GetPlayerCoinCount(player, coint_color), " ");
     }
@@ -370,7 +369,7 @@ void CoinState::PrintPreferences(std::ostream& out) const {
 
 void CoinState::PrintBoardDelimiterRow(std::ostream& out) const {
   SpielStrOut(out, "+");
-  for (int c = 0; c < game_.NumColumns(); c++) {
+  for (int c = 0; c < parent_game_.NumColumns(); c++) {
     SpielStrOut(out, "-");
   }
   SpielStrOut(out, "+\n");
@@ -378,9 +377,9 @@ void CoinState::PrintBoardDelimiterRow(std::ostream& out) const {
 
 void CoinState::PrintBoard(std::ostream& out) const {
   PrintBoardDelimiterRow(out);
-  for (int r = 0; r < game_.NumRows(); r++) {
+  for (int r = 0; r < parent_game_.NumRows(); r++) {
     SpielStrOut(out, "|");
-    for (int c = 0; c < game_.NumColumns(); c++) {
+    for (int c = 0; c < parent_game_.NumColumns(); c++) {
       SpielStrOut(out, GetField({r, c}));
     }
     SpielStrOut(out, "|\n");
@@ -399,7 +398,7 @@ std::string CoinState::ToString() const {
 }
 
 bool CoinState::IsTerminal() const {
-  return total_moves_ >= game_.EpisodeLength();
+  return total_moves_ >= parent_game_.EpisodeLength();
 }
 
 std::vector<double> CoinState::Returns() const {
@@ -408,8 +407,9 @@ std::vector<double> CoinState::Returns() const {
   }
 
   int collected_coins = 0;
-  std::vector<int> coin_count(game_.NumCoinColors());
-  for (int coin_color = 0; coin_color < game_.NumCoinColors(); coin_color++) {
+  std::vector<int> coin_count(parent_game_.NumCoinColors());
+  for (int coin_color = 0; coin_color < parent_game_.NumCoinColors();
+       coin_color++) {
     for (auto player = Player{0}; player < num_players_; player++) {
       Player player_coins = GetPlayerCoinCount(player, coin_color);
       coin_count[coin_color] += player_coins;
@@ -461,12 +461,12 @@ int CoinGame::MaxGameLength() const { return (episode_length_); }
 // Chance nodes must not be considered in NumDistinctActions.
 int CoinGame::NumDistinctActions() const { return offsets.size(); }
 
-std::unique_ptr<Game> CoinGame::Clone() const {
-  return std::unique_ptr<Game>(new CoinGame(*this));
+std::shared_ptr<const Game> CoinGame::Clone() const {
+  return std::shared_ptr<const Game>(new CoinGame(*this));
 }
 
 std::unique_ptr<State> CoinGame::NewInitialState() const {
-  return std::unique_ptr<State>(new CoinState(*this));
+  return std::unique_ptr<State>(new CoinState(shared_from_this()));
 }
 
 }  // namespace coin_game

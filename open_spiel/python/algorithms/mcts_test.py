@@ -43,13 +43,13 @@ def search_tic_tac_toe_state(initial_actions):
     state.apply_action(_get_action(state, action_str))
   bot = mcts.MCTSBot(
       game, player=state.current_player(), uct_c=math.sqrt(2),
-      max_simulations=10000, solve=True,
+      max_simulations=10000, solve=True, random_state=np.random.RandomState(42),
       evaluator=mcts.RandomRolloutEvaluator(n_rollouts=20))
   return bot.mcts_search(state), state
 
 
-def make_node(action, player=0, **kwargs):
-  node = mcts.SearchNode(action, player)
+def make_node(action, player=0, prior=1, **kwargs):
+  node = mcts.SearchNode(action, player, prior)
   for k, v in kwargs.items():
     setattr(node, k, v)
   return node

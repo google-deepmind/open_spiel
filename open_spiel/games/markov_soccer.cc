@@ -45,8 +45,8 @@ const GameType kGameType{
     /*parameter_specification=*/
     {{"horizon", GameParameter(kDefaultHorizon)}}};
 
-std::unique_ptr<Game> Factory(const GameParameters& params) {
-  return std::unique_ptr<Game>(new MarkovSoccerGame(params));
+std::shared_ptr<const Game> Factory(const GameParameters& params) {
+  return std::shared_ptr<const Game>(new MarkovSoccerGame(params));
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
@@ -73,9 +73,8 @@ constexpr std::array<int, 5> row_offsets = {{-1, 1, 0, 0, 0}};
 constexpr std::array<int, 5> col_offsets = {{0, 0, -1, 1, 0}};
 }  // namespace
 
-MarkovSoccerState::MarkovSoccerState(const MarkovSoccerGame& parent_game)
-    : SimMoveState(parent_game.NumDistinctActions(), parent_game.NumPlayers()),
-      parent_game_(parent_game) {}
+MarkovSoccerState::MarkovSoccerState(std::shared_ptr<const Game> game)
+    : SimMoveState(game) {}
 
 std::string MarkovSoccerState::ActionToString(Player player,
                                               Action action_id) const {
@@ -334,7 +333,7 @@ void MarkovSoccerState::InformationStateAsNormalizedVector(
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  values->resize(parent_game_.InformationStateNormalizedVectorSize());
+  values->resize(game_->InformationStateNormalizedVectorSize());
   std::fill(values->begin(), values->end(), 0.);
   int plane_size = kRows * kCols;
 
@@ -352,7 +351,8 @@ std::unique_ptr<State> MarkovSoccerState::Clone() const {
 }
 
 std::unique_ptr<State> MarkovSoccerGame::NewInitialState() const {
-  std::unique_ptr<MarkovSoccerState> state(new MarkovSoccerState(*this));
+  std::unique_ptr<MarkovSoccerState> state(
+      new MarkovSoccerState(shared_from_this()));
   state->Reset(ParameterValue<int>("horizon"));
   return state;
 }

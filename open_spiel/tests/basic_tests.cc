@@ -19,6 +19,7 @@
 #include <set>
 #include <string>
 
+#include "open_spiel/abseil-cpp/absl/random/uniform_int_distribution.h"
 #include "open_spiel/abseil-cpp/absl/time/clock.h"
 #include "open_spiel/game_transforms/turn_based_simultaneous_game.h"
 #include "open_spiel/spiel.h"
@@ -140,7 +141,7 @@ bool IsPowerOfTwo(int n) { return n == 0 || (n & (n - 1)) == 0; }
 
 // Checks that the game can be loaded.
 void LoadGameTest(const std::string& game_name) {
-  std::unique_ptr<Game> game = LoadGame(game_name);
+  std::shared_ptr<const Game> game = LoadGame(game_name);
   SPIEL_CHECK_TRUE(game != nullptr);
 }
 
@@ -171,8 +172,8 @@ void TestUndo(std::unique_ptr<State> state,
 
 void TestSerializeDeserialize(const Game& game, const State* state) {
   const std::string& ser_str = SerializeGameAndState(game, *state);
-  std::pair<std::unique_ptr<Game>, std::unique_ptr<State>> game_and_state =
-      DeserializeGameAndState(ser_str);
+  std::pair<std::shared_ptr<const Game>, std::unique_ptr<State>>
+      game_and_state = DeserializeGameAndState(ser_str);
   SPIEL_CHECK_EQ(game.ToString(), game_and_state.first->ToString());
   SPIEL_CHECK_EQ(state->ToString(), game_and_state.second->ToString());
 }
@@ -218,7 +219,7 @@ int RandomSimulationFast(std::mt19937* rng, const Game& game, bool verbose) {
       for (int p = 0; p < game.NumPlayers(); p++) {
         std::vector<Action> actions;
         actions = state->LegalActions(p);
-        std::uniform_int_distribution<> dis(0, actions.size() - 1);
+        std::uniform_int_distribution<int> dis(0, actions.size() - 1);
         Action action = actions[dis(*rng)];
         joint_action.push_back(action);
         if (verbose) {
@@ -231,7 +232,7 @@ int RandomSimulationFast(std::mt19937* rng, const Game& game, bool verbose) {
     } else {
       // Sample an action uniformly.
       std::vector<Action> actions = state->LegalActions();
-      std::uniform_int_distribution<> dis(0, actions.size() - 1);
+      std::uniform_int_distribution<int> dis(0, actions.size() - 1);
       Action action = actions[dis(*rng)];
       if (verbose) {
         int p = state->CurrentPlayer();
@@ -274,7 +275,8 @@ void RandomSimBenchmark(const std::string& game_def, int num_sims,
   std::cout.precision(default_precision);  // Reset.
 }
 
-void RandomSimulation(std::mt19937* rng, const Game& game, bool undo) {
+void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
+                      bool serialize) {
   std::vector<HistoryItem> history;
   std::vector<double> episode_returns(game.NumPlayers(), 0);
 
@@ -314,7 +316,7 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo) {
     SPIEL_CHECK_EQ(state->ToString(), state_copy->ToString());
     SPIEL_CHECK_EQ(state->History(), state_copy->History());
 
-    if (history.size() < 10 || IsPowerOfTwo(history.size())) {
+    if (serialize && (history.size() < 10 || IsPowerOfTwo(history.size()))) {
       TestSerializeDeserialize(game, state.get());
     }
 
@@ -348,7 +350,7 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo) {
       for (auto p = Player{0}; p < game.NumPlayers(); p++) {
         std::vector<Action> actions;
         actions = state->LegalActions(p);
-        std::uniform_int_distribution<> dis(0, actions.size() - 1);
+        std::uniform_int_distribution<int> dis(0, actions.size() - 1);
         Action action = actions[dis(*rng)];
         joint_action.push_back(action);
         if (p == 0) {
@@ -364,6 +366,13 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo) {
           std::vector<double> infostate_vector;
           state->InformationStateAsNormalizedVector(p, &infostate_vector);
           SPIEL_CHECK_EQ(infostate_vector.size(), infostate_vector_size);
+        }
+
+        // Check the observation state vector, if supported.
+        if (observation_vector_size > 0) {
+          std::vector<double> obs_vector;
+          state->ObservationAsNormalizedVector(p, &obs_vector);
+          SPIEL_CHECK_EQ(obs_vector.size(), observation_vector_size);
         }
       }
 
@@ -387,6 +396,13 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo) {
         SPIEL_CHECK_EQ(infostate_vector.size(), infostate_vector_size);
       }
 
+      // Check the observation state vector, if supported.
+      if (observation_vector_size > 0) {
+        std::vector<double> obs_vector;
+        state->ObservationAsNormalizedVector(player, &obs_vector);
+        SPIEL_CHECK_EQ(obs_vector.size(), observation_vector_size);
+      }
+
       // Sample an action uniformly.
       std::vector<Action> actions = state->LegalActions();
       LegalActionsMaskTest(game, *state, actions);
@@ -394,7 +410,7 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo) {
         SPIEL_CHECK_TRUE(actions.empty());
       else
         SPIEL_CHECK_FALSE(actions.empty());
-      std::uniform_int_distribution<> dis(0, actions.size() - 1);
+      std::uniform_int_distribution<int> dis(0, actions.size() - 1);
       Action action = actions[dis(*rng)];
 
       std::cout << "chose action: " << state->ActionToString(player, action)
@@ -453,7 +469,7 @@ void RandomSimTest(const Game& game, int num_sims) {
   std::cout << "\nRandomSimTest, game = " << game.GetType().short_name
             << ", num_sims = " << num_sims << std::endl;
   for (int sim = 0; sim < num_sims; ++sim) {
-    RandomSimulation(&rng, game, /*undo=*/false);
+    RandomSimulation(&rng, game, /*undo=*/false, /*serialize=*/true);
   }
 }
 
@@ -462,7 +478,16 @@ void RandomSimTestWithUndo(const Game& game, int num_sims) {
   std::cout << "RandomSimTestWithUndo, game = " << game.GetType().short_name
             << ", num_sims = " << num_sims << std::endl;
   for (int sim = 0; sim < num_sims; ++sim) {
-    RandomSimulation(&rng, game, /*undo=*/true);
+    RandomSimulation(&rng, game, /*undo=*/true, /*serialize=*/true);
+  }
+}
+
+void RandomSimTestNoSerialize(const Game& game, int num_sims) {
+  std::mt19937 rng;
+  std::cout << "RandomSimTestNoSerialize, game = " << game.GetType().short_name
+            << ", num_sims = " << num_sims << std::endl;
+  for (int sim = 0; sim < num_sims; ++sim) {
+    RandomSimulation(&rng, game, /*undo=*/false, /*serialize=*/false);
   }
 }
 

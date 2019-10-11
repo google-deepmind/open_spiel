@@ -56,8 +56,8 @@ const GameType kGameType{
     {{"rows", GameParameter(kDefaultRows)},
      {"columns", GameParameter(kDefaultColumns)}}};
 
-std::unique_ptr<Game> Factory(const GameParameters& params) {
-  return std::unique_ptr<Game>(new BreakthroughGame(params));
+std::shared_ptr<const Game> Factory(const GameParameters& params) {
+  return std::shared_ptr<const Game>(new BreakthroughGame(params));
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
@@ -115,9 +115,9 @@ std::string ColLabel(int col) {
 
 }  // namespace
 
-BreakthroughState::BreakthroughState(int num_distinct_actions, int rows,
+BreakthroughState::BreakthroughState(std::shared_ptr<const Game> game, int rows,
                                      int cols)
-    : State(num_distinct_actions, kNumPlayers), rows_(rows), cols_(cols) {
+    : State(game), rows_(rows), cols_(cols) {
   SPIEL_CHECK_GT(rows_, 1);
   SPIEL_CHECK_GT(cols_, 1);
 
@@ -387,13 +387,11 @@ int BreakthroughGame::NumDistinctActions() const {
   return rows_ * cols_ * kNumDirections * 2;
 }
 
-std::string BreakthroughGame::SerializeState(const State& state) const {
+std::string BreakthroughState::Serialize() const {
   std::string str = "";
-  auto bstate = dynamic_cast<const BreakthroughState*>(&state);
-  SPIEL_CHECK_TRUE(bstate != nullptr);
   for (int r = 0; r < rows_; r++) {
     for (int c = 0; c < cols_; c++) {
-      absl::StrAppend(&str, CellToString(bstate->board(r, c)));
+      absl::StrAppend(&str, CellToString(board(r, c)));
     }
   }
   return str;

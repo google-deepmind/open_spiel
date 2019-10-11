@@ -15,6 +15,8 @@
 #ifndef THIRD_PARTY_OPEN_SPIEL_SIMULTANEOUS_MOVE_GAME_H_
 #define THIRD_PARTY_OPEN_SPIEL_SIMULTANEOUS_MOVE_GAME_H_
 
+#include <memory>
+
 #include "open_spiel/spiel.h"
 
 // This is the generic superclass for simultaneous move games. A simultaneous
@@ -29,8 +31,7 @@ class SimMoveGame;
 
 class SimMoveState : public State {
  public:
-  SimMoveState(int num_distinct_actions, int num_players)
-      : State(num_distinct_actions, num_players) {}
+  SimMoveState(std::shared_ptr<const Game> game) : State(game) {}
   SimMoveState(const SimMoveState&) = default;
 
   // Subclasses must implement a per-player LegalActions function.

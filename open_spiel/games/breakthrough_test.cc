@@ -24,10 +24,9 @@ namespace {
 namespace testing = open_spiel::testing;
 
 void BasicSerializationTest() {
-  BreakthroughGame game({});
-  std::unique_ptr<State> state = game.NewInitialState();
-  std::unique_ptr<State> state2 =
-      game.DeserializeState(game.SerializeState(*state));
+  std::shared_ptr<const Game> game = LoadGame("breakthrough");
+  std::unique_ptr<State> state = game->NewInitialState();
+  std::unique_ptr<State> state2 = game->DeserializeState(state->Serialize());
   SPIEL_CHECK_EQ(state->ToString(), state2->ToString());
 }
 

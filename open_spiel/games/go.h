@@ -18,6 +18,7 @@
 #include <array>
 #include <cstring>
 #include <map>
+#include <memory>
 #include <string>
 #include <unordered_set>
 #include <vector>
@@ -38,14 +39,14 @@ namespace open_spiel {
 namespace go {
 
 // Constants.
-constexpr int NumPlayers() { return 2; }
-constexpr double LossUtility() { return -1; }
-constexpr double WinUtility() { return 1; }
-constexpr int CellStates() { return 3; }  // Black, white, empty.
+inline constexpr int NumPlayers() { return 2; }
+inline constexpr double LossUtility() { return -1; }
+inline constexpr double WinUtility() { return 1; }
+inline constexpr int CellStates() { return 3; }  // Black, white, empty.
 
 // Go can only end in a draw when using a round komi.
 // We also treat superko as a draw.
-constexpr double DrawUtility() { return 0; }
+inline constexpr double DrawUtility() { return 0; }
 
 // All actions must be in [0; NumDistinctActions).
 inline int NumDistinctActions(int board_size) { return kPass + 1; }
@@ -61,7 +62,8 @@ inline int ColorToPlayer(GoColor c) { return static_cast<int>(c); }
 class GoState : public State {
  public:
   // Constructs a Go state for the empty board.
-  GoState(int board_size, float komi, int handicap);
+  GoState(std::shared_ptr<const Game> game, int board_size, float komi,
+          int handicap);
 
   Player CurrentPlayer() const override {
     return IsTerminal() ? kTerminalPlayerId : ColorToPlayer(to_play_);
@@ -123,7 +125,8 @@ class GoGame : public Game {
   }
 
   std::unique_ptr<State> NewInitialState() const override {
-    return std::unique_ptr<State>(new GoState(board_size_, komi_, handicap_));
+    return std::unique_ptr<State>(
+        new GoState(shared_from_this(), board_size_, komi_, handicap_));
   }
 
   std::vector<int> ObservationNormalizedVectorShape() const override {
@@ -137,8 +140,8 @@ class GoGame : public Game {
   double MinUtility() const override { return LossUtility(); }
   double UtilitySum() const override { return LossUtility() + WinUtility(); }
   double MaxUtility() const override { return WinUtility(); }
-  std::unique_ptr<Game> Clone() const override {
-    return std::unique_ptr<Game>(new GoGame(*this));
+  std::shared_ptr<const Game> Clone() const override {
+    return std::shared_ptr<const Game>(new GoGame(*this));
   }
 
   int MaxGameLength() const override { return go::MaxGameLength(board_size_); }
