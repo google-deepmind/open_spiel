@@ -151,8 +151,10 @@ std::string SearchNode::ToString(const State& state) const {
   return absl::StrFormat(
       "%6s: player: %d, prior: %5.3f, value: %6.3f, sims: %5d, outcome: %s, "
       "%3d children",
-      (action >= 0 ? state.ActionToString(player, action) : "none"), player,
-      prior, (explore_count ? total_reward / explore_count : 0.), explore_count,
+      (action != kInvalidAction ? state.ActionToString(player, action)
+                                : "none"),
+      player, prior, (explore_count ? total_reward / explore_count : 0.),
+      explore_count,
       (outcome.empty() ? "none" : absl::StrFormat("%4.1f", outcome[player])),
       children.size());
 }
@@ -177,10 +179,16 @@ MCTSBot::MCTSBot(
         rng_(seed),
         evaluator_{evaluator} {
     GameType game_type = game.GetType();
-    if (game_type.reward_model != GameType::RewardModel::kTerminal ||
-        game_type.dynamics != GameType::Dynamics::kSequential) {
-      SpielFatalError("Game must have sequential turns and terminal rewards.");
-    }
+    if (game_type.reward_model != GameType::RewardModel::kTerminal)
+      SpielFatalError("Game must have terminal rewards.");
+    if (game_type.dynamics != GameType::Dynamics::kSequential)
+      SpielFatalError("Game must have sequential turns.");
+    if (game_type.information != GameType::Information::kPerfectInformation)
+      SpielFatalError("Game must be perfect information.");
+    if (player < 0 || player >= game.NumPlayers())
+      SpielFatalError(absl::StrFormat(
+          "Game doesn't support that many players. Max: %d, player: %d",
+          game.NumPlayers(), player));
   }
 
 std::pair<ActionsAndProbs, Action> MCTSBot::Step(const State& state) {
@@ -198,11 +206,12 @@ std::pair<ActionsAndProbs, Action> MCTSBot::Step(const State& state) {
     std::cerr << root->ToString(state) << std::endl;
     std::cerr << "Children:" << std::endl;
     std::cerr << root->ChildrenStr(state) << std::endl;
-    std::unique_ptr<State> chosen_state = state.Clone();
-    chosen_state->ApplyAction(best.action);
-    std::cerr << std::endl;
-    std::cerr << "Children of chosen:" << std::endl;
-    std::cerr << best.ChildrenStr(*chosen_state) << std::endl;
+    if (!best.children.empty()) {
+      std::unique_ptr<State> chosen_state = state.Clone();
+      chosen_state->ApplyAction(best.action);
+      std::cerr << "Children of chosen:" << std::endl;
+      std::cerr << best.ChildrenStr(*chosen_state) << std::endl;
+    }
   }
 
   return {{{best.action, 1.0}}, best.action};
@@ -232,14 +241,9 @@ std::unique_ptr<State> MCTSBot::ApplyTreePolicy(
     if (working_state->IsChanceNode()) {
       // For chance nodes, rollout according to chance node's probability
       // distribution
-      ActionsAndProbs outcomes = working_state->ChanceOutcomes();
-
-      double rand = std::uniform_real_distribution<double>(0.0, 1.0)(rng_);
-      int index = 0;
-      for (double sum = 0; sum < rand; ++index) {
-        sum += outcomes[index].second;
-      }
-      Action chosen_action = outcomes[index].first;
+      Action chosen_action = SampleChanceOutcome(
+          working_state->ChanceOutcomes(),
+          std::uniform_real_distribution<double>(0.0, 1.0)(rng_));
 
       for (SearchNode& child : current_node->children) {
         if (child.action == chosen_action) {
@@ -269,7 +273,8 @@ std::unique_ptr<State> MCTSBot::ApplyTreePolicy(
 
 std::unique_ptr<SearchNode> MCTSBot::MCTSearch(const State& state) {
   memory_used_ = 0;
-  auto root = std::make_unique<SearchNode>(-1, state.CurrentPlayer(), 1);
+  auto root = std::make_unique<SearchNode>(
+      kInvalidAction, state.CurrentPlayer(), 1);
   std::vector<SearchNode*> visit_path;
   std::vector<double> returns;
   visit_path.reserve(64);
@@ -295,7 +300,9 @@ std::unique_ptr<SearchNode> MCTSBot::MCTSearch(const State& state) {
     for (auto it = visit_path.rbegin(); it != visit_path.rend(); ++it) {
       SearchNode* node = *it;
 
-      node->total_reward += returns[node->player];
+      if (node->player != kChancePlayerId) {
+        node->total_reward += returns[node->player];
+      }
       node->explore_count += 1;
 
       // Back up solved results as well.

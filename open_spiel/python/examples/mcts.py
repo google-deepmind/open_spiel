@@ -87,7 +87,7 @@ def _play_game(game, bots, initial_actions):
   for action_str in initial_actions:
     action = _get_action(state, action_str)
     if action is None:
-      sys.exit("Illegal action: {}".format(action_str))
+      sys.exit("Invalid action: {}".format(action_str))
 
     history.append(action_str)
     state.apply_action(action)

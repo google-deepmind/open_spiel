@@ -76,7 +76,7 @@ open_spiel::Action GetAction(const open_spiel::State& state,
     if (action_str == state.ActionToString(state.CurrentPlayer(), action))
       return action;
   }
-  return -1;
+  return open_spiel::kInvalidAction;
 }
 
 std::pair<std::vector<double>, std::vector<std::string>> PlayGame(
@@ -90,8 +90,8 @@ std::pair<std::vector<double>, std::vector<std::string>> PlayGame(
 
   for (const auto& action_str : initial_actions) {
     open_spiel::Action action = GetAction(*state, action_str);
-    if (action < 0)
-      open_spiel::SpielFatalError(absl::StrCat("Illegal action: ", action_str));
+    if (action == open_spiel::kInvalidAction)
+      open_spiel::SpielFatalError(absl::StrCat("Invalid action: ", action_str));
 
     history.push_back(action_str);
     state->ApplyAction(action);

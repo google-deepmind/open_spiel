@@ -218,9 +218,16 @@ class MCTSBot(pyspiel.Bot):
     """
     # Check that the game satisfies the conditions for this MCTS implemention.
     game_type = game.get_type()
-    if (game_type.reward_model != pyspiel.GameType.RewardModel.TERMINAL or
-        game_type.dynamics != pyspiel.GameType.Dynamics.SEQUENTIAL):
-      raise ValueError("Game must have sequential turns and terminal rewards.")
+    if game_type.reward_model != pyspiel.GameType.RewardModel.TERMINAL:
+      raise ValueError("Game must have terminal rewards.")
+    if game_type.dynamics != pyspiel.GameType.Dynamics.SEQUENTIAL:
+      raise ValueError("Game must have sequential turns.")
+    if game_type.information != pyspiel.GameType.Information.PERFECT_INFORMATION:
+      raise ValueError("Game must be perfect information.")
+    if player < 0 or player >= game.num_players():
+      raise ValueError(
+          "Game doesn't support that many players. Max: {}, player: {}".format(
+              game.num_players(), player))
 
     super(MCTSBot, self).__init__(game, player)
     self.uct_c = uct_c
@@ -247,10 +254,11 @@ class MCTSBot(pyspiel.Bot):
       print(root.to_str(state))
       print("Children:")
       print(root.children_str(state))
-      chosen_state = state.clone()
-      chosen_state.apply_action(best.action)
-      print("Children of chosen:")
-      print(best.children_str(chosen_state))
+      if best.children:
+        chosen_state = state.clone()
+        chosen_state.apply_action(best.action)
+        print("Children of chosen:")
+        print(best.children_str(chosen_state))
 
     mcts_action = best.action
 
@@ -369,7 +377,8 @@ class MCTSBot(pyspiel.Bot):
         solved = False
 
       for node in reversed(visit_path):
-        node.total_reward += returns[node.player]
+        if node.player != pyspiel.PlayerId.CHANCE:
+          node.total_reward += returns[node.player]
         node.explore_count += 1
 
         if solved and node.children:
