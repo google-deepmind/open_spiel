@@ -1,32 +1,3 @@
-// Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
-// A generalized version of a UniversalPoker poker, a simple but non-trivial poker game
-// described in http://poker.cs.ualberta.ca/publications/UAI05.pdf .
-//
-// Taken verbatim from the linked paper above: "In UniversalPoker hold'em, the deck
-// consists of two suits with three cards in each suit. There are two rounds.
-// In the first round a single private card is dealt to each player. In the
-// second round a single board card is revealed. There is a two-bet maximum,
-// with raise amounts of 2 and 4 in the first and second round, respectively.
-// Both players start the first round with 1 already in the pot.
-//
-// So the maximin sequence is of the form:
-// private card player 0, private card player 1, [bets], public card, [bets]
-// Parameters:
-//     "players"       int    number of players               (default = 2)
-
 #ifndef THIRD_PARTY_OPEN_SPIEL_GAMES_UNIVERSAL_POKER_H_
 #define THIRD_PARTY_OPEN_SPIEL_GAMES_UNIVERSAL_POKER_H_
 
