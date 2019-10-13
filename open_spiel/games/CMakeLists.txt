@@ -80,6 +80,8 @@ add_library (games OBJECT
 )
 target_include_directories (games PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
+add_subdirectory(universal_poker)
+
 # Uncomment to enable Hanabi.
 # add_subdirectory (hanabi)
 
