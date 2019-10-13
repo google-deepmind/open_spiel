@@ -11,7 +11,7 @@
 #include <random>
 
 extern "C" {
-    #include <ACPC/game.h>
+    #include "open_spiel/games/universal_poker/ACPC/game.h"
 }
 
 
@@ -19,6 +19,10 @@ extern "C" {
 class PokerGame {
 private:
     Game game;
+public:
+    const Game &getGame() const;
+
+private:
     std::string gameName;
 
 public:
@@ -27,10 +31,12 @@ public:
     PokerGameState initialState();
     PokerGameState updateState(PokerGameState state, uint32_t actionIdx);
 
+    int getGameLength();
 
-    static std::unique_ptr<PokerGame> createFromGamedef(const char* fileName);
+    static PokerGame createFromGamedef(const std::string &gamedef);
 
-
+private:
+    int getGameLength(PokerGameState state);
 };
 
 

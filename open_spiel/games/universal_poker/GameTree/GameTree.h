@@ -7,8 +7,8 @@
 
 #define MAX_GAME_NODES (16*1024*1024)
 
-#include <BettingTree/BettingTree.h>
-#include <CardTree/CardTree.h>
+#include "open_spiel/games/universal_poker/BettingTree/BettingTree.h"
+#include "open_spiel/games/universal_poker/CardTree/CardTree.h"
 #include <random>
 #include <memory>
 #include <mutex>

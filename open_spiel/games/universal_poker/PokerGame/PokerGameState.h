@@ -6,8 +6,8 @@
 #define DEEPSTACK_CPP_POKERGAMESTATE_H
 
 
-#include <CardTree/CardSet.h>
-#include <BettingTree/BettingNode.h>
+#include "open_spiel/games/universal_poker/CardTree/CardSet.h"
+#include "open_spiel/games/universal_poker/BettingTree/BettingNode.h"
 
 #define PLAYER_DEALER 255
 

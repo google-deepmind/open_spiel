@@ -10,7 +10,7 @@
 #include <string>
 extern "C"
 {
-    #include <ACPC/game.h>
+    #include "open_spiel/games/universal_poker/ACPC/game.h"
 };
 
 #define ACTION_FOLD 0

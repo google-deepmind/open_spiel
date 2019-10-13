@@ -2,13 +2,11 @@
 
 #include <algorithm>
 #include <array>
-#include <numeric>
 #include <utility>
-
-#include "open_spiel/abseil-cpp/absl/strings/str_format.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_join.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel_utils.h"
+
+#include "open_spiel/games/universal_poker/PokerGame/PokerGame.h"
 
 namespace open_spiel::universal_poker {
     const GameType kGameType{
@@ -26,16 +24,19 @@ namespace open_spiel::universal_poker {
             /*provides_observation=*/true,
             /*provides_observation_as_normalized_vector=*/true,
             /*parameter_specification=*/
-                           {{"players", GameParameter(kDefaultPlayers)}}};
+                           {{"gameDesc", GameParameter(gameDesc)}}};
 
-    std::shared_ptr<const Game> Factory(const GameParameters& params) {
+    std::shared_ptr<const Game> Factory(const GameParameters &params) {
         return std::shared_ptr<const Game>(new UniversalPokerGame(params));
     }
 
     REGISTER_SPIEL_GAME(kGameType, Factory);
 
     // namespace universal_poker
-    UniversalPokerState::UniversalPokerState(std::shared_ptr<const Game> game) : State(game) {
+    UniversalPokerState::UniversalPokerState(std::shared_ptr<const Game> game)
+            : State(game),
+            internalState_( ) {
+
 
     }
 
@@ -83,42 +84,90 @@ namespace open_spiel::universal_poker {
         return State::ChanceOutcomes();
     }
 
+    std::vector<Action> UniversalPokerState::LegalActions() const {
+        return std::vector<Action>();
+    }
 
+
+    /**
+     * Universal Poker Game Constructor
+     * @param params
+     */
     UniversalPokerGame::UniversalPokerGame(const GameParameters &params)
-        :Game(kGameType, params)
-    {
+            : Game(kGameType, params),
+              gameDesc_(ParameterValue<std::string>("gameDesc")),
+              pokerGame_(PokerGame::createFromGamedef(gameDesc_)) {
+        maxGameLength_ = pokerGame_.getGameLength();
+        maxBoardCardCombinations_ = numBoardCardCombinations_(0);
 
+        for (int r = 1; r < numRounds_(); r++) {
+            int combos = numBoardCardCombinations_(r);
+            if (combos > maxBoardCardCombinations_) {
+                maxBoardCardCombinations_ = combos;
+            }
+        }
     }
 
     std::unique_ptr<State> UniversalPokerGame::NewInitialState() const {
-        return std::unique_ptr<State>();
-    }
-
-    double UniversalPokerGame::MaxUtility() const {
-        return 0;
-    }
-
-    double UniversalPokerGame::MinUtility() const {
-        return 0;
+        return std::unique_ptr<State>(new UniversalPokerState(shared_from_this()));
     }
 
     std::vector<int> UniversalPokerGame::InformationStateNormalizedVectorShape() const {
-        return Game::InformationStateNormalizedVectorShape();
+        // One-hot encoding for player number (who is to play).
+        // 2 slots of cards (total_cards_ bits each): private card, public card
+        // Followed by maximum game length * 2 bits each (call / raise)
+        return {(numPlayers_()) + ((numBoardCards_(numRounds_() - 1) + numHoleCards_(0))) + (MaxGameLength() * 2)};
     }
 
     std::vector<int> UniversalPokerGame::ObservationNormalizedVectorShape() const {
-        return Game::ObservationNormalizedVectorShape();
+        // One-hot encoding for player number (who is to play).
+        // 2 slots of cards (total_cards_ bits each): private card, public card
+        // Followed by the contribution of each player to the pot
+        return {(numPlayers_()) + (numBoardCards_(numRounds_() - 1) + numHoleCards_(0)) + (numPlayers_())};
     }
 
-    int UniversalPokerGame::MaxGameLength() const {
-        return 0;
+    double UniversalPokerGame::MaxUtility() const {
+        // In poker, the utility is defined as the money a player has at the end of
+        // the game minus then money the player had before starting the game.
+        // The most a player can win *per opponent* is the most each player can put
+        // into the pot, which is the raise amounts on each round times the maximum
+        // number raises, plus the original chip they put in to play.
+        return 1.0;
+    }
+
+    double UniversalPokerGame::MinUtility() const {
+        // In poker, the utility is defined as the money a player has at the end of
+        // the game minus then money the player had before starting the game.
+        // The most any single player can lose is the maximum number of raises per
+        // round times the amounts of each of the raises, plus the original chip they
+        // put in to play.
+        return -1.0;
+    }
+
+
+    int UniversalPokerGame::numBoardCardCombinations_(const int r) const {
+        assert(r < numRounds_());
+        int deckSize = deckSize_();
+
+        for (int i = 0; i < r; i++) {
+            deckSize -= numBoardCards_(r);
+        }
+
+        return choose_(deckSize, numBoardCards_(r));
+    }
+
+    int UniversalPokerGame::choose_(int n, int k) {
+        if (k == 0) {
+            return 1;
+        }
+        return (n * choose_(n - 1, k - 1)) / k;
     }
 
     int UniversalPokerGame::MaxChanceOutcomes() const {
-        return Game::MaxChanceOutcomes();
+        return maxBoardCardCombinations_;
     }
 
     int UniversalPokerGame::NumPlayers() const {
-        return 0;
+        return numPlayers_();
     }
 }

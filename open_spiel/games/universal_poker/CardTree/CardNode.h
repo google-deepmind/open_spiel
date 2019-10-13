@@ -11,8 +11,8 @@
 #include <eigen3/Eigen/Dense>
 #endif
 
-#include "CardTree/CardSet.h"
-#include "CardTree/CardSetIndex.h"
+#include "open_spiel/games/universal_poker/CardTree/CardSet.h"
+#include "open_spiel/games/universal_poker/CardTree/CardSetIndex.h"
 
 
 typedef  Eigen::Map<Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>, 0,

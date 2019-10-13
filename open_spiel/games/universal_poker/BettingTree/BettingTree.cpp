@@ -5,12 +5,12 @@
 #include <cassert>
 extern "C"
 {
-#include <ACPC/game.h>
+#include "open_spiel/games/universal_poker/ACPC/game.h"
 };
 
 #include <cmath>
-#include <ACPC/GameDefinitions.h>
-#include <ACPC/game.h>
+#include "open_spiel/games/universal_poker/ACPC/GameDefinitions.h"
+#include "open_spiel/games/universal_poker/ACPC/game.h"
 #include <algorithm>
 #include <iostream>
 #include <sstream>

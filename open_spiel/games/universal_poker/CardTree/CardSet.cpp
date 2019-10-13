@@ -9,8 +9,8 @@
 std::string suitChars = "cdhs";
 std::string rankChars = "23456789TJQKA";
 extern "C" {
-#include "ACPC/game.h"
-#include "ACPC/evalHandTables"
+#include "open_spiel/games/universal_poker/ACPC/game.h"
+#include "open_spiel/games/universal_poker/ACPC/evalHandTables"
 }
 CardSet::CardSet()
     :cs()

@@ -6,8 +6,8 @@
 #define DEEPSTACK_CPP_GAMENODE_H
 
 
-#include <BettingTree/BettingNode.h>
-#include <CardTree/CardNode.h>
+#include "open_spiel/games/universal_poker/BettingTree/BettingNode.h"
+#include "open_spiel/games/universal_poker/CardTree/CardNode.h"
 
 class GameNode {
 public:

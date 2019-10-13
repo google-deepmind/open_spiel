@@ -2,7 +2,7 @@
 // Created by Dennis Jöst on 03.05.18.
 //
 
-#include <ACPC/game.h>
+#include "open_spiel/games/universal_poker/ACPC/game.h"
 #include <iostream>
 #include "CardTree.h"
 #define DEBUG 0

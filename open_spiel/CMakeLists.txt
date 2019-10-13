@@ -71,6 +71,8 @@ set (OPEN_SPIEL_OBJECTS
   $<TARGET_OBJECTS:game_transforms>
   $<TARGET_OBJECTS:bridge_double_dummy_solver>
   # $<TARGET_OBJECTS:hanabi_learning_environment>
+  $<TARGET_OBJECTS:universal_poker_clib>
+  $<TARGET_OBJECTS:universal_poker_lib>
   $<TARGET_OBJECTS:algorithms>
 )
 
