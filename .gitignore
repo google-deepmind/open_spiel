@@ -30,3 +30,5 @@ get-pip.py
 
 # IDE
 .idea/
+
+open_spiel/cmake-build-debug/
