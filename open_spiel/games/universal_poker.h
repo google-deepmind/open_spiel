@@ -39,7 +39,11 @@ class UniversalPokerState : public State {
 
     std::vector<Action> LegalActions() const override;
 
+protected:
+    void DoApplyAction(Action action_id) override;
+
 private:
+    const UniversalPokerGame* pokerGame_ ;
     PokerGameState internalState_;
 };
 
@@ -47,7 +51,7 @@ class UniversalPokerGame : public Game {
  public:
   explicit UniversalPokerGame(const GameParameters& params);
 
-  int NumDistinctActions() const override { return 3; }
+  int NumDistinctActions() const override { return 4; }
   std::unique_ptr<State> NewInitialState() const override;
   int NumPlayers() const override;
   double MinUtility() const override;
@@ -66,18 +70,22 @@ class UniversalPokerGame : public Game {
 private:
     std::string gameDesc_;
     PokerGame pokerGame_;
+public:
+    const PokerGame &getPokerGame() const;
+
+private:
     int maxGameLength_;
     int maxBoardCardCombinations_;
 
 protected:
-    int numPlayers_() const {return pokerGame_.getGame().numPlayers;};
-    int deckSize_() const {return pokerGame_.getGame().numRanks * pokerGame_.getGame().numSuits; };
-    int numRounds_() const {return pokerGame_.getGame().numRounds;};
-    int stackSize_(int p) const {return pokerGame_.getGame().stack[p]; };
-    int numHoleCards_(int p) const {return pokerGame_.getGame().numHoleCards; };
-    int numRounds() const {return pokerGame_.getGame().numRounds; };
+    int numPlayers_() const {return pokerGame_.getGame()->numPlayers;};
+    int deckSize_() const {return pokerGame_.getGame()->numRanks * pokerGame_.getGame()->numSuits; };
+    int numRounds_() const {return pokerGame_.getGame()->numRounds;};
+    int stackSize_(int p) const {return pokerGame_.getGame()->stack[p]; };
+    int numHoleCards_(int p) const {return pokerGame_.getGame()->numHoleCards; };
+    int numRounds() const {return pokerGame_.getGame()->numRounds; };
 
-    int numBoardCards_(int r) const {return pokerGame_.getGame().numBoardCards[r]; };
+    int numBoardCards_(int r) const {return pokerGame_.getGame()->numBoardCards[r]; };
     int numBoardCardCombinations_(int r) const;
 
     static int choose_(int n, int k);

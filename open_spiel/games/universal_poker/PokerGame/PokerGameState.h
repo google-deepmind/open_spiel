@@ -9,7 +9,6 @@
 #include "open_spiel/games/universal_poker/CardTree/CardSet.h"
 #include "open_spiel/games/universal_poker/BettingTree/BettingNode.h"
 
-#define PLAYER_DEALER 255
 
 class PokerGameState {
 private:
@@ -34,7 +33,7 @@ public:
     };
 
 private:
-    Game* game;
+    const Game* game;
     State handState;
     CardSet deck;
     CardSet handCards[MAX_PLAYERS];
@@ -48,18 +47,18 @@ private:
     std::string bettingHistory;
 
 public:
-    PokerGameState(Game* game, PokerGameState* parent, GameAction action);
-    std::string getName();
-    BettingNode::BettingNodeType getType();
-    uint32_t getNbActions();
-    uint32_t getPlayer();
-    double getTotalReward(int player);
-    uint64_t getCardState(int player);
-    uint64_t getBetSize(int player);
-    std::string getBettingHistory();
-    uint64_t getCardsInDeck();
+    PokerGameState(const Game* game, PokerGameState* parent, GameAction action);
+    std::string getName() const;
+    BettingNode::BettingNodeType getType() const;
+    uint32_t getNbActions() const;
+    uint32_t getPlayer() const;
+    double getTotalReward(int player) const;
+    uint64_t getCardState(int player) const;
+    uint64_t getBetSize(int player) const;
+    std::string getBettingHistory() const;
+    uint64_t getCardsInDeck() const;
 
-    std::vector<GameAction> getActionsAllowed();
+    std::vector<GameAction> getActionsAllowed() const;
 
 protected:
     void initDeck();

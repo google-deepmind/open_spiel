@@ -20,7 +20,7 @@ class PokerGame {
 private:
     Game game;
 public:
-    const Game &getGame() const;
+    const Game* getGame() const ;
 
 private:
     std::string gameName;
@@ -29,7 +29,7 @@ public:
     PokerGame(Game* game, std::string gameName);
 
     PokerGameState initialState();
-    PokerGameState updateState(PokerGameState state, uint32_t actionIdx);
+    PokerGameState updateState(PokerGameState state, uint32_t actionIdx) const;
 
     int getGameLength();
 

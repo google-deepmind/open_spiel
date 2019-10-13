@@ -35,21 +35,21 @@ namespace open_spiel::universal_poker {
     // namespace universal_poker
     UniversalPokerState::UniversalPokerState(std::shared_ptr<const Game> game)
             : State(game),
-            internalState_( ) {
-
-
+            pokerGame_((UniversalPokerGame*)game.get()),
+            internalState_( pokerGame_->getPokerGame().getGame(), nullptr, PokerGameState::GameAction()) {
     }
 
     std::string UniversalPokerState::ToString() const {
-        return std::__cxx11::string();
+        return internalState_.getName();
     }
 
     bool UniversalPokerState::IsTerminal() const {
-        return false;
+        return internalState_.getType() == BettingNode::TERMINAL_FOLD_NODE ||
+        internalState_.getType() == BettingNode::TERMINAL_SHOWDOWN_NODE;
     }
 
     std::string UniversalPokerState::InformationState(Player player) const {
-        return State::InformationState(player);
+        return "";
     }
 
     std::string UniversalPokerState::ActionToString(Player player, Action move) const {
@@ -57,35 +57,69 @@ namespace open_spiel::universal_poker {
     }
 
     Player UniversalPokerState::CurrentPlayer() const {
-        return 0;
+        if( IsTerminal() ){
+            return Player(kTerminalPlayerId);
+        }
+
+        return Player(internalState_.getPlayer() == PLAYER_DEALER ? kChancePlayerId : internalState_.getPlayer());
     }
 
     std::vector<double> UniversalPokerState::Returns() const {
-        return std::vector<double>();
+        if (!IsTerminal()) {
+            return std::vector<double>(num_players_, 0.0);
+        }
+
+        std::vector<double> returns(num_players_);
+        for (auto player = Player{0}; player < num_players_; ++player) {
+            // Money vs money at start.
+            returns[player] = internalState_.getTotalReward(player);
+        }
+
+        return returns;
     }
 
     void UniversalPokerState::InformationStateAsNormalizedVector(Player player, std::vector<double> *values) const {
-        State::InformationStateAsNormalizedVector(player, values);
+
+
+
     }
 
     std::string UniversalPokerState::Observation(Player player) const {
-        return State::Observation(player);
+        return "";
     }
 
     void UniversalPokerState::ObservationAsNormalizedVector(Player player, std::vector<double> *values) const {
-        State::ObservationAsNormalizedVector(player, values);
     }
 
     std::unique_ptr<State> UniversalPokerState::Clone() const {
-        return std::unique_ptr<State>();
+        return std::unique_ptr<State>(new UniversalPokerState(*this));
     }
 
     std::vector<std::pair<Action, double>> UniversalPokerState::ChanceOutcomes() const {
-        return State::ChanceOutcomes();
+        SPIEL_CHECK_TRUE(IsChanceNode());
+        std::vector<std::pair<Action, double>> outcomes;
+        auto internalActions = internalState_.getActionsAllowed();
+
+        const double p = 1.0 / (double)internalActions.size();
+        for (uint64_t card = 0; card < internalActions.size(); ++card) {
+            outcomes.push_back({card, p});
+        }
+        return outcomes;
     }
 
     std::vector<Action> UniversalPokerState::LegalActions() const {
-        return std::vector<Action>();
+        std::vector<Action> actions;
+
+        for( uint64_t idx = 0; idx < internalState_.getActionsAllowed().size(); idx++){
+            actions.push_back(idx);
+        }
+
+        return actions;
+    }
+
+    void UniversalPokerState::DoApplyAction(Action action_id) {
+        internalState_ = pokerGame_->getPokerGame().updateState(internalState_, action_id);
+
     }
 
 
@@ -116,14 +150,14 @@ namespace open_spiel::universal_poker {
         // One-hot encoding for player number (who is to play).
         // 2 slots of cards (total_cards_ bits each): private card, public card
         // Followed by maximum game length * 2 bits each (call / raise)
-        return {(numPlayers_()) + ((numBoardCards_(numRounds_() - 1) + numHoleCards_(0))) + (MaxGameLength() * 2)};
+        return {0}; //{(numPlayers_()) + ((numBoardCards_(numRounds_() - 1) + numHoleCards_(0))) + (MaxGameLength() * 2)};
     }
 
     std::vector<int> UniversalPokerGame::ObservationNormalizedVectorShape() const {
         // One-hot encoding for player number (who is to play).
         // 2 slots of cards (total_cards_ bits each): private card, public card
         // Followed by the contribution of each player to the pot
-        return {(numPlayers_()) + (numBoardCards_(numRounds_() - 1) + numHoleCards_(0)) + (numPlayers_())};
+        return {0}; //{(numPlayers_()) + (numBoardCards_(numRounds_() - 1) + numHoleCards_(0)) + (numPlayers_())};
     }
 
     double UniversalPokerGame::MaxUtility() const {
@@ -132,7 +166,7 @@ namespace open_spiel::universal_poker {
         // The most a player can win *per opponent* is the most each player can put
         // into the pot, which is the raise amounts on each round times the maximum
         // number raises, plus the original chip they put in to play.
-        return 1.0;
+        return 100.0;
     }
 
     double UniversalPokerGame::MinUtility() const {
@@ -141,7 +175,7 @@ namespace open_spiel::universal_poker {
         // The most any single player can lose is the maximum number of raises per
         // round times the amounts of each of the raises, plus the original chip they
         // put in to play.
-        return -1.0;
+        return -100.0;
     }
 
 
@@ -169,5 +203,9 @@ namespace open_spiel::universal_poker {
 
     int UniversalPokerGame::NumPlayers() const {
         return numPlayers_();
+    }
+
+    const PokerGame &UniversalPokerGame::getPokerGame() const {
+        return pokerGame_;
     }
 }

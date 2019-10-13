@@ -21,7 +21,7 @@ PokerGameState PokerGame::initialState() {
 
 }
 
-PokerGameState PokerGame::updateState(PokerGameState state, uint32_t actionIdx) {
+PokerGameState PokerGame::updateState(PokerGameState state, uint32_t actionIdx) const {
 
 
     const std::vector<PokerGameState::GameAction> &actionsAllowed = state.getActionsAllowed();
@@ -42,8 +42,8 @@ PokerGame PokerGame::createFromGamedef(const std::string& gamedef) {
     return result;
 }
 
-const Game &PokerGame::getGame() const {
-    return game;
+const Game* PokerGame::getGame() const {
+    return &game;
 }
 
 int PokerGame::getGameLength() {

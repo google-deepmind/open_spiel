@@ -31,7 +31,7 @@ I bit_twiddle_permute(I v) {
     return w;
 }
 
-PokerGameState::PokerGameState(Game* game1, PokerGameState* parent, GameAction action)
+PokerGameState::PokerGameState(const Game* game1, PokerGameState* parent, GameAction action)
 :game(game1), actionsAllowed()
 {
     for (double &r : totalReward) {
@@ -40,7 +40,7 @@ PokerGameState::PokerGameState(Game* game1, PokerGameState* parent, GameAction a
 
     if(parent == nullptr){
         //This is a really fresh game
-        initState(game, handId++, &handState);
+        initState(game, handId, &handState);
         for( auto &card : handState.boardCards) card=255;
         for (auto &holeCard : handState.holeCards) {
             for (auto &card : holeCard) card = 255;
@@ -77,11 +77,11 @@ void PokerGameState::initDeck() {
     }
 }
 
-std::string PokerGameState::getName() {
+std::string PokerGameState::getName() const {
     return name;
 }
 
-std::vector<PokerGameState::GameAction> PokerGameState::getActionsAllowed() {
+std::vector<PokerGameState::GameAction> PokerGameState::getActionsAllowed() const {
     return actionsAllowed;
 }
 
@@ -228,15 +228,15 @@ std::vector<PokerGameState::GameAction> PokerGameState::calculateActionsAllowed(
 
 }
 
-BettingNode::BettingNodeType PokerGameState::getType() {
+BettingNode::BettingNodeType PokerGameState::getType() const{
     return nodeType;
 }
 
-uint32_t PokerGameState::getNbActions() {
+uint32_t PokerGameState::getNbActions() const{
     return static_cast<uint32_t>(actionsAllowed.size());
 }
 
-uint32_t PokerGameState::getPlayer() {
+uint32_t PokerGameState::getPlayer() const{
     if( nodeType == BettingNode::CHOICE_NODE ) {
         return currentPlayer(game, &handState);
     }
@@ -244,14 +244,14 @@ uint32_t PokerGameState::getPlayer() {
     return PLAYER_DEALER;
 }
 
-double PokerGameState::getTotalReward(int player) {
+double PokerGameState::getTotalReward(int player) const{
     assert(player >= 0);
     assert(player < game->numPlayers);
     assert(nodeType == BettingNode::TERMINAL_SHOWDOWN_NODE || nodeType == BettingNode::TERMINAL_FOLD_NODE);
     return this->totalReward[player];
 }
 
-uint64_t PokerGameState::getCardState(int player) {
+uint64_t PokerGameState::getCardState(int player) const{
     assert(player >= 0);
     assert(player < game->numPlayers || player == PLAYER_DEALER);
 
@@ -268,7 +268,7 @@ uint64_t PokerGameState::getCardState(int player) {
     return cardState;
 }
 
-uint64_t PokerGameState::getBetSize(int player) {
+uint64_t PokerGameState::getBetSize(int player) const{
     assert(player >= 0);
     assert(player < game->numPlayers || player == PLAYER_DEALER);
 
@@ -284,11 +284,11 @@ uint64_t PokerGameState::getBetSize(int player) {
     return betSize;
 }
 
-uint64_t PokerGameState::getCardsInDeck() {
+uint64_t PokerGameState::getCardsInDeck() const{
     return __builtin_popcountl( deck.cs.cards );
 }
 
-std::string PokerGameState::getBettingHistory() {
+std::string PokerGameState::getBettingHistory() const{
     return bettingHistory;
 };
 

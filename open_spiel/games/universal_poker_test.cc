@@ -25,10 +25,6 @@ void BasicUniversalPokerTests() {
   testing::LoadGameTest("universal_poker");
   testing::ChanceOutcomesTest(*LoadGame("universal_poker"));
   testing::RandomSimTest(*LoadGame("universal_poker"), 100);
-  for (Player players = 3; players <= 5; players++) {
-    testing::RandomSimTest(
-        *LoadGame("universal_poker", {{"players", GameParameter(players)}}), 100);
-  }
 }
 
 }  // namespace
