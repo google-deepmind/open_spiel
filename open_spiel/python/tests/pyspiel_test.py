@@ -1,4 +1,4 @@
-# Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+ # Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,6 +20,9 @@ from __future__ import print_function
 
 from absl.testing import absltest
 import six
+
+from open_spiel.python.algorithms import cfr
+from open_spiel.python.algorithms import exploitability
 
 from open_spiel.python import policy
 import pyspiel
@@ -199,5 +202,33 @@ class PyspielTest(absltest.TestCase):
                                           seed, -1)
 
 
-if __name__ == "__main__":
-  absltest.main()
+ # Compare exloitability for two games
+ def test_compare_universal_poker_exploitability(self, game_1="leduc_poker", game_2="universal_poker"):
+     game_1 = game_1
+     game_2 = game_2 # parameters need to be set to match the game_1
+     players = 2
+     iterations = 100
+     print_freq = 10
+
+     game_1 = pyspiel.load_game(game_1,
+                                {"players": pyspiel.GameParameter(players)})
+     cfr_solver_1 = cfr.CFRSolver(game_1)
+     game_2 = pyspiel.load_game(game_2,
+                                {"players": pyspiel.GameParameter(players)})
+     cfr_solver_2 = cfr.CFRSolver(game_2)
+
+     for i in range(iterations):
+         cfr_solver_1.evaluate_and_update_policy()
+         cfr_solver_2.evaluate_and_update_policy()
+         # if i % print_freq == 0:
+         #     conv_1 = exploitability.exploitability(game_1, cfr_solver_1.average_policy())
+         #     conv_2 = exploitability.exploitability(game_2, cfr_solver_2.average_policy())
+         #     print("Iteration {} exploitability of the {}: {} {}: {}".format(i, game_1, game_2, conv_1, conv_2))
+     conv_1 = exploitability.exploitability(game_1, cfr_solver_1.average_policy())
+     conv_2 = exploitability.exploitability(game_2, cfr_solver_2.average_policy())
+     # print("Final exploitability is {}: {} {}: {}".format(game_1, game_2, conv_1, conv_2))
+     self.assertEqual(conv_1, conv_2)
+
+  if __name__ == "__main__":
+    absltest.main()
+
