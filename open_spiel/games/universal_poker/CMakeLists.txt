@@ -1,6 +1,3 @@
-project(${CMAKE_PROJECT_NAME}_lib)
-
-
 set(HEADER_FILES
         BettingTree/BettingNode.h
         BettingTree/BettingTree.h
@@ -40,11 +37,13 @@ set(SOURCE_FILES
         PokerGame/PokerGame.cpp
         )
 
-add_library(${CMAKE_PROJECT_NAME}_clib ${CLIB_FILES} )
-set_target_properties(${CMAKE_PROJECT_NAME}_clib PROPERTIES POSITION_INDEPENDENT_CODE ON)
+add_library(universal_poker_clib ${CLIB_FILES} )
+set_target_properties(universal_poker_clib PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
+include_directories(.)
 
 # The library contains header and source files.
-add_library(${CMAKE_PROJECT_NAME}_lib STATIC
+add_library(universal_poker_lib STATIC
     ${SOURCE_FILES}
     ${HEADER_FILES}
 )
