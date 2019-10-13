@@ -73,6 +73,8 @@ add_library (games OBJECT
   tiny_bridge.h
   tiny_hanabi.cc
   tiny_hanabi.h
+  universal_poker.cc
+  universal_poker.h
   y.cc
   y.h
 )
@@ -284,6 +286,11 @@ add_executable(tiny_hanabi_test tiny_hanabi_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>
                $<TARGET_OBJECTS:algorithms>)
 add_test(tiny_hanabi_test tiny_hanabi_test)
+
+add_executable(universal_poker_test universal_poker_test.cc ${OPEN_SPIEL_OBJECTS}
+        $<TARGET_OBJECTS:tests>
+        $<TARGET_OBJECTS:algorithms>)
+add_test(universal_poker_test.cc universal_poker_test)
 
 add_executable(y_test y_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
