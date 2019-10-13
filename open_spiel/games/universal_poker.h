@@ -48,77 +48,6 @@ class UniversalPokerState : public State {
   std::unique_ptr<State> Clone() const override;
   // The probability of taking each possible action in a particular info state.
   std::vector<std::pair<Action, double>> ChanceOutcomes() const override;
-
-  // Additional methods
-  int round() const { return round_; }
-  int deck_size() const { return deck_size_; }
-  int public_card() const { return public_card_; }
-  int raises() const { return num_raises_; }
-  int private_card(Player player) const { return private_cards_[player]; }
-  std::vector<Action> LegalActions() const override;
-
-  // Returns a vector of MaxGameLength containing all of the betting actions
-  // taken so far. If the round has ended, the actions are kInvalidAction.
-  std::vector<int> padded_betting_sequence() const;
-
- protected:
-  // The meaning of `action_id` varies:
-  // - At decision nodes, one of ActionType::{kFold, kCall, kRaise}.
-  // - At a chance node, indicates the card to be dealt to the player or
-  // revealed publicly. The interpretation of each chance outcome depends on
-  // the number of players, but always follows:
-  //    lowest value of first suit,
-  //    lowest value of second suit,
-  //    next lowest value of first suit,
-  //    next lowest value of second suit,
-  //             .
-  //             .
-  //             .
-  //    highest value of first suit,
-  //    highest value of second suit.
-  // So, e.g. in the two player case (6 cards): 0 = Jack1, 1 = Jack2,
-  // 2 = Queen1, ... , 5 = King2.
-  void DoApplyAction(Action move) override;
-
- private:
-  int NextPlayer() const;
-  void ResolveWinner();
-  bool ReadyForNextRound() const;
-  void NewRound();
-  int RankHand(Player player) const;
-  void SequenceAppendMove(int move);
-  void Ante(Player player, int amount);
-
-  // Fields sets to bad/invalid values. Use Game::NewInitialState().
-  Player cur_player_;
-
-  int num_calls_;    // Number of calls this round (total, not per player).
-  int num_raises_;   // Number of raises made in the round (not per player).
-  int round_;        // Round number (1 or 2).
-  int stakes_;       // The current 'level' of the bet.
-  int num_winners_;  // Number of winning players.
-  int pot_;          // Number of chips in the pot.
-  int public_card_;  // The public card revealed after round 1.
-  int deck_size_;    // Number of cards remaining; not equal deck_.size()
-  int private_cards_dealt_;  // How many private cards currently dealt.
-  int remaining_players_;    // Num. players still in (not folded).
-
-  // Is this player a winner? Indexed by pid.
-  std::vector<bool> winner_;
-  // Each player's single private card. Indexed by pid.
-  std::vector<int> private_cards_;
-  // Cards by value (0-6 for standard 2-player game, -1 if no longer in the
-  // deck.)
-  std::vector<int> deck_;
-  // How much money each player has, indexed by pid.
-  std::vector<double> money_;
-  // How much each player has contributed to the pot, indexed by pid.
-  std::vector<int> ante_;
-  // Flag for whether the player has folded, indexed by pid.
-  std::vector<bool> folded_;
-  // Sequence of actions for each round. Needed to report information state.
-  std::vector<int> round1_sequence_;
-  std::vector<int> round2_sequence_;
 };
 
 class UniversalPokerGame : public Game {
@@ -127,8 +56,8 @@ class UniversalPokerGame : public Game {
 
   int NumDistinctActions() const override { return 3; }
   std::unique_ptr<State> NewInitialState() const override;
-  int MaxChanceOutcomes() const override { return total_cards_; }
-  int NumPlayers() const override { return num_players_; }
+  int MaxChanceOutcomes() const override;
+  int NumPlayers() const override;
   double MinUtility() const override;
   double MaxUtility() const override;
   double UtilitySum() const override { return 0; }
@@ -137,16 +66,8 @@ class UniversalPokerGame : public Game {
   }
   std::vector<int> InformationStateNormalizedVectorShape() const override;
   std::vector<int> ObservationNormalizedVectorShape() const override;
-  int MaxGameLength() const override {
-    // 2 rounds. Longest one for e.g. 4-player is, e.g.:
-    //   check, check, check, raise, call, call, raise, call, call, call
-    // = 2 raises + (num_players_-1)*2 calls + (num_players_-2) calls
-    return 2 * (2 + (num_players_ - 1) * 2 + (num_players_ - 2));
-  }
+  int MaxGameLength() const override;
 
- private:
-  int num_players_;  // Number of players.
-  int total_cards_;  // Number of cards total cards in the game.
 };
 
 }  // namespace universal_poker
