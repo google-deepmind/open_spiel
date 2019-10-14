@@ -61,7 +61,8 @@ void TFBatchTrajectoryRecorder::SampleChance(int idx) {
   while (states_[idx]->IsChanceNode()) {
     std::vector<std::pair<open_spiel::Action, double>> outcomes =
         states_[idx]->ChanceOutcomes();
-    Action action = open_spiel::SampleChanceOutcome(outcomes, dist_(rng_));
+    Action action =
+        open_spiel::SampleChanceOutcome(outcomes, dist_(rng_)).first;
     states_[idx]->ApplyAction(action);
   }
 

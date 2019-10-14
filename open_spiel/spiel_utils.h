@@ -16,6 +16,7 @@
 #define THIRD_PARTY_OPEN_SPIEL_SPIEL_UTILS_H_
 
 #include <algorithm>
+#include <cmath>
 #include <cstdint>
 #include <limits>
 #include <locale>
@@ -164,6 +165,10 @@ bool Near(T a, T b, T epsilon) {
 #define SPIEL_CHECK_LT(x, y) SPIEL_CHECK_OP(x, <, y)
 #define SPIEL_CHECK_EQ(x, y) SPIEL_CHECK_OP(x, ==, y)
 #define SPIEL_CHECK_NE(x, y) SPIEL_CHECK_OP(x, !=, y)
+#define SPIEL_CHECK_PROB(x) \
+  SPIEL_CHECK_GE(x, 0);     \
+  SPIEL_CHECK_LE(x, 1);     \
+  SPIEL_CHECK_FALSE(std::isnan(x) || std::isinf(x))
 
 // Checks that x and y are equal to the default dynamic threshold proportional
 // to max(|x|, |y|).

@@ -60,7 +60,8 @@ double ExternalSamplingMCCFRSolver::UpdateRegrets(const State& state,
   if (state.IsTerminal()) {
     return state.PlayerReturn(player);
   } else if (state.IsChanceNode()) {
-    Action action = SampleChanceOutcome(state.ChanceOutcomes(), dist_(*rng));
+    Action action =
+        SampleChanceOutcome(state.ChanceOutcomes(), dist_(*rng)).first;
     return UpdateRegrets(*state.Child(action), player, rng);
   } else if (state.IsSimultaneousNode()) {
     SpielFatalError(
