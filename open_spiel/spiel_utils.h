@@ -51,9 +51,10 @@ std::ostream& operator<<(std::ostream& stream, const std::vector<T>& v) {
   return stream;
 }
 
+namespace internal {
 // SpielStrOut(out, a, b, c) is equivalent to:
 //    out << a << b << c;
-// It is useful mostly to enable absl::StrAppend and absl::StrCat, below.
+// It is used to enable SpielStrCat, below.
 template <typename Out, typename T>
 void SpielStrOut(Out& out, const T& arg) {
   out << arg;
@@ -65,14 +66,14 @@ void SpielStrOut(Out& out, const T& arg1, Args&&... args) {
   SpielStrOut(out, std::forward<Args>(args)...);
 }
 
-namespace internal {
 // Builds a string from pieces:
 //
 //  SpielStrCat(1, " + ", 1, " = ", 2) --> "1 + 1 = 2"
 //
 // Converting the parameters to strings is done using the stream operator<<.
 // This is only kept around to be used in the SPIEL_CHECK_* macros and should
-// not be called by any code outside of this file.
+// not be called by any code outside of this file. Prefer absl::StrCat instead.
+// It is kept here due to support for more types, including char.
 template <typename... Args>
 std::string SpielStrCat(Args&&... args) {
   std::ostringstream out;

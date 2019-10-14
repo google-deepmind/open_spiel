@@ -214,7 +214,7 @@ ActionsAndProbs CoinState::ChanceOutcomes() const {
 std::string CoinState::Observation(Player player) const {
   std::ostringstream out;
   // A player only learns its own preference.
-  SpielStrOut(out, player_preferences_[player], "\n");
+  out << player_preferences_[player] << "\n";
   // Table of how many coins of each type were collected by each player.
   PrintCoinsCollected(out);
   // Current positions of all coins and players on the board.
@@ -342,56 +342,56 @@ std::string CoinState::ActionToString(Player player, Action action_id) const {
 
 void CoinState::PrintCoinsCollected(std::ostream& out) const {
   // Prints table with players as rows and coin_colors as columns.
-  SpielStrOut(out, "        ");
+  out << "        ";
   for (int coint_color = 0; coint_color < parent_game_.NumCoinColors();
        coint_color++) {
-    SpielStrOut(out, CoinSymbol(coint_color), " ");
+    out << CoinSymbol(coint_color) << " ";
   }
-  SpielStrOut(out, "\n");
+  out << "\n";
   for (auto player = Player{0}; player < num_players_; player++) {
-    SpielStrOut(out, "player", player, " ");
+    out << "player" << player << " ";
     for (int coint_color = 0; coint_color < parent_game_.NumCoinColors();
          coint_color++) {
-      SpielStrOut(out, GetPlayerCoinCount(player, coint_color), " ");
+      out << GetPlayerCoinCount(player, coint_color) << " ";
     }
-    SpielStrOut(out, "\n");
+    out << "\n";
   }
 }
 
 void CoinState::PrintPreferences(std::ostream& out) const {
-  SpielStrOut(out, "preferences=");
+  out << "preferences=";
   for (Player player = 0; player < setup_.num_players_assigned_preference;
        player++) {
-    SpielStrOut(out, player, ":", CoinSymbol(player_preferences_[player]), " ");
+    out << player << ":" << CoinSymbol(player_preferences_[player]) << " ";
   }
-  SpielStrOut(out, "\n");
+  out << "\n";
 }
 
 void CoinState::PrintBoardDelimiterRow(std::ostream& out) const {
-  SpielStrOut(out, "+");
+  out << "+";
   for (int c = 0; c < parent_game_.NumColumns(); c++) {
-    SpielStrOut(out, "-");
+    out << "-";
   }
-  SpielStrOut(out, "+\n");
+  out << "+\n";
 }
 
 void CoinState::PrintBoard(std::ostream& out) const {
   PrintBoardDelimiterRow(out);
   for (int r = 0; r < parent_game_.NumRows(); r++) {
-    SpielStrOut(out, "|");
+    out << "|";
     for (int c = 0; c < parent_game_.NumColumns(); c++) {
-      SpielStrOut(out, GetField({r, c}));
+      out << GetField({r, c});
     }
-    SpielStrOut(out, "|\n");
+    out << "|\n";
   }
   PrintBoardDelimiterRow(out);
 }
 
 std::string CoinState::ToString() const {
   std::ostringstream out;
-  SpielStrOut(out, "phase=", GamePhaseToString(GetPhase()), "\n");
+  out << "phase=" << GamePhaseToString(GetPhase()) << "\n";
   PrintPreferences(out);
-  SpielStrOut(out, "moves=", total_moves_, "\n");
+  out << "moves=" << total_moves_ << "\n";
   PrintCoinsCollected(out);
   PrintBoard(out);
   return out.str();
