@@ -23,7 +23,6 @@
 
 namespace open_spiel {
 namespace laser_tag {
-
 namespace {
 
 // Default parameters.
@@ -64,6 +63,16 @@ std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new LaserTagGame(params));
 }
 
+Action ToAction(ChanceOutcome outcome) {
+  if (outcome == ChanceOutcome::kChanceInit0) {
+    return kChanceInit0Action;
+  } else if (outcome == ChanceOutcome::kChanceInit1) {
+    return kChanceInit1Action;
+  } else {
+    SpielFatalError("Unrecognized outcome");
+  }
+}
+
 REGISTER_SPIEL_GAME(kGameTypeGeneralSum, Factory);
 
 // Valid characters: AB*.
@@ -83,22 +92,14 @@ enum MovementType {
   kFire = 9
 };
 
+constexpr int kNumMovementActions = 10;
+
 // Orientation
 enum Orientation { kNorth = 0, kSouth = 1, kEast = 2, kWest = 3 };
 
 // mapping of start and end orientations for left and right turn
 std::map<int, int> leftMapping = {{0, 3}, {1, 2}, {2, 0}, {3, 1}};
 std::map<int, int> rightMapping = {{0, 2}, {1, 3}, {2, 1}, {3, 0}};
-
-// Chance outcomes.
-enum ChanceOutcome {
-  kChanceLoc1 = 0,
-  kChanceLoc2 = 1,
-  kChanceLoc3 = 2,
-  kChanceLoc4 = 3,
-  kChanceInit1 = 4,
-  kChanceInit2 = 5
-};
 
 // four directions: N,S,E,W
 constexpr std::array<std::array<int, 10>, 4> row_offsets = {
@@ -120,25 +121,24 @@ std::string LaserTagState::ActionToString(int player, Action action_id) const {
   if (player == kSimultaneousPlayerId)
     return FlatJointActionToString(action_id);
   SPIEL_CHECK_GE(action_id, 0);
-  SPIEL_CHECK_LT(action_id, 10);
 
   std::string result = "";
   if (player == kChancePlayerId) {
+    SPIEL_CHECK_LT(action_id, game_->MaxChanceOutcomes());
+
     // Chance moves.
-    if (action_id == kChanceLoc1) {
-      result = "(spawned at spawn location #1)";
-    } else if (action_id == kChanceLoc2) {
-      result = "(spawned at spawn location #2)";
-    } else if (action_id == kChanceLoc3) {
-      result = "(spawned at spawn location #3)";
-    } else if (action_id == kChanceLoc4) {
-      result = "(spawned at spawn location #4)";
-    } else if (action_id == kChanceInit1) {
+    if (action_id == kChanceInit0Action) {
       result = "(A's action first)";
-    } else if (action_id == kChanceInit2) {
+    } else if (action_id == kChanceInit1Action) {
       result = "(B's action first)";
+    } else {
+      return absl::StrCat("(spawned at location #",
+                          action_id - kNumInitiativeChanceOutcomes, ")");
     }
   } else {
+    SPIEL_CHECK_LT(action_id, game_->NumDistinctActions());
+
+    // Regular move actions.
     if (action_id == kLeftTurn) {
       result = "left turn";
     } else if (action_id == kRightTurn) {
@@ -329,53 +329,9 @@ void LaserTagState::DoApplyAction(Action action_id) {
   }
   SPIEL_CHECK_TRUE(IsChanceNode());
   SPIEL_CHECK_GE(action_id, 0);
-  SPIEL_CHECK_LT(action_id, 6);
+  SPIEL_CHECK_LT(action_id, game_->MaxChanceOutcomes());
 
-  char spawning_player_char = ' ';
-
-  // spawn locations and move resolve order
-  if (!needs_respawn_.empty()) {
-    int spawning_player = needs_respawn_.back();
-    spawning_player_char = spawning_player == 0 ? 'A' : 'B';
-  }
-
-  if (action_id == kChanceLoc1) {
-    SPIEL_CHECK_NE(spawning_player_char, ' ');
-    if (field(grid_.spawn_points[0].first, grid_.spawn_points[0].second) !=
-        '.') {
-      return;
-    }
-    SetField(grid_.spawn_points[0].first, grid_.spawn_points[0].second,
-             spawning_player_char);
-    needs_respawn_.pop_back();
-  } else if (action_id == kChanceLoc2) {
-    SPIEL_CHECK_NE(spawning_player_char, ' ');
-    if (field(grid_.spawn_points[1].first, grid_.spawn_points[1].second) !=
-        '.') {
-      return;
-    }
-    SetField(grid_.spawn_points[1].first, grid_.spawn_points[1].second,
-             spawning_player_char);
-    needs_respawn_.pop_back();
-  } else if (action_id == kChanceLoc3) {
-    SPIEL_CHECK_NE(spawning_player_char, ' ');
-    if (field(grid_.spawn_points[2].first, grid_.spawn_points[2].second) !=
-        '.') {
-      return;
-    }
-    SetField(grid_.spawn_points[2].first, grid_.spawn_points[2].second,
-             spawning_player_char);
-    needs_respawn_.pop_back();
-  } else if (action_id == kChanceLoc4) {
-    SPIEL_CHECK_NE(spawning_player_char, ' ');
-    if (field(grid_.spawn_points[3].first, grid_.spawn_points[3].second) !=
-        '.') {
-      return;
-    }
-    SetField(grid_.spawn_points[3].first, grid_.spawn_points[3].second,
-             spawning_player_char);
-    needs_respawn_.pop_back();
-  } else if (action_id == kChanceInit1) {
+  if (action_id == kChanceInit0Action) {
     rewards_ = {0, 0};
     bool tagged = ResolveMove(0, moves_[0]);
     if (!tagged) {
@@ -384,7 +340,7 @@ void LaserTagState::DoApplyAction(Action action_id) {
     returns_[0] += rewards_[0];
     returns_[1] += rewards_[1];
     total_moves_++;
-  } else if (action_id == kChanceInit2) {
+  } else if (action_id == kChanceInit1Action) {
     rewards_ = {0, 0};
     bool tagged = ResolveMove(1, moves_[1]);
     if (!tagged) {
@@ -393,6 +349,29 @@ void LaserTagState::DoApplyAction(Action action_id) {
     returns_[0] += rewards_[0];
     returns_[1] += rewards_[1];
     total_moves_++;
+  } else {
+    char spawning_player_char = ' ';
+    int spawn_loc = action_id - kNumInitiativeChanceOutcomes;
+    SPIEL_CHECK_GE(spawn_loc, 0);
+    SPIEL_CHECK_LT(spawn_loc, grid_.spawn_points.size());
+
+    // spawn locations and move resolve order
+    if (!needs_respawn_.empty()) {
+      int spawning_player = needs_respawn_.back();
+      spawning_player_char = spawning_player == 0 ? 'A' : 'B';
+    }
+
+    SPIEL_CHECK_NE(spawning_player_char, ' ');
+    if (field(grid_.spawn_points[spawn_loc].first,
+              grid_.spawn_points[spawn_loc].second) != '.') {
+      // Make sure this location is empty to prevent respawning of players in
+      // the same location
+      return;
+    }
+
+    SetField(grid_.spawn_points[spawn_loc].first,
+             grid_.spawn_points[spawn_loc].second, spawning_player_char);
+    needs_respawn_.pop_back();
   }
 
   if (needs_respawn_.empty()) {
@@ -406,9 +385,14 @@ std::vector<Action> LaserTagState::LegalActions(int player) const {
   if (IsTerminal()) return {};
   if (IsChanceNode()) {
     if (!needs_respawn_.empty()) {
-      return {kChanceLoc1, kChanceLoc2, kChanceLoc3, kChanceLoc4};
+      std::vector<Action> outcomes(grid_.spawn_points.size(), kInvalidAction);
+      for (int i = 0; i < grid_.spawn_points.size(); ++i) {
+        outcomes[i] = kNumInitiativeChanceOutcomes + i;
+      }
+      return outcomes;
     } else {
-      return {kChanceInit1, kChanceInit2};
+      return {ToAction(ChanceOutcome::kChanceInit0),
+              ToAction(ChanceOutcome::kChanceInit1)};
     }
   } else {
     return {kLeftTurn,  kRightTurn, kForwardMove, kBackwardMove, kStepLeft,
@@ -419,13 +403,16 @@ std::vector<Action> LaserTagState::LegalActions(int player) const {
 std::vector<std::pair<Action, double>> LaserTagState::ChanceOutcomes() const {
   SPIEL_CHECK_TRUE(IsChanceNode());
   if (!needs_respawn_.empty()) {
-    return {std::pair<Action, double>(kChanceLoc1, 0.25),
-            std::pair<Action, double>(kChanceLoc2, 0.25),
-            std::pair<Action, double>(kChanceLoc3, 0.25),
-            std::pair<Action, double>(kChanceLoc4, 0.25)};
+    std::vector<std::pair<Action, double>> outcomes(grid_.spawn_points.size(),
+                                                    {kInvalidAction, -1.0});
+    const double unif_prob = 1.0 / outcomes.size();
+    for (int i = 0; i < grid_.spawn_points.size(); ++i) {
+      outcomes[i] = {kNumInitiativeChanceOutcomes + i, unif_prob};
+    }
+    return outcomes;
   } else {
-    return {std::pair<Action, double>(kChanceInit1, 0.5),
-            std::pair<Action, double>(kChanceInit2, 0.5)};
+    return {{ToAction(ChanceOutcome::kChanceInit0), 0.5},
+            {ToAction(ChanceOutcome::kChanceInit1), 0.5}};
   }
 }
 
@@ -508,6 +495,14 @@ std::unique_ptr<State> LaserTagGame::NewInitialState() const {
   return state;
 }
 
+int LaserTagGame::NumDistinctActions() const { return kNumMovementActions; }
+
+int LaserTagGame::MaxChanceOutcomes() const {
+  // First two for determining initiative, next n for spawn point locations,
+  // where n is equal to the number of spawn points.
+  return kNumInitiativeChanceOutcomes + grid_.spawn_points.size();
+}
+
 double LaserTagGame::MinUtility() const {
   if (horizon_ < 0) {
     return -1;
@@ -554,7 +549,8 @@ Grid ParseGrid(const std::string& grid_string) {
       col += 1;
     }
   }
-  SPIEL_CHECK_EQ(4, grid.spawn_points.size());
+  // Must have at least one spawn point.
+  SPIEL_CHECK_GE(grid.spawn_points.size(), 0);
   SPIEL_CHECK_EQ(
       grid.num_rows * grid.num_cols,
       count_empty_cells + grid.spawn_points.size() + grid.obstacles.size());

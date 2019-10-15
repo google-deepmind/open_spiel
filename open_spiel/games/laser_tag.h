@@ -46,6 +46,9 @@
 //                            Empty spaces are '.', obstacles are '*', spawn
 //                            points are 'S' (there must be four of these).
 
+namespace open_spiel {
+namespace laser_tag {
+
 inline constexpr char kDefaultGrid[] =
     "S.....S\n"
     ".......\n"
@@ -55,15 +58,22 @@ inline constexpr char kDefaultGrid[] =
     ".......\n"
     "S.....S";
 
-namespace open_spiel {
-namespace laser_tag {
-
 struct Grid {
   int num_rows;
   int num_cols;
   std::vector<std::pair<int, int>> obstacles;
   std::vector<std::pair<int, int>> spawn_points;
 };
+
+// Number of chance outcomes reserved for "initiative" (learning which player's
+// action gets resolved first).
+inline constexpr int kNumInitiativeChanceOutcomes = 2;
+
+// Reserved chance outcomes for initiative. The ones following these are to
+// determine spawn point locations.
+inline constexpr Action kChanceInit0Action = 0;
+inline constexpr Action kChanceInit1Action = 1;
+enum class ChanceOutcome { kChanceInit0, kChanceInit1 };
 
 class LaserTagState : public SimMoveState {
  public:
@@ -126,9 +136,9 @@ class LaserTagState : public SimMoveState {
 class LaserTagGame : public SimMoveGame {
  public:
   explicit LaserTagGame(const GameParameters& params);
-  int NumDistinctActions() const override { return 5; }
+  int NumDistinctActions() const override;
   std::unique_ptr<State> NewInitialState() const override;
-  int MaxChanceOutcomes() const override { return 4; }
+  int MaxChanceOutcomes() const override;
   int NumPlayers() const override { return 2; }
   double MinUtility() const override;
   double MaxUtility() const override;
