@@ -29,10 +29,11 @@ void BasicLaserTagTests() {
   testing::RandomSimTest(*LoadGame("laser_tag"), 100);
 }
 
-void SimpleTagTests(int horizon, bool zero_sum) {
+void SimpleTagTests(int horizon, bool zero_sum, std::string grid) {
   std::shared_ptr<const Game> game =
       LoadGame("laser_tag", {{"horizon", GameParameter(horizon)},
-                             {"zero_sum", GameParameter(zero_sum)}});
+                             {"zero_sum", GameParameter(zero_sum)},
+                             {"grid", GameParameter(grid)}});
   std::unique_ptr<State> state = game->NewInitialState();
   SPIEL_CHECK_TRUE(state->IsChanceNode());
   state->ApplyAction(1);  // Spawn B top-right
@@ -44,6 +45,22 @@ void SimpleTagTests(int horizon, bool zero_sum) {
   state->ApplyActions({0, 1});  // A: Turn left, B: Turn right.
   SPIEL_CHECK_TRUE(state->IsChanceNode());
   state->ApplyAction(4);  // chance node: player 0 resolved first
+
+  SPIEL_CHECK_FALSE(state->IsChanceNode());
+  state->ApplyActions({6, 1});  // A: Stand, B: Turn right.
+  SPIEL_CHECK_TRUE(state->IsChanceNode());
+  state->ApplyAction(4);  // chance node: player 0 resolved first
+
+  SPIEL_CHECK_FALSE(state->IsChanceNode());
+  state->ApplyActions({6, 2});  // A: Stand, B: Move forward.
+  SPIEL_CHECK_TRUE(state->IsChanceNode());
+  state->ApplyAction(4);  // chance node: player 0 resolved first
+
+  SPIEL_CHECK_FALSE(state->IsChanceNode());
+  state->ApplyActions({6, 0});  // A: Stand, B: Turn left.
+  SPIEL_CHECK_TRUE(state->IsChanceNode());
+  state->ApplyAction(4);  // chance node: player 0 resolved first
+
   SPIEL_CHECK_FALSE(state->IsChanceNode());
   state->ApplyActions({9, 9});  // stand-off!
   SPIEL_CHECK_TRUE(state->IsChanceNode());
@@ -96,9 +113,9 @@ void SimpleTagTests(int horizon, bool zero_sum) {
 }  // namespace open_spiel
 
 int main(int argc, char **argv) {
-  open_spiel::laser_tag::SimpleTagTests(-1, true);
-  open_spiel::laser_tag::SimpleTagTests(-1, false);
-  open_spiel::laser_tag::SimpleTagTests(1000, true);
-  open_spiel::laser_tag::SimpleTagTests(1000, false);
+  open_spiel::laser_tag::SimpleTagTests(-1, true, kDefaultGrid);
+  open_spiel::laser_tag::SimpleTagTests(-1, false, kDefaultGrid);
+  open_spiel::laser_tag::SimpleTagTests(1000, true, kDefaultGrid);
+  open_spiel::laser_tag::SimpleTagTests(1000, false, kDefaultGrid);
   open_spiel::laser_tag::BasicLaserTagTests();
 }

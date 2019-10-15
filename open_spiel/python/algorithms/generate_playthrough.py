@@ -109,7 +109,7 @@ def playthrough_lines(game_string, seed, alsologtostdout=False):
   add_line("NumDistinctActions() = {}".format(game.num_distinct_actions()))
   add_line("MaxChanceOutcomes() = {}".format(game.max_chance_outcomes()))
   add_line("GetParameters() = {{{}}}".format(",".join(
-      "{}={}".format(key, value)
+      "{}={}".format(key, _escape(str(value)))
       for key, value in sorted(game.get_parameters().items()))))
   add_line("NumPlayers() = {}".format(game.num_players()))
   add_line("MinUtility() = {:.5}".format(game.min_utility()))

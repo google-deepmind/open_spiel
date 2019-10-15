@@ -7,18 +7,18 @@ GameType.information = Information.PERFECT_INFORMATION
 GameType.long_name = "Laser Tag"
 GameType.max_num_players = 2
 GameType.min_num_players = 2
-GameType.parameter_specification = ["horizon", "zero_sum"]
+GameType.parameter_specification = ["grid", "horizon", "zero_sum"]
 GameType.provides_information_state = False
 GameType.provides_information_state_as_normalized_vector = False
 GameType.provides_observation = True
 GameType.provides_observation_as_normalized_vector = True
 GameType.reward_model = RewardModel.REWARDS
 GameType.short_name = "laser_tag"
-GameType.utility = Utility.ZERO_SUM
+GameType.utility = Utility.GENERAL_SUM
 
 NumDistinctActions() = 5
 MaxChanceOutcomes() = 4
-GetParameters() = {horizon=20,zero_sum=False}
+GetParameters() = {grid=S.....S\n.......\n..*.*..\n.**.**.\n..*.*..\n.......\nS.....S,horizon=20,zero_sum=False}
 NumPlayers() = 2
 MinUtility() = -20.0
 MaxUtility() = 20.0

@@ -29,7 +29,6 @@
 //
 // TODO:
 //   - implement partial observability (option for first-person observations)
-//   - generalize the implementation to allow any arbitrary map
 //
 // [1] Leibo et al. Multi-agent Reinforcement Learning in Sequential Social
 //     Dilemmas. https://arxiv.org/abs/1702.03037
@@ -43,15 +42,32 @@
 //       "zero_sum"   bool    If set, rewards are +1 for a tag and -1 for being
 //                            tagged. Otherwise, there there is only positive
 //                            reward of +1 per tag. (default = false).
+//       "grid"       string  String representation of grid.
+//                            Empty spaces are '.', obstacles are '*', spawn
+//                            points are 'S' (there must be four of these).
+
+inline constexpr char kDefaultGrid[] =
+    "S.....S\n"
+    ".......\n"
+    "..*.*..\n"
+    ".**.**.\n"
+    "..*.*..\n"
+    ".......\n"
+    "S.....S";
 
 namespace open_spiel {
 namespace laser_tag {
 
-class LaserTagGame;
+struct Grid {
+  int num_rows;
+  int num_cols;
+  std::vector<std::pair<int, int>> obstacles;
+  std::vector<std::pair<int, int>> spawn_points;
+};
 
 class LaserTagState : public SimMoveState {
  public:
-  explicit LaserTagState(std::shared_ptr<const Game> game);
+  explicit LaserTagState(std::shared_ptr<const Game> game, const Grid& grid);
   LaserTagState(const LaserTagState&) = default;
 
   std::string ActionToString(int player, Action action_id) const override;
@@ -86,6 +102,8 @@ class LaserTagState : public SimMoveState {
   bool ResolveMove(int player, int move);  // Return true if there was a tag
   bool InBounds(int r, int c) const;
   int observation_plane(int r, int c) const;
+
+  const Grid& grid_;
 
   // Fields set to bad values. Use Game::NewInitialState().
   int num_tags_ = 0;
@@ -122,6 +140,7 @@ class LaserTagGame : public SimMoveGame {
   int MaxGameLength() const override { return horizon_; }
 
  private:
+  Grid grid_;
   int horizon_;
   bool zero_sum_;
 };
