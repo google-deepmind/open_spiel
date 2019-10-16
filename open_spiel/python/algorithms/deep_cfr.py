@@ -331,12 +331,14 @@ class DeepCFRSolver(policy.Policy):
 
   def action_probabilities(self, state):
     """Returns action probabilities dict for a single batch."""
+    cur_player = state.current_player()
+    legal_actions = state.legal_actions(cur_player)
     info_state_vector = np.array(state.information_state_as_normalized_vector())
     if len(info_state_vector.shape) == 1:
       info_state_vector = np.expand_dims(info_state_vector, axis=0)
     probs = self._session.run(
         self._action_probs, feed_dict={self._info_state_ph: info_state_vector})
-    return {i: probs[0][i] for i in range(self._num_actions)}
+    return {action: probs[0][action] for i, action in enumerate(legal_actions)}
 
   def _learn_advantage_network(self, player):
     """Compute the loss on sampled transitions and perform a Q-network update.
