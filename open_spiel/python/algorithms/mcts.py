@@ -34,11 +34,11 @@ class Evaluator(object):
   the game. It returns the evaluation from all player's perspectives.
   """
 
-  def evaluate(self, state, random_state):
+  def evaluate(self, state):
     """Returns evaluation on given state."""
     raise NotImplementedError
 
-  def prior(self, state, random_state):
+  def prior(self, state):
     """Returns a probability for each legal action in the given state."""
     raise NotImplementedError
 
@@ -51,10 +51,11 @@ class RandomRolloutEvaluator(Evaluator):
   outcomes to be considered.
   """
 
-  def __init__(self, n_rollouts):
+  def __init__(self, n_rollouts, random_state=None):
     self.n_rollouts = n_rollouts
+    self._random_state = random_state or np.random.RandomState()
 
-  def evaluate(self, state, random_state):
+  def evaluate(self, state):
     """Returns evaluation on given state."""
     result = None
     for _ in range(self.n_rollouts):
@@ -63,18 +64,17 @@ class RandomRolloutEvaluator(Evaluator):
         if working_state.is_chance_node():
           outcomes = working_state.chance_outcomes()
           action_list, prob_list = zip(*outcomes)
-          action = random_state.choice(action_list, p=prob_list)
+          action = self._random_state.choice(action_list, p=prob_list)
         else:
-          action = random_state.choice(working_state.legal_actions())
+          action = self._random_state.choice(working_state.legal_actions())
         working_state.apply_action(action)
       returns = np.array(working_state.returns())
       result = returns if result is None else result + returns
 
     return result / self.n_rollouts
 
-  def prior(self, state, random_state):
+  def prior(self, state):
     """Returns equal probability for all actions."""
-    del random_state
     if state.is_chance_node():
       return state.chance_outcomes()
     else:
@@ -288,7 +288,7 @@ class MCTSBot(pyspiel.Bot):
     while not working_state.is_terminal() and current_node.explore_count > 0:
       if not current_node.children:
         # For a new node, initialize its state, then choose a child as normal.
-        legal_actions = self.evaluator.prior(working_state, self._random_state)
+        legal_actions = self.evaluator.prior(working_state)
         # Reduce bias from move generation order.
         self._random_state.shuffle(legal_actions)
         player = working_state.current_player()
@@ -373,7 +373,7 @@ class MCTSBot(pyspiel.Bot):
         visit_path[-1].outcome = returns
         solved = self.solve
       else:
-        returns = self.evaluator.evaluate(working_state, self._random_state)
+        returns = self.evaluator.evaluate(working_state)
         solved = False
 
       for node in reversed(visit_path):
