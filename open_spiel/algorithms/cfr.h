@@ -35,6 +35,9 @@ struct CFRInfoStateValues {
   bool empty() const { return legal_actions.empty(); }
   int num_actions() const { return legal_actions.size(); }
 
+  // A string representation of the information state values
+  std::string ToString() const;
+
   // Samples from current policy using randomly generated z, adding epsilon
   // exploration (mixing in uniform).
   int SampleActionIndex(double epsilon, double z);

@@ -49,9 +49,11 @@ void BasicBackgammonTestsDoNotStartWithDoubles() {
     std::unique_ptr<State> state = game->NewInitialState();
 
     while (state->IsChanceNode()) {
-      Action outcome = SampleChanceOutcome(
-          state->ChanceOutcomes(),
-          std::uniform_real_distribution<double>(0.0, 1.0)(rng));
+      Action outcome =
+          SampleChanceOutcome(
+              state->ChanceOutcomes(),
+              std::uniform_real_distribution<double>(0.0, 1.0)(rng))
+              .first;
       state->ApplyAction(outcome);
     }
     BackgammonState* backgammon_state =
