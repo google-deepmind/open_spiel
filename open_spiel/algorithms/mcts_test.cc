@@ -32,15 +32,8 @@ std::unique_ptr<open_spiel::Bot> InitBot(
     const open_spiel::Game& game, open_spiel::Player player,
     int max_simulations, const open_spiel::algorithms::Evaluator& evaluator) {;
   return std::make_unique<open_spiel::algorithms::MCTSBot>(
-        game,
-        player,
-        evaluator,
-        UCT_C,
-        max_simulations,
-        /* max_memory_mb */ 5,
-        /* solve */ true,
-        /* seed */ 42,
-        /* verbose */ false);
+      game, player, evaluator, UCT_C, max_simulations,
+      /*max_memory_mb=*/5, /*solve=*/true, /*seed=*/42, /*verbose=*/false);
 }
 
 void MCTSTest_CanPlayTicTacToe() {

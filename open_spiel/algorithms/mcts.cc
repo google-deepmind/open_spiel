@@ -157,7 +157,10 @@ std::string SearchNode::ToString(const State& state) const {
                                 : "none"),
       player, prior, (explore_count ? total_reward / explore_count : 0.),
       explore_count,
-      (outcome.empty() ? "none" : absl::StrFormat("%4.1f", outcome[player])),
+      (outcome.empty()
+           ? "none"
+           : absl::StrFormat("%4.1f",
+                             outcome[player == kChancePlayerId ? 0 : player])),
       children.size());
 }
 
@@ -185,8 +188,6 @@ MCTSBot::MCTSBot(
       SpielFatalError("Game must have terminal rewards.");
     if (game_type.dynamics != GameType::Dynamics::kSequential)
       SpielFatalError("Game must have sequential turns.");
-    if (game_type.information != GameType::Information::kPerfectInformation)
-      SpielFatalError("Game must be perfect information.");
     if (player < 0 || player >= game.NumPlayers())
       SpielFatalError(absl::StrFormat(
           "Game doesn't support that many players. Max: %d, player: %d",
@@ -276,9 +277,9 @@ std::unique_ptr<State> MCTSBot::ApplyTreePolicy(
 }
 
 std::unique_ptr<SearchNode> MCTSBot::MCTSearch(const State& state) {
+  SPIEL_CHECK_EQ(player_id_, state.CurrentPlayer());
   memory_used_ = 0;
-  auto root = std::make_unique<SearchNode>(
-      kInvalidAction, state.CurrentPlayer(), 1);
+  auto root = std::make_unique<SearchNode>(kInvalidAction, player_id_, 1);
   std::vector<SearchNode*> visit_path;
   std::vector<double> returns;
   visit_path.reserve(64);
@@ -304,9 +305,8 @@ std::unique_ptr<SearchNode> MCTSBot::MCTSearch(const State& state) {
     for (auto it = visit_path.rbegin(); it != visit_path.rend(); ++it) {
       SearchNode* node = *it;
 
-      if (node->player != kChancePlayerId) {
-        node->total_reward += returns[node->player];
-      }
+      node->total_reward +=
+          returns[node->player == kChancePlayerId ? player_id_ : node->player];
       node->explore_count += 1;
 
       // Back up solved results as well.
@@ -351,7 +351,8 @@ std::unique_ptr<SearchNode> MCTSBot::MCTSearch(const State& state) {
     }
 
     if (!root->outcome.empty() ||  // Full game tree is solved.
-        (max_memory_ && memory_used_ >= max_memory_)) {
+        (max_memory_ && memory_used_ >= max_memory_) ||
+        root->children.size() == 1) {
       break;
     }
   }

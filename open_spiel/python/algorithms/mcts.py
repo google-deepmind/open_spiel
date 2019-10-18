@@ -103,7 +103,12 @@ class SearchNode(object):
       node, along with their expected rewards.
   """
   __slots__ = [
-      "action", "player", "prior", "explore_count", "total_reward", "outcome",
+      "action",
+      "player",
+      "prior",
+      "explore_count",
+      "total_reward",
+      "outcome",
       "children",
   ]
 
@@ -156,7 +161,8 @@ class SearchNode(object):
     """
     return "\n".join([
         c.to_str(state)
-        for c in reversed(sorted(self.children, key=SearchNode.sort_key))])
+        for c in reversed(sorted(self.children, key=SearchNode.sort_key))
+    ])
 
   def to_str(self, state=None):
     """Returns the string representation of this node.
@@ -165,16 +171,15 @@ class SearchNode(object):
       state: A `pyspiel.State` object, to be used to convert the action id into
         a human readable format. If None, the action integer id is used.
     """
-    action = (state.action_to_string(state.current_player(), self.action)
-              if state and self.action is not None else str(self.action))
+    action = (
+        state.action_to_string(state.current_player(), self.action)
+        if state and self.action is not None else str(self.action))
     return ("{:>6}: player: {}, prior: {:5.3f}, value: {:6.3f}, sims: {:5d}, "
             "outcome: {}, {:3d} children").format(
-                action, self.player, self.prior,
-                self.explore_count and self.total_reward / self.explore_count,
-                self.explore_count,
+                action, self.player, self.prior, self.explore_count and
+                self.total_reward / self.explore_count, self.explore_count,
                 ("{:4.1f}".format(self.outcome[self.player])
-                 if self.outcome else "none"),
-                len(self.children))
+                 if self.outcome else "none"), len(self.children))
 
   def __str__(self):
     return self.to_str(None)
@@ -222,8 +227,6 @@ class MCTSBot(pyspiel.Bot):
       raise ValueError("Game must have terminal rewards.")
     if game_type.dynamics != pyspiel.GameType.Dynamics.SEQUENTIAL:
       raise ValueError("Game must have sequential turns.")
-    if game_type.information != pyspiel.GameType.Information.PERFECT_INFORMATION:
-      raise ValueError("Game must be perfect information.")
     if player < 0 or player >= game.num_players():
       raise ValueError(
           "Game doesn't support that many players. Max: {}, player: {}".format(
@@ -292,8 +295,9 @@ class MCTSBot(pyspiel.Bot):
         # Reduce bias from move generation order.
         self._random_state.shuffle(legal_actions)
         player = working_state.current_player()
-        current_node.children = [SearchNode(action, player, prior)
-                                 for action, prior in legal_actions]
+        current_node.children = [
+            SearchNode(action, player, prior) for action, prior in legal_actions
+        ]
 
       if working_state.is_chance_node():
         # For chance nodes, rollout according to chance node's probability
@@ -377,8 +381,8 @@ class MCTSBot(pyspiel.Bot):
         solved = False
 
       for node in reversed(visit_path):
-        if node.player != pyspiel.PlayerId.CHANCE:
-          node.total_reward += returns[node.player]
+        node.total_reward += returns[self.player if node.player ==
+                                     pyspiel.PlayerId.CHANCE else node.player]
         node.explore_count += 1
 
         if solved and node.children:

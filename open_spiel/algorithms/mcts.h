@@ -170,7 +170,6 @@ class MCTSBot : public Bot {
   int max_simulations_;
   int64_t max_memory_;  // Max memory allowed in the tree, in bytes.
   int64_t memory_used_ = 0;  // Memory used in the tree, in bytes.
-  Player player_;
   bool verbose_;
   bool solve_;
   double max_utility_;
