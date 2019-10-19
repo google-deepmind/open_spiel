@@ -1454,7 +1454,7 @@ static int readStateCommon( const char *string, const Game *game,
   /* HEADER */
   c = 0;
 
-  /* HEADER:handId */
+  /* HEADER:handId_ */
   if( sscanf( string, ":%"SCNu32"%n", &handId, &r ) < 1 ) {
     return -1;
   }
@@ -1462,27 +1462,27 @@ static int readStateCommon( const char *string, const Game *game,
 
   initState( game, handId, state );
 
-  /* HEADER:handId: */
+  /* HEADER:handId_: */
   if( string[ c ] != ':' ) {
     return -1;
   }
   ++c;
 
-  /* HEADER:handId:betting: */
+  /* HEADER:handId_:betting: */
   r = readBetting( &string[ c ], game, state );
   if( r < 0 ) {
     return -1;
   }
   c += r;
 
-  /* HEADER:handId:betting:holeCards */
+  /* HEADER:handId_:betting:holeCards */
   r = readHoleCards( &string[ c ], game, state );
   if( r < 0 ) {
     return -1;
   }
   c += r;
 
-  /* HEADER:handId:betting:holeCards boardCards */
+  /* HEADER:handId_:betting:holeCards boardCards */
   r = readBoardCards( &string[ c ], game, state );
   if( r < 0 ) {
     return -1;
@@ -1542,21 +1542,21 @@ static int printStateCommon( const Game *game, const State *state,
   /* HEADER */
   c = 0;
 
-  /* HEADER:handId: */
+  /* HEADER:handId_: */
   r = snprintf( &string[ c ], maxLen - c, ":%"PRIu32":", state->handId );
   if( r < 0 ) {
     return -1;
   }
   c += r;
 
-  /* HEADER:handId:betting */
+  /* HEADER:handId_:betting */
   r = printBetting( game, state, maxLen - c, &string[ c ] );
   if( r < 0 ) {
     return -1;
   }
   c += r;
 
-  /* HEADER:handId:betting: */
+  /* HEADER:handId_:betting: */
   if( c >= maxLen ) {
     return -1;
   }
@@ -1580,21 +1580,21 @@ int printState( const Game *game, const State *state,
   }
   c += r;
 
-  /* STATE:handId:betting: */
+  /* STATE:handId_:betting: */
   r = printStateCommon( game, state, maxLen - c, &string[ c ] );
   if( r < 0 ) {
     return -1;
   }
   c += r;
 
-  /* STATE:handId:betting:holeCards */
+  /* STATE:handId_:betting:holeCards */
   r = printAllHoleCards( game, state, maxLen - c, &string[ c ] );
   if( r < 0 ) {
     return -1;
   }
   c += r;
 
-  /* STATE:handId:betting:holeCards boardCards */
+  /* STATE:handId_:betting:holeCards boardCards */
   r = printBoardCards( game, state, maxLen - c, &string[ c ] );
   if( r < 0 ) {
     return -1;
@@ -1624,14 +1624,14 @@ int printMatchState( const Game *game, const MatchState *state,
   }
   c += r;
 
-  /* MATCHSTATE:player:handId:betting: */
+  /* MATCHSTATE:player:handId_:betting: */
   r = printStateCommon( game, &state->state, maxLen - c, &string[ c ] );
   if( r < 0 ) {
     return -1;
   }
   c += r;
 
-  /* MATCHSTATE:player:handId:betting:holeCards */
+  /* MATCHSTATE:player:handId_:betting:holeCards */
   r = printPlayerHoleCards( game, &state->state, state->viewingPlayer,
 			    maxLen - c, &string[ c ] );
   if( r < 0 ) {
@@ -1639,7 +1639,7 @@ int printMatchState( const Game *game, const MatchState *state,
   }
   c += r;
 
-  /* MATCHSTATE:player:handId:betting:holeCards boardCards */
+  /* MATCHSTATE:player:handId_:betting:holeCards boardCards */
   r = printBoardCards( game, &state->state, maxLen - c, &string[ c ] );
   if( r < 0 ) {
     return -1;

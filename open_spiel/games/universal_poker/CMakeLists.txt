@@ -1,19 +1,8 @@
 set(HEADER_FILES
-        BettingTree/BettingNode.h
-        BettingTree/BettingTree.h
-
-        GameTree/GameTree.h
-        GameTree/GameNode.h
-
-        CardTree/CardSet.h
-        CardTree/CardSetIndex.h
-        CardTree/CardTree.h
-        CardTree/CardNode.h
-
-        PokerGame/PokerGame.h
-        PokerGame/PokerGameState.h
-
-        acpc_cpp/acpc_state.h)
+        acpc_cpp/acpc_game.h
+        logic/betting_tree.h
+        logic/card_set.h
+        )
 
 set(CLIB_FILES
         acpc/game.h
@@ -22,22 +11,11 @@ set(CLIB_FILES
         acpc/rng.c)
 
 set(SOURCE_FILES
-        BettingTree/BettingNode.cpp
-        BettingTree/BettingTree.cpp
+        acpc_cpp/acpc_game.cc
+        logic/betting_tree.cc
+        logic/card_set.cc
 
-        GameTree/GameTree.cpp
-        GameTree/GameNode.cpp
-
-        CardTree/CardSet.cpp
-        CardTree/CardSetIndex.cpp
-        CardTree/CardTree.cpp
-        CardTree/CardNode.cpp
-
-        PokerGame/PokerGameState.cpp
-        PokerGame/PokerGame.cpp
-
-        acpc_cpp/acpc_state.cc
-        acpc_cpp/acpc_game.cc)
+        )
 
 add_library(universal_poker_clib ${CLIB_FILES} )
 set_target_properties(universal_poker_clib PROPERTIES POSITION_INDEPENDENT_CODE ON)
@@ -46,4 +24,22 @@ set_target_properties(universal_poker_clib PROPERTIES POSITION_INDEPENDENT_CODE 
 add_library(universal_poker_lib STATIC
     ${SOURCE_FILES}
     ${HEADER_FILES}
-)
+        )
+
+add_executable(universal_poker_acpc_cpp_test acpc_cpp/acpc_game_test.cc ${SOURCE_FILES}
+        $<TARGET_OBJECTS:tests>)
+target_link_libraries(universal_poker_acpc_cpp_test universal_poker_clib)
+
+add_test(universal_poker_acpc_cpp_test universal_poker_acpc_cpp_test)
+
+add_executable(universal_poker_betting_tree_test logic/betting_tree_test.cc ${SOURCE_FILES}
+        $<TARGET_OBJECTS:tests>)
+target_link_libraries(universal_poker_betting_tree_test universal_poker_clib)
+
+add_test(universal_poker_betting_tree_test universal_poker_betting_tree_test)
+
+add_executable(universal_poker_card_set_test logic/card_set_test.cc ${SOURCE_FILES}
+        $<TARGET_OBJECTS:tests>)
+target_link_libraries(universal_poker_card_set_test universal_poker_clib)
+
+add_test(universal_poker_card_set_test universal_poker_card_set_test)
