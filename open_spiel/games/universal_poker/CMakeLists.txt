@@ -12,14 +12,14 @@ set(HEADER_FILES
 
         PokerGame/PokerGame.h
         PokerGame/PokerGameState.h
-        )
+
+        acpc_cpp/acpc_state.h)
 
 set(CLIB_FILES
-        ACPC/game.h
-        ACPC/game.c
-        ACPC/rng.h
-        ACPC/rng.c
-        )
+        acpc/game.h
+        acpc/game.c
+        acpc/rng.h
+        acpc/rng.c)
 
 set(SOURCE_FILES
         BettingTree/BettingNode.cpp
@@ -35,7 +35,9 @@ set(SOURCE_FILES
 
         PokerGame/PokerGameState.cpp
         PokerGame/PokerGame.cpp
-        )
+
+        acpc_cpp/acpc_state.cc
+        acpc_cpp/acpc_game.cc)
 
 add_library(universal_poker_clib ${CLIB_FILES} )
 set_target_properties(universal_poker_clib PROPERTIES POSITION_INDEPENDENT_CODE ON)

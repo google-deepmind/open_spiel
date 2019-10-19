@@ -3,12 +3,12 @@
 //
 
 extern "C" {
-    #include "open_spiel/games/universal_poker/ACPC/game.h"
+    #include "open_spiel/games/universal_poker/acpc/game.h"
 };
 
 #include <iostream>
 #include <fstream>
-#include "open_spiel/games/universal_poker/ACPC/game.h"
+#include "open_spiel/games/universal_poker/acpc/game.h"
 #include <random>
 #include "GameTree.h"
 #include <regex>
