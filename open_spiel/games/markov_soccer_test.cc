@@ -26,7 +26,22 @@ namespace testing = open_spiel::testing;
 void BasicMarkovSoccerTests() {
   testing::LoadGameTest("markov_soccer");
   testing::ChanceOutcomesTest(*LoadGame("markov_soccer"));
-  testing::RandomSimTest(*LoadGame("markov_soccer"), 100);
+
+  constexpr const char big_grid[] =
+      "......................\n"
+      ".A....................\n"
+      "......................\n"
+      "......................\n"
+      "...........O..........\n"
+      "...........O..........\n"
+      "...........O..........\n"
+      "......................\n"
+      "......................\n"
+      "....................B.\n"
+      "......................\n";
+
+  testing::RandomSimTest(*LoadGame("markov_soccer", {{"horizon", GameParameter(100)},
+                             {"grid", GameParameter(std::string(big_grid))}}), 100);
 }
 
 }  // namespace

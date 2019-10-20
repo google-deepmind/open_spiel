@@ -29,15 +29,44 @@
 //
 // Parameters:
 //       "horizon"    int     max number of moves before draw  (default = 1000)
+//       "grid"       string  String representation of grid.
+//                            Empty spaces are '.', possible ball starting locations 
+//                            are 'O' and player A and B starting points are 'A' 
+//                            and 'B' respectively.
 
 namespace open_spiel {
 namespace markov_soccer {
+
+inline constexpr char kDefaultGrid[] =
+    ".....\n"
+    ".AO..\n"
+    "..O..\n"
+    "..OB.\n"
+    ".....";
+
+struct Grid {
+  int num_rows;
+  int num_cols;
+  std::pair<int, int> a_start;
+  std::pair<int, int> b_start;
+  std::vector<std::pair<int, int>> ball_start_points;
+};
+
+// Number of chance outcomes reserved for "initiative" (learning which player's
+// action gets resolved first).
+inline constexpr int kNumInitiativeChanceOutcomes = 2;
+
+// Reserved chance outcomes for initiative. The ones following these are to
+// determine spawn point locations.
+inline constexpr Action kChanceInit0Action = 0;
+inline constexpr Action kChanceInit1Action = 1;
+enum class ChanceOutcome { kChanceInit0, kChanceInit1 };
 
 class MarkovSoccerGame;
 
 class MarkovSoccerState : public SimMoveState {
  public:
-  explicit MarkovSoccerState(std::shared_ptr<const Game> game);
+  explicit MarkovSoccerState(std::shared_ptr<const Game> game, const Grid& grid);
   MarkovSoccerState(const MarkovSoccerState&) = default;
 
   std::string ActionToString(Player player, Action action_id) const override;
@@ -72,6 +101,8 @@ class MarkovSoccerState : public SimMoveState {
   bool InBounds(int r, int c) const;
   int observation_plane(int r, int c) const;
 
+  const Grid& grid_;
+
   // Fields set to bad values. Use Game::NewInitialState().
   int winner_ = -1;
   Player cur_player_ = -1;  // Could be chance's turn.
@@ -88,9 +119,9 @@ class MarkovSoccerState : public SimMoveState {
 class MarkovSoccerGame : public SimMoveGame {
  public:
   explicit MarkovSoccerGame(const GameParameters& params);
-  int NumDistinctActions() const override { return 5; }
+  int NumDistinctActions() const override;
   std::unique_ptr<State> NewInitialState() const override;
-  int MaxChanceOutcomes() const override { return 4; }
+  int MaxChanceOutcomes() const override;
   int NumPlayers() const override { return 2; }
   double MinUtility() const override { return -1; }
   double MaxUtility() const override { return 1; }
@@ -102,6 +133,7 @@ class MarkovSoccerGame : public SimMoveGame {
   int MaxGameLength() const override { return horizon_; }
 
  private:
+  Grid grid_;
   int horizon_;
 };
 
