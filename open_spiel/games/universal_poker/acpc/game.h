@@ -122,7 +122,7 @@ typedef struct {
 
 
 /* returns a game structure, or NULL on failure */
-Game *readGame( FILE *file );
+void readGame( FILE *file, Game* game );
 
 void printGame( FILE *file, const Game *game );
 

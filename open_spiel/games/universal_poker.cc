@@ -6,8 +6,6 @@
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel_utils.h"
 
-#include "open_spiel/games/universal_poker/PokerGame/PokerGame.h"
-
 namespace open_spiel::universal_poker {
     const GameType kGameType{
             /*short_name=*/"universal_poker",
@@ -35,17 +33,16 @@ namespace open_spiel::universal_poker {
     // namespace universal_poker
     UniversalPokerState::UniversalPokerState(std::shared_ptr<const Game> game)
             : State(game),
-            pokerGame_((UniversalPokerGame*)game.get()),
-            internalState_( pokerGame_->getPokerGame().getGame(), nullptr, PokerGameState::GameAction()) {
+              gameNode_(((UniversalPokerGame*)game.get())->GetGameTree())
+    {
     }
 
     std::string UniversalPokerState::ToString() const {
-        return internalState_.getName();
+        return gameNode_.ToString();
     }
 
     bool UniversalPokerState::IsTerminal() const {
-        return internalState_.getType() == BettingNode::TERMINAL_FOLD_NODE ||
-        internalState_.getType() == BettingNode::TERMINAL_SHOWDOWN_NODE;
+        return gameNode_.IsFinished();
     }
 
     std::string UniversalPokerState::InformationState(Player player) const {
@@ -60,8 +57,11 @@ namespace open_spiel::universal_poker {
         if( IsTerminal() ){
             return Player(kTerminalPlayerId);
         }
+        if( gameNode_.GetNodeType() == logic::GameTree::GameNode::NODE_TYPE_CHANCE ) {
+            return Player(kChancePlayerId);
+        }
 
-        return Player(internalState_.getPlayer() == PLAYER_DEALER ? kChancePlayerId : internalState_.getPlayer());
+        return Player(CurrentPlayer());
     }
 
     std::vector<double> UniversalPokerState::Returns() const {
@@ -72,7 +72,7 @@ namespace open_spiel::universal_poker {
         std::vector<double> returns(num_players_);
         for (auto player = Player{0}; player < num_players_; ++player) {
             // Money vs money at start.
-            returns[player] = internalState_.getTotalReward(player);
+            returns[player] = gameNode_.GetTotalReward(player);
         }
 
         return returns;
@@ -92,17 +92,16 @@ namespace open_spiel::universal_poker {
     }
 
     std::unique_ptr<State> UniversalPokerState::Clone() const {
-        return std::unique_ptr<State>(new UniversalPokerState(*this));
+        return nullptr;
     }
 
     std::vector<std::pair<Action, double>> UniversalPokerState::ChanceOutcomes() const {
         SPIEL_CHECK_TRUE(IsChanceNode());
         std::vector<std::pair<Action, double>> outcomes;
-        auto internalActions = internalState_.getActionsAllowed();
 
-        const double p = 1.0 / (double)internalActions.size();
-        for (uint64_t card = 0; card < internalActions.size(); ++card) {
-            outcomes.push_back({card, p});
+        const double p = 1.0 / (double)gameNode_.GetActionCount();
+        for (uint64_t card = 0; card < gameNode_.GetActionCount(); ++card) {
+            outcomes.emplace_back(card, p);
         }
         return outcomes;
     }
@@ -110,7 +109,7 @@ namespace open_spiel::universal_poker {
     std::vector<Action> UniversalPokerState::LegalActions() const {
         std::vector<Action> actions;
 
-        for( uint64_t idx = 0; idx < internalState_.getActionsAllowed().size(); idx++){
+        for( uint64_t idx = 0; idx < gameNode_.GetActionCount(); idx++){
             actions.push_back(idx);
         }
 
@@ -118,8 +117,7 @@ namespace open_spiel::universal_poker {
     }
 
     void UniversalPokerState::DoApplyAction(Action action_id) {
-        internalState_ = pokerGame_->getPokerGame().updateState(internalState_, action_id);
-
+        gameNode_.ApplyAction(action_id);
     }
 
 
@@ -130,16 +128,9 @@ namespace open_spiel::universal_poker {
     UniversalPokerGame::UniversalPokerGame(const GameParameters &params)
             : Game(kGameType, params),
               gameDesc_(ParameterValue<std::string>("gameDesc")),
-              pokerGame_(PokerGame::createFromGamedef(gameDesc_)) {
-        maxGameLength_ = pokerGame_.getGameLength();
-        maxBoardCardCombinations_ = numBoardCardCombinations_(0);
+              gameTree_(gameDesc_)
+    {
 
-        for (int r = 1; r < numRounds_(); r++) {
-            int combos = numBoardCardCombinations_(r);
-            if (combos > maxBoardCardCombinations_) {
-                maxBoardCardCombinations_ = combos;
-            }
-        }
     }
 
     std::unique_ptr<State> UniversalPokerGame::NewInitialState() const {
@@ -178,34 +169,31 @@ namespace open_spiel::universal_poker {
         return -100.0;
     }
 
-
-    int UniversalPokerGame::numBoardCardCombinations_(const int r) const {
-        assert(r < numRounds_());
-        int deckSize = deckSize_();
-
-        for (int i = 0; i < r; i++) {
-            deckSize -= numBoardCards_(r);
-        }
-
-        return choose_(deckSize, numBoardCards_(r));
-    }
-
-    int UniversalPokerGame::choose_(int n, int k) {
-        if (k == 0) {
-            return 1;
-        }
-        return (n * choose_(n - 1, k - 1)) / k;
-    }
-
     int UniversalPokerGame::MaxChanceOutcomes() const {
-        return maxBoardCardCombinations_;
+        return gameTree_.NumSuitsDeck() * gameTree_.NumRanksDeck();
     }
 
     int UniversalPokerGame::NumPlayers() const {
-        return numPlayers_();
+        return gameTree_.GetNbPlayers();
     }
 
-    const PokerGame &UniversalPokerGame::getPokerGame() const {
-        return pokerGame_;
+    int UniversalPokerGame::NumDistinctActions() const {
+        return gameTree_.GetMaxBettingActions();
+    }
+
+    logic::GameTree &UniversalPokerGame::GetGameTree() {
+        return gameTree_;
+    }
+
+    std::shared_ptr<const Game> UniversalPokerGame::Clone() const {
+        return std::shared_ptr<const Game>();
+    }
+
+    double UniversalPokerGame::UtilitySum() const {
+        return Game::UtilitySum();
+    }
+
+    int UniversalPokerGame::MaxGameLength() const {
+        return 0;
     }
 }

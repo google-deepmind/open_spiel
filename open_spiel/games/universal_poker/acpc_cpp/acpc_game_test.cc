@@ -14,19 +14,19 @@ void BasicACPCTests() {
 
     while( !state.IsFinished() ){
         int32_t minRaise = 0, maxRaise = 0;
-        state.RaiseIsValid(&minRaise, &maxRaise);
+        if( state.RaiseIsValid(&minRaise, &maxRaise) ){
+            minRaise = state.MaxSpend() > minRaise ? state.MaxSpend() : minRaise;
+        }
 
-        const ACPCGame::ACPCState::ACPCAction available_actions[]{
-                ACPCGame::ACPCState::ACPCAction(&game, ACPCGame::ACPCState::ACPCAction::ACTION_RAISE, minRaise),
-                ACPCGame::ACPCState::ACPCAction(&game, ACPCGame::ACPCState::ACPCAction::ACTION_RAISE, minRaise*2),
-                ACPCGame::ACPCState::ACPCAction(&game, ACPCGame::ACPCState::ACPCAction::ACTION_CALL, 0),
-                ACPCGame::ACPCState::ACPCAction(&game, ACPCGame::ACPCState::ACPCAction::ACTION_FOLD, 0)
+        const ACPCGame::ACPCState::ACPCActionType available_actions[] = {
+                ACPCGame::ACPCState::ACPC_CALL,
+                ACPCGame::ACPCState::ACPC_FOLD,
+                //ACPCGame::ACPCState::ACPC_RAISE
         };
 
         for( const auto &action: available_actions ){
-            if( state.IsValidAction(false, action) ) {
-                std::cout << action.ToString() << std::endl;
-                state.DoAction(action);
+            if( state.IsValidAction(action, 0) ) {
+                state.DoAction(action, 0);
                 std::cout << state.ToString() << std::endl;
             }
         }

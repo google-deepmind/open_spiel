@@ -13,29 +13,41 @@ namespace open_spiel::universal_poker::logic {
     constexpr uint8_t MAX_PLAYERS = 10;
 
     class BettingTree : public acpc_cpp::ACPCGame {
-        enum ActionType{ ACTION_DEAL, ACTION_FOLD, ACTION_CHECK_CALL, ACTION_BET_POT, ACTION_ALL_IN};
+        enum ActionType {
+            ACTION_DEAL, ACTION_FOLD, ACTION_CHECK_CALL, ACTION_BET_POT, ACTION_ALL_IN
+        };
 
     public:
         class BettingNode : public acpc_cpp::ACPCGame::ACPCState {
-        friend BettingTree;
+            friend BettingTree;
 
         public:
-            enum NodeType{ NODE_TYPE_CHANCE,  NODE_TYPE_CHOICE,  NODE_TYPE_TERMINAL_FOLD,  NODE_TYPE_TERMINAL_SHOWDOWN};
-            explicit BettingNode(BettingTree& bettingTree);
+            enum NodeType {
+                NODE_TYPE_CHANCE, NODE_TYPE_CHOICE, NODE_TYPE_TERMINAL_FOLD, NODE_TYPE_TERMINAL_SHOWDOWN
+            };
+
+            explicit BettingNode(BettingTree &bettingTree);
 
         public:
             NodeType GetNodeType() const;
+
             const std::vector<ActionType> &GetPossibleActions() const;
+
             void ApplyChoiceAction(uint32_t actionIdx);
-            void ApplyDealCards();
-            std::string ToString();
+
+            virtual void ApplyDealCards();
+
+            std::string ToString() const;
+
+            double GetTotalReward(uint8_t player) const;
+
 
         private:
-            const BettingTree& bettingTree_;
+            const BettingTree &bettingTree_;
             NodeType nodeType_;
-            std::vector<ActionType> possibleActions_ ;
-            ACPCGame::ACPCState::ACPCAction acpcBetPotAction_;
-            ACPCGame::ACPCState::ACPCAction acpcAllInAction_;
+            std::vector<ActionType> possibleActions_;
+            int32_t potSize_;
+            int32_t allInSize_;
 
             uint8_t nbHoleCardsDealtPerPlayer_[MAX_PLAYERS];
             uint8_t nbBoardCardsDealt_;
@@ -44,19 +56,11 @@ namespace open_spiel::universal_poker::logic {
         };
 
 
-
     public:
-        BettingTree(const std::string &gameDef);
-        uint32_t GetMaxBettingActions();
+        explicit BettingTree(const std::string &gameDef);
 
-    private:
-        const ACPCGame::ACPCState::ACPCAction acpcCallAction_;
-        const ACPCGame::ACPCState::ACPCAction acpcFoldAction_;
+        uint32_t GetMaxBettingActions() const ;
     };
-
-
-
-
 }
 
 

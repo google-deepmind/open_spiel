@@ -13,7 +13,7 @@ void BasicBettingTreeTests() {
 
     std::srand(std::time(nullptr));
 
-    for( int i = 0; i < 1; i++) {
+    for( int i = 0; i < 100; i++) {
         BettingTree::BettingNode bettingNode(bettingTree);
         std::cout << "INIT" << std::endl;
         std::cout << bettingNode.ToString() << std::endl;

@@ -154,13 +154,10 @@ static int readItems( const char *itemFormat, const int numItems,
   return i;
 }
 
-Game *readGame( FILE *file )
+void readGame( FILE *file, Game* game )
 {
   int stackRead, blindRead, raiseSizeRead, boardCardsRead, c, t;
   char line[ MAX_LINE_LEN ];
-  Game *game;
-
-  game = (Game*)malloc( sizeof( *game ) );
   assert( game != 0 );
   stackRead = 4;
   for( c = 0; c < MAX_ROUNDS; ++c ) {

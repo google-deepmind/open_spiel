@@ -72,7 +72,7 @@ namespace open_spiel::universal_poker::logic {
     }
 
 
-    std::string CardSet::ToString() {
+    std::string CardSet::ToString() const {
 
         std::ostringstream result;
         for (int r = MAX_RANKS - 1; r >= 0; r--) {

@@ -26,7 +26,7 @@ namespace open_spiel::universal_poker::logic {
         CardSet(uint8_t cards[], int size);
         CardSet(uint16_t numSuits, uint16_t numRanks);
 
-        std::string ToString();
+        std::string ToString() const;
         std::vector<uint8_t> ToCardArray();
 
         void AddCard(uint8_t card);

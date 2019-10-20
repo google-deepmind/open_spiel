@@ -9,21 +9,17 @@
 namespace open_spiel::universal_poker::logic {
 
     BettingTree::BettingTree(const std::string& gameDef)
-            : ACPCGame(gameDef),
-              acpcCallAction_(this, ACPCGame::ACPCState::ACPCAction::ACTION_CALL, 0),
-              acpcFoldAction_(this, ACPCGame::ACPCState::ACPCAction::ACTION_FOLD, 0) {
+            : ACPCGame(gameDef) {
 
     }
 
-    uint32_t BettingTree::GetMaxBettingActions() {
+    uint32_t BettingTree::GetMaxBettingActions() const {
         return IsLimitGame() ? 3 : 4;
     }
 
     BettingTree::BettingNode::BettingNode(BettingTree &bettingTree)
     : ACPCState(bettingTree), bettingTree_(bettingTree), nodeType_(NODE_TYPE_CHANCE), possibleActions_({ACTION_DEAL}),
-      acpcBetPotAction_(&bettingTree, ACPCGame::ACPCState::ACPCAction::ACTION_INVALID, 0),
-      acpcAllInAction_(&bettingTree, ACPCGame::ACPCState::ACPCAction::ACTION_INVALID, 0),
-      nbBoardCardsDealt_(0), nbHoleCardsDealtPerPlayer_{0,0,0,0,0,0,0,0,0,0}
+      nbBoardCardsDealt_(0), nbHoleCardsDealtPerPlayer_{0,0,0,0,0,0,0,0,0,0}, potSize_(0), allInSize_(0)
     {
     }
 
@@ -39,20 +35,16 @@ namespace open_spiel::universal_poker::logic {
         switch(actionType)
         {
             case ACTION_FOLD:
-                assert(IsValidAction(false, bettingTree_.acpcFoldAction_));
-                DoAction(bettingTree_.acpcFoldAction_);
+                DoAction(ACPC_FOLD, 0);
                 break;
             case ACTION_CHECK_CALL:
-                assert(IsValidAction(false, bettingTree_.acpcCallAction_));
-                DoAction(bettingTree_.acpcCallAction_);
+                DoAction(ACPC_CALL, 0);
                 break;
             case ACTION_BET_POT:
-                assert(IsValidAction(false, acpcBetPotAction_));
-                DoAction(acpcBetPotAction_);
+                DoAction(ACPC_RAISE, potSize_);
                 break;
             case ACTION_ALL_IN:
-                assert(IsValidAction(false, acpcAllInAction_));
-                DoAction(acpcAllInAction_);
+                DoAction(ACPC_RAISE, allInSize_);
                 break;
             case ACTION_DEAL:
             default:
@@ -111,33 +103,28 @@ namespace open_spiel::universal_poker::logic {
 
             //Check for CHOICE Actions
             nodeType_ = NODE_TYPE_CHOICE;
-            if( IsValidAction(false, bettingTree_.acpcFoldAction_) ){
+            if( IsValidAction(ACPC_FOLD, 0) ){
                 possibleActions_.push_back(ACTION_FOLD);
             }
-            if( IsValidAction(false, bettingTree_.acpcCallAction_) ){
+            if( IsValidAction(ACPC_CALL, 0) ){
                 possibleActions_.push_back(ACTION_CHECK_CALL);
             }
 
-            int32_t potSize = 0, minRaise = 0, maxRaise = 0;
-            acpcBetPotAction_.SetActionAndSize(ACPCAction::ACTION_INVALID, 0);
-            acpcAllInAction_.SetActionAndSize( ACPCAction::ACTION_INVALID, 0);
-            if( RaiseIsValid(&minRaise, &maxRaise) ){
-                if(bettingTree_.IsLimitGame()){
-                    acpcBetPotAction_.SetActionAndSize(ACPCAction::ACTION_RAISE, 0);
-                }
-                else {
-                    potSize = MaxSpend() > minRaise ? MaxSpend() : minRaise;
-                    acpcBetPotAction_.SetActionAndSize( ACPCAction::ACTION_RAISE, potSize);
-                    if( maxRaise > potSize ) {
-                        acpcAllInAction_.SetActionAndSize(ACPCAction::ACTION_RAISE, maxRaise);
-                    }
-                }
+            potSize_ = 0;
+            allInSize_ = 0;
 
-                if( IsValidAction(false, acpcBetPotAction_) ){
+            if( RaiseIsValid(&potSize_, &allInSize_) ){
+                if(bettingTree_.IsLimitGame()){
+                    potSize_ = 0;
                     possibleActions_.push_back(ACTION_BET_POT);
                 }
-                if( IsValidAction(false, acpcAllInAction_) ){
-                    possibleActions_.push_back(ACTION_ALL_IN);
+                else {
+                    potSize_ = MaxSpend() > potSize_ ? MaxSpend() : potSize_;
+
+                    possibleActions_.push_back(ACTION_BET_POT);
+                    if( allInSize_ > potSize_ ) {
+                        possibleActions_.push_back(ACTION_ALL_IN);
+                    }
                 }
             }
         }
@@ -147,10 +134,8 @@ namespace open_spiel::universal_poker::logic {
         return possibleActions_;
     }
 
-    std::string BettingTree::BettingNode::ToString() {
+    std::string BettingTree::BettingNode::ToString() const {
         std::ostringstream buf;
-        buf << "STATE START" << std::endl;
-
         buf << "NodeType: ";
         buf << (nodeType_ == NODE_TYPE_CHANCE ? "NODE_TYPE_CHANCE" : "");
         buf << (nodeType_ == NODE_TYPE_CHOICE ? "NODE_TYPE_CHOICE" : "");
@@ -169,9 +154,11 @@ namespace open_spiel::universal_poker::logic {
         buf << "]" << std::endl;
 
         buf << "ACPC State: " << ACPCState::ToString() << std::endl;
-
-        buf << "STATE END" << std::endl;
         return buf.str();
+    }
+
+    double BettingTree::BettingNode::GetTotalReward(uint8_t player) const {
+        return 0;
     }
 }
 
