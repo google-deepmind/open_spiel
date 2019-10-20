@@ -6,16 +6,14 @@
 
 namespace open_spiel::universal_poker::logic {
 
-void BasicBettingTreeTests() {
-    const std::string gameDesc("GAMEDEF\nnolimit\nnumPlayers = 2\nnumRounds = 2\nstack = 1200 1200\nblind = 100 100\nfirstPlayer = 1 1\nnumSuits = 2\nnumRanks = 3\nnumHoleCards = 1\nnumBoardCards = 0 1\nEND GAMEDEF");
-
+void BasicBettingTreeTests(const std::string gameDesc) {
     BettingTree bettingTree(gameDesc);
 
     std::srand(std::time(nullptr));
 
     for( int i = 0; i < 100; i++) {
-        BettingTree::BettingNode bettingNode(bettingTree);
-        std::cout << "INIT" << std::endl;
+        BettingTree::BettingNode bettingNode(&bettingTree);
+        std::cout << "INIT. DEPTH: " << bettingNode.GetDepth() << std::endl;
         std::cout << bettingNode.ToString() << std::endl;
 
         while (!bettingNode.IsFinished()) {
@@ -38,7 +36,13 @@ void BasicBettingTreeTests() {
 }  // namespace
 
 int main(int argc, char **argv) {
+    const std::string gameDesc("GAMEDEF\nnolimit\nnumPlayers = 2\nnumRounds = 2\nstack = 1200 1200\nblind = 100 100\nfirstPlayer = 1 1\nnumSuits = 2\nnumRanks = 3\nnumHoleCards = 1\nnumBoardCards = 0 1\nEND GAMEDEF");
 
-    open_spiel::universal_poker::logic::BasicBettingTreeTests();
+    //open_spiel::universal_poker::logic::BasicBettingTreeTests(gameDesc);
+
+
+    const std::string gameDescHoldem("GAMEDEF\nnolimit\nnumPlayers = 2\nnumRounds = 4\nstack = 20000 20000\nblind = 100 50\nfirstPlayer = 2 1 1 1\nnumSuits = 4\nnumRanks = 13\nnumHoleCards = 2\nnumBoardCards = 0 3 1 1\nEND GAMEDEF");
+
+    open_spiel::universal_poker::logic::BasicBettingTreeTests(gameDescHoldem);
 
 }

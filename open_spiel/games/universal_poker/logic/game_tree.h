@@ -13,15 +13,17 @@ namespace open_spiel::universal_poker::logic {
     public:
         class GameNode : public BettingNode {
         public:
-            explicit GameNode(GameTree &gameTree);
+            GameNode(GameTree* gameTree);
 
             uint32_t GetActionCount() const;
             void ApplyAction(uint32_t actionIdx);
             std::string ToString() const;
 
-
+            const CardSet& GetBoardCards() const ;
+            const CardSet& GetHoleCardsOfPlayer(uint8_t player) const;
+            double GetTotalReward(uint8_t player) const;
         private:
-            GameTree& gameTree_;
+            GameTree* gameTree_;
             CardSet deck_;
             uint32_t actionCount_ ;
             std::vector<CardSet> holeCards_;
@@ -30,7 +32,9 @@ namespace open_spiel::universal_poker::logic {
 
     public:
         GameTree(const std::string &gameDef);
-
+        int GetGameDepth() const;
+    private:
+        int gameDepth_;
     };
 }
 

@@ -15,7 +15,7 @@ void BasicGameTreeTests() {
 
 
     for( int i = 0; i < 100; i++) {
-        GameTree::GameNode node(tree);
+        GameTree::GameNode node(&tree);
         std::cout << node.ToString() << std::endl;
         while (!node.IsFinished()) {
 

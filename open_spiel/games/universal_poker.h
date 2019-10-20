@@ -56,6 +56,7 @@ namespace open_spiel {
             void DoApplyAction(Action action_id) override;
 
         private:
+            logic::GameTree* gameTree_;
             logic::GameTree::GameNode gameNode_;
 
         };
@@ -90,7 +91,7 @@ namespace open_spiel {
             std::string gameDesc_;
             logic::GameTree gameTree_;
         public:
-            logic::GameTree &GetGameTree();
+            logic::GameTree* GetGameTree();
         };
 
     }  // namespace universal_poker

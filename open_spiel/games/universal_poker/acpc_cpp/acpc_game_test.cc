@@ -7,7 +7,7 @@ void BasicACPCTests() {
     const std::string gameDesc("GAMEDEF\nnolimit\nnumPlayers = 2\nnumRounds = 2\nstack = 1200 1200\nblind = 100 100\nfirstPlayer = 1 1\nnumSuits = 2\nnumRanks = 3\nnumHoleCards = 1\nnumBoardCards = 0 1\nEND GAMEDEF");
 
     ACPCGame game(gameDesc);
-    ACPCGame::ACPCState state(game);
+    ACPCGame::ACPCState state(&game);
 
     std::cout << game.ToString() << std::endl;
     std::cout << state.ToString() << std::endl;

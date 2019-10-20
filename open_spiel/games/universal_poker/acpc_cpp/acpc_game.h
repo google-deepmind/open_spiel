@@ -24,11 +24,15 @@ namespace open_spiel::universal_poker::acpc_cpp {
             };
 
         public:
-            explicit ACPCState(ACPCGame &game);
+            ACPCState(ACPCGame* game);
+            ACPCState(const ACPCState& game);
             virtual ~ACPCState();
 
+            void SetHoleAndBoardCards(uint8_t holeCards[10][3], uint8_t boardCards[7], uint8_t nbHoleCards[10], uint8_t nbBoardCards) const;
+
             uint8_t CurrentPlayer() const;
-            int IsFinished() const;
+
+            virtual bool IsFinished() const;
             int RaiseIsValid(int32_t *minSize, int32_t *maxSize) const;
             int IsValidAction(const ACPCActionType actionType, const int32_t size) const;
             void DoAction(const ACPCActionType actionType, const int32_t size);
@@ -36,15 +40,20 @@ namespace open_spiel::universal_poker::acpc_cpp {
             uint32_t MaxSpend() const;
             uint8_t GetRound() const;
             uint8_t NumFolded() const;
+            uint32_t Money(const uint8_t player) const;
+            uint32_t Ante(const uint8_t player) const;
             std::string ToString() const;
+            std::string BettingSequence(uint8_t round) const;
+
         private:
-            ACPCGame &game_;
+            ACPCGame* game_;
             std::unique_ptr<State> acpcState_;
         };
 
 
     public:
-        explicit ACPCGame(const std::string &gameDef);
+        ACPCGame(const std::string &gameDef);
+        ACPCGame(const ACPCGame& game);
         virtual ~ACPCGame();
 
         std::string ToString() const;
@@ -54,10 +63,12 @@ namespace open_spiel::universal_poker::acpc_cpp {
         uint8_t GetNbBoardCardsRequired(uint8_t round) const;
         uint8_t NumSuitsDeck() const;
         uint8_t NumRanksDeck() const;
-
+        uint32_t StackSize(uint8_t player) const;
+        uint8_t GetTotalNbBoardCards() const;
     private:
         std::unique_ptr<Game> acpcGame_;
         uint32_t handId_;
+
 
     };
 

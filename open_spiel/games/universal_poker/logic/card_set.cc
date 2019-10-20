@@ -89,7 +89,7 @@ namespace open_spiel::universal_poker::logic {
         return result.str();
     }
 
-    std::vector<uint8_t> CardSet::ToCardArray() {
+    std::vector<uint8_t> CardSet::ToCardArray() const {
         std::vector<uint8_t> result;
 
         for (int r = MAX_RANKS - 1; r >= 0; r--) {
@@ -155,7 +155,11 @@ namespace open_spiel::universal_poker::logic {
 
         }
 
-
+    bool CardSet::ContainsCards(const uint8_t &card) {
+        int rank = rankOfCard(card);
+        int suit = suitOfCard(card);
+        return (cs.bySuit[suit] & ((uint16_t) 1 << rank)) > 0;
+    }
 
 
 }
