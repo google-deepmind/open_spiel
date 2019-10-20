@@ -20,10 +20,18 @@ void BasicBettingTreeTests(const std::string gameDesc) {
             if (bettingNode.GetNodeType() == BettingTree::BettingNode::NODE_TYPE_CHANCE) {
                 bettingNode.ApplyDealCards();
             } else {
-                uint32_t actionIdx = std::rand() % bettingNode.GetPossibleActions().size();
-                std::cout << "Selected Action: " << actionIdx << std::endl;
+                uint32_t actionIdx = std::rand() % bettingNode.GetPossibleActionCount();
+                uint32_t idx = 0;
+                for(auto action : BettingTree::ALL_ACTIONS){
+                    if(action & bettingNode.GetPossibleActionsMask()){
+                        if(idx==actionIdx){
+                            bettingNode.ApplyChoiceAction(action);
+                            break;
+                        }
+                        idx++;
+                    }
+                }
 
-                bettingNode.ApplyChoiceAction(actionIdx);
             }
 
             std::cout << bettingNode.ToString() << std::endl;

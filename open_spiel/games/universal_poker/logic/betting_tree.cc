@@ -7,6 +7,8 @@
 #include <sstream>
 
 namespace open_spiel::universal_poker::logic {
+    const char* actions = "0df0c000p0000000a";
+
 
     BettingTree::BettingTree(const std::string& gameDef)
             : ACPCGame(gameDef) {
@@ -18,7 +20,7 @@ namespace open_spiel::universal_poker::logic {
     }
 
     BettingTree::BettingNode::BettingNode(BettingTree* bettingTree)
-    : ACPCState(bettingTree), bettingTree_(bettingTree), nodeType_(NODE_TYPE_CHANCE), possibleActions_({ACTION_DEAL}),
+    : ACPCState(bettingTree), bettingTree_(bettingTree), nodeType_(NODE_TYPE_CHANCE), possibleActions_(ACTION_DEAL),
       nbBoardCardsDealt_(0), nbHoleCardsDealtPerPlayer_{0,0,0,0,0,0,0,0,0,0}, potSize_(0), allInSize_(0)
     {
     }
@@ -27,12 +29,12 @@ namespace open_spiel::universal_poker::logic {
         return nodeType_;
     }
 
-    void BettingTree::BettingNode::ApplyChoiceAction(uint32_t actionIdx) {
+    void BettingTree::BettingNode::ApplyChoiceAction(ActionType actionType) {
         assert(nodeType_ == NODE_TYPE_CHOICE);
-        assert(actionIdx >= 0 && actionIdx < possibleActions_.size());
+        assert((possibleActions_ & actionType) > 0);
 
-        ActionType actionType = possibleActions_[actionIdx];
-        actionSequence_ += (char)actionType;
+
+        actionSequence_ += (char)actions[actionType];
         switch(actionType)
         {
             case ACTION_FOLD:
@@ -53,7 +55,7 @@ namespace open_spiel::universal_poker::logic {
                 break;
         }
 
-        _calculateActionsAndNodeType();
+        _CalculateActionsAndNodeType();
     }
 
     void BettingTree::BettingNode::ApplyDealCards() {
@@ -63,22 +65,22 @@ namespace open_spiel::universal_poker::logic {
         for(uint8_t p=0; p < bettingTree_->GetNbPlayers(); p++ ){
             if(nbHoleCardsDealtPerPlayer_[p] < bettingTree_->GetNbHoleCardsRequired() ){
                 nbHoleCardsDealtPerPlayer_[p]++;
-                _calculateActionsAndNodeType();
+                _CalculateActionsAndNodeType();
                 return;
             }
         }
 
         if( nbBoardCardsDealt_ < bettingTree_->GetNbBoardCardsRequired(GetRound())) {
             nbBoardCardsDealt_++;
-            _calculateActionsAndNodeType();
+            _CalculateActionsAndNodeType();
             return;
         }
 
         assert(false);
     }
 
-    void BettingTree::BettingNode::_calculateActionsAndNodeType() {
-        possibleActions_.clear();
+    void BettingTree::BettingNode::_CalculateActionsAndNodeType() {
+        possibleActions_ = 0;
 
         if(ACPCState::IsFinished()) {
             if( NumFolded() >= bettingTree_->GetNbPlayers() - 1){
@@ -87,7 +89,7 @@ namespace open_spiel::universal_poker::logic {
             else {
                 if( nbBoardCardsDealt_ < bettingTree_->GetNbBoardCardsRequired(GetRound())) {
                     nodeType_ = NODE_TYPE_CHANCE;
-                    possibleActions_.push_back(ACTION_DEAL);
+                    possibleActions_ = ACTION_DEAL;
                     return;
                 }
                 nodeType_= NODE_TYPE_TERMINAL_SHOWDOWN;
@@ -99,23 +101,23 @@ namespace open_spiel::universal_poker::logic {
             for(uint8_t p=0; p < bettingTree_->GetNbPlayers(); p++ ){
                 if(nbHoleCardsDealtPerPlayer_[p] < bettingTree_->GetNbHoleCardsRequired() ){
                     nodeType_ = NODE_TYPE_CHANCE;
-                    possibleActions_.push_back(ACTION_DEAL);
+                    possibleActions_ = ACTION_DEAL;
                     return;
                 }
             }
             if( nbBoardCardsDealt_ < bettingTree_->GetNbBoardCardsRequired(GetRound())) {
                 nodeType_ = NODE_TYPE_CHANCE;
-                possibleActions_.push_back(ACTION_DEAL);
+                possibleActions_ = ACTION_DEAL;
                 return;
             }
 
             //Check for CHOICE Actions
             nodeType_ = NODE_TYPE_CHOICE;
             if( IsValidAction(ACPC_FOLD, 0) ){
-                possibleActions_.push_back(ACTION_FOLD);
+                possibleActions_ |= ACTION_FOLD;
             }
             if( IsValidAction(ACPC_CALL, 0) ){
-                possibleActions_.push_back(ACTION_CHECK_CALL);
+                possibleActions_ |= ACTION_CHECK_CALL;
             }
 
             potSize_ = 0;
@@ -124,24 +126,20 @@ namespace open_spiel::universal_poker::logic {
             if( RaiseIsValid(&potSize_, &allInSize_) ){
                 if(bettingTree_->IsLimitGame()){
                     potSize_ = 0;
-                    possibleActions_.push_back(ACTION_BET_POT);
+                    possibleActions_|= ACTION_BET_POT;
                 }
                 else {
                     int32_t currentPot = MaxSpend() * (bettingTree_->GetNbPlayers() - NumFolded());
                     potSize_ = currentPot > potSize_ ? currentPot : potSize_;
                     potSize_ = allInSize_ < potSize_ ? allInSize_ : potSize_;
 
-                    possibleActions_.push_back(ACTION_BET_POT);
+                    possibleActions_ |= ACTION_BET_POT;
                     if( allInSize_ > potSize_ ) {
-                        possibleActions_.push_back(ACTION_ALL_IN);
+                        possibleActions_ |= ACTION_ALL_IN;
                     }
                 }
             }
         }
-    }
-
-    const std::vector<BettingTree::ActionType> &BettingTree::BettingNode::GetPossibleActions() const {
-        return possibleActions_;
     }
 
     std::string BettingTree::BettingNode::ToString() const {
@@ -153,13 +151,15 @@ namespace open_spiel::universal_poker::logic {
         buf << (nodeType_ == NODE_TYPE_TERMINAL_FOLD ? "NODE_TYPE_TERMINAL_FOLD" : "");
         buf << std::endl;
 
-        buf << "PossibleActions (" << possibleActions_.size() << "): [";
-        for( auto action : possibleActions_ ){
-            buf << (action == ACTION_ALL_IN ? " ACTION_ALL_IN " : "");
-            buf << (action == ACTION_BET_POT ? " ACTION_BET_POT " : "");
-            buf << (action == ACTION_CHECK_CALL ? " ACTION_CHECK_CALL " : "");
-            buf << (action == ACTION_FOLD ? " ACTION_FOLD " : "");
-            buf << (action == ACTION_DEAL ? " ACTION_DEAL " : "");
+        buf << "PossibleActions (" << GetPossibleActionCount() << "): [";
+        for( auto action : ALL_ACTIONS ){
+            if( action & possibleActions_) {
+                buf << ((action == ACTION_ALL_IN) ? " ACTION_ALL_IN " : "");
+                buf << ((action == ACTION_BET_POT) ? " ACTION_BET_POT " : "");
+                buf << ((action == ACTION_CHECK_CALL) ? " ACTION_CHECK_CALL " : "");
+                buf << ((action == ACTION_FOLD) ? " ACTION_FOLD " : "");
+                buf << ((action == ACTION_DEAL) ? " ACTION_DEAL " : "");
+            }
         }
         buf << "]" << std::endl;
         buf << "Round: " << (int)GetRound() << std::endl;
@@ -170,16 +170,17 @@ namespace open_spiel::universal_poker::logic {
 
     int BettingTree::BettingNode::GetDepth() {
         int maxDepth = 0;
-        for(size_t action = 0; action < possibleActions_.size(); action++){
-            BettingNode child(*this);
-            if( child.GetNodeType() == NODE_TYPE_CHANCE ){
-                child.ApplyDealCards();
+        for(auto action : ALL_ACTIONS){
+            if( action & possibleActions_) {
+                BettingNode child(*this);
+                if (child.GetNodeType() == NODE_TYPE_CHANCE) {
+                    child.ApplyDealCards();
+                } else if (child.GetNodeType() == NODE_TYPE_CHOICE) {
+                    child.ApplyChoiceAction(action);
+                }
+                int depth = child.GetDepth();
+                maxDepth = depth > maxDepth ? depth : maxDepth;
             }
-            else if ( child.GetNodeType() == NODE_TYPE_CHOICE ){
-                child.ApplyChoiceAction(action);
-            }
-            int depth = child.GetDepth();
-            maxDepth = depth > maxDepth ? depth : maxDepth;
         }
 
         return 1+maxDepth;
@@ -194,6 +195,15 @@ namespace open_spiel::universal_poker::logic {
         assert( ACPCState::IsFinished() || !finished );
 
         return finished;
+    }
+
+    const int BettingTree::BettingNode::GetPossibleActionCount() const {
+        int result = __builtin_popcount(possibleActions_);
+        return result;
+    }
+
+    const uint32_t& BettingTree::BettingNode::GetPossibleActionsMask() const {
+        return possibleActions_;
     }
 
 

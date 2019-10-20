@@ -121,6 +121,16 @@ namespace open_spiel::universal_poker::acpc_cpp {
         return acpcGame_->stack[player];
     }
 
+    uint8_t ACPCGame::GetNbRounds() const {
+        return acpcGame_->numRounds;
+    }
+
+    uint32_t ACPCGame::BlindSize(uint8_t player) const {
+        assert(player < acpcGame_->numPlayers);
+
+        return acpcGame_->blind[player];
+    }
+
     std::string ACPCGame::ACPCState::ToString() const {
         char buf[STRING_BUFFERSIZE];
         printState(game_->acpcGame_.get(), acpcState_.get(), STRING_BUFFERSIZE, buf);
