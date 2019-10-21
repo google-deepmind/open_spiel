@@ -9,7 +9,7 @@
 namespace open_spiel::universal_poker::logic {
     GameTree::GameNode::GameNode( logic::GameTree* gameTree)
             : BettingNode(gameTree), deck_(gameTree->NumSuitsDeck(), gameTree->NumRanksDeck()), gameTree_(gameTree),
-              actionCount_(GetPossibleActions().size())
+              actionCount_(GetPossibleActionCount())
     {
         for(uint8_t p=0; p < gameTree_->GetNbPlayers(); p++ ){
             holeCards_.emplace_back();
@@ -39,14 +39,23 @@ namespace open_spiel::universal_poker::logic {
             }
         }
         else {
-            BettingNode::ApplyChoiceAction(actionIdx);
+            uint32_t idx = 0;
+            for(auto action : ALL_ACTIONS){
+                if(action & GetPossibleActionsMask()){
+                    if(idx==actionIdx){
+                        BettingNode::ApplyChoiceAction(action);
+                        break;
+                    }
+                    idx++;
+                }
+            }
         }
 
         if(GetNodeType() == NODE_TYPE_CHANCE ) {
-            actionCount_ = deck_.ToCardArray().size();
+            actionCount_ = deck_.CountCards();
         }
         else {
-            actionCount_ = GetPossibleActions().size();
+            actionCount_ = GetPossibleActionCount();
         }
     }
 
@@ -112,12 +121,7 @@ namespace open_spiel::universal_poker::logic {
     }
 
     GameTree::GameTree(const std::string &gameDef) : BettingTree(gameDef) {
-
-        gameDepth_ = GameNode(this).GetDepth();
-
     }
 
-    int GameTree::GetGameDepth() const {
-        return gameDepth_;
-    }
+
 }

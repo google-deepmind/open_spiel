@@ -90,13 +90,14 @@ namespace open_spiel::universal_poker::logic {
     }
 
     std::vector<uint8_t> CardSet::ToCardArray() const {
-        std::vector<uint8_t> result;
+        std::vector<uint8_t> result(CountCards(), 0);
 
+        int i = 0;
         for (int r = MAX_RANKS - 1; r >= 0; r--) {
             for (int s = MAX_SUITS - 1; s >= 0; s--) {
                 uint32_t mask = (uint32_t) 1 << r;
                 if (cs.bySuit[s] & mask) {
-                    result.push_back(makeCard(r, s));
+                    result[i++] = makeCard(r, s);
                 }
             }
         }
@@ -118,7 +119,7 @@ namespace open_spiel::universal_poker::logic {
         cs.bySuit[suit] ^= ((uint16_t) 1 << rank);
     }
 
-    uint32_t CardSet::CountCards() {
+    uint32_t CardSet::CountCards() const{
         return __builtin_popcountl(cs.cards);
     }
 

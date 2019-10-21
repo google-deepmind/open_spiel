@@ -58,12 +58,14 @@ namespace open_spiel::universal_poker::acpc_cpp {
 
         std::string ToString() const;
         bool IsLimitGame() const;
+        uint8_t GetNbRounds() const;
         uint8_t GetNbPlayers() const;
         uint8_t GetNbHoleCardsRequired() const;
         uint8_t GetNbBoardCardsRequired(uint8_t round) const;
         uint8_t NumSuitsDeck() const;
         uint8_t NumRanksDeck() const;
         uint32_t StackSize(uint8_t player) const;
+        uint32_t BlindSize(uint8_t player) const;
         uint8_t GetTotalNbBoardCards() const;
     private:
         std::unique_ptr<Game> acpcGame_;

@@ -243,20 +243,21 @@ namespace open_spiel::universal_poker {
 
     std::vector<std::pair<Action, double>> UniversalPokerState::ChanceOutcomes() const {
         SPIEL_CHECK_TRUE(IsChanceNode());
-        std::vector<std::pair<Action, double>> outcomes;
-
         const double p = 1.0 / (double)gameNode_.GetActionCount();
+        std::vector<std::pair<Action, double>> outcomes(gameNode_.GetActionCount(), {0, p});
+
+
         for (uint64_t card = 0; card < gameNode_.GetActionCount(); ++card) {
-            outcomes.emplace_back(card, p);
+            outcomes[card].first = card;
         }
         return outcomes;
     }
 
     std::vector<Action> UniversalPokerState::LegalActions() const {
-        std::vector<Action> actions;
+        std::vector<Action> actions(gameNode_.GetActionCount(), 0);
 
         for( uint64_t idx = 0; idx < gameNode_.GetActionCount(); idx++){
-            actions.push_back(idx);
+            actions[idx] = idx;
         }
 
         return actions;
@@ -352,6 +353,29 @@ namespace open_spiel::universal_poker {
     }
 
     int UniversalPokerGame::MaxGameLength() const {
-        return gameTree_.GetGameDepth() ;
+        //Make a good guess here because bruteforcing the tree is far too slow
+        //One Terminal Action
+        int length = 1;
+
+        //Deal Actions
+        length += gameTree_.GetTotalNbBoardCards() + gameTree_.GetNbHoleCardsRequired() * gameTree_.GetNbPlayers();
+
+        //Check Actions
+        length += (NumPlayers() * gameTree_.GetNbRounds());
+
+        //Bet Actions
+        double maxStack = 0;
+        double maxBlind = 0;
+        for( uint32_t p = 0; p < NumPlayers(); p++) {
+            maxStack = gameTree_.StackSize(p) > maxStack ? gameTree_.StackSize(p) : maxStack;
+            maxBlind = gameTree_.BlindSize(p) > maxStack ? gameTree_.BlindSize(p) : maxBlind;
+        }
+
+        while( maxStack > maxBlind ) {
+            maxStack /= 2.0; //You have always to bet the pot size
+            length += NumPlayers(); //Each player has to react
+        }
+
+        return length;
     }
 }

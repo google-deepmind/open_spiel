@@ -25,6 +25,9 @@ void BasicUniversalPokerTests() {
   testing::LoadGameTest("universal_poker");
   testing::ChanceOutcomesTest(*LoadGame("universal_poker"));
   testing::RandomSimTest(*LoadGame("universal_poker"), 100);
+
+  testing::RandomSimBenchmark("leduc_poker", 10000, false);
+  testing::RandomSimBenchmark("universal_poker", 10000, false);
 }
 
 }  // namespace

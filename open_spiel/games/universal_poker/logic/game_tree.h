@@ -32,9 +32,6 @@ namespace open_spiel::universal_poker::logic {
 
     public:
         GameTree(const std::string &gameDef);
-        int GetGameDepth() const;
-    private:
-        int gameDepth_;
     };
 }
 

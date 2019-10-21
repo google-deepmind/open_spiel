@@ -33,7 +33,7 @@ namespace open_spiel::universal_poker::logic {
         void RemoveCard(uint8_t card);
         bool ContainsCards(const uint8_t &i);
 
-        uint32_t CountCards();
+        uint32_t CountCards() const;
         int RankCards();
         bool IsBlocking(CardSet other);
 

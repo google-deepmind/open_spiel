@@ -13,9 +13,11 @@ namespace open_spiel::universal_poker::logic {
     constexpr uint8_t MAX_PLAYERS = 10;
 
     class BettingTree : public acpc_cpp::ACPCGame {
+    public:
         enum ActionType {
-            ACTION_DEAL = 'd', ACTION_FOLD = 'f', ACTION_CHECK_CALL = 'c', ACTION_BET_POT = 'p', ACTION_ALL_IN = 'a'
+            ACTION_DEAL = 1, ACTION_FOLD = 2, ACTION_CHECK_CALL = 4, ACTION_BET_POT = 8, ACTION_ALL_IN = 16
         };
+        static constexpr ActionType ALL_ACTIONS[5] = {ACTION_DEAL, ACTION_FOLD, ACTION_CHECK_CALL, ACTION_BET_POT, ACTION_ALL_IN};
 
     public:
         class BettingNode : public acpc_cpp::ACPCGame::ACPCState {
@@ -31,9 +33,10 @@ namespace open_spiel::universal_poker::logic {
         public:
             NodeType GetNodeType() const;
 
-            const std::vector<ActionType> &GetPossibleActions() const;
+            const uint32_t &GetPossibleActionsMask() const;
+            const int GetPossibleActionCount() const;
 
-            void ApplyChoiceAction(uint32_t actionIdx);
+            void ApplyChoiceAction(ActionType actionType);
 
             virtual void ApplyDealCards();
 
@@ -48,7 +51,7 @@ namespace open_spiel::universal_poker::logic {
         private:
             const BettingTree* bettingTree_;
             NodeType nodeType_;
-            std::vector<ActionType> possibleActions_;
+            uint32_t possibleActions_;
             int32_t potSize_;
             int32_t allInSize_;
             std::string actionSequence_;
@@ -56,7 +59,7 @@ namespace open_spiel::universal_poker::logic {
             uint8_t nbHoleCardsDealtPerPlayer_[MAX_PLAYERS];
             uint8_t nbBoardCardsDealt_;
 
-            void _calculateActionsAndNodeType();
+            void _CalculateActionsAndNodeType();
         };
 
 
