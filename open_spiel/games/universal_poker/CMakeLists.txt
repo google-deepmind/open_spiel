@@ -19,11 +19,11 @@ set(SOURCE_FILES
 
         )
 
-add_library(universal_poker_clib ${CLIB_FILES} )
+add_library(universal_poker_clib OBJECT ${CLIB_FILES} )
 set_target_properties(universal_poker_clib PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 # The library contains header and source files.
-add_library(universal_poker_lib STATIC
+add_library(universal_poker_lib OBJECT
     ${SOURCE_FILES}
     ${HEADER_FILES}
         )
