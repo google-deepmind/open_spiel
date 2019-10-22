@@ -243,40 +243,35 @@ void readGame( FILE *file, Game* game )
   if( game->numRounds == 0 || game->numRounds > MAX_ROUNDS ) {
 
     fprintf( stderr, "invalid number of rounds: %"PRIu8"\n", game->numRounds );
-    free( game );
-    return NULL;
+    return;
   }
 
   if( game->numPlayers < 2 || game->numPlayers > MAX_PLAYERS ) {
 
     fprintf( stderr, "invalid number of players: %"PRIu8"\n",
 	     game->numPlayers );
-    free( game );
-    return NULL;
+    return;
   }
 
   if( stackRead < game->numPlayers ) {
 
     fprintf( stderr, "only read %"PRIu8" stack sizes, need %"PRIu8"\n",
 	    stackRead, game->numPlayers );
-    free( game );
-    return NULL;
+    return;
   }
 
   if( blindRead < game->numPlayers ) {
 
     fprintf( stderr, "only read %"PRIu8" blinds, need %"PRIu8"\n",
 	    blindRead, game->numPlayers );
-    free( game );
-    return NULL;
+    return;
   }
   for( c = 0; c < game->numPlayers; ++c ) {
 
     if( game->blind[ c ] > game->stack[ c ] ) {
       fprintf( stderr, "blind for player %d is greater than stack size\n",
 	       c + 1 );
-      free( game );
-      return NULL;
+      return;
     }
   }
 
@@ -285,8 +280,7 @@ void readGame( FILE *file, Game* game )
 
     fprintf( stderr, "only read %"PRIu8" raise sizes, need %"PRIu8"\n",
 	     raiseSizeRead, game->numRounds );
-    free( game );
-    return NULL;
+    return;
   }
 
   for( c = 0; c < game->numRounds; ++c ) {
@@ -296,8 +290,7 @@ void readGame( FILE *file, Game* game )
 
       fprintf( stderr, "invalid first player %"PRIu8" on round %d\n",
 	      game->firstPlayer[ c ], c + 1 );
-      free( game );
-      return NULL;
+      return;
     }
 
     --game->firstPlayer[ c ];
@@ -306,31 +299,27 @@ void readGame( FILE *file, Game* game )
   if( game->numSuits == 0 || game->numSuits > MAX_SUITS ) {
 
     fprintf( stderr, "invalid number of suits: %"PRIu8"\n", game->numSuits );
-    free( game );
-    return NULL;
+    return;
   }
 
   if( game->numRanks == 0 || game->numRanks > MAX_RANKS ) {
 
     fprintf( stderr, "invalid number of ranks: %"PRIu8"\n", game->numRanks );
-    free( game );
-    return NULL;
+    return;
   }
 
   if( game->numHoleCards == 0 || game->numHoleCards > MAX_HOLE_CARDS ) {
 
     fprintf( stderr, "invalid number of hole cards: %"PRIu8"\n",
 	     game->numHoleCards );
-    free( game );
-    return NULL;
+    return;
   }
 
   if( boardCardsRead < game->numRounds ) {
 
     fprintf( stderr, "only read %"PRIu8" board card numbers, need %"PRIu8"\n",
 	    boardCardsRead, game->numRounds );
-    free( game );
-    return NULL;
+    return;
   }
 
   t = game->numHoleCards * game->numPlayers;
@@ -340,11 +329,8 @@ void readGame( FILE *file, Game* game )
   if( t > game->numSuits * game->numRanks ) {
 
     fprintf( stderr, "too many hole and board cards for specified deck\n" );
-    free( game );
-    return NULL;
+    return;
   }
-
-  return game;
 }
 
 void printGame( FILE *file, const Game *game )

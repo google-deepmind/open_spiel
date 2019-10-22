@@ -11,10 +11,6 @@
 
 namespace open_spiel {
     namespace universal_poker {
-
-        inline const std::string gameDesc(
-                "GAMEDEF\nnolimit\nnumPlayers = 2\nnumRounds = 2\nstack = 1200 1200\nblind = 100 100\nfirstPlayer = 1 1\nnumSuits = 2\nnumRanks = 3\nnumHoleCards = 1\nnumBoardCards = 0 1\nEND GAMEDEF");
-
         class UniversalPokerGame;
 
         enum ActionType {
@@ -92,6 +88,8 @@ namespace open_spiel {
             logic::GameTree gameTree_;
         public:
             logic::GameTree* GetGameTree();
+
+            std::string parseParameters(const GameParameters &map);
         };
 
     }  // namespace universal_poker

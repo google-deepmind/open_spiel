@@ -12,11 +12,11 @@ namespace open_spiel::universal_poker {
     const GameType kGameType{
             /*short_name=*/"universal_poker",
             /*long_name=*/"Universal Poker",
-                           GameType::Dynamics::kSequential,
-                           GameType::ChanceMode::kExplicitStochastic,
-                           GameType::Information::kImperfectInformation,
-                           GameType::Utility::kZeroSum,
-                           GameType::RewardModel::kTerminal,
+           GameType::Dynamics::kSequential,
+           GameType::ChanceMode::kExplicitStochastic,
+           GameType::Information::kImperfectInformation,
+           GameType::Utility::kZeroSum,
+           GameType::RewardModel::kTerminal,
             /*max_num_players=*/10,
             /*min_num_players=*/2,
             /*provides_information_state=*/true,
@@ -24,7 +24,20 @@ namespace open_spiel::universal_poker {
             /*provides_observation=*/true,
             /*provides_observation_as_normalized_vector=*/true,
             /*parameter_specification=*/
-                           {{"gameDesc", GameParameter(gameDesc)}}};
+           {
+                   { "players", GameParameter(2) },                    // Number of Players (up to 10)
+                   { "bettingType", GameParameter(std::string("nolimit")) },        // Betting Type "limit" "nolimit" (currently only nolimit supported)
+                   { "stackPerPlayer",  GameParameter(1200) },         // Stack of money per Player
+                   { "bigBlind",  GameParameter(100) },                // Big Blind
+                   { "smallBlind",  GameParameter(100) },              // Small Blind
+                   { "rounds",  GameParameter(2) },                    // Count of Rounds
+                   { "firstPlayer",  GameParameter(std::string("1 1")) },           // Who is the first player by round?
+                   { "numSuits",  GameParameter(2) },                  // NumSuits of deck
+                   { "numRanks",  GameParameter(3) },                  // NumRanks of deck
+                   { "numHoleCards",  GameParameter(1) },              // Hole Cards (Private Cards) per Player
+                   { "numBoardCards",  GameParameter(std::string("0 1")) }         // Board Cards (Public Cards) per Player
+           }
+    };
 
     std::shared_ptr<const Game> Factory(const GameParameters &params) {
         return std::shared_ptr<const Game>(new UniversalPokerGame(params));
@@ -274,7 +287,7 @@ namespace open_spiel::universal_poker {
      */
     UniversalPokerGame::UniversalPokerGame(const GameParameters &params)
             : Game(kGameType, params),
-              gameDesc_(ParameterValue<std::string>("gameDesc")),
+              gameDesc_(parseParameters(params)),
               gameTree_(gameDesc_)
     {
 
@@ -377,5 +390,60 @@ namespace open_spiel::universal_poker {
         }
 
         return length;
+    }
+
+    /**
+     * Parses the Game Paramters and makes a gameDesc out of it
+     * @param map
+     * @return
+     */
+    std::string UniversalPokerGame::parseParameters(const GameParameters &map) {
+
+        std::string gameDesc;
+        if( map.find("gameDesc") == map.end() ) {
+            std::ostringstream generatedDesc;
+
+            generatedDesc << "GAMEDEF" << std::endl;
+            generatedDesc << ParameterValue<std::string>("bettingType") << std::endl;
+            generatedDesc << "numPlayers = " << (int)ParameterValue<int>("players") << std::endl;
+            generatedDesc << "numRounds = " << (int)ParameterValue<int>("rounds") << std::endl;
+
+            generatedDesc << "stack = " ;
+            for( int p = 0; p < ParameterValue<int>("players"); p++){
+                generatedDesc << ParameterValue<int>("stackPerPlayer") << " ";
+            }
+            generatedDesc << std::endl;
+
+            generatedDesc << "blind = " ;
+            for( int p = 0; p < ParameterValue<int>("players"); p++){
+                if(p == 0){
+                    generatedDesc << ParameterValue<int>("bigBlind") << " ";
+                }
+                else if (p == 1){
+                    generatedDesc << ParameterValue<int>("smallBlind") << " ";
+                }
+                else {
+                    generatedDesc << "0 " << std::endl;
+                }
+            }
+            generatedDesc << std::endl;
+
+            generatedDesc << "firstPlayer = " << (std::string)ParameterValue<std::string>("firstPlayer") << std::endl;
+            generatedDesc << "numSuits = " << (int)ParameterValue<int>("numSuits") << std::endl;
+            generatedDesc << "numRanks = " << (int)ParameterValue<int>("numRanks") << std::endl;
+            generatedDesc << "numHoleCards = " << (int)ParameterValue<int>("numHoleCards") << std::endl;
+            generatedDesc << "numBoardCards = " << (std::string)ParameterValue<std::string>("numBoardCards") << std::endl;
+
+            generatedDesc << "END GAMEDEF" << std::endl;
+
+            gameDesc = generatedDesc.str();
+
+        }
+        else {
+            gameDesc = ParameterValue<std::string>("bettingType");
+        }
+        return gameDesc;
+
+
     }
 }
