@@ -127,7 +127,7 @@ namespace open_spiel::universal_poker {
         offset += deck.CountCards();
 
 
-        const char* actionSeq = gameNode_.GetActionSequence().c_str();
+        std::string actionSeq = gameNode_.GetActionSequence();
         const int length = gameNode_.GetActionSequence().length();
         SPIEL_CHECK_LT(length, game_->MaxGameLength());
 
@@ -145,11 +145,17 @@ namespace open_spiel::universal_poker {
                 // Encode raise as 01.
                 (*values)[offset + (2 * i)] = 1;
                 (*values)[offset + (2 * i) + 1] = 1;
-            } else {
-                SPIEL_CHECK_EQ(actionSeq[i] == 'f' || actionSeq[i] == 'd' , true);
+            } else if(actionSeq[i] == 'f') {
                 // Encode fold as 00.
                 (*values)[offset + (2 * i)] = 0;
                 (*values)[offset + (2 * i) + 1] = 0;
+            }
+            else if(actionSeq[i] == 'd') {
+                (*values)[offset + (2 * i)] = 0;
+                (*values)[offset + (2 * i) + 1] = 0;
+            }
+            else {
+                SPIEL_CHECK_EQ(actionSeq[i], 'd' );
             }
         }
 
@@ -423,7 +429,7 @@ namespace open_spiel::universal_poker {
                     generatedDesc << ParameterValue<int>("smallBlind") << " ";
                 }
                 else {
-                    generatedDesc << "0 " << std::endl;
+                    generatedDesc << "0 ";
                 }
             }
             generatedDesc << std::endl;
