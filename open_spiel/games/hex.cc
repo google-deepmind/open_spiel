@@ -19,6 +19,8 @@
 #include <utility>
 #include <vector>
 
+#include "open_spiel/tensor_view.h"
+
 namespace open_spiel {
 namespace hex {
 namespace {
@@ -265,12 +267,11 @@ void HexState::ObservationAsNormalizedVector(
   // TODO(author8): Make an option to not expose connection info
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
-  values->resize(board_.size() * kCellStates);
-  std::fill(values->begin(), values->end(), 0.);
+
+  TensorView<2> view(values, {kCellStates, static_cast<int>(board_.size())},
+                     true);
   for (int cell = 0; cell < board_.size(); ++cell) {
-    (*values)[board_.size() *
-                  (static_cast<int>(board_[cell]) - kMinValueCellState) +
-              cell] = 1.0;
+    view[{static_cast<int>(board_[cell]) - kMinValueCellState, cell}] = 1.0;
   }
 }
 

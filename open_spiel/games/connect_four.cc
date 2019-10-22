@@ -18,6 +18,8 @@
 #include <memory>
 #include <utility>
 
+#include "open_spiel/tensor_view.h"
+
 namespace open_spiel {
 namespace connect_four {
 namespace {
@@ -192,10 +194,10 @@ void ConnectFourState::InformationStateAsNormalizedVector(
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  values->resize(kNumCells * kCellStates);
-  std::fill(values->begin(), values->end(), 0.);
+  TensorView<2> view(values, {kCellStates, kNumCells}, true);
+
   for (int cell = 0; cell < kNumCells; ++cell) {
-    (*values)[kNumCells * static_cast<int>(board_[cell]) + cell] = 1.0;
+    view[{static_cast<int>(board_[cell]), cell}] = 1.0;
   }
 }
 

@@ -43,6 +43,7 @@ set (OPEN_SPIEL_CORE_FILES
   simultaneous_move_game.cc
   spiel_utils.h
   spiel_utils.cc
+  tensor_view.h
 )
 
 # We add the subdirectory here so open_spiel_core can #include absl.

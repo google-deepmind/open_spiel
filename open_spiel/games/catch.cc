@@ -19,6 +19,7 @@
 
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel_utils.h"
+#include "open_spiel/tensor_view.h"
 
 namespace open_spiel {
 namespace catch_ {
@@ -161,11 +162,10 @@ void CatchState::ObservationAsNormalizedVector(
     Player player, std::vector<double>* values) const {
   SPIEL_CHECK_EQ(player, 0);
 
-  values->resize(num_rows_ * num_columns_);
-  std::fill(values->begin(), values->end(), 0.);
+  TensorView<2> view(values, {num_rows_, num_columns_}, true);
   if (initialized_) {
-    (*values)[ball_row_ * num_columns_ + ball_col_] = 1.0;
-    (*values)[(num_rows_ - 1) * num_columns_ + paddle_col_] = 1.0;
+    view[{ball_row_, ball_col_}] = 1.0;
+    view[{num_rows_ - 1, paddle_col_}] = 1.0;
   }
 }
 
