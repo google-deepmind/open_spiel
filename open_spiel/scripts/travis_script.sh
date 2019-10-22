@@ -29,3 +29,11 @@ pip3 install --upgrade -r requirements.txt -q
 
 ./open_spiel/scripts/build_and_run_tests.sh
 deactivate
+
+# Build and run tests with pip package method
+virtualenv -p python ./venv-pip
+source ./venv-pip/bin/activate
+
+python --version
+./open_spiel/scripts/pip_install_and_run_tests.sh
+deactivate
