@@ -120,7 +120,7 @@ class TrajectoryRecorder {
 
   BatchedTrajectory RecordBatch(const std::vector<TabularPolicy>& policies,
                                 int batch_size, int max_unroll_length) {
-    bool include_full_observations = !state_to_index_.empty();
+    const bool include_full_observations = state_to_index_.empty();
     std::unique_ptr<State> root = game_->NewInitialState();
     return RecordBatchedTrajectory(*game_, policies, *root, state_to_index_,
                                    batch_size, include_full_observations, &rng_,
