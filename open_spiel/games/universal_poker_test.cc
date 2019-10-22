@@ -26,8 +26,8 @@ void BasicUniversalPokerTests() {
   testing::ChanceOutcomesTest(*LoadGame("universal_poker"));
   testing::RandomSimTest(*LoadGame("universal_poker"), 100);
 
-  testing::RandomSimBenchmark("leduc_poker", 10000, false);
-  testing::RandomSimBenchmark("universal_poker", 10000, false);
+  //testing::RandomSimBenchmark("leduc_poker", 10000, false);
+  //testing::RandomSimBenchmark("universal_poker", 10000, false);
 
   std::shared_ptr<const Game> gFivePlayers =
           LoadGame({{"name", GameParameter(std::string("universal_poker"))}, {"players", GameParameter(5)}});
