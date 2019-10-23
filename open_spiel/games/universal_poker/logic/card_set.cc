@@ -7,8 +7,8 @@ std::string suitChars = "cdhs";
 std::string rankChars = "23456789TJQKA";
 
 extern "C" {
-#include "open_spiel/games/universal_poker/acpc/game.h"
-#include "open_spiel/games/universal_poker/acpc/evalHandTables"
+#include "open_spiel/games/universal_poker/acpc/project_acpc_server/game.h"
+#include "open_spiel/games/universal_poker/acpc/project_acpc_server/evalHandTables"
 }
 
 namespace open_spiel::universal_poker::logic {

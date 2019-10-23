@@ -7,10 +7,11 @@
 #include <sstream>
 #include <assert.h>
 #include <ostream>
+#include <string.h>
 
 extern "C"
 {
-#include "open_spiel/games/universal_poker/acpc/game.h"
+#include "open_spiel/games/universal_poker/acpc/project_acpc_server/game.h"
 };
 
 namespace open_spiel::universal_poker::acpc_cpp {
@@ -45,7 +46,12 @@ namespace open_spiel::universal_poker::acpc_cpp {
         gameDef.copy(buf, STRING_BUFFERSIZE);
 
         FILE *f = fmemopen(&buf, STRING_BUFFERSIZE, "r");
-        readGame(f, acpcGame);
+        ::Game* game = readGame(f);
+
+        memcpy(acpcGame, game, sizeof(Game));
+
+
+        free(game);
         fclose(f);
     }
 

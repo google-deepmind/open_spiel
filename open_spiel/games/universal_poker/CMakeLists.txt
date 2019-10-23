@@ -6,10 +6,10 @@ set(HEADER_FILES
         )
 
 set(CLIB_FILES
-        acpc/game.h
-        acpc/game.c
-        acpc/rng.h
-        acpc/rng.c)
+        acpc/project_acpc_server/game.h
+        acpc/project_acpc_server/game.c
+        acpc/project_acpc_server/rng.h
+        acpc/project_acpc_server/rng.c)
 
 set(SOURCE_FILES
         acpc_cpp/acpc_game.cc
