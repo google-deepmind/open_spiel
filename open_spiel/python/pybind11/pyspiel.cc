@@ -340,18 +340,12 @@ PYBIND11_MODULE(pyspiel, m) {
            &TabularBestResponse::GetBestResponsePolicy)
       .def("get_best_response_actions",
            &TabularBestResponse::GetBestResponseActions)
-      .def("set_policy",
-           (void (open_spiel::algorithms::TabularBestResponse::*)(
-               const std::unordered_map<std::string,
-                                        open_spiel::ActionsAndProbs>&)) &
-               TabularBestResponse::SetPolicy);
+      .def("set_policy", py::overload_cast<const std::unordered_map<
+                             std::string, open_spiel::ActionsAndProbs>&>(
+                             &TabularBestResponse::SetPolicy))
+      .def("set_policy", py::overload_cast<const Policy*>(
+                             &TabularBestResponse::SetPolicy));
 
-  // A tabular policy represented internally as a map. Note that this
-  // implementation is not directly compatible with the Python TabularPolicy
-  // implementation; the latter is implemented as a table of size
-  // [num_states, num_actions], while this is implemented as a map. It is
-  // non-trivial to convert between the two, but we have a function that does so
-  // in the open_spiel/python/policy.py file.
   py::class_<open_spiel::Policy>(m, "Policy")
       .def("action_probabilities",
            (std::unordered_map<Action, double>(open_spiel::Policy::*)(
@@ -362,10 +356,16 @@ PYBIND11_MODULE(pyspiel, m) {
                const std::string&) const) &
                open_spiel::Policy::GetStatePolicyAsMap);
 
+  // A tabular policy represented internally as a map. Note that this
+  // implementation is not directly compatible with the Python TabularPolicy
+  // implementation; the latter is implemented as a table of size
+  // [num_states, num_actions], while this is implemented as a map. It is
+  // non-trivial to convert between the two, but we have a function that does so
+  // in the open_spiel/python/policy.py file.
   py::class_<open_spiel::TabularPolicy, open_spiel::Policy>(m, "TabularPolicy")
       .def(py::init<const std::unordered_map<std::string, ActionsAndProbs>&>())
-      .def("get_state_policy", &open_spiel::TabularPolicy::GetStatePolicy);
-
+      .def("get_state_policy", &open_spiel::TabularPolicy::GetStatePolicy)
+      .def("policy_table", &open_spiel::TabularPolicy::PolicyTable);
   m.def("UniformRandomPolicy", &open_spiel::GetUniformPolicy);
 
   py::class_<open_spiel::algorithms::CFRSolver>(m, "CFRSolver")
@@ -475,9 +475,9 @@ PYBIND11_MODULE(pyspiel, m) {
         "to it.");
 
   m.def("exploitability",
-        (double (*)(const Game&,
-                    const std::unordered_map<std::string, ActionsAndProbs>&))
-            Exploitability,
+        py::overload_cast<const Game&,
+                    const std::unordered_map<std::string, ActionsAndProbs>&>(
+            &Exploitability),
         "Returns the sum of the utility that a best responder wins when when "
         "playing against 1) the player 0 policy contained in `policy` and 2) "
         "the player 1 policy contained in `policy`."
@@ -485,7 +485,7 @@ PYBIND11_MODULE(pyspiel, m) {
         "games, and raises a SpielFatalError if an incompatible game is passed "
         "to it.");
 
-  m.def("nash_conv", (double (*)(const Game&, const Policy&))NashConv,
+  m.def("nash_conv", py::overload_cast<const Game&, const Policy&>(&NashConv),
         "Returns the sum of the utility that a best responder wins when when "
         "playing against 1) the player 0 policy contained in `policy` and 2) "
         "the player 1 policy contained in `policy`."
@@ -494,9 +494,9 @@ PYBIND11_MODULE(pyspiel, m) {
         "to it.");
 
   m.def("nash_conv",
-        (double (*)(
+        py::overload_cast<
             const Game&,
-            const std::unordered_map<std::string, ActionsAndProbs>&))NashConv,
+            const std::unordered_map<std::string, ActionsAndProbs>&>(&NashConv),
         "Calculates a measure of how far the given policy is from a Nash "
         "equilibrium by returning the sum of the improvements in the value "
         "that each player could obtain by unilaterally changing their strategy "
