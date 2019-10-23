@@ -44,11 +44,17 @@ if [ $GIT_IS_AVAILABLE -ne 0 ]; then #...
 fi
 
 [[ -d "./pybind11" ]] || git clone -b 'v2.2.4' --single-branch --depth 1 https://github.com/pybind/pybind11.git
+# The official https://github.com/ethansbrown/acpc was outdated so we forked it and updated it with
+# the latest version from http://www.computerpokercompetition.org/downloads/code/competition_server/project_acpc_server_v1.0.42.tar.bz2
+[[ -d open_spiel/games/universal_poker/acpc ]] || \
+  git clone -b 'master' --single-branch --depth 1 https://github.com/dennisjay/acpc.git  \
+  open_spiel/games/universal_poker/acpc
 # The official https://github.com/dds-bridge/dds.git seems to not accept PR,
 # so we have forked it.
 [[ -d open_spiel/games/bridge/double_dummy_solver ]] || \
   git clone -b 'develop' --single-branch --depth 1 https://github.com/jblespiau/dds.git  \
   open_spiel/games/bridge/double_dummy_solver
+
 # `master` is a moving branch, but we never had issues. Let's use it and
 # checkout a specific commit only if an issue occur one day.
 [[ -d open_spiel/abseil-cpp ]] || \
