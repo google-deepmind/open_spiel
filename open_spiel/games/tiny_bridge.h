@@ -20,9 +20,10 @@
 
 #include "open_spiel/spiel.h"
 
-// A very small version of bridge, with 8 cards in total.
-// For the mechanics of the full game, see
-// https://en.wikipedia.org/wiki/Contract_bridge
+// A very small version of bridge, with 8 cards in total, created by Edward
+// Lockhart, inspired by a research project at University of Alberta by Michael
+// Bowling, Kate Davison, and Nathan Sturtevant. For the mechanics of the full
+// game, see https://en.wikipedia.org/wiki/Contract_bridge.
 //
 // This smaller game has two suits (hearts and spades), each with
 // four cards (Jack, Queen, King, Ace). Each of the four players gets
