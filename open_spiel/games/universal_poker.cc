@@ -32,8 +32,8 @@ namespace open_spiel::universal_poker {
                    { "smallBlind",  GameParameter(100) },              // Small Blind
                    { "rounds",  GameParameter(2) },                    // Count of Rounds
                    { "firstPlayer",  GameParameter(std::string("1 1")) },           // Who is the first player by round?
-                   { "numSuits",  GameParameter(2) },                  // NumSuits of deck
-                   { "numRanks",  GameParameter(3) },                  // NumRanks of deck
+                   { "numSuits",  GameParameter(4) },                  // NumSuits of deck
+                   { "numRanks",  GameParameter(6) },                  // NumRanks of deck
                    { "numHoleCards",  GameParameter(1) },              // Hole Cards (Private Cards) per Player
                    { "numBoardCards",  GameParameter(std::string("0 1")) }         // Board Cards (Public Cards) per Player
            }
