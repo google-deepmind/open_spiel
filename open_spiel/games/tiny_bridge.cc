@@ -171,15 +171,17 @@ REGISTER_SPIEL_GAME(kGameType2p, Factory2p);
 REGISTER_SPIEL_GAME(kGameType4p, Factory4p);
 
 // Score a played-out hand.
-// Score is 1 for the second trick, 2 for slam (bidding and making two).
-// -1 per undertrick. Doubling and redoubling each multiply the score by 2.
-int Score(int contract, int tricks, bool doubled, bool redoubled) {
+int Score(int contract, int tricks, bool doubled, bool redoubled, int trumps) {
+  // -20 per undertrick
+  // +10 for 1H/S/NT (+10 extra if overtrick)
+  // +30 for 2H/S/NT
   const int contract_tricks = 1 + (contract - 1) / 3;
   const int contract_result = tricks - contract_tricks;
   const int double_factor = (1 + doubled) * (1 + redoubled);
-  if (contract_result < 0) return double_factor * contract_result;
-  int score = contract_result;
-  if (contract_tricks == 2) score += 3;
+  if (contract_result < 0) return 20 * double_factor * contract_result;
+  int score = tricks * 10;
+  if (contract_tricks == 2) score += 10;
+  if (contract_tricks == 2 && trumps == 2) score += 5;
   return score * double_factor;
 }
 
@@ -266,7 +268,7 @@ int TinyBridgeAuctionState::Score_p0(std::array<int, kNumCards> holder) const {
       algorithms::AlphaBetaSearch(*game, &play, nullptr, -1, decl).first;
   const int declarer_score =
       Score(state.last_bid, tricks, state.doubler != kInvalidPlayer,
-            state.redoubler != kInvalidPlayer);
+            state.redoubler != kInvalidPlayer, trumps);
   if (num_players_ == 2)
     return declarer_score;
   else

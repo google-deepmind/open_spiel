@@ -43,24 +43,12 @@
 // any bids in the auction phase.
 //
 // Scoring is as follows, for the declaring partnership:
-//  -1 per trick short of contract
-//  +1 for making two tricks
-//  +2 for bidding and making two tricks
-//
-// Supposing one side can make two tricks, then their scores would be:
-//
-//   (2X)-Dbl -2   +4  Doubling opponents in 2x, making zero tricks
-//   2X =          +3  Bidding and making slam
-//   (2X)-Dbl -1   +2  Doubling opponents down one
-//   (1X)-Dbl -1
-//   1X +1         +1  Bidding 1X, making an overtrick
-//
-// Bidding and making a one-level contract scores zero, as does passing the hand
-// out. So in the 2p game, the only point in bidding is if a slam might be
-// possible.
-// In the 4p game, it can also be useful to bid to prevent the opponents from
-// finding their slam, or to incur a penalty smaller than the value of the
-// opponents' slam.
+//     +10 for making 1H/S/NT (+10 extra if overtrick)
+//     +30 for making 2H/S
+//     +35 for making 2NT
+//     -20 per undertrick
+// Doubling (only in the 4p game) multiplies all scores by 2. Redoubling by a
+// further factor of 2.
 
 namespace open_spiel {
 namespace tiny_bridge {
@@ -83,8 +71,8 @@ class TinyBridgeGame2p : public Game {
   int NumDistinctActions() const override { return kNumActions2p; }
   std::unique_ptr<State> NewInitialState() const override;
   int NumPlayers() const override { return 2; }
-  double MinUtility() const override { return -3; }
-  double MaxUtility() const override { return 3; }
+  double MinUtility() const override { return -40; }
+  double MaxUtility() const override { return 35; }
   int MaxGameLength() const override { return 8; }
   int MaxChanceOutcomes() const override { return 28; }
   std::shared_ptr<const Game> Clone() const override {
@@ -105,9 +93,9 @@ class TinyBridgeGame4p : public Game {
   int NumDistinctActions() const override { return kNumActions; }
   std::unique_ptr<State> NewInitialState() const override;
   int NumPlayers() const override { return 4; }
-  double MinUtility() const override { return -12; }
+  double MinUtility() const override { return -160; }
   double UtilitySum() const override { return 0; }
-  double MaxUtility() const override { return 12; }
+  double MaxUtility() const override { return 160; }
   int MaxGameLength() const override { return 57; }
   int MaxChanceOutcomes() const override { return 28; }
   std::shared_ptr<const Game> Clone() const override {
