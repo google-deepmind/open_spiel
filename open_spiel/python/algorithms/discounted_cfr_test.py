@@ -22,7 +22,6 @@ from __future__ import print_function
 from absl.testing import absltest
 import numpy as np
 
-from google3.testing.pybase import googletest
 from open_spiel.python.algorithms import discounted_cfr
 from open_spiel.python.algorithms import expected_game_score
 import pyspiel
@@ -51,4 +50,4 @@ class DiscountedCfrTest(absltest.TestCase):
 
 
 if __name__ == "__main__":
-  googletest.main()
+  absltest.main()
