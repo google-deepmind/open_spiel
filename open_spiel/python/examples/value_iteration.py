@@ -50,7 +50,7 @@ def play_tic_tac_toe():
 
 def main():
   parser = argparse.ArgumentParser("value_iteration")
-  parser.add_argument("game", default="tic_tac_toe")
+  parser.add_argument("game", nargs='?', default="tic_tac_toe")
   args = parser.parse_args()
 
   if args.game == "tic_tac_toe":
