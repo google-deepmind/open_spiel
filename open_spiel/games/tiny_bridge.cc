@@ -174,7 +174,8 @@ REGISTER_SPIEL_GAME(kGameType4p, Factory4p);
 int Score(int contract, int tricks, bool doubled, bool redoubled, int trumps) {
   // -20 per undertrick
   // +10 for 1H/S/NT (+10 extra if overtrick)
-  // +30 for 2H/S/NT
+  // +30 for 2H/S
+  // +35 for 2NT
   const int contract_tricks = 1 + (contract - 1) / 3;
   const int contract_result = tricks - contract_tricks;
   const int double_factor = (1 + doubled) * (1 + redoubled);
@@ -260,8 +261,8 @@ int TinyBridgeAuctionState::Score_p0(std::array<int, kNumCards> holder) const {
   auto state = AnalyzeAuction();
   std::shared_ptr<Game> game(new TinyBridgePlayGame({}));
   int trumps = (state.last_bid - 1) % 3;
-  int leader = num_players_ == 2 ? (state.last_bidder * 2 + 1)
-                                 : (state.last_bidder + 1) % 4;
+  int leader = num_players_ == 2 ? (state.last_bidder * 2 + 3) % 4
+                                 : (state.last_bidder + 3) % 4;
   int decl = num_players_ == 2 ? 0 : state.last_bidder % 2;
   TinyBridgePlayState play{game, trumps, leader, holder};
   const int tricks =
