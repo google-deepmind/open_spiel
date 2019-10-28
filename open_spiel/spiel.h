@@ -400,6 +400,13 @@ class State {
 
   virtual std::vector<double> ObservationAsNormalizedVector(
       Player player) const {
+    // We add this player check, to prevent errors if the game implementation
+    // lacks that check (in particular as this function is the one used in
+    // Python). This can lead to doing this check twice.
+    // TODO(author2): Do we want to prevent executing this twice for games
+    // that implement it?
+    SPIEL_CHECK_GE(player, 0);
+    SPIEL_CHECK_LT(player, num_players_);
     std::vector<double> normalized_observation;
     ObservationAsNormalizedVector(player, &normalized_observation);
     return normalized_observation;
