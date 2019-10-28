@@ -122,6 +122,17 @@ class SearchNode(object):
     self.children = []
 
   def uct_value(self, parent_explore_count, uct_c):
+    """Returns the UCT value of child."""
+    if self.outcome is not None:
+      return self.outcome[self.player]
+
+    if self.explore_count == 0:
+      return float("inf")
+
+    return self.total_reward / self.explore_count + uct_c * math.sqrt(
+        math.log(parent_explore_count) / self.explore_count)
+
+  def puct_value(self, parent_explore_count, uct_c):
     """Returns the PUCT value of child."""
     if self.outcome is not None:
       return self.outcome[self.player]
@@ -196,6 +207,7 @@ class MCTSBot(pyspiel.Bot):
                evaluator,
                solve=True,
                random_state=None,
+               child_selection_fn=SearchNode.uct_value,
                verbose=False):
     """Initializes a MCTS Search algorithm in the form of a bot.
 
@@ -214,6 +226,8 @@ class MCTSBot(pyspiel.Bot):
       evaluator: A `Evaluator` object to use to evaluate a leaf node.
       solve: Whether to back up solved states.
       random_state: An optional numpy RandomState to make it deterministic.
+      child_selection_fn: A function to select the child in the descent phase.
+          The default is UCT.
       verbose: Whether to print information about the search tree before
         returning the action. Useful for confirming the search is working
         sensibly.
@@ -241,6 +255,7 @@ class MCTSBot(pyspiel.Bot):
     self.solve = solve
     self.max_utility = game.max_utility()
     self._random_state = random_state or np.random.RandomState()
+    self._child_selection_fn = child_selection_fn
 
   def step(self, state):
     """Returns bot's policy and action at given state."""
@@ -311,7 +326,8 @@ class MCTSBot(pyspiel.Bot):
         # Otherwise choose node with largest UCT value
         chosen_child = max(
             current_node.children,
-            key=lambda c: c.uct_value(current_node.explore_count, self.uct_c))
+            key=lambda c: self._child_selection_fn(  # pylint: disable=g-long-lambda
+                c, current_node.explore_count, self.uct_c))
 
       working_state.apply_action(chosen_child.action)
       current_node = chosen_child
