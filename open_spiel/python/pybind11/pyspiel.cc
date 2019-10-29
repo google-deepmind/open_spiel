@@ -19,6 +19,7 @@
 #include "open_spiel/algorithms/cfr.h"
 #include "open_spiel/algorithms/cfr_br.h"
 #include "open_spiel/algorithms/evaluate_bots.h"
+#include "open_spiel/algorithms/expected_returns.h"
 #include "open_spiel/algorithms/matrix_game_utils.h"
 #include "open_spiel/algorithms/tabular_exploitability.h"
 #include "open_spiel/algorithms/trajectories.h"
@@ -501,6 +502,12 @@ PYBIND11_MODULE(pyspiel, m) {
 
   m.def("convert_to_turn_based", open_spiel::ConvertToTurnBased,
         "Returns a turn-based version of the given game.");
+
+  m.def("expected_returns",
+        py::overload_cast<const State&, const std::vector<const Policy*>&, int>(
+            &open_spiel::algorithms::ExpectedReturns),
+        "Computes the undiscounted expected returns from a depth-limited "
+        "search.");
 
   py::class_<open_spiel::algorithms::BatchedTrajectory>(m, "BatchedTrajectory")
       .def(py::init<int>())
