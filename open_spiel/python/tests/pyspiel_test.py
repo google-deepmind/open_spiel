@@ -57,6 +57,7 @@ class PyspielTest(absltest.TestCase):
         "matrix_mp",
         "matrix_pd",
         "matrix_rps",
+        "matrix_rpsw",
         "matrix_sh",
         "matrix_shapleys_game",
         "misere",
