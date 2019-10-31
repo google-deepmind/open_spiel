@@ -42,7 +42,7 @@ flags.DEFINE_integer(
 # DQN model hyper-parameters
 flags.DEFINE_list("convolutional_layers_sizes", [64,32],
                   "Number of hidden convolutional units in the Q-Network MLP.")
-flags.DEFINE_list("kernal_shape", [3,3],
+flags.DEFINE_list("kernel_shape", [3,3],
                   "Convolutional Kernal Shape")
 flags.DEFINE_list("fully_connected_layers_sizes", [64, 16],
                   "Number of hidden fully connected units in the Q-Network MLP. Note last layer comes from the number of possible moves in the game itself")
@@ -98,7 +98,7 @@ def main(_):
   with tf.Session() as sess:
 
     convolutional_layers_sizes = [int(l) for l in FLAGS.convolutional_layers_sizes]
-    kernal_shape = [int(l) for l in FLAGS.kernal_shape]
+    kernel_shape = [int(l) for l in FLAGS.kernel_shape]
     fully_connected_layers_sizes = [int(l) for l in FLAGS.fully_connected_layers_sizes]
 
     
@@ -110,7 +110,7 @@ def main(_):
             state_representation_size=info_state_size,
             num_actions=num_actions,
             convolutional_layers_sizes=convolutional_layers_sizes,
-            kernal_shape=kernal_shape,
+            kernel_shape=kernel_shape,
             fully_connected_layers_sizes=fully_connected_layers_sizes,
             replay_buffer_capacity=FLAGS.replay_buffer_capacity,
             batch_size=FLAGS.batch_size,

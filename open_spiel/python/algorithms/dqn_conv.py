@@ -100,7 +100,7 @@ class DQN(rl_agent.AbstractAgent):
                state_representation_size,
                num_actions,
                convolutional_layers_sizes,
-               kernal_shape,
+               kernel_shape,
                fully_connected_layers_sizes,
                state_representation_shape,
                replay_buffer_capacity=10000,
@@ -123,7 +123,7 @@ class DQN(rl_agent.AbstractAgent):
     self._num_actions = num_actions
 
     self._convolutional_layers_sizes=convolutional_layers_sizes
-    self._kernal_shape=kernal_shape
+    self._kernel_shape=kernel_shape
     self._fully_connected_layers_sizes=fully_connected_layers_sizes + [num_actions]
     self._state_representation_shape=state_representation_shape
     self._batch_size = batch_size
@@ -168,13 +168,13 @@ class DQN(rl_agent.AbstractAgent):
         name="legal_actions_mask_ph")
 
     self._convolutional_layers_sizes=convolutional_layers_sizes
-    self._kernal_shape=kernal_shape
+    self._kernel_shape=kernel_shape
     self._fully_connected_layers_sizes
 
     self._q_network = snt.Sequential([
       snt.nets.ConvNet2D(
             output_channels=self._convolutional_layers_sizes, 
-            kernel_shapes=self._kernal_shape,
+            kernel_shapes=self._kernel_shape,
             strides=[1, 1],
             paddings=[snt.SAME],
             activate_final=True,
@@ -198,7 +198,7 @@ class DQN(rl_agent.AbstractAgent):
     self._target_q_network = snt.Sequential([
       snt.nets.ConvNet2D(
             output_channels=self._convolutional_layers_sizes, 
-            kernel_shapes=self._kernal_shape,
+            kernel_shapes=self._kernel_shape,
             strides=[1, 1],
             paddings=[snt.SAME],
             activate_final=True,
