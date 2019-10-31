@@ -21,6 +21,7 @@
 #include "open_spiel/algorithms/evaluate_bots.h"
 #include "open_spiel/algorithms/expected_returns.h"
 #include "open_spiel/algorithms/matrix_game_utils.h"
+#include "open_spiel/algorithms/mcts.h"
 #include "open_spiel/algorithms/tabular_exploitability.h"
 #include "open_spiel/algorithms/trajectories.h"
 #include "open_spiel/game_transforms/turn_based_simultaneous_game.h"
@@ -36,6 +37,7 @@
 namespace open_spiel {
 namespace {
 
+using ::open_spiel::algorithms::Evaluator;
 using ::open_spiel::algorithms::Exploitability;
 using ::open_spiel::algorithms::NashConv;
 using ::open_spiel::algorithms::TabularBestResponse;
@@ -56,7 +58,8 @@ class SpielException : public std::exception {
   std::string message_;
 };
 
-// Trampoline helper class to allow implementing Bots in Python.
+// Trampoline helper class to allow implementing Bots in Python. See
+// https://pybind11.readthedocs.io/en/stable/advanced/classes.html#overriding-virtual-functions-in-python
 class PyBot : public Bot {
  public:
   // We need the bot constructor
@@ -330,6 +333,28 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("step", &Bot::Step)
       .def("apply_action", &Bot::ApplyAction)
       .def("restart", &Bot::Restart);
+
+  py::class_<algorithms::Evaluator> mcts_evaluator(m, "Evaluator");
+  py::class_<algorithms::RandomRolloutEvaluator, algorithms::Evaluator>(
+      m, "RandomRolloutEvaluator")
+      .def(py::init<int, int>(), py::arg("n_rollouts"), py::arg("seed"));
+
+  py::enum_<algorithms::ChildSelectionPolicy>(m, "ChildSelectionPolicy")
+      .value("UCT", algorithms::ChildSelectionPolicy::UCT)
+      .value("PUCT", algorithms::ChildSelectionPolicy::PUCT);
+
+  py::class_<algorithms::MCTSBot, Bot>(m, "MCTSBot")
+      .def(py::init<const Game&, Player, const Evaluator&, double, int, int64_t,
+                    bool, int, bool,
+                    ::open_spiel::algorithms::ChildSelectionPolicy>(),
+           py::arg("game"), py::arg("player"), py::arg("evaluator"),
+           py::arg("uct_c"), py::arg("max_simulations"),
+           py::arg("max_memory_mb"), py::arg("solve"), py::arg("seed"),
+           py::arg("verbose"),
+           py::arg("child_selection_policy") =
+               algorithms::ChildSelectionPolicy::UCT)
+      .def("step", &algorithms::MCTSBot::Step)
+      .def("mcts_search", &algorithms::MCTSBot::MCTSearch);
 
   py::class_<TabularBestResponse>(m, "TabularBestResponse")
       .def(py::init<const open_spiel::Game&, int,
