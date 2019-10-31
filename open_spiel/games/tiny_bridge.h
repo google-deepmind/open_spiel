@@ -53,15 +53,19 @@
 namespace open_spiel {
 namespace tiny_bridge {
 
-inline constexpr int kNumBids = 6;       // 1H, 1S, 1NT, 2H, 2S, 2NT
-inline constexpr int kNumActions2p = 7;  // Plus Pass
+inline constexpr int kNumActions2p = 7;  // Pass, 1H, 1S, 1NT, 2H, 2S, 2NT
 inline constexpr int kNumActions = 9;    // Plus Double, Redouble
 enum Call { kPass = 0, k1H, k1S, k1NT, k2H, k2S, k2NT, kDouble, kRedouble };
 inline constexpr int kNumRanks = 4;
 inline constexpr int kNumSuits = 2;
-inline constexpr int kNumCards = kNumRanks * kNumSuits;
-inline constexpr int kNumHands = 4;
-inline constexpr int kNumTricks = kNumCards / kNumHands;
+inline constexpr int kDeckSize = kNumRanks * kNumSuits;
+inline constexpr int kNumSeats = 4;
+inline constexpr int kNumTricks = kDeckSize / kNumSeats;
+// Number of possible private states (hands) for a single player.
+inline constexpr int kNumPrivates = (kDeckSize * (kDeckSize - 1)) / 2;
+inline constexpr std::array<const char*, kNumActions> kActionStr{
+    "Pass", "1H", "1S", "1NT", "2H", "2S", "2NT", "Dbl", "RDbl"};
+enum Seat { kInvalidSeat = -1, kWest = 0, kNorth = 1, kEast = 2, kSouth = 3 };
 
 // Two-player game. Only one partnership gets to bid, so this
 // is a purely-cooperative two-player game.
@@ -71,18 +75,18 @@ class TinyBridgeGame2p : public Game {
   int NumDistinctActions() const override { return kNumActions2p; }
   std::unique_ptr<State> NewInitialState() const override;
   int NumPlayers() const override { return 2; }
-  double MinUtility() const override { return -40; }
-  double MaxUtility() const override { return 35; }
+  double MinUtility() const override { return -40; }  // Bid 2NT, 0 tricks
+  double MaxUtility() const override { return 35; }   // Bid 2NT, 2 tricks
   int MaxGameLength() const override { return 8; }
-  int MaxChanceOutcomes() const override { return 28; }
+  int MaxChanceOutcomes() const override { return kNumPrivates; }
   std::shared_ptr<const Game> Clone() const override {
     return std::shared_ptr<const Game>(new TinyBridgeGame2p(*this));
   }
   std::vector<int> InformationStateNormalizedVectorShape() const {
-    return {kNumCards + kNumActions2p * 2};
+    return {kDeckSize + kNumActions2p * 2};
   }
   std::vector<int> ObservationNormalizedVectorShape() const override {
-    return {kNumCards + kNumActions2p};
+    return {kDeckSize + kNumActions2p};
   }
 };
 
@@ -97,7 +101,7 @@ class TinyBridgeGame4p : public Game {
   double UtilitySum() const override { return 0; }
   double MaxUtility() const override { return 160; }
   int MaxGameLength() const override { return 57; }
-  int MaxChanceOutcomes() const override { return 28; }
+  int MaxChanceOutcomes() const override { return kNumPrivates; }
   std::shared_ptr<const Game> Clone() const override {
     return std::shared_ptr<const Game>(new TinyBridgeGame4p(*this));
   }
@@ -107,7 +111,7 @@ class TinyBridgeGame4p : public Game {
 class TinyBridgePlayGame : public Game {
  public:
   explicit TinyBridgePlayGame(const GameParameters& params);
-  int NumDistinctActions() const override { return kNumCards; }
+  int NumDistinctActions() const override { return kDeckSize; }
   std::unique_ptr<State> NewInitialState() const override;
   int NumPlayers() const override { return 2; }
   double MinUtility() const override { return 0; }
@@ -121,6 +125,13 @@ class TinyBridgePlayGame : public Game {
 // State of an in-progress auction, either 2p or 4p.
 class TinyBridgeAuctionState : public State {
  public:
+  struct AuctionState {
+    Action last_bid;
+    Seat last_bidder;
+    Seat doubler;
+    Seat redoubler;
+  };
+
   TinyBridgeAuctionState(std::shared_ptr<const Game> game) : State(game) {}
   TinyBridgeAuctionState(const TinyBridgeAuctionState&) = default;
 
@@ -140,7 +151,7 @@ class TinyBridgeAuctionState : public State {
   void UndoAction(Player player, Action action) override;
   std::vector<std::pair<Action, double>> ChanceOutcomes() const override;
   std::string AuctionString() const;
-  std::string HandString(Player player) const;
+  std::string PlayerHandString(Player player) const;
   std::string DealString() const;
 
  protected:
@@ -151,31 +162,23 @@ class TinyBridgeAuctionState : public State {
   double utility_p0;
   std::vector<int> actions_;
 
-  struct AuctionState {
-    int last_bid;
-    Player last_bidder;
-    Player doubler;
-    Player redoubler;
-  };
-
   bool IsDealt(Player player) const { return actions_.size() > player; }
   bool HasAuctionStarted() const { return actions_.size() > num_players_; }
   AuctionState AnalyzeAuction() const;
-  int Score_p0(std::array<int, kNumCards> holder) const;
-  std::array<int, kNumCards> CardHolders() const;
-  std::string HandName(Player player) const;
+  std::array<Seat, kDeckSize> CardHolders() const;
+  Seat PlayerToSeat(Player player) const;
 };
 
 // State of in-progress play.
 class TinyBridgePlayState : public State {
  public:
-  TinyBridgePlayState(std::shared_ptr<const Game> game, int trumps, int leader,
-                      std::array<int, kNumCards> holder)
+  TinyBridgePlayState(std::shared_ptr<const Game> game, int trumps, Seat leader,
+                      std::array<Seat, kDeckSize> holder)
       : State(game), trumps_(trumps), leader_(leader), holder_(holder) {}
   TinyBridgePlayState(const TinyBridgePlayState&) = default;
 
   Player CurrentPlayer() const { return CurrentHand() % 2; }
-  int CurrentHand() const;
+  Seat CurrentHand() const;
 
   std::string ActionToString(Player player, Action action_id) const override;
   bool IsTerminal() const override;
@@ -190,11 +193,30 @@ class TinyBridgePlayState : public State {
 
  private:
   int trumps_;  // The trump suit (or notrumps)
-  int leader_;  // The hand who plays first to the first trick.
-  std::array<int, kNumCards> holder_;   // hand of the holder of each card
-  std::array<int, kNumTricks> winner_;  // hand of the winner of each trick
-  std::vector<std::pair<int, int>> actions_;  // (hand, card)
+  Seat leader_;  // The hand who plays first to the first trick.
+  std::array<Seat, kDeckSize> holder_;   // hand of the holder of each card
+  std::array<Seat, kNumTricks> winner_;  // hand of the winner of each trick
+  std::vector<std::pair<Seat, int>> actions_;  // (hand, card)
 };
+
+// String representation for the specified hand.
+std::string HandString(Action outcome);
+
+// String representation for the specified seat.
+std::string SeatString(Seat seat);
+
+// True if player 0 having private state hand0 is consistent with player 1
+// having private state hand1, i.e. the two hands have no cards in common.
+bool IsConsistent(Action hand0, Action hand1);
+
+// The score for player 0 of the specified contract.
+int Score_p0(std::array<Seat, kDeckSize> holder,
+             const TinyBridgeAuctionState::AuctionState& state);
+
+// For the two-player (purely cooperative) case, the expected score for
+// declaring side in the specified contract.
+double Score_2p(Action hand0, Action hand1,
+                const TinyBridgeAuctionState::AuctionState& state);
 
 }  // namespace tiny_bridge
 }  // namespace open_spiel
