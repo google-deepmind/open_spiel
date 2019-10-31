@@ -290,6 +290,11 @@ class Environment(object):
         ]),
         legal_actions=(self._game.num_distinct_actions(),),
         current_player=(),
+        info_state_shape=tuple([
+            self._game.observation_normalized_vector_shape()
+            if self._use_observation else
+            self._game.information_state_normalized_vector_shape()
+        ]),
     )
 
   def action_spec(self):

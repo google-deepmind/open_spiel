@@ -78,11 +78,12 @@ class RLEnvironmentTest(absltest.TestCase):
 
     ttt_max_actions = 9
     ttt_normalized_info_set_shape = (27,)
-
+    ttt_info_set_shape = ([3,3,3],)
     self.assertEqual(action_spec["num_actions"], ttt_max_actions)
     self.assertEqual(env_spec["info_state"], ttt_normalized_info_set_shape)
+    self.assertEqual(env_spec["info_state_shape"], ttt_info_set_shape)
     self.assertCountEqual(env_spec.keys(),
-                          ["current_player", "info_state", "legal_actions"])
+                          ["current_player", "info_state", "legal_actions","info_state_shape"])
     self.assertCountEqual(action_spec.keys(),
                           ["dtype", "max", "min", "num_actions"])
 
