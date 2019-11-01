@@ -70,7 +70,7 @@ set (OPEN_SPIEL_CORE_OBJECTS $<TARGET_OBJECTS:open_spiel_core>)
 
 # Query API objects
 add_library(open_spiel_query OBJECT ${OPEN_SPIEL_QUERY_FILES})
-target_include_directories (open_spiel_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} abseil-cpp)
+target_include_directories (open_spiel_query PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 set (OPEN_SPIEL_OBJECTS
   $<TARGET_OBJECTS:open_spiel_core>
