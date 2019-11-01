@@ -41,7 +41,7 @@ namespace open_spiel::universal_poker::acpc_cpp {
         return acpcAction;
     }
 
-    void *readGameToStruct(const std::string &gameDef, Game* acpcGame) {
+    void readGameToStruct(const std::string &gameDef, Game* acpcGame) {
         char buf[STRING_BUFFERSIZE];
         gameDef.copy(buf, STRING_BUFFERSIZE);
 
