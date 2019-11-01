@@ -46,6 +46,8 @@ set (OPEN_SPIEL_CORE_FILES
   tensor_view.h
 )
 
+set (OPEN_SPIEL_QUERY_FILES query.cc query.h)
+
 # We add the subdirectory here so open_spiel_core can #include absl.
 add_subdirectory (abseil-cpp)
 
@@ -66,10 +68,15 @@ link_libraries(open_spiel_core
 # Just the minimal base library: no games.
 set (OPEN_SPIEL_CORE_OBJECTS $<TARGET_OBJECTS:open_spiel_core>)
 
+# Query API objects
+add_library(open_spiel_query OBJECT ${OPEN_SPIEL_QUERY_FILES})
+target_include_directories (open_spiel_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} abseil-cpp)
+
 set (OPEN_SPIEL_OBJECTS
   $<TARGET_OBJECTS:open_spiel_core>
   $<TARGET_OBJECTS:games>
   $<TARGET_OBJECTS:game_transforms>
+  $<TARGET_OBJECTS:open_spiel_query>
   $<TARGET_OBJECTS:bridge_double_dummy_solver>
   # $<TARGET_OBJECTS:hanabi_learning_environment>
   $<TARGET_OBJECTS:algorithms>

@@ -28,6 +28,7 @@
 #include "open_spiel/matrix_game.h"
 #include "open_spiel/normal_form_game.h"
 #include "open_spiel/policy.h"
+#include "open_spiel/query.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_bots.h"
 #include "open_spiel/spiel_utils.h"
@@ -569,6 +570,11 @@ PYBIND11_MODULE(pyspiel, m) {
             const std::unordered_map<std::string, int>&, int, bool, int, int>(
             &open_spiel::algorithms::RecordBatchedTrajectory),
         "Records a batch of trajectories.");
+
+  // Game-Specific Query API.
+  m.def("negotiation_item_pool", &open_spiel::query::NegotiationItemPool);
+  m.def("negotiation_agent_utils",
+        &open_spiel::query::NegotiationAgentUtils);
 
   // Set an error handler that will raise exceptions. These exceptions are for
   // the Python interface only. When used from C++, OpenSpiel will never raise
