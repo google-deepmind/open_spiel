@@ -58,7 +58,6 @@ class ReplayBuffer(object):
     """
     if len(self._data) < self._replay_buffer_capacity:
       self._data.append(element)
-      #print(len(self._data))
     else:
       self._data[self._next_entry_index] = element
       self._next_entry_index += 1
@@ -187,12 +186,11 @@ class DQN(rl_agent.AbstractAgent):
         )
       ])
 
-    print("\nTF Print\n")  
-    model_vars = tf.trainable_variables()
-    slim.model_analyzer.analyze_vars(model_vars, print_info=True)
-    print("\nPython Print\n")  
+    # print("\n----Network Definition----\n")  
+    # model_vars = tf.trainable_variables()
+    # slim.model_analyzer.analyze_vars(model_vars, print_info=True)
+    # print("\n----Network Definition----\n")  
 
-    # snt.nets.MLP(output_sizes=self._layer_sizes)
     self._q_values = self._q_network(self._info_state_ph)
 
     self._target_q_network = snt.Sequential([
