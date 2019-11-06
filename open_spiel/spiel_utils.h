@@ -50,6 +50,15 @@ std::ostream& operator<<(std::ostream& stream, const std::vector<T>& v) {
   stream << "]";
   return stream;
 }
+template <typename T, std::size_t N>
+std::ostream& operator<<(std::ostream& stream, const std::array<T, N>& v) {
+  stream << "[";
+  for (const auto& element : v) {
+    stream << element << " ";
+  }
+  stream << "]";
+  return stream;
+}
 
 namespace internal {
 // SpielStrOut(out, a, b, c) is equivalent to:

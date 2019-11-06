@@ -18,6 +18,7 @@
 #include <utility>
 
 #include "open_spiel/spiel.h"
+#include "open_spiel/tensor_view.h"
 
 namespace open_spiel {
 namespace markov_soccer {
@@ -351,15 +352,14 @@ void MarkovSoccerState::InformationStateAsNormalizedVector(
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  values->resize(game_->InformationStateNormalizedVectorSize());
-  std::fill(values->begin(), values->end(), 0.);
-  int plane_size = grid_.num_rows * grid_.num_cols;
+  TensorView<3> view(values, {kCellStates, grid_.num_rows, grid_.num_cols},
+                     true);
 
   for (int r = 0; r < grid_.num_rows; r++) {
     for (int c = 0; c < grid_.num_cols; c++) {
       int plane = observation_plane(r, c);
       SPIEL_CHECK_TRUE(plane >= 0 && plane < kCellStates);
-      (*values)[plane * plane_size + r * grid_.num_cols + c] = 1.0;
+      view[{plane, r, c}] = 1.0;
     }
   }
 }

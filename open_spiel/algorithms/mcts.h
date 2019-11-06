@@ -67,6 +67,11 @@
 namespace open_spiel {
 namespace algorithms {
 
+enum class ChildSelectionPolicy {
+  UCT,
+  PUCT,
+};
+
 // Abstract class representing an evaluation function for a game.
 // The evaluation function takes in an intermediate state in the game and
 // returns an evaluation of that state, which should correlate with chances of
@@ -115,7 +120,10 @@ struct SearchNode {
     action(action_), prior(prior_), player(player_) {}
 
   // The value as returned by the UCT formula.
-  double Value(int parent_explore_count, double uct_c) const;
+  double UCTValue(int parent_explore_count, double uct_c) const;
+
+  // The value as returned by the PUCT formula.
+  double PUCTValue(int parent_explore_count, double uct_c) const;
 
   // The sort order for the BestChild.
   bool CompareFinal(const SearchNode& b) const;
@@ -140,7 +148,8 @@ class MCTSBot : public Bot {
       int64_t max_memory_mb,  // Max memory use in megabytes.
       bool solve,  // Whether to back up solved states.
       int seed,
-      bool verbose);
+      bool verbose,
+      ChildSelectionPolicy child_selection_policy = ChildSelectionPolicy::UCT);
 
   // Run MCTS for one step, choosing the action, and printing some information.
   std::pair<ActionsAndProbs, Action> Step(const State& state) override;
@@ -174,6 +183,7 @@ class MCTSBot : public Bot {
   bool solve_;
   double max_utility_;
   std::mt19937 rng_;
+  const ChildSelectionPolicy child_selection_policy_;
   const Evaluator& evaluator_;
 };
 

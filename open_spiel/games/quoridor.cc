@@ -22,6 +22,7 @@
 #include <vector>
 
 #include "open_spiel/game_parameters.h"
+#include "open_spiel/tensor_view.h"
 
 namespace open_spiel {
 namespace quoridor {
@@ -437,19 +438,16 @@ void QuoridorState::ObservationAsNormalizedVector(
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  std::fill(values->begin(), values->end(), 0.);
-  values->resize(board_.size() * (kCellStates + kNumPlayers), 0.);
-
-  auto set_value = [&values, this](int plane, int i, double value) {
-    (*values)[i + plane * board_.size()] = value;
-  };
+  TensorView<2> view(
+      values, {kCellStates + kNumPlayers, static_cast<int>(board_.size())},
+      true);
 
   for (int i = 0; i < board_.size(); ++i) {
     if (board_[i] < kCellStates) {
-      set_value(static_cast<int>(board_[i]), i, 1.0);
+      view[{static_cast<int>(board_[i]), i}] = 1.0;
     }
-    set_value(kCellStates + kPlayer1, i, wall_count_[kPlayer1]);
-    set_value(kCellStates + kPlayer2, i, wall_count_[kPlayer2]);
+    view[{kCellStates + kPlayer1, i}] = wall_count_[kPlayer1];
+    view[{kCellStates + kPlayer2, i}] = wall_count_[kPlayer2];
   }
 }
 

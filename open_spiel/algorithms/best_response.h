@@ -41,8 +41,6 @@ class TabularBestResponse {
       const std::unordered_map<std::string, ActionsAndProbs>& policy_table);
 
   TabularBestResponse(TabularBestResponse&&) = default;
-  TabularBestResponse(const TabularBestResponse&) = default;
-  TabularBestResponse& operator=(const TabularBestResponse&) = default;
 
   // Returns the action that maximizes utility for the agent at the given
   // infostate. The infostate must correspond to a decision node for

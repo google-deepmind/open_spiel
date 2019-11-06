@@ -90,7 +90,22 @@ ActionsAndProbs RandomRolloutEvaluator::Prior(const State& state) const {
   }
 }
 
-double SearchNode::Value(int parent_explore_count, double uct_c) const {
+// UCT value of given child
+double SearchNode::UCTValue(int parent_explore_count, double uct_c) const {
+  if (!outcome.empty()) {
+    return outcome[player];
+  }
+
+  if (explore_count == 0)
+    return std::numeric_limits<double>::infinity();
+
+  // The "greedy-value" of choosing a given child is always with respect to
+  // the current player for this node.
+  return total_reward / explore_count +
+         uct_c * std::sqrt(std::log(parent_explore_count) / explore_count);
+}
+
+double SearchNode::PUCTValue(int parent_explore_count, double uct_c) const {
   // Returns the PUCT value of this node.
   if (!outcome.empty()) {
     return outcome[player];
@@ -173,7 +188,8 @@ MCTSBot::MCTSBot(
       int64_t max_memory_mb,
       bool solve,
       int seed,
-      bool verbose)
+      bool verbose,
+      ChildSelectionPolicy child_selection_policy)
       : Bot{game, player},
         uct_c_{uct_c},
         max_simulations_{max_simulations},
@@ -182,6 +198,7 @@ MCTSBot::MCTSBot(
         solve_(solve),
         max_utility_(game.MaxUtility()),
         rng_(seed),
+        child_selection_policy_(child_selection_policy),
         evaluator_{evaluator} {
     GameType game_type = game.GetType();
     if (game_type.reward_model != GameType::RewardModel::kTerminal)
@@ -260,7 +277,15 @@ std::unique_ptr<State> MCTSBot::ApplyTreePolicy(
       // Otherwise choose node with largest UCT value.
       double max_value = -std::numeric_limits<double>::infinity();
       for (SearchNode& child : current_node->children) {
-        double val = child.Value(current_node->explore_count, uct_c_);
+        double val;
+        switch (child_selection_policy_) {
+          case ChildSelectionPolicy::UCT:
+            val = child.UCTValue(current_node->explore_count, uct_c_);
+            break;
+          case ChildSelectionPolicy::PUCT:
+            val = child.PUCTValue(current_node->explore_count, uct_c_);
+            break;
+        }
         if (val > max_value) {
           max_value = val;
           chosen_child = &child;

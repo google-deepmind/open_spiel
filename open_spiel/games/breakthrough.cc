@@ -18,7 +18,9 @@
 #include <string>
 #include <utility>
 #include <vector>
+
 #include "open_spiel/game_parameters.h"
+#include "open_spiel/tensor_view.h"
 
 namespace open_spiel {
 namespace breakthrough {
@@ -327,15 +329,13 @@ void BreakthroughState::InformationStateAsNormalizedVector(
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  values->resize(rows_ * cols_ * kCellStates);
-  std::fill(values->begin(), values->end(), 0);
-  int plane_size = rows_ * cols_;
+  TensorView<3> view(values, {kCellStates, rows_, cols_}, true);
 
   for (int r = 0; r < rows_; r++) {
     for (int c = 0; c < cols_; c++) {
       int plane = observation_plane(r, c);
       SPIEL_CHECK_TRUE(plane >= 0 && plane < kCellStates);
-      (*values)[plane * plane_size + r * cols_ + c] = 1.0;
+      view[{plane, r, c}] = 1.0;
     }
   }
 }

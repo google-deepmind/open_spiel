@@ -14,6 +14,7 @@
 
 #include <iostream>
 #include <random>
+#include <vector>
 
 #include "open_spiel/abseil-cpp/absl/flags/flag.h"
 #include "open_spiel/abseil-cpp/absl/flags/parse.h"
@@ -36,8 +37,19 @@ int RandomSimulation(std::mt19937* rng, const Game& game, bool verbose) {
               << state->ToString() << std::endl;
   }
 
+  std::vector<double> obs;
+  bool provides_info_state =
+      game.GetType().provides_information_state_as_normalized_vector;
+  bool provides_observations =
+      game.GetType().provides_observation_as_normalized_vector;
+
   int game_length = 0;
   while (!state->IsTerminal()) {
+    if (provides_observations) {
+      state->ObservationAsNormalizedVector(state->CurrentPlayer(), &obs);
+    } else if (provides_info_state) {
+      state->InformationStateAsNormalizedVector(state->CurrentPlayer(), &obs);
+    }
     ++game_length;
     if (state->IsChanceNode()) {
       // Chance node; sample one according to underlying distribution
@@ -83,6 +95,7 @@ int RandomSimulation(std::mt19937* rng, const Game& game, bool verbose) {
     }
     if (verbose) {
       std::cout << "State: " << std::endl << state->ToString() << std::endl;
+      std::cout << "Observation: " << obs << std::endl;
     }
   }
   return game_length;

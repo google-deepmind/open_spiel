@@ -173,6 +173,7 @@ void TurnBasedSimultaneousState::InformationStateAsNormalizedVector(
   SPIEL_CHECK_LT(player, num_players_);
 
   values->clear();
+  values->reserve(game_->InformationStateNormalizedVectorSize());
 
   // First, get the 2 * num_players bits to encode whose turn it is and who
   // the observer is.
