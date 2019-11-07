@@ -16,6 +16,8 @@ natural extensions. The core API and games are implemented in C++ and exposed to
 Python. Algorithms and tools are written both in C++ and Python. There is also a
 branch of pure Swift in the `swift` subdirectory.
 
+To try OpenSpiel in Google Colaboratory, please refer to `open_spiel/colabs` subdirectory or start [here](https://colab.research.google.com/github/deepmind/open_spiel/blob/master/open_spiel/colabs/install_open_spiel.ipynb).
+
 <p align="center">
   <img src="docs/_static/OpenSpielB.png" alt="OpenSpiel visual asset">
 </p>
@@ -28,6 +30,7 @@ Please choose among the following options:
 *   [Introduction to OpenSpiel](docs/intro.md)
 *   [API Overview and First Example](docs/concepts.md)
 *   [Overview of Implemented Games](docs/games.md)
+*   [Overview of Implemented Algorithms](docs/algorithms.md)
 *   [Developer Guide](docs/developer_guide.md)
 *   [Guidelines and Contributing](docs/contributing.md)
 *   [Swift OpenSpiel](docs/swift.md)
@@ -36,4 +39,26 @@ Please choose among the following options:
 For a longer introduction to the core concepts, formalisms, and terminology,
 including an overview of the algorithms and some results, please see
 [OpenSpiel: A Framework for Reinforcement Learning in Games](https://arxiv.org/abs/1908.09453).
+
+If you use OpenSpiel in your research, please cite the paper using the following
+BibTeX:
+
+```
+@article{LanctotEtAl2019OpenSpiel,
+  title     = {{OpenSpiel}: A Framework for Reinforcement Learning in Games},
+  author    = {Marc Lanctot and Edward Lockhart and Jean-Baptiste Lespiau and Vinicius Zambaldi and
+               Satyaki Upadhyay and Julien P\'{e}rolat and Sriram Srinivasan and Finbarr Timbers and
+               Karl Tuyls and Shayegan Omidshafiei and Daniel Hennes and Dustin Morrill and Paul Muller and
+               Timo Ewalds and Ryan Faulkner and J\'{a}nos Kram\'{a}r and Bart De Vylder and Brennan Saeta and
+               James Bradbury and David Ding and Sebastian Borgeaud and Matthew Lai and Julian Schrittwieser and
+               Thomas Anthony and Edward Hughes and Ivo Danihelka and Jonah Ryan-Davis},
+  year      = {2019},
+  eprint    = {1908.09453},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.LG}
+  journal   = {CoRR},
+  volume    = {abs/1908.09453},
+  url       = {http://arxiv.org/abs/1908.09453},
+}
+```
 

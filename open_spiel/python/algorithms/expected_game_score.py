@@ -20,6 +20,8 @@ from __future__ import print_function
 
 import numpy as np
 
+PROBABILITY_THRESHOLD = 0
+
 
 def policy_value(state, policies):
   """Returns the expected values for the state for players following `policies`.
@@ -54,6 +56,7 @@ def policy_value(state, policies):
     values = np.zeros(shape=num_players)
     for action, probability in policies[player].action_probabilities(
         state).items():
-      child = state.child(action)
-      values += probability * policy_value(child, policies)
+      if probability > PROBABILITY_THRESHOLD:
+        child = state.child(action)
+        values += probability * policy_value(child, policies)
   return values

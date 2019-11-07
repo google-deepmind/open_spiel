@@ -15,6 +15,7 @@
 #ifndef THIRD_PARTY_OPEN_SPIEL_GAMES_GOOFSPIEL_H_
 #define THIRD_PARTY_OPEN_SPIEL_GAMES_GOOFSPIEL_H_
 
+#include <memory>
 #include <set>
 #include <string>
 #include <vector>
@@ -46,10 +47,10 @@
 namespace open_spiel {
 namespace goofspiel {
 
-constexpr int kDefaultNumPlayers = 2;
-constexpr int kDefaultNumCards = 13;
-constexpr const char* kDefaultPointsOrder = "random";
-constexpr const bool kDefaultImpInfo = false;
+inline constexpr int kDefaultNumPlayers = 2;
+inline constexpr int kDefaultNumCards = 13;
+inline constexpr const char* kDefaultPointsOrder = "random";
+inline constexpr const bool kDefaultImpInfo = false;
 
 enum class PointsOrder {
   kRandom,
@@ -57,27 +58,26 @@ enum class PointsOrder {
   kAscending,
 };
 
-constexpr const int kInvalidCard = -1;
+inline constexpr const int kInvalidCard = -1;
 
 class GoofspielState : public SimMoveState {
  public:
-  explicit GoofspielState(int num_distinct_actions, int num_players,
-                          int num_cards, PointsOrder points_order,
-                          bool impinfo);
+  explicit GoofspielState(std::shared_ptr<const Game> game, int num_cards,
+                          PointsOrder points_order, bool impinfo);
 
-  int CurrentPlayer() const override;
-  std::string ActionToString(int player, Action action_id) const override;
+  Player CurrentPlayer() const override;
+  std::string ActionToString(Player player, Action action_id) const override;
   std::string ToString() const override;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
-  std::string InformationState(int player) const override;
+  std::string InformationState(Player player) const override;
 
   void InformationStateAsNormalizedVector(
-      int player, std::vector<double>* values) const override;
+      Player player, std::vector<double>* values) const override;
   std::unique_ptr<State> Clone() const override;
   std::vector<std::pair<Action, double>> ChanceOutcomes() const override;
 
-  std::vector<Action> LegalActions(int player) const override;
+  std::vector<Action> LegalActions(Player player) const override;
 
  protected:
   void DoApplyAction(Action action_id) override;
@@ -88,7 +88,7 @@ class GoofspielState : public SimMoveState {
   PointsOrder points_order_;
   bool impinfo_;
 
-  int current_player_;
+  Player current_player_;
   std::set<int> winners_;
   int turns_;
   int point_card_index_;
@@ -110,8 +110,8 @@ class GoofspielGame : public Game {
   double MinUtility() const override { return -1; }
   double MaxUtility() const override { return +1; }
   double UtilitySum() const override { return 0; }
-  std::unique_ptr<Game> Clone() const override {
-    return std::unique_ptr<Game>(new GoofspielGame(*this));
+  std::shared_ptr<const Game> Clone() const override {
+    return std::shared_ptr<const Game>(new GoofspielGame(*this));
   }
   std::vector<int> InformationStateNormalizedVectorShape() const override;
   int MaxGameLength() const override { return num_cards_; }

@@ -31,8 +31,8 @@ void BasicConnectFourTests() {
 }
 
 void FastLoss() {
-  ConnectFourGame game({});
-  auto state = game.NewInitialState();
+  std::shared_ptr<const Game> game = LoadGame("connect_four");
+  auto state = game->NewInitialState();
   state->ApplyAction(3);
   state->ApplyAction(3);
   state->ApplyAction(4);
@@ -53,16 +53,15 @@ void FastLoss() {
 }
 
 void BasicSerializationTest() {
-  ConnectFourGame game({});
-  std::unique_ptr<State> state = game.NewInitialState();
-  std::unique_ptr<State> state2 =
-      game.DeserializeState(game.SerializeState(*state));
+  std::shared_ptr<const Game> game = LoadGame("connect_four");
+  std::unique_ptr<State> state = game->NewInitialState();
+  std::unique_ptr<State> state2 = game->DeserializeState(state->Serialize());
   SPIEL_CHECK_EQ(state->ToString(), state2->ToString());
 }
 
 void DeserializeDraw() {
-  ConnectFourGame game({});
-  auto state = game.DeserializeState(
+  std::shared_ptr<const Game> game = LoadGame("connect_four");
+  auto state = game->DeserializeState(
       "ooxxxoo\n"
       "xxoooxx\n"
       "ooxxxoo\n"

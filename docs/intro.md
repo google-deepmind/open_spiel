@@ -19,7 +19,7 @@ extensions.
 
 **Multi-language support**
 
-*   C++11
+*   C++17
 *   Python 3
 *   A subset of the features are available in Swift.
 
@@ -30,16 +30,13 @@ bindings.
 
 The methods names are in `CamelCase` in C++ and `snake_case` in Python (e.g.
 `state.ApplyAction` in C++ will be `state.apply_action` in Python). See the
-[pybind11](python/pybind11/pyspiel.cc) definition in
-`open_spiel/python/pybind11/pyspel.cc` for the full mapping between names.
+pybind11 definition in `open_spiel/python/pybind11/pyspel.cc` for the full
+mapping between names.
 
 For algorithms, many are written in both languages, even if some are only
 available from Python.
 
 **Platforms**
 
-OpenSpiel has been tested on Linux (Debian 10 and Ubuntu 19.04). We have not
-tested on MacOS or Windows, but since the code uses freely available tools which
-are also available on MacOS and Windows, we do not anticipate any (major)
-problems compiling and running under those platforms. Patches and instructions
-would be much appreciated.
+OpenSpiel has been tested on Linux (Debian 10 and Ubuntu 19.04), MacOS, and
+[Windows 10 (through Windows Subsystem for Linux)](windows.md).

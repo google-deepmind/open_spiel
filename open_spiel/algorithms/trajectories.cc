@@ -21,6 +21,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
@@ -28,7 +29,7 @@ namespace open_spiel {
 namespace algorithms {
 namespace {
 std::string StateKey(const Game& game, const State& state,
-                     int player = kInvalidPlayer) {
+                     Player player = kInvalidPlayer) {
   if (game.GetType().provides_information_state) {
     if (player == kInvalidPlayer) return state.InformationState();
     return state.InformationState(player);
@@ -143,8 +144,9 @@ BatchedTrajectory RecordTrajectory(
     Action action = kInvalidAction;
     if (state->IsChanceNode()) {
       action = open_spiel::SampleChanceOutcome(
-          state->ChanceOutcomes(),
-          std::uniform_real_distribution<double>(0.0, 1.0)(*rng));
+                   state->ChanceOutcomes(),
+                   std::uniform_real_distribution<double>(0.0, 1.0)(*rng))
+                   .first;
     } else if (state->IsSimultaneousNode()) {
       open_spiel::SpielFatalError(
           "We do not support games with simultaneous actions.");
@@ -161,16 +163,27 @@ BatchedTrajectory RecordTrajectory(
       }
       ActionsAndProbs policy = policies.at(state->CurrentPlayer())
                                    .GetStatePolicy(state->InformationState());
-      SPIEL_CHECK_EQ(policy.size(), game.NumDistinctActions());
-      std::vector<double> probs;
-      probs.reserve(policy.size());
+      if (policy.size() > state->LegalActions().size()) {
+        std::string policy_str = "";
+        for (const auto& item : policy) {
+          absl::StrAppend(&policy_str, "(", item.first, ",", item.second, ") ");
+        }
+        SpielFatalError(absl::StrCat(
+            "There are more actions than legal actions from ",
+            typeid(policies.at(state->CurrentPlayer())).name(),
+            "\n Legal actions are: ", absl::StrJoin(state->LegalActions(), " "),
+            " \n Available probabilities were:", policy_str));
+      }
+      std::vector<double> probs(game.NumDistinctActions(), 0.);
       for (const std::pair<Action, double>& pair : policy) {
-        probs.push_back(pair.second);
+        probs[pair.first] = pair.second;
       }
       trajectory.player_policies[0].push_back(probs);
       trajectory.player_ids[0].push_back(state->CurrentPlayer());
-      action = SampleChanceOutcome(
-          policy, std::uniform_real_distribution<double>(0.0, 1.0)(*rng));
+      action =
+          SampleChanceOutcome(
+              policy, std::uniform_real_distribution<double>(0.0, 1.0)(*rng))
+              .first;
       trajectory.actions[0].push_back(action);
     }
     SPIEL_CHECK_NE(action, kInvalidAction);

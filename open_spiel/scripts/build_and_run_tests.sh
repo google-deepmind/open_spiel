@@ -39,9 +39,8 @@ MAKE_NUM_PROCS=$(${NPROC})
 let TEST_NUM_PROCS=4*${MAKE_NUM_PROCS}
 
 PYVERSION=$(python3 -c 'import sys; print(sys.version.split(" ")[0])')
-PY_VERSION_MAJOR=$(python3 -c 'import sys; print(sys.version_info.major)')
 
-BUILD_DIR="build_python_$PY_VERSION_MAJOR"
+BUILD_DIR="build"
 mkdir -p $BUILD_DIR
 cd $BUILD_DIR
 

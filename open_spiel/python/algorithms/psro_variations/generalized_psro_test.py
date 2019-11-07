@@ -19,7 +19,7 @@ from __future__ import division
 from __future__ import print_function
 
 import logging
-import unittest
+from absl.testing import absltest
 from absl.testing import parameterized
 
 from open_spiel.python.algorithms.psro_variations import generalized_psro
@@ -171,4 +171,4 @@ class GeneralizedPSROTest(parameterized.TestCase):
 
 
 if __name__ == "__main__":
-  unittest.main()
+  absltest.main()

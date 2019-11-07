@@ -18,7 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import unittest
+from absl.testing import absltest
 
 import numpy as np
 
@@ -27,13 +27,14 @@ from open_spiel.python.algorithms import action_value_vs_best_response
 import pyspiel
 
 
-class ActionValuesVsBestResponseTest(unittest.TestCase):
+class ActionValuesVsBestResponseTest(absltest.TestCase):
 
   def test_kuhn_poker_uniform(self):
     game = pyspiel.load_game("kuhn_poker")
     calc = action_value_vs_best_response.Calculator(game)
-    expl, avvbr, cfrp = calc(0, policy.UniformRandomPolicy(game),
-                             ["0", "1", "2", "0pb", "1pb", "2pb"])
+    (expl, avvbr, cfrp,
+     player_reach_probs) = calc(0, policy.UniformRandomPolicy(game),
+                                ["0", "1", "2", "0pb", "1pb", "2pb"])
     self.assertAlmostEqual(expl, 15 / 36)
     np.testing.assert_allclose(
         avvbr,
@@ -46,11 +47,12 @@ class ActionValuesVsBestResponseTest(unittest.TestCase):
             [-1.0, 2.0],  # 2pb - winning
         ])
     np.testing.assert_allclose(cfrp, [1 / 3, 1 / 3, 1 / 3, 1 / 3, 1 / 3, 1 / 3])
+    np.testing.assert_allclose([1, 1, 1, 1/2, 1/2, 1/2], player_reach_probs)
 
   def test_kuhn_poker_always_pass_p0(self):
     game = pyspiel.load_game("kuhn_poker")
     calc = action_value_vs_best_response.Calculator(game)
-    expl, avvbr, cfrp = calc(
+    (expl, avvbr, cfrp, player_reach_probs) = calc(
         0, policy.PolicyFromCallable(game, lambda state: [(0, 1.0), (1, 0.0)]),
         ["0", "1", "2", "0pb", "1pb", "2pb"])
     self.assertAlmostEqual(expl, 1.)
@@ -73,7 +75,8 @@ class ActionValuesVsBestResponseTest(unittest.TestCase):
             [-1, 2],  # 2pb
         ])
     np.testing.assert_allclose(cfrp, [1 / 3, 1 / 3, 1 / 3, 1 / 6, 1 / 6, 1 / 3])
+    np.testing.assert_allclose([1., 1., 1., 1., 1., 1.], player_reach_probs)
 
 
 if __name__ == "__main__":
-  unittest.main()
+  absltest.main()

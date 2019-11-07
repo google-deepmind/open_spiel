@@ -47,9 +47,9 @@ namespace {
 //   The optimal value of the sub-game starting in state (given alpha/beta).
 double _alpha_beta(State* state, int depth, double alpha, double beta,
                    std::function<double(const State&)> value_function,
-                   int maximizing_player_id, Action* best_action) {
+                   Player maximizing_player, Action* best_action) {
   if (state->IsTerminal()) {
-    return state->PlayerReturn(maximizing_player_id);
+    return state->PlayerReturn(maximizing_player);
   }
 
   if (depth == 0 && !value_function) {
@@ -62,15 +62,15 @@ double _alpha_beta(State* state, int depth, double alpha, double beta,
     return value_function(*state);
   }
 
-  int player = state->CurrentPlayer();
-  if (player == maximizing_player_id) {
+  Player player = state->CurrentPlayer();
+  if (player == maximizing_player) {
     double value = -std::numeric_limits<double>::infinity();
 
     for (auto action : state->LegalActions()) {
       state->ApplyAction(action);
       double child_value =
           _alpha_beta(state, /*depth=*/depth - 1, /*alpha=*/alpha,
-                      /*beta=*/beta, value_function, maximizing_player_id,
+                      /*beta=*/beta, value_function, maximizing_player,
                       /*best_action=*/nullptr);
       state->UndoAction(player, action);
 
@@ -95,7 +95,7 @@ double _alpha_beta(State* state, int depth, double alpha, double beta,
       state->ApplyAction(action);
       double child_value =
           _alpha_beta(state, /*depth=*/depth - 1, /*alpha=*/alpha,
-                      /*beta=*/beta, value_function, maximizing_player_id,
+                      /*beta=*/beta, value_function, maximizing_player,
                       /*best_action=*/nullptr);
       state->UndoAction(player, action);
 
@@ -120,7 +120,7 @@ double _alpha_beta(State* state, int depth, double alpha, double beta,
 std::pair<double, Action> AlphaBetaSearch(
     const Game& game, const State* state,
     std::function<double(const State&)> value_function, int depth_limit,
-    int maximizing_player_id) {
+    Player maximizing_player) {
   if (game.NumPlayers() != 2) {
     SpielFatalError("Game must be a 2-player game");
   }
@@ -150,15 +150,15 @@ std::pair<double, Action> AlphaBetaSearch(
     search_root = state->Clone();
   }
 
-  if (maximizing_player_id == kInvalidPlayer) {
-    maximizing_player_id = search_root->CurrentPlayer();
+  if (maximizing_player == kInvalidPlayer) {
+    maximizing_player = search_root->CurrentPlayer();
   }
 
   double infinity = std::numeric_limits<double>::infinity();
   Action best_action = kInvalidAction;
   double value = _alpha_beta(
       search_root.get(), /*depth=*/depth_limit, /*alpha=*/-infinity,
-      /*beta=*/infinity, value_function, maximizing_player_id, &best_action);
+      /*beta=*/infinity, value_function, maximizing_player, &best_action);
 
   return std::pair<double, Action>(value, best_action);
 }

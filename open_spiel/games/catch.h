@@ -44,10 +44,10 @@ namespace open_spiel {
 namespace catch_ {
 
 // Constants.
-constexpr int kNumPlayers = 1;
-constexpr int kNumActions = 3;
-constexpr int kDefaultRows = 10;
-constexpr int kDefaultColumns = 5;
+inline constexpr int kNumPlayers = 1;
+inline constexpr int kNumActions = 3;
+inline constexpr int kDefaultRows = 10;
+inline constexpr int kDefaultColumns = 5;
 
 // State of a cell.
 enum class CellState {
@@ -61,22 +61,22 @@ class CatchGame;
 // State of an in-play game.
 class CatchState : public State {
  public:
-  CatchState(const CatchGame& parent_game);
+  CatchState(std::shared_ptr<const Game> game);
   CatchState(const CatchState&) = default;
 
-  int CurrentPlayer() const override;
-  std::string ActionToString(int player, Action action_id) const override;
+  Player CurrentPlayer() const override;
+  std::string ActionToString(Player player, Action action_id) const override;
   std::string ToString() const override;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
-  std::string InformationState(int player) const override;
-  std::string Observation(int player) const override;
+  std::string InformationState(Player player) const override;
+  std::string Observation(Player player) const override;
   void ObservationAsNormalizedVector(
-      int player, std::vector<double>* values) const override;
+      Player player, std::vector<double>* values) const override;
   void InformationStateAsNormalizedVector(
-      int player, std::vector<double>* values) const override;
+      Player player, std::vector<double>* values) const override;
   std::unique_ptr<State> Clone() const override;
-  void UndoAction(int player, Action move) override;
+  void UndoAction(Player player, Action move) override;
   std::vector<Action> LegalActions() const override;
   ActionsAndProbs ChanceOutcomes() const override;
   CellState BoardAt(int row, int column) const;
@@ -85,8 +85,8 @@ class CatchState : public State {
   void DoApplyAction(Action move) override;
 
  private:
-  const CatchGame& game_;
-
+  int num_rows_ = -1;
+  int num_columns_ = -1;
   bool initialized_ = false;
   int ball_row_ = -1;
   int ball_col_ = -1;
@@ -98,10 +98,10 @@ class CatchGame : public Game {
  public:
   explicit CatchGame(const GameParameters& params);
   std::unique_ptr<State> NewInitialState() const override {
-    return std::unique_ptr<State>(new CatchState(*this));
+    return std::unique_ptr<State>(new CatchState(shared_from_this()));
   }
-  std::unique_ptr<Game> Clone() const override {
-    return std::unique_ptr<Game>(new CatchGame(*this));
+  std::shared_ptr<const Game> Clone() const override {
+    return std::shared_ptr<const Game>(new CatchGame(*this));
   }
   std::vector<int> ObservationNormalizedVectorShape() const override {
     return {num_rows_, num_columns_};

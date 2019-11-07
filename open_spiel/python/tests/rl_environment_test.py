@@ -18,12 +18,12 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import unittest
+from absl.testing import absltest
 
 from open_spiel.python import rl_environment
 
 
-class RLEnvironmentTest(unittest.TestCase):
+class RLEnvironmentTest(absltest.TestCase):
 
   def test_create_game(self):
     env = rl_environment.Environment("tic_tac_toe")
@@ -39,8 +39,8 @@ class RLEnvironmentTest(unittest.TestCase):
     env = rl_environment.Environment("kuhn_poker", **{"players": 3})
     time_step = env.reset()
     self.assertEqual(time_step.observations["current_player"], 0)
-    self.assertEqual(len(time_step.observations["info_state"]), 3)
-    self.assertEqual(len(time_step.observations["legal_actions"]), 3)
+    self.assertLen(time_step.observations["info_state"], 3)
+    self.assertLen(time_step.observations["legal_actions"], 3)
     self.assertEqual(time_step.rewards, None)
     self.assertEqual(time_step.discounts, None)
     self.assertEqual(time_step.step_type.first(), True)
@@ -56,11 +56,11 @@ class RLEnvironmentTest(unittest.TestCase):
     _ = env.reset()
     time_step = env.step([0])
     self.assertEqual(time_step.observations["current_player"], 1)
-    self.assertEqual(len(time_step.observations["info_state"]), 2)
-    self.assertEqual(len(time_step.observations["legal_actions"]), 2)
-    self.assertEqual(len(time_step.rewards), 2)
-    self.assertEqual(len(time_step.discounts), 2)
-    self.assertEqual(len(time_step.observations), 3)
+    self.assertLen(time_step.observations["info_state"], 2)
+    self.assertLen(time_step.observations["legal_actions"], 2)
+    self.assertLen(time_step.rewards, 2)
+    self.assertLen(time_step.discounts, 2)
+    self.assertLen(time_step.observations, 3)
 
     # O X O   # Moves 0, 1, 2
     # X O X   # Moves 3, 4, 5
@@ -81,11 +81,10 @@ class RLEnvironmentTest(unittest.TestCase):
 
     self.assertEqual(action_spec["num_actions"], ttt_max_actions)
     self.assertEqual(env_spec["info_state"], ttt_normalized_info_set_shape)
-    self.assertEqual(
-        sorted(env_spec.keys()),
-        ["current_player", "info_state", "legal_actions"])
-    self.assertEqual(
-        sorted(action_spec.keys()), ["dtype", "max", "min", "num_actions"])
+    self.assertCountEqual(env_spec.keys(),
+                          ["current_player", "info_state", "legal_actions"])
+    self.assertCountEqual(action_spec.keys(),
+                          ["dtype", "max", "min", "num_actions"])
 
   def test_full_game_simultaneous_move(self):
     env = rl_environment.Environment("goofspiel")
@@ -93,11 +92,11 @@ class RLEnvironmentTest(unittest.TestCase):
     time_step = env.step([0, 0])
     self.assertEqual(time_step.observations["current_player"],
                      rl_environment.SIMULTANEOUS_PLAYER_ID)
-    self.assertEqual(len(time_step.observations["info_state"]), 2)
-    self.assertEqual(len(time_step.observations["legal_actions"]), 2)
-    self.assertEqual(len(time_step.rewards), 2)
-    self.assertEqual(len(time_step.discounts), 2)
-    self.assertEqual(len(time_step.observations), 3)
+    self.assertLen(time_step.observations["info_state"], 2)
+    self.assertLen(time_step.observations["legal_actions"], 2)
+    self.assertLen(time_step.rewards, 2)
+    self.assertLen(time_step.discounts, 2)
+    self.assertLen(time_step.observations, 3)
 
     actions = [act[0] for act in time_step.observations["legal_actions"]]
     time_step = env.step(actions)
@@ -109,4 +108,4 @@ class RLEnvironmentTest(unittest.TestCase):
 
 
 if __name__ == "__main__":
-  unittest.main()
+  absltest.main()

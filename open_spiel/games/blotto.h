@@ -44,12 +44,12 @@ using ActionMap = std::unordered_map<Action, std::vector<int>>;
 
 class BlottoState : public NFGState {
  public:
-  BlottoState(int num_distinct_actions, int num_players, int coins, int fields,
+  BlottoState(std::shared_ptr<const Game> game, int coins, int fields,
               const ActionMap* action_map,
               const std::vector<Action>* legal_actions_);
 
-  std::vector<Action> LegalActions(int player) const override;
-  std::string ActionToString(int player, Action move_id) const override;
+  std::vector<Action> LegalActions(Player player) const override;
+  std::string ActionToString(Player player, Action move_id) const override;
   std::string ToString() const override;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
@@ -83,17 +83,17 @@ class BlottoGame : public NormalFormGame {
 
   int NumDistinctActions() const override;
   std::unique_ptr<State> NewInitialState() const override {
-    return std::unique_ptr<State>(
-        new BlottoState(NumDistinctActions(), NumPlayers(), coins_, fields_,
-                        action_map_.get(), legal_actions_.get()));
+    return std::unique_ptr<State>(new BlottoState(shared_from_this(), coins_,
+                                                  fields_, action_map_.get(),
+                                                  legal_actions_.get()));
   }
 
   int NumPlayers() const override { return players_; }
   double MinUtility() const override { return -1; }
   double UtilitySum() const override { return 0; }
   double MaxUtility() const override { return +1; }
-  std::unique_ptr<Game> Clone() const override {
-    return std::unique_ptr<Game>(new BlottoGame(*this));
+  std::shared_ptr<const Game> Clone() const override {
+    return std::shared_ptr<const Game>(new BlottoGame(*this));
   }
 
  private:

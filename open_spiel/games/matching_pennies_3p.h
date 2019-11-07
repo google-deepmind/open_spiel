@@ -44,10 +44,10 @@ namespace matching_pennies_3p {
 
 class MatchingPennies3pState : public NFGState {
  public:
-  MatchingPennies3pState(int num_distinct_actions, int num_players);
+  MatchingPennies3pState(std::shared_ptr<const Game> game);
 
-  std::vector<Action> LegalActions(int player) const override;
-  std::string ActionToString(int player, Action move_id) const override;
+  std::vector<Action> LegalActions(Player player) const override;
+  std::string ActionToString(Player player, Action move_id) const override;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
   std::unique_ptr<State> Clone() const override;
@@ -67,15 +67,15 @@ class MatchingPennies3pGame : public NormalFormGame {
   int NumDistinctActions() const { return 2; }
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(
-        new MatchingPennies3pState(NumDistinctActions(), NumPlayers()));
+        new MatchingPennies3pState(shared_from_this()));
   }
 
   int NumPlayers() const override { return 3; }
   double MinUtility() const override { return -1; }
   double UtilitySum() const override { return 0; }
   double MaxUtility() const override { return +1; }
-  std::unique_ptr<Game> Clone() const override {
-    return std::unique_ptr<Game>(new MatchingPennies3pGame(*this));
+  std::shared_ptr<const Game> Clone() const override {
+    return std::shared_ptr<const Game>(new MatchingPennies3pGame(*this));
   }
 };
 

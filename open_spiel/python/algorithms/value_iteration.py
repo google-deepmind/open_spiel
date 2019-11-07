@@ -19,22 +19,50 @@ from __future__ import division
 from __future__ import print_function
 
 from open_spiel.python.algorithms import get_all_states
+from open_spiel.python.algorithms import lp_solver
 import pyspiel
+
+
+def _get_future_states(possibilities, state, reach=1.0):
+  """Does a lookahead over chance nodes to all next states after (s,a).
+
+  Also works if there are no chance nodes (i.e. base case).
+
+  Arguments:
+    possibilities:  an empty list, that will be filled with (str(next_state),
+        transition probability) pairs for all possible next states
+    state: the state following some s.apply_action(a), can be a chance node
+    reach: chance reach probability of getting to this point from (s,a)
+
+  Returns: nothing.
+  """
+  if not state.is_chance_node() or state.is_terminal():
+    # Base case
+    possibilities.append((str(state), reach))
+  else:
+    assert state.is_chance_node()
+    for outcome, prob in state.chance_outcomes():
+      next_state = state.child(outcome)
+      _get_future_states(possibilities, next_state, reach * prob)
 
 
 def _add_transition(transitions, key, state):
   """Adds action transitions from given state."""
-  for action in state.legal_actions():
-    next_state = state.child(action)
-    possibilities = []
-    if next_state.is_chance_node():
-      for chance_action, prob in next_state.chance_outcomes():
-        realized_next_state = next_state.child(chance_action)
-        possibilities.append([str(realized_next_state), prob])
-    else:
-      possibilities = [(str(next_state), 1)]
 
-    transitions[(key, action)] = possibilities
+  if state.is_simultaneous_node():
+    for p0action in state.legal_actions(0):
+      for p1action in state.legal_actions(1):
+        next_state = state.clone()
+        next_state.apply_actions([p0action, p1action])
+        possibilities = []
+        _get_future_states(possibilities, next_state)
+        transitions[(key, p0action, p1action)] = possibilities
+  else:
+    for action in state.legal_actions():
+      next_state = state.child(action)
+      possibilities = []
+      _get_future_states(possibilities, next_state)
+      transitions[(key, action)] = possibilities
 
 
 def _initialize_maps(states, values, transitions):
@@ -47,7 +75,7 @@ def _initialize_maps(states, values, transitions):
       _add_transition(transitions, key, state)
 
 
-def value_iteration(game, depth_limit, threshold):
+def value_iteration(game, depth_limit, threshold, cyclic_game=False):
   """Solves for the optimal value function of a game.
 
   For small games only! Solves the game using value iteration,
@@ -60,20 +88,34 @@ def value_iteration(game, depth_limit, threshold):
     depth_limit: How deeply to analyze the game tree. Negative means no limit, 0
       means root-only, etc.
     threshold: Maximum error for state values..
+    cyclic_game: set to True if the game has cycles (from state A we can get to
+      state B, and from state B we can get back to state A).
+
 
   Returns:
     A `dict` with string keys and float values, mapping string encoding of
     states to the values of those states.
   """
-  if game.num_players() not in (1, 2):
-    raise ValueError("Game must be a 1-player or 2-player game")
-  if (game.num_players() == 2 and
-      game.get_type().utility != pyspiel.GameType.Utility.ZERO_SUM):
-    raise ValueError("2-player games must be zero sum games")
+  assert game.num_players() in (1,
+                                2), ("Game must be a 1-player or 2-player game")
+  if game.num_players() == 2:
+    assert game.get_type().utility == pyspiel.GameType.Utility.ZERO_SUM, (
+        "2-player games must be zero sum games")
+
+  # Must be perfect information or one-shot (not imperfect information).
+  assert (game.get_type().information == pyspiel.GameType.Information.ONE_SHOT
+          or game.get_type().information ==
+          pyspiel.GameType.Information.PERFECT_INFORMATION)
+
   # We expect Value Iteration to be used with perfect information games, in
   # which `str` is assumed to display the state of the game.
   states = get_all_states.get_all_states(
-      game, depth_limit, True, False, to_string=str)
+      game,
+      depth_limit,
+      True,
+      False,
+      to_string=str,
+      stop_if_encountered=cyclic_game)
   values = {}
   transitions = {}
 
@@ -85,15 +127,38 @@ def value_iteration(game, depth_limit, threshold):
     for key, state in states.items():
       if state.is_terminal():
         continue
-      player = state.current_player()
-      value = min_utility if player == 0 else -min_utility
-      for action in state.legal_actions():
-        next_states = transitions[(key, action)]
-        q_value = sum(p * values[next_state] for next_state, p in next_states)
-        if player == 0:
-          value = max(value, q_value)
-        else:
-          value = min(value, q_value)
+      elif state.is_simultaneous_node():
+        # Simultaneous node. Assemble a matrix game from the child utilities.
+        # and solve it using a matrix game solver.
+        p0_utils = []  # row player
+        p1_utils = []  # col player
+        row = 0
+        for p0action in state.legal_actions(0):
+          # new row
+          p0_utils.append([])
+          p1_utils.append([])
+          for p1action in state.legal_actions(1):
+            # loop from left-to-right of columns
+            next_states = transitions[(key, p0action, p1action)]
+            joint_q_value = sum(
+                p * values[next_state] for next_state, p in next_states)
+            p0_utils[row].append(joint_q_value)
+            p1_utils[row].append(-joint_q_value)
+          row += 1
+        stage_game = pyspiel.create_matrix_game(p0_utils, p1_utils)
+        solution = lp_solver.solve_zero_sum_matrix_game(stage_game)
+        value = solution[2]
+      else:
+        # Regular decision node
+        player = state.current_player()
+        value = min_utility if player == 0 else -min_utility
+        for action in state.legal_actions():
+          next_states = transitions[(key, action)]
+          q_value = sum(p * values[next_state] for next_state, p in next_states)
+          if player == 0:
+            value = max(value, q_value)
+          else:
+            value = min(value, q_value)
       error = max(abs(values[key] - value), error)
       values[key] = value
 

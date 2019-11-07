@@ -16,8 +16,8 @@
 
 #include <sstream>
 
+#include "open_spiel/game_parameters.h"
 #include "open_spiel/games/go/go_board.h"
-#include "open_spiel/spiel_optional.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
@@ -35,20 +35,20 @@ const GameType kGameType{
     GameType::RewardModel::kTerminal,
     /*max_num_players=*/2,
     /*min_num_players=*/2,
-    /*provides_information_state=*/false,
+    /*provides_information_state=*/true,
     /*provides_information_state_as_normalized_vector=*/false,
-    /*provides_observation=*/false,
-    /*provides_observation_as_normalized_vector=*/false,
+    /*provides_observation=*/true,
+    /*provides_observation_as_normalized_vector=*/true,
     /*parameter_specification=*/
     {
-        {"komi", GameType::ParameterSpec{GameParameter::Type::kDouble, false}},
-        {"board_size",
-         GameType::ParameterSpec{GameParameter::Type::kInt, false}},
+        {"komi", GameParameter(7.5)},
+        {"board_size", GameParameter(19)},
+        {"handicap", GameParameter(0)},
     },
 };
 
-std::unique_ptr<Game> Factory(const GameParameters& params) {
-  return std::unique_ptr<Game>(new GoGame(params));
+std::shared_ptr<const Game> Factory(const GameParameters& params) {
+  return std::shared_ptr<const Game>(new GoGame(params));
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
@@ -77,8 +77,9 @@ std::vector<GoPoint> HandicapStones(int num_handicap) {
 
 }  // namespace
 
-GoState::GoState(int board_size, float komi, int handicap)
-    : State(go::NumDistinctActions(board_size), go::NumPlayers()),
+GoState::GoState(std::shared_ptr<const Game> game, int board_size, float komi,
+                 int handicap)
+    : State(game),
       board_(board_size),
       komi_(komi),
       handicap_(handicap),
@@ -86,19 +87,48 @@ GoState::GoState(int board_size, float komi, int handicap)
   ResetBoard();
 }
 
-std::vector<Action> GoState::LegalActions() const {
-  std::vector<Action> actions = {kPass};
+std::string GoState::InformationState(int player) const {
+  return HistoryString();
+}
 
+std::string GoState::Observation(int player) const { return ToString(); }
+
+void GoState::ObservationAsNormalizedVector(int player,
+                                            std::vector<double>* values) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+
+  int num_cells = board_.board_size() * board_.board_size();
+  values->resize(num_cells * (CellStates() + 1));
+  std::fill(values->begin(), values->end(), 0.);
+
+  // Add planes: black, white, empty.
+  int cell = 0;
+  for (GoPoint p : BoardPoints(board_.board_size())) {
+    int color_val = static_cast<int>(board_.PointColor(p));
+    (*values)[num_cells * color_val + cell] = 1.0;
+    ++cell;
+  }
+  SPIEL_CHECK_EQ(cell, num_cells);
+
+  // Add a fourth binary plane for komi (whether white is to play).
+  std::fill(values->begin() + (CellStates() * num_cells), values->end(),
+            (to_play_ == GoColor::kWhite ? 1.0 : 0.0));
+}
+
+std::vector<Action> GoState::LegalActions() const {
+  std::vector<Action> actions{};
+  if (IsTerminal()) return actions;
   for (GoPoint p : BoardPoints(board_.board_size())) {
     if (board_.IsLegalMove(p, to_play_)) {
       actions.push_back(p);
     }
   }
-
+  actions.push_back(kPass);
   return actions;
 }
 
-std::string GoState::ActionToString(int player, Action action) const {
+std::string GoState::ActionToString(Player player, Action action) const {
   return absl::StrCat(GoColorToString(static_cast<GoColor>(player)), " ",
                       GoPointToString(action));
 }
@@ -150,7 +180,7 @@ std::unique_ptr<State> GoState::Clone() const {
   return std::unique_ptr<State>(new GoState(*this));
 }
 
-void GoState::UndoAction(int player, Action action) {
+void GoState::UndoAction(Player player, Action action) {
   // We don't have direct undo functionality, but copying the board and
   // replaying all actions is still pretty fast (> 1 million undos/second).
   history_.pop_back();
@@ -189,9 +219,9 @@ void GoState::ResetBoard() {
 
 GoGame::GoGame(const GameParameters& params)
     : Game(kGameType, params),
-      komi_(ParameterValue<double>("komi", 7.5)),
-      board_size_(ParameterValue<int>("board_size", 19)),
-      handicap_(ParameterValue<int>("handicap", 0)) {}
+      komi_(ParameterValue<double>("komi")),
+      board_size_(ParameterValue<int>("board_size")),
+      handicap_(ParameterValue<int>("handicap")) {}
 
 }  // namespace go
 }  // namespace open_spiel

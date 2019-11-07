@@ -26,13 +26,13 @@ std::vector<double> EvaluateBots(State* state, const std::vector<Bot*>& bots,
   while (!state->IsTerminal()) {
     if (state->IsChanceNode()) {
       state->ApplyAction(
-          SampleChanceOutcome(state->ChanceOutcomes(), uniform(rng)));
+          SampleChanceOutcome(state->ChanceOutcomes(), uniform(rng)).first);
     } else if (state->IsSimultaneousNode()) {
-      for (int i = 0; i < num_players; ++i) {
-        if (state->LegalActions(i).empty()) {
-          joint_actions[i] = kInvalidAction;
+      for (auto p = Player{0}; p < num_players; ++p) {
+        if (state->LegalActions(p).empty()) {
+          joint_actions[p] = kInvalidAction;
         } else {
-          joint_actions[i] = bots[i]->Step(*state).second;
+          joint_actions[p] = bots[p]->Step(*state).second;
         }
       }
       state->ApplyActions(joint_actions);

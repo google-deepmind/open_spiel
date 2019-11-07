@@ -20,7 +20,8 @@ from __future__ import print_function
 
 
 def _get_subgames_states(state, all_states, depth_limit, depth,
-                         include_terminals, include_chance_states, to_string):
+                         include_terminals, include_chance_states, to_string,
+                         stop_if_encountered):
   """Extract non-chance states for a subgame into the all_states dict."""
   if state.is_terminal():
     if include_terminals:
@@ -38,19 +39,24 @@ def _get_subgames_states(state, all_states, depth_limit, depth,
     state_str = to_string(state)
     if state_str not in all_states:
       all_states[state_str] = state.clone()
+    else:
+      # We already saw this one. Stop the recursion if the flag is set
+      if stop_if_encountered:
+        return
 
   for action in state.legal_actions():
     state_for_search = state.child(action)
-
     _get_subgames_states(state_for_search, all_states, depth_limit, depth + 1,
-                         include_terminals, include_chance_states, to_string)
+                         include_terminals, include_chance_states, to_string,
+                         stop_if_encountered)
 
 
 def get_all_states(game,
                    depth_limit,
                    include_terminals,
                    include_chance_states,
-                   to_string=lambda s: s.history_str()):
+                   to_string=lambda s: s.history_str(),
+                   stop_if_encountered=True):
   """Gets all states in the game, indexed by their string representation.
 
   For small games only! Useful for methods that solve the  games explicitly,
@@ -70,6 +76,9 @@ def get_all_states(game,
       `lambda s: s.history_str()` as this enforces perfect recall, but for
         historical reasons, using `str` is also supported, but the goal is to
         remove this argument.
+    stop_if_encountered: if this is set, do not keep recursively adding states
+        if this state is already in the list. This allows support for games that
+        have cycles.
 
   Returns:
     A `dict` with `to_string(state)` keys and `pyspiel.State` values containing
@@ -87,7 +96,8 @@ def get_all_states(game,
       depth=0,
       include_terminals=include_terminals,
       include_chance_states=include_chance_states,
-      to_string=to_string)
+      to_string=to_string,
+      stop_if_encountered=stop_if_encountered)
 
   if not all_states:
     raise ValueError("GetSubgameStates returned 0 states!")

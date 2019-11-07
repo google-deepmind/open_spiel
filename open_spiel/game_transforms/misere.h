@@ -34,7 +34,8 @@ inline std::vector<double> Negative(std::vector<double>&& vector) {
 
 class MisereState : public WrappedState {
  public:
-  MisereState(std::unique_ptr<State> state) : WrappedState(std::move(state)) {}
+  MisereState(std::shared_ptr<const Game> game, std::unique_ptr<State> state)
+      : WrappedState(game, std::move(state)) {}
   MisereState(const MisereState& other) = default;
 
   std::vector<double> Rewards() const override {
@@ -52,16 +53,17 @@ class MisereState : public WrappedState {
 
 class MisereGame : public WrappedGame {
  public:
-  MisereGame(std::unique_ptr<Game> game, GameType game_type,
+  MisereGame(std::shared_ptr<const Game> game, GameType game_type,
              GameParameters game_parameters);
   MisereGame(const MisereGame& other) = default;
 
   std::unique_ptr<State> NewInitialState() const override {
-    return std::unique_ptr<State>(new MisereState(game_->NewInitialState()));
+    return std::unique_ptr<State>(
+        new MisereState(shared_from_this(), game_->NewInitialState()));
   }
 
-  std::unique_ptr<Game> Clone() const override {
-    return std::unique_ptr<Game>(new MisereGame(*this));
+  std::shared_ptr<const Game> Clone() const override {
+    return std::shared_ptr<const Game>(new MisereGame(*this));
   }
 
   double MinUtility() const override { return -game_->MaxUtility(); }

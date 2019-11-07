@@ -14,6 +14,8 @@
 
 #include "open_spiel/games/matching_pennies_3p.h"
 
+#include <memory>
+
 #include "open_spiel/normal_form_game.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
@@ -41,24 +43,24 @@ const GameType kGameType{
     /*provides_observation_as_normalized_vector=*/false,
     /*parameter_specification=*/{}};
 
-std::unique_ptr<Game> Factory(const GameParameters& params) {
-  return std::unique_ptr<Game>(new MatchingPennies3pGame(params));
+std::shared_ptr<const Game> Factory(const GameParameters& params) {
+  return std::shared_ptr<const Game>(new MatchingPennies3pGame(params));
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
 }  // namespace
 
-MatchingPennies3pState::MatchingPennies3pState(int num_distinct_actions,
-                                               int num_players)
-    : NFGState(num_distinct_actions, num_players),
-      terminal_(false),
-      returns_({0, 0, 0}) {}
+MatchingPennies3pState::MatchingPennies3pState(std::shared_ptr<const Game> game)
+    : NFGState(game), terminal_(false), returns_({0, 0, 0}) {}
 
-std::vector<Action> MatchingPennies3pState::LegalActions(int player) const {
-  return {kHeadsActionId, kTailsActionId};  // Heads and Tails.
+std::vector<Action> MatchingPennies3pState::LegalActions(Player player) const {
+  if (terminal_)
+    return {};
+  else
+    return {kHeadsActionId, kTailsActionId};
 }
 
-std::string MatchingPennies3pState::ActionToString(int player,
+std::string MatchingPennies3pState::ActionToString(Player player,
                                                    Action move_id) const {
   switch (move_id) {
     case kHeadsActionId:

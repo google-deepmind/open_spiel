@@ -62,12 +62,12 @@ class DeterministicTabularPolicy : public Policy {
  public:
   // Creates a deterministic policy and sets it to the specified policy.
   DeterministicTabularPolicy(
-      const Game& game, int player,
+      const Game& game, Player player,
       const std::unordered_map<std::string, Action> policy);
 
   // Creates a default deterministic policy, with all actions set to their first
   // legal action (index 0 in the legal actions list).
-  DeterministicTabularPolicy(const Game& game, int player);
+  DeterministicTabularPolicy(const Game& game, Player player);
 
   ActionsAndProbs GetStatePolicy(const std::string& info_state) const override;
   Action GetAction(const std::string& info_state) const;
@@ -98,10 +98,10 @@ class DeterministicTabularPolicy : public Policy {
   std::string ToString(const std::string& delimiter) const;
 
  private:
-  void CreateTable(const Game& game, int player);
+  void CreateTable(const Game& game, Player player);
 
   std::unordered_map<std::string, LegalsWithIndex> table_;
-  int player_;
+  Player player_;
 };
 
 }  // namespace algorithms

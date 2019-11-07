@@ -19,7 +19,7 @@
 
 namespace open_spiel {
 
-int NextPlayerRoundRobin(int player, int nplayers) {
+int NextPlayerRoundRobin(Player player, int nplayers) {
   if (player + 1 < nplayers) {
     return player + 1;
   } else {
@@ -28,36 +28,11 @@ int NextPlayerRoundRobin(int player, int nplayers) {
 }
 
 // Helper function to determine the previous player in a round robin.
-int PreviousPlayerRoundRobin(int player, int nplayers) {
+int PreviousPlayerRoundRobin(Player player, int nplayers) {
   if (player - 1 >= 0) {
     return player - 1;
   } else {
     return nplayers - 1;
-  }
-}
-
-std::pair<bool, std::string> ParseCmdLineArg(int argc, char** argv,
-                                             const std::string& name) {
-  std::string prefix = "--" + name + "=";
-
-  for (int i = 0; i < argc; ++i) {
-    std::string arg = argv[i];
-    if (arg.find(prefix) == 0) {
-      return std::pair<bool, std::string>(true, arg.substr(prefix.length()));
-    }
-  }
-
-  return std::pair<bool, std::string>(false, "");
-}
-
-std::string ParseCmdLineArgDefault(int argc, char** argv,
-                                   const std::string& name,
-                                   const std::string& default_value) {
-  std::pair<bool, std::string> ret_value = ParseCmdLineArg(argc, argv, name);
-  if (ret_value.first) {
-    return ret_value.second;
-  } else {
-    return default_value;
   }
 }
 

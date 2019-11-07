@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <memory>
 #include <string>
 
 #include "open_spiel/algorithms/value_iteration.h"
@@ -19,13 +20,12 @@
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
-namespace ttt = open_spiel::tic_tac_toe;
-
 // Example code for using value iteration algorithm to solve tic-tac-toe.
 int main(int argc, char** argv) {
-  ttt::TicTacToeGame game({});
+  std::shared_ptr<const open_spiel::Game> game =
+      open_spiel::LoadGame("tic_tac_toe");
 
-  auto solution = open_spiel::algorithms::ValueIteration(game, -1, 0.01);
+  auto solution = open_spiel::algorithms::ValueIteration(*game, -1, 0.01);
   for (auto kv : solution) {
     std::cerr << "State: " << std::endl
               << kv.first << std::endl

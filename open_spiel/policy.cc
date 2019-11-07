@@ -17,23 +17,25 @@
 #include <list>
 #include <memory>
 
+#include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
 
 double GetProb(const ActionsAndProbs& action_and_probs, Action action) {
-  for (const auto& action_and_prob : action_and_probs) {
-    if (action_and_prob.first == action) {
-      return action_and_prob.second;
-    }
-  }
-  return -1.0;
+  auto it = absl::c_find_if(action_and_probs,
+                            [&action](const std::pair<Action, double>& p) {
+                              return p.first == action;
+                            });
+  if (it == action_and_probs.end()) return -1.;
+  return it->second;
 }
 
 TabularPolicy::TabularPolicy(const Game& game)
     : TabularPolicy(GetRandomPolicy(game)) {}
 
-TabularPolicy GetEmptyTabularPolicy(const Game& game) {
+TabularPolicy GetEmptyTabularPolicy(const Game& game,
+                                    bool initialize_to_uniform) {
   std::unordered_map<std::string, ActionsAndProbs> policy;
   if (game.GetType().dynamics != GameType::Dynamics::kSequential) {
     SpielFatalError("Game is not sequential.");
@@ -53,12 +55,18 @@ TabularPolicy GetEmptyTabularPolicy(const Game& game) {
       }
     } else {
       ActionsAndProbs infostate_policy;
-      infostate_policy.reserve(game.NumDistinctActions());
-      Action action_index = 0;
-      for (int is_legal : state->LegalActionsMask()) {
-        if (is_legal == 1) to_visit.push_back(state->Child(action_index));
-        infostate_policy.push_back({action_index, is_legal});
-        ++action_index;
+      std::vector<Action> legal_actions = state->LegalActions();
+      const int num_legal_actions = legal_actions.size();
+      SPIEL_CHECK_GT(num_legal_actions, 0.);
+      double action_probability = 1.;
+      if (initialize_to_uniform) {
+        action_probability = 1. / num_legal_actions;
+      }
+
+      infostate_policy.reserve(num_legal_actions);
+      for (Action action : legal_actions) {
+        to_visit.push_back(state->Child(action));
+        infostate_policy.push_back({action, action_probability});
       }
       if (infostate_policy.empty()) {
         SpielFatalError("State has zero legal actions.");
@@ -70,32 +78,7 @@ TabularPolicy GetEmptyTabularPolicy(const Game& game) {
 }
 
 TabularPolicy GetUniformPolicy(const Game& game) {
-  TabularPolicy policy = GetEmptyTabularPolicy(game);
-  std::unordered_map<std::string, ActionsAndProbs>& policy_table =
-      policy.PolicyTable();
-  for (const auto& kv : policy_table) {
-    ActionsAndProbs state_policy;
-    if (kv.second.empty()) {
-      SpielFatalError("State has zero legal actions.");
-    }
-    state_policy.reserve(kv.second.size());
-    double num_legal_actions = 0.;
-    for (const auto& a_and_p : kv.second) {
-      // GetEmptyTabularPolicy assigns a probability of 1 to all legal actions
-      // and a probability of 0 to all illegal actions.
-      num_legal_actions += a_and_p.second;
-    }
-    SPIEL_CHECK_GT(num_legal_actions, 0.);
-    double prob = 1. / num_legal_actions;
-
-    // action_and_prob.second is equal to 1 if the action is legal, 0 otherwise.
-    for (const auto& action_and_prob : kv.second) {
-      state_policy.push_back(
-          {action_and_prob.first, prob * action_and_prob.second});
-    }
-    policy_table[kv.first] = std::move(state_policy);
-  }
-  return policy;
+  return GetEmptyTabularPolicy(game, /*initialize_to_uniform=*/true);
 }
 
 TabularPolicy GetRandomPolicy(const Game& game, int seed) {
@@ -136,29 +119,48 @@ TabularPolicy GetRandomPolicy(const Game& game, int seed) {
 }
 
 TabularPolicy GetFirstActionPolicy(const Game& game) {
-  TabularPolicy policy = GetEmptyTabularPolicy(game);
-  std::unordered_map<std::string, ActionsAndProbs>& policy_table =
-      policy.PolicyTable();
-  for (auto& kv : policy_table) {
-    ActionsAndProbs state_policy;
-    bool first_legal_action_found = false;
-    for (int i = 0; i < kv.second.size(); ++i) {
-      Action action = kv.second[i].first;
-      // We set the first legal action to have unit probability, setting
-      // everything else to 0.
-      if (Near(kv.second[i].second, 1.0) && !first_legal_action_found) {
-        first_legal_action_found = true;
-        state_policy.push_back({action, 1.});
-      } else {
-        state_policy.push_back({action, 0.});
-      }
-    }
-    if (state_policy.empty()) {
-      SpielFatalError("State has zero legal actions.");
-    }
-    kv.second = state_policy;
+  std::unordered_map<std::string, ActionsAndProbs> policy;
+  if (game.GetType().dynamics != GameType::Dynamics::kSequential) {
+    SpielFatalError("Game is not sequential.");
+    return TabularPolicy(policy);
   }
-  return policy;
+  std::list<std::unique_ptr<State>> to_visit;
+  to_visit.push_back(game.NewInitialState());
+  while (!to_visit.empty()) {
+    std::unique_ptr<State> state = std::move(to_visit.back());
+    to_visit.pop_back();
+    if (state->IsTerminal()) {
+      continue;
+    }
+    if (state->IsChanceNode()) {
+      for (const auto& outcome_and_prob : state->ChanceOutcomes()) {
+        to_visit.emplace_back(state->Child(outcome_and_prob.first));
+      }
+    } else {
+      ActionsAndProbs infostate_policy;
+      std::vector<Action> legal_actions = state->LegalActions();
+      const int num_legal_actions = legal_actions.size();
+      SPIEL_CHECK_GT(num_legal_actions, 0.);
+      bool first_legal_action_found = false;
+
+      infostate_policy.reserve(num_legal_actions);
+      for (Action action : legal_actions) {
+        to_visit.push_back(state->Child(action));
+        if (!first_legal_action_found) {
+          first_legal_action_found = true;
+          infostate_policy.push_back({action, 1.});
+
+        } else {
+          infostate_policy.push_back({action, 0.});
+        }
+      }
+      if (infostate_policy.empty()) {
+        SpielFatalError("State has zero legal actions.");
+      }
+      policy.insert({state->InformationState(), infostate_policy});
+    }
+  }
+  return TabularPolicy(policy);
 }
 
 }  // namespace open_spiel

@@ -19,7 +19,7 @@ namespace open_spiel {
 std::vector<Action> SimMoveState::FlatJointActionToActions(
     Action flat_action) const {
   std::vector<Action> actions(num_players_, kInvalidAction);
-  for (int player = 0; player < num_players_; ++player) {
+  for (Player player = 0; player < num_players_; ++player) {
     // For each player with legal actions available:
     const auto legal_actions = LegalActions(player);
     int num_actions = legal_actions.size();
@@ -43,7 +43,7 @@ std::vector<Action> SimMoveState::LegalFlatJointActions() const {
   // Compute the number of possible joint actions = \prod #actions(i)
   // over all players with any legal actions available.
   int number_joint_actions = 1;
-  for (int player = 0; player < num_players_; ++player) {
+  for (auto player = Player{0}; player < num_players_; ++player) {
     int num_actions = LegalActions(player).size();
     if (num_actions > 1) number_joint_actions *= num_actions;
   }
@@ -59,7 +59,7 @@ std::string SimMoveState::FlatJointActionToString(Action flat_action) const {
   // string. For example, [Heads, Tails] would mean than player 0 chooses Heads,
   // and player 1 chooses Tails.
   std::string str;
-  for (int player = 0; player < num_players_; ++player) {
+  for (auto player = Player{0}; player < num_players_; ++player) {
     if (!str.empty()) str.append(", ");
     const auto legal_actions = LegalActions(player);
     int num_actions = legal_actions.size();

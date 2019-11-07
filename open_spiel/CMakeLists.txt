@@ -8,9 +8,12 @@ Any Python library found with CMake modules FindPython2/FindPython3 that \
 agrees  with the major version and is at least as high for minor version and \
 patch number is accepted. If the variable is not set, we use the FindPython \
 module which favours Python 3 over Python 2 if both are available.")
-set (CMAKE_CXX_STANDARD 11)
+set (CMAKE_CXX_STANDARD 17)
 if(APPLE)
-  set (CMAKE_CXX_FLAGS "-Werror -undefined dynamic_lookup")
+  # On MacOS:
+  #   -Werror causes problems with abseil on MacOS
+  #   -undefined dynamic_lookup is necessary for pybind11 linking
+  set (CMAKE_CXX_FLAGS "-w -undefined dynamic_lookup")
 else()
   set (CMAKE_CXX_FLAGS "-Werror")
 endif()
@@ -38,11 +41,12 @@ set (OPEN_SPIEL_CORE_FILES
   policy.cc
   simultaneous_move_game.h
   simultaneous_move_game.cc
-  spiel_optional.h
-  spiel_optional.cc
   spiel_utils.h
   spiel_utils.cc
+  tensor_view.h
 )
+
+set (OPEN_SPIEL_QUERY_FILES query.cc query.h)
 
 # We add the subdirectory here so open_spiel_core can #include absl.
 add_subdirectory (abseil-cpp)
@@ -50,16 +54,31 @@ add_subdirectory (abseil-cpp)
 # Just the core without any of the games
 add_library(open_spiel_core OBJECT ${OPEN_SPIEL_CORE_FILES})
 target_include_directories (open_spiel_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} abseil-cpp)
-link_libraries(open_spiel_core absl::strings absl::str_format)
+link_libraries(open_spiel_core
+  absl::container
+  absl::flags
+  absl::flags_parse
+  absl::optional
+  absl::random_random
+  absl::str_format
+  absl::strings
+  absl::time
+)
 
 # Just the minimal base library: no games.
 set (OPEN_SPIEL_CORE_OBJECTS $<TARGET_OBJECTS:open_spiel_core>)
+
+# Query API objects
+add_library(open_spiel_query OBJECT ${OPEN_SPIEL_QUERY_FILES})
+target_include_directories (open_spiel_query PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 set (OPEN_SPIEL_OBJECTS
   $<TARGET_OBJECTS:open_spiel_core>
   $<TARGET_OBJECTS:games>
   $<TARGET_OBJECTS:game_transforms>
+  $<TARGET_OBJECTS:open_spiel_query>
   $<TARGET_OBJECTS:bridge_double_dummy_solver>
+  # $<TARGET_OBJECTS:hanabi_learning_environment>
   $<TARGET_OBJECTS:algorithms>
 )
 

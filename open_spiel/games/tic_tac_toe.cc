@@ -20,6 +20,7 @@
 #include <vector>
 
 #include "open_spiel/spiel_utils.h"
+#include "open_spiel/tensor_view.h"
 
 namespace open_spiel {
 namespace tic_tac_toe {
@@ -43,15 +44,15 @@ const GameType kGameType{
     /*parameter_specification=*/{}  // no parameters
 };
 
-std::unique_ptr<Game> Factory(const GameParameters& params) {
-  return std::unique_ptr<Game>(new TicTacToeGame(params));
+std::shared_ptr<const Game> Factory(const GameParameters& params) {
+  return std::shared_ptr<const Game>(new TicTacToeGame(params));
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
 
 }  // namespace
 
-CellState PlayerToState(int player) {
+CellState PlayerToState(Player player) {
   switch (player) {
     case 0:
       return CellState::kCross;
@@ -73,17 +74,21 @@ std::string StateToString(CellState state) {
       return "x";
     default:
       SpielFatalError("Unknown state.");
-      return "This will never return.";
   }
 }
 
 void TicTacToeState::DoApplyAction(Action move) {
   SPIEL_CHECK_EQ(board_[move], CellState::kEmpty);
   board_[move] = PlayerToState(CurrentPlayer());
+  if (HasLine(current_player_)) {
+    outcome_ = current_player_;
+  }
   current_player_ = 1 - current_player_;
+  num_moves_ += 1;
 }
 
 std::vector<Action> TicTacToeState::LegalActions() const {
+  if (IsTerminal()) return {};
   // Can move in any empty cell.
   std::vector<Action> moves;
   for (int cell = 0; cell < kNumCells; ++cell) {
@@ -94,12 +99,13 @@ std::vector<Action> TicTacToeState::LegalActions() const {
   return moves;
 }
 
-std::string TicTacToeState::ActionToString(int player, Action action_id) const {
+std::string TicTacToeState::ActionToString(Player player,
+                                           Action action_id) const {
   return absl::StrCat(StateToString(PlayerToState(player)), "(",
                       action_id % kNumCols, ",", action_id / kNumCols, ")");
 }
 
-bool TicTacToeState::HasLine(int player) const {
+bool TicTacToeState::HasLine(Player player) const {
   CellState c = PlayerToState(player);
   return (board_[0] == c && board_[1] == c && board_[2] == c) ||
          (board_[3] == c && board_[4] == c && board_[5] == c) ||
@@ -112,14 +118,10 @@ bool TicTacToeState::HasLine(int player) const {
 }
 
 bool TicTacToeState::IsFull() const {
-  for (int cell = 0; cell < kNumCells; ++cell) {
-    if (board_[cell] == CellState::kEmpty) return false;
-  }
-  return true;
+  return num_moves_ == kNumCells;
 }
 
-TicTacToeState::TicTacToeState(int num_distinct_actions)
-    : State(num_distinct_actions, kNumPlayers) {
+TicTacToeState::TicTacToeState(std::shared_ptr<const Game> game) : State(game) {
   std::fill(begin(board_), end(board_), CellState::kEmpty);
 }
 
@@ -137,44 +139,46 @@ std::string TicTacToeState::ToString() const {
 }
 
 bool TicTacToeState::IsTerminal() const {
-  return HasLine(0) || HasLine(1) || IsFull();
+  return outcome_ != kInvalidPlayer || IsFull();
 }
 
 std::vector<double> TicTacToeState::Returns() const {
-  if (HasLine(0)) {
+  if (outcome_ == Player{0}) {
     return {1.0, -1.0};
-  } else if (HasLine(1)) {
+  } else if (outcome_ == Player{1}) {
     return {-1.0, 1.0};
   } else {
     return {0.0, 0.0};
   }
 }
 
-std::string TicTacToeState::InformationState(int player) const {
+std::string TicTacToeState::InformationState(Player player) const {
   return HistoryString();
 }
 
-std::string TicTacToeState::Observation(int player) const {
+std::string TicTacToeState::Observation(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   return ToString();
 }
 
 void TicTacToeState::ObservationAsNormalizedVector(
-    int player, std::vector<double>* values) const {
+    Player player, std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  values->resize(kNumCells * kCellStates);
-  std::fill(values->begin(), values->end(), 0.);
+  // Treat `values` as a 2-d tensor.
+  TensorView<2> view(values, {kCellStates, kNumCells}, true);
   for (int cell = 0; cell < kNumCells; ++cell) {
-    (*values)[kNumCells * static_cast<int>(board_[cell]) + cell] = 1.0;
+    view[{static_cast<int>(board_[cell]), cell}] = 1.0;
   }
 }
 
-void TicTacToeState::UndoAction(int player, Action move) {
+void TicTacToeState::UndoAction(Player player, Action move) {
   board_[move] = CellState::kEmpty;
   current_player_ = player;
+  outcome_ = kInvalidPlayer;
+  num_moves_ -= 1;
   history_.pop_back();
 }
 

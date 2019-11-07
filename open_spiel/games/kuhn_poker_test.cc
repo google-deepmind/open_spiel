@@ -28,15 +28,15 @@ void BasicKuhnTests() {
   testing::LoadGameTest("kuhn_poker");
   testing::ChanceOutcomesTest(*LoadGame("kuhn_poker"));
   testing::RandomSimTest(*LoadGame("kuhn_poker"), 100);
-  for (int players = 3; players <= 5; players++) {
+  for (Player players = 3; players <= 5; players++) {
     testing::RandomSimTest(
         *LoadGame("kuhn_poker", {{"players", GameParameter(players)}}), 100);
   }
 }
 
 void CountStates() {
-  KuhnGame game({});
-  auto states = algorithms::GetAllStates(game, /*depth_limit=*/-1,
+  std::shared_ptr<const Game> game = LoadGame("kuhn_poker");
+  auto states = algorithms::GetAllStates(*game, /*depth_limit=*/-1,
                                          /*include_terminals=*/true,
                                          /*include_chance_states=*/false);
   // 6 deals * 9 betting sequences (-, p, b, pp, pb, bp, bb, pbp, pbb) = 54
@@ -50,8 +50,8 @@ void CountStates() {
 int main(int argc, char **argv) {
   open_spiel::kuhn_poker::BasicKuhnTests();
   open_spiel::kuhn_poker::CountStates();
-  open_spiel::testing::CheckChanceOutcomes(open_spiel::kuhn_poker::KuhnGame(
-      {{"players", open_spiel::GameParameter(3)}}));
-  open_spiel::testing::RandomSimTest(open_spiel::kuhn_poker::KuhnGame({}),
+  open_spiel::testing::CheckChanceOutcomes(*open_spiel::LoadGame(
+      "kuhn_poker", {{"players", open_spiel::GameParameter(3)}}));
+  open_spiel::testing::RandomSimTest(*open_spiel::LoadGame("kuhn_poker"),
                                      /*num_sims=*/10);
 }

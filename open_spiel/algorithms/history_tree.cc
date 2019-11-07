@@ -26,7 +26,7 @@ namespace algorithms {
 namespace {
 
 std::unique_ptr<HistoryNode> RecursivelyBuildGameTree(
-    std::unique_ptr<State> state, int player_id,
+    std::unique_ptr<State> state, Player player_id,
     std::unordered_map<std::string, HistoryNode*>* state_to_node) {
   std::unique_ptr<HistoryNode> node(
       new HistoryNode(player_id, std::move(state)));
@@ -78,7 +78,7 @@ std::unique_ptr<HistoryNode> RecursivelyBuildGameTree(
 
 }  // namespace
 
-HistoryNode::HistoryNode(int player_id, std::unique_ptr<State> game_state)
+HistoryNode::HistoryNode(Player player_id, std::unique_ptr<State> game_state)
     : state_(std::move(game_state)),
       history_(state_->ToString()),
       type_(state_->GetType()) {
@@ -156,15 +156,15 @@ std::vector<std::string> HistoryTree::GetHistories() {
 }
 
 // Builds game tree consisting of all decision nodes for player_id.
-HistoryTree::HistoryTree(std::unique_ptr<State> state, int player_id) {
+HistoryTree::HistoryTree(std::unique_ptr<State> state, Player player_id) {
   root_ =
       RecursivelyBuildGameTree(std::move(state), player_id, &state_to_node_);
 }
 
 ActionsAndProbs GetSuccessorsWithProbs(const State& state,
-                                       int best_responder_id,
+                                       Player best_responder,
                                        const Policy* policy) {
-  if (state.CurrentPlayer() == best_responder_id) {
+  if (state.CurrentPlayer() == best_responder) {
     ActionsAndProbs state_policy;
     for (const auto& legal_action : state.LegalActions()) {
       // Counterfactual reach probabilities exclude the player's
@@ -189,18 +189,18 @@ ActionsAndProbs GetSuccessorsWithProbs(const State& state,
 // to pass the probabilities-so-far into the call, and get everything right
 // the first time, without recursion. The recursion is simpler, however.
 std::vector<std::pair<std::unique_ptr<State>, double>> DecisionNodes(
-    const State& parent_state, int best_responder_id, const Policy* policy) {
+    const State& parent_state, Player best_responder, const Policy* policy) {
   // If the state is terminal, then there are no more decisions to be made,
   // so we're done.
   if (parent_state.IsTerminal()) return {};
 
   std::vector<std::pair<std::unique_ptr<State>, double>> states_and_probs;
   // We only consider states where the best_responder is making a decision.
-  if (parent_state.CurrentPlayer() == best_responder_id) {
+  if (parent_state.CurrentPlayer() == best_responder) {
     states_and_probs.push_back({parent_state.Clone(), 1.});
   }
   ActionsAndProbs actions_and_probs =
-      GetSuccessorsWithProbs(parent_state, best_responder_id, policy);
+      GetSuccessorsWithProbs(parent_state, best_responder, policy);
   for (open_spiel::Action action : parent_state.LegalActions()) {
     std::unique_ptr<State> child = parent_state.Child(action);
 
@@ -209,7 +209,7 @@ std::vector<std::pair<std::unique_ptr<State>, double>> DecisionNodes(
     // this is only done once, at the start of the exploitability calculation,
     // this is fine for now.
     std::vector<std::pair<std::unique_ptr<State>, double>> children =
-        DecisionNodes(*child, best_responder_id, policy);
+        DecisionNodes(*child, best_responder, policy);
     const double prob = GetProb(actions_and_probs, action);
     SPIEL_CHECK_GE(prob, 0);
     for (auto& state_and_prob : children) {
@@ -224,19 +224,19 @@ std::vector<std::pair<std::unique_ptr<State>, double>> DecisionNodes(
 }
 
 std::unordered_map<std::string, std::vector<std::pair<HistoryNode*, double>>>
-GetAllInfoSets(std::unique_ptr<State> state, int best_responder_id,
+GetAllInfoSets(std::unique_ptr<State> state, Player best_responder,
                const Policy* policy, HistoryTree* tree) {
   std::unordered_map<std::string, std::vector<std::pair<HistoryNode*, double>>>
       infosets;
   // We only need decision nodes, as there's no decision to be made at chance
   // nodes (we randomly sample from the different outcomes there).
   std::vector<std::pair<std::unique_ptr<State>, double>> states_and_probs =
-      DecisionNodes(*state, best_responder_id, policy);
+      DecisionNodes(*state, best_responder, policy);
   infosets.reserve(states_and_probs.size());
   for (const auto& state_and_prob : states_and_probs) {
     // We look at each decision from the perspective of the best_responder.
     std::string infostate =
-        state_and_prob.first->InformationState(best_responder_id);
+        state_and_prob.first->InformationState(best_responder);
     infosets[infostate].push_back(
         {tree->GetByHistory(state_and_prob.first->ToString()),
          state_and_prob.second});

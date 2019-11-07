@@ -21,12 +21,20 @@
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
 namespace backgammon {
 namespace {
+
+// A few constants to help with the conversion to human-readable string formats.
+// TODO: remove these once we've changed kBarPos and kScorePos (see TODO in
+// header).
+constexpr int kNumBarPosHumanReadable = 25;
+constexpr int kNumOffPosHumanReadable = -2;
+
 const std::vector<std::pair<Action, double>> kChanceOutcomes = {
     std::pair<Action, double>(0, 1.0 / 18),
     std::pair<Action, double>(1, 1.0 / 18),
@@ -72,10 +80,11 @@ const GameType kGameType{
     /*provides_observation=*/false,
     /*provides_observation_as_normalized_vector=*/false,
     /*parameter_specification=*/
-    {{"scoring_type", {GameParameter::Type::kString, false}}}};
+    {{"scoring_type",
+      GameParameter(static_cast<std::string>(kDefaultScoringType))}}};
 
-static std::unique_ptr<Game> Factory(const GameParameters& params) {
-  return std::unique_ptr<Game>(new BackgammonGame(params));
+static std::shared_ptr<const Game> Factory(const GameParameters& params) {
+  return std::shared_ptr<const Game>(new BackgammonGame(params));
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
@@ -106,30 +115,159 @@ std::string PositionToString(int pos) {
   }
 }
 
-std::string BackgammonState::ActionToString(int player, Action move_id) const {
+std::string PositionToStringHumanReadable(int pos) {
+  if (pos == kNumBarPosHumanReadable) {
+    return "Bar";
+  } else if (pos == kNumOffPosHumanReadable) {
+    return "Off";
+  } else {
+    return PositionToString(pos);
+  }
+}
+
+int BackgammonState::AugmentCheckerMove(CheckerMove* cmove, int player,
+                                        int start) const {
+  int end = cmove->num;
+  if (end != kPassPos) {
+    // Not a pass, so work out where the piece finished
+    end = start - cmove->num;
+    if (end <= 0) {
+      end = kNumOffPosHumanReadable;  // Off
+    } else if (board_[Opponent(player)]
+                     [player == kOPlayerId ? (end - 1)
+                                           : (kNumPoints - end)] == 1) {
+      cmove->hit = true;  // Check to see if move is a hit
+    }
+  }
+  return end;
+}
+
+std::string BackgammonState::ActionToString(Player player,
+                                            Action move_id) const {
   if (player == kChancePlayerId) {
     return absl::StrCat("chance outcome ", move_id,
                         " (roll: ", kChanceOutcomeValues[move_id][0],
                         kChanceOutcomeValues[move_id][1], ")");
   } else {
+    // Assemble a human-readable string representation of the move using
+    // standard backgammon notation:
+    //
+    // - Always show the numbering going from Bar->24->0->Off, irrespective of
+    //   which player is moving.
+    // - Show the start position followed by end position.
+    // - Show hits with an asterisk, e.g. 9/7*.
+    // - Order the moves by highest number first, e.g. 22/7 10/8 not 10/8 22/7.
+    //   Not an official requirement, but seems to be standard convention.
+    // - Show duplicate moves as 10/8(2).
+    // - Show moves on a single piece as 10/8/5 not 10/8 8/5
+    //
+    // Note that there are tests to ensure the ActionToString follows this
+    // output format. Any changes would need to be reflected in the tests as
+    // well.
     std::vector<CheckerMove> cmoves = SpielMoveToCheckerMoves(player, move_id);
-    return absl::StrCat(move_id, " (", PositionToString(cmoves[0].pos), "-",
-                        cmoves[0].num, cmoves[0].hit ? "*" : "", " ",
-                        PositionToString(cmoves[1].pos), "-", cmoves[1].num,
-                        cmoves[1].hit ? "*" : "", ")");
+
+    int cmove0_start;
+    int cmove1_start;
+    if (player == kOPlayerId) {
+      cmove0_start = (cmoves[0].pos == kBarPos ?
+                      kNumBarPosHumanReadable : cmoves[0].pos + 1);
+      cmove1_start = (cmoves[1].pos == kBarPos ?
+                      kNumBarPosHumanReadable : cmoves[1].pos + 1);
+    } else {
+      // swap the board numbering round for Player X so player is moving
+      // from 24->0
+      cmove0_start = (cmoves[0].pos == kBarPos ?
+                      kNumBarPosHumanReadable : kNumPoints - cmoves[0].pos);
+      cmove1_start = (cmoves[1].pos == kBarPos ?
+                      kNumBarPosHumanReadable : kNumPoints - cmoves[1].pos);
+    }
+
+    // Add hit information and compute whether the moves go off the board.
+    int cmove0_end = AugmentCheckerMove(&cmoves[0], player, cmove0_start);
+    int cmove1_end = AugmentCheckerMove(&cmoves[1], player, cmove1_start);
+
+    // check for 2 pieces hitting on the same point.
+    bool double_hit =
+        (cmoves[1].hit && cmoves[0].hit && cmove1_end == cmove0_end);
+
+    std::string returnVal = "";
+    if (cmove0_start == cmove1_start &&
+        cmove0_end == cmove1_end) {     // same move, show as (2).
+      if (cmoves[1].num == kPassPos) {  // Player can't move at all!
+        returnVal = "Pass";
+      } else {
+        returnVal = absl::StrCat(move_id, " - ",
+                                 PositionToStringHumanReadable(cmove0_start),
+                                 "/", PositionToStringHumanReadable(cmove0_end),
+                                 cmoves[0].hit ? "*" : "", "(2)");
+      }
+    } else if ((cmove0_start < cmove1_start ||
+                (cmove0_start == cmove1_start && cmove0_end < cmove1_end) ||
+                cmoves[0].num == kPassPos) &&
+               cmoves[1].num != kPassPos) {
+      // tradition to start with higher numbers first,
+      // so swap moves round if this not the case. If
+      // there is a pass move, put it last.
+      if (cmove1_end == cmove0_start) {
+        // Check to see if the same piece is moving for both
+        // moves, as this changes the format of the output.
+        returnVal = absl::StrCat(
+            move_id, " - ", PositionToStringHumanReadable(cmove1_start), "/",
+            PositionToStringHumanReadable(cmove1_end), cmoves[1].hit ? "*" : "",
+            "/", PositionToStringHumanReadable(cmove0_end),
+            cmoves[0].hit ? "*" : "");
+      } else {
+        returnVal = absl::StrCat(
+            move_id, " - ", PositionToStringHumanReadable(cmove1_start), "/",
+            PositionToStringHumanReadable(cmove1_end), cmoves[1].hit ? "*" : "",
+            " ",
+            (cmoves[0].num != kPassPos)
+                ? PositionToStringHumanReadable(cmove0_start)
+                : "",
+            (cmoves[0].num != kPassPos) ? "/" : "",
+            PositionToStringHumanReadable(cmove0_end),
+            (cmoves[0].hit && !double_hit) ? "*" : "");
+      }
+    } else {
+      if (cmove0_end == cmove1_start) {
+        // Check to see if the same piece is moving for both
+        // moves, as this changes the format of the output.
+        returnVal = absl::StrCat(move_id, " - ",
+                                 PositionToStringHumanReadable(cmove0_start),
+                                 "/", PositionToStringHumanReadable(cmove0_end),
+                                 cmoves[0].hit ? "*" : "", "/",
+                                 PositionToStringHumanReadable(cmove1_end),
+                                 cmoves[1].hit ? "*" : "");
+      } else {
+        returnVal =
+            absl::StrCat(move_id, " - ",
+                         PositionToStringHumanReadable(cmove0_start), "/",
+                         PositionToStringHumanReadable(cmove0_end),
+                         cmoves[0].hit ? "*" : "", " ",
+                         (cmoves[1].num != kPassPos)
+                             ? PositionToStringHumanReadable(cmove1_start)
+                             : "",
+                         (cmoves[1].num != kPassPos) ? "/" : "",
+                         PositionToStringHumanReadable(cmove1_end),
+                         (cmoves[1].hit && !double_hit) ? "*" : "");
+      }
+    }
+
+    return returnVal;
   }
 }
 
-std::string BackgammonState::InformationState(int player) const {
+std::string BackgammonState::InformationState(Player player) const {
   return ToString();
 }
 
 void BackgammonState::InformationStateAsNormalizedVector(
-    int player, std::vector<double>* values) const {
+    Player player, std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LE(player, 1);
   int opponent = Opponent(player);
   values->clear();
+  values->reserve(game_->InformationStateNormalizedVectorSize());
   // The format of this vector is described in Section 3.4 of "G. Tesauro,
   // Practical issues in temporal-difference learning, 1994."
   // https://link.springer.com/article/10.1007/BF00992697
@@ -156,9 +294,9 @@ void BackgammonState::InformationStateAsNormalizedVector(
   SPIEL_CHECK_EQ(kStateEncodingSize, values->size());
 }
 
-BackgammonState::BackgammonState(int num_distinct_actions, int num_players,
+BackgammonState::BackgammonState(std::shared_ptr<const Game> game,
                                  ScoringType scoring_type)
-    : State(num_distinct_actions, num_players),
+    : State(game),
       scoring_type_(scoring_type),
       cur_player_(kChancePlayerId),
       prev_player_(kChancePlayerId),
@@ -194,8 +332,8 @@ int BackgammonState::board(int player, int pos) const {
   }
 }
 
-int BackgammonState::CurrentPlayer() const {
-  return IsTerminal() ? kTerminalPlayerId : cur_player_;
+Player BackgammonState::CurrentPlayer() const {
+  return IsTerminal() ? kTerminalPlayerId : Player{cur_player_};
 }
 
 int BackgammonState::Opponent(int player) const { return 1 - player; }
@@ -941,6 +1079,7 @@ std::vector<Action> BackgammonState::ProcessLegalMoves(
 
 std::vector<Action> BackgammonState::LegalActions() const {
   if (IsChanceNode()) return LegalChanceOutcomes();
+  if (IsTerminal()) return {};
 
   SPIEL_CHECK_EQ(CountTotalCheckers(kXPlayerId), kNumCheckersPerPlayer);
   SPIEL_CHECK_EQ(CountTotalCheckers(kOPlayerId), kNumCheckersPerPlayer);
@@ -952,6 +1091,7 @@ std::vector<Action> BackgammonState::LegalActions() const {
   SPIEL_CHECK_GE(max_moves, 0);
   SPIEL_CHECK_LE(max_moves, 2);
   std::vector<Action> legal_actions = ProcessLegalMoves(max_moves, movelist);
+  std::sort(legal_actions.begin(), legal_actions.end());
   return legal_actions;
 }
 
@@ -1088,8 +1228,8 @@ void BackgammonState::SetState(int cur_player, bool double_turn,
 
 BackgammonGame::BackgammonGame(const GameParameters& params)
     : Game(kGameType, params),
-      scoring_type_(ParseScoringType(
-          ParameterValue<std::string>("scoring_type", kDefaultScoringType))) {}
+      scoring_type_(
+          ParseScoringType(ParameterValue<std::string>("scoring_type"))) {}
 
 double BackgammonGame::MaxUtility() const {
   switch (scoring_type_) {

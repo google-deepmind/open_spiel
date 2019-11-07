@@ -42,17 +42,18 @@ namespace leduc_poker {
 
 // Default parameters.
 
-// TODO(b/127425075): Use absl::optional instead of sentinel values once absl is
+// TODO(b/127425075): Use std::optional instead of sentinel values once absl is
 // added as a dependency.
-constexpr int kInvalidCard = -10000;
-constexpr int kDefaultPlayers = 2;
-constexpr int kNumSuits = 2;
-constexpr int kFirstRaiseAmount = 2;
-constexpr int kSecondRaiseAmount = 4;
-constexpr int kTotalRaisesPerRound = 2;
-constexpr int kMaxRaises = 2;
-constexpr int kStartingMoney = 100;
-constexpr int kNumInfoStates = 936;  // Number of info state in the 2P game.
+inline constexpr int kInvalidCard = -10000;
+inline constexpr int kDefaultPlayers = 2;
+inline constexpr int kNumSuits = 2;
+inline constexpr int kFirstRaiseAmount = 2;
+inline constexpr int kSecondRaiseAmount = 4;
+inline constexpr int kTotalRaisesPerRound = 2;
+inline constexpr int kMaxRaises = 2;
+inline constexpr int kStartingMoney = 100;
+inline constexpr int kNumInfoStates =
+    936;  // Number of info state in the 2P game.
 
 class LeducGame;
 
@@ -60,19 +61,19 @@ enum ActionType { kFold = 0, kCall = 1, kRaise = 2 };
 
 class LeducState : public State {
  public:
-  explicit LeducState(int num_players, const LeducGame& parent);
+  explicit LeducState(std::shared_ptr<const Game> game);
 
-  int CurrentPlayer() const override;
-  std::string ActionToString(int player, Action move) const override;
+  Player CurrentPlayer() const override;
+  std::string ActionToString(Player player, Action move) const override;
   std::string ToString() const override;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
-  std::string InformationState(int player) const override;
-  std::string Observation(int player) const override;
+  std::string InformationState(Player player) const override;
+  std::string Observation(Player player) const override;
   void InformationStateAsNormalizedVector(
-      int player, std::vector<double>* values) const override;
+      Player player, std::vector<double>* values) const override;
   void ObservationAsNormalizedVector(
-      int player, std::vector<double>* values) const override;
+      Player player, std::vector<double>* values) const override;
   std::unique_ptr<State> Clone() const override;
   // The probability of taking each possible action in a particular info state.
   std::vector<std::pair<Action, double>> ChanceOutcomes() const override;
@@ -82,7 +83,7 @@ class LeducState : public State {
   int deck_size() const { return deck_size_; }
   int public_card() const { return public_card_; }
   int raises() const { return num_raises_; }
-  int private_card(int player) const { return private_cards_[player]; }
+  int private_card(Player player) const { return private_cards_[player]; }
   std::vector<Action> LegalActions() const override;
 
   // Returns a vector of MaxGameLength containing all of the betting actions
@@ -113,14 +114,12 @@ class LeducState : public State {
   void ResolveWinner();
   bool ReadyForNextRound() const;
   void NewRound();
-  int RankHand(int player) const;
+  int RankHand(Player player) const;
   void SequenceAppendMove(int move);
-  void Ante(int player, int amount);
-
-  const LeducGame& parent_game_;
+  void Ante(Player player, int amount);
 
   // Fields sets to bad/invalid values. Use Game::NewInitialState().
-  int cur_player_;
+  Player cur_player_;
 
   int num_calls_;    // Number of calls this round (total, not per player).
   int num_raises_;   // Number of raises made in the round (not per player).
@@ -162,8 +161,8 @@ class LeducGame : public Game {
   double MinUtility() const override;
   double MaxUtility() const override;
   double UtilitySum() const override { return 0; }
-  std::unique_ptr<Game> Clone() const override {
-    return std::unique_ptr<Game>(new LeducGame(*this));
+  std::shared_ptr<const Game> Clone() const override {
+    return std::shared_ptr<const Game>(new LeducGame(*this));
   }
   std::vector<int> InformationStateNormalizedVectorShape() const override;
   std::vector<int> ObservationNormalizedVectorShape() const override;

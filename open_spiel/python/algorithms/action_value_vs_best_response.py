@@ -42,6 +42,28 @@ def _tuples_from_policy(policy_vector):
   ]
 
 
+_CalculatorReturn = collections.namedtuple(
+    "_CalculatorReturn",
+    [
+        # The exploitability of the opponent strategy, i.e. the value of the
+        # best-responder player BR.
+        "exploitability",
+        # An array of shape `[len(info_states), game.num_distinct_actions()]`
+        # giving the value of each action vs the best response.
+        # Will be zero for invalid actions.
+        "values_vs_br",
+        # The player's counterfactual reach probability of this infostate when
+        # playing against the BR, as a list of shape [num_info_states].
+        "counterfactual_reach_probs_vs_br",
+        # The reach probability of the current player at the infostates when
+        # playing against the BR, as list shape [num_info_states].
+        # This is the product of the current player probs along *one* trajectory
+        # leading to this info-state (this number should be the same along
+        # any trajectory leading to this info-state because of perfect recall).
+        "player_reach_probs_vs_br",
+    ])
+
+
 class Calculator(object):
   """Class to orchestrate the calculation."""
 
@@ -49,6 +71,7 @@ class Calculator(object):
     if game.num_players() != 2:
       raise ValueError("Only supports 2-player games.")
     self.game = game
+    self._num_players = game.num_players()
     self.action_values = None
     self.num_actions = game.num_distinct_actions()
     self.info_state_prob = None
@@ -57,20 +80,16 @@ class Calculator(object):
     self._best_responder = {0: None, 1: None}
     self._all_states = None
 
-  def get_action_values(self,
-                        state,
-                        policies,
-                        reach_prob=1.0,
-                        cf_prob=1.0,
-                        chance_prob=1.0):
+  def get_action_values(self, state, policies, reach_probabilities=None):
     """Computes the value of the state given the policies.
 
     Args:
       state: The state to start analysis from.
       policies: List of `policy.Policy` objects, one per player.
-      reach_prob: Total probability of reaching `state`.
-      cf_prob: Opponent and chance probability of reaching `state`.
-      chance_prob: Chance probability of reaching `state`.
+      reach_probabilities: A numpy array of shape `[num_players + 1]`.
+        reach_probabilities[i] is the product of the player i action
+        probabilities along the current trajectory. Note that
+        reach_probabilities[-1] corresponds to the chance player.
 
     Returns:
       The value of the root state to each player.
@@ -78,29 +97,44 @@ class Calculator(object):
     Side-effects - populates:
       `self.action_values[(player, infostate)][action]`.
       `self.info_state_prob[(player, infostate)]`.
+      `self.info_state_player_prob[(player, infostate)]`:
       `self.info_state_cf_prob[(player, infostate)]`.
       `self.info_state_chance_prob[(player, infostate)]`.
 
     We use `(player, infostate)` as a key in case the same infostate is shared
     by multiple players, e.g. in a simultaneous-move game.
     """
+    if reach_probabilities is None:
+      reach_probabilities = np.ones(self._num_players + 1)
+
     if state.is_terminal():
       return np.array(state.returns())
+
+    current_player = state.current_player()
+    reach_prob = np.prod(reach_probabilities)
+
     is_chance = state.is_chance_node()
     if not is_chance:
       key = (state.current_player(), state.information_state())
+      counterfactual_reach_prob = (
+          np.prod(reach_probabilities[:current_player]) *
+          np.prod(reach_probabilities[current_player + 1:]))
       self.info_state_prob[key] += reach_prob
-      self.info_state_cf_prob[key] += cf_prob
-      self.info_state_chance_prob[key] += chance_prob
+      self.info_state_cf_prob[key] += counterfactual_reach_prob
+      self.info_state_chance_prob[key] += reach_probabilities[-1]
+      # Mind that we have "=" here and not "+=", because we just need to use
+      # the reach prob for the player for *any* of the histories leading to
+      # the current info_state (they are all equal because of perfect recall).
+      self.info_state_player_prob[key] = reach_probabilities[current_player]
+
     value = np.zeros(len(policies))
-    include_cfp = (state.current_player() != self.player)
     for action, prob in _transitions(state, policies):
       child = state.child(action)
+      new_reach_probabilities = reach_probabilities.copy()
+      new_reach_probabilities[current_player] *= prob
       child_value = self.get_action_values(
-          child, policies, reach_prob * prob,
-          cf_prob * prob if include_cfp else cf_prob,
-          chance_prob * prob if is_chance else chance_prob)
-      if not state.is_chance_node():
+          child, policies, reach_probabilities=new_reach_probabilities)
+      if not is_chance:
         self.action_values[key][action] += child_value * reach_prob
       value += child_value * prob
     return value
@@ -114,13 +148,7 @@ class Calculator(object):
       info_states: A list of info state strings.
 
     Returns:
-      A triple `(exploitability, vvbr, brcfrp)`
-      exploitability: the exploitability of the supplied strategy
-      vvbr: An array of shape `[len(info_states), game.num_distinct_actions()]`
-        giving the value of each action vs the best response.
-        Will be zero for invalid actions.
-      brcfrp: The player's counterfactual reach probability of this infostate
-        when playing against the best response.
+      A `_CalculatorReturn` nametuple. See its docstring for the documentation.
     """
     self.player = player
     opponent = 1 - player
@@ -174,6 +202,7 @@ class Calculator(object):
     self.action_values = collections.defaultdict(
         lambda: collections.defaultdict(lambda: np.zeros(2)))
     self.info_state_prob = collections.defaultdict(float)
+    self.info_state_player_prob = collections.defaultdict(float)
     self.info_state_cf_prob = collections.defaultdict(float)
     self.info_state_chance_prob = collections.defaultdict(float)
     self.get_action_values(
@@ -187,13 +216,20 @@ class Calculator(object):
     # Collect normalized action values for each information state
     rv = []
     cfrp = []
+    player_reach_probs_vs_br = []
     for info_state in info_states:
-      av = self.action_values[(player, info_state)]
-      norm_prob = self.info_state_prob[(player, info_state)]
+      key = (player, info_state)
+      av = self.action_values[key]
+      norm_prob = self.info_state_prob[key]
       rv.append([(av[a][player] / norm_prob) if
                  (a in av and norm_prob > 0) else 0
                  for a in range(self.num_actions)])
-      cfrp.append(self.info_state_cf_prob[(player, info_state)])
+      cfrp.append(self.info_state_cf_prob[key])
+      player_reach_probs_vs_br.append(self.info_state_player_prob[key])
 
     # Return values
-    return best_response_value, rv, cfrp
+    return _CalculatorReturn(
+        exploitability=best_response_value,
+        values_vs_br=rv,
+        counterfactual_reach_probs_vs_br=cfrp,
+        player_reach_probs_vs_br=player_reach_probs_vs_br)

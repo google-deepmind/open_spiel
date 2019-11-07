@@ -16,6 +16,7 @@
 #define THIRD_PARTY_OPEN_SPIEL_GAMES_COOP_BOX_PUSHING_SOCCER_H_
 
 #include <array>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -53,21 +54,21 @@ enum class ActionType { kTurnLeft, kTurnRight, kMoveForward, kStay };
 
 class CoopBoxPushingState : public SimMoveState {
  public:
-  CoopBoxPushingState(int horizon);
+  CoopBoxPushingState(std::shared_ptr<const Game> game, int horizon);
 
-  std::string ActionToString(int player, Action action) const override;
+  std::string ActionToString(Player player, Action action) const override;
   std::string ToString() const override;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
   std::vector<double> Rewards() const override;
-  std::string InformationState(int player) const {
+  std::string InformationState(Player player) const {
     SPIEL_CHECK_GE(player, 0);
     SPIEL_CHECK_LT(player, num_players_);
     return absl::StrCat("Observing player: ", player, "\n", ToString());
   }
-  void InformationStateAsNormalizedVector(int player,
+  void InformationStateAsNormalizedVector(Player player,
                                           std::vector<double>* values) const;
-  int CurrentPlayer() const override {
+  Player CurrentPlayer() const override {
     return IsTerminal() ? kTerminalPlayerId : cur_player_;
   }
   std::unique_ptr<State> Clone() const override;
@@ -75,7 +76,7 @@ class CoopBoxPushingState : public SimMoveState {
   ActionsAndProbs ChanceOutcomes() const;
 
   void Reset(const GameParameters& params);
-  std::vector<Action> LegalActions(int player) const override;
+  std::vector<Action> LegalActions(Player player) const override;
 
  protected:
   void DoApplyAction(Action action) override;
@@ -83,21 +84,21 @@ class CoopBoxPushingState : public SimMoveState {
 
  private:
   void SetField(std::pair<int, int> coord, char v);
-  void SetPlayer(std::pair<int, int> coord, int player,
+  void SetPlayer(std::pair<int, int> coord, Player player,
                  OrientationType orientation);
-  void SetPlayer(std::pair<int, int> coord, int player);
+  void SetPlayer(std::pair<int, int> coord, Player player);
   void AddReward(double reward);
   char field(std::pair<int, int> coord) const;
   void ResolveMoves();
-  void MoveForward(int player);
+  void MoveForward(Player player);
   bool InBounds(std::pair<int, int> coord) const;
-  bool SameAsPlayer(std::pair<int, int> coord, int player) const;
-  int ObservationPlane(std::pair<int, int> coord, int player) const;
+  bool SameAsPlayer(std::pair<int, int> coord, Player player) const;
+  int ObservationPlane(std::pair<int, int> coord, Player player) const;
 
   // Fields sets to bad/invalid values. Use Game::NewInitialState().
   double total_rewards_ = -1;
-  int horizon_ = -1;     // Limit on the total number of moves.
-  int cur_player_ = -1;  // Could be chance's turn.
+  int horizon_ = -1;        // Limit on the total number of moves.
+  Player cur_player_ = -1;  // Could be chance's turn.
   int total_moves_ = 0;
   int initiative_;  // 0 = player initiative+1 goes first.
   bool win_;        // True if agents push the big box to the goal.
@@ -125,8 +126,8 @@ class CoopBoxPushingGame : public SimMoveGame {
   int NumPlayers() const override;
   double MinUtility() const override;
   double MaxUtility() const override;
-  std::unique_ptr<Game> Clone() const override {
-    return std::unique_ptr<Game>(new CoopBoxPushingGame(*this));
+  std::shared_ptr<const Game> Clone() const override {
+    return std::shared_ptr<const Game>(new CoopBoxPushingGame(*this));
   }
   std::vector<int> InformationStateNormalizedVectorShape() const override;
   int MaxGameLength() const override { return horizon_; }

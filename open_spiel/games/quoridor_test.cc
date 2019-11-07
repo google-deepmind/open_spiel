@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <iostream>
+
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/tests/basic_tests.h"
@@ -25,7 +27,6 @@ namespace testing = open_spiel::testing;
 void BasicQuoridorTests() {
   testing::LoadGameTest("quoridor(board_size=5)");
   testing::NoChanceOutcomesTest(*LoadGame("quoridor()"));
-
   testing::RandomSimTest(*LoadGame("quoridor"), 10);
 
   for (int i = 5; i <= 13; i++) {
@@ -33,8 +34,7 @@ void BasicQuoridorTests() {
         *LoadGame(absl::StrCat("quoridor(board_size=", i, ")")), 5);
   }
 
-  testing::RandomSimTest(
-      *LoadGame("quoridor(board_size=9,wall_count=5)"), 3);
+  testing::RandomSimTest(*LoadGame("quoridor(board_size=9,wall_count=5)"), 3);
 
   // Ansi colors!
   testing::RandomSimTest(

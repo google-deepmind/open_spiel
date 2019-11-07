@@ -18,13 +18,13 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import unittest
+from absl.testing import absltest
 
 from open_spiel.python.algorithms import lp_solver
 import pyspiel
 
 
-class MatrixGamesUtilsTest(unittest.TestCase):
+class MatrixGamesUtilsTest(absltest.TestCase):
 
   def test_extensive_to_matrix_game(self):
     kuhn_game = pyspiel.load_game("kuhn_poker")
@@ -35,6 +35,28 @@ class MatrixGamesUtilsTest(unittest.TestCase):
     self.assertAlmostEqual(p0_sol_val, -1 / 18)
     self.assertAlmostEqual(p1_sol_val, +1 / 18)
 
+  def test_extensive_to_matrix_game_type(self):
+    game = pyspiel.extensive_to_matrix_game(pyspiel.load_game("kuhn_poker"))
+    game_type = game.get_type()
+    self.assertEqual(game_type.dynamics, pyspiel.GameType.Dynamics.SIMULTANEOUS)
+    self.assertEqual(game_type.chance_mode,
+                     pyspiel.GameType.ChanceMode.DETERMINISTIC)
+    self.assertEqual(game_type.information,
+                     pyspiel.GameType.Information.ONE_SHOT)
+    self.assertEqual(game_type.utility, pyspiel.GameType.Utility.ZERO_SUM)
+
+  def test_extensive_to_matrix_game_payoff_matrix(self):
+    turn_based_game = pyspiel.load_game_as_turn_based("matrix_pd")
+    matrix_game = pyspiel.extensive_to_matrix_game(turn_based_game)
+    orig_game = pyspiel.load_matrix_game("matrix_pd")
+
+    for row in range(orig_game.num_rows()):
+      for col in range(orig_game.num_cols()):
+        for player in range(2):
+          self.assertEqual(
+              orig_game.player_utility(player, row, col),
+              matrix_game.player_utility(player, row, col))
+
 
 if __name__ == "__main__":
-  unittest.main()
+  absltest.main()

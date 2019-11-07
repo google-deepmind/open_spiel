@@ -51,7 +51,7 @@ void CheckExploitabilityKuhnPoker(const Game& game, const Policy& policy) {
 }
 
 void CFRTest_KuhnPoker() {
-  std::unique_ptr<Game> game = LoadGame("kuhn_poker");
+  std::shared_ptr<const Game> game = LoadGame("kuhn_poker");
   CFRSolver solver(*game);
   for (int i = 0; i < 300; i++) {
     solver.EvaluateAndUpdatePolicy();
@@ -62,7 +62,7 @@ void CFRTest_KuhnPoker() {
 }
 
 void CFRPlusTest_KuhnPoker() {
-  std::unique_ptr<Game> game = LoadGame("kuhn_poker");
+  std::shared_ptr<const Game> game = LoadGame("kuhn_poker");
   CFRPlusSolver solver(*game);
   for (int i = 0; i < 200; i++) {
     solver.EvaluateAndUpdatePolicy();
@@ -72,14 +72,14 @@ void CFRPlusTest_KuhnPoker() {
   CheckExploitabilityKuhnPoker(*game, *average_policy);
 }
 
-void CFRTest_KuhnPokerRunsWithThreePlayers(bool initialize_cumulative_values,
+void CFRTest_KuhnPokerRunsWithThreePlayers(
                                            bool linear_averaging,
                                            bool regret_matching_plus,
                                            bool alternating_updates) {
   int num_players = 3;
-  std::unique_ptr<Game> game =
+  std::shared_ptr<const Game> game =
       LoadGame("kuhn_poker", {{"players", GameParameter(num_players)}});
-  CFRSolverBase solver(*game, initialize_cumulative_values,
+  CFRSolverBase solver(*game,
                        regret_matching_plus, alternating_updates,
                        linear_averaging);
   for (int i = 0; i < 10; i++) {
@@ -97,9 +97,9 @@ void CFRTest_KuhnPokerRunsWithThreePlayers(bool initialize_cumulative_values,
 void CFRTest_GeneralMultiplePlayerTest(const std::string& game_name,
                                        int num_players, int num_iterations,
                                        double nashconv_upper_bound) {
-  std::unique_ptr<Game> game =
+  std::shared_ptr<const Game> game =
       LoadGame(game_name, {{"players", GameParameter(num_players)}});
-  CFRSolverBase solver(*game, /*initialize_cumulative_values=*/true,
+  CFRSolverBase solver(*game,
                        /*alternating_updates=*/true,
                        /*linear_averaging=*/false,
                        /*regret_matching_plus=*/false);
@@ -119,8 +119,8 @@ void CFRTest_OneShotGameTest(int iterations, std::string one_shot_game,
   // strategy. However, CFR is not guaranteed to converge, and indeed fails to,
   // just like was shown for fictitious play.
   std::cout << one_shot_game << " convergence test." << std::endl;
-  std::unique_ptr<Game> game = LoadGameAsTurnBased(one_shot_game);
-  CFRSolverBase solver(*game, /*initialize_cumulative_values=*/true,
+  std::shared_ptr<const Game> game = LoadGameAsTurnBased(one_shot_game);
+  CFRSolverBase solver(*game,
                        /*alternating_updates=*/true,
                        /*linear_averaging=*/false,
                        /*regret_matching_plus=*/false);
@@ -139,8 +139,8 @@ void CFRTest_OneShotGameTest(int iterations, std::string one_shot_game,
 // Tests the convergence of CFR in a specific game. Only computes nashconv
 // if the upper bound is positive.
 void CFRTest_TicTacToe(int num_iterations, double nashconv_upper_bound) {
-  std::unique_ptr<Game> game = LoadGame("tic_tac_toe");
-  CFRSolverBase solver(*game, /*initialize_cumulative_values=*/false,
+  std::shared_ptr<const Game> game = LoadGame("tic_tac_toe");
+  CFRSolverBase solver(*game,
                        /*alternating_updates=*/true,
                        /*linear_averaging=*/false,
                        /*regret_matching_plus=*/false);
@@ -164,27 +164,18 @@ int main(int argc, char** argv) {
   algorithms::CFRTest_KuhnPoker();
   algorithms::CFRPlusTest_KuhnPoker();
   algorithms::CFRTest_KuhnPokerRunsWithThreePlayers(
-      /*initialize_cumulative_values=*/false,
       /*linear_averaging=*/false,
       /*regret_matching_plus=*/false,
       /*alternating_updates=*/false);
   algorithms::CFRTest_KuhnPokerRunsWithThreePlayers(
-      /*initialize_cumulative_values=*/true,
-      /*linear_averaging=*/false,
-      /*regret_matching_plus=*/false,
-      /*alternating_updates=*/false);
-  algorithms::CFRTest_KuhnPokerRunsWithThreePlayers(
-      /*initialize_cumulative_values=*/true,
       /*linear_averaging=*/true,
       /*regret_matching_plus=*/false,
       /*alternating_updates=*/false);
   algorithms::CFRTest_KuhnPokerRunsWithThreePlayers(
-      /*initialize_cumulative_values=*/true,
       /*linear_averaging=*/true,
       /*regret_matching_plus=*/true,
       /*alternating_updates=*/false);
   algorithms::CFRTest_KuhnPokerRunsWithThreePlayers(
-      /*initialize_cumulative_values=*/true,
       /*linear_averaging=*/true,
       /*regret_matching_plus=*/true,
       /*alternating_updates=*/true);

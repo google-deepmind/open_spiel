@@ -16,6 +16,7 @@
 #define THIRD_PARTY_OPEN_SPIEL_MATRIX_GAME_H_
 
 #include <algorithm>
+#include <memory>
 #include <numeric>
 
 #include "open_spiel/normal_form_game.h"
@@ -26,8 +27,8 @@
 namespace open_spiel {
 namespace matrix_game {
 
-constexpr int kRowPlayer = 0;
-constexpr int kColPlayer = 1;
+inline constexpr int kRowPlayer = 0;
+inline constexpr int kColPlayer = 1;
 
 // Return a flattened version of these vector of rows. This simply scans each
 // row in turn, appending each elements onto the end of a 1D vector. The rows
@@ -80,8 +81,8 @@ class MatrixGame : public NormalFormGame {
         *std::max_element(begin(col_utilities_), end(col_utilities_)));
   }
 
-  std::unique_ptr<Game> Clone() const override {
-    return std::unique_ptr<Game>(new MatrixGame(*this));
+  std::shared_ptr<const Game> Clone() const override {
+    return std::shared_ptr<const Game>(new MatrixGame(*this));
   }
 
   // Methods for MatrixState to call.
@@ -93,10 +94,10 @@ class MatrixGame : public NormalFormGame {
   double ColUtility(int row, int col) const {
     return col_utilities_[Index(row, col)];
   }
-  double PlayerUtility(int player, int row, int col) {
-    SPIEL_CHECK_TRUE(player == 0 || player == 1);
-    return (player == 0 ? row_utilities_[Index(row, col)]
-                        : col_utilities_[Index(row, col)]);
+  double PlayerUtility(Player player, int row, int col) const {
+    SPIEL_CHECK_TRUE(player == Player{0} || player == Player{1});
+    return (player == Player{0} ? row_utilities_[Index(row, col)]
+                                : col_utilities_[Index(row, col)]);
   }
   const std::string& RowActionName(int row) const {
     return row_action_names_[row];
@@ -115,15 +116,16 @@ class MatrixGame : public NormalFormGame {
 
 class MatrixState : public NFGState {
  public:
-  explicit MatrixState(const MatrixGame& game);
-  MatrixState(const MatrixState&) = default;
+  explicit MatrixState(std::shared_ptr<const Game> game);
+  explicit MatrixState(const MatrixState&) = default;
 
-  virtual std::vector<Action> LegalActions(int player) const {
+  virtual std::vector<Action> LegalActions(Player player) const {
+    if (IsTerminal()) return {};
     if (player == kSimultaneousPlayerId) {
       return LegalFlatJointActions();
     } else {
-      std::vector<Action> moves(player == kRowPlayer ? game_.NumRows()
-                                                     : game_.NumCols());
+      std::vector<Action> moves(player == kRowPlayer ? matrix_game_->NumRows()
+                                                     : matrix_game_->NumCols());
       std::iota(moves.begin(), moves.end(), 0);  // fill with values 0...n-1
       return moves;
     }
@@ -131,21 +133,21 @@ class MatrixState : public NFGState {
 
   std::string ToString() const override;
 
-  virtual std::string ActionToString(int player, Action action_id) const {
+  virtual std::string ActionToString(Player player, Action action_id) const {
     if (player == kSimultaneousPlayerId)
       return FlatJointActionToString(action_id);
     else if (player == kRowPlayer)
-      return game_.RowActionName(action_id);
+      return matrix_game_->RowActionName(action_id);
     else
-      return game_.ColActionName(action_id);
+      return matrix_game_->ColActionName(action_id);
   }
 
   virtual bool IsTerminal() const { return !joint_move_.empty(); }
 
   virtual std::vector<double> Returns() const {
     if (IsTerminal()) {
-      return {game_.RowUtility(joint_move_[0], joint_move_[1]),
-              game_.ColUtility(joint_move_[0], joint_move_[1])};
+      return {matrix_game_->RowUtility(joint_move_[0], joint_move_[1]),
+              matrix_game_->ColUtility(joint_move_[0], joint_move_[1])};
     } else {
       return {0, 0};
     }
@@ -159,20 +161,20 @@ class MatrixState : public NFGState {
   virtual void DoApplyActions(const std::vector<Action>& moves) {
     SPIEL_CHECK_EQ(moves.size(), 2);
     SPIEL_CHECK_GE(moves[kRowPlayer], 0);
-    SPIEL_CHECK_LT(moves[kRowPlayer], game_.NumRows());
+    SPIEL_CHECK_LT(moves[kRowPlayer], matrix_game_->NumRows());
     SPIEL_CHECK_GE(moves[kColPlayer], 0);
-    SPIEL_CHECK_LT(moves[kColPlayer], game_.NumCols());
+    SPIEL_CHECK_LT(moves[kColPlayer], matrix_game_->NumCols());
     joint_move_ = moves;
   }
 
  private:
-  const MatrixGame& game_;
   std::vector<Action> joint_move_{};  // joint move that was chosen
+  const MatrixGame* matrix_game_;
 };
 
 // Create a matrix game with the specified utilities and row/column names.
 // Utilities must be in row-major form.
-std::unique_ptr<MatrixGame> CreateMatrixGame(
+std::shared_ptr<const MatrixGame> CreateMatrixGame(
     const std::string& short_name, const std::string& long_name,
     const std::vector<std::string>& row_names,
     const std::vector<std::string>& col_names,
@@ -182,7 +184,7 @@ std::unique_ptr<MatrixGame> CreateMatrixGame(
 // Create a matrix game with the specified utilities, with default names
 // ("short_name", "Long Name", row0, row1.., col0, col1, ...).
 // Utilities must be in row-major form.
-std::unique_ptr<MatrixGame> CreateMatrixGame(
+std::shared_ptr<const MatrixGame> CreateMatrixGame(
     const std::vector<std::vector<double>>& row_player_utils,
     const std::vector<std::vector<double>>& col_player_utils);
 

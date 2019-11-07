@@ -18,7 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import unittest
+from absl.testing import absltest
 import numpy as np
 
 from open_spiel.python import policy
@@ -26,7 +26,7 @@ from open_spiel.python.algorithms import expected_game_score
 import pyspiel
 
 
-class PolicyValueTest(unittest.TestCase):
+class PolicyValueTest(absltest.TestCase):
 
   def test_expected_game_score_uniform_random_kuhn_poker(self):
     game = pyspiel.load_game("kuhn_poker")
@@ -37,4 +37,4 @@ class PolicyValueTest(unittest.TestCase):
 
 
 if __name__ == "__main__":
-  unittest.main()
+  absltest.main()

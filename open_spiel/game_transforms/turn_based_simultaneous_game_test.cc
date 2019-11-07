@@ -17,6 +17,7 @@
 #include <random>
 #include <string>
 
+#include "open_spiel/abseil-cpp/absl/random/uniform_int_distribution.h"
 #include "open_spiel/spiel.h"
 
 namespace open_spiel {
@@ -38,8 +39,10 @@ void SimulateGames(std::mt19937* rng, const Game& game, State* sim_state,
       // Chance node; sample one according to underlying distribution
       std::vector<std::pair<Action, double>> outcomes =
           sim_state->ChanceOutcomes();
-      Action action = open_spiel::SampleChanceOutcome(
-          outcomes, std::uniform_real_distribution<double>(0.0, 1.0)(*rng));
+      Action action =
+          open_spiel::SampleChanceOutcome(
+              outcomes, std::uniform_real_distribution<double>(0.0, 1.0)(*rng))
+              .first;
 
       std::cout << "sampled outcome: %s\n"
                 << sim_state->ActionToString(kChancePlayerId, action)
@@ -53,15 +56,17 @@ void SimulateGames(std::mt19937* rng, const Game& game, State* sim_state,
       // Players choose simultaneously.
       std::vector<Action> joint_action;
 
-      // Sample a action for each player
-      for (int p = 0; p < game.NumPlayers(); p++) {
-        // Check the information states to each player are consistent.
-        SPIEL_CHECK_EQ(sim_state->InformationState(p),
-                       wrapped_sim_state->InformationState(p));
+      // Sample an action for each player
+      for (auto p = Player{0}; p < game.NumPlayers(); p++) {
+        if (game.GetType().provides_information_state) {
+          // Check the information states to each player are consistent.
+          SPIEL_CHECK_EQ(sim_state->InformationState(p),
+                         wrapped_sim_state->InformationState(p));
+        }
 
         std::vector<Action> actions;
         actions = sim_state->LegalActions(p);
-        std::uniform_int_distribution<> dis(0, actions.size() - 1);
+        absl::uniform_int_distribution<> dis(0, actions.size() - 1);
         Action action = actions[dis(*rng)];
         joint_action.push_back(action);
         std::cout << "player " << p << " chose "
@@ -84,7 +89,7 @@ void SimulateGames(std::mt19937* rng, const Game& game, State* sim_state,
   auto sim_returns = sim_state->Returns();
   auto turn_returns = turn_based_state->Returns();
 
-  for (int player = 0; player < game.NumPlayers(); player++) {
+  for (auto player = Player{0}; player < game.NumPlayers(); player++) {
     double utility = sim_returns[player];
     SPIEL_CHECK_GE(utility, game.MinUtility());
     SPIEL_CHECK_LE(utility, game.MaxUtility());
@@ -105,8 +110,8 @@ void BasicTurnBasedSimultaneousTests() {
       if (type.dynamics == GameType::Dynamics::kSimultaneous) {
         std::cout << "TurnBasedSimultaneous: Testing " << name << std::endl;
         for (int i = 0; i < 100; ++i) {
-          std::unique_ptr<Game> sim_game = LoadGame(name);
-          std::unique_ptr<Game> turn_based_game =
+          std::shared_ptr<const Game> sim_game = LoadGame(name);
+          std::shared_ptr<const Game> turn_based_game =
               ConvertToTurnBased(*LoadGame(name));
           auto sim_state = sim_game->NewInitialState();
           auto turn_based_state = turn_based_game->NewInitialState();

@@ -16,6 +16,7 @@
 #define THIRD_PARTY_OPEN_SPIEL_GAMES_MARKOV_SOCCER_H_
 
 #include <array>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -28,29 +29,58 @@
 //
 // Parameters:
 //       "horizon"    int     max number of moves before draw  (default = 1000)
+//       "grid"       string  String representation of grid.
+//                            Empty spaces are '.', possible ball starting
+//                            locations are 'O' and player A and B starting
+//                            points are 'A' and 'B' respectively.
 
 namespace open_spiel {
 namespace markov_soccer {
+
+inline constexpr char kDefaultGrid[] =
+    ".....\n"
+    "..OB.\n"
+    ".AO..\n"
+    ".....";
+
+struct Grid {
+  int num_rows;
+  int num_cols;
+  std::pair<int, int> a_start;
+  std::pair<int, int> b_start;
+  std::vector<std::pair<int, int>> ball_start_points;
+};
+
+// Number of chance outcomes reserved for "initiative" (learning which player's
+// action gets resolved first).
+inline constexpr int kNumInitiativeChanceOutcomes = 2;
+
+// Reserved chance outcomes for initiative. The ones following these are to
+// determine spawn point locations.
+inline constexpr Action kChanceInit0Action = 0;
+inline constexpr Action kChanceInit1Action = 1;
+enum class ChanceOutcome { kChanceInit0, kChanceInit1 };
 
 class MarkovSoccerGame;
 
 class MarkovSoccerState : public SimMoveState {
  public:
-  explicit MarkovSoccerState(const MarkovSoccerGame& parent_game);
+  explicit MarkovSoccerState(std::shared_ptr<const Game> game,
+                             const Grid& grid);
   MarkovSoccerState(const MarkovSoccerState&) = default;
 
-  std::string ActionToString(int player, Action action_id) const override;
+  std::string ActionToString(Player player, Action action_id) const override;
   std::string ToString() const override;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
-  std::string InformationState(int player) const {
+  std::string InformationState(Player player) const {
     SPIEL_CHECK_GE(player, 0);
     SPIEL_CHECK_LT(player, num_players_);
     return ToString();
   }
-  void InformationStateAsNormalizedVector(int player,
+  void InformationStateAsNormalizedVector(Player player,
                                           std::vector<double>* values) const;
-  int CurrentPlayer() const override {
+  Player CurrentPlayer() const override {
     return IsTerminal() ? kTerminalPlayerId : cur_player_;
   }
   std::unique_ptr<State> Clone() const override;
@@ -58,7 +88,7 @@ class MarkovSoccerState : public SimMoveState {
   ActionsAndProbs ChanceOutcomes() const;
 
   void Reset(int horizon);
-  std::vector<Action> LegalActions(int player) const override;
+  std::vector<Action> LegalActions(Player player) const override;
 
  protected:
   void DoApplyAction(Action action_id) override;
@@ -67,15 +97,15 @@ class MarkovSoccerState : public SimMoveState {
  private:
   void SetField(int r, int c, char v);
   char field(int r, int c) const;
-  void ResolveMove(int player, int move);
+  void ResolveMove(Player player, int move);
   bool InBounds(int r, int c) const;
   int observation_plane(int r, int c) const;
 
-  const MarkovSoccerGame& parent_game_;
+  const Grid& grid_;
 
   // Fields set to bad values. Use Game::NewInitialState().
   int winner_ = -1;
-  int cur_player_ = -1;  // Could be chance's turn.
+  Player cur_player_ = -1;  // Could be chance's turn.
   int total_moves_ = -1;
   int horizon_ = -1;
   std::array<int, 2> player_row_ = {{-1, -1}};  // Players' rows.
@@ -89,20 +119,21 @@ class MarkovSoccerState : public SimMoveState {
 class MarkovSoccerGame : public SimMoveGame {
  public:
   explicit MarkovSoccerGame(const GameParameters& params);
-  int NumDistinctActions() const override { return 5; }
+  int NumDistinctActions() const override;
   std::unique_ptr<State> NewInitialState() const override;
-  int MaxChanceOutcomes() const override { return 4; }
+  int MaxChanceOutcomes() const override;
   int NumPlayers() const override { return 2; }
   double MinUtility() const override { return -1; }
   double MaxUtility() const override { return 1; }
   double UtilitySum() const override { return 0; }
-  std::unique_ptr<Game> Clone() const override {
-    return std::unique_ptr<Game>(new MarkovSoccerGame(*this));
+  std::shared_ptr<const Game> Clone() const override {
+    return std::shared_ptr<const Game>(new MarkovSoccerGame(*this));
   }
   std::vector<int> InformationStateNormalizedVectorShape() const override;
   int MaxGameLength() const override { return horizon_; }
 
  private:
+  Grid grid_;
   int horizon_;
 };
 

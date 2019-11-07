@@ -23,6 +23,7 @@
 
 // A simple jeopardy dice game that includes chance nodes.
 // See http://cs.gettysburg.edu/projects/pig/index.html for details.
+// Also https://en.wikipedia.org/wiki/Pig_(dice_game)
 //
 // Parameters:
 //     "diceoutcomes"  int    number of outcomes of the dice  (default = 6)
@@ -38,18 +39,18 @@ class PigGame;
 class PigState : public State {
  public:
   PigState(const PigState&) = default;
-  PigState(int num_distinct_actions, int num_players, int dice_outcomes,
-           int horizon, int win_score);
+  PigState(std::shared_ptr<const Game> game, int dice_outcomes, int horizon,
+           int win_score);
 
-  int CurrentPlayer() const override;
-  std::string ActionToString(int player, Action move_id) const override;
+  Player CurrentPlayer() const override;
+  std::string ActionToString(Player player, Action move_id) const override;
   std::vector<std::pair<Action, double>> ChanceOutcomes() const override;
   std::string ToString() const override;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
-  std::string InformationState(int player) const override;
+  std::string InformationState(Player player) const override;
   void InformationStateAsNormalizedVector(
-      int player, std::vector<double>* values) const override;
+      Player player, std::vector<double>* values) const override;
 
   std::unique_ptr<State> Clone() const override;
 
@@ -66,11 +67,11 @@ class PigState : public State {
   int nplayers_ = -1;
   int win_score_ = 0;
 
-  int total_moves_ = -1;  // Total num moves taken during the game.
-  int cur_player_ = -1;   // Player to play.
-  int turn_player_ = -1;  // Whose actual turn is it. At chance nodes, we need
-                          // to remember whose is playing for next turns (while
-                          // cur_player will be the chance player's id.)
+  int total_moves_ = -1;    // Total num moves taken during the game.
+  Player cur_player_ = -1;  // Player to play.
+  int turn_player_ = -1;    // Whose actual turn is it. At chance nodes, we need
+                            // to remember whose is playing for next turns
+                            // (cur_player will be the chance player's id.)
   std::vector<int> scores_;  // Score for each player.
   int turn_total_ = -1;
 };
@@ -81,9 +82,8 @@ class PigGame : public Game {
 
   int NumDistinctActions() const override { return 6; }
   std::unique_ptr<State> NewInitialState() const override {
-    return std::unique_ptr<State>(new PigState(NumDistinctActions(),
-                                               num_players_, dice_outcomes_,
-                                               horizon_, win_score_));
+    return std::unique_ptr<State>(
+        new PigState(shared_from_this(), dice_outcomes_, horizon_, win_score_));
   }
   int MaxChanceOutcomes() const override { return dice_outcomes_; }
 
@@ -94,8 +94,8 @@ class PigGame : public Game {
   double MinUtility() const override { return -1; }
   double UtilitySum() const override { return 0; }
   double MaxUtility() const override { return +1; }
-  std::unique_ptr<Game> Clone() const override {
-    return std::unique_ptr<Game>(new PigGame(*this));
+  std::shared_ptr<const Game> Clone() const override {
+    return std::shared_ptr<const Game>(new PigGame(*this));
   }
   std::vector<int> InformationStateNormalizedVectorShape() const override;
 

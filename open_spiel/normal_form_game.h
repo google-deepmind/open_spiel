@@ -15,6 +15,8 @@
 #ifndef THIRD_PARTY_OPEN_SPIEL_NORMAL_FORM_GAME_H_
 #define THIRD_PARTY_OPEN_SPIEL_NORMAL_FORM_GAME_H_
 
+#include <memory>
+
 #include "open_spiel/simultaneous_move_game.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
@@ -29,16 +31,15 @@ namespace open_spiel {
 
 class NFGState : public SimMoveState {
  public:
-  NFGState(int num_distinct_actions, int num_players)
-      : SimMoveState(num_distinct_actions, num_players) {}
+  NFGState(std::shared_ptr<const Game> game) : SimMoveState(game) {}
 
   // There are no chance nodes in a normal-form game (there is only one state),
-  int CurrentPlayer() const final {
+  Player CurrentPlayer() const final {
     return IsTerminal() ? kTerminalPlayerId : kSimultaneousPlayerId;
   }
 
   // Since there's only one state, we can implement the representations here.
-  std::string InformationState(int player) const override {
+  std::string InformationState(Player player) const override {
     std::string info_state = absl::StrCat("Observing player: ", player, ". ");
     if (!IsTerminal()) {
       absl::StrAppend(&info_state, "Non-terminal");
@@ -60,7 +61,7 @@ class NFGState : public SimMoveState {
     return result;
   }
 
-  void InformationStateAsNormalizedVector(int player,
+  void InformationStateAsNormalizedVector(Player player,
                                           std::vector<double>* values) const {
     values->resize(1);
     if (IsTerminal()) {

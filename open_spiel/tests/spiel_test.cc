@@ -20,8 +20,10 @@
 #include <string>
 #include <vector>
 
+#include "open_spiel/games/kuhn_poker.h"
 #include "open_spiel/games/leduc_poker.h"
 #include "open_spiel/games/liars_dice.h"
+#include "open_spiel/games/tic_tac_toe.h"
 #include "open_spiel/policy.h"
 #include "open_spiel/simultaneous_move_game.h"
 #include "open_spiel/spiel_utils.h"
@@ -42,7 +44,7 @@ void KuhnTests() {
   RandomSimTest(*LoadGame("kuhn_poker"), /*num_sims=*/100);
 
   // More than two players.
-  for (int players = 3; players <= 5; players++) {
+  for (Player players = 3; players <= 5; players++) {
     RandomSimTest(
         *LoadGame("kuhn_poker", {{"players", GameParameter(players)}}),
         /*num_sims=*/100);
@@ -55,14 +57,34 @@ void TicTacToeTests() {
   RandomSimTest(*tic_tac_toe, /*num_sims=*/100);
 }
 
+// Dummy game to test flat joint action logic.
+class FlatJointActionTestGame : public SimMoveGame {
+ public:
+  explicit FlatJointActionTestGame(const GameParameters& params)
+      : SimMoveGame(GameType{}, params) {}
+  int NumDistinctActions() const override { return 8; }
+  std::unique_ptr<State> NewInitialState() const override { return nullptr; }
+  int MaxChanceOutcomes() const override { return 4; }
+  int NumPlayers() const override { return 3; }
+  double MinUtility() const override { return -10; }
+  double MaxUtility() const override { return 10; }
+  std::shared_ptr<const Game> Clone() const override {
+    return std::shared_ptr<const Game>(new FlatJointActionTestGame(*this));
+  }
+  std::vector<int> InformationStateNormalizedVectorShape() const override {
+    return {};
+  }
+  int MaxGameLength() const override { return 1; }
+};
+
 // Dummy state to test flat joint action logic.
 class FlatJointActionTestState : public SimMoveState {
  public:
   FlatJointActionTestState()
-      : SimMoveState(/*num_distinct_actions=*/8,
-                     /*num_players=*/3) {}
+      : SimMoveState(std::shared_ptr<const FlatJointActionTestGame>(
+            new FlatJointActionTestGame({}))) {}
   const std::vector<Action>& JointAction() const { return joint_action_; }
-  std::vector<Action> LegalActions(int player) const override {
+  std::vector<Action> LegalActions(Player player) const override {
     if (player == kSimultaneousPlayerId) return LegalFlatJointActions();
     switch (player) {
       case 0:
@@ -74,8 +96,8 @@ class FlatJointActionTestState : public SimMoveState {
     }
     SpielFatalError("Invalid player id");
   }
-  int CurrentPlayer() const override { return kSimultaneousPlayerId; }
-  std::string ActionToString(int player, Action action_id) const override {
+  Player CurrentPlayer() const override { return kSimultaneousPlayerId; }
+  std::string ActionToString(Player player, Action action_id) const override {
     if (player == kSimultaneousPlayerId)
       return FlatJointActionToString(action_id);
     return absl::StrCat("(p=", player, ",a=", action_id, ")");
@@ -127,8 +149,10 @@ void TestPoliciesCanPlay(PolicyGenerator policy_generator, const Game& game) {
       } else {
         outcomes = policy.GetStatePolicy(state->InformationState());
       }
-      Action action = open_spiel::SampleChanceOutcome(
-          outcomes, std::uniform_real_distribution<double>(0.0, 1.0)(rng));
+      Action action =
+          open_spiel::SampleChanceOutcome(
+              outcomes, std::uniform_real_distribution<double>(0.0, 1.0)(rng))
+              .first;
       state->ApplyAction(action);
     }
   }
@@ -147,7 +171,7 @@ void TestEveryInfostateInPolicy(PolicyGenerator policy_generator,
     }
     if (!state->IsChanceNode() && !state->IsTerminal()) {
       SPIEL_CHECK_EQ(policy.GetStatePolicy(state->InformationState()).size(),
-                     game.NumDistinctActions());
+                     state->LegalActions().size());
     }
   }
 }
@@ -163,7 +187,7 @@ void PolicyTest() {
   // push_back.
   for (const std::string& game_name :
        {"leduc_poker", "kuhn_poker", "liars_dice"}) {
-    std::unique_ptr<Game> game = LoadGame(game_name);
+    std::shared_ptr<const Game> game = LoadGame(game_name);
     for (const auto& policy_generator : policy_generators) {
       TestEveryInfostateInPolicy(policy_generator, *game);
       TestPoliciesCanPlay(policy_generator, *game);
@@ -188,8 +212,9 @@ void LeducPokerDeserializeTest() {
       "1\n"  // check
       "\n";
 
-  std::pair<std::unique_ptr<Game>, std::unique_ptr<State>> game_and_state =
-      open_spiel::DeserializeGameAndState(serialized_game_and_state);
+  std::pair<std::shared_ptr<const Game>, std::unique_ptr<State>>
+      game_and_state =
+          open_spiel::DeserializeGameAndState(serialized_game_and_state);
 
   // Should be at round 2 deal (chance node).
   SPIEL_CHECK_TRUE(game_and_state.second->IsChanceNode());

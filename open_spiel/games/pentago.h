@@ -18,6 +18,7 @@
 #include <array>
 #include <cstdint>
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -32,15 +33,15 @@
 namespace open_spiel {
 namespace pentago {
 
-constexpr int kNumPlayers = 2;
-constexpr int kBoardSize = 6;
-constexpr int kBoardPositions = kBoardSize * kBoardSize;
-constexpr int kPossibleRotations = 8;
-constexpr int kPossibleActions = kBoardPositions * kPossibleRotations;
-constexpr int kPossibleWinConditions = 32;
-constexpr int kCellStates = 1 + kNumPlayers;
+inline constexpr int kNumPlayers = 2;
+inline constexpr int kBoardSize = 6;
+inline constexpr int kBoardPositions = kBoardSize * kBoardSize;
+inline constexpr int kPossibleRotations = 8;
+inline constexpr int kPossibleActions = kBoardPositions * kPossibleRotations;
+inline constexpr int kPossibleWinConditions = 32;
+inline constexpr int kCellStates = 1 + kNumPlayers;
 
-enum Player {
+enum PentagoPlayer {
   kPlayer1,
   kPlayer2,
   kPlayerNone,
@@ -50,34 +51,35 @@ enum Player {
 // State of an in-play game.
 class PentagoState : public State {
  public:
-  PentagoState(bool ansi_color_output = false);
+  PentagoState(std::shared_ptr<const Game> game,
+               bool ansi_color_output = false);
 
   PentagoState(const PentagoState&) = default;
 
-  int CurrentPlayer() const override {
+  Player CurrentPlayer() const override {
     return IsTerminal() ? kTerminalPlayerId : static_cast<int>(current_player_);
   }
-  std::string ActionToString(int player, Action action_id) const override;
+  std::string ActionToString(Player player, Action action_id) const override;
   std::string ToString() const override;
   bool IsTerminal() const override { return outcome_ != kPlayerNone; }
   std::vector<double> Returns() const override;
-  std::string InformationState(int player) const override;
-  std::string Observation(int player) const override;
+  std::string InformationState(Player player) const override;
+  std::string Observation(Player player) const override;
   void ObservationAsNormalizedVector(
-      int player, std::vector<double>* values) const override;
+      Player player, std::vector<double>* values) const override;
   std::unique_ptr<State> Clone() const override;
   std::vector<Action> LegalActions() const override;
 
  protected:
   void DoApplyAction(Action action) override;
 
-  Player get(int x, int y) const { return get(x + y * kBoardSize); }
-  Player get(int i) const;
+  PentagoPlayer get(int x, int y) const { return get(x + y * kBoardSize); }
+  PentagoPlayer get(int i) const;
 
  private:
   std::array<uint64_t, kNumPlayers> board_;
-  Player current_player_ = kPlayer1;
-  Player outcome_ = kPlayerNone;
+  PentagoPlayer current_player_ = kPlayer1;
+  PentagoPlayer outcome_ = kPlayerNone;
   int moves_made_ = 0;
   const bool ansi_color_output_;
 };
@@ -89,14 +91,15 @@ class PentagoGame : public Game {
 
   int NumDistinctActions() const override { return kPossibleActions; }
   std::unique_ptr<State> NewInitialState() const override {
-    return std::unique_ptr<State>(new PentagoState(ansi_color_output_));
+    return std::unique_ptr<State>(
+        new PentagoState(shared_from_this(), ansi_color_output_));
   }
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override { return -1; }
   double UtilitySum() const override { return 0; }
   double MaxUtility() const override { return 1; }
-  std::unique_ptr<Game> Clone() const override {
-    return std::unique_ptr<Game>(new PentagoGame(*this));
+  std::shared_ptr<const Game> Clone() const override {
+    return std::shared_ptr<const Game>(new PentagoGame(*this));
   }
   std::vector<int> ObservationNormalizedVectorShape() const override {
     return {kCellStates, kBoardSize, kBoardSize};

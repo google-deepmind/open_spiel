@@ -18,6 +18,7 @@
 #include <array>
 #include <cstdint>
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -33,12 +34,13 @@
 namespace open_spiel {
 namespace havannah {
 
-constexpr int kNumPlayers = 2;
-constexpr int kDefaultBoardSize = 8;
-constexpr int kMaxNeighbors = 6;  // Maximum number of neighbors for a cell
-constexpr int kCellStates = 1 + kNumPlayers;
+inline constexpr int kNumPlayers = 2;
+inline constexpr int kDefaultBoardSize = 8;
+inline constexpr int kMaxNeighbors =
+    6;  // Maximum number of neighbors for a cell
+inline constexpr int kCellStates = 1 + kNumPlayers;
 
-enum Player : uint8_t {
+enum HavannahPlayer : uint8_t {
   kPlayer1,
   kPlayer2,
   kPlayerNone,
@@ -66,8 +68,8 @@ struct Move {
   int8_t x, y;  // The x,y coordinates
   int16_t xy;  // precomputed x + y * board_diameter as an index into the array.
 
-  constexpr Move(MoveSpecial m = kMoveUnknown) : x(-1), y(-1), xy(m) {}
-  constexpr Move(int x_, int y_, MoveSpecial m) : x(x_), y(y_), xy(m) {}
+  inline constexpr Move(MoveSpecial m = kMoveUnknown) : x(-1), y(-1), xy(m) {}
+  inline constexpr Move(int x_, int y_, MoveSpecial m) : x(x_), y(y_), xy(m) {}
   Move(int x_, int y_, int board_size)
       : x(x_), y(y_), xy(CalcXY(x_, y_, board_size)) {}
 
@@ -100,7 +102,7 @@ class HavannahState : public State {
   // cell that is not a group leader.
   struct Cell {
     // Who controls this cell.
-    Player player;
+    HavannahPlayer player;
 
     // Whether this cell is marked/visited in a ring search. Should always be
     // false except while running CheckRingDFS.
@@ -117,7 +119,7 @@ class HavannahState : public State {
     uint8_t edge;    // A bitset of which edges this group is connected to.
 
     Cell() {}
-    Cell(Player player_, int parent_, int corner_, int edge_)
+    Cell(HavannahPlayer player_, int parent_, int corner_, int edge_)
         : player(player_),
           mark(false),
           parent(parent_),
@@ -132,21 +134,22 @@ class HavannahState : public State {
   };
 
  public:
-  HavannahState(int board_size, bool ansi_color_output = false);
+  HavannahState(std::shared_ptr<const Game> game, int board_size,
+                bool ansi_color_output = false);
 
   HavannahState(const HavannahState&) = default;
 
-  int CurrentPlayer() const override {
+  Player CurrentPlayer() const override {
     return IsTerminal() ? kTerminalPlayerId : static_cast<int>(current_player_);
   }
-  std::string ActionToString(int player, Action action_id) const override;
+  std::string ActionToString(Player player, Action action_id) const override;
   std::string ToString() const override;
   bool IsTerminal() const override { return outcome_ != kPlayerNone; }
   std::vector<double> Returns() const override;
-  std::string InformationState(int player) const override;
-  std::string Observation(int player) const override;
+  std::string InformationState(Player player) const override;
+  std::string Observation(Player player) const override;
   void ObservationAsNormalizedVector(
-      int player, std::vector<double>* values) const override;
+      Player player, std::vector<double>* values) const override;
   std::unique_ptr<State> Clone() const override;
   std::vector<Action> LegalActions() const override;
 
@@ -174,8 +177,8 @@ class HavannahState : public State {
 
  private:
   std::vector<Cell> board_;
-  Player current_player_ = kPlayer1;
-  Player outcome_ = kPlayerNone;
+  HavannahPlayer current_player_ = kPlayer1;
+  HavannahPlayer outcome_ = kPlayerNone;
   const int board_size_;
   const int board_diameter_;
   const int valid_cells_;
@@ -197,14 +200,14 @@ class HavannahGame : public Game {
   }
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(
-        new HavannahState(board_size_, ansi_color_output_));
+        new HavannahState(shared_from_this(), board_size_, ansi_color_output_));
   }
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override { return -1; }
   double UtilitySum() const override { return 0; }
   double MaxUtility() const override { return 1; }
-  std::unique_ptr<Game> Clone() const override {
-    return std::unique_ptr<Game>(new HavannahGame(*this));
+  std::shared_ptr<const Game> Clone() const override {
+    return std::shared_ptr<const Game>(new HavannahGame(*this));
   }
   std::vector<int> ObservationNormalizedVectorShape() const override {
     return {kCellStates, Diameter(), Diameter()};

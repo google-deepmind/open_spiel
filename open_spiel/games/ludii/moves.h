@@ -12,12 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "open_spiel/spiel_optional.h"
+#ifndef THIRD_PARTY_OPEN_SPIEL_GAMES_LUDII_MOVES_H_
+#define THIRD_PARTY_OPEN_SPIEL_GAMES_LUDII_MOVES_H_
+
+#include <string>
+#include <vector>
+
+#include "jni.h"  // NOLINT
+#include "open_spiel/games/ludii/move.h"
 
 namespace open_spiel {
+namespace ludii {
 
-// Global instantiation of the Nullopt type convertible to all Optional<>
-// instantiations to signify an optional without value.
-extern const Nullopt kNullopt{Nullopt::kInit};
+class Moves {
+ public:
+  Moves(JNIEnv *env, jobject moves);
 
+  std::vector<Move> GetMoves() const;
+
+ private:
+  JNIEnv *env;
+  jobject moves;
+};
+
+}  // namespace ludii
 }  // namespace open_spiel
+
+#endif  // THIRD_PARTY_OPEN_SPIEL_GAMES_LUDII_MOVES_H_

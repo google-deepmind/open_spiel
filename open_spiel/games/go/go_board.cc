@@ -16,6 +16,7 @@
 
 #include <iomanip>
 
+#include "open_spiel/abseil-cpp/absl/random/uniform_int_distribution.h"
 #include "open_spiel/games/chess/chess_common.h"
 #include "open_spiel/spiel_utils.h"
 
@@ -470,8 +471,8 @@ std::ostream& operator<<(std::ostream& os, const GoBoard& board) {
   }
 
   // TODO(author9): Make this a public URL.
-  os << "http://jumper/goboard/" << encoded << "&size=" << board.board_size()
-     << std::endl;
+  // os << "http://jumper/goboard/" << encoded << "&size=" << board.board_size()
+  //    << std::endl;
 
   return os;
 }

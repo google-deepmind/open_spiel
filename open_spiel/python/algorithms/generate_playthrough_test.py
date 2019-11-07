@@ -18,17 +18,17 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import unittest
+from absl.testing import absltest
 
 from open_spiel.python.algorithms import generate_playthrough
 
 
-class PlaythroughTest(unittest.TestCase):
+class PlaythroughTest(absltest.TestCase):
 
   def test_runs(self):
     result = generate_playthrough.playthrough("tic_tac_toe", seed=1234)
-    self.assertGreater(len(result), 0)
+    self.assertNotEmpty(result)
 
 
 if __name__ == "__main__":
-  unittest.main()
+  absltest.main()

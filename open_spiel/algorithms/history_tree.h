@@ -32,7 +32,7 @@ namespace algorithms {
 // history in the game.
 class HistoryNode {
  public:
-  HistoryNode(int player_id, std::unique_ptr<State> game_state);
+  HistoryNode(Player player_id, std::unique_ptr<State> game_state);
 
   State* GetState() { return state_.get(); }
 
@@ -77,7 +77,7 @@ class HistoryTree {
   // Builds a tree of histories. player_id is needed here as we view all chance
   // and terminal nodes from the viewpoint of player_id. Decision nodes are
   // viewed from the perspective of the player making the decision.
-  HistoryTree(std::unique_ptr<State> state, int player_id);
+  HistoryTree(std::unique_ptr<State> state, Player player_id);
 
   HistoryNode* Root() { return root_.get(); }
 
@@ -101,21 +101,21 @@ class HistoryTree {
 // actions, a probability of 1 for all of the best_responder's actions, and the
 // natural chance probabilty for all change actions. We return all infosets
 // (i.e. all sets of history nodes grouped by infostate) for the sub-game rooted
-// at state, from the perspective of the player with id best_responder_id.
+// at state, from the perspective of the player with id best_responder.
 std::unordered_map<std::string, std::vector<std::pair<HistoryNode*, double>>>
-GetAllInfoSets(std::unique_ptr<State> state, int best_responder_id,
+GetAllInfoSets(std::unique_ptr<State> state, Player best_responder,
                const Policy* policy, HistoryTree* tree);
 
 // For a given state, returns all successor states with accompanying
 // counter-factual probabilities.
 ActionsAndProbs GetSuccessorsWithProbs(const State& state,
-                                       int best_responder_id,
+                                       Player best_responder,
                                        const Policy* policy);
 
 // Returns all decision nodes, with accompanying counter-factual probabilities,
 // for the sub-game rooted at parent_state.
 std::vector<std::pair<std::unique_ptr<State>, double>> DecisionNodes(
-    const State& parent_state, int best_responder_id, const Policy* policy);
+    const State& parent_state, Player best_responder, const Policy* policy);
 
 }  // namespace algorithms
 }  // namespace open_spiel

@@ -21,18 +21,18 @@ namespace algorithms {
 namespace {
 
 void KuhnDeterministicPolicyTest() {
-  kuhn_poker::KuhnGame kuhn_game({});
+  std::shared_ptr<const Game> game = LoadGame("kuhn_poker");
 
   int p0_policies = 1;
   int p1_policies = 1;
 
-  DeterministicTabularPolicy p0_policy(kuhn_game, 0);
+  DeterministicTabularPolicy p0_policy(*game, Player{0});
   while (p0_policy.NextPolicy()) {
     p0_policies += 1;
   }
   SPIEL_CHECK_EQ(p0_policies, 64);  // 2^6
 
-  DeterministicTabularPolicy p1_policy(kuhn_game, 1);
+  DeterministicTabularPolicy p1_policy(*game, Player{1});
   while (p1_policy.NextPolicy()) {
     p1_policies += 1;
   }

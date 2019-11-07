@@ -2230,15 +2230,15 @@ action: 5
 
 # State 110
 IsTerminal() = True
-ToString() = "[FINISHED]\nPlayer 1 score = 25\n  f  e  d  c  b  a\n  0  1  0  0  1  0\n  0  0  0  0  2  0\n  A  B  C  D  E  F\nPlayer 0 score = 19\n"
+ToString() = "[FINISHED]\nPlayer 1 score = 27\n  f  e  d  c  b  a\n  0  0  0  0  0  0\n  0  0  0  0  0  0\n  A  B  C  D  E  F\nPlayer 0 score = 21\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1, 0, 0, 4, 2, 2, 4, 0, 5, 3, 3, 5, 5]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5 0 3 4 5 5 1 1 0 0 4 2 2 4 0 5 3 3 5 5"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
-Observation(0) = "0 | 19 25 | 0 0 0 0 2 0 0 1 0 0 1 0"
-Observation(1) = "0 | 19 25 | 0 0 0 0 2 0 0 1 0 0 1 0"
-ObservationAsNormalizedVector(0) = [0.0, 0.0, 0.0, 0.0, 0.04167, 0.0, 0.0, 0.02083, 0.0, 0.0, 0.02083, 0.0, 0.39583, 0.52083]
-ObservationAsNormalizedVector(1) = [0.0, 0.0, 0.0, 0.0, 0.04167, 0.0, 0.0, 0.02083, 0.0, 0.0, 0.02083, 0.0, 0.39583, 0.52083]
+Observation(0) = "0 | 21 27 | 0 0 0 0 0 0 0 0 0 0 0 0"
+Observation(1) = "0 | 21 27 | 0 0 0 0 0 0 0 0 0 0 0 0"
+ObservationAsNormalizedVector(0) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.4375, 0.5625]
+ObservationAsNormalizedVector(1) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.4375, 0.5625]
 Rewards() = [-1.0, 1.0]
 Returns() = [-1.0, 1.0]

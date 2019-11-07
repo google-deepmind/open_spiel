@@ -51,29 +51,27 @@ const GameType kGameType{
     /*provides_observation=*/true,
     /*provides_observation_as_normalized_vector=*/true,
     /*parameter_specification=*/
-    {{"obstype", {GameParameter::Type::kString, false}}}};
+    {{"obstype", GameParameter(static_cast<std::string>(kDefaultObsType))}}};
 
-std::unique_ptr<Game> Factory(const GameParameters& params) {
-  return std::unique_ptr<Game>(new PhantomTTTGame(params));
+std::shared_ptr<const Game> Factory(const GameParameters& params) {
+  return std::shared_ptr<const Game>(new PhantomTTTGame(params));
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
 
 }  // namespace
 
-PhantomTTTState::PhantomTTTState(int num_distinct_actions,
+PhantomTTTState::PhantomTTTState(std::shared_ptr<const Game> game,
                                  ObservationType obs_type)
-    : State(num_distinct_actions, tic_tac_toe::kNumPlayers),
-      state_(num_distinct_actions),
-      obs_type_(obs_type) {
+    : State(game), state_(game), obs_type_(obs_type) {
   std::fill(begin(x_view_), end(x_view_), CellState::kEmpty);
   std::fill(begin(o_view_), end(o_view_), CellState::kEmpty);
 }
 
 void PhantomTTTState::DoApplyAction(Action move) {
   // Current player's view.
-  int cur_player = CurrentPlayer();
-  auto& cur_view = cur_player == 0 ? x_view_ : o_view_;
+  Player cur_player = CurrentPlayer();
+  auto& cur_view = cur_player == Player{0} ? x_view_ : o_view_;
 
   // Two cases: either there is a mark already there, or not.
   if (state_.BoardAt(move) == CellState::kEmpty) {
@@ -92,9 +90,10 @@ void PhantomTTTState::DoApplyAction(Action move) {
 }
 
 std::vector<Action> PhantomTTTState::LegalActions() const {
+  if (IsTerminal()) return {};
   std::vector<Action> moves;
-  const int player = CurrentPlayer();
-  const auto& cur_view = player == 0 ? x_view_ : o_view_;
+  const Player player = CurrentPlayer();
+  const auto& cur_view = player == Player{0} ? x_view_ : o_view_;
 
   for (Action move = 0; move < kNumCells; ++move) {
     if (cur_view[move] == CellState::kEmpty) {
@@ -105,8 +104,8 @@ std::vector<Action> PhantomTTTState::LegalActions() const {
   return moves;
 }
 
-std::string PhantomTTTState::ViewToString(int player) const {
-  const auto& cur_view = player == 0 ? x_view_ : o_view_;
+std::string PhantomTTTState::ViewToString(Player player) const {
+  const auto& cur_view = player == Player{0} ? x_view_ : o_view_;
   std::string str;
   for (int r = 0; r < kNumRows; ++r) {
     for (int c = 0; c < kNumCols; ++c) {
@@ -119,7 +118,7 @@ std::string PhantomTTTState::ViewToString(int player) const {
   return str;
 }
 
-std::string PhantomTTTState::ActionSequenceToString(int player) const {
+std::string PhantomTTTState::ActionSequenceToString(Player player) const {
   std::string str;
   for (const auto& player_with_action : action_sequence_) {
     if (player_with_action.first == player) {
@@ -141,14 +140,14 @@ std::string PhantomTTTState::ActionSequenceToString(int player) const {
   return str;
 }
 
-std::string PhantomTTTState::InformationState(int player) const {
+std::string PhantomTTTState::InformationState(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   return ViewToString(player) + "\n" + ActionSequenceToString(player);
 }
 
 void PhantomTTTState::InformationStateAsNormalizedVector(
-    int player, std::vector<double>* values) const {
+    Player player, std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
@@ -156,7 +155,7 @@ void PhantomTTTState::InformationStateAsNormalizedVector(
   // Then the action sequence follows (one-hot encoded, per action).
   // Encoded in the same way as InformationStateAsString, so full sequences
   // which may contain action value 10 to represent "I don't know."
-  const auto& player_view = player == 0 ? x_view_ : o_view_;
+  const auto& player_view = player == Player{0} ? x_view_ : o_view_;
   values->resize(kNumCells * kCellStates +
                  kLongestSequence * (1 + kBitsPerAction));
   std::fill(values->begin(), values->end(), 0.);
@@ -191,7 +190,7 @@ std::unique_ptr<State> PhantomTTTState::Clone() const {
   return std::unique_ptr<State>(new PhantomTTTState(*this));
 }
 
-void PhantomTTTState::UndoAction(int player, Action move) {
+void PhantomTTTState::UndoAction(Player player, Action move) {
   Action last_move = action_sequence_.back().second;
   SPIEL_CHECK_EQ(last_move, move);
 
@@ -204,7 +203,7 @@ void PhantomTTTState::UndoAction(int player, Action move) {
   }
 
   // Undo the action from that player's view, and pop from the action seq
-  auto& player_view = player == 0 ? x_view_ : o_view_;
+  auto& player_view = player == Player{0} ? x_view_ : o_view_;
   player_view[move] = CellState::kEmpty;
   action_sequence_.pop_back();
 
@@ -214,9 +213,11 @@ void PhantomTTTState::UndoAction(int player, Action move) {
 }
 
 PhantomTTTGame::PhantomTTTGame(const GameParameters& params)
-    : Game(kGameType, params), game_(GameParameters{}) {
+    : Game(kGameType, params),
+      game_(std::static_pointer_cast<const tic_tac_toe::TicTacToeGame>(
+          LoadGame("tic_tac_toe"))) {
   std::string obs_type =
-      ParameterValue<std::string>("obstype", kDefaultObsType);
+      ParameterValue<std::string>("obstype");
   if (obs_type == "reveal-nothing") {
     obs_type_ = ObservationType::kRevealNothing;
   } else if (obs_type == "reveal-numturns") {

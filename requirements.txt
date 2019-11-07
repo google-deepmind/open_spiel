@@ -8,4 +8,6 @@ cvxopt == 1.2.3
 networkx == 2.2
 mock == 3.0.5
 matplotlib == 3.1.1
+nashpy == 0.0.19
 scipy == 1.1.0
+attrs == 19.1.0

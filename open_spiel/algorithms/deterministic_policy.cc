@@ -20,7 +20,7 @@ namespace open_spiel {
 namespace algorithms {
 
 DeterministicTabularPolicy::DeterministicTabularPolicy(
-    const Game& game, int player,
+    const Game& game, Player player,
     const std::unordered_map<std::string, Action> policy)
     : table_(), player_(player) {
   CreateTable(game, player);
@@ -32,7 +32,7 @@ DeterministicTabularPolicy::DeterministicTabularPolicy(
 }
 
 DeterministicTabularPolicy::DeterministicTabularPolicy(const Game& game,
-                                                       int player)
+                                                       Player player)
     : table_(), player_(player) {
   CreateTable(game, player);
 }
@@ -80,7 +80,7 @@ void DeterministicTabularPolicy::ResetDefaultPolicy() {
   }
 }
 
-void DeterministicTabularPolicy::CreateTable(const Game& game, int player) {
+void DeterministicTabularPolicy::CreateTable(const Game& game, Player player) {
   std::unordered_map<std::string, std::vector<Action>> legal_actions_map =
       GetLegalActionsMap(game, -1, player);
   for (const auto& info_state_actions : legal_actions_map) {

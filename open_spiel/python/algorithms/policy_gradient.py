@@ -103,7 +103,8 @@ class PolicyGradient(rl_agent.AbstractAgent):
                pi_learning_rate=0.001,
                entropy_cost=0.01,
                num_critic_before_pi=8,
-               additional_discount_factor=1.0):
+               additional_discount_factor=1.0,
+               max_global_gradient_norm=None):
     """Initialize the PolicyGradient agent.
 
     Args:
@@ -131,6 +132,8 @@ class PolicyGradient(rl_agent.AbstractAgent):
       additional_discount_factor: float, additional discount to compute returns.
         Defaults to 1.0, in which case, no extra discount is applied.  None that
         users must provide *only one of* `loss_str` or `loss_class`.
+      max_global_gradient_norm: float or None, maximum global norm of a gradient
+        to which the gradient is shrunk if its value is larger.
     """
     assert bool(loss_str) ^ bool(loss_class), "Please provide only one option."
     loss_class = loss_class if loss_class else self._get_loss_class(loss_str)
@@ -200,7 +203,18 @@ class PolicyGradient(rl_agent.AbstractAgent):
               labels=self._return_ph, predictions=value_predictions))
     critic_optimizer = tf.train.GradientDescentOptimizer(
         learning_rate=critic_learning_rate)
-    self._critic_learn_step = critic_optimizer.minimize(self._critic_loss)
+
+    def minimize_with_clipping(optimizer, loss):
+      grads_and_vars = optimizer.compute_gradients(loss)
+      if max_global_gradient_norm is not None:
+        grads, variables = zip(*grads_and_vars)
+        grads, _ = tf.clip_by_global_norm(grads, max_global_gradient_norm)
+        grads_and_vars = list(zip(grads, variables))
+
+      return optimizer.apply_gradients(grads_and_vars)
+
+    self._critic_learn_step = minimize_with_clipping(critic_optimizer,
+                                                     self._critic_loss)
 
     # Pi loss
     pg_class = loss_class(entropy_cost=entropy_cost)
@@ -215,7 +229,8 @@ class PolicyGradient(rl_agent.AbstractAgent):
           policy_logits=self._policy_logits, action_values=self._q_values)
     pi_optimizer = tf.train.GradientDescentOptimizer(
         learning_rate=pi_learning_rate)
-    self._pi_learn_step = pi_optimizer.minimize(self._pi_loss)
+
+    self._pi_learn_step = minimize_with_clipping(pi_optimizer, self._pi_loss)
 
   def _get_loss_class(self, loss_str):
     if loss_str == "rpg":
@@ -250,11 +265,16 @@ class PolicyGradient(rl_agent.AbstractAgent):
     Returns:
       A `rl_agent.StepOutput` containing the action probs and chosen action.
     """
-    # Act step: don't act at terminal info states.
-    if not time_step.last():
+    # Act step: don't act at terminal info states or if its not our turn.
+    if (not time_step.last()) and (
+        time_step.is_simultaneous_move() or
+        self.player_id == time_step.current_player()):
       info_state = time_step.observations["info_state"][self.player_id]
       legal_actions = time_step.observations["legal_actions"][self.player_id]
       action, probs = self._act(info_state, legal_actions)
+    else:
+      action = None
+      probs = []
 
     if not is_evaluation:
       self._step_counter += 1

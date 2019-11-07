@@ -60,7 +60,7 @@ void InitializeMaps(const map<std::string, state_pointer>& states,
     if (kv.second->IsTerminal()) {
       // For both 1-player and 2-player zero sum games, suffices to look at
       // player 0's utility
-      (*values)[key] = kv.second->PlayerReturn(0);
+      (*values)[key] = kv.second->PlayerReturn(Player{0});
     } else {
       (*values)[key] = 0;
       AddTransition(transitions, key, kv.second);
@@ -80,6 +80,12 @@ std::map<std::string, double> ValueIteration(const Game& game, int depth_limit,
   if (game.NumPlayers() == 2) {
     SPIEL_CHECK_EQ(game.GetType().utility, GameType::Utility::kZeroSum);
   }
+
+  // No support for simultaneous games (needs an LP solver). And so also must
+  // be a perfect information game.
+  SPIEL_CHECK_EQ(game.GetType().dynamics, GameType::Dynamics::kSequential);
+  SPIEL_CHECK_EQ(game.GetType().information,
+                 GameType::Information::kPerfectInformation);
 
   auto states = GetAllStates(game, depth_limit, /*include_terminals=*/true,
                              /*include_chance_states=*/false);
@@ -103,7 +109,7 @@ std::map<std::string, double> ValueIteration(const Game& game, int depth_limit,
       // is the maximizing player (i.e. player 0), and to maximum utility
       // if current player is the minimizing player (i.e. player 1).
       double value = min_utility;
-      if (player == 1) value = -value;
+      if (player == Player{1}) value = -value;
       for (auto action : kv.second->LegalActions()) {
         auto possibilities = transitions[std::make_pair(key, action)];
         double q_value = 0;
@@ -112,7 +118,7 @@ std::map<std::string, double> ValueIteration(const Game& game, int depth_limit,
         }
         // Player 0 is maximizing the value (which is w.r.t. player 0)
         // Player 1 is minimizing the value
-        if (player == 0)
+        if (player == Player{0})
           value = std::max(value, q_value);
         else
           value = std::min(value, q_value);

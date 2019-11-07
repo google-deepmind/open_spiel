@@ -16,6 +16,7 @@
 #define THIRD_PARTY_OPEN_SPIEL_GAMES_OSHI_ZUMO_H_
 
 #include <array>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -42,6 +43,7 @@
 //   "coins"      int     number of coins each player starts with (default: 50)
 //   "size"       int     size of the field (= 2*size + 1)        (default: 3)
 //   "horizon"    int     max number of moves before draw       (default: 1000)
+//   "min_bid"    int     minimum bid at each turn              (default: 0)
 
 namespace open_spiel {
 namespace oshi_zumo {
@@ -50,31 +52,31 @@ class OshiZumoGame;
 
 class OshiZumoState : public SimMoveState {
  public:
-  explicit OshiZumoState(const OshiZumoGame& parent_game);
+  explicit OshiZumoState(std::shared_ptr<const Game> game);
 
-  int CurrentPlayer() const override;
-  std::string ActionToString(int player, Action action_id) const override;
+  Player CurrentPlayer() const override;
+  std::string ActionToString(Player player, Action action_id) const override;
   std::string ToString() const override;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
-  std::string InformationState(int player) const override;
+  std::string InformationState(Player player) const override;
   void InformationStateAsNormalizedVector(
-      int player, std::vector<double>* values) const override;
+      Player player, std::vector<double>* values) const override;
   std::unique_ptr<State> Clone() const override;
-  std::vector<Action> LegalActions(int player) const override;
+  std::vector<Action> LegalActions(Player player) const override;
 
  protected:
   void DoApplyActions(const std::vector<Action>& actions) override;
 
  private:
   const OshiZumoGame& parent_game_;
-
   int winner_;
   int total_moves_;
   int horizon_;
   int starting_coins_;
   int size_;
   bool alesia_;
+  int min_bid_;
   int wrestler_pos_;
   std::array<int, 2> coins_;
 };
@@ -90,8 +92,8 @@ class OshiZumoGame : public Game {
   double MinUtility() const override { return -1; }
   double MaxUtility() const override { return +1; }
   double UtilitySum() const override { return 0; }
-  std::unique_ptr<Game> Clone() const override {
-    return std::unique_ptr<Game>(new OshiZumoGame(*this));
+  std::shared_ptr<const Game> Clone() const override {
+    return std::shared_ptr<const Game>(new OshiZumoGame(*this));
   }
   std::vector<int> InformationStateNormalizedVectorShape() const override;
   int MaxGameLength() const override { return horizon_; }
@@ -101,12 +103,14 @@ class OshiZumoGame : public Game {
   int starting_coins() const { return starting_coins_; }
   int size() const { return size_; }
   bool alesia() const { return alesia_; }
+  int min_bid() const { return min_bid_; }
 
  private:
   int horizon_;
   int starting_coins_;
   int size_;
   bool alesia_;
+  int min_bid_;
 };
 
 }  // namespace oshi_zumo

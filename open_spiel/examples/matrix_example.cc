@@ -15,6 +15,7 @@
 #include <memory>
 #include <random>
 
+#include "open_spiel/abseil-cpp/absl/random/uniform_int_distribution.h"
 #include "open_spiel/matrix_game.h"
 #include "open_spiel/spiel.h"
 
@@ -24,7 +25,7 @@ int main(int argc, char** argv) {
 
   // Create the game with its default parameter settings.
   std::cerr << "Creating game..\n" << std::endl;
-  std::unique_ptr<open_spiel::Game> game(
+  std::shared_ptr<const open_spiel::Game> game(
       new open_spiel::matrix_game::MatrixGame(
           {/*short_name=*/"matrix_pd",
            /*long_name=*/"Prisoner's Dilemma",
@@ -57,10 +58,10 @@ int main(int argc, char** argv) {
   std::vector<open_spiel::Action> col_actions = state->LegalActions(1);
 
   open_spiel::Action row_action =
-      row_actions[std::uniform_int_distribution<int>(
+      row_actions[absl::uniform_int_distribution<int>(
           0, row_actions.size() - 1)(rng)];
   open_spiel::Action col_action =
-      col_actions[std::uniform_int_distribution<int>(
+      col_actions[absl::uniform_int_distribution<int>(
           0, col_actions.size() - 1)(rng)];
 
   std::cerr << "Joint action is: (" << state->ActionToString(0, row_action)

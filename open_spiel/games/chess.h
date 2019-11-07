@@ -18,12 +18,12 @@
 #include <array>
 #include <cstring>
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
 #include "open_spiel/games/chess/chess_board.h"
 #include "open_spiel/spiel.h"
-#include "open_spiel/spiel_optional.h"
 #include "open_spiel/spiel_utils.h"
 
 // Game of chess:
@@ -35,17 +35,17 @@ namespace open_spiel {
 namespace chess {
 
 // Constants.
-constexpr int NumPlayers() { return 2; }
-constexpr double LossUtility() { return -1; }
-constexpr double DrawUtility() { return 0; }
-constexpr double WinUtility() { return 1; }
-constexpr int BoardSize() { return 8; }
+inline constexpr int NumPlayers() { return 2; }
+inline constexpr double LossUtility() { return -1; }
+inline constexpr double DrawUtility() { return 0; }
+inline constexpr double WinUtility() { return 1; }
+inline constexpr int BoardSize() { return 8; }
 
 // See action encoding below.
-constexpr int NumDistinctActions() { return (1 << 15); }
+inline constexpr int NumDistinctActions() { return (1 << 15); }
 
 // https://math.stackexchange.com/questions/194008/how-many-turns-can-a-chess-game-take-at-maximum
-constexpr int MaxGameLength() { return 17695; }
+inline constexpr int MaxGameLength() { return 17695; }
 
 inline const std::vector<int>& InformationStateNormalizedVectorShape() {
   static std::vector<int> shape{
@@ -68,7 +68,7 @@ inline int ColorToPlayer(Color c) {
   }
 }
 
-inline int OtherPlayer(int player) { return player == 0 ? 1 : 0; }
+inline int OtherPlayer(Player player) { return player == Player{0} ? 1 : 0; }
 
 // Action encoding (must be changed to support larger boards):
 // bits 0-5: from square (0-64)
@@ -169,20 +169,20 @@ inline Move ActionToMove(const Action& action) {
 class ChessState : public State {
  public:
   // Constructs a chess state at the standard start position.
-  ChessState();
+  ChessState(std::shared_ptr<const Game> game);
 
   // Constructs a chess state at the given position in Forsyth-Edwards Notation.
   // https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
-  ChessState(const std::string& fen);
+  ChessState(std::shared_ptr<const Game> game, const std::string& fen);
   ChessState(const ChessState&) = default;
 
   ChessState& operator=(const ChessState&) = default;
 
-  int CurrentPlayer() const override {
+  Player CurrentPlayer() const override {
     return IsTerminal() ? kTerminalPlayerId : ColorToPlayer(Board().ToPlay());
   }
   std::vector<Action> LegalActions() const override;
-  std::string ActionToString(int player, Action action) const override;
+  std::string ActionToString(Player player, Action action) const override;
   std::string ToString() const override;
 
   bool IsTerminal() const override {
@@ -191,11 +191,11 @@ class ChessState : public State {
 
   std::vector<double> Returns() const override;
 
-  std::string InformationState(int player) const override;
+  std::string InformationState(Player player) const override;
   void InformationStateAsNormalizedVector(
-      int player, std::vector<double>* values) const override;
+      Player player, std::vector<double>* values) const override;
   std::unique_ptr<State> Clone() const override;
-  void UndoAction(int player, Action action) override;
+  void UndoAction(Player player, Action action) override;
 
   // Current board.
   StandardChessBoard& Board() { return current_board_; }
@@ -209,7 +209,7 @@ class ChessState : public State {
   // board position has already appeared twice in the history).
   bool IsRepetitionDraw() const;
 
-  Optional<std::vector<double>> MaybeFinalReturns() const;
+  std::optional<std::vector<double>> MaybeFinalReturns() const;
 
   // We have to store every move made to check for repetitions and to implement
   // undo. We store the current board position as an optimization.
@@ -241,15 +241,18 @@ class ChessGame : public Game {
   int NumDistinctActions() const override {
     return chess::NumDistinctActions();
   }
+  std::unique_ptr<State> NewInitialState(const std::string& fen) const {
+    return std::unique_ptr<State>(new ChessState(shared_from_this(), fen));
+  }
   std::unique_ptr<State> NewInitialState() const override {
-    return std::unique_ptr<State>(new ChessState());
+    return std::unique_ptr<State>(new ChessState(shared_from_this()));
   }
   int NumPlayers() const override { return chess::NumPlayers(); }
   double MinUtility() const override { return LossUtility(); }
   double UtilitySum() const override { return DrawUtility(); }
   double MaxUtility() const override { return WinUtility(); }
-  std::unique_ptr<Game> Clone() const override {
-    return std::unique_ptr<Game>(new ChessGame(*this));
+  std::shared_ptr<const Game> Clone() const override {
+    return std::shared_ptr<const Game>(new ChessGame(*this));
   }
   std::vector<int> InformationStateNormalizedVectorShape() const override {
     return chess::InformationStateNormalizedVectorShape();

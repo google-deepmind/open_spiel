@@ -15,6 +15,7 @@
 #ifndef THIRD_PARTY_OPEN_SPIEL_GAMES_OWARE_H_
 #define THIRD_PARTY_OPEN_SPIEL_GAMES_OWARE_H_
 
+#include <memory>
 #include <unordered_set>
 
 #include "open_spiel/games/oware/oware_board.h"
@@ -38,37 +39,39 @@
 namespace open_spiel {
 namespace oware {
 
-constexpr int kMinCapture = 2;
-constexpr int kMaxCapture = 3;
+inline constexpr int kMinCapture = 2;
+inline constexpr int kMaxCapture = 3;
 
-constexpr int kDefaultHousesPerPlayer = 6;
-constexpr int kDdefaultSeedsPerHouse = 4;
+inline constexpr int kDefaultHousesPerPlayer = 6;
+inline constexpr int kDdefaultSeedsPerHouse = 4;
 
 // Informed guess based on
 // https://mancala.fandom.com/wiki/Statistics
-constexpr int kMaxGameLength = 1000;
+inline constexpr int kMaxGameLength = 1000;
 
 class OwareState : public State {
  public:
-  OwareState(int num_houses_per_player, int num_seeds_per_house);
+  OwareState(std::shared_ptr<const Game> game, int num_houses_per_player,
+             int num_seeds_per_house);
 
   OwareState(const OwareState&) = default;
 
   // Custom board setup to support testing.
-  explicit OwareState(const OwareBoard& board);
+  explicit OwareState(std::shared_ptr<const Game> game,
+                      const OwareBoard& board);
 
-  int CurrentPlayer() const override {
+  Player CurrentPlayer() const override {
     return IsTerminal() ? kTerminalPlayerId : board_.current_player;
   }
 
   std::vector<Action> LegalActions() const override;
-  std::string ActionToString(int player, Action action_id) const override;
+  std::string ActionToString(Player player, Action action_id) const override;
   std::string ToString() const override;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
   std::unique_ptr<State> Clone() const override;
   const OwareBoard& Board() const { return board_; }
-  std::string Observation(int player) const override;
+  std::string Observation(Player player) const override;
 
   // The game board is provided as a vector, encoding the players' seeds
   // and their score, as a fraction of the number of total number of seeds in
@@ -76,13 +79,13 @@ class OwareState : public State {
   // training, although the given representation is not necessary the best
   // for that purpose.
   void ObservationAsNormalizedVector(
-      int player, std::vector<double>* values) const override;
+      Player player, std::vector<double>* values) const override;
 
  protected:
   void DoApplyAction(Action action) override;
 
  private:
-  void WritePlayerScore(std::ostringstream& out, int player) const;
+  void WritePlayerScore(std::ostringstream& out, Player player) const;
 
   // Collects the seeds from the given house and distributes them
   // counterclockwise, skipping the starting position in all cases.
@@ -114,11 +117,11 @@ class OwareState : public State {
     return LowerHouse(house) + num_houses_per_player_ - 1;
   }
 
-  int PlayerLowerHouse(int player) const {
+  int PlayerLowerHouse(Player player) const {
     return player * num_houses_per_player_;
   }
 
-  int PlayerUpperHouse(int player) const {
+  int PlayerUpperHouse(Player player) const {
     return player * num_houses_per_player_ + num_houses_per_player_ - 1;
   }
 
@@ -130,7 +133,7 @@ class OwareState : public State {
     return house % num_houses_per_player_;
   }
 
-  int ActionToHouse(int player, Action action) const {
+  int ActionToHouse(Player player, Action action) const {
     return player * num_houses_per_player_ + action;
   }
 
@@ -160,15 +163,15 @@ class OwareGame : public Game {
   explicit OwareGame(const GameParameters& params);
   int NumDistinctActions() const override { return num_houses_per_player_; }
   std::unique_ptr<State> NewInitialState() const override {
-    return std::unique_ptr<State>(
-        new OwareState(num_houses_per_player_, num_seeds_per_house_));
+    return std::unique_ptr<State>(new OwareState(
+        shared_from_this(), num_houses_per_player_, num_seeds_per_house_));
   }
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override { return -1; }
   double UtilitySum() const override { return 0; }
   double MaxUtility() const override { return 1; }
-  std::unique_ptr<Game> Clone() const override {
-    return std::unique_ptr<Game>(new OwareGame(*this));
+  std::shared_ptr<const Game> Clone() const override {
+    return std::shared_ptr<const Game>(new OwareGame(*this));
   }
 
   int MaxGameLength() const override { return kMaxGameLength; }

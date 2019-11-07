@@ -18,7 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import unittest
+from absl.testing import absltest
 from absl.testing import parameterized
 
 from open_spiel.python.algorithms.psro_variations import optimization_oracle
@@ -90,4 +90,4 @@ class RectifiedNashResponseTest(parameterized.TestCase):
 
 
 if __name__ == "__main__":
-  unittest.main()
+  absltest.main()

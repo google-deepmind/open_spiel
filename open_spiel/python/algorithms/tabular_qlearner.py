@@ -60,17 +60,12 @@ class QLearner(rl_agent.AbstractAgent):
       A valid epsilon-greedy action and valid action probabilities.
     """
     probs = np.zeros(self._num_actions)
-    if info_state not in self._q_values or np.random.rand() < epsilon:
-      action = np.random.choice(legal_actions)
-      probs[legal_actions] = 1.0 / len(legal_actions)
-    else:
-      legal_actions_values = np.array(
-          [self._q_values[info_state][a] for a in legal_actions])
-      action = legal_actions[np.argmax(legal_actions_values)]
-      # Reduce max_q for numerical stability. Result is the same.
-      max_q = np.max(legal_actions_values)
-      e_x = np.exp(legal_actions_values - max_q)
-      probs[legal_actions] = e_x / e_x.sum(axis=0)
+    greedy_q = max([self._q_values[info_state][a] for a in legal_actions])
+    greedy_actions = [a for a in legal_actions
+                      if self._q_values[info_state][a] == greedy_q]
+    probs[legal_actions] = epsilon / len(legal_actions)
+    probs[greedy_actions] += (1 - epsilon) / len(greedy_actions)
+    action = np.random.choice(range(self._num_actions), p=probs)
     return action, probs
 
   def step(self, time_step, is_evaluation=False):
