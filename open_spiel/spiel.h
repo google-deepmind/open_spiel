@@ -241,6 +241,18 @@ class State {
   // in different states (and hence probably different action ids).
   // This method will format chance outcomes if player == kChancePlayer
   virtual std::string ActionToString(Player player, Action action_id) const = 0;
+  std::string ActionToString(Action action_id) const {
+    return ActionToString(CurrentPlayer(), action_id);
+  }
+
+  // Reverses the mapping done by ActionToString.
+  // Note: This currently just loops over all legal actions, converts them into
+  // a string, and checks equality, so it can be very slow.
+  virtual Action StringToAction(Player player,
+                                const std::string& action_str) const;
+  Action StringToAction(const std::string& action_str) const {
+    return StringToAction(CurrentPlayer(), action_str);
+  }
 
   // Returns a string representation of the state. This has no particular
   // semantics and is targeting debugging code.

@@ -345,6 +345,15 @@ std::string State::Serialize() const {
   return absl::StrCat(absl::StrJoin(History(), "\n"), "\n");
 }
 
+Action State::StringToAction(Player player,
+                             const std::string& action_str) const {
+  for (const Action action : LegalActions()) {
+    if (action_str == ActionToString(player, action)) return action;
+  }
+  SpielFatalError(
+      absl::StrCat("Couldn't find an action matching ", action_str));
+}
+
 std::unique_ptr<State> Game::DeserializeState(const std::string& str) const {
   // This simple deserialization doesn't work for games with sampled chance
   // nodes, since the history doesn't give us enough information to reconstruct

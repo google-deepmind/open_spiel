@@ -204,7 +204,15 @@ PYBIND11_MODULE(pyspiel, m) {
            (std::vector<int>(State::*)(int) const) & State::LegalActionsMask)
       .def("legal_actions_mask",
            (std::vector<int>(State::*)(void) const) & State::LegalActionsMask)
-      .def("action_to_string", &State::ActionToString)
+      .def("action_to_string", (std::string(State::*)(Player, Action) const) &
+                                   State::ActionToString)
+      .def("action_to_string",
+           (std::string(State::*)(Action) const) & State::ActionToString)
+      .def("string_to_action",
+           (Action(State::*)(Player, const std::string&) const) &
+               State::StringToAction)
+      .def("string_to_action",
+           (Action(State::*)(const std::string&) const) & State::StringToAction)
       .def("__str__", &State::ToString)
       .def("is_terminal", &State::IsTerminal)
       .def("rewards", &State::Rewards)
