@@ -32,7 +32,8 @@ CXX=g++
 NPROC=nproc
 if [[ "$OSTYPE" == "darwin"* ]]; then  # Mac OSX
   NPROC="sysctl -n hw.physicalcpu"
-  CXX=/usr/local/bin/g++-7
+  # deactivate g++ in favor of clang++
+  #CXX=/usr/local/bin/g++-7
 fi
 
 MAKE_NUM_PROCS=$(${NPROC})
@@ -46,7 +47,7 @@ cd $BUILD_DIR
 
 echo "Building and testing in $PWD using 'python' (version $PYVERSION)."
 
-cmake -DPython_TARGET_VERSION=${PYVERSION} ../open_spiel
+cmake -DPython_TARGET_VERSION=${PYVERSION} -DCMAKE_CXX_COMPILER=${CXX} ../open_spiel
 make -j$MAKE_NUM_PROCS
 
 export PYTHONPATH=$PYTHONPATH:`pwd`/../open_spiel
