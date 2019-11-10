@@ -18,6 +18,7 @@
 #include <utility>
 
 #include "open_spiel/spiel.h"
+#include "open_spiel/tensor_view.h"
 
 namespace open_spiel {
 namespace coop_box_pushing {
@@ -453,14 +454,13 @@ int CoopBoxPushingState::ObservationPlane(std::pair<int, int> coord,
 
 void CoopBoxPushingState::InformationStateAsNormalizedVector(
     Player player, std::vector<double>* values) const {
-  values->resize(kCellStates * kRows * kCols);
-  int plane_size = kRows * kCols;
+  TensorView<3> view(values, {kCellStates, kRows, kCols}, true);
 
   for (int r = 0; r < kRows; r++) {
     for (int c = 0; c < kCols; c++) {
       int plane = ObservationPlane({r, c}, player);
       SPIEL_CHECK_TRUE(plane >= 0 && plane < kCellStates);
-      (*values)[plane * plane_size + r * kCols + c] = 1.0;
+      view[{plane, r, c}] = 1.0;
     }
   }
 }

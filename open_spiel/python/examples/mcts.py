@@ -37,8 +37,9 @@ flags.DEFINE_enum("player1", "mcts", _KNOWN_PLAYERS, "Who controls player 1.")
 flags.DEFINE_enum("player2", "random", _KNOWN_PLAYERS, "Who controls player 2.")
 flags.DEFINE_integer("uct_c", 2, "UCT's exploration constant.")
 flags.DEFINE_integer("rollout_count", 10, "How many rollouts to do.")
-flags.DEFINE_integer("max_simulations", 10000, "How many nodes to expand.")
+flags.DEFINE_integer("max_simulations", 10000, "How many simulations to run.")
 flags.DEFINE_integer("num_games", 1, "How many games to play.")
+flags.DEFINE_integer("seed", None, "Seed for the random number generator.")
 flags.DEFINE_bool("solve", True, "Whether to use MCTS-Solver.")
 flags.DEFINE_bool("quiet", False, "Don't show the moves as they're played.")
 flags.DEFINE_bool("verbose", False, "Show the MCTS stats of possible moves.")
@@ -53,18 +54,20 @@ def _opt_print(*args, **kwargs):
 
 def _init_bot(bot_type, game, player_id):
   """Initializes a bot by type."""
+  rng = np.random.RandomState(FLAGS.seed)
   if bot_type == "mcts":
-    evaluator = mcts.RandomRolloutEvaluator(FLAGS.rollout_count)
+    evaluator = mcts.RandomRolloutEvaluator(FLAGS.rollout_count, rng)
     return mcts.MCTSBot(
         game,
         player_id,
         FLAGS.uct_c,
         FLAGS.max_simulations,
         evaluator,
+        random_state=rng,
         solve=FLAGS.solve,
         verbose=FLAGS.verbose)
   if bot_type == "random":
-    return uniform_random.UniformRandomBot(game, player_id, np.random)
+    return uniform_random.UniformRandomBot(game, player_id, rng)
   if bot_type == "human":
     return human.HumanBot(game, player_id)
   raise ValueError("Invalid bot type: %s" % bot_type)
@@ -87,7 +90,7 @@ def _play_game(game, bots, initial_actions):
   for action_str in initial_actions:
     action = _get_action(state, action_str)
     if action is None:
-      sys.exit("Illegal action: {}".format(action_str))
+      sys.exit("Invalid action: {}".format(action_str))
 
     history.append(action_str)
     state.apply_action(action)

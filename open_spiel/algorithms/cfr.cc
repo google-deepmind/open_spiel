@@ -336,6 +336,20 @@ std::vector<double> CFRSolverBase::GetPolicy(
   return entry->second.current_policy;
 }
 
+std::string CFRInfoStateValues::ToString() const {
+  std::string str = "";
+  absl::StrAppend(&str, "Legal actions: ", absl::StrJoin(legal_actions, ", "),
+                  "\n");
+  absl::StrAppend(&str, "Current policy: ", absl::StrJoin(current_policy, ", "),
+                  "\n");
+  absl::StrAppend(&str, "Cumulative regrets: ",
+                  absl::StrJoin(cumulative_regrets, ", "), "\n");
+  absl::StrAppend(&str,
+                  "Cumulative policy: ", absl::StrJoin(cumulative_policy, ", "),
+                  "\n");
+  return str;
+}
+
 void CFRInfoStateValues::ApplyRegretMatching() {
   double sum_positive_regrets = 0.0;
   for (int aidx = 0; aidx < num_actions(); ++aidx) {

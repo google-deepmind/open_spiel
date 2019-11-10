@@ -47,7 +47,9 @@ std::vector<double> RandomRolloutEvaluator::evaluate(const State& state) const {
       if (working_state->IsChanceNode()) {
         ActionsAndProbs outcomes = working_state->ChanceOutcomes();
         Action action = SampleChanceOutcome(
-            outcomes, std::uniform_real_distribution<double>(0.0, 1.0)(rng_));
+                            outcomes, std::uniform_real_distribution<double>(
+                                          0.0, 1.0)(rng_))
+                            .first;
         working_state->ApplyAction(action);
       } else {
         std::vector<Action> actions = working_state->LegalActions();
@@ -88,7 +90,22 @@ ActionsAndProbs RandomRolloutEvaluator::Prior(const State& state) const {
   }
 }
 
-double SearchNode::Value(int parent_explore_count, double uct_c) const {
+// UCT value of given child
+double SearchNode::UCTValue(int parent_explore_count, double uct_c) const {
+  if (!outcome.empty()) {
+    return outcome[player];
+  }
+
+  if (explore_count == 0)
+    return std::numeric_limits<double>::infinity();
+
+  // The "greedy-value" of choosing a given child is always with respect to
+  // the current player for this node.
+  return total_reward / explore_count +
+         uct_c * std::sqrt(std::log(parent_explore_count) / explore_count);
+}
+
+double SearchNode::PUCTValue(int parent_explore_count, double uct_c) const {
   // Returns the PUCT value of this node.
   if (!outcome.empty()) {
     return outcome[player];
@@ -151,9 +168,14 @@ std::string SearchNode::ToString(const State& state) const {
   return absl::StrFormat(
       "%6s: player: %d, prior: %5.3f, value: %6.3f, sims: %5d, outcome: %s, "
       "%3d children",
-      (action >= 0 ? state.ActionToString(player, action) : "none"), player,
-      prior, (explore_count ? total_reward / explore_count : 0.), explore_count,
-      (outcome.empty() ? "none" : absl::StrFormat("%4.1f", outcome[player])),
+      (action != kInvalidAction ? state.ActionToString(player, action)
+                                : "none"),
+      player, prior, (explore_count ? total_reward / explore_count : 0.),
+      explore_count,
+      (outcome.empty()
+           ? "none"
+           : absl::StrFormat("%4.1f",
+                             outcome[player == kChancePlayerId ? 0 : player])),
       children.size());
 }
 
@@ -166,7 +188,8 @@ MCTSBot::MCTSBot(
       int64_t max_memory_mb,
       bool solve,
       int seed,
-      bool verbose)
+      bool verbose,
+      ChildSelectionPolicy child_selection_policy)
       : Bot{game, player},
         uct_c_{uct_c},
         max_simulations_{max_simulations},
@@ -175,12 +198,17 @@ MCTSBot::MCTSBot(
         solve_(solve),
         max_utility_(game.MaxUtility()),
         rng_(seed),
+        child_selection_policy_(child_selection_policy),
         evaluator_{evaluator} {
     GameType game_type = game.GetType();
-    if (game_type.reward_model != GameType::RewardModel::kTerminal ||
-        game_type.dynamics != GameType::Dynamics::kSequential) {
-      SpielFatalError("Game must have sequential turns and terminal rewards.");
-    }
+    if (game_type.reward_model != GameType::RewardModel::kTerminal)
+      SpielFatalError("Game must have terminal rewards.");
+    if (game_type.dynamics != GameType::Dynamics::kSequential)
+      SpielFatalError("Game must have sequential turns.");
+    if (player < 0 || player >= game.NumPlayers())
+      SpielFatalError(absl::StrFormat(
+          "Game doesn't support that many players. Max: %d, player: %d",
+          game.NumPlayers(), player));
   }
 
 std::pair<ActionsAndProbs, Action> MCTSBot::Step(const State& state) {
@@ -198,11 +226,12 @@ std::pair<ActionsAndProbs, Action> MCTSBot::Step(const State& state) {
     std::cerr << root->ToString(state) << std::endl;
     std::cerr << "Children:" << std::endl;
     std::cerr << root->ChildrenStr(state) << std::endl;
-    std::unique_ptr<State> chosen_state = state.Clone();
-    chosen_state->ApplyAction(best.action);
-    std::cerr << std::endl;
-    std::cerr << "Children of chosen:" << std::endl;
-    std::cerr << best.ChildrenStr(*chosen_state) << std::endl;
+    if (!best.children.empty()) {
+      std::unique_ptr<State> chosen_state = state.Clone();
+      chosen_state->ApplyAction(best.action);
+      std::cerr << "Children of chosen:" << std::endl;
+      std::cerr << best.ChildrenStr(*chosen_state) << std::endl;
+    }
   }
 
   return {{{best.action, 1.0}}, best.action};
@@ -232,14 +261,11 @@ std::unique_ptr<State> MCTSBot::ApplyTreePolicy(
     if (working_state->IsChanceNode()) {
       // For chance nodes, rollout according to chance node's probability
       // distribution
-      ActionsAndProbs outcomes = working_state->ChanceOutcomes();
-
-      double rand = std::uniform_real_distribution<double>(0.0, 1.0)(rng_);
-      int index = 0;
-      for (double sum = 0; sum < rand; ++index) {
-        sum += outcomes[index].second;
-      }
-      Action chosen_action = outcomes[index].first;
+      Action chosen_action =
+          SampleChanceOutcome(
+              working_state->ChanceOutcomes(),
+              std::uniform_real_distribution<double>(0.0, 1.0)(rng_))
+              .first;
 
       for (SearchNode& child : current_node->children) {
         if (child.action == chosen_action) {
@@ -251,7 +277,15 @@ std::unique_ptr<State> MCTSBot::ApplyTreePolicy(
       // Otherwise choose node with largest UCT value.
       double max_value = -std::numeric_limits<double>::infinity();
       for (SearchNode& child : current_node->children) {
-        double val = child.Value(current_node->explore_count, uct_c_);
+        double val;
+        switch (child_selection_policy_) {
+          case ChildSelectionPolicy::UCT:
+            val = child.UCTValue(current_node->explore_count, uct_c_);
+            break;
+          case ChildSelectionPolicy::PUCT:
+            val = child.PUCTValue(current_node->explore_count, uct_c_);
+            break;
+        }
         if (val > max_value) {
           max_value = val;
           chosen_child = &child;
@@ -268,8 +302,9 @@ std::unique_ptr<State> MCTSBot::ApplyTreePolicy(
 }
 
 std::unique_ptr<SearchNode> MCTSBot::MCTSearch(const State& state) {
+  SPIEL_CHECK_EQ(player_id_, state.CurrentPlayer());
   memory_used_ = 0;
-  auto root = std::make_unique<SearchNode>(-1, state.CurrentPlayer(), 1);
+  auto root = std::make_unique<SearchNode>(kInvalidAction, player_id_, 1);
   std::vector<SearchNode*> visit_path;
   std::vector<double> returns;
   visit_path.reserve(64);
@@ -295,7 +330,8 @@ std::unique_ptr<SearchNode> MCTSBot::MCTSearch(const State& state) {
     for (auto it = visit_path.rbegin(); it != visit_path.rend(); ++it) {
       SearchNode* node = *it;
 
-      node->total_reward += returns[node->player];
+      node->total_reward +=
+          returns[node->player == kChancePlayerId ? player_id_ : node->player];
       node->explore_count += 1;
 
       // Back up solved results as well.
@@ -340,7 +376,8 @@ std::unique_ptr<SearchNode> MCTSBot::MCTSearch(const State& state) {
     }
 
     if (!root->outcome.empty() ||  // Full game tree is solved.
-        (max_memory_ && memory_used_ >= max_memory_)) {
+        (max_memory_ && memory_used_ >= max_memory_) ||
+        root->children.size() == 1) {
       break;
     }
   }

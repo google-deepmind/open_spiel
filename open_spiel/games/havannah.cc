@@ -20,6 +20,7 @@
 #include <vector>
 
 #include "open_spiel/game_parameters.h"
+#include "open_spiel/tensor_view.h"
 
 namespace open_spiel {
 namespace havannah {
@@ -287,11 +288,11 @@ void HavannahState::ObservationAsNormalizedVector(
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  std::fill(values->begin(), values->end(), 0.);
-  values->resize(board_.size() * kCellStates, 0.);
+  TensorView<2> view(values, {kCellStates, static_cast<int>(board_.size())},
+                     true);
   for (int i = 0; i < board_.size(); ++i) {
     if (board_[i].player != kPlayerInvalid) {
-      (*values)[board_.size() * static_cast<int>(board_[i].player) + i] = 1.0;
+      view[{static_cast<int>(board_[i].player), i}] = 1.0;
     }
   }
 }

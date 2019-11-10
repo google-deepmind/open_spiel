@@ -137,13 +137,8 @@ void ChessState::InformationStateAsNormalizedVector(
     Player player, std::vector<double>* values) const {
   SPIEL_CHECK_NE(player, kChancePlayerId);
 
-  std::size_t vector_size = 1;
-  for (int dim : InformationStateNormalizedVectorShape()) {
-    vector_size *= dim;
-  }
-
-  values->resize(0);
-  values->reserve(vector_size);
+  values->clear();
+  values->reserve(game_->InformationStateNormalizedVectorSize());
 
   // Piece cconfiguration.
   for (const auto& piece_type : kPieceTypes) {

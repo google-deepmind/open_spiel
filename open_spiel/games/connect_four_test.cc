@@ -79,10 +79,6 @@ void DeserializeDraw() {
   SPIEL_CHECK_EQ(state->Returns(), (std::vector<double>{0, 0}));
 }
 
-void Benchmark() {
-  testing::RandomSimBenchmark("connect_four", 10000);
-}
-
 }  // namespace
 }  // namespace connect_four
 }  // namespace open_spiel
@@ -92,5 +88,4 @@ int main(int argc, char **argv) {
   open_spiel::connect_four::FastLoss();
   open_spiel::connect_four::BasicSerializationTest();
   open_spiel::connect_four::DeserializeDraw();
-  open_spiel::connect_four::Benchmark();
 }

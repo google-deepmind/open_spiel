@@ -18,6 +18,7 @@
 #include <utility>
 
 #include "open_spiel/spiel.h"
+#include "open_spiel/tensor_view.h"
 
 namespace open_spiel {
 namespace markov_soccer {
@@ -43,17 +44,24 @@ const GameType kGameType{
     /*provides_observation=*/false,
     /*provides_observation_as_normalized_vector=*/false,
     /*parameter_specification=*/
-    {{"horizon", GameParameter(kDefaultHorizon)}}};
+    {{"horizon", GameParameter(kDefaultHorizon)},
+     {"grid", GameParameter(std::string(kDefaultGrid))}}};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new MarkovSoccerGame(params));
 }
 
-REGISTER_SPIEL_GAME(kGameType, Factory);
+Action ToAction(ChanceOutcome outcome) {
+  if (outcome == ChanceOutcome::kChanceInit0) {
+    return kChanceInit0Action;
+  } else if (outcome == ChanceOutcome::kChanceInit1) {
+    return kChanceInit1Action;
+  } else {
+    SpielFatalError("Unrecognized outcome");
+  }
+}
 
-// Constants.
-constexpr int kRows = 4;
-constexpr int kCols = 5;
+REGISTER_SPIEL_GAME(kGameType, Factory);
 
 // Valid characters: AaBbO. , so 6 characters per cell.
 constexpr int kCellStates = 6;
@@ -61,41 +69,40 @@ constexpr int kCellStates = 6;
 // Movement.
 enum MovementType { kUp = 0, kDown = 1, kLeft = 2, kRight = 3, kStand = 4 };
 
-// Chance outcomes.
-enum ChanceOutcome {
-  kChanceLoc1 = 0,
-  kChanceLoc2 = 1,
-  kChanceInit1 = 2,
-  kChanceInit2 = 3
-};
+constexpr int kNumMovementActions = 5;
 
 constexpr std::array<int, 5> row_offsets = {{-1, 1, 0, 0, 0}};
 constexpr std::array<int, 5> col_offsets = {{0, 0, -1, 1, 0}};
 }  // namespace
 
-MarkovSoccerState::MarkovSoccerState(std::shared_ptr<const Game> game)
-    : SimMoveState(game) {}
+MarkovSoccerState::MarkovSoccerState(std::shared_ptr<const Game> game,
+                                     const Grid& grid)
+    : SimMoveState(game), grid_(grid) {}
 
 std::string MarkovSoccerState::ActionToString(Player player,
                                               Action action_id) const {
   if (player == kSimultaneousPlayerId)
     return FlatJointActionToString(action_id);
   SPIEL_CHECK_GE(action_id, 0);
-  SPIEL_CHECK_LT(action_id, 5);
 
   std::string result = "";
   if (player == kChancePlayerId) {
+    SPIEL_CHECK_LT(action_id, game_->MaxChanceOutcomes());
+
     // Chance moves.
-    if (action_id == kChanceLoc1) {
-      result = "(ball at 1,2)";
-    } else if (action_id == kChanceLoc2) {
-      result = "(ball at 2,2)";
-    } else if (action_id == kChanceInit1) {
+    if (action_id == kChanceInit0Action) {
       result = "(A's action first)";
-    } else if (action_id == kChanceInit2) {
+    } else if (action_id == kChanceInit1Action) {
       result = "(B's action first)";
+    } else {
+      int ball_loc = action_id - kNumInitiativeChanceOutcomes;
+      return absl::StrCat("(ball at ", grid_.ball_start_points[ball_loc].first,
+                          ",", grid_.ball_start_points[ball_loc].second, ")");
     }
   } else {
+    SPIEL_CHECK_LT(action_id, game_->NumDistinctActions());
+
+    // Regular move actions.
     if (action_id == kUp) {
       result = "up";
     } else if (action_id == kDown) {
@@ -112,7 +119,7 @@ std::string MarkovSoccerState::ActionToString(Player player,
 }
 
 void MarkovSoccerState::SetField(int r, int c, char v) {
-  field_[r * kCols + c] = v;
+  field_[r * grid_.num_cols + c] = v;
 
   if (v == 'a' || v == 'A') {
     player_row_[0] = r;
@@ -129,15 +136,15 @@ void MarkovSoccerState::SetField(int r, int c, char v) {
 }
 
 char MarkovSoccerState::field(int r, int c) const {
-  return field_[r * kCols + c];
+  return field_[r * grid_.num_cols + c];
 }
 
 void MarkovSoccerState::Reset(int horizon) {
   horizon_ = horizon;
-  field_.resize(kRows * kCols, '.');
+  field_.resize(grid_.num_rows * grid_.num_cols, '.');
 
-  SetField(2, 1, 'a');
-  SetField(1, 3, 'b');
+  SetField(grid_.a_start.first, grid_.a_start.second, 'a');
+  SetField(grid_.b_start.first, grid_.b_start.second, 'b');
 
   cur_player_ = kChancePlayerId;
   winner_ = kInvalidPlayer;
@@ -155,7 +162,7 @@ void MarkovSoccerState::DoApplyActions(const std::vector<Action>& moves) {
 }
 
 bool MarkovSoccerState::InBounds(int r, int c) const {
-  return (r >= 0 && c >= 0 && r < kRows && c < kCols);
+  return (r >= 0 && c >= 0 && r < grid_.num_rows && c < grid_.num_cols);
 }
 
 void MarkovSoccerState::ResolveMove(Player player, int move) {
@@ -169,7 +176,7 @@ void MarkovSoccerState::ResolveMove(Player player, int move) {
   if (!InBounds(new_row, new_col)) {
     // Check, this is a goal? If so, set the winner.
     if (from_piece == 'A' && (new_row == 1 || new_row == 2) &&
-        (new_col == kCols)) {
+        (new_col == grid_.num_cols)) {
       SetField(old_row, old_col, '.');
       winner_ = 0;
     } else if (from_piece == 'B' && (new_row == 1 || new_row == 2) &&
@@ -224,18 +231,18 @@ void MarkovSoccerState::DoApplyAction(Action action_id) {
   }
   SPIEL_CHECK_TRUE(IsChanceNode());
   SPIEL_CHECK_GE(action_id, 0);
-  SPIEL_CHECK_LT(action_id, 4);
+  SPIEL_CHECK_LT(action_id, game_->MaxChanceOutcomes());
 
-  if (action_id == 0) {
-    SetField(1, 2, 'O');
-  } else if (action_id == 1) {
-    SetField(2, 2, 'O');
-  } else if (action_id == 2) {
+  if (action_id == kChanceInit0Action) {
     ResolveMove(1, moves_[0]);
     ResolveMove(2, moves_[1]);
-  } else if (action_id == 3) {
+  } else if (action_id == kChanceInit1Action) {
     ResolveMove(2, moves_[1]);
     ResolveMove(1, moves_[0]);
+  } else {
+    int ball_loc = action_id - kNumInitiativeChanceOutcomes;
+    SetField(grid_.ball_start_points[ball_loc].first,
+             grid_.ball_start_points[ball_loc].second, 'O');
   }
 
   cur_player_ = kSimultaneousPlayerId;
@@ -246,9 +253,15 @@ std::vector<Action> MarkovSoccerState::LegalActions(Player player) const {
   if (IsTerminal()) return {};
   if (IsChanceNode()) {
     if (total_moves_ == 0) {
-      return {kChanceLoc1, kChanceLoc2};
+      std::vector<Action> outcomes(grid_.ball_start_points.size(),
+                                   kInvalidAction);
+      for (int i = 0; i < grid_.ball_start_points.size(); ++i) {
+        outcomes[i] = kNumInitiativeChanceOutcomes + i;
+      }
+      return outcomes;
     } else {
-      return {kChanceInit1, kChanceInit2};
+      return {ToAction(ChanceOutcome::kChanceInit0),
+              ToAction(ChanceOutcome::kChanceInit1)};
     }
   } else {
     return {kUp, kDown, kLeft, kRight, kStand};
@@ -259,19 +272,25 @@ std::vector<std::pair<Action, double>> MarkovSoccerState::ChanceOutcomes()
     const {
   SPIEL_CHECK_TRUE(IsChanceNode());
   if (total_moves_ == 0) {
-    return {std::pair<Action, double>(kChanceLoc1, 0.5),
-            std::pair<Action, double>(kChanceLoc2, 0.5)};
+    std::vector<std::pair<Action, double>> outcomes(
+        grid_.ball_start_points.size(), {kInvalidAction, -1.0});
+    const double unif_prob = 1.0 / outcomes.size();
+    for (int i = 0; i < grid_.ball_start_points.size(); ++i) {
+      outcomes[i] = {kNumInitiativeChanceOutcomes + i, unif_prob};
+    }
+    return outcomes;
   } else {
-    return {std::pair<Action, double>(kChanceInit1, 0.5),
-            std::pair<Action, double>(kChanceInit2, 0.5)};
+    return {
+        std::pair<Action, double>(ToAction(ChanceOutcome::kChanceInit0), 0.5),
+        std::pair<Action, double>(ToAction(ChanceOutcome::kChanceInit1), 0.5)};
   }
 }
 
 std::string MarkovSoccerState::ToString() const {
   std::string result = "";
 
-  for (int r = 0; r < kRows; r++) {
-    for (int c = 0; c < kCols; c++) {
+  for (int r = 0; r < grid_.num_rows; r++) {
+    for (int c = 0; c < grid_.num_cols; c++) {
       result += field(r, c);
     }
 
@@ -333,15 +352,14 @@ void MarkovSoccerState::InformationStateAsNormalizedVector(
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  values->resize(game_->InformationStateNormalizedVectorSize());
-  std::fill(values->begin(), values->end(), 0.);
-  int plane_size = kRows * kCols;
+  TensorView<3> view(values, {kCellStates, grid_.num_rows, grid_.num_cols},
+                     true);
 
-  for (int r = 0; r < kRows; r++) {
-    for (int c = 0; c < kCols; c++) {
+  for (int r = 0; r < grid_.num_rows; r++) {
+    for (int c = 0; c < grid_.num_cols; c++) {
       int plane = observation_plane(r, c);
       SPIEL_CHECK_TRUE(plane >= 0 && plane < kCellStates);
-      (*values)[plane * plane_size + r * kCols + c] = 1.0;
+      view[{plane, r, c}] = 1.0;
     }
   }
 }
@@ -352,18 +370,73 @@ std::unique_ptr<State> MarkovSoccerState::Clone() const {
 
 std::unique_ptr<State> MarkovSoccerGame::NewInitialState() const {
   std::unique_ptr<MarkovSoccerState> state(
-      new MarkovSoccerState(shared_from_this()));
+      new MarkovSoccerState(shared_from_this(), grid_));
   state->Reset(ParameterValue<int>("horizon"));
   return state;
 }
 
+int MarkovSoccerGame::NumDistinctActions() const { return kNumMovementActions; }
+
+int MarkovSoccerGame::MaxChanceOutcomes() const {
+  // First two for determining initiative, next n for spawn point locations,
+  // where n is equal to the number of spawn points.
+  return kNumInitiativeChanceOutcomes + grid_.ball_start_points.size();
+}
+
 std::vector<int> MarkovSoccerGame::InformationStateNormalizedVectorShape()
     const {
-  return {kCellStates, kRows, kCols};
+  return {kCellStates, grid_.num_rows, grid_.num_cols};
 }
+
+namespace {
+Grid ParseGrid(const std::string& grid_string) {
+  Grid grid{/*num_rows=*/0, /*num_cols=*/0};
+  int row = 0;
+  int col = 0;
+  int count_empty_cells = 0;
+  bool a_set = false;
+  bool b_set = false;
+  for (auto c : grid_string) {
+    if (c == '\n') {
+      row += 1;
+      col = 0;
+    } else {
+      if (row >= grid.num_rows) grid.num_rows = row + 1;
+      if (col >= grid.num_cols) grid.num_cols = col + 1;
+      if (c == 'O') {
+        grid.ball_start_points.emplace_back(row, col);
+      } else if (c == 'A') {
+        if (a_set == true) {
+          SpielFatalError("Can only have one A in grid.");
+        }
+        grid.a_start = {row, col};
+        a_set = true;
+      } else if (c == 'B') {
+        if (b_set == true) {
+          SpielFatalError("Can only have one B in grid.");
+        }
+        grid.b_start = {row, col};
+        b_set = true;
+      } else if (c == '.') {
+        ++count_empty_cells;
+      } else {
+        SpielFatalError(absl::StrCat("Invalid char '", std::string(1, c),
+                                     "' at grid (", row, ",", col, ")"));
+      }
+      col += 1;
+    }
+  }
+  // Must have at least one ball starting location.
+  SPIEL_CHECK_GE(grid.ball_start_points.size(), 0);
+  SPIEL_CHECK_EQ(grid.num_rows * grid.num_cols,
+                 count_empty_cells + grid.ball_start_points.size() + 2);
+  return grid;
+}
+}  // namespace
 
 MarkovSoccerGame::MarkovSoccerGame(const GameParameters& params)
     : SimMoveGame(kGameType, params),
+      grid_(ParseGrid(ParameterValue<std::string>("grid"))),
       horizon_(ParameterValue<int>("horizon")) {}
 
 }  // namespace markov_soccer

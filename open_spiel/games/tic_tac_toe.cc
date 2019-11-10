@@ -20,6 +20,7 @@
 #include <vector>
 
 #include "open_spiel/spiel_utils.h"
+#include "open_spiel/tensor_view.h"
 
 namespace open_spiel {
 namespace tic_tac_toe {
@@ -79,7 +80,11 @@ std::string StateToString(CellState state) {
 void TicTacToeState::DoApplyAction(Action move) {
   SPIEL_CHECK_EQ(board_[move], CellState::kEmpty);
   board_[move] = PlayerToState(CurrentPlayer());
+  if (HasLine(current_player_)) {
+    outcome_ = current_player_;
+  }
   current_player_ = 1 - current_player_;
+  num_moves_ += 1;
 }
 
 std::vector<Action> TicTacToeState::LegalActions() const {
@@ -113,10 +118,7 @@ bool TicTacToeState::HasLine(Player player) const {
 }
 
 bool TicTacToeState::IsFull() const {
-  for (int cell = 0; cell < kNumCells; ++cell) {
-    if (board_[cell] == CellState::kEmpty) return false;
-  }
-  return true;
+  return num_moves_ == kNumCells;
 }
 
 TicTacToeState::TicTacToeState(std::shared_ptr<const Game> game) : State(game) {
@@ -137,13 +139,13 @@ std::string TicTacToeState::ToString() const {
 }
 
 bool TicTacToeState::IsTerminal() const {
-  return HasLine(0) || HasLine(1) || IsFull();
+  return outcome_ != kInvalidPlayer || IsFull();
 }
 
 std::vector<double> TicTacToeState::Returns() const {
-  if (HasLine(0)) {
+  if (outcome_ == Player{0}) {
     return {1.0, -1.0};
-  } else if (HasLine(1)) {
+  } else if (outcome_ == Player{1}) {
     return {-1.0, 1.0};
   } else {
     return {0.0, 0.0};
@@ -165,16 +167,18 @@ void TicTacToeState::ObservationAsNormalizedVector(
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  values->resize(kNumCells * kCellStates);
-  std::fill(values->begin(), values->end(), 0.);
+  // Treat `values` as a 2-d tensor.
+  TensorView<2> view(values, {kCellStates, kNumCells}, true);
   for (int cell = 0; cell < kNumCells; ++cell) {
-    (*values)[kNumCells * static_cast<int>(board_[cell]) + cell] = 1.0;
+    view[{static_cast<int>(board_[cell]), cell}] = 1.0;
   }
 }
 
 void TicTacToeState::UndoAction(Player player, Action move) {
   board_[move] = CellState::kEmpty;
   current_player_ = player;
+  outcome_ = kInvalidPlayer;
+  num_moves_ -= 1;
   history_.pop_back();
 }
 

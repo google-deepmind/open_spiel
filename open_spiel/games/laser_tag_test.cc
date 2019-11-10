@@ -23,31 +23,52 @@ namespace {
 
 namespace testing = open_spiel::testing;
 
+// Spawn location values for the default map only.
+constexpr int kTopLeftSpawnOutcome = kNumInitiativeChanceOutcomes;
+constexpr int kTopRightSpawnOutcome = kNumInitiativeChanceOutcomes + 1;
+
 void BasicLaserTagTests() {
   testing::LoadGameTest("laser_tag");
   testing::ChanceOutcomesTest(*LoadGame("laser_tag"));
   testing::RandomSimTest(*LoadGame("laser_tag"), 100);
 }
 
-void SimpleTagTests(int horizon, bool zero_sum) {
+void SimpleTagTests(int horizon, bool zero_sum, std::string grid) {
   std::shared_ptr<const Game> game =
       LoadGame("laser_tag", {{"horizon", GameParameter(horizon)},
-                             {"zero_sum", GameParameter(zero_sum)}});
+                             {"zero_sum", GameParameter(zero_sum)},
+                             {"grid", GameParameter(grid)}});
   std::unique_ptr<State> state = game->NewInitialState();
   SPIEL_CHECK_TRUE(state->IsChanceNode());
-  state->ApplyAction(1);  // Spawn B top-right
+  state->ApplyAction(kTopRightSpawnOutcome);  // Spawn B top-right
   SPIEL_CHECK_TRUE(state->IsChanceNode());
-  state->ApplyAction(0);  // Spawn A top-left
+  state->ApplyAction(kTopLeftSpawnOutcome);  // Spawn A top-left
 
   // Both facing south
   SPIEL_CHECK_FALSE(state->IsChanceNode());
   state->ApplyActions({0, 1});  // A: Turn left, B: Turn right.
   SPIEL_CHECK_TRUE(state->IsChanceNode());
-  state->ApplyAction(4);  // chance node: player 0 resolved first
+  state->ApplyAction(kChanceInit0Action);  // chance node: player 0 first
+
+  SPIEL_CHECK_FALSE(state->IsChanceNode());
+  state->ApplyActions({6, 1});  // A: Stand, B: Turn right.
+  SPIEL_CHECK_TRUE(state->IsChanceNode());
+  state->ApplyAction(kChanceInit0Action);  // chance node: player 0 first
+
+  SPIEL_CHECK_FALSE(state->IsChanceNode());
+  state->ApplyActions({6, 2});  // A: Stand, B: Move forward.
+  SPIEL_CHECK_TRUE(state->IsChanceNode());
+  state->ApplyAction(kChanceInit0Action);  // chance node: player 0 first
+
+  SPIEL_CHECK_FALSE(state->IsChanceNode());
+  state->ApplyActions({6, 0});  // A: Stand, B: Turn left.
+  SPIEL_CHECK_TRUE(state->IsChanceNode());
+  state->ApplyAction(kChanceInit0Action);  // chance node: player 0 first
+
   SPIEL_CHECK_FALSE(state->IsChanceNode());
   state->ApplyActions({9, 9});  // stand-off!
   SPIEL_CHECK_TRUE(state->IsChanceNode());
-  state->ApplyAction(5);  // chance node: player 1 ('B') resolves first
+  state->ApplyAction(kChanceInit1Action);  // chance node: player 1 first
 
   std::cout << state->ToString() << std::endl;
 
@@ -71,14 +92,14 @@ void SimpleTagTests(int horizon, bool zero_sum) {
 
   // horizon > 0, continue... do it again!
   SPIEL_CHECK_TRUE(state->IsChanceNode());
-  state->ApplyAction(0);  // Spawn A at top-left again
+  state->ApplyAction(kTopLeftSpawnOutcome);  // Spawn A at top-left again
   SPIEL_CHECK_FALSE(state->IsChanceNode());
   state->ApplyActions({9, 9});  // stand-off!
   SPIEL_CHECK_TRUE(state->IsChanceNode());
-  state->ApplyAction(4);  // chance node: player 0 ('A') resolves first
+  state->ApplyAction(kChanceInit0Action);  // chance node: player 0 first
   SPIEL_CHECK_FALSE(state->IsTerminal());
   SPIEL_CHECK_TRUE(state->IsChanceNode());
-  state->ApplyAction(1);  // Spawn B at top-right again
+  state->ApplyAction(kTopRightSpawnOutcome);  // Spawn B at top-right again
   SPIEL_CHECK_FALSE(state->IsChanceNode());
 
   // Immediate tag reward goes to player 0.
@@ -91,14 +112,37 @@ void SimpleTagTests(int horizon, bool zero_sum) {
   SPIEL_CHECK_EQ(state->PlayerReturn(1), zero_sum ? 0 : 1);
 }
 
+void BasicLaserTagTestsBigGrid() {
+  constexpr const char big_grid[] =
+      ".....S................\n"
+      "S..***....*.....S**...\n"
+      "...*S..****...*......*\n"
+      ".......*S.**..*...****\n"
+      "..**...*......*......*\n"
+      "..S....*......**....**\n"
+      "**....***.....*S....**\n"
+      "S......*.....**......S\n"
+      "*...*........S**......\n"
+      "**..**....**........**\n"
+      "*....................S\n";
+  testing::ChanceOutcomesTest(
+      *LoadGame("laser_tag", {{"grid", GameParameter(std::string(big_grid))}}));
+  testing::RandomSimTest(
+      *LoadGame("laser_tag", {{"grid", GameParameter(std::string(big_grid))}}),
+      10);
+}
+
 }  // namespace
 }  // namespace laser_tag
 }  // namespace open_spiel
 
+namespace laser_tag = open_spiel::laser_tag;
+
 int main(int argc, char **argv) {
-  open_spiel::laser_tag::SimpleTagTests(-1, true);
-  open_spiel::laser_tag::SimpleTagTests(-1, false);
-  open_spiel::laser_tag::SimpleTagTests(1000, true);
-  open_spiel::laser_tag::SimpleTagTests(1000, false);
-  open_spiel::laser_tag::BasicLaserTagTests();
+  laser_tag::SimpleTagTests(-1, true, laser_tag::kDefaultGrid);
+  laser_tag::SimpleTagTests(-1, false, laser_tag::kDefaultGrid);
+  laser_tag::SimpleTagTests(1000, true, laser_tag::kDefaultGrid);
+  laser_tag::SimpleTagTests(1000, false, laser_tag::kDefaultGrid);
+  laser_tag::BasicLaserTagTests();
+  laser_tag::BasicLaserTagTestsBigGrid();
 }

@@ -189,92 +189,6 @@ void TestHistoryContainsActions(const Game& game,
   }
 }
 
-// Run a random game with no additional verifications. Meant for benchmarking.
-int RandomSimulationFast(std::mt19937* rng, const Game& game, bool verbose) {
-  std::unique_ptr<open_spiel::State> state = game.NewInitialState();
-
-  if (verbose) {
-    std::cout << "Initial state:" << std::endl
-              << "State:" << std::endl
-              << state->ToString() << std::endl;
-  }
-
-  int game_length = 0;
-  while (!state->IsTerminal()) {
-    ++game_length;
-    if (state->IsChanceNode()) {
-      // Chance node; sample one according to underlying distribution
-      std::vector<std::pair<Action, double>> outcomes = state->ChanceOutcomes();
-      Action action = open_spiel::SampleChanceOutcome(
-          outcomes, std::uniform_real_distribution<double>(0.0, 1.0)(*rng));
-      if (verbose) {
-        std::cout << "Sampled outcome: "
-                  << state->ActionToString(kChancePlayerId, action)
-                  << std::endl;
-      }
-      state->ApplyAction(action);
-    } else if (state->CurrentPlayer() == open_spiel::kSimultaneousPlayerId) {
-      // Sample an action for each player
-      std::vector<Action> joint_action;
-      for (int p = 0; p < game.NumPlayers(); p++) {
-        std::vector<Action> actions;
-        actions = state->LegalActions(p);
-        std::uniform_int_distribution<int> dis(0, actions.size() - 1);
-        Action action = actions[dis(*rng)];
-        joint_action.push_back(action);
-        if (verbose) {
-          std::cout << "Player " << p
-                    << " chose action:" << state->ActionToString(p, action)
-                    << std::endl;
-        }
-      }
-      state->ApplyActions(joint_action);
-    } else {
-      // Sample an action uniformly.
-      std::vector<Action> actions = state->LegalActions();
-      std::uniform_int_distribution<int> dis(0, actions.size() - 1);
-      Action action = actions[dis(*rng)];
-      if (verbose) {
-        int p = state->CurrentPlayer();
-        std::cout << "Player " << p
-                  << " chose action: " << state->ActionToString(p, action)
-                  << std::endl;
-      }
-      state->ApplyAction(action);
-    }
-    if (verbose) {
-      std::cout << "State: " << std::endl << state->ToString() << std::endl;
-    }
-  }
-  return game_length;
-}
-
-// Perform num_sims random simulations of the specified game, and output the
-// time taken.
-void RandomSimBenchmark(const std::string& game_def, int num_sims,
-                        bool verbose) {
-  std::mt19937 rng;
-  std::cout << "RandomSimBenchmark, game = " << game_def
-            << ", num_sims = " << num_sims << ". ";
-
-  auto game = LoadGame(game_def);
-
-  absl::Time start = absl::Now();
-  int num_moves = 0;
-  for (int sim = 0; sim < num_sims; ++sim) {
-    num_moves += RandomSimulationFast(&rng, *game, verbose);
-  }
-  absl::Time end = absl::Now();
-  double seconds = absl::ToDoubleSeconds(end - start);
-
-  int default_precision = std::cout.precision();
-  std::cout.precision(1);
-  std::cout << std::fixed << "Finished in " << (seconds * 1000) << " ms, "
-            << (num_sims / seconds) << " sims/s, " << (num_moves / seconds)
-            << " moves/s" << std::defaultfloat << std::endl;
-  std::cout.precision(default_precision);  // Reset.
-}
-
 void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
                       bool serialize) {
   std::vector<HistoryItem> history;
@@ -323,8 +237,10 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
     if (state->IsChanceNode()) {
       // Chance node; sample one according to underlying distribution
       std::vector<std::pair<Action, double>> outcomes = state->ChanceOutcomes();
-      Action action = open_spiel::SampleChanceOutcome(
-          outcomes, std::uniform_real_distribution<double>(0.0, 1.0)(*rng));
+      Action action =
+          open_spiel::SampleChanceOutcome(
+              outcomes, std::uniform_real_distribution<double>(0.0, 1.0)(*rng))
+              .first;
 
       std::cout << "sampled outcome: "
                 << state->ActionToString(kChancePlayerId, action) << std::endl;
@@ -348,8 +264,7 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
 
       // Sample an action for each player
       for (auto p = Player{0}; p < game.NumPlayers(); p++) {
-        std::vector<Action> actions;
-        actions = state->LegalActions(p);
+        std::vector<Action> actions = state->LegalActions(p);
         std::uniform_int_distribution<int> dis(0, actions.size() - 1);
         Action action = actions[dis(*rng)];
         joint_action.push_back(action);
@@ -363,15 +278,15 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
 
         // Check the information state, if supported.
         if (infostate_vector_size > 0) {
-          std::vector<double> infostate_vector;
-          state->InformationStateAsNormalizedVector(p, &infostate_vector);
+          std::vector<double> infostate_vector =
+              state->InformationStateAsNormalizedVector(p);
           SPIEL_CHECK_EQ(infostate_vector.size(), infostate_vector_size);
         }
 
         // Check the observation state vector, if supported.
         if (observation_vector_size > 0) {
-          std::vector<double> obs_vector;
-          state->ObservationAsNormalizedVector(p, &obs_vector);
+          std::vector<double> obs_vector =
+              state->ObservationAsNormalizedVector(p);
           SPIEL_CHECK_EQ(obs_vector.size(), observation_vector_size);
         }
       }
@@ -391,15 +306,15 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
 
       // First, check the information state vector, if supported.
       if (infostate_vector_size > 0) {
-        std::vector<double> infostate_vector;
-        state->InformationStateAsNormalizedVector(player, &infostate_vector);
+        std::vector<double> infostate_vector =
+            state->InformationStateAsNormalizedVector(player);
         SPIEL_CHECK_EQ(infostate_vector.size(), infostate_vector_size);
       }
 
       // Check the observation state vector, if supported.
       if (observation_vector_size > 0) {
-        std::vector<double> obs_vector;
-        state->ObservationAsNormalizedVector(player, &obs_vector);
+        std::vector<double> obs_vector =
+            state->ObservationAsNormalizedVector(player);
         SPIEL_CHECK_EQ(obs_vector.size(), observation_vector_size);
       }
 
@@ -443,8 +358,8 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
   // for example, as a final observation in an RL environment.
   for (auto p = Player{0}; p < game.NumPlayers(); p++) {
     if (infostate_vector_size > 0) {
-      std::vector<double> infostate_vector;
-      state->InformationStateAsNormalizedVector(p, &infostate_vector);
+      std::vector<double> infostate_vector =
+          state->InformationStateAsNormalizedVector(p);
       SPIEL_CHECK_EQ(infostate_vector.size(), infostate_vector_size);
     }
   }

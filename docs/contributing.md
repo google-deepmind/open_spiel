@@ -83,10 +83,6 @@ release!). Contributions are certainly not limited to these suggestions!
     Preferably, an implementation that closely matches the pseudo-code provided
     in the paper.
 
--   **Baselines for Monte Carlo CFR**. Implementations of the variance-reduction
-    techniques for MCCFR ([Ref1](https://arxiv.org/abs/1809.03057),
-    [Ref2](https://arxiv.org/abs/1907.09633)).
-
 -   **Checkers / Draughts**. This is a classic game and an important one in the
     history of game AI
     (["Checkers is solved"](https://science.sciencemag.org/content/317/5844/1518)).

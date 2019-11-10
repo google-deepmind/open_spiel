@@ -267,6 +267,7 @@ void BackgammonState::InformationStateAsNormalizedVector(
   SPIEL_CHECK_LE(player, 1);
   int opponent = Opponent(player);
   values->clear();
+  values->reserve(game_->InformationStateNormalizedVectorSize());
   // The format of this vector is described in Section 3.4 of "G. Tesauro,
   // Practical issues in temporal-difference learning, 1994."
   // https://link.springer.com/article/10.1007/BF00992697

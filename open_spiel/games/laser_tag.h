@@ -29,7 +29,6 @@
 //
 // TODO:
 //   - implement partial observability (option for first-person observations)
-//   - generalize the implementation to allow any arbitrary map
 //
 // [1] Leibo et al. Multi-agent Reinforcement Learning in Sequential Social
 //     Dilemmas. https://arxiv.org/abs/1702.03037
@@ -43,15 +42,42 @@
 //       "zero_sum"   bool    If set, rewards are +1 for a tag and -1 for being
 //                            tagged. Otherwise, there there is only positive
 //                            reward of +1 per tag. (default = false).
+//       "grid"       string  String representation of grid.
+//                            Empty spaces are '.', obstacles are '*', spawn
+//                            points are 'S' (there must be four of these).
 
 namespace open_spiel {
 namespace laser_tag {
 
-class LaserTagGame;
+inline constexpr char kDefaultGrid[] =
+    "S.....S\n"
+    ".......\n"
+    "..*.*..\n"
+    ".**.**.\n"
+    "..*.*..\n"
+    ".......\n"
+    "S.....S";
+
+struct Grid {
+  int num_rows;
+  int num_cols;
+  std::vector<std::pair<int, int>> obstacles;
+  std::vector<std::pair<int, int>> spawn_points;
+};
+
+// Number of chance outcomes reserved for "initiative" (learning which player's
+// action gets resolved first).
+inline constexpr int kNumInitiativeChanceOutcomes = 2;
+
+// Reserved chance outcomes for initiative. The ones following these are to
+// determine spawn point locations.
+inline constexpr Action kChanceInit0Action = 0;
+inline constexpr Action kChanceInit1Action = 1;
+enum class ChanceOutcome { kChanceInit0, kChanceInit1 };
 
 class LaserTagState : public SimMoveState {
  public:
-  explicit LaserTagState(std::shared_ptr<const Game> game);
+  explicit LaserTagState(std::shared_ptr<const Game> game, const Grid& grid);
   LaserTagState(const LaserTagState&) = default;
 
   std::string ActionToString(int player, Action action_id) const override;
@@ -87,6 +113,8 @@ class LaserTagState : public SimMoveState {
   bool InBounds(int r, int c) const;
   int observation_plane(int r, int c) const;
 
+  const Grid& grid_;
+
   // Fields set to bad values. Use Game::NewInitialState().
   int num_tags_ = 0;
   int cur_player_ = -1;  // Could be chance's turn.
@@ -108,9 +136,9 @@ class LaserTagState : public SimMoveState {
 class LaserTagGame : public SimMoveGame {
  public:
   explicit LaserTagGame(const GameParameters& params);
-  int NumDistinctActions() const override { return 5; }
+  int NumDistinctActions() const override;
   std::unique_ptr<State> NewInitialState() const override;
-  int MaxChanceOutcomes() const override { return 4; }
+  int MaxChanceOutcomes() const override;
   int NumPlayers() const override { return 2; }
   double MinUtility() const override;
   double MaxUtility() const override;
@@ -122,6 +150,7 @@ class LaserTagGame : public SimMoveGame {
   int MaxGameLength() const override { return horizon_; }
 
  private:
+  Grid grid_;
   int horizon_;
   bool zero_sum_;
 };

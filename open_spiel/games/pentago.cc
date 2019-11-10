@@ -19,6 +19,8 @@
 #include <utility>
 #include <vector>
 
+#include "open_spiel/tensor_view.h"
+
 namespace open_spiel {
 namespace pentago {
 namespace {
@@ -239,10 +241,9 @@ void PentagoState::ObservationAsNormalizedVector(
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  std::fill(values->begin(), values->end(), 0.);
-  values->resize(kBoardPositions * kCellStates, 0.);
+  TensorView<2> view(values, {kCellStates, kBoardPositions}, true);
   for (int i = 0; i < kBoardPositions; i++) {
-    (*values)[kBoardPositions * static_cast<int>(get(i)) + i] = 1.0;
+    view[{static_cast<int>(get(i)), i}] = 1.0;
   }
 }
 

@@ -378,6 +378,7 @@ void GoofspielState::InformationStateAsNormalizedVector(
   SPIEL_CHECK_LT(player, num_players_);
 
   values->clear();
+  values->reserve(game_->InformationStateNormalizedVectorSize());
 
   // 1-hot vector for the observing player.
   for (auto p = Player{0}; p < num_players_; ++p) {

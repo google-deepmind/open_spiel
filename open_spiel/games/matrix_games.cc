@@ -77,6 +77,37 @@ std::shared_ptr<const Game> Factory(const GameParameters& params) {
 REGISTER_SPIEL_GAME(kGameType, Factory);
 }  // namespace rock_paper_scissors
 
+// Rock, Paper, Scissors, Water: a variant of RPS by Martin Schmid which adds
+// an action to both players that always gives, adding a pure equilibrium to the
+// game.
+namespace rock_paper_scissors_water {
+// Facts about the game
+const GameType kGameType{
+    /*short_name=*/"matrix_rpsw",
+    /*long_name=*/"Rock, Paper, Scissors, Water",
+    GameType::Dynamics::kSimultaneous,
+    GameType::ChanceMode::kDeterministic,
+    GameType::Information::kOneShot,
+    GameType::Utility::kZeroSum,
+    GameType::RewardModel::kTerminal,
+    /*max_num_players=*/2,
+    /*min_num_players=*/2,
+    /*provides_information_state=*/true,
+    /*provides_information_state_as_normalized_vector=*/true,
+    /*parameter_specification=*/{}  // no parameters
+};
+
+std::shared_ptr<const Game> Factory(const GameParameters& params) {
+  return std::shared_ptr<const Game>(
+      new MatrixGame(kGameType, params, {"Rock", "Paper", "Scissors", "Water"},
+                     {"Rock", "Paper", "Scissors", "Water"},
+                     {0, -1, 1, 0, 1, 0, -1, 0, -1, 1, 0, 0, 0, 0, 0, 0},
+                     {0, 1, -1, 0, -1, 0, 1, 0, 1, -1, 0, 0, 0, 0, 0, 0}));
+}
+
+REGISTER_SPIEL_GAME(kGameType, Factory);
+}  // namespace rock_paper_scissors_water
+
 // A general-sum variant of Rock, Paper, Scissors. Often used as a
 // counter-example for certain learning dynamics, such as ficitions play.
 // See Chapter 7 of (Shoham and Leyton-Brown, Multiagent Systems Algorithmic,

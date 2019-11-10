@@ -400,6 +400,13 @@ class State {
 
   virtual std::vector<double> ObservationAsNormalizedVector(
       Player player) const {
+    // We add this player check, to prevent errors if the game implementation
+    // lacks that check (in particular as this function is the one used in
+    // Python). This can lead to doing this check twice.
+    // TODO(author2): Do we want to prevent executing this twice for games
+    // that implement it?
+    SPIEL_CHECK_GE(player, 0);
+    SPIEL_CHECK_LT(player, num_players_);
     std::vector<double> normalized_observation;
     ObservationAsNormalizedVector(player, &normalized_observation);
     return normalized_observation;
@@ -716,8 +723,9 @@ std::shared_ptr<const Game> LoadGame(GameParameters params);
 // Used to sample a policy. Can also sample from chance outcomes.
 // Probabilities of the actions must sum to 1.
 // The parameter z should be a sample from a uniform distribution on the range
-// [0, 1).
-Action SampleChanceOutcome(const ActionsAndProbs& outcomes, double z);
+// [0, 1). Returns the sampled action and its probability.
+std::pair<Action, double> SampleChanceOutcome(const ActionsAndProbs& outcomes,
+                                              double z);
 
 // Serialize the game and the state into one self-contained string that can
 // be reloaded via open_spiel::DeserializeGameAndState.
