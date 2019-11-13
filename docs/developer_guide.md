@@ -75,3 +75,33 @@ ideal to first be aware of the general API (see `spiel.h`).
         random games, to be used by integration tests to prevent any regression.
         `open_spiel/integration_tests/playthrough_test.py` will automatically
         load the playthroughs and compare them to newly generated playthroughs.
+
+## Conditional dependencies
+
+The goal is to make it possible to optionally include external dependencies and
+build against them. The setup was designed to met the following needs:
+
+-   **Single source of truth**: We want a single action to be sufficient to
+    manage the conditional install and build. Thus, we use bash environment
+    variables, that are read both by the install script (`install.sh`) to know
+    whether we should clone the dependency, and by CMake to know whether we
+    should include the files in the target. Tests can also access the bash
+    environment variable.
+-   **Light and safe defaults**: By default, we exclude the dependencies to
+    diminish install time and compilation time. If the bash variable is unset,
+    we download the dependency and we do not build against it.
+-   **Respect the user-defined values**: The `global_variables.sh` script, which
+    is included in all the scripts that needs to access the constant values, do
+    not override the constants but set them if and only if they are undefined.
+    This respects the user-defined values, e.g. on their `.bashrc` or on the
+    command line.
+
+When you add a new conditional dependency, you need to touch:
+
+-   the root CMakeLists.txt to add the option, with an OFF default
+-   add the option to `scripts/global_variables.sh`
+-   set the option to "ON" in `.travis.yml` for the "All dependencies"
+    integration test.
+-   change `install.sh` to make sure the dependency is installed
+-   use constructs like `if (${BUILD_WITH_HANABI})` in CMake to optionally add
+    the targets to build.

@@ -26,14 +26,8 @@
 // can be found here: https://github.com/deepmind/hanabi-learning-environment
 //
 // Since Hanabi relies on an (optional) external dependency, it is not included
-// in the list of compiled games by default. To enable it, follow these steps:
-//   1. git clone the Hanabi Learning Environment above (e.g. in $HOME)
-//   2. Set the path of HANABI_HOME in games/hanabi/CMakeLists.txt
-//   3. Uncomment hanabi.cc, hanabi.h, and the add_subdirectory (hanabi) in
-//      games/CMakeLists.txt
-//   4. Uncomment the $<TARGET_OBJECTS:hanabi_learning_environment> in the
-//      top-level CMakeLists.txt
-//   5. Enjoy the fireworks!
+// in the list of compiled games by default. To enable it, read `install.md`
+// (TLDR: Set the environment variable BUILD_WITH_HANABI to ON).
 
 #include <memory>
 

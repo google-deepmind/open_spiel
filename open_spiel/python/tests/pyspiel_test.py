@@ -18,6 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import os
 from absl.testing import absltest
 import six
 
@@ -31,7 +32,7 @@ class PyspielTest(absltest.TestCase):
     game_names = pyspiel.registered_names()
 
     # Specify game names in alphabetical order, to make the test easier to read.
-    expected = [
+    expected = set([
         "backgammon",
         "blotto",
         "breakthrough",
@@ -74,7 +75,10 @@ class PyspielTest(absltest.TestCase):
         "tiny_hanabi",
         "turn_based_simultaneous_game",
         "y",
-    ]
+    ])
+    if os.environ.get("BUILD_WITH_HANABI", "OFF") == "ON":
+      expected.add("hanabi")
+    expected = sorted(list(expected))
     self.assertCountEqual(game_names, expected)
 
   def test_no_mandatory_parameters(self):

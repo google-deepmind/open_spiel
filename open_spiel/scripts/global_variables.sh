@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
 #
@@ -14,17 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-set -e
-set -x
+# Generates a playthrough for a new game with optional parameters.
+# This script exists mainly as a reminder for the command to run.
 
-virtualenv -p python ./venv
-source ./venv/bin/activate
+# This file contains the global variables that control conditional dependencies.
+# It is being used to know whether we should:
+# (a) download a dependency (done in install.sh)
+# (b) build it and link against it during the `cmake` build process
+#
+# Note that we do not change the value of the constants if they are already
+# defined by an enclosing scope (useful for command line overrides).
 
-python --version
-pip3 install -r requirements.txt
-
-# Within the tests, we build against all possible optional dependencies.
-BUILD_WITH_HANABI="ON"
-
-./open_spiel/scripts/build_and_run_tests.sh
-deactivate
+export BUILD_WITH_HANABI=${BUILD_WITH_HANABI:-"OFF"}

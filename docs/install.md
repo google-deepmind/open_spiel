@@ -5,8 +5,9 @@ The instructions here are for Linux and MacOS. For installation on Windows, see
 
 ## Summary
 
-1.  Install system packages and download some dependencies. Only needs to be
-    run once.
+1.  Install system packages and download some dependencies. Only needs to be run
+    once or if you enable some new conditional dependencies (see specific
+    section below).
 
     ```bash
     ./install.sh
@@ -46,6 +47,11 @@ To make sure OpenSpiel works on the default configurations, we do use the
 Linux versions).
 
 ## Detailed steps
+
+### Configuration conditional dependencies
+
+See `open_spiel/scripts/global_variables.sh` to configure the conditional
+dependencies. See also the [Developer Guide](devloper_guide.md).
 
 ### Installing system-wide dependencies
 

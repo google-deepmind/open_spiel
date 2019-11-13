@@ -1,4 +1,4 @@
-add_library (games OBJECT
+set(GAME_SOURCES
   backgammon.cc
   backgammon.h
   blotto.cc
@@ -31,9 +31,6 @@ add_library (games OBJECT
   go/go_board.h
   goofspiel.cc
   goofspiel.h
-  # Uncomment to enable Hanabi.
-  # hanabi.cc
-  # hanabi.h
   havannah.cc
   havannah.h
   hex.cc
@@ -76,10 +73,18 @@ add_library (games OBJECT
   y.cc
   y.h
 )
+
+if (${BUILD_WITH_HANABI})
+  set(GAME_SOURCES ${GAME_SOURCES} hanabi.cc hanabi.h)
+endif()
+add_library (games OBJECT ${GAME_SOURCES})
+
+
 target_include_directories (games PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
-# Uncomment to enable Hanabi.
-# add_subdirectory (hanabi)
+if (${BUILD_WITH_HANABI})
+  add_subdirectory (hanabi)
+endif()
 
 # Uncomment to build the Ludii demo
 # add_subdirectory (ludii)

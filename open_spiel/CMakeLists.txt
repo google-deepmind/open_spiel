@@ -21,6 +21,44 @@ endif()
 # Position-independent code is needed for Python extension modules.
 set (CMAKE_POSITION_INDEPENDENT_CODE ON)
 
+## Optional dependencies
+# One can optionally build and link against specific external dependencies.
+# We expect these arguments to be always defined, when building using any script
+# in `open_spiel/scripts/`, thus, we emit a warning when it's not, with a
+# conservative default.
+# See the documentation in install.md.
+if(NOT WIN32)
+  string(ASCII 27 Esc)
+  set(ColourReset "${Esc}[m")
+  set(ColourBold  "${Esc}[1m")
+  set(Red         "${Esc}[31m")
+  set(Green       "${Esc}[32m")
+  set(Yellow      "${Esc}[33m")
+  set(Blue        "${Esc}[34m")
+  set(Magenta     "${Esc}[35m")
+  set(Cyan        "${Esc}[36m")
+  set(White       "${Esc}[37m")
+  set(BoldRed     "${Esc}[1;31m")
+  set(BoldGreen   "${Esc}[1;32m")
+  set(BoldYellow  "${Esc}[1;33m")
+  set(BoldBlue    "${Esc}[1;34m")
+  set(BoldMagenta "${Esc}[1;35m")
+  set(BoldCyan    "${Esc}[1;36m")
+  set(BoldWhite   "${Esc}[1;37m")
+endif()
+
+set (BUILD_WITH_HANABI OFF CACHE BOOL "Build against the Hanabi game.")
+if(NOT DEFINED ENV{BUILD_WITH_HANABI})
+    message("${BoldRed}BUILD_WITH_HANABI not set. Defaults to OFF${ColourReset}")
+    set (ENV{BUILD_WITH_HANABI} OFF)
+endif()
+set (BUILD_WITH_HANABI $ENV{BUILD_WITH_HANABI})
+message("${BoldYellow}BUILD_WITH_HANABI: ${BUILD_WITH_HANABI} ${ColourReset}")
+
+##
+
+
+
 # Needed to disable Abseil tests.
 set (BUILD_TESTING OFF)
 
@@ -78,9 +116,11 @@ set (OPEN_SPIEL_OBJECTS
   $<TARGET_OBJECTS:game_transforms>
   $<TARGET_OBJECTS:open_spiel_query>
   $<TARGET_OBJECTS:bridge_double_dummy_solver>
-  # $<TARGET_OBJECTS:hanabi_learning_environment>
   $<TARGET_OBJECTS:algorithms>
 )
+if (BUILD_WITH_HANABI)
+  set(OPEN_SPIEL_OBJECTS ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:hanabi_learning_environment>)
+endif()
 
 # We have the parent of this directory in the include path, so that we can
 # include for example "open_spiel/spiel.h" (assuming this directory is named

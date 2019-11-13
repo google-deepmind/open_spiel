@@ -21,6 +21,9 @@
 set -e  # exit when any command fails
 set -x
 
+MYDIR="$(dirname "$(realpath "$0")")"
+source "${MYDIR}/open_spiel/scripts/global_variables.sh"
+
 # 1. Clone the external dependencies before installing systen packages, to make
 # sure they are present even if later commands fail.
 #
@@ -54,6 +57,12 @@ fi
 [[ -d open_spiel/abseil-cpp ]] || \
   git clone -b 'master' --single-branch --depth 1 https://github.com/abseil/abseil-cpp.git \
   open_spiel/abseil-cpp
+
+# Optional dependencies.
+DIR="open_spiel/games/hanabi/hanabi-learning-environment"
+if [[ ${BUILD_WITH_HANABI:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; then
+  git clone -b 'master' --single-branch --depth 1 https://github.com/deepmind/hanabi-learning-environment.git ${DIR}
+fi
 
 
 # 2. Install other required system-wide dependencies
