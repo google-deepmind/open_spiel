@@ -28,6 +28,9 @@
 set -e  # exit when any command fails
 set -x
 
+MYDIR="$(dirname "$(realpath "$0")")"
+source "${MYDIR}/global_variables.sh"
+
 CXX=g++
 NPROC=nproc
 if [[ "$OSTYPE" == "darwin"* ]]; then  # Mac OSX
