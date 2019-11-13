@@ -95,6 +95,7 @@ class GoofspielState : public SimMoveState {
   std::vector<int> points_;
   std::vector<int> point_deck_;                  // Current point deck.
   std::vector<std::vector<bool>> player_hands_;  // true if card is in hand.
+  std::vector<int> point_card_sequence_;
   std::vector<int> win_sequence_;
   std::vector<std::vector<Action>> actions_history_;
 };
