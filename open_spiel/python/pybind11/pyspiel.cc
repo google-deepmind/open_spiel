@@ -353,7 +353,7 @@ PYBIND11_MODULE(pyspiel, m) {
       .value("PUCT", algorithms::ChildSelectionPolicy::PUCT);
 
   py::class_<algorithms::MCTSBot, Bot>(m, "MCTSBot")
-      .def(py::init<const Game&, Player, const Evaluator&, double, int, int64_t,
+      .def(py::init<const Game&, Player, Evaluator*, double, int, int64_t,
                     bool, int, bool,
                     ::open_spiel::algorithms::ChildSelectionPolicy>(),
            py::arg("game"), py::arg("player"), py::arg("evaluator"),

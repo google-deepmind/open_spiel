@@ -81,10 +81,10 @@ class Evaluator {
   virtual ~Evaluator() = default;
 
   // Return a value of this state for each player.
-  virtual std::vector<double> evaluate(const State& state) const = 0;
+  virtual std::vector<double> Evaluate(const State& state) = 0;
 
   // Return a policy: the probability of the current player playing each action.
-  virtual ActionsAndProbs Prior(const State& state) const = 0;
+  virtual ActionsAndProbs Prior(const State& state) = 0;
 };
 
 // A simple evaluator that returns the average outcome of playing random actions
@@ -96,14 +96,14 @@ class RandomRolloutEvaluator : public Evaluator {
     n_rollouts_(n_rollouts), rng_(seed) {}
 
   // Runs random games, returning the average returns.
-  std::vector<double> evaluate(const State& state) const override;
+  std::vector<double> Evaluate(const State& state) override;
 
   // Returns equal probability for each action.
-  ActionsAndProbs Prior(const State& state) const override;
+  ActionsAndProbs Prior(const State& state) override;
 
  private:
   int n_rollouts_;
-  mutable std::mt19937 rng_;
+  std::mt19937 rng_;
 };
 
 // A node in the search tree for MCTS
@@ -142,7 +142,7 @@ class MCTSBot : public Bot {
   MCTSBot(
       const Game& game,
       Player player,
-      const Evaluator& evaluator,
+      Evaluator* evaluator,
       double uct_c,
       int max_simulations,
       int64_t max_memory_mb,  // Max memory use in megabytes.
@@ -184,7 +184,7 @@ class MCTSBot : public Bot {
   double max_utility_;
   std::mt19937 rng_;
   const ChildSelectionPolicy child_selection_policy_;
-  const Evaluator& evaluator_;
+  Evaluator* evaluator_;
 };
 
 }  // namespace algorithms
