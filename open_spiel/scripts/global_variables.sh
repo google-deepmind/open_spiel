@@ -26,3 +26,4 @@
 # defined by an enclosing scope (useful for command line overrides).
 
 export BUILD_WITH_HANABI=${BUILD_WITH_HANABI:-"OFF"}
+export BUILD_WITH_ACPC=${BUILD_WITH_ACPC:-"OFF"}

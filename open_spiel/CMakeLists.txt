@@ -55,6 +55,14 @@ endif()
 set (BUILD_WITH_HANABI $ENV{BUILD_WITH_HANABI})
 message("${BoldYellow}BUILD_WITH_HANABI: ${BUILD_WITH_HANABI} ${ColourReset}")
 
+set (BUILD_WITH_ACPC OFF CACHE BOOL "Build against the Universal Poker library.")
+if(NOT DEFINED ENV{BUILD_WITH_ACPC})
+    message("${BoldRed}BUILD_WITH_ACPC not set. Defaults to OFF${ColourReset}")
+    set (ENV{BUILD_WITH_ACPC} OFF)
+endif()
+set (BUILD_WITH_ACPC $ENV{BUILD_WITH_ACPC})
+message("${BoldYellow}BUILD_WITH_ACPC: ${BUILD_WITH_ACPC} ${ColourReset}")
+
 ##
 
 
@@ -121,6 +129,10 @@ set (OPEN_SPIEL_OBJECTS
 if (BUILD_WITH_HANABI)
   set(OPEN_SPIEL_OBJECTS ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:hanabi_learning_environment>)
 endif()
+if (BUILD_WITH_ACPC)
+  set(OPEN_SPIEL_OBJECTS ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:universal_poker_clib> $<TARGET_OBJECTS:universal_poker_lib>)
+endif()
+
 
 # We have the parent of this directory in the include path, so that we can
 # include for example "open_spiel/spiel.h" (assuming this directory is named

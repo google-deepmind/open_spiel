@@ -52,6 +52,7 @@ fi
 [[ -d open_spiel/games/bridge/double_dummy_solver ]] || \
   git clone -b 'develop' --single-branch --depth 1 https://github.com/jblespiau/dds.git  \
   open_spiel/games/bridge/double_dummy_solver
+
 # `master` is a moving branch, but we never had issues. Let's use it and
 # checkout a specific commit only if an issue occur one day.
 [[ -d open_spiel/abseil-cpp ]] || \
@@ -62,6 +63,13 @@ fi
 DIR="open_spiel/games/hanabi/hanabi-learning-environment"
 if [[ ${BUILD_WITH_HANABI:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; then
   git clone -b 'master' --single-branch --depth 1 https://github.com/deepmind/hanabi-learning-environment.git ${DIR}
+fi
+
+# The official https://github.com/ethansbrown/acpc was outdated so we forked it and updated it with
+# the latest version from http://www.computerpokercompetition.org/downloads/code/competition_server/project_acpc_server_v1.0.42.tar.bz2
+DIR="open_spiel/games/universal_poker/acpc"
+if [[ ${BUILD_WITH_ACPC:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; then
+  git clone -b 'master' --single-branch --depth 1  https://github.com/dennisjay/acpc.git ${DIR}
 fi
 
 
