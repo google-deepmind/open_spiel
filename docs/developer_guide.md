@@ -100,8 +100,6 @@ When you add a new conditional dependency, you need to touch:
 
 -   the root CMakeLists.txt to add the option, with an OFF default
 -   add the option to `scripts/global_variables.sh`
--   set the option to "ON" in `.travis.yml` for the "All dependencies"
-    integration test.
 -   change `install.sh` to make sure the dependency is installed
 -   use constructs like `if (${BUILD_WITH_HANABI})` in CMake to optionally add
     the targets to build.
