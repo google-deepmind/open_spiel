@@ -15,6 +15,7 @@
 #ifndef THIRD_PARTY_OPEN_SPIEL_SPIEL_BOTS_H_
 #define THIRD_PARTY_OPEN_SPIEL_SPIEL_BOTS_H_
 
+#include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
@@ -54,6 +55,10 @@ class Bot {
 // A uniform random bot, for test purposes.
 std::unique_ptr<Bot> MakeUniformRandomBot(const Game& game, Player player_id,
                                           int seed);
+
+// A bot that samples from a policy.
+std::unique_ptr<Bot> MakePolicyBot(const Game& game, Player player_id, int seed,
+                                   std::unique_ptr<Policy> policy);
 
 // A both with a fixed action preference, for test purposes.
 // Picks the first legal action found in the list of actions.
