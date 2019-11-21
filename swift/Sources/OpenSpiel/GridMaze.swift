@@ -38,6 +38,7 @@ public class GridMaze: GameProtocol {
     public var history = [GridMaze.Action]()
     public var currentPlayer: Player { return isTerminal ? .terminal : .player(0) }
     public var isTerminal: Bool { return gridCell.isTerminal }
+    public var isGoal: Bool { return gridCell.isGoal }
     public var gridCell: GridCell  // Cell in the maze where we are currently positioned
     var utility = 0.0
   }
@@ -100,16 +101,17 @@ public class GridMaze: GameProtocol {
 
   //----
   public init(
-    rowCount: Int, colCount: Int,
-    cellLeftSide: GridCell = BOUNCE(reward: -1.0),
-    cellTopSide: GridCell = BOUNCE(reward: -1.0),
-    cellBottomSide: GridCell = BOUNCE(reward: -1.0),
-    cellRightSide: GridCell = BOUNCE(reward: -1.0),
-    cellTopLeft: GridCell = BOUNCE(reward: -1.0),
-    cellTopRight: GridCell = BOUNCE(reward: -1.0),
-    cellBottomLeft: GridCell = BOUNCE(reward: -1.0),
-    cellBottomRight: GridCell = BOUNCE(reward: -1.0),
-    cellAllOthers: GridCell = SPACE(reward: -1.0)
+    rowCount: Int,
+    colCount: Int,
+    cellsLeftSide: GridCell = WALL(),
+    cellsTopSide: GridCell = WALL(),
+    cellsBottomSide: GridCell = WALL(),
+    cellsRightSide: GridCell = WALL(),
+    cellsTopLeft: GridCell = WALL(),
+    cellsTopRight: GridCell = WALL(),
+    cellsBottomLeft: GridCell = WALL(),
+    cellsBottomRight: GridCell = WALL(),
+    cellsAllOthers: GridCell = SPACE(reward: -1.0)
   ) {
     precondition(rowCount > 0 && colCount > 0, "Row and column count must be larger than 0")
 
@@ -122,25 +124,25 @@ public class GridMaze: GameProtocol {
     for ridx in 0..<rowCount {
       maze.append([GridCell]())
       for cidx in 0..<colCount {
-        maze[ridx].append(cellAllOthers)
-        self[ridx, cidx] = cellAllOthers  // Sets state in cell element
+        maze[ridx].append(cellsAllOthers)
+        self[ridx, cidx] = cellsAllOthers  // Sets state in cell element
       }
     }
 
     for i in 0..<rowCount {
-      self[i, 0] = cellLeftSide
-      self[i, 0] = cellLeftSide
-      self[i, colCount - 1] = cellRightSide
+      self[i, 0] = cellsLeftSide
+      self[i, 0] = cellsLeftSide
+      self[i, colCount - 1] = cellsRightSide
     }
     for i in 0..<colCount {
-      self[0, i] = cellTopSide
-      self[rowCount - 1, i] = cellBottomSide
+      self[0, i] = cellsTopSide
+      self[rowCount - 1, i] = cellsBottomSide
     }
 
-    self[0, 0] = cellTopLeft
-    self[0, colCount - 1] = cellTopRight
-    self[rowCount - 1, 0] = cellBottomLeft
-    self[rowCount - 1, colCount - 1] = cellBottomRight
+    self[0, 0] = cellsTopLeft
+    self[0, colCount - 1] = cellsTopRight
+    self[rowCount - 1, 0] = cellsBottomLeft
+    self[rowCount - 1, colCount - 1] = cellsBottomRight
   }
 
   //---
@@ -225,8 +227,8 @@ public typealias JumpSpecificationProbability = (js: JumpSpecification, prob: Do
 public enum JumpSpecification: Equatable, CustomStringConvertible {
   case Welcome  // I am happy to welcome you to my space
   case BounceBack  // You cannot enter my space, bounce back (e.g. Wall)
-  case Relative(Int, Int)  // Teleport (extend to also support a function argument)
-  case Absolute(Int, Int)  // Teleport (extend to also support a function argument)
+  case Relative(Int, Int)  // Teleport(row,col) (extend to also support a function argument)
+  case Absolute(Int, Int)  // Teleport(row,col) (extend to also support a function argument)
 
   public var description: String {
     switch self {
@@ -250,12 +252,14 @@ public struct GridCell {
   // TODO: Need to read these from public scope, can we statically limit write to private scope?
   public var canAttemptToBeEntered: Bool  // True if it is legal to take an action towards entering this cell
   public var canBeEntered: Bool {  // False if you can never actually arrive at this cell, i.e. does not have a welcoming JS)
-    return entryJumpProbabilities.count == 0
-      || entryJumpProbabilities.contains { $0.js == .Welcome && $0.prob > 0 }
+    return canAttemptToBeEntered &&
+      (entryJumpProbabilities.count == 0
+        || entryJumpProbabilities.contains { $0.js == .Welcome && $0.prob > 0 })
   }
 
   public var isInitial: Bool
   public var isTerminal: Bool
+  public var isGoal: Bool
 
   // Stoachstic behavior for cell
   // When attempting to enter cell, this specification can specify alternative behavior than just entering cell
@@ -280,12 +284,14 @@ public struct GridCell {
     entryJumpProbabilities: [JumpSpecificationProbability] = [],
     isInitial: Bool,
     isTerminal: Bool,
+    isGoal: Bool,
     canAttemptToBeEntered: Bool
   ) {
     self.oneWordDescription = oneWordDescription
     self.rewardOnEnter = reward
     self.isInitial = isInitial
     self.isTerminal = isTerminal
+    self.isGoal = isGoal
     self.canAttemptToBeEntered = canAttemptToBeEntered
     self.entryJumpProbabilities = entryJumpProbabilities
   }
@@ -336,6 +342,7 @@ public struct GridCell {
       originCell: self,
       targetCell: targetCell,
       js: targetCell.entryJumpProbabilities[probabilityIndex].js)
+    
     return targetCell2
   }
 
@@ -396,43 +403,43 @@ public struct GridCell {
 public func SPACE(reward: Double = -1) -> GridCell {
   return GridCell(
     oneWordDescription: "SPACE", reward: reward,
-    isInitial: false, isTerminal: false,
+    isInitial: false, isTerminal: false, isGoal: false,
     canAttemptToBeEntered: true)
 }
 
 public func START(reward: Double = -1) -> GridCell {
   return GridCell(
     oneWordDescription: "START", reward: reward,
-    isInitial: true, isTerminal: false,
+    isInitial: true, isTerminal: false, isGoal: false,
     canAttemptToBeEntered: true)
 }
 
 public func GOAL(reward: Double) -> GridCell {
   return GridCell(
     oneWordDescription: "GOAL", reward: reward,
-    isInitial: false, isTerminal: true,
+    isInitial: false, isTerminal: true, isGoal: true,
     canAttemptToBeEntered: true)
 }
 
 public func HOLE(reward: Double) -> GridCell {
   return GridCell(
     oneWordDescription: "HOLE", reward: reward,
-    isInitial: false, isTerminal: true,
+    isInitial: false, isTerminal: true, isGoal: false,
     canAttemptToBeEntered: true)
 }
 
 public func WALL(reward: Double = -Double.infinity) -> GridCell {
   return GridCell(
     oneWordDescription: "WALL", reward: reward,
-    isInitial: false, isTerminal: false,
+    isInitial: false, isTerminal: false, isGoal: false,
     canAttemptToBeEntered: false)
 }
 
-public func BOUNCE(reward: Double = -1) -> GridCell {
+public func BOUNCE() -> GridCell {
   return GridCell(
-    oneWordDescription: "BOUNCE", reward: reward,
+    oneWordDescription: "BOUNCE", reward: -1.0,   // Reward is irrelevant, you receive reward of cell you bounce back to
     entryJumpProbabilities: [(prob: 1.0, js: .BounceBack)],
-    isInitial: false, isTerminal: false,
+    isInitial: false, isTerminal: false, isGoal: false,
     canAttemptToBeEntered: true)
 }
 
@@ -581,8 +588,10 @@ extension GridMaze {
         {
           jsStr = "(JS)"
         }
-        str
-          = "\(cell.oneWordDescription)\(jsStr):\(double2Str(printFullFloat: printFullFloat, value: cell.rewardOnEnter))"
+        str = "\(cell.oneWordDescription)\(jsStr)"
+        if cell.canBeEntered {
+          str = "\(str):\(double2Str(printFullFloat: printFullFloat, value: cell.rewardOnEnter))"
+        }
         if cell.isTerminal {
           str += ":T"
         } else if cell.isInitial {
@@ -599,8 +608,7 @@ extension GridMaze {
     vtable: VTableType? = nil,
     qtable: QTableType? = nil,
     ptable: PTableType? = nil,
-    printFullFloat: Bool
-  ) -> ([[String]]?, [[[String]]]?, [[String]]?) {
+    printFullFloat: Bool) -> ([[String]]?, [[[String]]]?, [[String]]?) {
 
     var vtableResult: [[String]]? = nil
     if vtable != nil {
