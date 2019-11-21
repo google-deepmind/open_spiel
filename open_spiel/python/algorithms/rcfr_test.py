@@ -22,10 +22,10 @@ from absl.testing import absltest
 from absl.testing import parameterized
 
 import numpy as np
+import pyspiel
 import tensorflow as tf
 
 from open_spiel.python.algorithms import rcfr
-import pyspiel
 
 tf.compat.v1.enable_eager_execution()
 
