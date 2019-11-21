@@ -106,7 +106,8 @@ def play_bot_in_scenarios(game, bots, scenarios=None):
                     scenario.expected_prob, actual_prob))
     total_score += score
 
-  total_score /= len(scenarios)
+  if scenarios:
+    total_score /= len(scenarios)
   logging.info("Average score across all scenarios: %.4f.", total_score)
   results_dict = {}
   for name, score, expected_action, expected_prob, actual_prob in results:
