@@ -786,47 +786,34 @@ class ReservoirBuffer(object):
   """A generic reservoir buffer data structure.
 
   After every insertion, its contents represents a `size`-size uniform
-  random sample from the stream of elements that have been inserted.
+  random sample from the stream of candidates that have been encountered.
   """
 
   def __init__(self, size):
     self.size = size
     self.num_elements = 0
     self._buffer = np.full([size], None, dtype=object)
+    self._num_candidates = 0
 
   @property
   def buffer(self):
     return self._buffer[:self.num_elements]
 
-  def insert(self, element):
-    """Insert `element` into this buffer."""
+  def insert(self, candidate):
+    """Consider this `candidate` for inclusion in this sampling buffer."""
+    self._num_candidates += 1
     if self.num_elements < self.size:
-      self._buffer[self.num_elements] = element
+      self._buffer[self.num_elements] = candidate
       self.num_elements += 1
-    elif np.random.uniform() > 0.5:
-      self._buffer[np.random.choice(self.size)] = element
-
-  def insert_all(self, elements):
-    """Insert all `elements` into this buffer."""
-    num_inserted = 0
-    if self.num_available_spaces() > 0:
-      num_inserted = min(self.num_available_spaces(), len(elements))
-      self._buffer[self.num_elements:self.num_elements + num_inserted][:] = (
-          elements[:num_inserted])
-      self.num_elements += num_inserted
-      if num_inserted == len(elements):
-        return
-
-    num_remaining = len(elements) - num_inserted
-    if num_remaining < 1:
       return
+    idx = np.random.choice(self._num_candidates)
+    if idx < self.size:
+      self._buffer[idx] = candidate
 
-    insert_element = np.random.uniform(size=[num_remaining]) > 0.5
-    num_swapped = insert_element.sum()
-    if num_swapped > 0:
-      swap_indices = np.random.choice(self.size, size=num_swapped, replace=True)
-      self._buffer[swap_indices] = np.array(
-          elements[num_inserted:], dtype=object)[insert_element].tolist()
+  def insert_all(self, candidates):
+    """Consider all `candidates` for inclusion in this sampling buffer."""
+    for candidate in candidates:
+      self.insert(candidate)
 
   def num_available_spaces(self):
     """The number of freely available spaces in this buffer."""
