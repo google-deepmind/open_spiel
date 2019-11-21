@@ -158,7 +158,7 @@ HavannahState::HavannahState(std::shared_ptr<const Game> game, int board_size,
       board_diameter_(board_size * 2 - 1),
       valid_cells_((board_size * 2 - 1) * (board_size * 2 - 1) -
                    board_size * (board_size - 1)),  // diameter^2 - corners
-      neighbors(get_neighbors(board_size)),
+      neighbors_(get_neighbors(board_size)),
       ansi_color_output_(ansi_color_output) {
   board_.resize(board_diameter_ * board_diameter_);
   for (int i = 0; i < board_.size(); i++) {
@@ -310,7 +310,7 @@ void HavannahState::DoApplyAction(Action action) {
 
   bool alreadyjoined = false;  // Useful for finding rings.
   bool skip = false;
-  for (const Move& m : neighbors[move.xy]) {
+  for (const Move& m : neighbors_[move.xy]) {
     if (skip) {
       skip = false;
     } else if (m.OnBoard()) {
@@ -379,7 +379,7 @@ bool HavannahState::CheckRingDFS(const Move& move, int left, int right) {
   bool success = false;
   for (int i = left; !success && i <= right; i++) {
     int dir = (i + 6) % 6;  // Normalize.
-    success = CheckRingDFS(neighbors[move.xy][dir], dir - 1, dir + 1);
+    success = CheckRingDFS(neighbors_[move.xy][dir], dir - 1, dir + 1);
   }
   c.mark = false;
   return success;

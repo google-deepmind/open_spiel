@@ -184,7 +184,7 @@ class HavannahState : public State {
   const int valid_cells_;
   int moves_made_ = 0;
   Move last_move_ = kMoveNone;
-  const NeighborList& neighbors;
+  const NeighborList& neighbors_;
   const bool ansi_color_output_;
 };
 
