@@ -46,7 +46,7 @@ class RcfrTest(parameterized.TestCase, tf.test.TestCase):
 
   def setUp(self):
     super(RcfrTest, self).setUp()
-    tf.set_random_seed(42)
+    tf.compat.v1.random.set_random_seed(42)
 
   def test_with_one_hot_action_features_single_state_vector(self):
     information_state_features = [1., 2., 3.]
