@@ -70,6 +70,8 @@ fi
 cd ..
 
 # Test Julia
-julia ./open_spiel/julia/example.jl tic_tac_toe
-julia ./open_spiel/julia/example.jl kuhn_poker
-julia ./open_spiel/julia/example.jl 'goofspiel(imp_info=True,num_cards=4,points_order=descending)'
+if [[ ${BUILD_WITH_JULIA:-"ON"} == "ON" ]]; then
+  julia ./open_spiel/julia/example.jl tic_tac_toe
+  julia ./open_spiel/julia/example.jl kuhn_poker
+  julia ./open_spiel/julia/example.jl 'goofspiel(imp_info=True,num_cards=4,points_order=descending)'
+fi
