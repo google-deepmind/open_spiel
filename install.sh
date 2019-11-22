@@ -67,7 +67,7 @@ fi
 
 # 2. Install other required system-wide dependencies
 if [[ "$OSTYPE" == "linux-gnu" ]]; then
-  EXT_DEPS="virtualenv cmake python3 python3-dev python3-pip python3-setuptools python3-wheel curl"
+  EXT_DEPS="virtualenv cmake python3 python3-dev python3-pip python3-setuptools python3-wheel wget"
   APT_GET=`which apt-get`
   if [ "$APT_GET" = "" ]
   then
@@ -101,7 +101,7 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
       echo -e "\e[33m$JULIA_VERSION_INFO is already installed.\e[0m"
     else
       echo "Julia not found. Installing them..."
-      sudo curl https://julialang-s3.julialang.org/bin/linux/x64/1.2/julia-1.2.0-linux-x86_64.tar.gz -o /tmp/julia.tar.gz -s
+      sudo wget https://julialang-s3.julialang.org/bin/linux/x64/1.2/julia-1.2.0-linux-x86_64.tar.gz -O /tmp/julia.tar.gz
       sudo tar -zxvf /tmp/julia.tar.gz -C /usr/local
       sudo ln -s /usr/local/julia-1.2.0/bin/julia /usr/local/bin/julia
     fi
