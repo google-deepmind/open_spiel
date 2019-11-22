@@ -105,7 +105,7 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
       sudo ln -s /usr/local/julia-1.2.0/bin/julia /usr/local/bin/julia
     fi
     # Install CxxWrap.jl
-    julia -e 'using Pkg; Pkg.add(PackageSpec(name="CxxWrap", rev="0c82e3e383ddf2db1face8ece22d0a552f0ca11a"))' # TODO: use stable version
+    julia -e 'using Pkg; Pkg.add(StatsBase); Pkg.add(PackageSpec(name="CxxWrap", rev="0c82e3e383ddf2db1face8ece22d0a552f0ca11a"))' # TODO: use stable version
   fi
 elif [[ "$OSTYPE" == "darwin"* ]]; then  # Mac OSX
   [[ -x "$(type python3)" ]] || brew install python3 || echo "** Warning: failed 'brew install python3' -- continuing"

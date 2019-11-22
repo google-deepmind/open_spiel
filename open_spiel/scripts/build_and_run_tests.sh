@@ -70,7 +70,6 @@ fi
 cd ..
 
 # Test Julia
-julia -e "using Pkg; Pkg.add(StatsBase)"
 julia ./open_spiel/julia/example.jl tic_tac_toe
 julia ./open_spiel/julia/example.jl kuhn_poker
 julia ./open_spiel/julia/example.jl 'goofspiel(imp_info=True,num_cards=4,points_order=descending)'
