@@ -18,16 +18,16 @@ import OpenSpiel
 import TensorFlow
 
 // Create the GridMaze environment the Robot should learn to solve
-var mazeEnv = GridMaze(rowCount: 6, colCount: 6)
-mazeEnv[1, 1] = START()
-mazeEnv[2, 2] = HOLE(reward: -100)
-mazeEnv[2, 3] = SPACE(reward: -2.0)
-mazeEnv[3, 2] = SPACE(reward: -2.0)
-mazeEnv[3, 4] = HOLE(reward: -100)
-mazeEnv[4, 0] = SPACE(reward: -1.0)
-mazeEnv[4, 2] = BOUNCE()
-mazeEnv[4, 4] = GOAL(reward: 1.0)
-mazeEnv[4, 5] = SPACE(reward: -1.0)
+var mazeEnv = GridMaze(rowCount: 6, columnCount: 6)
+mazeEnv[1, 1] = GridCell.start(reward: -1.0)
+mazeEnv[2, 2] = GridCell.hole(reward: -100)
+mazeEnv[2, 3] = GridCell.space(reward: -2.0)
+mazeEnv[3, 2] = GridCell.space(reward: -2.0)
+mazeEnv[3, 4] = GridCell.hole(reward: -100)
+mazeEnv[4, 0] = GridCell.space(reward: -1.0)
+mazeEnv[4, 2] = GridCell.bounce
+mazeEnv[4, 4] = GridCell.goal(reward: 1.0)
+mazeEnv[4, 5] = GridCell.space(reward: -1.0)
 mazeEnv[2, 4].entryJumpProbabilities = [(.Relative(1, 0), 0.5), (.Welcome, 0.5)]
 
 // Print environment

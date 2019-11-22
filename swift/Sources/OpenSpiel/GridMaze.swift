@@ -97,52 +97,39 @@ public class GridMaze: GameProtocol {
   public var maze: [[GridCell]] = [[GridCell]]()
 
   public var rowCount: Int
-  public var colCount: Int
+  public var columnCount: Int
 
   //----
   public init(
     rowCount: Int,
-    colCount: Int,
-    cellsLeftSide: GridCell = WALL(),
-    cellsTopSide: GridCell = WALL(),
-    cellsBottomSide: GridCell = WALL(),
-    cellsRightSide: GridCell = WALL(),
-    cellsTopLeft: GridCell = WALL(),
-    cellsTopRight: GridCell = WALL(),
-    cellsBottomLeft: GridCell = WALL(),
-    cellsBottomRight: GridCell = WALL(),
-    cellsAllOthers: GridCell = SPACE(reward: -1.0)
+    columnCount: Int,
+    borderCell: GridCell = GridCell.wall,
+    innerCell: GridCell = GridCell.space(reward: -1.0)
   ) {
-    precondition(rowCount > 0 && colCount > 0, "Row and column count must be larger than 0")
+    precondition(rowCount > 0 && columnCount > 0, "Row and column count must be larger than 0")
 
     self.rowCount = rowCount
-    self.colCount = colCount
+    self.columnCount = columnCount
 
-    // Allocate and assign state entries for each cell in grid
+    // Allocate and assign innerCell entries for each cell in grid
     // TODO: Can we use init(repeating: ..., count: ...) with [[GridCell]] in an elegant way?
     maze.reserveCapacity(rowCount)
     for ridx in 0..<rowCount {
       maze.append([GridCell]())
-      for cidx in 0..<colCount {
-        maze[ridx].append(cellsAllOthers)
-        self[ridx, cidx] = cellsAllOthers  // Sets state in cell element
+      for cidx in 0..<columnCount {
+        maze[ridx].append(innerCell)
+        self[ridx, cidx] = innerCell  // Sets state in cell element
       }
     }
 
     for i in 0..<rowCount {
-      self[i, 0] = cellsLeftSide
-      self[i, 0] = cellsLeftSide
-      self[i, colCount - 1] = cellsRightSide
+      self[i, 0] = borderCell
+      self[i, columnCount - 1] = borderCell
     }
-    for i in 0..<colCount {
-      self[0, i] = cellsTopSide
-      self[rowCount - 1, i] = cellsBottomSide
+    for i in 0..<columnCount {
+      self[0, i] = borderCell
+      self[rowCount - 1, i] = borderCell
     }
-
-    self[0, 0] = cellsTopLeft
-    self[0, colCount - 1] = cellsTopRight
-    self[rowCount - 1, 0] = cellsBottomLeft
-    self[rowCount - 1, colCount - 1] = cellsBottomRight
   }
 
   //---
@@ -206,7 +193,7 @@ extension GridMaze.GameState {
 
   // TODO: Correct understanding?
   public func informationStateAsNormalizedVector(for player: Player) -> [Double] {
-    return [Double(game.colCount * gridCell.row! + gridCell.col!)]  // Each position is a unique info state
+    return [Double(game.columnCount * gridCell.row! + gridCell.col!)]  // Each position is a unique info state
   }
 
   // TODO: Correct understanding?
@@ -306,7 +293,7 @@ public struct GridCell {
     case .LEFT:
       newCol -= 1
       if col == 0 {
-        newCol = game!.colCount - 1
+        newCol = game!.columnCount - 1
       }
     case .UP:
       newRow -= 1
@@ -320,7 +307,7 @@ public struct GridCell {
       }
     case .RIGHT:
       newCol += 1
-      if col == game!.colCount - 1 {
+      if col == game!.columnCount - 1 {
         newCol = 0
       }
     }
@@ -400,47 +387,55 @@ public struct GridCell {
 // ***************************************************************************
 // Create factory functions for common Cell Types to use in GridMazes
 
-public func SPACE(reward: Double = -1) -> GridCell {
-  return GridCell(
-    oneWordDescription: "SPACE", reward: reward,
-    isInitial: false, isTerminal: false, isGoal: false,
-    canAttemptToBeEntered: true)
-}
+extension GridCell {
+  /// Creates a start cell with the given reward.
+  public static func start(reward: Double = -1) -> GridCell {
+    return GridCell(
+      oneWordDescription: "START", reward: reward,
+      isInitial: true, isTerminal: false, isGoal: false,
+      canAttemptToBeEntered: true)
+  }
 
-public func START(reward: Double = -1) -> GridCell {
-  return GridCell(
-    oneWordDescription: "START", reward: reward,
-    isInitial: true, isTerminal: false, isGoal: false,
-    canAttemptToBeEntered: true)
-}
+  /// Creates a goal cell with the given reward.
+  public static func goal(reward: Double) -> GridCell {
+    return GridCell(
+      oneWordDescription: "GOAL", reward: reward,
+      isInitial: false, isTerminal: true, isGoal: true,
+      canAttemptToBeEntered: true)
+  }
 
-public func GOAL(reward: Double) -> GridCell {
-  return GridCell(
-    oneWordDescription: "GOAL", reward: reward,
-    isInitial: false, isTerminal: true, isGoal: true,
-    canAttemptToBeEntered: true)
-}
+  /// Creates a start cell with the given reward.
+  public static func space(reward: Double) -> GridCell {
+    return GridCell(
+      oneWordDescription: "SPACE", reward: reward,
+      isInitial: false, isTerminal: false, isGoal: false,
+      canAttemptToBeEntered: true)
+  }
 
-public func HOLE(reward: Double) -> GridCell {
-  return GridCell(
-    oneWordDescription: "HOLE", reward: reward,
-    isInitial: false, isTerminal: true, isGoal: false,
-    canAttemptToBeEntered: true)
-}
+  /// Creates a hole cell with the given reward.
+  public static func hole(reward: Double) -> GridCell {
+    return GridCell(
+      oneWordDescription: "HOLE", reward: reward,
+      isInitial: false, isTerminal: true, isGoal: false,
+      canAttemptToBeEntered: true)
+  }
 
-public func WALL(reward: Double = -Double.infinity) -> GridCell {
-  return GridCell(
-    oneWordDescription: "WALL", reward: reward,
-    isInitial: false, isTerminal: false, isGoal: false,
-    canAttemptToBeEntered: false)
-}
+  /// Creates a wall cell with the given reward.
+  public static var wall: GridCell {
+    return GridCell(
+      oneWordDescription: "WALL", reward: -1.0,  // Reward is no-op because !canAttemptToBeEntered
+      isInitial: false, isTerminal: false, isGoal: false,
+      canAttemptToBeEntered: false)
+  }
 
-public func BOUNCE() -> GridCell {
-  return GridCell(
-    oneWordDescription: "BOUNCE", reward: -1.0,   // Reward is irrelevant, you receive reward of cell you bounce back to
-    entryJumpProbabilities: [(prob: 1.0, js: .BounceBack)],
-    isInitial: false, isTerminal: false, isGoal: false,
-    canAttemptToBeEntered: true)
+  /// A bounce cell.
+  public static var bounce: GridCell {
+    return GridCell(
+      oneWordDescription: "BOUNCE", reward: -1.0,   // Reward is irrelevant, you receive reward of cell you bounce back to
+      entryJumpProbabilities: [(prob: 1.0, js: .BounceBack)],
+      isInitial: false, isTerminal: false, isGoal: false,
+      canAttemptToBeEntered: true)
+  }
 }
 
 // ***************************************************************************
