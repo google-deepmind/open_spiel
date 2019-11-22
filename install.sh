@@ -94,7 +94,7 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
   fi
 
   # Julia related stuff
-  if [[ ${BUILD_WITH_JULIA:-"ON"} == "ON" ]]; then
+  if [[ ${BUILD_WITH_JULIA:-"OFF"} == "ON" ]]; then
     # Install Julia
     if which julia >/dev/null; then
       JULIA_VERSION_INFO=`julia --version`
