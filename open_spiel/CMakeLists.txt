@@ -21,9 +21,6 @@ endif()
 # Position-independent code is needed for Python extension modules.
 set (CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-option(WITH_PYTHON     "Compile OpenSpiel with Python"             ON)
-option(WITH_JULIA      "Compile OpenSpiel with Julia"             OFF)
-
 ## Optional dependencies
 # One can optionally build and link against specific external dependencies.
 # We expect these arguments to be always defined, when building using any script
@@ -57,6 +54,14 @@ if(NOT DEFINED ENV{BUILD_WITH_HANABI})
 endif()
 set (BUILD_WITH_HANABI $ENV{BUILD_WITH_HANABI})
 message("${BoldYellow}BUILD_WITH_HANABI: ${BUILD_WITH_HANABI} ${ColourReset}")
+
+set (BUILD_WITH_JULIA OFF CACHE BOOL "Build binary for Julia.")
+if(NOT DEFINED ENV{BUILD_WITH_JULIA})
+    message("${BoldRed}BUILD_WITH_JULIA not set. Defaults to OFF${ColourReset}")
+    set (ENV{BUILD_WITH_JULIA} OFF)
+endif()
+set (BUILD_WITH_JULIA $ENV{BUILD_WITH_JULIA})
+message("${BoldYellow}BUILD_WITH_JULIA: ${BUILD_WITH_JULIA} ${ColourReset}")
 
 ##
 
@@ -135,11 +140,8 @@ add_subdirectory (examples)
 add_subdirectory (games)
 add_subdirectory (game_transforms)
 add_subdirectory (tests)
+add_subdirectory (python)
 
-if (WITH_PYTHON)
-  add_subdirectory (python)
-endif()
-
-if (WITH_JULIA)
+if (BUILD_WITH_JULIA)
   add_subdirectory (julia)
 endif()

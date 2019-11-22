@@ -46,7 +46,11 @@ cd $BUILD_DIR
 
 echo "Building and testing in $PWD using 'python' (version $PYVERSION)."
 
-cmake -DPython_TARGET_VERSION=${PYVERSION} -DCMAKE_CXX_COMPILER=${CXX} ../open_spiel
+if [[ ${BUILD_WITH_JULIA:-"ON"} == "ON" ]]; then
+  JlCxx_DIR=`julia -e 'using CxxWrap; print(joinpath(dirname(CxxWrap.jlcxx_path), "cmake", "JlCxx"))'`
+fi
+
+cmake -DPython_TARGET_VERSION=${PYVERSION} -DCMAKE_CXX_COMPILER=${CXX} -DJlCxx_DIR=$JlCxx_DIR ../open_spiel
 make -j$MAKE_NUM_PROCS
 
 export PYTHONPATH=$PYTHONPATH:`pwd`/../open_spiel
@@ -64,3 +68,6 @@ else
 fi
 
 cd ..
+
+# Test Julia
+julia -e 'include("./open_spiel/julia/OpenSpiel.jl"); include("./open_spiel/julia/example.jl")'  # TODO: finish test.jl
