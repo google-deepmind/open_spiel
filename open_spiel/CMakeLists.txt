@@ -21,6 +21,9 @@ endif()
 # Position-independent code is needed for Python extension modules.
 set (CMAKE_POSITION_INDEPENDENT_CODE ON)
 
+option(WITH_PYTHON     "Compile OpenSpiel with Python"             ON)
+option(WITH_JULIA      "Compile OpenSpiel with Julia"             OFF)
+
 ## Optional dependencies
 # One can optionally build and link against specific external dependencies.
 # We expect these arguments to be always defined, when building using any script
@@ -132,5 +135,11 @@ add_subdirectory (examples)
 add_subdirectory (games)
 add_subdirectory (game_transforms)
 add_subdirectory (tests)
-add_subdirectory (python)
-add_subdirectory (julia)
+
+if (WITH_PYTHON)
+  add_subdirectory (python)
+endif()
+
+if (WITH_JULIA)
+  add_subdirectory (julia)
+endif()
