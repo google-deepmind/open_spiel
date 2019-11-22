@@ -123,16 +123,25 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
         .method("information_state", [](open_spiel::State &s) { return s.InformationState();})
         .method("information_state_as_normalized_vector", [](open_spiel::State &s) { return s.InformationStateAsNormalizedVector();})
         .method("information_state_as_normalized_vector", [](open_spiel::State &s, open_spiel::Player p) { return s.InformationStateAsNormalizedVector(p);})
-        .method("information_state_as_normalized_vector", [](open_spiel::State &s, open_spiel::Player p, std::vector<double> values) { return s.InformationStateAsNormalizedVector(p, &values); })
+        .method("information_state_as_normalized_vector", [](open_spiel::State &s, open_spiel::Player p, jlcxx::ArrayRef<double, 1> values) {
+          std::vector<double> data(values.begin(), values.end());
+          return s.InformationStateAsNormalizedVector(p, &data);
+          })
         .method("observation", [](open_spiel::State &s) { return s.Observation();})
         .method("observation", [](open_spiel::State &s, open_spiel::Player p) { return s.Observation(p);})
         .method("observation_as_normalized_vector", [](open_spiel::State &s) { return s.ObservationAsNormalizedVector();})
         .method("observation_as_normalized_vector", [](open_spiel::State &s, open_spiel::Player p) { return s.ObservationAsNormalizedVector(p);})
-        .method("observation_as_normalized_vector", [](open_spiel::State &s, open_spiel::Player p, std::vector<double> values) { return s.ObservationAsNormalizedVector(p, &values); })
+        .method("observation_as_normalized_vector", [](open_spiel::State &s, open_spiel::Player p, jlcxx::ArrayRef<double, 1> values) {
+          std::vector<double> data(values.begin(), values.end());
+          return s.ObservationAsNormalizedVector(p, &data);
+          })
         .method("clone", &open_spiel::State::Clone)
         .method("child", &open_spiel::State::Child)
         .method("undo_action", &open_spiel::State::UndoAction)
-        .method("apply_actions", [](open_spiel::State &s, std::vector<open_spiel::Action> values) { return s.ApplyActions(values); })
+        .method("apply_actions", [](open_spiel::State &s, jlcxx::ArrayRef<open_spiel::Action, 1> values) {
+          std::vector<open_spiel::Action> data(values.begin(), values.end());
+          return s.ApplyActions(data);
+          })
         .method("num_distinct_actions", &open_spiel::State::NumDistinctActions)
         .method("num_players", &open_spiel::State::NumPlayers)
         .method("chance_outcomes", &open_spiel::State::ChanceOutcomes)
