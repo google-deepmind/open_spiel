@@ -30,9 +30,6 @@ class Bot {
       : game_(game), player_id_(player_id) {}
   virtual ~Bot() = default;
 
-  // Override the bot's action choice.
-  virtual void ApplyAction(Action action) {}
-
   // Choose and execute an action in a game. The bot should return its
   // distribution over actions and also its selected action.
   virtual std::pair<ActionsAndProbs, Action> Step(const State& state) = 0;
