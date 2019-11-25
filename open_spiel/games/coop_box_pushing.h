@@ -28,7 +28,9 @@
 // http://rbr.cs.umass.edu/papers/SZuai07.pdf
 //
 // Parameters:
-//     "horizon"       int    length of horizon                (default = 100)
+//     "fully_observable" bool   agents see everything, or only partial view as
+//                               described in the original paper (def: false)
+//     "horizon"          int    length of horizon (default = 100)
 
 namespace open_spiel {
 namespace coop_box_pushing {
@@ -49,25 +51,34 @@ enum OrientationType {
   kInvalid = 4
 };
 
+// When not fully-observable, the number of observations (taken from Seuken &
+// Zilberstein '12): empty field, wall, other agent, small box, large box.
+enum ObservationType {
+  kEmptyFieldObs,
+  kWallObs,
+  kOtherAgentObs,
+  kSmallBoxObs,
+  kBigBoxObs
+};
+constexpr int kNumObservations = 5;
+
 // Different actions used by the agent.
 enum class ActionType { kTurnLeft, kTurnRight, kMoveForward, kStay };
 
 class CoopBoxPushingState : public SimMoveState {
  public:
-  CoopBoxPushingState(std::shared_ptr<const Game> game, int horizon);
+  CoopBoxPushingState(std::shared_ptr<const Game> game, int horizon,
+                      bool fully_observable);
 
   std::string ActionToString(Player player, Action action) const override;
   std::string ToString() const override;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
   std::vector<double> Rewards() const override;
-  std::string InformationState(Player player) const {
-    SPIEL_CHECK_GE(player, 0);
-    SPIEL_CHECK_LT(player, num_players_);
-    return absl::StrCat("Observing player: ", player, "\n", ToString());
-  }
-  void InformationStateAsNormalizedVector(Player player,
-                                          std::vector<double>* values) const;
+  void ObservationAsNormalizedVector(
+      Player player, std::vector<double>* values) const override;
+  std::string Observation(Player player) const override;
+
   Player CurrentPlayer() const override {
     return IsTerminal() ? kTerminalPlayerId : cur_player_;
   }
@@ -93,15 +104,21 @@ class CoopBoxPushingState : public SimMoveState {
   void MoveForward(Player player);
   bool InBounds(std::pair<int, int> coord) const;
   bool SameAsPlayer(std::pair<int, int> coord, Player player) const;
+
+  // Partial observation of the specific agent.
+  ObservationType PartialObservation(Player player) const;
+
+  // Observation planes for the fully-observable case.
   int ObservationPlane(std::pair<int, int> coord, Player player) const;
 
   // Fields sets to bad/invalid values. Use Game::NewInitialState().
   double total_rewards_ = -1;
   int horizon_ = -1;        // Limit on the total number of moves.
-  Player cur_player_ = -1;  // Could be chance's turn.
+  Player cur_player_ = kSimultaneousPlayerId;
   int total_moves_ = 0;
-  int initiative_;  // 0 = player initiative+1 goes first.
+  int initiative_;  // player id of player to resolve actions first.
   bool win_;        // True if agents push the big box to the goal.
+  bool fully_observable_;
 
   // Most recent rewards.
   double reward_;
@@ -129,11 +146,12 @@ class CoopBoxPushingGame : public SimMoveGame {
   std::shared_ptr<const Game> Clone() const override {
     return std::shared_ptr<const Game>(new CoopBoxPushingGame(*this));
   }
-  std::vector<int> InformationStateNormalizedVectorShape() const override;
+  std::vector<int> ObservationNormalizedVectorShape() const override;
   int MaxGameLength() const override { return horizon_; }
 
  private:
   int horizon_;
+  bool fully_observable_;
 };
 
 }  // namespace coop_box_pushing

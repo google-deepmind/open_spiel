@@ -30,8 +30,7 @@ matrix:
     dist: bionic # Ubuntu 18.04.2 LTS released on 26 April 2018
     env:
       - OS_PYTHON_VERSION=3.6
-      - BUILD_WITH_HANABI="ON"
-      - BUILD_WITH_JULIA="ON"
+      - DEFAULT_OPTIONAL_DEPENDENCY="ON"
   # - os: osx
   #   # macOS 10.14 (Mojave), release on September 24, 2018.
   #   osx_image: xcode11

@@ -75,7 +75,10 @@ GoofspielState::GoofspielState(std::shared_ptr<const Game> game, int num_cards,
       current_player_(kInvalidPlayer),
       winners_({}),
       turns_(0),
-      point_card_index_(-1) {
+      point_card_index_(-1),
+      point_card_sequence_({}),
+      win_sequence_({}),
+      actions_history_({}) {
   // Points and point-card deck.
   points_.resize(num_players_);
   std::fill(points_.begin(), points_.end(), 0);
@@ -102,9 +105,6 @@ GoofspielState::GoofspielState(std::shared_ptr<const Game> game, int num_cards,
     point_card_index_ = num_cards - 1;
     current_player_ = kSimultaneousPlayerId;
   }
-
-  win_sequence_.clear();
-  actions_history_.clear();
 }
 
 int GoofspielState::CurrentPlayer() const {
@@ -122,6 +122,9 @@ void GoofspielState::DoApplyAction(Action action_id) {
   }
   SPIEL_CHECK_TRUE(IsChanceNode());
   point_card_index_ = action_id;
+  SPIEL_CHECK_GE(point_card_index_, 0);
+  SPIEL_CHECK_LT(point_card_index_, point_deck_.size());
+  point_card_sequence_.push_back(point_deck_[point_card_index_]);
   current_player_ = kSimultaneousPlayerId;
 }
 
@@ -281,11 +284,12 @@ std::string GoofspielState::ToString() const {
     }
   }
 
-  if (point_card_index_ >= 0) {
-    absl::StrAppend(&result, "Point card: ");
-    absl::StrAppend(&result, point_deck_[point_card_index_]);
-    absl::StrAppend(&result, "\n");
+  absl::StrAppend(&result, "Point card sequence: ");
+  for (int i = 0; i < point_card_sequence_.size(); ++i) {
+    absl::StrAppend(&result, point_card_sequence_[i], " ");
   }
+  absl::StrAppend(&result, "\n");
+
   return result + points_line + "\n";
 }
 
@@ -323,6 +327,7 @@ std::string GoofspielState::InformationState(Player player) const {
     // Only know the observing player's hand.
     // Only know the observing player's action sequence.
     // Know the win-loss outcome of each step.
+    // Show the point card sequence from the start.
 
     for (auto p = Player{0}; p < num_players_; ++p) {
       absl::StrAppend(&points_line, points_[p]);
@@ -360,11 +365,12 @@ std::string GoofspielState::InformationState(Player player) const {
       win_sequence.push_back(' ');
     }
 
-    if (point_card_index_ >= 0) {
-      absl::StrAppend(&result, "Point card: ");
-      absl::StrAppend(&result, point_deck_[point_card_index_]);
-      absl::StrAppend(&result, "\n");
+    absl::StrAppend(&result, "Point card sequence: ");
+    for (int i = 0; i < point_card_sequence_.size(); ++i) {
+      absl::StrAppend(&result, point_card_sequence_[i], " ");
     }
+    absl::StrAppend(&result, "\n");
+
     return result + win_sequence + "\n" + points_line + "\n";
   } else {
     // All the information is public.
@@ -408,8 +414,19 @@ void GoofspielState::InformationStateAsNormalizedVector(
     }
 
     // Padding for future tricks
-    const int future_tricks = num_cards_ - win_sequence_.size();
+    int future_tricks = num_cards_ - win_sequence_.size();
     for (int i = 0; i < future_tricks * num_players_; ++i) values->push_back(0);
+
+    // Point card sequence.
+    for (int i = 0; i < point_card_sequence_.size(); ++i) {
+      for (int j = 0; j < num_cards_; ++j) {
+        values->push_back(point_card_sequence_[i] == (j + 1) ? 1 : 0);
+      }
+    }
+
+    // Padding for future tricks
+    future_tricks = num_cards_ - point_card_sequence_.size();
+    for (int i = 0; i < future_tricks * num_cards_; ++i) values->push_back(0);
 
     // The observing player's action sequence.
     for (int i = 0; i < num_cards_; ++i) {
@@ -422,6 +439,17 @@ void GoofspielState::InformationStateAsNormalizedVector(
     }
 
   } else {
+    // Point card sequence.
+    for (int i = 0; i < point_card_sequence_.size(); ++i) {
+      for (int j = 0; j < num_cards_; ++j) {
+        values->push_back(point_card_sequence_[i] == (j + 1) ? 1 : 0);
+      }
+    }
+
+    // Padding for future tricks
+    int future_tricks = num_cards_ - point_card_sequence_.size();
+    for (int i = 0; i < future_tricks * num_cards_; ++i) values->push_back(0);
+
     // Bit vectors encoding all players' hands.
     for (auto p = Player{0}; p < num_players_; ++p) {
       for (int c = 0; c < num_cards_; ++c) {
@@ -468,6 +496,8 @@ std::vector<int> GoofspielGame::InformationStateNormalizedVectorShape() const {
             // A sequence of 1-hot bit vectors encoding the player who won that
             // turn, where max number of turns is num_cards
             num_cards_ * num_players_ +
+            // A sequence of 1-hot bit vectors encoding the point card sequence
+            num_cards_ * num_cards_ +
             // The observing player's own action sequence
             num_cards_ * num_cards_};
   } else {
@@ -476,6 +506,8 @@ std::vector<int> GoofspielGame::InformationStateNormalizedVectorShape() const {
             // 1-hot bit vector for point total per player; upper bound is 1 +
             // 2 + ... + K = K*(K+1) / 2, but must add one to include 0 points.
             num_players_ * ((num_cards_ * (num_cards_ + 1)) / 2 + 1) +
+            // A sequence of 1-hot bit vectors encoding the point card sequence
+            num_cards_ * num_cards_ +
             // Bit vector for each card per player
             num_players_ * num_cards_};
   }

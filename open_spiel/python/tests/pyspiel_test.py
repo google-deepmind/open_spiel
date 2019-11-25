@@ -78,6 +78,8 @@ class PyspielTest(absltest.TestCase):
     ])
     if os.environ.get("BUILD_WITH_HANABI", "OFF") == "ON":
       expected.add("hanabi")
+    if os.environ.get("BUILD_WITH_ACPC", "OFF") == "ON":
+      expected.add("universal_poker")
     expected = sorted(list(expected))
     self.assertCountEqual(game_names, expected)
 

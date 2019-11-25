@@ -23,9 +23,5 @@ source ./venv/bin/activate
 python --version
 pip3 install -r requirements.txt
 
-# Within the tests, we build against all possible optional dependencies.
-BUILD_WITH_HANABI="ON"
-BUILD_WITH_JULIA="ON"
-
 ./open_spiel/scripts/build_and_run_tests.sh
 deactivate

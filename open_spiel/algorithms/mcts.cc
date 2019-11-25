@@ -39,7 +39,7 @@ constexpr inline int VectorMemory(const std::vector<T>& vec) {
   return sizeof(T) * vec.capacity();
 }
 
-std::vector<double> RandomRolloutEvaluator::evaluate(const State& state) const {
+std::vector<double> RandomRolloutEvaluator::Evaluate(const State& state) {
   std::vector<double> result;
   for (int i = 0; i < n_rollouts_; ++i) {
     std::unique_ptr<State> working_state = state.Clone();
@@ -75,7 +75,7 @@ std::vector<double> RandomRolloutEvaluator::evaluate(const State& state) const {
   return result;
 }
 
-ActionsAndProbs RandomRolloutEvaluator::Prior(const State& state) const {
+ActionsAndProbs RandomRolloutEvaluator::Prior(const State& state) {
   // Returns equal probability for all actions.
   if (state.IsChanceNode()) {
     return state.ChanceOutcomes();
@@ -182,7 +182,7 @@ std::string SearchNode::ToString(const State& state) const {
 MCTSBot::MCTSBot(
       const Game& game,
       Player player,
-      const Evaluator& evaluator,
+      Evaluator* evaluator,
       double uct_c,
       int max_simulations,
       int64_t max_memory_mb,
@@ -246,7 +246,7 @@ std::unique_ptr<State> MCTSBot::ApplyTreePolicy(
   while (!working_state->IsTerminal() && current_node->explore_count > 0) {
     if (current_node->children.empty()) {
       // For a new node, initialize its state, then choose a child as normal.
-      ActionsAndProbs legal_actions = evaluator_.Prior(*working_state);
+      ActionsAndProbs legal_actions = evaluator_->Prior(*working_state);
       // Reduce bias from move generation order.
       std::shuffle(legal_actions.begin(), legal_actions.end(), rng_);
       Player player = working_state->CurrentPlayer();
@@ -322,7 +322,7 @@ std::unique_ptr<SearchNode> MCTSBot::MCTSearch(const State& state) {
       memory_used_ += VectorMemory(returns);
       solved = solve_;
     } else {
-      returns = evaluator_.evaluate(*working_state);
+      returns = evaluator_->Evaluate(*working_state);
       solved = false;
     }
 

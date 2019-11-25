@@ -61,6 +61,36 @@ void CFRTest_KuhnPoker() {
   CheckExploitabilityKuhnPoker(*game, *average_policy);
 }
 
+void CFRTest_IIGoof4() {
+  // Random points order.
+  std::shared_ptr<const Game> game = LoadGameAsTurnBased(
+      "goofspiel", {{"imp_info", GameParameter(true)},
+                    {"points_order", GameParameter(std::string("random"))},
+                    {"num_cards", GameParameter(4)}});
+
+  CFRSolver solver(*game);
+  for (int i = 0; i < 100; i++) {
+    solver.EvaluateAndUpdatePolicy();
+  }
+  // Values checked with Marc's thesis implementation.
+  const std::unique_ptr<Policy> average_policy = solver.AveragePolicy();
+  SPIEL_CHECK_LE(Exploitability(*game, *average_policy), 0.1);
+
+  // Fixed points order.
+  game = LoadGameAsTurnBased(
+      "goofspiel", {{"imp_info", GameParameter(true)},
+                    {"points_order", GameParameter(std::string("descending"))},
+                    {"num_cards", GameParameter(4)}});
+
+  CFRSolver solver2(*game);
+  for (int i = 0; i < 1000; i++) {
+    solver2.EvaluateAndUpdatePolicy();
+  }
+  // Values checkes with Marc's thesis implementation.
+  const std::unique_ptr<Policy> average_policy2 = solver2.AveragePolicy();
+  SPIEL_CHECK_LE(Exploitability(*game, *average_policy2), 0.01);
+}
+
 void CFRPlusTest_KuhnPoker() {
   std::shared_ptr<const Game> game = LoadGame("kuhn_poker");
   CFRPlusSolver solver(*game);
@@ -162,6 +192,7 @@ namespace algorithms = open_spiel::algorithms;
 
 int main(int argc, char** argv) {
   algorithms::CFRTest_KuhnPoker();
+  algorithms::CFRTest_IIGoof4();
   algorithms::CFRPlusTest_KuhnPoker();
   algorithms::CFRTest_KuhnPokerRunsWithThreePlayers(
       /*linear_averaging=*/false,

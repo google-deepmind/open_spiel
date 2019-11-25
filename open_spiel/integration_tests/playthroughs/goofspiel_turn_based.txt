@@ -23,23 +23,23 @@ NumPlayers() = 2
 MinUtility() = -1.0
 MaxUtility() = 1.0
 UtilitySum() = 0.0
-InformationStateNormalizedVectorShape() = [56]
-InformationStateNormalizedVectorSize() = 56
+InformationStateNormalizedVectorShape() = [72]
+InformationStateNormalizedVectorSize() = 72
 MaxGameLength() = 8
 ToString() = "turn_based_simultaneous_game(game=goofspiel(imp_info=True,num_cards=4,players=2,points_order=descending))"
 
 # State 0
 IsTerminal() = False
-ToString() = "Partial joint action: \nP0 hand: 1 2 3 4 \nP1 hand: 1 2 3 4 \nP0 actions: \nP1 actions: \nPoint card: 4\nPoints: 0 0 \n"
+ToString() = "Partial joint action: \nP0 hand: 1 2 3 4 \nP1 hand: 1 2 3 4 \nP0 actions: \nP1 actions: \nPoint card sequence: \nPoints: 0 0 \n"
 History() = []
 HistoryString() = ""
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationState(0) = "Current player: 0\nP0 hand: 1 2 3 4 \nP0 action sequence: \nPoint card: 4\nWin sequence: \nPoints: 0 0 \n"
-InformationState(1) = "Current player: 0\nP1 hand: 1 2 3 4 \nP1 action sequence: \nPoint card: 4\nWin sequence: \nPoints: 0 0 \n"
-InformationStateAsNormalizedVector(0) = [1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateAsNormalizedVector(1) = [1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+InformationState(0) = "Current player: 0\nP0 hand: 1 2 3 4 \nP0 action sequence: \nPoint card sequence: \nWin sequence: \nPoints: 0 0 \n"
+InformationState(1) = "Current player: 0\nP1 hand: 1 2 3 4 \nP1 action sequence: \nPoint card sequence: \nWin sequence: \nPoints: 0 0 \n"
+InformationStateAsNormalizedVector(0) = [1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+InformationStateAsNormalizedVector(1) = [1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [0, 1, 2, 3]
@@ -50,16 +50,16 @@ action: 2
 
 # State 1
 IsTerminal() = False
-ToString() = "Partial joint action: 2 \nP0 hand: 1 2 3 4 \nP1 hand: 1 2 3 4 \nP0 actions: \nP1 actions: \nPoint card: 4\nPoints: 0 0 \n"
+ToString() = "Partial joint action: 2 \nP0 hand: 1 2 3 4 \nP1 hand: 1 2 3 4 \nP0 actions: \nP1 actions: \nPoint card sequence: \nPoints: 0 0 \n"
 History() = [2]
 HistoryString() = "2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationState(0) = "Current player: 1\nObserver's action this turn: 2\nP0 hand: 1 2 3 4 \nP0 action sequence: \nPoint card: 4\nWin sequence: \nPoints: 0 0 \n"
-InformationState(1) = "Current player: 1\nP1 hand: 1 2 3 4 \nP1 action sequence: \nPoint card: 4\nWin sequence: \nPoints: 0 0 \n"
-InformationStateAsNormalizedVector(0) = [0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateAsNormalizedVector(1) = [0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+InformationState(0) = "Current player: 1\nObserver's action this turn: 2\nP0 hand: 1 2 3 4 \nP0 action sequence: \nPoint card sequence: \nWin sequence: \nPoints: 0 0 \n"
+InformationState(1) = "Current player: 1\nP1 hand: 1 2 3 4 \nP1 action sequence: \nPoint card sequence: \nWin sequence: \nPoints: 0 0 \n"
+InformationStateAsNormalizedVector(0) = [0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+InformationStateAsNormalizedVector(1) = [0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [0, 1, 2, 3]
@@ -70,16 +70,16 @@ action: 3
 
 # State 2
 IsTerminal() = False
-ToString() = "Partial joint action: \nP0 hand: 1 2 4 \nP1 hand: 1 2 3 \nP0 actions: 2 \nP1 actions: 3 \nPoint card: 3\nPoints: 0 4 \n"
+ToString() = "Partial joint action: \nP0 hand: 1 2 4 \nP1 hand: 1 2 3 \nP0 actions: 2 \nP1 actions: 3 \nPoint card sequence: \nPoints: 0 4 \n"
 History() = [2, 3]
 HistoryString() = "2 3"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationState(0) = "Current player: 0\nP0 hand: 1 2 4 \nP0 action sequence: 2 \nPoint card: 3\nWin sequence: 1 \nPoints: 0 4 \n"
-InformationState(1) = "Current player: 0\nP1 hand: 1 2 3 \nP1 action sequence: 3 \nPoint card: 3\nWin sequence: 1 \nPoints: 0 4 \n"
-InformationStateAsNormalizedVector(0) = [1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateAsNormalizedVector(1) = [1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+InformationState(0) = "Current player: 0\nP0 hand: 1 2 4 \nP0 action sequence: 2 \nPoint card sequence: \nWin sequence: 1 \nPoints: 0 4 \n"
+InformationState(1) = "Current player: 0\nP1 hand: 1 2 3 \nP1 action sequence: 3 \nPoint card sequence: \nWin sequence: 1 \nPoints: 0 4 \n"
+InformationStateAsNormalizedVector(0) = [1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+InformationStateAsNormalizedVector(1) = [1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [0, 1, 3]
@@ -90,16 +90,16 @@ action: 1
 
 # State 3
 IsTerminal() = False
-ToString() = "Partial joint action: 1 \nP0 hand: 1 2 4 \nP1 hand: 1 2 3 \nP0 actions: 2 \nP1 actions: 3 \nPoint card: 3\nPoints: 0 4 \n"
+ToString() = "Partial joint action: 1 \nP0 hand: 1 2 4 \nP1 hand: 1 2 3 \nP0 actions: 2 \nP1 actions: 3 \nPoint card sequence: \nPoints: 0 4 \n"
 History() = [2, 3, 1]
 HistoryString() = "2 3 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationState(0) = "Current player: 1\nObserver's action this turn: 1\nP0 hand: 1 2 4 \nP0 action sequence: 2 \nPoint card: 3\nWin sequence: 1 \nPoints: 0 4 \n"
-InformationState(1) = "Current player: 1\nP1 hand: 1 2 3 \nP1 action sequence: 3 \nPoint card: 3\nWin sequence: 1 \nPoints: 0 4 \n"
-InformationStateAsNormalizedVector(0) = [0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateAsNormalizedVector(1) = [0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+InformationState(0) = "Current player: 1\nObserver's action this turn: 1\nP0 hand: 1 2 4 \nP0 action sequence: 2 \nPoint card sequence: \nWin sequence: 1 \nPoints: 0 4 \n"
+InformationState(1) = "Current player: 1\nP1 hand: 1 2 3 \nP1 action sequence: 3 \nPoint card sequence: \nWin sequence: 1 \nPoints: 0 4 \n"
+InformationStateAsNormalizedVector(0) = [0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+InformationStateAsNormalizedVector(1) = [0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [0, 1, 2]
@@ -110,16 +110,16 @@ action: 0
 
 # State 4
 IsTerminal() = False
-ToString() = "Partial joint action: \nP0 hand: 1 4 \nP1 hand: 2 3 \nP0 actions: 2 1 \nP1 actions: 3 0 \nPoint card: 2\nPoints: 3 4 \n"
+ToString() = "Partial joint action: \nP0 hand: 1 4 \nP1 hand: 2 3 \nP0 actions: 2 1 \nP1 actions: 3 0 \nPoint card sequence: \nPoints: 3 4 \n"
 History() = [2, 3, 1, 0]
 HistoryString() = "2 3 1 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationState(0) = "Current player: 0\nP0 hand: 1 4 \nP0 action sequence: 2 1 \nPoint card: 2\nWin sequence: 1 0 \nPoints: 3 4 \n"
-InformationState(1) = "Current player: 0\nP1 hand: 2 3 \nP1 action sequence: 3 0 \nPoint card: 2\nWin sequence: 1 0 \nPoints: 3 4 \n"
-InformationStateAsNormalizedVector(0) = [1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateAsNormalizedVector(1) = [1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+InformationState(0) = "Current player: 0\nP0 hand: 1 4 \nP0 action sequence: 2 1 \nPoint card sequence: \nWin sequence: 1 0 \nPoints: 3 4 \n"
+InformationState(1) = "Current player: 0\nP1 hand: 2 3 \nP1 action sequence: 3 0 \nPoint card sequence: \nWin sequence: 1 0 \nPoints: 3 4 \n"
+InformationStateAsNormalizedVector(0) = [1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+InformationStateAsNormalizedVector(1) = [1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [0, 3]
@@ -130,16 +130,16 @@ action: 3
 
 # State 5
 IsTerminal() = False
-ToString() = "Partial joint action: 3 \nP0 hand: 1 4 \nP1 hand: 2 3 \nP0 actions: 2 1 \nP1 actions: 3 0 \nPoint card: 2\nPoints: 3 4 \n"
+ToString() = "Partial joint action: 3 \nP0 hand: 1 4 \nP1 hand: 2 3 \nP0 actions: 2 1 \nP1 actions: 3 0 \nPoint card sequence: \nPoints: 3 4 \n"
 History() = [2, 3, 1, 0, 3]
 HistoryString() = "2 3 1 0 3"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationState(0) = "Current player: 1\nObserver's action this turn: 3\nP0 hand: 1 4 \nP0 action sequence: 2 1 \nPoint card: 2\nWin sequence: 1 0 \nPoints: 3 4 \n"
-InformationState(1) = "Current player: 1\nP1 hand: 2 3 \nP1 action sequence: 3 0 \nPoint card: 2\nWin sequence: 1 0 \nPoints: 3 4 \n"
-InformationStateAsNormalizedVector(0) = [0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateAsNormalizedVector(1) = [0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+InformationState(0) = "Current player: 1\nObserver's action this turn: 3\nP0 hand: 1 4 \nP0 action sequence: 2 1 \nPoint card sequence: \nWin sequence: 1 0 \nPoints: 3 4 \n"
+InformationState(1) = "Current player: 1\nP1 hand: 2 3 \nP1 action sequence: 3 0 \nPoint card sequence: \nWin sequence: 1 0 \nPoints: 3 4 \n"
+InformationStateAsNormalizedVector(0) = [0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+InformationStateAsNormalizedVector(1) = [0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [1, 2]
@@ -150,15 +150,15 @@ action: 1
 
 # State 6
 IsTerminal() = True
-ToString() = "P0 hand: \nP1 hand: \nP0 actions: 2 1 3 0 \nP1 actions: 3 0 1 2 \nPoints: 5 5 \n"
+ToString() = "P0 hand: \nP1 hand: \nP0 actions: 2 1 3 0 \nP1 actions: 3 0 1 2 \nPoint card sequence: \nPoints: 5 5 \n"
 History() = [2, 3, 1, 0, 3, 1]
 HistoryString() = "2 3 1 0 3 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
-InformationState(0) = "Current player: -4\nP0 hand: \nP0 action sequence: 2 1 3 0 \nWin sequence: 1 0 0 1 \nPoints: 5 5 \n"
-InformationState(1) = "Current player: -4\nP1 hand: \nP1 action sequence: 3 0 1 2 \nWin sequence: 1 0 0 1 \nPoints: 5 5 \n"
-InformationStateAsNormalizedVector(0) = [0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0]
-InformationStateAsNormalizedVector(1) = [0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0]
+InformationState(0) = "Current player: -4\nP0 hand: \nP0 action sequence: 2 1 3 0 \nPoint card sequence: \nWin sequence: 1 0 0 1 \nPoints: 5 5 \n"
+InformationState(1) = "Current player: -4\nP1 hand: \nP1 action sequence: 3 0 1 2 \nPoint card sequence: \nWin sequence: 1 0 0 1 \nPoints: 5 5 \n"
+InformationStateAsNormalizedVector(0) = [0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0]
+InformationStateAsNormalizedVector(1) = [0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0]
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
