@@ -236,6 +236,15 @@ std::string PentagoState::Observation(Player player) const {
   return ToString();
 }
 
+int PlayerRelative(PentagoPlayer state, Player current) {
+  switch (state) {
+    case kPlayer1: return current == 0 ? 0 : 1;
+    case kPlayer2: return current == 1 ? 0 : 1;
+    case kPlayerNone: return 2;
+    default: SpielFatalError("Unknown player type.");
+  }
+}
+
 void PentagoState::ObservationAsNormalizedVector(
     Player player, std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
@@ -243,7 +252,7 @@ void PentagoState::ObservationAsNormalizedVector(
 
   TensorView<2> view(values, {kCellStates, kBoardPositions}, true);
   for (int i = 0; i < kBoardPositions; i++) {
-    view[{static_cast<int>(get(i)), i}] = 1.0;
+    view[{PlayerRelative(get(i), player), i}] = 1.0;
   }
 }
 

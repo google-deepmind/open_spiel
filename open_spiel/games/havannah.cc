@@ -283,6 +283,15 @@ std::string HavannahState::Observation(Player player) const {
   return ToString();
 }
 
+int PlayerRelative(HavannahPlayer state, Player current) {
+  switch (state) {
+    case kPlayer1: return current == 0 ? 0 : 1;
+    case kPlayer2: return current == 1 ? 0 : 1;
+    case kPlayerNone: return 2;
+    default: SpielFatalError("Unknown player type.");
+  }
+}
+
 void HavannahState::ObservationAsNormalizedVector(
     Player player, std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
@@ -291,8 +300,8 @@ void HavannahState::ObservationAsNormalizedVector(
   TensorView<2> view(values, {kCellStates, static_cast<int>(board_.size())},
                      true);
   for (int i = 0; i < board_.size(); ++i) {
-    if (board_[i].player != kPlayerInvalid) {
-      view[{static_cast<int>(board_[i].player), i}] = 1.0;
+    if (board_[i].player < kCellStates) {
+      view[{PlayerRelative(board_[i].player, player), i}] = 1.0;
     }
   }
 }

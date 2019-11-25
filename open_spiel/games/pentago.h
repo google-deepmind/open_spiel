@@ -65,6 +65,9 @@ class PentagoState : public State {
   std::vector<double> Returns() const override;
   std::string InformationState(Player player) const override;
   std::string Observation(Player player) const override;
+
+  // A 3d tensor, 3 player-relative one-hot 2d planes. The layers are: the
+  // specified player, the other player, and empty.
   void ObservationAsNormalizedVector(
       Player player, std::vector<double>* values) const override;
   std::unique_ptr<State> Clone() const override;

@@ -237,6 +237,15 @@ std::string YState::Observation(Player player) const {
   return ToString();
 }
 
+int PlayerRelative(YPlayer state, Player current) {
+  switch (state) {
+    case kPlayer1: return current == 0 ? 0 : 1;
+    case kPlayer2: return current == 1 ? 0 : 1;
+    case kPlayerNone: return 2;
+    default: SpielFatalError("Unknown player type.");
+  }
+}
+
 void YState::ObservationAsNormalizedVector(Player player,
                                            std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
@@ -246,7 +255,7 @@ void YState::ObservationAsNormalizedVector(Player player,
                      true);
   for (int i = 0; i < board_.size(); ++i) {
     if (board_[i].player != kPlayerInvalid) {
-      view[{static_cast<int>(board_[i].player), i}] = 1.0;
+      view[{PlayerRelative(board_[i].player, player), i}] = 1.0;
     }
   }
 }

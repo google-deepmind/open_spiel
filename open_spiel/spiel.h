@@ -405,6 +405,7 @@ class State {
     return Observation(CurrentPlayer());
   }
 
+  // Returns the view of the game, preferably from `player`'s perspective.
   virtual void ObservationAsNormalizedVector(
       Player player, std::vector<double>* values) const {
     SpielFatalError("ObservationAsNormalizedVector unimplemented!");
