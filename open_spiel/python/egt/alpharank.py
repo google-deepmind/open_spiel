@@ -437,7 +437,8 @@ def sweep_pi_vs_alpha(payoff_tables,
                       m=50,
                       rtol=1e-5,
                       atol=1e-8,
-                      num_strats_to_label=10):
+                      num_strats_to_label=10,
+                      legend_sort_clusters=False):
   """Computes stationary distribution, pi, for range of selection intensities.
 
   The range of selection intensities is defined in alpha_list and corresponds
@@ -456,6 +457,10 @@ def sweep_pi_vs_alpha(payoff_tables,
     rtol: The relative tolerance parameter for np.allclose calls.
     atol: The absolute tolerance parameter for np.allclose calls.
     num_strats_to_label: Number of strats to label in legend
+    legend_sort_clusters: If true, strategies in the same cluster are sorted
+      in the legend according to orderings for earlier alpha values. Primarily
+      for visualization purposes! Rankings for lower alpha values should be
+      interpreted carefully.
 
   Returns:
    pi: AlphaRank stationary distribution.
@@ -524,7 +529,8 @@ def sweep_pi_vs_alpha(payoff_tables,
         num_populations,
         num_strats_per_population,
         strat_labels,
-        num_strats_to_label=num_strats_to_label)
+        num_strats_to_label=num_strats_to_label,
+        legend_sort_clusters=legend_sort_clusters)
 
   if return_alpha:
     return pi, alpha

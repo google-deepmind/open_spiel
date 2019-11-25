@@ -317,7 +317,7 @@ def _draw_pie(ax,
 def generate_sorted_masses_strats(pi_list,
                                   curr_alpha_idx,
                                   strats_to_go):
-  """ Generates a sorted list of (mass, strats) tuples
+  """Generates a sorted list of (mass, strats) tuples
 
   Args:
     pi_list: List of stationary distributions, pi
@@ -364,7 +364,8 @@ def plot_pi_vs_alpha(pi_list,
                      num_strats_to_label,
                      plot_semilogx=True,
                      xlabel=r"Ranking-intensity $\alpha$",
-                     ylabel=r"Strategy mass in stationary distribution $\pi$"):
+                     ylabel=r"Strategy mass in stationary distribution $\pi$",
+                     legend_sort_clusters=False):
   """Plots stationary distributions, pi, against selection intensities, alpha.
 
   Args:
@@ -377,6 +378,10 @@ def plot_pi_vs_alpha(pi_list,
     plot_semilogx: Boolean set to enable/disable semilogx plot.
     xlabel: Plot xlabel.
     ylabel: Plot ylabel.
+    legend_sort_clusters: If true, strategies in the same cluster are sorted
+      in the legend according to orderings for earlier alpha values. Primarily
+      for visualization purposes! Rankings for lower alpha values should be
+      interpreted carefully.
   """
 
   # Cluster strategies for which the stationary distribution has similar masses
@@ -399,10 +404,13 @@ def plot_pi_vs_alpha(pi_list,
   num_strats_printed = 0
   add_legend_entries = True
 
-  sorted_masses_strats = generate_sorted_masses_strats(
-      pi_list,
-      pi_list.shape[0] - 1,
-      [i for i in range(pi_list.shape[1])])
+  if legend_sort_clusters:
+    sorted_masses_strats = generate_sorted_masses_strats(
+        pi_list,
+        pi_list.shape[0] - 1,
+        range(pi_list.shape[1]))
+  else:
+    sorted_masses_strats = sorted(masses_to_strats.items(), reverse=True)
 
   for mass, strats in sorted_masses_strats:
     for profile_id in strats:
