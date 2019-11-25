@@ -1,9 +1,10 @@
-module Spiel
+module OpenSpiel_jll
+
+include("$(@__DIR__)/../deps/deps.jl")
 
 using CxxWrap
 
-path_to_lib = get(ENV, "LIB_SPIEL_JL", "$(dirname(@__FILE__))/../../build/julia/libspieljl.so")
-@wrapmodule(path_to_lib)
+@wrapmodule(LIB_OPEN_SPIEL)
 
 function __init__()
     @initcxx
