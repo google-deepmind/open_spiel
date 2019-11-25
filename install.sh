@@ -75,7 +75,7 @@ fi
 
 # 2. Install other required system-wide dependencies
 if [[ "$OSTYPE" == "linux-gnu" ]]; then
-  EXT_DEPS="virtualenv cmake python3 python3-dev python3-pip python3-setuptools python3-wheel wget"
+  EXT_DEPS="virtualenv cmake python3 python3-dev python3-pip python3-setuptools python3-wheel"
   APT_GET=`which apt-get`
   if [ "$APT_GET" = "" ]
   then
@@ -108,13 +108,14 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
       JULIA_VERSION_INFO=`julia --version`
       echo -e "\e[33m$JULIA_VERSION_INFO is already installed.\e[0m"
     else
-      echo "Julia not found. Installing them..."
-      sudo wget https://julialang-s3.julialang.org/bin/linux/x64/1.2/julia-1.2.0-linux-x86_64.tar.gz -O /tmp/julia.tar.gz
-      sudo tar -zxvf /tmp/julia.tar.gz -C /usr/local
-      sudo ln -s /usr/local/julia-1.2.0/bin/julia /usr/local/bin/julia
+      echo "Julia not found. Installing it in the home dir..."
+      sudo apt-get install wget
+      wget https://julialang-s3.julialang.org/bin/linux/x64/1.2/julia-1.2.0-linux-x86_64.tar.gz -O /tmp/julia.tar.gz
+      tar -zxvf /tmp/julia.tar.gz -C ~
+      sudo ln -s ~/julia-1.2.0/bin/julia /usr/local/bin/julia
     fi
-    # Install CxxWrap.jl
-    julia -e 'using Pkg; Pkg.add("StatsBase"); Pkg.add(PackageSpec(name="CxxWrap", rev="0c82e3e383ddf2db1face8ece22d0a552f0ca11a"))' # TODO: use stable version
+    # Install dependencies
+    julia --project="${MYDIR}/open_spiel/julia" -e 'using Pkg; Pkg.instantiate()'
   fi
 elif [[ "$OSTYPE" == "darwin"* ]]; then  # Mac OSX
   [[ -x "$(type python3)" ]] || brew install python3 || echo "** Warning: failed 'brew install python3' -- continuing"

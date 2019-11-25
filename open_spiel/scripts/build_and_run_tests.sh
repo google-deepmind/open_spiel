@@ -50,7 +50,7 @@ cd $BUILD_DIR
 echo "Building and testing in $PWD using 'python' (version $PYVERSION)."
 
 if [[ ${BUILD_WITH_JULIA:-"OFF"} == "ON" ]]; then
-  JlCxx_DIR=`julia -e 'using CxxWrap; print(joinpath(dirname(CxxWrap.jlcxx_path), "cmake", "JlCxx"))'`
+  JlCxx_DIR=`julia --project=${MYDIR}/../julia -e 'using CxxWrap; print(joinpath(dirname(CxxWrap.jlcxx_path), "cmake", "JlCxx"))'`
 fi
 
 cmake -DPython_TARGET_VERSION=${PYVERSION} -DCMAKE_CXX_COMPILER=${CXX} -DJlCxx_DIR=$JlCxx_DIR ../open_spiel
@@ -70,11 +70,9 @@ else
   exit 1
 fi
 
-cd ..
-
 # Test Julia
 if [[ ${BUILD_WITH_JULIA:-"OFF"} == "ON" ]]; then
-  julia ./open_spiel/julia/example.jl tic_tac_toe
-  julia ./open_spiel/julia/example.jl kuhn_poker
-  julia ./open_spiel/julia/example.jl 'goofspiel(imp_info=True,num_cards=4,points_order=descending)'
+  julia --project=${MYDIR}/../julia -e 'using Pkg; Pkg.test()'
 fi
+
+cd ..
