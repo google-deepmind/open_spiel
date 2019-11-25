@@ -179,39 +179,34 @@ std::string SearchNode::ToString(const State& state) const {
       children.size());
 }
 
-MCTSBot::MCTSBot(
-      const Game& game,
-      Player player,
-      Evaluator* evaluator,
-      double uct_c,
-      int max_simulations,
-      int64_t max_memory_mb,
-      bool solve,
-      int seed,
-      bool verbose,
-      ChildSelectionPolicy child_selection_policy)
-      : Bot{game, player},
-        uct_c_{uct_c},
-        max_simulations_{max_simulations},
-        max_memory_(max_memory_mb << 20),  // megabytes -> bytes
-        verbose_(verbose),
-        solve_(solve),
-        max_utility_(game.MaxUtility()),
-        rng_(seed),
-        child_selection_policy_(child_selection_policy),
-        evaluator_{evaluator} {
-    GameType game_type = game.GetType();
-    if (game_type.reward_model != GameType::RewardModel::kTerminal)
-      SpielFatalError("Game must have terminal rewards.");
-    if (game_type.dynamics != GameType::Dynamics::kSequential)
-      SpielFatalError("Game must have sequential turns.");
-    if (player < 0 || player >= game.NumPlayers())
-      SpielFatalError(absl::StrFormat(
-          "Game doesn't support that many players. Max: %d, player: %d",
-          game.NumPlayers(), player));
-  }
+MCTSBot::MCTSBot(const Game& game, Player player, Evaluator* evaluator,
+                 double uct_c, int max_simulations, int64_t max_memory_mb,
+                 bool solve, int seed, bool verbose,
+                 ChildSelectionPolicy child_selection_policy)
+    : Bot(/*provides_policy=*/false),
+      game_(game),
+      player_id_(player),
+      uct_c_{uct_c},
+      max_simulations_{max_simulations},
+      max_memory_(max_memory_mb << 20),  // megabytes -> bytes
+      verbose_(verbose),
+      solve_(solve),
+      max_utility_(game.MaxUtility()),
+      rng_(seed),
+      child_selection_policy_(child_selection_policy),
+      evaluator_{evaluator} {
+  GameType game_type = game.GetType();
+  if (game_type.reward_model != GameType::RewardModel::kTerminal)
+    SpielFatalError("Game must have terminal rewards.");
+  if (game_type.dynamics != GameType::Dynamics::kSequential)
+    SpielFatalError("Game must have sequential turns.");
+  if (player < 0 || player >= game.NumPlayers())
+    SpielFatalError(absl::StrFormat(
+        "Game doesn't support that many players. Max: %d, player: %d",
+        game.NumPlayers(), player));
+}
 
-std::pair<ActionsAndProbs, Action> MCTSBot::Step(const State& state) {
+Action MCTSBot::Step(const State& state) {
   absl::Time start = absl::Now();
   std::unique_ptr<SearchNode> root = MCTSearch(state);
   const SearchNode& best = root->BestChild();
@@ -234,7 +229,7 @@ std::pair<ActionsAndProbs, Action> MCTSBot::Step(const State& state) {
     }
   }
 
-  return {{{best.action, 1.0}}, best.action};
+  return best.action;
 }
 
 std::unique_ptr<State> MCTSBot::ApplyTreePolicy(

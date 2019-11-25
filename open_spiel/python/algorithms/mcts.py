@@ -235,6 +235,7 @@ class MCTSBot(pyspiel.Bot):
     Raises:
       ValueError: if the game type isn't supported.
     """
+    pyspiel.Bot.__init__(self, provides_policy=False)
     # Check that the game satisfies the conditions for this MCTS implemention.
     game_type = game.get_type()
     if game_type.reward_model != pyspiel.GameType.RewardModel.TERMINAL:
@@ -246,7 +247,8 @@ class MCTSBot(pyspiel.Bot):
           "Game doesn't support that many players. Max: {}, player: {}".format(
               game.num_players(), player))
 
-    super(MCTSBot, self).__init__(game, player)
+    self._game = game
+    self._player_id = player
     self.uct_c = uct_c
     self.max_simulations = max_simulations
     self.evaluator = evaluator
@@ -257,7 +259,13 @@ class MCTSBot(pyspiel.Bot):
     self._random_state = random_state or np.random.RandomState()
     self._child_selection_fn = child_selection_fn
 
-  def step(self, state):
+  def restart_at(self, state):
+    pass
+
+  def player_id(self):
+    return self._player_id
+
+  def step_with_policy(self, state):
     """Returns bot's policy and action at given state."""
     t1 = time.time()
     root = self.mcts_search(state)
@@ -284,6 +292,9 @@ class MCTSBot(pyspiel.Bot):
               for action in state.legal_actions(self.player_id())]
 
     return policy, mcts_action
+
+  def step(self, state):
+    return self.step_with_policy(state)[1]
 
   def _apply_tree_policy(self, root, state):
     """Applies the UCT policy to play the game until reaching a leaf node.

@@ -22,7 +22,7 @@ std::vector<double> EvaluateBots(State* state, const std::vector<Bot*>& bots,
   std::mt19937 rng(seed);
   std::uniform_real_distribution<> uniform(0, 1);
   std::vector<Action> joint_actions(bots.size());
-  for (auto bot : bots) bot->Restart(*state);
+  for (auto bot : bots) bot->RestartAt(*state);
   while (!state->IsTerminal()) {
     if (state->IsChanceNode()) {
       state->ApplyAction(
@@ -32,12 +32,12 @@ std::vector<double> EvaluateBots(State* state, const std::vector<Bot*>& bots,
         if (state->LegalActions(p).empty()) {
           joint_actions[p] = kInvalidAction;
         } else {
-          joint_actions[p] = bots[p]->Step(*state).second;
+          joint_actions[p] = bots[p]->Step(*state);
         }
       }
       state->ApplyActions(joint_actions);
     } else {
-      state->ApplyAction(bots[state->CurrentPlayer()]->Step(*state).second);
+      state->ApplyAction(bots[state->CurrentPlayer()]->Step(*state));
     }
   }
 

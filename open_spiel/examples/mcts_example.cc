@@ -122,8 +122,7 @@ std::pair<std::vector<double>, std::vector<std::string>> PlayGame(
           "MCTS not supported for games with simultaneous actions.");
     } else {
       // Decision node, ask the right bot to make its action
-      auto bot_choice = bots[player]->Step(*state);
-      action = bot_choice.second;
+      action = bots[player]->Step(*state);
       if (!quiet)
         std::cerr << "Chose action: " << state->ActionToString(player, action)
                   << std::endl;

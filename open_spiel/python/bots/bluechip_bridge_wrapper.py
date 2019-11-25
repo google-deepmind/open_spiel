@@ -199,7 +199,9 @@ class BlueChipBridgeBot(pyspiel.Bot):
       client: The BlueChip bot; must support methods `start`, `read_line`, and
         `send_line`.
     """
-    super(BlueChipBridgeBot, self).__init__(game, player_id)
+    pyspiel.Bot.__init__(self, provides_policy=False)
+    self._game = game
+    self._player_id = player_id
     self._client = client
     self._seat = _SEATS[player_id]
     self._partner = _SEATS[1 - player_id]
@@ -207,7 +209,14 @@ class BlueChipBridgeBot(pyspiel.Bot):
     self._right_hand_opponent = _OPPONENTS[1 - player_id]
     self._connected = False
 
-  def restart(self, state):
+  def player_id(self):
+    return self._player_id
+
+  def restart(self):
+    """Indicates that the next step may be from a non-sequential state."""
+    self._connected = False
+
+  def restart_at(self, state):
     """Indicates that the next step may be from a non-sequential state."""
     self._connected = False
 

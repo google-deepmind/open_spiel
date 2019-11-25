@@ -114,7 +114,7 @@ def _play_game(game, bots, initial_actions):
     else:
       # Decision node: sample action for the single current player
       bot = bots[state.current_player()]
-      _, action = bot.step(state)
+      action = bot.step(state)
       action_str = state.action_to_string(state.current_player(), action)
       _opt_print("Player {} sampled action: {}".format(state.current_player(),
                                                        action_str))

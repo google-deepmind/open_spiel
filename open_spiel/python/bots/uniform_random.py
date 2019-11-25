@@ -34,10 +34,18 @@ class UniformRandomBot(pyspiel.Bot):
       rng: A random number generator supporting a `choice` method, e.g.
         `np.random`
     """
-    super(UniformRandomBot, self).__init__(game, player_id)
+    pyspiel.Bot.__init__(self, provides_policy=True)
+    self._game = game
+    self._player_id = player_id
     self._rng = rng
 
-  def step(self, state):
+  def restart_at(self, state):
+    pass
+
+  def player_id(self):
+    return self._player_id
+
+  def step_with_policy(self, state):
     """Returns the stochastic policy and selected action in the given state.
 
     Args:
@@ -50,10 +58,14 @@ class UniformRandomBot(pyspiel.Bot):
       The `action` is selected uniformly at random from the legal actions,
       or `pyspiel.INVALID_ACTION` if there are no legal actions available.
     """
-    legal_actions = state.legal_actions(self.player_id())
+    legal_actions = state.legal_actions(self._player_id)
     if not legal_actions:
       return [], pyspiel.INVALID_ACTION
     p = 1 / len(legal_actions)
     policy = [(action, p) for action in legal_actions]
     action = self._rng.choice(legal_actions)
     return policy, action
+
+  def step(self, state):
+    return self.step_with_policy(state)[1]
+

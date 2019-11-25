@@ -135,7 +135,6 @@ struct SearchNode {
   std::string ChildrenStr(const State& state) const;
 };
 
-
 // A SpielBot that uses the MCTS algorithm as its policy.
 class MCTSBot : public Bot {
  public:
@@ -150,9 +149,12 @@ class MCTSBot : public Bot {
       int seed,
       bool verbose,
       ChildSelectionPolicy child_selection_policy = ChildSelectionPolicy::UCT);
+  ~MCTSBot() = default;
 
+  void Restart() override {}
+  void RestartAt(const State& state) override {}
   // Run MCTS for one step, choosing the action, and printing some information.
-  std::pair<ActionsAndProbs, Action> Step(const State& state) override;
+  Action Step(const State& state) override;
 
   // Run MCTS on a given state, and return the resulting search tree.
   std::unique_ptr<SearchNode> MCTSearch(const State& state);
@@ -175,6 +177,8 @@ class MCTSBot : public Bot {
       SearchNode* root, const State& state,
       std::vector<SearchNode*>* visit_path);
 
+  const Game& game_;
+  Player player_id_;
   double uct_c_;
   int max_simulations_;
   int64_t max_memory_;  // Max memory allowed in the tree, in bytes.

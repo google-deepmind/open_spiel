@@ -40,12 +40,12 @@ class BotTest(absltest.TestCase):
     state.apply_action(4)
 
     # p0 starts: uniform from [check, bet]
-    policy, _ = bots[0].step(state)
+    policy, _ = bots[0].step_with_policy(state)
     self.assertCountEqual(policy, [(1, 0.5), (2, 0.5)])
 
     # Afte p0 bets, p1 chooses from [fold, call, raise]
     state.apply_action(2)
-    policy, _ = bots[1].step(state)
+    policy, _ = bots[1].step_with_policy(state)
     self.assertCountEqual(policy, [(0, 1 / 3), (1, 1 / 3), (2, 1 / 3)])
 
   def test_no_legal_actions(self):
@@ -56,8 +56,8 @@ class BotTest(absltest.TestCase):
     state.apply_action(1)  # deal
     state.apply_action(1)  # bet
     state.apply_action(0)  # fold
-    bot.restart(state)
-    policy, action = bot.step(state)
+    bot.restart_at(state)
+    policy, action = bot.step_with_policy(state)
     self.assertEqual(policy, [])
     self.assertEqual(action, pyspiel.INVALID_ACTION)
 

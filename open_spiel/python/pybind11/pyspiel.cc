@@ -65,30 +65,58 @@ class PyBot : public Bot {
  public:
   // We need the bot constructor
   using Bot::Bot;
+  ~PyBot() override = default;
 
-  // Override the bot's action choice.
   using step_retval_t = std::pair<ActionsAndProbs, open_spiel::Action>;
 
   // Choose and execute an action in a game. The bot should return its
   // distribution over actions and also its selected action.
-  step_retval_t Step(const State& state) override {
+  open_spiel::Action Step(const State& state) override {
     PYBIND11_OVERLOAD_PURE_NAME(
-        step_retval_t,  // Return type (must be a simple token for macro parser)
-        Bot,            // Parent class
-        "step",         // Name of function in Python
-        Step,           // Name of function in C++
-        state           // Arguments
+        open_spiel::Action,  // Return type (must be simple token)
+        Bot,                 // Parent class
+        "step",              // Name of function in Python
+        Step,                // Name of function in C++
+        state                // Arguments
     );
   }
 
   // Restart at the specified state.
-  void Restart(const State& state) override {
+  void Restart() override {
     PYBIND11_OVERLOAD_NAME(
         void,       // Return type (must be a simple token for macro parser)
         Bot,        // Parent class
         "restart",  // Name of function in Python
         Restart,    // Name of function in C++
-        state       // Arguments
+        // The trailing coma after Restart is necessary to say "No argument"
+    );
+  }
+  void RestartAt(const State& state) override {
+    PYBIND11_OVERLOAD_NAME(
+        void,          // Return type (must be a simple token for macro parser)
+        Bot,           // Parent class
+        "restart_at",  // Name of function in Python
+        RestartAt,     // Name of function in C++
+        state          // Arguments
+    );
+  }
+
+  ActionsAndProbs GetPolicy(const State& state) override {
+    PYBIND11_OVERLOAD_NAME(ActionsAndProbs,  // Return type (must be a simple
+                                             // token for macro parser)
+                           Bot,              // Parent class
+                           "get_policy",     // Name of function in Python
+                           GetPolicy,        // Name of function in C++
+                           state);
+  }
+  std::pair<ActionsAndProbs, Action> StepWithPolicy(
+      const State& state) override {
+    PYBIND11_OVERLOAD_NAME(
+        step_retval_t,  // Return type (must be a simple token for macro parser)
+        Bot,            // Parent class
+        "step_with_policy",  // Name of function in Python
+        StepWithPolicy,      // Name of function in C++
+        state                // Arguments
     );
   }
 };
@@ -125,8 +153,7 @@ PYBIND11_MODULE(pyspiel, m) {
       .def(py::init<std::string, std::string, GameType::Dynamics,
                     GameType::ChanceMode, GameType::Information,
                     GameType::Utility, GameType::RewardModel, int, int, bool,
-                    bool, bool, bool,
-                    std::map<std::string, GameParameter>>())
+                    bool, bool, bool, std::map<std::string, GameParameter>>())
       .def_readonly("short_name", &GameType::short_name)
       .def_readonly("long_name", &GameType::long_name)
       .def_readonly("dynamics", &GameType::dynamics)
@@ -328,10 +355,13 @@ PYBIND11_MODULE(pyspiel, m) {
           }));
 
   py::class_<Bot, PyBot> bot(m, "Bot");
-  bot.def(py::init<const Game&, int>())
-      .def("player_id", &Bot::PlayerId)
+  bot.def(py::init<bool>(), py::arg("provides_policy"))
       .def("step", &Bot::Step)
-      .def("restart", &Bot::Restart);
+      .def("restart", &Bot::Restart)
+      .def("restart_at", &Bot::RestartAt)
+      .def("provides_policy", &Bot::ProvidesPolicy)
+      .def("get_policy", &Bot::GetPolicy)
+      .def("step_with_policy", &Bot::StepWithPolicy);
 
   py::class_<algorithms::Evaluator> mcts_evaluator(m, "Evaluator");
   py::class_<algorithms::RandomRolloutEvaluator, algorithms::Evaluator>(
@@ -343,15 +373,15 @@ PYBIND11_MODULE(pyspiel, m) {
       .value("PUCT", algorithms::ChildSelectionPolicy::PUCT);
 
   py::class_<algorithms::MCTSBot, Bot>(m, "MCTSBot")
-      .def(py::init<const Game&, Player, Evaluator*, double, int, int64_t,
-                    bool, int, bool,
-                    ::open_spiel::algorithms::ChildSelectionPolicy>(),
-           py::arg("game"), py::arg("player"), py::arg("evaluator"),
-           py::arg("uct_c"), py::arg("max_simulations"),
-           py::arg("max_memory_mb"), py::arg("solve"), py::arg("seed"),
-           py::arg("verbose"),
-           py::arg("child_selection_policy") =
-               algorithms::ChildSelectionPolicy::UCT)
+      .def(
+          py::init<const Game&, Player, Evaluator*, double, int, int64_t, bool,
+                   int, bool, ::open_spiel::algorithms::ChildSelectionPolicy>(),
+          py::arg("game"), py::arg("player"), py::arg("evaluator"),
+          py::arg("uct_c"), py::arg("max_simulations"),
+          py::arg("max_memory_mb"), py::arg("solve"), py::arg("seed"),
+          py::arg("verbose"),
+          py::arg("child_selection_policy") =
+              algorithms::ChildSelectionPolicy::UCT)
       .def("step", &algorithms::MCTSBot::Step)
       .def("mcts_search", &algorithms::MCTSBot::MCTSearch);
 
@@ -472,7 +502,8 @@ PYBIND11_MODULE(pyspiel, m) {
   m.def("registered_games", GameRegisterer::RegisteredGames,
         "Returns the details of all available games.");
 
-  m.def("evaluate_bots", open_spiel::EvaluateBots,
+  m.def("evaluate_bots", open_spiel::EvaluateBots, py::arg("state"),
+        py::arg("bots"), py::arg("seed"),
         "Plays a single game with the given bots and returns the final "
         "utilities.");
 
@@ -571,8 +602,7 @@ PYBIND11_MODULE(pyspiel, m) {
 
   // Game-Specific Query API.
   m.def("negotiation_item_pool", &open_spiel::query::NegotiationItemPool);
-  m.def("negotiation_agent_utils",
-        &open_spiel::query::NegotiationAgentUtils);
+  m.def("negotiation_agent_utils", &open_spiel::query::NegotiationAgentUtils);
 
   // Set an error handler that will raise exceptions. These exceptions are for
   // the Python interface only. When used from C++, OpenSpiel will never raise

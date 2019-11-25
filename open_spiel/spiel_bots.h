@@ -19,34 +19,86 @@
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
-// Bots are things which can play a game. Here we define a base interface for
-// a bot, and some functions to manipulate them.
+// Bots are things which can play a game. Here we define the interface for
+// various features of a bot, and some trivial uniform and fixed action bots.
+
+// Different use-cases include:
+// - play a bot versus another bot (we just need an action). This should be
+//   general enough to support simultaneous games (in which case the bot needs
+//   to know a player_id).
+// - restart the game (to the initial state, and an arbitrary state)
+// - interact with a bot and study its behavior, for example by looking at its
+//   policy in specific states, or by accessing its action distribution. This
+//   implies being able to set the bot into a specific game state.
+
+// Bots can differ, in particular with respect to:
+//
+// 1. Bot determinism.
+//    - deterministic: the (state -> action) suggestion is deterministic
+//    - Explicit Stochastic: the (state-> distribution over actions) is
+//      deterministic and the bot exposes it
+//    - Implicitly stochastic: even though the (state -> actions distribution)
+//      may exist in theory, it's intractable or not implemented. Thus, the
+//      (state -> action) suggestion is stochastic.
+//
+// 2. Bot statefulness. A bot can be stateless, or stateful (the policy can
+//    depend on the history of states, observations and/or actions).
 
 namespace open_spiel {
 
+// A simple bot that can play moves and be restarted. The bot may be stateful,
+// thus, one should restart it to provide states from a different history line.
+//
+// For simulatenous games, or for bots playing as a single player, the
+// implementation should take the player_id in the constructor.
+//
+// Optionally, the Bot can provide additional functionality (see
+// `ProvidesPolicy`).
 class Bot {
  public:
-  Bot(const Game& game, Player player_id)
-      : game_(game), player_id_(player_id) {}
+  explicit Bot(bool provides_policy) : provides_policy_(provides_policy) {}
   virtual ~Bot() = default;
 
-  // Choose and execute an action in a game. The bot should return its
-  // distribution over actions and also its selected action.
-  virtual std::pair<ActionsAndProbs, Action> Step(const State& state) = 0;
+  // Asks the bot to decide on an action to play. The bot should be able to
+  // safely assumes the action was played.
+  virtual Action Step(const State& state) = 0;
+  // Restarts the bot to its initial state, ready to start a new trajectory.
+  virtual void Restart() {}
+  // Configure the bot to be on the given `state` which can be arbitrary.
+  // Bot not supporting this feature can raise an error.
+  virtual void RestartAt(const State& state) {
+    SpielFatalError("RestartAt(state) not implemented.");
+  }
 
-  // Which player this bot acts as.
-  Player PlayerId() const { return player_id_; }
+  // Extends a bot to support explicit stochasticity, meaning that it can
+  // return a distribution over moves.
+  bool ProvidesPolicy() { return provides_policy_; }
+  virtual ActionsAndProbs GetPolicy(const State& state) {
+    if (ProvidesPolicy()) {
+      SpielFatalError(
+          "GetPolicy not implemented but should because the bot is registered "
+          "as exposing its policy.");
+    } else {
+      SpielFatalError(
+          "GetPolicy not implemented because the bot is not exposing any "
+          "policy.");
+    }
+  }
+  virtual std::pair<ActionsAndProbs, Action> StepWithPolicy(
+      const State& state) {
+    if (ProvidesPolicy()) {
+      SpielFatalError(
+          "StepWithPolicy not implemented but should because the bot is "
+          "registered as exposing its policy.");
+    } else {
+      SpielFatalError(
+          "StepWithPolicy not implemented because the bot is not exposing any "
+          "policy.");
+    }
+  }
 
-  // Restart at a given state of the game.
-  // In general, bots can rely on states being presented sequentially as the
-  // game is being played. This method allows us to start from an arbitrary
-  // state. This is useful when starting a new game without having to create a
-  // new bot.
-  virtual void Restart(const State& state) {}
-
- protected:
-  const Game& game_;
-  Player player_id_;
+ private:
+  bool provides_policy_;
 };
 
 // A uniform random bot, for test purposes.
