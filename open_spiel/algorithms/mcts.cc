@@ -21,6 +21,7 @@
 #include <random>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/abseil-cpp/absl/random/uniform_int_distribution.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_format.h"
@@ -179,10 +180,36 @@ std::string SearchNode::ToString(const State& state) const {
       children.size());
 }
 
-MCTSBot::MCTSBot(const Game& game, Player player, Evaluator* evaluator,
-                 double uct_c, int max_simulations, int64_t max_memory_mb,
-                 bool solve, int seed, bool verbose,
-                 ChildSelectionPolicy child_selection_policy)
+std::vector<double> dirichlet_noise(int count, double alpha,
+                                    std::mt19937* rng) {
+  auto noise = std::vector<double>{};
+  noise.reserve(count);
+
+  std::gamma_distribution<double> gamma(alpha, 1.0);
+  for (int i = 0; i < count; ++i) {
+    noise.emplace_back(gamma(*rng));
+  }
+
+  double sum = absl::c_accumulate(noise, 0.0);
+  for (double& v : noise) {
+      v /= sum;
+  }
+  return noise;
+}
+
+MCTSBot::MCTSBot(
+      const Game& game,
+      Player player,
+      Evaluator* evaluator,
+      double uct_c,
+      int max_simulations,
+      int64_t max_memory_mb,
+      bool solve,
+      int seed,
+      bool verbose,
+      ChildSelectionPolicy child_selection_policy,
+      double dirichlet_alpha,
+      double dirichlet_epsilon)
     : Bot(/*provides_policy=*/false),
       game_(game),
       player_id_(player),
@@ -192,6 +219,8 @@ MCTSBot::MCTSBot(const Game& game, Player player, Evaluator* evaluator,
       verbose_(verbose),
       solve_(solve),
       max_utility_(game.MaxUtility()),
+      dirichlet_alpha_(dirichlet_alpha),
+      dirichlet_epsilon_(dirichlet_epsilon),
       rng_(seed),
       child_selection_policy_(child_selection_policy),
       evaluator_{evaluator} {
@@ -242,6 +271,15 @@ std::unique_ptr<State> MCTSBot::ApplyTreePolicy(
     if (current_node->children.empty()) {
       // For a new node, initialize its state, then choose a child as normal.
       ActionsAndProbs legal_actions = evaluator_->Prior(*working_state);
+      if (current_node == root && dirichlet_alpha_ > 0) {
+        std::vector<double> noise = dirichlet_noise(
+            legal_actions.size(), dirichlet_alpha_, &rng_);
+        for (int i = 0; i < legal_actions.size(); i++) {
+          legal_actions[i].second =
+              (1 - dirichlet_epsilon_) * legal_actions[i].second +
+              dirichlet_epsilon_ * noise[i];
+        }
+      }
       // Reduce bias from move generation order.
       std::shuffle(legal_actions.begin(), legal_actions.end(), rng_);
       Player player = working_state->CurrentPlayer();
