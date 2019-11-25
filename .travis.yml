@@ -31,9 +31,10 @@ matrix:
     env:
       - OS_PYTHON_VERSION=3.6
       - DEFAULT_OPTIONAL_DEPENDENCY="ON"
-  # - os: osx
-  #   # macOS 10.14 (Mojave), release on September 24, 2018.
-  #   osx_image: xcode11
+  # Build and test on MacOS. We use a single target, with all dependencies.
+  - os: osx # macOS 10.14 (Mojave), release on September 24, 2018.
+    osx_image: xcode11.2
+    env: DEFAULT_OPTIONAL_DEPENDENCY="ON"
 
 script:
   - ./install.sh
