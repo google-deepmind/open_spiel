@@ -96,11 +96,11 @@ bool GameType::ContainsRequiredParameters() const {
   return false;
 }
 
-GameRegisterer::GameRegisterer(const GameType& game_type, CreateFunc creator) {
+GameRegister::GameRegister(const GameType& game_type, CreateFunc creator) {
   RegisterGame(game_type, creator);
 }
 
-std::shared_ptr<const Game> GameRegisterer::CreateByName(
+std::shared_ptr<const Game> GameRegister::CreateByName(
     const std::string& short_name, const GameParameters& params) {
   auto iter = factories().find(short_name);
   if (iter == factories().end()) {
@@ -114,7 +114,7 @@ std::shared_ptr<const Game> GameRegisterer::CreateByName(
   }
 }
 
-std::vector<std::string> GameRegisterer::RegisteredNames() {
+std::vector<std::string> GameRegister::RegisteredNames() {
   std::vector<std::string> names;
   for (const auto& key_val : factories()) {
     names.push_back(key_val.first);
@@ -122,7 +122,7 @@ std::vector<std::string> GameRegisterer::RegisteredNames() {
   return names;
 }
 
-std::vector<GameType> GameRegisterer::RegisteredGames() {
+std::vector<GameType> GameRegister::RegisteredGames() {
   std::vector<GameType> games;
   for (const auto& key_val : factories()) {
     games.push_back(key_val.second.first);
@@ -130,25 +130,25 @@ std::vector<GameType> GameRegisterer::RegisteredGames() {
   return games;
 }
 
-bool GameRegisterer::IsValidName(const std::string& short_name) {
+bool GameRegister::IsValidName(const std::string& short_name) {
   return factories().find(short_name) != factories().end();
 }
 
-void GameRegisterer::RegisterGame(const GameType& game_info,
-                                  GameRegisterer::CreateFunc creator) {
+void GameRegister::RegisterGame(const GameType& game_info,
+                                  GameRegister::CreateFunc creator) {
   factories()[game_info.short_name] = std::make_pair(game_info, creator);
 }
 
 bool IsGameRegistered(const std::string& short_name) {
-  return GameRegisterer::IsValidName(short_name);
+  return GameRegister::IsValidName(short_name);
 }
 
 std::vector<std::string> RegisteredGames() {
-  return GameRegisterer::RegisteredNames();
+  return GameRegister::RegisteredNames();
 }
 
 std::vector<GameType> RegisteredGameTypes() {
-  return GameRegisterer::RegisteredGames();
+  return GameRegister::RegisteredGames();
 }
 
 std::shared_ptr<const Game> LoadGame(const std::string& game_string) {
@@ -158,7 +158,7 @@ std::shared_ptr<const Game> LoadGame(const std::string& game_string) {
 std::shared_ptr<const Game> LoadGame(const std::string& short_name,
                                      const GameParameters& params) {
   std::shared_ptr<const Game> result =
-      GameRegisterer::CreateByName(short_name, params);
+      GameRegister::CreateByName(short_name, params);
   if (result == nullptr) {
     SpielFatalError(absl::StrCat("Unable to create game: ", short_name));
   }
@@ -174,7 +174,7 @@ std::shared_ptr<const Game> LoadGame(GameParameters params) {
   std::string name = it->second.string_value();
   params.erase(it);
   std::shared_ptr<const Game> result =
-      GameRegisterer::CreateByName(name, params);
+      GameRegister::CreateByName(name, params);
   if (result == nullptr) {
     SpielFatalError(absl::StrCat("Unable to create game: ", name));
   }

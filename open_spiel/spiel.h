@@ -682,14 +682,14 @@ class Game : public std::enable_shared_from_this<Game> {
 #define CONCAT_(x, y) x##y
 #define CONCAT(x, y) CONCAT_(x, y)
 #define REGISTER_SPIEL_GAME(info, factory) \
-  GameRegisterer CONCAT(game, __COUNTER__)(info, factory);
+  GameRegister CONCAT(game, __COUNTER__)(info, factory);
 
-class GameRegisterer {
+class GameRegister {
  public:
   using CreateFunc =
       std::function<std::shared_ptr<const Game>(const GameParameters& params)>;
 
-  GameRegisterer(const GameType& game_type, CreateFunc creator);
+  GameRegister(const GameType& game_type, CreateFunc creator);
 
   static std::shared_ptr<const Game> CreateByName(const std::string& short_name,
                                                   const GameParameters& params);
