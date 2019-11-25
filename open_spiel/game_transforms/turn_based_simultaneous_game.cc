@@ -241,12 +241,22 @@ std::shared_ptr<const Game> ConvertToTurnBased(const Game& game) {
 }
 
 std::shared_ptr<const Game> LoadGameAsTurnBased(const std::string& name) {
-  return ConvertToTurnBased(*LoadGame(name));
+  auto game = LoadGame(name);
+  if (game->GetType().dynamics == GameType::Dynamics::kSimultaneous) {
+    return ConvertToTurnBased(*game);
+  } else {
+    return game;
+  }
 }
 
 std::shared_ptr<const Game> LoadGameAsTurnBased(const std::string& name,
                                                 const GameParameters& params) {
-  return ConvertToTurnBased(*LoadGame(name, params));
+  auto game = LoadGame(name, params);
+  if (game->GetType().dynamics == GameType::Dynamics::kSimultaneous) {
+    return ConvertToTurnBased(*game);
+  } else {
+    return game;
+  }
 }
 
 }  // namespace open_spiel

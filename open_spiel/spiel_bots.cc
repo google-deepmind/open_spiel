@@ -17,6 +17,7 @@
 #include <algorithm>
 
 #include "open_spiel/abseil-cpp/absl/random/uniform_int_distribution.h"
+#include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
@@ -42,12 +43,40 @@ class UniformRandomBot : public Bot {
   std::mt19937 rng_;
 };
 
+class PolicyBot : public Bot {
+ public:
+  PolicyBot(const Game& game, Player player_id, int seed,
+            std::unique_ptr<Policy> policy)
+      : Bot(game, player_id), rng_(seed), policy_(std::move(policy)) {}
+
+  std::pair<ActionsAndProbs, Action> Step(const State& state) override {
+    std::cout << "About to call GetStatePolicy.\n";
+    ActionsAndProbs state_policy = policy_->GetStatePolicy(state);
+    std::cout << "Called GetStatePolicy.\n";
+    Action action = SampleChanceOutcome(
+                        state_policy,
+                        std::uniform_real_distribution<double>(0.0, 1.0)(rng_))
+                        .first;
+    return {state_policy, action};
+  }
+
+ private:
+  std::mt19937 rng_;
+  std::unique_ptr<Policy> policy_;
+};
+
 }  // namespace
 
 // A uniform random bot, for test purposes.
 std::unique_ptr<Bot> MakeUniformRandomBot(const Game& game, Player player_id,
                                           int seed) {
   return std::unique_ptr<Bot>(new UniformRandomBot(game, player_id, seed));
+}
+
+// A bot that samples from a policy.
+std::unique_ptr<Bot> MakePolicyBot(const Game& game, Player player_id, int seed,
+                                   std::unique_ptr<Policy> policy) {
+  return std::make_unique<PolicyBot>(game, player_id, seed, std::move(policy));
 }
 
 namespace {

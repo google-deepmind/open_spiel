@@ -22,10 +22,11 @@ from absl.testing import absltest
 from absl.testing import parameterized
 
 import numpy as np
+# Note: this import needs to come before Tensorflow to fix a malloc error.
+import pyspiel  # pylint: disable=g-bad-import-order
 import tensorflow as tf
 
 from open_spiel.python.algorithms import rcfr
-import pyspiel
 
 tf.compat.v1.enable_eager_execution()
 
@@ -46,7 +47,7 @@ class RcfrTest(parameterized.TestCase, tf.test.TestCase):
 
   def setUp(self):
     super(RcfrTest, self).setUp()
-    tf.set_random_seed(42)
+    tf.compat.v1.random.set_random_seed(42)
 
   def test_with_one_hot_action_features_single_state_vector(self):
     information_state_features = [1., 2., 3.]

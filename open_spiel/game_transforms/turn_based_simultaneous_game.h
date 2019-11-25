@@ -112,8 +112,8 @@ class TurnBasedSimultaneousGame : public Game {
 // Important: takes ownership of the game that is passed in.
 std::shared_ptr<const Game> ConvertToTurnBased(const Game& game);
 
-// These are equivalent to LoadGame but return a converted game. They are simple
-// wrappers provided for the Python API.
+// These are equivalent to LoadGame but converts the game to turn-based if it is
+// not already one. They are simple wrappers provided for the Python API.
 std::shared_ptr<const Game> LoadGameAsTurnBased(const std::string& name);
 std::shared_ptr<const Game> LoadGameAsTurnBased(const std::string& name,
                                                 const GameParameters& params);

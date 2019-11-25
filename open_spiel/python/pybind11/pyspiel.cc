@@ -68,15 +68,6 @@ class PyBot : public Bot {
 
   // Override the bot's action choice.
   using step_retval_t = std::pair<ActionsAndProbs, open_spiel::Action>;
-  void ApplyAction(Action action) override {
-    PYBIND11_OVERLOAD_NAME(
-        void,  // Return type (must be a simple token for macro parser)
-        Bot,   // Parent class
-        "apply_action",  // Name of function in Python
-        ApplyAction,     // Name of function in C++
-        action           // Arguments
-    );
-  }
 
   // Choose and execute an action in a game. The bot should return its
   // distribution over actions and also its selected action.
@@ -340,7 +331,6 @@ PYBIND11_MODULE(pyspiel, m) {
   bot.def(py::init<const Game&, int>())
       .def("player_id", &Bot::PlayerId)
       .def("step", &Bot::Step)
-      .def("apply_action", &Bot::ApplyAction)
       .def("restart", &Bot::Restart);
 
   py::class_<algorithms::Evaluator> mcts_evaluator(m, "Evaluator");
