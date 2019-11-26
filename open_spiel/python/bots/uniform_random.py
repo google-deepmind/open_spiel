@@ -24,18 +24,16 @@ import pyspiel
 class UniformRandomBot(pyspiel.Bot):
   """Chooses uniformly at random from the available legal actions."""
 
-  def __init__(self, game, player_id, rng):
+  def __init__(self, player_id, rng):
     """Initializes a uniform-random bot.
 
     Args:
-      game: The game this bot will play.
       player_id: The integer id of the player for this bot, e.g. `0` if acting
         as the first player.
       rng: A random number generator supporting a `choice` method, e.g.
         `np.random`
     """
     pyspiel.Bot.__init__(self, provides_policy=True)
-    self._game = game
     self._player_id = player_id
     self._rng = rng
 

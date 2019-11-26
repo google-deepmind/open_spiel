@@ -49,10 +49,10 @@ uint_fast32_t Seed() {
 }
 
 std::unique_ptr<open_spiel::Bot> InitBot(
-    std::string type, const open_spiel::Game& game, open_spiel::Player player,
+    std::string type, const open_spiel::Game* game, open_spiel::Player player,
     open_spiel::algorithms::Evaluator* evaluator) {
   if (type == "random") {
-    return open_spiel::MakeUniformRandomBot(game, player, Seed());
+    return open_spiel::MakeUniformRandomBot(player, Seed());
   }
 
   if (type == "mcts") {
@@ -159,8 +159,10 @@ int main(int argc, char** argv) {
       absl::GetFlag(FLAGS_rollout_count), Seed());
 
   std::vector<std::unique_ptr<open_spiel::Bot>> bots;
-  bots.push_back(InitBot(absl::GetFlag(FLAGS_player1), *game, 0, &evaluator));
-  bots.push_back(InitBot(absl::GetFlag(FLAGS_player2), *game, 1, &evaluator));
+  bots.push_back(
+      InitBot(absl::GetFlag(FLAGS_player1), game.get(), 0, &evaluator));
+  bots.push_back(
+      InitBot(absl::GetFlag(FLAGS_player2), game.get(), 1, &evaluator));
 
   std::vector<std::string> initial_actions;
   for (int i = 1; i < positional_args.size(); ++i) {

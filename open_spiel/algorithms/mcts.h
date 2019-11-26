@@ -139,7 +139,7 @@ struct SearchNode {
 class MCTSBot : public Bot {
  public:
   MCTSBot(
-      const Game& game,
+      const Game* game,
       Player player,
       Evaluator* evaluator,
       double uct_c,

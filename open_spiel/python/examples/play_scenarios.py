@@ -38,7 +38,7 @@ def main(argv):
 
   # TODO(author1): Add support for bots from neural networks.
   bots = [
-      uniform_random.UniformRandomBot(game, i, random)
+      uniform_random.UniformRandomBot(i, random)
       for i in range(game.num_players())
   ]
   scenarios.play_bot_in_scenarios(game, bots)

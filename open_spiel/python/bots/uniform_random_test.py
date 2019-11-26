@@ -30,8 +30,8 @@ class BotTest(absltest.TestCase):
   def test_policy_is_uniform(self):
     game = pyspiel.load_game("leduc_poker")
     bots = [
-        uniform_random.UniformRandomBot(game, 0, random),
-        uniform_random.UniformRandomBot(game, 1, random)
+        uniform_random.UniformRandomBot(0, random),
+        uniform_random.UniformRandomBot(1, random)
     ]
 
     # deal each player a card
@@ -50,7 +50,7 @@ class BotTest(absltest.TestCase):
 
   def test_no_legal_actions(self):
     game = pyspiel.load_game("kuhn_poker")
-    bot = uniform_random.UniformRandomBot(game, 0, random)
+    bot = uniform_random.UniformRandomBot(0, random)
     state = game.new_initial_state()
     state.apply_action(2)  # deal
     state.apply_action(1)  # deal

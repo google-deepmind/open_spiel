@@ -102,8 +102,7 @@ class Bot {
 };
 
 // A uniform random bot, for test purposes.
-std::unique_ptr<Bot> MakeUniformRandomBot(const Game& game, Player player_id,
-                                          int seed);
+std::unique_ptr<Bot> MakeUniformRandomBot(Player player_id, int seed);
 
 // A bot that samples from a policy.
 std::unique_ptr<Bot> MakePolicyBot(const Game& game, Player player_id, int seed,
@@ -112,7 +111,7 @@ std::unique_ptr<Bot> MakePolicyBot(const Game& game, Player player_id, int seed,
 // A both with a fixed action preference, for test purposes.
 // Picks the first legal action found in the list of actions.
 std::unique_ptr<Bot> MakeFixedActionPreferenceBot(
-    const Game& game, Player player_id, const std::vector<Action>& actions);
+    Player player_id, const std::vector<Action>& actions);
 
 }  // namespace open_spiel
 

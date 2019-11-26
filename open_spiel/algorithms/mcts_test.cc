@@ -29,7 +29,7 @@ namespace {
 constexpr double UCT_C = 2;
 
 std::unique_ptr<open_spiel::Bot> InitBot(
-    const open_spiel::Game& game, open_spiel::Player player,
+    const open_spiel::Game* game, open_spiel::Player player,
     int max_simulations, open_spiel::algorithms::Evaluator* evaluator) {;
   return std::make_unique<open_spiel::algorithms::MCTSBot>(
       game, player, evaluator, UCT_C, max_simulations,
@@ -40,8 +40,8 @@ void MCTSTest_CanPlayTicTacToe() {
   auto game = LoadGame("tic_tac_toe");
   int max_simulations = 100;
   open_spiel::algorithms::RandomRolloutEvaluator evaluator(20, 42);
-  auto bot0 = InitBot(*game, 0, max_simulations, &evaluator);
-  auto bot1 = InitBot(*game, 1, max_simulations, &evaluator);
+  auto bot0 = InitBot(game.get(), 0, max_simulations, &evaluator);
+  auto bot1 = InitBot(game.get(), 1, max_simulations, &evaluator);
   auto results = EvaluateBots(
       game->NewInitialState().get(), {bot0.get(), bot1.get()}, 42);
   SPIEL_CHECK_EQ(results[0] + results[1], 0);
@@ -51,7 +51,7 @@ void MCTSTest_CanPlaySinglePlayer() {
   auto game = LoadGame("catch");
   int max_simulations = 100;
   open_spiel::algorithms::RandomRolloutEvaluator evaluator(20, 42);
-  auto bot = InitBot(*game, 0, max_simulations, &evaluator);
+  auto bot = InitBot(game.get(), 0, max_simulations, &evaluator);
   auto results = EvaluateBots(
       game->NewInitialState().get(), {bot.get()}, 42);
   SPIEL_CHECK_GT(results[0], 0);
@@ -61,9 +61,9 @@ void MCTSTest_CanPlayThreePlayerStochasticGames() {
   auto game = LoadGame("pig(players=3,winscore=20,horizon=30)");
   int max_simulations = 1000;
   open_spiel::algorithms::RandomRolloutEvaluator evaluator(20, 42);
-  auto bot0 = InitBot(*game, 0, max_simulations, &evaluator);
-  auto bot1 = InitBot(*game, 1, max_simulations, &evaluator);
-  auto bot2 = InitBot(*game, 2, max_simulations, &evaluator);
+  auto bot0 = InitBot(game.get(), 0, max_simulations, &evaluator);
+  auto bot1 = InitBot(game.get(), 1, max_simulations, &evaluator);
+  auto bot2 = InitBot(game.get(), 2, max_simulations, &evaluator);
   auto results = EvaluateBots(
       game->NewInitialState().get(), {bot0.get(), bot1.get(), bot2.get()}, 42);
   SPIEL_CHECK_FLOAT_EQ(results[0] + results[1] + results[2], 0);
@@ -87,7 +87,7 @@ std::pair<std::unique_ptr<algorithms::SearchNode>, std::unique_ptr<State>>
   }
   open_spiel::algorithms::RandomRolloutEvaluator evaluator(20, 42);
   algorithms::MCTSBot bot(
-        *game,
+        game.get(),
         state->CurrentPlayer(),
         &evaluator,
         UCT_C,

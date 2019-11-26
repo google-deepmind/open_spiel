@@ -15,6 +15,7 @@
 #include "open_spiel/spiel_bots.h"
 
 #include <algorithm>
+#include <unordered_set>
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/random/uniform_int_distribution.h"
@@ -24,26 +25,13 @@
 namespace open_spiel {
 namespace {
 
-class SinglePlayerPolicyBot : public Bot {
+class UniformRandomBot : public Bot {
  public:
-  SinglePlayerPolicyBot(const Game& game, Player player_id)
-      : Bot(/*provides_policy=*/true), game_(game), player_id_(player_id) {}
-  ~SinglePlayerPolicyBot() = default;
-
-  void RestartAt(const State&) {}
-  Player PlayerId() const { return player_id_; }
-
- protected:
-  const Game& game_;
-  Player player_id_;
-};
-
-class UniformRandomBot : public SinglePlayerPolicyBot {
- public:
-  UniformRandomBot(const Game& game, Player player_id, int seed)
-      : SinglePlayerPolicyBot(game, player_id), rng_(seed) {}
+  UniformRandomBot(Player player_id, int seed)
+      : Bot(/*provides_policy=*/true), player_id_(player_id), rng_(seed) {}
   ~UniformRandomBot() = default;
 
+  void RestartAt(const State&) {}
   Action Step(const State& state) override {
     return StepWithPolicy(state).second;
   }
@@ -67,15 +55,14 @@ class UniformRandomBot : public SinglePlayerPolicyBot {
   }
 
  private:
+  const Player player_id_;
   std::mt19937 rng_;
 };
 
 class PolicyBot : public Bot {
  public:
   PolicyBot(int seed, std::unique_ptr<Policy> policy)
-      : Bot(/*provides_policy=*/true),
-        rng_(seed),
-        policy_(std::move(policy)) {}
+      : Bot(/*provides_policy=*/true), rng_(seed), policy_(std::move(policy)) {}
   ~PolicyBot() = default;
 
   void RestartAt(const State&) {}
@@ -108,9 +95,8 @@ class PolicyBot : public Bot {
 }  // namespace
 
 // A uniform random bot, for test purposes.
-std::unique_ptr<Bot> MakeUniformRandomBot(const Game& game, Player player_id,
-                                          int seed) {
-  return std::unique_ptr<Bot>(new UniformRandomBot(game, player_id, seed));
+std::unique_ptr<Bot> MakeUniformRandomBot(Player player_id, int seed) {
+  return std::unique_ptr<Bot>(new UniformRandomBot(player_id, seed));
 }
 
 // A bot that samples from a policy.
@@ -120,23 +106,27 @@ std::unique_ptr<Bot> MakePolicyBot(const Game& game, Player player_id, int seed,
 }
 
 namespace {
-class FixedActionPreferenceBot : public SinglePlayerPolicyBot {
+class FixedActionPreferenceBot : public Bot {
  public:
-  FixedActionPreferenceBot(const Game& game, Player player_id,
-                           const std::vector<Action>& actions)
-      : SinglePlayerPolicyBot(game, player_id), actions_(actions) {}
+  FixedActionPreferenceBot(Player player_id, const std::vector<Action>& actions)
+      : Bot(/*provides_policy=*/true),
+        player_id_(player_id),
+        actions_(actions) {}
   ~FixedActionPreferenceBot() = default;
 
+  void RestartAt(const State&) {}
   Action Step(const State& state) override {
     return StepWithPolicy(state).second;
   }
 
   ActionsAndProbs GetPolicy(const State& state) {
     std::vector<Action> legal_actions = state.LegalActions(player_id_);
-    auto begin = std::begin(legal_actions);
-    auto end = std::end(legal_actions);
+    std::unordered_set<Action> legal_actions_set =
+        std::unordered_set<Action>(legal_actions.begin(), legal_actions.end());
     for (Action action : actions_) {
-      if (std::find(begin, end, action) != end) return {{action, 1.0}};
+      if (legal_actions_set.count(action) == 1) {
+        return {{action, 1.0}};
+      }
     }
     SpielFatalError("No legal actions in action list.");
   }
@@ -148,6 +138,7 @@ class FixedActionPreferenceBot : public SinglePlayerPolicyBot {
   }
 
  private:
+  const Player player_id_;
   std::vector<Action> actions_;
 };
 
@@ -156,9 +147,8 @@ class FixedActionPreferenceBot : public SinglePlayerPolicyBot {
 // A bot with a fixed action preference, for test purposes.
 // Picks the first legal action found in the list of actions.
 std::unique_ptr<Bot> MakeFixedActionPreferenceBot(
-    const Game& game, Player player_id, const std::vector<Action>& actions) {
-  return std::unique_ptr<Bot>(
-      new FixedActionPreferenceBot(game, player_id, actions));
+    Player player_id, const std::vector<Action>& actions) {
+  return std::unique_ptr<Bot>(new FixedActionPreferenceBot(player_id, actions));
 }
 
 }  // namespace open_spiel
