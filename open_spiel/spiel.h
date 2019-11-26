@@ -320,7 +320,7 @@ class State {
   // including chance) and the `State` objects.
   virtual std::vector<Action> History() const { return history_; }
 
-  virtual std::string HistoryString() const {
+  std::string HistoryString() const {
     return absl::StrJoin(history_, " ");
   }
 
@@ -348,14 +348,12 @@ class State {
   // be.
 
   // There are currently no use-case for calling this function with
-  // 'kChancePlayerId'. Thus, games are expected to raise an error in that case.
+  // `kChancePlayerId` or `kTerminalPlayerId`. Thus, games are expected to raise
+  // an error in those cases.
   virtual std::string InformationState(Player player) const {
     SpielFatalError("InformationState is not implemented.");
   }
-
-  // This function should raise an error on Terminal nodes, since the
-  // CurrentPlayer() should be kTerminalPlayerId.
-  virtual std::string InformationState() const {
+  std::string InformationState() const {
     return InformationState(CurrentPlayer());
   }
 
@@ -366,23 +364,19 @@ class State {
   // This function should resize the supplied vector if required.
 
   // There are currently no use-case for calling this function with
-  // 'kChancePlayerId'. Thus, games are expected to raise an error in that case.
+  // `kChancePlayerId` or `kTerminalPlayerId`. Thus, games are expected to raise
+  // an error in those cases.
   virtual void InformationStateAsNormalizedVector(
       Player player, std::vector<double>* values) const {
     SpielFatalError("InformationStateAsNormalizedVector unimplemented!");
   }
-
-  virtual std::vector<double> InformationStateAsNormalizedVector(
-      Player player) const {
+  std::vector<double> InformationStateAsNormalizedVector(Player player) const {
     std::vector<double> normalized_info_state;
     InformationStateAsNormalizedVector(player, &normalized_info_state);
     return normalized_info_state;
   }
-
-  virtual std::vector<double> InformationStateAsNormalizedVector() const {
-    std::vector<double> normalized_info_state;
-    InformationStateAsNormalizedVector(CurrentPlayer(), &normalized_info_state);
-    return normalized_info_state;
+  std::vector<double> InformationStateAsNormalizedVector() const {
+    return InformationStateAsNormalizedVector(CurrentPlayer());
   }
 
   // We have functions for observations which are parallel to those for
@@ -400,19 +394,14 @@ class State {
   virtual std::string Observation(Player player) const {
     SpielFatalError("Observation is not implemented.");
   }
-
-  virtual std::string Observation() const {
-    return Observation(CurrentPlayer());
-  }
+  std::string Observation() const { return Observation(CurrentPlayer()); }
 
   // Returns the view of the game, preferably from `player`'s perspective.
   virtual void ObservationAsNormalizedVector(
       Player player, std::vector<double>* values) const {
     SpielFatalError("ObservationAsNormalizedVector unimplemented!");
   }
-
-  virtual std::vector<double> ObservationAsNormalizedVector(
-      Player player) const {
+  std::vector<double> ObservationAsNormalizedVector(Player player) const {
     // We add this player check, to prevent errors if the game implementation
     // lacks that check (in particular as this function is the one used in
     // Python). This can lead to doing this check twice.
@@ -424,11 +413,8 @@ class State {
     ObservationAsNormalizedVector(player, &normalized_observation);
     return normalized_observation;
   }
-
-  virtual std::vector<double> ObservationAsNormalizedVector() const {
-    std::vector<double> normalized_observation;
-    ObservationAsNormalizedVector(CurrentPlayer(), &normalized_observation);
-    return normalized_observation;
+  std::vector<double> ObservationAsNormalizedVector() const {
+    return ObservationAsNormalizedVector(CurrentPlayer());
   }
 
   // Return a copy of this state.
