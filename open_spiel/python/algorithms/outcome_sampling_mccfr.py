@@ -100,7 +100,7 @@ class OutcomeSamplingSolver(object):
     """
 
     def wrap(state):
-      info_state_key = state.information_state(state.current_player())
+      info_state_key = state.information_state_string(state.current_player())
       legal_actions = state.legal_actions()
       infostate_info = self._lookup_infostate_info(info_state_key,
                                                    len(legal_actions))
@@ -159,7 +159,7 @@ class OutcomeSamplingSolver(object):
                            sample_reach)
 
     cur_player = state.current_player()
-    info_state_key = state.information_state(cur_player)
+    info_state_key = state.information_state_string(cur_player)
     legal_actions = state.legal_actions()
     num_legal_actions = len(legal_actions)
     infostate_info = self._lookup_infostate_info(info_state_key,

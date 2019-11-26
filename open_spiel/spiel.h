@@ -117,15 +117,15 @@ struct GameType {
   // Which type of information state representations are supported?
   // The information state is a perfect-recall state-of-the-game from the
   // perspective of one player.
-  bool provides_information_state;
-  bool provides_information_state_as_normalized_vector;
+  bool provides_information_state_string;
+  bool provides_information_state_tensor;
 
   // Which type of observation representations are supported?
   // The observation is some subset of the information state with the property
   // that remembering all the player's observations and actions is sufficient
   // to reconstruct the information state.
-  bool provides_observation;
-  bool provides_observation_as_normalized_vector;
+  bool provides_observation_string;
+  bool provides_observation_tensor;
 
   std::map<std::string, GameParameter> parameter_specification;
   bool ContainsRequiredParameters() const;
@@ -350,11 +350,11 @@ class State {
   // There are currently no use-case for calling this function with
   // `kChancePlayerId` or `kTerminalPlayerId`. Thus, games are expected to raise
   // an error in those cases.
-  virtual std::string InformationState(Player player) const {
-    SpielFatalError("InformationState is not implemented.");
+  virtual std::string InformationStateString(Player player) const {
+    SpielFatalError("InformationStateString is not implemented.");
   }
-  std::string InformationState() const {
-    return InformationState(CurrentPlayer());
+  std::string InformationStateString() const {
+    return InformationStateString(CurrentPlayer());
   }
 
   // Vector form, useful for neural-net function approximation approaches.
@@ -366,17 +366,17 @@ class State {
   // There are currently no use-case for calling this function with
   // `kChancePlayerId` or `kTerminalPlayerId`. Thus, games are expected to raise
   // an error in those cases.
-  virtual void InformationStateAsNormalizedVector(
+  virtual void InformationStateTensor(
       Player player, std::vector<double>* values) const {
-    SpielFatalError("InformationStateAsNormalizedVector unimplemented!");
+    SpielFatalError("InformationStateTensor unimplemented!");
   }
-  std::vector<double> InformationStateAsNormalizedVector(Player player) const {
+  std::vector<double> InformationStateTensor(Player player) const {
     std::vector<double> normalized_info_state;
-    InformationStateAsNormalizedVector(player, &normalized_info_state);
+    InformationStateTensor(player, &normalized_info_state);
     return normalized_info_state;
   }
-  std::vector<double> InformationStateAsNormalizedVector() const {
-    return InformationStateAsNormalizedVector(CurrentPlayer());
+  std::vector<double> InformationStateTensor() const {
+    return InformationStateTensor(CurrentPlayer());
   }
 
   // We have functions for observations which are parallel to those for
@@ -391,17 +391,19 @@ class State {
   // Note that neither of these are valid information states, since the same
   // observation may arise from two different observation histories (i.e. they
   // are not perfect recall).
-  virtual std::string Observation(Player player) const {
-    SpielFatalError("Observation is not implemented.");
+  virtual std::string ObservationString(Player player) const {
+    SpielFatalError("ObservationString is not implemented.");
   }
-  std::string Observation() const { return Observation(CurrentPlayer()); }
+  std::string ObservationString() const {
+    return ObservationString(CurrentPlayer());
+  }
 
   // Returns the view of the game, preferably from `player`'s perspective.
-  virtual void ObservationAsNormalizedVector(
+  virtual void ObservationTensor(
       Player player, std::vector<double>* values) const {
-    SpielFatalError("ObservationAsNormalizedVector unimplemented!");
+    SpielFatalError("ObservationTensor unimplemented!");
   }
-  std::vector<double> ObservationAsNormalizedVector(Player player) const {
+  std::vector<double> ObservationTensor(Player player) const {
     // We add this player check, to prevent errors if the game implementation
     // lacks that check (in particular as this function is the one used in
     // Python). This can lead to doing this check twice.
@@ -410,11 +412,11 @@ class State {
     SPIEL_CHECK_GE(player, 0);
     SPIEL_CHECK_LT(player, num_players_);
     std::vector<double> normalized_observation;
-    ObservationAsNormalizedVector(player, &normalized_observation);
+    ObservationTensor(player, &normalized_observation);
     return normalized_observation;
   }
-  std::vector<double> ObservationAsNormalizedVector() const {
-    return ObservationAsNormalizedVector(CurrentPlayer());
+  std::vector<double> ObservationTensor() const {
+    return ObservationTensor(CurrentPlayer());
   }
 
   // Return a copy of this state.
@@ -588,16 +590,16 @@ class Game : public std::enable_shared_from_this<Game> {
   // Describes the structure of the information state representation in a
   // tensor-like format. This is especially useful for experiments involving
   // reinforcement learning and neural networks. Note: the actual information is
-  // returned in a 1-D vector by State::InformationStateAsNormalizedVector -
+  // returned in a 1-D vector by State::InformationStateTensor -
   // see the documentation of that function for details of the data layout.
-  virtual std::vector<int> InformationStateNormalizedVectorShape() const {
-    SpielFatalError("InformationStateNormalizedVectorShape unimplemented.");
+  virtual std::vector<int> InformationStateTensorShape() const {
+    SpielFatalError("InformationStateTensorShape unimplemented.");
   }
 
   // The size of (flat) vector needed for the information state tensor-like
   // format.
-  int InformationStateNormalizedVectorSize() const {
-    std::vector<int> shape = InformationStateNormalizedVectorShape();
+  int InformationStateTensorSize() const {
+    std::vector<int> shape = InformationStateTensorShape();
     return shape.empty() ? 0
                          : std::accumulate(shape.begin(), shape.end(), 1,
                                            std::multiplies<double>());
@@ -606,16 +608,16 @@ class Game : public std::enable_shared_from_this<Game> {
   // Describes the structure of the observation representation in a
   // tensor-like format. This is especially useful for experiments involving
   // reinforcement learning and neural networks. Note: the actual observation is
-  // returned in a 1-D vector by State::ObservationAsNormalizedVector -
+  // returned in a 1-D vector by State::ObservationTensor -
   // see the documentation of that function for details of the data layout.
-  virtual std::vector<int> ObservationNormalizedVectorShape() const {
-    SpielFatalError("ObservationNormalizedVectorShape unimplemented.");
+  virtual std::vector<int> ObservationTensorShape() const {
+    SpielFatalError("ObservationTensorShape unimplemented.");
   }
 
   // The size of (flat) vector needed for the observation tensor-like
   // format.
-  int ObservationNormalizedVectorSize() const {
-    std::vector<int> shape = ObservationNormalizedVectorShape();
+  int ObservationTensorSize() const {
+    std::vector<int> shape = ObservationTensorShape();
     return shape.empty() ? 0
                          : std::accumulate(shape.begin(), shape.end(), 1,
                                            std::multiplies<double>());

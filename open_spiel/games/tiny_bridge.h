@@ -82,10 +82,10 @@ class TinyBridgeGame2p : public Game {
   std::shared_ptr<const Game> Clone() const override {
     return std::shared_ptr<const Game>(new TinyBridgeGame2p(*this));
   }
-  std::vector<int> InformationStateNormalizedVectorShape() const {
+  std::vector<int> InformationStateTensorShape() const {
     return {kDeckSize + kNumActions2p * 2};
   }
-  std::vector<int> ObservationNormalizedVectorShape() const override {
+  std::vector<int> ObservationTensorShape() const override {
     return {kDeckSize + kNumActions2p};
   }
 };
@@ -141,11 +141,11 @@ class TinyBridgeAuctionState : public State {
   std::string ToString() const override;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
-  std::string InformationState(Player player) const override;
-  void InformationStateAsNormalizedVector(
+  std::string InformationStateString(Player player) const override;
+  void InformationStateTensor(
       Player player, std::vector<double>* values) const override;
-  std::string Observation(Player player) const override;
-  void ObservationAsNormalizedVector(
+  std::string ObservationString(Player player) const override;
+  void ObservationTensor(
       Player player, std::vector<double>* values) const override;
   std::unique_ptr<State> Clone() const override;
   void UndoAction(Player player, Action action) override;

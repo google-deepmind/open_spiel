@@ -47,12 +47,16 @@ public class GridMaze: GameProtocol {
   // Many of the things could instead of fatalError return nil if that was supported by GameProtocol
   // Crashing or -Double.infinity are only current alteratives
   public var minUtility: Double { fatalError("Cannot be calcuated for GridMaze") }
+
   /// TODO: Ok? It is not known
   public var maxUtility: Double { fatalError("Cannot be calcuated for GridMaze") }
+
   /// TODO: Ok? It is not known
   public var utilitySum: Double? { return nil }  // Only known for very specific (and trivial) mazes
+
   public var playerCount: Int { return 1 }  // Only one player navigating (and terminal player does not count)
   public var maxGameLength: Int { fatalError("Cannot be calcuated for GridMaze") }
+
   /// TODO: Ok? It is not known
   public static var info: GameInfo {
     fatalError("Cannot be (easily) caluated for GridMaze")
@@ -67,8 +71,8 @@ public class GridMaze: GameProtocol {
     //        rewardModel: .rewards, /// TODO: Can change dynamically (even after init)
     //        maxPlayers: 1,
     //        minPlayers: 1,
-    //        providesInformationState: true,
-    //        providesInformationStateAsNormalizedVector: true
+    //        providesInformationStateString: true,
+    //        providesInformationStateTensor: true
     //      )
   }
 
@@ -85,13 +89,13 @@ public class GridMaze: GameProtocol {
   public var allActions: [Action] { return GridMaze.Action.allCases }
 
   // TODO
-  // Spiel docs refer to ImperfectInformationState.informationStateAsNormalizedVector`
+  // Spiel docs refer to ImperfectInformationState.informationStateTensor`
   // cannot find ImperfectInformationState so
   // "see the documentation of that function for details of the data layout." not possible
   // Full inforation state is position (of robot) in maze, either [1] if we
   // flatMap maze and use position index, alt [1, 1] if we use (row,col)?
   // What should we return, TicTacToe returns [3*boardSize*boardSize]
-  public var informationStateNormalizedVectorShape: [Int] { [1] }
+  public var informationStateTensorShape: [Int] { [1] }
 
   // *** Section 2: Native things for GridMaze
   public var maze: [[GridCell]] = [[GridCell]]()
@@ -159,10 +163,9 @@ extension GridMaze.GameState {
     }
 
     var mask: [Bool] = Array(repeating: false, count: GridMaze.Action.allCases.count)
-    mask
-      = zip(mask, GridMaze.Action.allCases).map {
-        gridCell.getTargetWOJumpSpecification(takingAction: $0.1).canAttemptToBeEntered
-      }
+    mask = zip(mask, GridMaze.Action.allCases).map {
+      gridCell.getTargetWOJumpSpecification(takingAction: $0.1).canAttemptToBeEntered
+    }
     return mask
   }
 
@@ -192,12 +195,12 @@ extension GridMaze.GameState {
   }
 
   // TODO: Correct understanding?
-  public func informationStateAsNormalizedVector(for player: Player) -> [Double] {
+  public func informationStateTensor(for player: Player) -> [Double] {
     return [Double(game.columnCount * gridCell.row! + gridCell.col!)]  // Each position is a unique info state
   }
 
   // TODO: Correct understanding?
-  public func informationState(for player: Player) -> String {
+  public func informationStateString(for player: Player) -> String {
     return GridMaze.GameState.informationStateImpl(gridCell: gridCell)
   }
 
@@ -238,10 +241,13 @@ public struct GridCell {
 
   // TODO: Need to read these from public scope, can we statically limit write to private scope?
   public var canAttemptToBeEntered: Bool  // True if it is legal to take an action towards entering this cell
+
   public var canBeEntered: Bool {  // False if you can never actually arrive at this cell, i.e. does not have a welcoming JS)
-    return canAttemptToBeEntered &&
-      (entryJumpProbabilities.count == 0
-        || entryJumpProbabilities.contains { $0.js == .Welcome && $0.prob > 0 })
+    return canAttemptToBeEntered
+      && (
+        entryJumpProbabilities.count == 0
+          || entryJumpProbabilities.contains { $0.js == .Welcome && $0.prob > 0 }
+      )
   }
 
   public var isInitial: Bool
@@ -329,7 +335,7 @@ public struct GridCell {
       originCell: self,
       targetCell: targetCell,
       js: targetCell.entryJumpProbabilities[probabilityIndex].js)
-    
+
     return targetCell2
   }
 
@@ -431,7 +437,7 @@ extension GridCell {
   /// A bounce cell.
   public static var bounce: GridCell {
     return GridCell(
-      oneWordDescription: "BOUNCE", reward: -1.0,   // Reward is irrelevant, you receive reward of cell you bounce back to
+      oneWordDescription: "BOUNCE", reward: -1.0,  // Reward is irrelevant, you receive reward of cell you bounce back to
       entryJumpProbabilities: [(prob: 1.0, js: .BounceBack)],
       isInitial: false, isTerminal: false, isGoal: false,
       canAttemptToBeEntered: true)
@@ -603,7 +609,8 @@ extension GridMaze {
     vtable: VTableType? = nil,
     qtable: QTableType? = nil,
     ptable: PTableType? = nil,
-    printFullFloat: Bool) -> ([[String]]?, [[[String]]]?, [[String]]?) {
+    printFullFloat: Bool
+  ) -> ([[String]]?, [[[String]]]?, [[String]]?) {
 
     var vtableResult: [[String]]? = nil
     if vtable != nil {
@@ -643,16 +650,15 @@ extension GridMaze {
             let qvaluePart = 1.0 / Double(gs.legalActions.count)
             q = gs.legalActions.map { ($0, qvaluePart) }
           }
-          _
-            = q.map {
-              if $0 == .UP || $0 == .DOWN {
-                if qs1.count > 0 { qs1 += " " }
-                qs1 += "\($0.description):\(double2Str(printFullFloat: printFullFloat, value: $1))"
-              } else {
-                if qs2.count > 0 { qs2 += " " }
-                qs2 += "\($0.description):\(double2Str(printFullFloat: printFullFloat, value: $1))"
-              }
+          _ = q.map {
+            if $0 == .UP || $0 == .DOWN {
+              if qs1.count > 0 { qs1 += " " }
+              qs1 += "\($0.description):\(double2Str(printFullFloat: printFullFloat, value: $1))"
+            } else {
+              if qs2.count > 0 { qs2 += " " }
+              qs2 += "\($0.description):\(double2Str(printFullFloat: printFullFloat, value: $1))"
             }
+          }
         }
         if qtable != nil {
           qtableStrs.append([qs1, qs2])

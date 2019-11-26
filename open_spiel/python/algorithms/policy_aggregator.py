@@ -47,16 +47,16 @@ class PolicyFunction(policy.Policy):
 
   def _state_key(self, state, player_id=None):
     """Returns the key to use to look up this (state, player_id) pair."""
-    if self._game_type.provides_information_state:
+    if self._game_type.provides_information_state_string:
       if player_id is None:
-        return state.information_state()
+        return state.information_state_string()
       else:
-        return state.information_state(player_id)
-    elif self._game_type.provides_observation:
+        return state.information_state_string(player_id)
+    elif self._game_type.provides_observation_tensor:
       if player_id is None:
-        return state.observation()
+        return state.observation_tensor()
       else:
-        return state.observation(player_id)
+        return state.observation_tensor(player_id)
     else:
       return str(state)
 
@@ -115,16 +115,16 @@ class PolicyAggregator(object):
   def _state_key(self, state, player_id=None):
     """Returns the key to use to look up this (state, player) pair."""
     # TODO(somidshafiei): fuse this with the identical PolicyFunction._state_key
-    if self._game_type.provides_information_state:
+    if self._game_type.provides_information_state_string:
       if player_id is None:
-        return state.information_state()
+        return state.information_state_string()
       else:
-        return state.information_state(player_id)
-    elif self._game_type.provides_observation:
+        return state.information_state_string(player_id)
+    elif self._game_type.provides_observation_string:
       if player_id is None:
-        return state.observation()
+        return state.observation_string()
       else:
-        return state.observation(player_id)
+        return state.observation_string(player_id)
     else:
       return str(state)
 

@@ -75,9 +75,9 @@ class CoopBoxPushingState : public SimMoveState {
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
   std::vector<double> Rewards() const override;
-  void ObservationAsNormalizedVector(
+  void ObservationTensor(
       Player player, std::vector<double>* values) const override;
-  std::string Observation(Player player) const override;
+  std::string ObservationString(Player player) const override;
 
   Player CurrentPlayer() const override {
     return IsTerminal() ? kTerminalPlayerId : cur_player_;
@@ -146,7 +146,7 @@ class CoopBoxPushingGame : public SimMoveGame {
   std::shared_ptr<const Game> Clone() const override {
     return std::shared_ptr<const Game>(new CoopBoxPushingGame(*this));
   }
-  std::vector<int> ObservationNormalizedVectorShape() const override;
+  std::vector<int> ObservationTensorShape() const override;
   int MaxGameLength() const override { return horizon_; }
 
  private:

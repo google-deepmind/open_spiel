@@ -39,10 +39,10 @@ const GameType kGameType{
     GameType::RewardModel::kRewards,
     /*max_num_players=*/100,
     /*min_num_players=*/1,
-    /*provides_information_state=*/true,
-    /*provides_information_state_as_normalized_vector=*/true,
-    /*provides_observation=*/false,
-    /*provides_observation_as_normalized_vector=*/false,
+    /*provides_information_state_string=*/true,
+    /*provides_information_state_tensor=*/true,
+    /*provides_observation_string=*/false,
+    /*provides_observation_tensor=*/false,
     {{"game",
       GameParameter(GameParameter::Type::kGame, /*is_mandatory=*/true)}}};
 
@@ -148,7 +148,8 @@ std::vector<double> TurnBasedSimultaneousState::Returns() const {
   return state_->Returns();
 }
 
-std::string TurnBasedSimultaneousState::InformationState(Player player) const {
+std::string TurnBasedSimultaneousState::InformationStateString(
+    Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
@@ -164,16 +165,16 @@ std::string TurnBasedSimultaneousState::InformationState(Player player) const {
       extra_info.push_back('\n');
     }
   }
-  return extra_info + state_->InformationState(player);
+  return extra_info + state_->InformationStateString(player);
 }
 
-void TurnBasedSimultaneousState::InformationStateAsNormalizedVector(
+void TurnBasedSimultaneousState::InformationStateTensor(
     Player player, std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
   values->clear();
-  values->reserve(game_->InformationStateNormalizedVectorSize());
+  values->reserve(game_->InformationStateTensorSize());
 
   // First, get the 2 * num_players bits to encode whose turn it is and who
   // the observer is.
@@ -186,7 +187,7 @@ void TurnBasedSimultaneousState::InformationStateAsNormalizedVector(
 
   // Then get the underlying info set at
   std::vector<double> infoset;
-  state_->InformationStateAsNormalizedVector(player, &infoset);
+  state_->InformationStateTensor(player, &infoset);
 
   int offset = values->size();
   values->resize(values->size() + infoset.size());
@@ -216,8 +217,8 @@ GameType ConvertType(GameType type) {
   type.short_name = kGameType.short_name;
   type.long_name = "Turn-based " + type.long_name;
   type.parameter_specification = kGameType.parameter_specification;
-  type.provides_observation = false;
-  type.provides_observation_as_normalized_vector = false;
+  type.provides_observation_string = false;
+  type.provides_observation_tensor = false;
   return type;
 }
 

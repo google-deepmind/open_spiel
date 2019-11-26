@@ -57,7 +57,7 @@ std::vector<double> ExpectedReturnsImpl(
     SPIEL_CHECK_TRUE(smstate != nullptr);
     std::vector<ActionsAndProbs> state_policies(num_players);
     for (auto p = Player{0}; p < num_players; ++p) {
-      state_policies[p] = policy_func(p, state.InformationState(p));
+      state_policies[p] = policy_func(p, state.InformationStateString(p));
       if (state_policies[p].empty()) {
         SpielFatalError("Error in ExpectedReturnsImpl; infostate not found.");
       }
@@ -90,7 +90,7 @@ std::vector<double> ExpectedReturnsImpl(
     // Turn-based decision node.
     Player player = state.CurrentPlayer();
     ActionsAndProbs state_policy =
-        policy_func(player, state.InformationState());
+        policy_func(player, state.InformationStateString());
     if (state_policy.empty()) {
       SpielFatalError("Error in ExpectedReturnsImpl; infostate not found.");
     }

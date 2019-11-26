@@ -401,11 +401,11 @@ class EVAAgent(object):
   def action_probabilities(self, state):
     """Returns action probabilites dict for a single batch."""
     # TODO(author3, author6): Refactor this to expect pre-normalized form.
-    if hasattr(state, "information_state_as_normalized_vector"):
+    if hasattr(state, "information_state_tensor"):
       state_rep = tuple(
-          state.information_state_as_normalized_vector(self.player_id))
-    elif hasattr(state, "observation_as_normalized_vector"):
-      state_rep = tuple(state.observation_as_normalized_vector(self.player_id))
+          state.information_state_tensor(self.player_id))
+    elif hasattr(state, "observation_tensor"):
+      state_rep = tuple(state.observation_tensor(self.player_id))
     else:
       raise AttributeError("Unable to extract normalized state vector.")
     legal_actions = state.legal_actions(self.player_id)

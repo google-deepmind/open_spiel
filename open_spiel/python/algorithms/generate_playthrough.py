@@ -91,15 +91,14 @@ def playthrough_lines(game_string, seed, alsologtostdout=False):
   add_line("GameType.parameter_specification = {}".format("[{}]".format(
       ", ".join('"{}"'.format(param)
                 for param in sorted(game_type.parameter_specification)))))
-  add_line("GameType.provides_information_state = {}".format(
-      game_type.provides_information_state))
-  add_line(
-      "GameType.provides_information_state_as_normalized_vector = {}".format(
-          game_type.provides_information_state_as_normalized_vector))
-  add_line("GameType.provides_observation = {}".format(
-      game_type.provides_observation))
-  add_line("GameType.provides_observation_as_normalized_vector = {}".format(
-      game_type.provides_observation_as_normalized_vector))
+  add_line("GameType.provides_information_state_string = {}".format(
+      game_type.provides_information_state_string))
+  add_line("GameType.provides_information_state_tensor = {}".format(
+      game_type.provides_information_state_tensor))
+  add_line("GameType.provides_observation_string = {}".format(
+      game_type.provides_observation_string))
+  add_line("GameType.provides_observation_tensor = {}".format(
+      game_type.provides_observation_tensor))
   add_line("GameType.reward_model = {}".format(game_type.reward_model))
   add_line("GameType.short_name = {}".format('"{}"'.format(
       game_type.short_name)))
@@ -119,16 +118,16 @@ def playthrough_lines(game_string, seed, alsologtostdout=False):
   except RuntimeError:
     utility_sum = None
   add_line("UtilitySum() = {}".format(utility_sum))
-  if game_type.provides_information_state_as_normalized_vector:
-    add_line("InformationStateNormalizedVectorShape() = {}".format(
-        [int(x) for x in game.information_state_normalized_vector_shape()]))
-    add_line("InformationStateNormalizedVectorSize() = {}".format(
-        game.information_state_normalized_vector_size()))
-  if game_type.provides_observation_as_normalized_vector:
-    add_line("ObservationNormalizedVectorShape() = {}".format(
-        [int(x) for x in game.observation_normalized_vector_shape()]))
-    add_line("ObservationNormalizedVectorSize() = {}".format(
-        game.observation_normalized_vector_size()))
+  if game_type.provides_information_state_tensor:
+    add_line("InformationStateTensorShape() = {}".format(
+        [int(x) for x in game.information_state_tensor_shape()]))
+    add_line("InformationStateTensorSize() = {}".format(
+        game.information_state_tensor_size()))
+  if game_type.provides_observation_tensor:
+    add_line("ObservationTensorShape() = {}".format(
+        [int(x) for x in game.observation_tensor_shape()]))
+    add_line("ObservationTensorSize() = {}".format(
+        game.observation_tensor_size()))
   add_line("MaxGameLength() = {}".format(game.max_game_length()))
   add_line('ToString() = "{}"'.format(str(game)))
 
@@ -147,27 +146,26 @@ def playthrough_lines(game_string, seed, alsologtostdout=False):
     add_line("IsChanceNode() = {}".format(state.is_chance_node()))
     add_line("IsSimultaneousNode() = {}".format(state.is_simultaneous_node()))
     add_line("CurrentPlayer() = {}".format(state.current_player()))
-    if game.get_type().provides_information_state:
+    if game.get_type().provides_information_state_string:
       for player in players:
-        add_line('InformationState({}) = "{}"'.format(
-            player, _escape(state.information_state(player))))
-    if game.get_type().provides_information_state_as_normalized_vector:
+        add_line('InformationStateString({}) = "{}"'.format(
+            player, _escape(state.information_state_string(player))))
+    if game.get_type().provides_information_state_tensor:
       for player in players:
         vec = ", ".join(
             str(round(x, 5))
-            for x in state.information_state_as_normalized_vector(player))
-        add_line("InformationStateAsNormalizedVector({}) = [{}]".format(
+            for x in state.information_state_tensor(player))
+        add_line("InformationStateTensor({}) = [{}]".format(
             player, vec))
-    if game.get_type().provides_observation:
+    if game.get_type().provides_observation_string:
       for player in players:
-        add_line('Observation({}) = "{}"'.format(
-            player, _escape(state.observation(player))))
-    if game.get_type().provides_observation_as_normalized_vector:
+        add_line('ObservationString({}) = "{}"'.format(
+            player, _escape(state.observation_string(player))))
+    if game.get_type().provides_observation_tensor:
       for player in players:
         vec = ", ".join(
-            str(round(x, 5))
-            for x in state.observation_as_normalized_vector(player))
-        add_line("ObservationAsNormalizedVector({}) = [{}]".format(player, vec))
+            str(round(x, 5)) for x in state.observation_tensor(player))
+        add_line("ObservationTensor({}) = [{}]".format(player, vec))
     if game_type.chance_mode == pyspiel.GameType.ChanceMode.SAMPLED_STOCHASTIC:
       add_line('SerializeState() = "{}"'.format(_escape(state.serialize())))
     if not state.is_chance_node():

@@ -45,10 +45,10 @@ const GameType kGameType{
     GameType::RewardModel::kTerminal,
     /*max_num_players=*/kNumPlayers,
     /*min_num_players=*/kNumPlayers,
-    /*provides_information_state=*/true,
-    /*provides_information_state_as_normalized_vector=*/true,
-    /*provides_observation=*/false,
-    /*provides_observation_as_normalized_vector=*/false,
+    /*provides_information_state_string=*/true,
+    /*provides_information_state_tensor=*/true,
+    /*provides_observation_string=*/false,
+    /*provides_observation_tensor=*/false,
     /*parameter_specification=*/
     {
         {"subgame", GameParameter(static_cast<std::string>(""))},
@@ -171,13 +171,14 @@ std::string UncontestedBiddingState::AuctionString() const {
   return actions;
 }
 
-std::string UncontestedBiddingState::InformationState(Player player) const {
+std::string UncontestedBiddingState::InformationStateString(
+    Player player) const {
   if (!dealt_) return "";
   return absl::StrCat(deal_.HandString(player * 13, (player + 1) * 13), " ",
                       AuctionString());
 }
 
-void UncontestedBiddingState::InformationStateAsNormalizedVector(
+void UncontestedBiddingState::InformationStateTensor(
     Player player, std::vector<double>* values) const {
   values->resize(kStateSize);
   std::fill(values->begin(), values->end(), 0.);

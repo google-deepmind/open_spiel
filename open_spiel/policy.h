@@ -73,7 +73,7 @@ class Policy {
   // Returns a list of (action, prob) pairs for the policy at this state.
   // If the policy is not available at the state, returns and empty list.
   virtual ActionsAndProbs GetStatePolicy(const State& state) const {
-    return GetStatePolicy(state.InformationState());
+    return GetStatePolicy(state.InformationStateString());
   }
 
   // Returns a list of (action, prob) pairs for the policy at this info state.

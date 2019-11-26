@@ -70,7 +70,7 @@ double ExternalSamplingMCCFRSolver::UpdateRegrets(const State& state,
   }
 
   Player cur_player = state.CurrentPlayer();
-  std::string is_key = state.InformationState(cur_player);
+  std::string is_key = state.InformationStateString(cur_player);
   std::vector<Action> legal_actions = state.LegalActions();
 
   // The insert here only inserts the default value if the key is not found,
@@ -141,7 +141,7 @@ void ExternalSamplingMCCFRSolver::FullUpdateAverage(
   if (sum == 0.0) return;
 
   Player cur_player = state.CurrentPlayer();
-  std::string is_key = state.InformationState(cur_player);
+  std::string is_key = state.InformationStateString(cur_player);
   std::vector<Action> legal_actions = state.LegalActions();
 
   // The insert here only inserts the default value if the key is not found,

@@ -78,7 +78,7 @@ public extension DeterministicPolicy {
 public struct TabularPolicy<Game: GameProtocol>: StochasticPolicy {
   let table: [String: [Game.Action: Double]]
   public func actionProbabilities(forState state: Game.State) -> [Game.Action: Double] {
-    return self.table[state.informationState()]!
+    return self.table[state.informationStateString()]!
   }
 }
 
@@ -160,7 +160,7 @@ public struct TensorFlowTabularPolicy<Game: GameProtocol>: StochasticPolicy, Dif
   public func actionProbabilities(forState state: Game.State) -> [Game.Action : Double] {
     switch state.currentPlayer {
     case let .player(playerID):
-      let informationState = state.informationState(for: state.currentPlayer)
+      let informationState = state.informationStateString(for: state.currentPlayer)
       let probs = probabilities[playerID][
         informationStateCache.informationStateIndices[playerID][informationState]!]
       let transitions = zip(state.game.allActions, probs.scalars).filter { action, probability in

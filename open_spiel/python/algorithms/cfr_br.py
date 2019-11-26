@@ -102,7 +102,8 @@ class CFRBRSolver(_CFRSolverBase):
     # pylint: disable=g-long-lambda
     current_policy = policy.PolicyFromCallable(
         self._game,
-        lambda state: self._get_infostate_policy(state.information_state()))
+        lambda state: self._get_infostate_policy(
+            state.information_state_string()))
     # pylint: disable=g-long-lambda
 
     for player_id in range(self._game.num_players()):

@@ -37,9 +37,9 @@ def _manually_create_game():
       2,  # max num players
       2,  # min_num_players
       True,  # provides_information_state
-      True,  # provides_information_state_as_normalized_vector
+      True,  # provides_information_state_tensor
       False,  # provides_observation
-      False,  # provides_observation_as_normalized_vector
+      False,  # provides_observation_tensor
       dict()  # parameter_specification
   )
   game = pyspiel.MatrixGame(

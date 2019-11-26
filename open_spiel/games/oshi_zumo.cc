@@ -47,10 +47,10 @@ const GameType kGameType{
     GameType::RewardModel::kTerminal,
     /*max_num_players=*/2,
     /*min_num_players=*/2,
-    /*provides_information_state=*/true,
-    /*provides_information_state_as_normalized_vector=*/true,
-    /*provides_observation=*/false,
-    /*provides_observation_as_normalized_vector=*/false,
+    /*provides_information_state_string=*/true,
+    /*provides_information_state_tensor=*/true,
+    /*provides_observation_string=*/false,
+    /*provides_observation_tensor=*/false,
     /*parameter_specification=*/
     {{"alesia", GameParameter(kDefaultAlesia)},
      {"coins", GameParameter(kDefaultCoins)},
@@ -194,18 +194,18 @@ std::vector<double> OshiZumoState::Returns() const {
   }
 }
 
-std::string OshiZumoState::InformationState(Player player) const {
+std::string OshiZumoState::InformationStateString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   return ToString();  // All the information is public.
 }
 
-void OshiZumoState::InformationStateAsNormalizedVector(
+void OshiZumoState::InformationStateTensor(
     Player player, std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  values->resize(parent_game_.InformationStateNormalizedVectorShape()[0]);
+  values->resize(parent_game_.InformationStateTensorShape()[0]);
   std::fill(values->begin(), values->end(), 0.);
 
   // 1 bit per coin value of player 1. { 0, 1, ... , starting_coins_ }
@@ -241,7 +241,7 @@ std::unique_ptr<State> OshiZumoGame::NewInitialState() const {
   return std::unique_ptr<State>(new OshiZumoState(shared_from_this()));
 }
 
-std::vector<int> OshiZumoGame::InformationStateNormalizedVectorShape() const {
+std::vector<int> OshiZumoGame::InformationStateTensorShape() const {
   // 1 bit per coin value of player 1. { 0, 1, ..., starting_coins_ }
   // 1 bit per coin value of player 2. { 0, 1, ..., starting_coins_ }
   // 1 bit per position of the field. { 0, 1, ... , 2*size_+2 }

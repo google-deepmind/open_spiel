@@ -36,10 +36,10 @@ const GameType kGameType{
     GameType::RewardModel::kTerminal,
     /*max_num_players=*/1,
     /*min_num_players=*/1,
-    /*provides_information_state=*/true,
-    /*provides_information_state_as_normalized_vector=*/true,
-    /*provides_observation=*/true,
-    /*provides_observation_as_normalized_vector=*/true,
+    /*provides_information_state_string=*/true,
+    /*provides_information_state_tensor=*/true,
+    /*provides_observation_string=*/true,
+    /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
     {{"rows", GameParameter(kDefaultRows)},
      {"columns", GameParameter(kDefaultColumns)}}};
@@ -148,17 +148,17 @@ std::vector<double> CatchState::Returns() const {
   }
 }
 
-std::string CatchState::InformationState(Player player) const {
+std::string CatchState::InformationStateString(Player player) const {
   SPIEL_CHECK_EQ(player, 0);
   return HistoryString();
 }
 
-std::string CatchState::Observation(Player player) const {
+std::string CatchState::ObservationString(Player player) const {
   SPIEL_CHECK_EQ(player, 0);
   return ToString();
 }
 
-void CatchState::ObservationAsNormalizedVector(
+void CatchState::ObservationTensor(
     Player player, std::vector<double>* values) const {
   SPIEL_CHECK_EQ(player, 0);
 
@@ -169,7 +169,7 @@ void CatchState::ObservationAsNormalizedVector(
   }
 }
 
-void CatchState::InformationStateAsNormalizedVector(
+void CatchState::InformationStateTensor(
     Player player, std::vector<double>* values) const {
   SPIEL_CHECK_EQ(player, 0);
 

@@ -68,7 +68,7 @@ class BestResponsePolicy(pyspiel_policy.Policy):
     """Returns a dict of infostatekey to list of (state, cf_probability)."""
     infosets = collections.defaultdict(list)
     for s, p in self.decision_nodes(state):
-      infosets[s.information_state(self._player_id)].append((s, p))
+      infosets[s.information_state_string(self._player_id)].append((s, p))
     return dict(infosets)
 
   def decision_nodes(self, parent_state):
@@ -98,7 +98,7 @@ class BestResponsePolicy(pyspiel_policy.Policy):
       return state.player_return(self._player_id)
     elif state.current_player() == self._player_id:
       action = self.best_response_action(
-          state.information_state(self._player_id))
+          state.information_state_string(self._player_id))
       return self.q_value(state, action)
     else:
       return sum(p * self.q_value(state, a) for a, p in self.transitions(state))
@@ -131,4 +131,6 @@ class BestResponsePolicy(pyspiel_policy.Policy):
     """
     if player_id is None:
       player_id = state.current_player()
-    return {self.best_response_action(state.information_state(player_id)): 1}
+    return {
+        self.best_response_action(state.information_state_string(player_id)): 1
+    }

@@ -41,10 +41,10 @@ const GameType kGameType{
     GameType::RewardModel::kTerminal,
     /*max_num_players=*/10,
     /*min_num_players=*/2,
-    /*provides_information_state=*/true,
-    /*provides_information_state_as_normalized_vector=*/true,
-    /*provides_observation=*/true,
-    /*provides_observation_as_normalized_vector=*/true,
+    /*provides_information_state_string=*/true,
+    /*provides_information_state_tensor=*/true,
+    /*provides_observation_string=*/true,
+    /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
     {{"players", GameParameter(kDefaultPlayers)}}};
 
@@ -169,7 +169,7 @@ std::vector<double> KuhnState::Returns() const {
 }
 
 // Information state is card then bets, e.g. 1pb
-std::string KuhnState::InformationState(Player player) const {
+std::string KuhnState::InformationStateString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
@@ -181,7 +181,7 @@ std::string KuhnState::InformationState(Player player) const {
 }
 
 // Observation is card then contributions to the pot, e.g. 111
-std::string KuhnState::Observation(Player player) const {
+std::string KuhnState::ObservationString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
@@ -196,7 +196,7 @@ std::string KuhnState::Observation(Player player) const {
   return str;
 }
 
-void KuhnState::InformationStateAsNormalizedVector(
+void KuhnState::InformationStateTensor(
     Player player, std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
@@ -217,11 +217,11 @@ void KuhnState::InformationStateAsNormalizedVector(
   }
 }
 
-void KuhnState::ObservationAsNormalizedVector(
+void KuhnState::ObservationTensor(
     Player player, std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
-  // The format is described in ObservationNormalizedVectorShape
+  // The format is described in ObservationTensorShape
   // The last elements of this vector contain the contribution to the pot of
   // each player. These values are thus not normalized.
 
@@ -294,7 +294,7 @@ std::unique_ptr<State> KuhnGame::NewInitialState() const {
   return std::unique_ptr<State>(new KuhnState(shared_from_this()));
 }
 
-std::vector<int> KuhnGame::InformationStateNormalizedVectorShape() const {
+std::vector<int> KuhnGame::InformationStateTensorShape() const {
   // One-hot for whose turn it is.
   // One-hot encoding for the single private card. (n+1 cards = n+1 bits)
   // Followed by 2 (n - 1 + n) bits for betting sequence (longest sequence:
@@ -303,7 +303,7 @@ std::vector<int> KuhnGame::InformationStateNormalizedVectorShape() const {
   return {6 * num_players_ - 1};
 }
 
-std::vector<int> KuhnGame::ObservationNormalizedVectorShape() const {
+std::vector<int> KuhnGame::ObservationTensorShape() const {
   // One-hot for whose turn it is.
   // One-hot encoding for the single private card. (n+1 cards = n+1 bits)
   // Followed by the contribution of each player to the pot (n).

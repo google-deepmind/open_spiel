@@ -95,7 +95,7 @@ double OutcomeSamplingMCCFRSolver::SampleEpisode(State* state,
   SPIEL_CHECK_PROB(sample_reach);
 
   int player = state->CurrentPlayer();
-  std::string is_key = state->InformationState(player);
+  std::string is_key = state->InformationStateString(player);
   std::vector<Action> legal_actions = state->LegalActions();
 
   // The insert here only inserts the default value if the key is not found,

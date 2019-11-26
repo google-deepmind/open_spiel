@@ -28,10 +28,10 @@ const GameType kGameType{
     GameType::RewardModel::kRewards,
     /*max_num_players=*/100,
     /*min_num_players=*/1,
-    /*provides_information_state=*/true,
-    /*provides_information_state_as_normalized_vector=*/true,
-    /*provides_observation=*/true,
-    /*provides_observation_as_normalized_vector=*/true,
+    /*provides_information_state_string=*/true,
+    /*provides_information_state_tensor=*/true,
+    /*provides_observation_string=*/true,
+    /*provides_observation_tensor=*/true,
     {{"game",
       GameParameter(GameParameter::Type::kGame, /*is_mandatory=*/true)}}};
 

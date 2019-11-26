@@ -39,7 +39,7 @@ class NFGState : public SimMoveState {
   }
 
   // Since there's only one state, we can implement the representations here.
-  std::string InformationState(Player player) const override {
+  std::string InformationStateString(Player player) const override {
     std::string info_state = absl::StrCat("Observing player: ", player, ". ");
     if (!IsTerminal()) {
       absl::StrAppend(&info_state, "Non-terminal");
@@ -61,8 +61,8 @@ class NFGState : public SimMoveState {
     return result;
   }
 
-  void InformationStateAsNormalizedVector(Player player,
-                                          std::vector<double>* values) const {
+  void InformationStateTensor(Player player,
+                              std::vector<double>* values) const {
     values->resize(1);
     if (IsTerminal()) {
       (*values)[0] = 1;
@@ -75,7 +75,7 @@ class NFGState : public SimMoveState {
 class NormalFormGame : public SimMoveGame {
  public:
   // Game has one state.
-  virtual std::vector<int> InformationStateNormalizedVectorShape() const {
+  virtual std::vector<int> InformationStateTensorShape() const {
     return {1};
   }
 

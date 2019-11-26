@@ -163,13 +163,14 @@ PYBIND11_MODULE(pyspiel, m) {
       .def_readonly("reward_model", &GameType::reward_model)
       .def_readonly("max_num_players", &GameType::max_num_players)
       .def_readonly("min_num_players", &GameType::min_num_players)
-      .def_readonly("provides_information_state",
-                    &GameType::provides_information_state)
-      .def_readonly("provides_information_state_as_normalized_vector",
-                    &GameType::provides_information_state_as_normalized_vector)
-      .def_readonly("provides_observation", &GameType::provides_observation)
-      .def_readonly("provides_observation_as_normalized_vector",
-                    &GameType::provides_observation_as_normalized_vector)
+      .def_readonly("provides_information_state_string",
+                    &GameType::provides_information_state_string)
+      .def_readonly("provides_information_state_tensor",
+                    &GameType::provides_information_state_tensor)
+      .def_readonly("provides_observation_string",
+                    &GameType::provides_observation_string)
+      .def_readonly("provides_observation_tensor",
+                    &GameType::provides_observation_tensor)
       .def_readonly("parameter_specification",
                     &GameType::parameter_specification)
       .def("__repr__", [](const GameType& gt) {
@@ -241,25 +242,24 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("is_simultaneous_node", &State::IsSimultaneousNode)
       .def("history", &State::History)
       .def("history_str", &State::HistoryString)
-      .def("information_state",
-           (std::string(State::*)(int) const) & State::InformationState)
-      .def("information_state",
-           (std::string(State::*)() const) & State::InformationState)
-      .def("information_state_as_normalized_vector",
+      .def("information_state_string",
+           (std::string(State::*)(int) const) & State::InformationStateString)
+      .def("information_state_string",
+           (std::string(State::*)() const) & State::InformationStateString)
+      .def("information_state_tensor",
            (std::vector<double>(State::*)(int) const) &
-               State::InformationStateAsNormalizedVector)
-      .def("information_state_as_normalized_vector",
+               State::InformationStateTensor)
+      .def("information_state_tensor",
            (std::vector<double>(State::*)() const) &
-               State::InformationStateAsNormalizedVector)
-      .def("observation",
-           (std::string(State::*)(int) const) & State::Observation)
-      .def("observation", (std::string(State::*)() const) & State::Observation)
-      .def("observation_as_normalized_vector",
-           (std::vector<double>(State::*)(int) const) &
-               State::ObservationAsNormalizedVector)
-      .def("observation_as_normalized_vector",
-           (std::vector<double>(State::*)() const) &
-               State::ObservationAsNormalizedVector)
+               State::InformationStateTensor)
+      .def("observation_string",
+           (std::string(State::*)(int) const) & State::ObservationString)
+      .def("observation_string",
+           (std::string(State::*)() const) & State::ObservationString)
+      .def("observation_tensor", (std::vector<double>(State::*)(int) const) &
+                                     State::ObservationTensor)
+      .def("observation_tensor", (std::vector<double>(State::*)() const) &
+                                     State::ObservationTensor)
       .def("clone", &State::Clone)
       .def("child", &State::Child)
       .def("undo_action", &State::UndoAction)
@@ -289,14 +289,10 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("max_utility", &Game::MaxUtility)
       .def("get_type", &Game::GetType)
       .def("utility_sum", &Game::UtilitySum)
-      .def("information_state_normalized_vector_shape",
-           &Game::InformationStateNormalizedVectorShape)
-      .def("information_state_normalized_vector_size",
-           &Game::InformationStateNormalizedVectorSize)
-      .def("observation_normalized_vector_shape",
-           &Game::ObservationNormalizedVectorShape)
-      .def("observation_normalized_vector_size",
-           &Game::ObservationNormalizedVectorSize)
+      .def("information_state_tensor_shape", &Game::InformationStateTensorShape)
+      .def("information_state_tensor_size", &Game::InformationStateTensorSize)
+      .def("observation_tensor_shape", &Game::ObservationTensorShape)
+      .def("observation_tensor_size", &Game::ObservationTensorSize)
       .def("deserialize_state", &Game::DeserializeState)
       .def("max_game_length", &Game::MaxGameLength)
       .def("__str__", &Game::ToString)

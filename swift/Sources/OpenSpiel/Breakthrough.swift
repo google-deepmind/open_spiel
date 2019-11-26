@@ -30,8 +30,8 @@ public class Breakthrough: GameProtocol {
     rewardModel: .terminal,
     maxPlayers: 2,
     minPlayers: 2,
-    providesInformationState: true,
-    providesInformationStateAsNormalizedVector: true
+    providesInformationStateString: true,
+    providesInformationStateTensor: true
   )
 
   /// Represents the two player agents.
@@ -148,13 +148,13 @@ public class Breakthrough: GameProtocol {
       }
     }
 
-    public func informationState(for player: Player) -> String {
+    public func informationStateString(for player: Player) -> String {
       String(describing: self)
     }
 
-    public func informationStateAsNormalizedVector(for player: Player) -> [Double] {
+    public func informationStateTensor(for player: Player) -> [Double] {
       var state = Array<Double>(repeating: 0,
-                                count: game.informationStateNormalizedVectorShape.reduce(1, *))
+                                count: game.informationStateTensorShape.reduce(1, *))
       // Note: this implementation is intended to produce the same information state vectors as the
       // original C++ implementation.
       let planeSize = Int(game.boardWidth * game.boardHeight)
@@ -195,7 +195,7 @@ public class Breakthrough: GameProtocol {
     }
     return actions
   }()
-  public var informationStateNormalizedVectorShape: [Int] {
+  public var informationStateTensorShape: [Int] {
     [3, /* # of cell states */
     Int(boardHeight),
     Int(boardWidth)]

@@ -129,14 +129,14 @@ class TabularPolicy(Policy):
   - Set `policy(info_state, action)`:
   ```
   tabular_policy = TabularPolicy(game)
-  info_state_str = state.information_state(<optional player>)
+  info_state_str = state.information_state_string(<optional player>)
   state_policy = tabular_policy.policy_for_key(info_state_str)
   state_policy[action] = <value>
   ```
   - Set `policy(info_state)`:
   ```
   tabular_policy = TabularPolicy(game)
-  info_state_str = state.information_state(<optional player>)
+  info_state_str = state.information_state_string(<optional player>)
   state_policy = tabular_policy.policy_for_key(info_state_str)
   state_policy[:] = <list or numpy.array>
   ```
@@ -157,7 +157,7 @@ class TabularPolicy(Policy):
     states: A `list` of the states as ordered in the `action_probability_array`.
     state_in: array of shape `(num_states, state_vector_size)` containing the
       normalised vector representation of each information state. Populated only
-      for games which support information_state_as_normalized_vector(), and is
+      for games which support information_state_tensor(), and is
       None otherwise.
     game_type: The game attributes as returned by `Game::GetType`; used to
       determine whether to use information state or observation as the key in
@@ -197,12 +197,10 @@ class TabularPolicy(Policy):
               legal_actions_list.append(legal_actions)
               self.states_per_player[player].append(key)
               self.states.append(state)
-              if self.game_type.provides_information_state_as_normalized_vector:
-                state_in_list.append(
-                    state.information_state_as_normalized_vector(player))
-              elif self.game_type.provides_observation_as_normalized_vector:
-                state_in_list.append(
-                    state.observation_as_normalized_vector(player))
+              if self.game_type.provides_information_state_tensor:
+                state_in_list.append(state.information_state_tensor(player))
+              elif self.game_type.provides_observation_tensor:
+                state_in_list.append(state.observation_tensor(player))
 
     # Put legal action masks in a numpy array and create the uniform random
     # policy.
@@ -216,16 +214,16 @@ class TabularPolicy(Policy):
 
   def _state_key(self, state, player):
     """Returns the key to use to look up this (state, player) pair."""
-    if self.game_type.provides_information_state:
+    if self.game_type.provides_information_state_string:
       if player is None:
-        return state.information_state()
+        return state.information_state_string()
       else:
-        return state.information_state(player)
-    elif self.game_type.provides_observation:
+        return state.information_state_string(player)
+    elif self.game_type.provides_observation_string:
       if player is None:
-        return state.observation()
+        return state.observation_string()
       else:
-        return state.observation(player)
+        return state.observation_string(player)
     else:
       return str(state)
 

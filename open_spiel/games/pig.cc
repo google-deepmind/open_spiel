@@ -49,10 +49,10 @@ const GameType kGameType{
     GameType::RewardModel::kTerminal,
     /*max_num_players=*/10,
     /*min_num_players=*/2,
-    /*provides_information_state=*/true,
-    /*provides_information_state_as_normalized_vector=*/true,
-    /*provides_observation=*/false,
-    /*provides_observation_as_normalized_vector=*/false,
+    /*provides_information_state_string=*/true,
+    /*provides_information_state_tensor=*/true,
+    /*provides_observation_string=*/false,
+    /*provides_observation_tensor=*/false,
     /*parameter_specification=*/
     {
         {"players", GameParameter(kDefaultPlayers)},
@@ -110,18 +110,18 @@ std::vector<double> PigState::Returns() const {
   return std::vector<double>(num_players_, 0.0);
 }
 
-std::string PigState::InformationState(Player player) const {
+std::string PigState::InformationStateString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   return ToString();
 }
 
-std::vector<int> PigGame::InformationStateNormalizedVectorShape() const {
+std::vector<int> PigGame::InformationStateTensorShape() const {
   int num_bins = (win_score_ / kBinSize) + 1;
   return {1 + num_players_, num_bins};
 }
 
-void PigState::InformationStateAsNormalizedVector(
+void PigState::InformationStateTensor(
     Player player, std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);

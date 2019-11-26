@@ -35,10 +35,10 @@ const GameType kGameType{
     GameType::RewardModel::kTerminal,
     /*max_num_players=*/10,
     /*min_num_players=*/2,
-    /*provides_information_state=*/true,
-    /*provides_information_state_as_normalized_vector=*/true,
-    /*provides_observation=*/false,
-    /*provides_observation_as_normalized_vector=*/false,
+    /*provides_information_state_string=*/true,
+    /*provides_information_state_tensor=*/true,
+    /*provides_observation_string=*/false,
+    /*provides_observation_tensor=*/false,
     /*parameter_specification=*/
     {{"imp_info", GameParameter(kDefaultImpInfo)},
      {"num_cards", GameParameter(kDefaultNumCards)},
@@ -314,7 +314,7 @@ std::vector<double> GoofspielState::Returns() const {
   }
 }
 
-std::string GoofspielState::InformationState(Player player) const {
+std::string GoofspielState::InformationStateString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
@@ -378,13 +378,13 @@ std::string GoofspielState::InformationState(Player player) const {
   }
 }
 
-void GoofspielState::InformationStateAsNormalizedVector(
+void GoofspielState::InformationStateTensor(
     Player player, std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
   values->clear();
-  values->reserve(game_->InformationStateNormalizedVectorSize());
+  values->reserve(game_->InformationStateTensorSize());
 
   // 1-hot vector for the observing player.
   for (auto p = Player{0}; p < num_players_; ++p) {
@@ -484,7 +484,7 @@ int GoofspielGame::MaxChanceOutcomes() const {
   }
 }
 
-std::vector<int> GoofspielGame::InformationStateNormalizedVectorShape() const {
+std::vector<int> GoofspielGame::InformationStateTensorShape() const {
   if (impinfo_) {
     return {// 1-hot bit vector for observing player
             num_players_ +

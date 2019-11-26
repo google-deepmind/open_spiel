@@ -50,8 +50,8 @@ class LiarsDiceState : public State {
   std::string ToString() const override;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
-  std::string InformationState(Player player) const override;
-  void InformationStateAsNormalizedVector(
+  std::string InformationStateString(Player player) const override;
+  void InformationStateTensor(
       Player player, std::vector<double>* values) const override;
   std::unique_ptr<State> Clone() const override;
   std::vector<std::pair<Action, double>> ChanceOutcomes() const override;
@@ -98,7 +98,7 @@ class LiarsDiceGame : public Game {
   std::shared_ptr<const Game> Clone() const override {
     return std::shared_ptr<const Game>(new LiarsDiceGame(*this));
   }
-  std::vector<int> InformationStateNormalizedVectorShape() const override;
+  std::vector<int> InformationStateTensorShape() const override;
   int MaxGameLength() const override;
 
   // Returns the maximum among how many dice each player has. For example,

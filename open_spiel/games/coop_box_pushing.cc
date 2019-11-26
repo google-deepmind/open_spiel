@@ -75,10 +75,10 @@ const GameType kGameType{
     GameType::RewardModel::kRewards,
     /*max_num_players=*/2,
     /*min_num_players=*/2,
-    /*provides_information_state=*/false,
-    /*provides_information_state_as_normalized_vector=*/false,
-    /*provides_observation=*/true,
-    /*provides_observation_as_normalized_vector=*/true,
+    /*provides_information_state_string=*/false,
+    /*provides_information_state_tensor=*/false,
+    /*provides_observation_string=*/true,
+    /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
     {{"fully_observable", GameParameter(kDefaultFullyObservable)},
      {"horizon", GameParameter(kDefaultHorizon)}}};
@@ -430,7 +430,7 @@ ObservationType CoopBoxPushingState::PartialObservation(Player player) const {
   }
 }
 
-std::string CoopBoxPushingState::Observation(Player player) const {
+std::string CoopBoxPushingState::ObservationString(Player player) const {
   if (fully_observable_) {
     return ToString();
   } else {
@@ -506,7 +506,7 @@ int CoopBoxPushingState::ObservationPlane(std::pair<int, int> coord,
   return plane;
 }
 
-void CoopBoxPushingState::ObservationAsNormalizedVector(
+void CoopBoxPushingState::ObservationTensor(
     Player player, std::vector<double>* values) const {
   if (fully_observable_) {
     TensorView<3> view(values, {kCellStates, kRows, kCols}, true);
@@ -535,7 +535,7 @@ CoopBoxPushingGame::CoopBoxPushingGame(const GameParameters& params)
       horizon_(ParameterValue<int>("horizon")),
       fully_observable_(ParameterValue<bool>("fully_observable")) {}
 
-std::vector<int> CoopBoxPushingGame::ObservationNormalizedVectorShape() const {
+std::vector<int> CoopBoxPushingGame::ObservationTensorShape() const {
   if (fully_observable_) {
     return {kCellStates, kRows, kCols};
   } else {

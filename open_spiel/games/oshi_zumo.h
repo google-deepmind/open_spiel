@@ -59,8 +59,8 @@ class OshiZumoState : public SimMoveState {
   std::string ToString() const override;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
-  std::string InformationState(Player player) const override;
-  void InformationStateAsNormalizedVector(
+  std::string InformationStateString(Player player) const override;
+  void InformationStateTensor(
       Player player, std::vector<double>* values) const override;
   std::unique_ptr<State> Clone() const override;
   std::vector<Action> LegalActions(Player player) const override;
@@ -95,7 +95,7 @@ class OshiZumoGame : public Game {
   std::shared_ptr<const Game> Clone() const override {
     return std::shared_ptr<const Game>(new OshiZumoGame(*this));
   }
-  std::vector<int> InformationStateNormalizedVectorShape() const override;
+  std::vector<int> InformationStateTensorShape() const override;
   int MaxGameLength() const override { return horizon_; }
 
   // Access to game parameters.

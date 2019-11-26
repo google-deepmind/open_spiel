@@ -146,7 +146,7 @@ def _expect(client, expected):
 
 def _hand_string(state_vec):
   """Returns the hand of the to-play player in the state in BlueChip format."""
-  # See UncontestedBiddingState::InformationStateAsNormalizedVector
+  # See UncontestedBiddingState::InformationStateTensor
   # The first 52 elements are whether or not we hold the given card (cards
   # ordered suit-by-suit, in ascending order of rank).
   suits = []
@@ -162,7 +162,7 @@ def _hand_string(state_vec):
 
 def _actions(state_vec):
   """Returns the player actions that have been taken in the game so far."""
-  # See UncontestedBiddingState::InformationStateAsNormalizedVector
+  # See UncontestedBiddingState::InformationStateTensor
   # The first 52 elements are the cards held, then two elements for each
   # possible action, specifying which of the two players has taken it (if
   # either player has). Then two elements specifying which player we are.
@@ -222,7 +222,7 @@ class BlueChipBridgeBot(pyspiel.Bot):
 
   def step(self, state):
     """Returns the action and policy for the bot in this state."""
-    state_vec = state.information_state_as_normalized_vector(self.player_id())
+    state_vec = state.information_state_tensor(self.player_id())
 
     # Connect if necessary.
     if not self._connected:

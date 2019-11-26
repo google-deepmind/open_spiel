@@ -40,10 +40,10 @@ const GameType kGameType{
     GameType::RewardModel::kTerminal,
     /*max_num_players=*/10,
     /*min_num_players=*/2,
-    /*provides_information_state=*/true,
-    /*provides_information_state_as_normalized_vector=*/true,
-    /*provides_observation=*/true,
-    /*provides_observation_as_normalized_vector=*/true,
+    /*provides_information_state_string=*/true,
+    /*provides_information_state_tensor=*/true,
+    /*provides_observation_string=*/true,
+    /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
     {{"players", GameParameter(kDefaultPlayers)}}};
 
@@ -276,7 +276,7 @@ std::vector<double> LeducState::Returns() const {
 }
 
 // Information state is card then bets.
-std::string LeducState::InformationState(Player player) const {
+std::string LeducState::InformationStateString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   // TODO(author1): Fix typos in InformationState string.
@@ -289,7 +289,7 @@ std::string LeducState::InformationState(Player player) const {
 }
 
 // Observation is card then contribution of each players to the pot.
-std::string LeducState::Observation(Player player) const {
+std::string LeducState::ObservationString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   std::string result;
@@ -313,12 +313,12 @@ std::string LeducState::Observation(Player player) const {
   return result;
 }
 
-void LeducState::InformationStateAsNormalizedVector(
+void LeducState::InformationStateTensor(
     Player player, std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  values->resize(game_->InformationStateNormalizedVectorShape()[0]);
+  values->resize(game_->InformationStateTensorShape()[0]);
   std::fill(values->begin(), values->end(), 0.);
 
   // Layout of observation:
@@ -370,12 +370,12 @@ void LeducState::InformationStateAsNormalizedVector(
   }
 }
 
-void LeducState::ObservationAsNormalizedVector(
+void LeducState::ObservationTensor(
     Player player, std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  values->resize(game_->ObservationNormalizedVectorShape()[0]);
+  values->resize(game_->ObservationTensorShape()[0]);
   std::fill(values->begin(), values->end(), 0.);
 
   // Layout of observation:
@@ -571,14 +571,14 @@ std::unique_ptr<State> LeducGame::NewInitialState() const {
   return std::unique_ptr<State>(new LeducState(shared_from_this()));
 }
 
-std::vector<int> LeducGame::InformationStateNormalizedVectorShape() const {
+std::vector<int> LeducGame::InformationStateTensorShape() const {
   // One-hot encoding for player number (who is to play).
   // 2 slots of cards (total_cards_ bits each): private card, public card
   // Followed by maximum game length * 2 bits each (call / raise)
   return {(num_players_) + (total_cards_ * 2) + (MaxGameLength() * 2)};
 }
 
-std::vector<int> LeducGame::ObservationNormalizedVectorShape() const {
+std::vector<int> LeducGame::ObservationTensorShape() const {
   // One-hot encoding for player number (who is to play).
   // 2 slots of cards (total_cards_ bits each): private card, public card
   // Followed by the contribution of each player to the pot

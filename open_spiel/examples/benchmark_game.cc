@@ -38,17 +38,15 @@ int RandomSimulation(std::mt19937* rng, const Game& game, bool verbose) {
   }
 
   std::vector<double> obs;
-  bool provides_info_state =
-      game.GetType().provides_information_state_as_normalized_vector;
-  bool provides_observations =
-      game.GetType().provides_observation_as_normalized_vector;
+  bool provides_info_state = game.GetType().provides_information_state_tensor;
+  bool provides_observations = game.GetType().provides_observation_tensor;
 
   int game_length = 0;
   while (!state->IsTerminal()) {
     if (provides_observations) {
-      state->ObservationAsNormalizedVector(state->CurrentPlayer(), &obs);
+      state->ObservationTensor(state->CurrentPlayer(), &obs);
     } else if (provides_info_state) {
-      state->InformationStateAsNormalizedVector(state->CurrentPlayer(), &obs);
+      state->InformationStateTensor(state->CurrentPlayer(), &obs);
     }
     ++game_length;
     if (state->IsChanceNode()) {

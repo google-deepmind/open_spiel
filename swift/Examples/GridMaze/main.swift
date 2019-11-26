@@ -45,7 +45,7 @@ while true {
     
     // The current informationState, denoting the cell position the Robot is currently at
     // If you create a learning algorithm, this will be the key to v-/q-/policy-tables
-    // let currentInformationState = gameState.informationState()
+    // let currentInformationState = gameState.informationStateString()
     
     // Select a random action from the legal ones in this state
     // The GridMaze.Action enum has members: .LEFT, .UP, .DOWN, .RIGHT

@@ -28,9 +28,8 @@ namespace open_spiel {
 // dimensions can be supplied at construction time. It then lets you index into
 // the vector easily without having to compute the 1d-vector's indices manually.
 // Given the common use case is to fill the observations in
-// ObservationAsNormalizedVector and InformationStateAsNormalizedVector it
-// offers a way to resize and clear the vector to match the specified shape at
-// construction.
+// ObservationTensor and InformationStateTensor it offers a way to resize and
+// clear the vector to match the specified shape at construction.
 template<int Rank>
 class TensorView {
  public:

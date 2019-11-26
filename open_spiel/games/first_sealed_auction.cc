@@ -33,10 +33,10 @@ const GameType kGameType{
     GameType::RewardModel::kTerminal,
     /*max_num_players=*/10,
     /*min_num_players=*/2,
-    /*provides_information_state=*/true,
-    /*provides_information_state_as_normalized_vector=*/true,
-    /*provides_observation=*/true,
-    /*provides_observation_as_normalized_vector=*/true,
+    /*provides_information_state_string=*/true,
+    /*provides_information_state_tensor=*/true,
+    /*provides_observation_string=*/true,
+    /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
     {
         {"players", GameParameter(kDefaultPlayers)},
@@ -136,7 +136,7 @@ void FPSBAState::DoApplyAction(Action action_id) {
   }
 }
 
-std::string FPSBAState::InformationState(Player player) const {
+std::string FPSBAState::InformationStateString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   if (valuations_.size() <= player) return absl::StrCat("p", player);
@@ -146,7 +146,7 @@ std::string FPSBAState::InformationState(Player player) const {
                       bids_[player]);
 }
 
-void FPSBAState::InformationStateAsNormalizedVector(
+void FPSBAState::InformationStateTensor(
     Player player, std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
@@ -166,14 +166,14 @@ void FPSBAState::InformationStateAsNormalizedVector(
   SPIEL_CHECK_EQ(cursor - values->begin(), values->size());
 }
 
-std::string FPSBAState::Observation(Player player) const {
+std::string FPSBAState::ObservationString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   if (valuations_.size() <= player) return "";
   return absl::StrCat(valuations_[player]);
 }
 
-void FPSBAState::ObservationAsNormalizedVector(
+void FPSBAState::ObservationTensor(
     Player player, std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);

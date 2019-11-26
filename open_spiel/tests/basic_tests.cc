@@ -195,16 +195,15 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
   std::vector<double> episode_returns(game.NumPlayers(), 0);
 
   int infostate_vector_size =
-      game.GetType().provides_information_state_as_normalized_vector
-          ? game.InformationStateNormalizedVectorSize()
+      game.GetType().provides_information_state_tensor
+          ? game.InformationStateTensorSize()
           : 0;
   std::cout << "Information state vector size: " << infostate_vector_size
             << std::endl;
 
-  int observation_vector_size =
-      game.GetType().provides_observation_as_normalized_vector
-          ? game.ObservationNormalizedVectorSize()
-          : 0;
+  int observation_vector_size = game.GetType().provides_observation_tensor
+                                    ? game.ObservationTensorSize()
+                                    : 0;
   std::cout << "Observation vector size: " << observation_vector_size
             << std::endl;
 
@@ -279,14 +278,14 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
         // Check the information state, if supported.
         if (infostate_vector_size > 0) {
           std::vector<double> infostate_vector =
-              state->InformationStateAsNormalizedVector(p);
+              state->InformationStateTensor(p);
           SPIEL_CHECK_EQ(infostate_vector.size(), infostate_vector_size);
         }
 
         // Check the observation state vector, if supported.
         if (observation_vector_size > 0) {
           std::vector<double> obs_vector =
-              state->ObservationAsNormalizedVector(p);
+              state->ObservationTensor(p);
           SPIEL_CHECK_EQ(obs_vector.size(), observation_vector_size);
         }
       }
@@ -307,14 +306,14 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
       // First, check the information state vector, if supported.
       if (infostate_vector_size > 0) {
         std::vector<double> infostate_vector =
-            state->InformationStateAsNormalizedVector(player);
+            state->InformationStateTensor(player);
         SPIEL_CHECK_EQ(infostate_vector.size(), infostate_vector_size);
       }
 
       // Check the observation state vector, if supported.
       if (observation_vector_size > 0) {
         std::vector<double> obs_vector =
-            state->ObservationAsNormalizedVector(player);
+            state->ObservationTensor(player);
         SPIEL_CHECK_EQ(obs_vector.size(), observation_vector_size);
       }
 
@@ -359,7 +358,7 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
   for (auto p = Player{0}; p < game.NumPlayers(); p++) {
     if (infostate_vector_size > 0) {
       std::vector<double> infostate_vector =
-          state->InformationStateAsNormalizedVector(p);
+          state->InformationStateTensor(p);
       SPIEL_CHECK_EQ(infostate_vector.size(), infostate_vector_size);
     }
   }

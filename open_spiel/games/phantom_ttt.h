@@ -66,17 +66,17 @@ class PhantomTTTState : public State {
   std::string ToString() const override { return state_.ToString(); }
   bool IsTerminal() const override { return state_.IsTerminal(); }
   std::vector<double> Returns() const override { return state_.Returns(); }
-  std::string Observation(Player player) const override {
-    return state_.Observation(player);
+  std::string ObservationString(Player player) const override {
+    return state_.ObservationString(player);
   }
-  void ObservationAsNormalizedVector(
+  void ObservationTensor(
       Player player, std::vector<double>* values) const override {
-    state_.ObservationAsNormalizedVector(player, values);
+    state_.ObservationTensor(player, values);
   }
 
   // These are implemented for phantom games
-  std::string InformationState(Player player) const override;
-  void InformationStateAsNormalizedVector(
+  std::string InformationStateString(Player player) const override;
+  void InformationStateTensor(
       Player player, std::vector<double>* values) const override;
   std::unique_ptr<State> Clone() const override;
   void UndoAction(Player player, Action move) override;
@@ -112,15 +112,15 @@ class PhantomTTTGame : public Game {
   double MinUtility() const override { return game_->MinUtility(); }
   double UtilitySum() const override { return game_->UtilitySum(); }
   double MaxUtility() const override { return game_->MaxUtility(); }
-  std::vector<int> ObservationNormalizedVectorShape() const {
-    return game_->ObservationNormalizedVectorShape();
+  std::vector<int> ObservationTensorShape() const {
+    return game_->ObservationTensorShape();
   }
 
   std::shared_ptr<const Game> Clone() const override {
     return std::shared_ptr<const Game>(new PhantomTTTGame(*this));
   }
   // This will depend on the obstype parameter.
-  std::vector<int> InformationStateNormalizedVectorShape() const override;
+  std::vector<int> InformationStateTensorShape() const override;
   int MaxGameLength() const { return kLongestSequence; }
 
  private:

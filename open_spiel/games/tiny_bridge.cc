@@ -101,10 +101,10 @@ const GameType kGameType2p{
     GameType::RewardModel::kTerminal,
     /*max_num_players=*/2,
     /*min_num_players=*/2,
-    /*provides_information_state=*/true,
-    /*provides_information_state_as_normalized_vector=*/true,
-    /*provides_observation=*/true,
-    /*provides_observation_as_normalized_vector=*/true,
+    /*provides_information_state_string=*/true,
+    /*provides_information_state_tensor=*/true,
+    /*provides_observation_string=*/true,
+    /*provides_observation_tensor=*/true,
     /*parameter_specification=*/{}  // no parameters
 };
 
@@ -118,10 +118,10 @@ const GameType kGameType4p{
     GameType::RewardModel::kTerminal,
     /*max_num_players=*/4,
     /*min_num_players=*/4,
-    /*provides_information_state=*/true,
-    /*provides_information_state_as_normalized_vector=*/false,
-    /*provides_observation=*/true,
-    /*provides_observation_as_normalized_vector=*/false,
+    /*provides_information_state_string=*/true,
+    /*provides_information_state_tensor=*/false,
+    /*provides_observation_string=*/true,
+    /*provides_observation_tensor=*/false,
     /*parameter_specification=*/{}  // no parameters
 };
 
@@ -137,10 +137,10 @@ const GameType kGameTypePlay{
     GameType::RewardModel::kTerminal,
     /*max_num_players=*/2,
     /*min_num_players=*/2,
-    /*provides_information_state=*/false,
-    /*provides_information_state_as_normalized_vector=*/false,
-    /*provides_observation=*/false,
-    /*provides_observation_as_normalized_vector=*/false,
+    /*provides_information_state_string=*/false,
+    /*provides_information_state_tensor=*/false,
+    /*provides_observation_string=*/false,
+    /*provides_observation_tensor=*/false,
     /*parameter_specification=*/
     {
         {"trumps",
@@ -472,7 +472,8 @@ std::vector<double> TinyBridgeAuctionState::Returns() const {
   }
 }
 
-std::string TinyBridgeAuctionState::InformationState(Player player) const {
+std::string TinyBridgeAuctionState::InformationStateString(
+    Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
@@ -490,7 +491,7 @@ std::string TinyBridgeAuctionState::InformationState(Player player) const {
 // This is an observation for West, who holds HJ and SA.
 // The most recent bid is 2NT by East, which has been doubled by South
 // and redoubled by West.
-std::string TinyBridgeAuctionState::Observation(Player player) const {
+std::string TinyBridgeAuctionState::ObservationString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
@@ -514,7 +515,7 @@ std::string TinyBridgeAuctionState::Observation(Player player) const {
 //   kNumActions2p*2 bits showing which actions have been taken in the game.
 //     For each action, the bits are [1, 0] if we took the action,
 //     [0, 1] if our partner took the action, and otherwise [0, 0].
-void TinyBridgeAuctionState::InformationStateAsNormalizedVector(
+void TinyBridgeAuctionState::InformationStateTensor(
     Player player, std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
@@ -535,7 +536,7 @@ void TinyBridgeAuctionState::InformationStateAsNormalizedVector(
 // Information state vector consists of:
 //   kNumCards bits showing which cards the observing player holds
 //   kNumActions2p bits showing the most recent action (one-hot)
-void TinyBridgeAuctionState::ObservationAsNormalizedVector(
+void TinyBridgeAuctionState::ObservationTensor(
     Player player, std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);

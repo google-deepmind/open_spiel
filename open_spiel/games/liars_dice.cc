@@ -41,10 +41,10 @@ const GameType kGameType{
     GameType::RewardModel::kTerminal,
     /*max_num_players=*/kDefaultPlayers,
     /*min_num_players=*/kDefaultPlayers,
-    /*provides_information_state=*/true,
-    /*provides_information_state_as_normalized_vector=*/true,
-    /*provides_observation=*/false,
-    /*provides_observation_as_normalized_vector=*/false,
+    /*provides_information_state_string=*/true,
+    /*provides_information_state_tensor=*/true,
+    /*provides_observation_string=*/false,
+    /*provides_observation_tensor=*/false,
     /*parameter_specification=*/
     {{"players", GameParameter(kDefaultPlayers)},
      {"numdice", GameParameter(kDefaultNumDice)}}};
@@ -218,7 +218,7 @@ std::vector<std::pair<Action, double>> LiarsDiceState::ChanceOutcomes() const {
   return outcomes;
 }
 
-std::string LiarsDiceState::InformationState(Player player) const {
+std::string LiarsDiceState::InformationStateString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
@@ -276,7 +276,7 @@ std::vector<double> LiarsDiceState::Returns() const {
   return returns;
 }
 
-void LiarsDiceState::InformationStateAsNormalizedVector(
+void LiarsDiceState::InformationStateTensor(
     Player player, std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
@@ -372,7 +372,7 @@ int LiarsDiceGame::MaxGameLength() const {
   return total_num_dice_ * kDiceSides + 1;
 }
 
-std::vector<int> LiarsDiceGame::InformationStateNormalizedVectorShape() const {
+std::vector<int> LiarsDiceGame::InformationStateTensorShape() const {
   // One-hot encoding for the player number.
   // One-hot encoding for each die (max_dice_per_player_ * sides).
   // One slot(bit) for each legal bid.

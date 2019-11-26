@@ -70,7 +70,7 @@ def test_policy_on_game(self, game, policy_object):
       depth_limit=-1,
       include_terminals=False,
       include_chance_states=False,
-      to_string=lambda s: s.information_state())
+      to_string=lambda s: s.information_state_string())
 
   for state in all_states.values():
     legal_actions = set(state.legal_actions())
@@ -286,9 +286,9 @@ class TabularRockPaperScissorsPolicyTest(absltest.TestCase):
     # Test that there are two valid states, indexed as 0 and 1.
     game = pyspiel.load_game_as_turn_based("matrix_rps")
     state = game.new_initial_state()
-    first_info_state = state.information_state()
+    first_info_state = state.information_state_string()
     state.apply_action(state.legal_actions()[0])
-    second_info_state = state.information_state()
+    second_info_state = state.information_state_string()
     self.assertCountEqual(self.tabular_policy.state_lookup,
                           [first_info_state, second_info_state])
     self.assertCountEqual(self.tabular_policy.state_lookup.values(), [0, 1])

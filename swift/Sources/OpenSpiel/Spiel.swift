@@ -59,9 +59,9 @@ public protocol GameProtocol {
   /// tensor-like format. This is especially useful for experiments involving
   /// reinforcement learning and neural networks.
   /// Note: the actual information is returned in a 1-D vector by
-  /// `ImperfectInformationState.informationStateAsNormalizedVector` -
+  /// `ImperfectInformationState.informationStateTensor` -
   /// see the documentation of that function for details of the data layout.
-  var informationStateNormalizedVectorShape: [Int] { get }
+  var informationStateTensorShape: [Int] { get }
 
   /// Maximum length of any one game (in terms of number of decision nodes
   /// visited in the game tree). For a simultaneous action game, this is the
@@ -149,16 +149,16 @@ public protocol StateProtocol: Hashable {
   /// environment).
   ///
   /// Not valid in chance states.
-  func informationState(for player: Player) -> String
+  func informationStateString(for player: Player) -> String
 
   /// Vector form, useful for neural-net function approximation approaches.
-  /// The size of the vector must match Game.informationStateNormalizedVectorShape
+  /// The size of the vector must match Game.informationStateTensorShape
   /// with values in lexicographic order. E.g. for 2x4x3, order would be:
   /// (0,0,0), (0,0,1), (0,0,2), (0,1,0), ... , (1,3,2).
   ///
   /// There are currently no use-case for calling this function with
   /// `Player.chance`. Thus, games are expected to raise an error in that case.
-  func informationStateAsNormalizedVector(for player: Player) -> [Double]
+  func informationStateTensor(for player: Player) -> [Double]
 }
 
 public extension StateProtocol {
@@ -173,21 +173,21 @@ public extension StateProtocol {
   }
 
   /// The information state for the current player.
-  func informationState() -> String {
-    return informationState(for: currentPlayer)
+  func informationStateString() -> String {
+    return informationStateString(for: currentPlayer)
   }
 
   /// The normalized-vector information state for the current player as a Swift array.
-  func informationStateAsNormalizedVector() -> [Double] {
-    return informationStateAsNormalizedVector(for: currentPlayer)
+  func informationStateTensor() -> [Double] {
+    return informationStateTensor(for: currentPlayer)
   }
 
   /// The normalized-vector information state as a TensorFlow tensor.
   /// Includes a singleton batch dimension :(
   func informationStateAsTensor(for player: Player) -> Tensor<Double> {
     return Tensor(
-      shape: TensorShape([1] + game.informationStateNormalizedVectorShape),
-      scalars: informationStateAsNormalizedVector(for: player))
+      shape: TensorShape([1] + game.informationStateTensorShape),
+      scalars: informationStateTensor(for: player))
   }
 
   /// The normalized-vector information state for the current player as a TensorFlow tensor.
@@ -305,8 +305,8 @@ public struct GameInfo {
   public let maxPlayers, minPlayers: Int
 
   /// Which type of information state representations are supported?
-  public let providesInformationState: Bool
-  public let providesInformationStateAsNormalizedVector: Bool
+  public let providesInformationStateString: Bool
+  public let providesInformationStateTensor: Bool
 }
 
 /// Used to sample a policy. Can also sample from chance outcomes.

@@ -169,9 +169,9 @@ class Environment(object):
     self._discounts = [discount] * self._num_players
 
     # Decide whether to use observation or information_state
-    if self._game.get_type().provides_information_state_as_normalized_vector:
+    if self._game.get_type().provides_information_state_tensor:
       self._use_observation = False
-    elif self._game.get_type().provides_observation_as_normalized_vector:
+    elif self._game.get_type().provides_observation_tensor:
       self._use_observation = True
     else:
       raise ValueError("Game must provide either information state or "
@@ -222,9 +222,8 @@ class Environment(object):
     for player_id in range(self.num_players):
       rewards.append(cur_rewards[player_id])
       observations["info_state"].append(
-          self._state.observation_as_normalized_vector(player_id) if self
-          ._use_observation else self._state
-          .information_state_as_normalized_vector(player_id))
+          self._state.observation_tensor(player_id) if self._use_observation
+          else self._state.information_state_tensor(player_id))
 
       observations["legal_actions"].append(self._state.legal_actions(player_id))
     observations["current_player"] = self._state.current_player()
@@ -255,9 +254,8 @@ class Environment(object):
     observations = {"info_state": [], "legal_actions": [], "current_player": []}
     for player_id in range(self.num_players):
       observations["info_state"].append(
-          self._state.observation_as_normalized_vector(player_id) if self
-          ._use_observation else self._state
-          .information_state_as_normalized_vector(player_id))
+          self._state.observation_tensor(player_id) if self._use_observation
+          else self._state.information_state_tensor(player_id))
       observations["legal_actions"].append(self._state.legal_actions(player_id))
     observations["current_player"] = self._state.current_player()
 
@@ -284,9 +282,9 @@ class Environment(object):
     """
     return dict(
         info_state=tuple([
-            self._game.observation_normalized_vector_size()
+            self._game.observation_tensor_size()
             if self._use_observation else
-            self._game.information_state_normalized_vector_size()
+            self._game.information_state_tensor_size()
         ]),
         legal_actions=(self._game.num_distinct_actions(),),
         current_player=(),

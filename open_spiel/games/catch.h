@@ -69,11 +69,11 @@ class CatchState : public State {
   std::string ToString() const override;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
-  std::string InformationState(Player player) const override;
-  std::string Observation(Player player) const override;
-  void ObservationAsNormalizedVector(
+  std::string InformationStateString(Player player) const override;
+  std::string ObservationString(Player player) const override;
+  void ObservationTensor(
       Player player, std::vector<double>* values) const override;
-  void InformationStateAsNormalizedVector(
+  void InformationStateTensor(
       Player player, std::vector<double>* values) const override;
   std::unique_ptr<State> Clone() const override;
   void UndoAction(Player player, Action move) override;
@@ -103,10 +103,10 @@ class CatchGame : public Game {
   std::shared_ptr<const Game> Clone() const override {
     return std::shared_ptr<const Game>(new CatchGame(*this));
   }
-  std::vector<int> ObservationNormalizedVectorShape() const override {
+  std::vector<int> ObservationTensorShape() const override {
     return {num_rows_, num_columns_};
   }
-  std::vector<int> InformationStateNormalizedVectorShape() const override {
+  std::vector<int> InformationStateTensorShape() const override {
     return {num_columns_ + kNumActions * num_rows_};
   }
 

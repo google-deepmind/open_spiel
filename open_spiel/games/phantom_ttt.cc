@@ -46,10 +46,10 @@ const GameType kGameType{
     GameType::RewardModel::kTerminal,
     /*max_num_players=*/2,
     /*min_num_players=*/2,
-    /*provides_information_state=*/true,
-    /*provides_information_state_as_normalized_vector=*/true,
-    /*provides_observation=*/true,
-    /*provides_observation_as_normalized_vector=*/true,
+    /*provides_information_state_string=*/true,
+    /*provides_information_state_tensor=*/true,
+    /*provides_observation_string=*/true,
+    /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
     {{"obstype", GameParameter(static_cast<std::string>(kDefaultObsType))}}};
 
@@ -140,13 +140,13 @@ std::string PhantomTTTState::ActionSequenceToString(Player player) const {
   return str;
 }
 
-std::string PhantomTTTState::InformationState(Player player) const {
+std::string PhantomTTTState::InformationStateString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   return ViewToString(player) + "\n" + ActionSequenceToString(player);
 }
 
-void PhantomTTTState::InformationStateAsNormalizedVector(
+void PhantomTTTState::InformationStateTensor(
     Player player, std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
@@ -227,7 +227,7 @@ PhantomTTTGame::PhantomTTTGame(const GameParameters& params)
   }
 }
 
-std::vector<int> PhantomTTTGame::InformationStateNormalizedVectorShape() const {
+std::vector<int> PhantomTTTGame::InformationStateTensorShape() const {
   // Enc
   return {1, kNumCells * kCellStates + kLongestSequence * (1 + kBitsPerAction)};
 }

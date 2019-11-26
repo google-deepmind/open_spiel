@@ -30,12 +30,12 @@ namespace algorithms {
 namespace {
 std::string StateKey(const Game& game, const State& state,
                      Player player = kInvalidPlayer) {
-  if (game.GetType().provides_information_state) {
-    if (player == kInvalidPlayer) return state.InformationState();
-    return state.InformationState(player);
-  } else if (game.GetType().provides_observation) {
-    if (player == kInvalidPlayer) return state.Observation();
-    return state.Observation(player);
+  if (game.GetType().provides_information_state_string) {
+    if (player == kInvalidPlayer) return state.InformationStateString();
+    return state.InformationStateString(player);
+  } else if (game.GetType().provides_observation_string) {
+    if (player == kInvalidPlayer) return state.ObservationString();
+    return state.ObservationString(player);
   }
   return state.ToString();
 }
@@ -159,10 +159,11 @@ BatchedTrajectory RecordTrajectory(
         trajectory.state_indices[0].push_back(it->second);
       } else {
         trajectory.observations[0].push_back(
-            state->InformationStateAsNormalizedVector());
+            state->InformationStateTensor());
       }
-      ActionsAndProbs policy = policies.at(state->CurrentPlayer())
-                                   .GetStatePolicy(state->InformationState());
+      ActionsAndProbs policy =
+          policies.at(state->CurrentPlayer())
+              .GetStatePolicy(state->InformationStateString());
       if (policy.size() > state->LegalActions().size()) {
         std::string policy_str = "";
         for (const auto& item : policy) {
