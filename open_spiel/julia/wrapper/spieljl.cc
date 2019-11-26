@@ -60,11 +60,11 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
     .constructor<const open_spiel::GameParameter::Type&>()
     .constructor<const open_spiel::GameParameter::Type&, const bool&>()
     .method("is_mandatory", &open_spiel::GameParameter::is_mandatory)
-    .method("string", &open_spiel::GameParameter::ToReprString)
+    .method("string", &open_spiel::GameParameter::ToString)
+    .method("repr_string", &open_spiel::GameParameter::ToReprString)
     ;
 
   mod.add_type<open_spiel::GameParameters>("GameParameters")
-    .constructor<>()
     .method("getindex", [](open_spiel::GameParameters ps, std::string& k) { return ps[k]; })
     .method("setindex!", [](open_spiel::GameParameters ps, open_spiel::GameParameter p, std::string& k) { ps[k] = p; })
     .method("length", [](open_spiel::GameParameters ps) { return ps.size(); });
@@ -166,7 +166,7 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
     .method("observation_normalized_vector_size", &open_spiel::Game::ObservationNormalizedVectorSize)
     .method("deserialize_state", &open_spiel::Game::DeserializeState)
     .method("max_game_length", &open_spiel::Game::MaxGameLength)
-    .method("string", &open_spiel::Game::ToString);
+    .method("to_string", &open_spiel::Game::ToString);
 
   mod.add_type<open_spiel::matrix_game::MatrixGame>("MatrixGame")
     .constructor<open_spiel::GameType, open_spiel::GameParameters, std::vector<std::string>, std::vector<std::string>, std::vector<double>, std::vector<double>>()
@@ -181,14 +181,25 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
 
   mod.method("create_matrix_game", [](const std::string& a, const std::string& b, const std::vector<std::string>& c, const std::vector<std::string>& d, const std::vector<std::vector<double>>& e, const std::vector<std::vector<double>>& f) { return open_spiel::matrix_game::CreateMatrixGame(a,b,c,d,e,f); });
   mod.method("create_matrix_game", [](const std::vector<std::vector<double>>& a, const std::vector<std::vector<double>>& b) { return open_spiel::matrix_game::CreateMatrixGame(a,b); });
-
   mod.method("load_game", [](const std::string & s) { return open_spiel::LoadGame(s); });
   mod.method("load_game", [](const std::string & s, const open_spiel::GameParameters& ps) { return open_spiel::LoadGame(s, ps); });
   mod.method("load_game_as_turn_based", [](const std::string &s) { return open_spiel::LoadGameAsTurnBased(s); });
   mod.method("load_game_as_turn_based", [](const std::string &s, const open_spiel::GameParameters& ps) { return open_spiel::LoadGameAsTurnBased(s, ps); });
-
   mod.method("load_matrix_game", &open_spiel::algorithms::LoadMatrixGame);
   mod.method("extensive_to_matrix_game", &open_spiel::algorithms::ExtensiveToMatrixGame);
   mod.method("registered_names", &open_spiel::GameRegister::RegisteredNames);
   mod.method("registered_games", &open_spiel::GameRegister::RegisteredGames);
+
+  mod.add_type<open_spiel::Bot>("Bot")
+    .method("player_id", &open_spiel::Bot::PlayerId)
+    .method("restart", &open_spiel::Bot::Restart);
+
+  jlcxx::stl::apply_stl<open_spiel::Bot*>(mod);
+
+  mod.add_type<open_spiel::Policy>("Policy");
+
+  mod.method("make_uniform_random_bot", &open_spiel::MakeUniformRandomBot);
+  mod.method("make_fixed_action_preference_bot", &open_spiel::MakeFixedActionPreferenceBot);
+  // mod.method("make_policy_bot", &open_spiel::MakePolicyBot);  // ??? error
+
 }
