@@ -60,13 +60,29 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
     .constructor<const open_spiel::GameParameter::Type&>()
     .constructor<const open_spiel::GameParameter::Type&, const bool&>()
     .method("is_mandatory", &open_spiel::GameParameter::is_mandatory)
-    .method("string", &open_spiel::GameParameter::ToString)
-    .method("repr_string", &open_spiel::GameParameter::ToReprString)
+    .method("to_string", &open_spiel::GameParameter::ToString)
+    .method("to_repr_string", &open_spiel::GameParameter::ToReprString)
     ;
 
   mod.add_type<open_spiel::GameParameters>("GameParameters")
     .method("getindex", [](open_spiel::GameParameters ps, std::string& k) { return ps[k]; })
     .method("setindex!", [](open_spiel::GameParameters ps, open_spiel::GameParameter p, std::string& k) { ps[k] = p; })
+    .method("keys", [](open_spiel::GameParameters ps) {
+      std::vector<std::string> keys;
+      keys.reserve(ps.size());
+      for(auto const & it : ps){
+        keys.emplace_back(it.first);
+      }
+      return keys;
+      })
+    .method("values", [](open_spiel::GameParameters ps) {
+      std::vector<open_spiel::GameParameter> vals;
+      vals.reserve(ps.size());
+      for(auto const & it : ps){
+        vals.emplace_back(it.second);
+      }
+      return vals;
+      })
     .method("length", [](open_spiel::GameParameters ps) { return ps.size(); });
 
 
@@ -74,8 +90,6 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
   mod.set_const("TERMINAL_STATE", open_spiel::StateType::kTerminal);
   mod.set_const("CHANCE_STATE", open_spiel::StateType::kChance);
   mod.set_const("DECISION_STATE", open_spiel::StateType::kDecision);
-
-  mod.add_type<open_spiel::GameType>("GameType");
 
   mod.add_bits<open_spiel::GameType::Dynamics>("Dynamics", jlcxx::julia_type("CppEnum"));
   mod.set_const("SEQUENTIAL", open_spiel::GameType::Dynamics::kSequential);
@@ -100,6 +114,22 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
   mod.add_bits<open_spiel::GameType::RewardModel>("RewardModel", jlcxx::julia_type("CppEnum"));
   mod.set_const("REWARDS", open_spiel::GameType::RewardModel::kRewards);
   mod.set_const("TERMINAL", open_spiel::GameType::RewardModel::kTerminal);
+
+  mod.add_type<open_spiel::GameType>("GameType")
+    .method("short_name", [](const open_spiel::GameType& gt) {return gt.short_name;})
+    .method("long_name", [](const open_spiel::GameType& gt) {return gt.long_name;})
+    .method("dynamics", [](const open_spiel::GameType& gt) {return gt.dynamics;})
+    .method("chance_mode", [](const open_spiel::GameType& gt) {return gt.chance_mode;})
+    .method("information", [](const open_spiel::GameType& gt) {return gt.information;})
+    .method("utility", [](const open_spiel::GameType& gt) {return gt.utility;})
+    .method("reward_model", [](const open_spiel::GameType& gt) {return gt.reward_model;})
+    .method("max_num_players", [](const open_spiel::GameType& gt) {return gt.max_num_players;})
+    .method("min_num_players", [](const open_spiel::GameType& gt) {return gt.min_num_players;})
+    .method("provides_information_state", [](const open_spiel::GameType& gt) {return gt.provides_information_state;})
+    .method("provides_information_state_as_normalized_vector", [](const open_spiel::GameType& gt) {return gt.provides_information_state_as_normalized_vector;})
+    .method("provides_observation", [](const open_spiel::GameType& gt) {return gt.provides_observation;})
+    .method("provides_observation_as_normalized_vector", [](const open_spiel::GameType& gt) {return gt.provides_observation_as_normalized_vector;})
+    .method("parameter_specification", [](const open_spiel::GameType& gt) {return gt.parameter_specification;});
 
   mod.add_bits<open_spiel::PlayerId>("PlayerId", jlcxx::julia_type("CppEnum"));
   mod.set_const("INVALID_PLAYER", open_spiel::kInvalidPlayer);

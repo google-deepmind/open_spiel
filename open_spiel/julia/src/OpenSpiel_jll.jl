@@ -3,11 +3,11 @@ module OpenSpiel_jll
 include("$(@__DIR__)/../deps/deps.jl")
 
 using CxxWrap
-import Base:show
+import Base:show, length, getindex, setindex!, keys, values
 
 @wrapmodule(LIB_OPEN_SPIEL)
 
-Base.show(io::IO, g::CxxWrap.StdLib.SharedPtrAllocated{OpenSpiel_jll.Game}) = print(io, string(g))
+Base.show(io::IO, g::CxxWrap.StdLib.SharedPtrAllocated{OpenSpiel_jll.Game}) = print(io, to_string(g))
 
 # export all
 for n in names(@__MODULE__(); all=true)
