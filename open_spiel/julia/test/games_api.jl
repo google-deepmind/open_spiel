@@ -125,4 +125,13 @@ end
     @test String(take!(io)) == "GameParameter(double_value=1.2)"
 end
 
+@testset "simultaneous game history" begin
+    game = load_game("coop_box_pushing")
+    state = new_initial_state(game)
+    apply_action(state, 0)
+    state2 = new_initial_state(game)
+    apply_action(state2, fill(0, num_players(game)))
+    @test history(state) == history(state2)
+end
+
 end

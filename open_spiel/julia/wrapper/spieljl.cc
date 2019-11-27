@@ -234,4 +234,7 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
   mod.method("make_fixed_action_preference_bot", &open_spiel::MakeFixedActionPreferenceBot);
   // mod.method("make_policy_bot", &open_spiel::MakePolicyBot);  // ??? error
 
+  mod.add_type<std::pair<std::shared_ptr<const open_spiel::Game>, std::unique_ptr<open_spiel::State>>>("GameStatePair");
+  mod.method("serialize_game_and_state", &open_spiel::SerializeGameAndState);
+  mod.method("deserialize_game_and_state", &open_spiel::DeserializeGameAndState);
 }
