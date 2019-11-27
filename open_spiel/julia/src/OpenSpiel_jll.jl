@@ -3,11 +3,20 @@ module OpenSpiel_jll
 include("$(@__DIR__)/../deps/deps.jl")
 
 using CxxWrap
+import CxxWrap:argument_overloads
 import Base:show, length, getindex, setindex!, keys, values
 
-@wrapmodule(LIB_OPEN_SPIEL)
+@readmodule(LIB_OPEN_SPIEL)
+@wraptypes
+CxxWrap.argument_overloads(t::Type{Float64}) = Type[]
+@wrapfunctions
 
 Base.show(io::IO, g::CxxWrap.StdLib.SharedPtrAllocated{OpenSpiel_jll.Game}) = print(io, to_string(g))
+Base.show(io::IO, gp::GameParameterAllocated) = print(io, to_repr_string(gp))
+
+# a workaround to disable argument_overloads for bool
+GameParameter(x::Bool) = GameParameter(UInt8[x])
+GameParameter(x::Int) = GameParameter(Ref(Int32(x)))
 
 # export all
 for n in names(@__MODULE__(); all=true)
