@@ -194,6 +194,11 @@ class MCTSBot : public Bot {
   Evaluator* evaluator_;
 };
 
+// Returns a vector of noise sampled from a dirichlet distribution. See:
+// https://en.wikipedia.org/wiki/Dirichlet_process
+std::vector<double> dirichlet_noise(int count, double alpha,
+                                    std::mt19937* rng);
+
 }  // namespace algorithms
 }  // namespace open_spiel
 
