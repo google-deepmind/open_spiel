@@ -269,6 +269,7 @@ TinyBridgeAuctionState::AuctionState TinyBridgeAuctionState::AnalyzeAuction()
 
 int Score_p0(std::array<Seat, kDeckSize> holder,
              const TinyBridgeAuctionState::AuctionState& state) {
+  if (state.last_bid == Call::kPass) return 0;
   std::shared_ptr<Game> game(new TinyBridgePlayGame({}));
   int trumps = (state.last_bid - 1) % 3;
   Seat leader = Seat((state.last_bidder + 3) % 4);
