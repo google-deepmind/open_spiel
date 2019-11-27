@@ -299,6 +299,7 @@ class State {
   // multiple players are required it is more efficient to use Returns() above.
   virtual double PlayerReturn(Player player) const {
     auto returns = Returns();
+    SPIEL_CHECK_GE(player, 0);
     SPIEL_CHECK_LT(player, returns.size());
     return returns[player];
   }
