@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include "open_spiel/algorithms/evaluate_bots.h"
+
 #include <memory>
 
 #include "open_spiel/policy.h"

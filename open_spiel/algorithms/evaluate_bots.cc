@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "open_spiel/algorithms/evaluate_bots.h"
+
+#include <vector>
+
 #include "open_spiel/spiel_bots.h"
 
 namespace open_spiel {
@@ -22,7 +26,11 @@ std::vector<double> EvaluateBots(State* state, const std::vector<Bot*>& bots,
   std::mt19937 rng(seed);
   std::uniform_real_distribution<> uniform(0, 1);
   std::vector<Action> joint_actions(bots.size());
-  for (auto bot : bots) bot->RestartAt(*state);
+  if (state->History().empty()) {
+    for (auto bot : bots) bot->Restart();
+  } else {
+    for (auto bot : bots) bot->RestartAt(*state);
+  }
   while (!state->IsTerminal()) {
     if (state->IsChanceNode()) {
       state->ApplyAction(

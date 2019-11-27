@@ -24,6 +24,8 @@ namespace open_spiel {
 
 // Play a game once, to compare bot performance.
 // Must supply one bot for each player in the game.
+// `state.Restart()` will be called if the state is the root node, otherwise
+// `RestartAt(state)` will be called.
 std::vector<double> EvaluateBots(State* state, const std::vector<Bot*>& bots,
                                  int seed);
 

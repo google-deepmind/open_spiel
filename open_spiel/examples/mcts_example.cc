@@ -192,4 +192,6 @@ int main(int argc, char** argv) {
             << std::endl;
   std::cerr << "Overall returns: " << absl::StrJoin(overall_returns, ",")
             << std::endl;
+
+  return 0;
 }
