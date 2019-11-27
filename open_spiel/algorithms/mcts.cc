@@ -198,7 +198,7 @@ std::vector<double> dirichlet_noise(int count, double alpha,
 }
 
 MCTSBot::MCTSBot(
-      const Game* game,
+      const Game& game,
       Player player,
       Evaluator* evaluator,
       double uct_c,
@@ -211,28 +211,27 @@ MCTSBot::MCTSBot(
       double dirichlet_alpha,
       double dirichlet_epsilon)
     : Bot(/*provides_policy=*/false),
-      game_(*game),
       player_id_(player),
       uct_c_{uct_c},
       max_simulations_{max_simulations},
       max_memory_(max_memory_mb << 20),  // megabytes -> bytes
       verbose_(verbose),
       solve_(solve),
-      max_utility_(game->MaxUtility()),
+      max_utility_(game.MaxUtility()),
       dirichlet_alpha_(dirichlet_alpha),
       dirichlet_epsilon_(dirichlet_epsilon),
       rng_(seed),
       child_selection_policy_(child_selection_policy),
       evaluator_{evaluator} {
-  GameType game_type = game->GetType();
+  GameType game_type = game.GetType();
   if (game_type.reward_model != GameType::RewardModel::kTerminal)
     SpielFatalError("Game must have terminal rewards.");
   if (game_type.dynamics != GameType::Dynamics::kSequential)
     SpielFatalError("Game must have sequential turns.");
-  if (player < 0 || player >= game->NumPlayers())
+  if (player < 0 || player >= game.NumPlayers())
     SpielFatalError(absl::StrFormat(
         "Game doesn't support that many players. Max: %d, player: %d",
-        game->NumPlayers(), player));
+        game.NumPlayers(), player));
 }
 
 Action MCTSBot::Step(const State& state) {

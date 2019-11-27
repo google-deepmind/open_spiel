@@ -139,7 +139,7 @@ struct SearchNode {
 class MCTSBot : public Bot {
  public:
   MCTSBot(
-      const Game* game,
+      const Game& game,
       Player player,
       Evaluator* evaluator,
       double uct_c,
@@ -179,7 +179,6 @@ class MCTSBot : public Bot {
       SearchNode* root, const State& state,
       std::vector<SearchNode*>* visit_path);
 
-  const Game& game_;
   Player player_id_;
   double uct_c_;
   int max_simulations_;
