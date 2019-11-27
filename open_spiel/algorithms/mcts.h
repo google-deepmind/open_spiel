@@ -158,6 +158,12 @@ class MCTSBot : public Bot {
   // Run MCTS for one step, choosing the action, and printing some information.
   Action Step(const State& state) override;
 
+  // Implements StepWithPolicy. This is equivalent to calling Step, but wraps
+  // the action as an ActionsAndProbs with 100% probability assigned to the
+  // lone action.
+  std::pair<ActionsAndProbs, Action> StepWithPolicy(
+      const State& state) override;
+
   // Run MCTS on a given state, and return the resulting search tree.
   std::unique_ptr<SearchNode> MCTSearch(const State& state);
 

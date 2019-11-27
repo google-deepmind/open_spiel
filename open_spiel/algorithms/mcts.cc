@@ -260,6 +260,12 @@ Action MCTSBot::Step(const State& state) {
   return best.action;
 }
 
+std::pair<ActionsAndProbs, Action> MCTSBot::StepWithPolicy(const State& state) {
+  Action action = Step(state);
+  return {{{action, 1.}}, action};
+}
+
+
 std::unique_ptr<State> MCTSBot::ApplyTreePolicy(
     SearchNode* root, const State& state,
     std::vector<SearchNode*>* visit_path) {
