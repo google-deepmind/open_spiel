@@ -47,7 +47,7 @@ inline constexpr int NumDistinctActions() { return (1 << 15); }
 // https://math.stackexchange.com/questions/194008/how-many-turns-can-a-chess-game-take-at-maximum
 inline constexpr int MaxGameLength() { return 17695; }
 
-inline const std::vector<int>& InformationStateTensorShape() {
+inline const std::vector<int>& ObservationTensorShape() {
   static std::vector<int> shape{
       13 /* piece types * colours + empty */ + 1 /* repetition count */ +
           1 /* side to move */ + 1 /* irreversible move counter */ +
@@ -191,8 +191,8 @@ class ChessState : public State {
 
   std::vector<double> Returns() const override;
 
-  std::string InformationStateString(Player player) const override;
-  void InformationStateTensor(
+  std::string ObservationString(Player player) const override;
+  void ObservationTensor(
       Player player, std::vector<double>* values) const override;
   std::unique_ptr<State> Clone() const override;
   void UndoAction(Player player, Action action) override;
@@ -254,8 +254,8 @@ class ChessGame : public Game {
   std::shared_ptr<const Game> Clone() const override {
     return std::shared_ptr<const Game>(new ChessGame(*this));
   }
-  std::vector<int> InformationStateTensorShape() const override {
-    return chess::InformationStateTensorShape();
+  std::vector<int> ObservationTensorShape() const override {
+    return chess::ObservationTensorShape();
   }
   int MaxGameLength() const override { return chess::MaxGameLength(); }
 };

@@ -122,12 +122,12 @@ double ValueAt(const std::vector<double>& v, const std::vector<int>& shape,
   return ValueAt(v, shape, plane, sq.x, sq.y);
 }
 
-void InformationStateVectorTests() {
+void ObservationTensorTests() {
   std::shared_ptr<const Game> game = LoadGame("chess");
   ChessState initial_state(game);
-  auto shape = game->InformationStateTensorShape();
+  auto shape = game->ObservationTensorShape();
   std::vector<double> v;
-  initial_state.InformationStateTensor(initial_state.CurrentPlayer(), &v);
+  initial_state.ObservationTensor(initial_state.CurrentPlayer(), &v);
 
   // For each piece type, check one square that's supposed to be occupied, and
   // one that isn't.
@@ -190,8 +190,8 @@ void InformationStateVectorTests() {
   ApplySANMove("e5", &initial_state);
   ApplySANMove("Ke2", &initial_state);
 
-  initial_state.InformationStateTensor(initial_state.CurrentPlayer(), &v);
-  SPIEL_CHECK_EQ(v.size(), game->InformationStateTensorSize());
+  initial_state.ObservationTensor(initial_state.CurrentPlayer(), &v);
+  SPIEL_CHECK_EQ(v.size(), game->ObservationTensorSize());
 
   // Now it's black to move.
   SPIEL_CHECK_EQ(ValueAt(v, shape, 14, 0, 0), 0.0);
@@ -221,5 +221,5 @@ int main(int argc, char** argv) {
   open_spiel::chess::MoveGenerationTests();
   open_spiel::chess::UndoTests();
   open_spiel::chess::TerminalReturnTests();
-  open_spiel::chess::InformationStateVectorTests();
+  open_spiel::chess::ObservationTensorTests();
 }
