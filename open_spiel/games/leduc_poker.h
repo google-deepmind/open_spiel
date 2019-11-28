@@ -89,6 +89,8 @@ class LeducState : public State {
   // Returns a vector of MaxGameLength containing all of the betting actions
   // taken so far. If the round has ended, the actions are kInvalidAction.
   std::vector<int> padded_betting_sequence() const;
+  std::unique_ptr<State> ResampleFromInfostate(
+      int player_id, std::function<double()> rng) const;
 
  protected:
   // The meaning of `action_id` varies:
@@ -117,6 +119,7 @@ class LeducState : public State {
   int RankHand(Player player) const;
   void SequenceAppendMove(int move);
   void Ante(Player player, int amount);
+  void SetPrivate(Player player, Action move);
 
   // Fields sets to bad/invalid values. Use Game::NewInitialState().
   Player cur_player_;

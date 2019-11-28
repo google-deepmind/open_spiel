@@ -284,6 +284,31 @@ bool KuhnState::DidBet(Player player) const {
   }
 }
 
+std::unique_ptr<State> KuhnState::ResampleFromInfostate(
+    int player_id, std::function<double()> rng) const {
+  std::unique_ptr<State> state = game_->NewInitialState();
+  Action player_chance = history_.at(player_id);
+  for (int p = 0; p < game_->NumPlayers(); ++p) {
+    if (p == history_.size()) return state;
+    if (p == player_id) {
+      state->ApplyAction(player_chance);
+    } else {
+      Action other_chance = player_chance;
+      while (other_chance == player_chance) {
+        other_chance =
+            SampleChanceOutcome(state->ChanceOutcomes(), rng()).first;
+      }
+      state->ApplyAction(other_chance);
+    }
+  }
+  SPIEL_CHECK_GE(state->CurrentPlayer(), 0);
+  if (game_->NumPlayers() == history_.size()) return state;
+  for (int i = game_->NumPlayers(); i < history_.size(); ++i) {
+    state->ApplyAction(history_.at(i));
+  }
+  return state;
+}
+
 KuhnGame::KuhnGame(const GameParameters& params)
     : Game(kGameType, params), num_players_(ParameterValue<int>("players")) {
   SPIEL_CHECK_GE(num_players_, kGameType.min_num_players);

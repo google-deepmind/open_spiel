@@ -105,17 +105,7 @@ void LeducState::DoApplyAction(Action move) {
     SPIEL_CHECK_NE(deck_[move], kInvalidCard);
 
     if (private_cards_dealt_ < num_players_) {
-      // Round 1. `move` refers to the card value to deal to the current
-      // underlying player (given by `private_cards_dealt_`).
-      private_cards_[private_cards_dealt_] = deck_[move];
-      deck_[move] = kInvalidCard;
-      deck_size_--;
-      private_cards_dealt_++;
-
-      if (private_cards_dealt_ == num_players_) {
-        // When all private cards are dealt, move to player 0.
-        cur_player_ = 0;
-      }
+      SetPrivate(private_cards_dealt_, move);
     } else {
       // Round 2: A single public card.
       public_card_ = deck_[move];
@@ -557,6 +547,44 @@ std::vector<int> LeducState::padded_betting_sequence() const {
                  round2_sequence_.end());
   history.resize(game_->MaxGameLength(), kInvalidAction);
   return history;
+}
+
+void LeducState::SetPrivate(Player player, Action move) {
+  // Round 1. `move` refers to the card value to deal to the current
+  // underlying player (given by `private_cards_dealt_`).
+  private_cards_[player] = deck_[move];
+  deck_[move] = kInvalidCard;
+  --deck_size_;
+  ++private_cards_dealt_;
+
+  // When all private cards are dealt, move to player 0.
+  if (private_cards_dealt_ == num_players_) cur_player_ = 0;
+}
+
+std::unique_ptr<State> LeducState::ResampleFromInfostate(
+    int player_id, std::function<double()> rng) const {
+  std::unique_ptr<LeducState> clone = std::make_unique<LeducState>(game_);
+
+  // First, deal out cards:
+  Action player_chance = history_.at(player_id);
+  for (int p = 0; p < GetGame()->NumPlayers(); ++p) {
+    if (p == player_id) {
+      clone->ApplyAction(history_.at(p));
+    } else {
+      Action chosen_action = player_chance;
+      while (chosen_action == player_chance || chosen_action == public_card_) {
+        chosen_action =
+            SampleChanceOutcome(clone->ChanceOutcomes(), rng()).first;
+      }
+      clone->ApplyAction(chosen_action);
+    }
+  }
+  for (int action : round1_sequence_) clone->ApplyAction(action);
+  if (public_card_ != kInvalidCard) {
+    clone->ApplyAction(public_card_);
+    for (int action : round2_sequence_) clone->ApplyAction(action);
+  }
+  return clone;
 }
 
 LeducGame::LeducGame(const GameParameters& params)

@@ -55,6 +55,9 @@ void CheckChanceOutcomes(const Game& game);
 // mode kSampledStochastic).
 void RandomSimTestNoSerialize(const Game& game, int num_sims);
 
+// Verifies that ResampleFromInfostate is correctly implemented.
+void ResampleInfostateTest(const Game& game, int num_sims);
+
 }  // namespace testing
 }  // namespace open_spiel
 

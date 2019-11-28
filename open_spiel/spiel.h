@@ -505,6 +505,21 @@ class State {
   // If overridden, this must be the inverse of Game::DeserializeState.
   virtual std::string Serialize() const;
 
+  // Resamples a new history from the information state from player_id's view.
+  // This resamples a private for the other players, but holds player_id's
+  // privates constant, and the public information constant.
+  // The privates are sampled uniformly at each chance node. For games with
+  // partially-revealed actions that require some policy, we sample uniformly
+  // from the list of actions that are consistent with what player_id observed.
+  // For rng, we need something that returns a double in [0, 1). This value will
+  // be interpreted as a cumulative distribution function, and will be used to
+  // sample from the legal chance actions. A good choice would be
+  // absl/std::uniform_real_distribution<double>(0., 1.).
+  virtual std::unique_ptr<State> ResampleFromInfostate(
+      int player_id, std::function<double()> rng) const {
+    SpielFatalError("ResampleFromInfostate() not implemented.");
+  }
+
  protected:
   // See ApplyAction.
   virtual void DoApplyAction(Action action_id) {

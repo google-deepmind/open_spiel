@@ -29,6 +29,7 @@ void BasicLeducTests() {
     testing::RandomSimTest(
         *LoadGame("leduc_poker", {{"players", GameParameter(players)}}), 100);
   }
+  testing::ResampleInfostateTest(*LoadGame("leduc_poker"), /*num_sims=*/100);
 }
 
 }  // namespace

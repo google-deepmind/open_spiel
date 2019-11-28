@@ -66,6 +66,8 @@ class KuhnState : public State {
   std::vector<std::pair<Action, double>> ChanceOutcomes() const override;
   std::vector<Action> LegalActions() const override;
   std::vector<int> hand() const { return {card_dealt_[CurrentPlayer()]}; }
+  std::unique_ptr<State> ResampleFromInfostate(
+      int player_id, std::function<double()> rng) const;
 
  protected:
   void DoApplyAction(Action move) override;

@@ -16,6 +16,7 @@
 
 #include <iostream>
 #include <memory>
+#include <random>
 #include <set>
 #include <string>
 
@@ -457,6 +458,34 @@ void CheckChanceOutcomes(const State& state) {
 
 void CheckChanceOutcomes(const Game& game) {
   CheckChanceOutcomes(*game.NewInitialState());
+}
+
+// Verifies that ResampleFromInfostate is correctly implemented.
+void ResampleInfostateTest(const Game& game, int num_sims) {
+  std::mt19937 rng;
+  auto sampler = [&rng]() {
+    return std::uniform_real_distribution<double>(0., 1.)(rng);
+  };
+  for (int i = 0; i < num_sims; ++i) {
+    std::unique_ptr<State> state = game.NewInitialState();
+    while (!state->IsTerminal()) {
+      if (!state->IsChanceNode()) {
+        for (int p = 0; p < state->NumPlayers(); ++p) {
+          std::unique_ptr<State> other_state =
+              state->ResampleFromInfostate(p, sampler);
+          SPIEL_CHECK_EQ(state->InformationStateString(p),
+                         other_state->InformationStateString(p));
+          SPIEL_CHECK_EQ(state->InformationStateTensor(p),
+                         other_state->InformationStateTensor(p));
+          SPIEL_CHECK_EQ(state->CurrentPlayer(), other_state->CurrentPlayer());
+        }
+      }
+      std::vector<Action> actions = state->LegalActions();
+      std::uniform_int_distribution<int> dis(0, actions.size() - 1);
+      Action action = actions[dis(rng)];
+      state->ApplyAction(action);
+    }
+  }
 }
 
 }  // namespace testing
