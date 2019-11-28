@@ -110,9 +110,9 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
     else
       echo "Julia not found. Installing it in the home dir..."
       sudo apt-get install wget
-      wget https://julialang-s3.julialang.org/bin/linux/x64/1.2/julia-1.2.0-linux-x86_64.tar.gz -O /tmp/julia.tar.gz
+      wget https://julialang-s3.julialang.org/bin/linux/x64/1.3/julia-1.3.0-linux-x86_64.tar.gz -O /tmp/julia.tar.gz
       tar -zxvf /tmp/julia.tar.gz -C ~
-      sudo ln -s ~/julia-1.2.0/bin/julia /usr/local/bin/julia
+      sudo ln -s ~/julia-1.3.0/bin/julia /usr/local/bin/julia
     fi
     # Install dependencies
     julia --project="${MYDIR}/open_spiel/julia" -e 'using Pkg; Pkg.instantiate()'

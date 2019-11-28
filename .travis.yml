@@ -34,7 +34,9 @@ matrix:
   # Build and test on MacOS. We use a single target, with all dependencies.
   - os: osx # macOS 10.14 (Mojave), release on September 24, 2018.
     osx_image: xcode11.2
-    env: DEFAULT_OPTIONAL_DEPENDENCY="ON"
+    env:
+      - DEFAULT_OPTIONAL_DEPENDENCY="ON"
+      - BUILD_WITH_JULIA="OFF" # untested on mac
 
 script:
   - ./install.sh
