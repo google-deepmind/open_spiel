@@ -72,7 +72,7 @@ fi
 
 # Test Julia
 if [[ ${BUILD_WITH_JULIA:-"OFF"} == "ON" ]]; then
-  julia --project=${MYDIR}/../julia -e 'using Pkg; Pkg.test()'
+  julia --project=${MYDIR}/../julia -e 'using Pkg; Pkg.build(); Pkg.test()'
 fi
 
 cd ..
