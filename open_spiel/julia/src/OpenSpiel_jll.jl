@@ -4,7 +4,7 @@ include("$(@__DIR__)/../deps/deps.jl")
 
 using CxxWrap
 import CxxWrap:argument_overloads
-import Base:show, length, getindex, setindex!, keys, values, copy, deepcopy
+import Base:show, length, getindex, setindex!, keys, values, copy, deepcopy, first, last
 
 @readmodule(LIB_OPEN_SPIEL)
 @wraptypes
@@ -29,10 +29,33 @@ function apply_action(state, actions::AbstractVector{<:Number})
     apply_actions(state, A)
 end
 
+function deserialize_game_and_state(s::CxxWrap.StdLib.StdStringAllocated)
+    game_and_state = _deserialize_game_and_state(s)
+    first(game_and_state), last(game_and_state)
+end
+
+function GameParameters(kw::Iterators.Pairs)
+    ps = GameParameters()
+    for (k, v) in kw
+        ps[string(k)] = v
+    end
+    ps
+end
+
+function Base.show(io::IO, ps::GameParametersAllocated)
+    ps_pairs = ["$k => $v" for (k, v) in zip(keys(ps), values(ps))]
+    s = length(ps_pairs) == 0 ? "" : join(',', ps_pairs)
+    print(io, "GameParameters($s)")
+end
+
+load_game(s::Union{String, CxxWrap.StdLib.StdStringAllocated}; kw...) = length(kw) == 0 ? _load_game(s) : _load_game(s, GameParameters(kw))
+
+load_game_as_turn_based(s::Union{String, CxxWrap.StdLib.StdStringAllocated}; kw...) = length(kw) == 0 ? _load_game_as_turn_based(s) : _load_game_as_turn_based(s, ps)
+
 # export all
 for n in names(@__MODULE__(); all=true)
     if Base.isidentifier(n) &&
-        !startswith(String(n), "__cxxwrap") &&
+        !startswith(String(n), "_") &&
         n ∉ (Symbol(@__MODULE__()), :eval, :include)
         @eval export $n
     end

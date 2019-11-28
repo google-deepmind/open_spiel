@@ -80,7 +80,7 @@ function simulate_game(game)
         elseif is_simultaneous_node(state)
             chosen_actions = [
                 rand(legal_actions(state, pid-1))
-                for pid in 1:Spiel.num_players(game)
+                for pid in 1:num_players(game)
             ]  # in julia, index starts with 1
             # Apply the joint action and test cloning states.
             apply_action_test_clone(state, chosen_actions)

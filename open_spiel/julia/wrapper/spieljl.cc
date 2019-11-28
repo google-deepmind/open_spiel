@@ -30,11 +30,11 @@ template<> struct jlcxx::IsMirroredType<open_spiel::PlayerId> : std::true_type {
 
 template<> struct jlcxx::IsMirroredType<std::pair<open_spiel::Action, double>> : std::true_type {};
 
-template<> struct jlcxx::julia_type_factory<std::pair<open_spiel::Action, double>>
+template<typename K, typename V> struct jlcxx::julia_type_factory<std::pair<K, V>>
 {
   static jl_datatype_t* julia_type()
   {
-    return (jl_datatype_t*)apply_type(jlcxx::julia_type("Pair"), jl_svec2(julia_base_type<open_spiel::Action>(), julia_base_type<double>()));
+    return (jl_datatype_t*)apply_type(jlcxx::julia_type("Pair"), jl_svec2(julia_base_type<K>(), julia_base_type<V>()));
   }
 };
 
@@ -67,8 +67,8 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
     ;
 
   mod.add_type<open_spiel::GameParameters>("GameParameters")
-    .method("getindex", [](open_spiel::GameParameters ps, std::string& k) { return ps[k]; })
-    .method("setindex!", [](open_spiel::GameParameters ps, open_spiel::GameParameter p, std::string& k) { ps[k] = p; })
+    .method("getindex", [](open_spiel::GameParameters &ps, std::string& k) { return ps[k]; })
+    .method("setindex!", [](open_spiel::GameParameters &ps, open_spiel::GameParameter p, std::string& k) { ps[k] = p; })
     .method("keys", [](open_spiel::GameParameters ps) {
       std::vector<std::string> keys;
       keys.reserve(ps.size());
@@ -213,10 +213,10 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
 
   mod.method("create_matrix_game", [](const std::string& a, const std::string& b, const std::vector<std::string>& c, const std::vector<std::string>& d, const std::vector<std::vector<double>>& e, const std::vector<std::vector<double>>& f) { return open_spiel::matrix_game::CreateMatrixGame(a,b,c,d,e,f); });
   mod.method("create_matrix_game", [](const std::vector<std::vector<double>>& a, const std::vector<std::vector<double>>& b) { return open_spiel::matrix_game::CreateMatrixGame(a,b); });
-  mod.method("load_game", [](const std::string & s) { return open_spiel::LoadGame(s); });
-  mod.method("load_game", [](const std::string & s, const open_spiel::GameParameters& ps) { return open_spiel::LoadGame(s, ps); });
-  mod.method("load_game_as_turn_based", [](const std::string &s) { return open_spiel::LoadGameAsTurnBased(s); });
-  mod.method("load_game_as_turn_based", [](const std::string &s, const open_spiel::GameParameters& ps) { return open_spiel::LoadGameAsTurnBased(s, ps); });
+  mod.method("_load_game", [](const std::string & s) { return open_spiel::LoadGame(s); });
+  mod.method("_load_game", [](const std::string & s, const open_spiel::GameParameters& ps) { return open_spiel::LoadGame(s, ps); });
+  mod.method("_load_game_as_turn_based", [](const std::string &s) { return open_spiel::LoadGameAsTurnBased(s); });
+  mod.method("_load_game_as_turn_based", [](const std::string &s, const open_spiel::GameParameters& ps) { return open_spiel::LoadGameAsTurnBased(s, ps); });
   mod.method("load_matrix_game", &open_spiel::algorithms::LoadMatrixGame);
   mod.method("extensive_to_matrix_game", &open_spiel::algorithms::ExtensiveToMatrixGame);
   mod.method("registered_names", &open_spiel::GameRegister::RegisteredNames);
@@ -234,7 +234,10 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
   mod.method("make_fixed_action_preference_bot", &open_spiel::MakeFixedActionPreferenceBot);
   // mod.method("make_policy_bot", &open_spiel::MakePolicyBot);  // ??? error
 
-  mod.add_type<std::pair<std::shared_ptr<const open_spiel::Game>, std::unique_ptr<open_spiel::State>>>("GameStatePair");
+  mod.add_type<std::pair<std::shared_ptr<const open_spiel::Game>, std::unique_ptr<open_spiel::State>>>("GameStatePair")
+    .method("first", [](std::pair<std::shared_ptr<const open_spiel::Game>, std::unique_ptr<open_spiel::State>> &p) { return p.first; })
+    .method("last", [](std::pair<std::shared_ptr<const open_spiel::Game>, std::unique_ptr<open_spiel::State>> &p) { return std::move(p.second); });
+
   mod.method("serialize_game_and_state", &open_spiel::SerializeGameAndState);
-  mod.method("deserialize_game_and_state", &open_spiel::DeserializeGameAndState);
+  mod.method("_deserialize_game_and_state", &open_spiel::DeserializeGameAndState);
 }
