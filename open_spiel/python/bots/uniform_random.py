@@ -33,7 +33,7 @@ class UniformRandomBot(pyspiel.Bot):
       rng: A random number generator supporting a `choice` method, e.g.
         `np.random`
     """
-    pyspiel.Bot.__init__(self, provides_policy=True)
+    pyspiel.Bot.__init__(self)
     self._player_id = player_id
     self._rng = rng
 
@@ -42,6 +42,9 @@ class UniformRandomBot(pyspiel.Bot):
 
   def player_id(self):
     return self._player_id
+
+  def provides_policy(self):
+    return True
 
   def step_with_policy(self, state):
     """Returns the stochastic policy and selected action in the given state.

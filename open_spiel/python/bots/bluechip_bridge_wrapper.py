@@ -199,7 +199,7 @@ class BlueChipBridgeBot(pyspiel.Bot):
       client: The BlueChip bot; must support methods `start`, `read_line`, and
         `send_line`.
     """
-    pyspiel.Bot.__init__(self, provides_policy=False)
+    pyspiel.Bot.__init__(self)
     self._game = game
     self._player_id = player_id
     self._client = client

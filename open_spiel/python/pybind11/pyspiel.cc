@@ -91,6 +91,25 @@ class PyBot : public Bot {
         // The trailing coma after Restart is necessary to say "No argument"
     );
   }
+  bool ProvidesForceAction() override {
+    PYBIND11_OVERLOAD_NAME(
+        bool,  // Return type (must be a simple token for macro parser)
+        Bot,   // Parent class
+        "provides_force_action",  // Name of function in Python
+        ProvidesForceAction,     // Name of function in C++
+                           // Arguments
+    );
+  }
+  void ForceAction(const State& state, Action action) override {
+    PYBIND11_OVERLOAD_NAME(
+        void,  // Return type (must be a simple token for macro parser)
+        Bot,   // Parent class
+        "force_action",  // Name of function in Python
+        ForceAction,     // Name of function in C++
+        state,           // Arguments
+        action);
+  }
+
   void RestartAt(const State& state) override {
     PYBIND11_OVERLOAD_NAME(
         void,          // Return type (must be a simple token for macro parser)
@@ -100,7 +119,15 @@ class PyBot : public Bot {
         state          // Arguments
     );
   }
-
+  bool ProvidesPolicy() override {
+    PYBIND11_OVERLOAD_NAME(
+        bool,  // Return type (must be a simple token for macro parser)
+        Bot,   // Parent class
+        "provides_policy",  // Name of function in Python
+        ProvidesPolicy,     // Name of function in C++
+                           // Arguments
+    );
+  }
   ActionsAndProbs GetPolicy(const State& state) override {
     PYBIND11_OVERLOAD_NAME(ActionsAndProbs,  // Return type (must be a simple
                                              // token for macro parser)
@@ -249,17 +276,16 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("information_state_tensor",
            (std::vector<double>(State::*)(int) const) &
                State::InformationStateTensor)
-      .def("information_state_tensor",
-           (std::vector<double>(State::*)() const) &
-               State::InformationStateTensor)
+      .def("information_state_tensor", (std::vector<double>(State::*)() const) &
+                                           State::InformationStateTensor)
       .def("observation_string",
            (std::string(State::*)(int) const) & State::ObservationString)
       .def("observation_string",
            (std::string(State::*)() const) & State::ObservationString)
       .def("observation_tensor", (std::vector<double>(State::*)(int) const) &
                                      State::ObservationTensor)
-      .def("observation_tensor", (std::vector<double>(State::*)() const) &
-                                     State::ObservationTensor)
+      .def("observation_tensor",
+           (std::vector<double>(State::*)() const) & State::ObservationTensor)
       .def("clone", &State::Clone)
       .def("child", &State::Child)
       .def("undo_action", &State::UndoAction)
@@ -351,10 +377,12 @@ PYBIND11_MODULE(pyspiel, m) {
           }));
 
   py::class_<Bot, PyBot> bot(m, "Bot");
-  bot.def(py::init<bool>(), py::arg("provides_policy"))
+  bot.def(py::init<>())
       .def("step", &Bot::Step)
       .def("restart", &Bot::Restart)
       .def("restart_at", &Bot::RestartAt)
+      .def("provides_force_action", &Bot::ProvidesForceAction)
+      .def("force_action", &Bot::ForceAction)
       .def("provides_policy", &Bot::ProvidesPolicy)
       .def("get_policy", &Bot::GetPolicy)
       .def("step_with_policy", &Bot::StepWithPolicy);

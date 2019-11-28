@@ -28,13 +28,14 @@ namespace {
 class UniformRandomBot : public Bot {
  public:
   UniformRandomBot(Player player_id, int seed)
-      : Bot(/*provides_policy=*/true), player_id_(player_id), rng_(seed) {}
+      : player_id_(player_id), rng_(seed) {}
   ~UniformRandomBot() = default;
 
   void RestartAt(const State&) {}
   Action Step(const State& state) override {
     return StepWithPolicy(state).second;
   }
+  bool ProvidesPolicy() override { return true; }
   ActionsAndProbs GetPolicy(const State& state) override {
     ActionsAndProbs policy;
     auto legal_actions = state.LegalActions(player_id_);
@@ -62,14 +63,14 @@ class UniformRandomBot : public Bot {
 class PolicyBot : public Bot {
  public:
   PolicyBot(int seed, std::unique_ptr<Policy> policy)
-      : Bot(/*provides_policy=*/true), rng_(seed), policy_(std::move(policy)) {}
+      : Bot(), rng_(seed), policy_(std::move(policy)) {}
   ~PolicyBot() = default;
 
   void RestartAt(const State&) {}
   Action Step(const State& state) override {
     return StepWithPolicy(state).second;
   }
-
+  bool ProvidesPolicy() override { return true; }
   ActionsAndProbs GetPolicy(const State& state) override {
     std::cout << "About to call GetStatePolicy.\n";
     ActionsAndProbs actions_and_probs = policy_->GetStatePolicy(state);
@@ -109,16 +110,14 @@ namespace {
 class FixedActionPreferenceBot : public Bot {
  public:
   FixedActionPreferenceBot(Player player_id, const std::vector<Action>& actions)
-      : Bot(/*provides_policy=*/true),
-        player_id_(player_id),
-        actions_(actions) {}
+      : Bot(), player_id_(player_id), actions_(actions) {}
   ~FixedActionPreferenceBot() = default;
 
   void RestartAt(const State&) {}
   Action Step(const State& state) override {
     return StepWithPolicy(state).second;
   }
-
+  bool ProvidesPolicy() override { return true; }
   ActionsAndProbs GetPolicy(const State& state) {
     std::vector<Action> legal_actions = state.LegalActions(player_id_);
     std::unordered_set<Action> legal_actions_set =

@@ -53,10 +53,21 @@ namespace open_spiel {
 // implementation should take the player_id in the constructor.
 //
 // Optionally, the Bot can provide additional functionality (see
-// `ProvidesPolicy`).
+// `IsOverridable` and `ProvidesPolicy`).
+// In Python, the simplest way to implement such a bot is:
+//
+// class MyBot(pyspiel.Bot):
+//
+//  def __init__(self):
+//    pyspiel.Bot.__init__(self)
+//    # If you do implement get_policy and step_with_policy
+//  def provides_force_action(self):
+//    return True
+//  def force_action(self, state, action):
+//    ...
 class Bot {
  public:
-  explicit Bot(bool provides_policy) : provides_policy_(provides_policy) {}
+  // Constructs a Bot that only supports `Step` and `Restart` (maybe RestartAt).
   virtual ~Bot() = default;
 
   // Asks the bot to decide on an action to play. The bot should be able to
@@ -70,9 +81,26 @@ class Bot {
     SpielFatalError("RestartAt(state) not implemented.");
   }
 
+  // Returns `true` if it is possible to force the Bot to take a specific
+  // action on playable states. In case of a stateful bot, it should correctly
+  // update its internal state.
+  virtual bool ProvidesForceAction() { return false; }
+  // Notifies the bot that it should consider that it took action action in
+  // the given state.
+  virtual void ForceAction(const State& state, Action action) {
+    if (ProvidesForceAction()) {
+      SpielFatalError(
+          "ForceAction not implemented but should because the bot is "
+          "registered as overridable.");
+    } else {
+      SpielFatalError(
+          "ForceAction not implemented because the bot is not overridable");
+    }
+  }
+
   // Extends a bot to support explicit stochasticity, meaning that it can
   // return a distribution over moves.
-  bool ProvidesPolicy() { return provides_policy_; }
+  virtual bool ProvidesPolicy() { return false; }
   virtual ActionsAndProbs GetPolicy(const State& state) {
     if (ProvidesPolicy()) {
       SpielFatalError(
@@ -96,9 +124,6 @@ class Bot {
           "policy.");
     }
   }
-
- private:
-  bool provides_policy_;
 };
 
 // A uniform random bot, for test purposes.

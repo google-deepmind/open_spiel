@@ -210,8 +210,7 @@ MCTSBot::MCTSBot(
       ChildSelectionPolicy child_selection_policy,
       double dirichlet_alpha,
       double dirichlet_epsilon)
-    : Bot(/*provides_policy=*/false),
-      player_id_(player),
+    : player_id_(player),
       uct_c_{uct_c},
       max_simulations_{max_simulations},
       max_memory_(max_memory_mb << 20),  // megabytes -> bytes

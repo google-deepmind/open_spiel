@@ -238,7 +238,7 @@ class MCTSBot(pyspiel.Bot):
     Raises:
       ValueError: if the game type isn't supported.
     """
-    pyspiel.Bot.__init__(self, provides_policy=False)
+    pyspiel.Bot.__init__(self)
     # Check that the game satisfies the conditions for this MCTS implemention.
     game_type = game.get_type()
     if game_type.reward_model != pyspiel.GameType.RewardModel.TERMINAL:
