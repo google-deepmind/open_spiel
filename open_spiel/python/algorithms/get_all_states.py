@@ -77,8 +77,8 @@ def get_all_states(game,
         historical reasons, using `str` is also supported, but the goal is to
         remove this argument.
     stop_if_encountered: if this is set, do not keep recursively adding states
-        if this state is already in the list. This allows support for games that
-        have cycles.
+      if this state is already in the list. This allows support for games that
+      have cycles.
 
   Returns:
     A `dict` with `to_string(state)` keys and `pyspiel.State` values containing

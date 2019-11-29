@@ -69,4 +69,3 @@ class UniformRandomBot(pyspiel.Bot):
 
   def step(self, state):
     return self.step_with_policy(state)[1]
-

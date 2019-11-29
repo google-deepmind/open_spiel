@@ -26,24 +26,23 @@ namespace pentago {
 namespace {
 
 // Facts about the game.
-const GameType kGameType{
-    /*short_name=*/"pentago",
-    /*long_name=*/"Pentago",
-    GameType::Dynamics::kSequential,
-    GameType::ChanceMode::kDeterministic,
-    GameType::Information::kPerfectInformation,
-    GameType::Utility::kZeroSum,
-    GameType::RewardModel::kTerminal,
-    /*max_num_players=*/2,
-    /*min_num_players=*/2,
-    /*provides_information_state_string=*/true,
-    /*provides_information_state_tensor=*/false,
-    /*provides_observation_string=*/true,
-    /*provides_observation_tensor=*/true,
-    /*parameter_specification=*/
-    {
-        {"ansi_color_output", GameParameter(false)},
-    }};
+const GameType kGameType{/*short_name=*/"pentago",
+                         /*long_name=*/"Pentago",
+                         GameType::Dynamics::kSequential,
+                         GameType::ChanceMode::kDeterministic,
+                         GameType::Information::kPerfectInformation,
+                         GameType::Utility::kZeroSum,
+                         GameType::RewardModel::kTerminal,
+                         /*max_num_players=*/2,
+                         /*min_num_players=*/2,
+                         /*provides_information_state_string=*/true,
+                         /*provides_information_state_tensor=*/false,
+                         /*provides_observation_string=*/true,
+                         /*provides_observation_tensor=*/true,
+                         /*parameter_specification=*/
+                         {
+                             {"ansi_color_output", GameParameter(false)},
+                         }};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new PentagoGame(params));
@@ -238,15 +237,19 @@ std::string PentagoState::ObservationString(Player player) const {
 
 int PlayerRelative(PentagoPlayer state, Player current) {
   switch (state) {
-    case kPlayer1: return current == 0 ? 0 : 1;
-    case kPlayer2: return current == 1 ? 0 : 1;
-    case kPlayerNone: return 2;
-    default: SpielFatalError("Unknown player type.");
+    case kPlayer1:
+      return current == 0 ? 0 : 1;
+    case kPlayer2:
+      return current == 1 ? 0 : 1;
+    case kPlayerNone:
+      return 2;
+    default:
+      SpielFatalError("Unknown player type.");
   }
 }
 
-void PentagoState::ObservationTensor(
-    Player player, std::vector<double>* values) const {
+void PentagoState::ObservationTensor(Player player,
+                                     std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 

@@ -457,9 +457,9 @@ def sweep_pi_vs_alpha(payoff_tables,
     rtol: The relative tolerance parameter for np.allclose calls.
     atol: The absolute tolerance parameter for np.allclose calls.
     num_strats_to_label: Number of strats to label in legend
-    legend_sort_clusters: If true, strategies in the same cluster are sorted
-      in the legend according to orderings for earlier alpha values. Primarily
-      for visualization purposes! Rankings for lower alpha values should be
+    legend_sort_clusters: If true, strategies in the same cluster are sorted in
+      the legend according to orderings for earlier alpha values. Primarily for
+      visualization purposes! Rankings for lower alpha values should be
       interpreted carefully.
 
   Returns:

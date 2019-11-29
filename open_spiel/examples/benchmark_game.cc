@@ -104,8 +104,8 @@ int RandomSimulation(std::mt19937* rng, const Game& game, bool verbose) {
 void RandomSimBenchmark(const std::string& game_def, int num_sims,
                         bool verbose) {
   std::mt19937 rng;
-  std::cout << absl::StrFormat("Benchmark: game: %s, num_sims: %d. ",
-                               game_def, num_sims);
+  std::cout << absl::StrFormat("Benchmark: game: %s, num_sims: %d. ", game_def,
+                               num_sims);
 
   auto game = LoadGame(game_def);
 

@@ -26,23 +26,22 @@ namespace catch_ {
 namespace {
 
 // Facts about the game.
-const GameType kGameType{
-    /*short_name=*/"catch",
-    /*long_name=*/"Catch",
-    GameType::Dynamics::kSequential,
-    GameType::ChanceMode::kExplicitStochastic,
-    GameType::Information::kPerfectInformation,
-    GameType::Utility::kGeneralSum,
-    GameType::RewardModel::kTerminal,
-    /*max_num_players=*/1,
-    /*min_num_players=*/1,
-    /*provides_information_state_string=*/true,
-    /*provides_information_state_tensor=*/true,
-    /*provides_observation_string=*/true,
-    /*provides_observation_tensor=*/true,
-    /*parameter_specification=*/
-    {{"rows", GameParameter(kDefaultRows)},
-     {"columns", GameParameter(kDefaultColumns)}}};
+const GameType kGameType{/*short_name=*/"catch",
+                         /*long_name=*/"Catch",
+                         GameType::Dynamics::kSequential,
+                         GameType::ChanceMode::kExplicitStochastic,
+                         GameType::Information::kPerfectInformation,
+                         GameType::Utility::kGeneralSum,
+                         GameType::RewardModel::kTerminal,
+                         /*max_num_players=*/1,
+                         /*min_num_players=*/1,
+                         /*provides_information_state_string=*/true,
+                         /*provides_information_state_tensor=*/true,
+                         /*provides_observation_string=*/true,
+                         /*provides_observation_tensor=*/true,
+                         /*parameter_specification=*/
+                         {{"rows", GameParameter(kDefaultRows)},
+                          {"columns", GameParameter(kDefaultColumns)}}};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new CatchGame(params));
@@ -158,8 +157,8 @@ std::string CatchState::ObservationString(Player player) const {
   return ToString();
 }
 
-void CatchState::ObservationTensor(
-    Player player, std::vector<double>* values) const {
+void CatchState::ObservationTensor(Player player,
+                                   std::vector<double>* values) const {
   SPIEL_CHECK_EQ(player, 0);
 
   TensorView<2> view(values, {num_rows_, num_columns_}, true);
@@ -169,8 +168,8 @@ void CatchState::ObservationTensor(
   }
 }
 
-void CatchState::InformationStateTensor(
-    Player player, std::vector<double>* values) const {
+void CatchState::InformationStateTensor(Player player,
+                                        std::vector<double>* values) const {
   SPIEL_CHECK_EQ(player, 0);
 
   values->resize(num_columns_ + kNumActions * num_rows_);

@@ -61,8 +61,9 @@ class QLearner(rl_agent.AbstractAgent):
     """
     probs = np.zeros(self._num_actions)
     greedy_q = max([self._q_values[info_state][a] for a in legal_actions])
-    greedy_actions = [a for a in legal_actions
-                      if self._q_values[info_state][a] == greedy_q]
+    greedy_actions = [
+        a for a in legal_actions if self._q_values[info_state][a] == greedy_q
+    ]
     probs[legal_actions] = epsilon / len(legal_actions)
     probs[greedy_actions] += (1 - epsilon) / len(greedy_actions)
     action = np.random.choice(range(self._num_actions), p=probs)

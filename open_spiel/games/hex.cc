@@ -26,24 +26,23 @@ namespace hex {
 namespace {
 
 // Facts about the game.
-const GameType kGameType{
-    /*short_name=*/"hex",
-    /*long_name=*/"Hex",
-    GameType::Dynamics::kSequential,
-    GameType::ChanceMode::kDeterministic,
-    GameType::Information::kPerfectInformation,
-    GameType::Utility::kZeroSum,
-    GameType::RewardModel::kTerminal,
-    /*max_num_players=*/2,
-    /*min_num_players=*/2,
-    /*provides_information_state_string=*/true,
-    /*provides_information_state_tensor=*/false,
-    /*provides_observation_string=*/true,
-    /*provides_observation_tensor=*/true,
-    /*parameter_specification=*/
-    {
-        {"board_size", GameParameter(kDefaultBoardSize)},
-    }};
+const GameType kGameType{/*short_name=*/"hex",
+                         /*long_name=*/"Hex",
+                         GameType::Dynamics::kSequential,
+                         GameType::ChanceMode::kDeterministic,
+                         GameType::Information::kPerfectInformation,
+                         GameType::Utility::kZeroSum,
+                         GameType::RewardModel::kTerminal,
+                         /*max_num_players=*/2,
+                         /*min_num_players=*/2,
+                         /*provides_information_state_string=*/true,
+                         /*provides_information_state_tensor=*/false,
+                         /*provides_observation_string=*/true,
+                         /*provides_observation_tensor=*/true,
+                         /*parameter_specification=*/
+                         {
+                             {"board_size", GameParameter(kDefaultBoardSize)},
+                         }};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new HexGame(params));
@@ -262,8 +261,8 @@ std::string HexState::ObservationString(Player player) const {
   return ToString();
 }
 
-void HexState::ObservationTensor(
-    Player player, std::vector<double>* values) const {
+void HexState::ObservationTensor(Player player,
+                                 std::vector<double>* values) const {
   // TODO(author8): Make an option to not expose connection info
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);

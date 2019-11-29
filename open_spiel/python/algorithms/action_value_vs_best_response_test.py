@@ -47,7 +47,8 @@ class ActionValuesVsBestResponseTest(absltest.TestCase):
             [-1.0, 2.0],  # 2pb - winning
         ])
     np.testing.assert_allclose(cfrp, [1 / 3, 1 / 3, 1 / 3, 1 / 3, 1 / 3, 1 / 3])
-    np.testing.assert_allclose([1, 1, 1, 1/2, 1/2, 1/2], player_reach_probs)
+    np.testing.assert_allclose([1, 1, 1, 1 / 2, 1 / 2, 1 / 2],
+                               player_reach_probs)
 
   def test_kuhn_poker_always_pass_p0(self):
     game = pyspiel.load_game("kuhn_poker")

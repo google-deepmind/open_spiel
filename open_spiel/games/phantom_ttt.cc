@@ -216,8 +216,7 @@ PhantomTTTGame::PhantomTTTGame(const GameParameters& params)
     : Game(kGameType, params),
       game_(std::static_pointer_cast<const tic_tac_toe::TicTacToeGame>(
           LoadGame("tic_tac_toe"))) {
-  std::string obs_type =
-      ParameterValue<std::string>("obstype");
+  std::string obs_type = ParameterValue<std::string>("obstype");
   if (obs_type == "reveal-nothing") {
     obs_type_ = ObservationType::kRevealNothing;
   } else if (obs_type == "reveal-numturns") {

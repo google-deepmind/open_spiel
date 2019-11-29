@@ -29,23 +29,22 @@ namespace {
 constexpr int kDefaultHorizon = 1000;
 
 // Facts about the game
-const GameType kGameType{
-    /*short_name=*/"markov_soccer",
-    /*long_name=*/"Markov Soccer",
-    GameType::Dynamics::kSimultaneous,
-    GameType::ChanceMode::kDeterministic,
-    GameType::Information::kPerfectInformation,
-    GameType::Utility::kZeroSum,
-    GameType::RewardModel::kTerminal,
-    /*max_num_players=*/2,
-    /*min_num_players=*/2,
-    /*provides_information_state_string=*/false,
-    /*provides_information_state_tensor=*/false,
-    /*provides_observation_string=*/true,
-    /*provides_observation_tensor=*/true,
-    /*parameter_specification=*/
-    {{"horizon", GameParameter(kDefaultHorizon)},
-     {"grid", GameParameter(std::string(kDefaultGrid))}}};
+const GameType kGameType{/*short_name=*/"markov_soccer",
+                         /*long_name=*/"Markov Soccer",
+                         GameType::Dynamics::kSimultaneous,
+                         GameType::ChanceMode::kDeterministic,
+                         GameType::Information::kPerfectInformation,
+                         GameType::Utility::kZeroSum,
+                         GameType::RewardModel::kTerminal,
+                         /*max_num_players=*/2,
+                         /*min_num_players=*/2,
+                         /*provides_information_state_string=*/false,
+                         /*provides_information_state_tensor=*/false,
+                         /*provides_observation_string=*/true,
+                         /*provides_observation_tensor=*/true,
+                         /*parameter_specification=*/
+                         {{"horizon", GameParameter(kDefaultHorizon)},
+                          {"grid", GameParameter(std::string(kDefaultGrid))}}};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new MarkovSoccerGame(params));
@@ -347,8 +346,8 @@ int MarkovSoccerState::observation_plane(int r, int c) const {
   return plane;
 }
 
-void MarkovSoccerState::ObservationTensor(
-    Player player, std::vector<double>* values) const {
+void MarkovSoccerState::ObservationTensor(Player player,
+                                          std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 

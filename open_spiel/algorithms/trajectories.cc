@@ -158,8 +158,7 @@ BatchedTrajectory RecordTrajectory(
         SPIEL_CHECK_TRUE(it != state_to_index.end());
         trajectory.state_indices[0].push_back(it->second);
       } else {
-        trajectory.observations[0].push_back(
-            state->InformationStateTensor());
+        trajectory.observations[0].push_back(state->InformationStateTensor());
       }
       ActionsAndProbs policy =
           policies.at(state->CurrentPlayer())

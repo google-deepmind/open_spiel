@@ -402,8 +402,7 @@ class EVAAgent(object):
     """Returns action probabilites dict for a single batch."""
     # TODO(author3, author6): Refactor this to expect pre-normalized form.
     if hasattr(state, "information_state_tensor"):
-      state_rep = tuple(
-          state.information_state_tensor(self.player_id))
+      state_rep = tuple(state.information_state_tensor(self.player_id))
     elif hasattr(state, "observation_tensor"):
       state_rep = tuple(state.observation_tensor(self.player_id))
     else:

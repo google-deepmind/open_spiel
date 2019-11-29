@@ -378,8 +378,8 @@ std::string GoofspielState::InformationStateString(Player player) const {
   }
 }
 
-void GoofspielState::InformationStateTensor(
-    Player player, std::vector<double>* values) const {
+void GoofspielState::InformationStateTensor(Player player,
+                                            std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 

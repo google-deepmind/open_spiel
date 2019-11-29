@@ -506,8 +506,8 @@ int CoopBoxPushingState::ObservationPlane(std::pair<int, int> coord,
   return plane;
 }
 
-void CoopBoxPushingState::ObservationTensor(
-    Player player, std::vector<double>* values) const {
+void CoopBoxPushingState::ObservationTensor(Player player,
+                                            std::vector<double>* values) const {
   if (fully_observable_) {
     TensorView<3> view(values, {kCellStates, kRows, kCols}, true);
 

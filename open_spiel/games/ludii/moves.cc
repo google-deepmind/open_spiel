@@ -45,4 +45,3 @@ std::vector<Move> Moves::GetMoves() const {
 
 }  // namespace ludii
 }  // namespace open_spiel
-

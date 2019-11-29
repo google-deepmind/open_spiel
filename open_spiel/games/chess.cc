@@ -133,8 +133,8 @@ std::string ChessState::ObservationString(Player player) const {
   return ToString();
 }
 
-void ChessState::ObservationTensor(
-    Player player, std::vector<double>* values) const {
+void ChessState::ObservationTensor(Player player,
+                                   std::vector<double>* values) const {
   SPIEL_CHECK_NE(player, kChancePlayerId);
 
   values->clear();

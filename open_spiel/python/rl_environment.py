@@ -282,8 +282,7 @@ class Environment(object):
     """
     return dict(
         info_state=tuple([
-            self._game.observation_tensor_size()
-            if self._use_observation else
+            self._game.observation_tensor_size() if self._use_observation else
             self._game.information_state_tensor_size()
         ]),
         legal_actions=(self._game.num_distinct_actions(),),

@@ -198,8 +198,7 @@ void TurnBasedSimultaneousState::InformationStateTensor(
   }
 }
 
-std::string TurnBasedSimultaneousState::ObservationString(
-    Player player) const {
+std::string TurnBasedSimultaneousState::ObservationString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 

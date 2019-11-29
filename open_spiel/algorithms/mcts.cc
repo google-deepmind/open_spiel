@@ -35,7 +35,7 @@ namespace algorithms {
 
 // Return the memory use of a vector. Useful to track and limit memory use when
 // running for a long time and build a big tree (eg to solve a game).
-template<class T>
+template <class T>
 constexpr inline int VectorMemory(const std::vector<T>& vec) {
   return sizeof(T) * vec.capacity();
 }
@@ -97,8 +97,7 @@ double SearchNode::UCTValue(int parent_explore_count, double uct_c) const {
     return outcome[player];
   }
 
-  if (explore_count == 0)
-    return std::numeric_limits<double>::infinity();
+  if (explore_count == 0) return std::numeric_limits<double>::infinity();
 
   // The "greedy-value" of choosing a given child is always with respect to
   // the current player for this node.
@@ -114,7 +113,7 @@ double SearchNode::PUCTValue(int parent_explore_count, double uct_c) const {
 
   return ((explore_count != 0 ? total_reward / explore_count : 0) +
           uct_c * prior * std::sqrt(parent_explore_count) /
-          (explore_count + 1));
+              (explore_count + 1));
 }
 
 bool SearchNode::CompareFinal(const SearchNode& b) const {
@@ -141,10 +140,10 @@ const SearchNode& SearchNode::BestChild() const {
   // - Hardest loss if everything is a loss
   // - Highest expected reward if explore counts are equal (unlikely).
   // - Longest win, if multiple are proven (unlikely due to early stopping).
-  return *std::max_element(
-      children.begin(), children.end(),
-      [](const SearchNode& a, const SearchNode& b) {
-          return a.CompareFinal(b); });
+  return *std::max_element(children.begin(), children.end(),
+                           [](const SearchNode& a, const SearchNode& b) {
+                             return a.CompareFinal(b);
+                           });
 }
 
 std::string SearchNode::ChildrenStr(const State& state) const {
@@ -157,7 +156,8 @@ std::string SearchNode::ChildrenStr(const State& state) const {
     }
     std::sort(refs.begin(), refs.end(),
               [](const SearchNode* a, const SearchNode* b) {
-                  return b->CompareFinal(*a); });
+                return b->CompareFinal(*a);
+              });
     for (const SearchNode* child : refs) {
       absl::StrAppend(&out, child->ToString(state), "\n");
     }
@@ -192,24 +192,16 @@ std::vector<double> dirichlet_noise(int count, double alpha,
 
   double sum = absl::c_accumulate(noise, 0.0);
   for (double& v : noise) {
-      v /= sum;
+    v /= sum;
   }
   return noise;
 }
 
-MCTSBot::MCTSBot(
-      const Game& game,
-      Player player,
-      Evaluator* evaluator,
-      double uct_c,
-      int max_simulations,
-      int64_t max_memory_mb,
-      bool solve,
-      int seed,
-      bool verbose,
-      ChildSelectionPolicy child_selection_policy,
-      double dirichlet_alpha,
-      double dirichlet_epsilon)
+MCTSBot::MCTSBot(const Game& game, Player player, Evaluator* evaluator,
+                 double uct_c, int max_simulations, int64_t max_memory_mb,
+                 bool solve, int seed, bool verbose,
+                 ChildSelectionPolicy child_selection_policy,
+                 double dirichlet_alpha, double dirichlet_epsilon)
     : player_id_(player),
       uct_c_{uct_c},
       max_simulations_{max_simulations},
@@ -240,10 +232,12 @@ Action MCTSBot::Step(const State& state) {
 
   if (verbose_) {
     double seconds = absl::ToDoubleSeconds(absl::Now() - start);
-    std::cerr << absl::StrFormat(
-        "Finished %d sims in %.3f secs, %.1f sims/s, tree size: %d mb.",
-        root->explore_count, seconds, (root->explore_count / seconds),
-        memory_used_ / (1<<20)) << std::endl;
+    std::cerr
+        << absl::StrFormat(
+               "Finished %d sims in %.3f secs, %.1f sims/s, tree size: %d mb.",
+               root->explore_count, seconds, (root->explore_count / seconds),
+               memory_used_ / (1 << 20))
+        << std::endl;
     std::cerr << "Root:" << std::endl;
     std::cerr << root->ToString(state) << std::endl;
     std::cerr << "Children:" << std::endl;
@@ -264,7 +258,6 @@ std::pair<ActionsAndProbs, Action> MCTSBot::StepWithPolicy(const State& state) {
   return {{{action, 1.}}, action};
 }
 
-
 std::unique_ptr<State> MCTSBot::ApplyTreePolicy(
     SearchNode* root, const State& state,
     std::vector<SearchNode*>* visit_path) {
@@ -276,8 +269,8 @@ std::unique_ptr<State> MCTSBot::ApplyTreePolicy(
       // For a new node, initialize its state, then choose a child as normal.
       ActionsAndProbs legal_actions = evaluator_->Prior(*working_state);
       if (current_node == root && dirichlet_alpha_ > 0) {
-        std::vector<double> noise = dirichlet_noise(
-            legal_actions.size(), dirichlet_alpha_, &rng_);
+        std::vector<double> noise =
+            dirichlet_noise(legal_actions.size(), dirichlet_alpha_, &rng_);
         for (int i = 0; i < legal_actions.size(); i++) {
           legal_actions[i].second =
               (1 - dirichlet_epsilon_) * legal_actions[i].second +
@@ -348,8 +341,8 @@ std::unique_ptr<SearchNode> MCTSBot::MCTSearch(const State& state) {
     visit_path.clear();
     returns.clear();
 
-    std::unique_ptr<State> working_state = ApplyTreePolicy(
-        root.get(), state, &visit_path);
+    std::unique_ptr<State> working_state =
+        ApplyTreePolicy(root.get(), state, &visit_path);
 
     bool solved;
     if (working_state->IsTerminal()) {
@@ -381,7 +374,8 @@ std::unique_ptr<SearchNode> MCTSBot::MCTSearch(const State& state) {
           if (!outcome.empty() &&
               std::all_of(node->children.begin() + 1, node->children.end(),
                           [&outcome](const SearchNode& c) {
-                            return c.outcome == outcome; })) {
+                            return c.outcome == outcome;
+                          })) {
             node->outcome = outcome;
             memory_used_ += VectorMemory(node->outcome);
           } else {

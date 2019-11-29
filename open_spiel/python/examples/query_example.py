@@ -40,10 +40,8 @@ def main(_):
   state.apply_action(0)
 
   print("Item pool: {}".format(pyspiel.negotiation_item_pool(state)))
-  print("Player 0 utils: {}".format(
-      pyspiel.negotiation_agent_utils(state, 0)))
-  print("Player 1 utils: {}".format(
-      pyspiel.negotiation_agent_utils(state, 1)))
+  print("Player 0 utils: {}".format(pyspiel.negotiation_agent_utils(state, 0)))
+  print("Player 1 utils: {}".format(pyspiel.negotiation_agent_utils(state, 1)))
 
   state = game.new_initial_state()
 
@@ -53,10 +51,8 @@ def main(_):
   state.apply_action(0)
 
   print("Item pool: {}".format(pyspiel.negotiation_item_pool(state)))
-  print("Player 0 utils: {}".format(
-      pyspiel.negotiation_agent_utils(state, 0)))
-  print("Player 1 utils: {}".format(
-      pyspiel.negotiation_agent_utils(state, 1)))
+  print("Player 0 utils: {}".format(pyspiel.negotiation_agent_utils(state, 0)))
+  print("Player 1 utils: {}".format(pyspiel.negotiation_agent_utils(state, 1)))
 
 
 if __name__ == "__main__":

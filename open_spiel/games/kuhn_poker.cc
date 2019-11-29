@@ -31,22 +31,21 @@ constexpr int kDefaultPlayers = 2;
 constexpr double kAnte = 1;
 
 // Facts about the game
-const GameType kGameType{
-    /*short_name=*/"kuhn_poker",
-    /*long_name=*/"Kuhn Poker",
-    GameType::Dynamics::kSequential,
-    GameType::ChanceMode::kExplicitStochastic,
-    GameType::Information::kImperfectInformation,
-    GameType::Utility::kZeroSum,
-    GameType::RewardModel::kTerminal,
-    /*max_num_players=*/10,
-    /*min_num_players=*/2,
-    /*provides_information_state_string=*/true,
-    /*provides_information_state_tensor=*/true,
-    /*provides_observation_string=*/true,
-    /*provides_observation_tensor=*/true,
-    /*parameter_specification=*/
-    {{"players", GameParameter(kDefaultPlayers)}}};
+const GameType kGameType{/*short_name=*/"kuhn_poker",
+                         /*long_name=*/"Kuhn Poker",
+                         GameType::Dynamics::kSequential,
+                         GameType::ChanceMode::kExplicitStochastic,
+                         GameType::Information::kImperfectInformation,
+                         GameType::Utility::kZeroSum,
+                         GameType::RewardModel::kTerminal,
+                         /*max_num_players=*/10,
+                         /*min_num_players=*/2,
+                         /*provides_information_state_string=*/true,
+                         /*provides_information_state_tensor=*/true,
+                         /*provides_observation_string=*/true,
+                         /*provides_observation_tensor=*/true,
+                         /*parameter_specification=*/
+                         {{"players", GameParameter(kDefaultPlayers)}}};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new KuhnGame(params));
@@ -196,8 +195,8 @@ std::string KuhnState::ObservationString(Player player) const {
   return str;
 }
 
-void KuhnState::InformationStateTensor(
-    Player player, std::vector<double>* values) const {
+void KuhnState::InformationStateTensor(Player player,
+                                       std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
@@ -217,8 +216,8 @@ void KuhnState::InformationStateTensor(
   }
 }
 
-void KuhnState::ObservationTensor(
-    Player player, std::vector<double>* values) const {
+void KuhnState::ObservationTensor(Player player,
+                                  std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   // The format is described in ObservationTensorShape

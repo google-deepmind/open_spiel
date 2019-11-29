@@ -172,8 +172,8 @@ std::vector<int> NegotiationGame::ObservationTensorShape() const {
           (enable_utterances_ ? utterance_dim_ * num_symbols_ : 0)};
 }
 
-void NegotiationState::ObservationTensor(
-    Player player, std::vector<double>* values) const {
+void NegotiationState::ObservationTensor(Player player,
+                                         std::vector<double>* values) const {
   values->resize(parent_game_.ObservationTensorSize());
   std::fill(values->begin(), values->end(), 0);
 

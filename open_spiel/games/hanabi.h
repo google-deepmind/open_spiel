@@ -78,8 +78,7 @@ class OpenSpielHanabiState : public State {
   // impractically large.
   // The observation by default includes knowledge inferred from past hints.
   std::string ObservationString(Player player) const override;
-  void ObservationTensor(Player player,
-                                     std::vector<double>* values) const;
+  void ObservationTensor(Player player, std::vector<double>* values) const;
 
   std::unique_ptr<State> Clone() const override;
   ActionsAndProbs ChanceOutcomes() const override;

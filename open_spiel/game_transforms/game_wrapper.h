@@ -55,8 +55,8 @@ class WrappedState : public State {
     return state_->InformationStateString(player);
   }
 
-  void InformationStateTensor(
-      Player player, std::vector<double>* values) const override {
+  void InformationStateTensor(Player player,
+                              std::vector<double>* values) const override {
     state_->InformationStateTensor(player, values);
   }
 
@@ -64,8 +64,8 @@ class WrappedState : public State {
     return state_->ObservationString(player);
   }
 
-  virtual void ObservationTensor(
-      Player player, std::vector<double>* values) const {
+  virtual void ObservationTensor(Player player,
+                                 std::vector<double>* values) const {
     state_->ObservationTensor(player, values);
   }
 

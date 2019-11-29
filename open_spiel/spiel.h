@@ -321,9 +321,7 @@ class State {
   // including chance) and the `State` objects.
   virtual std::vector<Action> History() const { return history_; }
 
-  std::string HistoryString() const {
-    return absl::StrJoin(history_, " ");
-  }
+  std::string HistoryString() const { return absl::StrJoin(history_, " "); }
 
   // For imperfect information games. Returns an identifier for the current
   // information state for the specified player.
@@ -367,8 +365,8 @@ class State {
   // There are currently no use-case for calling this function with
   // `kChancePlayerId` or `kTerminalPlayerId`. Thus, games are expected to raise
   // an error in those cases.
-  virtual void InformationStateTensor(
-      Player player, std::vector<double>* values) const {
+  virtual void InformationStateTensor(Player player,
+                                      std::vector<double>* values) const {
     SpielFatalError("InformationStateTensor unimplemented!");
   }
   std::vector<double> InformationStateTensor(Player player) const {
@@ -400,8 +398,8 @@ class State {
   }
 
   // Returns the view of the game, preferably from `player`'s perspective.
-  virtual void ObservationTensor(
-      Player player, std::vector<double>* values) const {
+  virtual void ObservationTensor(Player player,
+                                 std::vector<double>* values) const {
     SpielFatalError("ObservationTensor unimplemented!");
   }
   std::vector<double> ObservationTensor(Player player) const {

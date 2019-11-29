@@ -71,10 +71,10 @@ class CatchState : public State {
   std::vector<double> Returns() const override;
   std::string InformationStateString(Player player) const override;
   std::string ObservationString(Player player) const override;
-  void ObservationTensor(
-      Player player, std::vector<double>* values) const override;
-  void InformationStateTensor(
-      Player player, std::vector<double>* values) const override;
+  void ObservationTensor(Player player,
+                         std::vector<double>* values) const override;
+  void InformationStateTensor(Player player,
+                              std::vector<double>* values) const override;
   std::unique_ptr<State> Clone() const override;
   void UndoAction(Player player, Action move) override;
   std::vector<Action> LegalActions() const override;

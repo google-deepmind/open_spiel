@@ -75,9 +75,7 @@ class NFGState : public SimMoveState {
 class NormalFormGame : public SimMoveGame {
  public:
   // Game has one state.
-  virtual std::vector<int> InformationStateTensorShape() const {
-    return {1};
-  }
+  virtual std::vector<int> InformationStateTensorShape() const { return {1}; }
 
   // Game lasts one turn.
   int MaxGameLength() const override { return 1; }

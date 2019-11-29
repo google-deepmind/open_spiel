@@ -191,15 +191,19 @@ std::string ConnectFourState::ObservationString(Player player) const {
 
 int PlayerRelative(CellState state, Player current) {
   switch (state) {
-    case CellState::kNought: return current == 0 ? 0 : 1;
-    case CellState::kCross: return current == 1 ? 0 : 1;
-    case CellState::kEmpty: return 2;
-    default: SpielFatalError("Unknown player type.");
+    case CellState::kNought:
+      return current == 0 ? 0 : 1;
+    case CellState::kCross:
+      return current == 1 ? 0 : 1;
+    case CellState::kEmpty:
+      return 2;
+    default:
+      SpielFatalError("Unknown player type.");
   }
 }
 
-void ConnectFourState::ObservationTensor(
-    Player player, std::vector<double>* values) const {
+void ConnectFourState::ObservationTensor(Player player,
+                                         std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 

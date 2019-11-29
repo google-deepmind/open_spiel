@@ -15,6 +15,7 @@
 #include "open_spiel/games/oware.h"
 
 #include <iomanip>
+
 #include "open_spiel/game_parameters.h"
 
 namespace open_spiel {
@@ -276,8 +277,8 @@ std::string OwareState::ObservationString(Player player) const {
   return board_.ToString();
 }
 
-void OwareState::ObservationTensor(
-    Player player, std::vector<double>* values) const {
+void OwareState::ObservationTensor(Player player,
+                                   std::vector<double>* values) const {
   values->resize(/*seeds*/ NumHouses() + /*scores*/ kNumPlayers);
   for (int house = 0; house < NumHouses(); ++house) {
     (*values)[house] = ((double)board_.seeds[house]) / total_seeds_;
@@ -290,10 +291,8 @@ void OwareState::ObservationTensor(
 
 OwareGame::OwareGame(const GameParameters& params)
     : Game(kGameType, params),
-      num_houses_per_player_(ParameterValue<int>("num_houses_per_player"
-                                                 )),
-      num_seeds_per_house_(
-          ParameterValue<int>("num_seeds_per_house")) {}
+      num_houses_per_player_(ParameterValue<int>("num_houses_per_player")),
+      num_seeds_per_house_(ParameterValue<int>("num_seeds_per_house")) {}
 
 std::vector<int> OwareGame::ObservationTensorShape() const {
   return {/*seeds*/ num_houses_per_player_ * kNumPlayers +

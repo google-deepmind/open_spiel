@@ -71,9 +71,7 @@ class FlatJointActionTestGame : public SimMoveGame {
   std::shared_ptr<const Game> Clone() const override {
     return std::shared_ptr<const Game>(new FlatJointActionTestGame(*this));
   }
-  std::vector<int> InformationStateTensorShape() const override {
-    return {};
-  }
+  std::vector<int> InformationStateTensorShape() const override { return {}; }
   int MaxGameLength() const override { return 1; }
 };
 

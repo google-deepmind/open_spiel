@@ -30,22 +30,21 @@ namespace {
 
 constexpr double kAnte = 1;
 
-const GameType kGameType{
-    /*short_name=*/"leduc_poker",
-    /*long_name=*/"Leduc Poker",
-    GameType::Dynamics::kSequential,
-    GameType::ChanceMode::kExplicitStochastic,
-    GameType::Information::kImperfectInformation,
-    GameType::Utility::kZeroSum,
-    GameType::RewardModel::kTerminal,
-    /*max_num_players=*/10,
-    /*min_num_players=*/2,
-    /*provides_information_state_string=*/true,
-    /*provides_information_state_tensor=*/true,
-    /*provides_observation_string=*/true,
-    /*provides_observation_tensor=*/true,
-    /*parameter_specification=*/
-    {{"players", GameParameter(kDefaultPlayers)}}};
+const GameType kGameType{/*short_name=*/"leduc_poker",
+                         /*long_name=*/"Leduc Poker",
+                         GameType::Dynamics::kSequential,
+                         GameType::ChanceMode::kExplicitStochastic,
+                         GameType::Information::kImperfectInformation,
+                         GameType::Utility::kZeroSum,
+                         GameType::RewardModel::kTerminal,
+                         /*max_num_players=*/10,
+                         /*min_num_players=*/2,
+                         /*provides_information_state_string=*/true,
+                         /*provides_information_state_tensor=*/true,
+                         /*provides_observation_string=*/true,
+                         /*provides_observation_tensor=*/true,
+                         /*parameter_specification=*/
+                         {{"players", GameParameter(kDefaultPlayers)}}};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new LeducGame(params));
@@ -303,8 +302,8 @@ std::string LeducState::ObservationString(Player player) const {
   return result;
 }
 
-void LeducState::InformationStateTensor(
-    Player player, std::vector<double>* values) const {
+void LeducState::InformationStateTensor(Player player,
+                                        std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
@@ -360,8 +359,8 @@ void LeducState::InformationStateTensor(
   }
 }
 
-void LeducState::ObservationTensor(
-    Player player, std::vector<double>* values) const {
+void LeducState::ObservationTensor(Player player,
+                                   std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 

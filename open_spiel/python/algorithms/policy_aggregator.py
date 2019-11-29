@@ -95,8 +95,8 @@ class PolicyPool(object):
 
   def __call__(self, state, player):
     return [
-        a.action_probabilities(state, player_id=player) for a
-        in self._policies[player]
+        a.action_probabilities(state, player_id=player)
+        for a in self._policies[player]
     ]
 
 
@@ -173,7 +173,7 @@ class PolicyAggregator(object):
       actions, probabilities = zip(*self._policy[key].items())
       # Add some small proba mass to avoid divide by zero, which happens for
       # games with low reach probabilities for certain states (keys)
-      new_probs = [prob+self._epsilon for prob in probabilities]
+      new_probs = [prob + self._epsilon for prob in probabilities]
       denom = sum(new_probs)
       for i in range(len(actions)):
         self._policy[key][actions[i]] = new_probs[i] / denom

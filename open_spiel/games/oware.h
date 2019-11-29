@@ -78,8 +78,8 @@ class OwareState : public State {
   // the game. This provides an interface that can be used for neural network
   // training, although the given representation is not necessary the best
   // for that purpose.
-  void ObservationTensor(
-      Player player, std::vector<double>* values) const override;
+  void ObservationTensor(Player player,
+                         std::vector<double>* values) const override;
 
  protected:
   void DoApplyAction(Action action) override;

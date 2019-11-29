@@ -17,6 +17,7 @@
 #include <algorithm>
 #include <array>
 #include <utility>
+
 #include "open_spiel/game_parameters.h"
 
 namespace open_spiel {
@@ -31,23 +32,22 @@ constexpr int kInvalidOutcome = -1;
 constexpr int kInvalidBid = -1;
 
 // Facts about the game
-const GameType kGameType{
-    /*short_name=*/"liars_dice",
-    /*long_name=*/"Liars Dice",
-    GameType::Dynamics::kSequential,
-    GameType::ChanceMode::kExplicitStochastic,
-    GameType::Information::kImperfectInformation,
-    GameType::Utility::kZeroSum,
-    GameType::RewardModel::kTerminal,
-    /*max_num_players=*/kDefaultPlayers,
-    /*min_num_players=*/kDefaultPlayers,
-    /*provides_information_state_string=*/true,
-    /*provides_information_state_tensor=*/true,
-    /*provides_observation_string=*/false,
-    /*provides_observation_tensor=*/false,
-    /*parameter_specification=*/
-    {{"players", GameParameter(kDefaultPlayers)},
-     {"numdice", GameParameter(kDefaultNumDice)}}};
+const GameType kGameType{/*short_name=*/"liars_dice",
+                         /*long_name=*/"Liars Dice",
+                         GameType::Dynamics::kSequential,
+                         GameType::ChanceMode::kExplicitStochastic,
+                         GameType::Information::kImperfectInformation,
+                         GameType::Utility::kZeroSum,
+                         GameType::RewardModel::kTerminal,
+                         /*max_num_players=*/kDefaultPlayers,
+                         /*min_num_players=*/kDefaultPlayers,
+                         /*provides_information_state_string=*/true,
+                         /*provides_information_state_tensor=*/true,
+                         /*provides_observation_string=*/false,
+                         /*provides_observation_tensor=*/false,
+                         /*parameter_specification=*/
+                         {{"players", GameParameter(kDefaultPlayers)},
+                          {"numdice", GameParameter(kDefaultNumDice)}}};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new LiarsDiceGame(params));
@@ -276,8 +276,8 @@ std::vector<double> LiarsDiceState::Returns() const {
   return returns;
 }
 
-void LiarsDiceState::InformationStateTensor(
-    Player player, std::vector<double>* values) const {
+void LiarsDiceState::InformationStateTensor(Player player,
+                                            std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 

@@ -51,8 +51,8 @@ class UniversalPokerState : public State {
   std::string ObservationString(Player player) const override;
   void InformationStateTensor(Player player,
                               std::vector<double> *values) const override;
-  void ObservationTensor(
-      Player player, std::vector<double> *values) const override;
+  void ObservationTensor(Player player,
+                         std::vector<double> *values) const override;
   std::unique_ptr<State> Clone() const override;
 
   // The probability of taking each possible action in a particular info state.

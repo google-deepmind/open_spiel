@@ -32,10 +32,10 @@
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_bots.h"
 #include "open_spiel/spiel_utils.h"
+#include "pybind11/include/pybind11/functional.h"
 #include "pybind11/include/pybind11/operators.h"
 #include "pybind11/include/pybind11/pybind11.h"
 #include "pybind11/include/pybind11/stl.h"
-#include "pybind11/include/pybind11/functional.h"
 
 namespace open_spiel {
 namespace {
@@ -98,8 +98,8 @@ class PyBot : public Bot {
         bool,  // Return type (must be a simple token for macro parser)
         Bot,   // Parent class
         "provides_force_action",  // Name of function in Python
-        ProvidesForceAction,     // Name of function in C++
-                           // Arguments
+        ProvidesForceAction,      // Name of function in C++
+                                  // Arguments
     );
   }
   void ForceAction(const State& state, Action action) override {
@@ -127,7 +127,7 @@ class PyBot : public Bot {
         Bot,   // Parent class
         "provides_policy",  // Name of function in Python
         ProvidesPolicy,     // Name of function in C++
-                           // Arguments
+                            // Arguments
     );
   }
   ActionsAndProbs GetPolicy(const State& state) override {
@@ -559,16 +559,17 @@ PYBIND11_MODULE(pyspiel, m) {
         "games, and raises a SpielFatalError if an incompatible game is passed "
         "to it.");
 
-  m.def("exploitability",
-        py::overload_cast<const Game&,
-                    const std::unordered_map<std::string, ActionsAndProbs>&>(
-            &Exploitability),
-        "Returns the sum of the utility that a best responder wins when when "
-        "playing against 1) the player 0 policy contained in `policy` and 2) "
-        "the player 1 policy contained in `policy`."
-        "This only works for two player, zero- or constant-sum sequential "
-        "games, and raises a SpielFatalError if an incompatible game is passed "
-        "to it.");
+  m.def(
+      "exploitability",
+      py::overload_cast<
+          const Game&, const std::unordered_map<std::string, ActionsAndProbs>&>(
+          &Exploitability),
+      "Returns the sum of the utility that a best responder wins when when "
+      "playing against 1) the player 0 policy contained in `policy` and 2) "
+      "the player 1 policy contained in `policy`."
+      "This only works for two player, zero- or constant-sum sequential "
+      "games, and raises a SpielFatalError if an incompatible game is passed "
+      "to it.");
 
   m.def("nash_conv", py::overload_cast<const Game&, const Policy&>(&NashConv),
         "Returns the sum of the utility that a best responder wins when when "
@@ -578,15 +579,16 @@ PYBIND11_MODULE(pyspiel, m) {
         "games, and raises a SpielFatalError if an incompatible game is passed "
         "to it.");
 
-  m.def("nash_conv",
-        py::overload_cast<
-            const Game&,
-            const std::unordered_map<std::string, ActionsAndProbs>&>(&NashConv),
-        "Calculates a measure of how far the given policy is from a Nash "
-        "equilibrium by returning the sum of the improvements in the value "
-        "that each player could obtain by unilaterally changing their strategy "
-        "while the opposing player maintains their current strategy (which "
-        "for a Nash equilibrium, this value is 0).");
+  m.def(
+      "nash_conv",
+      py::overload_cast<
+          const Game&, const std::unordered_map<std::string, ActionsAndProbs>&>(
+          &NashConv),
+      "Calculates a measure of how far the given policy is from a Nash "
+      "equilibrium by returning the sum of the improvements in the value "
+      "that each player could obtain by unilaterally changing their strategy "
+      "while the opposing player maintains their current strategy (which "
+      "for a Nash equilibrium, this value is 0).");
 
   m.def("convert_to_turn_based", open_spiel::ConvertToTurnBased,
         "Returns a turn-based version of the given game.");

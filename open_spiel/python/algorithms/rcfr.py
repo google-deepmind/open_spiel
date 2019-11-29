@@ -128,8 +128,7 @@ def num_features(game):
   Args:
     game: An OpenSpiel `Game`.
   """
-  return (game.information_state_tensor_size() +
-          game.num_distinct_actions())
+  return game.information_state_tensor_size() + game.num_distinct_actions()
 
 
 class RootStateWrapper(object):

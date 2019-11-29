@@ -467,8 +467,8 @@ int LaserTagState::observation_plane(int r, int c) const {
   return plane;
 }
 
-void LaserTagState::ObservationTensor(
-    int player, std::vector<double>* values) const {
+void LaserTagState::ObservationTensor(int player,
+                                      std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
@@ -479,7 +479,7 @@ void LaserTagState::ObservationTensor(
     for (int c = 0; c < grid_.num_cols; c++) {
       int plane = observation_plane(r, c);
       SPIEL_CHECK_TRUE(plane >= 0 && plane < kCellStates);
-      view[{plane, r,  c}] = 1.0;
+      view[{plane, r, c}] = 1.0;
     }
   }
 }

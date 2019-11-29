@@ -14,8 +14,8 @@
 
 #include <array>
 #include <cstdio>
-#include <memory>
 #include <map>
+#include <memory>
 #include <random>
 #include <string>
 #include <vector>
@@ -57,14 +57,9 @@ std::unique_ptr<open_spiel::Bot> InitBot(
 
   if (type == "mcts") {
     return std::make_unique<open_spiel::algorithms::MCTSBot>(
-        game,
-        player,
-        evaluator,
-        absl::GetFlag(FLAGS_uct_c),
+        game, player, evaluator, absl::GetFlag(FLAGS_uct_c),
         absl::GetFlag(FLAGS_max_simulations),
-        absl::GetFlag(FLAGS_max_memory_mb),
-        absl::GetFlag(FLAGS_solve),
-        Seed(),
+        absl::GetFlag(FLAGS_max_memory_mb), absl::GetFlag(FLAGS_solve), Seed(),
         absl::GetFlag(FLAGS_verbose));
   }
   open_spiel::SpielFatalError("Bad player type. Known types: mcts, random");
@@ -81,8 +76,7 @@ open_spiel::Action GetAction(const open_spiel::State& state,
 
 std::pair<std::vector<double>, std::vector<std::string>> PlayGame(
     const open_spiel::Game& game,
-    std::vector<std::unique_ptr<open_spiel::Bot>>& bots,
-    std::mt19937& rng,
+    std::vector<std::unique_ptr<open_spiel::Bot>>& bots, std::mt19937& rng,
     const std::vector<std::string>& initial_actions) {
   bool quiet = absl::GetFlag(FLAGS_quiet);
   std::unique_ptr<open_spiel::State> state = game.NewInitialState();
@@ -103,8 +97,7 @@ std::pair<std::vector<double>, std::vector<std::string>> PlayGame(
 
   while (!state->IsTerminal()) {
     open_spiel::Player player = state->CurrentPlayer();
-    if (!quiet)
-      std::cerr << "player turn: " << player << std::endl;
+    if (!quiet) std::cerr << "player turn: " << player << std::endl;
 
     open_spiel::Action action;
     if (state->IsChanceNode()) {

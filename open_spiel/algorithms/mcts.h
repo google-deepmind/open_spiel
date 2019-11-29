@@ -63,7 +63,6 @@
 // - Winands, Bjornsson, and Saito, Monte-Carlo Tree Search Solver, 2008.
 //   https://dke.maastrichtuniversity.nl/m.winands/documents/uctloa.pdf
 
-
 namespace open_spiel {
 namespace algorithms {
 
@@ -92,8 +91,8 @@ class Evaluator {
 // n_rollouts is the number of random outcomes to be considered.
 class RandomRolloutEvaluator : public Evaluator {
  public:
-  explicit RandomRolloutEvaluator(int n_rollouts, int seed) :
-    n_rollouts_(n_rollouts), rng_(seed) {}
+  explicit RandomRolloutEvaluator(int n_rollouts, int seed)
+      : n_rollouts_(n_rollouts), rng_(seed) {}
 
   // Runs random games, returning the average returns.
   std::vector<double> Evaluate(const State& state) override;
@@ -116,8 +115,8 @@ struct SearchNode {
   std::vector<double> outcome;  // The reward if each players plays perfectly.
   std::vector<SearchNode> children;  // The successors to this state.
 
-  SearchNode(Action action_, Player player_, double prior_) :
-    action(action_), prior(prior_), player(player_) {}
+  SearchNode(Action action_, Player player_, double prior_)
+      : action(action_), prior(prior_), player(player_) {}
 
   // The value as returned by the UCT formula.
   double UCTValue(int parent_explore_count, double uct_c) const;
@@ -139,18 +138,13 @@ struct SearchNode {
 class MCTSBot : public Bot {
  public:
   MCTSBot(
-      const Game& game,
-      Player player,
-      Evaluator* evaluator,
-      double uct_c,
+      const Game& game, Player player, Evaluator* evaluator, double uct_c,
       int max_simulations,
       int64_t max_memory_mb,  // Max memory use in megabytes.
-      bool solve,  // Whether to back up solved states.
-      int seed,
-      bool verbose,
+      bool solve,             // Whether to back up solved states.
+      int seed, bool verbose,
       ChildSelectionPolicy child_selection_policy = ChildSelectionPolicy::UCT,
-      double dirichlet_alpha = 0,
-      double dirichlet_epsilon = 0);
+      double dirichlet_alpha = 0, double dirichlet_epsilon = 0);
   ~MCTSBot() = default;
 
   void Restart() override {}
@@ -181,14 +175,13 @@ class MCTSBot : public Bot {
   //     node to a leaf node.
   //
   // Returns: The state of the game at the leaf node.
-  std::unique_ptr<State> ApplyTreePolicy(
-      SearchNode* root, const State& state,
-      std::vector<SearchNode*>* visit_path);
+  std::unique_ptr<State> ApplyTreePolicy(SearchNode* root, const State& state,
+                                         std::vector<SearchNode*>* visit_path);
 
   Player player_id_;
   double uct_c_;
   int max_simulations_;
-  int64_t max_memory_;  // Max memory allowed in the tree, in bytes.
+  int64_t max_memory_;       // Max memory allowed in the tree, in bytes.
   int64_t memory_used_ = 0;  // Memory used in the tree, in bytes.
   bool verbose_;
   bool solve_;
@@ -202,8 +195,7 @@ class MCTSBot : public Bot {
 
 // Returns a vector of noise sampled from a dirichlet distribution. See:
 // https://en.wikipedia.org/wiki/Dirichlet_process
-std::vector<double> dirichlet_noise(int count, double alpha,
-                                    std::mt19937* rng);
+std::vector<double> dirichlet_noise(int count, double alpha, std::mt19937* rng);
 
 }  // namespace algorithms
 }  // namespace open_spiel

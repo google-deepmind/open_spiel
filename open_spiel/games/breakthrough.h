@@ -58,8 +58,8 @@ class BreakthroughState : public State {
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
   std::string ObservationString(Player player) const override;
-  void ObservationTensor(
-      Player player, std::vector<double>* values) const override;
+  void ObservationTensor(Player player,
+                         std::vector<double>* values) const override;
   std::unique_ptr<State> Clone() const override;
   void UndoAction(Player player, Action action) override;
 

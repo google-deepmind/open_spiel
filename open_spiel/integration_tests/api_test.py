@@ -410,10 +410,11 @@ def _assert_is_perfect_recall_recursive(state, current_history,
       # Check for `information_state`
       expected_infosets_history = [
           (s.information_state_string(current_player), a)
-          for s, a in previous_history if s.current_player() == current_player]
-      infosets_history = [
-          (s.information_state_string(current_player), a)
-          for s, a in current_history if s.current_player() == current_player]
+          for s, a in previous_history
+          if s.current_player() == current_player]  # pylint: disable=g-complex-comprehension
+      infosets_history = [(s.information_state_string(current_player), a)
+                          for s, a in current_history
+                          if s.current_player() == current_player]
 
       if expected_infosets_history != infosets_history:
         # pyformat: disable

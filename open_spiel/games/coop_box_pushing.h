@@ -75,8 +75,8 @@ class CoopBoxPushingState : public SimMoveState {
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
   std::vector<double> Rewards() const override;
-  void ObservationTensor(
-      Player player, std::vector<double>* values) const override;
+  void ObservationTensor(Player player,
+                         std::vector<double>* values) const override;
   std::string ObservationString(Player player) const override;
 
   Player CurrentPlayer() const override {
@@ -113,7 +113,7 @@ class CoopBoxPushingState : public SimMoveState {
 
   // Fields sets to bad/invalid values. Use Game::NewInitialState().
   double total_rewards_ = -1;
-  int horizon_ = -1;        // Limit on the total number of moves.
+  int horizon_ = -1;  // Limit on the total number of moves.
   Player cur_player_ = kSimultaneousPlayerId;
   int total_moves_ = 0;
   int initiative_;  // player id of player to resolve actions first.

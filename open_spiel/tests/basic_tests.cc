@@ -195,10 +195,9 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
   std::vector<HistoryItem> history;
   std::vector<double> episode_returns(game.NumPlayers(), 0);
 
-  int infostate_vector_size =
-      game.GetType().provides_information_state_tensor
-          ? game.InformationStateTensorSize()
-          : 0;
+  int infostate_vector_size = game.GetType().provides_information_state_tensor
+                                  ? game.InformationStateTensorSize()
+                                  : 0;
   std::cout << "Information state vector size: " << infostate_vector_size
             << std::endl;
 
@@ -285,8 +284,7 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
 
         // Check the observation state vector, if supported.
         if (observation_vector_size > 0) {
-          std::vector<double> obs_vector =
-              state->ObservationTensor(p);
+          std::vector<double> obs_vector = state->ObservationTensor(p);
           SPIEL_CHECK_EQ(obs_vector.size(), observation_vector_size);
         }
       }
@@ -313,8 +311,7 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
 
       // Check the observation state vector, if supported.
       if (observation_vector_size > 0) {
-        std::vector<double> obs_vector =
-            state->ObservationTensor(player);
+        std::vector<double> obs_vector = state->ObservationTensor(player);
         SPIEL_CHECK_EQ(obs_vector.size(), observation_vector_size);
       }
 
@@ -358,8 +355,7 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
   // for example, as a final observation in an RL environment.
   for (auto p = Player{0}; p < game.NumPlayers(); p++) {
     if (infostate_vector_size > 0) {
-      std::vector<double> infostate_vector =
-          state->InformationStateTensor(p);
+      std::vector<double> infostate_vector = state->InformationStateTensor(p);
       SPIEL_CHECK_EQ(infostate_vector.size(), infostate_vector_size);
     }
   }

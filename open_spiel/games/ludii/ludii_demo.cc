@@ -56,8 +56,8 @@ int main(int argc, char** argv) {
     std::cout << *i << ' ' << std::endl;
 
   // Load a Ludii game
-  ludii::Game test_game = gameLoader.LoadGame(
-      "board/space/blocking/Amazons.lud");
+  ludii::Game test_game =
+      gameLoader.LoadGame("board/space/blocking/Amazons.lud");
 
   // Test some Ludii API calls
   test_game.Create(0);

@@ -27,21 +27,20 @@ constexpr const Action kHeadsActionId = 0;
 constexpr const Action kTailsActionId = 1;
 
 namespace {
-const GameType kGameType{
-    /*short_name=*/"matching_pennies_3p",
-    /*long_name=*/"Three-Player Matching Pennies",
-    GameType::Dynamics::kSimultaneous,
-    GameType::ChanceMode::kDeterministic,
-    GameType::Information::kOneShot,
-    GameType::Utility::kGeneralSum,
-    GameType::RewardModel::kTerminal,
-    /*max_num_players=*/3,
-    /*min_num_players=*/3,
-    /*provides_information_state_string=*/true,
-    /*provides_information_state_tensor=*/true,
-    /*provides_observation_string=*/false,
-    /*provides_observation_tensor=*/false,
-    /*parameter_specification=*/{}};
+const GameType kGameType{/*short_name=*/"matching_pennies_3p",
+                         /*long_name=*/"Three-Player Matching Pennies",
+                         GameType::Dynamics::kSimultaneous,
+                         GameType::ChanceMode::kDeterministic,
+                         GameType::Information::kOneShot,
+                         GameType::Utility::kGeneralSum,
+                         GameType::RewardModel::kTerminal,
+                         /*max_num_players=*/3,
+                         /*min_num_players=*/3,
+                         /*provides_information_state_string=*/true,
+                         /*provides_information_state_tensor=*/true,
+                         /*provides_observation_string=*/false,
+                         /*provides_observation_tensor=*/false,
+                         /*parameter_specification=*/{}};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new MatchingPennies3pGame(params));

@@ -48,7 +48,8 @@ def main(unused_argv):
 
   policies = [[
       policy.TabularPolicy(env.game).copy_with_noise(alpha=float(i), beta=1.0)
-      for i in range(2)] for _ in range(2)]
+      for i in range(2)
+  ] for _ in range(2)]  # pylint: disable=g-complex-comprehension
 
   probabilities = [
       list(np.ones(len(policies[i])) / len(policies[i])) for i in range(2)

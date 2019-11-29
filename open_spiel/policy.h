@@ -110,7 +110,7 @@ class TabularPolicy : public Policy {
       Action action_taken = action_map.at(entry.first);
       for (auto& action_and_prob : policy_table_[info_state]) {
         action_and_prob.second =
-          (action_and_prob.first == action_taken ? 1.0 : 0.0);
+            (action_and_prob.first == action_taken ? 1.0 : 0.0);
       }
     }
   }

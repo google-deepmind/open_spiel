@@ -228,7 +228,7 @@ class MCTSBot(pyspiel.Bot):
       solve: Whether to back up solved states.
       random_state: An optional numpy RandomState to make it deterministic.
       child_selection_fn: A function to select the child in the descent phase.
-          The default is UCT.
+        The default is UCT.
       dirichlet_noise: A tuple of (epsilon, alpha) for adding dirichlet noise to
         the policy at the root. This is from the alpha-zero paper.
       verbose: Whether to print information about the search tree before

@@ -48,7 +48,7 @@ ActionsAndProbs CFRAveragePolicy::GetStatePolicy(
 
   if (sum_prob == 0.0) {
     // Return a uniform policy at this node
-    double prob = 1. / is_vals.num_actions();;
+    double prob = 1. / is_vals.num_actions();
     for (Action action : is_vals.legal_actions) {
       actions_and_probs.push_back({action, prob});
     }
@@ -260,11 +260,11 @@ void CFRSolverBase::GetInfoStatePolicyFromPolicy(
 
   // The policy may have extra ones not at this infostate
   for (Action action : legal_actions) {
-    const auto& iter = std::find_if(
-        actions_and_probs.begin(), actions_and_probs.end(),
-        [action](const std::pair<Action, double>& ap) {
-          return ap.first == action;
-        });
+    const auto& iter =
+        std::find_if(actions_and_probs.begin(), actions_and_probs.end(),
+                     [action](const std::pair<Action, double>& ap) {
+                       return ap.first == action;
+                     });
     info_state_policy->push_back(iter->second);
   }
 

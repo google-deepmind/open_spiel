@@ -153,10 +153,8 @@ def playthrough_lines(game_string, seed, alsologtostdout=False):
     if game.get_type().provides_information_state_tensor:
       for player in players:
         vec = ", ".join(
-            str(round(x, 5))
-            for x in state.information_state_tensor(player))
-        add_line("InformationStateTensor({}) = [{}]".format(
-            player, vec))
+            str(round(x, 5)) for x in state.information_state_tensor(player))
+        add_line("InformationStateTensor({}) = [{}]".format(player, vec))
     if game.get_type().provides_observation_string:
       for player in players:
         add_line('ObservationString({}) = "{}"'.format(

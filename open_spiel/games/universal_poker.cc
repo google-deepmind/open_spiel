@@ -182,8 +182,8 @@ void UniversalPokerState::InformationStateTensor(
   SPIEL_CHECK_EQ(offset, game_->InformationStateTensorShape()[0]);
 }
 
-void UniversalPokerState::ObservationTensor(
-    Player player, std::vector<double> *values) const {
+void UniversalPokerState::ObservationTensor(Player player,
+                                            std::vector<double> *values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, NumPlayers());
 
@@ -318,8 +318,7 @@ std::unique_ptr<State> UniversalPokerGame::NewInitialState() const {
   return std::unique_ptr<State>(new UniversalPokerState(shared_from_this()));
 }
 
-std::vector<int> UniversalPokerGame::InformationStateTensorShape()
-    const {
+std::vector<int> UniversalPokerGame::InformationStateTensorShape() const {
   // One-hot encoding for player number (who is to play).
   // 2 slots of cards (total_cards_ bits each): private card, public card
   // Followed by maximum game length * 2 bits each (call / raise)

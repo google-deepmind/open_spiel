@@ -23,25 +23,24 @@ namespace first_sealed_auction {
 namespace {
 
 // Facts about the game
-const GameType kGameType{
-    /*short_name=*/"first_sealed_auction",
-    /*long_name=*/"First-Price Sealed-Bid Auction",
-    GameType::Dynamics::kSequential,
-    GameType::ChanceMode::kExplicitStochastic,
-    GameType::Information::kImperfectInformation,
-    GameType::Utility::kGeneralSum,
-    GameType::RewardModel::kTerminal,
-    /*max_num_players=*/10,
-    /*min_num_players=*/2,
-    /*provides_information_state_string=*/true,
-    /*provides_information_state_tensor=*/true,
-    /*provides_observation_string=*/true,
-    /*provides_observation_tensor=*/true,
-    /*parameter_specification=*/
-    {
-        {"players", GameParameter(kDefaultPlayers)},
-        {"max_value", GameParameter(kDefaultMaxValue)},
-    }};
+const GameType kGameType{/*short_name=*/"first_sealed_auction",
+                         /*long_name=*/"First-Price Sealed-Bid Auction",
+                         GameType::Dynamics::kSequential,
+                         GameType::ChanceMode::kExplicitStochastic,
+                         GameType::Information::kImperfectInformation,
+                         GameType::Utility::kGeneralSum,
+                         GameType::RewardModel::kTerminal,
+                         /*max_num_players=*/10,
+                         /*min_num_players=*/2,
+                         /*provides_information_state_string=*/true,
+                         /*provides_information_state_tensor=*/true,
+                         /*provides_observation_string=*/true,
+                         /*provides_observation_tensor=*/true,
+                         /*parameter_specification=*/
+                         {
+                             {"players", GameParameter(kDefaultPlayers)},
+                             {"max_value", GameParameter(kDefaultMaxValue)},
+                         }};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new FPSBAGame(params));
@@ -52,7 +51,7 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 
 FPSBAGame::FPSBAGame(const GameParameters& params)
     : Game(kGameType, params),
-      num_players_(ParameterValue<int>("players" )),
+      num_players_(ParameterValue<int>("players")),
       max_value_(ParameterValue<int>("max_value")) {}
 
 FPSBAState::FPSBAState(std::shared_ptr<const Game> game)
@@ -146,8 +145,8 @@ std::string FPSBAState::InformationStateString(Player player) const {
                       bids_[player]);
 }
 
-void FPSBAState::InformationStateTensor(
-    Player player, std::vector<double>* values) const {
+void FPSBAState::InformationStateTensor(Player player,
+                                        std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   values->resize(2 * max_value_ + num_players_);
@@ -173,8 +172,8 @@ std::string FPSBAState::ObservationString(Player player) const {
   return absl::StrCat(valuations_[player]);
 }
 
-void FPSBAState::ObservationTensor(
-    Player player, std::vector<double>* values) const {
+void FPSBAState::ObservationTensor(Player player,
+                                   std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   values->resize(max_value_);
