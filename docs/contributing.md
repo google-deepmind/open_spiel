@@ -239,8 +239,3 @@ release!). Contributions are certainly not limited to these suggestions!
     for running a batch of episodes using Tensorflow directly from C++ (in
     `contrib/`). It has not yet been tested with CMake and public Tensorflow. We
     would like to officially support this and move it into the core library.
-
--   **Value Iteration for Simultaneous Move Games**. The current implementation
-    of value iteration does not support simultaneous move games despite having
-    the necessary LP-solving routines needed. This is a simple change to support
-    solving simultaneous-move games.
