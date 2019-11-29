@@ -11,7 +11,8 @@ import Base:show, length, getindex, setindex!, keys, values, copy, deepcopy, fir
 CxxWrap.argument_overloads(t::Type{Float64}) = Type[]
 @wrapfunctions
 
-Base.show(io::IO, g::CxxWrap.StdLib.SharedPtrAllocated{OpenSpiel_jll.Game}) = print(io, to_string(g))
+Base.show(io::IO, g::CxxWrap.StdLib.SharedPtrAllocated{Game}) = print(io, to_string(g))
+Base.show(io::IO, s::CxxWrap.StdLib.UniquePtrAllocated{State}) = print(io, to_string(s))
 Base.show(io::IO, gp::GameParameterAllocated) = print(io, to_repr_string(gp))
 
 # a workaround to disable argument_overloads for bool
