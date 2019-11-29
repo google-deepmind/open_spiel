@@ -35,6 +35,7 @@
 #include "pybind11/include/pybind11/operators.h"
 #include "pybind11/include/pybind11/pybind11.h"
 #include "pybind11/include/pybind11/stl.h"
+#include "pybind11/include/pybind11/functional.h"
 
 namespace open_spiel {
 namespace {
@@ -302,6 +303,7 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("chance_outcomes", &State::ChanceOutcomes)
       .def("get_type", &State::GetType)
       .def("serialize", &State::Serialize)
+      .def("resample_from_infostate", &State::ResampleFromInfostate)
       .def(py::pickle(              // Pickle support
           [](const State& state) {  // __getstate__
             return SerializeGameAndState(*state.GetGame(), state);
