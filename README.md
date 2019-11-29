@@ -61,7 +61,6 @@ BibTeX:
   journal   = {CoRR},
   volume    = {abs/1908.09453},
   url       = {http://arxiv.org/abs/1908.09453},
-  note      = {\url{http://arxiv.org/abs/1908.09453}},
 }
 ```
 
