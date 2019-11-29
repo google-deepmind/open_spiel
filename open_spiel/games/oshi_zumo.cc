@@ -37,26 +37,25 @@ constexpr int kDefaultSize = 3;
 constexpr bool kDefaultAlesia = false;
 constexpr int kDefaultMinBid = 0;
 
-const GameType kGameType{
-    /*short_name=*/"oshi_zumo",
-    /*long_name=*/"Oshi Zumo",
-    GameType::Dynamics::kSimultaneous,
-    GameType::ChanceMode::kDeterministic,
-    GameType::Information::kPerfectInformation,
-    GameType::Utility::kZeroSum,
-    GameType::RewardModel::kTerminal,
-    /*max_num_players=*/2,
-    /*min_num_players=*/2,
-    /*provides_information_state_string=*/true,
-    /*provides_information_state_tensor=*/true,
-    /*provides_observation_string=*/false,
-    /*provides_observation_tensor=*/false,
-    /*parameter_specification=*/
-    {{"alesia", GameParameter(kDefaultAlesia)},
-     {"coins", GameParameter(kDefaultCoins)},
-     {"size", GameParameter(kDefaultSize)},
-     {"horizon", GameParameter(kDefaultHorizon)},
-     {"min_bid", GameParameter(kDefaultMinBid)}}};
+const GameType kGameType{/*short_name=*/"oshi_zumo",
+                         /*long_name=*/"Oshi Zumo",
+                         GameType::Dynamics::kSimultaneous,
+                         GameType::ChanceMode::kDeterministic,
+                         GameType::Information::kPerfectInformation,
+                         GameType::Utility::kZeroSum,
+                         GameType::RewardModel::kTerminal,
+                         /*max_num_players=*/2,
+                         /*min_num_players=*/2,
+                         /*provides_information_state_string=*/true,
+                         /*provides_information_state_tensor=*/false,
+                         /*provides_observation_string=*/true,
+                         /*provides_observation_tensor=*/true,
+                         /*parameter_specification=*/
+                         {{"alesia", GameParameter(kDefaultAlesia)},
+                          {"coins", GameParameter(kDefaultCoins)},
+                          {"size", GameParameter(kDefaultSize)},
+                          {"horizon", GameParameter(kDefaultHorizon)},
+                          {"min_bid", GameParameter(kDefaultMinBid)}}};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new OshiZumoGame(params));
@@ -197,15 +196,21 @@ std::vector<double> OshiZumoState::Returns() const {
 std::string OshiZumoState::InformationStateString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
+  return HistoryString();  // All the information is public.
+}
+
+std::string OshiZumoState::ObservationString(Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
   return ToString();  // All the information is public.
 }
 
-void OshiZumoState::InformationStateTensor(
-    Player player, std::vector<double>* values) const {
+void OshiZumoState::ObservationTensor(Player player,
+                                      std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  values->resize(parent_game_.InformationStateTensorShape()[0]);
+  values->resize(parent_game_.ObservationTensorShape()[0]);
   std::fill(values->begin(), values->end(), 0.);
 
   // 1 bit per coin value of player 1. { 0, 1, ... , starting_coins_ }
@@ -241,7 +246,7 @@ std::unique_ptr<State> OshiZumoGame::NewInitialState() const {
   return std::unique_ptr<State>(new OshiZumoState(shared_from_this()));
 }
 
-std::vector<int> OshiZumoGame::InformationStateTensorShape() const {
+std::vector<int> OshiZumoGame::ObservationTensorShape() const {
   // 1 bit per coin value of player 1. { 0, 1, ..., starting_coins_ }
   // 1 bit per coin value of player 2. { 0, 1, ..., starting_coins_ }
   // 1 bit per position of the field. { 0, 1, ... , 2*size_+2 }
