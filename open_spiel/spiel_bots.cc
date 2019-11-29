@@ -72,10 +72,7 @@ class PolicyBot : public Bot {
   }
   bool ProvidesPolicy() override { return true; }
   ActionsAndProbs GetPolicy(const State& state) override {
-    std::cout << "About to call GetStatePolicy.\n";
-    ActionsAndProbs actions_and_probs = policy_->GetStatePolicy(state);
-    std::cout << "Called GetStatePolicy.\n";
-    return actions_and_probs;
+    return policy_->GetStatePolicy(state);
   }
 
   std::pair<ActionsAndProbs, Action> StepWithPolicy(
