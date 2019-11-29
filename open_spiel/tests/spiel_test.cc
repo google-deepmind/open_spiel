@@ -150,7 +150,7 @@ void TestPoliciesCanPlay(PolicyGenerator policy_generator, const Game& game) {
         outcomes = policy.GetStatePolicy(state->InformationStateString());
       }
       Action action =
-          open_spiel::SampleChanceOutcome(
+          open_spiel::SampleAction(
               outcomes, std::uniform_real_distribution<double>(0.0, 1.0)(rng))
               .first;
       state->ApplyAction(action);

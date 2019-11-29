@@ -87,7 +87,7 @@ int main(int argc, char** argv) {
       std::vector<std::pair<open_spiel::Action, double>> outcomes =
           state->ChanceOutcomes();
       open_spiel::Action action =
-          open_spiel::SampleChanceOutcome(
+          open_spiel::SampleAction(
               outcomes, std::uniform_real_distribution<double>(0.0, 1.0)(rng))
               .first;
       std::cerr << "sampled outcome: "

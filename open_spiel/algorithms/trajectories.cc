@@ -143,7 +143,7 @@ BatchedTrajectory RecordTrajectory(
   while (!state->IsTerminal()) {
     Action action = kInvalidAction;
     if (state->IsChanceNode()) {
-      action = open_spiel::SampleChanceOutcome(
+      action = open_spiel::SampleAction(
                    state->ChanceOutcomes(),
                    std::uniform_real_distribution<double>(0.0, 1.0)(*rng))
                    .first;
@@ -181,10 +181,9 @@ BatchedTrajectory RecordTrajectory(
       }
       trajectory.player_policies[0].push_back(probs);
       trajectory.player_ids[0].push_back(state->CurrentPlayer());
-      action =
-          SampleChanceOutcome(
-              policy, std::uniform_real_distribution<double>(0.0, 1.0)(*rng))
-              .first;
+      action = SampleAction(policy, std::uniform_real_distribution<double>(
+                                        0.0, 1.0)(*rng))
+                   .first;
       trajectory.actions[0].push_back(action);
     }
     SPIEL_CHECK_NE(action, kInvalidAction);

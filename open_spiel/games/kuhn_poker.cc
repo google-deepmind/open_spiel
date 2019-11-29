@@ -295,8 +295,7 @@ std::unique_ptr<State> KuhnState::ResampleFromInfostate(
     } else {
       Action other_chance = player_chance;
       while (other_chance == player_chance) {
-        other_chance =
-            SampleChanceOutcome(state->ChanceOutcomes(), rng()).first;
+        other_chance = SampleAction(state->ChanceOutcomes(), rng()).first;
       }
       state->ApplyAction(other_chance);
     }

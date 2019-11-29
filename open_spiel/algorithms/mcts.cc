@@ -47,10 +47,10 @@ std::vector<double> RandomRolloutEvaluator::Evaluate(const State& state) {
     while (!working_state->IsTerminal()) {
       if (working_state->IsChanceNode()) {
         ActionsAndProbs outcomes = working_state->ChanceOutcomes();
-        Action action = SampleChanceOutcome(
-                            outcomes, std::uniform_real_distribution<double>(
-                                          0.0, 1.0)(rng_))
-                            .first;
+        Action action =
+            SampleAction(outcomes,
+                         std::uniform_real_distribution<double>(0.0, 1.0)(rng_))
+                .first;
         working_state->ApplyAction(action);
       } else {
         std::vector<Action> actions = working_state->LegalActions();
@@ -299,9 +299,8 @@ std::unique_ptr<State> MCTSBot::ApplyTreePolicy(
       // For chance nodes, rollout according to chance node's probability
       // distribution
       Action chosen_action =
-          SampleChanceOutcome(
-              working_state->ChanceOutcomes(),
-              std::uniform_real_distribution<double>(0.0, 1.0)(rng_))
+          SampleAction(working_state->ChanceOutcomes(),
+                       std::uniform_real_distribution<double>(0.0, 1.0)(rng_))
               .first;
 
       for (SearchNode& child : current_node->children) {

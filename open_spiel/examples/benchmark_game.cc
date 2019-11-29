@@ -53,8 +53,8 @@ int RandomSimulation(std::mt19937* rng, const Game& game, bool verbose) {
       // Chance node; sample one according to underlying distribution
       std::vector<std::pair<Action, double>> outcomes = state->ChanceOutcomes();
       Action action =
-          SampleChanceOutcome(
-              outcomes, std::uniform_real_distribution<double>(0.0, 1.0)(*rng))
+          SampleAction(outcomes,
+                       std::uniform_real_distribution<double>(0.0, 1.0)(*rng))
               .first;
       if (verbose) {
         std::cout << "Sampled outcome: "

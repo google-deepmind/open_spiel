@@ -302,8 +302,8 @@ bool Game::ParameterValue<bool>(const std::string& key,
   }
 }
 
-std::pair<Action, double> SampleChanceOutcome(const ActionsAndProbs& outcomes,
-                                              double z) {
+std::pair<Action, double> SampleAction(const ActionsAndProbs& outcomes,
+                                       double z) {
   double sum = 0;
 
   // First do a check that this is indeed a proper discrete distribution.

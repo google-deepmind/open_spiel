@@ -238,7 +238,7 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
       // Chance node; sample one according to underlying distribution
       std::vector<std::pair<Action, double>> outcomes = state->ChanceOutcomes();
       Action action =
-          open_spiel::SampleChanceOutcome(
+          open_spiel::SampleAction(
               outcomes, std::uniform_real_distribution<double>(0.0, 1.0)(*rng))
               .first;
 

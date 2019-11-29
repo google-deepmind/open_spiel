@@ -50,9 +50,8 @@ void BasicBackgammonTestsDoNotStartWithDoubles() {
 
     while (state->IsChanceNode()) {
       Action outcome =
-          SampleChanceOutcome(
-              state->ChanceOutcomes(),
-              std::uniform_real_distribution<double>(0.0, 1.0)(rng))
+          SampleAction(state->ChanceOutcomes(),
+                       std::uniform_real_distribution<double>(0.0, 1.0)(rng))
               .first;
       state->ApplyAction(outcome);
     }

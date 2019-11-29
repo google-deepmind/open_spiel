@@ -34,7 +34,7 @@ std::vector<double> EvaluateBots(State* state, const std::vector<Bot*>& bots,
   while (!state->IsTerminal()) {
     if (state->IsChanceNode()) {
       state->ApplyAction(
-          SampleChanceOutcome(state->ChanceOutcomes(), uniform(rng)).first);
+          SampleAction(state->ChanceOutcomes(), uniform(rng)).first);
     } else if (state->IsSimultaneousNode()) {
       for (auto p = Player{0}; p < num_players; ++p) {
         if (state->LegalActions(p).empty()) {

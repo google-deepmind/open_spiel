@@ -79,7 +79,7 @@ double OutcomeSamplingMCCFRSolver::SampleEpisode(State* state,
     return state->PlayerReturn(update_player_);
   } else if (state->IsChanceNode()) {
     std::pair<Action, double> outcome_and_prob =
-        SampleChanceOutcome(state->ChanceOutcomes(), dist_(*rng));
+        SampleAction(state->ChanceOutcomes(), dist_(*rng));
     SPIEL_CHECK_PROB(outcome_and_prob.second);
     SPIEL_CHECK_GT(outcome_and_prob.second, 0);
     state->ApplyAction(outcome_and_prob.first);

@@ -573,8 +573,7 @@ std::unique_ptr<State> LeducState::ResampleFromInfostate(
     } else {
       Action chosen_action = player_chance;
       while (chosen_action == player_chance || chosen_action == public_card_) {
-        chosen_action =
-            SampleChanceOutcome(clone->ChanceOutcomes(), rng()).first;
+        chosen_action = SampleAction(clone->ChanceOutcomes(), rng()).first;
       }
       clone->ApplyAction(chosen_action);
     }

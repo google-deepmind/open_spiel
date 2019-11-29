@@ -737,12 +737,12 @@ std::shared_ptr<const Game> LoadGame(const std::string& short_name,
 // implementation).
 std::shared_ptr<const Game> LoadGame(GameParameters params);
 
-// Used to sample a policy. Can also sample from chance outcomes.
+// Used to sample a policy or chance outcome distribution.
 // Probabilities of the actions must sum to 1.
 // The parameter z should be a sample from a uniform distribution on the range
 // [0, 1). Returns the sampled action and its probability.
-std::pair<Action, double> SampleChanceOutcome(const ActionsAndProbs& outcomes,
-                                              double z);
+std::pair<Action, double> SampleAction(const ActionsAndProbs& outcomes,
+                                       double z);
 
 // Serialize the game and the state into one self-contained string that can
 // be reloaded via open_spiel::DeserializeGameAndState.
