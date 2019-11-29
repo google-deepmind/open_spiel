@@ -20,17 +20,21 @@
 #include <cstdint>
 #include <limits>
 #include <locale>
+#include <random>
 #include <sstream>
 #include <string>
 #include <type_traits>
 #include <utility>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/random/uniform_real_distribution.h"
 #include "open_spiel/abseil-cpp/absl/strings/ascii.h"
 #include "open_spiel/abseil-cpp/absl/strings/match.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_split.h"
+#include "open_spiel/abseil-cpp/absl/time/clock.h"
+#include "open_spiel/abseil-cpp/absl/time/time.h"
 
 // Code that is not part of the API, but is widely useful in implementations
 
@@ -218,6 +222,35 @@ bool Near(T a, T b, T epsilon) {
 // Specify a new error handler.
 using ErrorHandler = void (*)(const std::string&);
 void SetErrorHandler(ErrorHandler error_handler);
+
+// A ProbabilitySampler that samples uniformly from a distribution.
+class UniformProbabilitySampler {
+ public:
+  UniformProbabilitySampler(int seed, double min = 0., double max = 1.)
+      : seed_(seed), rng_(seed_), dist_(min, max), min_(min), max_(max) {}
+
+  UniformProbabilitySampler(double min = 0., double max = 1.)
+      : rng_(seed_), dist_(min, max), min_(min), max_(max) {}
+
+  // When copying, we reinitialize the sampler to have the initial seed.
+  UniformProbabilitySampler(const UniformProbabilitySampler& other)
+      : seed_(other.seed_),
+        rng_(other.seed_),
+        dist_(other.min_, other.max_),
+        min_(other.min_),
+        max_(other.max_) {}
+
+  double operator()() { return dist_(rng_); }
+
+ private:
+  // Set the seed as the number of nanoseconds
+  const int seed_ = absl::ToInt64Nanoseconds(absl::Now() - absl::UnixEpoch());
+  std::mt19937 rng_;
+  absl::uniform_real_distribution<double> dist_;
+
+  const double min_;
+  const double max_;
+};
 
 }  // namespace open_spiel
 

@@ -32,6 +32,7 @@
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_bots.h"
 #include "open_spiel/spiel_utils.h"
+#include "pybind11/include/pybind11/operators.h"
 #include "pybind11/include/pybind11/pybind11.h"
 #include "pybind11/include/pybind11/stl.h"
 
@@ -168,6 +169,12 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("is_mandatory", &GameParameter::is_mandatory)
       .def("__str__", &GameParameter::ToString)
       .def("__repr__", &GameParameter::ToReprString);
+
+  py::class_<UniformProbabilitySampler> uniform_sampler(
+      m, "UniformProbabilitySampler");
+  uniform_sampler.def(py::init<double, double>())
+      .def(py::init<int, double, double>())
+      .def("__call__", &UniformProbabilitySampler::operator());
 
   py::enum_<open_spiel::StateType>(m, "StateType")
       .value("TERMINAL", open_spiel::StateType::kTerminal)

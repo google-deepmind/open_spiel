@@ -463,9 +463,7 @@ void CheckChanceOutcomes(const Game& game) {
 // Verifies that ResampleFromInfostate is correctly implemented.
 void ResampleInfostateTest(const Game& game, int num_sims) {
   std::mt19937 rng;
-  auto sampler = [&rng]() {
-    return std::uniform_real_distribution<double>(0., 1.)(rng);
-  };
+  UniformProbabilitySampler sampler;
   for (int i = 0; i < num_sims; ++i) {
     std::unique_ptr<State> state = game.NewInitialState();
     while (!state->IsTerminal()) {
