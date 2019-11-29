@@ -39,10 +39,10 @@ const GameType kGameType{
     GameType::RewardModel::kTerminal,
     /*max_num_players=*/2,
     /*min_num_players=*/2,
-    /*provides_information_state_string=*/true,
-    /*provides_information_state_tensor=*/true,
-    /*provides_observation_string=*/false,
-    /*provides_observation_tensor=*/false,
+    /*provides_information_state_string=*/false,
+    /*provides_information_state_tensor=*/false,
+    /*provides_observation_string=*/true,
+    /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
     {{"horizon", GameParameter(kDefaultHorizon)},
      {"grid", GameParameter(std::string(kDefaultGrid))}}};
@@ -347,7 +347,7 @@ int MarkovSoccerState::observation_plane(int r, int c) const {
   return plane;
 }
 
-void MarkovSoccerState::InformationStateTensor(
+void MarkovSoccerState::ObservationTensor(
     Player player, std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
@@ -383,7 +383,7 @@ int MarkovSoccerGame::MaxChanceOutcomes() const {
   return kNumInitiativeChanceOutcomes + grid_.ball_start_points.size();
 }
 
-std::vector<int> MarkovSoccerGame::InformationStateTensorShape() const {
+std::vector<int> MarkovSoccerGame::ObservationTensorShape() const {
   return {kCellStates, grid_.num_rows, grid_.num_cols};
 }
 

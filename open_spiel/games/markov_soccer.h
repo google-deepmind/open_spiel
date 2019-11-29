@@ -73,12 +73,12 @@ class MarkovSoccerState : public SimMoveState {
   std::string ToString() const override;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
-  std::string InformationStateString(Player player) const {
+  std::string ObservationString(Player player) const {
     SPIEL_CHECK_GE(player, 0);
     SPIEL_CHECK_LT(player, num_players_);
     return ToString();
   }
-  void InformationStateTensor(Player player, std::vector<double>* values) const;
+  void ObservationTensor(Player player, std::vector<double>* values) const;
   Player CurrentPlayer() const override {
     return IsTerminal() ? kTerminalPlayerId : cur_player_;
   }
@@ -128,7 +128,7 @@ class MarkovSoccerGame : public SimMoveGame {
   std::shared_ptr<const Game> Clone() const override {
     return std::shared_ptr<const Game>(new MarkovSoccerGame(*this));
   }
-  std::vector<int> InformationStateTensorShape() const override;
+  std::vector<int> ObservationTensorShape() const override;
   int MaxGameLength() const override { return horizon_; }
 
  private:

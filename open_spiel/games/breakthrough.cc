@@ -50,10 +50,10 @@ const GameType kGameType{
     GameType::RewardModel::kTerminal,
     /*max_num_players=*/2,
     /*min_num_players=*/2,
-    /*provides_information_state_string=*/true,
-    /*provides_information_state_tensor=*/true,
-    /*provides_observation_string=*/false,
-    /*provides_observation_tensor=*/false,
+    /*provides_information_state_string=*/false,
+    /*provides_information_state_tensor=*/false,
+    /*provides_observation_string=*/true,
+    /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
     {{"rows", GameParameter(kDefaultRows)},
      {"columns", GameParameter(kDefaultColumns)}}};
@@ -318,13 +318,13 @@ std::vector<double> BreakthroughState::Returns() const {
   }
 }
 
-std::string BreakthroughState::InformationStateString(Player player) const {
+std::string BreakthroughState::ObservationString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   return ToString();
 }
 
-void BreakthroughState::InformationStateTensor(
+void BreakthroughState::ObservationTensor(
     Player player, std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);

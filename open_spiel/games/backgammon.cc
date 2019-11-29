@@ -75,10 +75,10 @@ const GameType kGameType{
     GameType::RewardModel::kTerminal,
     /*min_num_players=*/2,
     /*max_num_players=*/2,
-    /*provides_information_state_string=*/true,
-    /*provides_information_state_tensor=*/true,
-    /*provides_observation_string=*/false,
-    /*provides_observation_tensor=*/false,
+    /*provides_information_state_string=*/false,
+    /*provides_information_state_tensor=*/false,
+    /*provides_observation_string=*/true,
+    /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
     {{"scoring_type",
       GameParameter(static_cast<std::string>(kDefaultScoringType))}}};
@@ -257,17 +257,17 @@ std::string BackgammonState::ActionToString(Player player,
   }
 }
 
-std::string BackgammonState::InformationStateString(Player player) const {
+std::string BackgammonState::ObservationString(Player player) const {
   return ToString();
 }
 
-void BackgammonState::InformationStateTensor(
+void BackgammonState::ObservationTensor(
     Player player, std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LE(player, 1);
   int opponent = Opponent(player);
   values->clear();
-  values->reserve(game_->InformationStateTensorSize());
+  values->reserve(game_->ObservationTensorSize());
   // The format of this vector is described in Section 3.4 of "G. Tesauro,
   // Practical issues in temporal-difference learning, 1994."
   // https://link.springer.com/article/10.1007/BF00992697
