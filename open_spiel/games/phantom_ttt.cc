@@ -19,6 +19,7 @@
 #include <vector>
 
 #include "./tic_tac_toe.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
@@ -151,7 +152,7 @@ void PhantomTTTState::InformationStateTensor(
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  // First 27 bits encodes the player's view in the same was as TicTacToe.
+  // First 27 bits encodes the player's view in the same way as TicTacToe.
   // Then the action sequence follows (one-hot encoded, per action).
   // Encoded in the same way as InformationStateAsString, so full sequences
   // which may contain action value 10 to represent "I don't know."
@@ -183,6 +184,35 @@ void PhantomTTTState::InformationStateTensor(
     }
 
     offset += (1 + kBitsPerAction);
+  }
+}
+
+std::string PhantomTTTState::ObservationString(Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+  std::string observation = ViewToString(player);
+  if (obs_type_ == ObservationType::kRevealNumTurns) {
+    absl::StrAppend(&observation, "\nTotal turns: ", action_sequence_.size());
+  }
+  return observation;
+}
+
+void PhantomTTTState::ObservationTensor(Player player,
+                                        std::vector<double>* values) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+  values->resize(game_->ObservationTensorSize());
+  std::fill(values->begin(), values->end(), 0.);
+
+  // First 27 bits encodes the player's view in the same way as TicTacToe.
+  const auto& player_view = player == Player{0} ? x_view_ : o_view_;
+  for (int cell = 0; cell < kNumCells; ++cell) {
+    (*values)[kNumCells * static_cast<int>(player_view[cell]) + cell] = 1.0;
+  }
+
+  // Then a one-hot to represent total number of turns.
+  if (obs_type_ == ObservationType::kRevealNumTurns) {
+    (*values)[kNumCells * kCellStates + action_sequence_.size()] = 1.0;
   }
 }
 
@@ -229,6 +259,16 @@ PhantomTTTGame::PhantomTTTGame(const GameParameters& params)
 std::vector<int> PhantomTTTGame::InformationStateTensorShape() const {
   // Enc
   return {1, kNumCells * kCellStates + kLongestSequence * (1 + kBitsPerAction)};
+}
+
+std::vector<int> PhantomTTTGame::ObservationTensorShape() const {
+  if (obs_type_ == ObservationType::kRevealNothing) {
+    return {kNumCells * kCellStates};
+  } else if (obs_type_ == ObservationType::kRevealNumTurns) {
+    return {kNumCells * kCellStates + kLongestSequence};
+  } else {
+    SpielFatalError("Uknown observation type");
+  }
 }
 
 }  // namespace phantom_ttt
