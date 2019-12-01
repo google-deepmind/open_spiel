@@ -13,7 +13,7 @@ CxxWrap.argument_overloads(t::Type{Float64}) = Type[]
 
 Base.show(io::IO, g::CxxWrap.StdLib.SharedPtrAllocated{Game}) = print(io, to_string(g))
 Base.show(io::IO, s::CxxWrap.StdLib.UniquePtrAllocated{State}) = print(io, to_string(s))
-Base.show(io::IO, gp::GameParameterAllocated) = print(io, to_repr_string(gp))
+Base.show(io::IO, gp::Union{GameParameterAllocated, GameParameterDereferenced}) = print(io, to_repr_string(gp))
 
 # a workaround to disable argument_overloads for bool
 GameParameter(x::Bool) = GameParameter(UInt8[x])
@@ -35,23 +35,25 @@ function deserialize_game_and_state(s::CxxWrap.StdLib.StdStringAllocated)
     first(game_and_state), last(game_and_state)
 end
 
-function GameParameters(kw::Iterators.Pairs)
-    ps = GameParameters()
+function StdMap{K, V}(kw) where {K, V}
+    ps = StdMap{K, V}()
     for (k, v) in kw
-        ps[string(k)] = v
+        ps[convert(K, k)] = convert(V, v)
     end
     ps
 end
 
-function Base.show(io::IO, ps::GameParametersAllocated)
+function Base.show(io::IO, ::MIME{Symbol("text/plain")}, ps::StdMapAllocated{K, V}) where {K, V}
     ps_pairs = ["$k => $v" for (k, v) in zip(keys(ps), values(ps))]
-    s = length(ps_pairs) == 0 ? "" : join(',', ps_pairs)
-    print(io, "GameParameters($s)")
+    println(io, "StdMap{$K,$V} with $(length(ps_pairs)) entries:")
+    for s in ps_pairs
+        println(io, "  $s")
+    end
 end
 
-load_game(s::Union{String, CxxWrap.StdLib.StdStringAllocated}; kw...) = length(kw) == 0 ? _load_game(s) : _load_game(s, GameParameters(kw))
+load_game(s::Union{String, CxxWrap.StdLib.StdStringAllocated}; kw...) = length(kw) == 0 ? _load_game(s) : _load_game(s, StdMap{StdString, GameParameter}([StdString(string(k)) => v for (k,v) in kw]))
 
-load_game_as_turn_based(s::Union{String, CxxWrap.StdLib.StdStringAllocated}; kw...) = length(kw) == 0 ? _load_game_as_turn_based(s) : _load_game_as_turn_based(s, ps)
+load_game_as_turn_based(s::Union{String, CxxWrap.StdLib.StdStringAllocated}; kw...) = length(kw) == 0 ? _load_game_as_turn_based(s) : _load_game_as_turn_based(s, StdMap{StdString, GameParameter}([StdString(string(k)) => v for (k,v) in kw]))
 
 # export all
 for n in names(@__MODULE__(); all=true)

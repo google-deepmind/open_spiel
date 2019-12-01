@@ -8,12 +8,12 @@ For developers, the basic idea of this Julia wrapper is that, a shared lib named
 
 1. Why is this package named `OpenSpiel_jll` but not `OpenSpiel`?
 
-    The reason is that we plan to use [BinaryBuilder](https://github.com/JuliaPackaging/BinaryBuilder.jl) for the building process once the dependencies and APIs are stable. Then another package named `OpenSpiel` will be registered.
+    The reason is that we plan to use [BinaryBuilder](https://github.com/JuliaPackaging/BinaryBuilder.jl) for the building process once the dependencies and APIs are stable. So by convention, this package is named `OpenSpiel_jll`. Another package named `OpenSpiel` will be registered later.
 
 1. What is `StdVector`?
 
     `StdVector` is introduced in [CxxWrap.jl](https://github.com/JuliaInterop/CxxWrap.jl) recently. It is a wrapper of `std::vector` in the C++ side. Since that it is a subtype of `AbstractVector`, most functions should just work out of the box.
 
-1. I can't find the `xxx` function/type in the Julia wrapper.
+1. I can't find the `xxx` function/type in the Julia wrapper/The program exits unexpectedly.
 
-    Almost all the functions and types in `spiel.h` should be exported (if not, please create an issue).
+    Although most of the functions and types should be exported, only `State` and `Game` related APIs are well tested. So if you encounter any error, please do not hesitate to create an issue.
