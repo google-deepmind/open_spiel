@@ -44,7 +44,7 @@ const GameType kGameType{/*short_name=*/"liars_dice",
                          /*provides_information_state_string=*/true,
                          /*provides_information_state_tensor=*/true,
                          /*provides_observation_string=*/false,
-                         /*provides_observation_tensor=*/false,
+                         /*provides_observation_tensor=*/true,
                          /*parameter_specification=*/
                          {{"players", GameParameter(kDefaultPlayers)},
                           {"numdice", GameParameter(kDefaultNumDice)}}};
@@ -284,8 +284,10 @@ void LiarsDiceState::InformationStateTensor(Player player,
   // One-hot encoding for player number.
   // One-hot encoding for each die (max_dice_per_player_ * sides).
   // One slot(bit) for each legal bid.
-  // One slot(bit) for a call (needed by terminal state encoding).
+  // One slot(bit) for calling liar. (Necessary because observations and
+  // information states need to be defined at terminals)
   int offset = 0;
+  std::fill(values->begin(), values->end(), 0.);
   values->resize(num_players_ + (max_dice_per_player_ * kDiceSides) +
                  (total_num_dice_ * kDiceSides) + 1);
   (*values)[player] = 1;
@@ -308,6 +310,49 @@ void LiarsDiceState::InformationStateTensor(Player player,
   offset = num_players_ + max_dice_per_player_ * kDiceSides;
 
   for (int b = 0; b < bidseq_.size(); b++) {
+    SPIEL_CHECK_GE(bidseq_[b], 0);
+    SPIEL_CHECK_LE(bidseq_[b], total_num_dice_ * kDiceSides);
+    (*values)[offset + bidseq_[b]] = 1;
+  }
+}
+
+void LiarsDiceState::ObservationTensor(
+    Player player, std::vector<double>* values) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+
+  // One-hot encoding for player number.
+  // One-hot encoding for each die (max_dice_per_player_ * sides).
+  // One slot(bit) for the two last legal bid.
+  // One slot(bit) for calling liar. (Necessary because observations and
+  // information states need to be defined at terminals)
+  int offset = 0;
+  std::fill(values->begin(), values->end(), 0.);
+  values->resize(num_players_ + (max_dice_per_player_ * kDiceSides) +
+                 (total_num_dice_ * kDiceSides) + 1);
+  (*values)[player] = 1;
+  offset += num_players_;
+
+  int my_num_dice = num_dice_[player];
+
+  for (int d = 0; d < my_num_dice; d++) {
+    int outcome = dice_outcomes_[player][d];
+    if (outcome != kInvalidOutcome) {
+      SPIEL_CHECK_GE(outcome, 1);
+      SPIEL_CHECK_LE(outcome, kDiceSides);
+      (*values)[offset + (outcome - 1)] = 1;
+    }
+    offset += kDiceSides;
+  }
+
+  // Skip to bidding part. If current player has fewer dice than the other
+  // players, all the remaining entries are 0 for those dice.
+  offset = num_players_ + max_dice_per_player_ * kDiceSides;
+
+  // We only show the num_players_ last bids
+  int size_bid = bidseq_.size();
+  int bid_offset = std::max(0, size_bid - num_players_);
+  for (int b = bid_offset; b < size_bid; b++) {
     SPIEL_CHECK_GE(bidseq_[b], 0);
     SPIEL_CHECK_LE(bidseq_[b], total_num_dice_ * kDiceSides);
     (*values)[offset + bidseq_[b]] = 1;
@@ -376,7 +421,18 @@ std::vector<int> LiarsDiceGame::InformationStateTensorShape() const {
   // One-hot encoding for the player number.
   // One-hot encoding for each die (max_dice_per_player_ * sides).
   // One slot(bit) for each legal bid.
-  // One slot(bit) for each call. (Needed by terminal state encodeding.)
+  // One slot(bit) for calling liar. (Necessary because observations and
+  // information states need to be defined at terminals)
+  return {num_players_ + (max_dice_per_player_ * kDiceSides) +
+          (total_num_dice_ * kDiceSides) + 1};
+}
+
+std::vector<int> LiarsDiceGame::ObservationTensorShape() const {
+  // One-hot encoding for the player number.
+  // One-hot encoding for each die (max_dice_per_player_ * sides).
+  // One slot(bit) for the num_players_ last legal bid.
+  // One slot(bit) for calling liar. (Necessary because observations and
+  // information states need to be defined at terminals)
   return {num_players_ + (max_dice_per_player_ * kDiceSides) +
           (total_num_dice_ * kDiceSides) + 1};
 }
