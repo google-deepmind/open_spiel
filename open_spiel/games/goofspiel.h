@@ -71,9 +71,12 @@ class GoofspielState : public SimMoveState {
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
   std::string InformationStateString(Player player) const override;
+  std::string ObservationString(Player player) const override;
 
   void InformationStateTensor(Player player,
                               std::vector<double>* values) const override;
+  void ObservationTensor(Player player,
+                         std::vector<double>* values) const override;
   std::unique_ptr<State> Clone() const override;
   std::vector<std::pair<Action, double>> ChanceOutcomes() const override;
 
@@ -84,6 +87,9 @@ class GoofspielState : public SimMoveState {
   void DoApplyActions(const std::vector<Action>& actions) override;
 
  private:
+  // Increments the count and increments the player mod num_players_.
+  void NextPlayer(int* count, Player* player) const;
+
   int num_cards_;
   PointsOrder points_order_;
   bool impinfo_;
@@ -96,7 +102,7 @@ class GoofspielState : public SimMoveState {
   std::vector<int> point_deck_;                  // Current point deck.
   std::vector<std::vector<bool>> player_hands_;  // true if card is in hand.
   std::vector<int> point_card_sequence_;
-  std::vector<int> win_sequence_;
+  std::vector<int> win_sequence_;  // Which player won
   std::vector<std::vector<Action>> actions_history_;
 };
 
@@ -115,6 +121,7 @@ class GoofspielGame : public Game {
     return std::shared_ptr<const Game>(new GoofspielGame(*this));
   }
   std::vector<int> InformationStateTensorShape() const override;
+  std::vector<int> ObservationTensorShape() const override;
   int MaxGameLength() const override { return num_cards_; }
 
  private:
