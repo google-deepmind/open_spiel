@@ -31,7 +31,7 @@ def evaluate_bots(state, bots, rng):
       state.apply_action(rng.choice(outcomes, p=probs))
     elif state.is_simultaneous_node():
       joint_actions = [
-          bot.step(state)[1]
+          bot.step(state)
           if state.legal_actions(player_id) else pyspiel.INVALID_ACTION
           for player_id, bot in enumerate(bots)
       ]
