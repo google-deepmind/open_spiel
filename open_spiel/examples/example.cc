@@ -87,7 +87,7 @@ int main(int argc, char** argv) {
       std::vector<std::pair<open_spiel::Action, double>> outcomes =
           state->ChanceOutcomes();
       open_spiel::Action action =
-          open_spiel::SampleChanceOutcome(
+          open_spiel::SampleAction(
               outcomes, std::uniform_real_distribution<double>(0.0, 1.0)(rng))
               .first;
       std::cerr << "sampled outcome: "
@@ -103,14 +103,14 @@ int main(int argc, char** argv) {
       for (auto player = open_spiel::Player{0}; player < game->NumPlayers();
            ++player) {
         if (show_infostate) {
-          if (game->GetType().provides_information_state_as_normalized_vector) {
-            state->InformationStateAsNormalizedVector(player, &infostate);
+          if (game->GetType().provides_information_state_tensor) {
+            state->InformationStateTensor(player, &infostate);
             std::cerr << "player " << player << ": "
                       << absl::StrJoin(infostate, " ") << std::endl;
           }
-          if (game->GetType().provides_information_state) {
+          if (game->GetType().provides_information_state_string) {
             std::cerr << "player " << player << ": "
-                      << state->InformationState(player) << std::endl;
+                      << state->InformationStateString(player) << std::endl;
           }
         }
 
@@ -131,15 +131,15 @@ int main(int argc, char** argv) {
       // Decision node, sample one uniformly.
       auto player = state->CurrentPlayer();
       if (show_infostate) {
-        if (game->GetType().provides_information_state_as_normalized_vector) {
+        if (game->GetType().provides_information_state_tensor) {
           std::vector<double> infostate;
-          state->InformationStateAsNormalizedVector(player, &infostate);
+          state->InformationStateTensor(player, &infostate);
           std::cerr << "player " << player << ": "
                     << absl::StrJoin(infostate, " ") << std::endl;
         }
-        if (game->GetType().provides_information_state) {
+        if (game->GetType().provides_information_state_string) {
           std::cerr << "player " << player << ": "
-                    << state->InformationState(player) << std::endl;
+                    << state->InformationStateString(player) << std::endl;
         }
       }
 

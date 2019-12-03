@@ -12,24 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "open_spiel/spiel.h"
-
 #include "open_spiel/games/negotiation.h"
+#include "open_spiel/spiel.h"
 
 namespace open_spiel {
 namespace query {
 
 // Negotiation
 std::vector<int> NegotiationItemPool(const State& state) {
-  const auto* nstate = dynamic_cast<const negotiation::NegotiationState*>(
-      &state);
+  const auto* nstate =
+      dynamic_cast<const negotiation::NegotiationState*>(&state);
   SPIEL_CHECK_TRUE(nstate != nullptr);
   return nstate->ItemPool();
 }
 
 std::vector<int> NegotiationAgentUtils(const State& state, int player) {
-  const auto* nstate = dynamic_cast<const negotiation::NegotiationState*>(
-      &state);
+  const auto* nstate =
+      dynamic_cast<const negotiation::NegotiationState*>(&state);
   SPIEL_CHECK_TRUE(nstate != nullptr);
   return nstate->AgentUtils()[player];
 }

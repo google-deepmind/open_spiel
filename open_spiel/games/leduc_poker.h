@@ -68,12 +68,12 @@ class LeducState : public State {
   std::string ToString() const override;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
-  std::string InformationState(Player player) const override;
-  std::string Observation(Player player) const override;
-  void InformationStateAsNormalizedVector(
-      Player player, std::vector<double>* values) const override;
-  void ObservationAsNormalizedVector(
-      Player player, std::vector<double>* values) const override;
+  std::string InformationStateString(Player player) const override;
+  std::string ObservationString(Player player) const override;
+  void InformationStateTensor(Player player,
+                              std::vector<double>* values) const override;
+  void ObservationTensor(Player player,
+                         std::vector<double>* values) const override;
   std::unique_ptr<State> Clone() const override;
   // The probability of taking each possible action in a particular info state.
   std::vector<std::pair<Action, double>> ChanceOutcomes() const override;
@@ -89,6 +89,8 @@ class LeducState : public State {
   // Returns a vector of MaxGameLength containing all of the betting actions
   // taken so far. If the round has ended, the actions are kInvalidAction.
   std::vector<int> padded_betting_sequence() const;
+  std::unique_ptr<State> ResampleFromInfostate(
+      int player_id, std::function<double()> rng) const;
 
  protected:
   // The meaning of `action_id` varies:
@@ -117,6 +119,7 @@ class LeducState : public State {
   int RankHand(Player player) const;
   void SequenceAppendMove(int move);
   void Ante(Player player, int amount);
+  void SetPrivate(Player player, Action move);
 
   // Fields sets to bad/invalid values. Use Game::NewInitialState().
   Player cur_player_;
@@ -164,8 +167,8 @@ class LeducGame : public Game {
   std::shared_ptr<const Game> Clone() const override {
     return std::shared_ptr<const Game>(new LeducGame(*this));
   }
-  std::vector<int> InformationStateNormalizedVectorShape() const override;
-  std::vector<int> ObservationNormalizedVectorShape() const override;
+  std::vector<int> InformationStateTensorShape() const override;
+  std::vector<int> ObservationTensorShape() const override;
   int MaxGameLength() const override {
     // 2 rounds. Longest one for e.g. 4-player is, e.g.:
     //   check, check, check, raise, call, call, raise, call, call, call

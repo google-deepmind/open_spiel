@@ -74,13 +74,13 @@ class GoState : public State {
 
   bool IsTerminal() const override;
 
-  std::string InformationState(int player) const override;
-  std::string Observation(int player) const override;
+  std::string InformationStateString(int player) const override;
+  std::string ObservationString(int player) const override;
 
   // Four planes: black, white, empty, and a bias plane of bits indicating komi
   // (whether white is to play).
-  void ObservationAsNormalizedVector(
-      int player, std::vector<double>* values) const override;
+  void ObservationTensor(int player,
+                         std::vector<double>* values) const override;
 
   std::vector<double> Returns() const override;
 
@@ -129,7 +129,7 @@ class GoGame : public Game {
         new GoState(shared_from_this(), board_size_, komi_, handicap_));
   }
 
-  std::vector<int> ObservationNormalizedVectorShape() const override {
+  std::vector<int> ObservationTensorShape() const override {
     // Planes: black, white, empty, and a bias plane indicating komi (whether
     // white is to play).
     return {CellStates() + 1, board_size_, board_size_};

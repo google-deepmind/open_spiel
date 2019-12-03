@@ -409,7 +409,6 @@ void KuhnPokerFirstActionBestResponsePid1() {
                                        policy, actual_best_responses);
 }
 
-
 void KuhnPokerExploitabilityDescentMinimalSimulationPid0() {
   std::shared_ptr<const Game> game = LoadGame("kuhn_poker");
   auto best_responder = Player{1};

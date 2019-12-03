@@ -60,8 +60,7 @@ double ExternalSamplingMCCFRSolver::UpdateRegrets(const State& state,
   if (state.IsTerminal()) {
     return state.PlayerReturn(player);
   } else if (state.IsChanceNode()) {
-    Action action =
-        SampleChanceOutcome(state.ChanceOutcomes(), dist_(*rng)).first;
+    Action action = SampleAction(state.ChanceOutcomes(), dist_(*rng)).first;
     return UpdateRegrets(*state.Child(action), player, rng);
   } else if (state.IsSimultaneousNode()) {
     SpielFatalError(
@@ -70,7 +69,7 @@ double ExternalSamplingMCCFRSolver::UpdateRegrets(const State& state,
   }
 
   Player cur_player = state.CurrentPlayer();
-  std::string is_key = state.InformationState(cur_player);
+  std::string is_key = state.InformationStateString(cur_player);
   std::vector<Action> legal_actions = state.LegalActions();
 
   // The insert here only inserts the default value if the key is not found,
@@ -141,7 +140,7 @@ void ExternalSamplingMCCFRSolver::FullUpdateAverage(
   if (sum == 0.0) return;
 
   Player cur_player = state.CurrentPlayer();
-  std::string is_key = state.InformationState(cur_player);
+  std::string is_key = state.InformationStateString(cur_player);
   std::vector<Action> legal_actions = state.LegalActions();
 
   // The insert here only inserts the default value if the key is not found,

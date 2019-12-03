@@ -60,7 +60,7 @@ class BestResponseTest(parameterized.TestCase, absltest.TestCase):
         depth_limit=-1,
         include_terminals=False,
         include_chance_states=False,
-        to_string=lambda s: s.information_state())
+        to_string=lambda s: s.information_state_string())
 
     for current_player in range(game.num_players()):
       python_br = best_response.BestResponsePolicy(game, current_player,

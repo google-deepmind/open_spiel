@@ -45,7 +45,11 @@ def search_tic_tac_toe_state(initial_actions):
     state.apply_action(_get_action(state, action_str))
   rng = np.random.RandomState(42)
   bot = mcts.MCTSBot(
-      game, state.current_player(), UCT_C, max_simulations=10000, solve=True,
+      game,
+      state.current_player(),
+      UCT_C,
+      max_simulations=10000,
+      solve=True,
       random_state=rng,
       evaluator=mcts.RandomRolloutEvaluator(n_rollouts=20, random_state=rng))
   return bot.mcts_search(state), state
@@ -114,8 +118,9 @@ class MctsBotTest(absltest.TestCase):
 
     best = root.best_child()
     self.assertEqual(best.outcome[best.player], 0)
-    self.assertIn(state.action_to_string(best.player, best.action),
-                  ("o(0,2)", "o(2,0)"))  # All others lose.
+    self.assertIn(
+        state.action_to_string(best.player, best.action),
+        ("o(0,2)", "o(2,0)"))  # All others lose.
 
   def test_solve_loss(self):
     root, state = search_tic_tac_toe_state("x(1,1) o(0,0) x(2,2) o(1,0) x(2,0)")
@@ -171,10 +176,13 @@ class MctsBotTest(absltest.TestCase):
     ])
 
   def test_choose_positive_reward_over_promising(self):
-    self.assertBestChild(1, [
-        make_node(0, explore_count=50, total_reward=40),  # more promising
-        make_node(1, explore_count=10, total_reward=1, outcome=[0.1]),  # solved
-    ])
+    self.assertBestChild(
+        1,
+        [
+            make_node(0, explore_count=50, total_reward=40),  # more promising
+            make_node(1, explore_count=10, total_reward=1, outcome=[0.1
+                                                                   ]),  # solved
+        ])
 
   def test_choose_most_visited_over_loss(self):
     self.assertBestChild(0, [

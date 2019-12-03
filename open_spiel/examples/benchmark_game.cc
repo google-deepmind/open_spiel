@@ -38,25 +38,23 @@ int RandomSimulation(std::mt19937* rng, const Game& game, bool verbose) {
   }
 
   std::vector<double> obs;
-  bool provides_info_state =
-      game.GetType().provides_information_state_as_normalized_vector;
-  bool provides_observations =
-      game.GetType().provides_observation_as_normalized_vector;
+  bool provides_info_state = game.GetType().provides_information_state_tensor;
+  bool provides_observations = game.GetType().provides_observation_tensor;
 
   int game_length = 0;
   while (!state->IsTerminal()) {
     if (provides_observations) {
-      state->ObservationAsNormalizedVector(state->CurrentPlayer(), &obs);
+      state->ObservationTensor(state->CurrentPlayer(), &obs);
     } else if (provides_info_state) {
-      state->InformationStateAsNormalizedVector(state->CurrentPlayer(), &obs);
+      state->InformationStateTensor(state->CurrentPlayer(), &obs);
     }
     ++game_length;
     if (state->IsChanceNode()) {
       // Chance node; sample one according to underlying distribution
       std::vector<std::pair<Action, double>> outcomes = state->ChanceOutcomes();
       Action action =
-          SampleChanceOutcome(
-              outcomes, std::uniform_real_distribution<double>(0.0, 1.0)(*rng))
+          SampleAction(outcomes,
+                       std::uniform_real_distribution<double>(0.0, 1.0)(*rng))
               .first;
       if (verbose) {
         std::cout << "Sampled outcome: "
@@ -106,8 +104,8 @@ int RandomSimulation(std::mt19937* rng, const Game& game, bool verbose) {
 void RandomSimBenchmark(const std::string& game_def, int num_sims,
                         bool verbose) {
   std::mt19937 rng;
-  std::cout << absl::StrFormat("Benchmark: game: %s, num_sims: %d. ",
-                               game_def, num_sims);
+  std::cout << absl::StrFormat("Benchmark: game: %s, num_sims: %d. ", game_def,
+                               num_sims);
 
   auto game = LoadGame(game_def);
 

@@ -51,22 +51,22 @@ class WrappedState : public State {
 
   std::vector<double> Returns() const override { return state_->Returns(); }
 
-  std::string InformationState(Player player) const override {
-    return state_->InformationState(player);
+  std::string InformationStateString(Player player) const override {
+    return state_->InformationStateString(player);
   }
 
-  void InformationStateAsNormalizedVector(
-      Player player, std::vector<double>* values) const override {
-    state_->InformationStateAsNormalizedVector(player, values);
+  void InformationStateTensor(Player player,
+                              std::vector<double>* values) const override {
+    state_->InformationStateTensor(player, values);
   }
 
-  virtual std::string Observation(Player player) const {
-    return state_->Observation(player);
+  virtual std::string ObservationString(Player player) const {
+    return state_->ObservationString(player);
   }
 
-  virtual void ObservationAsNormalizedVector(
-      Player player, std::vector<double>* values) const {
-    state_->ObservationAsNormalizedVector(player, values);
+  virtual void ObservationTensor(Player player,
+                                 std::vector<double>* values) const {
+    state_->ObservationTensor(player, values);
   }
 
   virtual std::unique_ptr<State> Clone() const = 0;
@@ -117,12 +117,12 @@ class WrappedGame : public Game {
   double MaxUtility() const override { return game_->MaxUtility(); }
   double UtilitySum() const override { return game_->UtilitySum(); }
 
-  std::vector<int> InformationStateNormalizedVectorShape() const override {
-    return game_->InformationStateNormalizedVectorShape();
+  std::vector<int> InformationStateTensorShape() const override {
+    return game_->InformationStateTensorShape();
   }
 
-  std::vector<int> ObservationNormalizedVectorShape() const override {
-    return game_->ObservationNormalizedVectorShape();
+  std::vector<int> ObservationTensorShape() const override {
+    return game_->ObservationTensorShape();
   }
 
   int MaxGameLength() const override { return game_->MaxGameLength(); }

@@ -21,6 +21,7 @@
 #include <random>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/abseil-cpp/absl/random/uniform_int_distribution.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_format.h"
@@ -34,7 +35,7 @@ namespace algorithms {
 
 // Return the memory use of a vector. Useful to track and limit memory use when
 // running for a long time and build a big tree (eg to solve a game).
-template<class T>
+template <class T>
 constexpr inline int VectorMemory(const std::vector<T>& vec) {
   return sizeof(T) * vec.capacity();
 }
@@ -46,10 +47,10 @@ std::vector<double> RandomRolloutEvaluator::Evaluate(const State& state) {
     while (!working_state->IsTerminal()) {
       if (working_state->IsChanceNode()) {
         ActionsAndProbs outcomes = working_state->ChanceOutcomes();
-        Action action = SampleChanceOutcome(
-                            outcomes, std::uniform_real_distribution<double>(
-                                          0.0, 1.0)(rng_))
-                            .first;
+        Action action =
+            SampleAction(outcomes,
+                         std::uniform_real_distribution<double>(0.0, 1.0)(rng_))
+                .first;
         working_state->ApplyAction(action);
       } else {
         std::vector<Action> actions = working_state->LegalActions();
@@ -96,8 +97,7 @@ double SearchNode::UCTValue(int parent_explore_count, double uct_c) const {
     return outcome[player];
   }
 
-  if (explore_count == 0)
-    return std::numeric_limits<double>::infinity();
+  if (explore_count == 0) return std::numeric_limits<double>::infinity();
 
   // The "greedy-value" of choosing a given child is always with respect to
   // the current player for this node.
@@ -113,7 +113,7 @@ double SearchNode::PUCTValue(int parent_explore_count, double uct_c) const {
 
   return ((explore_count != 0 ? total_reward / explore_count : 0) +
           uct_c * prior * std::sqrt(parent_explore_count) /
-          (explore_count + 1));
+              (explore_count + 1));
 }
 
 bool SearchNode::CompareFinal(const SearchNode& b) const {
@@ -140,10 +140,10 @@ const SearchNode& SearchNode::BestChild() const {
   // - Hardest loss if everything is a loss
   // - Highest expected reward if explore counts are equal (unlikely).
   // - Longest win, if multiple are proven (unlikely due to early stopping).
-  return *std::max_element(
-      children.begin(), children.end(),
-      [](const SearchNode& a, const SearchNode& b) {
-          return a.CompareFinal(b); });
+  return *std::max_element(children.begin(), children.end(),
+                           [](const SearchNode& a, const SearchNode& b) {
+                             return a.CompareFinal(b);
+                           });
 }
 
 std::string SearchNode::ChildrenStr(const State& state) const {
@@ -156,7 +156,8 @@ std::string SearchNode::ChildrenStr(const State& state) const {
     }
     std::sort(refs.begin(), refs.end(),
               [](const SearchNode* a, const SearchNode* b) {
-                  return b->CompareFinal(*a); });
+                return b->CompareFinal(*a);
+              });
     for (const SearchNode* child : refs) {
       absl::StrAppend(&out, child->ToString(state), "\n");
     }
@@ -179,49 +180,64 @@ std::string SearchNode::ToString(const State& state) const {
       children.size());
 }
 
-MCTSBot::MCTSBot(
-      const Game& game,
-      Player player,
-      Evaluator* evaluator,
-      double uct_c,
-      int max_simulations,
-      int64_t max_memory_mb,
-      bool solve,
-      int seed,
-      bool verbose,
-      ChildSelectionPolicy child_selection_policy)
-      : Bot{game, player},
-        uct_c_{uct_c},
-        max_simulations_{max_simulations},
-        max_memory_(max_memory_mb << 20),  // megabytes -> bytes
-        verbose_(verbose),
-        solve_(solve),
-        max_utility_(game.MaxUtility()),
-        rng_(seed),
-        child_selection_policy_(child_selection_policy),
-        evaluator_{evaluator} {
-    GameType game_type = game.GetType();
-    if (game_type.reward_model != GameType::RewardModel::kTerminal)
-      SpielFatalError("Game must have terminal rewards.");
-    if (game_type.dynamics != GameType::Dynamics::kSequential)
-      SpielFatalError("Game must have sequential turns.");
-    if (player < 0 || player >= game.NumPlayers())
-      SpielFatalError(absl::StrFormat(
-          "Game doesn't support that many players. Max: %d, player: %d",
-          game.NumPlayers(), player));
+std::vector<double> dirichlet_noise(int count, double alpha,
+                                    std::mt19937* rng) {
+  auto noise = std::vector<double>{};
+  noise.reserve(count);
+
+  std::gamma_distribution<double> gamma(alpha, 1.0);
+  for (int i = 0; i < count; ++i) {
+    noise.emplace_back(gamma(*rng));
   }
 
-std::pair<ActionsAndProbs, Action> MCTSBot::Step(const State& state) {
+  double sum = absl::c_accumulate(noise, 0.0);
+  for (double& v : noise) {
+    v /= sum;
+  }
+  return noise;
+}
+
+MCTSBot::MCTSBot(const Game& game, Player player, Evaluator* evaluator,
+                 double uct_c, int max_simulations, int64_t max_memory_mb,
+                 bool solve, int seed, bool verbose,
+                 ChildSelectionPolicy child_selection_policy,
+                 double dirichlet_alpha, double dirichlet_epsilon)
+    : player_id_(player),
+      uct_c_{uct_c},
+      max_simulations_{max_simulations},
+      max_memory_(max_memory_mb << 20),  // megabytes -> bytes
+      verbose_(verbose),
+      solve_(solve),
+      max_utility_(game.MaxUtility()),
+      dirichlet_alpha_(dirichlet_alpha),
+      dirichlet_epsilon_(dirichlet_epsilon),
+      rng_(seed),
+      child_selection_policy_(child_selection_policy),
+      evaluator_{evaluator} {
+  GameType game_type = game.GetType();
+  if (game_type.reward_model != GameType::RewardModel::kTerminal)
+    SpielFatalError("Game must have terminal rewards.");
+  if (game_type.dynamics != GameType::Dynamics::kSequential)
+    SpielFatalError("Game must have sequential turns.");
+  if (player < 0 || player >= game.NumPlayers())
+    SpielFatalError(absl::StrFormat(
+        "Game doesn't support that many players. Max: %d, player: %d",
+        game.NumPlayers(), player));
+}
+
+Action MCTSBot::Step(const State& state) {
   absl::Time start = absl::Now();
   std::unique_ptr<SearchNode> root = MCTSearch(state);
   const SearchNode& best = root->BestChild();
 
   if (verbose_) {
     double seconds = absl::ToDoubleSeconds(absl::Now() - start);
-    std::cerr << absl::StrFormat(
-        "Finished %d sims in %.3f secs, %.1f sims/s, tree size: %d mb.",
-        root->explore_count, seconds, (root->explore_count / seconds),
-        memory_used_ / (1<<20)) << std::endl;
+    std::cerr
+        << absl::StrFormat(
+               "Finished %d sims in %.3f secs, %.1f sims/s, tree size: %d mb.",
+               root->explore_count, seconds, (root->explore_count / seconds),
+               memory_used_ / (1 << 20))
+        << std::endl;
     std::cerr << "Root:" << std::endl;
     std::cerr << root->ToString(state) << std::endl;
     std::cerr << "Children:" << std::endl;
@@ -234,7 +250,12 @@ std::pair<ActionsAndProbs, Action> MCTSBot::Step(const State& state) {
     }
   }
 
-  return {{{best.action, 1.0}}, best.action};
+  return best.action;
+}
+
+std::pair<ActionsAndProbs, Action> MCTSBot::StepWithPolicy(const State& state) {
+  Action action = Step(state);
+  return {{{action, 1.}}, action};
 }
 
 std::unique_ptr<State> MCTSBot::ApplyTreePolicy(
@@ -247,6 +268,15 @@ std::unique_ptr<State> MCTSBot::ApplyTreePolicy(
     if (current_node->children.empty()) {
       // For a new node, initialize its state, then choose a child as normal.
       ActionsAndProbs legal_actions = evaluator_->Prior(*working_state);
+      if (current_node == root && dirichlet_alpha_ > 0) {
+        std::vector<double> noise =
+            dirichlet_noise(legal_actions.size(), dirichlet_alpha_, &rng_);
+        for (int i = 0; i < legal_actions.size(); i++) {
+          legal_actions[i].second =
+              (1 - dirichlet_epsilon_) * legal_actions[i].second +
+              dirichlet_epsilon_ * noise[i];
+        }
+      }
       // Reduce bias from move generation order.
       std::shuffle(legal_actions.begin(), legal_actions.end(), rng_);
       Player player = working_state->CurrentPlayer();
@@ -262,9 +292,8 @@ std::unique_ptr<State> MCTSBot::ApplyTreePolicy(
       // For chance nodes, rollout according to chance node's probability
       // distribution
       Action chosen_action =
-          SampleChanceOutcome(
-              working_state->ChanceOutcomes(),
-              std::uniform_real_distribution<double>(0.0, 1.0)(rng_))
+          SampleAction(working_state->ChanceOutcomes(),
+                       std::uniform_real_distribution<double>(0.0, 1.0)(rng_))
               .first;
 
       for (SearchNode& child : current_node->children) {
@@ -312,8 +341,8 @@ std::unique_ptr<SearchNode> MCTSBot::MCTSearch(const State& state) {
     visit_path.clear();
     returns.clear();
 
-    std::unique_ptr<State> working_state = ApplyTreePolicy(
-        root.get(), state, &visit_path);
+    std::unique_ptr<State> working_state =
+        ApplyTreePolicy(root.get(), state, &visit_path);
 
     bool solved;
     if (working_state->IsTerminal()) {
@@ -345,7 +374,8 @@ std::unique_ptr<SearchNode> MCTSBot::MCTSearch(const State& state) {
           if (!outcome.empty() &&
               std::all_of(node->children.begin() + 1, node->children.end(),
                           [&outcome](const SearchNode& c) {
-                            return c.outcome == outcome; })) {
+                            return c.outcome == outcome;
+                          })) {
             node->outcome = outcome;
             memory_used_ += VectorMemory(node->outcome);
           } else {

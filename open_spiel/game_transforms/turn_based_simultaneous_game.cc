@@ -39,10 +39,10 @@ const GameType kGameType{
     GameType::RewardModel::kRewards,
     /*max_num_players=*/100,
     /*min_num_players=*/1,
-    /*provides_information_state=*/true,
-    /*provides_information_state_as_normalized_vector=*/true,
-    /*provides_observation=*/false,
-    /*provides_observation_as_normalized_vector=*/false,
+    /*provides_information_state_string=*/true,
+    /*provides_information_state_tensor=*/true,
+    /*provides_observation_string=*/true,
+    /*provides_observation_tensor=*/true,
     {{"game",
       GameParameter(GameParameter::Type::kGame, /*is_mandatory=*/true)}}};
 
@@ -148,7 +148,8 @@ std::vector<double> TurnBasedSimultaneousState::Returns() const {
   return state_->Returns();
 }
 
-std::string TurnBasedSimultaneousState::InformationState(Player player) const {
+std::string TurnBasedSimultaneousState::InformationStateString(
+    Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
@@ -164,16 +165,16 @@ std::string TurnBasedSimultaneousState::InformationState(Player player) const {
       extra_info.push_back('\n');
     }
   }
-  return extra_info + state_->InformationState(player);
+  return extra_info + state_->InformationStateString(player);
 }
 
-void TurnBasedSimultaneousState::InformationStateAsNormalizedVector(
+void TurnBasedSimultaneousState::InformationStateTensor(
     Player player, std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
   values->clear();
-  values->reserve(game_->InformationStateNormalizedVectorSize());
+  values->reserve(game_->InformationStateTensorSize());
 
   // First, get the 2 * num_players bits to encode whose turn it is and who
   // the observer is.
@@ -184,9 +185,9 @@ void TurnBasedSimultaneousState::InformationStateAsNormalizedVector(
     values->push_back(p == player ? 1 : 0);
   }
 
-  // Then get the underlying info set at
+  // Then get the underlying info set
   std::vector<double> infoset;
-  state_->InformationStateAsNormalizedVector(player, &infoset);
+  state_->InformationStateTensor(player, &infoset);
 
   int offset = values->size();
   values->resize(values->size() + infoset.size());
@@ -194,6 +195,55 @@ void TurnBasedSimultaneousState::InformationStateAsNormalizedVector(
   // Now copy it over.
   for (int i = 0; i < infoset.size(); i++) {
     (*values)[offset + i] = infoset[i];
+  }
+}
+
+std::string TurnBasedSimultaneousState::ObservationString(Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+
+  std::string extra_info = "";
+  extra_info = "Current player: ";
+  absl::StrAppend(&extra_info, current_player_);
+  extra_info.push_back('\n');
+  if (rollout_mode_) {
+    // Include the player's action if they have take one already.
+    if (player < current_player_) {
+      absl::StrAppend(&extra_info, "Observer's action this turn: ");
+      absl::StrAppend(&extra_info, action_vector_[player]);
+      extra_info.push_back('\n');
+    }
+  }
+  return extra_info + state_->ObservationString(player);
+}
+
+void TurnBasedSimultaneousState::ObservationTensor(
+    Player player, std::vector<double>* values) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+
+  values->clear();
+  values->reserve(game_->ObservationTensorSize());
+
+  // First, get the 2 * num_players bits to encode whose turn it is and who
+  // the observer is.
+  for (auto p = Player{0}; p < num_players_; ++p) {
+    values->push_back(p == current_player_ ? 1 : 0);
+  }
+  for (auto p = Player{0}; p < num_players_; ++p) {
+    values->push_back(p == player ? 1 : 0);
+  }
+
+  // Then get the underlying observation
+  std::vector<double> observation;
+  state_->ObservationTensor(player, &observation);
+
+  int offset = values->size();
+  values->resize(values->size() + observation.size());
+
+  // Now copy it over.
+  for (int i = 0; i < observation.size(); i++) {
+    (*values)[offset + i] = observation[i];
   }
 }
 
@@ -216,8 +266,8 @@ GameType ConvertType(GameType type) {
   type.short_name = kGameType.short_name;
   type.long_name = "Turn-based " + type.long_name;
   type.parameter_specification = kGameType.parameter_specification;
-  type.provides_observation = false;
-  type.provides_observation_as_normalized_vector = false;
+  type.provides_observation_string = false;
+  type.provides_observation_tensor = false;
   return type;
 }
 

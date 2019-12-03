@@ -43,7 +43,7 @@ TFBatchTrajectoryRecorder::TFBatchTrajectoryRecorder(
       graph_filename_(graph_filename),
       rng_(),
       dist_(0.0, 1.0),
-      flat_input_size_(game_->InformationStateNormalizedVectorSize()),
+      flat_input_size_(game_->InformationStateTensorSize()),
       num_actions_(game_->NumDistinctActions()) {
   TF_CHECK_OK(
       ReadBinaryProto(tf::Env::Default(), graph_filename_, &graph_def_));
@@ -61,8 +61,7 @@ void TFBatchTrajectoryRecorder::SampleChance(int idx) {
   while (states_[idx]->IsChanceNode()) {
     std::vector<std::pair<open_spiel::Action, double>> outcomes =
         states_[idx]->ChanceOutcomes();
-    Action action =
-        open_spiel::SampleChanceOutcome(outcomes, dist_(rng_)).first;
+    Action action = open_spiel::SampleAction(outcomes, dist_(rng_)).first;
     states_[idx]->ApplyAction(action);
   }
 
@@ -128,8 +127,8 @@ void TFBatchTrajectoryRecorder::FillInputsAndMasks() {
         mask_matrix(b, a) = mask[a];
       }
 
-      states_[b]->InformationStateAsNormalizedVector(
-          states_[b]->CurrentPlayer(), &info_state_vector);
+      states_[b]->InformationStateTensor(states_[b]->CurrentPlayer(),
+                                         &info_state_vector);
       for (int i = 0; i < info_state_vector.size(); ++i) {
         inputs_matrix(b, i) = info_state_vector[i];
       }

@@ -102,15 +102,13 @@ void CFRPlusTest_KuhnPoker() {
   CheckExploitabilityKuhnPoker(*game, *average_policy);
 }
 
-void CFRTest_KuhnPokerRunsWithThreePlayers(
-                                           bool linear_averaging,
+void CFRTest_KuhnPokerRunsWithThreePlayers(bool linear_averaging,
                                            bool regret_matching_plus,
                                            bool alternating_updates) {
   int num_players = 3;
   std::shared_ptr<const Game> game =
       LoadGame("kuhn_poker", {{"players", GameParameter(num_players)}});
-  CFRSolverBase solver(*game,
-                       regret_matching_plus, alternating_updates,
+  CFRSolverBase solver(*game, regret_matching_plus, alternating_updates,
                        linear_averaging);
   for (int i = 0; i < 10; i++) {
     solver.EvaluateAndUpdatePolicy();

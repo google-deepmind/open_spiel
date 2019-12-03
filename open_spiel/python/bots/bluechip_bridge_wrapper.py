@@ -146,7 +146,7 @@ def _expect(client, expected):
 
 def _hand_string(state_vec):
   """Returns the hand of the to-play player in the state in BlueChip format."""
-  # See UncontestedBiddingState::InformationStateAsNormalizedVector
+  # See UncontestedBiddingState::InformationStateTensor
   # The first 52 elements are whether or not we hold the given card (cards
   # ordered suit-by-suit, in ascending order of rank).
   suits = []
@@ -162,7 +162,7 @@ def _hand_string(state_vec):
 
 def _actions(state_vec):
   """Returns the player actions that have been taken in the game so far."""
-  # See UncontestedBiddingState::InformationStateAsNormalizedVector
+  # See UncontestedBiddingState::InformationStateTensor
   # The first 52 elements are the cards held, then two elements for each
   # possible action, specifying which of the two players has taken it (if
   # either player has). Then two elements specifying which player we are.
@@ -199,7 +199,9 @@ class BlueChipBridgeBot(pyspiel.Bot):
       client: The BlueChip bot; must support methods `start`, `read_line`, and
         `send_line`.
     """
-    super(BlueChipBridgeBot, self).__init__(game, player_id)
+    pyspiel.Bot.__init__(self)
+    self._game = game
+    self._player_id = player_id
     self._client = client
     self._seat = _SEATS[player_id]
     self._partner = _SEATS[1 - player_id]
@@ -207,13 +209,20 @@ class BlueChipBridgeBot(pyspiel.Bot):
     self._right_hand_opponent = _OPPONENTS[1 - player_id]
     self._connected = False
 
-  def restart(self, state):
+  def player_id(self):
+    return self._player_id
+
+  def restart(self):
+    """Indicates that the next step may be from a non-sequential state."""
+    self._connected = False
+
+  def restart_at(self, state):
     """Indicates that the next step may be from a non-sequential state."""
     self._connected = False
 
   def step(self, state):
     """Returns the action and policy for the bot in this state."""
-    state_vec = state.information_state_as_normalized_vector(self.player_id())
+    state_vec = state.information_state_tensor(self.player_id())
 
     # Connect if necessary.
     if not self._connected:

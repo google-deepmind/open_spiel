@@ -55,12 +55,12 @@ class FPSBAState : public State {
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
   std::unique_ptr<State> Clone() const override;
-  std::string InformationState(Player player) const override;
-  void InformationStateAsNormalizedVector(
-      Player player, std::vector<double>* values) const override;
-  std::string Observation(Player player) const override;
-  void ObservationAsNormalizedVector(
-      Player player, std::vector<double>* values) const override;
+  std::string InformationStateString(Player player) const override;
+  void InformationStateTensor(Player player,
+                              std::vector<double>* values) const override;
+  std::string ObservationString(Player player) const override;
+  void ObservationTensor(Player player,
+                         std::vector<double>* values) const override;
   ActionsAndProbs ChanceOutcomes() const override;
 
  protected:
@@ -92,10 +92,10 @@ class FPSBAGame : public Game {
     return std::shared_ptr<const Game>(new FPSBAGame(*this));
   }
   int MaxGameLength() const override { return num_players_; }
-  std::vector<int> InformationStateNormalizedVectorShape() const override {
+  std::vector<int> InformationStateTensorShape() const override {
     return {max_value_ * 2 + num_players_};
   };
-  std::vector<int> ObservationNormalizedVectorShape() const override {
+  std::vector<int> ObservationTensorShape() const override {
     return {max_value_};
   };
 

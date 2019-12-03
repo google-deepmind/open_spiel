@@ -28,24 +28,23 @@ constexpr const int kDefaultNumPlayers = 2;
 
 namespace {
 
-const GameType kGameType{
-    /*short_name=*/"blotto",
-    /*long_name=*/"Blotto",
-    GameType::Dynamics::kSimultaneous,
-    GameType::ChanceMode::kDeterministic,
-    GameType::Information::kOneShot,
-    GameType::Utility::kZeroSum,
-    GameType::RewardModel::kTerminal,
-    /*max_num_players=*/10,
-    /*min_num_players=*/2,
-    /*provides_information_state=*/true,
-    /*provides_information_state_as_normalized_vector=*/true,
-    /*provides_observation=*/false,
-    /*provides_observation_as_normalized_vector=*/false,
-    /*parameter_specification=*/
-    {{"coins", GameParameter(kDefaultNumCoins)},
-     {"fields", GameParameter(kDefaultNumFields)},
-     {"players", GameParameter(kDefaultNumPlayers)}}};
+const GameType kGameType{/*short_name=*/"blotto",
+                         /*long_name=*/"Blotto",
+                         GameType::Dynamics::kSimultaneous,
+                         GameType::ChanceMode::kDeterministic,
+                         GameType::Information::kOneShot,
+                         GameType::Utility::kZeroSum,
+                         GameType::RewardModel::kTerminal,
+                         /*max_num_players=*/10,
+                         /*min_num_players=*/2,
+                         /*provides_information_state_string=*/true,
+                         /*provides_information_state_tensor=*/true,
+                         /*provides_observation_string=*/false,
+                         /*provides_observation_tensor=*/false,
+                         /*parameter_specification=*/
+                         {{"coins", GameParameter(kDefaultNumCoins)},
+                          {"fields", GameParameter(kDefaultNumFields)},
+                          {"players", GameParameter(kDefaultNumPlayers)}}};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new BlottoGame(params));

@@ -32,6 +32,8 @@
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_bots.h"
 #include "open_spiel/spiel_utils.h"
+#include "pybind11/include/pybind11/functional.h"
+#include "pybind11/include/pybind11/operators.h"
 #include "pybind11/include/pybind11/pybind11.h"
 #include "pybind11/include/pybind11/stl.h"
 
@@ -65,30 +67,85 @@ class PyBot : public Bot {
  public:
   // We need the bot constructor
   using Bot::Bot;
+  ~PyBot() override = default;
 
-  // Override the bot's action choice.
   using step_retval_t = std::pair<ActionsAndProbs, open_spiel::Action>;
 
   // Choose and execute an action in a game. The bot should return its
   // distribution over actions and also its selected action.
-  step_retval_t Step(const State& state) override {
+  open_spiel::Action Step(const State& state) override {
     PYBIND11_OVERLOAD_PURE_NAME(
-        step_retval_t,  // Return type (must be a simple token for macro parser)
-        Bot,            // Parent class
-        "step",         // Name of function in Python
-        Step,           // Name of function in C++
-        state           // Arguments
+        open_spiel::Action,  // Return type (must be simple token)
+        Bot,                 // Parent class
+        "step",              // Name of function in Python
+        Step,                // Name of function in C++
+        state                // Arguments
     );
   }
 
   // Restart at the specified state.
-  void Restart(const State& state) override {
+  void Restart() override {
     PYBIND11_OVERLOAD_NAME(
         void,       // Return type (must be a simple token for macro parser)
         Bot,        // Parent class
         "restart",  // Name of function in Python
         Restart,    // Name of function in C++
-        state       // Arguments
+        // The trailing coma after Restart is necessary to say "No argument"
+    );
+  }
+  bool ProvidesForceAction() override {
+    PYBIND11_OVERLOAD_NAME(
+        bool,  // Return type (must be a simple token for macro parser)
+        Bot,   // Parent class
+        "provides_force_action",  // Name of function in Python
+        ProvidesForceAction,      // Name of function in C++
+                                  // Arguments
+    );
+  }
+  void ForceAction(const State& state, Action action) override {
+    PYBIND11_OVERLOAD_NAME(
+        void,  // Return type (must be a simple token for macro parser)
+        Bot,   // Parent class
+        "force_action",  // Name of function in Python
+        ForceAction,     // Name of function in C++
+        state,           // Arguments
+        action);
+  }
+
+  void RestartAt(const State& state) override {
+    PYBIND11_OVERLOAD_NAME(
+        void,          // Return type (must be a simple token for macro parser)
+        Bot,           // Parent class
+        "restart_at",  // Name of function in Python
+        RestartAt,     // Name of function in C++
+        state          // Arguments
+    );
+  }
+  bool ProvidesPolicy() override {
+    PYBIND11_OVERLOAD_NAME(
+        bool,  // Return type (must be a simple token for macro parser)
+        Bot,   // Parent class
+        "provides_policy",  // Name of function in Python
+        ProvidesPolicy,     // Name of function in C++
+                            // Arguments
+    );
+  }
+  ActionsAndProbs GetPolicy(const State& state) override {
+    PYBIND11_OVERLOAD_NAME(ActionsAndProbs,  // Return type (must be a simple
+                                             // token for macro parser)
+                           Bot,              // Parent class
+                           "get_policy",     // Name of function in Python
+                           GetPolicy,        // Name of function in C++
+                           state);
+  }
+  std::pair<ActionsAndProbs, Action> StepWithPolicy(
+      const State& state) override {
+    PYBIND11_OVERLOAD_NAME(
+        step_retval_t,  // Return type (must be a simple token for macro parser)
+        Bot,            // Parent class
+        "step_with_policy",  // Name of function in Python
+        StepWithPolicy,      // Name of function in C++
+        state                // Arguments
     );
   }
 };
@@ -114,6 +171,12 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("__str__", &GameParameter::ToString)
       .def("__repr__", &GameParameter::ToReprString);
 
+  py::class_<UniformProbabilitySampler> uniform_sampler(
+      m, "UniformProbabilitySampler");
+  uniform_sampler.def(py::init<double, double>())
+      .def(py::init<int, double, double>())
+      .def("__call__", &UniformProbabilitySampler::operator());
+
   py::enum_<open_spiel::StateType>(m, "StateType")
       .value("TERMINAL", open_spiel::StateType::kTerminal)
       .value("CHANCE", open_spiel::StateType::kChance)
@@ -125,8 +188,7 @@ PYBIND11_MODULE(pyspiel, m) {
       .def(py::init<std::string, std::string, GameType::Dynamics,
                     GameType::ChanceMode, GameType::Information,
                     GameType::Utility, GameType::RewardModel, int, int, bool,
-                    bool, bool, bool,
-                    std::map<std::string, GameParameter>>())
+                    bool, bool, bool, std::map<std::string, GameParameter>>())
       .def_readonly("short_name", &GameType::short_name)
       .def_readonly("long_name", &GameType::long_name)
       .def_readonly("dynamics", &GameType::dynamics)
@@ -136,13 +198,14 @@ PYBIND11_MODULE(pyspiel, m) {
       .def_readonly("reward_model", &GameType::reward_model)
       .def_readonly("max_num_players", &GameType::max_num_players)
       .def_readonly("min_num_players", &GameType::min_num_players)
-      .def_readonly("provides_information_state",
-                    &GameType::provides_information_state)
-      .def_readonly("provides_information_state_as_normalized_vector",
-                    &GameType::provides_information_state_as_normalized_vector)
-      .def_readonly("provides_observation", &GameType::provides_observation)
-      .def_readonly("provides_observation_as_normalized_vector",
-                    &GameType::provides_observation_as_normalized_vector)
+      .def_readonly("provides_information_state_string",
+                    &GameType::provides_information_state_string)
+      .def_readonly("provides_information_state_tensor",
+                    &GameType::provides_information_state_tensor)
+      .def_readonly("provides_observation_string",
+                    &GameType::provides_observation_string)
+      .def_readonly("provides_observation_tensor",
+                    &GameType::provides_observation_tensor)
       .def_readonly("parameter_specification",
                     &GameType::parameter_specification)
       .def("__repr__", [](const GameType& gt) {
@@ -214,25 +277,23 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("is_simultaneous_node", &State::IsSimultaneousNode)
       .def("history", &State::History)
       .def("history_str", &State::HistoryString)
-      .def("information_state",
-           (std::string(State::*)(int) const) & State::InformationState)
-      .def("information_state",
-           (std::string(State::*)() const) & State::InformationState)
-      .def("information_state_as_normalized_vector",
+      .def("information_state_string",
+           (std::string(State::*)(int) const) & State::InformationStateString)
+      .def("information_state_string",
+           (std::string(State::*)() const) & State::InformationStateString)
+      .def("information_state_tensor",
            (std::vector<double>(State::*)(int) const) &
-               State::InformationStateAsNormalizedVector)
-      .def("information_state_as_normalized_vector",
-           (std::vector<double>(State::*)() const) &
-               State::InformationStateAsNormalizedVector)
-      .def("observation",
-           (std::string(State::*)(int) const) & State::Observation)
-      .def("observation", (std::string(State::*)() const) & State::Observation)
-      .def("observation_as_normalized_vector",
-           (std::vector<double>(State::*)(int) const) &
-               State::ObservationAsNormalizedVector)
-      .def("observation_as_normalized_vector",
-           (std::vector<double>(State::*)() const) &
-               State::ObservationAsNormalizedVector)
+               State::InformationStateTensor)
+      .def("information_state_tensor", (std::vector<double>(State::*)() const) &
+                                           State::InformationStateTensor)
+      .def("observation_string",
+           (std::string(State::*)(int) const) & State::ObservationString)
+      .def("observation_string",
+           (std::string(State::*)() const) & State::ObservationString)
+      .def("observation_tensor", (std::vector<double>(State::*)(int) const) &
+                                     State::ObservationTensor)
+      .def("observation_tensor",
+           (std::vector<double>(State::*)() const) & State::ObservationTensor)
       .def("clone", &State::Clone)
       .def("child", &State::Child)
       .def("undo_action", &State::UndoAction)
@@ -242,6 +303,7 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("chance_outcomes", &State::ChanceOutcomes)
       .def("get_type", &State::GetType)
       .def("serialize", &State::Serialize)
+      .def("resample_from_infostate", &State::ResampleFromInfostate)
       .def(py::pickle(              // Pickle support
           [](const State& state) {  // __getstate__
             return SerializeGameAndState(*state.GetGame(), state);
@@ -262,14 +324,10 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("max_utility", &Game::MaxUtility)
       .def("get_type", &Game::GetType)
       .def("utility_sum", &Game::UtilitySum)
-      .def("information_state_normalized_vector_shape",
-           &Game::InformationStateNormalizedVectorShape)
-      .def("information_state_normalized_vector_size",
-           &Game::InformationStateNormalizedVectorSize)
-      .def("observation_normalized_vector_shape",
-           &Game::ObservationNormalizedVectorShape)
-      .def("observation_normalized_vector_size",
-           &Game::ObservationNormalizedVectorSize)
+      .def("information_state_tensor_shape", &Game::InformationStateTensorShape)
+      .def("information_state_tensor_size", &Game::InformationStateTensorSize)
+      .def("observation_tensor_shape", &Game::ObservationTensorShape)
+      .def("observation_tensor_size", &Game::ObservationTensorSize)
       .def("deserialize_state", &Game::DeserializeState)
       .def("max_game_length", &Game::MaxGameLength)
       .def("__str__", &Game::ToString)
@@ -328,10 +386,15 @@ PYBIND11_MODULE(pyspiel, m) {
           }));
 
   py::class_<Bot, PyBot> bot(m, "Bot");
-  bot.def(py::init<const Game&, int>())
-      .def("player_id", &Bot::PlayerId)
+  bot.def(py::init<>())
       .def("step", &Bot::Step)
-      .def("restart", &Bot::Restart);
+      .def("restart", &Bot::Restart)
+      .def("restart_at", &Bot::RestartAt)
+      .def("provides_force_action", &Bot::ProvidesForceAction)
+      .def("force_action", &Bot::ForceAction)
+      .def("provides_policy", &Bot::ProvidesPolicy)
+      .def("get_policy", &Bot::GetPolicy)
+      .def("step_with_policy", &Bot::StepWithPolicy);
 
   py::class_<algorithms::Evaluator> mcts_evaluator(m, "Evaluator");
   py::class_<algorithms::RandomRolloutEvaluator, algorithms::Evaluator>(
@@ -343,15 +406,15 @@ PYBIND11_MODULE(pyspiel, m) {
       .value("PUCT", algorithms::ChildSelectionPolicy::PUCT);
 
   py::class_<algorithms::MCTSBot, Bot>(m, "MCTSBot")
-      .def(py::init<const Game&, Player, Evaluator*, double, int, int64_t,
-                    bool, int, bool,
-                    ::open_spiel::algorithms::ChildSelectionPolicy>(),
-           py::arg("game"), py::arg("player"), py::arg("evaluator"),
-           py::arg("uct_c"), py::arg("max_simulations"),
-           py::arg("max_memory_mb"), py::arg("solve"), py::arg("seed"),
-           py::arg("verbose"),
-           py::arg("child_selection_policy") =
-               algorithms::ChildSelectionPolicy::UCT)
+      .def(
+          py::init<const Game&, Player, Evaluator*, double, int, int64_t, bool,
+                   int, bool, ::open_spiel::algorithms::ChildSelectionPolicy>(),
+          py::arg("game"), py::arg("player"), py::arg("evaluator"),
+          py::arg("uct_c"), py::arg("max_simulations"),
+          py::arg("max_memory_mb"), py::arg("solve"), py::arg("seed"),
+          py::arg("verbose"),
+          py::arg("child_selection_policy") =
+              algorithms::ChildSelectionPolicy::UCT)
       .def("step", &algorithms::MCTSBot::Step)
       .def("mcts_search", &algorithms::MCTSBot::MCTSearch);
 
@@ -472,7 +535,8 @@ PYBIND11_MODULE(pyspiel, m) {
   m.def("registered_games", GameRegister::RegisteredGames,
         "Returns the details of all available games.");
 
-  m.def("evaluate_bots", open_spiel::EvaluateBots,
+  m.def("evaluate_bots", open_spiel::EvaluateBots, py::arg("state"),
+        py::arg("bots"), py::arg("seed"),
         "Plays a single game with the given bots and returns the final "
         "utilities.");
 
@@ -495,16 +559,17 @@ PYBIND11_MODULE(pyspiel, m) {
         "games, and raises a SpielFatalError if an incompatible game is passed "
         "to it.");
 
-  m.def("exploitability",
-        py::overload_cast<const Game&,
-                    const std::unordered_map<std::string, ActionsAndProbs>&>(
-            &Exploitability),
-        "Returns the sum of the utility that a best responder wins when when "
-        "playing against 1) the player 0 policy contained in `policy` and 2) "
-        "the player 1 policy contained in `policy`."
-        "This only works for two player, zero- or constant-sum sequential "
-        "games, and raises a SpielFatalError if an incompatible game is passed "
-        "to it.");
+  m.def(
+      "exploitability",
+      py::overload_cast<
+          const Game&, const std::unordered_map<std::string, ActionsAndProbs>&>(
+          &Exploitability),
+      "Returns the sum of the utility that a best responder wins when when "
+      "playing against 1) the player 0 policy contained in `policy` and 2) "
+      "the player 1 policy contained in `policy`."
+      "This only works for two player, zero- or constant-sum sequential "
+      "games, and raises a SpielFatalError if an incompatible game is passed "
+      "to it.");
 
   m.def("nash_conv", py::overload_cast<const Game&, const Policy&>(&NashConv),
         "Returns the sum of the utility that a best responder wins when when "
@@ -514,15 +579,16 @@ PYBIND11_MODULE(pyspiel, m) {
         "games, and raises a SpielFatalError if an incompatible game is passed "
         "to it.");
 
-  m.def("nash_conv",
-        py::overload_cast<
-            const Game&,
-            const std::unordered_map<std::string, ActionsAndProbs>&>(&NashConv),
-        "Calculates a measure of how far the given policy is from a Nash "
-        "equilibrium by returning the sum of the improvements in the value "
-        "that each player could obtain by unilaterally changing their strategy "
-        "while the opposing player maintains their current strategy (which "
-        "for a Nash equilibrium, this value is 0).");
+  m.def(
+      "nash_conv",
+      py::overload_cast<
+          const Game&, const std::unordered_map<std::string, ActionsAndProbs>&>(
+          &NashConv),
+      "Calculates a measure of how far the given policy is from a Nash "
+      "equilibrium by returning the sum of the improvements in the value "
+      "that each player could obtain by unilaterally changing their strategy "
+      "while the opposing player maintains their current strategy (which "
+      "for a Nash equilibrium, this value is 0).");
 
   m.def("convert_to_turn_based", open_spiel::ConvertToTurnBased,
         "Returns a turn-based version of the given game.");
@@ -571,8 +637,7 @@ PYBIND11_MODULE(pyspiel, m) {
 
   // Game-Specific Query API.
   m.def("negotiation_item_pool", &open_spiel::query::NegotiationItemPool);
-  m.def("negotiation_agent_utils",
-        &open_spiel::query::NegotiationAgentUtils);
+  m.def("negotiation_agent_utils", &open_spiel::query::NegotiationAgentUtils);
 
   // Set an error handler that will raise exceptions. These exceptions are for
   // the Python interface only. When used from C++, OpenSpiel will never raise

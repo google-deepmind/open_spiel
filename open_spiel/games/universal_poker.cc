@@ -38,10 +38,10 @@ const GameType kGameType{
     GameType::RewardModel::kTerminal,
     /*max_num_players=*/10,
     /*min_num_players=*/2,
-    /*provides_information_state=*/true,
-    /*provides_information_state_as_normalized_vector=*/true,
-    /*provides_observation=*/true,
-    /*provides_observation_as_normalized_vector=*/true,
+    /*provides_information_state_string=*/true,
+    /*provides_information_state_tensor=*/true,
+    /*provides_observation_string=*/true,
+    /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
     {// Number of Players (up to 10)
      {"players", GameParameter(2)},
@@ -110,12 +110,12 @@ std::vector<double> UniversalPokerState::Returns() const {
   return returns;
 }
 
-void UniversalPokerState::InformationStateAsNormalizedVector(
+void UniversalPokerState::InformationStateTensor(
     Player player, std::vector<double> *values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  values->resize(game_->InformationStateNormalizedVectorShape()[0]);
+  values->resize(game_->InformationStateTensorShape()[0]);
   std::fill(values->begin(), values->end(), 0.);
 
   // Layout of observation:
@@ -179,15 +179,15 @@ void UniversalPokerState::InformationStateAsNormalizedVector(
   // Move offset up to the next round: 2 bits per move.
   offset += game_->MaxGameLength() * 2;
 
-  SPIEL_CHECK_EQ(offset, game_->InformationStateNormalizedVectorShape()[0]);
+  SPIEL_CHECK_EQ(offset, game_->InformationStateTensorShape()[0]);
 }
 
-void UniversalPokerState::ObservationAsNormalizedVector(
-    Player player, std::vector<double> *values) const {
+void UniversalPokerState::ObservationTensor(Player player,
+                                            std::vector<double> *values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, NumPlayers());
 
-  values->resize(game_->ObservationNormalizedVectorShape()[0]);
+  values->resize(game_->ObservationTensorShape()[0]);
   std::fill(values->begin(), values->end(), 0.);
 
   // Layout of observation:
@@ -222,10 +222,10 @@ void UniversalPokerState::ObservationAsNormalizedVector(
     (*values)[offset + p] = gameNode_.Ante(p);
   }
   offset += NumPlayers();
-  SPIEL_CHECK_EQ(offset, game_->ObservationNormalizedVectorShape()[0]);
+  SPIEL_CHECK_EQ(offset, game_->ObservationTensorShape()[0]);
 }
 
-std::string UniversalPokerState::InformationState(Player player) const {
+std::string UniversalPokerState::InformationStateString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, gameTree_->GetNbPlayers());
   const uint32_t pot = gameNode_.MaxSpend() *
@@ -247,7 +247,7 @@ std::string UniversalPokerState::InformationState(Player player) const {
       gameNode_.GetBoardCards().ToString(), absl::StrJoin(sequences, "¦"));
 }
 
-std::string UniversalPokerState::Observation(Player player) const {
+std::string UniversalPokerState::ObservationString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, gameTree_->GetNbPlayers());
   std::string result;
@@ -318,8 +318,7 @@ std::unique_ptr<State> UniversalPokerGame::NewInitialState() const {
   return std::unique_ptr<State>(new UniversalPokerState(shared_from_this()));
 }
 
-std::vector<int> UniversalPokerGame::InformationStateNormalizedVectorShape()
-    const {
+std::vector<int> UniversalPokerGame::InformationStateTensorShape() const {
   // One-hot encoding for player number (who is to play).
   // 2 slots of cards (total_cards_ bits each): private card, public card
   // Followed by maximum game length * 2 bits each (call / raise)
@@ -335,7 +334,7 @@ std::vector<int> UniversalPokerGame::InformationStateNormalizedVectorShape()
           (gameLength * 2)};
 }
 
-std::vector<int> UniversalPokerGame::ObservationNormalizedVectorShape() const {
+std::vector<int> UniversalPokerGame::ObservationTensorShape() const {
   // One-hot encoding for player number (who is to play).
   // 2 slots of cards (total_cards_ bits each): private card, public card
   // Followed by the contribution of each player to the pot

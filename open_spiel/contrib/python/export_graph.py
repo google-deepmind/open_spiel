@@ -38,7 +38,7 @@ def main(_):
   game = pyspiel.load_game(FLAGS.game)
 
   # Information state length
-  info_state_shape = game.information_state_normalized_vector_shape()
+  info_state_shape = game.information_state_tensor_shape()
   flat_info_state_length = np.prod(info_state_shape)
 
   # Output

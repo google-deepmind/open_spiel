@@ -37,10 +37,10 @@ const GameType kGameType{
     GameType::RewardModel::kTerminal,
     /*max_num_players=*/2,
     /*min_num_players=*/2,
-    /*provides_information_state=*/true,
-    /*provides_information_state_as_normalized_vector=*/true,
-    /*provides_observation=*/false,
-    /*provides_observation_as_normalized_vector=*/false,
+    /*provides_information_state_string=*/false,
+    /*provides_information_state_tensor=*/false,
+    /*provides_observation_string=*/true,
+    /*provides_observation_tensor=*/true,
     /*parameter_specification=*/{}  // no parameters
 };
 
@@ -129,16 +129,16 @@ std::vector<double> ChessState::Returns() const {
   }
 }
 
-std::string ChessState::InformationState(Player player) const {
+std::string ChessState::ObservationString(Player player) const {
   return ToString();
 }
 
-void ChessState::InformationStateAsNormalizedVector(
-    Player player, std::vector<double>* values) const {
+void ChessState::ObservationTensor(Player player,
+                                   std::vector<double>* values) const {
   SPIEL_CHECK_NE(player, kChancePlayerId);
 
   values->clear();
-  values->reserve(game_->InformationStateNormalizedVectorSize());
+  values->reserve(game_->ObservationTensorSize());
 
   // Piece cconfiguration.
   for (const auto& piece_type : kPieceTypes) {

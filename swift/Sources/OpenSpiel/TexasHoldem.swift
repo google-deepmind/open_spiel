@@ -28,8 +28,8 @@ public struct TexasHoldem: GameProtocol {
     rewardModel: .terminal,
     maxPlayers: 6,
     minPlayers: 2,
-    providesInformationState: true,
-    providesInformationStateAsNormalizedVector: true
+    providesInformationStateString: true,
+    providesInformationStateTensor: true
   )
 
   /// The available actions in the Texas Holdem game.
@@ -161,7 +161,7 @@ public struct TexasHoldem: GameProtocol {
     [.fold, .call, .allIn] + betDiscretization.map { .raise($0) }
   }
 
-  public var informationStateNormalizedVectorShape: [Int] {
+  public var informationStateTensorShape: [Int] {
     []  // TODO: IMPLEMENT ME!
   }
 
@@ -306,11 +306,11 @@ extension TexasHoldem.State {
     return Double(money[playerID] - game.initialMoney)
   }
   /// Computes a string-based information state for a given player in the current state.
-  public func informationState(for player: Player) -> String {
+  public func informationStateString(for player: Player) -> String {
     fatalError("IMPLEMENT ME!")  // TODO
   }
   /// Computes a normalized vector representing the information state.
-  public func informationStateAsNormalizedVector(for player: Player) -> [Double] {
+  public func informationStateTensor(for player: Player) -> [Double] {
     fatalError("UMIMPLEMENTED!") // TODO
   }
 }

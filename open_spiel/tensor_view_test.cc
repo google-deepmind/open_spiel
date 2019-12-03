@@ -12,10 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "open_spiel/tensor_view.h"
+
 #include <array>
 #include <vector>
 
-#include "open_spiel/tensor_view.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
@@ -136,6 +137,4 @@ void TestTensorView() {
 }  // namespace
 }  // namespace open_spiel
 
-int main(int argc, char** argv) {
-  open_spiel::TestTensorView();
-}
+int main(int argc, char** argv) { open_spiel::TestTensorView(); }

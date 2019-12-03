@@ -44,8 +44,8 @@ public struct LeducPoker: GameProtocol {
     rewardModel: .terminal,
     maxPlayers: 10,
     minPlayers: 2,
-    providesInformationState: true,
-    providesInformationStateAsNormalizedVector: true
+    providesInformationStateString: true,
+    providesInformationStateTensor: true
   )
 
   // Representations of cards in Leduc poker. Assumes 2 suits of equivalent value.
@@ -138,7 +138,7 @@ public struct LeducPoker: GameProtocol {
       return money[playerID] - game.startingMoney
     }
 
-    public func informationState(for player: Player) -> String {
+    public func informationStateString(for player: Player) -> String {
       guard case let .player(playerID) = player else {
         preconditionFailure("Invalid player \(player) for LeducPoker.State.informationState")
       }
@@ -156,7 +156,7 @@ public struct LeducPoker: GameProtocol {
       return "\(metadataStr)[Money: \(moneyStr)][Private: \(privateStr)]\(roundsStr)"
     }
 
-    public func informationStateAsNormalizedVector(for player: Player) -> [Double] {
+    public func informationStateTensor(for player: Player) -> [Double] {
       guard case let .player(playerID) = player else {
         preconditionFailure("Invalid player \(player) for LeducPoker.State.informationState")
       }
@@ -168,7 +168,7 @@ public struct LeducPoker: GameProtocol {
       //  first round sequence: (max round seq length)*2 bits
       //  second round sequence: (max round seq length)*2 bits
 
-      var state = Array<Double>(repeating: 0, count: game.informationStateNormalizedVectorShape[0])
+      var state = Array<Double>(repeating: 0, count: game.informationStateTensorShape[0])
 
       var offset = 0
 
@@ -247,7 +247,7 @@ public struct LeducPoker: GameProtocol {
   public var initialState: State {
     State(game: self)
   }
-  public var informationStateNormalizedVectorShape: [Int] {
+  public var informationStateTensorShape: [Int] {
     [playerCount + (totalCards * 2) + (maxGameLength * 2)]
   }
 

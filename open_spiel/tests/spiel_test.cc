@@ -71,9 +71,7 @@ class FlatJointActionTestGame : public SimMoveGame {
   std::shared_ptr<const Game> Clone() const override {
     return std::shared_ptr<const Game>(new FlatJointActionTestGame(*this));
   }
-  std::vector<int> InformationStateNormalizedVectorShape() const override {
-    return {};
-  }
+  std::vector<int> InformationStateTensorShape() const override { return {}; }
   int MaxGameLength() const override { return 1; }
 };
 
@@ -147,10 +145,10 @@ void TestPoliciesCanPlay(PolicyGenerator policy_generator, const Game& game) {
       if (state->IsChanceNode()) {
         outcomes = state->ChanceOutcomes();
       } else {
-        outcomes = policy.GetStatePolicy(state->InformationState());
+        outcomes = policy.GetStatePolicy(state->InformationStateString());
       }
       Action action =
-          open_spiel::SampleChanceOutcome(
+          open_spiel::SampleAction(
               outcomes, std::uniform_real_distribution<double>(0.0, 1.0)(rng))
               .first;
       state->ApplyAction(action);
@@ -170,8 +168,9 @@ void TestEveryInfostateInPolicy(PolicyGenerator policy_generator,
       to_visit.push_back(state->Child(action));
     }
     if (!state->IsChanceNode() && !state->IsTerminal()) {
-      SPIEL_CHECK_EQ(policy.GetStatePolicy(state->InformationState()).size(),
-                     state->LegalActions().size());
+      SPIEL_CHECK_EQ(
+          policy.GetStatePolicy(state->InformationStateString()).size(),
+          state->LegalActions().size());
     }
   }
 }

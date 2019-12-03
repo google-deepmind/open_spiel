@@ -33,10 +33,10 @@ const GameType kGameType{
     GameType::RewardModel::kRewards,
     /*max_num_players=*/5,
     /*min_num_players=*/2,
-    /*provides_information_state=*/false,
-    /*provides_information_state_as_normalized_vector=*/false,
-    /*provides_observation=*/true,
-    /*provides_observation_as_normalized_vector=*/true,
+    /*provides_information_state_string=*/false,
+    /*provides_information_state_tensor=*/false,
+    /*provides_observation_string=*/true,
+    /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
     {
         {"players", GameParameter(GameParameter::Type::kInt)},
@@ -132,7 +132,7 @@ std::shared_ptr<const Game> OpenSpielHanabiGame::Clone() const {
   return std::shared_ptr<Game>(new OpenSpielHanabiGame(GetParameters()));
 }
 
-std::vector<int> OpenSpielHanabiGame::ObservationNormalizedVectorShape() const {
+std::vector<int> OpenSpielHanabiGame::ObservationTensorShape() const {
   return encoder_.Shape();
 }
 
@@ -196,11 +196,11 @@ void OpenSpielHanabiState::DoApplyAction(Action action) {
   }
 }
 
-std::string OpenSpielHanabiState::Observation(Player player) const {
+std::string OpenSpielHanabiState::ObservationString(Player player) const {
   return hanabi_learning_env::HanabiObservation(state_, player).ToString();
 }
 
-void OpenSpielHanabiState::ObservationAsNormalizedVector(
+void OpenSpielHanabiState::ObservationTensor(
     Player player, std::vector<double>* values) const {
   auto obs = game_->Encoder().Encode(
       hanabi_learning_env::HanabiObservation(state_, player));

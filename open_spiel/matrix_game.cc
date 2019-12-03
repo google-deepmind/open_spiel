@@ -163,8 +163,8 @@ std::shared_ptr<const MatrixGame> CreateMatrixGame(
       GameType::RewardModel::kTerminal,
       /*max_num_players=*/2,
       /*min_num_players=*/2,
-      /*provides_information_state=*/true,
-      /*provides_information_state_as_normalized_vector=*/true,
+      /*provides_information_state_string=*/true,
+      /*provides_information_state_tensor=*/true,
       /*parameter_specification=*/{}  // no parameters
   };
 

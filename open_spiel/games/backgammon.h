@@ -60,7 +60,7 @@ inline constexpr const int kScorePos = 101;
 // number is encoded as a 2-digit number in base 26.
 inline constexpr const int kNumDistinctActions = 1352;
 
-// See InformationStateNormalizedVectorShape for details.
+// See ObservationTensorShape for details.
 inline constexpr const int kBoardEncodingSize = 4 * kNumPoints * kNumPlayers;
 inline constexpr const int kStateEncodingSize =
     3 * kNumPlayers + kBoardEncodingSize;
@@ -122,9 +122,9 @@ class BackgammonState : public State {
   std::string ToString() const override;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
-  std::string InformationState(Player player) const override;
-  void InformationStateAsNormalizedVector(
-      Player player, std::vector<double>* values) const override;
+  std::string ObservationString(Player player) const override;
+  void ObservationTensor(Player player,
+                         std::vector<double>* values) const override;
   std::unique_ptr<State> Clone() const override;
 
   // Setter function used for debugging and tests. Note: this does not set the
@@ -258,7 +258,7 @@ class BackgammonGame : public Game {
     return std::shared_ptr<const Game>(new BackgammonGame(*this));
   }
 
-  std::vector<int> InformationStateNormalizedVectorShape() const override {
+  std::vector<int> ObservationTensorShape() const override {
     // Encode each point on the board as four doubles:
     // - One double for whether there is one checker or not (1 or 0).
     // - One double for whether there are two checkers or not (1 or 0).

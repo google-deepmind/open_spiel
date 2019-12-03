@@ -67,7 +67,7 @@ def _init_bot(bot_type, game, player_id):
         solve=FLAGS.solve,
         verbose=FLAGS.verbose)
   if bot_type == "random":
-    return uniform_random.UniformRandomBot(game, player_id, rng)
+    return uniform_random.UniformRandomBot(player_id, rng)
   if bot_type == "human":
     return human.HumanBot(game, player_id)
   raise ValueError("Invalid bot type: %s" % bot_type)
@@ -114,7 +114,7 @@ def _play_game(game, bots, initial_actions):
     else:
       # Decision node: sample action for the single current player
       bot = bots[state.current_player()]
-      _, action = bot.step(state)
+      action = bot.step(state)
       action_str = state.action_to_string(state.current_player(), action)
       _opt_print("Player {} sampled action: {}".format(state.current_player(),
                                                        action_str))

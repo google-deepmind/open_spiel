@@ -37,10 +37,10 @@ const GameType kGameType{
     GameType::RewardModel::kTerminal,
     /*max_num_players=*/2,
     /*min_num_players=*/2,
-    /*provides_information_state=*/true,
-    /*provides_information_state_as_normalized_vector=*/false,
-    /*provides_observation=*/true,
-    /*provides_observation_as_normalized_vector=*/true,
+    /*provides_information_state_string=*/true,
+    /*provides_information_state_tensor=*/false,
+    /*provides_observation_string=*/true,
+    /*provides_observation_tensor=*/true,
     /*parameter_specification=*/{}  // no parameters
 };
 
@@ -117,9 +117,7 @@ bool TicTacToeState::HasLine(Player player) const {
          (board_[2] == c && board_[4] == c && board_[6] == c);
 }
 
-bool TicTacToeState::IsFull() const {
-  return num_moves_ == kNumCells;
-}
+bool TicTacToeState::IsFull() const { return num_moves_ == kNumCells; }
 
 TicTacToeState::TicTacToeState(std::shared_ptr<const Game> game) : State(game) {
   std::fill(begin(board_), end(board_), CellState::kEmpty);
@@ -152,18 +150,18 @@ std::vector<double> TicTacToeState::Returns() const {
   }
 }
 
-std::string TicTacToeState::InformationState(Player player) const {
+std::string TicTacToeState::InformationStateString(Player player) const {
   return HistoryString();
 }
 
-std::string TicTacToeState::Observation(Player player) const {
+std::string TicTacToeState::ObservationString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   return ToString();
 }
 
-void TicTacToeState::ObservationAsNormalizedVector(
-    Player player, std::vector<double>* values) const {
+void TicTacToeState::ObservationTensor(Player player,
+                                       std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 

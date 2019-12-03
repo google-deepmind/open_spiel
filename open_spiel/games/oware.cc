@@ -15,6 +15,7 @@
 #include "open_spiel/games/oware.h"
 
 #include <iomanip>
+
 #include "open_spiel/game_parameters.h"
 
 namespace open_spiel {
@@ -33,10 +34,10 @@ const GameType kGameType{
     GameType::RewardModel::kTerminal,
     /*max_num_players=*/2,
     /*min_num_players=*/2,
-    /*provides_information_state=*/false,
-    /*provides_information_state_as_normalized_vector=*/false,
-    /*provides_observation=*/true,
-    /*provides_observation_as_normalized_vector=*/true,
+    /*provides_information_state_string=*/false,
+    /*provides_information_state_tensor=*/false,
+    /*provides_observation_string=*/true,
+    /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
     {{"num_houses_per_player", GameParameter(kDefaultHousesPerPlayer)},
      {"num_seeds_per_house", GameParameter(kDdefaultSeedsPerHouse)}}};
@@ -272,12 +273,12 @@ void OwareState::CollectAndTerminate() {
   }
 }
 
-std::string OwareState::Observation(Player player) const {
+std::string OwareState::ObservationString(Player player) const {
   return board_.ToString();
 }
 
-void OwareState::ObservationAsNormalizedVector(
-    Player player, std::vector<double>* values) const {
+void OwareState::ObservationTensor(Player player,
+                                   std::vector<double>* values) const {
   values->resize(/*seeds*/ NumHouses() + /*scores*/ kNumPlayers);
   for (int house = 0; house < NumHouses(); ++house) {
     (*values)[house] = ((double)board_.seeds[house]) / total_seeds_;
@@ -290,12 +291,10 @@ void OwareState::ObservationAsNormalizedVector(
 
 OwareGame::OwareGame(const GameParameters& params)
     : Game(kGameType, params),
-      num_houses_per_player_(ParameterValue<int>("num_houses_per_player"
-                                                 )),
-      num_seeds_per_house_(
-          ParameterValue<int>("num_seeds_per_house")) {}
+      num_houses_per_player_(ParameterValue<int>("num_houses_per_player")),
+      num_seeds_per_house_(ParameterValue<int>("num_seeds_per_house")) {}
 
-std::vector<int> OwareGame::ObservationNormalizedVectorShape() const {
+std::vector<int> OwareGame::ObservationTensorShape() const {
   return {/*seeds*/ num_houses_per_player_ * kNumPlayers +
           /*scores*/ kNumPlayers};
 }

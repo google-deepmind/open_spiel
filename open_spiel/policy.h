@@ -73,7 +73,7 @@ class Policy {
   // Returns a list of (action, prob) pairs for the policy at this state.
   // If the policy is not available at the state, returns and empty list.
   virtual ActionsAndProbs GetStatePolicy(const State& state) const {
-    return GetStatePolicy(state.InformationState());
+    return GetStatePolicy(state.InformationStateString());
   }
 
   // Returns a list of (action, prob) pairs for the policy at this info state.
@@ -110,7 +110,7 @@ class TabularPolicy : public Policy {
       Action action_taken = action_map.at(entry.first);
       for (auto& action_and_prob : policy_table_[info_state]) {
         action_and_prob.second =
-          (action_and_prob.first == action_taken ? 1.0 : 0.0);
+            (action_and_prob.first == action_taken ? 1.0 : 0.0);
       }
     }
   }

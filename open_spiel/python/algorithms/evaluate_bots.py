@@ -24,7 +24,7 @@ import pyspiel
 def evaluate_bots(state, bots, rng):
   """Plays bots against each other, returns terminal utility for each bot."""
   for bot in bots:
-    bot.restart(state)
+    bot.restart_at(state)
   while not state.is_terminal():
     if state.is_chance_node():
       outcomes, probs = zip(*state.chance_outcomes())
@@ -37,5 +37,5 @@ def evaluate_bots(state, bots, rng):
       ]
       state.apply_actions(joint_actions)
     else:
-      state.apply_action(bots[state.current_player()].step(state)[1])
+      state.apply_action(bots[state.current_player()].step(state))
   return state.returns()

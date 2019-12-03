@@ -128,10 +128,13 @@ class YState : public State {
   std::string ToString() const override;
   bool IsTerminal() const override { return outcome_ != kPlayerNone; }
   std::vector<double> Returns() const override;
-  std::string InformationState(Player player) const override;
-  std::string Observation(Player player) const override;
-  void ObservationAsNormalizedVector(
-      Player player, std::vector<double>* values) const override;
+  std::string InformationStateString(Player player) const override;
+  std::string ObservationString(Player player) const override;
+
+  // A 3d tensor, 3 player-relative one-hot 2d planes. The layers are: the
+  // specified player, the other player, and empty.
+  void ObservationTensor(Player player,
+                         std::vector<double>* values) const override;
   std::unique_ptr<State> Clone() const override;
   std::vector<Action> LegalActions() const override;
 
@@ -180,7 +183,7 @@ class YGame : public Game {
   std::shared_ptr<const Game> Clone() const override {
     return std::shared_ptr<const Game>(new YGame(*this));
   }
-  std::vector<int> ObservationNormalizedVectorShape() const override {
+  std::vector<int> ObservationTensorShape() const override {
     return {kCellStates, board_size_, board_size_};
   }
   int MaxGameLength() const {

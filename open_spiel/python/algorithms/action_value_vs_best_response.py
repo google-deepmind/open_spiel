@@ -115,7 +115,7 @@ class Calculator(object):
 
     is_chance = state.is_chance_node()
     if not is_chance:
-      key = (state.current_player(), state.information_state())
+      key = (state.current_player(), state.information_state_string())
       counterfactual_reach_prob = (
           np.prod(reach_probabilities[:current_player]) *
           np.prod(reach_probabilities[current_player + 1:]))
@@ -154,7 +154,7 @@ class Calculator(object):
     opponent = 1 - player
 
     def best_response_policy(state):
-      infostate = state.information_state(opponent)
+      infostate = state.information_state_string(opponent)
       action = best_response_actions[infostate]
       return [(action, 1.0)]
 
@@ -177,7 +177,7 @@ class Calculator(object):
             include_terminals=False,
             include_chance_states=False)
         self._state_to_information_state = {
-            state: self._all_states[state].information_state()
+            state: self._all_states[state].information_state_string()
             for state in self._all_states
         }
       tabular_policy = policy_utils.policy_to_dict(

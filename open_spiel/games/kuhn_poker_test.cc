@@ -54,4 +54,7 @@ int main(int argc, char **argv) {
       "kuhn_poker", {{"players", open_spiel::GameParameter(3)}}));
   open_spiel::testing::RandomSimTest(*open_spiel::LoadGame("kuhn_poker"),
                                      /*num_sims=*/10);
+  open_spiel::testing::ResampleInfostateTest(
+      *open_spiel::LoadGame("kuhn_poker"),
+      /*num_sims=*/10);
 }

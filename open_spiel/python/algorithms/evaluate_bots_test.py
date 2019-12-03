@@ -32,8 +32,8 @@ class EvaluateBotsTest(absltest.TestCase):
   def test_cpp_vs_python(self):
     game = pyspiel.load_game("kuhn_poker")
     bots = [
-        pyspiel.make_uniform_random_bot(game, 0, 1234),
-        uniform_random.UniformRandomBot(game, 1, np.random.RandomState(4321))
+        pyspiel.make_uniform_random_bot(0, 1234),
+        uniform_random.UniformRandomBot(1, np.random.RandomState(4321))
     ]
     results = np.array([
         evaluate_bots.evaluate_bots(game.new_initial_state(), bots, np.random)

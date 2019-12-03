@@ -80,7 +80,7 @@ class CoinState : public State {
   std::unique_ptr<State> Clone() const override;
 
   ActionsAndProbs ChanceOutcomes() const override;
-  std::string Observation(Player player) const override;
+  std::string ObservationString(Player player) const override;
 
  protected:
   void DoApplyAction(Action action) override;

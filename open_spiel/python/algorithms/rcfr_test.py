@@ -105,7 +105,7 @@ class RcfrTest(parameterized.TestCase, tf.test.TestCase):
     assert len(state.legal_actions()) == 2
     features = rcfr.sequence_features(state, 3)
 
-    x = state.information_state_as_normalized_vector()
+    x = state.information_state_tensor()
     self.assertAllEqual([x + [1, 0, 0], x + [0, 1, 0]], features)
 
   def test_num_features(self):
@@ -373,7 +373,7 @@ class RcfrTest(parameterized.TestCase, tf.test.TestCase):
 
     def policy_fn(state):
       """Generates a policy profile by treating sequence indices as weights."""
-      info_state = state.information_state()
+      info_state = state.information_state_string()
       sequence_offset = root.info_state_to_sequence_idx[info_state]
       num_actions = len(state.legal_actions())
       return rcfr.normalized_by_sum(

@@ -82,10 +82,10 @@ class TinyBridgeGame2p : public Game {
   std::shared_ptr<const Game> Clone() const override {
     return std::shared_ptr<const Game>(new TinyBridgeGame2p(*this));
   }
-  std::vector<int> InformationStateNormalizedVectorShape() const {
+  std::vector<int> InformationStateTensorShape() const {
     return {kDeckSize + kNumActions2p * 2};
   }
-  std::vector<int> ObservationNormalizedVectorShape() const override {
+  std::vector<int> ObservationTensorShape() const override {
     return {kDeckSize + kNumActions2p};
   }
 };
@@ -141,12 +141,12 @@ class TinyBridgeAuctionState : public State {
   std::string ToString() const override;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
-  std::string InformationState(Player player) const override;
-  void InformationStateAsNormalizedVector(
-      Player player, std::vector<double>* values) const override;
-  std::string Observation(Player player) const override;
-  void ObservationAsNormalizedVector(
-      Player player, std::vector<double>* values) const override;
+  std::string InformationStateString(Player player) const override;
+  void InformationStateTensor(Player player,
+                              std::vector<double>* values) const override;
+  std::string ObservationString(Player player) const override;
+  void ObservationTensor(Player player,
+                         std::vector<double>* values) const override;
   std::unique_ptr<State> Clone() const override;
   void UndoAction(Player player, Action action) override;
   std::vector<std::pair<Action, double>> ChanceOutcomes() const override;
@@ -192,7 +192,7 @@ class TinyBridgePlayState : public State {
   void DoApplyAction(Action action) override;
 
  private:
-  int trumps_;  // The trump suit (or notrumps)
+  int trumps_;   // The trump suit (or notrumps)
   Seat leader_;  // The hand who plays first to the first trick.
   std::array<Seat, kDeckSize> holder_;   // hand of the holder of each card
   std::array<Seat, kNumTricks> winner_;  // hand of the winner of each trick

@@ -51,7 +51,7 @@ class RandomRolloutEvaluator(Evaluator):
   outcomes to be considered.
   """
 
-  def __init__(self, n_rollouts, random_state=None):
+  def __init__(self, n_rollouts=1, random_state=None):
     self.n_rollouts = n_rollouts
     self._random_state = random_state or np.random.RandomState()
 
@@ -208,6 +208,7 @@ class MCTSBot(pyspiel.Bot):
                solve=True,
                random_state=None,
                child_selection_fn=SearchNode.uct_value,
+               dirichlet_noise=None,
                verbose=False):
     """Initializes a MCTS Search algorithm in the form of a bot.
 
@@ -227,7 +228,9 @@ class MCTSBot(pyspiel.Bot):
       solve: Whether to back up solved states.
       random_state: An optional numpy RandomState to make it deterministic.
       child_selection_fn: A function to select the child in the descent phase.
-          The default is UCT.
+        The default is UCT.
+      dirichlet_noise: A tuple of (epsilon, alpha) for adding dirichlet noise to
+        the policy at the root. This is from the alpha-zero paper.
       verbose: Whether to print information about the search tree before
         returning the action. Useful for confirming the search is working
         sensibly.
@@ -235,6 +238,7 @@ class MCTSBot(pyspiel.Bot):
     Raises:
       ValueError: if the game type isn't supported.
     """
+    pyspiel.Bot.__init__(self)
     # Check that the game satisfies the conditions for this MCTS implemention.
     game_type = game.get_type()
     if game_type.reward_model != pyspiel.GameType.RewardModel.TERMINAL:
@@ -246,7 +250,8 @@ class MCTSBot(pyspiel.Bot):
           "Game doesn't support that many players. Max: {}, player: {}".format(
               game.num_players(), player))
 
-    super(MCTSBot, self).__init__(game, player)
+    self._game = game
+    self._player_id = player
     self.uct_c = uct_c
     self.max_simulations = max_simulations
     self.evaluator = evaluator
@@ -254,10 +259,17 @@ class MCTSBot(pyspiel.Bot):
     self.verbose = verbose
     self.solve = solve
     self.max_utility = game.max_utility()
+    self._dirichlet_noise = dirichlet_noise
     self._random_state = random_state or np.random.RandomState()
     self._child_selection_fn = child_selection_fn
 
-  def step(self, state):
+  def restart_at(self, state):
+    pass
+
+  def player_id(self):
+    return self._player_id
+
+  def step_with_policy(self, state):
     """Returns bot's policy and action at given state."""
     t1 = time.time()
     root = self.mcts_search(state)
@@ -285,6 +297,9 @@ class MCTSBot(pyspiel.Bot):
 
     return policy, mcts_action
 
+  def step(self, state):
+    return self.step_with_policy(state)[1]
+
   def _apply_tree_policy(self, root, state):
     """Applies the UCT policy to play the game until reaching a leaf node.
 
@@ -307,6 +322,11 @@ class MCTSBot(pyspiel.Bot):
       if not current_node.children:
         # For a new node, initialize its state, then choose a child as normal.
         legal_actions = self.evaluator.prior(working_state)
+        if current_node is root and self._dirichlet_noise:
+          epsilon, alpha = self._dirichlet_noise
+          noise = self._random_state.dirichlet([alpha] * len(legal_actions))
+          legal_actions = [(a, (1 - epsilon) * p + epsilon * n)
+                           for (a, p), n in zip(legal_actions, noise)]
         # Reduce bias from move generation order.
         self._random_state.shuffle(legal_actions)
         player = working_state.current_player()

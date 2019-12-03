@@ -80,7 +80,7 @@ def default_node_decorator(state):
     attrs["width"] = _WIDTH / 2.
     attrs["height"] = _HEIGHT / 2.
   else:
-    attrs["label"] = str(state.information_state())
+    attrs["label"] = str(state.information_state_string())
     attrs["shape"] = _PLAYER_SHAPES.get(player, "ellipse")
     attrs["color"] = _PLAYER_COLORS.get(player, "black")
   return attrs
@@ -199,7 +199,7 @@ class GameTree(pygraphviz.AGraph):
 
       if not child.is_chance_node() and not child.is_terminal():
         player = child.current_player()
-        info_state = child.information_state()
+        info_state = child.information_state_string()
         self._infosets[(player, info_state)].append(child_str)
 
       self._build_tree(child, depth + 1, depth_limit)

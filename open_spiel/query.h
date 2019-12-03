@@ -26,7 +26,7 @@ namespace query {
 std::vector<int> NegotiationItemPool(const State& state);
 std::vector<int> NegotiationAgentUtils(const State& state, int player);
 
-}  // query
+}  // namespace query
 }  // namespace open_spiel
 
 #endif  // THIRD_PARTY_OPEN_SPIEL_QUERY_H_

@@ -58,8 +58,8 @@ SPIEL_MULTIPLAYER_GAMES_LIST = [
     (g, p)
     for g in SPIEL_LOADABLE_GAMES_LIST
     for p in range(max(g.min_num_players, 2), 1 + min(g.max_num_players, 6))
-    if g.max_num_players > 2 and g.max_num_players > g.min_num_players
-    and g.short_name != "tiny_hanabi"  # default payoff only works for 2p
+    if g.max_num_players > 2 and g.max_num_players > g.min_num_players and
+    g.short_name != "tiny_hanabi"  # default payoff only works for 2p
 ]
 assert len(SPIEL_MULTIPLAYER_GAMES_LIST) >= 35, len(
     SPIEL_MULTIPLAYER_GAMES_LIST)
@@ -69,22 +69,24 @@ class GamesSimTest(parameterized.TestCase):
 
   def apply_action(self, state, action):
     if state.is_simultaneous_node():
+      assert isinstance(action, list)
       state.apply_actions(action)
     else:
       state.apply_action(action)
 
   def apply_action_test_clone(self, state, action):
-    """Apply the action and test the clone method if it's implemented."""
+    """Applies the action and tests the clone method if it's implemented."""
     try:
       state_clone = state.clone()
-      self.assertEqual(str(state), str(state_clone))
-      self.assertEqual(state.history(), state_clone.history())
-      self.apply_action(state, action)
-      self.apply_action(state_clone, action)
-      self.assertEqual(str(state), str(state_clone))
-      self.assertEqual(state.history(), state_clone.history())
     except Exception:  # pylint: disable=broad-except
       self.apply_action(state, action)
+      return
+    self.assertEqual(str(state), str(state_clone))
+    self.assertEqual(state.history(), state_clone.history())
+    self.apply_action(state, action)
+    self.apply_action(state_clone, action)
+    self.assertEqual(str(state), str(state_clone))
+    self.assertEqual(state.history(), state_clone.history())
 
   def serialize_deserialize(self, game, state):
     # OpenSpiel native serialization

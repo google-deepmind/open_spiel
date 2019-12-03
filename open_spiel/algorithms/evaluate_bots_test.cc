@@ -14,6 +14,8 @@
 
 #include "open_spiel/algorithms/evaluate_bots.h"
 
+#include <memory>
+
 #include "open_spiel/policy.h"
 #include "open_spiel/spiel_bots.h"
 
@@ -22,8 +24,8 @@ namespace {
 
 void BotTest_RandomVsRandom() {
   auto game = LoadGame("kuhn_poker");
-  auto bot0 = MakeUniformRandomBot(*game, Player{0}, /*seed=*/1234);
-  auto bot1 = MakeUniformRandomBot(*game, Player{1}, /*seed=*/4321);
+  auto bot0 = MakeUniformRandomBot(0, /*seed=*/1234);
+  auto bot1 = MakeUniformRandomBot(1, /*seed=*/4321);
   constexpr int num_players = 2;
   std::vector<double> average_results(num_players);
   constexpr int num_iters = 100000;
@@ -45,7 +47,7 @@ void BotTest_RandomVsRandom() {
 
 void BotTest_RandomVsRandomPolicy() {
   auto game = LoadGame("kuhn_poker");
-  auto bot0 = MakeUniformRandomBot(*game, Player{0}, /*seed=*/1234);
+  auto bot0 = MakeUniformRandomBot(0, /*seed=*/1234);
   std::unique_ptr<Policy> uniform_policy =
       std::make_unique<TabularPolicy>(GetUniformPolicy(*game));
   auto bot1 =

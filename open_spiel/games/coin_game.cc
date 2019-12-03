@@ -47,10 +47,10 @@ const GameType kGameType{
     GameType::RewardModel::kTerminal,
     /*max_num_players=*/10,
     /*min_num_players=*/1,
-    /*provides_information_state=*/false,
-    /*provides_information_state_as_normalized_vector=*/false,
-    /*provides_observation=*/true,
-    /*provides_observation_as_normalized_vector=*/false,
+    /*provides_information_state_string=*/false,
+    /*provides_information_state_tensor=*/false,
+    /*provides_observation_string=*/true,
+    /*provides_observation_tensor=*/false,
     /*parameter_specification=*/
     {
         {"players", GameParameter(kDefaultPlayers)},
@@ -211,7 +211,7 @@ ActionsAndProbs CoinState::ChanceOutcomes() const {
   }
 }
 
-std::string CoinState::Observation(Player player) const {
+std::string CoinState::ObservationString(Player player) const {
   std::ostringstream out;
   // A player only learns its own preference.
   out << player_preferences_[player] << "\n";

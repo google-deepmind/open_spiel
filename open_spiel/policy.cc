@@ -71,7 +71,7 @@ TabularPolicy GetEmptyTabularPolicy(const Game& game,
       if (infostate_policy.empty()) {
         SpielFatalError("State has zero legal actions.");
       }
-      policy.insert({state->InformationState(), infostate_policy});
+      policy.insert({state->InformationStateString(), infostate_policy});
     }
   }
   return TabularPolicy(policy);
@@ -157,7 +157,7 @@ TabularPolicy GetFirstActionPolicy(const Game& game) {
       if (infostate_policy.empty()) {
         SpielFatalError("State has zero legal actions.");
       }
-      policy.insert({state->InformationState(), infostate_policy});
+      policy.insert({state->InformationStateString(), infostate_policy});
     }
   }
   return TabularPolicy(policy);

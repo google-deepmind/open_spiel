@@ -27,25 +27,24 @@ namespace y_game {
 namespace {
 
 // Facts about the game.
-const GameType kGameType{
-    /*short_name=*/"y",
-    /*long_name=*/"Y Connection Game",
-    GameType::Dynamics::kSequential,
-    GameType::ChanceMode::kDeterministic,
-    GameType::Information::kPerfectInformation,
-    GameType::Utility::kZeroSum,
-    GameType::RewardModel::kTerminal,
-    /*max_num_players=*/2,
-    /*min_num_players=*/2,
-    /*provides_information_state=*/true,
-    /*provides_information_state_as_normalized_vector=*/false,
-    /*provides_observation=*/true,
-    /*provides_observation_as_normalized_vector=*/true,
-    /*parameter_specification=*/
-    {
-        {"board_size", GameParameter(kDefaultBoardSize)},
-        {"ansi_color_output", GameParameter(false)},
-    }};
+const GameType kGameType{/*short_name=*/"y",
+                         /*long_name=*/"Y Connection Game",
+                         GameType::Dynamics::kSequential,
+                         GameType::ChanceMode::kDeterministic,
+                         GameType::Information::kPerfectInformation,
+                         GameType::Utility::kZeroSum,
+                         GameType::RewardModel::kTerminal,
+                         /*max_num_players=*/2,
+                         /*min_num_players=*/2,
+                         /*provides_information_state_string=*/true,
+                         /*provides_information_state_tensor=*/false,
+                         /*provides_observation_string=*/true,
+                         /*provides_observation_tensor=*/true,
+                         /*parameter_specification=*/
+                         {
+                             {"board_size", GameParameter(kDefaultBoardSize)},
+                             {"ansi_color_output", GameParameter(false)},
+                         }};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new YGame(params));
@@ -227,18 +226,31 @@ std::vector<double> YState::Returns() const {
   return {0, 0};  // Unfinished
 }
 
-std::string YState::InformationState(Player player) const {
+std::string YState::InformationStateString(Player player) const {
   return HistoryString();
 }
 
-std::string YState::Observation(Player player) const {
+std::string YState::ObservationString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   return ToString();
 }
 
-void YState::ObservationAsNormalizedVector(Player player,
-                                           std::vector<double>* values) const {
+int PlayerRelative(YPlayer state, Player current) {
+  switch (state) {
+    case kPlayer1:
+      return current == 0 ? 0 : 1;
+    case kPlayer2:
+      return current == 1 ? 0 : 1;
+    case kPlayerNone:
+      return 2;
+    default:
+      SpielFatalError("Unknown player type.");
+  }
+}
+
+void YState::ObservationTensor(Player player,
+                               std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
@@ -246,7 +258,7 @@ void YState::ObservationAsNormalizedVector(Player player,
                      true);
   for (int i = 0; i < board_.size(); ++i) {
     if (board_[i].player != kPlayerInvalid) {
-      view[{static_cast<int>(board_[i].player), i}] = 1.0;
+      view[{PlayerRelative(board_[i].player, player), i}] = 1.0;
     }
   }
 }

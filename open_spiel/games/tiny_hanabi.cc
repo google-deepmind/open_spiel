@@ -61,10 +61,10 @@ const GameType kGameType{
     GameType::RewardModel::kTerminal,
     /*max_num_players=*/10,
     /*min_num_players=*/2,
-    /*provides_information_state=*/true,
-    /*provides_information_state_as_normalized_vector=*/true,
-    /*provides_observation=*/true,
-    /*provides_observation_as_normalized_vector=*/true,
+    /*provides_information_state_string=*/true,
+    /*provides_information_state_tensor=*/true,
+    /*provides_observation_string=*/true,
+    /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
     {
         {"num_players", GameParameter(2)},
@@ -151,7 +151,7 @@ std::vector<Action> TinyHanabiState::LegalActions() const {
   return actions;
 }
 
-std::string TinyHanabiState::InformationState(Player player) const {
+std::string TinyHanabiState::InformationStateString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
@@ -163,7 +163,7 @@ std::string TinyHanabiState::InformationState(Player player) const {
   return rv;
 }
 
-void TinyHanabiState::InformationStateAsNormalizedVector(
+void TinyHanabiState::InformationStateTensor(
     Player player, std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
@@ -179,19 +179,19 @@ void TinyHanabiState::InformationStateAsNormalizedVector(
   }
 }
 
-void TinyHanabiState::ObservationAsNormalizedVector(
-    Player player, std::vector<double>* values) const {
+void TinyHanabiState::ObservationTensor(Player player,
+                                        std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  InformationStateAsNormalizedVector(player, values);
+  InformationStateTensor(player, values);
 }
 
-std::string TinyHanabiState::Observation(Player player) const {
+std::string TinyHanabiState::ObservationString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  return InformationState(player);
+  return InformationStateString(player);
 }
 
 void TinyHanabiState::DoApplyAction(Action action) {}
