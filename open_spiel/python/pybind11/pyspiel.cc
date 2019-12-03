@@ -529,10 +529,10 @@ PYBIND11_MODULE(pyspiel, m) {
         "Converts a two-player extensive-game to its equivalent matrix game, "
         "which is exponentially larger. Use only with small games.");
 
-  m.def("registered_names", GameRegister::RegisteredNames,
+  m.def("registered_names", GameRegisterer::RegisteredNames,
         "Returns the names of all available games.");
 
-  m.def("registered_games", GameRegister::RegisteredGames,
+  m.def("registered_games", GameRegisterer::RegisteredGames,
         "Returns the details of all available games.");
 
   m.def("evaluate_bots", open_spiel::EvaluateBots, py::arg("state"),

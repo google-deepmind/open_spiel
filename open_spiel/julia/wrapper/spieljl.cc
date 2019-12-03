@@ -255,8 +255,8 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
   mod.method("_load_game_as_turn_based", [](const std::string &s, const open_spiel::GameParameters& ps) { return open_spiel::LoadGameAsTurnBased(s, ps); });
   mod.method("load_matrix_game", &open_spiel::algorithms::LoadMatrixGame);
   mod.method("extensive_to_matrix_game", &open_spiel::algorithms::ExtensiveToMatrixGame);
-  mod.method("registered_names", &open_spiel::GameRegister::RegisteredNames);
-  mod.method("registered_games", &open_spiel::GameRegister::RegisteredGames);
+  mod.method("registered_names", &open_spiel::GameRegisterer::RegisteredNames);
+  mod.method("registered_games", &open_spiel::GameRegisterer::RegisteredGames);
 
   mod.add_type<open_spiel::Bot>("Bot")
     .method("step", &open_spiel::Bot::Step)
