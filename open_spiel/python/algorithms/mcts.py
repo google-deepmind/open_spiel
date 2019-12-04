@@ -201,7 +201,6 @@ class MCTSBot(pyspiel.Bot):
 
   def __init__(self,
                game,
-               player,
                uct_c,
                max_simulations,
                evaluator,
@@ -217,7 +216,6 @@ class MCTSBot(pyspiel.Bot):
 
     Args:
       game: A pyspiel.Game to play.
-      player: Which player to expect, starting from 0.
       uct_c: The exploration constant for UCT.
       max_simulations: How many iterations of MCTS to perform. Each simulation
         will result in one call to the evaluator. Memory usage should grow
@@ -245,17 +243,11 @@ class MCTSBot(pyspiel.Bot):
       raise ValueError("Game must have terminal rewards.")
     if game_type.dynamics != pyspiel.GameType.Dynamics.SEQUENTIAL:
       raise ValueError("Game must have sequential turns.")
-    if player < 0 or player >= game.num_players():
-      raise ValueError(
-          "Game doesn't support that many players. Max: {}, player: {}".format(
-              game.num_players(), player))
 
     self._game = game
-    self._player_id = player
     self.uct_c = uct_c
     self.max_simulations = max_simulations
     self.evaluator = evaluator
-    self.player = player
     self.verbose = verbose
     self.solve = solve
     self.max_utility = game.max_utility()
@@ -265,9 +257,6 @@ class MCTSBot(pyspiel.Bot):
 
   def restart_at(self, state):
     pass
-
-  def player_id(self):
-    return self._player_id
 
   def step_with_policy(self, state):
     """Returns bot's policy and action at given state."""
@@ -293,7 +282,7 @@ class MCTSBot(pyspiel.Bot):
     mcts_action = best.action
 
     policy = [(action, (1.0 if action == mcts_action else 0.0))
-              for action in state.legal_actions(self.player_id())]
+              for action in state.legal_actions(state.current_player())]
 
     return policy, mcts_action
 
@@ -404,7 +393,7 @@ class MCTSBot(pyspiel.Bot):
     Returns:
       The most visited move from the root node.
     """
-    assert state.current_player() == self.player
+    root_player = state.current_player()
     root = SearchNode(None, state.current_player(), 1)
     for _ in range(self.max_simulations):
       visit_path, working_state = self._apply_tree_policy(root, state)
@@ -417,7 +406,7 @@ class MCTSBot(pyspiel.Bot):
         solved = False
 
       for node in reversed(visit_path):
-        node.total_reward += returns[self.player if node.player ==
+        node.total_reward += returns[root_player if node.player ==
                                      pyspiel.PlayerId.CHANCE else node.player]
         node.explore_count += 1
 

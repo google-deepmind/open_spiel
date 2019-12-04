@@ -407,9 +407,9 @@ PYBIND11_MODULE(pyspiel, m) {
 
   py::class_<algorithms::MCTSBot, Bot>(m, "MCTSBot")
       .def(
-          py::init<const Game&, Player, Evaluator*, double, int, int64_t, bool,
+          py::init<const Game&, Evaluator*, double, int, int64_t, bool,
                    int, bool, ::open_spiel::algorithms::ChildSelectionPolicy>(),
-          py::arg("game"), py::arg("player"), py::arg("evaluator"),
+          py::arg("game"), py::arg("evaluator"),
           py::arg("uct_c"), py::arg("max_simulations"),
           py::arg("max_memory_mb"), py::arg("solve"), py::arg("seed"),
           py::arg("verbose"),
