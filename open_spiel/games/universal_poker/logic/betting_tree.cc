@@ -39,12 +39,12 @@ BettingNode::NodeType BettingNode::GetNodeType()
   return nodeType_;
 }
 
-void BettingNode::ApplyChoiceAction(ActionType actionType) {
+void BettingNode::ApplyChoiceAction(ActionType action_type) {
   assert(nodeType_ == NODE_TYPE_CHOICE);
-  assert((possibleActions_ & actionType) > 0);
+  assert((possibleActions_ & action_type) > 0);
 
-  actionSequence_ += (char)actions[actionType];
-  switch (actionType) {
+  actionSequence_ += (char)actions[action_type];
+  switch (action_type) {
     case ACTION_FOLD:
       DoAction(ACPC_FOLD, 0);
       break;

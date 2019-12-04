@@ -19,9 +19,7 @@
 #include <string>
 
 #include "open_spiel/abseil-cpp/absl/strings/string_view.h"
-#include "open_spiel/spiel_utils.h"
 
-// These are defined in ACPC game.cc
 constexpr absl::string_view kSuitChars = "cdhs";
 constexpr absl::string_view kRankChars = "23456789TJQKA";
 
@@ -30,9 +28,7 @@ extern "C" {
 #include "open_spiel/games/universal_poker/acpc/project_acpc_server/game.h"
 }
 
-namespace open_spiel {
-namespace universal_poker {
-namespace logic {
+namespace open_spiel::universal_poker::logic {
 
 using I = uint64_t;
 
@@ -44,13 +40,10 @@ I bit_twiddle_permute(I v) {
   return w;
 }
 
-// The string should be a sequence of <Rank><Suit>, e.g. 4h for 4 of Heart.
-CardSet::CardSet(std::string card_str) : cs() {
-  SPIEL_CHECK_EQ( card_str.size() % 2, 0);
-
-  for (int i = 0; i < card_str.size(); i += 2) {
-    char rankChr = card_str[i];
-    char suitChr = card_str[i + 1];
+CardSet::CardSet(std::string cardString) : cs() {
+  for (int i = 0; i < cardString.size(); i += 2) {
+    char rankChr = cardString[i];
+    char suitChr = cardString[i + 1];
 
     uint8_t rank = (uint8_t)(kRankChars.find(rankChr));
     uint8_t suit = (uint8_t)(kSuitChars.find(suitChr));
@@ -60,7 +53,7 @@ CardSet::CardSet(std::string card_str) : cs() {
 }
 
 CardSet::CardSet(std::vector<int> cards) : cs() {
-  for (int i = 0; i < cards.size(); i++) {
+  for (int i = 0; i < cards.size(); ++i) {
     int rank = rankOfCard(cards[i]);
     int suit = suitOfCard(cards[i]);
 
@@ -68,18 +61,9 @@ CardSet::CardSet(std::vector<int> cards) : cs() {
   }
 }
 
-CardSet::CardSet(uint8_t *cards, int size) : cs() {
-  for (int i = 0; i < size; i++) {
-    int rank = rankOfCard(cards[i]);
-    int suit = suitOfCard(cards[i]);
-
-    cs.bySuit[suit] |= ((uint16_t)1 << rank);
-  }
-}
-
-CardSet::CardSet(uint16_t numSuits, uint16_t numRanks) : cs() {
-  for (uint16_t r = 0; r < numRanks; r++) {
-    for (uint16_t s = 0; s < numSuits; s++) {
+CardSet::CardSet(uint16_t num_suits, uint16_t num_ranks) : cs() {
+  for (uint16_t r = 0; r < num_ranks; r++) {
+    for (uint16_t s = 0; s < num_suits; s++) {
       cs.bySuit[s] |= ((uint16_t)1 << r);
     }
   }
@@ -130,21 +114,17 @@ void CardSet::RemoveCard(uint8_t card) {
 
 uint32_t CardSet::CountCards() const { return __builtin_popcountl(cs.cards); }
 
-int CardSet::RankCards() {
-  Cardset csNative;
+int CardSet::RankCards() const {
+  ::Cardset csNative;
   csNative.cards = cs.cards;
   return rankCardset(csNative);
-}
-
-bool CardSet::IsBlocking(CardSet other) {
-  return (cs.cards & other.cs.cards) > 0;
 }
 
 std::vector<CardSet> CardSet::SampleCards(int nbCards) {
   std::vector<CardSet> combinations;
 
   uint64_t p = 0;
-  for (int i = 0; i < nbCards; i++) {
+  for (int i = 0; i < nbCards; ++i) {
     p += (1 << i);
   }
 
@@ -167,6 +147,4 @@ bool CardSet::ContainsCards(uint8_t card) {
   return (cs.bySuit[suit] & ((uint16_t)1 << rank)) > 0;
 }
 
-}  // namespace logic
-}  // namespace universal_poker
-}  // namespace open_spiel
+}  // namespace open_spiel::universal_poker::logic

@@ -61,7 +61,7 @@ class BettingNode : public acpc_cpp::ACPCState {
   const uint32_t& GetPossibleActionsMask() const;
   const int GetPossibleActionCount() const;
 
-  void ApplyChoiceAction(ActionType actionType);
+  void ApplyChoiceAction(ActionType action_type);
   virtual void ApplyDealCards();
   std::string ToString() const;
   int GetDepth();
