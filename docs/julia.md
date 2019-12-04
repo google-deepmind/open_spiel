@@ -66,3 +66,21 @@ run_once("tic_tac_toe")
 run_once("kuhn_poker")
 run_once("goofspiel(imp_info=True,num_cards=4,points_order=descending)")
 ```
+
+## Q&A
+
+1. Why is this package named `OpenSpiel_jll` but not `OpenSpiel`?
+
+    The reason is that we plan to use [BinaryBuilder](https://github.com/JuliaPackaging/BinaryBuilder.jl) for the building process once the dependencies and APIs are stable. So by convention, this package is named `OpenSpiel_jll`. Another package named `OpenSpiel` will be registered later.
+
+1. What is `StdVector`?
+
+    `StdVector` is introduced in [CxxWrap.jl](https://github.com/JuliaInterop/CxxWrap.jl) recently. It is a wrapper of `std::vector` in the C++ side. Since that it is a subtype of `AbstractVector`, most functions should just work out of the box.
+
+1. `0-based` or `1-based`?
+
+    Considering that this package is very low level, most APIs are `0-based` to keep the code concise and consistent. Especially take care of the `Player` id which starts from `0`. And it wouldn't surprise you that some types from the Julia side, like `StdVector`, are `1-based`.
+
+1. I can't find the `xxx` function/type in the Julia wrapper/The program exits unexpectedly.
+
+    Although most of the functions and types should be exported, there is still a chance that some APIs are not well tested. So if you encounter any error, please do not hesitate to create an issue.
