@@ -34,11 +34,6 @@ BettingNode::BettingNode(acpc_cpp::ACPCGame* acpc_game)
       nbHoleCardsDealtPerPlayer_{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
       nbBoardCardsDealt_(0) {}
 
-BettingNode::NodeType BettingNode::GetNodeType()
-    const {
-  return nodeType_;
-}
-
 void BettingNode::ApplyChoiceAction(ActionType action_type) {
   assert(nodeType_ == NODE_TYPE_CHOICE);
   assert((possibleActions_ & action_type) > 0);
@@ -71,8 +66,7 @@ void BettingNode::ApplyDealCards() {
   actionSequence_ += 'd';
 
   for (uint8_t p = 0; p < acpc_game_->GetNbPlayers(); p++) {
-    if (nbHoleCardsDealtPerPlayer_[p] <
-        acpc_game_->GetNbHoleCardsRequired()) {
+    if (nbHoleCardsDealtPerPlayer_[p] < acpc_game_->GetNbHoleCardsRequired()) {
       nbHoleCardsDealtPerPlayer_[p]++;
       _CalculateActionsAndNodeType();
       return;
@@ -114,8 +108,7 @@ void BettingNode::_CalculateActionsAndNodeType() {
         return;
       }
     }
-    if (nbBoardCardsDealt_ <
-        acpc_game_->GetNbBoardCardsRequired(GetRound())) {
+    if (nbBoardCardsDealt_ < acpc_game_->GetNbBoardCardsRequired(GetRound())) {
       nodeType_ = NODE_TYPE_CHANCE;
       possibleActions_ = ACTION_DEAL;
       return;
@@ -199,9 +192,7 @@ int BettingNode::GetDepth() {
   return 1 + maxDepth;
 }
 
-std::string BettingNode::GetActionSequence() const {
-  return actionSequence_;
-}
+std::string BettingNode::GetActionSequence() const { return actionSequence_; }
 
 bool BettingNode::IsFinished() const {
   bool finished = nodeType_ == NODE_TYPE_TERMINAL_SHOWDOWN ||
@@ -212,8 +203,8 @@ bool BettingNode::IsFinished() const {
 }
 
 const int BettingNode::GetPossibleActionCount() const {
-  int result = __builtin_popcount(possibleActions_);
-  return result;
+  // _builtin_popcount(int) function is used to count the number of one's
+  return __builtin_popcount(possibleActions_);
 }
 
 const uint32_t& BettingNode::GetPossibleActionsMask() const {

@@ -17,30 +17,31 @@
 
 #include "open_spiel/games/universal_poker/logic/betting_tree.h"
 #include "open_spiel/games/universal_poker/logic/card_set.h"
+#include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
 namespace universal_poker {
 namespace logic {
 
-
 class GameNode : public BettingNode {
  public:
   GameNode(acpc_cpp::ACPCGame* acpc_game);
 
-  uint32_t GetActionCount() const;
+  int GetActionCount() const { return action_count_; }
   void ApplyAction(uint32_t actionIdx);
   std::string ToString() const;
 
-  const CardSet& GetBoardCards() const;
-  const CardSet& GetHoleCardsOfPlayer(uint8_t player) const;
-  double GetTotalReward(uint8_t player) const;
+  const CardSet& GetBoardCards() const { return board_cards_; }
+  const CardSet& GetHoleCardsOfPlayer(Player player) const;
+  double GetTotalReward(Player player) const;
 
  private:
-  acpc_cpp::ACPCGame* acpc_game_;
-  CardSet deck_;
-  uint32_t actionCount_;
-  std::vector<CardSet> holeCards_;
-  CardSet boardCards_;
+  CardSet deck_;  // The remaining cards to deal.
+  // Memoize the number of available actions at this node (recomputed after
+  // each action).
+  int action_count_;
+  std::vector<CardSet> hole_cards_;  // The cards already owned by each player
+  CardSet board_cards_;
 };
 
 }  // namespace logic

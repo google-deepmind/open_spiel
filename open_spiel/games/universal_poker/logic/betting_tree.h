@@ -24,7 +24,7 @@ namespace open_spiel {
 namespace universal_poker {
 namespace logic {
 
-constexpr uint8_t MAX_PLAYERS = 10;
+constexpr uint8_t kMaxUniversalPokerPlayers = 10;
 
 // Returns how many actions are available at a choice node (3 when limit
 // and 4 for no limit).
@@ -33,7 +33,6 @@ constexpr uint8_t MAX_PLAYERS = 10;
 inline uint32_t GetMaxBettingActions(const acpc_cpp::ACPCGame& acpc_game) {
   return acpc_game.IsLimitGame() ? 3 : 4;
 }
-
 
 class BettingNode : public acpc_cpp::ACPCState {
  public:
@@ -56,7 +55,7 @@ class BettingNode : public acpc_cpp::ACPCState {
 
   BettingNode(acpc_cpp::ACPCGame* acpc_game);
 
-  NodeType GetNodeType() const;
+  NodeType GetNodeType() const { return nodeType_; }
 
   const uint32_t& GetPossibleActionsMask() const;
   const int GetPossibleActionCount() const;
@@ -68,15 +67,17 @@ class BettingNode : public acpc_cpp::ACPCState {
   std::string GetActionSequence() const;
   bool IsFinished() const;
 
- private:
+ protected:
   acpc_cpp::ACPCGame* acpc_game_;
+
+ private:
   NodeType nodeType_;
   uint32_t possibleActions_;
   int32_t potSize_;
   int32_t allInSize_;
   std::string actionSequence_;
 
-  uint8_t nbHoleCardsDealtPerPlayer_[MAX_PLAYERS];
+  uint8_t nbHoleCardsDealtPerPlayer_[kMaxUniversalPokerPlayers];
   uint8_t nbBoardCardsDealt_;
 
   void _CalculateActionsAndNodeType();

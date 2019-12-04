@@ -26,16 +26,25 @@ namespace universal_poker {
 namespace logic {
 
 void BasicGameTreeTests() {
-  const std::string gameDesc(
-      "GAMEDEF\nnolimit\nnumPlayers = 2\nnumRounds = 2\nstack = 1200 "
-      "1200\nblind = 100 100\nfirstPlayer = 1 1\nnumSuits = 2\nnumRanks = "
-      "3\nnumHoleCards = 1\nnumBoardCards = 0 1\nEND GAMEDEF");
+  const std::string gamedef(
+      "GAMEDEF\n"
+      "nolimit\n"
+      "numPlayers = 2\n"
+      "numRounds = 2\n"
+      "stack = 1200 1200\n"
+      "blind = 100 100\n"
+      "firstPlayer = 1 1\n"
+      "numSuits = 2\n"
+      "numRanks = 3\n"
+      "numHoleCards = 1\n"
+      "numBoardCards = 0 1\n"
+      "END GAMEDEF");
 
-  acpc_cpp::ACPCGame acpc_game(gameDesc);
+  acpc_cpp::ACPCGame acpc_game(gamedef);
 
   std::srand(std::time(nullptr));
 
-  for (int i = 0; i < 100; i++) {
+  for (int i = 0; i < 100; ++i) {
     GameNode node(&acpc_game);
     std::cout << node.ToString() << std::endl;
     while (!node.IsFinished()) {
@@ -50,16 +59,25 @@ void BasicGameTreeTests() {
 }
 
 void HoldemGameTreeTests() {
-  const std::string gameDescHoldem(
-      "GAMEDEF\nnolimit\nnumPlayers = 2\nnumRounds = 4\nstack = 20000 "
-      "20000\nblind = 100 50\nfirstPlayer = 2 1 1 1\nnumSuits = 4\nnumRanks = "
-      "13\nnumHoleCards = 2\nnumBoardCards = 0 3 1 1\nEND GAMEDEF");
-
-  acpc_cpp::ACPCGame acpc_game(gameDescHoldem);
+  // This is the "holdem.nolimit.2p.reverse_blinds.game" ACPC example.
+  const std::string holdem_nolimit_2p_reverse_blinds(
+      "GAMEDEF\n"
+      "nolimit\n"
+      "numPlayers = 2\n"
+      "numRounds = 4\n"
+      "stack = 20000 20000\n"
+      "blind = 100 50\n"
+      "firstPlayer = 2 1 1 1\n"
+      "numSuits = 4\n"
+      "numRanks = 13\n"
+      "numHoleCards = 2\n"
+      "numBoardCards = 0 3 1 1\n"
+      "END GAMEDEF");
+  acpc_cpp::ACPCGame acpc_game(holdem_nolimit_2p_reverse_blinds);
 
   std::srand(std::time(nullptr));
 
-  for (int i = 0; i < 100; i++) {
+  for (int i = 0; i < 100; ++i) {
     GameNode node(&acpc_game);
     while (!node.IsFinished()) {
       uint32_t actions = node.GetActionCount();

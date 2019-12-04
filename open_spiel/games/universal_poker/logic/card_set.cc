@@ -112,7 +112,7 @@ void CardSet::RemoveCard(uint8_t card) {
   cs.bySuit[suit] ^= ((uint16_t)1 << rank);
 }
 
-uint32_t CardSet::CountCards() const { return __builtin_popcountl(cs.cards); }
+int CardSet::CountCards() const { return __builtin_popcountl(cs.cards); }
 
 int CardSet::RankCards() const {
   ::Cardset csNative;

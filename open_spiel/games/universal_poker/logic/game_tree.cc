@@ -18,23 +18,20 @@
 
 #include <sstream>
 
+#include "open_spiel/spiel_utils.h"
+
 namespace open_spiel {
 namespace universal_poker {
 namespace logic {
 
 GameNode::GameNode(acpc_cpp::ACPCGame* acpc_game)
-
     : BettingNode(acpc_game),
-      acpc_game_(acpc_game),
-      deck_(acpc_game->NumSuitsDeck(), acpc_game->NumRanksDeck()),
-      actionCount_(GetPossibleActionCount()) {
-  for (uint8_t p = 0; p < acpc_game_->GetNbPlayers(); p++) {
-    holeCards_.emplace_back();
-  }
-
-  if (GetNodeType() == NODE_TYPE_CHANCE) {
-    actionCount_ = deck_.ToCardArray().size();
-  }
+      deck_(/*num_suits=*/acpc_game->NumSuitsDeck(),
+            /*num_ranks=*/acpc_game->NumRanksDeck()),
+      action_count_(GetPossibleActionCount()),
+      hole_cards_(acpc_game_->GetNbPlayers()) {
+  SPIEL_CHECK_EQ(GetNodeType(), NODE_TYPE_CHANCE);
+  action_count_ = deck_.ToCardArray().size();
 }
 
 void GameNode::ApplyAction(uint32_t actionIdx) {
@@ -45,15 +42,15 @@ void GameNode::ApplyAction(uint32_t actionIdx) {
 
     // Check where to add this card
     for (uint8_t p = 0; p < acpc_game_->GetNbPlayers(); p++) {
-      if (holeCards_[p].CountCards() < acpc_game_->GetNbHoleCardsRequired()) {
-        holeCards_[p].AddCard(card);
+      if (hole_cards_[p].CountCards() < acpc_game_->GetNbHoleCardsRequired()) {
+        hole_cards_[p].AddCard(card);
         break;
       }
     }
 
-    if (boardCards_.CountCards() <
+    if (board_cards_.CountCards() <
         acpc_game_->GetNbBoardCardsRequired(GetRound())) {
-      boardCards_.AddCard(card);
+      board_cards_.AddCard(card);
     }
   } else {
     uint32_t idx = 0;
@@ -69,21 +66,20 @@ void GameNode::ApplyAction(uint32_t actionIdx) {
   }
 
   if (GetNodeType() == NODE_TYPE_CHANCE) {
-    actionCount_ = deck_.CountCards();
+    action_count_ = deck_.CountCards();
   } else {
-    actionCount_ = GetPossibleActionCount();
+    action_count_ = GetPossibleActionCount();
   }
 }
-
-uint32_t GameNode::GetActionCount() const { return actionCount_; }
 
 std::string GameNode::ToString() const {
   std::ostringstream buf;
 
   for (uint8_t p = 0; p < acpc_game_->GetNbPlayers(); p++) {
-    buf << "P" << (int)p << " Cards: " << holeCards_[p].ToString() << std::endl;
+    buf << "P" << (int)p << " Cards: " << hole_cards_[p].ToString()
+        << std::endl;
   }
-  buf << "BoardCards " << boardCards_.ToString() << std::endl;
+  buf << "BoardCards " << board_cards_.ToString() << std::endl;
 
   if (GetNodeType() == NODE_TYPE_CHANCE) {
     buf << "PossibleCardsToDeal " << deck_.ToString();
@@ -99,33 +95,33 @@ std::string GameNode::ToString() const {
   return buf.str();
 }
 
-const CardSet& GameNode::GetBoardCards() const { return boardCards_; }
-
-const CardSet& GameNode::GetHoleCardsOfPlayer(uint8_t player) const {
-  assert(player < holeCards_.size());
-  return holeCards_[player];
+const CardSet& GameNode::GetHoleCardsOfPlayer(Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, hole_cards_.size());
+  return hole_cards_[player];
 }
 
-double GameNode::GetTotalReward(uint8_t player) const {
-  assert(player < acpc_game_->GetNbPlayers());
+double GameNode::GetTotalReward(Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, acpc_game_->GetNbPlayers());
   // Copy Board Cards and Hole Cards
-  uint8_t holeCards[10][3], boardCards[7], nbHoleCards[10], nbBoardCards;
+  uint8_t holeCards[10][3], boardCards[7], nbHoleCards[10];
 
-  for (size_t p = 0; p < holeCards_.size(); p++) {
-    auto cards = holeCards_[p].ToCardArray();
-    for (size_t c = 0; c < cards.size(); c++) {
+  for (size_t p = 0; p < hole_cards_.size(); ++p) {
+    auto cards = hole_cards_[p].ToCardArray();
+    for (size_t c = 0; c < cards.size(); ++c) {
       holeCards[p][c] = cards[c];
     }
     nbHoleCards[p] = cards.size();
   }
 
-  auto bc = boardCards_.ToCardArray();
-  for (size_t c = 0; c < bc.size(); c++) {
+  auto bc = board_cards_.ToCardArray();
+  for (size_t c = 0; c < bc.size(); ++c) {
     boardCards[c] = bc[c];
   }
-  nbBoardCards = bc.size();
 
-  SetHoleAndBoardCards(holeCards, boardCards, nbHoleCards, nbBoardCards);
+  SetHoleAndBoardCards(holeCards, boardCards, nbHoleCards,
+                       /*nbBoardCards=*/bc.size());
 
   return ValueOfState(player);
 }

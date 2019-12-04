@@ -20,21 +20,22 @@
 
 #include "open_spiel/games/universal_poker/acpc_cpp/acpc_game.h"
 
-namespace open_spiel::universal_poker::logic {
+namespace open_spiel {
+namespace universal_poker {
+namespace logic {
 
 void BasicBettingTreeTests(const std::string gameDesc) {
   acpc_cpp::ACPCGame acpc_game(gameDesc);
 
   std::srand(std::time(nullptr));
 
-  for (int i = 0; i < 100; i++) {
+  for (int i = 0; i < 100; ++i) {
     BettingNode bettingNode(&acpc_game);
     std::cout << "INIT. DEPTH: " << bettingNode.GetDepth() << std::endl;
     std::cout << bettingNode.ToString() << std::endl;
 
     while (!bettingNode.IsFinished()) {
-      if (bettingNode.GetNodeType() ==
-          BettingNode::NODE_TYPE_CHANCE) {
+      if (bettingNode.GetNodeType() == BettingNode::NODE_TYPE_CHANCE) {
         bettingNode.ApplyDealCards();
       } else {
         uint32_t actionIdx = std::rand() % bettingNode.GetPossibleActionCount();
@@ -55,20 +56,38 @@ void BasicBettingTreeTests(const std::string gameDesc) {
   }
 }
 
-}  // namespace open_spiel::universal_poker::logic
+}  // namespace logic
+}  // namespace universal_poker
+}  // namespace open_spiel
 
 int main(int argc, char **argv) {
   const std::string gameDesc(
-      "GAMEDEF\nnolimit\nnumPlayers = 2\nnumRounds = 2\nstack = 1200 "
-      "1200\nblind = 100 100\nfirstPlayer = 1 1\nnumSuits = 2\nnumRanks = "
-      "3\nnumHoleCards = 1\nnumBoardCards = 0 1\nEND GAMEDEF");
-
-  // open_spiel::universal_poker::logic::BasicBettingTreeTests(gameDesc);
+      "GAMEDEF\n"
+      "nolimit\n"
+      "numPlayers = 2\n"
+      "numRounds = 2\n"
+      "stack = 1200 1200\n"
+      "blind = 100 100\n"
+      "firstPlayer = 1 1\n"
+      "numSuits = 2\n"
+      "numRanks = 3\n"
+      "numHoleCards = 1\n"
+      "numBoardCards = 0 1\n"
+      "END GAMEDEF");
+  open_spiel::universal_poker::logic::BasicBettingTreeTests(gameDesc);
 
   const std::string gameDescHoldem(
-      "GAMEDEF\nnolimit\nnumPlayers = 2\nnumRounds = 4\nstack = 20000 "
-      "20000\nblind = 100 50\nfirstPlayer = 2 1 1 1\nnumSuits = 4\nnumRanks = "
-      "13\nnumHoleCards = 2\nnumBoardCards = 0 3 1 1\nEND GAMEDEF");
-
+      "GAMEDEF\n"
+      "nolimit\n"
+      "numPlayers = 2\n"
+      "numRounds = 4\n"
+      "stack = 20000 20000\n"
+      "blind = 100 50\n"
+      "firstPlayer = 2 1 1 1\n"
+      "numSuits = 4\n"
+      "numRanks = 13\n"
+      "numHoleCards = 2\n"
+      "numBoardCards = 0 3 1 1\n"
+      "END GAMEDEF");
   open_spiel::universal_poker::logic::BasicBettingTreeTests(gameDescHoldem);
 }

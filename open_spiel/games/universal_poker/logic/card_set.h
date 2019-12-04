@@ -54,8 +54,7 @@ class CardSet {
 
   bool ContainsCards(uint8_t card);
 
-  // TODO(author2): Use int instead of uint32.
-  uint32_t CountCards() const;
+  int CountCards() const;
   // Returns the ranking value of this set of cards as evaluated by ACPC.
   int RankCards() const;
 
