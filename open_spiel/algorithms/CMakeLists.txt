@@ -27,6 +27,8 @@ add_library (algorithms OBJECT
   minimax.cc
   outcome_sampling_mccfr.h
   outcome_sampling_mccfr.cc
+  state_distribution.h
+  state_distribution.cc
   tabular_exploitability.h
   tabular_exploitability.cc
   trajectories.h
@@ -84,10 +86,14 @@ add_executable(outcome_sampling_mccfr_test outcome_sampling_mccfr_test.cc
     $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})
 add_test(outcome_sampling_mccfr_test outcome_sampling_mccfr_test)
 
+add_executable(state_distribution_test state_distribution_test.cc
+    $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})
+add_test(state_distribution_test state_distribution_test)
+
 add_executable(tabular_exploitability_test tabular_exploitability_test.cc
-        $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})
+    $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})
 add_test(tabular_exploitability_test tabular_exploitability_test)
 
 add_executable(trajectories_test trajectories_test.cc
-        $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})
+    $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})
 add_test(trajectories_test trajectories_test)
