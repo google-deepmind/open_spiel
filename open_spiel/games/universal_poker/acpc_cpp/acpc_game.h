@@ -15,15 +15,16 @@
 #ifndef OPEN_SPIEL_ACPC_GAME_H
 #define OPEN_SPIEL_ACPC_GAME_H
 
-static const int STRING_BUFFERSIZE = 4096;
-
 #include <memory>
 #include <string>
 
-namespace open_spiel::universal_poker::acpc_cpp {
-struct Game;
-struct State;
-struct Action;
+namespace open_spiel {
+namespace universal_poker {
+namespace acpc_cpp {
+
+struct RawACPCGame;
+struct RawACPCState;
+struct RawACPCAction;
 
 class ACPCGame {
  public:
@@ -33,7 +34,7 @@ class ACPCGame {
 
    public:
     ACPCState(ACPCGame* game);
-    ACPCState(const ACPCState& game);
+    ACPCState(const ACPCState& other);
     virtual ~ACPCState();
 
     void SetHoleAndBoardCards(uint8_t holeCards[10][3], uint8_t boardCards[7],
@@ -42,7 +43,7 @@ class ACPCGame {
 
     uint8_t CurrentPlayer() const;
 
-    virtual bool IsFinished() const;
+    bool IsFinished() const;
     int RaiseIsValid(int32_t* minSize, int32_t* maxSize) const;
     int IsValidAction(const ACPCActionType actionType,
                       const int32_t size) const;
@@ -58,12 +59,12 @@ class ACPCGame {
 
    private:
     ACPCGame* game_;
-    std::unique_ptr<State> acpcState_;
+    std::unique_ptr<RawACPCState> acpcState_;
   };
 
  public:
   ACPCGame(const std::string& gameDef);
-  ACPCGame(const ACPCGame& game);
+  ACPCGame(const ACPCGame& other);
   virtual ~ACPCGame();
 
   std::string ToString() const;
@@ -78,11 +79,14 @@ class ACPCGame {
   uint32_t BlindSize(uint8_t player) const;
   uint8_t GetTotalNbBoardCards() const;
 
- private:
   uint32_t handId_;
-  std::unique_ptr<Game> acpcGame_;
+
+ private:
+  std::unique_ptr<RawACPCGame> acpc_game_;
 };
 
-}  // namespace open_spiel::universal_poker::acpc_cpp
+}  // namespace acpc_cpp
+}  // namespace universal_poker
+}  // namespace open_spiel
 
 #endif  // OPEN_SPIEL_ACPC_GAME_H

@@ -19,9 +19,14 @@
 #include <string>
 #include <vector>
 
-namespace open_spiel::universal_poker::logic {
+namespace open_spiel {
+namespace universal_poker {
+namespace logic {
+
 constexpr int MAX_SUITS = 4;
 
+// This is an equivalent of the ACPC evalHandTables.Cardset struct.
+// A card is defined by the integer <rank> * MAX_SUITS + <suit>
 class CardSet {
  public:
   union CardSetUnion {
@@ -31,7 +36,7 @@ class CardSet {
   } cs;
 
  public:
-  CardSet();
+  CardSet() : cs() {}
   CardSet(std::string cardString);
   CardSet(std::vector<int> cards);
   CardSet(uint8_t cards[], int size);
@@ -42,7 +47,7 @@ class CardSet {
 
   void AddCard(uint8_t card);
   void RemoveCard(uint8_t card);
-  bool ContainsCards(const uint8_t &i);
+  bool ContainsCards(const uint8_t &card);
 
   uint32_t CountCards() const;
   int RankCards();
@@ -51,6 +56,8 @@ class CardSet {
   std::vector<CardSet> SampleCards(int nbCards);
 };
 
-}  // namespace open_spiel::universal_poker::logic
+}  // namespace logic
+}  // namespace universal_poker
+}  // namespace open_spiel
 
 #endif  // OPEN_SPIEL_CARD_SET_H

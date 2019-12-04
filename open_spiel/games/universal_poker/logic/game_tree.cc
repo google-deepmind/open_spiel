@@ -18,8 +18,12 @@
 
 #include <sstream>
 
-namespace open_spiel::universal_poker::logic {
+namespace open_spiel {
+namespace universal_poker {
+namespace logic {
+
 GameTree::GameNode::GameNode(logic::GameTree* gameTree)
+
     : BettingNode(gameTree),
       gameTree_(gameTree),
       deck_(gameTree->NumSuitsDeck(), gameTree->NumRanksDeck()),
@@ -128,4 +132,6 @@ double GameTree::GameNode::GetTotalReward(uint8_t player) const {
 
 GameTree::GameTree(const std::string& gameDef) : BettingTree(gameDef) {}
 
-}  // namespace open_spiel::universal_poker::logic
+}  // namespace logic
+}  // namespace universal_poker
+}  // namespace open_spiel

@@ -62,8 +62,8 @@ class UniversalPokerState : public State {
   void DoApplyAction(Action action_id) override;
 
  private:
-  logic::GameTree *gameTree_;
-  logic::GameTree::GameNode gameNode_;
+  logic::GameTree *game_tree_;
+  logic::GameTree::GameNode game_node_;
 };
 
 class UniversalPokerGame : public Game {
@@ -76,7 +76,7 @@ class UniversalPokerGame : public Game {
   double MinUtility() const override;
   double MaxUtility() const override;
   int MaxChanceOutcomes() const override;
-  double UtilitySum() const override;
+  double UtilitySum() const override { return 0; }
   std::shared_ptr<const Game> Clone() const override;
   std::vector<int> InformationStateTensorShape() const override;
   std::vector<int> ObservationTensorShape() const override;
@@ -84,7 +84,7 @@ class UniversalPokerGame : public Game {
 
  private:
   std::string gameDesc_;
-  logic::GameTree gameTree_;
+  logic::GameTree game_tree_;
 
  public:
   logic::GameTree *GetGameTree();

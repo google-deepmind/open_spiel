@@ -19,7 +19,9 @@
 #include <string>
 
 #include "open_spiel/abseil-cpp/absl/strings/string_view.h"
+#include "open_spiel/spiel_utils.h"
 
+// These are defined in ACPC game.cc
 constexpr absl::string_view kSuitChars = "cdhs";
 constexpr absl::string_view kRankChars = "23456789TJQKA";
 
@@ -28,7 +30,10 @@ extern "C" {
 #include "open_spiel/games/universal_poker/acpc/project_acpc_server/game.h"
 }
 
-namespace open_spiel::universal_poker::logic {
+namespace open_spiel {
+namespace universal_poker {
+namespace logic {
+
 using I = uint64_t;
 
 auto dump(I v) { return std::bitset<sizeof(I) * __CHAR_BIT__>(v); }
@@ -39,12 +44,13 @@ I bit_twiddle_permute(I v) {
   return w;
 }
 
-CardSet::CardSet() : cs() {}
+// The string should be a sequence of <Rank><Suit>, e.g. 4h for 4 of Heart.
+CardSet::CardSet(std::string card_str) : cs() {
+  SPIEL_CHECK_EQ( card_str.size() % 2, 0);
 
-CardSet::CardSet(std::string cardString) : cs() {
-  for (int i = 0; i < cardString.size(); i += 2) {
-    char rankChr = cardString[i];
-    char suitChr = cardString[i + 1];
+  for (int i = 0; i < card_str.size(); i += 2) {
+    char rankChr = card_str[i];
+    char suitChr = card_str[i + 1];
 
     uint8_t rank = (uint8_t)(kRankChars.find(rankChr));
     uint8_t suit = (uint8_t)(kSuitChars.find(suitChr));
@@ -161,4 +167,6 @@ bool CardSet::ContainsCards(const uint8_t &card) {
   return (cs.bySuit[suit] & ((uint16_t)1 << rank)) > 0;
 }
 
-}  // namespace open_spiel::universal_poker::logic
+}  // namespace logic
+}  // namespace universal_poker
+}  // namespace open_spiel
