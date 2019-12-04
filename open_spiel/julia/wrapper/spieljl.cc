@@ -95,7 +95,8 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
       std::map<std::string, open_spiel::GameParameter>,
       std::unordered_map<open_spiel::Action, double>,
       std::unordered_map<std::string, open_spiel::Action>,
-      std::unordered_map<std::string, open_spiel::ActionsAndProbs>
+      std::unordered_map<std::string, open_spiel::ActionsAndProbs>,
+      std::unordered_map<std::string, int>
     >([](auto wrapped) {
       typedef typename decltype(wrapped)::type WrappedT;
       typedef typename WrappedT::key_type WrappedKey;
@@ -284,15 +285,22 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
     .constructor<const open_spiel::Game&>()
     .constructor<const std::unordered_map<std::string, open_spiel::ActionsAndProbs>&>()
     .method("get_state_policy", &open_spiel::TabularPolicy::GetStatePolicy)
-    .method("policy_table", &open_spiel::TabularPolicy::PolicyTable);
+    .method("policy_table", &open_spiel::TabularPolicy::PolicyTable)
+    .method("get_state_policy", [](open_spiel::TabularPolicy p, const open_spiel::State& state) { return p.GetStatePolicy(state.InformationStateString()); })
+    .method("get_state_policy", [](open_spiel::TabularPolicy p, const std::string& state) { return p.GetStatePolicy(state); });
 
   jlcxx::stl::apply_stl<open_spiel::TabularPolicy>(mod);
 
-  mod.method("UniformRandomPolicy", &open_spiel::GetUniformPolicy);
+  mod.method("get_empty_tabular_policy", &open_spiel::GetEmptyTabularPolicy);
+  mod.method("get_uniform_policy", &open_spiel::GetUniformPolicy);
+  mod.method("get_random_policy", &open_spiel::GetRandomPolicy);
+  mod.method("get_first_action_policy", &open_spiel::GetFirstActionPolicy);
 
-  mod.method("make_uniform_random_bot", &open_spiel::MakeUniformRandomBot);
-  mod.method("make_fixed_action_preference_bot", &open_spiel::MakeFixedActionPreferenceBot);
-  mod.method("make_policy_bot", [](const open_spiel::Game& game, open_spiel::Player pid, int seed, open_spiel::Policy policy) { return open_spiel::MakePolicyBot(game, pid, seed, std::make_unique<open_spiel::Policy>(policy)); });
+  // !!! Bots bellow are not exported directly in c++
+  // !!! which makes it hard to dispatch overriden methods
+  // mod.method("make_uniform_random_bot", &open_spiel::MakeUniformRandomBot);
+  // mod.method("make_fixed_action_preference_bot", &open_spiel::MakeFixedActionPreferenceBot);
+  // mod.method("make_policy_bot", [](const open_spiel::Game& game, open_spiel::Player pid, int seed, open_spiel::Policy policy) { return open_spiel::MakePolicyBot(game, pid, seed, std::make_unique<open_spiel::Policy>(policy)); });
 
   // !!! just a workaround here
   mod.add_type<std::pair<std::shared_ptr<const open_spiel::Game>, std::unique_ptr<open_spiel::State>>>("GameStatePair")
@@ -302,12 +310,12 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
   mod.method("serialize_game_and_state", &open_spiel::SerializeGameAndState);
   mod.method("_deserialize_game_and_state", &open_spiel::DeserializeGameAndState);
 
-  mod.add_type<open_spiel::algorithms::Evaluator>("Evaluator")
-    .method("evaluate", &open_spiel::algorithms::Evaluator::Evaluate)
-    .method("prior", &open_spiel::algorithms::Evaluator::Prior);
+  mod.add_type<open_spiel::algorithms::Evaluator>("Evaluator");
 
   mod.add_type<open_spiel::algorithms::RandomRolloutEvaluator>("RandomRolloutEvaluator", jlcxx::julia_type<open_spiel::algorithms::Evaluator>())
-    .constructor<int, int>();
+    .constructor<int, int>()
+    .method("evaluate", &open_spiel::algorithms::Evaluator::Evaluate)
+    .method("prior", &open_spiel::algorithms::Evaluator::Prior);
 
   mod.add_bits<open_spiel::algorithms::ChildSelectionPolicy>("ChildSelectionPolicy", jlcxx::julia_type("CppEnum"));
   mod.set_const("UCT", open_spiel::algorithms::ChildSelectionPolicy::UCT);
@@ -320,14 +328,35 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
     .method("compare_final", &open_spiel::algorithms::SearchNode::CompareFinal)
     .method("best_child", &open_spiel::algorithms::SearchNode::BestChild)
     .method("to_string", &open_spiel::algorithms::SearchNode::ToString)
-    .method("children_str", &open_spiel::algorithms::SearchNode::ChildrenStr);
+    .method("children_str", &open_spiel::algorithms::SearchNode::ChildrenStr)
+    // TODO: https://github.com/JuliaInterop/CxxWrap.jl/issues/90
+    .method("get_action", [](open_spiel::algorithms::SearchNode& sn) { return sn.action; })
+    .method("get_prior", [](open_spiel::algorithms::SearchNode& sn) { return sn.prior; })
+    .method("get_player", [](open_spiel::algorithms::SearchNode& sn) { return sn.player; })
+    .method("get_explore_count", [](open_spiel::algorithms::SearchNode& sn) { return sn.explore_count; })
+    .method("get_total_reward", [](open_spiel::algorithms::SearchNode& sn) { return sn.total_reward; })
+    .method("get_outcome", [](open_spiel::algorithms::SearchNode& sn) { return sn.outcome; })
+    .method("set_action!", [](open_spiel::algorithms::SearchNode& sn, open_spiel::Action action) { sn.action = action; })
+    .method("set_prior!", [](open_spiel::algorithms::SearchNode& sn, double prior) { sn.prior = prior; })
+    .method("set_player!", [](open_spiel::algorithms::SearchNode& sn, open_spiel::Player player) { sn.player = player; })
+    .method("set_explore_count!", [](open_spiel::algorithms::SearchNode& sn, int explore_count) { sn.explore_count = explore_count; })
+    .method("set_total_reward!", [](open_spiel::algorithms::SearchNode& sn, double total_reward) { sn.total_reward = total_reward; })
+    .method("set_outcome!", [](open_spiel::algorithms::SearchNode& sn, std::vector<double> outcome) { sn.outcome = outcome; });
 
-  jlcxx::stl::apply_stl<open_spiel::algorithms::SearchNode*>(mod);
+  jlcxx::stl::apply_stl<open_spiel::algorithms::SearchNode>(mod);
+
+  mod.method("get_children", [](open_spiel::algorithms::SearchNode& sn) { return sn.children; });
+  mod.method("set_children!", [](open_spiel::algorithms::SearchNode& sn, std::vector<open_spiel::algorithms::SearchNode> children) { sn.children = children; });
 
   mod.add_type<open_spiel::algorithms::MCTSBot>("MCTSBot", jlcxx::julia_type<open_spiel::Bot>())
     .constructor<const open_spiel::Game&, open_spiel::Player, open_spiel::algorithms::Evaluator*, double, int, int64_t, bool, int, bool, open_spiel::algorithms::ChildSelectionPolicy>()
+    .method("restart", &open_spiel::algorithms::MCTSBot::Restart)
+    .method("restart_at", &open_spiel::algorithms::MCTSBot::RestartAt)
     .method("step", &open_spiel::algorithms::MCTSBot::Step)
+    .method("step_with_policy", &open_spiel::algorithms::MCTSBot::StepWithPolicy)
     .method("mcts_search", &open_spiel::algorithms::MCTSBot::MCTSearch);
+
+  jlcxx::stl::apply_stl<open_spiel::algorithms::MCTSBot*>(mod);
 
   mod.add_type<open_spiel::algorithms::TabularBestResponse>("TabularBestResponse")
     .constructor<const open_spiel::Game&, open_spiel::Player, const open_spiel::Policy* >()
@@ -351,9 +380,8 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
     .constructor<const open_spiel::Game&>();
 
   mod.add_type<open_spiel::algorithms::CFRBRSolver>("CFRBRSolver", jlcxx::julia_type<open_spiel::algorithms::CFRSolverBase>())
-    .constructor<const open_spiel::Game&>();
-
-  mod.add_type<std::unordered_map<std::string, int>>("StateToIndex");
+    .constructor<const open_spiel::Game&>()
+    .method("evaluate_and_update_policy", &open_spiel::algorithms::CFRSolver::EvaluateAndUpdatePolicy);
 
   mod.add_type<open_spiel::algorithms::TrajectoryRecorder>("TrajectoryRecorder")
     .constructor<const open_spiel::Game&, const std::unordered_map<std::string, int>&, int>();

@@ -134,4 +134,15 @@ end
     @test history(state) == history(state2)
 end
 
+@testset "Matrixrame" begin
+    matrix_blotto = load_matrix_game("blotto")
+    @test num_rows(matrix_blotto) == 66
+    @test num_cols(matrix_blotto) == 66
+
+    kuhn_game = load_game("kuhn_poker")
+    kuhn_matrix_game = extensive_to_matrix_game(kuhn_game)
+    @test num_rows(kuhn_matrix_game) == 64
+    @test num_cols(kuhn_matrix_game) == 64
+end
+
 end

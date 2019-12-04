@@ -115,6 +115,8 @@ struct SearchNode {
   std::vector<double> outcome;  // The reward if each players plays perfectly.
   std::vector<SearchNode> children;  // The successors to this state.
 
+  SearchNode() {}
+
   SearchNode(Action action_, Player player_, double prior_)
       : action(action_), prior(prior_), player(player_) {}
 
