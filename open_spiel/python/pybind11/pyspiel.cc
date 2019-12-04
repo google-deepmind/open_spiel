@@ -594,8 +594,8 @@ PYBIND11_MODULE(pyspiel, m) {
         "Returns a turn-based version of the given game.");
 
   m.def("expected_returns",
-        py::overload_cast<const State&, const std::vector<const Policy*>&, int>(
-            &open_spiel::algorithms::ExpectedReturns),
+        py::overload_cast<const State&, const std::vector<const Policy*>&, int,
+                          bool>(&open_spiel::algorithms::ExpectedReturns),
         "Computes the undiscounted expected returns from a depth-limited "
         "search.");
 

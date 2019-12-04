@@ -62,7 +62,11 @@ fi
 # Optional dependencies.
 DIR="open_spiel/games/hanabi/hanabi-learning-environment"
 if [[ ${BUILD_WITH_HANABI:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; then
-  git clone -b 'master' --single-branch --depth 1 https://github.com/deepmind/hanabi-learning-environment.git ${DIR}
+  git clone -b 'master' --single-branch --depth 15 https://github.com/deepmind/hanabi-learning-environment.git ${DIR}
+  # We checkout a specific CL to prevent future breakage due to changes upstream
+  pushd ${DIR}
+  git checkout  'b31c973'
+  popd
 fi
 
 # The official https://github.com/ethansbrown/acpc was outdated so we forked it and updated it with

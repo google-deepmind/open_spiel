@@ -69,7 +69,7 @@ def _init_bot(bot_type, game, player_id):
   if bot_type == "random":
     return uniform_random.UniformRandomBot(player_id, rng)
   if bot_type == "human":
-    return human.HumanBot(game, player_id)
+    return human.HumanBot()
   raise ValueError("Invalid bot type: %s" % bot_type)
 
 

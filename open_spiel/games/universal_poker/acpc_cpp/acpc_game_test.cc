@@ -27,7 +27,7 @@ void BasicACPCTests() {
       "3\nnumHoleCards = 1\nnumBoardCards = 0 1\nEND GAMEDEF");
 
   ACPCGame game(gameDesc);
-  ACPCGame::ACPCState state(&game);
+  ACPCState state(&game);
 
   std::cout << game.ToString() << std::endl;
   std::cout << state.ToString() << std::endl;
@@ -38,9 +38,9 @@ void BasicACPCTests() {
       minRaise = state.MaxSpend() > minRaise ? state.MaxSpend() : minRaise;
     }
 
-    const ACPCGame::ACPCState::ACPCActionType available_actions[] = {
-        ACPCGame::ACPCState::ACPC_CALL, ACPCGame::ACPCState::ACPC_FOLD,
-        // ACPCGame::ACPCState::ACPC_RAISE
+    const ACPCState::ACPCActionType available_actions[] = {
+        ACPCState::ACPC_CALL, ACPCState::ACPC_FOLD,
+        // ACPCState::ACPC_RAISE
     };
 
     for (const auto &action : available_actions) {

@@ -44,9 +44,9 @@ def _print_columns(strings):
 class HumanBot(pyspiel.Bot):
   """Asks the user which action to play."""
 
-  def step(self, state):
+  def step_with_policy(self, state):
     """Returns the stochastic policy and selected action in the given state."""
-    legal_actions = state.legal_actions(self.player_id())
+    legal_actions = state.legal_actions(state.current_player())
     if not legal_actions:
       return [], pyspiel.INVALID_ACTION
     p = 1 / len(legal_actions)
@@ -82,3 +82,10 @@ class HumanBot(pyspiel.Bot):
         return policy, action
 
       print("Illegal action selected:", action_str)
+
+  def step(self, state):
+    return self.step_with_policy(state)[1]
+
+  def restart_at(self, state):
+    pass
+

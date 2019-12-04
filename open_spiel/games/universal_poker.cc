@@ -14,19 +14,21 @@
 
 #include "open_spiel/games/universal_poker.h"
 
-#include <open_spiel/abseil-cpp/absl/strings/str_format.h>
-
 #include <algorithm>
 #include <array>
 #include <utility>
 
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_format.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_join.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/games/universal_poker/logic/card_set.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
 namespace universal_poker {
+
+const absl::string_view kNoGameDef = "NoGameDef";
 
 const GameType kGameType{
     /*short_name=*/"universal_poker",
@@ -43,7 +45,41 @@ const GameType kGameType{
     /*provides_observation_string=*/true,
     /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
-    {// Number of Players (up to 10)
+    //
+    // The ACPC code uses a specific configuration file to describe the game.
+    // The following has been copied from ACPC documentation:
+    // """
+    // Game definitions can have the following fields (case is ignored):
+    //
+    // gamedef - the starting tag for a game definition
+    // end gamedef - ending tag for a game definition
+    // stack - the stack size for each player at the start of each hand (for
+    //   no-limit)
+    // blind - the size of the blinds for each player (relative to the dealer)
+    // raisesize - the size of raises on each round (for limit games)
+    // limit - specifies a limit game
+    // nolimit - specifies a no-limit game
+    // numplayers - number of players in the game
+    // numrounds - number of betting rounds per hand of the game
+    // firstplayer - the player that acts first (relative to the dealer) on each
+    //   round
+    // maxraises - the maximum number of raises on each round
+    // numsuits - the number of different suits in the deck
+    // numranks - the number of different ranks in the deck
+    // numholecards - the number of private cards to  deal to each player
+    // numboardcards - the number of cards revealed on each round
+    //
+    // Empty lines or lines with '#' as the very first character will be ignored
+    //
+    // If you are creating your own game definitions, please note that game.h
+    // defines some constants for maximums in games (e.g., number of rounds).
+    // These may need to be changed for games outside of the what is being run
+    // for the Annual Computer Poker Competition.
+    // """
+    {// The ACPC gamedef string.  When present, it will take precedence over
+     // everything and no other argument should be provided.
+     {"gamedef", GameParameter(std::string(kNoGameDef))},
+     // Number of Players (up to 10)
      {"players", GameParameter(2)},
      // Betting Type "limit" "nolimit" (currently only nolimit supported)
      {"bettingType", GameParameter(std::string("nolimit"))},
@@ -71,14 +107,14 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 // namespace universal_poker
 UniversalPokerState::UniversalPokerState(std::shared_ptr<const Game> game)
     : State(game),
-      gameTree_(((UniversalPokerGame *)game.get())->GetGameTree()),
-      gameNode_(gameTree_) {}
+      game_tree_(((UniversalPokerGame *)game.get())->GetGameTree()),
+      game_node_(game_tree_) {}
 
 std::string UniversalPokerState::ToString() const {
-  return gameNode_.ToString();
+  return game_node_.ToString();
 }
 
-bool UniversalPokerState::IsTerminal() const { return gameNode_.IsFinished(); }
+bool UniversalPokerState::IsTerminal() const { return game_node_.IsFinished(); }
 
 std::string UniversalPokerState::ActionToString(Player player,
                                                 Action move) const {
@@ -87,13 +123,13 @@ std::string UniversalPokerState::ActionToString(Player player,
 
 Player UniversalPokerState::CurrentPlayer() const {
   if (IsTerminal()) {
-    return Player(kTerminalPlayerId);
+    return kTerminalPlayerId;
   }
-  if (gameNode_.GetNodeType() == logic::GameTree::GameNode::NODE_TYPE_CHANCE) {
-    return Player(kChancePlayerId);
+  if (game_node_.GetNodeType() == logic::GameNode::NODE_TYPE_CHANCE) {
+    return kChancePlayerId;
   }
 
-  return Player(gameNode_.CurrentPlayer());
+  return Player(game_node_.CurrentPlayer());
 }
 
 std::vector<double> UniversalPokerState::Returns() const {
@@ -102,9 +138,9 @@ std::vector<double> UniversalPokerState::Returns() const {
   }
 
   std::vector<double> returns(NumPlayers());
-  for (auto player = Player{0}; player < NumPlayers(); ++player) {
+  for (Player player = 0; player < NumPlayers(); ++player) {
     // Money vs money at start.
-    returns[player] = gameNode_.GetTotalReward(player);
+    returns[player] = game_node_.GetTotalReward(player);
   }
 
   return returns;
@@ -131,23 +167,23 @@ void UniversalPokerState::InformationStateTensor(
   (*values)[player] = 1;
   offset += NumPlayers();
 
-  logic::CardSet deck(gameTree_->NumSuitsDeck(), gameTree_->NumRanksDeck());
+  logic::CardSet deck(game_tree_->NumSuitsDeck(), game_tree_->NumRanksDeck());
   const std::vector<uint8_t> deckCards = deck.ToCardArray();
-  logic::CardSet holeCards = gameNode_.GetHoleCardsOfPlayer(player);
+  logic::CardSet holeCards = game_node_.GetHoleCardsOfPlayer(player);
 
   for (uint32_t i = 0; i < deck.CountCards(); i++) {
     (*values)[i + offset] = holeCards.ContainsCards(deckCards[i]) ? 1.0 : 0.0;
   }
   offset += deck.CountCards();
 
-  logic::CardSet boardCards = gameNode_.GetBoardCards();
+  logic::CardSet boardCards = game_node_.GetBoardCards();
   for (uint32_t i = 0; i < deck.CountCards(); i++) {
     (*values)[i + offset] = boardCards.ContainsCards(deckCards[i]) ? 1.0 : 0.0;
   }
   offset += deck.CountCards();
 
-  std::string actionSeq = gameNode_.GetActionSequence();
-  const int length = gameNode_.GetActionSequence().length();
+  std::string actionSeq = game_node_.GetActionSequence();
+  const int length = game_node_.GetActionSequence().length();
   SPIEL_CHECK_LT(length, game_->MaxGameLength());
 
   for (int i = 0; i < length; ++i) {
@@ -202,16 +238,16 @@ void UniversalPokerState::ObservationTensor(Player player,
   (*values)[player] = 1;
   offset += NumPlayers();
 
-  logic::CardSet deck(gameTree_->NumSuitsDeck(), gameTree_->NumRanksDeck());
+  logic::CardSet deck(game_tree_->NumSuitsDeck(), game_tree_->NumRanksDeck());
   const std::vector<uint8_t> deckCards = deck.ToCardArray();
-  logic::CardSet holeCards = gameNode_.GetHoleCardsOfPlayer(player);
+  logic::CardSet holeCards = game_node_.GetHoleCardsOfPlayer(player);
 
   for (uint32_t i = 0; i < deck.CountCards(); i++) {
     (*values)[i + offset] = holeCards.ContainsCards(deckCards[i]) ? 1.0 : 0.0;
   }
   offset += deck.CountCards();
 
-  logic::CardSet boardCards = gameNode_.GetBoardCards();
+  logic::CardSet boardCards = game_node_.GetBoardCards();
   for (uint32_t i = 0; i < deck.CountCards(); i++) {
     (*values)[i + offset] = boardCards.ContainsCards(deckCards[i]) ? 1.0 : 0.0;
   }
@@ -219,7 +255,7 @@ void UniversalPokerState::ObservationTensor(Player player,
 
   // Adding the contribution of each players to the pot.
   for (auto p = Player{0}; p < NumPlayers(); p++) {
-    (*values)[offset + p] = gameNode_.Ante(p);
+    (*values)[offset + p] = game_node_.Ante(p);
   }
   offset += NumPlayers();
   SPIEL_CHECK_EQ(offset, game_->ObservationTensorShape()[0]);
@@ -227,47 +263,47 @@ void UniversalPokerState::ObservationTensor(Player player,
 
 std::string UniversalPokerState::InformationStateString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
-  SPIEL_CHECK_LT(player, gameTree_->GetNbPlayers());
-  const uint32_t pot = gameNode_.MaxSpend() *
-                       (gameTree_->GetNbPlayers() - gameNode_.NumFolded());
+  SPIEL_CHECK_LT(player, game_tree_->GetNbPlayers());
+  const uint32_t pot = game_node_.MaxSpend() *
+                       (game_tree_->GetNbPlayers() - game_node_.NumFolded());
   std::vector<int> money;
-  for (auto p = Player{0}; p < gameTree_->GetNbPlayers(); p++) {
-    money.emplace_back(gameNode_.Money(p));
+  for (auto p = Player{0}; p < game_tree_->GetNbPlayers(); p++) {
+    money.emplace_back(game_node_.Money(p));
   }
   std::vector<std::string> sequences;
-  for (auto r = 0; r <= gameNode_.GetRound(); r++) {
-    sequences.emplace_back(gameNode_.BettingSequence(r));
+  for (auto r = 0; r <= game_node_.GetRound(); r++) {
+    sequences.emplace_back(game_node_.BettingSequence(r));
   }
 
   return absl::StrFormat(
       "[Round %i][Player: %i][Pot: %i][Money: %s][Private: %s][Public: "
       "%s][Sequences: %s]",
-      gameNode_.GetRound(), CurrentPlayer(), pot, absl::StrJoin(money, " "),
-      gameNode_.GetHoleCardsOfPlayer(player).ToString(),
-      gameNode_.GetBoardCards().ToString(), absl::StrJoin(sequences, "¦"));
+      game_node_.GetRound(), CurrentPlayer(), pot, absl::StrJoin(money, " "),
+      game_node_.GetHoleCardsOfPlayer(player).ToString(),
+      game_node_.GetBoardCards().ToString(), absl::StrJoin(sequences, "¦"));
 }
 
 std::string UniversalPokerState::ObservationString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
-  SPIEL_CHECK_LT(player, gameTree_->GetNbPlayers());
+  SPIEL_CHECK_LT(player, game_tree_->GetNbPlayers());
   std::string result;
 
-  const uint32_t pot = gameNode_.MaxSpend() *
-                       (gameTree_->GetNbPlayers() - gameNode_.NumFolded());
-  absl::StrAppend(&result, "[Round ", gameNode_.GetRound(),
+  const uint32_t pot = game_node_.MaxSpend() *
+                       (game_tree_->GetNbPlayers() - game_node_.NumFolded());
+  absl::StrAppend(&result, "[Round ", game_node_.GetRound(),
                   "][Player: ", CurrentPlayer(), "][Pot: ", pot, "][Money:");
-  for (auto p = Player{0}; p < gameTree_->GetNbPlayers(); p++) {
-    absl::StrAppend(&result, " ", gameNode_.Money(p));
+  for (auto p = Player{0}; p < game_tree_->GetNbPlayers(); p++) {
+    absl::StrAppend(&result, " ", game_node_.Money(p));
   }
   // Add the player's private cards
   if (player != kChancePlayerId) {
     absl::StrAppend(&result, "[Private: ",
-                    gameNode_.GetHoleCardsOfPlayer(player).ToString(), "]");
+                    game_node_.GetHoleCardsOfPlayer(player).ToString(), "]");
   }
   // Adding the contribution of each players to the pot
   absl::StrAppend(&result, "[Ante:");
   for (auto p = Player{0}; p < num_players_; p++) {
-    absl::StrAppend(&result, " ", gameNode_.Ante(p));
+    absl::StrAppend(&result, " ", game_node_.Ante(p));
   }
   absl::StrAppend(&result, "]");
 
@@ -281,20 +317,20 @@ std::unique_ptr<State> UniversalPokerState::Clone() const {
 std::vector<std::pair<Action, double>> UniversalPokerState::ChanceOutcomes()
     const {
   SPIEL_CHECK_TRUE(IsChanceNode());
-  const double p = 1.0 / (double)gameNode_.GetActionCount();
-  std::vector<std::pair<Action, double>> outcomes(gameNode_.GetActionCount(),
+  const double p = 1.0 / (double)game_node_.GetActionCount();
+  std::vector<std::pair<Action, double>> outcomes(game_node_.GetActionCount(),
                                                   {0, p});
 
-  for (uint64_t card = 0; card < gameNode_.GetActionCount(); ++card) {
+  for (uint64_t card = 0; card < game_node_.GetActionCount(); ++card) {
     outcomes[card].first = card;
   }
   return outcomes;
 }
 
 std::vector<Action> UniversalPokerState::LegalActions() const {
-  std::vector<Action> actions(gameNode_.GetActionCount(), 0);
+  std::vector<Action> actions(game_node_.GetActionCount(), 0);
 
-  for (uint64_t idx = 0; idx < gameNode_.GetActionCount(); idx++) {
+  for (uint64_t idx = 0; idx < game_node_.GetActionCount(); ++idx) {
     actions[idx] = idx;
   }
 
@@ -302,7 +338,7 @@ std::vector<Action> UniversalPokerState::LegalActions() const {
 }
 
 void UniversalPokerState::DoApplyAction(Action action_id) {
-  gameNode_.ApplyAction(action_id);
+  game_node_.ApplyAction(action_id);
 }
 
 /**
@@ -312,7 +348,7 @@ void UniversalPokerState::DoApplyAction(Action action_id) {
 UniversalPokerGame::UniversalPokerGame(const GameParameters &params)
     : Game(kGameType, params),
       gameDesc_(parseParameters(params)),
-      gameTree_(gameDesc_) {}
+      game_tree_(gameDesc_) {}
 
 std::unique_ptr<State> UniversalPokerGame::NewInitialState() const {
   return std::unique_ptr<State>(new UniversalPokerState(shared_from_this()));
@@ -323,14 +359,14 @@ std::vector<int> UniversalPokerGame::InformationStateTensorShape() const {
   // 2 slots of cards (total_cards_ bits each): private card, public card
   // Followed by maximum game length * 2 bits each (call / raise)
 
-  const int numBoardCards = gameTree_.GetTotalNbBoardCards();
-  const int numHoleCards = gameTree_.GetNbHoleCardsRequired();
-  const int numPlayers = gameTree_.GetNbPlayers();
+  const int numBoardCards = game_tree_.GetTotalNbBoardCards();
+  const int numHoleCards = game_tree_.GetNbHoleCardsRequired();
+  const int numPlayers = game_tree_.GetNbPlayers();
   const int gameLength = MaxGameLength();
 
   return {(numPlayers) +
           (numBoardCards + numHoleCards) *
-              (gameTree_.NumRanksDeck() * gameTree_.NumSuitsDeck()) +
+              (game_tree_.NumRanksDeck() * game_tree_.NumSuitsDeck()) +
           (gameLength * 2)};
 }
 
@@ -339,13 +375,13 @@ std::vector<int> UniversalPokerGame::ObservationTensorShape() const {
   // 2 slots of cards (total_cards_ bits each): private card, public card
   // Followed by the contribution of each player to the pot
 
-  const int numBoardCards = gameTree_.GetTotalNbBoardCards();
-  const int numHoleCards = gameTree_.GetNbHoleCardsRequired();
-  const int numPlayers = gameTree_.GetNbPlayers();
+  const int numBoardCards = game_tree_.GetTotalNbBoardCards();
+  const int numHoleCards = game_tree_.GetNbHoleCardsRequired();
+  const int numPlayers = game_tree_.GetNbPlayers();
 
   return {(numPlayers) +
           (numBoardCards + numHoleCards) *
-              (gameTree_.NumRanksDeck() * gameTree_.NumSuitsDeck()) +
+              (game_tree_.NumRanksDeck() * game_tree_.NumSuitsDeck()) +
           (numPlayers)};
 }
 
@@ -356,7 +392,7 @@ double UniversalPokerGame::MaxUtility() const {
   // into the pot, which is the raise amounts on each round times the maximum
   // number raises, plus the original chip they put in to play.
 
-  return (double)gameTree_.StackSize(0) * (gameTree_.GetNbPlayers() - 1);
+  return (double)game_tree_.StackSize(0) * (game_tree_.GetNbPlayers() - 1);
 }
 
 double UniversalPokerGame::MinUtility() const {
@@ -365,26 +401,24 @@ double UniversalPokerGame::MinUtility() const {
   // The most any single player can lose is the maximum number of raises per
   // round times the amounts of each of the raises, plus the original chip they
   // put in to play.
-  return -1 * (double)gameTree_.StackSize(0);
+  return -1 * (double)game_tree_.StackSize(0);
 }
 
 int UniversalPokerGame::MaxChanceOutcomes() const {
-  return gameTree_.NumSuitsDeck() * gameTree_.NumRanksDeck();
+  return game_tree_.NumSuitsDeck() * game_tree_.NumRanksDeck();
 }
 
-int UniversalPokerGame::NumPlayers() const { return gameTree_.GetNbPlayers(); }
+int UniversalPokerGame::NumPlayers() const { return game_tree_.GetNbPlayers(); }
 
 int UniversalPokerGame::NumDistinctActions() const {
-  return gameTree_.GetMaxBettingActions();
+  return game_tree_.GetMaxBettingActions();
 }
 
-logic::GameTree *UniversalPokerGame::GetGameTree() { return &gameTree_; }
+logic::GameTree *UniversalPokerGame::GetGameTree() { return &game_tree_; }
 
 std::shared_ptr<const Game> UniversalPokerGame::Clone() const {
   return std::shared_ptr<const Game>(new UniversalPokerGame(*this));
 }
-
-double UniversalPokerGame::UtilitySum() const { return 0; }
 
 int UniversalPokerGame::MaxGameLength() const {
   // Make a good guess here because bruteforcing the tree is far too slow
@@ -392,20 +426,20 @@ int UniversalPokerGame::MaxGameLength() const {
   int length = 1;
 
   // Deal Actions
-  length += gameTree_.GetTotalNbBoardCards() +
-            gameTree_.GetNbHoleCardsRequired() * gameTree_.GetNbPlayers();
+  length += game_tree_.GetTotalNbBoardCards() +
+            game_tree_.GetNbHoleCardsRequired() * game_tree_.GetNbPlayers();
 
   // Check Actions
-  length += (NumPlayers() * gameTree_.GetNbRounds());
+  length += (NumPlayers() * game_tree_.GetNbRounds());
 
   // Bet Actions
   double maxStack = 0;
   double maxBlind = 0;
   for (uint32_t p = 0; p < NumPlayers(); p++) {
     maxStack =
-        gameTree_.StackSize(p) > maxStack ? gameTree_.StackSize(p) : maxStack;
+        game_tree_.StackSize(p) > maxStack ? game_tree_.StackSize(p) : maxStack;
     maxBlind =
-        gameTree_.BlindSize(p) > maxStack ? gameTree_.BlindSize(p) : maxBlind;
+        game_tree_.BlindSize(p) > maxStack ? game_tree_.BlindSize(p) : maxBlind;
   }
 
   while (maxStack > maxBlind) {
@@ -422,56 +456,59 @@ int UniversalPokerGame::MaxGameLength() const {
  * @return
  */
 std::string UniversalPokerGame::parseParameters(const GameParameters &map) {
-  std::string gameDesc;
-  if (map.find("gameDesc") == map.end()) {
-    std::ostringstream generatedDesc;
-
-    generatedDesc << "GAMEDEF" << std::endl;
-    generatedDesc << ParameterValue<std::string>("bettingType") << std::endl;
-    generatedDesc << "numPlayers = " << (int)ParameterValue<int>("players")
-                  << std::endl;
-    generatedDesc << "numRounds = " << (int)ParameterValue<int>("rounds")
-                  << std::endl;
-
-    generatedDesc << "stack = ";
-    for (int p = 0; p < ParameterValue<int>("players"); p++) {
-      generatedDesc << ParameterValue<int>("stackPerPlayer") << " ";
-    }
-    generatedDesc << std::endl;
-
-    generatedDesc << "blind = ";
-    for (int p = 0; p < ParameterValue<int>("players"); p++) {
-      if (p == 0) {
-        generatedDesc << ParameterValue<int>("bigBlind") << " ";
-      } else if (p == 1) {
-        generatedDesc << ParameterValue<int>("smallBlind") << " ";
-      } else {
-        generatedDesc << "0 ";
+  if (map.find("gamedef") != map.end()) {
+    // We check for sanity that all parameters are empty
+    if (map.size() != 1) {
+      std::vector<std::string> game_parameter_keys;
+      game_parameter_keys.reserve(map.size());
+      for (auto const &imap : map) {
+        game_parameter_keys.push_back(imap.first);
       }
+      SpielFatalError(
+          absl::StrCat("When loading a 'universal_poker' game, the 'gamedef' "
+                       "field was present, but other fields were present too: ",
+                       absl::StrJoin(game_parameter_keys, ", "),
+                       "gamedef is exclusive with other paraemters."));
     }
-    generatedDesc << std::endl;
-
-    generatedDesc << "firstPlayer = "
-                  << (std::string)ParameterValue<std::string>("firstPlayer")
-                  << std::endl;
-    generatedDesc << "numSuits = " << (int)ParameterValue<int>("numSuits")
-                  << std::endl;
-    generatedDesc << "numRanks = " << (int)ParameterValue<int>("numRanks")
-                  << std::endl;
-    generatedDesc << "numHoleCards = "
-                  << (int)ParameterValue<int>("numHoleCards") << std::endl;
-    generatedDesc << "numBoardCards = "
-                  << (std::string)ParameterValue<std::string>("numBoardCards")
-                  << std::endl;
-
-    generatedDesc << "END GAMEDEF" << std::endl;
-
-    gameDesc = generatedDesc.str();
-
-  } else {
-    gameDesc = ParameterValue<std::string>("bettingType");
+    return ParameterValue<std::string>("gamedef");
   }
-  return gameDesc;
+
+  std::string generated_gamedef = "GAMEDEF\n";
+  absl::StrAppend(
+      &generated_gamedef, ParameterValue<std::string>("bettingType"), "\n",
+      "numPlayers = ", ParameterValue<int>("players"), "\n",
+      "numRounds = ", ParameterValue<int>("rounds"), "\n",
+      "numSuits = ", ParameterValue<int>("numSuits"), "\n",
+      "firstPlayer = ", ParameterValue<std::string>("firstPlayer"), "\n",
+      "numRanks = ", ParameterValue<int>("numRanks"), "\n",
+      "numHoleCards = ", ParameterValue<int>("numHoleCards"), "\n",
+      "numBoardCards = ", ParameterValue<std::string>("numBoardCards"), "\n");
+
+  absl::StrAppend(&generated_gamedef, "stack = ");
+  for (int p = 0; p < ParameterValue<int>("players"); p++) {
+    absl::StrAppend(&generated_gamedef, ParameterValue<int>("stackPerPlayer"),
+                    " ");
+  }
+  absl::StrAppend(&generated_gamedef, "\n");
+
+  absl::StrAppend(&generated_gamedef, "blind = ");
+  for (int p = 0; p < ParameterValue<int>("players"); p++) {
+    if (p == 0) {
+      absl::StrAppend(&generated_gamedef, ParameterValue<int>("bigBlind"), " ");
+    } else if (p == 1) {
+      absl::StrAppend(&generated_gamedef, ParameterValue<int>("smallBlind"),
+                      " ");
+    } else {
+      absl::StrAppend(&generated_gamedef, "0 ");
+    }
+  }
+  absl::StrAppend(&generated_gamedef, "\n");
+
+  absl::StrAppend(&generated_gamedef, "END GAMEDEF\n");
+  std::cerr << "Generated gamedef for Universal Poker:\n"
+            << generated_gamedef << std::endl;
+  return generated_gamedef;
 }
+
 }  // namespace universal_poker
 }  // namespace open_spiel
