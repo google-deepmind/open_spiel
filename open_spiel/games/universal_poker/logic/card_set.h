@@ -47,7 +47,7 @@ class CardSet {
 
   void AddCard(uint8_t card);
   void RemoveCard(uint8_t card);
-  bool ContainsCards(const uint8_t &card);
+  bool ContainsCards(uint8_t card);
 
   uint32_t CountCards() const;
   int RankCards();

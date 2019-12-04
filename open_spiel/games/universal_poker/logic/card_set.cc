@@ -161,7 +161,7 @@ std::vector<CardSet> CardSet::SampleCards(int nbCards) {
   return combinations;
 }
 
-bool CardSet::ContainsCards(const uint8_t &card) {
+bool CardSet::ContainsCards(uint8_t card) {
   int rank = rankOfCard(card);
   int suit = suitOfCard(card);
   return (cs.bySuit[suit] & ((uint16_t)1 << rank)) > 0;

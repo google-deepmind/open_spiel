@@ -18,6 +18,7 @@
 #include <ctime>
 #include <iostream>
 
+#include "open_spiel/games/universal_poker/acpc_cpp/acpc_game.h"
 #include "open_spiel/games/universal_poker/logic/card_set.h"
 
 namespace open_spiel {
@@ -30,12 +31,12 @@ void BasicGameTreeTests() {
       "1200\nblind = 100 100\nfirstPlayer = 1 1\nnumSuits = 2\nnumRanks = "
       "3\nnumHoleCards = 1\nnumBoardCards = 0 1\nEND GAMEDEF");
 
-  GameTree tree(gameDesc);
+  acpc_cpp::ACPCGame acpc_game(gameDesc);
 
   std::srand(std::time(nullptr));
 
   for (int i = 0; i < 100; i++) {
-    GameNode node(&tree);
+    GameNode node(&acpc_game);
     std::cout << node.ToString() << std::endl;
     while (!node.IsFinished()) {
       uint32_t actions = node.GetActionCount();
@@ -54,12 +55,12 @@ void HoldemGameTreeTests() {
       "20000\nblind = 100 50\nfirstPlayer = 2 1 1 1\nnumSuits = 4\nnumRanks = "
       "13\nnumHoleCards = 2\nnumBoardCards = 0 3 1 1\nEND GAMEDEF");
 
-  GameTree tree(gameDescHoldem);
+  acpc_cpp::ACPCGame acpc_game(gameDescHoldem);
 
   std::srand(std::time(nullptr));
 
   for (int i = 0; i < 100; i++) {
-    GameNode node(&tree);
+    GameNode node(&acpc_game);
     while (!node.IsFinished()) {
       uint32_t actions = node.GetActionCount();
       uint32_t action = std::rand() % actions;

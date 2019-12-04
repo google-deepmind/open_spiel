@@ -22,13 +22,13 @@ namespace open_spiel {
 namespace universal_poker {
 namespace logic {
 
-GameNode::GameNode(logic::GameTree* gameTree)
+GameNode::GameNode(acpc_cpp::ACPCGame* acpc_game)
 
-    : BettingNode(gameTree),
-      gameTree_(gameTree),
-      deck_(gameTree->NumSuitsDeck(), gameTree->NumRanksDeck()),
+    : BettingNode(acpc_game),
+      acpc_game_(acpc_game),
+      deck_(acpc_game->NumSuitsDeck(), acpc_game->NumRanksDeck()),
       actionCount_(GetPossibleActionCount()) {
-  for (uint8_t p = 0; p < gameTree_->GetNbPlayers(); p++) {
+  for (uint8_t p = 0; p < acpc_game_->GetNbPlayers(); p++) {
     holeCards_.emplace_back();
   }
 
@@ -44,15 +44,15 @@ void GameNode::ApplyAction(uint32_t actionIdx) {
     deck_.RemoveCard(card);
 
     // Check where to add this card
-    for (uint8_t p = 0; p < gameTree_->GetNbPlayers(); p++) {
-      if (holeCards_[p].CountCards() < gameTree_->GetNbHoleCardsRequired()) {
+    for (uint8_t p = 0; p < acpc_game_->GetNbPlayers(); p++) {
+      if (holeCards_[p].CountCards() < acpc_game_->GetNbHoleCardsRequired()) {
         holeCards_[p].AddCard(card);
         break;
       }
     }
 
     if (boardCards_.CountCards() <
-        gameTree_->GetNbBoardCardsRequired(GetRound())) {
+        acpc_game_->GetNbBoardCardsRequired(GetRound())) {
       boardCards_.AddCard(card);
     }
   } else {
@@ -80,7 +80,7 @@ uint32_t GameNode::GetActionCount() const { return actionCount_; }
 std::string GameNode::ToString() const {
   std::ostringstream buf;
 
-  for (uint8_t p = 0; p < gameTree_->GetNbPlayers(); p++) {
+  for (uint8_t p = 0; p < acpc_game_->GetNbPlayers(); p++) {
     buf << "P" << (int)p << " Cards: " << holeCards_[p].ToString() << std::endl;
   }
   buf << "BoardCards " << boardCards_.ToString() << std::endl;
@@ -90,7 +90,7 @@ std::string GameNode::ToString() const {
   }
   if (GetNodeType() == NODE_TYPE_TERMINAL_FOLD ||
       GetNodeType() == NODE_TYPE_TERMINAL_SHOWDOWN) {
-    for (uint8_t p = 0; p < gameTree_->GetNbPlayers(); p++) {
+    for (uint8_t p = 0; p < acpc_game_->GetNbPlayers(); p++) {
       buf << "P" << (int)p << " Reward: " << GetTotalReward(p) << std::endl;
     }
   }
@@ -107,7 +107,7 @@ const CardSet& GameNode::GetHoleCardsOfPlayer(uint8_t player) const {
 }
 
 double GameNode::GetTotalReward(uint8_t player) const {
-  assert(player < gameTree_->GetNbPlayers());
+  assert(player < acpc_game_->GetNbPlayers());
   // Copy Board Cards and Hole Cards
   uint8_t holeCards[10][3], boardCards[7], nbHoleCards[10], nbBoardCards;
 
@@ -129,8 +129,6 @@ double GameNode::GetTotalReward(uint8_t player) const {
 
   return ValueOfState(player);
 }
-
-GameTree::GameTree(const std::string& gameDef) : BettingTree(gameDef) {}
 
 }  // namespace logic
 }  // namespace universal_poker

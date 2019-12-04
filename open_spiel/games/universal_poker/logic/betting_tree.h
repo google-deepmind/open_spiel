@@ -26,15 +26,16 @@ namespace logic {
 
 constexpr uint8_t MAX_PLAYERS = 10;
 
-class BettingTree : public acpc_cpp::ACPCGame {
- public:
-  BettingTree(const std::string& gameDef);
-  uint32_t GetMaxBettingActions() const;
-};
+// Returns how many actions are available at a choice node (3 when limit
+// and 4 for no limit).
+// TODO(author2): Is that a bug? There are 5 actions? Is no limit means
+// "bet bot" is added? or should "all in" be also added?
+inline uint32_t GetMaxBettingActions(const acpc_cpp::ACPCGame& acpc_game) {
+  return acpc_game.IsLimitGame() ? 3 : 4;
+}
+
 
 class BettingNode : public acpc_cpp::ACPCState {
-  friend BettingTree;
-
  public:
   enum NodeType {
     NODE_TYPE_CHANCE,
@@ -53,7 +54,7 @@ class BettingNode : public acpc_cpp::ACPCState {
                                                 ACTION_CHECK_CALL,
                                                 ACTION_BET_POT, ACTION_ALL_IN};
 
-  BettingNode(BettingTree* bettingTree);
+  BettingNode(acpc_cpp::ACPCGame* acpc_game);
 
   NodeType GetNodeType() const;
 
@@ -68,7 +69,7 @@ class BettingNode : public acpc_cpp::ACPCState {
   bool IsFinished() const;
 
  private:
-  const BettingTree* bettingTree_;
+  acpc_cpp::ACPCGame* acpc_game_;
   NodeType nodeType_;
   uint32_t possibleActions_;
   int32_t potSize_;

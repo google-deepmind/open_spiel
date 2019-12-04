@@ -23,12 +23,12 @@
 namespace open_spiel::universal_poker::logic {
 
 void BasicBettingTreeTests(const std::string gameDesc) {
-  BettingTree bettingTree(gameDesc);
+  acpc_cpp::ACPCGame acpc_game(gameDesc);
 
   std::srand(std::time(nullptr));
 
   for (int i = 0; i < 100; i++) {
-    BettingNode bettingNode(&bettingTree);
+    BettingNode bettingNode(&acpc_game);
     std::cout << "INIT. DEPTH: " << bettingNode.GetDepth() << std::endl;
     std::cout << bettingNode.ToString() << std::endl;
 

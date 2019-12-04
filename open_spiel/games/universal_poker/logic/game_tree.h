@@ -22,14 +22,10 @@ namespace open_spiel {
 namespace universal_poker {
 namespace logic {
 
-class GameTree : public BettingTree {
- public:
-  GameTree(const std::string& gameDef);
-};
 
 class GameNode : public BettingNode {
  public:
-  GameNode(GameTree* gameTree);
+  GameNode(acpc_cpp::ACPCGame* acpc_game);
 
   uint32_t GetActionCount() const;
   void ApplyAction(uint32_t actionIdx);
@@ -40,7 +36,7 @@ class GameNode : public BettingNode {
   double GetTotalReward(uint8_t player) const;
 
  private:
-  GameTree* gameTree_;
+  acpc_cpp::ACPCGame* acpc_game_;
   CardSet deck_;
   uint32_t actionCount_;
   std::vector<CardSet> holeCards_;
