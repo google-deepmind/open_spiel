@@ -79,8 +79,8 @@ class ACPCGame {
   uint8_t GetTotalNbBoardCards() const;
 
  private:
-  std::unique_ptr<Game> acpcGame_;
   uint32_t handId_;
+  std::unique_ptr<Game> acpcGame_;
 };
 
 }  // namespace open_spiel::universal_poker::acpc_cpp

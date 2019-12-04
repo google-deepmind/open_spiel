@@ -76,6 +76,7 @@ class PyspielTest(absltest.TestCase):
         "turn_based_simultaneous_game",
         "y",
     ])
+
     if os.environ.get("BUILD_WITH_HANABI", "OFF") == "ON":
       expected.add("hanabi")
     if os.environ.get("BUILD_WITH_ACPC", "OFF") == "ON":

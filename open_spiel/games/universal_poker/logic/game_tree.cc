@@ -21,8 +21,8 @@
 namespace open_spiel::universal_poker::logic {
 GameTree::GameNode::GameNode(logic::GameTree* gameTree)
     : BettingNode(gameTree),
-      deck_(gameTree->NumSuitsDeck(), gameTree->NumRanksDeck()),
       gameTree_(gameTree),
+      deck_(gameTree->NumSuitsDeck(), gameTree->NumRanksDeck()),
       actionCount_(GetPossibleActionCount()) {
   for (uint8_t p = 0; p < gameTree_->GetNbPlayers(); p++) {
     holeCards_.emplace_back();

@@ -35,10 +35,10 @@ BettingTree::BettingNode::BettingNode(BettingTree* bettingTree)
       bettingTree_(bettingTree),
       nodeType_(NODE_TYPE_CHANCE),
       possibleActions_(ACTION_DEAL),
-      nbBoardCardsDealt_(0),
-      nbHoleCardsDealtPerPlayer_{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
       potSize_(0),
-      allInSize_(0) {}
+      allInSize_(0),
+      nbHoleCardsDealtPerPlayer_{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+      nbBoardCardsDealt_(0) {}
 
 BettingTree::BettingNode::NodeType BettingTree::BettingNode::GetNodeType()
     const {

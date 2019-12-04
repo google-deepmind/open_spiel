@@ -15,13 +15,12 @@
 #ifndef THIRD_PARTY_OPEN_SPIEL_GAMES_UNIVERSAL_POKER_H_
 #define THIRD_PARTY_OPEN_SPIEL_GAMES_UNIVERSAL_POKER_H_
 
-#include <open_spiel/games/universal_poker/logic/game_tree.h>
-
 #include <array>
 #include <memory>
 #include <string>
 #include <vector>
 
+#include "open_spiel/games/universal_poker/logic/game_tree.h"
 #include "open_spiel/spiel.h"
 
 // This is a wrapper around the Annual Computer Poker Competition bot (ACPC)

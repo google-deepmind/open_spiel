@@ -14,8 +14,6 @@
 
 #include "open_spiel/games/universal_poker.h"
 
-#include <open_spiel/abseil-cpp/absl/strings/str_format.h>
-
 #include <algorithm>
 #include <array>
 #include <utility>
@@ -24,6 +22,7 @@
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/games/universal_poker/logic/card_set.h"
 #include "open_spiel/spiel_utils.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_format.h"
 
 namespace open_spiel {
 namespace universal_poker {
