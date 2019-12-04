@@ -24,7 +24,7 @@ namespace open_spiel {
 namespace universal_poker {
 namespace logic {
 
-GameNode::GameNode(acpc_cpp::ACPCGame* acpc_game)
+GameNode::GameNode(const acpc_cpp::ACPCGame* acpc_game)
     : BettingNode(acpc_game),
       deck_(/*num_suits=*/acpc_game->NumSuitsDeck(),
             /*num_ranks=*/acpc_game->NumRanksDeck()),

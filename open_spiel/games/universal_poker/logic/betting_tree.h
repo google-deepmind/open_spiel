@@ -53,7 +53,7 @@ class BettingNode : public acpc_cpp::ACPCState {
                                                 ACTION_CHECK_CALL,
                                                 ACTION_BET_POT, ACTION_ALL_IN};
 
-  BettingNode(acpc_cpp::ACPCGame* acpc_game);
+  BettingNode(const acpc_cpp::ACPCGame* acpc_game);
 
   NodeType GetNodeType() const { return nodeType_; }
 
@@ -68,7 +68,7 @@ class BettingNode : public acpc_cpp::ACPCState {
   bool IsFinished() const;
 
  protected:
-  acpc_cpp::ACPCGame* acpc_game_;
+  const acpc_cpp::ACPCGame* acpc_game_;
 
  private:
   NodeType nodeType_;

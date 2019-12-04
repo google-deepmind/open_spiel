@@ -37,7 +37,7 @@ class ACPCState {
   enum ACPCActionType { ACPC_FOLD, ACPC_CALL, ACPC_RAISE, ACPC_INVALID };
 
  public:
-  ACPCState(ACPCGame* game);
+  ACPCState(const ACPCGame* game);
   ACPCState(const ACPCState& other);
   virtual ~ACPCState();
 
@@ -60,7 +60,7 @@ class ACPCState {
   std::string ToString() const;
   std::string BettingSequence(uint8_t round) const;
 
-  ACPCGame* game_;
+  const ACPCGame* game_;
   std::unique_ptr<RawACPCState> acpcState_;
 };
 
@@ -74,7 +74,7 @@ class ACPCGame {
   bool IsLimitGame() const;
   uint8_t GetNbRounds() const;
   uint8_t GetNbPlayers() const;
-    // Returns the number of private cards for each player in this game.
+  // Returns the number of private cards for each player in this game.
   uint8_t GetNbHoleCardsRequired() const;
   uint8_t GetNbBoardCardsRequired(uint8_t round) const;
   uint8_t NumSuitsDeck() const;

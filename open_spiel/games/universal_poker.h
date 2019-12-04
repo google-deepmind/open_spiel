@@ -62,7 +62,7 @@ class UniversalPokerState : public State {
   void DoApplyAction(Action action_id) override;
 
  private:
-  acpc_cpp::ACPCGame *acpc_game_;
+  const acpc_cpp::ACPCGame *acpc_game_;
   logic::GameNode game_node_;
 };
 
@@ -84,10 +84,10 @@ class UniversalPokerGame : public Game {
 
  private:
   std::string gameDesc_;
-  acpc_cpp::ACPCGame acpc_game_;
+  const acpc_cpp::ACPCGame acpc_game_;
 
  public:
-  acpc_cpp::ACPCGame *GetACPCGame();
+  const acpc_cpp::ACPCGame *GetACPCGame() const { return &acpc_game_; }
 
   std::string parseParameters(const GameParameters &map);
 };

@@ -185,7 +185,7 @@ uint8_t ACPCState::CurrentPlayer() const {
   return currentPlayer(game_->acpc_game_.get(), acpcState_.get());
 }
 
-ACPCState::ACPCState(ACPCGame *game)
+ACPCState::ACPCState(const ACPCGame *game)
     : game_(game), acpcState_(std::make_unique<RawACPCState>()) {
   initState(game_->acpc_game_.get(),
             game_->handId_ /*TODO this make a unit test fail++*/,

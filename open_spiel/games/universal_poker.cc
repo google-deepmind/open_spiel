@@ -107,7 +107,8 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 // namespace universal_poker
 UniversalPokerState::UniversalPokerState(std::shared_ptr<const Game> game)
     : State(game),
-      acpc_game_(((UniversalPokerGame *)game.get())->GetACPCGame()),
+      acpc_game_(
+          static_cast<const UniversalPokerGame *>(game.get())->GetACPCGame()),
       game_node_(acpc_game_) {}
 
 std::string UniversalPokerState::ToString() const {
@@ -414,8 +415,6 @@ int UniversalPokerGame::NumDistinctActions() const {
   return logic::GetMaxBettingActions(acpc_game_);
 }
 
-acpc_cpp::ACPCGame *UniversalPokerGame::GetACPCGame() { return &acpc_game_; }
-
 std::shared_ptr<const Game> UniversalPokerGame::Clone() const {
   return std::shared_ptr<const Game>(new UniversalPokerGame(*this));
 }
@@ -470,7 +469,10 @@ std::string UniversalPokerGame::parseParameters(const GameParameters &map) {
                        absl::StrJoin(game_parameter_keys, ", "),
                        "gamedef is exclusive with other paraemters."));
     }
-    return ParameterValue<std::string>("gamedef");
+    std::string retreived_gamedef = ParameterValue<std::string>("gamedef");
+    std::cerr << "gamedef directly passed for Universal Poker:\n"
+              << retreived_gamedef << std::endl;
+    return retreived_gamedef;
   }
 
   std::string generated_gamedef = "GAMEDEF\n";

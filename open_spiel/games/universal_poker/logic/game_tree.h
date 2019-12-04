@@ -25,7 +25,7 @@ namespace logic {
 
 class GameNode : public BettingNode {
  public:
-  GameNode(acpc_cpp::ACPCGame* acpc_game);
+  GameNode(const acpc_cpp::ACPCGame* acpc_game);
 
   int GetActionCount() const { return action_count_; }
   void ApplyAction(uint32_t actionIdx);

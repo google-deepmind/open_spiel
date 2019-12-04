@@ -24,7 +24,7 @@ namespace logic {
 
 const char* actions = "0df0c000p0000000a";
 
-BettingNode::BettingNode(acpc_cpp::ACPCGame* acpc_game)
+BettingNode::BettingNode(const acpc_cpp::ACPCGame* acpc_game)
     : ACPCState(acpc_game),
       acpc_game_(acpc_game),
       nodeType_(NODE_TYPE_CHANCE),
