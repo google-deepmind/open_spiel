@@ -22,7 +22,7 @@ namespace open_spiel {
 namespace universal_poker {
 namespace logic {
 
-GameTree::GameNode::GameNode(logic::GameTree* gameTree)
+GameNode::GameNode(logic::GameTree* gameTree)
 
     : BettingNode(gameTree),
       gameTree_(gameTree),
@@ -37,7 +37,7 @@ GameTree::GameNode::GameNode(logic::GameTree* gameTree)
   }
 }
 
-void GameTree::GameNode::ApplyAction(uint32_t actionIdx) {
+void GameNode::ApplyAction(uint32_t actionIdx) {
   if (GetNodeType() == NODE_TYPE_CHANCE) {
     BettingNode::ApplyDealCards();
     uint8_t card = deck_.ToCardArray()[actionIdx];
@@ -75,9 +75,9 @@ void GameTree::GameNode::ApplyAction(uint32_t actionIdx) {
   }
 }
 
-uint32_t GameTree::GameNode::GetActionCount() const { return actionCount_; }
+uint32_t GameNode::GetActionCount() const { return actionCount_; }
 
-std::string GameTree::GameNode::ToString() const {
+std::string GameNode::ToString() const {
   std::ostringstream buf;
 
   for (uint8_t p = 0; p < gameTree_->GetNbPlayers(); p++) {
@@ -99,14 +99,14 @@ std::string GameTree::GameNode::ToString() const {
   return buf.str();
 }
 
-const CardSet& GameTree::GameNode::GetBoardCards() const { return boardCards_; }
+const CardSet& GameNode::GetBoardCards() const { return boardCards_; }
 
-const CardSet& GameTree::GameNode::GetHoleCardsOfPlayer(uint8_t player) const {
+const CardSet& GameNode::GetHoleCardsOfPlayer(uint8_t player) const {
   assert(player < holeCards_.size());
   return holeCards_[player];
 }
 
-double GameTree::GameNode::GetTotalReward(uint8_t player) const {
+double GameNode::GetTotalReward(uint8_t player) const {
   assert(player < gameTree_->GetNbPlayers());
   // Copy Board Cards and Hole Cards
   uint8_t holeCards[10][3], boardCards[7], nbHoleCards[10], nbBoardCards;

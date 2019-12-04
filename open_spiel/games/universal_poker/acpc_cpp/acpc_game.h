@@ -26,42 +26,41 @@ struct RawACPCGame;
 struct RawACPCState;
 struct RawACPCAction;
 
-class ACPCGame {
+class ACPCGame;
+
+class ACPCState {
  public:
-  class ACPCState {
-   public:
-    enum ACPCActionType { ACPC_FOLD, ACPC_CALL, ACPC_RAISE, ACPC_INVALID };
+  enum ACPCActionType { ACPC_FOLD, ACPC_CALL, ACPC_RAISE, ACPC_INVALID };
 
-   public:
-    ACPCState(ACPCGame* game);
-    ACPCState(const ACPCState& other);
-    virtual ~ACPCState();
+ public:
+  ACPCState(ACPCGame* game);
+  ACPCState(const ACPCState& other);
+  virtual ~ACPCState();
 
-    void SetHoleAndBoardCards(uint8_t holeCards[10][3], uint8_t boardCards[7],
-                              uint8_t nbHoleCards[10],
-                              uint8_t nbBoardCards) const;
+  void SetHoleAndBoardCards(uint8_t holeCards[10][3], uint8_t boardCards[7],
+                            uint8_t nbHoleCards[10],
+                            uint8_t nbBoardCards) const;
 
-    uint8_t CurrentPlayer() const;
+  uint8_t CurrentPlayer() const;
 
-    bool IsFinished() const;
-    int RaiseIsValid(int32_t* minSize, int32_t* maxSize) const;
-    int IsValidAction(const ACPCActionType actionType,
-                      const int32_t size) const;
-    void DoAction(const ACPCActionType actionType, const int32_t size);
-    double ValueOfState(const uint8_t player) const;
-    uint32_t MaxSpend() const;
-    uint8_t GetRound() const;
-    uint8_t NumFolded() const;
-    uint32_t Money(const uint8_t player) const;
-    uint32_t Ante(const uint8_t player) const;
-    std::string ToString() const;
-    std::string BettingSequence(uint8_t round) const;
+  bool IsFinished() const;
+  int RaiseIsValid(int32_t* minSize, int32_t* maxSize) const;
+  int IsValidAction(const ACPCActionType actionType, const int32_t size) const;
+  void DoAction(const ACPCActionType actionType, const int32_t size);
+  double ValueOfState(const uint8_t player) const;
+  uint32_t MaxSpend() const;
+  uint8_t GetRound() const;
+  uint8_t NumFolded() const;
+  uint32_t Money(const uint8_t player) const;
+  uint32_t Ante(const uint8_t player) const;
+  std::string ToString() const;
+  std::string BettingSequence(uint8_t round) const;
 
-   private:
-    ACPCGame* game_;
-    std::unique_ptr<RawACPCState> acpcState_;
-  };
+  ACPCGame* game_;
+  std::unique_ptr<RawACPCState> acpcState_;
+};
 
+class ACPCGame {
  public:
   ACPCGame(const std::string& gameDef);
   ACPCGame(const ACPCGame& other);
@@ -80,8 +79,6 @@ class ACPCGame {
   uint8_t GetTotalNbBoardCards() const;
 
   uint32_t handId_;
-
- private:
   std::unique_ptr<RawACPCGame> acpc_game_;
 };
 

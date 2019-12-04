@@ -38,19 +38,19 @@ struct RawACPCState : public ::State {};
 struct RawACPCAction : public ::Action {};
 
 namespace {
-RawACPCAction GetAction(ACPCGame::ACPCState::ACPCActionType type,
+RawACPCAction GetAction(ACPCState::ACPCActionType type,
                         int32_t size) {
   RawACPCAction acpc_action;
 
   acpc_action.size = size;
   switch (type) {
-    case ACPCGame::ACPCState::ACPC_CALL:
+    case ACPCState::ACPC_CALL:
       acpc_action.type = a_call;
       break;
-    case ACPCGame::ACPCState::ACPC_FOLD:
+    case ACPCState::ACPC_FOLD:
       acpc_action.type = a_fold;
       break;
-    case ACPCGame::ACPCState::ACPC_RAISE:
+    case ACPCState::ACPC_RAISE:
       acpc_action.type = a_raise;
       break;
     default:
@@ -144,7 +144,7 @@ uint32_t ACPCGame::BlindSize(uint8_t player) const {
   return acpc_game_->blind[player];
 }
 
-std::string ACPCGame::ACPCState::ToString() const {
+std::string ACPCState::ToString() const {
   char buf[STRING_BUFFERSIZE];
   printState(game_->acpc_game_.get(), acpcState_.get(), STRING_BUFFERSIZE, buf);
   std::ostringstream out;
@@ -158,69 +158,69 @@ std::string ACPCGame::ACPCState::ToString() const {
   return out.str();
 }
 
-int ACPCGame::ACPCState::RaiseIsValid(int32_t *minSize,
+int ACPCState::RaiseIsValid(int32_t *minSize,
                                       int32_t *maxSize) const {
   return raiseIsValid(game_->acpc_game_.get(), acpcState_.get(), minSize,
                       maxSize);
 }
 
-double ACPCGame::ACPCState::ValueOfState(const uint8_t player) const {
+double ACPCState::ValueOfState(const uint8_t player) const {
   assert(stateFinished(acpcState_.get()));
   return valueOfState(game_->acpc_game_.get(), acpcState_.get(), player);
 }
 
-bool ACPCGame::ACPCState::IsFinished() const {
+bool ACPCState::IsFinished() const {
   return stateFinished(acpcState_.get());
 }
 
-uint32_t ACPCGame::ACPCState::MaxSpend() const { return acpcState_->maxSpent; }
+uint32_t ACPCState::MaxSpend() const { return acpcState_->maxSpent; }
 
-uint8_t ACPCGame::ACPCState::GetRound() const { return acpcState_->round; }
+uint8_t ACPCState::GetRound() const { return acpcState_->round; }
 
-uint8_t ACPCGame::ACPCState::NumFolded() const {
+uint8_t ACPCState::NumFolded() const {
   return numFolded(game_->acpc_game_.get(), acpcState_.get());
 }
 
-uint8_t ACPCGame::ACPCState::CurrentPlayer() const {
+uint8_t ACPCState::CurrentPlayer() const {
   return currentPlayer(game_->acpc_game_.get(), acpcState_.get());
 }
 
-ACPCGame::ACPCState::ACPCState(ACPCGame *game)
+ACPCState::ACPCState(ACPCGame *game)
     : game_(game), acpcState_(std::make_unique<RawACPCState>()) {
   initState(game_->acpc_game_.get(),
             game_->handId_ /*TODO this make a unit test fail++*/,
             acpcState_.get());
 }
 
-ACPCGame::ACPCState::ACPCState(const ACPCGame::ACPCState &other)
+ACPCState::ACPCState(const ACPCState &other)
     : game_(other.game_),
       acpcState_(std::make_unique<RawACPCState>(*other.acpcState_)) {}
 
-void ACPCGame::ACPCState::DoAction(
-    const ACPCGame::ACPCState::ACPCActionType actionType, const int32_t size) {
+void ACPCState::DoAction(
+    const ACPCState::ACPCActionType actionType, const int32_t size) {
   RawACPCAction a = GetAction(actionType, size);
   assert(isValidAction(game_->acpc_game_.get(), acpcState_.get(), false, &a));
   doAction(game_->acpc_game_.get(), &a, acpcState_.get());
 }
 
-int ACPCGame::ACPCState::IsValidAction(
-    const ACPCGame::ACPCState::ACPCActionType actionType,
+int ACPCState::IsValidAction(
+    const ACPCState::ACPCActionType actionType,
     const int32_t size) const {
   RawACPCAction a = GetAction(actionType, size);
   return isValidAction(game_->acpc_game_.get(), acpcState_.get(), false, &a);
 }
 
-uint32_t ACPCGame::ACPCState::Money(const uint8_t player) const {
+uint32_t ACPCState::Money(const uint8_t player) const {
   assert(player < game_->acpc_game_->numPlayers);
   return game_->acpc_game_->stack[player] - acpcState_->spent[player];
 }
 
-uint32_t ACPCGame::ACPCState::Ante(const uint8_t player) const {
+uint32_t ACPCState::Ante(const uint8_t player) const {
   assert(player < game_->acpc_game_->numPlayers);
   return acpcState_->spent[player];
 }
 
-std::string ACPCGame::ACPCState::BettingSequence(uint8_t round) const {
+std::string ACPCState::BettingSequence(uint8_t round) const {
   assert(round < game_->acpc_game_->numRounds);
   std::ostringstream out;
   char buf[10];
@@ -233,7 +233,7 @@ std::string ACPCGame::ACPCState::BettingSequence(uint8_t round) const {
   return out.str();
 }
 
-void ACPCGame::ACPCState::SetHoleAndBoardCards(uint8_t holeCards[10][3],
+void ACPCState::SetHoleAndBoardCards(uint8_t holeCards[10][3],
                                                uint8_t boardCards[7],
                                                uint8_t nbHoleCards[10],
                                                uint8_t nbBoardCards) const {
@@ -250,7 +250,7 @@ void ACPCGame::ACPCState::SetHoleAndBoardCards(uint8_t holeCards[10][3],
   }
 }
 
-ACPCGame::ACPCState::~ACPCState() = default;
+ACPCState::~ACPCState() = default;
 ACPCGame::~ACPCGame() = default;
 }  // namespace acpc_cpp
 }  // namespace universal_poker

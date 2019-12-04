@@ -125,7 +125,7 @@ Player UniversalPokerState::CurrentPlayer() const {
   if (IsTerminal()) {
     return kTerminalPlayerId;
   }
-  if (game_node_.GetNodeType() == logic::GameTree::GameNode::NODE_TYPE_CHANCE) {
+  if (game_node_.GetNodeType() == logic::GameNode::NODE_TYPE_CHANCE) {
     return kChancePlayerId;
   }
 

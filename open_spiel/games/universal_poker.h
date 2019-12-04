@@ -63,7 +63,7 @@ class UniversalPokerState : public State {
 
  private:
   logic::GameTree *game_tree_;
-  logic::GameTree::GameNode game_node_;
+  logic::GameNode game_node_;
 };
 
 class UniversalPokerGame : public Game {

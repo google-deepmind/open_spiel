@@ -35,7 +35,7 @@ void BasicGameTreeTests() {
   std::srand(std::time(nullptr));
 
   for (int i = 0; i < 100; i++) {
-    GameTree::GameNode node(&tree);
+    GameNode node(&tree);
     std::cout << node.ToString() << std::endl;
     while (!node.IsFinished()) {
       uint32_t actions = node.GetActionCount();
@@ -59,7 +59,7 @@ void HoldemGameTreeTests() {
   std::srand(std::time(nullptr));
 
   for (int i = 0; i < 100; i++) {
-    GameTree::GameNode node(&tree);
+    GameNode node(&tree);
     while (!node.IsFinished()) {
       uint32_t actions = node.GetActionCount();
       uint32_t action = std::rand() % actions;

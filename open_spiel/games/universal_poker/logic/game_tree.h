@@ -24,29 +24,29 @@ namespace logic {
 
 class GameTree : public BettingTree {
  public:
-  class GameNode : public BettingNode {
-   public:
-    GameNode(GameTree* gameTree);
-
-    uint32_t GetActionCount() const;
-    void ApplyAction(uint32_t actionIdx);
-    std::string ToString() const;
-
-    const CardSet& GetBoardCards() const;
-    const CardSet& GetHoleCardsOfPlayer(uint8_t player) const;
-    double GetTotalReward(uint8_t player) const;
-
-   private:
-    GameTree* gameTree_;
-    CardSet deck_;
-    uint32_t actionCount_;
-    std::vector<CardSet> holeCards_;
-    CardSet boardCards_;
-  };
-
- public:
   GameTree(const std::string& gameDef);
 };
+
+class GameNode : public BettingNode {
+ public:
+  GameNode(GameTree* gameTree);
+
+  uint32_t GetActionCount() const;
+  void ApplyAction(uint32_t actionIdx);
+  std::string ToString() const;
+
+  const CardSet& GetBoardCards() const;
+  const CardSet& GetHoleCardsOfPlayer(uint8_t player) const;
+  double GetTotalReward(uint8_t player) const;
+
+ private:
+  GameTree* gameTree_;
+  CardSet deck_;
+  uint32_t actionCount_;
+  std::vector<CardSet> holeCards_;
+  CardSet boardCards_;
+};
+
 }  // namespace logic
 }  // namespace universal_poker
 }  // namespace open_spiel
