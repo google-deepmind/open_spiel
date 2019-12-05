@@ -52,9 +52,9 @@ class CardSet {
   // Toogle (does not remove) the bit associated to `card`.
   void RemoveCard(uint8_t card);
 
-  bool ContainsCards(uint8_t card);
+  bool ContainsCards(uint8_t card) const;
 
-  int CountCards() const;
+  int NumCards() const;
   // Returns the ranking value of this set of cards as evaluated by ACPC.
   int RankCards() const;
 

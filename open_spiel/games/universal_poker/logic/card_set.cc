@@ -84,7 +84,7 @@ std::string CardSet::ToString() const {
 }
 
 std::vector<uint8_t> CardSet::ToCardArray() const {
-  std::vector<uint8_t> result(CountCards(), 0);
+  std::vector<uint8_t> result(NumCards(), 0);
 
   int i = 0;
   for (int r = MAX_RANKS - 1; r >= 0; r--) {
@@ -112,7 +112,7 @@ void CardSet::RemoveCard(uint8_t card) {
   cs.bySuit[suit] ^= ((uint16_t)1 << rank);
 }
 
-int CardSet::CountCards() const { return __builtin_popcountl(cs.cards); }
+int CardSet::NumCards() const { return __builtin_popcountl(cs.cards); }
 
 int CardSet::RankCards() const {
   ::Cardset csNative;
@@ -141,7 +141,7 @@ std::vector<CardSet> CardSet::SampleCards(int nbCards) {
   return combinations;
 }
 
-bool CardSet::ContainsCards(uint8_t card) {
+bool CardSet::ContainsCards(uint8_t card) const {
   int rank = rankOfCard(card);
   int suit = suitOfCard(card);
   return (cs.bySuit[suit] & ((uint16_t)1 << rank)) > 0;

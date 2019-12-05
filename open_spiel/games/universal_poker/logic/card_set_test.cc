@@ -28,12 +28,12 @@ void BasicCardSetTests() {
     std::cout << "Card: " << card << std::endl;
   }
   std::cout << "Rank: " << cs.RankCards() << std::endl;
-  std::cout << "Count Cards: " << cs.CountCards() << std::endl;
+  std::cout << "Count Cards: " << cs.NumCards() << std::endl;
 
   CardSet deck(4, 13);
   std::cout << "CardSet: " << deck.ToString() << std::endl;
   std::cout << "Rank: " << deck.RankCards() << std::endl;
-  std::cout << "Count Cards: " << deck.CountCards() << std::endl;
+  std::cout << "Count Cards: " << deck.NumCards() << std::endl;
 
   for (auto combo : deck.SampleCards(3)) {
     std::cout << "CardSet: " << combo.ToString() << std::endl;

@@ -20,7 +20,8 @@
 #include <string>
 #include <vector>
 
-#include "open_spiel/games/universal_poker/logic/game_tree.h"
+#include "open_spiel/games/universal_poker/logic/betting_tree.h"
+#include "open_spiel/games/universal_poker/logic/card_set.h"
 #include "open_spiel/spiel.h"
 
 // This is a wrapper around the Annual Computer Poker Competition bot (ACPC)
@@ -61,9 +62,16 @@ class UniversalPokerState : public State {
  protected:
   void DoApplyAction(Action action_id) override;
 
- private:
+ public:
   const acpc_cpp::ACPCGame *acpc_game_;
-  logic::GameNode game_node_;
+  logic::BettingNode betting_node_;
+  double GetTotalReward(Player player) const;
+
+  logic::CardSet deck_;  // The remaining cards to deal.
+  int action_count_;
+  // The cards already owned by each player
+  std::vector<logic::CardSet> hole_cards_;
+  logic::CardSet board_cards_;
 };
 
 class UniversalPokerGame : public Game {
