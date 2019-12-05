@@ -73,7 +73,7 @@ class ACPCGame {
   std::string ToString() const;
   bool IsLimitGame() const;
   uint8_t GetNbRounds() const;
-  uint8_t GetNbPlayers() const;
+  int GetNbPlayers() const;
   // Returns the number of private cards for each player in this game.
   uint8_t GetNbHoleCardsRequired() const;
   uint8_t GetNbBoardCardsRequired(uint8_t round) const;

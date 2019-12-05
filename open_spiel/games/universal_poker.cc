@@ -380,7 +380,7 @@ std::vector<int> UniversalPokerGame::ObservationTensorShape() const {
   const int numHoleCards = acpc_game_.GetNbHoleCardsRequired();
   const int numPlayers = acpc_game_.GetNbPlayers();
 
-  return {(numPlayers) +
+  return {numPlayers +
           (numBoardCards + numHoleCards) *
               (acpc_game_.NumRanksDeck() * acpc_game_.NumSuitsDeck()) +
           (numPlayers)};

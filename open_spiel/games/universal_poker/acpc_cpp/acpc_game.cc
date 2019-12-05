@@ -101,7 +101,7 @@ bool ACPCGame::IsLimitGame() const {
   return acpc_game_->bettingType == limitBetting;
 }
 
-uint8_t ACPCGame::GetNbPlayers() const { return acpc_game_->numPlayers; }
+int ACPCGame::GetNbPlayers() const { return acpc_game_->numPlayers; }
 
 uint8_t ACPCGame::GetNbHoleCardsRequired() const {
   return acpc_game_->numHoleCards;
@@ -151,7 +151,7 @@ std::string ACPCState::ToString() const {
 
   out << buf << std::endl << "Spent: [";
   for (int p = 0; p < game_->acpc_game_->numPlayers; ++p) {
-    out << "P" << p << ": " << acpcState_->spent[p] << "\t";
+    out << "P" << p << ": " << acpcState_->spent[p] << "  ";
   }
   out << "]" << std::endl;
 

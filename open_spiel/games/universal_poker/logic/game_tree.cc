@@ -41,7 +41,7 @@ void GameNode::ApplyAction(uint32_t actionIdx) {
     deck_.RemoveCard(card);
 
     // Check where to add this card
-    for (uint8_t p = 0; p < acpc_game_->GetNbPlayers(); p++) {
+    for (int p = 0; p < acpc_game_->GetNbPlayers(); ++p) {
       if (hole_cards_[p].CountCards() < acpc_game_->GetNbHoleCardsRequired()) {
         hole_cards_[p].AddCard(card);
         break;
@@ -75,7 +75,7 @@ void GameNode::ApplyAction(uint32_t actionIdx) {
 std::string GameNode::ToString() const {
   std::ostringstream buf;
 
-  for (uint8_t p = 0; p < acpc_game_->GetNbPlayers(); p++) {
+  for (int p = 0; p < acpc_game_->GetNbPlayers(); ++p) {
     buf << "P" << (int)p << " Cards: " << hole_cards_[p].ToString()
         << std::endl;
   }
@@ -86,8 +86,8 @@ std::string GameNode::ToString() const {
   }
   if (GetNodeType() == NODE_TYPE_TERMINAL_FOLD ||
       GetNodeType() == NODE_TYPE_TERMINAL_SHOWDOWN) {
-    for (uint8_t p = 0; p < acpc_game_->GetNbPlayers(); p++) {
-      buf << "P" << (int)p << " Reward: " << GetTotalReward(p) << std::endl;
+    for (int p = 0; p < acpc_game_->GetNbPlayers(); ++p) {
+      buf << "P" << p << " Reward: " << GetTotalReward(p) << std::endl;
     }
   }
   buf << BettingNode::ToString();

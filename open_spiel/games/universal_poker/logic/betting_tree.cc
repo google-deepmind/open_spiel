@@ -100,7 +100,7 @@ void BettingNode::_CalculateActionsAndNodeType() {
 
   } else {
     // Check for sth to deal
-    for (uint8_t p = 0; p < acpc_game_->GetNbPlayers(); p++) {
+    for (int p = 0; p < acpc_game_->GetNbPlayers(); ++p) {
       if (nbHoleCardsDealtPerPlayer_[p] <
           acpc_game_->GetNbHoleCardsRequired()) {
         nodeType_ = NODE_TYPE_CHANCE;
