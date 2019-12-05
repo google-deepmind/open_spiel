@@ -34,6 +34,44 @@ swift build  # builds the OpenSpiel library
 swift test   # runs all unit tests
 ```
 
+## Using XCode
+
+To use OpenSpiel as a dependency for an XCode project, you need to use the [Swift Package Manager](https://swift.org/package-manager/) and use it to generate an XCode project. Create an executable package called `foo`:
+```
+mkdir foo
+cd foo
+swift package init --type executable
+```
+Now open the file `Package.swift` that was generated, and add OpenSpiel as a dependency. The contents are now:
+```
+// Package.swift
+
+import PackageDescription
+
+let package = Package(
+    name: "foo",
+    dependencies: [
+        .package(url: "https://github.com/deepmind/open_spiel.git", .branch("master")),
+    ],
+    targets: [
+        // Targets are the basic building blocks of a package. A target can define a module or a test suite.
+        // Targets can depend on other targets in this package, and on products in packages which this package depends on.
+        .target(
+            name: "foo",
+            dependencies: ["OpenSpiel"]),
+        .testTarget(
+            name: "fooTests",
+            dependencies: ["foo"]),
+    ]
+)
+```
+An XCode project can be generated from this package:
+```
+swift package generate-xcodeproj
+open foo.xcodeproj
+```
+Set the build system to the Legacy Build System (File → Project Settings → Build System), and you are ready to build using XCode.
+
 ## A tour through the code
 
 *   `Spiel.swift` contains the primary abstractions common to all games, such as
