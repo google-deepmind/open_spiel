@@ -66,6 +66,23 @@ class CTestTestCommand(test):
         )
 
 
+def get_requirements(requirements_file):
+    """Parse the requirements.txt file and produce a list of dependencies for setup()
+
+    Currently a requirements.txt is being used to specify dependencies. In order to
+    avoid specifying it in two places, we're going to use that file as the source
+    of truth.
+    """
+    with open(requirements_file) as f:
+        return list(filter(lambda s: len(s) > 0, (parse_requirement(l) for l in f)))
+
+
+def parse_requirement(s):
+    """Parse a line of a requirements.txt file"""
+    requirement, *_ = s.split("#")
+    return requirement.strip()
+
+
 setup(
     name="pyspiel",
     version="0.0.1rc2",
@@ -75,20 +92,7 @@ setup(
     long_description=get_readme("README.md"),
     long_description_content_type="text/markdown",
     url="https://github.com/deepmind/open_spiel",
-    install_requires=[
-        "absl-py == 0.7.1",
-        "tensorflow < 1.15.0, >= 1.14.0",
-        "dm-sonnet == 1.32",
-        "IPython == 5.8.0",
-        "tensorflow-probability < 0.8.0, >= 0.7.0",
-        "cvxopt == 1.2.3",
-        "networkx == 2.2",
-        "mock == 3.0.5",
-        "matplotlib == 3.1.1",
-        "nashpy == 0.0.19",
-        "scipy == 1.1.0",
-        "attrs == 19.1.0",
-    ],
+    install_requires=get_requirements("requirements.txt"),
     ext_modules=[CMakeExtension("pyspiel", sourcedir="open_spiel")],
     cmdclass={"build_ext": BuildExt, "test": CTestTestCommand},
     zip_safe=False,
