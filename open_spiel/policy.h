@@ -99,6 +99,13 @@ class TabularPolicy : public Policy {
   TabularPolicy(const std::unordered_map<std::string, ActionsAndProbs>& table)
       : policy_table_(table) {}
 
+  // Converts a policy to a TabularPolicy.
+  TabularPolicy(const Game& game, const Policy& policy) : TabularPolicy(game) {
+    for (auto& [infostate, is_policy] : policy_table_) {
+      is_policy = policy.GetStatePolicy(infostate);
+    }
+  }
+
   // Creates a new TabularPolicy from a deterministic policy encoded as a
   // {info_state_str -> action} dict. The dummy_policy is used to initialize
   // the initial mapping.
@@ -125,6 +132,10 @@ class TabularPolicy : public Policy {
   }
 
   std::unordered_map<std::string, ActionsAndProbs>& PolicyTable() {
+    return policy_table_;
+  }
+
+  const std::unordered_map<std::string, ActionsAndProbs>& PolicyTable() const {
     return policy_table_;
   }
 
