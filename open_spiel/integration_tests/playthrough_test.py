@@ -28,7 +28,7 @@ import pyspiel
 
 _DATA_DIR = "open_spiel/integration_tests/playthroughs/"
 
-_OPTIONAL_GAMES = set(["hanabi"])
+_OPTIONAL_GAMES = frozenset(["hanabi", "universal_poker"])
 _AVAILABLE_GAMES = set(pyspiel.registered_names())
 
 
