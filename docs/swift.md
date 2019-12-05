@@ -54,8 +54,6 @@ let package = Package(
         .package(url: "https://github.com/deepmind/open_spiel.git", .branch("master")),
     ],
     targets: [
-        // Targets are the basic building blocks of a package. A target can define a module or a test suite.
-        // Targets can depend on other targets in this package, and on products in packages which this package depends on.
         .target(
             name: "foo",
             dependencies: ["OpenSpiel"]),
@@ -71,6 +69,7 @@ swift package generate-xcodeproj
 open foo.xcodeproj
 ```
 Set the build system to the Legacy Build System (File → Project Settings → Build System), and you are ready to build using XCode.
+
 
 ## A tour through the code
 
