@@ -1,0 +1,168 @@
+game: tiny_bridge_2p(abstracted=true)
+seed: 2072203143
+
+GameType.chance_mode = ChanceMode.EXPLICIT_STOCHASTIC
+GameType.dynamics = Dynamics.SEQUENTIAL
+GameType.information = Information.IMPERFECT_INFORMATION
+GameType.long_name = "Tiny Bridge (Uncontested)"
+GameType.max_num_players = 2
+GameType.min_num_players = 2
+GameType.parameter_specification = ["abstracted"]
+GameType.provides_information_state_string = True
+GameType.provides_information_state_tensor = True
+GameType.provides_observation_string = True
+GameType.provides_observation_tensor = True
+GameType.reward_model = RewardModel.TERMINAL
+GameType.short_name = "tiny_bridge_2p"
+GameType.utility = Utility.IDENTICAL
+
+NumDistinctActions() = 7
+MaxChanceOutcomes() = 28
+GetParameters() = {abstracted=True}
+NumPlayers() = 2
+MinUtility() = -40.0
+MaxUtility() = 35.0
+UtilitySum() = None
+InformationStateTensorShape() = [12]
+InformationStateTensorSize() = 12
+ObservationTensorShape() = [12]
+ObservationTensorSize() = 12
+MaxGameLength() = 8
+ToString() = "tiny_bridge_2p(abstracted=True)"
+
+# State 0
+IsTerminal() = False
+ToString() = "W:?? E:??"
+History() = []
+HistoryString() = ""
+IsChanceNode() = True
+IsSimultaneousNode() = False
+CurrentPlayer() = -1
+InformationStateString(0) = "W:??"
+InformationStateString(1) = "E:??"
+InformationStateTensor(0) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+InformationStateTensor(1) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationString(0) = "W:??"
+ObservationString(1) = "E:??"
+ObservationTensor(0) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(1) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ChanceOutcomes() = [{0, 0.035714285714}, {1, 0.035714285714}, {3, 0.035714285714}, {6, 0.035714285714}, {10, 0.035714285714}, {15, 0.035714285714}, {21, 0.035714285714}, {2, 0.035714285714}, {4, 0.035714285714}, {7, 0.035714285714}, {11, 0.035714285714}, {16, 0.035714285714}, {22, 0.035714285714}, {5, 0.035714285714}, {8, 0.035714285714}, {12, 0.035714285714}, {17, 0.035714285714}, {23, 0.035714285714}, {9, 0.035714285714}, {13, 0.035714285714}, {18, 0.035714285714}, {24, 0.035714285714}, {14, 0.035714285714}, {19, 0.035714285714}, {25, 0.035714285714}, {20, 0.035714285714}, {26, 0.035714285714}, {27, 0.035714285714}]
+LegalActions() = [0, 1, 3, 6, 10, 15, 21, 2, 4, 7, 11, 16, 22, 5, 8, 12, 17, 23, 9, 13, 18, 24, 14, 19, 25, 20, 26, 27]
+StringLegalActions() = ["HQHJ", "HKHJ", "HAHJ", "SJHJ", "SQHJ", "SKHJ", "SAHJ", "HKHQ", "HAHQ", "SJHQ", "SQHQ", "SKHQ", "SAHQ", "HAHK", "SJHK", "SQHK", "SKHK", "SAHK", "SJHA", "SQHA", "SKHA", "SAHA", "SQSJ", "SKSJ", "SASJ", "SKSQ", "SASQ", "SASK"]
+
+# Apply action "SKHJ"
+action: 15
+
+# State 1
+IsTerminal() = False
+ToString() = "W:SKHJ E:??"
+History() = [15]
+HistoryString() = "15"
+IsChanceNode() = True
+IsSimultaneousNode() = False
+CurrentPlayer() = -1
+InformationStateString(0) = "W:SJHJ SJHK SJHQ SKHJ SKHK SKHQ SQHJ SQHK SQHQ"
+InformationStateString(1) = "E:??"
+InformationStateTensor(0) = [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+InformationStateTensor(1) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationString(0) = "W:SJHJ SJHK SJHQ SKHJ SKHK SKHQ SQHJ SQHK SQHQ"
+ObservationString(1) = "E:??"
+ObservationTensor(0) = [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(1) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ChanceOutcomes() = [{2, 0.066666666667}, {4, 0.066666666667}, {7, 0.066666666667}, {11, 0.066666666667}, {22, 0.066666666667}, {5, 0.066666666667}, {8, 0.066666666667}, {12, 0.066666666667}, {23, 0.066666666667}, {9, 0.066666666667}, {13, 0.066666666667}, {24, 0.066666666667}, {14, 0.066666666667}, {25, 0.066666666667}, {26, 0.066666666667}]
+LegalActions() = [2, 4, 7, 11, 22, 5, 8, 12, 23, 9, 13, 24, 14, 25, 26]
+StringLegalActions() = ["HKHQ", "HAHQ", "SJHQ", "SQHQ", "SAHQ", "HAHK", "SJHK", "SQHK", "SAHK", "SJHA", "SQHA", "SAHA", "SQSJ", "SASJ", "SASQ"]
+
+# Apply action "SQSJ"
+action: 14
+
+# State 2
+IsTerminal() = False
+ToString() = "W:SKHJ E:SQSJ"
+History() = [15, 14]
+HistoryString() = "15 14"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "W:SJHJ SJHK SJHQ SKHJ SKHK SKHQ SQHJ SQHK SQHQ"
+InformationStateString(1) = "E:SQSJ"
+InformationStateTensor(0) = [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+InformationStateTensor(1) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationString(0) = "W:SJHJ SJHK SJHQ SKHJ SKHK SKHQ SQHJ SQHK SQHQ"
+ObservationString(1) = "E:SQSJ"
+ObservationTensor(0) = [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(1) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 3, 4, 5, 6]
+StringLegalActions() = ["Pass", "1H", "1S", "1NT", "2H", "2S", "2NT"]
+
+# Apply action "2S"
+action: 5
+
+# State 3
+IsTerminal() = False
+ToString() = "W:SKHJ E:SQSJ 2S"
+History() = [15, 14, 5]
+HistoryString() = "15 14 5"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "W:SJHJ SJHK SJHQ SKHJ SKHK SKHQ SQHJ SQHK SQHQ 2S"
+InformationStateString(1) = "E:SQSJ 2S"
+InformationStateTensor(0) = [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0]
+InformationStateTensor(1) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0]
+ObservationString(0) = "W:SJHJ SJHK SJHQ SKHJ SKHK SKHQ SQHJ SQHK SQHQ 2S:W"
+ObservationString(1) = "E:SQSJ 2S:W"
+ObservationTensor(0) = [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(1) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 6]
+StringLegalActions() = ["Pass", "2NT"]
+
+# Apply action "2NT"
+action: 6
+
+# State 4
+IsTerminal() = False
+ToString() = "W:SKHJ E:SQSJ 2S-2NT"
+History() = [15, 14, 5, 6]
+HistoryString() = "15 14 5 6"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "W:SJHJ SJHK SJHQ SKHJ SKHK SKHQ SQHJ SQHK SQHQ 2S-2NT"
+InformationStateString(1) = "E:SQSJ 2S-2NT"
+InformationStateTensor(0) = [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0]
+InformationStateTensor(1) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0]
+ObservationString(0) = "W:SJHJ SJHK SJHQ SKHJ SKHK SKHQ SQHJ SQHK SQHQ 2NT:E"
+ObservationString(1) = "E:SQSJ 2NT:E"
+ObservationTensor(0) = [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0]
+ObservationTensor(1) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0]
+StringLegalActions() = ["Pass"]
+
+# Apply action "Pass"
+action: 0
+
+# State 5
+IsTerminal() = True
+ToString() = "W:SKHJ E:SQSJ 2S-2NT-Pass"
+History() = [15, 14, 5, 6, 0]
+HistoryString() = "15 14 5 6 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = -4
+InformationStateString(0) = "W:SJHJ SJHK SJHQ SKHJ SKHK SKHQ SQHJ SQHK SQHQ 2S-2NT-Pass"
+InformationStateString(1) = "E:SQSJ 2S-2NT-Pass"
+InformationStateTensor(0) = [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0]
+InformationStateTensor(1) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0]
+ObservationString(0) = "W:SJHJ SJHK SJHQ SKHJ SKHK SKHQ SQHJ SQHK SQHQ 2NT:E"
+ObservationString(1) = "E:SQSJ 2NT:E"
+ObservationTensor(0) = [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(1) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+Rewards() = [-39.99999999999999, -39.99999999999999]
+Returns() = [-39.99999999999999, -39.99999999999999]

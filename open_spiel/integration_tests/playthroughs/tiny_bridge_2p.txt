@@ -7,7 +7,7 @@ GameType.information = Information.IMPERFECT_INFORMATION
 GameType.long_name = "Tiny Bridge (Uncontested)"
 GameType.max_num_players = 2
 GameType.min_num_players = 2
-GameType.parameter_specification = []
+GameType.parameter_specification = ["abstracted"]
 GameType.provides_information_state_string = True
 GameType.provides_information_state_tensor = True
 GameType.provides_observation_string = True
@@ -18,7 +18,7 @@ GameType.utility = Utility.IDENTICAL
 
 NumDistinctActions() = 7
 MaxChanceOutcomes() = 28
-GetParameters() = {}
+GetParameters() = {abstracted=False}
 NumPlayers() = 2
 MinUtility() = -40.0
 MaxUtility() = 35.0

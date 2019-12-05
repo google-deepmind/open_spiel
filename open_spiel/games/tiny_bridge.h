@@ -49,6 +49,12 @@
 //     -20 per undertrick
 // Doubling (only in the 4p game) multiplies all scores by 2. Redoubling by a
 // further factor of 2.
+//
+// An abstracted version of the game is supported, where the 28 possible hands
+// are grouped into 12 buckets, using the following abstractions:
+//   - When holding only one card in a suit, we consider J/Q/K equivalent
+//   - We consider KQ and KJ in a single suit equivalent
+//   - We consider AK and AQ in a single suit equivalent (but not AJ)
 
 namespace open_spiel {
 namespace tiny_bridge {
@@ -61,6 +67,8 @@ inline constexpr int kNumSuits = 2;
 inline constexpr int kDeckSize = kNumRanks * kNumSuits;
 inline constexpr int kNumSeats = 4;
 inline constexpr int kNumTricks = kDeckSize / kNumSeats;
+inline constexpr int kNumAbstractHands = 12;
+
 // Number of possible private states (hands) for a single player.
 inline constexpr int kNumPrivates = (kDeckSize * (kDeckSize - 1)) / 2;
 inline constexpr std::array<const char*, kNumActions> kActionStr{
@@ -83,11 +91,14 @@ class TinyBridgeGame2p : public Game {
     return std::shared_ptr<const Game>(new TinyBridgeGame2p(*this));
   }
   std::vector<int> InformationStateTensorShape() const {
-    return {kDeckSize + kNumActions2p * 2};
+    return {is_abstracted_ ? kNumAbstractHands : kDeckSize + kNumActions2p * 2};
   }
   std::vector<int> ObservationTensorShape() const override {
-    return {kDeckSize + kNumActions2p};
+    return {is_abstracted_ ? kNumAbstractHands : kDeckSize + kNumActions2p};
   }
+
+ private:
+  const bool is_abstracted_;
 };
 
 // Four-player game. This is a zero-sum game of two partnerships.
@@ -132,7 +143,8 @@ class TinyBridgeAuctionState : public State {
     Seat redoubler;
   };
 
-  TinyBridgeAuctionState(std::shared_ptr<const Game> game) : State(game) {}
+  TinyBridgeAuctionState(std::shared_ptr<const Game> game, bool is_abstracted)
+      : State(game), is_abstracted_(is_abstracted) {}
   TinyBridgeAuctionState(const TinyBridgeAuctionState&) = default;
 
   Player CurrentPlayer() const override;
@@ -151,7 +163,7 @@ class TinyBridgeAuctionState : public State {
   void UndoAction(Player player, Action action) override;
   std::vector<std::pair<Action, double>> ChanceOutcomes() const override;
   std::string AuctionString() const;
-  std::string PlayerHandString(Player player) const;
+  std::string PlayerHandString(Player player, bool abstracted) const;
   std::string DealString() const;
 
  protected:
@@ -161,6 +173,7 @@ class TinyBridgeAuctionState : public State {
   bool is_terminal_ = false;
   double utility_p0;
   std::vector<int> actions_;
+  bool is_abstracted_;
 
   bool IsDealt(Player player) const { return actions_.size() > player; }
   bool HasAuctionStarted() const { return actions_.size() > num_players_; }

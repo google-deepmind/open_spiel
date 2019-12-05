@@ -90,6 +90,55 @@ std::pair<int, int> ChanceOutcomeToCards(int outcome) {
   return {card0, outcome - CardsToChanceOutcome(card0, 0)};
 }
 
+// Hand abstraction. Each line is a bucket of hands that are indistinguishable.
+inline constexpr const char* kAbstraction[kNumAbstractHands] = {
+    // Mixed suits.
+    "SAHA",
+    "SJHA SKHA SQHA",
+    "SAHJ SAHK SAHQ",
+    "SJHJ SJHK SJHQ SKHJ SKHK SKHQ SQHJ SQHK SQHQ",
+    // Hearts only.
+    "HAHK HAHQ",
+    "HKHJ HKHQ",
+    "HAHJ",
+    "HQHJ",
+    // Spades only.
+    "SASK SASQ",
+    "SKSQ SKSJ",
+    "SASJ",
+    "SQSJ",
+};
+
+// Computes the abstraction lookup.
+std::vector<int> ConcreteToAbstract() {
+  std::vector<int> concrete_to_abstract(kNumPrivates, -1);
+  for (int c = 0; c < kNumPrivates; ++c) {
+    auto hand = HandString(c);
+    for (int ah = 0; ah < kNumAbstractHands; ++ah) {
+      if (absl::StrContains(kAbstraction[ah], hand)) {
+        concrete_to_abstract[c] = ah;
+        break;
+      }
+    }
+    if (concrete_to_abstract[c] == -1) {
+      SpielFatalError(
+          absl::StrCat("Abstraction not found for concrete hand '", hand, "'"));
+    }
+  }
+  return concrete_to_abstract;
+}
+
+// Returns an abstraction.
+int ChanceOutcomeToHandAbstraction(int outcome) {
+  static std::vector<int> concrete_to_abstract = ConcreteToAbstract();
+  return concrete_to_abstract[outcome];
+}
+
+// Abstract hand string.
+std::string ChanceOutcomeToHandAbstractionString(int outcome) {
+  return kAbstraction[ChanceOutcomeToHandAbstraction(outcome)];
+}
+
 // Facts about the game
 const GameType kGameType2p{
     /*short_name=*/"tiny_bridge_2p",
@@ -105,8 +154,11 @@ const GameType kGameType2p{
     /*provides_information_state_tensor=*/true,
     /*provides_observation_string=*/true,
     /*provides_observation_tensor=*/true,
-    /*parameter_specification=*/{}  // no parameters
-};
+    /*parameter_specification=*/
+    {
+        {"abstracted",
+         GameParameter(GameParameter::Type::kBool, /*is_mandatory=*/false)},
+    }};
 
 const GameType kGameType4p{
     /*short_name=*/"tiny_bridge_4p",
@@ -194,17 +246,20 @@ std::string HandString(Action outcome) {
 std::string SeatString(Seat seat) { return std::string(1, kSeatChar[seat]); }
 
 TinyBridgeGame2p::TinyBridgeGame2p(const GameParameters& params)
-    : Game(kGameType2p, params) {}
+    : Game(kGameType2p, params),
+      is_abstracted_(ParameterValue<bool>("abstracted", false)) {}
 
 std::unique_ptr<State> TinyBridgeGame2p::NewInitialState() const {
-  return std::unique_ptr<State>(new TinyBridgeAuctionState(shared_from_this()));
+  return std::unique_ptr<State>(
+      new TinyBridgeAuctionState(shared_from_this(), is_abstracted_));
 }
 
 TinyBridgeGame4p::TinyBridgeGame4p(const GameParameters& params)
     : Game(kGameType4p, params) {}
 
 std::unique_ptr<State> TinyBridgeGame4p::NewInitialState() const {
-  return std::unique_ptr<State>(new TinyBridgeAuctionState(shared_from_this()));
+  return std::unique_ptr<State>(
+      new TinyBridgeAuctionState(shared_from_this(), /*is_abstracted=*/false));
 }
 
 TinyBridgePlayGame::TinyBridgePlayGame(const GameParameters& params)
@@ -230,9 +285,11 @@ Seat TinyBridgeAuctionState::PlayerToSeat(Player player) const {
   return num_players_ == 2 ? Seat(player * 2) : Seat(player);
 }
 
-std::string TinyBridgeAuctionState::PlayerHandString(Player player) const {
+std::string TinyBridgeAuctionState::PlayerHandString(Player player,
+                                                     bool abstracted) const {
   if (!IsDealt(player)) return "??";
-  return HandString(actions_[player]);
+  return abstracted ? ChanceOutcomeToHandAbstractionString(actions_[player])
+                    : HandString(actions_[player]);
 }
 
 std::string TinyBridgeAuctionState::DealString() const {
@@ -240,7 +297,7 @@ std::string TinyBridgeAuctionState::DealString() const {
   for (auto player = Player{0}; player < num_players_; ++player) {
     if (player != 0) deal.push_back(' ');
     absl::StrAppend(&deal, SeatString(PlayerToSeat(player)), ":",
-                    PlayerHandString(player));
+                    PlayerHandString(player, /*abstracted=*/false));
   }
   return deal;
 }
@@ -479,7 +536,7 @@ std::string TinyBridgeAuctionState::InformationStateString(
   SPIEL_CHECK_LT(player, num_players_);
 
   std::string hand = absl::StrCat(SeatString(PlayerToSeat(player)), ":",
-                                  PlayerHandString(player));
+                                  PlayerHandString(player, is_abstracted_));
   std::string auction = AuctionString();
   if (!auction.empty())
     return absl::StrCat(hand, " ", auction);
@@ -496,8 +553,9 @@ std::string TinyBridgeAuctionState::ObservationString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  std::string observation = absl::StrCat(SeatString(PlayerToSeat(player)), ":",
-                                         PlayerHandString(player));
+  std::string observation =
+      absl::StrCat(SeatString(PlayerToSeat(player)), ":",
+                   PlayerHandString(player, is_abstracted_));
   if (HasAuctionStarted()) {
     auto state = AnalyzeAuction();
     absl::StrAppend(&observation, " ",
@@ -522,15 +580,21 @@ void TinyBridgeAuctionState::InformationStateTensor(
   SPIEL_CHECK_LT(player, num_players_);
 
   SPIEL_CHECK_EQ(num_players_, 2);
-  values->resize(kDeckSize + kNumActions2p * 2);
+  const int kHandSize = is_abstracted_ ? kNumAbstractHands : kDeckSize;
+  values->resize(kHandSize + kNumActions2p * 2);
   std::fill(values->begin(), values->end(), 0);
   if (IsDealt(player)) {
-    const auto cards = ChanceOutcomeToCards(actions_[player]);
-    values->at(cards.first) = 1;
-    values->at(cards.second) = 1;
+    if (is_abstracted_) {
+      const int abstraction = ChanceOutcomeToHandAbstraction(actions_[player]);
+      values->at(abstraction) = 1;
+    } else {
+      const auto cards = ChanceOutcomeToCards(actions_[player]);
+      values->at(cards.first) = 1;
+      values->at(cards.second) = 1;
+    }
   }
   for (int i = num_players_; i < actions_.size(); ++i) {
-    values->at(kDeckSize + actions_[i] * 2 + (i - player) % num_players_) = 1;
+    values->at(kHandSize + actions_[i] * 2 + (i - player) % num_players_) = 1;
   }
 }
 
@@ -543,15 +607,21 @@ void TinyBridgeAuctionState::ObservationTensor(
   SPIEL_CHECK_LT(player, num_players_);
 
   SPIEL_CHECK_EQ(num_players_, 2);
-  values->resize(kDeckSize + kNumActions2p);
+  const int kHandSize = is_abstracted_ ? kNumAbstractHands : kDeckSize;
+  values->resize(kHandSize + kNumActions2p);
   std::fill(values->begin(), values->end(), 0);
   if (IsDealt(player)) {
-    const auto cards = ChanceOutcomeToCards(actions_[player]);
-    values->at(cards.first) = 1;
-    values->at(cards.second) = 1;
+    if (is_abstracted_) {
+      const int abstraction = ChanceOutcomeToHandAbstraction(actions_[player]);
+      values->at(abstraction) = 1;
+    } else {
+      const auto cards = ChanceOutcomeToCards(actions_[player]);
+      values->at(cards.first) = 1;
+      values->at(cards.second) = 1;
+    }
   }
   if (HasAuctionStarted()) {
-    values->at(kDeckSize + actions_.back()) = 1;
+    values->at(kHandSize + actions_.back()) = 1;
   }
 }
 
