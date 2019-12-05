@@ -69,11 +69,12 @@ if [[ ${BUILD_WITH_HANABI:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; then
   popd
 fi
 
-# The official https://github.com/ethansbrown/acpc was outdated so we forked it and updated it with
-# the latest version from http://www.computerpokercompetition.org/downloads/code/competition_server/project_acpc_server_v1.0.42.tar.bz2
+# This Github repository contains the raw code from the ACPC server
+# http://www.computerpokercompetition.org/downloads/code/competition_server/project_acpc_server_v1.0.42.tar.bz2
+# with the code compiled as C++ within a namespace.
 DIR="open_spiel/games/universal_poker/acpc"
 if [[ ${BUILD_WITH_ACPC:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; then
-  git clone -b 'master' --single-branch --depth 1  https://github.com/dennisjay/acpc.git ${DIR}
+  git clone -b 'master' --single-branch --depth 1  https://github.com/jblespiau/project_acpc_server.git ${DIR}
 fi
 
 

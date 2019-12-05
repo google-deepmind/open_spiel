@@ -6,9 +6,9 @@ set(HEADER_FILES
 
 set(CLIB_FILES
   acpc/project_acpc_server/game.h
-  acpc/project_acpc_server/game.c
+  acpc/project_acpc_server/game.cc
   acpc/project_acpc_server/rng.h
-  acpc/project_acpc_server/rng.c
+  acpc/project_acpc_server/rng.cc
 )
 
 set(SOURCE_FILES
