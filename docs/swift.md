@@ -68,7 +68,7 @@ An XCode project can be generated from this package:
 swift package generate-xcodeproj
 open foo.xcodeproj
 ```
-Set the build system to the Legacy Build System (File → Project Settings → Build System), and you are ready to build using XCode.
+Set the build system to the Legacy Build System (File → Project Settings → Build System) required by [Swift for Tensorflow](https://github.com/tensorflow/swift/blob/master/Installation.md#installation), and you are ready to build using XCode.
 
 
 ## A tour through the code
