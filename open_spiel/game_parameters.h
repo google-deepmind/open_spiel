@@ -115,6 +115,8 @@ class GameParameter {
   Type type_;
 };
 
+std::string GameParameterTypeToString(const GameParameter::Type& type);
+
 inline bool IsParameterSpecified(const GameParameters& table,
                                  const std::string& key) {
   return table.find(key) != table.end();
