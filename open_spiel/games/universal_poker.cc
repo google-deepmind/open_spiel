@@ -24,12 +24,13 @@
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/games/universal_poker/logic/card_set.h"
+#include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
 namespace universal_poker {
 
-const absl::string_view kNoGameDef = "NoGameDef";
+const absl::string_view kEmptyString = "";
 
 const GameType kGameType{
     /*short_name=*/"universal_poker",
@@ -46,57 +47,56 @@ const GameType kGameType{
     /*provides_observation_string=*/true,
     /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
-    //
-    // The ACPC code uses a specific configuration file to describe the game.
-    // The following has been copied from ACPC documentation:
-    // """
-    // Game definitions can have the following fields (case is ignored):
-    //
-    // gamedef - the starting tag for a game definition
-    // end gamedef - ending tag for a game definition
-    // stack - the stack size for each player at the start of each hand (for
-    //   no-limit)
-    // blind - the size of the blinds for each player (relative to the dealer)
-    // raisesize - the size of raises on each round (for limit games)
-    // limit - specifies a limit game
-    // nolimit - specifies a no-limit game
-    // numplayers - number of players in the game
-    // numrounds - number of betting rounds per hand of the game
-    // firstplayer - the player that acts first (relative to the dealer) on each
-    //   round
-    // maxraises - the maximum number of raises on each round
-    // numsuits - the number of different suits in the deck
-    // numranks - the number of different ranks in the deck
-    // numholecards - the number of private cards to  deal to each player
-    // numboardcards - the number of cards revealed on each round
-    //
-    // Empty lines or lines with '#' as the very first character will be ignored
-    //
-    // If you are creating your own game definitions, please note that game.h
-    // defines some constants for maximums in games (e.g., number of rounds).
-    // These may need to be changed for games outside of the what is being run
-    // for the Annual Computer Poker Competition.
-    // """
-    {// The ACPC gamedef string.  When present, it will take precedence over
+
+    {// The ACPC code uses a specific configuration file to describe the game.
+     // The following has been copied from ACPC documentation:
+     //
+     // Empty lines or lines with '#' as the very first character will be
+     // ignored
+     //
+     // The Game definitions should start with "gamedef" and end with
+     // "end gamedef" and can have the fields documented bellow (case is
+     // ignored)
+     //
+     // If you are creating your own game definitions, please note that game.h
+     // defines some constants for maximums in games (e.g., number of rounds).
+     // These may need to be changed for games outside of the what is being run
+     // for the Annual Computer Poker Competition.
+
+     // The ACPC gamedef string.  When present, it will take precedence over
      // everything and no other argument should be provided.
-     {"gamedef", GameParameter(std::string(kNoGameDef))},
+     {"gamedef", GameParameter(std::string(kEmptyString))},
+     // Instead of a single gamedef, specifying each line is also possible.
+     // The documentation is adapted from project_acpc_server/game.cc.
+     //
      // Number of Players (up to 10)
-     {"players", GameParameter(2)},
-     // Betting Type "limit" "nolimit" (currently only nolimit supported)
-     {"bettingType", GameParameter(std::string("nolimit"))},
-     // Stack of money per Player
-     {"stackPerPlayer", GameParameter(1200)},
-     {"bigBlind", GameParameter(100)},
-     {"smallBlind", GameParameter(100)},
-     // Count of Rounds
-     {"rounds", GameParameter(2)},
-     // Who is the first player by round?
+     {"numPlayers", GameParameter(2)},
+     // Betting Type "limit" "nolimit"
+     {"betting", GameParameter(std::string("nolimit"))},
+     // The stack size for each player at the start of each hand (for
+     // no-limit). It will be ignored on "limit".
+     // TODO(author2): It's unclear what happens on limit. It defaults to
+     // INT32_MAX for all players when not provided.
+     {"stack", GameParameter(std::string("1200 1200"))},
+     // The size of the blinds for each player (relative to the dealer)
+     {"blind", GameParameter(std::string("100 100"))},
+     // The size of raises on each round (for limit games only) as numrounds
+     // integers. It will be ignored for nolimite games.
+     {"raiseSize", GameParameter(std::string("100 100"))},
+     // Number of betting rounds per hand of the game
+     {"numRounds", GameParameter(2)},
+     // The player that acts first (relative to the dealer) on each round
      {"firstPlayer", GameParameter(std::string("1 1"))},
+     // maxraises - the maximum number of raises on each round. If not
+     // specified, it will default to UINT8_MAX.
+     {"maxRaises", GameParameter(std::string(kEmptyString))},
+     // The number of different suits in the deck
      {"numSuits", GameParameter(4)},
+     // The number of different ranks in the deck
      {"numRanks", GameParameter(6)},
-     // Hole Cards (Private Cards) per Player
+     // The number of private cards to  deal to each player
      {"numHoleCards", GameParameter(1)},
-     // Board Cards (Public Cards) per Player
+     // The number of cards revealed on each round
      {"numBoardCards", GameParameter(std::string("0 1"))}}};
 
 std::shared_ptr<const Game> Factory(const GameParameters &params) {
@@ -109,7 +109,7 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 // and 4 for no limit).
 // TODO(author2): Is that a bug? There are 5 actions? Is no limit means
 // "bet bot" is added? or should "all in" be also added?
-inline uint32_t GetMaxBettingActions(const acpc_cpp::ACPCGame& acpc_game) {
+inline uint32_t GetMaxBettingActions(const acpc_cpp::ACPCGame &acpc_game) {
   return acpc_game.IsLimitGame() ? 3 : 4;
 }
 
@@ -122,7 +122,7 @@ UniversalPokerState::UniversalPokerState(std::shared_ptr<const Game> game)
       deck_(/*num_suits=*/acpc_game_->NumSuitsDeck(),
             /*num_ranks=*/acpc_game_->NumRanksDeck()),
       hole_cards_(acpc_game_->GetNbPlayers()),
-      nodeType_(NODE_TYPE_CHANCE),
+      cur_player_(kChancePlayerId),
       possibleActions_(ACTION_DEAL) {}
 
 std::string UniversalPokerState::ToString() const {
@@ -137,21 +137,19 @@ std::string UniversalPokerState::ToString() const {
   if (IsChanceNode()) {
     buf << "PossibleCardsToDeal " << deck_.ToString() << std::endl;
   }
-  if (nodeType_ == NODE_TYPE_TERMINAL_FOLD ||
-      nodeType_ == NODE_TYPE_TERMINAL_SHOWDOWN) {
+  if (IsTerminal()) {
     for (int p = 0; p < acpc_game_->GetNbPlayers(); ++p) {
       buf << "P" << p << " Reward: " << GetTotalReward(p) << std::endl;
     }
   }
-  buf << "NodeType: ";
-  buf << (nodeType_ == NODE_TYPE_CHANCE ? "NODE_TYPE_CHANCE" : "");
-  buf << (nodeType_ == NODE_TYPE_CHOICE ? "NODE_TYPE_CHOICE" : "");
-  buf << (nodeType_ == NODE_TYPE_TERMINAL_SHOWDOWN
-              ? "NODE_TYPE_TERMINAL_SHOWDOWN"
-              : "");
-  buf << (nodeType_ == NODE_TYPE_TERMINAL_FOLD ? "NODE_TYPE_TERMINAL_FOLD"
-                                               : "");
-  buf << std::endl;
+  buf << "Node type?: ";
+  if (IsChanceNode()) {
+    buf << "Chance node" << std::endl;
+  } else if (IsTerminal()) {
+    buf << "Terminal Node!" << std::endl;
+  } else {
+    buf << "Player node for player " << cur_player_ << std::endl;
+  }
 
   buf << "PossibleActions (" << GetPossibleActionCount() << "): [";
   for (auto action : ALL_ACTIONS) {
@@ -171,23 +169,26 @@ std::string UniversalPokerState::ToString() const {
   return buf.str();
 }
 
+std::string UniversalPokerState::ActionToString(Player player,
+                                                Action move) const {
+  return absl::StrCat("player=", player, " move=", move);
+}
+
 bool UniversalPokerState::IsTerminal() const {
-  bool finished = nodeType_ == NODE_TYPE_TERMINAL_SHOWDOWN ||
-                  nodeType_ == NODE_TYPE_TERMINAL_FOLD;
+  bool finished = cur_player_ == kTerminalPlayerId;
   assert(acpc_state_.IsFinished() || !finished);
   return finished;
 }
 
-std::string UniversalPokerState::ActionToString(Player player,
-                                                Action move) const {
-  return absl::StrCat("player=", player, " move=", move);
+bool UniversalPokerState::IsChanceNode() const {
+  return cur_player_ == kChancePlayerId;
 }
 
 Player UniversalPokerState::CurrentPlayer() const {
   if (IsTerminal()) {
     return kTerminalPlayerId;
   }
-  if (nodeType_ == NODE_TYPE_CHANCE) {
+  if (IsChanceNode()) {
     return kChancePlayerId;
   }
 
@@ -385,7 +386,7 @@ std::vector<std::pair<Action, double>> UniversalPokerState::ChanceOutcomes()
   const int num_cards = available_cards.size();
   const double p = 1.0 / num_cards;
 
-  // We need to cast std::vector<uint8_t> into std::vector<Action>.
+  // We need to convert std::vector<uint8_t> into std::vector<Action>.
   std::vector<std::pair<Action, double>> outcomes;
   outcomes.reserve(num_cards);
   for (const auto &card : available_cards) {
@@ -411,24 +412,30 @@ std::vector<Action> UniversalPokerState::LegalActions() const {
   return actions;
 }
 
+// We first deal the cards to each player, dealing all the cards to the first
+// player first, then the second player, until all players have their private
+// cards.
 void UniversalPokerState::DoApplyAction(Action action_id) {
   if (IsChanceNode()) {
-    ApplyDealCards();
     // In chance nodes, the action_id is exactly the card being dealt.
     uint8_t card = action_id;
     deck_.RemoveCard(card);
+    actionSequence_ += 'd';
 
     // Check where to add this card
     for (int p = 0; p < acpc_game_->GetNbPlayers(); ++p) {
       if (hole_cards_[p].NumCards() < acpc_game_->GetNbHoleCardsRequired()) {
         hole_cards_[p].AddCard(card);
-        break;
+        _CalculateActionsAndNodeType();
+        return;
       }
     }
 
     if (board_cards_.NumCards() <
         acpc_game_->GetNbBoardCardsRequired(acpc_state_.GetRound())) {
       board_cards_.AddCard(card);
+      _CalculateActionsAndNodeType();
+      return;
     }
   } else {
     uint32_t idx = 0;
@@ -518,7 +525,7 @@ double UniversalPokerGame::MinUtility() const {
   // The most any single player can lose is the maximum number of raises per
   // round times the amounts of each of the raises, plus the original chip they
   // put in to play.
-  return -1 * (double)acpc_game_.StackSize(0);
+  return -1. * (double)acpc_game_.StackSize(0);
 }
 
 int UniversalPokerGame::MaxChanceOutcomes() const {
@@ -592,36 +599,39 @@ std::string UniversalPokerGame::parseParameters(const GameParameters &map) {
   }
 
   std::string generated_gamedef = "GAMEDEF\n";
+
   absl::StrAppend(
-      &generated_gamedef, ParameterValue<std::string>("bettingType"), "\n",
-      "numPlayers = ", ParameterValue<int>("players"), "\n",
-      "numRounds = ", ParameterValue<int>("rounds"), "\n",
-      "numSuits = ", ParameterValue<int>("numSuits"), "\n",
+      &generated_gamedef, ParameterValue<std::string>("betting"), "\n",
+      "numPlayers = ", ParameterValue<int>("numPlayers"), "\n",
+      "numRounds = ", ParameterValue<int>("numRounds"), "\n",
+      "numsuits = ", ParameterValue<int>("numSuits"), "\n",
       "firstPlayer = ", ParameterValue<std::string>("firstPlayer"), "\n",
       "numRanks = ", ParameterValue<int>("numRanks"), "\n",
       "numHoleCards = ", ParameterValue<int>("numHoleCards"), "\n",
       "numBoardCards = ", ParameterValue<std::string>("numBoardCards"), "\n");
 
-  absl::StrAppend(&generated_gamedef, "stack = ");
-  for (int p = 0; p < ParameterValue<int>("players"); p++) {
-    absl::StrAppend(&generated_gamedef, ParameterValue<int>("stackPerPlayer"),
-                    " ");
+  std::string max_raises = ParameterValue<std::string>("maxRaises");
+  if (max_raises != kEmptyString) {
+    absl::StrAppend(&generated_gamedef, "maxRaises = ", max_raises, "\n");
   }
-  absl::StrAppend(&generated_gamedef, "\n");
 
-  absl::StrAppend(&generated_gamedef, "blind = ");
-  for (int p = 0; p < ParameterValue<int>("players"); p++) {
-    if (p == 0) {
-      absl::StrAppend(&generated_gamedef, ParameterValue<int>("bigBlind"), " ");
-    } else if (p == 1) {
-      absl::StrAppend(&generated_gamedef, ParameterValue<int>("smallBlind"),
-                      " ");
-    } else {
-      absl::StrAppend(&generated_gamedef, "0 ");
+  if (ParameterValue<std::string>("betting") == "limit") {
+    std::string raise_size = ParameterValue<std::string>("raiseSize");
+    if (raise_size != kEmptyString) {
+      absl::StrAppend(&generated_gamedef, "raiseSize = ", raise_size, "\n");
     }
+  } else if (ParameterValue<std::string>("betting") == "nolimit") {
+    std::string stack = ParameterValue<std::string>("stack");
+    if (stack != kEmptyString) {
+      absl::StrAppend(&generated_gamedef, "stack = ", stack, "\n");
+    }
+  } else {
+    SpielFatalError(absl::StrCat("betting should be limit or nolimit, not ",
+                                 ParameterValue<std::string>("betting")));
   }
-  absl::StrAppend(&generated_gamedef, "\n");
 
+  absl::StrAppend(&generated_gamedef,
+                  "blind = ", ParameterValue<std::string>("blind"), "\n");
   absl::StrAppend(&generated_gamedef, "END GAMEDEF\n");
   std::cerr << "Generated gamedef for Universal Poker:\n"
             << generated_gamedef << std::endl;
@@ -631,7 +641,7 @@ std::string UniversalPokerGame::parseParameters(const GameParameters &map) {
 const char *actions = "0df0c000p0000000a";
 
 void UniversalPokerState::ApplyChoiceAction(ActionType action_type) {
-  assert(nodeType_ == NODE_TYPE_CHOICE);
+  SPIEL_CHECK_GE(cur_player_, 0);  // No chance not terminal.
   assert((possibleActions_ & action_type) > 0);
 
   actionSequence_ += (char)actions[action_type];
@@ -659,63 +669,45 @@ void UniversalPokerState::ApplyChoiceAction(ActionType action_type) {
   _CalculateActionsAndNodeType();
 }
 
-void UniversalPokerState::ApplyDealCards() {
-  assert(nodeType_ == NODE_TYPE_CHANCE);
-  actionSequence_ += 'd';
-
-  for (uint8_t p = 0; p < acpc_game_->GetNbPlayers(); p++) {
-    if (nbHoleCardsDealtPerPlayer_[p] < acpc_game_->GetNbHoleCardsRequired()) {
-      nbHoleCardsDealtPerPlayer_[p]++;
-      _CalculateActionsAndNodeType();
-      return;
-    }
-  }
-
-  if (nbBoardCardsDealt_ <
-      acpc_game_->GetNbBoardCardsRequired(acpc_state_.GetRound())) {
-    nbBoardCardsDealt_++;
-    _CalculateActionsAndNodeType();
-    return;
-  }
-
-  assert(false);
-}
-
 void UniversalPokerState::_CalculateActionsAndNodeType() {
   possibleActions_ = 0;
 
   if (acpc_state_.IsFinished()) {
     if (acpc_state_.NumFolded() >= acpc_game_->GetNbPlayers() - 1) {
-      nodeType_ = NODE_TYPE_TERMINAL_FOLD;
+      // All players except one has fold.
+      cur_player_ = kTerminalPlayerId;
     } else {
-      if (nbBoardCardsDealt_ <
+      if (board_cards_.NumCards() <
           acpc_game_->GetNbBoardCardsRequired(acpc_state_.GetRound())) {
-        nodeType_ = NODE_TYPE_CHANCE;
+        cur_player_ = kChancePlayerId;
         possibleActions_ = ACTION_DEAL;
         return;
       }
-      nodeType_ = NODE_TYPE_TERMINAL_SHOWDOWN;
+      // Showdown!
+      cur_player_ = kTerminalPlayerId;
     }
 
   } else {
     // Check for sth to deal
-    for (int p = 0; p < acpc_game_->GetNbPlayers(); ++p) {
-      if (nbHoleCardsDealtPerPlayer_[p] <
-          acpc_game_->GetNbHoleCardsRequired()) {
-        nodeType_ = NODE_TYPE_CHANCE;
-        possibleActions_ = ACTION_DEAL;
-        return;
-      }
+    // 1. We still need to deal cards if a player still has missing cards.
+    // Because we deal from 0 to num_players - 1, we can just check the last
+    // player.
+    if (hole_cards_[acpc_game_->GetNbPlayers() - 1].NumCards() <
+        acpc_game_->GetNbHoleCardsRequired()) {
+      cur_player_ = kChancePlayerId;
+      possibleActions_ = ACTION_DEAL;
+      return;
     }
-    if (nbBoardCardsDealt_ <
+    // 2. We need to deal a public card.
+    if (board_cards_.NumCards() <
         acpc_game_->GetNbBoardCardsRequired(acpc_state_.GetRound())) {
-      nodeType_ = NODE_TYPE_CHANCE;
+      cur_player_ = kChancePlayerId;
       possibleActions_ = ACTION_DEAL;
       return;
     }
 
     // Check for CHOICE Actions
-    nodeType_ = NODE_TYPE_CHOICE;
+    cur_player_ = acpc_state_.CurrentPlayer();
     if (acpc_state_.IsValidAction(
             acpc_cpp::ACPCState::ACPCActionType::ACPC_FOLD, 0)) {
       possibleActions_ |= ACTION_FOLD;
@@ -753,9 +745,9 @@ int UniversalPokerState::GetDepth() {
   for (auto action : ALL_ACTIONS) {
     if (action & possibleActions_) {
       UniversalPokerState child(*this);
-      if (child.nodeType_ == NODE_TYPE_CHANCE) {
-        child.ApplyDealCards();
-      } else if (child.nodeType_ == NODE_TYPE_CHOICE) {
+      if (child.IsChanceNode()) {
+        child.ApplyAction(child.LegalActions()[0]);
+      } else if (child.CurrentPlayer() >= 0) {  // Player node
         child.ApplyChoiceAction(action);
       }
       int depth = child.GetDepth();

@@ -44,10 +44,11 @@ class UniversalPokerState : public State {
  public:
   explicit UniversalPokerState(std::shared_ptr<const Game> game);
 
+  bool IsTerminal() const override;
+  bool IsChanceNode() const override;
   Player CurrentPlayer() const override;
   std::string ActionToString(Player player, Action move) const override;
   std::string ToString() const override;
-  bool IsTerminal() const override;
   std::vector<double> Returns() const override;
   std::string InformationStateString(Player player) const override;
   std::string ObservationString(Player player) const override;
@@ -64,12 +65,6 @@ class UniversalPokerState : public State {
  protected:
   void DoApplyAction(Action action_id) override;
 
-  enum NodeType {
-    NODE_TYPE_CHANCE,
-    NODE_TYPE_CHOICE,
-    NODE_TYPE_TERMINAL_FOLD,
-    NODE_TYPE_TERMINAL_SHOWDOWN
-  };
   enum ActionType {
     ACTION_DEAL = 1,
     ACTION_FOLD = 2,
@@ -87,17 +82,17 @@ class UniversalPokerState : public State {
   logic::CardSet deck_;  // The remaining cards to deal.
   // The cards already owned by each player
   std::vector<logic::CardSet> hole_cards_;
-  logic::CardSet board_cards_;
-
-  NodeType nodeType_;
+  logic::CardSet board_cards_;  // The public cards.
+  // The current player:
+  // kChancePlayerId for chance nodes
+  // kTerminalPlayerId when we everyone except one player has fold, or that
+  // we have reached the showdown.
+  // The current player >= 0 otherwise.
+  Player cur_player_;
   uint32_t possibleActions_;
   int32_t potSize_ = 0;
   int32_t allInSize_ = 0;
   std::string actionSequence_;
-
-  uint8_t nbHoleCardsDealtPerPlayer_[kMaxUniversalPokerPlayers] = {
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-  uint8_t nbBoardCardsDealt_ = 0;
 
   void _CalculateActionsAndNodeType();
 
@@ -107,7 +102,6 @@ class UniversalPokerState : public State {
   const int GetPossibleActionCount() const;
 
   void ApplyChoiceAction(ActionType action_type);
-  virtual void ApplyDealCards();
   int GetDepth();
   std::string GetActionSequence() const { return actionSequence_; }
 };

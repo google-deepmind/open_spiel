@@ -39,6 +39,19 @@ constexpr absl::string_view kKuhnLimit3P =
      "numHoleCards = 1\n"
      "numBoardCards = 0\n"
      "END GAMEDEF\n");
+GameParameters KuhnLimit3PParameters() {
+  return {{"betting", GameParameter(std::string("limit"))},
+          {"numPlayers", GameParameter(3)},
+          {"numRounds", GameParameter(1)},
+          {"blind", GameParameter(std::string("1 1 1"))},
+          {"raiseSize", GameParameter(std::string("1"))},
+          {"firstPlayer", GameParameter(std::string("1"))},
+          {"maxRaises", GameParameter(std::string("1"))},
+          {"numSuits", GameParameter(1)},
+          {"numRanks", GameParameter(4)},
+          {"numHoleCards", GameParameter(1)},
+          {"numBoardCards", GameParameter(std::string("0"))}};
+}
 
 constexpr absl::string_view kHoldemNoLimit6P =
     ("GAMEDEF\n"
@@ -53,15 +66,57 @@ constexpr absl::string_view kHoldemNoLimit6P =
      "numHoleCards = 2\n"
      "numBoardCards = 0 3 1 1\n"
      "END GAMEDEF\n");
-
-void LoadGameFromGamdeDef() {
-  UniversalPokerGame kuhn_limit_3p(
-      {{"gamedef", GameParameter(std::string(kKuhnLimit3P))}});
-  UniversalPokerGame holdem_no_limit_6p(
-      {{"gamedef", GameParameter(std::string(kHoldemNoLimit6P))}});
+GameParameters HoldemNoLimit6PParameters() {
+  return {{"betting", GameParameter(std::string("nolimit"))},
+          {"numPlayers", GameParameter(6)},
+          {"numRounds", GameParameter(4)},
+          {"stack",
+           GameParameter(std::string("20000 20000 20000 20000 20000 20000"))},
+          {"blind", GameParameter(std::string("50 100 0 0 0 0"))},
+          {"firstPlayer", GameParameter(std::string("3 1 1 1"))},
+          {"numSuits", GameParameter(4)},
+          {"numRanks", GameParameter(13)},
+          {"numHoleCards", GameParameter(2)},
+          {"numBoardCards", GameParameter(std::string("0 3 1 1"))}};
 }
 
+void LoadKuhnLimitWithAndWithoutGameDef() {
+  UniversalPokerGame kuhn_limit_3p_gamedef(
+      {{"gamedef", GameParameter(std::string(kKuhnLimit3P))}});
+  UniversalPokerGame kuhn_limit_3p(KuhnLimit3PParameters());
+
+  SPIEL_CHECK_EQ(kuhn_limit_3p_gamedef.GetACPCGame()->ToString(),
+                 kuhn_limit_3p.GetACPCGame()->ToString());
+  SPIEL_CHECK_TRUE((*(kuhn_limit_3p_gamedef.GetACPCGame())) ==
+                   (*(kuhn_limit_3p.GetACPCGame())));
+}
+
+void LoadHoldemNoLimit6PWithAndWithoutGameDef() {
+  UniversalPokerGame holdem_no_limit_6p_gamedef(
+      {{"gamedef", GameParameter(std::string(kHoldemNoLimit6P))}});
+  UniversalPokerGame holdem_no_limit_6p(HoldemNoLimit6PParameters());
+
+  SPIEL_CHECK_EQ(holdem_no_limit_6p_gamedef.GetACPCGame()->ToString(),
+                 holdem_no_limit_6p.GetACPCGame()->ToString());
+  SPIEL_CHECK_TRUE((*(holdem_no_limit_6p_gamedef.GetACPCGame())) ==
+                   (*(holdem_no_limit_6p.GetACPCGame())));
+}
 void LoadGameFromDefaultConfig() { LoadGame("universal_poker"); }
+
+void LoadAndRunGamesFullParameters() {
+  std::shared_ptr<const Game> kuhn_limit_3p =
+      LoadGame("universal_poker", KuhnLimit3PParameters());
+  testing::RandomSimTestNoSerialize(*kuhn_limit_3p, 1);
+  // TODO(b/145688976): The serialization is also broken
+  // In particular, the firstPlayer string "1" is converted back to an integer
+  // when deserializing, which crashes.
+  // testing::RandomSimTest(*kuhn_limit_3p, 1);
+
+  std::shared_ptr<const Game> holdem_nolimit_6p =
+      LoadGame("universal_poker", HoldemNoLimit6PParameters());
+  testing::RandomSimTestNoSerialize(*holdem_nolimit_6p, 1);
+  testing::RandomSimTest(*holdem_nolimit_6p, 3);
+}
 
 void LoadAndRunGameFromGameDef() {
   std::shared_ptr<const Game> holdem_nolimit_6p =
@@ -85,11 +140,6 @@ void BasicUniversalPokerTests() {
   // testing::RandomSimBenchmark("leduc_poker", 10000, false);
   // testing::RandomSimBenchmark("universal_poker", 10000, false);
 
-  std::shared_ptr<const Game> gFivePlayers =
-      LoadGame({{"name", GameParameter(std::string("universal_poker"))},
-                {"players", GameParameter(5)}});
-  testing::RandomSimTest(*gFivePlayers, 100);
-
   testing::CheckChanceOutcomes(*LoadGame("universal_poker"));
 }
 
@@ -97,8 +147,12 @@ void BasicUniversalPokerTests() {
 }  // namespace universal_poker
 }  // namespace open_spiel
 
-int main(int argc, char** argv) {
-  open_spiel::universal_poker::LoadGameFromGamdeDef();
+int main(int argc, char **argv) {
+  open_spiel::universal_poker::LoadKuhnLimitWithAndWithoutGameDef();
+  open_spiel::universal_poker::LoadHoldemNoLimit6PWithAndWithoutGameDef();
+
+  open_spiel::universal_poker::LoadAndRunGamesFullParameters();
+
   open_spiel::universal_poker::LoadGameFromDefaultConfig();
   open_spiel::universal_poker::LoadAndRunGameFromGameDef();
   open_spiel::universal_poker::LoadAndRunGameFromDefaultConfig();

@@ -18,10 +18,11 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <algorithm>
 #include <ostream>
 #include <sstream>
 
-#include "open_spiel/games/universal_poker/acpc/project_acpc_server/game.h"
+
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
@@ -30,9 +31,6 @@ namespace acpc_cpp {
 
 static const int STRING_BUFFERSIZE = 4096;
 
-struct RawACPCGame : public ::project_acpc_server::Game {};
-struct RawACPCState : public ::project_acpc_server::State {};
-struct RawACPCAction : public ::project_acpc_server::Action {};
 
 namespace {
 RawACPCAction GetAction(ACPCState::ACPCActionType type, int32_t size) {
@@ -80,6 +78,46 @@ ACPCGame::ACPCGame(const std::string &gameDef)
 ACPCGame::ACPCGame(const ACPCGame &other)
     : handId_(other.handId_),
       acpc_game_(std::make_unique<RawACPCGame>(*other.acpc_game_)) {}
+
+// We compare the values for all the fields. For arrays, note that only the
+// first `numPlayers` or `numRounds` values are meaningful, the rest being
+// non-initialized.
+bool ACPCGame::operator==(const ACPCGame &other) const {
+  // See project_acpc_server/game.h:42. 12 fields total.
+  // int32_t stack[ MAX_PLAYERS ];
+  // int32_t blind[ MAX_PLAYERS ];
+  // int32_t raiseSize[ MAX_ROUNDS ];
+  // enum BettingType bettingType;
+  // uint8_t numPlayers;
+  // uint8_t numRounds;
+  // uint8_t firstPlayer[ MAX_ROUNDS ];
+  // uint8_t maxRaises[ MAX_ROUNDS ];
+  // uint8_t numSuits;
+  // uint8_t numRanks;
+  // uint8_t numHoleCards;
+  // uint8_t numBoardCards[ MAX_ROUNDS ];
+  const RawACPCGame *first = acpc_game_.get();
+  const RawACPCGame *second = other.acpc_game_.get();
+  const int num_players = first->numPlayers;
+const int num_rounds = first->numRounds;
+  return (  // new line
+      first->numPlayers == second->numPlayers &&
+      first->numRounds == second->numRounds &&
+      std::equal(first->stack, first->stack + num_players, second->stack) &&
+      std::equal(first->blind, first->blind + num_players, second->blind) &&
+      std::equal(first->raiseSize, first->raiseSize + num_rounds,
+                 second->raiseSize) &&
+      first->bettingType == second->bettingType &&
+      std::equal(first->firstPlayer, first->firstPlayer + num_rounds,
+                 second->firstPlayer) &&
+      std::equal(first->maxRaises, first->maxRaises + num_rounds,
+                 second->maxRaises) &&
+      first->numSuits == second->numSuits &&
+      first->numRanks == second->numRanks &&
+      first->numHoleCards == second->numHoleCards &&
+      std::equal(first->numBoardCards, first->numBoardCards + num_rounds,
+                 second->numBoardCards));
+}
 
 std::string ACPCGame::ToString() const {
   char buf[STRING_BUFFERSIZE];
@@ -184,9 +222,9 @@ uint8_t ACPCState::CurrentPlayer() const {
 
 ACPCState::ACPCState(const ACPCGame *game)
     : game_(game), acpcState_(std::make_unique<RawACPCState>()) {
-  project_acpc_server::initState(game_->acpc_game_.get(),
-            game_->handId_ /*TODO this make a unit test fail++*/,
-            acpcState_.get());
+  project_acpc_server::initState(
+      game_->acpc_game_.get(),
+      game_->handId_ /*TODO this make a unit test fail++*/, acpcState_.get());
 }
 
 ACPCState::ACPCState(const ACPCState &other)

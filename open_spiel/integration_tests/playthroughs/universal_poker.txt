@@ -7,7 +7,7 @@ GameType.information = Information.IMPERFECT_INFORMATION
 GameType.long_name = "Universal Poker"
 GameType.max_num_players = 10
 GameType.min_num_players = 2
-GameType.parameter_specification = ["bettingType", "bigBlind", "firstPlayer", "gamedef", "numBoardCards", "numHoleCards", "numRanks", "numSuits", "players", "rounds", "smallBlind", "stackPerPlayer"]
+GameType.parameter_specification = ["betting", "blind", "firstPlayer", "gamedef", "maxRaises", "numBoardCards", "numHoleCards", "numPlayers", "numRanks", "numRounds", "numSuits", "raiseSize", "stack"]
 GameType.provides_information_state_string = True
 GameType.provides_information_state_tensor = True
 GameType.provides_observation_string = True
@@ -18,7 +18,7 @@ GameType.utility = Utility.ZERO_SUM
 
 NumDistinctActions() = 4
 MaxChanceOutcomes() = 24
-GetParameters() = {bettingType=nolimit,bigBlind=100,firstPlayer=1 1,numBoardCards=0 1,numHoleCards=1,numRanks=6,numSuits=4,players=2,rounds=2,smallBlind=100,stackPerPlayer=1200}
+GetParameters() = {betting=nolimit,blind=100 100,firstPlayer=1 1,maxRaises=,numBoardCards=0 1,numHoleCards=1,numPlayers=2,numRanks=6,numRounds=2,numSuits=4,stack=1200 1200}
 NumPlayers() = 2
 MinUtility() = -1200.0
 MaxUtility() = 1200.0
@@ -32,7 +32,7 @@ ToString() = "universal_poker()"
 
 # State 0
 IsTerminal() = False
-ToString() = "P0 Cards: \nP1 Cards: \nBoardCards \nPossibleCardsToDeal 7s7h7d7c6s6h6d6c5s5h5d5c4s4h4d4c3s3h3d3c2s2h2d2c\nNodeType: NODE_TYPE_CHANCE\nPossibleActions (1): [ ACTION_DEAL ]\nRound: 0\nACPC State: STATE:0::2c|2c\nSpent: [P0: 100  P1: 100  ]\n\nAction Sequence: \n"
+ToString() = "P0 Cards: \nP1 Cards: \nBoardCards \nPossibleCardsToDeal 7s7h7d7c6s6h6d6c5s5h5d5c4s4h4d4c3s3h3d3c2s2h2d2c\nNode type?: Chance node\nPossibleActions (1): [ ACTION_DEAL ]\nRound: 0\nACPC State: STATE:0::2c|2c\nSpent: [P0: 100  P1: 100  ]\n\nAction Sequence: \n"
 History() = []
 HistoryString() = ""
 IsChanceNode() = True
@@ -55,7 +55,7 @@ action: 8
 
 # State 1
 IsTerminal() = False
-ToString() = "P0 Cards: 4c\nP1 Cards: \nBoardCards \nPossibleCardsToDeal 7s7h7d7c6s6h6d6c5s5h5d5c4s4h4d3s3h3d3c2s2h2d2c\nNodeType: NODE_TYPE_CHANCE\nPossibleActions (1): [ ACTION_DEAL ]\nRound: 0\nACPC State: STATE:0::2c|2c\nSpent: [P0: 100  P1: 100  ]\n\nAction Sequence: d\n"
+ToString() = "P0 Cards: 4c\nP1 Cards: \nBoardCards \nPossibleCardsToDeal 7s7h7d7c6s6h6d6c5s5h5d5c4s4h4d3s3h3d3c2s2h2d2c\nNode type?: Chance node\nPossibleActions (1): [ ACTION_DEAL ]\nRound: 0\nACPC State: STATE:0::2c|2c\nSpent: [P0: 100  P1: 100  ]\n\nAction Sequence: d\n"
 History() = [8]
 HistoryString() = "8"
 IsChanceNode() = True
@@ -78,7 +78,7 @@ action: 14
 
 # State 2
 IsTerminal() = False
-ToString() = "P0 Cards: 4c\nP1 Cards: 5h\nBoardCards \nNodeType: NODE_TYPE_CHOICE\nPossibleActions (3): [ ACTION_CHECK_CALL  ACTION_BET_POT  ACTION_ALL_IN ]\nRound: 0\nACPC State: STATE:0::2c|2c\nSpent: [P0: 100  P1: 100  ]\n\nAction Sequence: dd\n"
+ToString() = "P0 Cards: 4c\nP1 Cards: 5h\nBoardCards \nNode type?: Player node for player 0\nPossibleActions (3): [ ACTION_CHECK_CALL  ACTION_BET_POT  ACTION_ALL_IN ]\nRound: 0\nACPC State: STATE:0::2c|2c\nSpent: [P0: 100  P1: 100  ]\n\nAction Sequence: dd\n"
 History() = [8, 14]
 HistoryString() = "8 14"
 IsChanceNode() = False
@@ -102,7 +102,7 @@ action: 2
 
 # State 3
 IsTerminal() = False
-ToString() = "P0 Cards: 4c\nP1 Cards: 5h\nBoardCards \nNodeType: NODE_TYPE_CHOICE\nPossibleActions (2): [ ACTION_FOLD  ACTION_CHECK_CALL ]\nRound: 0\nACPC State: STATE:0:r1200:2c|2c\nSpent: [P0: 1200  P1: 100  ]\n\nAction Sequence: dda\n"
+ToString() = "P0 Cards: 4c\nP1 Cards: 5h\nBoardCards \nNode type?: Player node for player 1\nPossibleActions (2): [ ACTION_FOLD  ACTION_CHECK_CALL ]\nRound: 0\nACPC State: STATE:0:r1200:2c|2c\nSpent: [P0: 1200  P1: 100  ]\n\nAction Sequence: dda\n"
 History() = [8, 14, 2]
 HistoryString() = "8 14 2"
 IsChanceNode() = False
@@ -126,7 +126,7 @@ action: 0
 
 # State 4
 IsTerminal() = True
-ToString() = "P0 Cards: 4c\nP1 Cards: 5h\nBoardCards \nP0 Reward: 100\nP1 Reward: -100\nNodeType: NODE_TYPE_TERMINAL_FOLD\nPossibleActions (0): []\nRound: 0\nACPC State: STATE:0:r1200f:4c|5h\nSpent: [P0: 1200  P1: 100  ]\n\nAction Sequence: ddaf\n"
+ToString() = "P0 Cards: 4c\nP1 Cards: 5h\nBoardCards \nP0 Reward: 100\nP1 Reward: -100\nNode type?: Terminal Node!\nPossibleActions (0): []\nRound: 0\nACPC State: STATE:0:r1200f:4c|5h\nSpent: [P0: 1200  P1: 100  ]\n\nAction Sequence: ddaf\n"
 History() = [8, 14, 2, 0]
 HistoryString() = "8 14 2 0"
 IsChanceNode() = False

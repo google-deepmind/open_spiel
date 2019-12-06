@@ -307,7 +307,9 @@ class State {
   // Is this state a chance node? Chance nodes are "states" whose actions
   // represent stochastic outcomes. "Chance" or "Nature" is thought of as a
   // player with a fixed (randomized) policy.
-  bool IsChanceNode() const { return CurrentPlayer() == kChancePlayerId; }
+  virtual bool IsChanceNode() const {
+    return CurrentPlayer() == kChancePlayerId;
+  }
 
   // Is this state a node that requires simultaneous action choices from more
   // than one player? If this is ever true, then the game should be marked as

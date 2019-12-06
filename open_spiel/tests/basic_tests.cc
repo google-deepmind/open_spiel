@@ -427,7 +427,7 @@ void CheckChanceOutcomes(const State& state) {
     if (legal_actions != default_legal_actions) {
       SpielFatalError(absl::StrCat(
           "Legalactions() and LegalActions(kChancePlayerId) do not give the "
-          "same result:"
+          "same result:",
           "\nLegalActions():                ",
           absl::StrJoin(default_legal_actions, ", "),
           "\nLegalActions(kChancePlayerId): ",

@@ -18,17 +18,15 @@
 #include <memory>
 #include <string>
 
+#include "open_spiel/games/universal_poker/acpc/project_acpc_server/game.h"
+
 namespace open_spiel {
 namespace universal_poker {
 namespace acpc_cpp {
 
-// We could have included "project_acpc_server/game.h" here, and directly
-// expose the structs, but this would pollute the top level namespace.
-// Thus, to prevent from leaking all the symbols, we create wrappers that will
-// expose the structure fields through methods only.
-struct RawACPCGame;
-struct RawACPCState;
-struct RawACPCAction;
+struct RawACPCGame : public ::project_acpc_server::Game {};
+struct RawACPCState : public ::project_acpc_server::State {};
+struct RawACPCAction : public ::project_acpc_server::Action {};
 
 class ACPCGame;
 
@@ -90,6 +88,9 @@ class ACPCGame {
 
   uint32_t handId_;
   std::unique_ptr<RawACPCGame> acpc_game_;
+
+  // Checks that the underlying acpc_game_ structs have all their fields equal.
+  bool operator==(const ACPCGame& other) const;
 };
 
 }  // namespace acpc_cpp
