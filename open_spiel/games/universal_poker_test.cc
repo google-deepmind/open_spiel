@@ -64,13 +64,12 @@ void LoadGameFromGamdeDef() {
 void LoadGameFromDefaultConfig() { LoadGame("universal_poker"); }
 
 void LoadAndRunGameFromGameDef() {
-  std::shared_ptr<const Game> kuhn_limit_3p =
+  std::shared_ptr<const Game> holdem_nolimit_6p =
       LoadGame("universal_poker",
                {{"gamedef", GameParameter(std::string(kHoldemNoLimit6P))}});
-  // TODO(b/145686585): An assert fails in InformationStateTensorShape
-  // testing::RandomSimTestNoSerialize(*kuhn_limit_3p, 1);
+  testing::RandomSimTestNoSerialize(*holdem_nolimit_6p, 1);
   // TODO(b/145688976): The serialization is also broken
-  // testing::RandomSimTest(*kuhn_limit_3p, 1);
+  // testing::RandomSimTest(*holdem_nolimit_6p, 1);
 }
 
 void LoadAndRunGameFromDefaultConfig() {

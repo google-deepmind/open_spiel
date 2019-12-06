@@ -132,7 +132,7 @@ uint32_t ACPCGame::StackSize(uint8_t player) const {
   return acpc_game_->stack[player];
 }
 
-uint8_t ACPCGame::GetNbRounds() const { return acpc_game_->numRounds; }
+int ACPCGame::NumRounds() const { return acpc_game_->numRounds; }
 
 uint32_t ACPCGame::BlindSize(uint8_t player) const {
   SPIEL_CHECK_LE(0, player);
@@ -170,7 +170,7 @@ bool ACPCState::IsFinished() const { return stateFinished(acpcState_.get()); }
 
 uint32_t ACPCState::MaxSpend() const { return acpcState_->maxSpent; }
 
-uint8_t ACPCState::GetRound() const { return acpcState_->round; }
+int ACPCState::GetRound() const { return acpcState_->round; }
 
 uint8_t ACPCState::NumFolded() const {
   return project_acpc_server::numFolded(game_->acpc_game_.get(),

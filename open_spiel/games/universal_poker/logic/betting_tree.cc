@@ -168,7 +168,7 @@ std::string BettingNode::ToString() const {
     }
   }
   buf << "]" << std::endl;
-  buf << "Round: " << (int)GetRound() << std::endl;
+  buf << "Round: " << GetRound() << std::endl;
   buf << "ACPC State: " << ACPCState::ToString() << std::endl;
   buf << "Action Sequence: " << actionSequence_ << std::endl;
   return buf.str();
@@ -192,23 +192,9 @@ int BettingNode::GetDepth() {
   return 1 + maxDepth;
 }
 
-std::string BettingNode::GetActionSequence() const { return actionSequence_; }
-
-bool BettingNode::IsFinished() const {
-  bool finished = nodeType_ == NODE_TYPE_TERMINAL_SHOWDOWN ||
-                  nodeType_ == NODE_TYPE_TERMINAL_FOLD;
-  assert(ACPCState::IsFinished() || !finished);
-
-  return finished;
-}
-
 const int BettingNode::GetPossibleActionCount() const {
   // _builtin_popcount(int) function is used to count the number of one's
   return __builtin_popcount(possibleActions_);
-}
-
-const uint32_t& BettingNode::GetPossibleActionsMask() const {
-  return possibleActions_;
 }
 
 }  // namespace logic

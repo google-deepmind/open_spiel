@@ -53,7 +53,9 @@ class ACPCState {
   void DoAction(const ACPCActionType actionType, const int32_t size);
   double ValueOfState(const uint8_t player) const;
   uint32_t MaxSpend() const;
-  uint8_t GetRound() const;
+  // Returns the current round 0-indexed round id (<= game.NumRounds() - 1).
+  // A showdown is still in game.NumRounds()-1, not a separate round
+  int GetRound() const;
   uint8_t NumFolded() const;
   uint32_t Money(const uint8_t player) const;
   uint32_t Ante(const uint8_t player) const;
@@ -72,7 +74,8 @@ class ACPCGame {
 
   std::string ToString() const;
   bool IsLimitGame() const;
-  uint8_t GetNbRounds() const;
+  // The total number of betting rounds.
+  int NumRounds() const;
   int GetNbPlayers() const;
   // Returns the number of private cards for each player in this game.
   uint8_t GetNbHoleCardsRequired() const;

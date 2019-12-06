@@ -128,7 +128,7 @@ std::string UniversalPokerState::ToString() const {
   }
   buf << "BoardCards " << board_cards_.ToString() << std::endl;
 
-  if (betting_node_.GetNodeType() == logic::BettingNode::NODE_TYPE_CHANCE) {
+  if (IsChanceNode()) {
     buf << "PossibleCardsToDeal " << deck_.ToString() << std::endl;
   }
   if (betting_node_.GetNodeType() ==
@@ -145,7 +145,12 @@ std::string UniversalPokerState::ToString() const {
 }
 
 bool UniversalPokerState::IsTerminal() const {
-  return betting_node_.IsFinished();
+  bool finished = betting_node_.GetNodeType() ==
+                      logic::BettingNode::NODE_TYPE_TERMINAL_SHOWDOWN ||
+                  betting_node_.GetNodeType() ==
+                      logic::BettingNode::NODE_TYPE_TERMINAL_FOLD;
+  assert(betting_node_.IsFinished() || !finished);
+  return finished;
 }
 
 std::string UniversalPokerState::ActionToString(Player player,
@@ -188,34 +193,36 @@ void UniversalPokerState::InformationStateTensor(
 
   // Layout of observation:
   //   my player number: num_players bits
-  //   my card: deck_.size() bits
-  //   public card: deck_.size() bits
-  //   first round sequence: (max round seq length)*2 bits
-  //   second round sequence: (max round seq length)*2 bits
-
+  //   my cards: Initial deck size bits (1 means you have the card), i.e.
+  //             MaxChanceOutcomes() = NumSuits * NumRanks
+  //   public cards: Same as above, but for the public cards.
+  //   NumRounds() round sequence: (max round seq length)*2 bits
   int offset = 0;
 
   // Mark who I am.
   (*values)[player] = 1;
   offset += NumPlayers();
 
-  logic::CardSet deck(acpc_game_->NumSuitsDeck(), acpc_game_->NumRanksDeck());
-  const std::vector<uint8_t> deckCards = deck.ToCardArray();
+  const logic::CardSet full_deck(acpc_game_->NumSuitsDeck(),
+                                 acpc_game_->NumRanksDeck());
+  const std::vector<uint8_t> deckCards = full_deck.ToCardArray();
   logic::CardSet holeCards = hole_cards_[player];
-
-  for (uint32_t i = 0; i < deck.NumCards(); i++) {
+  // TODO(author2): it should be way more efficient to iterate over the cards
+  // of the player, rather than iterating over all the cards.
+  for (uint32_t i = 0; i < full_deck.NumCards(); i++) {
     (*values)[i + offset] = holeCards.ContainsCards(deckCards[i]) ? 1.0 : 0.0;
   }
-  offset += deck.NumCards();
+  offset += full_deck.NumCards();
 
-  for (uint32_t i = 0; i < deck.NumCards(); i++) {
+  // Public cards
+  for (int i = 0; i < full_deck.NumCards(); ++i) {
     (*values)[i + offset] =
         board_cards_.ContainsCards(deckCards[i]) ? 1.0 : 0.0;
   }
-  offset += deck.NumCards();
+  offset += full_deck.NumCards();
 
-  std::string actionSeq = betting_node_.GetActionSequence();
-  const int length = betting_node_.GetActionSequence().length();
+  const std::string actionSeq = betting_node_.GetActionSequence();
+  const int length = actionSeq.length();
   SPIEL_CHECK_LT(length, game_->MaxGameLength());
 
   for (int i = 0; i < length; ++i) {
@@ -234,6 +241,7 @@ void UniversalPokerState::InformationStateTensor(
       (*values)[offset + (2 * i) + 1] = 1;
     } else if (actionSeq[i] == 'f') {
       // Encode fold as 00.
+      // TODO(author2): Should this be 11?
       (*values)[offset + (2 * i)] = 0;
       (*values)[offset + (2 * i) + 1] = 0;
     } else if (actionSeq[i] == 'd') {
@@ -246,7 +254,6 @@ void UniversalPokerState::InformationStateTensor(
 
   // Move offset up to the next round: 2 bits per move.
   offset += game_->MaxGameLength() * 2;
-
   SPIEL_CHECK_EQ(offset, game_->InformationStateTensorShape()[0]);
 }
 
@@ -260,30 +267,31 @@ void UniversalPokerState::ObservationTensor(Player player,
 
   // Layout of observation:
   //   my player number: num_players bits
-  //   my card: deck_.size() bits
-  //   public card: deck_.size() bits
+  //   my cards: Initial deck size bits (1 means you have the card), i.e.
+  //             MaxChanceOutcomes() = NumSuits * NumRanks
+  //   public cards: Same as above, but for the public cards.
   //   the contribution of each player to the pot. num_players integers.
-
   int offset = 0;
 
   // Mark who I am.
   (*values)[player] = 1;
   offset += NumPlayers();
 
-  logic::CardSet deck(acpc_game_->NumSuitsDeck(), acpc_game_->NumRanksDeck());
-  const std::vector<uint8_t> deckCards = deck.ToCardArray();
+  const logic::CardSet full_deck(acpc_game_->NumSuitsDeck(),
+                                 acpc_game_->NumRanksDeck());
+  const std::vector<uint8_t> all_cards = full_deck.ToCardArray();
   logic::CardSet holeCards = hole_cards_[player];
 
-  for (uint32_t i = 0; i < deck.NumCards(); i++) {
-    (*values)[i + offset] = holeCards.ContainsCards(deckCards[i]) ? 1.0 : 0.0;
+  for (uint32_t i = 0; i < full_deck.NumCards(); i++) {
+    (*values)[i + offset] = holeCards.ContainsCards(all_cards[i]) ? 1.0 : 0.0;
   }
-  offset += deck.NumCards();
+  offset += full_deck.NumCards();
 
-  for (uint32_t i = 0; i < deck.NumCards(); i++) {
+  for (uint32_t i = 0; i < full_deck.NumCards(); i++) {
     (*values)[i + offset] =
-        board_cards_.ContainsCards(deckCards[i]) ? 1.0 : 0.0;
+        board_cards_.ContainsCards(all_cards[i]) ? 1.0 : 0.0;
   }
-  offset += deck.NumCards();
+  offset += full_deck.NumCards();
 
   // Adding the contribution of each players to the pot.
   for (auto p = Player{0}; p < NumPlayers(); p++) {
@@ -379,7 +387,7 @@ std::vector<Action> UniversalPokerState::LegalActions() const {
 }
 
 void UniversalPokerState::DoApplyAction(Action action_id) {
-  if (betting_node_.GetNodeType() == logic::BettingNode::NODE_TYPE_CHANCE) {
+  if (IsChanceNode()) {
     betting_node_.ApplyDealCards();
     // In chance nodes, the action_id is exactly the card being dealt.
     uint8_t card = action_id;
@@ -451,33 +459,22 @@ std::unique_ptr<State> UniversalPokerGame::NewInitialState() const {
 
 std::vector<int> UniversalPokerGame::InformationStateTensorShape() const {
   // One-hot encoding for player number (who is to play).
-  // 2 slots of cards (total_cards_ bits each): private card, public card
+  // 2 slots of cards (total_num_cards bits each): private card, public card
   // Followed by maximum game length * 2 bits each (call / raise)
-
-  const int numBoardCards = acpc_game_.GetTotalNbBoardCards();
-  const int numHoleCards = acpc_game_.GetNbHoleCardsRequired();
-  const int numPlayers = acpc_game_.GetNbPlayers();
+  const int num_players = acpc_game_.GetNbPlayers();
   const int gameLength = MaxGameLength();
+  const int total_num_cards = MaxChanceOutcomes();
 
-  return {(numPlayers) +
-          (numBoardCards + numHoleCards) *
-              (acpc_game_.NumRanksDeck() * acpc_game_.NumSuitsDeck()) +
-          (gameLength * 2)};
+  return {num_players + 2 * total_num_cards + 2 * gameLength};
 }
 
 std::vector<int> UniversalPokerGame::ObservationTensorShape() const {
   // One-hot encoding for player number (who is to play).
   // 2 slots of cards (total_cards_ bits each): private card, public card
   // Followed by the contribution of each player to the pot
-
-  const int numBoardCards = acpc_game_.GetTotalNbBoardCards();
-  const int numHoleCards = acpc_game_.GetNbHoleCardsRequired();
-  const int numPlayers = acpc_game_.GetNbPlayers();
-
-  return {numPlayers +
-          (numBoardCards + numHoleCards) *
-              (acpc_game_.NumRanksDeck() * acpc_game_.NumSuitsDeck()) +
-          (numPlayers)};
+  const int num_players = acpc_game_.GetNbPlayers();
+  const int total_num_cards = MaxChanceOutcomes();
+  return {2 * (num_players + total_num_cards)};
 }
 
 double UniversalPokerGame::MaxUtility() const {
@@ -523,7 +520,7 @@ int UniversalPokerGame::MaxGameLength() const {
             acpc_game_.GetNbHoleCardsRequired() * acpc_game_.GetNbPlayers();
 
   // Check Actions
-  length += (NumPlayers() * acpc_game_.GetNbRounds());
+  length += (NumPlayers() * acpc_game_.NumRounds());
 
   // Bet Actions
   double maxStack = 0;

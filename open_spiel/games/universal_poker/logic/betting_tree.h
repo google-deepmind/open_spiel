@@ -57,15 +57,14 @@ class BettingNode : public acpc_cpp::ACPCState {
 
   NodeType GetNodeType() const { return nodeType_; }
 
-  const uint32_t& GetPossibleActionsMask() const;
+  const uint32_t& GetPossibleActionsMask() const {  return possibleActions_;}
   const int GetPossibleActionCount() const;
 
   void ApplyChoiceAction(ActionType action_type);
   virtual void ApplyDealCards();
   std::string ToString() const;
   int GetDepth();
-  std::string GetActionSequence() const;
-  bool IsFinished() const;
+  std::string GetActionSequence() const { return actionSequence_; }
 
  protected:
   const acpc_cpp::ACPCGame* acpc_game_;
