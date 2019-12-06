@@ -45,6 +45,8 @@ class ACPCState {
                             uint8_t nbHoleCards[10],
                             uint8_t nbBoardCards) const;
 
+  // The current player is the first player in a new round, or the next player
+  // within a round.
   uint8_t CurrentPlayer() const;
 
   bool IsFinished() const;

@@ -20,7 +20,7 @@
 #include <string>
 #include <vector>
 
-#include "open_spiel/games/universal_poker/logic/betting_tree.h"
+#include "open_spiel/games/universal_poker/acpc_cpp/acpc_game.h"
 #include "open_spiel/games/universal_poker/logic/card_set.h"
 #include "open_spiel/spiel.h"
 
@@ -35,6 +35,8 @@ namespace open_spiel {
 namespace universal_poker {
 
 class UniversalPokerGame;
+
+constexpr uint8_t kMaxUniversalPokerPlayers = 10;
 
 enum ActionType { kFold = 0, kCall = 1, kRaise = 2 };
 
@@ -62,15 +64,52 @@ class UniversalPokerState : public State {
  protected:
   void DoApplyAction(Action action_id) override;
 
+  enum NodeType {
+    NODE_TYPE_CHANCE,
+    NODE_TYPE_CHOICE,
+    NODE_TYPE_TERMINAL_FOLD,
+    NODE_TYPE_TERMINAL_SHOWDOWN
+  };
+  enum ActionType {
+    ACTION_DEAL = 1,
+    ACTION_FOLD = 2,
+    ACTION_CHECK_CALL = 4,
+    ACTION_BET_POT = 8,
+    ACTION_ALL_IN = 16
+  };
+  static constexpr ActionType ALL_ACTIONS[5] = {ACTION_DEAL, ACTION_FOLD,
+                                                ACTION_CHECK_CALL,
+                                                ACTION_BET_POT, ACTION_ALL_IN};
+
  public:
   const acpc_cpp::ACPCGame *acpc_game_;
-  logic::BettingNode betting_node_;
-  double GetTotalReward(Player player) const;
-
+  acpc_cpp::ACPCState acpc_state_;
   logic::CardSet deck_;  // The remaining cards to deal.
   // The cards already owned by each player
   std::vector<logic::CardSet> hole_cards_;
   logic::CardSet board_cards_;
+
+  NodeType nodeType_;
+  uint32_t possibleActions_;
+  int32_t potSize_ = 0;
+  int32_t allInSize_ = 0;
+  std::string actionSequence_;
+
+  uint8_t nbHoleCardsDealtPerPlayer_[kMaxUniversalPokerPlayers] = {
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  uint8_t nbBoardCardsDealt_ = 0;
+
+  void _CalculateActionsAndNodeType();
+
+  double GetTotalReward(Player player) const;
+
+  const uint32_t &GetPossibleActionsMask() const { return possibleActions_; }
+  const int GetPossibleActionCount() const;
+
+  void ApplyChoiceAction(ActionType action_type);
+  virtual void ApplyDealCards();
+  int GetDepth();
+  std::string GetActionSequence() const { return actionSequence_; }
 };
 
 class UniversalPokerGame : public Game {
