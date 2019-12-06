@@ -68,7 +68,6 @@ class UniversalPokerState : public State {
   double GetTotalReward(Player player) const;
 
   logic::CardSet deck_;  // The remaining cards to deal.
-  int action_count_;
   // The cards already owned by each player
   std::vector<logic::CardSet> hole_cards_;
   logic::CardSet board_cards_;

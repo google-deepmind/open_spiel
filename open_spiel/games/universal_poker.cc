@@ -16,6 +16,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cstdint>
 #include <utility>
 
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
@@ -116,20 +117,19 @@ UniversalPokerState::UniversalPokerState(std::shared_ptr<const Game> game)
       hole_cards_(acpc_game_->GetNbPlayers()) {
   SPIEL_CHECK_EQ(betting_node_.GetNodeType(),
                  logic::BettingNode::NODE_TYPE_CHANCE);
-  action_count_ = deck_.ToCardArray().size();
 }
 
 std::string UniversalPokerState::ToString() const {
   std::ostringstream buf;
 
   for (int p = 0; p < acpc_game_->GetNbPlayers(); ++p) {
-    buf << "P" << (int)p << " Cards: " << hole_cards_[p].ToString()
+    buf << "P" << p << " Cards: " << hole_cards_[p].ToString()
         << std::endl;
   }
   buf << "BoardCards " << board_cards_.ToString() << std::endl;
 
   if (betting_node_.GetNodeType() == logic::BettingNode::NODE_TYPE_CHANCE) {
-    buf << "PossibleCardsToDeal " << deck_.ToString();
+    buf << "PossibleCardsToDeal " << deck_.ToString() << std::endl;
   }
   if (betting_node_.GetNodeType() ==
           logic::BettingNode::NODE_TYPE_TERMINAL_FOLD ||
@@ -348,31 +348,41 @@ std::unique_ptr<State> UniversalPokerState::Clone() const {
 std::vector<std::pair<Action, double>> UniversalPokerState::ChanceOutcomes()
     const {
   SPIEL_CHECK_TRUE(IsChanceNode());
-  int num_cards = deck_.ToCardArray().size();
-  const double p = 1.0 / (double)num_cards;
-  std::vector<std::pair<Action, double>> outcomes(num_cards, {0, p});
+  std::vector<uint8_t> available_cards = deck_.ToCardArray();
+  const int num_cards = available_cards.size();
+  const double p = 1.0 / num_cards;
 
-  for (uint64_t card = 0; card < num_cards; ++card) {
-    outcomes[card].first = card;
+  // We need to cast std::vector<uint8_t> into std::vector<Action>.
+  std::vector<std::pair<Action, double>> outcomes;
+  outcomes.reserve(num_cards);
+  for (const auto &card : available_cards) {
+    outcomes.push_back({Action{card}, p});
   }
   return outcomes;
 }
 
-
 std::vector<Action> UniversalPokerState::LegalActions() const {
-  std::vector<Action> actions(action_count_, 0);
-
-  for (uint64_t idx = 0; idx < action_count_; ++idx) {
-    actions[idx] = idx;
+  if (betting_node_.GetNodeType() == logic::BettingNode::NODE_TYPE_CHANCE) {
+    std::vector<uint8_t> available_cards = deck_.ToCardArray();
+    std::vector<Action> actions;
+    actions.reserve(available_cards.size());
+    for (const auto &card : available_cards) {
+      actions.push_back(card);
+    }
+    return actions;
   }
 
+  int num_actions = betting_node_.GetPossibleActionCount();
+  std::vector<Action> actions(num_actions, 0);
+  std::iota(actions.begin(), actions.end(), 0);
   return actions;
 }
 
 void UniversalPokerState::DoApplyAction(Action action_id) {
   if (betting_node_.GetNodeType() == logic::BettingNode::NODE_TYPE_CHANCE) {
     betting_node_.ApplyDealCards();
-    uint8_t card = deck_.ToCardArray()[action_id];
+    // In chance nodes, the action_id is exactly the card being dealt.
+    uint8_t card = action_id;
     deck_.RemoveCard(card);
 
     // Check where to add this card
@@ -399,12 +409,6 @@ void UniversalPokerState::DoApplyAction(Action action_id) {
       }
     }
   }
-
-  if (betting_node_.GetNodeType() == logic::BettingNode::NODE_TYPE_CHANCE) {
-    action_count_ = deck_.NumCards();
-  } else {
-    action_count_ = betting_node_.GetPossibleActionCount();
-  }
 }
 
 double UniversalPokerState::GetTotalReward(Player player) const {
@@ -427,7 +431,7 @@ double UniversalPokerState::GetTotalReward(Player player) const {
   }
 
   betting_node_.SetHoleAndBoardCards(holeCards, boardCards, nbHoleCards,
-                       /*nbBoardCards=*/bc.size());
+                                     /*nbBoardCards=*/bc.size());
 
   return betting_node_.ValueOfState(player);
 }

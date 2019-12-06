@@ -87,8 +87,8 @@ std::vector<uint8_t> CardSet::ToCardArray() const {
   std::vector<uint8_t> result(NumCards(), 0);
 
   int i = 0;
-  for (int r = MAX_RANKS - 1; r >= 0; r--) {
-    for (int s = MAX_SUITS - 1; s >= 0; s--) {
+  for (int r = 0; r < MAX_RANKS; ++r) {
+    for (int s = 0; s < MAX_SUITS; ++s) {
       uint32_t mask = (uint32_t)1 << r;
       if (cs.bySuit[s] & mask) {
         result[i++] = makeCard(r, s);

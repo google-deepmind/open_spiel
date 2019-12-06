@@ -90,6 +90,8 @@ void BasicUniversalPokerTests() {
       LoadGame({{"name", GameParameter(std::string("universal_poker"))},
                 {"players", GameParameter(5)}});
   testing::RandomSimTest(*gFivePlayers, 100);
+
+  testing::CheckChanceOutcomes(*LoadGame("universal_poker"));
 }
 
 }  // namespace
