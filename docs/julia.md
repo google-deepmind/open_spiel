@@ -79,7 +79,7 @@ run_once("goofspiel(imp_info=True,num_cards=4,points_order=descending)")
 
 1. `0-based` or `1-based`?
 
-    Considering that this package is very low level, most APIs are `0-based` to keep the code concise and consistent. Especially take care of the `Player` id which starts from `0`. And it wouldn't surprise you that some types from the Julia side, like `StdVector`, are `1-based`.
+    As this package is a low-level wrapper of OpenSpiel C++, most APIs are zero-based: for instance, the `Player` id starts from zero. But note that some bridge types, like `StdVector`, implicitly convert between indexing conventions, so APIs that use `StdVector` are one-based.
 
 1. I can't find the `xxx` function/type in the Julia wrapper/The program exits unexpectedly.
 
