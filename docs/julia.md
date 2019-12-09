@@ -22,7 +22,7 @@ Currently this package is not registered. The reason is that we rely on some new
 
 ## Example
 
-Here we demonstrate how to use the Julia API to play one trajector:
+Here we demonstrate how to use the Julia API to play one game:
 
 ```julia
 using OpenSpiel_jll
