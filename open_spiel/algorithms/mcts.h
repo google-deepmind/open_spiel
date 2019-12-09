@@ -140,7 +140,7 @@ struct SearchNode {
 class MCTSBot : public Bot {
  public:
   MCTSBot(
-      const Game& game, Player player, Evaluator* evaluator, double uct_c,
+      const Game& game, Evaluator* evaluator, double uct_c,
       int max_simulations,
       int64_t max_memory_mb,  // Max memory use in megabytes.
       bool solve,             // Whether to back up solved states.
@@ -180,7 +180,6 @@ class MCTSBot : public Bot {
   std::unique_ptr<State> ApplyTreePolicy(SearchNode* root, const State& state,
                                          std::vector<SearchNode*>* visit_path);
 
-  Player player_id_;
   double uct_c_;
   int max_simulations_;
   int64_t max_memory_;       // Max memory allowed in the tree, in bytes.

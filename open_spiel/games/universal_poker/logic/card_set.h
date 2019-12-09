@@ -23,15 +23,17 @@ namespace open_spiel {
 namespace universal_poker {
 namespace logic {
 
-constexpr int MAX_SUITS = 4;
+constexpr int kMaxSuits = 4;  // Also defined in ACPC game.h
 
-// This is an equivalent of the ACPC evalHandTables.Cardset struct.
-// A card is defined by the integer <rank> * MAX_SUITS + <suit>
+// This is an equivalent wrapper to acpc evalHandTables.Cardset.
+// It stores the cards for each color over 16 * 4 bits. The use of a Union
+// allows to access only a specific color (16 bits) using bySuit[color].
+// A uint8_t card is defined by the integer <rank> * MAX_SUITS + <suit>
 class CardSet {
  public:
   union CardSetUnion {
     CardSetUnion() : cards(0) {}
-    uint16_t bySuit[MAX_SUITS];
+    uint16_t bySuit[kMaxSuits];
     uint64_t cards;
   } cs;
 
@@ -39,20 +41,24 @@ class CardSet {
   CardSet() : cs() {}
   CardSet(std::string cardString);
   CardSet(std::vector<int> cards);
-  CardSet(uint8_t cards[], int size);
-  CardSet(uint16_t numSuits, uint16_t numRanks);
+  // Returns a set containing num_ranks cards per suit for num_suits.
+  CardSet(uint16_t num_suits, uint16_t num_ranks);
 
   std::string ToString() const;
   std::vector<uint8_t> ToCardArray() const;
 
+  // Add a card, as MAX_RANKS * <suite> + <rank> to the CardSet.
   void AddCard(uint8_t card);
+  // Toogle (does not remove) the bit associated to `card`.
   void RemoveCard(uint8_t card);
-  bool ContainsCards(const uint8_t &card);
 
-  uint32_t CountCards() const;
-  int RankCards();
-  bool IsBlocking(CardSet other);
+  bool ContainsCards(uint8_t card) const;
 
+  int NumCards() const;
+  // Returns the ranking value of this set of cards as evaluated by ACPC.
+  int RankCards() const;
+
+  // TODO(author2): Remove?
   std::vector<CardSet> SampleCards(int nbCards);
 };
 

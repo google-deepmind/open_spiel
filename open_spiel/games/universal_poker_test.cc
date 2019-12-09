@@ -63,12 +63,15 @@ void LoadGameFromGamdeDef() {
 
 void LoadGameFromDefaultConfig() { LoadGame("universal_poker"); }
 
-// TODO(author2): This generates a segfault and need fixing.
-// void LoadAndRunGameFromGameDef() {
-//   UniversalPokerGame kuhn_limit_3p(
-//       {{"gamedef", GameParameter(std::string(kKuhnLimit3P))}});
-//   testing::RandomSimTest(kuhn_limit_3p, 2);
-// }
+void LoadAndRunGameFromGameDef() {
+  std::shared_ptr<const Game> kuhn_limit_3p =
+      LoadGame("universal_poker",
+               {{"gamedef", GameParameter(std::string(kHoldemNoLimit6P))}});
+  // TODO(b/145686585): An assert fails in InformationStateTensorShape
+  // testing::RandomSimTestNoSerialize(*kuhn_limit_3p, 1);
+  // TODO(b/145688976): The serialization is also broken
+  // testing::RandomSimTest(*kuhn_limit_3p, 1);
+}
 
 void LoadAndRunGameFromDefaultConfig() {
   std::shared_ptr<const Game> game = LoadGame("universal_poker");
@@ -96,8 +99,7 @@ void BasicUniversalPokerTests() {
 int main(int argc, char** argv) {
   open_spiel::universal_poker::LoadGameFromGamdeDef();
   open_spiel::universal_poker::LoadGameFromDefaultConfig();
-  // TODO(author2): This one is still failing. Debug this.
-  // open_spiel::universal_poker::LoadAndRunGameFromGameDef();
+  open_spiel::universal_poker::LoadAndRunGameFromGameDef();
   open_spiel::universal_poker::LoadAndRunGameFromDefaultConfig();
 
   open_spiel::universal_poker::BasicUniversalPokerTests();

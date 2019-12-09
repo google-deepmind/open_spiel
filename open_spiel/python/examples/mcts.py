@@ -59,7 +59,6 @@ def _init_bot(bot_type, game, player_id):
     evaluator = mcts.RandomRolloutEvaluator(FLAGS.rollout_count, rng)
     return mcts.MCTSBot(
         game,
-        player_id,
         FLAGS.uct_c,
         FLAGS.max_simulations,
         evaluator,

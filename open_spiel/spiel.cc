@@ -35,6 +35,18 @@ constexpr const char* kSerializeMetaSectionHeader = "[Meta]";
 constexpr const char* kSerializeGameSectionHeader = "[Game]";
 constexpr const char* kSerializeStateSectionHeader = "[State]";
 
+// Returns the available parameter keys, to be used as a utility function.
+std::string ListValidParameters(
+    const std::map<std::string, GameParameter>& param_spec) {
+  std::vector<std::string> available_keys;
+  available_keys.reserve(param_spec.size());
+  for (const auto& item : param_spec) {
+    available_keys.push_back(item.first);
+  }
+  std::sort(available_keys.begin(), available_keys.end());
+  return absl::StrJoin(available_keys, ", ");
+}
+
 // Check on supplied parameters for game creation.
 // Issues a SpielFatalError if any are missing, of the wrong type, or
 // unexpectedly present.
@@ -43,8 +55,11 @@ void ValidateParams(const GameParameters& params,
   // Check all supplied parameters are supported and of the right type.
   for (const auto& param : params) {
     const auto it = param_spec.find(param.first);
-    if (it == param_spec.end())
-      SpielFatalError(absl::StrCat("Unknown parameter ", param.first));
+    if (it == param_spec.end()) {
+      SpielFatalError(absl::StrCat(
+          "Unknown parameter ", param.first,
+          ". Available parameters are: ", ListValidParameters(param_spec)));
+    }
     if (it->second.type() != param.second.type()) {
       SpielFatalError(absl::StrCat("Wrong type for parameter ", param.first));
     }

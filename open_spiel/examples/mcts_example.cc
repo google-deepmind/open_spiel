@@ -57,7 +57,7 @@ std::unique_ptr<open_spiel::Bot> InitBot(
 
   if (type == "mcts") {
     return std::make_unique<open_spiel::algorithms::MCTSBot>(
-        game, player, evaluator, absl::GetFlag(FLAGS_uct_c),
+        game, evaluator, absl::GetFlag(FLAGS_uct_c),
         absl::GetFlag(FLAGS_max_simulations),
         absl::GetFlag(FLAGS_max_memory_mb), absl::GetFlag(FLAGS_solve), Seed(),
         absl::GetFlag(FLAGS_verbose));

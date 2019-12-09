@@ -24,17 +24,17 @@ namespace open_spiel {
 namespace universal_poker {
 namespace logic {
 
-constexpr uint8_t MAX_PLAYERS = 10;
+constexpr uint8_t kMaxUniversalPokerPlayers = 10;
 
-class BettingTree : public acpc_cpp::ACPCGame {
- public:
-  BettingTree(const std::string& gameDef);
-  uint32_t GetMaxBettingActions() const;
-};
+// Returns how many actions are available at a choice node (3 when limit
+// and 4 for no limit).
+// TODO(author2): Is that a bug? There are 5 actions? Is no limit means
+// "bet bot" is added? or should "all in" be also added?
+inline uint32_t GetMaxBettingActions(const acpc_cpp::ACPCGame& acpc_game) {
+  return acpc_game.IsLimitGame() ? 3 : 4;
+}
 
 class BettingNode : public acpc_cpp::ACPCState {
-  friend BettingTree;
-
  public:
   enum NodeType {
     NODE_TYPE_CHANCE,
@@ -53,29 +53,31 @@ class BettingNode : public acpc_cpp::ACPCState {
                                                 ACTION_CHECK_CALL,
                                                 ACTION_BET_POT, ACTION_ALL_IN};
 
-  BettingNode(BettingTree* bettingTree);
+  BettingNode(const acpc_cpp::ACPCGame* acpc_game);
 
-  NodeType GetNodeType() const;
+  NodeType GetNodeType() const { return nodeType_; }
 
   const uint32_t& GetPossibleActionsMask() const;
   const int GetPossibleActionCount() const;
 
-  void ApplyChoiceAction(ActionType actionType);
+  void ApplyChoiceAction(ActionType action_type);
   virtual void ApplyDealCards();
   std::string ToString() const;
   int GetDepth();
   std::string GetActionSequence() const;
   bool IsFinished() const;
 
+ protected:
+  const acpc_cpp::ACPCGame* acpc_game_;
+
  private:
-  const BettingTree* bettingTree_;
   NodeType nodeType_;
   uint32_t possibleActions_;
   int32_t potSize_;
   int32_t allInSize_;
   std::string actionSequence_;
 
-  uint8_t nbHoleCardsDealtPerPlayer_[MAX_PLAYERS];
+  uint8_t nbHoleCardsDealtPerPlayer_[kMaxUniversalPokerPlayers];
   uint8_t nbBoardCardsDealt_;
 
   void _CalculateActionsAndNodeType();

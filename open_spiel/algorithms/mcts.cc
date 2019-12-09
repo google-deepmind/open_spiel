@@ -197,13 +197,12 @@ std::vector<double> dirichlet_noise(int count, double alpha,
   return noise;
 }
 
-MCTSBot::MCTSBot(const Game& game, Player player, Evaluator* evaluator,
+MCTSBot::MCTSBot(const Game& game, Evaluator* evaluator,
                  double uct_c, int max_simulations, int64_t max_memory_mb,
                  bool solve, int seed, bool verbose,
                  ChildSelectionPolicy child_selection_policy,
                  double dirichlet_alpha, double dirichlet_epsilon)
-    : player_id_(player),
-      uct_c_{uct_c},
+    : uct_c_{uct_c},
       max_simulations_{max_simulations},
       max_memory_(max_memory_mb << 20),  // megabytes -> bytes
       verbose_(verbose),
@@ -219,10 +218,6 @@ MCTSBot::MCTSBot(const Game& game, Player player, Evaluator* evaluator,
     SpielFatalError("Game must have terminal rewards.");
   if (game_type.dynamics != GameType::Dynamics::kSequential)
     SpielFatalError("Game must have sequential turns.");
-  if (player < 0 || player >= game.NumPlayers())
-    SpielFatalError(absl::StrFormat(
-        "Game doesn't support that many players. Max: %d, player: %d",
-        game.NumPlayers(), player));
 }
 
 Action MCTSBot::Step(const State& state) {
@@ -331,9 +326,9 @@ std::unique_ptr<State> MCTSBot::ApplyTreePolicy(
 }
 
 std::unique_ptr<SearchNode> MCTSBot::MCTSearch(const State& state) {
-  SPIEL_CHECK_EQ(player_id_, state.CurrentPlayer());
+  Player player_id = state.CurrentPlayer();
   memory_used_ = 0;
-  auto root = std::make_unique<SearchNode>(kInvalidAction, player_id_, 1);
+  auto root = std::make_unique<SearchNode>(kInvalidAction, player_id, 1);
   std::vector<SearchNode*> visit_path;
   std::vector<double> returns;
   visit_path.reserve(64);
@@ -360,7 +355,7 @@ std::unique_ptr<SearchNode> MCTSBot::MCTSearch(const State& state) {
       SearchNode* node = *it;
 
       node->total_reward +=
-          returns[node->player == kChancePlayerId ? player_id_ : node->player];
+          returns[node->player == kChancePlayerId ? player_id : node->player];
       node->explore_count += 1;
 
       // Back up solved results as well.

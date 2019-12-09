@@ -46,7 +46,6 @@ def search_tic_tac_toe_state(initial_actions):
   rng = np.random.RandomState(42)
   bot = mcts.MCTSBot(
       game,
-      state.current_player(),
       UCT_C,
       max_simulations=10000,
       solve=True,
@@ -73,9 +72,17 @@ class MctsBotTest(absltest.TestCase):
     max_simulations = 100
     evaluator = mcts.RandomRolloutEvaluator(n_rollouts=20)
     bots = [
-        mcts.MCTSBot(game, 0, UCT_C, max_simulations, evaluator),
-        mcts.MCTSBot(game, 1, UCT_C, max_simulations, evaluator),
+        mcts.MCTSBot(game, UCT_C, max_simulations, evaluator),
+        mcts.MCTSBot(game, UCT_C, max_simulations, evaluator),
     ]
+    v = evaluate_bots.evaluate_bots(game.new_initial_state(), bots, np.random)
+    self.assertEqual(v[0] + v[1], 0)
+
+  def test_can_play_both_sides(self):
+    game = pyspiel.load_game("tic_tac_toe")
+    bot = mcts.MCTSBot(game, UCT_C, max_simulations=100,
+                       evaluator=mcts.RandomRolloutEvaluator(n_rollouts=20))
+    bots = [bot, bot]
     v = evaluate_bots.evaluate_bots(game.new_initial_state(), bots, np.random)
     self.assertEqual(v[0] + v[1], 0)
 
@@ -83,7 +90,7 @@ class MctsBotTest(absltest.TestCase):
     game = pyspiel.load_game("catch")
     max_simulations = 100
     evaluator = mcts.RandomRolloutEvaluator(n_rollouts=20)
-    bots = [mcts.MCTSBot(game, 0, UCT_C, max_simulations, evaluator)]
+    bots = [mcts.MCTSBot(game, UCT_C, max_simulations, evaluator)]
     v = evaluate_bots.evaluate_bots(game.new_initial_state(), bots, np.random)
     self.assertGreater(v[0], 0)
 
@@ -91,16 +98,16 @@ class MctsBotTest(absltest.TestCase):
     game = pyspiel.load_game("matrix_mp")
     evaluator = mcts.RandomRolloutEvaluator(n_rollouts=20)
     with self.assertRaises(ValueError):
-      mcts.MCTSBot(game, 0, UCT_C, max_simulations=100, evaluator=evaluator)
+      mcts.MCTSBot(game, UCT_C, max_simulations=100, evaluator=evaluator)
 
   def test_can_play_three_player_stochastic_games(self):
     game = pyspiel.load_game("pig(players=3,winscore=20,horizon=30)")
     max_simulations = 100
     evaluator = mcts.RandomRolloutEvaluator(n_rollouts=5)
     bots = [
-        mcts.MCTSBot(game, 0, UCT_C, max_simulations, evaluator),
-        mcts.MCTSBot(game, 1, UCT_C, max_simulations, evaluator),
-        mcts.MCTSBot(game, 2, UCT_C, max_simulations, evaluator),
+        mcts.MCTSBot(game, UCT_C, max_simulations, evaluator),
+        mcts.MCTSBot(game, UCT_C, max_simulations, evaluator),
+        mcts.MCTSBot(game, UCT_C, max_simulations, evaluator),
     ]
     v = evaluate_bots.evaluate_bots(game.new_initial_state(), bots, np.random)
     self.assertEqual(sum(v), 0)
