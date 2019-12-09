@@ -71,7 +71,7 @@ run_once("goofspiel(imp_info=True,num_cards=4,points_order=descending)")
 
 1. Why is this package named `OpenSpiel_jll` but not `OpenSpiel`?
 
-    The reason is that we plan to use [BinaryBuilder](https://github.com/JuliaPackaging/BinaryBuilder.jl) for the building process once the dependencies and APIs are stable. So by convention, this package is named `OpenSpiel_jll`. Another package named `OpenSpiel` will be registered later.
+    This package is a low-level wrapper for the OpenSpiel C++ codebase, designed to use the [BinaryBuilder](https://github.com/JuliaPackaging/BinaryBuilder.jl) infrastructure for building and distributing binary dependencies for Julia packages. Following the Julia community convention, that makes it a "JLL". Another package named `OpenSpiel` will be registered later, with a dependency on `OpenSpiel_jll` and containing pure-Julia games and algorithms.
 
 1. What is `StdVector`?
 
