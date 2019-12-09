@@ -46,7 +46,7 @@ function run_once(name)
             println("Sampled outcome: $(action_to_string(state, action))")
             apply_action(state, action)
         elseif is_simultaneous_node(state)
-            chosen_actions = [rand(legal_actions(state, pid-1)) for pid in 1:num_players(game)]  # in julia, index starts with 1
+            chosen_actions = [rand(legal_actions(state, pid-1)) for pid in 1:num_players(game)]  # in Julia, indices start at 1
             println("Chosen actions: $([action_to_string(state, pid-1, action) for (pid, action) in enumerate(chosen_actions)])")
             apply_action(state, chosen_actions)
         else
