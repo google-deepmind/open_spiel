@@ -38,6 +38,20 @@ function Base.show(io::IO, ::MIME{Symbol("text/plain")}, ps::StdMapAllocated{K, 
     end
 end
 
-load_game(s::Union{String, CxxWrap.StdLib.StdStringAllocated}; kw...) = length(kw) == 0 ? _load_game(s) : _load_game(s, StdMap{StdString, GameParameter}([StdString(string(k)) => v for (k,v) in kw]))
+function load_game(s::Union{String, CxxWrap.StdLib.StdStringAllocated}; kw...)
+    if length(kw) == 0
+        _load_game(s)
+    else
+        ps = [StdString(string(k)) => v for (k,v) in kw]
+        _load_game(s, StdMap{StdString, GameParameter}(ps))
+    end
+end
 
-load_game_as_turn_based(s::Union{String, CxxWrap.StdLib.StdStringAllocated}; kw...) = length(kw) == 0 ? _load_game_as_turn_based(s) : _load_game_as_turn_based(s, StdMap{StdString, GameParameter}([StdString(string(k)) => v for (k,v) in kw]))
+function load_game_as_turn_based(s::Union{String, CxxWrap.StdLib.StdStringAllocated}; kw...)
+    if length(kw) == 0
+        _load_game_as_turn_based(s)
+    else
+        ps = [StdString(string(k)) => v for (k,v) in kw]
+        _load_game_as_turn_based(s, StdMap{StdString, GameParameter}(ps))
+    end
+end
