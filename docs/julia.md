@@ -35,7 +35,7 @@ using StatsBase
 function run_once(name)
     game = load_game(name)
     state = new_initial_state(game)
-    println("initial state of game[$(name)] is:\n$(state)")
+    println("Initial state of game[$(name)] is:\n$(state)")
 
     while !is_terminal(state)
         if is_chance_node(state)
