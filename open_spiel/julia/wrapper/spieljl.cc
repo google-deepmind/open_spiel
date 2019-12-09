@@ -349,7 +349,7 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
   mod.method("set_children!", [](open_spiel::algorithms::SearchNode& sn, std::vector<open_spiel::algorithms::SearchNode> children) { sn.children = children; });
 
   mod.add_type<open_spiel::algorithms::MCTSBot>("MCTSBot", jlcxx::julia_type<open_spiel::Bot>())
-    .constructor<const open_spiel::Game&, open_spiel::Player, open_spiel::algorithms::Evaluator*, double, int, int64_t, bool, int, bool, open_spiel::algorithms::ChildSelectionPolicy>()
+    .constructor<const open_spiel::Game&, open_spiel::algorithms::Evaluator*, double, int, int64_t, bool, int, bool, open_spiel::algorithms::ChildSelectionPolicy, double, double>()
     .method("restart", &open_spiel::algorithms::MCTSBot::Restart)
     .method("restart_at", &open_spiel::algorithms::MCTSBot::RestartAt)
     .method("step", &open_spiel::algorithms::MCTSBot::Step)
