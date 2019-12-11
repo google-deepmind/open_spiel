@@ -23,6 +23,9 @@
 namespace open_spiel {
 namespace algorithms {
 
+using HistoryDistribution =
+    std::pair<std::vector<std::unique_ptr<State>>, std::vector<double>>;
+
 // Returns a distribution over states at the information state containing the
 // specified state given the opponents' policies. That is, it returns
 // Pr(h | s, \pi_{-i}) by normalizing the opponents' reach probabilities over
@@ -43,8 +46,17 @@ namespace algorithms {
 //
 // Note: currently only works for turn-based games of imperfect information,
 // and does not work with kSampledStochastic chance modes.
-std::pair<std::vector<std::unique_ptr<State>>, std::vector<double>>
-GetStateDistribution(const State& state, const Policy* opponent_policy);
+HistoryDistribution GetStateDistribution(const State& state,
+                                         const Policy* opponent_policy);
+
+// Incrementally builds the state distribution vectors. Must be called at each
+// state in a trajectory. All of the states should correspond to the same
+// information state (i.e. all states should have identical
+// InformationStateString values, although this is not doublechecked). If
+// previous is empty, calls the non-incremental version.
+HistoryDistribution UpdateIncrementalStateDistribution(
+    const State& state, const Policy* opponent_policy, int player_id,
+    const HistoryDistribution& previous = {});
 
 }  // namespace algorithms
 }  // namespace open_spiel
