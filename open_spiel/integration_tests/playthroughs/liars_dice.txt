@@ -31,8 +31,8 @@ MaxGameLength() = 13
 ToString() = "liars_dice()"
 
 # State 0
+# -1 -1 - chance node, current roller is player 0
 IsTerminal() = False
-ToString() = "-1 -1 - chance node, current roller is player 0"
 History() = []
 HistoryString() = ""
 IsChanceNode() = True
@@ -52,8 +52,8 @@ StringLegalActions() = ["chance outcome 1", "chance outcome 2", "chance outcome 
 action: 2
 
 # State 1
+# 2 -1 - chance node, current roller is player 1
 IsTerminal() = False
-ToString() = "2 -1 - chance node, current roller is player 1"
 History() = [2]
 HistoryString() = "2"
 IsChanceNode() = True
@@ -73,8 +73,8 @@ StringLegalActions() = ["chance outcome 1", "chance outcome 2", "chance outcome 
 action: 5
 
 # State 2
+# 2 5
 IsTerminal() = False
-ToString() = "2 5"
 History() = [2, 5]
 HistoryString() = "2 5"
 IsChanceNode() = False
@@ -95,8 +95,8 @@ StringLegalActions() = ["1-1", "1-2", "1-3", "1-4", "1-5", "1-6", "2-1", "2-2", 
 action: 1
 
 # State 3
+# 2 5 1-2
 IsTerminal() = False
-ToString() = "2 5 1-2"
 History() = [2, 5, 1]
 HistoryString() = "2 5 1"
 IsChanceNode() = False
@@ -117,8 +117,8 @@ StringLegalActions() = ["1-3", "1-4", "1-5", "1-6", "2-1", "2-2", "2-3", "2-4", 
 action: 4
 
 # State 4
+# 2 5 1-2 1-5
 IsTerminal() = False
-ToString() = "2 5 1-2 1-5"
 History() = [2, 5, 1, 4]
 HistoryString() = "2 5 1 4"
 IsChanceNode() = False
@@ -139,8 +139,8 @@ StringLegalActions() = ["1-6", "2-1", "2-2", "2-3", "2-4", "2-5", "2-6", "Liar"]
 action: 8
 
 # State 5
+# 2 5 1-2 1-5 2-3
 IsTerminal() = False
-ToString() = "2 5 1-2 1-5 2-3"
 History() = [2, 5, 1, 4, 8]
 HistoryString() = "2 5 1 4 8"
 IsChanceNode() = False
@@ -161,8 +161,8 @@ StringLegalActions() = ["2-4", "2-5", "2-6", "Liar"]
 action: 12
 
 # State 6
+# 2 5 1-2 1-5 2-3 Liar
 IsTerminal() = True
-ToString() = "2 5 1-2 1-5 2-3 Liar"
 History() = [2, 5, 1, 4, 8, 12]
 HistoryString() = "2 5 1 4 8 12"
 IsChanceNode() = False

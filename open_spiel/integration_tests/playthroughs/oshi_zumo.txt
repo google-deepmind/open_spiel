@@ -29,8 +29,8 @@ MaxGameLength() = 1000
 ToString() = "oshi_zumo(coins=10)"
 
 # State 0
+# Coins: 10 10, Field: #...W...#
 IsTerminal() = False
-ToString() = "Coins: 10 10, Field: #...W...#\n"
 History() = []
 HistoryString() = ""
 IsChanceNode() = False
@@ -53,8 +53,8 @@ StringLegalActions(1) = ["[P1]Bid: 0", "[P1]Bid: 1", "[P1]Bid: 2", "[P1]Bid: 3",
 actions: [6, 10]
 
 # State 1
+# Coins: 4 0, Field: #..W....#
 IsTerminal() = False
-ToString() = "Coins: 4 0, Field: #..W....#\n"
 History() = [6, 10]
 HistoryString() = "6 10"
 IsChanceNode() = False
@@ -77,8 +77,8 @@ StringLegalActions(1) = ["[P1]Bid: 0"]
 actions: [1, 0]
 
 # State 2
+# Coins: 3 0, Field: #...W...#
 IsTerminal() = False
-ToString() = "Coins: 3 0, Field: #...W...#\n"
 History() = [6, 10, 1, 0]
 HistoryString() = "6 10 1 0"
 IsChanceNode() = False
@@ -101,8 +101,8 @@ StringLegalActions(1) = ["[P1]Bid: 0"]
 actions: [1, 0]
 
 # State 3
+# Coins: 2 0, Field: #....W..#
 IsTerminal() = False
-ToString() = "Coins: 2 0, Field: #....W..#\n"
 History() = [6, 10, 1, 0, 1, 0]
 HistoryString() = "6 10 1 0 1 0"
 IsChanceNode() = False
@@ -125,8 +125,8 @@ StringLegalActions(1) = ["[P1]Bid: 0"]
 actions: [1, 0]
 
 # State 4
+# Coins: 1 0, Field: #.....W.#
 IsTerminal() = False
-ToString() = "Coins: 1 0, Field: #.....W.#\n"
 History() = [6, 10, 1, 0, 1, 0, 1, 0]
 HistoryString() = "6 10 1 0 1 0 1 0"
 IsChanceNode() = False
@@ -149,8 +149,8 @@ StringLegalActions(1) = ["[P1]Bid: 0"]
 actions: [1, 0]
 
 # State 5
+# Coins: 0 0, Field: #......W#
 IsTerminal() = True
-ToString() = "Coins: 0 0, Field: #......W#\n"
 History() = [6, 10, 1, 0, 1, 0, 1, 0, 1, 0]
 HistoryString() = "6 10 1 0 1 0 1 0 1 0"
 IsChanceNode() = False

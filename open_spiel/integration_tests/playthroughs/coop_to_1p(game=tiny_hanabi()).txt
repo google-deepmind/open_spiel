@@ -29,8 +29,8 @@ MaxGameLength() = 4
 ToString() = "coop_to_1p(game=tiny_hanabi())"
 
 # State 0
+# 
 IsTerminal() = False
-ToString() = "\n"
 History() = []
 HistoryString() = ""
 IsChanceNode() = True
@@ -46,8 +46,9 @@ StringLegalActions() = ["d0", "d1"]
 action: 0
 
 # State 1
+# p0:d0
+# Player 0 possible: d0 d1
 IsTerminal() = False
-ToString() = "p0:d0\nPlayer 0 possible: d0 d1\n"
 History() = [0]
 HistoryString() = "0"
 IsChanceNode() = True
@@ -63,8 +64,13 @@ StringLegalActions() = ["d0", "d1"]
 action: 1
 
 # State 2
+# p0:d0 p1:d1
+# Player 0 p0a0: none
+# Player 0 p0a1: none
+# Player 0 p0a2: none
+# Player 0 unassigned: d0 d1
+# Player 1 possible: d0 d1
 IsTerminal() = False
-ToString() = "p0:d0 p1:d1\nPlayer 0 p0a0: none\nPlayer 0 p0a1: none\nPlayer 0 p0a2: none\nPlayer 0 unassigned: d0 d1\nPlayer 1 possible: d0 d1\n"
 History() = [0, 1]
 HistoryString() = "0 1"
 IsChanceNode() = False
@@ -81,8 +87,13 @@ StringLegalActions() = ["d0->p0a0", "d0->p0a1", "d0->p0a2"]
 action: 2
 
 # State 3
+# p0:d0 p1:d1
+# Player 0 p0a0: none
+# Player 0 p0a1: none
+# Player 0 p0a2: d0
+# Player 0 unassigned: d1
+# Player 1 possible: d0 d1
 IsTerminal() = False
-ToString() = "p0:d0 p1:d1\nPlayer 0 p0a0: none\nPlayer 0 p0a1: none\nPlayer 0 p0a2: d0\nPlayer 0 unassigned: d1\nPlayer 1 possible: d0 d1\n"
 History() = [0, 1, 2]
 HistoryString() = "0 1 2"
 IsChanceNode() = False
@@ -99,8 +110,13 @@ StringLegalActions() = ["d1->p0a0", "d1->p0a1", "d1->p0a2"]
 action: 1
 
 # State 4
+# p0:d0 p1:d1 p0:a2
+# Player 0 possible: d0
+# Player 1 p1a0: none
+# Player 1 p1a1: none
+# Player 1 p1a2: none
+# Player 1 unassigned: d0 d1
 IsTerminal() = False
-ToString() = "p0:d0 p1:d1 p0:a2\nPlayer 0 possible: d0\nPlayer 1 p1a0: none\nPlayer 1 p1a1: none\nPlayer 1 p1a2: none\nPlayer 1 unassigned: d0 d1\n"
 History() = [0, 1, 2, 1]
 HistoryString() = "0 1 2 1"
 IsChanceNode() = False
@@ -117,8 +133,13 @@ StringLegalActions() = ["d0->p1a0", "d0->p1a1", "d0->p1a2"]
 action: 2
 
 # State 5
+# p0:d0 p1:d1 p0:a2
+# Player 0 possible: d0
+# Player 1 p1a0: none
+# Player 1 p1a1: none
+# Player 1 p1a2: d0
+# Player 1 unassigned: d1
 IsTerminal() = False
-ToString() = "p0:d0 p1:d1 p0:a2\nPlayer 0 possible: d0\nPlayer 1 p1a0: none\nPlayer 1 p1a1: none\nPlayer 1 p1a2: d0\nPlayer 1 unassigned: d1\n"
 History() = [0, 1, 2, 1, 2]
 HistoryString() = "0 1 2 1 2"
 IsChanceNode() = False
@@ -135,8 +156,10 @@ StringLegalActions() = ["d1->p1a0", "d1->p1a1", "d1->p1a2"]
 action: 2
 
 # State 6
+# p0:d0 p1:d1 p0:a2 p1:a2
+# Player 0 possible: d0
+# Player 1 possible: d0 d1
 IsTerminal() = True
-ToString() = "p0:d0 p1:d1 p0:a2 p1:a2\nPlayer 0 possible: d0\nPlayer 1 possible: d0 d1\n"
 History() = [0, 1, 2, 1, 2, 2]
 HistoryString() = "0 1 2 1 2 2"
 IsChanceNode() = False

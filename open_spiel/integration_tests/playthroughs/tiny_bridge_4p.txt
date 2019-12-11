@@ -27,8 +27,8 @@ MaxGameLength() = 57
 ToString() = "tiny_bridge_4p()"
 
 # State 0
+# W:?? N:?? E:?? S:??
 IsTerminal() = False
-ToString() = "W:?? N:?? E:?? S:??"
 History() = []
 HistoryString() = ""
 IsChanceNode() = True
@@ -50,8 +50,8 @@ StringLegalActions() = ["HQHJ", "HKHJ", "HAHJ", "SJHJ", "SQHJ", "SKHJ", "SAHJ", 
 action: 21
 
 # State 1
+# W:SAHJ N:?? E:?? S:??
 IsTerminal() = False
-ToString() = "W:SAHJ N:?? E:?? S:??"
 History() = [21]
 HistoryString() = "21"
 IsChanceNode() = True
@@ -73,8 +73,8 @@ StringLegalActions() = ["HKHQ", "HAHQ", "SJHQ", "SQHQ", "SKHQ", "HAHK", "SJHK", 
 action: 4
 
 # State 2
+# W:SAHJ N:HAHQ E:?? S:??
 IsTerminal() = False
-ToString() = "W:SAHJ N:HAHQ E:?? S:??"
 History() = [21, 4]
 HistoryString() = "21 4"
 IsChanceNode() = True
@@ -96,8 +96,8 @@ StringLegalActions() = ["SJHK", "SQHK", "SKHK", "SQSJ", "SKSJ", "SKSQ"]
 action: 17
 
 # State 3
+# W:SAHJ N:HAHQ E:SKHK S:??
 IsTerminal() = False
-ToString() = "W:SAHJ N:HAHQ E:SKHK S:??"
 History() = [21, 4, 17]
 HistoryString() = "21 4 17"
 IsChanceNode() = True
@@ -119,8 +119,8 @@ StringLegalActions() = ["SQSJ"]
 action: 14
 
 # State 4
+# W:SAHJ N:HAHQ E:SKHK S:SQSJ
 IsTerminal() = False
-ToString() = "W:SAHJ N:HAHQ E:SKHK S:SQSJ"
 History() = [21, 4, 17, 14]
 HistoryString() = "21 4 17 14"
 IsChanceNode() = False
@@ -143,8 +143,8 @@ StringLegalActions() = ["Pass", "1H", "1S", "1NT", "2H", "2S", "2NT"]
 action: 4
 
 # State 5
+# W:SAHJ N:HAHQ E:SKHK S:SQSJ 2H
 IsTerminal() = False
-ToString() = "W:SAHJ N:HAHQ E:SKHK S:SQSJ 2H"
 History() = [21, 4, 17, 14, 4]
 HistoryString() = "21 4 17 14 4"
 IsChanceNode() = False
@@ -167,8 +167,8 @@ StringLegalActions() = ["Pass", "2S", "2NT", "Dbl"]
 action: 5
 
 # State 6
+# W:SAHJ N:HAHQ E:SKHK S:SQSJ 2H-2S
 IsTerminal() = False
-ToString() = "W:SAHJ N:HAHQ E:SKHK S:SQSJ 2H-2S"
 History() = [21, 4, 17, 14, 4, 5]
 HistoryString() = "21 4 17 14 4 5"
 IsChanceNode() = False
@@ -191,8 +191,8 @@ StringLegalActions() = ["Pass", "2NT", "Dbl"]
 action: 6
 
 # State 7
+# W:SAHJ N:HAHQ E:SKHK S:SQSJ 2H-2S-2NT
 IsTerminal() = False
-ToString() = "W:SAHJ N:HAHQ E:SKHK S:SQSJ 2H-2S-2NT"
 History() = [21, 4, 17, 14, 4, 5, 6]
 HistoryString() = "21 4 17 14 4 5 6"
 IsChanceNode() = False
@@ -215,8 +215,8 @@ StringLegalActions() = ["Pass", "Dbl"]
 action: 7
 
 # State 8
+# W:SAHJ N:HAHQ E:SKHK S:SQSJ 2H-2S-2NT-Dbl
 IsTerminal() = False
-ToString() = "W:SAHJ N:HAHQ E:SKHK S:SQSJ 2H-2S-2NT-Dbl"
 History() = [21, 4, 17, 14, 4, 5, 6, 7]
 HistoryString() = "21 4 17 14 4 5 6 7"
 IsChanceNode() = False
@@ -239,8 +239,8 @@ StringLegalActions() = ["Pass", "RDbl"]
 action: 8
 
 # State 9
+# W:SAHJ N:HAHQ E:SKHK S:SQSJ 2H-2S-2NT-Dbl-RDbl
 IsTerminal() = False
-ToString() = "W:SAHJ N:HAHQ E:SKHK S:SQSJ 2H-2S-2NT-Dbl-RDbl"
 History() = [21, 4, 17, 14, 4, 5, 6, 7, 8]
 HistoryString() = "21 4 17 14 4 5 6 7 8"
 IsChanceNode() = False
@@ -263,8 +263,8 @@ StringLegalActions() = ["Pass"]
 action: 0
 
 # State 10
+# W:SAHJ N:HAHQ E:SKHK S:SQSJ 2H-2S-2NT-Dbl-RDbl-Pass
 IsTerminal() = False
-ToString() = "W:SAHJ N:HAHQ E:SKHK S:SQSJ 2H-2S-2NT-Dbl-RDbl-Pass"
 History() = [21, 4, 17, 14, 4, 5, 6, 7, 8, 0]
 HistoryString() = "21 4 17 14 4 5 6 7 8 0"
 IsChanceNode() = False
@@ -287,8 +287,8 @@ StringLegalActions() = ["Pass"]
 action: 0
 
 # State 11
+# W:SAHJ N:HAHQ E:SKHK S:SQSJ 2H-2S-2NT-Dbl-RDbl-Pass-Pass
 IsTerminal() = False
-ToString() = "W:SAHJ N:HAHQ E:SKHK S:SQSJ 2H-2S-2NT-Dbl-RDbl-Pass-Pass"
 History() = [21, 4, 17, 14, 4, 5, 6, 7, 8, 0, 0]
 HistoryString() = "21 4 17 14 4 5 6 7 8 0 0"
 IsChanceNode() = False
@@ -311,8 +311,8 @@ StringLegalActions() = ["Pass"]
 action: 0
 
 # State 12
+# W:SAHJ N:HAHQ E:SKHK S:SQSJ 2H-2S-2NT-Dbl-RDbl-Pass-Pass-Pass
 IsTerminal() = True
-ToString() = "W:SAHJ N:HAHQ E:SKHK S:SQSJ 2H-2S-2NT-Dbl-RDbl-Pass-Pass-Pass"
 History() = [21, 4, 17, 14, 4, 5, 6, 7, 8, 0, 0, 0]
 HistoryString() = "21 4 17 14 4 5 6 7 8 0 0 0"
 IsChanceNode() = False

@@ -29,8 +29,8 @@ MaxGameLength() = 17695
 ToString() = "chess()"
 
 # State 0
+# rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
 IsTerminal() = False
-ToString() = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 History() = []
 HistoryString() = ""
 IsChanceNode() = False
@@ -49,8 +49,8 @@ StringLegalActions() = ["Nba3", "aa3", "b3", "Nbc3", "cc3", "d3", "e3", "Ngf3", 
 action: 1422
 
 # State 1
+# rnbqkbnr/pppppppp/8/8/8/6P1/PPPPPP1P/RNBQKBNR b KQkq - 0 1
 IsTerminal() = False
-ToString() = "rnbqkbnr/pppppppp/8/8/8/6P1/PPPPPP1P/RNBQKBNR b KQkq - 0 1"
 History() = [1422]
 HistoryString() = "1422"
 IsChanceNode() = False
@@ -69,8 +69,8 @@ StringLegalActions() = ["a5", "b5", "c5", "d5", "e5", "f5", "g5", "h5", "aa6", "
 action: 2942
 
 # State 2
+# rnbqkb1r/pppppppp/5n2/8/8/6P1/PPPPPP1P/RNBQKBNR w KQkq - 1 2
 IsTerminal() = False
-ToString() = "rnbqkb1r/pppppppp/5n2/8/8/6P1/PPPPPP1P/RNBQKBNR w KQkq - 1 2"
 History() = [1422, 2942]
 HistoryString() = "1422 2942"
 IsChanceNode() = False
@@ -89,8 +89,8 @@ StringLegalActions() = ["Bg2", "Nba3", "aa3", "b3", "Nbc3", "cc3", "d3", "e3", "
 action: 901
 
 # State 3
+# rnbqkb1r/pppppppp/5n2/8/8/6P1/PPPPPPBP/RNBQK1NR b KQkq - 2 2
 IsTerminal() = False
-ToString() = "rnbqkb1r/pppppppp/5n2/8/8/6P1/PPPPPPBP/RNBQK1NR b KQkq - 2 2"
 History() = [1422, 2942, 901]
 HistoryString() = "1422 2942 901"
 IsChanceNode() = False
@@ -109,8 +109,8 @@ StringLegalActions() = ["Ne4", "Ng4", "a5", "b5", "c5", "Nfd5", "dd5", "e5", "g5
 action: 2617
 
 # State 4
+# r1bqkb1r/pppppppp/n4n2/8/8/6P1/PPPPPPBP/RNBQK1NR w KQkq - 3 3
 IsTerminal() = False
-ToString() = "r1bqkb1r/pppppppp/n4n2/8/8/6P1/PPPPPPBP/RNBQK1NR w KQkq - 3 3"
 History() = [1422, 2942, 901, 2617]
 HistoryString() = "1422 2942 901 2617"
 IsChanceNode() = False
@@ -129,8 +129,8 @@ StringLegalActions() = ["Kef1", "Bgf1", "Nba3", "aa3", "b3", "Nbc3", "cc3", "d3"
 action: 1162
 
 # State 5
+# r1bqkb1r/pppppppp/n4n2/8/8/2P3P1/PP1PPPBP/RNBQK1NR b KQkq - 0 3
 IsTerminal() = False
-ToString() = "r1bqkb1r/pppppppp/n4n2/8/8/2P3P1/PP1PPPBP/RNBQK1NR b KQkq - 0 3"
 History() = [1422, 2942, 901, 2617, 1162]
 HistoryString() = "1422 2942 901 2617 1162"
 IsChanceNode() = False
@@ -149,8 +149,8 @@ StringLegalActions() = ["Nb4", "Ne4", "Ng4", "b5", "Nac5", "cc5", "Nfd5", "dd5",
 action: 1837
 
 # State 6
+# r1bqkb1r/pppppppp/n7/8/4n3/2P3P1/PP1PPPBP/RNBQK1NR w KQkq - 1 4
 IsTerminal() = False
-ToString() = "r1bqkb1r/pppppppp/n7/8/4n3/2P3P1/PP1PPPBP/RNBQK1NR w KQkq - 1 4"
 History() = [1422, 2942, 901, 2617, 1162, 1837]
 HistoryString() = "1422 2942 901 2617 1162 1837"
 IsChanceNode() = False
@@ -169,8 +169,8 @@ StringLegalActions() = ["Kef1", "Bgf1", "Qc2", "Nba3", "aa3", "Qdb3", "bb3", "d3
 action: 324
 
 # State 7
+# r1bqkb1r/pppppppp/n7/8/4n3/2P3P1/PP1PPPBP/RNBQ1KNR b kq - 2 4
 IsTerminal() = False
-ToString() = "r1bqkb1r/pppppppp/n7/8/4n3/2P3P1/PP1PPPBP/RNBQ1KNR b kq - 2 4"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324]
 HistoryString() = "1422 2942 901 2617 1162 1837 324"
 IsChanceNode() = False
@@ -189,8 +189,8 @@ StringLegalActions() = ["Nxd2+", "Nxf2", "Nxc3", "Nxg3+", "Nb4", "b5", "Nec5", "
 action: 860
 
 # State 8
+# r1bqkb1r/pppppppp/n7/8/8/2P3P1/PP1PPnBP/RNBQ1KNR w kq - 0 5
 IsTerminal() = False
-ToString() = "r1bqkb1r/pppppppp/n7/8/8/2P3P1/PP1PPnBP/RNBQ1KNR w kq - 0 5"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860"
 IsChanceNode() = False
@@ -209,8 +209,8 @@ StringLegalActions() = ["Qde1", "Kfe1", "Qc2", "Kxf2", "Nba3", "aa3", "Qdb3", "b
 action: 1486
 
 # State 9
+# r1bqkb1r/pppppppp/n7/8/8/2P3PB/PP1PPn1P/RNBQ1KNR b kq - 1 5
 IsTerminal() = False
-ToString() = "r1bqkb1r/pppppppp/n7/8/8/2P3PB/PP1PPn1P/RNBQ1KNR b kq - 1 5"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486"
 IsChanceNode() = False
@@ -229,8 +229,8 @@ StringLegalActions() = ["Nxd1", "Nxh1", "Nd3", "Nxh3", "Nb4", "Ne4", "Ng4", "b5"
 action: 2868
 
 # State 10
+# r1bqkb1r/pppp1ppp/n3p3/8/8/2P3PB/PP1PPn1P/RNBQ1KNR w kq - 0 6
 IsTerminal() = False
-ToString() = "r1bqkb1r/pppp1ppp/n3p3/8/8/2P3PB/PP1PPn1P/RNBQ1KNR w kq - 0 6"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868"
 IsChanceNode() = False
@@ -249,8 +249,8 @@ StringLegalActions() = ["Qde1", "Kfe1", "Qc2", "Kxf2", "Kfg2", "Bhg2", "Nba3", "
 action: 2839
 
 # State 11
+# r1bqkb1r/pppp1ppp/n3B3/8/8/2P3P1/PP1PPn1P/RNBQ1KNR b kq - 0 6
 IsTerminal() = False
-ToString() = "r1bqkb1r/pppp1ppp/n3B3/8/8/2P3P1/PP1PPn1P/RNBQ1KNR b kq - 0 6"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839"
 IsChanceNode() = False
@@ -269,8 +269,8 @@ StringLegalActions() = ["Nxd1", "Nxh1", "Ba3", "Nd3", "Nh3", "Nab4", "Bfb4", "Ne
 action: 2291
 
 # State 12
+# r1bqkb1r/ppp2ppp/n3B3/3p4/8/2P3P1/PP1PPn1P/RNBQ1KNR w kq d6 0 7
 IsTerminal() = False
-ToString() = "r1bqkb1r/ppp2ppp/n3B3/3p4/8/2P3P1/PP1PPn1P/RNBQ1KNR w kq d6 0 7"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291"
 IsChanceNode() = False
@@ -289,8 +289,8 @@ StringLegalActions() = ["Qde1", "Kfe1", "Qc2", "Kxf2", "Kg2", "Nba3", "aa3", "Qd
 action: 1544
 
 # State 13
+# r1bqkb1r/ppp2ppp/n3B3/3p4/P7/2P3P1/1P1PPn1P/RNBQ1KNR b kq a3 0 7
 IsTerminal() = False
-ToString() = "r1bqkb1r/ppp2ppp/n3B3/3p4/P7/2P3P1/1P1PPn1P/RNBQ1KNR b kq a3 0 7"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544"
 IsChanceNode() = False
@@ -309,8 +309,8 @@ StringLegalActions() = ["Nxd1", "Nxh1", "Ba3", "Nd3", "Nh3", "Nab4", "Bfb4", "d4
 action: 3704
 
 # State 14
+# 1rbqkb1r/ppp2ppp/n3B3/3p4/P7/2P3P1/1P1PPn1P/RNBQ1KNR w k - 1 8
 IsTerminal() = False
-ToString() = "1rbqkb1r/ppp2ppp/n3B3/3p4/P7/2P3P1/1P1PPn1P/RNBQ1KNR w k - 1 8"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704"
 IsChanceNode() = False
@@ -329,8 +329,8 @@ StringLegalActions() = ["Qde1", "Kfe1", "Ra2", "Qc2", "Kxf2", "Kg2", "Raa3", "Nb
 action: 2284
 
 # State 15
+# 1rbqkb1r/ppp2ppp/n7/3B4/P7/2P3P1/1P1PPn1P/RNBQ1KNR b k - 0 8
 IsTerminal() = False
-ToString() = "1rbqkb1r/ppp2ppp/n7/3B4/P7/2P3P1/1P1PPn1P/RNBQ1KNR b k - 0 8"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284"
 IsChanceNode() = False
@@ -349,8 +349,8 @@ StringLegalActions() = ["Nxd1", "Nxh1", "Ba3", "Nd3", "Nfh3", "Bch3+", "Nab4", "
 action: 4031
 
 # State 16
+# 1rbqkbr1/ppp2ppp/n7/3B4/P7/2P3P1/1P1PPn1P/RNBQ1KNR w - - 1 9
 IsTerminal() = False
-ToString() = "1rbqkbr1/ppp2ppp/n7/3B4/P7/2P3P1/1P1PPn1P/RNBQ1KNR w - - 1 9"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031"
 IsChanceNode() = False
@@ -369,8 +369,8 @@ StringLegalActions() = ["Qde1", "Kfe1", "Raa2", "Bda2", "Qc2", "Kxf2", "Kfg2", "
 action: 1379
 
 # State 17
+# 1rbqkbr1/ppp2ppp/n7/8/P7/2P2BP1/1P1PPn1P/RNBQ1KNR b - - 2 9
 IsTerminal() = False
-ToString() = "1rbqkbr1/ppp2ppp/n7/8/P7/2P2BP1/1P1PPn1P/RNBQ1KNR b - - 2 9"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379"
 IsChanceNode() = False
@@ -389,8 +389,8 @@ StringLegalActions() = ["Nxd1", "Nxh1", "Qxd2", "Ba3", "Nfd3", "Qdd3", "Nfh3", "
 action: 3322
 
 # State 18
+# 1r1qkbr1/pppb1ppp/n7/8/P7/2P2BP1/1P1PPn1P/RNBQ1KNR w - - 3 10
 IsTerminal() = False
-ToString() = "1r1qkbr1/pppb1ppp/n7/8/P7/2P2BP1/1P1PPn1P/RNBQ1KNR w - - 3 10"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322"
 IsChanceNode() = False
@@ -409,8 +409,8 @@ StringLegalActions() = ["Qde1", "Kfe1", "Ra2", "Qc2", "Kxf2", "K1g2", "B3g2", "R
 action: 901
 
 # State 19
+# 1r1qkbr1/pppb1ppp/n7/8/P7/2P2BP1/1P1PPnKP/RNBQ2NR b - - 4 10
 IsTerminal() = False
-ToString() = "1r1qkbr1/pppb1ppp/n7/8/P7/2P2BP1/1P1PPnKP/RNBQ2NR b - - 4 10"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901"
 IsChanceNode() = False
@@ -429,8 +429,8 @@ StringLegalActions() = ["Nxd1", "Nxh1", "Ba3", "Nd3", "Nfh3", "Bdh3+", "Bxa4", "
 action: 3387
 
 # State 20
+# 1r2kbr1/pppbqppp/n7/8/P7/2P2BP1/1P1PPnKP/RNBQ2NR w - - 5 11
 IsTerminal() = False
-ToString() = "1r2kbr1/pppbqppp/n7/8/P7/2P2BP1/1P1PPnKP/RNBQ2NR w - - 5 11"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387"
 IsChanceNode() = False
@@ -449,8 +449,8 @@ StringLegalActions() = ["Qe1", "Qdf1", "Kgf1", "Ra2", "Qc2", "Kxf2", "Raa3", "Nb
 action: 1941
 
 # State 21
+# 1r2kbr1/pppbqppp/n7/8/P5B1/2P3P1/1P1PPnKP/RNBQ2NR b - - 6 11
 IsTerminal() = False
-ToString() = "1r2kbr1/pppbqppp/n7/8/P5B1/2P3P1/1P1PPnKP/RNBQ2NR b - - 6 11"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941"
 IsChanceNode() = False
@@ -469,8 +469,8 @@ StringLegalActions() = ["Nxd1", "Nxh1", "Qxe2", "Qa3", "Nd3", "Qe3", "Nh3", "Bxa
 action: 3641
 
 # State 22
+# r3kbr1/pppbqppp/n7/8/P5B1/2P3P1/1P1PPnKP/RNBQ2NR w - - 7 12
 IsTerminal() = False
-ToString() = "r3kbr1/pppbqppp/n7/8/P5B1/2P3P1/1P1PPnKP/RNBQ2NR w - - 7 12"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641"
 IsChanceNode() = False
@@ -489,8 +489,8 @@ StringLegalActions() = ["Qe1", "Qdf1", "Kgf1", "Ra2", "Qc2", "Kxf2", "Raa3", "Nb
 action: 3294
 
 # State 23
+# r3kbr1/pppBqppp/n7/8/P7/2P3P1/1P1PPnKP/RNBQ2NR b - - 0 12
 IsTerminal() = False
-ToString() = "r3kbr1/pppBqppp/n7/8/P7/2P3P1/1P1PPnKP/RNBQ2NR b - - 0 12"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294"
 IsChanceNode() = False
@@ -509,8 +509,8 @@ StringLegalActions() = ["Q7xd7", "K8xd7", "Kd8"]
 action: 3324
 
 # State 24
+# r4br1/pppkqppp/n7/8/P7/2P3P1/1P1PPnKP/RNBQ2NR w - - 0 13
 IsTerminal() = False
-ToString() = "r4br1/pppkqppp/n7/8/P7/2P3P1/1P1PPnKP/RNBQ2NR w - - 0 13"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324"
 IsChanceNode() = False
@@ -529,8 +529,8 @@ StringLegalActions() = ["Qe1", "Qdf1", "Kgf1", "Ra2", "Qc2", "Kxf2", "Raa3", "Nb
 action: 334
 
 # State 25
+# r4br1/pppkqppp/n7/8/P7/2P3P1/1P1PPn1P/RNBQ1KNR b - - 1 13
 IsTerminal() = False
-ToString() = "r4br1/pppkqppp/n7/8/P7/2P3P1/1P1PPn1P/RNBQ1KNR b - - 1 13"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334"
 IsChanceNode() = False
@@ -549,8 +549,8 @@ StringLegalActions() = ["Nxd1", "Nxh1", "Qxe2+", "Qa3", "Nd3", "Qe3", "Nh3", "Na
 action: 1076
 
 # State 26
+# r4br1/pppk1ppp/n7/8/P7/q1P3P1/1P1PPn1P/RNBQ1KNR w - - 2 14
 IsTerminal() = False
-ToString() = "r4br1/pppk1ppp/n7/8/P7/q1P3P1/1P1PPn1P/RNBQ1KNR w - - 2 14"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076"
 IsChanceNode() = False
@@ -569,8 +569,8 @@ StringLegalActions() = ["Qde1", "Kfe1", "Ra2", "Qc2", "Kxf2", "Kg2", "Raxa3", "N
 action: 1033
 
 # State 27
+# r4br1/pppk1ppp/n7/8/P7/P1P3P1/3PPn1P/RNBQ1KNR b - - 0 14
 IsTerminal() = False
-ToString() = "r4br1/pppk1ppp/n7/8/P7/P1P3P1/3PPn1P/RNBQ1KNR b - - 0 14"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033"
 IsChanceNode() = False
@@ -589,8 +589,8 @@ StringLegalActions() = ["Nxd1", "Nxh1", "Bxa3", "Nd3", "Nh3", "Nab4", "Bfb4", "N
 action: 2673
 
 # State 28
+# r4br1/p1pk1ppp/np6/8/P7/P1P3P1/3PPn1P/RNBQ1KNR w - - 0 15
 IsTerminal() = False
-ToString() = "r4br1/p1pk1ppp/np6/8/P7/P1P3P1/3PPn1P/RNBQ1KNR w - - 0 15"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673"
 IsChanceNode() = False
@@ -609,8 +609,8 @@ StringLegalActions() = ["Qde1", "Kfe1", "Ra2", "Bb2", "Qc2", "Kxf2", "Kg2", "Qb3
 action: 1739
 
 # State 29
+# r4br1/p1pk1ppp/np6/8/P2P4/P1P3P1/4Pn1P/RNBQ1KNR b - d3 0 15
 IsTerminal() = False
-ToString() = "r4br1/p1pk1ppp/np6/8/P2P4/P1P3P1/4Pn1P/RNBQ1KNR b - d3 0 15"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739"
 IsChanceNode() = False
@@ -629,8 +629,8 @@ StringLegalActions() = ["Nxd1", "Nxh1", "Bxa3", "Nd3", "Nh3", "Nab4", "Bfb4", "N
 action: 3891
 
 # State 30
+# r3kbr1/p1p2ppp/np6/8/P2P4/P1P3P1/4Pn1P/RNBQ1KNR w - - 1 16
 IsTerminal() = False
-ToString() = "r3kbr1/p1p2ppp/np6/8/P2P4/P1P3P1/4Pn1P/RNBQ1KNR w - - 1 16"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891"
 IsChanceNode() = False
@@ -649,8 +649,8 @@ StringLegalActions() = ["Qde1", "Kfe1", "Ra2", "Bb2", "Qc2", "Nbd2", "Bcd2", "Qd
 action: 578
 
 # State 31
+# r3kbr1/p1p2ppp/np6/8/P2P4/P1P3P1/1B2Pn1P/RN1Q1KNR b - - 2 16
 IsTerminal() = False
-ToString() = "r3kbr1/p1p2ppp/np6/8/P2P4/P1P3P1/1B2Pn1P/RN1Q1KNR b - - 2 16"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578"
 IsChanceNode() = False
@@ -669,8 +669,8 @@ StringLegalActions() = ["Nxd1", "Nxh1", "Bxa3", "Nd3", "Nh3", "Nab4", "Bfb4", "N
 action: 3389
 
 # State 32
+# r3k1r1/p1p1bppp/np6/8/P2P4/P1P3P1/1B2Pn1P/RN1Q1KNR w - - 3 17
 IsTerminal() = False
-ToString() = "r3k1r1/p1p1bppp/np6/8/P2P4/P1P3P1/1B2Pn1P/RN1Q1KNR w - - 3 17"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389"
 IsChanceNode() = False
@@ -689,8 +689,8 @@ StringLegalActions() = ["Qdc1", "Bbc1", "Qde1", "Kfe1", "Ra2", "Qc2", "Nbd2", "Q
 action: 1942
 
 # State 33
+# r3k1r1/p1p1bppp/np6/8/P2P2P1/P1P5/1B2Pn1P/RN1Q1KNR b - - 0 17
 IsTerminal() = False
-ToString() = "r3k1r1/p1p1bppp/np6/8/P2P2P1/P1P5/1B2Pn1P/RN1Q1KNR b - - 0 17"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942"
 IsChanceNode() = False
@@ -709,8 +709,8 @@ StringLegalActions() = ["Nxd1", "Nxh1", "Bxa3", "Nd3", "Nh3", "Nab4", "Beb4", "N
 action: 1640
 
 # State 34
+# r3k1r1/p1p1bppp/1p6/8/Pn1P2P1/P1P5/1B2Pn1P/RN1Q1KNR w - - 1 18
 IsTerminal() = False
-ToString() = "r3k1r1/p1p1bppp/1p6/8/Pn1P2P1/P1P5/1B2Pn1P/RN1Q1KNR w - - 1 18"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640"
 IsChanceNode() = False
@@ -729,8 +729,8 @@ StringLegalActions() = ["Qdc1", "Bbc1", "Qde1", "Kfe1", "Ra2", "Qc2", "Nbd2", "Q
 action: 1999
 
 # State 35
+# r3k1r1/p1p1bppp/1p6/8/Pn1P2PP/P1P5/1B2Pn2/RN1Q1KNR b - h3 0 18
 IsTerminal() = False
-ToString() = "r3k1r1/p1p1bppp/1p6/8/Pn1P2PP/P1P5/1B2Pn2/RN1Q1KNR b - h3 0 18"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999"
 IsChanceNode() = False
@@ -749,8 +749,8 @@ StringLegalActions() = ["Nxd1", "Nxh1", "Na2", "Nc2", "Nfd3", "Nbd3", "Nh3", "Ne
 action: 2713
 
 # State 36
+# r3k1r1/p1p1bppp/1pn5/8/P2P2PP/P1P5/1B2Pn2/RN1Q1KNR w - - 1 19
 IsTerminal() = False
-ToString() = "r3k1r1/p1p1bppp/1pn5/8/P2P2PP/P1P5/1B2Pn2/RN1Q1KNR w - - 1 19"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713"
 IsChanceNode() = False
@@ -769,8 +769,8 @@ StringLegalActions() = ["Qdc1", "Bbc1", "Qde1", "Kfe1", "Ra2", "Qc2", "Nbd2", "Q
 action: 259
 
 # State 37
+# r3k1r1/p1p1bppp/1pn5/8/P2P2PP/P1P5/1B2Pn2/RN2QKNR b - - 2 19
 IsTerminal() = False
-ToString() = "r3k1r1/p1p1bppp/1pn5/8/P2P2PP/P1P5/1B2Pn2/RN2QKNR b - - 2 19"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259"
 IsChanceNode() = False
@@ -789,8 +789,8 @@ StringLegalActions() = ["Nd1", "Nxh1", "Bxa3", "Nd3", "Nh3", "Ncb4", "Beb4", "Nx
 action: 2933
 
 # State 38
+# r3k1r1/p1p1b1pp/1pn2p2/8/P2P2PP/P1P5/1B2Pn2/RN2QKNR w - - 0 20
 IsTerminal() = False
-ToString() = "r3k1r1/p1p1b1pp/1pn2p2/8/P2P2PP/P1P5/1B2Pn2/RN2QKNR w - - 0 20"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933"
 IsChanceNode() = False
@@ -809,8 +809,8 @@ StringLegalActions() = ["Qec1", "Bbc1", "Qd1", "Ra2", "Nbd2", "Qed2", "Qexf2", "
 action: 836
 
 # State 39
+# r3k1r1/p1p1b1pp/1pn2p2/8/P2P2PP/P1P5/1B2PQ2/RN3KNR b - - 0 20
 IsTerminal() = False
-ToString() = "r3k1r1/p1p1b1pp/1pn2p2/8/P2P2PP/P1P5/1B2PQ2/RN3KNR b - - 0 20"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836"
 IsChanceNode() = False
@@ -829,8 +829,8 @@ StringLegalActions() = ["Bxa3", "Ncb4", "Beb4", "Nxd4", "Nca5", "aa5", "b5", "Bc
 action: 1642
 
 # State 40
+# r3k1r1/p1p1b1pp/1p3p2/8/Pn1P2PP/P1P5/1B2PQ2/RN3KNR w - - 1 21
 IsTerminal() = False
-ToString() = "r3k1r1/p1p1b1pp/1p3p2/8/Pn1P2PP/P1P5/1B2PQ2/RN3KNR w - - 1 21"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642"
 IsChanceNode() = False
@@ -849,8 +849,8 @@ StringLegalActions() = ["Bc1", "K1e1", "Q2e1", "Ra2", "Nd2", "K1g2", "Q2g2", "Rh
 action: 1479
 
 # State 41
+# r3k1r1/p1p1b1pp/1p3p2/8/Pn1P2PP/P1P4R/1B2PQ2/RN3KN1 b - - 2 21
 IsTerminal() = False
-ToString() = "r3k1r1/p1p1b1pp/1p3p2/8/Pn1P2PP/P1P4R/1B2PQ2/RN3KN1 b - - 2 21"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479"
 IsChanceNode() = False
@@ -869,8 +869,8 @@ StringLegalActions() = ["Na2", "Nc2", "Nd3", "a5", "b5", "cc5", "Bec5", "Nd5", "
 action: 537
 
 # State 42
+# r3k1r1/p1p1b1pp/1p3p2/8/P2P2PP/P1P4R/nB2PQ2/RN3KN1 w - - 3 22
 IsTerminal() = False
-ToString() = "r3k1r1/p1p1b1pp/1p3p2/8/P2P2PP/P1P4R/nB2PQ2/RN3KN1 w - - 3 22"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537"
 IsChanceNode() = False
@@ -889,8 +889,8 @@ StringLegalActions() = ["Bc1", "K1e1", "Q2e1", "Rh1", "Rxa2", "Nd2", "K1g2", "Q2
 action: 1421
 
 # State 43
+# r3k1r1/p1p1b1pp/1p3p2/8/P2P2PP/P1P3QR/nB2P3/RN3KN1 b - - 4 22
 IsTerminal() = False
-ToString() = "r3k1r1/p1p1b1pp/1p3p2/8/P2P2PP/P1P3QR/nB2P3/RN3KN1 b - - 4 22"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421"
 IsChanceNode() = False
@@ -909,8 +909,8 @@ StringLegalActions() = ["Nc1", "Bxa3", "Nxc3", "Nab4", "Beb4", "a5", "b5", "cc5"
 action: 1076
 
 # State 44
+# r3k1r1/p1p3pp/1p3p2/8/P2P2PP/b1P3QR/nB2P3/RN3KN1 w - - 0 23
 IsTerminal() = False
-ToString() = "r3k1r1/p1p3pp/1p3p2/8/P2P2PP/b1P3QR/nB2P3/RN3KN1 w - - 0 23"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076"
 IsChanceNode() = False
@@ -929,8 +929,8 @@ StringLegalActions() = ["Bc1", "Kfe1", "Qge1", "Rh1", "Rxa2", "Nd2", "Kff2", "Qg
 action: 471
 
 # State 45
+# r3k1r1/p1p3pp/1p3p2/8/P2P2PP/b1P3Q1/nB2P3/RN3KNR b - - 1 23
 IsTerminal() = False
-ToString() = "r3k1r1/p1p3pp/1p3p2/8/P2P2PP/b1P3Q1/nB2P3/RN3KNR b - - 1 23"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471"
 IsChanceNode() = False
@@ -949,8 +949,8 @@ StringLegalActions() = ["Nc1", "Bxb2", "Nxc3", "N2b4", "B3b4", "a5", "b5", "Bac5
 action: 3836
 
 # State 46
+# r2k2r1/p1p3pp/1p3p2/8/P2P2PP/b1P3Q1/nB2P3/RN3KNR w - - 2 24
 IsTerminal() = False
-ToString() = "r2k2r1/p1p3pp/1p3p2/8/P2P2PP/b1P3Q1/nB2P3/RN3KNR w - - 2 24"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836"
 IsChanceNode() = False
@@ -969,8 +969,8 @@ StringLegalActions() = ["Bc1", "Kfe1", "Qge1", "Rxa2", "Nd2", "Kff2", "Qgf2", "K
 action: 982
 
 # State 47
+# r2k2r1/p1p3pp/1p3p2/8/P2P2PP/b1P5/nB2P2Q/RN3KNR b - - 3 24
 IsTerminal() = False
-ToString() = "r2k2r1/p1p3pp/1p3p2/8/P2P2PP/b1P5/nB2P2Q/RN3KNR b - - 3 24"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982"
 IsChanceNode() = False
@@ -989,8 +989,8 @@ StringLegalActions() = ["Nc1", "Bxb2", "Nxc3", "N2b4", "B3b4", "a5", "b5", "Bac5
 action: 2486
 
 # State 48
+# r2k2r1/p1p4p/1p3p2/6p1/P2P2PP/b1P5/nB2P2Q/RN3KNR w - g6 0 25
 IsTerminal() = False
-ToString() = "r2k2r1/p1p4p/1p3p2/6p1/P2P2PP/b1P5/nB2P2Q/RN3KNR w - g6 0 25"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486"
 IsChanceNode() = False
@@ -1009,8 +1009,8 @@ StringLegalActions() = ["Bc1", "Ke1", "Rxa2", "Nd2", "Kff2", "Qhf2", "Kfg2", "Qh
 action: 1350
 
 # State 49
+# r2k2r1/p1p4p/1p3p2/6p1/P2P2PP/b1P2N2/nB2P2Q/RN3K1R b - - 1 25
 IsTerminal() = False
-ToString() = "r2k2r1/p1p4p/1p3p2/6p1/P2P2PP/b1P2N2/nB2P2Q/RN3K1R b - - 1 25"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350"
 IsChanceNode() = False
@@ -1029,8 +1029,8 @@ StringLegalActions() = ["Nc1", "Bxb2", "Nxc3", "N2b4", "B3b4", "gxh4", "a5", "b5
 action: 2226
 
 # State 50
+# r2k2r1/p6p/1p3p2/2p3p1/P2P2PP/b1P2N2/nB2P2Q/RN3K1R w - c6 0 26
 IsTerminal() = False
-ToString() = "r2k2r1/p6p/1p3p2/2p3p1/P2P2PP/b1P2N2/nB2P2Q/RN3K1R w - c6 0 26"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226"
 IsChanceNode() = False
@@ -1049,8 +1049,8 @@ StringLegalActions() = ["Bc1", "K1e1", "N3e1", "Kf1g1", "Rh1g1", "Q2g1", "N3g1",
 action: 847
 
 # State 51
+# r2k2r1/p6p/1p3p2/2p3p1/P2P2PP/b1P2N2/nB2PQ2/RN3K1R b - - 1 26
 IsTerminal() = False
-ToString() = "r2k2r1/p6p/1p3p2/2p3p1/P2P2PP/b1P2N2/nB2PQ2/RN3K1R b - - 1 26"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847"
 IsChanceNode() = False
@@ -1069,8 +1069,8 @@ StringLegalActions() = ["Nc1", "Bxb2", "Nxc3", "N2b4", "B3b4", "c4", "cxd4", "gx
 action: 3518
 
 # State 52
+# r2k4/p5rp/1p3p2/2p3p1/P2P2PP/b1P2N2/nB2PQ2/RN3K1R w - - 2 27
 IsTerminal() = False
-ToString() = "r2k4/p5rp/1p3p2/2p3p1/P2P2PP/b1P2N2/nB2PQ2/RN3K1R w - - 2 27"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518"
 IsChanceNode() = False
@@ -1089,8 +1089,8 @@ StringLegalActions() = ["Bc1", "K1e1", "Q2e1", "N3e1", "Kf1g1", "Rhg1", "Q2g1", 
 action: 512
 
 # State 53
+# r2k4/p5rp/1p3p2/2p3p1/P2P2PP/b1P2N2/RB2PQ2/1N3K1R b - - 0 27
 IsTerminal() = False
-ToString() = "r2k4/p5rp/1p3p2/2p3p1/P2P2PP/b1P2N2/RB2PQ2/1N3K1R b - - 0 27"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512"
 IsChanceNode() = False
@@ -1109,8 +1109,8 @@ StringLegalActions() = ["Bxb2", "Bb4", "c4", "cxd4", "gxh4", "a5", "b5", "f5", "
 action: 2551
 
 # State 54
+# r2k4/p5r1/1p3p2/2p3pp/P2P2PP/b1P2N2/RB2PQ2/1N3K1R w - h6 0 28
 IsTerminal() = False
-ToString() = "r2k4/p5r1/1p3p2/2p3pp/P2P2PP/b1P2N2/RB2PQ2/1N3K1R w - h6 0 28"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551"
 IsChanceNode() = False
@@ -1129,8 +1129,8 @@ StringLegalActions() = ["Raa1", "Bba1", "Bc1", "K1e1", "Q2e1", "N3e1", "Kf1g1", 
 action: 137
 
 # State 55
+# r2k4/p5r1/1p3p2/2p3pp/P2P2PP/b1P2N2/R3PQ2/1NB2K1R b - - 1 28
 IsTerminal() = False
-ToString() = "r2k4/p5r1/1p3p2/2p3pp/P2P2PP/b1P2N2/R3PQ2/1NB2K1R b - - 1 28"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137"
 IsChanceNode() = False
@@ -1149,8 +1149,8 @@ StringLegalActions() = ["Bxc1", "Bb2", "Bb4", "c4", "cxd4", "hxg4", "gxh4", "a5"
 action: 2413
 
 # State 56
+# r2k4/p5r1/1p6/2p2ppp/P2P2PP/b1P2N2/R3PQ2/1NB2K1R w - - 0 29
 IsTerminal() = False
-ToString() = "r2k4/p5r1/1p6/2p2ppp/P2P2PP/b1P2N2/R3PQ2/1NB2K1R w - - 0 29"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413"
 IsChanceNode() = False
@@ -1169,8 +1169,8 @@ StringLegalActions() = ["Ra1", "K1e1", "Q2e1", "N3e1", "Kf1g1", "Rhg1", "Q2g1", 
 action: 2267
 
 # State 57
+# r2k4/p5r1/1p6/2pP1ppp/P5PP/b1P2N2/R3PQ2/1NB2K1R b - - 0 29
 IsTerminal() = False
-ToString() = "r2k4/p5r1/1p6/2pP1ppp/P5PP/b1P2N2/R3PQ2/1NB2K1R b - - 0 29"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267"
 IsChanceNode() = False
@@ -1189,8 +1189,8 @@ StringLegalActions() = ["Bxc1", "Bb2", "Bb4", "c4", "f4", "fxg4", "hxg4", "gxh4"
 action: 1698
 
 # State 58
+# r2k4/p5r1/1p6/3P1ppp/P1p3PP/b1P2N2/R3PQ2/1NB2K1R w - - 0 30
 IsTerminal() = False
-ToString() = "r2k4/p5r1/1p6/3P1ppp/P1p3PP/b1P2N2/R3PQ2/1NB2K1R w - - 0 30"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698"
 IsChanceNode() = False
@@ -1209,8 +1209,8 @@ StringLegalActions() = ["Ra1", "K1e1", "Q2e1", "N3e1", "Kf1g1", "Rhg1", "Q2g1", 
 action: 981
 
 # State 59
+# r2k4/p5r1/1p6/3P1ppp/P1p3PP/b1P5/R3PQ1N/1NB2K1R b - - 1 30
 IsTerminal() = False
-ToString() = "r2k4/p5r1/1p6/3P1ppp/P1p3PP/b1P5/R3PQ1N/1NB2K1R b - - 1 30"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981"
 IsChanceNode() = False
@@ -1229,8 +1229,8 @@ StringLegalActions() = ["Bxc1", "Bb2", "Bb4", "f4", "fxg4", "hxg4", "gxh4", "a5"
 action: 3254
 
 # State 60
+# r2k4/p1r5/1p6/3P1ppp/P1p3PP/b1P5/R3PQ1N/1NB2K1R w - - 2 31
 IsTerminal() = False
-ToString() = "r2k4/p1r5/1p6/3P1ppp/P1p3PP/b1P5/R3PQ1N/1NB2K1R w - - 2 31"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254"
 IsChanceNode() = False
@@ -1249,8 +1249,8 @@ StringLegalActions() = ["Ra1", "K1e1", "Q2e1", "Kf1g1", "Rhg1", "Q2g1", "Bcb2", 
 action: 1421
 
 # State 61
+# r2k4/p1r5/1p6/3P1ppp/P1p3PP/b1P3Q1/R3P2N/1NB2K1R b - - 3 31
 IsTerminal() = False
-ToString() = "r2k4/p1r5/1p6/3P1ppp/P1p3PP/b1P3Q1/R3P2N/1NB2K1R b - - 3 31"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421"
 IsChanceNode() = False
@@ -1269,8 +1269,8 @@ StringLegalActions() = ["Bxc1", "Bb2", "Bb4", "f4", "fxg4", "hxg4", "gxh4", "a5"
 action: 3506
 
 # State 62
+# r2k4/p5r1/1p6/3P1ppp/P1p3PP/b1P3Q1/R3P2N/1NB2K1R w - - 4 32
 IsTerminal() = False
-ToString() = "r2k4/p5r1/1p6/3P1ppp/P1p3PP/b1P3Q1/R3P2N/1NB2K1R w - - 4 32"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506"
 IsChanceNode() = False
@@ -1289,8 +1289,8 @@ StringLegalActions() = ["Ra1", "Kfe1", "Qge1", "Kfg1", "Rhg1", "Qgg1", "Bcb2", "
 action: 1026
 
 # State 63
+# r2k4/p5r1/1p6/3P1ppp/P1p3PP/B1P3Q1/R3P2N/1N3K1R b - - 0 32
 IsTerminal() = False
-ToString() = "r2k4/p5r1/1p6/3P1ppp/P1p3PP/B1P3Q1/R3P2N/1N3K1R b - - 0 32"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026"
 IsChanceNode() = False
@@ -1309,8 +1309,8 @@ StringLegalActions() = ["f4", "fxg4", "hxg4", "gxh4", "a5", "b5", "a6", "Rg6", "
 action: 2153
 
 # State 64
+# r2k4/p5r1/8/1p1P1ppp/P1p3PP/B1P3Q1/R3P2N/1N3K1R w - - 0 33
 IsTerminal() = False
-ToString() = "r2k4/p5r1/8/1p1P1ppp/P1p3PP/B1P3Q1/R3P2N/1N3K1R w - - 0 33"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153"
 IsChanceNode() = False
@@ -1329,8 +1329,8 @@ StringLegalActions() = ["Ra1", "Bc1", "Kfe1", "Qge1", "Kfg1", "Rhg1", "Qgg1", "R
 action: 1366
 
 # State 65
+# r2k4/p5r1/8/1p1P1ppp/P1p3PP/B1P2Q2/R3P2N/1N3K1R b - - 1 33
 IsTerminal() = False
-ToString() = "r2k4/p5r1/8/1p1P1ppp/P1p3PP/B1P2Q2/R3P2N/1N3K1R b - - 1 33"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366"
 IsChanceNode() = False
@@ -1349,8 +1349,8 @@ StringLegalActions() = ["bxa4", "b4", "f4", "fxg4", "hxg4", "gxh4", "a5", "a6", 
 action: 2022
 
 # State 66
+# r2k4/p5r1/8/1p1P1p1p/P1p3Pp/B1P2Q2/R3P2N/1N3K1R w - - 0 34
 IsTerminal() = False
-ToString() = "r2k4/p5r1/8/1p1P1p1p/P1p3Pp/B1P2Q2/R3P2N/1N3K1R w - - 0 34"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022"
 IsChanceNode() = False
@@ -1369,8 +1369,8 @@ StringLegalActions() = ["Ra1", "Bc1", "Ke1", "Kfg1", "Rhg1", "R2b2", "B3b2", "Rc
 action: 2398
 
 # State 67
+# r2k4/p5r1/8/1p1P1P1p/P1p4p/B1P2Q2/R3P2N/1N3K1R b - - 0 34
 IsTerminal() = False
-ToString() = "r2k4/p5r1/8/1p1P1P1p/P1p4p/B1P2Q2/R3P2N/1N3K1R b - - 0 34"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398"
 IsChanceNode() = False
@@ -1389,8 +1389,8 @@ StringLegalActions() = ["Rg1+", "Rg2", "Rg3", "h3", "bxa4", "b4", "Rg4", "a5", "
 action: 1569
 
 # State 68
+# r2k4/p5r1/8/3P1P1p/p1p4p/B1P2Q2/R3P2N/1N3K1R w - - 0 35
 IsTerminal() = False
-ToString() = "r2k4/p5r1/8/3P1P1p/p1p4p/B1P2Q2/R3P2N/1N3K1R w - - 0 35"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569"
 IsChanceNode() = False
@@ -1409,8 +1409,8 @@ StringLegalActions() = ["Ra1", "Bc1", "Ke1", "Rg1", "R2b2", "B3b2", "Rc2", "Nbd2
 action: 1941
 
 # State 69
+# r2k4/p5r1/8/3P1P1p/p1p3Qp/B1P5/R3P2N/1N3K1R b - - 1 35
 IsTerminal() = False
-ToString() = "r2k4/p5r1/8/3P1P1p/p1p3Qp/B1P5/R3P2N/1N3K1R b - - 1 35"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941"
 IsChanceNode() = False
@@ -1429,8 +1429,8 @@ StringLegalActions() = ["h3", "hxg4", "Rgxg4", "a5", "Rg5", "a6", "Rg6", "Rb7", 
 action: 3323
 
 # State 70
+# r7/p2k2r1/8/3P1P1p/p1p3Qp/B1P5/R3P2N/1N3K1R w - - 2 36
 IsTerminal() = False
-ToString() = "r7/p2k2r1/8/3P1P1p/p1p3Qp/B1P5/R3P2N/1N3K1R w - - 2 36"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323"
 IsChanceNode() = False
@@ -1449,8 +1449,8 @@ StringLegalActions() = ["Ra1", "Bc1", "Ke1", "Kfg1", "Rhg1", "Qgg1", "R2b2", "B3
 action: 1292
 
 # State 71
+# r7/p2k2r1/8/3P1P1p/p1p3Qp/B1P1P3/R6N/1N3K1R b - - 0 36
 IsTerminal() = False
-ToString() = "r7/p2k2r1/8/3P1P1p/p1p3Qp/B1P1P3/R6N/1N3K1R b - - 0 36"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292"
 IsChanceNode() = False
@@ -1469,8 +1469,8 @@ StringLegalActions() = ["h3", "hxg4", "Rgxg4", "a5", "Rg5", "a6", "Rg6", "Kc7", 
 action: 3960
 
 # State 72
+# 5r2/p2k2r1/8/3P1P1p/p1p3Qp/B1P1P3/R6N/1N3K1R w - - 1 37
 IsTerminal() = False
-ToString() = "5r2/p2k2r1/8/3P1P1p/p1p3Qp/B1P1P3/R6N/1N3K1R w - - 1 37"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960"
 IsChanceNode() = False
@@ -1489,8 +1489,8 @@ StringLegalActions() = ["Ra1", "Bc1", "Qd1", "Ke1", "Kfg1", "Rhg1", "Qgg1", "R2b
 action: 1374
 
 # State 73
+# 5r2/p2k2r1/8/3P1P1p/p1p4p/B1P1PQ2/R6N/1N3K1R b - - 2 37
 IsTerminal() = False
-ToString() = "5r2/p2k2r1/8/3P1P1p/p1p4p/B1P1PQ2/R6N/1N3K1R b - - 2 37"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374"
 IsChanceNode() = False
@@ -1509,8 +1509,8 @@ StringLegalActions() = ["Rg1+", "Rg2", "Rg3", "h3", "Rg4", "a5", "Rxf5", "Rg5", 
 action: 3827
 
 # State 74
+# 3k1r2/p5r1/8/3P1P1p/p1p4p/B1P1PQ2/R6N/1N3K1R w - - 3 38
 IsTerminal() = False
-ToString() = "3k1r2/p5r1/8/3P1P1p/p1p4p/B1P1PQ2/R6N/1N3K1R w - - 3 38"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827"
 IsChanceNode() = False
@@ -1529,8 +1529,8 @@ StringLegalActions() = ["Ra1", "Bc1", "Qd1", "Ke1", "Rg1", "R2b2", "B3b2", "Rc2"
 action: 776
 
 # State 75
+# 3k1r2/p5r1/8/3P1P1p/p1p4p/B1P1PQ2/4R2N/1N3K1R b - - 4 38
 IsTerminal() = False
-ToString() = "3k1r2/p5r1/8/3P1P1p/p1p4p/B1P1PQ2/4R2N/1N3K1R b - - 4 38"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776"
 IsChanceNode() = False
@@ -1549,8 +1549,8 @@ StringLegalActions() = ["Rg1+", "Rg2", "Rg3", "h3", "Rg4", "a5", "Rxf5", "Rg5", 
 action: 438
 
 # State 76
+# 3k1r2/p7/8/3P1P1p/p1p4p/B1P1PQ2/4R2N/1N3KrR w - - 5 39
 IsTerminal() = False
-ToString() = "3k1r2/p7/8/3P1P1p/p1p4p/B1P1PQ2/4R2N/1N3KrR w - - 5 39"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438"
 IsChanceNode() = False
@@ -1569,8 +1569,8 @@ StringLegalActions() = ["Kfxg1", "Rhxg1", "Kf2"]
 action: 837
 
 # State 77
+# 3k1r2/p7/8/3P1P1p/p1p4p/B1P1PQ2/4RK1N/1N4rR b - - 6 39
 IsTerminal() = False
-ToString() = "3k1r2/p7/8/3P1P1p/p1p4p/B1P1PQ2/4RK1N/1N4rR b - - 6 39"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837"
 IsChanceNode() = False
@@ -1589,8 +1589,8 @@ StringLegalActions() = ["Rxb1", "Rc1", "Rd1", "Re1", "Rf1+", "Rxh1", "Rg2+", "Rg
 action: 70
 
 # State 78
+# 3k1r2/p7/8/3P1P1p/p1p4p/B1P1PQ2/4RK1N/1r5R w - - 0 40
 IsTerminal() = False
-ToString() = "3k1r2/p7/8/3P1P1p/p1p4p/B1P1PQ2/4RK1N/1r5R w - - 0 40"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70"
 IsChanceNode() = False
@@ -1609,8 +1609,8 @@ StringLegalActions() = ["Rxb1", "Rhc1", "Bac1", "Rd1", "Rhe1", "Ree1", "R1f1", "
 action: 1877
 
 # State 79
+# 3k1r2/p7/8/3P1P1p/p1p2Q1p/B1P1P3/4RK1N/1r5R b - - 1 40
 IsTerminal() = False
-ToString() = "3k1r2/p7/8/3P1P1p/p1p2Q1p/B1P1P3/4RK1N/1r5R b - - 1 40"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877"
 IsChanceNode() = False
@@ -1629,8 +1629,8 @@ StringLegalActions() = ["Ra1", "Rc1", "Rd1", "Re1", "Rf1+", "Rg1", "Rxh1", "Rb2"
 action: 385
 
 # State 80
+# 3k1r2/p7/8/3P1P1p/p1p2Q1p/B1P1P3/4RK1N/6rR w - - 2 41
 IsTerminal() = False
-ToString() = "3k1r2/p7/8/3P1P1p/p1p2Q1p/B1P1P3/4RK1N/6rR w - - 2 41"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385"
 IsChanceNode() = False
@@ -1649,8 +1649,8 @@ StringLegalActions() = ["Bc1", "Re1", "Nf1", "Rhxg1", "Kfxg1", "Ra2", "Reb2", "B
 action: 1437
 
 # State 81
+# 3k1r2/p7/8/3P1P1p/p1p4p/B1P1P1Q1/4RK1N/6rR b - - 3 41
 IsTerminal() = False
-ToString() = "3k1r2/p7/8/3P1P1p/p1p4p/B1P1P1Q1/4RK1N/6rR b - - 3 41"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437"
 IsChanceNode() = False
@@ -1669,8 +1669,8 @@ StringLegalActions() = ["Ra1", "Rb1", "Rc1", "Rd1", "Re1", "Rf1+", "Rxh1", "Rg2+
 action: 1503
 
 # State 82
+# 3k1r2/p7/8/3P1P1p/p1p5/B1P1P1Qp/4RK1N/6rR w - - 0 42
 IsTerminal() = False
-ToString() = "3k1r2/p7/8/3P1P1p/p1p5/B1P1P1Qp/4RK1N/6rR w - - 0 42"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503"
 IsChanceNode() = False
@@ -1689,8 +1689,8 @@ StringLegalActions() = ["Bc1", "Re1", "Nf1", "Rhxg1", "Kfxg1", "Qgxg1", "Ra2", "
 action: 268
 
 # State 83
+# 3k1r2/p7/8/3P1P1p/p1p5/B1P1P1Qp/5K1N/4R1rR b - - 1 42
 IsTerminal() = False
-ToString() = "3k1r2/p7/8/3P1P1p/p1p5/B1P1P1Qp/5K1N/4R1rR b - - 1 42"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268"
 IsChanceNode() = False
@@ -1709,8 +1709,8 @@ StringLegalActions() = ["Rxe1", "Rf1+", "Rxh1", "Rg2+", "Rxg3", "h4", "a5", "Rxf
 action: 326
 
 # State 84
+# 3k1r2/p7/8/3P1P1p/p1p5/B1P1P1Qp/5K1N/4Rr1R w - - 2 43
 IsTerminal() = False
-ToString() = "3k1r2/p7/8/3P1P1p/p1p5/B1P1P1Qp/5K1N/4Rr1R w - - 2 43"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326"
 IsChanceNode() = False
@@ -1729,8 +1729,8 @@ StringLegalActions() = ["Rexf1", "Rh1xf1", "Kfxf1", "Nh2xf1", "Ke2"]
 action: 781
 
 # State 85
+# 3k1r2/p7/8/3P1P1p/p1p5/B1P1P1Qp/4K2N/4Rr1R b - - 3 43
 IsTerminal() = False
-ToString() = "3k1r2/p7/8/3P1P1p/p1p5/B1P1P1Qp/4K2N/4Rr1R b - - 3 43"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781"
 IsChanceNode() = False
@@ -1749,8 +1749,8 @@ StringLegalActions() = ["Rxe1+", "Rg1", "Rxh1", "Rf2+", "Rf3", "Rf4", "h4", "a5"
 action: 2023
 
 # State 86
+# 3k1r2/p7/8/3P1P2/p1p4p/B1P1P1Qp/4K2N/4Rr1R w - - 0 44
 IsTerminal() = False
-ToString() = "3k1r2/p7/8/3P1P2/p1p4p/B1P1P1Qp/4K2N/4Rr1R w - - 0 44"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023"
 IsChanceNode() = False
@@ -1769,8 +1769,8 @@ StringLegalActions() = ["Ra1", "Rb1", "Rec1", "Bac1", "R1d1", "K2d1", "Re1xf1", 
 action: 2006
 
 # State 87
+# 3k1r2/p7/8/3P1P2/p1p4Q/B1P1P2p/4K2N/4Rr1R b - - 0 44
 IsTerminal() = False
-ToString() = "3k1r2/p7/8/3P1P2/p1p4Q/B1P1P2p/4K2N/4Rr1R b - - 0 44"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006"
 IsChanceNode() = False
@@ -1789,8 +1789,8 @@ StringLegalActions() = ["Rf6", "Kc7", "Kd7", "Kc8", "Ke8"]
 action: 3323
 
 # State 88
+# 5r2/p2k4/8/3P1P2/p1p4Q/B1P1P2p/4K2N/4Rr1R w - - 1 45
 IsTerminal() = False
-ToString() = "5r2/p2k4/8/3P1P2/p1p4Q/B1P1P2p/4K2N/4Rr1R w - - 1 45"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323"
 IsChanceNode() = False
@@ -1809,8 +1809,8 @@ StringLegalActions() = ["Ra1", "Rb1", "Rec1", "Bac1", "R1d1", "K2d1", "Re1xf1", 
 action: 2911
 
 # State 89
+# 5r2/p2k4/5Q2/3P1P2/p1p5/B1P1P2p/4K2N/4Rr1R b - - 2 45
 IsTerminal() = False
-ToString() = "5r2/p2k4/5Q2/3P1P2/p1p5/B1P1P2p/4K2N/4Rr1R b - - 2 45"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911"
 IsChanceNode() = False
@@ -1829,8 +1829,8 @@ StringLegalActions() = ["Rxe1+", "Rg1", "Rxh1", "Rf2+", "Rf3", "Rf4", "a5", "Rxf
 action: 3453
 
 # State 90
+# 8/p2k1r2/5Q2/3P1P2/p1p5/B1P1P2p/4K2N/4Rr1R w - - 3 46
 IsTerminal() = False
-ToString() = "8/p2k1r2/5Q2/3P1P2/p1p5/B1P1P2p/4K2N/4Rr1R w - - 3 46"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453"
 IsChanceNode() = False
@@ -1849,8 +1849,8 @@ StringLegalActions() = ["Ra1", "Rb1", "Rec1", "Bac1", "R1d1", "K2d1", "Re1xf1", 
 action: 3437
 
 # State 91
+# 8/p2k1Q2/8/3P1P2/p1p5/B1P1P2p/4K2N/4Rr1R b - - 0 46
 IsTerminal() = False
-ToString() = "8/p2k1Q2/8/3P1P2/p1p5/B1P1P2p/4K2N/4Rr1R b - - 0 46"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437"
 IsChanceNode() = False
@@ -1869,8 +1869,8 @@ StringLegalActions() = ["Kc8", "Kd8"]
 action: 3827
 
 # State 92
+# 3k4/p4Q2/8/3P1P2/p1p5/B1P1P2p/4K2N/4Rr1R w - - 1 47
 IsTerminal() = False
-ToString() = "3k4/p4Q2/8/3P1P2/p1p5/B1P1P2p/4K2N/4Rr1R w - - 1 47"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827"
 IsChanceNode() = False
@@ -1889,8 +1889,8 @@ StringLegalActions() = ["Ra1", "Rb1", "Rec1", "Bac1", "R1d1", "K2d1", "Re1xf1", 
 action: 4021
 
 # State 93
+# 3k2Q1/p7/8/3P1P2/p1p5/B1P1P2p/4K2N/4Rr1R b - - 2 47
 IsTerminal() = False
-ToString() = "3k2Q1/p7/8/3P1P2/p1p5/B1P1P2p/4K2N/4Rr1R b - - 2 47"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021"
 IsChanceNode() = False
@@ -1909,8 +1909,8 @@ StringLegalActions() = ["Kc7", "Kd7"]
 action: 3323
 
 # State 94
+# 6Q1/p2k4/8/3P1P2/p1p5/B1P1P2p/4K2N/4Rr1R w - - 3 48
 IsTerminal() = False
-ToString() = "6Q1/p2k4/8/3P1P2/p1p5/B1P1P2p/4K2N/4Rr1R w - - 3 48"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021, 3323]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021 3323"
 IsChanceNode() = False
@@ -1929,8 +1929,8 @@ StringLegalActions() = ["Ra1", "Rb1", "Rec1", "Bac1", "R1d1", "K2d1", "Re1xf1", 
 action: 2494
 
 # State 95
+# 8/p2k4/8/3P1PQ1/p1p5/B1P1P2p/4K2N/4Rr1R b - - 4 48
 IsTerminal() = False
-ToString() = "8/p2k4/8/3P1PQ1/p1p5/B1P1P2p/4K2N/4Rr1R b - - 4 48"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021, 3323, 2494]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021 3323 2494"
 IsChanceNode() = False
@@ -1949,8 +1949,8 @@ StringLegalActions() = ["Rxe1+", "Rg1", "Rxh1", "Rf2+", "Rf3", "Rf4", "a5", "Rxf
 action: 1861
 
 # State 96
+# 8/p2k4/8/3P1PQ1/p1p2r2/B1P1P2p/4K2N/4R2R w - - 5 49
 IsTerminal() = False
-ToString() = "8/p2k4/8/3P1PQ1/p1p2r2/B1P1P2p/4K2N/4R2R w - - 5 49"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021, 3323, 2494, 1861]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021 3323 2494 1861"
 IsChanceNode() = False
@@ -1969,8 +1969,8 @@ StringLegalActions() = ["Ra1", "Rb1", "Rec1", "Bac1", "R1d1", "K2d1", "Ref1", "R
 action: 1616
 
 # State 97
+# 8/p2k4/8/3P1PQ1/pBp2r2/2P1P2p/4K2N/4R2R b - - 6 49
 IsTerminal() = False
-ToString() = "8/p2k4/8/3P1PQ1/pBp2r2/2P1P2p/4K2N/4R2R b - - 6 49"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021, 3323, 2494, 1861, 1616]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021 3323 2494 1861 1616"
 IsChanceNode() = False
@@ -1989,8 +1989,8 @@ StringLegalActions() = ["Rf1", "Rf2+", "a3", "Rf3", "Rd4", "Re4", "Rg4", "Rh4", 
 action: 2013
 
 # State 98
+# 8/p2k4/8/3P1PQ1/pBp4r/2P1P2p/4K2N/4R2R w - - 7 50
 IsTerminal() = False
-ToString() = "8/p2k4/8/3P1PQ1/pBp4r/2P1P2p/4K2N/4R2R w - - 7 50"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021, 3323, 2494, 1861, 1616, 2013]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021 3323 2494 1861 1616 2013"
 IsChanceNode() = False
@@ -2009,8 +2009,8 @@ StringLegalActions() = ["Ra1", "Rb1", "Rc1", "R1d1", "K2d1", "Re1f1", "Rh1f1", "
 action: 388
 
 # State 99
+# 8/p2k4/8/3P1PQ1/pBp4r/2P1P2p/4K2N/6RR b - - 8 50
 IsTerminal() = False
-ToString() = "8/p2k4/8/3P1PQ1/pBp4r/2P1P2p/4K2N/6RR b - - 8 50"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021, 3323, 2494, 1861, 1616, 2013, 388]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021 3323 2494 1861 1616 2013 388"
 IsChanceNode() = False
@@ -2029,8 +2029,8 @@ StringLegalActions() = ["a3", "Rd4", "Re4", "Rf4", "Rg4", "a5", "Rh5", "a6", "Rh
 action: 2608
 
 # State 100
+# 8/3k4/p7/3P1PQ1/pBp4r/2P1P2p/4K2N/6RR w - - 0 51
 IsTerminal() = False
-ToString() = "8/3k4/p7/3P1PQ1/pBp4r/2P1P2p/4K2N/6RR w - - 0 51"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021, 3323, 2494, 1861, 1616, 2013, 388, 2608]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021 3323 2494 1861 1616 2013 388 2608"
 IsChanceNode() = False
@@ -2049,8 +2049,8 @@ StringLegalActions() = ["Ra1", "Rb1", "Rc1", "Rgd1", "Ked1", "Rge1", "Kee1", "Rg
 action: 3046
 
 # State 101
+# 8/3k4/p6Q/3P1P2/pBp4r/2P1P2p/4K2N/6RR b - - 1 51
 IsTerminal() = False
-ToString() = "8/3k4/p6Q/3P1P2/pBp4r/2P1P2p/4K2N/6RR b - - 1 51"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021, 3323, 2494, 1861, 1616, 2013, 388, 2608, 3046]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021 3323 2494 1861 1616 2013 388 2608 3046"
 IsChanceNode() = False
@@ -2069,8 +2069,8 @@ StringLegalActions() = ["a3", "Rd4", "Re4", "Rf4", "Rg4", "a5", "Rh5", "Rxh6", "
 action: 1759
 
 # State 102
+# 8/3k4/p6Q/3P1P2/pBpr4/2P1P2p/4K2N/6RR w - - 2 52
 IsTerminal() = False
-ToString() = "8/3k4/p6Q/3P1P2/pBpr4/2P1P2p/4K2N/6RR w - - 2 52"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021, 3323, 2494, 1861, 1616, 2013, 388, 2608, 3046, 1759]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021 3323 2494 1861 1616 2013 388 2608 3046 1759"
 IsChanceNode() = False
@@ -2089,8 +2089,8 @@ StringLegalActions() = ["Ra1", "Rb1", "Rc1", "Rd1", "Rge1", "Kee1", "Rgf1", "Kef
 action: 2671
 
 # State 103
+# 8/3k4/pQ6/3P1P2/pBpr4/2P1P2p/4K2N/6RR b - - 3 52
 IsTerminal() = False
-ToString() = "8/3k4/pQ6/3P1P2/pBpr4/2P1P2p/4K2N/6RR b - - 3 52"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021, 3323, 2494, 1861, 1616, 2013, 388, 2608, 3046, 1759, 2671]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021 3323 2494 1861 1616 2013 388 2608 3046 1759 2671"
 IsChanceNode() = False
@@ -2109,8 +2109,8 @@ StringLegalActions() = ["Rd1", "Rd2+", "a3", "Rd3", "Re4", "Rf4", "Rg4", "Rh4", 
 action: 1243
 
 # State 104
+# 8/3k4/pQ6/3P1P2/pBp5/2PrP2p/4K2N/6RR w - - 4 53
 IsTerminal() = False
-ToString() = "8/3k4/pQ6/3P1P2/pBp5/2PrP2p/4K2N/6RR w - - 4 53"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021, 3323, 2494, 1861, 1616, 2013, 388, 2608, 3046, 1759, 2671, 1243]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021 3323 2494 1861 1616 2013 388 2608 3046 1759 2671 1243"
 IsChanceNode() = False
@@ -2129,8 +2129,8 @@ StringLegalActions() = ["Ra1", "Rb1", "Rc1", "Rd1", "Rge1", "Kee1", "Rgf1", "Kef
 action: 198
 
 # State 105
+# 8/3k4/pQ6/3P1P2/pBp5/2PrP2p/4K2N/3R3R b - - 5 53
 IsTerminal() = False
-ToString() = "8/3k4/pQ6/3P1P2/pBp5/2PrP2p/4K2N/3R3R b - - 5 53"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021, 3323, 2494, 1861, 1616, 2013, 388, 2608, 3046, 1759, 2671, 1243, 198]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021 3323 2494 1861 1616 2013 388 2608 3046 1759 2671 1243 198"
 IsChanceNode() = False
@@ -2149,8 +2149,8 @@ StringLegalActions() = ["Rxd1", "Rd2+", "a3", "Rxc3", "Rxe3+", "Rd4", "a5", "Rxd
 action: 3763
 
 # State 106
+# 2k5/8/pQ6/3P1P2/pBp5/2PrP2p/4K2N/3R3R w - - 6 54
 IsTerminal() = False
-ToString() = "2k5/8/pQ6/3P1P2/pBp5/2PrP2p/4K2N/3R3R w - - 6 54"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021, 3323, 2494, 1861, 1616, 2013, 388, 2608, 3046, 1759, 2671, 1243, 198, 3763]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021 3323 2494 1861 1616 2013 388 2608 3046 1759 2671 1243 198 3763"
 IsChanceNode() = False
@@ -2169,8 +2169,8 @@ StringLegalActions() = ["Ra1", "Rb1", "Rc1", "Rde1", "Rhe1", "Kee1", "Rdf1", "Rh
 action: 1359
 
 # State 107
+# 2k5/8/pQ6/3P1P2/pBp5/2PrPN1p/4K3/3R3R b - - 7 54
 IsTerminal() = False
-ToString() = "2k5/8/pQ6/3P1P2/pBp5/2PrPN1p/4K3/3R3R b - - 7 54"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021, 3323, 2494, 1861, 1616, 2013, 388, 2608, 3046, 1759, 2671, 1243, 198, 3763, 1359]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021 3323 2494 1861 1616 2013 388 2608 3046 1759 2671 1243 198 3763 1359"
 IsChanceNode() = False
@@ -2189,8 +2189,8 @@ StringLegalActions() = ["Rxd1", "Rd2+", "h2", "a3", "Rxc3", "Rxe3+", "Rd4", "a5"
 action: 2088
 
 # State 108
+# 2k5/8/1Q6/p2P1P2/pBp5/2PrPN1p/4K3/3R3R w - - 0 55
 IsTerminal() = False
-ToString() = "2k5/8/1Q6/p2P1P2/pBp5/2PrPN1p/4K3/3R3R w - - 0 55"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021, 3323, 2494, 1861, 1616, 2013, 388, 2608, 3046, 1759, 2671, 1243, 198, 3763, 1359, 2088]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021 3323 2494 1861 1616 2013 388 2608 3046 1759 2671 1243 198 3763 1359 2088"
 IsChanceNode() = False
@@ -2209,8 +2209,8 @@ StringLegalActions() = ["Ra1", "Rb1", "Rc1", "Rde1", "Rhe1", "Kee1", "Nfe1", "Rd
 action: 2787
 
 # State 109
+# 2k5/8/1Q1P4/p4P2/pBp5/2PrPN1p/4K3/3R3R b - - 0 55
 IsTerminal() = False
-ToString() = "2k5/8/1Q1P4/p4P2/pBp5/2PrPN1p/4K3/3R3R b - - 0 55"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021, 3323, 2494, 1861, 1616, 2013, 388, 2608, 3046, 1759, 2671, 1243, 198, 3763, 1359, 2088, 2787]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021 3323 2494 1861 1616 2013 388 2608 3046 1759 2671 1243 198 3763 1359 2088 2787"
 IsChanceNode() = False
@@ -2229,8 +2229,8 @@ StringLegalActions() = ["Rxd1", "Rd2+", "h2", "a3", "Rxc3", "Rxe3+", "axb4", "Rd
 action: 1048
 
 # State 110
+# 2k5/8/1Q1P4/p4P2/1Bp5/p1PrPN1p/4K3/3R3R w - - 0 56
 IsTerminal() = False
-ToString() = "2k5/8/1Q1P4/p4P2/1Bp5/p1PrPN1p/4K3/3R3R w - - 0 56"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021, 3323, 2494, 1861, 1616, 2013, 388, 2608, 3046, 1759, 2671, 1243, 198, 3763, 1359, 2088, 2787, 1048]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021 3323 2494 1861 1616 2013 388 2608 3046 1759 2671 1243 198 3763 1359 2088 2787 1048"
 IsChanceNode() = False
@@ -2249,8 +2249,8 @@ StringLegalActions() = ["Ra1", "Rb1", "Rc1", "Rde1", "Rhe1", "Kee1", "Nfe1", "Rd
 action: 405
 
 # State 111
+# 2k5/8/1Q1P4/p4P2/1Bp5/p1PrP2p/4K3/3R2NR b - - 1 56
 IsTerminal() = False
-ToString() = "2k5/8/1Q1P4/p4P2/1Bp5/p1PrP2p/4K3/3R2NR b - - 1 56"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021, 3323, 2494, 1861, 1616, 2013, 388, 2608, 3046, 1759, 2671, 1243, 198, 3763, 1359, 2088, 2787, 1048, 405]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021 3323 2494 1861 1616 2013 388 2608 3046 1759 2671 1243 198 3763 1359 2088 2787 1048 405"
 IsChanceNode() = False
@@ -2269,8 +2269,8 @@ StringLegalActions() = ["Rxd1", "a2", "Rd2+", "h2", "Rxc3", "Rxe3+", "a4", "axb4
 action: 983
 
 # State 112
+# 2k5/8/1Q1P4/p4P2/1Bp5/p1PrP3/4K2p/3R2NR w - - 0 57
 IsTerminal() = False
-ToString() = "2k5/8/1Q1P4/p4P2/1Bp5/p1PrP3/4K2p/3R2NR w - - 0 57"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021, 3323, 2494, 1861, 1616, 2013, 388, 2608, 3046, 1759, 2671, 1243, 198, 3763, 1359, 2088, 2787, 1048, 405, 983]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021 3323 2494 1861 1616 2013 388 2608 3046 1759 2671 1243 198 3763 1359 2088 2787 1048 405 983"
 IsChanceNode() = False
@@ -2289,8 +2289,8 @@ StringLegalActions() = ["Ra1", "Rb1", "Rc1", "Rde1", "Kee1", "Rdf1", "Kef1", "Rd
 action: 707
 
 # State 113
+# 2k5/8/1Q1P4/p4P2/1Bp5/p1PrP3/3RK2p/6NR b - - 1 57
 IsTerminal() = False
-ToString() = "2k5/8/1Q1P4/p4P2/1Bp5/p1PrP3/3RK2p/6NR b - - 1 57"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021, 3323, 2494, 1861, 1616, 2013, 388, 2608, 3046, 1759, 2671, 1243, 198, 3763, 1359, 2088, 2787, 1048, 405, 983, 707]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021 3323 2494 1861 1616 2013 388 2608 3046 1759 2671 1243 198 3763 1359 2088 2787 1048 405 983 707"
 IsChanceNode() = False
@@ -2309,8 +2309,8 @@ StringLegalActions() = ["a2", "Rxd2+", "Rxc3", "Rxe3+", "a4", "axb4", "Rd4", "Rd
 action: 3322
 
 # State 114
+# 8/3k4/1Q1P4/p4P2/1Bp5/p1PrP3/3RK2p/6NR w - - 2 58
 IsTerminal() = False
-ToString() = "8/3k4/1Q1P4/p4P2/1Bp5/p1PrP3/3RK2p/6NR w - - 2 58"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021, 3323, 2494, 1861, 1616, 2013, 388, 2608, 3046, 1759, 2671, 1243, 198, 3763, 1359, 2088, 2787, 1048, 405, 983, 707, 3322]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021 3323 2494 1861 1616 2013 388 2608 3046 1759 2671 1243 198 3763 1359 2088 2787 1048 405 983 707 3322"
 IsChanceNode() = False
@@ -2329,8 +2329,8 @@ StringLegalActions() = ["Rdd1", "Ked1", "Ke1", "Kf1", "Ra2", "Rb2", "Rc2", "Kf2"
 action: 2917
 
 # State 115
+# 8/3k4/1Q1P1P2/p7/1Bp5/p1PrP3/3RK2p/6NR b - - 0 58
 IsTerminal() = False
-ToString() = "8/3k4/1Q1P1P2/p7/1Bp5/p1PrP3/3RK2p/6NR b - - 0 58"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021, 3323, 2494, 1861, 1616, 2013, 388, 2608, 3046, 1759, 2671, 1243, 198, 3763, 1359, 2088, 2787, 1048, 405, 983, 707, 3322, 2917]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021 3323 2494 1861 1616 2013 388 2608 3046 1759 2671 1243 198 3763 1359 2088 2787 1048 405 983 707 3322 2917"
 IsChanceNode() = False
@@ -2349,8 +2349,8 @@ StringLegalActions() = ["a2", "Rxd2+", "Rxc3", "Rxe3+", "a4", "axb4", "Rd4", "Rd
 action: 1747
 
 # State 116
+# 8/3k4/1Q1P1P2/p7/1Bpr4/p1P1P3/3RK2p/6NR w - - 1 59
 IsTerminal() = False
-ToString() = "8/3k4/1Q1P1P2/p7/1Bpr4/p1P1P3/3RK2p/6NR w - - 1 59"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021, 3323, 2494, 1861, 1616, 2013, 388, 2608, 3046, 1759, 2671, 1243, 198, 3763, 1359, 2088, 2787, 1048, 405, 983, 707, 3322, 2917, 1747]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021 3323 2494 1861 1616 2013 388 2608 3046 1759 2671 1243 198 3763 1359 2088 2787 1048 405 983 707 3322 2917 1747"
 IsChanceNode() = False
@@ -2369,8 +2369,8 @@ StringLegalActions() = ["Rdd1", "Ked1", "Ke1", "Kf1", "Ra2", "Rb2", "Rc2", "Kf2"
 action: 1478
 
 # State 117
+# 8/3k4/1Q1P1P2/p7/1Bpr4/p1P1P2N/3RK2p/7R b - - 2 59
 IsTerminal() = False
-ToString() = "8/3k4/1Q1P1P2/p7/1Bpr4/p1P1P2N/3RK2p/7R b - - 2 59"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021, 3323, 2494, 1861, 1616, 2013, 388, 2608, 3046, 1759, 2671, 1243, 198, 3763, 1359, 2088, 2787, 1048, 405, 983, 707, 3322, 2917, 1747, 1478]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021 3323 2494 1861 1616 2013 388 2608 3046 1759 2671 1243 198 3763 1359 2088 2787 1048 405 983 707 3322 2917 1747 1478"
 IsChanceNode() = False
@@ -2389,8 +2389,8 @@ StringLegalActions() = ["a2", "Rxd2+", "Rd3", "a4", "axb4", "Re4", "Rf4", "Rg4",
 action: 1819
 
 # State 118
+# 8/3k4/1Q1P1P2/p7/1Bp1r3/p1P1P2N/3RK2p/7R w - - 3 60
 IsTerminal() = False
-ToString() = "8/3k4/1Q1P1P2/p7/1Bp1r3/p1P1P2N/3RK2p/7R w - - 3 60"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021, 3323, 2494, 1861, 1616, 2013, 388, 2608, 3046, 1759, 2671, 1243, 198, 3763, 1359, 2088, 2787, 1048, 405, 983, 707, 3322, 2917, 1747, 1478, 1819]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021 3323 2494 1861 1616 2013 388 2608 3046 1759 2671 1243 198 3763 1359 2088 2787 1048 405 983 707 3322 2917 1747 1478 1819"
 IsChanceNode() = False
@@ -2409,8 +2409,8 @@ StringLegalActions() = ["Ra1", "Rb1", "Rc1", "Rhd1", "Rdd1", "Ked1", "Rhe1", "Ke
 action: 204
 
 # State 119
+# 8/3k4/1Q1P1P2/p7/1Bp1r3/p1P1P2N/3R3p/3K3R b - - 4 60
 IsTerminal() = False
-ToString() = "8/3k4/1Q1P1P2/p7/1Bp1r3/p1P1P2N/3R3p/3K3R b - - 4 60"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021, 3323, 2494, 1861, 1616, 2013, 388, 2608, 3046, 1759, 2671, 1243, 198, 3763, 1359, 2088, 2787, 1048, 405, 983, 707, 3322, 2917, 1747, 1478, 1819, 204]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021 3323 2494 1861 1616 2013 388 2608 3046 1759 2671 1243 198 3763 1359 2088 2787 1048 405 983 707 3322 2917 1747 1478 1819 204"
 IsChanceNode() = False
@@ -2429,8 +2429,8 @@ StringLegalActions() = ["a2", "Rxe3", "a4", "axb4", "Rd4", "Rf4", "Rg4", "Rh4", 
 action: 1756
 
 # State 120
+# 8/3k4/1Q1P1P2/p7/1Bpr4/p1P1P2N/3R3p/3K3R w - - 5 61
 IsTerminal() = False
-ToString() = "8/3k4/1Q1P1P2/p7/1Bpr4/p1P1P2N/3R3p/3K3R w - - 5 61"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021, 3323, 2494, 1861, 1616, 2013, 388, 2608, 3046, 1759, 2671, 1243, 198, 3763, 1359, 2088, 2787, 1048, 405, 983, 707, 3322, 2917, 1747, 1478, 1819, 204, 1756]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021 3323 2494 1861 1616 2013 388 2608 3046 1759 2671 1243 198 3763 1359 2088 2787 1048 405 983 707 3322 2917 1747 1478 1819 204 1756"
 IsChanceNode() = False
@@ -2449,8 +2449,8 @@ StringLegalActions() = ["Kc1", "Kde1", "Rhe1", "Rf1", "R1g1", "N3g1", "Kc2", "Ke
 action: 1739
 
 # State 121
+# 8/3k4/1Q1P1P2/p7/1BpR4/p1P1P2N/7p/3K3R b - - 0 61
 IsTerminal() = False
-ToString() = "8/3k4/1Q1P1P2/p7/1BpR4/p1P1P2N/7p/3K3R b - - 0 61"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021, 3323, 2494, 1861, 1616, 2013, 388, 2608, 3046, 1759, 2671, 1243, 198, 3763, 1359, 2088, 2787, 1048, 405, 983, 707, 3322, 2917, 1747, 1478, 1819, 204, 1756, 1739]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021 3323 2494 1861 1616 2013 388 2608 3046 1759 2671 1243 198 3763 1359 2088 2787 1048 405 983 707 3322 2917 1747 1478 1819 204 1756 1739"
 IsChanceNode() = False
@@ -2469,8 +2469,8 @@ StringLegalActions() = ["a2", "a4", "axb4", "Ke6", "Kc8", "Ke8"]
 action: 3763
 
 # State 122
+# 2k5/8/1Q1P1P2/p7/1BpR4/p1P1P2N/7p/3K3R w - - 1 62
 IsTerminal() = False
-ToString() = "2k5/8/1Q1P1P2/p7/1BpR4/p1P1P2N/7p/3K3R w - - 1 62"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021, 3323, 2494, 1861, 1616, 2013, 388, 2608, 3046, 1759, 2671, 1243, 198, 3763, 1359, 2088, 2787, 1048, 405, 983, 707, 3322, 2917, 1747, 1478, 1819, 204, 1756, 1739, 3763]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021 3323 2494 1861 1616 2013 388 2608 3046 1759 2671 1243 198 3763 1359 2088 2787 1048 405 983 707 3322 2917 1747 1478 1819 204 1756 1739 3763"
 IsChanceNode() = False
@@ -2489,8 +2489,8 @@ StringLegalActions() = ["Kc1", "Kde1", "Rhe1", "Rf1", "R1g1", "N3g1", "Kc2", "K1
 action: 2201
 
 # State 123
+# 2k5/8/1Q1P1P2/p1B5/2pR4/p1P1P2N/7p/3K3R b - - 2 62
 IsTerminal() = False
-ToString() = "2k5/8/1Q1P1P2/p1B5/2pR4/p1P1P2N/7p/3K3R b - - 2 62"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021, 3323, 2494, 1861, 1616, 2013, 388, 2608, 3046, 1759, 2671, 1243, 198, 3763, 1359, 2088, 2787, 1048, 405, 983, 707, 3322, 2917, 1747, 1478, 1819, 204, 1756, 1739, 3763, 2201]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021 3323 2494 1861 1616 2013 388 2608 3046 1759 2671 1243 198 3763 1359 2088 2787 1048 405 983 707 3322 2917 1747 1478 1819 204 1756 1739 3763 2201"
 IsChanceNode() = False
@@ -2509,8 +2509,8 @@ StringLegalActions() = ["a2", "a4", "Kd7"]
 action: 1568
 
 # State 124
+# 2k5/8/1Q1P1P2/2B5/p1pR4/p1P1P2N/7p/3K3R w - - 0 63
 IsTerminal() = False
-ToString() = "2k5/8/1Q1P1P2/2B5/p1pR4/p1P1P2N/7p/3K3R w - - 0 63"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021, 3323, 2494, 1861, 1616, 2013, 388, 2608, 3046, 1759, 2671, 1243, 198, 3763, 1359, 2088, 2787, 1048, 405, 983, 707, 3322, 2917, 1747, 1478, 1819, 204, 1756, 1739, 3763, 2201, 1568]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021 3323 2494 1861 1616 2013 388 2608 3046 1759 2671 1243 198 3763 1359 2088 2787 1048 405 983 707 3322 2917 1747 1478 1819 204 1756 1739 3763 2201 1568"
 IsChanceNode() = False
@@ -2529,8 +2529,8 @@ StringLegalActions() = ["Qb1", "Kc1", "Kde1", "Rhe1", "Rf1", "R1g1", "N3g1", "Qb
 action: 407
 
 # State 125
+# 2k5/8/1Q1P1P2/2B5/p1pR4/p1P1P3/7p/3K2NR b - - 1 63
 IsTerminal() = False
-ToString() = "2k5/8/1Q1P1P2/2B5/p1pR4/p1P1P3/7p/3K2NR b - - 1 63"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021, 3323, 2494, 1861, 1616, 2013, 388, 2608, 3046, 1759, 2671, 1243, 198, 3763, 1359, 2088, 2787, 1048, 405, 983, 707, 3322, 2917, 1747, 1478, 1819, 204, 1756, 1739, 3763, 2201, 1568, 407]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021 3323 2494 1861 1616 2013 388 2608 3046 1759 2671 1243 198 3763 1359 2088 2787 1048 405 983 707 3322 2917 1747 1478 1819 204 1756 1739 3763 2201 1568 407"
 IsChanceNode() = False
@@ -2549,8 +2549,8 @@ StringLegalActions() = ["a2", "Kd7", "hxg1=Q+", "hxg1=R+", "hxg1=B", "hxg1=N"]
 action: 3322
 
 # State 126
+# 8/3k4/1Q1P1P2/2B5/p1pR4/p1P1P3/7p/3K2NR w - - 2 64
 IsTerminal() = False
-ToString() = "8/3k4/1Q1P1P2/2B5/p1pR4/p1P1P3/7p/3K2NR w - - 2 64"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021, 3323, 2494, 1861, 1616, 2013, 388, 2608, 3046, 1759, 2671, 1243, 198, 3763, 1359, 2088, 2787, 1048, 405, 983, 707, 3322, 2917, 1747, 1478, 1819, 204, 1756, 1739, 3763, 2201, 1568, 407, 3322]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021 3323 2494 1861 1616 2013 388 2608 3046 1759 2671 1243 198 3763 1359 2088 2787 1048 405 983 707 3322 2917 1747 1478 1819 204 1756 1739 3763 2201 1568 407 3322"
 IsChanceNode() = False
@@ -2569,8 +2569,8 @@ StringLegalActions() = ["Qb1", "Kc1", "Ke1", "Qb2", "Kc2", "K1d2", "R4d2", "Kde2
 action: 1243
 
 # State 127
+# 8/3k4/1Q1P1P2/2B5/p1p5/p1PRP3/7p/3K2NR b - - 3 64
 IsTerminal() = False
-ToString() = "8/3k4/1Q1P1P2/2B5/p1p5/p1PRP3/7p/3K2NR b - - 3 64"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021, 3323, 2494, 1861, 1616, 2013, 388, 2608, 3046, 1759, 2671, 1243, 198, 3763, 1359, 2088, 2787, 1048, 405, 983, 707, 3322, 2917, 1747, 1478, 1819, 204, 1756, 1739, 3763, 2201, 1568, 407, 3322, 1243]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021 3323 2494 1861 1616 2013 388 2608 3046 1759 2671 1243 198 3763 1359 2088 2787 1048 405 983 707 3322 2917 1747 1478 1819 204 1756 1739 3763 2201 1568 407 3322 1243"
 IsChanceNode() = False
@@ -2589,8 +2589,8 @@ StringLegalActions() = ["a2", "cxd3", "Ke6", "Kc8", "Ke8", "hxg1=Q+", "hxg1=R+",
 action: 3891
 
 # State 128
+# 4k3/8/1Q1P1P2/2B5/p1p5/p1PRP3/7p/3K2NR w - - 4 65
 IsTerminal() = False
-ToString() = "4k3/8/1Q1P1P2/2B5/p1p5/p1PRP3/7p/3K2NR w - - 4 65"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021, 3323, 2494, 1861, 1616, 2013, 388, 2608, 3046, 1759, 2671, 1243, 198, 3763, 1359, 2088, 2787, 1048, 405, 983, 707, 3322, 2917, 1747, 1478, 1819, 204, 1756, 1739, 3763, 2201, 1568, 407, 3322, 1243, 3891]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021 3323 2494 1861 1616 2013 388 2608 3046 1759 2671 1243 198 3763 1359 2088 2787 1048 405 983 707 3322 2917 1747 1478 1819 204 1756 1739 3763 2201 1568 407 3322 1243 3891"
 IsChanceNode() = False
@@ -2609,8 +2609,8 @@ StringLegalActions() = ["Qb1", "Kc1", "Ke1", "Qb2", "Kc2", "K1d2", "R3d2", "Kde2
 action: 707
 
 # State 129
+# 4k3/8/1Q1P1P2/2B5/p1p5/p1PRP3/3K3p/6NR b - - 5 65
 IsTerminal() = False
-ToString() = "4k3/8/1Q1P1P2/2B5/p1p5/p1PRP3/3K3p/6NR b - - 5 65"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021, 3323, 2494, 1861, 1616, 2013, 388, 2608, 3046, 1759, 2671, 1243, 198, 3763, 1359, 2088, 2787, 1048, 405, 983, 707, 3322, 2917, 1747, 1478, 1819, 204, 1756, 1739, 3763, 2201, 1568, 407, 3322, 1243, 3891, 707]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021 3323 2494 1861 1616 2013 388 2608 3046 1759 2671 1243 198 3763 1359 2088 2787 1048 405 983 707 3322 2917 1747 1478 1819 204 1756 1739 3763 2201 1568 407 3322 1243 3891 707"
 IsChanceNode() = False
@@ -2629,8 +2629,8 @@ StringLegalActions() = ["a2", "cxd3", "Kd7", "Kf7", "Kf8", "hxg1=Q", "hxg1=R", "
 action: 3324
 
 # State 130
+# 8/3k4/1Q1P1P2/2B5/p1p5/p1PRP3/3K3p/6NR w - - 6 66
 IsTerminal() = False
-ToString() = "8/3k4/1Q1P1P2/2B5/p1p5/p1PRP3/3K3p/6NR w - - 6 66"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021, 3323, 2494, 1861, 1616, 2013, 388, 2608, 3046, 1759, 2671, 1243, 198, 3763, 1359, 2088, 2787, 1048, 405, 983, 707, 3322, 2917, 1747, 1478, 1819, 204, 1756, 1739, 3763, 2201, 1568, 407, 3322, 1243, 3891, 707, 3324]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021 3323 2494 1861 1616 2013 388 2608 3046 1759 2671 1243 198 3763 1359 2088 2787 1048 405 983 707 3322 2917 1747 1478 1819 204 1756 1739 3763 2201 1568 407 3322 1243 3891 707 3324"
 IsChanceNode() = False
@@ -2649,8 +2649,8 @@ StringLegalActions() = ["Qb1", "Kc1", "Kd1", "Ke1", "Qb2", "Kc2", "Nge2", "Kde2"
 action: 1812
 
 # State 131
+# 8/3k4/1Q1P1P2/2B5/p1p1P3/p1PR4/3K3p/6NR b - - 0 66
 IsTerminal() = False
-ToString() = "8/3k4/1Q1P1P2/2B5/p1p1P3/p1PR4/3K3p/6NR b - - 0 66"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021, 3323, 2494, 1861, 1616, 2013, 388, 2608, 3046, 1759, 2671, 1243, 198, 3763, 1359, 2088, 2787, 1048, 405, 983, 707, 3322, 2917, 1747, 1478, 1819, 204, 1756, 1739, 3763, 2201, 1568, 407, 3322, 1243, 3891, 707, 3324, 1812]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021 3323 2494 1861 1616 2013 388 2608 3046 1759 2671 1243 198 3763 1359 2088 2787 1048 405 983 707 3322 2917 1747 1478 1819 204 1756 1739 3763 2201 1568 407 3322 1243 3891 707 3324 1812"
 IsChanceNode() = False
@@ -2669,8 +2669,8 @@ StringLegalActions() = ["a2", "cxd3", "Ke6", "Kc8", "Ke8", "hxg1=Q", "hxg1=R", "
 action: 3891
 
 # State 132
+# 4k3/8/1Q1P1P2/2B5/p1p1P3/p1PR4/3K3p/6NR w - - 1 67
 IsTerminal() = False
-ToString() = "4k3/8/1Q1P1P2/2B5/p1p1P3/p1PR4/3K3p/6NR w - - 1 67"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021, 3323, 2494, 1861, 1616, 2013, 388, 2608, 3046, 1759, 2671, 1243, 198, 3763, 1359, 2088, 2787, 1048, 405, 983, 707, 3322, 2917, 1747, 1478, 1819, 204, 1756, 1739, 3763, 2201, 1568, 407, 3322, 1243, 3891, 707, 3324, 1812, 3891]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021 3323 2494 1861 1616 2013 388 2608 3046 1759 2671 1243 198 3763 1359 2088 2787 1048 405 983 707 3322 2917 1747 1478 1819 204 1756 1739 3763 2201 1568 407 3322 1243 3891 707 3324 1812 3891"
 IsChanceNode() = False
@@ -2689,8 +2689,8 @@ StringLegalActions() = ["Qb1", "Kc1", "Kd1", "Ke1", "Qb2", "Kc2", "Nge2", "Kde2"
 action: 1291
 
 # State 133
+# 4k3/8/1Q1P1P2/2B5/p1p1P3/p1PRK3/7p/6NR b - - 2 67
 IsTerminal() = False
-ToString() = "4k3/8/1Q1P1P2/2B5/p1p1P3/p1PRK3/7p/6NR b - - 2 67"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021, 3323, 2494, 1861, 1616, 2013, 388, 2608, 3046, 1759, 2671, 1243, 198, 3763, 1359, 2088, 2787, 1048, 405, 983, 707, 3322, 2917, 1747, 1478, 1819, 204, 1756, 1739, 3763, 2201, 1568, 407, 3322, 1243, 3891, 707, 3324, 1812, 3891, 1291]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021 3323 2494 1861 1616 2013 388 2608 3046 1759 2671 1243 198 3763 1359 2088 2787 1048 405 983 707 3322 2917 1747 1478 1819 204 1756 1739 3763 2201 1568 407 3322 1243 3891 707 3324 1812 3891 1291"
 IsChanceNode() = False
@@ -2709,8 +2709,8 @@ StringLegalActions() = ["a2", "cxd3", "Kd7", "Kf7", "Kf8", "hxg1=Q+", "hxg1=R", 
 action: 3452
 
 # State 134
+# 8/5k2/1Q1P1P2/2B5/p1p1P3/p1PRK3/7p/6NR w - - 3 68
 IsTerminal() = False
-ToString() = "8/5k2/1Q1P1P2/2B5/p1p1P3/p1PRK3/7p/6NR w - - 3 68"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021, 3323, 2494, 1861, 1616, 2013, 388, 2608, 3046, 1759, 2671, 1243, 198, 3763, 1359, 2088, 2787, 1048, 405, 983, 707, 3322, 2917, 1747, 1478, 1819, 204, 1756, 1739, 3763, 2201, 1568, 407, 3322, 1243, 3891, 707, 3324, 1812, 3891, 1291, 3452]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021 3323 2494 1861 1616 2013 388 2608 3046 1759 2671 1243 198 3763 1359 2088 2787 1048 405 983 707 3322 2917 1747 1478 1819 204 1756 1739 3763 2201 1568 407 3322 1243 3891 707 3324 1812 3891 1291 3452"
 IsChanceNode() = False
@@ -2729,8 +2729,8 @@ StringLegalActions() = ["Qb1", "Rd1", "Qb2", "Rdd2", "Ked2", "Nge2", "Kee2", "Kf
 action: 852
 
 # State 135
+# 8/5k2/1Q1P1P2/2B5/p1p1P3/p1PR4/5K1p/6NR b - - 4 68
 IsTerminal() = False
-ToString() = "8/5k2/1Q1P1P2/2B5/p1p1P3/p1PR4/5K1p/6NR b - - 4 68"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021, 3323, 2494, 1861, 1616, 2013, 388, 2608, 3046, 1759, 2671, 1243, 198, 3763, 1359, 2088, 2787, 1048, 405, 983, 707, 3322, 2917, 1747, 1478, 1819, 204, 1756, 1739, 3763, 2201, 1568, 407, 3322, 1243, 3891, 707, 3324, 1812, 3891, 1291, 3452, 852]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021 3323 2494 1861 1616 2013 388 2608 3046 1759 2671 1243 198 3763 1359 2088 2787 1048 405 983 707 3322 2917 1747 1478 1819 204 1756 1739 3763 2201 1568 407 3322 1243 3891 707 3324 1812 3891 1291 3452 852"
 IsChanceNode() = False
@@ -2749,8 +2749,8 @@ StringLegalActions() = ["a2", "cxd3", "Ke6", "Kxf6", "Kg6", "Ke8", "Kf8", "Kg8",
 action: 8591
 
 # State 136
+# 8/5k2/1Q1P1P2/2B5/p1p1P3/p1PR4/5K2/6rR w - - 0 69
 IsTerminal() = False
-ToString() = "8/5k2/1Q1P1P2/2B5/p1p1P3/p1PR4/5K2/6rR w - - 0 69"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021, 3323, 2494, 1861, 1616, 2013, 388, 2608, 3046, 1759, 2671, 1243, 198, 3763, 1359, 2088, 2787, 1048, 405, 983, 707, 3322, 2917, 1747, 1478, 1819, 204, 1756, 1739, 3763, 2201, 1568, 407, 3322, 1243, 3891, 707, 3324, 1812, 3891, 1291, 3452, 852, 8591]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021 3323 2494 1861 1616 2013 388 2608 3046 1759 2671 1243 198 3763 1359 2088 2787 1048 405 983 707 3322 2917 1747 1478 1819 204 1756 1739 3763 2201 1568 407 3322 1243 3891 707 3324 1812 3891 1291 3452 852 8591"
 IsChanceNode() = False
@@ -2769,8 +2769,8 @@ StringLegalActions() = ["Qb1", "Rd1", "Rhxg1", "Kfxg1", "Qb2", "Rd2", "Ke2", "Rh
 action: 1427
 
 # State 137
+# 8/5k2/1Q1P1P2/2B5/p1p1P3/p1P3R1/5K2/6rR b - - 1 69
 IsTerminal() = False
-ToString() = "8/5k2/1Q1P1P2/2B5/p1p1P3/p1P3R1/5K2/6rR b - - 1 69"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021, 3323, 2494, 1861, 1616, 2013, 388, 2608, 3046, 1759, 2671, 1243, 198, 3763, 1359, 2088, 2787, 1048, 405, 983, 707, 3322, 2917, 1747, 1478, 1819, 204, 1756, 1739, 3763, 2201, 1568, 407, 3322, 1243, 3891, 707, 3324, 1812, 3891, 1291, 3452, 852, 8591, 1427]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021 3323 2494 1861 1616 2013 388 2608 3046 1759 2671 1243 198 3763 1359 2088 2787 1048 405 983 707 3322 2917 1747 1478 1819 204 1756 1739 3763 2201 1568 407 3322 1243 3891 707 3324 1812 3891 1291 3452 852 8591 1427"
 IsChanceNode() = False
@@ -2789,8 +2789,8 @@ StringLegalActions() = ["Ra1", "Rb1", "Rc1", "Rd1", "Re1", "Rf1+", "Rxh1", "a2",
 action: 134
 
 # State 138
+# 8/5k2/1Q1P1P2/2B5/p1p1P3/p1P3R1/5K2/2r4R w - - 2 70
 IsTerminal() = False
-ToString() = "8/5k2/1Q1P1P2/2B5/p1p1P3/p1P3R1/5K2/2r4R w - - 2 70"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021, 3323, 2494, 1861, 1616, 2013, 388, 2608, 3046, 1759, 2671, 1243, 198, 3763, 1359, 2088, 2787, 1048, 405, 983, 707, 3322, 2917, 1747, 1478, 1819, 204, 1756, 1739, 3763, 2201, 1568, 407, 3322, 1243, 3891, 707, 3324, 1812, 3891, 1291, 3452, 852, 8591, 1427, 134]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021 3323 2494 1861 1616 2013 388 2608 3046 1759 2671 1243 198 3763 1359 2088 2787 1048 405 983 707 3322 2917 1747 1478 1819 204 1756 1739 3763 2201 1568 407 3322 1243 3891 707 3324 1812 3891 1291 3452 852 8591 1427 134"
 IsChanceNode() = False
@@ -2809,8 +2809,8 @@ StringLegalActions() = ["Qb1", "Rxc1", "Rd1", "Re1", "Rf1", "Rhg1", "Rgg1", "Qb2
 action: 263
 
 # State 139
+# 8/5k2/1Q1P1P2/2B5/p1p1P3/p1P3R1/5K2/2r1R3 b - - 3 70
 IsTerminal() = False
-ToString() = "8/5k2/1Q1P1P2/2B5/p1p1P3/p1P3R1/5K2/2r1R3 b - - 3 70"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021, 3323, 2494, 1861, 1616, 2013, 388, 2608, 3046, 1759, 2671, 1243, 198, 3763, 1359, 2088, 2787, 1048, 405, 983, 707, 3322, 2917, 1747, 1478, 1819, 204, 1756, 1739, 3763, 2201, 1568, 407, 3322, 1243, 3891, 707, 3324, 1812, 3891, 1291, 3452, 852, 8591, 1427, 134, 263]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021 3323 2494 1861 1616 2013 388 2608 3046 1759 2671 1243 198 3763 1359 2088 2787 1048 405 983 707 3322 2917 1747 1478 1819 204 1756 1739 3763 2201 1568 407 3322 1243 3891 707 3324 1812 3891 1291 3452 852 8591 1427 134 263"
 IsChanceNode() = False
@@ -2829,8 +2829,8 @@ StringLegalActions() = ["Ra1", "Rb1", "Rd1", "Rxe1", "a2", "Rc2+", "Rxc3", "Ke6"
 action: 2
 
 # State 140
+# 8/5k2/1Q1P1P2/2B5/p1p1P3/p1P3R1/5K2/r3R3 w - - 4 71
 IsTerminal() = False
-ToString() = "8/5k2/1Q1P1P2/2B5/p1p1P3/p1P3R1/5K2/r3R3 w - - 4 71"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021, 3323, 2494, 1861, 1616, 2013, 388, 2608, 3046, 1759, 2671, 1243, 198, 3763, 1359, 2088, 2787, 1048, 405, 983, 707, 3322, 2917, 1747, 1478, 1819, 204, 1756, 1739, 3763, 2201, 1568, 407, 3322, 1243, 3891, 707, 3324, 1812, 3891, 1291, 3452, 852, 8591, 1427, 134, 263, 2]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021 3323 2494 1861 1616 2013 388 2608 3046 1759 2671 1243 198 3763 1359 2088 2787 1048 405 983 707 3322 2917 1747 1478 1819 204 1756 1739 3763 2201 1568 407 3322 1243 3891 707 3324 1812 3891 1291 3452 852 8591 1427 134 263 2"
 IsChanceNode() = False
@@ -2849,8 +2849,8 @@ StringLegalActions() = ["Rxa1", "Reb1", "Qbb1", "Rc1", "Rd1", "Ref1", "Kff1", "R
 action: 2332
 
 # State 141
+# 8/5k2/1Q1P1P2/2B1P3/p1p5/p1P3R1/5K2/r3R3 b - - 0 71
 IsTerminal() = False
-ToString() = "8/5k2/1Q1P1P2/2B1P3/p1p5/p1P3R1/5K2/r3R3 b - - 0 71"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021, 3323, 2494, 1861, 1616, 2013, 388, 2608, 3046, 1759, 2671, 1243, 198, 3763, 1359, 2088, 2787, 1048, 405, 983, 707, 3322, 2917, 1747, 1478, 1819, 204, 1756, 1739, 3763, 2201, 1568, 407, 3322, 1243, 3891, 707, 3324, 1812, 3891, 1291, 3452, 852, 8591, 1427, 134, 263, 2, 2332]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021 3323 2494 1861 1616 2013 388 2608 3046 1759 2671 1243 198 3763 1359 2088 2787 1048 405 983 707 3322 2917 1747 1478 1819 204 1756 1739 3763 2201 1568 407 3322 1243 3891 707 3324 1812 3891 1291 3452 852 8591 1427 134 263 2 2332"
 IsChanceNode() = False
@@ -2869,8 +2869,8 @@ StringLegalActions() = ["Rb1", "Rc1", "Rd1", "Rxe1", "R1a2+", "3a2", "Ke6", "Ke8
 action: 128
 
 # State 142
+# 8/5k2/1Q1P1P2/2B1P3/p1p5/p1P3R1/5K2/2r1R3 w - - 1 72
 IsTerminal() = False
-ToString() = "8/5k2/1Q1P1P2/2B1P3/p1p5/p1P3R1/5K2/2r1R3 w - - 1 72"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021, 3323, 2494, 1861, 1616, 2013, 388, 2608, 3046, 1759, 2671, 1243, 198, 3763, 1359, 2088, 2787, 1048, 405, 983, 707, 3322, 2917, 1747, 1478, 1819, 204, 1756, 1739, 3763, 2201, 1568, 407, 3322, 1243, 3891, 707, 3324, 1812, 3891, 1291, 3452, 852, 8591, 1427, 134, 263, 2, 2332, 128]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021 3323 2494 1861 1616 2013 388 2608 3046 1759 2671 1243 198 3763 1359 2088 2787 1048 405 983 707 3322 2917 1747 1478 1819 204 1756 1739 3763 2201 1568 407 3322 1243 3891 707 3324 1812 3891 1291 3452 852 8591 1427 134 263 2 2332 128"
 IsChanceNode() = False
@@ -2889,8 +2889,8 @@ StringLegalActions() = ["Qb1", "Rxc1", "Rd1", "Ref1", "Kff1", "Reg1", "Kfg1", "R
 action: 1762
 
 # State 143
+# 8/5k2/1Q1P1P2/4P3/p1pB4/p1P3R1/5K2/2r1R3 b - - 2 72
 IsTerminal() = False
-ToString() = "8/5k2/1Q1P1P2/4P3/p1pB4/p1P3R1/5K2/2r1R3 b - - 2 72"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021, 3323, 2494, 1861, 1616, 2013, 388, 2608, 3046, 1759, 2671, 1243, 198, 3763, 1359, 2088, 2787, 1048, 405, 983, 707, 3322, 2917, 1747, 1478, 1819, 204, 1756, 1739, 3763, 2201, 1568, 407, 3322, 1243, 3891, 707, 3324, 1812, 3891, 1291, 3452, 852, 8591, 1427, 134, 263, 2, 2332, 128, 1762]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021 3323 2494 1861 1616 2013 388 2608 3046 1759 2671 1243 198 3763 1359 2088 2787 1048 405 983 707 3322 2917 1747 1478 1819 204 1756 1739 3763 2201 1568 407 3322 1243 3891 707 3324 1812 3891 1291 3452 852 8591 1427 134 263 2 2332 128 1762"
 IsChanceNode() = False
@@ -2909,8 +2909,8 @@ StringLegalActions() = ["Ra1", "Rb1", "Rd1", "Rxe1", "a2", "Rc2+", "Rxc3", "Ke6"
 action: 1154
 
 # State 144
+# 8/5k2/1Q1P1P2/4P3/p1pB4/p1r3R1/5K2/4R3 w - - 0 73
 IsTerminal() = False
-ToString() = "8/5k2/1Q1P1P2/4P3/p1pB4/p1r3R1/5K2/4R3 w - - 0 73"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021, 3323, 2494, 1861, 1616, 2013, 388, 2608, 3046, 1759, 2671, 1243, 198, 3763, 1359, 2088, 2787, 1048, 405, 983, 707, 3322, 2917, 1747, 1478, 1819, 204, 1756, 1739, 3763, 2201, 1568, 407, 3322, 1243, 3891, 707, 3324, 1812, 3891, 1291, 3452, 852, 8591, 1427, 134, 263, 2, 2332, 128, 1762, 1154]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021 3323 2494 1861 1616 2013 388 2608 3046 1759 2671 1243 198 3763 1359 2088 2787 1048 405 983 707 3322 2917 1747 1478 1819 204 1756 1739 3763 2201 1568 407 3322 1243 3891 707 3324 1812 3891 1291 3452 852 8591 1427 134 263 2 2332 128 1762 1154"
 IsChanceNode() = False
@@ -2929,8 +2929,8 @@ StringLegalActions() = ["Ra1", "Reb1", "Qbb1", "Rc1", "Rd1", "Ref1", "Kff1", "Re
 action: 2203
 
 # State 145
+# 8/5k2/1Q1P1P2/2B1P3/p1p5/p1r3R1/5K2/4R3 b - - 1 73
 IsTerminal() = False
-ToString() = "8/5k2/1Q1P1P2/2B1P3/p1p5/p1r3R1/5K2/4R3 b - - 1 73"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021, 3323, 2494, 1861, 1616, 2013, 388, 2608, 3046, 1759, 2671, 1243, 198, 3763, 1359, 2088, 2787, 1048, 405, 983, 707, 3322, 2917, 1747, 1478, 1819, 204, 1756, 1739, 3763, 2201, 1568, 407, 3322, 1243, 3891, 707, 3324, 1812, 3891, 1291, 3452, 852, 8591, 1427, 134, 263, 2, 2332, 128, 1762, 1154, 2203]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021 3323 2494 1861 1616 2013 388 2608 3046 1759 2671 1243 198 3763 1359 2088 2787 1048 405 983 707 3322 2917 1747 1478 1819 204 1756 1739 3763 2201 1568 407 3322 1243 3891 707 3324 1812 3891 1291 3452 852 8591 1427 134 263 2 2332 128 1762 1154 2203"
 IsChanceNode() = False
@@ -2949,8 +2949,8 @@ StringLegalActions() = ["Rc1", "a2", "Rc2+", "Rb3", "Rd3", "Re3", "Rf3+", "Rxg3"
 action: 1362
 
 # State 146
+# 8/5k2/1Q1P1P2/2B1P3/p1p5/p4rR1/5K2/4R3 w - - 2 74
 IsTerminal() = False
-ToString() = "8/5k2/1Q1P1P2/2B1P3/p1p5/p4rR1/5K2/4R3 w - - 2 74"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021, 3323, 2494, 1861, 1616, 2013, 388, 2608, 3046, 1759, 2671, 1243, 198, 3763, 1359, 2088, 2787, 1048, 405, 983, 707, 3322, 2917, 1747, 1478, 1819, 204, 1756, 1739, 3763, 2201, 1568, 407, 3322, 1243, 3891, 707, 3324, 1812, 3891, 1291, 3452, 852, 8591, 1427, 134, 263, 2, 2332, 128, 1762, 1154, 2203, 1362]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021 3323 2494 1861 1616 2013 388 2608 3046 1759 2671 1243 198 3763 1359 2088 2787 1048 405 983 707 3322 2917 1747 1478 1819 204 1756 1739 3763 2201 1568 407 3322 1243 3891 707 3324 1812 3891 1291 3452 852 8591 1427 134 263 2 2332 128 1762 1154 2203 1362"
 IsChanceNode() = False
@@ -2969,8 +2969,8 @@ StringLegalActions() = ["Kg1", "Ke2", "Kg2", "Kfxf3", "Rgxf3"]
 action: 909
 
 # State 147
+# 8/5k2/1Q1P1P2/2B1P3/p1p5/p4rR1/6K1/4R3 b - - 3 74
 IsTerminal() = False
-ToString() = "8/5k2/1Q1P1P2/2B1P3/p1p5/p4rR1/6K1/4R3 b - - 3 74"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021, 3323, 2494, 1861, 1616, 2013, 388, 2608, 3046, 1759, 2671, 1243, 198, 3763, 1359, 2088, 2787, 1048, 405, 983, 707, 3322, 2917, 1747, 1478, 1819, 204, 1756, 1739, 3763, 2201, 1568, 407, 3322, 1243, 3891, 707, 3324, 1812, 3891, 1291, 3452, 852, 8591, 1427, 134, 263, 2, 2332, 128, 1762, 1154, 2203, 1362, 909]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021 3323 2494 1861 1616 2013 388 2608 3046 1759 2671 1243 198 3763 1359 2088 2787 1048 405 983 707 3322 2917 1747 1478 1819 204 1756 1739 3763 2201 1568 407 3322 1243 3891 707 3324 1812 3891 1291 3452 852 8591 1427 134 263 2 2332 128 1762 1154 2203 1362 909"
 IsChanceNode() = False
@@ -2989,8 +2989,8 @@ StringLegalActions() = ["Rf1", "a2", "Rf2+", "Rb3", "Rfc3", "cc3", "Rd3", "Re3",
 action: 528
 
 # State 148
+# 8/5k2/1Q1P1P2/2B1P3/p1p5/5rR1/p5K1/4R3 w - - 0 75
 IsTerminal() = False
-ToString() = "8/5k2/1Q1P1P2/2B1P3/p1p5/5rR1/p5K1/4R3 w - - 0 75"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021, 3323, 2494, 1861, 1616, 2013, 388, 2608, 3046, 1759, 2671, 1243, 198, 3763, 1359, 2088, 2787, 1048, 405, 983, 707, 3322, 2917, 1747, 1478, 1819, 204, 1756, 1739, 3763, 2201, 1568, 407, 3322, 1243, 3891, 707, 3324, 1812, 3891, 1291, 3452, 852, 8591, 1427, 134, 263, 2, 2332, 128, 1762, 1154, 2203, 1362, 909, 528]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021 3323 2494 1861 1616 2013 388 2608 3046 1759 2671 1243 198 3763 1359 2088 2787 1048 405 983 707 3322 2917 1747 1478 1819 204 1756 1739 3763 2201 1568 407 3322 1243 3891 707 3324 1812 3891 1291 3452 852 8591 1427 134 263 2 2332 128 1762 1154 2203 1362 909 528"
 IsChanceNode() = False
@@ -3009,8 +3009,8 @@ StringLegalActions() = ["Ra1", "Reb1", "Qbb1", "Rc1", "Rd1", "Rf1", "Reg1", "Kgg
 action: 2852
 
 # State 149
+# 8/5k2/1Q1PPP2/2B5/p1p5/5rR1/p5K1/4R3 b - - 0 75
 IsTerminal() = False
-ToString() = "8/5k2/1Q1PPP2/2B5/p1p5/5rR1/p5K1/4R3 b - - 0 75"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021, 3323, 2494, 1861, 1616, 2013, 388, 2608, 3046, 1759, 2671, 1243, 198, 3763, 1359, 2088, 2787, 1048, 405, 983, 707, 3322, 2917, 1747, 1478, 1819, 204, 1756, 1739, 3763, 2201, 1568, 407, 3322, 1243, 3891, 707, 3324, 1812, 3891, 1291, 3452, 852, 8591, 1427, 134, 263, 2, 2332, 128, 1762, 1154, 2203, 1362, 909, 528, 2852]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021 3323 2494 1861 1616 2013 388 2608 3046 1759 2671 1243 198 3763 1359 2088 2787 1048 405 983 707 3322 2917 1747 1478 1819 204 1756 1739 3763 2201 1568 407 3322 1243 3891 707 3324 1812 3891 1291 3452 852 8591 1427 134 263 2 2332 128 1762 1154 2203 1362 909 528 2852"
 IsChanceNode() = False
@@ -3029,8 +3029,8 @@ StringLegalActions() = ["Kxf6", "Ke8", "Kf8"]
 action: 3957
 
 # State 150
+# 5k2/8/1Q1PPP2/2B5/p1p5/5rR1/p5K1/4R3 w - - 1 76
 IsTerminal() = False
-ToString() = "5k2/8/1Q1PPP2/2B5/p1p5/5rR1/p5K1/4R3 w - - 1 76"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021, 3323, 2494, 1861, 1616, 2013, 388, 2608, 3046, 1759, 2671, 1243, 198, 3763, 1359, 2088, 2787, 1048, 405, 983, 707, 3322, 2917, 1747, 1478, 1819, 204, 1756, 1739, 3763, 2201, 1568, 407, 3322, 1243, 3891, 707, 3324, 1812, 3891, 1291, 3452, 852, 8591, 1427, 134, 263, 2, 2332, 128, 1762, 1154, 2203, 1362, 909, 528, 2852, 3957]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021 3323 2494 1861 1616 2013 388 2608 3046 1759 2671 1243 198 3763 1359 2088 2787 1048 405 983 707 3322 2917 1747 1478 1819 204 1756 1739 3763 2201 1568 407 3322 1243 3891 707 3324 1812 3891 1291 3452 852 8591 1427 134 263 2 2332 128 1762 1154 2203 1362 909 528 2852 3957"
 IsChanceNode() = False
@@ -3049,8 +3049,8 @@ StringLegalActions() = ["Ra1", "Reb1", "Qbb1", "Rc1", "Rd1", "Rf1", "Reg1", "Kgg
 action: 3307
 
 # State 151
+# 5k2/3P4/1Q2PP2/2B5/p1p5/5rR1/p5K1/4R3 b - - 0 76
 IsTerminal() = True
-ToString() = "5k2/3P4/1Q2PP2/2B5/p1p5/5rR1/p5K1/4R3 b - - 0 76"
 History() = [1422, 2942, 901, 2617, 1162, 1837, 324, 860, 1486, 2868, 2839, 2291, 1544, 3704, 2284, 4031, 1379, 3322, 901, 3387, 1941, 3641, 3294, 3324, 334, 1076, 1033, 2673, 1739, 3891, 578, 3389, 1942, 1640, 1999, 2713, 259, 2933, 836, 1642, 1479, 537, 1421, 1076, 471, 3836, 982, 2486, 1350, 2226, 847, 3518, 512, 2551, 137, 2413, 2267, 1698, 981, 3254, 1421, 3506, 1026, 2153, 1366, 2022, 2398, 1569, 1941, 3323, 1292, 3960, 1374, 3827, 776, 438, 837, 70, 1877, 385, 1437, 1503, 268, 326, 781, 2023, 2006, 3323, 2911, 3453, 3437, 3827, 4021, 3323, 2494, 1861, 1616, 2013, 388, 2608, 3046, 1759, 2671, 1243, 198, 3763, 1359, 2088, 2787, 1048, 405, 983, 707, 3322, 2917, 1747, 1478, 1819, 204, 1756, 1739, 3763, 2201, 1568, 407, 3322, 1243, 3891, 707, 3324, 1812, 3891, 1291, 3452, 852, 8591, 1427, 134, 263, 2, 2332, 128, 1762, 1154, 2203, 1362, 909, 528, 2852, 3957, 3307]
 HistoryString() = "1422 2942 901 2617 1162 1837 324 860 1486 2868 2839 2291 1544 3704 2284 4031 1379 3322 901 3387 1941 3641 3294 3324 334 1076 1033 2673 1739 3891 578 3389 1942 1640 1999 2713 259 2933 836 1642 1479 537 1421 1076 471 3836 982 2486 1350 2226 847 3518 512 2551 137 2413 2267 1698 981 3254 1421 3506 1026 2153 1366 2022 2398 1569 1941 3323 1292 3960 1374 3827 776 438 837 70 1877 385 1437 1503 268 326 781 2023 2006 3323 2911 3453 3437 3827 4021 3323 2494 1861 1616 2013 388 2608 3046 1759 2671 1243 198 3763 1359 2088 2787 1048 405 983 707 3322 2917 1747 1478 1819 204 1756 1739 3763 2201 1568 407 3322 1243 3891 707 3324 1812 3891 1291 3452 852 8591 1427 134 263 2 2332 128 1762 1154 2203 1362 909 528 2852 3957 3307"
 IsChanceNode() = False

@@ -31,8 +31,18 @@ MaxGameLength() = 2178
 ToString() = "universal_poker()"
 
 # State 0
+# P0 Cards: 
+# P1 Cards: 
+# BoardCards 
+# PossibleCardsToDeal 7s7h7d7c6s6h6d6c5s5h5d5c4s4h4d4c3s3h3d3c2s2h2d2c
+# Node type?: Chance node
+# PossibleActions (1): [ ACTION_DEAL ]
+# Round: 0
+# ACPC State: STATE:0::2c|2c
+# Spent: [P0: 100  P1: 100  ]
+# 
+# Action Sequence: 
 IsTerminal() = False
-ToString() = "P0 Cards: \nP1 Cards: \nBoardCards \nPossibleCardsToDeal 7s7h7d7c6s6h6d6c5s5h5d5c4s4h4d4c3s3h3d3c2s2h2d2c\nNode type?: Chance node\nPossibleActions (1): [ ACTION_DEAL ]\nRound: 0\nACPC State: STATE:0::2c|2c\nSpent: [P0: 100  P1: 100  ]\n\nAction Sequence: \n"
 History() = []
 HistoryString() = ""
 IsChanceNode() = True
@@ -54,8 +64,18 @@ StringLegalActions() = ["player=-1 move=0", "player=-1 move=1", "player=-1 move=
 action: 8
 
 # State 1
+# P0 Cards: 4c
+# P1 Cards: 
+# BoardCards 
+# PossibleCardsToDeal 7s7h7d7c6s6h6d6c5s5h5d5c4s4h4d3s3h3d3c2s2h2d2c
+# Node type?: Chance node
+# PossibleActions (1): [ ACTION_DEAL ]
+# Round: 0
+# ACPC State: STATE:0::2c|2c
+# Spent: [P0: 100  P1: 100  ]
+# 
+# Action Sequence: d
 IsTerminal() = False
-ToString() = "P0 Cards: 4c\nP1 Cards: \nBoardCards \nPossibleCardsToDeal 7s7h7d7c6s6h6d6c5s5h5d5c4s4h4d3s3h3d3c2s2h2d2c\nNode type?: Chance node\nPossibleActions (1): [ ACTION_DEAL ]\nRound: 0\nACPC State: STATE:0::2c|2c\nSpent: [P0: 100  P1: 100  ]\n\nAction Sequence: d\n"
 History() = [8]
 HistoryString() = "8"
 IsChanceNode() = True
@@ -77,8 +97,17 @@ StringLegalActions() = ["player=-1 move=0", "player=-1 move=1", "player=-1 move=
 action: 14
 
 # State 2
+# P0 Cards: 4c
+# P1 Cards: 5h
+# BoardCards 
+# Node type?: Player node for player 0
+# PossibleActions (3): [ ACTION_CHECK_CALL  ACTION_BET_POT  ACTION_ALL_IN ]
+# Round: 0
+# ACPC State: STATE:0::2c|2c
+# Spent: [P0: 100  P1: 100  ]
+# 
+# Action Sequence: dd
 IsTerminal() = False
-ToString() = "P0 Cards: 4c\nP1 Cards: 5h\nBoardCards \nNode type?: Player node for player 0\nPossibleActions (3): [ ACTION_CHECK_CALL  ACTION_BET_POT  ACTION_ALL_IN ]\nRound: 0\nACPC State: STATE:0::2c|2c\nSpent: [P0: 100  P1: 100  ]\n\nAction Sequence: dd\n"
 History() = [8, 14]
 HistoryString() = "8 14"
 IsChanceNode() = False
@@ -101,8 +130,17 @@ StringLegalActions() = ["player=0 move=0", "player=0 move=1", "player=0 move=2"]
 action: 2
 
 # State 3
+# P0 Cards: 4c
+# P1 Cards: 5h
+# BoardCards 
+# Node type?: Player node for player 1
+# PossibleActions (2): [ ACTION_FOLD  ACTION_CHECK_CALL ]
+# Round: 0
+# ACPC State: STATE:0:r1200:2c|2c
+# Spent: [P0: 1200  P1: 100  ]
+# 
+# Action Sequence: dda
 IsTerminal() = False
-ToString() = "P0 Cards: 4c\nP1 Cards: 5h\nBoardCards \nNode type?: Player node for player 1\nPossibleActions (2): [ ACTION_FOLD  ACTION_CHECK_CALL ]\nRound: 0\nACPC State: STATE:0:r1200:2c|2c\nSpent: [P0: 1200  P1: 100  ]\n\nAction Sequence: dda\n"
 History() = [8, 14, 2]
 HistoryString() = "8 14 2"
 IsChanceNode() = False
@@ -125,8 +163,19 @@ StringLegalActions() = ["player=1 move=0", "player=1 move=1"]
 action: 0
 
 # State 4
+# P0 Cards: 4c
+# P1 Cards: 5h
+# BoardCards 
+# P0 Reward: 100
+# P1 Reward: -100
+# Node type?: Terminal Node!
+# PossibleActions (0): []
+# Round: 0
+# ACPC State: STATE:0:r1200f:4c|5h
+# Spent: [P0: 1200  P1: 100  ]
+# 
+# Action Sequence: ddaf
 IsTerminal() = True
-ToString() = "P0 Cards: 4c\nP1 Cards: 5h\nBoardCards \nP0 Reward: 100\nP1 Reward: -100\nNode type?: Terminal Node!\nPossibleActions (0): []\nRound: 0\nACPC State: STATE:0:r1200f:4c|5h\nSpent: [P0: 1200  P1: 100  ]\n\nAction Sequence: ddaf\n"
 History() = [8, 14, 2, 0]
 HistoryString() = "8 14 2 0"
 IsChanceNode() = False

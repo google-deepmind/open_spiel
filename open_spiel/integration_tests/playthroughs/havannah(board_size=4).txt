@@ -29,8 +29,15 @@ MaxGameLength() = 37
 ToString() = "havannah(board_size=4)"
 
 # State 0
+#         a b c d
+#      1 . . . . e
+#     2 . . . . . f
+#    3 . . . . . . g
+#   4 . . . . . . .
+#    5 . . . . . .
+#     6 . . . . .
+#      7 . . . .
 IsTerminal() = False
-ToString() = "        a b c d\n     1 . . . . e\n    2 . . . . . f\n   3 . . . . . . g\n  4 . . . . . . .\n   5 . . . . . .\n    6 . . . . .\n     7 . . . .\n"
 History() = []
 HistoryString() = ""
 IsChanceNode() = False
@@ -51,8 +58,15 @@ StringLegalActions() = ["a1", "b1", "c1", "d1", "a2", "b2", "c2", "d2", "e2", "a
 action: 23
 
 # State 1
+#         a b c d
+#      1 . . . . e
+#     2 . . . . . f
+#    3 . . . . . . g
+#   4 . .[O]. . . .
+#    5 . . . . . .
+#     6 . . . . .
+#      7 . . . .
 IsTerminal() = False
-ToString() = "        a b c d\n     1 . . . . e\n    2 . . . . . f\n   3 . . . . . . g\n  4 . .[O]. . . .\n   5 . . . . . .\n    6 . . . . .\n     7 . . . .\n"
 History() = [23]
 HistoryString() = "23"
 IsChanceNode() = False
@@ -73,8 +87,15 @@ StringLegalActions() = ["a1", "b1", "c1", "d1", "a2", "b2", "c2", "d2", "e2", "a
 action: 10
 
 # State 2
+#         a b c d
+#      1 . . . . e
+#     2 . . .[@]. f
+#    3 . . . . . . g
+#   4 . . O . . . .
+#    5 . . . . . .
+#     6 . . . . .
+#      7 . . . .
 IsTerminal() = False
-ToString() = "        a b c d\n     1 . . . . e\n    2 . . .[@]. f\n   3 . . . . . . g\n  4 . . O . . . .\n   5 . . . . . .\n    6 . . . . .\n     7 . . . .\n"
 History() = [23, 10]
 HistoryString() = "23 10"
 IsChanceNode() = False
@@ -95,8 +116,15 @@ StringLegalActions() = ["a1", "b1", "c1", "d1", "a2", "b2", "c2", "e2", "a3", "b
 action: 30
 
 # State 3
+#         a b c d
+#      1 . . . . e
+#     2 . . . @ . f
+#    3 . . . . . . g
+#   4 . . O . . . .
+#    5 .[O]. . . .
+#     6 . . . . .
+#      7 . . . .
 IsTerminal() = False
-ToString() = "        a b c d\n     1 . . . . e\n    2 . . . @ . f\n   3 . . . . . . g\n  4 . . O . . . .\n   5 .[O]. . . .\n    6 . . . . .\n     7 . . . .\n"
 History() = [23, 10, 30]
 HistoryString() = "23 10 30"
 IsChanceNode() = False
@@ -117,8 +145,15 @@ StringLegalActions() = ["a1", "b1", "c1", "d1", "a2", "b2", "c2", "e2", "a3", "b
 action: 22
 
 # State 4
+#         a b c d
+#      1 . . . . e
+#     2 . . . @ . f
+#    3 . . . . . . g
+#   4 .[@]O . . . .
+#    5 . O . . . .
+#     6 . . . . .
+#      7 . . . .
 IsTerminal() = False
-ToString() = "        a b c d\n     1 . . . . e\n    2 . . . @ . f\n   3 . . . . . . g\n  4 .[@]O . . . .\n   5 . O . . . .\n    6 . . . . .\n     7 . . . .\n"
 History() = [23, 10, 30, 22]
 HistoryString() = "23 10 30 22"
 IsChanceNode() = False
@@ -139,8 +174,15 @@ StringLegalActions() = ["a1", "b1", "c1", "d1", "a2", "b2", "c2", "e2", "a3", "b
 action: 26
 
 # State 5
+#         a b c d
+#      1 . . . . e
+#     2 . . . @ . f
+#    3 . . . . . . g
+#   4 . @ O . .[O].
+#    5 . O . . . .
+#     6 . . . . .
+#      7 . . . .
 IsTerminal() = False
-ToString() = "        a b c d\n     1 . . . . e\n    2 . . . @ . f\n   3 . . . . . . g\n  4 . @ O . .[O].\n   5 . O . . . .\n    6 . . . . .\n     7 . . . .\n"
 History() = [23, 10, 30, 22, 26]
 HistoryString() = "23 10 30 22 26"
 IsChanceNode() = False
@@ -161,8 +203,15 @@ StringLegalActions() = ["a1", "b1", "c1", "d1", "a2", "b2", "c2", "e2", "a3", "b
 action: 15
 
 # State 6
+#         a b c d
+#      1 . . . . e
+#     2 . . . @ . f
+#    3 .[@]. . . . g
+#   4 . @ O . . O .
+#    5 . O . . . .
+#     6 . . . . .
+#      7 . . . .
 IsTerminal() = False
-ToString() = "        a b c d\n     1 . . . . e\n    2 . . . @ . f\n   3 .[@]. . . . g\n  4 . @ O . . O .\n   5 . O . . . .\n    6 . . . . .\n     7 . . . .\n"
 History() = [23, 10, 30, 22, 26, 15]
 HistoryString() = "23 10 30 22 26 15"
 IsChanceNode() = False
@@ -183,8 +232,15 @@ StringLegalActions() = ["a1", "b1", "c1", "d1", "a2", "b2", "c2", "e2", "a3", "c
 action: 11
 
 # State 7
+#         a b c d
+#      1 . . . . e
+#     2 . . . @[O] f
+#    3 . @ . . . . g
+#   4 . @ O . . O .
+#    5 . O . . . .
+#     6 . . . . .
+#      7 . . . .
 IsTerminal() = False
-ToString() = "        a b c d\n     1 . . . . e\n    2 . . . @[O] f\n   3 . @ . . . . g\n  4 . @ O . . O .\n   5 . O . . . .\n    6 . . . . .\n     7 . . . .\n"
 History() = [23, 10, 30, 22, 26, 15, 11]
 HistoryString() = "23 10 30 22 26 15 11"
 IsChanceNode() = False
@@ -205,8 +261,15 @@ StringLegalActions() = ["a1", "b1", "c1", "d1", "a2", "b2", "c2", "a3", "c3", "d
 action: 33
 
 # State 8
+#         a b c d
+#      1 . . . . e
+#     2 . . . @ O f
+#    3 . @ . . . . g
+#   4 . @ O . . O .
+#    5 . O . .[@].
+#     6 . . . . .
+#      7 . . . .
 IsTerminal() = False
-ToString() = "        a b c d\n     1 . . . . e\n    2 . . . @ O f\n   3 . @ . . . . g\n  4 . @ O . . O .\n   5 . O . .[@].\n    6 . . . . .\n     7 . . . .\n"
 History() = [23, 10, 30, 22, 26, 15, 11, 33]
 HistoryString() = "23 10 30 22 26 15 11 33"
 IsChanceNode() = False
@@ -227,8 +290,15 @@ StringLegalActions() = ["a1", "b1", "c1", "d1", "a2", "b2", "c2", "a3", "c3", "d
 action: 27
 
 # State 9
+#         a b c d
+#      1 . . . . e
+#     2 . . . @ O f
+#    3 . @ . . . . g
+#   4 . @ O . . O[O]
+#    5 . O . . @ .
+#     6 . . . . .
+#      7 . . . .
 IsTerminal() = False
-ToString() = "        a b c d\n     1 . . . . e\n    2 . . . @ O f\n   3 . @ . . . . g\n  4 . @ O . . O[O]\n   5 . O . . @ .\n    6 . . . . .\n     7 . . . .\n"
 History() = [23, 10, 30, 22, 26, 15, 11, 33, 27]
 HistoryString() = "23 10 30 22 26 15 11 33 27"
 IsChanceNode() = False
@@ -249,8 +319,15 @@ StringLegalActions() = ["a1", "b1", "c1", "d1", "a2", "b2", "c2", "a3", "c3", "d
 action: 32
 
 # State 10
+#         a b c d
+#      1 . . . . e
+#     2 . . . @ O f
+#    3 . @ . . . . g
+#   4 . @ O . . O O
+#    5 . O .[@]@ .
+#     6 . . . . .
+#      7 . . . .
 IsTerminal() = False
-ToString() = "        a b c d\n     1 . . . . e\n    2 . . . @ O f\n   3 . @ . . . . g\n  4 . @ O . . O O\n   5 . O .[@]@ .\n    6 . . . . .\n     7 . . . .\n"
 History() = [23, 10, 30, 22, 26, 15, 11, 33, 27, 32]
 HistoryString() = "23 10 30 22 26 15 11 33 27 32"
 IsChanceNode() = False
@@ -271,8 +348,15 @@ StringLegalActions() = ["a1", "b1", "c1", "d1", "a2", "b2", "c2", "a3", "c3", "d
 action: 8
 
 # State 11
+#         a b c d
+#      1 . . . . e
+#     2 .[O]. @ O f
+#    3 . @ . . . . g
+#   4 . @ O . . O O
+#    5 . O . @ @ .
+#     6 . . . . .
+#      7 . . . .
 IsTerminal() = False
-ToString() = "        a b c d\n     1 . . . . e\n    2 .[O]. @ O f\n   3 . @ . . . . g\n  4 . @ O . . O O\n   5 . O . @ @ .\n    6 . . . . .\n     7 . . . .\n"
 History() = [23, 10, 30, 22, 26, 15, 11, 33, 27, 32, 8]
 HistoryString() = "23 10 30 22 26 15 11 33 27 32 8"
 IsChanceNode() = False
@@ -293,8 +377,15 @@ StringLegalActions() = ["a1", "b1", "c1", "d1", "a2", "c2", "a3", "c3", "d3", "e
 action: 34
 
 # State 12
+#         a b c d
+#      1 . . . . e
+#     2 . O . @ O f
+#    3 . @ . . . . g
+#   4 . @ O . . O O
+#    5 . O . @ @[@]
+#     6 . . . . .
+#      7 . . . .
 IsTerminal() = False
-ToString() = "        a b c d\n     1 . . . . e\n    2 . O . @ O f\n   3 . @ . . . . g\n  4 . @ O . . O O\n   5 . O . @ @[@]\n    6 . . . . .\n     7 . . . .\n"
 History() = [23, 10, 30, 22, 26, 15, 11, 33, 27, 32, 8, 34]
 HistoryString() = "23 10 30 22 26 15 11 33 27 32 8 34"
 IsChanceNode() = False
@@ -315,8 +406,15 @@ StringLegalActions() = ["a1", "b1", "c1", "d1", "a2", "c2", "a3", "c3", "d3", "e
 action: 21
 
 # State 13
+#         a b c d
+#      1 . . . . e
+#     2 . O . @ O f
+#    3 . @ . . . . g
+#   4[O]@ O . . O O
+#    5 . O . @ @ @
+#     6 . . . . .
+#      7 . . . .
 IsTerminal() = False
-ToString() = "        a b c d\n     1 . . . . e\n    2 . O . @ O f\n   3 . @ . . . . g\n  4[O]@ O . . O O\n   5 . O . @ @ @\n    6 . . . . .\n     7 . . . .\n"
 History() = [23, 10, 30, 22, 26, 15, 11, 33, 27, 32, 8, 34, 21]
 HistoryString() = "23 10 30 22 26 15 11 33 27 32 8 34 21"
 IsChanceNode() = False
@@ -337,8 +435,15 @@ StringLegalActions() = ["a1", "b1", "c1", "d1", "a2", "c2", "a3", "c3", "d3", "e
 action: 14
 
 # State 14
+#         a b c d
+#      1 . . . . e
+#     2 . O . @ O f
+#    3[@]@ . . . . g
+#   4 O @ O . . O O
+#    5 . O . @ @ @
+#     6 . . . . .
+#      7 . . . .
 IsTerminal() = False
-ToString() = "        a b c d\n     1 . . . . e\n    2 . O . @ O f\n   3[@]@ . . . . g\n  4 O @ O . . O O\n   5 . O . @ @ @\n    6 . . . . .\n     7 . . . .\n"
 History() = [23, 10, 30, 22, 26, 15, 11, 33, 27, 32, 8, 34, 21, 14]
 HistoryString() = "23 10 30 22 26 15 11 33 27 32 8 34 21 14"
 IsChanceNode() = False
@@ -359,8 +464,15 @@ StringLegalActions() = ["a1", "b1", "c1", "d1", "a2", "c2", "c3", "d3", "e3", "f
 action: 24
 
 # State 15
+#         a b c d
+#      1 . . . . e
+#     2 . O . @ O f
+#    3 @ @ . . . . g
+#   4 O @ O[O]. O O
+#    5 . O . @ @ @
+#     6 . . . . .
+#      7 . . . .
 IsTerminal() = False
-ToString() = "        a b c d\n     1 . . . . e\n    2 . O . @ O f\n   3 @ @ . . . . g\n  4 O @ O[O]. O O\n   5 . O . @ @ @\n    6 . . . . .\n     7 . . . .\n"
 History() = [23, 10, 30, 22, 26, 15, 11, 33, 27, 32, 8, 34, 21, 14, 24]
 HistoryString() = "23 10 30 22 26 15 11 33 27 32 8 34 21 14 24"
 IsChanceNode() = False
@@ -381,8 +493,15 @@ StringLegalActions() = ["a1", "b1", "c1", "d1", "a2", "c2", "c3", "d3", "e3", "f
 action: 19
 
 # State 16
+#         a b c d
+#      1 . . . . e
+#     2 . O . @ O f
+#    3 @ @ . . .[@] g
+#   4 O @ O O . O O
+#    5 . O . @ @ @
+#     6 . . . . .
+#      7 . . . .
 IsTerminal() = False
-ToString() = "        a b c d\n     1 . . . . e\n    2 . O . @ O f\n   3 @ @ . . .[@] g\n  4 O @ O O . O O\n   5 . O . @ @ @\n    6 . . . . .\n     7 . . . .\n"
 History() = [23, 10, 30, 22, 26, 15, 11, 33, 27, 32, 8, 34, 21, 14, 24, 19]
 HistoryString() = "23 10 30 22 26 15 11 33 27 32 8 34 21 14 24 19"
 IsChanceNode() = False
@@ -403,8 +522,15 @@ StringLegalActions() = ["a1", "b1", "c1", "d1", "a2", "c2", "c3", "d3", "e3", "e
 action: 3
 
 # State 17
+#         a b c d
+#      1 . . .[O] e
+#     2 . O . @ O f
+#    3 @ @ . . . @ g
+#   4 O @ O O . O O
+#    5 . O . @ @ @
+#     6 . . . . .
+#      7 . . . .
 IsTerminal() = False
-ToString() = "        a b c d\n     1 . . .[O] e\n    2 . O . @ O f\n   3 @ @ . . . @ g\n  4 O @ O O . O O\n   5 . O . @ @ @\n    6 . . . . .\n     7 . . . .\n"
 History() = [23, 10, 30, 22, 26, 15, 11, 33, 27, 32, 8, 34, 21, 14, 24, 19, 3]
 HistoryString() = "23 10 30 22 26 15 11 33 27 32 8 34 21 14 24 19 3"
 IsChanceNode() = False
@@ -425,8 +551,15 @@ StringLegalActions() = ["a1", "b1", "c1", "a2", "c2", "c3", "d3", "e3", "e4", "b
 action: 40
 
 # State 18
+#         a b c d
+#      1 . . . O e
+#     2 . O . @ O f
+#    3 @ @ . . . @ g
+#   4 O @ O O . O O
+#    5 . O . @ @ @
+#     6 . . .[@].
+#      7 . . . .
 IsTerminal() = False
-ToString() = "        a b c d\n     1 . . . O e\n    2 . O . @ O f\n   3 @ @ . . . @ g\n  4 O @ O O . O O\n   5 . O . @ @ @\n    6 . . .[@].\n     7 . . . .\n"
 History() = [23, 10, 30, 22, 26, 15, 11, 33, 27, 32, 8, 34, 21, 14, 24, 19, 3, 40]
 HistoryString() = "23 10 30 22 26 15 11 33 27 32 8 34 21 14 24 19 3 40"
 IsChanceNode() = False
@@ -447,8 +580,15 @@ StringLegalActions() = ["a1", "b1", "c1", "a2", "c2", "c3", "d3", "e3", "e4", "b
 action: 31
 
 # State 19
+#         a b c d
+#      1 . . . O e
+#     2 . O . @ O f
+#    3 @ @ . . . @ g
+#   4 O @ O O . O O
+#    5 . O[O]@ @ @
+#     6 . . . @ .
+#      7 . . . .
 IsTerminal() = False
-ToString() = "        a b c d\n     1 . . . O e\n    2 . O . @ O f\n   3 @ @ . . . @ g\n  4 O @ O O . O O\n   5 . O[O]@ @ @\n    6 . . . @ .\n     7 . . . .\n"
 History() = [23, 10, 30, 22, 26, 15, 11, 33, 27, 32, 8, 34, 21, 14, 24, 19, 3, 40, 31]
 HistoryString() = "23 10 30 22 26 15 11 33 27 32 8 34 21 14 24 19 3 40 31"
 IsChanceNode() = False
@@ -469,8 +609,15 @@ StringLegalActions() = ["a1", "b1", "c1", "a2", "c2", "c3", "d3", "e3", "e4", "b
 action: 0
 
 # State 20
+#         a b c d
+#      1[@]. . O e
+#     2 . O . @ O f
+#    3 @ @ . . . @ g
+#   4 O @ O O . O O
+#    5 . O O @ @ @
+#     6 . . . @ .
+#      7 . . . .
 IsTerminal() = False
-ToString() = "        a b c d\n     1[@]. . O e\n    2 . O . @ O f\n   3 @ @ . . . @ g\n  4 O @ O O . O O\n   5 . O O @ @ @\n    6 . . . @ .\n     7 . . . .\n"
 History() = [23, 10, 30, 22, 26, 15, 11, 33, 27, 32, 8, 34, 21, 14, 24, 19, 3, 40, 31, 0]
 HistoryString() = "23 10 30 22 26 15 11 33 27 32 8 34 21 14 24 19 3 40 31 0"
 IsChanceNode() = False
@@ -491,8 +638,15 @@ StringLegalActions() = ["b1", "c1", "a2", "c2", "c3", "d3", "e3", "e4", "b5", "c
 action: 38
 
 # State 21
+#         a b c d
+#      1 @ . . O e
+#     2 . O . @ O f
+#    3 @ @ . . . @ g
+#   4 O @ O O . O O
+#    5 . O O @ @ @
+#     6 .[O]. @ .
+#      7 . . . .
 IsTerminal() = False
-ToString() = "        a b c d\n     1 @ . . O e\n    2 . O . @ O f\n   3 @ @ . . . @ g\n  4 O @ O O . O O\n   5 . O O @ @ @\n    6 .[O]. @ .\n     7 . . . .\n"
 History() = [23, 10, 30, 22, 26, 15, 11, 33, 27, 32, 8, 34, 21, 14, 24, 19, 3, 40, 31, 0, 38]
 HistoryString() = "23 10 30 22 26 15 11 33 27 32 8 34 21 14 24 19 3 40 31 0 38"
 IsChanceNode() = False
@@ -513,8 +667,15 @@ StringLegalActions() = ["b1", "c1", "a2", "c2", "c3", "d3", "e3", "e4", "b5", "c
 action: 45
 
 # State 22
+#         a b c d
+#      1 @ . . O e
+#     2 . O . @ O f
+#    3 @ @ . . . @ g
+#   4 O @ O O . O O
+#    5 . O O @ @ @
+#     6 . O . @ .
+#      7[@]. . .
 IsTerminal() = False
-ToString() = "        a b c d\n     1 @ . . O e\n    2 . O . @ O f\n   3 @ @ . . . @ g\n  4 O @ O O . O O\n   5 . O O @ @ @\n    6 . O . @ .\n     7[@]. . .\n"
 History() = [23, 10, 30, 22, 26, 15, 11, 33, 27, 32, 8, 34, 21, 14, 24, 19, 3, 40, 31, 0, 38, 45]
 HistoryString() = "23 10 30 22 26 15 11 33 27 32 8 34 21 14 24 19 3 40 31 0 38 45"
 IsChanceNode() = False
@@ -535,8 +696,15 @@ StringLegalActions() = ["b1", "c1", "a2", "c2", "c3", "d3", "e3", "e4", "b5", "c
 action: 39
 
 # State 23
+#         a b c d
+#      1 @ . . O e
+#     2 . O . @ O f
+#    3 @ @ . . . @ g
+#   4 O @ O O . O O
+#    5 . O O @ @ @
+#     6 . O[O]@ .
+#      7 @ . . .
 IsTerminal() = False
-ToString() = "        a b c d\n     1 @ . . O e\n    2 . O . @ O f\n   3 @ @ . . . @ g\n  4 O @ O O . O O\n   5 . O O @ @ @\n    6 . O[O]@ .\n     7 @ . . .\n"
 History() = [23, 10, 30, 22, 26, 15, 11, 33, 27, 32, 8, 34, 21, 14, 24, 19, 3, 40, 31, 0, 38, 45, 39]
 HistoryString() = "23 10 30 22 26 15 11 33 27 32 8 34 21 14 24 19 3 40 31 0 38 45 39"
 IsChanceNode() = False
@@ -557,8 +725,15 @@ StringLegalActions() = ["b1", "c1", "a2", "c2", "c3", "d3", "e3", "e4", "b5", "c
 action: 18
 
 # State 24
+#         a b c d
+#      1 @ . . O e
+#     2 . O . @ O f
+#    3 @ @ . .[@]@ g
+#   4 O @ O O . O O
+#    5 . O O @ @ @
+#     6 . O O @ .
+#      7 @ . . .
 IsTerminal() = False
-ToString() = "        a b c d\n     1 @ . . O e\n    2 . O . @ O f\n   3 @ @ . .[@]@ g\n  4 O @ O O . O O\n   5 . O O @ @ @\n    6 . O O @ .\n     7 @ . . .\n"
 History() = [23, 10, 30, 22, 26, 15, 11, 33, 27, 32, 8, 34, 21, 14, 24, 19, 3, 40, 31, 0, 38, 45, 39, 18]
 HistoryString() = "23 10 30 22 26 15 11 33 27 32 8 34 21 14 24 19 3 40 31 0 38 45 39 18"
 IsChanceNode() = False
@@ -579,8 +754,15 @@ StringLegalActions() = ["b1", "c1", "a2", "c2", "c3", "d3", "e4", "b5", "c6", "g
 action: 47
 
 # State 25
+#         a b c d
+#      1 @ . . O e
+#     2 . O . @ O f
+#    3 @ @ . . @ @ g
+#   4 O @ O O . O O
+#    5 . O O @ @ @
+#     6 . O O @ .
+#      7 @ .[O].
 IsTerminal() = False
-ToString() = "        a b c d\n     1 @ . . O e\n    2 . O . @ O f\n   3 @ @ . . @ @ g\n  4 O @ O O . O O\n   5 . O O @ @ @\n    6 . O O @ .\n     7 @ .[O].\n"
 History() = [23, 10, 30, 22, 26, 15, 11, 33, 27, 32, 8, 34, 21, 14, 24, 19, 3, 40, 31, 0, 38, 45, 39, 18, 47]
 HistoryString() = "23 10 30 22 26 15 11 33 27 32 8 34 21 14 24 19 3 40 31 0 38 45 39 18 47"
 IsChanceNode() = False
@@ -601,8 +783,15 @@ StringLegalActions() = ["b1", "c1", "a2", "c2", "c3", "d3", "e4", "b5", "c6", "g
 action: 41
 
 # State 26
+#         a b c d
+#      1 @ . . O e
+#     2 . O . @ O f
+#    3 @ @ . . @ @ g
+#   4 O @ O O . O O
+#    5 . O O @ @ @
+#     6 . O O @[@]
+#      7 @ . O .
 IsTerminal() = False
-ToString() = "        a b c d\n     1 @ . . O e\n    2 . O . @ O f\n   3 @ @ . . @ @ g\n  4 O @ O O . O O\n   5 . O O @ @ @\n    6 . O O @[@]\n     7 @ . O .\n"
 History() = [23, 10, 30, 22, 26, 15, 11, 33, 27, 32, 8, 34, 21, 14, 24, 19, 3, 40, 31, 0, 38, 45, 39, 18, 47, 41]
 HistoryString() = "23 10 30 22 26 15 11 33 27 32 8 34 21 14 24 19 3 40 31 0 38 45 39 18 47 41"
 IsChanceNode() = False
@@ -623,8 +812,15 @@ StringLegalActions() = ["b1", "c1", "a2", "c2", "c3", "d3", "e4", "b5", "c6", "e
 action: 2
 
 # State 27
+#         a b c d
+#      1 @ .[O]O e
+#     2 . O . @ O f
+#    3 @ @ . . @ @ g
+#   4 O @ O O . O O
+#    5 . O O @ @ @
+#     6 . O O @ @
+#      7 @ . O .
 IsTerminal() = False
-ToString() = "        a b c d\n     1 @ .[O]O e\n    2 . O . @ O f\n   3 @ @ . . @ @ g\n  4 O @ O O . O O\n   5 . O O @ @ @\n    6 . O O @ @\n     7 @ . O .\n"
 History() = [23, 10, 30, 22, 26, 15, 11, 33, 27, 32, 8, 34, 21, 14, 24, 19, 3, 40, 31, 0, 38, 45, 39, 18, 47, 41, 2]
 HistoryString() = "23 10 30 22 26 15 11 33 27 32 8 34 21 14 24 19 3 40 31 0 38 45 39 18 47 41 2"
 IsChanceNode() = False
@@ -645,8 +841,15 @@ StringLegalActions() = ["b1", "a2", "c2", "c3", "d3", "e4", "b5", "c6", "e7", "g
 action: 9
 
 # State 28
+#         a b c d
+#      1 @ . O O e
+#     2 . O[@]@ O f
+#    3 @ @ . . @ @ g
+#   4 O @ O O . O O
+#    5 . O O @ @ @
+#     6 . O O @ @
+#      7 @ . O .
 IsTerminal() = False
-ToString() = "        a b c d\n     1 @ . O O e\n    2 . O[@]@ O f\n   3 @ @ . . @ @ g\n  4 O @ O O . O O\n   5 . O O @ @ @\n    6 . O O @ @\n     7 @ . O .\n"
 History() = [23, 10, 30, 22, 26, 15, 11, 33, 27, 32, 8, 34, 21, 14, 24, 19, 3, 40, 31, 0, 38, 45, 39, 18, 47, 41, 2, 9]
 HistoryString() = "23 10 30 22 26 15 11 33 27 32 8 34 21 14 24 19 3 40 31 0 38 45 39 18 47 41 2 9"
 IsChanceNode() = False
@@ -667,8 +870,15 @@ StringLegalActions() = ["b1", "a2", "c3", "d3", "e4", "b5", "c6", "e7", "g7"]
 action: 37
 
 # State 29
+#         a b c d
+#      1 @ . O O e
+#     2 . O @ @ O f
+#    3 @ @ . . @ @ g
+#   4 O @ O O . O O
+#    5 . O O @ @ @
+#     6[O]O O @ @
+#      7 @ . O .
 IsTerminal() = False
-ToString() = "        a b c d\n     1 @ . O O e\n    2 . O @ @ O f\n   3 @ @ . . @ @ g\n  4 O @ O O . O O\n   5 . O O @ @ @\n    6[O]O O @ @\n     7 @ . O .\n"
 History() = [23, 10, 30, 22, 26, 15, 11, 33, 27, 32, 8, 34, 21, 14, 24, 19, 3, 40, 31, 0, 38, 45, 39, 18, 47, 41, 2, 9, 37]
 HistoryString() = "23 10 30 22 26 15 11 33 27 32 8 34 21 14 24 19 3 40 31 0 38 45 39 18 47 41 2 9 37"
 IsChanceNode() = False
@@ -689,8 +899,15 @@ StringLegalActions() = ["b1", "a2", "c3", "d3", "e4", "b5", "e7", "g7"]
 action: 17
 
 # State 30
+#         a b c d
+#      1 @ . O O e
+#     2 . O @ @ O f
+#    3 @ @ .[@]@ @ g
+#   4 O @ O O . O O
+#    5 . O O @ @ @
+#     6 O O O @ @
+#      7 @ . O .
 IsTerminal() = False
-ToString() = "        a b c d\n     1 @ . O O e\n    2 . O @ @ O f\n   3 @ @ .[@]@ @ g\n  4 O @ O O . O O\n   5 . O O @ @ @\n    6 O O O @ @\n     7 @ . O .\n"
 History() = [23, 10, 30, 22, 26, 15, 11, 33, 27, 32, 8, 34, 21, 14, 24, 19, 3, 40, 31, 0, 38, 45, 39, 18, 47, 41, 2, 9, 37, 17]
 HistoryString() = "23 10 30 22 26 15 11 33 27 32 8 34 21 14 24 19 3 40 31 0 38 45 39 18 47 41 2 9 37 17"
 IsChanceNode() = False
@@ -711,8 +928,15 @@ StringLegalActions() = ["b1", "a2", "c3", "e4", "b5", "e7", "g7"]
 action: 1
 
 # State 31
+#         a b c d
+#      1 @[O]O O e
+#     2 . O @ @ O f
+#    3 @ @ . @ @ @ g
+#   4 O @ O O . O O
+#    5 . O O @ @ @
+#     6 O O O @ @
+#      7 @ . O .
 IsTerminal() = False
-ToString() = "        a b c d\n     1 @[O]O O e\n    2 . O @ @ O f\n   3 @ @ . @ @ @ g\n  4 O @ O O . O O\n   5 . O O @ @ @\n    6 O O O @ @\n     7 @ . O .\n"
 History() = [23, 10, 30, 22, 26, 15, 11, 33, 27, 32, 8, 34, 21, 14, 24, 19, 3, 40, 31, 0, 38, 45, 39, 18, 47, 41, 2, 9, 37, 17, 1]
 HistoryString() = "23 10 30 22 26 15 11 33 27 32 8 34 21 14 24 19 3 40 31 0 38 45 39 18 47 41 2 9 37 17 1"
 IsChanceNode() = False
@@ -733,8 +957,15 @@ StringLegalActions() = ["a2", "c3", "e4", "b5", "e7", "g7"]
 action: 48
 
 # State 32
+#         a b c d
+#      1 @ O O O e
+#     2 . O @ @ O f
+#    3 @ @ . @ @ @ g
+#   4 O @ O O . O O
+#    5 . O O @ @ @
+#     6 O O O @ @
+#      7 @ . O[@]
 IsTerminal() = False
-ToString() = "        a b c d\n     1 @ O O O e\n    2 . O @ @ O f\n   3 @ @ . @ @ @ g\n  4 O @ O O . O O\n   5 . O O @ @ @\n    6 O O O @ @\n     7 @ . O[@]\n"
 History() = [23, 10, 30, 22, 26, 15, 11, 33, 27, 32, 8, 34, 21, 14, 24, 19, 3, 40, 31, 0, 38, 45, 39, 18, 47, 41, 2, 9, 37, 17, 1, 48]
 HistoryString() = "23 10 30 22 26 15 11 33 27 32 8 34 21 14 24 19 3 40 31 0 38 45 39 18 47 41 2 9 37 17 1 48"
 IsChanceNode() = False
@@ -755,8 +986,15 @@ StringLegalActions() = ["a2", "c3", "e4", "b5", "e7"]
 action: 7
 
 # State 33
+#         a b c d
+#      1 @ O O O e
+#     2[O]O @ @ O f
+#    3 @ @ . @ @ @ g
+#   4 O @ O O . O O
+#    5 . O O @ @ @
+#     6 O O O @ @
+#      7 @ . O @
 IsTerminal() = True
-ToString() = "        a b c d\n     1 @ O O O e\n    2[O]O @ @ O f\n   3 @ @ . @ @ @ g\n  4 O @ O O . O O\n   5 . O O @ @ @\n    6 O O O @ @\n     7 @ . O @\n"
 History() = [23, 10, 30, 22, 26, 15, 11, 33, 27, 32, 8, 34, 21, 14, 24, 19, 3, 40, 31, 0, 38, 45, 39, 18, 47, 41, 2, 9, 37, 17, 1, 48, 7]
 HistoryString() = "23 10 30 22 26 15 11 33 27 32 8 34 21 14 24 19 3 40 31 0 38 45 39 18 47 41 2 9 37 17 1 48 7"
 IsChanceNode() = False

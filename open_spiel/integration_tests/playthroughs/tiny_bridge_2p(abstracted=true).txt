@@ -31,8 +31,8 @@ MaxGameLength() = 8
 ToString() = "tiny_bridge_2p(abstracted=True)"
 
 # State 0
+# W:?? E:??
 IsTerminal() = False
-ToString() = "W:?? E:??"
 History() = []
 HistoryString() = ""
 IsChanceNode() = True
@@ -54,8 +54,8 @@ StringLegalActions() = ["HQHJ", "HKHJ", "HAHJ", "SJHJ", "SQHJ", "SKHJ", "SAHJ", 
 action: 15
 
 # State 1
+# W:SKHJ E:??
 IsTerminal() = False
-ToString() = "W:SKHJ E:??"
 History() = [15]
 HistoryString() = "15"
 IsChanceNode() = True
@@ -77,8 +77,8 @@ StringLegalActions() = ["HKHQ", "HAHQ", "SJHQ", "SQHQ", "SAHQ", "HAHK", "SJHK", 
 action: 14
 
 # State 2
+# W:SKHJ E:SQSJ
 IsTerminal() = False
-ToString() = "W:SKHJ E:SQSJ"
 History() = [15, 14]
 HistoryString() = "15 14"
 IsChanceNode() = False
@@ -101,8 +101,8 @@ StringLegalActions() = ["Pass", "1H", "1S", "1NT", "2H", "2S", "2NT"]
 action: 5
 
 # State 3
+# W:SKHJ E:SQSJ 2S
 IsTerminal() = False
-ToString() = "W:SKHJ E:SQSJ 2S"
 History() = [15, 14, 5]
 HistoryString() = "15 14 5"
 IsChanceNode() = False
@@ -125,8 +125,8 @@ StringLegalActions() = ["Pass", "2NT"]
 action: 6
 
 # State 4
+# W:SKHJ E:SQSJ 2S-2NT
 IsTerminal() = False
-ToString() = "W:SKHJ E:SQSJ 2S-2NT"
 History() = [15, 14, 5, 6]
 HistoryString() = "15 14 5 6"
 IsChanceNode() = False
@@ -149,8 +149,8 @@ StringLegalActions() = ["Pass"]
 action: 0
 
 # State 5
+# W:SKHJ E:SQSJ 2S-2NT-Pass
 IsTerminal() = True
-ToString() = "W:SKHJ E:SQSJ 2S-2NT-Pass"
 History() = [15, 14, 5, 6, 0]
 HistoryString() = "15 14 5 6 0"
 IsChanceNode() = False

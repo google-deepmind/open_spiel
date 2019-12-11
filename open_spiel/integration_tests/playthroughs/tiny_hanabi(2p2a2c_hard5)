@@ -32,7 +32,6 @@ ToString() = "tiny_hanabi(num_actions=2,num_chance=2,num_players=2,payoff=3;0;0;
 
 # State 0
 IsTerminal() = False
-ToString() = ""
 History() = []
 HistoryString() = ""
 IsChanceNode() = True
@@ -54,8 +53,8 @@ StringLegalActions() = ["d0", "d1"]
 action: 1
 
 # State 1
+# p0:d1
 IsTerminal() = False
-ToString() = "p0:d1"
 History() = [1]
 HistoryString() = "1"
 IsChanceNode() = True
@@ -77,8 +76,8 @@ StringLegalActions() = ["d0", "d1"]
 action: 1
 
 # State 2
+# p0:d1 p1:d1
 IsTerminal() = False
-ToString() = "p0:d1 p1:d1"
 History() = [1, 1]
 HistoryString() = "1 1"
 IsChanceNode() = False
@@ -101,8 +100,8 @@ StringLegalActions() = ["p0a0", "p0a1"]
 action: 0
 
 # State 3
+# p0:d1 p1:d1 p0:a0
 IsTerminal() = False
-ToString() = "p0:d1 p1:d1 p0:a0"
 History() = [1, 1, 0]
 HistoryString() = "1 1 0"
 IsChanceNode() = False
@@ -125,8 +124,8 @@ StringLegalActions() = ["p1a0", "p1a1"]
 action: 1
 
 # State 4
+# p0:d1 p1:d1 p0:a0 p1:a1
 IsTerminal() = True
-ToString() = "p0:d1 p1:d1 p0:a0 p1:a1"
 History() = [1, 1, 0, 1]
 HistoryString() = "1 1 0 1"
 IsChanceNode() = False

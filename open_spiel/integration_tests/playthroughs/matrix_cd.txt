@@ -29,8 +29,13 @@ MaxGameLength() = 1
 ToString() = "matrix_cd()"
 
 # State 0
+# Terminal? false
+# Row actions: Dare Chicken 
+# Col actions: Dare Chicken 
+# Utility matrix:
+# 0,0 4,1 
+# 1,4 3,3 
 IsTerminal() = False
-ToString() = "Terminal? false\nRow actions: Dare Chicken \nCol actions: Dare Chicken \nUtility matrix:\n0,0 4,1 \n1,4 3,3 \n"
 History() = []
 HistoryString() = ""
 IsChanceNode() = False
@@ -51,8 +56,15 @@ StringLegalActions(1) = ["Dare", "Chicken"]
 actions: [0, 1]
 
 # State 1
+# Terminal? true
+# History: 0 1
+# Returns: 4,1
+# Row actions: 
+# Col actions: 
+# Utility matrix:
+# 0,0 4,1 
+# 1,4 3,3 
 IsTerminal() = True
-ToString() = "Terminal? true\nHistory: 0 1\nReturns: 4,1\nRow actions: \nCol actions: \nUtility matrix:\n0,0 4,1 \n1,4 3,3 \n"
 History() = [0, 1]
 HistoryString() = "0 1"
 IsChanceNode() = False

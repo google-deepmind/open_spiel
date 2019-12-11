@@ -139,8 +139,9 @@ def playthrough_lines(game_string, seed, alsologtostdout=False):
   while True:
     add_line("")
     add_line("# State {}".format(state_idx))
+    for line in str(state).splitlines():
+      add_line("# {}".format(line))
     add_line("IsTerminal() = {}".format(state.is_terminal()))
-    add_line('ToString() = "{}"'.format(_escape(str(state))))
     add_line("History() = {}".format([int(a) for a in state.history()]))
     add_line('HistoryString() = "{}"'.format(state.history_str()))
     add_line("IsChanceNode() = {}".format(state.is_chance_node()))

@@ -31,8 +31,13 @@ MaxGameLength() = 4
 ToString() = "goofspiel(imp_info=True,num_cards=4,points_order=descending)"
 
 # State 0
+# P0 hand: 1 2 3 4 
+# P1 hand: 1 2 3 4 
+# P0 actions: 
+# P1 actions: 
+# Point card sequence: 
+# Points: 0 0 
 IsTerminal() = False
-ToString() = "P0 hand: 1 2 3 4 \nP1 hand: 1 2 3 4 \nP0 actions: \nP1 actions: \nPoint card sequence: \nPoints: 0 0 \n"
 History() = []
 HistoryString() = ""
 IsChanceNode() = False
@@ -57,8 +62,13 @@ StringLegalActions(1) = ["[P1]Bid: 1", "[P1]Bid: 2", "[P1]Bid: 3", "[P1]Bid: 4"]
 actions: [2, 3]
 
 # State 1
+# P0 hand: 1 2 4 
+# P1 hand: 1 2 3 
+# P0 actions: 2 
+# P1 actions: 3 
+# Point card sequence: 
+# Points: 0 4 
 IsTerminal() = False
-ToString() = "P0 hand: 1 2 4 \nP1 hand: 1 2 3 \nP0 actions: 2 \nP1 actions: 3 \nPoint card sequence: \nPoints: 0 4 \n"
 History() = [2, 3]
 HistoryString() = "2 3"
 IsChanceNode() = False
@@ -83,8 +93,13 @@ StringLegalActions(1) = ["[P1]Bid: 1", "[P1]Bid: 2", "[P1]Bid: 3"]
 actions: [1, 0]
 
 # State 2
+# P0 hand: 1 4 
+# P1 hand: 2 3 
+# P0 actions: 2 1 
+# P1 actions: 3 0 
+# Point card sequence: 
+# Points: 3 4 
 IsTerminal() = False
-ToString() = "P0 hand: 1 4 \nP1 hand: 2 3 \nP0 actions: 2 1 \nP1 actions: 3 0 \nPoint card sequence: \nPoints: 3 4 \n"
 History() = [2, 3, 1, 0]
 HistoryString() = "2 3 1 0"
 IsChanceNode() = False
@@ -109,8 +124,13 @@ StringLegalActions(1) = ["[P1]Bid: 2", "[P1]Bid: 3"]
 actions: [3, 1]
 
 # State 3
+# P0 hand: 
+# P1 hand: 
+# P0 actions: 2 1 3 0 
+# P1 actions: 3 0 1 2 
+# Point card sequence: 
+# Points: 5 5 
 IsTerminal() = True
-ToString() = "P0 hand: \nP1 hand: \nP0 actions: 2 1 3 0 \nP1 actions: 3 0 1 2 \nPoint card sequence: \nPoints: 5 5 \n"
 History() = [2, 3, 1, 0, 3, 1]
 HistoryString() = "2 3 1 0 3 1"
 IsChanceNode() = False

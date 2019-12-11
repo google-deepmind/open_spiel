@@ -27,8 +27,23 @@ MaxGameLength() = 20
 ToString() = "coin_game()"
 
 # State 0
+# phase=AssignPreferences
+# preferences=
+# moves=0
+#         a b c 
+# player0 0 0 0 
+# player1 0 0 0 
+# +--------+
+# |        |
+# |        |
+# |        |
+# |        |
+# |        |
+# |        |
+# |        |
+# |        |
+# +--------+
 IsTerminal() = False
-ToString() = "phase=AssignPreferences\npreferences=\nmoves=0\n        a b c \nplayer0 0 0 0 \nplayer1 0 0 0 \n+--------+\n|        |\n|        |\n|        |\n|        |\n|        |\n|        |\n|        |\n|        |\n+--------+\n"
 History() = []
 HistoryString() = ""
 IsChanceNode() = True
@@ -44,8 +59,23 @@ StringLegalActions() = ["0", "1", "2"]
 action: 1
 
 # State 1
+# phase=AssignPreferences
+# preferences=0:b 
+# moves=0
+#         a b c 
+# player0 0 0 0 
+# player1 0 0 0 
+# +--------+
+# |        |
+# |        |
+# |        |
+# |        |
+# |        |
+# |        |
+# |        |
+# |        |
+# +--------+
 IsTerminal() = False
-ToString() = "phase=AssignPreferences\npreferences=0:b \nmoves=0\n        a b c \nplayer0 0 0 0 \nplayer1 0 0 0 \n+--------+\n|        |\n|        |\n|        |\n|        |\n|        |\n|        |\n|        |\n|        |\n+--------+\n"
 History() = [1]
 HistoryString() = "1"
 IsChanceNode() = True
@@ -61,8 +91,23 @@ StringLegalActions() = ["0", "2"]
 action: 2
 
 # State 2
+# phase=DeployPlayers
+# preferences=0:b 1:c 
+# moves=0
+#         a b c 
+# player0 0 0 0 
+# player1 0 0 0 
+# +--------+
+# |        |
+# |        |
+# |        |
+# |        |
+# |        |
+# |        |
+# |        |
+# |        |
+# +--------+
 IsTerminal() = False
-ToString() = "phase=DeployPlayers\npreferences=0:b 1:c \nmoves=0\n        a b c \nplayer0 0 0 0 \nplayer1 0 0 0 \n+--------+\n|        |\n|        |\n|        |\n|        |\n|        |\n|        |\n|        |\n|        |\n+--------+\n"
 History() = [1, 2]
 HistoryString() = "1 2"
 IsChanceNode() = True
@@ -78,8 +123,23 @@ StringLegalActions() = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", 
 action: 62
 
 # State 3
+# phase=DeployPlayers
+# preferences=0:b 1:c 
+# moves=0
+#         a b c 
+# player0 0 0 0 
+# player1 0 0 0 
+# +--------+
+# |        |
+# |        |
+# |        |
+# |        |
+# |        |
+# |        |
+# |        |
+# |      0 |
+# +--------+
 IsTerminal() = False
-ToString() = "phase=DeployPlayers\npreferences=0:b 1:c \nmoves=0\n        a b c \nplayer0 0 0 0 \nplayer1 0 0 0 \n+--------+\n|        |\n|        |\n|        |\n|        |\n|        |\n|        |\n|        |\n|      0 |\n+--------+\n"
 History() = [1, 2, 62]
 HistoryString() = "1 2 62"
 IsChanceNode() = True
@@ -95,8 +155,23 @@ StringLegalActions() = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", 
 action: 50
 
 # State 4
+# phase=DeployCoins
+# preferences=0:b 1:c 
+# moves=0
+#         a b c 
+# player0 0 0 0 
+# player1 0 0 0 
+# +--------+
+# |        |
+# |        |
+# |        |
+# |        |
+# |        |
+# |        |
+# |  1     |
+# |      0 |
+# +--------+
 IsTerminal() = False
-ToString() = "phase=DeployCoins\npreferences=0:b 1:c \nmoves=0\n        a b c \nplayer0 0 0 0 \nplayer1 0 0 0 \n+--------+\n|        |\n|        |\n|        |\n|        |\n|        |\n|        |\n|  1     |\n|      0 |\n+--------+\n"
 History() = [1, 2, 62, 50]
 HistoryString() = "1 2 62 50"
 IsChanceNode() = True
@@ -112,8 +187,23 @@ StringLegalActions() = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", 
 action: 34
 
 # State 5
+# phase=DeployCoins
+# preferences=0:b 1:c 
+# moves=0
+#         a b c 
+# player0 0 0 0 
+# player1 0 0 0 
+# +--------+
+# |        |
+# |        |
+# |        |
+# |        |
+# |  a     |
+# |        |
+# |  1     |
+# |      0 |
+# +--------+
 IsTerminal() = False
-ToString() = "phase=DeployCoins\npreferences=0:b 1:c \nmoves=0\n        a b c \nplayer0 0 0 0 \nplayer1 0 0 0 \n+--------+\n|        |\n|        |\n|        |\n|        |\n|  a     |\n|        |\n|  1     |\n|      0 |\n+--------+\n"
 History() = [1, 2, 62, 50, 34]
 HistoryString() = "1 2 62 50 34"
 IsChanceNode() = True
@@ -129,8 +219,23 @@ StringLegalActions() = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", 
 action: 9
 
 # State 6
+# phase=DeployCoins
+# preferences=0:b 1:c 
+# moves=0
+#         a b c 
+# player0 0 0 0 
+# player1 0 0 0 
+# +--------+
+# |        |
+# | a      |
+# |        |
+# |        |
+# |  a     |
+# |        |
+# |  1     |
+# |      0 |
+# +--------+
 IsTerminal() = False
-ToString() = "phase=DeployCoins\npreferences=0:b 1:c \nmoves=0\n        a b c \nplayer0 0 0 0 \nplayer1 0 0 0 \n+--------+\n|        |\n| a      |\n|        |\n|        |\n|  a     |\n|        |\n|  1     |\n|      0 |\n+--------+\n"
 History() = [1, 2, 62, 50, 34, 9]
 HistoryString() = "1 2 62 50 34 9"
 IsChanceNode() = True
@@ -146,8 +251,23 @@ StringLegalActions() = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "10", "11",
 action: 49
 
 # State 7
+# phase=DeployCoins
+# preferences=0:b 1:c 
+# moves=0
+#         a b c 
+# player0 0 0 0 
+# player1 0 0 0 
+# +--------+
+# |        |
+# | a      |
+# |        |
+# |        |
+# |  a     |
+# |        |
+# | a1     |
+# |      0 |
+# +--------+
 IsTerminal() = False
-ToString() = "phase=DeployCoins\npreferences=0:b 1:c \nmoves=0\n        a b c \nplayer0 0 0 0 \nplayer1 0 0 0 \n+--------+\n|        |\n| a      |\n|        |\n|        |\n|  a     |\n|        |\n| a1     |\n|      0 |\n+--------+\n"
 History() = [1, 2, 62, 50, 34, 9, 49]
 HistoryString() = "1 2 62 50 34 9 49"
 IsChanceNode() = True
@@ -163,8 +283,23 @@ StringLegalActions() = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "10", "11",
 action: 25
 
 # State 8
+# phase=DeployCoins
+# preferences=0:b 1:c 
+# moves=0
+#         a b c 
+# player0 0 0 0 
+# player1 0 0 0 
+# +--------+
+# |        |
+# | a      |
+# |        |
+# | a      |
+# |  a     |
+# |        |
+# | a1     |
+# |      0 |
+# +--------+
 IsTerminal() = False
-ToString() = "phase=DeployCoins\npreferences=0:b 1:c \nmoves=0\n        a b c \nplayer0 0 0 0 \nplayer1 0 0 0 \n+--------+\n|        |\n| a      |\n|        |\n| a      |\n|  a     |\n|        |\n| a1     |\n|      0 |\n+--------+\n"
 History() = [1, 2, 62, 50, 34, 9, 49, 25]
 HistoryString() = "1 2 62 50 34 9 49 25"
 IsChanceNode() = True
@@ -180,8 +315,23 @@ StringLegalActions() = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "10", "11",
 action: 60
 
 # State 9
+# phase=DeployCoins
+# preferences=0:b 1:c 
+# moves=0
+#         a b c 
+# player0 0 0 0 
+# player1 0 0 0 
+# +--------+
+# |        |
+# | a      |
+# |        |
+# | a      |
+# |  a     |
+# |        |
+# | a1     |
+# |    b 0 |
+# +--------+
 IsTerminal() = False
-ToString() = "phase=DeployCoins\npreferences=0:b 1:c \nmoves=0\n        a b c \nplayer0 0 0 0 \nplayer1 0 0 0 \n+--------+\n|        |\n| a      |\n|        |\n| a      |\n|  a     |\n|        |\n| a1     |\n|    b 0 |\n+--------+\n"
 History() = [1, 2, 62, 50, 34, 9, 49, 25, 60]
 HistoryString() = "1 2 62 50 34 9 49 25 60"
 IsChanceNode() = True
@@ -197,8 +347,23 @@ StringLegalActions() = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "10", "11",
 action: 42
 
 # State 10
+# phase=DeployCoins
+# preferences=0:b 1:c 
+# moves=0
+#         a b c 
+# player0 0 0 0 
+# player1 0 0 0 
+# +--------+
+# |        |
+# | a      |
+# |        |
+# | a      |
+# |  a     |
+# |  b     |
+# | a1     |
+# |    b 0 |
+# +--------+
 IsTerminal() = False
-ToString() = "phase=DeployCoins\npreferences=0:b 1:c \nmoves=0\n        a b c \nplayer0 0 0 0 \nplayer1 0 0 0 \n+--------+\n|        |\n| a      |\n|        |\n| a      |\n|  a     |\n|  b     |\n| a1     |\n|    b 0 |\n+--------+\n"
 History() = [1, 2, 62, 50, 34, 9, 49, 25, 60, 42]
 HistoryString() = "1 2 62 50 34 9 49 25 60 42"
 IsChanceNode() = True
@@ -214,8 +379,23 @@ StringLegalActions() = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "10", "11",
 action: 55
 
 # State 11
+# phase=DeployCoins
+# preferences=0:b 1:c 
+# moves=0
+#         a b c 
+# player0 0 0 0 
+# player1 0 0 0 
+# +--------+
+# |        |
+# | a      |
+# |        |
+# | a      |
+# |  a     |
+# |  b     |
+# | a1    b|
+# |    b 0 |
+# +--------+
 IsTerminal() = False
-ToString() = "phase=DeployCoins\npreferences=0:b 1:c \nmoves=0\n        a b c \nplayer0 0 0 0 \nplayer1 0 0 0 \n+--------+\n|        |\n| a      |\n|        |\n| a      |\n|  a     |\n|  b     |\n| a1    b|\n|    b 0 |\n+--------+\n"
 History() = [1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55]
 HistoryString() = "1 2 62 50 34 9 49 25 60 42 55"
 IsChanceNode() = True
@@ -231,8 +411,23 @@ StringLegalActions() = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "10", "11",
 action: 19
 
 # State 12
+# phase=DeployCoins
+# preferences=0:b 1:c 
+# moves=0
+#         a b c 
+# player0 0 0 0 
+# player1 0 0 0 
+# +--------+
+# |        |
+# | a      |
+# |   b    |
+# | a      |
+# |  a     |
+# |  b     |
+# | a1    b|
+# |    b 0 |
+# +--------+
 IsTerminal() = False
-ToString() = "phase=DeployCoins\npreferences=0:b 1:c \nmoves=0\n        a b c \nplayer0 0 0 0 \nplayer1 0 0 0 \n+--------+\n|        |\n| a      |\n|   b    |\n| a      |\n|  a     |\n|  b     |\n| a1    b|\n|    b 0 |\n+--------+\n"
 History() = [1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19]
 HistoryString() = "1 2 62 50 34 9 49 25 60 42 55 19"
 IsChanceNode() = True
@@ -248,8 +443,23 @@ StringLegalActions() = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "10", "11",
 action: 17
 
 # State 13
+# phase=DeployCoins
+# preferences=0:b 1:c 
+# moves=0
+#         a b c 
+# player0 0 0 0 
+# player1 0 0 0 
+# +--------+
+# |        |
+# | a      |
+# | c b    |
+# | a      |
+# |  a     |
+# |  b     |
+# | a1    b|
+# |    b 0 |
+# +--------+
 IsTerminal() = False
-ToString() = "phase=DeployCoins\npreferences=0:b 1:c \nmoves=0\n        a b c \nplayer0 0 0 0 \nplayer1 0 0 0 \n+--------+\n|        |\n| a      |\n| c b    |\n| a      |\n|  a     |\n|  b     |\n| a1    b|\n|    b 0 |\n+--------+\n"
 History() = [1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17]
 HistoryString() = "1 2 62 50 34 9 49 25 60 42 55 19 17"
 IsChanceNode() = True
@@ -265,8 +475,23 @@ StringLegalActions() = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "10", "11",
 action: 44
 
 # State 14
+# phase=DeployCoins
+# preferences=0:b 1:c 
+# moves=0
+#         a b c 
+# player0 0 0 0 
+# player1 0 0 0 
+# +--------+
+# |        |
+# | a      |
+# | c b    |
+# | a      |
+# |  a     |
+# |  b c   |
+# | a1    b|
+# |    b 0 |
+# +--------+
 IsTerminal() = False
-ToString() = "phase=DeployCoins\npreferences=0:b 1:c \nmoves=0\n        a b c \nplayer0 0 0 0 \nplayer1 0 0 0 \n+--------+\n|        |\n| a      |\n| c b    |\n| a      |\n|  a     |\n|  b c   |\n| a1    b|\n|    b 0 |\n+--------+\n"
 History() = [1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44]
 HistoryString() = "1 2 62 50 34 9 49 25 60 42 55 19 17 44"
 IsChanceNode() = True
@@ -282,8 +507,23 @@ StringLegalActions() = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "10", "11",
 action: 35
 
 # State 15
+# phase=DeployCoins
+# preferences=0:b 1:c 
+# moves=0
+#         a b c 
+# player0 0 0 0 
+# player1 0 0 0 
+# +--------+
+# |        |
+# | a      |
+# | c b    |
+# | a      |
+# |  ac    |
+# |  b c   |
+# | a1    b|
+# |    b 0 |
+# +--------+
 IsTerminal() = False
-ToString() = "phase=DeployCoins\npreferences=0:b 1:c \nmoves=0\n        a b c \nplayer0 0 0 0 \nplayer1 0 0 0 \n+--------+\n|        |\n| a      |\n| c b    |\n| a      |\n|  ac    |\n|  b c   |\n| a1    b|\n|    b 0 |\n+--------+\n"
 History() = [1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35]
 HistoryString() = "1 2 62 50 34 9 49 25 60 42 55 19 17 44 35"
 IsChanceNode() = True
@@ -299,8 +539,23 @@ StringLegalActions() = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "10", "11",
 action: 47
 
 # State 16
+# phase=Play
+# preferences=0:b 1:c 
+# moves=0
+#         a b c 
+# player0 0 0 0 
+# player1 0 0 0 
+# +--------+
+# |        |
+# | a      |
+# | c b    |
+# | a      |
+# |  ac    |
+# |  b c  c|
+# | a1    b|
+# |    b 0 |
+# +--------+
 IsTerminal() = False
-ToString() = "phase=Play\npreferences=0:b 1:c \nmoves=0\n        a b c \nplayer0 0 0 0 \nplayer1 0 0 0 \n+--------+\n|        |\n| a      |\n| c b    |\n| a      |\n|  ac    |\n|  b c  c|\n| a1    b|\n|    b 0 |\n+--------+\n"
 History() = [1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47]
 HistoryString() = "1 2 62 50 34 9 49 25 60 42 55 19 17 44 35 47"
 IsChanceNode() = False
@@ -317,8 +572,23 @@ StringLegalActions() = ["up", "down", "left", "right", "stand"]
 action: 4
 
 # State 17
+# phase=Play
+# preferences=0:b 1:c 
+# moves=1
+#         a b c 
+# player0 0 0 0 
+# player1 0 0 0 
+# +--------+
+# |        |
+# | a      |
+# | c b    |
+# | a      |
+# |  ac    |
+# |  b c  c|
+# | a1    b|
+# |    b 0 |
+# +--------+
 IsTerminal() = False
-ToString() = "phase=Play\npreferences=0:b 1:c \nmoves=1\n        a b c \nplayer0 0 0 0 \nplayer1 0 0 0 \n+--------+\n|        |\n| a      |\n| c b    |\n| a      |\n|  ac    |\n|  b c  c|\n| a1    b|\n|    b 0 |\n+--------+\n"
 History() = [1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4]
 HistoryString() = "1 2 62 50 34 9 49 25 60 42 55 19 17 44 35 47 4"
 IsChanceNode() = False
@@ -335,8 +605,23 @@ StringLegalActions() = ["up", "down", "left", "right", "stand"]
 action: 0
 
 # State 18
+# phase=Play
+# preferences=0:b 1:c 
+# moves=2
+#         a b c 
+# player0 0 0 0 
+# player1 0 1 0 
+# +--------+
+# |        |
+# | a      |
+# | c b    |
+# | a      |
+# |  ac    |
+# |  1 c  c|
+# | a     b|
+# |    b 0 |
+# +--------+
 IsTerminal() = False
-ToString() = "phase=Play\npreferences=0:b 1:c \nmoves=2\n        a b c \nplayer0 0 0 0 \nplayer1 0 1 0 \n+--------+\n|        |\n| a      |\n| c b    |\n| a      |\n|  ac    |\n|  1 c  c|\n| a     b|\n|    b 0 |\n+--------+\n"
 History() = [1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4, 0]
 HistoryString() = "1 2 62 50 34 9 49 25 60 42 55 19 17 44 35 47 4 0"
 IsChanceNode() = False
@@ -353,8 +638,23 @@ StringLegalActions() = ["up", "down", "left", "right", "stand"]
 action: 3
 
 # State 19
+# phase=Play
+# preferences=0:b 1:c 
+# moves=3
+#         a b c 
+# player0 0 0 0 
+# player1 0 1 0 
+# +--------+
+# |        |
+# | a      |
+# | c b    |
+# | a      |
+# |  ac    |
+# |  1 c  c|
+# | a     b|
+# |    b  0|
+# +--------+
 IsTerminal() = False
-ToString() = "phase=Play\npreferences=0:b 1:c \nmoves=3\n        a b c \nplayer0 0 0 0 \nplayer1 0 1 0 \n+--------+\n|        |\n| a      |\n| c b    |\n| a      |\n|  ac    |\n|  1 c  c|\n| a     b|\n|    b  0|\n+--------+\n"
 History() = [1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4, 0, 3]
 HistoryString() = "1 2 62 50 34 9 49 25 60 42 55 19 17 44 35 47 4 0 3"
 IsChanceNode() = False
@@ -371,8 +671,23 @@ StringLegalActions() = ["up", "down", "left", "right", "stand"]
 action: 3
 
 # State 20
+# phase=Play
+# preferences=0:b 1:c 
+# moves=4
+#         a b c 
+# player0 0 0 0 
+# player1 0 1 0 
+# +--------+
+# |        |
+# | a      |
+# | c b    |
+# | a      |
+# |  ac    |
+# |   1c  c|
+# | a     b|
+# |    b  0|
+# +--------+
 IsTerminal() = False
-ToString() = "phase=Play\npreferences=0:b 1:c \nmoves=4\n        a b c \nplayer0 0 0 0 \nplayer1 0 1 0 \n+--------+\n|        |\n| a      |\n| c b    |\n| a      |\n|  ac    |\n|   1c  c|\n| a     b|\n|    b  0|\n+--------+\n"
 History() = [1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4, 0, 3, 3]
 HistoryString() = "1 2 62 50 34 9 49 25 60 42 55 19 17 44 35 47 4 0 3 3"
 IsChanceNode() = False
@@ -389,8 +704,23 @@ StringLegalActions() = ["up", "down", "left", "right", "stand"]
 action: 2
 
 # State 21
+# phase=Play
+# preferences=0:b 1:c 
+# moves=5
+#         a b c 
+# player0 0 0 0 
+# player1 0 1 0 
+# +--------+
+# |        |
+# | a      |
+# | c b    |
+# | a      |
+# |  ac    |
+# |   1c  c|
+# | a     b|
+# |    b 0 |
+# +--------+
 IsTerminal() = False
-ToString() = "phase=Play\npreferences=0:b 1:c \nmoves=5\n        a b c \nplayer0 0 0 0 \nplayer1 0 1 0 \n+--------+\n|        |\n| a      |\n| c b    |\n| a      |\n|  ac    |\n|   1c  c|\n| a     b|\n|    b 0 |\n+--------+\n"
 History() = [1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4, 0, 3, 3, 2]
 HistoryString() = "1 2 62 50 34 9 49 25 60 42 55 19 17 44 35 47 4 0 3 3 2"
 IsChanceNode() = False
@@ -407,8 +737,23 @@ StringLegalActions() = ["up", "down", "left", "right", "stand"]
 action: 1
 
 # State 22
+# phase=Play
+# preferences=0:b 1:c 
+# moves=6
+#         a b c 
+# player0 0 0 0 
+# player1 0 1 0 
+# +--------+
+# |        |
+# | a      |
+# | c b    |
+# | a      |
+# |  ac    |
+# |    c  c|
+# | a 1   b|
+# |    b 0 |
+# +--------+
 IsTerminal() = False
-ToString() = "phase=Play\npreferences=0:b 1:c \nmoves=6\n        a b c \nplayer0 0 0 0 \nplayer1 0 1 0 \n+--------+\n|        |\n| a      |\n| c b    |\n| a      |\n|  ac    |\n|    c  c|\n| a 1   b|\n|    b 0 |\n+--------+\n"
 History() = [1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4, 0, 3, 3, 2, 1]
 HistoryString() = "1 2 62 50 34 9 49 25 60 42 55 19 17 44 35 47 4 0 3 3 2 1"
 IsChanceNode() = False
@@ -425,8 +770,23 @@ StringLegalActions() = ["up", "down", "left", "right", "stand"]
 action: 2
 
 # State 23
+# phase=Play
+# preferences=0:b 1:c 
+# moves=7
+#         a b c 
+# player0 0 0 0 
+# player1 0 1 0 
+# +--------+
+# |        |
+# | a      |
+# | c b    |
+# | a      |
+# |  ac    |
+# |    c  c|
+# | a 1   b|
+# |    b0  |
+# +--------+
 IsTerminal() = False
-ToString() = "phase=Play\npreferences=0:b 1:c \nmoves=7\n        a b c \nplayer0 0 0 0 \nplayer1 0 1 0 \n+--------+\n|        |\n| a      |\n| c b    |\n| a      |\n|  ac    |\n|    c  c|\n| a 1   b|\n|    b0  |\n+--------+\n"
 History() = [1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4, 0, 3, 3, 2, 1, 2]
 HistoryString() = "1 2 62 50 34 9 49 25 60 42 55 19 17 44 35 47 4 0 3 3 2 1 2"
 IsChanceNode() = False
@@ -443,8 +803,23 @@ StringLegalActions() = ["up", "down", "left", "right", "stand"]
 action: 1
 
 # State 24
+# phase=Play
+# preferences=0:b 1:c 
+# moves=8
+#         a b c 
+# player0 0 0 0 
+# player1 0 1 0 
+# +--------+
+# |        |
+# | a      |
+# | c b    |
+# | a      |
+# |  ac    |
+# |    c  c|
+# | a     b|
+# |   1b0  |
+# +--------+
 IsTerminal() = False
-ToString() = "phase=Play\npreferences=0:b 1:c \nmoves=8\n        a b c \nplayer0 0 0 0 \nplayer1 0 1 0 \n+--------+\n|        |\n| a      |\n| c b    |\n| a      |\n|  ac    |\n|    c  c|\n| a     b|\n|   1b0  |\n+--------+\n"
 History() = [1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4, 0, 3, 3, 2, 1, 2, 1]
 HistoryString() = "1 2 62 50 34 9 49 25 60 42 55 19 17 44 35 47 4 0 3 3 2 1 2 1"
 IsChanceNode() = False
@@ -461,8 +836,23 @@ StringLegalActions() = ["up", "down", "left", "right", "stand"]
 action: 0
 
 # State 25
+# phase=Play
+# preferences=0:b 1:c 
+# moves=9
+#         a b c 
+# player0 0 0 0 
+# player1 0 1 0 
+# +--------+
+# |        |
+# | a      |
+# | c b    |
+# | a      |
+# |  ac    |
+# |    c  c|
+# | a   0 b|
+# |   1b   |
+# +--------+
 IsTerminal() = False
-ToString() = "phase=Play\npreferences=0:b 1:c \nmoves=9\n        a b c \nplayer0 0 0 0 \nplayer1 0 1 0 \n+--------+\n|        |\n| a      |\n| c b    |\n| a      |\n|  ac    |\n|    c  c|\n| a   0 b|\n|   1b   |\n+--------+\n"
 History() = [1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4, 0, 3, 3, 2, 1, 2, 1, 0]
 HistoryString() = "1 2 62 50 34 9 49 25 60 42 55 19 17 44 35 47 4 0 3 3 2 1 2 1 0"
 IsChanceNode() = False
@@ -479,8 +869,23 @@ StringLegalActions() = ["up", "down", "left", "right", "stand"]
 action: 0
 
 # State 26
+# phase=Play
+# preferences=0:b 1:c 
+# moves=10
+#         a b c 
+# player0 0 0 0 
+# player1 0 1 0 
+# +--------+
+# |        |
+# | a      |
+# | c b    |
+# | a      |
+# |  ac    |
+# |    c  c|
+# | a 1 0 b|
+# |    b   |
+# +--------+
 IsTerminal() = False
-ToString() = "phase=Play\npreferences=0:b 1:c \nmoves=10\n        a b c \nplayer0 0 0 0 \nplayer1 0 1 0 \n+--------+\n|        |\n| a      |\n| c b    |\n| a      |\n|  ac    |\n|    c  c|\n| a 1 0 b|\n|    b   |\n+--------+\n"
 History() = [1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4, 0, 3, 3, 2, 1, 2, 1, 0, 0]
 HistoryString() = "1 2 62 50 34 9 49 25 60 42 55 19 17 44 35 47 4 0 3 3 2 1 2 1 0 0"
 IsChanceNode() = False
@@ -497,8 +902,23 @@ StringLegalActions() = ["up", "down", "left", "right", "stand"]
 action: 4
 
 # State 27
+# phase=Play
+# preferences=0:b 1:c 
+# moves=11
+#         a b c 
+# player0 0 0 0 
+# player1 0 1 0 
+# +--------+
+# |        |
+# | a      |
+# | c b    |
+# | a      |
+# |  ac    |
+# |    c  c|
+# | a 1 0 b|
+# |    b   |
+# +--------+
 IsTerminal() = False
-ToString() = "phase=Play\npreferences=0:b 1:c \nmoves=11\n        a b c \nplayer0 0 0 0 \nplayer1 0 1 0 \n+--------+\n|        |\n| a      |\n| c b    |\n| a      |\n|  ac    |\n|    c  c|\n| a 1 0 b|\n|    b   |\n+--------+\n"
 History() = [1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4, 0, 3, 3, 2, 1, 2, 1, 0, 0, 4]
 HistoryString() = "1 2 62 50 34 9 49 25 60 42 55 19 17 44 35 47 4 0 3 3 2 1 2 1 0 0 4"
 IsChanceNode() = False
@@ -515,8 +935,23 @@ StringLegalActions() = ["up", "down", "left", "right", "stand"]
 action: 4
 
 # State 28
+# phase=Play
+# preferences=0:b 1:c 
+# moves=12
+#         a b c 
+# player0 0 0 0 
+# player1 0 1 0 
+# +--------+
+# |        |
+# | a      |
+# | c b    |
+# | a      |
+# |  ac    |
+# |    c  c|
+# | a 1 0 b|
+# |    b   |
+# +--------+
 IsTerminal() = False
-ToString() = "phase=Play\npreferences=0:b 1:c \nmoves=12\n        a b c \nplayer0 0 0 0 \nplayer1 0 1 0 \n+--------+\n|        |\n| a      |\n| c b    |\n| a      |\n|  ac    |\n|    c  c|\n| a 1 0 b|\n|    b   |\n+--------+\n"
 History() = [1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4, 0, 3, 3, 2, 1, 2, 1, 0, 0, 4, 4]
 HistoryString() = "1 2 62 50 34 9 49 25 60 42 55 19 17 44 35 47 4 0 3 3 2 1 2 1 0 0 4 4"
 IsChanceNode() = False
@@ -533,8 +968,23 @@ StringLegalActions() = ["up", "down", "left", "right", "stand"]
 action: 3
 
 # State 29
+# phase=Play
+# preferences=0:b 1:c 
+# moves=13
+#         a b c 
+# player0 0 0 0 
+# player1 0 1 0 
+# +--------+
+# |        |
+# | a      |
+# | c b    |
+# | a      |
+# |  ac    |
+# |    c  c|
+# | a 1  0b|
+# |    b   |
+# +--------+
 IsTerminal() = False
-ToString() = "phase=Play\npreferences=0:b 1:c \nmoves=13\n        a b c \nplayer0 0 0 0 \nplayer1 0 1 0 \n+--------+\n|        |\n| a      |\n| c b    |\n| a      |\n|  ac    |\n|    c  c|\n| a 1  0b|\n|    b   |\n+--------+\n"
 History() = [1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4, 0, 3, 3, 2, 1, 2, 1, 0, 0, 4, 4, 3]
 HistoryString() = "1 2 62 50 34 9 49 25 60 42 55 19 17 44 35 47 4 0 3 3 2 1 2 1 0 0 4 4 3"
 IsChanceNode() = False
@@ -551,8 +1001,23 @@ StringLegalActions() = ["up", "down", "left", "right", "stand"]
 action: 2
 
 # State 30
+# phase=Play
+# preferences=0:b 1:c 
+# moves=14
+#         a b c 
+# player0 0 0 0 
+# player1 0 1 0 
+# +--------+
+# |        |
+# | a      |
+# | c b    |
+# | a      |
+# |  ac    |
+# |    c  c|
+# | a1   0b|
+# |    b   |
+# +--------+
 IsTerminal() = False
-ToString() = "phase=Play\npreferences=0:b 1:c \nmoves=14\n        a b c \nplayer0 0 0 0 \nplayer1 0 1 0 \n+--------+\n|        |\n| a      |\n| c b    |\n| a      |\n|  ac    |\n|    c  c|\n| a1   0b|\n|    b   |\n+--------+\n"
 History() = [1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4, 0, 3, 3, 2, 1, 2, 1, 0, 0, 4, 4, 3, 2]
 HistoryString() = "1 2 62 50 34 9 49 25 60 42 55 19 17 44 35 47 4 0 3 3 2 1 2 1 0 0 4 4 3 2"
 IsChanceNode() = False
@@ -569,8 +1034,23 @@ StringLegalActions() = ["up", "down", "left", "right", "stand"]
 action: 1
 
 # State 31
+# phase=Play
+# preferences=0:b 1:c 
+# moves=15
+#         a b c 
+# player0 0 0 0 
+# player1 0 1 0 
+# +--------+
+# |        |
+# | a      |
+# | c b    |
+# | a      |
+# |  ac    |
+# |    c  c|
+# | a1    b|
+# |    b 0 |
+# +--------+
 IsTerminal() = False
-ToString() = "phase=Play\npreferences=0:b 1:c \nmoves=15\n        a b c \nplayer0 0 0 0 \nplayer1 0 1 0 \n+--------+\n|        |\n| a      |\n| c b    |\n| a      |\n|  ac    |\n|    c  c|\n| a1    b|\n|    b 0 |\n+--------+\n"
 History() = [1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4, 0, 3, 3, 2, 1, 2, 1, 0, 0, 4, 4, 3, 2, 1]
 HistoryString() = "1 2 62 50 34 9 49 25 60 42 55 19 17 44 35 47 4 0 3 3 2 1 2 1 0 0 4 4 3 2 1"
 IsChanceNode() = False
@@ -587,8 +1067,23 @@ StringLegalActions() = ["up", "down", "left", "right", "stand"]
 action: 1
 
 # State 32
+# phase=Play
+# preferences=0:b 1:c 
+# moves=16
+#         a b c 
+# player0 0 0 0 
+# player1 0 1 0 
+# +--------+
+# |        |
+# | a      |
+# | c b    |
+# | a      |
+# |  ac    |
+# |    c  c|
+# | a     b|
+# |  1 b 0 |
+# +--------+
 IsTerminal() = False
-ToString() = "phase=Play\npreferences=0:b 1:c \nmoves=16\n        a b c \nplayer0 0 0 0 \nplayer1 0 1 0 \n+--------+\n|        |\n| a      |\n| c b    |\n| a      |\n|  ac    |\n|    c  c|\n| a     b|\n|  1 b 0 |\n+--------+\n"
 History() = [1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4, 0, 3, 3, 2, 1, 2, 1, 0, 0, 4, 4, 3, 2, 1, 1]
 HistoryString() = "1 2 62 50 34 9 49 25 60 42 55 19 17 44 35 47 4 0 3 3 2 1 2 1 0 0 4 4 3 2 1 1"
 IsChanceNode() = False
@@ -605,8 +1100,23 @@ StringLegalActions() = ["up", "down", "left", "right", "stand"]
 action: 0
 
 # State 33
+# phase=Play
+# preferences=0:b 1:c 
+# moves=17
+#         a b c 
+# player0 0 0 0 
+# player1 0 1 0 
+# +--------+
+# |        |
+# | a      |
+# | c b    |
+# | a      |
+# |  ac    |
+# |    c  c|
+# | a    0b|
+# |  1 b   |
+# +--------+
 IsTerminal() = False
-ToString() = "phase=Play\npreferences=0:b 1:c \nmoves=17\n        a b c \nplayer0 0 0 0 \nplayer1 0 1 0 \n+--------+\n|        |\n| a      |\n| c b    |\n| a      |\n|  ac    |\n|    c  c|\n| a    0b|\n|  1 b   |\n+--------+\n"
 History() = [1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4, 0, 3, 3, 2, 1, 2, 1, 0, 0, 4, 4, 3, 2, 1, 1, 0]
 HistoryString() = "1 2 62 50 34 9 49 25 60 42 55 19 17 44 35 47 4 0 3 3 2 1 2 1 0 0 4 4 3 2 1 1 0"
 IsChanceNode() = False
@@ -623,8 +1133,23 @@ StringLegalActions() = ["up", "down", "left", "right", "stand"]
 action: 2
 
 # State 34
+# phase=Play
+# preferences=0:b 1:c 
+# moves=18
+#         a b c 
+# player0 0 0 0 
+# player1 0 1 0 
+# +--------+
+# |        |
+# | a      |
+# | c b    |
+# | a      |
+# |  ac    |
+# |    c  c|
+# | a    0b|
+# | 1  b   |
+# +--------+
 IsTerminal() = False
-ToString() = "phase=Play\npreferences=0:b 1:c \nmoves=18\n        a b c \nplayer0 0 0 0 \nplayer1 0 1 0 \n+--------+\n|        |\n| a      |\n| c b    |\n| a      |\n|  ac    |\n|    c  c|\n| a    0b|\n| 1  b   |\n+--------+\n"
 History() = [1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4, 0, 3, 3, 2, 1, 2, 1, 0, 0, 4, 4, 3, 2, 1, 1, 0, 2]
 HistoryString() = "1 2 62 50 34 9 49 25 60 42 55 19 17 44 35 47 4 0 3 3 2 1 2 1 0 0 4 4 3 2 1 1 0 2"
 IsChanceNode() = False
@@ -641,8 +1166,23 @@ StringLegalActions() = ["up", "down", "left", "right", "stand"]
 action: 0
 
 # State 35
+# phase=Play
+# preferences=0:b 1:c 
+# moves=19
+#         a b c 
+# player0 0 0 0 
+# player1 0 1 0 
+# +--------+
+# |        |
+# | a      |
+# | c b    |
+# | a      |
+# |  ac    |
+# |    c 0c|
+# | a     b|
+# | 1  b   |
+# +--------+
 IsTerminal() = False
-ToString() = "phase=Play\npreferences=0:b 1:c \nmoves=19\n        a b c \nplayer0 0 0 0 \nplayer1 0 1 0 \n+--------+\n|        |\n| a      |\n| c b    |\n| a      |\n|  ac    |\n|    c 0c|\n| a     b|\n| 1  b   |\n+--------+\n"
 History() = [1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4, 0, 3, 3, 2, 1, 2, 1, 0, 0, 4, 4, 3, 2, 1, 1, 0, 2, 0]
 HistoryString() = "1 2 62 50 34 9 49 25 60 42 55 19 17 44 35 47 4 0 3 3 2 1 2 1 0 0 4 4 3 2 1 1 0 2 0"
 IsChanceNode() = False
@@ -659,8 +1199,23 @@ StringLegalActions() = ["up", "down", "left", "right", "stand"]
 action: 4
 
 # State 36
+# phase=Play
+# preferences=0:b 1:c 
+# moves=20
+#         a b c 
+# player0 0 0 0 
+# player1 0 1 0 
+# +--------+
+# |        |
+# | a      |
+# | c b    |
+# | a      |
+# |  ac    |
+# |    c 0c|
+# | a     b|
+# | 1  b   |
+# +--------+
 IsTerminal() = True
-ToString() = "phase=Play\npreferences=0:b 1:c \nmoves=20\n        a b c \nplayer0 0 0 0 \nplayer1 0 1 0 \n+--------+\n|        |\n| a      |\n| c b    |\n| a      |\n|  ac    |\n|    c 0c|\n| a     b|\n| 1  b   |\n+--------+\n"
 History() = [1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4, 0, 3, 3, 2, 1, 2, 1, 0, 0, 4, 4, 3, 2, 1, 1, 0, 2, 0, 4]
 HistoryString() = "1 2 62 50 34 9 49 25 60 42 55 19 17 44 35 47 4 0 3 3 2 1 2 1 0 0 4 4 3 2 1 1 0 2 0 4"
 IsChanceNode() = False

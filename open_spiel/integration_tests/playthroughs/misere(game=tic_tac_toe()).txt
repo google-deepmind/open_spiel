@@ -29,8 +29,10 @@ MaxGameLength() = 9
 ToString() = "misere(game=tic_tac_toe())"
 
 # State 0
+# ...
+# ...
+# ...
 IsTerminal() = False
-ToString() = "...\n...\n..."
 History() = []
 HistoryString() = ""
 IsChanceNode() = False
@@ -51,8 +53,10 @@ StringLegalActions() = ["x(0,0)", "x(1,0)", "x(2,0)", "x(0,1)", "x(1,1)", "x(2,1
 action: 1
 
 # State 1
+# .x.
+# ...
+# ...
 IsTerminal() = False
-ToString() = ".x.\n...\n..."
 History() = [1]
 HistoryString() = "1"
 IsChanceNode() = False
@@ -73,8 +77,10 @@ StringLegalActions() = ["o(0,0)", "o(2,0)", "o(0,1)", "o(1,1)", "o(2,1)", "o(0,2
 action: 2
 
 # State 2
+# .xo
+# ...
+# ...
 IsTerminal() = False
-ToString() = ".xo\n...\n..."
 History() = [1, 2]
 HistoryString() = "1 2"
 IsChanceNode() = False
@@ -95,8 +101,10 @@ StringLegalActions() = ["x(0,0)", "x(0,1)", "x(1,1)", "x(2,1)", "x(0,2)", "x(1,2
 action: 7
 
 # State 3
+# .xo
+# ...
+# .x.
 IsTerminal() = False
-ToString() = ".xo\n...\n.x."
 History() = [1, 2, 7]
 HistoryString() = "1 2 7"
 IsChanceNode() = False
@@ -117,8 +125,10 @@ StringLegalActions() = ["o(0,0)", "o(0,1)", "o(1,1)", "o(2,1)", "o(0,2)", "o(2,2
 action: 8
 
 # State 4
+# .xo
+# ...
+# .xo
 IsTerminal() = False
-ToString() = ".xo\n...\n.xo"
 History() = [1, 2, 7, 8]
 HistoryString() = "1 2 7 8"
 IsChanceNode() = False
@@ -139,8 +149,10 @@ StringLegalActions() = ["x(0,0)", "x(0,1)", "x(1,1)", "x(2,1)", "x(0,2)"]
 action: 5
 
 # State 5
+# .xo
+# ..x
+# .xo
 IsTerminal() = False
-ToString() = ".xo\n..x\n.xo"
 History() = [1, 2, 7, 8, 5]
 HistoryString() = "1 2 7 8 5"
 IsChanceNode() = False
@@ -161,8 +173,10 @@ StringLegalActions() = ["o(0,0)", "o(0,1)", "o(1,1)", "o(0,2)"]
 action: 6
 
 # State 6
+# .xo
+# ..x
+# oxo
 IsTerminal() = False
-ToString() = ".xo\n..x\noxo"
 History() = [1, 2, 7, 8, 5, 6]
 HistoryString() = "1 2 7 8 5 6"
 IsChanceNode() = False
@@ -183,8 +197,10 @@ StringLegalActions() = ["x(0,0)", "x(0,1)", "x(1,1)"]
 action: 3
 
 # State 7
+# .xo
+# x.x
+# oxo
 IsTerminal() = False
-ToString() = ".xo\nx.x\noxo"
 History() = [1, 2, 7, 8, 5, 6, 3]
 HistoryString() = "1 2 7 8 5 6 3"
 IsChanceNode() = False
@@ -205,8 +221,10 @@ StringLegalActions() = ["o(0,0)", "o(1,1)"]
 action: 4
 
 # State 8
+# .xo
+# xox
+# oxo
 IsTerminal() = True
-ToString() = ".xo\nxox\noxo"
 History() = [1, 2, 7, 8, 5, 6, 3, 4]
 HistoryString() = "1 2 7 8 5 6 3 4"
 IsChanceNode() = False

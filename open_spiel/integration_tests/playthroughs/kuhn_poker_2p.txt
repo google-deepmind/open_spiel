@@ -32,7 +32,6 @@ ToString() = "kuhn_poker(players=2)"
 
 # State 0
 IsTerminal() = False
-ToString() = ""
 History() = []
 HistoryString() = ""
 IsChanceNode() = True
@@ -54,8 +53,8 @@ StringLegalActions() = ["Deal:0", "Deal:1", "Deal:2"]
 action: 1
 
 # State 1
+# 1
 IsTerminal() = False
-ToString() = "1"
 History() = [1]
 HistoryString() = "1"
 IsChanceNode() = True
@@ -77,8 +76,8 @@ StringLegalActions() = ["Deal:0", "Deal:2"]
 action: 2
 
 # State 2
+# 1 2
 IsTerminal() = False
-ToString() = "1 2"
 History() = [1, 2]
 HistoryString() = "1 2"
 IsChanceNode() = False
@@ -101,8 +100,8 @@ StringLegalActions() = ["Pass", "Bet"]
 action: 0
 
 # State 3
+# 1 2 p
 IsTerminal() = False
-ToString() = "1 2 p"
 History() = [1, 2, 0]
 HistoryString() = "1 2 0"
 IsChanceNode() = False
@@ -125,8 +124,8 @@ StringLegalActions() = ["Pass", "Bet"]
 action: 0
 
 # State 4
+# 1 2 pp
 IsTerminal() = True
-ToString() = "1 2 pp"
 History() = [1, 2, 0, 0]
 HistoryString() = "1 2 0 0"
 IsChanceNode() = False
