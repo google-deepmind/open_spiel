@@ -156,6 +156,26 @@ void TestPoliciesCanPlay(PolicyGenerator policy_generator, const Game& game) {
   }
 }
 
+void TestPoliciesCanPlay(const Policy& policy, const Game& game) {
+  std::mt19937 rng(0);
+  for (int i = 0; i < kNumSimulations; ++i) {
+    std::unique_ptr<State> state = game.NewInitialState();
+    while (!state->IsTerminal()) {
+      ActionsAndProbs outcomes;
+      if (state->IsChanceNode()) {
+        outcomes = state->ChanceOutcomes();
+      } else {
+        outcomes = policy.GetStatePolicy(*state);
+      }
+      Action action =
+          open_spiel::SampleAction(
+              outcomes, std::uniform_real_distribution<double>(0.0, 1.0)(rng))
+              .first;
+      state->ApplyAction(action);
+    }
+  }
+}
+
 void TestEveryInfostateInPolicy(PolicyGenerator policy_generator,
                                 const Game& game) {
   TabularPolicy policy = policy_generator(game);
@@ -184,6 +204,7 @@ void PolicyTest() {
 
   // For some reason, this can't seem to be brace-initialized, so instead we use
   // push_back.
+  std::unique_ptr<Policy> uniform_policy = std::make_unique<UniformPolicy>();
   for (const std::string& game_name :
        {"leduc_poker", "kuhn_poker", "liars_dice"}) {
     std::shared_ptr<const Game> game = LoadGame(game_name);
@@ -191,6 +212,7 @@ void PolicyTest() {
       TestEveryInfostateInPolicy(policy_generator, *game);
       TestPoliciesCanPlay(policy_generator, *game);
     }
+    TestPoliciesCanPlay(*uniform_policy, *game);
   }
 }
 
