@@ -164,15 +164,13 @@ HistoryDistribution UpdateIncrementalStateDistribution(
   current.second = previous.second;
   // The current state must be one action ahead of the previous ones.
   const std::vector<Action> history = state.History();
-  SPIEL_CHECK_GT(history.size(), previous.first[0]->History().size());
-  SPIEL_CHECK_EQ(history.size(), previous.first[0]->History().size() + 1);
   Action action = history.back();
-  const StateType& type = previous.first[0]->GetType();
   for (int i = 0; i < previous.first.size(); ++i) {
     std::unique_ptr<State>& parent = current.first[i];
     double& prob = current.second[i];
-    if (prob == 0) continue;
-    switch (type) {
+    if (Near(prob, 0.)) continue;
+    SPIEL_CHECK_EQ(history.size(), parent->History().size() + 1);
+    switch (parent->GetType()) {
       case StateType::kChance: {
         open_spiel::ActionsAndProbs outcomes = parent->ChanceOutcomes();
         double action_prob = GetProb(outcomes, action);
