@@ -21,7 +21,7 @@ constexpr int kBaseTrickScores[] = {20, 20, 30, 30, 30};
 
 int ScoreContract(Contract contract, DoubleStatus double_status) {
   int score = contract.level * kBaseTrickScores[contract.trumps];
-  if (contract.trumps == Suit::kNone) score += 10;
+  if (contract.trumps == kNoTrump) score += 10;
   return score * double_status;
 }
 
@@ -48,7 +48,7 @@ int ScoreUndertricks(int undertricks, bool is_vulnerable,
 }
 
 // Score for tricks made in excess of the bid.
-int ScoreOvertricks(Suit trump_suit, int overtricks, bool is_vulnerable,
+int ScoreOvertricks(Denomination trump_suit, int overtricks, bool is_vulnerable,
                     DoubleStatus double_status) {
   if (double_status == kUndoubled) {
     return overtricks * kBaseTrickScores[trump_suit];

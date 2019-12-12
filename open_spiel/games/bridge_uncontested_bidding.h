@@ -96,7 +96,9 @@
 #include "open_spiel/spiel.h"
 
 namespace open_spiel {
-namespace bridge {
+namespace bridge_uncontested_bidding {
+
+using bridge::Contract;
 
 inline constexpr int kNumSuits = 4;
 inline constexpr int kNumDenominations = 1 + kNumSuits;
@@ -112,6 +114,8 @@ inline constexpr int kMinScore = -650;  // 13 undertricks, at 50 each
 inline constexpr int kMaxScore = 1520;  // 7NT making
 inline constexpr int kStateSize =
     kNumCards + kNumPlayers * kNumActions + kNumPlayers;
+inline constexpr char kRankChar[] = "23456789TJQKA";
+inline constexpr char kSuitChar[] = "CDHSN";
 
 class Deal {
  public:
@@ -230,7 +234,7 @@ class UncontestedBiddingGame : public Game {
   mutable int rng_seed_;
 };
 
-}  // namespace bridge
+}  // namespace bridge_uncontested_bidding
 }  // namespace open_spiel
 
 #endif  // THIRD_PARTY_OPEN_SPIEL_GAMES_BRIDGE_UNCONTESTED_BIDDING_H_
