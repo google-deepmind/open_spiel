@@ -28,11 +28,11 @@ MaxGameLength() = 25
 ToString() = "hex(board_size=5)"
 
 # State 0
-# . . . . . 
-#  . . . . . 
-#   . . . . . 
-#    . . . . . 
-#     . . . . . 
+# . . . . .
+#  . . . . .
+#   . . . . .
+#    . . . . .
+#     . . . . .
 IsTerminal() = False
 History() = []
 HistoryString() = ""
@@ -54,11 +54,11 @@ StringLegalActions() = ["y(0,0)", "y(1,0)", "y(2,0)", "y(3,0)", "y(4,0)", "x(0,1
 action: 12
 
 # State 1
-# . . . . . 
-#  . . . . . 
-#   . . x . . 
-#    . . . . . 
-#     . . . . . 
+# . . . . .
+#  . . . . .
+#   . . x . .
+#    . . . . .
+#     . . . . .
 IsTerminal() = False
 History() = [12]
 HistoryString() = "12"
@@ -80,11 +80,11 @@ StringLegalActions() = ["p(0,0)", "o(1,0)", "o(2,0)", "o(3,0)", "q(4,0)", "p(0,1
 action: 11
 
 # State 2
-# . . . . . 
-#  . . . . . 
-#   . o x . . 
-#    . . . . . 
-#     . . . . . 
+# . . . . .
+#  . . . . .
+#   . o x . .
+#    . . . . .
+#     . . . . .
 IsTerminal() = False
 History() = [12, 11]
 HistoryString() = "12 11"
@@ -106,11 +106,11 @@ StringLegalActions() = ["y(0,0)", "y(1,0)", "y(2,0)", "y(3,0)", "y(4,0)", "x(0,1
 action: 10
 
 # State 3
-# . . . . . 
-#  . . . . . 
-#   x o x . . 
-#    . . . . . 
-#     . . . . . 
+# . . . . .
+#  . . . . .
+#   x o x . .
+#    . . . . .
+#     . . . . .
 IsTerminal() = False
 History() = [12, 11, 10]
 HistoryString() = "12 11 10"
@@ -132,11 +132,11 @@ StringLegalActions() = ["p(0,0)", "o(1,0)", "o(2,0)", "o(3,0)", "q(4,0)", "p(0,1
 action: 14
 
 # State 4
-# . . . . . 
-#  . . . . . 
-#   x o x . q 
-#    . . . . . 
-#     . . . . . 
+# . . . . .
+#  . . . . .
+#   x o x . q
+#    . . . . .
+#     . . . . .
 IsTerminal() = False
 History() = [12, 11, 10, 14]
 HistoryString() = "12 11 10 14"
@@ -158,11 +158,11 @@ StringLegalActions() = ["y(0,0)", "y(1,0)", "y(2,0)", "y(3,0)", "y(4,0)", "x(0,1
 action: 4
 
 # State 5
-# . . . . y 
-#  . . . . . 
-#   x o x . q 
-#    . . . . . 
-#     . . . . . 
+# . . . . y
+#  . . . . .
+#   x o x . q
+#    . . . . .
+#     . . . . .
 IsTerminal() = False
 History() = [12, 11, 10, 14, 4]
 HistoryString() = "12 11 10 14 4"
@@ -184,11 +184,11 @@ StringLegalActions() = ["p(0,0)", "o(1,0)", "o(2,0)", "o(3,0)", "p(0,1)", "o(1,1
 action: 8
 
 # State 6
-# . . . . y 
-#  . . . o . 
-#   x o x . q 
-#    . . . . . 
-#     . . . . . 
+# . . . . y
+#  . . . o .
+#   x o x . q
+#    . . . . .
+#     . . . . .
 IsTerminal() = False
 History() = [12, 11, 10, 14, 4, 8]
 HistoryString() = "12 11 10 14 4 8"
@@ -210,11 +210,11 @@ StringLegalActions() = ["y(0,0)", "y(1,0)", "y(2,0)", "y(3,0)", "x(0,1)", "x(1,1
 action: 22
 
 # State 7
-# . . . . y 
-#  . . . o . 
-#   x o x . q 
-#    . . . . . 
-#     . . z . . 
+# . . . . y
+#  . . . o .
+#   x o x . q
+#    . . . . .
+#     . . z . .
 IsTerminal() = False
 History() = [12, 11, 10, 14, 4, 8, 22]
 HistoryString() = "12 11 10 14 4 8 22"
@@ -236,11 +236,11 @@ StringLegalActions() = ["p(0,0)", "o(1,0)", "o(2,0)", "o(3,0)", "p(0,1)", "o(1,1
 action: 3
 
 # State 8
-# . . . o y 
-#  . . . o . 
-#   x o x . q 
-#    . . . . . 
-#     . . z . . 
+# . . . o y
+#  . . . o .
+#   x o x . q
+#    . . . . .
+#     . . z . .
 IsTerminal() = False
 History() = [12, 11, 10, 14, 4, 8, 22, 3]
 HistoryString() = "12 11 10 14 4 8 22 3"
@@ -262,11 +262,11 @@ StringLegalActions() = ["y(0,0)", "y(1,0)", "y(2,0)", "x(0,1)", "x(1,1)", "x(2,1
 action: 7
 
 # State 9
-# . . . o y 
-#  . . x o . 
-#   x o x . q 
-#    . . . . . 
-#     . . z . . 
+# . . . o y
+#  . . x o .
+#   x o x . q
+#    . . . . .
+#     . . z . .
 IsTerminal() = False
 History() = [12, 11, 10, 14, 4, 8, 22, 3, 7]
 HistoryString() = "12 11 10 14 4 8 22 3 7"
@@ -288,11 +288,11 @@ StringLegalActions() = ["p(0,0)", "o(1,0)", "o(2,0)", "p(0,1)", "o(1,1)", "q(4,1
 action: 1
 
 # State 10
-# . o . o y 
-#  . . x o . 
-#   x o x . q 
-#    . . . . . 
-#     . . z . . 
+# . o . o y
+#  . . x o .
+#   x o x . q
+#    . . . . .
+#     . . z . .
 IsTerminal() = False
 History() = [12, 11, 10, 14, 4, 8, 22, 3, 7, 1]
 HistoryString() = "12 11 10 14 4 8 22 3 7 1"
@@ -314,11 +314,11 @@ StringLegalActions() = ["y(0,0)", "y(2,0)", "x(0,1)", "x(1,1)", "y(4,1)", "x(3,2
 action: 18
 
 # State 11
-# . o . o y 
-#  . . x o . 
-#   x o x . q 
-#    . . . z . 
-#     . . z . . 
+# . o . o y
+#  . . x o .
+#   x o x . q
+#    . . . z .
+#     . . z . .
 IsTerminal() = False
 History() = [12, 11, 10, 14, 4, 8, 22, 3, 7, 1, 18]
 HistoryString() = "12 11 10 14 4 8 22 3 7 1 18"
@@ -340,11 +340,11 @@ StringLegalActions() = ["p(0,0)", "o(2,0)", "p(0,1)", "o(1,1)", "q(4,1)", "q(3,2
 action: 6
 
 # State 12
-# . o . o y 
-#  . o x o . 
-#   x o x . q 
-#    . . . z . 
-#     . . z . . 
+# . o . o y
+#  . o x o .
+#   x o x . q
+#    . . . z .
+#     . . z . .
 IsTerminal() = False
 History() = [12, 11, 10, 14, 4, 8, 22, 3, 7, 1, 18, 6]
 HistoryString() = "12 11 10 14 4 8 22 3 7 1 18 6"
@@ -366,11 +366,11 @@ StringLegalActions() = ["y(0,0)", "y(2,0)", "x(0,1)", "y(4,1)", "z(3,2)", "x(0,3
 action: 17
 
 # State 13
-# . o . o y 
-#  . o z o . 
-#   x o z . q 
-#    . . z z . 
-#     . . z . . 
+# . o . o y
+#  . o z o .
+#   x o z . q
+#    . . z z .
+#     . . z . .
 IsTerminal() = False
 History() = [12, 11, 10, 14, 4, 8, 22, 3, 7, 1, 18, 6, 17]
 HistoryString() = "12 11 10 14 4 8 22 3 7 1 18 6 17"
@@ -392,11 +392,11 @@ StringLegalActions() = ["p(0,0)", "o(2,0)", "p(0,1)", "q(4,1)", "q(3,2)", "p(0,3
 action: 24
 
 # State 14
-# . o . o y 
-#  . o z o . 
-#   x o z . q 
-#    . . z z . 
-#     . . z . q 
+# . o . o y
+#  . o z o .
+#   x o z . q
+#    . . z z .
+#     . . z . q
 IsTerminal() = False
 History() = [12, 11, 10, 14, 4, 8, 22, 3, 7, 1, 18, 6, 17, 24]
 HistoryString() = "12 11 10 14 4 8 22 3 7 1 18 6 17 24"
@@ -418,11 +418,11 @@ StringLegalActions() = ["y(0,0)", "X(2,0)", "x(0,1)", "y(4,1)", "z(3,2)", "x(0,3
 action: 9
 
 # State 15
-# . o . o y 
-#  . o z o y 
-#   x o z . q 
-#    . . z z . 
-#     . . z . q 
+# . o . o y
+#  . o z o y
+#   x o z . q
+#    . . z z .
+#     . . z . q
 IsTerminal() = False
 History() = [12, 11, 10, 14, 4, 8, 22, 3, 7, 1, 18, 6, 17, 24, 9]
 HistoryString() = "12 11 10 14 4 8 22 3 7 1 18 6 17 24 9"
@@ -444,11 +444,11 @@ StringLegalActions() = ["p(0,0)", "o(2,0)", "p(0,1)", "q(3,2)", "p(0,3)", "o(1,3
 action: 2
 
 # State 16
-# . o o o y 
-#  . o z o y 
-#   x o z . q 
-#    . . z z . 
-#     . . z . q 
+# . o o o y
+#  . o z o y
+#   x o z . q
+#    . . z z .
+#     . . z . q
 IsTerminal() = False
 History() = [12, 11, 10, 14, 4, 8, 22, 3, 7, 1, 18, 6, 17, 24, 9, 2]
 HistoryString() = "12 11 10 14 4 8 22 3 7 1 18 6 17 24 9 2"
@@ -470,11 +470,11 @@ StringLegalActions() = ["y(0,0)", "x(0,1)", "X(3,2)", "x(0,3)", "z(1,3)", "z(4,3
 action: 19
 
 # State 17
-# . o o o y 
-#  . o z o y 
-#   x o z . q 
-#    . . z z z 
-#     . . z . q 
+# . o o o y
+#  . o z o y
+#   x o z . q
+#    . . z z z
+#     . . z . q
 IsTerminal() = False
 History() = [12, 11, 10, 14, 4, 8, 22, 3, 7, 1, 18, 6, 17, 24, 9, 2, 19]
 HistoryString() = "12 11 10 14 4 8 22 3 7 1 18 6 17 24 9 2 19"
@@ -496,11 +496,11 @@ StringLegalActions() = ["p(0,0)", "p(0,1)", "q(3,2)", "p(0,3)", "o(1,3)", "p(0,4
 action: 16
 
 # State 18
-# . o o o y 
-#  . o z o y 
-#   x o z . q 
-#    . o z z z 
-#     . . z . q 
+# . o o o y
+#  . o z o y
+#   x o z . q
+#    . o z z z
+#     . . z . q
 IsTerminal() = False
 History() = [12, 11, 10, 14, 4, 8, 22, 3, 7, 1, 18, 6, 17, 24, 9, 2, 19, 16]
 HistoryString() = "12 11 10 14 4 8 22 3 7 1 18 6 17 24 9 2 19 16"
@@ -522,11 +522,11 @@ StringLegalActions() = ["y(0,0)", "x(0,1)", "X(3,2)", "x(0,3)", "z(0,4)", "z(1,4
 action: 23
 
 # State 19
-# . o o o y 
-#  . o z o y 
-#   x o z . q 
-#    . o z z z 
-#     . . z z q 
+# . o o o y
+#  . o z o y
+#   x o z . q
+#    . o z z z
+#     . . z z q
 IsTerminal() = False
 History() = [12, 11, 10, 14, 4, 8, 22, 3, 7, 1, 18, 6, 17, 24, 9, 2, 19, 16, 23]
 HistoryString() = "12 11 10 14 4 8 22 3 7 1 18 6 17 24 9 2 19 16 23"
@@ -548,11 +548,11 @@ StringLegalActions() = ["p(0,0)", "p(0,1)", "q(3,2)", "p(0,3)", "p(0,4)", "o(1,4
 action: 13
 
 # State 20
-# . q q q y 
-#  . q z q y 
-#   x q z q q 
-#    . q z z z 
-#     . . z z q 
+# . q q q y
+#  . q z q y
+#   x q z q q
+#    . q z z z
+#     . . z z q
 IsTerminal() = False
 History() = [12, 11, 10, 14, 4, 8, 22, 3, 7, 1, 18, 6, 17, 24, 9, 2, 19, 16, 23, 13]
 HistoryString() = "12 11 10 14 4 8 22 3 7 1 18 6 17 24 9 2 19 16 23 13"
@@ -574,11 +574,11 @@ StringLegalActions() = ["y(0,0)", "x(0,1)", "x(0,3)", "z(0,4)", "z(1,4)"]
 action: 5
 
 # State 21
-# . q q q y 
-#  x q z q y 
-#   x q z q q 
-#    . q z z z 
-#     . . z z q 
+# . q q q y
+#  x q z q y
+#   x q z q q
+#    . q z z z
+#     . . z z q
 IsTerminal() = False
 History() = [12, 11, 10, 14, 4, 8, 22, 3, 7, 1, 18, 6, 17, 24, 9, 2, 19, 16, 23, 13, 5]
 HistoryString() = "12 11 10 14 4 8 22 3 7 1 18 6 17 24 9 2 19 16 23 13 5"
@@ -600,11 +600,11 @@ StringLegalActions() = ["O(0,0)", "O(0,3)", "O(0,4)", "q(1,4)"]
 action: 15
 
 # State 22
-# . q q q y 
-#  x q z q y 
-#   x q z q q 
-#    O q z z z 
-#     . . z z q 
+# . q q q y
+#  x q z q y
+#   x q z q q
+#    O q z z z
+#     . . z z q
 IsTerminal() = True
 History() = [12, 11, 10, 14, 4, 8, 22, 3, 7, 1, 18, 6, 17, 24, 9, 2, 19, 16, 23, 13, 5, 15]
 HistoryString() = "12 11 10 14 4 8 22 3 7 1 18 6 17 24 9 2 19 16 23 13 5 15"

@@ -29,7 +29,7 @@ ToString() = "go(board_size=7,komi=4.5)"
 
 # State 0
 # GoState(komi=4.5, to_play=Bhistory.size()=0)
-# 
+#
 #  7 +++++++
 #  6 +++++++
 #  5 +++++++
@@ -60,7 +60,7 @@ action: 88
 
 # State 1
 # GoState(komi=4.5, to_play=Whistory.size()=1)
-# 
+#
 #  7 +++++++
 #  6 +++++++
 #  5 +++++++
@@ -91,7 +91,7 @@ action: 67
 
 # State 2
 # GoState(komi=4.5, to_play=Bhistory.size()=2)
-# 
+#
 #  7 +++++++
 #  6 +++++++
 #  5 +++++++
@@ -122,7 +122,7 @@ action: 44
 
 # State 3
 # GoState(komi=4.5, to_play=Whistory.size()=3)
-# 
+#
 #  7 +++++++
 #  6 +++++++
 #  5 +++++++
@@ -153,7 +153,7 @@ action: 107
 
 # State 4
 # GoState(komi=4.5, to_play=Bhistory.size()=4)
-# 
+#
 #  7 +++++++
 #  6 +++++++
 #  5 +O+++++
@@ -184,7 +184,7 @@ action: 133
 
 # State 5
 # GoState(komi=4.5, to_play=Whistory.size()=5)
-# 
+#
 #  7 +++++++
 #  6 ++++++X
 #  5 +O+++++
@@ -215,7 +215,7 @@ action: 24
 
 # State 6
 # GoState(komi=4.5, to_play=Bhistory.size()=6)
-# 
+#
 #  7 +++++++
 #  6 ++++++X
 #  5 +O+++++
@@ -246,7 +246,7 @@ action: 148
 
 # State 7
 # GoState(komi=4.5, to_play=Whistory.size()=7)
-# 
+#
 #  7 X++++++
 #  6 ++++++X
 #  5 +O+++++
@@ -277,7 +277,7 @@ action: 129
 
 # State 8
 # GoState(komi=4.5, to_play=Bhistory.size()=8)
-# 
+#
 #  7 X++++++
 #  6 ++O+++X
 #  5 +O+++++
@@ -308,7 +308,7 @@ action: 68
 
 # State 9
 # GoState(komi=4.5, to_play=Whistory.size()=9)
-# 
+#
 #  7 X++++++
 #  6 ++O+++X
 #  5 +O+++++
@@ -339,7 +339,7 @@ action: 26
 
 # State 10
 # GoState(komi=4.5, to_play=Bhistory.size()=10)
-# 
+#
 #  7 X++++++
 #  6 ++O+++X
 #  5 +O+++++
@@ -370,7 +370,7 @@ action: 153
 
 # State 11
 # GoState(komi=4.5, to_play=Whistory.size()=11)
-# 
+#
 #  7 X++++X+
 #  6 ++O+++X
 #  5 +O+++++
@@ -401,7 +401,7 @@ action: 22
 
 # State 12
 # GoState(komi=4.5, to_play=Bhistory.size()=12)
-# 
+#
 #  7 X++++X+
 #  6 ++O+++X
 #  5 +O+++++
@@ -432,7 +432,7 @@ action: 66
 
 # State 13
 # GoState(komi=4.5, to_play=Whistory.size()=13)
-# 
+#
 #  7 X++++X+
 #  6 ++O+++X
 #  5 +O+++++
@@ -463,7 +463,7 @@ action: 87
 
 # State 14
 # GoState(komi=4.5, to_play=Bhistory.size()=14)
-# 
+#
 #  7 X++++X+
 #  6 ++O+++X
 #  5 +O+++++
@@ -494,7 +494,7 @@ action: 112
 
 # State 15
 # GoState(komi=4.5, to_play=Whistory.size()=15)
-# 
+#
 #  7 X++++X+
 #  6 ++O+++X
 #  5 +O++++X
@@ -525,7 +525,7 @@ action: 70
 
 # State 16
 # GoState(komi=4.5, to_play=Bhistory.size()=16)
-# 
+#
 #  7 X++++X+
 #  6 ++O+++X
 #  5 +O++++X
@@ -556,7 +556,7 @@ action: 131
 
 # State 17
 # GoState(komi=4.5, to_play=Whistory.size()=17)
-# 
+#
 #  7 X++++X+
 #  6 ++O+X+X
 #  5 +O++++X
@@ -587,7 +587,7 @@ action: 27
 
 # State 18
 # GoState(komi=4.5, to_play=Bhistory.size()=18)
-# 
+#
 #  7 X++++X+
 #  6 ++O+X+X
 #  5 +O++++X
@@ -618,7 +618,7 @@ action: 90
 
 # State 19
 # GoState(komi=4.5, to_play=Whistory.size()=19)
-# 
+#
 #  7 X++++X+
 #  6 ++O+X+X
 #  5 +O++++X
@@ -649,7 +649,7 @@ action: 85
 
 # State 20
 # GoState(komi=4.5, to_play=Bhistory.size()=20)
-# 
+#
 #  7 X++++X+
 #  6 ++O+X+X
 #  5 +O++++X
@@ -680,7 +680,7 @@ action: 442
 
 # State 21
 # GoState(komi=4.5, to_play=Whistory.size()=21)
-# 
+#
 #  7 X++++X+
 #  6 ++O+X+X
 #  5 +O++++X
@@ -711,7 +711,7 @@ action: 65
 
 # State 22
 # GoState(komi=4.5, to_play=Bhistory.size()=22)
-# 
+#
 #  7 X++++X+
 #  6 ++O+X+X
 #  5 +O++++X
@@ -742,7 +742,7 @@ action: 106
 
 # State 23
 # GoState(komi=4.5, to_play=Whistory.size()=23)
-# 
+#
 #  7 X++++X+
 #  6 ++O+X+X
 #  5 XO++++X
@@ -773,7 +773,7 @@ action: 130
 
 # State 24
 # GoState(komi=4.5, to_play=Bhistory.size()=24)
-# 
+#
 #  7 X++++X+
 #  6 ++OOX+X
 #  5 XO++++X
@@ -804,7 +804,7 @@ action: 128
 
 # State 25
 # GoState(komi=4.5, to_play=Whistory.size()=25)
-# 
+#
 #  7 X++++X+
 #  6 +XOOX+X
 #  5 XO++++X
@@ -835,7 +835,7 @@ action: 109
 
 # State 26
 # GoState(komi=4.5, to_play=Bhistory.size()=26)
-# 
+#
 #  7 X++++X+
 #  6 +XOOX+X
 #  5 XO+O++X
@@ -866,7 +866,7 @@ action: 152
 
 # State 27
 # GoState(komi=4.5, to_play=Whistory.size()=27)
-# 
+#
 #  7 X+++XX+
 #  6 +XOOX+X
 #  5 XO+O++X
@@ -897,7 +897,7 @@ action: 23
 
 # State 28
 # GoState(komi=4.5, to_play=Bhistory.size()=28)
-# 
+#
 #  7 X+++XX+
 #  6 +XOOX+X
 #  5 XO+O++X
@@ -928,7 +928,7 @@ action: 110
 
 # State 29
 # GoState(komi=4.5, to_play=Whistory.size()=29)
-# 
+#
 #  7 X+++XX+
 #  6 +XOOX+X
 #  5 XO+OX+X
@@ -959,7 +959,7 @@ action: 89
 
 # State 30
 # GoState(komi=4.5, to_play=Bhistory.size()=30)
-# 
+#
 #  7 X+++XX+
 #  6 +XOOX+X
 #  5 XO+OX+X
@@ -990,7 +990,7 @@ action: 149
 
 # State 31
 # GoState(komi=4.5, to_play=Whistory.size()=31)
-# 
+#
 #  7 XX++XX+
 #  6 +XOOX+X
 #  5 XO+OX+X
@@ -1021,7 +1021,7 @@ action: 88
 
 # State 32
 # GoState(komi=4.5, to_play=Bhistory.size()=32)
-# 
+#
 #  7 XX++XX+
 #  6 +XOOX+X
 #  5 XO+OX+X
@@ -1052,7 +1052,7 @@ action: 64
 
 # State 33
 # GoState(komi=4.5, to_play=Whistory.size()=33)
-# 
+#
 #  7 XX++XX+
 #  6 +XOOX+X
 #  5 XO+OX+X
@@ -1083,7 +1083,7 @@ action: 28
 
 # State 34
 # GoState(komi=4.5, to_play=Bhistory.size()=34)
-# 
+#
 #  7 XX++XX+
 #  6 +XOOX+X
 #  5 XO+OX+X
@@ -1114,7 +1114,7 @@ action: 48
 
 # State 35
 # GoState(komi=4.5, to_play=Whistory.size()=35)
-# 
+#
 #  7 XX++XX+
 #  6 +XOOX+X
 #  5 XO+OX+X
@@ -1145,7 +1145,7 @@ action: 45
 
 # State 36
 # GoState(komi=4.5, to_play=Bhistory.size()=36)
-# 
+#
 #  7 XX++XX+
 #  6 +XOOX+X
 #  5 XO+OX+X
@@ -1176,7 +1176,7 @@ action: 132
 
 # State 37
 # GoState(komi=4.5, to_play=Whistory.size()=37)
-# 
+#
 #  7 XX++XX+
 #  6 +XOOXXX
 #  5 XO+OX+X
@@ -1207,7 +1207,7 @@ action: 442
 
 # State 38
 # GoState(komi=4.5, to_play=Bhistory.size()=38)
-# 
+#
 #  7 XX++XX+
 #  6 +XOOXXX
 #  5 XO+OX+X
@@ -1238,7 +1238,7 @@ action: 69
 
 # State 39
 # GoState(komi=4.5, to_play=Whistory.size()=39)
-# 
+#
 #  7 XX++XX+
 #  6 +XOOXXX
 #  5 XO+OX+X
@@ -1269,7 +1269,7 @@ action: 91
 
 # State 40
 # GoState(komi=4.5, to_play=Bhistory.size()=40)
-# 
+#
 #  7 XX++XX+
 #  6 +XOOXXX
 #  5 XO+OX+X
@@ -1300,7 +1300,7 @@ action: 151
 
 # State 41
 # GoState(komi=4.5, to_play=Whistory.size()=41)
-# 
+#
 #  7 XX+XXX+
 #  6 +XOOXXX
 #  5 XO+OX+X
@@ -1331,7 +1331,7 @@ action: 43
 
 # State 42
 # GoState(komi=4.5, to_play=Bhistory.size()=42)
-# 
+#
 #  7 XX+XXX+
 #  6 +XOOXXX
 #  5 XO+OX+X
@@ -1362,7 +1362,7 @@ action: 25
 
 # State 43
 # GoState(komi=4.5, to_play=Whistory.size()=43)
-# 
+#
 #  7 XX+XXX+
 #  6 +XOOXXX
 #  5 XO+OX+X
@@ -1393,7 +1393,7 @@ action: 127
 
 # State 44
 # GoState(komi=4.5, to_play=Bhistory.size()=44)
-# 
+#
 #  7 XX+XXX+
 #  6 OXOOXXX
 #  5 +O+OX+X
@@ -1424,7 +1424,7 @@ action: 442
 
 # State 45
 # GoState(komi=4.5, to_play=Whistory.size()=45)
-# 
+#
 #  7 XX+XXX+
 #  6 OXOOXXX
 #  5 +O+OX+X
@@ -1455,7 +1455,7 @@ action: 150
 
 # State 46
 # GoState(komi=4.5, to_play=Bhistory.size()=46)
-# 
+#
 #  7 ++OXXX+
 #  6 O+OOXXX
 #  5 +O+OX+X
@@ -1486,7 +1486,7 @@ action: 149
 
 # State 47
 # GoState(komi=4.5, to_play=Whistory.size()=47)
-# 
+#
 #  7 +XOXXX+
 #  6 O+OOXXX
 #  5 +O+OX+X
@@ -1517,7 +1517,7 @@ action: 108
 
 # State 48
 # GoState(komi=4.5, to_play=Bhistory.size()=48)
-# 
+#
 #  7 +XOXXX+
 #  6 O+OOXXX
 #  5 +OOOX+X
@@ -1548,7 +1548,7 @@ action: 128
 
 # State 49
 # GoState(komi=4.5, to_play=Whistory.size()=49)
-# 
+#
 #  7 +XOXXX+
 #  6 OXOOXXX
 #  5 +OOOX+X
@@ -1579,7 +1579,7 @@ action: 66
 
 # State 50
 # GoState(komi=4.5, to_play=Bhistory.size()=50)
-# 
+#
 #  7 +XOXXX+
 #  6 OXOOXXX
 #  5 +OOOX+X
@@ -1610,7 +1610,7 @@ action: 442
 
 # State 51
 # GoState(komi=4.5, to_play=Whistory.size()=51)
-# 
+#
 #  7 +XOXXX+
 #  6 OXOOXXX
 #  5 +OOOX+X
@@ -1641,7 +1641,7 @@ action: 64
 
 # State 52
 # GoState(komi=4.5, to_play=Bhistory.size()=52)
-# 
+#
 #  7 +XOXXX+
 #  6 OXOOXXX
 #  5 +OOOX+X
@@ -1672,7 +1672,7 @@ action: 46
 
 # State 53
 # GoState(komi=4.5, to_play=Whistory.size()=53)
-# 
+#
 #  7 +XOXXX+
 #  6 OXOOXXX
 #  5 +OOOX+X
@@ -1703,7 +1703,7 @@ action: 44
 
 # State 54
 # GoState(komi=4.5, to_play=Bhistory.size()=54)
-# 
+#
 #  7 +XOXXX+
 #  6 OXOOXXX
 #  5 +OOOX+X
@@ -1734,7 +1734,7 @@ action: 49
 
 # State 55
 # GoState(komi=4.5, to_play=Whistory.size()=55)
-# 
+#
 #  7 +XOXXX+
 #  6 OXOOXXX
 #  5 +OOOX+X
@@ -1765,7 +1765,7 @@ action: 106
 
 # State 56
 # GoState(komi=4.5, to_play=Bhistory.size()=56)
-# 
+#
 #  7 +XOXXX+
 #  6 OXOOXXX
 #  5 OOOOX+X
@@ -1796,7 +1796,7 @@ action: 111
 
 # State 57
 # GoState(komi=4.5, to_play=Whistory.size()=57)
-# 
+#
 #  7 +XOXXX+
 #  6 OXOOXXX
 #  5 OOOOXXX
@@ -1827,7 +1827,7 @@ action: 70
 
 # State 58
 # GoState(komi=4.5, to_play=Bhistory.size()=58)
-# 
+#
 #  7 +XOXXX+
 #  6 OXOOXXX
 #  5 OOOOXXX
@@ -1858,7 +1858,7 @@ action: 442
 
 # State 59
 # GoState(komi=4.5, to_play=Whistory.size()=59)
-# 
+#
 #  7 +XOXXX+
 #  6 OXOOXXX
 #  5 OOOOXXX
@@ -1889,7 +1889,7 @@ action: 148
 
 # State 60
 # GoState(komi=4.5, to_play=Bhistory.size()=60)
-# 
+#
 #  7 O+OXXX+
 #  6 O+OOXXX
 #  5 OOOOXXX
@@ -1920,7 +1920,7 @@ action: 47
 
 # State 61
 # GoState(komi=4.5, to_play=Whistory.size()=61)
-# 
+#
 #  7 O+OXXX+
 #  6 O+OOXXX
 #  5 OOOOXXX
@@ -1951,7 +1951,7 @@ action: 128
 
 # State 62
 # GoState(komi=4.5, to_play=Bhistory.size()=62)
-# 
+#
 #  7 O+OXXX+
 #  6 OOOOXXX
 #  5 OOOOXXX
@@ -1982,7 +1982,7 @@ action: 26
 
 # State 63
 # GoState(komi=4.5, to_play=Whistory.size()=63)
-# 
+#
 #  7 O+OXXX+
 #  6 OOOOXXX
 #  5 OOOOXXX
@@ -2013,7 +2013,7 @@ action: 28
 
 # State 64
 # GoState(komi=4.5, to_play=Bhistory.size()=64)
-# 
+#
 #  7 O+OXXX+
 #  6 OOOOXXX
 #  5 OOOOXXX
@@ -2044,7 +2044,7 @@ action: 154
 
 # State 65
 # GoState(komi=4.5, to_play=Whistory.size()=65)
-# 
+#
 #  7 O+OXXXX
 #  6 OOOOXXX
 #  5 OOOOXXX
@@ -2075,7 +2075,7 @@ action: 442
 
 # State 66
 # GoState(komi=4.5, to_play=Bhistory.size()=66)
-# 
+#
 #  7 O+OXXXX
 #  6 OOOOXXX
 #  5 OOOOXXX
@@ -2106,7 +2106,7 @@ action: 91
 
 # State 67
 # GoState(komi=4.5, to_play=Whistory.size()=67)
-# 
+#
 #  7 O+OXXXX
 #  6 OOOOXXX
 #  5 OOOOXXX
@@ -2137,7 +2137,7 @@ action: 442
 
 # State 68
 # GoState(komi=4.5, to_play=Bhistory.size()=68)
-# 
+#
 #  7 O+OXXXX
 #  6 OOOOXXX
 #  5 OOOOXXX
@@ -2168,7 +2168,7 @@ action: 442
 
 # State 69
 # GoState(komi=4.5, to_play=Whistory.size()=69)
-# 
+#
 #  7 O+OXXXX
 #  6 OOOOXXX
 #  5 OOOOXXX

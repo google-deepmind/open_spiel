@@ -42,7 +42,7 @@ ToString() = "backgammon()"
 # |x...o.|o....x|
 # +------|------+
 # Turn: o
-# Dice: 
+# Dice:
 # Bar:
 # Scores, X: 0, O: 0
 IsTerminal() = False
@@ -183,7 +183,7 @@ action: 137
 # |x...o.|ooo..x|
 # +------|------+
 # Turn: o
-# Dice: 
+# Dice:
 # Bar:
 # Scores, X: 0, O: 0
 IsTerminal() = False
@@ -254,7 +254,7 @@ action: 973
 # |x...o.|ooo..x|
 # +------|------+
 # Turn: o
-# Dice: 
+# Dice:
 # Bar:
 # Scores, X: 0, O: 0
 IsTerminal() = False
@@ -325,7 +325,7 @@ action: 142
 # |x...o.|ooo..x|
 # +------|------+
 # Turn: o
-# Dice: 
+# Dice:
 # Bar:
 # Scores, X: 0, O: 0
 IsTerminal() = False
@@ -396,7 +396,7 @@ action: 1103
 # |x...o.|ooo..x|
 # +------|------+
 # Turn: o
-# Dice: 
+# Dice:
 # Bar:
 # Scores, X: 0, O: 0
 IsTerminal() = False
@@ -503,7 +503,7 @@ action: 142
 # |x..oo.|ooo.ox|
 # +------|------+
 # Turn: o
-# Dice: 
+# Dice:
 # Bar:
 # Scores, X: 0, O: 0
 IsTerminal() = False
@@ -574,7 +574,7 @@ action: 978
 # |x..oo.|ooo.ox|
 # +------|------+
 # Turn: o
-# Dice: 
+# Dice:
 # Bar:
 # Scores, X: 0, O: 0
 IsTerminal() = False
@@ -645,7 +645,7 @@ action: 993
 # |x..ooo|.oo.ox|
 # +------|------+
 # Turn: o
-# Dice: 
+# Dice:
 # Bar:
 # Scores, X: 0, O: 0
 IsTerminal() = False
@@ -716,7 +716,7 @@ action: 1081
 # |x..ooo|.oo.ox|
 # +------|------+
 # Turn: o
-# Dice: 
+# Dice:
 # Bar:
 # Scores, X: 0, O: 0
 IsTerminal() = False
@@ -787,7 +787,7 @@ action: 214
 # |x...o.|ooo.ox|
 # +------|------+
 # Turn: o
-# Dice: 
+# Dice:
 # Bar:
 # Scores, X: 0, O: 0
 IsTerminal() = False
@@ -858,7 +858,7 @@ action: 1136
 # |x...o.|ooo.ox|
 # +------|------+
 # Turn: o
-# Dice: 
+# Dice:
 # Bar:
 # Scores, X: 0, O: 0
 IsTerminal() = False
@@ -929,7 +929,7 @@ action: 1279
 # |x...o.|.oo.ox|
 # +------|------+
 # Turn: o
-# Dice: 
+# Dice:
 # Bar: x
 # Scores, X: 0, O: 0
 IsTerminal() = False
@@ -1000,7 +1000,7 @@ action: 1116
 # |x...o.|.oo.ox|
 # +------|------+
 # Turn: o
-# Dice: 
+# Dice:
 # Bar:
 # Scores, X: 0, O: 0
 IsTerminal() = False
@@ -1107,7 +1107,7 @@ action: 194
 # |x...o.|.oooox|
 # +------|------+
 # Turn: o
-# Dice: 
+# Dice:
 # Bar:
 # Scores, X: 0, O: 0
 IsTerminal() = False
@@ -1214,7 +1214,7 @@ action: 536
 # |x...o.|.oooox|
 # +------|------+
 # Turn: o
-# Dice: 
+# Dice:
 # Bar:
 # Scores, X: 0, O: 0
 IsTerminal() = False
@@ -1285,7 +1285,7 @@ action: 870
 # |x.o...|.oooox|
 # +------|------+
 # Turn: o
-# Dice: 
+# Dice:
 # Bar:
 # Scores, X: 0, O: 0
 IsTerminal() = False
@@ -1356,7 +1356,7 @@ action: 1051
 # |..o...|.oooox|
 # +------|------+
 # Turn: o
-# Dice: 
+# Dice:
 # Bar:
 # Scores, X: 0, O: 0
 IsTerminal() = False
@@ -1427,7 +1427,7 @@ action: 116
 # |..oo..|.oooox|
 # +------|------+
 # Turn: o
-# Dice: 
+# Dice:
 # Bar:
 # Scores, X: 0, O: 0
 IsTerminal() = False
@@ -1498,7 +1498,7 @@ action: 1162
 # |..oo..|.oooox|
 # +------|------+
 # Turn: o
-# Dice: 
+# Dice:
 # Bar: o
 # Scores, X: 0, O: 0
 IsTerminal() = False
@@ -1569,7 +1569,7 @@ action: 1246
 # |..oo..|.oooox|
 # +------|------+
 # Turn: o
-# Dice: 
+# Dice:
 # Bar: x
 # Scores, X: 0, O: 0
 IsTerminal() = False
@@ -1640,7 +1640,7 @@ action: 154
 # |..xo..|.oooox|
 # +------|------+
 # Turn: o
-# Dice: 
+# Dice:
 # Bar: o
 # Scores, X: 0, O: 0
 IsTerminal() = False
@@ -1711,7 +1711,7 @@ action: 1142
 # |o.xo..|.oooox|
 # +------|------+
 # Turn: o
-# Dice: 
+# Dice:
 # Bar:
 # Scores, X: 0, O: 0
 IsTerminal() = False
@@ -1782,7 +1782,7 @@ action: 694
 # |o.xo..|.xooox|
 # +------|------+
 # Turn: o
-# Dice: 
+# Dice:
 # Bar: oo
 # Scores, X: 0, O: 0
 IsTerminal() = False
@@ -1853,7 +1853,7 @@ action: 648
 # |o.xo..|.xooox|
 # +------|------+
 # Turn: o
-# Dice: 
+# Dice:
 # Bar: xx
 # Scores, X: 0, O: 0
 IsTerminal() = False
@@ -1924,7 +1924,7 @@ action: 674
 # |o.xo..|xxooox|
 # +------|------+
 # Turn: o
-# Dice: 
+# Dice:
 # Bar: x
 # Scores, X: 0, O: 0
 IsTerminal() = False
@@ -1995,7 +1995,7 @@ action: 1233
 # |..xo..|xxooox|
 # +------|------+
 # Turn: o
-# Dice: 
+# Dice:
 # Bar: x
 # Scores, X: 0, O: 0
 IsTerminal() = False
@@ -2066,7 +2066,7 @@ action: 1351
 # |..xo..|xxooox|
 # +------|------+
 # Turn: o
-# Dice: 
+# Dice:
 # Bar: x
 # Scores, X: 0, O: 0
 IsTerminal() = False
@@ -2137,7 +2137,7 @@ action: 606
 # |..xo..|xxooox|
 # +------|------+
 # Turn: o
-# Dice: 
+# Dice:
 # Bar: x
 # Scores, X: 0, O: 0
 IsTerminal() = False
@@ -2208,7 +2208,7 @@ action: 24
 # |..xo..|xxooox|
 # +------|------+
 # Turn: o
-# Dice: 
+# Dice:
 # Bar:
 # Scores, X: 0, O: 0
 IsTerminal() = False
@@ -2279,7 +2279,7 @@ action: 303
 # |..xoo.|xxooox|
 # +------|------+
 # Turn: o
-# Dice: 
+# Dice:
 # Bar:
 # Scores, X: 0, O: 0
 IsTerminal() = False
@@ -2350,7 +2350,7 @@ action: 512
 # |..xoo.|xxooox|
 # +------|------+
 # Turn: o
-# Dice: 
+# Dice:
 # Bar:
 # Scores, X: 0, O: 0
 IsTerminal() = False
@@ -2421,7 +2421,7 @@ action: 813
 # |..xo..|.xoo6x|
 # +------|------+
 # Turn: o
-# Dice: 
+# Dice:
 # Bar: x
 # Scores, X: 0, O: 0
 IsTerminal() = False
@@ -2492,7 +2492,7 @@ action: 154
 # |..xox.|.xoo6x|
 # +------|------+
 # Turn: o
-# Dice: 
+# Dice:
 # Bar:
 # Scores, X: 0, O: 0
 IsTerminal() = False
@@ -2563,7 +2563,7 @@ action: 1225
 # |..xox.|.xoo6x|
 # +------|------+
 # Turn: o
-# Dice: 
+# Dice:
 # Bar:
 # Scores, X: 0, O: 0
 IsTerminal() = False
@@ -2634,7 +2634,7 @@ action: 787
 # |..xxx.|.xoo6x|
 # +------|------+
 # Turn: o
-# Dice: 
+# Dice:
 # Bar: o
 # Scores, X: 0, O: 0
 IsTerminal() = False
@@ -2705,7 +2705,7 @@ action: 76
 # |..xxx.|.xoo7x|
 # +------|------+
 # Turn: o
-# Dice: 
+# Dice:
 # Bar: x
 # Scores, X: 0, O: 0
 IsTerminal() = False
@@ -2776,7 +2776,7 @@ action: 128
 # |..xxxx|.xoo7x|
 # +------|------+
 # Turn: o
-# Dice: 
+# Dice:
 # Bar:
 # Scores, X: 0, O: 0
 IsTerminal() = False
@@ -2883,7 +2883,7 @@ action: 223
 # |.ox.xx|.xoo7x|
 # +------|------+
 # Turn: o
-# Dice: 
+# Dice:
 # Bar: x
 # Scores, X: 0, O: 0
 IsTerminal() = False
@@ -2990,7 +2990,7 @@ action: 165
 # |xox.x.|.xoo7x|
 # +------|------+
 # Turn: o
-# Dice: 
+# Dice:
 # Bar:
 # Scores, X: 0, O: 0
 IsTerminal() = False
@@ -3061,7 +3061,7 @@ action: 62
 # |x.xox.|.xoo8x|
 # +------|------+
 # Turn: o
-# Dice: 
+# Dice:
 # Bar:
 # Scores, X: 0, O: 0
 IsTerminal() = False
@@ -3132,7 +3132,7 @@ action: 880
 # |xxxo..|.xoo8x|
 # +------|------+
 # Turn: o
-# Dice: 
+# Dice:
 # Bar:
 # Scores, X: 0, O: 0
 IsTerminal() = False
@@ -3203,7 +3203,7 @@ action: 866
 # |xxx...|oxoo8x|
 # +------|------+
 # Turn: o
-# Dice: 
+# Dice:
 # Bar:
 # Scores, X: 0, O: 0
 IsTerminal() = False
@@ -3274,7 +3274,7 @@ action: 234
 # |xx....|oxoo8.|
 # +------|------+
 # Turn: o
-# Dice: 
+# Dice:
 # Bar:
 # Scores, X: 0, O: 0
 IsTerminal() = False
@@ -3345,7 +3345,7 @@ action: 83
 # |xx....|.xoo8.|
 # +------|------+
 # Turn: o
-# Dice: 
+# Dice:
 # Bar:
 # Scores, X: 0, O: 1
 IsTerminal() = False
@@ -3416,7 +3416,7 @@ action: 212
 # |xxx...|.xoo8.|
 # +------|------+
 # Turn: o
-# Dice: 
+# Dice:
 # Bar:
 # Scores, X: 0, O: 1
 IsTerminal() = False
@@ -3523,7 +3523,7 @@ action: 54
 # |xxx...|.xoo8o|
 # +------|------+
 # Turn: o
-# Dice: 
+# Dice:
 # Bar:
 # Scores, X: 0, O: 4
 IsTerminal() = False
@@ -3594,7 +3594,7 @@ action: 582
 # |x.x...|.xoo8o|
 # +------|------+
 # Turn: o
-# Dice: 
+# Dice:
 # Bar:
 # Scores, X: 0, O: 4
 IsTerminal() = False
@@ -3665,7 +3665,7 @@ action: 29
 # |x.x...|.x.o7o|
 # +------|------+
 # Turn: o
-# Dice: 
+# Dice:
 # Bar:
 # Scores, X: 0, O: 5
 IsTerminal() = False
@@ -3736,7 +3736,7 @@ action: 453
 # |x.x...|.x.o7o|
 # +------|------+
 # Turn: o
-# Dice: 
+# Dice:
 # Bar:
 # Scores, X: 0, O: 5
 IsTerminal() = False
@@ -3843,7 +3843,7 @@ action: 27
 # |x.x...|.x..oo|
 # +------|------+
 # Turn: o
-# Dice: 
+# Dice:
 # Bar:
 # Scores, X: 0, O: 9
 IsTerminal() = False
@@ -3914,7 +3914,7 @@ action: 800
 # |xxx...|.x..oo|
 # +------|------+
 # Turn: o
-# Dice: 
+# Dice:
 # Bar:
 # Scores, X: 0, O: 9
 IsTerminal() = False
@@ -3985,7 +3985,7 @@ action: 703
 # |xxx...|.x..oo|
 # +------|------+
 # Turn: o
-# Dice: 
+# Dice:
 # Bar:
 # Scores, X: 0, O: 11
 IsTerminal() = False
@@ -4056,7 +4056,7 @@ action: 290
 # |.xx.x.|....oo|
 # +------|------+
 # Turn: o
-# Dice: 
+# Dice:
 # Bar:
 # Scores, X: 0, O: 11
 IsTerminal() = False
@@ -4127,7 +4127,7 @@ action: 702
 # |.xx.x.|....oo|
 # +------|------+
 # Turn: o
-# Dice: 
+# Dice:
 # Bar:
 # Scores, X: 0, O: 13
 IsTerminal() = False
@@ -4234,7 +4234,7 @@ action: 322
 # |....x.|....oo|
 # +------|------+
 # Turn: o
-# Dice: 
+# Dice:
 # Bar:
 # Scores, X: 0, O: 13
 IsTerminal() = False
@@ -4305,7 +4305,7 @@ action: 677
 # |....x.|......|
 # +------|------+
 # Turn: o
-# Dice: 
+# Dice:
 # Bar:
 # Scores, X: 0, O: 15
 IsTerminal() = True

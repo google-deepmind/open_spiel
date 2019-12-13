@@ -47,7 +47,7 @@ StringLegalActions() = ["Deal"]
 action: 0
 
 # State 1
-# T8643.KQ983.K2.A K972.AJT6.64.853 
+# T8643.KQ983.K2.A K972.AJT6.64.853
 IsTerminal() = False
 History() = [0]
 HistoryString() = "0"

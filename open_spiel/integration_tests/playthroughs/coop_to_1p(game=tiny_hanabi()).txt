@@ -28,7 +28,7 @@ MaxGameLength() = 4
 ToString() = "coop_to_1p(game=tiny_hanabi())"
 
 # State 0
-# 
+#
 IsTerminal() = False
 History() = []
 HistoryString() = ""

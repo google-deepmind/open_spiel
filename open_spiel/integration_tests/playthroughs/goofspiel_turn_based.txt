@@ -28,13 +28,13 @@ MaxGameLength() = 8
 ToString() = "turn_based_simultaneous_game(game=goofspiel(imp_info=True,num_cards=4,players=2,points_order=descending))"
 
 # State 0
-# Partial joint action: 
-# P0 hand: 1 2 3 4 
-# P1 hand: 1 2 3 4 
-# P0 actions: 
-# P1 actions: 
-# Point card sequence: 
-# Points: 0 0 
+# Partial joint action:
+# P0 hand: 1 2 3 4
+# P1 hand: 1 2 3 4
+# P0 actions:
+# P1 actions:
+# Point card sequence:
+# Points: 0 0
 IsTerminal() = False
 History() = []
 HistoryString() = ""
@@ -54,13 +54,13 @@ StringLegalActions() = ["[P0]Bid: 1", "[P0]Bid: 2", "[P0]Bid: 3", "[P0]Bid: 4"]
 action: 2
 
 # State 1
-# Partial joint action: 2 
-# P0 hand: 1 2 3 4 
-# P1 hand: 1 2 3 4 
-# P0 actions: 
-# P1 actions: 
-# Point card sequence: 
-# Points: 0 0 
+# Partial joint action: 2
+# P0 hand: 1 2 3 4
+# P1 hand: 1 2 3 4
+# P0 actions:
+# P1 actions:
+# Point card sequence:
+# Points: 0 0
 IsTerminal() = False
 History() = [2]
 HistoryString() = "2"
@@ -80,13 +80,13 @@ StringLegalActions() = ["[P1]Bid: 1", "[P1]Bid: 2", "[P1]Bid: 3", "[P1]Bid: 4"]
 action: 3
 
 # State 2
-# Partial joint action: 
-# P0 hand: 1 2 4 
-# P1 hand: 1 2 3 
-# P0 actions: 2 
-# P1 actions: 3 
-# Point card sequence: 
-# Points: 0 4 
+# Partial joint action:
+# P0 hand: 1 2 4
+# P1 hand: 1 2 3
+# P0 actions: 2
+# P1 actions: 3
+# Point card sequence:
+# Points: 0 4
 IsTerminal() = False
 History() = [2, 3]
 HistoryString() = "2 3"
@@ -106,13 +106,13 @@ StringLegalActions() = ["[P0]Bid: 1", "[P0]Bid: 2", "[P0]Bid: 4"]
 action: 1
 
 # State 3
-# Partial joint action: 1 
-# P0 hand: 1 2 4 
-# P1 hand: 1 2 3 
-# P0 actions: 2 
-# P1 actions: 3 
-# Point card sequence: 
-# Points: 0 4 
+# Partial joint action: 1
+# P0 hand: 1 2 4
+# P1 hand: 1 2 3
+# P0 actions: 2
+# P1 actions: 3
+# Point card sequence:
+# Points: 0 4
 IsTerminal() = False
 History() = [2, 3, 1]
 HistoryString() = "2 3 1"
@@ -132,13 +132,13 @@ StringLegalActions() = ["[P1]Bid: 1", "[P1]Bid: 2", "[P1]Bid: 3"]
 action: 0
 
 # State 4
-# Partial joint action: 
-# P0 hand: 1 4 
-# P1 hand: 2 3 
-# P0 actions: 2 1 
-# P1 actions: 3 0 
-# Point card sequence: 
-# Points: 3 4 
+# Partial joint action:
+# P0 hand: 1 4
+# P1 hand: 2 3
+# P0 actions: 2 1
+# P1 actions: 3 0
+# Point card sequence:
+# Points: 3 4
 IsTerminal() = False
 History() = [2, 3, 1, 0]
 HistoryString() = "2 3 1 0"
@@ -158,13 +158,13 @@ StringLegalActions() = ["[P0]Bid: 1", "[P0]Bid: 4"]
 action: 3
 
 # State 5
-# Partial joint action: 3 
-# P0 hand: 1 4 
-# P1 hand: 2 3 
-# P0 actions: 2 1 
-# P1 actions: 3 0 
-# Point card sequence: 
-# Points: 3 4 
+# Partial joint action: 3
+# P0 hand: 1 4
+# P1 hand: 2 3
+# P0 actions: 2 1
+# P1 actions: 3 0
+# Point card sequence:
+# Points: 3 4
 IsTerminal() = False
 History() = [2, 3, 1, 0, 3]
 HistoryString() = "2 3 1 0 3"
@@ -184,12 +184,12 @@ StringLegalActions() = ["[P1]Bid: 2", "[P1]Bid: 3"]
 action: 1
 
 # State 6
-# P0 hand: 
-# P1 hand: 
-# P0 actions: 2 1 3 0 
-# P1 actions: 3 0 1 2 
-# Point card sequence: 
-# Points: 5 5 
+# P0 hand:
+# P1 hand:
+# P0 actions: 2 1 3 0
+# P1 actions: 3 0 1 2
+# Point card sequence:
+# Points: 5 5
 IsTerminal() = True
 History() = [2, 3, 1, 0, 3, 1]
 HistoryString() = "2 3 1 0 3 1"

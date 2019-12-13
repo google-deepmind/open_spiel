@@ -30,7 +30,7 @@ ToString() = "hanabi(colors=2,hand_size=3,players=3,ranks=3)"
 # State 0
 # Life tokens: 3
 # Info tokens: 8
-# Fireworks: R0 Y0 
+# Fireworks: R0 Y0
 # Hands:
 # -----
 # -----
@@ -58,7 +58,7 @@ action: 3
 # State 1
 # Life tokens: 3
 # Info tokens: 8
-# Fireworks: R0 Y0 
+# Fireworks: R0 Y0
 # Hands:
 # Y1 || XX|RY123
 # -----
@@ -87,7 +87,7 @@ action: 1
 # State 2
 # Life tokens: 3
 # Info tokens: 8
-# Fireworks: R0 Y0 
+# Fireworks: R0 Y0
 # Hands:
 # Y1 || XX|RY123
 # R2 || XX|RY123
@@ -117,7 +117,7 @@ action: 4
 # State 3
 # Life tokens: 3
 # Info tokens: 8
-# Fireworks: R0 Y0 
+# Fireworks: R0 Y0
 # Hands:
 # Y1 || XX|RY123
 # R2 || XX|RY123
@@ -148,7 +148,7 @@ action: 4
 # State 4
 # Life tokens: 3
 # Info tokens: 8
-# Fireworks: R0 Y0 
+# Fireworks: R0 Y0
 # Hands:
 # Y1 || XX|RY123
 # R2 || XX|RY123
@@ -180,7 +180,7 @@ action: 2
 # State 5
 # Life tokens: 3
 # Info tokens: 8
-# Fireworks: R0 Y0 
+# Fireworks: R0 Y0
 # Hands:
 # Y1 || XX|RY123
 # R2 || XX|RY123
@@ -213,7 +213,7 @@ action: 3
 # State 6
 # Life tokens: 3
 # Info tokens: 8
-# Fireworks: R0 Y0 
+# Fireworks: R0 Y0
 # Hands:
 # Y1 || XX|RY123
 # R2 || XX|RY123
@@ -247,7 +247,7 @@ action: 0
 # State 7
 # Life tokens: 3
 # Info tokens: 8
-# Fireworks: R0 Y0 
+# Fireworks: R0 Y0
 # Hands:
 # Y1 || XX|RY123
 # R2 || XX|RY123
@@ -282,7 +282,7 @@ action: 1
 # State 8
 # Life tokens: 3
 # Info tokens: 8
-# Fireworks: R0 Y0 
+# Fireworks: R0 Y0
 # Hands:
 # Y1 || XX|RY123
 # R2 || XX|RY123
@@ -318,7 +318,7 @@ action: 3
 # State 9
 # Life tokens: 3
 # Info tokens: 8
-# Fireworks: R0 Y0 
+# Fireworks: R0 Y0
 # Hands:
 # Cur player
 # Y1 || XX|RY123
@@ -357,7 +357,7 @@ action: 14
 # State 10
 # Life tokens: 3
 # Info tokens: 7
-# Fireworks: R0 Y0 
+# Fireworks: R0 Y0
 # Hands:
 # Y1 || XX|RY123
 # R2 || XX|RY123
@@ -396,7 +396,7 @@ action: 13
 # State 11
 # Life tokens: 3
 # Info tokens: 6
-# Fireworks: R0 Y0 
+# Fireworks: R0 Y0
 # Hands:
 # Y1 || X1|RY1
 # R2 || XX|RY23
@@ -435,7 +435,7 @@ action: 15
 # State 12
 # Life tokens: 3
 # Info tokens: 5
-# Fireworks: R0 Y0 
+# Fireworks: R0 Y0
 # Hands:
 # Cur player
 # Y1 || X1|RY1
@@ -474,7 +474,7 @@ action: 0
 # State 13
 # Life tokens: 3
 # Info tokens: 6
-# Fireworks: R0 Y0 
+# Fireworks: R0 Y0
 # Hands:
 # R2 || XX|RY23
 # Y2 || XX|RY23
@@ -510,7 +510,7 @@ action: 5
 # State 14
 # Life tokens: 3
 # Info tokens: 6
-# Fireworks: R0 Y0 
+# Fireworks: R0 Y0
 # Hands:
 # R2 || XX|RY23
 # Y2 || XX|RY23
@@ -549,7 +549,7 @@ action: 8
 # State 15
 # Life tokens: 3
 # Info tokens: 5
-# Fireworks: R0 Y0 
+# Fireworks: R0 Y0
 # Hands:
 # R2 || RX|R23
 # Y2 || XX|Y23
@@ -588,7 +588,7 @@ action: 5
 # State 16
 # Life tokens: 3
 # Info tokens: 5
-# Fireworks: R0 Y1 
+# Fireworks: R0 Y1
 # Hands:
 # R2 || RX|R23
 # Y2 || XX|Y23
@@ -624,7 +624,7 @@ action: 0
 # State 17
 # Life tokens: 3
 # Info tokens: 5
-# Fireworks: R0 Y1 
+# Fireworks: R0 Y1
 # Hands:
 # Cur player
 # R2 || RX|R23
@@ -663,7 +663,7 @@ action: 4
 # State 18
 # Life tokens: 3
 # Info tokens: 5
-# Fireworks: R0 Y2 
+# Fireworks: R0 Y2
 # Hands:
 # R2 || RX|R23
 # Y3 || XX|Y123
@@ -699,7 +699,7 @@ action: 0
 # State 19
 # Life tokens: 3
 # Info tokens: 5
-# Fireworks: R0 Y2 
+# Fireworks: R0 Y2
 # Hands:
 # R2 || RX|R23
 # Y3 || XX|Y123
@@ -738,7 +738,7 @@ action: 9
 # State 20
 # Life tokens: 3
 # Info tokens: 4
-# Fireworks: R0 Y2 
+# Fireworks: R0 Y2
 # Hands:
 # R2 || RX|R23
 # Y3 || YX|Y123
@@ -777,7 +777,7 @@ action: 11
 # State 21
 # Life tokens: 3
 # Info tokens: 3
-# Fireworks: R0 Y2 
+# Fireworks: R0 Y2
 # Hands:
 # Cur player
 # R2 || R2|R2
@@ -816,7 +816,7 @@ action: 2
 # State 22
 # Life tokens: 3
 # Info tokens: 4
-# Fireworks: R0 Y2 
+# Fireworks: R0 Y2
 # Hands:
 # R2 || R2|R2
 # Y3 || YX|Y13

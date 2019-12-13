@@ -29,18 +29,18 @@ ToString() = "bridge()"
 
 # State 0
 # Vul: None
-#         S 
-#         H 
-#         D 
-#         C 
-# S               S 
-# H               H 
-# D               D 
-# C               C 
-#         S 
-#         H 
-#         D 
-#         C 
+#         S
+#         H
+#         D
+#         C
+# S               S
+# H               H
+# D               D
+# C               C
+#         S
+#         H
+#         D
+#         C
 IsTerminal() = False
 History() = []
 HistoryString() = ""
@@ -65,18 +65,18 @@ action: 22
 
 # State 1
 # Vul: None
-#         S 
+#         S
 #         H 7
-#         D 
-#         C 
-# S               S 
-# H               H 
-# D               D 
-# C               C 
-#         S 
-#         H 
-#         D 
-#         C 
+#         D
+#         C
+# S               S
+# H               H
+# D               D
+# C               C
+#         S
+#         H
+#         D
+#         C
 IsTerminal() = False
 History() = [22]
 HistoryString() = "22"
@@ -101,18 +101,18 @@ action: 18
 
 # State 2
 # Vul: None
-#         S 
+#         S
 #         H 7
-#         D 
-#         C 
-# S               S 
+#         D
+#         C
+# S               S
 # H               H 6
-# D               D 
-# C               C 
-#         S 
-#         H 
-#         D 
-#         C 
+# D               D
+# C               C
+#         S
+#         H
+#         D
+#         C
 IsTerminal() = False
 History() = [22, 18]
 HistoryString() = "22 18"
@@ -137,18 +137,18 @@ action: 47
 
 # State 3
 # Vul: None
-#         S 
+#         S
 #         H 7
-#         D 
-#         C 
-# S               S 
+#         D
+#         C
+# S               S
 # H               H 6
-# D               D 
-# C               C 
+# D               D
+# C               C
 #         S K
-#         H 
-#         D 
-#         C 
+#         H
+#         D
+#         C
 IsTerminal() = False
 History() = [22, 18, 47]
 HistoryString() = "22 18 47"
@@ -173,18 +173,18 @@ action: 31
 
 # State 4
 # Vul: None
-#         S 
+#         S
 #         H 7
-#         D 
-#         C 
-# S 9             S 
+#         D
+#         C
+# S 9             S
 # H               H 6
-# D               D 
-# C               C 
+# D               D
+# C               C
 #         S K
-#         H 
-#         D 
-#         C 
+#         H
+#         D
+#         C
 IsTerminal() = False
 History() = [22, 18, 47, 31]
 HistoryString() = "22 18 47 31"
@@ -209,18 +209,18 @@ action: 14
 
 # State 5
 # Vul: None
-#         S 
+#         S
 #         H 75
-#         D 
-#         C 
-# S 9             S 
+#         D
+#         C
+# S 9             S
 # H               H 6
-# D               D 
-# C               C 
+# D               D
+# C               C
 #         S K
-#         H 
-#         D 
-#         C 
+#         H
+#         D
+#         C
 IsTerminal() = False
 History() = [22, 18, 47, 31, 14]
 HistoryString() = "22 18 47 31 14"
@@ -245,18 +245,18 @@ action: 12
 
 # State 6
 # Vul: None
-#         S 
+#         S
 #         H 75
-#         D 
-#         C 
-# S 9             S 
+#         D
+#         C
+# S 9             S
 # H               H 6
-# D               D 
+# D               D
 # C               C 5
 #         S K
-#         H 
-#         D 
-#         C 
+#         H
+#         D
+#         C
 IsTerminal() = False
 History() = [22, 18, 47, 31, 14, 12]
 HistoryString() = "22 18 47 31 14 12"
@@ -281,18 +281,18 @@ action: 46
 
 # State 7
 # Vul: None
-#         S 
+#         S
 #         H 75
-#         D 
-#         C 
-# S 9             S 
+#         D
+#         C
+# S 9             S
 # H               H 6
-# D               D 
+# D               D
 # C               C 5
 #         S K
 #         H K
-#         D 
-#         C 
+#         D
+#         C
 IsTerminal() = False
 History() = [22, 18, 47, 31, 14, 12, 46]
 HistoryString() = "22 18 47 31 14 12 46"
@@ -317,18 +317,18 @@ action: 50
 
 # State 8
 # Vul: None
-#         S 
+#         S
 #         H 75
-#         D 
-#         C 
-# S 9             S 
+#         D
+#         C
+# S 9             S
 # H A             H 6
-# D               D 
+# D               D
 # C               C 5
 #         S K
 #         H K
-#         D 
-#         C 
+#         D
+#         C
 IsTerminal() = False
 History() = [22, 18, 47, 31, 14, 12, 46, 50]
 HistoryString() = "22 18 47 31 14 12 46 50"
@@ -353,18 +353,18 @@ action: 48
 
 # State 9
 # Vul: None
-#         S 
+#         S
 #         H 75
-#         D 
+#         D
 #         C A
-# S 9             S 
+# S 9             S
 # H A             H 6
-# D               D 
+# D               D
 # C               C 5
 #         S K
 #         H K
-#         D 
-#         C 
+#         D
+#         C
 IsTerminal() = False
 History() = [22, 18, 47, 31, 14, 12, 46, 50, 48]
 HistoryString() = "22 18 47 31 14 12 46 50 48"
@@ -389,18 +389,18 @@ action: 49
 
 # State 10
 # Vul: None
-#         S 
+#         S
 #         H 75
-#         D 
+#         D
 #         C A
-# S 9             S 
+# S 9             S
 # H A             H 6
 # D               D A
 # C               C 5
 #         S K
 #         H K
-#         D 
-#         C 
+#         D
+#         C
 IsTerminal() = False
 History() = [22, 18, 47, 31, 14, 12, 46, 50, 48, 49]
 HistoryString() = "22 18 47 31 14 12 46 50 48 49"
@@ -425,18 +425,18 @@ action: 30
 
 # State 11
 # Vul: None
-#         S 
+#         S
 #         H 75
-#         D 
+#         D
 #         C A
-# S 9             S 
+# S 9             S
 # H A             H 6
 # D               D A
 # C               C 5
 #         S K
 #         H K9
-#         D 
-#         C 
+#         D
+#         C
 IsTerminal() = False
 History() = [22, 18, 47, 31, 14, 12, 46, 50, 48, 49, 30]
 HistoryString() = "22 18 47 31 14 12 46 50 48 49 30"
@@ -461,18 +461,18 @@ action: 9
 
 # State 12
 # Vul: None
-#         S 
+#         S
 #         H 75
-#         D 
+#         D
 #         C A
-# S 9             S 
+# S 9             S
 # H A             H 6
 # D 4             D A
 # C               C 5
 #         S K
 #         H K9
-#         D 
-#         C 
+#         D
+#         C
 IsTerminal() = False
 History() = [22, 18, 47, 31, 14, 12, 46, 50, 48, 49, 30, 9]
 HistoryString() = "22 18 47 31 14 12 46 50 48 49 30 9"
@@ -499,16 +499,16 @@ action: 15
 # Vul: None
 #         S 5
 #         H 75
-#         D 
+#         D
 #         C A
-# S 9             S 
+# S 9             S
 # H A             H 6
 # D 4             D A
 # C               C 5
 #         S K
 #         H K9
-#         D 
-#         C 
+#         D
+#         C
 IsTerminal() = False
 History() = [22, 18, 47, 31, 14, 12, 46, 50, 48, 49, 30, 9, 15]
 HistoryString() = "22 18 47 31 14 12 46 50 48 49 30 9 15"
@@ -535,16 +535,16 @@ action: 45
 # Vul: None
 #         S 5
 #         H 75
-#         D 
+#         D
 #         C A
-# S 9             S 
+# S 9             S
 # H A             H 6
 # D 4             D AK
 # C               C 5
 #         S K
 #         H K9
-#         D 
-#         C 
+#         D
+#         C
 IsTerminal() = False
 History() = [22, 18, 47, 31, 14, 12, 46, 50, 48, 49, 30, 9, 15, 45]
 HistoryString() = "22 18 47 31 14 12 46 50 48 49 30 9 15 45"
@@ -571,16 +571,16 @@ action: 41
 # Vul: None
 #         S 5
 #         H 75
-#         D 
+#         D
 #         C A
-# S 9             S 
+# S 9             S
 # H A             H 6
 # D 4             D AK
 # C               C 5
 #         S K
 #         H K9
 #         D Q
-#         C 
+#         C
 IsTerminal() = False
 History() = [22, 18, 47, 31, 14, 12, 46, 50, 48, 49, 30, 9, 15, 45, 41]
 HistoryString() = "22 18 47 31 14 12 46 50 48 49 30 9 15 45 41"
@@ -607,16 +607,16 @@ action: 28
 # Vul: None
 #         S 5
 #         H 75
-#         D 
+#         D
 #         C A
-# S 9             S 
+# S 9             S
 # H A             H 6
 # D 4             D AK
 # C 9             C 5
 #         S K
 #         H K9
 #         D Q
-#         C 
+#         C
 IsTerminal() = False
 History() = [22, 18, 47, 31, 14, 12, 46, 50, 48, 49, 30, 9, 15, 45, 41, 28]
 HistoryString() = "22 18 47 31 14 12 46 50 48 49 30 9 15 45 41 28"
@@ -643,16 +643,16 @@ action: 24
 # Vul: None
 #         S 5
 #         H 75
-#         D 
+#         D
 #         C A8
-# S 9             S 
+# S 9             S
 # H A             H 6
 # D 4             D AK
 # C 9             C 5
 #         S K
 #         H K9
 #         D Q
-#         C 
+#         C
 IsTerminal() = False
 History() = [22, 18, 47, 31, 14, 12, 46, 50, 48, 49, 30, 9, 15, 45, 41, 28, 24]
 HistoryString() = "22 18 47 31 14 12 46 50 48 49 30 9 15 45 41 28 24"
@@ -679,16 +679,16 @@ action: 29
 # Vul: None
 #         S 5
 #         H 75
-#         D 
+#         D
 #         C A8
-# S 9             S 
+# S 9             S
 # H A             H 6
 # D 4             D AK9
 # C 9             C 5
 #         S K
 #         H K9
 #         D Q
-#         C 
+#         C
 IsTerminal() = False
 History() = [22, 18, 47, 31, 14, 12, 46, 50, 48, 49, 30, 9, 15, 45, 41, 28, 24, 29]
 HistoryString() = "22 18 47 31 14 12 46 50 48 49 30 9 15 45 41 28 24 29"
@@ -715,16 +715,16 @@ action: 1
 # Vul: None
 #         S 5
 #         H 75
-#         D 
+#         D
 #         C A8
-# S 9             S 
+# S 9             S
 # H A             H 6
 # D 4             D AK9
 # C 9             C 5
 #         S K
 #         H K9
 #         D Q2
-#         C 
+#         C
 IsTerminal() = False
 History() = [22, 18, 47, 31, 14, 12, 46, 50, 48, 49, 30, 9, 15, 45, 41, 28, 24, 29, 1]
 HistoryString() = "22 18 47 31 14 12 46 50 48 49 30 9 15 45 41 28 24 29 1"
@@ -751,16 +751,16 @@ action: 10
 # Vul: None
 #         S 5
 #         H 75
-#         D 
+#         D
 #         C A8
-# S 9             S 
+# S 9             S
 # H A4            H 6
 # D 4             D AK9
 # C 9             C 5
 #         S K
 #         H K9
 #         D Q2
-#         C 
+#         C
 IsTerminal() = False
 History() = [22, 18, 47, 31, 14, 12, 46, 50, 48, 49, 30, 9, 15, 45, 41, 28, 24, 29, 1, 10]
 HistoryString() = "22 18 47 31 14 12 46 50 48 49 30 9 15 45 41 28 24 29 1 10"
@@ -787,16 +787,16 @@ action: 19
 # Vul: None
 #         S 65
 #         H 75
-#         D 
+#         D
 #         C A8
-# S 9             S 
+# S 9             S
 # H A4            H 6
 # D 4             D AK9
 # C 9             C 5
 #         S K
 #         H K9
 #         D Q2
-#         C 
+#         C
 IsTerminal() = False
 History() = [22, 18, 47, 31, 14, 12, 46, 50, 48, 49, 30, 9, 15, 45, 41, 28, 24, 29, 1, 10, 19]
 HistoryString() = "22 18 47 31 14 12 46 50 48 49 30 9 15 45 41 28 24 29 1 10 19"
@@ -823,16 +823,16 @@ action: 33
 # Vul: None
 #         S 65
 #         H 75
-#         D 
+#         D
 #         C A8
-# S 9             S 
+# S 9             S
 # H A4            H 6
 # D 4             D AKT9
 # C 9             C 5
 #         S K
 #         H K9
 #         D Q2
-#         C 
+#         C
 IsTerminal() = False
 History() = [22, 18, 47, 31, 14, 12, 46, 50, 48, 49, 30, 9, 15, 45, 41, 28, 24, 29, 1, 10, 19, 33]
 HistoryString() = "22 18 47 31 14 12 46 50 48 49 30 9 15 45 41 28 24 29 1 10 19 33"
@@ -859,16 +859,16 @@ action: 39
 # Vul: None
 #         S 65
 #         H 75
-#         D 
+#         D
 #         C A8
-# S 9             S 
+# S 9             S
 # H A4            H 6
 # D 4             D AKT9
 # C 9             C 5
 #         S KJ
 #         H K9
 #         D Q2
-#         C 
+#         C
 IsTerminal() = False
 History() = [22, 18, 47, 31, 14, 12, 46, 50, 48, 49, 30, 9, 15, 45, 41, 28, 24, 29, 1, 10, 19, 33, 39]
 HistoryString() = "22 18 47 31 14 12 46 50 48 49 30 9 15 45 41 28 24 29 1 10 19 33 39"
@@ -895,16 +895,16 @@ action: 35
 # Vul: None
 #         S 65
 #         H 75
-#         D 
+#         D
 #         C A8
-# S T9            S 
+# S T9            S
 # H A4            H 6
 # D 4             D AKT9
 # C 9             C 5
 #         S KJ
 #         H K9
 #         D Q2
-#         C 
+#         C
 IsTerminal() = False
 History() = [22, 18, 47, 31, 14, 12, 46, 50, 48, 49, 30, 9, 15, 45, 41, 28, 24, 29, 1, 10, 19, 33, 39, 35]
 HistoryString() = "22 18 47 31 14 12 46 50 48 49 30 9 15 45 41 28 24 29 1 10 19 33 39 35"
@@ -931,16 +931,16 @@ action: 0
 # Vul: None
 #         S 65
 #         H 75
-#         D 
+#         D
 #         C A82
-# S T9            S 
+# S T9            S
 # H A4            H 6
 # D 4             D AKT9
 # C 9             C 5
 #         S KJ
 #         H K9
 #         D Q2
-#         C 
+#         C
 IsTerminal() = False
 History() = [22, 18, 47, 31, 14, 12, 46, 50, 48, 49, 30, 9, 15, 45, 41, 28, 24, 29, 1, 10, 19, 33, 39, 35, 0]
 HistoryString() = "22 18 47 31 14 12 46 50 48 49 30 9 15 45 41 28 24 29 1 10 19 33 39 35 0"
@@ -967,7 +967,7 @@ action: 11
 # Vul: None
 #         S 65
 #         H 75
-#         D 
+#         D
 #         C A82
 # S T9            S 4
 # H A4            H 6
@@ -976,7 +976,7 @@ action: 11
 #         S KJ
 #         H K9
 #         D Q2
-#         C 
+#         C
 IsTerminal() = False
 History() = [22, 18, 47, 31, 14, 12, 46, 50, 48, 49, 30, 9, 15, 45, 41, 28, 24, 29, 1, 10, 19, 33, 39, 35, 0, 11]
 HistoryString() = "22 18 47 31 14 12 46 50 48 49 30 9 15 45 41 28 24 29 1 10 19 33 39 35 0 11"
@@ -1003,7 +1003,7 @@ action: 40
 # Vul: None
 #         S 65
 #         H 75
-#         D 
+#         D
 #         C A82
 # S T9            S 4
 # H A4            H 6
@@ -1039,7 +1039,7 @@ action: 20
 # Vul: None
 #         S 65
 #         H 75
-#         D 
+#         D
 #         C A82
 # S T9            S 4
 # H A4            H 6
@@ -1075,7 +1075,7 @@ action: 42
 # Vul: None
 #         S 65
 #         H Q75
-#         D 
+#         D
 #         C A82
 # S T9            S 4
 # H A4            H 6
@@ -1111,7 +1111,7 @@ action: 32
 # Vul: None
 #         S 65
 #         H Q75
-#         D 
+#         D
 #         C A82
 # S T9            S 4
 # H A4            H 6
@@ -1147,7 +1147,7 @@ action: 5
 # Vul: None
 #         S 65
 #         H Q75
-#         D 
+#         D
 #         C A82
 # S T9            S 4
 # H A4            H 6
@@ -1183,7 +1183,7 @@ action: 23
 # Vul: None
 #         S 65
 #         H Q75
-#         D 
+#         D
 #         C A82
 # S T97           S 4
 # H A4            H 6
@@ -1219,7 +1219,7 @@ action: 51
 # Vul: None
 #         S A65
 #         H Q75
-#         D 
+#         D
 #         C A82
 # S T97           S 4
 # H A4            H 6
@@ -1255,7 +1255,7 @@ action: 25
 # Vul: None
 #         S A65
 #         H Q75
-#         D 
+#         D
 #         C A82
 # S T97           S 4
 # H A4            H 6
@@ -1291,7 +1291,7 @@ action: 38
 # Vul: None
 #         S A65
 #         H Q75
-#         D 
+#         D
 #         C A82
 # S T97           S 4
 # H A4            H 6
@@ -1327,7 +1327,7 @@ action: 21
 # Vul: None
 #         S A65
 #         H Q75
-#         D 
+#         D
 #         C A82
 # S T97           S 4
 # H A4            H 6
@@ -1363,7 +1363,7 @@ action: 7
 # Vul: None
 #         S A653
 #         H Q75
-#         D 
+#         D
 #         C A82
 # S T97           S 4
 # H A4            H 6
@@ -1399,7 +1399,7 @@ action: 37
 # Vul: None
 #         S A653
 #         H Q75
-#         D 
+#         D
 #         C A82
 # S T97           S 4
 # H A4            H 6
@@ -1435,7 +1435,7 @@ action: 6
 # Vul: None
 #         S A653
 #         H Q75
-#         D 
+#         D
 #         C A82
 # S T97           S 4
 # H A4            H 6
@@ -1471,7 +1471,7 @@ action: 44
 # Vul: None
 #         S A653
 #         H Q75
-#         D 
+#         D
 #         C A82
 # S T97           S 4
 # H A4            H 6
@@ -1507,7 +1507,7 @@ action: 2
 # Vul: None
 #         S A653
 #         H Q752
-#         D 
+#         D
 #         C A82
 # S T97           S 4
 # H A4            H 6
@@ -1543,7 +1543,7 @@ action: 43
 # Vul: None
 #         S A653
 #         H Q752
-#         D 
+#         D
 #         C A82
 # S T97           S Q4
 # H A4            H 6
@@ -1579,7 +1579,7 @@ action: 36
 # Vul: None
 #         S A653
 #         H Q752
-#         D 
+#         D
 #         C A82
 # S T97           S Q4
 # H A4            H 6
@@ -1615,7 +1615,7 @@ action: 3
 # Vul: None
 #         S A653
 #         H Q752
-#         D 
+#         D
 #         C A82
 # S T972          S Q4
 # H A4            H 6
@@ -1949,9 +1949,9 @@ action: 57
 #         H KJT93
 #         D Q32
 #         C QJ3
-# 
+#
 # West  North East  South
-#       1H    
+#       1H
 IsTerminal() = False
 History() = [22, 18, 47, 31, 14, 12, 46, 50, 48, 49, 30, 9, 15, 45, 41, 28, 24, 29, 1, 10, 19, 33, 39, 35, 0, 11, 40, 20, 42, 32, 5, 23, 51, 25, 38, 21, 7, 37, 6, 44, 2, 43, 36, 3, 17, 27, 4, 16, 8, 26, 34, 13, 57]
 HistoryString() = "22 18 47 31 14 12 46 50 48 49 30 9 15 45 41 28 24 29 1 10 19 33 39 35 0 11 40 20 42 32 5 23 51 25 38 21 7 37 6 44 2 43 36 3 17 27 4 16 8 26 34 13 57"
@@ -1988,9 +1988,9 @@ action: 89
 #         H KJT93
 #         D Q32
 #         C QJ3
-# 
+#
 # West  North East  South
-#       1H    7N    
+#       1H    7N
 IsTerminal() = False
 History() = [22, 18, 47, 31, 14, 12, 46, 50, 48, 49, 30, 9, 15, 45, 41, 28, 24, 29, 1, 10, 19, 33, 39, 35, 0, 11, 40, 20, 42, 32, 5, 23, 51, 25, 38, 21, 7, 37, 6, 44, 2, 43, 36, 3, 17, 27, 4, 16, 8, 26, 34, 13, 57, 89]
 HistoryString() = "22 18 47 31 14 12 46 50 48 49 30 9 15 45 41 28 24 29 1 10 19 33 39 35 0 11 40 20 42 32 5 23 51 25 38 21 7 37 6 44 2 43 36 3 17 27 4 16 8 26 34 13 57 89"
@@ -2027,9 +2027,9 @@ action: 52
 #         H KJT93
 #         D Q32
 #         C QJ3
-# 
+#
 # West  North East  South
-#       1H    7N    Pass  
+#       1H    7N    Pass
 IsTerminal() = False
 History() = [22, 18, 47, 31, 14, 12, 46, 50, 48, 49, 30, 9, 15, 45, 41, 28, 24, 29, 1, 10, 19, 33, 39, 35, 0, 11, 40, 20, 42, 32, 5, 23, 51, 25, 38, 21, 7, 37, 6, 44, 2, 43, 36, 3, 17, 27, 4, 16, 8, 26, 34, 13, 57, 89, 52]
 HistoryString() = "22 18 47 31 14 12 46 50 48 49 30 9 15 45 41 28 24 29 1 10 19 33 39 35 0 11 40 20 42 32 5 23 51 25 38 21 7 37 6 44 2 43 36 3 17 27 4 16 8 26 34 13 57 89 52"
@@ -2066,10 +2066,10 @@ action: 52
 #         H KJT93
 #         D Q32
 #         C QJ3
-# 
+#
 # West  North East  South
-#       1H    7N    Pass  
-# Pass  
+#       1H    7N    Pass
+# Pass
 IsTerminal() = False
 History() = [22, 18, 47, 31, 14, 12, 46, 50, 48, 49, 30, 9, 15, 45, 41, 28, 24, 29, 1, 10, 19, 33, 39, 35, 0, 11, 40, 20, 42, 32, 5, 23, 51, 25, 38, 21, 7, 37, 6, 44, 2, 43, 36, 3, 17, 27, 4, 16, 8, 26, 34, 13, 57, 89, 52, 52]
 HistoryString() = "22 18 47 31 14 12 46 50 48 49 30 9 15 45 41 28 24 29 1 10 19 33 39 35 0 11 40 20 42 32 5 23 51 25 38 21 7 37 6 44 2 43 36 3 17 27 4 16 8 26 34 13 57 89 52 52"
@@ -2106,10 +2106,10 @@ action: 52
 #         H KJT93
 #         D Q32
 #         C QJ3
-# 
+#
 # West  North East  South
-#       1H    7N    Pass  
-# Pass  Pass  
+#       1H    7N    Pass
+# Pass  Pass
 IsTerminal() = True
 History() = [22, 18, 47, 31, 14, 12, 46, 50, 48, 49, 30, 9, 15, 45, 41, 28, 24, 29, 1, 10, 19, 33, 39, 35, 0, 11, 40, 20, 42, 32, 5, 23, 51, 25, 38, 21, 7, 37, 6, 44, 2, 43, 36, 3, 17, 27, 4, 16, 8, 26, 34, 13, 57, 89, 52, 52, 52]
 HistoryString() = "22 18 47 31 14 12 46 50 48 49 30 9 15 45 41 28 24 29 1 10 19 33 39 35 0 11 40 20 42 32 5 23 51 25 38 21 7 37 6 44 2 43 36 3 17 27 4 16 8 26 34 13 57 89 52 52 52"

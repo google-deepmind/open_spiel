@@ -29,12 +29,12 @@ ToString() = "matrix_rps()"
 
 # State 0
 # Terminal? false
-# Row actions: Rock Paper Scissors 
-# Col actions: Rock Paper Scissors 
+# Row actions: Rock Paper Scissors
+# Col actions: Rock Paper Scissors
 # Utility matrix:
-# 0,0 -1,1 1,-1 
-# 1,-1 0,0 -1,1 
-# -1,1 1,-1 0,0 
+# 0,0 -1,1 1,-1
+# 1,-1 0,0 -1,1
+# -1,1 1,-1 0,0
 IsTerminal() = False
 History() = []
 HistoryString() = ""
@@ -59,12 +59,12 @@ actions: [2, 0]
 # Terminal? true
 # History: 2 0
 # Returns: -1,1
-# Row actions: 
-# Col actions: 
+# Row actions:
+# Col actions:
 # Utility matrix:
-# 0,0 -1,1 1,-1 
-# 1,-1 0,0 -1,1 
-# -1,1 1,-1 0,0 
+# 0,0 -1,1 1,-1
+# 1,-1 0,0 -1,1
+# -1,1 1,-1 0,0
 IsTerminal() = True
 History() = [2, 0]
 HistoryString() = "2 0"

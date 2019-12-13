@@ -29,9 +29,9 @@ ToString() = "coin_game()"
 # phase=AssignPreferences
 # preferences=
 # moves=0
-#         a b c 
-# player0 0 0 0 
-# player1 0 0 0 
+#         a b c
+# player0 0 0 0
+# player1 0 0 0
 # +--------+
 # |        |
 # |        |
@@ -59,11 +59,11 @@ action: 1
 
 # State 1
 # phase=AssignPreferences
-# preferences=0:b 
+# preferences=0:b
 # moves=0
-#         a b c 
-# player0 0 0 0 
-# player1 0 0 0 
+#         a b c
+# player0 0 0 0
+# player1 0 0 0
 # +--------+
 # |        |
 # |        |
@@ -91,11 +91,11 @@ action: 2
 
 # State 2
 # phase=DeployPlayers
-# preferences=0:b 1:c 
+# preferences=0:b 1:c
 # moves=0
-#         a b c 
-# player0 0 0 0 
-# player1 0 0 0 
+#         a b c
+# player0 0 0 0
+# player1 0 0 0
 # +--------+
 # |        |
 # |        |
@@ -123,11 +123,11 @@ action: 62
 
 # State 3
 # phase=DeployPlayers
-# preferences=0:b 1:c 
+# preferences=0:b 1:c
 # moves=0
-#         a b c 
-# player0 0 0 0 
-# player1 0 0 0 
+#         a b c
+# player0 0 0 0
+# player1 0 0 0
 # +--------+
 # |        |
 # |        |
@@ -155,11 +155,11 @@ action: 50
 
 # State 4
 # phase=DeployCoins
-# preferences=0:b 1:c 
+# preferences=0:b 1:c
 # moves=0
-#         a b c 
-# player0 0 0 0 
-# player1 0 0 0 
+#         a b c
+# player0 0 0 0
+# player1 0 0 0
 # +--------+
 # |        |
 # |        |
@@ -187,11 +187,11 @@ action: 34
 
 # State 5
 # phase=DeployCoins
-# preferences=0:b 1:c 
+# preferences=0:b 1:c
 # moves=0
-#         a b c 
-# player0 0 0 0 
-# player1 0 0 0 
+#         a b c
+# player0 0 0 0
+# player1 0 0 0
 # +--------+
 # |        |
 # |        |
@@ -219,11 +219,11 @@ action: 9
 
 # State 6
 # phase=DeployCoins
-# preferences=0:b 1:c 
+# preferences=0:b 1:c
 # moves=0
-#         a b c 
-# player0 0 0 0 
-# player1 0 0 0 
+#         a b c
+# player0 0 0 0
+# player1 0 0 0
 # +--------+
 # |        |
 # | a      |
@@ -251,11 +251,11 @@ action: 49
 
 # State 7
 # phase=DeployCoins
-# preferences=0:b 1:c 
+# preferences=0:b 1:c
 # moves=0
-#         a b c 
-# player0 0 0 0 
-# player1 0 0 0 
+#         a b c
+# player0 0 0 0
+# player1 0 0 0
 # +--------+
 # |        |
 # | a      |
@@ -283,11 +283,11 @@ action: 25
 
 # State 8
 # phase=DeployCoins
-# preferences=0:b 1:c 
+# preferences=0:b 1:c
 # moves=0
-#         a b c 
-# player0 0 0 0 
-# player1 0 0 0 
+#         a b c
+# player0 0 0 0
+# player1 0 0 0
 # +--------+
 # |        |
 # | a      |
@@ -315,11 +315,11 @@ action: 60
 
 # State 9
 # phase=DeployCoins
-# preferences=0:b 1:c 
+# preferences=0:b 1:c
 # moves=0
-#         a b c 
-# player0 0 0 0 
-# player1 0 0 0 
+#         a b c
+# player0 0 0 0
+# player1 0 0 0
 # +--------+
 # |        |
 # | a      |
@@ -347,11 +347,11 @@ action: 42
 
 # State 10
 # phase=DeployCoins
-# preferences=0:b 1:c 
+# preferences=0:b 1:c
 # moves=0
-#         a b c 
-# player0 0 0 0 
-# player1 0 0 0 
+#         a b c
+# player0 0 0 0
+# player1 0 0 0
 # +--------+
 # |        |
 # | a      |
@@ -379,11 +379,11 @@ action: 55
 
 # State 11
 # phase=DeployCoins
-# preferences=0:b 1:c 
+# preferences=0:b 1:c
 # moves=0
-#         a b c 
-# player0 0 0 0 
-# player1 0 0 0 
+#         a b c
+# player0 0 0 0
+# player1 0 0 0
 # +--------+
 # |        |
 # | a      |
@@ -411,11 +411,11 @@ action: 19
 
 # State 12
 # phase=DeployCoins
-# preferences=0:b 1:c 
+# preferences=0:b 1:c
 # moves=0
-#         a b c 
-# player0 0 0 0 
-# player1 0 0 0 
+#         a b c
+# player0 0 0 0
+# player1 0 0 0
 # +--------+
 # |        |
 # | a      |
@@ -443,11 +443,11 @@ action: 17
 
 # State 13
 # phase=DeployCoins
-# preferences=0:b 1:c 
+# preferences=0:b 1:c
 # moves=0
-#         a b c 
-# player0 0 0 0 
-# player1 0 0 0 
+#         a b c
+# player0 0 0 0
+# player1 0 0 0
 # +--------+
 # |        |
 # | a      |
@@ -475,11 +475,11 @@ action: 44
 
 # State 14
 # phase=DeployCoins
-# preferences=0:b 1:c 
+# preferences=0:b 1:c
 # moves=0
-#         a b c 
-# player0 0 0 0 
-# player1 0 0 0 
+#         a b c
+# player0 0 0 0
+# player1 0 0 0
 # +--------+
 # |        |
 # | a      |
@@ -507,11 +507,11 @@ action: 35
 
 # State 15
 # phase=DeployCoins
-# preferences=0:b 1:c 
+# preferences=0:b 1:c
 # moves=0
-#         a b c 
-# player0 0 0 0 
-# player1 0 0 0 
+#         a b c
+# player0 0 0 0
+# player1 0 0 0
 # +--------+
 # |        |
 # | a      |
@@ -539,11 +539,11 @@ action: 47
 
 # State 16
 # phase=Play
-# preferences=0:b 1:c 
+# preferences=0:b 1:c
 # moves=0
-#         a b c 
-# player0 0 0 0 
-# player1 0 0 0 
+#         a b c
+# player0 0 0 0
+# player1 0 0 0
 # +--------+
 # |        |
 # | a      |
@@ -572,11 +572,11 @@ action: 4
 
 # State 17
 # phase=Play
-# preferences=0:b 1:c 
+# preferences=0:b 1:c
 # moves=1
-#         a b c 
-# player0 0 0 0 
-# player1 0 0 0 
+#         a b c
+# player0 0 0 0
+# player1 0 0 0
 # +--------+
 # |        |
 # | a      |
@@ -605,11 +605,11 @@ action: 0
 
 # State 18
 # phase=Play
-# preferences=0:b 1:c 
+# preferences=0:b 1:c
 # moves=2
-#         a b c 
-# player0 0 0 0 
-# player1 0 1 0 
+#         a b c
+# player0 0 0 0
+# player1 0 1 0
 # +--------+
 # |        |
 # | a      |
@@ -638,11 +638,11 @@ action: 3
 
 # State 19
 # phase=Play
-# preferences=0:b 1:c 
+# preferences=0:b 1:c
 # moves=3
-#         a b c 
-# player0 0 0 0 
-# player1 0 1 0 
+#         a b c
+# player0 0 0 0
+# player1 0 1 0
 # +--------+
 # |        |
 # | a      |
@@ -671,11 +671,11 @@ action: 3
 
 # State 20
 # phase=Play
-# preferences=0:b 1:c 
+# preferences=0:b 1:c
 # moves=4
-#         a b c 
-# player0 0 0 0 
-# player1 0 1 0 
+#         a b c
+# player0 0 0 0
+# player1 0 1 0
 # +--------+
 # |        |
 # | a      |
@@ -704,11 +704,11 @@ action: 2
 
 # State 21
 # phase=Play
-# preferences=0:b 1:c 
+# preferences=0:b 1:c
 # moves=5
-#         a b c 
-# player0 0 0 0 
-# player1 0 1 0 
+#         a b c
+# player0 0 0 0
+# player1 0 1 0
 # +--------+
 # |        |
 # | a      |
@@ -737,11 +737,11 @@ action: 1
 
 # State 22
 # phase=Play
-# preferences=0:b 1:c 
+# preferences=0:b 1:c
 # moves=6
-#         a b c 
-# player0 0 0 0 
-# player1 0 1 0 
+#         a b c
+# player0 0 0 0
+# player1 0 1 0
 # +--------+
 # |        |
 # | a      |
@@ -770,11 +770,11 @@ action: 2
 
 # State 23
 # phase=Play
-# preferences=0:b 1:c 
+# preferences=0:b 1:c
 # moves=7
-#         a b c 
-# player0 0 0 0 
-# player1 0 1 0 
+#         a b c
+# player0 0 0 0
+# player1 0 1 0
 # +--------+
 # |        |
 # | a      |
@@ -803,11 +803,11 @@ action: 1
 
 # State 24
 # phase=Play
-# preferences=0:b 1:c 
+# preferences=0:b 1:c
 # moves=8
-#         a b c 
-# player0 0 0 0 
-# player1 0 1 0 
+#         a b c
+# player0 0 0 0
+# player1 0 1 0
 # +--------+
 # |        |
 # | a      |
@@ -836,11 +836,11 @@ action: 0
 
 # State 25
 # phase=Play
-# preferences=0:b 1:c 
+# preferences=0:b 1:c
 # moves=9
-#         a b c 
-# player0 0 0 0 
-# player1 0 1 0 
+#         a b c
+# player0 0 0 0
+# player1 0 1 0
 # +--------+
 # |        |
 # | a      |
@@ -869,11 +869,11 @@ action: 0
 
 # State 26
 # phase=Play
-# preferences=0:b 1:c 
+# preferences=0:b 1:c
 # moves=10
-#         a b c 
-# player0 0 0 0 
-# player1 0 1 0 
+#         a b c
+# player0 0 0 0
+# player1 0 1 0
 # +--------+
 # |        |
 # | a      |
@@ -902,11 +902,11 @@ action: 4
 
 # State 27
 # phase=Play
-# preferences=0:b 1:c 
+# preferences=0:b 1:c
 # moves=11
-#         a b c 
-# player0 0 0 0 
-# player1 0 1 0 
+#         a b c
+# player0 0 0 0
+# player1 0 1 0
 # +--------+
 # |        |
 # | a      |
@@ -935,11 +935,11 @@ action: 4
 
 # State 28
 # phase=Play
-# preferences=0:b 1:c 
+# preferences=0:b 1:c
 # moves=12
-#         a b c 
-# player0 0 0 0 
-# player1 0 1 0 
+#         a b c
+# player0 0 0 0
+# player1 0 1 0
 # +--------+
 # |        |
 # | a      |
@@ -968,11 +968,11 @@ action: 3
 
 # State 29
 # phase=Play
-# preferences=0:b 1:c 
+# preferences=0:b 1:c
 # moves=13
-#         a b c 
-# player0 0 0 0 
-# player1 0 1 0 
+#         a b c
+# player0 0 0 0
+# player1 0 1 0
 # +--------+
 # |        |
 # | a      |
@@ -1001,11 +1001,11 @@ action: 2
 
 # State 30
 # phase=Play
-# preferences=0:b 1:c 
+# preferences=0:b 1:c
 # moves=14
-#         a b c 
-# player0 0 0 0 
-# player1 0 1 0 
+#         a b c
+# player0 0 0 0
+# player1 0 1 0
 # +--------+
 # |        |
 # | a      |
@@ -1034,11 +1034,11 @@ action: 1
 
 # State 31
 # phase=Play
-# preferences=0:b 1:c 
+# preferences=0:b 1:c
 # moves=15
-#         a b c 
-# player0 0 0 0 
-# player1 0 1 0 
+#         a b c
+# player0 0 0 0
+# player1 0 1 0
 # +--------+
 # |        |
 # | a      |
@@ -1067,11 +1067,11 @@ action: 1
 
 # State 32
 # phase=Play
-# preferences=0:b 1:c 
+# preferences=0:b 1:c
 # moves=16
-#         a b c 
-# player0 0 0 0 
-# player1 0 1 0 
+#         a b c
+# player0 0 0 0
+# player1 0 1 0
 # +--------+
 # |        |
 # | a      |
@@ -1100,11 +1100,11 @@ action: 0
 
 # State 33
 # phase=Play
-# preferences=0:b 1:c 
+# preferences=0:b 1:c
 # moves=17
-#         a b c 
-# player0 0 0 0 
-# player1 0 1 0 
+#         a b c
+# player0 0 0 0
+# player1 0 1 0
 # +--------+
 # |        |
 # | a      |
@@ -1133,11 +1133,11 @@ action: 2
 
 # State 34
 # phase=Play
-# preferences=0:b 1:c 
+# preferences=0:b 1:c
 # moves=18
-#         a b c 
-# player0 0 0 0 
-# player1 0 1 0 
+#         a b c
+# player0 0 0 0
+# player1 0 1 0
 # +--------+
 # |        |
 # | a      |
@@ -1166,11 +1166,11 @@ action: 0
 
 # State 35
 # phase=Play
-# preferences=0:b 1:c 
+# preferences=0:b 1:c
 # moves=19
-#         a b c 
-# player0 0 0 0 
-# player1 0 1 0 
+#         a b c
+# player0 0 0 0
+# player1 0 1 0
 # +--------+
 # |        |
 # | a      |
@@ -1199,11 +1199,11 @@ action: 4
 
 # State 36
 # phase=Play
-# preferences=0:b 1:c 
+# preferences=0:b 1:c
 # moves=20
-#         a b c 
-# player0 0 0 0 
-# player1 0 1 0 
+#         a b c
+# player0 0 0 0
+# player1 0 1 0
 # +--------+
 # |        |
 # | a      |

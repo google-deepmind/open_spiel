@@ -34,9 +34,9 @@ ToString() = "leduc_poker(players=3)"
 # Player: -1
 # Pot: 3
 # Money (p1 p2 ...): 99 99 99
-# Cards (public p1 p2 ...): -10000 -10000 -10000 -10000 
-# Round 1 sequence: 
-# Round 2 sequence: 
+# Cards (public p1 p2 ...): -10000 -10000 -10000 -10000
+# Round 1 sequence:
+# Round 2 sequence:
 IsTerminal() = False
 History() = []
 HistoryString() = ""
@@ -67,9 +67,9 @@ action: 4
 # Player: -1
 # Pot: 3
 # Money (p1 p2 ...): 99 99 99
-# Cards (public p1 p2 ...): -10000 4 -10000 -10000 
-# Round 1 sequence: 
-# Round 2 sequence: 
+# Cards (public p1 p2 ...): -10000 4 -10000 -10000
+# Round 1 sequence:
+# Round 2 sequence:
 IsTerminal() = False
 History() = [4]
 HistoryString() = "4"
@@ -100,9 +100,9 @@ action: 2
 # Player: -1
 # Pot: 3
 # Money (p1 p2 ...): 99 99 99
-# Cards (public p1 p2 ...): -10000 4 2 -10000 
-# Round 1 sequence: 
-# Round 2 sequence: 
+# Cards (public p1 p2 ...): -10000 4 2 -10000
+# Round 1 sequence:
+# Round 2 sequence:
 IsTerminal() = False
 History() = [4, 2]
 HistoryString() = "4 2"
@@ -133,9 +133,9 @@ action: 3
 # Player: 0
 # Pot: 3
 # Money (p1 p2 ...): 99 99 99
-# Cards (public p1 p2 ...): -10000 4 2 3 
-# Round 1 sequence: 
-# Round 2 sequence: 
+# Cards (public p1 p2 ...): -10000 4 2 3
+# Round 1 sequence:
+# Round 2 sequence:
 IsTerminal() = False
 History() = [4, 2, 3]
 HistoryString() = "4 2 3"
@@ -167,9 +167,9 @@ action: 1
 # Player: 1
 # Pot: 3
 # Money (p1 p2 ...): 99 99 99
-# Cards (public p1 p2 ...): -10000 4 2 3 
+# Cards (public p1 p2 ...): -10000 4 2 3
 # Round 1 sequence: 1
-# Round 2 sequence: 
+# Round 2 sequence:
 IsTerminal() = False
 History() = [4, 2, 3, 1]
 HistoryString() = "4 2 3 1"
@@ -201,9 +201,9 @@ action: 2
 # Player: 2
 # Pot: 5
 # Money (p1 p2 ...): 99 97 99
-# Cards (public p1 p2 ...): -10000 4 2 3 
+# Cards (public p1 p2 ...): -10000 4 2 3
 # Round 1 sequence: 1 2
-# Round 2 sequence: 
+# Round 2 sequence:
 IsTerminal() = False
 History() = [4, 2, 3, 1, 2]
 HistoryString() = "4 2 3 1 2"
@@ -235,9 +235,9 @@ action: 1
 # Player: 0
 # Pot: 7
 # Money (p1 p2 ...): 99 97 97
-# Cards (public p1 p2 ...): -10000 4 2 3 
+# Cards (public p1 p2 ...): -10000 4 2 3
 # Round 1 sequence: 1 2 1
-# Round 2 sequence: 
+# Round 2 sequence:
 IsTerminal() = False
 History() = [4, 2, 3, 1, 2, 1]
 HistoryString() = "4 2 3 1 2 1"
@@ -269,9 +269,9 @@ action: 0
 # Player: -1
 # Pot: 7
 # Money (p1 p2 ...): 99 97 97
-# Cards (public p1 p2 ...): -10000 4 2 3 
+# Cards (public p1 p2 ...): -10000 4 2 3
 # Round 1 sequence: 1 2 1 0
-# Round 2 sequence: 
+# Round 2 sequence:
 IsTerminal() = False
 History() = [4, 2, 3, 1, 2, 1, 0]
 HistoryString() = "4 2 3 1 2 1 0"
@@ -302,9 +302,9 @@ action: 1
 # Player: 1
 # Pot: 7
 # Money (p1 p2 ...): 99 97 97
-# Cards (public p1 p2 ...): 1 4 2 3 
+# Cards (public p1 p2 ...): 1 4 2 3
 # Round 1 sequence: 1 2 1 0
-# Round 2 sequence: 
+# Round 2 sequence:
 IsTerminal() = False
 History() = [4, 2, 3, 1, 2, 1, 0, 1]
 HistoryString() = "4 2 3 1 2 1 0 1"
@@ -336,7 +336,7 @@ action: 2
 # Player: 2
 # Pot: 11
 # Money (p1 p2 ...): 99 93 97
-# Cards (public p1 p2 ...): 1 4 2 3 
+# Cards (public p1 p2 ...): 1 4 2 3
 # Round 1 sequence: 1 2 1 0
 # Round 2 sequence: 2
 IsTerminal() = False
@@ -370,7 +370,7 @@ action: 1
 # Player: 2
 # Pot: 0
 # Money (p1 p2 ...): 99 100.5 100.5
-# Cards (public p1 p2 ...): 1 4 2 3 
+# Cards (public p1 p2 ...): 1 4 2 3
 # Round 1 sequence: 1 2 1 0
 # Round 2 sequence: 2 1
 IsTerminal() = True

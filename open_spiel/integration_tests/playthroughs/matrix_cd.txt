@@ -29,11 +29,11 @@ ToString() = "matrix_cd()"
 
 # State 0
 # Terminal? false
-# Row actions: Dare Chicken 
-# Col actions: Dare Chicken 
+# Row actions: Dare Chicken
+# Col actions: Dare Chicken
 # Utility matrix:
-# 0,0 4,1 
-# 1,4 3,3 
+# 0,0 4,1
+# 1,4 3,3
 IsTerminal() = False
 History() = []
 HistoryString() = ""
@@ -58,11 +58,11 @@ actions: [0, 1]
 # Terminal? true
 # History: 0 1
 # Returns: 4,1
-# Row actions: 
-# Col actions: 
+# Row actions:
+# Col actions:
 # Utility matrix:
-# 0,0 4,1 
-# 1,4 3,3 
+# 0,0 4,1
+# 1,4 3,3
 IsTerminal() = True
 History() = [0, 1]
 HistoryString() = "0 1"
