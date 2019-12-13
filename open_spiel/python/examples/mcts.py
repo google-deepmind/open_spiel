@@ -97,6 +97,7 @@ def _play_game(game, bots, initial_actions):
     _opt_print("Next state:\n{}".format(state))
 
   while not state.is_terminal():
+    current_player = state.current_player()
     # The state can be three different types: chance node,
     # simultaneous node, or decision node
     if state.is_chance_node():
@@ -106,18 +107,21 @@ def _play_game(game, bots, initial_actions):
       _opt_print("Chance node, got " + str(num_actions) + " outcomes")
       action_list, prob_list = zip(*outcomes)
       action = np.random.choice(action_list, p=prob_list)
-      action_str = state.action_to_string(state.current_player(), action)
+      action_str = state.action_to_string(current_player, action)
       _opt_print("Sampled action: ", action_str)
     elif state.is_simultaneous_node():
       raise ValueError("Game cannot have simultaneous nodes.")
     else:
       # Decision node: sample action for the single current player
-      bot = bots[state.current_player()]
+      bot = bots[current_player]
       action = bot.step(state)
-      action_str = state.action_to_string(state.current_player(), action)
-      _opt_print("Player {} sampled action: {}".format(state.current_player(),
+      action_str = state.action_to_string(current_player, action)
+      _opt_print("Player {} sampled action: {}".format(current_player,
                                                        action_str))
 
+    for i, bot in enumerate(bots):
+      if i != current_player:
+        bot.inform_action(state, current_player, action)
     history.append(action_str)
     state.apply_action(action)
 

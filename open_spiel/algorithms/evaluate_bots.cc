@@ -16,6 +16,7 @@
 
 #include <vector>
 
+#include "open_spiel/spiel.h"
 #include "open_spiel/spiel_bots.h"
 
 namespace open_spiel {
@@ -33,10 +34,11 @@ std::vector<double> EvaluateBots(State* state, const std::vector<Bot*>& bots,
   }
   while (!state->IsTerminal()) {
     if (state->IsChanceNode()) {
-      state->ApplyAction(
-          SampleAction(state->ChanceOutcomes(), uniform(rng)).first);
+      Action action = SampleAction(state->ChanceOutcomes(), uniform(rng)).first;
+      for (auto bot : bots) bot->InformAction(*state, kChancePlayerId, action);
+      state->ApplyAction(action);
     } else if (state->IsSimultaneousNode()) {
-      for (auto p = Player{0}; p < num_players; ++p) {
+      for (Player p = 0; p < num_players; ++p) {
         if (state->LegalActions(p).empty()) {
           joint_actions[p] = kInvalidAction;
         } else {
@@ -45,7 +47,14 @@ std::vector<double> EvaluateBots(State* state, const std::vector<Bot*>& bots,
       }
       state->ApplyActions(joint_actions);
     } else {
-      state->ApplyAction(bots[state->CurrentPlayer()]->Step(*state));
+      Player current_player = state->CurrentPlayer();
+      Action action = bots[current_player]->Step(*state);
+      for (Player p = 0; p < num_players; ++p) {
+        if (p != current_player) {
+          bots[p]->InformAction(*state, current_player, action);
+        }
+      }
+      state->ApplyAction(action);
     }
   }
 

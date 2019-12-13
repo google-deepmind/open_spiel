@@ -120,7 +120,11 @@ std::pair<std::vector<double>, std::vector<std::string>> PlayGame(
         std::cerr << "Chose action: " << state->ActionToString(player, action)
                   << std::endl;
     }
-
+    for (open_spiel::Player p = 0; p < bots.size(); ++p) {
+      if (p != player) {
+        bots[p]->InformAction(*state, player, action);
+      }
+    }
     history.push_back(state->ActionToString(player, action));
     state->ApplyAction(action);
 

@@ -73,6 +73,16 @@ class Bot {
   // Asks the bot to decide on an action to play. The bot should be able to
   // safely assumes the action was played.
   virtual Action Step(const State& state) = 0;
+
+  // Let the bot know that a different player made an action at a given state.
+  // This is useful for stateful bots so they know that the state of the game
+  // has advanced. This should not be called for the bot that generated the
+  // action as it already knows the action it took. As most bots are not
+  // stateful, the default implementation is a no-op.
+  virtual void InformAction(const State& state, Player player_id,
+                            Action action) {}
+  // TODO(author7): Add an InformActions for simultaneous move games.
+
   // Restarts the bot to its initial state, ready to start a new trajectory.
   virtual void Restart() {}
   // Configure the bot to be on the given `state` which can be arbitrary.
@@ -129,11 +139,16 @@ class Bot {
 // A uniform random bot, for test purposes.
 std::unique_ptr<Bot> MakeUniformRandomBot(Player player_id, int seed);
 
+// A uniform random bot that takes actions based on its own copy of the state,
+// for test purposes.
+std::unique_ptr<Bot> MakeStatefulRandomBot(const Game& game, Player player_id,
+                                           int seed);
+
 // A bot that samples from a policy.
 std::unique_ptr<Bot> MakePolicyBot(const Game& game, Player player_id, int seed,
                                    std::unique_ptr<Policy> policy);
 
-// A both with a fixed action preference, for test purposes.
+// A bot with a fixed action preference, for test purposes.
 // Picks the first legal action found in the list of actions.
 std::unique_ptr<Bot> MakeFixedActionPreferenceBot(
     Player player_id, const std::vector<Action>& actions);

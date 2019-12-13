@@ -111,6 +111,17 @@ class PyBot : public Bot {
         state,           // Arguments
         action);
   }
+  void InformAction(const State& state, Player player_id,
+                    Action action) override {
+    PYBIND11_OVERLOAD_NAME(
+        void,  // Return type (must be a simple token for macro parser)
+        Bot,   // Parent class
+        "inform_action",  // Name of function in Python
+        InformAction,     // Name of function in C++
+        state,            // Arguments
+        player_id,
+        action);
+  }
 
   void RestartAt(const State& state) override {
     PYBIND11_OVERLOAD_NAME(
@@ -392,6 +403,7 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("restart_at", &Bot::RestartAt)
       .def("provides_force_action", &Bot::ProvidesForceAction)
       .def("force_action", &Bot::ForceAction)
+      .def("inform_action", &Bot::InformAction)
       .def("provides_policy", &Bot::ProvidesPolicy)
       .def("get_policy", &Bot::GetPolicy)
       .def("step_with_policy", &Bot::StepWithPolicy);
@@ -543,6 +555,9 @@ PYBIND11_MODULE(pyspiel, m) {
 
   m.def("make_uniform_random_bot", open_spiel::MakeUniformRandomBot,
         "A uniform random bot, for test purposes.");
+
+  m.def("make_stateful_random_bot", open_spiel::MakeStatefulRandomBot,
+        "A stateful random bot, for test purposes.");
 
   m.def("serialize_game_and_state", open_spiel::SerializeGameAndState,
         "A general implementation of game and state serialization.");
