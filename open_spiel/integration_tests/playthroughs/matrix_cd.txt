@@ -1,5 +1,4 @@
 game: matrix_cd
-seed: 737170672
 
 GameType.chance_mode = ChanceMode.DETERMINISTIC
 GameType.dynamics = Dynamics.SIMULTANEOUS

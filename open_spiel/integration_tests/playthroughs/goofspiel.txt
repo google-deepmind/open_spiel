@@ -1,5 +1,4 @@
 game: goofspiel(imp_info=True,num_cards=4,points_order=descending)
-seed: 3694876523
 
 GameType.chance_mode = ChanceMode.EXPLICIT_STOCHASTIC
 GameType.dynamics = Dynamics.SIMULTANEOUS

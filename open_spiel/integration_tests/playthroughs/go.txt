@@ -1,5 +1,4 @@
 game: go(board_size=7,komi=4.5)
-seed: 4205453627
 
 GameType.chance_mode = ChanceMode.DETERMINISTIC
 GameType.dynamics = Dynamics.SEQUENTIAL

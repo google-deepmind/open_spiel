@@ -1,5 +1,4 @@
 game: blotto
-seed: 2137432654
 
 GameType.chance_mode = ChanceMode.DETERMINISTIC
 GameType.dynamics = Dynamics.SIMULTANEOUS

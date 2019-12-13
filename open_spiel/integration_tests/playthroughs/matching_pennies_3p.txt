@@ -1,5 +1,4 @@
 game: matching_pennies_3p
-seed: 129684656
 
 GameType.chance_mode = ChanceMode.DETERMINISTIC
 GameType.dynamics = Dynamics.SIMULTANEOUS

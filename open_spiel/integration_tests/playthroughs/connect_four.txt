@@ -1,5 +1,4 @@
 game: connect_four
-seed: 3088790510
 
 GameType.chance_mode = ChanceMode.DETERMINISTIC
 GameType.dynamics = Dynamics.SEQUENTIAL

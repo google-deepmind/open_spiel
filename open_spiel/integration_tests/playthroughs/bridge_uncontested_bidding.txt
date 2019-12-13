@@ -1,5 +1,4 @@
 game: bridge_uncontested_bidding(relative_scoring=True)
-seed: 3322034862
 
 GameType.chance_mode = ChanceMode.SAMPLED_STOCHASTIC
 GameType.dynamics = Dynamics.SEQUENTIAL

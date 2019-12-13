@@ -1,5 +1,4 @@
 game: hanabi(colors=2,ranks=3,hand_size=3,players=3)
-seed: 149987211
 
 GameType.chance_mode = ChanceMode.EXPLICIT_STOCHASTIC
 GameType.dynamics = Dynamics.SEQUENTIAL

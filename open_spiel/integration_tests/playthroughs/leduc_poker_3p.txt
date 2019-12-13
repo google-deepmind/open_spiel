@@ -1,5 +1,4 @@
 game: leduc_poker(players=3)
-seed: 1131383529
 
 GameType.chance_mode = ChanceMode.EXPLICIT_STOCHASTIC
 GameType.dynamics = Dynamics.SEQUENTIAL

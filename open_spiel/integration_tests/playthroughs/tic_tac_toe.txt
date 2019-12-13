@@ -1,5 +1,4 @@
 game: tic_tac_toe
-seed: 2509889034
 
 GameType.chance_mode = ChanceMode.DETERMINISTIC
 GameType.dynamics = Dynamics.SEQUENTIAL

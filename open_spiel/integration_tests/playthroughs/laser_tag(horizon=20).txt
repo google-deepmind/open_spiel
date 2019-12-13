@@ -1,5 +1,4 @@
 game: laser_tag(horizon=20)
-seed: 2309970241
 
 GameType.chance_mode = ChanceMode.DETERMINISTIC
 GameType.dynamics = Dynamics.SIMULTANEOUS

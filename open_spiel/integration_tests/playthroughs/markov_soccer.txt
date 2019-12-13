@@ -1,5 +1,4 @@
 game: markov_soccer(horizon=20)
-seed: 3255058788
 
 GameType.chance_mode = ChanceMode.DETERMINISTIC
 GameType.dynamics = Dynamics.SIMULTANEOUS

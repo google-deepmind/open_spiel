@@ -1,5 +1,4 @@
 game: universal_poker
-seed: 3864206395
 
 GameType.chance_mode = ChanceMode.EXPLICIT_STOCHASTIC
 GameType.dynamics = Dynamics.SEQUENTIAL

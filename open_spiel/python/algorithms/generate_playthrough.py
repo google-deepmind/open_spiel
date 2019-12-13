@@ -35,7 +35,7 @@ def _escape(x):
   return x
 
 
-def playthrough(game_string, seed, alsologtostdout=False):
+def playthrough(game_string, action_sequence, alsologtostdout=False):
   """Returns a playthrough of the specified game as a single text.
 
   Actions are selected uniformly at random, including chance actions.
@@ -43,29 +43,27 @@ def playthrough(game_string, seed, alsologtostdout=False):
   Args:
     game_string: string, e.g. 'markov_soccer', with possible optional params,
       e.g. 'go(komi=4.5,board_size=19)'.
-    seed: an integer to seed the random number generator governing action
-      choices.
+    action_sequence: A (possibly partial) list of action choices to make.
     alsologtostdout: Whether to also print the trace to stdout. This can be
       useful when an error occurs, to still be able to get context information.
   """
-  lines = playthrough_lines(
-      game_string=game_string, seed=seed, alsologtostdout=alsologtostdout)
+  lines = playthrough_lines(game_string, alsologtostdout, action_sequence)
   return "\n".join(lines) + "\n"
 
 
-def playthrough_lines(game_string, seed, alsologtostdout=False):
+def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None):
   """Returns a playthrough of the specified game as a list of lines.
 
   Actions are selected uniformly at random, including chance actions.
 
   Args:
     game_string: string, e.g. 'markov_soccer' or 'kuhn_poker(players=4)'.
-    seed: an integer to seed the random number generator governing action
-      choices.
     alsologtostdout: Whether to also print the trace to stdout. This can be
       useful when an error occurs, to still be able to get context information.
+    action_sequence: A (possibly partial) list of action choices to make.
   """
   lines = []
+  action_sequence = action_sequence or []
   if alsologtostdout:
 
     def add_line(v):
@@ -76,9 +74,7 @@ def playthrough_lines(game_string, seed, alsologtostdout=False):
 
   game = pyspiel.load_game(game_string)
   add_line("game: {}".format(game_string))
-  if seed is None:
-    seed = np.random.randint(2**32 - 1)
-  add_line("seed: {}".format(seed))
+  seed = np.random.randint(2**32 - 1)
 
   add_line("")
   game_type = game.get_type()
@@ -186,7 +182,10 @@ def playthrough_lines(game_string, seed, alsologtostdout=False):
         add_line("StringLegalActions({}) = [{}]".format(
             player, ", ".join('"{}"'.format(state.action_to_string(player, x))
                               for x in state.legal_actions(player))))
-      actions = [rng.choice(state.legal_actions(player)) for player in players]
+      if state_idx < len(action_sequence):
+        actions = action_sequence[state_idx]
+      else:
+        actions = [rng.choice(state.legal_actions(pl)) for pl in players]
       add_line("")
       add_line("# Apply joint action [{}]".format(
           format(", ".join(
@@ -201,7 +200,10 @@ def playthrough_lines(game_string, seed, alsologtostdout=False):
       add_line("StringLegalActions() = [{}]".format(", ".join(
           '"{}"'.format(state.action_to_string(state.current_player(), x))
           for x in state.legal_actions())))
-      action = rng.choice(state.legal_actions())
+      if state_idx < len(action_sequence):
+        action = action_sequence[state_idx]
+      else:
+        action = rng.choice(state.legal_actions())
       add_line("")
       add_line('# Apply action "{}"'.format(
           state.action_to_string(state.current_player(), action)))
@@ -225,23 +227,26 @@ def _playthrough_params(lines):
   Returns:
     A `dict` with entries:
       game_string: string, e.g. 'markov_soccer'.
-      seed: an optional integerString to seed the random number generator
-        governing action choices.
+      action_sequence: a list of action choices made in the playthrough.
     Suitable for passing to playthrough to re-generate the playthrough.
 
   Raises:
     ValueError if the playthrough is not valid.
   """
-  params = dict()
+  params = {"action_sequence": []}
   for line in lines:
     match_game = re.match(r"^game: (.*)$", line)
-    match_seed = re.match(r"^seed: (.*)$", line)
+    match_action = re.match(r"^action: (.*)$", line)
+    match_actions = re.match(r"^actions: \[(.*)\]$", line)
     if match_game:
       params["game_string"] = match_game.group(1)
-    if match_seed:
-      params["seed"] = int(match_seed.group(1))
-    if "game_string" in params and "seed" in params:
-      return params
+    if match_action:
+      params["action_sequence"].append(int(match_action.group(1)))
+    if match_actions:
+      params["action_sequence"].append(
+          [int(x) for x in match_actions.group(1).split(", ")])
+  if "game_string" in params:
+    return params
   raise ValueError("Could not find params")
 
 

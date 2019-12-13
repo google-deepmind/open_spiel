@@ -1,5 +1,4 @@
 game: tiny_hanabi
-seed: 3811163648
 
 GameType.chance_mode = ChanceMode.EXPLICIT_STOCHASTIC
 GameType.dynamics = Dynamics.SEQUENTIAL

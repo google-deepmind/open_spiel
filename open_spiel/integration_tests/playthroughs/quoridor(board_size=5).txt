@@ -1,5 +1,4 @@
 game: quoridor(board_size=5)
-seed: 1780759726
 
 GameType.chance_mode = ChanceMode.DETERMINISTIC
 GameType.dynamics = Dynamics.SEQUENTIAL

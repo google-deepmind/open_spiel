@@ -1,5 +1,4 @@
 game: negotiation(rng_seed=100,utterance_dim=2,num_symbols=3)
-seed: 1370999156
 
 GameType.chance_mode = ChanceMode.SAMPLED_STOCHASTIC
 GameType.dynamics = Dynamics.SEQUENTIAL

@@ -1,5 +1,4 @@
 game: kuhn_poker(players=2)
-seed: 2711794576
 
 GameType.chance_mode = ChanceMode.EXPLICIT_STOCHASTIC
 GameType.dynamics = Dynamics.SEQUENTIAL

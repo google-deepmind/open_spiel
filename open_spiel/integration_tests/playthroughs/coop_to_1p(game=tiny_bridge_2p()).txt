@@ -1,5 +1,4 @@
 game: coop_to_1p(game=tiny_bridge_2p())
-seed: 870236294
 
 GameType.chance_mode = ChanceMode.EXPLICIT_STOCHASTIC
 GameType.dynamics = Dynamics.SEQUENTIAL

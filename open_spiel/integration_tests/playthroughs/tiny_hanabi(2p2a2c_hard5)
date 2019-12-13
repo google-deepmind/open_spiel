@@ -1,5 +1,4 @@
 game: tiny_hanabi(num_players=2,num_chance=2,num_actions=2,payoff=3;0;0;3;2;0;3;3;2;2;3;0;0;1;0;2)
-seed: 3092045064
 
 GameType.chance_mode = ChanceMode.EXPLICIT_STOCHASTIC
 GameType.dynamics = Dynamics.SEQUENTIAL

@@ -1,5 +1,4 @@
 game: coop_box_pushing
-seed: 231391287
 
 GameType.chance_mode = ChanceMode.DETERMINISTIC
 GameType.dynamics = Dynamics.SIMULTANEOUS

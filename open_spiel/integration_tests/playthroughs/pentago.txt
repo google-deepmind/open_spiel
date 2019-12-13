@@ -1,5 +1,4 @@
 game: pentago
-seed: 389366867
 
 GameType.chance_mode = ChanceMode.DETERMINISTIC
 GameType.dynamics = Dynamics.SEQUENTIAL

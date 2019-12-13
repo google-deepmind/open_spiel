@@ -1,5 +1,4 @@
 game: oware
-seed: 1875058860
 
 GameType.chance_mode = ChanceMode.DETERMINISTIC
 GameType.dynamics = Dynamics.SEQUENTIAL

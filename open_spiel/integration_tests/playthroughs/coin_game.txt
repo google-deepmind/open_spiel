@@ -1,5 +1,4 @@
 game: coin_game
-seed: 3441307802
 
 GameType.chance_mode = ChanceMode.EXPLICIT_STOCHASTIC
 GameType.dynamics = Dynamics.SEQUENTIAL

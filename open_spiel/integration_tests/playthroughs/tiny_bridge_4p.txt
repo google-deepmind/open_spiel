@@ -1,5 +1,4 @@
 game: tiny_bridge_4p
-seed: 4133439701
 
 GameType.chance_mode = ChanceMode.EXPLICIT_STOCHASTIC
 GameType.dynamics = Dynamics.SEQUENTIAL

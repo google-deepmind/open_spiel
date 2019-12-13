@@ -1,5 +1,4 @@
 game: phantom_ttt
-seed: 2919703701
 
 GameType.chance_mode = ChanceMode.DETERMINISTIC
 GameType.dynamics = Dynamics.SEQUENTIAL

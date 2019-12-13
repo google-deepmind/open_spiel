@@ -1,5 +1,4 @@
 game: misere(game=kuhn_poker())
-seed: 718346008
 
 GameType.chance_mode = ChanceMode.EXPLICIT_STOCHASTIC
 GameType.dynamics = Dynamics.SEQUENTIAL

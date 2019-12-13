@@ -1,5 +1,4 @@
 game: bridge(use_double_dummy_result=false)
-seed: 3771151773
 
 GameType.chance_mode = ChanceMode.EXPLICIT_STOCHASTIC
 GameType.dynamics = Dynamics.SEQUENTIAL

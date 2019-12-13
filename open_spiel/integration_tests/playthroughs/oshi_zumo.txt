@@ -1,5 +1,4 @@
 game: oshi_zumo(coins=10)
-seed: 1110819977
 
 GameType.chance_mode = ChanceMode.DETERMINISTIC
 GameType.dynamics = Dynamics.SIMULTANEOUS

@@ -1,5 +1,4 @@
 game: chess
-seed: 205026171
 
 GameType.chance_mode = ChanceMode.DETERMINISTIC
 GameType.dynamics = Dynamics.SEQUENTIAL

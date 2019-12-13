@@ -1,5 +1,4 @@
 game: catch
-seed: 2707063696
 
 GameType.chance_mode = ChanceMode.EXPLICIT_STOCHASTIC
 GameType.dynamics = Dynamics.SEQUENTIAL

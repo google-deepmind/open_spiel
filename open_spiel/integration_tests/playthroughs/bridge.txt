@@ -1,5 +1,4 @@
 game: bridge
-seed: 319857284
 
 GameType.chance_mode = ChanceMode.EXPLICIT_STOCHASTIC
 GameType.dynamics = Dynamics.SEQUENTIAL

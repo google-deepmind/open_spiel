@@ -1,5 +1,4 @@
 game: matrix_rps
-seed: 1031786929
 
 GameType.chance_mode = ChanceMode.DETERMINISTIC
 GameType.dynamics = Dynamics.SIMULTANEOUS

@@ -1,5 +1,4 @@
 game: havannah(board_size=4)
-seed: 2445391896
 
 GameType.chance_mode = ChanceMode.DETERMINISTIC
 GameType.dynamics = Dynamics.SEQUENTIAL

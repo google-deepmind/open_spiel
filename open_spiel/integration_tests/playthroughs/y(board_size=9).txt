@@ -1,5 +1,4 @@
 game: y(board_size=9)
-seed: 3303454310
 
 GameType.chance_mode = ChanceMode.DETERMINISTIC
 GameType.dynamics = Dynamics.SEQUENTIAL

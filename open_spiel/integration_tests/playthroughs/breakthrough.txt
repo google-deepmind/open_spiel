@@ -1,5 +1,4 @@
 game: breakthrough
-seed: 1583615979
 
 GameType.chance_mode = ChanceMode.DETERMINISTIC
 GameType.dynamics = Dynamics.SEQUENTIAL

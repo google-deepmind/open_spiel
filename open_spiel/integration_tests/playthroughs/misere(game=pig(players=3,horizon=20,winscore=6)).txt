@@ -1,5 +1,4 @@
 game: misere(game=pig(players=3,horizon=20,winscore=6))
-seed: 1358622266
 
 GameType.chance_mode = ChanceMode.EXPLICIT_STOCHASTIC
 GameType.dynamics = Dynamics.SEQUENTIAL

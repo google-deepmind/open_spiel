@@ -1,5 +1,4 @@
 game: pig(players=4,horizon=10,winscore=10)
-seed: 3026497748
 
 GameType.chance_mode = ChanceMode.EXPLICIT_STOCHASTIC
 GameType.dynamics = Dynamics.SEQUENTIAL

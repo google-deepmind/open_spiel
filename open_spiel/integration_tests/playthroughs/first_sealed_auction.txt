@@ -1,5 +1,4 @@
 game: first_sealed_auction
-seed: 1284008198
 
 GameType.chance_mode = ChanceMode.EXPLICIT_STOCHASTIC
 GameType.dynamics = Dynamics.SEQUENTIAL

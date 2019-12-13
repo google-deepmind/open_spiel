@@ -1,5 +1,4 @@
 game: misere(game=tic_tac_toe())
-seed: 3292290572
 
 GameType.chance_mode = ChanceMode.DETERMINISTIC
 GameType.dynamics = Dynamics.SEQUENTIAL
