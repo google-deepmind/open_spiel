@@ -5,6 +5,8 @@ set(GAME_SOURCES
   blotto.h
   breakthrough.cc
   breakthrough.h
+  bridge.cc
+  bridge.h
   bridge/bridge_scoring.cc
   bridge/bridge_scoring.h
   bridge_uncontested_bidding.cc

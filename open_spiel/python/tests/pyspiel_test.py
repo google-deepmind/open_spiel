@@ -36,6 +36,7 @@ class PyspielTest(absltest.TestCase):
         "backgammon",
         "blotto",
         "breakthrough",
+        "bridge",
         "bridge_uncontested_bidding",
         "catch",
         "chess",
