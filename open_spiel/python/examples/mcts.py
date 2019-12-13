@@ -26,15 +26,17 @@ from absl import flags
 import numpy as np
 
 from open_spiel.python.algorithms import mcts
+from open_spiel.python.bots import gtp
 from open_spiel.python.bots import human
 from open_spiel.python.bots import uniform_random
 import pyspiel
 
-_KNOWN_PLAYERS = ["mcts", "random", "human"]
+_KNOWN_PLAYERS = ["mcts", "random", "human", "gtp"]
 
 flags.DEFINE_string("game", "tic_tac_toe", "Name of the game.")
 flags.DEFINE_enum("player1", "mcts", _KNOWN_PLAYERS, "Who controls player 1.")
 flags.DEFINE_enum("player2", "random", _KNOWN_PLAYERS, "Who controls player 2.")
+flags.DEFINE_string("gtp_path", None, "Where to find a binary for gtp.")
 flags.DEFINE_integer("uct_c", 2, "UCT's exploration constant.")
 flags.DEFINE_integer("rollout_count", 10, "How many rollouts to do.")
 flags.DEFINE_integer("max_simulations", 10000, "How many simulations to run.")
@@ -69,6 +71,8 @@ def _init_bot(bot_type, game, player_id):
     return uniform_random.UniformRandomBot(player_id, rng)
   if bot_type == "human":
     return human.HumanBot()
+  if bot_type == "gtp":
+    return gtp.GTPBot(game, FLAGS.gtp_path)
   raise ValueError("Invalid bot type: %s" % bot_type)
 
 

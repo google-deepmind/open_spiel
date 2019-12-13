@@ -15,3 +15,5 @@ add_test(value_iteration_example_test value_iteration_example)
 
 add_executable(cfr_example cfr_example.cc ${OPEN_SPIEL_OBJECTS})
 add_test(cfr_example_test cfr_example)
+
+add_executable(gtp gtp.cc ${OPEN_SPIEL_OBJECTS})
