@@ -38,6 +38,29 @@ matrix:
       # Unfortunately, the build fails on MacOs for universal poker.
       - BUILD_WITH_ACPC="OFF"
       - DEFAULT_OPTIONAL_DEPENDENCY="ON"
+  # Build and run tests without all optional dependencies (default behavior) and
+  # use nox
+  - os: linux
+    dist: bionic # Ubuntu 18.04.2 LTS released on 26 April 2018
+    env: 
+      - OS_PYTHON_VERSION=3.6
+      - TRAVIS_USE_NOX=1
+  # Build and run tests with all optional dependencies and use nox
+  - os: linux
+    dist: bionic # Ubuntu 18.04.2 LTS released on 26 April 2018
+    env:
+      - OS_PYTHON_VERSION=3.6
+      - DEFAULT_OPTIONAL_DEPENDENCY="ON"
+      - TRAVIS_USE_NOX=1
+  # Build and test on MacOS. We use a single target, with all dependencies and
+  # use nox.
+  - os: osx # macOS 10.14 (Mojave), release on September 24, 2018.
+    osx_image: xcode10.3
+    env:
+      # Unfortunately, the build fails on MacOs for universal poker.
+      - BUILD_WITH_ACPC="OFF"
+      - DEFAULT_OPTIONAL_DEPENDENCY="ON"
+      - TRAVIS_USE_NOX=1
 
 script:
   - ./install.sh

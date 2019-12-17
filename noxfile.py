@@ -15,6 +15,7 @@ def get_distutils_tempdir():
 def tests(session):
     session.install("-r", "requirements.txt")
     session.run("python", "setup.py", "build")
+    session.run("python", "setup.py", "install")
     session.cd(os.path.join("build", get_distutils_tempdir()))
     session.run(
         "ctest", f"-j{4*os.cpu_count()}", "--output-on-failure", external=True

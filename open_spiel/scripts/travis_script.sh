@@ -17,6 +17,13 @@
 set -e
 set -x
 
+if [ ! "$TRAVIS_USE_NOX" -eq 0 ]; then
+    # Build and run tests using nox
+    pip3 install nox 
+    nox -s tests
+    exit 0
+fi
+
 sudo -H pip3 install --upgrade pip
 sudo -H pip3 install --upgrade setuptools
 sudo -H pip3 install --force-reinstall virtualenv
@@ -26,10 +33,3 @@ source ./venv/bin/activate
 
 python3 --version
 pip3 install --upgrade -r requirements.txt -q
-
-./open_spiel/scripts/build_and_run_tests.sh
-deactivate
-
-# Build and run tests using nox
-pip3 install nox
-nox -s tests
