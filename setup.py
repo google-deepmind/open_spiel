@@ -1,11 +1,8 @@
 import os
 import subprocess
-import sys
-import sysconfig
 
 from setuptools import Extension, setup
 from setuptools.command.build_ext import build_ext
-from setuptools.command.test import test
 
 
 def get_readme(file):
@@ -14,12 +11,23 @@ def get_readme(file):
 
 
 class CMakeExtension(Extension):
+    """An extension with no sources.
+
+    We do not want distutils to handle any of the compilation (instead we rely on 
+    CMake), so we always pass an empty list to the constructor.
+    """
+
     def __init__(self, name, sourcedir=""):
         super().__init__(name, sources=[])
         self.sourcedir = os.path.abspath(sourcedir)
 
 
 class BuildExt(build_ext):
+    """Our custom build_ext command.
+
+    Uses CMake to build extensions instead of a bare compiler (e.g. gcc, clang).
+    """
+
     def run(self):
         try:
             subprocess.check_call(["cmake", "--version"])
@@ -52,20 +60,6 @@ class BuildExt(build_ext):
         )
 
 
-class CTestTestCommand(test):
-    @staticmethod
-    def _get_distutils_dirname(name):
-        return f"{name}.{sysconfig.get_platform()}-{sys.version_info[0]}.{sys.version_info[1]}"
-
-    def run_tests(self):
-        env = os.environ.copy()
-        subprocess.check_call(
-            ["ctest", f"-j{4*os.cpu_count()}", "--output-on-failure"],
-            cwd=os.path.join("build", self._get_distutils_dirname("temp")),
-            env=env,
-        )
-
-
 def get_requirements(requirements_file):
     """Parse the requirements.txt file and produce a list of dependencies for setup()
 
@@ -94,6 +88,6 @@ setup(
     url="https://github.com/deepmind/open_spiel",
     install_requires=get_requirements("requirements.txt"),
     ext_modules=[CMakeExtension("pyspiel", sourcedir="open_spiel")],
-    cmdclass={"build_ext": BuildExt, "test": CTestTestCommand},
+    cmdclass={"build_ext": BuildExt},
     zip_safe=False,
 )

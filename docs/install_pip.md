@@ -30,7 +30,8 @@ This covers installation using the Python package manager `pip`.
 3.  Run tests to check everything works:
 
     ```bash
-    python setup.py test
+    pip install nox
+    nox -s tests
     ```
 
 To make sure OpenSpiel works on the default configurations, we do use the
