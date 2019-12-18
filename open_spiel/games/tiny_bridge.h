@@ -59,8 +59,9 @@
 namespace open_spiel {
 namespace tiny_bridge {
 
-inline constexpr int kNumActions2p = 7;  // Pass, 1H, 1S, 1NT, 2H, 2S, 2NT
-inline constexpr int kNumActions = 9;    // Plus Double, Redouble
+inline constexpr int kNumBids = 6;                  // 1H, 1S, 1NT, 2H, 2S, 2NT
+inline constexpr int kNumActions2p = 1 + kNumBids;  // Plus Pass
+inline constexpr int kNumActions4p = 3 + kNumBids;  // Pass, Double, Redouble
 enum Call { kPass = 0, k1H, k1S, k1NT, k2H, k2S, k2NT, kDouble, kRedouble };
 inline constexpr int kNumRanks = 4;
 inline constexpr int kNumSuits = 2;
@@ -71,7 +72,7 @@ inline constexpr int kNumAbstractHands = 12;
 
 // Number of possible private states (hands) for a single player.
 inline constexpr int kNumPrivates = (kDeckSize * (kDeckSize - 1)) / 2;
-inline constexpr std::array<const char*, kNumActions> kActionStr{
+inline constexpr std::array<const char*, kNumActions4p> kActionStr{
     "Pass", "1H", "1S", "1NT", "2H", "2S", "2NT", "Dbl", "RDbl"};
 enum Seat { kInvalidSeat = -1, kWest = 0, kNorth = 1, kEast = 2, kSouth = 3 };
 
@@ -105,7 +106,7 @@ class TinyBridgeGame2p : public Game {
 class TinyBridgeGame4p : public Game {
  public:
   explicit TinyBridgeGame4p(const GameParameters& params);
-  int NumDistinctActions() const override { return kNumActions; }
+  int NumDistinctActions() const override { return kNumActions4p; }
   std::unique_ptr<State> NewInitialState() const override;
   int NumPlayers() const override { return 4; }
   double MinUtility() const override { return -160; }
@@ -144,7 +145,7 @@ class TinyBridgeAuctionState : public State {
   };
 
   TinyBridgeAuctionState(std::shared_ptr<const Game> game, bool is_abstracted)
-      : State(game), is_abstracted_(is_abstracted) {}
+      : State(std::move(game)), is_abstracted_(is_abstracted) {}
   TinyBridgeAuctionState(const TinyBridgeAuctionState&) = default;
 
   Player CurrentPlayer() const override;
@@ -180,6 +181,7 @@ class TinyBridgeAuctionState : public State {
   AuctionState AnalyzeAuction() const;
   std::array<Seat, kDeckSize> CardHolders() const;
   Seat PlayerToSeat(Player player) const;
+  Player SeatToPlayer(Seat seat) const;
 };
 
 // State of in-progress play.
@@ -187,7 +189,10 @@ class TinyBridgePlayState : public State {
  public:
   TinyBridgePlayState(std::shared_ptr<const Game> game, int trumps, Seat leader,
                       std::array<Seat, kDeckSize> holder)
-      : State(game), trumps_(trumps), leader_(leader), holder_(holder) {}
+      : State(std::move(game)),
+        trumps_(trumps),
+        leader_(leader),
+        holder_(holder) {}
   TinyBridgePlayState(const TinyBridgePlayState&) = default;
 
   Player CurrentPlayer() const { return CurrentHand() % 2; }
