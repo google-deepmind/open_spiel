@@ -30,9 +30,9 @@ constexpr std::array<char, kNumSeats> kSeatChar{'W', 'N', 'E', 'S'};
 std::string RelativeSeatString(Seat player, Seat observer) {
   constexpr std::array<absl::string_view, 4> relative_player{"Us", "LH", "Pd",
                                                              "RH"};
-  return {relative_player[(kNumSeats + static_cast<int>(player) -
-                           static_cast<int>(observer)) %
-                          kNumSeats]};
+  return std::string(relative_player[(kNumSeats + static_cast<int>(player) -
+                                      static_cast<int>(observer)) %
+                                     kNumSeats]);
 }
 
 int Suit(int card) { return card / kNumRanks; }

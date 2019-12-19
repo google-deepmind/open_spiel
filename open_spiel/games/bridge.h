@@ -143,7 +143,7 @@ class BridgeState : public State {
   std::vector<Action> DealLegalActions() const;
   std::vector<Action> BiddingLegalActions() const;
   std::vector<Action> PlayLegalActions() const;
-  void ApplyDealAction(int cards);
+  void ApplyDealAction(int card);
   void ApplyBiddingAction(int call);
   void ApplyPlayAction(int card);
   void ComputeDoubleDummyTricks();
