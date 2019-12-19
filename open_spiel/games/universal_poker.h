@@ -102,7 +102,6 @@ class UniversalPokerState : public State {
   const int GetPossibleActionCount() const;
 
   void ApplyChoiceAction(ActionType action_type);
-  int GetDepth();
   std::string GetActionSequence() const { return actionSequence_; }
 };
 

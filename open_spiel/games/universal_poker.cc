@@ -746,24 +746,6 @@ void UniversalPokerState::_CalculateActionsAndNodeType() {
   }
 }
 
-int UniversalPokerState::GetDepth() {
-  int maxDepth = 0;
-  for (auto action : ALL_ACTIONS) {
-    if (action & possibleActions_) {
-      UniversalPokerState child(*this);
-      if (child.IsChanceNode()) {
-        child.ApplyAction(child.LegalActions()[0]);
-      } else if (child.CurrentPlayer() >= 0) {  // Player node
-        child.ApplyChoiceAction(action);
-      }
-      int depth = child.GetDepth();
-      maxDepth = depth > maxDepth ? depth : maxDepth;
-    }
-  }
-
-  return 1 + maxDepth;
-}
-
 const int UniversalPokerState::GetPossibleActionCount() const {
   // _builtin_popcount(int) function is used to count the number of one's
   return __builtin_popcount(possibleActions_);
