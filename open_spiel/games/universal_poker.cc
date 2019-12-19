@@ -476,6 +476,43 @@ double UniversalPokerState::GetTotalReward(Player player) const {
   return acpc_state_.ValueOfState(player);
 }
 
+HistoryDistribution UniversalPokerState::GetHistoriesConsistentWithInfostate()
+    const {
+  // This is only implemented for 2 players.
+  SPIEL_CHECK_EQ(acpc_game_->GetNbPlayers(), 2);
+  logic::CardSet is_cards;
+  const logic::CardSet &our_cards = hole_cards_[cur_player_];
+  for (uint8_t card : our_cards.ToCardArray()) is_cards.AddCard(card);
+  for (uint8_t card : board_cards_.ToCardArray()) is_cards.AddCard(card);
+  logic::CardSet fresh_deck(/*num_suits=*/acpc_game_->NumSuitsDeck(),
+                            /*num_ranks=*/acpc_game_->NumRanksDeck());
+  for (uint8_t card : is_cards.ToCardArray()) fresh_deck.RemoveCard(card);
+  const int hand_size = acpc_game_->GetNbHoleCardsRequired();
+  HistoryDistribution dist;
+  for (uint8_t hole_card1 : fresh_deck.ToCardArray()) {
+    logic::CardSet subset_deck = fresh_deck;
+    subset_deck.RemoveCard(hole_card1);
+    for (uint8_t hole_card2 : subset_deck.ToCardArray()) {
+      if (hole_card1 < hole_card2) continue;
+      std::unique_ptr<State> root = game_->NewInitialState();
+      if (cur_player_ == 0) {
+        for (uint8_t card : our_cards.ToCardArray()) root->ApplyAction(card);
+        root->ApplyAction(hole_card1);
+        root->ApplyAction(hole_card2);
+      } else if (cur_player_ == 1) {
+        root->ApplyAction(hole_card1);
+        root->ApplyAction(hole_card2);
+        for (uint8_t card : our_cards.ToCardArray()) root->ApplyAction(card);
+      }
+      SPIEL_CHECK_FALSE(root->IsChanceNode());
+      dist.first.push_back(std::move(root));
+    }
+  }
+  dist.second.resize(dist.first.size(),
+                     1. / static_cast<double>(dist.first.size()));
+  return dist;
+}
+
 /**
  * Universal Poker Game Constructor
  * @param params

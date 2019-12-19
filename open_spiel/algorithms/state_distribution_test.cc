@@ -14,8 +14,7 @@
 
 #include "open_spiel/algorithms/state_distribution.h"
 
-#include "open_spiel/games/kuhn_poker.h"
-#include "open_spiel/games/leduc_poker.h"
+#include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
@@ -119,8 +118,28 @@ void LeducStateDistributionTest() {
       UpdateIncrementalStateDistribution(*state, &uniform_policy,
                                          /*player_id=*/1, incremental_dist);
   std::cerr << "Comparing dists 2..." << std::endl;
+  SPIEL_CHECK_FLOAT_EQ(absl::c_accumulate(dist.second, 0.), 1.);
+  SPIEL_CHECK_FLOAT_EQ(absl::c_accumulate(incremental_dist.second, 0.), 1.);
   CompareDists(dist, incremental_dist);
 }
+
+constexpr absl::string_view kHUNLGameString =
+    ("universal_poker(betting=limit,numPlayers=2,numRounds=4,stack=1200 "
+     "1200,blind=50 100,firstPlayer=2 "
+     "1,numSuits=4,numRanks=13,numHoleCards=2,numBoardCards=0 3 1 "
+     "1,raiseSize=100 100 100 100)");
+
+void HULIncrementalTest() {
+  std::shared_ptr<const Game> game = LoadGame(std::string(kHUNLGameString));
+  UniformPolicy policy;
+  std::unique_ptr<State> state = game->NewInitialState();
+  while (state->IsChanceNode()) state->ApplyAction(state->LegalActions()[0]);
+  HistoryDistribution inc_dist =
+      UpdateIncrementalStateDistribution(*state, &policy, /*player_id=*/0);
+  SPIEL_CHECK_EQ(inc_dist.second.size(), 1225);
+  SPIEL_CHECK_FLOAT_EQ(absl::c_accumulate(inc_dist.second, 0.), 1.);
+}
+
 
 }  // namespace
 }  // namespace algorithms
@@ -131,4 +150,5 @@ namespace algorithms = open_spiel::algorithms;
 int main(int argc, char** argv) {
   algorithms::KuhnStateDistributionTest();
   algorithms::LeducStateDistributionTest();
+  algorithms::HULIncrementalTest();
 }

@@ -34,6 +34,11 @@
 namespace open_spiel {
 namespace universal_poker {
 
+// We alias this here as we can't import state_distribution.h or we'd have a
+// circular dependency.
+using HistoryDistribution =
+    std::pair<std::vector<std::unique_ptr<State>>, std::vector<double>>;
+
 class UniversalPokerGame;
 
 constexpr uint8_t kMaxUniversalPokerPlayers = 10;
@@ -61,6 +66,9 @@ class UniversalPokerState : public State {
   // The probability of taking each possible action in a particular info state.
   std::vector<std::pair<Action, double>> ChanceOutcomes() const override;
   std::vector<Action> LegalActions() const override;
+
+  // Used to make UpdateIncrementalStateDistribution much faster.
+  HistoryDistribution GetHistoriesConsistentWithInfostate() const;
 
  protected:
   void DoApplyAction(Action action_id) override;
