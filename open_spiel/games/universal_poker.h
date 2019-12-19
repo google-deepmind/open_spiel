@@ -125,6 +125,7 @@ class UniversalPokerGame : public Game {
  private:
   std::string gameDesc_;
   const acpc_cpp::ACPCGame acpc_game_;
+  std::optional<int> max_game_length_;
 
  public:
   const acpc_cpp::ACPCGame *GetACPCGame() const { return &acpc_game_; }

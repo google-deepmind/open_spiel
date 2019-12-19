@@ -483,7 +483,10 @@ double UniversalPokerState::GetTotalReward(Player player) const {
 UniversalPokerGame::UniversalPokerGame(const GameParameters &params)
     : Game(kGameType, params),
       gameDesc_(parseParameters(params)),
-      acpc_game_(gameDesc_) {}
+      acpc_game_(gameDesc_) {
+  max_game_length_ = MaxGameLength();
+  SPIEL_CHECK_TRUE(max_game_length_.has_value());
+}
 
 std::unique_ptr<State> UniversalPokerGame::NewInitialState() const {
   return std::unique_ptr<State>(new UniversalPokerState(shared_from_this()));
@@ -543,6 +546,9 @@ std::shared_ptr<const Game> UniversalPokerGame::Clone() const {
 }
 
 int UniversalPokerGame::MaxGameLength() const {
+  // We cache this as this is very slow to calculate.
+  if (max_game_length_) return *max_game_length_;
+
   // Make a good guess here because bruteforcing the tree is far too slow
   // One Terminal Action
   int length = 1;
