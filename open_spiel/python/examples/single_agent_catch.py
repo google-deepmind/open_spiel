@@ -22,7 +22,7 @@ import logging
 from absl import app
 from absl import flags
 
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 from open_spiel.python.algorithms import dqn
 from open_spiel.python.algorithms import eva
 from open_spiel.python.algorithms import policy_gradient

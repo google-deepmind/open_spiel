@@ -21,7 +21,7 @@ from __future__ import print_function
 from absl import app
 from absl import flags
 from absl import logging
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 
 from open_spiel.python import policy
 from open_spiel.python import rl_environment

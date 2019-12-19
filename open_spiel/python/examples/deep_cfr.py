@@ -23,7 +23,7 @@ from absl import flags
 from absl import logging
 import six
 
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 
 from open_spiel.python import policy
 from open_spiel.python.algorithms import deep_cfr
