@@ -44,6 +44,8 @@ class UniversalPokerGame;
 constexpr uint8_t kMaxUniversalPokerPlayers = 10;
 
 enum ActionType { kFold = 0, kCall = 1, kRaise = 2 };
+enum BettingAbstraction { kFCPA = 0, kFC = 1 };
+std::ostream &operator<<(std::ostream &os, const BettingAbstraction &betting);
 
 class UniversalPokerState : public State {
  public:
@@ -77,12 +79,11 @@ class UniversalPokerState : public State {
     ACTION_DEAL = 1,
     ACTION_FOLD = 2,
     ACTION_CHECK_CALL = 4,
-    ACTION_BET_POT = 8,
+    ACTION_BET = 8,
     ACTION_ALL_IN = 16
   };
-  static constexpr ActionType ALL_ACTIONS[5] = {ACTION_DEAL, ACTION_FOLD,
-                                                ACTION_CHECK_CALL,
-                                                ACTION_BET_POT, ACTION_ALL_IN};
+  static constexpr ActionType ALL_ACTIONS[5] = {
+      ACTION_DEAL, ACTION_FOLD, ACTION_CHECK_CALL, ACTION_BET, ACTION_ALL_IN};
 
  public:
   const acpc_cpp::ACPCGame *acpc_game_;
@@ -101,6 +102,8 @@ class UniversalPokerState : public State {
   int32_t potSize_ = 0;
   int32_t allInSize_ = 0;
   std::string actionSequence_;
+
+  BettingAbstraction betting_abstraction_ = BettingAbstraction::kFCPA;
 
   void _CalculateActionsAndNodeType();
 
@@ -128,11 +131,15 @@ class UniversalPokerGame : public Game {
   std::vector<int> InformationStateTensorShape() const override;
   std::vector<int> ObservationTensorShape() const override;
   int MaxGameLength() const override;
+  BettingAbstraction betting_abstraction() const {
+    return betting_abstraction_;
+  }
 
  private:
   std::string gameDesc_;
   const acpc_cpp::ACPCGame acpc_game_;
   std::optional<int> max_game_length_;
+  BettingAbstraction betting_abstraction_ = BettingAbstraction::kFCPA;
 
  public:
   const acpc_cpp::ACPCGame *GetACPCGame() const { return &acpc_game_; }
