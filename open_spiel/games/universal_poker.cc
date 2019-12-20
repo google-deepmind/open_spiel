@@ -101,7 +101,6 @@ const GameType kGameType{
      // Specify which actions are available to the player, in both limit and
      // nolimit games. Available options are: "fc" for fold and check/call.
      // "fcpa" for fold, check/call, bet pot and all in (default).
-     // "full" for allowing all legal bets.
      {"bettingAbstraction", GameParameter(std::string("fcpa"))}}};
 
 std::shared_ptr<const Game> Factory(const GameParameters &params) {
@@ -412,11 +411,12 @@ std::vector<Action> UniversalPokerState::LegalActions() const {
     }
     return actions;
   }
-
-  int num_actions = GetPossibleActionCount();
-  std::vector<Action> actions(num_actions, 0);
-  std::iota(actions.begin(), actions.end(), 0);
-  return actions;
+  std::vector<Action> legal_actions;
+  if (ACTION_FOLD & possibleActions_) legal_actions.push_back(kFold);
+  if (ACTION_CHECK_CALL & possibleActions_) legal_actions.push_back(kCall);
+  if (ACTION_BET & possibleActions_) legal_actions.push_back(kBet);
+  if (ACTION_ALL_IN & possibleActions_) legal_actions.push_back(kAllIn);
+  return legal_actions;
 }
 
 // We first deal the cards to each player, dealing all the cards to the first
@@ -445,16 +445,24 @@ void UniversalPokerState::DoApplyAction(Action action_id) {
       return;
     }
   } else {
-    uint32_t idx = 0;
-    for (auto action : ALL_ACTIONS) {
-      if (action & GetPossibleActionsMask()) {
-        if (idx == action_id) {
-          ApplyChoiceAction(action);
-          break;
-        }
-        idx++;
-      }
+    int action_int = static_cast<int>(action_id);
+    if (action_int == kFold) {
+      ApplyChoiceAction(ACTION_FOLD);
+      return;
     }
+    if (action_int == kCall) {
+      ApplyChoiceAction(ACTION_CHECK_CALL);
+      return;
+    }
+    if (action_int == kBet) {
+      ApplyChoiceAction(ACTION_BET);
+      return;
+    }
+    if (action_int == kAllIn) {
+      ApplyChoiceAction(ACTION_ALL_IN);
+      return;
+    }
+    SpielFatalError(absl::StrFormat("Action not recognized: %i", action_id));
   }
 }
 
@@ -530,21 +538,15 @@ UniversalPokerGame::UniversalPokerGame(const GameParameters &params)
       acpc_game_(gameDesc_) {
   max_game_length_ = MaxGameLength();
   SPIEL_CHECK_TRUE(max_game_length_.has_value());
-  auto it = params.find("bettingAbstraction");
-  // If bettingAbstraction isn't set, we use FCPA.
-  if (it == params.end()) {
+  std::string betting_abstraction =
+      ParameterValue<std::string>("bettingAbstraction");
+  if (betting_abstraction == "fc") {
+    betting_abstraction_ = BettingAbstraction::kFC;
+  } else if (betting_abstraction == "fcpa") {
     betting_abstraction_ = BettingAbstraction::kFCPA;
   } else {
-    SPIEL_CHECK_TRUE(it->second.has_string_value());
-    std::string abstraction = it->second.ToString();
-    if (abstraction == "fc") {
-      betting_abstraction_ = BettingAbstraction::kFC;
-    } else if (abstraction == "fcpa") {
-      betting_abstraction_ = BettingAbstraction::kFCPA;
-    } else {
-      SpielFatalError(absl::StrFormat("bettingAbstraction: %s not supported.",
-                                      abstraction));
-    }
+    SpielFatalError(absl::StrFormat("bettingAbstraction: %s not supported.",
+                                    betting_abstraction));
   }
 }
 

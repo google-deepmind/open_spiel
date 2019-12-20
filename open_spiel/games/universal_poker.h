@@ -43,7 +43,9 @@ class UniversalPokerGame;
 
 constexpr uint8_t kMaxUniversalPokerPlayers = 10;
 
-enum ActionType { kFold = 0, kCall = 1, kRaise = 2 };
+// This is the mapping from int to action. E.g. the legal action "0" is fold,
+// the legal action "1" is check/call, etc.
+enum ActionType { kFold = 0, kCall = 1, kBet = 2, kAllIn = 3 };
 enum BettingAbstraction { kFCPA = 0, kFC = 1 };
 std::ostream &operator<<(std::ostream &os, const BettingAbstraction &betting);
 
@@ -74,7 +76,6 @@ class UniversalPokerState : public State {
 
  protected:
   void DoApplyAction(Action action_id) override;
-
   enum ActionType {
     ACTION_DEAL = 1,
     ACTION_FOLD = 2,
@@ -103,7 +104,7 @@ class UniversalPokerState : public State {
   int32_t allInSize_ = 0;
   std::string actionSequence_;
 
-  BettingAbstraction betting_abstraction_ = BettingAbstraction::kFCPA;
+  BettingAbstraction betting_abstraction_;
 
   void _CalculateActionsAndNodeType();
 
