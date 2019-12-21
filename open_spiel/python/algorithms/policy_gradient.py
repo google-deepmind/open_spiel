@@ -250,8 +250,8 @@ class PolicyGradient(rl_agent.AbstractAgent):
 
     # Remove illegal actions, re-normalize probs
     probs = np.zeros(self._num_actions)
+    probs[legal_actions] = policy_probs[0][legal_actions]
     if sum(probs) != 0:
-        probs[legal_actions] = policy_probs[0][legal_actions]
         probs /= sum(probs)
     else:
         probs[legal_actions] = 1/len(legal_actions)
