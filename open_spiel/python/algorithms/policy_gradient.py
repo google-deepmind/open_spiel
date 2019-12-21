@@ -243,7 +243,7 @@ class PolicyGradient(rl_agent.AbstractAgent):
       return rl_losses.BatchA2CLoss
 
   def _act(self, info_state, legal_actions):
-    #make a singleton batch for NN compatibility: [1, info_state_size]
+    # make a singleton batch for NN compatibility: [1, info_state_size]
     info_state = np.reshape(info_state, [1, -1])
     policy_probs = self._session.run(
         self._policy_probs, feed_dict={self._info_state_ph: info_state})
