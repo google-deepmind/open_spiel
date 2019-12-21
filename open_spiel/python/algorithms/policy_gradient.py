@@ -72,7 +72,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from absl import logging
 import collections
 import numpy as np
 import sonnet as snt
@@ -245,23 +244,17 @@ class PolicyGradient(rl_agent.AbstractAgent):
 
   def _act(self, info_state, legal_actions):
     #make a singleton batch for NN compatibility: [1, info_state_size]
-    lst = [0 for i in range(self._num_actions)]
-    for i in legal_actions:
-        lst[i]=1
-    legal_tensor= tf.convert_to_tensor(lst,dtype='float32')
-    filter_tensor = tf.multiply(self._policy_logits,legal_tensor)
-    filter_prob = tf.nn.softmax(filter_tensor)
     info_state = np.reshape(info_state, [1, -1])
     policy_probs = self._session.run(
-        filter_prob, feed_dict={self._info_state_ph: info_state})
+        self._policy_probs, feed_dict={self._info_state_ph: info_state})
 
-    # info_state = np.reshape(info_state, [1, -1])
-    # policy_probs = self._session.run(
-    #     self._policy_probs, feed_dict={self._info_state_ph: info_state})
     # Remove illegal actions, re-normalize probs
     probs = np.zeros(self._num_actions)
-    probs[legal_actions] = policy_probs[0][legal_actions]
-    probs /= sum(probs)
+    if sum(probs) != 0:
+        probs[legal_actions] = policy_probs[0][legal_actions]
+        probs /= sum(probs)
+    else:
+        probs[legal_actions] = 1/len(legal_actions)
     action = np.random.choice(len(probs), p=probs)
     return action, probs
 
