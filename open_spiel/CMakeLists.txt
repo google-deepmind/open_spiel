@@ -89,6 +89,8 @@ set (OPEN_SPIEL_CORE_FILES
   simultaneous_move_game.cc
   spiel_utils.h
   spiel_utils.cc
+  tensor_game.h
+  tensor_game.cc
   tensor_view.h
 )
 

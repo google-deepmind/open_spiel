@@ -32,6 +32,7 @@ import pyspiel
 _MANDATORY_PARAMETERS_GAMES = [
     "misere",
     "turn_based_simultaneous_game",
+    "normal_form_extensive_game"
 ]
 
 _GAMES_TO_TEST = list(
@@ -48,6 +49,9 @@ _GAMES_FULL_TREE_TRAVERSAL_TESTS = [
     ("kuhn_poker3p", "kuhn_poker(players=3)"),
     ("first_sealed_auction", "first_sealed_auction(max_value=2)"),
     ("tiny_hanabi", "tiny_hanabi"),
+    ("nf_auction", "turn_based_simultaneous_game(game="
+     "normal_form_extensive_game(game="
+     "first_sealed_auction(max_value=3)))"),
     # Disabled by default - big games, slow tests.
     # Uncomment to check the games if you modify them.
     # ("liars_dice", "liars_dice"),
@@ -65,6 +69,7 @@ TOTAL_NUM_STATES = {
     "first_sealed_auction": (12, 10, 14),
     "tiny_bridge_2p": (29, 53760, 53340),
     "tiny_hanabi": (3, 16, 36),
+    "nf_auction": (0, 7, 36),
 }
 
 # This is kept to ensure non-regression, but we would like to remove that
@@ -79,6 +84,7 @@ PERFECT_RECALL_NUM_STATES = {
     "first_sealed_auction": 4,
     "tiny_bridge_2p": 3584,
     "tiny_hanabi": 8,
+    "nf_auction": 2,
 }
 
 

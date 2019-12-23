@@ -5,6 +5,8 @@ add_library (game_transforms OBJECT
   misere.h
   turn_based_simultaneous_game.cc
   turn_based_simultaneous_game.h
+  normal_form_extensive_game.cc
+  normal_form_extensive_game.h
 )
 target_include_directories (game_transforms PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -25,3 +27,9 @@ add_executable(coop_to_1p_test
                ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(coop_to_1p_test coop_to_1p_test)
+
+add_executable(normal_form_extensive_game_test
+               normal_form_extensive_game_test.cc
+               ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(normal_form_extensive_game_test normal_form_extensive_game_test)

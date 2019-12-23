@@ -99,6 +99,13 @@ class MatrixGame : public NormalFormGame {
     return (player == Player{0} ? row_utilities_[Index(row, col)]
                                 : col_utilities_[Index(row, col)]);
   }
+  const std::vector<double>& RowUtilities() const { return row_utilities_; }
+  const std::vector<double>& ColUtilities() const { return col_utilities_; }
+  const std::vector<double>& PlayerUtilities(
+      const Player player) const {
+    SPIEL_CHECK_TRUE(player == Player{0} || player == Player{1});
+    return (player == Player{0} ? row_utilities_ : col_utilities_);
+  }
   const std::string& RowActionName(int row) const {
     return row_action_names_[row];
   }

@@ -23,7 +23,9 @@
 #include "open_spiel/algorithms/matrix_game_utils.h"
 #include "open_spiel/algorithms/mcts.h"
 #include "open_spiel/algorithms/tabular_exploitability.h"
+#include "open_spiel/algorithms/tensor_game_utils.h"
 #include "open_spiel/algorithms/trajectories.h"
+#include "open_spiel/game_transforms/normal_form_extensive_game.h"
 #include "open_spiel/game_transforms/turn_based_simultaneous_game.h"
 #include "open_spiel/matrix_game.h"
 #include "open_spiel/normal_form_game.h"
@@ -33,6 +35,7 @@
 #include "open_spiel/spiel_bots.h"
 #include "open_spiel/spiel_utils.h"
 #include "pybind11/include/pybind11/functional.h"
+#include "pybind11/include/pybind11/numpy.h"
 #include "pybind11/include/pybind11/operators.h"
 #include "pybind11/include/pybind11/pybind11.h"
 #include "pybind11/include/pybind11/stl.h"
@@ -45,6 +48,7 @@ using ::open_spiel::algorithms::Exploitability;
 using ::open_spiel::algorithms::NashConv;
 using ::open_spiel::algorithms::TabularBestResponse;
 using ::open_spiel::matrix_game::MatrixGame;
+using ::open_spiel::tensor_game::TensorGame;
 
 namespace py = ::pybind11;
 
@@ -382,6 +386,25 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("row_utility", &MatrixGame::RowUtility)
       .def("col_utility", &MatrixGame::ColUtility)
       .def("player_utility", &MatrixGame::PlayerUtility)
+      .def("row_utilities",
+           [](const MatrixGame& game) {
+             const std::vector<double>& row_utilities = game.RowUtilities();
+             return py::array_t<double>({game.NumRows(), game.NumCols()},
+                                        &row_utilities[0]);
+           })
+      .def("col_utilities",
+           [](const MatrixGame& game) {
+             const std::vector<double>& col_utilities = game.ColUtilities();
+             return py::array_t<double>({game.NumRows(), game.NumCols()},
+                                        &col_utilities[0]);
+           })
+      .def("player_utilities",
+           [](const MatrixGame& game, const Player player) {
+             const std::vector<double>& player_utilities =
+                 game.PlayerUtilities(player);
+             return py::array_t<double>({game.NumRows(), game.NumCols()},
+                                        &player_utilities[0]);
+           })
       .def("row_action_name", &MatrixGame::RowActionName)
       .def("col_action_name", &MatrixGame::ColActionName)
       .def(py::pickle(                                  // Pickle support
@@ -394,6 +417,33 @@ PYBIND11_MODULE(pyspiel, m) {
             // set the holder type to std::shared_ptr<const Game> either.
             return std::const_pointer_cast<MatrixGame>(
                 algorithms::LoadMatrixGame(data));
+          }));
+
+  py::class_<TensorGame, std::shared_ptr<TensorGame>> tensor_game(
+      m, "TensorGame", normal_form_game);
+  tensor_game
+      .def(py::init<GameType, GameParameters,
+                    std::vector<std::vector<std::string>>,
+                    std::vector<std::vector<double>>>())
+      .def("shape", &TensorGame::Shape)
+      .def("player_utility", &TensorGame::PlayerUtility)
+      .def("player_utilities",
+           [](const TensorGame& game, const Player player) {
+             const std::vector<double>& utilities =
+                 game.PlayerUtilities(player);
+             return py::array_t<double>(game.Shape(), &utilities[0]);
+           })
+      .def("action_name", &TensorGame::ActionName)
+      .def(py::pickle(                                  // Pickle support
+          [](std::shared_ptr<const TensorGame> game) {  // __getstate__
+            return game->ToString();
+          },
+          [](const std::string& data) {  // __setstate__
+            // Have to remove the const here for this to compile, presumably
+            // because the holder type is non-const. But seems like you can't
+            // set the holder type to std::shared_ptr<const Game> either.
+            return std::const_pointer_cast<TensorGame>(
+                algorithms::LoadTensorGame(data));
           }));
 
   py::class_<Bot, PyBot> bot(m, "Bot");
@@ -514,6 +564,45 @@ PYBIND11_MODULE(pyspiel, m) {
             &open_spiel::matrix_game::CreateMatrixGame),
         "Creates an arbitrary matrix game from dimensions and utilities.");
 
+  m.def("create_tensor_game",
+        py::overload_cast<const std::string&, const std::string&,
+                          const std::vector<std::vector<std::string>>&,
+                          const std::vector<std::vector<double>>&>(
+            &open_spiel::tensor_game::CreateTensorGame),
+        "Creates an arbitrary tensor game from named actions and utilities.");
+
+  m.def("create_matrix_game",
+        py::overload_cast<const std::vector<std::vector<double>>&,
+                          const std::vector<std::vector<double>>&>(
+            &open_spiel::matrix_game::CreateMatrixGame),
+        "Creates an arbitrary matrix game from dimensions and utilities.");
+
+  m.def("create_tensor_game",
+        py::overload_cast<const std::vector<std::vector<double>>&,
+                          const std::vector<int>&>(
+            &open_spiel::tensor_game::CreateTensorGame),
+        "Creates an arbitrary matrix game from dimensions and utilities.");
+
+  m.def(
+      "create_tensor_game",
+      [](const std::vector<py::array_t<
+             double, py::array::c_style | py::array::forcecast>>& utilities) {
+        const int num_players = utilities.size();
+        const std::vector<int> shape(
+            utilities[0].shape(), utilities[0].shape() + utilities[0].ndim());
+        std::vector<std::vector<double>> flat_utilities;
+        for (const auto& player_utilities : utilities) {
+          SPIEL_CHECK_EQ(player_utilities.ndim(), num_players);
+          SPIEL_CHECK_TRUE(
+              std::equal(shape.begin(), shape.end(), player_utilities.shape()));
+          flat_utilities.push_back(std::vector<double>(
+              player_utilities.data(),
+              player_utilities.data() + player_utilities.size()));
+        }
+        return open_spiel::tensor_game::CreateTensorGame(flat_utilities, shape);
+      },
+      "Creates an arbitrary matrix game from dimensions and utilities.");
+
   m.def("load_game",
         py::overload_cast<const std::string&>(&open_spiel::LoadGame),
         "Returns a new game object for the specified short name using default "
@@ -537,9 +626,17 @@ PYBIND11_MODULE(pyspiel, m) {
   m.def("load_matrix_game", open_spiel::algorithms::LoadMatrixGame,
         "Loads a game as a matrix game (will fail if not a matrix game.");
 
+  m.def("load_tensor_game", open_spiel::algorithms::LoadTensorGame,
+        "Loads a game as a tensor game (will fail if not a tensor game.");
+
   m.def("extensive_to_matrix_game",
         open_spiel::algorithms::ExtensiveToMatrixGame,
         "Converts a two-player extensive-game to its equivalent matrix game, "
+        "which is exponentially larger. Use only with small games.");
+
+  m.def("extensive_to_tensor_game",
+        open_spiel::ExtensiveToTensorGame,
+        "Converts an extensive-game to its equivalent tensor game, "
         "which is exponentially larger. Use only with small games.");
 
   m.def("registered_names", GameRegisterer::RegisteredNames,
@@ -660,7 +757,7 @@ PYBIND11_MODULE(pyspiel, m) {
   // exceptions - the process will be terminated instead.
   open_spiel::SetErrorHandler(
       [](const std::string& string) { throw SpielException(string); });
-}
+}  // NOLINT(readability/fn_size)
 
 }  // namespace
 }  // namespace open_spiel
