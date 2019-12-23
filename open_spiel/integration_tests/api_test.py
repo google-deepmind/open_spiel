@@ -42,6 +42,7 @@ _GAMES_TO_TEST = list(
 # (name to display, string to pass to load_game).
 _GAMES_FULL_TREE_TRAVERSAL_TESTS = [
     ("catch", "catch(rows=6,columns=3)"),
+    ("deep_sea", "deep_sea(size=3)"),
     ("kuhn_poker", "kuhn_poker"),
     ("leduc_poker", "leduc_poker"),
     ("iigoofspiel4", "turn_based_simultaneous_game(game=goofspiel("
@@ -61,6 +62,7 @@ _GAMES_FULL_TREE_TRAVERSAL_TESTS = [
 TOTAL_NUM_STATES = {
     # This maps the game name to (chance, playable, terminal)
     "catch": (1, 363, 729),
+    "deep_sea": (0, 7, 8),
     "kuhn_poker": (4, 24, 30),
     "leduc_poker": (157, 3780, 5520),
     "liars_dice": (7, 147456, 147420),
@@ -76,6 +78,7 @@ TOTAL_NUM_STATES = {
 # when we can interpret what are these numbers.
 PERFECT_RECALL_NUM_STATES = {
     "catch": 363,
+    "deep_sea": 7,
     "kuhn_poker": 12,
     "leduc_poker": 936,
     "liars_dice": 24576,
