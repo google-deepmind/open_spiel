@@ -40,6 +40,7 @@ class PyspielTest(absltest.TestCase):
         "bridge_uncontested_bidding",
         "catch",
         "chess",
+        "cliff_walking",
         "coin_game",
         "connect_four",
         "coop_box_pushing",
