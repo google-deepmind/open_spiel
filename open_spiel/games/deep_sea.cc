@@ -146,9 +146,10 @@ std::string DeepSeaState::ObservationString(Player player) const {
 void DeepSeaState::ObservationTensor(Player player,
                                      std::vector<double>* values) const {
   SPIEL_CHECK_EQ(player, 0);
-  values->resize(size_ * size_);
   std::fill(values->begin(), values->end(), 0.);
-  (*values)[player_row_ * size_ + player_col_] = 1.0;
+  values->resize(size_ * size_);
+  if (player_row_ < size_ && player_col_ < size_)
+    (*values)[player_row_ * size_ + player_col_] = 1.0;
 }
 
 void DeepSeaState::InformationStateTensor(Player player,
