@@ -22,10 +22,10 @@ NumPlayers() = 2
 MinUtility() = -40.0
 MaxUtility() = 35.0
 UtilitySum() = None
-InformationStateTensorShape() = [12]
-InformationStateTensorSize() = 12
-ObservationTensorShape() = [12]
-ObservationTensorSize() = 12
+InformationStateTensorShape() = [26]
+InformationStateTensorSize() = 26
+ObservationTensorShape() = [19]
+ObservationTensorSize() = 19
 MaxGameLength() = 8
 ToString() = "tiny_bridge_2p(abstracted=True)"
 

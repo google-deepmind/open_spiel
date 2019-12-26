@@ -92,10 +92,11 @@ class TinyBridgeGame2p : public Game {
     return std::shared_ptr<const Game>(new TinyBridgeGame2p(*this));
   }
   std::vector<int> InformationStateTensorShape() const {
-    return {is_abstracted_ ? kNumAbstractHands : kDeckSize + kNumActions2p * 2};
+    return {(is_abstracted_ ? kNumAbstractHands : kDeckSize) +
+            kNumActions2p * 2};
   }
   std::vector<int> ObservationTensorShape() const override {
-    return {is_abstracted_ ? kNumAbstractHands : kDeckSize + kNumActions2p};
+    return {(is_abstracted_ ? kNumAbstractHands : kDeckSize) + kNumActions2p};
   }
 
  private:
@@ -116,6 +117,12 @@ class TinyBridgeGame4p : public Game {
   int MaxChanceOutcomes() const override { return kNumPrivates; }
   std::shared_ptr<const Game> Clone() const override {
     return std::shared_ptr<const Game>(new TinyBridgeGame4p(*this));
+  }
+  std::vector<int> InformationStateTensorShape() const {
+    return {kDeckSize + (kNumBids * 3 + 1) * NumPlayers()};
+  }
+  std::vector<int> ObservationTensorShape() const override {
+    return {kDeckSize + kNumBids + 4 * NumPlayers()};
   }
 };
 
