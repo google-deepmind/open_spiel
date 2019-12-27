@@ -129,7 +129,7 @@ constexpr absl::string_view kHUNLGameString =
      "1,numSuits=4,numRanks=13,numHoleCards=2,numBoardCards=0 3 1 "
      "1,raiseSize=100 100 100 100)");
 
-void HULIncrementalTest() {
+void HUNLIncrementalTest() {
   std::shared_ptr<const Game> game = LoadGame(std::string(kHUNLGameString));
   UniformPolicy policy;
   std::unique_ptr<State> state = game->NewInitialState();
@@ -150,5 +150,10 @@ namespace algorithms = open_spiel::algorithms;
 int main(int argc, char** argv) {
   algorithms::KuhnStateDistributionTest();
   algorithms::LeducStateDistributionTest();
-  algorithms::HULIncrementalTest();
+
+  // ACPC is an optional dependency. Only test HUNL if it is registered.
+  if (open_spiel::IsGameRegistered(std::string(algorithms::kHUNLGameString))) {
+    algorithms::HUNLIncrementalTest();
+  }
+
 }
