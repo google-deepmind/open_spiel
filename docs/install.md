@@ -51,7 +51,7 @@ Linux versions).
 ### Configuration conditional dependencies
 
 See `open_spiel/scripts/global_variables.sh` to configure the conditional
-dependencies. See also the [Developer Guide](devloper_guide.md).
+dependencies. See also the [Developer Guide](developer_guide.md).
 
 ### Installing system-wide dependencies
 
