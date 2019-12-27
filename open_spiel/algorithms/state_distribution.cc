@@ -24,7 +24,6 @@
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
-#include "open_spiel/games/universal_poker.h"
 #include "open_spiel/simultaneous_move_game.h"
 #include "open_spiel/spiel.h"
 
@@ -153,13 +152,12 @@ HistoryDistribution UpdateIncrementalStateDistribution(
     const State& state, const Policy* opponent_policy, int player_id,
     const HistoryDistribution& previous) {
   if (previous.first.empty()) {
-    // We have a special case here as universal_poker can be very big.
-    if (state.GetGame()->GetType().short_name == "universal_poker" &&
-        state.GetGame()->NumPlayers() == 2) {
-      auto up_state =
-          dynamic_cast<const universal_poker::UniversalPokerState*>(&state);
-      return up_state->GetHistoriesConsistentWithInfostate();
-    }
+    HistoryDistribution dist = state.GetHistoriesConsistentWithInfostate();
+
+    // If the game didn't implement GetHistoriesConsistentWithInfostate, then
+    // this is empty, otherwise, we're good.
+    if (!dist.first.empty()) return dist;
+
     // If the previous pair is empty, then we have to do a BFS to find all
     // relevant nodes:
     return GetStateDistribution(state, opponent_policy);

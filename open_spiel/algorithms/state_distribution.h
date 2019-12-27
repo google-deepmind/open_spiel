@@ -23,9 +23,6 @@
 namespace open_spiel {
 namespace algorithms {
 
-using HistoryDistribution =
-    std::pair<std::vector<std::unique_ptr<State>>, std::vector<double>>;
-
 // Returns a distribution over states at the information state containing the
 // specified state given the opponents' policies. That is, it returns
 // Pr(h | s, \pi_{-i}) by normalizing the opponents' reach probabilities over

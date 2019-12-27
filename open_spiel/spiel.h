@@ -521,6 +521,14 @@ class State {
     SpielFatalError("ResampleFromInfostate() not implemented.");
   }
 
+  // Returns a vector of states & probabilities that are consistent with the
+  // infostate from the view of the current player. By default, this is not
+  // implemented and returns an empty list.
+  virtual std::pair<std::vector<std::unique_ptr<State>>, std::vector<double>>
+  GetHistoriesConsistentWithInfostate() const {
+    return {};
+  }
+
  protected:
   // See ApplyAction.
   virtual void DoApplyAction(Action action_id) {
@@ -781,6 +789,11 @@ std::string SerializeGameAndState(const Game& game, const State& state);
 // seed.
 std::pair<std::shared_ptr<const Game>, std::unique_ptr<State>>
 DeserializeGameAndState(const std::string& serialized_state);
+
+// We alias this here as we can't import state_distribution.h or we'd have a
+// circular dependency.
+using HistoryDistribution =
+    std::pair<std::vector<std::unique_ptr<State>>, std::vector<double>>;
 
 }  // namespace open_spiel
 

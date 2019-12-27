@@ -494,7 +494,8 @@ double UniversalPokerState::GetTotalReward(Player player) const {
 HistoryDistribution UniversalPokerState::GetHistoriesConsistentWithInfostate()
     const {
   // This is only implemented for 2 players.
-  SPIEL_CHECK_EQ(acpc_game_->GetNbPlayers(), 2);
+  if (acpc_game_->GetNbPlayers() != 2) return {};
+
   logic::CardSet is_cards;
   const logic::CardSet &our_cards = hole_cards_[cur_player_];
   for (uint8_t card : our_cards.ToCardArray()) is_cards.AddCard(card);
