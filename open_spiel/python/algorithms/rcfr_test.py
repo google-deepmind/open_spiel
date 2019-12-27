@@ -24,7 +24,7 @@ from absl.testing import parameterized
 import numpy as np
 # Note: this import needs to come before Tensorflow to fix a malloc error.
 import pyspiel  # pylint: disable=g-bad-import-order
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 
 from open_spiel.python.algorithms import rcfr
 
