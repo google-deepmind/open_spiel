@@ -77,6 +77,8 @@ class Calculator(object):
     self.info_state_prob = None
     self.info_state_cf_prob = None
     self.info_state_chance_prob = None
+    # best_responder[i] is a best response to the provided policy for player i.
+    # It is therefore a policy for player (1-i).
     self._best_responder = {0: None, 1: None}
     self._all_states = None
 
@@ -143,7 +145,9 @@ class Calculator(object):
     """Computes action values per state for the player.
 
     Args:
-      player: The id of the player 0 <= player < game.num_players().
+      player: The id of the player (0 <= player < game.num_players()). This
+        player will play `player_policy`, while the opponent will play a best
+        response.
       player_policy: A `policy.Policy` object.
       info_states: A list of info state strings.
 
