@@ -24,11 +24,11 @@ from absl.testing import parameterized
 import numpy as np
 # Note: this import needs to come before Tensorflow to fix a malloc error.
 import pyspiel  # pylint: disable=g-bad-import-order
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 
 from open_spiel.python.algorithms import rcfr
 
-tf.compat.v1.enable_eager_execution()
+tf.enable_eager_execution()
 
 _GAME = pyspiel.load_game('kuhn_poker')
 _BOOLEANS = [False, True]
@@ -47,7 +47,7 @@ class RcfrTest(parameterized.TestCase, tf.test.TestCase):
 
   def setUp(self):
     super(RcfrTest, self).setUp()
-    tf.compat.v1.random.set_random_seed(42)
+    tf.random.set_random_seed(42)
 
   def test_with_one_hot_action_features_single_state_vector(self):
     information_state_features = [1., 2., 3.]
@@ -478,7 +478,7 @@ class RcfrTest(parameterized.TestCase, tf.test.TestCase):
 
       for x, y in data:
         optimizer.minimize(
-            lambda: tf.compat.v1.losses.huber_loss(y, models[regret_player](x)),  # pylint: disable=cell-var-from-loop
+            lambda: tf.losses.huber_loss(y, models[regret_player](x)),  # pylint: disable=cell-var-from-loop
             models[regret_player].trainable_variables)
 
       regret_player = reach_weights_player
@@ -506,7 +506,7 @@ class RcfrTest(parameterized.TestCase, tf.test.TestCase):
 
       for x, y in data:
         optimizer.minimize(
-            lambda: tf.compat.v1.losses.huber_loss(y, model(x)),  # pylint: disable=cell-var-from-loop
+            lambda: tf.losses.huber_loss(y, model(x)),  # pylint: disable=cell-var-from-loop
             model.trainable_variables)
 
     average_policy = patient.average_policy()
@@ -567,7 +567,7 @@ class RcfrTest(parameterized.TestCase, tf.test.TestCase):
 
       for x, y in data:
         optimizer.minimize(
-            lambda: tf.compat.v1.losses.huber_loss(y, model(x)),  # pylint: disable=cell-var-from-loop
+            lambda: tf.losses.huber_loss(y, model(x)),  # pylint: disable=cell-var-from-loop
             model.trainable_variables)
 
     average_policy = patient.average_policy()
