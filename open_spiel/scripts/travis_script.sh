@@ -19,6 +19,7 @@ set -x
 
 sudo -H pip3 install --upgrade pip
 sudo -H pip3 install --upgrade setuptools
+sudo -H pip3 install --force-reinstall virtualenv
 
 virtualenv -p python ./venv
 source ./venv/bin/activate
