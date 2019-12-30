@@ -17,6 +17,10 @@
 set -e
 set -x
 
+# Need this to be able to install TF >= 1.15 on Ubuntu 18.04.
+sudo pip3 install --upgrade pip
+sudo pip3 install --upgrade setuptools
+
 virtualenv -p python ./venv
 source ./venv/bin/activate
 
