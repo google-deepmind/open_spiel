@@ -17,8 +17,8 @@
 set -e
 set -x
 
-pip3 install --upgrade pip
-pip3 install --upgrade setuptools
+sudo -H pip3 install --upgrade pip
+sudo -H pip3 install --upgrade setuptools
 
 virtualenv -p python ./venv
 source ./venv/bin/activate
