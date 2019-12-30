@@ -31,11 +31,17 @@ set -x
 MYDIR="$(dirname "$(realpath "$0")")"
 source "${MYDIR}/global_variables.sh"
 
-CXX=g++
+CXX=`which clang++`
+if [ ! -x $CXX ]
+then
+  echo -n "clang++ not found in the path (the clang C++ compiler is needed to "
+  echo "compile OpenSpiel). Exiting..."
+  exit 1
+fi
+
 NPROC=nproc
 if [[ "$OSTYPE" == "darwin"* ]]; then  # Mac OSX
   NPROC="sysctl -n hw.physicalcpu"
-  CXX=/usr/local/bin/g++-7
 fi
 
 MAKE_NUM_PROCS=$(${NPROC})

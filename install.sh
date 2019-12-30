@@ -18,6 +18,11 @@
 # The following should be easy to setup as a submodule:
 # https://git-scm.com/docs/git-submodule
 
+die() {
+  echo "$*" 1>&2
+  exit 1
+}
+
 set -e  # exit when any command fails
 set -x
 
@@ -80,7 +85,7 @@ fi
 
 # 2. Install other required system-wide dependencies
 if [[ "$OSTYPE" == "linux-gnu" ]]; then
-  EXT_DEPS="virtualenv cmake python3 python3-dev python3-pip python3-setuptools python3-wheel"
+  EXT_DEPS="virtualenv clang cmake python3 python3-dev python3-pip python3-setuptools python3-wheel"
   APT_GET=`which apt-get`
   if [ "$APT_GET" = "" ]
   then
@@ -108,7 +113,7 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
 elif [[ "$OSTYPE" == "darwin"* ]]; then  # Mac OSX
   [[ -x `which realpath` ]] || brew install coreutils || echo "** Warning: failed 'brew install coreutils' -- continuing"
   [[ -x `which python3` ]] || brew install python3 || echo "** Warning: failed 'brew install python3' -- continuing"
-  [[ -x `which g++-7` ]] || brew install gcc@7 || echo "** Warning: failed 'brew install gcc@7' -- continuing"
+  [[ -x `which clang++` ]] || die "Clang not found. Please install or upgrade XCode and run the command-line developer tools"
   curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
   python3 get-pip.py
   pip3 install virtualenv

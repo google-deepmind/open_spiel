@@ -83,7 +83,7 @@ pip3 install --upgrade -r requirements.txt
 
 Make sure that the virtual environment is still activated.
 
-By default, `g++` (version 7) is used (and potentially installed by
+By default, Clang C++ compiler is used (and potentially installed by
 `install.sh`).
 
 Build and run tests (Python 3):
@@ -91,7 +91,7 @@ Build and run tests (Python 3):
 ```bash
 mkdir build
 cd build
-CXX=g++ cmake -DPython_TARGET_VERSION=3.6 -DCMAKE_CXX_COMPILER=${CXX} ../open_spiel
+CXX=clang++ cmake -DPython_TARGET_VERSION=3.6 -DCMAKE_CXX_COMPILER=${CXX} ../open_spiel
 make -j$(nproc)
 ctest -j$(nproc)
 ```
