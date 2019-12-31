@@ -90,7 +90,7 @@ class LeducState : public State {
   // taken so far. If the round has ended, the actions are kInvalidAction.
   std::vector<int> padded_betting_sequence() const;
   std::unique_ptr<State> ResampleFromInfostate(
-      int player_id, std::function<double()> rng) const;
+      int player_id, std::function<double()> rng) const override;
 
  protected:
   // The meaning of `action_id` varies:

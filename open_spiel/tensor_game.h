@@ -124,7 +124,7 @@ class TensorState : public NFGState {
   explicit TensorState(std::shared_ptr<const Game> game);
   explicit TensorState(const TensorState&) = default;
 
-  virtual std::vector<Action> LegalActions(Player player) const {
+  std::vector<Action> LegalActions(Player player) const override {
     if (IsTerminal()) return {};
     if (player == kSimultaneousPlayerId) {
       return LegalFlatJointActions();
@@ -137,16 +137,16 @@ class TensorState : public NFGState {
 
   std::string ToString() const override;
 
-  virtual std::string ActionToString(Player player, Action action_id) const {
+  std::string ActionToString(Player player, Action action_id) const override {
     if (player == kSimultaneousPlayerId)
       return FlatJointActionToString(action_id);
     else
       return tensor_game_->ActionName(player, action_id);
   }
 
-  virtual bool IsTerminal() const { return !joint_move_.empty(); }
+  bool IsTerminal() const override { return !joint_move_.empty(); }
 
-  virtual std::vector<double> Returns() const {
+  std::vector<double> Returns() const override {
     std::vector<double> returns(NumPlayers());
     if (IsTerminal()) {
       for (Player player = 0; player < returns.size(); player++) {
@@ -156,12 +156,12 @@ class TensorState : public NFGState {
     return returns;
   }
 
-  virtual std::unique_ptr<State> Clone() const {
+  std::unique_ptr<State> Clone() const override {
     return std::unique_ptr<State>(new TensorState(*this));
   }
 
  protected:
-  virtual void DoApplyActions(const std::vector<Action>& moves) {
+  void DoApplyActions(const std::vector<Action>& moves) override {
     SPIEL_CHECK_EQ(moves.size(), NumPlayers());
     for (Player player = 0; player < NumPlayers(); player++) {
       SPIEL_CHECK_GE(moves[player], 0);

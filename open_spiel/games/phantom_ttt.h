@@ -60,7 +60,7 @@ class PhantomTTTState : public State {
 
   // Forward to underlying game state
   Player CurrentPlayer() const override { return state_.CurrentPlayer(); }
-  std::string ActionToString(Player player, Action action_id) const {
+  std::string ActionToString(Player player, Action action_id) const override {
     return state_.ActionToString(player, action_id);
   }
   std::string ToString() const override { return state_.ToString(); }
@@ -115,7 +115,7 @@ class PhantomTTTGame : public Game {
   // These will depend on the obstype parameter.
   std::vector<int> InformationStateTensorShape() const override;
   std::vector<int> ObservationTensorShape() const override;
-  int MaxGameLength() const { return kLongestSequence; }
+  int MaxGameLength() const override { return kLongestSequence; }
 
  private:
   std::shared_ptr<const tic_tac_toe::TicTacToeGame> game_;

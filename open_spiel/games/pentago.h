@@ -107,7 +107,7 @@ class PentagoGame : public Game {
   std::vector<int> ObservationTensorShape() const override {
     return {kCellStates, kBoardSize, kBoardSize};
   }
-  int MaxGameLength() const {
+  int MaxGameLength() const override {
     // No stones are removed, and it is possible to draw by filling the board.
     // Increase this by one if swap is ever implemented.
     return kBoardPositions;

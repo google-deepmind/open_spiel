@@ -91,7 +91,7 @@ class TinyBridgeGame2p : public Game {
   std::shared_ptr<const Game> Clone() const override {
     return std::shared_ptr<const Game>(new TinyBridgeGame2p(*this));
   }
-  std::vector<int> InformationStateTensorShape() const {
+  std::vector<int> InformationStateTensorShape() const override {
     return {(is_abstracted_ ? kNumAbstractHands : kDeckSize) +
             kNumActions2p * 2};
   }
@@ -118,7 +118,7 @@ class TinyBridgeGame4p : public Game {
   std::shared_ptr<const Game> Clone() const override {
     return std::shared_ptr<const Game>(new TinyBridgeGame4p(*this));
   }
-  std::vector<int> InformationStateTensorShape() const {
+  std::vector<int> InformationStateTensorShape() const override {
     return {kDeckSize + (kNumBids * 3 + 1) * NumPlayers()};
   }
   std::vector<int> ObservationTensorShape() const override {
@@ -202,7 +202,7 @@ class TinyBridgePlayState : public State {
         holder_(holder) {}
   TinyBridgePlayState(const TinyBridgePlayState&) = default;
 
-  Player CurrentPlayer() const { return CurrentHand() % 2; }
+  Player CurrentPlayer() const override { return CurrentHand() % 2; }
   Seat CurrentHand() const;
 
   std::string ActionToString(Player player, Action action_id) const override;

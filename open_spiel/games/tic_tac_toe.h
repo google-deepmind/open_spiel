@@ -105,7 +105,7 @@ class TicTacToeGame : public Game {
   std::vector<int> ObservationTensorShape() const override {
     return {kCellStates, kNumRows, kNumCols};
   }
-  int MaxGameLength() const { return kNumCells; }
+  int MaxGameLength() const override { return kNumCells; }
 };
 
 CellState PlayerToState(Player player);

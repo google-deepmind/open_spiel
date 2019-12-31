@@ -64,7 +64,7 @@ class MatchingPennies3pGame : public NormalFormGame {
  public:
   explicit MatchingPennies3pGame(const GameParameters& params);
 
-  int NumDistinctActions() const { return 2; }
+  int NumDistinctActions() const override { return 2; }
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(
         new MatchingPennies3pState(shared_from_this()));

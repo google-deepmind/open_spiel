@@ -113,7 +113,7 @@ class HexGame : public Game {
   std::vector<int> ObservationTensorShape() const override {
     return {kCellStates, board_size_, board_size_};
   }
-  int MaxGameLength() const { return board_size_ * board_size_; }
+  int MaxGameLength() const override { return board_size_ * board_size_; }
 
  private:
   const int board_size_;

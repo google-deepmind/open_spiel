@@ -91,7 +91,7 @@ class TinyHanabiGame : public Game {
   std::shared_ptr<const Game> Clone() const override {
     return std::shared_ptr<const Game>(new TinyHanabiGame(*this));
   }
-  std::vector<int> InformationStateTensorShape() const {
+  std::vector<int> InformationStateTensorShape() const override {
     return {payoff_.NumChance() + payoff_.NumActions() * payoff_.NumPlayers()};
   }
   std::vector<int> ObservationTensorShape() const override {

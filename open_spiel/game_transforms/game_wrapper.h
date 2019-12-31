@@ -31,7 +31,7 @@ class WrappedState : public State {
 
   Player CurrentPlayer() const override { return state_->CurrentPlayer(); }
 
-  virtual std::vector<Action> LegalActions(Player player) const {
+  std::vector<Action> LegalActions(Player player) const override {
     return state_->LegalActions(player);
   }
 
@@ -60,18 +60,18 @@ class WrappedState : public State {
     state_->InformationStateTensor(player, values);
   }
 
-  virtual std::string ObservationString(Player player) const {
+  std::string ObservationString(Player player) const override {
     return state_->ObservationString(player);
   }
 
-  virtual void ObservationTensor(Player player,
-                                 std::vector<double>* values) const {
+  void ObservationTensor(Player player,
+                                 std::vector<double>* values) const override{
     state_->ObservationTensor(player, values);
   }
 
-  virtual std::unique_ptr<State> Clone() const = 0;
+  std::unique_ptr<State> Clone() const override = 0;
 
-  virtual void UndoAction(Player player, Action action) {
+  void UndoAction(Player player, Action action) override {
     state_->UndoAction(player, action);
     history_.pop_back();
   }

@@ -35,7 +35,7 @@ class SimMoveState : public State {
   SimMoveState(const SimMoveState&) = default;
 
   // Subclasses must implement a per-player LegalActions function.
-  virtual std::vector<Action> LegalActions(Player player) const = 0;
+  std::vector<Action> LegalActions(Player player) const override = 0;
 
   // LegalActions() returns either the chance outcomes (at a chance node),
   // or a flattened form of the joint legal actions (at simultaneous move
