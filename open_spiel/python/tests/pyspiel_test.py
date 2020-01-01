@@ -36,13 +36,16 @@ class PyspielTest(absltest.TestCase):
         "backgammon",
         "blotto",
         "breakthrough",
+        "bridge",
         "bridge_uncontested_bidding",
         "catch",
         "chess",
+        "cliff_walking",
         "coin_game",
         "connect_four",
         "coop_box_pushing",
         "coop_to_1p",
+        "deep_sea",
         "first_sealed_auction",
         "go",
         "goofspiel",
@@ -64,6 +67,7 @@ class PyspielTest(absltest.TestCase):
         "matrix_shapleys_game",
         "misere",
         "negotiation",
+        "normal_form_extensive_game",
         "oshi_zumo",
         "oware",
         "pentago",
@@ -104,6 +108,7 @@ class PyspielTest(absltest.TestCase):
         # Only add games here if there is no sensible default for a parameter.
         "misere",
         "turn_based_simultaneous_game",
+        "normal_form_extensive_game",
     ]
     self.assertCountEqual(games_with_mandatory_parameters, expected)
 

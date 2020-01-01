@@ -1,5 +1,4 @@
 game: matching_pennies_3p
-seed: 129684656
 
 GameType.chance_mode = ChanceMode.DETERMINISTIC
 GameType.dynamics = Dynamics.SIMULTANEOUS
@@ -29,8 +28,8 @@ MaxGameLength() = 1
 ToString() = "matching_pennies_3p()"
 
 # State 0
+# Normal form game default NFGState::ToString. Non-terminal
 IsTerminal() = False
-ToString() = "Normal form game default NFGState::ToString. Non-terminal"
 History() = []
 HistoryString() = ""
 IsChanceNode() = False
@@ -55,8 +54,8 @@ StringLegalActions(2) = ["Heads", "Tails"]
 actions: [1, 1, 0]
 
 # State 1
+# Normal form game default NFGState::ToString. Terminal, history: 1 1 0, returns: 1,-1,1
 IsTerminal() = True
-ToString() = "Normal form game default NFGState::ToString. Terminal, history: 1 1 0, returns: 1,-1,1"
 History() = [1, 1, 0]
 HistoryString() = "1 1 0"
 IsChanceNode() = False

@@ -18,17 +18,15 @@
 #include <memory>
 #include <string>
 
+#include "open_spiel/games/universal_poker/acpc/project_acpc_server/game.h"
+
 namespace open_spiel {
 namespace universal_poker {
 namespace acpc_cpp {
 
-// We could have included "project_acpc_server/game.h" here, and directly
-// expose the structs, but this would pollute the top level namespace.
-// Thus, to prevent from leaking all the symbols, we create wrappers that will
-// expose the structure fields through methods only.
-struct RawACPCGame;
-struct RawACPCState;
-struct RawACPCAction;
+struct RawACPCGame : public ::project_acpc_server::Game {};
+struct RawACPCState : public ::project_acpc_server::State {};
+struct RawACPCAction : public ::project_acpc_server::Action {};
 
 class ACPCGame;
 
@@ -45,6 +43,8 @@ class ACPCState {
                             uint8_t nbHoleCards[10],
                             uint8_t nbBoardCards) const;
 
+  // The current player is the first player in a new round, or the next player
+  // within a round.
   uint8_t CurrentPlayer() const;
 
   bool IsFinished() const;
@@ -53,7 +53,9 @@ class ACPCState {
   void DoAction(const ACPCActionType actionType, const int32_t size);
   double ValueOfState(const uint8_t player) const;
   uint32_t MaxSpend() const;
-  uint8_t GetRound() const;
+  // Returns the current round 0-indexed round id (<= game.NumRounds() - 1).
+  // A showdown is still in game.NumRounds()-1, not a separate round
+  int GetRound() const;
   uint8_t NumFolded() const;
   uint32_t Money(const uint8_t player) const;
   uint32_t Ante(const uint8_t player) const;
@@ -72,7 +74,8 @@ class ACPCGame {
 
   std::string ToString() const;
   bool IsLimitGame() const;
-  uint8_t GetNbRounds() const;
+  // The total number of betting rounds.
+  int NumRounds() const;
   int GetNbPlayers() const;
   // Returns the number of private cards for each player in this game.
   uint8_t GetNbHoleCardsRequired() const;
@@ -85,6 +88,9 @@ class ACPCGame {
 
   uint32_t handId_;
   std::unique_ptr<RawACPCGame> acpc_game_;
+
+  // Checks that the underlying acpc_game_ structs have all their fields equal.
+  bool operator==(const ACPCGame& other) const;
 };
 
 }  // namespace acpc_cpp

@@ -1,5 +1,4 @@
 game: bridge_uncontested_bidding(subgame=2NT,relative_scoring=True)
-seed: 4210357689
 
 GameType.chance_mode = ChanceMode.SAMPLED_STOCHASTIC
 GameType.dynamics = Dynamics.SEQUENTIAL
@@ -30,7 +29,6 @@ ToString() = "bridge_uncontested_bidding(relative_scoring=True,subgame=2NT)"
 
 # State 0
 IsTerminal() = False
-ToString() = ""
 History() = []
 HistoryString() = ""
 IsChanceNode() = True
@@ -49,8 +47,8 @@ StringLegalActions() = ["Deal"]
 action: 0
 
 # State 1
+# QT85.JT7.AKQ.AKQ 643.86.97642.T94 2N
 IsTerminal() = False
-ToString() = "QT85.JT7.AKQ.AKQ 643.86.97642.T94 2N"
 History() = [0]
 HistoryString() = "0"
 IsChanceNode() = False
@@ -70,8 +68,8 @@ StringLegalActions() = ["Pass", "3C", "3D", "3H", "3S", "3N", "4C", "4D", "4H", 
 action: 27
 
 # State 2
+# QT85.JT7.AKQ.AKQ 643.86.97642.T94 2N-6D
 IsTerminal() = False
-ToString() = "QT85.JT7.AKQ.AKQ 643.86.97642.T94 2N-6D"
 History() = [0, 27]
 HistoryString() = "0 27"
 IsChanceNode() = False
@@ -91,8 +89,8 @@ StringLegalActions() = ["Pass", "6H", "6S", "6N", "7C", "7D", "7H", "7S", "7N"]
 action: 0
 
 # State 3
+# QT85.JT7.AKQ.AKQ 643.86.97642.T94 2N-6D-Pass Score:-220 2N(W):-155 3C(E):-175 3D(W):-70 3D(E):-70 3H(W):-240 3H(E):-240 3S(W):-120 3S(E):-120 3N(W):-205 4C(W):-225 4H(W):-290 4H(E):-290 4S(W):-170 4S(E):-170 5C(W):-275 5C(E):-275 5D(W):-170 5D(E):-170 6C(W):-325 6C(E):-325 6D(W):-220 6D(E):-220 6H(W):-390 6H(E):-390 6S(W):-270 6S(E):-270 6N(W):-355 7C(W):-375 7C(E):-375 7D(W):-270 7D(E):-270 7H(W):-440 7H(E):-440 7S(W):-320 7S(E):-320 7N(W):-405
 IsTerminal() = True
-ToString() = "QT85.JT7.AKQ.AKQ 643.86.97642.T94 2N-6D-Pass Score:-220 2N(W):-155 3C(E):-175 3D(W):-70 3D(E):-70 3H(W):-240 3H(E):-240 3S(W):-120 3S(E):-120 3N(W):-205 4C(W):-225 4H(W):-290 4H(E):-290 4S(W):-170 4S(E):-170 5C(W):-275 5C(E):-275 5D(W):-170 5D(E):-170 6C(W):-325 6C(E):-325 6D(W):-220 6D(E):-220 6H(W):-390 6H(E):-390 6S(W):-270 6S(E):-270 6N(W):-355 7C(W):-375 7C(E):-375 7D(W):-270 7D(E):-270 7H(W):-440 7H(E):-440 7S(W):-320 7S(E):-320 7N(W):-405"
 History() = [0, 27, 0]
 HistoryString() = "0 27 0"
 IsChanceNode() = False

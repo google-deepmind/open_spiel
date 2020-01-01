@@ -1,5 +1,4 @@
 game: blotto
-seed: 2137432654
 
 GameType.chance_mode = ChanceMode.DETERMINISTIC
 GameType.dynamics = Dynamics.SIMULTANEOUS
@@ -29,8 +28,8 @@ MaxGameLength() = 1
 ToString() = "blotto()"
 
 # State 0
+# Terminal? 0
 IsTerminal() = False
-ToString() = "Terminal? 0\n"
 History() = []
 HistoryString() = ""
 IsChanceNode() = False
@@ -51,8 +50,10 @@ StringLegalActions(1) = ["[0,0,10]", "[0,1,9]", "[0,2,8]", "[0,3,7]", "[0,4,6]",
 actions: [54, 58]
 
 # State 1
+# Terminal? 1
+# P0 action: [6,3,1]
+# P1 action: [7,2,1]
 IsTerminal() = True
-ToString() = "Terminal? 1\nP0 action: [6,3,1]\nP1 action: [7,2,1]\n"
 History() = [54, 58]
 HistoryString() = "54 58"
 IsChanceNode() = False

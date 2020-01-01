@@ -42,6 +42,15 @@ class EvaluateBotsTest(absltest.TestCase):
     average_results = np.mean(results, axis=0)
     np.testing.assert_allclose(average_results, [0.125, -0.125], atol=0.1)
 
+  def test_random_vs_stateful(self):
+    game = pyspiel.load_game("tic_tac_toe")
+    bots = [
+        pyspiel.make_stateful_random_bot(game, 0, 1234),
+        uniform_random.UniformRandomBot(1, np.random.RandomState(4321))
+    ]
+    for _ in range(1000):
+      evaluate_bots.evaluate_bots(game.new_initial_state(), bots, np.random)
+
 
 if __name__ == "__main__":
   absltest.main()

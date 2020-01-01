@@ -24,8 +24,8 @@ namespace {
 void ScoringTests() {
   SPIEL_CHECK_EQ(Score({4, kHearts, kUndoubled}, 11, true), 650);
   SPIEL_CHECK_EQ(Score({4, kDiamonds, kUndoubled}, 10, true), 130);
-  SPIEL_CHECK_EQ(Score({3, kNone, kUndoubled}, 6, false), -150);
-  SPIEL_CHECK_EQ(Score({3, kNone, kDoubled}, 6, false), -500);
+  SPIEL_CHECK_EQ(Score({3, kNoTrump, kUndoubled}, 6, false), -150);
+  SPIEL_CHECK_EQ(Score({3, kNoTrump, kDoubled}, 6, false), -500);
   SPIEL_CHECK_EQ(Score({2, kSpades, kDoubled}, 8, true), 670);
 }
 

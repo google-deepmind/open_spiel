@@ -1,5 +1,4 @@
 game: go(board_size=7,komi=4.5)
-seed: 4205453627
 
 GameType.chance_mode = ChanceMode.DETERMINISTIC
 GameType.dynamics = Dynamics.SEQUENTIAL
@@ -29,8 +28,17 @@ MaxGameLength() = 98
 ToString() = "go(board_size=7,komi=4.5)"
 
 # State 0
+# GoState(komi=4.5, to_play=Bhistory.size()=0)
+#
+#  7 +++++++
+#  6 +++++++
+#  5 +++++++
+#  4 +++++++
+#  3 +++++++
+#  2 +++++++
+#  1 +++++++
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Bhistory.size()=0)\n\n 7 +++++++\n 6 +++++++\n 5 +++++++\n 4 +++++++\n 3 +++++++\n 2 +++++++\n 1 +++++++\n   ABCDEFG\n"
 History() = []
 HistoryString() = ""
 IsChanceNode() = False
@@ -51,8 +59,17 @@ StringLegalActions() = ["B a1", "B b1", "B c1", "B d1", "B e1", "B f1", "B g1", 
 action: 88
 
 # State 1
+# GoState(komi=4.5, to_play=Whistory.size()=1)
+#
+#  7 +++++++
+#  6 +++++++
+#  5 +++++++
+#  4 +++X+++
+#  3 +++++++
+#  2 +++++++
+#  1 +++++++
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Whistory.size()=1)\n\n 7 +++++++\n 6 +++++++\n 5 +++++++\n 4 +++X+++\n 3 +++++++\n 2 +++++++\n 1 +++++++\n   ABCDEFG\n"
 History() = [88]
 HistoryString() = "88"
 IsChanceNode() = False
@@ -73,8 +90,17 @@ StringLegalActions() = ["W a1", "W b1", "W c1", "W d1", "W e1", "W f1", "W g1", 
 action: 67
 
 # State 2
+# GoState(komi=4.5, to_play=Bhistory.size()=2)
+#
+#  7 +++++++
+#  6 +++++++
+#  5 +++++++
+#  4 +++X+++
+#  3 +++O+++
+#  2 +++++++
+#  1 +++++++
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Bhistory.size()=2)\n\n 7 +++++++\n 6 +++++++\n 5 +++++++\n 4 +++X+++\n 3 +++O+++\n 2 +++++++\n 1 +++++++\n   ABCDEFG\n"
 History() = [88, 67]
 HistoryString() = "88 67"
 IsChanceNode() = False
@@ -95,8 +121,17 @@ StringLegalActions() = ["B a1", "B b1", "B c1", "B d1", "B e1", "B f1", "B g1", 
 action: 44
 
 # State 3
+# GoState(komi=4.5, to_play=Whistory.size()=3)
+#
+#  7 +++++++
+#  6 +++++++
+#  5 +++++++
+#  4 +++X+++
+#  3 +++O+++
+#  2 +X+++++
+#  1 +++++++
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Whistory.size()=3)\n\n 7 +++++++\n 6 +++++++\n 5 +++++++\n 4 +++X+++\n 3 +++O+++\n 2 +X+++++\n 1 +++++++\n   ABCDEFG\n"
 History() = [88, 67, 44]
 HistoryString() = "88 67 44"
 IsChanceNode() = False
@@ -117,8 +152,17 @@ StringLegalActions() = ["W a1", "W b1", "W c1", "W d1", "W e1", "W f1", "W g1", 
 action: 107
 
 # State 4
+# GoState(komi=4.5, to_play=Bhistory.size()=4)
+#
+#  7 +++++++
+#  6 +++++++
+#  5 +O+++++
+#  4 +++X+++
+#  3 +++O+++
+#  2 +X+++++
+#  1 +++++++
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Bhistory.size()=4)\n\n 7 +++++++\n 6 +++++++\n 5 +O+++++\n 4 +++X+++\n 3 +++O+++\n 2 +X+++++\n 1 +++++++\n   ABCDEFG\n"
 History() = [88, 67, 44, 107]
 HistoryString() = "88 67 44 107"
 IsChanceNode() = False
@@ -139,8 +183,17 @@ StringLegalActions() = ["B a1", "B b1", "B c1", "B d1", "B e1", "B f1", "B g1", 
 action: 133
 
 # State 5
+# GoState(komi=4.5, to_play=Whistory.size()=5)
+#
+#  7 +++++++
+#  6 ++++++X
+#  5 +O+++++
+#  4 +++X+++
+#  3 +++O+++
+#  2 +X+++++
+#  1 +++++++
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Whistory.size()=5)\n\n 7 +++++++\n 6 ++++++X\n 5 +O+++++\n 4 +++X+++\n 3 +++O+++\n 2 +X+++++\n 1 +++++++\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133]
 HistoryString() = "88 67 44 107 133"
 IsChanceNode() = False
@@ -161,8 +214,17 @@ StringLegalActions() = ["W a1", "W b1", "W c1", "W d1", "W e1", "W f1", "W g1", 
 action: 24
 
 # State 6
+# GoState(komi=4.5, to_play=Bhistory.size()=6)
+#
+#  7 +++++++
+#  6 ++++++X
+#  5 +O+++++
+#  4 +++X+++
+#  3 +++O+++
+#  2 +X+++++
+#  1 ++O++++
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Bhistory.size()=6)\n\n 7 +++++++\n 6 ++++++X\n 5 +O+++++\n 4 +++X+++\n 3 +++O+++\n 2 +X+++++\n 1 ++O++++\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24]
 HistoryString() = "88 67 44 107 133 24"
 IsChanceNode() = False
@@ -183,8 +245,17 @@ StringLegalActions() = ["B a1", "B b1", "B d1", "B e1", "B f1", "B g1", "B a2", 
 action: 148
 
 # State 7
+# GoState(komi=4.5, to_play=Whistory.size()=7)
+#
+#  7 X++++++
+#  6 ++++++X
+#  5 +O+++++
+#  4 +++X+++
+#  3 +++O+++
+#  2 +X+++++
+#  1 ++O++++
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Whistory.size()=7)\n\n 7 X++++++\n 6 ++++++X\n 5 +O+++++\n 4 +++X+++\n 3 +++O+++\n 2 +X+++++\n 1 ++O++++\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148]
 HistoryString() = "88 67 44 107 133 24 148"
 IsChanceNode() = False
@@ -205,8 +276,17 @@ StringLegalActions() = ["W a1", "W b1", "W d1", "W e1", "W f1", "W g1", "W a2", 
 action: 129
 
 # State 8
+# GoState(komi=4.5, to_play=Bhistory.size()=8)
+#
+#  7 X++++++
+#  6 ++O+++X
+#  5 +O+++++
+#  4 +++X+++
+#  3 +++O+++
+#  2 +X+++++
+#  1 ++O++++
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Bhistory.size()=8)\n\n 7 X++++++\n 6 ++O+++X\n 5 +O+++++\n 4 +++X+++\n 3 +++O+++\n 2 +X+++++\n 1 ++O++++\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129]
 HistoryString() = "88 67 44 107 133 24 148 129"
 IsChanceNode() = False
@@ -227,8 +307,17 @@ StringLegalActions() = ["B a1", "B b1", "B d1", "B e1", "B f1", "B g1", "B a2", 
 action: 68
 
 # State 9
+# GoState(komi=4.5, to_play=Whistory.size()=9)
+#
+#  7 X++++++
+#  6 ++O+++X
+#  5 +O+++++
+#  4 +++X+++
+#  3 +++OX++
+#  2 +X+++++
+#  1 ++O++++
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Whistory.size()=9)\n\n 7 X++++++\n 6 ++O+++X\n 5 +O+++++\n 4 +++X+++\n 3 +++OX++\n 2 +X+++++\n 1 ++O++++\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68]
 HistoryString() = "88 67 44 107 133 24 148 129 68"
 IsChanceNode() = False
@@ -249,8 +338,17 @@ StringLegalActions() = ["W a1", "W b1", "W d1", "W e1", "W f1", "W g1", "W a2", 
 action: 26
 
 # State 10
+# GoState(komi=4.5, to_play=Bhistory.size()=10)
+#
+#  7 X++++++
+#  6 ++O+++X
+#  5 +O+++++
+#  4 +++X+++
+#  3 +++OX++
+#  2 +X+++++
+#  1 ++O+O++
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Bhistory.size()=10)\n\n 7 X++++++\n 6 ++O+++X\n 5 +O+++++\n 4 +++X+++\n 3 +++OX++\n 2 +X+++++\n 1 ++O+O++\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26"
 IsChanceNode() = False
@@ -271,8 +369,17 @@ StringLegalActions() = ["B a1", "B b1", "B d1", "B f1", "B g1", "B a2", "B c2", 
 action: 153
 
 # State 11
+# GoState(komi=4.5, to_play=Whistory.size()=11)
+#
+#  7 X++++X+
+#  6 ++O+++X
+#  5 +O+++++
+#  4 +++X+++
+#  3 +++OX++
+#  2 +X+++++
+#  1 ++O+O++
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Whistory.size()=11)\n\n 7 X++++X+\n 6 ++O+++X\n 5 +O+++++\n 4 +++X+++\n 3 +++OX++\n 2 +X+++++\n 1 ++O+O++\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153"
 IsChanceNode() = False
@@ -293,8 +400,17 @@ StringLegalActions() = ["W a1", "W b1", "W d1", "W f1", "W g1", "W a2", "W c2", 
 action: 22
 
 # State 12
+# GoState(komi=4.5, to_play=Bhistory.size()=12)
+#
+#  7 X++++X+
+#  6 ++O+++X
+#  5 +O+++++
+#  4 +++X+++
+#  3 +++OX++
+#  2 +X+++++
+#  1 O+O+O++
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Bhistory.size()=12)\n\n 7 X++++X+\n 6 ++O+++X\n 5 +O+++++\n 4 +++X+++\n 3 +++OX++\n 2 +X+++++\n 1 O+O+O++\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153, 22]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153 22"
 IsChanceNode() = False
@@ -315,8 +431,17 @@ StringLegalActions() = ["B b1", "B d1", "B f1", "B g1", "B a2", "B c2", "B d2", 
 action: 66
 
 # State 13
+# GoState(komi=4.5, to_play=Whistory.size()=13)
+#
+#  7 X++++X+
+#  6 ++O+++X
+#  5 +O+++++
+#  4 +++X+++
+#  3 ++XOX++
+#  2 +X+++++
+#  1 O+O+O++
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Whistory.size()=13)\n\n 7 X++++X+\n 6 ++O+++X\n 5 +O+++++\n 4 +++X+++\n 3 ++XOX++\n 2 +X+++++\n 1 O+O+O++\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153, 22, 66]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153 22 66"
 IsChanceNode() = False
@@ -337,8 +462,17 @@ StringLegalActions() = ["W b1", "W d1", "W f1", "W g1", "W a2", "W c2", "W d2", 
 action: 87
 
 # State 14
+# GoState(komi=4.5, to_play=Bhistory.size()=14)
+#
+#  7 X++++X+
+#  6 ++O+++X
+#  5 +O+++++
+#  4 ++OX+++
+#  3 ++XOX++
+#  2 +X+++++
+#  1 O+O+O++
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Bhistory.size()=14)\n\n 7 X++++X+\n 6 ++O+++X\n 5 +O+++++\n 4 ++OX+++\n 3 ++XOX++\n 2 +X+++++\n 1 O+O+O++\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153, 22, 66, 87]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153 22 66 87"
 IsChanceNode() = False
@@ -359,8 +493,17 @@ StringLegalActions() = ["B b1", "B d1", "B f1", "B g1", "B a2", "B c2", "B d2", 
 action: 112
 
 # State 15
+# GoState(komi=4.5, to_play=Whistory.size()=15)
+#
+#  7 X++++X+
+#  6 ++O+++X
+#  5 +O++++X
+#  4 ++OX+++
+#  3 ++XOX++
+#  2 +X+++++
+#  1 O+O+O++
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Whistory.size()=15)\n\n 7 X++++X+\n 6 ++O+++X\n 5 +O++++X\n 4 ++OX+++\n 3 ++XOX++\n 2 +X+++++\n 1 O+O+O++\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153, 22, 66, 87, 112]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153 22 66 87 112"
 IsChanceNode() = False
@@ -381,8 +524,17 @@ StringLegalActions() = ["W b1", "W d1", "W f1", "W g1", "W a2", "W c2", "W d2", 
 action: 70
 
 # State 16
+# GoState(komi=4.5, to_play=Bhistory.size()=16)
+#
+#  7 X++++X+
+#  6 ++O+++X
+#  5 +O++++X
+#  4 ++OX+++
+#  3 ++XOX+O
+#  2 +X+++++
+#  1 O+O+O++
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Bhistory.size()=16)\n\n 7 X++++X+\n 6 ++O+++X\n 5 +O++++X\n 4 ++OX+++\n 3 ++XOX+O\n 2 +X+++++\n 1 O+O+O++\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153, 22, 66, 87, 112, 70]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153 22 66 87 112 70"
 IsChanceNode() = False
@@ -403,8 +555,17 @@ StringLegalActions() = ["B b1", "B d1", "B f1", "B g1", "B a2", "B c2", "B d2", 
 action: 131
 
 # State 17
+# GoState(komi=4.5, to_play=Whistory.size()=17)
+#
+#  7 X++++X+
+#  6 ++O+X+X
+#  5 +O++++X
+#  4 ++OX+++
+#  3 ++XOX+O
+#  2 +X+++++
+#  1 O+O+O++
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Whistory.size()=17)\n\n 7 X++++X+\n 6 ++O+X+X\n 5 +O++++X\n 4 ++OX+++\n 3 ++XOX+O\n 2 +X+++++\n 1 O+O+O++\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153, 22, 66, 87, 112, 70, 131]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153 22 66 87 112 70 131"
 IsChanceNode() = False
@@ -425,8 +586,17 @@ StringLegalActions() = ["W b1", "W d1", "W f1", "W g1", "W a2", "W c2", "W d2", 
 action: 27
 
 # State 18
+# GoState(komi=4.5, to_play=Bhistory.size()=18)
+#
+#  7 X++++X+
+#  6 ++O+X+X
+#  5 +O++++X
+#  4 ++OX+++
+#  3 ++XOX+O
+#  2 +X+++++
+#  1 O+O+OO+
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Bhistory.size()=18)\n\n 7 X++++X+\n 6 ++O+X+X\n 5 +O++++X\n 4 ++OX+++\n 3 ++XOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153, 22, 66, 87, 112, 70, 131, 27]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153 22 66 87 112 70 131 27"
 IsChanceNode() = False
@@ -447,8 +617,17 @@ StringLegalActions() = ["B b1", "B d1", "B g1", "B a2", "B c2", "B d2", "B e2", 
 action: 90
 
 # State 19
+# GoState(komi=4.5, to_play=Whistory.size()=19)
+#
+#  7 X++++X+
+#  6 ++O+X+X
+#  5 +O++++X
+#  4 ++OX+X+
+#  3 ++XOX+O
+#  2 +X+++++
+#  1 O+O+OO+
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Whistory.size()=19)\n\n 7 X++++X+\n 6 ++O+X+X\n 5 +O++++X\n 4 ++OX+X+\n 3 ++XOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153, 22, 66, 87, 112, 70, 131, 27, 90]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153 22 66 87 112 70 131 27 90"
 IsChanceNode() = False
@@ -469,8 +648,17 @@ StringLegalActions() = ["W b1", "W d1", "W g1", "W a2", "W c2", "W d2", "W e2", 
 action: 85
 
 # State 20
+# GoState(komi=4.5, to_play=Bhistory.size()=20)
+#
+#  7 X++++X+
+#  6 ++O+X+X
+#  5 +O++++X
+#  4 O+OX+X+
+#  3 ++XOX+O
+#  2 +X+++++
+#  1 O+O+OO+
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Bhistory.size()=20)\n\n 7 X++++X+\n 6 ++O+X+X\n 5 +O++++X\n 4 O+OX+X+\n 3 ++XOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153, 22, 66, 87, 112, 70, 131, 27, 90, 85]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153 22 66 87 112 70 131 27 90 85"
 IsChanceNode() = False
@@ -491,8 +679,17 @@ StringLegalActions() = ["B b1", "B d1", "B g1", "B a2", "B c2", "B d2", "B e2", 
 action: 442
 
 # State 21
+# GoState(komi=4.5, to_play=Whistory.size()=21)
+#
+#  7 X++++X+
+#  6 ++O+X+X
+#  5 +O++++X
+#  4 O+OX+X+
+#  3 ++XOX+O
+#  2 +X+++++
+#  1 O+O+OO+
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Whistory.size()=21)\n\n 7 X++++X+\n 6 ++O+X+X\n 5 +O++++X\n 4 O+OX+X+\n 3 ++XOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153, 22, 66, 87, 112, 70, 131, 27, 90, 85, 442]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153 22 66 87 112 70 131 27 90 85 442"
 IsChanceNode() = False
@@ -513,8 +710,17 @@ StringLegalActions() = ["W b1", "W d1", "W g1", "W a2", "W c2", "W d2", "W e2", 
 action: 65
 
 # State 22
+# GoState(komi=4.5, to_play=Bhistory.size()=22)
+#
+#  7 X++++X+
+#  6 ++O+X+X
+#  5 +O++++X
+#  4 O+OX+X+
+#  3 +OXOX+O
+#  2 +X+++++
+#  1 O+O+OO+
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Bhistory.size()=22)\n\n 7 X++++X+\n 6 ++O+X+X\n 5 +O++++X\n 4 O+OX+X+\n 3 +OXOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153, 22, 66, 87, 112, 70, 131, 27, 90, 85, 442, 65]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153 22 66 87 112 70 131 27 90 85 442 65"
 IsChanceNode() = False
@@ -535,8 +741,17 @@ StringLegalActions() = ["B b1", "B d1", "B g1", "B a2", "B c2", "B d2", "B e2", 
 action: 106
 
 # State 23
+# GoState(komi=4.5, to_play=Whistory.size()=23)
+#
+#  7 X++++X+
+#  6 ++O+X+X
+#  5 XO++++X
+#  4 O+OX+X+
+#  3 +OXOX+O
+#  2 +X+++++
+#  1 O+O+OO+
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Whistory.size()=23)\n\n 7 X++++X+\n 6 ++O+X+X\n 5 XO++++X\n 4 O+OX+X+\n 3 +OXOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153, 22, 66, 87, 112, 70, 131, 27, 90, 85, 442, 65, 106]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153 22 66 87 112 70 131 27 90 85 442 65 106"
 IsChanceNode() = False
@@ -557,8 +772,17 @@ StringLegalActions() = ["W b1", "W d1", "W g1", "W a2", "W c2", "W d2", "W e2", 
 action: 130
 
 # State 24
+# GoState(komi=4.5, to_play=Bhistory.size()=24)
+#
+#  7 X++++X+
+#  6 ++OOX+X
+#  5 XO++++X
+#  4 O+OX+X+
+#  3 +OXOX+O
+#  2 +X+++++
+#  1 O+O+OO+
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Bhistory.size()=24)\n\n 7 X++++X+\n 6 ++OOX+X\n 5 XO++++X\n 4 O+OX+X+\n 3 +OXOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153, 22, 66, 87, 112, 70, 131, 27, 90, 85, 442, 65, 106, 130]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153 22 66 87 112 70 131 27 90 85 442 65 106 130"
 IsChanceNode() = False
@@ -579,8 +803,17 @@ StringLegalActions() = ["B b1", "B d1", "B g1", "B a2", "B c2", "B d2", "B e2", 
 action: 128
 
 # State 25
+# GoState(komi=4.5, to_play=Whistory.size()=25)
+#
+#  7 X++++X+
+#  6 +XOOX+X
+#  5 XO++++X
+#  4 O+OX+X+
+#  3 +OXOX+O
+#  2 +X+++++
+#  1 O+O+OO+
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Whistory.size()=25)\n\n 7 X++++X+\n 6 +XOOX+X\n 5 XO++++X\n 4 O+OX+X+\n 3 +OXOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153, 22, 66, 87, 112, 70, 131, 27, 90, 85, 442, 65, 106, 130, 128]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153 22 66 87 112 70 131 27 90 85 442 65 106 130 128"
 IsChanceNode() = False
@@ -601,8 +834,17 @@ StringLegalActions() = ["W b1", "W d1", "W g1", "W a2", "W c2", "W d2", "W e2", 
 action: 109
 
 # State 26
+# GoState(komi=4.5, to_play=Bhistory.size()=26)
+#
+#  7 X++++X+
+#  6 +XOOX+X
+#  5 XO+O++X
+#  4 O+OX+X+
+#  3 +OXOX+O
+#  2 +X+++++
+#  1 O+O+OO+
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Bhistory.size()=26)\n\n 7 X++++X+\n 6 +XOOX+X\n 5 XO+O++X\n 4 O+OX+X+\n 3 +OXOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153, 22, 66, 87, 112, 70, 131, 27, 90, 85, 442, 65, 106, 130, 128, 109]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153 22 66 87 112 70 131 27 90 85 442 65 106 130 128 109"
 IsChanceNode() = False
@@ -623,8 +865,17 @@ StringLegalActions() = ["B b1", "B d1", "B g1", "B a2", "B c2", "B d2", "B e2", 
 action: 152
 
 # State 27
+# GoState(komi=4.5, to_play=Whistory.size()=27)
+#
+#  7 X+++XX+
+#  6 +XOOX+X
+#  5 XO+O++X
+#  4 O+OX+X+
+#  3 +OXOX+O
+#  2 +X+++++
+#  1 O+O+OO+
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Whistory.size()=27)\n\n 7 X+++XX+\n 6 +XOOX+X\n 5 XO+O++X\n 4 O+OX+X+\n 3 +OXOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153, 22, 66, 87, 112, 70, 131, 27, 90, 85, 442, 65, 106, 130, 128, 109, 152]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153 22 66 87 112 70 131 27 90 85 442 65 106 130 128 109 152"
 IsChanceNode() = False
@@ -645,8 +896,17 @@ StringLegalActions() = ["W b1", "W d1", "W g1", "W a2", "W c2", "W d2", "W e2", 
 action: 23
 
 # State 28
+# GoState(komi=4.5, to_play=Bhistory.size()=28)
+#
+#  7 X+++XX+
+#  6 +XOOX+X
+#  5 XO+O++X
+#  4 O+OX+X+
+#  3 +OXOX+O
+#  2 +X+++++
+#  1 OOO+OO+
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Bhistory.size()=28)\n\n 7 X+++XX+\n 6 +XOOX+X\n 5 XO+O++X\n 4 O+OX+X+\n 3 +OXOX+O\n 2 +X+++++\n 1 OOO+OO+\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153, 22, 66, 87, 112, 70, 131, 27, 90, 85, 442, 65, 106, 130, 128, 109, 152, 23]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153 22 66 87 112 70 131 27 90 85 442 65 106 130 128 109 152 23"
 IsChanceNode() = False
@@ -667,8 +927,17 @@ StringLegalActions() = ["B d1", "B g1", "B a2", "B c2", "B d2", "B e2", "B f2", 
 action: 110
 
 # State 29
+# GoState(komi=4.5, to_play=Whistory.size()=29)
+#
+#  7 X+++XX+
+#  6 +XOOX+X
+#  5 XO+OX+X
+#  4 O+OX+X+
+#  3 +OXOX+O
+#  2 +X+++++
+#  1 OOO+OO+
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Whistory.size()=29)\n\n 7 X+++XX+\n 6 +XOOX+X\n 5 XO+OX+X\n 4 O+OX+X+\n 3 +OXOX+O\n 2 +X+++++\n 1 OOO+OO+\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153, 22, 66, 87, 112, 70, 131, 27, 90, 85, 442, 65, 106, 130, 128, 109, 152, 23, 110]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153 22 66 87 112 70 131 27 90 85 442 65 106 130 128 109 152 23 110"
 IsChanceNode() = False
@@ -689,8 +958,17 @@ StringLegalActions() = ["W d1", "W g1", "W a2", "W c2", "W d2", "W e2", "W f2", 
 action: 89
 
 # State 30
+# GoState(komi=4.5, to_play=Bhistory.size()=30)
+#
+#  7 X+++XX+
+#  6 +XOOX+X
+#  5 XO+OX+X
+#  4 O+O+OX+
+#  3 +OXOX+O
+#  2 +X+++++
+#  1 OOO+OO+
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Bhistory.size()=30)\n\n 7 X+++XX+\n 6 +XOOX+X\n 5 XO+OX+X\n 4 O+O+OX+\n 3 +OXOX+O\n 2 +X+++++\n 1 OOO+OO+\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153, 22, 66, 87, 112, 70, 131, 27, 90, 85, 442, 65, 106, 130, 128, 109, 152, 23, 110, 89]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153 22 66 87 112 70 131 27 90 85 442 65 106 130 128 109 152 23 110 89"
 IsChanceNode() = False
@@ -711,8 +989,17 @@ StringLegalActions() = ["B d1", "B g1", "B a2", "B c2", "B d2", "B e2", "B f2", 
 action: 149
 
 # State 31
+# GoState(komi=4.5, to_play=Whistory.size()=31)
+#
+#  7 XX++XX+
+#  6 +XOOX+X
+#  5 XO+OX+X
+#  4 O+O+OX+
+#  3 +OXOX+O
+#  2 +X+++++
+#  1 OOO+OO+
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Whistory.size()=31)\n\n 7 XX++XX+\n 6 +XOOX+X\n 5 XO+OX+X\n 4 O+O+OX+\n 3 +OXOX+O\n 2 +X+++++\n 1 OOO+OO+\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153, 22, 66, 87, 112, 70, 131, 27, 90, 85, 442, 65, 106, 130, 128, 109, 152, 23, 110, 89, 149]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153 22 66 87 112 70 131 27 90 85 442 65 106 130 128 109 152 23 110 89 149"
 IsChanceNode() = False
@@ -733,8 +1020,17 @@ StringLegalActions() = ["W d1", "W g1", "W a2", "W c2", "W d2", "W e2", "W f2", 
 action: 88
 
 # State 32
+# GoState(komi=4.5, to_play=Bhistory.size()=32)
+#
+#  7 XX++XX+
+#  6 +XOOX+X
+#  5 XO+OX+X
+#  4 O+OOOX+
+#  3 +OXOX+O
+#  2 +X+++++
+#  1 OOO+OO+
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Bhistory.size()=32)\n\n 7 XX++XX+\n 6 +XOOX+X\n 5 XO+OX+X\n 4 O+OOOX+\n 3 +OXOX+O\n 2 +X+++++\n 1 OOO+OO+\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153, 22, 66, 87, 112, 70, 131, 27, 90, 85, 442, 65, 106, 130, 128, 109, 152, 23, 110, 89, 149, 88]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153 22 66 87 112 70 131 27 90 85 442 65 106 130 128 109 152 23 110 89 149 88"
 IsChanceNode() = False
@@ -755,8 +1051,17 @@ StringLegalActions() = ["B d1", "B g1", "B a2", "B c2", "B d2", "B e2", "B f2", 
 action: 64
 
 # State 33
+# GoState(komi=4.5, to_play=Whistory.size()=33)
+#
+#  7 XX++XX+
+#  6 +XOOX+X
+#  5 XO+OX+X
+#  4 O+OOOX+
+#  3 XOXOX+O
+#  2 +X+++++
+#  1 OOO+OO+
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Whistory.size()=33)\n\n 7 XX++XX+\n 6 +XOOX+X\n 5 XO+OX+X\n 4 O+OOOX+\n 3 XOXOX+O\n 2 +X+++++\n 1 OOO+OO+\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153, 22, 66, 87, 112, 70, 131, 27, 90, 85, 442, 65, 106, 130, 128, 109, 152, 23, 110, 89, 149, 88, 64]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153 22 66 87 112 70 131 27 90 85 442 65 106 130 128 109 152 23 110 89 149 88 64"
 IsChanceNode() = False
@@ -777,8 +1082,17 @@ StringLegalActions() = ["W d1", "W g1", "W a2", "W c2", "W d2", "W e2", "W f2", 
 action: 28
 
 # State 34
+# GoState(komi=4.5, to_play=Bhistory.size()=34)
+#
+#  7 XX++XX+
+#  6 +XOOX+X
+#  5 XO+OX+X
+#  4 O+OOOX+
+#  3 XOXOX+O
+#  2 +X+++++
+#  1 OOO+OOO
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Bhistory.size()=34)\n\n 7 XX++XX+\n 6 +XOOX+X\n 5 XO+OX+X\n 4 O+OOOX+\n 3 XOXOX+O\n 2 +X+++++\n 1 OOO+OOO\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153, 22, 66, 87, 112, 70, 131, 27, 90, 85, 442, 65, 106, 130, 128, 109, 152, 23, 110, 89, 149, 88, 64, 28]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153 22 66 87 112 70 131 27 90 85 442 65 106 130 128 109 152 23 110 89 149 88 64 28"
 IsChanceNode() = False
@@ -799,8 +1113,17 @@ StringLegalActions() = ["B d1", "B a2", "B c2", "B d2", "B e2", "B f2", "B g2", 
 action: 48
 
 # State 35
+# GoState(komi=4.5, to_play=Whistory.size()=35)
+#
+#  7 XX++XX+
+#  6 +XOOX+X
+#  5 XO+OX+X
+#  4 O+OOOX+
+#  3 XOXOX+O
+#  2 +X+++X+
+#  1 OOO+OOO
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Whistory.size()=35)\n\n 7 XX++XX+\n 6 +XOOX+X\n 5 XO+OX+X\n 4 O+OOOX+\n 3 XOXOX+O\n 2 +X+++X+\n 1 OOO+OOO\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153, 22, 66, 87, 112, 70, 131, 27, 90, 85, 442, 65, 106, 130, 128, 109, 152, 23, 110, 89, 149, 88, 64, 28, 48]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153 22 66 87 112 70 131 27 90 85 442 65 106 130 128 109 152 23 110 89 149 88 64 28 48"
 IsChanceNode() = False
@@ -821,8 +1144,17 @@ StringLegalActions() = ["W d1", "W a2", "W c2", "W d2", "W e2", "W g2", "W f3", 
 action: 45
 
 # State 36
+# GoState(komi=4.5, to_play=Bhistory.size()=36)
+#
+#  7 XX++XX+
+#  6 +XOOX+X
+#  5 XO+OX+X
+#  4 O+OOOX+
+#  3 XO+OX+O
+#  2 +XO++X+
+#  1 OOO+OOO
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Bhistory.size()=36)\n\n 7 XX++XX+\n 6 +XOOX+X\n 5 XO+OX+X\n 4 O+OOOX+\n 3 XO+OX+O\n 2 +XO++X+\n 1 OOO+OOO\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153, 22, 66, 87, 112, 70, 131, 27, 90, 85, 442, 65, 106, 130, 128, 109, 152, 23, 110, 89, 149, 88, 64, 28, 48, 45]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153 22 66 87 112 70 131 27 90 85 442 65 106 130 128 109 152 23 110 89 149 88 64 28 48 45"
 IsChanceNode() = False
@@ -843,8 +1175,17 @@ StringLegalActions() = ["B d1", "B d2", "B e2", "B g2", "B f3", "B b4", "B g4", 
 action: 132
 
 # State 37
+# GoState(komi=4.5, to_play=Whistory.size()=37)
+#
+#  7 XX++XX+
+#  6 +XOOXXX
+#  5 XO+OX+X
+#  4 O+OOOX+
+#  3 XO+OX+O
+#  2 +XO++X+
+#  1 OOO+OOO
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Whistory.size()=37)\n\n 7 XX++XX+\n 6 +XOOXXX\n 5 XO+OX+X\n 4 O+OOOX+\n 3 XO+OX+O\n 2 +XO++X+\n 1 OOO+OOO\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153, 22, 66, 87, 112, 70, 131, 27, 90, 85, 442, 65, 106, 130, 128, 109, 152, 23, 110, 89, 149, 88, 64, 28, 48, 45, 132]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153 22 66 87 112 70 131 27 90 85 442 65 106 130 128 109 152 23 110 89 149 88 64 28 48 45 132"
 IsChanceNode() = False
@@ -865,8 +1206,17 @@ StringLegalActions() = ["W d1", "W a2", "W d2", "W e2", "W g2", "W c3", "W f3", 
 action: 442
 
 # State 38
+# GoState(komi=4.5, to_play=Bhistory.size()=38)
+#
+#  7 XX++XX+
+#  6 +XOOXXX
+#  5 XO+OX+X
+#  4 O+OOOX+
+#  3 XO+OX+O
+#  2 +XO++X+
+#  1 OOO+OOO
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Bhistory.size()=38)\n\n 7 XX++XX+\n 6 +XOOXXX\n 5 XO+OX+X\n 4 O+OOOX+\n 3 XO+OX+O\n 2 +XO++X+\n 1 OOO+OOO\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153, 22, 66, 87, 112, 70, 131, 27, 90, 85, 442, 65, 106, 130, 128, 109, 152, 23, 110, 89, 149, 88, 64, 28, 48, 45, 132, 442]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153 22 66 87 112 70 131 27 90 85 442 65 106 130 128 109 152 23 110 89 149 88 64 28 48 45 132 442"
 IsChanceNode() = False
@@ -887,8 +1237,17 @@ StringLegalActions() = ["B d1", "B d2", "B e2", "B g2", "B f3", "B b4", "B g4", 
 action: 69
 
 # State 39
+# GoState(komi=4.5, to_play=Whistory.size()=39)
+#
+#  7 XX++XX+
+#  6 +XOOXXX
+#  5 XO+OX+X
+#  4 O+OOOX+
+#  3 XO+OXXO
+#  2 +XO++X+
+#  1 OOO+OOO
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Whistory.size()=39)\n\n 7 XX++XX+\n 6 +XOOXXX\n 5 XO+OX+X\n 4 O+OOOX+\n 3 XO+OXXO\n 2 +XO++X+\n 1 OOO+OOO\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153, 22, 66, 87, 112, 70, 131, 27, 90, 85, 442, 65, 106, 130, 128, 109, 152, 23, 110, 89, 149, 88, 64, 28, 48, 45, 132, 442, 69]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153 22 66 87 112 70 131 27 90 85 442 65 106 130 128 109 152 23 110 89 149 88 64 28 48 45 132 442 69"
 IsChanceNode() = False
@@ -909,8 +1268,17 @@ StringLegalActions() = ["W d1", "W a2", "W d2", "W e2", "W g2", "W c3", "W b4", 
 action: 91
 
 # State 40
+# GoState(komi=4.5, to_play=Bhistory.size()=40)
+#
+#  7 XX++XX+
+#  6 +XOOXXX
+#  5 XO+OX+X
+#  4 O+OOOXO
+#  3 XO+OXXO
+#  2 +XO++X+
+#  1 OOO+OOO
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Bhistory.size()=40)\n\n 7 XX++XX+\n 6 +XOOXXX\n 5 XO+OX+X\n 4 O+OOOXO\n 3 XO+OXXO\n 2 +XO++X+\n 1 OOO+OOO\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153, 22, 66, 87, 112, 70, 131, 27, 90, 85, 442, 65, 106, 130, 128, 109, 152, 23, 110, 89, 149, 88, 64, 28, 48, 45, 132, 442, 69, 91]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153 22 66 87 112 70 131 27 90 85 442 65 106 130 128 109 152 23 110 89 149 88 64 28 48 45 132 442 69 91"
 IsChanceNode() = False
@@ -931,8 +1299,17 @@ StringLegalActions() = ["B d1", "B d2", "B e2", "B g2", "B b4", "B f5", "B a6", 
 action: 151
 
 # State 41
+# GoState(komi=4.5, to_play=Whistory.size()=41)
+#
+#  7 XX+XXX+
+#  6 +XOOXXX
+#  5 XO+OX+X
+#  4 O+OOOXO
+#  3 XO+OXXO
+#  2 +XO++X+
+#  1 OOO+OOO
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Whistory.size()=41)\n\n 7 XX+XXX+\n 6 +XOOXXX\n 5 XO+OX+X\n 4 O+OOOXO\n 3 XO+OXXO\n 2 +XO++X+\n 1 OOO+OOO\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153, 22, 66, 87, 112, 70, 131, 27, 90, 85, 442, 65, 106, 130, 128, 109, 152, 23, 110, 89, 149, 88, 64, 28, 48, 45, 132, 442, 69, 91, 151]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153 22 66 87 112 70 131 27 90 85 442 65 106 130 128 109 152 23 110 89 149 88 64 28 48 45 132 442 69 91 151"
 IsChanceNode() = False
@@ -953,8 +1330,17 @@ StringLegalActions() = ["W d1", "W a2", "W d2", "W e2", "W g2", "W c3", "W b4", 
 action: 43
 
 # State 42
+# GoState(komi=4.5, to_play=Bhistory.size()=42)
+#
+#  7 XX+XXX+
+#  6 +XOOXXX
+#  5 XO+OX+X
+#  4 O+OOOXO
+#  3 +O+OXXO
+#  2 O+O++X+
+#  1 OOO+OOO
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Bhistory.size()=42)\n\n 7 XX+XXX+\n 6 +XOOXXX\n 5 XO+OX+X\n 4 O+OOOXO\n 3 +O+OXXO\n 2 O+O++X+\n 1 OOO+OOO\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153, 22, 66, 87, 112, 70, 131, 27, 90, 85, 442, 65, 106, 130, 128, 109, 152, 23, 110, 89, 149, 88, 64, 28, 48, 45, 132, 442, 69, 91, 151, 43]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153 22 66 87 112 70 131 27 90 85 442 65 106 130 128 109 152 23 110 89 149 88 64 28 48 45 132 442 69 91 151 43"
 IsChanceNode() = False
@@ -975,8 +1361,17 @@ StringLegalActions() = ["B d1", "B d2", "B e2", "B g2", "B f5", "B a6", "B c7", 
 action: 25
 
 # State 43
+# GoState(komi=4.5, to_play=Whistory.size()=43)
+#
+#  7 XX+XXX+
+#  6 +XOOXXX
+#  5 XO+OX+X
+#  4 O+OOOXO
+#  3 +O+OXXO
+#  2 O+O++X+
+#  1 OOOXOOO
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Whistory.size()=43)\n\n 7 XX+XXX+\n 6 +XOOXXX\n 5 XO+OX+X\n 4 O+OOOXO\n 3 +O+OXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153, 22, 66, 87, 112, 70, 131, 27, 90, 85, 442, 65, 106, 130, 128, 109, 152, 23, 110, 89, 149, 88, 64, 28, 48, 45, 132, 442, 69, 91, 151, 43, 25]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153 22 66 87 112 70 131 27 90 85 442 65 106 130 128 109 152 23 110 89 149 88 64 28 48 45 132 442 69 91 151 43 25"
 IsChanceNode() = False
@@ -997,8 +1392,17 @@ StringLegalActions() = ["W b2", "W d2", "W e2", "W g2", "W a3", "W c3", "W b4", 
 action: 127
 
 # State 44
+# GoState(komi=4.5, to_play=Bhistory.size()=44)
+#
+#  7 XX+XXX+
+#  6 OXOOXXX
+#  5 +O+OX+X
+#  4 O+OOOXO
+#  3 +O+OXXO
+#  2 O+O++X+
+#  1 OOOXOOO
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Bhistory.size()=44)\n\n 7 XX+XXX+\n 6 OXOOXXX\n 5 +O+OX+X\n 4 O+OOOXO\n 3 +O+OXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153, 22, 66, 87, 112, 70, 131, 27, 90, 85, 442, 65, 106, 130, 128, 109, 152, 23, 110, 89, 149, 88, 64, 28, 48, 45, 132, 442, 69, 91, 151, 43, 25, 127]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153 22 66 87 112 70 131 27 90 85 442 65 106 130 128 109 152 23 110 89 149 88 64 28 48 45 132 442 69 91 151 43 25 127"
 IsChanceNode() = False
@@ -1019,8 +1423,17 @@ StringLegalActions() = ["B d2", "B e2", "B g2", "B f5", "B c7", "B g7", "B PASS"
 action: 442
 
 # State 45
+# GoState(komi=4.5, to_play=Whistory.size()=45)
+#
+#  7 XX+XXX+
+#  6 OXOOXXX
+#  5 +O+OX+X
+#  4 O+OOOXO
+#  3 +O+OXXO
+#  2 O+O++X+
+#  1 OOOXOOO
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Whistory.size()=45)\n\n 7 XX+XXX+\n 6 OXOOXXX\n 5 +O+OX+X\n 4 O+OOOXO\n 3 +O+OXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153, 22, 66, 87, 112, 70, 131, 27, 90, 85, 442, 65, 106, 130, 128, 109, 152, 23, 110, 89, 149, 88, 64, 28, 48, 45, 132, 442, 69, 91, 151, 43, 25, 127, 442]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153 22 66 87 112 70 131 27 90 85 442 65 106 130 128 109 152 23 110 89 149 88 64 28 48 45 132 442 69 91 151 43 25 127 442"
 IsChanceNode() = False
@@ -1041,8 +1454,17 @@ StringLegalActions() = ["W b2", "W d2", "W e2", "W g2", "W a3", "W c3", "W b4", 
 action: 150
 
 # State 46
+# GoState(komi=4.5, to_play=Bhistory.size()=46)
+#
+#  7 ++OXXX+
+#  6 O+OOXXX
+#  5 +O+OX+X
+#  4 O+OOOXO
+#  3 +O+OXXO
+#  2 O+O++X+
+#  1 OOOXOOO
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Bhistory.size()=46)\n\n 7 ++OXXX+\n 6 O+OOXXX\n 5 +O+OX+X\n 4 O+OOOXO\n 3 +O+OXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153, 22, 66, 87, 112, 70, 131, 27, 90, 85, 442, 65, 106, 130, 128, 109, 152, 23, 110, 89, 149, 88, 64, 28, 48, 45, 132, 442, 69, 91, 151, 43, 25, 127, 442, 150]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153 22 66 87 112 70 131 27 90 85 442 65 106 130 128 109 152 23 110 89 149 88 64 28 48 45 132 442 69 91 151 43 25 127 442 150"
 IsChanceNode() = False
@@ -1063,8 +1485,17 @@ StringLegalActions() = ["B d2", "B e2", "B g2", "B f5", "B b6", "B a7", "B b7", 
 action: 149
 
 # State 47
+# GoState(komi=4.5, to_play=Whistory.size()=47)
+#
+#  7 +XOXXX+
+#  6 O+OOXXX
+#  5 +O+OX+X
+#  4 O+OOOXO
+#  3 +O+OXXO
+#  2 O+O++X+
+#  1 OOOXOOO
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Whistory.size()=47)\n\n 7 +XOXXX+\n 6 O+OOXXX\n 5 +O+OX+X\n 4 O+OOOXO\n 3 +O+OXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153, 22, 66, 87, 112, 70, 131, 27, 90, 85, 442, 65, 106, 130, 128, 109, 152, 23, 110, 89, 149, 88, 64, 28, 48, 45, 132, 442, 69, 91, 151, 43, 25, 127, 442, 150, 149]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153 22 66 87 112 70 131 27 90 85 442 65 106 130 128 109 152 23 110 89 149 88 64 28 48 45 132 442 69 91 151 43 25 127 442 150 149"
 IsChanceNode() = False
@@ -1085,8 +1516,17 @@ StringLegalActions() = ["W b2", "W d2", "W e2", "W g2", "W a3", "W c3", "W b4", 
 action: 108
 
 # State 48
+# GoState(komi=4.5, to_play=Bhistory.size()=48)
+#
+#  7 +XOXXX+
+#  6 O+OOXXX
+#  5 +OOOX+X
+#  4 O+OOOXO
+#  3 +O+OXXO
+#  2 O+O++X+
+#  1 OOOXOOO
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Bhistory.size()=48)\n\n 7 +XOXXX+\n 6 O+OOXXX\n 5 +OOOX+X\n 4 O+OOOXO\n 3 +O+OXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153, 22, 66, 87, 112, 70, 131, 27, 90, 85, 442, 65, 106, 130, 128, 109, 152, 23, 110, 89, 149, 88, 64, 28, 48, 45, 132, 442, 69, 91, 151, 43, 25, 127, 442, 150, 149, 108]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153 22 66 87 112 70 131 27 90 85 442 65 106 130 128 109 152 23 110 89 149 88 64 28 48 45 132 442 69 91 151 43 25 127 442 150 149 108"
 IsChanceNode() = False
@@ -1107,8 +1547,17 @@ StringLegalActions() = ["B d2", "B e2", "B g2", "B f5", "B b6", "B a7", "B g7", 
 action: 128
 
 # State 49
+# GoState(komi=4.5, to_play=Whistory.size()=49)
+#
+#  7 +XOXXX+
+#  6 OXOOXXX
+#  5 +OOOX+X
+#  4 O+OOOXO
+#  3 +O+OXXO
+#  2 O+O++X+
+#  1 OOOXOOO
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Whistory.size()=49)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 +OOOX+X\n 4 O+OOOXO\n 3 +O+OXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153, 22, 66, 87, 112, 70, 131, 27, 90, 85, 442, 65, 106, 130, 128, 109, 152, 23, 110, 89, 149, 88, 64, 28, 48, 45, 132, 442, 69, 91, 151, 43, 25, 127, 442, 150, 149, 108, 128]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153 22 66 87 112 70 131 27 90 85 442 65 106 130 128 109 152 23 110 89 149 88 64 28 48 45 132 442 69 91 151 43 25 127 442 150 149 108 128"
 IsChanceNode() = False
@@ -1129,8 +1578,17 @@ StringLegalActions() = ["W b2", "W d2", "W e2", "W g2", "W a3", "W c3", "W b4", 
 action: 66
 
 # State 50
+# GoState(komi=4.5, to_play=Bhistory.size()=50)
+#
+#  7 +XOXXX+
+#  6 OXOOXXX
+#  5 +OOOX+X
+#  4 O+OOOXO
+#  3 +OOOXXO
+#  2 O+O++X+
+#  1 OOOXOOO
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Bhistory.size()=50)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 +OOOX+X\n 4 O+OOOXO\n 3 +OOOXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153, 22, 66, 87, 112, 70, 131, 27, 90, 85, 442, 65, 106, 130, 128, 109, 152, 23, 110, 89, 149, 88, 64, 28, 48, 45, 132, 442, 69, 91, 151, 43, 25, 127, 442, 150, 149, 108, 128, 66]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153 22 66 87 112 70 131 27 90 85 442 65 106 130 128 109 152 23 110 89 149 88 64 28 48 45 132 442 69 91 151 43 25 127 442 150 149 108 128 66"
 IsChanceNode() = False
@@ -1151,8 +1609,17 @@ StringLegalActions() = ["B d2", "B e2", "B g2", "B f5", "B g7", "B PASS"]
 action: 442
 
 # State 51
+# GoState(komi=4.5, to_play=Whistory.size()=51)
+#
+#  7 +XOXXX+
+#  6 OXOOXXX
+#  5 +OOOX+X
+#  4 O+OOOXO
+#  3 +OOOXXO
+#  2 O+O++X+
+#  1 OOOXOOO
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Whistory.size()=51)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 +OOOX+X\n 4 O+OOOXO\n 3 +OOOXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153, 22, 66, 87, 112, 70, 131, 27, 90, 85, 442, 65, 106, 130, 128, 109, 152, 23, 110, 89, 149, 88, 64, 28, 48, 45, 132, 442, 69, 91, 151, 43, 25, 127, 442, 150, 149, 108, 128, 66, 442]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153 22 66 87 112 70 131 27 90 85 442 65 106 130 128 109 152 23 110 89 149 88 64 28 48 45 132 442 69 91 151 43 25 127 442 150 149 108 128 66 442"
 IsChanceNode() = False
@@ -1173,8 +1640,17 @@ StringLegalActions() = ["W b2", "W d2", "W e2", "W g2", "W a3", "W b4", "W a5", 
 action: 64
 
 # State 52
+# GoState(komi=4.5, to_play=Bhistory.size()=52)
+#
+#  7 +XOXXX+
+#  6 OXOOXXX
+#  5 +OOOX+X
+#  4 O+OOOXO
+#  3 OOOOXXO
+#  2 O+O++X+
+#  1 OOOXOOO
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Bhistory.size()=52)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 +OOOX+X\n 4 O+OOOXO\n 3 OOOOXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153, 22, 66, 87, 112, 70, 131, 27, 90, 85, 442, 65, 106, 130, 128, 109, 152, 23, 110, 89, 149, 88, 64, 28, 48, 45, 132, 442, 69, 91, 151, 43, 25, 127, 442, 150, 149, 108, 128, 66, 442, 64]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153 22 66 87 112 70 131 27 90 85 442 65 106 130 128 109 152 23 110 89 149 88 64 28 48 45 132 442 69 91 151 43 25 127 442 150 149 108 128 66 442 64"
 IsChanceNode() = False
@@ -1195,8 +1671,17 @@ StringLegalActions() = ["B d2", "B e2", "B g2", "B f5", "B g7", "B PASS"]
 action: 46
 
 # State 53
+# GoState(komi=4.5, to_play=Whistory.size()=53)
+#
+#  7 +XOXXX+
+#  6 OXOOXXX
+#  5 +OOOX+X
+#  4 O+OOOXO
+#  3 OOOOXXO
+#  2 O+OX+X+
+#  1 OOOXOOO
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Whistory.size()=53)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 +OOOX+X\n 4 O+OOOXO\n 3 OOOOXXO\n 2 O+OX+X+\n 1 OOOXOOO\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153, 22, 66, 87, 112, 70, 131, 27, 90, 85, 442, 65, 106, 130, 128, 109, 152, 23, 110, 89, 149, 88, 64, 28, 48, 45, 132, 442, 69, 91, 151, 43, 25, 127, 442, 150, 149, 108, 128, 66, 442, 64, 46]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153 22 66 87 112 70 131 27 90 85 442 65 106 130 128 109 152 23 110 89 149 88 64 28 48 45 132 442 69 91 151 43 25 127 442 150 149 108 128 66 442 64 46"
 IsChanceNode() = False
@@ -1217,8 +1702,17 @@ StringLegalActions() = ["W b2", "W e2", "W g2", "W b4", "W a5", "W a7", "W PASS"
 action: 44
 
 # State 54
+# GoState(komi=4.5, to_play=Bhistory.size()=54)
+#
+#  7 +XOXXX+
+#  6 OXOOXXX
+#  5 +OOOX+X
+#  4 O+OOOXO
+#  3 OOOOXXO
+#  2 OOOX+X+
+#  1 OOOXOOO
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Bhistory.size()=54)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 +OOOX+X\n 4 O+OOOXO\n 3 OOOOXXO\n 2 OOOX+X+\n 1 OOOXOOO\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153, 22, 66, 87, 112, 70, 131, 27, 90, 85, 442, 65, 106, 130, 128, 109, 152, 23, 110, 89, 149, 88, 64, 28, 48, 45, 132, 442, 69, 91, 151, 43, 25, 127, 442, 150, 149, 108, 128, 66, 442, 64, 46, 44]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153 22 66 87 112 70 131 27 90 85 442 65 106 130 128 109 152 23 110 89 149 88 64 28 48 45 132 442 69 91 151 43 25 127 442 150 149 108 128 66 442 64 46 44"
 IsChanceNode() = False
@@ -1239,8 +1733,17 @@ StringLegalActions() = ["B e2", "B g2", "B f5", "B g7", "B PASS"]
 action: 49
 
 # State 55
+# GoState(komi=4.5, to_play=Whistory.size()=55)
+#
+#  7 +XOXXX+
+#  6 OXOOXXX
+#  5 +OOOX+X
+#  4 O+OOOX+
+#  3 OOOOXX+
+#  2 OOOX+XX
+#  1 OOOXOOO
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Whistory.size()=55)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 +OOOX+X\n 4 O+OOOX+\n 3 OOOOXX+\n 2 OOOX+XX\n 1 OOOXOOO\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153, 22, 66, 87, 112, 70, 131, 27, 90, 85, 442, 65, 106, 130, 128, 109, 152, 23, 110, 89, 149, 88, 64, 28, 48, 45, 132, 442, 69, 91, 151, 43, 25, 127, 442, 150, 149, 108, 128, 66, 442, 64, 46, 44, 49]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153 22 66 87 112 70 131 27 90 85 442 65 106 130 128 109 152 23 110 89 149 88 64 28 48 45 132 442 69 91 151 43 25 127 442 150 149 108 128 66 442 64 46 44 49"
 IsChanceNode() = False
@@ -1261,8 +1764,17 @@ StringLegalActions() = ["W e2", "W g3", "W b4", "W g4", "W a5", "W a7", "W PASS"
 action: 106
 
 # State 56
+# GoState(komi=4.5, to_play=Bhistory.size()=56)
+#
+#  7 +XOXXX+
+#  6 OXOOXXX
+#  5 OOOOX+X
+#  4 O+OOOX+
+#  3 OOOOXX+
+#  2 OOOX+XX
+#  1 OOOXOOO
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Bhistory.size()=56)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 OOOOX+X\n 4 O+OOOX+\n 3 OOOOXX+\n 2 OOOX+XX\n 1 OOOXOOO\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153, 22, 66, 87, 112, 70, 131, 27, 90, 85, 442, 65, 106, 130, 128, 109, 152, 23, 110, 89, 149, 88, 64, 28, 48, 45, 132, 442, 69, 91, 151, 43, 25, 127, 442, 150, 149, 108, 128, 66, 442, 64, 46, 44, 49, 106]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153 22 66 87 112 70 131 27 90 85 442 65 106 130 128 109 152 23 110 89 149 88 64 28 48 45 132 442 69 91 151 43 25 127 442 150 149 108 128 66 442 64 46 44 49 106"
 IsChanceNode() = False
@@ -1283,8 +1795,17 @@ StringLegalActions() = ["B e2", "B g3", "B g4", "B f5", "B g7", "B PASS"]
 action: 111
 
 # State 57
+# GoState(komi=4.5, to_play=Whistory.size()=57)
+#
+#  7 +XOXXX+
+#  6 OXOOXXX
+#  5 OOOOXXX
+#  4 O+OOOX+
+#  3 OOOOXX+
+#  2 OOOX+XX
+#  1 OOOXOOO
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Whistory.size()=57)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXX+\n 2 OOOX+XX\n 1 OOOXOOO\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153, 22, 66, 87, 112, 70, 131, 27, 90, 85, 442, 65, 106, 130, 128, 109, 152, 23, 110, 89, 149, 88, 64, 28, 48, 45, 132, 442, 69, 91, 151, 43, 25, 127, 442, 150, 149, 108, 128, 66, 442, 64, 46, 44, 49, 106, 111]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153 22 66 87 112 70 131 27 90 85 442 65 106 130 128 109 152 23 110 89 149 88 64 28 48 45 132 442 69 91 151 43 25 127 442 150 149 108 128 66 442 64 46 44 49 106 111"
 IsChanceNode() = False
@@ -1305,8 +1826,17 @@ StringLegalActions() = ["W e2", "W g3", "W b4", "W g4", "W a7", "W PASS"]
 action: 70
 
 # State 58
+# GoState(komi=4.5, to_play=Bhistory.size()=58)
+#
+#  7 +XOXXX+
+#  6 OXOOXXX
+#  5 OOOOXXX
+#  4 O+OOOX+
+#  3 OOOOXXO
+#  2 OOOX+XX
+#  1 OOOXOOO
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Bhistory.size()=58)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOX+XX\n 1 OOOXOOO\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153, 22, 66, 87, 112, 70, 131, 27, 90, 85, 442, 65, 106, 130, 128, 109, 152, 23, 110, 89, 149, 88, 64, 28, 48, 45, 132, 442, 69, 91, 151, 43, 25, 127, 442, 150, 149, 108, 128, 66, 442, 64, 46, 44, 49, 106, 111, 70]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153 22 66 87 112 70 131 27 90 85 442 65 106 130 128 109 152 23 110 89 149 88 64 28 48 45 132 442 69 91 151 43 25 127 442 150 149 108 128 66 442 64 46 44 49 106 111 70"
 IsChanceNode() = False
@@ -1327,8 +1857,17 @@ StringLegalActions() = ["B e2", "B g4", "B g7", "B PASS"]
 action: 442
 
 # State 59
+# GoState(komi=4.5, to_play=Whistory.size()=59)
+#
+#  7 +XOXXX+
+#  6 OXOOXXX
+#  5 OOOOXXX
+#  4 O+OOOX+
+#  3 OOOOXXO
+#  2 OOOX+XX
+#  1 OOOXOOO
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Whistory.size()=59)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOX+XX\n 1 OOOXOOO\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153, 22, 66, 87, 112, 70, 131, 27, 90, 85, 442, 65, 106, 130, 128, 109, 152, 23, 110, 89, 149, 88, 64, 28, 48, 45, 132, 442, 69, 91, 151, 43, 25, 127, 442, 150, 149, 108, 128, 66, 442, 64, 46, 44, 49, 106, 111, 70, 442]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153 22 66 87 112 70 131 27 90 85 442 65 106 130 128 109 152 23 110 89 149 88 64 28 48 45 132 442 69 91 151 43 25 127 442 150 149 108 128 66 442 64 46 44 49 106 111 70 442"
 IsChanceNode() = False
@@ -1349,8 +1888,17 @@ StringLegalActions() = ["W e2", "W b4", "W a7", "W PASS"]
 action: 148
 
 # State 60
+# GoState(komi=4.5, to_play=Bhistory.size()=60)
+#
+#  7 O+OXXX+
+#  6 O+OOXXX
+#  5 OOOOXXX
+#  4 O+OOOX+
+#  3 OOOOXXO
+#  2 OOOX+XX
+#  1 OOOXOOO
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Bhistory.size()=60)\n\n 7 O+OXXX+\n 6 O+OOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOX+XX\n 1 OOOXOOO\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153, 22, 66, 87, 112, 70, 131, 27, 90, 85, 442, 65, 106, 130, 128, 109, 152, 23, 110, 89, 149, 88, 64, 28, 48, 45, 132, 442, 69, 91, 151, 43, 25, 127, 442, 150, 149, 108, 128, 66, 442, 64, 46, 44, 49, 106, 111, 70, 442, 148]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153 22 66 87 112 70 131 27 90 85 442 65 106 130 128 109 152 23 110 89 149 88 64 28 48 45 132 442 69 91 151 43 25 127 442 150 149 108 128 66 442 64 46 44 49 106 111 70 442 148"
 IsChanceNode() = False
@@ -1371,8 +1919,17 @@ StringLegalActions() = ["B e2", "B g4", "B b6", "B b7", "B g7", "B PASS"]
 action: 47
 
 # State 61
+# GoState(komi=4.5, to_play=Whistory.size()=61)
+#
+#  7 O+OXXX+
+#  6 O+OOXXX
+#  5 OOOOXXX
+#  4 O+OOOX+
+#  3 OOOOXXO
+#  2 OOOXXXX
+#  1 OOOX+++
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Whistory.size()=61)\n\n 7 O+OXXX+\n 6 O+OOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOXXXX\n 1 OOOX+++\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153, 22, 66, 87, 112, 70, 131, 27, 90, 85, 442, 65, 106, 130, 128, 109, 152, 23, 110, 89, 149, 88, 64, 28, 48, 45, 132, 442, 69, 91, 151, 43, 25, 127, 442, 150, 149, 108, 128, 66, 442, 64, 46, 44, 49, 106, 111, 70, 442, 148, 47]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153 22 66 87 112 70 131 27 90 85 442 65 106 130 128 109 152 23 110 89 149 88 64 28 48 45 132 442 69 91 151 43 25 127 442 150 149 108 128 66 442 64 46 44 49 106 111 70 442 148 47"
 IsChanceNode() = False
@@ -1393,8 +1950,17 @@ StringLegalActions() = ["W e1", "W f1", "W g1", "W b4", "W b6", "W b7", "W PASS"
 action: 128
 
 # State 62
+# GoState(komi=4.5, to_play=Bhistory.size()=62)
+#
+#  7 O+OXXX+
+#  6 OOOOXXX
+#  5 OOOOXXX
+#  4 O+OOOX+
+#  3 OOOOXXO
+#  2 OOOXXXX
+#  1 OOOX+++
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Bhistory.size()=62)\n\n 7 O+OXXX+\n 6 OOOOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOXXXX\n 1 OOOX+++\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153, 22, 66, 87, 112, 70, 131, 27, 90, 85, 442, 65, 106, 130, 128, 109, 152, 23, 110, 89, 149, 88, 64, 28, 48, 45, 132, 442, 69, 91, 151, 43, 25, 127, 442, 150, 149, 108, 128, 66, 442, 64, 46, 44, 49, 106, 111, 70, 442, 148, 47, 128]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153 22 66 87 112 70 131 27 90 85 442 65 106 130 128 109 152 23 110 89 149 88 64 28 48 45 132 442 69 91 151 43 25 127 442 150 149 108 128 66 442 64 46 44 49 106 111 70 442 148 47 128"
 IsChanceNode() = False
@@ -1415,8 +1981,17 @@ StringLegalActions() = ["B e1", "B f1", "B g1", "B g4", "B g7", "B PASS"]
 action: 26
 
 # State 63
+# GoState(komi=4.5, to_play=Whistory.size()=63)
+#
+#  7 O+OXXX+
+#  6 OOOOXXX
+#  5 OOOOXXX
+#  4 O+OOOX+
+#  3 OOOOXXO
+#  2 OOOXXXX
+#  1 OOOXX++
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Whistory.size()=63)\n\n 7 O+OXXX+\n 6 OOOOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOXXXX\n 1 OOOXX++\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153, 22, 66, 87, 112, 70, 131, 27, 90, 85, 442, 65, 106, 130, 128, 109, 152, 23, 110, 89, 149, 88, 64, 28, 48, 45, 132, 442, 69, 91, 151, 43, 25, 127, 442, 150, 149, 108, 128, 66, 442, 64, 46, 44, 49, 106, 111, 70, 442, 148, 47, 128, 26]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153 22 66 87 112 70 131 27 90 85 442 65 106 130 128 109 152 23 110 89 149 88 64 28 48 45 132 442 69 91 151 43 25 127 442 150 149 108 128 66 442 64 46 44 49 106 111 70 442 148 47 128 26"
 IsChanceNode() = False
@@ -1437,8 +2012,17 @@ StringLegalActions() = ["W f1", "W g1", "W b4", "W b7", "W PASS"]
 action: 28
 
 # State 64
+# GoState(komi=4.5, to_play=Bhistory.size()=64)
+#
+#  7 O+OXXX+
+#  6 OOOOXXX
+#  5 OOOOXXX
+#  4 O+OOOX+
+#  3 OOOOXXO
+#  2 OOOXXXX
+#  1 OOOXX+O
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Bhistory.size()=64)\n\n 7 O+OXXX+\n 6 OOOOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOXXXX\n 1 OOOXX+O\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153, 22, 66, 87, 112, 70, 131, 27, 90, 85, 442, 65, 106, 130, 128, 109, 152, 23, 110, 89, 149, 88, 64, 28, 48, 45, 132, 442, 69, 91, 151, 43, 25, 127, 442, 150, 149, 108, 128, 66, 442, 64, 46, 44, 49, 106, 111, 70, 442, 148, 47, 128, 26, 28]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153 22 66 87 112 70 131 27 90 85 442 65 106 130 128 109 152 23 110 89 149 88 64 28 48 45 132 442 69 91 151 43 25 127 442 150 149 108 128 66 442 64 46 44 49 106 111 70 442 148 47 128 26 28"
 IsChanceNode() = False
@@ -1459,8 +2043,17 @@ StringLegalActions() = ["B f1", "B g4", "B g7", "B PASS"]
 action: 154
 
 # State 65
+# GoState(komi=4.5, to_play=Whistory.size()=65)
+#
+#  7 O+OXXXX
+#  6 OOOOXXX
+#  5 OOOOXXX
+#  4 O+OOOX+
+#  3 OOOOXXO
+#  2 OOOXXXX
+#  1 OOOXX+O
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Whistory.size()=65)\n\n 7 O+OXXXX\n 6 OOOOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOXXXX\n 1 OOOXX+O\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153, 22, 66, 87, 112, 70, 131, 27, 90, 85, 442, 65, 106, 130, 128, 109, 152, 23, 110, 89, 149, 88, 64, 28, 48, 45, 132, 442, 69, 91, 151, 43, 25, 127, 442, 150, 149, 108, 128, 66, 442, 64, 46, 44, 49, 106, 111, 70, 442, 148, 47, 128, 26, 28, 154]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153 22 66 87 112 70 131 27 90 85 442 65 106 130 128 109 152 23 110 89 149 88 64 28 48 45 132 442 69 91 151 43 25 127 442 150 149 108 128 66 442 64 46 44 49 106 111 70 442 148 47 128 26 28 154"
 IsChanceNode() = False
@@ -1481,8 +2074,17 @@ StringLegalActions() = ["W b4", "W b7", "W PASS"]
 action: 442
 
 # State 66
+# GoState(komi=4.5, to_play=Bhistory.size()=66)
+#
+#  7 O+OXXXX
+#  6 OOOOXXX
+#  5 OOOOXXX
+#  4 O+OOOX+
+#  3 OOOOXXO
+#  2 OOOXXXX
+#  1 OOOXX+O
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Bhistory.size()=66)\n\n 7 O+OXXXX\n 6 OOOOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOXXXX\n 1 OOOXX+O\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153, 22, 66, 87, 112, 70, 131, 27, 90, 85, 442, 65, 106, 130, 128, 109, 152, 23, 110, 89, 149, 88, 64, 28, 48, 45, 132, 442, 69, 91, 151, 43, 25, 127, 442, 150, 149, 108, 128, 66, 442, 64, 46, 44, 49, 106, 111, 70, 442, 148, 47, 128, 26, 28, 154, 442]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153 22 66 87 112 70 131 27 90 85 442 65 106 130 128 109 152 23 110 89 149 88 64 28 48 45 132 442 69 91 151 43 25 127 442 150 149 108 128 66 442 64 46 44 49 106 111 70 442 148 47 128 26 28 154 442"
 IsChanceNode() = False
@@ -1503,8 +2105,17 @@ StringLegalActions() = ["B f1", "B g4", "B PASS"]
 action: 91
 
 # State 67
+# GoState(komi=4.5, to_play=Whistory.size()=67)
+#
+#  7 O+OXXXX
+#  6 OOOOXXX
+#  5 OOOOXXX
+#  4 O+OOOXX
+#  3 OOOOXX+
+#  2 OOOXXXX
+#  1 OOOXX+O
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Whistory.size()=67)\n\n 7 O+OXXXX\n 6 OOOOXXX\n 5 OOOOXXX\n 4 O+OOOXX\n 3 OOOOXX+\n 2 OOOXXXX\n 1 OOOXX+O\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153, 22, 66, 87, 112, 70, 131, 27, 90, 85, 442, 65, 106, 130, 128, 109, 152, 23, 110, 89, 149, 88, 64, 28, 48, 45, 132, 442, 69, 91, 151, 43, 25, 127, 442, 150, 149, 108, 128, 66, 442, 64, 46, 44, 49, 106, 111, 70, 442, 148, 47, 128, 26, 28, 154, 442, 91]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153 22 66 87 112 70 131 27 90 85 442 65 106 130 128 109 152 23 110 89 149 88 64 28 48 45 132 442 69 91 151 43 25 127 442 150 149 108 128 66 442 64 46 44 49 106 111 70 442 148 47 128 26 28 154 442 91"
 IsChanceNode() = False
@@ -1525,8 +2136,17 @@ StringLegalActions() = ["W b4", "W b7", "W PASS"]
 action: 442
 
 # State 68
+# GoState(komi=4.5, to_play=Bhistory.size()=68)
+#
+#  7 O+OXXXX
+#  6 OOOOXXX
+#  5 OOOOXXX
+#  4 O+OOOXX
+#  3 OOOOXX+
+#  2 OOOXXXX
+#  1 OOOXX+O
+#    ABCDEFG
 IsTerminal() = False
-ToString() = "GoState(komi=4.5, to_play=Bhistory.size()=68)\n\n 7 O+OXXXX\n 6 OOOOXXX\n 5 OOOOXXX\n 4 O+OOOXX\n 3 OOOOXX+\n 2 OOOXXXX\n 1 OOOXX+O\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153, 22, 66, 87, 112, 70, 131, 27, 90, 85, 442, 65, 106, 130, 128, 109, 152, 23, 110, 89, 149, 88, 64, 28, 48, 45, 132, 442, 69, 91, 151, 43, 25, 127, 442, 150, 149, 108, 128, 66, 442, 64, 46, 44, 49, 106, 111, 70, 442, 148, 47, 128, 26, 28, 154, 442, 91, 442]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153 22 66 87 112 70 131 27 90 85 442 65 106 130 128 109 152 23 110 89 149 88 64 28 48 45 132 442 69 91 151 43 25 127 442 150 149 108 128 66 442 64 46 44 49 106 111 70 442 148 47 128 26 28 154 442 91 442"
 IsChanceNode() = False
@@ -1547,8 +2167,17 @@ StringLegalActions() = ["B f1", "B g3", "B PASS"]
 action: 442
 
 # State 69
+# GoState(komi=4.5, to_play=Whistory.size()=69)
+#
+#  7 O+OXXXX
+#  6 OOOOXXX
+#  5 OOOOXXX
+#  4 O+OOOXX
+#  3 OOOOXX+
+#  2 OOOXXXX
+#  1 OOOXX+O
+#    ABCDEFG
 IsTerminal() = True
-ToString() = "GoState(komi=4.5, to_play=Whistory.size()=69)\n\n 7 O+OXXXX\n 6 OOOOXXX\n 5 OOOOXXX\n 4 O+OOOXX\n 3 OOOOXX+\n 2 OOOXXXX\n 1 OOOXX+O\n   ABCDEFG\n"
 History() = [88, 67, 44, 107, 133, 24, 148, 129, 68, 26, 153, 22, 66, 87, 112, 70, 131, 27, 90, 85, 442, 65, 106, 130, 128, 109, 152, 23, 110, 89, 149, 88, 64, 28, 48, 45, 132, 442, 69, 91, 151, 43, 25, 127, 442, 150, 149, 108, 128, 66, 442, 64, 46, 44, 49, 106, 111, 70, 442, 148, 47, 128, 26, 28, 154, 442, 91, 442, 442]
 HistoryString() = "88 67 44 107 133 24 148 129 68 26 153 22 66 87 112 70 131 27 90 85 442 65 106 130 128 109 152 23 110 89 149 88 64 28 48 45 132 442 69 91 151 43 25 127 442 150 149 108 128 66 442 64 46 44 49 106 111 70 442 148 47 128 26 28 154 442 91 442 442"
 IsChanceNode() = False

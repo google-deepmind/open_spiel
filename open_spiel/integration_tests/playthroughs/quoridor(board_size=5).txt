@@ -1,5 +1,4 @@
 game: quoridor(board_size=5)
-seed: 1780759726
 
 GameType.chance_mode = ChanceMode.DETERMINISTIC
 GameType.dynamics = Dynamics.SEQUENTIAL
@@ -29,8 +28,18 @@ MaxGameLength() = 100
 ToString() = "quoridor(board_size=5)"
 
 # State 0
+# Board size: 5, walls: 3, 3
+#    a   b   c   d   e
+#  1 .   .   @   .   .
+#
+#  2 .   .   .   .   .
+#
+#  3 .   .   .   .   .
+#
+#  4 .   .   .   .   .
+#
+#  5 .   .   O   .   .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 3, 3\n   a   b   c   d   e\n 1 .   .   @   .   . \n                     \n 2 .   .   .   .   . \n                     \n 3 .   .   .   .   . \n                     \n 4 .   .   .   .   . \n                     \n 5 .   .   O   .   . \n"
 History() = []
 HistoryString() = ""
 IsChanceNode() = False
@@ -51,8 +60,18 @@ StringLegalActions() = ["a1v", "b1v", "c1v", "d1v", "a1h", "b1h", "c1h", "d1h", 
 action: 63
 
 # State 1
+# Board size: 5, walls: 2, 3
+#    a   b   c   d   e
+#  1 .   .   @   .   .
+#
+#  2 .   .   .   .   .
+#
+#  3 .   .   .   .   .
+#
+#  4 .   .   .   .   .
+#   ---+---
+#  5 .   .   O   .   .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 2, 3\n   a   b   c   d   e\n 1 .   .   @   .   . \n                     \n 2 .   .   .   .   . \n                     \n 3 .   .   .   .   . \n                     \n 4 .   .   .   .   . \n  ---+---            \n 5 .   .   O   .   . \n"
 History() = [63]
 HistoryString() = "63"
 IsChanceNode() = False
@@ -73,8 +92,18 @@ StringLegalActions() = ["a1v", "b1", "b1v", "c1v", "d1", "d1v", "a1h", "b1h", "c
 action: 59
 
 # State 2
+# Board size: 5, walls: 2, 2
+#    a   b   c   d   e
+#  1 .   .   @   .   .
+#
+#  2 .   .   .   .   .
+#
+#  3 .   .   .   .   .
+#
+#  4 .   .   . | .   .
+#   ---+---    +
+#  5 .   .   O | .   .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 2, 2\n   a   b   c   d   e\n 1 .   .   @   .   . \n                     \n 2 .   .   .   .   . \n                     \n 3 .   .   .   .   . \n                     \n 4 .   .   . | .   . \n  ---+---    +       \n 5 .   .   O | .   . \n"
 History() = [63, 59]
 HistoryString() = "63 59"
 IsChanceNode() = False
@@ -95,8 +124,18 @@ StringLegalActions() = ["a1v", "b1v", "c1v", "d1v", "a1h", "b1h", "c1h", "d1h", 
 action: 7
 
 # State 3
+# Board size: 5, walls: 1, 2
+#    a   b   c   d   e
+#  1 .   .   @   . | .
+#                  +
+#  2 .   .   .   . | .
+#
+#  3 .   .   .   .   .
+#
+#  4 .   .   . | .   .
+#   ---+---    +
+#  5 .   .   O | .   .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 1, 2\n   a   b   c   d   e\n 1 .   .   @   . | . \n                 +   \n 2 .   .   .   . | . \n                     \n 3 .   .   .   .   . \n                     \n 4 .   .   . | .   . \n  ---+---    +       \n 5 .   .   O | .   . \n"
 History() = [63, 59, 7]
 HistoryString() = "63 59 7"
 IsChanceNode() = False
@@ -117,8 +156,18 @@ StringLegalActions() = ["a1v", "b1", "b1v", "c1v", "d1", "a1h", "b1h", "c1h", "a
 action: 49
 
 # State 4
+# Board size: 5, walls: 1, 1
+#    a   b   c   d   e
+#  1 .   .   @   . | .
+#                  +
+#  2 .   .   .   . | .
+#
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   . | .   .
+#   ---+---    +
+#  5 .   .   O | .   .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 1, 1\n   a   b   c   d   e\n 1 .   .   @   . | . \n                 +   \n 2 .   .   .   . | . \n                     \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   . | .   . \n  ---+---    +       \n 5 .   .   O | .   . \n"
 History() = [63, 59, 7, 49]
 HistoryString() = "63 59 7 49"
 IsChanceNode() = False
@@ -139,8 +188,18 @@ StringLegalActions() = ["a1v", "b1v", "c1v", "a1h", "b1h", "c1h", "a2v", "b2v", 
 action: 61
 
 # State 5
+# Board size: 5, walls: 0, 1
+#    a   b   c   d   e
+#  1 .   .   @   . | .
+#                  +
+#  2 .   .   .   . | .
+#
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   .   O | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 1\n   a   b   c   d   e\n 1 .   .   @   . | . \n                 +   \n 2 .   .   .   . | . \n                     \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   .   O | . | . \n"
 History() = [63, 59, 7, 49, 61]
 HistoryString() = "63 59 7 49 61"
 IsChanceNode() = False
@@ -161,8 +220,18 @@ StringLegalActions() = ["a1v", "b1", "b1v", "c1v", "d1", "a1h", "b1h", "c1h", "a
 action: 31
 
 # State 6
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   @   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   .   O | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   @   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   .   O | . | . \n"
 History() = [63, 59, 7, 49, 61, 31]
 HistoryString() = "63 59 7 49 61 31"
 IsChanceNode() = False
@@ -183,8 +252,18 @@ StringLegalActions() = ["c4", "b5"]
 action: 74
 
 # State 7
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   @   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   O   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   @   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   O   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74]
 HistoryString() = "63 59 7 49 61 31 74"
 IsChanceNode() = False
@@ -205,8 +284,18 @@ StringLegalActions() = ["b1", "d1", "c2"]
 action: 2
 
 # State 8
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   @   .   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   O   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   @   .   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   O   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2]
 HistoryString() = "63 59 7 49 61 31 74 2"
 IsChanceNode() = False
@@ -227,8 +316,18 @@ StringLegalActions() = ["a5", "c5"]
 action: 76
 
 # State 9
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   @   .   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   .   O | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   @   .   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   .   O | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76]
 HistoryString() = "63 59 7 49 61 31 74 2 76"
 IsChanceNode() = False
@@ -249,8 +348,18 @@ StringLegalActions() = ["a1", "c1", "b2"]
 action: 0
 
 # State 10
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 @   .   .   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   .   O | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 @   .   .   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   .   O | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0"
 IsChanceNode() = False
@@ -271,8 +380,18 @@ StringLegalActions() = ["c4", "b5"]
 action: 58
 
 # State 11
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 @   .   .   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   O | . | .
+#   ---+---    +   +
+#  5 .   .   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 @   .   .   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   O | . | . \n  ---+---    +   +   \n 5 .   .   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58"
 IsChanceNode() = False
@@ -293,8 +412,18 @@ StringLegalActions() = ["b1", "a2"]
 action: 2
 
 # State 12
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   @   .   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   O | . | .
+#   ---+---    +   +
+#  5 .   .   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   @   .   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   O | . | . \n  ---+---    +   +   \n 5 .   .   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2"
 IsChanceNode() = False
@@ -315,8 +444,18 @@ StringLegalActions() = ["b4", "c5"]
 action: 76
 
 # State 13
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   @   .   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   .   O | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   @   .   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   .   O | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76"
 IsChanceNode() = False
@@ -337,8 +476,18 @@ StringLegalActions() = ["a1", "c1", "b2"]
 action: 4
 
 # State 14
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   @   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   .   O | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   @   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   .   O | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4"
 IsChanceNode() = False
@@ -359,8 +508,18 @@ StringLegalActions() = ["c4", "b5"]
 action: 58
 
 # State 15
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   @   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   O | . | .
+#   ---+---    +   +
+#  5 .   .   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   @   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   O | . | . \n  ---+---    +   +   \n 5 .   .   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58"
 IsChanceNode() = False
@@ -381,8 +540,18 @@ StringLegalActions() = ["b1", "d1", "c2"]
 action: 2
 
 # State 16
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   @   .   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   O | . | .
+#   ---+---    +   +
+#  5 .   .   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   @   .   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   O | . | . \n  ---+---    +   +   \n 5 .   .   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2"
 IsChanceNode() = False
@@ -403,8 +572,18 @@ StringLegalActions() = ["b4", "c5"]
 action: 76
 
 # State 17
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   @   .   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   .   O | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   @   .   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   .   O | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76"
 IsChanceNode() = False
@@ -425,8 +604,18 @@ StringLegalActions() = ["a1", "c1", "b2"]
 action: 0
 
 # State 18
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 @   .   .   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   .   O | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 @   .   .   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   .   O | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0"
 IsChanceNode() = False
@@ -447,8 +636,18 @@ StringLegalActions() = ["c4", "b5"]
 action: 74
 
 # State 19
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 @   .   .   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   O   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 @   .   .   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   O   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74"
 IsChanceNode() = False
@@ -469,8 +668,18 @@ StringLegalActions() = ["b1", "a2"]
 action: 18
 
 # State 20
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 @   .   .   . | .
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   O   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 @   .   .   . | . \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   O   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18"
 IsChanceNode() = False
@@ -491,8 +700,18 @@ StringLegalActions() = ["a5", "c5"]
 action: 72
 
 # State 21
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 @   .   .   . | .
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 O   .   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 @   .   .   . | . \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 O   .   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72"
 IsChanceNode() = False
@@ -513,8 +732,18 @@ StringLegalActions() = ["a1", "b2", "a3"]
 action: 20
 
 # State 22
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   @   .   . | .
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 O   .   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   @   .   . | . \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 O   .   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20"
 IsChanceNode() = False
@@ -535,8 +764,18 @@ StringLegalActions() = ["b5"]
 action: 74
 
 # State 23
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   @   .   . | .
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   O   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   @   .   . | . \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   O   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74"
 IsChanceNode() = False
@@ -557,8 +796,18 @@ StringLegalActions() = ["b1", "a2", "c2", "b3"]
 action: 22
 
 # State 24
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   .   @   . | .
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   O   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   .   @   . | . \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   O   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22"
 IsChanceNode() = False
@@ -579,8 +828,18 @@ StringLegalActions() = ["a5", "c5"]
 action: 72
 
 # State 25
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   .   @   . | .
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 O   .   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   .   @   . | . \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 O   .   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72"
 IsChanceNode() = False
@@ -601,8 +860,18 @@ StringLegalActions() = ["c1", "b2", "d2"]
 action: 24
 
 # State 26
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   .   .   @ | .
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 O   .   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   .   .   @ | . \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 O   .   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24"
 IsChanceNode() = False
@@ -623,8 +892,18 @@ StringLegalActions() = ["b5"]
 action: 74
 
 # State 27
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   .   .   @ | .
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   O   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   .   .   @ | . \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   O   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74"
 IsChanceNode() = False
@@ -645,8 +924,18 @@ StringLegalActions() = ["d1", "c2"]
 action: 22
 
 # State 28
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   .   @   . | .
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   O   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   .   @   . | . \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   O   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22"
 IsChanceNode() = False
@@ -667,8 +956,18 @@ StringLegalActions() = ["a5", "c5"]
 action: 76
 
 # State 29
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   .   @   . | .
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   .   O | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   .   @   . | . \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   .   O | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76"
 IsChanceNode() = False
@@ -689,8 +988,18 @@ StringLegalActions() = ["c1", "b2", "d2"]
 action: 20
 
 # State 30
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   @   .   . | .
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   .   O | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   @   .   . | . \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   .   O | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20"
 IsChanceNode() = False
@@ -711,8 +1020,18 @@ StringLegalActions() = ["c4", "b5"]
 action: 74
 
 # State 31
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   @   .   . | .
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   O   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   @   .   . | . \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   O   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74"
 IsChanceNode() = False
@@ -733,8 +1052,18 @@ StringLegalActions() = ["b1", "a2", "c2", "b3"]
 action: 38
 
 # State 32
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 .   @   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   O   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 .   @   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   O   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38"
 IsChanceNode() = False
@@ -755,8 +1084,18 @@ StringLegalActions() = ["a5", "c5"]
 action: 72
 
 # State 33
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 .   @   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 O   .   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 .   @   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 O   .   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72"
 IsChanceNode() = False
@@ -777,8 +1116,18 @@ StringLegalActions() = ["b2", "a3", "c3", "b4"]
 action: 40
 
 # State 34
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 .   .   @   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 O   .   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 .   .   @   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 O   .   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40"
 IsChanceNode() = False
@@ -799,8 +1148,18 @@ StringLegalActions() = ["b5"]
 action: 74
 
 # State 35
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 .   .   @   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   O   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 .   .   @   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   O   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74"
 IsChanceNode() = False
@@ -821,8 +1180,18 @@ StringLegalActions() = ["b3", "d3"]
 action: 42
 
 # State 36
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 .   .   .   @   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   O   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 .   .   .   @   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   O   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42"
 IsChanceNode() = False
@@ -843,8 +1212,18 @@ StringLegalActions() = ["a5", "c5"]
 action: 76
 
 # State 37
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 .   .   .   @   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   .   O | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 .   .   .   @   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   .   O | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76"
 IsChanceNode() = False
@@ -865,8 +1244,18 @@ StringLegalActions() = ["c3", "e3"]
 action: 44
 
 # State 38
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 .   .   .   .   @
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   .   O | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 .   .   .   .   @ \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   .   O | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44"
 IsChanceNode() = False
@@ -887,8 +1276,18 @@ StringLegalActions() = ["c4", "b5"]
 action: 74
 
 # State 39
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 .   .   .   .   @
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   O   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 .   .   .   .   @ \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   O   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74"
 IsChanceNode() = False
@@ -909,8 +1308,18 @@ StringLegalActions() = ["e2", "d3", "e4"]
 action: 62
 
 # State 40
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   . | . | @
+#   ---+---    +   +
+#  5 .   O   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   . | . | @ \n  ---+---    +   +   \n 5 .   O   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62"
 IsChanceNode() = False
@@ -931,8 +1340,18 @@ StringLegalActions() = ["a5", "c5"]
 action: 72
 
 # State 41
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   . | . | @
+#   ---+---    +   +
+#  5 O   .   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   . | . | @ \n  ---+---    +   +   \n 5 O   .   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72"
 IsChanceNode() = False
@@ -953,8 +1372,18 @@ StringLegalActions() = ["e3", "e5"]
 action: 44
 
 # State 42
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 .   .   .   .   @
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 O   .   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 .   .   .   .   @ \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 O   .   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44"
 IsChanceNode() = False
@@ -975,8 +1404,18 @@ StringLegalActions() = ["b5"]
 action: 74
 
 # State 43
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 .   .   .   .   @
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   O   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 .   .   .   .   @ \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   O   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44, 74]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44 74"
 IsChanceNode() = False
@@ -997,8 +1436,18 @@ StringLegalActions() = ["e2", "d3", "e4"]
 action: 26
 
 # State 44
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   .   .   . | @
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   O   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   .   .   . | @ \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   O   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44, 74, 26]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44 74 26"
 IsChanceNode() = False
@@ -1019,8 +1468,18 @@ StringLegalActions() = ["a5", "c5"]
 action: 76
 
 # State 45
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   .   .   . | @
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   .   O | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   .   .   . | @ \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   .   O | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44, 74, 26, 76]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44 74 26 76"
 IsChanceNode() = False
@@ -1041,8 +1500,18 @@ StringLegalActions() = ["e1", "e3"]
 action: 8
 
 # State 46
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | @
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   .   O | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | @ \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   .   O | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44, 74, 26, 76, 8]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44 74 26 76 8"
 IsChanceNode() = False
@@ -1063,8 +1532,18 @@ StringLegalActions() = ["c4", "b5"]
 action: 58
 
 # State 47
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | @
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   O | . | .
+#   ---+---    +   +
+#  5 .   .   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | @ \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   O | . | . \n  ---+---    +   +   \n 5 .   .   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44, 74, 26, 76, 8, 58]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44 74 26 76 8 58"
 IsChanceNode() = False
@@ -1085,8 +1564,18 @@ StringLegalActions() = ["e2"]
 action: 26
 
 # State 48
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   .   .   . | @
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   O | . | .
+#   ---+---    +   +
+#  5 .   .   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   .   .   . | @ \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   O | . | . \n  ---+---    +   +   \n 5 .   .   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44, 74, 26, 76, 8, 58, 26]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44 74 26 76 8 58 26"
 IsChanceNode() = False
@@ -1107,8 +1596,18 @@ StringLegalActions() = ["b4", "c5"]
 action: 76
 
 # State 49
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   .   .   . | @
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   .   O | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   .   .   . | @ \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   .   O | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44, 74, 26, 76, 8, 58, 26, 76]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44 74 26 76 8 58 26 76"
 IsChanceNode() = False
@@ -1129,8 +1628,18 @@ StringLegalActions() = ["e1", "e3"]
 action: 8
 
 # State 50
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | @
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   .   O | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | @ \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   .   O | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44, 74, 26, 76, 8, 58, 26, 76, 8]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44 74 26 76 8 58 26 76 8"
 IsChanceNode() = False
@@ -1151,8 +1660,18 @@ StringLegalActions() = ["c4", "b5"]
 action: 74
 
 # State 51
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | @
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   O   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | @ \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   O   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44, 74, 26, 76, 8, 58, 26, 76, 8, 74]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44 74 26 76 8 58 26 76 8 74"
 IsChanceNode() = False
@@ -1173,8 +1692,18 @@ StringLegalActions() = ["e2"]
 action: 26
 
 # State 52
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   .   .   . | @
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   O   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   .   .   . | @ \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   O   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44, 74, 26, 76, 8, 58, 26, 76, 8, 74, 26]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44 74 26 76 8 58 26 76 8 74 26"
 IsChanceNode() = False
@@ -1195,8 +1724,18 @@ StringLegalActions() = ["a5", "c5"]
 action: 72
 
 # State 53
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   .   .   . | @
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 O   .   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   .   .   . | @ \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 O   .   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44, 74, 26, 76, 8, 58, 26, 76, 8, 74, 26, 72]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44 74 26 76 8 58 26 76 8 74 26 72"
 IsChanceNode() = False
@@ -1217,8 +1756,18 @@ StringLegalActions() = ["e1", "e3"]
 action: 44
 
 # State 54
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 .   .   .   .   @
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 O   .   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 .   .   .   .   @ \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 O   .   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44, 74, 26, 76, 8, 58, 26, 76, 8, 74, 26, 72, 44]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44 74 26 76 8 58 26 76 8 74 26 72 44"
 IsChanceNode() = False
@@ -1239,8 +1788,18 @@ StringLegalActions() = ["b5"]
 action: 74
 
 # State 55
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 .   .   .   .   @
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   O   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 .   .   .   .   @ \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   O   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44, 74, 26, 76, 8, 58, 26, 76, 8, 74, 26, 72, 44, 74]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44 74 26 76 8 58 26 76 8 74 26 72 44 74"
 IsChanceNode() = False
@@ -1261,8 +1820,18 @@ StringLegalActions() = ["e2", "d3", "e4"]
 action: 42
 
 # State 56
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 .   .   .   @   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   O   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 .   .   .   @   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   O   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44, 74, 26, 76, 8, 58, 26, 76, 8, 74, 26, 72, 44, 74, 42]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44 74 26 76 8 58 26 76 8 74 26 72 44 74 42"
 IsChanceNode() = False
@@ -1283,8 +1852,18 @@ StringLegalActions() = ["a5", "c5"]
 action: 76
 
 # State 57
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 .   .   .   @   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   .   O | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 .   .   .   @   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   .   O | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44, 74, 26, 76, 8, 58, 26, 76, 8, 74, 26, 72, 44, 74, 42, 76]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44 74 26 76 8 58 26 76 8 74 26 72 44 74 42 76"
 IsChanceNode() = False
@@ -1305,8 +1884,18 @@ StringLegalActions() = ["c3", "e3"]
 action: 44
 
 # State 58
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 .   .   .   .   @
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   .   O | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 .   .   .   .   @ \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   .   O | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44, 74, 26, 76, 8, 58, 26, 76, 8, 74, 26, 72, 44, 74, 42, 76, 44]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44 74 26 76 8 58 26 76 8 74 26 72 44 74 42 76 44"
 IsChanceNode() = False
@@ -1327,8 +1916,18 @@ StringLegalActions() = ["c4", "b5"]
 action: 74
 
 # State 59
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 .   .   .   .   @
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   O   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 .   .   .   .   @ \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   O   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44, 74, 26, 76, 8, 58, 26, 76, 8, 74, 26, 72, 44, 74, 42, 76, 44, 74]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44 74 26 76 8 58 26 76 8 74 26 72 44 74 42 76 44 74"
 IsChanceNode() = False
@@ -1349,8 +1948,18 @@ StringLegalActions() = ["e2", "d3", "e4"]
 action: 42
 
 # State 60
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 .   .   .   @   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   O   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 .   .   .   @   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   O   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44, 74, 26, 76, 8, 58, 26, 76, 8, 74, 26, 72, 44, 74, 42, 76, 44, 74, 42]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44 74 26 76 8 58 26 76 8 74 26 72 44 74 42 76 44 74 42"
 IsChanceNode() = False
@@ -1371,8 +1980,18 @@ StringLegalActions() = ["a5", "c5"]
 action: 76
 
 # State 61
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 .   .   .   @   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   .   O | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 .   .   .   @   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   .   O | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44, 74, 26, 76, 8, 58, 26, 76, 8, 74, 26, 72, 44, 74, 42, 76, 44, 74, 42, 76]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44 74 26 76 8 58 26 76 8 74 26 72 44 74 42 76 44 74 42 76"
 IsChanceNode() = False
@@ -1393,8 +2012,18 @@ StringLegalActions() = ["c3", "e3"]
 action: 40
 
 # State 62
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 .   .   @   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   .   O | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 .   .   @   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   .   O | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44, 74, 26, 76, 8, 58, 26, 76, 8, 74, 26, 72, 44, 74, 42, 76, 44, 74, 42, 76, 40]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44 74 26 76 8 58 26 76 8 74 26 72 44 74 42 76 44 74 42 76 40"
 IsChanceNode() = False
@@ -1415,8 +2044,18 @@ StringLegalActions() = ["c4", "b5"]
 action: 74
 
 # State 63
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 .   .   @   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   O   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 .   .   @   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   O   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44, 74, 26, 76, 8, 58, 26, 76, 8, 74, 26, 72, 44, 74, 42, 76, 44, 74, 42, 76, 40, 74]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44 74 26 76 8 58 26 76 8 74 26 72 44 74 42 76 44 74 42 76 40 74"
 IsChanceNode() = False
@@ -1437,8 +2076,18 @@ StringLegalActions() = ["b3", "d3"]
 action: 38
 
 # State 64
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 .   @   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   O   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 .   @   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   O   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44, 74, 26, 76, 8, 58, 26, 76, 8, 74, 26, 72, 44, 74, 42, 76, 44, 74, 42, 76, 40, 74, 38]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44 74 26 76 8 58 26 76 8 74 26 72 44 74 42 76 44 74 42 76 40 74 38"
 IsChanceNode() = False
@@ -1459,8 +2108,18 @@ StringLegalActions() = ["a5", "c5"]
 action: 72
 
 # State 65
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 .   @   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 O   .   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 .   @   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 O   .   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44, 74, 26, 76, 8, 58, 26, 76, 8, 74, 26, 72, 44, 74, 42, 76, 44, 74, 42, 76, 40, 74, 38, 72]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44 74 26 76 8 58 26 76 8 74 26 72 44 74 42 76 44 74 42 76 40 74 38 72"
 IsChanceNode() = False
@@ -1481,8 +2140,18 @@ StringLegalActions() = ["b2", "a3", "c3", "b4"]
 action: 36
 
 # State 66
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 @   .   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 O   .   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 @   .   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 O   .   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44, 74, 26, 76, 8, 58, 26, 76, 8, 74, 26, 72, 44, 74, 42, 76, 44, 74, 42, 76, 40, 74, 38, 72, 36]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44 74 26 76 8 58 26 76 8 74 26 72 44 74 42 76 44 74 42 76 40 74 38 72 36"
 IsChanceNode() = False
@@ -1503,8 +2172,18 @@ StringLegalActions() = ["b5"]
 action: 74
 
 # State 67
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 @   .   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   O   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 @   .   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   O   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44, 74, 26, 76, 8, 58, 26, 76, 8, 74, 26, 72, 44, 74, 42, 76, 44, 74, 42, 76, 40, 74, 38, 72, 36, 74]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44 74 26 76 8 58 26 76 8 74 26 72 44 74 42 76 44 74 42 76 40 74 38 72 36 74"
 IsChanceNode() = False
@@ -1525,8 +2204,18 @@ StringLegalActions() = ["a2", "b3", "a4"]
 action: 54
 
 # State 68
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 @   .   . | . | .
+#   ---+---    +   +
+#  5 .   O   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 @   .   . | . | . \n  ---+---    +   +   \n 5 .   O   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44, 74, 26, 76, 8, 58, 26, 76, 8, 74, 26, 72, 44, 74, 42, 76, 44, 74, 42, 76, 40, 74, 38, 72, 36, 74, 54]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44 74 26 76 8 58 26 76 8 74 26 72 44 74 42 76 44 74 42 76 40 74 38 72 36 74 54"
 IsChanceNode() = False
@@ -1547,8 +2236,18 @@ StringLegalActions() = ["a5", "c5"]
 action: 72
 
 # State 69
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 @   .   . | . | .
+#   ---+---    +   +
+#  5 O   .   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 @   .   . | . | . \n  ---+---    +   +   \n 5 O   .   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44, 74, 26, 76, 8, 58, 26, 76, 8, 74, 26, 72, 44, 74, 42, 76, 44, 74, 42, 76, 40, 74, 38, 72, 36, 74, 54, 72]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44 74 26 76 8 58 26 76 8 74 26 72 44 74 42 76 44 74 42 76 40 74 38 72 36 74 54 72"
 IsChanceNode() = False
@@ -1569,8 +2268,18 @@ StringLegalActions() = ["a3", "b4"]
 action: 36
 
 # State 70
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 @   .   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 O   .   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 @   .   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 O   .   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44, 74, 26, 76, 8, 58, 26, 76, 8, 74, 26, 72, 44, 74, 42, 76, 44, 74, 42, 76, 40, 74, 38, 72, 36, 74, 54, 72, 36]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44 74 26 76 8 58 26 76 8 74 26 72 44 74 42 76 44 74 42 76 40 74 38 72 36 74 54 72 36"
 IsChanceNode() = False
@@ -1591,8 +2300,18 @@ StringLegalActions() = ["b5"]
 action: 74
 
 # State 71
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 @   .   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   O   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 @   .   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   O   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44, 74, 26, 76, 8, 58, 26, 76, 8, 74, 26, 72, 44, 74, 42, 76, 44, 74, 42, 76, 40, 74, 38, 72, 36, 74, 54, 72, 36, 74]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44 74 26 76 8 58 26 76 8 74 26 72 44 74 42 76 44 74 42 76 40 74 38 72 36 74 54 72 36 74"
 IsChanceNode() = False
@@ -1613,8 +2332,18 @@ StringLegalActions() = ["a2", "b3", "a4"]
 action: 38
 
 # State 72
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 .   @   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   O   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 .   @   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   O   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44, 74, 26, 76, 8, 58, 26, 76, 8, 74, 26, 72, 44, 74, 42, 76, 44, 74, 42, 76, 40, 74, 38, 72, 36, 74, 54, 72, 36, 74, 38]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44 74 26 76 8 58 26 76 8 74 26 72 44 74 42 76 44 74 42 76 40 74 38 72 36 74 54 72 36 74 38"
 IsChanceNode() = False
@@ -1635,8 +2364,18 @@ StringLegalActions() = ["a5", "c5"]
 action: 76
 
 # State 73
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 .   @   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   .   O | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 .   @   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   .   O | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44, 74, 26, 76, 8, 58, 26, 76, 8, 74, 26, 72, 44, 74, 42, 76, 44, 74, 42, 76, 40, 74, 38, 72, 36, 74, 54, 72, 36, 74, 38, 76]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44 74 26 76 8 58 26 76 8 74 26 72 44 74 42 76 44 74 42 76 40 74 38 72 36 74 54 72 36 74 38 76"
 IsChanceNode() = False
@@ -1657,8 +2396,18 @@ StringLegalActions() = ["b2", "a3", "c3", "b4"]
 action: 20
 
 # State 74
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   @   .   . | .
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   .   O | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   @   .   . | . \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   .   O | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44, 74, 26, 76, 8, 58, 26, 76, 8, 74, 26, 72, 44, 74, 42, 76, 44, 74, 42, 76, 40, 74, 38, 72, 36, 74, 54, 72, 36, 74, 38, 76, 20]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44 74 26 76 8 58 26 76 8 74 26 72 44 74 42 76 44 74 42 76 40 74 38 72 36 74 54 72 36 74 38 76 20"
 IsChanceNode() = False
@@ -1679,8 +2428,18 @@ StringLegalActions() = ["c4", "b5"]
 action: 74
 
 # State 75
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   @   .   . | .
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   O   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   @   .   . | . \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   O   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44, 74, 26, 76, 8, 58, 26, 76, 8, 74, 26, 72, 44, 74, 42, 76, 44, 74, 42, 76, 40, 74, 38, 72, 36, 74, 54, 72, 36, 74, 38, 76, 20, 74]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44 74 26 76 8 58 26 76 8 74 26 72 44 74 42 76 44 74 42 76 40 74 38 72 36 74 54 72 36 74 38 76 20 74"
 IsChanceNode() = False
@@ -1701,8 +2460,18 @@ StringLegalActions() = ["b1", "a2", "c2", "b3"]
 action: 22
 
 # State 76
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   .   @   . | .
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   O   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   .   @   . | . \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   O   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44, 74, 26, 76, 8, 58, 26, 76, 8, 74, 26, 72, 44, 74, 42, 76, 44, 74, 42, 76, 40, 74, 38, 72, 36, 74, 54, 72, 36, 74, 38, 76, 20, 74, 22]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44 74 26 76 8 58 26 76 8 74 26 72 44 74 42 76 44 74 42 76 40 74 38 72 36 74 54 72 36 74 38 76 20 74 22"
 IsChanceNode() = False
@@ -1723,8 +2492,18 @@ StringLegalActions() = ["a5", "c5"]
 action: 72
 
 # State 77
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   .   @   . | .
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 O   .   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   .   @   . | . \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 O   .   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44, 74, 26, 76, 8, 58, 26, 76, 8, 74, 26, 72, 44, 74, 42, 76, 44, 74, 42, 76, 40, 74, 38, 72, 36, 74, 54, 72, 36, 74, 38, 76, 20, 74, 22, 72]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44 74 26 76 8 58 26 76 8 74 26 72 44 74 42 76 44 74 42 76 40 74 38 72 36 74 54 72 36 74 38 76 20 74 22 72"
 IsChanceNode() = False
@@ -1745,8 +2524,18 @@ StringLegalActions() = ["c1", "b2", "d2"]
 action: 4
 
 # State 78
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   @   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 O   .   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   @   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 O   .   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44, 74, 26, 76, 8, 58, 26, 76, 8, 74, 26, 72, 44, 74, 42, 76, 44, 74, 42, 76, 40, 74, 38, 72, 36, 74, 54, 72, 36, 74, 38, 76, 20, 74, 22, 72, 4]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44 74 26 76 8 58 26 76 8 74 26 72 44 74 42 76 44 74 42 76 40 74 38 72 36 74 54 72 36 74 38 76 20 74 22 72 4"
 IsChanceNode() = False
@@ -1767,8 +2556,18 @@ StringLegalActions() = ["b5"]
 action: 74
 
 # State 79
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   @   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   O   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   @   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   O   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44, 74, 26, 76, 8, 58, 26, 76, 8, 74, 26, 72, 44, 74, 42, 76, 44, 74, 42, 76, 40, 74, 38, 72, 36, 74, 54, 72, 36, 74, 38, 76, 20, 74, 22, 72, 4, 74]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44 74 26 76 8 58 26 76 8 74 26 72 44 74 42 76 44 74 42 76 40 74 38 72 36 74 54 72 36 74 38 76 20 74 22 72 4 74"
 IsChanceNode() = False
@@ -1789,8 +2588,18 @@ StringLegalActions() = ["b1", "d1", "c2"]
 action: 2
 
 # State 80
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   @   .   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   O   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   @   .   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   O   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44, 74, 26, 76, 8, 58, 26, 76, 8, 74, 26, 72, 44, 74, 42, 76, 44, 74, 42, 76, 40, 74, 38, 72, 36, 74, 54, 72, 36, 74, 38, 76, 20, 74, 22, 72, 4, 74, 2]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44 74 26 76 8 58 26 76 8 74 26 72 44 74 42 76 44 74 42 76 40 74 38 72 36 74 54 72 36 74 38 76 20 74 22 72 4 74 2"
 IsChanceNode() = False
@@ -1811,8 +2620,18 @@ StringLegalActions() = ["a5", "c5"]
 action: 76
 
 # State 81
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   @   .   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   .   O | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   @   .   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   .   O | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44, 74, 26, 76, 8, 58, 26, 76, 8, 74, 26, 72, 44, 74, 42, 76, 44, 74, 42, 76, 40, 74, 38, 72, 36, 74, 54, 72, 36, 74, 38, 76, 20, 74, 22, 72, 4, 74, 2, 76]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44 74 26 76 8 58 26 76 8 74 26 72 44 74 42 76 44 74 42 76 40 74 38 72 36 74 54 72 36 74 38 76 20 74 22 72 4 74 2 76"
 IsChanceNode() = False
@@ -1833,8 +2652,18 @@ StringLegalActions() = ["a1", "c1", "b2"]
 action: 0
 
 # State 82
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 @   .   .   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   .   O | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 @   .   .   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   .   O | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44, 74, 26, 76, 8, 58, 26, 76, 8, 74, 26, 72, 44, 74, 42, 76, 44, 74, 42, 76, 40, 74, 38, 72, 36, 74, 54, 72, 36, 74, 38, 76, 20, 74, 22, 72, 4, 74, 2, 76, 0]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44 74 26 76 8 58 26 76 8 74 26 72 44 74 42 76 44 74 42 76 40 74 38 72 36 74 54 72 36 74 38 76 20 74 22 72 4 74 2 76 0"
 IsChanceNode() = False
@@ -1855,8 +2684,18 @@ StringLegalActions() = ["c4", "b5"]
 action: 74
 
 # State 83
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 @   .   .   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   O   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 @   .   .   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   O   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44, 74, 26, 76, 8, 58, 26, 76, 8, 74, 26, 72, 44, 74, 42, 76, 44, 74, 42, 76, 40, 74, 38, 72, 36, 74, 54, 72, 36, 74, 38, 76, 20, 74, 22, 72, 4, 74, 2, 76, 0, 74]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44 74 26 76 8 58 26 76 8 74 26 72 44 74 42 76 44 74 42 76 40 74 38 72 36 74 54 72 36 74 38 76 20 74 22 72 4 74 2 76 0 74"
 IsChanceNode() = False
@@ -1877,8 +2716,18 @@ StringLegalActions() = ["b1", "a2"]
 action: 18
 
 # State 84
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 @   .   .   . | .
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   O   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 @   .   .   . | . \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   O   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44, 74, 26, 76, 8, 58, 26, 76, 8, 74, 26, 72, 44, 74, 42, 76, 44, 74, 42, 76, 40, 74, 38, 72, 36, 74, 54, 72, 36, 74, 38, 76, 20, 74, 22, 72, 4, 74, 2, 76, 0, 74, 18]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44 74 26 76 8 58 26 76 8 74 26 72 44 74 42 76 44 74 42 76 40 74 38 72 36 74 54 72 36 74 38 76 20 74 22 72 4 74 2 76 0 74 18"
 IsChanceNode() = False
@@ -1899,8 +2748,18 @@ StringLegalActions() = ["a5", "c5"]
 action: 72
 
 # State 85
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 @   .   .   . | .
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 O   .   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 @   .   .   . | . \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 O   .   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44, 74, 26, 76, 8, 58, 26, 76, 8, 74, 26, 72, 44, 74, 42, 76, 44, 74, 42, 76, 40, 74, 38, 72, 36, 74, 54, 72, 36, 74, 38, 76, 20, 74, 22, 72, 4, 74, 2, 76, 0, 74, 18, 72]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44 74 26 76 8 58 26 76 8 74 26 72 44 74 42 76 44 74 42 76 40 74 38 72 36 74 54 72 36 74 38 76 20 74 22 72 4 74 2 76 0 74 18 72"
 IsChanceNode() = False
@@ -1921,8 +2780,18 @@ StringLegalActions() = ["a1", "b2", "a3"]
 action: 0
 
 # State 86
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 @   .   .   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 O   .   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 @   .   .   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 O   .   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44, 74, 26, 76, 8, 58, 26, 76, 8, 74, 26, 72, 44, 74, 42, 76, 44, 74, 42, 76, 40, 74, 38, 72, 36, 74, 54, 72, 36, 74, 38, 76, 20, 74, 22, 72, 4, 74, 2, 76, 0, 74, 18, 72, 0]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44 74 26 76 8 58 26 76 8 74 26 72 44 74 42 76 44 74 42 76 40 74 38 72 36 74 54 72 36 74 38 76 20 74 22 72 4 74 2 76 0 74 18 72 0"
 IsChanceNode() = False
@@ -1943,8 +2812,18 @@ StringLegalActions() = ["b5"]
 action: 74
 
 # State 87
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 @   .   .   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   O   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 @   .   .   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   O   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44, 74, 26, 76, 8, 58, 26, 76, 8, 74, 26, 72, 44, 74, 42, 76, 44, 74, 42, 76, 40, 74, 38, 72, 36, 74, 54, 72, 36, 74, 38, 76, 20, 74, 22, 72, 4, 74, 2, 76, 0, 74, 18, 72, 0, 74]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44 74 26 76 8 58 26 76 8 74 26 72 44 74 42 76 44 74 42 76 40 74 38 72 36 74 54 72 36 74 38 76 20 74 22 72 4 74 2 76 0 74 18 72 0 74"
 IsChanceNode() = False
@@ -1965,8 +2844,18 @@ StringLegalActions() = ["b1", "a2"]
 action: 18
 
 # State 88
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 @   .   .   . | .
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   O   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 @   .   .   . | . \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   O   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44, 74, 26, 76, 8, 58, 26, 76, 8, 74, 26, 72, 44, 74, 42, 76, 44, 74, 42, 76, 40, 74, 38, 72, 36, 74, 54, 72, 36, 74, 38, 76, 20, 74, 22, 72, 4, 74, 2, 76, 0, 74, 18, 72, 0, 74, 18]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44 74 26 76 8 58 26 76 8 74 26 72 44 74 42 76 44 74 42 76 40 74 38 72 36 74 54 72 36 74 38 76 20 74 22 72 4 74 2 76 0 74 18 72 0 74 18"
 IsChanceNode() = False
@@ -1987,8 +2876,18 @@ StringLegalActions() = ["a5", "c5"]
 action: 72
 
 # State 89
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 @   .   .   . | .
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 O   .   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 @   .   .   . | . \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 O   .   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44, 74, 26, 76, 8, 58, 26, 76, 8, 74, 26, 72, 44, 74, 42, 76, 44, 74, 42, 76, 40, 74, 38, 72, 36, 74, 54, 72, 36, 74, 38, 76, 20, 74, 22, 72, 4, 74, 2, 76, 0, 74, 18, 72, 0, 74, 18, 72]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44 74 26 76 8 58 26 76 8 74 26 72 44 74 42 76 44 74 42 76 40 74 38 72 36 74 54 72 36 74 38 76 20 74 22 72 4 74 2 76 0 74 18 72 0 74 18 72"
 IsChanceNode() = False
@@ -2009,8 +2908,18 @@ StringLegalActions() = ["a1", "b2", "a3"]
 action: 20
 
 # State 90
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   @   .   . | .
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 O   .   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   @   .   . | . \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 O   .   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44, 74, 26, 76, 8, 58, 26, 76, 8, 74, 26, 72, 44, 74, 42, 76, 44, 74, 42, 76, 40, 74, 38, 72, 36, 74, 54, 72, 36, 74, 38, 76, 20, 74, 22, 72, 4, 74, 2, 76, 0, 74, 18, 72, 0, 74, 18, 72, 20]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44 74 26 76 8 58 26 76 8 74 26 72 44 74 42 76 44 74 42 76 40 74 38 72 36 74 54 72 36 74 38 76 20 74 22 72 4 74 2 76 0 74 18 72 0 74 18 72 20"
 IsChanceNode() = False
@@ -2031,8 +2940,18 @@ StringLegalActions() = ["b5"]
 action: 74
 
 # State 91
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   @   .   . | .
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   O   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   @   .   . | . \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   O   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44, 74, 26, 76, 8, 58, 26, 76, 8, 74, 26, 72, 44, 74, 42, 76, 44, 74, 42, 76, 40, 74, 38, 72, 36, 74, 54, 72, 36, 74, 38, 76, 20, 74, 22, 72, 4, 74, 2, 76, 0, 74, 18, 72, 0, 74, 18, 72, 20, 74]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44 74 26 76 8 58 26 76 8 74 26 72 44 74 42 76 44 74 42 76 40 74 38 72 36 74 54 72 36 74 38 76 20 74 22 72 4 74 2 76 0 74 18 72 0 74 18 72 20 74"
 IsChanceNode() = False
@@ -2053,8 +2972,18 @@ StringLegalActions() = ["b1", "a2", "c2", "b3"]
 action: 18
 
 # State 92
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 @   .   .   . | .
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   O   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 @   .   .   . | . \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   O   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44, 74, 26, 76, 8, 58, 26, 76, 8, 74, 26, 72, 44, 74, 42, 76, 44, 74, 42, 76, 40, 74, 38, 72, 36, 74, 54, 72, 36, 74, 38, 76, 20, 74, 22, 72, 4, 74, 2, 76, 0, 74, 18, 72, 0, 74, 18, 72, 20, 74, 18]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44 74 26 76 8 58 26 76 8 74 26 72 44 74 42 76 44 74 42 76 40 74 38 72 36 74 54 72 36 74 38 76 20 74 22 72 4 74 2 76 0 74 18 72 0 74 18 72 20 74 18"
 IsChanceNode() = False
@@ -2075,8 +3004,18 @@ StringLegalActions() = ["a5", "c5"]
 action: 76
 
 # State 93
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 @   .   .   . | .
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   .   O | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 @   .   .   . | . \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   .   O | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44, 74, 26, 76, 8, 58, 26, 76, 8, 74, 26, 72, 44, 74, 42, 76, 44, 74, 42, 76, 40, 74, 38, 72, 36, 74, 54, 72, 36, 74, 38, 76, 20, 74, 22, 72, 4, 74, 2, 76, 0, 74, 18, 72, 0, 74, 18, 72, 20, 74, 18, 76]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44 74 26 76 8 58 26 76 8 74 26 72 44 74 42 76 44 74 42 76 40 74 38 72 36 74 54 72 36 74 38 76 20 74 22 72 4 74 2 76 0 74 18 72 0 74 18 72 20 74 18 76"
 IsChanceNode() = False
@@ -2097,8 +3036,18 @@ StringLegalActions() = ["a1", "b2", "a3"]
 action: 36
 
 # State 94
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 @   .   .   .   .
+#           ---+---
+#  4 .   .   . | . | .
+#   ---+---    +   +
+#  5 .   .   O | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 @   .   .   .   . \n          ---+---    \n 4 .   .   . | . | . \n  ---+---    +   +   \n 5 .   .   O | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44, 74, 26, 76, 8, 58, 26, 76, 8, 74, 26, 72, 44, 74, 42, 76, 44, 74, 42, 76, 40, 74, 38, 72, 36, 74, 54, 72, 36, 74, 38, 76, 20, 74, 22, 72, 4, 74, 2, 76, 0, 74, 18, 72, 0, 74, 18, 72, 20, 74, 18, 76, 36]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44 74 26 76 8 58 26 76 8 74 26 72 44 74 42 76 44 74 42 76 40 74 38 72 36 74 54 72 36 74 38 76 20 74 22 72 4 74 2 76 0 74 18 72 0 74 18 72 20 74 18 76 36"
 IsChanceNode() = False
@@ -2119,8 +3068,18 @@ StringLegalActions() = ["c4", "b5"]
 action: 58
 
 # State 95
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 @   .   .   .   .
+#           ---+---
+#  4 .   .   O | . | .
+#   ---+---    +   +
+#  5 .   .   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 @   .   .   .   . \n          ---+---    \n 4 .   .   O | . | . \n  ---+---    +   +   \n 5 .   .   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44, 74, 26, 76, 8, 58, 26, 76, 8, 74, 26, 72, 44, 74, 42, 76, 44, 74, 42, 76, 40, 74, 38, 72, 36, 74, 54, 72, 36, 74, 38, 76, 20, 74, 22, 72, 4, 74, 2, 76, 0, 74, 18, 72, 0, 74, 18, 72, 20, 74, 18, 76, 36, 58]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44 74 26 76 8 58 26 76 8 74 26 72 44 74 42 76 44 74 42 76 40 74 38 72 36 74 54 72 36 74 38 76 20 74 22 72 4 74 2 76 0 74 18 72 0 74 18 72 20 74 18 76 36 58"
 IsChanceNode() = False
@@ -2141,8 +3100,18 @@ StringLegalActions() = ["a2", "b3", "a4"]
 action: 54
 
 # State 96
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 @   .   O | . | .
+#   ---+---    +   +
+#  5 .   .   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 @   .   O | . | . \n  ---+---    +   +   \n 5 .   .   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44, 74, 26, 76, 8, 58, 26, 76, 8, 74, 26, 72, 44, 74, 42, 76, 44, 74, 42, 76, 40, 74, 38, 72, 36, 74, 54, 72, 36, 74, 38, 76, 20, 74, 22, 72, 4, 74, 2, 76, 0, 74, 18, 72, 0, 74, 18, 72, 20, 74, 18, 76, 36, 58, 54]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44 74 26 76 8 58 26 76 8 74 26 72 44 74 42 76 44 74 42 76 40 74 38 72 36 74 54 72 36 74 38 76 20 74 22 72 4 74 2 76 0 74 18 72 0 74 18 72 20 74 18 76 36 58 54"
 IsChanceNode() = False
@@ -2163,8 +3132,18 @@ StringLegalActions() = ["b4", "c5"]
 action: 56
 
 # State 97
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 .   .   .   .   .
+#           ---+---
+#  4 @   O   . | . | .
+#   ---+---    +   +
+#  5 .   .   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 .   .   .   .   . \n          ---+---    \n 4 @   O   . | . | . \n  ---+---    +   +   \n 5 .   .   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44, 74, 26, 76, 8, 58, 26, 76, 8, 74, 26, 72, 44, 74, 42, 76, 44, 74, 42, 76, 40, 74, 38, 72, 36, 74, 54, 72, 36, 74, 38, 76, 20, 74, 22, 72, 4, 74, 2, 76, 0, 74, 18, 72, 0, 74, 18, 72, 20, 74, 18, 76, 36, 58, 54, 56]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44 74 26 76 8 58 26 76 8 74 26 72 44 74 42 76 44 74 42 76 40 74 38 72 36 74 54 72 36 74 38 76 20 74 22 72 4 74 2 76 0 74 18 72 0 74 18 72 20 74 18 76 36 58 54 56"
 IsChanceNode() = False
@@ -2185,8 +3164,18 @@ StringLegalActions() = ["a3", "c4"]
 action: 36
 
 # State 98
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 @   .   .   .   .
+#           ---+---
+#  4 .   O   . | . | .
+#   ---+---    +   +
+#  5 .   .   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 @   .   .   .   . \n          ---+---    \n 4 .   O   . | . | . \n  ---+---    +   +   \n 5 .   .   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44, 74, 26, 76, 8, 58, 26, 76, 8, 74, 26, 72, 44, 74, 42, 76, 44, 74, 42, 76, 40, 74, 38, 72, 36, 74, 54, 72, 36, 74, 38, 76, 20, 74, 22, 72, 4, 74, 2, 76, 0, 74, 18, 72, 0, 74, 18, 72, 20, 74, 18, 76, 36, 58, 54, 56, 36]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44 74 26 76 8 58 26 76 8 74 26 72 44 74 42 76 44 74 42 76 40 74 38 72 36 74 54 72 36 74 38 76 20 74 22 72 4 74 2 76 0 74 18 72 0 74 18 72 20 74 18 76 36 58 54 56 36"
 IsChanceNode() = False
@@ -2207,8 +3196,18 @@ StringLegalActions() = ["b3", "a4", "c4"]
 action: 58
 
 # State 99
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 @   .   .   .   .
+#           ---+---
+#  4 .   .   O | . | .
+#   ---+---    +   +
+#  5 .   .   . | . | .
 IsTerminal() = False
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 @   .   .   .   . \n          ---+---    \n 4 .   .   O | . | . \n  ---+---    +   +   \n 5 .   .   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44, 74, 26, 76, 8, 58, 26, 76, 8, 74, 26, 72, 44, 74, 42, 76, 44, 74, 42, 76, 40, 74, 38, 72, 36, 74, 54, 72, 36, 74, 38, 76, 20, 74, 22, 72, 4, 74, 2, 76, 0, 74, 18, 72, 0, 74, 18, 72, 20, 74, 18, 76, 36, 58, 54, 56, 36, 58]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44 74 26 76 8 58 26 76 8 74 26 72 44 74 42 76 44 74 42 76 40 74 38 72 36 74 54 72 36 74 38 76 20 74 22 72 4 74 2 76 0 74 18 72 0 74 18 72 20 74 18 76 36 58 54 56 36 58"
 IsChanceNode() = False
@@ -2229,8 +3228,18 @@ StringLegalActions() = ["a2", "b3", "a4"]
 action: 38
 
 # State 100
+# Board size: 5, walls: 0, 0
+#    a   b   c   d   e
+#  1 .   .   .   . | .
+#                  +
+#  2 .   .   .   . | .
+#           ---+---
+#  3 .   @   .   .   .
+#           ---+---
+#  4 .   .   O | . | .
+#   ---+---    +   +
+#  5 .   .   . | . | .
 IsTerminal() = True
-ToString() = "Board size: 5, walls: 0, 0\n   a   b   c   d   e\n 1 .   .   .   . | . \n                 +   \n 2 .   .   .   . | . \n          ---+---    \n 3 .   @   .   .   . \n          ---+---    \n 4 .   .   O | . | . \n  ---+---    +   +   \n 5 .   .   . | . | . \n"
 History() = [63, 59, 7, 49, 61, 31, 74, 2, 76, 0, 58, 2, 76, 4, 58, 2, 76, 0, 74, 18, 72, 20, 74, 22, 72, 24, 74, 22, 76, 20, 74, 38, 72, 40, 74, 42, 76, 44, 74, 62, 72, 44, 74, 26, 76, 8, 58, 26, 76, 8, 74, 26, 72, 44, 74, 42, 76, 44, 74, 42, 76, 40, 74, 38, 72, 36, 74, 54, 72, 36, 74, 38, 76, 20, 74, 22, 72, 4, 74, 2, 76, 0, 74, 18, 72, 0, 74, 18, 72, 20, 74, 18, 76, 36, 58, 54, 56, 36, 58, 38]
 HistoryString() = "63 59 7 49 61 31 74 2 76 0 58 2 76 4 58 2 76 0 74 18 72 20 74 22 72 24 74 22 76 20 74 38 72 40 74 42 76 44 74 62 72 44 74 26 76 8 58 26 76 8 74 26 72 44 74 42 76 44 74 42 76 40 74 38 72 36 74 54 72 36 74 38 76 20 74 22 72 4 74 2 76 0 74 18 72 0 74 18 72 20 74 18 76 36 58 54 56 36 58 38"
 IsChanceNode() = False

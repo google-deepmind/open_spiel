@@ -61,7 +61,11 @@ void ValidateParams(const GameParameters& params,
           ". Available parameters are: ", ListValidParameters(param_spec)));
     }
     if (it->second.type() != param.second.type()) {
-      SpielFatalError(absl::StrCat("Wrong type for parameter ", param.first));
+      SpielFatalError(absl::StrCat(
+          "Wrong type for parameter ", param.first,
+          ". Expected type: ", GameParameterTypeToString(it->second.type()),
+          ", got ", GameParameterTypeToString(param.second.type()), " with ",
+          param.second.ToString()));
     }
   }
   // Check we aren't missing any mandatory parameters.

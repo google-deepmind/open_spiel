@@ -1,5 +1,4 @@
 game: oware
-seed: 1875058860
 
 GameType.chance_mode = ChanceMode.DETERMINISTIC
 GameType.dynamics = Dynamics.SEQUENTIAL
@@ -29,8 +28,13 @@ MaxGameLength() = 1000
 ToString() = "oware()"
 
 # State 0
+# Player 1 score = 0
+#   f  e  d  c  b  a
+#   4  4  4  4  4  4
+#   4  4  4  4  4  4
+#   A  B  C  D  E  F
+# Player 0 score = 0 [PLAYING]
 IsTerminal() = False
-ToString() = "Player 1 score = 0\n  f  e  d  c  b  a\n  4  4  4  4  4  4\n  4  4  4  4  4  4\n  A  B  C  D  E  F\nPlayer 0 score = 0 [PLAYING]\n"
 History() = []
 HistoryString() = ""
 IsChanceNode() = False
@@ -49,8 +53,13 @@ StringLegalActions() = ["A", "B", "C", "D", "E", "F"]
 action: 2
 
 # State 1
+# Player 1 score = 0 [PLAYING]
+#   f  e  d  c  b  a
+#   4  4  4  4  4  5
+#   4  4  0  5  5  5
+#   A  B  C  D  E  F
+# Player 0 score = 0
 IsTerminal() = False
-ToString() = "Player 1 score = 0 [PLAYING]\n  f  e  d  c  b  a\n  4  4  4  4  4  5\n  4  4  0  5  5  5\n  A  B  C  D  E  F\nPlayer 0 score = 0\n"
 History() = [2]
 HistoryString() = "2"
 IsChanceNode() = False
@@ -69,8 +78,13 @@ StringLegalActions() = ["a", "b", "c", "d", "e", "f"]
 action: 5
 
 # State 2
+# Player 1 score = 0
+#   f  e  d  c  b  a
+#   0  4  4  4  4  5
+#   5  5  1  6  5  5
+#   A  B  C  D  E  F
+# Player 0 score = 0 [PLAYING]
 IsTerminal() = False
-ToString() = "Player 1 score = 0\n  f  e  d  c  b  a\n  0  4  4  4  4  5\n  5  5  1  6  5  5\n  A  B  C  D  E  F\nPlayer 0 score = 0 [PLAYING]\n"
 History() = [2, 5]
 HistoryString() = "2 5"
 IsChanceNode() = False
@@ -89,8 +103,13 @@ StringLegalActions() = ["A", "B", "C", "D", "E", "F"]
 action: 2
 
 # State 3
+# Player 1 score = 0 [PLAYING]
+#   f  e  d  c  b  a
+#   0  4  4  4  4  5
+#   5  5  0  7  5  5
+#   A  B  C  D  E  F
+# Player 0 score = 0
 IsTerminal() = False
-ToString() = "Player 1 score = 0 [PLAYING]\n  f  e  d  c  b  a\n  0  4  4  4  4  5\n  5  5  0  7  5  5\n  A  B  C  D  E  F\nPlayer 0 score = 0\n"
 History() = [2, 5, 2]
 HistoryString() = "2 5 2"
 IsChanceNode() = False
@@ -109,8 +128,13 @@ StringLegalActions() = ["a", "b", "c", "d", "e"]
 action: 1
 
 # State 4
+# Player 1 score = 0
+#   f  e  d  c  b  a
+#   1  5  5  5  0  5
+#   5  5  0  7  5  5
+#   A  B  C  D  E  F
+# Player 0 score = 0 [PLAYING]
 IsTerminal() = False
-ToString() = "Player 1 score = 0\n  f  e  d  c  b  a\n  1  5  5  5  0  5\n  5  5  0  7  5  5\n  A  B  C  D  E  F\nPlayer 0 score = 0 [PLAYING]\n"
 History() = [2, 5, 2, 1]
 HistoryString() = "2 5 2 1"
 IsChanceNode() = False
@@ -129,8 +153,13 @@ StringLegalActions() = ["A", "B", "D", "E", "F"]
 action: 1
 
 # State 5
+# Player 1 score = 0 [PLAYING]
+#   f  e  d  c  b  a
+#   1  5  5  5  0  6
+#   5  0  1  8  6  6
+#   A  B  C  D  E  F
+# Player 0 score = 0
 IsTerminal() = False
-ToString() = "Player 1 score = 0 [PLAYING]\n  f  e  d  c  b  a\n  1  5  5  5  0  6\n  5  0  1  8  6  6\n  A  B  C  D  E  F\nPlayer 0 score = 0\n"
 History() = [2, 5, 2, 1, 1]
 HistoryString() = "2 5 2 1 1"
 IsChanceNode() = False
@@ -149,8 +178,13 @@ StringLegalActions() = ["a", "c", "d", "e", "f"]
 action: 2
 
 # State 6
+# Player 1 score = 0
+#   f  e  d  c  b  a
+#   2  6  6  0  0  6
+#   6  1  1  8  6  6
+#   A  B  C  D  E  F
+# Player 0 score = 0 [PLAYING]
 IsTerminal() = False
-ToString() = "Player 1 score = 0\n  f  e  d  c  b  a\n  2  6  6  0  0  6\n  6  1  1  8  6  6\n  A  B  C  D  E  F\nPlayer 0 score = 0 [PLAYING]\n"
 History() = [2, 5, 2, 1, 1, 2]
 HistoryString() = "2 5 2 1 1 2"
 IsChanceNode() = False
@@ -169,8 +203,13 @@ StringLegalActions() = ["A", "B", "C", "D", "E", "F"]
 action: 2
 
 # State 7
+# Player 1 score = 0 [PLAYING]
+#   f  e  d  c  b  a
+#   2  6  6  0  0  6
+#   6  1  0  9  6  6
+#   A  B  C  D  E  F
+# Player 0 score = 0
 IsTerminal() = False
-ToString() = "Player 1 score = 0 [PLAYING]\n  f  e  d  c  b  a\n  2  6  6  0  0  6\n  6  1  0  9  6  6\n  A  B  C  D  E  F\nPlayer 0 score = 0\n"
 History() = [2, 5, 2, 1, 1, 2, 2]
 HistoryString() = "2 5 2 1 1 2 2"
 IsChanceNode() = False
@@ -189,8 +228,13 @@ StringLegalActions() = ["a", "d", "e", "f"]
 action: 3
 
 # State 8
+# Player 1 score = 0
+#   f  e  d  c  b  a
+#   3  7  0  0  0  6
+#   7  2  1 10  6  6
+#   A  B  C  D  E  F
+# Player 0 score = 0 [PLAYING]
 IsTerminal() = False
-ToString() = "Player 1 score = 0\n  f  e  d  c  b  a\n  3  7  0  0  0  6\n  7  2  1 10  6  6\n  A  B  C  D  E  F\nPlayer 0 score = 0 [PLAYING]\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3]
 HistoryString() = "2 5 2 1 1 2 2 3"
 IsChanceNode() = False
@@ -209,8 +253,13 @@ StringLegalActions() = ["A", "B", "C", "D", "E", "F"]
 action: 5
 
 # State 9
+# Player 1 score = 0 [PLAYING]
+#   f  e  d  c  b  a
+#   4  8  1  1  1  7
+#   7  2  1 10  6  0
+#   A  B  C  D  E  F
+# Player 0 score = 0
 IsTerminal() = False
-ToString() = "Player 1 score = 0 [PLAYING]\n  f  e  d  c  b  a\n  4  8  1  1  1  7\n  7  2  1 10  6  0\n  A  B  C  D  E  F\nPlayer 0 score = 0\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5]
 HistoryString() = "2 5 2 1 1 2 2 3 5"
 IsChanceNode() = False
@@ -229,8 +278,13 @@ StringLegalActions() = ["a", "b", "c", "d", "e", "f"]
 action: 4
 
 # State 10
+# Player 1 score = 0
+#   f  e  d  c  b  a
+#   5  0  1  1  1  8
+#   8  3  2 11  7  1
+#   A  B  C  D  E  F
+# Player 0 score = 0 [PLAYING]
 IsTerminal() = False
-ToString() = "Player 1 score = 0\n  f  e  d  c  b  a\n  5  0  1  1  1  8\n  8  3  2 11  7  1\n  A  B  C  D  E  F\nPlayer 0 score = 0 [PLAYING]\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4"
 IsChanceNode() = False
@@ -249,8 +303,13 @@ StringLegalActions() = ["A", "B", "C", "D", "E", "F"]
 action: 2
 
 # State 11
+# Player 1 score = 0 [PLAYING]
+#   f  e  d  c  b  a
+#   5  0  1  1  1  8
+#   8  3  0 12  8  1
+#   A  B  C  D  E  F
+# Player 0 score = 0
 IsTerminal() = False
-ToString() = "Player 1 score = 0 [PLAYING]\n  f  e  d  c  b  a\n  5  0  1  1  1  8\n  8  3  0 12  8  1\n  A  B  C  D  E  F\nPlayer 0 score = 0\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2"
 IsChanceNode() = False
@@ -269,8 +328,13 @@ StringLegalActions() = ["a", "b", "c", "d", "f"]
 action: 3
 
 # State 12
+# Player 1 score = 0
+#   f  e  d  c  b  a
+#   5  1  0  1  1  8
+#   8  3  0 12  8  1
+#   A  B  C  D  E  F
+# Player 0 score = 0 [PLAYING]
 IsTerminal() = False
-ToString() = "Player 1 score = 0\n  f  e  d  c  b  a\n  5  1  0  1  1  8\n  8  3  0 12  8  1\n  A  B  C  D  E  F\nPlayer 0 score = 0 [PLAYING]\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3"
 IsChanceNode() = False
@@ -289,8 +353,13 @@ StringLegalActions() = ["A", "B", "D", "E", "F"]
 action: 3
 
 # State 13
+# Player 1 score = 0 [PLAYING]
+#   f  e  d  c  b  a
+#   6  2  1  2  2  9
+#   9  4  1  0 10  2
+#   A  B  C  D  E  F
+# Player 0 score = 0
 IsTerminal() = False
-ToString() = "Player 1 score = 0 [PLAYING]\n  f  e  d  c  b  a\n  6  2  1  2  2  9\n  9  4  1  0 10  2\n  A  B  C  D  E  F\nPlayer 0 score = 0\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3"
 IsChanceNode() = False
@@ -309,8 +378,13 @@ StringLegalActions() = ["a", "b", "c", "d", "e", "f"]
 action: 4
 
 # State 14
+# Player 1 score = 0
+#   f  e  d  c  b  a
+#   7  0  1  2  2  9
+#  10  4  1  0 10  2
+#   A  B  C  D  E  F
+# Player 0 score = 0 [PLAYING]
 IsTerminal() = False
-ToString() = "Player 1 score = 0\n  f  e  d  c  b  a\n  7  0  1  2  2  9\n 10  4  1  0 10  2\n  A  B  C  D  E  F\nPlayer 0 score = 0 [PLAYING]\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4"
 IsChanceNode() = False
@@ -329,8 +403,13 @@ StringLegalActions() = ["A", "B", "C", "E", "F"]
 action: 0
 
 # State 15
+# Player 1 score = 0 [PLAYING]
+#   f  e  d  c  b  a
+#   7  1  2  3  3 10
+#   0  5  2  1 11  3
+#   A  B  C  D  E  F
+# Player 0 score = 0
 IsTerminal() = False
-ToString() = "Player 1 score = 0 [PLAYING]\n  f  e  d  c  b  a\n  7  1  2  3  3 10\n  0  5  2  1 11  3\n  A  B  C  D  E  F\nPlayer 0 score = 0\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0"
 IsChanceNode() = False
@@ -349,8 +428,13 @@ StringLegalActions() = ["a", "b", "c", "d", "e", "f"]
 action: 1
 
 # State 16
+# Player 1 score = 0
+#   f  e  d  c  b  a
+#   7  2  3  4  0 10
+#   0  5  2  1 11  3
+#   A  B  C  D  E  F
+# Player 0 score = 0 [PLAYING]
 IsTerminal() = False
-ToString() = "Player 1 score = 0\n  f  e  d  c  b  a\n  7  2  3  4  0 10\n  0  5  2  1 11  3\n  A  B  C  D  E  F\nPlayer 0 score = 0 [PLAYING]\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1"
 IsChanceNode() = False
@@ -369,8 +453,13 @@ StringLegalActions() = ["B", "C", "D", "E", "F"]
 action: 3
 
 # State 17
+# Player 1 score = 0 [PLAYING]
+#   f  e  d  c  b  a
+#   7  2  3  4  0 10
+#   0  5  2  0 12  3
+#   A  B  C  D  E  F
+# Player 0 score = 0
 IsTerminal() = False
-ToString() = "Player 1 score = 0 [PLAYING]\n  f  e  d  c  b  a\n  7  2  3  4  0 10\n  0  5  2  0 12  3\n  A  B  C  D  E  F\nPlayer 0 score = 0\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3"
 IsChanceNode() = False
@@ -389,8 +478,13 @@ StringLegalActions() = ["a", "c", "d", "e", "f"]
 action: 0
 
 # State 18
+# Player 1 score = 0
+#   f  e  d  c  b  a
+#   8  3  4  5  1  0
+#   1  6  3  1 13  3
+#   A  B  C  D  E  F
+# Player 0 score = 0 [PLAYING]
 IsTerminal() = False
-ToString() = "Player 1 score = 0\n  f  e  d  c  b  a\n  8  3  4  5  1  0\n  1  6  3  1 13  3\n  A  B  C  D  E  F\nPlayer 0 score = 0 [PLAYING]\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0"
 IsChanceNode() = False
@@ -409,8 +503,13 @@ StringLegalActions() = ["A", "B", "C", "D", "E", "F"]
 action: 2
 
 # State 19
+# Player 1 score = 0 [PLAYING]
+#   f  e  d  c  b  a
+#   8  3  4  5  1  0
+#   1  6  0  2 14  4
+#   A  B  C  D  E  F
+# Player 0 score = 0
 IsTerminal() = False
-ToString() = "Player 1 score = 0 [PLAYING]\n  f  e  d  c  b  a\n  8  3  4  5  1  0\n  1  6  0  2 14  4\n  A  B  C  D  E  F\nPlayer 0 score = 0\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2"
 IsChanceNode() = False
@@ -429,8 +528,13 @@ StringLegalActions() = ["b", "c", "d", "e", "f"]
 action: 2
 
 # State 20
+# Player 1 score = 0
+#   f  e  d  c  b  a
+#   9  4  5  0  1  0
+#   2  7  0  2 14  4
+#   A  B  C  D  E  F
+# Player 0 score = 0 [PLAYING]
 IsTerminal() = False
-ToString() = "Player 1 score = 0\n  f  e  d  c  b  a\n  9  4  5  0  1  0\n  2  7  0  2 14  4\n  A  B  C  D  E  F\nPlayer 0 score = 0 [PLAYING]\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2"
 IsChanceNode() = False
@@ -449,8 +553,13 @@ StringLegalActions() = ["A", "B", "D", "E", "F"]
 action: 4
 
 # State 21
+# Player 1 score = 0 [PLAYING]
+#   f  e  d  c  b  a
+#  10  5  6  1  0  0
+#   3  8  1  3  0  6
+#   A  B  C  D  E  F
+# Player 0 score = 5
 IsTerminal() = False
-ToString() = "Player 1 score = 0 [PLAYING]\n  f  e  d  c  b  a\n 10  5  6  1  0  0\n  3  8  1  3  0  6\n  A  B  C  D  E  F\nPlayer 0 score = 5\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4"
 IsChanceNode() = False
@@ -469,8 +578,13 @@ StringLegalActions() = ["c", "d", "e", "f"]
 action: 2
 
 # State 22
+# Player 1 score = 0
+#   f  e  d  c  b  a
+#  10  5  7  0  0  0
+#   3  8  1  3  0  6
+#   A  B  C  D  E  F
+# Player 0 score = 5 [PLAYING]
 IsTerminal() = False
-ToString() = "Player 1 score = 0\n  f  e  d  c  b  a\n 10  5  7  0  0  0\n  3  8  1  3  0  6\n  A  B  C  D  E  F\nPlayer 0 score = 5 [PLAYING]\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2"
 IsChanceNode() = False
@@ -489,8 +603,13 @@ StringLegalActions() = ["A", "B", "C", "D", "F"]
 action: 2
 
 # State 23
+# Player 1 score = 0 [PLAYING]
+#   f  e  d  c  b  a
+#  10  5  7  0  0  0
+#   3  8  0  4  0  6
+#   A  B  C  D  E  F
+# Player 0 score = 5
 IsTerminal() = False
-ToString() = "Player 1 score = 0 [PLAYING]\n  f  e  d  c  b  a\n 10  5  7  0  0  0\n  3  8  0  4  0  6\n  A  B  C  D  E  F\nPlayer 0 score = 5\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2"
 IsChanceNode() = False
@@ -509,8 +628,13 @@ StringLegalActions() = ["d", "e", "f"]
 action: 4
 
 # State 24
+# Player 1 score = 0
+#   f  e  d  c  b  a
+#  11  0  7  0  0  0
+#   4  9  1  5  0  6
+#   A  B  C  D  E  F
+# Player 0 score = 5 [PLAYING]
 IsTerminal() = False
-ToString() = "Player 1 score = 0\n  f  e  d  c  b  a\n 11  0  7  0  0  0\n  4  9  1  5  0  6\n  A  B  C  D  E  F\nPlayer 0 score = 5 [PLAYING]\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4"
 IsChanceNode() = False
@@ -529,8 +653,13 @@ StringLegalActions() = ["A", "B", "C", "D", "F"]
 action: 3
 
 # State 25
+# Player 1 score = 0 [PLAYING]
+#   f  e  d  c  b  a
+#  11  0  7  1  1  1
+#   4  9  1  0  1  7
+#   A  B  C  D  E  F
+# Player 0 score = 5
 IsTerminal() = False
-ToString() = "Player 1 score = 0 [PLAYING]\n  f  e  d  c  b  a\n 11  0  7  1  1  1\n  4  9  1  0  1  7\n  A  B  C  D  E  F\nPlayer 0 score = 5\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3"
 IsChanceNode() = False
@@ -549,8 +678,13 @@ StringLegalActions() = ["a", "b", "c", "d", "f"]
 action: 3
 
 # State 26
+# Player 1 score = 2
+#   f  e  d  c  b  a
+#  12  1  0  1  1  1
+#   5 10  2  1  0  7
+#   A  B  C  D  E  F
+# Player 0 score = 5 [PLAYING]
 IsTerminal() = False
-ToString() = "Player 1 score = 2\n  f  e  d  c  b  a\n 12  1  0  1  1  1\n  5 10  2  1  0  7\n  A  B  C  D  E  F\nPlayer 0 score = 5 [PLAYING]\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3"
 IsChanceNode() = False
@@ -569,8 +703,13 @@ StringLegalActions() = ["A", "B", "C", "D", "F"]
 action: 0
 
 # State 27
+# Player 1 score = 2 [PLAYING]
+#   f  e  d  c  b  a
+#  12  1  0  1  1  1
+#   0 11  3  2  1  8
+#   A  B  C  D  E  F
+# Player 0 score = 5
 IsTerminal() = False
-ToString() = "Player 1 score = 2 [PLAYING]\n  f  e  d  c  b  a\n 12  1  0  1  1  1\n  0 11  3  2  1  8\n  A  B  C  D  E  F\nPlayer 0 score = 5\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0"
 IsChanceNode() = False
@@ -589,8 +728,13 @@ StringLegalActions() = ["a", "b", "c", "e", "f"]
 action: 4
 
 # State 28
+# Player 1 score = 2
+#   f  e  d  c  b  a
+#  13  0  0  1  1  1
+#   0 11  3  2  1  8
+#   A  B  C  D  E  F
+# Player 0 score = 5 [PLAYING]
 IsTerminal() = False
-ToString() = "Player 1 score = 2\n  f  e  d  c  b  a\n 13  0  0  1  1  1\n  0 11  3  2  1  8\n  A  B  C  D  E  F\nPlayer 0 score = 5 [PLAYING]\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4"
 IsChanceNode() = False
@@ -609,8 +753,13 @@ StringLegalActions() = ["B", "C", "D", "E", "F"]
 action: 5
 
 # State 29
+# Player 1 score = 2 [PLAYING]
+#   f  e  d  c  b  a
+#  14  1  1  2  2  2
+#   1 12  3  2  1  0
+#   A  B  C  D  E  F
+# Player 0 score = 5
 IsTerminal() = False
-ToString() = "Player 1 score = 2 [PLAYING]\n  f  e  d  c  b  a\n 14  1  1  2  2  2\n  1 12  3  2  1  0\n  A  B  C  D  E  F\nPlayer 0 score = 5\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5"
 IsChanceNode() = False
@@ -629,8 +778,13 @@ StringLegalActions() = ["a", "b", "c", "d", "e", "f"]
 action: 1
 
 # State 30
+# Player 1 score = 2
+#   f  e  d  c  b  a
+#  14  1  2  3  0  2
+#   1 12  3  2  1  0
+#   A  B  C  D  E  F
+# Player 0 score = 5 [PLAYING]
 IsTerminal() = False
-ToString() = "Player 1 score = 2\n  f  e  d  c  b  a\n 14  1  2  3  0  2\n  1 12  3  2  1  0\n  A  B  C  D  E  F\nPlayer 0 score = 5 [PLAYING]\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1"
 IsChanceNode() = False
@@ -649,8 +803,13 @@ StringLegalActions() = ["A", "B", "C", "D", "E"]
 action: 0
 
 # State 31
+# Player 1 score = 2 [PLAYING]
+#   f  e  d  c  b  a
+#  14  1  2  3  0  2
+#   0 13  3  2  1  0
+#   A  B  C  D  E  F
+# Player 0 score = 5
 IsTerminal() = False
-ToString() = "Player 1 score = 2 [PLAYING]\n  f  e  d  c  b  a\n 14  1  2  3  0  2\n  0 13  3  2  1  0\n  A  B  C  D  E  F\nPlayer 0 score = 5\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0"
 IsChanceNode() = False
@@ -669,8 +828,13 @@ StringLegalActions() = ["a", "c", "d", "e", "f"]
 action: 4
 
 # State 32
+# Player 1 score = 2
+#   f  e  d  c  b  a
+#  15  0  2  3  0  2
+#   0 13  3  2  1  0
+#   A  B  C  D  E  F
+# Player 0 score = 5 [PLAYING]
 IsTerminal() = False
-ToString() = "Player 1 score = 2\n  f  e  d  c  b  a\n 15  0  2  3  0  2\n  0 13  3  2  1  0\n  A  B  C  D  E  F\nPlayer 0 score = 5 [PLAYING]\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4"
 IsChanceNode() = False
@@ -689,8 +853,13 @@ StringLegalActions() = ["B", "C", "D", "E"]
 action: 4
 
 # State 33
+# Player 1 score = 2 [PLAYING]
+#   f  e  d  c  b  a
+#  15  0  2  3  0  2
+#   0 13  3  2  0  1
+#   A  B  C  D  E  F
+# Player 0 score = 5
 IsTerminal() = False
-ToString() = "Player 1 score = 2 [PLAYING]\n  f  e  d  c  b  a\n 15  0  2  3  0  2\n  0 13  3  2  0  1\n  A  B  C  D  E  F\nPlayer 0 score = 5\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4"
 IsChanceNode() = False
@@ -709,8 +878,13 @@ StringLegalActions() = ["a", "c", "d", "f"]
 action: 0
 
 # State 34
+# Player 1 score = 2
+#   f  e  d  c  b  a
+#  15  0  2  4  1  0
+#   0 13  3  2  0  1
+#   A  B  C  D  E  F
+# Player 0 score = 5 [PLAYING]
 IsTerminal() = False
-ToString() = "Player 1 score = 2\n  f  e  d  c  b  a\n 15  0  2  4  1  0\n  0 13  3  2  0  1\n  A  B  C  D  E  F\nPlayer 0 score = 5 [PLAYING]\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0"
 IsChanceNode() = False
@@ -729,8 +903,13 @@ StringLegalActions() = ["B", "C", "D", "F"]
 action: 5
 
 # State 35
+# Player 1 score = 2 [PLAYING]
+#   f  e  d  c  b  a
+#  15  0  2  4  1  1
+#   0 13  3  2  0  0
+#   A  B  C  D  E  F
+# Player 0 score = 5
 IsTerminal() = False
-ToString() = "Player 1 score = 2 [PLAYING]\n  f  e  d  c  b  a\n 15  0  2  4  1  1\n  0 13  3  2  0  0\n  A  B  C  D  E  F\nPlayer 0 score = 5\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5"
 IsChanceNode() = False
@@ -749,8 +928,13 @@ StringLegalActions() = ["a", "b", "c", "d", "f"]
 action: 1
 
 # State 36
+# Player 1 score = 2
+#   f  e  d  c  b  a
+#  15  0  2  5  0  1
+#   0 13  3  2  0  0
+#   A  B  C  D  E  F
+# Player 0 score = 5 [PLAYING]
 IsTerminal() = False
-ToString() = "Player 1 score = 2\n  f  e  d  c  b  a\n 15  0  2  5  0  1\n  0 13  3  2  0  0\n  A  B  C  D  E  F\nPlayer 0 score = 5 [PLAYING]\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1"
 IsChanceNode() = False
@@ -769,8 +953,13 @@ StringLegalActions() = ["B", "C", "D"]
 action: 1
 
 # State 37
+# Player 1 score = 2 [PLAYING]
+#   f  e  d  c  b  a
+#  16  1  3  6  1  2
+#   1  0  5  4  1  1
+#   A  B  C  D  E  F
+# Player 0 score = 5
 IsTerminal() = False
-ToString() = "Player 1 score = 2 [PLAYING]\n  f  e  d  c  b  a\n 16  1  3  6  1  2\n  1  0  5  4  1  1\n  A  B  C  D  E  F\nPlayer 0 score = 5\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1"
 IsChanceNode() = False
@@ -789,8 +978,13 @@ StringLegalActions() = ["a", "b", "c", "d", "e", "f"]
 action: 4
 
 # State 38
+# Player 1 score = 2
+#   f  e  d  c  b  a
+#  17  0  3  6  1  2
+#   1  0  5  4  1  1
+#   A  B  C  D  E  F
+# Player 0 score = 5 [PLAYING]
 IsTerminal() = False
-ToString() = "Player 1 score = 2\n  f  e  d  c  b  a\n 17  0  3  6  1  2\n  1  0  5  4  1  1\n  A  B  C  D  E  F\nPlayer 0 score = 5 [PLAYING]\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4"
 IsChanceNode() = False
@@ -809,8 +1003,13 @@ StringLegalActions() = ["A", "C", "D", "E", "F"]
 action: 0
 
 # State 39
+# Player 1 score = 2 [PLAYING]
+#   f  e  d  c  b  a
+#  17  0  3  6  1  2
+#   0  1  5  4  1  1
+#   A  B  C  D  E  F
+# Player 0 score = 5
 IsTerminal() = False
-ToString() = "Player 1 score = 2 [PLAYING]\n  f  e  d  c  b  a\n 17  0  3  6  1  2\n  0  1  5  4  1  1\n  A  B  C  D  E  F\nPlayer 0 score = 5\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0"
 IsChanceNode() = False
@@ -829,8 +1028,13 @@ StringLegalActions() = ["a", "b", "c", "d", "f"]
 action: 3
 
 # State 40
+# Player 1 score = 2
+#   f  e  d  c  b  a
+#  18  1  0  6  1  2
+#   1  1  5  4  1  1
+#   A  B  C  D  E  F
+# Player 0 score = 5 [PLAYING]
 IsTerminal() = False
-ToString() = "Player 1 score = 2\n  f  e  d  c  b  a\n 18  1  0  6  1  2\n  1  1  5  4  1  1\n  A  B  C  D  E  F\nPlayer 0 score = 5 [PLAYING]\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3"
 IsChanceNode() = False
@@ -849,8 +1053,13 @@ StringLegalActions() = ["A", "B", "C", "D", "E", "F"]
 action: 3
 
 # State 41
+# Player 1 score = 2 [PLAYING]
+#   f  e  d  c  b  a
+#  18  1  0  6  0  0
+#   1  1  5  0  2  2
+#   A  B  C  D  E  F
+# Player 0 score = 10
 IsTerminal() = False
-ToString() = "Player 1 score = 2 [PLAYING]\n  f  e  d  c  b  a\n 18  1  0  6  0  0\n  1  1  5  0  2  2\n  A  B  C  D  E  F\nPlayer 0 score = 10\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3"
 IsChanceNode() = False
@@ -869,8 +1078,13 @@ StringLegalActions() = ["c", "e", "f"]
 action: 4
 
 # State 42
+# Player 1 score = 2
+#   f  e  d  c  b  a
+#  19  0  0  6  0  0
+#   1  1  5  0  2  2
+#   A  B  C  D  E  F
+# Player 0 score = 10 [PLAYING]
 IsTerminal() = False
-ToString() = "Player 1 score = 2\n  f  e  d  c  b  a\n 19  0  0  6  0  0\n  1  1  5  0  2  2\n  A  B  C  D  E  F\nPlayer 0 score = 10 [PLAYING]\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4"
 IsChanceNode() = False
@@ -889,8 +1103,13 @@ StringLegalActions() = ["A", "B", "C", "E", "F"]
 action: 1
 
 # State 43
+# Player 1 score = 2 [PLAYING]
+#   f  e  d  c  b  a
+#  19  0  0  6  0  0
+#   1  0  6  0  2  2
+#   A  B  C  D  E  F
+# Player 0 score = 10
 IsTerminal() = False
-ToString() = "Player 1 score = 2 [PLAYING]\n  f  e  d  c  b  a\n 19  0  0  6  0  0\n  1  0  6  0  2  2\n  A  B  C  D  E  F\nPlayer 0 score = 10\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1"
 IsChanceNode() = False
@@ -909,8 +1128,13 @@ StringLegalActions() = ["c", "f"]
 action: 5
 
 # State 44
+# Player 1 score = 2
+#   f  e  d  c  b  a
+#   0  1  1  7  2  2
+#   3  2  8  2  4  4
+#   A  B  C  D  E  F
+# Player 0 score = 10 [PLAYING]
 IsTerminal() = False
-ToString() = "Player 1 score = 2\n  f  e  d  c  b  a\n  0  1  1  7  2  2\n  3  2  8  2  4  4\n  A  B  C  D  E  F\nPlayer 0 score = 10 [PLAYING]\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5"
 IsChanceNode() = False
@@ -929,8 +1153,13 @@ StringLegalActions() = ["A", "B", "C", "D", "E", "F"]
 action: 3
 
 # State 45
+# Player 1 score = 2 [PLAYING]
+#   f  e  d  c  b  a
+#   0  1  1  7  2  2
+#   3  2  8  0  5  5
+#   A  B  C  D  E  F
+# Player 0 score = 10
 IsTerminal() = False
-ToString() = "Player 1 score = 2 [PLAYING]\n  f  e  d  c  b  a\n  0  1  1  7  2  2\n  3  2  8  0  5  5\n  A  B  C  D  E  F\nPlayer 0 score = 10\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3"
 IsChanceNode() = False
@@ -949,8 +1178,13 @@ StringLegalActions() = ["a", "b", "c", "d", "e"]
 action: 2
 
 # State 46
+# Player 1 score = 2
+#   f  e  d  c  b  a
+#   1  2  2  0  2  2
+#   4  3  9  1  5  5
+#   A  B  C  D  E  F
+# Player 0 score = 10 [PLAYING]
 IsTerminal() = False
-ToString() = "Player 1 score = 2\n  f  e  d  c  b  a\n  1  2  2  0  2  2\n  4  3  9  1  5  5\n  A  B  C  D  E  F\nPlayer 0 score = 10 [PLAYING]\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2"
 IsChanceNode() = False
@@ -969,8 +1203,13 @@ StringLegalActions() = ["A", "B", "C", "D", "E", "F"]
 action: 0
 
 # State 47
+# Player 1 score = 2 [PLAYING]
+#   f  e  d  c  b  a
+#   1  2  2  0  2  2
+#   0  4 10  2  6  5
+#   A  B  C  D  E  F
+# Player 0 score = 10
 IsTerminal() = False
-ToString() = "Player 1 score = 2 [PLAYING]\n  f  e  d  c  b  a\n  1  2  2  0  2  2\n  0  4 10  2  6  5\n  A  B  C  D  E  F\nPlayer 0 score = 10\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0"
 IsChanceNode() = False
@@ -989,8 +1228,13 @@ StringLegalActions() = ["a", "b", "d", "e", "f"]
 action: 3
 
 # State 48
+# Player 1 score = 2
+#   f  e  d  c  b  a
+#   2  3  0  0  2  2
+#   0  4 10  2  6  5
+#   A  B  C  D  E  F
+# Player 0 score = 10 [PLAYING]
 IsTerminal() = False
-ToString() = "Player 1 score = 2\n  f  e  d  c  b  a\n  2  3  0  0  2  2\n  0  4 10  2  6  5\n  A  B  C  D  E  F\nPlayer 0 score = 10 [PLAYING]\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3"
 IsChanceNode() = False
@@ -1009,8 +1253,13 @@ StringLegalActions() = ["B", "C", "D", "E", "F"]
 action: 5
 
 # State 49
+# Player 1 score = 2 [PLAYING]
+#   f  e  d  c  b  a
+#   2  4  1  1  3  3
+#   0  4 10  2  6  0
+#   A  B  C  D  E  F
+# Player 0 score = 10
 IsTerminal() = False
-ToString() = "Player 1 score = 2 [PLAYING]\n  f  e  d  c  b  a\n  2  4  1  1  3  3\n  0  4 10  2  6  0\n  A  B  C  D  E  F\nPlayer 0 score = 10\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5"
 IsChanceNode() = False
@@ -1029,8 +1278,13 @@ StringLegalActions() = ["a", "b", "c", "d", "e", "f"]
 action: 5
 
 # State 50
+# Player 1 score = 2
+#   f  e  d  c  b  a
+#   0  4  1  1  3  3
+#   1  5 10  2  6  0
+#   A  B  C  D  E  F
+# Player 0 score = 10 [PLAYING]
 IsTerminal() = False
-ToString() = "Player 1 score = 2\n  f  e  d  c  b  a\n  0  4  1  1  3  3\n  1  5 10  2  6  0\n  A  B  C  D  E  F\nPlayer 0 score = 10 [PLAYING]\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5"
 IsChanceNode() = False
@@ -1049,8 +1303,13 @@ StringLegalActions() = ["A", "B", "C", "D", "E"]
 action: 1
 
 # State 51
+# Player 1 score = 2 [PLAYING]
+#   f  e  d  c  b  a
+#   0  4  1  1  3  4
+#   1  0 11  3  7  1
+#   A  B  C  D  E  F
+# Player 0 score = 10
 IsTerminal() = False
-ToString() = "Player 1 score = 2 [PLAYING]\n  f  e  d  c  b  a\n  0  4  1  1  3  4\n  1  0 11  3  7  1\n  A  B  C  D  E  F\nPlayer 0 score = 10\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1"
 IsChanceNode() = False
@@ -1069,8 +1328,13 @@ StringLegalActions() = ["a", "b", "c", "d", "e"]
 action: 1
 
 # State 52
+# Player 1 score = 2
+#   f  e  d  c  b  a
+#   0  5  2  2  0  4
+#   1  0 11  3  7  1
+#   A  B  C  D  E  F
+# Player 0 score = 10 [PLAYING]
 IsTerminal() = False
-ToString() = "Player 1 score = 2\n  f  e  d  c  b  a\n  0  5  2  2  0  4\n  1  0 11  3  7  1\n  A  B  C  D  E  F\nPlayer 0 score = 10 [PLAYING]\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1"
 IsChanceNode() = False
@@ -1089,8 +1353,13 @@ StringLegalActions() = ["A", "C", "D", "E", "F"]
 action: 3
 
 # State 53
+# Player 1 score = 2 [PLAYING]
+#   f  e  d  c  b  a
+#   0  5  2  2  0  5
+#   1  0 11  0  8  2
+#   A  B  C  D  E  F
+# Player 0 score = 10
 IsTerminal() = False
-ToString() = "Player 1 score = 2 [PLAYING]\n  f  e  d  c  b  a\n  0  5  2  2  0  5\n  1  0 11  0  8  2\n  A  B  C  D  E  F\nPlayer 0 score = 10\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3"
 IsChanceNode() = False
@@ -1109,8 +1378,13 @@ StringLegalActions() = ["a", "c", "d", "e"]
 action: 2
 
 # State 54
+# Player 1 score = 2
+#   f  e  d  c  b  a
+#   0  6  3  0  0  5
+#   1  0 11  0  8  2
+#   A  B  C  D  E  F
+# Player 0 score = 10 [PLAYING]
 IsTerminal() = False
-ToString() = "Player 1 score = 2\n  f  e  d  c  b  a\n  0  6  3  0  0  5\n  1  0 11  0  8  2\n  A  B  C  D  E  F\nPlayer 0 score = 10 [PLAYING]\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2"
 IsChanceNode() = False
@@ -1129,8 +1403,13 @@ StringLegalActions() = ["A", "C", "E", "F"]
 action: 2
 
 # State 55
+# Player 1 score = 2 [PLAYING]
+#   f  e  d  c  b  a
+#   1  7  4  1  1  6
+#   2  1  0  1  9  3
+#   A  B  C  D  E  F
+# Player 0 score = 10
 IsTerminal() = False
-ToString() = "Player 1 score = 2 [PLAYING]\n  f  e  d  c  b  a\n  1  7  4  1  1  6\n  2  1  0  1  9  3\n  A  B  C  D  E  F\nPlayer 0 score = 10\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2"
 IsChanceNode() = False
@@ -1149,8 +1428,13 @@ StringLegalActions() = ["a", "b", "c", "d", "e", "f"]
 action: 3
 
 # State 56
+# Player 1 score = 7
+#   f  e  d  c  b  a
+#   2  8  0  1  1  6
+#   0  0  0  1  9  3
+#   A  B  C  D  E  F
+# Player 0 score = 10 [PLAYING]
 IsTerminal() = False
-ToString() = "Player 1 score = 7\n  f  e  d  c  b  a\n  2  8  0  1  1  6\n  0  0  0  1  9  3\n  A  B  C  D  E  F\nPlayer 0 score = 10 [PLAYING]\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3"
 IsChanceNode() = False
@@ -1169,8 +1453,13 @@ StringLegalActions() = ["D", "E", "F"]
 action: 5
 
 # State 57
+# Player 1 score = 7 [PLAYING]
+#   f  e  d  c  b  a
+#   2  8  0  0  0  7
+#   0  0  0  1  9  0
+#   A  B  C  D  E  F
+# Player 0 score = 14
 IsTerminal() = False
-ToString() = "Player 1 score = 7 [PLAYING]\n  f  e  d  c  b  a\n  2  8  0  0  0  7\n  0  0  0  1  9  0\n  A  B  C  D  E  F\nPlayer 0 score = 14\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5"
 IsChanceNode() = False
@@ -1189,8 +1478,13 @@ StringLegalActions() = ["a", "e", "f"]
 action: 5
 
 # State 58
+# Player 1 score = 7
+#   f  e  d  c  b  a
+#   0  8  0  0  0  7
+#   1  1  0  1  9  0
+#   A  B  C  D  E  F
+# Player 0 score = 14 [PLAYING]
 IsTerminal() = False
-ToString() = "Player 1 score = 7\n  f  e  d  c  b  a\n  0  8  0  0  0  7\n  1  1  0  1  9  0\n  A  B  C  D  E  F\nPlayer 0 score = 14 [PLAYING]\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5"
 IsChanceNode() = False
@@ -1209,8 +1503,13 @@ StringLegalActions() = ["A", "B", "D", "E"]
 action: 4
 
 # State 59
+# Player 1 score = 7 [PLAYING]
+#   f  e  d  c  b  a
+#   1  9  1  1  1  8
+#   2  2  0  1  0  1
+#   A  B  C  D  E  F
+# Player 0 score = 14
 IsTerminal() = False
-ToString() = "Player 1 score = 7 [PLAYING]\n  f  e  d  c  b  a\n  1  9  1  1  1  8\n  2  2  0  1  0  1\n  A  B  C  D  E  F\nPlayer 0 score = 14\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4"
 IsChanceNode() = False
@@ -1229,8 +1528,13 @@ StringLegalActions() = ["a", "b", "c", "d", "e", "f"]
 action: 5
 
 # State 60
+# Player 1 score = 10
+#   f  e  d  c  b  a
+#   0  9  1  1  1  8
+#   0  2  0  1  0  1
+#   A  B  C  D  E  F
+# Player 0 score = 14 [PLAYING]
 IsTerminal() = False
-ToString() = "Player 1 score = 10\n  f  e  d  c  b  a\n  0  9  1  1  1  8\n  0  2  0  1  0  1\n  A  B  C  D  E  F\nPlayer 0 score = 14 [PLAYING]\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5"
 IsChanceNode() = False
@@ -1249,8 +1553,13 @@ StringLegalActions() = ["B", "D", "F"]
 action: 3
 
 # State 61
+# Player 1 score = 10 [PLAYING]
+#   f  e  d  c  b  a
+#   0  9  1  1  1  8
+#   0  2  0  0  1  1
+#   A  B  C  D  E  F
+# Player 0 score = 14
 IsTerminal() = False
-ToString() = "Player 1 score = 10 [PLAYING]\n  f  e  d  c  b  a\n  0  9  1  1  1  8\n  0  2  0  0  1  1\n  A  B  C  D  E  F\nPlayer 0 score = 14\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3"
 IsChanceNode() = False
@@ -1269,8 +1578,13 @@ StringLegalActions() = ["a", "b", "c", "d", "e"]
 action: 3
 
 # State 62
+# Player 1 score = 10
+#   f  e  d  c  b  a
+#   0 10  0  1  1  8
+#   0  2  0  0  1  1
+#   A  B  C  D  E  F
+# Player 0 score = 14 [PLAYING]
 IsTerminal() = False
-ToString() = "Player 1 score = 10\n  f  e  d  c  b  a\n  0 10  0  1  1  8\n  0  2  0  0  1  1\n  A  B  C  D  E  F\nPlayer 0 score = 14 [PLAYING]\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3"
 IsChanceNode() = False
@@ -1289,8 +1603,13 @@ StringLegalActions() = ["B", "E", "F"]
 action: 1
 
 # State 63
+# Player 1 score = 10 [PLAYING]
+#   f  e  d  c  b  a
+#   0 10  0  1  1  8
+#   0  0  1  1  1  1
+#   A  B  C  D  E  F
+# Player 0 score = 14
 IsTerminal() = False
-ToString() = "Player 1 score = 10 [PLAYING]\n  f  e  d  c  b  a\n  0 10  0  1  1  8\n  0  0  1  1  1  1\n  A  B  C  D  E  F\nPlayer 0 score = 14\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1"
 IsChanceNode() = False
@@ -1309,8 +1628,13 @@ StringLegalActions() = ["a", "b", "c", "e"]
 action: 4
 
 # State 64
+# Player 1 score = 10
+#   f  e  d  c  b  a
+#   1  0  0  2  2  9
+#   1  1  2  2  2  2
+#   A  B  C  D  E  F
+# Player 0 score = 14 [PLAYING]
 IsTerminal() = False
-ToString() = "Player 1 score = 10\n  f  e  d  c  b  a\n  1  0  0  2  2  9\n  1  1  2  2  2  2\n  A  B  C  D  E  F\nPlayer 0 score = 14 [PLAYING]\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4"
 IsChanceNode() = False
@@ -1329,8 +1653,13 @@ StringLegalActions() = ["A", "B", "C", "D", "E", "F"]
 action: 3
 
 # State 65
+# Player 1 score = 10 [PLAYING]
+#   f  e  d  c  b  a
+#   1  0  0  2  2  9
+#   1  1  2  0  3  3
+#   A  B  C  D  E  F
+# Player 0 score = 14
 IsTerminal() = False
-ToString() = "Player 1 score = 10 [PLAYING]\n  f  e  d  c  b  a\n  1  0  0  2  2  9\n  1  1  2  0  3  3\n  A  B  C  D  E  F\nPlayer 0 score = 14\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3"
 IsChanceNode() = False
@@ -1349,8 +1678,13 @@ StringLegalActions() = ["a", "b", "c", "f"]
 action: 1
 
 # State 66
+# Player 1 score = 10
+#   f  e  d  c  b  a
+#   1  0  1  3  0  9
+#   1  1  2  0  3  3
+#   A  B  C  D  E  F
+# Player 0 score = 14 [PLAYING]
 IsTerminal() = False
-ToString() = "Player 1 score = 10\n  f  e  d  c  b  a\n  1  0  1  3  0  9\n  1  1  2  0  3  3\n  A  B  C  D  E  F\nPlayer 0 score = 14 [PLAYING]\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1"
 IsChanceNode() = False
@@ -1369,8 +1703,13 @@ StringLegalActions() = ["A", "B", "C", "E", "F"]
 action: 5
 
 # State 67
+# Player 1 score = 10 [PLAYING]
+#   f  e  d  c  b  a
+#   1  0  1  4  1 10
+#   1  1  2  0  3  0
+#   A  B  C  D  E  F
+# Player 0 score = 14
 IsTerminal() = False
-ToString() = "Player 1 score = 10 [PLAYING]\n  f  e  d  c  b  a\n  1  0  1  4  1 10\n  1  1  2  0  3  0\n  A  B  C  D  E  F\nPlayer 0 score = 14\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5"
 IsChanceNode() = False
@@ -1389,8 +1728,13 @@ StringLegalActions() = ["a", "b", "c", "d", "f"]
 action: 1
 
 # State 68
+# Player 1 score = 10
+#   f  e  d  c  b  a
+#   1  0  1  5  0 10
+#   1  1  2  0  3  0
+#   A  B  C  D  E  F
+# Player 0 score = 14 [PLAYING]
 IsTerminal() = False
-ToString() = "Player 1 score = 10\n  f  e  d  c  b  a\n  1  0  1  5  0 10\n  1  1  2  0  3  0\n  A  B  C  D  E  F\nPlayer 0 score = 14 [PLAYING]\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1"
 IsChanceNode() = False
@@ -1409,8 +1753,13 @@ StringLegalActions() = ["A", "B", "C", "E"]
 action: 4
 
 # State 69
+# Player 1 score = 10 [PLAYING]
+#   f  e  d  c  b  a
+#   1  0  1  5  1 11
+#   1  1  2  0  0  1
+#   A  B  C  D  E  F
+# Player 0 score = 14
 IsTerminal() = False
-ToString() = "Player 1 score = 10 [PLAYING]\n  f  e  d  c  b  a\n  1  0  1  5  1 11\n  1  1  2  0  0  1\n  A  B  C  D  E  F\nPlayer 0 score = 14\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4"
 IsChanceNode() = False
@@ -1429,8 +1778,13 @@ StringLegalActions() = ["a", "b", "c", "d", "f"]
 action: 3
 
 # State 70
+# Player 1 score = 10
+#   f  e  d  c  b  a
+#   1  1  0  5  1 11
+#   1  1  2  0  0  1
+#   A  B  C  D  E  F
+# Player 0 score = 14 [PLAYING]
 IsTerminal() = False
-ToString() = "Player 1 score = 10\n  f  e  d  c  b  a\n  1  1  0  5  1 11\n  1  1  2  0  0  1\n  A  B  C  D  E  F\nPlayer 0 score = 14 [PLAYING]\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3"
 IsChanceNode() = False
@@ -1449,8 +1803,13 @@ StringLegalActions() = ["A", "B", "C", "F"]
 action: 1
 
 # State 71
+# Player 1 score = 10 [PLAYING]
+#   f  e  d  c  b  a
+#   1  1  0  5  1 11
+#   1  0  3  0  0  1
+#   A  B  C  D  E  F
+# Player 0 score = 14
 IsTerminal() = False
-ToString() = "Player 1 score = 10 [PLAYING]\n  f  e  d  c  b  a\n  1  1  0  5  1 11\n  1  0  3  0  0  1\n  A  B  C  D  E  F\nPlayer 0 score = 14\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1"
 IsChanceNode() = False
@@ -1469,8 +1828,13 @@ StringLegalActions() = ["a", "b", "c", "e", "f"]
 action: 5
 
 # State 72
+# Player 1 score = 12
+#   f  e  d  c  b  a
+#   0  1  0  5  1 11
+#   0  0  3  0  0  1
+#   A  B  C  D  E  F
+# Player 0 score = 14 [PLAYING]
 IsTerminal() = False
-ToString() = "Player 1 score = 12\n  f  e  d  c  b  a\n  0  1  0  5  1 11\n  0  0  3  0  0  1\n  A  B  C  D  E  F\nPlayer 0 score = 14 [PLAYING]\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5"
 IsChanceNode() = False
@@ -1489,8 +1853,13 @@ StringLegalActions() = ["C", "F"]
 action: 2
 
 # State 73
+# Player 1 score = 12 [PLAYING]
+#   f  e  d  c  b  a
+#   0  1  0  5  1 11
+#   0  0  0  1  1  2
+#   A  B  C  D  E  F
+# Player 0 score = 14
 IsTerminal() = False
-ToString() = "Player 1 score = 12 [PLAYING]\n  f  e  d  c  b  a\n  0  1  0  5  1 11\n  0  0  0  1  1  2\n  A  B  C  D  E  F\nPlayer 0 score = 14\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2"
 IsChanceNode() = False
@@ -1509,8 +1878,13 @@ StringLegalActions() = ["a", "b", "c", "e"]
 action: 1
 
 # State 74
+# Player 1 score = 12
+#   f  e  d  c  b  a
+#   0  1  0  6  0 11
+#   0  0  0  1  1  2
+#   A  B  C  D  E  F
+# Player 0 score = 14 [PLAYING]
 IsTerminal() = False
-ToString() = "Player 1 score = 12\n  f  e  d  c  b  a\n  0  1  0  6  0 11\n  0  0  0  1  1  2\n  A  B  C  D  E  F\nPlayer 0 score = 14 [PLAYING]\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1"
 IsChanceNode() = False
@@ -1529,8 +1903,13 @@ StringLegalActions() = ["D", "E", "F"]
 action: 5
 
 # State 75
+# Player 1 score = 12 [PLAYING]
+#   f  e  d  c  b  a
+#   0  1  0  6  1 12
+#   0  0  0  1  1  0
+#   A  B  C  D  E  F
+# Player 0 score = 14
 IsTerminal() = False
-ToString() = "Player 1 score = 12 [PLAYING]\n  f  e  d  c  b  a\n  0  1  0  6  1 12\n  0  0  0  1  1  0\n  A  B  C  D  E  F\nPlayer 0 score = 14\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5"
 IsChanceNode() = False
@@ -1549,8 +1928,13 @@ StringLegalActions() = ["a", "b", "c", "e"]
 action: 1
 
 # State 76
+# Player 1 score = 12
+#   f  e  d  c  b  a
+#   0  1  0  7  0 12
+#   0  0  0  1  1  0
+#   A  B  C  D  E  F
+# Player 0 score = 14 [PLAYING]
 IsTerminal() = False
-ToString() = "Player 1 score = 12\n  f  e  d  c  b  a\n  0  1  0  7  0 12\n  0  0  0  1  1  0\n  A  B  C  D  E  F\nPlayer 0 score = 14 [PLAYING]\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1"
 IsChanceNode() = False
@@ -1569,8 +1953,13 @@ StringLegalActions() = ["D", "E"]
 action: 3
 
 # State 77
+# Player 1 score = 12 [PLAYING]
+#   f  e  d  c  b  a
+#   0  1  0  7  0 12
+#   0  0  0  0  2  0
+#   A  B  C  D  E  F
+# Player 0 score = 14
 IsTerminal() = False
-ToString() = "Player 1 score = 12 [PLAYING]\n  f  e  d  c  b  a\n  0  1  0  7  0 12\n  0  0  0  0  2  0\n  A  B  C  D  E  F\nPlayer 0 score = 14\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3"
 IsChanceNode() = False
@@ -1589,8 +1978,13 @@ StringLegalActions() = ["a", "c", "e"]
 action: 2
 
 # State 78
+# Player 1 score = 12
+#   f  e  d  c  b  a
+#   1  2  1  0  0 12
+#   1  1  1  1  2  0
+#   A  B  C  D  E  F
+# Player 0 score = 14 [PLAYING]
 IsTerminal() = False
-ToString() = "Player 1 score = 12\n  f  e  d  c  b  a\n  1  2  1  0  0 12\n  1  1  1  1  2  0\n  A  B  C  D  E  F\nPlayer 0 score = 14 [PLAYING]\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2"
 IsChanceNode() = False
@@ -1609,8 +2003,13 @@ StringLegalActions() = ["A", "B", "C", "D", "E"]
 action: 2
 
 # State 79
+# Player 1 score = 12 [PLAYING]
+#   f  e  d  c  b  a
+#   1  2  1  0  0 12
+#   1  1  0  2  2  0
+#   A  B  C  D  E  F
+# Player 0 score = 14
 IsTerminal() = False
-ToString() = "Player 1 score = 12 [PLAYING]\n  f  e  d  c  b  a\n  1  2  1  0  0 12\n  1  1  0  2  2  0\n  A  B  C  D  E  F\nPlayer 0 score = 14\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2"
 IsChanceNode() = False
@@ -1629,8 +2028,13 @@ StringLegalActions() = ["a", "d", "e", "f"]
 action: 5
 
 # State 80
+# Player 1 score = 14
+#   f  e  d  c  b  a
+#   0  2  1  0  0 12
+#   0  1  0  2  2  0
+#   A  B  C  D  E  F
+# Player 0 score = 14 [PLAYING]
 IsTerminal() = False
-ToString() = "Player 1 score = 14\n  f  e  d  c  b  a\n  0  2  1  0  0 12\n  0  1  0  2  2  0\n  A  B  C  D  E  F\nPlayer 0 score = 14 [PLAYING]\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5"
 IsChanceNode() = False
@@ -1649,8 +2053,13 @@ StringLegalActions() = ["B", "D", "E"]
 action: 4
 
 # State 81
+# Player 1 score = 14 [PLAYING]
+#   f  e  d  c  b  a
+#   0  2  1  0  0 13
+#   0  1  0  2  0  1
+#   A  B  C  D  E  F
+# Player 0 score = 14
 IsTerminal() = False
-ToString() = "Player 1 score = 14 [PLAYING]\n  f  e  d  c  b  a\n  0  2  1  0  0 13\n  0  1  0  2  0  1\n  A  B  C  D  E  F\nPlayer 0 score = 14\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4"
 IsChanceNode() = False
@@ -1669,8 +2078,13 @@ StringLegalActions() = ["a", "d", "e"]
 action: 4
 
 # State 82
+# Player 1 score = 14
+#   f  e  d  c  b  a
+#   1  0  1  0  0 13
+#   1  1  0  2  0  1
+#   A  B  C  D  E  F
+# Player 0 score = 14 [PLAYING]
 IsTerminal() = False
-ToString() = "Player 1 score = 14\n  f  e  d  c  b  a\n  1  0  1  0  0 13\n  1  1  0  2  0  1\n  A  B  C  D  E  F\nPlayer 0 score = 14 [PLAYING]\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4"
 IsChanceNode() = False
@@ -1689,8 +2103,13 @@ StringLegalActions() = ["A", "B", "D", "F"]
 action: 3
 
 # State 83
+# Player 1 score = 14 [PLAYING]
+#   f  e  d  c  b  a
+#   1  0  1  0  0 13
+#   1  1  0  0  1  2
+#   A  B  C  D  E  F
+# Player 0 score = 14
 IsTerminal() = False
-ToString() = "Player 1 score = 14 [PLAYING]\n  f  e  d  c  b  a\n  1  0  1  0  0 13\n  1  1  0  0  1  2\n  A  B  C  D  E  F\nPlayer 0 score = 14\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3"
 IsChanceNode() = False
@@ -1709,8 +2128,13 @@ StringLegalActions() = ["a", "d", "f"]
 action: 3
 
 # State 84
+# Player 1 score = 14
+#   f  e  d  c  b  a
+#   1  1  0  0  0 13
+#   1  1  0  0  1  2
+#   A  B  C  D  E  F
+# Player 0 score = 14 [PLAYING]
 IsTerminal() = False
-ToString() = "Player 1 score = 14\n  f  e  d  c  b  a\n  1  1  0  0  0 13\n  1  1  0  0  1  2\n  A  B  C  D  E  F\nPlayer 0 score = 14 [PLAYING]\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3"
 IsChanceNode() = False
@@ -1729,8 +2153,13 @@ StringLegalActions() = ["A", "B", "E", "F"]
 action: 1
 
 # State 85
+# Player 1 score = 14 [PLAYING]
+#   f  e  d  c  b  a
+#   1  1  0  0  0 13
+#   1  0  1  0  1  2
+#   A  B  C  D  E  F
+# Player 0 score = 14
 IsTerminal() = False
-ToString() = "Player 1 score = 14 [PLAYING]\n  f  e  d  c  b  a\n  1  1  0  0  0 13\n  1  0  1  0  1  2\n  A  B  C  D  E  F\nPlayer 0 score = 14\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1"
 IsChanceNode() = False
@@ -1749,8 +2178,13 @@ StringLegalActions() = ["a", "e", "f"]
 action: 0
 
 # State 86
+# Player 1 score = 14
+#   f  e  d  c  b  a
+#   2  2  1  2  2  0
+#   2  1  2  1  2  3
+#   A  B  C  D  E  F
+# Player 0 score = 14 [PLAYING]
 IsTerminal() = False
-ToString() = "Player 1 score = 14\n  f  e  d  c  b  a\n  2  2  1  2  2  0\n  2  1  2  1  2  3\n  A  B  C  D  E  F\nPlayer 0 score = 14 [PLAYING]\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0"
 IsChanceNode() = False
@@ -1769,8 +2203,13 @@ StringLegalActions() = ["A", "B", "C", "D", "E", "F"]
 action: 4
 
 # State 87
+# Player 1 score = 14 [PLAYING]
+#   f  e  d  c  b  a
+#   2  2  1  2  2  1
+#   2  1  2  1  0  4
+#   A  B  C  D  E  F
+# Player 0 score = 14
 IsTerminal() = False
-ToString() = "Player 1 score = 14 [PLAYING]\n  f  e  d  c  b  a\n  2  2  1  2  2  1\n  2  1  2  1  0  4\n  A  B  C  D  E  F\nPlayer 0 score = 14\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4"
 IsChanceNode() = False
@@ -1789,8 +2228,13 @@ StringLegalActions() = ["a", "b", "c", "d", "e", "f"]
 action: 0
 
 # State 88
+# Player 1 score = 14
+#   f  e  d  c  b  a
+#   2  2  1  2  3  0
+#   2  1  2  1  0  4
+#   A  B  C  D  E  F
+# Player 0 score = 14 [PLAYING]
 IsTerminal() = False
-ToString() = "Player 1 score = 14\n  f  e  d  c  b  a\n  2  2  1  2  3  0\n  2  1  2  1  0  4\n  A  B  C  D  E  F\nPlayer 0 score = 14 [PLAYING]\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0"
 IsChanceNode() = False
@@ -1809,8 +2253,13 @@ StringLegalActions() = ["A", "B", "C", "D", "F"]
 action: 2
 
 # State 89
+# Player 1 score = 14 [PLAYING]
+#   f  e  d  c  b  a
+#   2  2  1  2  3  0
+#   2  1  0  2  1  4
+#   A  B  C  D  E  F
+# Player 0 score = 14
 IsTerminal() = False
-ToString() = "Player 1 score = 14 [PLAYING]\n  f  e  d  c  b  a\n  2  2  1  2  3  0\n  2  1  0  2  1  4\n  A  B  C  D  E  F\nPlayer 0 score = 14\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2"
 IsChanceNode() = False
@@ -1829,8 +2278,13 @@ StringLegalActions() = ["b", "c", "d", "e", "f"]
 action: 1
 
 # State 90
+# Player 1 score = 14
+#   f  e  d  c  b  a
+#   2  3  2  3  0  0
+#   2  1  0  2  1  4
+#   A  B  C  D  E  F
+# Player 0 score = 14 [PLAYING]
 IsTerminal() = False
-ToString() = "Player 1 score = 14\n  f  e  d  c  b  a\n  2  3  2  3  0  0\n  2  1  0  2  1  4\n  A  B  C  D  E  F\nPlayer 0 score = 14 [PLAYING]\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1"
 IsChanceNode() = False
@@ -1849,8 +2303,13 @@ StringLegalActions() = ["A", "B", "D", "E", "F"]
 action: 5
 
 # State 91
+# Player 1 score = 14 [PLAYING]
+#   f  e  d  c  b  a
+#   2  3  0  4  1  1
+#   2  1  0  2  1  0
+#   A  B  C  D  E  F
+# Player 0 score = 17
 IsTerminal() = False
-ToString() = "Player 1 score = 14 [PLAYING]\n  f  e  d  c  b  a\n  2  3  0  4  1  1\n  2  1  0  2  1  0\n  A  B  C  D  E  F\nPlayer 0 score = 17\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5"
 IsChanceNode() = False
@@ -1869,8 +2328,13 @@ StringLegalActions() = ["a", "b", "c", "e", "f"]
 action: 0
 
 # State 92
+# Player 1 score = 14
+#   f  e  d  c  b  a
+#   2  3  0  4  2  0
+#   2  1  0  2  1  0
+#   A  B  C  D  E  F
+# Player 0 score = 17 [PLAYING]
 IsTerminal() = False
-ToString() = "Player 1 score = 14\n  f  e  d  c  b  a\n  2  3  0  4  2  0\n  2  1  0  2  1  0\n  A  B  C  D  E  F\nPlayer 0 score = 17 [PLAYING]\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5 0"
 IsChanceNode() = False
@@ -1889,8 +2353,13 @@ StringLegalActions() = ["A", "B", "D", "E"]
 action: 3
 
 # State 93
+# Player 1 score = 14 [PLAYING]
+#   f  e  d  c  b  a
+#   2  3  0  4  2  0
+#   2  1  0  0  2  1
+#   A  B  C  D  E  F
+# Player 0 score = 17
 IsTerminal() = False
-ToString() = "Player 1 score = 14 [PLAYING]\n  f  e  d  c  b  a\n  2  3  0  4  2  0\n  2  1  0  0  2  1\n  A  B  C  D  E  F\nPlayer 0 score = 17\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5 0 3"
 IsChanceNode() = False
@@ -1909,8 +2378,13 @@ StringLegalActions() = ["b", "c", "e", "f"]
 action: 4
 
 # State 94
+# Player 1 score = 19
+#   f  e  d  c  b  a
+#   3  0  0  4  2  0
+#   0  0  0  0  2  1
+#   A  B  C  D  E  F
+# Player 0 score = 17 [PLAYING]
 IsTerminal() = False
-ToString() = "Player 1 score = 19\n  f  e  d  c  b  a\n  3  0  0  4  2  0\n  0  0  0  0  2  1\n  A  B  C  D  E  F\nPlayer 0 score = 17 [PLAYING]\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5 0 3 4"
 IsChanceNode() = False
@@ -1929,8 +2403,13 @@ StringLegalActions() = ["E", "F"]
 action: 5
 
 # State 95
+# Player 1 score = 19 [PLAYING]
+#   f  e  d  c  b  a
+#   3  0  0  4  2  1
+#   0  0  0  0  2  0
+#   A  B  C  D  E  F
+# Player 0 score = 17
 IsTerminal() = False
-ToString() = "Player 1 score = 19 [PLAYING]\n  f  e  d  c  b  a\n  3  0  0  4  2  1\n  0  0  0  0  2  0\n  A  B  C  D  E  F\nPlayer 0 score = 17\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5 0 3 4 5"
 IsChanceNode() = False
@@ -1949,8 +2428,13 @@ StringLegalActions() = ["a", "b", "c", "f"]
 action: 5
 
 # State 96
+# Player 1 score = 19
+#   f  e  d  c  b  a
+#   0  0  0  4  2  1
+#   1  1  1  0  2  0
+#   A  B  C  D  E  F
+# Player 0 score = 17 [PLAYING]
 IsTerminal() = False
-ToString() = "Player 1 score = 19\n  f  e  d  c  b  a\n  0  0  0  4  2  1\n  1  1  1  0  2  0\n  A  B  C  D  E  F\nPlayer 0 score = 17 [PLAYING]\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5 0 3 4 5 5"
 IsChanceNode() = False
@@ -1969,8 +2453,13 @@ StringLegalActions() = ["A", "B", "C", "E"]
 action: 1
 
 # State 97
+# Player 1 score = 19 [PLAYING]
+#   f  e  d  c  b  a
+#   0  0  0  4  2  1
+#   1  0  2  0  2  0
+#   A  B  C  D  E  F
+# Player 0 score = 17
 IsTerminal() = False
-ToString() = "Player 1 score = 19 [PLAYING]\n  f  e  d  c  b  a\n  0  0  0  4  2  1\n  1  0  2  0  2  0\n  A  B  C  D  E  F\nPlayer 0 score = 17\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5 0 3 4 5 5 1"
 IsChanceNode() = False
@@ -1989,8 +2478,13 @@ StringLegalActions() = ["a", "b", "c"]
 action: 1
 
 # State 98
+# Player 1 score = 19
+#   f  e  d  c  b  a
+#   0  0  1  5  0  1
+#   1  0  2  0  2  0
+#   A  B  C  D  E  F
+# Player 0 score = 17 [PLAYING]
 IsTerminal() = False
-ToString() = "Player 1 score = 19\n  f  e  d  c  b  a\n  0  0  1  5  0  1\n  1  0  2  0  2  0\n  A  B  C  D  E  F\nPlayer 0 score = 17 [PLAYING]\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5 0 3 4 5 5 1 1"
 IsChanceNode() = False
@@ -2009,8 +2503,13 @@ StringLegalActions() = ["A", "C", "E"]
 action: 0
 
 # State 99
+# Player 1 score = 19 [PLAYING]
+#   f  e  d  c  b  a
+#   0  0  1  5  0  1
+#   0  1  2  0  2  0
+#   A  B  C  D  E  F
+# Player 0 score = 17
 IsTerminal() = False
-ToString() = "Player 1 score = 19 [PLAYING]\n  f  e  d  c  b  a\n  0  0  1  5  0  1\n  0  1  2  0  2  0\n  A  B  C  D  E  F\nPlayer 0 score = 17\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1, 0]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5 0 3 4 5 5 1 1 0"
 IsChanceNode() = False
@@ -2029,8 +2528,13 @@ StringLegalActions() = ["a", "c", "d"]
 action: 0
 
 # State 100
+# Player 1 score = 19
+#   f  e  d  c  b  a
+#   0  0  1  5  1  0
+#   0  1  2  0  2  0
+#   A  B  C  D  E  F
+# Player 0 score = 17 [PLAYING]
 IsTerminal() = False
-ToString() = "Player 1 score = 19\n  f  e  d  c  b  a\n  0  0  1  5  1  0\n  0  1  2  0  2  0\n  A  B  C  D  E  F\nPlayer 0 score = 17 [PLAYING]\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1, 0, 0]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5 0 3 4 5 5 1 1 0 0"
 IsChanceNode() = False
@@ -2049,8 +2553,13 @@ StringLegalActions() = ["B", "C", "E"]
 action: 4
 
 # State 101
+# Player 1 score = 19 [PLAYING]
+#   f  e  d  c  b  a
+#   0  0  1  5  1  1
+#   0  1  2  0  0  1
+#   A  B  C  D  E  F
+# Player 0 score = 17
 IsTerminal() = False
-ToString() = "Player 1 score = 19 [PLAYING]\n  f  e  d  c  b  a\n  0  0  1  5  1  1\n  0  1  2  0  0  1\n  A  B  C  D  E  F\nPlayer 0 score = 17\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1, 0, 0, 4]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5 0 3 4 5 5 1 1 0 0 4"
 IsChanceNode() = False
@@ -2069,8 +2578,13 @@ StringLegalActions() = ["a", "b", "c", "d"]
 action: 2
 
 # State 102
+# Player 1 score = 21
+#   f  e  d  c  b  a
+#   1  1  2  0  1  1
+#   1  0  2  0  0  1
+#   A  B  C  D  E  F
+# Player 0 score = 17 [PLAYING]
 IsTerminal() = False
-ToString() = "Player 1 score = 21\n  f  e  d  c  b  a\n  1  1  2  0  1  1\n  1  0  2  0  0  1\n  A  B  C  D  E  F\nPlayer 0 score = 17 [PLAYING]\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1, 0, 0, 4, 2]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5 0 3 4 5 5 1 1 0 0 4 2"
 IsChanceNode() = False
@@ -2089,8 +2603,13 @@ StringLegalActions() = ["A", "C", "F"]
 action: 2
 
 # State 103
+# Player 1 score = 21 [PLAYING]
+#   f  e  d  c  b  a
+#   1  1  2  0  1  1
+#   1  0  0  1  1  1
+#   A  B  C  D  E  F
+# Player 0 score = 17
 IsTerminal() = False
-ToString() = "Player 1 score = 21 [PLAYING]\n  f  e  d  c  b  a\n  1  1  2  0  1  1\n  1  0  0  1  1  1\n  A  B  C  D  E  F\nPlayer 0 score = 17\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1, 0, 0, 4, 2, 2]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5 0 3 4 5 5 1 1 0 0 4 2 2"
 IsChanceNode() = False
@@ -2109,8 +2628,13 @@ StringLegalActions() = ["a", "b", "d", "e", "f"]
 action: 4
 
 # State 104
+# Player 1 score = 21
+#   f  e  d  c  b  a
+#   2  0  2  0  1  1
+#   1  0  0  1  1  1
+#   A  B  C  D  E  F
+# Player 0 score = 17 [PLAYING]
 IsTerminal() = False
-ToString() = "Player 1 score = 21\n  f  e  d  c  b  a\n  2  0  2  0  1  1\n  1  0  0  1  1  1\n  A  B  C  D  E  F\nPlayer 0 score = 17 [PLAYING]\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1, 0, 0, 4, 2, 2, 4]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5 0 3 4 5 5 1 1 0 0 4 2 2 4"
 IsChanceNode() = False
@@ -2129,8 +2653,13 @@ StringLegalActions() = ["A", "D", "E", "F"]
 action: 0
 
 # State 105
+# Player 1 score = 21 [PLAYING]
+#   f  e  d  c  b  a
+#   2  0  2  0  1  1
+#   0  1  0  1  1  1
+#   A  B  C  D  E  F
+# Player 0 score = 17
 IsTerminal() = False
-ToString() = "Player 1 score = 21 [PLAYING]\n  f  e  d  c  b  a\n  2  0  2  0  1  1\n  0  1  0  1  1  1\n  A  B  C  D  E  F\nPlayer 0 score = 17\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1, 0, 0, 4, 2, 2, 4, 0]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5 0 3 4 5 5 1 1 0 0 4 2 2 4 0"
 IsChanceNode() = False
@@ -2149,8 +2678,13 @@ StringLegalActions() = ["a", "b", "d", "f"]
 action: 5
 
 # State 106
+# Player 1 score = 23
+#   f  e  d  c  b  a
+#   0  0  2  0  1  1
+#   1  0  0  1  1  1
+#   A  B  C  D  E  F
+# Player 0 score = 17 [PLAYING]
 IsTerminal() = False
-ToString() = "Player 1 score = 23\n  f  e  d  c  b  a\n  0  0  2  0  1  1\n  1  0  0  1  1  1\n  A  B  C  D  E  F\nPlayer 0 score = 17 [PLAYING]\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1, 0, 0, 4, 2, 2, 4, 0, 5]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5 0 3 4 5 5 1 1 0 0 4 2 2 4 0 5"
 IsChanceNode() = False
@@ -2169,8 +2703,13 @@ StringLegalActions() = ["A", "D", "E", "F"]
 action: 3
 
 # State 107
+# Player 1 score = 23 [PLAYING]
+#   f  e  d  c  b  a
+#   0  0  2  0  1  1
+#   1  0  0  0  2  1
+#   A  B  C  D  E  F
+# Player 0 score = 17
 IsTerminal() = False
-ToString() = "Player 1 score = 23 [PLAYING]\n  f  e  d  c  b  a\n  0  0  2  0  1  1\n  1  0  0  0  2  1\n  A  B  C  D  E  F\nPlayer 0 score = 17\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1, 0, 0, 4, 2, 2, 4, 0, 5, 3]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5 0 3 4 5 5 1 1 0 0 4 2 2 4 0 5 3"
 IsChanceNode() = False
@@ -2189,8 +2728,13 @@ StringLegalActions() = ["a", "b", "d"]
 action: 3
 
 # State 108
+# Player 1 score = 23
+#   f  e  d  c  b  a
+#   1  1  0  0  1  1
+#   1  0  0  0  2  1
+#   A  B  C  D  E  F
+# Player 0 score = 17 [PLAYING]
 IsTerminal() = False
-ToString() = "Player 1 score = 23\n  f  e  d  c  b  a\n  1  1  0  0  1  1\n  1  0  0  0  2  1\n  A  B  C  D  E  F\nPlayer 0 score = 17 [PLAYING]\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1, 0, 0, 4, 2, 2, 4, 0, 5, 3, 3]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5 0 3 4 5 5 1 1 0 0 4 2 2 4 0 5 3 3"
 IsChanceNode() = False
@@ -2209,8 +2753,13 @@ StringLegalActions() = ["A", "E", "F"]
 action: 5
 
 # State 109
+# Player 1 score = 23 [PLAYING]
+#   f  e  d  c  b  a
+#   1  1  0  0  1  0
+#   1  0  0  0  2  0
+#   A  B  C  D  E  F
+# Player 0 score = 19
 IsTerminal() = False
-ToString() = "Player 1 score = 23 [PLAYING]\n  f  e  d  c  b  a\n  1  1  0  0  1  0\n  1  0  0  0  2  0\n  A  B  C  D  E  F\nPlayer 0 score = 19\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1, 0, 0, 4, 2, 2, 4, 0, 5, 3, 3, 5]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5 0 3 4 5 5 1 1 0 0 4 2 2 4 0 5 3 3 5"
 IsChanceNode() = False
@@ -2229,8 +2778,14 @@ StringLegalActions() = ["b", "e", "f"]
 action: 5
 
 # State 110
+# [FINISHED]
+# Player 1 score = 27
+#   f  e  d  c  b  a
+#   0  0  0  0  0  0
+#   0  0  0  0  0  0
+#   A  B  C  D  E  F
+# Player 0 score = 21
 IsTerminal() = True
-ToString() = "[FINISHED]\nPlayer 1 score = 27\n  f  e  d  c  b  a\n  0  0  0  0  0  0\n  0  0  0  0  0  0\n  A  B  C  D  E  F\nPlayer 0 score = 21\n"
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1, 0, 0, 4, 2, 2, 4, 0, 5, 3, 3, 5, 5]
 HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5 0 3 4 5 5 1 1 0 0 4 2 2 4 0 5 3 3 5 5"
 IsChanceNode() = False

@@ -17,11 +17,15 @@
 set -e
 set -x
 
-virtualenv -p python ./venv
+sudo -H pip3 install --upgrade pip
+sudo -H pip3 install --upgrade setuptools
+sudo -H pip3 install --force-reinstall virtualenv
+
+virtualenv -p python3 ./venv
 source ./venv/bin/activate
 
-python --version
-pip3 install -r requirements.txt
+python3 --version
+pip3 install --upgrade -r requirements.txt -q
 
 ./open_spiel/scripts/build_and_run_tests.sh
 deactivate

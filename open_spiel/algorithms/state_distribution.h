@@ -43,8 +43,19 @@ namespace algorithms {
 //
 // Note: currently only works for turn-based games of imperfect information,
 // and does not work with kSampledStochastic chance modes.
-std::pair<std::vector<std::unique_ptr<State>>, std::vector<double>>
-GetStateDistribution(const State& state, const Policy* opponent_policy);
+HistoryDistribution GetStateDistribution(const State& state,
+                                         const Policy* opponent_policy);
+
+// Incrementally builds the state distribution vectors. Must be called at each
+// state in a trajectory. All of the states should correspond to the same
+// information state (i.e. all states should have identical
+// InformationStateString values, although this is not doublechecked). If
+// previous is empty, calls the non-incremental version. This must be called for
+// each state in order, starting from the first non-chance node, or it will be
+// wrong.
+HistoryDistribution UpdateIncrementalStateDistribution(
+    const State& state, const Policy* opponent_policy, int player_id,
+    const HistoryDistribution& previous = {});
 
 }  // namespace algorithms
 }  // namespace open_spiel

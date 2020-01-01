@@ -1,5 +1,4 @@
 game: kuhn_poker(players=3)
-seed: 3023298744
 
 GameType.chance_mode = ChanceMode.EXPLICIT_STOCHASTIC
 GameType.dynamics = Dynamics.SEQUENTIAL
@@ -32,7 +31,6 @@ ToString() = "kuhn_poker(players=3)"
 
 # State 0
 IsTerminal() = False
-ToString() = ""
 History() = []
 HistoryString() = ""
 IsChanceNode() = True
@@ -58,8 +56,8 @@ StringLegalActions() = ["Deal:0", "Deal:1", "Deal:2", "Deal:3"]
 action: 1
 
 # State 1
+# 1
 IsTerminal() = False
-ToString() = "1"
 History() = [1]
 HistoryString() = "1"
 IsChanceNode() = True
@@ -85,8 +83,8 @@ StringLegalActions() = ["Deal:0", "Deal:2", "Deal:3"]
 action: 3
 
 # State 2
+# 1 3
 IsTerminal() = False
-ToString() = "1 3"
 History() = [1, 3]
 HistoryString() = "1 3"
 IsChanceNode() = True
@@ -112,8 +110,8 @@ StringLegalActions() = ["Deal:0", "Deal:2"]
 action: 2
 
 # State 3
+# 1 3 2
 IsTerminal() = False
-ToString() = "1 3 2"
 History() = [1, 3, 2]
 HistoryString() = "1 3 2"
 IsChanceNode() = False
@@ -140,8 +138,8 @@ StringLegalActions() = ["Pass", "Bet"]
 action: 0
 
 # State 4
+# 1 3 2 p
 IsTerminal() = False
-ToString() = "1 3 2 p"
 History() = [1, 3, 2, 0]
 HistoryString() = "1 3 2 0"
 IsChanceNode() = False
@@ -168,8 +166,8 @@ StringLegalActions() = ["Pass", "Bet"]
 action: 0
 
 # State 5
+# 1 3 2 pp
 IsTerminal() = False
-ToString() = "1 3 2 pp"
 History() = [1, 3, 2, 0, 0]
 HistoryString() = "1 3 2 0 0"
 IsChanceNode() = False
@@ -196,8 +194,8 @@ StringLegalActions() = ["Pass", "Bet"]
 action: 1
 
 # State 6
+# 1 3 2 ppb
 IsTerminal() = False
-ToString() = "1 3 2 ppb"
 History() = [1, 3, 2, 0, 0, 1]
 HistoryString() = "1 3 2 0 0 1"
 IsChanceNode() = False
@@ -224,8 +222,8 @@ StringLegalActions() = ["Pass", "Bet"]
 action: 1
 
 # State 7
+# 1 3 2 ppbb
 IsTerminal() = False
-ToString() = "1 3 2 ppbb"
 History() = [1, 3, 2, 0, 0, 1, 1]
 HistoryString() = "1 3 2 0 0 1 1"
 IsChanceNode() = False
@@ -252,8 +250,8 @@ StringLegalActions() = ["Pass", "Bet"]
 action: 0
 
 # State 8
+# 1 3 2 ppbbp
 IsTerminal() = True
-ToString() = "1 3 2 ppbbp"
 History() = [1, 3, 2, 0, 0, 1, 1, 0]
 HistoryString() = "1 3 2 0 0 1 1 0"
 IsChanceNode() = False

@@ -26,7 +26,8 @@ from open_spiel.python.algorithms import generate_playthrough
 class PlaythroughTest(absltest.TestCase):
 
   def test_runs(self):
-    result = generate_playthrough.playthrough("tic_tac_toe", seed=1234)
+    result = generate_playthrough.playthrough(
+        "tic_tac_toe", action_sequence=[0, 1, 2, 3, 4, 5, 6, 7, 8])
     self.assertNotEmpty(result)
 
 

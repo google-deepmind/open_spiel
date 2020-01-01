@@ -11,11 +11,10 @@ module which favours Python 3 over Python 2 if both are available.")
 set (CMAKE_CXX_STANDARD 17)
 if(APPLE)
   # On MacOS:
-  #   -Werror causes problems with abseil on MacOS
   #   -undefined dynamic_lookup is necessary for pybind11 linking
-  set (CMAKE_CXX_FLAGS "-w -undefined dynamic_lookup")
+  set (CMAKE_CXX_FLAGS "-Wno-everything -w -undefined dynamic_lookup")
 else()
-  set (CMAKE_CXX_FLAGS "-Werror")
+  set (CMAKE_CXX_FLAGS "-Wno-everything")
 endif()
 
 # Position-independent code is needed for Python extension modules.
@@ -97,6 +96,8 @@ set (OPEN_SPIEL_CORE_FILES
   simultaneous_move_game.cc
   spiel_utils.h
   spiel_utils.cc
+  tensor_game.h
+  tensor_game.cc
   tensor_view.h
 )
 

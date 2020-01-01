@@ -32,6 +32,7 @@ import pyspiel
 _MANDATORY_PARAMETERS_GAMES = [
     "misere",
     "turn_based_simultaneous_game",
+    "normal_form_extensive_game"
 ]
 
 _GAMES_TO_TEST = list(
@@ -41,6 +42,8 @@ _GAMES_TO_TEST = list(
 # (name to display, string to pass to load_game).
 _GAMES_FULL_TREE_TRAVERSAL_TESTS = [
     ("catch", "catch(rows=6,columns=3)"),
+    ("cliff_walking", "cliff_walking(horizon=7)"),
+    ("deep_sea", "deep_sea(size=3)"),
     ("kuhn_poker", "kuhn_poker"),
     ("leduc_poker", "leduc_poker"),
     ("iigoofspiel4", "turn_based_simultaneous_game(game=goofspiel("
@@ -48,6 +51,9 @@ _GAMES_FULL_TREE_TRAVERSAL_TESTS = [
     ("kuhn_poker3p", "kuhn_poker(players=3)"),
     ("first_sealed_auction", "first_sealed_auction(max_value=2)"),
     ("tiny_hanabi", "tiny_hanabi"),
+    ("nf_auction", "turn_based_simultaneous_game(game="
+     "normal_form_extensive_game(game="
+     "first_sealed_auction(max_value=3)))"),
     # Disabled by default - big games, slow tests.
     # Uncomment to check the games if you modify them.
     # ("liars_dice", "liars_dice"),
@@ -57,6 +63,8 @@ _GAMES_FULL_TREE_TRAVERSAL_TESTS = [
 TOTAL_NUM_STATES = {
     # This maps the game name to (chance, playable, terminal)
     "catch": (1, 363, 729),
+    "cliff_walking": (0, 2119, 6358),
+    "deep_sea": (0, 7, 8),
     "kuhn_poker": (4, 24, 30),
     "leduc_poker": (157, 3780, 5520),
     "liars_dice": (7, 147456, 147420),
@@ -65,12 +73,15 @@ TOTAL_NUM_STATES = {
     "first_sealed_auction": (12, 10, 14),
     "tiny_bridge_2p": (29, 53760, 53340),
     "tiny_hanabi": (3, 16, 36),
+    "nf_auction": (0, 7, 36),
 }
 
 # This is kept to ensure non-regression, but we would like to remove that
 # when we can interpret what are these numbers.
 PERFECT_RECALL_NUM_STATES = {
     "catch": 363,
+    "cliff_walking": 2119,
+    "deep_sea": 7,
     "kuhn_poker": 12,
     "leduc_poker": 936,
     "liars_dice": 24576,
@@ -79,6 +90,7 @@ PERFECT_RECALL_NUM_STATES = {
     "first_sealed_auction": 4,
     "tiny_bridge_2p": 3584,
     "tiny_hanabi": 8,
+    "nf_auction": 2,
 }
 
 

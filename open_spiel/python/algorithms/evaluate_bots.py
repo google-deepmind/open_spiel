@@ -28,7 +28,10 @@ def evaluate_bots(state, bots, rng):
   while not state.is_terminal():
     if state.is_chance_node():
       outcomes, probs = zip(*state.chance_outcomes())
-      state.apply_action(rng.choice(outcomes, p=probs))
+      action = rng.choice(outcomes, p=probs)
+      for bot in bots:
+        bot.inform_action(state, pyspiel.PlayerId.CHANCE, action)
+      state.apply_action(action)
     elif state.is_simultaneous_node():
       joint_actions = [
           bot.step(state)
@@ -37,5 +40,10 @@ def evaluate_bots(state, bots, rng):
       ]
       state.apply_actions(joint_actions)
     else:
-      state.apply_action(bots[state.current_player()].step(state))
+      current_player = state.current_player()
+      action = bots[current_player].step(state)
+      for i, bot in enumerate(bots):
+        if i != current_player:
+          bot.inform_action(state, current_player, action)
+      state.apply_action(action)
   return state.returns()

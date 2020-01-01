@@ -14,9 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Generates a playthrough for a new game with optional parameters.
-# This script exists mainly as a reminder for the command to run.
-
 # This file contains the global variables that control conditional dependencies.
 # It is being used to know whether we should:
 # (a) download a dependency (done in install.sh)
@@ -29,6 +26,10 @@
 # particular to be able to use that in the Travis CI test.
 export DEFAULT_OPTIONAL_DEPENDENCY=${DEFAULT_OPTIONAL_DEPENDENCY:-"OFF"}
 
+# Each optional dependency has their own flag, that defaults to the global
+# "$DEFAULT_OPTIONAL_DEPENDENCY" if undefined. To enable an optional dependency,
+# we recomment defining the associated environment variable in your bashrc or
+# your virtualenv bashrc, e.g. export BUILD_WITH_HANABI="ON"
 export BUILD_WITH_HANABI=${BUILD_WITH_HANABI:-$DEFAULT_OPTIONAL_DEPENDENCY}
 export BUILD_WITH_ACPC=${BUILD_WITH_ACPC:-$DEFAULT_OPTIONAL_DEPENDENCY}
 export BUILD_WITH_JULIA=${BUILD_WITH_JULIA:-$DEFAULT_OPTIONAL_DEPENDENCY}

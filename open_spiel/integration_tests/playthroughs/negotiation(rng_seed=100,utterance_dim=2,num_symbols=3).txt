@@ -1,5 +1,4 @@
 game: negotiation(rng_seed=100,utterance_dim=2,num_symbols=3)
-seed: 1370999156
 
 GameType.chance_mode = ChanceMode.SAMPLED_STOCHASTIC
 GameType.dynamics = Dynamics.SEQUENTIAL
@@ -29,8 +28,8 @@ MaxGameLength() = 20
 ToString() = "negotiation(num_symbols=3,rng_seed=100,utterance_dim=2)"
 
 # State 0
+# Initial chance node
 IsTerminal() = False
-ToString() = "Initial chance node"
 History() = []
 HistoryString() = ""
 IsChanceNode() = True
@@ -49,8 +48,13 @@ StringLegalActions() = ["chance outcome 0"]
 action: 0
 
 # State 1
+# Max steps: 4
+# Item pool: 0 1 4
+# Agent 0 util vec: 2 9 4
+# Agent 1 util vec: 1 9 6
+# Current player: 0
+# Turn Type: Proposal
 IsTerminal() = False
-ToString() = "Max steps: 4\nItem pool: 0 1 4\nAgent 0 util vec: 2 9 4\nAgent 1 util vec: 1 9 6\nCurrent player: 0\nTurn Type: Proposal\n"
 History() = [0]
 HistoryString() = "0"
 IsChanceNode() = False
@@ -70,8 +74,14 @@ StringLegalActions() = ["Proposal: [0, 0, 0]", "Proposal: [0, 0, 1]", "Proposal:
 action: 9
 
 # State 2
+# Max steps: 4
+# Item pool: 0 1 4
+# Agent 0 util vec: 2 9 4
+# Agent 1 util vec: 1 9 6
+# Current player: 0
+# Turn Type: Utterance
+# Player 0 proposes: [0, 1, 3]
 IsTerminal() = False
-ToString() = "Max steps: 4\nItem pool: 0 1 4\nAgent 0 util vec: 2 9 4\nAgent 1 util vec: 1 9 6\nCurrent player: 0\nTurn Type: Utterance\nPlayer 0 proposes: [0, 1, 3]\n"
 History() = [0, 9]
 HistoryString() = "0 9"
 IsChanceNode() = False
@@ -91,8 +101,14 @@ StringLegalActions() = [", Utterance: [0, 0]", ", Utterance: [0, 1]", ", Utteran
 action: 223
 
 # State 3
+# Max steps: 4
+# Item pool: 0 1 4
+# Agent 0 util vec: 2 9 4
+# Agent 1 util vec: 1 9 6
+# Current player: 1
+# Turn Type: Proposal
+# Player 0 proposes: [0, 1, 3] utters: [2, 0]
 IsTerminal() = False
-ToString() = "Max steps: 4\nItem pool: 0 1 4\nAgent 0 util vec: 2 9 4\nAgent 1 util vec: 1 9 6\nCurrent player: 1\nTurn Type: Proposal\nPlayer 0 proposes: [0, 1, 3] utters: [2, 0]\n"
 History() = [0, 9, 223]
 HistoryString() = "0 9 223"
 IsChanceNode() = False
@@ -112,8 +128,15 @@ StringLegalActions() = ["Proposal: [0, 0, 0]", "Proposal: [0, 0, 1]", "Proposal:
 action: 1
 
 # State 4
+# Max steps: 4
+# Item pool: 0 1 4
+# Agent 0 util vec: 2 9 4
+# Agent 1 util vec: 1 9 6
+# Current player: 1
+# Turn Type: Utterance
+# Player 0 proposes: [0, 1, 3] utters: [2, 0]
+# Player 1 proposes: [0, 0, 1]
 IsTerminal() = False
-ToString() = "Max steps: 4\nItem pool: 0 1 4\nAgent 0 util vec: 2 9 4\nAgent 1 util vec: 1 9 6\nCurrent player: 1\nTurn Type: Utterance\nPlayer 0 proposes: [0, 1, 3] utters: [2, 0]\nPlayer 1 proposes: [0, 0, 1]\n"
 History() = [0, 9, 223, 1]
 HistoryString() = "0 9 223 1"
 IsChanceNode() = False
@@ -133,8 +156,15 @@ StringLegalActions() = [", Utterance: [0, 0]", ", Utterance: [0, 1]", ", Utteran
 action: 225
 
 # State 5
+# Max steps: 4
+# Item pool: 0 1 4
+# Agent 0 util vec: 2 9 4
+# Agent 1 util vec: 1 9 6
+# Current player: 0
+# Turn Type: Proposal
+# Player 0 proposes: [0, 1, 3] utters: [2, 0]
+# Player 1 proposes: [0, 0, 1] utters: [2, 2]
 IsTerminal() = False
-ToString() = "Max steps: 4\nItem pool: 0 1 4\nAgent 0 util vec: 2 9 4\nAgent 1 util vec: 1 9 6\nCurrent player: 0\nTurn Type: Proposal\nPlayer 0 proposes: [0, 1, 3] utters: [2, 0]\nPlayer 1 proposes: [0, 0, 1] utters: [2, 2]\n"
 History() = [0, 9, 223, 1, 225]
 HistoryString() = "0 9 223 1 225"
 IsChanceNode() = False
@@ -154,8 +184,16 @@ StringLegalActions() = ["Proposal: [0, 0, 0]", "Proposal: [0, 0, 1]", "Proposal:
 action: 7
 
 # State 6
+# Max steps: 4
+# Item pool: 0 1 4
+# Agent 0 util vec: 2 9 4
+# Agent 1 util vec: 1 9 6
+# Current player: 0
+# Turn Type: Utterance
+# Player 0 proposes: [0, 1, 3] utters: [2, 0]
+# Player 1 proposes: [0, 0, 1] utters: [2, 2]
+# Player 0 proposes: [0, 1, 1]
 IsTerminal() = False
-ToString() = "Max steps: 4\nItem pool: 0 1 4\nAgent 0 util vec: 2 9 4\nAgent 1 util vec: 1 9 6\nCurrent player: 0\nTurn Type: Utterance\nPlayer 0 proposes: [0, 1, 3] utters: [2, 0]\nPlayer 1 proposes: [0, 0, 1] utters: [2, 2]\nPlayer 0 proposes: [0, 1, 1]\n"
 History() = [0, 9, 223, 1, 225, 7]
 HistoryString() = "0 9 223 1 225 7"
 IsChanceNode() = False
@@ -175,8 +213,16 @@ StringLegalActions() = [", Utterance: [0, 0]", ", Utterance: [0, 1]", ", Utteran
 action: 220
 
 # State 7
+# Max steps: 4
+# Item pool: 0 1 4
+# Agent 0 util vec: 2 9 4
+# Agent 1 util vec: 1 9 6
+# Current player: 1
+# Turn Type: Proposal
+# Player 0 proposes: [0, 1, 3] utters: [2, 0]
+# Player 1 proposes: [0, 0, 1] utters: [2, 2]
+# Player 0 proposes: [0, 1, 1] utters: [1, 0]
 IsTerminal() = False
-ToString() = "Max steps: 4\nItem pool: 0 1 4\nAgent 0 util vec: 2 9 4\nAgent 1 util vec: 1 9 6\nCurrent player: 1\nTurn Type: Proposal\nPlayer 0 proposes: [0, 1, 3] utters: [2, 0]\nPlayer 1 proposes: [0, 0, 1] utters: [2, 2]\nPlayer 0 proposes: [0, 1, 1] utters: [1, 0]\n"
 History() = [0, 9, 223, 1, 225, 7, 220]
 HistoryString() = "0 9 223 1 225 7 220"
 IsChanceNode() = False
@@ -196,8 +242,17 @@ StringLegalActions() = ["Proposal: [0, 0, 0]", "Proposal: [0, 0, 1]", "Proposal:
 action: 9
 
 # State 8
+# Max steps: 4
+# Item pool: 0 1 4
+# Agent 0 util vec: 2 9 4
+# Agent 1 util vec: 1 9 6
+# Current player: 1
+# Turn Type: Utterance
+# Player 0 proposes: [0, 1, 3] utters: [2, 0]
+# Player 1 proposes: [0, 0, 1] utters: [2, 2]
+# Player 0 proposes: [0, 1, 1] utters: [1, 0]
+# Player 1 proposes: [0, 1, 3]
 IsTerminal() = False
-ToString() = "Max steps: 4\nItem pool: 0 1 4\nAgent 0 util vec: 2 9 4\nAgent 1 util vec: 1 9 6\nCurrent player: 1\nTurn Type: Utterance\nPlayer 0 proposes: [0, 1, 3] utters: [2, 0]\nPlayer 1 proposes: [0, 0, 1] utters: [2, 2]\nPlayer 0 proposes: [0, 1, 1] utters: [1, 0]\nPlayer 1 proposes: [0, 1, 3]\n"
 History() = [0, 9, 223, 1, 225, 7, 220, 9]
 HistoryString() = "0 9 223 1 225 7 220 9"
 IsChanceNode() = False
@@ -217,8 +272,17 @@ StringLegalActions() = [", Utterance: [0, 0]", ", Utterance: [0, 1]", ", Utteran
 action: 223
 
 # State 9
+# Max steps: 4
+# Item pool: 0 1 4
+# Agent 0 util vec: 2 9 4
+# Agent 1 util vec: 1 9 6
+# Current player: 0
+# Turn Type: Proposal
+# Player 0 proposes: [0, 1, 3] utters: [2, 0]
+# Player 1 proposes: [0, 0, 1] utters: [2, 2]
+# Player 0 proposes: [0, 1, 1] utters: [1, 0]
+# Player 1 proposes: [0, 1, 3] utters: [2, 0]
 IsTerminal() = True
-ToString() = "Max steps: 4\nItem pool: 0 1 4\nAgent 0 util vec: 2 9 4\nAgent 1 util vec: 1 9 6\nCurrent player: 0\nTurn Type: Proposal\nPlayer 0 proposes: [0, 1, 3] utters: [2, 0]\nPlayer 1 proposes: [0, 0, 1] utters: [2, 2]\nPlayer 0 proposes: [0, 1, 1] utters: [1, 0]\nPlayer 1 proposes: [0, 1, 3] utters: [2, 0]\n"
 History() = [0, 9, 223, 1, 225, 7, 220, 9, 223]
 HistoryString() = "0 9 223 1 225 7 220 9 223"
 IsChanceNode() = False

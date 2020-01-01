@@ -1,5 +1,4 @@
 game: breakthrough
-seed: 1583615979
 
 GameType.chance_mode = ChanceMode.DETERMINISTIC
 GameType.dynamics = Dynamics.SEQUENTIAL
@@ -29,8 +28,16 @@ MaxGameLength() = 209
 ToString() = "breakthrough()"
 
 # State 0
+# 8bbbbbbbb
+# 7bbbbbbbb
+# 6........
+# 5........
+# 4........
+# 3........
+# 2wwwwwwww
+# 1wwwwwwww
+#  abcdefgh
 IsTerminal() = False
-ToString() = "8bbbbbbbb\n7bbbbbbbb\n6........\n5........\n4........\n3........\n2wwwwwwww\n1wwwwwwww\n abcdefgh\n"
 History() = []
 HistoryString() = ""
 IsChanceNode() = False
@@ -49,8 +56,16 @@ StringLegalActions() = ["a7a6", "a7b6", "b7a6", "b7b6", "b7c6", "c7b6", "c7c6", 
 action: 124
 
 # State 1
+# 8bbbbbbbb
+# 7bb.bbbbb
+# 6...b....
+# 5........
+# 4........
+# 3........
+# 2wwwwwwww
+# 1wwwwwwww
+#  abcdefgh
 IsTerminal() = False
-ToString() = "8bbbbbbbb\n7bb.bbbbb\n6...b....\n5........\n4........\n3........\n2wwwwwwww\n1wwwwwwww\n abcdefgh\n"
 History() = [124]
 HistoryString() = "124"
 IsChanceNode() = False
@@ -69,8 +84,16 @@ StringLegalActions() = ["a2a3", "a2b3", "b2a3", "b2b3", "b2c3", "c2b3", "c2c3", 
 action: 620
 
 # State 2
+# 8bbbbbbbb
+# 7bb.bbbbb
+# 6...b....
+# 5........
+# 4........
+# 3...w....
+# 2www.wwww
+# 1wwwwwwww
+#  abcdefgh
 IsTerminal() = False
-ToString() = "8bbbbbbbb\n7bb.bbbbb\n6...b....\n5........\n4........\n3...w....\n2www.wwww\n1wwwwwwww\n abcdefgh\n"
 History() = [124, 620]
 HistoryString() = "124 620"
 IsChanceNode() = False
@@ -89,8 +112,16 @@ StringLegalActions() = ["b8c7", "c8c7", "d8c7", "a7a6", "a7b6", "b7a6", "b7b6", 
 action: 156
 
 # State 3
+# 8bbbbbbbb
+# 7bb.bb.bb
+# 6...bb...
+# 5........
+# 4........
+# 3...w....
+# 2www.wwww
+# 1wwwwwwww
+#  abcdefgh
 IsTerminal() = False
-ToString() = "8bbbbbbbb\n7bb.bb.bb\n6...bb...\n5........\n4........\n3...w....\n2www.wwww\n1wwwwwwww\n abcdefgh\n"
 History() = [124, 620, 156]
 HistoryString() = "124 620 156"
 IsChanceNode() = False
@@ -109,8 +140,16 @@ StringLegalActions() = ["d3c4", "d3d4", "d3e4", "a2a3", "a2b3", "b2a3", "b2b3", 
 action: 642
 
 # State 4
+# 8bbbbbbbb
+# 7bb.bb.bb
+# 6...bb...
+# 5........
+# 4........
+# 3...ww...
+# 2www.w.ww
+# 1wwwwwwww
+#  abcdefgh
 IsTerminal() = False
-ToString() = "8bbbbbbbb\n7bb.bb.bb\n6...bb...\n5........\n4........\n3...ww...\n2www.w.ww\n1wwwwwwww\n abcdefgh\n"
 History() = [124, 620, 156, 642]
 HistoryString() = "124 620 156 642"
 IsChanceNode() = False
@@ -129,8 +168,16 @@ StringLegalActions() = ["b8c7", "c8c7", "d8c7", "e8f7", "f8f7", "g8f7", "a7a6", 
 action: 16
 
 # State 5
+# 8b.bbbbbb
+# 7bbbbb.bb
+# 6...bb...
+# 5........
+# 4........
+# 3...ww...
+# 2www.w.ww
+# 1wwwwwwww
+#  abcdefgh
 IsTerminal() = False
-ToString() = "8b.bbbbbb\n7bbbbb.bb\n6...bb...\n5........\n4........\n3...ww...\n2www.w.ww\n1wwwwwwww\n abcdefgh\n"
 History() = [124, 620, 156, 642, 16]
 HistoryString() = "124 620 156 642 16"
 IsChanceNode() = False
@@ -149,8 +196,16 @@ StringLegalActions() = ["d3c4", "d3d4", "d3e4", "e3d4", "e3e4", "e3f4", "a2a3", 
 action: 596
 
 # State 6
+# 8b.bbbbbb
+# 7bbbbb.bb
+# 6...bb...
+# 5........
+# 4........
+# 3.w.ww...
+# 2w.w.w.ww
+# 1wwwwwwww
+#  abcdefgh
 IsTerminal() = False
-ToString() = "8b.bbbbbb\n7bbbbb.bb\n6...bb...\n5........\n4........\n3.w.ww...\n2w.w.w.ww\n1wwwwwwww\n abcdefgh\n"
 History() = [124, 620, 156, 642, 16, 596]
 HistoryString() = "124 620 156 642 16 596"
 IsChanceNode() = False
@@ -169,8 +224,16 @@ StringLegalActions() = ["e8f7", "f8f7", "g8f7", "a7a6", "a7b6", "b7a6", "b7b6", 
 action: 230
 
 # State 7
+# 8b.bbbbbb
+# 7bbbbb.bb
+# 6....b...
+# 5...b....
+# 4........
+# 3.w.ww...
+# 2w.w.w.ww
+# 1wwwwwwww
+#  abcdefgh
 IsTerminal() = False
-ToString() = "8b.bbbbbb\n7bbbbb.bb\n6....b...\n5...b....\n4........\n3.w.ww...\n2w.w.w.ww\n1wwwwwwww\n abcdefgh\n"
 History() = [124, 620, 156, 642, 16, 596, 230]
 HistoryString() = "124 620 156 642 16 596 230"
 IsChanceNode() = False
@@ -189,8 +252,16 @@ StringLegalActions() = ["b3a4", "b3b4", "b3c4", "d3c4", "d3d4", "d3e4", "e3d4", 
 action: 750
 
 # State 8
+# 8b.bbbbbb
+# 7bbbbb.bb
+# 6....b...
+# 5...b....
+# 4........
+# 3.w.ww...
+# 2w.w.wwww
+# 1wwwwww.w
+#  abcdefgh
 IsTerminal() = False
-ToString() = "8b.bbbbbb\n7bbbbb.bb\n6....b...\n5...b....\n4........\n3.w.ww...\n2w.w.wwww\n1wwwwww.w\n abcdefgh\n"
 History() = [124, 620, 156, 642, 16, 596, 230, 750]
 HistoryString() = "124 620 156 642 16 596 230 750"
 IsChanceNode() = False
@@ -209,8 +280,16 @@ StringLegalActions() = ["e8f7", "f8f7", "g8f7", "a7a6", "a7b6", "b7a6", "b7b6", 
 action: 62
 
 # State 9
+# 8b.bbb.bb
+# 7bbbbbbbb
+# 6....b...
+# 5...b....
+# 4........
+# 3.w.ww...
+# 2w.w.wwww
+# 1wwwwww.w
+#  abcdefgh
 IsTerminal() = False
-ToString() = "8b.bbb.bb\n7bbbbbbbb\n6....b...\n5...b....\n4........\n3.w.ww...\n2w.w.wwww\n1wwwwww.w\n abcdefgh\n"
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62]
 HistoryString() = "124 620 156 642 16 596 230 750 62"
 IsChanceNode() = False
@@ -229,8 +308,16 @@ StringLegalActions() = ["b3a4", "b3b4", "b3c4", "d3c4", "d3d4", "d3e4", "e3d4", 
 action: 668
 
 # State 10
+# 8b.bbb.bb
+# 7bbbbbbbb
+# 6....b...
+# 5...b....
+# 4........
+# 3.w.ww..w
+# 2w.w.www.
+# 1wwwwww.w
+#  abcdefgh
 IsTerminal() = False
-ToString() = "8b.bbb.bb\n7bbbbbbbb\n6....b...\n5...b....\n4........\n3.w.ww..w\n2w.w.www.\n1wwwwww.w\n abcdefgh\n"
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668]
 HistoryString() = "124 620 156 642 16 596 230 750 62 668"
 IsChanceNode() = False
@@ -249,8 +336,16 @@ StringLegalActions() = ["a7a6", "a7b6", "b7a6", "b7b6", "b7c6", "c7b6", "c7c6", 
 action: 108
 
 # State 11
+# 8b.bbb.bb
+# 7b.bbbbbb
+# 6b...b...
+# 5...b....
+# 4........
+# 3.w.ww..w
+# 2w.w.www.
+# 1wwwwww.w
+#  abcdefgh
 IsTerminal() = False
-ToString() = "8b.bbb.bb\n7b.bbbbbb\n6b...b...\n5...b....\n4........\n3.w.ww..w\n2w.w.www.\n1wwwwww.w\n abcdefgh\n"
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108]
 HistoryString() = "124 620 156 642 16 596 230 750 62 668 108"
 IsChanceNode() = False
@@ -269,8 +364,16 @@ StringLegalActions() = ["b3a4", "b3b4", "b3c4", "d3c4", "d3d4", "d3e4", "e3d4", 
 action: 572
 
 # State 12
+# 8b.bbb.bb
+# 7b.bbbbbb
+# 6b...b...
+# 5...b....
+# 4.......w
+# 3.w.ww...
+# 2w.w.www.
+# 1wwwwww.w
+#  abcdefgh
 IsTerminal() = False
-ToString() = "8b.bbb.bb\n7b.bbbbbb\n6b...b...\n5...b....\n4.......w\n3.w.ww...\n2w.w.www.\n1wwwwww.w\n abcdefgh\n"
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572]
 HistoryString() = "124 620 156 642 16 596 230 750 62 668 108 572"
 IsChanceNode() = False
@@ -289,8 +392,16 @@ StringLegalActions() = ["a8b7", "c8b7", "a7b6", "c7b6", "c7c6", "c7d6", "d7c6", 
 action: 132
 
 # State 13
+# 8b.bbb.bb
+# 7b.b.bbbb
+# 6b.b.b...
+# 5...b....
+# 4.......w
+# 3.w.ww...
+# 2w.w.www.
+# 1wwwwww.w
+#  abcdefgh
 IsTerminal() = False
-ToString() = "8b.bbb.bb\n7b.b.bbbb\n6b.b.b...\n5...b....\n4.......w\n3.w.ww...\n2w.w.www.\n1wwwwww.w\n abcdefgh\n"
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132]
 HistoryString() = "124 620 156 642 16 596 230 750 62 668 108 572 132"
 IsChanceNode() = False
@@ -309,8 +420,16 @@ StringLegalActions() = ["h4g5", "h4h5", "b3a4", "b3b4", "b3c4", "d3c4", "d3d4", 
 action: 682
 
 # State 14
+# 8b.bbb.bb
+# 7b.b.bbbb
+# 6b.b.b...
+# 5...b....
+# 4.......w
+# 3.w.ww...
+# 2www.www.
+# 1.wwwww.w
+#  abcdefgh
 IsTerminal() = False
-ToString() = "8b.bbb.bb\n7b.b.bbbb\n6b.b.b...\n5...b....\n4.......w\n3.w.ww...\n2www.www.\n1.wwwww.w\n abcdefgh\n"
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682]
 HistoryString() = "124 620 156 642 16 596 230 750 62 668 108 572 132 682"
 IsChanceNode() = False
@@ -329,8 +448,16 @@ StringLegalActions() = ["a8b7", "c8b7", "c8d7", "d8d7", "e8d7", "a7b6", "c7b6", 
 action: 170
 
 # State 15
+# 8b.bbb.bb
+# 7b.b.bb.b
+# 6b.b.b.b.
+# 5...b....
+# 4.......w
+# 3.w.ww...
+# 2www.www.
+# 1.wwwww.w
+#  abcdefgh
 IsTerminal() = False
-ToString() = "8b.bbb.bb\n7b.b.bb.b\n6b.b.b.b.\n5...b....\n4.......w\n3.w.ww...\n2www.www.\n1.wwwww.w\n abcdefgh\n"
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170]
 HistoryString() = "124 620 156 642 16 596 230 750 62 668 108 572 132 682 170"
 IsChanceNode() = False
@@ -349,8 +476,16 @@ StringLegalActions() = ["h4g5", "h4h5", "b3a4", "b3b4", "b3c4", "d3c4", "d3d4", 
 action: 538
 
 # State 16
+# 8b.bbb.bb
+# 7b.b.bb.b
+# 6b.b.b.b.
+# 5...b....
+# 4.....w.w
+# 3.w.w....
+# 2www.www.
+# 1.wwwww.w
+#  abcdefgh
 IsTerminal() = False
-ToString() = "8b.bbb.bb\n7b.b.bb.b\n6b.b.b.b.\n5...b....\n4.....w.w\n3.w.w....\n2www.www.\n1.wwwww.w\n abcdefgh\n"
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538]
 HistoryString() = "124 620 156 642 16 596 230 750 62 668 108 572 132 682 170 538"
 IsChanceNode() = False
@@ -369,8 +504,16 @@ StringLegalActions() = ["a8b7", "c8b7", "c8d7", "d8d7", "e8d7", "g8g7", "h8g7", 
 action: 148
 
 # State 17
+# 8b.bbb.bb
+# 7b.b..b.b
+# 6b.b.bbb.
+# 5...b....
+# 4.....w.w
+# 3.w.w....
+# 2www.www.
+# 1.wwwww.w
+#  abcdefgh
 IsTerminal() = False
-ToString() = "8b.bbb.bb\n7b.b..b.b\n6b.b.bbb.\n5...b....\n4.....w.w\n3.w.w....\n2www.www.\n1.wwwww.w\n abcdefgh\n"
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148]
 HistoryString() = "124 620 156 642 16 596 230 750 62 668 108 572 132 682 170 538 148"
 IsChanceNode() = False
@@ -389,8 +532,16 @@ StringLegalActions() = ["f4e5", "f4f5", "f4g5", "h4g5", "h4h5", "b3a4", "b3b4", 
 action: 500
 
 # State 18
+# 8b.bbb.bb
+# 7b.b..b.b
+# 6b.b.bbb.
+# 5...b....
+# 4.w...w.w
+# 3...w....
+# 2www.www.
+# 1.wwwww.w
+#  abcdefgh
 IsTerminal() = False
-ToString() = "8b.bbb.bb\n7b.b..b.b\n6b.b.bbb.\n5...b....\n4.w...w.w\n3...w....\n2www.www.\n1.wwwww.w\n abcdefgh\n"
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500]
 HistoryString() = "124 620 156 642 16 596 230 750 62 668 108 572 132 682 170 538 148 500"
 IsChanceNode() = False
@@ -409,8 +560,16 @@ StringLegalActions() = ["a8b7", "c8b7", "c8d7", "d8d7", "d8e7", "e8d7", "e8e7", 
 action: 48
 
 # State 19
+# 8b.bb..bb
+# 7b.bb.b.b
+# 6b.b.bbb.
+# 5...b....
+# 4.w...w.w
+# 3...w....
+# 2www.www.
+# 1.wwwww.w
+#  abcdefgh
 IsTerminal() = False
-ToString() = "8b.bb..bb\n7b.bb.b.b\n6b.b.bbb.\n5...b....\n4.w...w.w\n3...w....\n2www.www.\n1.wwwww.w\n abcdefgh\n"
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48]
 HistoryString() = "124 620 156 642 16 596 230 750 62 668 108 572 132 682 170 538 148 500 48"
 IsChanceNode() = False
@@ -429,8 +588,16 @@ StringLegalActions() = ["b4a5", "b4b5", "b4c5", "f4e5", "f4f5", "f4g5", "h4g5", 
 action: 584
 
 # State 20
+# 8b.bb..bb
+# 7b.bb.b.b
+# 6b.b.bbb.
+# 5...b....
+# 4.w...w.w
+# 3w..w....
+# 2.ww.www.
+# 1.wwwww.w
+#  abcdefgh
 IsTerminal() = False
-ToString() = "8b.bb..bb\n7b.bb.b.b\n6b.b.bbb.\n5...b....\n4.w...w.w\n3w..w....\n2.ww.www.\n1.wwwww.w\n abcdefgh\n"
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584]
 HistoryString() = "124 620 156 642 16 596 230 750 62 668 108 572 132 682 170 538 148 500 48 584"
 IsChanceNode() = False
@@ -449,8 +616,16 @@ StringLegalActions() = ["a8b7", "c8b7", "d8e7", "g8g7", "h8g7", "a7b6", "c7b6", 
 action: 266
 
 # State 21
+# 8b.bb..bb
+# 7b.bb.b.b
+# 6b.b.bb..
+# 5...b..b.
+# 4.w...w.w
+# 3w..w....
+# 2.ww.www.
+# 1.wwwww.w
+#  abcdefgh
 IsTerminal() = False
-ToString() = "8b.bb..bb\n7b.bb.b.b\n6b.b.bb..\n5...b..b.\n4.w...w.w\n3w..w....\n2.ww.www.\n1.wwwww.w\n abcdefgh\n"
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584, 266]
 HistoryString() = "124 620 156 642 16 596 230 750 62 668 108 572 132 682 170 538 148 500 48 584 266"
 IsChanceNode() = False
@@ -469,8 +644,16 @@ StringLegalActions() = ["b4a5", "b4b5", "b4c5", "f4e5", "f4f5", "f4g5*", "h4g5*"
 action: 656
 
 # State 22
+# 8b.bb..bb
+# 7b.bb.b.b
+# 6b.b.bb..
+# 5...b..b.
+# 4.w...w.w
+# 3w..w..w.
+# 2.ww.ww..
+# 1.wwwww.w
+#  abcdefgh
 IsTerminal() = False
-ToString() = "8b.bb..bb\n7b.bb.b.b\n6b.b.bb..\n5...b..b.\n4.w...w.w\n3w..w..w.\n2.ww.ww..\n1.wwwww.w\n abcdefgh\n"
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584, 266, 656]
 HistoryString() = "124 620 156 642 16 596 230 750 62 668 108 572 132 682 170 538 148 500 48 584 266 656"
 IsChanceNode() = False
@@ -489,8 +672,16 @@ StringLegalActions() = ["a8b7", "c8b7", "d8e7", "g8g7", "h8g7", "a7b6", "c7b6", 
 action: 84
 
 # State 23
+# 8b.bb..b.
+# 7b.bb.bbb
+# 6b.b.bb..
+# 5...b..b.
+# 4.w...w.w
+# 3w..w..w.
+# 2.ww.ww..
+# 1.wwwww.w
+#  abcdefgh
 IsTerminal() = False
-ToString() = "8b.bb..b.\n7b.bb.bbb\n6b.b.bb..\n5...b..b.\n4.w...w.w\n3w..w..w.\n2.ww.ww..\n1.wwwww.w\n abcdefgh\n"
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584, 266, 656, 84]
 HistoryString() = "124 620 156 642 16 596 230 750 62 668 108 572 132 682 170 538 148 500 48 584 266 656 84"
 IsChanceNode() = False
@@ -509,8 +700,16 @@ StringLegalActions() = ["b4a5", "b4b5", "b4c5", "f4e5", "f4f5", "f4g5*", "h4g5*"
 action: 402
 
 # State 24
+# 8b.bb..b.
+# 7b.bb.bbb
+# 6b.b.bb..
+# 5w..b..b.
+# 4.....w.w
+# 3w..w..w.
+# 2.ww.ww..
+# 1.wwwww.w
+#  abcdefgh
 IsTerminal() = False
-ToString() = "8b.bb..b.\n7b.bb.bbb\n6b.b.bb..\n5w..b..b.\n4.....w.w\n3w..w..w.\n2.ww.ww..\n1.wwwww.w\n abcdefgh\n"
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584, 266, 656, 84, 402]
 HistoryString() = "124 620 156 642 16 596 230 750 62 668 108 572 132 682 170 538 148 500 48 584 266 656 84 402"
 IsChanceNode() = False
@@ -529,8 +728,16 @@ StringLegalActions() = ["a8b7", "c8b7", "d8e7", "a7b6", "c7b6", "c7d6", "d7d6", 
 action: 124
 
 # State 25
+# 8b.bb..b.
+# 7b..b.bbb
+# 6b.bbbb..
+# 5w..b..b.
+# 4.....w.w
+# 3w..w..w.
+# 2.ww.ww..
+# 1.wwwww.w
+#  abcdefgh
 IsTerminal() = False
-ToString() = "8b.bb..b.\n7b..b.bbb\n6b.bbbb..\n5w..b..b.\n4.....w.w\n3w..w..w.\n2.ww.ww..\n1.wwwww.w\n abcdefgh\n"
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584, 266, 656, 84, 402, 124]
 HistoryString() = "124 620 156 642 16 596 230 750 62 668 108 572 132 682 170 538 148 500 48 584 266 656 84 402 124"
 IsChanceNode() = False
@@ -549,8 +756,16 @@ StringLegalActions() = ["a5b6", "f4e5", "f4f5", "f4g5*", "h4g5*", "h4h5", "a3a4"
 action: 762
 
 # State 26
+# 8b.bb..b.
+# 7b..b.bbb
+# 6b.bbbb..
+# 5w..b..b.
+# 4.....w.w
+# 3w..w..w.
+# 2.ww.www.
+# 1.wwwww..
+#  abcdefgh
 IsTerminal() = False
-ToString() = "8b.bb..b.\n7b..b.bbb\n6b.bbbb..\n5w..b..b.\n4.....w.w\n3w..w..w.\n2.ww.www.\n1.wwwww..\n abcdefgh\n"
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584, 266, 656, 84, 402, 124, 762]
 HistoryString() = "124 620 156 642 16 596 230 750 62 668 108 572 132 682 170 538 148 500 48 584 266 656 84 402 124 762"
 IsChanceNode() = False
@@ -569,8 +784,16 @@ StringLegalActions() = ["a8b7", "c8b7", "c8c7", "d8c7", "d8e7", "a7b6", "f7g6", 
 action: 170
 
 # State 27
+# 8b.bb..b.
+# 7b..b.b.b
+# 6b.bbbbb.
+# 5w..b..b.
+# 4.....w.w
+# 3w..w..w.
+# 2.ww.www.
+# 1.wwwww..
+#  abcdefgh
 IsTerminal() = False
-ToString() = "8b.bb..b.\n7b..b.b.b\n6b.bbbbb.\n5w..b..b.\n4.....w.w\n3w..w..w.\n2.ww.www.\n1.wwwww..\n abcdefgh\n"
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584, 266, 656, 84, 402, 124, 762, 170]
 HistoryString() = "124 620 156 642 16 596 230 750 62 668 108 572 132 682 170 538 148 500 48 584 266 656 84 402 124 762 170"
 IsChanceNode() = False
@@ -589,8 +812,16 @@ StringLegalActions() = ["a5b6", "f4e5", "f4f5", "f4g5*", "h4g5*", "h4h5", "a3a4"
 action: 475
 
 # State 28
+# 8b.bb..b.
+# 7b..b.b.b
+# 6b.bbbbb.
+# 5w..b..w.
+# 4.....w..
+# 3w..w..w.
+# 2.ww.www.
+# 1.wwwww..
+#  abcdefgh
 IsTerminal() = False
-ToString() = "8b.bb..b.\n7b..b.b.b\n6b.bbbbb.\n5w..b..w.\n4.....w..\n3w..w..w.\n2.ww.www.\n1.wwwww..\n abcdefgh\n"
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584, 266, 656, 84, 402, 124, 762, 170, 475]
 HistoryString() = "124 620 156 642 16 596 230 750 62 668 108 572 132 682 170 538 148 500 48 584 266 656 84 402 124 762 170 475"
 IsChanceNode() = False
@@ -609,8 +840,16 @@ StringLegalActions() = ["a8b7", "c8b7", "c8c7", "d8c7", "d8e7", "g8g7", "a7b6", 
 action: 228
 
 # State 29
+# 8b.bb..b.
+# 7b..b.b.b
+# 6b.b.bbb.
+# 5w.bb..w.
+# 4.....w..
+# 3w..w..w.
+# 2.ww.www.
+# 1.wwwww..
+#  abcdefgh
 IsTerminal() = False
-ToString() = "8b.bb..b.\n7b..b.b.b\n6b.b.bbb.\n5w.bb..w.\n4.....w..\n3w..w..w.\n2.ww.www.\n1.wwwww..\n abcdefgh\n"
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584, 266, 656, 84, 402, 124, 762, 170, 475, 228]
 HistoryString() = "124 620 156 642 16 596 230 750 62 668 108 572 132 682 170 538 148 500 48 584 266 656 84 402 124 762 170 475 228"
 IsChanceNode() = False
@@ -629,8 +868,16 @@ StringLegalActions() = ["a5b6", "g5f6*", "g5h6", "f4e5", "f4f5", "a3a4", "a3b4",
 action: 367
 
 # State 30
+# 8b.bb..b.
+# 7b..b.b.b
+# 6b.b.bwb.
+# 5w.bb....
+# 4.....w..
+# 3w..w..w.
+# 2.ww.www.
+# 1.wwwww..
+#  abcdefgh
 IsTerminal() = False
-ToString() = "8b.bb..b.\n7b..b.b.b\n6b.b.bwb.\n5w.bb....\n4.....w..\n3w..w..w.\n2.ww.www.\n1.wwwww..\n abcdefgh\n"
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584, 266, 656, 84, 402, 124, 762, 170, 475, 228, 367]
 HistoryString() = "124 620 156 642 16 596 230 750 62 668 108 572 132 682 170 538 148 500 48 584 266 656 84 402 124 762 170 475 228 367"
 IsChanceNode() = False
@@ -649,8 +896,16 @@ StringLegalActions() = ["a8b7", "c8b7", "c8c7", "d8c7", "d8e7", "g8g7", "a7b6", 
 action: 316
 
 # State 31
+# 8b.bb..b.
+# 7b..b.b.b
+# 6b.b.bwb.
+# 5w..b....
+# 4...b.w..
+# 3w..w..w.
+# 2.ww.www.
+# 1.wwwww..
+#  abcdefgh
 IsTerminal() = False
-ToString() = "8b.bb..b.\n7b..b.b.b\n6b.b.bwb.\n5w..b....\n4...b.w..\n3w..w..w.\n2.ww.www.\n1.wwwww..\n abcdefgh\n"
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584, 266, 656, 84, 402, 124, 762, 170, 475, 228, 367, 316]
 HistoryString() = "124 620 156 642 16 596 230 750 62 668 108 572 132 682 170 538 148 500 48 584 266 656 84 402 124 762 170 475 228 367 316"
 IsChanceNode() = False
@@ -669,8 +924,16 @@ StringLegalActions() = ["f6e7", "f6g7", "a5b6", "f4e5", "f4f5", "f4g5", "a3a4", 
 action: 258
 
 # State 32
+# 8b.bb..b.
+# 7b..bwb.b
+# 6b.b.b.b.
+# 5w..b....
+# 4...b.w..
+# 3w..w..w.
+# 2.ww.www.
+# 1.wwwww..
+#  abcdefgh
 IsTerminal() = False
-ToString() = "8b.bb..b.\n7b..bwb.b\n6b.b.b.b.\n5w..b....\n4...b.w..\n3w..w..w.\n2.ww.www.\n1.wwwww..\n abcdefgh\n"
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584, 266, 656, 84, 402, 124, 762, 170, 475, 228, 367, 316, 258]
 HistoryString() = "124 620 156 642 16 596 230 750 62 668 108 572 132 682 170 538 148 500 48 584 266 656 84 402 124 762 170 475 228 367 316 258"
 IsChanceNode() = False
@@ -689,8 +952,16 @@ StringLegalActions() = ["a8b7", "c8b7", "c8c7", "d8c7", "d8e7*", "g8g7", "a7b6",
 action: 158
 
 # State 33
+# 8b.bb..b.
+# 7b..bw..b
+# 6b.b.bbb.
+# 5w..b....
+# 4...b.w..
+# 3w..w..w.
+# 2.ww.www.
+# 1.wwwww..
+#  abcdefgh
 IsTerminal() = False
-ToString() = "8b.bb..b.\n7b..bw..b\n6b.b.bbb.\n5w..b....\n4...b.w..\n3w..w..w.\n2.ww.www.\n1.wwwww..\n abcdefgh\n"
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584, 266, 656, 84, 402, 124, 762, 170, 475, 228, 367, 316, 258, 158]
 HistoryString() = "124 620 156 642 16 596 230 750 62 668 108 572 132 682 170 538 148 500 48 584 266 656 84 402 124 762 170 475 228 367 316 258 158"
 IsChanceNode() = False
@@ -709,8 +980,16 @@ StringLegalActions() = ["e7d8*", "e7e8", "e7f8", "a5b6", "f4e5", "f4f5", "f4g5",
 action: 562
 
 # State 34
+# 8b.bb..b.
+# 7b..bw..b
+# 6b.b.bbb.
+# 5w..b....
+# 4...b.w.w
+# 3w..w....
+# 2.ww.www.
+# 1.wwwww..
+#  abcdefgh
 IsTerminal() = False
-ToString() = "8b.bb..b.\n7b..bw..b\n6b.b.bbb.\n5w..b....\n4...b.w.w\n3w..w....\n2.ww.www.\n1.wwwww..\n abcdefgh\n"
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584, 266, 656, 84, 402, 124, 762, 170, 475, 228, 367, 316, 258, 158, 562]
 HistoryString() = "124 620 156 642 16 596 230 750 62 668 108 572 132 682 170 538 148 500 48 584 266 656 84 402 124 762 170 475 228 367 316 258 158 562"
 IsChanceNode() = False
@@ -729,8 +1008,16 @@ StringLegalActions() = ["a8b7", "c8b7", "c8c7", "d8c7", "d8e7*", "g8f7", "g8g7",
 action: 254
 
 # State 35
+# 8b.bb..b.
+# 7b..bw..b
+# 6b.b.b.b.
+# 5w..b.b..
+# 4...b.w.w
+# 3w..w....
+# 2.ww.www.
+# 1.wwwww..
+#  abcdefgh
 IsTerminal() = False
-ToString() = "8b.bb..b.\n7b..bw..b\n6b.b.b.b.\n5w..b.b..\n4...b.w.w\n3w..w....\n2.ww.www.\n1.wwwww..\n abcdefgh\n"
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584, 266, 656, 84, 402, 124, 762, 170, 475, 228, 367, 316, 258, 158, 562, 254]
 HistoryString() = "124 620 156 642 16 596 230 750 62 668 108 572 132 682 170 538 148 500 48 584 266 656 84 402 124 762 170 475 228 367 316 258 158 562 254"
 IsChanceNode() = False
@@ -749,8 +1036,16 @@ StringLegalActions() = ["e7d8*", "e7e8", "e7f8", "a5b6", "f4e5", "f4g5", "h4g5",
 action: 522
 
 # State 36
+# 8b.bb..b.
+# 7b..bw..b
+# 6b.b.b.b.
+# 5w..b.b..
+# 4..wb.w.w
+# 3w.......
+# 2.ww.www.
+# 1.wwwww..
+#  abcdefgh
 IsTerminal() = False
-ToString() = "8b.bb..b.\n7b..bw..b\n6b.b.b.b.\n5w..b.b..\n4..wb.w.w\n3w.......\n2.ww.www.\n1.wwwww..\n abcdefgh\n"
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584, 266, 656, 84, 402, 124, 762, 170, 475, 228, 367, 316, 258, 158, 562, 254, 522]
 HistoryString() = "124 620 156 642 16 596 230 750 62 668 108 572 132 682 170 538 148 500 48 584 266 656 84 402 124 762 170 475 228 367 316 258 158 562 254 522"
 IsChanceNode() = False
@@ -769,8 +1064,16 @@ StringLegalActions() = ["a8b7", "c8b7", "c8c7", "d8c7", "d8e7*", "g8f7", "g8g7",
 action: 424
 
 # State 37
+# 8b.bb..b.
+# 7b..bw..b
+# 6b.b.b.b.
+# 5w..b.b..
+# 4..w..w.w
+# 3w...b...
+# 2.ww.www.
+# 1.wwwww..
+#  abcdefgh
 IsTerminal() = False
-ToString() = "8b.bb..b.\n7b..bw..b\n6b.b.b.b.\n5w..b.b..\n4..w..w.w\n3w...b...\n2.ww.www.\n1.wwwww..\n abcdefgh\n"
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584, 266, 656, 84, 402, 124, 762, 170, 475, 228, 367, 316, 258, 158, 562, 254, 522, 424]
 HistoryString() = "124 620 156 642 16 596 230 750 62 668 108 572 132 682 170 538 148 500 48 584 266 656 84 402 124 762 170 475 228 367 316 258 158 562 254 522 424"
 IsChanceNode() = False
@@ -789,8 +1092,16 @@ StringLegalActions() = ["e7d8*", "e7e8", "e7f8", "a5b6", "c4b5", "c4c5", "c4d5*"
 action: 152
 
 # State 38
+# 8b.bbw.b.
+# 7b..b...b
+# 6b.b.b.b.
+# 5w..b.b..
+# 4..w..w.w
+# 3w...b...
+# 2.ww.www.
+# 1.wwwww..
+#  abcdefgh
 IsTerminal() = True
-ToString() = "8b.bbw.b.\n7b..b...b\n6b.b.b.b.\n5w..b.b..\n4..w..w.w\n3w...b...\n2.ww.www.\n1.wwwww..\n abcdefgh\n"
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584, 266, 656, 84, 402, 124, 762, 170, 475, 228, 367, 316, 258, 158, 562, 254, 522, 424, 152]
 HistoryString() = "124 620 156 642 16 596 230 750 62 668 108 572 132 682 170 538 148 500 48 584 266 656 84 402 124 762 170 475 228 367 316 258 158 562 254 522 424 152"
 IsChanceNode() = False

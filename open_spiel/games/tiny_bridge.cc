@@ -17,6 +17,7 @@
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/algorithms/minimax.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
 namespace tiny_bridge {
@@ -25,6 +26,17 @@ namespace {
 constexpr std::array<char, kNumRanks> kRankChar{'J', 'Q', 'K', 'A'};
 constexpr std::array<char, 1 + kNumSuits> kSuitChar{'H', 'S', 'N'};
 constexpr std::array<char, kNumSeats> kSeatChar{'W', 'N', 'E', 'S'};
+
+int RelativeSeatIndex(Seat player, Seat observer) {
+  return (kNumSeats + static_cast<int>(player) - static_cast<int>(observer)) %
+         kNumSeats;
+}
+
+std::string RelativeSeatString(Seat player, Seat observer) {
+  constexpr std::array<absl::string_view, 4> relative_player{"Us", "LH", "Pd",
+                                                             "RH"};
+  return std::string(relative_player[RelativeSeatIndex(player, observer)]);
+}
 
 int Suit(int card) { return card / kNumRanks; }
 int Rank(int card) { return card % kNumRanks; }
@@ -90,6 +102,56 @@ std::pair<int, int> ChanceOutcomeToCards(int outcome) {
   return {card0, outcome - CardsToChanceOutcome(card0, 0)};
 }
 
+// Hand abstraction. Each line is a bucket of hands that are
+// indistinguishable.
+inline constexpr const char* kAbstraction[kNumAbstractHands] = {
+    // Mixed suits.
+    "SAHA",
+    "SJHA SKHA SQHA",
+    "SAHJ SAHK SAHQ",
+    "SJHJ SJHK SJHQ SKHJ SKHK SKHQ SQHJ SQHK SQHQ",
+    // Hearts only.
+    "HAHK HAHQ",
+    "HKHJ HKHQ",
+    "HAHJ",
+    "HQHJ",
+    // Spades only.
+    "SASK SASQ",
+    "SKSQ SKSJ",
+    "SASJ",
+    "SQSJ",
+};
+
+// Computes the abstraction lookup.
+std::vector<int> ConcreteToAbstract() {
+  std::vector<int> concrete_to_abstract(kNumPrivates, -1);
+  for (int c = 0; c < kNumPrivates; ++c) {
+    auto hand = HandString(c);
+    for (int ah = 0; ah < kNumAbstractHands; ++ah) {
+      if (absl::StrContains(kAbstraction[ah], hand)) {
+        concrete_to_abstract[c] = ah;
+        break;
+      }
+    }
+    if (concrete_to_abstract[c] == -1) {
+      SpielFatalError(
+          absl::StrCat("Abstraction not found for concrete hand '", hand, "'"));
+    }
+  }
+  return concrete_to_abstract;
+}
+
+// Returns an abstraction.
+int ChanceOutcomeToHandAbstraction(int outcome) {
+  static std::vector<int> concrete_to_abstract = ConcreteToAbstract();
+  return concrete_to_abstract[outcome];
+}
+
+// Abstract hand string.
+std::string ChanceOutcomeToHandAbstractionString(int outcome) {
+  return kAbstraction[ChanceOutcomeToHandAbstraction(outcome)];
+}
+
 // Facts about the game
 const GameType kGameType2p{
     /*short_name=*/"tiny_bridge_2p",
@@ -105,8 +167,11 @@ const GameType kGameType2p{
     /*provides_information_state_tensor=*/true,
     /*provides_observation_string=*/true,
     /*provides_observation_tensor=*/true,
-    /*parameter_specification=*/{}  // no parameters
-};
+    /*parameter_specification=*/
+    {
+        {"abstracted",
+         GameParameter(GameParameter::Type::kBool, /*is_mandatory=*/false)},
+    }};
 
 const GameType kGameType4p{
     /*short_name=*/"tiny_bridge_4p",
@@ -119,9 +184,9 @@ const GameType kGameType4p{
     /*max_num_players=*/4,
     /*min_num_players=*/4,
     /*provides_information_state_string=*/true,
-    /*provides_information_state_tensor=*/false,
+    /*provides_information_state_tensor=*/true,
     /*provides_observation_string=*/true,
-    /*provides_observation_tensor=*/false,
+    /*provides_observation_tensor=*/true,
     /*parameter_specification=*/{}  // no parameters
 };
 
@@ -194,17 +259,20 @@ std::string HandString(Action outcome) {
 std::string SeatString(Seat seat) { return std::string(1, kSeatChar[seat]); }
 
 TinyBridgeGame2p::TinyBridgeGame2p(const GameParameters& params)
-    : Game(kGameType2p, params) {}
+    : Game(kGameType2p, params),
+      is_abstracted_(ParameterValue<bool>("abstracted", false)) {}
 
 std::unique_ptr<State> TinyBridgeGame2p::NewInitialState() const {
-  return std::unique_ptr<State>(new TinyBridgeAuctionState(shared_from_this()));
+  return std::unique_ptr<State>(
+      new TinyBridgeAuctionState(shared_from_this(), is_abstracted_));
 }
 
 TinyBridgeGame4p::TinyBridgeGame4p(const GameParameters& params)
     : Game(kGameType4p, params) {}
 
 std::unique_ptr<State> TinyBridgeGame4p::NewInitialState() const {
-  return std::unique_ptr<State>(new TinyBridgeAuctionState(shared_from_this()));
+  return std::unique_ptr<State>(
+      new TinyBridgeAuctionState(shared_from_this(), /*is_abstracted=*/false));
 }
 
 TinyBridgePlayGame::TinyBridgePlayGame(const GameParameters& params)
@@ -230,9 +298,16 @@ Seat TinyBridgeAuctionState::PlayerToSeat(Player player) const {
   return num_players_ == 2 ? Seat(player * 2) : Seat(player);
 }
 
-std::string TinyBridgeAuctionState::PlayerHandString(Player player) const {
+Player TinyBridgeAuctionState::SeatToPlayer(Seat seat) const {
+  return num_players_ == 2 ? static_cast<int>(seat) / 2
+                           : static_cast<int>(seat);
+}
+
+std::string TinyBridgeAuctionState::PlayerHandString(Player player,
+                                                     bool abstracted) const {
   if (!IsDealt(player)) return "??";
-  return HandString(actions_[player]);
+  return abstracted ? ChanceOutcomeToHandAbstractionString(actions_[player])
+                    : HandString(actions_[player]);
 }
 
 std::string TinyBridgeAuctionState::DealString() const {
@@ -240,7 +315,7 @@ std::string TinyBridgeAuctionState::DealString() const {
   for (auto player = Player{0}; player < num_players_; ++player) {
     if (player != 0) deal.push_back(' ');
     absl::StrAppend(&deal, SeatString(PlayerToSeat(player)), ":",
-                    PlayerHandString(player));
+                    PlayerHandString(player, /*abstracted=*/false));
   }
   return deal;
 }
@@ -478,80 +553,156 @@ std::string TinyBridgeAuctionState::InformationStateString(
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  std::string hand = absl::StrCat(SeatString(PlayerToSeat(player)), ":",
-                                  PlayerHandString(player));
+  std::string hand = PlayerHandString(player, is_abstracted_);
+  std::string dealer = RelativeSeatString(Seat::kWest, PlayerToSeat(player));
   std::string auction = AuctionString();
   if (!auction.empty())
-    return absl::StrCat(hand, " ", auction);
+    return absl::StrCat(hand, " ", dealer, " ", auction);
   else
     return hand;
 }
 
 // Observation string is the player's cards plus the most recent bid,
-// plus any doubles or redoubles. E.g. "W:HJSA 2NT:E Dbl:S RDbl:W"
-// This is an observation for West, who holds HJ and SA.
-// The most recent bid is 2NT by East, which has been doubled by South
+// plus any doubles or redoubles. E.g. "HJSA 2NT:Us Dbl:RH RDbl:Pd"
+// This is an observation for a player who holds HJ and SA.
 // and redoubled by West.
+// The most recent bid is 2NT by this player, which has been doubled by their
+// right-hand-opponent and redoubled by their partner. So the most recent few
+// calls must be: 2NT-Pass-Pass-Dbl-Pass-Pass-RDbl-Pass.
 std::string TinyBridgeAuctionState::ObservationString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  std::string observation = absl::StrCat(SeatString(PlayerToSeat(player)), ":",
-                                         PlayerHandString(player));
+  std::string observation = PlayerHandString(player, is_abstracted_);
   if (HasAuctionStarted()) {
     auto state = AnalyzeAuction();
-    absl::StrAppend(&observation, " ",
-                    ActionToString(state.last_bidder, state.last_bid), ":",
-                    SeatString(state.last_bidder));
+    if (state.last_bid != Call::kPass) {
+      absl::StrAppend(
+          &observation, " ", ActionToString(state.last_bidder, state.last_bid),
+          ":", RelativeSeatString(state.last_bidder, PlayerToSeat(player)));
+    }
     if (state.doubler != kInvalidSeat)
-      absl::StrAppend(&observation, " ", "Dbl:", SeatString(state.doubler));
+      absl::StrAppend(&observation, " ", "Dbl:",
+                      RelativeSeatString(state.doubler, PlayerToSeat(player)));
     if (state.redoubler != kInvalidSeat)
-      absl::StrAppend(&observation, " ", "RDbl:", SeatString(state.redoubler));
+      absl::StrAppend(
+          &observation, " ",
+          "RDbl:", RelativeSeatString(state.redoubler, PlayerToSeat(player)));
   }
   return observation;
 }
 
 // Information state vector consists of:
 //   kNumCards bits showing which cards the observing player holds
-//   kNumActions2p*2 bits showing which actions have been taken in the game.
+//   For 2p, kNumActions2p*2 bits showing which actions have been taken:
 //     For each action, the bits are [1, 0] if we took the action,
 //     [0, 1] if our partner took the action, and otherwise [0, 0].
+//   For 4p, (kNumBids*3+1)*num_players bits showing which actions have been
+//   taken:
+//     For each player, 1 bit showing if they passed before the first bid
+//     For each bid, 4 bits showing who made it, 4 bits showing who doubled it,
+//     and 4 bits showing who redoubled it.
+//     Each set of 4 bits is relative the the current player.
 void TinyBridgeAuctionState::InformationStateTensor(
     Player player, std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  SPIEL_CHECK_EQ(num_players_, 2);
-  values->resize(kDeckSize + kNumActions2p * 2);
+  const int hand_size = is_abstracted_ ? kNumAbstractHands : kDeckSize;
+  const int auction_size = (num_players_ == 2)
+                               ? kNumActions2p * num_players_
+                               : num_players_ + kNumBids * num_players_ * 3;
   std::fill(values->begin(), values->end(), 0);
+  values->resize(hand_size + auction_size);
   if (IsDealt(player)) {
-    const auto cards = ChanceOutcomeToCards(actions_[player]);
-    values->at(cards.first) = 1;
-    values->at(cards.second) = 1;
+    if (is_abstracted_) {
+      const int abstraction = ChanceOutcomeToHandAbstraction(actions_[player]);
+      values->at(abstraction) = 1;
+    } else {
+      const auto cards = ChanceOutcomeToCards(actions_[player]);
+      values->at(cards.first) = 1;
+      values->at(cards.second) = 1;
+    }
   }
-  for (int i = num_players_; i < actions_.size(); ++i) {
-    values->at(kDeckSize + actions_[i] * 2 + (i - player) % num_players_) = 1;
+  if (num_players_ == 2) {
+    for (int i = num_players_; i < actions_.size(); ++i) {
+      values->at(hand_size + actions_[i] * 2 + (i - player) % num_players_) = 1;
+    }
+  } else {
+    auto last_bid = Call::kPass;
+    auto observer = PlayerToSeat(player);
+    for (int i = num_players_; i < actions_.size(); ++i) {
+      int bidder = RelativeSeatIndex(Seat(i % num_players_), observer);
+      if (actions_[i] == Call::kPass) {
+        if (last_bid == Call::kPass) {
+          values->at(hand_size + bidder) = 1;
+        }
+      } else if (actions_[i] == Call::kDouble) {
+        values->at(hand_size + num_players_ +
+                   (last_bid - 1) * (3 * num_players_) + bidder) = 1;
+      } else if (actions_[i] == Call::kRedouble) {
+        values->at(hand_size + num_players_ +
+                   (last_bid - 1) * (3 * num_players_) + num_players_ +
+                   bidder) = 1;
+      } else {
+        last_bid = Call(actions_[i]);
+        values->at(hand_size + num_players_ +
+                   (last_bid - 1) * (3 * num_players_) + num_players_ * 2 +
+                   bidder) = 1;
+      }
+    }
   }
 }
 
 // Information state vector consists of:
 //   kNumCards bits showing which cards the observing player holds
+// For 2p:
 //   kNumActions2p bits showing the most recent action (one-hot)
+// For 4p:
+//   kNumBids bits showing the most recent bid (one-hot)
+//   4 bits showing who bid it (relative to the observing player)
+//   4 bits showing who doubled it (relative to the observing player)
+//   4 bits showing who redoubled it (relative to the observing player)
+//   4 bits for the dealer
 void TinyBridgeAuctionState::ObservationTensor(
     Player player, std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  SPIEL_CHECK_EQ(num_players_, 2);
-  values->resize(kDeckSize + kNumActions2p);
+  const int hand_size = is_abstracted_ ? kNumAbstractHands : kDeckSize;
+  const int auction_size =
+      num_players_ == 2 ? kNumActions2p : kNumBids + 4 * num_players_;
   std::fill(values->begin(), values->end(), 0);
+  values->resize(hand_size + auction_size);
   if (IsDealt(player)) {
-    const auto cards = ChanceOutcomeToCards(actions_[player]);
-    values->at(cards.first) = 1;
-    values->at(cards.second) = 1;
+    if (is_abstracted_) {
+      const int abstraction = ChanceOutcomeToHandAbstraction(actions_[player]);
+      values->at(abstraction) = 1;
+    } else {
+      const auto cards = ChanceOutcomeToCards(actions_[player]);
+      values->at(cards.first) = 1;
+      values->at(cards.second) = 1;
+    }
   }
-  if (HasAuctionStarted()) {
-    values->at(kDeckSize + actions_.back()) = 1;
+  if (num_players_ == 2) {
+    if (HasAuctionStarted()) {
+      values->at(hand_size + actions_.back()) = 1;
+    }
+  } else {
+    auto state = AnalyzeAuction();
+    auto seat = PlayerToSeat(player);
+    if (state.last_bidder != kInvalidSeat)
+      values->at(hand_size + RelativeSeatIndex(state.last_bidder, seat)) = 1;
+    if (state.doubler != kInvalidSeat)
+      values->at(hand_size + kNumSeats +
+                 RelativeSeatIndex(state.doubler, seat)) = 1;
+    if (state.redoubler != kInvalidSeat)
+      values->at(hand_size + kNumSeats * 2 +
+                 RelativeSeatIndex(state.redoubler, seat)) = 1;
+    values->at(hand_size + kNumSeats * 3 +
+               RelativeSeatIndex(Seat::kWest, seat)) = 1;
+    if (state.last_bidder != kInvalidSeat)
+      values->at(hand_size + kNumSeats * 4 + state.last_bid - 1) = 1;
   }
 }
 

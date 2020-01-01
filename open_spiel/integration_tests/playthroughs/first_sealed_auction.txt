@@ -1,5 +1,4 @@
 game: first_sealed_auction
-seed: 1284008198
 
 GameType.chance_mode = ChanceMode.EXPLICIT_STOCHASTIC
 GameType.dynamics = Dynamics.SEQUENTIAL
@@ -31,8 +30,8 @@ MaxGameLength() = 2
 ToString() = "first_sealed_auction()"
 
 # State 0
+# ;
 IsTerminal() = False
-ToString() = ";"
 History() = []
 HistoryString() = ""
 IsChanceNode() = True
@@ -54,8 +53,8 @@ StringLegalActions() = ["Player 0 value: 1", "Player 0 value: 2", "Player 0 valu
 action: 9
 
 # State 1
+# 9;
 IsTerminal() = False
-ToString() = "9;"
 History() = [9]
 HistoryString() = "9"
 IsChanceNode() = True
@@ -77,8 +76,8 @@ StringLegalActions() = ["Player 1 value: 1", "Player 1 value: 2", "Player 1 valu
 action: 10
 
 # State 2
+# 9,10;
 IsTerminal() = False
-ToString() = "9,10;"
 History() = [9, 10]
 HistoryString() = "9 10"
 IsChanceNode() = False
@@ -101,8 +100,8 @@ StringLegalActions() = ["Player 0 bid: 0", "Player 0 bid: 1", "Player 0 bid: 2",
 action: 3
 
 # State 3
+# 9,10;3
 IsTerminal() = False
-ToString() = "9,10;3"
 History() = [9, 10, 3]
 HistoryString() = "9 10 3"
 IsChanceNode() = False
@@ -125,8 +124,8 @@ StringLegalActions() = ["Player 1 bid: 0", "Player 1 bid: 1", "Player 1 bid: 2",
 action: 5
 
 # State 4
+# 9,10;3,5
 IsTerminal() = False
-ToString() = "9,10;3,5"
 History() = [9, 10, 3, 5]
 HistoryString() = "9 10 3 5"
 IsChanceNode() = True
@@ -148,8 +147,8 @@ StringLegalActions() = ["Chose winner 1"]
 action: 1
 
 # State 5
+# 9,10;3,5;1
 IsTerminal() = True
-ToString() = "9,10;3,5;1"
 History() = [9, 10, 3, 5, 1]
 HistoryString() = "9 10 3 5 1"
 IsChanceNode() = False

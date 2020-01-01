@@ -108,7 +108,7 @@ void LeducState::DoApplyAction(Action move) {
     } else {
       // Round 2: A single public card.
       public_card_ = deck_[move];
-      deck_[move] = kInvalidPlayer;
+      deck_[move] = kInvalidCard;
       deck_size_--;
 
       // We have finished the public card, let's bet!

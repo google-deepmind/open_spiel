@@ -27,7 +27,7 @@ import random
 import enum
 import numpy as np
 import sonnet as snt
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 
 from open_spiel.python import rl_agent
 from open_spiel.python.algorithms import dqn

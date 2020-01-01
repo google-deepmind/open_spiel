@@ -25,7 +25,7 @@ namespace {
 void BotTest_RandomVsRandom() {
   auto game = LoadGame("kuhn_poker");
   auto bot0 = MakeUniformRandomBot(0, /*seed=*/1234);
-  auto bot1 = MakeUniformRandomBot(1, /*seed=*/4321);
+  auto bot1 = MakeStatefulRandomBot(*game, 1, /*seed=*/4321);
   constexpr int num_players = 2;
   std::vector<double> average_results(num_players);
   constexpr int num_iters = 100000;

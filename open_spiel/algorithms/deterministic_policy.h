@@ -18,7 +18,7 @@
 #include <algorithm>
 #include <iterator>
 #include <string>
-#include <unordered_map>
+#include <map>
 #include <vector>
 
 #include "open_spiel/policy.h"
@@ -100,7 +100,7 @@ class DeterministicTabularPolicy : public Policy {
  private:
   void CreateTable(const Game& game, Player player);
 
-  std::unordered_map<std::string, LegalsWithIndex> table_;
+  std::map<std::string, LegalsWithIndex> table_;
   Player player_;
 };
 

@@ -19,6 +19,7 @@
 #include <utility>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
@@ -99,6 +100,13 @@ class TabularPolicy : public Policy {
   TabularPolicy(const std::unordered_map<std::string, ActionsAndProbs>& table)
       : policy_table_(table) {}
 
+  // Converts a policy to a TabularPolicy.
+  TabularPolicy(const Game& game, const Policy& policy) : TabularPolicy(game) {
+    for (auto& [infostate, is_policy] : policy_table_) {
+      is_policy = policy.GetStatePolicy(infostate);
+    }
+  }
+
   // Creates a new TabularPolicy from a deterministic policy encoded as a
   // {info_state_str -> action} dict. The dummy_policy is used to initialize
   // the initial mapping.
@@ -128,8 +136,27 @@ class TabularPolicy : public Policy {
     return policy_table_;
   }
 
+  const std::unordered_map<std::string, ActionsAndProbs>& PolicyTable() const {
+    return policy_table_;
+  }
+
  private:
   std::unordered_map<std::string, ActionsAndProbs> policy_table_;
+};
+
+// Chooses all legal actions with equal probability. This is equivalent to the
+// tabular version, except that this works for large games.
+class UniformPolicy : public Policy {
+ public:
+  ActionsAndProbs GetStatePolicy(const State& state) const {
+    ActionsAndProbs probs;
+    std::vector<Action> actions = state.LegalActions();
+    probs.reserve(actions.size());
+    absl::c_for_each(actions, [&probs, &actions](Action a) {
+      probs.push_back({a, 1. / static_cast<double>(actions.size())});
+    });
+    return probs;
+  }
 };
 
 // Returns the probability for the specified action, or -1 if not found.

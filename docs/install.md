@@ -19,6 +19,7 @@ The instructions here are for Linux and MacOS. For installation on Windows, see
     ```bash
     virtualenv -p python3 venv
     source venv/bin/activate
+    pip3 install --upgrade pip
     pip3 install -r requirements.txt
     ```
 
@@ -51,7 +52,7 @@ Linux versions).
 ### Configuration conditional dependencies
 
 See `open_spiel/scripts/global_variables.sh` to configure the conditional
-dependencies. See also the [Developer Guide](devloper_guide.md).
+dependencies. See also the [Developer Guide](developer_guide.md).
 
 ### Installing system-wide dependencies
 
@@ -82,7 +83,7 @@ pip3 install --upgrade -r requirements.txt
 
 Make sure that the virtual environment is still activated.
 
-By default, `g++` (version 7) is used (and potentially installed by
+By default, Clang C++ compiler is used (and potentially installed by
 `install.sh`).
 
 Build and run tests (Python 3):
@@ -90,7 +91,7 @@ Build and run tests (Python 3):
 ```bash
 mkdir build
 cd build
-CXX=g++ cmake -DPython_TARGET_VERSION=3.6 -DCMAKE_CXX_COMPILER=${CXX} ../open_spiel
+CXX=clang++ cmake -DPython_TARGET_VERSION=3.6 -DCMAKE_CXX_COMPILER=${CXX} ../open_spiel
 make -j$(nproc)
 ctest -j$(nproc)
 ```

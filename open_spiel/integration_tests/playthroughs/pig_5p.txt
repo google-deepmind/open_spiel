@@ -1,5 +1,4 @@
 game: pig(players=5,horizon=100,winscore=20)
-seed: 3172873524
 
 GameType.chance_mode = ChanceMode.EXPLICIT_STOCHASTIC
 GameType.dynamics = Dynamics.SEQUENTIAL
@@ -29,8 +28,9 @@ MaxGameLength() = 100
 ToString() = "pig(horizon=100,players=5,winscore=20)"
 
 # State 0
+# Scores: 0 0 0 0 0, Turn total: 0
+# Current player: 0
 IsTerminal() = False
-ToString() = "Scores: 0 0 0 0 0, Turn total: 0\nCurrent player: 0\n"
 History() = []
 HistoryString() = ""
 IsChanceNode() = False
@@ -55,8 +55,9 @@ StringLegalActions() = ["roll", "stop"]
 action: 1
 
 # State 1
+# Scores: 0 0 0 0 0, Turn total: 0
+# Current player: 1
 IsTerminal() = False
-ToString() = "Scores: 0 0 0 0 0, Turn total: 0\nCurrent player: 1\n"
 History() = [1]
 HistoryString() = "1"
 IsChanceNode() = False
@@ -81,8 +82,9 @@ StringLegalActions() = ["roll", "stop"]
 action: 0
 
 # State 2
+# Scores: 0 0 0 0 0, Turn total: 0
+# Current player: 1 (rolling)
 IsTerminal() = False
-ToString() = "Scores: 0 0 0 0 0, Turn total: 0\nCurrent player: 1 (rolling)\n"
 History() = [1, 0]
 HistoryString() = "1 0"
 IsChanceNode() = True
@@ -106,8 +108,9 @@ StringLegalActions() = ["chance outcome 1", "chance outcome 2", "chance outcome 
 action: 2
 
 # State 3
+# Scores: 0 0 0 0 0, Turn total: 3
+# Current player: 1
 IsTerminal() = False
-ToString() = "Scores: 0 0 0 0 0, Turn total: 3\nCurrent player: 1\n"
 History() = [1, 0, 2]
 HistoryString() = "1 0 2"
 IsChanceNode() = False
@@ -132,8 +135,9 @@ StringLegalActions() = ["roll", "stop"]
 action: 1
 
 # State 4
+# Scores: 0 3 0 0 0, Turn total: 0
+# Current player: 2
 IsTerminal() = False
-ToString() = "Scores: 0 3 0 0 0, Turn total: 0\nCurrent player: 2\n"
 History() = [1, 0, 2, 1]
 HistoryString() = "1 0 2 1"
 IsChanceNode() = False
@@ -158,8 +162,9 @@ StringLegalActions() = ["roll", "stop"]
 action: 1
 
 # State 5
+# Scores: 0 3 0 0 0, Turn total: 0
+# Current player: 3
 IsTerminal() = False
-ToString() = "Scores: 0 3 0 0 0, Turn total: 0\nCurrent player: 3\n"
 History() = [1, 0, 2, 1, 1]
 HistoryString() = "1 0 2 1 1"
 IsChanceNode() = False
@@ -184,8 +189,9 @@ StringLegalActions() = ["roll", "stop"]
 action: 1
 
 # State 6
+# Scores: 0 3 0 0 0, Turn total: 0
+# Current player: 4
 IsTerminal() = False
-ToString() = "Scores: 0 3 0 0 0, Turn total: 0\nCurrent player: 4\n"
 History() = [1, 0, 2, 1, 1, 1]
 HistoryString() = "1 0 2 1 1 1"
 IsChanceNode() = False
@@ -210,8 +216,9 @@ StringLegalActions() = ["roll", "stop"]
 action: 0
 
 # State 7
+# Scores: 0 3 0 0 0, Turn total: 0
+# Current player: 4 (rolling)
 IsTerminal() = False
-ToString() = "Scores: 0 3 0 0 0, Turn total: 0\nCurrent player: 4 (rolling)\n"
 History() = [1, 0, 2, 1, 1, 1, 0]
 HistoryString() = "1 0 2 1 1 1 0"
 IsChanceNode() = True
@@ -235,8 +242,9 @@ StringLegalActions() = ["chance outcome 1", "chance outcome 2", "chance outcome 
 action: 2
 
 # State 8
+# Scores: 0 3 0 0 0, Turn total: 3
+# Current player: 4
 IsTerminal() = False
-ToString() = "Scores: 0 3 0 0 0, Turn total: 3\nCurrent player: 4\n"
 History() = [1, 0, 2, 1, 1, 1, 0, 2]
 HistoryString() = "1 0 2 1 1 1 0 2"
 IsChanceNode() = False
@@ -261,8 +269,9 @@ StringLegalActions() = ["roll", "stop"]
 action: 0
 
 # State 9
+# Scores: 0 3 0 0 0, Turn total: 3
+# Current player: 4 (rolling)
 IsTerminal() = False
-ToString() = "Scores: 0 3 0 0 0, Turn total: 3\nCurrent player: 4 (rolling)\n"
 History() = [1, 0, 2, 1, 1, 1, 0, 2, 0]
 HistoryString() = "1 0 2 1 1 1 0 2 0"
 IsChanceNode() = True
@@ -286,8 +295,9 @@ StringLegalActions() = ["chance outcome 1", "chance outcome 2", "chance outcome 
 action: 3
 
 # State 10
+# Scores: 0 3 0 0 0, Turn total: 7
+# Current player: 4
 IsTerminal() = False
-ToString() = "Scores: 0 3 0 0 0, Turn total: 7\nCurrent player: 4\n"
 History() = [1, 0, 2, 1, 1, 1, 0, 2, 0, 3]
 HistoryString() = "1 0 2 1 1 1 0 2 0 3"
 IsChanceNode() = False
@@ -312,8 +322,9 @@ StringLegalActions() = ["roll", "stop"]
 action: 0
 
 # State 11
+# Scores: 0 3 0 0 0, Turn total: 7
+# Current player: 4 (rolling)
 IsTerminal() = False
-ToString() = "Scores: 0 3 0 0 0, Turn total: 7\nCurrent player: 4 (rolling)\n"
 History() = [1, 0, 2, 1, 1, 1, 0, 2, 0, 3, 0]
 HistoryString() = "1 0 2 1 1 1 0 2 0 3 0"
 IsChanceNode() = True
@@ -337,8 +348,9 @@ StringLegalActions() = ["chance outcome 1", "chance outcome 2", "chance outcome 
 action: 1
 
 # State 12
+# Scores: 0 3 0 0 0, Turn total: 0
+# Current player: 0
 IsTerminal() = False
-ToString() = "Scores: 0 3 0 0 0, Turn total: 0\nCurrent player: 0\n"
 History() = [1, 0, 2, 1, 1, 1, 0, 2, 0, 3, 0, 1]
 HistoryString() = "1 0 2 1 1 1 0 2 0 3 0 1"
 IsChanceNode() = False
@@ -363,8 +375,9 @@ StringLegalActions() = ["roll", "stop"]
 action: 1
 
 # State 13
+# Scores: 0 3 0 0 0, Turn total: 0
+# Current player: 1
 IsTerminal() = False
-ToString() = "Scores: 0 3 0 0 0, Turn total: 0\nCurrent player: 1\n"
 History() = [1, 0, 2, 1, 1, 1, 0, 2, 0, 3, 0, 1, 1]
 HistoryString() = "1 0 2 1 1 1 0 2 0 3 0 1 1"
 IsChanceNode() = False
@@ -389,8 +402,9 @@ StringLegalActions() = ["roll", "stop"]
 action: 1
 
 # State 14
+# Scores: 0 3 0 0 0, Turn total: 0
+# Current player: 2
 IsTerminal() = False
-ToString() = "Scores: 0 3 0 0 0, Turn total: 0\nCurrent player: 2\n"
 History() = [1, 0, 2, 1, 1, 1, 0, 2, 0, 3, 0, 1, 1, 1]
 HistoryString() = "1 0 2 1 1 1 0 2 0 3 0 1 1 1"
 IsChanceNode() = False
@@ -415,8 +429,9 @@ StringLegalActions() = ["roll", "stop"]
 action: 0
 
 # State 15
+# Scores: 0 3 0 0 0, Turn total: 0
+# Current player: 2 (rolling)
 IsTerminal() = False
-ToString() = "Scores: 0 3 0 0 0, Turn total: 0\nCurrent player: 2 (rolling)\n"
 History() = [1, 0, 2, 1, 1, 1, 0, 2, 0, 3, 0, 1, 1, 1, 0]
 HistoryString() = "1 0 2 1 1 1 0 2 0 3 0 1 1 1 0"
 IsChanceNode() = True
@@ -440,8 +455,9 @@ StringLegalActions() = ["chance outcome 1", "chance outcome 2", "chance outcome 
 action: 6
 
 # State 16
+# Scores: 0 3 0 0 0, Turn total: 7
+# Current player: 2
 IsTerminal() = False
-ToString() = "Scores: 0 3 0 0 0, Turn total: 7\nCurrent player: 2\n"
 History() = [1, 0, 2, 1, 1, 1, 0, 2, 0, 3, 0, 1, 1, 1, 0, 6]
 HistoryString() = "1 0 2 1 1 1 0 2 0 3 0 1 1 1 0 6"
 IsChanceNode() = False
@@ -466,8 +482,9 @@ StringLegalActions() = ["roll", "stop"]
 action: 0
 
 # State 17
+# Scores: 0 3 0 0 0, Turn total: 7
+# Current player: 2 (rolling)
 IsTerminal() = False
-ToString() = "Scores: 0 3 0 0 0, Turn total: 7\nCurrent player: 2 (rolling)\n"
 History() = [1, 0, 2, 1, 1, 1, 0, 2, 0, 3, 0, 1, 1, 1, 0, 6, 0]
 HistoryString() = "1 0 2 1 1 1 0 2 0 3 0 1 1 1 0 6 0"
 IsChanceNode() = True
@@ -491,8 +508,9 @@ StringLegalActions() = ["chance outcome 1", "chance outcome 2", "chance outcome 
 action: 2
 
 # State 18
+# Scores: 0 3 0 0 0, Turn total: 10
+# Current player: 2
 IsTerminal() = False
-ToString() = "Scores: 0 3 0 0 0, Turn total: 10\nCurrent player: 2\n"
 History() = [1, 0, 2, 1, 1, 1, 0, 2, 0, 3, 0, 1, 1, 1, 0, 6, 0, 2]
 HistoryString() = "1 0 2 1 1 1 0 2 0 3 0 1 1 1 0 6 0 2"
 IsChanceNode() = False
@@ -517,8 +535,9 @@ StringLegalActions() = ["roll", "stop"]
 action: 1
 
 # State 19
+# Scores: 0 3 10 0 0, Turn total: 0
+# Current player: 3
 IsTerminal() = False
-ToString() = "Scores: 0 3 10 0 0, Turn total: 0\nCurrent player: 3\n"
 History() = [1, 0, 2, 1, 1, 1, 0, 2, 0, 3, 0, 1, 1, 1, 0, 6, 0, 2, 1]
 HistoryString() = "1 0 2 1 1 1 0 2 0 3 0 1 1 1 0 6 0 2 1"
 IsChanceNode() = False
@@ -543,8 +562,9 @@ StringLegalActions() = ["roll", "stop"]
 action: 0
 
 # State 20
+# Scores: 0 3 10 0 0, Turn total: 0
+# Current player: 3 (rolling)
 IsTerminal() = False
-ToString() = "Scores: 0 3 10 0 0, Turn total: 0\nCurrent player: 3 (rolling)\n"
 History() = [1, 0, 2, 1, 1, 1, 0, 2, 0, 3, 0, 1, 1, 1, 0, 6, 0, 2, 1, 0]
 HistoryString() = "1 0 2 1 1 1 0 2 0 3 0 1 1 1 0 6 0 2 1 0"
 IsChanceNode() = True
@@ -568,8 +588,9 @@ StringLegalActions() = ["chance outcome 1", "chance outcome 2", "chance outcome 
 action: 4
 
 # State 21
+# Scores: 0 3 10 0 0, Turn total: 5
+# Current player: 3
 IsTerminal() = False
-ToString() = "Scores: 0 3 10 0 0, Turn total: 5\nCurrent player: 3\n"
 History() = [1, 0, 2, 1, 1, 1, 0, 2, 0, 3, 0, 1, 1, 1, 0, 6, 0, 2, 1, 0, 4]
 HistoryString() = "1 0 2 1 1 1 0 2 0 3 0 1 1 1 0 6 0 2 1 0 4"
 IsChanceNode() = False
@@ -594,8 +615,9 @@ StringLegalActions() = ["roll", "stop"]
 action: 1
 
 # State 22
+# Scores: 0 3 10 5 0, Turn total: 0
+# Current player: 4
 IsTerminal() = False
-ToString() = "Scores: 0 3 10 5 0, Turn total: 0\nCurrent player: 4\n"
 History() = [1, 0, 2, 1, 1, 1, 0, 2, 0, 3, 0, 1, 1, 1, 0, 6, 0, 2, 1, 0, 4, 1]
 HistoryString() = "1 0 2 1 1 1 0 2 0 3 0 1 1 1 0 6 0 2 1 0 4 1"
 IsChanceNode() = False
@@ -620,8 +642,9 @@ StringLegalActions() = ["roll", "stop"]
 action: 0
 
 # State 23
+# Scores: 0 3 10 5 0, Turn total: 0
+# Current player: 4 (rolling)
 IsTerminal() = False
-ToString() = "Scores: 0 3 10 5 0, Turn total: 0\nCurrent player: 4 (rolling)\n"
 History() = [1, 0, 2, 1, 1, 1, 0, 2, 0, 3, 0, 1, 1, 1, 0, 6, 0, 2, 1, 0, 4, 1, 0]
 HistoryString() = "1 0 2 1 1 1 0 2 0 3 0 1 1 1 0 6 0 2 1 0 4 1 0"
 IsChanceNode() = True
@@ -645,8 +668,9 @@ StringLegalActions() = ["chance outcome 1", "chance outcome 2", "chance outcome 
 action: 3
 
 # State 24
+# Scores: 0 3 10 5 0, Turn total: 4
+# Current player: 4
 IsTerminal() = False
-ToString() = "Scores: 0 3 10 5 0, Turn total: 4\nCurrent player: 4\n"
 History() = [1, 0, 2, 1, 1, 1, 0, 2, 0, 3, 0, 1, 1, 1, 0, 6, 0, 2, 1, 0, 4, 1, 0, 3]
 HistoryString() = "1 0 2 1 1 1 0 2 0 3 0 1 1 1 0 6 0 2 1 0 4 1 0 3"
 IsChanceNode() = False
@@ -671,8 +695,9 @@ StringLegalActions() = ["roll", "stop"]
 action: 0
 
 # State 25
+# Scores: 0 3 10 5 0, Turn total: 4
+# Current player: 4 (rolling)
 IsTerminal() = False
-ToString() = "Scores: 0 3 10 5 0, Turn total: 4\nCurrent player: 4 (rolling)\n"
 History() = [1, 0, 2, 1, 1, 1, 0, 2, 0, 3, 0, 1, 1, 1, 0, 6, 0, 2, 1, 0, 4, 1, 0, 3, 0]
 HistoryString() = "1 0 2 1 1 1 0 2 0 3 0 1 1 1 0 6 0 2 1 0 4 1 0 3 0"
 IsChanceNode() = True
@@ -696,8 +721,9 @@ StringLegalActions() = ["chance outcome 1", "chance outcome 2", "chance outcome 
 action: 5
 
 # State 26
+# Scores: 0 3 10 5 0, Turn total: 10
+# Current player: 4
 IsTerminal() = False
-ToString() = "Scores: 0 3 10 5 0, Turn total: 10\nCurrent player: 4\n"
 History() = [1, 0, 2, 1, 1, 1, 0, 2, 0, 3, 0, 1, 1, 1, 0, 6, 0, 2, 1, 0, 4, 1, 0, 3, 0, 5]
 HistoryString() = "1 0 2 1 1 1 0 2 0 3 0 1 1 1 0 6 0 2 1 0 4 1 0 3 0 5"
 IsChanceNode() = False
@@ -722,8 +748,9 @@ StringLegalActions() = ["roll", "stop"]
 action: 0
 
 # State 27
+# Scores: 0 3 10 5 0, Turn total: 10
+# Current player: 4 (rolling)
 IsTerminal() = False
-ToString() = "Scores: 0 3 10 5 0, Turn total: 10\nCurrent player: 4 (rolling)\n"
 History() = [1, 0, 2, 1, 1, 1, 0, 2, 0, 3, 0, 1, 1, 1, 0, 6, 0, 2, 1, 0, 4, 1, 0, 3, 0, 5, 0]
 HistoryString() = "1 0 2 1 1 1 0 2 0 3 0 1 1 1 0 6 0 2 1 0 4 1 0 3 0 5 0"
 IsChanceNode() = True
@@ -747,8 +774,9 @@ StringLegalActions() = ["chance outcome 1", "chance outcome 2", "chance outcome 
 action: 3
 
 # State 28
+# Scores: 0 3 10 5 0, Turn total: 14
+# Current player: 4
 IsTerminal() = False
-ToString() = "Scores: 0 3 10 5 0, Turn total: 14\nCurrent player: 4\n"
 History() = [1, 0, 2, 1, 1, 1, 0, 2, 0, 3, 0, 1, 1, 1, 0, 6, 0, 2, 1, 0, 4, 1, 0, 3, 0, 5, 0, 3]
 HistoryString() = "1 0 2 1 1 1 0 2 0 3 0 1 1 1 0 6 0 2 1 0 4 1 0 3 0 5 0 3"
 IsChanceNode() = False
@@ -773,8 +801,9 @@ StringLegalActions() = ["roll", "stop"]
 action: 1
 
 # State 29
+# Scores: 0 3 10 5 14, Turn total: 0
+# Current player: 0
 IsTerminal() = False
-ToString() = "Scores: 0 3 10 5 14, Turn total: 0\nCurrent player: 0\n"
 History() = [1, 0, 2, 1, 1, 1, 0, 2, 0, 3, 0, 1, 1, 1, 0, 6, 0, 2, 1, 0, 4, 1, 0, 3, 0, 5, 0, 3, 1]
 HistoryString() = "1 0 2 1 1 1 0 2 0 3 0 1 1 1 0 6 0 2 1 0 4 1 0 3 0 5 0 3 1"
 IsChanceNode() = False
@@ -799,8 +828,9 @@ StringLegalActions() = ["roll", "stop"]
 action: 0
 
 # State 30
+# Scores: 0 3 10 5 14, Turn total: 0
+# Current player: 0 (rolling)
 IsTerminal() = False
-ToString() = "Scores: 0 3 10 5 14, Turn total: 0\nCurrent player: 0 (rolling)\n"
 History() = [1, 0, 2, 1, 1, 1, 0, 2, 0, 3, 0, 1, 1, 1, 0, 6, 0, 2, 1, 0, 4, 1, 0, 3, 0, 5, 0, 3, 1, 0]
 HistoryString() = "1 0 2 1 1 1 0 2 0 3 0 1 1 1 0 6 0 2 1 0 4 1 0 3 0 5 0 3 1 0"
 IsChanceNode() = True
@@ -824,8 +854,9 @@ StringLegalActions() = ["chance outcome 1", "chance outcome 2", "chance outcome 
 action: 5
 
 # State 31
+# Scores: 0 3 10 5 14, Turn total: 6
+# Current player: 0
 IsTerminal() = False
-ToString() = "Scores: 0 3 10 5 14, Turn total: 6\nCurrent player: 0\n"
 History() = [1, 0, 2, 1, 1, 1, 0, 2, 0, 3, 0, 1, 1, 1, 0, 6, 0, 2, 1, 0, 4, 1, 0, 3, 0, 5, 0, 3, 1, 0, 5]
 HistoryString() = "1 0 2 1 1 1 0 2 0 3 0 1 1 1 0 6 0 2 1 0 4 1 0 3 0 5 0 3 1 0 5"
 IsChanceNode() = False
@@ -850,8 +881,9 @@ StringLegalActions() = ["roll", "stop"]
 action: 1
 
 # State 32
+# Scores: 6 3 10 5 14, Turn total: 0
+# Current player: 1
 IsTerminal() = False
-ToString() = "Scores: 6 3 10 5 14, Turn total: 0\nCurrent player: 1\n"
 History() = [1, 0, 2, 1, 1, 1, 0, 2, 0, 3, 0, 1, 1, 1, 0, 6, 0, 2, 1, 0, 4, 1, 0, 3, 0, 5, 0, 3, 1, 0, 5, 1]
 HistoryString() = "1 0 2 1 1 1 0 2 0 3 0 1 1 1 0 6 0 2 1 0 4 1 0 3 0 5 0 3 1 0 5 1"
 IsChanceNode() = False
@@ -876,8 +908,9 @@ StringLegalActions() = ["roll", "stop"]
 action: 0
 
 # State 33
+# Scores: 6 3 10 5 14, Turn total: 0
+# Current player: 1 (rolling)
 IsTerminal() = False
-ToString() = "Scores: 6 3 10 5 14, Turn total: 0\nCurrent player: 1 (rolling)\n"
 History() = [1, 0, 2, 1, 1, 1, 0, 2, 0, 3, 0, 1, 1, 1, 0, 6, 0, 2, 1, 0, 4, 1, 0, 3, 0, 5, 0, 3, 1, 0, 5, 1, 0]
 HistoryString() = "1 0 2 1 1 1 0 2 0 3 0 1 1 1 0 6 0 2 1 0 4 1 0 3 0 5 0 3 1 0 5 1 0"
 IsChanceNode() = True
@@ -901,8 +934,9 @@ StringLegalActions() = ["chance outcome 1", "chance outcome 2", "chance outcome 
 action: 6
 
 # State 34
+# Scores: 6 3 10 5 14, Turn total: 7
+# Current player: 1
 IsTerminal() = False
-ToString() = "Scores: 6 3 10 5 14, Turn total: 7\nCurrent player: 1\n"
 History() = [1, 0, 2, 1, 1, 1, 0, 2, 0, 3, 0, 1, 1, 1, 0, 6, 0, 2, 1, 0, 4, 1, 0, 3, 0, 5, 0, 3, 1, 0, 5, 1, 0, 6]
 HistoryString() = "1 0 2 1 1 1 0 2 0 3 0 1 1 1 0 6 0 2 1 0 4 1 0 3 0 5 0 3 1 0 5 1 0 6"
 IsChanceNode() = False
@@ -927,8 +961,9 @@ StringLegalActions() = ["roll", "stop"]
 action: 0
 
 # State 35
+# Scores: 6 3 10 5 14, Turn total: 7
+# Current player: 1 (rolling)
 IsTerminal() = False
-ToString() = "Scores: 6 3 10 5 14, Turn total: 7\nCurrent player: 1 (rolling)\n"
 History() = [1, 0, 2, 1, 1, 1, 0, 2, 0, 3, 0, 1, 1, 1, 0, 6, 0, 2, 1, 0, 4, 1, 0, 3, 0, 5, 0, 3, 1, 0, 5, 1, 0, 6, 0]
 HistoryString() = "1 0 2 1 1 1 0 2 0 3 0 1 1 1 0 6 0 2 1 0 4 1 0 3 0 5 0 3 1 0 5 1 0 6 0"
 IsChanceNode() = True
@@ -952,8 +987,9 @@ StringLegalActions() = ["chance outcome 1", "chance outcome 2", "chance outcome 
 action: 5
 
 # State 36
+# Scores: 6 3 10 5 14, Turn total: 13
+# Current player: 1
 IsTerminal() = False
-ToString() = "Scores: 6 3 10 5 14, Turn total: 13\nCurrent player: 1\n"
 History() = [1, 0, 2, 1, 1, 1, 0, 2, 0, 3, 0, 1, 1, 1, 0, 6, 0, 2, 1, 0, 4, 1, 0, 3, 0, 5, 0, 3, 1, 0, 5, 1, 0, 6, 0, 5]
 HistoryString() = "1 0 2 1 1 1 0 2 0 3 0 1 1 1 0 6 0 2 1 0 4 1 0 3 0 5 0 3 1 0 5 1 0 6 0 5"
 IsChanceNode() = False
@@ -978,8 +1014,9 @@ StringLegalActions() = ["roll", "stop"]
 action: 0
 
 # State 37
+# Scores: 6 3 10 5 14, Turn total: 13
+# Current player: 1 (rolling)
 IsTerminal() = False
-ToString() = "Scores: 6 3 10 5 14, Turn total: 13\nCurrent player: 1 (rolling)\n"
 History() = [1, 0, 2, 1, 1, 1, 0, 2, 0, 3, 0, 1, 1, 1, 0, 6, 0, 2, 1, 0, 4, 1, 0, 3, 0, 5, 0, 3, 1, 0, 5, 1, 0, 6, 0, 5, 0]
 HistoryString() = "1 0 2 1 1 1 0 2 0 3 0 1 1 1 0 6 0 2 1 0 4 1 0 3 0 5 0 3 1 0 5 1 0 6 0 5 0"
 IsChanceNode() = True
@@ -1003,8 +1040,9 @@ StringLegalActions() = ["chance outcome 1", "chance outcome 2", "chance outcome 
 action: 4
 
 # State 38
+# Scores: 6 3 10 5 14, Turn total: 18
+# Current player: 1
 IsTerminal() = False
-ToString() = "Scores: 6 3 10 5 14, Turn total: 18\nCurrent player: 1\n"
 History() = [1, 0, 2, 1, 1, 1, 0, 2, 0, 3, 0, 1, 1, 1, 0, 6, 0, 2, 1, 0, 4, 1, 0, 3, 0, 5, 0, 3, 1, 0, 5, 1, 0, 6, 0, 5, 0, 4]
 HistoryString() = "1 0 2 1 1 1 0 2 0 3 0 1 1 1 0 6 0 2 1 0 4 1 0 3 0 5 0 3 1 0 5 1 0 6 0 5 0 4"
 IsChanceNode() = False
@@ -1029,8 +1067,9 @@ StringLegalActions() = ["stop"]
 action: 1
 
 # State 39
+# Scores: 6 21 10 5 14, Turn total: 0
+# Current player: 2
 IsTerminal() = True
-ToString() = "Scores: 6 21 10 5 14, Turn total: 0\nCurrent player: 2\n"
 History() = [1, 0, 2, 1, 1, 1, 0, 2, 0, 3, 0, 1, 1, 1, 0, 6, 0, 2, 1, 0, 4, 1, 0, 3, 0, 5, 0, 3, 1, 0, 5, 1, 0, 6, 0, 5, 0, 4, 1]
 HistoryString() = "1 0 2 1 1 1 0 2 0 3 0 1 1 1 0 6 0 2 1 0 4 1 0 3 0 5 0 3 1 0 5 1 0 6 0 5 0 4 1"
 IsChanceNode() = False

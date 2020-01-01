@@ -1,5 +1,4 @@
 game: laser_tag(horizon=20)
-seed: 2309970241
 
 GameType.chance_mode = ChanceMode.DETERMINISTIC
 GameType.dynamics = Dynamics.SIMULTANEOUS
@@ -29,8 +28,16 @@ MaxGameLength() = 20
 ToString() = "laser_tag(horizon=20)"
 
 # State 0
+# .......
+# .......
+# ..*.*..
+# .**.**.
+# ..*.*..
+# .......
+# .......
+# Orientations: 1 1
+# Chance Node
 IsTerminal() = False
-ToString() = ".......\n.......\n..*.*..\n.**.**.\n..*.*..\n.......\n.......\nOrientations: 1 1\nChance Node"
 History() = []
 HistoryString() = ""
 IsChanceNode() = True
@@ -48,8 +55,16 @@ StringLegalActions() = ["(spawned at location #0)", "(spawned at location #1)", 
 action: 2
 
 # State 1
+# B......
+# .......
+# ..*.*..
+# .**.**.
+# ..*.*..
+# .......
+# .......
+# Orientations: 1 1
+# Chance Node
 IsTerminal() = False
-ToString() = "B......\n.......\n..*.*..\n.**.**.\n..*.*..\n.......\n.......\nOrientations: 1 1\nChance Node"
 History() = [2]
 HistoryString() = "2"
 IsChanceNode() = True
@@ -67,8 +82,15 @@ StringLegalActions() = ["(spawned at location #0)", "(spawned at location #1)", 
 action: 4
 
 # State 2
+# B......
+# .......
+# ..*.*..
+# .**.**.
+# ..*.*..
+# .......
+# A......
+# Orientations: 1 1
 IsTerminal() = False
-ToString() = "B......\n.......\n..*.*..\n.**.**.\n..*.*..\n.......\nA......\nOrientations: 1 1\n"
 History() = [2, 4]
 HistoryString() = "2 4"
 IsChanceNode() = False
@@ -89,8 +111,16 @@ StringLegalActions(1) = ["left turn", "right turn", "move forward", "move backwa
 actions: [4, 6]
 
 # State 3
+# B......
+# .......
+# ..*.*..
+# .**.**.
+# ..*.*..
+# .......
+# A......
+# Orientations: 1 1
+# Chance Node
 IsTerminal() = False
-ToString() = "B......\n.......\n..*.*..\n.**.**.\n..*.*..\n.......\nA......\nOrientations: 1 1\nChance Node"
 History() = [2, 4, 4, 6]
 HistoryString() = "2 4 4 6"
 IsChanceNode() = True
@@ -108,8 +138,15 @@ StringLegalActions() = ["(A's action first)", "(B's action first)"]
 action: 1
 
 # State 4
+# B......
+# .......
+# ..*.*..
+# .**.**.
+# ..*.*..
+# .......
+# .A.....
+# Orientations: 1 1
 IsTerminal() = False
-ToString() = "B......\n.......\n..*.*..\n.**.**.\n..*.*..\n.......\n.A.....\nOrientations: 1 1\n"
 History() = [2, 4, 4, 6, 1]
 HistoryString() = "2 4 4 6 1"
 IsChanceNode() = False
@@ -130,8 +167,16 @@ StringLegalActions(1) = ["left turn", "right turn", "move forward", "move backwa
 actions: [5, 2]
 
 # State 5
+# B......
+# .......
+# ..*.*..
+# .**.**.
+# ..*.*..
+# .......
+# .A.....
+# Orientations: 1 1
+# Chance Node
 IsTerminal() = False
-ToString() = "B......\n.......\n..*.*..\n.**.**.\n..*.*..\n.......\n.A.....\nOrientations: 1 1\nChance Node"
 History() = [2, 4, 4, 6, 1, 5, 2]
 HistoryString() = "2 4 4 6 1 5 2"
 IsChanceNode() = True
@@ -149,8 +194,15 @@ StringLegalActions() = ["(A's action first)", "(B's action first)"]
 action: 1
 
 # State 6
+# .......
+# B......
+# ..*.*..
+# .**.**.
+# ..*.*..
+# .......
+# .A.....
+# Orientations: 1 1
 IsTerminal() = False
-ToString() = ".......\nB......\n..*.*..\n.**.**.\n..*.*..\n.......\n.A.....\nOrientations: 1 1\n"
 History() = [2, 4, 4, 6, 1, 5, 2, 1]
 HistoryString() = "2 4 4 6 1 5 2 1"
 IsChanceNode() = False
@@ -171,8 +223,16 @@ StringLegalActions(1) = ["left turn", "right turn", "move forward", "move backwa
 actions: [6, 2]
 
 # State 7
+# .......
+# B......
+# ..*.*..
+# .**.**.
+# ..*.*..
+# .......
+# .A.....
+# Orientations: 1 1
+# Chance Node
 IsTerminal() = False
-ToString() = ".......\nB......\n..*.*..\n.**.**.\n..*.*..\n.......\n.A.....\nOrientations: 1 1\nChance Node"
 History() = [2, 4, 4, 6, 1, 5, 2, 1, 6, 2]
 HistoryString() = "2 4 4 6 1 5 2 1 6 2"
 IsChanceNode() = True
@@ -190,8 +250,15 @@ StringLegalActions() = ["(A's action first)", "(B's action first)"]
 action: 0
 
 # State 8
+# .......
+# .......
+# B.*.*..
+# .**.**.
+# ..*.*..
+# .......
+# .A.....
+# Orientations: 1 1
 IsTerminal() = False
-ToString() = ".......\n.......\nB.*.*..\n.**.**.\n..*.*..\n.......\n.A.....\nOrientations: 1 1\n"
 History() = [2, 4, 4, 6, 1, 5, 2, 1, 6, 2, 0]
 HistoryString() = "2 4 4 6 1 5 2 1 6 2 0"
 IsChanceNode() = False
@@ -212,8 +279,16 @@ StringLegalActions(1) = ["left turn", "right turn", "move forward", "move backwa
 actions: [5, 5]
 
 # State 9
+# .......
+# .......
+# B.*.*..
+# .**.**.
+# ..*.*..
+# .......
+# .A.....
+# Orientations: 1 1
+# Chance Node
 IsTerminal() = False
-ToString() = ".......\n.......\nB.*.*..\n.**.**.\n..*.*..\n.......\n.A.....\nOrientations: 1 1\nChance Node"
 History() = [2, 4, 4, 6, 1, 5, 2, 1, 6, 2, 0, 5, 5]
 HistoryString() = "2 4 4 6 1 5 2 1 6 2 0 5 5"
 IsChanceNode() = True
@@ -231,8 +306,15 @@ StringLegalActions() = ["(A's action first)", "(B's action first)"]
 action: 0
 
 # State 10
+# .......
+# .......
+# B.*.*..
+# .**.**.
+# ..*.*..
+# .......
+# .A.....
+# Orientations: 1 1
 IsTerminal() = False
-ToString() = ".......\n.......\nB.*.*..\n.**.**.\n..*.*..\n.......\n.A.....\nOrientations: 1 1\n"
 History() = [2, 4, 4, 6, 1, 5, 2, 1, 6, 2, 0, 5, 5, 0]
 HistoryString() = "2 4 4 6 1 5 2 1 6 2 0 5 5 0"
 IsChanceNode() = False
@@ -253,8 +335,16 @@ StringLegalActions(1) = ["left turn", "right turn", "move forward", "move backwa
 actions: [8, 9]
 
 # State 11
+# .......
+# .......
+# B.*.*..
+# .**.**.
+# ..*.*..
+# .......
+# .A.....
+# Orientations: 1 1
+# Chance Node
 IsTerminal() = False
-ToString() = ".......\n.......\nB.*.*..\n.**.**.\n..*.*..\n.......\n.A.....\nOrientations: 1 1\nChance Node"
 History() = [2, 4, 4, 6, 1, 5, 2, 1, 6, 2, 0, 5, 5, 0, 8, 9]
 HistoryString() = "2 4 4 6 1 5 2 1 6 2 0 5 5 0 8 9"
 IsChanceNode() = True
@@ -272,8 +362,15 @@ StringLegalActions() = ["(A's action first)", "(B's action first)"]
 action: 0
 
 # State 12
+# .......
+# .......
+# B.*.*..
+# .**.**.
+# ..*.*..
+# .......
+# .A.....
+# Orientations: 1 1
 IsTerminal() = False
-ToString() = ".......\n.......\nB.*.*..\n.**.**.\n..*.*..\n.......\n.A.....\nOrientations: 1 1\n"
 History() = [2, 4, 4, 6, 1, 5, 2, 1, 6, 2, 0, 5, 5, 0, 8, 9, 0]
 HistoryString() = "2 4 4 6 1 5 2 1 6 2 0 5 5 0 8 9 0"
 IsChanceNode() = False
@@ -294,8 +391,16 @@ StringLegalActions(1) = ["left turn", "right turn", "move forward", "move backwa
 actions: [8, 2]
 
 # State 13
+# .......
+# .......
+# B.*.*..
+# .**.**.
+# ..*.*..
+# .......
+# .A.....
+# Orientations: 1 1
+# Chance Node
 IsTerminal() = False
-ToString() = ".......\n.......\nB.*.*..\n.**.**.\n..*.*..\n.......\n.A.....\nOrientations: 1 1\nChance Node"
 History() = [2, 4, 4, 6, 1, 5, 2, 1, 6, 2, 0, 5, 5, 0, 8, 9, 0, 8, 2]
 HistoryString() = "2 4 4 6 1 5 2 1 6 2 0 5 5 0 8 9 0 8 2"
 IsChanceNode() = True
@@ -313,8 +418,15 @@ StringLegalActions() = ["(A's action first)", "(B's action first)"]
 action: 1
 
 # State 14
+# .......
+# .......
+# ..*.*..
+# B**.**.
+# ..*.*..
+# .......
+# .A.....
+# Orientations: 1 1
 IsTerminal() = False
-ToString() = ".......\n.......\n..*.*..\nB**.**.\n..*.*..\n.......\n.A.....\nOrientations: 1 1\n"
 History() = [2, 4, 4, 6, 1, 5, 2, 1, 6, 2, 0, 5, 5, 0, 8, 9, 0, 8, 2, 1]
 HistoryString() = "2 4 4 6 1 5 2 1 6 2 0 5 5 0 8 9 0 8 2 1"
 IsChanceNode() = False
@@ -335,8 +447,16 @@ StringLegalActions(1) = ["left turn", "right turn", "move forward", "move backwa
 actions: [7, 7]
 
 # State 15
+# .......
+# .......
+# ..*.*..
+# B**.**.
+# ..*.*..
+# .......
+# .A.....
+# Orientations: 1 1
+# Chance Node
 IsTerminal() = False
-ToString() = ".......\n.......\n..*.*..\nB**.**.\n..*.*..\n.......\n.A.....\nOrientations: 1 1\nChance Node"
 History() = [2, 4, 4, 6, 1, 5, 2, 1, 6, 2, 0, 5, 5, 0, 8, 9, 0, 8, 2, 1, 7, 7]
 HistoryString() = "2 4 4 6 1 5 2 1 6 2 0 5 5 0 8 9 0 8 2 1 7 7"
 IsChanceNode() = True
@@ -354,8 +474,15 @@ StringLegalActions() = ["(A's action first)", "(B's action first)"]
 action: 1
 
 # State 16
+# .......
+# .......
+# ..*.*..
+# .**.**.
+# B.*.*..
+# .......
+# .A.....
+# Orientations: 1 2
 IsTerminal() = False
-ToString() = ".......\n.......\n..*.*..\n.**.**.\nB.*.*..\n.......\n.A.....\nOrientations: 1 2\n"
 History() = [2, 4, 4, 6, 1, 5, 2, 1, 6, 2, 0, 5, 5, 0, 8, 9, 0, 8, 2, 1, 7, 7, 1]
 HistoryString() = "2 4 4 6 1 5 2 1 6 2 0 5 5 0 8 9 0 8 2 1 7 7 1"
 IsChanceNode() = False
@@ -376,8 +503,16 @@ StringLegalActions(1) = ["left turn", "right turn", "move forward", "move backwa
 actions: [3, 8]
 
 # State 17
+# .......
+# .......
+# ..*.*..
+# .**.**.
+# B.*.*..
+# .......
+# .A.....
+# Orientations: 1 2
+# Chance Node
 IsTerminal() = False
-ToString() = ".......\n.......\n..*.*..\n.**.**.\nB.*.*..\n.......\n.A.....\nOrientations: 1 2\nChance Node"
 History() = [2, 4, 4, 6, 1, 5, 2, 1, 6, 2, 0, 5, 5, 0, 8, 9, 0, 8, 2, 1, 7, 7, 1, 3, 8]
 HistoryString() = "2 4 4 6 1 5 2 1 6 2 0 5 5 0 8 9 0 8 2 1 7 7 1 3 8"
 IsChanceNode() = True
@@ -395,8 +530,15 @@ StringLegalActions() = ["(A's action first)", "(B's action first)"]
 action: 1
 
 # State 18
+# .......
+# .......
+# ..*.*..
+# .**.**.
+# .B*.*..
+# .A.....
+# .......
+# Orientations: 1 1
 IsTerminal() = False
-ToString() = ".......\n.......\n..*.*..\n.**.**.\n.B*.*..\n.A.....\n.......\nOrientations: 1 1\n"
 History() = [2, 4, 4, 6, 1, 5, 2, 1, 6, 2, 0, 5, 5, 0, 8, 9, 0, 8, 2, 1, 7, 7, 1, 3, 8, 1]
 HistoryString() = "2 4 4 6 1 5 2 1 6 2 0 5 5 0 8 9 0 8 2 1 7 7 1 3 8 1"
 IsChanceNode() = False
@@ -417,8 +559,16 @@ StringLegalActions(1) = ["left turn", "right turn", "move forward", "move backwa
 actions: [0, 4]
 
 # State 19
+# .......
+# .......
+# ..*.*..
+# .**.**.
+# .B*.*..
+# .A.....
+# .......
+# Orientations: 1 1
+# Chance Node
 IsTerminal() = False
-ToString() = ".......\n.......\n..*.*..\n.**.**.\n.B*.*..\n.A.....\n.......\nOrientations: 1 1\nChance Node"
 History() = [2, 4, 4, 6, 1, 5, 2, 1, 6, 2, 0, 5, 5, 0, 8, 9, 0, 8, 2, 1, 7, 7, 1, 3, 8, 1, 0, 4]
 HistoryString() = "2 4 4 6 1 5 2 1 6 2 0 5 5 0 8 9 0 8 2 1 7 7 1 3 8 1 0 4"
 IsChanceNode() = True
@@ -436,8 +586,15 @@ StringLegalActions() = ["(A's action first)", "(B's action first)"]
 action: 1
 
 # State 20
+# .......
+# .......
+# ..*.*..
+# .**.**.
+# .B*.*..
+# .A.....
+# .......
+# Orientations: 2 1
 IsTerminal() = False
-ToString() = ".......\n.......\n..*.*..\n.**.**.\n.B*.*..\n.A.....\n.......\nOrientations: 2 1\n"
 History() = [2, 4, 4, 6, 1, 5, 2, 1, 6, 2, 0, 5, 5, 0, 8, 9, 0, 8, 2, 1, 7, 7, 1, 3, 8, 1, 0, 4, 1]
 HistoryString() = "2 4 4 6 1 5 2 1 6 2 0 5 5 0 8 9 0 8 2 1 7 7 1 3 8 1 0 4 1"
 IsChanceNode() = False
@@ -458,8 +615,16 @@ StringLegalActions(1) = ["left turn", "right turn", "move forward", "move backwa
 actions: [5, 6]
 
 # State 21
+# .......
+# .......
+# ..*.*..
+# .**.**.
+# .B*.*..
+# .A.....
+# .......
+# Orientations: 2 1
+# Chance Node
 IsTerminal() = False
-ToString() = ".......\n.......\n..*.*..\n.**.**.\n.B*.*..\n.A.....\n.......\nOrientations: 2 1\nChance Node"
 History() = [2, 4, 4, 6, 1, 5, 2, 1, 6, 2, 0, 5, 5, 0, 8, 9, 0, 8, 2, 1, 7, 7, 1, 3, 8, 1, 0, 4, 1, 5, 6]
 HistoryString() = "2 4 4 6 1 5 2 1 6 2 0 5 5 0 8 9 0 8 2 1 7 7 1 3 8 1 0 4 1 5 6"
 IsChanceNode() = True
@@ -477,8 +642,15 @@ StringLegalActions() = ["(A's action first)", "(B's action first)"]
 action: 0
 
 # State 22
+# .......
+# .......
+# ..*.*..
+# .**.**.
+# .B*.*..
+# .A.....
+# .......
+# Orientations: 2 1
 IsTerminal() = False
-ToString() = ".......\n.......\n..*.*..\n.**.**.\n.B*.*..\n.A.....\n.......\nOrientations: 2 1\n"
 History() = [2, 4, 4, 6, 1, 5, 2, 1, 6, 2, 0, 5, 5, 0, 8, 9, 0, 8, 2, 1, 7, 7, 1, 3, 8, 1, 0, 4, 1, 5, 6, 0]
 HistoryString() = "2 4 4 6 1 5 2 1 6 2 0 5 5 0 8 9 0 8 2 1 7 7 1 3 8 1 0 4 1 5 6 0"
 IsChanceNode() = False
@@ -499,8 +671,16 @@ StringLegalActions(1) = ["left turn", "right turn", "move forward", "move backwa
 actions: [5, 7]
 
 # State 23
+# .......
+# .......
+# ..*.*..
+# .**.**.
+# .B*.*..
+# .A.....
+# .......
+# Orientations: 2 1
+# Chance Node
 IsTerminal() = False
-ToString() = ".......\n.......\n..*.*..\n.**.**.\n.B*.*..\n.A.....\n.......\nOrientations: 2 1\nChance Node"
 History() = [2, 4, 4, 6, 1, 5, 2, 1, 6, 2, 0, 5, 5, 0, 8, 9, 0, 8, 2, 1, 7, 7, 1, 3, 8, 1, 0, 4, 1, 5, 6, 0, 5, 7]
 HistoryString() = "2 4 4 6 1 5 2 1 6 2 0 5 5 0 8 9 0 8 2 1 7 7 1 3 8 1 0 4 1 5 6 0 5 7"
 IsChanceNode() = True
@@ -518,8 +698,15 @@ StringLegalActions() = ["(A's action first)", "(B's action first)"]
 action: 0
 
 # State 24
+# .......
+# .......
+# ..*.*..
+# .**.**.
+# .B*.*..
+# .A.....
+# .......
+# Orientations: 2 1
 IsTerminal() = False
-ToString() = ".......\n.......\n..*.*..\n.**.**.\n.B*.*..\n.A.....\n.......\nOrientations: 2 1\n"
 History() = [2, 4, 4, 6, 1, 5, 2, 1, 6, 2, 0, 5, 5, 0, 8, 9, 0, 8, 2, 1, 7, 7, 1, 3, 8, 1, 0, 4, 1, 5, 6, 0, 5, 7, 0]
 HistoryString() = "2 4 4 6 1 5 2 1 6 2 0 5 5 0 8 9 0 8 2 1 7 7 1 3 8 1 0 4 1 5 6 0 5 7 0"
 IsChanceNode() = False
@@ -540,8 +727,16 @@ StringLegalActions(1) = ["left turn", "right turn", "move forward", "move backwa
 actions: [3, 1]
 
 # State 25
+# .......
+# .......
+# ..*.*..
+# .**.**.
+# .B*.*..
+# .A.....
+# .......
+# Orientations: 2 1
+# Chance Node
 IsTerminal() = False
-ToString() = ".......\n.......\n..*.*..\n.**.**.\n.B*.*..\n.A.....\n.......\nOrientations: 2 1\nChance Node"
 History() = [2, 4, 4, 6, 1, 5, 2, 1, 6, 2, 0, 5, 5, 0, 8, 9, 0, 8, 2, 1, 7, 7, 1, 3, 8, 1, 0, 4, 1, 5, 6, 0, 5, 7, 0, 3, 1]
 HistoryString() = "2 4 4 6 1 5 2 1 6 2 0 5 5 0 8 9 0 8 2 1 7 7 1 3 8 1 0 4 1 5 6 0 5 7 0 3 1"
 IsChanceNode() = True
@@ -559,8 +754,15 @@ StringLegalActions() = ["(A's action first)", "(B's action first)"]
 action: 0
 
 # State 26
+# .......
+# .......
+# ..*.*..
+# .**.**.
+# .B*.*..
+# A......
+# .......
+# Orientations: 2 3
 IsTerminal() = False
-ToString() = ".......\n.......\n..*.*..\n.**.**.\n.B*.*..\nA......\n.......\nOrientations: 2 3\n"
 History() = [2, 4, 4, 6, 1, 5, 2, 1, 6, 2, 0, 5, 5, 0, 8, 9, 0, 8, 2, 1, 7, 7, 1, 3, 8, 1, 0, 4, 1, 5, 6, 0, 5, 7, 0, 3, 1, 0]
 HistoryString() = "2 4 4 6 1 5 2 1 6 2 0 5 5 0 8 9 0 8 2 1 7 7 1 3 8 1 0 4 1 5 6 0 5 7 0 3 1 0"
 IsChanceNode() = False
@@ -581,8 +783,16 @@ StringLegalActions(1) = ["left turn", "right turn", "move forward", "move backwa
 actions: [2, 1]
 
 # State 27
+# .......
+# .......
+# ..*.*..
+# .**.**.
+# .B*.*..
+# A......
+# .......
+# Orientations: 2 3
+# Chance Node
 IsTerminal() = False
-ToString() = ".......\n.......\n..*.*..\n.**.**.\n.B*.*..\nA......\n.......\nOrientations: 2 3\nChance Node"
 History() = [2, 4, 4, 6, 1, 5, 2, 1, 6, 2, 0, 5, 5, 0, 8, 9, 0, 8, 2, 1, 7, 7, 1, 3, 8, 1, 0, 4, 1, 5, 6, 0, 5, 7, 0, 3, 1, 0, 2, 1]
 HistoryString() = "2 4 4 6 1 5 2 1 6 2 0 5 5 0 8 9 0 8 2 1 7 7 1 3 8 1 0 4 1 5 6 0 5 7 0 3 1 0 2 1"
 IsChanceNode() = True
@@ -600,8 +810,15 @@ StringLegalActions() = ["(A's action first)", "(B's action first)"]
 action: 0
 
 # State 28
+# .......
+# .......
+# ..*.*..
+# .**.**.
+# .B*.*..
+# .A.....
+# .......
+# Orientations: 2 0
 IsTerminal() = False
-ToString() = ".......\n.......\n..*.*..\n.**.**.\n.B*.*..\n.A.....\n.......\nOrientations: 2 0\n"
 History() = [2, 4, 4, 6, 1, 5, 2, 1, 6, 2, 0, 5, 5, 0, 8, 9, 0, 8, 2, 1, 7, 7, 1, 3, 8, 1, 0, 4, 1, 5, 6, 0, 5, 7, 0, 3, 1, 0, 2, 1, 0]
 HistoryString() = "2 4 4 6 1 5 2 1 6 2 0 5 5 0 8 9 0 8 2 1 7 7 1 3 8 1 0 4 1 5 6 0 5 7 0 3 1 0 2 1 0"
 IsChanceNode() = False
@@ -622,8 +839,16 @@ StringLegalActions(1) = ["left turn", "right turn", "move forward", "move backwa
 actions: [0, 1]
 
 # State 29
+# .......
+# .......
+# ..*.*..
+# .**.**.
+# .B*.*..
+# .A.....
+# .......
+# Orientations: 2 0
+# Chance Node
 IsTerminal() = False
-ToString() = ".......\n.......\n..*.*..\n.**.**.\n.B*.*..\n.A.....\n.......\nOrientations: 2 0\nChance Node"
 History() = [2, 4, 4, 6, 1, 5, 2, 1, 6, 2, 0, 5, 5, 0, 8, 9, 0, 8, 2, 1, 7, 7, 1, 3, 8, 1, 0, 4, 1, 5, 6, 0, 5, 7, 0, 3, 1, 0, 2, 1, 0, 0, 1]
 HistoryString() = "2 4 4 6 1 5 2 1 6 2 0 5 5 0 8 9 0 8 2 1 7 7 1 3 8 1 0 4 1 5 6 0 5 7 0 3 1 0 2 1 0 0 1"
 IsChanceNode() = True
@@ -641,8 +866,15 @@ StringLegalActions() = ["(A's action first)", "(B's action first)"]
 action: 0
 
 # State 30
+# .......
+# .......
+# ..*.*..
+# .**.**.
+# .B*.*..
+# .A.....
+# .......
+# Orientations: 0 2
 IsTerminal() = False
-ToString() = ".......\n.......\n..*.*..\n.**.**.\n.B*.*..\n.A.....\n.......\nOrientations: 0 2\n"
 History() = [2, 4, 4, 6, 1, 5, 2, 1, 6, 2, 0, 5, 5, 0, 8, 9, 0, 8, 2, 1, 7, 7, 1, 3, 8, 1, 0, 4, 1, 5, 6, 0, 5, 7, 0, 3, 1, 0, 2, 1, 0, 0, 1, 0]
 HistoryString() = "2 4 4 6 1 5 2 1 6 2 0 5 5 0 8 9 0 8 2 1 7 7 1 3 8 1 0 4 1 5 6 0 5 7 0 3 1 0 2 1 0 0 1 0"
 IsChanceNode() = False
@@ -663,8 +895,16 @@ StringLegalActions(1) = ["left turn", "right turn", "move forward", "move backwa
 actions: [2, 9]
 
 # State 31
+# .......
+# .......
+# ..*.*..
+# .**.**.
+# .B*.*..
+# .A.....
+# .......
+# Orientations: 0 2
+# Chance Node
 IsTerminal() = False
-ToString() = ".......\n.......\n..*.*..\n.**.**.\n.B*.*..\n.A.....\n.......\nOrientations: 0 2\nChance Node"
 History() = [2, 4, 4, 6, 1, 5, 2, 1, 6, 2, 0, 5, 5, 0, 8, 9, 0, 8, 2, 1, 7, 7, 1, 3, 8, 1, 0, 4, 1, 5, 6, 0, 5, 7, 0, 3, 1, 0, 2, 1, 0, 0, 1, 0, 2, 9]
 HistoryString() = "2 4 4 6 1 5 2 1 6 2 0 5 5 0 8 9 0 8 2 1 7 7 1 3 8 1 0 4 1 5 6 0 5 7 0 3 1 0 2 1 0 0 1 0 2 9"
 IsChanceNode() = True
@@ -682,8 +922,15 @@ StringLegalActions() = ["(A's action first)", "(B's action first)"]
 action: 0
 
 # State 32
+# .......
+# .......
+# ..*.*..
+# .**.**.
+# .B*.*..
+# .A.....
+# .......
+# Orientations: 0 2
 IsTerminal() = False
-ToString() = ".......\n.......\n..*.*..\n.**.**.\n.B*.*..\n.A.....\n.......\nOrientations: 0 2\n"
 History() = [2, 4, 4, 6, 1, 5, 2, 1, 6, 2, 0, 5, 5, 0, 8, 9, 0, 8, 2, 1, 7, 7, 1, 3, 8, 1, 0, 4, 1, 5, 6, 0, 5, 7, 0, 3, 1, 0, 2, 1, 0, 0, 1, 0, 2, 9, 0]
 HistoryString() = "2 4 4 6 1 5 2 1 6 2 0 5 5 0 8 9 0 8 2 1 7 7 1 3 8 1 0 4 1 5 6 0 5 7 0 3 1 0 2 1 0 0 1 0 2 9 0"
 IsChanceNode() = False
@@ -704,8 +951,16 @@ StringLegalActions(1) = ["left turn", "right turn", "move forward", "move backwa
 actions: [2, 7]
 
 # State 33
+# .......
+# .......
+# ..*.*..
+# .**.**.
+# .B*.*..
+# .A.....
+# .......
+# Orientations: 0 2
+# Chance Node
 IsTerminal() = False
-ToString() = ".......\n.......\n..*.*..\n.**.**.\n.B*.*..\n.A.....\n.......\nOrientations: 0 2\nChance Node"
 History() = [2, 4, 4, 6, 1, 5, 2, 1, 6, 2, 0, 5, 5, 0, 8, 9, 0, 8, 2, 1, 7, 7, 1, 3, 8, 1, 0, 4, 1, 5, 6, 0, 5, 7, 0, 3, 1, 0, 2, 1, 0, 0, 1, 0, 2, 9, 0, 2, 7]
 HistoryString() = "2 4 4 6 1 5 2 1 6 2 0 5 5 0 8 9 0 8 2 1 7 7 1 3 8 1 0 4 1 5 6 0 5 7 0 3 1 0 2 1 0 0 1 0 2 9 0 2 7"
 IsChanceNode() = True
@@ -723,8 +978,15 @@ StringLegalActions() = ["(A's action first)", "(B's action first)"]
 action: 0
 
 # State 34
+# .......
+# .......
+# ..*.*..
+# .**.**.
+# .B*.*..
+# .A.....
+# .......
+# Orientations: 0 2
 IsTerminal() = False
-ToString() = ".......\n.......\n..*.*..\n.**.**.\n.B*.*..\n.A.....\n.......\nOrientations: 0 2\n"
 History() = [2, 4, 4, 6, 1, 5, 2, 1, 6, 2, 0, 5, 5, 0, 8, 9, 0, 8, 2, 1, 7, 7, 1, 3, 8, 1, 0, 4, 1, 5, 6, 0, 5, 7, 0, 3, 1, 0, 2, 1, 0, 0, 1, 0, 2, 9, 0, 2, 7, 0]
 HistoryString() = "2 4 4 6 1 5 2 1 6 2 0 5 5 0 8 9 0 8 2 1 7 7 1 3 8 1 0 4 1 5 6 0 5 7 0 3 1 0 2 1 0 0 1 0 2 9 0 2 7 0"
 IsChanceNode() = False
@@ -745,8 +1007,16 @@ StringLegalActions(1) = ["left turn", "right turn", "move forward", "move backwa
 actions: [7, 2]
 
 # State 35
+# .......
+# .......
+# ..*.*..
+# .**.**.
+# .B*.*..
+# .A.....
+# .......
+# Orientations: 0 2
+# Chance Node
 IsTerminal() = False
-ToString() = ".......\n.......\n..*.*..\n.**.**.\n.B*.*..\n.A.....\n.......\nOrientations: 0 2\nChance Node"
 History() = [2, 4, 4, 6, 1, 5, 2, 1, 6, 2, 0, 5, 5, 0, 8, 9, 0, 8, 2, 1, 7, 7, 1, 3, 8, 1, 0, 4, 1, 5, 6, 0, 5, 7, 0, 3, 1, 0, 2, 1, 0, 0, 1, 0, 2, 9, 0, 2, 7, 0, 7, 2]
 HistoryString() = "2 4 4 6 1 5 2 1 6 2 0 5 5 0 8 9 0 8 2 1 7 7 1 3 8 1 0 4 1 5 6 0 5 7 0 3 1 0 2 1 0 0 1 0 2 9 0 2 7 0 7 2"
 IsChanceNode() = True
@@ -764,8 +1034,15 @@ StringLegalActions() = ["(A's action first)", "(B's action first)"]
 action: 1
 
 # State 36
+# .......
+# .......
+# ..*.*..
+# .**.**.
+# .B*.*..
+# .A.....
+# .......
+# Orientations: 0 2
 IsTerminal() = False
-ToString() = ".......\n.......\n..*.*..\n.**.**.\n.B*.*..\n.A.....\n.......\nOrientations: 0 2\n"
 History() = [2, 4, 4, 6, 1, 5, 2, 1, 6, 2, 0, 5, 5, 0, 8, 9, 0, 8, 2, 1, 7, 7, 1, 3, 8, 1, 0, 4, 1, 5, 6, 0, 5, 7, 0, 3, 1, 0, 2, 1, 0, 0, 1, 0, 2, 9, 0, 2, 7, 0, 7, 2, 1]
 HistoryString() = "2 4 4 6 1 5 2 1 6 2 0 5 5 0 8 9 0 8 2 1 7 7 1 3 8 1 0 4 1 5 6 0 5 7 0 3 1 0 2 1 0 0 1 0 2 9 0 2 7 0 7 2 1"
 IsChanceNode() = False
@@ -786,8 +1063,16 @@ StringLegalActions(1) = ["left turn", "right turn", "move forward", "move backwa
 actions: [6, 9]
 
 # State 37
+# .......
+# .......
+# ..*.*..
+# .**.**.
+# .B*.*..
+# .A.....
+# .......
+# Orientations: 0 2
+# Chance Node
 IsTerminal() = False
-ToString() = ".......\n.......\n..*.*..\n.**.**.\n.B*.*..\n.A.....\n.......\nOrientations: 0 2\nChance Node"
 History() = [2, 4, 4, 6, 1, 5, 2, 1, 6, 2, 0, 5, 5, 0, 8, 9, 0, 8, 2, 1, 7, 7, 1, 3, 8, 1, 0, 4, 1, 5, 6, 0, 5, 7, 0, 3, 1, 0, 2, 1, 0, 0, 1, 0, 2, 9, 0, 2, 7, 0, 7, 2, 1, 6, 9]
 HistoryString() = "2 4 4 6 1 5 2 1 6 2 0 5 5 0 8 9 0 8 2 1 7 7 1 3 8 1 0 4 1 5 6 0 5 7 0 3 1 0 2 1 0 0 1 0 2 9 0 2 7 0 7 2 1 6 9"
 IsChanceNode() = True
@@ -805,8 +1090,15 @@ StringLegalActions() = ["(A's action first)", "(B's action first)"]
 action: 1
 
 # State 38
+# .......
+# .......
+# ..*.*..
+# .**.**.
+# .B*.*..
+# .A.....
+# .......
+# Orientations: 0 2
 IsTerminal() = False
-ToString() = ".......\n.......\n..*.*..\n.**.**.\n.B*.*..\n.A.....\n.......\nOrientations: 0 2\n"
 History() = [2, 4, 4, 6, 1, 5, 2, 1, 6, 2, 0, 5, 5, 0, 8, 9, 0, 8, 2, 1, 7, 7, 1, 3, 8, 1, 0, 4, 1, 5, 6, 0, 5, 7, 0, 3, 1, 0, 2, 1, 0, 0, 1, 0, 2, 9, 0, 2, 7, 0, 7, 2, 1, 6, 9, 1]
 HistoryString() = "2 4 4 6 1 5 2 1 6 2 0 5 5 0 8 9 0 8 2 1 7 7 1 3 8 1 0 4 1 5 6 0 5 7 0 3 1 0 2 1 0 0 1 0 2 9 0 2 7 0 7 2 1 6 9 1"
 IsChanceNode() = False
@@ -827,8 +1119,16 @@ StringLegalActions(1) = ["left turn", "right turn", "move forward", "move backwa
 actions: [3, 5]
 
 # State 39
+# .......
+# .......
+# ..*.*..
+# .**.**.
+# .B*.*..
+# .A.....
+# .......
+# Orientations: 0 2
+# Chance Node
 IsTerminal() = False
-ToString() = ".......\n.......\n..*.*..\n.**.**.\n.B*.*..\n.A.....\n.......\nOrientations: 0 2\nChance Node"
 History() = [2, 4, 4, 6, 1, 5, 2, 1, 6, 2, 0, 5, 5, 0, 8, 9, 0, 8, 2, 1, 7, 7, 1, 3, 8, 1, 0, 4, 1, 5, 6, 0, 5, 7, 0, 3, 1, 0, 2, 1, 0, 0, 1, 0, 2, 9, 0, 2, 7, 0, 7, 2, 1, 6, 9, 1, 3, 5]
 HistoryString() = "2 4 4 6 1 5 2 1 6 2 0 5 5 0 8 9 0 8 2 1 7 7 1 3 8 1 0 4 1 5 6 0 5 7 0 3 1 0 2 1 0 0 1 0 2 9 0 2 7 0 7 2 1 6 9 1 3 5"
 IsChanceNode() = True
@@ -846,8 +1146,15 @@ StringLegalActions() = ["(A's action first)", "(B's action first)"]
 action: 0
 
 # State 40
+# .......
+# .......
+# ..*.*..
+# .**.**.
+# .B*.*..
+# .......
+# .A.....
+# Orientations: 0 2
 IsTerminal() = False
-ToString() = ".......\n.......\n..*.*..\n.**.**.\n.B*.*..\n.......\n.A.....\nOrientations: 0 2\n"
 History() = [2, 4, 4, 6, 1, 5, 2, 1, 6, 2, 0, 5, 5, 0, 8, 9, 0, 8, 2, 1, 7, 7, 1, 3, 8, 1, 0, 4, 1, 5, 6, 0, 5, 7, 0, 3, 1, 0, 2, 1, 0, 0, 1, 0, 2, 9, 0, 2, 7, 0, 7, 2, 1, 6, 9, 1, 3, 5, 0]
 HistoryString() = "2 4 4 6 1 5 2 1 6 2 0 5 5 0 8 9 0 8 2 1 7 7 1 3 8 1 0 4 1 5 6 0 5 7 0 3 1 0 2 1 0 0 1 0 2 9 0 2 7 0 7 2 1 6 9 1 3 5 0"
 IsChanceNode() = False
@@ -868,8 +1175,16 @@ StringLegalActions(1) = ["left turn", "right turn", "move forward", "move backwa
 actions: [5, 4]
 
 # State 41
+# .......
+# .......
+# ..*.*..
+# .**.**.
+# .B*.*..
+# .......
+# .A.....
+# Orientations: 0 2
+# Chance Node
 IsTerminal() = False
-ToString() = ".......\n.......\n..*.*..\n.**.**.\n.B*.*..\n.......\n.A.....\nOrientations: 0 2\nChance Node"
 History() = [2, 4, 4, 6, 1, 5, 2, 1, 6, 2, 0, 5, 5, 0, 8, 9, 0, 8, 2, 1, 7, 7, 1, 3, 8, 1, 0, 4, 1, 5, 6, 0, 5, 7, 0, 3, 1, 0, 2, 1, 0, 0, 1, 0, 2, 9, 0, 2, 7, 0, 7, 2, 1, 6, 9, 1, 3, 5, 0, 5, 4]
 HistoryString() = "2 4 4 6 1 5 2 1 6 2 0 5 5 0 8 9 0 8 2 1 7 7 1 3 8 1 0 4 1 5 6 0 5 7 0 3 1 0 2 1 0 0 1 0 2 9 0 2 7 0 7 2 1 6 9 1 3 5 0 5 4"
 IsChanceNode() = True
@@ -887,8 +1202,15 @@ StringLegalActions() = ["(A's action first)", "(B's action first)"]
 action: 0
 
 # State 42
+# .......
+# .......
+# ..*.*..
+# .**.**.
+# .B*.*..
+# .......
+# .A.....
+# Orientations: 0 2
 IsTerminal() = True
-ToString() = ".......\n.......\n..*.*..\n.**.**.\n.B*.*..\n.......\n.A.....\nOrientations: 0 2\n"
 History() = [2, 4, 4, 6, 1, 5, 2, 1, 6, 2, 0, 5, 5, 0, 8, 9, 0, 8, 2, 1, 7, 7, 1, 3, 8, 1, 0, 4, 1, 5, 6, 0, 5, 7, 0, 3, 1, 0, 2, 1, 0, 0, 1, 0, 2, 9, 0, 2, 7, 0, 7, 2, 1, 6, 9, 1, 3, 5, 0, 5, 4, 0]
 HistoryString() = "2 4 4 6 1 5 2 1 6 2 0 5 5 0 8 9 0 8 2 1 7 7 1 3 8 1 0 4 1 5 6 0 5 7 0 3 1 0 2 1 0 0 1 0 2 9 0 2 7 0 7 2 1 6 9 1 3 5 0 5 4 0"
 IsChanceNode() = False

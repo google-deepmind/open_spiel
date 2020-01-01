@@ -31,6 +31,8 @@ add_library (algorithms OBJECT
   state_distribution.cc
   tabular_exploitability.h
   tabular_exploitability.cc
+  tensor_game_utils.h
+  tensor_game_utils.cc
   trajectories.h
   trajectories.cc
   value_iteration.h
@@ -93,6 +95,10 @@ add_test(state_distribution_test state_distribution_test)
 add_executable(tabular_exploitability_test tabular_exploitability_test.cc
     $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})
 add_test(tabular_exploitability_test tabular_exploitability_test)
+
+add_executable(tensor_game_utils_test tensor_game_utils_test.cc
+    $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})
+add_test(tensor_game_utils_test tensor_game_utils_test)
 
 add_executable(trajectories_test trajectories_test.cc
     $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})

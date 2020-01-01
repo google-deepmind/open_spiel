@@ -60,6 +60,44 @@ class UniformRandomBot : public Bot {
   std::mt19937 rng_;
 };
 
+// A UniformRandomBot that keeps a copy of the state up to date. This exists
+// primarily to verify that InformAction is called correctly by the run loop.
+class StatefulRandomBot : public UniformRandomBot {
+ public:
+  StatefulRandomBot(const Game& game, Player player_id, int seed)
+      : UniformRandomBot(player_id, seed), state_(game.NewInitialState()) {}
+
+  void Restart() { state_ = state_->GetGame()->NewInitialState(); }
+  void RestartAt(const State& state) { state_ = state.Clone(); }
+  void InformAction(const State& state, Player player_id,
+                    Action action) override {
+    CheckStatesEqual(state, *state_);
+    state_->ApplyAction(action);
+  }
+  ActionsAndProbs GetPolicy(const State& state) override {
+    CheckStatesEqual(state, *state_);
+    return UniformRandomBot::GetPolicy(*state_);
+  }
+  std::pair<ActionsAndProbs, Action> StepWithPolicy(
+      const State& state) override {
+    std::pair<ActionsAndProbs, Action> ret =
+        UniformRandomBot::StepWithPolicy(*state_);
+    state_->ApplyAction(ret.second);
+    return ret;
+  }
+
+ private:
+  void CheckStatesEqual(const State& state1, const State& state2) const {
+    SPIEL_CHECK_EQ(state1.History(), state2.History());
+    SPIEL_CHECK_EQ(state1.CurrentPlayer(), state2.CurrentPlayer());
+    SPIEL_CHECK_EQ(state1.LegalActions(), state2.LegalActions());
+    if (!state1.IsChanceNode()) {
+      SPIEL_CHECK_EQ(state1.ObservationTensor(), state2.ObservationTensor());
+    }
+  }
+  std::unique_ptr<State> state_;
+};
+
 class PolicyBot : public Bot {
  public:
   PolicyBot(int seed, std::unique_ptr<Policy> policy)
@@ -90,20 +128,6 @@ class PolicyBot : public Bot {
   std::unique_ptr<Policy> policy_;
 };
 
-}  // namespace
-
-// A uniform random bot, for test purposes.
-std::unique_ptr<Bot> MakeUniformRandomBot(Player player_id, int seed) {
-  return std::unique_ptr<Bot>(new UniformRandomBot(player_id, seed));
-}
-
-// A bot that samples from a policy.
-std::unique_ptr<Bot> MakePolicyBot(const Game& game, Player player_id, int seed,
-                                   std::unique_ptr<Policy> policy) {
-  return std::make_unique<PolicyBot>(seed, std::move(policy));
-}
-
-namespace {
 class FixedActionPreferenceBot : public Bot {
  public:
   FixedActionPreferenceBot(Player player_id, const std::vector<Action>& actions)
@@ -140,11 +164,26 @@ class FixedActionPreferenceBot : public Bot {
 
 }  // namespace
 
+// A uniform random bot, for test purposes.
+std::unique_ptr<Bot> MakeUniformRandomBot(Player player_id, int seed) {
+  return std::make_unique<UniformRandomBot>(player_id, seed);
+}
+
+// A bot that samples from a policy.
+std::unique_ptr<Bot> MakePolicyBot(const Game& game, Player player_id, int seed,
+                                   std::unique_ptr<Policy> policy) {
+  return std::make_unique<PolicyBot>(seed, std::move(policy));
+}
 // A bot with a fixed action preference, for test purposes.
 // Picks the first legal action found in the list of actions.
 std::unique_ptr<Bot> MakeFixedActionPreferenceBot(
     Player player_id, const std::vector<Action>& actions) {
-  return std::unique_ptr<Bot>(new FixedActionPreferenceBot(player_id, actions));
+  return std::make_unique<FixedActionPreferenceBot>(player_id, actions);
+}
+
+std::unique_ptr<Bot> MakeStatefulRandomBot(const Game& game, Player player_id,
+                                           int seed) {
+  return std::make_unique<StatefulRandomBot>(game, player_id, seed);
 }
 
 }  // namespace open_spiel

@@ -21,7 +21,7 @@ from __future__ import print_function
 import itertools
 
 from absl.testing import parameterized
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 
 from open_spiel.python import rl_environment
 from open_spiel.python.algorithms import policy_gradient

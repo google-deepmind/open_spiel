@@ -1,5 +1,4 @@
 game: leduc_poker
-seed: 773740114
 
 GameType.chance_mode = ChanceMode.EXPLICIT_STOCHASTIC
 GameType.dynamics = Dynamics.SEQUENTIAL
@@ -31,8 +30,14 @@ MaxGameLength() = 8
 ToString() = "leduc_poker()"
 
 # State 0
+# Round: 1
+# Player: -1
+# Pot: 2
+# Money (p1 p2 ...): 99 99
+# Cards (public p1 p2 ...): -10000 -10000 -10000
+# Round 1 sequence:
+# Round 2 sequence:
 IsTerminal() = False
-ToString() = "Round: 1\nPlayer: -1\nPot: 2\nMoney (p1 p2 ...): 99 99\nCards (public p1 p2 ...): -10000 -10000 -10000 \nRound 1 sequence: \nRound 2 sequence: \n"
 History() = []
 HistoryString() = ""
 IsChanceNode() = True
@@ -54,8 +59,14 @@ StringLegalActions() = ["Chance outcome:0", "Chance outcome:1", "Chance outcome:
 action: 0
 
 # State 1
+# Round: 1
+# Player: -1
+# Pot: 2
+# Money (p1 p2 ...): 99 99
+# Cards (public p1 p2 ...): -10000 0 -10000
+# Round 1 sequence:
+# Round 2 sequence:
 IsTerminal() = False
-ToString() = "Round: 1\nPlayer: -1\nPot: 2\nMoney (p1 p2 ...): 99 99\nCards (public p1 p2 ...): -10000 0 -10000 \nRound 1 sequence: \nRound 2 sequence: \n"
 History() = [0]
 HistoryString() = "0"
 IsChanceNode() = True
@@ -77,8 +88,14 @@ StringLegalActions() = ["Chance outcome:1", "Chance outcome:2", "Chance outcome:
 action: 3
 
 # State 2
+# Round: 1
+# Player: 0
+# Pot: 2
+# Money (p1 p2 ...): 99 99
+# Cards (public p1 p2 ...): -10000 0 3
+# Round 1 sequence:
+# Round 2 sequence:
 IsTerminal() = False
-ToString() = "Round: 1\nPlayer: 0\nPot: 2\nMoney (p1 p2 ...): 99 99\nCards (public p1 p2 ...): -10000 0 3 \nRound 1 sequence: \nRound 2 sequence: \n"
 History() = [0, 3]
 HistoryString() = "0 3"
 IsChanceNode() = False
@@ -101,8 +118,14 @@ StringLegalActions() = ["Call", "Raise"]
 action: 2
 
 # State 3
+# Round: 1
+# Player: 1
+# Pot: 4
+# Money (p1 p2 ...): 97 99
+# Cards (public p1 p2 ...): -10000 0 3
+# Round 1 sequence: 2
+# Round 2 sequence:
 IsTerminal() = False
-ToString() = "Round: 1\nPlayer: 1\nPot: 4\nMoney (p1 p2 ...): 97 99\nCards (public p1 p2 ...): -10000 0 3 \nRound 1 sequence: 2\nRound 2 sequence: \n"
 History() = [0, 3, 2]
 HistoryString() = "0 3 2"
 IsChanceNode() = False
@@ -125,8 +148,14 @@ StringLegalActions() = ["Fold", "Call", "Raise"]
 action: 0
 
 # State 4
+# Round: 1
+# Player: 1
+# Pot: 0
+# Money (p1 p2 ...): 101 99
+# Cards (public p1 p2 ...): -10000 0 3
+# Round 1 sequence: 2 0
+# Round 2 sequence:
 IsTerminal() = True
-ToString() = "Round: 1\nPlayer: 1\nPot: 0\nMoney (p1 p2 ...): 101 99\nCards (public p1 p2 ...): -10000 0 3 \nRound 1 sequence: 2 0\nRound 2 sequence: \n"
 History() = [0, 3, 2, 0]
 HistoryString() = "0 3 2 0"
 IsChanceNode() = False

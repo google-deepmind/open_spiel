@@ -26,7 +26,7 @@ from __future__ import print_function
 
 from absl import app
 from absl import flags
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 
 from open_spiel.python.algorithms import neurd
 import pyspiel

@@ -5,6 +5,8 @@ set(GAME_SOURCES
   blotto.h
   breakthrough.cc
   breakthrough.h
+  bridge.cc
+  bridge.h
   bridge/bridge_scoring.cc
   bridge/bridge_scoring.h
   bridge_uncontested_bidding.cc
@@ -17,12 +19,16 @@ set(GAME_SOURCES
   chess/chess_board.h
   chess/chess_common.cc
   chess/chess_common.h
+  cliff_walking.cc
+  cliff_walking.h
   coin_game.cc
   coin_game.h
   connect_four.cc
   connect_four.h
   coop_box_pushing.cc
   coop_box_pushing.h
+  deep_sea.cc
+  deep_sea.h
   first_sealed_auction.cc
   first_sealed_auction.h
   go.cc
@@ -181,6 +187,10 @@ add_executable(chess_test chess_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(chess_test chess_test)
 
+add_executable(cliff_walking_test cliff_walking_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(cliff_walking_test cliff_walking_test)
+
 add_executable(coin_game_test coin_game_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>
                $<TARGET_OBJECTS:algorithms>)
@@ -195,6 +205,10 @@ add_executable(coop_box_pushing_test coop_box_pushing_test.cc
                ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(coop_box_pushing_test coop_box_pushing_test)
+
+add_executable(deep_sea_test deep_sea_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(deep_sea_test deep_sea_test)
 
 add_executable(first_sealed_auction_test first_sealed_auction_test.cc
                ${OPEN_SPIEL_OBJECTS}

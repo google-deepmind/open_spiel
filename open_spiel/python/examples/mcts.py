@@ -26,15 +26,17 @@ from absl import flags
 import numpy as np
 
 from open_spiel.python.algorithms import mcts
+from open_spiel.python.bots import gtp
 from open_spiel.python.bots import human
 from open_spiel.python.bots import uniform_random
 import pyspiel
 
-_KNOWN_PLAYERS = ["mcts", "random", "human"]
+_KNOWN_PLAYERS = ["mcts", "random", "human", "gtp"]
 
 flags.DEFINE_string("game", "tic_tac_toe", "Name of the game.")
 flags.DEFINE_enum("player1", "mcts", _KNOWN_PLAYERS, "Who controls player 1.")
 flags.DEFINE_enum("player2", "random", _KNOWN_PLAYERS, "Who controls player 2.")
+flags.DEFINE_string("gtp_path", None, "Where to find a binary for gtp.")
 flags.DEFINE_integer("uct_c", 2, "UCT's exploration constant.")
 flags.DEFINE_integer("rollout_count", 10, "How many rollouts to do.")
 flags.DEFINE_integer("max_simulations", 10000, "How many simulations to run.")
@@ -69,6 +71,8 @@ def _init_bot(bot_type, game, player_id):
     return uniform_random.UniformRandomBot(player_id, rng)
   if bot_type == "human":
     return human.HumanBot()
+  if bot_type == "gtp":
+    return gtp.GTPBot(game, FLAGS.gtp_path)
   raise ValueError("Invalid bot type: %s" % bot_type)
 
 
@@ -97,6 +101,7 @@ def _play_game(game, bots, initial_actions):
     _opt_print("Next state:\n{}".format(state))
 
   while not state.is_terminal():
+    current_player = state.current_player()
     # The state can be three different types: chance node,
     # simultaneous node, or decision node
     if state.is_chance_node():
@@ -106,18 +111,21 @@ def _play_game(game, bots, initial_actions):
       _opt_print("Chance node, got " + str(num_actions) + " outcomes")
       action_list, prob_list = zip(*outcomes)
       action = np.random.choice(action_list, p=prob_list)
-      action_str = state.action_to_string(state.current_player(), action)
+      action_str = state.action_to_string(current_player, action)
       _opt_print("Sampled action: ", action_str)
     elif state.is_simultaneous_node():
       raise ValueError("Game cannot have simultaneous nodes.")
     else:
       # Decision node: sample action for the single current player
-      bot = bots[state.current_player()]
+      bot = bots[current_player]
       action = bot.step(state)
-      action_str = state.action_to_string(state.current_player(), action)
-      _opt_print("Player {} sampled action: {}".format(state.current_player(),
+      action_str = state.action_to_string(current_player, action)
+      _opt_print("Player {} sampled action: {}".format(current_player,
                                                        action_str))
 
+    for i, bot in enumerate(bots):
+      if i != current_player:
+        bot.inform_action(state, current_player, action)
     history.append(action_str)
     state.apply_action(action)
 

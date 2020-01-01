@@ -64,7 +64,7 @@ struct GameType {
 
   // Is the game one-player-at-a-time or do players act simultaneously?
   enum class Dynamics {
-    kSimultaneous,  // Every player acts at each stage.
+    kSimultaneous,  // In some or all nodes every player acts.
     kSequential,    // Turn-based games.
   };
   Dynamics dynamics;
@@ -171,7 +171,8 @@ class State {
   virtual Player CurrentPlayer() const = 0;
 
   // Change the state of the game by applying the specified action in turn-based
-  // games. This function encodes the logic of the game rules. Returns true
+  // games or in non-simultaneous nodes of simultaneous move games.
+  // This function encodes the logic of the game rules. Returns true
   // on success. In simultaneous games, returns false (ApplyActions should be
   // used in that case.)
   //
@@ -307,7 +308,9 @@ class State {
   // Is this state a chance node? Chance nodes are "states" whose actions
   // represent stochastic outcomes. "Chance" or "Nature" is thought of as a
   // player with a fixed (randomized) policy.
-  bool IsChanceNode() const { return CurrentPlayer() == kChancePlayerId; }
+  virtual bool IsChanceNode() const {
+    return CurrentPlayer() == kChancePlayerId;
+  }
 
   // Is this state a node that requires simultaneous action choices from more
   // than one player? If this is ever true, then the game should be marked as
@@ -516,6 +519,14 @@ class State {
   virtual std::unique_ptr<State> ResampleFromInfostate(
       int player_id, std::function<double()> rng) const {
     SpielFatalError("ResampleFromInfostate() not implemented.");
+  }
+
+  // Returns a vector of states & probabilities that are consistent with the
+  // infostate from the view of the current player. By default, this is not
+  // implemented and returns an empty list.
+  virtual std::pair<std::vector<std::unique_ptr<State>>, std::vector<double>>
+  GetHistoriesConsistentWithInfostate() const {
+    return {};
   }
 
  protected:
@@ -778,6 +789,11 @@ std::string SerializeGameAndState(const Game& game, const State& state);
 // seed.
 std::pair<std::shared_ptr<const Game>, std::unique_ptr<State>>
 DeserializeGameAndState(const std::string& serialized_state);
+
+// We alias this here as we can't import state_distribution.h or we'd have a
+// circular dependency.
+using HistoryDistribution =
+    std::pair<std::vector<std::unique_ptr<State>>, std::vector<double>>;
 
 }  // namespace open_spiel
 
