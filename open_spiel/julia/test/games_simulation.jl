@@ -25,7 +25,8 @@ SPIEL_MULTIPLAYER_GAMES_LIST = [
     for p in max(min_num_players(g), 2) : min(max_num_players(g), 6)
     if (max_num_players(g) > 2) &&
         (max_num_players(g) > min_num_players(g)) &&
-        (short_name(g) != "tiny_hanabi")  # default payoff only works for 2p
+        (short_name(g) != "tiny_hanabi") &&  # default payoff only works for 2p
+        (short_name(g) != "universal_poker")
 ]
 
 @test length(SPIEL_MULTIPLAYER_GAMES_LIST) >= 35

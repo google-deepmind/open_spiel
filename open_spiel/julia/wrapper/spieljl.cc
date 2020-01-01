@@ -285,7 +285,7 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
     .constructor<const open_spiel::Game&>()
     .constructor<const std::unordered_map<std::string, open_spiel::ActionsAndProbs>&>()
     .method("get_state_policy", &open_spiel::TabularPolicy::GetStatePolicy)
-    .method("policy_table", &open_spiel::TabularPolicy::PolicyTable)
+    .method("policy_table", [](open_spiel::TabularPolicy p) { return p.PolicyTable(); } )
     .method("get_state_policy", [](open_spiel::TabularPolicy p, const open_spiel::State& state) { return p.GetStatePolicy(state.InformationStateString()); })
     .method("get_state_policy", [](open_spiel::TabularPolicy p, const std::string& state) { return p.GetStatePolicy(state); });
 
