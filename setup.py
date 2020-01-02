@@ -46,7 +46,7 @@ class BuildExt(build_ext):
         )
         cmake_args = [
             "-DPython_TARGET_VERSION=3.6",
-            "-DCMAKE_CXX_COMPILER=g++",
+            "-DCMAKE_CXX_COMPILER=clang++",
             f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={extension_dir}",
         ]
         if not os.path.exists(self.build_temp):
