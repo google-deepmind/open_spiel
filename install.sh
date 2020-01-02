@@ -134,6 +134,19 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then  # Mac OSX
   curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
   python3 get-pip.py
   pip3 install virtualenv
+
+  # Julia related stuff
+  if [[ ${BUILD_WITH_JULIA:-"OFF"} == "ON" ]]; then
+    if which julia >/dev/null; then
+      JULIA_VERSION_INFO=`julia --version`
+      echo -e "\e[33m$JULIA_VERSION_INFO is already installed.\e[0m"
+    else
+      brew cask install julia
+    fi
+
+    # Install dependencies
+    julia --project="${MYDIR}/open_spiel/julia" -e 'using Pkg; Pkg.instantiate()'
+  fi
 else
   echo "The OS '$OSTYPE' is not supported (Only Linux and MacOS is). " \
        "Feel free to contribute the install for a new OS."

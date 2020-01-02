@@ -37,7 +37,6 @@ matrix:
     env:
       # Unfortunately, the build fails on MacOs for universal poker.
       - BUILD_WITH_ACPC="OFF"
-      - BUILD_WITH_JULIA="OFF" # untested on mac yet
       - DEFAULT_OPTIONAL_DEPENDENCY="ON"
 
 script:
