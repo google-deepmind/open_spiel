@@ -33,3 +33,6 @@ source ./venv/bin/activate
 
 python3 --version
 pip3 install --upgrade -r requirements.txt -q
+
+./open_spiel/scripts/build_and_run_tests.sh
+deactivate
