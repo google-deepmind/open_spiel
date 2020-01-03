@@ -523,10 +523,19 @@ class State {
 
   // Returns a vector of states & probabilities that are consistent with the
   // infostate from the view of the current player. By default, this is not
-  // implemented and returns an empty list.
-  virtual std::pair<std::vector<std::unique_ptr<State>>, std::vector<double>>
-  GetHistoriesConsistentWithInfostate() const {
+  // implemented and returns an empty list. This doesn't make any attempt to
+  // correct for the opponent's policy in the probabilities, and so this is
+  // wrong for any state that's not the first non-chance node.
+  virtual std::unique_ptr<
+      std::pair<std::vector<std::unique_ptr<State>>, std::vector<double>>>
+  GetHistoriesConsistentWithInfostate(int player_id) const {
     return {};
+  }
+
+  virtual std::unique_ptr<
+      std::pair<std::vector<std::unique_ptr<State>>, std::vector<double>>>
+  GetHistoriesConsistentWithInfostate() const {
+    return GetHistoriesConsistentWithInfostate(CurrentPlayer());
   }
 
  protected:
