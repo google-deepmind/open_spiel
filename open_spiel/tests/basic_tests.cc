@@ -16,6 +16,8 @@
 
 #include <iostream>
 #include <memory>
+#include <numeric>
+#include <optional>
 #include <random>
 #include <set>
 #include <string>
@@ -33,6 +35,7 @@ namespace {
 
 constexpr int kInvalidHistoryPlayer = -300;
 constexpr int kInvalidHistoryAction = -301;
+constexpr double kUtilitySumTolerance = 1e-9;
 
 // Information about the simulation history. Used to track past states and
 // actions for rolling back simulations via UndoAction, and check History.
@@ -187,6 +190,32 @@ void TestHistoryContainsActions(const Game& game,
       SPIEL_CHECK_EQ(history_item.state->History(), actions);
     }
     actions.push_back(history_item.action);
+  }
+}
+
+void CheckReturnsSum(const Game& game, const State& state) {
+  std::vector<double> returns = state.Returns();
+  double rsum = std::accumulate(returns.begin(), returns.end(), 0.0);
+
+  switch (game.GetType().utility) {
+    case GameType::Utility::kZeroSum: {
+      SPIEL_CHECK_TRUE(Near(rsum, 0.0, kUtilitySumTolerance));
+      break;
+    }
+    case GameType::Utility::kConstantSum: {
+      SPIEL_CHECK_TRUE(Near(rsum, game.UtilitySum(), kUtilitySumTolerance));
+      break;
+    }
+    case GameType::Utility::kIdentical: {
+      for (int i = 1; i < returns.size(); ++i) {
+        SPIEL_CHECK_TRUE(
+            Near(returns[i], returns[i - 1], kUtilitySumTolerance));
+      }
+      break;
+    }
+    case GameType::Utility::kGeneralSum: {
+      break;
+    }
   }
 }
 
@@ -360,6 +389,10 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
     }
   }
 
+  // Check that the returns satisfy the constraints based on the game type.
+  CheckReturnsSum(game, *state);
+
+  // Now, check each individual return is within bounds.
   auto returns = state->Returns();
   SPIEL_CHECK_EQ(returns.size(), game.NumPlayers());
   for (Player player = 0; player < game.NumPlayers(); player++) {
