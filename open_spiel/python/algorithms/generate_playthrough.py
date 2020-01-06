@@ -252,7 +252,7 @@ def _playthrough_params(lines):
 
 def replay(filename):
   """Re-runs the playthrough in the specified file. Returns (original, new)."""
-  with open(filename, "r") as f:
+  with open(filename, "r", encoding="utf-8") as f:
     original = f.read()
   kwargs = _playthrough_params(original.splitlines())
   return (original, playthrough(**kwargs))
