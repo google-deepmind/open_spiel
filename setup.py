@@ -95,7 +95,7 @@ setuptools.setup(
     version="0.0.1rc2",
     license="Apache 2.0",
     author="The OpenSpiel authors",
-    author_email="lanctot@google.com",
+    author_email="open_spiel@google.com",
     description="A Framework for Reinforcement Learning in Games",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
