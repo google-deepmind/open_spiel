@@ -23,7 +23,7 @@ import tensorflow.compat.v1 as tf
 from open_spiel.python.algorithms import neurd
 import pyspiel
 
-tf.compat.v1.enable_eager_execution()
+tf.enable_eager_execution()
 
 _GAME = pyspiel.load_game('kuhn_poker')
 
@@ -44,8 +44,6 @@ class NeurdTest(tf.test.TestCase):
     super(NeurdTest, self).setUp()
     tf.set_random_seed(42)
 
-  @absltest.skip('Does not run in the open-source world. See '
-                 'https://github.com/deepmind/open_spiel/issues/18')
   def test_neurd(self):
     num_iterations = 2
     models = [_new_model() for _ in range(_GAME.num_players())]
@@ -62,7 +60,7 @@ class NeurdTest(tf.test.TestCase):
           data=data,
           batch_size=12,
           step_size=10.0,
-          autoencoder_loss=tf.compat.v1.losses.huber_loss)
+          autoencoder_loss=tf.losses.huber_loss)
 
     for _ in range(num_iterations):
       solver.evaluate_and_update_policy(_train)
