@@ -15,6 +15,7 @@
 #include "open_spiel/games/universal_poker/logic/card_set.h"
 
 #include <bitset>
+#include <iostream>
 #include <sstream>
 #include <string>
 
@@ -30,13 +31,16 @@ extern "C" {
 
 namespace open_spiel::universal_poker::logic {
 
-using I = uint64_t;
-
-auto dump(I v) { return std::bitset<sizeof(I) * __CHAR_BIT__>(v); }
-I bit_twiddle_permute(I v) {
-  I t = v | (v - 1);
-  I w = (t + 1) | (((~t & -~t) - 1) >> (__builtin_ctzl(v) + 1));
-
+// Returns the lexicographically next permutation of the supplied bits.
+// See https://graphics.stanford.edu/~seander/bithacks.html#NextBitPermutation
+uint64_t bit_twiddle_permute(uint64_t v) {
+  uint64_t t = v | (v - 1);
+  uint64_t u = ((~t & -~t) - 1);
+  int shift = __builtin_ctzl(v) + 1;
+  // Shifting by 64 bits or more is undefined behaviour, so we must avoid it.
+  // See for example: http://c0x.coding-guidelines.com/6.5.7.html (1185).
+  u = (shift < 64) ? (u >> shift) : 0;
+  uint64_t w = (t + 1) | u;
   return w;
 }
 
@@ -47,7 +51,8 @@ CardSet::CardSet(std::string cardString) : cs() {
 
     uint8_t rank = (uint8_t)(kRankChars.find(rankChr));
     uint8_t suit = (uint8_t)(kSuitChars.find(suitChr));
-
+    assert(rank < MAX_RANKS);
+    assert(suit < MAX_SUITS);
     cs.bySuit[suit] |= ((uint16_t)1 << rank);
   }
 }
@@ -128,7 +133,8 @@ std::vector<CardSet> CardSet::SampleCards(int nbCards) {
     p += (1 << i);
   }
 
-  for (I n = bit_twiddle_permute(p); n > p; p = n, n = bit_twiddle_permute(p)) {
+  for (uint64_t n = bit_twiddle_permute(p); n > p;
+       p = n, n = bit_twiddle_permute(p)) {
     uint64_t combo = n & cs.cards;
     if (__builtin_popcountl(combo) == nbCards) {
       CardSet c;
