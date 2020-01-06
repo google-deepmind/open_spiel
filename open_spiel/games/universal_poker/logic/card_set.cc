@@ -20,6 +20,7 @@
 #include <string>
 
 #include "open_spiel/abseil-cpp/absl/strings/string_view.h"
+#include "open_spiel/spiel_utils.h"
 
 constexpr absl::string_view kSuitChars = "cdhs";
 constexpr absl::string_view kRankChars = "23456789TJQKA";
@@ -51,8 +52,8 @@ CardSet::CardSet(std::string cardString) : cs() {
 
     uint8_t rank = (uint8_t)(kRankChars.find(rankChr));
     uint8_t suit = (uint8_t)(kSuitChars.find(suitChr));
-    assert(rank < MAX_RANKS);
-    assert(suit < MAX_SUITS);
+    SPIEL_CHECK_LT(rank, MAX_RANKS);
+    SPIEL_CHECK_LT(suit, MAX_SUITS);
     cs.bySuit[suit] |= ((uint16_t)1 << rank);
   }
 }
