@@ -227,17 +227,7 @@ class TabularPolicy(Policy):
       return str(state)
 
   def action_probabilities(self, state, player_id=None):
-    """Returns the policy for a player in a state.
-
-    Args:
-      state: A `pyspiel.State` object.
-      player_id: Optional, the player id for which we want an action. Optional
-        unless this is a simultaneous state at which multiple players can act.
-
-    Returns:
-      A `dict` of `{action: probability}` for the specified player in the
-      supplied state.
-    """
+    """See base-class. Important: do not iterate over these to walk the tree."""
     policy = self.policy_for_key(self._state_key(state, player_id))
     return {
         action: probability
