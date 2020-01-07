@@ -43,9 +43,9 @@ int RandomSimulation(std::mt19937* rng, const Game& game, bool verbose) {
 
   int game_length = 0;
   while (!state->IsTerminal()) {
-    if (provides_observations) {
+    if (provides_observations && state->CurrentPlayer() >= 0) {
       state->ObservationTensor(state->CurrentPlayer(), &obs);
-    } else if (provides_info_state) {
+    } else if (provides_info_state && state->CurrentPlayer() >= 0) {
       state->InformationStateTensor(state->CurrentPlayer(), &obs);
     }
     ++game_length;
