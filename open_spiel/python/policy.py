@@ -71,7 +71,7 @@ class Policy(object):
     - Only legal actions are present in the mapping, but it does not have to
       be exhaustive: missing actions are considered to be associated to a zero
       probability. This means that one should not iterate over the returned
-      dictionary if they want to iteratve over the full history tree.
+      dictionary if they want to iterate over the full history tree.
       If bugs are caused by this, we can change it to force policies to
       exhaustively give the probabilities for all legal actions.
 
