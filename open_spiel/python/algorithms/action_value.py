@@ -90,9 +90,8 @@ class TreeWalkCalculator(object):
       reach_probabilities: A numpy array of shape `[num_players + 1]`.
         reach_probabilities[i] is the product of the player i action
         probabilities along the current trajectory. Note that
-        reach_probabilities[-1] corresponds to the chance player.
-        Initially, it should be called with np.ones(self._num_players + 1) at
-        the root node.
+        reach_probabilities[-1] corresponds to the chance player. Initially, it
+        should be called with np.ones(self._num_players + 1) at the root node.
 
     Returns:
       The value of the root state to each player.
@@ -173,6 +172,34 @@ class TreeWalkCalculator(object):
         policies,
         reach_probabilities=np.ones(self._num_players + 1))
 
+  def _get_tabular_statistics(self, keys):
+    """Returns tabular numpy arrays of the resulting stastistics.
+
+    Args:
+      keys: A list of the (player, info_state_str) keys to use to return the
+        tabular numpy array of results.
+    """
+    # Collect normalized action values for each information state
+    action_values = []
+    cfrp = []  # Counterfactual reach probabilities
+    player_reach_probs = []
+
+    for key in keys:
+      player = key[0]
+      av = self.weighted_action_values[key]
+      norm_prob = self.info_state_prob[key]
+      action_values.append([(av[a][player] / norm_prob) if
+                            (a in av and norm_prob > 0) else 0
+                            for a in range(self._num_actions)])
+      cfrp.append(self.info_state_cf_prob[key])
+      player_reach_probs.append(self.info_state_player_prob[key])
+
+    # Return values
+    return _CalculatorReturn(
+        action_values=action_values,
+        counterfactual_reach_probs=cfrp,
+        player_reach_probs=player_reach_probs)
+
   def get_tabular_statistics(self, tabular_policy):
     """Returns tabular numpy arrays of the resulting stastistics.
 
@@ -183,27 +210,9 @@ class TreeWalkCalculator(object):
       tabular_policy: A `policy.TabularPolicy` object, used to get the ordering
         of the states i nthe tabular numpy array.
     """
-    # Collect normalized action values for each information state
-    action_values = []
-    cfrp = []  # Counterfactual reach probabilities
-    player_reach_probs = []
-
-    for player in [0, 1]:
-      for info_state_str in tabular_policy.states_per_player[player]:
-        key = (player, info_state_str)
-        av = self.weighted_action_values[key]
-        norm_prob = self.info_state_prob[key]
-        action_values.append([(av[a][player] / norm_prob) if
-                              (a in av and norm_prob > 0) else 0
-                              for a in range(self._num_actions)])
-        cfrp.append(self.info_state_cf_prob[key])
-        player_reach_probs.append(self.info_state_player_prob[key])
-
-    # Return values
-    return _CalculatorReturn(
-        action_values=action_values,
-        counterfactual_reach_probs=cfrp,
-        player_reach_probs=player_reach_probs)
+    keys = ([(0, s) for s in tabular_policy.states_per_player[0]] +
+            [(1, s) for s in tabular_policy.states_per_player[1]])
+    return self._get_tabular_statistics(keys)
 
   def __call__(self, policies, tabular_policy):
     """Computes action values per state for the player.

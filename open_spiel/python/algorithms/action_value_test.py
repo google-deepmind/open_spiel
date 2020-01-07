@@ -18,12 +18,10 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import collections
 import unittest
 import numpy as np
 from open_spiel.python import policy
 from open_spiel.python.algorithms import action_value
-from open_spiel.python.algorithms import action_value_vs_best_response
 import pyspiel
 
 
@@ -81,6 +79,8 @@ class ActionValuesTest(unittest.TestCase):
       ], tabular_policy)
 
       # Action 0 == Pass. Action 1 == Bet
+      # Some values are 0 because the states are not reached, thus the expected
+      # value of that node is undefined.
       np.testing.assert_array_almost_equal(
           np.asarray([
               [-1.0, -0.5],
@@ -124,53 +124,6 @@ class ActionValuesTest(unittest.TestCase):
       np.testing.assert_array_equal(
           [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
           returned_values.player_reach_probs)
-
-  def test_equivalent_to_action_value_vs_best_response(self):
-    game = pyspiel.load_game("leduc_poker")
-    calc = action_value.TreeWalkCalculator(game)
-
-    calc.compute_all_states_action_values([
-        policy.PolicyFromCallable(game, _uniform_policy),
-        policy.PolicyFromCallable(game, _uniform_policy)
-    ])
-
-    other_calculator = action_value_vs_best_response.Calculator(game)
-
-    # Compute action values
-    other_calculator.action_values = collections.defaultdict(
-        lambda: collections.defaultdict(lambda: np.zeros(2)))
-    other_calculator.info_state_prob = collections.defaultdict(float)
-    other_calculator.info_state_player_prob = collections.defaultdict(float)
-    other_calculator.info_state_cf_prob = collections.defaultdict(float)
-    other_calculator.info_state_chance_prob = collections.defaultdict(float)
-    other_calculator.get_action_values(
-        game.new_initial_state(), {
-            0: policy.PolicyFromCallable(game, _uniform_policy),
-            1: policy.PolicyFromCallable(game, _uniform_policy),
-        })
-
-    _assert_dict_np_array_equal(calc.weighted_action_values,
-                                other_calculator.action_values)
-    _assert_dict_np_array_equal(calc.info_state_prob,
-                                other_calculator.info_state_prob)
-    _assert_dict_np_array_equal(calc.info_state_player_prob,
-                                other_calculator.info_state_player_prob)
-    _assert_dict_np_array_equal(calc.info_state_cf_prob,
-                                other_calculator.info_state_cf_prob)
-    _assert_dict_np_array_equal(calc.info_state_chance_prob,
-                                other_calculator.info_state_chance_prob)
-    _assert_dict_np_array_equal(calc.weighted_action_values,
-                                other_calculator.action_values)
-
-
-def _assert_dict_np_array_equal(d1, d2):
-  assert len(d1) == len(d2)
-  for key, value in d1.items():
-    assert key in d2
-    if isinstance(value, dict):
-      _assert_dict_np_array_equal(value, d2[key])
-    else:
-      np.testing.assert_array_equal(value, d2[key])
 
 
 if __name__ == "__main__":
