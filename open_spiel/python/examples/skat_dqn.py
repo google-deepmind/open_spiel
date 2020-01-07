@@ -77,7 +77,7 @@ def eval_against_random_bots(env, trained_agents, random_agents, num_episodes):
             time_step, is_evaluation=True)
         action_list = [agent_output.action]
         time_step = env.step(action_list)
-        episode_rewards += time_step.rewards[player_pos]
+        episode_rewards += time_step.rewards[eval_player_pos]
       sum_episode_rewards[player_pos] += episode_rewards
   return sum_episode_rewards / num_episodes
 
