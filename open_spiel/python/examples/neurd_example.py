@@ -31,7 +31,7 @@ import tensorflow.compat.v1 as tf
 from open_spiel.python.algorithms import neurd
 import pyspiel
 
-tf.compat.v1.enable_eager_execution()
+tf.enable_eager_execution()
 
 FLAGS = flags.FLAGS
 

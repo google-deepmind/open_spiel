@@ -19,6 +19,7 @@
 #include <cstdint>
 #include <utility>
 
+#include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_format.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
@@ -491,41 +492,42 @@ double UniversalPokerState::GetTotalReward(Player player) const {
   return acpc_state_.ValueOfState(player);
 }
 
-HistoryDistribution UniversalPokerState::GetHistoriesConsistentWithInfostate()
-    const {
+std::unique_ptr<HistoryDistribution>
+UniversalPokerState::GetHistoriesConsistentWithInfostate(int player_id) const {
   // This is only implemented for 2 players.
   if (acpc_game_->GetNbPlayers() != 2) return {};
 
   logic::CardSet is_cards;
-  const logic::CardSet &our_cards = hole_cards_[cur_player_];
+  const logic::CardSet &our_cards = hole_cards_[player_id];
   for (uint8_t card : our_cards.ToCardArray()) is_cards.AddCard(card);
   for (uint8_t card : board_cards_.ToCardArray()) is_cards.AddCard(card);
   logic::CardSet fresh_deck(/*num_suits=*/acpc_game_->NumSuitsDeck(),
                             /*num_ranks=*/acpc_game_->NumRanksDeck());
   for (uint8_t card : is_cards.ToCardArray()) fresh_deck.RemoveCard(card);
   const int hand_size = acpc_game_->GetNbHoleCardsRequired();
-  HistoryDistribution dist;
+  auto dist = std::make_unique<HistoryDistribution>();
   for (uint8_t hole_card1 : fresh_deck.ToCardArray()) {
     logic::CardSet subset_deck = fresh_deck;
     subset_deck.RemoveCard(hole_card1);
     for (uint8_t hole_card2 : subset_deck.ToCardArray()) {
       if (hole_card1 < hole_card2) continue;
       std::unique_ptr<State> root = game_->NewInitialState();
-      if (cur_player_ == 0) {
+      if (player_id == 0) {
         for (uint8_t card : our_cards.ToCardArray()) root->ApplyAction(card);
         root->ApplyAction(hole_card1);
         root->ApplyAction(hole_card2);
-      } else if (cur_player_ == 1) {
+      } else if (player_id == 1) {
         root->ApplyAction(hole_card1);
         root->ApplyAction(hole_card2);
         for (uint8_t card : our_cards.ToCardArray()) root->ApplyAction(card);
       }
       SPIEL_CHECK_FALSE(root->IsChanceNode());
-      dist.first.push_back(std::move(root));
+      dist->first.push_back(std::move(root));
+      dist->second.push_back(1.);
     }
   }
-  dist.second.resize(dist.first.size(),
-                     1. / static_cast<double>(dist.first.size()));
+  dist->second.resize(dist->first.size(),
+                      1. / static_cast<double>(dist->first.size()));
   return dist;
 }
 
@@ -637,7 +639,6 @@ int UniversalPokerGame::MaxGameLength() const {
     maxStack /= 2.0;         // You have always to bet the pot size
     length += NumPlayers();  // Each player has to react
   }
-
   return length;
 }
 
@@ -661,10 +662,7 @@ std::string UniversalPokerGame::parseParameters(const GameParameters &map) {
                        absl::StrJoin(game_parameter_keys, ", "),
                        "gamedef is exclusive with other paraemters."));
     }
-    std::string retreived_gamedef = ParameterValue<std::string>("gamedef");
-    std::cerr << "gamedef directly passed for Universal Poker:\n"
-              << retreived_gamedef << std::endl;
-    return retreived_gamedef;
+    return ParameterValue<std::string>("gamedef");
   }
 
   std::string generated_gamedef = "GAMEDEF\n";

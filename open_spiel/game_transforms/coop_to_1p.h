@@ -107,7 +107,7 @@ class CoopTo1pState : public State {
     Player underlying_player = state_->CurrentPlayer();
     return underlying_player < 0 ? underlying_player : kPlayerId;
   }
-  virtual std::vector<Action> LegalActions(Player player) const {
+  std::vector<Action> LegalActions(Player player) const override {
     if (player == CurrentPlayer())
       return LegalActions();
     else

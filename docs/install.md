@@ -3,11 +3,25 @@
 The instructions here are for Linux and MacOS. For installation on Windows, see
 [these separate installation instructions](windows.md).
 
+Currently there are two installation methods:
+
+1.  building from the source code and editing `PYTHONPATH`.
+2.  using `pip install` to build and testing using
+    [nox](https://nox.thea.codes/en/stable/). A pip package to install directly
+    does not exist yet.
+
 ## Summary
 
-1.  Install system packages and download some dependencies. Only needs to be run
-    once or if you enable some new conditional dependencies (see specific
-    section below).
+In a nutshell:
+
+```bash
+./install.sh  # Needed to run once and when major changes are released.
+./build_and_run_tests.sh  # Run this every-time you need to rebuild.
+```
+
+1.  Install system packages (e.g. cmake) and download some dependencies. Only
+    needs to be run once or if you enable some new conditional dependencies (see
+    specific section below).
 
     ```bash
     ./install.sh
@@ -19,19 +33,44 @@ The instructions here are for Linux and MacOS. For installation on Windows, see
     ```bash
     virtualenv -p python3 venv
     source venv/bin/activate
-    pip3 install --upgrade pip
-    pip3 install -r requirements.txt
     ```
 
     Use `deactivate` to quit the virtual environment.
 
-3.  Build and run tests to check everything works:
+    `pip` should be installed once and upgraded:
+
+    ```
+    curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+    # Install pip deps as your user. Do not use the system's pip.
+    python3 get-pip.py --user
+    pip3 install --upgrade pip --user
+    pip3 install --upgrade setuptools testresources --user
+    ```
+
+3.  This sections differs depending on the installation procedure:
+
+    **Building and testing from source**
 
     ```bash
+    pip3 install -r requirements.txt
     ./open_spiel/scripts/build_and_run_tests.sh
     ```
 
-4.  Add
+    **Building and testing using PIP**
+
+    ```bash
+    python3 -m pip install .
+    pip install nox
+    nox -s tests
+    ```
+
+    Optionally, use `pip install -e` to install in
+    [editable mode](https://pip.pypa.io/en/stable/reference/pip_install/#editable-installs),
+    which will allow you to skip this `pip install` step if you edit any Python
+    source files. If you edit any C++ files, you will have to rerun the install
+    command.
+
+4.  Only when building from source:
 
     ```bash
     # For the python modules in open_spiel.
@@ -46,6 +85,16 @@ The instructions here are for Linux and MacOS. For installation on Windows, see
 To make sure OpenSpiel works on the default configurations, we do use the
 `python3` command and not `python` (which still defaults to Python 2 on modern
 Linux versions).
+
+## Running the first example
+
+In the `build` directory, running `examples/example` will prints out a list of
+registered games and the usage. Now, let’s play game of Tic-Tac-Toe with uniform
+random players:
+
+```bash
+examples/example --game=tic_tac_toe
+```
 
 ## Detailed steps
 
@@ -125,14 +174,4 @@ or `.profile`.
 export PYTHONPATH=$PYTHONPATH:/<path_to_open_spiel>
 # For the Python bindings of Pyspiel
 export PYTHONPATH=$PYTHONPATH:/<path_to_open_spiel>/build/python
-```
-
-# Running the first example
-
-In the `build` directory, running `examples/example` will prints out a list of
-registered games and the usage. Now, let’s play game of Tic-Tac-Toe with uniform
-random players:
-
-```bash
-examples/example --game=tic_tac_toe
 ```

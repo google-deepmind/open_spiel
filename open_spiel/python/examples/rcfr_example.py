@@ -25,7 +25,7 @@ import tensorflow.compat.v1 as tf
 from open_spiel.python.algorithms import rcfr
 import pyspiel
 
-tf.compat.v1.enable_eager_execution()
+tf.enable_eager_execution()
 
 FLAGS = flags.FLAGS
 
@@ -98,7 +98,7 @@ def main(_):
     def _train():
       for x, y in data:
         optimizer.minimize(
-            lambda: tf.compat.v1.losses.huber_loss(y, model(x), delta=0.01),  # pylint: disable=cell-var-from-loop
+            lambda: tf.losses.huber_loss(y, model(x), delta=0.01),  # pylint: disable=cell-var-from-loop
             model.trainable_variables)
 
     _train()

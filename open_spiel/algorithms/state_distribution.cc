@@ -148,32 +148,22 @@ HistoryDistribution GetStateDistribution(const State& state,
   return {std::move(final_states), Normalize(final_probs)};
 }
 
-HistoryDistribution UpdateIncrementalStateDistribution(
+std::unique_ptr<HistoryDistribution> UpdateIncrementalStateDistribution(
     const State& state, const Policy* opponent_policy, int player_id,
-    const HistoryDistribution& previous) {
-  if (previous.first.empty()) {
-    HistoryDistribution dist = state.GetHistoriesConsistentWithInfostate();
-
-    // If the game didn't implement GetHistoriesConsistentWithInfostate, then
-    // this is empty, otherwise, we're good.
-    if (!dist.first.empty()) return dist;
-
+    std::unique_ptr<HistoryDistribution> previous) {
+  if (previous == nullptr) previous = std::make_unique<HistoryDistribution>();
+  if (previous->first.empty()) {
     // If the previous pair is empty, then we have to do a BFS to find all
     // relevant nodes:
-    return GetStateDistribution(state, opponent_policy);
+    return std::make_unique<HistoryDistribution>(
+        GetStateDistribution(state, opponent_policy));
   }
-  HistoryDistribution current;
-  current.first.reserve(previous.first.size());
-  for (const std::unique_ptr<State>& state : previous.first) {
-    current.first.push_back(state->Clone());
-  }
-  current.second = previous.second;
-  // The current state must be one action ahead of the previous ones.
+  // The current state must be one action ahead of the dist ones.
   const std::vector<Action> history = state.History();
   Action action = history.back();
-  for (int i = 0; i < previous.first.size(); ++i) {
-    std::unique_ptr<State>& parent = current.first[i];
-    double& prob = current.second[i];
+  for (int i = 0; i < previous->first.size(); ++i) {
+    std::unique_ptr<State>& parent = previous->first[i];
+    double& prob = previous->second[i];
     if (Near(prob, 0.)) continue;
     SPIEL_CHECK_EQ(history.size(), parent->History().size() + 1);
     switch (parent->GetType()) {
@@ -208,8 +198,8 @@ HistoryDistribution UpdateIncrementalStateDistribution(
     if (prob == 0) continue;
     parent->ApplyAction(action);
   }
-  current.second = Normalize(current.second);
-  return current;
+  previous->second = Normalize(previous->second);
+  return previous;
 }
 
 }  // namespace algorithms

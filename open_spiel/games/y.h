@@ -186,7 +186,7 @@ class YGame : public Game {
   std::vector<int> ObservationTensorShape() const override {
     return {kCellStates, board_size_, board_size_};
   }
-  int MaxGameLength() const {
+  int MaxGameLength() const override {
     // The true number of playable cells on the board.
     // No stones are removed, and someone will win by filling the board.
     // Increase this by one if swap is ever implemented.

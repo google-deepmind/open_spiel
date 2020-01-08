@@ -169,7 +169,7 @@ class QuoridorGame : public Game {
   std::vector<int> ObservationTensorShape() const override {
     return {kCellStates + kNumPlayers, Diameter(), Diameter()};
   }
-  int MaxGameLength() const {
+  int MaxGameLength() const override {
     // There's no anti-repetition rule, so this could be infinite, but no sane
     // agent would take more moves than placing all the walls and visiting
     // all squares.

@@ -1,5 +1,3 @@
-#!/bin/bash
-
 # Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,25 +12,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-set -e
-set -x
+# Lint as: python3
+"""An integration test building and testing open_spiel wheel."""
+import os
+import sys
+import sysconfig
 
-if [ ! "$TRAVIS_USE_NOX" -eq 0 ]; then
-    # Build and run tests using nox
-    pip3 install nox
-    nox -s tests
-    exit 0
-fi
+import nox
 
-sudo -H pip3 install --upgrade pip
-sudo -H pip3 install --upgrade setuptools
-sudo -H pip3 install --force-reinstall virtualenv
 
-virtualenv -p python3 ./venv
-source ./venv/bin/activate
+def get_distutils_tempdir():
+  return (
+      f"temp.{sysconfig.get_platform()}-{sys.version_info[0]}.{sys.version_info[1]}"
+  )
 
-python3 --version
-pip3 install --upgrade -r requirements.txt -q
 
-./open_spiel/scripts/build_and_run_tests.sh
-deactivate
+@nox.session
+def tests(session):
+  session.install("-r", "requirements.txt")
+  session.run("python", "setup.py", "build")
+  session.run("python", "setup.py", "install")
+  session.cd(os.path.join("build", get_distutils_tempdir()))
+  session.run(
+      "ctest", f"-j{4*os.cpu_count()}", "--output-on-failure", external=True)

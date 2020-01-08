@@ -21,7 +21,7 @@ namespace universal_poker {
 namespace logic {
 
 void BasicCardSetTests() {
-  CardSet cs("AhKaQhJhTh");
+  CardSet cs("AhKsQhJhTh");
 
   std::cout << "CardSet: " << cs.ToString() << std::endl;
   for (auto card : cs.ToCardArray()) {

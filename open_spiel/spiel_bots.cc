@@ -31,7 +31,7 @@ class UniformRandomBot : public Bot {
       : player_id_(player_id), rng_(seed) {}
   ~UniformRandomBot() = default;
 
-  void RestartAt(const State&) {}
+  void RestartAt(const State&) override {}
   Action Step(const State& state) override {
     return StepWithPolicy(state).second;
   }
@@ -67,8 +67,8 @@ class StatefulRandomBot : public UniformRandomBot {
   StatefulRandomBot(const Game& game, Player player_id, int seed)
       : UniformRandomBot(player_id, seed), state_(game.NewInitialState()) {}
 
-  void Restart() { state_ = state_->GetGame()->NewInitialState(); }
-  void RestartAt(const State& state) { state_ = state.Clone(); }
+  void Restart() override { state_ = state_->GetGame()->NewInitialState(); }
+  void RestartAt(const State& state) override { state_ = state.Clone(); }
   void InformAction(const State& state, Player player_id,
                     Action action) override {
     CheckStatesEqual(state, *state_);
@@ -104,7 +104,7 @@ class PolicyBot : public Bot {
       : Bot(), rng_(seed), policy_(std::move(policy)) {}
   ~PolicyBot() = default;
 
-  void RestartAt(const State&) {}
+  void RestartAt(const State&) override {}
   Action Step(const State& state) override {
     return StepWithPolicy(state).second;
   }
@@ -134,12 +134,12 @@ class FixedActionPreferenceBot : public Bot {
       : Bot(), player_id_(player_id), actions_(actions) {}
   ~FixedActionPreferenceBot() = default;
 
-  void RestartAt(const State&) {}
+  void RestartAt(const State&) override {}
   Action Step(const State& state) override {
     return StepWithPolicy(state).second;
   }
   bool ProvidesPolicy() override { return true; }
-  ActionsAndProbs GetPolicy(const State& state) {
+  ActionsAndProbs GetPolicy(const State& state) override {
     std::vector<Action> legal_actions = state.LegalActions(player_id_);
     std::unordered_set<Action> legal_actions_set =
         std::unordered_set<Action>(legal_actions.begin(), legal_actions.end());

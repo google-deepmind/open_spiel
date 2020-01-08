@@ -14,19 +14,37 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# The following builds open_spiel and executes the tests using the `python`
-# command. The version under 'python' is automatically detected.
+# The following scripts:
+# (optionally) create a virtualenv
+# (optionally) install the pip package dependencies
+# builds open_spiel and executes the tests using the `python3` command.
 #
-# It assumes:
-#   - we are at the root of the project
-#   - `install.sh` has been run
-#   - the Python dependencies has been installed, e.g. using
-#     `pip install --upgrade -r ../requirements.txt`.
-#
-# Using a virtualenv is recommended but not mandatory.
-#
+# We assume "install.sh` has been run once before.
+
+# As we encourage the use of a virtualenv, it is set to be used by default.
+# Use the --novirtualenv flag to disable this feature.
+
+# You will need to install at some points the requirements, within the
+# virtualenv or as system wide packages. By default, it will be installed the
+# first time the virtualenv is setup, but you can force an install using the
+# --install=true flag.
+
+
+# We use https://github.com/kward/shflags to define convenient flags.
+. $(dirname "$0")/shflags
+
+DEFINE_boolean 'virtualenv' true "Whether to use virtualenv. We enter a virtualenv (stored in venv/) only if this flag is true and we are not already in one."
+# We define a string and not a boolean, because we can to know whether this flag
+# has been explicitly set or not.
+DEFINE_string 'install' "default" 'Whether to install requirements.txt packages. Doing it is slow. By default, it will be true (a) the first-time a virtualenv is being setup (if system_wide_packages is false), (b) if the user overrides it with "true".'
+DEFINE_boolean 'system_wide_packages' false 'Whether to use --system-site-packages on the virtualenv.'
+DEFINE_boolean 'build_with_pip' false 'Whether to use "python3 -m pip install ." or the usual cmake&make and ctest.'
+
+FLAGS "$@" || exit $?
+eval set -- "${FLAGS_ARGV}"
+
 set -e  # exit when any command fails
-set -x
+# set -x  # Prints all executed command
 
 MYDIR="$(dirname "$(realpath "$0")")"
 source "${MYDIR}/global_variables.sh"
@@ -47,38 +65,107 @@ fi
 MAKE_NUM_PROCS=$(${NPROC})
 let TEST_NUM_PROCS=4*${MAKE_NUM_PROCS}
 
+# if we are in a virtual_env, we will not create a new one inside.
+if [[ "$VIRTUAL_ENV" != "" ]]
+then
+  echo -e "\e[1m\e[93mVirtualenv already detected. We do not create a new one.\e[0m"
+  FLAGS_virtualenv=${FLAGS_FALSE}
+fi
+
+
+echo -e "\e[33mRunning ${0} from $PWD\e[0m"
+PYBIN="python3"
+if ! [ -x "$(command -v $PYBIN)" ]; then
+  echo -e "\e[1m\e[93m$PYBIN not found! Skip build and test.\e[0m"
+  continue
+fi
+
+PY_VERSION_MAJOR=$($PYBIN -c 'import sys; print(sys.version_info.major)')
 PYVERSION=$(python3 -c 'import sys; print(sys.version.split(" ")[0])')
 
-BUILD_DIR="build"
-mkdir -p $BUILD_DIR
-cd $BUILD_DIR
-
-echo "Building and testing in $PWD using 'python' (version $PYVERSION)."
+TMPDIR="."
+VENV_DIR="$TMPDIR/venv"
+if [[ ${FLAGS_virtualenv} -eq ${FLAGS_TRUE} ]]; then
+  if ! [ -d "$VENV_DIR" ]; then
+    extra_args=''
+    if [[ ${FLAGS_system_wide_packages} -eq ${FLAGS_TRUE} ]]; then
+      extra_args="--system-site-packages"
+    else
+      # If we are in a virtual-env, and are not using the system-wide packages
+      # then we need to install the dependencies the first time the virtualenv
+      # is created
+      FLAGS_install="true"
+    fi
+    echo -e "\e[33mInstalling a virtualenv to $VENV_DIR. The setup is long the first time, please wait.\e[0m"
+    virtualenv -p $PYBIN $VENV_DIR $extra_args
+  else
+    echo -e "\e[33mReusing virtualenv from $VENV_DIR.\e[0m"
+  fi
+  source $VENV_DIR/bin/activate
+fi
 
 if [[ ${BUILD_WITH_JULIA:-"OFF"} == "ON" ]]; then
   JlCxx_DIR=`julia --project=${MYDIR}/../julia -e 'using CxxWrap; print(joinpath(dirname(CxxWrap.jlcxx_path), "cmake", "JlCxx"))'`
 fi
 
-cmake -DPython_TARGET_VERSION=${PYVERSION} -DCMAKE_CXX_COMPILER=${CXX} -DJlCxx_DIR=$JlCxx_DIR ../open_spiel
-make -j$MAKE_NUM_PROCS
+# We only exit the virtualenv if we were asked to create one.
+function cleanup {
+  if [[ ${FLAGS_virtualenv} -eq ${FLAGS_TRUE} ]]; then
+    echo "Exiting virtualenv"
+    deactivate
+  fi
+}
+trap cleanup EXIT
 
-export PYTHONPATH=$PYTHONPATH:`pwd`/../open_spiel
-export PYTHONPATH=$PYTHONPATH:`pwd`/python  # For the Python bindings of Pyspiel
 
-if ctest -j$TEST_NUM_PROCS --output-on-failure ../open_spiel; then
-  echo -e "\033[32mAll tests passed. Nicely done!\e[0m"
+if [[ ${FLAGS_install} == "true" ]]; then
+  echo -e "\e[33mInstalling the requirements (use --noinstall to skip).\e[0m"
+  pip3 install --upgrade -r ./requirements.txt
 else
-  echo -e "\033[31mAt least one test failed.\e[0m"
-  echo "If this is the first time you have run these tests, try:"
-  echo "pip install -r requirements.txt"
-  echo "Note that outside a virtualenv, you will need to install the system "
-  echo "wide matplotlib: sudo apt-get install python-matplotlib"
-  exit 1
+  echo -e "\e[33mSkipping installation of requirements.txt.\e[0m"
 fi
 
-# Test Julia
-if [[ ${BUILD_WITH_JULIA:-"OFF"} == "ON" ]]; then
-  julia --project=${MYDIR}/../julia -e 'using Pkg; Pkg.build(); Pkg.test()'
-fi
 
-cd ..
+if [[ ${FLAGS_build_with_pip} -eq ${FLAGS_TRUE} ]]; then
+  # TODO(author2): We probably want to use `python3 -m pip install .` directly
+  # and skip the usage of nox.
+  pip3 install nox
+
+  if nox -s tests; then
+    echo -e "\033[32mAll tests passed. Nicely done!\e[0m"
+  else
+    echo -e "\033[31mAt least one test failed.\e[0m"
+
+    exit 1
+  fi
+else
+  BUILD_DIR="build"
+  mkdir -p $BUILD_DIR
+  cd $BUILD_DIR
+
+  echo "Building and testing in $PWD using 'python' (version $PYVERSION)."
+
+  cmake -DPython_TARGET_VERSION=${PYVERSION} -DCMAKE_CXX_COMPILER=${CXX} -DJlCxx_DIR=$JlCxx_DIR ../open_spiel
+  make -j$MAKE_NUM_PROCS
+
+  export PYTHONPATH=$PYTHONPATH:`pwd`/../open_spiel
+  export PYTHONPATH=$PYTHONPATH:`pwd`/python  # For the Python bindings of Pyspiel
+
+  if ctest -j$TEST_NUM_PROCS --output-on-failure ../open_spiel; then
+    echo -e "\033[32mAll tests passed. Nicely done!\e[0m"
+  else
+    echo -e "\033[31mAt least one test failed.\e[0m"
+    echo "If this is the first time you have run these tests, try:"
+    echo "pip3 install -r requirements.txt"
+    echo "Note that outside a virtualenv, you will need to install the system "
+    echo "wide matplotlib: sudo apt-get install python-matplotlib"
+    exit 1
+  fi
+
+  if [[ ${BUILD_WITH_JULIA:-"OFF"} == "ON" ]]; then
+    echo "Building and testing Julia bindings..."
+    julia --project=${MYDIR}/../julia -e 'using Pkg; Pkg.build(); Pkg.test()'
+  fi
+
+  cd ..
+fi

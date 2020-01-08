@@ -215,7 +215,7 @@ class HavannahGame : public Game {
   std::vector<int> ObservationTensorShape() const override {
     return {kCellStates, Diameter(), Diameter()};
   }
-  int MaxGameLength() const {
+  int MaxGameLength() const override {
     // The true number of playable cells on the board.
     // No stones are removed, and it is possible to draw by filling the board.
     // Increase this by one if swap is ever implemented.

@@ -73,18 +73,19 @@ class MarkovSoccerState : public SimMoveState {
   std::string ToString() const override;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
-  std::string ObservationString(Player player) const {
+  std::string ObservationString(Player player) const override {
     SPIEL_CHECK_GE(player, 0);
     SPIEL_CHECK_LT(player, num_players_);
     return ToString();
   }
-  void ObservationTensor(Player player, std::vector<double>* values) const;
+  void ObservationTensor(Player player,
+                         std::vector<double>* values) const override;
   Player CurrentPlayer() const override {
     return IsTerminal() ? kTerminalPlayerId : cur_player_;
   }
   std::unique_ptr<State> Clone() const override;
 
-  ActionsAndProbs ChanceOutcomes() const;
+  ActionsAndProbs ChanceOutcomes() const override;
 
   void Reset(int horizon);
   std::vector<Action> LegalActions(Player player) const override;

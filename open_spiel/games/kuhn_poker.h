@@ -67,7 +67,7 @@ class KuhnState : public State {
   std::vector<Action> LegalActions() const override;
   std::vector<int> hand() const { return {card_dealt_[CurrentPlayer()]}; }
   std::unique_ptr<State> ResampleFromInfostate(
-      int player_id, std::function<double()> rng) const;
+      int player_id, std::function<double()> rng) const override;
 
  protected:
   void DoApplyAction(Action move) override;

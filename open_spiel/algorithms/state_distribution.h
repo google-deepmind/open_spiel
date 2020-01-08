@@ -53,9 +53,9 @@ HistoryDistribution GetStateDistribution(const State& state,
 // previous is empty, calls the non-incremental version. This must be called for
 // each state in order, starting from the first non-chance node, or it will be
 // wrong.
-HistoryDistribution UpdateIncrementalStateDistribution(
+std::unique_ptr<HistoryDistribution> UpdateIncrementalStateDistribution(
     const State& state, const Policy* opponent_policy, int player_id,
-    const HistoryDistribution& previous = {});
+    std::unique_ptr<HistoryDistribution> previous);
 
 }  // namespace algorithms
 }  // namespace open_spiel

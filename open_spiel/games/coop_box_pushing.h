@@ -84,7 +84,7 @@ class CoopBoxPushingState : public SimMoveState {
   }
   std::unique_ptr<State> Clone() const override;
 
-  ActionsAndProbs ChanceOutcomes() const;
+  ActionsAndProbs ChanceOutcomes() const override;
 
   void Reset(const GameParameters& params);
   std::vector<Action> LegalActions(Player player) const override;
