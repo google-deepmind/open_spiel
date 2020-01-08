@@ -203,7 +203,8 @@ class Environment(object):
         step_type: A `StepType` value.
     """
     assert len(actions) == self.num_actions_per_step, (
-        "Invalid number of actions! Expected {}".format(self.num_players))
+        "Invalid number of actions! Expected {}".format(
+            self.num_actions_per_step))
     if self._should_reset:
       return self.reset()
 
