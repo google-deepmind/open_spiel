@@ -160,11 +160,6 @@ else
     exit 1
   fi
 
-  if [[ ${BUILD_WITH_JULIA:-"OFF"} == "ON" ]]; then
-    echo "Building and testing Julia bindings..."
-    julia --project=${MYDIR}/../julia -e 'using Pkg; Pkg.build(); Pkg.test()'
-  fi
-
   cd ..
 fi
 
@@ -178,4 +173,8 @@ if [[ ${BUILD_WITH_JULIA:-"OFF"} == "ON" ]]; then
 
   cmake -DPython_TARGET_VERSION=${PYVERSION} -DCMAKE_CXX_COMPILER=${CXX} -DJlCxx_DIR=${JlCxx_DIR} ../open_spiel
   make -j$MAKE_NUM_PROCS
+
+  julia --project=${MYDIR}/../julia -e 'using Pkg; Pkg.build(); Pkg.test()'
+
+  cd ..
 fi
