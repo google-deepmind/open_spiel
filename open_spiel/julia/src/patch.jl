@@ -1,3 +1,5 @@
+Base.print(io::IO, s::CxxWrap.StdLib.StdStringAllocated) = write(io, [reinterpret(UInt8, s[i]) for i in 1:length(s)])
+
 Base.show(io::IO, g::CxxWrap.StdLib.SharedPtrAllocated{Game}) = print(io, to_string(g))
 Base.show(io::IO, s::CxxWrap.StdLib.UniquePtrAllocated{State}) = print(io, to_string(s))
 Base.show(io::IO, gp::Union{GameParameterAllocated, GameParameterDereferenced}) = print(io, to_repr_string(gp))
