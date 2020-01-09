@@ -18,8 +18,10 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import unittest
+from absl.testing import absltest
+from absl.testing import parameterized
 import numpy as np
+
 from open_spiel.python import policy
 from open_spiel.python.algorithms import action_value
 import pyspiel
@@ -31,10 +33,11 @@ def _uniform_policy(state):
   return [(a, p) for a in actions]
 
 
-class ActionValuesTest(unittest.TestCase):
+class ActionValuesTest(parameterized.TestCase):
 
-  def test_run_on_kuhn_poker_uniform(self):
-    game = pyspiel.load_game("kuhn_poker")
+  @parameterized.parameters(["kuhn_poker", "leduc_poker"])
+  def test_runs_with_uniform_policies(self, game_name):
+    game = pyspiel.load_game(game_name)
     calc = action_value.TreeWalkCalculator(game)
 
     calc.compute_all_states_action_values([
@@ -125,6 +128,22 @@ class ActionValuesTest(unittest.TestCase):
           [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
           returned_values.player_reach_probs)
 
+      np.testing.assert_array_almost_equal(
+          np.asarray([
+              np.array([-1/3, -1/6]),
+              np.array([-1/6, -1/3]),
+              np.array([-1/6, 1/6]),
+              np.array([-1/6, 0.]),
+              np.array([0., 0.5]),
+              np.array([-1/6, 1/3]),
+              np.array([0., 1/3]),
+              np.array([0., 0.]),
+              np.array([1/3, 1/3]),
+              np.array([0., 0.]),
+              np.array([-1/3, 1/3]),
+              np.array([0., 0.])
+          ]), returned_values.sum_cfr_reach_by_action_value)
+
 
 if __name__ == "__main__":
-  unittest.main()
+  absltest.main()

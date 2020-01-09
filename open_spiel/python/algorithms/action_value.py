@@ -36,11 +36,14 @@ _CalculatorReturn = collections.namedtuple(
         # leading to this info-state (this number should be the same along
         # any trajectory leading to this info-state because of perfect recall).
         "player_reach_probs",
+        # A list of `len(info_states)` `[game.num_distinct_actions()]` numpy
+        # array so that v[s_index][a] = \sum_{h \in x} cfr_reach(h) * Q(h, a)
+        "sum_cfr_reach_by_action_value",
     ])
 
 
 class TreeWalkCalculator(object):
-  """Class to orchestrate the calculation.
+  r"""Class to orchestrate the calculation.
 
   This performs a full history tree walk and computes several statistics,
   available as attributes.
@@ -59,6 +62,9 @@ class TreeWalkCalculator(object):
       product of the opponents probabilities of actions leading to the history.
     info_state_chance_prob: Same as above, for the chance probability to get
       into that state.
+    info_state_cf_prob_by_q_sum: A dictionary mapping (player,information state
+      string) to a vector of shape `[num_actions]`, that store for each action
+      the cumulative \sum_{h \in x} cfr_reach(h) * Q(h, a)
     root_values: The values at the root node [for player 0, for player 1].
   """
 
@@ -79,6 +85,7 @@ class TreeWalkCalculator(object):
     self.info_state_player_prob = None
     self.info_state_cf_prob = None
     self.info_state_chance_prob = None
+    self.info_state_cf_prob_by_q_sum = None
     self.root_values = None
 
   def _get_action_values(self, state, policies, reach_probabilities):
@@ -144,6 +151,9 @@ class TreeWalkCalculator(object):
           child, policies, reach_probabilities=new_reach_probabilities)
       if not is_chance:
         self.weighted_action_values[key][action] += child_value * reach_prob
+        self.info_state_cf_prob_by_q_sum[key][action] += (
+            child_value[current_player] *
+            reach_probabilities[1 - current_player] * reach_probabilities[-1])
       value += child_value * prob
     return value
 
@@ -165,6 +175,8 @@ class TreeWalkCalculator(object):
     self.info_state_player_prob = collections.defaultdict(float)
     self.info_state_cf_prob = collections.defaultdict(float)
     self.info_state_chance_prob = collections.defaultdict(float)
+    self.info_state_cf_prob_by_q_sum = collections.defaultdict(
+        lambda: np.zeros(self._num_actions))
 
     assert len(policies) == self._num_players
     self.root_values = self._get_action_values(
@@ -183,6 +195,7 @@ class TreeWalkCalculator(object):
     action_values = []
     cfrp = []  # Counterfactual reach probabilities
     player_reach_probs = []
+    sum_cfr_reach_by_action_value = []
 
     for key in keys:
       player = key[0]
@@ -193,12 +206,15 @@ class TreeWalkCalculator(object):
                             for a in range(self._num_actions)])
       cfrp.append(self.info_state_cf_prob[key])
       player_reach_probs.append(self.info_state_player_prob[key])
+      sum_cfr_reach_by_action_value.append(
+          self.info_state_cf_prob_by_q_sum[key])
 
     # Return values
     return _CalculatorReturn(
         action_values=action_values,
         counterfactual_reach_probs=cfrp,
-        player_reach_probs=player_reach_probs)
+        player_reach_probs=player_reach_probs,
+        sum_cfr_reach_by_action_value=sum_cfr_reach_by_action_value)
 
   def get_tabular_statistics(self, tabular_policy):
     """Returns tabular numpy arrays of the resulting stastistics.
