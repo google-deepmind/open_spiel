@@ -62,7 +62,7 @@ class ReplayBuffer(object):
       self._next_entry_index += 1
       self._next_entry_index %= self._replay_buffer_capacity
 
-  def sample(self, num_samples):
+  def sample(self, num_samples, replace=False):
     """Returns `num_samples` uniformly sampled from the buffer.
 
     Args:
@@ -74,10 +74,13 @@ class ReplayBuffer(object):
     Raises:
       ValueError: If there are less than `num_samples` elements in the buffer
     """
-    if len(self._data) < num_samples:
-      raise ValueError("{} elements could not be sampled from size {}".format(
-          num_samples, len(self._data)))
-    return random.sample(self._data, num_samples)
+    if replace:
+      return random.choices(self._data, k=num_samples)
+    else:
+      if len(self._data) < num_samples:
+        raise ValueError("{} elements could not be sampled from size {}".format(
+            num_samples, len(self._data)))
+      return random.sample(self._data, num_samples)
 
   def __len__(self):
     return len(self._data)

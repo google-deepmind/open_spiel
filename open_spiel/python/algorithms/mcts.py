@@ -20,6 +20,7 @@ from __future__ import print_function
 
 import math
 import time
+from functools import lru_cache
 
 import numpy as np
 
@@ -41,6 +42,41 @@ class Evaluator(object):
   def prior(self, state):
     """Returns a probability for each legal action in the given state."""
     raise NotImplementedError
+
+
+class TrainableEvaluator(object):
+  """Abstract class representing a trainable evaluation function for a game
+
+  The evaluation function takes in an intermediate state in the game and returns
+  an evaluation of that state, which should correlate with chances of winning
+  the game. It returns the evaluation from all player's perspectives.
+  """
+
+  def __init__(self, cache_size=0):
+    if cache_size != 0:
+      self.value_and_prior = lru_cache(maxsize=cache_size)(self.value_and_prior)
+
+      wrapped_update = self.update
+
+      def clearing_update(train_examples):
+        self.value_and_prior.cache_clear()
+        return wrapped_update(train_examples)
+
+      self.update = clearing_update
+
+  def value_and_prior(self, state):
+    """Returns a probability for each legal action in the given state."""
+    raise NotImplementedError
+
+  def update(self, train_examples):
+    """Returns a probability for each legal action in the given state."""
+    raise NotImplementedError
+
+  def evaluate(self, state):
+    return self.value_and_prior(state)[0]
+
+  def prior(self, state):
+    return self.value_and_prior(state)[1]
 
 
 class RandomRolloutEvaluator(Evaluator):
