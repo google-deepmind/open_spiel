@@ -104,10 +104,6 @@ if [[ ${FLAGS_virtualenv} -eq ${FLAGS_TRUE} ]]; then
   source $VENV_DIR/bin/activate
 fi
 
-if [[ ${BUILD_WITH_JULIA:-"OFF"} == "ON" ]]; then
-  JlCxx_DIR=`julia --project=${MYDIR}/../julia -e 'using CxxWrap; print(joinpath(dirname(CxxWrap.jlcxx_path), "cmake", "JlCxx"))'`
-fi
-
 # We only exit the virtualenv if we were asked to create one.
 function cleanup {
   if [[ ${FLAGS_virtualenv} -eq ${FLAGS_TRUE} ]]; then
@@ -125,6 +121,10 @@ else
   echo -e "\e[33mSkipping installation of requirements.txt.\e[0m"
 fi
 
+BUILD_DIR="build"
+mkdir -p $BUILD_DIR
+
+# Build and test python wrapper
 
 if [[ ${FLAGS_build_with_pip} -eq ${FLAGS_TRUE} ]]; then
   # TODO(author2): We probably want to use `python3 -m pip install .` directly
@@ -139,13 +139,11 @@ if [[ ${FLAGS_build_with_pip} -eq ${FLAGS_TRUE} ]]; then
     exit 1
   fi
 else
-  BUILD_DIR="build"
-  mkdir -p $BUILD_DIR
   cd $BUILD_DIR
 
   echo "Building and testing in $PWD using 'python' (version $PYVERSION)."
 
-  cmake -DPython_TARGET_VERSION=${PYVERSION} -DCMAKE_CXX_COMPILER=${CXX} -DJlCxx_DIR=$JlCxx_DIR ../open_spiel
+  cmake -DPython_TARGET_VERSION=${PYVERSION} -DCMAKE_CXX_COMPILER=${CXX} ../open_spiel
   make -j$MAKE_NUM_PROCS
 
   export PYTHONPATH=$PYTHONPATH:`pwd`/../open_spiel
@@ -168,4 +166,16 @@ else
   fi
 
   cd ..
+fi
+
+if [[ ${BUILD_WITH_JULIA:-"OFF"} == "ON" ]]; then
+  echo "Start building Julia wrapper..."
+  cd $BUILD_DIR
+
+  JlCxx_DIR=`julia --project=${MYDIR}/../julia -e 'using CxxWrap; print(joinpath(dirname(CxxWrap.jlcxx_path), "cmake", "JlCxx"))'`
+  JULIA_VERSION_INFO=`julia --version`
+  echo "Found JlCxx at $JlCxx_DIR with $JULIA_VERSION_INFO"
+
+  cmake -DPython_TARGET_VERSION=${PYVERSION} -DCMAKE_CXX_COMPILER=${CXX} -DJlCxx_DIR=${JlCxx_DIR} ../open_spiel
+  make -j$MAKE_NUM_PROCS
 fi
