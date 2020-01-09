@@ -83,8 +83,7 @@ fi
 PY_VERSION_MAJOR=$($PYBIN -c 'import sys; print(sys.version_info.major)')
 PYVERSION=$(python3 -c 'import sys; print(sys.version.split(" ")[0])')
 
-TMPDIR="."
-VENV_DIR="$TMPDIR/venv"
+VENV_DIR="./venv"
 if [[ ${FLAGS_virtualenv} -eq ${FLAGS_TRUE} ]]; then
   if ! [ -d "$VENV_DIR" ]; then
     extra_args=''
