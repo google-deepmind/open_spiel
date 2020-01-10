@@ -43,6 +43,13 @@ HistoryDistribution GetStateDistribution(const State& state,
                                          const Policy* opponent_policy) {
   std::shared_ptr<const Game> game = state.GetGame();
   GameType game_type = game->GetType();
+  if (game_type.information == GameType::Information::kPerfectInformation) {
+    HistoryDistribution dist;
+    // We can't use brace initialization here as it triggers the copy ctor.
+    dist.first.push_back(state.Clone());
+    dist.second.push_back(1.);
+    return dist;
+  }
   SPIEL_CHECK_EQ(game_type.information,
                  GameType::Information::kImperfectInformation);
   SPIEL_CHECK_EQ(game_type.dynamics, GameType::Dynamics::kSequential);
