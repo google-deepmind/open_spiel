@@ -360,7 +360,6 @@ int Score_p0(std::array<Seat, kDeckSize> holder,
   return (decl == 0) ? declarer_score : -declarer_score;
 }
 
-namespace {
 // Score indexed by [WestHand][EastHand][Contract][LastBidder]
 using ScoringTable = std::array<
     std::array<std::array<std::array<double, 2>, kNumActions2p>, kNumPrivates>,
@@ -415,7 +414,6 @@ ScoringTable MakeScores() {
   }
   return scores;
 }
-}  // namespace
 
 double Score_2p(Action hand0, Action hand1,
                 const TinyBridgeAuctionState::AuctionState& state) {
