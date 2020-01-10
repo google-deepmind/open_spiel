@@ -32,6 +32,7 @@ pybind11/
 # Install artifacts
 get-pip.py
 open_spiel/scripts/shflags
+open_spiel/scripts/jill.sh
 
 # IDE
 .idea/

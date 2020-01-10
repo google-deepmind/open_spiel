@@ -88,8 +88,26 @@ if [[ ${BUILD_WITH_ACPC:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; then
   git clone -b 'master' --single-branch --depth 1  https://github.com/jblespiau/project_acpc_server.git ${DIR}
 fi
 
-
 # 2. Install other required system-wide dependencies
+
+# Julia related stuff
+if [[ ${BUILD_WITH_JULIA:-"OFF"} == "ON" ]]; then
+  if which julia >/dev/null; then
+    JULIA_VERSION_INFO=`julia --version`
+    echo -e "\e[33m$JULIA_VERSION_INFO is already installed.\e[0m"
+  else
+    JULIA_INSTALLER="open_spiel/scripts/jill.sh"
+    if [[ ! -f $JULIA_INSTALLER ]]; then
+    curl https://raw.githubusercontent.com/abelsiqueira/jill/master/jill.sh -o jill.sh
+    mv jill.sh $JULIA_INSTALLER
+    fi
+    JULIA_VERSION=1.3.1 bash $JULIA_INSTALLER -y
+  fi
+
+  # Install dependencies
+  julia --project="${MYDIR}/open_spiel/julia" -e 'using Pkg; Pkg.instantiate()'
+fi
+
 if [[ "$OSTYPE" == "linux-gnu" ]]; then
   EXT_DEPS="virtualenv clang cmake python3 python3-dev python3-pip python3-setuptools python3-wheel"
   APT_GET=`which apt-get`
@@ -116,23 +134,6 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
   if [[ "$TRAVIS" ]]; then
     sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python${OS_PYTHON_VERSION} 10
   fi
-
-  # Julia related stuff
-  if [[ ${BUILD_WITH_JULIA:-"OFF"} == "ON" ]]; then
-    # Install Julia
-    if which julia >/dev/null; then
-      JULIA_VERSION_INFO=`julia --version`
-      echo -e "\e[33m$JULIA_VERSION_INFO is already installed.\e[0m"
-    else
-      echo "Julia not found. Installing it in the home dir..."
-      sudo apt-get install wget
-      wget https://julialang-s3.julialang.org/bin/linux/x64/1.3/julia-1.3.0-linux-x86_64.tar.gz -O /tmp/julia.tar.gz
-      tar -zxvf /tmp/julia.tar.gz -C ~
-      sudo ln -s ~/julia-1.3.0/bin/julia /usr/local/bin/julia
-    fi
-    # Install dependencies
-    julia --project="${MYDIR}/open_spiel/julia" -e 'using Pkg; Pkg.instantiate()'
-  fi
 elif [[ "$OSTYPE" == "darwin"* ]]; then  # Mac OSX
   [[ -x `which realpath` ]] || brew install coreutils || echo "** Warning: failed 'brew install coreutils' -- continuing"
   [[ -x `which python3` ]] || brew install python3 || echo "** Warning: failed 'brew install python3' -- continuing"
@@ -140,19 +141,6 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then  # Mac OSX
   curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
   python3 get-pip.py
   pip3 install virtualenv
-
-  # Julia related stuff
-  if [[ ${BUILD_WITH_JULIA:-"OFF"} == "ON" ]]; then
-    if which julia >/dev/null; then
-      JULIA_VERSION_INFO=`julia --version`
-      echo -e "\e[33m$JULIA_VERSION_INFO is already installed.\e[0m"
-    else
-      brew cask install julia
-    fi
-
-    # Install dependencies
-    julia --project="${MYDIR}/open_spiel/julia" -e 'using Pkg; Pkg.instantiate()'
-  fi
 else
   echo "The OS '$OSTYPE' is not supported (Only Linux and MacOS is). " \
        "Feel free to contribute the install for a new OS."
