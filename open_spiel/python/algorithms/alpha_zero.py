@@ -22,10 +22,7 @@ import random
 import numpy as np
 import math
 
-# import tensorflow.compat.v1 as tf
-import tensorflow as tf
-from tensorflow import keras
-from tensorflow.keras import layers
+import tensorflow.compat.v1 as tf
 
 import pyspiel
 from open_spiel.python.algorithms import mcts
@@ -35,8 +32,7 @@ from open_spiel.python.algorithms import dqn
 MCTSResult = collections.namedtuple("MCTSResult",
                                     "observation target_value target_policy")
 
-LossValue = collections.namedtuple("LossValue",
-                                   "total_loss policy_loss value_loss l2_loss")
+LossValues = collections.namedtuple("LossValues", "total policy value l2")
 
 
 class AlphaZero(object):
@@ -50,7 +46,6 @@ class AlphaZero(object):
                action_selection_transition=30,
                num_self_play_games=5000,
                num_training_rounds=10,
-               num_training_updates=int(700e3),
                batch_size=4096,
                random_state=None):
     """
@@ -99,21 +94,13 @@ class AlphaZero(object):
     self.game = game
     self.buffer = dqn.ReplayBuffer(replay_buffer_capacity)
     self.num_self_play_games = num_self_play_games
-    self.num_training_updates = num_training_updates
     self._action_selection_transition = action_selection_transition
     self.batch_size = batch_size
 
-  def train(self):
-    losses = {"total": [], "policy": [], "value": [], "l2": []}
-    for _ in range(self.num_training_updates):
-      data = self.buffer.sample(self.batch_size, replace=True)
-      (total_loss, policy_loss, value_loss,
-       l2_loss) = self.bot.evaluator.update(data)
-      losses["total"].append(total_loss)
-      losses["policy"].append(policy_loss)
-      losses["value"].append(value_loss)
-      losses["l2"].append(l2_loss)
-    return losses
+  def update(self):
+    data = self.buffer.sample(self.batch_size, replace=True)
+    (total_loss, policy_loss, value_loss, l2_loss) = self.bot.evaluator.update(data)
+    return LossValues(total=total_loss, policy=policy_loss, value=value_loss, l2=l2_loss)
 
   def self_play(self):
     for _ in range(self.num_self_play_games):
@@ -196,8 +183,8 @@ class AlphaZeroResNetEvaluator(mcts.TrainableEvaluator):
                num_filters=256,
                value_head_hidden_size=256,
                l2_regularization=1e-4,
-               optimizer=tf.compat.v1.train.MomentumOptimizer(2e-2,
-                                                              momentum=0.9)):
+               optimizer=tf.train.MomentumOptimizer(2e-2, momentum=0.9),
+               device='cpu'):
     super().__init__(cache_size=cache_size)
 
     if len(input_shape) != 3:
@@ -208,20 +195,33 @@ class AlphaZeroResNetEvaluator(mcts.TrainableEvaluator):
     self.l2_regularization = l2_regularization
     self.optimizer = optimizer
 
-    inputs = keras.Input(shape=input_shape, name='input')
-    resnet_body = alpha_zero_resnet_body(
-        inputs,
-        num_filters=num_filters,
-        num_residual_blocks=num_residual_blocks)
-    value_head = alpha_zero_value_head(resnet_body,
-                                       hidden_size=value_head_hidden_size)
-    policy_head = alpha_zero_mlp_policy_head(resnet_body, num_actions)
-    self.model = keras.Model(inputs=inputs, outputs=[value_head, policy_head])
+    if device == 'gpu':
+      if tf.test.is_gpu_available():
+        raise ValueError("GPU support is unaivalable.")
+      self.device = tf.device("gpu:0")
+
+    if device == 'cpu':
+      self.device = tf.device("cpu:0")
+    else:
+      self.device = device
+
+    with self.device:
+      inputs = tf.keras.Input(shape=input_shape, name='input')
+      resnet_body = alpha_zero_resnet_body(
+          inputs,
+          num_filters=num_filters,
+          num_residual_blocks=num_residual_blocks)
+      value_head = alpha_zero_value_head(resnet_body,
+                                         hidden_size=value_head_hidden_size)
+      policy_head = alpha_zero_mlp_policy_head(resnet_body, num_actions)
+      self.model = tf.keras.Model(inputs=inputs,
+                                  outputs=[value_head, policy_head])
 
   def value_and_prior(self, state):
     tensor_state = np.array(state.observation_tensor(),
                             dtype=np.float32).reshape(self.input_shape)
-    value, policy = self.model(tensor_state)
+    with self.device:
+      value, policy = self.model(tensor_state)
 
     # renormalize policy over legal actions
     policy = np.array(policy)[0]
@@ -244,28 +244,29 @@ class AlphaZeroResNetEvaluator(mcts.TrainableEvaluator):
     target_values = np.vstack([v for (_, v, _) in training_examples])
     target_policies = np.vstack([p for (_, _, p) in training_examples])
 
-    with tf.GradientTape() as tape:
-      values, policy_logits = self.model(observations, training=True)
-      loss_value = tf.losses.mean_squared_error(values,
-                                                tf.stop_gradient(target_values))
-      loss_policy = tf.nn.softmax_cross_entropy_with_logits_v2(
-          logits=policy_logits, labels=tf.stop_gradient(target_policies))
-      loss_policy = tf.reduce_mean(loss_policy)
+    with self.device:
+      with tf.GradientTape() as tape:
+        values, policy_logits = self.model(observations, training=True)
+        loss_value = tf.losses.mean_squared_error(
+            values, tf.stop_gradient(target_values))
+        loss_policy = tf.nn.softmax_cross_entropy_with_logits_v2(
+            logits=policy_logits, labels=tf.stop_gradient(target_policies))
+        loss_policy = tf.reduce_mean(loss_policy)
 
-      loss_l2 = 0
-      for weights in self.model.trainable_variables:
-        loss_l2 += self.l2_regularization * tf.nn.l2_loss(weights)
-      loss = loss_policy + loss_value + loss_l2
+        loss_l2 = 0
+        for weights in self.model.trainable_variables:
+          loss_l2 += self.l2_regularization * tf.nn.l2_loss(weights)
+        loss = loss_policy + loss_value + loss_l2
 
-    grads = tape.gradient(loss, self.model.trainable_variables)
-    self.optimizer.apply_gradients(
-        zip(grads, self.model.trainable_variables),
-        global_step=tf.train.get_or_create_global_step())
+      grads = tape.gradient(loss, self.model.trainable_variables)
+      self.optimizer.apply_gradients(
+          zip(grads, self.model.trainable_variables),
+          global_step=tf.train.get_or_create_global_step())
 
-    return LossValue(total_loss=float(loss),
-                     policy_loss=float(loss_policy),
-                     value_loss=float(loss_value),
-                     l2_loss=float(loss_l2))
+    return LossValues(total=float(loss),
+                      policy=float(loss_policy),
+                      value=float(loss_value),
+                      l2=float(loss_l2))
 
 
 # This ResNet implementation copies as closely as possible the
@@ -278,33 +279,33 @@ class AlphaZeroResNetEvaluator(mcts.TrainableEvaluator):
 def alpha_zero_residual_layer(inputs, num_filters, kernel_size, activation,
                               use_bias):
   x = inputs
-  x = layers.Conv2D(num_filters,
-                    kernel_size=kernel_size,
-                    padding='same',
-                    strides=1,
-                    kernel_initializer='he_normal',
-                    use_bias=use_bias)(x)
-  x = layers.BatchNormalization()(x)
-  x = layers.Activation(activation)(x)
-  x = layers.Conv2D(num_filters,
-                    kernel_size=kernel_size,
-                    padding='same',
-                    strides=1,
-                    kernel_initializer='he_normal',
-                    use_bias=use_bias)(x)
-  return layers.BatchNormalization()(x)
+  x = tf.keras.layers.Conv2D(num_filters,
+                             kernel_size=kernel_size,
+                             padding='same',
+                             strides=1,
+                             kernel_initializer='he_normal',
+                             use_bias=use_bias)(x)
+  x = tf.keras.layers.BatchNormalization()(x)
+  x = tf.keras.layers.Activation(activation)(x)
+  x = tf.keras.layers.Conv2D(num_filters,
+                             kernel_size=kernel_size,
+                             padding='same',
+                             strides=1,
+                             kernel_initializer='he_normal',
+                             use_bias=use_bias)(x)
+  return tf.keras.layers.BatchNormalization()(x)
 
 
 def alpha_zero_residual_tower(inputs, num_res_blocks, num_filters, kernel_size,
                               activation, use_bias):
   x = inputs
-  for res_block in range(num_res_blocks):
+  for _ in range(num_res_blocks):
     y = alpha_zero_residual_layer(x, num_filters, kernel_size, activation,
                                   use_bias)
     y = alpha_zero_residual_layer(x, num_filters, kernel_size, activation,
                                   use_bias)
-    x = layers.add([x, y])
-    x = layers.Activation(activation)(x)
+    x = tf.keras.layers.add([x, y])
+    x = tf.keras.layers.Activation(activation)(x)
 
   return x
 
@@ -317,14 +318,14 @@ def alpha_zero_resnet_body(inputs,
                            use_bias=False):
 
   x = inputs
-  x = layers.Conv2D(num_filters,
-                    kernel_size=kernel_size,
-                    padding='same',
-                    strides=1,
-                    kernel_initializer='he_normal',
-                    use_bias=use_bias)(x)
-  x = layers.BatchNormalization()(x)
-  x = layers.Activation(activation)(x)
+  x = tf.keras.layers.Conv2D(num_filters,
+                             kernel_size=kernel_size,
+                             padding='same',
+                             strides=1,
+                             kernel_initializer='he_normal',
+                             use_bias=use_bias)(x)
+  x = tf.keras.layers.BatchNormalization()(x)
+  x = tf.keras.layers.Activation(activation)(x)
   x = alpha_zero_residual_tower(x, num_residual_blocks, num_filters,
                                 kernel_size, activation, use_bias)
   return x
@@ -332,32 +333,33 @@ def alpha_zero_resnet_body(inputs,
 
 def alpha_zero_value_head(inputs, hidden_size=256, activation='relu'):
   x = inputs
-  x = layers.Conv2D(filters=1,
-                    kernel_size=1,
-                    strides=1,
-                    kernel_initializer='he_normal')(x)
-  x = layers.BatchNormalization()(x)
-  x = layers.Activation(activation)(x)
-  x = layers.Flatten()(x)
-  x = layers.Dense(hidden_size,
-                   activation=activation,
-                   kernel_initializer='he_normal')(x)
-  x = layers.Dense(1,
-                   activation='tanh',
-                   kernel_initializer='he_normal',
-                   name='value')(x)
+  x = tf.keras.layers.Conv2D(filters=1,
+                             kernel_size=1,
+                             strides=1,
+                             kernel_initializer='he_normal')(x)
+  x = tf.keras.layers.BatchNormalization()(x)
+  x = tf.keras.layers.Activation(activation)(x)
+  x = tf.keras.layers.Flatten()(x)
+  x = tf.keras.layers.Dense(hidden_size,
+                            activation=activation,
+                            kernel_initializer='he_normal')(x)
+  x = tf.keras.layers.Dense(1,
+                            activation='tanh',
+                            kernel_initializer='he_normal',
+                            name='value')(x)
   return x
 
 
 def alpha_zero_mlp_policy_head(inputs, num_classes, activation='relu'):
   x = inputs
-  x = layers.Conv2D(filters=2,
-                    kernel_size=1,
-                    strides=1,
-                    kernel_initializer='he_normal')(x)
-  x = layers.BatchNormalization()(x)
-  x = layers.Activation(activation)(x)
-  x = layers.Flatten()(x)
-  x = layers.Dense(num_classes, kernel_initializer='he_normal',
-                   name='policy')(x)
+  x = tf.keras.layers.Conv2D(filters=2,
+                             kernel_size=1,
+                             strides=1,
+                             kernel_initializer='he_normal')(x)
+  x = tf.keras.layers.BatchNormalization()(x)
+  x = tf.keras.layers.Activation(activation)(x)
+  x = tf.keras.layers.Flatten()(x)
+  x = tf.keras.layers.Dense(num_classes,
+                            kernel_initializer='he_normal',
+                            name='policy')(x)
   return x
