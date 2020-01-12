@@ -54,7 +54,8 @@ def np_masked_softmax(logits, legal_actions_mask):
     legal_actions_mask: The legal action mask, same shape as logits. 1 means
       it's a legal action, 0 means it's illegal.
   """
-  masked_logits = logits + np.log(legal_actions_mask)
+  with np.errstate(divide='ignore'):
+    masked_logits = logits + np.log(legal_actions_mask)
   max_logit = np.amax(masked_logits, axis=-1, keepdims=True)
   exp_logit = np.exp(masked_logits - max_logit)
   return exp_logit / np.sum(exp_logit, axis=-1, keepdims=True)
