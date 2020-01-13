@@ -24,6 +24,8 @@ import numpy as np
 _CalculatorReturn = collections.namedtuple(
     "_CalculatorReturn",
     [
+        # A list of size `num_players` of the root node value for each player.
+        "root_node_values",
         # An array of shape `[len(info_states), game.num_distinct_actions()]`
         # giving the value of each action. Will be zero for invalid actions.
         "action_values",
@@ -166,8 +168,12 @@ class TreeWalkCalculator(object):
     `calculator.infor_state_prob` to take ownership of the dictionary.
 
     Args:
-      policies: List of `policy.Policy` objects, one per player.
+      policies: List of `policy.Policy` objects, one per player. As the policy
+        will be accessed using `policies[i]`, it can also be a dictionary
+        mapping player_id to a `policy.Policy` object.
     """
+    assert len(policies) == self._num_players
+
     # Compute action values
     self.weighted_action_values = collections.defaultdict(
         lambda: collections.defaultdict(lambda: np.zeros(2)))
@@ -178,7 +184,6 @@ class TreeWalkCalculator(object):
     self.info_state_cf_prob_by_q_sum = collections.defaultdict(
         lambda: np.zeros(self._num_actions))
 
-    assert len(policies) == self._num_players
     self.root_values = self._get_action_values(
         self._game.new_initial_state(),
         policies,
@@ -211,6 +216,7 @@ class TreeWalkCalculator(object):
 
     # Return values
     return _CalculatorReturn(
+        root_node_values=self.root_values,
         action_values=action_values,
         counterfactual_reach_probs=cfrp,
         player_reach_probs=player_reach_probs,
