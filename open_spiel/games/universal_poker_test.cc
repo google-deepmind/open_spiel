@@ -14,6 +14,10 @@
 
 #include "open_spiel/games/universal_poker.h"
 
+#include <memory>
+
+#include "open_spiel/abseil-cpp/absl/algorithm/container.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_join.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
@@ -127,6 +131,31 @@ void LoadAndRunGameFromGameDef() {
   // testing::RandomSimTest(*holdem_nolimit_6p, 1);
 }
 
+void HUNLRegressionTests() {
+  std::shared_ptr<const Game> game = LoadGame(
+      "universal_poker(betting=nolimit,numPlayers=2,numRounds=4,blind=100 "
+      "50,firstPlayer=2 1 1 "
+      "1,numSuits=4,numRanks=13,numHoleCards=2,numBoardCards=0 3 1 1,stack=250 "
+      "250)");
+  std::unique_ptr<State> state = game->NewInitialState();
+  while (state->IsChanceNode()) {
+    state->ApplyAction(state->LegalActions()[0]);
+  }
+  std::cout << state->InformationStateString() << std::endl;
+  // Pot bet
+  state->ApplyAction(universal_poker::kBet);
+
+  // Now, the minimum bet size is 200, so player 0 has to go all-in, or fold.
+  std::vector<Action> actions = state->LegalActions();
+  absl::c_sort(actions);
+
+  // Legal actions should be fold, call, all-in.
+  SPIEL_CHECK_EQ(actions.size(), 3);
+  SPIEL_CHECK_EQ(actions[0], universal_poker::kFold);
+  SPIEL_CHECK_EQ(actions[1], universal_poker::kCall);
+  SPIEL_CHECK_EQ(actions[2], universal_poker::kAllIn);
+}
+
 void LoadAndRunGameFromDefaultConfig() {
   std::shared_ptr<const Game> game = LoadGame("universal_poker");
   testing::RandomSimTest(*game, 2);
@@ -158,4 +187,5 @@ int main(int argc, char **argv) {
   open_spiel::universal_poker::LoadAndRunGameFromDefaultConfig();
 
   open_spiel::universal_poker::BasicUniversalPokerTests();
+  open_spiel::universal_poker::HUNLRegressionTests();
 }
