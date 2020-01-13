@@ -37,17 +37,25 @@ import pyspiel
 FLAGS = flags.FLAGS
 
 flags.DEFINE_integer(
-    "num_rounds", 200,
+    "num_rounds", 400,
     "The number of rounds of self-play followed by neural net training.")
+
 flags.DEFINE_integer("num_self_play_games", 200,
                      "The number of self-play games to play in a round.")
 flags.DEFINE_integer(
-    "num_training_updates", 1000 * 10,
+    "num_training_updates", 1000,
     "The number of neural net training updates to carry out per round.")
-flags.DEFINE_integer("batch_size", 200,
+
+flags.DEFINE_integer("batch_size", 512,
                      "Number of transitions to sample at each learning step.")
+
 flags.DEFINE_integer(
-    "report_loss_num", 1000,
+    "report_loss_num", 100,
+    "The number of training updates for which the loss is averaged over and then reported."
+)
+
+flags.DEFINE_integer(
+    "window_size", 200 * 10 * 10,
     "The number of training updates for which the loss is averaged over and then reported."
 )
 
@@ -103,9 +111,11 @@ def main(_):
       game.observation_tensor_shape(),
       game.num_distinct_actions(),
       num_residual_blocks=2,
-      num_filters=64,
-      value_head_hidden_size=100,
-      optimizer=tf.train.AdamOptimizer())
+      num_filters=256,
+      value_head_hidden_size=256,
+      optimizer=tf.train.AdamOptimizer(learning_rate=0.01),
+      # optimizer=tf.train.MomentumOptimizer(2e-2, momentum=0.9),
+      device=FLAGS.device)
 
   bot = mcts.MCTSBot(game, (1.25, 19652),
                      25,
@@ -118,16 +128,13 @@ def main(_):
 
   a0 = alpha_zero.AlphaZero(game,
                             bot,
-                            replay_buffer_capacity=200000,
+                            replay_buffer_capacity=FLAGS.window_size,
                             action_selection_transition=4,
                             num_self_play_games=FLAGS.num_self_play_games,
                             batch_size=FLAGS.batch_size)
 
-  #
-  # num_training_rounds=200
-  # print("Score Random: ", mean_bot_score(game, [rand_bot0, a0.bot], num_evaluations=100))
+  ab_bot = AlphaBetaBot(game)
 
-  # a0.self_play()
   for num_round in range(FLAGS.num_rounds):
     logging.info("------------- Starting round %s out of %s -------------",
                  num_round, FLAGS.num_rounds)
@@ -136,21 +143,26 @@ def main(_):
 
     logging.info("Training net on replay buffer for %s iterations",
                  FLAGS.num_training_updates)
+  
     losses = []
     for train_num in range(1, FLAGS.num_training_updates + 1):
+      
       if (train_num % FLAGS.report_loss_num) == 0:
         m_losses = mean_losses(losses)
         logging.info("     [%s/%s] %s", train_num, FLAGS.num_training_updates,
                      m_losses)
+        losses = []
+        print("cleaned")
       batch_losses = a0.update()
+      # print(batch_losses)
       losses.append(batch_losses)
 
     # loss_total, loss_policy, loss_value, loss_l2 = a0.train()
     # print("Total: ", np.mean(loss_total), "Policy", np.mean(loss_policy), "Value", np.mean(loss_value), "L2", np.mean(loss_l2))
     # print("Score Random: ", mean_bot_score(game, [rand_bot0, a0.bot], num_evaluations=40))
 
-
-#     print("Score AlphaBeta: ", mean_bot_score(game, [ab_bot, a0.bot], num_evaluations=20))
+    print("Score SelfPlay: ", mean_bot_score(game, [a0.bot, a0.bot], num_evaluations=40))
+    print("Score AlphaBeta: ", mean_bot_score(game, [ab_bot, a0.bot], num_evaluations=40))
 
 if __name__ == "__main__":
   app.run(main)
