@@ -99,8 +99,12 @@ class AlphaZero(object):
 
   def update(self):
     data = self.buffer.sample(self.batch_size, replace=True)
-    (total_loss, policy_loss, value_loss, l2_loss) = self.bot.evaluator.update(data)
-    return LossValues(total=total_loss, policy=policy_loss, value=value_loss, l2=l2_loss)
+    (total_loss, policy_loss, value_loss,
+     l2_loss) = self.bot.evaluator.update(data)
+    return LossValues(total=total_loss,
+                      policy=policy_loss,
+                      value=value_loss,
+                      l2=l2_loss)
 
   def self_play(self):
     for _ in range(self.num_self_play_games):
@@ -108,15 +112,13 @@ class AlphaZero(object):
 
   def _self_play_single(self):
     state = self.game.new_initial_state()
-    input_shape = [1] + self.game.observation_tensor_shape()
     policy_target, observations = [], []
 
     while not state.is_terminal():
       root_node = self.bot.mcts_search(state)
       # compute and store the policy and value targets obtained from MCTS
-      observations.append(
-          np.array(state.observation_tensor(),
-                   dtype=np.float32).reshape(input_shape))
+      observations.append(np.array(state.observation_tensor(),
+                                   dtype=np.float32))
       target_policy = np.zeros(self.game.num_distinct_actions(),
                                dtype=np.float32)
       for child in root_node.children:
@@ -157,14 +159,14 @@ def alpha_zero_ucb_score(child, parent_explore_count, params):
 
   return prior_score + value_score
 
-
 def np_softmax(logits):
   max_logit = np.amax(logits, axis=-1, keepdims=True)
   exp_logit = np.exp(logits - max_logit)
   return exp_logit / np.sum(exp_logit, axis=-1, keepdims=True)
 
 
-class AlphaZeroResNetEvaluator(mcts.TrainableEvaluator):
+
+class AlphaZeroKerasEvaluator(mcts.TrainableEvaluator):
   """Implements a parameterized AlphaZero ResNet architecture used in the Science 
 	paper 'A general reinforcement learning algorithm that masters chess, shogi, 
 	and Go through self-play'.
@@ -176,21 +178,23 @@ class AlphaZeroResNetEvaluator(mcts.TrainableEvaluator):
   """
 
   def __init__(self,
-               input_shape,
-               num_actions,
+               keras_model,
                cache_size=None,
-               num_residual_blocks=19,
-               num_filters=256,
-               value_head_hidden_size=256,
                l2_regularization=1e-4,
                optimizer=tf.train.MomentumOptimizer(2e-2, momentum=0.9),
                device='cpu'):
     super().__init__(cache_size=cache_size)
 
-    if len(input_shape) != 3:
-      raise ValueError("The input_shape must be a rank-3 tensor.")
-    self.input_shape = [1] + input_shape  # add batch dimension
-    self.num_actions = num_actions
+    self.model = keras_model
+    # if not type(self.model) == tf.python.keras.engine.training.Model:
+    #   raise ValueError(
+    #       "The argument keras_model needs to be a Keras Model object, but was of type %s.",
+    #       type(self.model))
+
+    # TODO: validate user-supplied keras_model
+    self.input_shape = list(self.model.input_shape)
+    self.input_shape[0] = 1  # Keras sets the batch dim to None
+    _, (_, self.num_actions) = self.model.output_shape
 
     self.l2_regularization = l2_regularization
     self.optimizer = optimizer
@@ -203,18 +207,6 @@ class AlphaZeroResNetEvaluator(mcts.TrainableEvaluator):
       self.device = tf.device("cpu:0")
     else:
       self.device = device
-
-    with self.device:
-      inputs = tf.keras.Input(shape=input_shape, name='input')
-      resnet_body = alpha_zero_resnet_body(
-          inputs,
-          num_filters=num_filters,
-          num_residual_blocks=num_residual_blocks)
-      value_head = alpha_zero_value_head(resnet_body,
-                                         hidden_size=value_head_hidden_size)
-      policy_head = alpha_zero_mlp_policy_head(resnet_body, num_actions)
-      self.model = tf.keras.Model(inputs=inputs,
-                                  outputs=[value_head, policy_head])
 
   def value_and_prior(self, state):
     tensor_state = np.array(state.observation_tensor(),
@@ -235,10 +227,6 @@ class AlphaZeroResNetEvaluator(mcts.TrainableEvaluator):
     return (value, policy)
 
   def update(self, training_examples):
-    # As AlphaZero uses very large batch sizes that might not fit into memory,
-    # this implementation uses gradient accumulation to only compute one
-    # one example at a time
-
     observations = np.vstack([o for (o, _, _) in training_examples])
     target_values = np.vstack([v for (_, v, _) in training_examples])
     target_policies = np.vstack([p for (_, _, p) in training_examples])
@@ -251,7 +239,6 @@ class AlphaZeroResNetEvaluator(mcts.TrainableEvaluator):
         loss_policy = tf.nn.softmax_cross_entropy_with_logits_v2(
             logits=policy_logits, labels=tf.stop_gradient(target_policies))
         loss_policy = tf.reduce_mean(loss_policy)
-
         loss_l2 = 0
         for weights in self.model.trainable_variables:
           loss_l2 += self.l2_regularization * tf.nn.l2_loss(weights)
@@ -268,97 +255,155 @@ class AlphaZeroResNetEvaluator(mcts.TrainableEvaluator):
                       l2=float(loss_l2))
 
 
-# This ResNet implementation copies as closely as possible the
-# description found in the Methods section of the AlphaGo Zero Nature paper.
-# It is mentioned in the AlphaZero Science paper supplementary material that
-# "AlphaZero uses the same network architecture as AlphaGo Zero". Whether to use
-# biases in convolutions and the initialization scheme used are not mentioned.
+def keras_resnet(input_shape,
+                 num_actions,
+                 num_residual_blocks=19,
+                 num_filters=19,
+                 value_head_hidden_size=256,
+                 activation='relu'):
+  """
+  This ResNet implementation copies as closely as possible the
+  description found in the Methods section of the AlphaGo Zero Nature paper.
+  It is mentioned in the AlphaZero Science paper supplementary material that
+  "AlphaZero uses the same network architecture as AlphaGo Zero". Note that
+  this implementation only supports flat policy distributions.
+
+  Arguments:
+    input_shape: A tuple of 3 integers specifying the shape of the input tensor.
+    num_actions: The determines the output size of the policy head.
+    num_residual_blocks: The number of residual blocks. Can be 0.
+    num_filters: the number of convolution filters to use in the residual blocks.
+    value_head_hidden_size: the number of hidden units in the value head dense layer.
+    activation: the activation function to use in the net. Does not affect the 
+      final tanh activation in the value head.
+
+  Returns:
+    A keras Model with a single input and two outputs (value head, policy head).
+    The policy is a flat distribution over actions.
+  """
+  inputs = tf.keras.Input(shape=input_shape, name='input')
+  body = _resnet_body(inputs,
+                      num_filters=num_filters,
+                      num_residual_blocks=num_residual_blocks,
+                      activation=activation)
+  value_head = _resnet_value_head(body, hidden_size=value_head_hidden_size)
+  policy_head = _resnet_mlp_policy_head(body, num_actions)
+  return tf.keras.Model(inputs=inputs, outputs=[value_head, policy_head])
 
 
-def alpha_zero_residual_layer(inputs, num_filters, kernel_size, activation,
-                              use_bias):
+def _residual_layer(inputs, num_filters, kernel_size, activation):
   x = inputs
   x = tf.keras.layers.Conv2D(num_filters,
                              kernel_size=kernel_size,
                              padding='same',
                              strides=1,
-                             kernel_initializer='he_normal',
-                             use_bias=use_bias)(x)
+                             kernel_initializer='he_uniform')(x)
   x = tf.keras.layers.BatchNormalization()(x)
   x = tf.keras.layers.Activation(activation)(x)
   x = tf.keras.layers.Conv2D(num_filters,
                              kernel_size=kernel_size,
                              padding='same',
                              strides=1,
-                             kernel_initializer='he_normal',
-                             use_bias=use_bias)(x)
+                             kernel_initializer='he_uniform')(x)
   return tf.keras.layers.BatchNormalization()(x)
 
 
-def alpha_zero_residual_tower(inputs, num_res_blocks, num_filters, kernel_size,
-                              activation, use_bias):
+def _residual_tower(inputs, num_res_blocks, num_filters, kernel_size,
+                    activation):
   x = inputs
   for _ in range(num_res_blocks):
-    y = alpha_zero_residual_layer(x, num_filters, kernel_size, activation,
-                                  use_bias)
-    y = alpha_zero_residual_layer(x, num_filters, kernel_size, activation,
-                                  use_bias)
+    y = _residual_layer(x, num_filters, kernel_size, activation)
+    y = _residual_layer(x, num_filters, kernel_size, activation)
     x = tf.keras.layers.add([x, y])
     x = tf.keras.layers.Activation(activation)(x)
 
   return x
 
 
-def alpha_zero_resnet_body(inputs,
-                           num_residual_blocks=19,
-                           num_filters=256,
-                           kernel_size=3,
-                           activation='relu',
-                           use_bias=False):
+def _resnet_body(inputs,
+                 num_residual_blocks=19,
+                 num_filters=256,
+                 kernel_size=3,
+                 activation='relu'):
 
   x = inputs
   x = tf.keras.layers.Conv2D(num_filters,
                              kernel_size=kernel_size,
                              padding='same',
                              strides=1,
-                             kernel_initializer='he_normal',
-                             use_bias=use_bias)(x)
+                             kernel_initializer='he_uniform')(x)
   x = tf.keras.layers.BatchNormalization()(x)
   x = tf.keras.layers.Activation(activation)(x)
-  x = alpha_zero_residual_tower(x, num_residual_blocks, num_filters,
-                                kernel_size, activation, use_bias)
+  x = _residual_tower(x, num_residual_blocks, num_filters, kernel_size,
+                      activation)
   return x
 
 
-def alpha_zero_value_head(inputs, hidden_size=256, activation='relu'):
+def _resnet_value_head(inputs, hidden_size=256, activation='relu'):
   x = inputs
   x = tf.keras.layers.Conv2D(filters=1,
                              kernel_size=1,
                              strides=1,
-                             kernel_initializer='he_normal')(x)
+                             kernel_initializer='he_uniform')(x)
   x = tf.keras.layers.BatchNormalization()(x)
   x = tf.keras.layers.Activation(activation)(x)
   x = tf.keras.layers.Flatten()(x)
   x = tf.keras.layers.Dense(hidden_size,
                             activation=activation,
-                            kernel_initializer='he_normal')(x)
+                            kernel_initializer='he_uniform')(x)
   x = tf.keras.layers.Dense(1,
                             activation='tanh',
-                            kernel_initializer='he_normal',
+                            kernel_initializer='he_uniform',
                             name='value')(x)
   return x
 
 
-def alpha_zero_mlp_policy_head(inputs, num_classes, activation='relu'):
+def _resnet_mlp_policy_head(inputs, num_classes, activation='relu'):
   x = inputs
   x = tf.keras.layers.Conv2D(filters=2,
                              kernel_size=1,
                              strides=1,
-                             kernel_initializer='he_normal')(x)
+                             kernel_initializer='he_uniform')(x)
   x = tf.keras.layers.BatchNormalization()(x)
   x = tf.keras.layers.Activation(activation)(x)
   x = tf.keras.layers.Flatten()(x)
   x = tf.keras.layers.Dense(num_classes,
-                            kernel_initializer='he_normal',
+                            kernel_initializer='he_uniform',
                             name='policy')(x)
   return x
+
+
+def keras_mlp(input_size,
+              num_actions,
+              num_layers=2,
+              num_hidden=128,
+              activation='relu'):
+  """
+  A simple MLP implementation with both a value and policy head.
+
+  Arguments:
+    input_size: An integer specifying the size of the input vector.
+    num_actions: The determines the output size of the policy head.
+    num_layers: The number of dense layers before the policy and value heads.
+    num_hidden: the number of hidden units in the dense layers.
+    activation: the activation function to use in the net. Does not affect the 
+      final tanh activation in the value head.
+
+  Returns:
+    A keras Model with a single input and two outputs (value head, policy head).
+    The policy is a flat distribution over actions.
+  """
+  inputs = tf.keras.Input(shape=(input_size,), name='input')
+  x = inputs
+  for _ in range(num_layers):
+    x = tf.keras.layers.Dense(num_hidden,
+                              kernel_initializer='he_uniform',
+                              activation=activation)(x)
+  policy = tf.keras.layers.Dense(num_actions,
+                                 kernel_initializer='he_uniform',
+                                 name='policy')(x)
+  value = tf.keras.layers.Dense(1,
+                                kernel_initializer='he_uniform',
+                                activation='tanh',
+                                name='value')(x)
+  return tf.keras.Model(inputs=inputs, outputs=[value, policy])

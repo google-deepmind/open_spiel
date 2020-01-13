@@ -43,10 +43,10 @@ flags.DEFINE_integer(
 flags.DEFINE_integer("num_self_play_games", 200,
                      "The number of self-play games to play in a round.")
 flags.DEFINE_integer(
-    "num_training_updates", 1000,
+    "num_training_updates", 2000,
     "The number of neural net training updates to carry out per round.")
 
-flags.DEFINE_integer("batch_size", 512,
+flags.DEFINE_integer("batch_size", 128,
                      "Number of transitions to sample at each learning step.")
 
 flags.DEFINE_integer(
@@ -79,7 +79,7 @@ class AlphaBetaBot(pyspiel.Bot):
   def step(self, state):
     _, action = minimax.alpha_beta_search(self._game, state=state)
     return action
-
+d
 
 def mean_bot_score(game, bots, num_evaluations=100):
   results = np.array([
@@ -107,22 +107,22 @@ def mean_losses(losses):
 def main(_):
   game = pyspiel.load_game("tic_tac_toe")
 
-  evaluator = alpha_zero.AlphaZeroResNetEvaluator(
-      game.observation_tensor_shape(),
-      game.num_distinct_actions(),
-      num_residual_blocks=2,
-      num_filters=256,
-      value_head_hidden_size=256,
-      optimizer=tf.train.AdamOptimizer(learning_rate=0.01),
+  net = alpha_zero.keras_mlp(27, game.num_distinct_actions(), num_hidden=64)
+
+  evaluator = alpha_zero.AlphaZeroKerasEvaluator(
+      net,
+      optimizer=tf.train.AdamOptimizer(),
       # optimizer=tf.train.MomentumOptimizer(2e-2, momentum=0.9),
       device=FLAGS.device)
 
-  bot = mcts.MCTSBot(game, (1.25, 19652),
+  bot = mcts.MCTSBot(game, 
+      # (1.25, 19652),
+      1.4,
                      25,
                      evaluator,
                      solve=False,
                      random_state=np.random.RandomState(42),
-                     child_selection_fn=alpha_zero.alpha_zero_ucb_score,
+                    #  child_selection_fn=alpha_zero.alpha_zero_ucb_score,
                      dirichlet_noise=(0.25, FLAGS.dirichlet_noise_alpha),
                      verbose=False)
 
@@ -134,19 +134,23 @@ def main(_):
                             batch_size=FLAGS.batch_size)
 
   ab_bot = AlphaBetaBot(game)
+  rand_bot1 = uniform_random.UniformRandomBot(1, np.random.RandomState(3)) 
+  rand_bot0 = uniform_random.UniformRandomBot(0, np.random.RandomState(3)) 
 
   for num_round in range(FLAGS.num_rounds):
     logging.info("------------- Starting round %s out of %s -------------",
                  num_round, FLAGS.num_rounds)
     logging.info("Running %s games of self play", FLAGS.num_self_play_games)
     a0.self_play()
+    optim = a0.bot.evaluator.optimizer
+    tf.variables_initializer(optim.variables())
 
     logging.info("Training net on replay buffer for %s iterations",
                  FLAGS.num_training_updates)
-  
+
     losses = []
     for train_num in range(1, FLAGS.num_training_updates + 1):
-      
+
       if (train_num % FLAGS.report_loss_num) == 0:
         m_losses = mean_losses(losses)
         logging.info("     [%s/%s] %s", train_num, FLAGS.num_training_updates,
@@ -161,8 +165,14 @@ def main(_):
     # print("Total: ", np.mean(loss_total), "Policy", np.mean(loss_policy), "Value", np.mean(loss_value), "L2", np.mean(loss_l2))
     # print("Score Random: ", mean_bot_score(game, [rand_bot0, a0.bot], num_evaluations=40))
 
-    print("Score SelfPlay: ", mean_bot_score(game, [a0.bot, a0.bot], num_evaluations=40))
-    print("Score AlphaBeta: ", mean_bot_score(game, [ab_bot, a0.bot], num_evaluations=40))
+    print("Score SelfPlay: ",
+          mean_bot_score(game, [a0.bot, a0.bot], num_evaluations=40))
+    # print("Score AlphaBeta: ",
+    #       mean_bot_score(game, [ab_bot, a0.bot], num_evaluations=40))
+    print("Score RandomBot0: ",
+      mean_bot_score(game, [rand_bot0, a0.bot], num_evaluations=40))
+    print("Score RandomBot1: ",
+          mean_bot_score(game, [a0.bot, rand_bot1], num_evaluations=40))
 
 if __name__ == "__main__":
   app.run(main)
