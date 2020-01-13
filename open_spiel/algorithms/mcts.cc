@@ -182,7 +182,7 @@ std::string SearchNode::ToString(const State& state) const {
 
 std::vector<double> dirichlet_noise(int count, double alpha,
                                     std::mt19937* rng) {
-  auto noise = std::vector<double>{};
+  std::vector<double> noise;
   noise.reserve(count);
 
   std::gamma_distribution<double> gamma(alpha, 1.0);
