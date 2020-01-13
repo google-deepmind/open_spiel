@@ -196,11 +196,10 @@ class AlphaZeroResNetEvaluator(mcts.TrainableEvaluator):
     self.optimizer = optimizer
 
     if device == 'gpu':
-      if tf.test.is_gpu_available():
-        raise ValueError("GPU support is unaivalable.")
+      if not tf.test.is_gpu_available():
+        raise ValueError("GPU support is unavailable.")
       self.device = tf.device("gpu:0")
-
-    if device == 'cpu':
+    elif device == 'cpu':
       self.device = tf.device("cpu:0")
     else:
       self.device = device
