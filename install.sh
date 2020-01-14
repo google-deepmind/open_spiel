@@ -51,12 +51,6 @@ if [ $GIT_IS_AVAILABLE -ne 0 ]; then #...
   fi
 fi
 
-FILE="open_spiel/scripts/shflags"
-if [[ ! -f $FILE ]]; then
- curl https://raw.githubusercontent.com/kward/shflags/master/shflags -o shflags
- mv shflags $FILE
-fi
-
 [[ -d "./pybind11" ]] || git clone -b 'v2.2.4' --single-branch --depth 1 https://github.com/pybind/pybind11.git
 # The official https://github.com/dds-bridge/dds.git seems to not accept PR,
 # so we have forked it.
