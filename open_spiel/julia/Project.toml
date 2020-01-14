@@ -1,0 +1,19 @@
+name = "OpenSpiel_jll"
+uuid = "7e5d8dc8-489f-4be6-9273-f4c3010e6ec1"
+authors = ["Jun Tian <tianjun.cpp@gmail.com>"]
+version = "0.1.0"
+
+[deps]
+CxxWrap = "1f15a43c-97ca-5a2a-ae31-89f07a497df4"
+
+[compat]
+julia = "^1.2"
+CxxWrap = "^0.9"
+
+[extras]
+StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+
+[targets]
+test = ["StatsBase", "Test", "Random"]

@@ -17,7 +17,10 @@
 # The following scripts:
 # (optionally) create a virtualenv
 # (optionally) install the pip package dependencies
-# builds open_spiel and executes the tests using the `python3` command.
+# builds open_spiel
+# executes the C++ tests
+# executes the Python tests using the `python3` command.
+# (optionally) runs the Julia tests
 #
 # We assume "install.sh` has been run once before.
 
@@ -83,8 +86,7 @@ fi
 PY_VERSION_MAJOR=$($PYBIN -c 'import sys; print(sys.version_info.major)')
 PYVERSION=$(python3 -c 'import sys; print(sys.version.split(" ")[0])')
 
-TMPDIR="."
-VENV_DIR="$TMPDIR/venv"
+VENV_DIR="./venv"
 if [[ ${FLAGS_virtualenv} -eq ${FLAGS_TRUE} ]]; then
   if ! [ -d "$VENV_DIR" ]; then
     extra_args=''
@@ -121,7 +123,17 @@ else
   echo -e "\e[33mSkipping installation of requirements.txt.\e[0m"
 fi
 
+BUILD_DIR="build"
+mkdir -p $BUILD_DIR
 
+# Configure Julia compilation if required.
+if [[ ${BUILD_WITH_JULIA:-"OFF"} == "ON" ]]; then
+  JlCxx_DIR=`julia --project=${MYDIR}/../julia -e 'using CxxWrap; print(joinpath(dirname(CxxWrap.jlcxx_path), "cmake", "JlCxx"))'`
+  JULIA_VERSION_INFO=`julia --version`
+  echo "Found JlCxx at $JlCxx_DIR with $JULIA_VERSION_INFO"
+fi
+
+# Build / install everything and run tests (C++, Python, optionally Julia).
 if [[ ${FLAGS_build_with_pip} -eq ${FLAGS_TRUE} ]]; then
   # TODO(author2): We probably want to use `python3 -m pip install .` directly
   # and skip the usage of nox.
@@ -135,13 +147,11 @@ if [[ ${FLAGS_build_with_pip} -eq ${FLAGS_TRUE} ]]; then
     exit 1
   fi
 else
-  BUILD_DIR="build"
-  mkdir -p $BUILD_DIR
   cd $BUILD_DIR
 
   echo "Building and testing in $PWD using 'python' (version $PYVERSION)."
 
-  cmake -DPython_TARGET_VERSION=${PYVERSION} -DCMAKE_CXX_COMPILER=${CXX} ../open_spiel
+  cmake -DPython_TARGET_VERSION=${PYVERSION} -DCMAKE_CXX_COMPILER=${CXX} -DJlCxx_DIR=${JlCxx_DIR} ../open_spiel
   make -j$MAKE_NUM_PROCS
 
   export PYTHONPATH=$PYTHONPATH:`pwd`/../open_spiel

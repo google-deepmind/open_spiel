@@ -88,8 +88,29 @@ if [[ ${BUILD_WITH_ACPC:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; then
   git clone -b 'master' --single-branch --depth 1  https://github.com/jblespiau/project_acpc_server.git ${DIR}
 fi
 
-
 # 2. Install other required system-wide dependencies
+
+# Install Julia if required and not present already.
+if [[ ${BUILD_WITH_JULIA:-"OFF"} == "ON" ]]; then
+  if which julia >/dev/null; then
+    JULIA_VERSION_INFO=`julia --version`
+    echo -e "\e[33m$JULIA_VERSION_INFO is already installed.\e[0m"
+  else
+    JULIA_INSTALLER="open_spiel/scripts/jill.sh"
+    if [[ ! -f $JULIA_INSTALLER ]]; then
+    curl https://raw.githubusercontent.com/abelsiqueira/jill/master/jill.sh -o jill.sh
+    mv jill.sh $JULIA_INSTALLER
+    fi
+    JULIA_VERSION=1.3.1 bash $JULIA_INSTALLER -y
+    PATH=${PATH}:${HOME}/.local/bin
+  fi
+
+  # Install dependencies.
+  # TODO(author11) Remove the special-case CxxWrap installation. This may require waiting for v0.9 to be officially released.
+  julia --project="${MYDIR}/open_spiel/julia" -e 'using Pkg; Pkg.instantiate(); Pkg.add(Pkg.PackageSpec(name="CxxWrap", rev="0c82e3e383ddf2db1face8ece22d0a552f0ca11a"));'
+fi
+
+# Install other system-wide packages.
 if [[ "$OSTYPE" == "linux-gnu" ]]; then
   EXT_DEPS="virtualenv clang cmake python3 python3-dev python3-pip python3-setuptools python3-wheel"
   APT_GET=`which apt-get`
@@ -128,5 +149,3 @@ else
        "Feel free to contribute the install for a new OS."
   exit 1
 fi
-
-
