@@ -30,7 +30,7 @@ from open_spiel.python.algorithms import masked_softmax
 from open_spiel.python.algorithms import dqn
 
 MCTSResult = collections.namedtuple("MCTSResult",
-                                    "observation target_value target_policy")
+                                    "state_feature target_value target_policy")
 
 LossValues = collections.namedtuple("LossValues", "total policy value l2")
 
@@ -45,7 +45,6 @@ class AlphaZero(object):
                replay_buffer_capacity=int(1e6),
                action_selection_transition=30,
                num_self_play_games=5000,
-               num_training_rounds=10,
                batch_size=4096,
                random_state=None):
     """
@@ -54,18 +53,14 @@ class AlphaZero(object):
       bot: an MCTSBot object.
       replay_buffer_capacity: the size of the replay buffer in which the results 
         of self-play games are stored.
-
-      num_self_play_games: the number of self-play games to play before each
-        training round.
-      num_training_rounds: the number rounds of alternating training and
-        and self-play.
-      num_training_updates: the 
-      batch_size: the number of examples used for a single training update. Note
-        that this batch size must be small enough for the neural net training 
-        update to fit into device memory.
       action_selection_transition: an integer representing the move number in a 
         game of self-play when greedy action selection is used. Before this,
         actions are sampled from the MCTS policy.
+      num_self_play_games: the number of self-play games to play before each
+        training round.
+      batch_size: the number of examples used for a single training update. Note
+        that this batch size must be small enough for the neural net training 
+        update to fit into device memory.
       random_state: An optional numpy RandomState to make it deterministic.
 
     Raises:
@@ -92,13 +87,13 @@ class AlphaZero(object):
 
     self.bot = bot
     self.game = game
-    self.buffer = dqn.ReplayBuffer(replay_buffer_capacity)
+    self.replay_buffer = dqn.ReplayBuffer(replay_buffer_capacity)
     self.num_self_play_games = num_self_play_games
     self._action_selection_transition = action_selection_transition
     self.batch_size = batch_size
 
   def update(self):
-    data = self.buffer.sample(self.batch_size, replace=True)
+    data = self.replay_buffer.sample(self.batch_size, replace=True)
     (total_loss, policy_loss, value_loss,
      l2_loss) = self.bot.evaluator.update(data)
     return LossValues(total=total_loss,
@@ -107,33 +102,36 @@ class AlphaZero(object):
                       l2=l2_loss)
 
   def self_play(self):
-    for _ in range(self.num_self_play_games):
-      self._self_play_single()
+    # optim = a0.bot.evaluator.optimizer
+    # tf.variables_initializer(optim.variables())
+    return [self._self_play_single() for _ in range(self.num_self_play_games)]
 
   def _self_play_single(self):
     state = self.game.new_initial_state()
-    policy_target, observations = [], []
+    policy_targets, state_features = [], []
 
     while not state.is_terminal():
       root_node = self.bot.mcts_search(state)
-      # compute and store the policy and value targets obtained from MCTS
-      observations.append(np.array(state.observation_tensor(),
-                                   dtype=np.float32))
+      state_features.append(self.bot.evaluator.feature_extractor(state))
       target_policy = np.zeros(self.game.num_distinct_actions(),
                                dtype=np.float32)
       for child in root_node.children:
         target_policy[child.action] = child.explore_count
       target_policy /= sum(target_policy)
-      policy_target.append(target_policy)
-      # take the MCTS actions
+      policy_targets.append(target_policy)
+
       action = self._select_action(root_node.children, len(state.history()))
       state.apply_action(action)
 
     terminal_rewards = state.rewards()
-    for i, (obs, pol) in enumerate(zip(observations, policy_target)):
+    for i, (feature, pol) in enumerate(zip(state_features, policy_targets)):
       value = terminal_rewards[i % 2]
-      self.buffer.add(
-          MCTSResult(observation=obs, target_policy=pol, target_value=value))
+      self.replay_buffer.add(
+          MCTSResult(state_feature=feature,
+                     target_policy=pol,
+                     target_value=value))
+
+    return terminal_rewards
 
   def _select_action(self, children, game_history_len):
     explore_counts = [(child.explore_count, child.action) for child in children]
@@ -159,37 +157,50 @@ def alpha_zero_ucb_score(child, parent_explore_count, params):
 
   return prior_score + value_score
 
+
 def np_softmax(logits):
   max_logit = np.amax(logits, axis=-1, keepdims=True)
   exp_logit = np.exp(logits - max_logit)
   return exp_logit / np.sum(exp_logit, axis=-1, keepdims=True)
 
 
-
 class AlphaZeroKerasEvaluator(mcts.TrainableEvaluator):
-  """Implements a parameterized AlphaZero ResNet architecture used in the Science 
-	paper 'A general reinforcement learning algorithm that masters chess, shogi, 
-	and Go through self-play'.
-
-  This evaluator supports games in which the input features are a 3-Tensor and
-	the action space is represented by a vector. Other action representations, 
-	such as the 8x8x73-Tensor representation used by AlphaZero for Chess, are
-	not supported.
+  """Implements a 
   """
 
-  def __init__(self,
-               keras_model,
-               cache_size=None,
-               l2_regularization=1e-4,
-               optimizer=tf.train.MomentumOptimizer(2e-2, momentum=0.9),
-               device='cpu'):
+  def __init__(
+      self,
+      keras_model,
+      l2_regularization=1e-4,
+      #TODO: generalize optimizer
+      optimizer=tf.train.MomentumOptimizer(2e-1, momentum=0.9),
+      device='cpu',
+      feature_extractor=None,
+      cache_size=None):
+    """
+    Args:
+      keras_model: a Keras Model object.
+      l2_regularization: the amount of l2 regularization to use during training.
+      optimizer: the number of self-play games to play before each
+        training round.
+      device: The device used to run the keras_model during evaluation and 
+        training. Possible values are 'cpu', 'gpu', or a tf.device(...) object.
+      feature_extractor: a function which takes as argument the game state and 
+        returns a numpy tensor which the keras_model can accept as input. If 
+        None, then the default features will be used, which is the 
+        observation_tensor() state method, reshaped to match the keras_model 
+        input shape (if possible). The keras_model is always evaluated on the
+        output of this function.
+        cache_size: Whether to cache the result of the net evaluation. Calling 
+        the update method automatically resets the cache. Set to 0 to turn it 
+        off, and None for an unbounded cache size.
+    Raises:
+      ValueError: if incorrect inputs are supplied.
+    """
+
     super().__init__(cache_size=cache_size)
 
     self.model = keras_model
-    # if not type(self.model) == tf.python.keras.engine.training.Model:
-    #   raise ValueError(
-    #       "The argument keras_model needs to be a Keras Model object, but was of type %s.",
-    #       type(self.model))
 
     # TODO: validate user-supplied keras_model
     self.input_shape = list(self.model.input_shape)
@@ -208,11 +219,16 @@ class AlphaZeroKerasEvaluator(mcts.TrainableEvaluator):
     else:
       self.device = device
 
+    if feature_extractor == None:
+      self.feature_extractor = _create_default_feature_extractor(
+          self.input_shape)
+    else:
+      self.feature_extractor = feature_extractor
+
   def value_and_prior(self, state):
-    tensor_state = np.array(state.observation_tensor(),
-                            dtype=np.float32).reshape(self.input_shape)
+    state_feature = self.feature_extractor(state)
     with self.device:
-      value, policy = self.model(tensor_state)
+      value, policy = self.model(state_feature)
 
     # renormalize policy over legal actions
     policy = np.array(policy)[0]
@@ -221,23 +237,23 @@ class AlphaZeroKerasEvaluator(mcts.TrainableEvaluator):
     policy = [(action, policy[action]) for action in state.legal_actions()]
 
     # value is required to be array over players
-    value = np.array(value)[0, 0]
+    value = value[0, 0].numpy()
     value = np.array([value, -value])
 
     return (value, policy)
 
   def update(self, training_examples):
-    observations = np.vstack([o for (o, _, _) in training_examples])
-    target_values = np.vstack([v for (_, v, _) in training_examples])
-    target_policies = np.vstack([p for (_, _, p) in training_examples])
+    state_features = np.vstack([f for (f, _, _) in training_examples])
+    value_targets = np.vstack([v for (_, v, _) in training_examples])
+    policy_targets = np.vstack([p for (_, _, p) in training_examples])
 
     with self.device:
       with tf.GradientTape() as tape:
-        values, policy_logits = self.model(observations, training=True)
+        values, policy_logits = self.model(state_features, training=True)
         loss_value = tf.losses.mean_squared_error(
-            values, tf.stop_gradient(target_values))
+            values, tf.stop_gradient(value_targets))
         loss_policy = tf.nn.softmax_cross_entropy_with_logits_v2(
-            logits=policy_logits, labels=tf.stop_gradient(target_policies))
+            logits=policy_logits, labels=tf.stop_gradient(policy_targets))
         loss_policy = tf.reduce_mean(loss_policy)
         loss_l2 = 0
         for weights in self.model.trainable_variables:
@@ -255,10 +271,19 @@ class AlphaZeroKerasEvaluator(mcts.TrainableEvaluator):
                       l2=float(loss_l2))
 
 
+def _create_default_feature_extractor(shape):
+
+  def feature_extractor(state):
+    obs = state.observation_tensor()
+    return np.array(obs, dtype=np.float32).reshape(shape)
+
+  return feature_extractor
+
+
 def keras_resnet(input_shape,
                  num_actions,
                  num_residual_blocks=19,
-                 num_filters=19,
+                 num_filters=256,
                  value_head_hidden_size=256,
                  activation='relu'):
   """
@@ -269,14 +294,14 @@ def keras_resnet(input_shape,
   this implementation only supports flat policy distributions.
 
   Arguments:
-    input_shape: A tuple of 3 integers specifying the shape of the input tensor.
+    input_shape: A tuple of 3 integers specifying the non-batch dimensions of 
+      input tensor shape.
     num_actions: The determines the output size of the policy head.
     num_residual_blocks: The number of residual blocks. Can be 0.
     num_filters: the number of convolution filters to use in the residual blocks.
     value_head_hidden_size: the number of hidden units in the value head dense layer.
     activation: the activation function to use in the net. Does not affect the 
       final tanh activation in the value head.
-
   Returns:
     A keras Model with a single input and two outputs (value head, policy head).
     The policy is a flat distribution over actions.
@@ -285,9 +310,14 @@ def keras_resnet(input_shape,
   body = _resnet_body(inputs,
                       num_filters=num_filters,
                       num_residual_blocks=num_residual_blocks,
+                      kernel_size=3,
                       activation=activation)
-  value_head = _resnet_value_head(body, hidden_size=value_head_hidden_size)
-  policy_head = _resnet_mlp_policy_head(body, num_actions)
+  value_head = _resnet_value_head(body,
+                                  hidden_size=value_head_hidden_size,
+                                  activation=activation)
+  policy_head = _resnet_mlp_policy_head(body,
+                                        num_actions,
+                                        activation=activation)
   return tf.keras.Model(inputs=inputs, outputs=[value_head, policy_head])
 
 
@@ -305,7 +335,7 @@ def _residual_layer(inputs, num_filters, kernel_size, activation):
                              padding='same',
                              strides=1,
                              kernel_initializer='he_uniform')(x)
-  return tf.keras.layers.BatchNormalization()(x)
+  return tf.keras.layers.BatchNormalization(axis=-1)(x)
 
 
 def _residual_tower(inputs, num_res_blocks, num_filters, kernel_size,
@@ -320,12 +350,8 @@ def _residual_tower(inputs, num_res_blocks, num_filters, kernel_size,
   return x
 
 
-def _resnet_body(inputs,
-                 num_residual_blocks=19,
-                 num_filters=256,
-                 kernel_size=3,
-                 activation='relu'):
-
+def _resnet_body(inputs, num_residual_blocks, num_filters, kernel_size,
+                 activation):
   x = inputs
   x = tf.keras.layers.Conv2D(num_filters,
                              kernel_size=kernel_size,
@@ -339,7 +365,7 @@ def _resnet_body(inputs,
   return x
 
 
-def _resnet_value_head(inputs, hidden_size=256, activation='relu'):
+def _resnet_value_head(inputs, hidden_size, activation):
   x = inputs
   x = tf.keras.layers.Conv2D(filters=1,
                              kernel_size=1,
@@ -358,7 +384,7 @@ def _resnet_value_head(inputs, hidden_size=256, activation='relu'):
   return x
 
 
-def _resnet_mlp_policy_head(inputs, num_classes, activation='relu'):
+def _resnet_mlp_policy_head(inputs, num_classes, activation):
   x = inputs
   x = tf.keras.layers.Conv2D(filters=2,
                              kernel_size=1,
