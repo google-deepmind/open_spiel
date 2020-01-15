@@ -135,25 +135,48 @@ void HUNLRegressionTests() {
   std::shared_ptr<const Game> game = LoadGame(
       "universal_poker(betting=nolimit,numPlayers=2,numRounds=4,blind=100 "
       "50,firstPlayer=2 1 1 "
-      "1,numSuits=4,numRanks=13,numHoleCards=2,numBoardCards=0 3 1 1,stack=250 "
-      "250)");
+      "1,numSuits=4,numRanks=13,numHoleCards=2,numBoardCards=0 3 1 1,stack=400 "
+      "400)");
   std::unique_ptr<State> state = game->NewInitialState();
   while (state->IsChanceNode()) {
     state->ApplyAction(state->LegalActions()[0]);
   }
   std::cout << state->InformationStateString() << std::endl;
-  // Pot bet
+  // Pot bet: call 50, and raise by 200.
   state->ApplyAction(universal_poker::kBet);
 
-  // Now, the minimum bet size is 200, so player 0 has to go all-in, or fold.
+  // Now, the minimum bet size is larger than the pot, so player 0 can only
+  // fold, call, or go all-in.
   std::vector<Action> actions = state->LegalActions();
   absl::c_sort(actions);
 
-  // Legal actions should be fold, call, all-in.
   SPIEL_CHECK_EQ(actions.size(), 3);
   SPIEL_CHECK_EQ(actions[0], universal_poker::kFold);
   SPIEL_CHECK_EQ(actions[1], universal_poker::kCall);
   SPIEL_CHECK_EQ(actions[2], universal_poker::kAllIn);
+
+  // Try a similar test with a stacks of size 300.
+  game = LoadGame(
+      "universal_poker(betting=nolimit,numPlayers=2,numRounds=4,blind=100 "
+      "50,firstPlayer=2 1 1 "
+      "1,numSuits=4,numRanks=13,numHoleCards=2,numBoardCards=0 3 1 1,stack=300 "
+      "300)");
+  state = game->NewInitialState();
+  while (state->IsChanceNode()) {
+    state->ApplyAction(state->LegalActions()[0]);
+  }
+  std::cout << state->InformationStateString() << std::endl;
+
+  // The pot bet exactly matches the number of chips available. This is an edge
+  // case where all-in is not available, only the pot bet.
+
+  actions = state->LegalActions();
+  absl::c_sort(actions);
+
+  SPIEL_CHECK_EQ(actions.size(), 3);
+  SPIEL_CHECK_EQ(actions[0], universal_poker::kFold);
+  SPIEL_CHECK_EQ(actions[1], universal_poker::kCall);
+  SPIEL_CHECK_EQ(actions[2], universal_poker::kBet);
 }
 
 void LoadAndRunGameFromDefaultConfig() {
