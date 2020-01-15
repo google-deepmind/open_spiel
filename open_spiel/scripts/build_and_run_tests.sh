@@ -43,6 +43,11 @@ ArgsLibAddArg system_wide_packages bool false 'Whether to use --system-site-pack
 ArgsLibAddArg build_with_pip bool false 'Whether to use "python3 -m pip install ." or the usual cmake&make and ctest.'
 ArgsLibParse $@
 
+function die() {
+  echo -e "\033[31m${1}\e[0m"
+  exit -1
+}
+
 set -e  # exit when any command fails
 # set -x  # Prints all executed command
 
@@ -126,6 +131,13 @@ mkdir -p $BUILD_DIR
 
 # Configure Julia compilation if required.
 if [[ ${BUILD_WITH_JULIA:-"OFF"} == "ON" ]]; then
+  # Check that Julia is in the path.
+  if [[ ! -x `which julia` ]]
+  then
+    echo -e "\e[33mWarning: julia not in your PATH. Trying \$HOME/.local/bin\e[0m"
+    PATH=${PATH}:${HOME}/.local/bin
+    [[ -x `which julia` ]] || die "could not find julia command. Please add it to PATH and rerun."
+  fi
   JlCxx_DIR=`julia --project=${MYDIR}/../julia -e 'using CxxWrap; print(joinpath(dirname(CxxWrap.jlcxx_path), "cmake", "JlCxx"))'`
   JULIA_VERSION_INFO=`julia --version`
   echo "Found JlCxx at $JlCxx_DIR with $JULIA_VERSION_INFO"
