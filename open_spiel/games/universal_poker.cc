@@ -700,8 +700,6 @@ std::string UniversalPokerGame::parseParameters(const GameParameters &map) {
   absl::StrAppend(&generated_gamedef,
                   "blind = ", ParameterValue<std::string>("blind"), "\n");
   absl::StrAppend(&generated_gamedef, "END GAMEDEF\n");
-  std::cerr << "Generated gamedef for Universal Poker:\n"
-            << generated_gamedef << std::endl;
   return generated_gamedef;
 }
 
