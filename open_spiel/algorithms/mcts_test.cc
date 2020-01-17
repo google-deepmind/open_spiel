@@ -113,13 +113,13 @@ void MCTSTest_SolveDraw() {
   const algorithms::SearchNode& best = root->BestChild();
   SPIEL_CHECK_EQ(best.outcome[best.player], 0);
   std::string action_str = state->ActionToString(best.player, best.action);
-  if (action_str != "o(0,2)" && action_str != "o(2,0)")  // All others lose.
-    SPIEL_CHECK_EQ(action_str, "o(0,2)");  // "o(2,0)" is also valid.
+  if (action_str != "o(2,0)" && action_str != "o(0,2)")  // All others lose.
+    SPIEL_CHECK_EQ(action_str, "o(2,0)");  // "o(0,2)" is also valid.
 }
 
 void MCTSTest_SolveLoss() {
   auto [root, state] =
-      SearchTicTacToeState("x(1,1) o(0,0) x(2,2) o(1,0) x(2,0)");
+      SearchTicTacToeState("x(1,1) o(0,0) x(2,2) o(0,1) x(0,2)");
   SPIEL_CHECK_EQ(state->ToString(), "oox\n.x.\n..x");
   SPIEL_CHECK_EQ(root->outcome[root->player], -1);
   for (const algorithms::SearchNode& c : root->children)
@@ -127,12 +127,12 @@ void MCTSTest_SolveLoss() {
 }
 
 void MCTSTest_SolveWin() {
-  auto [root, state] = SearchTicTacToeState("x(1,0) o(2,2)");
+  auto [root, state] = SearchTicTacToeState("x(0,1) o(2,2)");
   SPIEL_CHECK_EQ(state->ToString(), ".x.\n...\n..o");
   SPIEL_CHECK_EQ(root->outcome[root->player], 1);
   const algorithms::SearchNode& best = root->BestChild();
   SPIEL_CHECK_EQ(best.outcome[best.player], 1);
-  SPIEL_CHECK_EQ(state->ActionToString(best.player, best.action), "x(2,0)");
+  SPIEL_CHECK_EQ(state->ActionToString(best.player, best.action), "x(0,2)");
 }
 
 }  // namespace
