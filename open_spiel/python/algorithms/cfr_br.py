@@ -46,7 +46,7 @@ class CFRBRSolver(_CFRSolverBase):
 
   It uses an exact Best Response and full tree traversal.
 
-  One iteration for a n-player game consist of the following:
+  One iteration for a n-player game consists of the following:
 
   - Compute the BR of each player against the rest of the players.
   - Then, for each player p sequentially (from player 0 to N-1):

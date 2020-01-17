@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Lint as python3.
 r"""Policy Gradient based agents implemented in TensorFlow.
 
 This class is composed of three policy gradient (PG) algorithms:
@@ -71,8 +72,9 @@ loss computation.
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-
 import collections
+import os
+from absl import logging
 import numpy as np
 import sonnet as snt
 import tensorflow.compat.v1 as tf
@@ -172,20 +174,23 @@ class PolicyGradient(rl_agent.AbstractAgent):
     net_torso = snt.nets.MLP(
         output_sizes=self._layer_sizes, activate_final=True)
     torso_out = net_torso(self._info_state_ph)
-    self._policy_logits = snt.Linear(
-        output_size=self._num_actions, name="policy_head")(
-            torso_out)
+    self._policy_head = snt.Linear(
+        output_size=self._num_actions, name="policy_head")
+    self._policy_logits = self._policy_head(torso_out)
     self._policy_probs = tf.nn.softmax(self._policy_logits)
+    self._savers = [("torso", snt.get_saver(net_torso)),
+                    ("policy_head", snt.get_saver(self._policy_head))]
 
     # Add baseline (V) head for A2C.
     if loss_class.__name__ == "BatchA2CLoss":
-      self._baseline = tf.squeeze(
-          snt.Linear(output_size=1, name="baseline")(torso_out), axis=1)
+      baseline = snt.Linear(output_size=1, name="baseline")
+      self._baseline = tf.squeeze(baseline(torso_out), axis=1)
+      self._savers.append(("baseline", snt.get_saver(baseline)))
     else:
       # Add q-values head otherwise
-      self._q_values = snt.Linear(
-          output_size=self._num_actions, name="q_values_head")(
-              torso_out)
+      q_head = snt.Linear(output_size=self._num_actions, name="q_values_head")
+      self._q_values = q_head(torso_out)
+      self._savers.append(("q_head", snt.get_saver(q_head)))
 
     # Critic loss
     # Baseline loss in case of A2C
@@ -229,8 +234,8 @@ class PolicyGradient(rl_agent.AbstractAgent):
           policy_logits=self._policy_logits, action_values=self._q_values)
     pi_optimizer = tf.train.GradientDescentOptimizer(
         learning_rate=pi_learning_rate)
-
     self._pi_learn_step = minimize_with_clipping(pi_optimizer, self._pi_loss)
+    self._loss_str = loss_str
 
   def _get_loss_class(self, loss_str):
     if loss_str == "rpg":
@@ -251,7 +256,10 @@ class PolicyGradient(rl_agent.AbstractAgent):
     # Remove illegal actions, re-normalize probs
     probs = np.zeros(self._num_actions)
     probs[legal_actions] = policy_probs[0][legal_actions]
-    probs /= sum(probs)
+    if sum(probs) != 0:
+      probs /= sum(probs)
+    else:
+      probs[legal_actions] = 1 / len(legal_actions)
     action = np.random.choice(len(probs), p=probs)
     return action, probs
 
@@ -303,6 +311,39 @@ class PolicyGradient(rl_agent.AbstractAgent):
         self._prev_action = action
 
     return rl_agent.StepOutput(action=action, probs=probs)
+
+  def _full_checkpoint_name(self, checkpoint_dir, name):
+    checkpoint_filename = "_".join(
+        [self._loss_str, name, "pid" + str(self.player_id)])
+    return os.path.join(checkpoint_dir, checkpoint_filename)
+
+  def _latest_checkpoint_filename(self, name):
+    checkpoint_filename = "_".join(
+        [self._loss_str, name, "pid" + str(self.player_id)])
+    return checkpoint_filename + "_latest"
+
+  def save(self, checkpoint_dir):
+    for name, saver in self._savers:
+      path = saver.save(
+          self._session,
+          self._full_checkpoint_name(checkpoint_dir, name),
+          latest_filename=self._latest_checkpoint_filename(name))
+      logging.info("saved to path: %s", path)
+
+  def has_checkpoint(self, checkpoint_dir):
+    for name, _ in self._savers:
+      if tf.train.latest_checkpoint(
+          self._full_checkpoint_name(checkpoint_dir, name),
+          os.path.join(checkpoint_dir,
+                       self._latest_checkpoint_filename(name))) is None:
+        return False
+    return True
+
+  def restore(self, checkpoint_dir):
+    for name, saver in self._savers:
+      full_checkpoint_dir = self._full_checkpoint_name(checkpoint_dir, name)
+      logging.info("Restoring checkpoint: %s", (full_checkpoint_dir))
+      saver.restore(self._session, full_checkpoint_dir)
 
   @property
   def loss(self):

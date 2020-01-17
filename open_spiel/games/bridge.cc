@@ -563,6 +563,16 @@ void BridgeState::ApplyPlayAction(int card) {
   }
 }
 
+Player BridgeState::CurrentPlayer() const {
+  if (phase_ == Phase::kPlay &&
+      Partnership(current_player_) == Partnership(contract_.declarer)) {
+    // Declarer chooses cards for both players.
+    return contract_.declarer;
+  } else {
+    return current_player_;
+  }
+}
+
 void BridgeState::ScoreUp() {
   int declarer_score = Score(contract_, num_declarer_tricks_,
                              is_vulnerable_[Partnership(contract_.declarer)]);

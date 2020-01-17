@@ -790,18 +790,23 @@ void UniversalPokerState::_CalculateActionsAndNodeType() {
     bool valid_to_raise = acpc_state_.RaiseIsValid(&potSize_, &allInSize_);
     if (betting_abstraction_ == BettingAbstraction::kFC) return;
     if (valid_to_raise) {
-      // It's always valid to bet the pot.
-      possibleActions_ |= ACTION_BET;
       if (acpc_game_->IsLimitGame()) {
         potSize_ = 0;
+        // There's only one "bet" allowed in Limit, which is "all-in or fixed
+        // bet".
+        possibleActions_ |= ACTION_BET;
       } else {
+        // It's always legal to go all-in in No Limit if other bets are legal:
+        possibleActions_ |= ACTION_ALL_IN;
         int32_t currentPot =
             acpc_state_.MaxSpend() *
             (acpc_game_->GetNbPlayers() - acpc_state_.NumFolded());
         potSize_ = currentPot > potSize_ ? currentPot : potSize_;
         potSize_ = allInSize_ < potSize_ ? allInSize_ : potSize_;
         if (allInSize_ > potSize_) {
-          possibleActions_ |= ACTION_ALL_IN;
+          // We only add a pot bet if it's going to have a different outcome
+          // from going all-in.
+          possibleActions_ |= ACTION_BET;
         }
       }
     }

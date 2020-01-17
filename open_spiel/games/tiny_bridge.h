@@ -239,9 +239,13 @@ int Score_p0(std::array<Seat, kDeckSize> holder,
              const TinyBridgeAuctionState::AuctionState& state);
 
 // For the two-player (purely cooperative) case, the expected score for
-// declaring side in the specified contract.
+// declaring side in the specified contract. Uses a cache of values.
 double Score_2p(Action hand0, Action hand1,
                 const TinyBridgeAuctionState::AuctionState& state);
+
+// Non-caching version of `Score_2p`.
+double Score_2p_(Action hand0, Action hand1,
+                 const TinyBridgeAuctionState::AuctionState& state);
 
 }  // namespace tiny_bridge
 }  // namespace open_spiel

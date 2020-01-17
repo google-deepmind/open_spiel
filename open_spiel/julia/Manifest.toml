@@ -1,0 +1,28 @@
+# This file is machine-generated - editing it directly is not advised
+
+[[BinaryProvider]]
+deps = ["Libdl", "SHA"]
+git-tree-sha1 = "5b08ed6036d9d3f0ee6369410b830f8873d4024c"
+uuid = "b99e7846-7c00-51b0-8f62-c81ae34c0232"
+version = "0.5.8"
+
+[[CxxWrap]]
+deps = ["BinaryProvider", "Libdl"]
+git-tree-sha1 = "20dc870e3c8a52969bd30992d87bd57e0952b2ba"
+repo-rev = "0c82e3e383ddf2db1face8ece22d0a552f0ca11a"
+repo-url = "https://github.com/JuliaInterop/CxxWrap.jl.git"
+uuid = "1f15a43c-97ca-5a2a-ae31-89f07a497df4"
+version = "0.9.0"
+
+[[Libdl]]
+uuid = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
+
+[[Random]]
+deps = ["Serialization"]
+uuid = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+
+[[SHA]]
+uuid = "ea8e919c-243c-51af-8825-aaa63cd721ce"
+
+[[Serialization]]
+uuid = "9e88b42a-f829-5b0c-bbe9-9e923198166b"

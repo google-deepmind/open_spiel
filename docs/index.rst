@@ -25,6 +25,11 @@ Welcome to OpenSpiel's documentation!
 
    OpenSpiel on Swift for TensorFlow<swift>
 
+.. toctree:: :caption: Julia OpenSpiel
+   :maxdepth: 2
+
+   OpenSpiel on Julia<julia>
+
 .. toctree:: :caption: Developer guide
    :maxdepth: 2
 

@@ -17,31 +17,31 @@
 # The following scripts:
 # (optionally) create a virtualenv
 # (optionally) install the pip package dependencies
-# builds open_spiel and executes the tests using the `python3` command.
+# builds open_spiel
+# executes the C++ tests
+# executes the Python tests using the `python3` command.
+# (optionally) runs the Julia tests
 #
 # We assume "install.sh` has been run once before.
 
 # As we encourage the use of a virtualenv, it is set to be used by default.
-# Use the --novirtualenv flag to disable this feature.
+# Use the --virtualenv=false flag to disable this feature.
 
 # You will need to install at some points the requirements, within the
 # virtualenv or as system wide packages. By default, it will be installed the
 # first time the virtualenv is setup, but you can force an install using the
 # --install=true flag.
 
+# Load argslib for parsing of command-line arguments.
+source $(dirname "$0")/argslib.sh
 
-# We use https://github.com/kward/shflags to define convenient flags.
-. $(dirname "$0")/shflags
-
-DEFINE_boolean 'virtualenv' true "Whether to use virtualenv. We enter a virtualenv (stored in venv/) only if this flag is true and we are not already in one."
+ArgsLibAddArg virtualenv bool true "Whether to use virtualenv. We enter a virtualenv (stored in venv/) only if this flag is true and we are not already in one."
 # We define a string and not a boolean, because we can to know whether this flag
 # has been explicitly set or not.
-DEFINE_string 'install' "default" 'Whether to install requirements.txt packages. Doing it is slow. By default, it will be true (a) the first-time a virtualenv is being setup (if system_wide_packages is false), (b) if the user overrides it with "true".'
-DEFINE_boolean 'system_wide_packages' false 'Whether to use --system-site-packages on the virtualenv.'
-DEFINE_boolean 'build_with_pip' false 'Whether to use "python3 -m pip install ." or the usual cmake&make and ctest.'
-
-FLAGS "$@" || exit $?
-eval set -- "${FLAGS_ARGV}"
+ArgsLibAddArg install string "default" 'Whether to install requirements.txt packages. Doing it is slow. By default, it will be true (a) the first-time a virtualenv is being setup (if system_wide_packages is false), (b) if the user overrides it with "true".'
+ArgsLibAddArg system_wide_packages bool false 'Whether to use --system-site-packages on the virtualenv.'
+ArgsLibAddArg build_with_pip bool false 'Whether to use "python3 -m pip install ." or the usual cmake&make and ctest.'
+ArgsLibParse $@
 
 set -e  # exit when any command fails
 # set -x  # Prints all executed command
@@ -69,33 +69,33 @@ let TEST_NUM_PROCS=4*${MAKE_NUM_PROCS}
 if [[ "$VIRTUAL_ENV" != "" ]]
 then
   echo -e "\e[1m\e[93mVirtualenv already detected. We do not create a new one.\e[0m"
-  FLAGS_virtualenv=${FLAGS_FALSE}
+  ArgsLibSet virtualenv false
 fi
 
-
 echo -e "\e[33mRunning ${0} from $PWD\e[0m"
-PYBIN="python3"
-if ! [ -x "$(command -v $PYBIN)" ]; then
+PYBIN=`which python3`
+if [ ! -x $PYBIN ]
+then
   echo -e "\e[1m\e[93m$PYBIN not found! Skip build and test.\e[0m"
   continue
 fi
 
 PY_VERSION_MAJOR=$($PYBIN -c 'import sys; print(sys.version_info.major)')
-PYVERSION=$(python3 -c 'import sys; print(sys.version.split(" ")[0])')
+PYVERSION=$($PYBIN -c 'import sys; print(sys.version.split(" ")[0])')
 
-TMPDIR="."
-VENV_DIR="$TMPDIR/venv"
-if [[ ${FLAGS_virtualenv} -eq ${FLAGS_TRUE} ]]; then
+VENV_DIR="./venv"
+if [[ $ARG_virtualenv == "true" ]]; then
   if ! [ -d "$VENV_DIR" ]; then
     extra_args=''
-    if [[ ${FLAGS_system_wide_packages} -eq ${FLAGS_TRUE} ]]; then
+    if [[ $ARG_system_wide_packages == "true" ]]; then
       extra_args="--system-site-packages"
     else
       # If we are in a virtual-env, and are not using the system-wide packages
       # then we need to install the dependencies the first time the virtualenv
       # is created
-      FLAGS_install="true"
+      ArgsLibSet install true
     fi
+    echo "Installing..."
     echo -e "\e[33mInstalling a virtualenv to $VENV_DIR. The setup is long the first time, please wait.\e[0m"
     virtualenv -p $PYBIN $VENV_DIR $extra_args
   else
@@ -106,7 +106,7 @@ fi
 
 # We only exit the virtualenv if we were asked to create one.
 function cleanup {
-  if [[ ${FLAGS_virtualenv} -eq ${FLAGS_TRUE} ]]; then
+  if [[ $ARG_virtualenv == "true" ]]; then
     echo "Exiting virtualenv"
     deactivate
   fi
@@ -114,15 +114,25 @@ function cleanup {
 trap cleanup EXIT
 
 
-if [[ ${FLAGS_install} == "true" ]]; then
+if [[ $ARG_install == "true" ]]; then
   echo -e "\e[33mInstalling the requirements (use --noinstall to skip).\e[0m"
   pip3 install --upgrade -r ./requirements.txt
 else
   echo -e "\e[33mSkipping installation of requirements.txt.\e[0m"
 fi
 
+BUILD_DIR="build"
+mkdir -p $BUILD_DIR
 
-if [[ ${FLAGS_build_with_pip} -eq ${FLAGS_TRUE} ]]; then
+# Configure Julia compilation if required.
+if [[ ${BUILD_WITH_JULIA:-"OFF"} == "ON" ]]; then
+  JlCxx_DIR=`julia --project=${MYDIR}/../julia -e 'using CxxWrap; print(joinpath(dirname(CxxWrap.jlcxx_path), "cmake", "JlCxx"))'`
+  JULIA_VERSION_INFO=`julia --version`
+  echo "Found JlCxx at $JlCxx_DIR with $JULIA_VERSION_INFO"
+fi
+
+# Build / install everything and run tests (C++, Python, optionally Julia).
+if [[ $ARG_build_with_pip == "true" ]]; then
   # TODO(author2): We probably want to use `python3 -m pip install .` directly
   # and skip the usage of nox.
   pip3 install nox
@@ -135,13 +145,11 @@ if [[ ${FLAGS_build_with_pip} -eq ${FLAGS_TRUE} ]]; then
     exit 1
   fi
 else
-  BUILD_DIR="build"
-  mkdir -p $BUILD_DIR
   cd $BUILD_DIR
 
   echo "Building and testing in $PWD using 'python' (version $PYVERSION)."
 
-  cmake -DPython_TARGET_VERSION=${PYVERSION} -DCMAKE_CXX_COMPILER=${CXX} ../open_spiel
+  cmake -DPython_TARGET_VERSION=${PYVERSION} -DCMAKE_CXX_COMPILER=${CXX} -DJlCxx_DIR=${JlCxx_DIR} ../open_spiel
   make -j$MAKE_NUM_PROCS
 
   export PYTHONPATH=$PYTHONPATH:`pwd`/../open_spiel

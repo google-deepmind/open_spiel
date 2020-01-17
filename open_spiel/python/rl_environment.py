@@ -177,6 +177,40 @@ class Environment(object):
       raise ValueError("Game must provide either information state or "
                        "observation as a normalized vector")
 
+  def get_time_step(self):
+    """Returns a `TimeStep` without updating the environment.
+
+    Returns:
+      A `TimeStep` namedtuple containing:
+        observation: list of dicts containing one observations per player, each
+          corresponding to `observation_spec()`.
+        reward: list of rewards at this timestep, or None if step_type is
+          `StepType.FIRST`.
+        discount: list of discounts in the range [0, 1], or None if step_type is
+          `StepType.FIRST`.
+        step_type: A `StepType` value.
+    """
+    observations = {"info_state": [], "legal_actions": [], "current_player": []}
+    rewards = []
+    step_type = StepType.LAST if self._state.is_terminal() else StepType.MID
+    self._should_reset = step_type == StepType.LAST
+
+    cur_rewards = self._state.rewards()
+    for player_id in range(self.num_players):
+      rewards.append(cur_rewards[player_id])
+      observations["info_state"].append(
+          self._state.observation_tensor(player_id) if self._use_observation
+          else self._state.information_state_tensor(player_id))
+
+      observations["legal_actions"].append(self._state.legal_actions(player_id))
+    observations["current_player"] = self._state.current_player()
+
+    return TimeStep(
+        observations=observations,
+        rewards=rewards,
+        discounts=self._discounts,
+        step_type=step_type)
+
   def step(self, actions):
     """Updates the environment according to `actions` and returns a `TimeStep`.
 
@@ -203,7 +237,8 @@ class Environment(object):
         step_type: A `StepType` value.
     """
     assert len(actions) == self.num_actions_per_step, (
-        "Invalid number of actions! Expected {}".format(self.num_players))
+        "Invalid number of actions! Expected {}".format(
+            self.num_actions_per_step))
     if self._should_reset:
       return self.reset()
 
@@ -213,26 +248,7 @@ class Environment(object):
       self._state.apply_actions(actions)
     self._sample_external_events()
 
-    observations = {"info_state": [], "legal_actions": [], "current_player": []}
-    rewards = []
-    step_type = StepType.LAST if self._state.is_terminal() else StepType.MID
-    self._should_reset = step_type == StepType.LAST
-
-    cur_rewards = self._state.rewards()
-    for player_id in range(self.num_players):
-      rewards.append(cur_rewards[player_id])
-      observations["info_state"].append(
-          self._state.observation_tensor(player_id) if self._use_observation
-          else self._state.information_state_tensor(player_id))
-
-      observations["legal_actions"].append(self._state.legal_actions(player_id))
-    observations["current_player"] = self._state.current_player()
-
-    return TimeStep(
-        observations=observations,
-        rewards=rewards,
-        discounts=self._discounts,
-        step_type=step_type)
+    return self.get_time_step()
 
   def reset(self):
     """Starts a new sequence and returns the first `TimeStep` of this sequence.
@@ -336,12 +352,12 @@ class Environment(object):
   def game(self):
     return self._game
 
-  def set_state(self, unused_new_state):
+  def set_state(self, new_state):
     """Updates the game state."""
-    # TODO(author3): add set/get state methods
-    pass
+    assert new_state.get_game() == self.game, (
+        "State must have been created by the same game.")
+    self._state = new_state
 
   @property
   def get_state(self):
-    # TODO(author3): add set/get state methods
-    pass
+    return self._state

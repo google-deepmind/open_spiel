@@ -71,7 +71,7 @@ class Policy(object):
     - Only legal actions are present in the mapping, but it does not have to
       be exhaustive: missing actions are considered to be associated to a zero
       probability. This means that one should not iterate over the returned
-      dictionary if they want to iteratve over the full history tree.
+      dictionary if they want to iterate over the full history tree.
       If bugs are caused by this, we can change it to force policies to
       exhaustively give the probabilities for all legal actions.
 
@@ -227,17 +227,7 @@ class TabularPolicy(Policy):
       return str(state)
 
   def action_probabilities(self, state, player_id=None):
-    """Returns the policy for a player in a state.
-
-    Args:
-      state: A `pyspiel.State` object.
-      player_id: Optional, the player id for which we want an action. Optional
-        unless this is a simultaneous state at which multiple players can act.
-
-    Returns:
-      A `dict` of `{action: probability}` for the specified player in the
-      supplied state.
-    """
+    """See base-class. Important: do not iterate over these to walk the tree."""
     policy = self.policy_for_key(self._state_key(state, player_id))
     return {
         action: probability

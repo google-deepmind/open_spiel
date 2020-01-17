@@ -316,6 +316,7 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("num_distinct_actions", &State::NumDistinctActions)
       .def("num_players", &State::NumPlayers)
       .def("chance_outcomes", &State::ChanceOutcomes)
+      .def("get_game", &State::GetGame)
       .def("get_type", &State::GetType)
       .def("serialize", &State::Serialize)
       .def("resample_from_infostate", &State::ResampleFromInfostate)
@@ -346,6 +347,8 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("deserialize_state", &Game::DeserializeState)
       .def("max_game_length", &Game::MaxGameLength)
       .def("__str__", &Game::ToString)
+      .def("__eq__", [](const Game& value, Game* value2) {
+        return value2 && value.ToString() == value2->ToString(); })
       .def(py::pickle(                            // Pickle support
           [](std::shared_ptr<const Game> game) {  // __getstate__
             return game->ToString();

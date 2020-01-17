@@ -38,6 +38,10 @@
 // The action space is as follows:
 //   0..51   Cards, used for both dealing (chance events) and play;
 //   52+     Calls (Pass, Dbl, RDbl, and bids), used during the auction phase.
+//
+// During the play phase, the dummy's cards are played by the declarer (their
+// partner). There will thus be 26 turns for declarer, and 13 turns for each
+// of the defenders during the play.
 
 #include <optional>
 
@@ -120,7 +124,7 @@ class BridgeState : public State {
  public:
   BridgeState(std::shared_ptr<const Game> game, bool use_double_dummy_result,
               bool is_dealer_vulnerable, bool is_non_dealer_vulnerable);
-  Player CurrentPlayer() const override { return current_player_; }
+  Player CurrentPlayer() const override;
   std::string ActionToString(Player player, Action action) const override;
   std::string ToString() const override;
   bool IsTerminal() const override { return phase_ == Phase::kGameOver; }
@@ -159,7 +163,7 @@ class BridgeState : public State {
   int num_passes_ = 0;  // Number of consecutive passes since the last non-pass.
   int num_declarer_tricks_ = 0;
   int num_cards_played_ = 0;
-  Player current_player_ = 0;
+  Player current_player_ = 0;  // During the play phase, the hand to play.
   Phase phase_ = Phase::kDeal;
   Contract contract_{0, kNoTrump, kUndoubled, kInvalidPlayer};
   std::array<std::array<std::optional<Player>, kNumDenominations>,
