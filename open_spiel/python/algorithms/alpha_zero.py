@@ -44,9 +44,6 @@ class AlphaZero(object):
                bot,
                replay_buffer_capacity=int(1e6),
                action_selection_transition=30,
-               num_self_play_games=5000,
-               num_training_epochs=10,
-               batch_size=4096,
                random_state=None):
     """
     Args:
@@ -57,9 +54,6 @@ class AlphaZero(object):
       action_selection_transition: an integer representing the move number in a 
         game of self-play when greedy action selection is used. Before this,
         actions are sampled from the MCTS policy.
-      num_self_play_games: the number of self-play games to play before each
-        training round.
-      num_training_epochs: the num
       batch_size: the number of examples used for a single training update. Note
         that this batch size must be small enough for the neural net training 
         update to fit into device memory.
@@ -90,28 +84,52 @@ class AlphaZero(object):
     self.bot = bot
     self.game = game
     self.replay_buffer = dqn.ReplayBuffer(replay_buffer_capacity)
-    self.num_self_play_games = num_self_play_games
     self.action_selection_transition = action_selection_transition
-    self.batch_size = batch_size
 
-  def update(self):
+  def update(self, num_training_epochs=10, batch_size=128, verbose=False):
+    """Trains the neural net by randomly sampling data (with replacement) from 
+      the replay buffer. An update resets the optimizer state.
 
-    data = self.replay_buffer.sample(self.batch_size, replace=True)
-    (total_loss, policy_loss, value_loss,
-     l2_loss) = self.bot.evaluator.update(data)
-    return LossValues(total=total_loss,
-                      policy=policy_loss,
-                      value=value_loss,
-                      l2=l2_loss)
+    Args:
+      num_training_epochs: An epoch represents one pass over the training data.
+        The total number training iterations this corresponds to is 
+        num_training_epochs * len(replay_buffer)/batch_size.
+      batch_size: the number of examples sampled from the replay buffer and 
+        used for each net training iteration.
+      verbose: whether to print training metrics during training.
 
-  def self_play(self):
-    # the AlphaZero pseudocode resets the optimizer state after a round of
-    # self-play
+    Returns:
+      A list of length num_training_epochs. Each element of this list is 
+        another list containing LossValues tuples, one for every training
+        iteration.
+    """
+    # The AlphaZero pseudocode resets the optimizer state before training.
     optim = self.bot.evaluator.optimizer
     tf.variables_initializer(optim.variables())
     tf.train.get_or_create_global_step().assign(0)
 
-    for _ in range(self.num_self_play_games):
+    num_epoch_iters = math.ceil(len(self.replay_buffer) / float(batch_size))
+    losses = []
+    for epoch in range(num_training_epochs):
+      epoch_losses = []
+      for _ in range(num_epoch_iters):
+        train_data = self.replay_buffer.sample(batch_size, replace=True)
+        epoch_losses.append(self.bot.evaluator.update(train_data))
+
+      losses.append(epoch_losses)
+      if verbose:
+        self._print_mean_epoch_losses(epoch, epoch_losses)
+
+    return losses
+
+  def self_play(self, num_self_play_games=5000):
+    """Uses the current state of the net with MCTS to play full games against  
+
+    Args:
+      num_self_play_games: the number of self-play games to play using the 
+        current net and MCTS.
+    """
+    for _ in range(num_self_play_games):
       self._self_play_single()
 
   def _self_play_single(self):
@@ -149,6 +167,21 @@ class AlphaZero(object):
       _, action = max(explore_counts)
     return action
 
+  def _print_mean_epoch_losses(self, epoch, losses):
+    total_loss, policy_loss, value_loss, l2_loss = 0, 0, 0, 0
+    for l in losses:
+      t, p, v, l2 = l
+      total_loss += t
+      policy_loss += p
+      value_loss += v
+      l2_loss += l2
+
+    loss_str = "Epoch {0} mean losses. Total: {1:.3g}, Policy: {2:.3g}, Value: {3:.3g}, L2: {4:.3g}"
+    n = float(len(losses))
+    print(
+        loss_str.format(epoch, total_loss / n, policy_loss / n, value_loss / n,
+                        l2_loss / n))
+
 
 def alpha_zero_ucb_score(child, parent_explore_count, params):
   c_init, c_base = params
@@ -157,10 +190,8 @@ def alpha_zero_ucb_score(child, parent_explore_count, params):
 
   c = math.log((parent_explore_count + c_base + 1) / c_base) + c_init
   c *= math.sqrt(parent_explore_count) / (child.explore_count + 1)
-
   prior_score = c * child.prior
   value_score = child.explore_count and child.total_reward / child.explore_count
-
   return prior_score + value_score
 
 
@@ -171,24 +202,19 @@ def np_softmax(logits):
 
 
 class AlphaZeroKerasEvaluator(mcts.TrainableEvaluator):
-  """Implements a 
-  """
 
-  def __init__(
-      self,
-      keras_model,
-      l2_regularization=1e-4,
-      #TODO: generalize optimizer
-      optimizer=tf.train.MomentumOptimizer(2e-1, momentum=0.9),
-      device='cpu',
-      feature_extractor=None,
-      cache_size=None):
+  def __init__(self,
+               keras_model,
+               l2_regularization=1e-4,
+               optimizer=tf.train.AdamOptimizer(learning_rate=0.005),
+               device='cpu',
+               feature_extractor=None,
+               cache_size=None):
     """
     Args:
       keras_model: a Keras Model object.
       l2_regularization: the amount of l2 regularization to use during training.
-      optimizer: the number of self-play games to play before each
-        training round.
+      optimizer: a TensorFlow optimizer object.
       device: The device used to run the keras_model during evaluation and 
         training. Possible values are 'cpu', 'gpu', or a tf.device(...) object.
       feature_extractor: a function which takes as argument the game state and 
@@ -274,7 +300,7 @@ class AlphaZeroKerasEvaluator(mcts.TrainableEvaluator):
       self.optimizer.apply_gradients(
           zip(grads, self.model.trainable_variables),
           global_step=tf.train.get_or_create_global_step())
- 
+
     return LossValues(total=float(loss),
                       policy=float(loss_policy),
                       value=float(loss_value),

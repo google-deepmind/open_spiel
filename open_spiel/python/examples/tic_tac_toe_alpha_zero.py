@@ -53,6 +53,11 @@ flags.DEFINE_integer("batch_size", 128,
 flags.DEFINE_integer("replay_buffer_capacity", 50000,
                      "The size of the replay buffer.")
 
+flags.DEFINE_integer(
+    "evaluation_frequency", 3,
+    "The current net will be evaluated against a minimax player every \
+      evaluation_frequency rounds.")
+
 flags.DEFINE_string(
     "net_type", "mlp",
     "The type of network to use. Can be either 'mlp' or 'resnet.")
@@ -76,32 +81,19 @@ class MinimaxBot(pyspiel.Bot):
     return action
 
 
-def evaluate_bots():
-  print("Score RandomBot0: ",
-        mean_bot_score(game, [rand_bot0, a0.bot], num_evaluations=40))
+def bot_evaluation(game, bots, num_evaluations):
+  '''Returns a tuple (wins, losses, draws) for player 2.'''
+  wins, losses, draws = 0, 0, 0
+  for i in range(num_evaluations):
+    [_, result] = pyspiel.evaluate_bots(game.new_initial_state(), bots, i)
+    if result == 0:
+      draws += 1
+    elif result == 1:
+      wins += 1
+    else:
+      losses += 1
 
-
-def mean_bot_score(game, bots, num_evaluations=100):
-  results = np.array([
-      pyspiel.evaluate_bots(game.new_initial_state(), bots, iteration)
-      for iteration in range(num_evaluations)
-  ])
-  return np.mean(results, axis=0)
-
-
-def mean_losses(losses):
-  total_loss, policy_loss, value_loss, l2_loss = 0, 0, 0, 0
-  for l in losses:
-    t, p, v, l2 = l
-    total_loss += t
-    policy_loss += p
-    value_loss += v
-    l2_loss += l2
-  return alpha_zero.LossValues(total=float('%.3g' % (total_loss / len(losses))),
-                               policy=float('%.3g' %
-                                            (policy_loss / len(losses))),
-                               value=float('%.3g' % (value_loss / len(losses))),
-                               l2=float('%.3g' % (l2_loss / len(losses))))
+  return (wins, losses, draws)
 
 
 def mlp_feature_extractor(state):
@@ -140,25 +132,20 @@ def main(_):
       device=FLAGS.device,
       feature_extractor=feature_extractor)
 
-  bot = mcts.MCTSBot(
-      game,
-      # (1.25, 19652),
-      1.,
-      20,
-      evaluator,
-      solve=False,
-      #  child_selection_fn=alpha_zero.alpha_zero_ucb_score,
-      dirichlet_noise=(0.25, 1.))
+  bot = mcts.MCTSBot(game,
+                     1.,
+                     20,
+                     evaluator,
+                     solve=False,
+                     dirichlet_noise=(0.25, 1.))
 
   # 3. Build an AlphaZero instance
   a0 = alpha_zero.AlphaZero(game,
                             bot,
                             replay_buffer_capacity=FLAGS.replay_buffer_capacity,
-                            action_selection_transition=4,
-                            num_self_play_games=FLAGS.num_self_play_games,
-                            batch_size=FLAGS.batch_size)
+                            action_selection_transition=4)
 
-  # 4. Create a bot using min-max search. It can never lose tic-tac-toe, so 
+  # 4. Create a bot using min-max search. It can never lose tic-tac-toe, so
   # a success condition for our AlphaZero bot is to draw all games with it.
   minimax_bot = MinimaxBot(game)
 
@@ -167,28 +154,22 @@ def main(_):
     logging.info("------------- Starting round %s out of %s -------------",
                  num_round, FLAGS.num_rounds)
 
-    # 5.a: 
-    if num_round % 3 == 0:
-      print("Result against Minimax player: %s draws and %s losses.",
-            mean_bot_score(game, [minimax_bot, a0.bot], num_evaluations=50))
+    if num_round % FLAGS.evaluation_frequency == 0:
+      num_evaluations = 50
+      logging.info("Playing %s games against the minimax player.",
+                   num_evaluations)
+      (_, losses, draws) = bot_evaluation(game, [minimax_bot, a0.bot],
+                                          num_evaluations=50)
+      logging.info("Result against Minimax player: %s losses and %s draws.",
+                   losses, draws)
 
     logging.info("Running %s games of self play", FLAGS.num_self_play_games)
-    a0.self_play()
-
-    num_training_updates = math.ceil(
-        len(a0.replay_buffer) / float(a0.batch_size))
-    logging.info("Training net on replay buffer for %s epochs",
-                 FLAGS.num_training_epochs)
-
-    for epoch in range(FLAGS.num_training_epochs):
-      losses = []
-      for _ in range(1, num_training_updates + 1):
-        batch_losses = a0.update()
-        losses.append(batch_losses)
-
-      m_losses = mean_losses(losses)
-      logging.info("     [%s/%s] %s", epoch, FLAGS.num_training_epochs,
-                   m_losses)
+    a0.self_play(num_self_play_games=FLAGS.num_self_play_games)
+    
+    logging.info("Training the net for %s epochs.", FLAGS.num_training_epochs)
+    a0.update(FLAGS.num_training_epochs,
+              batch_size=FLAGS.batch_size,
+              verbose=True)
 
 
 if __name__ == "__main__":
