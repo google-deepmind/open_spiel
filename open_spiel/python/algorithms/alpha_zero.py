@@ -37,7 +37,7 @@ LossValues = collections.namedtuple("LossValues", "total policy value l2")
 
 class AlphaZero(object):
   """AlphaZero implementation following the pseudocode AlphaZero implementation
-  given in the paper with DOI 10.1126/science.aar6404."""
+  given in the paper DOI:10.1126/science.aar6404."""
 
   def __init__(self,
                game,
@@ -45,6 +45,7 @@ class AlphaZero(object):
                replay_buffer_capacity=int(1e6),
                action_selection_transition=30,
                num_self_play_games=5000,
+               num_training_epochs=10,
                batch_size=4096,
                random_state=None):
     """
@@ -58,6 +59,7 @@ class AlphaZero(object):
         actions are sampled from the MCTS policy.
       num_self_play_games: the number of self-play games to play before each
         training round.
+      num_training_epochs: the num
       batch_size: the number of examples used for a single training update. Note
         that this batch size must be small enough for the neural net training 
         update to fit into device memory.
@@ -89,10 +91,11 @@ class AlphaZero(object):
     self.game = game
     self.replay_buffer = dqn.ReplayBuffer(replay_buffer_capacity)
     self.num_self_play_games = num_self_play_games
-    self._action_selection_transition = action_selection_transition
+    self.action_selection_transition = action_selection_transition
     self.batch_size = batch_size
 
   def update(self):
+
     data = self.replay_buffer.sample(self.batch_size, replace=True)
     (total_loss, policy_loss, value_loss,
      l2_loss) = self.bot.evaluator.update(data)
@@ -102,9 +105,14 @@ class AlphaZero(object):
                       l2=l2_loss)
 
   def self_play(self):
-    # optim = a0.bot.evaluator.optimizer
-    # tf.variables_initializer(optim.variables())
-    return [self._self_play_single() for _ in range(self.num_self_play_games)]
+    # the AlphaZero pseudocode resets the optimizer state after a round of
+    # self-play
+    optim = self.bot.evaluator.optimizer
+    tf.variables_initializer(optim.variables())
+    tf.train.get_or_create_global_step().assign(0)
+
+    for _ in range(self.num_self_play_games):
+      self._self_play_single()
 
   def _self_play_single(self):
     state = self.game.new_initial_state()
@@ -131,11 +139,9 @@ class AlphaZero(object):
                      target_policy=pol,
                      target_value=value))
 
-    return terminal_rewards
-
   def _select_action(self, children, game_history_len):
     explore_counts = [(child.explore_count, child.action) for child in children]
-    if game_history_len < self._action_selection_transition:
+    if game_history_len < self.action_selection_transition:
       probs = np_softmax(np.array([i[0] for i in explore_counts]))
       action_index = np.random.choice(range(len(probs)), p=probs)
       action = explore_counts[action_index][1]
@@ -238,9 +244,12 @@ class AlphaZeroKerasEvaluator(mcts.TrainableEvaluator):
 
     # value is required to be array over players
     value = value[0, 0].numpy()
-    value = np.array([value, -value])
+    if state.current_player() == 0:
+      values = np.array([value, -value])
+    else:
+      values = np.array([-value, value])
 
-    return (value, policy)
+    return (values, policy)
 
   def update(self, training_examples):
     state_features = np.vstack([f for (f, _, _) in training_examples])
@@ -261,10 +270,11 @@ class AlphaZeroKerasEvaluator(mcts.TrainableEvaluator):
         loss = loss_policy + loss_value + loss_l2
 
       grads = tape.gradient(loss, self.model.trainable_variables)
+
       self.optimizer.apply_gradients(
           zip(grads, self.model.trainable_variables),
           global_step=tf.train.get_or_create_global_step())
-
+ 
     return LossValues(total=float(loss),
                       policy=float(loss_policy),
                       value=float(loss_value),
@@ -285,7 +295,8 @@ def keras_resnet(input_shape,
                  num_residual_blocks=19,
                  num_filters=256,
                  value_head_hidden_size=256,
-                 activation='relu'):
+                 activation='relu',
+                 data_format="channels_last"):
   """
   This ResNet implementation copies as closely as possible the
   description found in the Methods section of the AlphaGo Zero Nature paper.
@@ -302,22 +313,28 @@ def keras_resnet(input_shape,
     value_head_hidden_size: the number of hidden units in the value head dense layer.
     activation: the activation function to use in the net. Does not affect the 
       final tanh activation in the value head.
+    data_format: Can take values 'channels_first' or 'channels_last' (default).
+      Which input dimension to interpret as the channel dimension. The input
+      is (1, channel, width, height) with (1, width, height, channel)
   Returns:
     A keras Model with a single input and two outputs (value head, policy head).
     The policy is a flat distribution over actions.
   """
   inputs = tf.keras.Input(shape=input_shape, name='input')
-  body = _resnet_body(inputs,
-                      num_filters=num_filters,
-                      num_residual_blocks=num_residual_blocks,
-                      kernel_size=3,
-                      activation=activation)
-  value_head = _resnet_value_head(body,
+  x = inputs
+  # Note: Keras with TensorFlow 1.15 does not support the data_format arg on CPU
+  # for convolutions. Hence why this transpose is needed.
+  if data_format == "channels_first":
+    x = tf.keras.backend.permute_dimensions(inputs, (0, 2, 3, 1))
+  x = _resnet_body(x,
+                   num_filters=num_filters,
+                   num_residual_blocks=num_residual_blocks,
+                   kernel_size=3,
+                   activation=activation)
+  value_head = _resnet_value_head(x,
                                   hidden_size=value_head_hidden_size,
                                   activation=activation)
-  policy_head = _resnet_mlp_policy_head(body,
-                                        num_actions,
-                                        activation=activation)
+  policy_head = _resnet_mlp_policy_head(x, num_actions, activation=activation)
   return tf.keras.Model(inputs=inputs, outputs=[value_head, policy_head])
 
 
