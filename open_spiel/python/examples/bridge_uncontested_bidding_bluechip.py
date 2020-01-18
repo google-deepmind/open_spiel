@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# pylint: disable=line-too-long
+# Lint as python3
 r"""Two BlueChip bridge bots bid with each other.
 
 The bot_cmd FLAG should contain a command-line to launch an external bot, e.g.
@@ -20,11 +20,6 @@ The bot_cmd FLAG should contain a command-line to launch an external bot, e.g.
 
 """
 # pylint: enable=line-too-long
-
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import google_type_annotations
-from __future__ import print_function
 
 import re
 import socket
@@ -34,7 +29,7 @@ from absl import app
 from absl import flags
 import numpy as np
 
-from open_spiel.python.bots import bluechip_bridge_wrapper
+from open_spiel.python.bots import bluechip_bridge_uncontested_bidding
 import pyspiel
 
 FLAGS = flags.FLAGS
@@ -50,7 +45,7 @@ flags.DEFINE_string(
 def _run_once(state, bots):
   """Plays bots with each other, returns terminal utility for each player."""
   for bot in bots:
-    bot.restart(state)
+    bot.restart_at(state)
   while not state.is_terminal():
     if state.is_chance_node():
       outcomes, probs = zip(*state.chance_outcomes())
@@ -69,10 +64,10 @@ def main(argv):
           "rng_seed": pyspiel.GameParameter(FLAGS.rng_seed),
       })
   bots = [
-      bluechip_bridge_wrapper.BlueChipBridgeBot(game, 0,
-                                                _WBridge5Client(FLAGS.bot_cmd)),
-      bluechip_bridge_wrapper.BlueChipBridgeBot(game, 1,
-                                                _WBridge5Client(FLAGS.bot_cmd)),
+      bluechip_bridge_uncontested_bidding.BlueChipBridgeBot(
+          game, 0, _WBridge5Client(FLAGS.bot_cmd)),
+      bluechip_bridge_uncontested_bidding.BlueChipBridgeBot(
+          game, 1, _WBridge5Client(FLAGS.bot_cmd)),
   ]
   results = []
 
@@ -112,12 +107,12 @@ class _WBridge5Client(object):
       data = self.conn.recv(1024)
       if not data:
         raise EOFError("Connection closed")
-      line += data
+      line += data.decode("ascii")
       if line.endswith("\n"):
         return re.sub(r"\s+", " ", line).strip()
 
   def send_line(self, line):
-    self.conn.send(line + "\r\n")
+    self.conn.send((line + "\r\n").encode("ascii"))
 
 
 if __name__ == "__main__":
