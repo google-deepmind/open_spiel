@@ -150,6 +150,19 @@ std::string BridgeState::ToString() const {
       if (player.has_value()) cards[*player][suit].push_back(kRankChar[rank]);
     }
   }
+  // Report the original deal in the terminal state, so that we can easily
+  // follow the play.
+  if (phase_ == Phase::kGameOver && !use_double_dummy_result_) {
+    std::array<Player, kNumCards> deal{};
+    for (int i = 0; i < kNumCards; ++i) deal[history_[i]] = (i % kNumPlayers);
+    for (int suit = 0; suit < kNumSuits; ++suit) {
+      for (int rank = kNumCardsPerSuit - 1; rank >= 0; --rank) {
+        const auto player = deal[Card(Suit(suit), rank)];
+        cards[player][suit].push_back(kRankChar[rank]);
+      }
+    }
+  }
+  // Format the hands
   for (int suit = 0; suit < kNumSuits; ++suit) {
     for (int player = 0; player < kNumPlayers; ++player) {
       if (cards[player][suit].empty()) cards[player][suit] = "none";
@@ -466,7 +479,7 @@ std::vector<std::pair<Action, double>> BridgeState::ChanceOutcomes() const {
   outcomes.reserve(num_cards_remaining);
   const double p = 1.0 / static_cast<double>(num_cards_remaining);
   for (int card = 0; card < kNumCards; ++card) {
-    if (holder_[card] == current_player_) outcomes.emplace_back(card, p);
+    if (!holder_[card].has_value()) outcomes.emplace_back(card, p);
   }
   return outcomes;
 }
@@ -564,8 +577,10 @@ void BridgeState::ApplyPlayAction(int card) {
 }
 
 Player BridgeState::CurrentPlayer() const {
-  if (phase_ == Phase::kPlay &&
-      Partnership(current_player_) == Partnership(contract_.declarer)) {
+  if (phase_ == Phase::kDeal) {
+    return kChancePlayerId;
+  } else if (phase_ == Phase::kPlay &&
+             Partnership(current_player_) == Partnership(contract_.declarer)) {
     // Declarer chooses cards for both players.
     return contract_.declarer;
   } else {
