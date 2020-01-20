@@ -12,20 +12,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Lint as python3
 """Functions to manipulate game playthoughs.
 
 Used by examples/playthrough.py and tests/playthrough_test.py.
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import os
 import re
 import numpy as np
 
+from open_spiel.python.games import tic_tac_toe
 import pyspiel
+
+
+def _load_game(game_string):
+  """Loads a game, including special-cases for Python-implemented games."""
+  if game_string == "python_tic_tac_toe":
+    return tic_tac_toe.TicTacToeGame()
+  else:
+    return pyspiel.load_game(game_string)
 
 
 def _escape(x):
@@ -72,7 +78,7 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None):
   else:
     add_line = lines.append
 
-  game = pyspiel.load_game(game_string)
+  game = _load_game(game_string)
   add_line("game: {}".format(game_string))
   seed = np.random.randint(2**32 - 1)
 

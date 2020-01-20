@@ -203,7 +203,16 @@ PYBIND11_MODULE(pyspiel, m) {
       .def(py::init<std::string, std::string, GameType::Dynamics,
                     GameType::ChanceMode, GameType::Information,
                     GameType::Utility, GameType::RewardModel, int, int, bool,
-                    bool, bool, bool, std::map<std::string, GameParameter>>())
+                    bool, bool, bool, std::map<std::string, GameParameter>>(),
+           py::arg("short_name"), py::arg("long_name"), py::arg("dynamics"),
+           py::arg("chance_mode"), py::arg("information"), py::arg("utility"),
+           py::arg("reward_model"), py::arg("max_num_players"),
+           py::arg("min_num_players"),
+           py::arg("provides_information_state_string"),
+           py::arg("provides_information_state_tensor"),
+           py::arg("provides_observation_string"),
+           py::arg("provides_observation_tensor"),
+           py::arg("parameter_specification"))
       .def_readonly("short_name", &GameType::short_name)
       .def_readonly("long_name", &GameType::long_name)
       .def_readonly("dynamics", &GameType::dynamics)
