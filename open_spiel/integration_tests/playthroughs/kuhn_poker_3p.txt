@@ -39,15 +39,15 @@ CurrentPlayer() = -1
 InformationStateString(0) = ""
 InformationStateString(1) = ""
 InformationStateString(2) = ""
-InformationStateTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateTensor(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+InformationStateTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(2): ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationString(0) = ""
 ObservationString(1) = ""
 ObservationString(2) = ""
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0]
-ObservationTensor(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0]
+ObservationTensor(0): ◉◯◯◯◯◯◯◉◉◉
+ObservationTensor(1): ◯◉◯◯◯◯◯◉◉◉
+ObservationTensor(2): ◯◯◉◯◯◯◯◉◉◉
 ChanceOutcomes() = [{0, 0.250000000000}, {1, 0.250000000000}, {2, 0.250000000000}, {3, 0.250000000000}]
 LegalActions() = [0, 1, 2, 3]
 StringLegalActions() = ["Deal:0", "Deal:1", "Deal:2", "Deal:3"]
@@ -66,15 +66,15 @@ CurrentPlayer() = -1
 InformationStateString(0) = "1"
 InformationStateString(1) = ""
 InformationStateString(2) = ""
-InformationStateTensor(0) = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateTensor(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+InformationStateTensor(0): ◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(2): ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationString(0) = "1111"
 ObservationString(1) = ""
 ObservationString(2) = ""
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0]
-ObservationTensor(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0]
+ObservationTensor(0): ◉◯◯◯◉◯◯◉◉◉
+ObservationTensor(1): ◯◉◯◯◯◯◯◉◉◉
+ObservationTensor(2): ◯◯◉◯◯◯◯◉◉◉
 ChanceOutcomes() = [{0, 0.333333333333}, {2, 0.333333333333}, {3, 0.333333333333}]
 LegalActions() = [0, 2, 3]
 StringLegalActions() = ["Deal:0", "Deal:2", "Deal:3"]
@@ -93,15 +93,15 @@ CurrentPlayer() = -1
 InformationStateString(0) = "1"
 InformationStateString(1) = "3"
 InformationStateString(2) = ""
-InformationStateTensor(0) = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateTensor(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+InformationStateTensor(0): ◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(1): ◯◉◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(2): ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationString(0) = "1111"
 ObservationString(1) = "3111"
 ObservationString(2) = ""
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0]
-ObservationTensor(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0]
+ObservationTensor(0): ◉◯◯◯◉◯◯◉◉◉
+ObservationTensor(1): ◯◉◯◯◯◯◉◉◉◉
+ObservationTensor(2): ◯◯◉◯◯◯◯◉◉◉
 ChanceOutcomes() = [{0, 0.500000000000}, {2, 0.500000000000}]
 LegalActions() = [0, 2]
 StringLegalActions() = ["Deal:0", "Deal:2"]
@@ -120,15 +120,15 @@ CurrentPlayer() = 0
 InformationStateString(0) = "1"
 InformationStateString(1) = "3"
 InformationStateString(2) = "2"
-InformationStateTensor(0) = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateTensor(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+InformationStateTensor(0): ◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(1): ◯◉◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(2): ◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯
 ObservationString(0) = "1111"
 ObservationString(1) = "3111"
 ObservationString(2) = "2111"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0]
-ObservationTensor(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0]
+ObservationTensor(0): ◉◯◯◯◉◯◯◉◉◉
+ObservationTensor(1): ◯◉◯◯◯◯◉◉◉◉
+ObservationTensor(2): ◯◯◉◯◯◉◯◉◉◉
 Rewards() = [0.0, 0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [0, 1]
@@ -148,15 +148,15 @@ CurrentPlayer() = 1
 InformationStateString(0) = "1p"
 InformationStateString(1) = "3p"
 InformationStateString(2) = "2p"
-InformationStateTensor(0) = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateTensor(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+InformationStateTensor(0): ◉◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯
+InformationStateTensor(1): ◯◉◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯
+InformationStateTensor(2): ◯◯◉◯◯◉◯◉◯◯◯◯◯◯◯◯◯
 ObservationString(0) = "1111"
 ObservationString(1) = "3111"
 ObservationString(2) = "2111"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0]
-ObservationTensor(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0]
+ObservationTensor(0): ◉◯◯◯◉◯◯◉◉◉
+ObservationTensor(1): ◯◉◯◯◯◯◉◉◉◉
+ObservationTensor(2): ◯◯◉◯◯◉◯◉◉◉
 Rewards() = [0.0, 0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [0, 1]
@@ -176,15 +176,15 @@ CurrentPlayer() = 2
 InformationStateString(0) = "1pp"
 InformationStateString(1) = "3pp"
 InformationStateString(2) = "2pp"
-InformationStateTensor(0) = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateTensor(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+InformationStateTensor(0): ◉◯◯◯◉◯◯◉◯◉◯◯◯◯◯◯◯
+InformationStateTensor(1): ◯◉◯◯◯◯◉◉◯◉◯◯◯◯◯◯◯
+InformationStateTensor(2): ◯◯◉◯◯◉◯◉◯◉◯◯◯◯◯◯◯
 ObservationString(0) = "1111"
 ObservationString(1) = "3111"
 ObservationString(2) = "2111"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0]
-ObservationTensor(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0]
+ObservationTensor(0): ◉◯◯◯◉◯◯◉◉◉
+ObservationTensor(1): ◯◉◯◯◯◯◉◉◉◉
+ObservationTensor(2): ◯◯◉◯◯◉◯◉◉◉
 Rewards() = [0.0, 0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [0, 1]
@@ -204,9 +204,9 @@ CurrentPlayer() = 0
 InformationStateString(0) = "1ppb"
 InformationStateString(1) = "3ppb"
 InformationStateString(2) = "2ppb"
-InformationStateTensor(0) = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateTensor(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0]
+InformationStateTensor(0): ◉◯◯◯◉◯◯◉◯◉◯◯◉◯◯◯◯
+InformationStateTensor(1): ◯◉◯◯◯◯◉◉◯◉◯◯◉◯◯◯◯
+InformationStateTensor(2): ◯◯◉◯◯◉◯◉◯◉◯◯◉◯◯◯◯
 ObservationString(0) = "1112"
 ObservationString(1) = "3112"
 ObservationString(2) = "2112"
@@ -232,9 +232,9 @@ CurrentPlayer() = 1
 InformationStateString(0) = "1ppbb"
 InformationStateString(1) = "3ppbb"
 InformationStateString(2) = "2ppbb"
-InformationStateTensor(0) = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0]
-InformationStateTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0]
-InformationStateTensor(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0]
+InformationStateTensor(0): ◉◯◯◯◉◯◯◉◯◉◯◯◉◯◉◯◯
+InformationStateTensor(1): ◯◉◯◯◯◯◉◉◯◉◯◯◉◯◉◯◯
+InformationStateTensor(2): ◯◯◉◯◯◉◯◉◯◉◯◯◉◯◉◯◯
 ObservationString(0) = "1212"
 ObservationString(1) = "3212"
 ObservationString(2) = "2212"
@@ -260,9 +260,9 @@ CurrentPlayer() = -4
 InformationStateString(0) = "1ppbbp"
 InformationStateString(1) = "3ppbbp"
 InformationStateString(2) = "2ppbbp"
-InformationStateTensor(0) = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0]
-InformationStateTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0]
-InformationStateTensor(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0]
+InformationStateTensor(0): ◉◯◯◯◉◯◯◉◯◉◯◯◉◯◉◉◯
+InformationStateTensor(1): ◯◉◯◯◯◯◉◉◯◉◯◯◉◯◉◉◯
+InformationStateTensor(2): ◯◯◉◯◯◉◯◉◯◉◯◯◉◯◉◉◯
 ObservationString(0) = "1212"
 ObservationString(1) = "3212"
 ObservationString(2) = "2212"

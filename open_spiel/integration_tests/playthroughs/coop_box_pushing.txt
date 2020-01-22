@@ -47,8 +47,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions(0) = [0, 1, 2, 3]
@@ -79,8 +79,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -108,8 +108,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -137,8 +137,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -166,8 +166,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-0.1, -0.1]
 LegalActions(0) = [0, 1, 2, 3]
@@ -198,8 +198,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -227,8 +227,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -256,8 +256,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -285,8 +285,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-0.2, -0.2]
 LegalActions(0) = [0, 1, 2, 3]
@@ -317,8 +317,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -346,8 +346,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -375,8 +375,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -404,8 +404,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-0.30000000000000004, -0.30000000000000004]
 LegalActions(0) = [0, 1, 2, 3]
@@ -436,8 +436,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -465,8 +465,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -494,8 +494,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -523,8 +523,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-0.4, -0.4]
 LegalActions(0) = [0, 1, 2, 3]
@@ -555,8 +555,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -584,8 +584,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -613,8 +613,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -642,8 +642,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-0.5, -0.5]
 LegalActions(0) = [0, 1, 2, 3]
@@ -674,8 +674,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -703,8 +703,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -732,8 +732,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -761,8 +761,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-0.6, -0.6]
 LegalActions(0) = [0, 1, 2, 3]
@@ -793,8 +793,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -822,8 +822,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -851,8 +851,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -880,8 +880,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-0.7, -0.7]
 LegalActions(0) = [0, 1, 2, 3]
@@ -912,8 +912,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -941,8 +941,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -970,8 +970,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -999,8 +999,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-0.7999999999999999, -0.7999999999999999]
 LegalActions(0) = [0, 1, 2, 3]
@@ -1031,8 +1031,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -1060,8 +1060,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -1089,8 +1089,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -1118,8 +1118,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-0.8999999999999999, -0.8999999999999999]
 LegalActions(0) = [0, 1, 2, 3]
@@ -1150,8 +1150,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -1179,8 +1179,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -1208,8 +1208,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -1237,8 +1237,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-0.9999999999999999, -0.9999999999999999]
 LegalActions(0) = [0, 1, 2, 3]
@@ -1269,8 +1269,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -1298,8 +1298,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -1327,8 +1327,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -1356,8 +1356,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-1.0999999999999999, -1.0999999999999999]
 LegalActions(0) = [0, 1, 2, 3]
@@ -1388,8 +1388,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -1417,8 +1417,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -1446,8 +1446,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -1475,8 +1475,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-1.2, -1.2]
 LegalActions(0) = [0, 1, 2, 3]
@@ -1507,8 +1507,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -1536,8 +1536,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -1565,8 +1565,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -1594,8 +1594,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-1.3, -1.3]
 LegalActions(0) = [0, 1, 2, 3]
@@ -1626,8 +1626,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -1655,8 +1655,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -1684,8 +1684,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -1713,8 +1713,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-1.4000000000000001, -1.4000000000000001]
 LegalActions(0) = [0, 1, 2, 3]
@@ -1745,8 +1745,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -1774,8 +1774,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -1803,8 +1803,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -1832,8 +1832,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-1.5000000000000002, -1.5000000000000002]
 LegalActions(0) = [0, 1, 2, 3]
@@ -1864,8 +1864,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -1893,8 +1893,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -1922,8 +1922,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -1951,8 +1951,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-1.6000000000000003, -1.6000000000000003]
 LegalActions(0) = [0, 1, 2, 3]
@@ -1983,8 +1983,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -2012,8 +2012,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -2041,8 +2041,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -2070,8 +2070,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-1.7000000000000004, -1.7000000000000004]
 LegalActions(0) = [0, 1, 2, 3]
@@ -2102,8 +2102,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -2131,8 +2131,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -2160,8 +2160,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -2189,8 +2189,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-1.8000000000000005, -1.8000000000000005]
 LegalActions(0) = [0, 1, 2, 3]
@@ -2221,8 +2221,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -2250,8 +2250,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -2279,8 +2279,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -2308,8 +2308,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-1.9000000000000006, -1.9000000000000006]
 LegalActions(0) = [0, 1, 2, 3]
@@ -2340,8 +2340,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -2369,8 +2369,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -2398,8 +2398,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -2427,8 +2427,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-2.0000000000000004, -2.0000000000000004]
 LegalActions(0) = [0, 1, 2, 3]
@@ -2459,8 +2459,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -2488,8 +2488,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -2517,8 +2517,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -2546,8 +2546,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-2.1000000000000005, -2.1000000000000005]
 LegalActions(0) = [0, 1, 2, 3]
@@ -2578,8 +2578,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -2607,8 +2607,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -2636,8 +2636,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -2665,8 +2665,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-2.2000000000000006, -2.2000000000000006]
 LegalActions(0) = [0, 1, 2, 3]
@@ -2697,8 +2697,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -2726,8 +2726,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -2755,8 +2755,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -2784,8 +2784,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-2.3000000000000007, -2.3000000000000007]
 LegalActions(0) = [0, 1, 2, 3]
@@ -2816,8 +2816,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -2845,8 +2845,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -2874,8 +2874,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -2903,8 +2903,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-2.400000000000001, -2.400000000000001]
 LegalActions(0) = [0, 1, 2, 3]
@@ -2935,8 +2935,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -2964,8 +2964,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -2993,8 +2993,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -3022,8 +3022,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-2.500000000000001, -2.500000000000001]
 LegalActions(0) = [0, 1, 2, 3]
@@ -3054,8 +3054,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -3083,8 +3083,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -3112,8 +3112,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -3141,8 +3141,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-2.600000000000001, -2.600000000000001]
 LegalActions(0) = [0, 1, 2, 3]
@@ -3173,8 +3173,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -3202,8 +3202,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -3231,8 +3231,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -3260,8 +3260,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "other agent"
 ObservationString(1) = "field"
-ObservationTensor(0) = [0.0, 0.0, 1.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◯◯◉◯◯
+ObservationTensor(1): ◉◯◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-2.700000000000001, -2.700000000000001]
 LegalActions(0) = [0, 1, 2, 3]
@@ -3292,8 +3292,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "other agent"
 ObservationString(1) = "field"
-ObservationTensor(0) = [0.0, 0.0, 1.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◯◯◉◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -3321,8 +3321,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "other agent"
 ObservationString(1) = "field"
-ObservationTensor(0) = [0.0, 0.0, 1.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◯◯◉◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -3350,8 +3350,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "other agent"
 ObservationString(1) = "field"
-ObservationTensor(0) = [0.0, 0.0, 1.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◯◯◉◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -3379,8 +3379,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "other agent"
 ObservationString(1) = "field"
-ObservationTensor(0) = [0.0, 0.0, 1.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◯◯◉◯◯
+ObservationTensor(1): ◉◯◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-2.800000000000001, -2.800000000000001]
 LegalActions(0) = [0, 1, 2, 3]
@@ -3411,8 +3411,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "other agent"
 ObservationString(1) = "field"
-ObservationTensor(0) = [0.0, 0.0, 1.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◯◯◉◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -3440,8 +3440,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "other agent"
 ObservationString(1) = "field"
-ObservationTensor(0) = [0.0, 0.0, 1.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◯◯◉◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -3469,8 +3469,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "other agent"
 ObservationString(1) = "field"
-ObservationTensor(0) = [0.0, 0.0, 1.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◯◯◉◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -3498,8 +3498,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "other agent"
 ObservationString(1) = "field"
-ObservationTensor(0) = [0.0, 0.0, 1.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◯◯◉◯◯
+ObservationTensor(1): ◉◯◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-2.9000000000000012, -2.9000000000000012]
 LegalActions(0) = [0, 1, 2, 3]
@@ -3530,8 +3530,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "other agent"
 ObservationString(1) = "field"
-ObservationTensor(0) = [0.0, 0.0, 1.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◯◯◉◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -3559,8 +3559,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "other agent"
 ObservationString(1) = "field"
-ObservationTensor(0) = [0.0, 0.0, 1.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◯◯◉◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -3588,8 +3588,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "other agent"
 ObservationString(1) = "field"
-ObservationTensor(0) = [0.0, 0.0, 1.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◯◯◉◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -3617,8 +3617,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-3.0000000000000013, -3.0000000000000013]
 LegalActions(0) = [0, 1, 2, 3]
@@ -3649,8 +3649,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -3678,8 +3678,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -3707,8 +3707,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -3736,8 +3736,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-3.1000000000000014, -3.1000000000000014]
 LegalActions(0) = [0, 1, 2, 3]
@@ -3768,8 +3768,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -3797,8 +3797,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -3826,8 +3826,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -3855,8 +3855,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "other agent"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 1.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◉◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-3.2000000000000015, -3.2000000000000015]
 LegalActions(0) = [0, 1, 2, 3]
@@ -3887,8 +3887,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "other agent"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 1.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◉◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -3916,8 +3916,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "other agent"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 1.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◉◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -3945,8 +3945,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "other agent"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 1.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◉◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -3974,8 +3974,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-3.3000000000000016, -3.3000000000000016]
 LegalActions(0) = [0, 1, 2, 3]
@@ -4006,8 +4006,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -4035,8 +4035,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -4064,8 +4064,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -4093,8 +4093,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-3.4000000000000017, -3.4000000000000017]
 LegalActions(0) = [0, 1, 2, 3]
@@ -4125,8 +4125,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -4154,8 +4154,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -4183,8 +4183,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -4212,8 +4212,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-3.5000000000000018, -3.5000000000000018]
 LegalActions(0) = [0, 1, 2, 3]
@@ -4244,8 +4244,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -4273,8 +4273,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -4302,8 +4302,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -4331,8 +4331,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-3.600000000000002, -3.600000000000002]
 LegalActions(0) = [0, 1, 2, 3]
@@ -4363,8 +4363,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -4392,8 +4392,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -4421,8 +4421,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -4450,8 +4450,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-3.700000000000002, -3.700000000000002]
 LegalActions(0) = [0, 1, 2, 3]
@@ -4482,8 +4482,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -4511,8 +4511,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -4540,8 +4540,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -4569,8 +4569,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-3.800000000000002, -3.800000000000002]
 LegalActions(0) = [0, 1, 2, 3]
@@ -4601,8 +4601,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -4630,8 +4630,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -4659,8 +4659,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -4688,8 +4688,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-3.900000000000002, -3.900000000000002]
 LegalActions(0) = [0, 1, 2, 3]
@@ -4720,8 +4720,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -4749,8 +4749,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -4778,8 +4778,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -4807,8 +4807,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-4.000000000000002, -4.000000000000002]
 LegalActions(0) = [0, 1, 2, 3]
@@ -4839,8 +4839,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -4868,8 +4868,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -4897,8 +4897,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -4926,8 +4926,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-4.100000000000001, -4.100000000000001]
 LegalActions(0) = [0, 1, 2, 3]
@@ -4958,8 +4958,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -4987,8 +4987,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -5016,8 +5016,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -5045,8 +5045,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-4.200000000000001, -4.200000000000001]
 LegalActions(0) = [0, 1, 2, 3]
@@ -5077,8 +5077,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -5106,8 +5106,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -5135,8 +5135,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -5164,8 +5164,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-4.300000000000001, -4.300000000000001]
 LegalActions(0) = [0, 1, 2, 3]
@@ -5196,8 +5196,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -5225,8 +5225,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -5254,8 +5254,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -5283,8 +5283,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-4.4, -4.4]
 LegalActions(0) = [0, 1, 2, 3]
@@ -5315,8 +5315,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -5344,8 +5344,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -5373,8 +5373,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -5402,8 +5402,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-4.5, -4.5]
 LegalActions(0) = [0, 1, 2, 3]
@@ -5434,8 +5434,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -5463,8 +5463,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -5492,8 +5492,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -5521,8 +5521,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-4.6, -4.6]
 LegalActions(0) = [0, 1, 2, 3]
@@ -5553,8 +5553,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -5582,8 +5582,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -5611,8 +5611,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -5640,8 +5640,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-4.699999999999999, -4.699999999999999]
 LegalActions(0) = [0, 1, 2, 3]
@@ -5672,8 +5672,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -5701,8 +5701,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -5730,8 +5730,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -5759,8 +5759,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-4.799999999999999, -4.799999999999999]
 LegalActions(0) = [0, 1, 2, 3]
@@ -5791,8 +5791,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -5820,8 +5820,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -5849,8 +5849,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -5878,8 +5878,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-4.899999999999999, -4.899999999999999]
 LegalActions(0) = [0, 1, 2, 3]
@@ -5910,8 +5910,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -5939,8 +5939,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -5968,8 +5968,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -5997,8 +5997,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-4.999999999999998, -4.999999999999998]
 LegalActions(0) = [0, 1, 2, 3]
@@ -6029,8 +6029,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -6058,8 +6058,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -6087,8 +6087,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -6116,8 +6116,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-5.099999999999998, -5.099999999999998]
 LegalActions(0) = [0, 1, 2, 3]
@@ -6148,8 +6148,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -6177,8 +6177,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -6206,8 +6206,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -6235,8 +6235,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-5.1999999999999975, -5.1999999999999975]
 LegalActions(0) = [0, 1, 2, 3]
@@ -6267,8 +6267,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -6296,8 +6296,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -6325,8 +6325,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -6354,8 +6354,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-5.299999999999997, -5.299999999999997]
 LegalActions(0) = [0, 1, 2, 3]
@@ -6386,8 +6386,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -6415,8 +6415,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -6444,8 +6444,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -6473,8 +6473,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-5.399999999999997, -5.399999999999997]
 LegalActions(0) = [0, 1, 2, 3]
@@ -6505,8 +6505,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -6534,8 +6534,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -6563,8 +6563,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -6592,8 +6592,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-5.4999999999999964, -5.4999999999999964]
 LegalActions(0) = [0, 1, 2, 3]
@@ -6624,8 +6624,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -6653,8 +6653,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -6682,8 +6682,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -6711,8 +6711,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-5.599999999999996, -5.599999999999996]
 LegalActions(0) = [0, 1, 2, 3]
@@ -6743,8 +6743,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -6772,8 +6772,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -6801,8 +6801,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -6830,8 +6830,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-5.699999999999996, -5.699999999999996]
 LegalActions(0) = [0, 1, 2, 3]
@@ -6862,8 +6862,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -6891,8 +6891,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -6920,8 +6920,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -6949,8 +6949,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-5.799999999999995, -5.799999999999995]
 LegalActions(0) = [0, 1, 2, 3]
@@ -6981,8 +6981,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -7010,8 +7010,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -7039,8 +7039,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -7068,8 +7068,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-5.899999999999995, -5.899999999999995]
 LegalActions(0) = [0, 1, 2, 3]
@@ -7100,8 +7100,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -7129,8 +7129,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -7158,8 +7158,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -7187,8 +7187,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-5.999999999999995, -5.999999999999995]
 LegalActions(0) = [0, 1, 2, 3]
@@ -7219,8 +7219,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -7248,8 +7248,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -7277,8 +7277,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -7306,8 +7306,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-6.099999999999994, -6.099999999999994]
 LegalActions(0) = [0, 1, 2, 3]
@@ -7338,8 +7338,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -7367,8 +7367,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -7396,8 +7396,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -7425,8 +7425,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "big box"
 ObservationString(1) = "field"
-ObservationTensor(0) = [0.0, 0.0, 0.0, 0.0, 1.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◯◯◯◯◉
+ObservationTensor(1): ◉◯◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-6.199999999999994, -6.199999999999994]
 LegalActions(0) = [0, 1, 2, 3]
@@ -7457,8 +7457,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "big box"
 ObservationString(1) = "field"
-ObservationTensor(0) = [0.0, 0.0, 0.0, 0.0, 1.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◯◯◯◯◉
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -7486,8 +7486,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "big box"
 ObservationString(1) = "field"
-ObservationTensor(0) = [0.0, 0.0, 0.0, 0.0, 1.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◯◯◯◯◉
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -7515,8 +7515,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "big box"
 ObservationString(1) = "field"
-ObservationTensor(0) = [0.0, 0.0, 0.0, 0.0, 1.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◯◯◯◯◉
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -7544,8 +7544,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "big box"
 ObservationString(1) = "field"
-ObservationTensor(0) = [0.0, 0.0, 0.0, 0.0, 1.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◯◯◯◯◉
+ObservationTensor(1): ◉◯◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-6.299999999999994, -6.299999999999994]
 LegalActions(0) = [0, 1, 2, 3]
@@ -7576,8 +7576,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "big box"
 ObservationString(1) = "field"
-ObservationTensor(0) = [0.0, 0.0, 0.0, 0.0, 1.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◯◯◯◯◉
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -7605,8 +7605,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "big box"
 ObservationString(1) = "field"
-ObservationTensor(0) = [0.0, 0.0, 0.0, 0.0, 1.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◯◯◯◯◉
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -7634,8 +7634,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "big box"
 ObservationString(1) = "field"
-ObservationTensor(0) = [0.0, 0.0, 0.0, 0.0, 1.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◯◯◯◯◉
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -7663,8 +7663,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-6.399999999999993, -6.399999999999993]
 LegalActions(0) = [0, 1, 2, 3]
@@ -7695,8 +7695,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -7724,8 +7724,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -7753,8 +7753,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -7782,8 +7782,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-6.499999999999993, -6.499999999999993]
 LegalActions(0) = [0, 1, 2, 3]
@@ -7814,8 +7814,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -7843,8 +7843,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -7872,8 +7872,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -7901,8 +7901,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-6.5999999999999925, -6.5999999999999925]
 LegalActions(0) = [0, 1, 2, 3]
@@ -7933,8 +7933,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -7962,8 +7962,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -7991,8 +7991,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -8020,8 +8020,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-6.699999999999992, -6.699999999999992]
 LegalActions(0) = [0, 1, 2, 3]
@@ -8052,8 +8052,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -8081,8 +8081,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -8110,8 +8110,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -8139,8 +8139,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-6.799999999999992, -6.799999999999992]
 LegalActions(0) = [0, 1, 2, 3]
@@ -8171,8 +8171,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -8200,8 +8200,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -8229,8 +8229,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -8258,8 +8258,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-6.8999999999999915, -6.8999999999999915]
 LegalActions(0) = [0, 1, 2, 3]
@@ -8290,8 +8290,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -8319,8 +8319,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -8348,8 +8348,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -8377,8 +8377,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-6.999999999999991, -6.999999999999991]
 LegalActions(0) = [0, 1, 2, 3]
@@ -8409,8 +8409,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -8438,8 +8438,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -8467,8 +8467,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -8496,8 +8496,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-7.099999999999991, -7.099999999999991]
 LegalActions(0) = [0, 1, 2, 3]
@@ -8528,8 +8528,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -8557,8 +8557,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -8586,8 +8586,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -8615,8 +8615,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-7.19999999999999, -7.19999999999999]
 LegalActions(0) = [0, 1, 2, 3]
@@ -8647,8 +8647,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -8676,8 +8676,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -8705,8 +8705,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "small box"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -8734,8 +8734,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-7.29999999999999, -7.29999999999999]
 LegalActions(0) = [0, 1, 2, 3]
@@ -8766,8 +8766,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -8795,8 +8795,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -8824,8 +8824,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -8853,8 +8853,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-7.39999999999999, -7.39999999999999]
 LegalActions(0) = [0, 1, 2, 3]
@@ -8885,8 +8885,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -8914,8 +8914,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -8943,8 +8943,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -8972,8 +8972,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-7.499999999999989, -7.499999999999989]
 LegalActions(0) = [0, 1, 2, 3]
@@ -9004,8 +9004,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -9033,8 +9033,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -9062,8 +9062,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -9091,8 +9091,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-7.599999999999989, -7.599999999999989]
 LegalActions(0) = [0, 1, 2, 3]
@@ -9123,8 +9123,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -9152,8 +9152,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -9181,8 +9181,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -9210,8 +9210,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-7.699999999999989, -7.699999999999989]
 LegalActions(0) = [0, 1, 2, 3]
@@ -9242,8 +9242,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -9271,8 +9271,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -9300,8 +9300,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -9329,8 +9329,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-7.799999999999988, -7.799999999999988]
 LegalActions(0) = [0, 1, 2, 3]
@@ -9361,8 +9361,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -9390,8 +9390,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -9419,8 +9419,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "field"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -9448,8 +9448,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-7.899999999999988, -7.899999999999988]
 LegalActions(0) = [0, 1, 2, 3]
@@ -9480,8 +9480,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -9509,8 +9509,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -9538,8 +9538,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -9567,8 +9567,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-7.999999999999988, -7.999999999999988]
 LegalActions(0) = [0, 1, 2, 3]
@@ -9599,8 +9599,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -9628,8 +9628,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -9657,8 +9657,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -9686,8 +9686,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 Rewards() = [-5.1, -5.1]
 Returns() = [-13.099999999999987, -13.099999999999987]
 LegalActions(0) = [0, 1, 2, 3]
@@ -9718,8 +9718,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -9747,8 +9747,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -9776,8 +9776,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -9805,8 +9805,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 Rewards() = [-5.1, -5.1]
 Returns() = [-18.19999999999999, -18.19999999999999]
 LegalActions(0) = [0, 1, 2, 3]
@@ -9837,8 +9837,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -9866,8 +9866,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -9895,8 +9895,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -9924,8 +9924,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-18.29999999999999, -18.29999999999999]
 LegalActions(0) = [0, 1, 2, 3]
@@ -9956,8 +9956,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -9985,8 +9985,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -10014,8 +10014,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -10043,8 +10043,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-18.39999999999999, -18.39999999999999]
 LegalActions(0) = [0, 1, 2, 3]
@@ -10075,8 +10075,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -10104,8 +10104,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -10133,8 +10133,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -10162,8 +10162,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-18.499999999999993, -18.499999999999993]
 LegalActions(0) = [0, 1, 2, 3]
@@ -10194,8 +10194,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -10223,8 +10223,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -10252,8 +10252,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -10281,8 +10281,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 Rewards() = [-5.1, -5.1]
 Returns() = [-23.599999999999994, -23.599999999999994]
 LegalActions(0) = [0, 1, 2, 3]
@@ -10313,8 +10313,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -10342,8 +10342,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -10371,8 +10371,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -10400,8 +10400,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "big box"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [0.0, 0.0, 0.0, 0.0, 1.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◯◯◯◯◉
+ObservationTensor(1): ◯◉◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-23.699999999999996, -23.699999999999996]
 LegalActions(0) = [0, 1, 2, 3]
@@ -10432,8 +10432,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "big box"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [0.0, 0.0, 0.0, 0.0, 1.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◯◯◯◯◉
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -10461,8 +10461,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "big box"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [0.0, 0.0, 0.0, 0.0, 1.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◯◯◯◯◉
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -10490,8 +10490,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "big box"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [0.0, 0.0, 0.0, 0.0, 1.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◯◯◯◯◉
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -10519,8 +10519,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "big box"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [0.0, 0.0, 0.0, 0.0, 1.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◯◯◯◯◉
+ObservationTensor(1): ◯◉◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-23.799999999999997, -23.799999999999997]
 LegalActions(0) = [0, 1, 2, 3]
@@ -10551,8 +10551,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "big box"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [0.0, 0.0, 0.0, 0.0, 1.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◯◯◯◯◉
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -10580,8 +10580,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "big box"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [0.0, 0.0, 0.0, 0.0, 1.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◯◯◯◯◉
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -10609,8 +10609,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "big box"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [0.0, 0.0, 0.0, 0.0, 1.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◯◯◯◯◉
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -10638,8 +10638,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "big box"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [0.0, 0.0, 0.0, 0.0, 1.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◯◯◯◯◉
+ObservationTensor(1): ◯◉◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-23.9, -23.9]
 LegalActions(0) = [0, 1, 2, 3]
@@ -10670,8 +10670,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "big box"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [0.0, 0.0, 0.0, 0.0, 1.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◯◯◯◯◉
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -10699,8 +10699,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "big box"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [0.0, 0.0, 0.0, 0.0, 1.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◯◯◯◯◉
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -10728,8 +10728,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "big box"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [0.0, 0.0, 0.0, 0.0, 1.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◯◯◯◯◉
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -10757,8 +10757,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "big box"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [0.0, 0.0, 0.0, 0.0, 1.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◯◯◯◯◉
+ObservationTensor(1): ◯◉◯◯◯
 Rewards() = [-10.1, -10.1]
 Returns() = [-34.0, -34.0]
 LegalActions(0) = [0, 1, 2, 3]
@@ -10789,8 +10789,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "big box"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [0.0, 0.0, 0.0, 0.0, 1.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◯◯◯◯◉
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -10818,8 +10818,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "big box"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [0.0, 0.0, 0.0, 0.0, 1.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◯◯◯◯◉
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -10847,8 +10847,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "big box"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [0.0, 0.0, 0.0, 0.0, 1.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◯◯◯◯◉
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -10876,8 +10876,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "big box"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [0.0, 0.0, 0.0, 0.0, 1.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◯◯◯◯◉
+ObservationTensor(1): ◯◉◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-34.1, -34.1]
 LegalActions(0) = [0, 1, 2, 3]
@@ -10908,8 +10908,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "big box"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [0.0, 0.0, 0.0, 0.0, 1.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◯◯◯◯◉
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -10937,8 +10937,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "big box"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [0.0, 0.0, 0.0, 0.0, 1.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◯◯◯◯◉
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -10966,8 +10966,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "big box"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [0.0, 0.0, 0.0, 0.0, 1.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◯◯◯◯◉
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -10995,8 +10995,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "big box"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [0.0, 0.0, 0.0, 0.0, 1.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◯◯◯◯◉
+ObservationTensor(1): ◯◉◯◯◯
 Rewards() = [-10.1, -10.1]
 Returns() = [-44.2, -44.2]
 LegalActions(0) = [0, 1, 2, 3]
@@ -11027,8 +11027,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "big box"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [0.0, 0.0, 0.0, 0.0, 1.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◯◯◯◯◉
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -11056,8 +11056,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "big box"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [0.0, 0.0, 0.0, 0.0, 1.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◯◯◯◯◉
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -11085,8 +11085,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "big box"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [0.0, 0.0, 0.0, 0.0, 1.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◯◯◯◯◉
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -11114,8 +11114,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-44.300000000000004, -44.300000000000004]
 LegalActions(0) = [0, 1, 2, 3]
@@ -11146,8 +11146,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -11175,8 +11175,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -11204,8 +11204,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -11233,8 +11233,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-44.400000000000006, -44.400000000000006]
 LegalActions(0) = [0, 1, 2, 3]
@@ -11265,8 +11265,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -11294,8 +11294,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -11323,8 +11323,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -11352,8 +11352,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 Rewards() = [-5.1, -5.1]
 Returns() = [-49.50000000000001, -49.50000000000001]
 LegalActions(0) = [0, 1, 2, 3]
@@ -11384,8 +11384,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -11413,8 +11413,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -11442,8 +11442,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -11471,8 +11471,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-49.60000000000001, -49.60000000000001]
 LegalActions(0) = [0, 1, 2, 3]
@@ -11503,8 +11503,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -11532,8 +11532,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -11561,8 +11561,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -11590,8 +11590,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-49.70000000000001, -49.70000000000001]
 LegalActions(0) = [0, 1, 2, 3]
@@ -11622,8 +11622,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -11651,8 +11651,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -11680,8 +11680,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -11709,8 +11709,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 Rewards() = [-5.1, -5.1]
 Returns() = [-54.80000000000001, -54.80000000000001]
 LegalActions(0) = [0, 1, 2, 3]
@@ -11741,8 +11741,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -11770,8 +11770,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -11799,8 +11799,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -11828,8 +11828,8 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-54.90000000000001, -54.90000000000001]
 LegalActions(0) = [0, 1, 2, 3]
@@ -11860,8 +11860,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -11889,8 +11889,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
@@ -11918,8 +11918,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "field"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯
 ChanceOutcomes() = [{2, 0.500000000000}, {3, 0.500000000000}]
 LegalActions() = [2, 3]
 StringLegalActions() = ["move forward", "stay"]
@@ -11947,7 +11947,7 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -4
 ObservationString(0) = "big box"
 ObservationString(1) = "wall"
-ObservationTensor(0) = [0.0, 0.0, 0.0, 0.0, 1.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◯◯◯◯◉
+ObservationTensor(1): ◯◉◯◯◯
 Rewards() = [-0.1, -0.1]
 Returns() = [-55.000000000000014, -55.000000000000014]

@@ -41,8 +41,14 @@ InformationStateString(0) = ""
 InformationStateString(1) = ""
 ObservationString(0) = "...\n...\n..."
 ObservationString(1) = "...\n...\n..."
-ObservationTensor(0) = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0):
+◉◉◉  ◯◯◯  ◯◯◯
+◉◉◉  ◯◯◯  ◯◯◯
+◉◉◉  ◯◯◯  ◯◯◯
+ObservationTensor(1):
+◉◉◉  ◯◯◯  ◯◯◯
+◉◉◉  ◯◯◯  ◯◯◯
+◉◉◉  ◯◯◯  ◯◯◯
 Rewards() = [-0.0, -0.0]
 Returns() = [-0.0, -0.0]
 LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8]
@@ -65,8 +71,14 @@ InformationStateString(0) = "1"
 InformationStateString(1) = "1"
 ObservationString(0) = ".x.\n...\n..."
 ObservationString(1) = ".x.\n...\n..."
-ObservationTensor(0) = [1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0):
+◉◯◉  ◯◯◯  ◯◉◯
+◉◉◉  ◯◯◯  ◯◯◯
+◉◉◉  ◯◯◯  ◯◯◯
+ObservationTensor(1):
+◉◯◉  ◯◯◯  ◯◉◯
+◉◉◉  ◯◯◯  ◯◯◯
+◉◉◉  ◯◯◯  ◯◯◯
 Rewards() = [-0.0, -0.0]
 Returns() = [-0.0, -0.0]
 LegalActions() = [0, 2, 3, 4, 5, 6, 7, 8]
@@ -89,8 +101,14 @@ InformationStateString(0) = "1 2"
 InformationStateString(1) = "1 2"
 ObservationString(0) = ".xo\n...\n..."
 ObservationString(1) = ".xo\n...\n..."
-ObservationTensor(0) = [1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0):
+◉◯◯  ◯◯◉  ◯◉◯
+◉◉◉  ◯◯◯  ◯◯◯
+◉◉◉  ◯◯◯  ◯◯◯
+ObservationTensor(1):
+◉◯◯  ◯◯◉  ◯◉◯
+◉◉◉  ◯◯◯  ◯◯◯
+◉◉◉  ◯◯◯  ◯◯◯
 Rewards() = [-0.0, -0.0]
 Returns() = [-0.0, -0.0]
 LegalActions() = [0, 3, 4, 5, 6, 7, 8]
@@ -113,8 +131,14 @@ InformationStateString(0) = "1 2 7"
 InformationStateString(1) = "1 2 7"
 ObservationString(0) = ".xo\n...\n.x."
 ObservationString(1) = ".xo\n...\n.x."
-ObservationTensor(0) = [1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0):
+◉◯◯  ◯◯◉  ◯◉◯
+◉◉◉  ◯◯◯  ◯◯◯
+◉◯◉  ◯◯◯  ◯◉◯
+ObservationTensor(1):
+◉◯◯  ◯◯◉  ◯◉◯
+◉◉◉  ◯◯◯  ◯◯◯
+◉◯◉  ◯◯◯  ◯◉◯
 Rewards() = [-0.0, -0.0]
 Returns() = [-0.0, -0.0]
 LegalActions() = [0, 3, 4, 5, 6, 8]
@@ -137,8 +161,14 @@ InformationStateString(0) = "1 2 7 8"
 InformationStateString(1) = "1 2 7 8"
 ObservationString(0) = ".xo\n...\n.xo"
 ObservationString(1) = ".xo\n...\n.xo"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0):
+◉◯◯  ◯◯◉  ◯◉◯
+◉◉◉  ◯◯◯  ◯◯◯
+◉◯◯  ◯◯◉  ◯◉◯
+ObservationTensor(1):
+◉◯◯  ◯◯◉  ◯◉◯
+◉◉◉  ◯◯◯  ◯◯◯
+◉◯◯  ◯◯◉  ◯◉◯
 Rewards() = [-0.0, -0.0]
 Returns() = [-0.0, -0.0]
 LegalActions() = [0, 3, 4, 5, 6]
@@ -161,8 +191,14 @@ InformationStateString(0) = "1 2 7 8 5"
 InformationStateString(1) = "1 2 7 8 5"
 ObservationString(0) = ".xo\n..x\n.xo"
 ObservationString(1) = ".xo\n..x\n.xo"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0]
+ObservationTensor(0):
+◉◯◯  ◯◯◉  ◯◉◯
+◉◉◯  ◯◯◯  ◯◯◉
+◉◯◯  ◯◯◉  ◯◉◯
+ObservationTensor(1):
+◉◯◯  ◯◯◉  ◯◉◯
+◉◉◯  ◯◯◯  ◯◯◉
+◉◯◯  ◯◯◉  ◯◉◯
 Rewards() = [-0.0, -0.0]
 Returns() = [-0.0, -0.0]
 LegalActions() = [0, 3, 4, 6]
@@ -185,8 +221,14 @@ InformationStateString(0) = "1 2 7 8 5 6"
 InformationStateString(1) = "1 2 7 8 5 6"
 ObservationString(0) = ".xo\n..x\noxo"
 ObservationString(1) = ".xo\n..x\noxo"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0]
+ObservationTensor(0):
+◉◯◯  ◯◯◉  ◯◉◯
+◉◉◯  ◯◯◯  ◯◯◉
+◯◯◯  ◉◯◉  ◯◉◯
+ObservationTensor(1):
+◉◯◯  ◯◯◉  ◯◉◯
+◉◉◯  ◯◯◯  ◯◯◉
+◯◯◯  ◉◯◉  ◯◉◯
 Rewards() = [-0.0, -0.0]
 Returns() = [-0.0, -0.0]
 LegalActions() = [0, 3, 4]
@@ -209,8 +251,14 @@ InformationStateString(0) = "1 2 7 8 5 6 3"
 InformationStateString(1) = "1 2 7 8 5 6 3"
 ObservationString(0) = ".xo\nx.x\noxo"
 ObservationString(1) = ".xo\nx.x\noxo"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0]
+ObservationTensor(0):
+◉◯◯  ◯◯◉  ◯◉◯
+◯◉◯  ◯◯◯  ◉◯◉
+◯◯◯  ◉◯◉  ◯◉◯
+ObservationTensor(1):
+◉◯◯  ◯◯◉  ◯◉◯
+◯◉◯  ◯◯◯  ◉◯◉
+◯◯◯  ◉◯◉  ◯◉◯
 Rewards() = [-0.0, -0.0]
 Returns() = [-0.0, -0.0]
 LegalActions() = [0, 4]
@@ -233,7 +281,13 @@ InformationStateString(0) = "1 2 7 8 5 6 3 4"
 InformationStateString(1) = "1 2 7 8 5 6 3 4"
 ObservationString(0) = ".xo\nxox\noxo"
 ObservationString(1) = ".xo\nxox\noxo"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0]
+ObservationTensor(0):
+◉◯◯  ◯◯◉  ◯◉◯
+◯◯◯  ◯◉◯  ◉◯◉
+◯◯◯  ◉◯◉  ◯◉◯
+ObservationTensor(1):
+◉◯◯  ◯◯◉  ◯◉◯
+◯◯◯  ◯◉◯  ◉◯◉
+◯◯◯  ◉◯◉  ◯◉◯
 Rewards() = [1.0, -1.0]
 Returns() = [1.0, -1.0]

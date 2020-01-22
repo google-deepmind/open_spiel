@@ -39,10 +39,10 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 InformationStateString(0) = "-1"
 InformationStateString(1) = "-1"
-InformationStateTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+InformationStateTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ChanceOutcomes() = [{1, 0.166666666667}, {2, 0.166666666667}, {3, 0.166666666667}, {4, 0.166666666667}, {5, 0.166666666667}, {6, 0.166666666667}]
 LegalActions() = [1, 2, 3, 4, 5, 6]
 StringLegalActions() = ["chance outcome 1", "chance outcome 2", "chance outcome 3", "chance outcome 4", "chance outcome 5", "chance outcome 6"]
@@ -60,10 +60,10 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 InformationStateString(0) = "2"
 InformationStateString(1) = "-1"
-InformationStateTensor(0) = [1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(0) = [1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+InformationStateTensor(0): ◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(0): ◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ChanceOutcomes() = [{1, 0.166666666667}, {2, 0.166666666667}, {3, 0.166666666667}, {4, 0.166666666667}, {5, 0.166666666667}, {6, 0.166666666667}]
 LegalActions() = [1, 2, 3, 4, 5, 6]
 StringLegalActions() = ["chance outcome 1", "chance outcome 2", "chance outcome 3", "chance outcome 4", "chance outcome 5", "chance outcome 6"]
@@ -81,10 +81,10 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 0
 InformationStateString(0) = "2"
 InformationStateString(1) = "5"
-InformationStateTensor(0) = [1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(0) = [1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+InformationStateTensor(0): ◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(1): ◯◉◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(0): ◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
@@ -103,10 +103,10 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 1
 InformationStateString(0) = "2 1-2"
 InformationStateString(1) = "5 1-2"
-InformationStateTensor(0) = [1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(0) = [1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+InformationStateTensor(0): ◉◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(1): ◯◉◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(0): ◉◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
@@ -125,10 +125,10 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 0
 InformationStateString(0) = "2 1-2 1-5"
 InformationStateString(1) = "5 1-2 1-5"
-InformationStateTensor(0) = [1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(0) = [1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+InformationStateTensor(0): ◉◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯
+InformationStateTensor(1): ◯◉◯◯◯◯◉◯◯◉◯◯◉◯◯◯◯◯◯◯◯
+ObservationTensor(0): ◉◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯◯◉◯◯◉◯◯◉◯◯◯◯◯◯◯◯
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [5, 6, 7, 8, 9, 10, 11, 12]
@@ -147,10 +147,10 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 1
 InformationStateString(0) = "2 1-2 1-5 2-3"
 InformationStateString(1) = "5 1-2 1-5 2-3"
-InformationStateTensor(0) = [1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(0) = [1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0]
+InformationStateTensor(0): ◉◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◉◯◯◯◯
+InformationStateTensor(1): ◯◉◯◯◯◯◉◯◯◉◯◯◉◯◯◯◉◯◯◯◯
+ObservationTensor(0): ◉◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [9, 10, 11, 12]
@@ -169,9 +169,9 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -4
 InformationStateString(0) = "2 1-2 1-5 2-3 Liar"
 InformationStateString(1) = "5 1-2 1-5 2-3 Liar"
-InformationStateTensor(0) = [1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
-InformationStateTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
-ObservationTensor(0) = [1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+InformationStateTensor(0): ◉◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◉◯◯◯◉
+InformationStateTensor(1): ◯◉◯◯◯◯◉◯◯◉◯◯◉◯◯◯◉◯◯◯◉
+ObservationTensor(0): ◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◉
+ObservationTensor(1): ◯◉◯◯◯◯◉◯◯◯◯◯◯◯◯◯◉◯◯◯◉
 Rewards() = [-1.0, 1.0]
 Returns() = [-1.0, 1.0]
