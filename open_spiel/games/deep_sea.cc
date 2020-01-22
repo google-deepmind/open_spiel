@@ -85,7 +85,7 @@ std::string DeepSeaState::ActionToString(Player player,
 
 std::string DeepSeaState::ToString() const {
   std::string str;
-  str.resize((size_ + 1) * (size_ + 2));
+  str.reserve((size_ + 1) * (size_ + 2));
   for (int r = 0; r < size_ + 1; ++r) {
     for (int c = 0; c < size_ + 1; ++c) {
       if (player_row_ == r && player_col_ == c) {
