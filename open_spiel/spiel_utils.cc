@@ -14,8 +14,12 @@
 
 #include "open_spiel/spiel_utils.h"
 
+#include <cstdlib>
+
 #include <iostream>
 #include <string>
+#include <vector>
+
 
 namespace open_spiel {
 
