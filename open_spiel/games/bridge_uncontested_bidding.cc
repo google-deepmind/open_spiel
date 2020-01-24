@@ -34,11 +34,11 @@ namespace bridge_uncontested_bidding {
 namespace {
 
 using open_spiel::bridge::kClubs;
+using open_spiel::bridge::kDenominationChar;
 using open_spiel::bridge::kDiamonds;
 using open_spiel::bridge::kHearts;
 using open_spiel::bridge::kNoTrump;
 using open_spiel::bridge::kSpades;
-
 using open_spiel::bridge::kUndoubled;
 
 constexpr int kNumRedeals = 10;  // how many possible layouts to analyse
@@ -106,15 +106,16 @@ std::string UncontestedBiddingState::ActionToString(Player player,
                                                     Action action_id) const {
   if (player == kChancePlayerId) return "Deal";
   if (action_id == kPass) return "Pass";
-  return absl::StrCat(Level(action_id),
-                      std::string(1, kSuitChar[Denomination(action_id)]));
+  return absl::StrCat(
+      Level(action_id),
+      std::string(1, kDenominationChar[Denomination(action_id)]));
 }
 
 Action ActionFromString(const std::string& str) {
   if (str == "Pass") return kPass;
   SPIEL_CHECK_EQ(str.length(), 2);
   auto level = str[0] - '0';
-  auto denomination = std::string(kSuitChar).find(str[1]);
+  auto denomination = std::string(kDenominationChar).find(str[1]);
   SPIEL_CHECK_NE(denomination, std::string::npos);
   return (level - 1) * kNumDenominations + denomination + 1;
 }
@@ -143,11 +144,11 @@ std::string UncontestedBiddingState::ToString() const {
   if (IsTerminal()) {
     absl::StrAppend(&rv, " Score:", score_);
     for (int i = 0; i < reference_contracts_.size(); ++i) {
-      absl::StrAppend(&rv, " ", reference_contracts_[i].level,
-                      std::string(1, kSuitChar[reference_contracts_[i].trumps]),
-                      "(",
-                      std::string(1, "WE"[reference_contracts_[i].declarer]),
-                      "):", reference_scores_[i]);
+      absl::StrAppend(
+          &rv, " ", reference_contracts_[i].level,
+          std::string(1, kDenominationChar[reference_contracts_[i].trumps]),
+          "(", std::string(1, "WE"[reference_contracts_[i].declarer]),
+          "):", reference_scores_[i]);
     }
   }
   return rv;
