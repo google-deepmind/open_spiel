@@ -661,7 +661,7 @@ void GinRummyState::ObservationTensor(Player player,
     ptr[card] = 1;
   ptr += kNumCards;
 
-  for (int i = 0; i < stock_size_; ++i)
+  for (int i = 0; i < std::min(stock_size_, kMaxStockSize); ++i)
     ptr[i] = 1;
   ptr += kMaxStockSize;
 
