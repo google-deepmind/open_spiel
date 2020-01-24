@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/games/gin_rummy.h"
 #include "open_spiel/games/gin_rummy/gin_rummy_utils.h"
 #include "open_spiel/spiel.h"
@@ -22,11 +23,6 @@ namespace gin_rummy {
 namespace {
 
 namespace testing = open_spiel::testing;
-
-bool ActionsContains(const std::vector<Action>& legal_actions, Action action) {
-  return std::find(legal_actions.begin(), legal_actions.end(), action) !=
-                   legal_actions.end();
-}
 
 void BasicGameTests() {
   testing::LoadGameTest("gin_rummy");
@@ -183,16 +179,16 @@ void GameplayTest1() {
   state->ApplyAction(54);
   // Player1 layoffs.
   std::vector<Action> legal_actions = state->LegalActions();
-  SPIEL_CHECK_TRUE(ActionsContains(legal_actions, 7));
+  SPIEL_CHECK_TRUE(absl::c_linear_search(legal_actions, 7));
   state->ApplyAction(7);  // Lay off 8s
   legal_actions = state->LegalActions();
-  SPIEL_CHECK_TRUE(ActionsContains(legal_actions, 8));
+  SPIEL_CHECK_TRUE(absl::c_linear_search(legal_actions, 8));
   state->ApplyAction(8);  // Lay off 9s
   legal_actions = state->LegalActions();
-  SPIEL_CHECK_TRUE(ActionsContains(legal_actions, 20));
+  SPIEL_CHECK_TRUE(absl::c_linear_search(legal_actions, 20));
   state->ApplyAction(20);  // Lay off 8c
   legal_actions = state->LegalActions();
-  SPIEL_CHECK_TRUE(ActionsContains(legal_actions, 19));
+  SPIEL_CHECK_TRUE(absl::c_linear_search(legal_actions, 19));
   state->ApplyAction(19);  // Lay off 7c
   state->ApplyAction(54);  // Finished layoffs
   state->ApplyAction(65);  // Lay meld of 2's
@@ -315,11 +311,11 @@ void GameplayTest3() {
   state->ApplyAction(54);
   // Player1 lays off the Ts
   std::vector<Action> legal_actions = state->LegalActions();
-  SPIEL_CHECK_TRUE(ActionsContains(legal_actions, 9));
+  SPIEL_CHECK_TRUE(absl::c_linear_search(legal_actions, 9));
   state->ApplyAction(9);
   // Assert Player1 can lay off the 9s
   legal_actions = state->LegalActions();
-  SPIEL_CHECK_TRUE(ActionsContains(legal_actions, 8));
+  SPIEL_CHECK_TRUE(absl::c_linear_search(legal_actions, 8));
   state->ApplyAction(8);
   // Player1 completes the hand and wins an undercut
   state->ApplyAction(54);
@@ -384,7 +380,7 @@ void WallTest() {
   for (auto action : initial_actions)
     state->ApplyAction(action);
   legal_actions = state->LegalActions();
-  SPIEL_CHECK_TRUE(ActionsContains(legal_actions, kKnockAction));
+  SPIEL_CHECK_TRUE(absl::c_linear_search(legal_actions, kKnockAction));
   // Player1 knocks and lays melds.
   state->ApplyAction(55);
   state->ApplyAction(0);
@@ -394,7 +390,7 @@ void WallTest() {
   state->ApplyAction(54);
   // Player1 made gin, so Player0 cannot layoff the Th on JhQhKh
   legal_actions = state->LegalActions();
-  SPIEL_CHECK_FALSE(ActionsContains(legal_actions, CardInt("Th")));
+  SPIEL_CHECK_FALSE(absl::c_linear_search(legal_actions, CardInt("Th")));
   // Player0 lays melds.
   state->ApplyAction(213);
   state->ApplyAction(132);
@@ -493,7 +489,7 @@ void OklahomaTest() {
 
   // Assert Player1 cannot knock.
   std::vector<Action> legal_actions = state->LegalActions();
-  SPIEL_CHECK_FALSE(ActionsContains(legal_actions, kKnockAction));
+  SPIEL_CHECK_FALSE(absl::c_linear_search(legal_actions, kKnockAction));
   // Play continues.
   state->ApplyAction(51);
   state->ApplyAction(53);
@@ -525,7 +521,7 @@ void OklahomaTest() {
   //
   // Player1 can now knock with gin.
   legal_actions = state->LegalActions();
-  SPIEL_CHECK_TRUE(ActionsContains(legal_actions, kKnockAction));
+  SPIEL_CHECK_TRUE(absl::c_linear_search(legal_actions, kKnockAction));
   state->ApplyAction(55);
   state->ApplyAction(8);
   state->ApplyAction(59);

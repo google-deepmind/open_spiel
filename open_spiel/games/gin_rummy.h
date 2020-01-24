@@ -54,6 +54,8 @@ inline constexpr int kNumRanks = 13;
 inline constexpr int kNumCards = kNumSuits * kNumRanks;
 inline constexpr int kMaxPossibleDeadwood = 98;  // E.g. KsKcQdQhJsJcTdTh9s9c
 inline constexpr int kMaxNumDrawUpcardActions = 50;
+inline constexpr int kHandSize = 10;
+inline constexpr int kMaxHandSize = 11;
 inline constexpr int kMaxStockSize = 31;  // Stock size when play begins
 inline constexpr int kWallStockSize = 2;
 inline constexpr int kDefaultKnockCard = 10;
@@ -75,8 +77,6 @@ inline constexpr int kObservationTensorSize =
     + kMaxStockSize      // Stock size
     + kNumMeldActions;   // Opponent's layed melds
 
-class GinRummyGame;
-
 class GinRummyState : public State {
  public:
   explicit GinRummyState(std::shared_ptr<const Game> game, bool oklahoma,
@@ -97,8 +97,12 @@ class GinRummyState : public State {
   void DoApplyAction(Action action) override;
 
  private:
-  enum class Phase { kDeal, kFirstUpcard, kDraw, kDiscard,
-                     kKnock, kLayoff, kWall, kGameOver };
+  enum class Phase {kDeal, kFirstUpcard, kDraw, kDiscard,
+                    kKnock, kLayoff, kWall, kGameOver};
+
+  const std::array<std::string, 8> phase_str_ = {"Deal", "FirstUpcard", "Draw",
+                                                 "Discard", "Knock", "Layoff",
+                                                 "Wall", "GameOver"};
 
   std::vector<Action> DealLegalActions() const;
   std::vector<Action> FirstUpcardLegalActions() const;
