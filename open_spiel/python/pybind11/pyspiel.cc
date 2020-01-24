@@ -184,7 +184,10 @@ PYBIND11_MODULE(pyspiel, m) {
       .def(py::init<GameParameters>())
       .def("is_mandatory", &GameParameter::is_mandatory)
       .def("__str__", &GameParameter::ToString)
-      .def("__repr__", &GameParameter::ToReprString);
+      .def("__repr__", &GameParameter::ToReprString)
+      .def("__eq__", [](const GameParameter &value, GameParameter *value2) {
+         return value2 && value.ToReprString() == value2->ToReprString();
+       });
 
   py::class_<UniformProbabilitySampler> uniform_sampler(
       m, "UniformProbabilitySampler");

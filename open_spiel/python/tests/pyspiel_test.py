@@ -157,7 +157,7 @@ class PyspielTest(absltest.TestCase):
     self.assertFalse(state.is_terminal())
     self.assertEqual(state.legal_actions(), [0, 1, 2, 3, 4, 5, 6, 7, 8])
 
-  def test_game_parameter(self):
+  def test_game_parameter_representation(self):
     param = pyspiel.GameParameter(True)
     self.assertEqual(repr(param), "GameParameter(bool_value=True)")
     param = pyspiel.GameParameter(False)
@@ -170,6 +170,13 @@ class PyspielTest(absltest.TestCase):
     self.assertEqual(repr(param), "GameParameter(double_value=1)")
     param = pyspiel.GameParameter(1.2)
     self.assertEqual(repr(param), "GameParameter(double_value=1.2)")
+
+  def test_game_parameter_equality(self):
+    param1 = pyspiel.GameParameter("one")
+    param1_again = pyspiel.GameParameter("one")
+    param2 = pyspiel.GameParameter("two")
+    self.assertEqual(param1, param1_again)
+    self.assertNotEqual(param1, param2)
 
   def test_game_type(self):
     game_type = pyspiel.GameType(
