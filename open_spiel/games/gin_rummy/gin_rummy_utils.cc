@@ -305,8 +305,7 @@ VecVecVecInt AllMeldGroups(const VecInt &cards) {
 VecVecInt BestMeldGroup(const VecInt &cards) {
   int best_meld_group_total_value = 0;
   VecVecInt best_meld_group;
-  VecVecVecInt all_meld_groups =
-      AllMeldGroups(cards);
+  VecVecVecInt all_meld_groups = AllMeldGroups(cards);
   for (auto meld_group : all_meld_groups) {
     int meld_group_total_value = TotalCardValue(meld_group);
     if (meld_group_total_value > best_meld_group_total_value) {
