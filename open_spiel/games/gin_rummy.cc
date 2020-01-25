@@ -646,7 +646,7 @@ void GinRummyState::ObservationTensor(Player player,
   for (int card : discard_pile_) ptr[card] = 1;
   ptr += kNumCards;
 
-  for (int i = 0; i < stock_size_; ++i) ptr[i] = 1;
+  for (int i = 0; i < std::min(stock_size_, kMaxStockSize); ++i) ptr[i] = 1;
   ptr += kMaxStockSize;
 
   if (knocked_[Opponent(player)]) {
