@@ -48,6 +48,7 @@ class PyspielTest(absltest.TestCase):
         "cursor_go",
         "deep_sea",
         "first_sealed_auction",
+        "gin_rummy",
         "go",
         "goofspiel",
         "havannah",

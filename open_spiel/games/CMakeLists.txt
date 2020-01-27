@@ -33,6 +33,10 @@ set(GAME_SOURCES
   deep_sea.h
   first_sealed_auction.cc
   first_sealed_auction.h
+  gin_rummy.cc
+  gin_rummy.h
+  gin_rummy/gin_rummy_utils.cc
+  gin_rummy/gin_rummy_utils.h
   go.cc
   go.h
   go/go_board.cc
@@ -223,6 +227,10 @@ add_executable(first_sealed_auction_test first_sealed_auction_test.cc
                ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(first_sealed_auction_test first_sealed_auction_test)
+
+add_executable(gin_rummy_test gin_rummy_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(gin_rummy_test gin_rummy_test)
 
 add_executable(go_test go_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
