@@ -50,7 +50,8 @@ from __future__ import division
 from __future__ import print_function
 
 import collections
-import logging
+
+from absl import logging
 import enum
 import numpy as np
 
@@ -132,6 +133,12 @@ class ChanceEventSampler(object):
     return self._rng.choice(actions, p=probs)
 
 
+class ObservationType(enum.Enum):
+  """Defines what kind of observation to use."""
+  OBSERVATION = 0  # Use observation_tensor
+  INFORMATION_STATE = 1  # Use information_state_tensor
+
+
 class Environment(object):
   """Open Spiel reinforcement learning environment class."""
 
@@ -139,6 +146,7 @@ class Environment(object):
                game,
                discount=1.0,
                chance_event_sampler=None,
+               observation_type=None,
                **kwargs):
     """Constructor.
 
@@ -147,6 +155,8 @@ class Environment(object):
       discount: float, discount used in non-initial steps. Defaults to 1.0.
       chance_event_sampler: optional object with `sample_external_events` method
         to sample chance events.
+      observation_type: what kind of observation to use. If not specified, will
+        default to INFORMATION_STATE unless the game doesn't provide it.
       **kwargs: dict, additional settings passed to the Open Spiel game.
     """
     self._chance_event_sampler = chance_event_sampler or ChanceEventSampler()
@@ -171,14 +181,21 @@ class Environment(object):
     # Discount returned at non-initial steps.
     self._discounts = [discount] * self._num_players
 
-    # Decide whether to use observation or information_state
-    if self._game.get_type().provides_information_state_tensor:
-      self._use_observation = False
-    elif self._game.get_type().provides_observation_tensor:
-      self._use_observation = True
-    else:
-      raise ValueError("Game must provide either information state or "
-                       "observation as a normalized vector")
+    # Determine what observation type to use.
+    if observation_type is None:
+      if self._game.get_type().provides_information_state_tensor:
+        observation_type = ObservationType.INFORMATION_STATE
+      else:
+        observation_type = ObservationType.OBSERVATION
+
+    # Check the requested observation type is supported.
+    if observation_type == ObservationType.OBSERVATION:
+      if not self._game.get_type().provides_observation_tensor:
+        raise ValueError("observation_tensor not supported by " + game)
+    elif observation_type == ObservationType.INFORMATION_STATE:
+      if not self._game.get_type().provides_information_state_tensor:
+        raise ValueError("information_state_tensor not supported by " + game)
+    self._use_observation = (observation_type == ObservationType.OBSERVATION)
 
   def get_time_step(self):
     """Returns a `TimeStep` without updating the environment.
