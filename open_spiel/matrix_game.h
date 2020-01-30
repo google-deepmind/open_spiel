@@ -16,11 +16,15 @@
 #define THIRD_PARTY_OPEN_SPIEL_MATRIX_GAME_H_
 
 #include <algorithm>
+#include <iterator>
 #include <memory>
 #include <numeric>
+#include <string>
+#include <vector>
 
 #include "open_spiel/normal_form_game.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_utils.h"
 
 // A matrix game is an example of a 2-player normal-form game.
 

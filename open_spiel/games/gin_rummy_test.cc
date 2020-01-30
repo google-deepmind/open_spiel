@@ -12,8 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/games/gin_rummy.h"
+
+#include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/games/gin_rummy/gin_rummy_utils.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/tests/basic_tests.h"
@@ -33,8 +34,7 @@ void MeldTests() {
   // There are 185 melds of length between 3 and 5 cards. All melds of
   // length greater than 5 can be expressed as two or more smaller melds.
   std::vector<int> full_deck;
-  for (int i = 0; i < kNumCards; ++i)
-    full_deck.push_back(i);
+  for (int i = 0; i < kNumCards; ++i) full_deck.push_back(i);
   std::vector<std::vector<int>> all_melds = AllMelds(full_deck);
   SPIEL_CHECK_EQ(all_melds.size(), kNumMeldActions);
 
@@ -125,7 +125,6 @@ void MeldTests() {
   SPIEL_CHECK_EQ(deadwood, 3);
 }
 
-
 // An extremely rare situation, but one that does arise in actual gameplay.
 // Tests both layoff and undercut functionality.
 void GameplayTest1() {
@@ -136,10 +135,9 @@ void GameplayTest1() {
       open_spiel::LoadGame("gin_rummy", params);
   std::unique_ptr<open_spiel::State> state = game->NewInitialState();
   std::vector<Action> initial_actions;
-  initial_actions = {11, 4, 5, 6, 21, 22, 23, 12, 25, 38, 1, 14,
-                     27, 40, 7, 20, 33, 8, 19, 13, 36, 52, 55, 11};
-  for (auto action : initial_actions)
-    state->ApplyAction(action);
+  initial_actions = {11, 4,  5, 6,  21, 22, 23, 12, 25, 38, 1,  14,
+                     27, 40, 7, 20, 33, 8,  19, 13, 36, 52, 55, 11};
+  for (auto action : initial_actions) state->ApplyAction(action);
   std::cout << state->ToString() << std::endl;
   // Player turn: 0
   // Phase: Knock
@@ -206,10 +204,9 @@ void GameplayTest2() {
       open_spiel::LoadGame("gin_rummy", params);
   std::unique_ptr<open_spiel::State> state = game->NewInitialState();
   std::vector<Action> initial_actions;
-  initial_actions = {1, 4, 5, 6, 17, 18, 19, 30, 31, 32, 2, 3,
-                     16, 29, 43, 44, 45, 7, 20, 33, 0, 52, 55, 1};
-  for (auto action : initial_actions)
-    state->ApplyAction(action);
+  initial_actions = {1,  4,  5,  6,  17, 18, 19, 30, 31, 32, 2,  3,
+                     16, 29, 43, 44, 45, 7,  20, 33, 0,  52, 55, 1};
+  for (auto action : initial_actions) state->ApplyAction(action);
   std::cout << state->ToString() << std::endl;
   // Player turn: 0
   // Phase: Knock
@@ -272,10 +269,9 @@ void GameplayTest3() {
       open_spiel::LoadGame("gin_rummy", params);
   std::unique_ptr<open_spiel::State> state = game->NewInitialState();
   std::vector<Action> initial_actions;
-  initial_actions = {10, 11, 12, 22, 35, 48, 13, 26, 1, 40, 9, 8,
-                     3, 16, 29, 42, 4, 17, 30, 43, 0, 52, 55, 1};
-  for (auto action : initial_actions)
-    state->ApplyAction(action);
+  initial_actions = {10, 11, 12, 22, 35, 48, 13, 26, 1, 40, 9,  8,
+                     3,  16, 29, 42, 4,  17, 30, 43, 0, 52, 55, 1};
+  for (auto action : initial_actions) state->ApplyAction(action);
   std::cout << state->ToString() << std::endl;
   // Player turn: 0
   // Phase: Knock
@@ -336,16 +332,15 @@ void WallTest() {
   std::unique_ptr<open_spiel::State> state = game->NewInitialState();
   std::vector<Action> legal_actions;
   std::vector<Action> initial_actions;
-  initial_actions = {8, 9, 10, 11, 12, 13, 14, 15, 48, 49, 0, 1, 2, 3, 4, 5, 6,
-                     7, 50, 51, 16, 54, 54, 53, 17, 17, 53, 18, 18, 53, 19, 19,
-                     53, 20, 20, 53, 21, 21, 53, 22, 22, 53, 23, 23, 53, 24, 24,
-                     53, 25, 25, 53, 26, 26, 53, 27, 27, 53, 28, 28, 53, 29, 29,
-                     53, 30, 30, 53, 31, 31, 53, 32, 32, 53, 33, 33, 53, 34, 34,
-                     53, 35, 35, 53, 36, 36, 53, 37, 37, 53, 38, 38, 53, 39, 39,
-                     53, 40, 40, 53, 41, 41, 53, 42, 42, 53, 43, 43, 53, 44, 44,
-                     53, 46, 49};
-  for (auto action : initial_actions)
-    state->ApplyAction(action);
+  initial_actions = {8,  9,  10, 11, 12, 13, 14, 15, 48, 49, 0,  1,  2,  3,
+                     4,  5,  6,  7,  50, 51, 16, 54, 54, 53, 17, 17, 53, 18,
+                     18, 53, 19, 19, 53, 20, 20, 53, 21, 21, 53, 22, 22, 53,
+                     23, 23, 53, 24, 24, 53, 25, 25, 53, 26, 26, 53, 27, 27,
+                     53, 28, 28, 53, 29, 29, 53, 30, 30, 53, 31, 31, 53, 32,
+                     32, 53, 33, 33, 53, 34, 34, 53, 35, 35, 53, 36, 36, 53,
+                     37, 37, 53, 38, 38, 53, 39, 39, 53, 40, 40, 53, 41, 41,
+                     53, 42, 42, 53, 43, 43, 53, 44, 44, 53, 46, 49};
+  for (auto action : initial_actions) state->ApplyAction(action);
   std::cout << state->ToString() << std::endl;
   // Player turn: 1
   // Phase: Wall
@@ -377,8 +372,7 @@ void WallTest() {
   SPIEL_CHECK_TRUE(state->IsTerminal());
   // Now let's reset the state as depicted above and knock instead.
   state = game->NewInitialState();
-  for (auto action : initial_actions)
-    state->ApplyAction(action);
+  for (auto action : initial_actions) state->ApplyAction(action);
   legal_actions = state->LegalActions();
   SPIEL_CHECK_TRUE(absl::c_linear_search(legal_actions, kKnockAction));
   // Player1 knocks and lays melds.
@@ -418,7 +412,7 @@ void MaxGameLengthTest() {
   std::unique_ptr<open_spiel::State> state = game->NewInitialState();
   std::vector<Action> initial_actions;
   // Deal hands
-  initial_actions = {0, 1, 2, 13, 14, 15, 26, 27, 28, 39, 9,
+  initial_actions = {0,  1,  2,  13, 14, 15, 26, 27, 28, 39, 9,
                      10, 11, 12, 23, 24, 25, 36, 37, 38, 40};
   // Loop of drawing and discarding.
   for (int i = 0; i < 16; ++i) {
@@ -454,8 +448,8 @@ void OklahomaTest() {
       open_spiel::LoadGame("gin_rummy", params);
   std::unique_ptr<open_spiel::State> state = game->NewInitialState();
   std::vector<Action> initial_actions;
-  initial_actions = {35, 37, 10, 11, 41, 14, 15, 16, 48, 49, 0,
-                     1, 2, 3, 4, 5, 6, 7, 8, 51, 13, 54, 52};
+  initial_actions = {35, 37, 10, 11, 41, 14, 15, 16, 48, 49, 0, 1,
+                     2,  3,  4,  5,  6,  7,  8,  51, 13, 54, 52};
   for (auto action : initial_actions) {
     state->ApplyAction(action);
   }
@@ -543,13 +537,13 @@ void OklahomaTest() {
 }  // namespace open_spiel
 
 int main(int argc, char** argv) {
-    open_spiel::gin_rummy::BasicGameTests();
-    open_spiel::gin_rummy::MeldTests();
-    open_spiel::gin_rummy::GameplayTest1();
-    open_spiel::gin_rummy::GameplayTest2();
-    open_spiel::gin_rummy::GameplayTest3();
-    open_spiel::gin_rummy::MaxGameLengthTest();
-    open_spiel::gin_rummy::WallTest();
-    open_spiel::gin_rummy::OklahomaTest();
-    std::cout << "Gin rummy tests passed!" << std::endl;
+  open_spiel::gin_rummy::BasicGameTests();
+  open_spiel::gin_rummy::MeldTests();
+  open_spiel::gin_rummy::GameplayTest1();
+  open_spiel::gin_rummy::GameplayTest2();
+  open_spiel::gin_rummy::GameplayTest3();
+  open_spiel::gin_rummy::MaxGameLengthTest();
+  open_spiel::gin_rummy::WallTest();
+  open_spiel::gin_rummy::OklahomaTest();
+  std::cout << "Gin rummy tests passed!" << std::endl;
 }

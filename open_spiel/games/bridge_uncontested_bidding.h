@@ -115,7 +115,6 @@ inline constexpr int kMaxScore = 1520;  // 7NT making
 inline constexpr int kStateSize =
     kNumCards + kNumPlayers * kNumActions + kNumPlayers;
 inline constexpr char kRankChar[] = "23456789TJQKA";
-inline constexpr char kSuitChar[] = "CDHSN";
 
 class Deal {
  public:

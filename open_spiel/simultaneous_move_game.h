@@ -16,6 +16,8 @@
 #define THIRD_PARTY_OPEN_SPIEL_SIMULTANEOUS_MOVE_GAME_H_
 
 #include <memory>
+#include <string>
+#include <vector>
 
 #include "open_spiel/spiel.h"
 

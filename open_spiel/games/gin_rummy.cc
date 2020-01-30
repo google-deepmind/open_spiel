@@ -22,8 +22,8 @@
 #include "open_spiel/abseil-cpp/absl/strings/str_format.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
 #include "open_spiel/game_parameters.h"
-#include "open_spiel/spiel_utils.h"
 #include "open_spiel/games/gin_rummy/gin_rummy_utils.h"
+#include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
 namespace gin_rummy {
@@ -45,10 +45,10 @@ const GameType kGameType{
     /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
     {
-       {"oklahoma", GameParameter(false)},
-       {"knock_card", GameParameter(kDefaultKnockCard)},
-       {"gin_bonus", GameParameter(kDefaultGinBonus)},
-       {"undercut_bonus", GameParameter(kDefaultUndercutBonus)},
+        {"oklahoma", GameParameter(false)},
+        {"knock_card", GameParameter(kDefaultKnockCard)},
+        {"gin_bonus", GameParameter(kDefaultGinBonus)},
+        {"undercut_bonus", GameParameter(kDefaultUndercutBonus)},
     }};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
@@ -59,19 +59,14 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 
 }  // namespace
 
-GinRummyState::GinRummyState(std::shared_ptr<const Game> game,
-                             bool oklahoma,
-                             int knock_card,
-                             int gin_bonus,
-                             int undercut_bonus)
-    : State(game),
+GinRummyState::GinRummyState(std::shared_ptr<const Game> game, bool oklahoma,
+                             int knock_card, int gin_bonus, int undercut_bonus)
+    : State(std::move(game)),
       oklahoma_(oklahoma),
       knock_card_(knock_card),
       gin_bonus_(gin_bonus),
-      undercut_bonus_(undercut_bonus) {
-  deck_.resize(kNumCards);
-  std::iota(deck_.begin(), deck_.end(), 0);
-}
+      undercut_bonus_(undercut_bonus),
+      deck_(kNumCards, true) {}
 
 int GinRummyState::CurrentPlayer() const {
   if (IsTerminal()) {
@@ -115,11 +110,10 @@ void GinRummyState::ApplyDealAction(Action action) {
   } else if (stock_size_ == kNumCards - 2 * kHandSize) {
     // Set upcard
     StockToUpcard(action);
-    for (int i = 0; i < kNumPlayers; ++i)
-      deadwood_[i] = MinDeadwood(hands_[i]);
+    for (int i = 0; i < kNumPlayers; ++i) deadwood_[i] = MinDeadwood(hands_[i]);
     // Initial upcard determines the knock card if playing Oklahoma.
     if (oklahoma_) {
-      knock_card_ = CardValue(upcard_);
+      knock_card_ = CardValue(action);
       // Ace upcard means we must play for gin!
       if (knock_card_ == 1) knock_card_ = 0;
     }
@@ -143,7 +137,7 @@ void GinRummyState::ApplyDealAction(Action action) {
 // both players pass, the first player draws from the stock.
 void GinRummyState::ApplyFirstUpcardAction(Action action) {
   if (action == kDrawUpcardAction) {
-    SPIEL_CHECK_NE(upcard_, kInvalidCard);
+    SPIEL_CHECK_TRUE(upcard_.has_value());
     prev_upcard_ = upcard_;
     UpcardToHand(cur_player_);
     deadwood_[cur_player_] = MinDeadwood(hands_[cur_player_]);
@@ -152,8 +146,8 @@ void GinRummyState::ApplyFirstUpcardAction(Action action) {
   } else if (action == kDrawStockAction) {
     SPIEL_CHECK_TRUE(pass_on_first_upcard_[0] && pass_on_first_upcard_[1]);
     prev_upcard_ = upcard_;
-    discard_pile_.push_back(upcard_);
-    upcard_ = kInvalidCard;
+    discard_pile_.push_back(upcard_.value());
+    upcard_ = std::nullopt;
     prev_player_ = cur_player_;
     cur_player_ = kChancePlayerId;
     phase_ = Phase::kDeal;
@@ -170,7 +164,7 @@ void GinRummyState::ApplyFirstUpcardAction(Action action) {
 
 void GinRummyState::ApplyDrawAction(Action action) {
   if (action == kDrawUpcardAction) {
-    SPIEL_CHECK_NE(upcard_, kInvalidCard);
+    SPIEL_CHECK_TRUE(upcard_.has_value());
     if (++num_draw_upcard_actions_ == kMaxNumDrawUpcardActions) {
       phase_ = Phase::kGameOver;
       return;
@@ -184,8 +178,8 @@ void GinRummyState::ApplyDrawAction(Action action) {
     // When a player chooses to draw from stock the upcard is no
     // longer in play and goes to the top of the discard pile.
     prev_upcard_ = upcard_;
-    discard_pile_.push_back(upcard_);
-    upcard_ = kInvalidCard;
+    if (upcard_.has_value()) discard_pile_.push_back(upcard_.value());
+    upcard_ = std::nullopt;
     prev_player_ = cur_player_;
     cur_player_ = kChancePlayerId;
     phase_ = Phase::kDeal;
@@ -245,8 +239,7 @@ void GinRummyState::ApplyKnockAction(Action action) {
     SPIEL_CHECK_LE(deadwood_[cur_player_], knock_card_);
     // If deadwood equals 0 then the player has gin. The opponent is not
     // allowed to lay off on gin.
-    if (deadwood_[cur_player_] == 0)
-      finished_layoffs_ = true;
+    if (deadwood_[cur_player_] == 0) finished_layoffs_ = true;
     cur_player_ = Opponent(prev_player_);
     phase_ = Phase::kLayoff;
   } else {
@@ -335,7 +328,7 @@ std::vector<Action> GinRummyState::LegalActions() const {
 std::vector<Action> GinRummyState::DealLegalActions() const {
   std::vector<Action> legal_actions;
   for (int card = 0; card < kNumCards; ++card) {
-    if (deck_[card] != kInvalidCard) legal_actions.push_back(card);
+    if (deck_[card]) legal_actions.push_back(card);
   }
   return legal_actions;
 }
@@ -439,7 +432,7 @@ std::vector<std::pair<Action, double>> GinRummyState::ChanceOutcomes() const {
   const double p = 1.0 / stock_size_;
   for (int card = 0; card < kNumCards; ++card) {
     // This card is still in the deck, prob is 1/stock_size_.
-    if (deck_[card] != kInvalidCard) outcomes.push_back({card, p});
+    if (deck_[card]) outcomes.push_back({card, p});
   }
   return outcomes;
 }
@@ -464,8 +457,8 @@ std::string GinRummyState::ActionToString(Player player, Action action) const {
       std::vector<std::string> meld_str = CardIntsToCardStrings(meld);
       action_str = absl::StrJoin(meld_str, "");
     } else {
-      SpielFatalError(absl::StrCat(
-          "Error in GinRummyState::ActionToString()."));
+      SpielFatalError(
+          absl::StrCat("Error in GinRummyState::ActionToString()."));
     }
     return absl::StrCat("Player: ", player, " Action: ", action_str);
   }
@@ -477,41 +470,37 @@ std::string GinRummyState::ToString() const {
   absl::StrAppend(&rv, "\nPrev upcard: ", CardString(prev_upcard_));
   absl::StrAppend(&rv, "\nRepeated move: ", repeated_move_);
   absl::StrAppend(&rv, "\nPlayer turn: ", cur_player_);
-  absl::StrAppend(&rv, "\nPhase: ", phase_str_[static_cast<int>(phase_)], "\n");
+  absl::StrAppend(&rv, "\nPhase: ", kPhaseString[static_cast<int>(phase_)],
+                  "\n");
   absl::StrAppend(&rv, "\nPlayer1: Deadwood=", deadwood_[1]);
   if (knocked_[0] && !layoffs_.empty()) {
     absl::StrAppend(&rv, "\nLayoffs: ");
-    for (int card : layoffs_)
-      absl::StrAppend(&rv, CardString(card));
+    for (int card : layoffs_) absl::StrAppend(&rv, CardString(card));
   }
   if (!layed_melds_[1].empty()) {
     absl::StrAppend(&rv, "\nLayed melds:");
     for (int meld_id : layed_melds_[1]) {
       absl::StrAppend(&rv, " ");
       std::vector<int> meld = int_to_meld.at(meld_id);
-      for (int card : meld)
-        absl::StrAppend(&rv, CardString(card));
+      for (int card : meld) absl::StrAppend(&rv, CardString(card));
     }
   }
   absl::StrAppend(&rv, "\n", HandToString(hands_[1]));
   absl::StrAppend(&rv, "\nStock size: ", stock_size_);
   absl::StrAppend(&rv, "  Upcard: ", CardString(upcard_));
   absl::StrAppend(&rv, "\nDiscard pile: ");
-  for (int card : discard_pile_)
-    absl::StrAppend(&rv, CardString(card));
+  for (int card : discard_pile_) absl::StrAppend(&rv, CardString(card));
   absl::StrAppend(&rv, "\n\nPlayer0: Deadwood=", deadwood_[0]);
   if (knocked_[1] && !layoffs_.empty()) {
     absl::StrAppend(&rv, "\nLayoffs: ");
-    for (int card : layoffs_)
-      absl::StrAppend(&rv, CardString(card));
+    for (int card : layoffs_) absl::StrAppend(&rv, CardString(card));
   }
   if (!layed_melds_[0].empty()) {
     absl::StrAppend(&rv, "\nLayed melds:");
     for (int meld_id : layed_melds_[0]) {
       absl::StrAppend(&rv, " ");
       std::vector<int> meld = int_to_meld.at(meld_id);
-      for (int card : meld)
-        absl::StrAppend(&rv, CardString(card));
+      for (int card : meld) absl::StrAppend(&rv, CardString(card));
     }
   }
   absl::StrAppend(&rv, "\n", HandToString(hands_[0]));
@@ -549,25 +538,27 @@ std::vector<double> GinRummyState::Returns() const {
 }
 
 void GinRummyState::StockToHand(Player player, Action card) {
-  hands_[player].push_back(deck_[card]);
-  deck_[card] = kInvalidCard;
+  hands_[player].push_back(card);
+  deck_[card] = false;
   --stock_size_;
 }
 
 void GinRummyState::StockToUpcard(Action card) {
-  upcard_ = deck_[card];
-  deck_[card] = kInvalidCard;
+  upcard_ = card;
+  deck_[card] = false;
   --stock_size_;
 }
 
 void GinRummyState::UpcardToHand(Player player) {
-  hands_[player].push_back(upcard_);
-  upcard_ = kInvalidCard;
+  SPIEL_CHECK_TRUE(upcard_.has_value());
+  hands_[player].push_back(upcard_.value());
+  upcard_ = std::nullopt;
 }
 
 void GinRummyState::RemoveFromHand(Player player, Action card) {
-  hands_[player].erase(std::remove(hands_[player].begin(),
-      hands_[player].end(), card), hands_[player].end());
+  hands_[player].erase(
+      std::remove(hands_[player].begin(), hands_[player].end(), card),
+      hands_[player].end());
 }
 
 std::unique_ptr<State> GinRummyState::Clone() const {
@@ -581,7 +572,7 @@ std::string GinRummyState::ObservationString(Player player) const {
   std::vector<int> hand;
   std::vector<int> discard_pile;
   std::vector<int> layed_melds;
-  int upcard = kInvalidCard;
+  std::optional<int> upcard;
   int knock_card = 0;
   int stock_size = 0;
 
@@ -617,8 +608,7 @@ std::string GinRummyState::ObservationString(Player player) const {
     absl::StrAppend(&rv, "\nOpponent melds: ");
     for (int meld_id : layed_melds) {
       std::vector<int> meld = int_to_meld.at(meld_id);
-      for (int card : meld)
-        absl::StrAppend(&rv, CardString(card));
+      for (int card : meld) absl::StrAppend(&rv, CardString(card));
       absl::StrAppend(&rv, " ");
     }
   }
@@ -626,8 +616,7 @@ std::string GinRummyState::ObservationString(Player player) const {
   absl::StrAppend(&rv, "  Upcard: ", CardString(upcard));
   absl::StrAppend(&rv, "  Knock card: ", knock_card);
   absl::StrAppend(&rv, "\nDiscard pile: ");
-  for (int card : discard_pile)
-    absl::StrAppend(&rv, CardString(card));
+  for (int card : discard_pile) absl::StrAppend(&rv, CardString(card));
   absl::StrAppend(&rv, "\n", HandToString(hand));
   return rv;
 }
@@ -645,29 +634,23 @@ void GinRummyState::ObservationTensor(Player player,
   ptr[player] = 1;
   ptr += kNumPlayers;
 
-  for (int i = 0; i < knock_card_; ++i)
-    ptr[i] = 1;
+  for (int i = 0; i < knock_card_; ++i) ptr[i] = 1;
   ptr += kDefaultKnockCard;
 
-  for (int card : hands_[player])
-    ptr[card] = 1;
+  for (int card : hands_[player]) ptr[card] = 1;
   ptr += kNumCards;
 
-  if (upcard_ != kInvalidCard)
-    ptr[upcard_] = 1;
+  if (upcard_.has_value()) ptr[upcard_.value()] = 1;
   ptr += kNumCards;
 
-  for (int card : discard_pile_)
-    ptr[card] = 1;
+  for (int card : discard_pile_) ptr[card] = 1;
   ptr += kNumCards;
 
-  for (int i = 0; i < std::min(stock_size_, kMaxStockSize); ++i)
-    ptr[i] = 1;
+  for (int i = 0; i < std::min(stock_size_, kMaxStockSize); ++i) ptr[i] = 1;
   ptr += kMaxStockSize;
 
   if (knocked_[Opponent(player)]) {
-    for (int meld : layed_melds_[Opponent(player)])
-      ptr[meld] = 1;
+    for (int meld : layed_melds_[Opponent(player)]) ptr[meld] = 1;
   }
 }
 

@@ -14,10 +14,17 @@
 
 #include "open_spiel/policy.h"
 
+#include <iterator>
 #include <list>
 #include <memory>
+#include <random>
+#include <string>
+#include <unordered_map>
+#include <utility>
+#include <vector>
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
+#include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {

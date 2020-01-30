@@ -19,6 +19,8 @@
 #include <iostream>
 #include <map>
 #include <memory>
+#include <numeric>
+#include <optional>
 #include <random>
 #include <sstream>
 #include <string>
@@ -26,6 +28,7 @@
 #include <utility>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/strings/str_join.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel_utils.h"
 

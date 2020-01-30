@@ -14,11 +14,14 @@
 
 #include "open_spiel/spiel_bots.h"
 
-#include <algorithm>
+#include <memory>
+#include <random>
 #include <unordered_set>
+#include <utility>
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/random/uniform_int_distribution.h"
+#include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 

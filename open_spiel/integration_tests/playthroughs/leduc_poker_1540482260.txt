@@ -45,12 +45,12 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 InformationStateString(0) = "[Round 1][Player: -1][Pot: 2][Money: 99 99[Private: -10000]][Round1]: [Public: -10000]\nRound 2 sequence: "
 InformationStateString(1) = "[Round 1][Player: -1][Pot: 2][Money: 99 99[Private: -10000]][Round1]: [Public: -10000]\nRound 2 sequence: "
-InformationStateTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+InformationStateTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationString(0) = "[Round 1][Player: -1][Pot: 2][Money: 99 99[Private: -10000][Ante: 1 1]"
 ObservationString(1) = "[Round 1][Player: -1][Pot: 2][Money: 99 99[Private: -10000][Ante: 1 1]"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0]
+ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉
+ObservationTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◯◯◯◉◉
 ChanceOutcomes() = [{0, 0.166666666667}, {1, 0.166666666667}, {2, 0.166666666667}, {3, 0.166666666667}, {4, 0.166666666667}, {5, 0.166666666667}]
 LegalActions() = [0, 1, 2, 3, 4, 5]
 StringLegalActions() = ["Chance outcome:0", "Chance outcome:1", "Chance outcome:2", "Chance outcome:3", "Chance outcome:4", "Chance outcome:5"]
@@ -74,12 +74,12 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 InformationStateString(0) = "[Round 1][Player: -1][Pot: 2][Money: 99 99[Private: 5]][Round1]: [Public: -10000]\nRound 2 sequence: "
 InformationStateString(1) = "[Round 1][Player: -1][Pot: 2][Money: 99 99[Private: -10000]][Round1]: [Public: -10000]\nRound 2 sequence: "
-InformationStateTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+InformationStateTensor(0): ◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationString(0) = "[Round 1][Player: -1][Pot: 2][Money: 99 99[Private: 5][Ante: 1 1]"
 ObservationString(1) = "[Round 1][Player: -1][Pot: 2][Money: 99 99[Private: -10000][Ante: 1 1]"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0]
+ObservationTensor(0): ◉◯◯◯◯◯◯◉◯◯◯◯◯◯◉◉
+ObservationTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◯◯◯◉◉
 ChanceOutcomes() = [{0, 0.200000000000}, {1, 0.200000000000}, {2, 0.200000000000}, {3, 0.200000000000}, {4, 0.200000000000}]
 LegalActions() = [0, 1, 2, 3, 4]
 StringLegalActions() = ["Chance outcome:0", "Chance outcome:1", "Chance outcome:2", "Chance outcome:3", "Chance outcome:4"]
@@ -103,12 +103,12 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 0
 InformationStateString(0) = "[Round 1][Player: 0][Pot: 2][Money: 99 99[Private: 5]][Round1]: [Public: -10000]\nRound 2 sequence: "
 InformationStateString(1) = "[Round 1][Player: 0][Pot: 2][Money: 99 99[Private: 1]][Round1]: [Public: -10000]\nRound 2 sequence: "
-InformationStateTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateTensor(1) = [0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+InformationStateTensor(0): ◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(1): ◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationString(0) = "[Round 1][Player: 0][Pot: 2][Money: 99 99[Private: 5][Ante: 1 1]"
 ObservationString(1) = "[Round 1][Player: 0][Pot: 2][Money: 99 99[Private: 1][Ante: 1 1]"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0]
+ObservationTensor(0): ◉◯◯◯◯◯◯◉◯◯◯◯◯◯◉◉
+ObservationTensor(1): ◯◉◯◉◯◯◯◯◯◯◯◯◯◯◉◉
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [1, 2]
@@ -133,8 +133,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 1
 InformationStateString(0) = "[Round 1][Player: 1][Pot: 4][Money: 97 99[Private: 5]][Round1]: 2[Public: -10000]\nRound 2 sequence: "
 InformationStateString(1) = "[Round 1][Player: 1][Pot: 4][Money: 97 99[Private: 1]][Round1]: 2[Public: -10000]\nRound 2 sequence: "
-InformationStateTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateTensor(1) = [0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+InformationStateTensor(0): ◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(1): ◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationString(0) = "[Round 1][Player: 1][Pot: 4][Money: 97 99[Private: 5][Ante: 3 1]"
 ObservationString(1) = "[Round 1][Player: 1][Pot: 4][Money: 97 99[Private: 1][Ante: 3 1]"
 ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 3.0, 1.0]
@@ -163,8 +163,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -4
 InformationStateString(0) = "[Round 1][Player: 1][Pot: 0][Money: 101 99[Private: 5]][Round1]: 2 0[Public: -10000]\nRound 2 sequence: "
 InformationStateString(1) = "[Round 1][Player: 1][Pot: 0][Money: 101 99[Private: 1]][Round1]: 2 0[Public: -10000]\nRound 2 sequence: "
-InformationStateTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateTensor(1) = [0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+InformationStateTensor(0): ◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(1): ◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationString(0) = "[Round 1][Player: 1][Pot: 0][Money: 101 99[Private: 5][Ante: 3 1]"
 ObservationString(1) = "[Round 1][Player: 1][Pot: 0][Money: 101 99[Private: 1][Ante: 3 1]"
 ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 3.0, 1.0]

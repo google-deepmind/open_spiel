@@ -700,8 +700,6 @@ std::string UniversalPokerGame::parseParameters(const GameParameters &map) {
   absl::StrAppend(&generated_gamedef,
                   "blind = ", ParameterValue<std::string>("blind"), "\n");
   absl::StrAppend(&generated_gamedef, "END GAMEDEF\n");
-  std::cerr << "Generated gamedef for Universal Poker:\n"
-            << generated_gamedef << std::endl;
   return generated_gamedef;
 }
 
@@ -796,17 +794,19 @@ void UniversalPokerState::_CalculateActionsAndNodeType() {
         // bet".
         possibleActions_ |= ACTION_BET;
       } else {
-        // It's always legal to go all-in in No Limit if other bets are legal:
-        possibleActions_ |= ACTION_ALL_IN;
-        int32_t currentPot =
-            acpc_state_.MaxSpend() *
-            (acpc_game_->GetNbPlayers() - acpc_state_.NumFolded());
-        potSize_ = currentPot > potSize_ ? currentPot : potSize_;
-        potSize_ = allInSize_ < potSize_ ? allInSize_ : potSize_;
-        if (allInSize_ > potSize_) {
-          // We only add a pot bet if it's going to have a different outcome
-          // from going all-in.
+        int cur_spent = acpc_state_.CurrentSpent(acpc_state_.CurrentPlayer());
+        int pot_raise_to =
+            acpc_state_.TotalSpent() + 2 * acpc_state_.MaxSpend() - cur_spent;
+
+        if (pot_raise_to >= potSize_ && pot_raise_to <= allInSize_) {
+          potSize_ = pot_raise_to;
           possibleActions_ |= ACTION_BET;
+        }
+
+        if (pot_raise_to != allInSize_) {
+          // If the raise to amount happens to match the number of chips I have,
+          // then this action was already added as a pot-bet.
+          possibleActions_ |= ACTION_ALL_IN;
         }
       }
     }

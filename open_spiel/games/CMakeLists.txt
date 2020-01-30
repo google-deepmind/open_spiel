@@ -27,6 +27,8 @@ set(GAME_SOURCES
   connect_four.h
   coop_box_pushing.cc
   coop_box_pushing.h
+  cursor_go.cc
+  cursor_go.h
   deep_sea.cc
   deep_sea.h
   first_sealed_auction.cc
@@ -211,6 +213,11 @@ add_executable(coop_box_pushing_test coop_box_pushing_test.cc
                ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(coop_box_pushing_test coop_box_pushing_test)
+
+add_executable(cursor_go_test cursor_go_test.cc
+               ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(cursor_go_test cursor_go_test)
 
 add_executable(deep_sea_test deep_sea_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)

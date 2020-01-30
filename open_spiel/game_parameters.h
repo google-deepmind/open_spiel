@@ -18,6 +18,7 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <utility>
 
 #include "open_spiel/spiel_utils.h"
 
@@ -29,6 +30,7 @@ namespace open_spiel {
 // - when specifying in Python a parameter value.
 //
 class GameParameter;
+
 using GameParameters = std::map<std::string, GameParameter>;
 std::string GameParametersToString(const GameParameters& game_params);
 GameParameters GameParametersFromString(const std::string& game_string);

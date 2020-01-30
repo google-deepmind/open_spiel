@@ -15,6 +15,10 @@
 #ifndef THIRD_PARTY_OPEN_SPIEL_SPIEL_BOTS_H_
 #define THIRD_PARTY_OPEN_SPIEL_SPIEL_BOTS_H_
 
+#include <memory>
+#include <utility>
+#include <vector>
+
 #include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"

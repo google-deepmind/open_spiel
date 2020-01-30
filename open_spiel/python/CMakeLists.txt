@@ -37,3 +37,17 @@ set_property(TEST python_${py_test}
     TEST_SRCDIR=${CMAKE_CURRENT_SOURCE_DIR}/../..)
 
 endforeach(py_test_file)
+
+# Additional tests (running examples as tests)
+# We don't generate these automatically because we may want custom parameters.
+
+add_test(NAME python_examples_bridge_supervised_learning
+         COMMAND python3
+         ${CMAKE_CURRENT_SOURCE_DIR}/examples/bridge_supervised_learning.py
+         --iterations 10
+         --eval_every 5
+         --data_path ${CMAKE_CURRENT_SOURCE_DIR}/examples/data/bridge)
+set_property(TEST python_examples_bridge_supervised_learning
+    PROPERTY ENVIRONMENT
+    PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}:${CMAKE_CURRENT_SOURCE_DIR}/../..;
+    TEST_SRCDIR=${CMAKE_CURRENT_SOURCE_DIR}/../..)

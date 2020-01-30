@@ -67,7 +67,7 @@
     end
 
     @testset "solve loss" begin
-        root, state = search_tic_tac_toe_state("x(1,1) o(0,0) x(2,2) o(1,0) x(2,0)")
+        root, state = search_tic_tac_toe_state("x(1,1) o(0,0) x(2,2) o(0,1) x(0,2)")
         @test to_string(state) == "oox\n.x.\n..x"
         @test get_outcome(root)[get_player(root)+1] == -1
         for c in get_children(root)
@@ -76,12 +76,12 @@
     end
 
     @testset "solve win" begin
-        root, state = search_tic_tac_toe_state("x(1,0) o(2,2)")
+        root, state = search_tic_tac_toe_state("x(0,1) o(2,2)")
         @test to_string(state) == ".x.\n...\n..o"
         @test get_outcome(root)[get_player(root)+1] == 1
         best = best_child(root)[]
         @test get_outcome(best)[get_player(best)+1] == 1
-        @test action_to_string(state, get_player(best), get_action(best)) == "x(2,0)"
+        @test action_to_string(state, get_player(best), get_action(best)) == "x(0,2)"
     end
 end
 

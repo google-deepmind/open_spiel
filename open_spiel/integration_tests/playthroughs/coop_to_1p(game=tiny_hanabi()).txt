@@ -36,7 +36,7 @@ IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "Player 0\nNew Game\n"
-ObservationTensor(0) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ChanceOutcomes() = [{0, 0.500000000000}, {1, 0.500000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["d0", "d1"]
@@ -54,7 +54,7 @@ IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "Player 0\nNew Game\nPlayer 0 possible: d0 d1\n"
-ObservationTensor(0) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ChanceOutcomes() = [{0, 0.500000000000}, {1, 0.500000000000}]
 LegalActions() = [0, 1]
 StringLegalActions() = ["d0", "d1"]
@@ -76,7 +76,7 @@ IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
 ObservationString(0) = "Player 0\nNew Game\nPlayer 0 p0a0: none\nPlayer 0 p0a1: none\nPlayer 0 p0a2: none\nPlayer 0 unassigned: d0 d1\nPlayer 1 possible: d0 d1\n"
-ObservationTensor(0) = [0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◯◯◯◉◉◉◉◯◯◯◯◯◯◉◯
 Rewards() = [0.0]
 Returns() = [0.0]
 LegalActions() = [0, 1, 2]
@@ -99,7 +99,7 @@ IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
 ObservationString(0) = "Player 0\nNew Game\nPlayer 0 p0a0: none\nPlayer 0 p0a1: none\nPlayer 0 p0a2: d0\nPlayer 0 unassigned: d1\nPlayer 1 possible: d0 d1\n"
-ObservationTensor(0) = [0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0]
+ObservationTensor(0): ◯◯◯◉◉◉◉◯◯◯◯◉◯◯◉
 Rewards() = [0.0]
 Returns() = [0.0]
 LegalActions() = [0, 1, 2]
@@ -122,7 +122,7 @@ IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
 ObservationString(0) = "Player 0\np0a2\nPlayer 0 possible: d0\nPlayer 1 p1a0: none\nPlayer 1 p1a1: none\nPlayer 1 p1a2: none\nPlayer 1 unassigned: d0 d1\n"
-ObservationTensor(0) = [0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◯◯◉◉◯◉◉◯◯◯◯◯◯◉◯
 Rewards() = [0.0]
 Returns() = [0.0]
 LegalActions() = [0, 1, 2]
@@ -145,7 +145,7 @@ IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
 ObservationString(0) = "Player 0\np0a2\nPlayer 0 possible: d0\nPlayer 1 p1a0: none\nPlayer 1 p1a1: none\nPlayer 1 p1a2: d0\nPlayer 1 unassigned: d1\n"
-ObservationTensor(0) = [0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0]
+ObservationTensor(0): ◯◯◉◉◯◉◉◯◯◯◯◉◯◯◉
 Rewards() = [0.0]
 Returns() = [0.0]
 LegalActions() = [0, 1, 2]
@@ -165,6 +165,6 @@ IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
 ObservationString(0) = "Player 0\np1a2\nPlayer 0 possible: d0\nPlayer 1 possible: d0 d1\n"
-ObservationTensor(0) = [0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◯◯◉◉◯◉◉◯◯◯◯◯◯◯◯
 Rewards() = [10.0]
 Returns() = [10.0]

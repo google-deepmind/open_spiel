@@ -14,16 +14,19 @@
 
 #include "open_spiel/spiel.h"
 
-#include <cstdlib>
-#include <iomanip>
+#include <algorithm>
+#include <functional>
 #include <iostream>
-#include <list>
+#include <map>
 #include <memory>
-#include <ostream>
+#include <optional>
+#include <string>
+#include <utility>
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_split.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel_utils.h"
 

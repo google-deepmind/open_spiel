@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Lint as python3
 """Play a game, selecting random moves, and save what we see.
 
 This can be used to check by hand the behaviour of a game, and also
@@ -23,12 +24,9 @@ playthrough --game kuhn_poker --params players=3
 ```
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 from absl import app
 from absl import flags
+from absl import logging
 
 from open_spiel.python.algorithms import generate_playthrough
 
@@ -61,7 +59,7 @@ def main(unused_argv):
       with open(FLAGS.output_file, "w") as f:
         f.write(text)
     else:
-      print(text, end="")
+      logging.info(text)
 
 
 if __name__ == "__main__":

@@ -355,7 +355,7 @@ def is_dominated(action,
   # Multiagent Systems: Algorithmic, Game-Theoretic, and Logical Foundations
   # http://www.masfoundations.org/mas.pdf
   assert mode in (DOMINANCE_STRICT, DOMINANCE_VERY_WEAK, DOMINANCE_WEAK)
-  payoffs = utils.nfg_to_ndarray(game_or_payoffs)[player] if isinstance(
+  payoffs = utils.game_payoffs_array(game_or_payoffs)[player] if isinstance(
       game_or_payoffs, pyspiel.NormalFormGame) else np.asfarray(game_or_payoffs)
 
   # Reshape payoffs so rows correspond to `player` and cols to the joint action
@@ -457,7 +457,7 @@ def iterated_dominance(game_or_payoffs, mode, tol=1e-7):
        `live_actions[player][action]` is `True` if `action` wasn't dominated for
        `player`.
   """
-  payoffs = utils.nfg_to_ndarray(game_or_payoffs) if isinstance(
+  payoffs = utils.game_payoffs_array(game_or_payoffs) if isinstance(
       game_or_payoffs, pyspiel.NormalFormGame) else np.asfarray(game_or_payoffs)
   live_actions = [
       np.ones(num_actions, np.bool) for num_actions in payoffs.shape[1:]

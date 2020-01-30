@@ -136,14 +136,14 @@ class Environment(object):
   """Open Spiel reinforcement learning environment class."""
 
   def __init__(self,
-               game_name,
+               game,
                discount=1.0,
                chance_event_sampler=None,
                **kwargs):
     """Constructor.
 
     Args:
-      game_name: string, Open Spiel game name.
+      game: [string, pyspiel.Game] Open Spiel game name or game instance.
       discount: float, discount used in non-initial steps. Defaults to 1.0.
       chance_event_sampler: optional object with `sample_external_events` method
         to sample chance events.
@@ -151,15 +151,18 @@ class Environment(object):
     """
     self._chance_event_sampler = chance_event_sampler or ChanceEventSampler()
 
-    if kwargs:
+    if isinstance(game, pyspiel.Game):
+      logging.info("Using game instance: %s", game.get_type().short_name)
+      self._game = game
+    elif kwargs:
       game_settings = {
           key: pyspiel.GameParameter(val) for (key, val) in kwargs.items()
       }
       logging.info("Using game settings: %s", game_settings)
-      self._game = pyspiel.load_game(game_name, game_settings)
+      self._game = pyspiel.load_game(game, game_settings)
     else:
-      logging.info("Using game string: %s", game_name)
-      self._game = pyspiel.load_game(game_name)
+      logging.info("Using game string: %s", game)
+      self._game = pyspiel.load_game(game)
 
     self._num_players = self._game.num_players()
     self._state = None

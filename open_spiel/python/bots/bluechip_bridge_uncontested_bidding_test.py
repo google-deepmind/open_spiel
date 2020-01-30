@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for third_party.open_spiel.python.bots.bluechip_bridge_wrapper."""
+"""Tests for third_party.open_spiel.python.bots.bluechip_bridge_uncontested_bidding."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -21,12 +21,12 @@ from __future__ import print_function
 import itertools
 
 from absl.testing import absltest
-from open_spiel.python.bots import bluechip_bridge_wrapper
+from open_spiel.python.bots import bluechip_bridge_uncontested_bidding
 import pyspiel
 
-_BID_1D = bluechip_bridge_wrapper._string_to_action("1D")
-_BID_1H = bluechip_bridge_wrapper._string_to_action("1H")
-_BID_2H = bluechip_bridge_wrapper._string_to_action("2H")
+_BID_1D = bluechip_bridge_uncontested_bidding._string_to_action("1D")
+_BID_1H = bluechip_bridge_uncontested_bidding._string_to_action("1H")
+_BID_2H = bluechip_bridge_uncontested_bidding._string_to_action("2H")
 
 
 class BluechipBridgeWrapperTest(absltest.TestCase):
@@ -50,7 +50,8 @@ class BluechipBridgeWrapperTest(absltest.TestCase):
                 "EAST PASSES",
             ]
         })
-    bot = bluechip_bridge_wrapper.BlueChipBridgeBot(game, 1, mock_client)
+    bot = bluechip_bridge_uncontested_bidding.BlueChipBridgeBot(
+        game, 1, mock_client)
     state = game.deserialize_state("A86.J543.K642.A3 J.KQ962.T953.J96")
     state.apply_action(_BID_1D)
     policy, action = bot.step(state)
@@ -59,8 +60,9 @@ class BluechipBridgeWrapperTest(absltest.TestCase):
     state.apply_action(action)
     state.apply_action(_BID_2H)
     policy, action = bot.step(state)
-    self.assertEqual(action, bluechip_bridge_wrapper._PASS_ACTION)
-    self.assertEqual(policy, (bluechip_bridge_wrapper._PASS_ACTION, 1.0))
+    self.assertEqual(action, bluechip_bridge_uncontested_bidding._PASS_ACTION)
+    self.assertEqual(policy,
+                     (bluechip_bridge_uncontested_bidding._PASS_ACTION, 1.0))
     # Finished - now check that the game state is correct.
     self.assertEqual(str(state), "A86.J543.K642.A3 J.KQ962.T953.J96 1D-1H-2H")
     # Check that we received the expected messages.
@@ -111,7 +113,8 @@ class BluechipBridgeWrapperTest(absltest.TestCase):
                 "WEST ready for SOUTH's bid",
             ]
         })
-    bot = bluechip_bridge_wrapper.BlueChipBridgeBot(game, 0, mock_client)
+    bot = bluechip_bridge_uncontested_bidding.BlueChipBridgeBot(
+        game, 0, mock_client)
     state = game.deserialize_state("A86.J543.K642.A3 J.KQ962.T953.J96")
     policy, action = bot.step(state)
     self.assertEqual(action, _BID_1D)
@@ -158,7 +161,8 @@ class BluechipBridgeWrapperTest(absltest.TestCase):
                 "WEST ready for cards",
             ]
         })
-    bot = bluechip_bridge_wrapper.BlueChipBridgeBot(game, 0, mock_client)
+    bot = bluechip_bridge_uncontested_bidding.BlueChipBridgeBot(
+        game, 0, mock_client)
     state = game.deserialize_state("A86.J543.K642.A3 J.KQ962.T953.J96")
     with self.assertRaisesRegex(
         ValueError,
@@ -178,7 +182,8 @@ class BluechipBridgeWrapperTest(absltest.TestCase):
                 "NORTH bids 1S",
             ]
         })
-    bot = bluechip_bridge_wrapper.BlueChipBridgeBot(game, 0, mock_client)
+    bot = bluechip_bridge_uncontested_bidding.BlueChipBridgeBot(
+        game, 0, mock_client)
     state = game.deserialize_state("A86.J543.K642.A3 J.KQ962.T953.J96")
     with self.assertRaisesRegex(
         ValueError,
@@ -187,15 +192,17 @@ class BluechipBridgeWrapperTest(absltest.TestCase):
 
   def test_string_to_action_to_string_roundtrip(self):
     for level, trump in itertools.product(
-        range(1, 8), bluechip_bridge_wrapper._TRUMP_SUIT):
+        range(1, 8), bluechip_bridge_uncontested_bidding._TRUMP_SUIT):
       bid = str(level) + trump
-      action = bluechip_bridge_wrapper._string_to_action(bid)
-      self.assertEqual(bid, bluechip_bridge_wrapper._action_to_string(action))
+      action = bluechip_bridge_uncontested_bidding._string_to_action(bid)
+      self.assertEqual(
+          bid, bluechip_bridge_uncontested_bidding._action_to_string(action))
 
   def test_action_to_string_to_action_roundtrip(self):
     for action in range(1, 36):
-      bid = bluechip_bridge_wrapper._action_to_string(action)
-      self.assertEqual(action, bluechip_bridge_wrapper._string_to_action(bid))
+      bid = bluechip_bridge_uncontested_bidding._action_to_string(action)
+      self.assertEqual(
+          action, bluechip_bridge_uncontested_bidding._string_to_action(bid))
 
 
 if __name__ == "__main__":

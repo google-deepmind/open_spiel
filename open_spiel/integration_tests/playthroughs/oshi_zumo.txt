@@ -39,8 +39,8 @@ InformationStateString(0) = ""
 InformationStateString(1) = ""
 ObservationString(0) = "Coins: 10 10, Field: #...W...#\n"
 ObservationString(1) = "Coins: 10 10, Field: #...W...#\n"
-ObservationTensor(0) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions(0) = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
@@ -63,8 +63,8 @@ InformationStateString(0) = "6 10"
 InformationStateString(1) = "6 10"
 ObservationString(0) = "Coins: 4 0, Field: #..W....#\n"
 ObservationString(1) = "Coins: 4 0, Field: #..W....#\n"
-ObservationTensor(0) = [0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
+ObservationTensor(1): ◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions(0) = [0, 1, 2, 3, 4]
@@ -87,8 +87,8 @@ InformationStateString(0) = "6 10 1 0"
 InformationStateString(1) = "6 10 1 0"
 ObservationString(0) = "Coins: 3 0, Field: #...W...#\n"
 ObservationString(1) = "Coins: 3 0, Field: #...W...#\n"
-ObservationTensor(0) = [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions(0) = [0, 1, 2, 3]
@@ -111,8 +111,8 @@ InformationStateString(0) = "6 10 1 0 1 0"
 InformationStateString(1) = "6 10 1 0 1 0"
 ObservationString(0) = "Coins: 2 0, Field: #....W..#\n"
 ObservationString(1) = "Coins: 2 0, Field: #....W..#\n"
-ObservationTensor(0) = [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0]
+ObservationTensor(0): ◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯
+ObservationTensor(1): ◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions(0) = [0, 1, 2]
@@ -135,8 +135,8 @@ InformationStateString(0) = "6 10 1 0 1 0 1 0"
 InformationStateString(1) = "6 10 1 0 1 0 1 0"
 ObservationString(0) = "Coins: 1 0, Field: #.....W.#\n"
 ObservationString(1) = "Coins: 1 0, Field: #.....W.#\n"
-ObservationTensor(0) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0]
+ObservationTensor(0): ◯◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯
+ObservationTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions(0) = [0, 1]
@@ -159,7 +159,7 @@ InformationStateString(0) = "6 10 1 0 1 0 1 0 1 0"
 InformationStateString(1) = "6 10 1 0 1 0 1 0 1 0"
 ObservationString(0) = "Coins: 0 0, Field: #......W#\n"
 ObservationString(1) = "Coins: 0 0, Field: #......W#\n"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0]
-ObservationTensor(1) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0]
+ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
+ObservationTensor(1): ◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
 Rewards() = [1.0, -1.0]
 Returns() = [1.0, -1.0]

@@ -86,6 +86,13 @@ fi
 
 # Install Julia if required and not present already.
 if [[ ${BUILD_WITH_JULIA:-"OFF"} == "ON" ]]; then
+  # Check that Julia is in the path.
+  if [[ ! -x `which julia` ]]
+  then
+    echo -e "\e[33mWarning: julia not in your PATH. Trying \$HOME/.local/bin\e[0m"
+    PATH=${PATH}:${HOME}/.local/bin
+  fi
+
   if which julia >/dev/null; then
     JULIA_VERSION_INFO=`julia --version`
     echo -e "\e[33m$JULIA_VERSION_INFO is already installed.\e[0m"
@@ -96,7 +103,8 @@ if [[ ${BUILD_WITH_JULIA:-"OFF"} == "ON" ]]; then
     mv jill.sh $JULIA_INSTALLER
     fi
     JULIA_VERSION=1.3.1 bash $JULIA_INSTALLER -y
-    PATH=${PATH}:${HOME}/.local/bin
+    # Should install in $HOME/.local/bin which was added to the path above
+    [[ -x `which julia` ]] || die "julia not found PATH after install."
   fi
 
   # Install dependencies.

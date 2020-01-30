@@ -41,21 +41,16 @@
 #include <utility>
 #include <vector>
 
-#include "open_spiel/spiel.h"
 #include "open_spiel/games/gin_rummy/gin_rummy_utils.h"
+#include "open_spiel/spiel.h"
 
 namespace open_spiel {
 namespace gin_rummy {
 
-inline constexpr int kInvalidCard = -10000;
 inline constexpr int kNumPlayers = 2;
-inline constexpr int kNumSuits = 4;
-inline constexpr int kNumRanks = 13;
-inline constexpr int kNumCards = kNumSuits * kNumRanks;
 inline constexpr int kMaxPossibleDeadwood = 98;  // E.g. KsKcQdQhJsJcTdTh9s9c
 inline constexpr int kMaxNumDrawUpcardActions = 50;
 inline constexpr int kHandSize = 10;
-inline constexpr int kMaxHandSize = 11;
 inline constexpr int kMaxStockSize = 31;  // Stock size when play begins
 inline constexpr int kWallStockSize = 2;
 inline constexpr int kDefaultKnockCard = 10;
@@ -82,7 +77,7 @@ class GinRummyState : public State {
   explicit GinRummyState(std::shared_ptr<const Game> game, bool oklahoma,
                          int knock_card, int gin_bonus, int undercut_bonus);
   Player CurrentPlayer() const override;
-  std::string ActionToString(Player player, Action move) const override;
+  std::string ActionToString(Player player, Action action) const override;
   std::string ToString() const override;
   bool IsTerminal() const override { return phase_ == Phase::kGameOver; }
   std::vector<double> Returns() const override;
@@ -97,12 +92,20 @@ class GinRummyState : public State {
   void DoApplyAction(Action action) override;
 
  private:
-  enum class Phase {kDeal, kFirstUpcard, kDraw, kDiscard,
-                    kKnock, kLayoff, kWall, kGameOver};
+  enum class Phase {
+    kDeal,
+    kFirstUpcard,
+    kDraw,
+    kDiscard,
+    kKnock,
+    kLayoff,
+    kWall,
+    kGameOver
+  };
 
-  const std::array<std::string, 8> phase_str_ = {"Deal", "FirstUpcard", "Draw",
-                                                 "Discard", "Knock", "Layoff",
-                                                 "Wall", "GameOver"};
+  inline static constexpr std::array<absl::string_view, 8> kPhaseString = {
+      "Deal",  "FirstUpcard", "Draw", "Discard",
+      "Knock", "Layoff",      "Wall", "GameOver"};
 
   std::vector<Action> DealLegalActions() const;
   std::vector<Action> FirstUpcardLegalActions() const;
@@ -129,7 +132,7 @@ class GinRummyState : public State {
   int Opponent(int player) const { return 1 - player; }
 
   const bool oklahoma_;  // If true, will override the knock card value.
-  int knock_card_;  // The maximum deadwood total for a legal knock.
+  int knock_card_;       // The maximum deadwood total for a legal knock.
   const int gin_bonus_;
   const int undercut_bonus_;
 
@@ -137,9 +140,9 @@ class GinRummyState : public State {
   Player cur_player_ = kChancePlayerId;
   Player prev_player_ = kChancePlayerId;
   bool finished_layoffs_ = false;
-  int upcard_ = kInvalidCard;
-  int prev_upcard_ = kInvalidCard;  // Used to track repeated moves.
-  int stock_size_ = kNumCards;  // Number of cards remaining in stock.
+  std::optional<int> upcard_;
+  std::optional<int> prev_upcard_;  // Used to track repeated moves.
+  int stock_size_ = kNumCards;      // Number of cards remaining in stock.
   // True if the prev player drew the upcard only to immediately discard it.
   // If both players do this in succession the game is declared a draw.
   bool repeated_move_ = false;
@@ -149,9 +152,10 @@ class GinRummyState : public State {
 
   // Each player's hand. Indexed by pid.
   std::vector<std::vector<int>> hands_ =
-      std::vector<std::vector<int>>(kNumPlayers, std::vector<int> ());
-  // Cards from 0-51 using the suit order "scdh".
-  std::vector<int> deck_{};
+      std::vector<std::vector<int>>(kNumPlayers, std::vector<int>());
+  // True if the card is still in the deck. Cards from 0-51 using the suit order
+  // "scdh".
+  std::vector<bool> deck_{};
   // Discard pile consists of cards that are out of play.
   std::vector<int> discard_pile_{};
   // Prior to a knock, deadwood tracks the minimum possible deadwood count
@@ -168,7 +172,7 @@ class GinRummyState : public State {
       std::vector<bool>(kNumPlayers, false);
   // Each player's layed melds during the knock phase. Indexed by pid.
   std::vector<std::vector<int>> layed_melds_ =
-      std::vector<std::vector<int>>(kNumPlayers, std::vector<int> ());
+      std::vector<std::vector<int>>(kNumPlayers, std::vector<int>());
   // Cards that have been layed off onto knocking player's layed melds.
   std::vector<int> layoffs_{};
 };

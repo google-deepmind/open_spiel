@@ -203,7 +203,7 @@ def main(_):
   num_rows, num_cols = game.num_rows(), game.num_cols()
   row_actions = [game.row_action_name(row) for row in range(num_rows)]
   col_actions = [game.col_action_name(col) for col in range(num_cols)]
-  row_payoffs, col_payoffs = utils.nfg_to_ndarray(game)
+  row_payoffs, col_payoffs = utils.game_payoffs_array(game)
   pure_nash = list(
       zip(*((row_payoffs >= row_payoffs.max(0, keepdims=True) - FLAGS.tol)
             & (col_payoffs >= col_payoffs.max(1, keepdims=True) - FLAGS.tol)

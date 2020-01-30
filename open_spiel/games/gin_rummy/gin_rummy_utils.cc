@@ -24,13 +24,6 @@
 namespace open_spiel {
 namespace gin_rummy {
 
-inline constexpr int kInvalidCard = -10000;
-inline constexpr int kNumSuits = 4;
-inline constexpr int kNumRanks = 13;
-inline constexpr int kNumCards = kNumSuits * kNumRanks;
-inline constexpr int kMaxHandSize = 11;
-inline constexpr int kHandStringSize = 174;
-
 int CardSuit(int card) { return card / kNumRanks; }
 int CardRank(int card) { return card % kNumRanks; }
 
@@ -38,14 +31,11 @@ int CardRank(int card) { return card % kNumRanks; }
 constexpr char kRankChar[] = "A23456789TJQK";
 constexpr char kSuitChar[] = "scdh";
 
-std::string CardString(int card) {
-  if (card == kInvalidCard) {
-    return "XX";
-  } else if (card >= 0 && card < kNumCards) {
-    return {kRankChar[CardRank(card)], kSuitChar[CardSuit(card)]};
-  } else {
-    SpielFatalError("Invalid CardString input");
-  }
+std::string CardString(std::optional<int> card) {
+  if (!card.has_value()) return "XX";
+  SPIEL_CHECK_GE(card.value(), 0);
+  SPIEL_CHECK_LT(card.value(), kNumCards);
+  return {kRankChar[CardRank(card.value())], kSuitChar[CardSuit(card.value())]};
 }
 
 int CardInt(std::string card) {
@@ -73,6 +63,7 @@ VecInt CardStringsToCardInts(const std::vector<std::string> &cards) {
 
 std::string HandToString(const VecInt &cards) {
   std::string rv;
+  constexpr int kHandStringSize = 174;
   rv.reserve(kHandStringSize);
   absl::StrAppend(&rv, "+--------------------------+\n");
   for (int i = 0; i < kNumSuits; ++i) {
@@ -139,7 +130,6 @@ bool IsConsecutive(const VecInt &v) {
   return true;
 }
 
-
 bool IsRankMeld(const VecInt &cards) {
   if (cards.size() != 3 && cards.size() != 4) {
     return false;
@@ -184,15 +174,15 @@ VecVecInt RankMelds(VecInt cards) {
     // We only add two of the 3 card melds here, the other two get added
     // during the 3 card meld sweep.
     if (CardRank(cards[i]) == CardRank(cards[i + 3])) {
-      melds.emplace_back(VecInt(cards.begin()+i, cards.begin()+i+4));
-      melds.emplace_back(VecInt{cards[i], cards[i+1], cards[i+3]});
-      melds.emplace_back(VecInt{cards[i], cards[i+2], cards[i+3]});
+      melds.emplace_back(VecInt(cards.begin() + i, cards.begin() + i + 4));
+      melds.emplace_back(VecInt{cards[i], cards[i + 1], cards[i + 3]});
+      melds.emplace_back(VecInt{cards[i], cards[i + 2], cards[i + 3]});
     }
   }
   // Sweep for 3 card melds.
   for (int i = 0; i < cards.size() - 2; ++i) {
-    if (CardRank(cards[i]) == CardRank(cards[i+2])) {
-      melds.emplace_back(VecInt(cards.begin()+i, cards.begin()+i+3));
+    if (CardRank(cards[i]) == CardRank(cards[i + 2])) {
+      melds.emplace_back(VecInt(cards.begin() + i, cards.begin() + i + 3));
     }
   }
   return melds;
@@ -208,26 +198,26 @@ VecVecInt SuitMelds(VecInt cards) {
   // Find all suit melds of length 5.
   if (cards.size() >= 5) {
     for (int i = 0; i < cards.size() - 4; ++i) {
-      if (cards[i] == cards[i+4] - 4 &&
-          CardSuit(cards[i]) == CardSuit(cards[i+4])) {
-        melds.emplace_back(VecInt(cards.begin()+i, cards.begin()+i+5));
+      if (cards[i] == cards[i + 4] - 4 &&
+          CardSuit(cards[i]) == CardSuit(cards[i + 4])) {
+        melds.emplace_back(VecInt(cards.begin() + i, cards.begin() + i + 5));
       }
     }
   }
   // Find all suit melds of length 4.
   if (cards.size() >= 4) {
     for (int i = 0; i < cards.size() - 3; ++i) {
-      if (cards[i] == cards[i+3] - 3 &&
-          CardSuit(cards[i]) == CardSuit(cards[i+3])) {
-        melds.emplace_back(VecInt(cards.begin()+i, cards.begin()+i+4));
+      if (cards[i] == cards[i + 3] - 3 &&
+          CardSuit(cards[i]) == CardSuit(cards[i + 3])) {
+        melds.emplace_back(VecInt(cards.begin() + i, cards.begin() + i + 4));
       }
     }
   }
   // Find all suit melds of length 3.
   for (int i = 0; i < cards.size() - 2; ++i) {
-    if (cards[i] == cards[i+2] - 2 &&
-        CardSuit(cards[i]) == CardSuit(cards[i+2])) {
-      melds.emplace_back(VecInt(cards.begin()+i, cards.begin()+i+3));
+    if (cards[i] == cards[i + 2] - 2 &&
+        CardSuit(cards[i]) == CardSuit(cards[i + 2])) {
+      melds.emplace_back(VecInt(cards.begin() + i, cards.begin() + i + 3));
     }
   }
   return melds;
@@ -274,8 +264,8 @@ VecVecInt NonOverlappingMelds(VecInt *meld, VecVecInt *melds) {
 }
 
 // Depth first search used by AllMeldGroups.
-void AllPaths(VecInt *meld, VecVecInt *all_melds,
-              VecVecInt *path, VecVecVecInt *all_paths) {
+void AllPaths(VecInt *meld, VecVecInt *all_melds, VecVecInt *path,
+              VecVecVecInt *all_paths) {
   path->push_back(*meld);
   VecVecInt child_melds = NonOverlappingMelds(meld, all_melds);
   if (child_melds.empty()) {
@@ -317,13 +307,13 @@ VecVecInt BestMeldGroup(const VecInt &cards) {
 }
 
 // Minimum deadwood count over all meld groups.
-int MinDeadwood(VecInt hand, int card) {
-  hand.push_back(card);
+int MinDeadwood(VecInt hand, std::optional<int> card) {
+  if (card.has_value()) hand.push_back(card.value());
   return MinDeadwood(hand);
 }
 
 // Minimum deadwood count over all meld groups.
-int MinDeadwood(VecInt hand) {
+int MinDeadwood(const VecInt &hand) {
   VecInt deadwood = hand;
   VecVecInt best_melds = BestMeldGroup(hand);
 
@@ -339,8 +329,7 @@ int MinDeadwood(VecInt hand) {
     deadwood.pop_back();
   }
   int deadwood_total = 0;
-  for (int card : deadwood)
-    deadwood_total += CardValue(card);
+  for (int card : deadwood) deadwood_total += CardValue(card);
   return deadwood_total;
 }
 
@@ -379,8 +368,7 @@ VecInt LegalMelds(const VecInt &hand, int knock_card) {
   int total_hand_value = TotalCardValue(hand);
   std::set<int> meld_set;
   VecInt hand_(hand);
-  VecVecVecInt all_meld_groups =
-      AllMeldGroups(hand_);
+  VecVecVecInt all_meld_groups = AllMeldGroups(hand_);
   for (auto meld_group : all_meld_groups) {
     int meld_group_total_value = TotalCardValue(meld_group);
     if (total_hand_value - meld_group_total_value <= knock_card) {
@@ -437,8 +425,7 @@ VecInt AllLayoffs(const VecInt &layed_melds, const VecInt &previous_layoffs) {
 std::map<VecInt, int> BuildMeldToIntMap() {
   std::map<VecInt, int> rv;
   VecInt full_deck;
-  for (int i = 0; i < kNumCards; ++i)
-    full_deck.push_back(i);
+  for (int i = 0; i < kNumCards; ++i) full_deck.push_back(i);
   VecVecInt all_melds = AllMelds(full_deck);
   for (int i = 0; i < all_melds.size(); ++i) {
     int meld_id = MeldToInt(all_melds[i]);
@@ -452,8 +439,7 @@ std::map<VecInt, int> BuildMeldToIntMap() {
 std::map<int, VecInt> BuildIntToMeldMap() {
   std::map<int, VecInt> rv;
   VecInt full_deck;
-  for (int i = 0; i < kNumCards; ++i)
-    full_deck.push_back(i);
+  for (int i = 0; i < kNumCards; ++i) full_deck.push_back(i);
   VecVecInt all_melds = AllMelds(full_deck);
   for (int i = 0; i < all_melds.size(); ++i) {
     for (auto meld : all_melds) {
@@ -488,6 +474,7 @@ int MeldToInt(VecInt meld) {
     } else if (meld.size() == 4) {
       return (CardRank(meld[0]) * 5) + 4;
     }
+    SpielFatalError("Impossible meld size");
   } else if (IsSuitMeld(meld)) {
     absl::c_sort(meld, CompareRanks);
     int offset = 65;  // 65 rank melds
@@ -502,6 +489,7 @@ int MeldToInt(VecInt meld) {
     if (meld.size() == 5) {
       return offset + (CardSuit(meld[0]) * (kNumRanks - 4)) + CardRank(meld[0]);
     }
+    SpielFatalError("Impossible meld size");
   } else {
     SpielFatalError("Not a meld");
   }

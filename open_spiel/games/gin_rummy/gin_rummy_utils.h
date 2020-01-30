@@ -15,18 +15,23 @@
 #ifndef THIRD_PARTY_OPEN_SPIEL_GAMES_GIN_RUMMY_UTILS_H_
 #define THIRD_PARTY_OPEN_SPIEL_GAMES_GIN_RUMMY_UTILS_H_
 
-#include <vector>
-#include <string>
 #include <map>
+#include <string>
+#include <vector>
 
 namespace open_spiel {
 namespace gin_rummy {
+
+inline constexpr int kNumSuits = 4;
+inline constexpr int kNumRanks = 13;
+inline constexpr int kNumCards = kNumSuits * kNumRanks;
+inline constexpr int kMaxHandSize = 11;
 
 using VecInt = std::vector<int>;
 using VecVecInt = std::vector<std::vector<int>>;
 using VecVecVecInt = std::vector<std::vector<std::vector<int>>>;
 
-std::string CardString(int card);
+std::string CardString(std::optional<int> card);
 std::string HandToString(const VecInt &cards);
 
 int CardInt(std::string card);
@@ -54,15 +59,15 @@ bool VectorsIntersect(VecInt *v1, VecInt *v2);
 
 VecVecInt NonOverlappingMelds(VecInt *meld, VecVecInt *melds);
 
-void AllPaths(VecInt *meld, VecVecInt *all_melds,
-              VecVecInt *path, VecVecVecInt *all_paths);
+void AllPaths(VecInt *meld, VecVecInt *all_melds, VecVecInt *path,
+              VecVecVecInt *all_paths);
 
 VecVecVecInt AllMeldGroups(const VecInt &cards);
 
 VecVecInt BestMeldGroup(const VecInt &cards);
 
-int MinDeadwood(VecInt hand, int card);
-int MinDeadwood(VecInt hand);
+int MinDeadwood(VecInt hand, std::optional<int> card);
+int MinDeadwood(const VecInt &hand);
 
 int RankMeldLayoff(const VecInt &meld);
 VecInt SuitMeldLayoffs(const VecInt &meld);

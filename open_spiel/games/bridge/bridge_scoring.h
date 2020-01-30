@@ -24,6 +24,7 @@ namespace bridge {
 
 enum Denomination { kClubs = 0, kDiamonds, kHearts, kSpades, kNoTrump };
 enum DoubleStatus { kUndoubled = 1, kDoubled = 2, kRedoubled = 4 };
+constexpr char kDenominationChar[] = "CDHSN";
 
 struct Contract {
   int level;

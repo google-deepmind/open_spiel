@@ -85,7 +85,11 @@ inline constexpr int kAuctionTensorSize =
     kNumCards                                  // Our hand
     + kNumVulnerabilities * kNumPartnerships;  // Vulnerability of each side
 inline constexpr int kPlayTensorSize =
-    kNumPlayers                // Who declarer is
+    kNumBidLevels              // What the contract is
+    + kNumDenominations        // What trumps are
+    + kNumOtherCalls           // Undoubled / doubled / redoubled
+    + kNumPlayers              // Who declarer is
+    + kNumVulnerabilities      // Vulnerability of the declaring side
     + kNumCards                // Our remaining cards
     + kNumCards                // Dummy's remaining cards
     + kNumPlayers * kNumCards  // Cards played to the previous trick
