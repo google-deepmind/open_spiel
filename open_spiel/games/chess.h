@@ -201,6 +201,13 @@ class ChessState : public State {
   StandardChessBoard& Board() { return current_board_; }
   const StandardChessBoard& Board() const { return current_board_; }
 
+  // Starting board.
+  StandardChessBoard& StartBoard() { return start_board_; }
+  const StandardChessBoard& StartBoard() const { return start_board_; }
+
+  std::vector<Move>& MovesHistory() { return moves_history_; }
+  const std::vector<Move>& MovesHistory() const { return moves_history_; }
+
  protected:
   void DoApplyAction(Action action) override;
 
