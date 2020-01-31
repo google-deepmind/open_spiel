@@ -216,6 +216,12 @@ class ChessState : public State {
   // board position has already appeared twice in the history).
   bool IsRepetitionDraw() const;
 
+  // Calculates legal actions and caches them. This is separate from
+  // LegalActions() as there are a number of other methods that need the value
+  // of LegalActions. This is a separate method as it's called from
+  // IsTerminal(), which is also called by LegalActions().
+  void MaybeGenerateLegalActions() const;
+
   std::optional<std::vector<double>> MaybeFinalReturns() const;
 
   // We have to store every move made to check for repetitions and to implement
@@ -239,6 +245,7 @@ class ChessState : public State {
   };
   using RepetitionTable = std::unordered_map<uint64_t, int, PassthroughHash>;
   RepetitionTable repetitions_;
+  mutable std::optional<std::vector<Action>> cached_legal_actions_;
 };
 
 // Game object.

@@ -16,6 +16,7 @@
 
 #include <optional>
 
+#include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/games/chess/chess_board.h"
 #include "open_spiel/spiel_utils.h"
 
@@ -100,17 +101,24 @@ void ChessState::DoApplyAction(Action action) {
   moves_history_.push_back(move);
   Board().ApplyMove(move);
   ++repetitions_[current_board_.HashValue()];
+  cached_legal_actions_.reset();
+}
+
+void ChessState::MaybeGenerateLegalActions() const {
+  if (!cached_legal_actions_) {
+    cached_legal_actions_ = std::vector<Action>();
+    Board().GenerateLegalMoves([this](const Move& move) -> bool {
+      cached_legal_actions_->push_back(MoveToAction(move));
+      return true;
+    });
+    absl::c_sort(*cached_legal_actions_);
+  }
 }
 
 std::vector<Action> ChessState::LegalActions() const {
-  std::vector<Action> actions;
-  if (IsTerminal()) return actions;
-  Board().GenerateLegalMoves([&actions](const Move& move) -> bool {
-    actions.push_back(MoveToAction(move));
-    return true;
-  });
-  std::sort(actions.begin(), actions.end());
-  return actions;
+  MaybeGenerateLegalActions();
+  if (IsTerminal()) return {};
+  return *cached_legal_actions_;
 }
 
 std::string ChessState::ActionToString(Player player, Action action) const {
@@ -211,12 +219,10 @@ std::optional<std::vector<double>> ChessState::MaybeFinalReturns() const {
   if (IsRepetitionDraw()) {
     return std::vector<double>{DrawUtility(), DrawUtility()};
   }
-
-  bool have_legal_moves = false;
-  Board().GenerateLegalMoves([&have_legal_moves](const Move& move) -> bool {
-    have_legal_moves = true;
-    return false;  // No need to generate more moves.
-  });
+  // Compute and cache the legal actions.
+  MaybeGenerateLegalActions();
+  SPIEL_CHECK_TRUE(cached_legal_actions_);
+  bool have_legal_moves = !cached_legal_actions_->empty();
 
   // If we don't have legal moves we are either stalemated or checkmated,
   // depending on whether we are in check or not.
