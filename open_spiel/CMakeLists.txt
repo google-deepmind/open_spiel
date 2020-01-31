@@ -116,6 +116,7 @@ link_libraries(open_spiel_core
   absl::container
   absl::flags
   absl::flags_parse
+  absl::flat_hash_map
   absl::optional
   absl::random_random
   absl::str_format
