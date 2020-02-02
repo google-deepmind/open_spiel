@@ -1,5 +1,3 @@
-Base.print(io::IO, s::CxxWrap.StdLib.StdStringAllocated) = write(io, [reinterpret(UInt8, s[i]) for i in 1:length(s)])
-
 Base.show(io::IO, g::CxxWrap.StdLib.SharedPtrAllocated{Game}) = print(io, to_string(g))
 Base.show(io::IO, s::CxxWrap.StdLib.UniquePtrAllocated{State}) = print(io, to_string(s))
 Base.show(io::IO, gp::Union{GameParameterAllocated, GameParameterDereferenced}) = print(io, to_repr_string(gp))
@@ -11,30 +9,20 @@ GameParameter(x::Int) = GameParameter(Ref(Int32(x)))
 Base.copy(s::CxxWrap.StdLib.UniquePtrAllocated{State}) = deepcopy(s)
 Base.deepcopy(s::CxxWrap.StdLib.UniquePtrAllocated{State}) = clone(s)
 
-if Sys.KERNEL == :Linux
-    function apply_action(state, actions::AbstractVector{<:Number})
-        A = StdVector{CxxLong}()
-        for a in actions
-            push!(A, a)
-        end
-        apply_actions(state, A)
+function apply_action(state, actions::AbstractVector{<:Number})
+    A = StdVector{CxxLong}()
+    for a in actions
+        push!(A, a)
     end
-elseif Sys.KERNEL == :Darwin
-    function apply_action(state, actions::AbstractVector{<:Number})
-        A = StdVector{Int}()
-        for a in actions
-            push!(A, a)
-        end
-        apply_actions(state, A)
-    end
-else
-    @error "unsupported system"
+    apply_actions(state, A)
 end
 
 function deserialize_game_and_state(s::CxxWrap.StdLib.StdStringAllocated)
     game_and_state = _deserialize_game_and_state(s)
     first(game_and_state), last(game_and_state)
 end
+
+Base.values(m::StdMap) = [m[k] for k in keys(m)]
 
 function StdMap{K, V}(kw) where {K, V}
     ps = StdMap{K, V}()
@@ -44,11 +32,10 @@ function StdMap{K, V}(kw) where {K, V}
     ps
 end
 
-function Base.show(io::IO, ::MIME{Symbol("text/plain")}, ps::StdMapAllocated{K, V}) where {K, V}
-    ps_pairs = ["$k => $v" for (k, v) in zip(keys(ps), values(ps))]
-    println(io, "StdMap{$K,$V} with $(length(ps_pairs)) entries:")
-    for s in ps_pairs
-        println(io, "  $s")
+function Base.show(io::IO, ps::StdMapAllocated{K, V}) where {K, V}
+    println(io, "StdMap{$K,$V} with $(length(ps)) entries:")
+    for k in keys(ps)
+        println(io, "  $k => $(ps[k])")
     end
 end
 
