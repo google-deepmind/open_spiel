@@ -1,5 +1,7 @@
 add_library (utils OBJECT
   circular_buffer.h
+  file.h
+  file.cc
   json.h
   json.cc
   lru_cache.h
@@ -14,6 +16,10 @@ target_include_directories (utils PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 add_executable(circular_buffer_test circular_buffer_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(circular_buffer_test circular_buffer_test)
+
+add_executable(file_test file_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(file_test file_test)
 
 add_executable(json_test json_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
