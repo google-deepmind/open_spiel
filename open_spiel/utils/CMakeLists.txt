@@ -2,6 +2,7 @@ add_library (utils OBJECT
   circular_buffer.h
   file.h
   file.cc
+  file_logger.h
   json.h
   json.cc
   lru_cache.h
@@ -20,6 +21,10 @@ add_test(circular_buffer_test circular_buffer_test)
 add_executable(file_test file_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(file_test file_test)
+
+add_executable(file_logger_test file_logger_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(file_logger_test file_logger_test)
 
 add_executable(json_test json_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
