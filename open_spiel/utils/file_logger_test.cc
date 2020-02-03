@@ -20,7 +20,7 @@
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/utils/file.h"
 
-namespace open_spiel::file {
+namespace open_spiel {
 namespace {
 
 std::string GetEnv(const std::string& key, const std::string& default_value) {
@@ -34,13 +34,12 @@ void TestFileLogger() {
   std::string dir = tmp_dir + "/open_spiel-test-" + val;
   std::string filename = dir + "/log-test.txt";
 
-  SPIEL_CHECK_TRUE(Exists(tmp_dir));
-  SPIEL_CHECK_TRUE(IsDirectory(tmp_dir));
-  SPIEL_CHECK_FALSE(Exists(dir));
-  SPIEL_CHECK_TRUE(Mkdir(dir));
-  SPIEL_CHECK_FALSE(Mkdir(dir));  // already exists
-  SPIEL_CHECK_TRUE(Exists(dir));
-  SPIEL_CHECK_TRUE(IsDirectory(dir));
+  SPIEL_CHECK_TRUE(file::Exists(tmp_dir));
+  SPIEL_CHECK_TRUE(file::IsDirectory(tmp_dir));
+  SPIEL_CHECK_FALSE(file::Exists(dir));
+  SPIEL_CHECK_TRUE(file::Mkdir(dir));
+  SPIEL_CHECK_TRUE(file::Exists(dir));
+  SPIEL_CHECK_TRUE(file::IsDirectory(dir));
 
   {
     FileLogger logger(dir, "test");
@@ -49,10 +48,8 @@ void TestFileLogger() {
     logger.Print("line %d: %s", 3, "asdf");
   }
 
-  std::string prefix = "hello world ";
-  std::string expected = prefix + val + "\n";
   {
-    File f(filename, "r");
+    file::File f(filename, "r");
     std::vector<std::string> lines = absl::StrSplit(f.ReadContents(), '\n');
     SPIEL_CHECK_EQ(lines.size(), 6);
     SPIEL_CHECK_TRUE(absl::StrContains(lines[0], "test started"));
@@ -63,13 +60,13 @@ void TestFileLogger() {
     SPIEL_CHECK_EQ(lines[5], "");
   }
 
-  SPIEL_CHECK_TRUE(Remove(filename));
-  SPIEL_CHECK_TRUE(Remove(dir));
+  SPIEL_CHECK_TRUE(file::Remove(filename));
+  SPIEL_CHECK_TRUE(file::Remove(dir));
 }
 
 }  // namespace
-}  // namespace open_spiel::file
+}  // namespace open_spiel
 
 int main(int argc, char** argv) {
-  open_spiel::file::TestFileLogger();
+  open_spiel::TestFileLogger();
 }
