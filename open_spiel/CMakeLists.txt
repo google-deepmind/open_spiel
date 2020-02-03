@@ -74,6 +74,14 @@ endif()
 set (BUILD_WITH_JULIA $ENV{BUILD_WITH_JULIA})
 message("${BoldYellow}BUILD_WITH_JULIA: ${BUILD_WITH_JULIA} ${ColourReset}")
 
+set (BUILD_WITH_PYTHON ON CACHE BOOL "Build binary for Python.")
+if(NOT DEFINED ENV{BUILD_WITH_PYTHON})
+    message("${BoldRed}BUILD_WITH_PYTHON not set. Defaults to OFF${ColourReset}")
+    set (ENV{BUILD_WITH_PYTHON} ON)
+endif()
+set (BUILD_WITH_PYTHON $ENV{BUILD_WITH_PYTHON})
+message("${BoldYellow}BUILD_WITH_PYTHON: ${BUILD_WITH_PYTHON} ${ColourReset}")
+
 ##
 
 
@@ -156,7 +164,11 @@ add_subdirectory (examples)
 add_subdirectory (games)
 add_subdirectory (game_transforms)
 add_subdirectory (tests)
-add_subdirectory (python)
+
+if (BUILD_WITH_PYTHON)
+  add_subdirectory (python)
+endif()
+
 add_subdirectory (utils)
 
 if (BUILD_WITH_JULIA)
