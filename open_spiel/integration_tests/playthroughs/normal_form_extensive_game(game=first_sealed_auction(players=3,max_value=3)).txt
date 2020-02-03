@@ -1,0 +1,136 @@
+game: normal_form_extensive_game(game=first_sealed_auction(players=3,max_value=3))
+
+GameType.chance_mode = ChanceMode.DETERMINISTIC
+GameType.dynamics = Dynamics.SIMULTANEOUS
+GameType.information = Information.ONE_SHOT
+GameType.long_name = "Normal-form First-Price Sealed-Bid Auction"
+GameType.max_num_players = 3
+GameType.min_num_players = 3
+GameType.parameter_specification = []
+GameType.provides_information_state_string = True
+GameType.provides_information_state_tensor = True
+GameType.provides_observation_string = False
+GameType.provides_observation_tensor = False
+GameType.reward_model = RewardModel.TERMINAL
+GameType.short_name = "normal_form_extensive_game"
+GameType.utility = Utility.GENERAL_SUM
+
+NumDistinctActions() = 6
+MaxChanceOutcomes() = 0
+GetParameters() = {}
+NumPlayers() = 3
+MinUtility() = 0.074074
+MaxUtility() = 1.1111
+UtilitySum() = None
+InformationStateTensorShape() = [1]
+InformationStateTensorSize() = 1
+MaxGameLength() = 1
+ToString() = "normal_form_extensive_game()"
+
+# State 0
+# Terminal? false
+IsTerminal() = False
+History() = []
+HistoryString() = ""
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+InformationStateString(0) = "Observing player: 0. Non-terminal"
+InformationStateString(1) = "Observing player: 1. Non-terminal"
+InformationStateString(2) = "Observing player: 2. Non-terminal"
+InformationStateTensor(0): ◯
+InformationStateTensor(1): ◯
+InformationStateTensor(2): ◯
+Rewards() = [0.0, 0.0, 0.0]
+Returns() = [0.0, 0.0, 0.0]
+LegalActions(0) = [0, 1, 2, 3, 4, 5]
+LegalActions(1) = [0, 1, 2, 3, 4, 5]
+LegalActions(2) = [0, 1, 2, 3, 4, 5]
+StringLegalActions(0) = ["p0 val 1  ---  action = 0
+p0 val 2  ---  action = 0
+p0 val 3  ---  action = 0
+", "p0 val 1  ---  action = 0
+p0 val 2  ---  action = 1
+p0 val 3  ---  action = 0
+", "p0 val 1  ---  action = 0
+p0 val 2  ---  action = 0
+p0 val 3  ---  action = 1
+", "p0 val 1  ---  action = 0
+p0 val 2  ---  action = 1
+p0 val 3  ---  action = 1
+", "p0 val 1  ---  action = 0
+p0 val 2  ---  action = 0
+p0 val 3  ---  action = 2
+", "p0 val 1  ---  action = 0
+p0 val 2  ---  action = 1
+p0 val 3  ---  action = 2
+"]
+StringLegalActions(1) = ["p1 val 1  ---  action = 0
+p1 val 2  ---  action = 0
+p1 val 3  ---  action = 0
+", "p1 val 1  ---  action = 0
+p1 val 2  ---  action = 1
+p1 val 3  ---  action = 0
+", "p1 val 1  ---  action = 0
+p1 val 2  ---  action = 0
+p1 val 3  ---  action = 1
+", "p1 val 1  ---  action = 0
+p1 val 2  ---  action = 1
+p1 val 3  ---  action = 1
+", "p1 val 1  ---  action = 0
+p1 val 2  ---  action = 0
+p1 val 3  ---  action = 2
+", "p1 val 1  ---  action = 0
+p1 val 2  ---  action = 1
+p1 val 3  ---  action = 2
+"]
+StringLegalActions(2) = ["p2 val 1  ---  action = 0
+p2 val 2  ---  action = 0
+p2 val 3  ---  action = 0
+", "p2 val 1  ---  action = 0
+p2 val 2  ---  action = 1
+p2 val 3  ---  action = 0
+", "p2 val 1  ---  action = 0
+p2 val 2  ---  action = 0
+p2 val 3  ---  action = 1
+", "p2 val 1  ---  action = 0
+p2 val 2  ---  action = 1
+p2 val 3  ---  action = 1
+", "p2 val 1  ---  action = 0
+p2 val 2  ---  action = 0
+p2 val 3  ---  action = 2
+", "p2 val 1  ---  action = 0
+p2 val 2  ---  action = 1
+p2 val 3  ---  action = 2
+"]
+
+# Apply joint action ["p0 val 1  ---  action = 0
+p0 val 2  ---  action = 0
+p0 val 3  ---  action = 0
+", "p1 val 1  ---  action = 0
+p1 val 2  ---  action = 0
+p1 val 3  ---  action = 0
+", "p2 val 1  ---  action = 0
+p2 val 2  ---  action = 0
+p2 val 3  ---  action = 1
+"]
+actions: [0, 0, 2]
+
+# State 1
+# Terminal? true
+# History: 0 0 2
+# Returns: 0.444444,0.444444,1
+IsTerminal() = True
+History() = [0, 0, 2]
+HistoryString() = "0 0 2"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = -4
+InformationStateString(0) = "Observing player: 0. Terminal. History string: 0 0 2"
+InformationStateString(1) = "Observing player: 1. Terminal. History string: 0 0 2"
+InformationStateString(2) = "Observing player: 2. Terminal. History string: 0 0 2"
+InformationStateTensor(0): ◉
+InformationStateTensor(1): ◉
+InformationStateTensor(2): ◉
+Rewards() = [0.4444444444444444, 0.4444444444444444, 1.0]
+Returns() = [0.4444444444444444, 0.4444444444444444, 1.0]
