@@ -42,7 +42,7 @@ inline constexpr double WinUtility() { return 1; }
 inline constexpr int BoardSize() { return 8; }
 
 // See action encoding below.
-inline constexpr int NumDistinctActions() { return (1 << 15); }
+inline constexpr int NumDistinctActions() { return (1 << 16); }
 
 // https://math.stackexchange.com/questions/194008/how-many-turns-can-a-chess-game-take-at-maximum
 inline constexpr int MaxGameLength() { return 17695; }
@@ -74,6 +74,8 @@ inline int OtherPlayer(Player player) { return player == Player{0} ? 1 : 0; }
 // bits 0-5: from square (0-64)
 // bits 6-11: to square (0-64)
 // bits 12-14: promotion type (0 if not promotion)
+// bits 15: is castling (we need to record this because just from and to squares
+//   can be ambiguous in chess960).
 //
 // Promotion type:
 enum class PromotionTypeEncoding {
@@ -136,6 +138,7 @@ inline Action MoveToAction(const Move& move) {
   }
 
   SetField(12, 3, promo_encoded, &action);
+  SetField(15, 1, move.is_castling, &action);
 
   return action;
 }
@@ -161,8 +164,10 @@ inline Move ActionToMove(const Action& action) {
     default:
       SpielFatalError("Unknown promotion type encoding");
   }
+
+  bool is_castling = GetField(action, 15, 1);
   return Move(IndexToSquare(GetField(action, 0, 6)),
-              IndexToSquare(GetField(action, 6, 6)), promo_type);
+              IndexToSquare(GetField(action, 6, 6)), promo_type, is_castling);
 }
 
 // State of an in-play game.

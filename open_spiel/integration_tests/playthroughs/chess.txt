@@ -15,7 +15,7 @@ GameType.reward_model = RewardModel.TERMINAL
 GameType.short_name = "chess"
 GameType.utility = Utility.ZERO_SUM
 
-NumDistinctActions() = 32768
+NumDistinctActions() = 65536
 MaxChanceOutcomes() = 0
 GetParameters() = {}
 NumPlayers() = 2
