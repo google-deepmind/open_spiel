@@ -5,6 +5,7 @@ add_library (utils OBJECT
   lru_cache.h
   stats.h
   tensor_view.h
+  threaded_queue.h
 )
 target_include_directories (utils PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -27,3 +28,7 @@ add_test(stats_test stats_test)
 add_executable(tensor_view_test tensor_view_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(tensor_view_test tensor_view_test)
+
+add_executable(threaded_queue_test threaded_queue_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(threaded_queue_test threaded_queue_test)
