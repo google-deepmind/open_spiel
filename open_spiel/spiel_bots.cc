@@ -119,11 +119,7 @@ class PolicyBot : public Bot {
   std::pair<ActionsAndProbs, Action> StepWithPolicy(
       const State& state) override {
     ActionsAndProbs actions_and_probs = GetPolicy(state);
-    Action action =
-        SampleAction(actions_and_probs,
-                     std::uniform_real_distribution<double>(0.0, 1.0)(rng_))
-            .first;
-    return {actions_and_probs, action};
+    return {actions_and_probs, SampleAction(actions_and_probs, rng_).first};
   }
 
  private:

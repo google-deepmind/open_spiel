@@ -28,6 +28,7 @@
 #include <utility>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/random/bit_gen_ref.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel_utils.h"
@@ -768,6 +769,8 @@ void NormalizePolicy(ActionsAndProbs* policy);
 // [0, 1). Returns the sampled action and its probability.
 std::pair<Action, double> SampleAction(const ActionsAndProbs& outcomes,
                                        double z);
+std::pair<Action, double> SampleAction(const ActionsAndProbs& outcomes,
+                                       absl::BitGenRef rng);
 
 // Serialize the game and the state into one self-contained string that can
 // be reloaded via open_spiel::DeserializeGameAndState.

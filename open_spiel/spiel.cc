@@ -335,6 +335,10 @@ void NormalizePolicy(ActionsAndProbs* policy) {
 }
 
 std::pair<Action, double> SampleAction(const ActionsAndProbs& outcomes,
+                                       absl::BitGenRef rng) {
+  return SampleAction(outcomes, absl::Uniform(rng, 0.0, 1.0));
+}
+std::pair<Action, double> SampleAction(const ActionsAndProbs& outcomes,
                                        double z) {
   SPIEL_CHECK_GE(z, 0);
   SPIEL_CHECK_LT(z, 1);

@@ -180,9 +180,7 @@ BatchedTrajectory RecordTrajectory(
       }
       trajectory.player_policies[0].push_back(probs);
       trajectory.player_ids[0].push_back(state->CurrentPlayer());
-      action = SampleAction(policy, std::uniform_real_distribution<double>(
-                                        0.0, 1.0)(*rng))
-                   .first;
+      action = SampleAction(policy, *rng).first;
       trajectory.actions[0].push_back(action);
     }
     SPIEL_CHECK_NE(action, kInvalidAction);
