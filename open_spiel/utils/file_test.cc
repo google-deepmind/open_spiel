@@ -78,6 +78,14 @@ void TestFile() {
   SPIEL_CHECK_FALSE(Remove(filename));  // already gone
   SPIEL_CHECK_FALSE(Exists(filename));
 
+  std::string deep_dir = dir + "/1/2/3";
+  SPIEL_CHECK_FALSE(IsDirectory(dir + "/1"));
+  SPIEL_CHECK_TRUE(Mkdirs(dir + "/1/2/3"));
+  SPIEL_CHECK_TRUE(IsDirectory(dir + "/1/2/3"));
+  SPIEL_CHECK_TRUE(Remove(dir + "/1/2/3"));
+  SPIEL_CHECK_TRUE(Remove(dir + "/1/2"));
+  SPIEL_CHECK_TRUE(Remove(dir + "/1"));
+
   SPIEL_CHECK_TRUE(Remove(dir));
   SPIEL_CHECK_FALSE(Exists(dir));
 }

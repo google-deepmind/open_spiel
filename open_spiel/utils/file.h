@@ -56,8 +56,8 @@ class File {
 
 bool Exists(const std::string& path);  // Does the file/directory exist?
 bool IsDirectory(const std::string& path);  // Is it a directory?
-bool Mkdir(const std::string& path);  // Make a single directory.
-bool Mkdirs(const std::string& path);  // Make all directories in the path.
+bool Mkdir(const std::string& path, int mode = 0755);  // Make a directory.
+bool Mkdirs(const std::string& path, int mode = 0755);  // Mkdir recursively.
 bool Remove(const std::string& path);  // Remove/delete the file/directory.
 
 }  // namespace open_spiel::file

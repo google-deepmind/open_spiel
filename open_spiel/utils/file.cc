@@ -14,7 +14,18 @@
 
 #include "open_spiel/utils/file.h"
 
-#include <filesystem>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
+#ifdef _WIN32
+// https://stackoverflow.com/a/42906151
+#include <windows.h>
+#define mkdir(dir, mode) _mkdir(dir)
+#define unlink(file) _unlink(file)
+#define rmdir(dir) _rmdir(dir)
+#endif
+
 #include <cstdio>
 
 #include "open_spiel/spiel_utils.h"
@@ -71,23 +82,45 @@ std::int64_t File::Length() {
 }
 
 bool Exists(const std::string& path) {
-  return std::filesystem::exists(path);
+  struct stat info;
+  return stat(path.c_str(), &info) == 0;
 }
 
 bool IsDirectory(const std::string& path) {
-  return std::filesystem::is_directory(path);
+  struct stat info;
+  return stat(path.c_str(), &info) == 0 && info.st_mode & S_IFDIR;
 }
 
-bool Mkdir(const std::string& path) {
-  return std::filesystem::create_directory(path);
+bool Mkdir(const std::string& path, int mode) {
+  return mkdir(path.c_str(), mode) == 0;
 }
 
-bool Mkdirs(const std::string& path) {
-  return std::filesystem::create_directories(path);
+bool Mkdirs(const std::string& path, int mode) {
+  struct stat info;
+  size_t pos = 0;
+  while (pos != std::string::npos) {
+    pos = path.find_first_of("\\/", pos + 1);
+    std::string sub_path = path.substr(0, pos);
+    if (stat(sub_path.c_str(), &info) == 0) {
+      if (info.st_mode & S_IFDIR) {
+        continue;  // directory already exists
+      } else {
+        return false;  // is a file?
+      }
+    }
+    if (!Mkdir(sub_path, mode)) {
+      return false;  // permission error?
+    }
+  }
+  return true;
 }
 
 bool Remove(const std::string& path) {
-  return std::filesystem::remove(path);
+  if (IsDirectory(path)) {
+    return rmdir(path.c_str()) == 0;
+  } else {
+    return unlink(path.c_str()) == 0;
+  }
 }
 
 }  // namespace open_spiel::file
