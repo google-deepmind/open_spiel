@@ -97,6 +97,15 @@ if [[ ${BUILD_WITH_JULIA:-"OFF"} == "ON" ]]; then
     JULIA_VERSION_INFO=`julia --version`
     echo -e "\e[33m$JULIA_VERSION_INFO is already installed.\e[0m"
   else
+    # Julia installed needs wget, make sure it's accessible.
+    if [[ "$OSTYPE" == "linux-gnu" ]]
+    then
+      [[ -x `which wget` ]] || sudo apt-get install wget
+    elif [[ "$OSTYPE" == "darwin"* ]]
+    then
+      [[ -x `which wget` ]] || brew install wget
+    fi
+    # Now install Julia
     JULIA_INSTALLER="open_spiel/scripts/jill.sh"
     if [[ ! -f $JULIA_INSTALLER ]]; then
     curl https://raw.githubusercontent.com/abelsiqueira/jill/master/jill.sh -o jill.sh
@@ -105,6 +114,9 @@ if [[ ${BUILD_WITH_JULIA:-"OFF"} == "ON" ]]; then
     JULIA_VERSION=1.3.1 bash $JULIA_INSTALLER -y
     # Should install in $HOME/.local/bin which was added to the path above
     [[ -x `which julia` ]] || die "julia not found PATH after install."
+    # Temporary workaround to fix a known issue with CxxWrap:
+    # https://github.com/JuliaInterop/libcxxwrap-julia/issues/39
+    rm -f $HOME/packages/julias/julia-1.3.1/lib/julia/libstdc++.so.6
   fi
 
   # Install dependencies.
