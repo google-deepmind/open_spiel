@@ -38,7 +38,7 @@ const GameType kGameType{
     GameType::RewardModel::kTerminal,
     /*max_num_players=*/2,
     /*min_num_players=*/2,
-    /*provides_information_state_string=*/false,
+    /*provides_information_state_string=*/true,
     /*provides_information_state_tensor=*/false,
     /*provides_observation_string=*/true,
     /*provides_observation_tensor=*/true,
@@ -135,6 +135,10 @@ std::vector<double> ChessState::Returns() const {
   } else {
     return {0.0, 0.0};
   }
+}
+
+std::string ChessState::InformationStateString(Player player) const {
+  return HistoryString();
 }
 
 std::string ChessState::ObservationString(Player player) const {
