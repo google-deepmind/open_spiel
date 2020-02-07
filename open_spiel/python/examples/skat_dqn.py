@@ -25,7 +25,7 @@ from absl import app
 from absl import flags
 from absl import logging
 import numpy as np
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 
 from open_spiel.python import rl_environment
 from open_spiel.python.algorithms import dqn
@@ -99,8 +99,8 @@ def main(_):
 
   with tf.Session() as sess:
     summaries_dir = os.path.join(FLAGS.checkpoint_dir, "random_eval")
-    summary_writer = tf.compat.v1.summary.FileWriter(
-        summaries_dir, tf.compat.v1.get_default_graph())
+    summary_writer = tf.summary.FileWriter(
+        summaries_dir, tf.get_default_graph())
     hidden_layers_sizes = [int(l) for l in FLAGS.hidden_layers_sizes]
     # pylint: disable=g-complex-comprehension
     agents = [
@@ -122,7 +122,7 @@ def main(_):
                                           FLAGS.num_eval_games)
         logging.info("[%s] Mean episode rewards %s", ep + 1, r_mean)
         for i in range(num_players):
-          summary = tf.compat.v1.Summary()
+          summary = tf.Summary()
           summary.value.add(tag="mean_reward/random_{}".format(i),
                             simple_value=r_mean[i])
           summary_writer.add_summary(summary, ep)
