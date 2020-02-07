@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for google3.third_party.open_spiel.python.egt.dynamics."""
+"""Tests for open_spiel.python.egt.dynamics."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -25,7 +25,7 @@ from absl.testing import parameterized
 import numpy as np
 
 from open_spiel.python.egt import dynamics
-from open_spiel.python.egt.utils import nfg_to_ndarray
+from open_spiel.python.egt.utils import game_payoffs_array
 import pyspiel
 
 
@@ -84,7 +84,7 @@ class DynamicsTest(parameterized.TestCase):
 
   def test_rd_rps_fixed_points(self):
     game = pyspiel.load_matrix_game('matrix_rps')
-    payoff_matrix = nfg_to_ndarray(game)
+    payoff_matrix = game_payoffs_array(game)
     rd = dynamics.replicator
     dyn = dynamics.SinglePopulationDynamics(payoff_matrix, rd)
 
@@ -98,14 +98,14 @@ class DynamicsTest(parameterized.TestCase):
                             dynamics.qpg)
   def test_dynamics_rps_mixed_fixed_point(self, func):
     game = pyspiel.load_matrix_game('matrix_rps')
-    payoff_matrix = nfg_to_ndarray(game)
+    payoff_matrix = game_payoffs_array(game)
     dyn = dynamics.SinglePopulationDynamics(payoff_matrix, func)
     x = np.ones(shape=(3,)) / 3.
     np.testing.assert_allclose(dyn(x), np.zeros((3,)), atol=1e-15)
 
   def test_multi_population_rps(self):
     game = pyspiel.load_matrix_game('matrix_rps')
-    payoff_matrix = nfg_to_ndarray(game)
+    payoff_matrix = game_payoffs_array(game)
     rd = dynamics.replicator
     dyn = dynamics.MultiPopulationDynamics(payoff_matrix, [rd] * 2)
     x = np.concatenate([np.ones(k) / float(k) for k in payoff_matrix.shape[1:]])

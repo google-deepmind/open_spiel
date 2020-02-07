@@ -16,7 +16,11 @@
 #define THIRD_PARTY_OPEN_SPIEL_NORMAL_FORM_GAME_H_
 
 #include <memory>
+#include <string>
+#include <vector>
 
+#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_join.h"
 #include "open_spiel/simultaneous_move_game.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"

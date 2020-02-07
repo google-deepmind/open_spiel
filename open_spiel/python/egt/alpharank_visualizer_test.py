@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for google3.third_party.open_spiel.python.egt.alpharank_visualizer."""
+"""Tests for open_spiel.python.egt.alpharank_visualizer."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -39,7 +39,7 @@ class AlpharankVisualizerTest(absltest.TestCase):
   def test_plot_pi_vs_alpha(self, mock_plt):
     # Construct game
     game = pyspiel.load_matrix_game("matrix_rps")
-    payoff_tables = utils.nfg_to_ndarray(game)
+    payoff_tables = utils.game_payoffs_array(game)
     _, payoff_tables = utils.is_symmetric_matrix_game(payoff_tables)
     payoffs_are_hpt_format = utils.check_payoffs_are_hpt(payoff_tables)
 

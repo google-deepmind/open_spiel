@@ -12,20 +12,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Lint as python3
 """Functions to manipulate game playthoughs.
 
 Used by examples/playthrough.py and tests/playthrough_test.py.
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import os
 import re
 import numpy as np
 
+from open_spiel.python.games import tic_tac_toe
 import pyspiel
+
+
+def _load_game(game_string):
+  """Loads a game, including special-cases for Python-implemented games."""
+  if game_string == "python_tic_tac_toe":
+    return tic_tac_toe.TicTacToeGame()
+  else:
+    return pyspiel.load_game(game_string)
 
 
 def _escape(x):
@@ -33,6 +39,59 @@ def _escape(x):
   x = x.replace("\\", R"\\")
   x = x.replace("\n", R"\n")
   return x
+
+
+def _format_value(v):
+  """Format a single value."""
+  if v == 0:
+    return "◯"
+  elif v == 1:
+    return "◉"
+  else:
+    return ValueError("Values must all be 0 or 1")
+
+
+def _format_vec(vec):
+  return "".join(_format_value(v) for v in vec)
+
+
+def _format_matrix(mat):
+  return np.char.array([_format_vec(row) for row in mat])
+
+
+def _format_tensor(tensor, tensor_name, max_cols=120):
+  """Formats a tensor in an easy-to-view format as a list of lines."""
+  if ((tensor.shape == (0,)) or (len(tensor.shape) > 3) or
+      not np.logical_or(tensor == 0, tensor == 1).all()):
+    vec = ", ".join(str(round(v, 5)) for v in tensor.ravel())
+    return ["{} = [{}]".format(tensor_name, vec)]
+  elif len(tensor.shape) == 1:
+    return ["{}: {}".format(tensor_name, _format_vec(tensor))]
+  elif len(tensor.shape) == 2:
+    if len(tensor_name) + tensor.shape[0] + 2 < max_cols:
+      lines = ["{}: {}".format(tensor_name, _format_vec(tensor[0]))]
+      prefix = " " * (len(tensor_name) + 2)
+    else:
+      lines = ["{}:".format(tensor_name), _format_vec(tensor[0])]
+      prefix = ""
+    for row in tensor[1:]:
+      lines.append(prefix + _format_vec(row))
+    return lines
+  elif len(tensor.shape) == 3:
+    lines = ["{}:".format(tensor_name)]
+    rows = []
+    for m in tensor:
+      formatted_matrix = _format_matrix(m)
+      if (not rows) or (len(rows[-1][0] + formatted_matrix[0]) + 2 > max_cols):
+        rows.append(formatted_matrix)
+      else:
+        rows[-1] = rows[-1] + "  " + formatted_matrix
+    for i, big_row in enumerate(rows):
+      if i > 0:
+        lines.append("")
+      for row in big_row:
+        lines.append("".join(row))
+    return lines
 
 
 def playthrough(game_string, action_sequence, alsologtostdout=False):
@@ -72,7 +131,7 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None):
   else:
     add_line = lines.append
 
-  game = pyspiel.load_game(game_string)
+  game = _load_game(game_string)
   add_line("game: {}".format(game_string))
   seed = np.random.randint(2**32 - 1)
 
@@ -149,18 +208,22 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None):
             player, _escape(state.information_state_string(player))))
     if game.get_type().provides_information_state_tensor:
       for player in players:
-        vec = ", ".join(
-            str(round(x, 5)) for x in state.information_state_tensor(player))
-        add_line("InformationStateTensor({}) = [{}]".format(player, vec))
+        label = "InformationStateTensor({})".format(player)
+        lines += _format_tensor(
+            np.reshape(
+                state.information_state_tensor(player),
+                game.information_state_tensor_shape()), label)
     if game.get_type().provides_observation_string:
       for player in players:
         add_line('ObservationString({}) = "{}"'.format(
             player, _escape(state.observation_string(player))))
     if game.get_type().provides_observation_tensor:
       for player in players:
-        vec = ", ".join(
-            str(round(x, 5)) for x in state.observation_tensor(player))
-        add_line("ObservationTensor({}) = [{}]".format(player, vec))
+        label = "ObservationTensor({})".format(player)
+        lines += _format_tensor(
+            np.reshape(
+                state.observation_tensor(player),
+                game.observation_tensor_shape()), label)
     if game_type.chance_mode == pyspiel.GameType.ChanceMode.SAMPLED_STOCHASTIC:
       add_line('SerializeState() = "{}"'.format(_escape(state.serialize())))
     if not state.is_chance_node():

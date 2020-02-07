@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for google3.third_party.open_spiel.python.algorithms.mcts."""
+"""Tests for open_spiel.python.algorithms.mcts."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -130,7 +130,7 @@ class MctsBotTest(absltest.TestCase):
         ("o(0,2)", "o(2,0)"))  # All others lose.
 
   def test_solve_loss(self):
-    root, state = search_tic_tac_toe_state("x(1,1) o(0,0) x(2,2) o(1,0) x(2,0)")
+    root, state = search_tic_tac_toe_state("x(1,1) o(0,0) x(2,2) o(0,1) x(0,2)")
     self.assertTTTStateStr(state, """
         oox
         .x.
@@ -141,7 +141,7 @@ class MctsBotTest(absltest.TestCase):
       self.assertEqual(c.outcome[c.player], -1)  # All losses.
 
   def test_solve_win(self):
-    root, state = search_tic_tac_toe_state("x(1,0) o(2,2)")
+    root, state = search_tic_tac_toe_state("x(0,1) o(2,2)")
     self.assertTTTStateStr(state, """
         .x.
         ...
@@ -150,7 +150,7 @@ class MctsBotTest(absltest.TestCase):
     self.assertEqual(root.outcome[root.player], 1)
     best = root.best_child()
     self.assertEqual(best.outcome[best.player], 1)
-    self.assertEqual(state.action_to_string(best.player, best.action), "x(2,0)")
+    self.assertEqual(state.action_to_string(best.player, best.action), "x(0,2)")
 
   def assertBestChild(self, choice, children):
     # If this causes flakiness, the key in `SearchNode.best_child` is bad.

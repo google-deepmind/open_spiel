@@ -13,7 +13,7 @@
 # limitations under the License.
 
 # Lint as: python3
-"""Tests for google3.third_party.open_spiel.python.algorithms.masked_softmax."""
+"""Tests for open_spiel.python.algorithms.masked_softmax."""
 
 from __future__ import absolute_import
 from __future__ import division

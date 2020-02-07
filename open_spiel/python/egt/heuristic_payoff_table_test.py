@@ -118,7 +118,7 @@ class PayoffTableTest(parameterized.TestCase):
   @parameterized.parameters(("matrix_rps",))
   def test_from_matrix_game(self, game):
     game = pyspiel.load_matrix_game(game)
-    payoff_tables = utils.nfg_to_ndarray(game)
+    payoff_tables = utils.game_payoffs_array(game)
     logging.info("Testing payoff table construction for matrix game.")
     table = heuristic_payoff_table.from_matrix_game(payoff_tables[0])
     print(table())
@@ -127,7 +127,7 @@ class PayoffTableTest(parameterized.TestCase):
   def test_expected_payoff(self, strategy):
     logging.info("Testing expected payoff for matrix game.")
     game = pyspiel.load_matrix_game("matrix_rps")
-    payoff_tables = utils.nfg_to_ndarray(game)
+    payoff_tables = utils.game_payoffs_array(game)
     table = heuristic_payoff_table.from_matrix_game(payoff_tables[0])
     expected_payoff = table.expected_payoff(strategy)
     print(expected_payoff)

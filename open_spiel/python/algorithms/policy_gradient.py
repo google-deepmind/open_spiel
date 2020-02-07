@@ -173,18 +173,19 @@ class PolicyGradient(rl_agent.AbstractAgent):
     # activate final as we plug logit and qvalue heads afterwards.
     net_torso = snt.nets.MLP(
         output_sizes=self._layer_sizes, activate_final=True)
-    torso_out = net_torso(self._info_state_ph)
     self._policy_head = snt.Linear(
         output_size=self._num_actions, name="policy_head")
-    self._policy_logits = self._policy_head(torso_out)
+    self.policy_logits_network = snt.Sequential([net_torso, self._policy_head])
+    self._policy_logits = self.policy_logits_network(self._info_state_ph)
     self._policy_probs = tf.nn.softmax(self._policy_logits)
     self._savers = [("torso", snt.get_saver(net_torso)),
                     ("policy_head", snt.get_saver(self._policy_head))]
-
+    torso_out = net_torso(self._info_state_ph)
     # Add baseline (V) head for A2C.
     if loss_class.__name__ == "BatchA2CLoss":
       baseline = snt.Linear(output_size=1, name="baseline")
-      self._baseline = tf.squeeze(baseline(torso_out), axis=1)
+      self._baseline = tf.squeeze(baseline(torso_out),
+                                  axis=1)
       self._savers.append(("baseline", snt.get_saver(baseline)))
     else:
       # Add q-values head otherwise

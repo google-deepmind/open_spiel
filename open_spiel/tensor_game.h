@@ -16,12 +16,16 @@
 #define THIRD_PARTY_OPEN_SPIEL_TENSOR_GAME_H_
 
 #include <algorithm>
+#include <iterator>
 #include <memory>
 #include <numeric>
+#include <string>
 #include <utility>
+#include <vector>
 
 #include "open_spiel/normal_form_game.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_utils.h"
 
 // A tensor game is an example of an n-player normal-form game.
 

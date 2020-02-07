@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for google3.third_party.open_spiel.python.pybind11.pyspiel."""
+"""Tests for open_spiel.python.pybind11.pyspiel."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -21,6 +21,7 @@ from __future__ import print_function
 from absl.testing import absltest
 
 from open_spiel.python import rl_environment
+import pyspiel
 
 
 class RLEnvironmentTest(absltest.TestCase):
@@ -34,6 +35,12 @@ class RLEnvironmentTest(absltest.TestCase):
     env = rl_environment.Environment("kuhn_poker", **{"players": 3})
     self.assertEqual(env.is_turn_based, True)
     self.assertEqual(env.num_players, 3)
+
+  def test_create_env_from_game_instance(self):
+    game = pyspiel.load_game("tic_tac_toe")
+    env = rl_environment.Environment(game)
+    self.assertEqual(env.is_turn_based, True)
+    self.assertEqual(env.num_players, 2)
 
   def test_reset(self):
     env = rl_environment.Environment("kuhn_poker", **{"players": 3})

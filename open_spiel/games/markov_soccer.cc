@@ -18,7 +18,7 @@
 #include <utility>
 
 #include "open_spiel/spiel.h"
-#include "open_spiel/tensor_view.h"
+#include "open_spiel/utils/tensor_view.h"
 
 namespace open_spiel {
 namespace markov_soccer {

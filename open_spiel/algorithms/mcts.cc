@@ -22,7 +22,7 @@
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
-#include "open_spiel/abseil-cpp/absl/random/uniform_int_distribution.h"
+#include "open_spiel/abseil-cpp/absl/random/distributions.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_format.h"
 #include "open_spiel/abseil-cpp/absl/time/clock.h"
@@ -47,16 +47,11 @@ std::vector<double> RandomRolloutEvaluator::Evaluate(const State& state) {
     while (!working_state->IsTerminal()) {
       if (working_state->IsChanceNode()) {
         ActionsAndProbs outcomes = working_state->ChanceOutcomes();
-        Action action =
-            SampleAction(outcomes,
-                         std::uniform_real_distribution<double>(0.0, 1.0)(rng_))
-                .first;
-        working_state->ApplyAction(action);
+        working_state->ApplyAction(SampleAction(outcomes, rng_).first);
       } else {
         std::vector<Action> actions = working_state->LegalActions();
-        absl::uniform_int_distribution<int> dist(0, actions.size() - 1);
-        int index = dist(rng_);
-        working_state->ApplyAction(actions[index]);
+        working_state->ApplyAction(
+            actions[absl::Uniform(rng_, 0u, actions.size())]);
       }
     }
 
@@ -287,9 +282,7 @@ std::unique_ptr<State> MCTSBot::ApplyTreePolicy(
       // For chance nodes, rollout according to chance node's probability
       // distribution
       Action chosen_action =
-          SampleAction(working_state->ChanceOutcomes(),
-                       std::uniform_real_distribution<double>(0.0, 1.0)(rng_))
-              .first;
+          SampleAction(working_state->ChanceOutcomes(), rng_).first;
 
       for (SearchNode& child : current_node->children) {
         if (child.action == chosen_action) {

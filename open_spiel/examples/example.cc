@@ -86,10 +86,7 @@ int main(int argc, char** argv) {
       // Chance node; sample one according to underlying distribution.
       std::vector<std::pair<open_spiel::Action, double>> outcomes =
           state->ChanceOutcomes();
-      open_spiel::Action action =
-          open_spiel::SampleAction(
-              outcomes, std::uniform_real_distribution<double>(0.0, 1.0)(rng))
-              .first;
+      open_spiel::Action action = open_spiel::SampleAction(outcomes, rng).first;
       std::cerr << "sampled outcome: "
                 << state->ActionToString(open_spiel::kChancePlayerId, action)
                 << std::endl;

@@ -18,7 +18,7 @@
 #include <memory>
 #include <utility>
 
-#include "open_spiel/tensor_view.h"
+#include "open_spiel/utils/tensor_view.h"
 
 namespace open_spiel {
 namespace connect_four {
@@ -35,7 +35,7 @@ const GameType kGameType{
     GameType::RewardModel::kTerminal,
     /*max_num_players=*/2,
     /*min_num_players=*/2,
-    /*provides_information_state_string=*/false,
+    /*provides_information_state_string=*/true,
     /*provides_information_state_tensor=*/false,
     /*provides_observation_string=*/true,
     /*provides_observation_tensor=*/true,
@@ -181,6 +181,10 @@ std::vector<double> ConnectFourState::Returns() const {
   if (outcome_ == Outcome::kPlayer1) return {1.0, -1.0};
   if (outcome_ == Outcome::kPlayer2) return {-1.0, 1.0};
   return {0.0, 0.0};
+}
+
+std::string ConnectFourState::InformationStateString(Player player) const {
+    return HistoryString();
 }
 
 std::string ConnectFourState::ObservationString(Player player) const {

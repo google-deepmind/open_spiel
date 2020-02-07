@@ -19,9 +19,9 @@
 #include <string.h>
 
 #include <algorithm>
+#include <numeric>
 #include <ostream>
 #include <sstream>
-
 
 #include "open_spiel/spiel_utils.h"
 
@@ -252,6 +252,16 @@ uint32_t ACPCState::Money(const uint8_t player) const {
 }
 
 uint32_t ACPCState::Ante(const uint8_t player) const {
+  assert(player < game_->acpc_game_->numPlayers);
+  return acpcState_->spent[player];
+}
+
+uint32_t ACPCState::TotalSpent() const {
+  return static_cast<uint32_t>(std::accumulate(std::begin(acpcState_->spent),
+                                               std::end(acpcState_->spent), 0));
+}
+
+uint32_t ACPCState::CurrentSpent(const uint8_t player) const {
   assert(player < game_->acpc_game_->numPlayers);
   return acpcState_->spent[player];
 }

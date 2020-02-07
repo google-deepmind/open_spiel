@@ -25,7 +25,6 @@ std::vector<double> EvaluateBots(State* state, const std::vector<Bot*>& bots,
                                  int seed) {
   const int num_players = bots.size();
   std::mt19937 rng(seed);
-  std::uniform_real_distribution<> uniform(0, 1);
   std::vector<Action> joint_actions(bots.size());
   if (state->History().empty()) {
     for (auto bot : bots) bot->Restart();
@@ -34,7 +33,7 @@ std::vector<double> EvaluateBots(State* state, const std::vector<Bot*>& bots,
   }
   while (!state->IsTerminal()) {
     if (state->IsChanceNode()) {
-      Action action = SampleAction(state->ChanceOutcomes(), uniform(rng)).first;
+      Action action = SampleAction(state->ChanceOutcomes(), rng).first;
       for (auto bot : bots) bot->InformAction(*state, kChancePlayerId, action);
       state->ApplyAction(action);
     } else if (state->IsSimultaneousNode()) {

@@ -102,7 +102,6 @@ set (OPEN_SPIEL_CORE_FILES
   spiel_utils.cc
   tensor_game.h
   tensor_game.cc
-  tensor_view.h
 )
 
 set (OPEN_SPIEL_QUERY_FILES query.cc query.h)
@@ -117,6 +116,7 @@ link_libraries(open_spiel_core
   absl::container
   absl::flags
   absl::flags_parse
+  absl::flat_hash_map
   absl::optional
   absl::random_random
   absl::str_format
@@ -138,6 +138,7 @@ set (OPEN_SPIEL_OBJECTS
   $<TARGET_OBJECTS:open_spiel_query>
   $<TARGET_OBJECTS:bridge_double_dummy_solver>
   $<TARGET_OBJECTS:algorithms>
+  $<TARGET_OBJECTS:utils>
 )
 if (BUILD_WITH_HANABI)
   set(OPEN_SPIEL_OBJECTS ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:hanabi_learning_environment>)
@@ -157,6 +158,7 @@ add_subdirectory (games)
 add_subdirectory (game_transforms)
 add_subdirectory (tests)
 add_subdirectory (python)
+add_subdirectory (utils)
 
 if (BUILD_WITH_JULIA)
   add_subdirectory (julia)

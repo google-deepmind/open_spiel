@@ -166,6 +166,9 @@ std::string Move::ToString() const {
     absl::StrAppend(&extra, ", promotion to ",
                     PieceTypeToString(promotion_type));
   }
+  if (is_castling) {
+    absl::StrAppend(&extra, " (castle)");
+  }
   return absl::StrCat(SquareToString(from), " to ", SquareToString(to), extra);
 }
 

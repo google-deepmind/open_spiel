@@ -20,7 +20,7 @@
 #include <vector>
 
 #include "open_spiel/spiel_utils.h"
-#include "open_spiel/tensor_view.h"
+#include "open_spiel/utils/tensor_view.h"
 
 namespace open_spiel {
 namespace tic_tac_toe {
@@ -102,7 +102,7 @@ std::vector<Action> TicTacToeState::LegalActions() const {
 std::string TicTacToeState::ActionToString(Player player,
                                            Action action_id) const {
   return absl::StrCat(StateToString(PlayerToState(player)), "(",
-                      action_id % kNumCols, ",", action_id / kNumCols, ")");
+                      action_id / kNumCols, ",", action_id % kNumCols, ")");
 }
 
 bool TicTacToeState::HasLine(Player player) const {

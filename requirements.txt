@@ -1,6 +1,6 @@
 # The single source of truth for the OpenSpiel pip dependencies.
-absl-py == 0.7.1
-tensorflow < 2.0, >= 1.15
+absl-py == 0.9.0
+tensorflow < 2.0, >= 1.15.1
 dm-sonnet == 1.32
 IPython == 5.8.0
 tensorflow-probability < 0.8.0, >= 0.7.0
@@ -9,5 +9,7 @@ networkx == 2.2
 mock == 3.0.5
 matplotlib == 3.1.1
 nashpy == 0.0.19
-scipy == 1.1.0
+scipy == 1.4.1
 attrs == 19.1.0
+jax >= 0.1.57
+jaxlib >= 0.1.37

@@ -15,6 +15,7 @@
 #ifndef THIRD_PARTY_OPEN_SPIEL_POLICY_H_
 #define THIRD_PARTY_OPEN_SPIEL_POLICY_H_
 
+#include <string>
 #include <unordered_map>
 #include <utility>
 #include <vector>

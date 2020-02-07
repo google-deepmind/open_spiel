@@ -14,16 +14,19 @@
 
 #include "open_spiel/spiel.h"
 
-#include <cstdlib>
-#include <iomanip>
+#include <algorithm>
+#include <functional>
 #include <iostream>
-#include <list>
+#include <map>
 #include <memory>
-#include <ostream>
+#include <optional>
+#include <string>
+#include <utility>
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_split.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel_utils.h"
 
@@ -321,11 +324,27 @@ bool Game::ParameterValue<bool>(const std::string& key,
   }
 }
 
+void NormalizePolicy(ActionsAndProbs* policy) {
+  double sum = 0;
+  for (const std::pair<Action, double>& outcome : *policy) {
+    sum += outcome.second;
+  }
+  for (std::pair<Action, double>& outcome : *policy) {
+    outcome.second /= sum;
+  }
+}
+
+std::pair<Action, double> SampleAction(const ActionsAndProbs& outcomes,
+                                       absl::BitGenRef rng) {
+  return SampleAction(outcomes, absl::Uniform(rng, 0.0, 1.0));
+}
 std::pair<Action, double> SampleAction(const ActionsAndProbs& outcomes,
                                        double z) {
-  double sum = 0;
+  SPIEL_CHECK_GE(z, 0);
+  SPIEL_CHECK_LT(z, 1);
 
   // First do a check that this is indeed a proper discrete distribution.
+  double sum = 0;
   for (const std::pair<Action, double>& outcome : outcomes) {
     double prob = outcome.second;
     SPIEL_CHECK_GE(prob, 0);
@@ -336,18 +355,17 @@ std::pair<Action, double> SampleAction(const ActionsAndProbs& outcomes,
 
   // Now sample an outcome.
   sum = 0;
-
-  for (const auto& outcome : outcomes) {
+  for (const std::pair<Action, double>& outcome : outcomes) {
     double prob = outcome.second;
     if (sum <= z && z < (sum + prob)) {
-      return {outcome.first, prob};
+      return outcome;
     }
     sum += prob;
   }
 
   // If we get here, something has gone wrong
   std::cerr << "Chance sampling failed; outcomes:" << std::endl;
-  for (const auto& outcome : outcomes) {
+  for (const std::pair<Action, double>& outcome : outcomes) {
     std::cerr << outcome.first << "  " << outcome.second << std::endl;
   }
   SpielFatalError(

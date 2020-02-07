@@ -17,7 +17,7 @@
   Example:
 
   game = pyspiel.load_game("matrix_pd")
-  payoff_tensor = utils.nfg_to_ndarray(game)
+  payoff_tensor = utils.game_payoffs_array(game)
   dyn = dynamics.MultiPopulationDynamics(payoff_tensor, dynamics.replicator)
 
   ax = plt.subplot(projection="2x2")

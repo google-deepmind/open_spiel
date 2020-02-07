@@ -38,9 +38,9 @@ CurrentPlayer() = -2
 InformationStateString(0) = "Observing player: 0. Non-terminal"
 InformationStateString(1) = "Observing player: 1. Non-terminal"
 InformationStateString(2) = "Observing player: 2. Non-terminal"
-InformationStateTensor(0) = [0.0]
-InformationStateTensor(1) = [0.0]
-InformationStateTensor(2) = [0.0]
+InformationStateTensor(0): ◯
+InformationStateTensor(1): ◯
+InformationStateTensor(2): ◯
 Rewards() = [0.0, 0.0, 0.0]
 Returns() = [0.0, 0.0, 0.0]
 LegalActions(0) = [0, 1]
@@ -64,8 +64,8 @@ CurrentPlayer() = -4
 InformationStateString(0) = "Observing player: 0. Terminal. History string: 1 1 0"
 InformationStateString(1) = "Observing player: 1. Terminal. History string: 1 1 0"
 InformationStateString(2) = "Observing player: 2. Terminal. History string: 1 1 0"
-InformationStateTensor(0) = [1.0]
-InformationStateTensor(1) = [1.0]
-InformationStateTensor(2) = [1.0]
+InformationStateTensor(0): ◉
+InformationStateTensor(1): ◉
+InformationStateTensor(2): ◉
 Rewards() = [1.0, -1.0, 1.0]
 Returns() = [1.0, -1.0, 1.0]

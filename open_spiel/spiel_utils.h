@@ -15,7 +15,10 @@
 #ifndef THIRD_PARTY_OPEN_SPIEL_SPIEL_UTILS_H_
 #define THIRD_PARTY_OPEN_SPIEL_SPIEL_UTILS_H_
 
+#include <cstddef>
+
 #include <algorithm>
+#include <array>
 #include <cmath>
 #include <cstdint>
 #include <limits>

@@ -103,10 +103,7 @@ std::pair<std::vector<double>, std::vector<std::string>> PlayGame(
     if (state->IsChanceNode()) {
       // Chance node; sample one according to underlying distribution.
       open_spiel::ActionsAndProbs outcomes = state->ChanceOutcomes();
-      action =
-          open_spiel::SampleAction(
-              outcomes, std::uniform_real_distribution<double>(0.0, 1.0)(rng))
-              .first;
+      action = open_spiel::SampleAction(outcomes, rng).first;
       if (!quiet)
         std::cerr << "Sampled action: " << state->ActionToString(player, action)
                   << std::endl;

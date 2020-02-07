@@ -18,10 +18,13 @@
 #include <array>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/games/universal_poker/acpc_cpp/acpc_game.h"
 #include "open_spiel/games/universal_poker/logic/card_set.h"
+#include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"
 
 // This is a wrapper around the Annual Computer Poker Competition bot (ACPC)
@@ -72,6 +75,7 @@ class UniversalPokerState : public State {
 
  protected:
   void DoApplyAction(Action action_id) override;
+
   enum ActionType {
     ACTION_DEAL = 1,
     ACTION_FOLD = 2,
@@ -142,6 +146,47 @@ class UniversalPokerGame : public Game {
   const acpc_cpp::ACPCGame *GetACPCGame() const { return &acpc_game_; }
 
   std::string parseParameters(const GameParameters &map);
+};
+
+// Only supported for UniversalPoker. Randomly plays an action from a fixed list
+// of actions. If none of the actions are legal, selects uniformly from the
+// list of legal actions.
+class UniformRestrictedActions : public Policy {
+ public:
+  // Actions will be restricted to this list when legal. If no such action is
+  // legal, uniform random over all legal actions will be returned.
+  explicit UniformRestrictedActions(std::vector<ActionType> actions)
+      : actions_(std::move(actions)) {}
+
+  ActionsAndProbs GetStatePolicy(const State &state) const {
+    ActionsAndProbs policy;
+    std::vector<Action> legal_actions = state.LegalActions();
+    for (Action action : legal_actions) {
+      if (absl::c_find(actions_, action) != actions_.end()) {
+        policy.emplace_back(action, 1.);
+      }
+    }
+
+    // If we have a non-empty policy, normalize it!
+    if (!policy.empty()) {
+      const double size = static_cast<double>(policy.size());
+      absl::c_for_each(policy, [size](std::pair<Action, double> &a_and_p) {
+        a_and_p.second /= size;
+      });
+      return policy;
+    }
+
+    // Otherwise, we return uniform random.
+    policy.reserve(legal_actions.size());
+    absl::c_for_each(legal_actions, [&policy, &legal_actions](Action a) {
+      policy.push_back({a, 1. / static_cast<double>(legal_actions.size())});
+    });
+    SPIEL_CHECK_EQ(policy.size(), legal_actions.size());
+    return policy;
+  }
+
+ private:
+  std::vector<ActionType> actions_;
 };
 
 }  // namespace universal_poker
