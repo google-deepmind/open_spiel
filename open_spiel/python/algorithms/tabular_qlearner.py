@@ -81,6 +81,10 @@ class QLearner(rl_agent.AbstractAgent):
     """
     info_state = str(time_step.observations["info_state"][self._player_id])
     legal_actions = time_step.observations["legal_actions"][self._player_id]
+
+    # Prevent undefined errors if this agent never plays until terminal step
+    action, probs = None, None
+
     # Act step: don't act at terminal states.
     if not time_step.last():
       epsilon = 0.0 if is_evaluation else self._epsilon
