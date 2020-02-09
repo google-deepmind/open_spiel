@@ -84,7 +84,7 @@ std::string MoveAsAscii(VirtualPoint p, GoColor c) {
 }  // namespace
 
 std::pair<int, int> VirtualPointTo2DPoint(VirtualPoint p) {
-  if (p == kInvalidPoint || p == kPass) return std::make_pair(-1, -1);
+  if (p == kInvalidPoint || p == kVirtualPass) return std::make_pair(-1, -1);
 
   const int row = static_cast<int>(p) / kVirtualBoardSize;
   const int col = static_cast<int>(p) % kVirtualBoardSize;
@@ -170,7 +170,7 @@ std::string VirtualPointToString(VirtualPoint p) {
   switch (p) {
     case kInvalidPoint:
       return "INVALID_POINT";
-    case kPass:
+    case kVirtualPass:
       return "PASS";
     default: {
       auto row_col = VirtualPointTo2DPoint(p);
@@ -184,7 +184,7 @@ std::string VirtualPointToString(VirtualPoint p) {
 VirtualPoint MakePoint(std::string s) {
   std::transform(s.begin(), s.end(), s.begin(), ::tolower);
 
-  if (s == "pass") return kPass;
+  if (s == "pass") return kVirtualPass;
   if (s.size() < 2 || s.size() > 3) return kInvalidPoint;
 
   int col = s[0] < 'i' ? s[0] - 'a' : s[0] - 'a' - 1;
@@ -228,7 +228,7 @@ void GoBoard::Clear() {
 }
 
 bool GoBoard::PlayMove(VirtualPoint p, GoColor c) {
-  if (p == kPass) {
+  if (p == kVirtualPass) {
     last_ko_point_ = kInvalidPoint;
     return true;
   }
@@ -387,7 +387,7 @@ bool GoBoard::IsInBoardArea(VirtualPoint p) const {
 }
 
 bool GoBoard::IsLegalMove(VirtualPoint p, GoColor c) const {
-  if (p == kPass) return true;
+  if (p == kVirtualPass) return true;
   if (!IsInBoardArea(p)) return false;
   if (!IsEmpty(p) || p == LastKoPoint()) return false;
   if (chain(p).num_pseudo_liberties > 0) return true;

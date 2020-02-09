@@ -123,7 +123,7 @@ std::vector<Action> GoState::LegalActions() const {
       actions.push_back(p);
     }
   }
-  actions.push_back(kPass);
+  actions.push_back(kVirtualPass);
   return actions;
 }
 
@@ -143,8 +143,8 @@ std::string GoState::ToString() const {
 bool GoState::IsTerminal() const {
   if (history_.size() < 2) return false;
   return (history_.size() >= MaxGameLength(board_.board_size())) || superko_ ||
-         (history_[history_.size() - 1] == kPass &&
-          history_[history_.size() - 2] == kPass);
+         (history_[history_.size() - 1] == kVirtualPass &&
+          history_[history_.size() - 2] == kVirtualPass);
 }
 
 std::vector<double> GoState::Returns() const {
@@ -194,7 +194,7 @@ void GoState::DoApplyAction(Action action) {
   to_play_ = OppColor(to_play_);
 
   bool was_inserted = repetitions_.insert(board_.HashValue()).second;
-  if (!was_inserted && action != kPass) {
+  if (!was_inserted && action != kVirtualPass) {
     // We have encountered this position before.
     superko_ = true;
   }

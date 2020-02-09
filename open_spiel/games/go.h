@@ -49,7 +49,7 @@ inline constexpr int CellStates() { return 3; }  // Black, white, empty.
 inline constexpr double DrawUtility() { return 0; }
 
 // All actions must be in [0; NumDistinctActions).
-inline int NumDistinctActions(int board_size) { return kPass + 1; }
+inline int NumDistinctActions(int board_size) { return kVirtualPass + 1; }
 
 // In theory Go games have no length limit, but we limit them to twice the
 // number of points on the board for practicality - only random games last

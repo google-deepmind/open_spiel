@@ -210,7 +210,7 @@ void CursorGoState::DoApplyAction(Action action) {
   if (action == kActionPlaceStone || action == kActionPass) {
     VirtualPoint point =
         (action == kActionPass)
-            ? go::kPass
+            ? go::kVirtualPass
             : VirtualPointFrom2DPoint(cursor_[ColorToPlayer(to_play_)]);
     SPIEL_CHECK_TRUE(board_.PlayMove(point, to_play_));
     is_terminal_ = last_move_was_pass_ && (action == kActionPass);

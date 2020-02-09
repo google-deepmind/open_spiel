@@ -47,7 +47,7 @@ inline constexpr int kVirtualBoardPoints =
 using VirtualPoint = uint16_t;
 
 inline constexpr VirtualPoint kInvalidPoint = 0;
-inline constexpr VirtualPoint kPass = kVirtualBoardPoints + 1;
+inline constexpr VirtualPoint kVirtualPass = kVirtualBoardPoints + 1;
 
 // Returns the VirtualPoint corresponding to the provided coordinates, e.g. "d4"
 // or "f10".
