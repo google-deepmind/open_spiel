@@ -45,7 +45,6 @@ namespace cursor_go {
 
 using go::GoBoard;
 using go::GoColor;
-using go::GoPoint;
 
 // Actions
 enum CursorGoAction : Action {

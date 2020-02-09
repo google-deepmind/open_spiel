@@ -53,16 +53,16 @@ std::shared_ptr<const Game> Factory(const GameParameters& params) {
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
 
-std::vector<GoPoint> HandicapStones(int num_handicap) {
+std::vector<VirtualPoint> HandicapStones(int num_handicap) {
   if (num_handicap < 2 || num_handicap > 9) return {};
 
-  static std::array<GoPoint, 9> placement = {
+  static std::array<VirtualPoint, 9> placement = {
       {MakePoint("d4"), MakePoint("q16"), MakePoint("d16"), MakePoint("q4"),
        MakePoint("d10"), MakePoint("q10"), MakePoint("k4"), MakePoint("k16"),
        MakePoint("k10")}};
-  static GoPoint center = MakePoint("k10");
+  static VirtualPoint center = MakePoint("k10");
 
-  std::vector<GoPoint> points;
+  std::vector<VirtualPoint> points;
   points.reserve(num_handicap);
   for (int i = 0; i < num_handicap; ++i) {
     points.push_back(placement[i]);
@@ -103,7 +103,7 @@ void GoState::ObservationTensor(int player, std::vector<double>* values) const {
 
   // Add planes: black, white, empty.
   int cell = 0;
-  for (GoPoint p : BoardPoints(board_.board_size())) {
+  for (VirtualPoint p : BoardPoints(board_.board_size())) {
     int color_val = static_cast<int>(board_.PointColor(p));
     (*values)[num_cells * color_val + cell] = 1.0;
     ++cell;
@@ -118,7 +118,7 @@ void GoState::ObservationTensor(int player, std::vector<double>* values) const {
 std::vector<Action> GoState::LegalActions() const {
   std::vector<Action> actions{};
   if (IsTerminal()) return actions;
-  for (GoPoint p : BoardPoints(board_.board_size())) {
+  for (VirtualPoint p : BoardPoints(board_.board_size())) {
     if (board_.IsLegalMove(p, to_play_)) {
       actions.push_back(p);
     }
@@ -129,7 +129,7 @@ std::vector<Action> GoState::LegalActions() const {
 
 std::string GoState::ActionToString(Player player, Action action) const {
   return absl::StrCat(GoColorToString(static_cast<GoColor>(player)), " ",
-                      GoPointToString(action));
+                      VirtualPointToString(action));
 }
 
 std::string GoState::ToString() const {
@@ -205,7 +205,7 @@ void GoState::ResetBoard() {
   if (handicap_ < 2) {
     to_play_ = GoColor::kBlack;
   } else {
-    for (GoPoint p : HandicapStones(handicap_)) {
+    for (VirtualPoint p : HandicapStones(handicap_)) {
       board_.PlayMove(p, GoColor::kBlack);
     }
     to_play_ = GoColor::kWhite;
