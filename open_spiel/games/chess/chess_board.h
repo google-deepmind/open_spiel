@@ -139,6 +139,7 @@ using StandardChessBoard = ChessBoard<8>;
 struct Move {
   Square from;
   Square to;
+  Piece piece;
   PieceType promotion_type;
 
   // We have to record castling here, because in Chess960 we may not be able to
@@ -146,10 +147,11 @@ struct Move {
   bool is_castling = false;
 
   Move() : is_castling(false) {}
-  Move(const Square& from, const Square& to,
+  Move(const Square& from, const Square& to, const Piece& piece,
        PieceType promotion_type = PieceType::kEmpty, bool is_castling = false)
       : from(from),
         to(to),
+        piece(piece),
         promotion_type(promotion_type),
         is_castling(is_castling) {}
 
@@ -207,7 +209,7 @@ struct Move {
   std::string ToSAN(const StandardChessBoard& board) const;
 
   bool operator==(const Move& other) const {
-    return from == other.from && to == other.to &&
+    return from == other.from && to == other.to && piece == other.piece &&
            promotion_type == other.promotion_type &&
            is_castling == other.is_castling;
   }

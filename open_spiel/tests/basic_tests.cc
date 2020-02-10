@@ -351,8 +351,8 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
       std::uniform_int_distribution<int> dis(0, actions.size() - 1);
       Action action = actions[dis(*rng)];
 
-      std::cout << "chose action: " << state->ActionToString(player, action)
-                << std::endl;
+      std::cout << "chose action: " << action << " ("
+                << state->ActionToString(player, action) << ")" << std::endl;
 
       history.emplace_back(state->Clone(), player, action);
       ApplyActionTestClone(game, state.get(), action);

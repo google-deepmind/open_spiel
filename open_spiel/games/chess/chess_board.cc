@@ -48,7 +48,7 @@ std::string ColorToString(Color c) {
     case Color::kEmpty:
       return "empty";
     default:
-      SpielFatalError("Unknown color.");
+      SpielFatalError(absl::StrCat("Unknown color: ", c));
       return "This will never return.";
   }
 }
@@ -169,7 +169,8 @@ std::string Move::ToString() const {
   if (is_castling) {
     absl::StrAppend(&extra, " (castle)");
   }
-  return absl::StrCat(SquareToString(from), " to ", SquareToString(to), extra);
+  return absl::StrCat(piece.ToString(), " ", SquareToString(from), " to ",
+                      SquareToString(to), extra);
 }
 
 std::string Move::ToLAN() const {
@@ -490,60 +491,67 @@ void ChessBoard<kBoardSize>::GeneratePseudoLegalMoves(
         switch (piece.type) {
           case PieceType::kKing:
             GenerateKingDestinations_(
-                sq, to_play_, [&yield, &sq, &generating](const Square &to) {
-                  YIELD(Move(sq, to));
+                sq, to_play_,
+                [&yield, &piece, &sq, &generating](const Square &to) {
+                  YIELD(Move(sq, to, piece));
                 });
             GenerateCastlingDestinations_(
-                sq, to_play_, [&yield, &sq, &generating](const Square &to) {
-                  YIELD(Move(sq, to, PieceType::kEmpty, true));
+                sq, to_play_,
+                [&yield, &piece, &sq, &generating](const Square &to) {
+                  YIELD(Move(sq, to, piece, PieceType::kEmpty, true));
                 });
             break;
           case PieceType::kQueen:
             GenerateQueenDestinations_(
-                sq, to_play_, [&yield, &sq, &generating](const Square &to) {
-                  YIELD(Move(sq, to));
+                sq, to_play_,
+                [&yield, &sq, &piece, &generating](const Square &to) {
+                  YIELD(Move(sq, to, piece));
                 });
             break;
           case PieceType::kRook:
             GenerateRookDestinations_(
-                sq, to_play_, [&yield, &sq, &generating](const Square &to) {
-                  YIELD(Move(sq, to));
+                sq, to_play_,
+                [&yield, &sq, &piece, &generating](const Square &to) {
+                  YIELD(Move(sq, to, piece));
                 });
             break;
           case PieceType::kBishop:
             GenerateBishopDestinations_(
-                sq, to_play_, [&yield, &sq, &generating](const Square &to) {
-                  YIELD(Move(sq, to));
+                sq, to_play_,
+                [&yield, &sq, &piece, &generating](const Square &to) {
+                  YIELD(Move(sq, to, piece));
                 });
             break;
           case PieceType::kKnight:
             GenerateKnightDestinations_(
-                sq, to_play_, [&yield, &sq, &generating](const Square &to) {
-                  YIELD(Move(sq, to));
+                sq, to_play_,
+                [&yield, &sq, &piece, &generating](const Square &to) {
+                  YIELD(Move(sq, to, piece));
                 });
             break;
           case PieceType::kPawn:
             GeneratePawnDestinations_(
-                sq, to_play_, [&yield, &sq, &generating](const Square &to) {
+                sq, to_play_,
+                [&yield, &sq, &piece, &generating](const Square &to) {
                   if (IsPawnPromotionRank(to)) {
-                    YIELD(Move(sq, to, PieceType::kQueen));
-                    YIELD(Move(sq, to, PieceType::kRook));
-                    YIELD(Move(sq, to, PieceType::kBishop));
-                    YIELD(Move(sq, to, PieceType::kKnight));
+                    YIELD(Move(sq, to, piece, PieceType::kQueen));
+                    YIELD(Move(sq, to, piece, PieceType::kRook));
+                    YIELD(Move(sq, to, piece, PieceType::kBishop));
+                    YIELD(Move(sq, to, piece, PieceType::kKnight));
                   } else {
-                    YIELD(Move(sq, to));
+                    YIELD(Move(sq, to, piece));
                   }
                 });
             GeneratePawnCaptureDestinations_(
                 sq, to_play_, true, /* include enpassant */
-                [&yield, &sq, &generating](const Square &to) {
+                [&yield, &sq, &piece, &generating](const Square &to) {
                   if (IsPawnPromotionRank(to)) {
-                    YIELD(Move(sq, to, PieceType::kQueen));
-                    YIELD(Move(sq, to, PieceType::kRook));
-                    YIELD(Move(sq, to, PieceType::kBishop));
-                    YIELD(Move(sq, to, PieceType::kKnight));
+                    YIELD(Move(sq, to, piece, PieceType::kQueen));
+                    YIELD(Move(sq, to, piece, PieceType::kRook));
+                    YIELD(Move(sq, to, piece, PieceType::kBishop));
+                    YIELD(Move(sq, to, piece, PieceType::kKnight));
                   } else {
-                    YIELD(Move(sq, to));
+                    YIELD(Move(sq, to, piece));
                   }
                 });
             break;

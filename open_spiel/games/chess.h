@@ -22,6 +22,7 @@
 #include <string>
 #include <vector>
 #include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
+#include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/games/chess/chess_board.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
@@ -42,7 +43,7 @@ inline constexpr double WinUtility() { return 1; }
 inline constexpr int BoardSize() { return 8; }
 
 // See action encoding below.
-inline constexpr int NumDistinctActions() { return (1 << 16); }
+inline constexpr int NumDistinctActions() { return 4672; }
 
 // https://math.stackexchange.com/questions/194008/how-many-turns-can-a-chess-game-take-at-maximum
 inline constexpr int MaxGameLength() { return 17695; }
@@ -86,6 +87,13 @@ enum class PromotionTypeEncoding {
   kKnight = 4
 };
 
+inline constexpr std::array<PieceType, 3> kUnderPromotionIndexToType = {
+    PieceType::kRook, PieceType::kBishop, PieceType::kKnight};
+inline constexpr std::array<Offset, 3> kUnderPromotionDirectionToOffset = {
+    {{0, 1}, {1, 1}, {-1, 1}}};
+inline constexpr int kNumUnderPromotions =
+    kUnderPromotionIndexToType.size() * kUnderPromotionDirectionToOffset.size();
+
 // Reads a bitfield within action, with LSB at offset, and length bits long (up
 // to 8).
 inline uint8_t GetField(Action action, int offset, int length) {
@@ -113,62 +121,21 @@ inline Square IndexToSquare(uint8_t index) {
                 static_cast<int8_t>(index / BoardSize())};
 }
 
-inline Action MoveToAction(const Move& move) {
-  Action action = 0;
+int EncodeMove(const Square& from_square, int destination_index, int board_size,
+               int num_actions_destinations);
 
-  SetField(0, 6, SquareToIndex(move.from), &action);
-  SetField(6, 6, SquareToIndex(move.to), &action);
+inline constexpr int kNumActionDestinations = 73;
 
-  uint8_t promo_encoded = 0;
-  switch (move.promotion_type) {
-    case PieceType::kQueen:
-      promo_encoded = static_cast<uint8_t>(PromotionTypeEncoding::kQueen);
-      break;
-    case PieceType::kRook:
-      promo_encoded = static_cast<uint8_t>(PromotionTypeEncoding::kRook);
-      break;
-    case PieceType::kBishop:
-      promo_encoded = static_cast<uint8_t>(PromotionTypeEncoding::kBishop);
-      break;
-    case PieceType::kKnight:
-      promo_encoded = static_cast<uint8_t>(PromotionTypeEncoding::kKnight);
-      break;
-    default:
-      promo_encoded = 0;
-  }
+int8_t ReflectRank(Color to_play, int board_size, int8_t rank);
 
-  SetField(12, 3, promo_encoded, &action);
-  SetField(15, 1, move.is_castling, &action);
+Color PlayerToColor(Player p);
 
-  return action;
-}
+Action MoveToAction(const Move& move);
 
-inline Move ActionToMove(const Action& action) {
-  PieceType promo_type;
-  switch (static_cast<PromotionTypeEncoding>(GetField(action, 12, 3))) {
-    case PromotionTypeEncoding::kQueen:
-      promo_type = PieceType::kQueen;
-      break;
-    case PromotionTypeEncoding::kRook:
-      promo_type = PieceType::kRook;
-      break;
-    case PromotionTypeEncoding::kBishop:
-      promo_type = PieceType::kBishop;
-      break;
-    case PromotionTypeEncoding::kKnight:
-      promo_type = PieceType::kKnight;
-      break;
-    case PromotionTypeEncoding::kNotPromotion:
-      promo_type = PieceType::kEmpty;
-      break;
-    default:
-      SpielFatalError("Unknown promotion type encoding");
-  }
+std::pair<Square, int> ActionToDestination(int action, int board_size,
+                                           int num_actions_destinations);
 
-  bool is_castling = GetField(action, 15, 1);
-  return Move(IndexToSquare(GetField(action, 0, 6)),
-              IndexToSquare(GetField(action, 6, 6)), promo_type, is_castling);
-}
+Move ActionToMove(const Action& action, const StandardChessBoard& board);
 
 // State of an in-play game.
 class ChessState : public State {
