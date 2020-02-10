@@ -21,7 +21,7 @@
 #include <memory>
 #include <string>
 #include <vector>
-
+#include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
 #include "open_spiel/games/chess/chess_board.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
@@ -248,7 +248,7 @@ class ChessState : public State {
       return static_cast<std::size_t>(x);
     }
   };
-  using RepetitionTable = std::unordered_map<uint64_t, int, PassthroughHash>;
+  using RepetitionTable = absl::flat_hash_map<uint64_t, int, PassthroughHash>;
   RepetitionTable repetitions_;
   mutable std::optional<std::vector<Action>> cached_legal_actions_;
 };
