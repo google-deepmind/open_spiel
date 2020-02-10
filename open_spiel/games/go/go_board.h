@@ -19,6 +19,7 @@
 #include <cstdint>
 #include <ostream>
 #include <vector>
+#include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
 namespace go {
@@ -37,6 +38,9 @@ GoColor OppColor(GoColor c);
 // In Virtual mode, an action (row, col) is row * 21 + col, and pass is 21*21+1.
 // All functions in this file (except stated otherwise) use these virtual
 // coordinates.
+//
+// However, in the OpenSpiel API (in go.{h, cc}), the actions are still exposed
+// as actions within 0, board_size*boardsize) (with pass = board_size **2.
 //
 // We support boards up to size 19.
 inline constexpr int kMaxBoardSize = 19;
@@ -60,11 +64,18 @@ std::ostream &operator<<(std::ostream &os, VirtualPoint p);
 
 // Conversion functions between VirtualPoint and row/column representation.
 std::pair<int, int> VirtualPointTo2DPoint(VirtualPoint p);
+// Returns the point identifier in the Virtual 21*21 board from the (row, col)
+// 0-index coordinate in the concrete board.
 VirtualPoint VirtualPointFrom2DPoint(std::pair<int, int> row_col);
 
 // Returns a reference to a vector that contains all points that are on a board
 // of the specified size.
 const std::vector<VirtualPoint> &BoardPoints(int board_size);
+
+// Converts an OpenSpiel action in range [0, board_size **2] to the
+// Virtual board range [0, kVirtualPass], and vice-versa.
+Action VirtualActionToAction(int virtual_action, int board_size);
+int ActionToVirtualAction(Action action, int board_size);
 
 // Simple Go board that is optimized for speed.
 // It only implements the minimum of functionality necessary to support the
@@ -77,6 +88,14 @@ class GoBoard {
   void Clear();
 
   inline int board_size() const { return board_size_; }
+  // Returns the concrete pass action.
+  inline int pass_action() const { return pass_action_; }
+  inline Action VirtualActionToAction(int virtual_action) const {
+    return go::VirtualActionToAction(virtual_action, board_size_);
+  }
+  inline int ActionToVirtualAction(Action action) const {
+    return go::ActionToVirtualAction(action, board_size_);
+  }
 
   inline GoColor PointColor(VirtualPoint p) const { return board_[p].color; }
 
@@ -208,6 +227,7 @@ class GoBoard {
   std::array<VirtualPoint, 4> last_captures_;
 
   int board_size_;
+  int pass_action_;
 
   VirtualPoint last_ko_point_;
 };

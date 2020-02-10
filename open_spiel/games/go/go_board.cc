@@ -19,6 +19,7 @@
 #include "open_spiel/abseil-cpp/absl/random/uniform_int_distribution.h"
 #include "open_spiel/games/chess/chess_common.h"
 #include "open_spiel/spiel_utils.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 
 namespace open_spiel {
 namespace go {
@@ -64,7 +65,7 @@ char GoColorToChar(GoColor c) {
     case GoColor::kGuard:
       return '#';
     default:
-      SpielFatalError("Unknown color.");
+      SpielFatalError(absl::StrCat("Unknown color ", c));
       return '!';
   }
 }
@@ -94,6 +95,23 @@ std::pair<int, int> VirtualPointTo2DPoint(VirtualPoint p) {
 VirtualPoint VirtualPointFrom2DPoint(std::pair<int, int> row_col) {
   return static_cast<VirtualPoint>((row_col.first + 1) * kVirtualBoardSize +
                                    row_col.second + 1);
+}
+
+// Internally, the board is *always* 21*21 with a border of guard stones around
+// all sides of the board. Thus we need to map a coordinate in that space
+// to a coordinate in the normal board.
+Action VirtualActionToAction(int virtual_action, int board_size) {
+  if (virtual_action == kVirtualPass) return board_size * board_size;
+  const int virtual_row = static_cast<int>(virtual_action) / kVirtualBoardSize;
+  const int virtual_col = static_cast<int>(virtual_action) % kVirtualBoardSize;
+  return board_size * (virtual_row - 1) + (virtual_col - 1);
+}
+
+int ActionToVirtualAction(Action action, int board_size) {
+  if (action == board_size * board_size) return kVirtualPass;
+  int row = action / board_size;
+  int column = action % board_size;
+  return (row + 1) * kVirtualBoardSize + (column + 1);
 }
 
 const std::vector<VirtualPoint>& BoardPoints(int board_size) {
@@ -196,7 +214,16 @@ VirtualPoint MakePoint(std::string s) {
   return VirtualPointFrom2DPoint({row - 1, col});
 }
 
-GoBoard::GoBoard(int board_size) : board_size_(board_size) { Clear(); }
+GoBoard::GoBoard(int board_size)
+    : board_size_(board_size), pass_action_(board_size * board_size) {
+  if (board_size_ > 19) {
+    SpielFatalError(
+        absl::StrCat("The current Go implementation supports board size up to "
+                     "19. Provided: ",
+                     board_size));
+  }
+  Clear();
+}
 
 void GoBoard::Clear() {
   zobrist_hash_ = 0;

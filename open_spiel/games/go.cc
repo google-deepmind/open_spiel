@@ -120,16 +120,17 @@ std::vector<Action> GoState::LegalActions() const {
   if (IsTerminal()) return actions;
   for (VirtualPoint p : BoardPoints(board_.board_size())) {
     if (board_.IsLegalMove(p, to_play_)) {
-      actions.push_back(p);
+      actions.push_back(board_.VirtualActionToAction(p));
     }
   }
-  actions.push_back(kVirtualPass);
+  actions.push_back(board_.pass_action());
   return actions;
 }
 
 std::string GoState::ActionToString(Player player, Action action) const {
-  return absl::StrCat(GoColorToString(static_cast<GoColor>(player)), " ",
-                      VirtualPointToString(action));
+  return absl::StrCat(
+      GoColorToString(static_cast<GoColor>(player)), " ",
+      VirtualPointToString(board_.ActionToVirtualAction(action)));
 }
 
 std::string GoState::ToString() const {
@@ -143,8 +144,8 @@ std::string GoState::ToString() const {
 bool GoState::IsTerminal() const {
   if (history_.size() < 2) return false;
   return (history_.size() >= MaxGameLength(board_.board_size())) || superko_ ||
-         (history_[history_.size() - 1] == kVirtualPass &&
-          history_[history_.size() - 2] == kVirtualPass);
+         (history_[history_.size() - 1] == board_.pass_action() &&
+          history_[history_.size() - 2] == board_.pass_action());
 }
 
 std::vector<double> GoState::Returns() const {
@@ -190,11 +191,12 @@ void GoState::UndoAction(Player player, Action action) {
 }
 
 void GoState::DoApplyAction(Action action) {
-  SPIEL_CHECK_TRUE(board_.PlayMove(action, to_play_));
+  SPIEL_CHECK_TRUE(
+      board_.PlayMove(board_.ActionToVirtualAction(action), to_play_));
   to_play_ = OppColor(to_play_);
 
   bool was_inserted = repetitions_.insert(board_.HashValue()).second;
-  if (!was_inserted && action != kVirtualPass) {
+  if (!was_inserted && action != board_.pass_action()) {
     // We have encountered this position before.
     superko_ = true;
   }
