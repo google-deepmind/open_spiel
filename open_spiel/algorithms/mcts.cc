@@ -33,11 +33,10 @@
 namespace open_spiel {
 namespace algorithms {
 
-// Return the memory use of a vector. Useful to track and limit memory use when
-// running for a long time and build a big tree (eg to solve a game).
-template <class T>
-constexpr inline int VectorMemory(const std::vector<T>& vec) {
-  return sizeof(T) * vec.capacity();
+int MIN_GC_LIMIT = 5;
+
+int MemoryUsedMb(int nodes) {
+  return nodes * sizeof(SearchNode) / (1 << 20);
 }
 
 std::vector<double> RandomRolloutEvaluator::Evaluate(const State& state) {
@@ -199,7 +198,9 @@ MCTSBot::MCTSBot(const Game& game, Evaluator* evaluator,
                  double dirichlet_alpha, double dirichlet_epsilon)
     : uct_c_{uct_c},
       max_simulations_{max_simulations},
-      max_memory_(max_memory_mb << 20),  // megabytes -> bytes
+      max_nodes_((max_memory_mb << 20) / sizeof(SearchNode) + 1),
+      nodes_(0),
+      gc_limit_(MIN_GC_LIMIT),
       verbose_(verbose),
       solve_(solve),
       max_utility_(game.MaxUtility()),
@@ -218,15 +219,18 @@ MCTSBot::MCTSBot(const Game& game, Evaluator* evaluator,
 Action MCTSBot::Step(const State& state) {
   absl::Time start = absl::Now();
   std::unique_ptr<SearchNode> root = MCTSearch(state);
+  SPIEL_CHECK_GT(root->children.size(), 0);
+
   const SearchNode& best = root->BestChild();
 
   if (verbose_) {
     double seconds = absl::ToDoubleSeconds(absl::Now() - start);
     std::cerr
         << absl::StrFormat(
-               "Finished %d sims in %.3f secs, %.1f sims/s, tree size: %d mb.",
+               ("Finished %d sims in %.3f secs, %.1f sims/s, "
+                "tree size: %d nodes / %d mb."),
                root->explore_count, seconds, (root->explore_count / seconds),
-               memory_used_ / (1 << 20))
+               nodes_, MemoryUsedMb(nodes_))
         << std::endl;
     std::cerr << "Root:" << std::endl;
     std::cerr << root->ToString(state) << std::endl;
@@ -274,7 +278,7 @@ std::unique_ptr<State> MCTSBot::ApplyTreePolicy(
       for (auto [action, prior] : legal_actions) {
         current_node->children.emplace_back(action, player, prior);
       }
-      memory_used_ += VectorMemory(legal_actions);
+      nodes_ += current_node->children.capacity();
     }
 
     SearchNode* chosen_child = nullptr;
@@ -320,7 +324,8 @@ std::unique_ptr<State> MCTSBot::ApplyTreePolicy(
 
 std::unique_ptr<SearchNode> MCTSBot::MCTSearch(const State& state) {
   Player player_id = state.CurrentPlayer();
-  memory_used_ = 0;
+  nodes_ = 1;
+  gc_limit_ = MIN_GC_LIMIT;
   auto root = std::make_unique<SearchNode>(kInvalidAction, player_id, 1);
   std::vector<SearchNode*> visit_path;
   std::vector<double> returns;
@@ -336,7 +341,6 @@ std::unique_ptr<SearchNode> MCTSBot::MCTSearch(const State& state) {
     if (working_state->IsTerminal()) {
       returns = working_state->Returns();
       visit_path[visit_path.size() - 1]->outcome = returns;
-      memory_used_ += VectorMemory(returns);
       solved = solve_;
     } else {
       returns = evaluator_->Evaluate(*working_state);
@@ -365,7 +369,6 @@ std::unique_ptr<SearchNode> MCTSBot::MCTSearch(const State& state) {
                             return c.outcome == outcome;
                           })) {
             node->outcome = outcome;
-            memory_used_ += VectorMemory(node->outcome);
           } else {
             solved = false;
           }
@@ -385,7 +388,6 @@ std::unique_ptr<SearchNode> MCTSBot::MCTSearch(const State& state) {
           if (best != nullptr &&
               (all_solved || best->outcome[player] == max_utility_)) {
             node->outcome = best->outcome;
-            memory_used_ += VectorMemory(node->outcome);
           } else {
             solved = false;
           }
@@ -394,13 +396,50 @@ std::unique_ptr<SearchNode> MCTSBot::MCTSearch(const State& state) {
     }
 
     if (!root->outcome.empty() ||  // Full game tree is solved.
-        (max_memory_ && memory_used_ >= max_memory_) ||
         root->children.size() == 1) {
       break;
+    }
+    if (max_nodes_ > 1 && nodes_ >= max_nodes_) {
+      // Note that actual memory used as counted by ps/top might exceed the
+      // counted value here, possibly by a significant margin (1.5x even!). Part
+      // of that is not counting the outcome array, but most of that is due to
+      // memory fragmentation and is out of our control without writing our own
+      // memory manager.
+      if (verbose_) {
+        std::cerr << absl::StrFormat(
+            ("Approx %d mb in %d nodes after %d sims, garbage collecting with "
+             "limit %d ... "),
+            MemoryUsedMb(nodes_), nodes_, i, gc_limit_);
+      }
+      GarbageCollect(root.get());
+
+      // Slowly increase or decrease to target releasing half the memory.
+      gc_limit_ *= (nodes_ > max_nodes_ / 2 ? 1.25 : 0.9);
+      gc_limit_ = std::max(MIN_GC_LIMIT, gc_limit_);
+      if (verbose_) {
+        std::cerr << absl::StrFormat(
+            "%d mb in %d nodes remaining\n",
+            MemoryUsedMb(nodes_), nodes_);
+      }
     }
   }
 
   return root;
+}
+
+void MCTSBot::GarbageCollect(SearchNode* node) {
+  if (node->children.empty()) {
+    return;
+  }
+  bool clear_children = node->explore_count < gc_limit_;
+  for (SearchNode& child : node->children) {
+    GarbageCollect(&child);
+  }
+  if (clear_children) {
+    nodes_ -= node->children.capacity();
+    node->children.clear();
+    node->children.shrink_to_fit();  // release the memory
+  }
 }
 
 }  // namespace algorithms

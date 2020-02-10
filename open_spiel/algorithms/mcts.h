@@ -180,10 +180,13 @@ class MCTSBot : public Bot {
   std::unique_ptr<State> ApplyTreePolicy(SearchNode* root, const State& state,
                                          std::vector<SearchNode*>* visit_path);
 
+  void GarbageCollect(SearchNode* node);
+
   double uct_c_;
   int max_simulations_;
-  int64_t max_memory_;       // Max memory allowed in the tree, in bytes.
-  int64_t memory_used_ = 0;  // Memory used in the tree, in bytes.
+  int max_nodes_;  // Max nodes allowed in the tree
+  int nodes_;  // Nodes used in the tree.
+  int gc_limit_;
   bool verbose_;
   bool solve_;
   double max_utility_;

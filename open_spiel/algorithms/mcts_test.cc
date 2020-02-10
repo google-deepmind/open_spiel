@@ -135,6 +135,21 @@ void MCTSTest_SolveWin() {
   SPIEL_CHECK_EQ(state->ActionToString(best.player, best.action), "x(0,2)");
 }
 
+void MCTSTest_GarbageCollect() {
+  auto game = LoadGame("tic_tac_toe");
+  std::unique_ptr<State> state = game->NewInitialState();
+  open_spiel::algorithms::RandomRolloutEvaluator evaluator(1, 42);
+  algorithms::MCTSBot bot(*game, &evaluator, UCT_C,
+                          /*max_simulations=*/ 1000000,
+                          /*max_memory_mb=*/ 1,
+                          /*solve=*/ true,
+                          /*seed=*/ 42,
+                          /*verbose=*/ true);  // Verify the log output.
+  std::unique_ptr<algorithms::SearchNode> root = bot.MCTSearch(*state);
+  SPIEL_CHECK_TRUE(root->outcome.size() == 2 ||
+                   root->explore_count == 1000000);
+}
+
 }  // namespace
 }  // namespace open_spiel
 
@@ -146,4 +161,5 @@ int main(int argc, char** argv) {
   open_spiel::MCTSTest_SolveDraw();
   open_spiel::MCTSTest_SolveLoss();
   open_spiel::MCTSTest_SolveWin();
+  open_spiel::MCTSTest_GarbageCollect();
 }
