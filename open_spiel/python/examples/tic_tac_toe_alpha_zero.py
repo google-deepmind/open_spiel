@@ -38,9 +38,9 @@ import numpy as np
 
 import tensorflow.compat.v1 as tf
 
-from open_spiel.python.algorithms import alpha_zero
 from open_spiel.python.algorithms import mcts
 from open_spiel.python.algorithms import minimax
+from open_spiel.python.algorithms.alpha_zero import alpha_zero
 import pyspiel
 
 tf.enable_eager_execution()
