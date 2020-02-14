@@ -136,7 +136,7 @@ std::string GoState::ActionToString(Player player, Action action) const {
 std::string GoState::ToString() const {
   std::stringstream ss;
   ss << "GoState(komi=" << komi_ << ", to_play=" << GoColorToString(to_play_)
-     << "history.size()=" << history_.size() << ")\n";
+     << ", history.size()=" << history_.size() << ")\n";
   ss << board_;
   return ss.str();
 }
