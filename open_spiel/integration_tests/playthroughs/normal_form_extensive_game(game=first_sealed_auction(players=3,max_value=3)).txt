@@ -16,6 +16,7 @@ GameType.short_name = "normal_form_extensive_game"
 GameType.utility = Utility.GENERAL_SUM
 
 NumDistinctActions() = 6
+PolicyTensorShape() = [6]
 MaxChanceOutcomes() = 0
 GetParameters() = {}
 NumPlayers() = 3

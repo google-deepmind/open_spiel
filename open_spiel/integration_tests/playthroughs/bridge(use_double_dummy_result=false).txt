@@ -16,6 +16,7 @@ GameType.short_name = "bridge"
 GameType.utility = Utility.ZERO_SUM
 
 NumDistinctActions() = 90
+PolicyTensorShape() = [90]
 MaxChanceOutcomes() = 0
 GetParameters() = {use_double_dummy_result=False}
 NumPlayers() = 4

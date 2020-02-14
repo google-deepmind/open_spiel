@@ -16,6 +16,7 @@ GameType.short_name = "oshi_zumo"
 GameType.utility = Utility.ZERO_SUM
 
 NumDistinctActions() = 11
+PolicyTensorShape() = [11]
 MaxChanceOutcomes() = 0
 GetParameters() = {alesia=False,coins=10,horizon=1000,min_bid=0,size=3}
 NumPlayers() = 2

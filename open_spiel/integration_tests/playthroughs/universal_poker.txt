@@ -16,6 +16,7 @@ GameType.short_name = "universal_poker"
 GameType.utility = Utility.ZERO_SUM
 
 NumDistinctActions() = 4
+PolicyTensorShape() = [4]
 MaxChanceOutcomes() = 24
 GetParameters() = {betting=nolimit,bettingAbstraction=fcpa,blind=100 100,firstPlayer=1 1,maxRaises=,numBoardCards=0 1,numHoleCards=1,numPlayers=2,numRanks=6,numRounds=2,numSuits=4,stack=1200 1200}
 NumPlayers() = 2

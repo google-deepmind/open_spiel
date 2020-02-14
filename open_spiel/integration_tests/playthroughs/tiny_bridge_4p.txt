@@ -16,6 +16,7 @@ GameType.short_name = "tiny_bridge_4p"
 GameType.utility = Utility.ZERO_SUM
 
 NumDistinctActions() = 9
+PolicyTensorShape() = [9]
 MaxChanceOutcomes() = 28
 GetParameters() = {}
 NumPlayers() = 4

@@ -16,6 +16,7 @@ GameType.short_name = "gin_rummy"
 GameType.utility = Utility.ZERO_SUM
 
 NumDistinctActions() = 241
+PolicyTensorShape() = [241]
 MaxChanceOutcomes() = 52
 GetParameters() = {gin_bonus=25,knock_card=10,oklahoma=False,undercut_bonus=25}
 NumPlayers() = 2

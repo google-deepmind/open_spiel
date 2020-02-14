@@ -16,6 +16,7 @@ GameType.short_name = "kuhn_poker"
 GameType.utility = Utility.ZERO_SUM
 
 NumDistinctActions() = 2
+PolicyTensorShape() = [2]
 MaxChanceOutcomes() = 3
 GetParameters() = {players=2}
 NumPlayers() = 2

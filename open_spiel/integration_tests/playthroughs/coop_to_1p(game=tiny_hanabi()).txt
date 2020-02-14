@@ -16,6 +16,7 @@ GameType.short_name = "coop_to_1p"
 GameType.utility = Utility.GENERAL_SUM
 
 NumDistinctActions() = 3
+PolicyTensorShape() = [3]
 MaxChanceOutcomes() = 2
 GetParameters() = {game=tiny_hanabi()}
 NumPlayers() = 1

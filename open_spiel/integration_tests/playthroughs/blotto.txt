@@ -16,6 +16,7 @@ GameType.short_name = "blotto"
 GameType.utility = Utility.ZERO_SUM
 
 NumDistinctActions() = 66
+PolicyTensorShape() = [66]
 MaxChanceOutcomes() = 0
 GetParameters() = {coins=10,fields=3,players=2}
 NumPlayers() = 2

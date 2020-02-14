@@ -16,6 +16,7 @@ GameType.short_name = "goofspiel"
 GameType.utility = Utility.ZERO_SUM
 
 NumDistinctActions() = 4
+PolicyTensorShape() = [4]
 MaxChanceOutcomes() = 0
 GetParameters() = {imp_info=True,num_cards=4,players=2,points_order=descending}
 NumPlayers() = 2

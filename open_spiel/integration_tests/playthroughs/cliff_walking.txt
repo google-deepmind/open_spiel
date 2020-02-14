@@ -16,6 +16,7 @@ GameType.short_name = "cliff_walking"
 GameType.utility = Utility.GENERAL_SUM
 
 NumDistinctActions() = 4
+PolicyTensorShape() = [4]
 MaxChanceOutcomes() = 0
 GetParameters() = {height=4,horizon=100,width=8}
 NumPlayers() = 1

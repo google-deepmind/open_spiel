@@ -356,6 +356,7 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("information_state_tensor_size", &Game::InformationStateTensorSize)
       .def("observation_tensor_shape", &Game::ObservationTensorShape)
       .def("observation_tensor_size", &Game::ObservationTensorSize)
+      .def("policy_tensor_shape", &Game::PolicyTensorShape)
       .def("deserialize_state", &Game::DeserializeState)
       .def("max_game_length", &Game::MaxGameLength)
       .def("__str__", &Game::ToString)

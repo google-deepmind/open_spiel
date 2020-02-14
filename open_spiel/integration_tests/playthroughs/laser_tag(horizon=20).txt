@@ -16,6 +16,7 @@ GameType.short_name = "laser_tag"
 GameType.utility = Utility.GENERAL_SUM
 
 NumDistinctActions() = 10
+PolicyTensorShape() = [10]
 MaxChanceOutcomes() = 6
 GetParameters() = {grid=S.....S\n.......\n..*.*..\n.**.**.\n..*.*..\n.......\nS.....S,horizon=20,zero_sum=False}
 NumPlayers() = 2

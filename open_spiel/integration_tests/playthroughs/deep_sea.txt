@@ -16,6 +16,7 @@ GameType.short_name = "deep_sea"
 GameType.utility = Utility.GENERAL_SUM
 
 NumDistinctActions() = 2
+PolicyTensorShape() = [2]
 MaxChanceOutcomes() = 2
 GetParameters() = {randomize_actions=True,seed=42,size=5,unscaled_move_cost=0.01}
 NumPlayers() = 1

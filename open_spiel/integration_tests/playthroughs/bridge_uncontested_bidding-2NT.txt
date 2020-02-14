@@ -16,6 +16,7 @@ GameType.short_name = "bridge_uncontested_bidding"
 GameType.utility = Utility.IDENTICAL
 
 NumDistinctActions() = 36
+PolicyTensorShape() = [36]
 MaxChanceOutcomes() = 0
 GetParameters() = {relative_scoring=True,rng_seed=0,subgame=2NT}
 NumPlayers() = 2

@@ -16,6 +16,7 @@ GameType.short_name = "liars_dice"
 GameType.utility = Utility.ZERO_SUM
 
 NumDistinctActions() = 13
+PolicyTensorShape() = [13]
 MaxChanceOutcomes() = 6
 GetParameters() = {numdice=1,players=2}
 NumPlayers() = 2

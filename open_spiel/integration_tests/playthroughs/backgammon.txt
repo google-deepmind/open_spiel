@@ -16,6 +16,7 @@ GameType.short_name = "backgammon"
 GameType.utility = Utility.ZERO_SUM
 
 NumDistinctActions() = 1352
+PolicyTensorShape() = [1352]
 MaxChanceOutcomes() = 21
 GetParameters() = {scoring_type=winloss_scoring}
 NumPlayers() = 2

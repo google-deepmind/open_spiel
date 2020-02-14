@@ -16,6 +16,7 @@ GameType.short_name = "tiny_hanabi"
 GameType.utility = Utility.IDENTICAL
 
 NumDistinctActions() = 3
+PolicyTensorShape() = [3]
 MaxChanceOutcomes() = 2
 GetParameters() = {num_actions=3,num_chance=2,num_players=2,payoff=10;0;0;4;8;4;10;0;0;0;0;10;4;8;4;0;0;10;0;0;10;4;8;4;0;0;0;10;0;0;4;8;4;10;0;0}
 NumPlayers() = 2

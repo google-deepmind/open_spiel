@@ -16,6 +16,7 @@ GameType.short_name = "negotiation"
 GameType.utility = Utility.GENERAL_SUM
 
 NumDistinctActions() = 226
+PolicyTensorShape() = [226]
 MaxChanceOutcomes() = 1
 GetParameters() = {enable_proposals=True,enable_utterances=True,num_items=3,num_symbols=3,rng_seed=100,utterance_dim=2}
 NumPlayers() = 2

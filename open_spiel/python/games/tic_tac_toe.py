@@ -268,6 +268,9 @@ class TicTacToeGame(object):
   def num_distinct_actions(self):
     return _NUM_CELLS
 
+  def policy_tensor_shape(self):
+    return (_NUM_ROWS, _NUM_COLS, 1)
+
   def clone(self):
     return TicTacToeGame()
 

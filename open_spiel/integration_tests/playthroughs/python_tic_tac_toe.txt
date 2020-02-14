@@ -16,6 +16,7 @@ GameType.short_name = "python_tic_tac_toe"
 GameType.utility = Utility.ZERO_SUM
 
 NumDistinctActions() = 9
+PolicyTensorShape() = (3, 3, 1)
 MaxChanceOutcomes() = 0
 GetParameters() = {}
 NumPlayers() = 2

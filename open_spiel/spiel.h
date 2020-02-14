@@ -661,6 +661,14 @@ class Game : public std::enable_shared_from_this<Game> {
                                            std::multiplies<double>());
   }
 
+  // Describes the structure of the policy representation in a
+  // tensor-like format. This is especially useful for experiments involving
+  // reinforcement learning and neural networks. Note: the actual policy is
+  // expected to be in the shape of a 1-D vector.
+  virtual std::vector<int> PolicyTensorShape() const {
+    return {NumDistinctActions()};
+  }
+
   // Returns a newly allocated state built from a string. Caller takes ownership
   // of the state.
 

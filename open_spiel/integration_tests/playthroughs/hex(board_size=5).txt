@@ -16,6 +16,7 @@ GameType.short_name = "hex"
 GameType.utility = Utility.ZERO_SUM
 
 NumDistinctActions() = 25
+PolicyTensorShape() = [25]
 MaxChanceOutcomes() = 0
 GetParameters() = {board_size=5}
 NumPlayers() = 2

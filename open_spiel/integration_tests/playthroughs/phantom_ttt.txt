@@ -16,6 +16,7 @@ GameType.short_name = "phantom_ttt"
 GameType.utility = Utility.ZERO_SUM
 
 NumDistinctActions() = 9
+PolicyTensorShape() = [9]
 MaxChanceOutcomes() = 0
 GetParameters() = {obstype=reveal-nothing}
 NumPlayers() = 2

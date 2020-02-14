@@ -16,6 +16,7 @@ GameType.short_name = "breakthrough"
 GameType.utility = Utility.ZERO_SUM
 
 NumDistinctActions() = 768
+PolicyTensorShape() = [768]
 MaxChanceOutcomes() = 0
 GetParameters() = {columns=8,rows=8}
 NumPlayers() = 2
