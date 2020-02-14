@@ -24,6 +24,7 @@ MinUtility() = -1.0
 MaxUtility() = 1.0
 UtilitySum() = 0.0
 InformationStateTensorShape() = [70]
+InformationStateTensorLayout() = TensorLayout.CHW
 InformationStateTensorSize() = 70
 MaxGameLength() = 8
 ToString() = "turn_based_simultaneous_game(game=goofspiel(imp_info=True,num_cards=4,players=2,points_order=descending))"

@@ -24,6 +24,7 @@ MinUtility() = -1.0
 MaxUtility() = 1.0
 UtilitySum() = 0.0
 ObservationTensorShape() = [3, 6, 6]
+ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 108
 MaxGameLength() = 36
 ToString() = "pentago()"

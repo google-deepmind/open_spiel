@@ -24,6 +24,7 @@ MinUtility() = -20.0
 MaxUtility() = 20.0
 UtilitySum() = 0.0
 ObservationTensorShape() = [4, 7, 7]
+ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 196
 MaxGameLength() = 20
 ToString() = "laser_tag(horizon=20)"

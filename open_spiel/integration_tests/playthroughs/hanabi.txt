@@ -24,6 +24,7 @@ MinUtility() = 0.0
 MaxUtility() = 6.0
 UtilitySum() = None
 ObservationTensorShape() = [199]
+ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 199
 MaxGameLength() = 41
 ToString() = "hanabi(colors=2,hand_size=3,players=3,ranks=3)"

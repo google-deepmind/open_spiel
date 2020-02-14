@@ -24,6 +24,7 @@ MinUtility() = -123.0
 MaxUtility() = 123.0
 UtilitySum() = 0.0
 ObservationTensorShape() = [384]
+ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 384
 MaxGameLength() = 300
 ToString() = "gin_rummy()"

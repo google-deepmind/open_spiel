@@ -24,6 +24,7 @@ MinUtility() = -1.0
 MaxUtility() = 1.0
 UtilitySum() = -0.0
 ObservationTensorShape() = [4, 7]
+ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 28
 MaxGameLength() = 20
 ToString() = "misere(game=pig(horizon=20,players=3,winscore=6))"

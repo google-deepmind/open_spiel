@@ -24,6 +24,7 @@ MinUtility() = -1.0
 MaxUtility() = 1.0
 UtilitySum() = 0.0
 ObservationTensorShape() = [14]
+ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 14
 MaxGameLength() = 1000
 ToString() = "oware()"

@@ -24,6 +24,7 @@ MinUtility() = -40.0
 MaxUtility() = 35.0
 UtilitySum() = None
 ObservationTensorShape() = [287]
+ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 287
 MaxGameLength() = 224
 ToString() = "coop_to_1p(game=tiny_bridge_2p())"

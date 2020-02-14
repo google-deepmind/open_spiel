@@ -24,6 +24,7 @@ MinUtility() = -2170.0
 MaxUtility() = 0.0
 UtilitySum() = None
 InformationStateTensorShape() = [126]
+InformationStateTensorLayout() = TensorLayout.CHW
 InformationStateTensorSize() = 126
 MaxGameLength() = 36
 ToString() = "bridge_uncontested_bidding(relative_scoring=True)"

@@ -24,6 +24,7 @@ MinUtility() = 0.0
 MaxUtility() = 4.0
 UtilitySum() = None
 InformationStateTensorShape() = [1]
+InformationStateTensorLayout() = TensorLayout.CHW
 InformationStateTensorSize() = 1
 MaxGameLength() = 1
 ToString() = "matrix_cd()"

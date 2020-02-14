@@ -24,6 +24,7 @@ MinUtility() = -7600.0
 MaxUtility() = 7600.0
 UtilitySum() = None
 ObservationTensorShape() = [571]
+ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 571
 MaxGameLength() = 319
 ToString() = "bridge()"

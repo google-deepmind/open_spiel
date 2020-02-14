@@ -24,6 +24,7 @@ MinUtility() = -150.0
 MaxUtility() = 150.0
 UtilitySum() = None
 ObservationTensorShape() = [81]
+ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 81
 MaxGameLength() = 20
 ToString() = "negotiation(num_symbols=3,rng_seed=100,utterance_dim=2)"

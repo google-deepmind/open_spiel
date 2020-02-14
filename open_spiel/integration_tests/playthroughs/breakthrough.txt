@@ -24,6 +24,7 @@ MinUtility() = -1.0
 MaxUtility() = 1.0
 UtilitySum() = 0.0
 ObservationTensorShape() = [3, 8, 8]
+ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 192
 MaxGameLength() = 209
 ToString() = "breakthrough()"

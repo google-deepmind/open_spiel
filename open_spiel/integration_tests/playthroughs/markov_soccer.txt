@@ -24,6 +24,7 @@ MinUtility() = -1.0
 MaxUtility() = 1.0
 UtilitySum() = 0.0
 ObservationTensorShape() = [6, 4, 5]
+ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 120
 MaxGameLength() = 20
 ToString() = "markov_soccer(horizon=20)"

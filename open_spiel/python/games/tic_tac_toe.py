@@ -313,6 +313,9 @@ class TicTacToeGame(object):
   def observation_tensor_shape(self):
     return [1 + _NUM_PLAYERS, _NUM_ROWS, _NUM_COLS]
 
+  def observation_tensor_layout(self):
+    return pyspiel.TensorLayout.CHW
+
   def observation_tensor_size(self):
     return np.product(self.observation_tensor_shape())
 

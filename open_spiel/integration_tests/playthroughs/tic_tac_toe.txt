@@ -24,6 +24,7 @@ MinUtility() = -1.0
 MaxUtility() = 1.0
 UtilitySum() = 0.0
 ObservationTensorShape() = [3, 3, 3]
+ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 27
 MaxGameLength() = 9
 ToString() = "tic_tac_toe()"

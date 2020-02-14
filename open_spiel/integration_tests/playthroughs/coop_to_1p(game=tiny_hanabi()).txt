@@ -24,6 +24,7 @@ MinUtility() = 0.0
 MaxUtility() = 10.0
 UtilitySum() = None
 ObservationTensorShape() = [15]
+ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 15
 MaxGameLength() = 4
 ToString() = "coop_to_1p(game=tiny_hanabi())"

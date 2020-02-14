@@ -24,6 +24,7 @@ MinUtility() = -1.0
 MaxUtility() = 1.0
 UtilitySum() = 0.0
 ObservationTensorShape() = [4, 7, 7]
+ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 196
 MaxGameLength() = 98
 ToString() = "go(board_size=7,komi=4.5)"

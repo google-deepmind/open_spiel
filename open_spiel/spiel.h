@@ -150,6 +150,15 @@ std::ostream& operator<<(std::ostream& stream, GameType::Utility value);
 // The probability of taking each possible action in a particular info state.
 using ActionsAndProbs = std::vector<std::pair<Action, double>>;
 
+// Layouts for 3-D tensors. For 2-D tensors, we assume that the layout is a
+// single spatial dimension and a channel dimension. If a 2-D tensor should be
+// interpreted as a 2-D space, report it as 3-D with a channel dimension of
+// size 1. We have no standard for higher-dimensional tensors.
+enum class TensorLayout {
+  kHWC,  // indexes are in the order (height, width, channels)
+  kCHW,  // indexes are in the order (channels, height, width)
+};
+
 // Forward declaration needed for the backpointer within State.
 class Game;
 
@@ -633,6 +642,9 @@ class Game : public std::enable_shared_from_this<Game> {
   virtual std::vector<int> InformationStateTensorShape() const {
     SpielFatalError("InformationStateTensorShape unimplemented.");
   }
+  virtual TensorLayout InformationStateTensorLayout() const {
+    return TensorLayout::kCHW;
+  }
 
   // The size of (flat) vector needed for the information state tensor-like
   // format.
@@ -650,6 +662,9 @@ class Game : public std::enable_shared_from_this<Game> {
   // see the documentation of that function for details of the data layout.
   virtual std::vector<int> ObservationTensorShape() const {
     SpielFatalError("ObservationTensorShape unimplemented.");
+  }
+  virtual TensorLayout ObservationTensorLayout() const {
+    return TensorLayout::kCHW;
   }
 
   // The size of (flat) vector needed for the observation tensor-like

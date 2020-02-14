@@ -24,6 +24,7 @@ MinUtility() = -0.01
 MaxUtility() = 0.99
 UtilitySum() = None
 ObservationTensorShape() = [5, 5]
+ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 25
 MaxGameLength() = 5
 ToString() = "deep_sea()"

@@ -24,6 +24,7 @@ MinUtility() = -1.0
 MaxUtility() = 1.0
 UtilitySum() = 0.0
 InformationStateTensorShape() = [1]
+InformationStateTensorLayout() = TensorLayout.CHW
 InformationStateTensorSize() = 1
 MaxGameLength() = 1
 ToString() = "blotto()"

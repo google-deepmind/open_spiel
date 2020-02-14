@@ -24,6 +24,7 @@ MinUtility() = -1.0
 MaxUtility() = 1.0
 UtilitySum() = 0.0
 ObservationTensorShape() = [9, 5, 5]
+ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 225
 MaxGameLength() = 25
 ToString() = "hex(board_size=5)"

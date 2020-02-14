@@ -24,6 +24,7 @@ MinUtility() = -1.0
 MaxUtility() = 1.0
 UtilitySum() = 0.0
 ObservationTensorShape() = [6, 5, 5]
+ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 150
 MaxGameLength() = 400
 ToString() = "cursor_go(board_size=5,max_cursor_moves=7)"

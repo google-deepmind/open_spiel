@@ -24,6 +24,7 @@ MinUtility() = -1.0
 MaxUtility() = 1.0
 UtilitySum() = 0.0
 ObservationTensorShape() = [3, 7, 7]
+ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 147
 MaxGameLength() = 37
 ToString() = "havannah(board_size=4)"

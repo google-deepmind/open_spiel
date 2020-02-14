@@ -177,11 +177,15 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None):
   if game_type.provides_information_state_tensor:
     add_line("InformationStateTensorShape() = {}".format(
         game.information_state_tensor_shape()))
+    add_line("InformationStateTensorLayout() = {}".format(
+        game.information_state_tensor_layout()))
     add_line("InformationStateTensorSize() = {}".format(
         game.information_state_tensor_size()))
   if game_type.provides_observation_tensor:
     add_line("ObservationTensorShape() = {}".format(
         game.observation_tensor_shape()))
+    add_line("ObservationTensorLayout() = {}".format(
+        game.observation_tensor_layout()))
     add_line("ObservationTensorSize() = {}".format(
         game.observation_tensor_size()))
   add_line("MaxGameLength() = {}".format(game.max_game_length()))

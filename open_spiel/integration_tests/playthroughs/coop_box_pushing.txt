@@ -24,6 +24,7 @@ MinUtility() = -1020.0
 MaxUtility() = 1.998e+04
 UtilitySum() = None
 ObservationTensorShape() = [5]
+ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 5
 MaxGameLength() = 100
 ToString() = "coop_box_pushing()"

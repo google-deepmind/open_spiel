@@ -24,6 +24,7 @@ MinUtility() = -1.0
 MaxUtility() = 1.0
 UtilitySum() = 0.0
 ObservationTensorShape() = [198]
+ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 198
 MaxGameLength() = 1000
 ToString() = "backgammon()"

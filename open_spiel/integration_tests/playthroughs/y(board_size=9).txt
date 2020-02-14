@@ -24,6 +24,7 @@ MinUtility() = -1.0
 MaxUtility() = 1.0
 UtilitySum() = 0.0
 ObservationTensorShape() = [3, 9, 9]
+ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 243
 MaxGameLength() = 45
 ToString() = "y(board_size=9)"

@@ -24,6 +24,7 @@ MinUtility() = -1.0
 MaxUtility() = 1.0
 UtilitySum() = 0.0
 ObservationTensorShape() = [5, 9, 9]
+ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 405
 MaxGameLength() = 100
 ToString() = "quoridor(board_size=5)"
