@@ -86,7 +86,7 @@ To make sure OpenSpiel works on the default configurations, we do use the
 `python3` command and not `python` (which still defaults to Python 2 on modern
 Linux versions).
 
-## Running the first example
+## Running the first examples
 
 In the `build` directory, running `examples/example` will prints out a list of
 registered games and the usage. Now, let’s play game of Tic-Tac-Toe with uniform
@@ -94,6 +94,18 @@ random players:
 
 ```bash
 examples/example --game=tic_tac_toe
+```
+
+Once the proper Python paths are set, from the main directory (one above
+`build`), try these out:
+
+```bash
+# Similar to the C++ example:
+python3 open_spiel/python/examples/example.py --game=breakthrough
+
+# Play a game against a random or MCTS bot:
+python3 open_spiel/python/examples/mcts.py --game=tic_tac_toe --player1=human --player2=random
+python3 open_spiel/python/examples/mcts.py --game=tic_tac_toe --player1=human --player2=mcts
 ```
 
 ## Detailed steps

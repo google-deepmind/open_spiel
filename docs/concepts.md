@@ -1,3 +1,22 @@
+## First examples
+
+One can run an example of a game running (in the `build/` folder):
+
+```bash
+./examples/example --game=tic_tac_toe
+```
+
+Similar examples using the Python API (run from one above `build`):
+
+```bash
+# Similar to the C++ example:
+python3 open_spiel/python/examples/example.py --game=breakthrough
+
+# Play a game against a random or MCTS bot:
+python3 open_spiel/python/examples/mcts.py --game=tic_tac_toe --player1=human --player2=random
+python3 open_spiel/python/examples/mcts.py --game=tic_tac_toe --player1=human --player2=mcts
+```
+
 ## Concepts
 
 The following documentation describes the high-level concepts. Refer to the code
