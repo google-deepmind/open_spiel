@@ -168,12 +168,11 @@ class AlphaZero(object):
       state.apply_action(action)
 
     terminal_rewards = state.rewards()
-    for i, (feature, pol) in enumerate(zip(state_features, policy_targets)):
-      value = terminal_rewards[i % 2]
+    for feature, pol in zip(state_features, policy_targets):
       self.replay_buffer.add(
           MCTSResult(state_feature=feature,
                      target_policy=pol,
-                     target_value=value))
+                     target_value=terminal_rewards[0]))
 
   def _select_action(self, children, game_history_len):
     explore_counts = [(child.explore_count, child.action) for child in children]
@@ -271,10 +270,7 @@ class AlphaZeroKerasEvaluator(mcts.Evaluator):
 
     # value is required to be array over players
     value = value[0, 0].numpy()
-    if state.current_player() == 0:
-      values = np.array([value, -value])
-    else:
-      values = np.array([-value, value])
+    values = np.array([value, -value])
 
     return (values, policy)
 
