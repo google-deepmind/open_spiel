@@ -34,7 +34,6 @@ from __future__ import print_function
 from absl import app
 from absl import flags
 from absl import logging
-import numpy as np
 
 import tensorflow.compat.v1 as tf
 
@@ -108,11 +107,6 @@ def bot_evaluation(game, bots, num_evaluations):
   return (wins, losses, draws)
 
 
-def mlp_feature_extractor(state):
-  obs = np.array(state.observation_tensor(), dtype=np.float32)
-  return np.reshape(obs[9:18] - obs[18:], (1, 9))
-
-
 def main(_):
   game = pyspiel.load_game("tic_tac_toe")
   num_actions = game.num_distinct_actions()
@@ -120,18 +114,14 @@ def main(_):
 
   # 1. Define a keras net
   if FLAGS.net_type == "resnet":
-    feature_extractor = None
     net = alpha_zero.keras_resnet(observation_shape,
                                   num_actions=num_actions,
                                   num_residual_blocks=1,
                                   num_filters=256,
                                   data_format="channels_first")
   elif FLAGS.net_type == "mlp":
-    # The full length-27 observation_tensor could be trained on. But this
-    # demonstrates the use of a custom feature extractor, and the training
-    # can be faster with this smaller feature representation.
-    feature_extractor = mlp_feature_extractor
-    net = alpha_zero.keras_mlp(9, num_actions, num_layers=2, num_hidden=64)
+    net = alpha_zero.keras_mlp(
+        observation_shape, num_actions, num_layers=2, num_hidden=64)
   else:
     raise ValueError(("Invalid value for 'net_type'. Must be either 'mlp' or "
                       "'resnet', but was %s") % FLAGS.net_type)
@@ -140,8 +130,7 @@ def main(_):
   evaluator = alpha_zero.AlphaZeroKerasEvaluator(
       net,
       optimizer=tf.train.AdamOptimizer(learning_rate=0.01),
-      device=FLAGS.device,
-      feature_extractor=feature_extractor)
+      device=FLAGS.device)
 
   bot = mcts.MCTSBot(game,
                      1.,

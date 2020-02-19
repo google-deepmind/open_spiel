@@ -212,8 +212,7 @@ class AlphaZeroKerasEvaluator(mcts.Evaluator):
                keras_model,
                l2_regularization=1e-4,
                optimizer=tf.train.AdamOptimizer(learning_rate=0.005),
-               device="cpu",
-               feature_extractor=None):
+               device="cpu"):
     """An AlphaZero MCTS Evaluator.
 
     Args:
@@ -222,12 +221,6 @@ class AlphaZeroKerasEvaluator(mcts.Evaluator):
       optimizer: a TensorFlow optimizer object.
       device: The device used to run the keras_model during evaluation and
         training. Possible values are 'cpu', 'gpu', or a tf.device(...) object.
-      feature_extractor: a function which takes as argument the game state and
-        returns a numpy tensor which the keras_model can accept as input. If
-        None, then the default features will be used, which is the
-        observation_tensor() state method, reshaped to match the keras_model
-        input shape (if possible). The keras_model is always evaluated on the
-        output of this function.
     Raises:
       ValueError: if incorrect inputs are supplied.
     """
@@ -250,11 +243,9 @@ class AlphaZeroKerasEvaluator(mcts.Evaluator):
     else:
       self.device = device
 
-    if feature_extractor is None:
-      self.feature_extractor = _create_default_feature_extractor(
-          self.input_shape)
-    else:
-      self.feature_extractor = feature_extractor
+  def feature_extractor(self, state):
+    obs = state.observation_tensor()
+    return np.array(obs, dtype=np.float32).reshape(self.input_shape)
 
   @functools.lru_cache(maxsize=2**12)
   def value_and_prior(self, state):
@@ -310,15 +301,6 @@ class AlphaZeroKerasEvaluator(mcts.Evaluator):
                       policy=float(loss_policy),
                       value=float(loss_value),
                       l2=float(loss_l2))
-
-
-def _create_default_feature_extractor(shape):
-
-  def feature_extractor(state):
-    obs = state.observation_tensor()
-    return np.array(obs, dtype=np.float32).reshape(shape)
-
-  return feature_extractor
 
 
 def keras_resnet(input_shape,
@@ -453,7 +435,7 @@ def _resnet_mlp_policy_head(inputs, num_classes, activation):
   return x
 
 
-def keras_mlp(input_size,
+def keras_mlp(input_shape,
               num_actions,
               num_layers=2,
               num_hidden=128,
@@ -461,7 +443,8 @@ def keras_mlp(input_size,
   """A simple MLP implementation with both a value and policy head.
 
   Arguments:
-    input_size: An integer specifying the size of the input vector.
+    input_shape: A tuple of 3 integers specifying the non-batch dimensions of
+      input tensor shape.
     num_actions: The determines the output size of the policy head.
     num_layers: The number of dense layers before the policy and value heads.
     num_hidden: the number of hidden units in the dense layers.
@@ -472,8 +455,9 @@ def keras_mlp(input_size,
     A keras Model with a single input and two outputs (value head, policy head).
     The policy is a flat distribution over actions.
   """
-  inputs = tf.keras.Input(shape=(input_size,), name="input")
-  x = inputs
+  input_size = int(np.prod(input_shape))
+  inputs = tf.keras.Input(shape=input_shape, name="input")
+  x = tf.keras.layers.Reshape((input_size,))(inputs)
   for _ in range(num_layers):
     x = tf.keras.layers.Dense(num_hidden,
                               kernel_initializer="he_uniform",
