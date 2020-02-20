@@ -154,7 +154,7 @@ class AlphaZero(object):
 
     while not state.is_terminal():
       root_node = self.bot.mcts_search(state)
-      state_features.append(self.bot.evaluator.shaped_observation(state))
+      state_features.append(state.observation_tensor())
       target_policy = np.zeros(self.game.num_distinct_actions(),
                                dtype=np.float32)
       for child in root_node.children:
@@ -212,17 +212,13 @@ class AlphaZeroKerasEvaluator(mcts.Evaluator):
     self._input_shape = game.observation_tensor_shape()
     self._num_actions = game.num_distinct_actions()
 
-  def shaped_observation(self, state):
-    obs = state.observation_tensor()
-    return np.array(obs, dtype=np.float32).reshape(self._input_shape)
-
   @functools.lru_cache(maxsize=2**12)
   def value_and_prior(self, state):
     # Make a singleton batch
-    obs = np.array(state.observation_tensor()).reshape([1,] + self._input_shape)
-    mask = np.array(state.legal_actions_mask()).reshape((1, self._num_actions))
+    obs = np.expand_dims(state.observation_tensor(), 0)
+    mask = np.expand_dims(state.legal_actions_mask(), 0)
     value, policy = self.model.inference(obs, mask)
-    return value[0], policy[0]  # Unpack batch
+    return value[0, 0], policy[0]  # Unpack batch
 
   def evaluate(self, state):
     value, _ = self.value_and_prior(state)
@@ -372,13 +368,13 @@ def keras_resnet(input_shape,
         tf.keras.layers.Dense(num_classes, name="policy"),
     ])
 
-  inputs = tf.keras.Input(shape=input_shape, name="input")
+  input_size = int(np.prod(input_shape))
+  inputs = tf.keras.Input(shape=input_size, name="input")
+  torso = tf.keras.layers.Reshape(input_shape)(inputs)
   # Note: Keras with TensorFlow 1.15 does not support the data_format arg on CPU
   # for convolutions. Hence why this transpose is needed.
   if data_format == "channels_first":
-    torso = tf.keras.backend.permute_dimensions(inputs, (0, 2, 3, 1))
-  else:
-    torso = inputs
+    torso = tf.keras.backend.permute_dimensions(torso, (0, 2, 3, 1))
   torso = resnet_body(torso, num_filters, 3)
   value_head = resnet_value_head(torso, value_head_hidden_size)
   policy_head = resnet_policy_head(torso, num_actions)
@@ -406,8 +402,8 @@ def keras_mlp(input_shape,
     The policy is a flat distribution over actions.
   """
   input_size = int(np.prod(input_shape))
-  inputs = tf.keras.Input(shape=input_shape, name="input")
-  torso = tf.keras.layers.Reshape((input_size,))(inputs)
+  inputs = tf.keras.Input(shape=input_size, name="input")
+  torso = inputs
   for _ in range(num_layers):
     torso = tf.keras.layers.Dense(num_hidden, activation=activation)(torso)
   policy = tf.keras.layers.Dense(num_actions, name="policy")(torso)
