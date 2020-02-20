@@ -60,6 +60,7 @@ class AlphaZero(object):
   def __init__(self,
                game,
                bot,
+               model,
                replay_buffer_capacity=int(1e6),
                action_selection_transition=30):
     """AlphaZero constructor.
@@ -67,6 +68,7 @@ class AlphaZero(object):
     Args:
       game: a pyspiel.Game object
       bot: an MCTSBot object.
+      model: A Model.
       replay_buffer_capacity: the size of the replay buffer in which the results
         of self-play games are stored.
       action_selection_transition: an integer representing the move number in a
@@ -96,8 +98,9 @@ class AlphaZero(object):
     if game.num_players() != 2:
       raise ValueError("Game must have exactly 2 players.")
 
-    self.bot = bot
     self.game = game
+    self.bot = bot
+    self.model = model
     self.replay_buffer = dqn.ReplayBuffer(replay_buffer_capacity)
     self.action_selection_transition = action_selection_transition
 
@@ -126,7 +129,7 @@ class AlphaZero(object):
       epoch_losses = []
       for _ in range(num_epoch_iters):
         train_data = self.replay_buffer.sample(batch_size)
-        epoch_losses.append(self.bot.evaluator.update(train_data))
+        epoch_losses.append(self.model.update(train_data))
 
       losses.append(epoch_losses)
       if verbose:
@@ -203,40 +206,10 @@ def np_softmax(logits):
 class AlphaZeroKerasEvaluator(mcts.Evaluator):
   """An AlphaZero MCTS Evaluator."""
 
-  def __init__(self,
-               keras_model,
-               l2_regularization=1e-4,
-               optimizer=tf.train.AdamOptimizer(learning_rate=0.005),
-               device="cpu"):
-    """An AlphaZero MCTS Evaluator.
-
-    Args:
-      keras_model: a Keras Model object.
-      l2_regularization: the amount of l2 regularization to use during training.
-      optimizer: a TensorFlow optimizer object.
-      device: The device used to run the keras_model during evaluation and
-        training. Possible values are 'cpu', 'gpu', or a tf.device(...) object.
-    Raises:
-      ValueError: if incorrect inputs are supplied.
-    """
-
-    self.model = keras_model
-
-    self.input_shape = list(self.model.input_shape)
-    self.input_shape[0] = 1  # Keras sets the batch dim to None
-    _, (_, self.num_actions) = self.model.output_shape
-
-    self.l2_regularization = l2_regularization
-    self.optimizer = optimizer
-
-    if device == "gpu":
-      if not tf.test.is_gpu_available():
-        raise ValueError("GPU support is unavailable.")
-      self.device = tf.device("gpu:0")
-    elif device == "cpu":
-      self.device = tf.device("cpu:0")
-    else:
-      self.device = device
+  def __init__(self, game, model):
+    """An AlphaZero MCTS Evaluator."""
+    self.model = model
+    self.input_shape = game.observation_tensor_shape()
 
   def feature_extractor(self, state):
     obs = state.observation_tensor()
@@ -244,18 +217,19 @@ class AlphaZeroKerasEvaluator(mcts.Evaluator):
 
   @functools.lru_cache(maxsize=2**12)
   def value_and_prior(self, state):
-    state_feature = self.feature_extractor(state)
-    with self.device:
-      value, policy = self.model(state_feature)
+    obs = self.feature_extractor(state)
+    obs = obs.reshape((1,) + obs.shape)  # Batch size of 1
+    value, policy = self.model.inference(obs)
+    value, policy = value[0], policy[0]  # Unpack batch
 
     # renormalize policy over legal actions
-    policy = np.array(policy)[0]
+    policy = np.array(policy)
     mask = np.array(state.legal_actions_mask())
     policy = masked_softmax.np_masked_softmax(policy, mask)
     policy = [(action, policy[action]) for action in state.legal_actions()]
 
     # value is required to be array over players
-    value = value[0, 0].numpy()
+    value = value[0].numpy()
     values = np.array([value, -value])
 
     return (values, policy)
@@ -266,31 +240,60 @@ class AlphaZeroKerasEvaluator(mcts.Evaluator):
   def prior(self, state):
     return self.value_and_prior(state)[1]
 
-  def update(self, training_examples):
-    state_features = np.vstack([f for (f, _, _) in training_examples])
-    value_targets = np.vstack([v for (_, v, _) in training_examples])
-    policy_targets = np.vstack([p for (_, _, p) in training_examples])
 
-    with self.device:
+class Model(object):
+  """A wrapper around a keras model, and optimizer."""
+
+  def __init__(self, keras_model, l2_regularization, learning_rate, device):
+    """A wrapper around a keras model, and optimizer.
+
+    Args:
+      keras_model: a Keras Model object.
+      l2_regularization: the amount of l2 regularization to use during training.
+      learning_rate: a learning rate for the adam optimizer.
+      device: The device used to run the keras_model during evaluation and
+        training. Possible values are 'cpu', 'gpu', or a tf.device(...) object.
+    """
+    if device == "gpu":
+      if not tf.test.is_gpu_available():
+        raise ValueError("GPU support is unavailable.")
+      self._device = tf.device("gpu:0")
+    elif device == "cpu":
+      self._device = tf.device("cpu:0")
+    else:
+      self._device = device
+    self._keras_model = keras_model
+    self._optimizer = tf.train.AdamOptimizer(learning_rate)
+    self._l2_regularization = l2_regularization
+
+  def inference(self, obs):
+    with self._device:
+      return self._keras_model(obs)
+
+  def update(self, training_examples):
+    """Run an update step."""
+    state_features = np.stack([f for (f, _, _) in training_examples])
+    value_targets = np.vstack([v for (_, v, _) in training_examples])
+    policy_targets = np.stack([p for (_, _, p) in training_examples])
+
+    with self._device:
       with tf.GradientTape() as tape:
-        values, policy_logits = self.model(state_features, training=True)
+        values, policy_logits = self._keras_model(state_features, training=True)
         loss_value = tf.losses.mean_squared_error(
             values, tf.stop_gradient(value_targets))
         loss_policy = tf.nn.softmax_cross_entropy_with_logits_v2(
             logits=policy_logits, labels=tf.stop_gradient(policy_targets))
         loss_policy = tf.reduce_mean(loss_policy)
         loss_l2 = 0
-        for weights in self.model.trainable_variables:
-          loss_l2 += self.l2_regularization * tf.nn.l2_loss(weights)
+        for weights in self._keras_model.trainable_variables:
+          loss_l2 += self._l2_regularization * tf.nn.l2_loss(weights)
         loss = loss_policy + loss_value + loss_l2
 
-      grads = tape.gradient(loss, self.model.trainable_variables)
+      grads = tape.gradient(loss, self._keras_model.trainable_variables)
 
-      self.optimizer.apply_gradients(
-          zip(grads, self.model.trainable_variables),
+      self._optimizer.apply_gradients(
+          zip(grads, self._keras_model.trainable_variables),
           global_step=tf.train.get_or_create_global_step())
-
-    self.value_and_prior.cache_clear()
 
     return LossValues(total=float(loss),
                       policy=float(loss_policy),

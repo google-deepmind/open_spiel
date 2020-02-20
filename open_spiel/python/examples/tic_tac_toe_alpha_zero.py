@@ -126,11 +126,11 @@ def main(_):
     raise ValueError(("Invalid value for 'net_type'. Must be either 'mlp' or "
                       "'resnet', but was %s") % FLAGS.net_type)
 
+  model = alpha_zero.Model(
+      net, l2_regularization=1e-4, learning_rate=0.01, device=FLAGS.device)
+
   # 2. Create an MCTS bot using the previous keras net
-  evaluator = alpha_zero.AlphaZeroKerasEvaluator(
-      net,
-      optimizer=tf.train.AdamOptimizer(learning_rate=0.01),
-      device=FLAGS.device)
+  evaluator = alpha_zero.AlphaZeroKerasEvaluator(game, model)
 
   bot = mcts.MCTSBot(game,
                      1.,
@@ -142,6 +142,7 @@ def main(_):
   # 3. Build an AlphaZero instance
   a0 = alpha_zero.AlphaZero(game,
                             bot,
+                            model,
                             replay_buffer_capacity=FLAGS.replay_buffer_capacity,
                             action_selection_transition=4)
 
@@ -170,6 +171,7 @@ def main(_):
     a0.update(FLAGS.num_training_epochs,
               batch_size=FLAGS.batch_size,
               verbose=True)
+    evaluator.value_and_prior.cache_clear()
 
 
 if __name__ == "__main__":
