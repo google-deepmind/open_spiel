@@ -114,11 +114,9 @@ def main(_):
 
   # 1. Define a keras net
   if FLAGS.net_type == "resnet":
-    net = alpha_zero.keras_resnet(observation_shape,
-                                  num_actions=num_actions,
-                                  num_residual_blocks=1,
-                                  num_filters=256,
-                                  data_format="channels_first")
+    net = alpha_zero.keras_resnet(
+        observation_shape, num_actions, num_residual_blocks=1, num_filters=256,
+        data_format="channels_first")
   elif FLAGS.net_type == "mlp":
     net = alpha_zero.keras_mlp(
         observation_shape, num_actions, num_layers=2, num_hidden=64)

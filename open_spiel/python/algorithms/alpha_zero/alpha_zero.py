@@ -301,6 +301,12 @@ class Model(object):
                       l2=float(loss_l2))
 
 
+def cascade(x, fns):
+  for fn in fns:
+    x = fn(x)
+  return x
+
+
 def keras_resnet(input_shape,
                  num_actions,
                  num_residual_blocks=19,
@@ -332,105 +338,57 @@ def keras_resnet(input_shape,
     A keras Model with a single input and two outputs (value head, policy head).
     The policy is a flat distribution over actions.
   """
+  def residual_layer(inputs, num_filters, kernel_size):
+    return cascade(inputs, [
+        tf.keras.layers.Conv2D(num_filters, kernel_size, padding="same"),
+        tf.keras.layers.BatchNormalization(),
+        tf.keras.layers.Activation(activation),
+        tf.keras.layers.Conv2D(num_filters, kernel_size, padding="same"),
+        tf.keras.layers.BatchNormalization(axis=-1),
+        lambda x: tf.keras.layers.add([x, inputs]),
+        tf.keras.layers.Activation(activation),
+    ])
+
+  def resnet_body(inputs, num_residual_blocks, num_filters, kernel_size):
+    x = cascade(inputs, [
+        tf.keras.layers.Conv2D(num_filters, kernel_size, padding="same"),
+        tf.keras.layers.BatchNormalization(),
+        tf.keras.layers.Activation(activation),
+    ])
+    for _ in range(num_residual_blocks):
+      x = residual_layer(x, num_filters, kernel_size)
+    return x
+
+  def resnet_value_head(inputs, hidden_size):
+    return cascade(inputs, [
+        tf.keras.layers.Conv2D(filters=1, kernel_size=1),
+        tf.keras.layers.BatchNormalization(),
+        tf.keras.layers.Activation(activation),
+        tf.keras.layers.Flatten(),
+        tf.keras.layers.Dense(hidden_size, activation),
+        tf.keras.layers.Dense(1, activation="tanh", name="value"),
+    ])
+
+  def resnet_policy_head(inputs, num_classes):
+    return cascade(inputs, [
+        tf.keras.layers.Conv2D(filters=2, kernel_size=1),
+        tf.keras.layers.BatchNormalization(),
+        tf.keras.layers.Activation(activation),
+        tf.keras.layers.Flatten(),
+        tf.keras.layers.Dense(num_classes, name="policy"),
+    ])
+
   inputs = tf.keras.Input(shape=input_shape, name="input")
-  x = inputs
   # Note: Keras with TensorFlow 1.15 does not support the data_format arg on CPU
   # for convolutions. Hence why this transpose is needed.
   if data_format == "channels_first":
-    x = tf.keras.backend.permute_dimensions(inputs, (0, 2, 3, 1))
-  x = _resnet_body(x,
-                   num_filters=num_filters,
-                   num_residual_blocks=num_residual_blocks,
-                   kernel_size=3,
-                   activation=activation)
-  value_head = _resnet_value_head(x,
-                                  hidden_size=value_head_hidden_size,
-                                  activation=activation)
-  policy_head = _resnet_mlp_policy_head(x, num_actions, activation=activation)
+    torso = tf.keras.backend.permute_dimensions(inputs, (0, 2, 3, 1))
+  else:
+    torso = inputs
+  torso = resnet_body(torso, num_filters, num_residual_blocks, 3)
+  value_head = resnet_value_head(torso, value_head_hidden_size)
+  policy_head = resnet_policy_head(torso, num_actions)
   return tf.keras.Model(inputs=inputs, outputs=[value_head, policy_head])
-
-
-def _residual_layer(inputs, num_filters, kernel_size, activation):
-  """Residual_layer."""
-  x = inputs
-  x = tf.keras.layers.Conv2D(num_filters,
-                             kernel_size=kernel_size,
-                             padding="same",
-                             strides=1,
-                             kernel_initializer="he_uniform")(x)
-  x = tf.keras.layers.BatchNormalization()(x)
-  x = tf.keras.layers.Activation(activation)(x)
-  x = tf.keras.layers.Conv2D(num_filters,
-                             kernel_size=kernel_size,
-                             padding="same",
-                             strides=1,
-                             kernel_initializer="he_uniform")(x)
-  return tf.keras.layers.BatchNormalization(axis=-1)(x)
-
-
-def _residual_tower(inputs, num_res_blocks, num_filters, kernel_size,
-                    activation):
-  """Residual_tower."""
-  x = inputs
-  for _ in range(num_res_blocks):
-    y = _residual_layer(x, num_filters, kernel_size, activation)
-    y = _residual_layer(x, num_filters, kernel_size, activation)
-    x = tf.keras.layers.add([x, y])
-    x = tf.keras.layers.Activation(activation)(x)
-
-  return x
-
-
-def _resnet_body(inputs, num_residual_blocks, num_filters, kernel_size,
-                 activation):
-  """Resnet_body."""
-  x = inputs
-  x = tf.keras.layers.Conv2D(num_filters,
-                             kernel_size=kernel_size,
-                             padding="same",
-                             strides=1,
-                             kernel_initializer="he_uniform")(x)
-  x = tf.keras.layers.BatchNormalization()(x)
-  x = tf.keras.layers.Activation(activation)(x)
-  x = _residual_tower(x, num_residual_blocks, num_filters, kernel_size,
-                      activation)
-  return x
-
-
-def _resnet_value_head(inputs, hidden_size, activation):
-  """Resnet_value_head."""
-  x = inputs
-  x = tf.keras.layers.Conv2D(filters=1,
-                             kernel_size=1,
-                             strides=1,
-                             kernel_initializer="he_uniform")(x)
-  x = tf.keras.layers.BatchNormalization()(x)
-  x = tf.keras.layers.Activation(activation)(x)
-  x = tf.keras.layers.Flatten()(x)
-  x = tf.keras.layers.Dense(hidden_size,
-                            activation=activation,
-                            kernel_initializer="he_uniform")(x)
-  x = tf.keras.layers.Dense(1,
-                            activation="tanh",
-                            kernel_initializer="he_uniform",
-                            name="value")(x)
-  return x
-
-
-def _resnet_mlp_policy_head(inputs, num_classes, activation):
-  """Resnet_mlp_policy_head."""
-  x = inputs
-  x = tf.keras.layers.Conv2D(filters=2,
-                             kernel_size=1,
-                             strides=1,
-                             kernel_initializer="he_uniform")(x)
-  x = tf.keras.layers.BatchNormalization()(x)
-  x = tf.keras.layers.Activation(activation)(x)
-  x = tf.keras.layers.Flatten()(x)
-  x = tf.keras.layers.Dense(num_classes,
-                            kernel_initializer="he_uniform",
-                            name="policy")(x)
-  return x
 
 
 def keras_mlp(input_shape,
@@ -455,16 +413,9 @@ def keras_mlp(input_shape,
   """
   input_size = int(np.prod(input_shape))
   inputs = tf.keras.Input(shape=input_shape, name="input")
-  x = tf.keras.layers.Reshape((input_size,))(inputs)
+  torso = tf.keras.layers.Reshape((input_size,))(inputs)
   for _ in range(num_layers):
-    x = tf.keras.layers.Dense(num_hidden,
-                              kernel_initializer="he_uniform",
-                              activation=activation)(x)
-  policy = tf.keras.layers.Dense(num_actions,
-                                 kernel_initializer="he_uniform",
-                                 name="policy")(x)
-  value = tf.keras.layers.Dense(1,
-                                kernel_initializer="he_uniform",
-                                activation="tanh",
-                                name="value")(x)
+    torso = tf.keras.layers.Dense(num_hidden, activation=activation)(torso)
+  policy = tf.keras.layers.Dense(num_actions, name="policy")(torso)
+  value = tf.keras.layers.Dense(1, activation="tanh", name="value")(torso)
   return tf.keras.Model(inputs=inputs, outputs=[value, policy])
