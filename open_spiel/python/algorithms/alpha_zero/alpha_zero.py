@@ -154,7 +154,7 @@ class AlphaZero(object):
 
     while not state.is_terminal():
       root_node = self.bot.mcts_search(state)
-      state_features.append(self.bot.evaluator.feature_extractor(state))
+      state_features.append(self.bot.evaluator.shaped_observation(state))
       target_policy = np.zeros(self.game.num_distinct_actions(),
                                dtype=np.float32)
       for child in root_node.children:
@@ -209,36 +209,28 @@ class AlphaZeroKerasEvaluator(mcts.Evaluator):
   def __init__(self, game, model):
     """An AlphaZero MCTS Evaluator."""
     self.model = model
-    self.input_shape = game.observation_tensor_shape()
+    self._input_shape = game.observation_tensor_shape()
+    self._num_actions = game.num_distinct_actions()
 
-  def feature_extractor(self, state):
+  def shaped_observation(self, state):
     obs = state.observation_tensor()
-    return np.array(obs, dtype=np.float32).reshape(self.input_shape)
+    return np.array(obs, dtype=np.float32).reshape(self._input_shape)
 
   @functools.lru_cache(maxsize=2**12)
   def value_and_prior(self, state):
-    obs = self.feature_extractor(state)
-    obs = obs.reshape((1,) + obs.shape)  # Batch size of 1
-    value, policy = self.model.inference(obs)
-    value, policy = value[0], policy[0]  # Unpack batch
-
-    # renormalize policy over legal actions
-    policy = np.array(policy)
-    mask = np.array(state.legal_actions_mask())
-    policy = masked_softmax.np_masked_softmax(policy, mask)
-    policy = [(action, policy[action]) for action in state.legal_actions()]
-
-    # value is required to be array over players
-    value = value[0].numpy()
-    values = np.array([value, -value])
-
-    return (values, policy)
+    # Make a singleton batch
+    obs = np.array(state.observation_tensor()).reshape([1,] + self._input_shape)
+    mask = np.array(state.legal_actions_mask()).reshape((1, self._num_actions))
+    value, policy = self.model.inference(obs, mask)
+    return value[0], policy[0]  # Unpack batch
 
   def evaluate(self, state):
-    return self.value_and_prior(state)[0]
+    value, _ = self.value_and_prior(state)
+    return np.array([value, -value])
 
   def prior(self, state):
-    return self.value_and_prior(state)[1]
+    _, policy = self.value_and_prior(state)
+    return [(action, policy[action]) for action in state.legal_actions()]
 
 
 class Model(object):
@@ -266,9 +258,11 @@ class Model(object):
     self._optimizer = tf.train.AdamOptimizer(learning_rate)
     self._l2_regularization = l2_regularization
 
-  def inference(self, obs):
+  def inference(self, obs, mask):
     with self._device:
-      return self._keras_model(obs)
+      value, policy = self._keras_model(obs)
+    policy = masked_softmax.np_masked_softmax(np.array(policy), np.array(mask))
+    return value, policy
 
   def update(self, training_examples):
     """Run an update step."""
