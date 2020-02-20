@@ -349,7 +349,7 @@ def keras_resnet(input_shape,
         tf.keras.layers.Activation(activation),
     ])
 
-  def resnet_body(inputs, num_residual_blocks, num_filters, kernel_size):
+  def resnet_body(inputs, num_filters, kernel_size):
     x = cascade(inputs, [
         tf.keras.layers.Conv2D(num_filters, kernel_size, padding="same"),
         tf.keras.layers.BatchNormalization(),
@@ -385,7 +385,7 @@ def keras_resnet(input_shape,
     torso = tf.keras.backend.permute_dimensions(inputs, (0, 2, 3, 1))
   else:
     torso = inputs
-  torso = resnet_body(torso, num_filters, num_residual_blocks, 3)
+  torso = resnet_body(torso, num_filters, 3)
   value_head = resnet_value_head(torso, value_head_hidden_size)
   policy_head = resnet_policy_head(torso, num_actions)
   return tf.keras.Model(inputs=inputs, outputs=[value_head, policy_head])
