@@ -120,11 +120,6 @@ class AlphaZero(object):
         another list containing LossValues tuples, one for every training
         iteration.
     """
-    # The AlphaZero pseudocode resets the optimizer state before training.
-    optim = self.bot.evaluator.optimizer
-    tf.variables_initializer(optim.variables())
-    tf.train.get_or_create_global_step().assign(0)
-
     num_epoch_iters = math.ceil(len(self.replay_buffer) / float(batch_size))
     losses = []
     for epoch in range(num_training_epochs):
