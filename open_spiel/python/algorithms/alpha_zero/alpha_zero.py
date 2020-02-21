@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Lint as: python3
 # Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,6 +35,7 @@ from __future__ import print_function
 import collections
 import functools
 import math
+from typing import Sequence
 
 import numpy as np
 
@@ -44,10 +46,39 @@ from open_spiel.python.algorithms import masked_softmax
 from open_spiel.python.algorithms import mcts
 import pyspiel
 
-MCTSResult = collections.namedtuple("MCTSResult",
-                                    "state_feature target_value target_policy")
 
-LossValues = collections.namedtuple("LossValues", "total policy value l2")
+class TrainInput(collections.namedtuple(
+    "TrainInput", "observation legals_mask policy value")):
+  """Inputs for training the Model."""
+
+  @staticmethod
+  def stack(train_inputs):
+    observation, legals_mask, policy, value = zip(*train_inputs)
+    return TrainInput(
+        np.array(observation),
+        np.array(legals_mask),
+        np.array(policy),
+        np.expand_dims(np.array(value), 1))
+
+
+class Losses(collections.namedtuple("Losses", "policy value l2")):
+  """Losses from a training step."""
+
+  @property
+  def total(self):
+    return self.policy + self.value + self.l2
+
+  def __str__(self):
+    return ("Losses(total: {:.3f}, policy: {:.3f}, value: {:.3f}, "
+            "l2: {:.3f})").format(self.total, self.policy, self.value, self.l2)
+
+  def __add__(self, other):
+    return Losses(self.policy + other.policy,
+                  self.value + other.value,
+                  self.l2 + other.l2)
+
+  def __truediv__(self, n):
+    return Losses(self.policy / n, self.value / n, self.l2 / n)
 
 
 class AlphaZero(object):
@@ -120,8 +151,7 @@ class AlphaZero(object):
 
     Returns:
       A list of length num_training_epochs. Each element of this list is
-        another list containing LossValues tuples, one for every training
-        iteration.
+        a Losses tuples, averaged per epoch.
     """
     num_epoch_iters = math.ceil(len(self.replay_buffer) / float(batch_size))
     losses = []
@@ -131,9 +161,10 @@ class AlphaZero(object):
         train_data = self.replay_buffer.sample(batch_size)
         epoch_losses.append(self.model.update(train_data))
 
+      epoch_losses = sum(epoch_losses, Losses(0, 0, 0)) / len(epoch_losses)
       losses.append(epoch_losses)
       if verbose:
-        self._print_mean_epoch_losses(epoch, epoch_losses)
+        print("Epoch {}: {}".format(epoch, epoch_losses))
 
     return losses
 
@@ -150,27 +181,28 @@ class AlphaZero(object):
   def _self_play_single(self):
     """Play a single game and add it to the replay buffer."""
     state = self.game.new_initial_state()
-    policy_targets, state_features = [], []
+    trajectory = []
 
     while not state.is_terminal():
-      root_node = self.bot.mcts_search(state)
-      state_features.append(state.observation_tensor())
+      root = self.bot.mcts_search(state)
       target_policy = np.zeros(self.game.num_distinct_actions(),
                                dtype=np.float32)
-      for child in root_node.children:
+      for child in root.children:
         target_policy[child.action] = child.explore_count
       target_policy /= sum(target_policy)
-      policy_targets.append(target_policy)
 
-      action = self._select_action(root_node.children, len(state.history()))
+      trajectory.append(TrainInput(
+          state.observation_tensor(), state.legal_actions_mask(),
+          target_policy, root.total_reward / root.explore_count))
+
+      action = self._select_action(root.children, len(trajectory))
       state.apply_action(action)
 
     terminal_rewards = state.rewards()
-    for feature, pol in zip(state_features, policy_targets):
+    for state in trajectory:
       self.replay_buffer.add(
-          MCTSResult(state_feature=feature,
-                     target_policy=pol,
-                     target_value=terminal_rewards[0]))
+          TrainInput(state.observation, state.legals_mask, state.policy,
+                     terminal_rewards[0]))
 
   def _select_action(self, children, game_history_len):
     explore_counts = [(child.explore_count, child.action) for child in children]
@@ -181,20 +213,6 @@ class AlphaZero(object):
     else:
       _, action = max(explore_counts)
     return action
-
-  def _print_mean_epoch_losses(self, epoch, losses):
-    total_loss, policy_loss, value_loss, l2_loss = 0, 0, 0, 0
-    for l in losses:
-      t, p, v, l2 = l
-      total_loss += t
-      policy_loss += p
-      value_loss += v
-      l2_loss += l2
-    n = len(losses)
-    print(("Epoch {0} mean losses. Total: {1:.3g}, Policy: {2:.3g}, "
-           "Value: {3:.3g}, L2: {4:.3g}").format(
-               epoch, total_loss / n, policy_loss / n, value_loss / n,
-               l2_loss / n))
 
 
 def np_softmax(logits):
@@ -260,19 +278,18 @@ class Model(object):
     policy = masked_softmax.np_masked_softmax(np.array(policy), np.array(mask))
     return value, policy
 
-  def update(self, training_examples):
+  def update(self, train_inputs: Sequence[TrainInput]):
     """Run an update step."""
-    state_features = np.stack([f for (f, _, _) in training_examples])
-    value_targets = np.vstack([v for (_, v, _) in training_examples])
-    policy_targets = np.stack([p for (_, _, p) in training_examples])
+    batch = TrainInput.stack(train_inputs)
 
     with self._device:
       with tf.GradientTape() as tape:
-        values, policy_logits = self._keras_model(state_features, training=True)
+        values, policy_logits = self._keras_model(
+            batch.observation, training=True)
         loss_value = tf.losses.mean_squared_error(
-            values, tf.stop_gradient(value_targets))
+            values, tf.stop_gradient(batch.value))
         loss_policy = tf.nn.softmax_cross_entropy_with_logits_v2(
-            logits=policy_logits, labels=tf.stop_gradient(policy_targets))
+            logits=policy_logits, labels=tf.stop_gradient(batch.policy))
         loss_policy = tf.reduce_mean(loss_policy)
         loss_l2 = 0
         for weights in self._keras_model.trainable_variables:
@@ -285,10 +302,8 @@ class Model(object):
           zip(grads, self._keras_model.trainable_variables),
           global_step=tf.train.get_or_create_global_step())
 
-    return LossValues(total=float(loss),
-                      policy=float(loss_policy),
-                      value=float(loss_value),
-                      l2=float(loss_l2))
+    return Losses(policy=float(loss_policy), value=float(loss_value),
+                  l2=float(loss_l2))
 
 
 def cascade(x, fns):
