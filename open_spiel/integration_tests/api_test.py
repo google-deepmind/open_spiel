@@ -29,14 +29,9 @@ import numpy as np
 from open_spiel.python.algorithms import get_all_states
 import pyspiel
 
-_MANDATORY_PARAMETERS_GAMES = [
-    "misere",
-    "turn_based_simultaneous_game",
-    "normal_form_extensive_game"
+_GAMES_TO_TEST = [
+    g.short_name for g in pyspiel.registered_games() if g.default_loadable
 ]
-
-_GAMES_TO_TEST = list(
-    set(pyspiel.registered_names()) - set(_MANDATORY_PARAMETERS_GAMES))
 
 # The list of game instances to test on the full tree as tuples
 # (name to display, string to pass to load_game).

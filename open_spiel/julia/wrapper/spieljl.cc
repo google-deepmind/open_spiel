@@ -239,6 +239,10 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod) {
               [](const open_spiel::GameType& gt) { return gt.max_num_players; })
       .method("min_num_players",
               [](const open_spiel::GameType& gt) { return gt.min_num_players; })
+      .method("default_loadable",
+              [](const open_spiel::GameType& gt) {
+                return gt.default_loadable;
+              })
       .method("provides_information_state_string",
               [](const open_spiel::GameType& gt) {
                 return gt.provides_information_state_string;

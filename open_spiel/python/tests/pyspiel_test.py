@@ -47,6 +47,7 @@ class PyspielTest(absltest.TestCase):
         "coop_to_1p",
         "cursor_go",
         "deep_sea",
+        "efg_game",
         "first_sealed_auction",
         "gin_rummy",
         "go",

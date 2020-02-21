@@ -133,6 +133,13 @@ struct GameType {
 
   std::map<std::string, GameParameter> parameter_specification;
   bool ContainsRequiredParameters() const;
+
+  // A number of optional values that have defaults, whose values can be
+  // overridden in each game.
+
+  // Can the game be loaded with no parameters? It is strongly recommended that
+  // games be loadable with sen
+  bool default_loadable = true;
 };
 
 enum class StateType {

@@ -39,6 +39,13 @@ class SFLPTest(absltest.TestCase):
     self.assertAlmostEqual(val1, -1 / 18)
     self.assertAlmostEqual(val2, +1 / 18)
 
+  def test_kuhn_poker_efg(self):
+    game = pyspiel.load_efg_game(pyspiel.get_kuhn_poker_efg_data())
+    val1, val2, _, _ = sequence_form_lp.solve_zero_sum_game(game)
+    # value from Kuhn 1950 or https://en.wikipedia.org/wiki/Kuhn_poker
+    self.assertAlmostEqual(val1, -1 / 18)
+    self.assertAlmostEqual(val2, +1 / 18)
+
   def test_leduc_poker(self):
     game = pyspiel.load_game("leduc_poker")
     val1, val2, _, _ = sequence_form_lp.solve_zero_sum_game(game)

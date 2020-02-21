@@ -4,10 +4,8 @@ MAX_ACTIONS_PER_GAME = 1000
 
 SPIEL_GAMES_LIST = registered_games()
 
-_has_mandatory_params(x) = any(is_mandatory, values(parameter_specification(x)))
-
 SPIEL_LOADABLE_GAMES_LIST = [
-    g for g in SPIEL_GAMES_LIST if !_has_mandatory_params(g)
+    g for g in SPIEL_GAMES_LIST if default_loadable(g)
 ]
 
 @test length(SPIEL_LOADABLE_GAMES_LIST) >= 38
