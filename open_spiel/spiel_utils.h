@@ -15,14 +15,14 @@
 #ifndef THIRD_PARTY_OPEN_SPIEL_SPIEL_UTILS_H_
 #define THIRD_PARTY_OPEN_SPIEL_SPIEL_UTILS_H_
 
-#include <cstddef>
-
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <cstddef>
 #include <cstdint>
 #include <limits>
 #include <locale>
+#include <optional>
 #include <random>
 #include <sstream>
 #include <string>
@@ -122,6 +122,12 @@ int NextPlayerRoundRobin(Player player, int nplayers);
 
 // Helper function to determine the previous player in a round robin.
 int PreviousPlayerRoundRobin(Player player, int nplayers);
+
+// Finds a file by looking up a number of directories. For example: if levels is
+// 3 and filename is my.txt, it will look for ./my.txt, ../my.txt, ../../my.txt,
+// and ../../../my.txt, return the first file found or std::nullopt if not
+// found.
+std::optional<std::string> FindFile(const std::string& filename, int levels);
 
 // Returns whether the absolute difference between floating point values a and
 // b is less than or equal to FloatingPointThresholdRatio() * max(|a|, |b|).

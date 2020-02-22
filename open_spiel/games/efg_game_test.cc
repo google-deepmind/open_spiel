@@ -14,9 +14,12 @@
 
 #include "open_spiel/games/efg_game.h"
 
+#include <cstdlib>
 #include <memory>
+#include <optional>
 
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_utils.h"
 #include "open_spiel/tests/basic_tests.h"
 
 namespace open_spiel {
@@ -53,23 +56,29 @@ void EFGGameSimTestsKuhnFromData() {
 }
 
 void EFGGameSimTestsSampleFromFile() {
-  std::shared_ptr<const Game> game = LoadGame(
-      "efg_game", {{"filename", GameParameter(std::string(kSampleFilename))}});
-  SPIEL_CHECK_TRUE(game != nullptr);
-  testing::RandomSimTest(*game, 100);
+  std::optional<std::string> file = FindFile(kSampleFilename, 2);
+  if (file != std::nullopt) {
+    std::shared_ptr<const Game> game =
+        LoadGame("efg_game", {{"filename", GameParameter(file.value())}});
+    SPIEL_CHECK_TRUE(game != nullptr);
+    testing::RandomSimTest(*game, 100);
+  }
 }
 
 void EFGGameSimTestsKuhnFromFile() {
-  std::shared_ptr<const Game> game = LoadGame(
-      "efg_game", {{"filename", GameParameter(std::string(kKuhnFilename))}});
-  SPIEL_CHECK_TRUE(game != nullptr);
-  GameType type = game->GetType();
-  SPIEL_CHECK_EQ(type.dynamics, GameType::Dynamics::kSequential);
-  SPIEL_CHECK_EQ(type.information,
-                 GameType::Information::kImperfectInformation);
-  SPIEL_CHECK_EQ(type.utility, GameType::Utility::kZeroSum);
-  SPIEL_CHECK_EQ(type.chance_mode, GameType::ChanceMode::kExplicitStochastic);
-  testing::RandomSimTest(*game, 100);
+  std::optional<std::string> file = FindFile(kKuhnFilename, 2);
+  if (file != std::nullopt) {
+    std::shared_ptr<const Game> game =
+        LoadGame("efg_game", {{"filename", GameParameter(file.value())}});
+    SPIEL_CHECK_TRUE(game != nullptr);
+    GameType type = game->GetType();
+    SPIEL_CHECK_EQ(type.dynamics, GameType::Dynamics::kSequential);
+    SPIEL_CHECK_EQ(type.information,
+                   GameType::Information::kImperfectInformation);
+    SPIEL_CHECK_EQ(type.utility, GameType::Utility::kZeroSum);
+    SPIEL_CHECK_EQ(type.chance_mode, GameType::ChanceMode::kExplicitStochastic);
+    testing::RandomSimTest(*game, 100);
+  }
 }
 
 }  // namespace
@@ -79,10 +88,6 @@ void EFGGameSimTestsKuhnFromFile() {
 int main(int argc, char** argv) {
   open_spiel::efg_game::EFGGameSimTestsSampleFromData();
   open_spiel::efg_game::EFGGameSimTestsKuhnFromData();
-
-  if (false) {
-    // Don't load files in unit tests by default.
-    open_spiel::efg_game::EFGGameSimTestsSampleFromFile();
-    open_spiel::efg_game::EFGGameSimTestsKuhnFromFile();
-  }
+  open_spiel::efg_game::EFGGameSimTestsSampleFromFile();
+  open_spiel::efg_game::EFGGameSimTestsKuhnFromFile();
 }
