@@ -66,7 +66,9 @@ struct Node {
 std::string GetSampleEFGData();
 std::string GetKuhnPokerEFGData();
 
-// A function to load an EFG directly from string data.
+// A function to load an EFG directly from string data. Note: games loaded
+// using this function will not be serializable (nor will their states). Use
+// the general LoadGame with the filename argument if serialization is required.
 std::shared_ptr<const Game> LoadEFGGame(const std::string& data);
 
 class EFGState : public State {
