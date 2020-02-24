@@ -140,6 +140,10 @@ class GoGame : public Game {
     return {CellStates() + 1, board_size_, board_size_};
   }
 
+  TensorLayout ObservationTensorLayout() const override{
+    return TensorLayout::kCHW;
+  }
+
   int NumPlayers() const override { return go::NumPlayers(); }
 
   double MinUtility() const override { return LossUtility(); }
