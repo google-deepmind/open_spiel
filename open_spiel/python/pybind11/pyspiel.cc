@@ -18,6 +18,7 @@
 #include "open_spiel/algorithms/best_response.h"
 #include "open_spiel/algorithms/cfr.h"
 #include "open_spiel/algorithms/cfr_br.h"
+#include "open_spiel/algorithms/deterministic_policy.h"
 #include "open_spiel/algorithms/evaluate_bots.h"
 #include "open_spiel/algorithms/expected_returns.h"
 #include "open_spiel/algorithms/matrix_game_utils.h"
@@ -739,6 +740,11 @@ PYBIND11_MODULE(pyspiel, m) {
 
   m.def("convert_to_turn_based", open_spiel::ConvertToTurnBased,
         "Returns a turn-based version of the given game.");
+
+  m.def("num_deterministic_policies",
+        open_spiel::algorithms::NumDeterministicPolicies,
+        "Returns number of determinstic policies in this game for a player, "
+        "or -1 if there are more than 2^64 - 1 policies.");
 
   m.def("expected_returns",
         py::overload_cast<const State&, const std::vector<const Policy*>&, int,

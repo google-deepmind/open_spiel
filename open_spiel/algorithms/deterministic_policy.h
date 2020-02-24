@@ -28,6 +28,10 @@
 namespace open_spiel {
 namespace algorithms {
 
+// Returns the number of deterministic policies for this player in this game,
+// if the number is less than 2^64-1. Otherwise, returns -1.
+int64_t NumDeterministicPolicies(const Game& game, Player player);
+
 // An simple container object used to store the legal actions (and chosen
 // action) for each information state.
 struct LegalsWithIndex {
