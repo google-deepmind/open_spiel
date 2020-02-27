@@ -45,6 +45,18 @@ class OutcomeSamplingMCCFRSolver {
   OutcomeSamplingMCCFRSolver(const Game& game, double epsilon = kDefaultEpsilon,
                              int seed = -1);
 
+  // Creates a solver that allows for a custom default uniform policy.
+  // This constructor is only useful when it is not feasible to keep an
+  // explicit default policy due to memory constraints in large games.
+  // A UniformPolicy could be used in cases where the inferred
+  // CFRAveragePolicy/CFRCurrentPolicy would only ever be queried with a state
+  // and a nullptr could be used in cases where info state lookup fails are
+  // expected to be handled externally by the caller
+  OutcomeSamplingMCCFRSolver(const Game& game,
+                             std::shared_ptr<Policy> uniform_policy,
+                             double epsilon = kDefaultEpsilon,
+                             int seed = -1);
+
   // Performs one iteration of outcome sampling.
   void RunIteration() { RunIteration(&rng_); }
 
@@ -82,7 +94,7 @@ class OutcomeSamplingMCCFRSolver {
   int update_player_;
   std::mt19937 rng_;
   absl::uniform_real_distribution<double> dist_;
-  std::shared_ptr<TabularPolicy> uniform_policy_;
+  std::shared_ptr<Policy> uniform_policy_;
 };
 
 }  // namespace algorithms

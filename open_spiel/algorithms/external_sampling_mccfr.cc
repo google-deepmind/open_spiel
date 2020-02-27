@@ -27,12 +27,22 @@ namespace algorithms {
 ExternalSamplingMCCFRSolver::ExternalSamplingMCCFRSolver(const Game& game,
                                                          int seed,
                                                          AverageType avg_type)
+  : ExternalSamplingMCCFRSolver(
+      game,
+      std::shared_ptr<TabularPolicy>(new TabularPolicy(GetUniformPolicy(game))),
+      seed,
+      avg_type) {}
+
+ExternalSamplingMCCFRSolver::ExternalSamplingMCCFRSolver(
+    const Game& game,
+    std::shared_ptr<Policy> uniform_policy,
+    int seed,
+    AverageType avg_type)
     : game_(game.Clone()),
+      uniform_policy_(uniform_policy),
       rng_(new std::mt19937(seed)),
       avg_type_(avg_type),
-      dist_(0.0, 1.0),
-      uniform_policy_(std::shared_ptr<TabularPolicy>(
-          new TabularPolicy(GetUniformPolicy(game)))) {
+      dist_(0.0, 1.0) {
   if (game_->GetType().dynamics != GameType::Dynamics::kSequential) {
     SpielFatalError(
         "MCCFR requires sequential games. If you're trying to run it "

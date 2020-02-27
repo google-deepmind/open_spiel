@@ -58,8 +58,21 @@ class ExternalSamplingMCCFRSolver {
  public:
   static inline constexpr double kInitialTableValues = 0.000001;
 
-  // Creates a solver with a specific seed and average type.
+  // Creates a solver with a specific seed, average type and an explicit
+  // default uniform policy
   ExternalSamplingMCCFRSolver(const Game& game, int seed = 0,
+                              AverageType avg_type = AverageType::kSimple);
+
+  // Creates a solver with a specific seed and average type and also allows
+  // for a custom default uniform policy. This constructor is only useful when
+  // it is not feasible to keep an explicit default policy due to memory
+  // constraints in large games. A UniformPolicy could be used in cases where
+  // the inferred CFRAveragePolicy/CFRCurrentPolicy would only ever be queried
+  // with a state and a nullptr could be used in cases where info state lookup
+  // fails are expected to be handled externally by the caller
+  ExternalSamplingMCCFRSolver(const Game& game,
+                              std::shared_ptr<Policy> uniform_policy,
+                              int seed = 0,
                               AverageType avg_type = AverageType::kSimple);
 
   // Performs one iteration of external sampling MCCFR, updating the regrets
@@ -88,7 +101,7 @@ class ExternalSamplingMCCFRSolver {
   AverageType avg_type_;
   CFRInfoStateValuesTable info_states_;
   std::uniform_real_distribution<double> dist_;
-  std::shared_ptr<TabularPolicy> uniform_policy_;
+  std::shared_ptr<Policy> uniform_policy_;
 };
 
 }  // namespace algorithms
