@@ -100,13 +100,14 @@ class PolicyGradient(rl_agent.AbstractAgent):
                loss_str="rpg",
                loss_class=None,
                hidden_layers_sizes=(128,),
-               batch_size=128,
+               batch_size=16,
                critic_learning_rate=0.01,
                pi_learning_rate=0.001,
                entropy_cost=0.01,
                num_critic_before_pi=8,
                additional_discount_factor=1.0,
-               max_global_gradient_norm=None):
+               max_global_gradient_norm=None,
+               optimizer_str="sgd"):
     """Initialize the PolicyGradient agent.
 
     Args:
@@ -136,8 +137,11 @@ class PolicyGradient(rl_agent.AbstractAgent):
         users must provide *only one of* `loss_str` or `loss_class`.
       max_global_gradient_norm: float or None, maximum global norm of a gradient
         to which the gradient is shrunk if its value is larger.
+      optimizer_str: String defining which optimizer to use. Supported values
+        are {sgd, adam}
     """
     assert bool(loss_str) ^ bool(loss_class), "Please provide only one option."
+    self._kwargs = locals()
     loss_class = loss_class if loss_class else self._get_loss_class(loss_str)
 
     self.player_id = player_id
@@ -171,27 +175,30 @@ class PolicyGradient(rl_agent.AbstractAgent):
 
     # Network
     # activate final as we plug logit and qvalue heads afterwards.
-    net_torso = snt.nets.MLP(
+    self._net_torso = snt.nets.MLP(
         output_sizes=self._layer_sizes, activate_final=True)
-    self._policy_head = snt.Linear(
+    torso_out = self._net_torso(self._info_state_ph)
+    self._policy_logits_layer = snt.Linear(
         output_size=self._num_actions, name="policy_head")
-    self.policy_logits_network = snt.Sequential([net_torso, self._policy_head])
-    self._policy_logits = self.policy_logits_network(self._info_state_ph)
+
+    self.policy_logits_network = snt.Sequential([self._net_torso,
+                                                 self._policy_logits_layer])
+
+    self._policy_logits = self._policy_logits_layer(torso_out)
     self._policy_probs = tf.nn.softmax(self._policy_logits)
-    self._savers = [("torso", snt.get_saver(net_torso)),
-                    ("policy_head", snt.get_saver(self._policy_head))]
-    torso_out = net_torso(self._info_state_ph)
+
+    self._savers = []
+
+    used_output_size = 1 if loss_class.__name__ == "BatchA2CLoss" else self._num_actions
+    self._q_values_layer = snt.Linear(
+        output_size=used_output_size, name="q_values_head")
+
     # Add baseline (V) head for A2C.
     if loss_class.__name__ == "BatchA2CLoss":
-      baseline = snt.Linear(output_size=1, name="baseline")
-      self._baseline = tf.squeeze(baseline(torso_out),
-                                  axis=1)
-      self._savers.append(("baseline", snt.get_saver(baseline)))
+      self._baseline = tf.squeeze(self._q_values_layer(torso_out), axis=1)
     else:
       # Add q-values head otherwise
-      q_head = snt.Linear(output_size=self._num_actions, name="q_values_head")
-      self._q_values = q_head(torso_out)
-      self._savers.append(("q_head", snt.get_saver(q_head)))
+      self._q_values = self._q_values_layer(torso_out)
 
     # Critic loss
     # Baseline loss in case of A2C
@@ -207,8 +214,14 @@ class PolicyGradient(rl_agent.AbstractAgent):
       self._critic_loss = tf.reduce_mean(
           tf.losses.mean_squared_error(
               labels=self._return_ph, predictions=value_predictions))
-    critic_optimizer = tf.train.GradientDescentOptimizer(
-        learning_rate=critic_learning_rate)
+    if optimizer_str == "adam":
+      self._critic_optimizer = tf.train.AdamOptimizer(
+          learning_rate=critic_learning_rate)
+    elif optimizer_str == "sgd":
+      self._critic_optimizer = tf.train.GradientDescentOptimizer(
+          learning_rate=critic_learning_rate)
+    else:
+      raise ValueError("Not implemented, choose from 'adam' and 'sgd'.")
 
     def minimize_with_clipping(optimizer, loss):
       grads_and_vars = optimizer.compute_gradients(loss)
@@ -219,7 +232,7 @@ class PolicyGradient(rl_agent.AbstractAgent):
 
       return optimizer.apply_gradients(grads_and_vars)
 
-    self._critic_learn_step = minimize_with_clipping(critic_optimizer,
+    self._critic_learn_step = minimize_with_clipping(self._critic_optimizer,
                                                      self._critic_loss)
 
     # Pi loss
@@ -233,10 +246,17 @@ class PolicyGradient(rl_agent.AbstractAgent):
     else:
       self._pi_loss = pg_class.loss(
           policy_logits=self._policy_logits, action_values=self._q_values)
-    pi_optimizer = tf.train.GradientDescentOptimizer(
-        learning_rate=pi_learning_rate)
-    self._pi_learn_step = minimize_with_clipping(pi_optimizer, self._pi_loss)
+    if optimizer_str == "adam":
+      self._pi_optimizer = tf.train.AdamOptimizer(
+          learning_rate=pi_learning_rate)
+    elif optimizer_str == "sgd":
+      self._pi_optimizer = tf.train.GradientDescentOptimizer(
+          learning_rate=pi_learning_rate)
+
+    self._pi_learn_step = minimize_with_clipping(self._pi_optimizer,
+                                                 self._pi_loss)
     self._loss_str = loss_str
+    self._initialize()
 
   def _get_loss_class(self, loss_str):
     if loss_str == "rpg":
@@ -249,7 +269,7 @@ class PolicyGradient(rl_agent.AbstractAgent):
       return rl_losses.BatchA2CLoss
 
   def _act(self, info_state, legal_actions):
-    # make a singleton batch for NN compatibility: [1, info_state_size]
+    # Make a singleton batch for NN compatibility: [1, info_state_size]
     info_state = np.reshape(info_state, [1, -1])
     policy_probs = self._session.run(
         self._policy_probs, feed_dict={self._info_state_ph: info_state})
@@ -426,3 +446,77 @@ class PolicyGradient(rl_agent.AbstractAgent):
         })
     self._last_pi_loss_value = pi_loss
     return pi_loss
+
+  def get_weights(self):
+    variables = [self._session.run(self._net_torso.variables)]
+    variables.append(self._session.run(self._policy_logits_layer.variables))
+    variables.append(self._session.run(self._q_values_layer.variables))
+    return variables
+
+  def _initialize(self):
+    initialization_torso = tf.group(
+        *[var.initializer for var in self._net_torso.variables])
+    initialization_logit = tf.group(
+        *[var.initializer for var in self._policy_logits_layer.variables])
+    initialization_q_val = tf.group(
+        *[var.initializer for var in self._q_values_layer.variables])
+    initialization_crit_opt = tf.group(
+        *[var.initializer for var in self._critic_optimizer.variables()])
+    initialization_pi_opt = tf.group(
+        *[var.initializer for var in self._pi_optimizer.variables()])
+
+    self._session.run(
+        tf.group(*[
+            initialization_torso, initialization_logit, initialization_q_val,
+            initialization_crit_opt, initialization_pi_opt
+        ]))
+    self._savers = [("torso", snt.get_saver(self._net_torso)),
+                    ("policy_head", snt.get_saver(self._policy_logits_layer))]
+    self._savers.append(("q_values_layer", snt.get_saver(self._q_values_layer)))
+
+  def copy_with_noise(self, sigma=0.0, copy_weights=True):
+    """Copies the object and perturbates its network's weights with noise.
+
+    Args:
+      sigma: gaussian dropout variance term : Multiplicative noise following
+        (1+sigma*epsilon), epsilon standard gaussian variable, multiplies each
+        model weight. sigma=0 means no perturbation.
+      copy_weights: Boolean determining whether to copy model weights (True) or
+        just model hyperparameters.
+
+    Returns:
+      Perturbated copy of the model.
+    """
+    _ = self._kwargs.pop("self", None)
+    copied_object = PolicyGradient(**self._kwargs)
+
+    net_torso = getattr(copied_object, "_net_torso")
+    policy_logits_layer = getattr(copied_object, "_policy_logits_layer")
+    q_values_layer = getattr(copied_object, "_q_values_layer")
+
+    if copy_weights:
+      copy_mlp_weights = tf.group(*[
+          va.assign(vb * (1 + sigma * tf.random.normal(vb.shape)))
+          for va, vb in zip(net_torso.variables, self._net_torso.variables)
+      ])
+      self._session.run(copy_mlp_weights)
+
+      copy_logit_weights = tf.group(*[
+          va.assign(vb * (1 + sigma * tf.random.normal(vb.shape)))
+          for va, vb in zip(policy_logits_layer.variables,
+                            self._policy_logits_layer.variables)
+      ])
+      self._session.run(copy_logit_weights)
+
+      copy_q_value_weights = tf.group(*[
+          va.assign(vb * (1 + sigma * tf.random.normal(vb.shape))) for va, vb in
+          zip(q_values_layer.variables, self._q_values_layer.variables)
+      ])
+      self._session.run(copy_q_value_weights)
+
+    for var in getattr(copied_object, "_critic_optimizer").variables():
+      self._session.run(var.initializer)
+    for var in getattr(copied_object, "_pi_optimizer").variables():
+      self._session.run(var.initializer)
+
+    return copied_object
