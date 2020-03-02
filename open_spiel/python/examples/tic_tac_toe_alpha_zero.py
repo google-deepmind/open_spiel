@@ -40,6 +40,7 @@ import tensorflow.compat.v1 as tf
 from open_spiel.python.algorithms import mcts
 from open_spiel.python.algorithms import minimax
 from open_spiel.python.algorithms.alpha_zero import alpha_zero
+from open_spiel.python.algorithms.alpha_zero import model as model_lib
 import pyspiel
 
 tf.enable_eager_execution()
@@ -114,17 +115,17 @@ def main(_):
 
   # 1. Define a keras net
   if FLAGS.net_type == "resnet":
-    net = alpha_zero.keras_resnet(
+    net = model_lib.keras_resnet(
         observation_shape, num_actions, num_residual_blocks=1, num_filters=256,
         data_format="channels_first")
   elif FLAGS.net_type == "mlp":
-    net = alpha_zero.keras_mlp(
+    net = model_lib.keras_mlp(
         observation_shape, num_actions, num_layers=2, num_hidden=64)
   else:
     raise ValueError(("Invalid value for 'net_type'. Must be either 'mlp' or "
                       "'resnet', but was %s") % FLAGS.net_type)
 
-  model = alpha_zero.Model(
+  model = model_lib.Model(
       net, l2_regularization=1e-4, learning_rate=0.01, device=FLAGS.device)
 
   # 2. Create an MCTS bot using the previous keras net
