@@ -49,10 +49,10 @@ class TrainInput(collections.namedtuple(
   def stack(train_inputs):
     observation, legals_mask, policy, value = zip(*train_inputs)
     return TrainInput(
-        np.array(observation),
+        np.array(observation, dtype=np.float32),
         np.array(legals_mask),
         np.array(policy),
-        np.expand_dims(np.array(value), 1))
+        np.expand_dims(value, 1))
 
 
 class Losses(collections.namedtuple("Losses", "policy value l2")):
@@ -101,9 +101,11 @@ class Model(object):
     self._l2_regularization = l2_regularization
 
   def inference(self, obs, mask):
+    obs = np.array(obs, dtype=np.float32)
+    mask = np.array(mask)
     with self._device:
       value, policy = self._keras_model(obs)
-    policy = masked_softmax.np_masked_softmax(np.array(policy), np.array(mask))
+    policy = masked_softmax.np_masked_softmax(policy, mask)
     return value, policy
 
   def update(self, train_inputs: Sequence[TrainInput]):
@@ -212,7 +214,7 @@ def keras_resnet(input_shape,
     ])
 
   input_size = int(np.prod(input_shape))
-  inputs = tf.keras.Input(shape=input_size, name="input")
+  inputs = tf.keras.Input(shape=input_size, dtype="float32", name="input")
   torso = tf.keras.layers.Reshape(input_shape)(inputs)
   # Note: Keras with TensorFlow 1.15 does not support the data_format arg on CPU
   # for convolutions. Hence why this transpose is needed.
@@ -245,7 +247,7 @@ def keras_mlp(input_shape,
     The policy is a flat distribution over actions.
   """
   input_size = int(np.prod(input_shape))
-  inputs = tf.keras.Input(shape=input_size, name="input")
+  inputs = tf.keras.Input(shape=input_size, dtype="float32", name="input")
   torso = inputs
   for _ in range(num_layers):
     torso = tf.keras.layers.Dense(num_hidden, activation=activation)(torso)
