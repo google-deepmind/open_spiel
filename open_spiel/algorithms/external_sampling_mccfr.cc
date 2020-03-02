@@ -14,10 +14,12 @@
 
 #include "open_spiel/algorithms/external_sampling_mccfr.h"
 
+#include <memory>
 #include <numeric>
 #include <random>
 
 #include "open_spiel/algorithms/cfr.h"
+#include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
@@ -27,12 +29,18 @@ namespace algorithms {
 ExternalSamplingMCCFRSolver::ExternalSamplingMCCFRSolver(const Game& game,
                                                          int seed,
                                                          AverageType avg_type)
+    : ExternalSamplingMCCFRSolver(
+          game, std::make_shared<TabularPolicy>(GetUniformPolicy(game)), seed,
+          avg_type) {}
+
+ExternalSamplingMCCFRSolver::ExternalSamplingMCCFRSolver(
+    const Game& game, std::shared_ptr<Policy> default_policy, int seed,
+    AverageType avg_type)
     : game_(game.Clone()),
       rng_(new std::mt19937(seed)),
       avg_type_(avg_type),
       dist_(0.0, 1.0),
-      uniform_policy_(std::shared_ptr<TabularPolicy>(
-          new TabularPolicy(GetUniformPolicy(game)))) {
+      default_policy_(default_policy) {
   if (game_->GetType().dynamics != GameType::Dynamics::kSequential) {
     SpielFatalError(
         "MCCFR requires sequential games. If you're trying to run it "

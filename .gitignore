@@ -36,5 +36,6 @@ open_spiel/scripts/jill.sh
 
 # IDE
 .idea/
+.vscode/
 
 open_spiel/cmake-build-debug/

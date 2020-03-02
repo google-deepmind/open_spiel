@@ -42,8 +42,16 @@ class OutcomeSamplingMCCFRSolver {
   static inline constexpr double kInitialTableValues = 0.000001;
   static inline constexpr double kDefaultEpsilon = 0.6;
 
+  // Creates a solver with a specific seed, average type and an explicit
+  // default uniform policy for states that have not been visited.
   OutcomeSamplingMCCFRSolver(const Game& game, double epsilon = kDefaultEpsilon,
                              int seed = -1);
+
+  // Creates a solver with a specific seed and average type, and also allows
+  // for a custom default policy for states that have not been visited.
+  OutcomeSamplingMCCFRSolver(const Game& game,
+                             std::shared_ptr<Policy> default_policy,
+                             double epsilon = kDefaultEpsilon, int seed = -1);
 
   // Performs one iteration of outcome sampling.
   void RunIteration() { RunIteration(&rng_); }
@@ -56,7 +64,7 @@ class OutcomeSamplingMCCFRSolver {
   // the CFRSolver object.
   std::unique_ptr<Policy> AveragePolicy() const {
     return std::unique_ptr<Policy>(
-        new CFRAveragePolicy(info_states_, uniform_policy_));
+        new CFRAveragePolicy(info_states_, default_policy_));
   }
 
  private:
@@ -82,7 +90,7 @@ class OutcomeSamplingMCCFRSolver {
   int update_player_;
   std::mt19937 rng_;
   absl::uniform_real_distribution<double> dist_;
-  std::shared_ptr<TabularPolicy> uniform_policy_;
+  std::shared_ptr<Policy> default_policy_;
 };
 
 }  // namespace algorithms

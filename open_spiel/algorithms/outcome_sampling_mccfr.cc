@@ -28,14 +28,27 @@ namespace algorithms {
 
 OutcomeSamplingMCCFRSolver::OutcomeSamplingMCCFRSolver(const Game& game,
                                                        double epsilon, int seed)
+    : OutcomeSamplingMCCFRSolver(
+          game, std::make_shared<TabularPolicy>(GetUniformPolicy(game)),
+          epsilon, seed) {}
+
+OutcomeSamplingMCCFRSolver::OutcomeSamplingMCCFRSolver(
+    const Game& game, std::shared_ptr<Policy> default_policy, double epsilon,
+    int seed)
     : game_(game),
       epsilon_(epsilon),
       num_players_(game.NumPlayers()),
       update_player_(-1),
       rng_(seed >= 0 ? seed : std::mt19937::default_seed),
       dist_(0.0, 1.0),
-      uniform_policy_(std::shared_ptr<TabularPolicy>(
-          new TabularPolicy(GetUniformPolicy(game)))) {}
+      default_policy_(default_policy) {
+  if (game_.GetType().dynamics != GameType::Dynamics::kSequential) {
+    SpielFatalError(
+        "MCCFR requires sequential games. If you're trying to run it "
+        "on a simultaneous (or normal-form) game, please first transform it "
+        "using turn_based_simultaneous_game.");
+  }
+}
 
 void OutcomeSamplingMCCFRSolver::RunIteration(std::mt19937* rng) {
   update_player_ = (update_player_ + 1) % num_players_;

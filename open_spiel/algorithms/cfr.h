@@ -57,17 +57,22 @@ using CFRInfoStateValuesTable =
 class CFRAveragePolicy : public Policy {
  public:
   // Returns the average policy from the CFR values.
-  // If an info state is not found, return the default policy for the info state
-  // (or an empty policy if default_policy is nullptr). If an info state has
-  // zero cumulative regret for all actions, return a uniform policy.
+  // If a state/info state is not found, return the default policy for the
+  // state/info state (or an empty policy if default_policy is nullptr).
+  // If an info state has zero cumulative regret for all actions,
+  // return a uniform policy.
   CFRAveragePolicy(const CFRInfoStateValuesTable& info_states,
-                   std::shared_ptr<TabularPolicy> default_policy);
+                   std::shared_ptr<Policy> default_policy);
+  ActionsAndProbs GetStatePolicy(const State& state) const override;
   ActionsAndProbs GetStatePolicy(const std::string& info_state) const override;
 
  private:
   const CFRInfoStateValuesTable& info_states_;
   bool default_to_uniform_;
-  std::shared_ptr<TabularPolicy> default_policy_;
+  std::shared_ptr<Policy> default_policy_;
+  void GetStatePolicyFromInformationStateValues(
+      const CFRInfoStateValues& is_vals,
+      ActionsAndProbs* actions_and_probs) const;
 };
 
 // A policy that extracts the current policy from the CFR table values.
@@ -77,12 +82,16 @@ class CFRCurrentPolicy : public Policy {
   // passed in, then it means that it is used if the lookup fails (use nullptr
   // to not use a default policy).
   CFRCurrentPolicy(const CFRInfoStateValuesTable& info_states,
-                   std::shared_ptr<TabularPolicy> default_policy);
+                   std::shared_ptr<Policy> default_policy);
+  ActionsAndProbs GetStatePolicy(const State& state) const override;
   ActionsAndProbs GetStatePolicy(const std::string& info_state) const override;
 
  private:
   const CFRInfoStateValuesTable& info_states_;
-  std::shared_ptr<TabularPolicy> default_policy_;
+  std::shared_ptr<Policy> default_policy_;
+  ActionsAndProbs GetStatePolicyFromInformationStateValues(
+      const CFRInfoStateValues& is_vals,
+      ActionsAndProbs& actions_and_probs) const;
 };
 
 // Base class supporting different flavours of the Counterfactual Regret
