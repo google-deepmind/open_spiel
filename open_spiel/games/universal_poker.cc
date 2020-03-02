@@ -31,7 +31,22 @@
 namespace open_spiel {
 namespace universal_poker {
 
-const absl::string_view kEmptyString = "";
+std::string HunlGameString(const std::string &betting_abstraction) {
+  return absl::StrFormat(
+      "universal_poker(betting=nolimit,numPlayers=2,numRounds=4,blind=100 50,"
+      "firstPlayer=2 1 1 "
+      "1,numSuits=4,numRanks=13,numHoleCards=2,numBoardCards=0 3 "
+      "1 1,stack=20000 20000,bettingAbstraction=%s)",
+      betting_abstraction);
+}
+
+std::string HulhGameString(const std::string &betting_abstraction) {
+  return absl::StrFormat(
+      "universal_poker(betting=limit,numPlayers=2,numRounds=4,blind=100 50,"
+      "firstPlayer=2 1,numSuits=4,numRanks=13,numHoleCards=2,numBoardCards=0 3 "
+      "1 1,raiseSize=200 200 400 400,maxRaises=3 4 4 4,bettingAbstraction=%s)",
+      betting_abstraction);
+}
 
 const GameType kGameType{
     /*short_name=*/"universal_poker",
@@ -66,7 +81,7 @@ const GameType kGameType{
 
      // The ACPC gamedef string.  When present, it will take precedence over
      // everything and no other argument should be provided.
-     {"gamedef", GameParameter(std::string(kEmptyString))},
+     {"gamedef", GameParameter(std::string(""))},
      // Instead of a single gamedef, specifying each line is also possible.
      // The documentation is adapted from project_acpc_server/game.cc.
      //
@@ -90,7 +105,7 @@ const GameType kGameType{
      {"firstPlayer", GameParameter(std::string("1 1"))},
      // maxraises - the maximum number of raises on each round. If not
      // specified, it will default to UINT8_MAX.
-     {"maxRaises", GameParameter(std::string(kEmptyString))},
+     {"maxRaises", GameParameter(std::string(""))},
      // The number of different suits in the deck
      {"numSuits", GameParameter(4)},
      // The number of different ranks in the deck
@@ -678,18 +693,18 @@ std::string UniversalPokerGame::parseParameters(const GameParameters &map) {
       "numBoardCards = ", ParameterValue<std::string>("numBoardCards"), "\n");
 
   std::string max_raises = ParameterValue<std::string>("maxRaises");
-  if (max_raises != kEmptyString) {
+  if (!max_raises.empty()) {
     absl::StrAppend(&generated_gamedef, "maxRaises = ", max_raises, "\n");
   }
 
   if (ParameterValue<std::string>("betting") == "limit") {
     std::string raise_size = ParameterValue<std::string>("raiseSize");
-    if (raise_size != kEmptyString) {
+    if (!raise_size.empty()) {
       absl::StrAppend(&generated_gamedef, "raiseSize = ", raise_size, "\n");
     }
   } else if (ParameterValue<std::string>("betting") == "nolimit") {
     std::string stack = ParameterValue<std::string>("stack");
-    if (stack != kEmptyString) {
+    if (!stack.empty()) {
       absl::StrAppend(&generated_gamedef, "stack = ", stack, "\n");
     }
   } else {

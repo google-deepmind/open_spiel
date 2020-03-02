@@ -29,6 +29,7 @@
 #include "open_spiel/game_transforms/normal_form_extensive_game.h"
 #include "open_spiel/game_transforms/turn_based_simultaneous_game.h"
 #include "open_spiel/games/efg_game.h"
+#include "open_spiel/games/universal_poker.h"
 #include "open_spiel/matrix_game.h"
 #include "open_spiel/normal_form_game.h"
 #include "open_spiel/policy.h"
@@ -577,6 +578,8 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("record_batch",
            &open_spiel::algorithms::TrajectoryRecorder::RecordBatch);
 
+  m.def("hulh_game_string", &open_spiel::universal_poker::HulhGameString);
+  m.def("hunl_game_string", &open_spiel::universal_poker::HunlGameString);
   m.def("create_matrix_game",
         py::overload_cast<const std::string&, const std::string&,
                           const std::vector<std::string>&,
