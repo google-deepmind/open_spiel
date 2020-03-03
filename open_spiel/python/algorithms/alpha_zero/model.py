@@ -38,8 +38,6 @@ from typing import Sequence
 import numpy as np
 import tensorflow.compat.v1 as tf
 
-from open_spiel.python.algorithms import masked_softmax
-
 
 class TrainInput(collections.namedtuple(
     "TrainInput", "observation legals_mask policy value")):
@@ -50,7 +48,7 @@ class TrainInput(collections.namedtuple(
     observation, legals_mask, policy, value = zip(*train_inputs)
     return TrainInput(
         np.array(observation, dtype=np.float32),
-        np.array(legals_mask),
+        np.array(legals_mask, dtype=np.bool),
         np.array(policy),
         np.expand_dims(value, 1))
 
@@ -101,12 +99,10 @@ class Model(object):
     self._l2_regularization = l2_regularization
 
   def inference(self, obs, mask):
-    obs = np.array(obs, dtype=np.float32)
-    mask = np.array(mask)
     with self._device:
-      value, policy = self._keras_model(obs)
-    policy = masked_softmax.np_masked_softmax(policy, mask)
-    return value, policy
+      value, _, policy_softmax = self._keras_model([
+          np.array(obs, dtype=np.float32), np.array(mask, dtype=np.bool)])
+    return value, policy_softmax
 
   def update(self, train_inputs: Sequence[TrainInput]):
     """Run an update step."""
@@ -114,13 +110,17 @@ class Model(object):
 
     with self._device:
       with tf.GradientTape() as tape:
-        values, policy_logits = self._keras_model(
-            batch.observation, training=True)
+        values, policy_logits, _ = self._keras_model(
+            [batch.observation, batch.legals_mask], training=True)
         loss_value = tf.losses.mean_squared_error(
             values, tf.stop_gradient(batch.value))
+
+        # The policy_logits applied the mask already, and the targets only
+        # contain valid policies, ie are also masked.
         loss_policy = tf.nn.softmax_cross_entropy_with_logits_v2(
             logits=policy_logits, labels=tf.stop_gradient(batch.policy))
         loss_policy = tf.reduce_mean(loss_policy)
+
         loss_l2 = 0
         for weights in self._keras_model.trainable_variables:
           loss_l2 += self._l2_regularization * tf.nn.l2_loss(weights)
@@ -215,6 +215,7 @@ def keras_resnet(input_shape,
 
   input_size = int(np.prod(input_shape))
   inputs = tf.keras.Input(shape=input_size, dtype="float32", name="input")
+  mask = tf.keras.Input(shape=num_actions, dtype="bool", name="mask")
   torso = tf.keras.layers.Reshape(input_shape)(inputs)
   # Note: Keras with TensorFlow 1.15 does not support the data_format arg on CPU
   # for convolutions. Hence why this transpose is needed.
@@ -222,8 +223,12 @@ def keras_resnet(input_shape,
     torso = tf.keras.backend.permute_dimensions(torso, (0, 2, 3, 1))
   torso = resnet_body(torso, num_filters, 3)
   value_head = resnet_value_head(torso, value_head_hidden_size)
-  policy_head = resnet_policy_head(torso, num_actions)
-  return tf.keras.Model(inputs=inputs, outputs=[value_head, policy_head])
+  policy_logits = resnet_policy_head(torso, num_actions)
+  policy_logits = tf.where(mask, policy_logits,
+                           -1e32 * tf.ones_like(policy_logits))
+  policy_softmax = tf.keras.layers.Softmax()(policy_logits)
+  return tf.keras.Model(inputs=[inputs, mask],
+                        outputs=[value_head, policy_logits, policy_softmax])
 
 
 def keras_mlp(input_shape,
@@ -248,9 +253,14 @@ def keras_mlp(input_shape,
   """
   input_size = int(np.prod(input_shape))
   inputs = tf.keras.Input(shape=input_size, dtype="float32", name="input")
+  mask = tf.keras.Input(shape=num_actions, dtype="bool", name="mask")
   torso = inputs
   for _ in range(num_layers):
     torso = tf.keras.layers.Dense(num_hidden, activation=activation)(torso)
-  policy = tf.keras.layers.Dense(num_actions, name="policy")(torso)
+  policy_logits = tf.keras.layers.Dense(num_actions, name="policy")(torso)
+  policy_logits = tf.where(mask, policy_logits,
+                           -1e32 * tf.ones_like(policy_logits))
+  policy_softmax = tf.keras.layers.Softmax()(policy_logits)
   value = tf.keras.layers.Dense(1, activation="tanh", name="value")(torso)
-  return tf.keras.Model(inputs=inputs, outputs=[value, policy])
+  return tf.keras.Model(inputs=[inputs, mask],
+                        outputs=[value, policy_logits, policy_softmax])
