@@ -15,13 +15,9 @@
 # Lint as: python3
 """Tests for open_spiel.python.algorithms.best_response."""
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 from absl.testing import absltest
-
 from absl.testing import parameterized
+
 from open_spiel.python import policy
 from open_spiel.python.algorithms import best_response
 from open_spiel.python.algorithms import get_all_states
@@ -79,6 +75,30 @@ class BestResponseTest(parameterized.TestCase, absltest.TestCase):
                 for a, prob in cpp_br.action_probabilities(state).items()
                 if prob != 0
             })
+
+  @parameterized.parameters(("kuhn_poker", 2))
+  def test_cpp_and_python_best_response_are_identical(self, game_name,
+                                                      num_players):
+    game = pyspiel.load_game(game_name,
+                             {"players": pyspiel.GameParameter(num_players)})
+
+    test_policy = policy.TabularPolicy(game)
+    for i_player in range(num_players):
+      best_resp_py_backend = best_response.BestResponsePolicy(
+          game, i_player, test_policy)
+      best_resp_cpp_backend = best_response.CPPBestResponsePolicy(
+          game, i_player, test_policy)
+      for state in best_resp_cpp_backend.all_states.values():
+        if i_player == state.current_player():
+          py_dict = best_resp_py_backend.action_probabilities(state)
+          cpp_dict = best_resp_cpp_backend.action_probabilities(state)
+
+          # We do check like this, because the actions associated to a 0. prob
+          # do not necessarily appear
+          for key, value in py_dict.items():
+            self.assertEqual(value, cpp_dict.get(key, 0.))
+          for key, value in cpp_dict.items():
+            self.assertEqual(value, py_dict.get(key, 0.))
 
 
 if __name__ == "__main__":

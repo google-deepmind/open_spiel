@@ -20,13 +20,13 @@ TODO(author2): Also include computation using the more efficient C++
 `TabularBestResponse` implementation.
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import collections
 
-from open_spiel.python import policy as pyspiel_policy
+from open_spiel.python import policy as openspiel_policy
+from open_spiel.python.algorithms import get_all_states
+from open_spiel.python.algorithms import noisy_policy
+from open_spiel.python.algorithms import policy_utils
+import pyspiel
 
 
 def _memoize_method(method):
@@ -43,7 +43,40 @@ def _memoize_method(method):
   return wrap
 
 
-class BestResponsePolicy(pyspiel_policy.Policy):
+def compute_states_and_info_states_if_none(game,
+                                           all_states=None,
+                                           state_to_information_state=None):
+  """Returns all_states and/or state_to_information_state for the game.
+
+  To recompute everything, pass in None for both all_states and
+  state_to_information_state. Otherwise, this function will use the passed in
+  values to reconstruct either of them.
+
+  Args:
+    game: The open_spiel game.
+    all_states: The result of calling get_all_states.get_all_states. Cached for
+      improved performance.
+    state_to_information_state: A dict mapping str(state) to
+      state.information_state for every state in the game. Cached for improved
+      performance.
+  """
+  if all_states is None:
+    all_states = get_all_states.get_all_states(
+        game,
+        depth_limit=-1,
+        include_terminals=False,
+        include_chance_states=False)
+
+  if state_to_information_state is None:
+    state_to_information_state = {
+        state: all_states[state].information_state_string()
+        for state in all_states
+    }
+
+  return all_states, state_to_information_state
+
+
+class BestResponsePolicy(openspiel_policy.Policy):
   """Computes the best response to a specified strategy."""
 
   def __init__(self, game, player_id, policy, root_state=None):
@@ -134,3 +167,98 @@ class BestResponsePolicy(pyspiel_policy.Policy):
     return {
         self.best_response_action(state.information_state_string(player_id)): 1
     }
+
+
+class CPPBestResponsePolicy(openspiel_policy.Policy):
+  """Computes best response action_probabilities using open_spiel's C++ backend.
+
+     May have better performance than best_response.py for large games.
+  """
+
+  def __init__(self,
+               game,
+               best_responder_id,
+               policy,
+               all_states=None,
+               state_to_information_state=None,
+               best_response_processor=None):
+    """Constructor.
+
+    Args:
+      game: The game to analyze.
+      best_responder_id: The player id of the best-responder.
+      policy: A policy.Policy object representing the joint policy, taking a
+        state and returning a list of (action, probability) pairs. This could be
+        aggr_policy, for instance.
+      all_states: The result of calling get_all_states.get_all_states. Cached
+        for improved performance.
+      state_to_information_state: A dict mapping str(state) to
+        state.information_state for every state in the game. Cached for improved
+        performance.
+      best_response_processor: A TabularBestResponse object, used for processing
+        the best response actions.
+    """
+    (self.all_states, self.state_to_information_state) = (
+        compute_states_and_info_states_if_none(
+            game, all_states, state_to_information_state))
+
+    policy_to_dict = policy_utils.policy_to_dict(
+        policy, game, self.all_states, self.state_to_information_state)
+
+    # pylint: disable=g-complex-comprehension
+    # Cache TabularBestResponse for players, due to their costly construction
+    # TODO(b/140426861): Use a single best-responder once the code supports
+    # multiple player ids.
+    if not best_response_processor:
+      best_response_processor = pyspiel.TabularBestResponse(
+          game, best_responder_id, policy_to_dict)
+
+    self._policy = policy
+    self.game = game
+    self.best_responder_id = best_responder_id
+    self.tabular_best_response_map = (
+        best_response_processor.get_best_response_actions())
+
+  def action_probabilities(self, state, player_id=None):
+    """Returns the policy for a player in a state.
+
+    Args:
+      state: A `pyspiel.State` object.
+      player_id: Optional, the player id for whom we want an action. Optional
+        unless this is a simultabeous state at which multiple players can act.
+
+    Returns:
+      A `dict` of `{action: probability}` for the specified player in the
+      supplied state.
+    """
+    # Send the best-response probabilities for the best-responder
+    if state.current_player() == self.best_responder_id:
+      probs = {action_id: 0. for action_id in state.legal_actions()}
+      info_state = self.state_to_information_state[state.history_str()]
+      probs[self.tabular_best_response_map[info_state]] = 1.
+      return probs
+
+    # Send the default probabilities for all other players
+    return self._policy.action_probabilities(state, player_id)
+
+  @property
+  def policy(self):
+    return self._policy
+
+  def copy_with_noise(self, alpha=0.0, beta=0.0):
+    """Copies this policy and adds noise, making it a Noisy Best Response.
+
+    The policy's new probabilities P' on each state s become
+    P'(s) = alpha * epsilon + (1-alpha) * P(s)
+
+    With P the former policy's probabilities, and epsilon ~ Softmax(beta *
+    Uniform)
+
+    Args:
+      alpha: First mixture component
+      beta: Softmax 1/temperature component
+
+    Returns:
+      Noisy copy of best response.
+    """
+    return noisy_policy.NoisyPolicy(self, alpha, beta, self.all_states)
