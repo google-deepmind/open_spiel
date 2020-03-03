@@ -31,8 +31,7 @@ RUN mkdir -p build && \
     ctest -j4
 COPY . build
 
-# export path
-ENV PYTHONPATH=${PYTHONPATH}:/open_spiel/
-ENV PYTHONPATH=${PYTHONPATH}:/open_spiel/build/python
+ENV PYTHONPATH=${PYTHONPATH}:/
+ENV PYTHONPATH=${PYTHONPATH}:/build/python
 
 WORKDIR ./open_spiel
