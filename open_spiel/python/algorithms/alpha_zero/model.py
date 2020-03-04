@@ -112,18 +112,19 @@ class Model(object):
       with tf.GradientTape() as tape:
         values, policy_logits, _ = self._keras_model(
             [batch.observation, batch.legals_mask], training=True)
+
         loss_value = tf.losses.mean_squared_error(
             values, tf.stop_gradient(batch.value))
 
         # The policy_logits applied the mask already, and the targets only
         # contain valid policies, ie are also masked.
-        loss_policy = tf.nn.softmax_cross_entropy_with_logits_v2(
-            logits=policy_logits, labels=tf.stop_gradient(batch.policy))
-        loss_policy = tf.reduce_mean(loss_policy)
+        loss_policy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(
+            logits=policy_logits, labels=tf.stop_gradient(batch.policy)))
 
-        loss_l2 = 0
-        for weights in self._keras_model.trainable_variables:
-          loss_l2 += self._l2_regularization * tf.nn.l2_loss(weights)
+        loss_l2 = tf.add_n([self._l2_regularization * tf.nn.l2_loss(var)
+                            for var in self._keras_model.trainable_variables
+                            if "/bias:" not in var.name])
+
         loss = loss_policy + loss_value + loss_l2
 
       grads = tape.gradient(loss, self._keras_model.trainable_variables)
