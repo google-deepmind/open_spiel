@@ -93,6 +93,8 @@ class ModelTest(parameterized.TestCase):
   def test_model_learns_simple(self, model_type):
     game = pyspiel.load_game("tic_tac_toe")
     model = build_model(game, model_type)
+    print("Num variables:", model.num_trainable_variables)
+    model.print_trainable_variables()
 
     train_inputs = []
     state = game.new_initial_state()
@@ -117,10 +119,12 @@ class ModelTest(parameterized.TestCase):
       losses.append(loss)
       if loss.policy < 0.05 and loss.value < 0.05:
         break
+
     self.assertGreater(losses[0].total, losses[-1].total)
     self.assertGreater(losses[0].policy, losses[-1].policy)
     self.assertGreater(losses[0].value, losses[-1].value)
     self.assertLess(losses[-1].value, 0.05)
+    self.assertLess(losses[-1].policy, 0.05)
 
   @parameterized.parameters(model_types)
   def test_model_learns_optimal(self, model_type):
@@ -128,6 +132,8 @@ class ModelTest(parameterized.TestCase):
     solve_game(game.new_initial_state())
 
     model = build_model(game, model_type)
+    print("Num variables:", model.num_trainable_variables)
+    model.print_trainable_variables()
 
     train_inputs = list(solved.values())
     print("states:", len(train_inputs))
@@ -143,6 +149,7 @@ class ModelTest(parameterized.TestCase):
     self.assertGreater(losses[0].value, losses[-1].value)
     self.assertGreater(losses[0].total, losses[-1].total)
     self.assertLess(losses[-1].value, 0.1)
+    self.assertLess(losses[-1].policy, 0.1)
 
 
 if __name__ == "__main__":

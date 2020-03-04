@@ -136,6 +136,14 @@ class Model(object):
     return Losses(policy=float(loss_policy), value=float(loss_value),
                   l2=float(loss_l2))
 
+  @property
+  def num_trainable_variables(self):
+    return sum(np.prod(v.shape) for v in self._keras_model.trainable_variables)
+
+  def print_trainable_variables(self):
+    for v in self._keras_model.trainable_variables:
+      print("{}: {}".format(v.name, v.shape))
+
 
 def cascade(x, fns):
   for fn in fns:
