@@ -73,7 +73,7 @@ def build_model(game, model_type):
   if model_type == "resnet":
     net = model_lib.keras_resnet(
         observation_shape, num_actions, num_residual_blocks=2, num_filters=64,
-        data_format="channels_first")
+        value_head_hidden_size=64, data_format="channels_first")
   elif model_type == "mlp":
     net = model_lib.keras_mlp(
         observation_shape, num_actions, num_layers=2, num_hidden=64)
