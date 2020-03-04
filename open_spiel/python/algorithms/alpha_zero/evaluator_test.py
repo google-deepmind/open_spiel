@@ -109,10 +109,9 @@ class EvaluatorTest(absltest.TestCase):
     value6 = evaluator.evaluate(game.new_initial_state())[0]
     self.assertEqual(value4, value6)
 
-    # functools lrucache goes by state id, not the true value
     info = evaluator.cache_info()
-    self.assertEqual(info.misses, 2)
-    self.assertEqual(info.hits, 1)
+    self.assertEqual(info.misses, 1)
+    self.assertEqual(info.hits, 2)
 
   def test_works_with_mcts(self):
     game = pyspiel.load_game("tic_tac_toe")
