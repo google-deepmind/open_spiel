@@ -32,13 +32,11 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import functools
 import math
 
 import numpy as np
 
 from open_spiel.python.algorithms import dqn
-from open_spiel.python.algorithms import mcts
 from open_spiel.python.algorithms.alpha_zero import model as model_lib
 import pyspiel
 
@@ -182,30 +180,4 @@ def np_softmax(logits):
   max_logit = np.amax(logits, axis=-1, keepdims=True)
   exp_logit = np.exp(logits - max_logit)
   return exp_logit / np.sum(exp_logit, axis=-1, keepdims=True)
-
-
-class AlphaZeroKerasEvaluator(mcts.Evaluator):
-  """An AlphaZero MCTS Evaluator."""
-
-  def __init__(self, game, model):
-    """An AlphaZero MCTS Evaluator."""
-    self.model = model
-    self._input_shape = game.observation_tensor_shape()
-    self._num_actions = game.num_distinct_actions()
-
-  @functools.lru_cache(maxsize=2**12)
-  def value_and_prior(self, state):
-    # Make a singleton batch
-    obs = np.expand_dims(state.observation_tensor(), 0)
-    mask = np.expand_dims(state.legal_actions_mask(), 0)
-    value, policy = self.model.inference(obs, mask)
-    return value[0, 0], policy[0]  # Unpack batch
-
-  def evaluate(self, state):
-    value, _ = self.value_and_prior(state)
-    return np.array([value, -value])
-
-  def prior(self, state):
-    _, policy = self.value_and_prior(state)
-    return [(action, policy[action]) for action in state.legal_actions()]
 

@@ -28,7 +28,6 @@
 # limitations under the License.
 """Tests for open_spiel.python.algorithms.alpha_zero.model."""
 
-from absl import flags
 from absl.testing import absltest
 from absl.testing import parameterized
 
@@ -37,8 +36,6 @@ import tensorflow.compat.v1 as tf
 
 from open_spiel.python.algorithms.alpha_zero import model as model_lib
 import pyspiel
-
-FLAGS = flags.FLAGS
 
 tf.enable_eager_execution()
 

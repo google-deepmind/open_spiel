@@ -40,6 +40,7 @@ import tensorflow.compat.v1 as tf
 from open_spiel.python.algorithms import mcts
 from open_spiel.python.algorithms import minimax
 from open_spiel.python.algorithms.alpha_zero import alpha_zero
+from open_spiel.python.algorithms.alpha_zero import evaluator as evaluator_lib
 from open_spiel.python.algorithms.alpha_zero import model as model_lib
 import pyspiel
 
@@ -129,7 +130,7 @@ def main(_):
       net, l2_regularization=1e-4, learning_rate=0.01, device=FLAGS.device)
 
   # 2. Create an MCTS bot using the previous keras net
-  evaluator = alpha_zero.AlphaZeroKerasEvaluator(game, model)
+  evaluator = evaluator_lib.AlphaZeroEvaluator(game, model)
 
   bot = mcts.MCTSBot(game,
                      1.,
@@ -170,7 +171,8 @@ def main(_):
     a0.update(FLAGS.num_training_epochs,
               batch_size=FLAGS.batch_size,
               verbose=True)
-    evaluator.value_and_prior.cache_clear()
+    logging.info("Cache: %s", evaluator.cache_info())
+    evaluator.clear_cache()
 
 
 if __name__ == "__main__":
