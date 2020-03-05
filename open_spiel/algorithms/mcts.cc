@@ -191,7 +191,7 @@ std::vector<double> dirichlet_noise(int count, double alpha,
   return noise;
 }
 
-MCTSBot::MCTSBot(const Game& game, std::shared_ptr<Evaluator> evaluator,
+MCTSBot::MCTSBot(const Game& game, const std::shared_ptr<Evaluator>& evaluator,
                  double uct_c, int max_simulations, int64_t max_memory_mb,
                  bool solve, int seed, bool verbose,
                  ChildSelectionPolicy child_selection_policy,
@@ -208,7 +208,7 @@ MCTSBot::MCTSBot(const Game& game, std::shared_ptr<Evaluator> evaluator,
       dirichlet_epsilon_(dirichlet_epsilon),
       rng_(seed),
       child_selection_policy_(child_selection_policy),
-      evaluator_(std::move(evaluator)) {
+      evaluator_(evaluator) {
   GameType game_type = game.GetType();
   if (game_type.reward_model != GameType::RewardModel::kTerminal)
     SpielFatalError("Game must have terminal rewards.");

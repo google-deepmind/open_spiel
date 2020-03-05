@@ -143,17 +143,20 @@ class MCTSBot : public Bot {
   // the same evaluator instance can be passed to multiple bots and to
   // make the MCTSBot Python interface work regardless of the scope of the
   // Python evaluator object.
+  //
+  // TODO(author5): The second parameter needs to be a const reference at the
+  // moment, even though it gets assigned to a member of type
+  // std::shared_ptr<Evaluator>. This is because using a
+  // std::shared_ptr<Evaluator> in the constructor leads to the Julia API test
+  // failing. We don't know why right now, but intend to fix this.
   MCTSBot(
-      const Game& game,
-      std::shared_ptr<Evaluator> evaluator,
-      double uct_c,
-      int max_simulations,
+      const Game& game, const std::shared_ptr<Evaluator>& evaluator,
+      double uct_c, int max_simulations,
       int64_t max_memory_mb,  // Max memory use in megabytes.
       bool solve,             // Whether to back up solved states.
       int seed, bool verbose,
       ChildSelectionPolicy child_selection_policy = ChildSelectionPolicy::UCT,
-      double dirichlet_alpha = 0,
-      double dirichlet_epsilon = 0);
+      double dirichlet_alpha = 0, double dirichlet_epsilon = 0);
   ~MCTSBot() = default;
 
   void Restart() override {}
