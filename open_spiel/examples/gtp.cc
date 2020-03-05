@@ -38,9 +38,9 @@ std::string Failure(const std::string& s) {
 
 std::unique_ptr<open_spiel::Bot> MakeBot(
     const open_spiel::Game& game,
-    open_spiel::algorithms::Evaluator* evaluator) {
+    std::shared_ptr<open_spiel::algorithms::Evaluator> evaluator) {
   return std::make_unique<open_spiel::algorithms::MCTSBot>(
-      game, evaluator, /*uct_c=*/2, /*max_simulations=*/1000,
+      game, std::move(evaluator), /*uct_c=*/2, /*max_simulations=*/1000,
       /*max_memory_mb=*/0, /*solve=*/true, /*seed=*/0, /*verbose=*/false);
 }
 
@@ -58,9 +58,10 @@ int main(int argc, char** argv) {
 
   std::unique_ptr<open_spiel::State> state = game->NewInitialState();
 
-  open_spiel::algorithms::RandomRolloutEvaluator evaluator(
+  auto evaluator =
+      std::make_shared<open_spiel::algorithms::RandomRolloutEvaluator>(
       /*n_rollouts=*/1, /*seed=*/0);
-  std::unique_ptr<open_spiel::Bot> bot = MakeBot(*game, &evaluator);
+  std::unique_ptr<open_spiel::Bot> bot = MakeBot(*game, evaluator);
 
   using Args = std::vector<std::string>;
   std::map<std::string, std::function<std::string(const Args&)>> cmds = {
@@ -91,7 +92,7 @@ int main(int argc, char** argv) {
       }
       game = open_spiel::LoadGame(args[0]);
       state = game->NewInitialState();
-      bot = MakeBot(*game, &evaluator);
+      bot = MakeBot(*game, evaluator);
       return Success(game->ToString());
     }},
     {"boardsize", [&bot, &game, &state, &evaluator](const Args& args) {
@@ -109,7 +110,7 @@ int main(int argc, char** argv) {
       params["board_size"] = open_spiel::GameParameter(board_size);
       game = open_spiel::LoadGame(game->GetType().short_name, params);
       state = game->NewInitialState();
-      bot = MakeBot(*game, &evaluator);
+      bot = MakeBot(*game, evaluator);
       return Success();
     }},
     {"play", [&bot, &state](const Args& args) {

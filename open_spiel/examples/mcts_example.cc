@@ -50,14 +50,14 @@ uint_fast32_t Seed() {
 
 std::unique_ptr<open_spiel::Bot> InitBot(
     std::string type, const open_spiel::Game& game, open_spiel::Player player,
-    open_spiel::algorithms::Evaluator* evaluator) {
+    std::shared_ptr<open_spiel::algorithms::Evaluator> evaluator) {
   if (type == "random") {
     return open_spiel::MakeUniformRandomBot(player, Seed());
   }
 
   if (type == "mcts") {
     return std::make_unique<open_spiel::algorithms::MCTSBot>(
-        game, evaluator, absl::GetFlag(FLAGS_uct_c),
+        game, std::move(evaluator), absl::GetFlag(FLAGS_uct_c),
         absl::GetFlag(FLAGS_max_simulations),
         absl::GetFlag(FLAGS_max_memory_mb), absl::GetFlag(FLAGS_solve), Seed(),
         absl::GetFlag(FLAGS_verbose));
@@ -149,12 +149,13 @@ int main(int argc, char** argv) {
   // 2-player games.
   SPIEL_CHECK_TRUE(game->NumPlayers() <= 2);
 
-  open_spiel::algorithms::RandomRolloutEvaluator evaluator(
-      absl::GetFlag(FLAGS_rollout_count), Seed());
+  auto evaluator =
+      std::make_shared<open_spiel::algorithms::RandomRolloutEvaluator>(
+          absl::GetFlag(FLAGS_rollout_count), Seed());
 
   std::vector<std::unique_ptr<open_spiel::Bot>> bots;
-  bots.push_back(InitBot(absl::GetFlag(FLAGS_player1), *game, 0, &evaluator));
-  bots.push_back(InitBot(absl::GetFlag(FLAGS_player2), *game, 1, &evaluator));
+  bots.push_back(InitBot(absl::GetFlag(FLAGS_player1), *game, 0, evaluator));
+  bots.push_back(InitBot(absl::GetFlag(FLAGS_player2), *game, 1, evaluator));
 
   std::vector<std::string> initial_actions;
   for (int i = 1; i < positional_args.size(); ++i) {

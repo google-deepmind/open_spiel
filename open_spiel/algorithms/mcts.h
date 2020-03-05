@@ -139,14 +139,21 @@ struct SearchNode {
 // A SpielBot that uses the MCTS algorithm as its policy.
 class MCTSBot : public Bot {
  public:
+  // The evaluator is passed as a shared pointer to make it explicit that
+  // the same evaluator instance can be passed to multiple bots and to
+  // make the MCTSBot Python interface work regardless of the scope of the
+  // Python evaluator object.
   MCTSBot(
-      const Game& game, Evaluator* evaluator, double uct_c,
+      const Game& game,
+      std::shared_ptr<Evaluator> evaluator,
+      double uct_c,
       int max_simulations,
       int64_t max_memory_mb,  // Max memory use in megabytes.
       bool solve,             // Whether to back up solved states.
       int seed, bool verbose,
       ChildSelectionPolicy child_selection_policy = ChildSelectionPolicy::UCT,
-      double dirichlet_alpha = 0, double dirichlet_epsilon = 0);
+      double dirichlet_alpha = 0,
+      double dirichlet_epsilon = 0);
   ~MCTSBot() = default;
 
   void Restart() override {}
@@ -194,7 +201,7 @@ class MCTSBot : public Bot {
   double dirichlet_epsilon_;
   std::mt19937 rng_;
   const ChildSelectionPolicy child_selection_policy_;
-  Evaluator* evaluator_;
+  std::shared_ptr<Evaluator> evaluator_;
 };
 
 // Returns a vector of noise sampled from a dirichlet distribution. See:
