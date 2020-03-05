@@ -26,6 +26,7 @@
 #include "open_spiel/algorithms/tabular_exploitability.h"
 #include "open_spiel/algorithms/tensor_game_utils.h"
 #include "open_spiel/algorithms/trajectories.h"
+#include "open_spiel/canonical_game_strings.h"
 #include "open_spiel/game_transforms/normal_form_extensive_game.h"
 #include "open_spiel/game_transforms/turn_based_simultaneous_game.h"
 #include "open_spiel/games/efg_game.h"
@@ -583,8 +584,8 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("record_batch",
            &open_spiel::algorithms::TrajectoryRecorder::RecordBatch);
 
-  m.def("hulh_game_string", &open_spiel::universal_poker::HulhGameString);
-  m.def("hunl_game_string", &open_spiel::universal_poker::HunlGameString);
+  m.def("hulh_game_string", &open_spiel::HulhGameString);
+  m.def("hunl_game_string", &open_spiel::HunlGameString);
   m.def("create_matrix_game",
         py::overload_cast<const std::string&, const std::string&,
                           const std::vector<std::string>&,

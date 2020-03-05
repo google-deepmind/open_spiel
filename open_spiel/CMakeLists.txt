@@ -85,6 +85,8 @@ set (BUILD_TESTING OFF)
 enable_testing()
 
 set (OPEN_SPIEL_CORE_FILES
+  canonical_game_strings.h
+  canonical_game_strings.cc
   game_parameters.h
   game_parameters.cc
   spiel.h
