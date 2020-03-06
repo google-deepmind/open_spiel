@@ -9,6 +9,7 @@ Currently there are two installation methods:
 2.  using `pip install` to build and testing using
     [nox](https://nox.thea.codes/en/stable/). A pip package to install directly
     does not exist yet.
+3.  installing via [Docker](https://www.docker.com).
 
 ## Summary
 
@@ -85,6 +86,15 @@ In a nutshell:
 To make sure OpenSpiel works on the default configurations, we do use the
 `python3` command and not `python` (which still defaults to Python 2 on modern
 Linux versions).
+
+## Installing via Docker
+
+In the top-level directory:
+
+```bash
+docker build -t openspiel .
+docker run openspiel python3 python/examples/matrix_game_example.py
+```
 
 ## Running the first examples
 
