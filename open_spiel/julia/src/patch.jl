@@ -1,3 +1,5 @@
+Base.convert(::Type{CxxWrap.StdLib.SharedPtrAllocated{Evaluator}}, p::CxxWrap.StdLib.SharedPtrAllocated{Evaluator}) = p
+
 Base.print(io::IO, s::CxxWrap.StdLib.StdStringAllocated) = write(io, [reinterpret(UInt8, s[i]) for i in 1:length(s)])
 
 Base.show(io::IO, g::CxxWrap.StdLib.SharedPtrAllocated{Game}) = print(io, to_string(g))

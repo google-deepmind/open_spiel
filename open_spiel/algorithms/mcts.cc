@@ -191,7 +191,7 @@ std::vector<double> dirichlet_noise(int count, double alpha,
   return noise;
 }
 
-MCTSBot::MCTSBot(const Game& game, const std::shared_ptr<Evaluator>& evaluator,
+MCTSBot::MCTSBot(const Game& game, std::shared_ptr<Evaluator> evaluator,
                  double uct_c, int max_simulations, int64_t max_memory_mb,
                  bool solve, int seed, bool verbose,
                  ChildSelectionPolicy child_selection_policy,
