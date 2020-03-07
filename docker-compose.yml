@@ -1,0 +1,8 @@
+version: "3.7"
+
+services:
+  openspiel:
+    build:
+      context: .
+      dockerfile: open_spiel/Dockerfile
+    image: openspiel

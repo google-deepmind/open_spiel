@@ -92,8 +92,7 @@ Linux versions).
 In the top-level directory:
 
 ```bash
-docker build -t openspiel .
-docker run openspiel python3 python/examples/matrix_game_example.py
+docker-compose run openspiel python3 python/examples/matrix_game_example.py
 ```
 
 ## Running the first examples
