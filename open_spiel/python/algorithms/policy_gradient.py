@@ -143,6 +143,7 @@ class PolicyGradient(rl_agent.AbstractAgent):
     assert bool(loss_str) ^ bool(loss_class), "Please provide only one option."
     self._kwargs = locals()
     loss_class = loss_class if loss_class else self._get_loss_class(loss_str)
+    self._loss_class = loss_class
 
     self.player_id = player_id
     self._session = session
@@ -189,15 +190,13 @@ class PolicyGradient(rl_agent.AbstractAgent):
 
     self._savers = []
 
-    used_output_size = 1 if loss_class.__name__ == "BatchA2CLoss" else self._num_actions
-    self._q_values_layer = snt.Linear(
-        output_size=used_output_size, name="q_values_head")
-
     # Add baseline (V) head for A2C.
     if loss_class.__name__ == "BatchA2CLoss":
-      self._baseline = tf.squeeze(self._q_values_layer(torso_out), axis=1)
+      self._baseline_layer = snt.Linear(output_size=1, name="baseline")
+      self._baseline = tf.squeeze(self._baseline_layer(torso_out), axis=1)
     else:
-      # Add q-values head otherwise
+      self._q_values_layer = snt.Linear(
+          output_size=self._num_actions, name="q_values_head")
       self._q_values = self._q_values_layer(torso_out)
 
     # Critic loss
@@ -458,8 +457,12 @@ class PolicyGradient(rl_agent.AbstractAgent):
         *[var.initializer for var in self._net_torso.variables])
     initialization_logit = tf.group(
         *[var.initializer for var in self._policy_logits_layer.variables])
-    initialization_q_val = tf.group(
-        *[var.initializer for var in self._q_values_layer.variables])
+    if self._loss_class.__name__ == "BatchA2CLoss":
+      initialization_baseline_or_q_val = tf.group(
+          *[var.initializer for var in self._baseline_layer.variables])
+    else:
+      initialization_baseline_or_q_val = tf.group(
+          *[var.initializer for var in self._q_values_layer.variables])
     initialization_crit_opt = tf.group(
         *[var.initializer for var in self._critic_optimizer.variables()])
     initialization_pi_opt = tf.group(
@@ -467,12 +470,16 @@ class PolicyGradient(rl_agent.AbstractAgent):
 
     self._session.run(
         tf.group(*[
-            initialization_torso, initialization_logit, initialization_q_val,
-            initialization_crit_opt, initialization_pi_opt
+            initialization_torso, initialization_logit,
+            initialization_baseline_or_q_val, initialization_crit_opt,
+            initialization_pi_opt
         ]))
     self._savers = [("torso", snt.get_saver(self._net_torso)),
                     ("policy_head", snt.get_saver(self._policy_logits_layer))]
-    self._savers.append(("q_values_layer", snt.get_saver(self._q_values_layer)))
+    if self._loss_class.__name__ == "BatchA2CLoss":
+      self._savers.append(("baseline", snt.get_saver(self._baseline_layer)))
+    else:
+      self._savers.append(("q_head", snt.get_saver(self._q_values_layer)))
 
   def copy_with_noise(self, sigma=0.0, copy_weights=True):
     """Copies the object and perturbates its network's weights with noise.
@@ -492,7 +499,10 @@ class PolicyGradient(rl_agent.AbstractAgent):
 
     net_torso = getattr(copied_object, "_net_torso")
     policy_logits_layer = getattr(copied_object, "_policy_logits_layer")
-    q_values_layer = getattr(copied_object, "_q_values_layer")
+    if hasattr(copied_object, "_q_values_layer"):
+      q_values_layer = getattr(copied_object, "_q_values_layer")
+    if hasattr(copied_object, "_baseline_layer"):
+      baseline_layer = getattr(copied_object, "_baseline_layer")
 
     if copy_weights:
       copy_mlp_weights = tf.group(*[
@@ -507,12 +517,18 @@ class PolicyGradient(rl_agent.AbstractAgent):
                             self._policy_logits_layer.variables)
       ])
       self._session.run(copy_logit_weights)
-
-      copy_q_value_weights = tf.group(*[
-          va.assign(vb * (1 + sigma * tf.random.normal(vb.shape))) for va, vb in
-          zip(q_values_layer.variables, self._q_values_layer.variables)
-      ])
-      self._session.run(copy_q_value_weights)
+      if hasattr(copied_object, "_q_values_layer"):
+        copy_q_value_weights = tf.group(*[
+            va.assign(vb * (1 + sigma * tf.random.normal(vb.shape))) for va, vb
+            in zip(q_values_layer.variables, self._q_values_layer.variables)
+        ])
+        self._session.run(copy_q_value_weights)
+      if hasattr(copied_object, "_baseline_layer"):
+        copy_baseline_weights = tf.group(*[
+            va.assign(vb * (1 + sigma * tf.random.normal(vb.shape))) for va, vb
+            in zip(baseline_layer.variables, self._baseline_layer.variables)
+        ])
+        self._session.run(copy_baseline_weights)
 
     for var in getattr(copied_object, "_critic_optimizer").variables():
       self._session.run(var.initializer)
