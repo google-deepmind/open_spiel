@@ -150,7 +150,7 @@ class MCTSBot : public Bot {
   // std::shared_ptr<Evaluator> in the constructor leads to the Julia API test
   // failing. We don't know why right now, but intend to fix this.
   MCTSBot(
-      const Game& game, const std::shared_ptr<Evaluator>& evaluator,
+      const Game& game, std::shared_ptr<Evaluator> evaluator,
       double uct_c, int max_simulations,
       int64_t max_memory_mb,  // Max memory use in megabytes.
       bool solve,             // Whether to back up solved states.
