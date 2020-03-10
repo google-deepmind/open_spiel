@@ -82,13 +82,11 @@ class DynamicsTest(parameterized.TestCase):
         dynamics.boltzmannq(x, payoff, temperature),
         _q_learning_dynamics(x, payoff, temperature))
 
-  def test_rd_rps_fixed_points(self):
+  def test_rd_rps_pure_fixed_points(self):
     game = pyspiel.load_matrix_game('matrix_rps')
     payoff_matrix = game_payoffs_array(game)
     rd = dynamics.replicator
     dyn = dynamics.SinglePopulationDynamics(payoff_matrix, rd)
-
-    # pure equilibria
     x = np.eye(3)
     np.testing.assert_allclose(dyn(x[0]), np.zeros((3,)))
     np.testing.assert_allclose(dyn(x[1]), np.zeros((3,)))
