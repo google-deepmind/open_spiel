@@ -606,8 +606,9 @@ class Game : public std::enable_shared_from_this<Game> {
   // Maximum number of chance outcomes for each chance node.
   virtual int MaxChanceOutcomes() const { return 0; }
 
-  // If the game is parametrizable, returns an object with the current parameter
-  // values, including defaulted values. Returns empty parameters otherwise.
+  // If the game is parameterizable, returns an object with the current
+  // parameter values, including defaulted values. Returns empty parameters
+  // otherwise.
   GameParameters GetParameters() const {
     GameParameters params = game_parameters_;
     params.insert(defaulted_parameters_.begin(), defaulted_parameters_.end());
@@ -622,7 +623,7 @@ class Game : public std::enable_shared_from_this<Game> {
   // values returned by State::PlayerReturn(Player player) over all valid player
   // numbers. This range should be as tight as possible; the intention is to
   // give some information to algorithms that require it, and so their
-  // performance may suffer if the range is not tight. Loss/win/draw outcomes
+  // performance may suffer if the range is not tight. Loss/draw/win outcomes
   // are common among games and should use the standard values of {-1,0,1}.
   virtual double MinUtility() const = 0;
   virtual double MaxUtility() const = 0;
@@ -653,7 +654,7 @@ class Game : public std::enable_shared_from_this<Game> {
     return TensorLayout::kCHW;
   }
 
-  // The size of (flat) vector needed for the information state tensor-like
+  // The size of the (flat) vector needed for the information state tensor-like
   // format.
   int InformationStateTensorSize() const {
     std::vector<int> shape = InformationStateTensorShape();
@@ -674,7 +675,7 @@ class Game : public std::enable_shared_from_this<Game> {
     return TensorLayout::kCHW;
   }
 
-  // The size of (flat) vector needed for the observation tensor-like
+  // The size of the (flat) vector needed for the observation tensor-like
   // format.
   int ObservationTensorSize() const {
     std::vector<int> shape = ObservationTensorShape();
@@ -693,17 +694,15 @@ class Game : public std::enable_shared_from_this<Game> {
 
   // Returns a newly allocated state built from a string. Caller takes ownership
   // of the state.
-
-  // Build a state from a string.
   //
   // The default implementation assumes a sequence of actions, one per line,
   // that is taken from the initial state.
   //
-  // If this method is overridden, then it should be inverse of
-  // Game::SerializeState (i.e. it should also be overridden).
+  // If this method is overridden, then it should be the inverse of
+  // Game::SerializeState (i.e. that method should also be overridden).
   virtual std::unique_ptr<State> DeserializeState(const std::string& str) const;
 
-  // Maximum length of any one game (in terms of number of decision nodes
+  // The maximum length of any one game (in terms of number of decision nodes
   // visited in the game tree). For a simultaneous action game, this is the
   // maximum number of joint decisions. In a turn-based game, this is the
   // maximum number of individual decisions summed over all players. Outcomes
