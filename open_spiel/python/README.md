@@ -1,10 +1,8 @@
 # Open Spiel Python API
 
-This is a Python API for [Open Spiel](/third_party/open_spiel/README.md).
+This is a Python API for OpenSpiel.
 
-An example run of Pig via the Python API:
+See `python/examples/example.py` for an example use and overview of the API, and
+the main OpenSpiel installation instructions to see how to run this example.
 
-```
-blaze build :example
-../../../blaze-bin/third_party/open_spiel/python/example --game=pig
-```
+For the full API specification, please see `python/pybind11/pyspiel.cc`.
