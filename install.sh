@@ -58,11 +58,15 @@ fi
   git clone -b 'develop' --single-branch --depth 1 https://github.com/jblespiau/dds.git  \
   open_spiel/games/bridge/double_dummy_solver
 
-# `master` is a moving branch, but we never had issues. Let's use it and
-# checkout a specific commit only if an issue occur one day.
-[[ -d open_spiel/abseil-cpp ]] || \
-  git clone -b 'master' --single-branch --depth 1 https://github.com/abseil/abseil-cpp.git \
-  open_spiel/abseil-cpp
+# `master` is a moving branch, and we recently ran into a problem where a change
+# in abseil broke OpenSpiel's build. Hence, we fix to a specific commit for now.
+# We can remove this once we fix the error.
+if [[ ! -d open_spiel/abseil-cpp ]]; then
+  git clone -b 'master' --single-branch --depth 15 https://github.com/abseil/abseil-cpp.git open_spiel/abseil-cpp
+  pushd open_spiel/abseil-cpp
+  git checkout '40a0e58'
+  popd
+fi
 
 # Optional dependencies.
 DIR="open_spiel/games/hanabi/hanabi-learning-environment"
