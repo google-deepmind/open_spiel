@@ -29,8 +29,8 @@ RUN pip3 install --upgrade cmake
 RUN mkdir -p build
 WORKDIR /repo/build
 RUN cmake -DPython_TARGET_VERSION=${PYVERSION} -DCMAKE_CXX_COMPILER=`which clang++` ../open_spiel 
-RUN make -j12
-RUN ctest -j12
+RUN make -j2
+RUN ctest -j2
 ENV PYTHONPATH=${PYTHONPATH}:/repo
 ENV PYTHONPATH=${PYTHONPATH}:/repo/build/python
 WORKDIR /repo/open_spiel
