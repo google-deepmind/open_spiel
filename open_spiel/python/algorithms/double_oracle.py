@@ -104,13 +104,18 @@ class DoubleOracleSolver(object):
     ]
     return best_response, best_response_utility
 
-  def solve(self, initial_strategies=None, max_steps=20, tolerance=1e-8):
+  def solve(self,
+            initial_strategies=None,
+            max_steps=20,
+            tolerance=5e-5,
+            verbose=True):
     """Solves the game using the Double Oracle algorithm.
 
     Args:
       initial_strategies: List of pure strategies for both players, optional.
-      max_steps: Maximum number of iterations, default 20.
+      max_steps: Maximum number of iterations, default: 20.
       tolerance: Stop if the estimated value of the game is below the tolerance.
+      verbose: If False, no warning is shown, default: True.
 
     Returns:
       solution: Policies for both players.
@@ -122,9 +127,19 @@ class DoubleOracleSolver(object):
     iteration = 0
     while iteration < max_steps:
       iteration += 1
+      last_subgame_size = lens(self.subgame_strategies)
       _, best_response_utility = self.step()
       value = sum(best_response_utility)
       if abs(value) < tolerance:
+        if verbose:
+          print("Last iteration={}; value below tolerance {} < {}."
+                .format(iteration, value, tolerance))
+        break
+      if lens(self.subgame_strategies) == last_subgame_size:
+        if verbose:
+          print(
+              "Last iteration={}; no strategies added, increase tolerance={} or check subgame solver."
+              .format(iteration, tolerance))
         break
 
     # Compute subgame solution and return solution in original strategy space.
