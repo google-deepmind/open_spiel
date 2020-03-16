@@ -89,11 +89,30 @@ Linux versions).
 
 ## Installing via Docker
 
-In the top-level directory:
+Option 1 (Basic, 3.13GB):
 
 ```bash
-docker build -t openspiel .
+docker build --target base -t openspiel . --rm
+```
+
+Option 2 (Slim, 2.26GB):
+
+```bash
+docker build --target python-slim -t openspiel . --rm
+```
+
+If you are only interested in developing in Python, use the second image. You
+can navigate through the runtime of the container (after the build step) with:
+
+```bash
+docker run -it --entrypoint /bin/bash openspiel
+```
+
+Finally you can run examples using:
+
+```bash
 docker run openspiel python3 python/examples/matrix_game_example.py
+docker run openspiel python3 python/examples/example.py
 ```
 
 ## Running the first examples
