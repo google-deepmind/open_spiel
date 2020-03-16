@@ -40,7 +40,7 @@ std::unique_ptr<open_spiel::Bot> MakeBot(
     const open_spiel::Game& game,
     std::shared_ptr<open_spiel::algorithms::Evaluator> evaluator) {
   return std::make_unique<open_spiel::algorithms::MCTSBot>(
-      game, evaluator, /*uct_c=*/2, /*max_simulations=*/1000,
+      game, std::move(evaluator), /*uct_c=*/2, /*max_simulations=*/1000,
       /*max_memory_mb=*/0, /*solve=*/true, /*seed=*/0, /*verbose=*/false);
 }
 

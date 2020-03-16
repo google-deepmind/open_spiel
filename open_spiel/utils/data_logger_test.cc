@@ -24,14 +24,9 @@
 namespace open_spiel {
 namespace {
 
-std::string GetEnv(const std::string& key, const std::string& default_value) {
-    char* val = getenv(key.c_str());
-    return ((val != nullptr) ? std::string(val) : default_value);
-}
-
 void TestDataLogger() {
   std::string val = std::to_string(std::rand());  // NOLINT
-  std::string tmp_dir = GetEnv("TMPDIR", "/tmp");
+  std::string tmp_dir = file::GetTmpDir();
   std::string dir = tmp_dir + "/open_spiel-test-" + val;
   std::string filename = dir + "/data-test.jsonl";
 

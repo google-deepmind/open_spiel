@@ -43,6 +43,13 @@
 #include "pybind11/include/pybind11/pybind11.h"
 #include "pybind11/include/pybind11/stl.h"
 
+// This file contains OpenSpiel's Python API. The best place to see an overview
+// of the API is to refer to python/examples/example.py. Generally, all the core
+// functions are exposed as snake case in Python (i.e. CurrentPlayer becomes
+// current_player, ApplyAction becomes apply_action, etc.) but otherwise the
+// functions and their effect remain the same. For a more detailed documentation
+// of each of the core API functions, please see spiel.h.
+
 namespace open_spiel {
 namespace {
 

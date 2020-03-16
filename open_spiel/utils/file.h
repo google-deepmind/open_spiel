@@ -60,6 +60,9 @@ bool Mkdir(const std::string& path, int mode = 0755);  // Make a directory.
 bool Mkdirs(const std::string& path, int mode = 0755);  // Mkdir recursively.
 bool Remove(const std::string& path);  // Remove/delete the file/directory.
 
+std::string GetEnv(const std::string& key, const std::string& default_value);
+std::string GetTmpDir();
+
 }  // namespace open_spiel::file
 
 #endif  // THIRD_PARTY_OPEN_SPIEL_UTILS_FILE_H_
