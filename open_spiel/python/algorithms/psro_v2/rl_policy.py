@@ -23,6 +23,7 @@ different types of oracles.
 from open_spiel.python import policy
 from open_spiel.python.algorithms import dqn
 from open_spiel.python.algorithms import policy_gradient
+from open_spiel.python.algorithms import ars
 
 
 def rl_policy_factory(rl_class):
@@ -129,4 +130,5 @@ def rl_policy_factory(rl_class):
 # pylint: disable=invalid-name
 PGPolicy = rl_policy_factory(policy_gradient.PolicyGradient)
 DQNPolicy = rl_policy_factory(dqn.DQN)
+ARSPolicy = rl_policy_factory(ars.ARS)
 # pylint: enable=invalid-name

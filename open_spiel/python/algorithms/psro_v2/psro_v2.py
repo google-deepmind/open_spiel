@@ -341,12 +341,9 @@ class PSROSolver(abstract_meta_trainer.AbstractMetaTrainer):
         training_parameters[current_player].append(new_parameter)
 
     # List of List of new policies (One list per player)
-    self._new_policies = self._oracle(
-        self._game,
-        training_parameters,
-        strategy_sampler=sample_strategy,
-        using_joint_strategies=self._rectify_training or
-        not self.sample_from_marginals)
+    self.oracle = self._oracle(self._game, training_parameters, strategy_sampler=sample_strategy,
+                               using_joint_strategies=self._rectify_training or not self.sample_from_marginals)
+    self._new_policies = self.oracle
 
   def update_empirical_gamestate(self, seed=None):
     """Given new agents in _new_policies, update meta_games through simulations.

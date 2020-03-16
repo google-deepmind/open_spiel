@@ -8,6 +8,7 @@ import numpy as np
 
 from open_spiel.python import rl_agent
 
+
 Transition = collections.namedtuple(
     "Transition", "info_state action reward discount legal_actions_mask")
 
@@ -36,25 +37,28 @@ class Normalizer():
 def softmax(x):
     return np.exp(x)/np.sum(np.exp(x))
 
+# TODO: clean the unused params.
 class ARS(rl_agent.AbstractAgent):
     def __init__(self,
+                 session,
                  player_id,
                  info_state_size,
                  num_actions,
-                 nb_steps,
-                 episode_length,
-                 learning_rate,
-                 nb_directions,
-                 nb_best_directions,
-                 noise,
-                 seed,
-                 v2=True
+                 nb_steps=1000,
+                 episode_length=1000,
+                 learning_rate=0.02,
+                 nb_directions=16,
+                 nb_best_directions=16,
+                 noise=0.03,
+                 seed=123,
+                 additional_discount_factor=1.0,
+                 v2=False
                  ):
 
         super(ARS, self).__init__(player_id)
         self._kwargs = locals()
 
-        self._player_id = player_id
+        self.player_id = player_id
         self._info_state_size = info_state_size
         self._num_actions = num_actions
         self._nb_steps = nb_steps
@@ -65,12 +69,16 @@ class ARS(rl_agent.AbstractAgent):
         assert self._nb_best_directions <= self._nb_directions
         self._noise = noise
         self._seed = seed
+        self._extra_discount = additional_discount_factor
         self.v2 = v2
 
         if self.v2:
-            self.normalizer = Normalizer(self._num_actions)
+            self.normalizer = Normalizer(self._info_state_size)
 
+        self._episode_data = []
         self._dataset = collections.defaultdict(list)
+        self._prev_time_step = None
+        self._prev_action = None
 
         # The index of current policy.
         self._current_policy_idx = -1
@@ -78,8 +86,12 @@ class ARS(rl_agent.AbstractAgent):
         # If all directions have been evaluated.
         self._done = False
 
-        # Initialize the policy parameters.
+        # Initialize the policy.
+        # TODO: Initial theta could follow Gaussian Distribution.
         self.theta = np.zeros((self._num_actions, self._info_state_size))
+        self.sample_deltas()
+        self.deltas_iterator()
+
 
 
     def _act(self, info_state, legal_actions):
@@ -130,7 +142,6 @@ class ARS(rl_agent.AbstractAgent):
                 else:
                     raise ValueError("Number of directions tried beyond scope.")
 
-                #TODO: check the order of these two.
                 self.deltas_iterator()
                 if self._done:
                     self._pi_update()
@@ -151,7 +162,6 @@ class ARS(rl_agent.AbstractAgent):
         self._neg_rew = [None] * self._nb_directions
         self._deltas_idx = 0
 
-    #TODO: consider which direction is the best?
     def deltas_iterator(self):
         direction = self._deltas_idx // self._nb_directions
         if direction == 0:

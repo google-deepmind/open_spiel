@@ -19,6 +19,7 @@ import numpy as np
 
 from open_spiel.python.algorithms import lp_solver
 from open_spiel.python.algorithms import projected_replicator_dynamics
+from open_spiel.python.algorithms.nash_solver import general_nash_solver as gs
 import pyspiel
 
 
@@ -146,6 +147,38 @@ def nash_strategy(solver, return_joint=False):
   else:
     joint_strategies = get_joint_strategy_from_marginals(result)
     return result, joint_strategies
+
+#TODO: Test this sovler with PSRO.
+def general_nash_strategy(solver, return_joint=False, NE_solver="gambit", mode='one'):
+  """Returns nash distribution on meta game matrix.
+
+    This method works for general-sum multi-player games.
+
+    Args:
+      solver: GenPSROSolver instance.
+      return_joint: If true, only returns marginals. Otherwise marginals as well
+        as joint probabilities.
+      NE_solver: Tool for finding a NE.
+      mode: Return one or all or pure NE.
+
+    Returns:
+      Nash distribution on strategies.
+    """
+  meta_games = solver.get_meta_game()
+  if not isinstance(meta_games, list):
+    meta_games = [meta_games, -meta_games]
+  equilibria = gs.nash_solver(meta_games, solver=NE_solver, mode=mode)
+
+  if not return_joint:
+    return equilibria
+  else:
+    if len(equilibria) == 1:
+      joint_strategies = get_joint_strategy_from_marginals(equilibria)
+      return equilibria, joint_strategies
+    else:
+      # If multiple NE exist, return a list with joint strategies.
+      joint_strategies_list = [get_joint_strategy_from_marginals([ne]) for ne in equilibria]
+      return equilibria, joint_strategies_list
 
 
 def prd_strategy(solver, return_joint=False):
