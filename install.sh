@@ -51,6 +51,10 @@ if [ $GIT_IS_AVAILABLE -ne 0 ]; then #...
   fi
 fi
 
+# For the external dependencies, we use fixed releases for the repositories that
+# the OpenSpiel team do not control.
+# Feel free to upgrade the version after having checked it works.
+
 [[ -d "./pybind11" ]] || git clone -b 'v2.2.4' --single-branch --depth 1 https://github.com/pybind/pybind11.git
 # The official https://github.com/dds-bridge/dds.git seems to not accept PR,
 # so we have forked it.
@@ -58,14 +62,8 @@ fi
   git clone -b 'develop' --single-branch --depth 1 https://github.com/jblespiau/dds.git  \
   open_spiel/games/bridge/double_dummy_solver
 
-# `master` is a moving branch, and we recently ran into a problem where a change
-# in abseil broke OpenSpiel's build. Hence, we fix to a specific commit for now.
-# We can remove this once we fix the error.
 if [[ ! -d open_spiel/abseil-cpp ]]; then
-  git clone -b 'master' --single-branch --depth 15 https://github.com/abseil/abseil-cpp.git open_spiel/abseil-cpp
-  pushd open_spiel/abseil-cpp
-  git checkout '40a0e58'
-  popd
+  git clone -b '20200225.1' --single-branch --depth 1 https://github.com/abseil/abseil-cpp.git open_spiel/abseil-cpp
 fi
 
 # Optional dependencies.
@@ -73,6 +71,8 @@ DIR="open_spiel/games/hanabi/hanabi-learning-environment"
 if [[ ${BUILD_WITH_HANABI:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; then
   git clone -b 'master' --single-branch --depth 15 https://github.com/deepmind/hanabi-learning-environment.git ${DIR}
   # We checkout a specific CL to prevent future breakage due to changes upstream
+  # The repository is very infrequently updated, thus the last 15 commits should
+  # be ok for a long time.
   pushd ${DIR}
   git checkout  'b31c973'
   popd
