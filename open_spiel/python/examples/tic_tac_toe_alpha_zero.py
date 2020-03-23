@@ -70,13 +70,10 @@ flags.DEFINE_integer(
     ("The current net will be evaluated against a minimax player every "
      "evaluation_frequency rounds."))
 
-flags.DEFINE_string(
-    "net_type", "mlp",
-    "The type of network to use. Can be either 'mlp' or 'resnet.")
-
-flags.DEFINE_string(
-    "device", "cpu",
-    "Device to evaluate neural nets on. Can be 'cpu', 'tpu' or 'gpu'.")
+flags.DEFINE_enum("nn_model", "resnet", model_lib.Model.valid_model_types,
+                  "What type of model should be used?.")
+flags.DEFINE_integer("nn_width", 2 ** 7, "How wide should the network be.")
+flags.DEFINE_integer("nn_depth", 2, "How deep should the network be.")
 
 
 class MinimaxBot(pyspiel.Bot):
@@ -111,27 +108,18 @@ def bot_evaluation(game, bots, num_evaluations):
 
 def main(_):
   game = pyspiel.load_game("tic_tac_toe")
-  num_actions = game.num_distinct_actions()
-  observation_shape = game.observation_tensor_shape()
 
-  # 1. Define a keras net
-  if FLAGS.net_type == "resnet":
-    net = model_lib.keras_resnet(
-        observation_shape, num_actions, num_residual_blocks=1, num_filters=256,
-        data_format="channels_first")
-  elif FLAGS.net_type == "mlp":
-    net = model_lib.keras_mlp(
-        observation_shape, num_actions, num_layers=2, num_hidden=64)
-  else:
-    raise ValueError(("Invalid value for 'net_type'. Must be either 'mlp' or "
-                      "'resnet', but was %s") % FLAGS.net_type)
-
+  # 1. Define a model
   model = model_lib.Model(
-      net, l2_regularization=1e-4, learning_rate=0.01, device=FLAGS.device)
+      FLAGS.nn_model, game.observation_tensor_shape(),
+      game.num_distinct_actions(), nn_width=FLAGS.nn_width,
+      nn_depth=FLAGS.nn_depth, weight_decay=1e-4, learning_rate=0.01, path=None)
+  print("Model type: {}({}, {}), size: {} variables".format(
+      FLAGS.nn_model, FLAGS.nn_width, FLAGS.nn_depth,
+      model.num_trainable_variables))
 
-  # 2. Create an MCTS bot using the previous keras net
+  # 2. Create an MCTS bot using the model
   evaluator = evaluator_lib.AlphaZeroEvaluator(game, model)
-
   bot = mcts.MCTSBot(game,
                      1.,
                      20,

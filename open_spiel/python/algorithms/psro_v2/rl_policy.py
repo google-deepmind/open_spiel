@@ -21,6 +21,7 @@ different types of oracles.
 """
 
 from open_spiel.python import policy
+from open_spiel.python import rl_environment
 from open_spiel.python.algorithms import dqn
 from open_spiel.python.algorithms import policy_gradient
 from open_spiel.python.algorithms import ars
@@ -52,7 +53,7 @@ def rl_policy_factory(rl_class):
       game = env.game
 
       super(RLPolicy, self).__init__(game, player_id)
-      self._policy = rl_class(player_id, **kwargs)
+      self._policy = rl_class(**{"player_id": player_id, **kwargs})
 
       self._frozen = False
       self._rl_class = rl_class
@@ -70,8 +71,33 @@ def rl_policy_factory(rl_class):
       cur_player = state.current_player()
       legal_actions = state.legal_actions(cur_player)
 
-      # Presupposes that the state comes from `self._env`.
-      time_step = self.get_time_step()
+      cur_player = state.current_player()
+      legal_actions = state.legal_actions(cur_player)
+
+      cur_player = state.current_player()
+      legal_actions = state.legal_actions(cur_player)
+
+      step_type = rl_environment.StepType.LAST if state.is_terminal(
+      ) else rl_environment.StepType.MID
+
+      self._obs["current_player"] = cur_player
+      self._obs["info_state"][cur_player] = (
+          state.information_state_tensor(cur_player))
+      self._obs["legal_actions"][cur_player] = legal_actions
+
+      # pylint: disable=protected-access
+      rewards = state.rewards()
+      if rewards:
+        time_step = rl_environment.TimeStep(
+            observations=self._obs, rewards=rewards,
+            discounts=self._env._discounts, step_type=step_type)
+      else:
+        rewards = [0] * self._num_players
+        time_step = rl_environment.TimeStep(
+            observations=self._obs, rewards=rewards,
+            discounts=self._env._discounts,
+            step_type=rl_environment.StepType.FIRST)
+      # pylint: enable=protected-access
 
       # pylint: enable=protected-access
       p = self._policy.step(time_step, is_evaluation=True).probs
