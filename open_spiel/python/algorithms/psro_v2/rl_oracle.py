@@ -77,9 +77,6 @@ class RLOracle(optimization_oracle.AbstractOracle):
   def __init__(self,
                env,
                best_response_class,
-               session,
-               info_state_size,
-               num_actions,
                best_response_kwargs,
                number_training_episodes=1e3,
                self_play_proportion=0.0,
@@ -89,9 +86,6 @@ class RLOracle(optimization_oracle.AbstractOracle):
     Args:
       env: rl_environment instance.
       best_response_class: class of the best response.
-      session: Tensorflow session.
-      info_state_size: Shape of the info states.
-      num_actions: The number of actions to specify.
       best_response_kwargs: kwargs of the best response.
       number_training_episodes: (Minimal) number of training episodes to run
         each best response through. May be higher for some policies.
@@ -103,9 +97,6 @@ class RLOracle(optimization_oracle.AbstractOracle):
     self._env = env
 
     self._best_response_class = best_response_class
-    self._session = session
-    self._info_state_size = info_state_size
-    self._num_actions = num_actions
     self._best_response_kwargs = best_response_kwargs
 
     self._self_play_proportion = self_play_proportion
@@ -233,9 +224,7 @@ class RLOracle(optimization_oracle.AbstractOracle):
         if isinstance(current_pol, self._best_response_class):
           new_pol = current_pol.copy_with_noise(self._kwargs.get("sigma", 0.0))
         else:
-          new_pol = self._best_response_class(self._env, self._session, player,
-                                              self._info_state_size,
-                                              self._num_actions,
+          new_pol = self._best_response_class(self._env, player,
                                               **self._best_response_kwargs)
         new_pols.append(new_pol)
       new_policies.append(new_pols)

@@ -29,7 +29,11 @@ import time
 from absl import app
 from absl import flags
 import numpy as np
+
+# pylint: disable=g-bad-import-order
+import pyspiel
 import tensorflow.compat.v1 as tf
+# pylint: enable=g-bad-import-order
 
 from open_spiel.python import policy
 from open_spiel.python import rl_environment
@@ -41,7 +45,6 @@ from open_spiel.python.algorithms.psro_v2 import psro_v2
 from open_spiel.python.algorithms.psro_v2 import rl_oracle
 from open_spiel.python.algorithms.psro_v2 import rl_policy
 from open_spiel.python.algorithms.psro_v2 import strategy_selectors
-import pyspiel
 
 
 FLAGS = flags.FLAGS
@@ -119,6 +122,9 @@ def init_pg_responder(sess, env):
   agent_class = rl_policy.PGPolicy
 
   agent_kwargs = {
+      "session": sess,
+      "info_state_size": info_state_size,
+      "num_actions": num_actions,
       "loss_str": FLAGS.loss_str,
       "loss_class": False,
       "hidden_layers_sizes": [FLAGS.hidden_layer_size] * FLAGS.n_hidden_layers,
@@ -132,9 +138,6 @@ def init_pg_responder(sess, env):
   oracle = rl_oracle.RLOracle(
       env,
       agent_class,
-      sess,
-      info_state_size,
-      num_actions,
       agent_kwargs,
       number_training_episodes=FLAGS.number_training_episodes,
       self_play_proportion=FLAGS.self_play_proportion,
@@ -143,10 +146,7 @@ def init_pg_responder(sess, env):
   agents = [
       agent_class(  # pylint: disable=g-complex-comprehension
           env,
-          sess,
           player_id,
-          info_state_size,
-          num_actions,
           **agent_kwargs)
       for player_id in range(FLAGS.n_players)
   ]
@@ -166,11 +166,14 @@ def init_br_responder(env):
 
 def init_dqn_responder(sess, env):
   """Initializes the Policy Gradient-based responder and agents."""
-  info_state_size = env.observation_spec()["info_state"][0]
+  state_representation_size = env.observation_spec()["info_state"][0]
   num_actions = env.action_spec()["num_actions"]
 
   agent_class = rl_policy.DQNPolicy
   agent_kwargs = {
+      "session": sess,
+      "state_representation_size": state_representation_size,
+      "num_actions": num_actions,
       "hidden_layers_sizes": [FLAGS.hidden_layer_size] * FLAGS.n_hidden_layers,
       "batch_size": FLAGS.batch_size,
       "learning_rate": FLAGS.dqn_learning_rate,
@@ -181,9 +184,6 @@ def init_dqn_responder(sess, env):
   oracle = rl_oracle.RLOracle(
       env,
       agent_class,
-      sess,
-      info_state_size,
-      num_actions,
       agent_kwargs,
       number_training_episodes=FLAGS.number_training_episodes,
       self_play_proportion=FLAGS.self_play_proportion,
@@ -192,10 +192,7 @@ def init_dqn_responder(sess, env):
   agents = [
       agent_class(  # pylint: disable=g-complex-comprehension
           env,
-          sess,
           player_id,
-          info_state_size,
-          num_actions,
           **agent_kwargs)
       for player_id in range(FLAGS.n_players)
   ]
@@ -248,17 +245,6 @@ def gpsro_looper(env, oracle, agents):
   sample_from_marginals = True  # TODO(somidshafiei) set False for alpharank
   training_strategy_selector = FLAGS.training_strategy_selector or strategy_selectors.probabilistic_strategy_selector
 
-  if FLAGS.meta_strategy_method == "alpharank":
-    # TODO(somidshafiei): Implement epsilon-sweep for Openspiel alpharank.
-    print("\n")
-    print("==================================================================\n"
-          "============================ Warning =============================\n"
-          "==================================================================\n"
-         )
-    print("Selected alpharank. Warning : Current alpharank version is unstable."
-          " It can raise errors because of infinite / nans elements in arrays. "
-          "A fix should be uploaded in upcoming openspiel iterations.")
-    print("\n")
   g_psro_solver = psro_v2.PSROSolver(
       env.game,
       oracle,
