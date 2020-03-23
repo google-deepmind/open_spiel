@@ -208,6 +208,6 @@ def prd_strategy(solver, return_joint=False):
 META_STRATEGY_METHODS = {
     "uniform_biased": uniform_biased_strategy,
     "uniform": uniform_strategy,
-    "nash": nash_strategy,
+    "nash": general_nash_strategy,
     "prd": prd_strategy,
 }

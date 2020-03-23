@@ -25,7 +25,7 @@ The other parameters keeping their default values.
 """
 
 import time
-
+import os
 from absl import app
 from absl import flags
 import numpy as np
@@ -33,7 +33,8 @@ import numpy as np
 # pylint: disable=g-bad-import-order
 import pyspiel
 import tensorflow.compat.v1 as tf
-# pylint: enable=g-bad-import-order
+from tensorboardX import SummaryWriter
+import logging
 
 from open_spiel.python import policy
 from open_spiel.python import rl_environment
@@ -54,7 +55,7 @@ flags.DEFINE_string("game_name", "kuhn_poker", "Game name.")
 flags.DEFINE_integer("n_players", 2, "The number of players.")
 
 # PSRO related
-flags.DEFINE_string("meta_strategy_method", "alpharank",
+flags.DEFINE_string("meta_strategy_method", "nash",
                     "Name of meta strategy computation method.")
 flags.DEFINE_integer("number_policies_selected", 1,
                      "Number of new strategies trained at each PSRO iteration.")
@@ -66,6 +67,7 @@ flags.DEFINE_integer("gpsro_iterations", 100,
                      "Number of training steps for GPSRO.")
 flags.DEFINE_bool("symmetric_game", False, "Whether to consider the current "
                   "game as a symmetric game.")
+flags.DEFINE_bool("quiesce",False,"Whether to use quiece")
 
 # Rectify options
 flags.DEFINE_string("rectifier", "",
@@ -258,6 +260,7 @@ def gpsro_looper(env, oracle, agents):
       prd_gamma=1e-10,
       sample_from_marginals=sample_from_marginals,
       symmetric_game=FLAGS.symmetric_game)
+      nash_solver_path=FLAGS.nash_solver_path)
 
   start_time = time.time()
   for gpsro_iteration in range(FLAGS.gpsro_iterations):
@@ -296,7 +299,7 @@ def main(argv):
                                          {"players": pyspiel.GameParameter(
                                              FLAGS.n_players)})
   env = rl_environment.Environment(game)
-
+  
   # Initialize oracle and agents
   with tf.Session() as sess:
     if FLAGS.oracle_type == "DQN":

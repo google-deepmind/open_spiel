@@ -41,7 +41,8 @@ def load_pkl(path):
     return result
 
 # Path that saves the payoff matrix for gamebit.
-gambit_DIR = os.getcwd() + '/nfg/payoffmatrix.nfg'
+gambit_DIR = os.path.dirname(os.path.realpath(__file__)) + '/nfg'
+gambit_NFG = gambit_DIR + '/payoffmatrix.nfg'
 
 # This functions help to translate meta_games into gambit nfg.
 def product(shape, axes):
@@ -59,7 +60,7 @@ def encode_gambit_file(meta_games):
     """
     num_players = len(meta_games)
     # Write header
-    with open(gambit_DIR, "w") as nfgFile:
+    with open(gambit_NFG, "w") as nfgFile:
         nfgFile.write('NFG 1 R "Empirical Game"\n')
         name_players = '{ "p1"'
         for i in range(2,num_players+1):
@@ -86,9 +87,9 @@ def gambit_analysis(timeout, method="gnm"):
     :param timeout: Maximum time for the subprocess.
     :param method: The gamebit command line method.
     """
-    if not isExist(gambit_DIR):
+    if not isExist(gambit_NFG):
         raise ValueError(".nfg file does not exist!")
-    command_str = "gambit-" + method + " -q " + os.getcwd() + "/nfg/payoffmatrix.nfg -d 8 > " + os.getcwd() + "/nfg/nash.txt"
+    command_str = "gambit-" + method + " -q " + gambit_NFG + " -d 8 > " + gambit_DIR + "/nash.txt"
     subproc.call_and_wait_with_timeout(command_str, timeout)
 
 def gambit_analysis_pure(timeout, method="enumpure"):
@@ -96,9 +97,9 @@ def gambit_analysis_pure(timeout, method="enumpure"):
     Call a subprocess and run gambit to find pure NE.
     :param timeout: Maximum time for the subprocess.
     """
-    if not isExist(gambit_DIR):
+    if not isExist(gambit_NFG):
         raise ValueError(".nfg file does not exist!")
-    command_str = "gambit-" + method + " -q " + os.getcwd() + "/nfg/payoffmatrix.nfg > " + os.getcwd() + "/nfg/nash.txt"
+    command_str = "gambit-" + method + " -q " + gambit_NFG + " > " + gambit_DIR + "/nash.txt"
     subproc.call_and_wait_with_timeout(command_str, timeout)
 
 def decode_gambit_file(meta_games, mode="all", max_num_nash=10):
@@ -109,7 +110,7 @@ def decode_gambit_file(meta_games, mode="all", max_num_nash=10):
     :param max_num_nash: the number of NE considered to return
     :return: a list of NE
     """
-    nash_DIR = os.getcwd() + '/nfg/nash.txt'
+    nash_DIR = gambit_DIR + '/nash.txt'
     if not isExist(nash_DIR):
         raise ValueError("nash.txt file does not exist!")
     num_lines = file_len(nash_DIR)
@@ -171,7 +172,7 @@ def do_gambit_analysis(meta_games, mode, timeout = 600, method="gnm", method_pur
         else:
             gambit_analysis(timeout, method)
         # If there is no pure NE, find mixed NE.
-        nash_DIR = os.getcwd() + '/nfg/nash.txt'
+        nash_DIR = gambit_DIR + '/nash.txt'
         if not isExist(nash_DIR):
             raise ValueError("nash.txt file does not exist!")
         num_lines = file_len(nash_DIR)
@@ -184,8 +185,8 @@ def do_gambit_analysis(meta_games, mode, timeout = 600, method="gnm", method_pur
             break
         timeout += 120
         if timeout > 7200:
-            logging.info("Gambit has been running for more than 2 hour.!")
-        logging.info("Timeout has been added by 120s.")
+            logging.warning("Gambit has been running for more than 2 hour.!")
+        logging.warning("Timeout has been added by 120s.")
     logging.info('gambit_analysis done!')
     return equilibria
 

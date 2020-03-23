@@ -68,12 +68,10 @@ def rl_policy_factory(rl_class):
       return time_step
 
     def action_probabilities(self, state, player_id=None):
-      cur_player = state.current_player()
-      legal_actions = state.legal_actions(cur_player)
-
-      cur_player = state.current_player()
-      legal_actions = state.legal_actions(cur_player)
-
+      print(state.history_str())
+      print(state.observation_string())
+      import pdb
+      pdb.set_trace()
       cur_player = state.current_player()
       legal_actions = state.legal_actions(cur_player)
 

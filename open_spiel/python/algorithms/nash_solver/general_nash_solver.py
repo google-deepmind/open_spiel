@@ -197,6 +197,7 @@ def nash_solver(meta_games,
     """
     num_players = len(meta_games)
     if solver == "gambit":
+        gambit_result = gambit_solve(meta_games,mode)
         return normalize_ne(gambit_solve(meta_games, mode))
     elif solver == "replicator":
         return normalize_ne([replicator_dynamics(meta_games)])
@@ -259,6 +260,5 @@ def nash_solver(meta_games,
 
 def normalize_ne(eq):
     for p in range(len(eq)):
-        for i, str in enumerate(eq[p]):
-            eq[p][i] = renormalize(str)
+        eq[p] = renormalize(eq[p])
     return eq
