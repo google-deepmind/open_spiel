@@ -164,7 +164,7 @@ else
   cmake -DPython_TARGET_VERSION=${PYVERSION} -DCMAKE_CXX_COMPILER=${CXX} -DJlCxx_DIR=${JlCxx_DIR} ../open_spiel
   make -j$MAKE_NUM_PROCS
 
-  export PYTHONPATH=$PYTHONPATH:`pwd`/../open_spiel
+  export PYTHONPATH=$PYTHONPATH:`pwd`/..
   export PYTHONPATH=$PYTHONPATH:`pwd`/python  # For the Python bindings of Pyspiel
 
   if ctest -j$TEST_NUM_PROCS --output-on-failure ../open_spiel; then

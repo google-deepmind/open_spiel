@@ -8,6 +8,8 @@ add_library (utils OBJECT
   json.h
   json.cc
   lru_cache.h
+  run_python.h
+  run_python.cc
   stats.h
   tensor_view.h
   thread.h
@@ -39,6 +41,10 @@ add_test(json_test json_test)
 add_executable(lru_cache_test lru_cache_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(lru_cache_test lru_cache_test)
+
+add_executable(run_python_test run_python_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(run_python_test run_python_test)
 
 add_executable(stats_test stats_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)

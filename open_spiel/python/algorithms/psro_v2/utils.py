@@ -246,7 +246,7 @@ def alpharank_strategy(solver, return_joint=False, **unused_kwargs):
     meta_games = [meta_games[0]]
 
     # Get alpharank distribution via alpha-sweep
-    _, _, joint_distr, _, _ = alpharank.compute(
+    joint_distr = alpharank.sweep_pi_vs_epsilon(
         meta_games)
     joint_distr = remove_epsilon_negative_probs(joint_distr)
 
@@ -258,7 +258,7 @@ def alpharank_strategy(solver, return_joint=False, **unused_kwargs):
       return joint_distr
 
   else:
-    _, _, joint_distr, _, _ = alpharank.compute(meta_games)
+    joint_distr = alpharank.sweep_pi_vs_epsilon(meta_games)
     joint_distr = remove_epsilon_negative_probs(joint_distr)
 
     if return_joint:

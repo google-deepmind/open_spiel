@@ -33,10 +33,13 @@ from __future__ import division
 from __future__ import print_function
 
 import collections
+import functools
 from typing import Sequence
 
 import numpy as np
 import tensorflow.compat.v1 as tf
+
+tfkl = tf.keras.layers
 
 
 class TrainInput(collections.namedtuple(
@@ -182,60 +185,64 @@ def keras_resnet(input_shape,
     A keras Model with a single input and two outputs (value head, policy head).
     The policy is a flat distribution over actions.
   """
-  def residual_layer(inputs, num_filters, kernel_size):
+  Conv2DSame = functools.partial(tfkl.Conv2D, padding="same")  # pylint: disable=invalid-name
+
+  def residual_layer(inputs, num_filters, kernel_size, name):
     return cascade(inputs, [
-        tf.keras.layers.Conv2D(num_filters, kernel_size, padding="same"),
-        tf.keras.layers.BatchNormalization(),
-        tf.keras.layers.Activation(activation),
-        tf.keras.layers.Conv2D(num_filters, kernel_size, padding="same"),
-        tf.keras.layers.BatchNormalization(axis=-1),
-        lambda x: tf.keras.layers.add([x, inputs]),
-        tf.keras.layers.Activation(activation),
+        Conv2DSame(num_filters, kernel_size, name=f"{name}_res_conv1"),
+        tfkl.BatchNormalization(name=f"{name}_res_batch_norm1"),
+        tfkl.Activation(activation),
+        Conv2DSame(num_filters, kernel_size, name=f"{name}_res_conv2"),
+        tfkl.BatchNormalization(name=f"{name}_res_batch_norm2"),
+        lambda x: tfkl.add([x, inputs]),
+        tfkl.Activation(activation),
     ])
 
   def resnet_body(inputs, num_filters, kernel_size):
     x = cascade(inputs, [
-        tf.keras.layers.Conv2D(num_filters, kernel_size, padding="same"),
-        tf.keras.layers.BatchNormalization(),
-        tf.keras.layers.Activation(activation),
+        Conv2DSame(num_filters, kernel_size, name="torso_in_conv"),
+        tfkl.BatchNormalization(name="torso_in_batch_norm"),
+        tfkl.Activation(activation),
     ])
-    for _ in range(num_residual_blocks):
-      x = residual_layer(x, num_filters, kernel_size)
+    for i in range(num_residual_blocks):
+      x = residual_layer(x, num_filters, kernel_size, name=f"torso_{i}")
     return x
 
   def resnet_value_head(inputs, hidden_size):
     return cascade(inputs, [
-        tf.keras.layers.Conv2D(filters=1, kernel_size=1),
-        tf.keras.layers.BatchNormalization(),
-        tf.keras.layers.Activation(activation),
-        tf.keras.layers.Flatten(),
-        tf.keras.layers.Dense(hidden_size, activation),
-        tf.keras.layers.Dense(1, activation="tanh", name="value"),
+        Conv2DSame(filters=1, kernel_size=1, name="value_conv"),
+        tfkl.BatchNormalization(name="value_batch_norm"),
+        tfkl.Activation(activation),
+        tfkl.Flatten(),
+        tfkl.Dense(hidden_size, name="value_dense"),
+        tfkl.Activation(activation),
+        tfkl.Dense(1, name="value"),
+        tfkl.Activation("tanh"),
     ])
 
   def resnet_policy_head(inputs, num_classes):
     return cascade(inputs, [
-        tf.keras.layers.Conv2D(filters=2, kernel_size=1),
-        tf.keras.layers.BatchNormalization(),
-        tf.keras.layers.Activation(activation),
-        tf.keras.layers.Flatten(),
-        tf.keras.layers.Dense(num_classes, name="policy"),
+        Conv2DSame(filters=2, kernel_size=1, name="policy_conv"),
+        tfkl.BatchNormalization(name="policy_batch_norm"),
+        tfkl.Activation(activation),
+        tfkl.Flatten(),
+        tfkl.Dense(num_classes, name="policy"),
     ])
 
   input_size = int(np.prod(input_shape))
   inputs = tf.keras.Input(shape=input_size, dtype="float32", name="input")
   mask = tf.keras.Input(shape=num_actions, dtype="bool", name="mask")
-  torso = tf.keras.layers.Reshape(input_shape)(inputs)
+  torso = tfkl.Reshape(input_shape)(inputs)
   # Note: Keras with TensorFlow 1.15 does not support the data_format arg on CPU
   # for convolutions. Hence why this transpose is needed.
   if data_format == "channels_first":
     torso = tf.keras.backend.permute_dimensions(torso, (0, 2, 3, 1))
   torso = resnet_body(torso, num_filters, 3)
-  value_head = resnet_value_head(torso, value_head_hidden_size)
   policy_logits = resnet_policy_head(torso, num_actions)
   policy_logits = tf.where(mask, policy_logits,
                            -1e32 * tf.ones_like(policy_logits))
-  policy_softmax = tf.keras.layers.Softmax()(policy_logits)
+  policy_softmax = tfkl.Softmax()(policy_logits)
+  value_head = resnet_value_head(torso, value_head_hidden_size)
   return tf.keras.Model(inputs=[inputs, mask],
                         outputs=[value_head, policy_logits, policy_softmax])
 
@@ -264,12 +271,22 @@ def keras_mlp(input_shape,
   inputs = tf.keras.Input(shape=input_size, dtype="float32", name="input")
   mask = tf.keras.Input(shape=num_actions, dtype="bool", name="mask")
   torso = inputs
-  for _ in range(num_layers):
-    torso = tf.keras.layers.Dense(num_hidden, activation=activation)(torso)
-  policy_logits = tf.keras.layers.Dense(num_actions, name="policy")(torso)
+  for i in range(num_layers):
+    torso = tf.keras.layers.Dense(
+        num_hidden, activation=activation, name=f"torso_{i}_dense")(torso)
+  policy_logits = cascade(torso, [
+      tfkl.Dense(num_hidden, name="policy_dense"),
+      tfkl.Activation("relu"),
+      tfkl.Dense(num_actions, name="policy"),
+  ])
   policy_logits = tf.where(mask, policy_logits,
                            -1e32 * tf.ones_like(policy_logits))
   policy_softmax = tf.keras.layers.Softmax()(policy_logits)
-  value = tf.keras.layers.Dense(1, activation="tanh", name="value")(torso)
+  value = cascade(torso, [
+      tfkl.Dense(num_hidden, name="value_dense"),
+      tfkl.Activation("relu"),
+      tfkl.Dense(1, name="value"),
+      tfkl.Activation("tanh"),
+  ])
   return tf.keras.Model(inputs=[inputs, mask],
                         outputs=[value, policy_logits, policy_softmax])
