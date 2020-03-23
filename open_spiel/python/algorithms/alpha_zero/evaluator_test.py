@@ -41,12 +41,9 @@ tf.enable_eager_execution()
 
 
 def build_model(game):
-  num_actions = game.num_distinct_actions()
-  observation_shape = game.observation_tensor_shape()
-  net = model_lib.keras_mlp(
-      observation_shape, num_actions, num_layers=2, num_hidden=64)
   return model_lib.Model(
-      net, l2_regularization=1e-4, learning_rate=0.01, device="cpu")
+      "mlp", game.observation_tensor_shape(), game.num_distinct_actions(),
+      nn_width=64, nn_depth=2, weight_decay=1e-4, learning_rate=0.01, path=None)
 
 
 class EvaluatorTest(absltest.TestCase):
