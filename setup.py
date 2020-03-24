@@ -59,7 +59,7 @@ class BuildExt(build_ext):
     extension_dir = os.path.abspath(
         os.path.dirname(self.get_ext_fullpath(ext.name)))
     cmake_args = [
-        "-DPython_TARGET_VERSION=3.7",
+        "-DPython_TARGET_VERSION=3.6",
         "-DCMAKE_CXX_COMPILER=clang++",
         f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={extension_dir}",
     ]

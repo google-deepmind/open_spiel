@@ -24,12 +24,12 @@ matrix:
   # Build and run tests without all optional dependencies (default behavior)
   - os: linux
     dist: bionic # Ubuntu 18.04.2 LTS released on 26 April 2018
-    env: OS_PYTHON_VERSION=3.7
+    env: OS_PYTHON_VERSION=3.6
   # Build and run tests with all optional dependencies
   - os: linux
     dist: bionic # Ubuntu 18.04.2 LTS released on 26 April 2018
     env:
-      - OS_PYTHON_VERSION=3.7
+      - OS_PYTHON_VERSION=3.6
       - DEFAULT_OPTIONAL_DEPENDENCY="ON"
   # Build and test on MacOS. We use a single target, with all dependencies.
   - os: osx
@@ -45,13 +45,13 @@ matrix:
   - os: linux
     dist: bionic # Ubuntu 18.04.2 LTS released on 26 April 2018
     env:
-      - OS_PYTHON_VERSION=3.7
+      - OS_PYTHON_VERSION=3.6
       - TRAVIS_USE_NOX=1
   # Build and run tests with all optional dependencies and use nox
   - os: linux
     dist: bionic # Ubuntu 18.04.2 LTS released on 26 April 2018
     env:
-      - OS_PYTHON_VERSION=3.7
+      - OS_PYTHON_VERSION=3.6
       - DEFAULT_OPTIONAL_DEPENDENCY="ON"
       - TRAVIS_USE_NOX=1
   # Build and test on MacOS. We use a single target, with all dependencies and
