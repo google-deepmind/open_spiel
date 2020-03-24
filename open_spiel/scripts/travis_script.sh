@@ -19,13 +19,9 @@ set -x
 
 if [ ! "$TRAVIS_USE_NOX" -eq 0 ]; then
   # Build and run tests using nox
-  #
-  # March 23rd, 2020: This is currently breaking Travis-CI due to
-  # run_python_test failing. Disabling it while we work on a fix.
-  #
-  # pip3 install nox
-  # nox -s tests
-  # exit 0
+  pip3 install nox
+  PWD=`pwd`  # normally defined, but just in case!
+  PYTHONPATH="$PYTHONPATH:$PWD:$PWD/build:$PWD/build/python" nox -s tests
   exit 0
 fi
 
