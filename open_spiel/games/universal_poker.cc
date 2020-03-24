@@ -159,6 +159,20 @@ std::string UniversalPokerState::ToString() const {
   } else {
     buf << "Player node for player " << cur_player_ << std::endl;
   }
+
+  if (betting_abstraction_ == BettingAbstraction::kFC ||
+        betting_abstraction_ == BettingAbstraction::kFCPA) {
+    buf << "PossibleActions (" << GetPossibleActionCount() << "): [";
+    for (auto action : ALL_ACTIONS) {
+      if (action & possibleActions_) {
+        buf << ((action == ACTION_ALL_IN) ? " ACTION_ALL_IN " : "");
+        buf << ((action == ACTION_BET) ? " ACTION_BET " : "");
+        buf << ((action == ACTION_CHECK_CALL) ? " ACTION_CHECK_CALL " : "");
+        buf << ((action == ACTION_FOLD) ? " ACTION_FOLD " : "");
+        buf << ((action == ACTION_DEAL) ? " ACTION_DEAL " : "");
+      }
+    }
+  }
   buf << "]" << std::endl;
   buf << "Round: " << acpc_state_.GetRound() << std::endl;
   buf << "ACPC State: " << acpc_state_.ToString() << std::endl;
@@ -406,38 +420,31 @@ std::vector<Action> UniversalPokerState::LegalActions() const {
 
   std::vector<Action> legal_actions;
 
-  if (acpc_state_.IsValidAction(
-          acpc_cpp::ACPCState::ACPCActionType::ACPC_FOLD, 0)) {
-    legal_actions.push_back(kFold);
-  }
-  if (acpc_state_.IsValidAction(
-          acpc_cpp::ACPCState::ACPCActionType::ACPC_CALL, 0)) {
-    legal_actions.push_back(kCall);
-  }
-
-  int32_t min_bet_size = 0;
-  int32_t max_bet_size = 0;
-
-  if (betting_abstraction_ == BettingAbstraction::kFC) 
+  if (betting_abstraction_ != BettingAbstraction::kFULLGAME) {
+    if (ACTION_FOLD & possibleActions_) legal_actions.push_back(kFold);
+    if (ACTION_CHECK_CALL & possibleActions_) legal_actions.push_back(kCall);
+    if (ACTION_BET & possibleActions_) legal_actions.push_back(kBet);
+    if (ACTION_ALL_IN & possibleActions_) legal_actions.push_back(kAllIn);
     return legal_actions;
-
-  bool valid_to_raise = acpc_state_.RaiseIsValid(&min_bet_size, &max_bet_size);
-  if (valid_to_raise) {
-    if (acpc_game_->IsLimitGame()) {
-      legal_actions.push_back(kBet);
-    } else if (betting_abstraction_ == BettingAbstraction::kFCPA) {
-        if (potSize_ >= min_bet_size && potSize_ <= max_bet_size)
-          legal_actions.push_back(1 + potSize_ / big_blind_);
-        if (allInSize_ == max_bet_size && allInSize_ != potSize_)
-          legal_actions.push_back(1 + allInSize_ / big_blind_);
-    } else {
+  } else {
+    if (acpc_state_.IsValidAction(
+            acpc_cpp::ACPCState::ACPCActionType::ACPC_FOLD, 0)) {
+      legal_actions.push_back(kFold);
+    }
+    if (acpc_state_.IsValidAction(
+            acpc_cpp::ACPCState::ACPCActionType::ACPC_CALL, 0)) {
+      legal_actions.push_back(kCall);
+    }
+    int32_t min_bet_size = 0;
+    int32_t max_bet_size = 0;
+    bool valid_to_raise = acpc_state_.RaiseIsValid(&min_bet_size, &max_bet_size);
+    if (valid_to_raise) {
       assert(min_bet_size % big_blind_ == 0);
       for (int i = min_bet_size; i <= max_bet_size; i += big_blind_) {
         legal_actions.push_back(1 + i / big_blind_);
       }
     }
   }
-
   return legal_actions;
 }
 
@@ -475,6 +482,16 @@ void UniversalPokerState::DoApplyAction(Action action_id) {
     if (action_int == kCall) {
       ApplyChoiceAction(ACTION_CHECK_CALL, 0);
       return;
+    }
+    if (betting_abstraction_ != BettingAbstraction::kFULLGAME) {
+      if (action_int == kBet) {
+        ApplyChoiceAction(ACTION_BET, potSize_);
+        return;
+      }
+      if (action_int == kAllIn) {
+        ApplyChoiceAction(ACTION_ALL_IN, allInSize_);
+        return;
+      }
     }
     if (action_int >= 2 && action_int <= NumDistinctActions()) {
       ApplyChoiceAction(ACTION_BET, (action_int - 1) * big_blind_);
@@ -622,7 +639,11 @@ int UniversalPokerGame::MaxChanceOutcomes() const {
 int UniversalPokerGame::NumPlayers() const { return acpc_game_.GetNbPlayers(); }
 
 int UniversalPokerGame::NumDistinctActions() const {
-  return starting_stack_big_blinds_ + 2;  // fold, check/call, bet/raise some multiple of BBs
+  if (betting_abstraction_ == BettingAbstraction::kFULLGAME) {
+    return starting_stack_big_blinds_ + 2;  // fold, check/call, bet/raise some multiple of BBs
+  } else {
+    return GetMaxBettingActions(acpc_game_);
+  }
 }
 
 std::shared_ptr<const Game> UniversalPokerGame::Clone() const {
@@ -742,8 +763,13 @@ void UniversalPokerState::ApplyChoiceAction(ActionType action_type, int size) {
       acpc_state_.DoAction(acpc_cpp::ACPCState::ACPCActionType::ACPC_CALL, 0);
       break;
     case ACTION_BET:
-      acpc_state_.DoAction(acpc_cpp::ACPCState::ACPCActionType::ACPC_RAISE,
-                           size);
+      if (betting_abstraction_ == BettingAbstraction::kFULLGAME) {
+        acpc_state_.DoAction(acpc_cpp::ACPCState::ACPCActionType::ACPC_RAISE,
+                             size);
+      } else {
+        acpc_state_.DoAction(acpc_cpp::ACPCState::ACPCActionType::ACPC_RAISE,
+                             potSize_);
+      }
       break;
     case ACTION_ALL_IN:
       acpc_state_.DoAction(acpc_cpp::ACPCState::ACPCActionType::ACPC_RAISE,
@@ -853,7 +879,7 @@ std::ostream &operator<<(std::ostream &os, const BettingAbstraction &betting) {
       break;
     }
     case BettingAbstraction::kFULLGAME: {
-      os << "BettingAbstration: FULLGAME";
+      os << "BettingAbstraction: FULLGAME";
       break;
     }
     default:
