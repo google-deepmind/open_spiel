@@ -345,7 +345,7 @@ def learner(*, config, actors, broadcast_fn, num, logger):
       losses.append(model.update(data))
 
     # Always save a checkpoint, either for keeping or for loading the weights to
-    # the actors. Only allows numbers, so use -1 as "latest".
+    # the actors. It only allows numbers, so use -1 as "latest".
     save_path = model.save_checkpoint(
         step if step % config.checkpoint_freq == 0 else -1)
     losses = sum(losses, model_lib.Losses(0, 0, 0)) / len(losses)
