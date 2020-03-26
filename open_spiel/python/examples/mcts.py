@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Lint as: python3
 """MCTS example."""
 
 from __future__ import absolute_import
@@ -19,6 +20,7 @@ from __future__ import division
 from __future__ import print_function
 
 import collections
+import random
 import sys
 
 from absl import app
@@ -37,11 +39,13 @@ flags.DEFINE_string("game", "tic_tac_toe", "Name of the game.")
 flags.DEFINE_enum("player1", "mcts", _KNOWN_PLAYERS, "Who controls player 1.")
 flags.DEFINE_enum("player2", "random", _KNOWN_PLAYERS, "Who controls player 2.")
 flags.DEFINE_string("gtp_path", None, "Where to find a binary for gtp.")
+flags.DEFINE_multi_string("gtp_cmd", [], "GTP commands to run at init.")
 flags.DEFINE_integer("uct_c", 2, "UCT's exploration constant.")
-flags.DEFINE_integer("rollout_count", 10, "How many rollouts to do.")
-flags.DEFINE_integer("max_simulations", 10000, "How many simulations to run.")
+flags.DEFINE_integer("rollout_count", 1, "How many rollouts to do.")
+flags.DEFINE_integer("max_simulations", 1000, "How many simulations to run.")
 flags.DEFINE_integer("num_games", 1, "How many games to play.")
 flags.DEFINE_integer("seed", None, "Seed for the random number generator.")
+flags.DEFINE_bool("random_first", False, "Play the first move randomly.")
 flags.DEFINE_bool("solve", True, "Whether to use MCTS-Solver.")
 flags.DEFINE_bool("quiet", False, "Don't show the moves as they're played.")
 flags.DEFINE_bool("verbose", False, "Show the MCTS stats of possible moves.")
@@ -72,7 +76,10 @@ def _init_bot(bot_type, game, player_id):
   if bot_type == "human":
     return human.HumanBot()
   if bot_type == "gtp":
-    return gtp.GTPBot(game, FLAGS.gtp_path)
+    bot = gtp.GTPBot(game, FLAGS.gtp_path)
+    for cmd in FLAGS.gtp_cmd:
+      bot.gtp_cmd(cmd)
+    return bot
   raise ValueError("Invalid bot type: %s" % bot_type)
 
 
@@ -90,12 +97,19 @@ def _play_game(game, bots, initial_actions):
 
   history = []
 
+  if FLAGS.random_first:
+    assert not initial_actions
+    initial_actions = [state.action_to_string(
+        state.current_player(), random.choice(state.legal_actions()))]
+
   for action_str in initial_actions:
     action = _get_action(state, action_str)
     if action is None:
       sys.exit("Invalid action: {}".format(action_str))
 
     history.append(action_str)
+    for bot in bots:
+      bot.inform_action(state, state.current_player(), action)
     state.apply_action(action)
     _opt_print("Forced action", action_str)
     _opt_print("Next state:\n{}".format(state))
@@ -135,6 +149,10 @@ def _play_game(game, bots, initial_actions):
   returns = state.returns()
   print("Returns:", " ".join(map(str, returns)), ", Game actions:",
         " ".join(history))
+
+  for bot in bots:
+    bot.restart()
+
   return returns, history
 
 
@@ -163,6 +181,7 @@ def main(argv):
     print("Caught a KeyboardInterrupt, stopping early.")
   print("Number of games played:", game_num + 1)
   print("Number of distinct games played:", len(histories))
+  print("Players:", FLAGS.player1, FLAGS.player2)
   print("Overall wins", overall_wins)
   print("Overall returns", overall_returns)
 
