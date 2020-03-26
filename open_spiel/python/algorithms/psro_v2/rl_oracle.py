@@ -108,20 +108,28 @@ class RLOracle(optimization_oracle.AbstractOracle):
     time_step = self._env.reset()
     cumulative_rewards = 0.0
     while not time_step.last():
-      player_id = time_step.observations["current_player"]
+      if time_step.is_simultaneous_move():
+        action_list = []
+        for agent in agents:
+          output = agent.step(time_step, is_evaluation=is_evaluation)
+          action_list.append(output.action)
+        time_step = self._env.step(action_list)
+        cumulative_rewards += np.array(time_step.rewards)
+      else:
+        player_id = time_step.observations["current_player"]
 
-      # is_evaluation is a boolean that, when False, lets policies train. The
-      # setting of PSRO requires that all policies be static aside from those
-      # being trained by the oracle. is_evaluation could be used to prevent
-      # policies from training, yet we have opted for adding a frozen attribute
-      # that prevents policies from training, for all values of is_evaluation.
-      # Since all policies returned by the oracle are frozen before being
-      # returned, only currently-trained policies can effectively learn.
-      agent_output = agents[player_id].step(
-          time_step, is_evaluation=is_evaluation)
-      action_list = [agent_output.action]
-      time_step = self._env.step(action_list)
-      cumulative_rewards += np.array(time_step.rewards)
+        # is_evaluation is a boolean that, when False, lets policies train. The
+        # setting of PSRO requires that all policies be static aside from those
+        # being trained by the oracle. is_evaluation could be used to prevent
+        # policies from training, yet we have opted for adding frozen attributes
+        # that prevents policies from training, for all values of is_evaluation.
+        # Since all policies returned by the oracle are frozen before being
+        # returned, only currently-trained policies can effectively learn.
+        agent_output = agents[player_id].step(
+            time_step, is_evaluation=is_evaluation)
+        action_list = [agent_output.action]
+        time_step = self._env.step(action_list)
+        cumulative_rewards += np.array(time_step.rewards)
 
     if not is_evaluation:
       for agent in agents:
