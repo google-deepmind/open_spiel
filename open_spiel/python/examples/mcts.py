@@ -28,18 +28,39 @@ from absl import flags
 import numpy as np
 
 from open_spiel.python.algorithms import mcts
+from open_spiel.python.algorithms.alpha_zero import evaluator as az_evaluator
+from open_spiel.python.algorithms.alpha_zero import model as az_model
 from open_spiel.python.bots import gtp
 from open_spiel.python.bots import human
 from open_spiel.python.bots import uniform_random
 import pyspiel
 
-_KNOWN_PLAYERS = ["mcts", "random", "human", "gtp"]
+_KNOWN_PLAYERS = [
+    # A generic Monte Carlo Tree Search agent.
+    "mcts",
+
+    # A generic random agent.
+    "random",
+
+    # You'll be asked to provide the moves.
+    "human",
+
+    # Run an external program that speaks the Go Text Protocol.
+    # Requires the gtp_path flag.
+    "gtp",
+
+    # Run an alpha_zero checkpoint with MCTS. Uses the specified UCT/sims.
+    # Requires the az_path flag.
+    "az"
+]
 
 flags.DEFINE_string("game", "tic_tac_toe", "Name of the game.")
 flags.DEFINE_enum("player1", "mcts", _KNOWN_PLAYERS, "Who controls player 1.")
 flags.DEFINE_enum("player2", "random", _KNOWN_PLAYERS, "Who controls player 2.")
 flags.DEFINE_string("gtp_path", None, "Where to find a binary for gtp.")
 flags.DEFINE_multi_string("gtp_cmd", [], "GTP commands to run at init.")
+flags.DEFINE_string("az_path", None,
+                    "Path to an alpha_zero checkpoint. Needed by an az player.")
 flags.DEFINE_integer("uct_c", 2, "UCT's exploration constant.")
 flags.DEFINE_integer("rollout_count", 1, "How many rollouts to do.")
 flags.DEFINE_integer("max_simulations", 1000, "How many simulations to run.")
@@ -69,6 +90,18 @@ def _init_bot(bot_type, game, player_id):
         FLAGS.max_simulations,
         evaluator,
         random_state=rng,
+        solve=FLAGS.solve,
+        verbose=FLAGS.verbose)
+  if bot_type == "az":
+    model = az_model.Model.from_checkpoint(FLAGS.az_path)
+    evaluator = az_evaluator.AlphaZeroEvaluator(game, model)
+    return mcts.MCTSBot(
+        game,
+        FLAGS.uct_c,
+        FLAGS.max_simulations,
+        evaluator,
+        random_state=rng,
+        child_selection_fn=mcts.SearchNode.puct_value,
         solve=FLAGS.solve,
         verbose=FLAGS.verbose)
   if bot_type == "random":

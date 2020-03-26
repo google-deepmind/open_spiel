@@ -135,7 +135,7 @@ class Config(collections.namedtuple(
 
 
 def _init_model_from_config(config):
-  return model_lib.Model(
+  return model_lib.Model.build_model(
       config.nn_model,
       config.observation_shape,
       config.output_size,
