@@ -45,7 +45,7 @@ const GameType kGameType{/*short_name=*/"trade_comm",
                          /*provides_information_state_string=*/false,
                          /*provides_information_state_tensor=*/false,
                          /*provides_observation_string=*/true,
-                         /*provides_observation_tensor=*/false,
+                         /*provides_observation_tensor=*/true,
                          /*parameter_specification=*/
                          {{"num_items", GameParameter(kDefaultNumItems)}}};
 
@@ -128,6 +128,46 @@ std::string TradeCommState::ObservationString(Player player) const {
   // Trade proposals are treated as simultaneous, so not included in the
   // observation.
   return str;
+}
+
+void TradeCommState::ObservationTensor(Player player,
+                                       std::vector<double>* values) const {
+  values->resize(game_->ObservationTensorSize());
+  std::fill(values->begin(), values->end(), 0);
+
+  if (IsChanceNode()) {
+    // No observations at chance nodes.
+    return;
+  }
+
+  SPIEL_CHECK_TRUE(player == 0 || player == 1);
+
+  // 2 bits to indicate whose turn it is.
+  int offset = 0;
+  (*values)[cur_player_] = 1;
+  offset += 2;
+
+  // Single bit for the phase: 0 = comm, 1 = trade.
+  (*values)[offset] = (phase_ == Phase::kCommunication ? 0 : 1);
+  offset += 1;
+
+  // one-hot vector for the item the observing player got
+  (*values)[offset + items_[player]] = 1;
+  offset += num_items_;
+
+  if (player < comm_history_.size()) {
+    // one-hot vector for the utterance the observing player made
+    (*values)[offset + comm_history_[player]] = 1;
+  }
+  offset += num_items_;
+
+  // one-hot vector for the utterance the observing player observed
+  if (1 - player < comm_history_.size()) {
+    (*values)[offset + comm_history_[1 - player]] = 1;
+  }
+  offset += num_items_;
+
+  SPIEL_CHECK_EQ(offset, values->size());
 }
 
 TradeCommState::TradeCommState(std::shared_ptr<const Game> game, int num_items)
@@ -229,6 +269,16 @@ int TradeCommGame::NumDistinctActions() const {
   return (num_items_ +                   // utterances
           num_items_ * (num_items_ - 1)  // 1:1 trades
   );
+}
+
+std::vector<int> TradeCommGame::ObservationTensorShape() const {
+  return {
+      2 +           // one hot vector for whose turn it is
+      1 +           // a single bit indicating the phase (comm or trade)
+      num_items_ +  // one-hot vector for the item the player got
+      num_items_ +  // one-hot vector for the utterance the player made
+      num_items_    // one-hot vector for the utterance the player observed
+  };
 }
 
 }  // namespace trade_comm
