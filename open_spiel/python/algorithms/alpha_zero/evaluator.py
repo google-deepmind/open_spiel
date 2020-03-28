@@ -40,6 +40,8 @@ class AlphaZeroEvaluator(mcts.Evaluator):
 
   def __init__(self, game, model, cache_size=2**16):
     """An AlphaZero MCTS Evaluator."""
+    if game.num_players() != 2:
+      raise ValueError("Game must be for two players.")
     game_type = game.get_type()
     if game_type.reward_model != pyspiel.GameType.RewardModel.TERMINAL:
       raise ValueError("Game must have terminal rewards.")

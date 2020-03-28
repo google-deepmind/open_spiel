@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef THIRD_PARTY_OPEN_SPIEL_UTILS_FILE_LOGGER_H_
-#define THIRD_PARTY_OPEN_SPIEL_UTILS_FILE_LOGGER_H_
+#ifndef THIRD_PARTY_OPEN_SPIEL_UTILS_LOGGER_H_
+#define THIRD_PARTY_OPEN_SPIEL_UTILS_LOGGER_H_
 
 #include <cstdio>
 #include <string>
@@ -25,21 +25,10 @@
 
 namespace open_spiel {
 
-// A logger to print stuff to a file.
-class FileLogger {
+class Logger {
  public:
-  FileLogger(const std::string& path, const std::string& name)
-      : fd_(absl::StrFormat("%s/log-%s.txt", path, name), "w"),
-        tz_(absl::LocalTimeZone()) {
-    Print("%s started", name);
-  }
-
-  void Print(const std::string& str) {
-    std::string time =
-        absl::FormatTime("%Y-%m-%d %H:%M:%E3S", absl::Now(), tz_);
-    fd_.Write(absl::StrFormat("[%s] %s\n", time, str));
-    fd_.Flush();
-  }
+  virtual ~Logger() = default;
+  virtual void Print(const std::string& str) = 0;
 
   // A specialization of Print that passes everything through StrFormat first.
   template <typename Arg1, typename... Args>
@@ -47,14 +36,40 @@ class FileLogger {
              const Args&... args) {
     Print(absl::StrFormat(format, arg1, args...));
   }
+};
 
-  ~FileLogger() { Print("Closing the log."); }
+
+// A logger to print stuff to a file.
+class FileLogger : public Logger {
+ public:
+  FileLogger(const std::string& path, const std::string& name)
+      : fd_(absl::StrFormat("%s/log-%s.txt", path, name), "w"),
+        tz_(absl::LocalTimeZone()) {
+    Print("%s started", name);
+  }
+
+  using Logger::Print;
+  void Print(const std::string& str) override {
+    std::string time =
+        absl::FormatTime("%Y-%m-%d %H:%M:%E3S", absl::Now(), tz_);
+    fd_.Write(absl::StrFormat("[%s] %s\n", time, str));
+    fd_.Flush();
+  }
+
+  ~FileLogger() override { Print("Closing the log."); }
 
  private:
   open_spiel::file::File fd_;
   absl::TimeZone tz_;
 };
 
+
+class NoopLogger : public Logger {
+ public:
+  using Logger::Print;
+  void Print(const std::string& str) override {}
+};
+
 }  // namespace open_spiel
 
-#endif  // THIRD_PARTY_OPEN_SPIEL_UTILS_FILE_LOGGER_H_
+#endif  // THIRD_PARTY_OPEN_SPIEL_UTILS_LOGGER_H_

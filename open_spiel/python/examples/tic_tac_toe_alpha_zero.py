@@ -35,8 +35,6 @@ from absl import app
 from absl import flags
 from absl import logging
 
-import tensorflow.compat.v1 as tf
-
 from open_spiel.python.algorithms import mcts
 from open_spiel.python.algorithms import minimax
 from open_spiel.python.algorithms.alpha_zero import alpha_zero
@@ -44,7 +42,6 @@ from open_spiel.python.algorithms.alpha_zero import evaluator as evaluator_lib
 from open_spiel.python.algorithms.alpha_zero import model as model_lib
 import pyspiel
 
-tf.enable_eager_execution()
 
 FLAGS = flags.FLAGS
 

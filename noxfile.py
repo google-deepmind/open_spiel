@@ -27,11 +27,11 @@ def get_distutils_tempdir():
   )
 
 
-@nox.session
+@nox.session(python="3.6")
 def tests(session):
   session.install("-r", "requirements.txt")
-  session.run("python", "setup.py", "build")
-  session.run("python", "setup.py", "install")
+  session.run("python3", "setup.py", "build")
+  session.run("python3", "setup.py", "install")
   session.cd(os.path.join("build", get_distutils_tempdir()))
   session.run(
       "ctest", f"-j{4*os.cpu_count()}", "--output-on-failure", external=True)

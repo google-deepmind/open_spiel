@@ -4,9 +4,9 @@ add_library (utils OBJECT
   data_logger.cc
   file.h
   file.cc
-  file_logger.h
   json.h
   json.cc
+  logger.h
   lru_cache.h
   run_python.h
   run_python.cc
@@ -30,13 +30,13 @@ add_executable(file_test file_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(file_test file_test)
 
-add_executable(file_logger_test file_logger_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(file_logger_test file_logger_test)
-
 add_executable(json_test json_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(json_test json_test)
+
+add_executable(logger_test logger_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(logger_test logger_test)
 
 add_executable(lru_cache_test lru_cache_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)

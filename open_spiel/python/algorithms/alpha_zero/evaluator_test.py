@@ -30,14 +30,11 @@
 
 from absl.testing import absltest
 import numpy as np
-import tensorflow.compat.v1 as tf
 
 from open_spiel.python.algorithms import mcts
 from open_spiel.python.algorithms.alpha_zero import evaluator as evaluator_lib
 from open_spiel.python.algorithms.alpha_zero import model as model_lib
 import pyspiel
-
-tf.enable_eager_execution()
 
 
 def build_model(game):
