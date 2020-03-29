@@ -225,6 +225,15 @@ def self_play_strategy(solver, return_joint=False):
     joint_strategies = get_joint_strategy_from_marginals(result)
     return result, joint_strategies
 
+def prioritized_fictitious_play(solver, return_joint=False):
+  """
+    Implementation of prioritized ficitious self-play.
+    :param solver: GenPSROSolver instance.
+    :param return_joint: If true, only returns marginals. Otherwise marginals as well
+        as joint probabilities.
+    :return:
+    """
+  raise NotImplementedError
 
 META_STRATEGY_METHODS = {
     "uniform_biased": uniform_biased_strategy,
@@ -232,5 +241,5 @@ META_STRATEGY_METHODS = {
     "nash": nash_strategy,
     "prd": prd_strategy,
     "general_nash": general_nash_strategy,
-    "sp": self_play_strategy
+    "sp": self_play_strategy,
 }
