@@ -52,7 +52,8 @@ class ARS(rl_agent.AbstractAgent):
                  noise=0.03,
                  seed=123,
                  additional_discount_factor=1.0,
-                 v2=False
+                 v2=False,
+                 discrete_action=True
                  ):
 
         super(ARS, self).__init__(player_id)
@@ -71,6 +72,7 @@ class ARS(rl_agent.AbstractAgent):
         self._seed = seed
         self._extra_discount = additional_discount_factor
         self.v2 = v2
+        self.discrete_action = discrete_action
 
         if self.v2:
             self.normalizer = Normalizer(self._info_state_size)
@@ -99,7 +101,10 @@ class ARS(rl_agent.AbstractAgent):
             self.normalizer.observe(info_state)
             info_state = self.normalizer.normalize(info_state)
         info_state = np.reshape(info_state, [-1, 1])
-        policy_probs = softmax(self._policy.dot(info_state)).reshape(-1)
+        if self.discrete_action:
+            policy_probs = softmax(self._policy.dot(info_state)).reshape(-1)
+        else:
+            raise NotImplementedError("The ARS currently does not support continuous actions.")
 
         # Remove illegal actions, re-normalize probs
         probs = np.zeros(self._num_actions)

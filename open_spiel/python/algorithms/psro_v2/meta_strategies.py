@@ -183,7 +183,6 @@ def general_nash_strategy(solver, return_joint=False, NE_solver="gambit", mode='
 
 def prd_strategy(solver, return_joint=False):
   """Computes Projected Replicator Dynamics strategies.
-
   Args:
     solver: GenPSROSolver instance.
     return_joint: If true, only returns marginals. Otherwise marginals as well
@@ -205,9 +204,33 @@ def prd_strategy(solver, return_joint=False):
     return result, joint_strategies
 
 
+def self_play_strategy(solver, return_joint=False):
+  """
+  Return a strategy with only the newest strategy in the support (played with probability 1).
+  :param solver: GenPSROSolver instance.
+  :param return_joint: If true, only returns marginals. Otherwise marginals as well
+      as joint probabilities.
+  :return:
+  """
+  policies = solver.get_policies()
+  policy_lengths = [len(pol) for pol in policies]
+  result = []
+  for pol_len in policy_lengths:
+    strategy = np.zeros(pol_len)
+    strategy[-1] = 1
+    result.append(strategy)
+  if not return_joint:
+    return result
+  else:
+    joint_strategies = get_joint_strategy_from_marginals(result)
+    return result, joint_strategies
+
+
 META_STRATEGY_METHODS = {
     "uniform_biased": uniform_biased_strategy,
     "uniform": uniform_strategy,
     "nash": nash_strategy,
     "prd": prd_strategy,
+    "general_nash": general_nash_strategy,
+    "sp": self_play_strategy
 }
