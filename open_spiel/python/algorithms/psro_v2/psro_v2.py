@@ -80,6 +80,7 @@ class PSROSolver(abstract_meta_trainer.AbstractMetaTrainer):
                n_noisy_copies=0,
                alpha_noise=0.0,
                beta_noise=0.0,
+               strategy_exp=True,
                **kwargs):
     """Initialize the PSRO solver.
 
@@ -160,6 +161,8 @@ class PSROSolver(abstract_meta_trainer.AbstractMetaTrainer):
 
     print("Sampling from marginals : {}".format(sample_from_marginals))
     self.sample_from_marginals = sample_from_marginals
+
+    self._strategy_exp = strategy_exp
 
     super(PSROSolver, self).__init__(
         game,
@@ -478,3 +481,11 @@ class PSROSolver(abstract_meta_trainer.AbstractMetaTrainer):
 
   def get_strategy_computation_and_selection_kwargs(self):
     return self._strategy_computation_and_selection_kwargs
+
+  ############################################
+  # Segment of Code for Strategy Exploration #
+  ############################################
+
+
+
+

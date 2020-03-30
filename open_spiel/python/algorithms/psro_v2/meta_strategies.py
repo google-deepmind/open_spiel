@@ -243,3 +243,11 @@ META_STRATEGY_METHODS = {
     "general_nash": general_nash_strategy,
     "sp": self_play_strategy,
 }
+
+# Meta-Strategy Methods for Strategy Exploration
+META_STRATEGY_METHODS_SE = {
+    "uniform": uniform_strategy,
+    "prd": prd_strategy,
+    "general_nash": general_nash_strategy,
+    "sp": self_play_strategy,
+}

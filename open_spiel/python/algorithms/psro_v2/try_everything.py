@@ -5,13 +5,11 @@ b = np.array([1,2,3])
 
 c = np.reshape(b,[-1,1])
 
-def softmax_on_range(number_policies):
-  x = np.array(list(range(number_policies)))
-  x = np.exp(x-x.max())
-  x /= np.sum(x)
-  return x
-
-print(softmax_on_range(5))
+def hello():
+    print("hello world.")
+a = {"a": hello}
+b = "hello world."
+print("use {}".format(b.__name__))
 
 
 
