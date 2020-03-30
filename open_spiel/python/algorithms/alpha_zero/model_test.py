@@ -61,7 +61,7 @@ def solve_game(state):
 
 
 def build_model(game, model_type):
-  return model_lib.Model(
+  return model_lib.Model.build_model(
       model_type, game.observation_tensor_shape(), game.num_distinct_actions(),
       nn_width=64, nn_depth=2, weight_decay=1e-4, learning_rate=0.01, path=None)
 

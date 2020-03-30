@@ -293,22 +293,13 @@ class PSROSolver(abstract_meta_trainer.AbstractMetaTrainer):
 
     The resulting policies are appended to self._new_policies.
     """
+
     used_policies, used_indexes = self._training_strategy_selector(
         self, self._number_policies_selected)
 
-    if self.symmetric_game:
-      self._policies = self._game_num_players * self._policies
-      self._num_players = self._game_num_players
-
-    sample_strategy, total_policies, probabilities_of_playing_policies = self.get_policies_and_strategies(
-    )
-
-    if self.symmetric_game:
-      # In a symmetric game, only one population is kept. The below lines
-      # therefore make PSRO consider only the first player during training,
-      # since both players are identical.
-      self._policies = [self._policies[0]]
-      self._num_players = 1
+    (sample_strategy,
+     total_policies,
+     probabilities_of_playing_policies) = self.get_policies_and_strategies()
 
     # Contains the training parameters of all trained oracles.
     # This is a list (Size num_players) of list (Size num_new_policies[player]),
@@ -320,7 +311,6 @@ class PSROSolver(abstract_meta_trainer.AbstractMetaTrainer):
         currently_used_policies = used_policies[current_player]
         current_indexes = used_indexes[current_player]
       else:
-        # Rectifying training will not work for joint strategies.
         currently_used_policies = [
             joint_policy[current_player] for joint_policy in used_policies
         ]
@@ -343,10 +333,22 @@ class PSROSolver(abstract_meta_trainer.AbstractMetaTrainer):
         }
         training_parameters[current_player].append(new_parameter)
 
+    if self.symmetric_game:
+      self._policies = self._game_num_players * self._policies
+      self._num_players = self._game_num_players
+      training_parameters = [training_parameters[0]]
+
     # List of List of new policies (One list per player)
     self.oracle = self._oracle(self._game, training_parameters, strategy_sampler=sample_strategy,
                                using_joint_strategies=self._rectify_training or not self.sample_from_marginals)
     self._new_policies = self.oracle
+
+    if self.symmetric_game:
+      # In a symmetric game, only one population is kept. The below lines
+      # therefore make PSRO consider only the first player during training,
+      # since both players are identical.
+      self._policies = [self._policies[0]]
+      self._num_players = 1
 
   def update_empirical_gamestate(self, seed=None):
     """Given new agents in _new_policies, update meta_games through simulations.

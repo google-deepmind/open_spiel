@@ -77,6 +77,13 @@ class PolicyFunction(policy.Policy):
       supplied state.
     """
     state_key = self._state_key(state, player_id=player_id)
+    if state.is_simultaneous_node():
+      # Policy aggregator doesn't yet support simultaneous moves nodes.
+      # The below lines are one step towards that direction.
+      result = []
+      for player_pol in self._policies:
+        result.append(player_pol[state_key])
+      return result
     if player_id is None:
       player_id = state.current_player()
     return self._policies[player_id][state_key]

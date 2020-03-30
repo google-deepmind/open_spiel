@@ -38,7 +38,7 @@ import pyspiel
 
 
 def build_model(game):
-  return model_lib.Model(
+  return model_lib.Model.build_model(
       "mlp", game.observation_tensor_shape(), game.num_distinct_actions(),
       nn_width=64, nn_depth=2, weight_decay=1e-4, learning_rate=0.01, path=None)
 

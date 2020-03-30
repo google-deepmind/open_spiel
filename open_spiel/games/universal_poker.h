@@ -44,12 +44,13 @@ constexpr uint8_t kMaxUniversalPokerPlayers = 10;
 // This is the mapping from int to action. E.g. the legal action "0" is fold,
 // the legal action "1" is check/call, etc.
 enum ActionType { kFold = 0, kCall = 1, kBet = 2, kAllIn = 3 };
-enum BettingAbstraction { kFCPA = 0, kFC = 1 };
+enum BettingAbstraction { kFCPA = 0, kFC = 1, kFULLGAME = 2 };
 std::ostream &operator<<(std::ostream &os, const BettingAbstraction &betting);
 
 class UniversalPokerState : public State {
  public:
-  explicit UniversalPokerState(std::shared_ptr<const Game> game);
+  explicit UniversalPokerState(std::shared_ptr<const Game> game, int big_blind,
+                               int starting_stack_big_blinds);
 
   bool IsTerminal() const override;
   bool IsChanceNode() const override;
@@ -75,6 +76,9 @@ class UniversalPokerState : public State {
 
  protected:
   void DoApplyAction(Action action_id) override;
+
+  int big_blind_;
+  int starting_stack_big_blinds_;
 
   enum ActionType {
     ACTION_DEAL = 1,
@@ -113,7 +117,7 @@ class UniversalPokerState : public State {
   const uint32_t &GetPossibleActionsMask() const { return possibleActions_; }
   const int GetPossibleActionCount() const;
 
-  void ApplyChoiceAction(ActionType action_type);
+  void ApplyChoiceAction(ActionType action_type, int size);
   std::string GetActionSequence() const { return actionSequence_; }
 };
 
@@ -140,12 +144,14 @@ class UniversalPokerGame : public Game {
   std::string gameDesc_;
   const acpc_cpp::ACPCGame acpc_game_;
   std::optional<int> max_game_length_;
-  BettingAbstraction betting_abstraction_ = BettingAbstraction::kFCPA;
+  BettingAbstraction betting_abstraction_ = BettingAbstraction::kFULLGAME;
 
  public:
   const acpc_cpp::ACPCGame *GetACPCGame() const { return &acpc_game_; }
 
   std::string parseParameters(const GameParameters &map);
+  int big_blind_;
+  int starting_stack_big_blinds_;
 };
 
 // Only supported for UniversalPoker. Randomly plays an action from a fixed list

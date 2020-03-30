@@ -125,7 +125,7 @@ class EnforceAPIOnFullTreeBase(parameterized.TestCase):
                  (self.game_name, player, str(state)))
           self.assertEmpty(state.legal_actions(player), msg=msg)
       elif state.is_simultaneous_node():
-        # TODO(open_spiel) - check simultaneous nodes
+        # No requirement for legal_actions to be empty, since all players act.
         pass
       elif state.is_chance_node():
         # Would be an error to request legal actions for a non-chance player.
@@ -287,7 +287,7 @@ class PartialEnforceAPIConventionsTest(parameterized.TestCase):
                  "legal_actions(%i) for state %s" % (game, player, state))
           self.assertEmpty(state.legal_actions(player), msg=msg)
       elif state.is_simultaneous_node():
-        # TODO(open_spiel) - check simultaneous nodes
+        # No requirement for legal_actions to be empty, since all players act.
         pass
       elif state.is_chance_node():
         # Would be an error to request legal actions for a non-chance player.

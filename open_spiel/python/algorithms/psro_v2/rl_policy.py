@@ -71,12 +71,6 @@ def rl_policy_factory(rl_class):
       cur_player = state.current_player()
       legal_actions = state.legal_actions(cur_player)
 
-      cur_player = state.current_player()
-      legal_actions = state.legal_actions(cur_player)
-
-      cur_player = state.current_player()
-      legal_actions = state.legal_actions(cur_player)
-
       step_type = rl_environment.StepType.LAST if state.is_terminal(
       ) else rl_environment.StepType.MID
 
@@ -99,7 +93,6 @@ def rl_policy_factory(rl_class):
             step_type=rl_environment.StepType.FIRST)
       # pylint: enable=protected-access
 
-      # pylint: enable=protected-access
       p = self._policy.step(time_step, is_evaluation=True).probs
       prob_dict = {action: p[action] for action in legal_actions}
       return prob_dict

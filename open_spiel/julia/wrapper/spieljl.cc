@@ -554,7 +554,7 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod) {
       .method("best_child", &open_spiel::algorithms::SearchNode::BestChild)
       .method("to_string", &open_spiel::algorithms::SearchNode::ToString)
       .method("children_str", &open_spiel::algorithms::SearchNode::ChildrenStr)
-      // TODO: https://github.com/JuliaInterop/CxxWrap.jl/issues/90
+      // TODO(author11): https://github.com/JuliaInterop/CxxWrap.jl/issues/90
       .method("get_action",
               [](open_spiel::algorithms::SearchNode& sn) { return sn.action; })
       .method("get_prior",

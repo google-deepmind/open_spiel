@@ -273,17 +273,19 @@ def gpsro_looper(env, oracle, agents):
       print("Meta game : {}".format(meta_game))
       print("Probabilities : {}".format(meta_probabilities))
 
-    aggregator = policy_aggregator.PolicyAggregator(env.game)
-    aggr_policies = aggregator.aggregate(
-        range(FLAGS.n_players), policies, meta_probabilities)
+    # The following lines only work for sequential games for the moment.
+    if env.game.get_type().dynamics == pyspiel.GameType.Dynamics.SEQUENTIAL:
+      aggregator = policy_aggregator.PolicyAggregator(env.game)
+      aggr_policies = aggregator.aggregate(
+          range(FLAGS.n_players), policies, meta_probabilities)
 
-    exploitabilities, expl_per_player = exploitability.nash_conv(
-        env.game, aggr_policies, return_only_nash_conv=False)
+      exploitabilities, expl_per_player = exploitability.nash_conv(
+          env.game, aggr_policies, return_only_nash_conv=False)
 
-    _ = print_policy_analysis(policies, env.game, FLAGS.verbose)
-    if FLAGS.verbose:
-      print("Exploitabilities : {}".format(exploitabilities))
-      print("Exploitabilities per player : {}".format(expl_per_player))
+      _ = print_policy_analysis(policies, env.game, FLAGS.verbose)
+      if FLAGS.verbose:
+        print("Exploitabilities : {}".format(exploitabilities))
+        print("Exploitabilities per player : {}".format(expl_per_player))
 
 
 def main(argv):
@@ -292,9 +294,8 @@ def main(argv):
 
   np.random.seed(FLAGS.seed)
 
-  game = pyspiel.load_game_as_turn_based(FLAGS.game_name,
-                                         {"players": pyspiel.GameParameter(
-                                             FLAGS.n_players)})
+  game = pyspiel.load_game(FLAGS.game_name,
+                           {"players": pyspiel.GameParameter(FLAGS.n_players)})
   env = rl_environment.Environment(game)
 
   # Initialize oracle and agents
