@@ -68,10 +68,6 @@ def rl_policy_factory(rl_class):
       return time_step
 
     def action_probabilities(self, state, player_id=None):
-      print(state.history_str())
-      print(state.observation_string())
-      import pdb
-      pdb.set_trace()
       cur_player = state.current_player()
       legal_actions = state.legal_actions(cur_player)
 
@@ -97,7 +93,6 @@ def rl_policy_factory(rl_class):
             step_type=rl_environment.StepType.FIRST)
       # pylint: enable=protected-access
 
-      # pylint: enable=protected-access
       p = self._policy.step(time_step, is_evaluation=True).probs
       prob_dict = {action: p[action] for action in legal_actions}
       return prob_dict

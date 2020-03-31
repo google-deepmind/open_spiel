@@ -26,14 +26,17 @@ import os
 class FileLogger(object):
   """A logger to print stuff to a file."""
 
-  def __init__(self, path, name, quiet=False):
+  def __init__(self, path, name, quiet=False, also_to_stdout=False):
     self._fd = open(os.path.join(path, "log-{}.txt".format(name)), "w")
     self._quiet = quiet
+    self.also_to_stdout = also_to_stdout
 
   def print(self, *args):
     # Date/time with millisecond precision.
     date_prefix = "[{}]".format(datetime.datetime.now().isoformat(" ")[:-3])
     print(date_prefix, *args, file=self._fd, flush=True)
+    if self.also_to_stdout:
+      print(date_prefix, *args, flush=True)
 
   def opt_print(self, *args):
     if not self._quiet:

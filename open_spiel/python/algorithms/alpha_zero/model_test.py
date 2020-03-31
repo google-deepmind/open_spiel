@@ -32,12 +32,9 @@ from absl.testing import absltest
 from absl.testing import parameterized
 
 import numpy as np
-import tensorflow.compat.v1 as tf
 
 from open_spiel.python.algorithms.alpha_zero import model as model_lib
 import pyspiel
-
-tf.enable_eager_execution()
 
 solved = {}
 
@@ -63,30 +60,15 @@ def solve_game(state):
   return value
 
 
-model_types = ["resnet", "mlp"]
-
-
 def build_model(game, model_type):
-  num_actions = game.num_distinct_actions()
-  observation_shape = game.observation_tensor_shape()
-
-  if model_type == "resnet":
-    net = model_lib.keras_resnet(
-        observation_shape, num_actions, num_residual_blocks=2, num_filters=64,
-        value_head_hidden_size=64, data_format="channels_first")
-  elif model_type == "mlp":
-    net = model_lib.keras_mlp(
-        observation_shape, num_actions, num_layers=2, num_hidden=64)
-  else:
-    raise ValueError("Invalid model_type: {}".format(model_type))
-
-  return model_lib.Model(
-      net, l2_regularization=1e-4, learning_rate=0.01, device="cpu")
+  return model_lib.Model.build_model(
+      model_type, game.observation_tensor_shape(), game.num_distinct_actions(),
+      nn_width=64, nn_depth=2, weight_decay=1e-4, learning_rate=0.01, path=None)
 
 
 class ModelTest(parameterized.TestCase):
 
-  @parameterized.parameters(model_types)
+  @parameterized.parameters(model_lib.Model.valid_model_types)
   def test_model_learns_simple(self, model_type):
     game = pyspiel.load_game("tic_tac_toe")
     model = build_model(game, model_type)
@@ -123,7 +105,7 @@ class ModelTest(parameterized.TestCase):
     self.assertLess(losses[-1].value, 0.05)
     self.assertLess(losses[-1].policy, 0.05)
 
-  @parameterized.parameters(model_types)
+  @parameterized.parameters(model_lib.Model.valid_model_types)
   def test_model_learns_optimal(self, model_type):
     game = pyspiel.load_game("tic_tac_toe")
     solve_game(game.new_initial_state())

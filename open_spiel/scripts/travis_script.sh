@@ -18,10 +18,11 @@ set -e
 set -x
 
 if [ ! "$TRAVIS_USE_NOX" -eq 0 ]; then
-    # Build and run tests using nox
-    pip3 install nox
-    nox -s tests
-    exit 0
+  # Build and run tests using nox
+  pip3 install nox
+  PWD=`pwd`  # normally defined, but just in case!
+  PYTHONPATH="$PYTHONPATH:$PWD:$PWD/build:$PWD/build/python" nox -s tests
+  exit 0
 fi
 
 sudo -H pip3 install --upgrade pip

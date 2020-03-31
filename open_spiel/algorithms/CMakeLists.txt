@@ -103,3 +103,5 @@ add_test(tensor_game_utils_test tensor_game_utils_test)
 add_executable(trajectories_test trajectories_test.cc
     $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})
 add_test(trajectories_test trajectories_test)
+
+add_subdirectory (alpha_zero)

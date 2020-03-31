@@ -80,6 +80,7 @@ class PSROSolver(abstract_meta_trainer.AbstractMetaTrainer):
                n_noisy_copies=0,
                alpha_noise=0.0,
                beta_noise=0.0,
+               strategy_exp=True,
                **kwargs):
     """Initialize the PSRO solver.
 
@@ -160,6 +161,8 @@ class PSROSolver(abstract_meta_trainer.AbstractMetaTrainer):
 
     print("Sampling from marginals : {}".format(sample_from_marginals))
     self.sample_from_marginals = sample_from_marginals
+
+    self._strategy_exp = strategy_exp
 
     super(PSROSolver, self).__init__(
         game,
@@ -289,21 +292,16 @@ class PSROSolver(abstract_meta_trainer.AbstractMetaTrainer):
 
     The resulting policies are appended to self._new_policies.
     """
+
     used_policies, used_indexes = self._training_strategy_selector(
         self, self._number_policies_selected)
 
-    if self.symmetric_game:
-      self._policies = self._game_num_players * self._policies
-      self._num_players = self._game_num_players
-
-    sample_strategy, total_policies, probabilities_of_playing_policies = self.get_policies_and_strategies(
-    )
+    (sample_strategy,
+     total_policies,
+     probabilities_of_playing_policies) = self.get_policies_and_strategies()
 
     if self.symmetric_game:
-      # In a symmetric game, only one population is kept. The below lines
-      # therefore make PSRO consider only the first player during training,
-      # since both players are identical.
-      self._policies = [self._policies[0]]
+      self._policies = [self._policies[0]] 
       self._num_players = 1
 
     # Contains the training parameters of all trained oracles.
@@ -316,7 +314,6 @@ class PSROSolver(abstract_meta_trainer.AbstractMetaTrainer):
         currently_used_policies = used_policies[current_player]
         current_indexes = used_indexes[current_player]
       else:
-        # Rectifying training will not work for joint strategies.
         currently_used_policies = [
             joint_policy[current_player] for joint_policy in used_policies
         ]
@@ -338,13 +335,12 @@ class PSROSolver(abstract_meta_trainer.AbstractMetaTrainer):
             "probabilities_of_playing_policies": new_probabilities
         }
         training_parameters[current_player].append(new_parameter)
-    
     # List of List of new policies (One list per player)
     self.oracle = self._oracle(self._game, training_parameters, strategy_sampler=sample_strategy,
                                using_joint_strategies=self._rectify_training or not self.sample_from_marginals)
     self._new_policies = self.oracle
     #return {'train_iter'+str(iter)+'_p'+str(i):training_curves[i] for i in range(len(training_curves))}
-  
+
   def update_empirical_gamestate(self, seed=None):
     """Given new agents in _new_policies, update meta_games through simulations.
 
@@ -478,3 +474,11 @@ class PSROSolver(abstract_meta_trainer.AbstractMetaTrainer):
 
   def get_strategy_computation_and_selection_kwargs(self):
     return self._strategy_computation_and_selection_kwargs
+
+  ############################################
+  # Segment of Code for Strategy Exploration #
+  ############################################
+
+
+
+

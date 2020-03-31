@@ -12,25 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "open_spiel/utils/file_logger.h"
 
 #include <cstdlib>
 #include <string>
 
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/utils/file.h"
+#include "open_spiel/utils/logger.h"
 
 namespace open_spiel {
 namespace {
 
-std::string GetEnv(const std::string& key, const std::string& default_value) {
-    char* val = getenv(key.c_str());
-    return ((val != nullptr) ? std::string(val) : default_value);
-}
-
 void TestFileLogger() {
   std::string val = std::to_string(std::rand());  // NOLINT
-  std::string tmp_dir = GetEnv("TMPDIR", "/tmp");
+  std::string tmp_dir = file::GetTmpDir();
   std::string dir = tmp_dir + "/open_spiel-test-" + val;
   std::string filename = dir + "/log-test.txt";
 

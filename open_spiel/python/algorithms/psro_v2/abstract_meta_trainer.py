@@ -103,6 +103,8 @@ class AbstractMetaTrainer(object):
                oracle,
                initial_policies=None,
                meta_strategy_method=_DEFAULT_META_STRATEGY_METHOD,
+               meta_strategy_method_frequency = 1,
+               oracle_frequency=5,
                training_strategy_selector=_DEFAULT_STRATEGY_SELECTION_METHOD,
                symmetric_game=False,
                number_policies_selected=1,
@@ -123,6 +125,7 @@ class AbstractMetaTrainer(object):
                 games.
               - "prd": Projected Replicator Dynamics, as described in Lanctot et
                 Al.
+      meta_strategy_method_frequency: The frequency of updating meta-strategy method.
       training_strategy_selector: A callable or a string. If a callable, takes
         as arguments: - An instance of `PSROSolver`, - a
           `number_policies_selected` integer. and returning a list of
@@ -152,13 +155,19 @@ class AbstractMetaTrainer(object):
 
     self.symmetric_game = symmetric_game
     self._game_num_players = self._num_players
+    #TODO: add support to role symmetric game.
     self._num_players = 1 if symmetric_game else self._num_players
 
     self._number_policies_selected = number_policies_selected
 
     meta_strategy_method = _process_string_or_callable(
         meta_strategy_method, meta_strategies.META_STRATEGY_METHODS)
-    print("Using {} as strategy method.".format(meta_strategy_method))
+    print("Using {} as strategy method.".format(meta_strategy_method.__name__))
+    # Save the name of current meta_strategy_method
+    self._meta_strategy_method_name = meta_strategy_method.__name__
+
+    self._meta_method_frequency = meta_strategy_method_frequency
+    self._update_oracle_frequency = oracle_frequency
 
     self._training_strategy_selector = _process_string_or_callable(
         training_strategy_selector,
@@ -246,3 +255,65 @@ class AbstractMetaTrainer(object):
 
   def get_kwargs(self):
     return self._kwargs
+
+  ############################################
+  # Segment of Code for Strategy Exploration #
+  ############################################
+
+  def update_meta_strategy_method(self, new_meta_str_method=None):
+    """
+    Update meta-strategy method and corresponding name.
+    :param new_meta_str_method: new meta-strategy method.
+    :return:
+    """
+    if new_meta_str_method is not None:
+      self._meta_strategy_method = _process_string_or_callable(new_meta_str_method, meta_strategies.META_STRATEGY_METHODS)
+      print("Using {} as strategy method.".format(self._meta_strategy_method.__name__))
+      self._meta_strategy_method_name = self._meta_strategy_method.__name__
+
+  def get_meta_strategy_method(self):
+    """
+    Return the name and the function of current meta-strategy method.
+    :return:
+    """
+    return self._meta_strategy_method_name, self._meta_strategy_method
+
+  def se_iteration(self, seed=None):
+    """Main trainer loop with strategy exploration.
+    Evaluate the performance of current meta-strategy method every _meta_method_frequency and update the
+    meta-strategy method.
+
+        Args:
+          seed: Seed for random BR noise generation.
+        """
+    self._iterations += 1
+    self.update_agents()  # Generate new, Best Response agents via oracle.
+    self.update_empirical_gamestate(seed=seed)  # Update gamestate matrix.
+    if self._iterations % self._meta_method_frequency == 0:
+      self.evalute_and_pick_meta_method()
+
+    if self._iterations % self._update_oracle_frequency == 0:
+      self.update_oracle()  # Switch fast and slow oracle.
+    self.update_meta_strategies()  # Compute meta strategy (e.g. Nash)
+
+  def update_oracle(self):
+    """
+    Switch fast and slow oracle.
+    :return:
+    """
+    raise NotImplementedError
+
+  def evalute_and_pick_meta_method(self):
+    """
+    Evaluate the performance of current meta-strategy method and update the
+    meta-strategy method.
+    :return:
+    """
+    # Evaluation
+    new_meta_str_method = self.evaluate_meta_method()
+
+    # Update
+    self.update_meta_strategy_method(new_meta_str_method)
+
+  def evaluate_meta_method(self):
+    raise NotImplementedError

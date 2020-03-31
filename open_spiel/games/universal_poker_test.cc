@@ -18,6 +18,7 @@
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
+#include "open_spiel/canonical_game_strings.h"
 #include "open_spiel/algorithms/evaluate_bots.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
@@ -123,6 +124,9 @@ void LoadAndRunGamesFullParameters() {
       LoadGame("universal_poker", HoldemNoLimit6PParameters());
   testing::RandomSimTestNoSerialize(*holdem_nolimit_6p, 1);
   testing::RandomSimTest(*holdem_nolimit_6p, 3);
+  std::shared_ptr<const Game> holdem_nolimit_fullgame =
+      LoadGame(HunlGameString("fullgame"));
+  testing::RandomSimTest(*holdem_nolimit_fullgame, 50);
 }
 
 void LoadAndRunGameFromGameDef() {
