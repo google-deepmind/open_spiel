@@ -234,9 +234,8 @@ void ChumpPolicyTests() {
   }
 }
 
-void FullNLBettingTests() {
-  // Test #1
-  // Checks min raising functionality.
+// Checks min raising functionality.
+void FullNLBettingTest1() {
   std::shared_ptr<const Game> game = LoadGame(
       "universal_poker(betting=nolimit,"
                       "numPlayers=2,"
@@ -273,22 +272,24 @@ void FullNLBettingTests() {
   SPIEL_CHECK_TRUE(absl::StrContains(state->ToString(),
       "ACPC State: STATE:0:cc/r4r6r8r10r12r14r16r18r20c//"
       ":2c2d|2h2s/3c3d3h/3s/4c"));
+}
 
-  // Test #2
-  // Checks that raises must double previous bet within the same round but
-  // each new round resets betting with the min bet size equal to the big blind.
-  game = LoadGame("universal_poker(betting=nolimit,"
-                                  "numPlayers=2,"
-                                  "numRounds=4,"
-                                  "blind=100 50,"
-                                  "firstPlayer=2 1 1 1,"
-                                  "numSuits=4,"
-                                  "numRanks=13,"
-                                  "numHoleCards=2,"
-                                  "numBoardCards=0 3 1 1,"
-                                  "stack=10000 10000,"
-                                  "bettingAbstraction=fullgame)");
-  state = game->NewInitialState();
+// Checks that raises must double previous bet within the same round but
+// each new round resets betting with the min bet size equal to the big blind.
+void FullNLBettingTest2() {
+  std::shared_ptr<const Game> game = LoadGame(
+      "universal_poker(betting=nolimit,"
+                      "numPlayers=2,"
+                      "numRounds=4,"
+                      "blind=100 50,"
+                      "firstPlayer=2 1 1 1,"
+                      "numSuits=4,"
+                      "numRanks=13,"
+                      "numHoleCards=2,"
+                      "numBoardCards=0 3 1 1,"
+                      "stack=10000 10000,"
+                      "bettingAbstraction=fullgame)");
+  std::unique_ptr<State> state = game->NewInitialState();
   while (state->IsChanceNode())
     state->ApplyAction(state->LegalActions()[0]);  // deal hole cards
   // assert all raise increments are valid
@@ -335,22 +336,24 @@ void FullNLBettingTests() {
   SPIEL_CHECK_TRUE(absl::StrContains(state->ToString(),
       "ACPC State: STATE:0:r5100c/r5200c/r5400r5600r5900c/r10000f"
       ":2c2d|2h2s/3c3d3h/3s/4c"));
+}
 
-  // Test #3
-  // Checks bet sizing is correct when there are more than two players
-  // all with different starting stacks.
-  game = LoadGame("universal_poker(betting=nolimit,"
-                                  "numPlayers=3,"
-                                  "numRounds=4,"
-                                  "blind=100 50 0,"
-                                  "firstPlayer=2 1 1 1,"
-                                  "numSuits=4,"
-                                  "numRanks=13,"
-                                  "numHoleCards=2,"
-                                  "numBoardCards=0 3 1 1,"
-                                  "stack=500 1000 2000,"
-                                  "bettingAbstraction=fullgame)");
-  state = game->NewInitialState();
+// Checks bet sizing is correct when there are more than two players
+// all with different starting stacks.
+void FullNLBettingTest3() {
+  std::shared_ptr<const Game> game = LoadGame(
+      "universal_poker(betting=nolimit,"
+                      "numPlayers=3,"
+                      "numRounds=4,"
+                      "blind=100 50 0,"
+                      "firstPlayer=2 1 1 1,"
+                      "numSuits=4,"
+                      "numRanks=13,"
+                      "numHoleCards=2,"
+                      "numBoardCards=0 3 1 1,"
+                      "stack=500 1000 2000,"
+                      "bettingAbstraction=fullgame)");
+  std::unique_ptr<State> state = game->NewInitialState();
   while (state->IsChanceNode())
     state->ApplyAction(state->LegalActions()[0]);
   state->ApplyAction(1);  // call big blind
@@ -409,5 +412,7 @@ int main(int argc, char **argv) {
   open_spiel::universal_poker::BasicUniversalPokerTests();
   open_spiel::universal_poker::HUNLRegressionTests();
   open_spiel::universal_poker::ChumpPolicyTests();
-  open_spiel::universal_poker::FullNLBettingTests();
+  open_spiel::universal_poker::FullNLBettingTest1();
+  open_spiel::universal_poker::FullNLBettingTest2();
+  open_spiel::universal_poker::FullNLBettingTest3();
 }
