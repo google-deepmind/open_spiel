@@ -300,10 +300,6 @@ class PSROSolver(abstract_meta_trainer.AbstractMetaTrainer):
      total_policies,
      probabilities_of_playing_policies) = self.get_policies_and_strategies()
 
-    if self.symmetric_game:
-      self._policies = [self._policies[0]] 
-      self._num_players = 1
-
     # Contains the training parameters of all trained oracles.
     # This is a list (Size num_players) of list (Size num_new_policies[player]),
     # each dict containing the needed information to train a new best response.
@@ -335,12 +331,25 @@ class PSROSolver(abstract_meta_trainer.AbstractMetaTrainer):
             "probabilities_of_playing_policies": new_probabilities
         }
         training_parameters[current_player].append(new_parameter)
+
+    if self.symmetric_game:
+      self._policies = self._game_num_players * self._policies
+      self._num_players = self._game_num_players
+      training_parameters = [training_parameters[0]]
+
     # List of List of new policies (One list per player)
-    self.oracle = self._oracle(self._game, training_parameters, strategy_sampler=sample_strategy,
+    self.oracle,reward_trace = self._oracle(self._game, training_parameters, strategy_sampler=sample_strategy,
                                using_joint_strategies=self._rectify_training or not self.sample_from_marginals)
     self._new_policies = self.oracle
-    #return {'train_iter'+str(iter)+'_p'+str(i):training_curves[i] for i in range(len(training_curves))}
+    if self.symmetric_game:
+      # In a symmetric game, only one population is kept. The below lines
+      # therefore make PSRO consider only the first player during training,
+      # since both players are identical.
+      self._policies = [self._policies[0]]
+      self._num_players = 1
 
+    return reward_trace
+  
   def update_empirical_gamestate(self, seed=None):
     """Given new agents in _new_policies, update meta_games through simulations.
 
@@ -433,10 +442,9 @@ class PSROSolver(abstract_meta_trainer.AbstractMetaTrainer):
                 meta_games[player][used_tuple] += utility_estimates[
                     permutation[player]] / len(player_permutations)
           else:
-            utility_estimates = self.sample_episodes(estimated_policies,
-                                                     self._sims_per_entry)
-            for k in range(self._num_players):
-              meta_games[k][tuple(used_index)] = utility_estimates[k]
+            utility_estimates = self.sample_episodes(estimated_policies,self._sims_per_entry)
+          for k in range(self._num_players):
+            meta_games[k][tuple(used_index)] = utility_estimates[k]
 
     if self.symmetric_game:
       # Make PSRO consider that we only have one population again, as we

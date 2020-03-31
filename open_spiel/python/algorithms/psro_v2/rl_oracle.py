@@ -275,16 +275,18 @@ class RLOracle(optimization_oracle.AbstractOracle):
     new_policies = self.generate_new_policies(training_parameters)
 
     # TODO(author4): Look into multithreading.
-    avg_rewards = []
+    reward_trace = [[] for _ in range(game.num_players())]
     while not self._has_terminated(episodes_per_oracle):
       agents, indexes = self.sample_policies_for_episode(
           new_policies, training_parameters, episodes_per_oracle,
           strategy_sampler)
-      avg_rewards.append(self._rollout(game, agents, **oracle_specific_execution_kwargs))
+      reward = self._rollout(game, agents, **oracle_specific_execution_kwargs)
+      for i in range(game.num_players()):
+        reward_trace[i].append(reward[i])
       episodes_per_oracle = update_episodes_per_oracles(episodes_per_oracle,
                                                         indexes)
     # Freeze the new policies to keep their weights static. This allows us to
     # later not have to make the distinction between static and training
     # policies in training iterations.
     freeze_all(new_policies)
-    return new_policies, avg_rewards
+    return new_policies, reward_trace

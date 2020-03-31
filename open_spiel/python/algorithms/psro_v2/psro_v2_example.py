@@ -265,7 +265,7 @@ def gpsro_looper(env, oracle, agents, writer):
     if FLAGS.verbose:
       print("Iteration : {}".format(gpsro_iteration))
       print("Time so far: {}".format(time.time() - start_time))
-    result_dict = g_psro_solver.iteration()
+    train_reward_curve = g_psro_solver.iteration()
     meta_game = g_psro_solver.get_meta_game()
     meta_probabilities = g_psro_solver.get_meta_strategies()
     policies = g_psro_solver.get_policies()
@@ -283,9 +283,9 @@ def gpsro_looper(env, oracle, agents, writer):
 
     _ = print_policy_analysis(policies, env.game, FLAGS.verbose)
 
-    #for key,val in result_dict:
-    #  for i in range(len(result_dict[key])):
-    #    writer.add_scalar(key+str(gpsro_iteration),result_dict[key][i],i)
+    for p in range(len(train_reward_curve)):
+      for p_i in range(len(train_reward_curve[p])):
+        writer.add_scalar('player'+str(p)+'_'+str(gpsro_iteration),train_reward_curve[p][p_i],p_i)
     for p in range(len(expl_per_player)):
       writer.add_scalar('player'+str(p)+'_exp',expl_per_player[p],gpsro_iteration)
     writer.add_scalar('exp',exploitabilities,gpsro_iteration)
