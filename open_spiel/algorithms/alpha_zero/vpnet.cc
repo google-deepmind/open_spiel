@@ -44,7 +44,7 @@ using TensorMapBool = Eigen::TensorMap<TensorBool, Eigen::Aligned>;
 bool CreateGraphDef(const Game& game, double learning_rate,
     double weight_decay, const std::string& path, const std::string& filename,
     std::string nn_model, int nn_width, int nn_depth, bool verbose) {
-  return RunPython("open_spiel.algorithms.alpha_zero.export_vpnet",
+  return RunPython("open_spiel.python.algorithms.alpha_zero.export_model",
                    {
                        "--game", absl::StrCat("'", game.ToString(), "'"),  //
                        "--path", absl::StrCat("'", path, "'"),             //

@@ -23,7 +23,7 @@
 namespace open_spiel {
 namespace algorithms {
 
-// Spawn a python interpreter to call export_vpnet.py.
+// Spawn a python interpreter to call export_model.py.
 // There are three options for nn_model: mlp, conv2d and resnet.
 // The nn_width is the number of hidden units for the mlp, and filters for
 // conv/resnet. The nn_depth is number of layers for all three.
