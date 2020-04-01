@@ -19,30 +19,13 @@ import numpy as np
 
 from open_spiel.python import policy
 from open_spiel.python.algorithms.psro_v2 import utils
-from open_spiel.python.algorithms.psro_v2 import PSROSolver
+from open_spiel.python.algorithms.psro_v2 import psro_v2
 from open_spiel.python.algorithms.psro_v2 import meta_strategies
 
-class PSROQuiesceSolver(PSROSolver):
+class PSROQuiesceSolver(psro_v2.PSROSolver):
   """
   quiesce class, incomplete information nash finding
   """
-  def __init__(self,
-               game,
-               oracle,
-               sims_per_entry,
-               initial_policies=None,
-               rectifier="",
-               training_strategy_selector=None,
-               meta_strategy_method="alpharank",
-               sample_from_marginals=False,
-               number_policies_selected=1,
-               n_noisy_copies=0,
-               alpha_noise=0.0,
-               beta_noise=0.0,
-               **kwargs):
-    self._meta_strategy_str = meta_strategy_method
-    super(PSROQuiesceSolver, self).__init__(**locals())
-
   def _initialize_policy(self, initial_policies):
     self._policies = [[] for k in range(self._num_players)]
     self._new_policies = [([initial_policies[k]] if initial_policies else
@@ -57,13 +40,14 @@ class PSROQuiesceSolver(PSROSolver):
         for _ in range(effective_payoff_size)
     ]
     super(PSROQuiesceSolver,self).update_empirical_gamestate(seed=None)
+    self.update_complete_ind([0 for _ in range(self._game_num_players)],add_sample=True)
   
   def update_meta_strategies(self):
     """Recomputes the current meta strategy of each player.
     Given new payoff tables, we call self._meta_strategy_method to update the
     meta-probabilities.
     """
-    if self._meta_strategy_str == 'nash':
+    if self._meta_strategy_str == 'nash' or 'general_nash':
         self._meta_strategy_probabilities,self._non_marginalized_probabilities = self.inner_loop()
     else:
         super(PSROQuiesceSolver,self).update_meta_strategies()
@@ -146,7 +130,7 @@ class PSROQuiesceSolver(PSROSolver):
     found_confirmed_eq = False
     while not found_confirmed_eq:
       maximum_subgame = self.get_complete_meta_game
-      ne_subgame,_ = self._meta_strategy_method(solver=self,return_joint=True,maximum_subgame)
+      ne_subgame,_ = self._meta_strategy_method(solver=self, return_joint=True, game=maximum_subgame)
       # ne_support_num: list of list, index of where equilibrium is [[0,1],[2]]
       # cumsum: index ne_subgame with self._complete_ind
       cum_sum = [np.cumsum(ele) for ele in self._complete_ind]
@@ -254,7 +238,7 @@ class PSROQuiesceSolver(PSROSolver):
     """
     policy_len = [len(self._policies) for _ in range(self._game_num_players)] if self.symmetric_game else [len(ele) for ele in self._policies]
     for i in range(self._game_num_players):
-      for _ in range(policy_len-len(self._complete_ind[i])):
+      for _ in range(policy_len[i]-len(self._complete_ind[i])):
         self._complete_ind[i].append(0)
 
       if not add_sample or self._complete_ind[i][policy_indicator[i]]==1:
@@ -278,7 +262,7 @@ class PSROQuiesceSolver(PSROSolver):
       estimated_policies = [self._policies[policy_indicator[i]] for i in range(self._game_num_players)]
     else:
       estimated_policies = [self._policies[i][policy_indicator[i]] for i in range(self._game_num_players)]
-    utility_estimates = self.rl_sample_episodes(estimated_policies,self._sims_per_entry)
+    utility_estimates = self.sample_episodes(estimated_policies,self._sims_per_entry)
     for k in range(self._game_num_players):
       self._meta_games[k][tuple(policy_indicator)] = utility_estimates[k]
     self.update_complete_ind(policy_indicator,add_sample=True)    

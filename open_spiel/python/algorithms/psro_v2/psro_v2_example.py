@@ -46,6 +46,7 @@ from open_spiel.python.algorithms.psro_v2 import psro_v2
 from open_spiel.python.algorithms.psro_v2 import rl_oracle
 from open_spiel.python.algorithms.psro_v2 import rl_policy
 from open_spiel.python.algorithms.psro_v2 import strategy_selectors
+from open_spiel.python.algorithms.psro_v2.quiesce import PSROQuiesceSolver
 
 
 FLAGS = flags.FLAGS
@@ -55,11 +56,11 @@ flags.DEFINE_string("game_name", "kuhn_poker", "Game name.")
 flags.DEFINE_integer("n_players", 2, "The number of players.")
 
 # PSRO related
-flags.DEFINE_string("meta_strategy_method", "nash",
+flags.DEFINE_string("meta_strategy_method", "general_nash",
                     "Name of meta strategy computation method.")
 flags.DEFINE_integer("number_policies_selected", 1,
                      "Number of new strategies trained at each PSRO iteration.")
-flags.DEFINE_integer("sims_per_entry", 1000,
+flags.DEFINE_integer("sims_per_entry", 50,
                      ("Number of simulations to run to estimate each element"
                       "of the game outcome matrix."))
 
@@ -67,7 +68,7 @@ flags.DEFINE_integer("gpsro_iterations", 100,
                      "Number of training steps for GPSRO.")
 flags.DEFINE_bool("symmetric_game", False, "Whether to consider the current "
                   "game as a symmetric game.")
-flags.DEFINE_bool("quiesce",False,"Whether to use quiece")
+flags.DEFINE_bool("quiesce",True,"Whether to use quiece")
 
 # Rectify options
 flags.DEFINE_string("rectifier", "",
@@ -86,9 +87,9 @@ flags.DEFINE_string("training_strategy_selector", "probabilistic",
                     "probability strategy available to each player.")
 
 # General (RL) agent parameters
-flags.DEFINE_string("oracle_type", "DQN", "Choices are DQN, PG (Policy "
+flags.DEFINE_string("oracle_type", "BR", "Choices are DQN, PG (Policy "
                     "Gradient) or BR (exact Best Response)")
-flags.DEFINE_integer("number_training_episodes", int(1e2), "Number training "
+flags.DEFINE_integer("number_training_episodes", int(2), "Number training "
                      "episodes per RL policy. Used for PG and DQN")
 flags.DEFINE_float("self_play_proportion", 0.0, "Self play proportion")
 flags.DEFINE_integer("hidden_layer_size", 256, "Hidden layer size")
@@ -241,12 +242,13 @@ def print_policy_analysis(policies, game, verbose=False):
   return unique_policies
 
 
-def gpsro_looper(env, oracle, agents, writer):
+def gpsro_looper(env, oracle, agents, writer, quiesce=False):
   """Initializes and executes the GPSRO training loop."""
   sample_from_marginals = True  # TODO(somidshafiei) set False for alpharank
   training_strategy_selector = FLAGS.training_strategy_selector or strategy_selectors.probabilistic_strategy_selector
-
-  g_psro_solver = psro_v2.PSROSolver(
+  
+  solver = psro_v2.PSROSolver if not quiesce else PSROQuiesceSolver
+  g_psro_solver = solver(
       env.game,
       oracle,
       initial_policies=agents,
@@ -319,7 +321,7 @@ def main(argv):
     elif FLAGS.oracle_type == "BR":
       oracle, agents = init_br_responder(env)
     sess.run(tf.global_variables_initializer())
-    gpsro_looper(env, oracle, agents, writer)
+    gpsro_looper(env, oracle, agents, writer,quiesce=FLAGS.quiesce)
 
   writer.close()
 

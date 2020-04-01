@@ -151,6 +151,7 @@ class AbstractMetaTrainer(object):
     self._iterations = 0
     self._game = game
     self._oracle = oracle
+    self._is_rloracle = oracle.__class__.__name__=='RLOracle'
     self._num_players = self._game.num_players()
 
     self.symmetric_game = symmetric_game

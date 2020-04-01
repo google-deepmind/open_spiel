@@ -281,8 +281,11 @@ class RLOracle(optimization_oracle.AbstractOracle):
           new_policies, training_parameters, episodes_per_oracle,
           strategy_sampler)
       reward = self._rollout(game, agents, **oracle_specific_execution_kwargs)
-      for i in range(game.num_players()):
-        reward_trace[i].append(reward[i])
+      if len(indexes)>1:
+        import pdb
+        pdb.set_trace()
+      else:
+        reward_trace[indexes[0][0]].append(reward[indexes[0][0]])
       episodes_per_oracle = update_episodes_per_oracles(episodes_per_oracle,
                                                         indexes)
     # Freeze the new policies to keep their weights static. This allows us to

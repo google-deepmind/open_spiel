@@ -149,22 +149,22 @@ def nash_strategy(solver, return_joint=False):
     return result, joint_strategies
 
 #TODO: Test this sovler with PSRO.
-def general_nash_strategy(solver, return_joint=False, NE_solver="gambit", mode='one'):
+def general_nash_strategy(solver, return_joint=False, NE_solver="gambit", mode='one', game=None):
   """Returns nash distribution on meta game matrix.
 
-    This method works for general-sum multi-player games.
+  This method works for general-sum multi-player games.
 
-    Args:
-      solver: GenPSROSolver instance.
-      return_joint: If true, only returns marginals. Otherwise marginals as well
-        as joint probabilities.
-      NE_solver: Tool for finding a NE.
-      mode: Return one or all or pure NE.
-
-    Returns:
-      Nash distribution on strategies.
-    """
-  meta_games = solver.get_meta_game()
+  Args:
+    solver: GenPSROSolver instance.
+    return_joint: If true, only returns marginals. Otherwise marginals as well
+      as joint probabilities.
+    NE_solver: Tool for finding a NE.
+    mode: Return one or all or pure NE.
+    game: overrides solver.get_meta_games() if provided
+  Returns:
+    Nash distribution on strategies.
+  """
+  meta_games = solver.get_meta_game() if game is None else game
   if not isinstance(meta_games, list):
     meta_games = [meta_games, -meta_games]
   equilibria = gs.nash_solver(meta_games, solver=NE_solver, mode=mode)
@@ -238,7 +238,7 @@ def prioritized_fictitious_play(solver, return_joint=False):
 META_STRATEGY_METHODS = {
     "uniform_biased": uniform_biased_strategy,
     "uniform": uniform_strategy,
-    "nash": general_nash_strategy,
+    "nash": nash_strategy,
     "prd": prd_strategy,
     "general_nash": general_nash_strategy,
     "sp": self_play_strategy,
