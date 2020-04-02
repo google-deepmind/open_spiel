@@ -1,15 +1,8 @@
 import numpy as np
 
-a = np.ones((5,3))
-b = np.array([1,2,3])
+a = 3
+b = a
 
-c = np.reshape(b,[-1,1])
-
-def hello():
-    print("hello world.")
-a = {"a": hello}
-b = "hello world."
-print("use {}".format(b.__name__))
-
-
+b += 1
+print(a, b, a is b)
 

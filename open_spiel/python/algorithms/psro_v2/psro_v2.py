@@ -73,9 +73,9 @@ class PSROSolver(abstract_meta_trainer.AbstractMetaTrainer):
                sims_per_entry,
                initial_policies=None,
                rectifier="",
-               training_strategy_selector=None,
-               meta_strategy_method="alpharank",
-               sample_from_marginals=False,
+               training_strategy_selector="probabilistic",
+               meta_strategy_method="general_nash",
+               sample_from_marginals=True,
                number_policies_selected=1,
                n_noisy_copies=0,
                alpha_noise=0.0,
@@ -131,6 +131,7 @@ class PSROSolver(abstract_meta_trainer.AbstractMetaTrainer):
         ignore this.
       alpha_noise: lower bound on alpha noise value (Mixture amplitude.)
       beta_noise: lower bound on beta noise value (Softmax temperature.)
+      strategy_exp: bool if doing strategy exploration.
       **kwargs: kwargs for meta strategy computation and training strategy
         selection.
     """
@@ -174,6 +175,7 @@ class PSROSolver(abstract_meta_trainer.AbstractMetaTrainer):
         **kwargs)
 
   def _initialize_policy(self, initial_policies):
+    #TODO: add policy initialization for symmetric game.
     self._policies = [[] for k in range(self._num_players)]
     self._new_policies = [([initial_policies[k]] if initial_policies else
                            [policy.UniformRandomPolicy(self._game)])
@@ -185,6 +187,7 @@ class PSROSolver(abstract_meta_trainer.AbstractMetaTrainer):
         np.array(utils.empty_list_generator(effective_payoff_size))
         for _ in range(effective_payoff_size)
     ]
+    # Initialize the payoff tensor.
     self.update_empirical_gamestate(seed=None)
 
   def get_joint_policy_ids(self):
@@ -210,15 +213,17 @@ class PSROSolver(abstract_meta_trainer.AbstractMetaTrainer):
 
   def update_meta_strategies(self):
     """Recomputes the current meta strategy of each player.
+    Overload the one in abstract solver.
 
     Given new payoff tables, we call self._meta_strategy_method to update the
     meta-probabilities.
     """
+    #TODO: return_joint should be associated with alpha-rank.
     if self.symmetric_game:
       self._policies = self._policies * self._game_num_players
 
     self._meta_strategy_probabilities, self._non_marginalized_probabilities =\
-        self._meta_strategy_method(solver=self, return_joint=True)
+        self._meta_strategy_method(solver=self, return_joint=False)
 
     if self.symmetric_game:
       self._policies = [self._policies[0]]
@@ -294,6 +299,7 @@ class PSROSolver(abstract_meta_trainer.AbstractMetaTrainer):
     The resulting policies are appended to self._new_policies.
     """
 
+    # Sample strategies from current meta-strategies as initial policies for training BR.
     used_policies, used_indexes = self._training_strategy_selector(
         self, self._number_policies_selected)
 
@@ -459,6 +465,7 @@ class PSROSolver(abstract_meta_trainer.AbstractMetaTrainer):
     self._policies = updated_policies
     return meta_games
 
+  #TODO: repeated!
   def get_meta_game(self):
     """Returns the meta game matrix."""
     return self._meta_games
@@ -468,6 +475,7 @@ class PSROSolver(abstract_meta_trainer.AbstractMetaTrainer):
     return self._meta_games
 
   def get_policies(self):
+    #TODO: repeated!
     """Returns a list, each element being a list of each player's policies."""
     policies = self._policies
     if self.symmetric_game:
@@ -488,6 +496,7 @@ class PSROSolver(abstract_meta_trainer.AbstractMetaTrainer):
   # Segment of Code for Strategy Exploration #
   ############################################
 
-
+  def evaluate_meta_method(self):
+      pass
 
 

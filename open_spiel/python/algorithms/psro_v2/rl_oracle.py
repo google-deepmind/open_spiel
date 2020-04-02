@@ -275,7 +275,6 @@ class RLOracle(optimization_oracle.AbstractOracle):
 
     new_policies = self.generate_new_policies(training_parameters)
 
-    # TODO(author4): Look into multithreading.
     while not self._has_terminated(episodes_per_oracle):
       agents, indexes = self.sample_policies_for_episode(
           new_policies, training_parameters, episodes_per_oracle,
