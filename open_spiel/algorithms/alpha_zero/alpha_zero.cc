@@ -273,14 +273,13 @@ void learner(const open_spiel::Game& game,
   CircularBuffer<VPNetModel::TrainInputs> replay_buffer(
       config.replay_buffer_size);
   int learn_rate = config.replay_buffer_size / config.replay_buffer_reuse;
-  int64_t states_learned = 0;
   int64_t total_trajectories = 0;
 
   const int stage_count = 7;
   std::vector<open_spiel::BasicStats> value_accuracies(stage_count);
   std::vector<open_spiel::BasicStats> value_predictions(stage_count);
   open_spiel::BasicStats game_lengths;
-  open_spiel::HistogramNumbered game_lengths_hist(game.MaxGameLength());
+  open_spiel::HistogramNumbered game_lengths_hist(game.MaxGameLength() + 1);
 
   open_spiel::HistogramNamed outcomes({"Player1", "Player2", "Draw"});
   // Actor threads have likely been contributing for a while, so put `last` in
@@ -303,8 +302,7 @@ void learner(const open_spiel::Game& game,
     int queue_size = trajectory_queue->Size();
     int num_states = 0;
     int num_trajectories = 0;
-    while (!stop->StopRequested() &&
-           replay_buffer.TotalAdded() - states_learned < learn_rate) {
+    while (!stop->StopRequested() && num_states < learn_rate) {
       std::optional<Trajectory> trajectory = trajectory_queue->Pop();
       if (trajectory) {
         num_trajectories += 1;
@@ -345,18 +343,14 @@ void learner(const open_spiel::Game& game,
          num_states, num_trajectories, num_states / seconds,
          num_states / (config.actors * seconds),
          static_cast<double>(num_states) / num_trajectories);
-    logger.Print(
-        "Queue size: %d. Buffer size: %d. States seen: %d, learned: %d, "
-        "new: %d",
-         queue_size, replay_buffer.Size(), replay_buffer.TotalAdded(),
-         states_learned, replay_buffer.TotalAdded() - states_learned);
+    logger.Print("Queue size: %d. Buffer size: %d. States seen: %d",
+                 queue_size, replay_buffer.Size(), replay_buffer.TotalAdded());
 
     if (stop->StopRequested()) {
       break;
     }
 
     last = now;
-    states_learned = replay_buffer.TotalAdded();
 
     VPNetModel::LossInfo losses;
     {  // Extra scope to return the device for use for inference asap.
