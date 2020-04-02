@@ -47,18 +47,17 @@
 
 namespace open_spiel::algorithms {
 
-struct ReplayNode {
-  std::vector<double> observation;
-  open_spiel::Player current_player;
-  std::vector<open_spiel::Action> legal_actions;
-  open_spiel::Action action;
-  open_spiel::ActionsAndProbs policy;
-  double value;
-  std::vector<double> returns;
-};
-
 struct Trajectory {
-  std::vector<ReplayNode> states;
+  struct State {
+    std::vector<double> observation;
+    open_spiel::Player current_player;
+    std::vector<open_spiel::Action> legal_actions;
+    open_spiel::Action action;
+    open_spiel::ActionsAndProbs policy;
+    double value;
+  };
+
+  std::vector<State> states;
   std::vector<double> returns;
 };
 
@@ -91,7 +90,7 @@ Trajectory PlayGame(
     }
 
     double root_value = root->total_reward / root->explore_count;
-    trajectory.states.push_back(ReplayNode{
+    trajectory.states.push_back(Trajectory::State{
         state->ObservationTensor(), player,
         state->LegalActions(), action, std::move(policy), root_value});
     std::string action_str = state->ActionToString(player, action);
@@ -271,13 +270,11 @@ void learner(const open_spiel::Game& game,
   logger.Print("Running the learner on device %d: %s", device_id,
                device_manager->Get(0, device_id)->Device());
 
-  CircularBuffer<ReplayNode> replay_buffer(config.replay_buffer_size);
+  CircularBuffer<VPNetModel::TrainInputs> replay_buffer(
+      config.replay_buffer_size);
   int learn_rate = config.replay_buffer_size / config.replay_buffer_reuse;
   int64_t states_learned = 0;
   int64_t total_trajectories = 0;
-
-  std::vector<VPNetModel::TrainInputs> train_inputs;
-  train_inputs.reserve(config.train_batch_size);
 
   const int stage_count = 7;
   std::vector<open_spiel::BasicStats> value_accuracies(stage_count);
@@ -318,19 +315,24 @@ void learner(const open_spiel::Game& game,
         double p1_outcome = trajectory->returns[0];
         outcomes.Add(p1_outcome > 0 ? 0 : (p1_outcome < 0 ? 1 : 2));
 
-        for (ReplayNode& n : trajectory->states) {
-          n.returns = trajectory->returns;
-          replay_buffer.Add(n);
+        for (const Trajectory::State& state : trajectory->states) {
+          replay_buffer.Add(
+              VPNetModel::TrainInputs{
+                  state.legal_actions,
+                  state.observation,
+                  state.policy,
+                  p1_outcome});
           num_states += 1;
         }
+
         for (int stage = 0; stage < stage_count; ++stage) {
           // Scale for the length of the game
           int index = (trajectory->states.size() - 1) *
                       static_cast<double>(stage) / (stage_count - 1);
-          const ReplayNode& n = trajectory->states[index];
-          value_accuracies[stage].Add((n.value >= 0) ==
-                                      (n.returns[n.current_player] >= 0));
-          value_predictions[stage].Add(abs(n.value));
+          const Trajectory::State& s = trajectory->states[index];
+          value_accuracies[stage].Add(
+              (s.value >= 0) == (trajectory->returns[s.current_player] >= 0));
+          value_predictions[stage].Add(abs(s.value));
         }
       }
     }
@@ -363,20 +365,8 @@ void learner(const open_spiel::Game& game,
 
       // Learn from them.
       for (int i = 0; i < replay_buffer.Size() / config.train_batch_size; i++) {
-        std::vector<ReplayNode> data = replay_buffer.Sample(
-            &rng, config.train_batch_size);
-
-        for (const ReplayNode& node : data) {
-          train_inputs.emplace_back(
-              VPNetModel::TrainInputs{
-                  node.legal_actions,
-                  node.observation,
-                  node.policy,
-                  node.returns[0]});
-        }
-
-        losses += learn_model->Learn(train_inputs);
-        train_inputs.clear();
+        losses += learn_model->Learn(replay_buffer.Sample(
+            &rng, config.train_batch_size));
       }
     }
 
