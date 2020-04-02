@@ -497,6 +497,8 @@ class PSROSolver(abstract_meta_trainer.AbstractMetaTrainer):
   ############################################
 
   def evaluate_meta_method(self):
-      pass
+      slow_subgame_index = self._slow_oracle_iters[-1] - 1
+      slow_submeta_game = [subgame[:slow_subgame_index] for subgame in self._meta_games]
+      
 
 

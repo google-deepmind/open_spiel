@@ -335,12 +335,16 @@ class AbstractMetaTrainer(object):
     self.update_meta_strategies()  # Compute meta strategy (e.g. Nash)
 
   def switch_oracle(self):
+    """
+        Switch fast and slow oracle.
+        :return:
+    """
     self.update_oracle(self._oracles[1 - self._mode])
     self._mode = 1 - self._mode
 
   def update_oracle(self, oracle):
     """
-    Switch fast and slow oracle.
+    Assign a new oracle.
     :return:
     """
     self._oracle = oracle
