@@ -27,8 +27,8 @@
 // Parameters:
 //     "players"       int    number of players               (default = 2)
 
-#ifndef THIRD_PARTY_OPEN_SPIEL_GAMES_LEDUC_POKER_H_
-#define THIRD_PARTY_OPEN_SPIEL_GAMES_LEDUC_POKER_H_
+#ifndef OPEN_SPIEL_GAMES_LEDUC_POKER_H_
+#define OPEN_SPIEL_GAMES_LEDUC_POKER_H_
 
 #include <array>
 #include <memory>
@@ -184,4 +184,4 @@ class LeducGame : public Game {
 }  // namespace leduc_poker
 }  // namespace open_spiel
 
-#endif  // THIRD_PARTY_OPEN_SPIEL_GAMES_LEDUC_POKER_H_
+#endif  // OPEN_SPIEL_GAMES_LEDUC_POKER_H_

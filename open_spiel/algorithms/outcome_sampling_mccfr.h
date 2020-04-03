@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef THIRD_PARTY_OPEN_SPIEL_ALGORITHMS_OUTCOME_SAMPLING_MCCFR_H_
-#define THIRD_PARTY_OPEN_SPIEL_ALGORITHMS_OUTCOME_SAMPLING_MCCFR_H_
+#ifndef OPEN_SPIEL_ALGORITHMS_OUTCOME_SAMPLING_MCCFR_H_
+#define OPEN_SPIEL_ALGORITHMS_OUTCOME_SAMPLING_MCCFR_H_
 
 #include <memory>
 #include <random>
@@ -96,4 +96,4 @@ class OutcomeSamplingMCCFRSolver {
 }  // namespace algorithms
 }  // namespace open_spiel
 
-#endif  // THIRD_PARTY_OPEN_SPIEL_ALGORITHMS_OUTCOME_SAMPLING_MCCFR_H_
+#endif  // OPEN_SPIEL_ALGORITHMS_OUTCOME_SAMPLING_MCCFR_H_

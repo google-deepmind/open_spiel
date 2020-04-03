@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef THIRD_PARTY_OPEN_SPIEL_UTILS_THREAD_H_
-#define THIRD_PARTY_OPEN_SPIEL_UTILS_THREAD_H_
+#ifndef OPEN_SPIEL_UTILS_THREAD_H_
+#define OPEN_SPIEL_UTILS_THREAD_H_
 
 #include <atomic>
 #include <functional>
@@ -54,4 +54,4 @@ class StopToken {
 
 }  // namespace open_spiel
 
-#endif  // THIRD_PARTY_OPEN_SPIEL_UTILS_THREAD_H_
+#endif  // OPEN_SPIEL_UTILS_THREAD_H_

@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef THIRD_PARTY_OPEN_SPIEL_GAMES_HAVANNAH_H_
-#define THIRD_PARTY_OPEN_SPIEL_GAMES_HAVANNAH_H_
+#ifndef OPEN_SPIEL_GAMES_HAVANNAH_H_
+#define OPEN_SPIEL_GAMES_HAVANNAH_H_
 
 #include <array>
 #include <cstdint>
@@ -231,4 +231,4 @@ class HavannahGame : public Game {
 }  // namespace havannah
 }  // namespace open_spiel
 
-#endif  // THIRD_PARTY_OPEN_SPIEL_GAMES_HAVANNAH_H_
+#endif  // OPEN_SPIEL_GAMES_HAVANNAH_H_

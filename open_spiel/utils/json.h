@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef THIRD_PARTY_OPEN_SPIEL_UTILS_JSON_H_
-#define THIRD_PARTY_OPEN_SPIEL_UTILS_JSON_H_
+#ifndef OPEN_SPIEL_UTILS_JSON_H_
+#define OPEN_SPIEL_UTILS_JSON_H_
 
 #include <cstdint>
 
@@ -130,4 +130,4 @@ std::optional<Value> FromString(absl::string_view str);
 
 }  // namespace open_spiel::json
 
-#endif  // THIRD_PARTY_OPEN_SPIEL_UTILS_JSON_H_
+#endif  // OPEN_SPIEL_UTILS_JSON_H_

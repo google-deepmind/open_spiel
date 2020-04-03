@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef THIRD_PARTY_OPEN_SPIEL_GAMES_HANABI_H_
-#define THIRD_PARTY_OPEN_SPIEL_GAMES_HANABI_H_
+#ifndef OPEN_SPIEL_GAMES_HANABI_H_
+#define OPEN_SPIEL_GAMES_HANABI_H_
 
 // Hanabi is a cooperative card game, described here:
 // https://en.wikipedia.org/wiki/Hanabi_(card_game)
@@ -98,4 +98,4 @@ class OpenSpielHanabiState : public State {
 }  // namespace hanabi
 }  // namespace open_spiel
 
-#endif  // THIRD_PARTY_OPEN_SPIEL_GAMES_HANABI_H_
+#endif  // OPEN_SPIEL_GAMES_HANABI_H_

@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef THIRD_PARTY_OPEN_SPIEL_UTILS_TENSOR_VIEW_H_
-#define THIRD_PARTY_OPEN_SPIEL_UTILS_TENSOR_VIEW_H_
+#ifndef OPEN_SPIEL_UTILS_TENSOR_VIEW_H_
+#define OPEN_SPIEL_UTILS_TENSOR_VIEW_H_
 
 #include <algorithm>
 #include <numeric>
@@ -80,4 +80,4 @@ class TensorView {
 
 }  // namespace open_spiel
 
-#endif  // THIRD_PARTY_OPEN_SPIEL_UTILS_TENSOR_VIEW_H_
+#endif  // OPEN_SPIEL_UTILS_TENSOR_VIEW_H_

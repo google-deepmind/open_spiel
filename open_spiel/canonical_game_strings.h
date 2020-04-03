@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef THIRD_PARTY_OPEN_SPIEL_CANONICAL_GAME_STRINGS_H_
-#define THIRD_PARTY_OPEN_SPIEL_CANONICAL_GAME_STRINGS_H_
+#ifndef OPEN_SPIEL_CANONICAL_GAME_STRINGS_H_
+#define OPEN_SPIEL_CANONICAL_GAME_STRINGS_H_
 
 #include <string>
 
@@ -34,4 +34,4 @@ std::string HulhGameString(const std::string &betting_abstraction);
 
 }  // namespace open_spiel
 
-#endif  // THIRD_PARTY_OPEN_SPIEL_SPIEL_H_
+#endif  // OPEN_SPIEL_SPIEL_H_

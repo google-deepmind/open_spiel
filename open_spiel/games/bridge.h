@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef THIRD_PARTY_OPEN_SPIEL_GAMES_BRIDGE_H_
-#define THIRD_PARTY_OPEN_SPIEL_GAMES_BRIDGE_H_
+#ifndef OPEN_SPIEL_GAMES_BRIDGE_H_
+#define OPEN_SPIEL_GAMES_BRIDGE_H_
 
 // The full game of contract bridge.
 // See https://en.wikipedia.org/wiki/Contract_bridge
@@ -219,4 +219,4 @@ class BridgeGame : public Game {
 }  // namespace bridge
 }  // namespace open_spiel
 
-#endif  // THIRD_PARTY_OPEN_SPIEL_GAMES_BRIDGE_H_
+#endif  // OPEN_SPIEL_GAMES_BRIDGE_H_

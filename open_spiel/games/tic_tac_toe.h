@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef THIRD_PARTY_OPEN_SPIEL_GAMES_TIC_TAC_TOE_H_
-#define THIRD_PARTY_OPEN_SPIEL_GAMES_TIC_TAC_TOE_H_
+#ifndef OPEN_SPIEL_GAMES_TIC_TAC_TOE_H_
+#define OPEN_SPIEL_GAMES_TIC_TAC_TOE_H_
 
 #include <array>
 #include <map>
@@ -118,4 +118,4 @@ inline std::ostream& operator<<(std::ostream& stream, const CellState& state) {
 }  // namespace tic_tac_toe
 }  // namespace open_spiel
 
-#endif  // THIRD_PARTY_OPEN_SPIEL_GAMES_TIC_TAC_TOE_H_
+#endif  // OPEN_SPIEL_GAMES_TIC_TAC_TOE_H_
