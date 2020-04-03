@@ -104,10 +104,12 @@ class AbstractMetaTrainer(object):
                initial_policies=None,
                meta_strategy_method=_DEFAULT_META_STRATEGY_METHOD,
                meta_strategy_method_frequency = 1,
-               oracle_frequency=5,
+               fast_oracle_period=5,
+               slow_oracle_period=1,
                training_strategy_selector=_DEFAULT_STRATEGY_SELECTION_METHOD,
                symmetric_game=False,
                number_policies_selected=1,
+               oracle_list=None,
                **kwargs):
     """Abstract Initialization for meta trainers.
 
@@ -145,6 +147,7 @@ class AbstractMetaTrainer(object):
         game or not (False).
       number_policies_selected: Maximum number of new policies to train for each
         player at each PSRO iteration.
+      oracle_list: A list with a fast oracle [1] and a slow oracle [0].
       **kwargs: kwargs for meta strategy computation and training strategy
         selection
     """
@@ -168,7 +171,16 @@ class AbstractMetaTrainer(object):
     self._meta_strategy_method_name = meta_strategy_method.__name__
 
     self._meta_method_frequency = meta_strategy_method_frequency
-    self._update_oracle_frequency = oracle_frequency
+    self._slow_oracle_period = slow_oracle_period
+    self._fast_oracle_period = fast_oracle_period
+
+    # Record how many iters each oracle has run in one period.
+    self._slow_oracle_counter = slow_oracle_period
+    self._fast_oracle_counter = slow_oracle_period
+
+    # Record which iter is fast or slow.
+    self._slow_oracle_iters = []
+    self._fast_oracle_iters = []
 
     self._training_strategy_selector = _process_string_or_callable(
         training_strategy_selector,
@@ -182,6 +194,10 @@ class AbstractMetaTrainer(object):
     self._initialize_policy(initial_policies)
     self._initialize_game_state()
     self.update_meta_strategies()
+
+    # Mode = fast 1 or slow 0
+    self._mode = 0
+    self._oracles = oracle_list
 
   def _initialize_policy(self, initial_policies):
     return NotImplementedError(
@@ -234,7 +250,7 @@ class AbstractMetaTrainer(object):
     return totals / num_episodes
 
   def get_meta_strategies(self):
-    """Returns the Nash Equilibrium distribution on meta game matrix."""
+    """Returns the meta-strategy distribution on meta game matrix."""
     meta_strategy_probabilities = self._meta_strategy_probabilities
     if self.symmetric_game:
       meta_strategy_probabilities = self._game_num_players * meta_strategy_probabilities
@@ -261,6 +277,7 @@ class AbstractMetaTrainer(object):
   # Segment of Code for Strategy Exploration #
   ############################################
 
+  #TODO: Consider the symmetric game.
   def update_meta_strategy_method(self, new_meta_str_method=None):
     """
     Update meta-strategy method and corresponding name.
@@ -279,6 +296,12 @@ class AbstractMetaTrainer(object):
     """
     return self._meta_strategy_method_name, self._meta_strategy_method
 
+  def reset_fast_oracle_counter(self):
+    self._fast_oracle_counter = self._fast_oracle_period
+
+  def reset_slow_oracle_counter(self):
+    self._slow_oracle_counter = self._slow_oracle_period
+
   def se_iteration(self, seed=None):
     """Main trainer loop with strategy exploration.
     Evaluate the performance of current meta-strategy method every _meta_method_frequency and update the
@@ -288,21 +311,46 @@ class AbstractMetaTrainer(object):
           seed: Seed for random BR noise generation.
         """
     self._iterations += 1
+
     self.update_agents()  # Generate new, Best Response agents via oracle.
     self.update_empirical_gamestate(seed=seed)  # Update gamestate matrix.
-    if self._iterations % self._meta_method_frequency == 0:
+
+    period = self._slow_oracle_period + self._fast_oracle_period
+    if self._iterations % (self._meta_method_frequency * period) == 0:
       self.evalute_and_pick_meta_method()
 
-    if self._iterations % self._update_oracle_frequency == 0:
-      self.update_oracle()  # Switch fast and slow oracle.
+    # Switch fast 1 and slow 0 oracle.
+    if self._mode:
+      self._fast_oracle_iters.append(self._iterations)
+      self._fast_oracle_counter -= 1
+      if self._fast_oracle_counter == 0:
+        self.switch_oracle()
+        self.reset_fast_oracle_counter()
+    else:
+      self._slow_oracle_iters.append(self._iterations)
+      self._slow_oracle_counter -= 1
+      if self._slow_oracle_counter == 0:
+        self.switch_oracle()
+        self.reset_slow_oracle_counter()
+
     self.update_meta_strategies()  # Compute meta strategy (e.g. Nash)
 
-  def update_oracle(self):
+  def switch_oracle(self):
     """
-    Switch fast and slow oracle.
+        Switch fast and slow oracle.
+        :return:
+    """
+    self.update_oracle(self._oracles[1 - self._mode])
+    self._mode = 1 - self._mode
+
+  def update_oracle(self, oracle):
+    """
+    Assign a new oracle.
     :return:
     """
-    raise NotImplementedError
+    self._oracle = oracle
+    #TODO: check the __name__ exists.
+    print("The current oracle is {}.".format(oracle.__name__))
 
   def evalute_and_pick_meta_method(self):
     """

@@ -274,7 +274,6 @@ class RLOracle(optimization_oracle.AbstractOracle):
     episodes_per_oracle = np.array(episodes_per_oracle)
 
     new_policies = self.generate_new_policies(training_parameters)
-
     # TODO(author4): Look into multithreading.
     reward_trace = [[] for _ in range(game.num_players())]
     while not self._has_terminated(episodes_per_oracle):
