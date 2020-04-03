@@ -51,6 +51,7 @@ def main(unused_argv):
       temperature=1,
       temperature_drop=4,
       evaluation_window=50,
+      eval_levels=7,
 
       nn_model="resnet",
       nn_width=128,

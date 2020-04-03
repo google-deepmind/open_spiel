@@ -118,6 +118,7 @@ class Config(collections.namedtuple(
         "actors",
         "evaluators",
         "evaluation_window",
+        "eval_levels",
 
         "uct_c",
         "max_simulations",
@@ -162,7 +163,7 @@ def watcher(fn):
       print("{} started".format(name))
       logger.print("{} started".format(name))
       try:
-        return fn(config=config, logger=logger, num=num, **kwargs)
+        return fn(config=config, logger=logger, **kwargs)
       except Exception as e:
         logger.print("\n".join([
             "",
@@ -246,9 +247,8 @@ def update_checkpoint(logger, queue, model, az_evaluator):
 
 
 @watcher
-def actor(*, config, game, logger, num, queue):
+def actor(*, config, game, logger, queue):
   """An actor process runner that generates games and returns trajectories."""
-  del num
   logger.print("Initializing model")
   model = _init_model_from_config(config)
   logger.print("Initializing bots")
@@ -265,50 +265,49 @@ def actor(*, config, game, logger, num, queue):
 
 
 @watcher
-def evaluator(*, game, config, logger, num, queue):
+def evaluator(*, game, config, logger, queue):
   """A process that plays the latest checkpoint vs standard MCTS."""
-  max_simulations = config.max_simulations * (3 ** num)
-  logger.print("Running MCTS with", max_simulations, "simulations")
   results = Buffer(config.evaluation_window)
   logger.print("Initializing model")
   model = _init_model_from_config(config)
   logger.print("Initializing bots")
   az_evaluator = evaluator_lib.AlphaZeroEvaluator(game, model)
   random_evaluator = mcts.RandomRolloutEvaluator()
-  az_player = 0
-  bots = [
-      _init_bot(config, game, az_evaluator, True),
-      mcts.MCTSBot(
-          game,
-          config.uct_c,
-          max_simulations,
-          random_evaluator,
-          solve=True,
-          verbose=False)
-  ]
+
   for game_num in itertools.count():
     if not update_checkpoint(logger, queue, model, az_evaluator):
       return
 
+    az_player = game_num % 2
+    difficulty = (game_num // 2) % config.eval_levels
+    max_simulations = int(config.max_simulations * (10 ** (difficulty / 2)))
+    bots = [
+        _init_bot(config, game, az_evaluator, True),
+        mcts.MCTSBot(
+            game,
+            config.uct_c,
+            max_simulations,
+            random_evaluator,
+            solve=True,
+            verbose=False)
+    ]
+    if az_player == 1:
+      bots = list(reversed(bots))
+
     trajectory = _play_game(logger, game_num, game, bots, temperature=1,
                             temperature_drop=0)
     results.append(trajectory.returns[az_player])
+    queue.put((difficulty, trajectory.returns[az_player]))
 
     logger.print("AZ: {}, MCTS: {}, AZ avg/{}: {:.3f}".format(
         trajectory.returns[az_player],
         trajectory.returns[1 - az_player],
         len(results), np.mean(results.data)))
 
-    # Swap players for the next game
-    bots = list(reversed(bots))
-    az_player = 1 - az_player
-
 
 @watcher
-def learner(*, game, config, actors, broadcast_fn, num, logger):
+def learner(*, game, config, actors, evaluators, broadcast_fn, logger):
   """A learner that consumes the replay buffer and trains the network."""
-  del num
-
   logger.also_to_stdout = True
   replay_buffer = Buffer(config.replay_buffer_size)
   learn_rate = config.replay_buffer_size // config.replay_buffer_reuse
@@ -329,6 +328,7 @@ def learner(*, game, config, actors, broadcast_fn, num, logger):
   game_lengths = stats.BasicStats()
   game_lengths_hist = stats.HistogramNumbered(game.max_game_length() + 1)
   outcomes = stats.HistogramNamed(["Player1", "Player2", "Draw"])
+  evals = [Buffer(config.evaluation_window) for _ in range(config.eval_levels)]
   total_trajectories = 0
 
   def trajectory_generator():
@@ -424,6 +424,14 @@ def learner(*, game, config, actors, broadcast_fn, num, logger):
 
     save_path, losses = learn(step)
 
+    for eval_process in evaluators:
+      while True:
+        try:
+          difficulty, outcome = eval_process.queue.get_nowait()
+          evals[difficulty].append(outcome)
+        except spawn.Empty:
+          break
+
     batch_size_stats = stats.BasicStats()  # Only makes sense in C++.
     batch_size_stats.add(1)
     data_log.write({
@@ -439,9 +447,9 @@ def learner(*, game, config, actors, broadcast_fn, num, logger):
         "outcomes": outcomes.data,
         "value_accuracy": [v.as_dict for v in value_accuracies],
         "value_prediction": [v.as_dict for v in value_predictions],
-        "eval": {  # TODO(author7): collect the results from evaluators.
-            "count": 0,
-            "results": [0],
+        "eval": {
+            "count": evals[0].total_seen,
+            "results": [sum(e.data) / len(e) for e in evals],
         },
         "batch_size": batch_size_stats.as_dict,
         "batch_size_hist": [0, 1],
@@ -518,7 +526,8 @@ def alpha_zero(config: Config):
       proc.queue.put(msg)
 
   try:
-    learner(game=game, config=config, actors=actors, broadcast_fn=broadcast)  # pylint: disable=missing-kwoa
+    learner(game=game, config=config, actors=actors,  # pylint: disable=missing-kwoa
+            evaluators=evaluators, broadcast_fn=broadcast)
   except (KeyboardInterrupt, EOFError):
     print("Caught a KeyboardInterrupt, stopping early.")
   finally:
