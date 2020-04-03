@@ -256,6 +256,7 @@ class RLOracle(optimization_oracle.AbstractOracle):
           player, the probabilities of playing each policy in total_policies for
           the same player.
       strategy_sampler: Callable that samples strategies from total_policies
+        meta_games = [meta_games, -meta_games]
         using probabilities_of_playing_policies. It only samples one joint
         set of policies for all players. Implemented to be able to take into
         account joint probabilities of action (For Alpharank)
@@ -281,11 +282,7 @@ class RLOracle(optimization_oracle.AbstractOracle):
           new_policies, training_parameters, episodes_per_oracle,
           strategy_sampler)
       reward = self._rollout(game, agents, **oracle_specific_execution_kwargs)
-      if len(indexes)>1:
-        import pdb
-        pdb.set_trace()
-      else:
-        reward_trace[indexes[0][0]].append(reward[indexes[0][0]])
+      reward_trace[indexes[0][0]].append(reward[indexes[0][0]])
       episodes_per_oracle = update_episodes_per_oracles(episodes_per_oracle,
                                                         indexes)
     # Freeze the new policies to keep their weights static. This allows us to

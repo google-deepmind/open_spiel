@@ -47,6 +47,7 @@ from open_spiel.python.algorithms.psro_v2 import rl_oracle
 from open_spiel.python.algorithms.psro_v2 import rl_policy
 from open_spiel.python.algorithms.psro_v2 import strategy_selectors
 from open_spiel.python.algorithms.psro_v2.quiesce import PSROQuiesceSolver
+from open_spiel.python.algorithms.psro_v2 import quiesce_sparse
 
 
 FLAGS = flags.FLAGS
@@ -69,10 +70,10 @@ flags.DEFINE_integer("gpsro_iterations", 100,
 flags.DEFINE_bool("symmetric_game", False, "Whether to consider the current "
                   "game as a symmetric game.")
 flags.DEFINE_bool("quiesce",True,"Whether to use quiece")
+flags.DEFINE_bool("sparse_quiesce",True,"whether to use sparse matrix quiesce implementation")
 
 # Rectify options
 flags.DEFINE_string("rectifier", "",
-                    "Which rectifier to use. Choices are '' "
                     "(No filtering), 'rectified' for rectified.")
 flags.DEFINE_string("training_strategy_selector", "probabilistic",
                     "Which strategy selector to use. Choices are "
@@ -247,7 +248,12 @@ def gpsro_looper(env, oracle, agents, writer, quiesce=False):
   sample_from_marginals = True  # TODO(somidshafiei) set False for alpharank
   training_strategy_selector = FLAGS.training_strategy_selector or strategy_selectors.probabilistic_strategy_selector
   
-  solver = psro_v2.PSROSolver if not quiesce else PSROQuiesceSolver
+  if not quiesce:
+    solver = psro_v2.PSROSolver
+  elif FLAGS.sparse_quiesce:
+    solver = quiesce_sparse.PSROQuiesceSolver
+  else:
+    solver = PSROQuiesceSolver
   g_psro_solver = solver(
       env.game,
       oracle,
