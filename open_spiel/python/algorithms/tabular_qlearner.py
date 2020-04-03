@@ -34,7 +34,7 @@ class QLearner(rl_agent.AbstractAgent):
   def __init__(self,
                player_id,
                num_actions,
-               step_size=0.5,
+               step_size=0.1,
                epsilon_schedule=rl_tools.ConstantSchedule(0.2),
                discount_factor=1.0):
     """Initialize the Q-Learning agent."""

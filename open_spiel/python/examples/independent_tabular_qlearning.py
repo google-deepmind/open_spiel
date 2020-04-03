@@ -21,7 +21,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import os
+import sys
 from absl import app
 from absl import flags
 import numpy as np
@@ -73,7 +73,7 @@ def create_epsilon_schedule(sched_str):
     return rl_tools.ConstantSchedule(float(values[1]))
   else:
     print("Unrecognized schedule string: {}".format(sched_str))
-    os.exit(-1)
+    sys.exit()
 
 
 def main(_):
