@@ -9,17 +9,18 @@ def regret(meta_games, subgame_index):
     :param subgame_index: the subgame to evaluate.
     :return: a list of regret, one for each player.
     """
-    submeta_games = [subgame[:subgame_index] for subgame in meta_games]
+    num_players = len(meta_games)
+    index = [slice(0, subgame_index) for _ in range(num_players)]
+    submeta_games = [subgame[tuple(index)] for subgame in meta_games]
     nash = nash_solver(submeta_games, solver="gambit")
 
     nash_payoffs = []
     deviation_payoffs = []
 
-    num_players = len(meta_games)
     for current_player in range(num_players):
-        meta_game = np.array(submeta_games[current_player])
+        meta_game = submeta_games[current_player]
         for dim in range(num_players):
-            newshape = -np.ones(num_players)
+            newshape = -np.ones(num_players, dtype=np.int64)
             newshape[dim] = len(nash[dim])
             meta_game = np.reshape(nash[dim], newshape=newshape) * meta_game
 
@@ -38,7 +39,7 @@ def regret(meta_games, subgame_index):
         for player in range(num_players):
             if current_player == player:
                 continue
-            newshape = -np.ones(num_players)
+            newshape = -np.ones(num_players, dtype=np.int64)
             newshape[player] = num_policy
             _meta_game = np.reshape(extended_nash[player], newshape=newshape) * _meta_game
 

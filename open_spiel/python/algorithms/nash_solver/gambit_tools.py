@@ -41,7 +41,7 @@ def load_pkl(path):
     return result
 
 # Path that saves the payoff matrix for gamebit.
-gambit_DIR = os.getcwd() + '/nfg/payoffmatrix.nfg'
+gambit_DIR = os.path.abspath(os.path.dirname(__file__)) + '/nfg/payoffmatrix.nfg'
 
 # This functions help to translate meta_games into gambit nfg.
 def product(shape, axes):
@@ -88,7 +88,7 @@ def gambit_analysis(timeout, method="gnm"):
     """
     if not isExist(gambit_DIR):
         raise ValueError(".nfg file does not exist!")
-    command_str = "gambit-" + method + " -q " + os.getcwd() + "/nfg/payoffmatrix.nfg -d 8 > " + os.getcwd() + "/nfg/nash.txt"
+    command_str = "gambit-" + method + " -q " + os.path.abspath(os.path.dirname(__file__)) + "/nfg/payoffmatrix.nfg -d 8 > " + os.getcwd() + "/nfg/nash.txt"
     subproc.call_and_wait_with_timeout(command_str, timeout)
 
 def gambit_analysis_pure(timeout, method="enumpure"):
@@ -98,7 +98,7 @@ def gambit_analysis_pure(timeout, method="enumpure"):
     """
     if not isExist(gambit_DIR):
         raise ValueError(".nfg file does not exist!")
-    command_str = "gambit-" + method + " -q " + os.getcwd() + "/nfg/payoffmatrix.nfg > " + os.getcwd() + "/nfg/nash.txt"
+    command_str = "gambit-" + method + " -q " + os.path.abspath(os.path.dirname(__file__)) + "/nfg/payoffmatrix.nfg > " + os.getcwd() + "/nfg/nash.txt"
     subproc.call_and_wait_with_timeout(command_str, timeout)
 
 def decode_gambit_file(meta_games, mode="all", max_num_nash=10):
@@ -171,7 +171,7 @@ def do_gambit_analysis(meta_games, mode, timeout = 600, method="gnm", method_pur
         else:
             gambit_analysis(timeout, method)
         # If there is no pure NE, find mixed NE.
-        nash_DIR = os.getcwd() + '/nfg/nash.txt'
+        nash_DIR = os.path.abspath(os.path.dirname(__file__)) + '/nfg/nash.txt'
         if not isExist(nash_DIR):
             raise ValueError("nash.txt file does not exist!")
         num_lines = file_len(nash_DIR)

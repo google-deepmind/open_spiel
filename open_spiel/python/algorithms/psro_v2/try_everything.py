@@ -21,5 +21,7 @@ import numpy as np
 #     print("***************")
 
 
-a = np.array([1,2,3,4])
-print(np.maximum(a, 3))
+a = np.array([[1,2],[3,4]])
+print(np.shape(a))
+b = [slice(0,2), slice(0,2)]
+print(a[tuple(b)])
