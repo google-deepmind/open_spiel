@@ -88,7 +88,7 @@ def gambit_analysis(timeout, method="gnm"):
     """
     if not isExist(gambit_DIR):
         raise ValueError(".nfg file does not exist!")
-    command_str = "gambit-" + method + " -q " + os.path.abspath(os.path.dirname(__file__)) + "/nfg/payoffmatrix.nfg -d 8 > " + os.getcwd() + "/nfg/nash.txt"
+    command_str = "gambit-" + method + " -q " + os.path.abspath(os.path.dirname(__file__)) + "/nfg/payoffmatrix.nfg -d 8 > " + os.path.abspath(os.path.dirname(__file__)) + "/nfg/nash.txt"
     subproc.call_and_wait_with_timeout(command_str, timeout)
 
 def gambit_analysis_pure(timeout, method="enumpure"):
@@ -98,7 +98,7 @@ def gambit_analysis_pure(timeout, method="enumpure"):
     """
     if not isExist(gambit_DIR):
         raise ValueError(".nfg file does not exist!")
-    command_str = "gambit-" + method + " -q " + os.path.abspath(os.path.dirname(__file__)) + "/nfg/payoffmatrix.nfg > " + os.getcwd() + "/nfg/nash.txt"
+    command_str = "gambit-" + method + " -q " + os.path.abspath(os.path.dirname(__file__)) + "/nfg/payoffmatrix.nfg > " + os.path.abspath(os.path.dirname(__file__)) + "/nfg/nash.txt"
     subproc.call_and_wait_with_timeout(command_str, timeout)
 
 def decode_gambit_file(meta_games, mode="all", max_num_nash=10):
@@ -109,7 +109,7 @@ def decode_gambit_file(meta_games, mode="all", max_num_nash=10):
     :param max_num_nash: the number of NE considered to return
     :return: a list of NE
     """
-    nash_DIR = os.getcwd() + '/nfg/nash.txt'
+    nash_DIR = os.path.abspath(os.path.dirname(__file__)) + '/nfg/nash.txt'
     if not isExist(nash_DIR):
         raise ValueError("nash.txt file does not exist!")
     num_lines = file_len(nash_DIR)
