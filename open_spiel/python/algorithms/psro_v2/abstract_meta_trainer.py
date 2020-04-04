@@ -23,6 +23,7 @@ import numpy as np
 from open_spiel.python.algorithms.psro_v2 import meta_strategies
 from open_spiel.python.algorithms.psro_v2 import strategy_selectors
 from open_spiel.python.algorithms.psro_v2 import utils
+from open_spiel.python.algorithms.psro_v2.eval_utils import SElogs
 
 _DEFAULT_STRATEGY_SELECTION_METHOD = "probabilistic"
 _DEFAULT_META_STRATEGY_METHOD = "prd"
@@ -178,9 +179,10 @@ class AbstractMetaTrainer(object):
     self._slow_oracle_counter = slow_oracle_period
     self._fast_oracle_counter = slow_oracle_period
 
-    # Record which iter is fast or slow.
-    self._slow_oracle_iters = []
-    self._fast_oracle_iters = []
+    # Create logs for strategy exploration (SE).
+    self.logs = SElogs(slow_oracle_period,
+                 fast_oracle_period,
+                 meta_strategies.META_STRATEGY_METHODS_SE)
 
     self._training_strategy_selector = _process_string_or_callable(
         training_strategy_selector,
@@ -320,13 +322,13 @@ class AbstractMetaTrainer(object):
 
     # Switch fast 1 and slow 0 oracle.
     if self._mode:
-      self._fast_oracle_iters.append(self._iterations)
+      self.logs.update_fast_iters(self._iterations)
       self._fast_oracle_counter -= 1
       if self._fast_oracle_counter == 0:
         self.switch_oracle()
         self.reset_fast_oracle_counter()
     else:
-      self._slow_oracle_iters.append(self._iterations)
+      self.logs.update_slow_iters(self._iterations)
       self._slow_oracle_counter -= 1
       if self._slow_oracle_counter == 0:
         self.switch_oracle()

@@ -54,3 +54,44 @@ def regret(meta_games, subgame_index):
     regret = np.maximum(np.array(deviation_payoffs)-np.array(nash_payoffs), 0)
 
     return regret
+
+
+class SElogs(object):
+    def __init__(self,
+                 slow_oracle_period,
+                 fast_oracle_period,
+                 meta_strategy_methods):
+
+        self.slow_oracle_period = slow_oracle_period
+        self.fast_oracle_period = fast_oracle_period
+        self.meta_strategy_methods = meta_strategy_methods
+
+        self._slow_oracle_iters = []
+        self._fast_oracle_iters = []
+
+        self.regrets = []
+        self.nashconv = []
+
+    def update_regrets(self, regrets):
+        self.regrets.append(regrets)
+
+    def get_regrets(self):
+        return self.regrets
+
+    def update_nashconv(self, nashconv):
+        self.nashconv.append(nashconv)
+
+    def get_nashconv(self):
+        return self.nashconv
+
+    def update_slow_iters(self, iter):
+        self._slow_oracle_iters.append(iter)
+
+    def get_slow_iters(self):
+        return self._slow_oracle_iters
+
+    def update_fast_iters(self, iter):
+        self._fast_oracle_iters.append(iter)
+
+    def get_fast_iters(self):
+        return self._fast_oracle_iters

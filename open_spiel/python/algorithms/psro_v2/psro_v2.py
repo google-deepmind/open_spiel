@@ -42,7 +42,7 @@ from open_spiel.python import policy
 from open_spiel.python.algorithms.psro_v2 import abstract_meta_trainer
 from open_spiel.python.algorithms.psro_v2 import strategy_selectors
 from open_spiel.python.algorithms.psro_v2 import utils
-
+from open_spiel.python.algorithms.psro_v2.eval_utils import regret
 
 TRAIN_TARGET_SELECTORS = {
     "": None,
@@ -497,8 +497,11 @@ class PSROSolver(abstract_meta_trainer.AbstractMetaTrainer):
   ############################################
 
   def evaluate_meta_method(self):
-      slow_subgame_index = self._slow_oracle_iters[-1] - 1
-      slow_submeta_game = [subgame[:slow_subgame_index] for subgame in self._meta_games]
-      
+      slow_subgame_index = self._slow_oracle_iters[-1]
+      meta_games = self.get_meta_game()
+      regrets = regret(meta_games, slow_subgame_index)
+      nashconv = np.sum(regrets)
+
+
 
 
