@@ -259,6 +259,5 @@ def nash_solver(meta_games,
 
 def normalize_ne(eq):
     for p in range(len(eq)):
-        for i, str in enumerate(eq[p]):
-            eq[p][i] = renormalize(str)
+        eq[p] = renormalize(eq[p])
     return eq
