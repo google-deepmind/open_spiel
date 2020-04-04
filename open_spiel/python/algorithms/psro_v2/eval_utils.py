@@ -9,7 +9,12 @@ def regret(meta_games, subgame_index):
     :param subgame_index: the subgame to evaluate.
     :return: a list of regret, one for each player.
     """
+    num_policy = np.shape(meta_games[0])[0]
     num_players = len(meta_games)
+    if num_policy == subgame_index:
+        print("The subgame is same as the full game. Return zero regret.")
+        return np.zeros(num_players)
+
     index = [slice(0, subgame_index) for _ in range(num_players)]
     submeta_games = [subgame[tuple(index)] for subgame in meta_games]
     nash = nash_solver(submeta_games, solver="gambit")
@@ -27,7 +32,6 @@ def regret(meta_games, subgame_index):
         nash_payoff = np.sum(meta_game)
         nash_payoffs.append(nash_payoff)
 
-    num_policy = np.shape(meta_games[0])[0]
     extended_nash = []
     for dist in nash:
         ex_nash = np.zeros(num_policy)
