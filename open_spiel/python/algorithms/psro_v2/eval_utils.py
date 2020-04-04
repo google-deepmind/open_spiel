@@ -14,8 +14,6 @@ def regret(meta_games, subgame_index):
     submeta_games = [subgame[tuple(index)] for subgame in meta_games]
     nash = nash_solver(submeta_games, solver="gambit")
 
-    print("Nash is ", nash)
-
     nash_payoffs = []
     deviation_payoffs = []
 
