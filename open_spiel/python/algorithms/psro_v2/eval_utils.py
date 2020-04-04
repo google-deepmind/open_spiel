@@ -14,6 +14,8 @@ def regret(meta_games, subgame_index):
     submeta_games = [subgame[tuple(index)] for subgame in meta_games]
     nash = nash_solver(submeta_games, solver="gambit")
 
+    print("Nash is ", nash)
+
     nash_payoffs = []
     deviation_payoffs = []
 
@@ -44,7 +46,7 @@ def regret(meta_games, subgame_index):
             _meta_game = np.reshape(extended_nash[player], newshape=newshape) * _meta_game
 
         axis = np.delete(np.arange(num_players), current_player)
-        deviation = np.max(np.sum(_meta_game, axis=axis))
+        deviation = np.max(np.sum(_meta_game, axis=tuple(axis)))
         deviation_payoffs.append(deviation)
 
     regret = np.maximum(np.array(deviation_payoffs)-np.array(nash_payoffs), 0)
