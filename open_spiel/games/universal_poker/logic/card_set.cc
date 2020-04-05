@@ -136,7 +136,7 @@ std::vector<CardSet> CardSet::SampleCards(int nbCards) {
 
   for (uint64_t n = bit_twiddle_permute(p); n > p;
        p = n, n = bit_twiddle_permute(p)) {
-    uint64_t combo = n & cs.cards;
+    uint64_t combo = p & cs.cards;
     if (__builtin_popcountl(combo) == nbCards) {
       CardSet c;
       c.cs.cards = combo;
