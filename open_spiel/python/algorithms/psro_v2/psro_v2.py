@@ -497,10 +497,15 @@ class PSROSolver(abstract_meta_trainer.AbstractMetaTrainer):
   ############################################
 
   def evaluate_meta_method(self):
-      slow_subgame_index = self._slow_oracle_iters[-1]
+      slow_subgame_index = self.logs.get_slow_iters()[-1]
       meta_games = self.get_meta_game()
       regrets = regret(meta_games, slow_subgame_index)
       nashconv = np.sum(regrets)
+
+      self.logs.update_regrets(regrets)
+      self.logs.update_nashconv(nashconv)
+
+
 
 
 

@@ -130,6 +130,8 @@ class AbstractMetaTrainer(object):
               - "prd": Projected Replicator Dynamics, as described in Lanctot et
                 Al.
       meta_strategy_method_frequency: The frequency of updating meta-strategy method.
+      fast_oracle_period: Number of iters using fast oracle in one period.
+      slow_oracle_period: Number of iters using slow oracle in one period.
       training_strategy_selector: A callable or a string. If a callable, takes
         as arguments: - An instance of `PSROSolver`, - a
           `number_policies_selected` integer. and returning a list of
@@ -317,7 +319,8 @@ class AbstractMetaTrainer(object):
     self.update_empirical_gamestate(seed=seed)  # Update gamestate matrix.
 
     period = self._slow_oracle_period + self._fast_oracle_period
-    if self._iterations % (self._meta_method_frequency * period) == 0:
+    if self._iterations % (self._meta_method_frequency * period) == 0 and \
+            self._iterations != (self._meta_method_frequency * period):
       self.evalute_and_pick_meta_method()
 
     # Switch fast 1 and slow 0 oracle.
