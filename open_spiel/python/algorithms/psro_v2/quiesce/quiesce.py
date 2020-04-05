@@ -129,6 +129,8 @@ class PSROQuiesceSolver(psro_v2.PSROSolver):
     """
     found_confirmed_eq = False
     while not found_confirmed_eq:
+      import pdb
+      #pdb.set_trace()
       maximum_subgame = self.get_complete_meta_game
       ne_subgame,_ = self._meta_strategy_method(solver=self, return_joint=True, game=maximum_subgame)
       # ne_support_num: list of list, index of where equilibrium is [[0,1],[2]]

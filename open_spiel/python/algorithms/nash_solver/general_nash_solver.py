@@ -198,9 +198,12 @@ def nash_solver(meta_games,
     num_players = len(meta_games)
     if solver == "gambit":
         gambit_result = gambit_solve(meta_games,mode)
-        return normalize_ne(gambit_solve(meta_games, mode))
+        if mode == 'one':
+          return normalize_ne(gambit_result)
+        elif mode == 'all':
+          return [normalize_ne(ele) for ele in gambit_result]
     elif solver == "replicator":
-        return normalize_ne([replicator_dynamics(meta_games)])
+        return normalize_ne(replicator_dynamics(meta_games))
     else:
         assert num_players == 2
 

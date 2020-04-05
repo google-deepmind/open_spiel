@@ -46,8 +46,8 @@ from open_spiel.python.algorithms.psro_v2 import psro_v2
 from open_spiel.python.algorithms.psro_v2 import rl_oracle
 from open_spiel.python.algorithms.psro_v2 import rl_policy
 from open_spiel.python.algorithms.psro_v2 import strategy_selectors
-from open_spiel.python.algorithms.psro_v2.quiesce import PSROQuiesceSolver
-from open_spiel.python.algorithms.psro_v2 import quiesce_sparse
+from open_spiel.python.algorithms.psro_v2.quiesce.quiesce import PSROQuiesceSolver
+from open_spiel.python.algorithms.psro_v2.quiesce import quiesce_sparse
 
 
 FLAGS = flags.FLAGS
