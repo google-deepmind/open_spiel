@@ -14,11 +14,11 @@ from open_spiel.python.algorithms.psro_v2.meta_strategies import general_nash_st
 
 np.random.seed(4)
 np.set_printoptions(precision=3)
-max_player = 3 # maximum num of player in a game
-min_player = 3 # minimum num of player in a game
+max_player = 4 # maximum num of player in a game
+min_player = 4 # minimum num of player in a game
 test_cases = 5 # num test case to generate in total
-min_policy = 5 # min number policy each agent has
-max_policy = 10# max number of poicy each agent has
+min_policy = 3 # min number policy each agent has
+max_policy = 5# max number of poicy each agent has
 payoff_scale = 10  # payoff range [-payoff_scale,payoff_scale]
 zero_threshold = 5e-3 # l1 difference betweent two vectors so that they are deemed different
 result_folder = './test_all_eq_result'
@@ -134,7 +134,7 @@ class QuiesceSparseTest(quiesce_sparse.PSROQuiesceSolver):
 
 def main():
   #sys.stdout = open(result_file,'w')
-  anomaly_meta_game_file = open(result_folder+'/anomaly_game_matrix.pkl','ab')
+  #anomaly_meta_game_file = open(result_folder+'/anomaly_game_matrix.pkl','ab')
   for i in range(test_cases):
     params = generate_parameters()
     meta_game = generate_meta_game(**params)
@@ -176,7 +176,7 @@ def main():
     closest,min_dis = element_distance_to_set(quiesce_full_eq, gambit_eq)
     print('distance to gambit-eq',closest,"{0:0.3f}".format(min_dis))
     if min_dis > zero_threshold:
-      pickle.dump(meta_game, anomaly_meta_game_file)
+      #pickle.dump(meta_game, anomaly_meta_game_file)
       print(meta_game)
 
     print("----------------QuieSpa_",end='')
@@ -190,7 +190,7 @@ def main():
     closest,min_dis = element_distance_to_set(quiesce_sparse_eq, gambit_eq)
     print('distance to gambit-eq',closest,"{0:0.3f}".format(min_dis))
 
-  anomaly_meta_game_file.close()  
+  #anomaly_meta_game_file.close()  
 
 if __name__ == '__main__':
   main()
