@@ -58,7 +58,7 @@ class CardSet {
   // Returns the ranking value of this set of cards as evaluated by ACPC.
   int RankCards() const;
 
-  // TODO(author2): Remove?
+  // Returns all the possible nbCards-subsets of this CardSet.
   std::vector<CardSet> SampleCards(int nbCards);
 };
 
