@@ -23,15 +23,15 @@
 namespace open_spiel {
 namespace algorithms {
 
-constexpr const double kTieTolerance = 0.00001;
+constexpr double kTieTolerance = 0.00001;
+constexpr int kUnexpandedVisitCount = -1;
 
 ISMCTSBot::ISMCTSBot(int seed, std::shared_ptr<Evaluator> evaluator,
                      double uct_c, int max_simulations, int max_world_samples)
     : rng_(seed),
       evaluator_(evaluator),
-      root_sample_index_(0),
       uct_c_(uct_c),
-      max_simualtions_(max_simulations),
+      max_simulations_(max_simulations),
       max_world_samples_(max_world_samples) {}
 
 double ISMCTSBot::RandomNumber() { return absl::Uniform(rng_, 0.0, 1.0); }
@@ -40,7 +40,6 @@ void ISMCTSBot::Reset() {
   nodes_.clear();
   node_pool_.clear();
   root_samples_.clear();
-  root_sample_index_ = 0;
 }
 
 Action ISMCTSBot::Step(const State& state) {
@@ -53,7 +52,7 @@ Action ISMCTSBot::Step(const State& state) {
 
   std::string root_infostate_key = state.InformationStateString();
 
-  for (int sim = 0; sim < max_simualtions_; ++sim) {
+  for (int sim = 0; sim < max_simulations_; ++sim) {
     std::unique_ptr<State> sampled_root_state = SampleRootState(state);
     SPIEL_CHECK_EQ(root_infostate_key,
                    sampled_root_state->InformationStateString());
@@ -68,7 +67,7 @@ Action ISMCTSBot::Step(const State& state) {
 }
 
 std::unique_ptr<State> ISMCTSBot::SampleRootState(const State& state) {
-  if (max_world_samples_ < 0) {
+  if (max_world_samples_ == kUnlimitedNumWorldSamples) {
     return state.ResampleFromInfostate(state.CurrentPlayer(),
                                        [this]() { return RandomNumber(); });
   } else if (root_samples_.size() < max_world_samples_) {
@@ -76,12 +75,10 @@ std::unique_ptr<State> ISMCTSBot::SampleRootState(const State& state) {
         state.CurrentPlayer(), [this]() { return RandomNumber(); }));
     return root_samples_.back()->Clone();
   } else if (root_samples_.size() == max_world_samples_) {
-    std::unique_ptr<State> sampled_state =
-        root_samples_[root_sample_index_]->Clone();
-    root_sample_index_ = (root_sample_index_ + 1) % root_samples_.size();
-    return sampled_state;
+    int idx = absl::Uniform(rng_, 0u, root_samples_.size());
+    return root_samples_[idx]->Clone();
   } else {
-    SpielFatalError("Case not handled.");
+    SpielFatalError("Case not handled (badly set max_world_samples..?)");
   }
 }
 
@@ -91,7 +88,7 @@ ISMCTSNode* ISMCTSBot::CreateNewNode(const State& state) {
   ISMCTSNode* node = node_pool_.back().get();
   nodes_[infostate_key] = node;
   node->legal_actions = state.LegalActions();
-  node->total_visits = -1;  // Means not expanded.
+  node->total_visits = kUnexpandedVisitCount;
   return node;
 }
 
@@ -157,7 +154,7 @@ std::vector<double> ISMCTSBot::RunSimulation(State* state) {
   ISMCTSNode* node = LookupOrCreateNode(*state);
   SPIEL_CHECK_TRUE(node != nullptr);
 
-  if (node->total_visits == -1) {
+  if (node->total_visits == kUnexpandedVisitCount) {
     // Newly created node, so we've just stepped out of the tree.
     node->total_visits = 0;  // Expand the node.
     return evaluator_->Evaluate(*state);

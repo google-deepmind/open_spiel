@@ -30,6 +30,9 @@
 namespace open_spiel {
 namespace algorithms {
 
+// Use this constant to use an unlimited number of world samples.
+inline constexpr int kUnlimitedNumWorldSamples = -1;
+
 struct ISMCTSNode {
   std::vector<Action> legal_actions;
   std::vector<Action> actions;
@@ -41,11 +44,12 @@ struct ISMCTSNode {
 class ISMCTSBot : public Bot {
  public:
   // Construct an IS-MCTS bot. The parameter max_world_samples controls how many
-  // states are sampled (with replacement!) at the root of the search; use -1 to
-  // have no restriction, and a number larger than zero to restrict the number).
+  // states are sampled (with replacement!) at the root of the search; use
+  // kUnlimitedWorldStates to have no restriction, and a number larger than
+  // zero to restrict the number).
   //
   // Important note: this bot requires that State::ResampleFromInfostate is
-  // implementede.
+  // implemented.
   ISMCTSBot(int seed, std::shared_ptr<Evaluator> evaluator, double uct_c,
             int max_simulations, int max_world_samples);
 
@@ -66,14 +70,13 @@ class ISMCTSBot : public Bot {
   absl::flat_hash_map<std::string, ISMCTSNode*> nodes_;
   std::vector<std::unique_ptr<ISMCTSNode>> node_pool_;
 
-  // If the number of sampled world state is restricted, these are used to keep
-  // track of which were sampled.
+  // If the number of sampled world state is restricted, this list is used to
+  // store the sampled states.
   std::vector<std::unique_ptr<State>> root_samples_;
-  int root_sample_index_;
 
-  double uct_c_;
-  int max_simualtions_;
-  int max_world_samples_;
+  const double uct_c_;
+  const int max_simulations_;
+  const int max_world_samples_;
   ISMCTSNode* root_node_;
 };
 
