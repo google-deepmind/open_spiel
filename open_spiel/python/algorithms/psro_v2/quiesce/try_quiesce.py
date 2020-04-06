@@ -153,7 +153,9 @@ def main():
       print("%%%%%%%%%%%%%%%%%%% EQ %%%%%%%%%%%%%%%%%")
       for eq_q in eq:
         print(["{0:0.3f}".format(i) for i in eq_q.tolist()])
-
+    
+    # TODO: RD may be performing poorly because gambit-gnm fails to find all
+    # equilibrium. Chang gambit to lca to test
     print("------------------RD_",end='')
     start = time.time()
     rd_eq = gs.nash_solver(meta_game,solver="replicator",mode='one')

@@ -23,6 +23,7 @@ from open_spiel.python.algorithms.psro_v2 import utils
 from open_spiel.python.algorithms.psro_v2 import psro_v2
 from open_spiel.python.algorithms.psro_v2 import meta_strategies
 
+# TODO: dictionary as data structure might be slow. Needs further optimization
 class sparray(object):
   """
   Class for sparse tensor using panda to store data
@@ -73,6 +74,7 @@ class sparray(object):
       dense[tuple([...]+list(ind))] = np.array(data)
     return [ele for ele in dense]
 
+# TODO: test symmetric game, as if self.symmetric changes shape and length
 class PSROQuiesceSolver(psro_v2.PSROSolver):
   """
   quiesce class, incomplete information nash finding
@@ -142,7 +144,7 @@ class PSROQuiesceSolver(psro_v2.PSROSolver):
     found_confirmed_eq = False
     while not found_confirmed_eq:
       maximum_subgame = self.get_complete_meta_game
-      ne_subgame = self._meta_strategy_method(solver=self, return_joint=False, game=maximum_subgame)
+      ne_subgame = meta_strategies.general_nash_strategy(solver=self, return_joint=False, game=maximum_subgame)
       # ne_support_num: list of list, index of where equilibrium is [[0,1],[2]]
       # cumsum: index ne_subgame with self._complete_ind
       cum_sum = [np.cumsum(ele) for ele in self._complete_ind]
