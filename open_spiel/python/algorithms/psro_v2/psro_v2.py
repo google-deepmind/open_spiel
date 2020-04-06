@@ -223,7 +223,7 @@ class PSROSolver(abstract_meta_trainer.AbstractMetaTrainer):
     if self.symmetric_game:
       self._policies = self._policies * self._game_num_players
     self._meta_strategy_probabilities, self._non_marginalized_probabilities =\
-        self._meta_strategy_method(solver=self, return_joint=False)
+        self._meta_strategy_method(solver=self, return_joint=True)
 
     if self.symmetric_game:
       self._policies = [self._policies[0]]

@@ -69,7 +69,7 @@ flags.DEFINE_integer("gpsro_iterations", 100,
                      "Number of training steps for GPSRO.")
 flags.DEFINE_bool("symmetric_game", False, "Whether to consider the current "
                   "game as a symmetric game.")
-flags.DEFINE_bool("quiesce",True,"Whether to use quiece")
+flags.DEFINE_bool("quiesce",False,"Whether to use quiece")
 flags.DEFINE_bool("sparse_quiesce",True,"whether to use sparse matrix quiesce implementation")
 
 # Rectify options
@@ -88,7 +88,7 @@ flags.DEFINE_string("training_strategy_selector", "probabilistic",
                     "probability strategy available to each player.")
 
 # General (RL) agent parameters
-flags.DEFINE_string("oracle_type", "BR", "Choices are DQN, PG (Policy "
+flags.DEFINE_string("oracle_type", "DQN", "Choices are DQN, PG (Policy "
                     "Gradient), BR (exact Best Response) or ARS(Augmented Random Search)")
 flags.DEFINE_integer("number_training_episodes", int(2), "Number training "
                      "episodes per RL policy. Used for PG and DQN")

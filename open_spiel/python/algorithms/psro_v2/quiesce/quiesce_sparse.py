@@ -75,6 +75,7 @@ class sparray(object):
     return [ele for ele in dense]
 
 # TODO: test symmetric game, as if self.symmetric changes shape and length
+# TODO: incomplete meta_game may be called in other part of strategy exploration. Please check
 class PSROQuiesceSolver(psro_v2.PSROSolver):
   """
   quiesce class, incomplete information nash finding

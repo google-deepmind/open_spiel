@@ -22,7 +22,8 @@ from open_spiel.python.algorithms.psro_v2 import utils
 from open_spiel.python.algorithms.psro_v2 import psro_v2
 from open_spiel.python.algorithms.psro_v2 import meta_strategies
 
-# TODO: test symmetric game, as if self.symmetric changes shape and length
+# TODO: test symmetric game, as self.symmetric flags changes self.policies and self.num_players
+# TODO: incomplete meta_game may be called in other part of strategy exploration. Please check
 class PSROQuiesceSolver(psro_v2.PSROSolver):
   """
   quiesce class, incomplete information nash finding
