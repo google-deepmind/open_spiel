@@ -14,9 +14,9 @@ from open_spiel.python.algorithms.psro_v2.meta_strategies import general_nash_st
 
 np.random.seed(4)
 np.set_printoptions(precision=3)
-max_player = 2 # maximum num of player in a game
-min_player = 2 # minimum num of player in a game
-test_cases = 10 # num test case to generate in total
+max_player = 3 # maximum num of player in a game
+min_player = 3 # minimum num of player in a game
+test_cases = 5 # num test case to generate in total
 min_policy = 5 # min number policy each agent has
 max_policy = 10# max number of poicy each agent has
 payoff_scale = 10  # payoff range [-payoff_scale,payoff_scale]
@@ -164,7 +164,7 @@ def main():
       print(["{0:0.3f}".format(i) for i in ele])
     closest,min_dis = element_distance_to_set(rd_eq,gambit_eq)
     print('distance to gambit-eq',closest,"{0:0.3f}".format(min_dis))
-    
+
     print("----------------QuieFul_",end='')
     quiesce_full = QuiesceTest(meta_game)
     start = time.time()

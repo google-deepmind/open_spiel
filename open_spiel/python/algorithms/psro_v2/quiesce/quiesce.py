@@ -129,10 +129,8 @@ class PSROQuiesceSolver(psro_v2.PSROSolver):
     """
     found_confirmed_eq = False
     while not found_confirmed_eq:
-      import pdb
-      #pdb.set_trace()
       maximum_subgame = self.get_complete_meta_game
-      ne_subgame,_ = self._meta_strategy_method(solver=self, return_joint=True, game=maximum_subgame)
+      ne_subgame = self._meta_strategy_method(solver=self, return_joint=False, game=maximum_subgame)
       # ne_support_num: list of list, index of where equilibrium is [[0,1],[2]]
       # cumsum: index ne_subgame with self._complete_ind
       cum_sum = [np.cumsum(ele) for ele in self._complete_ind]
@@ -145,7 +143,7 @@ class PSROQuiesceSolver(psro_v2.PSROSolver):
         ne_support_num.append(ne_support_num_p)
       # ne_subgame: non-zero equilibrium support, [[0.1,0.5,0.4],[0.2,0.4,0.4]]
       ne_subgame_nonzero = [np.array(ele) for ele in ne_subgame]
-      ne_subgame_nonzero = [list(ele[ele!=0]) for ele in ne_subgame_nonzero]
+      ne_subgame_nonzero = [ele[ele!=0] for ele in ne_subgame_nonzero]
       # get players' payoffs in nash equilibrium
       ne_payoffs = self.get_mixed_payoff(ne_support_num,ne_subgame_nonzero)
       # all possible deviation payoffs
@@ -203,7 +201,7 @@ class PSROQuiesceSolver(psro_v2.PSROSolver):
       for pol in possible_dev:
         stra_li,stra_sup = copy.deepcopy(eq),copy.deepcopy(eq_sup)
         stra_li[p] = [pol]
-        stra_sup[p] = [1.0]
+        stra_sup[p] = np.array([1.0])
         dev.append(self.get_mixed_payoff(stra_li,stra_sup)[p])
       devs.append(dev)
       dev_pol.append(possible_dev)
@@ -221,14 +219,14 @@ class PSROQuiesceSolver(psro_v2.PSROSolver):
     if np.any(np.isnan(self._meta_games[0][np.ix_(*strategy_list)])):
       return False
     meta_game = [ele[np.ix_(*strategy_list)] for ele in self._meta_games]
-    # multiple player prob_matrix tensor
-    prob_matrix = np.outer(strategy_support[0],strategy_support[1])
-    for i in range(self._num_players-2):
-      ind = tuple([Ellipsis for _ in range(len(prob_matrix.shape))]+[None])
-      prob_matrix = prob_matrix[ind]*strategy_support[i+2]
+    prob_matrix = meta_strategies.general_get_joint_strategy_from_marginals(strategy_support)
     payoffs=[]
     for i in range(self._num_players):
-      payoffs.append(np.sum(meta_game[i]*prob_matrix))
+      try:
+        payoffs.append(np.sum(meta_game[i]*prob_matrix))
+      except:
+        import pdb
+        pdb.set_trace()
     return payoffs
 
   def update_complete_ind(self, policy_indicator, add_sample=True):

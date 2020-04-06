@@ -97,7 +97,7 @@ def renormalize(probabilities):
 
 def get_joint_strategy_from_marginals(probabilities):
   """Returns a joint strategy matrix from a list of marginals.
-
+  Only works in when the different marginals have same lengths.
   Args:
     probabilities: list of probabilities.
 
@@ -110,8 +110,24 @@ def get_joint_strategy_from_marginals(probabilities):
     probas_shapes[i] = -1
     probas.append(probabilities[i].reshape(*probas_shapes))
   result = np.product(probas)
-  return result.reshape(-1)
+  if type(result) is np.ndarray:
+    return result.reshape(-1)
+  else:
+    return np.array(result)
 
+def general_get_joint_strategy_from_marginals(probabilities):
+  """Returns a joint strategy matrix from a list of marginals.
+  Does not require marginals to have the same lengths.
+  Args:
+    probabilities: list of probabilities.
+  
+  Returns:
+    A joint strategy from a list of marginals
+  """
+  joint = np.outer(probabilities[0],probabilities[1])
+  for i in range(len(probabilities)-2):
+    joint = joint.reshape(tuple(list(joint.shape)+[1]))*probabilities[i+2]
+  return joint
 
 def nash_strategy(solver, return_joint=False):
   """Returns nash distribution on meta game matrix.
@@ -172,13 +188,13 @@ def general_nash_strategy(solver, return_joint=False, NE_solver="gambit", mode='
   if not return_joint:
     return equilibria
   else:
-    if len(equilibria) == 1:
-      joint_strategies = get_joint_strategy_from_marginals(equilibria)
-      return equilibria, joint_strategies
-    else:
+    if mode == 'all' and type(equilibria[0])==list:
       # If multiple NE exist, return a list with joint strategies.
       joint_strategies_list = [get_joint_strategy_from_marginals([ne]) for ne in equilibria]
       return equilibria, joint_strategies_list
+    else:
+      joint_strategies = get_joint_strategy_from_marginals(equilibria)
+      return equilibria, joint_strategies
 
 
 def prd_strategy(solver, return_joint=False):
