@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef THIRD_PARTY_OPEN_SPIEL_GAME_TRANSFORMS_GAME_WRAPPER_H_
-#define THIRD_PARTY_OPEN_SPIEL_GAME_TRANSFORMS_GAME_WRAPPER_H_
+#ifndef OPEN_SPIEL_GAME_TRANSFORMS_GAME_WRAPPER_H_
+#define OPEN_SPIEL_GAME_TRANSFORMS_GAME_WRAPPER_H_
 
 #include "open_spiel/spiel.h"
 
@@ -133,4 +133,4 @@ class WrappedGame : public Game {
 
 }  // namespace open_spiel
 
-#endif  // THIRD_PARTY_OPEN_SPIEL_GAME_TRANSFORMS_GAME_WRAPPER_H_
+#endif  // OPEN_SPIEL_GAME_TRANSFORMS_GAME_WRAPPER_H_

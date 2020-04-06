@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef THIRD_PARTY_OPEN_SPIEL_ALGORITHMS_EVALUATE_BOTS_H_
-#define THIRD_PARTY_OPEN_SPIEL_ALGORITHMS_EVALUATE_BOTS_H_
+#ifndef OPEN_SPIEL_ALGORITHMS_EVALUATE_BOTS_H_
+#define OPEN_SPIEL_ALGORITHMS_EVALUATE_BOTS_H_
 
 #include <vector>
 
@@ -31,4 +31,4 @@ std::vector<double> EvaluateBots(State* state, const std::vector<Bot*>& bots,
 
 }  // namespace open_spiel
 
-#endif  // THIRD_PARTY_OPEN_SPIEL_ALGORITHMS_EVALUATE_BOTS_H_
+#endif  // OPEN_SPIEL_ALGORITHMS_EVALUATE_BOTS_H_

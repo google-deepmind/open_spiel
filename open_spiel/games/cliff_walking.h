@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef THIRD_PARTY_OPEN_SPIEL_GAMES_CLIFF_WALKING_H_
-#define THIRD_PARTY_OPEN_SPIEL_GAMES_CLIFF_WALKING_H_
+#ifndef OPEN_SPIEL_GAMES_CLIFF_WALKING_H_
+#define OPEN_SPIEL_GAMES_CLIFF_WALKING_H_
 
 #include <memory>
 #include <string>
@@ -148,4 +148,4 @@ class CliffWalkingGame : public Game {
 }  // namespace cliff_walking
 }  // namespace open_spiel
 
-#endif  // THIRD_PARTY_OPEN_SPIEL_GAMES_CLIFF_WALKING_H_
+#endif  // OPEN_SPIEL_GAMES_CLIFF_WALKING_H_

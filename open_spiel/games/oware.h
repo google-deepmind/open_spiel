@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef THIRD_PARTY_OPEN_SPIEL_GAMES_OWARE_H_
-#define THIRD_PARTY_OPEN_SPIEL_GAMES_OWARE_H_
+#ifndef OPEN_SPIEL_GAMES_OWARE_H_
+#define OPEN_SPIEL_GAMES_OWARE_H_
 
 #include <memory>
 #include <unordered_set>
@@ -185,4 +185,4 @@ class OwareGame : public Game {
 }  // namespace oware
 }  // namespace open_spiel
 
-#endif  // THIRD_PARTY_OPEN_SPIEL_GAMES_OWARE_H_
+#endif  // OPEN_SPIEL_GAMES_OWARE_H_

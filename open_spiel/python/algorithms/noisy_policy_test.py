@@ -13,7 +13,7 @@
 # limitations under the License.
 
 # Lint as: python3
-"""Tests for google3.third_party.open_spiel.python.algorithms.noisy_policy."""
+"""Tests for open_spiel.python.algorithms.noisy_policy."""
 
 from absl.testing import absltest
 from absl.testing import parameterized

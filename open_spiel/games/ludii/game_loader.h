@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef THIRD_PARTY_OPEN_SPIEL_GAMES_LUDII_LUDII_H_
-#define THIRD_PARTY_OPEN_SPIEL_GAMES_LUDII_LUDII_H_
+#ifndef OPEN_SPIEL_GAMES_LUDII_LUDII_H_
+#define OPEN_SPIEL_GAMES_LUDII_LUDII_H_
 
 #include <string>
 #include <vector>
@@ -37,4 +37,4 @@ class GameLoader {
 }  // namespace ludii
 }  // namespace open_spiel
 
-#endif  // THIRD_PARTY_OPEN_SPIEL_GAMES_LUDII_LUDII_H_
+#endif  // OPEN_SPIEL_GAMES_LUDII_LUDII_H_

@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef THIRD_PARTY_OPEN_SPIEL_ALGORITHMS_HISTORY_TREE_H_
-#define THIRD_PARTY_OPEN_SPIEL_ALGORITHMS_HISTORY_TREE_H_
+#ifndef OPEN_SPIEL_ALGORITHMS_HISTORY_TREE_H_
+#define OPEN_SPIEL_ALGORITHMS_HISTORY_TREE_H_
 
 #include <iostream>
 #include <map>
@@ -120,4 +120,4 @@ std::vector<std::pair<std::unique_ptr<State>, double>> DecisionNodes(
 }  // namespace algorithms
 }  // namespace open_spiel
 
-#endif  // THIRD_PARTY_OPEN_SPIEL_ALGORITHMS_HISTORY_TREE_H_
+#endif  // OPEN_SPIEL_ALGORITHMS_HISTORY_TREE_H_

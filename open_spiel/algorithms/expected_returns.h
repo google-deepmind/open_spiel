@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef THIRD_PARTY_OPEN_SPIEL_ALGORITHMS_EXPECTED_RETURNS_H_
-#define THIRD_PARTY_OPEN_SPIEL_ALGORITHMS_EXPECTED_RETURNS_H_
+#ifndef OPEN_SPIEL_ALGORITHMS_EXPECTED_RETURNS_H_
+#define OPEN_SPIEL_ALGORITHMS_EXPECTED_RETURNS_H_
 
 #include <string>
 
@@ -44,4 +44,4 @@ std::vector<double> ExpectedReturns(const State& state,
 }  // namespace algorithms
 }  // namespace open_spiel
 
-#endif  // THIRD_PARTY_OPEN_SPIEL_ALGORITHMS_EXPECTED_RETURNS_H_
+#endif  // OPEN_SPIEL_ALGORITHMS_EXPECTED_RETURNS_H_

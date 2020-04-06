@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef THIRD_PARTY_OPEN_SPIEL_GAMES_GIN_RUMMY_H_
-#define THIRD_PARTY_OPEN_SPIEL_GAMES_GIN_RUMMY_H_
+#ifndef OPEN_SPIEL_GAMES_GIN_RUMMY_H_
+#define OPEN_SPIEL_GAMES_GIN_RUMMY_H_
 
 // Implementation of the classic card game:
 // https://en.wikipedia.org/wiki/Gin_rummy
@@ -215,4 +215,4 @@ class GinRummyGame : public Game {
 }  // namespace gin_rummy
 }  // namespace open_spiel
 
-#endif  // THIRD_PARTY_OPEN_SPIEL_GAMES_GIN_RUMMY_H_
+#endif  // OPEN_SPIEL_GAMES_GIN_RUMMY_H_

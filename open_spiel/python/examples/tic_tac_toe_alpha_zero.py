@@ -21,15 +21,19 @@ If you want more control, check out `alpha_zero.py`.
 """
 
 from absl import app
+from absl import flags
 
 from open_spiel.python.algorithms.alpha_zero import alpha_zero
 from open_spiel.python.utils import spawn
+
+flags.DEFINE_string("path", None, "Where to save checkpoints.")
+FLAGS = flags.FLAGS
 
 
 def main(unused_argv):
   config = alpha_zero.Config(
       game="tic_tac_toe",
-      path=None,
+      path=FLAGS.path,
       learning_rate=0.01,
       weight_decay=1e-4,
       train_batch_size=128,
@@ -47,6 +51,7 @@ def main(unused_argv):
       temperature=1,
       temperature_drop=4,
       evaluation_window=50,
+      eval_levels=7,
 
       nn_model="resnet",
       nn_width=128,

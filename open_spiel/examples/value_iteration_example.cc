@@ -26,7 +26,7 @@ int main(int argc, char** argv) {
       open_spiel::LoadGame("tic_tac_toe");
 
   auto solution = open_spiel::algorithms::ValueIteration(*game, -1, 0.01);
-  for (auto kv : solution) {
+  for (const auto& kv : solution) {
     std::cerr << "State: " << std::endl
               << kv.first << std::endl
               << "Value: " << kv.second << std::endl;

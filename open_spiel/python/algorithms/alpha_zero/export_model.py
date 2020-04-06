@@ -12,18 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""An example of building and exporting a Tensorflow graph.
-
-Adapted from export_graph.py. This one exports a simple network with value and
-policy heads.
-
-Adapted from the Travis Ebesu's blog post:
-https://tebesu.github.io/posts/Training-a-TensorFlow-graph-in-C++-API
-"""
-
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
+# Lint as: python3
+"""Export the model's Tensorflow graph as a protobuf."""
 
 from absl import app
 from absl import flags
@@ -32,9 +22,9 @@ from open_spiel.python.algorithms.alpha_zero import model as model_lib
 import pyspiel
 
 FLAGS = flags.FLAGS
-flags.DEFINE_string("game", "tic_tac_toe", "Name of the game")
-flags.DEFINE_string("path", "/tmp/az", "Directory to save graph")
-flags.DEFINE_string("graph_def", "vpnet.pb", "Filename for the graph")
+flags.DEFINE_string("game", None, "Name of the game")
+flags.DEFINE_string("path", None, "Directory to save graph")
+flags.DEFINE_string("graph_def", None, "Filename for the graph")
 flags.DEFINE_enum("nn_model", "resnet", model_lib.Model.valid_model_types,
                   "What type of model should be used?.")
 flags.DEFINE_integer("nn_width", 2 ** 7, "How wide should the network be.")
@@ -42,6 +32,9 @@ flags.DEFINE_integer("nn_depth", 10, "How deep should the network be.")
 flags.DEFINE_float("learning_rate", 0.0001, "Learning rate used for training")
 flags.DEFINE_float("weight_decay", 0.0001, "L2 regularization strength.")
 flags.DEFINE_bool("verbose", False, "Print information about the model.")
+flags.mark_flag_as_required("game")
+flags.mark_flag_as_required("path")
+flags.mark_flag_as_required("graph_def")
 
 
 def main(_):

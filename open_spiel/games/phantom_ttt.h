@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef THIRD_PARTY_OPEN_SPIEL_GAMES_PHANTOM_TTT_H_
-#define THIRD_PARTY_OPEN_SPIEL_GAMES_PHANTOM_TTT_H_
+#ifndef OPEN_SPIEL_GAMES_PHANTOM_TTT_H_
+#define OPEN_SPIEL_GAMES_PHANTOM_TTT_H_
 
 #include <array>
 #include <map>
@@ -137,4 +137,4 @@ inline std::ostream& operator<<(std::ostream& stream,
 }  // namespace phantom_ttt
 }  // namespace open_spiel
 
-#endif  // THIRD_PARTY_OPEN_SPIEL_GAMES_PHANTOM_TTT_H_
+#endif  // OPEN_SPIEL_GAMES_PHANTOM_TTT_H_

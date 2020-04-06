@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef THIRD_PARTY_OPEN_SPIEL_ALGORITHMS_ALPHA_ZERO_DEVICE_MANAGER_H_
-#define THIRD_PARTY_OPEN_SPIEL_ALGORITHMS_ALPHA_ZERO_DEVICE_MANAGER_H_
+#ifndef OPEN_SPIEL_ALGORITHMS_ALPHA_ZERO_DEVICE_MANAGER_H_
+#define OPEN_SPIEL_ALGORITHMS_ALPHA_ZERO_DEVICE_MANAGER_H_
 
 #include <vector>
 
@@ -92,4 +92,4 @@ class DeviceManager {
 
 }  // namespace open_spiel::algorithms
 
-#endif  // THIRD_PARTY_OPEN_SPIEL_ALGORITHMS_ALPHA_ZERO_DEVICE_MANAGER_H_
+#endif  // OPEN_SPIEL_ALGORITHMS_ALPHA_ZERO_DEVICE_MANAGER_H_

@@ -97,7 +97,7 @@ class PolicyGradient(rl_agent.AbstractAgent):
                player_id,
                info_state_size,
                num_actions,
-               loss_str="rpg",
+               loss_str="a2c",
                loss_class=None,
                hidden_layers_sizes=(128,),
                batch_size=16,
@@ -117,7 +117,7 @@ class PolicyGradient(rl_agent.AbstractAgent):
       num_actions: int, number of actions per info state.
       loss_str: string or None. If string, must be one of ["rpg", "qpg", "rm",
         "a2c"] and defined in `_get_loss_class`. If None, a loss class must be
-        passed through `loss_class`. Defaults to "rpg".
+        passed through `loss_class`. Defaults to "a2c".
       loss_class: Class or None. If Class, it must define the policy gradient
         loss. If None a loss class in a string format must be passed through
         `loss_str`. Defaults to None.

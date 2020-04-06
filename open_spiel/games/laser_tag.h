@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef THIRD_PARTY_OPEN_SPIEL_GAMES_LASER_TAG_H_
-#define THIRD_PARTY_OPEN_SPIEL_GAMES_LASER_TAG_H_
+#ifndef OPEN_SPIEL_GAMES_LASER_TAG_H_
+#define OPEN_SPIEL_GAMES_LASER_TAG_H_
 
 #include <array>
 #include <memory>
@@ -158,4 +158,4 @@ class LaserTagGame : public SimMoveGame {
 }  // namespace laser_tag
 }  // namespace open_spiel
 
-#endif  // THIRD_PARTY_OPEN_SPIEL_GAMES_LASER_TAG_H_
+#endif  // OPEN_SPIEL_GAMES_LASER_TAG_H_

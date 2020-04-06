@@ -33,7 +33,7 @@ void DataLoggerJsonLines::Write(DataLogger::Record record) {
   static absl::TimeZone utc = absl::UTCTimeZone();
   absl::Time now = absl::Now();
   record.insert({
-      {"time_str", absl::FormatTime("%Y-%m-%d %H:%M:%E3S %z", now, utc)},
+      {"time_str", absl::FormatTime("%Y-%m-%d %H:%M:%E6S %z", now, utc)},
       {"time_abs", absl::ToUnixMicros(now) / 1000000.},
       {"time_rel", absl::ToDoubleSeconds(now - start_time_)},
   });

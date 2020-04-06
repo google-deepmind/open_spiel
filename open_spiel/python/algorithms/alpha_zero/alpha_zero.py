@@ -50,15 +50,19 @@ from open_spiel.python.algorithms import mcts
 from open_spiel.python.algorithms.alpha_zero import evaluator as evaluator_lib
 from open_spiel.python.algorithms.alpha_zero import model as model_lib
 import pyspiel
+from open_spiel.python.utils import data_logger
 from open_spiel.python.utils import file_logger
 from open_spiel.python.utils import spawn
+from open_spiel.python.utils import stats
 
 
 class TrajectoryState(object):
   """A particular point along a trajectory."""
 
-  def __init__(self, observation, legals_mask, action, policy, value):
+  def __init__(self, observation, current_player, legals_mask, action, policy,
+               value):
     self.observation = observation
+    self.current_player = current_player
     self.legals_mask = legals_mask
     self.action = action
     self.policy = policy
@@ -114,6 +118,7 @@ class Config(collections.namedtuple(
         "actors",
         "evaluators",
         "evaluation_window",
+        "eval_levels",
 
         "uct_c",
         "max_simulations",
@@ -158,7 +163,7 @@ def watcher(fn):
       print("{} started".format(name))
       logger.print("{} started".format(name))
       try:
-        return fn(config=config, logger=logger, num=num, **kwargs)
+        return fn(config=config, logger=logger, **kwargs)
       except Exception as e:
         logger.print("\n".join([
             "",
@@ -207,7 +212,8 @@ def _play_game(logger, game_num, game, bots, temperature, temperature_drop):
     else:
       action = np.random.choice(len(policy), p=policy)
     trajectory.states.append(TrajectoryState(
-        state.observation_tensor(), state.legal_actions_mask(), action, policy,
+        state.observation_tensor(), state.current_player(),
+        state.legal_actions_mask(), action, policy,
         root.total_reward / root.explore_count))
     action_str = state.action_to_string(state.current_player(), action)
     actions.append(action_str)
@@ -241,9 +247,8 @@ def update_checkpoint(logger, queue, model, az_evaluator):
 
 
 @watcher
-def actor(*, config, game, logger, num, queue):
+def actor(*, config, game, logger, queue):
   """An actor process runner that generates games and returns trajectories."""
-  del num
   logger.print("Initializing model")
   model = _init_model_from_config(config)
   logger.print("Initializing bots")
@@ -260,56 +265,52 @@ def actor(*, config, game, logger, num, queue):
 
 
 @watcher
-def evaluator(*, game, config, logger, num, queue):
+def evaluator(*, game, config, logger, queue):
   """A process that plays the latest checkpoint vs standard MCTS."""
-  max_simulations = config.max_simulations * (3 ** num)
-  logger.print("Running MCTS with", max_simulations, "simulations")
   results = Buffer(config.evaluation_window)
   logger.print("Initializing model")
   model = _init_model_from_config(config)
   logger.print("Initializing bots")
   az_evaluator = evaluator_lib.AlphaZeroEvaluator(game, model)
   random_evaluator = mcts.RandomRolloutEvaluator()
-  az_player = 0
-  bots = [
-      _init_bot(config, game, az_evaluator, True),
-      mcts.MCTSBot(
-          game,
-          config.uct_c,
-          max_simulations,
-          random_evaluator,
-          solve=True,
-          verbose=False)
-  ]
+
   for game_num in itertools.count():
     if not update_checkpoint(logger, queue, model, az_evaluator):
       return
 
+    az_player = game_num % 2
+    difficulty = (game_num // 2) % config.eval_levels
+    max_simulations = int(config.max_simulations * (10 ** (difficulty / 2)))
+    bots = [
+        _init_bot(config, game, az_evaluator, True),
+        mcts.MCTSBot(
+            game,
+            config.uct_c,
+            max_simulations,
+            random_evaluator,
+            solve=True,
+            verbose=False)
+    ]
+    if az_player == 1:
+      bots = list(reversed(bots))
+
     trajectory = _play_game(logger, game_num, game, bots, temperature=1,
                             temperature_drop=0)
     results.append(trajectory.returns[az_player])
+    queue.put((difficulty, trajectory.returns[az_player]))
 
     logger.print("AZ: {}, MCTS: {}, AZ avg/{}: {:.3f}".format(
         trajectory.returns[az_player],
         trajectory.returns[1 - az_player],
         len(results), np.mean(results.data)))
 
-    # Swap players for the next game
-    bots = list(reversed(bots))
-    az_player = 1 - az_player
-
 
 @watcher
-def learner(*, config, actors, broadcast_fn, num, logger):
+def learner(*, game, config, actors, evaluators, broadcast_fn, logger):
   """A learner that consumes the replay buffer and trains the network."""
-  del num
-
   logger.also_to_stdout = True
-  poll_freq = 10  # seconds
   replay_buffer = Buffer(config.replay_buffer_size)
   learn_rate = config.replay_buffer_size // config.replay_buffer_reuse
-  rate_window = 5 * 60
-  states_rate = Buffer(rate_window // poll_freq)
   logger.print("Initializing model")
   model = _init_model_from_config(config)
   logger.print("Model type: %s(%s, %s)" % (config.nn_model, config.nn_width,
@@ -319,22 +320,64 @@ def learner(*, config, actors, broadcast_fn, num, logger):
   logger.print("Initial checkpoint:", save_path)
   broadcast_fn(save_path)
 
+  data_log = data_logger.DataLoggerJsonLines(config.path, "learner", True)
+
+  stage_count = 7
+  value_accuracies = [stats.BasicStats() for _ in range(stage_count)]
+  value_predictions = [stats.BasicStats() for _ in range(stage_count)]
+  game_lengths = stats.BasicStats()
+  game_lengths_hist = stats.HistogramNumbered(game.max_game_length() + 1)
+  outcomes = stats.HistogramNamed(["Player1", "Player2", "Draw"])
+  evals = [Buffer(config.evaluation_window) for _ in range(config.eval_levels)]
+  total_trajectories = 0
+
+  def trajectory_generator():
+    """Merge all the actor queues into a single generator."""
+    while True:
+      found = 0
+      for actor_process in actors:
+        try:
+          yield actor_process.queue.get_nowait()
+        except spawn.Empty:
+          pass
+        else:
+          found += 1
+      if found == 0:
+        time.sleep(0.01)  # 10ms
+
   def collect_trajectories():
     """Collects the trajectories from actors into the replay buffer."""
     num_trajectories = 0
     num_states = 0
-    for actor_process in actors:
-      while True:
-        try:
-          trajectory = actor_process.queue.get_nowait()
-        except spawn.Empty:
-          break
-        num_trajectories += 1
-        num_states += len(trajectory.states)
-        replay_buffer.extend(
-            model_lib.TrainInput(
-                s.observation, s.legals_mask, s.policy, trajectory.returns[0])
-            for s in trajectory.states)
+    for trajectory in trajectory_generator():
+      num_trajectories += 1
+      num_states += len(trajectory.states)
+      game_lengths.add(len(trajectory.states))
+      game_lengths_hist.add(len(trajectory.states))
+
+      p1_outcome = trajectory.returns[0]
+      if p1_outcome > 0:
+        outcomes.add(0)
+      elif p1_outcome < 0:
+        outcomes.add(1)
+      else:
+        outcomes.add(2)
+
+      replay_buffer.extend(
+          model_lib.TrainInput(
+              s.observation, s.legals_mask, s.policy, p1_outcome)
+          for s in trajectory.states)
+
+      for stage in range(stage_count):
+        # Scale for the length of the game
+        index = (len(trajectory.states) - 1) * stage // (stage_count - 1)
+        n = trajectory.states[index]
+        accurate = (n.value >= 0) == (trajectory.returns[n.current_player] >= 0)
+        value_accuracies[stage].add(1 if accurate else 0)
+        value_predictions[stage].add(abs(n.value))
+
+      if num_states >= learn_rate:
+        break
     return num_trajectories, num_states
 
   def learn(step):
@@ -349,26 +392,88 @@ def learner(*, config, actors, broadcast_fn, num, logger):
     save_path = model.save_checkpoint(
         step if step % config.checkpoint_freq == 0 else -1)
     losses = sum(losses, model_lib.Losses(0, 0, 0)) / len(losses)
-    logger.print("Step {}: {}, path: {}".format(step, losses, save_path))
-    return save_path
+    logger.print(losses)
+    logger.print("Checkpoint saved:", save_path)
+    return save_path, losses
 
-  states_learned = 0
-  for learn_num in itertools.count(1):
-    while replay_buffer.total_seen - states_learned < learn_rate:
-      num_trajectories, num_states = collect_trajectories()
-      states_rate.append(num_states)
-      logger.print(
-          ("Collected {:5} states from {:3} games, {:.1f} states/s. Buffer "
-           "size: {}. States seen: {}, learned: {}, new: {}").format(
-               num_states, num_trajectories,
-               sum(states_rate.data) / (len(states_rate.data) * poll_freq),
-               len(replay_buffer), replay_buffer.total_seen, states_learned,
-               replay_buffer.total_seen - states_learned))
-      time.sleep(poll_freq)
-    states_learned = replay_buffer.total_seen
+  last_time = time.time() - 60
+  for step in itertools.count(1):
+    for value_accuracy in value_accuracies:
+      value_accuracy.reset()
+    for value_prediction in value_predictions:
+      value_prediction.reset()
+    game_lengths.reset()
+    game_lengths_hist.reset()
+    outcomes.reset()
 
-    save_path = learn(learn_num)
-    if config.max_steps > 0 and learn_num >= config.max_steps:
+    num_trajectories, num_states = collect_trajectories()
+    total_trajectories += num_trajectories
+    now = time.time()
+    seconds = now - last_time
+    last_time = now
+
+    logger.print("Step:", step)
+    logger.print(
+        ("Collected {:5} states from {:3} games, {:.1f} states/s. "
+         "{:.1f} states/(s*actor), game length: {:.1f}").format(
+             num_states, num_trajectories, num_states / seconds,
+             num_states / (config.actors * seconds),
+             num_states / num_trajectories))
+    logger.print("Buffer size: {}. States seen: {}".format(
+        len(replay_buffer), replay_buffer.total_seen))
+
+    save_path, losses = learn(step)
+
+    for eval_process in evaluators:
+      while True:
+        try:
+          difficulty, outcome = eval_process.queue.get_nowait()
+          evals[difficulty].append(outcome)
+        except spawn.Empty:
+          break
+
+    batch_size_stats = stats.BasicStats()  # Only makes sense in C++.
+    batch_size_stats.add(1)
+    data_log.write({
+        "step": step,
+        "total_states": replay_buffer.total_seen,
+        "states_per_s": num_states / seconds,
+        "states_per_s_actor": num_states / (config.actors * seconds),
+        "total_trajectories": total_trajectories,
+        "trajectories_per_s": num_trajectories / seconds,
+        "queue_size": 0,  # Only available in C++.
+        "game_length": game_lengths.as_dict,
+        "game_length_hist": game_lengths_hist.data,
+        "outcomes": outcomes.data,
+        "value_accuracy": [v.as_dict for v in value_accuracies],
+        "value_prediction": [v.as_dict for v in value_predictions],
+        "eval": {
+            "count": evals[0].total_seen,
+            "results": [sum(e.data) / len(e) for e in evals],
+        },
+        "batch_size": batch_size_stats.as_dict,
+        "batch_size_hist": [0, 1],
+        "loss": {
+            "policy": losses.policy,
+            "value": losses.value,
+            "l2reg": losses.l2,
+            "sum": losses.total,
+        },
+        "cache": {  # Null stats because it's hard to report between processes.
+            "size": 0,
+            "max_size": 0,
+            "usage": 0,
+            "requests": 0,
+            "requests_per_s": 0,
+            "hits": 0,
+            "misses": 0,
+            "misses_per_s": 0,
+            "hit_rate": 0,
+        },
+    })
+    logger.print()
+
+    if config.max_steps > 0 and step >= config.max_steps:
       break
 
     broadcast_fn(save_path)
@@ -421,7 +526,8 @@ def alpha_zero(config: Config):
       proc.queue.put(msg)
 
   try:
-    learner(config=config, actors=actors, broadcast_fn=broadcast)  # pylint: disable=missing-kwoa
+    learner(game=game, config=config, actors=actors,  # pylint: disable=missing-kwoa
+            evaluators=evaluators, broadcast_fn=broadcast)
   except (KeyboardInterrupt, EOFError):
     print("Caught a KeyboardInterrupt, stopping early.")
   finally:
