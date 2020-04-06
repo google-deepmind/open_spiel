@@ -154,7 +154,8 @@ class PSROSolver(abstract_meta_trainer.AbstractMetaTrainer):
     self._policies = []  # A list of size `num_players` of lists containing the
     # strategies of each player.
     self._new_policies = []
-
+    
+    self._meta_strategy_str = meta_strategy_method
     # Alpharank is a special case here, as it's not supported by the abstract
     # meta trainer api, so has to be passed as a function instead of a string.
     if not meta_strategy_method or meta_strategy_method == "alpharank":
@@ -221,9 +222,8 @@ class PSROSolver(abstract_meta_trainer.AbstractMetaTrainer):
     #TODO: return_joint should be associated with alpha-rank.
     if self.symmetric_game:
       self._policies = self._policies * self._game_num_players
-
     self._meta_strategy_probabilities, self._non_marginalized_probabilities =\
-        self._meta_strategy_method(solver=self, return_joint=False)
+        self._meta_strategy_method(solver=self, return_joint=True)
 
     if self.symmetric_game:
       self._policies = [self._policies[0]]
@@ -345,10 +345,13 @@ class PSROSolver(abstract_meta_trainer.AbstractMetaTrainer):
       training_parameters = [training_parameters[0]]
 
     # List of List of new policies (One list per player)
-    self.oracle = self._oracle(self._game, training_parameters, strategy_sampler=sample_strategy,
-                               using_joint_strategies=self._rectify_training or not self.sample_from_marginals)
-    self._new_policies = self.oracle
+    # collect training performance to plot if RL oracle
+    if self._is_rloracle:
+      self.oracle,reward_trace = self._oracle(self._game, training_parameters, strategy_sampler=sample_strategy, using_joint_strategies=self._rectify_training or not self.sample_from_marginals)
+    else:
+      self.oracle = self._oracle(self._game, training_parameters, strategy_sampler=sample_strategy, using_joint_strategies=self._rectify_training or not self.sample_from_marginals)
 
+    self._new_policies = self.oracle
     if self.symmetric_game:
       # In a symmetric game, only one population is kept. The below lines
       # therefore make PSRO consider only the first player during training,
@@ -356,6 +359,8 @@ class PSROSolver(abstract_meta_trainer.AbstractMetaTrainer):
       self._policies = [self._policies[0]]
       self._num_players = 1
 
+    return reward_trace if self._is_rloracle else []
+  
   def update_empirical_gamestate(self, seed=None):
     """Given new agents in _new_policies, update meta_games through simulations.
 
@@ -448,10 +453,9 @@ class PSROSolver(abstract_meta_trainer.AbstractMetaTrainer):
                 meta_games[player][used_tuple] += utility_estimates[
                     permutation[player]] / len(player_permutations)
           else:
-            utility_estimates = self.sample_episodes(estimated_policies,
-                                                     self._sims_per_entry)
-            for k in range(self._num_players):
-              meta_games[k][tuple(used_index)] = utility_estimates[k]
+            utility_estimates = self.sample_episodes(estimated_policies,self._sims_per_entry)
+          for k in range(self._num_players):
+            meta_games[k][tuple(used_index)] = utility_estimates[k]
 
     if self.symmetric_game:
       # Make PSRO consider that we only have one population again, as we

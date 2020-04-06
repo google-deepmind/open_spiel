@@ -69,7 +69,6 @@ def sample_episode(state, policies):
   """
   if state.is_terminal():
     return np.array(state.returns(), dtype=np.float32)
-
   if state.is_simultaneous_node():
     actions = [None] * state.num_players()
     for player in range(state.num_players()):
@@ -158,6 +157,7 @@ class AbstractMetaTrainer(object):
     self._iterations = 0
     self._game = game
     self._oracle = oracle
+    self._is_rloracle = oracle.__class__.__name__=='RLOracle'
     self._num_players = self._game.num_players()
 
     self.symmetric_game = symmetric_game
@@ -218,9 +218,10 @@ class AbstractMetaTrainer(object):
       seed: Seed for random BR noise generation.
     """
     self._iterations += 1
-    self.update_agents()  # Generate new, Best Response agents via oracle.
+    train_reward_curve = self.update_agents()  # Generate new, Best Response agents via oracle.
     self.update_empirical_gamestate(seed=seed)  # Update gamestate matrix.
     self.update_meta_strategies()  # Compute meta strategy (e.g. Nash)
+    return train_reward_curve
 
   def update_meta_strategies(self):
     self._meta_strategy_probabilities = self._meta_strategy_method(self)

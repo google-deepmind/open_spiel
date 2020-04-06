@@ -134,7 +134,6 @@ class RLOracle(optimization_oracle.AbstractOracle):
     if not is_evaluation:
       for agent in agents:
         agent.step(time_step)
-
     return cumulative_rewards
 
   def _has_terminated(self, episodes_per_oracle):
@@ -210,7 +209,7 @@ class RLOracle(optimization_oracle.AbstractOracle):
     return episode_policies, live_agents_player_index
 
   def _rollout(self, game, agents, **oracle_specific_execution_kwargs):
-    self.sample_episode(None, agents, is_evaluation=False)
+    return self.sample_episode(None, agents, is_evaluation=False)
 
   def generate_new_policies(self, training_parameters):
     """Generates new policies to be trained into best responses.
@@ -257,6 +256,7 @@ class RLOracle(optimization_oracle.AbstractOracle):
           player, the probabilities of playing each policy in total_policies for
           the same player.
       strategy_sampler: Callable that samples strategies from total_policies
+        meta_games = [meta_games, -meta_games]
         using probabilities_of_playing_policies. It only samples one joint
         set of policies for all players. Implemented to be able to take into
         account joint probabilities of action (For Alpharank)
@@ -274,16 +274,18 @@ class RLOracle(optimization_oracle.AbstractOracle):
     episodes_per_oracle = np.array(episodes_per_oracle)
 
     new_policies = self.generate_new_policies(training_parameters)
-
+    # TODO(author4): Look into multithreading.
+    reward_trace = [[] for _ in range(game.num_players())]
     while not self._has_terminated(episodes_per_oracle):
       agents, indexes = self.sample_policies_for_episode(
           new_policies, training_parameters, episodes_per_oracle,
           strategy_sampler)
-      self._rollout(game, agents, **oracle_specific_execution_kwargs)
+      reward = self._rollout(game, agents, **oracle_specific_execution_kwargs)
+      reward_trace[indexes[0][0]].append(reward[indexes[0][0]])
       episodes_per_oracle = update_episodes_per_oracles(episodes_per_oracle,
                                                         indexes)
     # Freeze the new policies to keep their weights static. This allows us to
     # later not have to make the distinction between static and training
     # policies in training iterations.
     freeze_all(new_policies)
-    return new_policies
+    return new_policies, reward_trace

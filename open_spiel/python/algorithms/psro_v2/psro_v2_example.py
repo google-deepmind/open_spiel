@@ -25,16 +25,16 @@ The other parameters keeping their default values.
 """
 
 import time
+import datetime
 import os
 from absl import app
 from absl import flags
 import numpy as np
-
-# pylint: disable=g-bad-import-order
 import pyspiel
 import tensorflow.compat.v1 as tf
 from tensorboardX import SummaryWriter
 import logging
+logging.disable(logging.INFO)
 
 from open_spiel.python import policy
 from open_spiel.python import rl_environment
@@ -46,20 +46,22 @@ from open_spiel.python.algorithms.psro_v2 import psro_v2
 from open_spiel.python.algorithms.psro_v2 import rl_oracle
 from open_spiel.python.algorithms.psro_v2 import rl_policy
 from open_spiel.python.algorithms.psro_v2 import strategy_selectors
+from open_spiel.python.algorithms.psro_v2.quiesce.quiesce import PSROQuiesceSolver
+from open_spiel.python.algorithms.psro_v2.quiesce import quiesce_sparse
 
 
 FLAGS = flags.FLAGS
-
+flags.DEFINE_string("root_result_folder",'root_result',"root directory of saved results")
 # Game-related
 flags.DEFINE_string("game_name", "kuhn_poker", "Game name.")
 flags.DEFINE_integer("n_players", 2, "The number of players.")
 
 # PSRO related
-flags.DEFINE_string("meta_strategy_method", "nash",
+flags.DEFINE_string("meta_strategy_method", "general_nash",
                     "Name of meta strategy computation method.")
 flags.DEFINE_integer("number_policies_selected", 1,
                      "Number of new strategies trained at each PSRO iteration.")
-flags.DEFINE_integer("sims_per_entry", 1000,
+flags.DEFINE_integer("sims_per_entry", 50,
                      ("Number of simulations to run to estimate each element"
                       "of the game outcome matrix."))
 
@@ -68,10 +70,10 @@ flags.DEFINE_integer("gpsro_iterations", 100,
 flags.DEFINE_bool("symmetric_game", False, "Whether to consider the current "
                   "game as a symmetric game.")
 flags.DEFINE_bool("quiesce",False,"Whether to use quiece")
+flags.DEFINE_bool("sparse_quiesce",True,"whether to use sparse matrix quiesce implementation")
 
 # Rectify options
 flags.DEFINE_string("rectifier", "",
-                    "Which rectifier to use. Choices are '' "
                     "(No filtering), 'rectified' for rectified.")
 flags.DEFINE_string("training_strategy_selector", "probabilistic",
                     "Which strategy selector to use. Choices are "
@@ -86,9 +88,9 @@ flags.DEFINE_string("training_strategy_selector", "probabilistic",
                     "probability strategy available to each player.")
 
 # General (RL) agent parameters
-flags.DEFINE_string("oracle_type", "BR", "Choices are DQN, PG (Policy "
-                    "Gradient) or BR (exact Best Response)")
-flags.DEFINE_integer("number_training_episodes", int(1e4), "Number training "
+flags.DEFINE_string("oracle_type", "DQN", "Choices are DQN, PG (Policy "
+                    "Gradient), BR (exact Best Response) or ARS(Augmented Random Search)")
+flags.DEFINE_integer("number_training_episodes", int(2), "Number training "
                      "episodes per RL policy. Used for PG and DQN")
 flags.DEFINE_float("self_play_proportion", 0.0, "Self play proportion")
 flags.DEFINE_integer("hidden_layer_size", 256, "Hidden layer size")
@@ -115,6 +117,13 @@ flags.DEFINE_integer("seed", 1, "Seed.")
 flags.DEFINE_bool("local_launch", False, "Launch locally or not.")
 flags.DEFINE_bool("verbose", True, "Enables verbose printing and profiling.")
 
+#ARS
+flags.DEFINE_integer("num_steps", 1000, "Number of steps.")
+flags.DEFINE_float("ars_learning_rate", 0.02, "ARS learning rate.")
+flags.DEFINE_integer("num_directions", 64, "Number of exploration directions.")
+flags.DEFINE_integer("num_best_directions", 64, "Select # best directions.")
+flags.DEFINE_float("noise", 0.03, "Coefficient of Gaussian noise.")
+flags.DEFINE_bool("v2", False, "v2 of ARS which normalizes observations.")
 
 def init_pg_responder(sess, env):
   """Initializes the Policy Gradient-based responder and agents."""
@@ -124,7 +133,7 @@ def init_pg_responder(sess, env):
   agent_class = rl_policy.PGPolicy
 
   agent_kwargs = {
-      "session": sess,
+      "session":sess,
       "info_state_size": info_state_size,
       "num_actions": num_actions,
       "loss_str": FLAGS.loss_str,
@@ -144,7 +153,6 @@ def init_pg_responder(sess, env):
       number_training_episodes=FLAGS.number_training_episodes,
       self_play_proportion=FLAGS.self_play_proportion,
       sigma=FLAGS.sigma)
-
   agents = [
       agent_class(  # pylint: disable=g-complex-comprehension
           env,
@@ -178,7 +186,7 @@ def init_dqn_responder(sess, env):
       "num_actions": num_actions,
       "hidden_layers_sizes": [FLAGS.hidden_layer_size] * FLAGS.n_hidden_layers,
       "batch_size": FLAGS.batch_size,
-      "learning_rate": FLAGS.dqn_learning_rate,
+     "learning_rate": FLAGS.dqn_learning_rate,
       "update_target_network_every": FLAGS.update_target_network_every,
       "learn_every": FLAGS.learn_every,
       "optimizer_str": FLAGS.optimizer_str
@@ -202,6 +210,45 @@ def init_dqn_responder(sess, env):
     agent.freeze()
   return oracle, agents
 
+def init_ars_responder(sess, env):
+  """
+  Initializes the ARS responder and agents.
+  :param sess: A fake sess=None
+  :param env: A rl environment.
+  :return: oracle and agents.
+  """
+  info_state_size = env.observation_spec()["info_state"][0]
+  num_actions = env.action_spec()["num_actions"]
+  agent_class = rl_policy.ARSPolicy
+  agent_kwargs = {
+    "session": sess,
+    "info_state_size": info_state_size,
+    "num_actions": num_actions,
+    "nb_steps": FLAGS.num_steps,
+    "learning_rate": FLAGS.ars_learning_rate,
+    "nb_directions": FLAGS.num_directions,
+    "nb_best_directions": FLAGS.num_directions,
+    "noise": FLAGS.noise,
+    "v2": FLAGS.v2
+  }
+  oracle = rl_oracle.RLOracle(
+    env,
+    agent_class,
+    agent_kwargs,
+    number_training_episodes=FLAGS.number_training_episodes,
+    self_play_proportion=FLAGS.self_play_proportion,
+    sigma=FLAGS.sigma)
+
+  agents = [
+    agent_class(
+      env,
+      player_id,
+      **agent_kwargs)
+    for player_id in range(FLAGS.n_players)
+  ]
+  for agent in agents:
+    agent.freeze()
+  return oracle, agents
 
 def print_policy_analysis(policies, game, verbose=False):
   """Function printing policy diversity within game's known policies.
@@ -242,12 +289,18 @@ def print_policy_analysis(policies, game, verbose=False):
   return unique_policies
 
 
-def gpsro_looper(env, oracle, agents):
+def gpsro_looper(env, oracle, agents, writer, quiesce=False):
   """Initializes and executes the GPSRO training loop."""
   sample_from_marginals = True  # TODO(somidshafiei) set False for alpharank
   training_strategy_selector = FLAGS.training_strategy_selector or strategy_selectors.probabilistic_strategy_selector
-
-  g_psro_solver = psro_v2.PSROSolver(
+  
+  if not quiesce:
+    solver = psro_v2.PSROSolver
+  elif FLAGS.sparse_quiesce:
+    solver = quiesce_sparse.PSROQuiesceSolver
+  else:
+    solver = PSROQuiesceSolver
+  g_psro_solver = solver(
       env.game,
       oracle,
       initial_policies=agents,
@@ -260,14 +313,13 @@ def gpsro_looper(env, oracle, agents):
       prd_gamma=1e-10,
       sample_from_marginals=sample_from_marginals,
       symmetric_game=FLAGS.symmetric_game)
-      nash_solver_path=FLAGS.nash_solver_path)
 
   start_time = time.time()
   for gpsro_iteration in range(FLAGS.gpsro_iterations):
     if FLAGS.verbose:
       print("Iteration : {}".format(gpsro_iteration))
       print("Time so far: {}".format(time.time() - start_time))
-    g_psro_solver.iteration()
+    train_reward_curve = g_psro_solver.iteration()
     meta_game = g_psro_solver.get_meta_game()
     meta_probabilities = g_psro_solver.get_meta_strategies()
     policies = g_psro_solver.get_policies()
@@ -276,20 +328,24 @@ def gpsro_looper(env, oracle, agents):
       print("Meta game : {}".format(meta_game))
       print("Probabilities : {}".format(meta_probabilities))
 
-    # The following lines only work for sequential games for the moment.
-    if env.game.get_type().dynamics == pyspiel.GameType.Dynamics.SEQUENTIAL:
-      aggregator = policy_aggregator.PolicyAggregator(env.game)
-      aggr_policies = aggregator.aggregate(
-          range(FLAGS.n_players), policies, meta_probabilities)
+    aggregator = policy_aggregator.PolicyAggregator(env.game)
+    aggr_policies = aggregator.aggregate(
+        range(FLAGS.n_players), policies, meta_probabilities)
 
-      exploitabilities, expl_per_player = exploitability.nash_conv(
-          env.game, aggr_policies, return_only_nash_conv=False)
+    exploitabilities, expl_per_player = exploitability.nash_conv(
+        env.game, aggr_policies, return_only_nash_conv=False)
 
-      _ = print_policy_analysis(policies, env.game, FLAGS.verbose)
-      if FLAGS.verbose:
-        print("Exploitabilities : {}".format(exploitabilities))
-        print("Exploitabilities per player : {}".format(expl_per_player))
+    _ = print_policy_analysis(policies, env.game, FLAGS.verbose)
 
+    for p in range(len(train_reward_curve)):
+      for p_i in range(len(train_reward_curve[p])):
+        writer.add_scalar('player'+str(p)+'_'+str(gpsro_iteration),train_reward_curve[p][p_i],p_i)
+    for p in range(len(expl_per_player)):
+      writer.add_scalar('player'+str(p)+'_exp',expl_per_player[p],gpsro_iteration)
+    writer.add_scalar('exp',exploitabilities,gpsro_iteration)
+    if FLAGS.verbose:
+      print("Exploitabilities : {}".format(exploitabilities))
+      print("Exploitabilities per player : {}".format(expl_per_player))
 
 def main(argv):
   if len(argv) > 1:
@@ -297,10 +353,17 @@ def main(argv):
 
   np.random.seed(FLAGS.seed)
 
-  game = pyspiel.load_game(FLAGS.game_name,
-                           {"players": pyspiel.GameParameter(FLAGS.n_players)})
+  game = pyspiel.load_game_as_turn_based(FLAGS.game_name,
+                                         {"players": pyspiel.GameParameter(
+                                             FLAGS.n_players)})
   env = rl_environment.Environment(game)
-  
+  env.reset()
+
+  if not os.path.exists(FLAGS.root_result_folder):
+    os.makedirs(FLAGS.root_result_folder)
+  checkpoint_dir = os.path.join(os.getcwd(),FLAGS.root_result_folder,FLAGS.game_name+'_'+FLAGS.oracle_type+'_sims_'+str(FLAGS.sims_per_entry)+'_it'+str(FLAGS.gpsro_iterations)+'_ep'+str(FLAGS.number_training_episodes)+'_'+datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
+  writer = SummaryWriter(logdir=checkpoint_dir+'/log')
+
   # Initialize oracle and agents
   with tf.Session() as sess:
     if FLAGS.oracle_type == "DQN":
@@ -309,8 +372,12 @@ def main(argv):
       oracle, agents = init_pg_responder(sess, env)
     elif FLAGS.oracle_type == "BR":
       oracle, agents = init_br_responder(env)
+    elif FLAGS.oracle_type == "ARS":
+      oracle, agents = init_ars_responder(sess, env)
     sess.run(tf.global_variables_initializer())
-    gpsro_looper(env, oracle, agents)
+    gpsro_looper(env, oracle, agents, writer,quiesce=FLAGS.quiesce)
+
+  writer.close()
 
 if __name__ == "__main__":
   app.run(main)
