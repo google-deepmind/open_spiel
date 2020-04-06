@@ -40,5 +40,4 @@ Names are ordered lexicographically. Typo or similar contributors are omitted.
 
 ## External contributors
 
-See
-[https://github.com/deepmind/open_spiel/graphs/contributors](https://github.com/deepmind/open_spiel/graphs/contributors).
+See https://github.com/deepmind/open_spiel/graphs/contributors.

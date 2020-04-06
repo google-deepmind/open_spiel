@@ -33,7 +33,8 @@ any other difference (e.g. `state.ApplyAction` in C++ will be
 
 ### The tree representation
 
-There are mainly 2 concepts to know about (defined in `open_spiel/spiel.h`):
+There are mainly 2 concepts to know about (defined in
+[open_spiel/spiel.h](https://github.com/deepmind/open_spiel/blob/master/open_spiel/spiel.h)):
 
 *   A `Game` object contains the high level description for a game (e.g. whether
     it is simultaneous or sequential, the number of players, the maximum and
@@ -62,8 +63,8 @@ action to it).
 
 ## Loading a game
 
-The games are all implemented in C++ in `open_spiel/games`. Available games
-names can be listed using `RegisteredNames()`.
+The games are all implemented in C++ in [open_spiel/games](https://github.com/deepmind/open_spiel/blob/master/open_spiel/games).
+Available games names can be listed using `RegisteredNames()`.
 
 A game can be created from its name and its arguments (which usually have
 defaults). There are 2 ways to create a game:
@@ -79,9 +80,9 @@ defaults). There are 2 ways to create a game:
 #### Creating sequential games from simultaneous games
 
 It is possible to apply generic game transformations (see
-`open_spiel/game_transforms/`) such as loading an `n`-players simultaneous games
-into an equivalent turn-based game where simultaneous moves are encoded as `n`
-turns.
+[open_spiel/game_transforms/](https://github.com/deepmind/open_spiel/blob/master/open_spiel/game_transforms/)) such as loading an `n`-players
+simultaneous games into an equivalent turn-based game where simultaneous moves
+are encoded as `n` turns.
 
 One can use `LoadGameAsTurnBased(game)`, or use the string representation, such
 as
@@ -114,12 +115,12 @@ while not state.is_terminal():
     state.apply_action(action)
 ```
 
-See `open_spiel/python/examples/example.py` for a more thorough example that
-covers more use of the core API.
+See [open_spiel/python/examples/example.py](https://github.com/deepmind/open_spiel/blob/master/open_spiel/python/examples/example.py) for a more
+thorough example that covers more use of the core API.
 
-See `open_spiel/python/examples/playthrough.py` (and
-`open_spiel/python/algorithms/generate_playthrough.py`) for an richer example
-generating a playthrough and printing all available information.
+See [open_spiel/python/examples/playthrough.py](https://github.com/deepmind/open_spiel/blob/master/open_spiel/python/examples/playthrough.py) (and
+[open_spiel/python/algorithms/generate_playthrough.py](https://github.com/deepmind/open_spiel/blob/master/open_spiel/python/algorithms/generate_playthrough.py)) for an
+richer example generating a playthrough and printing all available information.
 
-In C++, see `open_spiel/examples/example.cc` which generates random
-trajectories.
+In C++, see [open_spiel/examples/example.cc](https://github.com/deepmind/open_spiel/blob/master/open_spiel/examples/example.cc) which generates
+random trajectories.

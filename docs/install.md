@@ -141,12 +141,13 @@ python3 open_spiel/python/examples/mcts.py --game=tic_tac_toe --player1=human --
 
 ### Configuration conditional dependencies
 
-See `open_spiel/scripts/global_variables.sh` to configure the conditional
-dependencies. See also the [Developer Guide](developer_guide.md).
+See [open_spiel/scripts/global_variables.sh](https://github.com/deepmind/open_spiel/blob/master/open_spiel/scripts/global_variables.sh) to configure the
+conditional dependencies. See also the [Developer Guide](developer_guide.md).
 
 ### Installing system-wide dependencies
 
-See `install.sh` for the required packages and cloned repositories.
+See [open_spiel/scripts/install.sh](https://github.com/deepmind/open_spiel/blob/master/open_spiel/scripts/install.sh) for the required packages and cloned
+repositories.
 
 ### Installing Python dependencies
 
@@ -174,7 +175,7 @@ pip3 install --upgrade -r requirements.txt
 Make sure that the virtual environment is still activated.
 
 By default, Clang C++ compiler is used (and potentially installed by
-`install.sh`).
+[open_spiel/scripts/install.sh](https://github.com/deepmind/open_spiel/blob/master/open_spiel/scripts/install.sh)).
 
 Build and run tests (Python 3):
 
