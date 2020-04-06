@@ -23,6 +23,7 @@ import numpy as np
 from open_spiel.python.algorithms.psro_v2 import meta_strategies
 from open_spiel.python.algorithms.psro_v2 import strategy_selectors
 from open_spiel.python.algorithms.psro_v2 import utils
+from open_spiel.python.algorithms.psro_v2.eval_utils import SElogs
 
 _DEFAULT_STRATEGY_SELECTION_METHOD = "probabilistic"
 _DEFAULT_META_STRATEGY_METHOD = "prd"
@@ -128,6 +129,8 @@ class AbstractMetaTrainer(object):
               - "prd": Projected Replicator Dynamics, as described in Lanctot et
                 Al.
       meta_strategy_method_frequency: The frequency of updating meta-strategy method.
+      fast_oracle_period: Number of iters using fast oracle in one period.
+      slow_oracle_period: Number of iters using slow oracle in one period.
       training_strategy_selector: A callable or a string. If a callable, takes
         as arguments: - An instance of `PSROSolver`, - a
           `number_policies_selected` integer. and returning a list of
@@ -178,9 +181,10 @@ class AbstractMetaTrainer(object):
     self._slow_oracle_counter = slow_oracle_period
     self._fast_oracle_counter = slow_oracle_period
 
-    # Record which iter is fast or slow.
-    self._slow_oracle_iters = []
-    self._fast_oracle_iters = []
+    # Create logs for strategy exploration (SE).
+    self.logs = SElogs(slow_oracle_period,
+                 fast_oracle_period,
+                 meta_strategies.META_STRATEGY_METHODS_SE)
 
     self._training_strategy_selector = _process_string_or_callable(
         training_strategy_selector,
@@ -316,18 +320,19 @@ class AbstractMetaTrainer(object):
     self.update_empirical_gamestate(seed=seed)  # Update gamestate matrix.
 
     period = self._slow_oracle_period + self._fast_oracle_period
-    if self._iterations % (self._meta_method_frequency * period) == 0:
+    if self._iterations % (self._meta_method_frequency * period) == 0 and \
+            self._iterations != (self._meta_method_frequency * period):
       self.evalute_and_pick_meta_method()
 
     # Switch fast 1 and slow 0 oracle.
     if self._mode:
-      self._fast_oracle_iters.append(self._iterations)
+      self.logs.update_fast_iters(self._iterations)
       self._fast_oracle_counter -= 1
       if self._fast_oracle_counter == 0:
         self.switch_oracle()
         self.reset_fast_oracle_counter()
     else:
-      self._slow_oracle_iters.append(self._iterations)
+      self.logs.update_slow_iters(self._iterations)
       self._slow_oracle_counter -= 1
       if self._slow_oracle_counter == 0:
         self.switch_oracle()
