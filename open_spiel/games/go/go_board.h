@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef THIRD_PARTY_OPEN_SPIEL_GAMES_GO_GO_BOARD_H_
-#define THIRD_PARTY_OPEN_SPIEL_GAMES_GO_GO_BOARD_H_
+#ifndef OPEN_SPIEL_GAMES_GO_GO_BOARD_H_
+#define OPEN_SPIEL_GAMES_GO_GO_BOARD_H_
 
 #include <array>
 #include <cstdint>
@@ -240,4 +240,4 @@ float TrompTaylorScore(const GoBoard &board, float komi, int handicap = 0);
 }  // namespace go
 }  // namespace open_spiel
 
-#endif  // THIRD_PARTY_OPEN_SPIEL_GAMES_GO_GO_BOARD_H_
+#endif  // OPEN_SPIEL_GAMES_GO_GO_BOARD_H_

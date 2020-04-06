@@ -70,7 +70,7 @@ inline std::string GameParametersToString(const GameParameters& game_params) {
   if (game_params.count("name")) str = game_params.at("name").string_value();
   str.push_back('(');
   bool first = true;
-  for (auto key_val : game_params) {
+  for (const auto& key_val : game_params) {
     if (key_val.first != "name") {
       if (!first) str.push_back(',');
       str.append(key_val.first);

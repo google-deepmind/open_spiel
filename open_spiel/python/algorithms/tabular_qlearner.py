@@ -22,6 +22,7 @@ import collections
 import numpy as np
 
 from open_spiel.python import rl_agent
+from open_spiel.python import rl_tools
 
 
 class QLearner(rl_agent.AbstractAgent):
@@ -33,14 +34,15 @@ class QLearner(rl_agent.AbstractAgent):
   def __init__(self,
                player_id,
                num_actions,
-               step_size=0.5,
-               epsilon=0.2,
+               step_size=0.1,
+               epsilon_schedule=rl_tools.ConstantSchedule(0.2),
                discount_factor=1.0):
     """Initialize the Q-Learning agent."""
     self._player_id = player_id
     self._num_actions = num_actions
     self._step_size = step_size
-    self._epsilon = epsilon
+    self._epsilon_schedule = epsilon_schedule
+    self._epsilon = epsilon_schedule.value
     self._discount_factor = discount_factor
     self._q_values = collections.defaultdict(
         lambda: collections.defaultdict(float))
@@ -102,6 +104,9 @@ class QLearner(rl_agent.AbstractAgent):
       self._last_loss_value = target - prev_q_value
       self._q_values[self._prev_info_state][self._prev_action] += (
           self._step_size * self._last_loss_value)
+
+      # Decay epsilon, if necessary.
+      self._epsilon = self._epsilon_schedule.step()
 
       if time_step.last():  # prepare for the next episode.
         self._prev_info_state = None

@@ -234,6 +234,185 @@ void ChumpPolicyTests() {
   }
 }
 
+// Checks min raising functionality.
+void FullNLBettingTest1() {
+  std::shared_ptr<const Game> game = LoadGame(
+      "universal_poker(betting=nolimit,"
+                      "numPlayers=2,"
+                      "numRounds=4,"
+                      "blind=2 1,"
+                      "firstPlayer=2 1 1 1,"
+                      "numSuits=4,"
+                      "numRanks=13,"
+                      "numHoleCards=2,"
+                      "numBoardCards=0 3 1 1,"
+                      "stack=20 20,"
+                      "bettingAbstraction=fullgame)");
+  std::unique_ptr<State> state = game->NewInitialState();
+  while (state->IsChanceNode())
+    state->ApplyAction(state->LegalActions()[0]);  // deal hole cards
+  // assert all raise increments are valid
+  for (int i = 3; i < 12; ++i)
+    SPIEL_CHECK_TRUE(absl::c_linear_search(state->LegalActions(), i));
+  SPIEL_CHECK_FALSE(absl::c_linear_search(state->LegalActions(), 12));
+  state->ApplyAction(1);  // call big blind
+  state->ApplyAction(1);  // check big blind
+  for (int i = 0; i < 3; ++i)
+    state->ApplyAction(state->LegalActions()[0]);  // deal flop
+  // assert all raise increments are valid
+  for (int i = 3; i < 12; ++i)
+    SPIEL_CHECK_TRUE(absl::c_linear_search(state->LegalActions(), i));
+  // each player keeps min raising until one is all in
+  for (int i = 3; i < 12; ++i)
+    state->ApplyAction(i);
+  state->ApplyAction(1);  // call last raise
+  state->ApplyAction(state->LegalActions()[0]);  // deal turn
+  state->ApplyAction(state->LegalActions()[0]);  // deal river
+  SPIEL_CHECK_EQ(state->Returns()[0], state->Returns()[1]);  // hand is a draw
+  SPIEL_CHECK_TRUE(absl::StrContains(state->ToString(),
+      "ACPC State: STATE:0:cc/r4r6r8r10r12r14r16r18r20c//"
+      ":2c2d|2h2s/3c3d3h/3s/4c"));
+}
+
+// Checks that raises must double previous bet within the same round but
+// each new round resets betting with the min bet size equal to the big blind.
+void FullNLBettingTest2() {
+  std::shared_ptr<const Game> game = LoadGame(
+      "universal_poker(betting=nolimit,"
+                      "numPlayers=2,"
+                      "numRounds=4,"
+                      "blind=100 50,"
+                      "firstPlayer=2 1 1 1,"
+                      "numSuits=4,"
+                      "numRanks=13,"
+                      "numHoleCards=2,"
+                      "numBoardCards=0 3 1 1,"
+                      "stack=10000 10000,"
+                      "bettingAbstraction=fullgame)");
+  std::unique_ptr<State> state = game->NewInitialState();
+  while (state->IsChanceNode()) {
+    state->ApplyAction(state->LegalActions()[0]);  // deal hole cards
+  }
+  // assert all raise increments are valid
+  for (int i = 3; i < 102; ++i) {
+    SPIEL_CHECK_TRUE(absl::c_linear_search(state->LegalActions(), i));
+  }
+  SPIEL_CHECK_FALSE(absl::c_linear_search(state->LegalActions(), 102));
+  state->ApplyAction(52);  // bet just over half stack
+  // raise must double the size of the bet
+  // only legal actions now are fold, call, raise all-in
+  SPIEL_CHECK_EQ(state->LegalActions().size(), 3);
+  state->ApplyAction(1);  // call
+  for (int i = 0; i < 3; ++i) {
+    state->ApplyAction(state->LegalActions()[0]);  // deal flop
+  }
+  // new round of betting so we can bet as small as the big blind
+  for (int i = 53; i < 102; ++i) {
+    SPIEL_CHECK_TRUE(absl::c_linear_search(state->LegalActions(), i));
+  }
+  state->ApplyAction(53);  // min bet
+  // now we can raise as small as the big blind or as big as an all-in
+  for (int i = 54; i < 102; ++i) {
+    SPIEL_CHECK_TRUE(absl::c_linear_search(state->LegalActions(), i));
+  }
+  state->ApplyAction(1);  // opt just to call
+  state->ApplyAction(state->LegalActions()[0]);  // deal turn
+  // new round of betting so we can bet as small as the big blind
+  for (int i = 55; i < 102; ++i) {
+    SPIEL_CHECK_TRUE(absl::c_linear_search(state->LegalActions(), i));
+  }
+  state->ApplyAction(55);  // min bet 1 big blind
+  state->ApplyAction(57);  // raise to 3 big blinds
+  // now a reraise must at least double this raise to 5 big blinds
+  SPIEL_CHECK_FALSE(absl::c_linear_search(state->LegalActions(), 58));
+  SPIEL_CHECK_TRUE(absl::c_linear_search(state->LegalActions(), 59));
+  state->ApplyAction(60);  // reraise to 6 big blinds
+  // now a reraise must at least double this raise to 9 big blinds
+  SPIEL_CHECK_FALSE(absl::c_linear_search(state->LegalActions(), 62));
+  SPIEL_CHECK_TRUE(absl::c_linear_search(state->LegalActions(), 63));
+  state->ApplyAction(1);  // opt to just call
+  state->ApplyAction(state->LegalActions()[0]);  // deal river
+  // new round of betting so we can bet as small as the big blind
+  for (int i = 61; i < 102; ++i) {
+    SPIEL_CHECK_TRUE(absl::c_linear_search(state->LegalActions(), i));
+  }
+  state->ApplyAction(101);  // all-in!
+  state->ApplyAction(0);  // fold
+  SPIEL_CHECK_EQ(state->Returns()[0], 5900);
+  SPIEL_CHECK_EQ(state->Returns()[1], -5900);
+  SPIEL_CHECK_TRUE(absl::StrContains(state->ToString(),
+      "ACPC State: STATE:0:r5100c/r5200c/r5400r5600r5900c/r10000f"
+      ":2c2d|2h2s/3c3d3h/3s/4c"));
+}
+
+// Checks bet sizing is correct when there are more than two players
+// all with different starting stacks.
+void FullNLBettingTest3() {
+  std::shared_ptr<const Game> game = LoadGame(
+      "universal_poker(betting=nolimit,"
+                      "numPlayers=3,"
+                      "numRounds=4,"
+                      "blind=100 50 0,"
+                      "firstPlayer=2 1 1 1,"
+                      "numSuits=4,"
+                      "numRanks=13,"
+                      "numHoleCards=2,"
+                      "numBoardCards=0 3 1 1,"
+                      "stack=500 1000 2000,"
+                      "bettingAbstraction=fullgame)");
+  std::unique_ptr<State> state = game->NewInitialState();
+  while (state->IsChanceNode()) {
+    state->ApplyAction(state->LegalActions()[0]);
+  }
+  state->ApplyAction(1);  // call big blind
+  state->ApplyAction(1);  // call big blind
+  state->ApplyAction(1);  // check big blind
+  for (int i = 0; i < 3; ++i) {
+    state->ApplyAction(state->LegalActions()[0]);  // deal flop
+  }
+  // assert all raise increments are valid
+  for (int i = 3; i < 7; ++i) {
+    SPIEL_CHECK_TRUE(absl::c_linear_search(state->LegalActions(), i));
+  }
+  SPIEL_CHECK_FALSE(absl::c_linear_search(state->LegalActions(), 7));
+  state->ApplyAction(1);  // check
+  for (int i = 3; i < 12; ++i) {
+    SPIEL_CHECK_TRUE(absl::c_linear_search(state->LegalActions(), i));
+  }
+  SPIEL_CHECK_FALSE(absl::c_linear_search(state->LegalActions(), 12));
+  state->ApplyAction(1);  // check
+  for (int i = 3; i < 22; ++i) {
+    SPIEL_CHECK_TRUE(absl::c_linear_search(state->LegalActions(), i));
+  }
+  SPIEL_CHECK_FALSE(absl::c_linear_search(state->LegalActions(), 22));
+  state->ApplyAction(3);  // min raise
+  for (int i = 4; i < 7; ++i) {
+    SPIEL_CHECK_TRUE(absl::c_linear_search(state->LegalActions(), i));
+  }
+  SPIEL_CHECK_FALSE(absl::c_linear_search(state->LegalActions(), 7));
+  state->ApplyAction(6);  // short stack goes all-in
+  for (int i = 9; i < 12; ++i) {
+    SPIEL_CHECK_TRUE(absl::c_linear_search(state->LegalActions(), i));
+  }
+  SPIEL_CHECK_FALSE(absl::c_linear_search(state->LegalActions(), 12));
+  state->ApplyAction(9);  // min raise
+  for (int i = 12; i < 22; ++i) {
+    SPIEL_CHECK_TRUE(absl::c_linear_search(state->LegalActions(), i));
+  }
+  SPIEL_CHECK_FALSE(absl::c_linear_search(state->LegalActions(), 22));
+  state->ApplyAction(21);  // all-in
+  SPIEL_CHECK_EQ(state->LegalActions().size(), 2);
+  state->ApplyAction(1);  // call
+  state->ApplyAction(state->LegalActions()[0]);  // deal turn
+  state->ApplyAction(state->LegalActions()[0]);  // deal river
+  SPIEL_CHECK_EQ(state->Returns()[0], -500);
+  SPIEL_CHECK_EQ(state->Returns()[1], -1000);
+  SPIEL_CHECK_EQ(state->Returns()[2], 1500);
+  SPIEL_CHECK_TRUE(absl::StrContains(state->ToString(),
+      "ACPC State: STATE:0:ccc/ccr200r500r800r2000c//"
+      ":2c2d|2h2s|3c3d/3h3s4c/4d/4h"));
+}
+
 }  // namespace
 }  // namespace universal_poker
 }  // namespace open_spiel
@@ -248,4 +427,7 @@ int main(int argc, char **argv) {
   open_spiel::universal_poker::BasicUniversalPokerTests();
   open_spiel::universal_poker::HUNLRegressionTests();
   open_spiel::universal_poker::ChumpPolicyTests();
+  open_spiel::universal_poker::FullNLBettingTest1();
+  open_spiel::universal_poker::FullNLBettingTest2();
+  open_spiel::universal_poker::FullNLBettingTest3();
 }

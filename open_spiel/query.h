@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef THIRD_PARTY_OPEN_SPIEL_QUERY_H_
-#define THIRD_PARTY_OPEN_SPIEL_QUERY_H_
+#ifndef OPEN_SPIEL_QUERY_H_
+#define OPEN_SPIEL_QUERY_H_
 
 #include "open_spiel/spiel.h"
 
@@ -29,4 +29,4 @@ std::vector<int> NegotiationAgentUtils(const State& state, int player);
 }  // namespace query
 }  // namespace open_spiel
 
-#endif  // THIRD_PARTY_OPEN_SPIEL_QUERY_H_
+#endif  // OPEN_SPIEL_QUERY_H_

@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef THIRD_PARTY_OPEN_SPIEL_GAMES_COOP_BOX_PUSHING_SOCCER_H_
-#define THIRD_PARTY_OPEN_SPIEL_GAMES_COOP_BOX_PUSHING_SOCCER_H_
+#ifndef OPEN_SPIEL_GAMES_COOP_BOX_PUSHING_SOCCER_H_
+#define OPEN_SPIEL_GAMES_COOP_BOX_PUSHING_SOCCER_H_
 
 #include <array>
 #include <memory>
@@ -157,4 +157,4 @@ class CoopBoxPushingGame : public SimMoveGame {
 }  // namespace coop_box_pushing
 }  // namespace open_spiel
 
-#endif  // THIRD_PARTY_OPEN_SPIEL_GAMES_COOP_BOX_PUSHING
+#endif  // OPEN_SPIEL_GAMES_COOP_BOX_PUSHING

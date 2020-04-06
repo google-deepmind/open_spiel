@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef THIRD_PARTY_OPEN_SPIEL_GAMES_GOOFSPIEL_H_
-#define THIRD_PARTY_OPEN_SPIEL_GAMES_GOOFSPIEL_H_
+#ifndef OPEN_SPIEL_GAMES_GOOFSPIEL_H_
+#define OPEN_SPIEL_GAMES_GOOFSPIEL_H_
 
 #include <memory>
 #include <set>
@@ -134,4 +134,4 @@ class GoofspielGame : public Game {
 }  // namespace goofspiel
 }  // namespace open_spiel
 
-#endif  // THIRD_PARTY_OPEN_SPIEL_GAMES_GOOFSPIEL_H_
+#endif  // OPEN_SPIEL_GAMES_GOOFSPIEL_H_

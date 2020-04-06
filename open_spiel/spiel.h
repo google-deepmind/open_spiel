@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef THIRD_PARTY_OPEN_SPIEL_SPIEL_H_
-#define THIRD_PARTY_OPEN_SPIEL_SPIEL_H_
+#ifndef OPEN_SPIEL_SPIEL_H_
+#define OPEN_SPIEL_SPIEL_H_
 
 #include <functional>
 #include <iostream>
@@ -845,4 +845,4 @@ using HistoryDistribution =
 
 }  // namespace open_spiel
 
-#endif  // THIRD_PARTY_OPEN_SPIEL_SPIEL_H_
+#endif  // OPEN_SPIEL_SPIEL_H_

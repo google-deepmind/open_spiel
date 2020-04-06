@@ -15,11 +15,6 @@
 # Lint as: python3
 """Plays a uniform random bot against the default scenarios for that game."""
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import google_type_annotations
-from __future__ import print_function
-
 import random
 from absl import app
 from absl import flags

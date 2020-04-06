@@ -48,6 +48,11 @@ flags.DEFINE_integer("actors", 2, "How many actors to run.")
 flags.DEFINE_integer("evaluators", 1, "How many evaluators to run.")
 flags.DEFINE_integer("evaluation_window", 100,
                      "How many games to average results over.")
+flags.DEFINE_integer(
+    "eval_levels", 7,
+    ("Play evaluation games vs MCTS+Solver, with max_simulations*10^(n/2)"
+     " simulations for n in range(eval_levels). Default of 7 means "
+     "running mcts with up to 1000 times more simulations."))
 flags.DEFINE_integer("max_steps", 0, "How many learn steps before exiting.")
 flags.DEFINE_bool("quiet", True, "Don't show the moves as they're played.")
 flags.DEFINE_bool("verbose", False, "Show the MCTS stats of possible moves.")
@@ -76,6 +81,7 @@ def main(unused_argv):
       temperature=FLAGS.temperature,
       temperature_drop=FLAGS.temperature_drop,
       evaluation_window=FLAGS.evaluation_window,
+      eval_levels=FLAGS.eval_levels,
 
       nn_model=FLAGS.nn_model,
       nn_width=FLAGS.nn_width,

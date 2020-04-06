@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef THIRD_PARTY_OPEN_SPIEL_GAMES_BRIDGE_BRIDGE_SCORING_H_
-#define THIRD_PARTY_OPEN_SPIEL_GAMES_BRIDGE_BRIDGE_SCORING_H_
+#ifndef OPEN_SPIEL_GAMES_BRIDGE_BRIDGE_SCORING_H_
+#define OPEN_SPIEL_GAMES_BRIDGE_BRIDGE_SCORING_H_
 
 // Scoring for (duplicate) contract bridge.
 // See Law 77 of the Laws of Bridge, 2017:
@@ -38,4 +38,4 @@ int Score(Contract contract, int declarer_tricks, bool is_vulnerable);
 }  // namespace bridge
 }  // namespace open_spiel
 
-#endif  // THIRD_PARTY_OPEN_SPIEL_GAMES_BRIDGE_BRIDGE_SCORING_H_
+#endif  // OPEN_SPIEL_GAMES_BRIDGE_BRIDGE_SCORING_H_

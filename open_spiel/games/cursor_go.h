@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef THIRD_PARTY_OPEN_SPIEL_GAMES_CURSOR_GO_H_
-#define THIRD_PARTY_OPEN_SPIEL_GAMES_CURSOR_GO_H_
+#ifndef OPEN_SPIEL_GAMES_CURSOR_GO_H_
+#define OPEN_SPIEL_GAMES_CURSOR_GO_H_
 
 #include <array>
 #include <cstring>
@@ -180,4 +180,4 @@ class CursorGoGame : public Game {
 }  // namespace cursor_go
 }  // namespace open_spiel
 
-#endif  // THIRD_PARTY_OPEN_SPIEL_GAMES_GO_H_
+#endif  // OPEN_SPIEL_GAMES_GO_H_

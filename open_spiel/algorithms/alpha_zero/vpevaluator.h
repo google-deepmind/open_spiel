@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef THIRD_PARTY_OPEN_SPIEL_ALGORITHMS_ALPHA_ZERO_VPEVALUATOR_H_
-#define THIRD_PARTY_OPEN_SPIEL_ALGORITHMS_ALPHA_ZERO_VPEVALUATOR_H_
+#ifndef OPEN_SPIEL_ALGORITHMS_ALPHA_ZERO_VPEVALUATOR_H_
+#define OPEN_SPIEL_ALGORITHMS_ALPHA_ZERO_VPEVALUATOR_H_
 
 #include <future>  // NOLINT
 #include <vector>
@@ -78,4 +78,4 @@ class VPNetEvaluator : public Evaluator {
 }  // namespace algorithms
 }  // namespace open_spiel
 
-#endif  // THIRD_PARTY_OPEN_SPIEL_ALGORITHMS_ALPHA_ZERO_VPEVALUATOR_H_
+#endif  // OPEN_SPIEL_ALGORITHMS_ALPHA_ZERO_VPEVALUATOR_H_

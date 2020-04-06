@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef THIRD_PARTY_OPEN_SPIEL_UTILS_DATA_LOGGER_H_
-#define THIRD_PARTY_OPEN_SPIEL_UTILS_DATA_LOGGER_H_
+#ifndef OPEN_SPIEL_UTILS_DATA_LOGGER_H_
+#define OPEN_SPIEL_UTILS_DATA_LOGGER_H_
 
 #include <string>
 #include <utility>
@@ -64,4 +64,4 @@ class DataLoggerNoop : public DataLogger {
 
 }  // namespace open_spiel
 
-#endif  // THIRD_PARTY_OPEN_SPIEL_UTILS_DATA_LOGGER_H_
+#endif  // OPEN_SPIEL_UTILS_DATA_LOGGER_H_

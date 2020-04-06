@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef THIRD_PARTY_OPEN_SPIEL_GAME_TRANSFORMS_NORMAL_FORM_EXTENSIVE_GAME_H
-#define THIRD_PARTY_OPEN_SPIEL_GAME_TRANSFORMS_NORMAL_FORM_EXTENSIVE_GAME_H
+#ifndef OPEN_SPIEL_GAME_TRANSFORMS_NORMAL_FORM_EXTENSIVE_GAME_H
+#define OPEN_SPIEL_GAME_TRANSFORMS_NORMAL_FORM_EXTENSIVE_GAME_H
 
 #include "open_spiel/spiel.h"
 #include "open_spiel/tensor_game.h"
@@ -41,4 +41,4 @@ std::shared_ptr<const tensor_game::TensorGame> ExtensiveToTensorGame(
 
 }  // namespace open_spiel
 
-#endif  // THIRD_PARTY_OPEN_SPIEL_GAME_TRANSFORMS_NORMAL_FORM_EXTENSIVE_GAME_H_
+#endif  // OPEN_SPIEL_GAME_TRANSFORMS_NORMAL_FORM_EXTENSIVE_GAME_H_

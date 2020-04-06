@@ -22,11 +22,11 @@
 ABSL_FLAG(std::string, game, "tic_tac_toe", "The name of the game to play.");
 ABSL_FLAG(std::string, path, "/tmp/az", "Where to output the logs.");
 ABSL_FLAG(std::string, graph_def, "",
-          ("Where to get the graph. This could be from export_vpnet.py, or "
+          ("Where to get the graph. This could be from export_model.py, or "
            "from a checkpoint. If this is empty it'll create one."));
 ABSL_FLAG(std::string, nn_model, "resnet", "Model torso type.");
-ABSL_FLAG(int, nn_width, 128, "Width of the model, passed to export_vpnet.py.");
-ABSL_FLAG(int, nn_depth, 10, "Depth of the model, passed to export_vpnet.py.");
+ABSL_FLAG(int, nn_width, 128, "Width of the model, passed to export_model.py.");
+ABSL_FLAG(int, nn_depth, 10, "Depth of the model, passed to export_model.py.");
 ABSL_FLAG(double, uct_c, 2, "UCT exploration constant.");
 ABSL_FLAG(double, temperature, 1,
           "Temperature for final move selection for early moves in training.");

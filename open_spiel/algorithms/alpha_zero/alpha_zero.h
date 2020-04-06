@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef THIRD_PARTY_OPEN_SPIEL_ALGORITHMS_ALPHA_ZERO_ALPHA_ZERO_H_
-#define THIRD_PARTY_OPEN_SPIEL_ALGORITHMS_ALPHA_ZERO_ALPHA_ZERO_H_
+#ifndef OPEN_SPIEL_ALGORITHMS_ALPHA_ZERO_ALPHA_ZERO_H_
+#define OPEN_SPIEL_ALGORITHMS_ALPHA_ZERO_ALPHA_ZERO_H_
 
 #include "open_spiel/utils/thread.h"
 #include "open_spiel/utils/json.h"
@@ -93,4 +93,4 @@ bool AlphaZero(AlphaZeroConfig config, StopToken* stop);
 
 }  // namespace open_spiel::algorithms
 
-#endif  // THIRD_PARTY_OPEN_SPIEL_ALGORITHMS_ALPHA_ZERO_ALPHA_ZERO_H_
+#endif  // OPEN_SPIEL_ALGORITHMS_ALPHA_ZERO_ALPHA_ZERO_H_
