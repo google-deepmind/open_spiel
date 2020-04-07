@@ -65,7 +65,7 @@ flags.DEFINE_integer("sims_per_entry", 50,
                      ("Number of simulations to run to estimate each element"
                       "of the game outcome matrix."))
 
-flags.DEFINE_integer("gpsro_iterations", 100,
+flags.DEFINE_integer("gpsro_iterations", 150,
                      "Number of training steps for GPSRO.")
 flags.DEFINE_bool("symmetric_game", False, "Whether to consider the current "
                   "game as a symmetric game.")
@@ -90,18 +90,18 @@ flags.DEFINE_string("training_strategy_selector", "probabilistic",
 # General (RL) agent parameters
 flags.DEFINE_string("oracle_type", "DQN", "Choices are DQN, PG (Policy "
                     "Gradient), BR (exact Best Response) or ARS(Augmented Random Search)")
-flags.DEFINE_integer("number_training_episodes", int(2), "Number training "
+flags.DEFINE_integer("number_training_episodes", int(5e3), "Number training "
                      "episodes per RL policy. Used for PG and DQN")
 flags.DEFINE_float("self_play_proportion", 0.0, "Self play proportion")
-flags.DEFINE_integer("hidden_layer_size", 256, "Hidden layer size")
+flags.DEFINE_integer("hidden_layer_size", 128, "Hidden layer size")
 flags.DEFINE_integer("batch_size", 32, "Batch size")
 flags.DEFINE_float("sigma", 0.0, "Policy copy noise (Gaussian Dropout term).")
 flags.DEFINE_string("optimizer_str", "adam", "'adam' or 'sgd'")
+flags.DEFINE_integer("n_hidden_layers", 2, "# of hidden layers")
 
 # Policy Gradient Oracle related
 flags.DEFINE_string("loss_str", "qpg", "Name of loss used for BR training.")
 flags.DEFINE_integer("num_q_before_pi", 8, "# critic updates before Pi update")
-flags.DEFINE_integer("n_hidden_layers", 4, "# of hidden layers")
 flags.DEFINE_float("entropy_cost", 0.001, "Self play proportion")
 flags.DEFINE_float("critic_learning_rate", 1e-2, "Critic learning rate")
 flags.DEFINE_float("pi_learning_rate", 1e-3, "Policy learning rate.")
@@ -375,7 +375,7 @@ def main(argv):
     elif FLAGS.oracle_type == "ARS":
       oracle, agents = init_ars_responder(sess, env)
     sess.run(tf.global_variables_initializer())
-    gpsro_looper(env, oracle, agents, writer,quiesce=FLAGS.quiesce)
+    gpsro_looper(env, oracle, agents, writer, quiesce=FLAGS.quiesce)
 
   writer.close()
 

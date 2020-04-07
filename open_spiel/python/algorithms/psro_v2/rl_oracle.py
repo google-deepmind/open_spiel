@@ -22,6 +22,7 @@ import numpy as np
 
 from open_spiel.python.algorithms.psro_v2 import optimization_oracle
 from open_spiel.python.algorithms.psro_v2 import utils
+from tqdm import tqdm
 
 
 def update_episodes_per_oracles(episodes_per_oracle, played_policies_indexes):
@@ -50,7 +51,6 @@ def freeze_all(policies_per_player):
   for policies in policies_per_player:
     for pol in policies:
       pol.freeze()
-
 
 def random_count_weighted_choice(count_weight):
   """Returns a randomly sampled index i with P ~ 1 / (count_weight[i] + 1).
@@ -284,6 +284,8 @@ class RLOracle(optimization_oracle.AbstractOracle):
       reward_trace[indexes[0][0]].append(reward[indexes[0][0]])
       episodes_per_oracle = update_episodes_per_oracles(episodes_per_oracle,
                                                         indexes)
+    for i in range(len(reward_trace)):
+        reward_trace[i] = utils.lagging_mean(reward_trace[i])
     # Freeze the new policies to keep their weights static. This allows us to
     # later not have to make the distinction between static and training
     # policies in training iterations.

@@ -31,6 +31,19 @@ def empty_list_generator(number_dimensions):
     result = [result]
   return result
 
+def lagging_mean(li,lag=500):
+  """
+  Calcualte the lagging mean of list given
+  Params:
+    li : the one dimensional list to be processed
+    lag: length of moving average
+  """
+  if len(li) <= lag:
+    return list(np.cumsum(li)/(np.arange(len(li))+1))
+  else:
+    first_half = np.cumsum(li[0:lag])/(np.arange(lag)+1)
+    second_half = np.convolve(li[lag:],np.ones((lag,))/lag, mode='valid')
+    return first_half.tolist() + second_half.tolist()
 
 def random_choice(outcomes, probabilities):
   """Samples from discrete probability distribution.
