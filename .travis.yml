@@ -65,6 +65,8 @@ matrix:
       - TRAVIS_USE_NOX=1
 
 script:
+  - pwd
+  - chmod +x install.sh
   - ./install.sh
-  - python --version
+  - python3 --version
   - ./open_spiel/scripts/travis_script.sh
