@@ -147,14 +147,14 @@ def lemke_howson_solve(row_payoffs, col_payoffs):
     finally:
         warnings.showwarning = showwarning
 
-def gambit_solve(meta_games, mode):
+def gambit_solve(meta_games, mode, checkpoint_dir):
     """
     Find NE using gambit.
     :param meta_games: meta-games in PSRO.
     :param mode: options "all", "one", "pure"
     :return: a list of NE.
     """
-    return do_gambit_analysis(meta_games, mode)
+    return do_gambit_analysis(meta_games, mode, checkpoint_dir)
 
 def pure_ne_solve(meta_games, tol=1e-7):
     """
@@ -183,13 +183,15 @@ def nash_solver(meta_games,
                 solver,
                 mode="one",
                 gambit_path=None,
-                lrsnash_path=None):
+                lrsnash_path=None,
+                checkpoint_dir=None):
     """
     Solver for NE.
     :param meta_games: meta-games in PSRO.
     :param solver: options "gambit", "nashpy", "linear", "lrsnash", "replicator".
     :param mode: options "all", "one", "pure"
     :param lrsnash_path: path to lrsnash solver.
+    :param checkpoint_dir: path to gambit files
     :return: a list of NE.
     WARNING:
     opening up a subprocess in every iteration eventually
@@ -197,7 +199,7 @@ def nash_solver(meta_games,
     """
     num_players = len(meta_games)
     if solver == "gambit":
-        gambit_result = gambit_solve(meta_games,mode)
+        gambit_result = gambit_solve(meta_games, mode, checkpoint_dir)
         if mode == 'one':
           return normalize_ne(gambit_result)
         elif mode == 'all':

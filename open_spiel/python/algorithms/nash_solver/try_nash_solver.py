@@ -34,9 +34,14 @@ HT_p1_meta_game = np.array([[4, 1], [3, 2]])
 HT_p2_meta_game = np.array([[4, 3], [1, 2]])
 HT_meta_games = [HT_p1_meta_game, HT_p2_meta_game]
 
-game_list = ['MP', 'BOS', 'BC', 'RPS', 'HT']
+#(6) Random Games
+RND_p1_meta_game = np.random.randn(10, 10)
+RND_p2_meta_game = np.random.randn(10, 10)
+RND_meta_games = [RND_p1_meta_game, RND_p2_meta_game]
 
-game_name = 'HT'
+game_list = ['MP', 'BOS', 'BC', 'RPS', 'HT', 'RND']
+
+game_name = 'MP'
 
 def game_selector(game_name):
     if game_name == 'MP':
@@ -49,6 +54,8 @@ def game_selector(game_name):
         meta_games = RPS_meta_games
     elif game_name == 'HT':
         meta_games = HT_meta_games
+    elif game_name == 'RND':
+        meta_games = RND_meta_games
     else:
         raise ValueError("Game does not exist.")
     return meta_games
@@ -57,7 +64,7 @@ print("****************************************")
 for game in game_list:
     print("The current game is ", game)
     meta_games = game_selector(game)
-    equilibria = gs.nash_solver(meta_games, solver="replicator", mode='all')
+    equilibria = gs.nash_solver(meta_games, solver="gambit", mode='all')
     for eq in equilibria:
         print(eq)
     print('*************************************')

@@ -259,7 +259,7 @@ def gpsro_looper(env, oracle, agents):
       prd_iterations=50000,
       prd_gamma=1e-10,
       sample_from_marginals=sample_from_marginals,
-      symmetric_game=FLAGS.symmetric_game)
+      symmetric_game=FLAGS.symmetric_game,
       nash_solver_path=FLAGS.nash_solver_path)
 
   start_time = time.time()

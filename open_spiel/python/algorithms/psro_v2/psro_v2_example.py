@@ -289,7 +289,7 @@ def print_policy_analysis(policies, game, verbose=False):
   return unique_policies
 
 
-def gpsro_looper(env, oracle, agents, writer, quiesce=False):
+def gpsro_looper(env, oracle, agents, writer, quiesce=False, checkpoint_dir=None):
   """Initializes and executes the GPSRO training loop."""
   sample_from_marginals = True  # TODO(somidshafiei) set False for alpharank
   training_strategy_selector = FLAGS.training_strategy_selector or strategy_selectors.probabilistic_strategy_selector
@@ -312,7 +312,8 @@ def gpsro_looper(env, oracle, agents, writer, quiesce=False):
       prd_iterations=50000,
       prd_gamma=1e-10,
       sample_from_marginals=sample_from_marginals,
-      symmetric_game=FLAGS.symmetric_game)
+      symmetric_game=FLAGS.symmetric_game,
+      checkpoint_dir=checkpoint_dir)
 
   start_time = time.time()
   for gpsro_iteration in range(FLAGS.gpsro_iterations):
@@ -361,7 +362,9 @@ def main(argv):
 
   if not os.path.exists(FLAGS.root_result_folder):
     os.makedirs(FLAGS.root_result_folder)
-  checkpoint_dir = os.path.join(os.getcwd(),FLAGS.root_result_folder,FLAGS.game_name+'_'+FLAGS.oracle_type+'_sims_'+str(FLAGS.sims_per_entry)+'_it'+str(FLAGS.gpsro_iterations)+'_ep'+str(FLAGS.number_training_episodes)+'_'+datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
+  checkpoint_dir = os.path.join(os.getcwd(),
+                                FLAGS.root_result_folder,
+                                FLAGS.game_name+'_'+FLAGS.oracle_type+'_sims_'+str(FLAGS.sims_per_entry)+'_it'+str(FLAGS.gpsro_iterations)+'_ep'+str(FLAGS.number_training_episodes)+'_'+datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
   writer = SummaryWriter(logdir=checkpoint_dir+'/log')
 
   # Initialize oracle and agents
@@ -375,7 +378,7 @@ def main(argv):
     elif FLAGS.oracle_type == "ARS":
       oracle, agents = init_ars_responder(sess, env)
     sess.run(tf.global_variables_initializer())
-    gpsro_looper(env, oracle, agents, writer,quiesce=FLAGS.quiesce)
+    gpsro_looper(env, oracle, agents, writer, quiesce=FLAGS.quiesce, checkpoint_dir=checkpoint_dir)
 
   writer.close()
 
