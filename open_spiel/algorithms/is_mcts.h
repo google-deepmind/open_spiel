@@ -33,6 +33,12 @@ namespace algorithms {
 // Use this constant to use an unlimited number of world samples.
 inline constexpr int kUnlimitedNumWorldSamples = -1;
 
+enum class ISMCTSFinalPolicyType {
+  kNormalizedVisitCount,
+  kMaxVisitCount,
+  kMaxValue,
+};
+
 struct ISMCTSNode {
   std::vector<Action> legal_actions;
   std::vector<Action> actions;
@@ -51,18 +57,33 @@ class ISMCTSBot : public Bot {
   // Important note: this bot requires that State::ResampleFromInfostate is
   // implemented.
   ISMCTSBot(int seed, std::shared_ptr<Evaluator> evaluator, double uct_c,
-            int max_simulations, int max_world_samples);
+            int max_simulations, int max_world_samples,
+            ISMCTSFinalPolicyType final_policy_type);
 
   Action Step(const State& state) override;
+
+  bool ProvidesPolicy() override { return true; }
+  ActionsAndProbs GetPolicy(const State& state) override;
+  std::pair<ActionsAndProbs, Action> StepWithPolicy(
+      const State& state) override;
+
+  ActionsAndProbs RunSearch(const State& state);
+
+  // Bot maintains no history, so these are empty.
+  void Restart() override {}
+  void RestartAt(const State& state) override {}
 
  private:
   void Reset();
   double RandomNumber();
+
   std::unique_ptr<State> SampleRootState(const State& state);
   ISMCTSNode* CreateNewNode(const State& state);
   ISMCTSNode* LookupNode(const State& state);
   ISMCTSNode* LookupOrCreateNode(const State& state);
   std::pair<Action, int> SelectAction(ISMCTSNode* node);
+  ActionsAndProbs GetFinalPolicy() const;
+
   std::vector<double> RunSimulation(State* state);
 
   std::mt19937 rng_;
@@ -77,6 +98,7 @@ class ISMCTSBot : public Bot {
   const double uct_c_;
   const int max_simulations_;
   const int max_world_samples_;
+  const ISMCTSFinalPolicyType final_policy_type_;
   ISMCTSNode* root_node_;
 };
 

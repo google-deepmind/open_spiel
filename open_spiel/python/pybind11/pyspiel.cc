@@ -21,6 +21,7 @@
 #include "open_spiel/algorithms/deterministic_policy.h"
 #include "open_spiel/algorithms/evaluate_bots.h"
 #include "open_spiel/algorithms/expected_returns.h"
+#include "open_spiel/algorithms/is_mcts.h"
 #include "open_spiel/algorithms/matrix_game_utils.h"
 #include "open_spiel/algorithms/mcts.h"
 #include "open_spiel/algorithms/tabular_exploitability.h"
@@ -520,6 +521,28 @@ PYBIND11_MODULE(pyspiel, m) {
               algorithms::ChildSelectionPolicy::UCT)
       .def("step", &algorithms::MCTSBot::Step)
       .def("mcts_search", &algorithms::MCTSBot::MCTSearch);
+
+  py::enum_<algorithms::ISMCTSFinalPolicyType>(m, "ISMCTSFinalPolicyType")
+      .value("NORMALIZED_VISIT_COUNT",
+             algorithms::ISMCTSFinalPolicyType::kNormalizedVisitCount)
+      .value("MAX_VISIT_COUNT",
+             algorithms::ISMCTSFinalPolicyType::kMaxVisitCount)
+      .value("MAX_VALUE", algorithms::ISMCTSFinalPolicyType::kMaxValue);
+
+  py::class_<algorithms::ISMCTSBot, Bot>(m, "ISMCTSBot")
+      .def(py::init<int, std::shared_ptr<Evaluator>, double, int, int,
+                    algorithms::ISMCTSFinalPolicyType>(),
+           py::arg("seed"), py::arg("evaluator"), py::arg("uct_c"),
+           py::arg("max_simulations"),
+           py::arg("max_world_samples") = algorithms::kUnlimitedNumWorldSamples,
+           py::arg("final_policy_type") =
+               algorithms::ISMCTSFinalPolicyType::kNormalizedVisitCount)
+      .def("step", &algorithms::ISMCTSBot::Step)
+      .def("provides_policy", &algorithms::MCTSBot::ProvidesPolicy)
+      .def("get_policy", &algorithms::ISMCTSBot::GetPolicy)
+      .def("step_with_policy", &algorithms::ISMCTSBot::StepWithPolicy)
+      .def("restart", &algorithms::ISMCTSBot::Restart)
+      .def("restart_at", &algorithms::ISMCTSBot::RestartAt);
 
   py::class_<TabularBestResponse>(m, "TabularBestResponse")
       .def(py::init<const open_spiel::Game&, int,

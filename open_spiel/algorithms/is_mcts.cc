@@ -14,6 +14,9 @@
 
 #include "open_spiel/algorithms/is_mcts.h"
 
+#include <algorithm>
+#include <numeric>
+
 #include "open_spiel/abseil-cpp/absl/random/discrete_distribution.h"
 #include "open_spiel/abseil-cpp/absl/random/distributions.h"
 #include "open_spiel/abseil-cpp/absl/time/time.h"
@@ -27,12 +30,14 @@ constexpr double kTieTolerance = 0.00001;
 constexpr int kUnexpandedVisitCount = -1;
 
 ISMCTSBot::ISMCTSBot(int seed, std::shared_ptr<Evaluator> evaluator,
-                     double uct_c, int max_simulations, int max_world_samples)
+                     double uct_c, int max_simulations, int max_world_samples,
+                     ISMCTSFinalPolicyType final_policy_type)
     : rng_(seed),
       evaluator_(evaluator),
       uct_c_(uct_c),
       max_simulations_(max_simulations),
-      max_world_samples_(max_world_samples) {}
+      max_world_samples_(max_world_samples),
+      final_policy_type_(final_policy_type) {}
 
 double ISMCTSBot::RandomNumber() { return absl::Uniform(rng_, 0.0, 1.0); }
 
@@ -42,7 +47,7 @@ void ISMCTSBot::Reset() {
   root_samples_.clear();
 }
 
-Action ISMCTSBot::Step(const State& state) {
+ActionsAndProbs ISMCTSBot::RunSearch(const State& state) {
   Reset();
   SPIEL_CHECK_EQ(state.GetGame()->GetType().dynamics,
                  GameType::Dynamics::kSequential);
@@ -60,13 +65,89 @@ Action ISMCTSBot::Step(const State& state) {
     RunSimulation(sampled_root_state.get());
   }
 
-  absl::discrete_distribution<> visit_dist(root_node_->visits.begin(),
-                                           root_node_->visits.end());
-  int aidx = visit_dist(rng_);
-  return root_node_->actions[aidx];
+  return GetFinalPolicy();
 }
 
-std::unique_ptr<State> ISMCTSBot::SampleRootState(const State& state) {
+Action ISMCTSBot::Step(const State& state) {
+  ActionsAndProbs policy = RunSearch(state);
+  return SampleAction(policy, RandomNumber()).first;
+}
+
+ActionsAndProbs ISMCTSBot::GetPolicy(const State& state) {
+  return RunSearch(state);
+}
+
+std::pair<ActionsAndProbs, Action> ISMCTSBot::StepWithPolicy(
+    const State& state) {
+  ActionsAndProbs policy = GetPolicy(state);
+  Action sampled_action = SampleAction(policy, RandomNumber()).first;
+  return {policy, sampled_action};
+}
+
+ActionsAndProbs ISMCTSBot::GetFinalPolicy() const {
+  ActionsAndProbs policy;
+  SPIEL_CHECK_FALSE(root_node_ == nullptr);
+
+  switch (final_policy_type_) {
+    case ISMCTSFinalPolicyType::kNormalizedVisitCount: {
+      SPIEL_CHECK_EQ(root_node_->total_visits,
+                     std::accumulate(root_node_->visits.begin(),
+                                     root_node_->visits.end(), 0));
+      SPIEL_CHECK_GT(root_node_->total_visits, 0);
+      policy.reserve(root_node_->visits.size());
+      double total_visits = static_cast<double>(root_node_->total_visits);
+      for (int aidx = 0; aidx < root_node_->visits.size(); ++aidx) {
+        policy.push_back({root_node_->actions[aidx],
+                          root_node_->visits[aidx] / total_visits});
+      }
+    } break;
+
+    case ISMCTSFinalPolicyType::kMaxVisitCount: {
+      SPIEL_CHECK_GT(root_node_->total_visits, 0);
+      policy.reserve(root_node_->visits.size());
+      int max_aidx = std::max_element(root_node_->visits.begin(),
+                                      root_node_->visits.end()) -
+                     root_node_->visits.begin();
+      for (int aidx = 0; aidx < root_node_->visits.size(); ++aidx) {
+        policy.push_back(
+            {root_node_->actions[aidx], aidx == max_aidx ? 1.0 : 0.0});
+      }
+    } break;
+
+    case ISMCTSFinalPolicyType::kMaxValue: {
+      SPIEL_CHECK_GT(root_node_->total_visits, 0);
+      policy.reserve(root_node_->return_sums.size());
+      Action max_action = kInvalidAction;
+      double max_value = -std::numeric_limits<double>::infinity();
+      for (int aidx = 0; aidx < root_node_->visits.size(); ++aidx) {
+        double value = root_node_->return_sums[aidx] / root_node_->visits[aidx];
+        if (value > max_value) {
+          max_value = value;
+          max_action = root_node_->actions[aidx];
+        }
+      }
+      SPIEL_CHECK_NE(max_action, kInvalidAction);
+      for (int aidx = 0; aidx < root_node_->visits.size(); ++aidx) {
+        policy.push_back({root_node_->actions[aidx],
+                          root_node_->actions[aidx] == max_action ? 1.0 : 0.0});
+      }
+    }
+  }
+
+  // In case the search didn't cover all the legal moves, at zero probability
+  // for all the remaining actions.
+  int policy_size = policy.size();
+  if (policy_size < root_node_->legal_actions.size()) {
+    for (int aidx = policy_size; aidx < root_node_->legal_actions.size();
+         ++aidx) {
+      policy.push_back({root_node_->legal_actions[aidx], 0.0});
+    }
+  }
+  return policy;
+}
+
+std::unique_ptr<State> ISMCTSBot::ISMCTSBot::SampleRootState(
+    const State& state) {
   if (max_world_samples_ == kUnlimitedNumWorldSamples) {
     return state.ResampleFromInfostate(state.CurrentPlayer(),
                                        [this]() { return RandomNumber(); });
