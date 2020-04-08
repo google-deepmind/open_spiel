@@ -70,7 +70,7 @@ flags.DEFINE_integer("gpsro_iterations", 150,
 flags.DEFINE_bool("symmetric_game", False, "Whether to consider the current "
                   "game as a symmetric game.")
 flags.DEFINE_bool("quiesce",False,"Whether to use quiece")
-flags.DEFINE_bool("sparse_quiesce",True,"whether to use sparse matrix quiesce implementation")
+flags.DEFINE_bool("sparse_quiesce",False,"whether to use sparse matrix quiesce implementation")
 
 # Rectify options
 flags.DEFINE_string("rectifier", "",
@@ -90,7 +90,7 @@ flags.DEFINE_string("training_strategy_selector", "probabilistic",
 # General (RL) agent parameters
 flags.DEFINE_string("oracle_type", "DQN", "Choices are DQN, PG (Policy "
                     "Gradient), BR (exact Best Response) or ARS(Augmented Random Search)")
-flags.DEFINE_integer("number_training_episodes", int(5e3), "Number training "
+flags.DEFINE_integer("number_training_episodes", int(1e3), "Number training "
                      "episodes per RL policy. Used for PG and DQN")
 flags.DEFINE_float("self_play_proportion", 0.0, "Self play proportion")
 flags.DEFINE_integer("hidden_layer_size", 128, "Hidden layer size")
@@ -289,7 +289,7 @@ def print_policy_analysis(policies, game, verbose=False):
   return unique_policies
 
 
-def gpsro_looper(env, oracle, agents, writer, quiesce=False):
+def gpsro_looper(env, oracle, agents, writer, quiesce=False, checkpoint_dir=None):
   """Initializes and executes the GPSRO training loop."""
   sample_from_marginals = True  # TODO(somidshafiei) set False for alpharank
   training_strategy_selector = FLAGS.training_strategy_selector or strategy_selectors.probabilistic_strategy_selector
@@ -312,7 +312,8 @@ def gpsro_looper(env, oracle, agents, writer, quiesce=False):
       prd_iterations=50000,
       prd_gamma=1e-10,
       sample_from_marginals=sample_from_marginals,
-      symmetric_game=FLAGS.symmetric_game)
+      symmetric_game=FLAGS.symmetric_game,
+      checkpoint_dir=checkpoint_dir)
 
   start_time = time.time()
   for gpsro_iteration in range(FLAGS.gpsro_iterations):
@@ -361,7 +362,9 @@ def main(argv):
 
   if not os.path.exists(FLAGS.root_result_folder):
     os.makedirs(FLAGS.root_result_folder)
-  checkpoint_dir = os.path.join(os.getcwd(),FLAGS.root_result_folder,FLAGS.game_name+'_'+FLAGS.oracle_type+'_sims_'+str(FLAGS.sims_per_entry)+'_it'+str(FLAGS.gpsro_iterations)+'_ep'+str(FLAGS.number_training_episodes)+'_'+datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
+  checkpoint_dir = os.path.join(os.getcwd(),
+                                FLAGS.root_result_folder,
+                                FLAGS.game_name+'_'+FLAGS.oracle_type+'_sims_'+str(FLAGS.sims_per_entry)+'_it'+str(FLAGS.gpsro_iterations)+'_ep'+str(FLAGS.number_training_episodes)+'_'+datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
   writer = SummaryWriter(logdir=checkpoint_dir+'/log')
 
   # Initialize oracle and agents
@@ -375,7 +378,7 @@ def main(argv):
     elif FLAGS.oracle_type == "ARS":
       oracle, agents = init_ars_responder(sess, env)
     sess.run(tf.global_variables_initializer())
-    gpsro_looper(env, oracle, agents, writer, quiesce=FLAGS.quiesce)
+    gpsro_looper(env, oracle, agents, writer, quiesce=FLAGS.quiesce, checkpoint_dir=checkpoint_dir)
 
   writer.close()
 

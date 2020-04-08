@@ -8,14 +8,23 @@ import numpy as np
 
 from open_spiel.python import rl_agent
 
+"""
+This is a customized implementation of augmented random search (ARS) for openspiel.
+https://arxiv.org/abs/1803.07055
+
+The code is adapted from https://github.com/sourcecode369/Augmented-Random-Search-.
+The style of the code follows policy_gradient.py.
+"""
 
 Transition = collections.namedtuple(
     "Transition", "info_state action reward discount legal_actions_mask")
 
 # Normalizing the states
-# TODO: Should we normalize discrete state space?
-class Normalizer():
 
+class Normalizer():
+    """
+    The normalizer normalizes the observations in ARS. Refer to the ARS-V2.
+    """
     def __init__(self, nb_inputs):
         self.n = np.zeros(nb_inputs)
         self.mean = np.zeros(nb_inputs)
@@ -37,14 +46,16 @@ class Normalizer():
 def softmax(x):
     return np.exp(x)/np.sum(np.exp(x))
 
-# TODO: clean the unused params.
+
 class ARS(rl_agent.AbstractAgent):
+    """
+    Main class for ARS. Now ARS only support discrete actions.
+    """
     def __init__(self,
                  session,
                  player_id,
                  info_state_size,
                  num_actions,
-                 nb_steps=1000,
                  episode_length=1000,
                  learning_rate=0.02,
                  nb_directions=16,
@@ -55,6 +66,22 @@ class ARS(rl_agent.AbstractAgent):
                  v2=False,
                  discrete_action=True
                  ):
+        """
+        Initialize the ARS agent.
+        :param session: A dummy API place holder.
+        :param player_id: int, player identifier. Usually its position in the game.
+        :param info_state_size: int, info_state vector size.
+        :param num_actions: int, number of actions per info state.
+        :param episode_length: The maximum length of an episode.
+        :param learning_rate: Learning rate for ars.
+        :param nb_directions: Number of Gaussian noise sampled.
+        :param nb_best_directions: Number of exploration directions with the best performance.
+        :param noise: Noise coefficient.
+        :param seed: Random seed.
+        :param additional_discount_factor: Additional discount factor for episodes.
+        :param v2: bool, True: enable ARS-V2
+        :param discrete_action: bool, True for problems with discrete action space.
+        """
 
         super(ARS, self).__init__(player_id)
         self._kwargs = locals()
@@ -62,12 +89,10 @@ class ARS(rl_agent.AbstractAgent):
         self.player_id = player_id
         self._info_state_size = info_state_size
         self._num_actions = num_actions
-        self._nb_steps = nb_steps
         self._episode_length = episode_length
         self._learning_rate = learning_rate
         self._nb_directions = nb_directions
         self._nb_best_directions = nb_best_directions
-        assert self._nb_best_directions <= self._nb_directions
         self._noise = noise
         self._seed = seed
         self._extra_discount = additional_discount_factor
@@ -100,6 +125,8 @@ class ARS(rl_agent.AbstractAgent):
         if self.v2:
             self.normalizer.observe(info_state)
             info_state = self.normalizer.normalize(info_state)
+
+        # Make a singleton batch vector for ARS.
         info_state = np.reshape(info_state, [-1, 1])
         if self.discrete_action:
             if is_evaluation:

@@ -26,7 +26,7 @@ import pyspiel
 EPSILON_MIN_POSITIVE_PROBA = 1e-8
 
 
-def uniform_strategy(solver, return_joint=False):
+def uniform_strategy(solver, return_joint=False, checkpoint_dir=None):
   """Returns a Random Uniform distribution on policies.
 
   Args:
@@ -54,7 +54,7 @@ def softmax_on_range(number_policies):
   return x
 
 
-def uniform_biased_strategy(solver, return_joint=False):
+def uniform_biased_strategy(solver, return_joint=False, checkpoint_dir=None):
   """Returns a Biased Random Uniform distribution on policies.
 
   The uniform distribution is biased to prioritize playing against more recent
@@ -129,7 +129,7 @@ def general_get_joint_strategy_from_marginals(probabilities):
     joint = joint.reshape(tuple(list(joint.shape)+[1]))*probabilities[i+2]
   return joint
 
-def nash_strategy(solver, return_joint=False):
+def nash_strategy(solver, return_joint=False, checkpoint_dir=None):
   """Returns nash distribution on meta game matrix.
 
   This method only works for two player zero-sum games.
@@ -165,7 +165,7 @@ def nash_strategy(solver, return_joint=False):
     return result, joint_strategies
 
 #TODO: Test this sovler with PSRO.
-def general_nash_strategy(solver, return_joint=False, NE_solver="gambit", mode='one', game=None):
+def general_nash_strategy(solver, return_joint=False, NE_solver="gambit", mode='one', game=None, checkpoint_dir=None):
   """Returns nash distribution on meta game matrix.
 
   This method works for general-sum multi-player games.
@@ -183,7 +183,7 @@ def general_nash_strategy(solver, return_joint=False, NE_solver="gambit", mode='
   meta_games = solver.get_meta_game() if game is None else game
   if not isinstance(meta_games, list):
     meta_games = [meta_games, -meta_games]
-  equilibria = gs.nash_solver(meta_games, solver=NE_solver, mode=mode)
+  equilibria = gs.nash_solver(meta_games, solver=NE_solver, mode=mode, checkpoint_dir=checkpoint_dir)
 
   if not return_joint:
     return equilibria
@@ -197,7 +197,7 @@ def general_nash_strategy(solver, return_joint=False, NE_solver="gambit", mode='
       return equilibria, joint_strategies
 
 
-def prd_strategy(solver, return_joint=False):
+def prd_strategy(solver, return_joint=False, checkpoint_dir=None):
   """Computes Projected Replicator Dynamics strategies.
   Args:
     solver: GenPSROSolver instance.
@@ -220,7 +220,7 @@ def prd_strategy(solver, return_joint=False):
     return result, joint_strategies
 
 
-def self_play_strategy(solver, return_joint=False):
+def self_play_strategy(solver, return_joint=False, checkpoint_dir=None):
   """
   Return a strategy with only the newest strategy in the support (played with probability 1).
   :param solver: GenPSROSolver instance.

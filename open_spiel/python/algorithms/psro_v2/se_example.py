@@ -92,7 +92,6 @@ flags.DEFINE_bool("local_launch", False, "Launch locally or not.")
 flags.DEFINE_bool("verbose", True, "Enables verbose printing and profiling.")
 
 #ARS
-flags.DEFINE_integer("num_steps", 1000, "Number of steps.")
 flags.DEFINE_float("ars_learning_rate", 0.02, "ARS learning rate.")
 flags.DEFINE_integer("num_directions", 64, "Number of exploration directions.")
 flags.DEFINE_integer("num_best_directions", 64, "Select # best directions.")
@@ -205,7 +204,6 @@ def init_ars_responder(sess, env):
         "session": sess,
         "info_state_size": info_state_size,
         "num_actions": num_actions,
-        "nb_steps": FLAGS.num_steps,
         "learning_rate": FLAGS.ars_learning_rate,
         "nb_directions": FLAGS.num_directions,
         "nb_best_directions": FLAGS.num_directions,

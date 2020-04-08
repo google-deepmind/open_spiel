@@ -19,6 +19,16 @@ def isExist(path):
     """
     return os.path.exists(path)
 
+def mkdir(path):
+    path = path.strip()
+    path = path.rstrip("\\")
+    isExists = os.path.exists(path)
+    if isExists:
+        raise ValueError(path + " already exists.")
+    else:
+        os.makedirs(path)
+        print(path + " has been created successfully.")
+
 def save_pkl(obj,path):
     """
     Pickle a object to path.
@@ -41,8 +51,8 @@ def load_pkl(path):
     return result
 
 # Path that saves the payoff matrix for gamebit.
-gambit_DIR = os.path.dirname(os.path.realpath(__file__)) + '/nfg'
-gambit_NFG = gambit_DIR + '/payoffmatrix.nfg'
+# gambit_DIR = os.path.dirname(os.path.realpath(__file__)) + '/nfg'
+# gambit_NFG = gambit_DIR + '/payoffmatrix.nfg'
 
 # This functions help to translate meta_games into gambit nfg.
 def product(shape, axes):
@@ -53,12 +63,18 @@ def product(shape, axes):
         prod_trans_ordered[axis] = prod_trans[i]
     return zip(*prod_trans_ordered)
 
-def encode_gambit_file(meta_games):
+def encode_gambit_file(meta_games, checkpoint_dir=None):
     """
     Encode a meta-game to nfg file that gambit can recognize.
     :param meta_games: A meta-game (payoff tensor) in PSRO.
     """
     num_players = len(meta_games)
+    if checkpoint_dir is None:
+        gambit_DIR = os.path.dirname(os.path.realpath(__file__)) + '/nfg'
+    else:
+        gambit_DIR = checkpoint_dir + '/nfg'
+    gambit_NFG = gambit_DIR + '/payoffmatrix.nfg'
+
     # Write header
     with open(gambit_NFG, "w") as nfgFile:
         nfgFile.write('NFG 1 R "Empirical Game"\n')
@@ -81,28 +97,40 @@ def encode_gambit_file(meta_games):
             for meta_game in meta_games:
                 nfgFile.write(str(meta_game[tuple(current_index)]) + " ")
 
-def gambit_analysis(timeout, method="gnm"):
+def gambit_analysis(timeout, method="gnm", checkpoint_dir=None):
     """
     Call a subprocess and run gambit to find all NE.
     :param timeout: Maximum time for the subprocess.
     :param method: The gamebit command line method.
     """
+    if checkpoint_dir is None:
+        gambit_DIR = os.path.dirname(os.path.realpath(__file__)) + '/nfg'
+    else:
+        gambit_DIR = checkpoint_dir + '/nfg'
+    gambit_NFG = gambit_DIR + '/payoffmatrix.nfg'
+
     if not isExist(gambit_NFG):
         raise ValueError(".nfg file does not exist!")
     command_str = "gambit-" + method + " -q " + gambit_NFG + " -d 8 > " + gambit_DIR + "/nash.txt"
     subproc.call_and_wait_with_timeout(command_str, timeout)
 
-def gambit_analysis_pure(timeout, method="enumpure"):
+def gambit_analysis_pure(timeout, method="enumpure", checkpoint_dir=None):
     """
     Call a subprocess and run gambit to find pure NE.
     :param timeout: Maximum time for the subprocess.
     """
+    if checkpoint_dir is None:
+        gambit_DIR = os.path.dirname(os.path.realpath(__file__)) + '/nfg'
+    else:
+        gambit_DIR = checkpoint_dir + '/nfg'
+    gambit_NFG = gambit_DIR + '/payoffmatrix.nfg'
+
     if not isExist(gambit_NFG):
         raise ValueError(".nfg file does not exist!")
     command_str = "gambit-" + method + " -q " + gambit_NFG + " > " + gambit_DIR + "/nash.txt"
     subproc.call_and_wait_with_timeout(command_str, timeout)
 
-def decode_gambit_file(meta_games, mode="all", max_num_nash=10):
+def decode_gambit_file(meta_games, mode="all", max_num_nash=10, checkpoint_dir=None):
     """
     Decode the results returned from gambit to a numpy format used for PSRO.
     :param meta_games: A meta-game in PSRO.
@@ -110,6 +138,11 @@ def decode_gambit_file(meta_games, mode="all", max_num_nash=10):
     :param max_num_nash: the number of NE considered to return
     :return: a list of NE
     """
+    if checkpoint_dir is None:
+        gambit_DIR = os.path.dirname(os.path.realpath(__file__)) + '/nfg'
+    else:
+        gambit_DIR = checkpoint_dir + '/nfg'
+
     nash_DIR = gambit_DIR + '/nash.txt'
     if not isExist(nash_DIR):
         raise ValueError("nash.txt file does not exist!")
@@ -155,7 +188,7 @@ def decode_gambit_file(meta_games, mode="all", max_num_nash=10):
         logging.info("mode is beyond all/pure/one.")
 
 
-def do_gambit_analysis(meta_games, mode, timeout = 600, method="gnm", method_pure_ne="enumpure"):
+def do_gambit_analysis(meta_games, mode, timeout = 600, method="gnm", method_pure_ne="enumpure", checkpoint_dir=None):
     """
     Combine encoder and decoder.
     :param meta_games: meta-games in PSRO.
@@ -165,12 +198,19 @@ def do_gambit_analysis(meta_games, mode, timeout = 600, method="gnm", method_pur
     :param method_pure_ne: The gamebit command line method for finding pure NE.
     :return: a list of NE.
     """
-    encode_gambit_file(meta_games)
+    if checkpoint_dir is None:
+        gambit_DIR = os.path.dirname(os.path.realpath(__file__)) + '/nfg'
+    else:
+        gambit_DIR = checkpoint_dir + '/nfg'
+    if not isExist(gambit_DIR) and not checkpoint_dir is None:
+        mkdir(gambit_DIR)
+
+    encode_gambit_file(meta_games, checkpoint_dir)
     while True:
         if mode == 'pure':
-            gambit_analysis_pure(timeout, method_pure_ne)
+            gambit_analysis_pure(timeout, method_pure_ne, checkpoint_dir)
         else:
-            gambit_analysis(timeout, method)
+            gambit_analysis(timeout, method, checkpoint_dir)
         # If there is no pure NE, find mixed NE.
         nash_DIR = gambit_DIR + '/nash.txt'
         if not isExist(nash_DIR):
@@ -180,7 +220,7 @@ def do_gambit_analysis(meta_games, mode, timeout = 600, method="gnm", method_pur
             logging.info("Pure NE does not exist. Return mixed NE.")
             mode = 'all'
             continue
-        equilibria = decode_gambit_file(meta_games, mode)
+        equilibria = decode_gambit_file(meta_games, mode, checkpoint_dir=checkpoint_dir)
         if len(equilibria) != 0:
             break
         timeout += 120

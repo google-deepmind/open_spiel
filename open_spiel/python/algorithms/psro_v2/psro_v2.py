@@ -81,6 +81,7 @@ class PSROSolver(abstract_meta_trainer.AbstractMetaTrainer):
                alpha_noise=0.0,
                beta_noise=0.0,
                strategy_exp=True,
+               checkpoint_dir=None,
                **kwargs):
     """Initialize the PSRO solver.
 
@@ -132,6 +133,7 @@ class PSROSolver(abstract_meta_trainer.AbstractMetaTrainer):
       alpha_noise: lower bound on alpha noise value (Mixture amplitude.)
       beta_noise: lower bound on beta noise value (Softmax temperature.)
       strategy_exp: bool if doing strategy exploration.
+      checkpoint_dir: directory of checkpoint file.
       **kwargs: kwargs for meta strategy computation and training strategy
         selection.
     """
@@ -165,6 +167,7 @@ class PSROSolver(abstract_meta_trainer.AbstractMetaTrainer):
     self.sample_from_marginals = sample_from_marginals
 
     self._strategy_exp = strategy_exp
+    self.checkpoint_dir = checkpoint_dir
 
     super(PSROSolver, self).__init__(
         game,
@@ -223,7 +226,7 @@ class PSROSolver(abstract_meta_trainer.AbstractMetaTrainer):
     if self.symmetric_game:
       self._policies = self._policies * self._game_num_players
     self._meta_strategy_probabilities, self._non_marginalized_probabilities =\
-        self._meta_strategy_method(solver=self, return_joint=True)
+        self._meta_strategy_method(solver=self, return_joint=True, checkpoint_dir=self.checkpoint_dir)
 
     if self.symmetric_game:
       self._policies = [self._policies[0]]

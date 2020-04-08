@@ -132,7 +132,7 @@ class PSROQuiesceSolver(psro_v2.PSROSolver):
     found_confirmed_eq = False
     while not found_confirmed_eq:
       maximum_subgame = self.get_complete_meta_game
-      ne_subgame = meta_strategies.general_nash_strategy(solver=self, return_joint=False, game=maximum_subgame)
+      ne_subgame = meta_strategies.general_nash_strategy(solver=self, return_joint=False, game=maximum_subgame, checkpoint_dir=self.checkpoint_dir)
       # ne_support_num: list of list, index of where equilibrium is [[0,1],[2]]
       # cumsum: index ne_subgame with self._complete_ind
       cum_sum = [np.cumsum(ele) for ele in self._complete_ind]
