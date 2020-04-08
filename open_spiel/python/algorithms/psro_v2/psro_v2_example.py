@@ -92,7 +92,7 @@ flags.DEFINE_string("training_strategy_selector", "probabilistic",
                     "probability strategy available to each player.")
 
 # General (RL) agent parameters
-flags.DEFINE_string("oracle_type", "DQN", "Choices are DQN, PG (Policy "
+flags.DEFINE_string("oracle_type", "ARS", "Choices are DQN, PG (Policy "
                     "Gradient), BR (exact Best Response) or ARS(Augmented Random Search)")
 flags.DEFINE_integer("number_training_episodes", int(1e3), "Number training "
                      "episodes per RL policy. Used for PG and DQN")
@@ -228,7 +228,6 @@ def init_ars_responder(sess, env):
     "session": sess,
     "info_state_size": info_state_size,
     "num_actions": num_actions,
-    "nb_steps": FLAGS.num_steps,
     "learning_rate": FLAGS.ars_learning_rate,
     "nb_directions": FLAGS.num_directions,
     "nb_best_directions": FLAGS.num_directions,

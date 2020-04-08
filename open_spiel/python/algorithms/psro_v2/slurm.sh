@@ -17,3 +17,4 @@ module load python3.6-anaconda/5.2.0
 cd ${SLURM_SUBMIT_DIR}
 python psro_v2_example.py --oracle_type=DQN --quiesce=False --gpsro_iterations=150 --number_training_episodes=100000 --sbatch_run=True
 ##python psro_v2_example.py --oracle_type=PG --quiesce=False --gpsro_iterations=150 --number_training_episodes=100000 --sbatch_run=True
+##python psro_v2_example.py --oracle_type=ARS --quiesce=False --gpsro_iterations=150 --number_training_episodes=1000 --sbatch_run=True
