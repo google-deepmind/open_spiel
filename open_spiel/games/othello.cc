@@ -110,15 +110,6 @@ bool OthelloState::CanCapture(Player player, int move) const {
   int row = std::get<0>(row_col);
   int col = std::get<1>(row_col);
 
-  // bool none_adjacent = true;
-  // for (int i = -1; i < 2; i++) {
-  //   for (int j = -1; j < 2; j++) {
-  //     if (OnBoard(row + i, col + j) && (BoardAt(row + i, col + j) != CellState::kEmpty)) none_adjacent = false;
-  //   }
-  // }
-
-  // if (none_adjacent) return false;
-
   bool valid = false;
   for (int direction = Direction::kUp; direction < Direction::kLast; direction++) {
     if (CountSteps(player, row, col, static_cast<Direction>(direction)) != 0) {
