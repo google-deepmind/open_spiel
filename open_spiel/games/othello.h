@@ -67,7 +67,9 @@ class OthelloState : public State {
   OthelloState(const OthelloState&) = default; // can default for reversi
   OthelloState& operator=(const OthelloState&) = default;
 
-  Player CurrentPlayer() const override { return current_player_; }
+  Player CurrentPlayer() const override {
+    return IsTerminal() ? kTerminalPlayerId : current_player_;
+  }
 
   std::string ActionToString(Player player, Action action_id) const override;
   std::string ToString() const override;

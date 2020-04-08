@@ -211,16 +211,16 @@ void OthelloState::DoApplyAction(Action move) {
   }
 
   std::tuple<int, int> rowcol = XYFromCode(move);
-  CellState cell = PlayerToState(CurrentPlayer());
+  CellState cell = PlayerToState(current_player_);
 
   int row = std::get<0>(rowcol);
   int col = std::get<1>(rowcol);
   board_[row * kNumCols + col] = cell;
-
+  
   for (int direction = Direction::kUp; direction < Direction::kLast; direction++) {
     int steps = 0;
-    if ((steps = CountSteps(CurrentPlayer(), row, col, static_cast<Direction>(direction))) > 0) {
-      Capture(CurrentPlayer(), row, col, static_cast<Direction>(direction), steps);
+    if ((steps = CountSteps(current_player_, row, col, static_cast<Direction>(direction))) > 0) {
+      Capture(current_player_, row, col, static_cast<Direction>(direction), steps);
     }
   }
 
@@ -254,7 +254,7 @@ std::vector<Action> OthelloState::LegalActions() const {
   if (IsTerminal()) return {};
   
   // can move in an empty cell that captures
-  std::vector<Action> moves = LegalRegularActions(CurrentPlayer());
+  std::vector<Action> moves = LegalRegularActions(current_player_);
   if (moves.empty()) {
     moves.push_back(passMove);  // pass
   }
