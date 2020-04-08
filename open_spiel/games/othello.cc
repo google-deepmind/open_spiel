@@ -53,24 +53,24 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 
 }  // namespace
 
-std::tuple<int, int> GetNext(int row, int col, Direction dir) {
+std::pair<int, int> GetNext(int row, int col, Direction dir) {
   switch (dir) {
     case Direction::kUp:
-      return std::make_tuple(row - 1, col);
+      return std::make_pair(row - 1, col);
     case Direction::kDown:
-      return std::make_tuple(row + 1, col);
+      return std::make_pair(row + 1, col);
     case Direction::kLeft:
-      return std::make_tuple(row, col - 1);
+      return std::make_pair(row, col - 1);
     case Direction::kRight:
-      return std::make_tuple(row, col + 1);
+      return std::make_pair(row, col + 1);
     case Direction::kUpRight:
-      return std::make_tuple(row - 1, col + 1);
+      return std::make_pair(row - 1, col + 1);
     case Direction::kUpLeft:
-      return std::make_tuple(row - 1, col - 1);
+      return std::make_pair(row - 1, col - 1);
     case Direction::kDownRight:
-      return std::make_tuple(row + 1, col + 1);
+      return std::make_pair(row + 1, col + 1);
     case Direction::kDownLeft:
-      return std::make_tuple(row + 1, col - 1);
+      return std::make_pair(row + 1, col - 1);
     default:
       SpielFatalError(absl::StrCat("Found unmatched case in GetNext."));
   }
@@ -80,10 +80,10 @@ inline bool OthelloState::OnBoard(int row, int col) const {
   return (0 <= row) && (row < kNumRows) && (0 <= col) && (col < kNumCols);
 }
 
-int OthelloState::CountSteps(Player player, int row, int col, Direction dir) const {
-  std::tuple<int, int> rowcol = GetNext(row, col, dir);
-  row = std::get<0>(rowcol);
-  col = std::get<1>(rowcol);
+int OthelloState::CountSteps(Player player, int move, Direction dir) const {
+  int row, col;
+  std::tie(row, col) = RowColFromMove(move);
+  std::tie(row, col) = GetNext(row, col, dir);
 
   int count = 0;
   CellState cell = PlayerToState(player);
@@ -95,9 +95,7 @@ int OthelloState::CountSteps(Player player, int row, int col, Direction dir) con
     }
       
     count++;
-    rowcol = GetNext(row, col, dir);
-    row = std::get<0>(rowcol);
-    col = std::get<1>(rowcol);
+    std::tie(row, col) = GetNext(row, col, dir);
   }
 
   return 0;
@@ -106,13 +104,8 @@ int OthelloState::CountSteps(Player player, int row, int col, Direction dir) con
 bool OthelloState::CanCapture(Player player, int move) const {
   if (board_[move] != CellState::kEmpty) return false;
 
-  std::tuple<int, int> row_col = XYFromCode(move);
-  int row = std::get<0>(row_col);
-  int col = std::get<1>(row_col);
-
-  bool valid = false;
   for (int direction = Direction::kUp; direction < Direction::kLast; direction++) {
-    if (CountSteps(player, row, col, static_cast<Direction>(direction)) != 0) {
+    if (CountSteps(player, move, static_cast<Direction>(direction)) != 0) {
       return true;
     }
   }
@@ -120,22 +113,21 @@ bool OthelloState::CanCapture(Player player, int move) const {
   return false;
 }
 
-void OthelloState::Capture(Player player, int row, int col, Direction dir, int steps) {
-  std::tuple<int, int> rowcol = GetNext(row, col, dir);
-  row = std::get<0>(rowcol);
-  col = std::get<1>(rowcol);
-  CellState cell = PlayerToState(player);
+void OthelloState::Capture(Player player, int move, Direction dir, int steps) {
+  int row, col;
 
+  std::tie(row, col) = RowColFromMove(move);
+  std::tie(row, col) = GetNext(row, col, dir);
+  
+  CellState cell = PlayerToState(player);
   for (int step = 0; step < steps; step++) {
     if (BoardAt(row, col) == CellState::kEmpty || BoardAt(row, col) == cell) {
       SpielFatalError(absl::StrCat("Cannot capture cell (", row, ", ", col, ")"));
     }
 
-    board_[row * kNumCols + col] = cell;
+    board_[RowColToMove(row, col)] = cell;
     
-    rowcol = GetNext(row, col, dir);
-    row = std::get<0>(rowcol);
-    col = std::get<1>(rowcol);
+    std::tie(row, col) = GetNext(row, col, dir);
   }
 }
 
@@ -150,15 +142,24 @@ int OthelloState::DiskCount(Player player) const {
 }
 
 bool OthelloState::NoValidActions() const {
-  return (LegalRegularActions(Player(0)).empty() & LegalRegularActions(Player(1)).empty());
+  return (LegalRegularActions(Player(0)).empty() && LegalRegularActions(Player(1)).empty());
 }
 
-std::tuple<int, int> OthelloState::XYFromCode(int move) const {
-  if (move >= kNumCells || move < 0) {
+std::pair<int, int> OthelloState::RowColFromMove(int move) const {
+  if (move < 0 || move >= kNumCells) {
     SpielFatalError(absl::StrCat("Move too large: ", move));
   }
 
-  return std::make_tuple(move / kNumCols, move % kNumRows);
+  return std::make_pair(move / kNumCols, move % kNumRows);
+}
+
+
+int OthelloState::RowColToMove(int row, int col) const {
+  if (row < 0 || col < 0 || row * col >= kNumCells) {
+    SpielFatalError(absl::StrCat("Invalid move (", row, ", ", col, ")"));
+  }
+
+  return row * kNumCols + col;
 }
 
 CellState PlayerToState(Player player) {
@@ -173,14 +174,16 @@ CellState PlayerToState(Player player) {
   }
 }
 
-std::string StateToString(CellState state) {
+std::string StateToString(Player player, CellState state) {
   switch (state) {
     case CellState::kEmpty:
-      return ".";
+      return "-";
     case CellState::kWhite:
-      return "o";
+      if (player == Player(0)) return "o";
+      else return "x";
     case CellState::kBlack:
-      return "x";
+      if (player == Player(0)) return "x";
+      else return "o";
     default:
       SpielFatalError("Unknown state.");
   }
@@ -191,9 +194,8 @@ bool OthelloState::ValidAction(Player player, int move) const {
 }
 
 void OthelloState::DoApplyAction(Action move) {
-  if (move == passMove) {  // pass
+  if (move == kPassMove) {  // pass
     current_player_ = 1 - current_player_;
-    num_moves_ += 1;
     return;
   }
 
@@ -201,33 +203,31 @@ void OthelloState::DoApplyAction(Action move) {
     SpielFatalError(absl::StrCat("Invalid move ", move));
   }
 
-  std::tuple<int, int> rowcol = XYFromCode(move);
   CellState cell = PlayerToState(current_player_);
-
-  int row = std::get<0>(rowcol);
-  int col = std::get<1>(rowcol);
-  board_[row * kNumCols + col] = cell;
+  board_[move] = cell;
   
   for (int direction = Direction::kUp; direction < Direction::kLast; direction++) {
-    int steps = 0;
-    if ((steps = CountSteps(current_player_, row, col, static_cast<Direction>(direction))) > 0) {
-      Capture(current_player_, row, col, static_cast<Direction>(direction), steps);
+    int steps = CountSteps(current_player_, move, static_cast<Direction>(direction));
+    if (steps > 0) {
+      Capture(current_player_, move, static_cast<Direction>(direction), steps);
     }
   }
 
-  if (NoValidActions()) {
+  if (NoValidActions()) {  // check for end game state
     int count_zero = DiskCount(Player(0));
     int count_one = DiskCount(Player(1));
 
     if (count_zero > count_one) {
-      outcome_ = Player(0);
+      outcome_ = Player(0);  // player 0 wins
     } else if (count_zero < count_one) {
-      outcome_ = Player(1);
+      outcome_ = Player(1);  // player 1 wins
+    }  else {
+      outcome_ = Player(kTerminalPlayerId);  // tie
     }
+  } else {
+    current_player_ = 1 - current_player_;
   }
 
-  current_player_ = 1 - current_player_;
-  num_moves_ += 1;
 }
 
 std::vector<Action> OthelloState::LegalRegularActions(Player p) const {  // list 
@@ -247,7 +247,7 @@ std::vector<Action> OthelloState::LegalActions() const {
   // can move in an empty cell that captures
   std::vector<Action> moves = LegalRegularActions(current_player_);
   if (moves.empty()) {
-    moves.push_back(passMove);  // pass
+    moves.push_back(kPassMove);  // pass
   }
 
   return moves;
@@ -256,45 +256,50 @@ std::vector<Action> OthelloState::LegalActions() const {
 std::string OthelloState::ActionToString(Player player,
                                            Action action_id) const {
 
-  if (action_id == passMove) {
-    return absl::StrCat(StateToString(PlayerToState(player)), "(pass)");
+  if (action_id == kPassMove) {
+    return absl::StrCat(StateToString(player, PlayerToState(player)), "(pass)");
   } else {
-    return absl::StrCat(StateToString(PlayerToState(player)), "(",
-                      action_id / kNumCols, ",", action_id % kNumCols, ")");
+    int row, col;
+    std::tie(row, col) = RowColFromMove(action_id);
+    std::string row_label = std::string(1, static_cast<char>('1' + row));
+    std::string col_label = std::string(1, static_cast<char>('a' + col));
+    return absl::StrCat(col_label, row_label, " (", StateToString(player, PlayerToState(player)), ")");
   }
-}
-
-bool OthelloState::IsFull() const { 
-  for (int i = 0; i < kNumCells; i++) {
-    if (board_[i] == CellState::kEmpty) return false;
-  }
-
-  return true;
 }
 
 OthelloState::OthelloState(std::shared_ptr<const Game> game) : State(game) {
-  std::fill(begin(board_), end(board_), CellState::kEmpty);
+  absl::c_fill(board_, CellState::kEmpty);
   board_[27] = CellState::kWhite;
   board_[28] = CellState::kBlack;
   board_[35] = CellState::kBlack;
   board_[36] = CellState::kWhite;
 }
 
-std::string OthelloState::ToString() const {
+std::string OthelloState::ToStringForPlayer(Player player) const {
   std::string str;
+  std::string col_labels = "  a b c d e f g h  ";
+
+  absl::StrAppend(&str, col_labels, "\n");
   for (int r = 0; r < kNumRows; ++r) {
+    std::string label = std::string(1, static_cast<char>('1' + r));
+    absl::StrAppend(&str, label, " ");
     for (int c = 0; c < kNumCols; ++c) {
-      absl::StrAppend(&str, StateToString(BoardAt(r, c)));
+      absl::StrAppend(&str, StateToString(player, BoardAt(r, c)), " ");
     }
-    if (r < (kNumRows - 1)) {
-      absl::StrAppend(&str, "\n");
-    }
+    absl::StrAppend(&str, label, "\n");
   }
+
+  absl::StrAppend(&str, col_labels);
+
   return str;
 }
 
+std::string OthelloState::ToString() const {
+  return ToStringForPlayer(current_player_);
+}
+
 bool OthelloState::IsTerminal() const {
-  return outcome_ != kInvalidPlayer || NoValidActions();
+  return outcome_ != kInvalidPlayer;
 }
 
 std::vector<double> OthelloState::Returns() const {
@@ -314,7 +319,7 @@ std::string OthelloState::InformationStateString(Player player) const {
 std::string OthelloState::ObservationString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
-  return ToString();
+  return ToStringForPlayer(player);
 }
 
 void OthelloState::ObservationTensor(Player player,
@@ -324,8 +329,22 @@ void OthelloState::ObservationTensor(Player player,
 
   // Treat `values` as a 2-d tensor.
   TensorView<2> view(values, {kCellStates, kNumCells}, true);
+  
+  int value;
   for (int cell = 0; cell < kNumCells; ++cell) {
-    view[{static_cast<int>(board_[cell]), cell}] = 1.0;
+    value = static_cast<int>(board_[cell]);
+
+    if (player == Player(1)) {  // reverse the board
+      if (value == 2) {
+        view[{1, cell}] = 1.0;
+      } else if (value == 1) {
+        view[{2, cell}] = 1.0;
+      } else {
+        view[{0, cell}] = 1.0;
+      }
+    } else {
+      view[{value, cell}] = 1.0;
+    }
   }
 }
 

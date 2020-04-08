@@ -23,6 +23,7 @@
 #include <vector>
 
 #include "open_spiel/spiel.h"
+#include "open_spiel/abseil-cpp/absl/algorithm/container.h"  // for c_fill
 
 // Simple game of Othello:
 // https://en.wikipedia.org/wiki/Reversi
@@ -38,7 +39,7 @@ inline constexpr int kNumRows = 8;
 inline constexpr int kNumCols = 8;
 inline constexpr int kNumCells = kNumRows * kNumCols;
 inline constexpr int kCellStates = 1 + kNumPlayers;  // empty, 'x', and 'o'.
-inline constexpr int passMove = kNumCells;
+inline constexpr int kPassMove = kNumCells;
 
 // State of a cell.
 enum class CellState {
@@ -71,6 +72,8 @@ class OthelloState : public State {
     return IsTerminal() ? kTerminalPlayerId : current_player_;
   }
 
+  // Player CurrentPlayer() const override { return current_player_; }
+
   std::string ActionToString(Player player, Action action_id) const override;
   std::string ToString() const override;
   bool IsTerminal() const override;
@@ -83,28 +86,33 @@ class OthelloState : public State {
   void UndoAction(Player player, Action move) override;
   std::vector<Action> LegalActions() const override;
   CellState BoardAt(int cell) const { return board_[cell]; }
-  CellState BoardAt(int row, int column) const {
-    return board_[row * kNumCols + column];
+  CellState BoardAt(int row, int col) const {
+    return board_[RowColToMove(row, col)];
   }
 
  protected:
   std::array<CellState, kNumCells> board_;
   void DoApplyAction(Action move) override;
 
- private: 
-  int CountSteps(Player player, int row, int col, Direction dir) const;
+ private:
+  std::string ToStringForPlayer(Player player) const;  // to string for a specific player
+
   std::vector<Action> LegalRegularActions(Player p) const;  // list of regular (non-pass) actions
   bool ValidAction(Player player, int move) const; // check if a valid move
+  bool NoValidActions() const;  // no moves possible for either player
+
   int DiskCount(Player player) const;  // number of disk for each player
   bool CanCapture(Player player, int move) const;  // can capture by making move
-  void Capture(Player player, int row, int col, Direction dir, int steps);  // capture row, col in direction
-  bool IsFull() const;                // Is the board full?
-  bool NoValidActions() const;  // no moves possible for either player
+  int CountSteps(Player player, int move, Direction dir) const;  // count number of capturable disks in a direction
+  void Capture(Player player, int move, Direction dir, int steps);  // capture row, col in direction
+  
   inline bool OnBoard(int row, int col) const;  // is row and col on the boad?
-  std::tuple<int, int> XYFromCode(int move) const;  // return (row, col) from move code
+  
+  std::pair<int, int> RowColFromMove(int move) const;  // return (row, col) from move code
+  int RowColToMove(int row, int col) const;
+
   Player current_player_ = 0;         // Player zero goes first
   Player outcome_ = kInvalidPlayer;
-  int num_moves_ = 0;
 };
 
 // Game object.
@@ -129,10 +137,10 @@ class OthelloGame : public Game {
 };
 
 CellState PlayerToState(Player player);
-std::string StateToString(CellState state);
+std::string StateToString(Player player, CellState state);
 
 inline std::ostream& operator<<(std::ostream& stream, const CellState& state) {
-  return stream << StateToString(state);
+  return stream << StateToString(Player(0), state);
 }
 
 }  // namespace othello
