@@ -77,7 +77,7 @@ std::pair<int, int> GetNext(int row, int col, Direction dir) {
 }
 
 inline bool OthelloState::OnBoard(int row, int col) const {
-  return (0 <= row) && (row < kNumRows) && (0 <= col) && (col < kNumCols);
+  return (row >= 0) && (row < kNumRows) && (col >= 0) && (col < kNumCols);
 }
 
 int OthelloState::CountSteps(Player player, int move, Direction dir) const {
@@ -224,10 +224,11 @@ void OthelloState::DoApplyAction(Action move) {
     }  else {
       outcome_ = Player(kTerminalPlayerId);  // tie
     }
+
+    current_player_ = Player(kTerminalPlayerId);
   } else {
     current_player_ = 1 - current_player_;
   }
-
 }
 
 std::vector<Action> OthelloState::LegalRegularActions(Player p) const {  // list 
