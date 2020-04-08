@@ -31,7 +31,7 @@ def empty_list_generator(number_dimensions):
     result = [result]
   return result
 
-def lagging_mean(li,lag=500):
+def lagging_mean(li,lag=100):
   """
   Calcualte the lagging mean of list given
   Params:
@@ -41,8 +41,10 @@ def lagging_mean(li,lag=500):
   if len(li) <= lag:
     return list(np.cumsum(li)/(np.arange(len(li))+1))
   else:
-    first_half = np.cumsum(li[0:lag])/(np.arange(lag)+1)
-    second_half = np.convolve(li[lag:],np.ones((lag,))/lag, mode='valid')
+    first_half = np.cumsum(li[0:lag-1])/(np.arange(lag-1)+1)
+    ret = np.cumsum(li)
+    ret[lag:] = ret[lag:] - ret[:-lag]
+    second_half = ret[lag - 1:] / lag
     return first_half.tolist() + second_half.tolist()
 
 def random_choice(outcomes, probabilities):

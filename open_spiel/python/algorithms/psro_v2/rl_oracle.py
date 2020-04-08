@@ -23,7 +23,7 @@ import numpy as np
 from open_spiel.python.algorithms.psro_v2 import optimization_oracle
 from open_spiel.python.algorithms.psro_v2 import utils
 from tqdm import tqdm
-
+import sys
 
 def update_episodes_per_oracles(episodes_per_oracle, played_policies_indexes):
   """Updates the current episode count per policy.
@@ -276,6 +276,7 @@ class RLOracle(optimization_oracle.AbstractOracle):
     new_policies = self.generate_new_policies(training_parameters)
     # TODO(author4): Look into multithreading.
     reward_trace = [[] for _ in range(game.num_players())]
+    pbar = tqdm(total=self._number_training_episodes*game.num_players(), file=sys.stdout, leave=True)
     while not self._has_terminated(episodes_per_oracle):
       agents, indexes = self.sample_policies_for_episode(
           new_policies, training_parameters, episodes_per_oracle,
@@ -284,6 +285,8 @@ class RLOracle(optimization_oracle.AbstractOracle):
       reward_trace[indexes[0][0]].append(reward[indexes[0][0]])
       episodes_per_oracle = update_episodes_per_oracles(episodes_per_oracle,
                                                         indexes)
+      pbar.update(1)
+    pbar.close()
     for i in range(len(reward_trace)):
         reward_trace[i] = utils.lagging_mean(reward_trace[i])
     # Freeze the new policies to keep their weights static. This allows us to

@@ -27,6 +27,7 @@ The other parameters keeping their default values.
 import time
 import datetime
 import os
+import sys
 from absl import app
 from absl import flags
 import numpy as np
@@ -35,6 +36,8 @@ import tensorflow.compat.v1 as tf
 from tensorboardX import SummaryWriter
 import logging
 logging.disable(logging.INFO)
+import functools
+print = functools.partial(print, flush=True)
 
 from open_spiel.python import policy
 from open_spiel.python import rl_environment
@@ -52,6 +55,7 @@ from open_spiel.python.algorithms.psro_v2.quiesce import quiesce_sparse
 
 FLAGS = flags.FLAGS
 flags.DEFINE_string("root_result_folder",'root_result',"root directory of saved results")
+flags.DEFINE_bool("sbatch_run",False,"whether to redirect standard output to checkpoint directory")
 # Game-related
 flags.DEFINE_string("game_name", "kuhn_poker", "Game name.")
 flags.DEFINE_integer("n_players", 2, "The number of players.")
@@ -108,7 +112,7 @@ flags.DEFINE_float("pi_learning_rate", 1e-3, "Policy learning rate.")
 
 # DQN
 flags.DEFINE_float("dqn_learning_rate", 1e-2, "DQN learning rate.")
-flags.DEFINE_integer("update_target_network_every", 1000, "Update target "
+flags.DEFINE_integer("update_target_network_every", 500, "Update target "
                      "network every [X] steps")
 flags.DEFINE_integer("learn_every", 10, "Learn every [X] steps.")
 
@@ -353,7 +357,6 @@ def main(argv):
     raise app.UsageError("Too many command-line arguments.")
 
   np.random.seed(FLAGS.seed)
-
   game = pyspiel.load_game_as_turn_based(FLAGS.game_name,
                                          {"players": pyspiel.GameParameter(
                                              FLAGS.n_players)})
@@ -366,6 +369,8 @@ def main(argv):
                                 FLAGS.root_result_folder,
                                 FLAGS.game_name+'_'+FLAGS.oracle_type+'_sims_'+str(FLAGS.sims_per_entry)+'_it'+str(FLAGS.gpsro_iterations)+'_ep'+str(FLAGS.number_training_episodes)+'_'+datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
   writer = SummaryWriter(logdir=checkpoint_dir+'/log')
+  if FLAGS.sbatch_run:
+    sys.stdout = open(checkpoint_dir+'/stdout.txt','w+')
 
   # Initialize oracle and agents
   with tf.Session() as sess:
