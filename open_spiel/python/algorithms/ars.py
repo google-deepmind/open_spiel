@@ -166,7 +166,7 @@ class ARS(rl_agent.AbstractAgent):
             if time_step.last():
                 self._add_episode_data_to_dataset()
                 direction = self._current_policy_idx // self._nb_directions
-                delta_idx = self._deltas_idx % self._nb_directions
+                delta_idx = self._current_policy_idx % self._nb_directions
                 if direction == 0:
                     self._pos_rew[delta_idx] = self._dataset["returns"]
                     self._dataset = collections.defaultdict(list)
@@ -264,7 +264,7 @@ class ARS(rl_agent.AbstractAgent):
 
         # Add flattened data points to dataset
         self._dataset["actions"].extend(actions)
-        self._dataset["returns"].extend(returns)
+        self._dataset["returns"].extend(returns[0])
         self._dataset["info_states"].extend(info_states)
         self._episode_data = []
 
