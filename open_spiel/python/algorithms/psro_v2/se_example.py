@@ -93,8 +93,8 @@ flags.DEFINE_bool("verbose", True, "Enables verbose printing and profiling.")
 
 #ARS
 flags.DEFINE_float("ars_learning_rate", 0.02, "ARS learning rate.")
-flags.DEFINE_integer("num_directions", 64, "Number of exploration directions.")
-flags.DEFINE_integer("num_best_directions", 64, "Select # best directions.")
+flags.DEFINE_integer("num_directions", 16, "Number of exploration directions.")
+flags.DEFINE_integer("num_best_directions", 16, "Select # best directions.")
 flags.DEFINE_float("noise", 0.03, "Coefficient of Gaussian noise.")
 flags.DEFINE_bool("v2", False, "v2 of ARS which normalizes observations.")
 

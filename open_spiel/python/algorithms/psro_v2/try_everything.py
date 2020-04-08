@@ -17,6 +17,5 @@ import copy
 # print(_regret)
 
 
-a = np.array([1,2,3,4,5,6])
-b = a[range(3)]
-print(b)
+for i in range(16):
+    print(i%5)

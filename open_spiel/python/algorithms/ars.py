@@ -114,7 +114,6 @@ class ARS(rl_agent.AbstractAgent):
         self._done = False
 
         # Initialize the policy.
-        # TODO: Initial theta could follow Gaussian Distribution.
         self.theta = np.zeros((self._num_actions, self._info_state_size))
         self.sample_deltas()
         self.deltas_iterator()
@@ -179,6 +178,8 @@ class ARS(rl_agent.AbstractAgent):
 
                 self.deltas_iterator()
                 if self._done:
+                    # If all noisy polies have been tried then update policy.
+                    # Not update policy every time at the end of each episode in PSRO.
                     self._pi_update()
                     self.sample_deltas()
 
@@ -192,12 +193,21 @@ class ARS(rl_agent.AbstractAgent):
         return rl_agent.StepOutput(action=action, probs=probs)
 
     def sample_deltas(self):
+        """
+        Sample self._nb_directions number of Gausian noise, each of which matches the shape of theta.
+        :return:
+        """
         self._deltas = [np.random.randn(*self.theta.shape) for _ in range(self._nb_directions)]
         self._pos_rew = [None] * self._nb_directions
         self._neg_rew = [None] * self._nb_directions
         self._deltas_idx = 0
+        self._done = False
 
     def deltas_iterator(self):
+        """
+        Generate noisy policy based on sampled noise.
+        :return:
+        """
         direction = self._deltas_idx // self._nb_directions
         if direction == 0:
             sign = 1
@@ -214,6 +224,10 @@ class ARS(rl_agent.AbstractAgent):
 
 
     def _pi_update(self):
+        """
+        Update current policy by rewards collected from different directions.
+        :return:
+        """
         if None in self._pos_rew or None in self._neg_rew:
             raise ValueError("Not all directions are evaluated.")
 
@@ -279,6 +293,13 @@ class ARS(rl_agent.AbstractAgent):
         self._episode_data.append(transition)
 
     def copy_with_noise(self, sigma=0.0, copy_weights=True):
+        """
+        Copies the object and perturbates its network's weights with noise.
+        :param sigma:
+        :param copy_weights:
+        :return:
+        """
+
         _ = self._kwargs.pop("self", None)
         copied_object = ARS(**self._kwargs)
 
