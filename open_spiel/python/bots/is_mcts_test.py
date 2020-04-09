@@ -39,10 +39,16 @@ class ISMCTSBotTest(absltest.TestCase):
         pyspiel.ISMCTSFinalPolicyType.MAX_VISIT_COUNT,
         pyspiel.ISMCTSFinalPolicyType.MAX_VALUE
     ]:
-      bot = pyspiel.ISMCTSBot(SEED, evaluator, 5.0, 1000, -1, final_policy_type)
+      bot = pyspiel.ISMCTSBot(SEED, evaluator, 5.0, 1000, -1, final_policy_type,
+                              False, False)
       bots = [bot] * game.num_players()
       evaluate_bots.evaluate_bots(game.new_initial_state(), bots, np.random)
-      bot = pyspiel.ISMCTSBot(SEED, evaluator, 5.0, 1000, 10, final_policy_type)
+      bot = pyspiel.ISMCTSBot(SEED, evaluator, 5.0, 1000, 10, final_policy_type,
+                              False, False)
+      bots = [bot] * game.num_players()
+      evaluate_bots.evaluate_bots(game.new_initial_state(), bots, np.random)
+      bot = pyspiel.ISMCTSBot(SEED, evaluator, 5.0, 1000, 10, final_policy_type,
+                              True, True)
       bots = [bot] * game.num_players()
       evaluate_bots.evaluate_bots(game.new_initial_state(), bots, np.random)
 

@@ -531,12 +531,14 @@ PYBIND11_MODULE(pyspiel, m) {
 
   py::class_<algorithms::ISMCTSBot, Bot>(m, "ISMCTSBot")
       .def(py::init<int, std::shared_ptr<Evaluator>, double, int, int,
-                    algorithms::ISMCTSFinalPolicyType>(),
+                    algorithms::ISMCTSFinalPolicyType, bool, bool>(),
            py::arg("seed"), py::arg("evaluator"), py::arg("uct_c"),
            py::arg("max_simulations"),
            py::arg("max_world_samples") = algorithms::kUnlimitedNumWorldSamples,
            py::arg("final_policy_type") =
-               algorithms::ISMCTSFinalPolicyType::kNormalizedVisitCount)
+               algorithms::ISMCTSFinalPolicyType::kNormalizedVisitCount,
+           py::arg("use_observation_string") = false,
+           py::arg("allow_inconsistent_action_sets") = false)
       .def("step", &algorithms::ISMCTSBot::Step)
       .def("provides_policy", &algorithms::MCTSBot::ProvidesPolicy)
       .def("get_policy", &algorithms::ISMCTSBot::GetPolicy)
