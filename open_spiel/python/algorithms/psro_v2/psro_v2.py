@@ -94,7 +94,7 @@ class PSROSolver(abstract_meta_trainer.AbstractMetaTrainer):
         the game outcome matrix.
       initial_policies: A list of initial policies for each player, from which
         the optimization process will start.
-      rectifier: A string indicating the rectifying method. Can be :
+      eectifier: A string indicating the rectifying method. Can be :
               - "" or None: Train against potentially all strategies.
               - "rectified": Train only against strategies beaten by current
                 strategy.
@@ -349,7 +349,7 @@ class PSROSolver(abstract_meta_trainer.AbstractMetaTrainer):
 
     # List of List of new policies (One list per player)
     # collect training performance to plot if RL oracle
-    if self._is_rloracle:
+    if self._train_loggable_oracle:
       self.oracle,reward_trace = self._oracle(self._game, training_parameters, strategy_sampler=sample_strategy, using_joint_strategies=self._rectify_training or not self.sample_from_marginals)
     else:
       self.oracle = self._oracle(self._game, training_parameters, strategy_sampler=sample_strategy, using_joint_strategies=self._rectify_training or not self.sample_from_marginals)
@@ -362,7 +362,7 @@ class PSROSolver(abstract_meta_trainer.AbstractMetaTrainer):
       self._policies = [self._policies[0]]
       self._num_players = 1
 
-    return reward_trace if self._is_rloracle else []
+    return reward_trace if self._train_loggable_oracle else []
   
   def update_empirical_gamestate(self, seed=None):
     """Given new agents in _new_policies, update meta_games through simulations.

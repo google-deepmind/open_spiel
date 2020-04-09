@@ -157,7 +157,7 @@ class AbstractMetaTrainer(object):
     self._iterations = 0
     self._game = game
     self._oracle = oracle
-    self._is_rloracle = oracle.__class__.__name__=='RLOracle'
+    self._train_loggable_oracle = (oracle.__class__.__name__!='BestResponseOracle')
     self._num_players = self._game.num_players()
 
     self.symmetric_game = symmetric_game
@@ -353,7 +353,7 @@ class AbstractMetaTrainer(object):
     Assign a new oracle.
     :return:
     """
-    self._oracle = oracle
+    kelf._oracle = oracle
     #TODO: check the __name__ exists.
     print("The current oracle is {}.".format(oracle.__name__))
 

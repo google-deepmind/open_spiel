@@ -85,6 +85,8 @@ class ARS(rl_agent.AbstractAgent):
 
         super(ARS, self).__init__(player_id)
         self._kwargs = locals()
+        self._kwargs.pop("self")
+        self._kwargs.pop("__class__")
 
         self.player_id = player_id
         self._info_state_size = info_state_size
@@ -110,14 +112,10 @@ class ARS(rl_agent.AbstractAgent):
         # The index of current policy.
         self._current_policy_idx = -1
 
-        # If all directions have been evaluated.
-        self._done = False
-
         # Initialize the policy.
         self.theta = np.zeros((self._num_actions, self._info_state_size))
         self.sample_deltas()
         self.deltas_iterator()
-
 
 
     def _act(self, info_state, legal_actions, is_evaluation):
@@ -177,12 +175,6 @@ class ARS(rl_agent.AbstractAgent):
                     raise ValueError("Number of directions tried beyond scope.")
 
                 self.deltas_iterator()
-                if self._done:
-                    # If all noisy polies have been tried then update policy.
-                    # Not update policy every time at the end of each episode in PSRO.
-                    self._pi_update()
-                    self.sample_deltas()
-
                 self._prev_time_step = None
                 self._prev_action = None
                 return
@@ -201,27 +193,32 @@ class ARS(rl_agent.AbstractAgent):
         self._pos_rew = [None] * self._nb_directions
         self._neg_rew = [None] * self._nb_directions
         self._deltas_idx = 0
-        self._done = False
 
     def deltas_iterator(self):
         """
         Generate noisy policy based on sampled noise.
-        :return:
+        There is an outlying case, it does not really take place, but just exist to facilitates code writing: 
+            self._current_policy_idx = 128 
+            self._deltas_idx = 129
+        This case will be detected by self.done and pi_update will be consequently called to reset the indexes. The "self._current_policy_idx == 2*self._nb_directions" in step(self) is also designed for this purpose
         """
         direction = self._deltas_idx // self._nb_directions
         if direction == 0:
             sign = 1
         elif direction == 1:
             sign = -1
+        elif direction == 2:
+            # If all noisy polies have been tried then update policy.
+            # Not update policy at the end of evey episode in PSRO.
+            self._pi_update()
+            self.sample_deltas()
+            return
         else:
             raise ValueError("Number of directions tried beyond scope.")
         delta_idx = self._deltas_idx % self._nb_directions
         self._policy = self.theta + sign * self._noise * self._deltas[delta_idx]
         self._current_policy_idx = self._deltas_idx
         self._deltas_idx += 1
-        if self._deltas_idx == 2 * self._nb_directions:
-            self._done = True
-
 
     def _pi_update(self):
         """
@@ -255,7 +252,8 @@ class ARS(rl_agent.AbstractAgent):
         discount = [data.discount for data in self._episode_data]
         actions = [data.action for data in self._episode_data]
 
-        # Calculate returns
+        # Calculate returns of an episode
+        # final value equals to the first element of the list
         returns = np.array(rewards)
         for idx in reversed(range(len(rewards[:-1]))):
             returns[idx] = (
@@ -264,7 +262,7 @@ class ARS(rl_agent.AbstractAgent):
 
         # Add flattened data points to dataset
         self._dataset["actions"].extend(actions)
-        self._dataset["returns"].extend(returns[0])
+        self._dataset["returns"] = returns[0]
         self._dataset["info_states"].extend(info_states)
         self._episode_data = []
 
@@ -300,7 +298,6 @@ class ARS(rl_agent.AbstractAgent):
         :return:
         """
 
-        _ = self._kwargs.pop("self", None)
         copied_object = ARS(**self._kwargs)
 
         if copy_weights:
@@ -309,27 +306,3 @@ class ARS(rl_agent.AbstractAgent):
         copied_object.theta += sigma * np.random.normal(size=np.shape(self.theta))
 
         return copied_object
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

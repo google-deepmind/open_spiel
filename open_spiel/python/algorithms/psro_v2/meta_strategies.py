@@ -183,7 +183,7 @@ def general_nash_strategy(solver, return_joint=False, NE_solver="gambit", mode='
   meta_games = solver.get_meta_game() if game is None else game
   if not isinstance(meta_games, list):
     meta_games = [meta_games, -meta_games]
-  equilibria = gs.nash_solver(meta_games, solver=NE_solver, mode=mode)
+  equilibria = gs.nash_solver(meta_games, solver=NE_solver, mode=mode, checkpoint_dir=checkpoint_dir)
 
   if not return_joint:
     return equilibria

@@ -154,7 +154,7 @@ def gambit_solve(meta_games, mode, checkpoint_dir):
     :param mode: options "all", "one", "pure"
     :return: a list of NE.
     """
-    return do_gambit_analysis(meta_games, mode, checkpoint_dir)
+    return do_gambit_analysis(meta_games, mode, checkpoint_dir=checkpoint_dir)
 
 def pure_ne_solve(meta_games, tol=1e-7):
     """

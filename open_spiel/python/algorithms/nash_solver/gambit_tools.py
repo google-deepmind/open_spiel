@@ -220,7 +220,7 @@ def do_gambit_analysis(meta_games, mode, timeout = 600, method="gnm", method_pur
             logging.info("Pure NE does not exist. Return mixed NE.")
             mode = 'all'
             continue
-        equilibria = decode_gambit_file(meta_games, mode, checkpoint_dir)
+        equilibria = decode_gambit_file(meta_games, mode, checkpoint_dir=checkpoint_dir)
         if len(equilibria) != 0:
             break
         timeout += 120

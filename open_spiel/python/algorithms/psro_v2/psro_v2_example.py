@@ -27,6 +27,7 @@ The other parameters keeping their default values.
 import time
 import datetime
 import os
+import sys
 from absl import app
 from absl import flags
 import numpy as np
@@ -35,6 +36,8 @@ import tensorflow.compat.v1 as tf
 from tensorboardX import SummaryWriter
 import logging
 logging.disable(logging.INFO)
+import functools
+print = functools.partial(print, flush=True)
 
 from open_spiel.python import policy
 from open_spiel.python import rl_environment
@@ -52,6 +55,7 @@ from open_spiel.python.algorithms.psro_v2.quiesce import quiesce_sparse
 
 FLAGS = flags.FLAGS
 flags.DEFINE_string("root_result_folder",'root_result',"root directory of saved results")
+flags.DEFINE_bool("sbatch_run",False,"whether to redirect standard output to checkpoint directory")
 # Game-related
 flags.DEFINE_string("game_name", "kuhn_poker", "Game name.")
 flags.DEFINE_integer("n_players", 2, "The number of players.")
@@ -65,12 +69,12 @@ flags.DEFINE_integer("sims_per_entry", 50,
                      ("Number of simulations to run to estimate each element"
                       "of the game outcome matrix."))
 
-flags.DEFINE_integer("gpsro_iterations", 100,
+flags.DEFINE_integer("gpsro_iterations", 150,
                      "Number of training steps for GPSRO.")
 flags.DEFINE_bool("symmetric_game", False, "Whether to consider the current "
                   "game as a symmetric game.")
 flags.DEFINE_bool("quiesce",False,"Whether to use quiece")
-flags.DEFINE_bool("sparse_quiesce",True,"whether to use sparse matrix quiesce implementation")
+flags.DEFINE_bool("sparse_quiesce",False,"whether to use sparse matrix quiesce implementation")
 
 # Rectify options
 flags.DEFINE_string("rectifier", "",
@@ -88,27 +92,27 @@ flags.DEFINE_string("training_strategy_selector", "probabilistic",
                     "probability strategy available to each player.")
 
 # General (RL) agent parameters
-flags.DEFINE_string("oracle_type", "DQN", "Choices are DQN, PG (Policy "
+flags.DEFINE_string("oracle_type", "ARS", "Choices are DQN, PG (Policy "
                     "Gradient), BR (exact Best Response) or ARS(Augmented Random Search)")
-flags.DEFINE_integer("number_training_episodes", int(2), "Number training "
+flags.DEFINE_integer("number_training_episodes", int(1e3), "Number training "
                      "episodes per RL policy. Used for PG and DQN")
 flags.DEFINE_float("self_play_proportion", 0.0, "Self play proportion")
-flags.DEFINE_integer("hidden_layer_size", 256, "Hidden layer size")
+flags.DEFINE_integer("hidden_layer_size", 128, "Hidden layer size")
 flags.DEFINE_integer("batch_size", 32, "Batch size")
 flags.DEFINE_float("sigma", 0.0, "Policy copy noise (Gaussian Dropout term).")
 flags.DEFINE_string("optimizer_str", "adam", "'adam' or 'sgd'")
+flags.DEFINE_integer("n_hidden_layers", 2, "# of hidden layers")
 
 # Policy Gradient Oracle related
 flags.DEFINE_string("loss_str", "qpg", "Name of loss used for BR training.")
 flags.DEFINE_integer("num_q_before_pi", 8, "# critic updates before Pi update")
-flags.DEFINE_integer("n_hidden_layers", 4, "# of hidden layers")
 flags.DEFINE_float("entropy_cost", 0.001, "Self play proportion")
 flags.DEFINE_float("critic_learning_rate", 1e-2, "Critic learning rate")
 flags.DEFINE_float("pi_learning_rate", 1e-3, "Policy learning rate.")
 
 # DQN
 flags.DEFINE_float("dqn_learning_rate", 1e-2, "DQN learning rate.")
-flags.DEFINE_integer("update_target_network_every", 1000, "Update target "
+flags.DEFINE_integer("update_target_network_every", 500, "Update target "
                      "network every [X] steps")
 flags.DEFINE_integer("learn_every", 10, "Learn every [X] steps.")
 
@@ -224,7 +228,6 @@ def init_ars_responder(sess, env):
     "session": sess,
     "info_state_size": info_state_size,
     "num_actions": num_actions,
-    "nb_steps": FLAGS.num_steps,
     "learning_rate": FLAGS.ars_learning_rate,
     "nb_directions": FLAGS.num_directions,
     "nb_best_directions": FLAGS.num_directions,
@@ -353,7 +356,6 @@ def main(argv):
     raise app.UsageError("Too many command-line arguments.")
 
   np.random.seed(FLAGS.seed)
-
   game = pyspiel.load_game_as_turn_based(FLAGS.game_name,
                                          {"players": pyspiel.GameParameter(
                                              FLAGS.n_players)})
@@ -366,6 +368,8 @@ def main(argv):
                                 FLAGS.root_result_folder,
                                 FLAGS.game_name+'_'+FLAGS.oracle_type+'_sims_'+str(FLAGS.sims_per_entry)+'_it'+str(FLAGS.gpsro_iterations)+'_ep'+str(FLAGS.number_training_episodes)+'_'+datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
   writer = SummaryWriter(logdir=checkpoint_dir+'/log')
+  if FLAGS.sbatch_run:
+    sys.stdout = open(checkpoint_dir+'/stdout.txt','w+')
 
   # Initialize oracle and agents
   with tf.Session() as sess:
