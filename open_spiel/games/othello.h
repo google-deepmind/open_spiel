@@ -19,7 +19,6 @@
 #include <map>
 #include <memory>
 #include <string>
-#include <tuple>
 #include <vector>
 
 #include "open_spiel/spiel.h"
@@ -60,6 +59,26 @@ enum Direction {
   kLast
 };
 
+struct Move {
+  Move(int move) : row(move / kNumCols), col(move % kNumRows) {
+    if (move < 0 || move >= kNumCells) {
+      SpielFatalError(absl::StrCat("Move too large: ", move));
+    }
+  }
+
+  Move(int row, int col) : row(row), col(col) {};
+
+  inline int GetRow() const { return row; }
+  inline int GetColumn() const { return col; }
+  inline int GetAction() const { return row * kNumCols + col; }
+  inline bool OnBoard() const;
+
+  Move Next(Direction dir) const;
+
+private:
+  int row, col;
+};
+
 // State of an in-play game.
 class OthelloState : public State {
  public:
@@ -72,6 +91,7 @@ class OthelloState : public State {
 
   std::string ActionToString(Player player, Action action_id) const override;
   std::string ToString() const override;
+  std::string ToString(Player player) const;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
   std::string InformationStateString(Player player) const override;
@@ -79,33 +99,30 @@ class OthelloState : public State {
   void ObservationTensor(Player player,
                          std::vector<double>* values) const override;
   std::unique_ptr<State> Clone() const override;
-  void UndoAction(Player player, Action move) override;
+  void UndoAction(Player player, Action action) override;
   std::vector<Action> LegalActions() const override;
+
   CellState BoardAt(int cell) const { return board_[cell]; }
   CellState BoardAt(int row, int col) const {
-    return board_[RowColToMove(row, col)];
+    Move move(row, col);
+    return board_[move.GetAction()];
   }
 
  protected:
   std::array<CellState, kNumCells> board_;
-  void DoApplyAction(Action move) override;
+  void DoApplyAction(Action action) override;
 
  private:
-  std::string ToStringForPlayer(Player player) const;  // to string for a specific player
-
   std::vector<Action> LegalRegularActions(Player p) const;  // list of regular (non-pass) actions
-  bool ValidAction(Player player, int move) const; // check if a valid move
+  bool ValidAction(Player player, int action) const; // check if a valid move
   bool NoValidActions() const;  // no moves possible for either player
 
+  bool CanCapture(Player player, int action) const;  // can capture by making move
+  int CountSteps(Player player, int action, Direction dir) const;  // count number of capturable disks in a direction
+  void Capture(Player player, int action, Direction dir, int steps);  // capture row, col in direction
   int DiskCount(Player player) const;  // number of disk for each player
-  bool CanCapture(Player player, int move) const;  // can capture by making move
-  int CountSteps(Player player, int move, Direction dir) const;  // count number of capturable disks in a direction
-  void Capture(Player player, int move, Direction dir, int steps);  // capture row, col in direction
-  
-  inline bool OnBoard(int row, int col) const;  // is row and col on the boad?
-  
-  std::pair<int, int> RowColFromMove(int move) const;  // return (row, col) from move code
-  int RowColToMove(int row, int col) const;
+
+  CellState BoardAt(Move move) const { return BoardAt(move.GetRow(), move.GetColumn()); }
 
   Player current_player_ = 0;         // Player zero goes first
   Player outcome_ = kInvalidPlayer;
@@ -133,10 +150,11 @@ class OthelloGame : public Game {
 };
 
 CellState PlayerToState(Player player);
+std::string StateToString(CellState state);
 std::string StateToString(Player player, CellState state);
 
 inline std::ostream& operator<<(std::ostream& stream, const CellState& state) {
-  return stream << StateToString(Player(0), state);
+  return stream << StateToString(state);
 }
 
 }  // namespace othello
