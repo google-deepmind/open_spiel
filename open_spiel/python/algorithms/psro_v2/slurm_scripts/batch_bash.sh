@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-for file in ./slurm_scripts/*
+for file in ./scripts/*
 do
   sbatch "$file"
 done

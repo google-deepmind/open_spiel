@@ -10,7 +10,3 @@
 #SBATCH --time=04-00:00:00
 #SBATCH --account=wellman1
 #SBATCH --partition=standard
-#SBATCH --output=/home/wangyzh/alpharank/open_spiel/python/examples/slurm.log
-
-module load python3.6-anaconda/5.2.0
-cd $(dirname "${SLURM_SUBMIT_DIR}")

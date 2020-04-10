@@ -4,6 +4,16 @@ import numpy as np
 import itertools
 import copy
 
+def mkdir(path):
+    path = path.strip()
+    path = path.rstrip("\\")
+    isExists = os.path.exists(path)
+    if isExists:
+        raise ValueError(path + " already exists.")
+    else:
+        os.makedirs(path)
+        print(path + " has been created successfully.")
+
 def copy_file(original, target):
     shutil.copyfile(original, target)
     # print("Copy file from: ", original)
@@ -50,11 +60,18 @@ def random_search(num_output, param_range_dict, param_dtype_dict):
 def grid_search(param_dict):
     return list(itertools.product(*param_dict.values()))
 
-TARGET_DIR = os.getcwd() + '/slurm_scripts/'
-ORIGIN = os.getcwd() + '/base_slurm.sh'
+# TARGET_DIR = os.getcwd() + '/slurm_scripts/'
+ORIGIN = os.path.dirname(os.path.realpath(__file__)) + '/base_slurm.sh'
+MODULE1 = "module load python3.6-anaconda/5.2.0"
+MODULE2 = "cd $(dirname $(dirname '${SLURM_SUBMIT_DIR}'))"
+OUTPUT = "#SBATCH --output="
 COMMAND = "python psro_v2_example.py --oracle_type=BR --quiesce=False --gpsro_iterations=150 --number_training_episodes=100000 --sbatch_run=True"
 
-def bash_factory(num_files=10, grid_search_flag=True):
+def bash_factory(dir_name='scripts', num_files=10, grid_search_flag=True):
+    bash_path = os.path.dirname(os.path.realpath(__file__)) + '/' + dir_name + '/'
+    mkdir(bash_path)
+    output_path = os.path.dirname(os.path.realpath(__file__)) + '/' + dir_name + '_output' + '/'
+    mkdir(output_path)
     param_dict = {'ars_learning_rate': list(np.round(np.arange(0.01, 0.1, 0.01), decimals=2)),
                   'noise': list(np.round(np.arange(0.01, 0.1, 0.01), decimals=2))}
     if grid_search_flag:
@@ -65,13 +82,16 @@ def bash_factory(num_files=10, grid_search_flag=True):
         nick_name = ''
         for value in item:
             nick_name += "_" + str(value)
-        target = TARGET_DIR + str(i) + nick_name + '.sh'
+        target = bash_path + str(i) + nick_name + '.sh'
         copy_file(ORIGIN, target)
         new_command = copy.copy(COMMAND)
         for j, key in enumerate(param_dict.keys()):
             arg = ' --' + key + ' ' + str(item[j])
             new_command += arg
         with open(target, 'a') as file:
+            write_line(file, OUTPUT+output_path+str(i) + nick_name + '.log' + '\n')
+            write_line(file, MODULE1 + '\n')
+            write_line(file, MODULE2 + '\n')
             write_line(file, new_command)
 
 bash_factory()
