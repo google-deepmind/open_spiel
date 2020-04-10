@@ -108,7 +108,7 @@ class ISMCTSBot : public Bot {
   // actions). If so, returns an action not yet in the children. Otherwise,
   // returns kInvalidAction.
   Action CheckExpand(ISMCTSNode* node,
-                     const std::vector<Action>& legal_actions) const;
+                     const std::vector<Action>& legal_actions);
 
   // Returns a copy of the node with any actions not in specified legal actions
   // removed.

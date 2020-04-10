@@ -295,23 +295,22 @@ Action ISMCTSBot::SelectActionUCB(ISMCTSNode* node) {
 }
 
 Action ISMCTSBot::CheckExpand(ISMCTSNode* node,
-                              const std::vector<Action>& legal_actions) const {
-  if (!allow_inconsistent_action_sets_) {
-    // Faster use case for the default setting.
-    if (node->child_info.size() < legal_actions.size()) {
-      return legal_actions[node->child_info.size()];
-    } else {
-      return kInvalidAction;
-    }
-  } else {
-    // Search for the first action not in the child info.
-    for (Action action : legal_actions) {
-      if (node->child_info.find(action) == node->child_info.end()) {
-        return action;
-      }
-    }
+                              const std::vector<Action>& legal_actions) {
+  // Fast check in the common/default case.
+  if (!allow_inconsistent_action_sets_ &&
+      node->child_info.size() == legal_actions.size()) {
     return kInvalidAction;
   }
+
+  // Shuffle the legal actions to remove the bias from the move order.
+  std::vector<Action> legal_actions_copy = legal_actions;
+  std::shuffle(legal_actions_copy.begin(), legal_actions_copy.end(), rng_);
+  for (Action action : legal_actions_copy) {
+    if (node->child_info.find(action) == node->child_info.end()) {
+      return action;
+    }
+  }
+  return kInvalidAction;
 }
 
 std::vector<double> ISMCTSBot::RunSimulation(State* state) {
