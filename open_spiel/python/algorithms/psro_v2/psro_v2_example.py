@@ -122,7 +122,6 @@ flags.DEFINE_bool("local_launch", False, "Launch locally or not.")
 flags.DEFINE_bool("verbose", True, "Enables verbose printing and profiling.")
 
 #ARS
-flags.DEFINE_integer("num_steps", 1000, "Number of steps.")
 flags.DEFINE_float("ars_learning_rate", 0.02, "ARS learning rate.")
 flags.DEFINE_integer("num_directions", 64, "Number of exploration directions.")
 flags.DEFINE_integer("num_best_directions", 64, "Select # best directions.")

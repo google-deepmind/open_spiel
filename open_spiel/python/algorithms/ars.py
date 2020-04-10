@@ -88,6 +88,8 @@ class ARS(rl_agent.AbstractAgent):
         self._kwargs.pop("self")
         self._kwargs.pop("__class__")
 
+        assert nb_best_directions <= nb_directions
+
         self.player_id = player_id
         self._info_state_size = info_state_size
         self._num_actions = num_actions

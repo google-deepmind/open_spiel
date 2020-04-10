@@ -1,21 +1,26 @@
 import numpy as np
 import copy
-
-# from open_spiel.python.algorithms.psro_v2.eval_utils import regret
 #
-# BOS_p1_meta_game = np.array([[3, 0, 9, 100],
-#                              [0, 2, 9, 100],
-#                              [9, 9, 9, 100],
-#                              [100, 100, 100, 100]])
-# BOS_p2_meta_game = np.array([[2, 0, 9, 100],
-#                              [0, 3, 9, 100],
-#                              [9, 9, 9, 100],
-#                              [100, 100, 100, 100]])
-# BOS_meta_games = [BOS_p1_meta_game, BOS_p2_meta_game]
+# def lagging_mean(li,lag=3):
+#   """
+#   Calcualte the lagging mean of list given
+#   Params:
+#     li : the one dimensional list to be processed
+#     lag: length of moving average
+#   """
+#   if len(li) <= lag:
+#     return list(np.cumsum(li)/(np.arange(len(li))+1))
+#   else:
+#     first_half = np.cumsum(li[0:lag-1])/(np.arange(lag-1)+1)
+#     ret = np.cumsum(li)
+#     ret[lag:] = ret[lag:] - ret[:-lag]
+#     second_half = ret[lag - 1:] / lag
+#     return first_half.tolist() + second_half.tolist(), 1
 #
-# _regret = regret(BOS_meta_games, 4)
-# print(_regret)
+# a = [1,2,3,4,5,6,7]
+# p = lagging_mean(a)
+# print(p)
 
-
-for i in range(16):
-    print(i%5)
+param_dict = {'ars_learning_rate': list(np.round(np.arange(0.01, 0.1, 0.01), decimals=2)),
+                  'noise': list(np.arange(0.01, 0.1, 0.01))}
+print(param_dict)
