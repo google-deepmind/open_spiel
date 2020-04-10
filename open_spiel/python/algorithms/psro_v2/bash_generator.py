@@ -62,7 +62,10 @@ def bash_factory(num_files=10, grid_search_flag=True):
     else:
         raise NotImplementedError
     for i, item in enumerate(params):
-        target = TARGET_DIR + str(i) + '.sh'
+        nick_name = ''
+        for value in item:
+            nick_name += "_" + str(value)
+        target = TARGET_DIR + str(i) + nick_name + '.sh'
         copy_file(ORIGIN, target)
         new_command = copy.copy(COMMAND)
         for j, key in enumerate(param_dict.keys()):
