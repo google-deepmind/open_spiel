@@ -1,7 +1,7 @@
-name = "OpenSpiel_jll"
+name = "OpenSpiel"
 uuid = "7e5d8dc8-489f-4be6-9273-f4c3010e6ec1"
 authors = ["Jun Tian <tianjun.cpp@gmail.com>"]
-version = "0.1.0"
+version = "0.1.1"
 
 [deps]
 CxxWrap = "1f15a43c-97ca-5a2a-ae31-89f07a497df4"

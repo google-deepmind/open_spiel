@@ -1,4 +1,4 @@
-using OpenSpiel_jll
+using OpenSpiel
 using StatsBase
 using Test
 using CxxWrap
@@ -34,7 +34,7 @@ function evaluate_bots(
     returns(state)
 end
 
-@testset "OpenSpiel_jll.jl" begin
+@testset "OpenSpiel.jl" begin
     include("games_api.jl")
     include("games_simulation.jl")
     include("bots.jl")

@@ -1,4 +1,4 @@
-module OpenSpiel_jll
+module OpenSpiel
 
 include("$(@__DIR__)/../deps/deps.jl")
 
