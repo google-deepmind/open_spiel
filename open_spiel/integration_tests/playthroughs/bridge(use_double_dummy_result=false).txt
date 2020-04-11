@@ -16,6 +16,7 @@ GameType.short_name = "bridge"
 GameType.utility = Utility.ZERO_SUM
 
 NumDistinctActions() = 90
+PolicyTensorShape() = [90]
 MaxChanceOutcomes() = 0
 GetParameters() = {use_double_dummy_result=False}
 NumPlayers() = 4
@@ -23,6 +24,7 @@ MinUtility() = -7600.0
 MaxUtility() = 7600.0
 UtilitySum() = None
 ObservationTensorShape() = [571]
+ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 571
 MaxGameLength() = 371
 ToString() = "bridge(use_double_dummy_result=False)"

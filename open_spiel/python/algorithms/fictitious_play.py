@@ -170,10 +170,10 @@ class XFPSolver(object):
 
   def iteration(self):
     self._iterations += 1
-    self.compute_best_reponses()
+    self.compute_best_responses()
     self.update_average_policies()
 
-  def compute_best_reponses(self):
+  def compute_best_responses(self):
     """Updates self._oracles to hold best responses for each player."""
     for i in range(self._num_players):
       # Compute a best response policy to pi_{-i}.

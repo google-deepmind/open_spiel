@@ -22,6 +22,7 @@
 
 #include "open_spiel/algorithms/minimax.h"
 #include "open_spiel/game_parameters.h"
+#include "open_spiel/games/efg_game.h"
 #include "open_spiel/games/goofspiel.h"
 #include "open_spiel/games/kuhn_poker.h"
 #include "open_spiel/games/leduc_poker.h"
@@ -479,6 +480,17 @@ void KuhnPokerUniformValueTestPid1() {
       *game, /*best_responder=*/Player{1}, policy, histories_and_values);
 }
 
+void KuhnPokerEFGUniformValueTestPid1() {
+  std::shared_ptr<const Game> game = efg_game::LoadEFGGame(
+      efg_game::GetKuhnPokerEFGData());
+  TabularPolicy policy = GetUniformPolicy(*game);
+  std::vector<std::pair<std::string, double>> histories_and_values =
+      GetKuhnUniformBestResponseValuesPid1();
+  TabularBestResponse best_response(*game, 1, &policy);
+  double value = best_response.Value(game->NewInitialState()->ToString());
+  SPIEL_CHECK_TRUE(Near(value, histories_and_values[0].second));
+}
+
 void KuhnPokerOptimalValueTestPid0() {
   std::shared_ptr<const Game> game = LoadGame("kuhn_poker");
   TabularPolicy policy = GetOptimalKuhnPolicy(/*alpha=*/0.2);
@@ -513,6 +525,7 @@ int main(int argc, char** argv) {
   open_spiel::algorithms::KuhnPokerExploitabilityDescentMinimalSimulationPid0();
   open_spiel::algorithms::KuhnPokerUniformValueTestPid0();
   open_spiel::algorithms::KuhnPokerUniformValueTestPid1();
+  open_spiel::algorithms::KuhnPokerEFGUniformValueTestPid1();
   open_spiel::algorithms::KuhnPokerOptimalValueTestPid0();
   open_spiel::algorithms::KuhnPokerOptimalValueTestPid1();
 

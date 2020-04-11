@@ -16,6 +16,7 @@ GameType.short_name = "pig"
 GameType.utility = Utility.ZERO_SUM
 
 NumDistinctActions() = 6
+PolicyTensorShape() = [6]
 MaxChanceOutcomes() = 6
 GetParameters() = {diceoutcomes=6,horizon=10,players=4,winscore=10}
 NumPlayers() = 4
@@ -23,6 +24,7 @@ MinUtility() = -1.0
 MaxUtility() = 1.0
 UtilitySum() = 0.0
 ObservationTensorShape() = [5, 11]
+ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 55
 MaxGameLength() = 10
 ToString() = "pig(horizon=10,players=4,winscore=10)"

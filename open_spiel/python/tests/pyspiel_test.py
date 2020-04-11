@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for google3.third_party.open_spiel.python.pybind11.pyspiel."""
+"""Tests for open_spiel.python.pybind11.pyspiel."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -47,6 +47,7 @@ class PyspielTest(absltest.TestCase):
         "coop_to_1p",
         "cursor_go",
         "deep_sea",
+        "efg_game",
         "first_sealed_auction",
         "gin_rummy",
         "go",
@@ -81,6 +82,7 @@ class PyspielTest(absltest.TestCase):
         "tiny_bridge_2p",
         "tiny_bridge_4p",
         "tiny_hanabi",
+        "trade_comm",
         "turn_based_simultaneous_game",
         "y",
     ])

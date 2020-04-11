@@ -16,6 +16,7 @@ GameType.short_name = "laser_tag"
 GameType.utility = Utility.GENERAL_SUM
 
 NumDistinctActions() = 10
+PolicyTensorShape() = [10]
 MaxChanceOutcomes() = 6
 GetParameters() = {grid=S.....S\n.......\n..*.*..\n.**.**.\n..*.*..\n.......\nS.....S,horizon=20,zero_sum=False}
 NumPlayers() = 2
@@ -23,6 +24,7 @@ MinUtility() = -20.0
 MaxUtility() = 20.0
 UtilitySum() = 0.0
 ObservationTensorShape() = [4, 7, 7]
+ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 196
 MaxGameLength() = 20
 ToString() = "laser_tag(horizon=20)"

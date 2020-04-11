@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef THIRD_PARTY_OPEN_SPIEL_GAMES_GIN_RUMMY_UTILS_H_
-#define THIRD_PARTY_OPEN_SPIEL_GAMES_GIN_RUMMY_UTILS_H_
+#ifndef OPEN_SPIEL_GAMES_GIN_RUMMY_UTILS_H_
+#define OPEN_SPIEL_GAMES_GIN_RUMMY_UTILS_H_
 
 #include <map>
 #include <string>
@@ -88,4 +88,4 @@ static const std::map<VecInt, int> meld_to_int = BuildMeldToIntMap();
 }  // namespace gin_rummy
 }  // namespace open_spiel
 
-#endif  // THIRD_PARTY_OPEN_SPIEL_GAMES_GIN_RUMMY_UTILS_H_
+#endif  // OPEN_SPIEL_GAMES_GIN_RUMMY_UTILS_H_

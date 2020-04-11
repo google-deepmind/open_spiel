@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef THIRD_PARTY_OPEN_SPIEL_SPIEL_H_
-#define THIRD_PARTY_OPEN_SPIEL_SPIEL_H_
+#ifndef OPEN_SPIEL_SPIEL_H_
+#define OPEN_SPIEL_SPIEL_H_
 
 #include <functional>
 #include <iostream>
@@ -28,6 +28,7 @@
 #include <utility>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/random/bit_gen_ref.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel_utils.h"
@@ -132,6 +133,13 @@ struct GameType {
 
   std::map<std::string, GameParameter> parameter_specification;
   bool ContainsRequiredParameters() const;
+
+  // A number of optional values that have defaults, whose values can be
+  // overridden in each game.
+
+  // Can the game be loaded with no parameters? It is strongly recommended that
+  // games be loadable with sen
+  bool default_loadable = true;
 };
 
 enum class StateType {
@@ -148,6 +156,15 @@ std::ostream& operator<<(std::ostream& stream, GameType::Utility value);
 
 // The probability of taking each possible action in a particular info state.
 using ActionsAndProbs = std::vector<std::pair<Action, double>>;
+
+// Layouts for 3-D tensors. For 2-D tensors, we assume that the layout is a
+// single spatial dimension and a channel dimension. If a 2-D tensor should be
+// interpreted as a 2-D space, report it as 3-D with a channel dimension of
+// size 1. We have no standard for higher-dimensional tensors.
+enum class TensorLayout {
+  kHWC,  // indexes are in the order (height, width, channels)
+  kCHW,  // indexes are in the order (channels, height, width)
+};
 
 // Forward declaration needed for the backpointer within State.
 class Game;
@@ -589,8 +606,9 @@ class Game : public std::enable_shared_from_this<Game> {
   // Maximum number of chance outcomes for each chance node.
   virtual int MaxChanceOutcomes() const { return 0; }
 
-  // If the game is parametrizable, returns an object with the current parameter
-  // values, including defaulted values. Returns empty parameters otherwise.
+  // If the game is parameterizable, returns an object with the current
+  // parameter values, including defaulted values. Returns empty parameters
+  // otherwise.
   GameParameters GetParameters() const {
     GameParameters params = game_parameters_;
     params.insert(defaulted_parameters_.begin(), defaulted_parameters_.end());
@@ -605,7 +623,7 @@ class Game : public std::enable_shared_from_this<Game> {
   // values returned by State::PlayerReturn(Player player) over all valid player
   // numbers. This range should be as tight as possible; the intention is to
   // give some information to algorithms that require it, and so their
-  // performance may suffer if the range is not tight. Loss/win/draw outcomes
+  // performance may suffer if the range is not tight. Loss/draw/win outcomes
   // are common among games and should use the standard values of {-1,0,1}.
   virtual double MinUtility() const = 0;
   virtual double MaxUtility() const = 0;
@@ -632,8 +650,11 @@ class Game : public std::enable_shared_from_this<Game> {
   virtual std::vector<int> InformationStateTensorShape() const {
     SpielFatalError("InformationStateTensorShape unimplemented.");
   }
+  virtual TensorLayout InformationStateTensorLayout() const {
+    return TensorLayout::kCHW;
+  }
 
-  // The size of (flat) vector needed for the information state tensor-like
+  // The size of the (flat) vector needed for the information state tensor-like
   // format.
   int InformationStateTensorSize() const {
     std::vector<int> shape = InformationStateTensorShape();
@@ -650,8 +671,11 @@ class Game : public std::enable_shared_from_this<Game> {
   virtual std::vector<int> ObservationTensorShape() const {
     SpielFatalError("ObservationTensorShape unimplemented.");
   }
+  virtual TensorLayout ObservationTensorLayout() const {
+    return TensorLayout::kCHW;
+  }
 
-  // The size of (flat) vector needed for the observation tensor-like
+  // The size of the (flat) vector needed for the observation tensor-like
   // format.
   int ObservationTensorSize() const {
     std::vector<int> shape = ObservationTensorShape();
@@ -660,19 +684,25 @@ class Game : public std::enable_shared_from_this<Game> {
                                            std::multiplies<double>());
   }
 
+  // Describes the structure of the policy representation in a
+  // tensor-like format. This is especially useful for experiments involving
+  // reinforcement learning and neural networks. Note: the actual policy is
+  // expected to be in the shape of a 1-D vector.
+  virtual std::vector<int> PolicyTensorShape() const {
+    return {NumDistinctActions()};
+  }
+
   // Returns a newly allocated state built from a string. Caller takes ownership
   // of the state.
-
-  // Build a state from a string.
   //
   // The default implementation assumes a sequence of actions, one per line,
   // that is taken from the initial state.
   //
-  // If this method is overridden, then it should be inverse of
-  // Game::SerializeState (i.e. it should also be overridden).
+  // If this method is overridden, then it should be the inverse of
+  // Game::SerializeState (i.e. that method should also be overridden).
   virtual std::unique_ptr<State> DeserializeState(const std::string& str) const;
 
-  // Maximum length of any one game (in terms of number of decision nodes
+  // The maximum length of any one game (in terms of number of decision nodes
   // visited in the game tree). For a simultaneous action game, this is the
   // maximum number of joint decisions. In a turn-based game, this is the
   // maximum number of individual decisions summed over all players. Outcomes
@@ -758,12 +788,18 @@ std::shared_ptr<const Game> LoadGame(const std::string& short_name,
 // implementation).
 std::shared_ptr<const Game> LoadGame(GameParameters params);
 
+// Normalize a policy into a proper discrete distribution where the
+// probabilities sum to 1.
+void NormalizePolicy(ActionsAndProbs* policy);
+
 // Used to sample a policy or chance outcome distribution.
 // Probabilities of the actions must sum to 1.
 // The parameter z should be a sample from a uniform distribution on the range
 // [0, 1). Returns the sampled action and its probability.
 std::pair<Action, double> SampleAction(const ActionsAndProbs& outcomes,
                                        double z);
+std::pair<Action, double> SampleAction(const ActionsAndProbs& outcomes,
+                                       absl::BitGenRef rng);
 
 // Serialize the game and the state into one self-contained string that can
 // be reloaded via open_spiel::DeserializeGameAndState.
@@ -809,4 +845,4 @@ using HistoryDistribution =
 
 }  // namespace open_spiel
 
-#endif  // THIRD_PARTY_OPEN_SPIEL_SPIEL_H_
+#endif  // OPEN_SPIEL_SPIEL_H_

@@ -16,6 +16,7 @@ GameType.short_name = "tiny_bridge_2p"
 GameType.utility = Utility.IDENTICAL
 
 NumDistinctActions() = 7
+PolicyTensorShape() = [7]
 MaxChanceOutcomes() = 28
 GetParameters() = {abstracted=False}
 NumPlayers() = 2
@@ -23,8 +24,10 @@ MinUtility() = -40.0
 MaxUtility() = 35.0
 UtilitySum() = None
 InformationStateTensorShape() = [22]
+InformationStateTensorLayout() = TensorLayout.CHW
 InformationStateTensorSize() = 22
 ObservationTensorShape() = [15]
+ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 15
 MaxGameLength() = 8
 ToString() = "tiny_bridge_2p()"

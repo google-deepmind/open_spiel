@@ -16,6 +16,7 @@ GameType.short_name = "y"
 GameType.utility = Utility.ZERO_SUM
 
 NumDistinctActions() = 81
+PolicyTensorShape() = [81]
 MaxChanceOutcomes() = 0
 GetParameters() = {ansi_color_output=False,board_size=9}
 NumPlayers() = 2
@@ -23,6 +24,7 @@ MinUtility() = -1.0
 MaxUtility() = 1.0
 UtilitySum() = 0.0
 ObservationTensorShape() = [3, 9, 9]
+ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 243
 MaxGameLength() = 45
 ToString() = "y(board_size=9)"

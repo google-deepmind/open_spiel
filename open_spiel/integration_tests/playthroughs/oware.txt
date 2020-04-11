@@ -16,6 +16,7 @@ GameType.short_name = "oware"
 GameType.utility = Utility.ZERO_SUM
 
 NumDistinctActions() = 6
+PolicyTensorShape() = [6]
 MaxChanceOutcomes() = 0
 GetParameters() = {num_houses_per_player=6,num_seeds_per_house=4}
 NumPlayers() = 2
@@ -23,6 +24,7 @@ MinUtility() = -1.0
 MaxUtility() = 1.0
 UtilitySum() = 0.0
 ObservationTensorShape() = [14]
+ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 14
 MaxGameLength() = 1000
 ToString() = "oware()"

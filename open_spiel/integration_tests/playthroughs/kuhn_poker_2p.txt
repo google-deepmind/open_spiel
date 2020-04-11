@@ -16,6 +16,7 @@ GameType.short_name = "kuhn_poker"
 GameType.utility = Utility.ZERO_SUM
 
 NumDistinctActions() = 2
+PolicyTensorShape() = [2]
 MaxChanceOutcomes() = 3
 GetParameters() = {players=2}
 NumPlayers() = 2
@@ -23,8 +24,10 @@ MinUtility() = -2.0
 MaxUtility() = 2.0
 UtilitySum() = 0.0
 InformationStateTensorShape() = [11]
+InformationStateTensorLayout() = TensorLayout.CHW
 InformationStateTensorSize() = 11
 ObservationTensorShape() = [7]
+ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 7
 MaxGameLength() = 3
 ToString() = "kuhn_poker(players=2)"

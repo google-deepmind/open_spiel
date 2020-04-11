@@ -16,6 +16,7 @@ GameType.short_name = "coop_box_pushing"
 GameType.utility = Utility.IDENTICAL
 
 NumDistinctActions() = 4
+PolicyTensorShape() = [4]
 MaxChanceOutcomes() = 4
 GetParameters() = {fully_observable=False,horizon=100}
 NumPlayers() = 2
@@ -23,6 +24,7 @@ MinUtility() = -1020.0
 MaxUtility() = 1.998e+04
 UtilitySum() = None
 ObservationTensorShape() = [5]
+ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 5
 MaxGameLength() = 100
 ToString() = "coop_box_pushing()"

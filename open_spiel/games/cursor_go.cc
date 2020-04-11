@@ -26,9 +26,10 @@ namespace cursor_go {
 namespace {
 
 using go::BoardPoints;
-using go::GoPointFrom2DPoint;
-using go::GoPointToString;
 using go::MakePoint;
+using go::VirtualPoint;
+using go::VirtualPointFrom2DPoint;
+using go::VirtualPointToString;
 
 // Facts about the game
 const GameType kGameType{
@@ -60,16 +61,16 @@ std::shared_ptr<const Game> Factory(const GameParameters& params) {
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
 
-std::vector<GoPoint> HandicapStones(int num_handicap) {
+std::vector<VirtualPoint> HandicapStones(int num_handicap) {
   if (num_handicap < 2 || num_handicap > 9) return {};
 
-  static std::array<GoPoint, 9> placement = {
+  static std::array<VirtualPoint, 9> placement = {
       {MakePoint("d4"), MakePoint("q16"), MakePoint("d16"), MakePoint("q4"),
        MakePoint("d10"), MakePoint("q10"), MakePoint("k4"), MakePoint("k16"),
        MakePoint("k10")}};
-  static GoPoint center = MakePoint("k10");
+  static VirtualPoint center = MakePoint("k10");
 
-  std::vector<GoPoint> points;
+  std::vector<VirtualPoint> points;
   points.reserve(num_handicap);
   for (int i = 0; i < num_handicap; ++i) {
     points.push_back(placement[i]);
@@ -114,7 +115,7 @@ void CursorGoState::ObservationTensor(int player,
 
   // Add planes: black, white, empty.
   int cell = 0;
-  for (GoPoint p : BoardPoints(board_.board_size())) {
+  for (VirtualPoint p : BoardPoints(board_.board_size())) {
     int color_val = static_cast<int>(board_.PointColor(p));
     (*values)[num_cells * color_val + cell] = 1.0;
     ++cell;
@@ -147,7 +148,7 @@ std::vector<Action> CursorGoState::LegalActions() const {
     if (col > 0) actions.push_back(kActionLeft);
     if (col < board_.board_size() - 1) actions.push_back(kActionRight);
   }
-  if (board_.IsLegalMove(GoPointFrom2DPoint(cursor), to_play_))
+  if (board_.IsLegalMove(VirtualPointFrom2DPoint(cursor), to_play_))
     actions.push_back(kActionPlaceStone);
   actions.push_back(kActionPass);
   return actions;
@@ -168,7 +169,8 @@ std::string CursorGoState::ToString() const {
   ss << ")\n" << board_;
   if (!is_terminal_)
     ss << "\nCursor: "
-       << GoPointToString(GoPointFrom2DPoint(cursor_[ColorToPlayer(to_play_)]));
+       << VirtualPointToString(
+              VirtualPointFrom2DPoint(cursor_[ColorToPlayer(to_play_)]));
   return ss.str();
 }
 
@@ -206,9 +208,10 @@ std::unique_ptr<State> CursorGoState::Clone() const {
 
 void CursorGoState::DoApplyAction(Action action) {
   if (action == kActionPlaceStone || action == kActionPass) {
-    GoPoint point = (action == kActionPass)
-                        ? go::kPass
-                        : GoPointFrom2DPoint(cursor_[ColorToPlayer(to_play_)]);
+    VirtualPoint point =
+        (action == kActionPass)
+            ? go::kVirtualPass
+            : VirtualPointFrom2DPoint(cursor_[ColorToPlayer(to_play_)]);
     SPIEL_CHECK_TRUE(board_.PlayMove(point, to_play_));
     is_terminal_ = last_move_was_pass_ && (action == kActionPass);
     last_move_was_pass_ = (action == kActionPass);
@@ -250,7 +253,7 @@ void CursorGoState::ResetBoard() {
   if (handicap_ < 2) {
     to_play_ = GoColor::kBlack;
   } else {
-    for (GoPoint p : HandicapStones(handicap_)) {
+    for (VirtualPoint p : HandicapStones(handicap_)) {
       board_.PlayMove(p, GoColor::kBlack);
     }
     to_play_ = GoColor::kWhite;

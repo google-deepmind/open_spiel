@@ -16,6 +16,7 @@ GameType.short_name = "leduc_poker"
 GameType.utility = Utility.ZERO_SUM
 
 NumDistinctActions() = 3
+PolicyTensorShape() = [3]
 MaxChanceOutcomes() = 8
 GetParameters() = {players=3}
 NumPlayers() = 3
@@ -23,8 +24,10 @@ MinUtility() = -13.0
 MaxUtility() = 26.0
 UtilitySum() = 0.0
 InformationStateTensorShape() = [47]
+InformationStateTensorLayout() = TensorLayout.CHW
 InformationStateTensorSize() = 47
 ObservationTensorShape() = [22]
+ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 22
 MaxGameLength() = 14
 ToString() = "leduc_poker(players=3)"

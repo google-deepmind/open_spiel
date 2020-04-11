@@ -55,7 +55,7 @@ std::vector<std::string> CardIntsToCardStrings(const VecInt &cards) {
 
 VecInt CardStringsToCardInts(const std::vector<std::string> &cards) {
   VecInt rv;
-  for (std::string card : cards) {
+  for (const std::string &card : cards) {
     rv.push_back(CardInt(card));
   }
   return rv;
@@ -99,7 +99,7 @@ int TotalCardValue(const VecInt &cards) {
 // Sums point total over all cards.
 int TotalCardValue(const VecVecInt &meld_group) {
   int total_value = 0;
-  for (auto meld : meld_group) {
+  for (const auto &meld : meld_group) {
     for (auto card : meld) {
       total_value += CardValue(card);
     }
@@ -296,7 +296,7 @@ VecVecInt BestMeldGroup(const VecInt &cards) {
   int best_meld_group_total_value = 0;
   VecVecInt best_meld_group;
   VecVecVecInt all_meld_groups = AllMeldGroups(cards);
-  for (auto meld_group : all_meld_groups) {
+  for (const auto &meld_group : all_meld_groups) {
     int meld_group_total_value = TotalCardValue(meld_group);
     if (meld_group_total_value > best_meld_group_total_value) {
       best_meld_group_total_value = meld_group_total_value;
@@ -317,7 +317,7 @@ int MinDeadwood(const VecInt &hand) {
   VecInt deadwood = hand;
   VecVecInt best_melds = BestMeldGroup(hand);
 
-  for (auto meld : best_melds) {
+  for (const auto &meld : best_melds) {
     for (auto card : meld) {
       deadwood.erase(std::remove(deadwood.begin(), deadwood.end(), card),
                      deadwood.end());
@@ -369,10 +369,10 @@ VecInt LegalMelds(const VecInt &hand, int knock_card) {
   std::set<int> meld_set;
   VecInt hand_(hand);
   VecVecVecInt all_meld_groups = AllMeldGroups(hand_);
-  for (auto meld_group : all_meld_groups) {
+  for (const auto &meld_group : all_meld_groups) {
     int meld_group_total_value = TotalCardValue(meld_group);
     if (total_hand_value - meld_group_total_value <= knock_card) {
-      for (auto meld : meld_group) {
+      for (const auto &meld : meld_group) {
         meld_set.insert(meld_to_int.at(meld));
       }
     }
@@ -442,7 +442,7 @@ std::map<int, VecInt> BuildIntToMeldMap() {
   for (int i = 0; i < kNumCards; ++i) full_deck.push_back(i);
   VecVecInt all_melds = AllMelds(full_deck);
   for (int i = 0; i < all_melds.size(); ++i) {
-    for (auto meld : all_melds) {
+    for (const auto &meld : all_melds) {
       if (MeldToInt(meld) == i) {
         rv.insert(std::pair<int, VecInt>(i, meld));
         break;

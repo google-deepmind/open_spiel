@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef THIRD_PARTY_OPEN_SPIEL_POLICY_H_
-#define THIRD_PARTY_OPEN_SPIEL_POLICY_H_
+#ifndef OPEN_SPIEL_POLICY_H_
+#define OPEN_SPIEL_POLICY_H_
 
 #include <string>
 #include <unordered_map>
@@ -21,6 +21,7 @@
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
@@ -141,6 +142,18 @@ class TabularPolicy : public Policy {
     return policy_table_;
   }
 
+  const std::string ToString() const {
+    std::string str = "";
+    for (const auto& infostate_and_policy : policy_table_) {
+      absl::StrAppend(&str, infostate_and_policy.first, ": ");
+      for (const auto& policy : infostate_and_policy.second) {
+        absl::StrAppend(&str, " ", policy.first, "=", policy.second);
+      }
+      absl::StrAppend(&str, "\n");
+    }
+    return str;
+  }
+
  private:
   std::unordered_map<std::string, ActionsAndProbs> policy_table_;
 };
@@ -172,4 +185,4 @@ TabularPolicy GetFirstActionPolicy(const Game& game);
 
 }  // namespace open_spiel
 
-#endif  // THIRD_PARTY_OPEN_SPIEL_POLICY_H_
+#endif  // OPEN_SPIEL_POLICY_H_

@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef THIRD_PARTY_OPEN_SPIEL_GAMES_CHESS_H_
-#define THIRD_PARTY_OPEN_SPIEL_GAMES_CHESS_H_
+#ifndef OPEN_SPIEL_GAMES_CHESS_H_
+#define OPEN_SPIEL_GAMES_CHESS_H_
 
 #include <array>
 #include <cstring>
@@ -21,7 +21,8 @@
 #include <memory>
 #include <string>
 #include <vector>
-
+#include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
+#include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/games/chess/chess_board.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
@@ -42,7 +43,7 @@ inline constexpr double WinUtility() { return 1; }
 inline constexpr int BoardSize() { return 8; }
 
 // See action encoding below.
-inline constexpr int NumDistinctActions() { return (1 << 15); }
+inline constexpr int NumDistinctActions() { return 4672; }
 
 // https://math.stackexchange.com/questions/194008/how-many-turns-can-a-chess-game-take-at-maximum
 inline constexpr int MaxGameLength() { return 17695; }
@@ -74,6 +75,8 @@ inline int OtherPlayer(Player player) { return player == Player{0} ? 1 : 0; }
 // bits 0-5: from square (0-64)
 // bits 6-11: to square (0-64)
 // bits 12-14: promotion type (0 if not promotion)
+// bits 15: is castling (we need to record this because just from and to squares
+//   can be ambiguous in chess960).
 //
 // Promotion type:
 enum class PromotionTypeEncoding {
@@ -83,6 +86,13 @@ enum class PromotionTypeEncoding {
   kBishop = 3,
   kKnight = 4
 };
+
+inline constexpr std::array<PieceType, 3> kUnderPromotionIndexToType = {
+    PieceType::kRook, PieceType::kBishop, PieceType::kKnight};
+inline constexpr std::array<Offset, 3> kUnderPromotionDirectionToOffset = {
+    {{0, 1}, {1, 1}, {-1, 1}}};
+inline constexpr int kNumUnderPromotions =
+    kUnderPromotionIndexToType.size() * kUnderPromotionDirectionToOffset.size();
 
 // Reads a bitfield within action, with LSB at offset, and length bits long (up
 // to 8).
@@ -111,59 +121,21 @@ inline Square IndexToSquare(uint8_t index) {
                 static_cast<int8_t>(index / BoardSize())};
 }
 
-inline Action MoveToAction(const Move& move) {
-  Action action = 0;
+int EncodeMove(const Square& from_square, int destination_index, int board_size,
+               int num_actions_destinations);
 
-  SetField(0, 6, SquareToIndex(move.from), &action);
-  SetField(6, 6, SquareToIndex(move.to), &action);
+inline constexpr int kNumActionDestinations = 73;
 
-  uint8_t promo_encoded = 0;
-  switch (move.promotion_type) {
-    case PieceType::kQueen:
-      promo_encoded = static_cast<uint8_t>(PromotionTypeEncoding::kQueen);
-      break;
-    case PieceType::kRook:
-      promo_encoded = static_cast<uint8_t>(PromotionTypeEncoding::kRook);
-      break;
-    case PieceType::kBishop:
-      promo_encoded = static_cast<uint8_t>(PromotionTypeEncoding::kBishop);
-      break;
-    case PieceType::kKnight:
-      promo_encoded = static_cast<uint8_t>(PromotionTypeEncoding::kKnight);
-      break;
-    default:
-      promo_encoded = 0;
-  }
+int8_t ReflectRank(Color to_play, int board_size, int8_t rank);
 
-  SetField(12, 3, promo_encoded, &action);
+Color PlayerToColor(Player p);
 
-  return action;
-}
+Action MoveToAction(const Move& move);
 
-inline Move ActionToMove(const Action& action) {
-  PieceType promo_type;
-  switch (static_cast<PromotionTypeEncoding>(GetField(action, 12, 3))) {
-    case PromotionTypeEncoding::kQueen:
-      promo_type = PieceType::kQueen;
-      break;
-    case PromotionTypeEncoding::kRook:
-      promo_type = PieceType::kRook;
-      break;
-    case PromotionTypeEncoding::kBishop:
-      promo_type = PieceType::kBishop;
-      break;
-    case PromotionTypeEncoding::kKnight:
-      promo_type = PieceType::kKnight;
-      break;
-    case PromotionTypeEncoding::kNotPromotion:
-      promo_type = PieceType::kEmpty;
-      break;
-    default:
-      SpielFatalError("Unknown promotion type encoding");
-  }
-  return Move(IndexToSquare(GetField(action, 0, 6)),
-              IndexToSquare(GetField(action, 6, 6)), promo_type);
-}
+std::pair<Square, int> ActionToDestination(int action, int board_size,
+                                           int num_actions_destinations);
+
+Move ActionToMove(const Action& action, const StandardChessBoard& board);
 
 // State of an in-play game.
 class ChessState : public State {
@@ -190,7 +162,7 @@ class ChessState : public State {
   }
 
   std::vector<double> Returns() const override;
-
+  std::string InformationStateString(Player player) const override;
   std::string ObservationString(Player player) const override;
   void ObservationTensor(Player player,
                          std::vector<double>* values) const override;
@@ -201,6 +173,13 @@ class ChessState : public State {
   StandardChessBoard& Board() { return current_board_; }
   const StandardChessBoard& Board() const { return current_board_; }
 
+  // Starting board.
+  StandardChessBoard& StartBoard() { return start_board_; }
+  const StandardChessBoard& StartBoard() const { return start_board_; }
+
+  std::vector<Move>& MovesHistory() { return moves_history_; }
+  const std::vector<Move>& MovesHistory() const { return moves_history_; }
+
  protected:
   void DoApplyAction(Action action) override;
 
@@ -208,6 +187,12 @@ class ChessState : public State {
   // Draw can be claimed under the FIDE 3-fold repetition rule (the current
   // board position has already appeared twice in the history).
   bool IsRepetitionDraw() const;
+
+  // Calculates legal actions and caches them. This is separate from
+  // LegalActions() as there are a number of other methods that need the value
+  // of LegalActions. This is a separate method as it's called from
+  // IsTerminal(), which is also called by LegalActions().
+  void MaybeGenerateLegalActions() const;
 
   std::optional<std::vector<double>> MaybeFinalReturns() const;
 
@@ -230,8 +215,9 @@ class ChessState : public State {
       return static_cast<std::size_t>(x);
     }
   };
-  using RepetitionTable = std::unordered_map<uint64_t, int, PassthroughHash>;
+  using RepetitionTable = absl::flat_hash_map<uint64_t, int, PassthroughHash>;
   RepetitionTable repetitions_;
+  mutable std::optional<std::vector<Action>> cached_legal_actions_;
 };
 
 // Game object.
@@ -263,4 +249,4 @@ class ChessGame : public Game {
 }  // namespace chess
 }  // namespace open_spiel
 
-#endif  // THIRD_PARTY_OPEN_SPIEL_GAMES_CHESS_H_
+#endif  // OPEN_SPIEL_GAMES_CHESS_H_

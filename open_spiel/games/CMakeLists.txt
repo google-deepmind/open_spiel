@@ -31,6 +31,8 @@ set(GAME_SOURCES
   cursor_go.h
   deep_sea.cc
   deep_sea.h
+  efg_game.cc
+  efg_game.h
   first_sealed_auction.cc
   first_sealed_auction.h
   gin_rummy.cc
@@ -84,6 +86,8 @@ set(GAME_SOURCES
   tiny_bridge.h
   tiny_hanabi.cc
   tiny_hanabi.h
+  trade_comm.cc
+  trade_comm.h
   y.cc
   y.h
 )
@@ -223,6 +227,10 @@ add_executable(deep_sea_test deep_sea_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(deep_sea_test deep_sea_test)
 
+add_executable(efg_game_test efg_game_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(efg_game_test efg_game_test)
+
 add_executable(first_sealed_auction_test first_sealed_auction_test.cc
                ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
@@ -330,6 +338,10 @@ add_executable(tiny_hanabi_test tiny_hanabi_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>
                $<TARGET_OBJECTS:algorithms>)
 add_test(tiny_hanabi_test tiny_hanabi_test)
+
+add_executable(trade_comm_test trade_comm_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(trade_comm_test trade_comm_test)
 
 if (${BUILD_WITH_ACPC})
   add_executable(universal_poker_test universal_poker_test.cc ${OPEN_SPIEL_OBJECTS}

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for google3.third_party.open_spiel.integration_tests.api."""
+"""Tests for open_spiel.integration_tests.api."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -29,14 +29,9 @@ import numpy as np
 from open_spiel.python.algorithms import get_all_states
 import pyspiel
 
-_MANDATORY_PARAMETERS_GAMES = [
-    "misere",
-    "turn_based_simultaneous_game",
-    "normal_form_extensive_game"
+_GAMES_TO_TEST = [
+    g.short_name for g in pyspiel.registered_games() if g.default_loadable
 ]
-
-_GAMES_TO_TEST = list(
-    set(pyspiel.registered_names()) - set(_MANDATORY_PARAMETERS_GAMES))
 
 # The list of game instances to test on the full tree as tuples
 # (name to display, string to pass to load_game).
@@ -130,7 +125,7 @@ class EnforceAPIOnFullTreeBase(parameterized.TestCase):
                  (self.game_name, player, str(state)))
           self.assertEmpty(state.legal_actions(player), msg=msg)
       elif state.is_simultaneous_node():
-        # TODO(open_spiel) - check simultaneous nodes
+        # No requirement for legal_actions to be empty, since all players act.
         pass
       elif state.is_chance_node():
         # Would be an error to request legal actions for a non-chance player.
@@ -292,7 +287,7 @@ class PartialEnforceAPIConventionsTest(parameterized.TestCase):
                  "legal_actions(%i) for state %s" % (game, player, state))
           self.assertEmpty(state.legal_actions(player), msg=msg)
       elif state.is_simultaneous_node():
-        # TODO(open_spiel) - check simultaneous nodes
+        # No requirement for legal_actions to be empty, since all players act.
         pass
       elif state.is_chance_node():
         # Would be an error to request legal actions for a non-chance player.

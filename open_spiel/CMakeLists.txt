@@ -93,6 +93,8 @@ set (BUILD_TESTING OFF)
 enable_testing()
 
 set (OPEN_SPIEL_CORE_FILES
+  canonical_game_strings.h
+  canonical_game_strings.cc
   game_parameters.h
   game_parameters.cc
   spiel.h
@@ -124,6 +126,7 @@ link_libraries(open_spiel_core
   absl::container
   absl::flags
   absl::flags_parse
+  absl::flat_hash_map
   absl::optional
   absl::random_random
   absl::str_format

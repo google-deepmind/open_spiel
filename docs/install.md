@@ -9,6 +9,7 @@ Currently there are two installation methods:
 2.  using `pip install` to build and testing using
     [nox](https://nox.thea.codes/en/stable/). A pip package to install directly
     does not exist yet.
+3.  installing via [Docker](https://www.docker.com).
 
 ## Summary
 
@@ -42,9 +43,9 @@ In a nutshell:
     ```
     curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
     # Install pip deps as your user. Do not use the system's pip.
-    python3 get-pip.py --user
-    pip3 install --upgrade pip --user
-    pip3 install --upgrade setuptools testresources --user
+    python3 get-pip.py
+    pip3 install --upgrade pip
+    pip3 install --upgrade setuptools testresources
     ```
 
 3.  This sections differs depending on the installation procedure:
@@ -86,7 +87,35 @@ To make sure OpenSpiel works on the default configurations, we do use the
 `python3` command and not `python` (which still defaults to Python 2 on modern
 Linux versions).
 
-## Running the first example
+## Installing via Docker
+
+Option 1 (Basic, 3.13GB):
+
+```bash
+docker build --target base -t openspiel . --rm
+```
+
+Option 2 (Slim, 2.26GB):
+
+```bash
+docker build --target python-slim -t openspiel . --rm
+```
+
+If you are only interested in developing in Python, use the second image. You
+can navigate through the runtime of the container (after the build step) with:
+
+```bash
+docker run -it --entrypoint /bin/bash openspiel
+```
+
+Finally you can run examples using:
+
+```bash
+docker run openspiel python3 python/examples/matrix_game_example.py
+docker run openspiel python3 python/examples/example.py
+```
+
+## Running the first examples
 
 In the `build` directory, running `examples/example` will prints out a list of
 registered games and the usage. Now, let’s play game of Tic-Tac-Toe with uniform
@@ -96,16 +125,29 @@ random players:
 examples/example --game=tic_tac_toe
 ```
 
+Once the proper Python paths are set, from the main directory (one above
+`build`), try these out:
+
+```bash
+# Similar to the C++ example:
+python3 open_spiel/python/examples/example.py --game=breakthrough
+
+# Play a game against a random or MCTS bot:
+python3 open_spiel/python/examples/mcts.py --game=tic_tac_toe --player1=human --player2=random
+python3 open_spiel/python/examples/mcts.py --game=tic_tac_toe --player1=human --player2=mcts
+```
+
 ## Detailed steps
 
 ### Configuration conditional dependencies
 
-See `open_spiel/scripts/global_variables.sh` to configure the conditional
-dependencies. See also the [Developer Guide](developer_guide.md).
+See [open_spiel/scripts/global_variables.sh](https://github.com/deepmind/open_spiel/blob/master/open_spiel/scripts/global_variables.sh) to configure the
+conditional dependencies. See also the [Developer Guide](developer_guide.md).
 
 ### Installing system-wide dependencies
 
-See `install.sh` for the required packages and cloned repositories.
+See [open_spiel/scripts/install.sh](https://github.com/deepmind/open_spiel/blob/master/open_spiel/scripts/install.sh) for the required packages and cloned
+repositories.
 
 ### Installing Python dependencies
 
@@ -133,7 +175,7 @@ pip3 install --upgrade -r requirements.txt
 Make sure that the virtual environment is still activated.
 
 By default, Clang C++ compiler is used (and potentially installed by
-`install.sh`).
+[open_spiel/scripts/install.sh](https://github.com/deepmind/open_spiel/blob/master/open_spiel/scripts/install.sh)).
 
 Build and run tests (Python 3):
 

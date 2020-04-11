@@ -14,10 +14,30 @@
 
 #include "open_spiel/algorithms/deterministic_policy.h"
 
+#include <climits>
+
 #include "open_spiel/algorithms/get_legal_actions_map.h"
 
 namespace open_spiel {
 namespace algorithms {
+
+int64_t NumDeterministicPolicies(const Game& game, Player player) {
+  int64_t num_policies = 1;
+  std::unordered_map<std::string, std::vector<Action>> legal_actions_map =
+      GetLegalActionsMap(game, -1, player);
+  for (const auto& infostate_str_actions : legal_actions_map) {
+    int64_t num_actions = infostate_str_actions.second.size();
+    SPIEL_CHECK_GT(num_actions, 0);
+
+    // Check for integer overflow.
+    if (num_policies > INT64_MAX / num_actions) {
+      return -1;
+    }
+
+    num_policies *= num_actions;
+  }
+  return num_policies;
+}
 
 DeterministicTabularPolicy::DeterministicTabularPolicy(
     const Game& game, Player player,

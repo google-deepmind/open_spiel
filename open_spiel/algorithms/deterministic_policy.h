@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef THIRD_PARTY_OPEN_SPIEL_ALGORITHMS_DETERMINISTIC_POLICY_H_
-#define THIRD_PARTY_OPEN_SPIEL_ALGORITHMS_DETERMINISTIC_POLICY_H_
+#ifndef OPEN_SPIEL_ALGORITHMS_DETERMINISTIC_POLICY_H_
+#define OPEN_SPIEL_ALGORITHMS_DETERMINISTIC_POLICY_H_
 
 #include <algorithm>
 #include <iterator>
@@ -27,6 +27,10 @@
 
 namespace open_spiel {
 namespace algorithms {
+
+// Returns the number of deterministic policies for this player in this game,
+// if the number is less than 2^64-1. Otherwise, returns -1.
+int64_t NumDeterministicPolicies(const Game& game, Player player);
 
 // An simple container object used to store the legal actions (and chosen
 // action) for each information state.
@@ -107,4 +111,4 @@ class DeterministicTabularPolicy : public Policy {
 }  // namespace algorithms
 }  // namespace open_spiel
 
-#endif  // THIRD_PARTY_OPEN_SPIEL_ALGORITHMS_DETERMINISTIC_POLICY_H_
+#endif  // OPEN_SPIEL_ALGORITHMS_DETERMINISTIC_POLICY_H_

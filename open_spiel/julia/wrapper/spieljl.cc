@@ -244,6 +244,10 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod) {
               [](const open_spiel::GameType& gt) { return gt.max_num_players; })
       .method("min_num_players",
               [](const open_spiel::GameType& gt) { return gt.min_num_players; })
+      .method("default_loadable",
+              [](const open_spiel::GameType& gt) {
+                return gt.default_loadable;
+              })
       .method("provides_information_state_string",
               [](const open_spiel::GameType& gt) {
                 return gt.provides_information_state_string;
@@ -536,6 +540,11 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod) {
       .method("evaluate", &open_spiel::algorithms::Evaluator::Evaluate)
       .method("prior", &open_spiel::algorithms::Evaluator::Prior);
 
+  mod.method("random_rollout_evaluator_factory", [](int rollouts, int seed) {
+    return std::shared_ptr<open_spiel::algorithms::Evaluator>(
+        new open_spiel::algorithms::RandomRolloutEvaluator(rollouts, seed));
+  });
+
   mod.add_bits<open_spiel::algorithms::ChildSelectionPolicy>(
       "ChildSelectionPolicy", jlcxx::julia_type("CppEnum"));
   mod.set_const("UCT", open_spiel::algorithms::ChildSelectionPolicy::UCT);
@@ -550,7 +559,7 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod) {
       .method("best_child", &open_spiel::algorithms::SearchNode::BestChild)
       .method("to_string", &open_spiel::algorithms::SearchNode::ToString)
       .method("children_str", &open_spiel::algorithms::SearchNode::ChildrenStr)
-      // TODO: https://github.com/JuliaInterop/CxxWrap.jl/issues/90
+      // TODO(author11): https://github.com/JuliaInterop/CxxWrap.jl/issues/90
       .method("get_action",
               [](open_spiel::algorithms::SearchNode& sn) { return sn.action; })
       .method("get_prior",
@@ -600,7 +609,8 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod) {
 
   mod.add_type<open_spiel::algorithms::MCTSBot>(
          "MCTSBot", jlcxx::julia_base_type<open_spiel::Bot>())
-      .constructor<const open_spiel::Game&, open_spiel::algorithms::Evaluator*,
+      .constructor<const open_spiel::Game&,
+                   std::shared_ptr<open_spiel::algorithms::Evaluator>,
                    double, int, int64_t, bool, int, bool,
                    open_spiel::algorithms::ChildSelectionPolicy, double,
                    double>()

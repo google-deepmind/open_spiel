@@ -38,7 +38,7 @@ constexpr char kDefaultPayoffString[] =
 std::vector<int> ParsePayoffString(const std::string& str) {
   std::vector<std::string> pieces = absl::StrSplit(str, ';');
   std::vector<int> payoff;
-  for (const auto piece : pieces) {
+  for (const auto& piece : pieces) {
     int val;
     if (!absl::SimpleAtoi(piece, &val)) {
       SpielFatalError(absl::StrCat("Could not parse piece '", piece,

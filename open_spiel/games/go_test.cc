@@ -49,6 +49,20 @@ void HandicapTest() {
   SPIEL_CHECK_EQ(state.board().PointColor(MakePoint("q16")), GoColor::kBlack);
 }
 
+void ConcreteActionsAreUsedInTheAPI() {
+  int board_size = 13;
+  std::shared_ptr<const Game> game =
+      LoadGame("go", {{"board_size", open_spiel::GameParameter(board_size)}});
+  std::unique_ptr<State> state = game->NewInitialState();
+
+  SPIEL_CHECK_EQ(state->NumDistinctActions(), board_size * board_size + 1);
+  SPIEL_CHECK_EQ(state->LegalActions().size(), state->NumDistinctActions());
+  for (Action action : state->LegalActions()) {
+    SPIEL_CHECK_GE(action, 0);
+    SPIEL_CHECK_LE(action, board_size * board_size);
+  }
+}
+
 }  // namespace
 }  // namespace go
 }  // namespace open_spiel
@@ -56,4 +70,5 @@ void HandicapTest() {
 int main(int argc, char** argv) {
   open_spiel::go::BasicGoTests();
   open_spiel::go::HandicapTest();
+  open_spiel::go::ConcreteActionsAreUsedInTheAPI();
 }

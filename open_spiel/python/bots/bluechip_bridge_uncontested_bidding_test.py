@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for third_party.open_spiel.python.bots.bluechip_bridge_uncontested_bidding."""
+"""Tests for open_spiel.python.bots.bluechip_bridge_uncontested_bidding."""
 
 from __future__ import absolute_import
 from __future__ import division

@@ -147,11 +147,7 @@ void TestPoliciesCanPlay(PolicyGenerator policy_generator, const Game& game) {
       } else {
         outcomes = policy.GetStatePolicy(state->InformationStateString());
       }
-      Action action =
-          open_spiel::SampleAction(
-              outcomes, std::uniform_real_distribution<double>(0.0, 1.0)(rng))
-              .first;
-      state->ApplyAction(action);
+      state->ApplyAction(open_spiel::SampleAction(outcomes, rng).first);
     }
   }
 }
@@ -167,11 +163,7 @@ void TestPoliciesCanPlay(const Policy& policy, const Game& game) {
       } else {
         outcomes = policy.GetStatePolicy(*state);
       }
-      Action action =
-          open_spiel::SampleAction(
-              outcomes, std::uniform_real_distribution<double>(0.0, 1.0)(rng))
-              .first;
-      state->ApplyAction(action);
+      state->ApplyAction(open_spiel::SampleAction(outcomes, rng).first);
     }
   }
 }

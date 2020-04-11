@@ -13,7 +13,7 @@
 # limitations under the License.
 
 # Lint as python3
-"""Tests for google3.third_party.open_spiel.python.algorithms.playthrough."""
+"""Tests for open_spiel.python.algorithms.playthrough."""
 
 from absl.testing import absltest
 import numpy as np

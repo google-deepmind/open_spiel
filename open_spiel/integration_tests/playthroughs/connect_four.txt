@@ -7,7 +7,7 @@ GameType.long_name = "Connect Four"
 GameType.max_num_players = 2
 GameType.min_num_players = 2
 GameType.parameter_specification = []
-GameType.provides_information_state_string = False
+GameType.provides_information_state_string = True
 GameType.provides_information_state_tensor = False
 GameType.provides_observation_string = True
 GameType.provides_observation_tensor = True
@@ -16,6 +16,7 @@ GameType.short_name = "connect_four"
 GameType.utility = Utility.ZERO_SUM
 
 NumDistinctActions() = 7
+PolicyTensorShape() = [7]
 MaxChanceOutcomes() = 0
 GetParameters() = {}
 NumPlayers() = 2
@@ -23,6 +24,7 @@ MinUtility() = -1.0
 MaxUtility() = 1.0
 UtilitySum() = 0.0
 ObservationTensorShape() = [3, 6, 7]
+ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 126
 MaxGameLength() = 42
 ToString() = "connect_four()"
@@ -40,6 +42,8 @@ HistoryString() = ""
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
+InformationStateString(0) = ""
+InformationStateString(1) = ""
 ObservationString(0) = ".......\n.......\n.......\n.......\n.......\n.......\n"
 ObservationString(1) = ".......\n.......\n.......\n.......\n.......\n.......\n"
 ObservationTensor(0):
@@ -77,6 +81,8 @@ HistoryString() = "0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
+InformationStateString(0) = "0"
+InformationStateString(1) = "0"
 ObservationString(0) = ".......\n.......\n.......\n.......\n.......\nx......\n"
 ObservationString(1) = ".......\n.......\n.......\n.......\n.......\nx......\n"
 ObservationTensor(0):
@@ -114,6 +120,8 @@ HistoryString() = "0 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
+InformationStateString(0) = "0 1"
+InformationStateString(1) = "0 1"
 ObservationString(0) = ".......\n.......\n.......\n.......\n.......\nxo.....\n"
 ObservationString(1) = ".......\n.......\n.......\n.......\n.......\nxo.....\n"
 ObservationTensor(0):
@@ -151,6 +159,8 @@ HistoryString() = "0 1 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
+InformationStateString(0) = "0 1 2"
+InformationStateString(1) = "0 1 2"
 ObservationString(0) = ".......\n.......\n.......\n.......\n.......\nxox....\n"
 ObservationString(1) = ".......\n.......\n.......\n.......\n.......\nxox....\n"
 ObservationTensor(0):
@@ -188,6 +198,8 @@ HistoryString() = "0 1 2 6"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
+InformationStateString(0) = "0 1 2 6"
+InformationStateString(1) = "0 1 2 6"
 ObservationString(0) = ".......\n.......\n.......\n.......\n.......\nxox...o\n"
 ObservationString(1) = ".......\n.......\n.......\n.......\n.......\nxox...o\n"
 ObservationTensor(0):
@@ -225,6 +237,8 @@ HistoryString() = "0 1 2 6 4"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
+InformationStateString(0) = "0 1 2 6 4"
+InformationStateString(1) = "0 1 2 6 4"
 ObservationString(0) = ".......\n.......\n.......\n.......\n.......\nxox.x.o\n"
 ObservationString(1) = ".......\n.......\n.......\n.......\n.......\nxox.x.o\n"
 ObservationTensor(0):
@@ -262,6 +276,8 @@ HistoryString() = "0 1 2 6 4 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
+InformationStateString(0) = "0 1 2 6 4 1"
+InformationStateString(1) = "0 1 2 6 4 1"
 ObservationString(0) = ".......\n.......\n.......\n.......\n.o.....\nxox.x.o\n"
 ObservationString(1) = ".......\n.......\n.......\n.......\n.o.....\nxox.x.o\n"
 ObservationTensor(0):
@@ -299,6 +315,8 @@ HistoryString() = "0 1 2 6 4 1 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
+InformationStateString(0) = "0 1 2 6 4 1 0"
+InformationStateString(1) = "0 1 2 6 4 1 0"
 ObservationString(0) = ".......\n.......\n.......\n.......\nxo.....\nxox.x.o\n"
 ObservationString(1) = ".......\n.......\n.......\n.......\nxo.....\nxox.x.o\n"
 ObservationTensor(0):
@@ -336,6 +354,8 @@ HistoryString() = "0 1 2 6 4 1 0 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
+InformationStateString(0) = "0 1 2 6 4 1 0 2"
+InformationStateString(1) = "0 1 2 6 4 1 0 2"
 ObservationString(0) = ".......\n.......\n.......\n.......\nxoo....\nxox.x.o\n"
 ObservationString(1) = ".......\n.......\n.......\n.......\nxoo....\nxox.x.o\n"
 ObservationTensor(0):
@@ -373,6 +393,8 @@ HistoryString() = "0 1 2 6 4 1 0 2 6"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
+InformationStateString(0) = "0 1 2 6 4 1 0 2 6"
+InformationStateString(1) = "0 1 2 6 4 1 0 2 6"
 ObservationString(0) = ".......\n.......\n.......\n.......\nxoo...x\nxox.x.o\n"
 ObservationString(1) = ".......\n.......\n.......\n.......\nxoo...x\nxox.x.o\n"
 ObservationTensor(0):
@@ -410,6 +432,8 @@ HistoryString() = "0 1 2 6 4 1 0 2 6 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
+InformationStateString(0) = "0 1 2 6 4 1 0 2 6 0"
+InformationStateString(1) = "0 1 2 6 4 1 0 2 6 0"
 ObservationString(0) = ".......\n.......\n.......\no......\nxoo...x\nxox.x.o\n"
 ObservationString(1) = ".......\n.......\n.......\no......\nxoo...x\nxox.x.o\n"
 ObservationTensor(0):
@@ -447,6 +471,8 @@ HistoryString() = "0 1 2 6 4 1 0 2 6 0 5"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
+InformationStateString(0) = "0 1 2 6 4 1 0 2 6 0 5"
+InformationStateString(1) = "0 1 2 6 4 1 0 2 6 0 5"
 ObservationString(0) = ".......\n.......\n.......\no......\nxoo...x\nxox.xxo\n"
 ObservationString(1) = ".......\n.......\n.......\no......\nxoo...x\nxox.xxo\n"
 ObservationTensor(0):
@@ -484,6 +510,8 @@ HistoryString() = "0 1 2 6 4 1 0 2 6 0 5 4"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
+InformationStateString(0) = "0 1 2 6 4 1 0 2 6 0 5 4"
+InformationStateString(1) = "0 1 2 6 4 1 0 2 6 0 5 4"
 ObservationString(0) = ".......\n.......\n.......\no......\nxoo.o.x\nxox.xxo\n"
 ObservationString(1) = ".......\n.......\n.......\no......\nxoo.o.x\nxox.xxo\n"
 ObservationTensor(0):
@@ -521,6 +549,8 @@ HistoryString() = "0 1 2 6 4 1 0 2 6 0 5 4 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
+InformationStateString(0) = "0 1 2 6 4 1 0 2 6 0 5 4 0"
+InformationStateString(1) = "0 1 2 6 4 1 0 2 6 0 5 4 0"
 ObservationString(0) = ".......\n.......\nx......\no......\nxoo.o.x\nxox.xxo\n"
 ObservationString(1) = ".......\n.......\nx......\no......\nxoo.o.x\nxox.xxo\n"
 ObservationTensor(0):
@@ -558,6 +588,8 @@ HistoryString() = "0 1 2 6 4 1 0 2 6 0 5 4 0 6"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
+InformationStateString(0) = "0 1 2 6 4 1 0 2 6 0 5 4 0 6"
+InformationStateString(1) = "0 1 2 6 4 1 0 2 6 0 5 4 0 6"
 ObservationString(0) = ".......\n.......\nx......\no.....o\nxoo.o.x\nxox.xxo\n"
 ObservationString(1) = ".......\n.......\nx......\no.....o\nxoo.o.x\nxox.xxo\n"
 ObservationTensor(0):
@@ -595,6 +627,8 @@ HistoryString() = "0 1 2 6 4 1 0 2 6 0 5 4 0 6 5"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
+InformationStateString(0) = "0 1 2 6 4 1 0 2 6 0 5 4 0 6 5"
+InformationStateString(1) = "0 1 2 6 4 1 0 2 6 0 5 4 0 6 5"
 ObservationString(0) = ".......\n.......\nx......\no.....o\nxoo.oxx\nxox.xxo\n"
 ObservationString(1) = ".......\n.......\nx......\no.....o\nxoo.oxx\nxox.xxo\n"
 ObservationTensor(0):
@@ -632,6 +666,8 @@ HistoryString() = "0 1 2 6 4 1 0 2 6 0 5 4 0 6 5 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
+InformationStateString(0) = "0 1 2 6 4 1 0 2 6 0 5 4 0 6 5 0"
+InformationStateString(1) = "0 1 2 6 4 1 0 2 6 0 5 4 0 6 5 0"
 ObservationString(0) = ".......\no......\nx......\no.....o\nxoo.oxx\nxox.xxo\n"
 ObservationString(1) = ".......\no......\nx......\no.....o\nxoo.oxx\nxox.xxo\n"
 ObservationTensor(0):
@@ -669,6 +705,8 @@ HistoryString() = "0 1 2 6 4 1 0 2 6 0 5 4 0 6 5 0 3"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
+InformationStateString(0) = "0 1 2 6 4 1 0 2 6 0 5 4 0 6 5 0 3"
+InformationStateString(1) = "0 1 2 6 4 1 0 2 6 0 5 4 0 6 5 0 3"
 ObservationString(0) = ".......\no......\nx......\no.....o\nxoo.oxx\nxoxxxxo\n"
 ObservationString(1) = ".......\no......\nx......\no.....o\nxoo.oxx\nxoxxxxo\n"
 ObservationTensor(0):

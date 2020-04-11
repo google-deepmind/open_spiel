@@ -15,11 +15,6 @@
 # Lint as: python3
 """Provides tools to evaluate bots against specific scenarios."""
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import google_type_annotations
-from __future__ import print_function
-
 from typing import Text, List
 from absl import logging
 import dataclasses

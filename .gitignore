@@ -34,7 +34,11 @@ get-pip.py
 open_spiel/scripts/shflags
 open_spiel/scripts/jill.sh
 
+# julia wrapper
+Manifest.toml
+
 # IDE
 .idea/
+.vscode/
 
 open_spiel/cmake-build-debug/

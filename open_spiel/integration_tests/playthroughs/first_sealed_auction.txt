@@ -16,6 +16,7 @@ GameType.short_name = "first_sealed_auction"
 GameType.utility = Utility.GENERAL_SUM
 
 NumDistinctActions() = 10
+PolicyTensorShape() = [10]
 MaxChanceOutcomes() = 10
 GetParameters() = {max_value=10,players=2}
 NumPlayers() = 2
@@ -23,8 +24,10 @@ MinUtility() = 0.0
 MaxUtility() = 10.0
 UtilitySum() = None
 InformationStateTensorShape() = [22]
+InformationStateTensorLayout() = TensorLayout.CHW
 InformationStateTensorSize() = 22
 ObservationTensorShape() = [10]
+ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 10
 MaxGameLength() = 2
 ToString() = "first_sealed_auction()"

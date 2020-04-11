@@ -18,6 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import os
 import pickle
 from absl.testing import absltest
 from absl.testing import parameterized
@@ -32,16 +33,9 @@ MAX_ACTIONS_PER_GAME = 1000
 # All games registered in the main spiel library.
 SPIEL_GAMES_LIST = pyspiel.registered_games()
 
+# All games loadable without parameter values.
+SPIEL_LOADABLE_GAMES_LIST = [g for g in SPIEL_GAMES_LIST if g.default_loadable]
 
-# Check for mandatory parameters.
-def _has_mandatory_params(game):
-  return any(p.is_mandatory() for p in game.parameter_specification.values())
-
-
-# All games without mandatory parameters.
-SPIEL_LOADABLE_GAMES_LIST = [
-    g for g in SPIEL_GAMES_LIST if not _has_mandatory_params(g)
-]
 # TODO(b/141950198): Stop hard-coding the number of loadable games.
 assert len(SPIEL_LOADABLE_GAMES_LIST) >= 38, len(SPIEL_LOADABLE_GAMES_LIST)
 
@@ -68,6 +62,17 @@ assert len(SPIEL_MULTIPLAYER_GAMES_LIST) >= 35, len(
     SPIEL_MULTIPLAYER_GAMES_LIST)
 
 
+def find_file(filename, levels):
+  if os.path.isfile(filename):
+    return filename
+  else:
+    for _ in range(levels):
+      filename = "../" + filename
+      if os.path.isfile(filename):
+        return filename
+  return None
+
+
 class GamesSimTest(parameterized.TestCase):
 
   def apply_action(self, state, action):
@@ -91,27 +96,33 @@ class GamesSimTest(parameterized.TestCase):
     self.assertEqual(str(state), str(state_clone))
     self.assertEqual(state.history(), state_clone.history())
 
-  def serialize_deserialize(self, game, state, check_pyspiel_serialization):
+  def serialize_deserialize(self, game, state, check_pyspiel_serialization,
+                            check_pickle_serialization):
     # OpenSpiel native serialization
     if check_pyspiel_serialization:
       ser_str = pyspiel.serialize_game_and_state(game, state)
       new_game, new_state = pyspiel.deserialize_game_and_state(ser_str)
       self.assertEqual(str(game), str(new_game))
       self.assertEqual(str(state), str(new_state))
-    # Pickle serialization + deserialization (of the state).
-    pickled_state = pickle.dumps(state)
-    unpickled_state = pickle.loads(pickled_state)
-    self.assertEqual(str(state), str(unpickled_state))
+    if check_pickle_serialization:
+      # Pickle serialization + deserialization (of the state).
+      pickled_state = pickle.dumps(state)
+      unpickled_state = pickle.loads(pickled_state)
+      self.assertEqual(str(state), str(unpickled_state))
 
-  def sim_game(self, game, check_pyspiel_serialization=True):
+  def sim_game(self,
+               game,
+               check_pyspiel_serialization=True,
+               check_pickle_serialization=True):
     min_utility = game.min_utility()
     max_utility = game.max_utility()
     self.assertLess(min_utility, max_utility)
 
-    # Pickle serialization + deserialization (of the game).
-    pickled_game = pickle.dumps(game)
-    unpickled_game = pickle.loads(pickled_game)
-    self.assertEqual(str(game), str(unpickled_game))
+    if check_pickle_serialization:
+      # Pickle serialization + deserialization (of the game).
+      pickled_game = pickle.dumps(game)
+      unpickled_game = pickle.loads(pickled_game)
+      self.assertEqual(str(game), str(unpickled_game))
 
     # Get a new state
     state = game.new_initial_state()
@@ -124,7 +135,8 @@ class GamesSimTest(parameterized.TestCase):
 
       # Serialize/Deserialize is costly. Only do it every power of 2 actions.
       if total_actions >= next_serialize_check:
-        self.serialize_deserialize(game, state, check_pyspiel_serialization)
+        self.serialize_deserialize(game, state, check_pyspiel_serialization,
+                                   check_pickle_serialization)
         next_serialize_check *= 2
 
       # The state can be three different types: chance node,
@@ -207,7 +219,37 @@ class GamesSimTest(parameterized.TestCase):
     for _ in range(0, 100):
       # cannot use pyspiel's serialization since the python-only games don't
       # implement them
-      self.sim_game(game, False)
+      self.sim_game(
+          game,
+          check_pyspiel_serialization=False,
+          check_pickle_serialization=True)
+
+  def test_efg_game(self):
+    game = pyspiel.load_efg_game(pyspiel.get_sample_efg_data())
+    # EFG games loaded directly by string cannot serialize because the game's
+    # data cannot be passed in via string parameter.
+    for _ in range(0, 100):
+      self.sim_game(
+          game,
+          check_pyspiel_serialization=False,
+          check_pickle_serialization=False)
+    game = pyspiel.load_efg_game(pyspiel.get_kuhn_poker_efg_data())
+    for _ in range(0, 100):
+      self.sim_game(
+          game,
+          check_pyspiel_serialization=False,
+          check_pickle_serialization=False)
+    # EFG games loaded by file should serialize properly:
+    filename = find_file("open_spiel/games/efg/sample.efg", 2)
+    if filename is not None:
+      game = pyspiel.load_game("efg_game(filename=" + filename + ")")
+      for _ in range(0, 100):
+        self.sim_game(game)
+    filename = find_file("open_spiel/games/efg/sample.efg", 2)
+    if filename is not None:
+      game = pyspiel.load_game("efg_game(filename=" + filename + ")")
+      for _ in range(0, 100):
+        self.sim_game(game)
 
 
 if __name__ == "__main__":

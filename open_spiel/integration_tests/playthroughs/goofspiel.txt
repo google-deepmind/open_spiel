@@ -16,6 +16,7 @@ GameType.short_name = "goofspiel"
 GameType.utility = Utility.ZERO_SUM
 
 NumDistinctActions() = 4
+PolicyTensorShape() = [4]
 MaxChanceOutcomes() = 0
 GetParameters() = {imp_info=True,num_cards=4,players=2,points_order=descending}
 NumPlayers() = 2
@@ -23,8 +24,10 @@ MinUtility() = -1.0
 MaxUtility() = 1.0
 UtilitySum() = 0.0
 InformationStateTensorShape() = [66]
+InformationStateTensorLayout() = TensorLayout.CHW
 InformationStateTensorSize() = 66
 ObservationTensorShape() = [38]
+ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 38
 MaxGameLength() = 4
 ToString() = "goofspiel(imp_info=True,num_cards=4,points_order=descending)"

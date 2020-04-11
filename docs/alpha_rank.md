@@ -8,7 +8,7 @@ well as Heuristic Payoff Tables (HPTs).
 
 The following presents several typical use cases for Alpha-Rank. For an example
 complete python script, refer to
-`./open_spiel/python/egt/examples/alpharank_example.py`.
+[open_spiel/python/egt/examples/alpharank_example.py](https://github.com/deepmind/open_spiel/blob/master/open_spiel/python/egt/examples/alpharank_example.py).
 
 ## Importing the Alpha-Rank module
 

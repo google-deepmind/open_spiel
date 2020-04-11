@@ -16,6 +16,7 @@ GameType.short_name = "bridge_uncontested_bidding"
 GameType.utility = Utility.IDENTICAL
 
 NumDistinctActions() = 36
+PolicyTensorShape() = [36]
 MaxChanceOutcomes() = 0
 GetParameters() = {relative_scoring=True,rng_seed=0,subgame=}
 NumPlayers() = 2
@@ -23,6 +24,7 @@ MinUtility() = -2170.0
 MaxUtility() = 0.0
 UtilitySum() = None
 InformationStateTensorShape() = [126]
+InformationStateTensorLayout() = TensorLayout.CHW
 InformationStateTensorSize() = 126
 MaxGameLength() = 36
 ToString() = "bridge_uncontested_bidding(relative_scoring=True)"

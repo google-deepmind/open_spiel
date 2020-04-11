@@ -8,9 +8,9 @@
     @testset "can play tic_tac_toe" begin
         game = load_game("tic_tac_toe")
         max_simulations = 100
-        evaluator = RandomRolloutEvaluator(20, 42)
-        bot0 = init_bot(game, max_simulations, CxxPtr(evaluator))
-        bot1 = init_bot(game, max_simulations, CxxPtr(evaluator))
+        evaluator = random_rollout_evaluator_factory(20, 42)
+        bot0 = init_bot(game, max_simulations, evaluator)
+        bot1 = init_bot(game, max_simulations, evaluator)
         results = evaluate_bots(new_initial_state(game), [bot0, bot1], 42)
         @test results[1] + results[2] == 0
     end
@@ -18,8 +18,8 @@
     @testset "can play single player" begin
         game = load_game("catch")
         max_simulations = 100
-        evaluator = RandomRolloutEvaluator(20, 42)
-        bot = init_bot(game, max_simulations, CxxPtr(evaluator))
+        evaluator = random_rollout_evaluator_factory(20, 42)
+        bot = init_bot(game, max_simulations, evaluator)
         results = evaluate_bots(new_initial_state(game), [bot], 42)
         @test results[] > 0
     end
@@ -27,10 +27,10 @@
     @testset "play three player stochastic games" begin
         game = load_game("pig(players=3,winscore=20,horizon=30)")
         max_simulations = 1000
-        evaluator = RandomRolloutEvaluator(20, 42)
-        bot0 = init_bot(game, max_simulations, CxxPtr(evaluator))
-        bot1 = init_bot(game, max_simulations, CxxPtr(evaluator))
-        bot2 = init_bot(game, max_simulations, CxxPtr(evaluator))
+        evaluator = random_rollout_evaluator_factory(20, 42)
+        bot0 = init_bot(game, max_simulations, evaluator)
+        bot1 = init_bot(game, max_simulations, evaluator)
+        bot2 = init_bot(game, max_simulations, evaluator)
         results = evaluate_bots(new_initial_state(game), [bot0, bot1, bot2], 42)
         @test sum(results) == 0
     end
@@ -50,8 +50,8 @@
         for action_str in split(initial_actions, " ")
             apply_action(state, get_action_by_str(state, action_str))
         end
-        evaluator = RandomRolloutEvaluator(20, 42)
-        bot = MCTSBot(game, CxxPtr(evaluator), UCT_C, 10000, 10, true, 42, false, UCT, 0., 0.)
+        evaluator = random_rollout_evaluator_factory(20, 42)
+        bot = MCTSBot(game, evaluator, UCT_C, 10000, 10, true, 42, false, UCT, 0., 0.)
         mcts_search(bot, state), state
     end
 

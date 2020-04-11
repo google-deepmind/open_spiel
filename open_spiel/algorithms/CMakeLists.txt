@@ -19,6 +19,8 @@ add_library (algorithms OBJECT
   get_legal_actions_map.cc
   history_tree.h
   history_tree.cc
+  is_mcts.h
+  is_mcts.cc
   matrix_game_utils.h
   matrix_game_utils.cc
   mcts.h
@@ -76,6 +78,10 @@ add_executable(history_tree_test history_tree_test.cc
         $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})
 add_test(history_tree_test history_tree_test)
 
+add_executable(is_mcts_test is_mcts_test.cc
+        $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})
+add_test(is_mcts_test is_mcts_test)
+
 add_executable(matrix_game_utils_test matrix_game_utils_test.cc
     $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})
 add_test(matrix_game_utils_test matrix_game_utils_test)
@@ -103,3 +109,5 @@ add_test(tensor_game_utils_test tensor_game_utils_test)
 add_executable(trajectories_test trajectories_test.cc
     $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})
 add_test(trajectories_test trajectories_test)
+
+add_subdirectory (alpha_zero)

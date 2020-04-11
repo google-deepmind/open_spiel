@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for google3.third_party.open_spiel.python.egt.dynamics."""
+"""Tests for open_spiel.python.egt.dynamics."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -82,13 +82,11 @@ class DynamicsTest(parameterized.TestCase):
         dynamics.boltzmannq(x, payoff, temperature),
         _q_learning_dynamics(x, payoff, temperature))
 
-  def test_rd_rps_fixed_points(self):
+  def test_rd_rps_pure_fixed_points(self):
     game = pyspiel.load_matrix_game('matrix_rps')
     payoff_matrix = game_payoffs_array(game)
     rd = dynamics.replicator
     dyn = dynamics.SinglePopulationDynamics(payoff_matrix, rd)
-
-    # pure equilibria
     x = np.eye(3)
     np.testing.assert_allclose(dyn(x[0]), np.zeros((3,)))
     np.testing.assert_allclose(dyn(x[1]), np.zeros((3,)))

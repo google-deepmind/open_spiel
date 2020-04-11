@@ -161,6 +161,7 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None):
 
   add_line("")
   add_line("NumDistinctActions() = {}".format(game.num_distinct_actions()))
+  add_line("PolicyTensorShape() = {}".format(game.policy_tensor_shape()))
   add_line("MaxChanceOutcomes() = {}".format(game.max_chance_outcomes()))
   add_line("GetParameters() = {{{}}}".format(",".join(
       "{}={}".format(key, _escape(str(value)))
@@ -175,12 +176,16 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None):
   add_line("UtilitySum() = {}".format(utility_sum))
   if game_type.provides_information_state_tensor:
     add_line("InformationStateTensorShape() = {}".format(
-        [int(x) for x in game.information_state_tensor_shape()]))
+        game.information_state_tensor_shape()))
+    add_line("InformationStateTensorLayout() = {}".format(
+        game.information_state_tensor_layout()))
     add_line("InformationStateTensorSize() = {}".format(
         game.information_state_tensor_size()))
   if game_type.provides_observation_tensor:
     add_line("ObservationTensorShape() = {}".format(
-        [int(x) for x in game.observation_tensor_shape()]))
+        game.observation_tensor_shape()))
+    add_line("ObservationTensorLayout() = {}".format(
+        game.observation_tensor_layout()))
     add_line("ObservationTensorSize() = {}".format(
         game.observation_tensor_size()))
   add_line("MaxGameLength() = {}".format(game.max_game_length()))
