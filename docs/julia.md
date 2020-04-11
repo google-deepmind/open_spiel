@@ -6,17 +6,14 @@ arguments for convenience). See `spiel.h` for the full API description.
 
 ## Install
 
-Currently this package is not registered. The reason is that we rely on some new
-features introduced in [CxxWrap.jl](https://github.com/JuliaInterop/CxxWrap.jl),
-which is not released yet. Once CxxWrap.jl@v0.9.0 is released, we'll register
-this package and then you can simply install this package by `] add OpenSpiel`
-in the Julia REPL. For now, you need to follow the instructions bellow to
+For general usage, you can install this package in the Julia REPL with
+`] add OpenSpiel`. For developers, you need to follow the instructions bellow to
 install this package:
 
-1.  Install Julia and dependencies Edit `open_spiel/scripts/global_variables.sh`
+1.  Install Julia and dependencies. Edit `open_spiel/scripts/global_variables.sh`
     and set `BUILD_WITH_JULIA=ON`. Then run `./install.sh`. If you already have
     Julia installed on your system, make sure that it is visible in your
-    terminal and its version is v1.1 or later. Otherwise, Julia v1.3 will be
+    terminal and its version is v1.1 or later. Otherwise, Julia v1.3.1 will be
     automatically installed in your home dir and a soft link will be created at
     `/usr/local/bin/julia`.
 
@@ -26,14 +23,14 @@ install this package:
     ./open_spiel/scripts/build_and_run_tests.sh
     ```
 
-1.  Install `julia ] dev ./open_spiel/julia # run in Julia REPL`
+1.  Install `] dev ./open_spiel/julia` (run in Julia REPL).
 
 ## Example
 
 Here we demonstrate how to use the Julia API to play one game:
 
 ```julia
-using OpenSpiel_jll
+using OpenSpiel
 
 # Here we need the StatsBase package for weighted sampling
 using Pkg
@@ -76,17 +73,6 @@ run_once("goofspiel(imp_info=True,num_cards=4,points_order=descending)")
 ```
 
 ## Q&A
-
-1.  Why is this package named `OpenSpiel_jll` but not `OpenSpiel`?
-
-    This package is a low-level wrapper for the OpenSpiel C++ codebase, designed
-    to use the
-    [BinaryBuilder](https://github.com/JuliaPackaging/BinaryBuilder.jl)
-    infrastructure for building and distributing binary dependencies for Julia
-    packages. Following the Julia community convention, that makes it a "JLL".
-    Another package named `OpenSpiel` will be registered later, with a
-    dependency on `OpenSpiel_jll` and containing pure-Julia games and
-    algorithms.
 
 1.  What is `StdVector`?
 
