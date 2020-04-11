@@ -4,8 +4,6 @@ include("$(@__DIR__)/../deps/deps.jl")
 
 using CxxWrap
 import CxxWrap:argument_overloads
-import Base:show, length, getindex, setindex!, keys, values, copy, deepcopy, first, last, step, getfield, setfield!
-
 
 @wrapmodule(LIB_OPEN_SPIEL)
 
