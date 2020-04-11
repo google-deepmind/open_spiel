@@ -7,15 +7,16 @@ arguments for convenience). See `spiel.h` for the full API description.
 ## Install
 
 For general usage, you can install this package in the Julia REPL with
-`] add OpenSpiel`. For developers, you need to follow the instructions bellow to
-install this package:
+`] add OpenSpiel`. Note that this method only supports the Linux platform and
+ACPC is not included. For developers, you need to follow the instructions bellow
+to install this package:
 
 1.  Install Julia and dependencies. Edit `open_spiel/scripts/global_variables.sh`
-    and set `BUILD_WITH_JULIA=ON`. Then run `./install.sh`. If you already have
-    Julia installed on your system, make sure that it is visible in your
-    terminal and its version is v1.3 or later. Otherwise, Julia v1.3.1 will be
-    automatically installed in your home dir and a soft link will be created at
-    `/usr/local/bin/julia`.
+    and set `BUILD_WITH_JULIA=ON` (you may also turn on other options as you
+    wish). Then run `./install.sh`. If you already have Julia installed on your
+    system, make sure that it is visible in your terminal and its version is
+    v1.3 or later. Otherwise, Julia v1.3.1 will be automatically installed in
+    your home dir and a soft link will be created at `/usr/local/bin/julia`.
 
 1.  Build and run tests
 
