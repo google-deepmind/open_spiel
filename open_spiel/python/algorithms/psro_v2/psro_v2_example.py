@@ -122,6 +122,7 @@ flags.DEFINE_integer("learn_every", 10, "Learn every [X] steps.")
 flags.DEFINE_integer("seed", 1, "Seed.")
 flags.DEFINE_bool("local_launch", False, "Launch locally or not.")
 flags.DEFINE_bool("verbose", True, "Enables verbose printing and profiling.")
+flgas.DEFINE_bool("log_train",False,"log training reward curve")
 
 #ARS
 flags.DEFINE_float("ars_learning_rate", 0.02, "ARS learning rate.")
@@ -344,11 +345,15 @@ def gpsro_looper(env, oracle, agents, writer, quiesce=False, checkpoint_dir=None
     exploitabilities, expl_per_player = exploitability.nash_conv(
         env.game, aggr_policies, return_only_nash_conv=False)
 
-    _ = print_policy_analysis(policies, env.game, FLAGS.verbose)
+    unique_policies = print_policy_analysis(policies, env.game, FLAGS.verbose)
 
-    for p in range(len(train_reward_curve)):
-      for p_i in range(len(train_reward_curve[p])):
-        writer.add_scalar('player'+str(p)+'_'+str(gpsro_iteration),train_reward_curve[p][p_i],p_i)
+    for p, cur_set in enumerate(unique_policies):
+      writer.add_scalar('p'+str(player)+'unique_p',len(cur_set),gpsro_iteration)
+
+    if FLAGS.log_train and (gpsro_iteration<=10 or gpsro_iteration%5==0):
+      for p in range(len(train_reward_curve)):
+        for p_i in range(len(train_reward_curve[p])):
+          writer.add_scalar('player'+str(p)+'_'+str(gpsro_iteration),train_reward_curve[p][p_i],p_i)
     for p in range(len(expl_per_player)):
       writer.add_scalar('player'+str(p)+'_exp',expl_per_player[p],gpsro_iteration)
     writer.add_scalar('exp',exploitabilities,gpsro_iteration)
@@ -371,7 +376,7 @@ def main(argv):
     os.makedirs(FLAGS.root_result_folder)
   checkpoint_dir = os.path.join(os.getcwd(),
                                 FLAGS.root_result_folder,
-                                FLAGS.game_name+'_'+FLAGS.oracle_type+'_sims_'+str(FLAGS.sims_per_entry)+'_it'+str(FLAGS.gpsro_iterations)+'_ep'+str(FLAGS.number_training_episodes)+'_hl_'+str(FLAGS.hidden_layer_size)+'_bs_'+str(FLAGS.batch_size)+'_nhl_'+str(FLAGS.n_hidden_layers)+'_arslr_'+str(FLAGS.ars_learning_rate)+'_ars_n_'+str(FLAGS.noise)+'_'+datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
+                                FLAGS.game_name+'_'+'_or_'+FLAGS.oracle_type+'_sims_'+str(FLAGS.sims_per_entry)+'_it_'+str(FLAGS.gpsro_iterations)+'_ep_'+str(FLAGS.number_training_episodes)+'_hl_'+str(FLAGS.hidden_layer_size)+'_bs_'+str(FLAGS.batch_size)+'_nhl_'+str(FLAGS.n_hidden_layers)+'_arslr_'+str(FLAGS.ars_learning_rate)+'_arsn_'+str(FLAGS.noise)+'_'+datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
   writer = SummaryWriter(logdir=checkpoint_dir+'/log')
   if FLAGS.sbatch_run:
     sys.stdout = open(checkpoint_dir+'/stdout.txt','w+')
