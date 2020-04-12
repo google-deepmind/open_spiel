@@ -350,8 +350,10 @@ class PSROSolver(abstract_meta_trainer.AbstractMetaTrainer):
     # List of List of new policies (One list per player)
     # collect training performance to plot if RL oracle
     if self._train_loggable_oracle:
+      # rl oracle return reward trace together with approximate best response policies
       self.oracle,reward_trace = self._oracle(self._game, training_parameters, strategy_sampler=sample_strategy, using_joint_strategies=self._rectify_training or not self.sample_from_marginals)
     else:
+      # best response oracle does not return reward_trace
       self.oracle = self._oracle(self._game, training_parameters, strategy_sampler=sample_strategy, using_joint_strategies=self._rectify_training or not self.sample_from_marginals)
 
     self._new_policies = self.oracle

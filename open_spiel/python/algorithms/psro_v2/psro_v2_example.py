@@ -31,6 +31,8 @@ import sys
 from absl import app
 from absl import flags
 import numpy as np
+import pickle
+import atexit
 import pyspiel
 import tensorflow.compat.v1 as tf
 from tensorboardX import SummaryWriter
@@ -65,7 +67,7 @@ flags.DEFINE_string("meta_strategy_method", "general_nash",
                     "Name of meta strategy computation method.")
 flags.DEFINE_integer("number_policies_selected", 1,
                      "Number of new strategies trained at each PSRO iteration.")
-flags.DEFINE_integer("sims_per_entry", 50,
+flags.DEFINE_integer("sims_per_entry", 1000,
                      ("Number of simulations to run to estimate each element"
                       "of the game outcome matrix."))
 
@@ -92,16 +94,16 @@ flags.DEFINE_string("training_strategy_selector", "probabilistic",
                     "probability strategy available to each player.")
 
 # General (RL) agent parameters
-flags.DEFINE_string("oracle_type", "ARS", "Choices are DQN, PG (Policy "
+flags.DEFINE_string("oracle_type", "DQN", "Choices are DQN, PG (Policy "
                     "Gradient), BR (exact Best Response) or ARS(Augmented Random Search)")
-flags.DEFINE_integer("number_training_episodes", int(1e3), "Number training "
+flags.DEFINE_integer("number_training_episodes", int(1e4), "Number training "
                      "episodes per RL policy. Used for PG and DQN")
 flags.DEFINE_float("self_play_proportion", 0.0, "Self play proportion")
-flags.DEFINE_integer("hidden_layer_size", 128, "Hidden layer size")
+flags.DEFINE_integer("hidden_layer_size", 256, "Hidden layer size")
 flags.DEFINE_integer("batch_size", 32, "Batch size")
 flags.DEFINE_float("sigma", 0.0, "Policy copy noise (Gaussian Dropout term).")
 flags.DEFINE_string("optimizer_str", "adam", "'adam' or 'sgd'")
-flags.DEFINE_integer("n_hidden_layers", 2, "# of hidden layers")
+flags.DEFINE_integer("n_hidden_layers", 4, "# of hidden layers")
 
 # Policy Gradient Oracle related
 flags.DEFINE_string("loss_str", "qpg", "Name of loss used for BR training.")
@@ -290,6 +292,9 @@ def print_policy_analysis(policies, game, verbose=False):
   print("")
   return unique_policies
 
+def save_at_termination(solver, file_for_meta_game):
+    with open(file_for_meta_game,'wb') as f:
+        pickle.dump(solver.get_meta_game(), f)
 
 def gpsro_looper(env, oracle, agents, writer, quiesce=False, checkpoint_dir=None):
   """Initializes and executes the GPSRO training loop."""
@@ -317,6 +322,7 @@ def gpsro_looper(env, oracle, agents, writer, quiesce=False, checkpoint_dir=None
       symmetric_game=FLAGS.symmetric_game,
       checkpoint_dir=checkpoint_dir)
 
+  atexit.register(save_at_termination, solver=g_psro_solver, file_for_meta_game=checkpoint_dir+'/meta_game.pkl')
   start_time = time.time()
   for gpsro_iteration in range(FLAGS.gpsro_iterations):
     if FLAGS.verbose:
@@ -326,7 +332,7 @@ def gpsro_looper(env, oracle, agents, writer, quiesce=False, checkpoint_dir=None
     meta_game = g_psro_solver.get_meta_game()
     meta_probabilities = g_psro_solver.get_meta_strategies()
     policies = g_psro_solver.get_policies()
-
+    
     if FLAGS.verbose:
       print("Meta game : {}".format(meta_game))
       print("Probabilities : {}".format(meta_probabilities))
@@ -365,7 +371,7 @@ def main(argv):
     os.makedirs(FLAGS.root_result_folder)
   checkpoint_dir = os.path.join(os.getcwd(),
                                 FLAGS.root_result_folder,
-                                FLAGS.game_name+'_'+FLAGS.oracle_type+'_sims_'+str(FLAGS.sims_per_entry)+'_it'+str(FLAGS.gpsro_iterations)+'_ep'+str(FLAGS.number_training_episodes)+'_'+datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
+                                FLAGS.game_name+'_'+FLAGS.oracle_type+'_sims_'+str(FLAGS.sims_per_entry)+'_it'+str(FLAGS.gpsro_iterations)+'_ep'+str(FLAGS.number_training_episodes)+'_hl_'+str(FLAGS.hidden_layer_size)+'_bs_'+str(FLAGS.batch_size)+'_nhl_'+str(FLAGS.n_hidden_layers)+'_arslr_'+str(FLAGS.ars_learning_rate)+'_ars_n_'+str(FLAGS.noise)+'_'+datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
   writer = SummaryWriter(logdir=checkpoint_dir+'/log')
   if FLAGS.sbatch_run:
     sys.stdout = open(checkpoint_dir+'/stdout.txt','w+')

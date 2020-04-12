@@ -65,15 +65,21 @@ ORIGIN = os.path.dirname(os.path.realpath(__file__)) + '/base_slurm.sh'
 MODULE1 = "module load python3.6-anaconda/5.2.0"
 MODULE2 = "cd $(dirname $(dirname '${SLURM_SUBMIT_DIR}'))"
 OUTPUT = "#SBATCH --output="
-COMMAND = "python psro_v2_example.py --oracle_type=BR --quiesce=False --gpsro_iterations=150 --number_training_episodes=100000 --sbatch_run=True"
+COMMAND = "python ../psro_v2_example.py --oracle_type=ARS --quiesce=False --gpsro_iterations=150 --number_training_episodes=100000 --sbatch_run=True"
 
 def bash_factory(dir_name='scripts', num_files=10, grid_search_flag=True):
     bash_path = os.path.dirname(os.path.realpath(__file__)) + '/' + dir_name + '/'
-    mkdir(bash_path)
+    if os.path.exists(bash_path):
+        shutil.rmtree(bash_path, ignore_errors=True)
+    else:
+        mkdir(bash_path)
     output_path = os.path.dirname(os.path.realpath(__file__)) + '/' + dir_name + '_output' + '/'
-    mkdir(output_path)
-    param_dict = {'ars_learning_rate': list(np.round(np.arange(0.01, 0.1, 0.01), decimals=2)),
-                  'noise': list(np.round(np.arange(0.01, 0.1, 0.01), decimals=2))}
+    if os.path.exists(output_path):
+        shutil.rmtree(output_path, ignore_errors=True)
+    else:
+        mkdir(output_path)
+    param_dict = {'ars_learning_rate': [0.01,0.03,0.07,0.1,0.3,0.5],
+                  'noise': [0.01,0.03,0.07,0.1,0.3,0.5]}
     if grid_search_flag:
         params = grid_search(param_dict)
     else:
@@ -95,5 +101,4 @@ def bash_factory(dir_name='scripts', num_files=10, grid_search_flag=True):
             write_line(file, new_command)
 
 bash_factory()
-
 
