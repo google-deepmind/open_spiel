@@ -1,0 +1,18 @@
+EFG 2 R "Signaling game from Fig 1 of von Stengel and Forges 2008" { "Player 1" "Player 2" } "See Fig 1 of Extensive-Form Correlated Equilibrium:
+Definition and Computational Complexity"
+
+c "ROOT" 1 "c1" { "g" 1/2 "b" 1/2 } 0
+  p "G" 1 1 "G" { "X_G" "Y_G" } 0
+    p "G X_G" 2 1 "X" { "l_X" "r_X" } 0
+      t "G X_G l_X" 1 "Outcome G X_G l_X" { 4.0 10.0 }
+      t "G X_G r_X" 2 "Outcome G X_G r_X" { 0.0 6.0 }
+    p "G Y_G" 2 2 "Y" { "l_Y" "r_Y" } 0
+      t "G Y_G l_Y" 3 "Outcome G Y_G l_Y" { 4.0 10.0 }
+      t "G Y_G r_Y" 4 "Outcome G Y_G r_Y" { 0.0 6.0 }
+  p "B" 1 2 "B" { "X_B" "Y_B" } 0
+    p "B X_B" 2 1 "X" { "l_X" "r_X" } 0
+      t "B X_B l_X" 5 "Outcome B X_B l_X" { 6.0 0.0 }
+      t "B X_B r_X" 6 "Outcome B X_B r_X" { 0.0 6.0 }
+    p "B Y_B" 2 2 "Y" { "l_Y" "r_Y" } 0
+      t "B Y_B l_Y" 7 "Outcome B Y_B l_Y" { 6.0 0.0 }
+      t "B Y_B r_Y" 8 "Outcome B Y_B r_Y" { 0.0 6.0 }

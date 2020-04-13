@@ -33,6 +33,8 @@ set(GAME_SOURCES
   deep_sea.h
   efg_game.cc
   efg_game.h
+  efg_game_data.cc
+  efg_game_data.h
   first_sealed_auction.cc
   first_sealed_auction.h
   gin_rummy.cc
