@@ -44,6 +44,8 @@ class NFGState : public SimMoveState {
 
   // Since there's only one state, we can implement the representations here.
   std::string InformationStateString(Player player) const override {
+    SPIEL_CHECK_GE(player, 0);
+    SPIEL_CHECK_LT(player, num_players_);
     std::string info_state = absl::StrCat("Observing player: ", player, ". ");
     if (!IsTerminal()) {
       absl::StrAppend(&info_state, "Non-terminal");
@@ -67,6 +69,8 @@ class NFGState : public SimMoveState {
 
   void InformationStateTensor(Player player,
                               std::vector<double>* values) const override {
+    SPIEL_CHECK_GE(player, 0);
+    SPIEL_CHECK_LT(player, num_players_);
     values->resize(1);
     if (IsTerminal()) {
       (*values)[0] = 1;

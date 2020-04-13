@@ -221,6 +221,16 @@ void CheckReturnsSum(const Game& game, const State& state) {
 
 // Tests all observation and information_state related methods which are
 // supported by the game, for all players.
+//
+// The following functions should return valid outputs for valid player, even
+// on terminal states:
+// - std::string InformationStateString(Player player)
+// - std::vector<double> InformationStateTensor(Player player)
+// - std::string ObservationString(Player player)
+// - std::vector<double> ObservationTensor(Player player)
+//
+// These functions should crash on invalid players: this is tested in
+// api_test.py as it's simpler to catch the error from Python.
 void CheckObservables(const Game& game, const State& state) {
   for (auto p = Player{0}; p < game.NumPlayers(); ++p) {
     if (game.GetType().provides_information_state_tensor) {

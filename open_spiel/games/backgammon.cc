@@ -256,13 +256,16 @@ std::string BackgammonState::ActionToString(Player player,
 }
 
 std::string BackgammonState::ObservationString(Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
   return ToString();
 }
 
 void BackgammonState::ObservationTensor(Player player,
                                         std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
-  SPIEL_CHECK_LE(player, 1);
+  SPIEL_CHECK_LT(player, num_players_);
+
   int opponent = Opponent(player);
   values->clear();
   values->reserve(game_->ObservationTensorSize());

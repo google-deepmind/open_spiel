@@ -12,11 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Lint as: python3
 """Tests for open_spiel.integration_tests.api."""
-
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
 
 import random
 import unittest
@@ -29,8 +26,12 @@ import numpy as np
 from open_spiel.python.algorithms import get_all_states
 import pyspiel
 
-_GAMES_TO_TEST = [
-    g.short_name for g in pyspiel.registered_games() if g.default_loadable
+_ALL_GAMES = pyspiel.registered_games()
+
+_GAMES_TO_TEST = [g.short_name for g in _ALL_GAMES if g.default_loadable]
+
+_GAMES_NOT_UNDER_TEST = [
+    g.short_name for g in _ALL_GAMES if not g.default_loadable
 ]
 
 # The list of game instances to test on the full tree as tuples
@@ -265,6 +266,86 @@ def _get_some_states(game, num_plays=10, include_terminals=True):
 
 class PartialEnforceAPIConventionsTest(parameterized.TestCase):
   """This only partially test some properties."""
+
+  def _assert_observations_raises_error_on_invalid_player(self, game, state):
+    game_type = game.get_type()
+    game_name = game_type.short_name
+    num_players = game.num_players()
+
+    if game_type.provides_information_state_string:
+      for p in range(num_players):
+        state.information_state_string(p)
+      msg = f"information_state_string did not raise an error for {game_name}"
+      with self.assertRaisesRegex(RuntimeError, "player >= 0", mgs=msg):
+        state.information_state_string(-1)
+      with self.assertRaisesRegex(RuntimeError, "player <", mgs=msg):
+        state.information_state_string(num_players + 1)
+
+    if game_type.provides_information_state_tensor:
+      for p in range(num_players):
+        v = state.information_state_tensor(p)
+        self.assertLen(v, game.information_state_tensor_size())
+      msg = f"information_state_tensor did not raise an error for {game_name}"
+      with self.assertRaisesRegex(RuntimeError, "player >= 0", mgs=msg):
+        state.information_state_tensor(-1)
+      with self.assertRaisesRegex(RuntimeError, "player <", mgs=msg):
+        state.information_state_tensor(num_players + 1)
+
+    if game_type.provides_observation_tensor:
+      for p in range(num_players):
+        v = state.observation_tensor(p)
+        self.assertLen(v, game.observation_tensor_size())
+      msg = f"observation_tensor did not raise an error for {game_name}"
+      with self.assertRaisesRegex(RuntimeError, "player >= 0", msg=msg):
+        state.observation_tensor(-1)
+      with self.assertRaisesRegex(RuntimeError, "player <", msg=msg):
+        state.observation_tensor(num_players + 1)
+
+    if game_type.provides_observation_string:
+      for p in range(num_players):
+        state.observation_string(p)
+      msg = f"observation_string did not raise an error for {game_name}"
+      with self.assertRaisesRegex(RuntimeError, "player >= 0", msg=msg):
+        state.observation_string(-1)
+      with self.assertRaisesRegex(RuntimeError, "player <", msg=msg):
+        state.observation_string(num_players + 1)
+
+  @parameterized.parameters(_GAMES_TO_TEST)
+  def test_observations_raises_error_on_invalid_player(self, game_name):
+    print(f"Testing observations for {game_name}")
+    game = pyspiel.load_game(game_name)
+    state = game.new_initial_state()
+
+    # Some games cannot be finished by always taking the first legal actions.
+    give_up_after = float("inf")
+    if game.get_type().short_name in ["backgammon", "laser_tag"]:
+      give_up_after = 100
+
+    while not state.is_terminal():
+      if len(state.history()) > give_up_after:
+        break
+
+      if not state.is_chance_node():
+        self._assert_observations_raises_error_on_invalid_player(game, state)
+
+      if state.is_chance_node():
+        for action, prob in state.chance_outcomes():
+          if prob != 0:
+            state.apply_action(action)
+            break
+      elif state.is_simultaneous_node():
+        # Simultaneous node: sample actions for all players.
+        chosen_actions = [
+            state.legal_actions(pid)[0] for pid in range(game.num_players())
+        ]
+        state.apply_actions(chosen_actions)
+      else:
+        # Decision node: sample action for the single current player
+        action = random.choice(state.legal_actions(state.current_player()))
+        state.action_to_string(state.current_player(), action)
+        state.apply_action(action)
+
+    self._assert_observations_raises_error_on_invalid_player(game, state)
 
   @parameterized.parameters(_GAMES_TO_TEST)
   def test_legal_actions_returns_empty_list_on_opponent(self, game_name):

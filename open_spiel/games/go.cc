@@ -88,10 +88,16 @@ GoState::GoState(std::shared_ptr<const Game> game, int board_size, float komi,
 }
 
 std::string GoState::InformationStateString(int player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
   return HistoryString();
 }
 
-std::string GoState::ObservationString(int player) const { return ToString(); }
+std::string GoState::ObservationString(int player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+  return ToString();
+}
 
 void GoState::ObservationTensor(int player, std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);

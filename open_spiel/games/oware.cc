@@ -274,11 +274,16 @@ void OwareState::CollectAndTerminate() {
 }
 
 std::string OwareState::ObservationString(Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
   return board_.ToString();
 }
 
 void OwareState::ObservationTensor(Player player,
                                    std::vector<double>* values) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+
   values->resize(/*seeds*/ NumHouses() + /*scores*/ kNumPlayers);
   for (int house = 0; house < NumHouses(); ++house) {
     (*values)[house] = ((double)board_.seeds[house]) / total_seeds_;

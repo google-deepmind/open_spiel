@@ -301,6 +301,8 @@ std::vector<double> OthelloState::Returns() const {
 }
 
 std::string OthelloState::InformationStateString(Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
   return HistoryString();
 }
 

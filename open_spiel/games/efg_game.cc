@@ -121,6 +121,8 @@ std::vector<double> EFGState::Returns() const {
 }
 
 std::string EFGState::InformationStateString(Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
   // The information set number has to uniquely identify the infoset, whereas
   // the names are optional. But the numbers are unique per player, so must
   // add the player number.
@@ -129,6 +131,8 @@ std::string EFGState::InformationStateString(Player player) const {
 }
 
 std::string EFGState::ObservationString(Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
   return absl::StrCat(cur_node_->player_number - 1, "-", player, "-",
                       cur_node_->infoset_number, "-", cur_node_->infoset_name);
 }
