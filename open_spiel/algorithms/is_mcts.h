@@ -33,6 +33,11 @@ namespace algorithms {
 // Use this constant to use an unlimited number of world samples.
 inline constexpr int kUnlimitedNumWorldSamples = -1;
 
+// The key identifying a node contains the InformationStateString or
+// ObservationString, as well as the player id, because in some games the
+// observation string can be the same for different players.
+using ISMCTSStateKey = std::pair<Player, std::string>;
+
 enum class ISMCTSFinalPolicyType {
   kNormalizedVisitCount,
   kMaxVisitCount,
@@ -93,7 +98,7 @@ class ISMCTSBot : public Bot {
   void Reset();
   double RandomNumber();
 
-  std::string GetStateKey(const State& state) const;
+  ISMCTSStateKey GetStateKey(const State& state) const;
   std::unique_ptr<State> SampleRootState(const State& state);
   ISMCTSNode* CreateNewNode(const State& state);
   ISMCTSNode* LookupNode(const State& state);
@@ -120,7 +125,7 @@ class ISMCTSBot : public Bot {
 
   std::mt19937 rng_;
   std::shared_ptr<Evaluator> evaluator_;
-  absl::flat_hash_map<std::string, ISMCTSNode*> nodes_;
+  absl::flat_hash_map<ISMCTSStateKey, ISMCTSNode*> nodes_;
   std::vector<std::unique_ptr<ISMCTSNode>> node_pool_;
 
   // If the number of sampled world state is restricted, this list is used to

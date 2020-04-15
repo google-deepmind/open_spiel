@@ -51,11 +51,11 @@ void ISMCTSBot::Reset() {
   root_samples_.clear();
 }
 
-std::string ISMCTSBot::GetStateKey(const State& state) const {
+ISMCTSStateKey ISMCTSBot::GetStateKey(const State& state) const {
   if (use_observation_string_) {
-    return state.ObservationString();
+    return {state.CurrentPlayer(), state.ObservationString()};
   } else {
-    return state.InformationStateString();
+    return {state.CurrentPlayer(), state.InformationStateString()};
   }
 }
 
@@ -63,15 +63,23 @@ ActionsAndProbs ISMCTSBot::RunSearch(const State& state) {
   Reset();
   SPIEL_CHECK_EQ(state.GetGame()->GetType().dynamics,
                  GameType::Dynamics::kSequential);
+  SPIEL_CHECK_EQ(state.GetGame()->GetType().information,
+                 GameType::Information::kImperfectInformation);
+
+  // Optimization in case of single legal action, and support for games which
+  // do not support ResampleFromInfostate in certain specific (single action)
+  // states.
+  std::vector<Action> legal_actions = state.LegalActions();
+  if (legal_actions.size() == 1) return {{legal_actions[0], 1.0}};
 
   root_node_ = CreateNewNode(state);
   SPIEL_CHECK_TRUE(root_node_ != nullptr);
 
-  std::string root_infostate_key = GetStateKey(state);
+  auto root_infostate_key = GetStateKey(state);
 
   for (int sim = 0; sim < max_simulations_; ++sim) {
     std::unique_ptr<State> sampled_root_state = SampleRootState(state);
-    SPIEL_CHECK_EQ(root_infostate_key, GetStateKey(*sampled_root_state));
+    SPIEL_CHECK_TRUE(root_infostate_key == GetStateKey(*sampled_root_state));
     SPIEL_CHECK_TRUE(sampled_root_state != nullptr);
     RunSimulation(sampled_root_state.get());
   }
@@ -190,7 +198,7 @@ std::unique_ptr<State> ISMCTSBot::ISMCTSBot::SampleRootState(
 }
 
 ISMCTSNode* ISMCTSBot::CreateNewNode(const State& state) {
-  std::string infostate_key = GetStateKey(state);
+  auto infostate_key = GetStateKey(state);
   node_pool_.push_back(std::unique_ptr<ISMCTSNode>(new ISMCTSNode));
   ISMCTSNode* node = node_pool_.back().get();
   nodes_[infostate_key] = node;
