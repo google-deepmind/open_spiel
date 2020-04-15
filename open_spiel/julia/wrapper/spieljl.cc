@@ -173,14 +173,6 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod) {
           }
           return keys;
         });
-        // wrapped.method("values", [](WrappedT ps) {
-        //   std::vector<WrappedVal> vals;
-        //   vals.reserve(ps.size());
-        //   for (auto const& it : ps) {
-        //     vals.emplace_back(it.second);
-        //   }
-        //   return vals;
-        // });
 
         wrapped.module().unset_override_module();
       });
