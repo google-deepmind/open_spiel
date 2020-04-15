@@ -29,17 +29,18 @@ namespace algorithms {
 //
 // The second overloaded function acts the same way, except assumes that all of
 // the players' policies are encapsulated in one joint policy.
-// `provides_infostate` should be set to true if the Policy* objects passed in
-// have implemented the GetStatePolicy(const std::string&) method, as this
-// allows for additional optimizations. Otherwise, GetStatePolicy(const State&)
-// will be called.
+//
+// The `use_infostate_get_policy` flag indicates whether to call
+// Policy::GetStatePolicy(const std::string&) rather than
+// Policy::GetStatePolicy(const State&) instead for retrieving the policy at
+// each information state; we use a default of true for performance reasons.
 std::vector<double> ExpectedReturns(const State& state,
                                     const std::vector<const Policy*>& policies,
                                     int depth_limit,
-                                    bool provides_infostate = true);
+                                    bool use_infostate_get_policy = true);
 std::vector<double> ExpectedReturns(const State& state,
-                                    const Policy& joint_policy,
-                                    int depth_limit);
+                                    const Policy& joint_policy, int depth_limit,
+                                    bool use_infostate_get_policy = true);
 
 }  // namespace algorithms
 }  // namespace open_spiel

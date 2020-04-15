@@ -23,6 +23,7 @@
 #include "open_spiel/algorithms/minimax.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/games/efg_game.h"
+#include "open_spiel/games/efg_game_data.h"
 #include "open_spiel/games/goofspiel.h"
 #include "open_spiel/games/kuhn_poker.h"
 #include "open_spiel/games/leduc_poker.h"

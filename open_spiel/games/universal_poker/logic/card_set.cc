@@ -133,10 +133,12 @@ std::vector<CardSet> CardSet::SampleCards(int nbCards) {
   for (int i = 0; i < nbCards; ++i) {
     p += (1 << i);
   }
-
+  // Enumerates all the uint64_t integers that with nbCards 1-bits.
+  // The final n is ignored. It is fine as long as the rank < 16.
   for (uint64_t n = bit_twiddle_permute(p); n > p;
        p = n, n = bit_twiddle_permute(p)) {
-    uint64_t combo = n & cs.cards;
+    // Checks whether the CardSet represented by p is inside the CardSet.
+    uint64_t combo = p & cs.cards;
     if (__builtin_popcountl(combo) == nbCards) {
       CardSet c;
       c.cs.cards = combo;

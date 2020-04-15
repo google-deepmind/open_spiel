@@ -33,11 +33,20 @@ namespace algorithms {
 // Use this constant to use an unlimited number of world samples.
 inline constexpr int kUnlimitedNumWorldSamples = -1;
 
+enum class ISMCTSFinalPolicyType {
+  kNormalizedVisitCount,
+  kMaxVisitCount,
+  kMaxValue,
+};
+
+struct ChildInfo {
+  int visits;
+  double return_sum;
+  double value() const { return return_sum / visits; }
+};
+
 struct ISMCTSNode {
-  std::vector<Action> legal_actions;
-  std::vector<Action> actions;
-  std::vector<double> return_sums;
-  std::vector<int> visits;
+  absl::flat_hash_map<Action, ChildInfo> child_info;
   int total_visits;
 };
 
@@ -46,23 +55,67 @@ class ISMCTSBot : public Bot {
   // Construct an IS-MCTS bot. The parameter max_world_samples controls how many
   // states are sampled (with replacement!) at the root of the search; use
   // kUnlimitedWorldStates to have no restriction, and a number larger than
-  // zero to restrict the number).
+  // zero to restrict the number). If use_observation_string is true, then
+  // will use ObservationString as a key instead of InformationStateString.
+  // If allow_inconsistent_action_sets is true, then the algorithm handles the
+  // case of differing legal action sets across states with the same state key
+  // (information state string or observation string) which can happen when
+  // using observations or with game that have imperfect recall.
   //
   // Important note: this bot requires that State::ResampleFromInfostate is
   // implemented.
   ISMCTSBot(int seed, std::shared_ptr<Evaluator> evaluator, double uct_c,
-            int max_simulations, int max_world_samples);
+            int max_simulations, int max_world_samples,
+            ISMCTSFinalPolicyType final_policy_type,
+            bool use_observation_string, bool allow_inconsistent_action_sets);
+
+  // An IS-MCTS with sensible defaults.
+  ISMCTSBot(int seed, std::shared_ptr<Evaluator> evaluator, double uct_c,
+            int max_simulations)
+      : ISMCTSBot(seed, evaluator, uct_c, max_simulations,
+                  kUnlimitedNumWorldSamples,
+                  ISMCTSFinalPolicyType::kNormalizedVisitCount, false, false) {}
 
   Action Step(const State& state) override;
+
+  bool ProvidesPolicy() override { return true; }
+  ActionsAndProbs GetPolicy(const State& state) override;
+  std::pair<ActionsAndProbs, Action> StepWithPolicy(
+      const State& state) override;
+
+  ActionsAndProbs RunSearch(const State& state);
+
+  // Bot maintains no history, so these are empty.
+  void Restart() override {}
+  void RestartAt(const State& state) override {}
 
  private:
   void Reset();
   double RandomNumber();
+
+  std::string GetStateKey(const State& state) const;
   std::unique_ptr<State> SampleRootState(const State& state);
   ISMCTSNode* CreateNewNode(const State& state);
   ISMCTSNode* LookupNode(const State& state);
   ISMCTSNode* LookupOrCreateNode(const State& state);
-  std::pair<Action, int> SelectAction(ISMCTSNode* node);
+  Action SelectActionTreePolicy(ISMCTSNode* node,
+                                const std::vector<Action>& legal_actions);
+  Action SelectActionUCB(ISMCTSNode* node);
+  ActionsAndProbs GetFinalPolicy(const State& state, ISMCTSNode* node) const;
+  void ExpandIfNecessary(ISMCTSNode* node, Action action) const;
+
+  // Check if an expansion is possible (i.e. node does not contain all the
+  // actions). If so, returns an action not yet in the children. Otherwise,
+  // returns kInvalidAction.
+  Action CheckExpand(ISMCTSNode* node,
+                     const std::vector<Action>& legal_actions);
+
+  // Returns a copy of the node with any actions not in specified legal actions
+  // removed.
+  ISMCTSNode FilterIllegals(ISMCTSNode* node,
+                            const std::vector<Action>& legal_actions) const;
+
+  // Run a simulation, returning the player returns.
   std::vector<double> RunSimulation(State* state);
 
   std::mt19937 rng_;
@@ -77,6 +130,9 @@ class ISMCTSBot : public Bot {
   const double uct_c_;
   const int max_simulations_;
   const int max_world_samples_;
+  const ISMCTSFinalPolicyType final_policy_type_;
+  const bool use_observation_string_;
+  const bool allow_inconsistent_action_sets_;
   ISMCTSNode* root_node_;
 };
 

@@ -125,7 +125,9 @@ std::vector<double> DeepSeaState::Returns() const {
 }
 
 std::string DeepSeaState::InformationStateString(Player player) const {
-  SPIEL_CHECK_EQ(player, 0);
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+
   SPIEL_CHECK_EQ(history_.size(), player_row_);
   SPIEL_CHECK_EQ(direction_history_.size(), player_row_);
   std::string str;
@@ -137,7 +139,9 @@ std::string DeepSeaState::InformationStateString(Player player) const {
 }
 
 std::string DeepSeaState::ObservationString(Player player) const {
-  SPIEL_CHECK_EQ(player, 0);
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+
   std::string str(size_ * size_, '.');
   str[player_row_ * size_ + player_col_] = 'x';
   return str;
@@ -145,7 +149,9 @@ std::string DeepSeaState::ObservationString(Player player) const {
 
 void DeepSeaState::ObservationTensor(Player player,
                                      std::vector<double>* values) const {
-  SPIEL_CHECK_EQ(player, 0);
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+
   std::fill(values->begin(), values->end(), 0.);
   values->resize(size_ * size_);
   if (player_row_ < size_ && player_col_ < size_)
@@ -154,7 +160,9 @@ void DeepSeaState::ObservationTensor(Player player,
 
 void DeepSeaState::InformationStateTensor(Player player,
                                           std::vector<double>* values) const {
-  SPIEL_CHECK_EQ(player, 0);
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+
   values->resize(2 * size_);
   std::fill(values->begin(), values->end(), -1);
   for (int i = 0; i < player_row_; i++) {

@@ -96,15 +96,19 @@ CursorGoState::CursorGoState(std::shared_ptr<const Game> game, int board_size,
   ResetBoard();
 }
 
-std::string CursorGoState::InformationStateString(int player) const {
+std::string CursorGoState::InformationStateString(Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
   return HistoryString();
 }
 
-std::string CursorGoState::ObservationString(int player) const {
+std::string CursorGoState::ObservationString(Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
   return ToString();
 }
 
-void CursorGoState::ObservationTensor(int player,
+void CursorGoState::ObservationTensor(Player player,
                                       std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);

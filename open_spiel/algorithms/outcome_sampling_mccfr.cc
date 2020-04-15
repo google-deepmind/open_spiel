@@ -28,9 +28,8 @@ namespace algorithms {
 
 OutcomeSamplingMCCFRSolver::OutcomeSamplingMCCFRSolver(const Game& game,
                                                        double epsilon, int seed)
-    : OutcomeSamplingMCCFRSolver(
-          game, std::make_shared<TabularPolicy>(GetUniformPolicy(game)),
-          epsilon, seed) {}
+    : OutcomeSamplingMCCFRSolver(game, std::make_shared<UniformPolicy>(),
+                                 epsilon, seed) {}
 
 OutcomeSamplingMCCFRSolver::OutcomeSamplingMCCFRSolver(
     const Game& game, std::shared_ptr<Policy> default_policy, double epsilon,

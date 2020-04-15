@@ -34,6 +34,8 @@ import sonnet as snt
 import tensorflow.compat.v1 as tf
 
 from open_spiel.python import policy
+import pyspiel
+
 
 AdvantageMemory = collections.namedtuple(
     "AdvantageMemory", "info_state iteration advantage action")
@@ -144,6 +146,9 @@ class DeepCFRSolver(policy.Policy):
     all_players = list(range(game.num_players()))
     super(DeepCFRSolver, self).__init__(game, all_players)
     self._game = game
+    if game.get_type().dynamics == pyspiel.GameType.Dynamics.SIMULTANEOUS:
+      # `_traverse_game_tree` does not take into account this option.
+      raise ValueError("Simulatenous games are not supported.")
     self._session = session
     self._batch_size_advantage = batch_size_advantage
     self._batch_size_strategy = batch_size_strategy

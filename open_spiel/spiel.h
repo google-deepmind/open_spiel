@@ -138,7 +138,7 @@ struct GameType {
   // overridden in each game.
 
   // Can the game be loaded with no parameters? It is strongly recommended that
-  // games be loadable with sen
+  // games be loadable with default arguments.
   bool default_loadable = true;
 };
 
@@ -371,7 +371,9 @@ class State {
 
   // There are currently no use-case for calling this function with
   // `kChancePlayerId` or `kTerminalPlayerId`. Thus, games are expected to raise
-  // an error in those cases.
+  // an error in those cases using (and it's tested in api_test.py):
+  //   SPIEL_CHECK_GE(player, 0);
+  //   SPIEL_CHECK_LT(player, num_players_);
   virtual std::string InformationStateString(Player player) const {
     SpielFatalError("InformationStateString is not implemented.");
   }
@@ -388,6 +390,10 @@ class State {
   // There are currently no use-case for calling this function with
   // `kChancePlayerId` or `kTerminalPlayerId`. Thus, games are expected to raise
   // an error in those cases.
+  //
+  // Implementations should start with (and it's tested in api_test.py):
+  //   SPIEL_CHECK_GE(player, 0);
+  //   SPIEL_CHECK_LT(player, num_players_);
   virtual void InformationStateTensor(Player player,
                                       std::vector<double>* values) const {
     SpielFatalError("InformationStateTensor unimplemented!");
@@ -413,6 +419,10 @@ class State {
   // Note that neither of these are valid information states, since the same
   // observation may arise from two different observation histories (i.e. they
   // are not perfect recall).
+  //
+  // Implementations should start with (and it's tested in api_test.py):
+  //   SPIEL_CHECK_GE(player, 0);
+  //   SPIEL_CHECK_LT(player, num_players_);
   virtual std::string ObservationString(Player player) const {
     SpielFatalError("ObservationString is not implemented.");
   }
@@ -421,6 +431,10 @@ class State {
   }
 
   // Returns the view of the game, preferably from `player`'s perspective.
+  //
+  // Implementations should start with (and it's tested in api_test.py):
+  //   SPIEL_CHECK_GE(player, 0);
+  //   SPIEL_CHECK_LT(player, num_players_);
   virtual void ObservationTensor(Player player,
                                  std::vector<double>* values) const {
     SpielFatalError("ObservationTensor unimplemented!");

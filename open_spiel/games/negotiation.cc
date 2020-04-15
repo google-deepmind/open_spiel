@@ -127,6 +127,9 @@ std::vector<double> NegotiationState::Returns() const {
 }
 
 std::string NegotiationState::ObservationString(Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+
   if (IsChanceNode()) {
     return "ChanceNode -- no observation";
   }
@@ -174,6 +177,9 @@ std::vector<int> NegotiationGame::ObservationTensorShape() const {
 
 void NegotiationState::ObservationTensor(Player player,
                                          std::vector<double>* values) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+
   values->resize(parent_game_.ObservationTensorSize());
   std::fill(values->begin(), values->end(), 0);
 

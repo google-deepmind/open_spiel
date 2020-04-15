@@ -212,6 +212,9 @@ ActionsAndProbs CoinState::ChanceOutcomes() const {
 }
 
 std::string CoinState::ObservationString(Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+
   std::ostringstream out;
   // A player only learns its own preference.
   out << player_preferences_[player] << "\n";

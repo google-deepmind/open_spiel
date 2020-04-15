@@ -283,16 +283,21 @@ std::vector<double> ChessState::Returns() const {
 }
 
 std::string ChessState::InformationStateString(Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
   return HistoryString();
 }
 
 std::string ChessState::ObservationString(Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
   return ToString();
 }
 
 void ChessState::ObservationTensor(Player player,
                                    std::vector<double>* values) const {
-  SPIEL_CHECK_NE(player, kChancePlayerId);
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
 
   values->clear();
   values->reserve(game_->ObservationTensorSize());

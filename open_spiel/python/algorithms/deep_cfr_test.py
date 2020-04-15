@@ -50,7 +50,7 @@ class DeepCFRTest(parameterized.TestCase):
   def test_matching_pennies_3p(self):
     # We don't expect Deep CFR to necessarily converge on 3-player games but
     # it's nonetheless interesting to see this result.
-    game = pyspiel.load_game('matching_pennies_3p')
+    game = pyspiel.load_game_as_turn_based('matching_pennies_3p')
     with tf.Session() as sess:
       deep_cfr_solver = deep_cfr.DeepCFRSolver(
           sess,
@@ -69,7 +69,6 @@ class DeepCFRTest(parameterized.TestCase):
           game,
           policy.PolicyFromCallable(game, deep_cfr_solver.action_probabilities))
       print('Deep CFR in Matching Pennies 3p. NashConv: {}'.format(conv))
-      self.assertLess(conv, 0.05)
 
 
 if __name__ == '__main__':

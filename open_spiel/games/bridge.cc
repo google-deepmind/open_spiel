@@ -210,6 +210,9 @@ std::string BridgeState::ToString() const {
 }
 
 std::string BridgeState::ObservationString(Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+
   // We construct the ObservationString from the ObservationTensor to give
   // some indication that the tensor representation is correct & complete.
   std::vector<double> tensor(game_->ObservationTensorSize());
@@ -341,6 +344,9 @@ std::string BridgeState::ObservationString(Player player) const {
 
 void BridgeState::ObservationTensor(Player player,
                                     std::vector<double>* values) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+
   std::fill(values->begin(), values->end(), 0.0);
   values->resize(game_->ObservationTensorSize());
   if (phase_ == Phase::kGameOver || phase_ == Phase::kDeal) return;

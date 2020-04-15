@@ -197,11 +197,17 @@ void OpenSpielHanabiState::DoApplyAction(Action action) {
 }
 
 std::string OpenSpielHanabiState::ObservationString(Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+
   return hanabi_learning_env::HanabiObservation(state_, player).ToString();
 }
 
 void OpenSpielHanabiState::ObservationTensor(
     Player player, std::vector<double>* values) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+
   auto obs = game_->Encoder().Encode(
       hanabi_learning_env::HanabiObservation(state_, player));
   values->resize(obs.size());
