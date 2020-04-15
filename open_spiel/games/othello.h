@@ -63,9 +63,8 @@ inline constexpr std::array<Direction, 8> kDirections = {
 
 struct Move {
   Move(int move) : row(move / kNumCols), col(move % kNumRows) {
-    if (move < 0 || move >= kNumCells) {
-      SpielFatalError(absl::StrCat("Move too large: ", move));
-    }
+    SPIEL_CHECK_GE(move, 0);
+    SPIEL_CHECK_LT(move, kNumCells);
   }
 
   Move(int row, int col) : row(row), col(col) {};
@@ -108,8 +107,7 @@ class OthelloState : public State {
   void DoApplyAction(Action move) override;
 
   CellState BoardAt(int row, int col) const {
-    Move move(row, col);
-    return board_[move.GetAction()];
+    return board_[Move(row, col).GetAction()];
   }
 
   CellState BoardAt(Move move) const { return BoardAt(move.GetRow(), move.GetColumn()); }
