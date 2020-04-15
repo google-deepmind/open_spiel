@@ -203,8 +203,9 @@ std::vector<double> ExpectedReturnsImpl(
 
 std::vector<double> ExpectedReturns(const State& state,
                                     const std::vector<const Policy*>& policies,
-                                    int depth_limit, bool provides_infostate) {
-  if (provides_infostate) {
+                                    int depth_limit,
+                                    bool use_infostate_get_policy) {
+  if (use_infostate_get_policy) {
     return ExpectedReturnsImpl(
         state,
         [&policies](Player player, const std::string& info_state) {
@@ -222,14 +223,23 @@ std::vector<double> ExpectedReturns(const State& state,
 }
 
 std::vector<double> ExpectedReturns(const State& state,
-                                    const Policy& joint_policy,
-                                    int depth_limit) {
-  return ExpectedReturnsImpl(
-      state,
-      [&joint_policy](Player player, const std::string& info_state) {
-        return joint_policy.GetStatePolicy(info_state);
-      },
-      depth_limit);
+                                    const Policy& joint_policy, int depth_limit,
+                                    bool use_infostate_get_policy) {
+  if (use_infostate_get_policy) {
+    return ExpectedReturnsImpl(
+        state,
+        [&joint_policy](Player player, const std::string& info_state) {
+          return joint_policy.GetStatePolicy(info_state);
+        },
+        depth_limit);
+  } else {
+    return ExpectedReturnsImpl(
+        state,
+        [&joint_policy](Player player, const State& state) {
+          return joint_policy.GetStatePolicy(state);
+        },
+        depth_limit);
+  }
 }
 
 }  // namespace algorithms

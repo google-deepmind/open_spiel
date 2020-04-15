@@ -273,6 +273,8 @@ std::vector<double> HavannahState::Returns() const {
 }
 
 std::string HavannahState::InformationStateString(Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
   return HistoryString();
 }
 

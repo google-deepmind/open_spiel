@@ -29,9 +29,8 @@ namespace algorithms {
 ExternalSamplingMCCFRSolver::ExternalSamplingMCCFRSolver(const Game& game,
                                                          int seed,
                                                          AverageType avg_type)
-    : ExternalSamplingMCCFRSolver(
-          game, std::make_shared<TabularPolicy>(GetUniformPolicy(game)), seed,
-          avg_type) {}
+    : ExternalSamplingMCCFRSolver(game, std::make_shared<UniformPolicy>(), seed,
+                                  avg_type) {}
 
 ExternalSamplingMCCFRSolver::ExternalSamplingMCCFRSolver(
     const Game& game, std::shared_ptr<Policy> default_policy, int seed,

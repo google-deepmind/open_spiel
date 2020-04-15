@@ -227,6 +227,8 @@ std::vector<double> YState::Returns() const {
 }
 
 std::string YState::InformationStateString(Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
   return HistoryString();
 }
 

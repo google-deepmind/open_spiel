@@ -33,6 +33,8 @@ set(GAME_SOURCES
   deep_sea.h
   efg_game.cc
   efg_game.h
+  efg_game_data.cc
+  efg_game_data.h
   first_sealed_auction.cc
   first_sealed_auction.h
   gin_rummy.cc
@@ -66,6 +68,8 @@ set(GAME_SOURCES
   negotiation.h
   oshi_zumo.cc
   oshi_zumo.h
+  othello.cc
+  othello.h
   oware.cc
   oware.h
   oware/oware_board.cc
@@ -295,6 +299,10 @@ add_executable(oshi_zumo_test oshi_zumo_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>
                $<TARGET_OBJECTS:algorithms>)
 add_test(oshi_zumo_test oshi_zumo_test)
+
+add_executable(othello_test othello_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(othello_test othello_test)
 
 add_executable(oware_test oware_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>

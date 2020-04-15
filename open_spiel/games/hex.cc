@@ -252,6 +252,8 @@ std::vector<double> HexState::Returns() const {
 }
 
 std::string HexState::InformationStateString(Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
   return HistoryString();
 }
 

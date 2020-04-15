@@ -109,6 +109,8 @@ std::vector<double> TradeCommState::Returns() const {
 }
 
 std::string TradeCommState::ObservationString(Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
   if (IsChanceNode()) {
     return "ChanceNode -- no observation";
   }
@@ -132,6 +134,9 @@ std::string TradeCommState::ObservationString(Player player) const {
 
 void TradeCommState::ObservationTensor(Player player,
                                        std::vector<double>* values) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+
   values->resize(game_->ObservationTensorSize());
   std::fill(values->begin(), values->end(), 0);
 

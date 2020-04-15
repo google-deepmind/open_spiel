@@ -56,34 +56,53 @@ void ISMCTSTest_PlayGame(const std::string& game_name) {
   std::shared_ptr<const Game> game = LoadGame(game_name);
   auto evaluator =
       std::make_shared<algorithms::RandomRolloutEvaluator>(1, kSeed);
-  auto bot1 =
-      std::make_unique<algorithms::ISMCTSBot>(kSeed, evaluator, 5.0, 1000, -1);
-  std::mt19937 rng(kSeed);
 
-  std::cout << "Testing " << game_name << ", bot 1" << std::endl;
-  PlayGame(*game, bot1.get(), &rng);
-  PlayGame(*game, bot1.get(), &rng);
+  for (algorithms::ISMCTSFinalPolicyType type :
+       {algorithms::ISMCTSFinalPolicyType::kNormalizedVisitCount,
+        algorithms::ISMCTSFinalPolicyType::kMaxVisitCount,
+        algorithms::ISMCTSFinalPolicyType::kMaxValue}) {
+    auto bot1 = std::make_unique<algorithms::ISMCTSBot>(
+        kSeed, evaluator, 5.0, 1000, algorithms::kUnlimitedNumWorldSamples,
+        type, false, false);
 
-  auto bot2 =
-      std::make_unique<algorithms::ISMCTSBot>(kSeed, evaluator, 5.0, 1000, 10);
-  std::cout << "Testing " << game_name << ", bot 2" << std::endl;
-  PlayGame(*game, bot2.get(), &rng);
+    std::mt19937 rng(kSeed);
+
+    std::cout << "Testing " << game_name << ", bot 1" << std::endl;
+    PlayGame(*game, bot1.get(), &rng);
+
+    auto bot2 = std::make_unique<algorithms::ISMCTSBot>(
+        kSeed, evaluator, 5.0, 1000, 10, type, false, false);
+    std::cout << "Testing " << game_name << ", bot 2" << std::endl;
+    PlayGame(*game, bot2.get(), &rng);
+  }
 }
 
-void ISMCTSTest_Kuhn() {
+void ISMCTS_BasicPlayGameTest_Kuhn() {
   ISMCTSTest_PlayGame("kuhn_poker");
   ISMCTSTest_PlayGame("kuhn_poker(players=3)");
 }
 
-void ISMCTSTest_Leduc() {
+void ISMCTS_BasicPlayGameTest_Leduc() {
   ISMCTSTest_PlayGame("leduc_poker");
   ISMCTSTest_PlayGame("leduc_poker(players=3)");
+}
+
+void ISMCTS_LeducObservationTest() {
+  std::mt19937 rng(kSeed);
+  std::shared_ptr<const Game> game = LoadGame("leduc_poker");
+  auto evaluator =
+      std::make_shared<algorithms::RandomRolloutEvaluator>(1, kSeed);
+  auto bot = std::make_unique<algorithms::ISMCTSBot>(
+      kSeed, evaluator, 10.0, 1000, algorithms::kUnlimitedNumWorldSamples,
+      algorithms::ISMCTSFinalPolicyType::kNormalizedVisitCount, true, true);
+  PlayGame(*game, bot.get(), &rng);
 }
 
 }  // namespace
 }  // namespace open_spiel
 
 int main(int argc, char** argv) {
-  open_spiel::ISMCTSTest_Kuhn();
-  open_spiel::ISMCTSTest_Leduc();
+  open_spiel::ISMCTS_BasicPlayGameTest_Kuhn();
+  open_spiel::ISMCTS_BasicPlayGameTest_Leduc();
+  open_spiel::ISMCTS_LeducObservationTest();
 }

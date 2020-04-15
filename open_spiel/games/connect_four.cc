@@ -184,7 +184,9 @@ std::vector<double> ConnectFourState::Returns() const {
 }
 
 std::string ConnectFourState::InformationStateString(Player player) const {
-    return HistoryString();
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+  return HistoryString();
 }
 
 std::string ConnectFourState::ObservationString(Player player) const {

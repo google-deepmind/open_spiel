@@ -82,111 +82,6 @@ std::string NodeToString(const Node* node) {
 }
 }  // namespace
 
-// A copy of games/efg/kuhn_poker.efg useful to use for tests.
-const char* kKuhnEFGData = R"###(
-EFG 2 R "Kuhn poker" { "Player 1" "Player 2" } "A simplified poker game: https://en.wikipedia.org/wiki/Kuhn_poker"
-
-c "ROOT" 1 "c1" { "1" 1/3 "0" 1/3 "2" 1/3 } 0
-  c "c2" 2 "c2" { "2" 1/2 "0" 1/2 } 0
-    p "" 1 1 "1" { "p" "b" } 0
-      p "" 2 2 "2p" { "p" "b" } 0
-        t "" 3 "Outcome 12pp" { -1.0 1.0 }
-        p "" 1 2 "1pb" { "p" "b" } 0
-          t "" 4 "Outcome 12pbp" { -1.0 1.0 }
-          t "" 5 "Outcome 12pbb" { -2.0 2.0 }
-      p "" 2 1 "2b" { "p" "b" } 0
-        t "" 1 "Outcome 12bp" { 1.0 -1.0 }
-        t "" 2 "Outcome 12bb" { -2.0 2.0 }
-    p "" 1 1 "1" { "p" "b" } 0
-      p "" 2 3 "0p" { "p" "b" } 0
-        t "" 8 "Outcome 10pp" { 1.0 -1.0 }
-        p "" 1 2 "1pb" { "p" "b" } 0
-          t "" 6 "Outcome 10pbp" { -1.0 1.0 }
-          t "" 7 "Outcome 10pbb" { 2.0 -2.0 }
-      p "" 2 4 "0b" { "p" "b" } 0
-        t "" 9 "Outcome 10bp" { 1.0 -1.0 }
-        t "" 10 "Outcome 10bb" { 2.0 -2.0 }
-  c "c3" 3 "c3" { "2" 1/2 "1" 1/2 } 0
-    p "" 1 3 "0" { "p" "b" } 0
-      p "" 2 2 "2p" { "p" "b" } 0
-        t "" 13 "Outcome 02pp" { -1.0 1.0 }
-        p "" 1 4 "0pb" { "p" "b" } 0
-          t "" 14 "Outcome 02pbp" { -1.0 1.0 }
-          t "" 15 "Outcome 02pbb" { -2.0 2.0 }
-      p "" 2 1 "2b" { "p" "b" } 0
-        t "" 11 "Outcome 02bp" { 1.0 -1.0 }
-        t "" 12 "Outcome 02bb" { -2.0 2.0 }
-    p "" 1 3 "0" { "p" "b" } 0
-      p "" 2 5 "1p" { "p" "b" } 0
-        t "" 18 "Outcome 01pp" { -1.0 1.0 }
-        p "" 1 4 "0pb" { "p" "b" } 0
-          t "" 16 "Outcome 01pbp" { -1.0 1.0 }
-          t "" 17 "Outcome 01pbb" { -2.0 2.0 }
-      p "" 2 6 "1b" { "p" "b" } 0
-        t "" 19 "Outcome 01bp" { 1.0 -1.0 }
-        t "" 20 "Outcome 01bb" { -2.0 2.0 }
-  c "c4" 4 "c4" { "0" 1/2 "1" 1/2 } 0
-    p "" 1 5 "2" { "p" "b" } 0
-      p "" 2 3 "0p" { "p" "b" } 0
-        t "" 21 "Outcome 20pp" { 1.0 -1.0 }
-        p "" 1 6 "2pb" { "p" "b" } 0
-          t "" 22 "Outcome 20pbp" { -1.0 1.0 }
-          t "" 23 "Outcome 20pbb" { 2.0 -2.0 }
-      p "" 2 4 "0b" { "p" "b" } 0
-        t "" 24 "Outcome 20bp" { 1.0 -1.0 }
-        t "" 25 "Outcome 20bb" { 2.0 -2.0 }
-    p "" 1 5 "2" { "p" "b" } 0
-      p "" 2 5 "1p" { "p" "b" } 0
-        t "" 28 "Outcome 21pp" { 1.0 -1.0 }
-        p "" 1 6 "2pb" { "p" "b" } 0
-          t "" 26 "Outcome 21pbp" { -1.0 1.0 }
-          t "" 27 "Outcome 21pbb" { 2.0 -2.0 }
-      p "" 2 6 "1b" { "p" "b" } 0
-        t "" 29 "Outcome 21bp" { 1.0 -1.0 }
-        t "" 30 "Outcome 21bb" { 2.0 -2.0 }
-)###";
-
-// A copy of games/efg/sample.efg useful to use within tests.
-const char* kSampleEFGData = R"###(
-EFG 2 R "General Bayes game, one stage" { "Player 1" "Player 2" }
-c "ROOT" 1 "(0,1)" { "1G" 0.500000 "1B" 0.500000 } 0
-c "" 2 "(0,2)" { "2g" 0.500000 "2b" 0.500000 } 0
-p "" 1 1 "(1,1)" { "H" "L" } 0
-p "" 2 1 "(2,1)" { "h" "l" } 0
-t "" 1 "Outcome 1" { 10.000000 2.000000 }
-t "" 2 "Outcome 2" { 0.000000 10.000000 }
-p "" 2 1 "(2,1)" { "h" "l" } 0
-t "" 3 "Outcome 3" { 2.000000 4.000000 }
-t "" 4 "Outcome 4" { 4.000000 0.000000 }
-p "" 1 1 "(1,1)" { "H" "L" } 0
-p "" 2 2 "(2,2)" { "h" "l" } 0
-t "" 5 "Outcome 5" { 10.000000 2.000000 }
-t "" 6 "Outcome 6" { 0.000000 10.000000 }
-p "" 2 2 "(2,2)" { "h" "l" } 0
-t "" 7 "Outcome 7" { 2.000000 4.000000 }
-t "" 8 "Outcome 8" { 4.000000 0.000000 }
-c "" 3 "(0,3)" { "2g" 0.500000 "2b" 0.500000 } 0
-p "" 1 2 "(1,2)" { "H" "L" } 0
-p "" 2 1 "(2,1)" { "h" "l" } 0
-t "" 9 "Outcome 9" { 4.000000 2.000000 }
-t "" 10 "Outcome 10" { 2.000000 10.000000 }
-p "" 2 1 "(2,1)" { "h" "l" } 0
-t "" 11 "Outcome 11" { 0.000000 4.000000 }
-t "" 12 "Outcome 12" { 10.000000 2.000000 }
-p "" 1 2 "(1,2)" { "H" "L" } 0
-p "" 2 2 "(2,2)" { "h" "l" } 0
-t "" 13 "Outcome 13" { 4.000000 2.000000 }
-t "" 14 "Outcome 14" { 2.000000 10.000000 }
-p "" 2 2 "(2,2)" { "h" "l" } 0
-t "" 15 "Outcome 15" { 0.000000 4.000000 }
-t "" 16 "Outcome 16" { 10.000000 0.000000 }
-)###";
-
-// Include a few samples that are used for testing.
-std::string GetSampleEFGData() { return std::string(kSampleEFGData); }
-
-std::string GetKuhnPokerEFGData() { return std::string(kKuhnEFGData); }
-
 EFGState::EFGState(std::shared_ptr<const Game> game, const Node* root)
     : State(game), cur_node_(root) {}
 
@@ -226,6 +121,8 @@ std::vector<double> EFGState::Returns() const {
 }
 
 std::string EFGState::InformationStateString(Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
   // The information set number has to uniquely identify the infoset, whereas
   // the names are optional. But the numbers are unique per player, so must
   // add the player number.
@@ -234,6 +131,8 @@ std::string EFGState::InformationStateString(Player player) const {
 }
 
 std::string EFGState::ObservationString(Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
   return absl::StrCat(cur_node_->player_number - 1, "-", player, "-",
                       cur_node_->infoset_number, "-", cur_node_->infoset_name);
 }
@@ -278,7 +177,7 @@ std::vector<std::pair<Action, double>> EFGState::ChanceOutcomes() const {
   return outcomes;
 }
 
-int EFGGame::NumDistinctActions() const { return max_actions_; }
+int EFGGame::NumDistinctActions() const { return action_ids_.size(); }
 
 int EFGGame::NumPlayers() const { return num_players_; }
 
@@ -557,7 +456,9 @@ void EFGGame::ParsePlayerNode(Node* parent, Node* child, int depth) {
   SPIEL_CHECK_TRUE(NextToken() == "{");
   int actions = 0;
   while (string_data_.at(pos_) == '"') {
-    child->actions.push_back(NextToken());
+    std::string action_str = NextToken();
+    child->actions.push_back(action_str);
+    AddActionToMap(action_str);
     nodes_.push_back(NewNode());
     child->children.push_back(nodes_.back().get());
     actions++;

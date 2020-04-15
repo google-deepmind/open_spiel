@@ -431,6 +431,8 @@ ObservationType CoopBoxPushingState::PartialObservation(Player player) const {
 }
 
 std::string CoopBoxPushingState::ObservationString(Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
   if (fully_observable_) {
     return ToString();
   } else {
@@ -508,6 +510,8 @@ int CoopBoxPushingState::ObservationPlane(std::pair<int, int> coord,
 
 void CoopBoxPushingState::ObservationTensor(Player player,
                                             std::vector<double>* values) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
   if (fully_observable_) {
     TensorView<3> view(values, {kCellStates, kRows, kCols}, true);
 

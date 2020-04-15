@@ -94,12 +94,12 @@ class CursorGoState : public State {
 
   bool IsTerminal() const override { return is_terminal_; }
 
-  std::string InformationStateString(int player) const override;
-  std::string ObservationString(int player) const override;
+  std::string InformationStateString(Player player) const override;
+  std::string ObservationString(Player player) const override;
 
   // Five planes: black, white, empty, cursor position, and a bias plane of bits
   // indicating komi (whether white is to play).
-  void ObservationTensor(int player,
+  void ObservationTensor(Player player,
                          std::vector<double>* values) const override;
 
   std::vector<double> Returns() const override;

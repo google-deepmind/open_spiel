@@ -15,7 +15,9 @@
 # Lint as: python3
 """Example running PSRO on OpenSpiel Sequential games.
 
-To reproduce our ICLR paper, run this script with
+To reproduce results from (Muller et al., "A Generalized Training Approach for
+Multiagent Learning", ICLR 2020; https://arxiv.org/abs/1909.12823), run this
+script with:
   - `game_name` in ['kuhn_poker', 'leduc_poker']
   - `n_players` in [2, 3, 4, 5]
   - `meta_strategy_method` in ['alpharank', 'uniform', 'nash', 'prd']

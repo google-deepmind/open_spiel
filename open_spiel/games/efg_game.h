@@ -62,10 +62,6 @@ struct Node {
   std::vector<double> payoffs;
 };
 
-// A few example games used for testing.
-std::string GetSampleEFGData();
-std::string GetKuhnPokerEFGData();
-
 // A function to load an EFG directly from string data. Note: games loaded
 // using this function will not be serializable (nor will their states). Use
 // the general LoadGame with the filename argument if serialization is required.
@@ -117,6 +113,20 @@ class EFGGame : public Game {
     }
   }
 
+  Action GetAction(const std::string& label) const {
+    auto iter = action_ids_.find(label);
+    SPIEL_CHECK_TRUE(iter != action_ids_.end());
+    return iter->second;
+  }
+
+  void AddActionToMap(const std::string& label) {
+    auto iter = action_ids_.find(label);
+    if (iter != action_ids_.end()) {
+      return;
+    }
+    action_ids_[label] = action_ids_.size();
+  }
+
  private:
   std::unique_ptr<Node> NewNode() const;
   void ParseGame();
@@ -151,6 +161,7 @@ class EFGGame : public Game {
   bool general_sum_;
   bool perfect_information_;
   std::unordered_map<int, int> infoset_num_to_states_count_;
+  std::unordered_map<std::string, Action> action_ids_;
 };
 
 }  // namespace efg_game

@@ -140,12 +140,16 @@ std::string CoopTo1pState::PublicStateString() const {
 // Represents a decision point; contains the last action (if any) in the
 // underlying game and the current valid hands and their assignments.
 std::string CoopTo1pState::ObservationString(Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
   return absl::StrCat("Player ", player, "\n", PublicStateString(), "\n",
                       Assignments());
 }
 
-void CoopTo1pState::ObservationTensor(Player unused_player,
+void CoopTo1pState::ObservationTensor(Player player,
                                       std::vector<double>* values) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
   const int num_actions = state_->NumDistinctActions();
   const int num_players = state_->NumPlayers();
   values->resize(num_privates_ * (num_players + num_actions + 1) + num_actions);

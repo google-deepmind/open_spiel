@@ -41,6 +41,7 @@ ArgsLibAddArg virtualenv bool true "Whether to use virtualenv. We enter a virtua
 ArgsLibAddArg install string "default" 'Whether to install requirements.txt packages. Doing it is slow. By default, it will be true (a) the first-time a virtualenv is being setup (if system_wide_packages is false), (b) if the user overrides it with "true".'
 ArgsLibAddArg system_wide_packages bool false 'Whether to use --system-site-packages on the virtualenv.'
 ArgsLibAddArg build_with_pip bool false 'Whether to use "python3 -m pip install ." or the usual cmake&make and ctest.'
+ArgsLibAddArg test_only string "all" 'Builds and runs the specified test only (use "all" to run all tests)'
 ArgsLibParse $@
 
 function die() {
@@ -143,6 +144,19 @@ if [[ ${BUILD_WITH_JULIA:-"OFF"} == "ON" ]]; then
   echo "Found libcxxwrap_julia at $LIBCXXWRAP_JULIA_DIR with $JULIA_VERSION_INFO"
 fi
 
+function print_tests_passed {
+  echo -e "\033[32mAll tests passed. Nicely done!\e[0m"
+}
+
+function print_tests_failed {
+  echo -e "\033[31mAt least one test failed.\e[0m"
+  echo "If this is the first time you have run these tests, try:"
+  echo "pip3 install -r requirements.txt"
+  echo "Note that outside a virtualenv, you will need to install the system "
+  echo "wide matplotlib: sudo apt-get install python-matplotlib"
+  exit 1
+}
+
 # Build / install everything and run tests (C++, Python, optionally Julia).
 if [[ $ARG_build_with_pip == "true" ]]; then
   # TODO(author2): We probably want to use `python3 -m pip install .` directly
@@ -153,7 +167,6 @@ if [[ $ARG_build_with_pip == "true" ]]; then
     echo -e "\033[32mAll tests passed. Nicely done!\e[0m"
   else
     echo -e "\033[31mAt least one test failed.\e[0m"
-
     exit 1
   fi
 else
@@ -161,23 +174,40 @@ else
 
   echo "Building and testing in $PWD using 'python' (version $PYVERSION)."
 
-  cmake -DPython_TARGET_VERSION=${PYVERSION} -DCMAKE_CXX_COMPILER=${CXX} -DCMAKE_PREFIX_PATH=${LIBCXXWRAP_JULIA_DIR} ../open_spiel
-  make -j$MAKE_NUM_PROCS
-
   pwd=`pwd`
   export PYTHONPATH=$PYTHONPATH:$pwd/..
   export PYTHONPATH=$PYTHONPATH:$pwd/../open_spiel
   export PYTHONPATH=$PYTHONPATH:$pwd/python  # For pyspiel bindings
 
-  if ctest -j$TEST_NUM_PROCS --output-on-failure ../open_spiel; then
-    echo -e "\033[32mAll tests passed. Nicely done!\e[0m"
+  cmake -DPython_TARGET_VERSION=${PYVERSION} -DCMAKE_CXX_COMPILER=${CXX} -DCMAKE_PREFIX_PATH=${LIBCXXWRAP_JULIA_DIR} ../open_spiel
+
+  if [ "$ARG_test_only" != "all" ]
+  then
+    # Check for building and runnin a specific test.
+    # TODO(author5): generlize this; currently only covers Python and C++ tests
+    echo "Build and testing only $ARG_test_only"
+    if [[ $ARG_test_only == python_* ]]; then
+      echo "Building pyspiel"
+      make -j$MAKE_NUM_PROCS pyspiel
+    else
+      echo "Building $ARG_test_only"
+      make -j$MAKE_NUM_PROCS $ARG_test_only
+    fi
+
+    if ctest -j$TEST_NUM_PROCS --output-on-failure -R "^$ARG_test_only\$" ../open_spiel; then
+      print_tests_passed
+    else
+      print_tests_failed
+    fi
   else
-    echo -e "\033[31mAt least one test failed.\e[0m"
-    echo "If this is the first time you have run these tests, try:"
-    echo "pip3 install -r requirements.txt"
-    echo "Note that outside a virtualenv, you will need to install the system "
-    echo "wide matplotlib: sudo apt-get install python-matplotlib"
-    exit 1
+    # Make and test everything
+    echo "Building and running all tests"
+    make -j$MAKE_NUM_PROCS
+    if ctest -j$TEST_NUM_PROCS --output-on-failure ../open_spiel; then
+      print_tests_passed
+    else
+      print_tests_failed
+    fi
   fi
 
   cd ..

@@ -18,6 +18,7 @@
 #include <memory>
 #include <optional>
 
+#include "open_spiel/games/efg_game_data.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/tests/basic_tests.h"
@@ -30,6 +31,8 @@ namespace testing = open_spiel::testing;
 
 const char* kSampleFilename = "open_spiel/games/efg/sample.efg";
 const char* kKuhnFilename = "open_spiel/games/efg/kuhn_poker.efg";
+const char* kSignalingFilename =
+    "open_spiel/games/efg/signaling_vonstengel_forges_2008.efg";
 
 void EFGGameSimTestsSampleFromData() {
   std::shared_ptr<const Game> game = LoadEFGGame(GetSampleEFGData());
@@ -49,15 +52,30 @@ void EFGGameSimTestsKuhnFromData() {
                  GameType::Information::kImperfectInformation);
   SPIEL_CHECK_EQ(type.utility, GameType::Utility::kZeroSum);
   SPIEL_CHECK_EQ(type.chance_mode, GameType::ChanceMode::kExplicitStochastic);
+  SPIEL_CHECK_EQ(game->NumDistinctActions(), 2);
 
   // EFG games loaded directly via string cannot be properly deserialized
   // because there is no way to pass the data back vai the game string.
   testing::RandomSimTestNoSerialize(*game, 100);
 }
 
+void EFGGameSimTestsSignalingFromData() {
+  std::shared_ptr<const Game> game = LoadEFGGame(GetSignalingEFGData());
+  SPIEL_CHECK_TRUE(game != nullptr);
+  GameType type = game->GetType();
+  SPIEL_CHECK_EQ(type.dynamics, GameType::Dynamics::kSequential);
+  SPIEL_CHECK_EQ(type.information,
+                 GameType::Information::kImperfectInformation);
+  SPIEL_CHECK_EQ(type.utility, GameType::Utility::kGeneralSum);
+  SPIEL_CHECK_EQ(type.chance_mode, GameType::ChanceMode::kExplicitStochastic);
+  SPIEL_CHECK_EQ(game->NumDistinctActions(), 8);
+  testing::RandomSimTestNoSerialize(*game, 100);
+}
+
 void EFGGameSimTestsSampleFromFile() {
   std::optional<std::string> file = FindFile(kSampleFilename, 2);
   if (file != std::nullopt) {
+    std::cout << "Found file: " << file.value() << "; running sim test.";
     std::shared_ptr<const Game> game =
         LoadGame("efg_game", {{"filename", GameParameter(file.value())}});
     SPIEL_CHECK_TRUE(game != nullptr);
@@ -68,6 +86,7 @@ void EFGGameSimTestsSampleFromFile() {
 void EFGGameSimTestsKuhnFromFile() {
   std::optional<std::string> file = FindFile(kKuhnFilename, 2);
   if (file != std::nullopt) {
+    std::cout << "Found file: " << file.value() << "; running sim test.";
     std::shared_ptr<const Game> game =
         LoadGame("efg_game", {{"filename", GameParameter(file.value())}});
     SPIEL_CHECK_TRUE(game != nullptr);
@@ -77,6 +96,25 @@ void EFGGameSimTestsKuhnFromFile() {
                    GameType::Information::kImperfectInformation);
     SPIEL_CHECK_EQ(type.utility, GameType::Utility::kZeroSum);
     SPIEL_CHECK_EQ(type.chance_mode, GameType::ChanceMode::kExplicitStochastic);
+    SPIEL_CHECK_EQ(game->NumDistinctActions(), 2);
+    testing::RandomSimTest(*game, 100);
+  }
+}
+
+void EFGGameSimTestsSignalingFromFile() {
+  std::optional<std::string> file = FindFile(kSignalingFilename, 2);
+  if (file != std::nullopt) {
+    std::cout << "Found file: " << file.value() << "; running sim test.";
+    std::shared_ptr<const Game> game =
+        LoadGame("efg_game", {{"filename", GameParameter(file.value())}});
+    SPIEL_CHECK_TRUE(game != nullptr);
+    GameType type = game->GetType();
+    SPIEL_CHECK_EQ(type.dynamics, GameType::Dynamics::kSequential);
+    SPIEL_CHECK_EQ(type.information,
+                   GameType::Information::kImperfectInformation);
+    SPIEL_CHECK_EQ(type.utility, GameType::Utility::kGeneralSum);
+    SPIEL_CHECK_EQ(type.chance_mode, GameType::ChanceMode::kExplicitStochastic);
+    SPIEL_CHECK_EQ(game->NumDistinctActions(), 8);
     testing::RandomSimTest(*game, 100);
   }
 }
@@ -90,4 +128,6 @@ int main(int argc, char** argv) {
   open_spiel::efg_game::EFGGameSimTestsKuhnFromData();
   open_spiel::efg_game::EFGGameSimTestsSampleFromFile();
   open_spiel::efg_game::EFGGameSimTestsKuhnFromFile();
+  open_spiel::efg_game::EFGGameSimTestsSignalingFromData();
+  open_spiel::efg_game::EFGGameSimTestsSignalingFromFile();
 }
