@@ -76,7 +76,7 @@ message("${BoldYellow}BUILD_WITH_JULIA: ${BUILD_WITH_JULIA} ${ColourReset}")
 
 set (BUILD_WITH_PYTHON ON CACHE BOOL "Build binary for Python.")
 if(NOT DEFINED ENV{BUILD_WITH_PYTHON})
-    message("${BoldRed}BUILD_WITH_PYTHON not set. Defaults to OFF${ColourReset}")
+    message("${BoldRed}BUILD_WITH_PYTHON not set. Defaults to ON${ColourReset}")
     set (ENV{BUILD_WITH_PYTHON} ON)
 endif()
 set (BUILD_WITH_PYTHON $ENV{BUILD_WITH_PYTHON})
