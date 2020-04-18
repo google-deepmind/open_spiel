@@ -139,7 +139,7 @@ if [[ ${BUILD_WITH_JULIA:-"OFF"} == "ON" ]]; then
     PATH=${PATH}:${HOME}/.local/bin
     [[ -x `which julia` ]] || die "could not find julia command. Please add it to PATH and rerun."
   fi
-  LIBCXXWRAP_JULIA_DIR=`julia --project=${MYDIR}/../julia -e 'using CxxWrap; print(dirname(dirname(CxxWrap.CxxWrapCore.libcxxwrap_julia_jll.libcxxwrap_julia_path)))'`
+  LIBCXXWRAP_JULIA_DIR=`julia --project=${MYDIR}/../julia -e 'using CxxWrap; print(CxxWrap.prefix_path())'`
   JULIA_VERSION_INFO=`julia --version`
   echo "Found libcxxwrap_julia at $LIBCXXWRAP_JULIA_DIR with $JULIA_VERSION_INFO"
 fi

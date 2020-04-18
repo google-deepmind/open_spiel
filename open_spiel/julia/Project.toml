@@ -7,7 +7,7 @@ version = "0.1.1"
 CxxWrap = "1f15a43c-97ca-5a2a-ae31-89f07a497df4"
 
 [compat]
-CxxWrap = "0.10"
+CxxWrap = "0.10.1"
 julia = "1.3"
 
 [extras]
