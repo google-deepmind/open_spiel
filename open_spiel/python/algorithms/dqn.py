@@ -134,6 +134,8 @@ class DQN(rl_agent.AbstractAgent):
     self._epsilon_decay_duration = epsilon_decay_duration
 
     # TODO(author6) Allow for optional replay buffer config.
+    if not isinstance(replay_buffer_capacity, int):
+      raise ValueError("Replay buffer capacity not an integer.")
     self._replay_buffer = replay_buffer_class(replay_buffer_capacity)
     self._prev_timestep = None
     self._prev_action = None

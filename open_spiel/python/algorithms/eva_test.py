@@ -47,7 +47,7 @@ class EVATest(parameterized.TestCase):
                 embedding_size=12,
                 learning_rate=1e-4,
                 mixing_parameter=0.5,
-                memory_capacity=1e6,
+                memory_capacity=int(1e6),
                 discount_factor=1.0,
                 epsilon_start=1.0,
                 epsilon_end=0.1,

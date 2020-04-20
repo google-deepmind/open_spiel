@@ -98,7 +98,7 @@ class EVAAgent(object):
                num_neighbours=5,
                learning_rate=1e-4,
                mixing_parameter=0.9,
-               memory_capacity=1e6,
+               memory_capacity=int(1e6),
                discount_factor=1.0,
                update_target_network_every=1000,
                epsilon_start=1.0,
@@ -157,6 +157,10 @@ class EVAAgent(object):
     self._embedding_network = snt.nets.MLP(
         list(embedding_network_layers) + [embedding_size])
     self._embedding = self._embedding_network(self._info_state_ph)
+
+    # The DQN agent requires this be an integer.
+    if not isinstance(memory_capacity, int):
+      raise ValueError("Memory capacity not an integer.")
 
     # Initialize the parametric & non-parametric Q-networks.
     self._agent = dqn.DQN(
