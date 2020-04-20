@@ -78,16 +78,17 @@ class LinearSchedule(ValueSchedule):
     super(LinearSchedule, self).__init__()
     self._value = init_val
     self._final_value = final_val
+    assert isinstance(num_steps, int)
     self._num_steps = num_steps
     self._steps_taken = 0
     self._increment = (final_val - init_val) / num_steps
 
   def step(self):
     self._steps_taken += 1
-    if self._steps_taken == self._num_steps:
-      self._value = self._final_value
-    else:
+    if self._steps_taken < self._num_steps:
       self._value += self._increment
+    elif self._steps_taken == self._num_steps:
+      self._value = self._final_value
     return self._value
 
   @property
