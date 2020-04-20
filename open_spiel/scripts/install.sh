@@ -118,14 +118,10 @@ if [[ ${BUILD_WITH_JULIA:-"OFF"} == "ON" ]]; then
     JULIA_VERSION=1.3.1 bash $JULIA_INSTALLER -y
     # Should install in $HOME/.local/bin which was added to the path above
     [[ -x `which julia` ]] || die "julia not found PATH after install."
-    # Temporary workaround to fix a known issue with CxxWrap:
-    # https://github.com/JuliaInterop/libcxxwrap-julia/issues/39
-    rm -f $HOME/packages/julias/julia-1.3.1/lib/julia/libstdc++.so.6
   fi
 
   # Install dependencies.
-  # TODO(author11) Remove the special-case CxxWrap installation. This may require waiting for v0.9 to be officially released.
-  julia --project="${MYDIR}/open_spiel/julia" -e 'using Pkg; Pkg.instantiate(); Pkg.add(Pkg.PackageSpec(name="CxxWrap", rev="0c82e3e383ddf2db1face8ece22d0a552f0ca11a"));'
+  julia --project="${MYDIR}/open_spiel/julia" -e 'using Pkg; Pkg.instantiate();'
 fi
 
 # Install other system-wide packages.

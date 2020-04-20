@@ -139,9 +139,9 @@ if [[ ${BUILD_WITH_JULIA:-"OFF"} == "ON" ]]; then
     PATH=${PATH}:${HOME}/.local/bin
     [[ -x `which julia` ]] || die "could not find julia command. Please add it to PATH and rerun."
   fi
-  JlCxx_DIR=`julia --project=${MYDIR}/../julia -e 'using CxxWrap; print(joinpath(dirname(CxxWrap.jlcxx_path), "cmake", "JlCxx"))'`
+  LIBCXXWRAP_JULIA_DIR=`julia --project=${MYDIR}/../julia -e 'using CxxWrap; print(dirname(dirname(CxxWrap.CxxWrapCore.libcxxwrap_julia_jll.libcxxwrap_julia_path)))'`
   JULIA_VERSION_INFO=`julia --version`
-  echo "Found JlCxx at $JlCxx_DIR with $JULIA_VERSION_INFO"
+  echo "Found libcxxwrap_julia at $LIBCXXWRAP_JULIA_DIR with $JULIA_VERSION_INFO"
 fi
 
 function print_tests_passed {
@@ -179,7 +179,7 @@ else
   export PYTHONPATH=$PYTHONPATH:$pwd/../open_spiel
   export PYTHONPATH=$PYTHONPATH:$pwd/python  # For pyspiel bindings
 
-  cmake -DPython_TARGET_VERSION=${PYVERSION} -DCMAKE_CXX_COMPILER=${CXX} -DJlCxx_DIR=${JlCxx_DIR} ../open_spiel
+  cmake -DPython_TARGET_VERSION=${PYVERSION} -DCMAKE_CXX_COMPILER=${CXX} -DCMAKE_PREFIX_PATH=${LIBCXXWRAP_JULIA_DIR} ../open_spiel
 
   if [ "$ARG_test_only" != "all" ]
   then
@@ -189,6 +189,9 @@ else
     if [[ $ARG_test_only == python_* ]]; then
       echo "Building pyspiel"
       make -j$MAKE_NUM_PROCS pyspiel
+    elif [[ $ARG_test_only == julia_test ]]; then
+      echo "Building Julia API"
+      make -j$MAKE_NUM_PROCS spieljl
     else
       echo "Building $ARG_test_only"
       make -j$MAKE_NUM_PROCS $ARG_test_only

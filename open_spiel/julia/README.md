@@ -6,4 +6,4 @@ For general usage, please refer
 For developers, the basic idea of this Julia wrapper is that, a shared lib named
 `libspieljl.so` is built with the help of
 [CxxWrap.jl](https://github.com/JuliaInterop/CxxWrap.jl) and then it is wrapped
-in the `OpenSpiel_jll` module.
+in the `OpenSpiel` module.

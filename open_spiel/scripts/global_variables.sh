@@ -26,6 +26,9 @@
 # particular to be able to use that in the Travis CI test.
 export DEFAULT_OPTIONAL_DEPENDENCY=${DEFAULT_OPTIONAL_DEPENDENCY:-"OFF"}
 
+# Building the Python API can be disabled by setting this to OFF.
+export BUILD_WITH_PYTHON=${BUILD_WITH_PYTHON:-"ON"}
+
 # Each optional dependency has their own flag, that defaults to the global
 # "$DEFAULT_OPTIONAL_DEPENDENCY" if undefined. To enable an optional dependency,
 # we recomment defining the associated environment variable in your bashrc or
