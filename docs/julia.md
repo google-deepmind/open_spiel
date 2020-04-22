@@ -26,6 +26,10 @@ to install this package:
 
 1.  Install `] dev ./open_spiel/julia` (run in Julia REPL).
 
+## Know Problems
+
+1.  There's a problem when building this package on Mac with XCode v11.4 or above (see discussions [here](https://github.com/deepmind/open_spiel/pull/187#issuecomment-616540881)). To fix it, you need to install the latest `libcxxwrap` by following the instructions [here](https://github.com/JuliaInterop/libcxxwrap-julia#building-libcxxwrap-julia) after running `./install.sh`. Then make sure that the result of `julia --project=./open_spiel/julia -e 'using CxxWrap; print(CxxWrap.prefix_path())'` points to the newly built `libcxxwrap`. After that, build and install this package as stated above.
+
 ## Example
 
 Here we demonstrate how to use the Julia API to play one game:
