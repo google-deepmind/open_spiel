@@ -568,6 +568,9 @@ PYBIND11_MODULE(pyspiel, m) {
            (std::unordered_map<Action, double>(open_spiel::Policy::*)(
                const open_spiel::State&) const) &
                open_spiel::Policy::GetStatePolicyAsMap)
+      .def("get_state_policy", (ActionsAndProbs(open_spiel::Policy::*)(
+                                   const open_spiel::State&) const) &
+                                   open_spiel::Policy::GetStatePolicy)
       .def("get_state_policy_as_map",
            (std::unordered_map<Action, double>(open_spiel::Policy::*)(
                const std::string&) const) &
@@ -585,7 +588,9 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("policy_table",
            py::overload_cast<>(&open_spiel::TabularPolicy::PolicyTable));
   m.def("UniformRandomPolicy", &open_spiel::GetUniformPolicy);
-
+  py::class_<open_spiel::UniformPolicy, open_spiel::Policy>(m, "UniformPolicy")
+      .def(py::init<>())
+      .def("get_state_policy", &open_spiel::UniformPolicy::GetStatePolicy);
   py::class_<open_spiel::algorithms::CFRSolver>(m, "CFRSolver")
       .def(py::init<const Game&>())
       .def("evaluate_and_update_policy",
