@@ -24,6 +24,7 @@
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_format.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
@@ -168,6 +169,14 @@ TabularPolicy GetFirstActionPolicy(const Game& game) {
     }
   }
   return TabularPolicy(policy);
+}
+
+std::string PrintPolicy(const ActionsAndProbs& policy) {
+  std::string policy_string;
+  for (auto [a, p] : policy) {
+    absl::StrAppend(&policy_string, absl::StrFormat("(%i, %f), ", a, p));
+  }
+  return policy_string;
 }
 
 }  // namespace open_spiel

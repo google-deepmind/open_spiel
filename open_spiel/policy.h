@@ -183,6 +183,8 @@ TabularPolicy GetUniformPolicy(const Game& game);
 TabularPolicy GetRandomPolicy(const Game& game, int seed = 0);
 TabularPolicy GetFirstActionPolicy(const Game& game);
 
+std::string PrintPolicy(const ActionsAndProbs& policy);
+
 }  // namespace open_spiel
 
 #endif  // OPEN_SPIEL_POLICY_H_
