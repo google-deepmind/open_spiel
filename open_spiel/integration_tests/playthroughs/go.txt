@@ -6,7 +6,7 @@ GameType.information = Information.PERFECT_INFORMATION
 GameType.long_name = "Go"
 GameType.max_num_players = 2
 GameType.min_num_players = 2
-GameType.parameter_specification = ["board_size", "handicap", "komi"]
+GameType.parameter_specification = ["board_size", "handicap", "komi", "max_game_length"]
 GameType.provides_information_state_string = True
 GameType.provides_information_state_tensor = False
 GameType.provides_observation_string = True
@@ -18,7 +18,7 @@ GameType.utility = Utility.ZERO_SUM
 NumDistinctActions() = 50
 PolicyTensorShape() = [50]
 MaxChanceOutcomes() = 0
-GetParameters() = {board_size=7,handicap=0,komi=4.5}
+GetParameters() = {board_size=7,handicap=0,komi=4.5,max_game_length=98}
 NumPlayers() = 2
 MinUtility() = -1.0
 MaxUtility() = 1.0
