@@ -6,37 +6,36 @@
 #include <optional>
 #include <utility>
 #include <math.h>
-#include <unordered_map>
-#include <assert.h>
 
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel_utils.h"
 
 #define RESET   "\033[0m"
-#define BLACK   "\033[30m"
 #define RED     "\033[31m"
-#define GREEN   "\033[32m"
 #define YELLOW  "\033[33m"
-#define BLUE    "\033[34m"
-#define MAGENTA "\033[35m"
-#define CYAN    "\033[36m"
 #define WHITE   "\033[37m"
 
+/* GAME INFO
+   An implementation of Klondike Solitaire with 3 cards drawn at a time & infinite redeals. By default, `COLOR_FLAG` is
+   set to true and will color cards when they are converted to strings. If you see anything like "\033[...m" instead of
+   colored cards, then you can turn off this functionality by compiling again with `COLOR_FLAG` set to false.
 
-/* =====================================================================================================================
+   LOOP PREVENTION
+   Part of the difficulty in implementing this game is that no matter how many cards are drawn at a time or how many
+   redeals are allowed, certain situations lead to an infinite loop (e.g. moving a queen of hearts back and forth
+   between a king of spades and king of clubs).
 
-    An implementation of Klondike Solitaire with 3 cards drawn at a time & infinite redeals. Part of the difficulty in
-    implementing this game is that no matter how many cards are drawn at a time or how many redeals are allowed,
-    certain situations lead to an infinite loop (e.g. moving a queen of hearts back and forth between a king of spades
-    and king of clubs). In this implementation, we prevent these loops by recognizing when a "reversible move" is made;
-    one that has the potential to be returned to at a later state. Starting from this first reversible move, the output
-    of `ObservationString` is hashed and stored in `previous_states` in its descendants. `CandidateMoves` then provides
-    a list of moves that are technically legal according to the rules of the game and all reversible moves in this list
-    are checked to ensure they don't form a back edge to any member of `previous_states`. The moves that satisfy this
-    condition are passed along as `LegalActions`.
+   In this implementation, we prevent these loops by recognizing when a "reversible move" is made; one that has the
+   potential to be returned to at a later state. Starting from this first reversible move, the output of
+   `ObservationString` is hashed and stored in `previous_states` in its descendants. `CandidateMoves` then provides a
+   list of moves that are technically legal according to the rules of the game and all reversible moves in this list are
+   checked to ensure they don't form a back edge to any member of `previous_states`. The moves that satisfy this
+   condition are passed along as `LegalActions`.
 
-===================================================================================================================== */
+   If an irreversible move is made, `previous_states` is cleared and all candidate moves will be passed along as
+   `LegalActions` without having to check them for back edges. This continues until a reversible move is made, at which
+   point the above paragraph apply again. */
 
 /* TERMINOLOGY
     Pile:
@@ -61,7 +60,8 @@
     Deck:
         Purely a container of cards that can be drawn in groups of 3 into the waste. When it is empty,
         the deck is rebuilt by moving all remaining cards in the waste back into the deck in the
-        order they were originally revealed in the waste. It has no targets or sources.
+        order they were originally revealed in the waste. It has no targets or sources. The deck and waste
+        are both implemented in the `Deck` class as some of its attributes.
 
     Waste:
         Another ordered set of cards. It has no targets and has only one source card at most. The source
@@ -72,7 +72,7 @@
     Source Card:
         The card being moved to a target. In the case of a pile being moved, it is the first card
         in the pile, e.g. in the move (Ks <- Qh) where the cards being moved are {Qh, Js, 10h},
-        Qh would be the source card. Can be in any pile except the deck.
+        Qh would be the source card. Sources can be in any pile except the deck.
 
     Target Card:
         The single card that a source is being moved to. In the move (Ks <- Qh), the target would be
@@ -117,18 +117,6 @@
         is directly on top of a hidden card, in which case a chance node will reveal it in the next state. As you
         can't hide a card again once it's been revealed or move a card to the waste, these moves have no way of
         reaching a previous state. Reversible moves are just defined as moves that aren't irreversible.
-
-
-
-
-
-*/
-
-/* IDEAS
-   - One way to test if the game tree is complete (kind of) is to search the game with no
-     restrictions to a large depth. Record the maximum return in that simulation. Then search
-     the tree with restrictions (so it terminates), ensuring that with restrictions doesn't
-     limit the maximum return.
 */
 
 namespace open_spiel::solitaire {
@@ -160,17 +148,27 @@ namespace open_spiel::solitaire {
 
     // Miscellaneous ===================================================================================================
 
+    /* Used to hash the std::string of the current state. This is only used when a reversible move is made and
+     * we need to check if candidate moves would form a back edge to this state. Instead of comparing strings, we
+     * compare the hash of the strings created with this object. */
     std::hash<std::string> hasher;
 
+    /* Whether to format strings with ANSI colors or not.
+     * Only used by the function below, `color()`. */
     bool COLOR_FLAG = true;
 
     std::string color(std::string color) {
+        /* Returns an ANSI color provided by the argument (e.g. RED, YELLOW, WHITE, RESET) if `COLOR_FLAG` is true.
+         * Otherwise it returns an empty string. This is used so we can quickly turn color on and off. It's usually
+         * useful to have it on, as we can quickly see valid moves more quickly. In some cases, the terminal doesn't
+         * support colors and rather than print a bunch of gibberish, we can turn it off by setting `COLOR_FLAG`
+         * to false. */
         return COLOR_FLAG ? std::move(color) : "";
     }
 
     std::vector<std::string> GetOppositeSuits(const std::string & suit) {
-
-        // tracer trace("GetOppositeSuits()");
+        /* Just returns a vector of the suits of opposite color. For red suits ("h" and "d"), this returns the
+         * black suits ("s", "c"). For a black suit, this returns the red suits. */
 
         if (suit == "s" or suit == "c") {
             return {"h", "d"};
@@ -183,8 +181,8 @@ namespace open_spiel::solitaire {
     }
 
     std::string LocationString(Location location) {
-
-        // tracer trace("LocationString()");
+        /* `Location` is an enum, meaning that at runtime we can only see the value its tied to. This function lets
+         * us get a std::string of that value during runtime (e.g. kDeck is 0, LocationString(0) -> "kDeck") */
 
         switch (location) {
             case kDeck : {
@@ -209,18 +207,21 @@ namespace open_spiel::solitaire {
     }
 
     std::vector<double> ToCardIndices(const std::deque<Card> & pile, int length) {
-        // TODO: Handle empty piles
 
-        // tracer trace("ToCardIndices()");
+        /* Turns a pile of cards into a pile of card indices that is resized to a given length. If it's resized
+         * to be longer than the pile of cards, it is filled with `NO_CARD` (99.0) at the end. */
 
         std::vector<double> index_vector;
-        for (auto & card : pile) {
-            if (card.hidden) {
-                index_vector.push_back(HIDDEN_CARD);
-            } else {
-                index_vector.push_back((int) card);
+        if (not pile.empty()) {
+            for (auto & card : pile) {
+                if (card.hidden) {
+                    index_vector.push_back(HIDDEN_CARD);
+                } else {
+                    index_vector.push_back((int) card);
+                }
             }
         }
+
         index_vector.resize(length, NO_CARD);
         
         return index_vector;
@@ -234,16 +235,18 @@ namespace open_spiel::solitaire {
         suit(std::move(suit)),
         hidden(true),
         location(kMissing) {
-        // tracer trace("Card(rank, suit)");
+        /* Constructs a card with a given rank and suit. Must be unhidden and have it location set outside
+         * of this constructor */
     }
 
     Card::Card() : rank(""), suit(""), hidden(true), location(kMissing) {
-        // tracer trace("Card()");
+        /* Default constructor, just creates a hidden card with no rank, suit, or location. */
     }
 
     Card::Card(int index) : hidden(false), location(kMissing) {
 
-        // tracer trace("Card(int index)");
+        /* Constructs an unhidden card from its index; `location` is set to kMissing here and must be set outside of
+         * this constructor to be used by methods that depend on it */
 
         // Handles special cards
         if (index < 0) {
@@ -271,62 +274,30 @@ namespace open_spiel::solitaire {
     }
 
     Card::operator int() const {
-        // OPTIMIZE: This shouldn't have to recalculate the index after it's been set once before.
+        /* Looks up the card index with the map `RANKSUIT_TO_INDEX`. Depends only on the rank and suit of the card,
+         * so it could be called on a hidden card. Special cards (those with an empty rank "") are supported too. */
 
-        // tracer trace("Card::operator int()");
-
-        // NEW WAY OF GETTING INDEX
         std::pair<std::string, std::string> ranksuit = {rank, suit};
         return RANKSUIT_TO_INDEX.at(ranksuit);
-
-        /* OLD WAY OF GETTING INDEX
-        int old_index;
-        if (rank.empty()) {
-            if      (suit == "s")  { old_index = -1; }
-            else if (suit == "h")  { old_index = -2; }
-            else if (suit == "c")  { old_index = -3; }
-            else if (suit == "d")  { old_index = -4; }
-            else if (suit.empty()) { old_index = -5; }
-        }
-        else {
-            int rank_value = GetIndex(RANKS, rank);
-            int suit_value = GetIndex(SUITS, suit);
-            old_index = 13 * suit_value + rank_value;
-        }
-
-        std::cout << RED << "Comparing old and new methods of getting card index" << RESET << std::endl;
-        std::cout << "Card we are converting = " << this->ToString() << std::endl;
-        std::cout << "Old index = " << old_index << std::endl;
-        std::cout << "New index = " << index << std::endl;
-        */
-
-        /*
-        if (hidden) {
-            return (int) HIDDEN_CARD;
-        } else {
-            std::pair<std::string, std::string> ranksuit = {rank, suit};
-            try {
-                return RANKSUIT_TO_INDEX.at(ranksuit);
-            } catch (std::out_of_range()) {
-                std::cout << "ERROR: rank = " << ranksuit.first << "; suit = " << ranksuit.second << std::endl;
-            }
-        }
-        */
     }
 
     bool Card::operator==(Card & other_card) const {
-        // // tracer trace("Card::operator==");
         return rank == other_card.rank and suit == other_card.suit;
     }
 
     bool Card::operator==(const Card & other_card) const {
-        // // tracer trace("Card::operator==");
         return rank == other_card.rank and suit == other_card.suit;
     }
 
     std::vector<Card> Card::LegalChildren() const {
 
-        // tracer trace("LegalChildren()");
+        /* Returns a vector of the legal children a card can have. Depends on rank, suit, location, and if the card is
+         * hidden. Hidden cards can have no legal children. Cards with no rank or suit have four legal children, kings
+         * of all four suits. Cards with no rank and a suit have one child, an ace of the same suit. Otherwise, for
+         * cards with both a rank and a suit, their legal children depend on their location. In a foundation, they have
+         * one legal child, a card of the same suit but one rank higher (except for kings which have none). In a
+         * tableau, they have two legal children that are one rank lower, one for each opposite color suit (except for
+         * aces which have no legal children) */
 
         std::vector<Card>        legal_children = {};
         std::string              child_rank;
@@ -380,9 +351,10 @@ namespace open_spiel::solitaire {
     }
 
     std::string Card::ToString() const {
-        // TODO: Don't include formatting whitespace in this method
 
-        // tracer trace("Card::ToString()");
+        /* Represents the card as a string. Hidden and special cards have a single unicode glyph. Ordinary cards are
+         * represented as a concatenation of their rank and suit, optionally colored based on their suit if `COLOR_FLAG`
+         * is true (e.g. Card("Q", "h') would be "Qh") */
 
         std::string result;
 
@@ -435,7 +407,8 @@ namespace open_spiel::solitaire {
 
     Deck::Deck() {
 
-        // tracer trace("Deck()");
+        /* Default constructor, fills its attribute `cards` with 24 hidden cards and sets their location to kDeck.
+         * These cards have no rank or suit initially, those are given to them when revealed by a kReveal move */
 
         for (int i = 1; i <= 24; i++) {
             cards.emplace_back();
@@ -447,9 +420,10 @@ namespace open_spiel::solitaire {
 
     std::vector<Card> Deck::Sources() const {
 
-        // tracer trace("Deck::Sources()");
+        /* Despite being a vector, Sources() can only return one card at most. This is always the card that is at the
+         * front of the waste unless it is hidden. If the waste is empty or the front card is hidden, this returns
+         * an empty vector */
 
-        // TODO: Can simplify this if statement
         // If the waste is not empty, sources is just a vector of the top card of the waste
         if (not waste.empty()) {
             if (waste.front().hidden) {
@@ -467,7 +441,9 @@ namespace open_spiel::solitaire {
 
     std::vector<Card> Deck::Split(Card card) {
 
-        // tracer trace("Deck::Split()");
+        /* Returns the front card of the waste if it matches the `card` argument provided. This card is removed from
+         * the waste during the method. Behavior for what happens when the card doesn't match or there is no front
+         * card to check is undefined */
 
         std::vector<Card> split_cards;
         if (waste.front() == card) {
@@ -479,7 +455,8 @@ namespace open_spiel::solitaire {
 
     void Deck::draw(unsigned long num_cards) {
 
-        // tracer trace("Deck::draw()");
+        /* Pops and moves up to `num_cards` cards from the deck into the waste. Their location is changed from
+         * kDeck to kWaste when this happens. */
 
         std::deque<Card> drawn_cards;
         num_cards = std::min(num_cards, cards.size());
@@ -498,7 +475,9 @@ namespace open_spiel::solitaire {
 
     void Deck::rebuild() {
 
-        // tracer trace("Deck::rebuild()");
+        /* If `deck.cards` is empty, this method repopulates it with cards from `deck.waste` in the order given by
+         * `initial_order`. This allows us to keep drawing from the deck in the exact same order every time, only
+         * changing when a card is split from the waste and moved somewhere else */
 
         // TODO: Make sure cards and initial_order are never both empty at the same time.
         if (cards.empty()) {
@@ -518,19 +497,14 @@ namespace open_spiel::solitaire {
     // Foundation Methods ==============================================================================================
 
     Foundation::Foundation() {
-        // tracer trace("Foundation()");
         cards = {};
     }
 
     Foundation::Foundation(std::string suit) : suit(std::move(suit)) {
-        // tracer trace("Foundation(suit)");
         cards = {};
     }
 
     std::vector<Card> Foundation::Sources() const {
-
-        // tracer trace("Foundation::Sources()");
-
         // If the foundation is not empty, sources is just a vector of the top card of the foundation
         if (not cards.empty()) {
             return {cards.back()};
@@ -542,8 +516,6 @@ namespace open_spiel::solitaire {
     }
 
     std::vector<Card> Foundation::Targets() const {
-
-        // tracer trace("Foundation::Targets()");
 
         // If the foundation is not empty, targets is just the top card of the foundation
         if (not cards.empty()) {
@@ -559,9 +531,6 @@ namespace open_spiel::solitaire {
     }
 
     std::vector<Card> Foundation::Split(Card card) {
-
-        // tracer trace("Foundation::Split()");
-
         std::vector<Card> split_cards;
         if (cards.back() == card) {
             split_cards = {cards.back()};
@@ -571,12 +540,6 @@ namespace open_spiel::solitaire {
     }
 
     void Foundation::Extend(const std::vector<Card> & source_cards) {
-
-        // tracer trace("Foundation::Extend()");
-
-        // TODO: Can only extend with ordinary cards
-        // TODO: Probably no use for setting hidden to false.
-
         for (auto card : source_cards) {
             card.location = kFoundation;
             cards.push_back(card);
@@ -585,14 +548,9 @@ namespace open_spiel::solitaire {
 
     // Tableau Methods =================================================================================================
 
-    Tableau::Tableau() {
-        // tracer trace("Tableau()");
-    }
+    Tableau::Tableau() = default;
 
     Tableau::Tableau(int num_cards) {
-
-        // tracer trace("Tableau(num_cards)");
-
         for (int i = 1; i <= num_cards; i++) {
             cards.emplace_back();
         }
@@ -602,9 +560,6 @@ namespace open_spiel::solitaire {
     }
 
     std::vector<Card> Tableau::Sources() const {
-
-        // tracer trace("Tableau::Sources()");
-
         // If the tableau is not empty, sources is just a vector of all cards that are not hidden
         if (not cards.empty()) {
             std::vector<Card> sources;
@@ -622,11 +577,7 @@ namespace open_spiel::solitaire {
     }
 
     std::vector<Card> Tableau::Targets() const {
-        // DECISION: Should targets return a vector, even though it will only return one card?
         // If the tableau is not empty, targets is just a vector of the top card of the tableau
-
-        // tracer trace("Tableau::Targets()");
-
         if (not cards.empty()) {
             if (cards.back().hidden) {
                 return {};
@@ -644,11 +595,6 @@ namespace open_spiel::solitaire {
     }
 
     std::vector<Card> Tableau::Split(Card card) {
-
-        // TODO: How to handle a split when card isn't in this tableau?
-
-        // tracer trace("Tableau::Split()");
-
         std::vector<Card> split_cards;
         if (not cards.empty()) {
             bool split_flag = false;
@@ -671,9 +617,6 @@ namespace open_spiel::solitaire {
     }
 
     void Tableau::Extend(const std::vector<Card> & source_cards) {
-
-        // tracer trace("Tableau::Extend()");
-
         for (auto card : source_cards) {
             card.location = kTableau;
             cards.push_back(card);
@@ -683,27 +626,38 @@ namespace open_spiel::solitaire {
     // Move Methods ====================================================================================================
 
     Move::Move(Card target_card, Card source_card) {
-        // tracer trace("Move(target_card, source_card");
+        /* A move is essentially just a pair of cards where `target` is in `SolitaireState::Targets()`, `source` is
+         * in `SolitaireState::Sources()`, and `source` is in `target.LegalChildren()`. Each possible combination
+         * in a game has a corresponding `Action` in `enum ActionType` in solitaire.h */
+
         target = std::move(target_card);
         source = std::move(source_card);
     }
 
     Move::Move(Action action_id) {
-        // tracer trace("Move(action_id)");
+        /* Creates a move from an `Action` (e.g. Move(kMove7d6s) would have a `target` 7d and a `source` 6s).
+         * Used in `DoApplyAction` when given a kMove action to convert the action to a move that can be moved
+         * with `SolitaireState::MoveCards()` */
+
         auto card_pair = ACTION_TO_MOVE.at(action_id);
         target = Card(card_pair.first);
         source = Card(card_pair.second);
     }
 
     std::string Move::ToString() const {
-        // tracer trace("Move::ToString()");
+        /* Represents the target and source in the form (target ← source). The target and source are converted to
+         * strings via the `Card::ToString()` method, which can optionally be formatted with colors. */
+
         std::string result;
         absl::StrAppend(&result, target.ToString(), " ", "\U00002190", " ",source.ToString());
         return result;
     }
 
     Action Move::ActionId() const {
-        // tracer trace("Move::ActionId()");
+        /* The inverse of `Move(Action)`. Instead of making a move from an action, it takes an existing move
+         * and converts it back into its action. Used in `LegalActions()` to convert the moves returned from
+         * `CandidateMoves()` into actions. */
+
         return MOVE_TO_ACTION.at(std::make_pair((int) target, (int) source));
     }
 
@@ -714,7 +668,6 @@ namespace open_spiel::solitaire {
         deck(),
         foundations(),
         tableaus() {
-            // tracer trace("SolitaireState(game)");
             is_started = false;
             is_setup = false;
             previous_score = 0.0;
@@ -724,9 +677,12 @@ namespace open_spiel::solitaire {
 
     Player                  SolitaireState::CurrentPlayer() const {
 
-        // tracer trace("SolitaireState::CurrentPlayer()");
+        /* As there are only two actors in the game, chance and the player, we can determine who the current player
+         * is based on if the state is a chance node or not. At terminal nodes, the player is always kTerminalPlayer.
+         * If it's not terminal, then if it's a chance node, the player is kChancePlayerId. Otherwise, it's always
+         * the player, which has index 0.
+         */
 
-        // There are only two players in this game: chance and player 1.
         if (IsTerminal()) {
             // Index of the chance player
             return kTerminalPlayerId;
@@ -750,21 +706,11 @@ namespace open_spiel::solitaire {
 
     bool                    SolitaireState::IsTerminal() const {
 
-        // tracer trace("SolitaireState::IsTerminal()");
-
-        // Even if a player can't make any more moves this game, we still want to reveal
-        /*
-        int i = 0;
-        for (auto & card : deck.waste) {
-            if (card.hidden) { return false; }
-            else if (i >= 2) {
-                break;
-            }
-            else {
-                ++i;
-            }
-        }
-        */
+        /* Decides if the game is over, `is_finished` is an attribute of the state that allows us to make the next
+         * state terminal no matter what. The state is also terminal if the last 8 actions have been kDraw (Drawing
+         * through the entire deck without moving anything from it is equivalent to never having drawn through it at
+         * all). Finally, if LegalActions() is empty, then the state is also terminal as it can't be progressed
+         * any further */
 
         if (is_finished or draw_counter >= 9) {
             return true;
@@ -798,7 +744,9 @@ namespace open_spiel::solitaire {
 
     bool                    SolitaireState::IsChanceNode() const {
 
-        // tracer trace("SolitaireState::IsChanceNode()");
+        /* The first state in the game is always a chance node, so this returns true if `is_setup` is false. For
+         * subsequent states, if there is a hidden card in the waste or at the top card of a tableau, then this
+         * is also true so that a chance outcome can be chosen to reveal what rank and suit it has. */
 
         if (not is_setup) {
             // If setup is not started, this is a chance node
@@ -807,7 +755,7 @@ namespace open_spiel::solitaire {
 
         else {
 
-            // If there is a hidden card on the top of a tableau, this is a chance ndoe
+            // If there is a hidden card on the top of a tableau, this is a chance node
             for (auto & tableau : tableaus) {
                 if (tableau.cards.empty()) {
                     continue;
@@ -834,13 +782,17 @@ namespace open_spiel::solitaire {
 
     std::string             SolitaireState::ToString() const {
 
-        // tracer trace("SolitaireState::ToString()");
+        /* Only used for debugging, this method provides a representation of the current state. Other sections can
+         * be uncommented for more information or to debug but they will significantly impact performance as most of
+         * them don't reference a stored value and must be calculated again. */
 
         std::string result;
 
+        /*
         absl::StrAppend(&result, "DRAW COUNTER    : ", draw_counter);
 
         absl::StrAppend(&result, "\nIS REVERSIBLE   : ", is_reversible);
+        */
 
         absl::StrAppend(&result, "\n\nDECK        : ");
         for (const Card & card : deck.cards) {
@@ -878,6 +830,7 @@ namespace open_spiel::solitaire {
             }
         }
 
+        /*
         absl::StrAppend(&result, "\n\nTARGETS : ");
         for (const Card & card : Targets()) {
             absl::StrAppend(&result, card.ToString(), " ");
@@ -893,14 +846,14 @@ namespace open_spiel::solitaire {
             absl::StrAppend(&result, "\n", move.ToString(), " : ", move.ActionId());
             absl::StrAppend(&result, ", ", IsReversible(move));
         }
+        */
 
         return result;
     }
 
     std::string             SolitaireState::ActionToString(Player player, Action action_id) const {
-        // TODO: Probably use the enum names instead of the values the represent
-
-        // tracer trace("SolitaireState::ActionToString()");
+        /* Just converts an `Action` back to the name it was defined with (e.g. The `Action` kSetup maps to 0, this
+         * method converts 0 into a string "kSetup"). For a list of actions, see `enum ActionType` in solitaire.h */
 
         switch (action_id) {
             case kSetup : {
@@ -936,27 +889,22 @@ namespace open_spiel::solitaire {
     }
 
     std::string             SolitaireState::InformationStateString(Player player) const {
-        // tracer trace("SolitaireState::InformationStateString()");
+        /* Same thing as `HistoryString()`. It's just a list of actions taken since the beginning of the game.
+         * Can be useful for some debugging although I've found that because of it's large length it's usually better
+         * to split `InformationStateTensor` at the first occurrence of `kInvalidAction` and then reverse whats left
+         * in order to see the most recent actions taken */
+
         return HistoryString();
     }
 
     std::string             SolitaireState::ObservationString(Player player) const {
 
-        // tracer trace("SolitaireState::ObservationString()");
+        /* This method is actually very important in loop prevention as its value is hashed when a reversible move is
+         * done. It is basically just a subset of the information contained in `SolitaireState::ToString()` */
+
+        // TODO: Rely on a different method to get hashed state
 
         std::string result;
-
-        /*
-        absl::StrAppend(&result, "\n\nDECK        : ");
-        for (const Card & card : deck.cards) {
-            absl::StrAppend(&result, card.ToString(), " ");
-        }
-
-        absl::StrAppend(&result, "\nWASTE       : ");
-        for (const Card & card : deck.waste) {
-            absl::StrAppend(&result, card.ToString(), " ");
-        }
-        */
 
         absl::StrAppend(&result, "\nFOUNDATIONS : ");
         for (const Foundation & foundation : foundations) {
@@ -985,7 +933,9 @@ namespace open_spiel::solitaire {
 
     void                    SolitaireState::InformationStateTensor(Player player, std::vector<double> *values) const {
 
-        // tracer trace("SolitaireState::InformationStateTensor()");
+        /* As there are multiple ways to reach the same state in solitaire, we use a history of actions taken.
+         * This method just basically just pads `History()` with `kInvalidAction` up to length of
+         * `InformationStateTensorShape()`. */
 
         values->resize(game_->InformationStateTensorShape()[0]);
         std::fill(values->begin(), values->end(), kInvalidAction);
@@ -1000,9 +950,12 @@ namespace open_spiel::solitaire {
 
     void                    SolitaireState::ObservationTensor(Player player, std::vector<double> *values) const {
 
-        // TODO: Not sure if any pile being empty would have an effect on the final result
+        /* A view of the current state as a vector of doubles. Each pile in the state is represented as a list of
+         * card indices, hidden cards use `HIDDEN_CARD` (98.0) and non-existing cards use `NO_CARD` (99.0). Each pile
+         * is padded to its maximum length with `NO_CARD` if applicable. They are returned as a single vector
+         * concatenated together with size 233. */
 
-        // tracer trace("SolitaireState::ObservationTensor()");
+        // TODO: Not sure if any pile being empty would have an effect on the final result
 
         for (const auto & tableau : tableaus) {
             std::vector<double> tableau_obs = ToCardIndices(tableau.cards, 19);
@@ -1024,9 +977,8 @@ namespace open_spiel::solitaire {
 
     void                    SolitaireState::DoApplyAction(Action move) {
 
-        // Set previous_score to be equal to the returns from this state
-
-        // tracer trace("SolitaireState::DoApplyAction()");
+        /* Responsible for executing any legal actions or chance outcome. Sets `previous_score` in non-chance nodes.
+         * Also finishes solving the game if `IsSolvable` is true. */
 
         if (not IsChanceNode()) {
             previous_score = Returns().front();
@@ -1213,13 +1165,14 @@ namespace open_spiel::solitaire {
     }
 
     std::vector<double>     SolitaireState::Returns() const {
-        // Equal to the sum of all rewards up to the current state
 
-        // tracer trace("SolitaireState::Returns()");
+        /* Returns are calculated through 3 things: the cards on the foundations (points for each is depends on their
+         * rank and is defined in `FOUNDATION_POINTS`), the number of hidden cards revealed in the tableau, and the
+         * number of cards moved from the waste. */
 
         if (is_started) {
 
-            double returns = 0.0;
+            double returns;
 
             // Foundation Score
             double foundation_score = 0.0;
@@ -1249,9 +1202,9 @@ namespace open_spiel::solitaire {
 
             // Waste Score
             double waste_score = 0.0;
-            int waste_cards_remaning;
-            waste_cards_remaning = deck.cards.size() + deck.waste.size();
-            waste_score = (24 - waste_cards_remaning) * 20;
+            int waste_cards_remaining;
+            waste_cards_remaining = deck.cards.size() + deck.waste.size();
+            waste_score = (24 - waste_cards_remaining) * 20;
 
             // Total Score
             returns = foundation_score + tableau_score + waste_score;
@@ -1265,11 +1218,14 @@ namespace open_spiel::solitaire {
     }
 
     std::vector<double>     SolitaireState::Rewards() const {
-        // TODO: Should not be called on chance nodes (undefined and crashes)
-        // Highest possible reward per action is 120.0 (e.g. ♠ ← As where As is on a hidden card)
-        // Lowest possible reward per action is -100.0 (e.g. 2h ← As where As is in foundation initially) */
 
-        // tracer trace("SolitaireState::Rewards()");
+        /* Rewards are calculated by finding the difference between the current returns and `previous_score`.
+         * The attribute `previous_score` is set by `DoApplyAction` on non-chance nodes.
+         *
+         * Highest possible reward per action is 120.0 (e.g. ♠ ← As where As is on a hidden card)
+         * Lowest possible reward per action is -100.0 (e.g. 2h ← As where As is in foundation initially) */
+
+        // TODO: Should not be called on chance nodes (undefined and crashes)
 
         if (is_started) {
             std::vector<double> current_returns = Returns();
@@ -1283,14 +1239,19 @@ namespace open_spiel::solitaire {
 
     std::vector<Action>     SolitaireState::LegalActions() const {
 
-        // tracer trace("SolitaireState::LegalActions()");
+        /* Takes the output of CandidateMoves and filters it down and converts each of them to an `Action`. If there
+         * are cards left in the deck or waste, it also adds kDraw. If there are no legal moves, kDraw is added anyway
+         * just to make sure LegalActions isn't empty (TODO: Find a better method later)
+         *
+         * We filter candidate moves that would form cycles in the graph by comparing the result of reversible moves to
+         * `previous_states`. The one exception to this is moves that move a card to the foundations. This seems to be
+         * necessary to get the game to solve quickly in the late game, when almost all moves are reversible. If the
+         * state isn't reversible, then all candidate moves are legal moves, as they can't form cycles. */
 
         std::vector<Action> legal_actions;
 
         // Adds all candidate_moves to legal_actions that don't form a back edge to a previous state.
         for (const auto & move : CandidateMoves()) {
-
-            // TODO: Check if this helps solve the endgame or not
 
             // We allow all moves to the foundation
             if (move.target.location == kFoundation) {
@@ -1348,7 +1309,9 @@ namespace open_spiel::solitaire {
 
     std::vector<std::pair<Action, double>> SolitaireState::ChanceOutcomes() const {
 
-        // tracer trace("SolitaireState::ChanceOutcomes()");
+        /* At the beginning of the game, `kSetup` is always called. When a hidden card is about to be revealed, this
+         * method provides kReveal moves corresponding to the cards that haven't been revealed yet. The probability
+         * of choosing a particular card to reveal is uniformly distributed (1 / number of unrevealed cards). */
 
         if (!is_setup) {
             return {{kSetup, 1.0}};
@@ -1371,7 +1334,14 @@ namespace open_spiel::solitaire {
 
     std::vector<Card>       SolitaireState::Targets(const std::optional<std::string> & location) const {
 
-        // tracer trace("SolitaireState::Targets()");
+        /* A target is a card that another card can be moved to. They only exist in tableaus and foundations, and in
+         * both, they are the top card (equivalently, the one at `cards.back()`). If `location` is not given, this
+         * method returns all targets in all tableaus and foundations. If it is "tableau" or "foundation", then it
+         * returns all targets in those locations instead.
+         *
+         * If a tableau or foundation is empty, a special card is a target instead (i.e. Card("", "") for tableaus,
+         * Card("", x) for foundations where x is the foundation suit). These special cards don't actually exist
+         * in their containers `cards` attribute. */
 
         std::string loc = location.value_or("all");
         std::vector<Card> targets;
@@ -1399,7 +1369,15 @@ namespace open_spiel::solitaire {
 
     std::vector<Card>       SolitaireState::Sources(const std::optional<std::string> & location) const {
 
-        // tracer trace("SolitaireState::Sources()");
+        /* A source is a card that can be moved, along with all other cards below it, to a target card. They exist
+         * in tableaus, foundations, and the waste. In the waste, only the front card can be a source. In foundations,
+         * only the back card can be one. And in tableaus, all unhidden cards are sources. If `location` isn't provided
+         * to this method, then sources from all of these piles are returned. If it is (e.g. `location` is "tableau",
+         * "foundation", or "waste") then only sources in those kinds of piles are returned.
+         *
+         * Because special cards can't be moved and don't actually exist in the `cards` container, they will never
+         * show up in sources. This behavior is mostly defined in the pile classes, this method just concatenates
+         * all of their sources together. */
 
         std::string loc = location.value_or("all");
         std::vector<Card> sources;
@@ -1432,15 +1410,45 @@ namespace open_spiel::solitaire {
 
     std::vector<Move>       SolitaireState::CandidateMoves() const {
 
-        // tracer trace("SolitaireState::CandidateMoves()");
+        /* Returns a list of moves that are technically legal given the rules of solitaire. They are filtered
+         * down inside of `LegalActions()` in order to make sure the game terminates. We don't allow a king to be moved
+         * to any empty tableau, only the first occurrence of one. Furthermore, we only allow this to happen if the king
+         * is not the top card of the pile. Filtering these actions has no effect on the completeness of the game tree
+         * because the order of tableaus has no effect on the game. */
 
         std::vector<Move> candidate_moves;
         std::vector<Card> targets = Targets();
         std::vector<Card> sources = Sources();
 
+        /* Used to indicate that we have already seen a Card("", "") as a target once before
+         * Essentially we are making sure Targets() has no duplicates, but only Card("", "") can be duplicated,
+         * which is why we only check for that instead of checking for every target in Targets(); */
+
+        bool found_empty_target = false;
+
         for (const auto & target : targets) {
+
+            // If target is Card("", "") ...
+            if (target.rank.empty() and target.suit.empty()) {
+
+                // If we have already processed a Card("", "") target ...
+                if (found_empty_target) {
+                    // Then skip the duplicate and move on to the next target
+                    continue;
+                }
+
+                // If we haven't processed a Card("", "") before ...
+                else {
+                    // Then set the flag to true so we do not process further duplicates, if any
+                    found_empty_target = true;
+                }
+
+            }
+
+            // Get the legal children of the target (depends on target.location)
             std::vector<Card> legal_children = target.LegalChildren();
 
+            // Iterate over legal children and make sure they are sources in the current state
             for (auto source : legal_children) {
 
                 // We don't need to find target.location here because it's already set when called from Targets()
@@ -1485,8 +1493,10 @@ namespace open_spiel::solitaire {
 
     Tableau *               SolitaireState::FindTableau(const Card & card) const {
 
-        // tracer trace("SolitaireState::FindTableau()");
+        /* Returns a pointer to a tableau that contains the card argument. It doesn't rely on the cards `location`
+         * attribute at all, only its `rank` and `suit`. Don't call this with a card that isn't in any tableau. */
 
+        // This branch finds the first Card("", "") in the tableaus
         if (card.rank.empty() and card.suit.empty()) {
             for (auto & tableau : tableaus) {
                 if (tableau.cards.empty()) {
@@ -1495,6 +1505,7 @@ namespace open_spiel::solitaire {
             }
         }
 
+        // This branch handles finding any ordinary card in the tableaus
         else {
             for (auto & tableau : tableaus) {
                 if (not tableau.cards.empty()) {
@@ -1509,8 +1520,10 @@ namespace open_spiel::solitaire {
 
     Foundation *            SolitaireState::FindFoundation(const Card & card) const {
 
-        // tracer trace("SolitaireState::FindFoundation()");
+        /* Returns a pointer to a foundations that contains the card argument. It doesn't rely on the cards `location`
+         * attribute at all, only its `rank` and `suit`. Don't call this with a card that isn't in any foundation. */
 
+        // This branch handles special foundation cards, Card("", x) where x is in `SUITS`.
         if (card.rank.empty()) {
             for (auto & foundation : foundations) {
                 if (foundation.cards.empty() and foundation.suit == card.suit) {
@@ -1518,6 +1531,8 @@ namespace open_spiel::solitaire {
                 }
             }
         }
+
+        // This branch handles finding any ordinary card in the foundation
         else {
             for (auto & foundation : foundations) {
                 if (not foundation.cards.empty() and foundation.suit == card.suit) {
@@ -1531,9 +1546,12 @@ namespace open_spiel::solitaire {
     }
 
     Location                SolitaireState::FindLocation(const Card & card) const {
-        // OPTIMIZE: Shouldn't have to iterate through all piles just to find a card
 
-        // tracer trace("SolitaireState::FindLocation()");
+        /* Attempts to find `card` in the current state. It searches in the order: tableaus, foundations, waste, and
+         * then finally, deck. If `card` isn't found, it returns `kMissing`. Otherwise it returns the `Location`
+         * corresponding to where it was found (i.e. `kTableau`, `kFoundation`, `kWaste`, `kDeck`) */
+
+        // OPTIMIZE: Shouldn't have to iterate through all piles just to find a card
 
         // Handles special cards
         if (card.rank.empty()) {
@@ -1575,7 +1593,8 @@ namespace open_spiel::solitaire {
 
     void                    SolitaireState::MoveCards(const Move & move) {
 
-        // tracer trace("SolitaireState::MoveCards()");
+        /* This method is called by DoApplyAction when the action is kMove. It is the method that actually edits the
+         * state to move cards between piles */
 
         // Unpack target and source from move
         Card target = move.target;
@@ -1627,7 +1646,9 @@ namespace open_spiel::solitaire {
 
     bool                    SolitaireState::IsOverHidden(const Card & card) const {
 
-        // tracer trace("SolitaireState::IsOverHidden()");
+        /* Returns true if the provided card is directly on top of a hidden card. This only makes sense in the
+         * context of a tableau, so if the card isn't there, it returns false. Used to determine reversibility of
+         * moves. Moving a card that is over a hidden one would reveal it, making the move irreversible. */
 
         if (card.location == kTableau) {
             auto container = FindTableau(card);
@@ -1641,15 +1662,19 @@ namespace open_spiel::solitaire {
 
     bool                    SolitaireState::IsReversible(const Move & move) const {
 
-        // tracer trace("SolitaireState::IsReversible()");
+        /* Determines if a move is reversible. There are three ways that it could be true: if the source is in the
+         * waste (because you can't move a card back to the waste), if the source is on top of a hidden card
+         * (which would be revealed after the move and couldn't be hidden again) or if the card is the top card of
+         * a pile, in which case it couldn't be moved back */
 
         Card target = move.target;
         Card source = move.source;
 
-        target.location = FindLocation(target);
+        // target.location = FindLocation(target);
         source.location = FindLocation(source);
 
         switch (source.location) {
+
             // Cards cannot be moved back to the waste, therefore this is not reversible
             case kWaste : {
                 return false;
@@ -1678,7 +1703,9 @@ namespace open_spiel::solitaire {
 
     bool                    SolitaireState::IsBottomCard(Card card) const {
 
-        // tracer trace("SolitaireState::IsBottomCard()");
+        /* Returns true if the card is at the front of the `cards` vector that it's contained in.
+         * Used to help determine reversibility as you can't move a pile back to an empty tableau (except for
+         * ones starting with a king in some circumstances) */
 
         // Only implemented for cards in a tableau at the moment.
         if (card.location == kTableau) {
@@ -1695,10 +1722,10 @@ namespace open_spiel::solitaire {
     }
 
     bool                    SolitaireState::IsTopCard(const Card & card) const {
-        // Assumes that card is found in a container, meaning container.back() will be defined
-        // This isn't true for special cards (e.g. Card("", "") or Card("", "s") etc.)
 
-        // tracer trace("SolitaireState::IsTopCard()");
+        /* Similar to `IsBottomCard` except that it checks if the card is at the back of the vector.
+         * Assumes that card is found in a container, meaning container.back() will be defined (this isn't true for
+         * special cards (e.g. Card("", "") or Card("", "s") etc.) */
 
         std::deque<Card> container;
         switch (card.location) {
@@ -1722,7 +1749,10 @@ namespace open_spiel::solitaire {
 
     bool                    SolitaireState::IsSolvable() const {
 
-        // tracer trace("SolitaireState::IsSolvable()");
+        /* When there are no cards left in the deck or waste and no hidden cards left in the tableau, the state
+         * is guaranteed to be solvable. Used in DoApplyAction to complete the game in one step so that we don't
+         * waste time moving cards to the foundation. It's not uncommon for implementations of solitaire to finish
+         * the game automatically for you when you reach this state */
 
         if (deck.cards.empty() and deck.waste.empty()) {
             for (auto & tableau : tableaus) {
@@ -1756,30 +1786,59 @@ namespace open_spiel::solitaire {
     }
 
     int     SolitaireGame::NumDistinctActions() const {
+        /* This is just the number of elements in `enum ActionType` in solitaire.h. If actions are added or removed
+         * there, this number will have to be changed accordingly */
         return 206;
     }
 
     int     SolitaireGame::MaxGameLength() const {
+        /* The maximum number of actions that can be taken in a game. Because the information state is represented
+         * as a vector of actions taken so far, they both must be the same. See `InformationStateTensorShape()` for
+         * more information on choosing this number. */
+
         return 3000;
     }
 
     int     SolitaireGame::NumPlayers() const {
+        /* Solitaire is a single player game, any different number of players might break this implementation. */
         return 1;
     }
 
     double  SolitaireGame::MinUtility() const {
+        /* There are negative rewards in this game, but only for moving a card from the foundation to a tableau.
+         * The returns for a move and its inverse are zero sum though, so we can never actually go below 0.0 */
         return 0.0;
     }
 
     double  SolitaireGame::MaxUtility() const {
+        /* If a game is won, that means there are no cards left in the waste, all cards are revealed, and every
+         * card is on its foundation. The way returns are setup currently, the maximum return is 3,220.0
+         *   21 hidden cards * 20 points   = 420      (Revealing hidden cards)
+         *   24 cards in waste * 20 points = 480      (Moving cards from the waste)
+         *   4 suits * 580 points          = 2,320    (Having cards in the foundation)
+         *   TOTAL                         = 3,320 */
         return 3220.0;
     }
 
     std::vector<int> SolitaireGame::InformationStateTensorShape() const {
+        /* Basically the same thing as `MaxGameLength()`, although this particular method seems to have more methods
+         * that depend on it than `MaxGameLength()`. In a game without loop prevention, solitaire be played infinitely.
+         * With restrictions, it's hard to say what the maximum length would be. If this number is set too low, the
+         * game will crash if a game goes beyond that length. If it's too high, then we are wasting time and memory. */
+
         return {3000};
     }
 
     std::vector<int> SolitaireGame::ObservationTensorShape() const {
+        /* Observation tensors are always padded with the maximum length of each pile. The deck starts with 24 cards
+         * and no cards can be added to it, the waste can be at most the length of the deck so its maximum length is 24
+         * as well. A tableau can have at most 13 cards from a king to an ace and 6 from hidden cards underneath it, so
+         * its maximum length is 19. Foundations can only have one suit in them, and there are 13 cards in a suit.
+         *   Deck       = 24
+         *   Waste      = 24
+         *   Tableau    = 19 * 7 = 133
+         *   Foundation = 13 * 4 = 52
+         *   TOTAL      = 233 */
         return {233};
     }
 
