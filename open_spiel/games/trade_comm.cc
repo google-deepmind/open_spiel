@@ -60,13 +60,8 @@ std::pair<int, int> DecodeAllocation(Action chance_action, int num_items) {
 }
 
 std::pair<int, int> DecodeTrade(Action trade_action, int num_items) {
-  // num_items groups if num_items - 1 ask
-  std::pair<int, int> trade = {(trade_action - num_items) / (num_items - 1),
-                               (trade_action - num_items) % (num_items - 1)};
-  // Cannot trade a thing for itself, so skip that one in the order.
-  if (trade.second >= trade.first) {
-    trade.second++;
-  }
+  std::pair<int, int> trade = {(trade_action - num_items) / num_items,
+                               (trade_action - num_items) % num_items};
   return trade;
 }
 }  // namespace
@@ -117,6 +112,9 @@ std::string TradeCommState::ObservationString(Player player) const {
 
   std::string str = "";
 
+  // Whose turn is it?
+  absl::StrAppend(&str, "Current turn: ", cur_player_, "\n");
+
   // A player can see their own item.
   absl::StrAppend(&str, "My item: ", items_[player], "\n");
 
@@ -128,7 +126,10 @@ std::string TradeCommState::ObservationString(Player player) const {
   }
 
   // Trade proposals are treated as simultaneous, so not included in the
-  // observation.
+  // observation, but we do mark how many trade actions have happened to agents
+  // can work out what trading round they're on.
+  absl::StrAppend(&str, "Trade history size: ", trade_history_.size());
+
   return str;
 }
 
@@ -152,6 +153,10 @@ void TradeCommState::ObservationTensor(Player player,
   (*values)[cur_player_] = 1;
   offset += 2;
 
+  // 1 bit to indicate whether it's terminal
+  (*values)[offset] = IsTerminal() ? 1 : 0;
+  offset += 1;
+
   // Single bit for the phase: 0 = comm, 1 = trade.
   (*values)[offset] = (phase_ == Phase::kCommunication ? 0 : 1);
   offset += 1;
@@ -171,6 +176,10 @@ void TradeCommState::ObservationTensor(Player player,
     (*values)[offset + comm_history_[1 - player]] = 1;
   }
   offset += num_items_;
+
+  // one-hot vector for the size of the trade history
+  (*values)[offset + trade_history_.size()] = 1;
+  offset += 3;
 
   SPIEL_CHECK_EQ(offset, values->size());
 }
@@ -219,9 +228,10 @@ std::vector<Action> TradeCommState::LegalActions() const {
     }
     return legal_actions;
   } else if (phase_ == Phase::kTrade) {
-    // 1:1 trades for k items = k*(k-1) actions starting at num_items_.
+    // 1:1 trades for k items = k*k actions (includes trading an item for the
+    // same item) starting at num_items_.
     std::vector<Action> legal_actions;
-    int num_trade_actions = num_items_ * (num_items_ - 1);
+    int num_trade_actions = num_items_ * num_items_;
     legal_actions.reserve(num_trade_actions);
     for (int i = 0; i < num_trade_actions; ++i) {
       legal_actions.push_back(num_items_ + i);
@@ -271,18 +281,19 @@ TradeCommGame::TradeCommGame(const GameParameters& params)
       num_items_(ParameterValue<int>("num_items", kDefaultNumItems)) {}
 
 int TradeCommGame::NumDistinctActions() const {
-  return (num_items_ +                   // utterances
-          num_items_ * (num_items_ - 1)  // 1:1 trades
-  );
+  return num_items_ +              // utterances
+         num_items_ * num_items_;  // 1:1 trades
 }
 
 std::vector<int> TradeCommGame::ObservationTensorShape() const {
   return {
       2 +           // one hot vector for whose turn it is
+      1 +           // one bit to indicate whether the state is terminal
       1 +           // a single bit indicating the phase (comm or trade)
       num_items_ +  // one-hot vector for the item the player got
       num_items_ +  // one-hot vector for the utterance the player made
-      num_items_    // one-hot vector for the utterance the player observed
+      num_items_ +  // one-hot vector for the utterance the player observed
+      3             // trade history size
   };
 }
 

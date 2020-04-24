@@ -42,9 +42,6 @@
 // Parameters:
 //     "num_items"         int     number of distinct items (K) (default = 10)
 //
-// TODO(author5):
-//   - implement Observation tensor functions, so we can do
-//     neural net experiments.
 
 namespace open_spiel {
 namespace trade_comm {
