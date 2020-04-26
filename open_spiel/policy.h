@@ -27,6 +27,16 @@
 
 namespace open_spiel {
 
+// Returns the probability for the specified action, or -1 if not found.
+double GetProb(const ActionsAndProbs& action_and_probs, Action action);
+
+// Set an action probability for the specified action.
+void SetProb(ActionsAndProbs* actions_and_probs, Action action, double prob);
+
+// Helper for deterministic policies: returns the single action if the policy
+// is deterministic, otherwise returns kInvalidAction.
+Action GetAction(const ActionsAndProbs& action_and_probs);
+
 // A general policy object. A policy is a mapping from states to list of
 // (action, prob) pairs for all the legal actions at the state.
 class Policy {
@@ -134,6 +144,18 @@ class TabularPolicy : public Policy {
     }
   }
 
+  // Set the probability for action at the info state. If the info state is not
+  // in the policy, it is added. If the action is not in the info state policy,
+  // it is added. Otherwise it is modified.
+  void SetProb(const std::string& info_state, Action action, double prob) {
+    auto iter = policy_table_.find(info_state);
+    if (iter == policy_table_.end()) {
+      auto iter_and_bool = policy_table_.insert({info_state, {}});
+      iter = iter_and_bool.first;
+    }
+    open_spiel::SetProb(&(iter->second), action, prob);
+  }
+
   std::unordered_map<std::string, ActionsAndProbs>& PolicyTable() {
     return policy_table_;
   }
@@ -172,9 +194,6 @@ class UniformPolicy : public Policy {
     return probs;
   }
 };
-
-// Returns the probability for the specified action, or -1 if not found.
-double GetProb(const ActionsAndProbs& action_and_probs, Action action);
 
 // Helper functions that generate policies for testing.
 TabularPolicy GetEmptyTabularPolicy(const Game& game,
