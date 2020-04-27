@@ -794,6 +794,8 @@ namespace open_spiel::solitaire {
         absl::StrAppend(&result, "\nIS REVERSIBLE   : ", is_reversible);
         */
 
+        absl::StrAppend(&result, "\nCURRENT_DEPTH   : ", current_depth);
+
         absl::StrAppend(&result, "\n\nDECK        : ");
         for (const Card & card : deck.cards) {
             absl::StrAppend(&result, card.ToString(), " ");
@@ -1004,6 +1006,7 @@ namespace open_spiel::solitaire {
             is_finished     = false;
             is_reversible  = false;
             draw_counter   = 0;
+            current_depth  = 0;
             previous_score = 0.0;
 
         }
@@ -1137,6 +1140,13 @@ namespace open_spiel::solitaire {
                 draw_counter = 0;
             }
 
+        }
+
+        // Increase Current Depth ======================================================================================
+
+        ++current_depth;
+        if (current_depth >= game_->MaxGameLength()) {
+            is_finished = true;
         }
 
         // Finish Game =================================================================================================
@@ -1428,6 +1438,7 @@ namespace open_spiel::solitaire {
 
         for (const auto & target : targets) {
 
+            // Here we make sure only the first empty tableau can have a king move to it
             // If target is Card("", "") ...
             if (target.rank.empty() and target.suit.empty()) {
 
@@ -1796,7 +1807,7 @@ namespace open_spiel::solitaire {
          * as a vector of actions taken so far, they both must be the same. See `InformationStateTensorShape()` for
          * more information on choosing this number. */
 
-        return 3000;
+        return 500;
     }
 
     int     SolitaireGame::NumPlayers() const {
@@ -1826,7 +1837,7 @@ namespace open_spiel::solitaire {
          * With restrictions, it's hard to say what the maximum length would be. If this number is set too low, the
          * game will crash if a game goes beyond that length. If it's too high, then we are wasting time and memory. */
 
-        return {3000};
+        return {500};
     }
 
     std::vector<int> SolitaireGame::ObservationTensorShape() const {

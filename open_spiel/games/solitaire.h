@@ -941,6 +941,7 @@ namespace open_spiel::solitaire {
         bool   is_finished = false;
         bool   is_reversible = false;
         int    draw_counter = 0;
+        int    current_depth = 0;
         double previous_score;
         std::set<std::size_t> previous_states = {};
 
