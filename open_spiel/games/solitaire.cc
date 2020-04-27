@@ -14,7 +14,7 @@
 #define RESET   "\033[0m"
 #define RED     "\033[31m"
 #define YELLOW  "\033[33m"
-#define WHITE   "\033[37m"
+#define WHITE   "\033[30m"
 
 /* TERMINOLOGY
     Pile:
