@@ -155,7 +155,7 @@ namespace open_spiel::solitaire {
 
     /* Whether to format strings with ANSI colors or not.
      * Only used by the function below, `color()`. */
-    bool COLOR_FLAG = true;
+    bool COLOR_FLAG = false;
 
     std::string color(std::string color) {
         /* Returns an ANSI color provided by the argument (e.g. RED, YELLOW, WHITE, RESET) if `COLOR_FLAG` is true.
@@ -792,9 +792,9 @@ namespace open_spiel::solitaire {
         absl::StrAppend(&result, "DRAW COUNTER    : ", draw_counter);
 
         absl::StrAppend(&result, "\nIS REVERSIBLE   : ", is_reversible);
-        */
 
         absl::StrAppend(&result, "\nCURRENT_DEPTH   : ", current_depth);
+        */
 
         absl::StrAppend(&result, "\n\nDECK        : ");
         for (const Card & card : deck.cards) {
@@ -907,6 +907,16 @@ namespace open_spiel::solitaire {
         // TODO: Rely on a different method to get hashed state
 
         std::string result;
+
+        absl::StrAppend(&result, "DECK        : ");
+        for (const Card & card : deck.cards) {
+            absl::StrAppend(&result, card.ToString(), " ");
+        }
+
+        absl::StrAppend(&result, "\nWASTE       : ");
+        for (const Card & card : deck.waste) {
+            absl::StrAppend(&result, card.ToString(), " ");
+        }
 
         absl::StrAppend(&result, "\nFOUNDATIONS : ");
         for (const Foundation & foundation : foundations) {
