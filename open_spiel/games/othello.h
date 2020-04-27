@@ -61,23 +61,26 @@ enum Direction {
 inline constexpr std::array<Direction, 8> kDirections = {
     kUp, kDown, kLeft, kRight, kUpLeft, kUpRight, kDownLeft, kDownRight};
 
-struct Move {
-  Move(int move) : row(move / kNumCols), col(move % kNumRows) {
+class Move {
+ public:
+  Move(int move) : row_(move / kNumCols), col_(move % kNumCols) {
     SPIEL_CHECK_GE(move, 0);
     SPIEL_CHECK_LT(move, kNumCells);
   }
 
-  Move(int row, int col) : row(row), col(col) {}
+  Move(int row, int col) : row_(row), col_(col) {}
 
-  inline int GetRow() const { return row; }
-  inline int GetColumn() const { return col; }
-  inline int GetAction() const { return row * kNumCols + col; }
+  inline int GetRow() const { return row_; }
+  inline int GetColumn() const { return col_; }
+  inline int GetAction() const { return row_ * kNumCols + col_; }
   inline bool OnBoard() const;
 
   Move Next(Direction dir) const;
+  std::string ToString() const;
 
  private:
-  int row, col;
+  int row_;
+  int col_;
 };
 
 // State of an in-play game.
@@ -105,16 +108,8 @@ class OthelloState : public State {
   std::array<CellState, kNumCells> board_;
   void DoApplyAction(Action action) override;
 
-  CellState BoardAt(int row, int col) const {
-    return board_[Move(row, col).GetAction()];
-  }
-
-  CellState BoardAt(Move move) const {
-    return BoardAt(move.GetRow(), move.GetColumn());
-  }
-
-  std::string ToStringForPlayer(
-      Player player) const;  // to string for a specific player
+  CellState BoardAt(int row, int col) const { return BoardAt(Move(row, col)); }
+  CellState BoardAt(Move move) const { return board_[move.GetAction()]; }
 
   // Returns a list of regular (non-pass) actions.
   std::vector<Action> LegalRegularActions(Player p) const;

@@ -99,33 +99,36 @@ inline std::string ColumnString(int col) {
 Move Move::Next(Direction dir) const {
   switch (dir) {
     case Direction::kUp:
-      return Move(row - 1, col);
+      return Move(row_ - 1, col_);
     case Direction::kDown:
-      return Move(row + 1, col);
+      return Move(row_ + 1, col_);
     case Direction::kLeft:
-      return Move(row, col - 1);
+      return Move(row_, col_ - 1);
     case Direction::kRight:
-      return Move(row, col + 1);
+      return Move(row_, col_ + 1);
     case Direction::kUpRight:
-      return Move(row - 1, col + 1);
+      return Move(row_ - 1, col_ + 1);
     case Direction::kUpLeft:
-      return Move(row - 1, col - 1);
+      return Move(row_ - 1, col_ - 1);
     case Direction::kDownRight:
-      return Move(row + 1, col + 1);
+      return Move(row_ + 1, col_ + 1);
     case Direction::kDownLeft:
-      return Move(row + 1, col - 1);
+      return Move(row_ + 1, col_ - 1);
     default:
       SpielFatalError(absl::StrCat("Found unmatched case in Next."));
   }
 }
 
+std::string Move::ToString() const {
+  return absl::StrCat(ColumnString(col_), RowString(row_));
+}
+
 inline bool Move::OnBoard() const {
-  return (row >= 0) && (row < kNumRows) && (col >= 0) && (col < kNumCols);
+  return (row_ >= 0) && (row_ < kNumRows) && (col_ >= 0) && (col_ < kNumCols);
 }
 
 int OthelloState::CountSteps(Player player, int action, Direction dir) const {
-  Move move(action);
-  move = move.Next(dir);
+  Move move = Move(action).Next(dir);
 
   int count = 0;
   CellState cell = PlayerToState(player);
@@ -157,14 +160,12 @@ bool OthelloState::CanCapture(Player player, int move) const {
 
 void OthelloState::Capture(Player player, int action, Direction dir,
                            int steps) {
-  Move move(action);
-  move = move.Next(dir);
+  Move move = Move(action).Next(dir);
 
   CellState cell = PlayerToState(player);
   for (int step = 0; step < steps; step++) {
     if (BoardAt(move) == CellState::kEmpty || BoardAt(move) == cell) {
-      SpielFatalError(absl::StrCat("Cannot capture cell (", move.GetRow(), ", ",
-                                   move.GetColumn(), ")"));
+      SpielFatalError(absl::StrCat("Cannot capture cell ", move.ToString()));
     }
 
     board_[move.GetAction()] = cell;
@@ -241,9 +242,7 @@ std::string OthelloState::ActionToString(Player player,
   if (action_id == kPassMove) {
     return "pass";
   } else {
-    Move move(action_id);
-    return absl::StrCat(ColumnString(move.GetColumn()),
-                        RowString(move.GetRow()));
+    return Move(action_id).ToString();
   }
 }
 
