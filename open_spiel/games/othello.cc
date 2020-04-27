@@ -96,49 +96,48 @@ inline std::string ColumnString(int col) {
 
 }  // namespace
 
-std::pair<int, int> GetNext(int row, int col, Direction dir) {
+Move Move::Next(Direction dir) const {
   switch (dir) {
     case Direction::kUp:
-      return std::make_pair(row - 1, col);
+      return Move(row - 1, col);
     case Direction::kDown:
-      return std::make_pair(row + 1, col);
+      return Move(row + 1, col);
     case Direction::kLeft:
-      return std::make_pair(row, col - 1);
+      return Move(row, col - 1);
     case Direction::kRight:
-      return std::make_pair(row, col + 1);
+      return Move(row, col + 1);
     case Direction::kUpRight:
-      return std::make_pair(row - 1, col + 1);
+      return Move(row - 1, col + 1);
     case Direction::kUpLeft:
-      return std::make_pair(row - 1, col - 1);
+      return Move(row - 1, col - 1);
     case Direction::kDownRight:
-      return std::make_pair(row + 1, col + 1);
+      return Move(row + 1, col + 1);
     case Direction::kDownLeft:
-      return std::make_pair(row + 1, col - 1);
+      return Move(row + 1, col - 1);
     default:
-      SpielFatalError(absl::StrCat("Found unmatched case in GetNext."));
+      SpielFatalError(absl::StrCat("Found unmatched case in Next."));
   }
 }
 
-inline bool OthelloState::OnBoard(int row, int col) const {
+inline bool Move::OnBoard() const {
   return (row >= 0) && (row < kNumRows) && (col >= 0) && (col < kNumCols);
 }
 
-int OthelloState::CountSteps(Player player, int move, Direction dir) const {
-  int row, col;
-  std::tie(row, col) = RowColFromMove(move);
-  std::tie(row, col) = GetNext(row, col, dir);
+int OthelloState::CountSteps(Player player, int action, Direction dir) const {
+  Move move(action);
+  move = move.Next(dir);
 
   int count = 0;
   CellState cell = PlayerToState(player);
-  while (OnBoard(row, col)) {
-    if (BoardAt(row, col) == cell) {
+  while (move.OnBoard()) {
+    if (BoardAt(move) == cell) {
       return count;
-    } else if (BoardAt(row, col) == CellState::kEmpty) {
+    } else if (BoardAt(move) == CellState::kEmpty) {
       return 0;
     }
 
     count++;
-    std::tie(row, col) = GetNext(row, col, dir);
+    move = move.Next(dir);
   }
 
   return 0;
@@ -156,22 +155,20 @@ bool OthelloState::CanCapture(Player player, int move) const {
   return false;
 }
 
-void OthelloState::Capture(Player player, int move, Direction dir, int steps) {
-  int row, col;
-
-  std::tie(row, col) = RowColFromMove(move);
-  std::tie(row, col) = GetNext(row, col, dir);
+void OthelloState::Capture(Player player, int action, Direction dir,
+                           int steps) {
+  Move move(action);
+  move = move.Next(dir);
 
   CellState cell = PlayerToState(player);
   for (int step = 0; step < steps; step++) {
-    if (BoardAt(row, col) == CellState::kEmpty || BoardAt(row, col) == cell) {
-      SpielFatalError(
-          absl::StrCat("Cannot capture cell (", row, ", ", col, ")"));
+    if (BoardAt(move) == CellState::kEmpty || BoardAt(move) == cell) {
+      SpielFatalError(absl::StrCat("Cannot capture cell (", move.GetRow(), ", ",
+                                   move.GetColumn(), ")"));
     }
 
-    board_[RowColToMove(row, col)] = cell;
-
-    std::tie(row, col) = GetNext(row, col, dir);
+    board_[move.GetAction()] = cell;
+    move = move.Next(dir);
   }
 }
 
@@ -184,39 +181,25 @@ bool OthelloState::NoValidActions() const {
           LegalRegularActions(Player(1)).empty());
 }
 
-std::pair<int, int> OthelloState::RowColFromMove(int move) const {
-  SPIEL_CHECK_GE(move, 0);
-  SPIEL_CHECK_LT(move, kNumCells);
-  return {move / kNumCols, move % kNumCols};
-}
-
-int OthelloState::RowColToMove(int row, int col) const {
-  SPIEL_CHECK_GE(row, 0);
-  SPIEL_CHECK_LT(row, kNumRows);
-  SPIEL_CHECK_GE(col, 0);
-  SPIEL_CHECK_LT(col, kNumCols);
-  return row * kNumCols + col;
-}
-
 bool OthelloState::ValidAction(Player player, int move) const {
   return (board_[move] == CellState::kEmpty && CanCapture(player, move));
 }
 
-void OthelloState::DoApplyAction(Action move) {
-  if (move == kPassMove) {
+void OthelloState::DoApplyAction(Action action) {
+  if (action == kPassMove) {  // pass
     current_player_ = 1 - current_player_;
     return;
   }
 
-  SPIEL_CHECK_TRUE(ValidAction(current_player_, move));
+  SPIEL_CHECK_TRUE(ValidAction(current_player_, action));
 
   CellState cell = PlayerToState(current_player_);
-  board_[move] = cell;
+  board_[action] = cell;
 
   for (auto direction : kDirections) {
-    int steps = CountSteps(current_player_, move, direction);
+    int steps = CountSteps(current_player_, action, direction);
     if (steps > 0) {
-      Capture(current_player_, move, direction, steps);
+      Capture(current_player_, action, direction, steps);
     }
   }
 
@@ -258,23 +241,26 @@ std::string OthelloState::ActionToString(Player player,
   if (action_id == kPassMove) {
     return "pass";
   } else {
-    auto [row, col] = RowColFromMove(action_id);
-    return absl::StrCat(ColumnString(col), RowString(row));
+    Move move(action_id);
+    return absl::StrCat(ColumnString(move.GetColumn()),
+                        RowString(move.GetRow()));
   }
 }
 
 OthelloState::OthelloState(std::shared_ptr<const Game> game) : State(game) {
   absl::c_fill(board_, CellState::kEmpty);
-  board_[RowColToMove(3, 3)] = CellState::kWhite;
-  board_[RowColToMove(3, 4)] = CellState::kBlack;
-  board_[RowColToMove(4, 3)] = CellState::kBlack;
-  board_[RowColToMove(4, 4)] = CellState::kWhite;
+  board_[Move(3, 3).GetAction()] = CellState::kWhite;
+  board_[Move(3, 4).GetAction()] = CellState::kBlack;
+  board_[Move(4, 3).GetAction()] = CellState::kBlack;
+  board_[Move(4, 4).GetAction()] = CellState::kWhite;
 }
 
 std::string OthelloState::ToString() const {
   std::string col_labels = "  a b c d e f g h  ";
-  std::string str = absl::StrCat(PlayerToString(CurrentPlayer()), " to play:\n",
-                                 col_labels, "\n");
+  std::string str = IsTerminal() ? std::string("Terminal State:\n")
+                                 : absl::StrCat(PlayerToString(CurrentPlayer()),
+                                                " to play:\n");
+  absl::StrAppend(&str, col_labels, "\n");
   for (int r = 0; r < kNumRows; ++r) {
     absl::StrAppend(&str, RowString(r), " ");
     for (int c = 0; c < kNumCols; ++c) {

@@ -19,7 +19,6 @@
 #include <map>
 #include <memory>
 #include <string>
-#include <tuple>
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"  // for c_fill
@@ -58,8 +57,28 @@ enum Direction {
   kDownLeft,
   kDownRight,
 };
+
 inline constexpr std::array<Direction, 8> kDirections = {
     kUp, kDown, kLeft, kRight, kUpLeft, kUpRight, kDownLeft, kDownRight};
+
+struct Move {
+  Move(int move) : row(move / kNumCols), col(move % kNumRows) {
+    SPIEL_CHECK_GE(move, 0);
+    SPIEL_CHECK_LT(move, kNumCells);
+  }
+
+  Move(int row, int col) : row(row), col(col) {}
+
+  inline int GetRow() const { return row; }
+  inline int GetColumn() const { return col; }
+  inline int GetAction() const { return row * kNumCols + col; }
+  inline bool OnBoard() const;
+
+  Move Next(Direction dir) const;
+
+ private:
+  int row, col;
+};
 
 // State of an in-play game.
 class OthelloState : public State {
@@ -84,11 +103,16 @@ class OthelloState : public State {
 
  private:
   std::array<CellState, kNumCells> board_;
-  void DoApplyAction(Action move) override;
+  void DoApplyAction(Action action) override;
 
   CellState BoardAt(int row, int col) const {
-    return board_[RowColToMove(row, col)];
+    return board_[Move(row, col).GetAction()];
   }
+
+  CellState BoardAt(Move move) const {
+    return BoardAt(move.GetRow(), move.GetColumn());
+  }
+
   std::string ToStringForPlayer(
       Player player) const;  // to string for a specific player
 
@@ -109,19 +133,10 @@ class OthelloState : public State {
 
   // Returns the number of capturable disks of the opponent in the given
   // direction from the given starting location.
-  int CountSteps(Player player, int move, Direction dir) const;
+  int CountSteps(Player player, int action, Direction dir) const;
 
   // Updates the board to reflect a capture move.
-  void Capture(Player player, int move, Direction dir, int steps);
-
-  // Returns true if (row, col) is a valid location on the board.
-  inline bool OnBoard(int row, int col) const;
-
-  // Returns the (row, col) pair corresponding to the given move code.
-  std::pair<int, int> RowColFromMove(int move) const;
-
-  // Returns the move code for a given (row, col) pair.
-  int RowColToMove(int row, int col) const;
+  void Capture(Player player, int action, Direction dir, int steps);
 
   Player current_player_ = 0;  // Player zero goes first
   Player outcome_ = kInvalidPlayer;

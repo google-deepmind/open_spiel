@@ -2910,7 +2910,7 @@ StringLegalActions() = ["h7"]
 action: 55
 
 # State 60
-# -4 to play:
+# Terminal State:
 #   a b c d e f g h
 # 1 x o o o o o x x 1
 # 2 x x x o o o x x 2
@@ -2929,8 +2929,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -4
 InformationStateString(0) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19 12 63 20 31 39 24 23 11 46 30 10 15 47 5 6 4 7 55"
 InformationStateString(1) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19 12 63 20 31 39 24 23 11 46 30 10 15 47 5 6 4 7 55"
-ObservationString(0) = "-4 to play:\n  a b c d e f g h  \n1 x o o o o o x x 1\n2 x x x o o o x x 2\n3 x o o o x o o x 3\n4 o o x o o x o x 4\n5 o o x o x o x x 5\n6 x x o o o x o x 6\n7 x o o o o o o o 7\n8 x o o o o o o o 8\n  a b c d e f g h  "
-ObservationString(1) = "-4 to play:\n  a b c d e f g h  \n1 x o o o o o x x 1\n2 x x x o o o x x 2\n3 x o o o x o o x 3\n4 o o x o o x o x 4\n5 o o x o x o x x 5\n6 x x o o o x o x 6\n7 x o o o o o o o 7\n8 x o o o o o o o 8\n  a b c d e f g h  "
+ObservationString(0) = "Terminal State:\n  a b c d e f g h  \n1 x o o o o o x x 1\n2 x x x o o o x x 2\n3 x o o o x o o x 3\n4 o o x o o x o x 4\n5 o o x o x o x x 5\n6 x x o o o x o x 6\n7 x o o o o o o o 7\n8 x o o o o o o o 8\n  a b c d e f g h  "
+ObservationString(1) = "Terminal State:\n  a b c d e f g h  \n1 x o o o o o x x 1\n2 x x x o o o x x 2\n3 x o o o x o o x 3\n4 o o x o o x o x 4\n5 o o x o x o x x 5\n6 x x o o o x o x 6\n7 x o o o o o o o 7\n8 x o o o o o o o 8\n  a b c d e f g h  "
 ObservationTensor(0):
 ◯◯◯◯◯◯◯◯  ◉◯◯◯◯◯◉◉  ◯◉◉◉◉◉◯◯
 ◯◯◯◯◯◯◯◯  ◉◉◉◯◯◯◉◉  ◯◯◯◉◉◉◯◯
