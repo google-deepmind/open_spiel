@@ -16,27 +16,6 @@
 #define YELLOW  "\033[33m"
 #define WHITE   "\033[37m"
 
-/* GAME INFO
-   An implementation of Klondike Solitaire with 3 cards drawn at a time & infinite redeals. By default, `COLOR_FLAG` is
-   set to true and will color cards when they are converted to strings. If you see anything like "\033[...m" instead of
-   colored cards, then you can turn off this functionality by compiling again with `COLOR_FLAG` set to false.
-
-   LOOP PREVENTION
-   Part of the difficulty in implementing this game is that no matter how many cards are drawn at a time or how many
-   redeals are allowed, certain situations lead to an infinite loop (e.g. moving a queen of hearts back and forth
-   between a king of spades and king of clubs).
-
-   In this implementation, we prevent these loops by recognizing when a "reversible move" is made; one that has the
-   potential to be returned to at a later state. Starting from this first reversible move, the output of
-   `ObservationString` is hashed and stored in `previous_states` in its descendants. `CandidateMoves` then provides a
-   list of moves that are technically legal according to the rules of the game and all reversible moves in this list are
-   checked to ensure they don't form a back edge to any member of `previous_states`. The moves that satisfy this
-   condition are passed along as `LegalActions`.
-
-   If an irreversible move is made, `previous_states` is cleared and all candidate moves will be passed along as
-   `LegalActions` without having to check them for back edges. This continues until a reversible move is made, at which
-   point the above paragraph apply again. */
-
 /* TERMINOLOGY
     Pile:
         An abstract term referring to an ordered set of cards. In this game, it can refer to
@@ -155,7 +134,7 @@ namespace open_spiel::solitaire {
 
     /* Whether to format strings with ANSI colors or not.
      * Only used by the function below, `color()`. */
-    bool COLOR_FLAG = false;
+    bool COLOR_FLAG = true;
 
     std::string color(std::string color) {
         /* Returns an ANSI color provided by the argument (e.g. RED, YELLOW, WHITE, RESET) if `COLOR_FLAG` is true.
@@ -1203,7 +1182,7 @@ namespace open_spiel::solitaire {
             }
 
             // Tableau Score
-            double tableau_score = 0.0;
+            double tableau_score;
             int num_hidden_cards = 0;
             for (auto & tableau : tableaus) {
                 if (not tableau.cards.empty()) {
@@ -1221,7 +1200,7 @@ namespace open_spiel::solitaire {
             tableau_score = (21 - num_hidden_cards) * 20;
 
             // Waste Score
-            double waste_score = 0.0;
+            double waste_score;
             int waste_cards_remaining;
             waste_cards_remaining = deck.cards.size() + deck.waste.size();
             waste_score = (24 - waste_cards_remaining) * 20;
@@ -1814,8 +1793,8 @@ namespace open_spiel::solitaire {
 
     int     SolitaireGame::MaxGameLength() const {
         /* The maximum number of actions that can be taken in a game. Because the information state is represented
-         * as a vector of actions taken so far, they both must be the same. See `InformationStateTensorShape()` for
-         * more information on choosing this number. */
+         * as a vector of actions taken so far, they both must be the same. The game terminates when `depth` in a
+         * state hits this number. See `InformationStateTensorShape()` for more information on choosing this number. */
 
         return 500;
     }
@@ -1844,8 +1823,9 @@ namespace open_spiel::solitaire {
     std::vector<int> SolitaireGame::InformationStateTensorShape() const {
         /* Basically the same thing as `MaxGameLength()`, although this particular method seems to have more methods
          * that depend on it than `MaxGameLength()`. In a game without loop prevention, solitaire be played infinitely.
-         * With restrictions, it's hard to say what the maximum length would be. If this number is set too low, the
-         * game will crash if a game goes beyond that length. If it's too high, then we are wasting time and memory. */
+         * With restrictions, it's hard to say what the maximum length would be. If this number is set too low, there
+         * are some games we miss that could be solved in 5-6 thousand moves. If it's set too high, we use too much
+         * space/processing power on infostates that are usually mostly empty. */
 
         return {500};
     }
