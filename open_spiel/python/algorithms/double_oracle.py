@@ -44,17 +44,25 @@ def solve_subgame(subgame_payoffs):
 class DoubleOracleSolver(object):
   """Double Oracle solver."""
 
-  def __init__(self, game):
+  def __init__(self, game, enforce_symmetry=False):
     """Initializes the Double Oracle solver.
 
     Args:
       game: pyspiel.MatrixGame (zero-sum).
+      enforce_symmetry: If True, enforces symmetry in the strategies appended by
+        each player, by using the first player's best response for the second
+        player as well; also asserts the game is symmetric and that players are
+        seeded with identical initial_strategies, default: False.
     """
     assert isinstance(game, pyspiel.MatrixGame)
     assert game.get_type().utility == pyspiel.GameType.Utility.ZERO_SUM
     # convert matrix game to numpy.ndarray of shape [2,rows,columns]
     self.payoffs = utils.game_payoffs_array(game)
     self.subgame_strategies = [[], []]
+    self.enforce_symmetry = enforce_symmetry
+    if self.enforce_symmetry:
+      assert utils.is_symmetric_matrix_game(self.payoffs),\
+          "enforce_symmetry is True, but payoffs are asymmetric!"
 
   def subgame_payoffs(self):
     # Select payoffs from the full game according to the subgame strategies.
@@ -78,7 +86,8 @@ class DoubleOracleSolver(object):
         "{} != {}".format(lens(subgame_solution), lens(self.subgame_strategies))
     best_response = [None, None]
     best_response_utility = [None, None]
-    for player in range(2):
+    n_best_responders = 1 if self.enforce_symmetry else 2
+    for player in range(n_best_responders):
       opponent = 1 - player
       # collect relevant payoff entries
       payoffs = np.take(
@@ -90,6 +99,11 @@ class DoubleOracleSolver(object):
       avg_payoffs = (payoffs @ subgame_solution[opponent]).squeeze()
       best_response[player] = np.argmax(avg_payoffs)
       best_response_utility[player] = avg_payoffs[best_response[player]]
+
+    if self.enforce_symmetry:
+      best_response[1] = best_response[0]
+      best_response_utility[1] = best_response_utility[0]
+
     return best_response, best_response_utility
 
   def step(self):
@@ -97,6 +111,7 @@ class DoubleOracleSolver(object):
     subgame_payoffs = self.subgame_payoffs()
     subgame_solution = solve_subgame(subgame_payoffs)
     best_response, best_response_utility = self.oracle(subgame_solution)
+
     # Add best responses to the subgame strategies (if not included yet).
     self.subgame_strategies = [
         sorted(set(strategies + [br]))
@@ -104,28 +119,39 @@ class DoubleOracleSolver(object):
     ]
     return best_response, best_response_utility
 
-  def solve(self,
-            initial_strategies=None,
-            max_steps=20,
-            tolerance=5e-5,
-            verbose=True):
-    """Solves the game using the Double Oracle algorithm.
+  def solve_yield(self,
+                  initial_strategies,
+                  max_steps,
+                  tolerance,
+                  verbose,
+                  yield_subgame=False):
+    """Solves game using Double Oracle, yielding intermediate results.
 
     Args:
       initial_strategies: List of pure strategies for both players, optional.
       max_steps: Maximum number of iterations, default: 20.
       tolerance: Stop if the estimated value of the game is below the tolerance.
       verbose: If False, no warning is shown, default: True.
+      yield_subgame: If True, yields the subgame on each iteration. Otherwise,
+        yields the final results only, default: False.
 
-    Returns:
+    Yields:
       solution: Policies for both players.
       iteration: The number of iterations performed.
       value: Estimated value of the game.
     """
+    if self.enforce_symmetry and initial_strategies:
+      assert np.array_equal(initial_strategies[0], initial_strategies[1]),\
+          (f"Players must use same initial_strategies as symmetry is enforced."
+           f"\ninitial_strategies[0]: {initial_strategies[0]}, "
+           f"\ninitial_strategies[1]: {initial_strategies[1]}")
+
     self.subgame_strategies = initial_strategies \
         if initial_strategies else [[0], [0]]
     iteration = 0
     while iteration < max_steps:
+      if yield_subgame:
+        yield None, iteration, None, self.subgame_payoffs()
       iteration += 1
       last_subgame_size = lens(self.subgame_strategies)
       _, best_response_utility = self.step()
@@ -148,4 +174,17 @@ class DoubleOracleSolver(object):
     for p in range(2):
       solution[p][self.subgame_strategies[p]] = subgame_solution[p].squeeze()
 
+    yield solution, iteration, value, self.subgame_payoffs()
+
+  def solve(self,
+            initial_strategies=None,
+            max_steps=20,
+            tolerance=5e-5,
+            verbose=True):
+    """Solves the game using Double Oracle, returning the final solution."""
+    solution, iteration, value = None, None, None
+    generator = self.solve_yield(initial_strategies, max_steps, tolerance,
+                                 verbose, yield_subgame=False)
+    for solution, iteration, value, _ in generator:
+      pass
     return solution, iteration, value
