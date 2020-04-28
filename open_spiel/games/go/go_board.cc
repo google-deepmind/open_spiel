@@ -17,14 +17,60 @@
 #include <iomanip>
 
 #include "open_spiel/abseil-cpp/absl/random/uniform_int_distribution.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/games/chess/chess_common.h"
 #include "open_spiel/spiel_utils.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 
 namespace open_spiel {
 namespace go {
 
 namespace {
+
+// 8 adjacent directions.
+//
+//   405
+//   1 2
+//   637
+//
+// The order is important because it is used to index 3x3 patterns!
+//
+inline constexpr std::array<int, 9> Dir8 = {{
+    kVirtualBoardSize,  // new line
+    -1,                 // new line
+    +1,                 // new line
+    -static_cast<int>(kVirtualBoardSize),
+    +static_cast<int>(kVirtualBoardSize) - 1,
+    +static_cast<int>(kVirtualBoardSize) + 1,
+    -static_cast<int>(kVirtualBoardSize) - 1,
+    -static_cast<int>(kVirtualBoardSize) + 1,
+    0  // Dummy element.
+}};
+
+// To iterate over 4 neighboring points, do
+//
+// GoPoint point;
+// for (auto p = N4(point); p; ++p) {
+//   // Do something on *p..
+// }
+//
+class N4 {
+ public:
+  explicit N4(const VirtualPoint p)
+      : dir_(static_cast<VirtualPoint>(0)), p_(p) {}
+
+  N4& operator++() {
+    ++dir_;
+    return *this;
+  }
+
+  const VirtualPoint operator*() const { return p_ + Dir8[dir_]; }
+
+  explicit operator bool() const { return dir_ < 4; }
+
+ private:
+  VirtualPoint dir_;
+  const VirtualPoint p_;
+};
 
 // Calls f for all 4 direct neighbours of p.
 // f should have type void f(VirtualPoint n), but is passed as a template so we
@@ -287,6 +333,23 @@ bool GoBoard::PlayMove(VirtualPoint p, GoColor c) {
   return true;
 }
 
+VirtualPoint GoBoard::SingleLiberty(VirtualPoint p) const {
+  VirtualPoint head = ChainHead(p);
+  VirtualPoint liberty = chain(p).single_liberty();
+
+  // Check it is really a liberty.
+  SPIEL_CHECK_TRUE(IsInBoardArea(liberty));
+  SPIEL_CHECK_TRUE(IsEmpty(liberty));
+
+  // Make sure the liberty actually borders the group.
+  for (auto n = N4(liberty); n; ++n) {
+    if (ChainHead(*n) == head) return liberty;
+  }
+
+  SpielFatalError(
+      absl::StrCat("liberty", liberty, " does not actually border group ", p));
+}
+
 void GoBoard::SetStone(VirtualPoint p, GoColor c) {
   static const chess_common::ZobristTable<uint64_t, kVirtualBoardPoints, 2>
       zobrist_values(
@@ -477,6 +540,21 @@ void GoBoard::Chain::remove_liberty(VirtualPoint p) {
       static_cast<uint32_t>(p) * static_cast<uint32_t>(p);
 }
 
+VirtualPoint GoBoard::Chain::single_liberty() const {
+  SPIEL_CHECK_TRUE(in_atari());
+  // A point is in Atari if it has only a single liberty, i.e. all pseudo
+  // liberties are for the same point.
+  // This is true exactly when
+  //  liberty_vertex_sum**2 == liberty_vertex_sum_squared * num_pseudo_liberties
+  // Since all pseudo liberties are for the same point, this is equivalent to
+  // (taking n = num_pseudo_liberties):
+  //   (n * p)**2 = (n * p**2) * n
+  // Thus to obtain p, we simple need to divide out the number of pseudo
+  // liberties.
+  SPIEL_CHECK_EQ(liberty_vertex_sum % num_pseudo_liberties, 0);
+  return static_cast<VirtualPoint>(liberty_vertex_sum / num_pseudo_liberties);
+}
+
 std::ostream& operator<<(std::ostream& os, const GoBoard& board) {
   os << "\n";
   for (int row = board.board_size() - 1; row >= 0; --row) {
@@ -594,6 +672,39 @@ float TrompTaylorScore(const GoBoard& board, float komi, int handicap) {
     score -= handicap;
   }
   return score;
+}
+
+GoBoard CreateBoard(const std::string& initial_stones) {
+  GoBoard board(19);
+
+  int row = 0;
+  for (const auto& line : absl::StrSplit(initial_stones, '\n')) {
+    int col = 0;
+    bool stones_started = false;
+    for (const auto& c : line) {
+      if (c == ' ') {
+        if (stones_started) {
+          SpielFatalError(
+              "Whitespace is only allowed at the start of "
+              "the line. To represent empty intersections, "
+              "use +");
+        }
+        continue;
+      } else if (c == 'X') {
+        stones_started = true;
+        SPIEL_CHECK_TRUE(board.PlayMove(VirtualPointFrom2DPoint({row, col}),
+                                        GoColor::kBlack));
+      } else if (c == 'O') {
+        stones_started = true;
+        SPIEL_CHECK_TRUE(board.PlayMove(VirtualPointFrom2DPoint({row, col}),
+                                        GoColor::kWhite));
+      }
+      col++;
+    }
+    row++;
+  }
+
+  return board;
 }
 
 }  // namespace go
