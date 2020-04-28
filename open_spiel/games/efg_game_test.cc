@@ -31,6 +31,7 @@ namespace testing = open_spiel::testing;
 
 const char* kSampleFilename = "open_spiel/games/efg/sample.efg";
 const char* kKuhnFilename = "open_spiel/games/efg/kuhn_poker.efg";
+const char* kLeducFilename = "open_spiel/games/efg/leduc_poker.efg";
 const char* kSignalingFilename =
     "open_spiel/games/efg/signaling_vonstengel_forges_2008.efg";
 
@@ -101,6 +102,24 @@ void EFGGameSimTestsKuhnFromFile() {
   }
 }
 
+void EFGGameSimTestsLeducFromFile() {
+  std::optional<std::string> file = FindFile(kLeducFilename, 2);
+  if (file != std::nullopt) {
+    std::cout << "Found file: " << file.value() << "; running sim test.";
+    std::shared_ptr<const Game> game =
+        LoadGame("efg_game", {{"filename", GameParameter(file.value())}});
+    SPIEL_CHECK_TRUE(game != nullptr);
+    GameType type = game->GetType();
+    SPIEL_CHECK_EQ(type.dynamics, GameType::Dynamics::kSequential);
+    SPIEL_CHECK_EQ(type.information,
+                   GameType::Information::kImperfectInformation);
+    SPIEL_CHECK_EQ(type.utility, GameType::Utility::kZeroSum);
+    SPIEL_CHECK_EQ(type.chance_mode, GameType::ChanceMode::kExplicitStochastic);
+    SPIEL_CHECK_EQ(game->NumDistinctActions(), 3);
+    testing::RandomSimTest(*game, 100);
+  }
+}
+
 void EFGGameSimTestsSignalingFromFile() {
   std::optional<std::string> file = FindFile(kSignalingFilename, 2);
   if (file != std::nullopt) {
@@ -128,6 +147,7 @@ int main(int argc, char** argv) {
   open_spiel::efg_game::EFGGameSimTestsKuhnFromData();
   open_spiel::efg_game::EFGGameSimTestsSampleFromFile();
   open_spiel::efg_game::EFGGameSimTestsKuhnFromFile();
+  open_spiel::efg_game::EFGGameSimTestsLeducFromFile();
   open_spiel::efg_game::EFGGameSimTestsSignalingFromData();
   open_spiel::efg_game::EFGGameSimTestsSignalingFromFile();
 }
