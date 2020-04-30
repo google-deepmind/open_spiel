@@ -46,32 +46,6 @@ inline constexpr std::array<int, 9> Dir8 = {{
     0  // Dummy element.
 }};
 
-// To iterate over 4 neighboring points, do
-//
-// GoPoint point;
-// for (auto p = N4(point); p; ++p) {
-//   // Do something on *p..
-// }
-//
-class N4 {
- public:
-  explicit N4(const VirtualPoint p)
-      : dir_(static_cast<VirtualPoint>(0)), p_(p) {}
-
-  N4& operator++() {
-    ++dir_;
-    return *this;
-  }
-
-  const VirtualPoint operator*() const { return p_ + Dir8[dir_]; }
-
-  explicit operator bool() const { return dir_ < 4; }
-
- private:
-  VirtualPoint dir_;
-  const VirtualPoint p_;
-};
-
 // Calls f for all 4 direct neighbours of p.
 // f should have type void f(VirtualPoint n), but is passed as a template so we
 // can elide the function call overhead.
@@ -111,7 +85,7 @@ char GoColorToChar(GoColor c) {
     case GoColor::kGuard:
       return '#';
     default:
-      SpielFatalError(absl::StrCat("Unknown color ", c));
+      SpielFatalError(absl::StrCat("Unknown color ", c, " in GoColorToChar."));
       return '!';
   }
 }
@@ -129,6 +103,18 @@ std::string MoveAsAscii(VirtualPoint p, GoColor c) {
 }
 
 }  // namespace
+
+Neighbours4::Neighbours4(const VirtualPoint p)
+    : dir_(static_cast<VirtualPoint>(0)), p_(p) {}
+
+Neighbours4& Neighbours4::operator++() {
+  ++dir_;
+  return *this;
+}
+
+const VirtualPoint Neighbours4::operator*() const { return p_ + Dir8[dir_]; }
+
+Neighbours4::operator bool() const { return dir_ < 4; }
 
 std::pair<int, int> VirtualPointTo2DPoint(VirtualPoint p) {
   if (p == kInvalidPoint || p == kVirtualPass) return std::make_pair(-1, -1);
@@ -201,7 +187,7 @@ GoColor OppColor(GoColor c) {
     case GoColor::kGuard:
       return c;
     default:
-      SpielFatalError("Unknown color.");
+      SpielFatalError(absl::StrCat("Unknown color ", c, " in OppColor."));
       return c;
   }
 }
@@ -221,7 +207,8 @@ std::string GoColorToString(GoColor c) {
     case GoColor::kGuard:
       return "GUARD";
     default:
-      SpielFatalError("Unknown color.");
+      SpielFatalError(
+          absl::StrCat("Unknown color ", c, " in GoColorToString."));
       return "This will never return.";
   }
 }
@@ -306,6 +293,12 @@ bool GoBoard::PlayMove(VirtualPoint p, GoColor c) {
     return true;
   }
 
+  if (board_[p].color != GoColor::kEmpty) {
+    SpielFatalError(absl::StrCat("Trying to play the move ", GoColorToString(c),
+                                 ": ", VirtualPointToString(p), " (", p,
+                                 ") but the cell is already filled with ",
+                                 GoColorToString(board_[p].color)));
+  }
   SPIEL_CHECK_EQ(GoColor::kEmpty, board_[p].color);
 
   // Preparation for ko checking.
@@ -342,7 +335,7 @@ VirtualPoint GoBoard::SingleLiberty(VirtualPoint p) const {
   SPIEL_CHECK_TRUE(IsEmpty(liberty));
 
   // Make sure the liberty actually borders the group.
-  for (auto n = N4(liberty); n; ++n) {
+  for (auto n = Neighbours4(liberty); n; ++n) {
     if (ChainHead(*n) == head) return liberty;
   }
 
@@ -553,6 +546,12 @@ VirtualPoint GoBoard::Chain::single_liberty() const {
   // liberties.
   SPIEL_CHECK_EQ(liberty_vertex_sum % num_pseudo_liberties, 0);
   return static_cast<VirtualPoint>(liberty_vertex_sum / num_pseudo_liberties);
+}
+
+std::string GoBoard::ToString() {
+  std::ostringstream stream;
+  stream << *this;
+  return stream.str();
 }
 
 std::ostream& operator<<(std::ostream& os, const GoBoard& board) {

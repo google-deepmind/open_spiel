@@ -61,6 +61,7 @@ inline int DefaultMaxGameLength(int board_size) {
 }
 
 inline int ColorToPlayer(GoColor c) { return static_cast<int>(c); }
+inline GoColor PlayerToColor(Player p) { return static_cast<GoColor>(p); }
 
 // State of an in-play game.
 // Actions are contiguous from 0 to board_size * board_size - 1, row-major, i.e.

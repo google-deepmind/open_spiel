@@ -83,7 +83,7 @@ std::vector<VirtualPoint> HandicapStones(int num_handicap) {
 
 GoState::GoState(std::shared_ptr<const Game> game, int board_size, float komi,
                  int handicap)
-    : State(game),
+    : State(std::move(game)),
       board_(board_size),
       komi_(komi),
       handicap_(handicap),
