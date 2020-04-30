@@ -47,6 +47,7 @@ class QLearner(rl_agent.AbstractAgent):
     self._q_values = collections.defaultdict(
         lambda: collections.defaultdict(float))
     self._prev_info_state = None
+    self._last_loss_value = None
 
   def _epsilon_greedy(self, info_state, legal_actions, epsilon):
     """Returns a valid epsilon-greedy action and valid action probs.
