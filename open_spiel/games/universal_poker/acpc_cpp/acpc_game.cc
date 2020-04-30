@@ -23,6 +23,7 @@
 #include <ostream>
 #include <sstream>
 
+#include "open_spiel/games/universal_poker/acpc/project_acpc_server/game.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
@@ -30,7 +31,6 @@ namespace universal_poker {
 namespace acpc_cpp {
 
 static const int STRING_BUFFERSIZE = 4096;
-
 
 namespace {
 RawACPCAction GetAction(ACPCState::ACPCActionType type, int32_t size) {
@@ -99,15 +99,23 @@ bool ACPCGame::operator==(const ACPCGame &other) const {
   const RawACPCGame *first = acpc_game_.get();
   const RawACPCGame *second = other.acpc_game_.get();
   const int num_players = first->numPlayers;
-const int num_rounds = first->numRounds;
+  const int num_rounds = first->numRounds;
+
+  // We check for `raiseSize` only for limit betting.
+  if (first->bettingType != second->bettingType) {
+    return false;
+  }
+  if (first->bettingType == project_acpc_server::limitBetting) {
+    if (!std::equal(first->raiseSize, first->raiseSize + num_rounds,
+                 second->raiseSize)) {
+      return false;
+    }
+  }
   return (  // new line
       first->numPlayers == second->numPlayers &&
       first->numRounds == second->numRounds &&
       std::equal(first->stack, first->stack + num_players, second->stack) &&
       std::equal(first->blind, first->blind + num_players, second->blind) &&
-      std::equal(first->raiseSize, first->raiseSize + num_rounds,
-                 second->raiseSize) &&
-      first->bettingType == second->bettingType &&
       std::equal(first->firstPlayer, first->firstPlayer + num_rounds,
                  second->firstPlayer) &&
       std::equal(first->maxRaises, first->maxRaises + num_rounds,

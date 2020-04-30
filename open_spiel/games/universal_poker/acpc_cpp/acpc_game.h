@@ -93,6 +93,7 @@ class ACPCGame {
 
   // Checks that the underlying acpc_game_ structs have all their fields equal.
   bool operator==(const ACPCGame& other) const;
+  bool operator!=(const ACPCGame& other) const { return !(*this == other);}
 };
 
 }  // namespace acpc_cpp
