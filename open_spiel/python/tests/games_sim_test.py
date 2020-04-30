@@ -18,7 +18,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import os
 import pickle
 from absl.testing import absltest
 from absl.testing import parameterized
@@ -26,6 +25,7 @@ import numpy as np
 
 from open_spiel.python.games import tic_tac_toe
 import pyspiel
+from open_spiel.python.utils import file_utils
 
 # Put a bound on length of game so test does not timeout.
 MAX_ACTIONS_PER_GAME = 1000
@@ -60,17 +60,6 @@ SPIEL_MULTIPLAYER_GAMES_LIST = [
 ]
 assert len(SPIEL_MULTIPLAYER_GAMES_LIST) >= 35, len(
     SPIEL_MULTIPLAYER_GAMES_LIST)
-
-
-def find_file(filename, levels):
-  if os.path.isfile(filename):
-    return filename
-  else:
-    for _ in range(levels):
-      filename = "../" + filename
-      if os.path.isfile(filename):
-        return filename
-  return None
 
 
 class GamesSimTest(parameterized.TestCase):
@@ -240,12 +229,14 @@ class GamesSimTest(parameterized.TestCase):
           check_pyspiel_serialization=False,
           check_pickle_serialization=False)
     # EFG games loaded by file should serialize properly:
-    filename = find_file("open_spiel/games/efg/sample.efg", 2)
+    filename = file_utils.find_file(
+        "open_spiel/games/efg/sample.efg", 2)
     if filename is not None:
       game = pyspiel.load_game("efg_game(filename=" + filename + ")")
       for _ in range(0, 100):
         self.sim_game(game)
-    filename = find_file("open_spiel/games/efg/sample.efg", 2)
+    filename = file_utils.find_file(
+        "open_spiel/games/efg/sample.efg", 2)
     if filename is not None:
       game = pyspiel.load_game("efg_game(filename=" + filename + ")")
       for _ in range(0, 100):
