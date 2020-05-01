@@ -86,6 +86,10 @@ HistoryNode::HistoryNode(Player player_id, std::unique_ptr<State> game_state)
   // view of player player_id.
   if (type_ == StateType::kDecision && state_->CurrentPlayer() != player_id) {
     infostate_ = state_->InformationStateString();
+  } else if (type_ == StateType::kChance) {
+    infostate_ = kChanceNodeInfostateString;
+  } else if (type_ == StateType::kTerminal) {
+    infostate_ = kTerminalNodeInfostateString;
   } else {
     infostate_ = state_->InformationStateString(player_id);
   }

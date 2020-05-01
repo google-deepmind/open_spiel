@@ -114,6 +114,19 @@ void TestGameTree() {
                 "infostate stored in HistoryNode for history: ", history,
                 "in game: ", game_name));
           }
+        } else if (node->GetType() == StateType::kChance) {
+          if (node->GetInfoState() != HistoryNode::kChanceNodeInfostateString) {
+            SpielFatalError(absl::StrCat(
+                "Chance node's infostate string not properly set for history: ",
+                history, " in game: ", game_name));
+          }
+        } else if (node->GetType() == StateType::kTerminal) {
+          if (node->GetInfoState() !=
+              HistoryNode::kTerminalNodeInfostateString) {
+            SpielFatalError(absl::StrCat(
+                "Chance node's infostate string not properly set for history: ",
+                history, " in game: ", game_name));
+          }
         } else {
           if (node->GetInfoState() !=
               node->GetState()->InformationStateString(player_id)) {

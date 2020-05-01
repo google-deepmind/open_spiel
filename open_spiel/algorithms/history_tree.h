@@ -32,6 +32,11 @@ namespace algorithms {
 // history in the game.
 class HistoryNode {
  public:
+  // Use specific infostate strings for chance and terminal nodes so that we
+  // don't rely on the game implementations defining them at those states.
+  static constexpr const char* kChanceNodeInfostateString = "Chance Node";
+  static constexpr const char* kTerminalNodeInfostateString = "Terminal node";
+
   HistoryNode(Player player_id, std::unique_ptr<State> game_state);
 
   State* GetState() { return state_.get(); }
