@@ -7,6 +7,7 @@ namespace {
     namespace testing = open_spiel::testing;
 
     void BasicSolitaireTests() {
+
         // Tests that the game can be loaded (i.e. LoadGame doesn't return nullptr)
         testing::LoadGameTest("solitaire");
 
@@ -14,6 +15,7 @@ namespace {
         //testing::ChanceOutcomesTest(*LoadGame("solitaire"));
 
         testing::RandomSimTest(*LoadGame("solitaire"), 20);
+
     }
 
 } // namespace

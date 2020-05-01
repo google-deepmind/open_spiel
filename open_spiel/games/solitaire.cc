@@ -686,36 +686,12 @@ namespace open_spiel::solitaire {
     bool                    SolitaireState::IsTerminal() const {
 
         /* Decides if the game is over, `is_finished` is an attribute of the state that allows us to make the next
-         * state terminal no matter what. The state is also terminal if the last 8 actions have been kDraw (Drawing
-         * through the entire deck without moving anything from it is equivalent to never having drawn through it at
-         * all). Finally, if LegalActions() is empty, then the state is also terminal as it can't be progressed
-         * any further */
+         * state terminal no matter what. It's set to true inside of `DoApplyAction()` if the trajectory exceeds
+         * `MaxGameLength` or if the last 8 moves have all been kDraw. */
 
-        if (is_finished or draw_counter >= 9) {
+        if (is_finished) {
             return true;
-        }
-
-        else if (History().size() >= 8) {
-
-            std::vector<Action> history = History();
-            std::vector<Action> recent_history(history.end() - 8, history.end());
-
-            for (auto action : recent_history) {
-                if (action != kDraw) {
-                    return false;
-                }
-            }
-
-            // If all 8 recent actions are kDraw, then the state is terminal
-            return true;
-
-        }
-
-        else if (LegalActions().empty()) {
-            return true;
-        }
-
-        else {
+        } else {
             return false;
         }
 
@@ -875,6 +851,12 @@ namespace open_spiel::solitaire {
          * to split `InformationStateTensor` at the first occurrence of `kInvalidAction` and then reverse whats left
          * in order to see the most recent actions taken */
 
+        /* Raise an error if `player` is kChancePlayerId or kTerminalPlayerId
+         * Must be returned on terminal states. */
+
+        SPIEL_CHECK_GE(player, 0);
+        SPIEL_CHECK_LT(player, num_players_);
+
         return HistoryString();
     }
 
@@ -883,7 +865,8 @@ namespace open_spiel::solitaire {
         /* This method is actually very important in loop prevention as its value is hashed when a reversible move is
          * done. It is basically just a subset of the information contained in `SolitaireState::ToString()` */
 
-        // TODO: Rely on a different method to get hashed state
+        SPIEL_CHECK_GE(player, 0);
+        SPIEL_CHECK_LT(player, num_players_);
 
         std::string result;
 
@@ -928,6 +911,9 @@ namespace open_spiel::solitaire {
          * This method just basically just pads `History()` with `kInvalidAction` up to length of
          * `InformationStateTensorShape()`. */
 
+        SPIEL_CHECK_GE(player, 0);
+        SPIEL_CHECK_LT(player, num_players_);
+
         values->resize(game_->InformationStateTensorShape()[0]);
         std::fill(values->begin(), values->end(), kInvalidAction);
 
@@ -947,6 +933,9 @@ namespace open_spiel::solitaire {
          * concatenated together with size 233. */
 
         // TODO: Not sure if any pile being empty would have an effect on the final result
+
+        SPIEL_CHECK_GE(player, 0);
+        SPIEL_CHECK_LT(player, num_players_);
 
         for (const auto & tableau : tableaus) {
             std::vector<double> tableau_obs = ToCardIndices(tableau.cards, 19);
@@ -1055,8 +1044,9 @@ namespace open_spiel::solitaire {
             // Add move to revealed cards so we don't try to reveal it again
             revealed_cards.push_back(move);
 
+            /* NOTE: There shouldn't ever be a time before `is_started` where a tableau is empty, so we don't need
+                     to check if `tableau.cards` is empty beforehand. */
 
-            // TODO: There shouldn't ever be a time before `is_started` where a tableau is empty
             // If the game hasn't been started ...
             if (not is_started) {
                 // For every tableau in tableaus ...
@@ -1131,11 +1121,27 @@ namespace open_spiel::solitaire {
 
         }
 
-        // Increase Current Depth ======================================================================================
+        // Check Terminality ===========================================================================================
 
         ++current_depth;
-        if (current_depth >= game_->MaxGameLength()) {
+
+        if (current_depth >= game_->MaxGameLength() or draw_counter > 8) {
             is_finished = true;
+        }
+        else if (History().size() >= 8) {
+
+            std::vector<Action> history = History();
+            std::vector<Action> recent_history(history.end() - 8, history.end());
+
+            // If all 8 recent actions are kDraw, then the state is terminal
+            is_finished = true;
+
+            for (auto action : recent_history) {
+                if (action != kDraw) {
+                    // If a recent action is not kDraw, then the game is not finished
+                    is_finished = false;
+                }
+            }
         }
 
         // Finish Game =================================================================================================
@@ -1239,26 +1245,34 @@ namespace open_spiel::solitaire {
     std::vector<Action>     SolitaireState::LegalActions() const {
 
         /* Takes the output of CandidateMoves and filters it down and converts each of them to an `Action`. If there
-         * are cards left in the deck or waste, it also adds kDraw. If there are no legal moves, kDraw is added anyway
-         * just to make sure LegalActions isn't empty (TODO: Find a better method later)
+         * are cards left in the deck or waste, it also adds kDraw.
          *
          * We filter candidate moves that would form cycles in the graph by comparing the result of reversible moves to
-         * `previous_states`. The one exception to this is moves that move a card to the foundations. This seems to be
-         * necessary to get the game to solve quickly in the late game, when almost all moves are reversible. If the
-         * state isn't reversible, then all candidate moves are legal moves, as they can't form cycles. */
+         * `previous_states`. If the state isn't reversible, then all candidate moves are legal moves, as they can't
+         * form cycles. */
+
+        if (IsTerminal()) {
+            return {};
+        } else if (IsChanceNode()) {
+            return LegalChanceOutcomes();
+        }
 
         std::vector<Action> legal_actions;
 
         // Adds all candidate_moves to legal_actions that don't form a back edge to a previous state.
         for (const auto & move : CandidateMoves()) {
 
+            /* NOTE: Not sure if this is correct, but it does lead to more won games
+             *      (if uncommented, add else in front `if (is_reversible)`)
+
             // We allow all moves to the foundation
             if (move.target.location == kFoundation) {
                 legal_actions.push_back(move.ActionId());
             }
+            */
 
-            // Else if the state is reversible ...
-            else if (is_reversible) {
+            // If the state is reversible ...
+            if (is_reversible) {
 
                 // And the candidate move is reversible ...
                 if (IsReversible(move)) {
@@ -1266,25 +1280,40 @@ namespace open_spiel::solitaire {
                     // Then get the resulting state
                     auto child = Child(move.ActionId());
 
-                    // Then get the hash of the child state
-                    auto child_hash = hasher(child->ObservationString());
+                    // We can't call ObservationString for non-player nodes (chance, terminal, etc.)
+                    if (child->CurrentPlayer() < 0) {
 
-                    // If the child state is in previous_states, then it forms a loop
-                    if (previous_states.count(child_hash) > 0) {
-                        continue;
-                    }
-
-                    // Otherwise, it doesn't form a loop and we can add it to legal actions
-                    else {
+                        // But these nodes can't form a loop/cycle, so we don't have to check for one before adding
                         legal_actions.push_back(move.ActionId());
+
+                        // Then we continue to the next candidate move
+                        continue;
+
                     }
 
+                    // Otherwise if the child is a decision node ...
+                    else {
+
+                        // Then get the hash of the child state
+                        auto child_hash = hasher(child->ObservationString());
+
+                        // If the child state is in previous_states, then it forms a loop
+                        if (previous_states.count(child_hash) > 0) {
+                            continue;
+                        }
+
+                        // Otherwise, it doesn't form a loop and we can add it to legal actions
+                        else {
+                            legal_actions.push_back(move.ActionId());
+                        }
+                    }
                 }
 
                 // And the candidate move is not reversible ...
                 else {
                     legal_actions.push_back(move.ActionId());
                 }
+
             }
 
             // If the state isn't reversible, then all candidate_moves are legal actions
@@ -1295,7 +1324,7 @@ namespace open_spiel::solitaire {
         }
 
         // kDraw is added if there are cards to draw from or all candidate moves were not legal actions.
-        if (deck.cards.size() + deck.waste.size() > 0 or legal_actions.empty()) {
+        if (deck.cards.size() + deck.waste.size() > 0) {
             legal_actions.push_back(kDraw);
         }
 

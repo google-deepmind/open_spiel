@@ -20,29 +20,6 @@
 
 namespace open_spiel::solitaire {
 
-    // Function Call Tracer for Debugging in Python
-
-    /*
-    bool TRACER_FLAG = false;
-    struct tracer {
-
-        std::string name_;
-
-        tracer(std::string const& name) : name_(name) {
-            if (TRACER_FLAG) {
-                std::clog << BLUE << "LOG: Entering " << name_ << RESET << std::endl;
-            }
-        }
-
-        ~tracer() {
-            if (TRACER_FLAG) {
-                std::clog << GREEN << "LOG: Exiting " << name_ << RESET << std::endl;
-            }
-        }
-
-    };
-    */
-
     // Sets default number of players
     inline constexpr int    kDefaultPlayers = 1;
 
