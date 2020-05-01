@@ -110,8 +110,9 @@ class BestResponsePolicy(openspiel_policy.Policy):
       if parent_state.current_player() == self._player_id:
         yield (parent_state, 1.0)
       for action, p_action in self.transitions(parent_state):
-        for state, p_state in self.decision_nodes(parent_state.child(action)):
-          yield (state, p_state * p_action)
+        if action in parent_state.legal_actions():
+          for state, p_state in self.decision_nodes(parent_state.child(action)):
+            yield (state, p_state * p_action)
 
   def transitions(self, state):
     """Returns a list of (action, cf_prob) pairs from the specifed state."""
@@ -138,7 +139,10 @@ class BestResponsePolicy(openspiel_policy.Policy):
 
   def q_value(self, state, action):
     """Returns the value of the (state, action) to the best-responder."""
-    return self.value(state.child(action))
+    if action in state.legal_actions():
+      return self.value(state.child(action))
+    else:
+      return state.player_return(self._player_id)
 
   @_memoize_method
   def best_response_action(self, infostate):
