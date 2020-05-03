@@ -18,9 +18,9 @@
 #include <memory>
 #include <optional>
 #include <string>
-#include <unordered_map>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
@@ -127,6 +127,17 @@ class EFGGame : public Game {
     action_ids_[label] = action_ids_.size();
   }
 
+  // Get the information state strings by names or numbers.
+  // Note: since the names of the information sets are not required to be
+  // unique, if the same name is used for different infoset numbers in the file
+  // then the information set number may not be the correct one. Only use
+  // GetInformationStateStringByName if the names are unique and there is a
+  // one-to-one correspondence with infoset numbers!
+  std::string GetInformationStateStringByName(Player player,
+                                              const std::string& name) const;
+  std::string GetInformationStateStringByNumber(Player player,
+                                                int number) const;
+
  private:
   std::unique_ptr<Node> NewNode() const;
   void ParseGame();
@@ -135,6 +146,7 @@ class EFGGame : public Game {
   bool ParseDoubleValue(const std::string& str, double* value) const;
   bool IsWhiteSpace(char c) const;
   bool IsNodeToken(char c) const;
+  void UpdateAndCheckInfosetMaps(const Node* node);
   void ParseChanceNode(Node* parent, Node* child, int depth);
   void ParsePlayerNode(Node* parent, Node* child, int depth);
   void ParseTerminalNode(Node* parent, Node* child, int depth);
@@ -160,8 +172,12 @@ class EFGGame : public Game {
   bool identical_payoffs_;
   bool general_sum_;
   bool perfect_information_;
-  std::unordered_map<int, int> infoset_num_to_states_count_;
-  std::unordered_map<std::string, Action> action_ids_;
+  absl::flat_hash_map<int, int> infoset_num_to_states_count_;
+  absl::flat_hash_map<std::pair<Player, int>, std::string>
+      infoset_player_num_to_name_;
+  absl::flat_hash_map<std::string, std::pair<Player, int>>
+      infoset_name_to_player_num_;
+  absl::flat_hash_map<std::string, Action> action_ids_;
 };
 
 }  // namespace efg_game

@@ -80,6 +80,11 @@ std::string NodeToString(const Node* node) {
   }
   return str;
 }
+
+std::string EFGInformationStateString(Player owner, Player observer, int number,
+                                      const std::string& name) {
+  return absl::StrCat(owner, "-", observer, "-", number, "-", name);
+}
 }  // namespace
 
 EFGState::EFGState(std::shared_ptr<const Game> game, const Node* root)
@@ -126,8 +131,9 @@ std::string EFGState::InformationStateString(Player player) const {
   // The information set number has to uniquely identify the infoset, whereas
   // the names are optional. But the numbers are unique per player, so must
   // add the player number.
-  return absl::StrCat(cur_node_->player_number - 1, "-", player, "-",
-                      cur_node_->infoset_number, "-", cur_node_->infoset_name);
+  return EFGInformationStateString(cur_node_->player_number - 1, player,
+                                   cur_node_->infoset_number,
+                                   cur_node_->infoset_name);
 }
 
 std::string EFGState::ObservationString(Player player) const {
@@ -425,6 +431,35 @@ void EFGGame::ParseChanceNode(Node* parent, Node* child, int depth) {
   }
 }
 
+void EFGGame::UpdateAndCheckInfosetMaps(const Node* node) {
+  // If the infoset name is not empty:
+  //   1. ensure mapping from infoset (player,num) -> name is consistent, adding
+  //      it if it doesn't exist.
+  //   2. Add also name -> (player, num) to a hash map
+  Player player = node->player_number - 1;
+  if (!node->infoset_name.empty()) {
+    std::pair<Player, int> key = {player, node->infoset_number};
+    const auto& iter1 = infoset_player_num_to_name_.find(key);
+    if (iter1 != infoset_player_num_to_name_.end()) {
+      if (iter1->second != node->infoset_name) {
+        SpielFatalError(absl::StrCat(
+            "Inconsistent infoset (player, num) -> name: ",
+            static_cast<int>(player), ",", node->infoset_number, " ",
+            node->infoset_name, " ", iter1->second, "\nfilename: ", filename_,
+            "\nstring data:\n", string_data_));
+      }
+    } else {
+      std::pair<Player, int> key = {player, node->infoset_number};
+      infoset_player_num_to_name_[key] = node->infoset_name;
+    }
+
+    // Name -> infoset number is not required to be unique in .efg so we don't
+    // check it. So these may overlap unless the mapping is unique in the file.
+    infoset_name_to_player_num_[node->infoset_name] = {player,
+                                                       node->infoset_number};
+  }
+}
+
 void EFGGame::ParsePlayerNode(Node* parent, Node* child, int depth) {
   // a text string, giving the name of the node
   // a positive integer specifying the player who owns the node
@@ -446,12 +481,14 @@ void EFGGame::ParsePlayerNode(Node* parent, Node* child, int depth) {
   SPIEL_CHECK_TRUE(absl::SimpleAtoi(NextToken(), &child->player_number));
   SPIEL_CHECK_TRUE(absl::SimpleAtoi(NextToken(), &child->infoset_number));
   infoset_num_to_states_count_[child->infoset_number] += 1;
-  if (infoset_num_to_states_count_[child->infoset_number]) {
+  if (infoset_num_to_states_count_[child->infoset_number] > 1) {
     perfect_information_ = false;
   }
+  child->infoset_name = "";
   if (string_data_.at(pos_) == '"') {
     child->infoset_name = NextToken();
   }
+  UpdateAndCheckInfosetMaps(child);
   // Do not understand how the list of actions can be optional.
   SPIEL_CHECK_TRUE(NextToken() == "{");
   int actions = 0;
@@ -565,6 +602,25 @@ std::string EFGGame::PrettyTree(const Node* node,
     str += PrettyTree(child, indent + "  ");
   }
   return str;
+}
+
+std::string EFGGame::GetInformationStateStringByName(
+    Player player, const std::string& name) const {
+  const auto& iter = infoset_name_to_player_num_.find(name);
+  if (iter == infoset_name_to_player_num_.end()) {
+    SpielFatalError(absl::StrCat("Information state not found: ", name));
+  }
+  return EFGInformationStateString(player, player, iter->second.second, name);
+}
+
+std::string EFGGame::GetInformationStateStringByNumber(Player player,
+                                                       int number) const {
+  const auto& iter = infoset_player_num_to_name_.find({player, number});
+  if (iter == infoset_player_num_to_name_.end()) {
+    SpielFatalError(
+        absl::StrCat("Information state not found: ", player, ",", number));
+  }
+  return EFGInformationStateString(player, player, number, iter->second);
 }
 
 void EFGGame::ParseGame() {
