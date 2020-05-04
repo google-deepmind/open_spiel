@@ -32,8 +32,34 @@ namespace open_spiel::solitaire {
         return std::distance(std::begin(container), std::find(container.begin(), container.end(), element));
     }
 
+    /*
+    enum Suit {
+        kSpades = 0,
+        kHearts,
+        kClubs,
+        kDiamonds
+    };
+    enum Rank {
+        kA = 0,
+        k2,
+        k3,
+        k4,
+        k5,
+        k6,
+        k7,
+        k8,
+        k9,
+        kT,
+        kJ,
+        kQ,
+        kK,
+    };
+    */
+
     const std::vector<std::string> SUITS = {"s", "h", "c", "d"};
+
     const std::vector<std::string> RANKS = {"A", "2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K"};
+
     const std::map<std::string, double> FOUNDATION_POINTS = {
             //region Reward for move to the foundation with a source card of this rank
             {"A", 100.0},

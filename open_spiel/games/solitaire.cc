@@ -14,7 +14,7 @@
 #define RESET   "\033[0m"
 #define RED     "\033[31m"
 #define YELLOW  "\033[33m"
-#define WHITE   "\033[30m"
+#define BLACK   "\033[37m"
 
 /* TERMINOLOGY
     Pile:
@@ -149,9 +149,9 @@ namespace open_spiel::solitaire {
         /* Just returns a vector of the suits of opposite color. For red suits ("h" and "d"), this returns the
          * black suits ("s", "c"). For a black suit, this returns the red suits. */
 
-        if (suit == "s" or suit == "c") {
+        if (suit == "s" || suit == "c") {
             return {"h", "d"};
-        } else if (suit == "h" or suit == "d") {
+        } else if (suit == "h" || suit == "d") {
             return {"s", "c"};
         } else {
             std::cout << YELLOW << "WARNING: `suit` is not in (s, h, c, d)" << RESET << std::endl;
@@ -191,7 +191,7 @@ namespace open_spiel::solitaire {
          * to be longer than the pile of cards, it is filled with `NO_CARD` (99.0) at the end. */
 
         std::vector<double> index_vector;
-        if (not pile.empty()) {
+        if (!pile.empty()) {
             for (auto & card : pile) {
                 if (card.hidden) {
                     index_vector.push_back(HIDDEN_CARD);
@@ -227,23 +227,38 @@ namespace open_spiel::solitaire {
         /* Constructs an unhidden card from its index; `location` is set to kMissing here and must be set outside of
          * this constructor to be used by methods that depend on it */
 
-        // Handles special cards
+
         if (index < 0) {
-            rank = "";
-            switch (index) {
-                case -1 : { suit = "s"; break; }
-                case -2 : { suit = "h"; break; }
-                case -3 : { suit = "c"; break; }
-                case -4 : { suit = "d"; break; }
-                case -5 : { suit =  ""; break; }
-                default : {
-                    std::cout << YELLOW << "WARNING: Incorrect index for special card";
-                    break;
-                }
+          // Handles special cards
+          rank = "";
+          switch (index) {
+            case -1 : {
+              suit = "s";
+              break;
             }
-        }
-        // Handles ordinary cards
-        else {
+            case -2 : {
+              suit = "h";
+              break;
+            }
+            case -3 : {
+              suit = "c";
+              break;
+            }
+            case -4 : {
+              suit = "d";
+              break;
+            }
+            case -5 : {
+              suit = "";
+              break;
+            }
+            default : {
+              std::cout << YELLOW << "WARNING: Incorrect index for special card";
+              break;
+            }
+          }
+        } else {
+            // Handles ordinary cards
             int rank_value = index % 13;
             int suit_value = floor(index / 13);
             rank = RANKS.at(rank_value);
@@ -261,11 +276,11 @@ namespace open_spiel::solitaire {
     }
 
     bool Card::operator==(Card & other_card) const {
-        return rank == other_card.rank and suit == other_card.suit;
+        return rank == other_card.rank && suit == other_card.suit;
     }
 
     bool Card::operator==(const Card & other_card) const {
-        return rank == other_card.rank and suit == other_card.suit;
+        return rank == other_card.rank && suit == other_card.suit;
     }
 
     std::vector<Card> Card::LegalChildren() const {
@@ -284,32 +299,31 @@ namespace open_spiel::solitaire {
 
         // A hidden card has no legal children
         if (hidden) {
-            // log_exit("Exiting Card::operator==");
             return legal_children;
         }
 
         switch (location) {
             case kTableau:
-                // Handles empty tableau cards (children are kings of all suits)
+
                 if (rank.empty()) {
+                    // Handles empty tableau cards (children are kings of all suits)
                     child_rank  = "K";
                     child_suits = SUITS;
-                }
-                // Handles regular cards (except aces)
-                else if (rank != "A") {
+                } else if (rank != "A") {
+                    // Handles regular cards (except aces)
                     child_rank  = RANKS.at(GetIndex(RANKS, rank) - 1);
                     child_suits = GetOppositeSuits(suit);
                 }
                 break;
 
             case kFoundation:
-                // Handles empty foundation cards (children are aces of same suit)
+
                 if (rank.empty()) {
+                    // Handles empty foundation cards (children are aces of same suit)
                     child_rank  = "A";
                     child_suits = {suit};
-                }
-                // Handles regular cards (except kings)
-                else if (rank != "K") {
+                } else if (rank != "K") {
+                    // Handles regular cards (except kings)
                     child_rank  = RANKS.at(GetIndex(RANKS, rank) + 1);
                     child_suits = {suit};
                 }
@@ -340,23 +354,22 @@ namespace open_spiel::solitaire {
         if (hidden) {
             // Representation of a hidden card
             absl::StrAppend(&result, "\U0001F0A0", " ");
-        }
-        else {
+        } else {
             // Suit Color
-            if (suit == "s" or suit == "c") {
-                absl::StrAppend(&result, color(WHITE));
-            } else if (suit == "h" or suit == "d") {
+            if (suit == "s" || suit == "c") {
+                absl::StrAppend(&result, color(BLACK));
+            } else if (suit == "h" || suit == "d") {
                 absl::StrAppend(&result, color(RED));
             }
 
-            // Special Cards
             if (rank.empty()) {
-                // Handles special tableau cards which have no rank or suit
+                // Special Cards
+
                 if (suit.empty()) {
+                    // Handles special tableau cards which have no rank or suit
                     absl::StrAppend(&result, "\U0001F0BF");
-                }
-                // Handles special foundation cards which have a suit but not a rank
-                else {
+                } else {
+                    // Handles special foundation cards which have a suit but not a rank
                     if (suit == "s") {
                         absl::StrAppend(&result, "\U00002660");
                     } else if (suit == "h") {
@@ -367,15 +380,10 @@ namespace open_spiel::solitaire {
                         absl::StrAppend(&result, "\U00002666");
                     }
                 }
-            }
-
-            // Ordinary Cards
-            else {
+            } else {
+                // Ordinary Cards
                 absl::StrAppend(&result, rank, suit);
             }
-
-
-
         }
 
         absl::StrAppend(&result, color(RESET));
@@ -403,16 +411,15 @@ namespace open_spiel::solitaire {
          * front of the waste unless it is hidden. If the waste is empty or the front card is hidden, this returns
          * an empty vector */
 
-        // If the waste is not empty, sources is just a vector of the top card of the waste
-        if (not waste.empty()) {
+        if (!waste.empty()) {
+            // If the waste is not empty, sources is just a vector of the top card of the waste
             if (waste.front().hidden) {
                 return {};
             } else {
                 return {waste.front()};
             }
-        }
-        // If it is empty, sources is just an empty vector
-        else {
+        } else {
+            // If it is empty, sources is just an empty vector
             return {};
         }
 
@@ -484,24 +491,21 @@ namespace open_spiel::solitaire {
     }
 
     std::vector<Card> Foundation::Sources() const {
-        // If the foundation is not empty, sources is just a vector of the top card of the foundation
-        if (not cards.empty()) {
+        if (!cards.empty()) {
+            // If the foundation is not empty, sources is just a vector of the top card of the foundation
             return {cards.back()};
-        }
-        // If it is empty, then sources is just an empty vector
-        else {
+        } else {
+            // If it is empty, then sources is just an empty vector
             return {};
         }
     }
 
     std::vector<Card> Foundation::Targets() const {
-
-        // If the foundation is not empty, targets is just the top card of the foundation
-        if (not cards.empty()) {
+        if (!cards.empty()) {
+            // If the foundation is not empty, targets is just the top card of the foundation
             return {cards.back()};
-        }
-        // If it is empty, then targets is just a special card with no rank and a suit matching this foundation
-        else {
+        } else {
+            // If it is empty, then targets is just a special card with no rank and a suit matching this foundation
             auto card     = Card("", suit);
             card.hidden   = false;
             card.location = kFoundation;
@@ -539,33 +543,31 @@ namespace open_spiel::solitaire {
     }
 
     std::vector<Card> Tableau::Sources() const {
-        // If the tableau is not empty, sources is just a vector of all cards that are not hidden
-        if (not cards.empty()) {
+        if (!cards.empty()) {
+            // If the tableau is not empty, sources is just a vector of all cards that are not hidden
             std::vector<Card> sources;
             for (auto & card : cards) {
-                if (not card.hidden) {
+                if (!card.hidden) {
                     sources.push_back(card);
                 }
             }
             return sources;
-        }
-        // If it is empty, then sources is just an empty vector
-        else {
+        } else {
+            // If it is empty, then sources is just an empty vector
             return {};
         }
     }
 
     std::vector<Card> Tableau::Targets() const {
-        // If the tableau is not empty, targets is just a vector of the top card of the tableau
-        if (not cards.empty()) {
+        if (!cards.empty()) {
+            // If the tableau is not empty, targets is just a vector of the top card of the tableau
             if (cards.back().hidden) {
                 return {};
             } else {
                 return {cards.back()};
             }
-        }
-        // If it is empty, then targets is just a special card with no rank or suit
-        else {
+        } else {
+            // If it is empty, then targets is just a special card with no rank or suit
             auto card     = Card();
             card.hidden   = false;
             card.location = kTableau;
@@ -575,7 +577,7 @@ namespace open_spiel::solitaire {
 
     std::vector<Card> Tableau::Split(Card card) {
         std::vector<Card> split_cards;
-        if (not cards.empty()) {
+        if (!cards.empty()) {
             bool split_flag = false;
             for (auto it = cards.begin(); it != cards.end();) {
                 if (*it == card) {
@@ -652,7 +654,7 @@ namespace open_spiel::solitaire {
             previous_score = 0.0;
         }
 
-    // Overriden Methods -----------------------------------------------------------------------------------------------
+    // Overridden Methods -----------------------------------------------------------------------------------------------
 
     Player                  SolitaireState::CurrentPlayer() const {
 
@@ -665,22 +667,17 @@ namespace open_spiel::solitaire {
         if (IsTerminal()) {
             // Index of the chance player
             return kTerminalPlayerId;
-        }
-        else if (IsChanceNode()) {
+        } else if (IsChanceNode()) {
             // Index of the terminal player
             return kChancePlayerId;
-        }
-        else {
+        } else {
             // Index of the player
             return 0;
         }
     }
 
     std::unique_ptr<State>  SolitaireState::Clone() const {
-
-        // tracer trace("SolitaireState::Clone()");
         return std::unique_ptr<State>(new SolitaireState(*this));
-
     }
 
     bool                    SolitaireState::IsTerminal() const {
@@ -703,25 +700,21 @@ namespace open_spiel::solitaire {
          * subsequent states, if there is a hidden card in the waste or at the top card of a tableau, then this
          * is also true so that a chance outcome can be chosen to reveal what rank and suit it has. */
 
-        if (not is_setup) {
+        if (!is_setup) {
             // If setup is not started, this is a chance node
             return true;
-        }
-
-        else {
-
+        } else {
             // If there is a hidden card on the top of a tableau, this is a chance node
             for (auto & tableau : tableaus) {
                 if (tableau.cards.empty()) {
                     continue;
-                }
-                else if (tableau.cards.back().hidden) {
+                } else if (tableau.cards.back().hidden) {
                     return true;
                 }
             }
 
             // If any card in the waste is hidden, this is a chance node
-            if (not deck.waste.empty()) {
+            if (!deck.waste.empty()) {
                 for (auto & card : deck.waste) {
                     if (card.hidden) {
                         return true;
@@ -779,7 +772,7 @@ namespace open_spiel::solitaire {
 
         absl::StrAppend(&result, "\nTABLEAUS    : ");
         for (const Tableau & tableau : tableaus) {
-            if (not tableau.cards.empty()) {
+            if (!tableau.cards.empty()) {
                 absl::StrAppend(&result, "\n");
                 for (const Card & card : tableau.cards) {
                     absl::StrAppend(&result, card.ToString(), " ");
@@ -833,8 +826,11 @@ namespace open_spiel::solitaire {
                 std::string result;
 
                 absl::StrAppend(&result, "kMove");
-                if (move.target.rank.empty()) { absl::StrAppend(&result, "__"); }
-                else { absl::StrAppend(&result, move.target.rank, move.target.suit); }
+                if (move.target.rank.empty()) {
+                    absl::StrAppend(&result, "__");
+                } else {
+                    absl::StrAppend(&result, move.target.rank, move.target.suit);
+                }
                 absl::StrAppend(&result, move.source.rank, move.source.suit);
 
                 return result;
@@ -893,7 +889,7 @@ namespace open_spiel::solitaire {
 
         absl::StrAppend(&result, "\nTABLEAUS    : ");
         for (const Tableau & tableau : tableaus) {
-            if (not tableau.cards.empty()) {
+            if (!tableau.cards.empty()) {
                 absl::StrAppend(&result, "\n");
                 for (const Card & card : tableau.cards) {
                     absl::StrAppend(&result, card.ToString(), " ");
@@ -960,14 +956,14 @@ namespace open_spiel::solitaire {
         /* Responsible for executing any legal actions or chance outcome. Sets `previous_score` in non-chance nodes.
          * Also finishes solving the game if `IsSolvable` is true. */
 
-        if (not IsChanceNode()) {
+        if (!IsChanceNode()) {
             previous_score = Returns().front();
         }
 
         // Action Handling =============================================================================================
 
-        // Handles kSetup
         if (move == kSetup) {
+            // Handles kSetup
 
             // Creates tableaus
             for (int i = 1; i <= 7; i++) {
@@ -987,10 +983,8 @@ namespace open_spiel::solitaire {
             current_depth  = 0;
             previous_score = 0.0;
 
-        }
-
-        // Handles kReveal
-        else if (1 <= move and move <= 52) {
+        } else if (1 <= move && move <= 52) {
+            // Handles kReveal
 
             // Cards start at 0 instead of 1 which is why we subtract 1 to move here.
             Card revealed_card = Card(move - 1);
@@ -1000,7 +994,7 @@ namespace open_spiel::solitaire {
             for (auto & tableau : tableaus) {
 
                 // If it isn't empty ...
-                if (not tableau.cards.empty()) {
+                if (!tableau.cards.empty()) {
 
                     // If the last card is hidden ...
                     if (tableau.cards.back().hidden) {
@@ -1020,7 +1014,7 @@ namespace open_spiel::solitaire {
             }
 
             // If we didn't find a hidden card in the tableau and the waste isn't empty ...
-            if ((not found_hidden_card) and not deck.waste.empty()) {
+            if ((!found_hidden_card) && !deck.waste.empty()) {
 
                 // Then for card in the waste ...
                 for (auto & card : deck.waste) {
@@ -1048,17 +1042,15 @@ namespace open_spiel::solitaire {
                      to check if `tableau.cards` is empty beforehand. */
 
             // If the game hasn't been started ...
-            if (not is_started) {
+            if (!is_started) {
                 // For every tableau in tableaus ...
                 for (auto & tableau : tableaus) {
-                    // If the last card is hidden ...
                     if (tableau.cards.back().hidden) {
-                        // Then we are not ready to start the game.
+                        // If the last card is hidden then we are not ready to start the game.
                         // Return with is_started still false;
                         return;
-                    }
-                    // If the last card is not hidden, continue the loop and check the next tableau
-                    else {
+                    } else {
+                        // If the last card is not hidden, continue the loop and check the next tableau
                         continue;
                     }
                 }
@@ -1068,10 +1060,8 @@ namespace open_spiel::solitaire {
                 previous_score = 0.0;
             }
 
-        }
-
-        // Handles kDraw
-        else if (move == kDraw) {
+        } else if (move == kDraw) {
+            // Handles kDraw
             
             // kDraw is not reversible (well, you'd have to go through the deck again)
             // is_reversible = false;
@@ -1091,10 +1081,8 @@ namespace open_spiel::solitaire {
             if (draw_counter > 8) {
                 is_finished = true;
             }
-        }
-
-        // Handles kMove
-        else {
+        } else {
+            // Handles kMove
 
             // Create a move from the action id provided by 'move'
             Move selected_move = Move(move);
@@ -1125,10 +1113,9 @@ namespace open_spiel::solitaire {
 
         ++current_depth;
 
-        if (current_depth >= game_->MaxGameLength() or draw_counter > 8) {
+        if (current_depth >= game_->MaxGameLength() || draw_counter > 8) {
             is_finished = true;
-        }
-        else if (History().size() >= 8) {
+        } else if (History().size() >= 8) {
 
             std::vector<Action> history = History();
             std::vector<Action> recent_history(history.end() - 8, history.end());
@@ -1191,7 +1178,7 @@ namespace open_spiel::solitaire {
             double tableau_score;
             int num_hidden_cards = 0;
             for (auto & tableau : tableaus) {
-                if (not tableau.cards.empty()) {
+                if (!tableau.cards.empty()) {
                     for (auto & card : tableau.cards) {
                         // Cards that will be revealed by a chance node next turn are not counted
                         if (card.hidden) {
@@ -1214,9 +1201,7 @@ namespace open_spiel::solitaire {
             // Total Score
             returns = foundation_score + tableau_score + waste_score;
             return {returns};
-        }
-
-        else {
+        } else {
             return {0.0};
         }
 
@@ -1288,39 +1273,28 @@ namespace open_spiel::solitaire {
 
                         // Then we continue to the next candidate move
                         continue;
-
-                    }
-
-                    // Otherwise if the child is a decision node ...
-                    else {
-
+                    } else {
+                        // Otherwise if the child is a decision node ...
                         // Then get the hash of the child state
                         auto child_hash = hasher(child->ObservationString());
 
-                        // If the child state is in previous_states, then it forms a loop
                         if (previous_states.count(child_hash) > 0) {
+                            // If the child state is in previous_states, then it forms a loop
+                            // So we skip this move and move on to the next one
                             continue;
-                        }
-
-                        // Otherwise, it doesn't form a loop and we can add it to legal actions
-                        else {
+                        } else {
+                            // Otherwise, it doesn't form a loop and we can add it to legal actions
                             legal_actions.push_back(move.ActionId());
                         }
                     }
-                }
-
-                // And the candidate move is not reversible ...
-                else {
+                } else {
+                    // And the candidate move is not reversible ...
                     legal_actions.push_back(move.ActionId());
                 }
-
-            }
-
-            // If the state isn't reversible, then all candidate_moves are legal actions
-            else {
+            } else {
+                // If the state isn't reversible, then all candidate_moves are legal actions
                 legal_actions.push_back(move.ActionId());
             }
-
         }
 
         // kDraw is added if there are cards to draw from or all candidate moves were not legal actions.
@@ -1375,7 +1349,7 @@ namespace open_spiel::solitaire {
         std::vector<Card> targets;
 
         // Gets targets from tableaus
-        if (loc == "tableau" or loc == "all") {
+        if (loc == "tableau" || loc == "all") {
             for (const Tableau & tableau : tableaus) {
                 std::vector<Card> current_targets = tableau.Targets();
                 targets.insert(targets.end(), current_targets.begin(), current_targets.end());
@@ -1383,7 +1357,7 @@ namespace open_spiel::solitaire {
         }
 
         // Gets targets from foundations
-        if (loc == "foundation" or loc == "all") {
+        if (loc == "foundation" || loc == "all") {
             for (const Foundation & foundation : foundations) {
                 std::vector<Card> current_targets = foundation.Targets();
                 targets.insert(targets.end(), current_targets.begin(), current_targets.end());
@@ -1411,7 +1385,7 @@ namespace open_spiel::solitaire {
         std::vector<Card> sources;
 
         // Gets sources from tableaus
-        if (loc == "tableau" or loc == "all") {
+        if (loc == "tableau" || loc == "all") {
             for (const Tableau & tableau : tableaus) {
                 std::vector<Card> current_sources = tableau.Sources();
                 sources.insert(sources.end(), current_sources.begin(), current_sources.end());
@@ -1419,7 +1393,7 @@ namespace open_spiel::solitaire {
         }
 
         // Gets sources from foundations
-        if (loc == "foundation" or loc == "all") {
+        if (loc == "foundation" || loc == "all") {
             for (const Foundation & foundation : foundations) {
                 std::vector<Card> current_sources = foundation.Sources();
                 sources.insert(sources.end(), current_sources.begin(), current_sources.end());
@@ -1427,7 +1401,7 @@ namespace open_spiel::solitaire {
         }
 
         // Gets sources from waste
-        if (loc == "waste" or loc == "all") {
+        if (loc == "waste" || loc == "all") {
             std::vector<Card> current_sources = deck.Sources();
             sources.insert(sources.end(), current_sources.begin(), current_sources.end());
         }
@@ -1458,16 +1432,14 @@ namespace open_spiel::solitaire {
 
             // Here we make sure only the first empty tableau can have a king move to it
             // If target is Card("", "") ...
-            if (target.rank.empty() and target.suit.empty()) {
+            if (target.rank.empty() && target.suit.empty()) {
 
-                // If we have already processed a Card("", "") target ...
                 if (found_empty_target) {
+                    // If we have already processed a Card("", "") target ...
                     // Then skip the duplicate and move on to the next target
                     continue;
-                }
-
-                // If we haven't processed a Card("", "") before ...
-                else {
+                } else {
+                    // If we haven't processed a Card("", "") before ...
                     // Then set the flag to true so we do not process further duplicates, if any
                     found_empty_target = true;
                 }
@@ -1487,29 +1459,23 @@ namespace open_spiel::solitaire {
                 // Here we check that the legal child is a source in the current state
                 if (std::find(sources.begin(), sources.end(), source) != sources.end()) {
 
-                    // We check that if we're moving from tableau to foundation, that the source is the top of the pile
-                    if (target.location == kFoundation and source.location == kTableau) {
+                    if (target.location == kFoundation && source.location == kTableau) {
+                        // We check that if we're moving from tableau to foundation, that the source is the top of the pile
                         if (IsTopCard(source)) {
                             candidate_moves.emplace_back(target, source);
                         }
-                    }
-
-                    // We prevent moves that shuffle a pile beginning with a king between empty tableaus
-                    else if (target == Card("", "") and source.rank == "K") {
-                        if (not IsBottomCard(source)) {
+                    } else if (target == Card("", "") && source.rank == "K") {
+                        // We prevent moves that juggle a pile beginning with a king between empty tableaus
+                        if (!IsBottomCard(source)) {
                             candidate_moves.emplace_back(target, source);
                         }
-                    }
-
-                    // By default, we add all other cases to candidate moves
-                    else {
+                    } else {
+                        // By default, we add all other cases to candidate moves
                         candidate_moves.emplace_back(target, source);
                     }
 
-                }
-
-                // If the legal child is not in the sources of this state, do nothing and continue to next legal child
-                else {
+                } else {
+                    // If the legal child is not in the sources of this state, do nothing and continue to next legal child
                     continue;
                 }
 
@@ -1525,19 +1491,17 @@ namespace open_spiel::solitaire {
         /* Returns a pointer to a tableau that contains the card argument. It doesn't rely on the cards `location`
          * attribute at all, only its `rank` and `suit`. Don't call this with a card that isn't in any tableau. */
 
-        // This branch finds the first Card("", "") in the tableaus
-        if (card.rank.empty() and card.suit.empty()) {
+        if (card.rank.empty() && card.suit.empty()) {
+            // This branch finds the first Card("", "") in the tableaus
             for (auto & tableau : tableaus) {
                 if (tableau.cards.empty()) {
                     return const_cast<Tableau *>(& tableau);
                 }
             }
-        }
-
-        // This branch handles finding any ordinary card in the tableaus
-        else {
+        } else {
+            // This branch handles finding any ordinary card in the tableaus
             for (auto & tableau : tableaus) {
-                if (not tableau.cards.empty()) {
+                if (!tableau.cards.empty()) {
                     if (std::find(tableau.cards.begin(), tableau.cards.end(), card) != tableau.cards.end()) {
                         return const_cast<Tableau *>(& tableau);
                     }
@@ -1552,19 +1516,17 @@ namespace open_spiel::solitaire {
         /* Returns a pointer to a foundations that contains the card argument. It doesn't rely on the cards `location`
          * attribute at all, only its `rank` and `suit`. Don't call this with a card that isn't in any foundation. */
 
-        // This branch handles special foundation cards, Card("", x) where x is in `SUITS`.
         if (card.rank.empty()) {
+            // This branch handles special foundation cards, Card("", x) where x is in `SUITS`.
             for (auto & foundation : foundations) {
-                if (foundation.cards.empty() and foundation.suit == card.suit) {
+                if (foundation.cards.empty() && foundation.suit == card.suit) {
                     return const_cast<Foundation *>(& foundation);
                 }
             }
-        }
-
-        // This branch handles finding any ordinary card in the foundation
-        else {
+        } else {
+            // This branch handles finding any ordinary card in the foundation
             for (auto & foundation : foundations) {
-                if (not foundation.cards.empty() and foundation.suit == card.suit) {
+                if (!foundation.cards.empty() && foundation.suit == card.suit) {
                     if (std::find(foundation.cards.begin(), foundation.cards.end(), card) != foundation.cards.end()) {
                         return const_cast<Foundation *>(& foundation);
                     }
@@ -1714,7 +1676,7 @@ namespace open_spiel::solitaire {
             }
             // Cards can be moved back if they don't reveal a hidden card upon being moved
             case kTableau : {
-                if (IsBottomCard(source) or IsOverHidden(source)) {
+                if (IsBottomCard(source) || IsOverHidden(source)) {
                     return false;
                 } else {
                     return true;
@@ -1783,9 +1745,9 @@ namespace open_spiel::solitaire {
          * waste time moving cards to the foundation. It's not uncommon for implementations of solitaire to finish
          * the game automatically for you when you reach this state */
 
-        if (deck.cards.empty() and deck.waste.empty()) {
+        if (deck.cards.empty() && deck.waste.empty()) {
             for (auto & tableau : tableaus) {
-                if (not tableau.cards.empty()) {
+                if (!tableau.cards.empty()) {
                     for (auto & card : tableau.cards) {
                         // Returns false if at least one tableau card is hidden
                         if (card.hidden) {
@@ -1798,8 +1760,7 @@ namespace open_spiel::solitaire {
             }
             // Only returns true if all cards are revealed and there are no cards in deck or waste
             return true;
-        }
-        else {
+        } else {
             // Returned if there are cards in deck or waste
             return false;
         }
