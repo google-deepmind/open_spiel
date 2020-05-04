@@ -247,7 +247,7 @@ class TreeWalkCalculator(object):
     Args:
       policies: List of `policy.Policy` objects, one per player.
       tabular_policy: A `policy.TabularPolicy` object, used to get the ordering
-        of the states i nthe tabular numpy array.
+        of the states in the tabular numpy array.
 
     Returns:
       A `_CalculatorReturn` namedtuple. See its docstring for the details.
