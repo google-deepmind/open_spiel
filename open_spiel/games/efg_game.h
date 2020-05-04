@@ -100,6 +100,7 @@ class EFGGame : public Game {
         new EFGState(shared_from_this(), nodes_[0].get()));
   }
 
+  int MaxChanceOutcomes() const override;
   int NumDistinctActions() const override;
   int NumPlayers() const override;
   double MinUtility() const override;
@@ -115,9 +116,17 @@ class EFGGame : public Game {
     }
   }
 
+  // Gets the player / decision node action associated to this label.
   Action GetAction(const std::string& label) const {
     auto iter = action_ids_.find(label);
     SPIEL_CHECK_TRUE(iter != action_ids_.end());
+    return iter->second;
+  }
+
+  // Gets the chance node action associated to this label.
+  Action GetChanceAction(const std::string& label) const {
+    auto iter = chance_action_ids_.find(label);
+    SPIEL_CHECK_TRUE(iter != chance_action_ids_.end());
     return iter->second;
   }
 
@@ -128,6 +137,16 @@ class EFGGame : public Game {
     }
     Action new_action = action_ids_.size();
     action_ids_[label] = new_action;
+    return new_action;
+  }
+
+  Action AddOrGetChanceOutcome(const std::string& label) {
+    auto iter = chance_action_ids_.find(label);
+    if (iter != chance_action_ids_.end()) {
+      return iter->second;
+    }
+    Action new_action = chance_action_ids_.size();
+    chance_action_ids_[label] = new_action;
     return new_action;
   }
 
@@ -167,7 +186,6 @@ class EFGGame : public Game {
   int num_chance_nodes_;
   int num_players_;
   int max_actions_;
-  int max_chance_outcomes_;
   int max_depth_;
   std::optional<double> util_sum_;
   std::optional<double> max_util_;
@@ -176,12 +194,23 @@ class EFGGame : public Game {
   bool identical_payoffs_;
   bool general_sum_;
   bool perfect_information_;
+
+  // Maintains a count of states for each infoset (indexed by infoset number).
   absl::flat_hash_map<int, int> infoset_num_to_states_count_;
+
+  // Maintains a (player, infoset number) -> infoset name mapping and vice
+  // versa, for retrieval of information set strings externally
+  // (GetInformationStateStringByName and GetInformationStateStringByNumber).
   absl::flat_hash_map<std::pair<Player, int>, std::string>
       infoset_player_num_to_name_;
   absl::flat_hash_map<std::string, std::pair<Player, int>>
       infoset_name_to_player_num_;
+
+  // Action label -> action id mapping. Note that chance actions are excluded.
   absl::flat_hash_map<std::string, Action> action_ids_;
+
+  // Outcome label -> action id mapping for chance nodes.
+  absl::flat_hash_map<std::string, Action> chance_action_ids_;
 };
 
 }  // namespace efg_game

@@ -169,7 +169,11 @@ void EFGState::DoApplyAction(Action action) {
   // Actions in these games are just indices into the legal actions.
   SPIEL_CHECK_FALSE(cur_node_->type == NodeType::kTerminal);
   SPIEL_CHECK_GE(action, 0);
-  SPIEL_CHECK_LT(action, game_->NumDistinctActions());
+  if (IsChanceNode()) {
+    SPIEL_CHECK_LT(action, game_->MaxChanceOutcomes());
+  } else {
+    SPIEL_CHECK_LT(action, game_->NumDistinctActions());
+  }
   int action_idx = ActionIdx(action);
   SPIEL_CHECK_NE(action_idx, -1);
   SPIEL_CHECK_FALSE(cur_node_->children[action_idx] == nullptr);
@@ -191,6 +195,8 @@ std::vector<std::pair<Action, double>> EFGState::ChanceOutcomes() const {
   return outcomes;
 }
 
+int EFGGame::MaxChanceOutcomes() const { return chance_action_ids_.size(); }
+
 int EFGGame::NumDistinctActions() const { return action_ids_.size(); }
 
 int EFGGame::NumPlayers() const { return num_players_; }
@@ -209,7 +215,6 @@ EFGGame::EFGGame(const GameParameters& params)
       pos_(0),
       num_chance_nodes_(0),
       max_actions_(0),
-      max_chance_outcomes_(0),
       max_depth_(0),
       constant_sum_(true),
       identical_payoffs_(true),
@@ -244,7 +249,6 @@ EFGGame::EFGGame(const std::string& data)
       pos_(0),
       num_chance_nodes_(0),
       max_actions_(0),
-      max_chance_outcomes_(0),
       max_depth_(0),
       constant_sum_(true),
       identical_payoffs_(true),
@@ -417,7 +421,7 @@ void EFGGame::ParseChanceNode(Node* parent, Node* child, int depth) {
   while (string_data_.at(pos_) == '"') {
     std::string action_str = NextToken();
     child->actions.push_back(action_str);
-    Action action = AddOrGetAction(action_str);
+    Action action = AddOrGetChanceOutcome(action_str);
     child->action_ids.push_back(action);
     double prob = -1;
     SPIEL_CHECK_TRUE(ParseDoubleValue(NextToken(), &prob));
@@ -431,7 +435,6 @@ void EFGGame::ParseChanceNode(Node* parent, Node* child, int depth) {
   }
   SPIEL_CHECK_GT(child->actions.size(), 0);
   SPIEL_CHECK_TRUE(Near(prob_sum, 1.0));
-  max_chance_outcomes_ = std::max(max_chance_outcomes_, chance_outcomes);
   SPIEL_CHECK_TRUE(NextToken() == "}");
   SPIEL_CHECK_TRUE(absl::SimpleAtoi(NextToken(), &child->outcome_number));
   // Do not support optional payoffs here for now.
