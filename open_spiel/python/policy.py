@@ -359,7 +359,17 @@ class PolicyFromCallable(Policy):
     self._callable_policy = callable_policy
 
   def action_probabilities(self, state, player_id=None):
-    return dict(self._callable_policy(state))
+    action_probs = dict(self._callable_policy(state))
+    if not isinstance(state, pyspiel.State):
+        return action_probs
+    legal_actions = (
+        state.legal_actions()
+        if player_id is None else state.legal_actions(player_id))
+    return {
+        action: probability
+        for action, probability in action_probs.items()
+        if action in legal_actions
+    }
 
 
 class FirstActionPolicy(Policy):
