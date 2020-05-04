@@ -42,9 +42,11 @@ add_executable(lru_cache_test lru_cache_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(lru_cache_test lru_cache_test)
 
-add_executable(run_python_test run_python_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(run_python_test run_python_test)
+if (BUILD_WITH_PYTHON)
+  add_executable(run_python_test run_python_test.cc ${OPEN_SPIEL_OBJECTS}
+                 $<TARGET_OBJECTS:tests>)
+  add_test(run_python_test run_python_test)
+endif()
 
 add_executable(stats_test stats_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
