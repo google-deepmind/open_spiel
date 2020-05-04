@@ -156,7 +156,7 @@ bool KuhnState::IsTerminal() const { return winner_ != kInvalidPlayer; }
 
 std::vector<double> KuhnState::Returns() const {
   if (!IsTerminal()) {
-    return {0.0, 0.0};
+    return std::vector<double>(num_players_, 0.0);
   }
 
   std::vector<double> returns(num_players_);

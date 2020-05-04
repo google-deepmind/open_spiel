@@ -133,7 +133,7 @@ ObservationTensor(0): ◉◯◯◯◉◯◯◉◉◉
 ObservationTensor(1): ◯◉◯◯◯◯◉◉◉◉
 ObservationTensor(2): ◯◯◉◯◯◉◯◉◉◉
 Rewards() = [0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0]
+Returns() = [0.0, 0.0, 0.0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["Pass", "Bet"]
 
@@ -161,7 +161,7 @@ ObservationTensor(0): ◉◯◯◯◉◯◯◉◉◉
 ObservationTensor(1): ◯◉◯◯◯◯◉◉◉◉
 ObservationTensor(2): ◯◯◉◯◯◉◯◉◉◉
 Rewards() = [0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0]
+Returns() = [0.0, 0.0, 0.0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["Pass", "Bet"]
 
@@ -189,7 +189,7 @@ ObservationTensor(0): ◉◯◯◯◉◯◯◉◉◉
 ObservationTensor(1): ◯◉◯◯◯◯◉◉◉◉
 ObservationTensor(2): ◯◯◉◯◯◉◯◉◉◉
 Rewards() = [0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0]
+Returns() = [0.0, 0.0, 0.0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["Pass", "Bet"]
 
@@ -217,7 +217,7 @@ ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 2.0]
 ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 2.0]
 ObservationTensor(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 2.0]
 Rewards() = [0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0]
+Returns() = [0.0, 0.0, 0.0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["Pass", "Bet"]
 
@@ -245,7 +245,7 @@ ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 2.0, 1.0, 2.0]
 ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 2.0, 1.0, 2.0]
 ObservationTensor(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 2.0, 1.0, 2.0]
 Rewards() = [0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0]
+Returns() = [0.0, 0.0, 0.0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["Pass", "Bet"]
 
