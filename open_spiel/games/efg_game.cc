@@ -104,8 +104,10 @@ Player EFGState::CurrentPlayer() const {
 }
 
 std::string EFGState::ActionToString(Player player, Action action) const {
-  SPIEL_CHECK_LT(action, cur_node_->actions.size());
-  return cur_node_->actions[action];
+  int action_idx = ActionIdx(action);
+  SPIEL_CHECK_GE(action_idx, 0);
+  SPIEL_CHECK_LT(action_idx, cur_node_->actions.size());
+  return cur_node_->actions[action_idx];
 }
 
 std::string EFGState::ToString() const {
@@ -152,24 +154,30 @@ void EFGState::UndoAction(Player player, Action action) {
   cur_node_ = cur_node_->parent;
 }
 
+int EFGState::ActionIdx(Action action) const {
+  int action_idx = -1;
+  for (int i = 0; i < cur_node_->action_ids.size(); ++i) {
+    if (action == cur_node_->action_ids[i]) {
+      action_idx = i;
+      break;
+    }
+  }
+  return action_idx;
+}
+
 void EFGState::DoApplyAction(Action action) {
   // Actions in these games are just indices into the legal actions.
   SPIEL_CHECK_FALSE(cur_node_->type == NodeType::kTerminal);
-  SPIEL_CHECK_LT(action, cur_node_->children.size());
-  SPIEL_CHECK_FALSE(cur_node_->children[action] == nullptr);
-  cur_node_ = cur_node_->children[action];
+  SPIEL_CHECK_GE(action, 0);
+  SPIEL_CHECK_LT(action, game_->NumDistinctActions());
+  int action_idx = ActionIdx(action);
+  SPIEL_CHECK_NE(action_idx, -1);
+  SPIEL_CHECK_FALSE(cur_node_->children[action_idx] == nullptr);
+  cur_node_ = cur_node_->children[action_idx];
 }
 
 std::vector<Action> EFGState::LegalActions() const {
-  // Actions in these games are just indices into the legal actions.
-  std::vector<Action> actions(cur_node_->actions.size(), 0);
-  for (int i = 0; i < cur_node_->actions.size(); ++i) {
-    actions[i] = i;
-  }
-  if (cur_node_->type != NodeType::kTerminal) {
-    SPIEL_CHECK_GT(actions.size(), 0);
-  }
-  return actions;
+  return cur_node_->action_ids;
 }
 
 std::vector<std::pair<Action, double>> EFGState::ChanceOutcomes() const {
@@ -177,7 +185,7 @@ std::vector<std::pair<Action, double>> EFGState::ChanceOutcomes() const {
   SPIEL_CHECK_TRUE(cur_node_->type == NodeType::kChance);
   std::vector<std::pair<Action, double>> outcomes(cur_node_->children.size());
   for (int i = 0; i < cur_node_->children.size(); ++i) {
-    outcomes[i].first = i;
+    outcomes[i].first = cur_node_->action_ids[i];
     outcomes[i].second = cur_node_->probs[i];
   }
   return outcomes;
@@ -407,7 +415,10 @@ void EFGGame::ParseChanceNode(Node* parent, Node* child, int depth) {
   int chance_outcomes = 0;
   double prob_sum = 0.0;
   while (string_data_.at(pos_) == '"') {
-    child->actions.push_back(NextToken());
+    std::string action_str = NextToken();
+    child->actions.push_back(action_str);
+    Action action = AddOrGetAction(action_str);
+    child->action_ids.push_back(action);
     double prob = -1;
     SPIEL_CHECK_TRUE(ParseDoubleValue(NextToken(), &prob));
     SPIEL_CHECK_GE(prob, 0.0);
@@ -495,7 +506,8 @@ void EFGGame::ParsePlayerNode(Node* parent, Node* child, int depth) {
   while (string_data_.at(pos_) == '"') {
     std::string action_str = NextToken();
     child->actions.push_back(action_str);
-    AddActionToMap(action_str);
+    Action action = AddOrGetAction(action_str);
+    child->action_ids.push_back(action);
     nodes_.push_back(NewNode());
     child->children.push_back(nodes_.back().get());
     actions++;
@@ -609,6 +621,10 @@ std::string EFGGame::GetInformationStateStringByName(
   const auto& iter = infoset_name_to_player_num_.find(name);
   if (iter == infoset_name_to_player_num_.end()) {
     SpielFatalError(absl::StrCat("Information state not found: ", name));
+  }
+  if (iter->second.first != player) {
+    SpielFatalError(absl::StrCat("Player mismatch in lookup by name: ", name,
+                                 " ", player, " ", iter->second.first));
   }
   return EFGInformationStateString(player, player, iter->second.second, name);
 }

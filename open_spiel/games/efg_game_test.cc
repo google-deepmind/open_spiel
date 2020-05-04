@@ -53,7 +53,7 @@ void EFGGameSimTestsKuhnFromData() {
                  GameType::Information::kImperfectInformation);
   SPIEL_CHECK_EQ(type.utility, GameType::Utility::kZeroSum);
   SPIEL_CHECK_EQ(type.chance_mode, GameType::ChanceMode::kExplicitStochastic);
-  SPIEL_CHECK_EQ(game->NumDistinctActions(), 2);
+  SPIEL_CHECK_EQ(game->NumDistinctActions(), 5);  // Chance actions count.
 
   // EFG games loaded directly via string cannot be properly deserialized
   // because there is no way to pass the data back vai the game string.
@@ -69,7 +69,7 @@ void EFGGameSimTestsSignalingFromData() {
                  GameType::Information::kImperfectInformation);
   SPIEL_CHECK_EQ(type.utility, GameType::Utility::kGeneralSum);
   SPIEL_CHECK_EQ(type.chance_mode, GameType::ChanceMode::kExplicitStochastic);
-  SPIEL_CHECK_EQ(game->NumDistinctActions(), 8);
+  SPIEL_CHECK_EQ(game->NumDistinctActions(), 10);  // Chance actions count.
   testing::RandomSimTestNoSerialize(*game, 100);
 }
 
@@ -97,7 +97,7 @@ void EFGGameSimTestsKuhnFromFile() {
                    GameType::Information::kImperfectInformation);
     SPIEL_CHECK_EQ(type.utility, GameType::Utility::kZeroSum);
     SPIEL_CHECK_EQ(type.chance_mode, GameType::ChanceMode::kExplicitStochastic);
-    SPIEL_CHECK_EQ(game->NumDistinctActions(), 2);
+    SPIEL_CHECK_EQ(game->NumDistinctActions(), 5);  // Chance actions count.
     testing::RandomSimTest(*game, 100);
   }
 }
@@ -115,7 +115,7 @@ void EFGGameSimTestsLeducFromFile() {
                    GameType::Information::kImperfectInformation);
     SPIEL_CHECK_EQ(type.utility, GameType::Utility::kZeroSum);
     SPIEL_CHECK_EQ(type.chance_mode, GameType::ChanceMode::kExplicitStochastic);
-    SPIEL_CHECK_EQ(game->NumDistinctActions(), 3);
+    SPIEL_CHECK_EQ(game->NumDistinctActions(), 27);  // Chance actions count.
     testing::RandomSimTest(*game, 100);
   }
 }
@@ -133,7 +133,7 @@ void EFGGameSimTestsSignalingFromFile() {
                    GameType::Information::kImperfectInformation);
     SPIEL_CHECK_EQ(type.utility, GameType::Utility::kGeneralSum);
     SPIEL_CHECK_EQ(type.chance_mode, GameType::ChanceMode::kExplicitStochastic);
-    SPIEL_CHECK_EQ(game->NumDistinctActions(), 8);
+    SPIEL_CHECK_EQ(game->NumDistinctActions(), 10);  // Chance moves count.
     testing::RandomSimTest(*game, 100);
   }
 }

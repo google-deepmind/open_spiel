@@ -57,6 +57,7 @@ struct Node {
   std::string outcome_name;
   int outcome_number;
   std::vector<std::string> actions;
+  std::vector<Action> action_ids;
   std::vector<Node*> children;
   std::vector<double> probs;
   std::vector<double> payoffs;
@@ -86,6 +87,7 @@ class EFGState : public State {
   void DoApplyAction(Action action) override;
 
  private:
+  int ActionIdx(Action action) const;
   const Node* cur_node_;
 };
 
@@ -119,12 +121,14 @@ class EFGGame : public Game {
     return iter->second;
   }
 
-  void AddActionToMap(const std::string& label) {
+  Action AddOrGetAction(const std::string& label) {
     auto iter = action_ids_.find(label);
     if (iter != action_ids_.end()) {
-      return;
+      return iter->second;
     }
-    action_ids_[label] = action_ids_.size();
+    Action new_action = action_ids_.size();
+    action_ids_[label] = new_action;
+    return new_action;
   }
 
   // Get the information state strings by names or numbers.
