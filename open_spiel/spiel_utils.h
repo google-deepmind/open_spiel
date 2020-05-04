@@ -196,12 +196,13 @@ bool Near(T a, T b, T epsilon) {
 // Checks that x and y are equal to the default dynamic threshold proportional
 // to max(|x|, |y|).
 #define SPIEL_CHECK_FLOAT_EQ(x, y) \
-  SPIEL_CHECK_FN2(static_cast<float>(x), static_cast<float>(y), Near)
+  SPIEL_CHECK_FN2(static_cast<float>(x), static_cast<float>(y), \
+                  open_spiel::Near)
 
 // Checks that x and y are epsilon apart or closer.
 #define SPIEL_CHECK_FLOAT_NEAR(x, y, epsilon)                   \
   SPIEL_CHECK_FN3(static_cast<float>(x), static_cast<float>(y), \
-                  static_cast<float>(epsilon), Near)
+                  static_cast<float>(epsilon), open_spiel::Near)
 
 #define SPIEL_CHECK_TRUE(x)                                      \
   while (!(x))                                                   \
