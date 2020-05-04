@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Lint as python3
 """Representation of a policy for a game.
 
 This is a standard representation for passing policies into algorithms,
@@ -348,6 +349,7 @@ class UniformRandomPolicy(Policy):
 
 class PolicyFromCallable(Policy):
   """For backwards-compatibility reasons, create a policy from a callable."""
+  # TODO(author11) - remove all uses of this class
 
   def __init__(self, game, callable_policy):
     # When creating a Policy from a pyspiel_policy, we do not have the game.
@@ -359,7 +361,13 @@ class PolicyFromCallable(Policy):
     self._callable_policy = callable_policy
 
   def action_probabilities(self, state, player_id=None):
-    return dict(self._callable_policy(state))
+    action_probs = dict(self._callable_policy(state))
+    if isinstance(state, pyspiel.State):
+      legal_actions = state.legal_actions(player_id or state.current_player())
+      illegal_actions = set(action_probs.keys()) - set(legal_actions)
+      if illegal_actions:
+        raise ValueError(f"Illegal actions {illegal_actions} in state {state}")
+    return action_probs
 
 
 class FirstActionPolicy(Policy):
