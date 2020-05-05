@@ -54,7 +54,8 @@ class ActionValuesVsBestResponseTest(absltest.TestCase):
     game = pyspiel.load_game("kuhn_poker")
     calc = action_value_vs_best_response.Calculator(game)
     (expl, avvbr, cfrp, player_reach_probs) = calc(
-        0, policy.PolicyFromCallable(game, lambda state: [(0, 1.0), (1, 0.0)]),
+        0, policy.DeprecatedPolicyFromCallable(
+            game, lambda state: [(0, 1.0), (1, 0.0)]),
         ["0", "1", "2", "0pb", "1pb", "2pb"])
     self.assertAlmostEqual(expl, 1.)
     np.testing.assert_allclose(

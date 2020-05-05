@@ -345,7 +345,7 @@ class UniformRandomPolicy(Policy):
     return {action: probability for action in legal_actions}
 
 
-class PolicyFromCallable(Policy):
+class DeprecatedPolicyFromCallable(Policy):
   """For backwards-compatibility reasons, create a policy from a callable."""
   # TODO(author11) - remove all uses of this class
 
@@ -355,7 +355,7 @@ class PolicyFromCallable(Policy):
       all_players = None
     else:
       all_players = list(range(game.num_players()))
-    super(PolicyFromCallable, self).__init__(game, all_players)
+    super(DeprecatedPolicyFromCallable, self).__init__(game, all_players)
     self._callable_policy = callable_policy
 
   def action_probabilities(self, state, player_id=None):

@@ -98,12 +98,12 @@ class CFRBRSolver(_CFRSolverBase):
 
   def _compute_best_responses(self):
     """Computes each player best-response against the pool of other players."""
-    # pylint: disable=g-long-lambda
-    current_policy = policy.PolicyFromCallable(
-        self._game,
-        lambda state: self._get_infostate_policy(state.information_state_string(
-        )))
-    # pylint: disable=g-long-lambda
+
+    def policy_fn(state):
+      key = state.information_state_string()
+      return self._get_infostate_policy(key)
+
+    current_policy = policy.DeprecatedPolicyFromCallable(self._game, policy_fn)
 
     for player_id in range(self._game.num_players()):
       self._best_responses[player_id] = exploitability.best_response(
