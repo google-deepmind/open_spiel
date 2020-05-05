@@ -108,8 +108,8 @@ class FictitiousPlayTest(absltest.TestCase):
       if i % 10 == 0:
         conv = exploitability.nash_conv(
             game,
-            policy.PolicyFromCallable(game,
-                                      xfp_solver.average_policy_callable()))
+            policy.tabular_policy_from_callable(
+                game, xfp_solver.average_policy_callable()))
         print("FP in Matching Pennies 3p. Iter: {}, NashConv: {}".format(
             i, conv))
 
@@ -121,8 +121,8 @@ class FictitiousPlayTest(absltest.TestCase):
       if i % 10 == 0:
         conv = exploitability.nash_conv(
             game,
-            policy.PolicyFromCallable(game,
-                                      xfp_solver.average_policy_callable()))
+            policy.tabular_policy_from_callable(
+                game, xfp_solver.average_policy_callable()))
         print("FP in Shapley's Game. Iter: {}, NashConv: {}".format(i, conv))
 
 

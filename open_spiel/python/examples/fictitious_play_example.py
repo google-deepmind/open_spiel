@@ -43,7 +43,8 @@ def main(_):
     xfp_solver.iteration()
     conv = exploitability.exploitability(
         game,
-        policy.PolicyFromCallable(game, xfp_solver.average_policy_callable()))
+        policy.tabular_policy_from_callable(
+            game, xfp_solver.average_policy_callable()))
     if i % FLAGS.print_freq == 0:
       print("Iteration: {} Conv: {}".format(i, conv))
       sys.stdout.flush()

@@ -67,7 +67,8 @@ class DeepCFRTest(parameterized.TestCase):
       deep_cfr_solver.solve()
       conv = exploitability.nash_conv(
           game,
-          policy.PolicyFromCallable(game, deep_cfr_solver.action_probabilities))
+          policy.tabular_policy_from_callable(
+              game, deep_cfr_solver.action_probabilities))
       print('Deep CFR in Matching Pennies 3p. NashConv: {}'.format(conv))
 
 

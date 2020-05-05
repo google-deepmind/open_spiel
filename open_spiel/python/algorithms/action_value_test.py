@@ -40,8 +40,7 @@ class ActionValuesTest(parameterized.TestCase):
     game = pyspiel.load_game("kuhn_poker")
     calc = action_value.TreeWalkCalculator(game)
     uniform_policy = policy.TabularPolicy(game)
-    always_pass_policy = policy.TabularPolicy(game)
-    always_pass_policy.action_probability_array = np.array([[1., 0.]] * 12)
+    always_pass_policy = policy.FirstActionPolicy(game).to_tabular()
     returned_values = calc([always_pass_policy, uniform_policy],
                            always_pass_policy)
 

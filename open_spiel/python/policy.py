@@ -87,17 +87,6 @@ class Policy(object):
     """
     raise NotImplementedError()
 
-  def copy_with_noise(self, **noise_kwargs):
-    """Returns a copy of this policy perturbed with noise.
-
-    Noise shape depends on policy. It can be parameter perturbation,
-    probability perturbation, etc.
-
-    Args:
-      **noise_kwargs: Eventual arguments for noise generation functions.
-    """
-    raise NotImplementedError()
-
   def __call__(self, state, player_id=None):
     """Turns the policy into a callable.
 
@@ -110,6 +99,15 @@ class Policy(object):
       Dictionary of action: probability.
     """
     return self.action_probabilities(state, player_id)
+
+  def to_tabular(self):
+    """Returns a new `TabularPolicy` equivalent to this policy."""
+    tabular_policy = TabularPolicy(self.game)
+    for index, state in enumerate(tabular_policy.states):
+      tabular_policy.action_probability_array[index, :] = 0
+      for action, probability in self.action_probabilities(state).items():
+        tabular_policy.action_probability_array[index, action] = probability
+    return tabular_policy
 
 
 class TabularPolicy(Policy):
@@ -382,6 +380,32 @@ class FirstActionPolicy(Policy):
     return {min_action: 1.0}
 
 
+def tabular_policy_from_callable(game, callable_policy):
+  """Converts a legacy callable policy into a TabularPolicy.
+
+  Recommendation - instead of using this to convert your policy for evaluation
+  purposes, work directly with a `TabularPolicy` if possible.
+  Second choice - work with a `Policy` class and call `to_tabular` as needed.
+
+  Args:
+    game: The game for which we want a TabularPolicy.
+    callable_policy: A callable: state -> action probabilities dict or list.
+
+  Returns:
+    A TabularPolicy that materializes the callable policy.
+  """
+  empty_tabular_policy = TabularPolicy(game)
+  for state_index, state in enumerate(empty_tabular_policy.states):
+    action_probabilities = dict(callable_policy(state))
+    infostate_policy = [
+        action_probabilities.get(action, 0.)
+        for action in range(game.num_distinct_actions())
+    ]
+    empty_tabular_policy.action_probability_array[
+        state_index, :] = infostate_policy
+  return empty_tabular_policy
+
+
 def tabular_policy_from_policy(game, policy):
   """Converts any Policy instance into a TabularPolicy.
 
@@ -392,6 +416,7 @@ def tabular_policy_from_policy(game, policy):
   Returns:
     A TabularPolicy that's identical to policy.
   """
+  # TODO(author11) Remove this
   empty_tabular_policy = TabularPolicy(game)
   for state_index, state in enumerate(empty_tabular_policy.states):
     action_probabilities = policy.action_probabilities(state)
@@ -417,8 +442,3 @@ def python_policy_to_pyspiel_policy(python_tabular_policy):
         action_probs.append((action, prob))
     infostates_to_probabilities[infostate] = action_probs
   return pyspiel.TabularPolicy(infostates_to_probabilities)
-
-
-def policy_from_pyspiel_policy(pyspiel_policy):
-  """Returns a `policy.Policy` object from a `pyspiel.Policy` object."""
-  return PolicyFromCallable(None, pyspiel_policy.get_state_policy_as_map)

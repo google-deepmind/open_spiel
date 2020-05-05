@@ -255,7 +255,7 @@ class TabularPolicyTest(parameterized.TestCase):
   def test_can_turn_policy_into_tabular_policy(self, policy_class, game_name):
     game = pyspiel.load_game(game_name)
     realized_policy = policy_class(game)
-    tabular_policy = policy.tabular_policy_from_policy(game, realized_policy)
+    tabular_policy = realized_policy.to_tabular()
     for state in tabular_policy.states:
       self.assertEqual(
           realized_policy.action_probabilities(state),
@@ -342,20 +342,6 @@ class UniformRandomPolicyTest(absltest.TestCase):
             0: 0.5,
             1: 0.5
         })
-
-
-class PoliciesConversions(absltest.TestCase):
-
-  def test_cpp_to_python_policy(self):
-    game = pyspiel.load_game("kuhn_poker")
-    pyspiel_policy = pyspiel.UniformRandomPolicy(game)
-    python_policy = policy.policy_from_pyspiel_policy(pyspiel_policy)
-
-    for info_state_str in policy.TabularPolicy(game).state_lookup.keys():
-      self.assertEqual({
-          0: 0.5,
-          1: 0.5
-      }, python_policy.action_probabilities(info_state_str))
 
 
 if __name__ == "__main__":

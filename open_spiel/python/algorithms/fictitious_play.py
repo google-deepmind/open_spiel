@@ -180,7 +180,8 @@ class XFPSolver(object):
       # First, construct pi_{-i}.
       joint_policy = _joint_policy(self._policies)
       br_info = exploitability.best_response(
-          self._game, policy.PolicyFromCallable(self._game, joint_policy), i)
+          self._game,
+          policy.tabular_policy_from_callable(self._game, joint_policy), i)
       full_br_policy = _full_best_response_policy(
           br_info["best_response_action"])
       self._best_responses[i] = full_br_policy
