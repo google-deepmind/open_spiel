@@ -153,7 +153,8 @@ std::string BridgeState::ToString() const {
   // follow the play.
   if (phase_ == Phase::kGameOver && !use_double_dummy_result_) {
     std::array<Player, kNumCards> deal{};
-    for (int i = 0; i < kNumCards; ++i) deal[history_[i]] = (i % kNumPlayers);
+    for (int i = 0; i < kNumCards; ++i)
+      deal[history_[i].action] = (i % kNumPlayers);
     for (int suit = 0; suit < kNumSuits; ++suit) {
       for (int rank = kNumCardsPerSuit - 1; rank >= 0; --rank) {
         const auto player = deal[Card(Suit(suit), rank)];
@@ -181,8 +182,8 @@ std::string BridgeState::ToString() const {
     for (int i = kNumCards; i < history_.size() - num_cards_played_; ++i) {
       if (i % kNumPlayers == 3) rv.push_back('\n');
       absl::StrAppend(
-          &rv,
-          absl::StrFormat("%-6s", BidString(history_[i] - kBiddingActionBase)));
+          &rv, absl::StrFormat(
+                   "%-6s", BidString(history_[i].action - kBiddingActionBase)));
     }
   }
   if (num_cards_played_ > 0) {
@@ -196,7 +197,7 @@ std::string BridgeState::ToString() const {
       } else {
         player = (1 + player) % kNumPlayers;
       }
-      const int card = history_[history_.size() - num_cards_played_ + i];
+      const int card = history_[history_.size() - num_cards_played_ + i].action;
       if (i % kNumPlayers == 0) {
         trick = Trick(player, contract_.trumps, card);
       } else {
@@ -398,7 +399,7 @@ void BridgeState::ObservationTensor(Player player,
     if (current_trick > 0) {
       int leader = tricks_[current_trick - 1].Leader();
       for (int i = 0; i < kNumPlayers; ++i) {
-        int card = history_[this_trick_start - kNumPlayers + i];
+        int card = history_[this_trick_start - kNumPlayers + i].action;
         int relative_player = (i + leader + kNumPlayers - player) % kNumPlayers;
         ptr[relative_player * kNumCards + card] = 1;
       }
@@ -408,7 +409,7 @@ void BridgeState::ObservationTensor(Player player,
     // Current trick
     int leader = tricks_[current_trick].Leader();
     for (int i = 0; i < this_trick_cards_played; ++i) {
-      int card = history_[this_trick_start + i];
+      int card = history_[this_trick_start + i].action;
       int relative_player = (i + leader + kNumPlayers - player) % kNumPlayers;
       ptr[relative_player * kNumCards + card] = 1;
     }
@@ -432,7 +433,7 @@ void BridgeState::ObservationTensor(Player player,
     ptr += kNumVulnerabilities;
     int last_bid = 0;
     for (int i = kNumCards; i < history_.size(); ++i) {
-      int this_call = history_[i] - kBiddingActionBase;
+      int this_call = history_[i].action - kBiddingActionBase;
       int relative_bidder = (i + kNumPlayers - player) % kNumPlayers;
       if (last_bid == 0 && this_call == kPass) ptr[relative_bidder] = 1;
       if (this_call == kDouble) {

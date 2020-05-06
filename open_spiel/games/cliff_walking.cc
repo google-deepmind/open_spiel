@@ -153,7 +153,7 @@ void CliffWalkingState::InformationStateTensor(
   SPIEL_CHECK_LT(player, num_players_);
   values->resize(kNumActions * horizon_);
   for (int i = 0; i < history_.size(); i++) {
-    (*values)[i * kNumActions + history_[i]] = 1;
+    (*values)[i * kNumActions + history_[i].action] = 1;
   }
 }
 

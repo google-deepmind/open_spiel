@@ -132,7 +132,7 @@ std::string DeepSeaState::InformationStateString(Player player) const {
   SPIEL_CHECK_EQ(direction_history_.size(), player_row_);
   std::string str;
   for (int i = 0; i < player_row_; i++) {
-    absl::StrAppend(&str, history_[i] ? "R" : "L", "->",
+    absl::StrAppend(&str, history_[i].action ? "R" : "L", "->",
                     direction_history_[i] ? "R" : "L", "\n");
   }
   return str;
@@ -166,7 +166,7 @@ void DeepSeaState::InformationStateTensor(Player player,
   values->resize(2 * size_);
   std::fill(values->begin(), values->end(), -1);
   for (int i = 0; i < player_row_; i++) {
-    (*values)[2 * i] = history_[i];
+    (*values)[2 * i] = history_[i].action;
     (*values)[2 * i + 1] = direction_history_[i];
   }
 }

@@ -182,7 +182,8 @@ void CatchState::InformationStateTensor(Player player,
     (*values)[ball_col_] = 1;
     int offset = history_.size() - ball_row_ - 1;
     for (int i = 0; i < ball_row_; i++) {
-      (*values)[num_columns_ + i * kNumActions + history_[offset + i]] = 1;
+      (*values)[num_columns_ + i * kNumActions + history_[offset + i].action] =
+          1;
     }
   }
 }

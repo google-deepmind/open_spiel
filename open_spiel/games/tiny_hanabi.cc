@@ -122,10 +122,10 @@ std::string TinyHanabiState::ToString() const {
   std::string rv;
   for (int i = 0; i < payoff_.NumPlayers() && i < history_.size(); ++i) {
     if (i != 0) absl::StrAppend(&rv, " ");
-    absl::StrAppend(&rv, "p", i, ":d", history_[i]);
+    absl::StrAppend(&rv, "p", i, ":d", history_[i].action);
   }
   for (int i = payoff_.NumPlayers(); i < history_.size(); ++i) {
-    absl::StrAppend(&rv, " p", i - payoff_.NumPlayers(), ":a", history_[i]);
+    absl::StrAppend(&rv, " p", history_[i].player, ":a", history_[i].action);
   }
   return rv;
 }
@@ -156,9 +156,11 @@ std::string TinyHanabiState::InformationStateString(Player player) const {
   SPIEL_CHECK_LT(player, num_players_);
 
   std::string rv = absl::StrCat("p", player);
-  if (history_.size() > player) absl::StrAppend(&rv, ":d", history_[player]);
+  if (history_.size() > player)
+    absl::StrAppend(&rv, ":d", history_[player].action);
   for (int i = payoff_.NumPlayers(); i < history_.size(); ++i) {
-    absl::StrAppend(&rv, " p", i - payoff_.NumPlayers(), ":a", history_[i]);
+    absl::StrAppend(&rv, " p", i - payoff_.NumPlayers(), ":a",
+                    history_[i].action);
   }
   return rv;
 }
@@ -171,11 +173,11 @@ void TinyHanabiState::InformationStateTensor(
   values->resize(payoff_.NumChance() +
                  payoff_.NumActions() * payoff_.NumPlayers());
   std::fill(values->begin(), values->end(), 0);
-  if (history_.size() > player) values->at(history_[player]) = 1;
+  if (history_.size() > player) values->at(history_[player].action) = 1;
   for (int i = payoff_.NumPlayers(); i < history_.size(); ++i) {
     values->at(payoff_.NumChance() +
                (i - payoff_.NumPlayers()) * payoff_.NumActions() +
-               history_[i]) = 1;
+               history_[i].action) = 1;
   }
 }
 

@@ -59,8 +59,9 @@ class SimMoveState : public State {
     if (IsSimultaneousNode()) {
       ApplyFlatJointAction(action);
     } else {
+      const Player player = CurrentPlayer();
       DoApplyAction(action);
-      history_.push_back(action);
+      history_.push_back({player, action});
     }
   }
 

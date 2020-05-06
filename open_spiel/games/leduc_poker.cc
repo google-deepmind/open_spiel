@@ -565,10 +565,10 @@ std::unique_ptr<State> LeducState::ResampleFromInfostate(
   std::unique_ptr<LeducState> clone = std::make_unique<LeducState>(game_);
 
   // First, deal out cards:
-  Action player_chance = history_.at(player_id);
+  Action player_chance = history_.at(player_id).action;
   for (int p = 0; p < GetGame()->NumPlayers(); ++p) {
     if (p == player_id) {
-      clone->ApplyAction(history_.at(p));
+      clone->ApplyAction(history_.at(p).action);
     } else {
       Action chosen_action = player_chance;
       while (chosen_action == player_chance || chosen_action == public_card_) {

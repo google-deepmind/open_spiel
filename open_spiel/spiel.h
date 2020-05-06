@@ -205,8 +205,9 @@ class State {
   virtual void ApplyAction(Action action_id) {
     // history_ needs to be modified *after* DoApplyAction which could
     // be using it.
+    Player player = CurrentPlayer();
     DoApplyAction(action_id);
-    history_.push_back(action_id);
+    history_.push_back({player, action_id});
   }
 
   // `LegalActions(Player player)` is valid for all nodes in all games,
@@ -339,12 +340,28 @@ class State {
     return CurrentPlayer() == kSimultaneousPlayerId;
   }
 
-  // A string representation for the history. There should be a one to one
-  // mapping between an history (i.e. a sequence of actions for all players,
-  // including chance) and the `State` objects.
-  virtual std::vector<Action> History() const { return history_; }
+  // We store (player, action) pairs in the history.
+  struct PlayerAction {
+    Player player;
+    Action action;
+  };
 
-  std::string HistoryString() const { return absl::StrJoin(history_, " "); }
+  // For backward-compatibility reasons, this is the history of actions only.
+  // To get the (player, action) pairs, use `FullHistory` instead.
+  std::vector<Action> History() const {
+    std::vector<Action> history;
+    history.reserve(history_.size());
+    for (auto& h : history_) history.push_back(h.action);
+    return history;
+  }
+
+  // The full (player, action) history.
+  std::vector<PlayerAction> FullHistory() const { return history_; }
+
+  // A string representation for the history. There should be a one to one
+  // mapping between histories (i.e. sequences of actions for all players,
+  // including chance) and the `State` objects.
+  std::string HistoryString() const { return absl::StrJoin(History(), " "); }
 
   // For imperfect information games. Returns an identifier for the current
   // information state for the specified player.
@@ -479,13 +496,15 @@ class State {
   // Every player must submit a action; if one of the players has no actions at
   // this node, then kInvalidAction should be passed instead.
   //
-  // Simulatenous games should implement DoApplyActions.
+  // Simultaneous games should implement DoApplyActions.
   void ApplyActions(const std::vector<Action>& actions) {
     // history_ needs to be modified *after* DoApplyActions which could
     // be using it.
     DoApplyActions(actions);
     history_.reserve(history_.size() + actions.size());
-    history_.insert(history_.end(), actions.begin(), actions.end());
+    for (int player = 0; player < actions.size(); ++player) {
+      history_.push_back({player, actions[player]});
+    }
   }
 
   // The size of the action space. See `Game` for a full description.
@@ -585,7 +604,7 @@ class State {
   // Fields common to every game state.
   int num_distinct_actions_;
   int num_players_;
-  std::vector<Action> history_;  // The list of actions leading to the state.
+  std::vector<PlayerAction> history_;  // Actions taken so far.
 
   // A pointer to the game that created this state.
   std::shared_ptr<const Game> game_;

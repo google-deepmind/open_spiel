@@ -155,8 +155,8 @@ std::string GoState::ToString() const {
 bool GoState::IsTerminal() const {
   if (history_.size() < 2) return false;
   return (history_.size() >= max_game_length_) || superko_ ||
-         (history_[history_.size() - 1] == board_.pass_action() &&
-          history_[history_.size() - 2] == board_.pass_action());
+         (history_[history_.size() - 1].action == board_.pass_action() &&
+          history_[history_.size() - 2].action == board_.pass_action());
 }
 
 std::vector<double> GoState::Returns() const {
@@ -196,7 +196,7 @@ void GoState::UndoAction(Player player, Action action) {
   // replaying all actions is still pretty fast (> 1 million undos/second).
   history_.pop_back();
   ResetBoard();
-  for (Action action : history_) {
+  for (auto [_, action] : history_) {
     DoApplyAction(action);
   }
 }
