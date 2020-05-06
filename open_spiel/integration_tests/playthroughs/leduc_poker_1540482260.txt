@@ -6,7 +6,7 @@ GameType.information = Information.IMPERFECT_INFORMATION
 GameType.long_name = "Leduc Poker"
 GameType.max_num_players = 10
 GameType.min_num_players = 2
-GameType.parameter_specification = ["players"]
+GameType.parameter_specification = ["action_mapping", "players", "suit_isomorphism"]
 GameType.provides_information_state_string = True
 GameType.provides_information_state_tensor = True
 GameType.provides_observation_string = True
@@ -18,7 +18,7 @@ GameType.utility = Utility.ZERO_SUM
 NumDistinctActions() = 3
 PolicyTensorShape() = [3]
 MaxChanceOutcomes() = 6
-GetParameters() = {players=2}
+GetParameters() = {action_mapping=False,players=2,suit_isomorphism=False}
 NumPlayers() = 2
 MinUtility() = -13.0
 MaxUtility() = 13.0

@@ -24,8 +24,15 @@
 //
 // So the maximin sequence is of the form:
 // private card player 0, private card player 1, [bets], public card, [bets]
+//
 // Parameters:
-//     "players"       int    number of players               (default = 2)
+//     "players"           int    number of players          (default = 2)
+//     "action_mapping"    bool   regard all actions as legal and internally
+//                                map otherwise illegal actions to check/call
+//                                                           (default = false)
+//     "suit_isomorphism"  bool   player observations do not distinguish
+//                                between cards of different suits with
+//                                the same rank              (default = false)
 
 #ifndef OPEN_SPIEL_GAMES_LEDUC_POKER_H_
 #define OPEN_SPIEL_GAMES_LEDUC_POKER_H_
@@ -33,6 +40,7 @@
 #include <array>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "open_spiel/spiel.h"
@@ -53,7 +61,7 @@ inline constexpr int kTotalRaisesPerRound = 2;
 inline constexpr int kMaxRaises = 2;
 inline constexpr int kStartingMoney = 100;
 inline constexpr int kNumInfoStates =
-    936;  // Number of info state in the 2P game.
+    936;  // Number of info states in the 2P game with default params.
 
 class LeducGame;
 
@@ -61,7 +69,8 @@ enum ActionType { kFold = 0, kCall = 1, kRaise = 2 };
 
 class LeducState : public State {
  public:
-  explicit LeducState(std::shared_ptr<const Game> game);
+  explicit LeducState(std::shared_ptr<const Game> game,
+                      bool action_mapping, bool suit_isomorphism);
 
   Player CurrentPlayer() const override;
   std::string ActionToString(Player player, Action move) const override;
@@ -151,6 +160,12 @@ class LeducState : public State {
   // Sequence of actions for each round. Needed to report information state.
   std::vector<int> round1_sequence_;
   std::vector<int> round2_sequence_;
+  // Always regard all actions as legal, and internally map otherwise illegal
+  // actions to check/call.
+  bool action_mapping_;
+  // Players cannot distinguish between cards of different suits with the same
+  // rank.
+  bool suit_isomorphism_;
 };
 
 class LeducGame : public Game {
@@ -159,7 +174,7 @@ class LeducGame : public Game {
 
   int NumDistinctActions() const override { return 3; }
   std::unique_ptr<State> NewInitialState() const override;
-  int MaxChanceOutcomes() const override { return total_cards_; }
+  int MaxChanceOutcomes() const override;
   int NumPlayers() const override { return num_players_; }
   double MinUtility() const override;
   double MaxUtility() const override;
@@ -179,6 +194,12 @@ class LeducGame : public Game {
  private:
   int num_players_;  // Number of players.
   int total_cards_;  // Number of cards total cards in the game.
+  // Always regard all actions as legal, and internally map otherwise illegal
+  // actions to check/call.
+  bool action_mapping_;
+  // Players cannot distinguish between cards of different suits with the same
+  // rank.
+  bool suit_isomorphism_;
 };
 
 }  // namespace leduc_poker

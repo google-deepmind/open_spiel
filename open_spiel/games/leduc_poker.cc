@@ -44,7 +44,9 @@ const GameType kGameType{/*short_name=*/"leduc_poker",
                          /*provides_observation_string=*/true,
                          /*provides_observation_tensor=*/true,
                          /*parameter_specification=*/
-                         {{"players", GameParameter(kDefaultPlayers)}}};
+                         {{"players", GameParameter(kDefaultPlayers)},
+                          {"action_mapping", GameParameter(false)},
+                          {"suit_isomorphism", GameParameter(false)}}};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new LeducGame(params));
@@ -53,7 +55,8 @@ std::shared_ptr<const Game> Factory(const GameParameters& params) {
 REGISTER_SPIEL_GAME(kGameType, Factory);
 
 }  // namespace
-LeducState::LeducState(std::shared_ptr<const Game> game)
+LeducState::LeducState(std::shared_ptr<const Game> game,
+                       bool action_mapping, bool suit_isomorphism)
     : State(game),
       cur_player_(kChancePlayerId),
       num_calls_(0),
@@ -79,7 +82,13 @@ LeducState::LeducState(std::shared_ptr<const Game> game)
       folded_(game->NumPlayers(), false),
       // Sequence of actions for each round. Needed to report information state.
       round1_sequence_(),
-      round2_sequence_() {
+      round2_sequence_(),
+      // Always regard all actions as legal, and internally map otherwise
+      // illegal actions to check/call.
+      action_mapping_(action_mapping),
+      // Players cannot distinguish between cards of different suits with the
+      // same rank.
+      suit_isomorphism_(suit_isomorphism) {
   // Cards by value (0-6 for standard 2-player game, kInvalidCard if no longer
   // in the deck.)
   deck_.resize(deck_size_);
@@ -101,83 +110,117 @@ void LeducState::DoApplyAction(Action move) {
   if (IsChanceNode()) {
     SPIEL_CHECK_GE(move, 0);
     SPIEL_CHECK_LT(move, deck_.size());
-    SPIEL_CHECK_NE(deck_[move], kInvalidCard);
+    if (suit_isomorphism_) {
+      // One of the two identical cards must be left in the deck.
+      SPIEL_CHECK_TRUE(deck_[move * 2] != kInvalidCard ||
+                       deck_[move * 2 + 1] != kInvalidCard);
+    } else {
+      SPIEL_CHECK_NE(deck_[move], kInvalidCard);
+    }
 
     if (private_cards_dealt_ < num_players_) {
       SetPrivate(private_cards_dealt_, move);
     } else {
       // Round 2: A single public card.
-      public_card_ = deck_[move];
-      deck_[move] = kInvalidCard;
-      deck_size_--;
+      if (suit_isomorphism_) {
+        public_card_ = move;
+        if (deck_[move * 2] != kInvalidCard) {
+          deck_[move * 2] = kInvalidCard;
+        } else if (deck_[move * 2 + 1] != kInvalidCard) {
+          deck_[move * 2 + 1] = kInvalidCard;
+        } else {
+          SpielFatalError("Suit isomorphism error.");
+        }
+        deck_size_--;
+      } else {
+        public_card_ = deck_[move];
+        deck_[move] = kInvalidCard;
+        deck_size_--;
+      }
 
       // We have finished the public card, let's bet!
       cur_player_ = NextPlayer();
     }
-  } else if (move == ActionType::kFold) {
-    SPIEL_CHECK_NE(cur_player_, kChancePlayerId);
-    SequenceAppendMove(ActionType::kFold);
-
-    // Player is now out.
-    folded_[cur_player_] = true;
-    remaining_players_--;
-
-    if (IsTerminal()) {
-      ResolveWinner();
-    } else if (ReadyForNextRound()) {
-      NewRound();
-    } else {
-      cur_player_ = NextPlayer();
-    }
-  } else if (move == ActionType::kCall) {
-    SPIEL_CHECK_NE(cur_player_, kChancePlayerId);
-
-    // Current player puts in an amount of money equal to the current level
-    // (stakes) minus what they have contributed to level their contribution
-    // off. Note: this action also acts as a 'check' where the stakes are equal
-    // to each player's ante.
-    SPIEL_CHECK_GE(stakes_, ante_[cur_player_]);
-    int amount = stakes_ - ante_[cur_player_];
-    Ante(cur_player_, amount);
-    num_calls_++;
-    SequenceAppendMove(ActionType::kCall);
-
-    if (IsTerminal()) {
-      ResolveWinner();
-    } else if (ReadyForNextRound()) {
-      NewRound();
-    } else {
-      cur_player_ = NextPlayer();
-    }
-  } else if (move == ActionType::kRaise) {
-    SPIEL_CHECK_NE(cur_player_, kChancePlayerId);
-
-    // This player matches the current stakes and then brings the stakes up.
-    SPIEL_CHECK_LT(num_raises_, kMaxRaises);
-    int call_amount = stakes_ - ante_[cur_player_];
-
-    // First, match the current stakes if necessary
-    SPIEL_CHECK_GE(call_amount, 0);
-    if (call_amount > 0) {
-      Ante(cur_player_, call_amount);
-    }
-
-    // Now, raise the stakes.
-    int raise_amount = (round_ == 1 ? kFirstRaiseAmount : kSecondRaiseAmount);
-    stakes_ += raise_amount;
-    Ante(cur_player_, raise_amount);
-    num_raises_++;
-    num_calls_ = 0;
-    SequenceAppendMove(ActionType::kRaise);
-
-    if (IsTerminal()) {
-      ResolveWinner();
-    } else {
-      cur_player_ = NextPlayer();
-    }
   } else {
-    SpielFatalError(absl::StrCat("Move ", move, " is invalid. ChanceNode?",
-                                 IsChanceNode()));
+    // Player node.
+    if (action_mapping_) {
+      // Map otherwise illegal actions to kCall.
+      if (move == ActionType::kFold) {
+        if (stakes_ <= ante_[cur_player_]) {
+          move = ActionType::kCall;
+        }
+      } else if (move == ActionType::kRaise) {
+        if (num_raises_ >= 2) {
+          move = ActionType::kCall;
+        }
+      }
+    }
+
+    if (move == ActionType::kFold) {
+      SPIEL_CHECK_NE(cur_player_, kChancePlayerId);
+      SequenceAppendMove(ActionType::kFold);
+
+      // Player is now out.
+      folded_[cur_player_] = true;
+      remaining_players_--;
+
+      if (IsTerminal()) {
+        ResolveWinner();
+      } else if (ReadyForNextRound()) {
+        NewRound();
+      } else {
+        cur_player_ = NextPlayer();
+      }
+    } else if (move == ActionType::kCall) {
+      SPIEL_CHECK_NE(cur_player_, kChancePlayerId);
+
+      // Current player puts in an amount of money equal to the current level
+      // (stakes) minus what they have contributed to level their contribution
+      // off. Note: this action also acts as a 'check' where the stakes are
+      // equal to each player's ante.
+      SPIEL_CHECK_GE(stakes_, ante_[cur_player_]);
+      int amount = stakes_ - ante_[cur_player_];
+      Ante(cur_player_, amount);
+      num_calls_++;
+      SequenceAppendMove(ActionType::kCall);
+
+      if (IsTerminal()) {
+        ResolveWinner();
+      } else if (ReadyForNextRound()) {
+        NewRound();
+      } else {
+        cur_player_ = NextPlayer();
+      }
+    } else if (move == ActionType::kRaise) {
+      SPIEL_CHECK_NE(cur_player_, kChancePlayerId);
+
+      // This player matches the current stakes and then brings the stakes up.
+      SPIEL_CHECK_LT(num_raises_, kMaxRaises);
+      int call_amount = stakes_ - ante_[cur_player_];
+
+      // First, match the current stakes if necessary
+      SPIEL_CHECK_GE(call_amount, 0);
+      if (call_amount > 0) {
+        Ante(cur_player_, call_amount);
+      }
+
+      // Now, raise the stakes.
+      int raise_amount = (round_ == 1 ? kFirstRaiseAmount : kSecondRaiseAmount);
+      stakes_ += raise_amount;
+      Ante(cur_player_, raise_amount);
+      num_raises_++;
+      num_calls_ = 0;
+      SequenceAppendMove(ActionType::kRaise);
+
+      if (IsTerminal()) {
+        ResolveWinner();
+      } else {
+        cur_player_ = NextPlayer();
+      }
+    } else {
+      SpielFatalError(absl::StrCat("Move ", move, " is invalid. ChanceNode?",
+                                   IsChanceNode()));
+    }
   }
 }
 
@@ -185,9 +228,27 @@ std::vector<Action> LeducState::LegalActions() const {
   if (IsTerminal()) return {};
   std::vector<Action> movelist;
   if (IsChanceNode()) {
-    for (int card = 0; card < deck_.size(); card++) {
-      if (deck_[card] != kInvalidCard) movelist.push_back(card);
+    if (suit_isomorphism_) {
+      // Consecutive cards are identical under suit isomorphism.
+      for (int card = 0; card < deck_.size() / 2; card++) {
+        if (deck_[card * 2] != kInvalidCard ||
+            deck_[card * 2 + 1] != kInvalidCard) {
+          movelist.push_back(card);
+        }
+      }
+    } else {
+      for (int card = 0; card < deck_.size(); card++) {
+        if (deck_[card] != kInvalidCard) movelist.push_back(card);
+      }
     }
+    return movelist;
+  }
+
+  if (action_mapping_) {
+    // All actions are regarded as legal
+    movelist.push_back(ActionType::kFold);
+    movelist.push_back(ActionType::kCall);
+    movelist.push_back(ActionType::kRaise);
     return movelist;
   }
 
@@ -326,12 +387,20 @@ void LeducState::InformationStateTensor(Player player,
   if (private_cards_[player] >= 0) {
     (*values)[offset + private_cards_[player]] = 1;
   }
-  offset += deck_.size();
+  if (suit_isomorphism_) {
+    offset += deck_.size() / 2;
+  } else {
+    offset += deck_.size();
+  }
 
   if (public_card_ >= 0) {
     (*values)[offset + public_card_] = 1;
   }
-  offset += deck_.size();
+  if (suit_isomorphism_) {
+    offset += deck_.size() / 2;
+  } else {
+    offset += deck_.size();
+  }
 
   for (int r = 1; r <= 2; r++) {
     const std::vector<int>& round_sequence =
@@ -382,12 +451,21 @@ void LeducState::ObservationTensor(Player player,
   if (private_cards_[player] >= 0) {
     (*values)[offset + private_cards_[player]] = 1;
   }
-  offset += deck_.size();
+  if (suit_isomorphism_) {
+    offset += deck_.size() / 2;
+  } else {
+    offset += deck_.size();
+  }
 
   if (public_card_ >= 0) {
     (*values)[offset + public_card_] = 1;
   }
-  offset += deck_.size();
+  if (suit_isomorphism_) {
+    offset += deck_.size() / 2;
+  } else {
+    offset += deck_.size();
+  }
+
   // Adding the contribution of each players to the pot.
   for (auto p = Player{0}; p < num_players_; p++) {
     (*values)[offset + p] = ante_[p];
@@ -401,6 +479,21 @@ std::unique_ptr<State> LeducState::Clone() const {
 std::vector<std::pair<Action, double>> LeducState::ChanceOutcomes() const {
   SPIEL_CHECK_TRUE(IsChanceNode());
   std::vector<std::pair<Action, double>> outcomes;
+
+  if (suit_isomorphism_) {
+    const double p = 1.0 / deck_size_;
+    // Consecutive cards in deck are viewed identically.
+    for (int card = 0; card < deck_.size() / 2; card++) {
+      if (deck_[card * 2] != kInvalidCard &&
+          deck_[card * 2 + 1] != kInvalidCard) {
+        outcomes.push_back({card, p*2});
+      } else if (deck_[card * 2] != kInvalidCard ||
+                 deck_[card * 2 + 1] != kInvalidCard) {
+        outcomes.push_back({card, p});
+      }
+    }
+    return outcomes;
+  }
 
   const double p = 1.0 / deck_size_;
   for (int card = 0; card < deck_.size(); card++) {
@@ -437,6 +530,19 @@ int LeducState::RankHand(Player player) const {
   // Put the lower card in slot 0, the higher in slot 1.
   if (hand[0] > hand[1]) {
     std::swap(hand[0], hand[1]);
+  }
+
+  if (suit_isomorphism_) {
+    int num_cards = deck_.size() / 2;
+    if (hand[0] == hand[1]) {
+      // Pair! Offset by deck_size_^2 to put higher than every singles combo.
+      return (num_cards * num_cards + hand[0]);
+    } else {
+      // Otherwise card value dominates. Suit isomorphism has already removed
+      // the distinction between suits, so we can compare the ranks directly.
+      // This could lead to ties/draws and/or multiple winners.
+      return hand[1] * num_cards + hand[0];
+    }
   }
 
   // E.g. rank for two players:
@@ -551,8 +657,20 @@ std::vector<int> LeducState::padded_betting_sequence() const {
 void LeducState::SetPrivate(Player player, Action move) {
   // Round 1. `move` refers to the card value to deal to the current
   // underlying player (given by `private_cards_dealt_`).
-  private_cards_[player] = deck_[move];
-  deck_[move] = kInvalidCard;
+  if (suit_isomorphism_) {
+    // Consecutive cards are identical under suit isomorphism.
+    private_cards_[player] = move;
+    if (deck_[move * 2] != kInvalidCard) {
+      deck_[move * 2] = kInvalidCard;
+    } else if (deck_[move * 2 + 1] != kInvalidCard) {
+      deck_[move * 2 + 1] = kInvalidCard;
+    } else {
+      SpielFatalError("Suit isomorphism error.");
+    }
+  } else {
+    private_cards_[player] = deck_[move];
+    deck_[move] = kInvalidCard;
+  }
   --deck_size_;
   ++private_cards_dealt_;
 
@@ -562,7 +680,7 @@ void LeducState::SetPrivate(Player player, Action move) {
 
 std::unique_ptr<State> LeducState::ResampleFromInfostate(
     int player_id, std::function<double()> rng) const {
-  std::unique_ptr<LeducState> clone = std::make_unique<LeducState>(game_);
+  std::unique_ptr<State> clone = game_->NewInitialState();
 
   // First, deal out cards:
   Action player_chance = history_.at(player_id);
@@ -588,27 +706,47 @@ std::unique_ptr<State> LeducState::ResampleFromInfostate(
 LeducGame::LeducGame(const GameParameters& params)
     : Game(kGameType, params),
       num_players_(ParameterValue<int>("players")),
+      action_mapping_(ParameterValue<bool>("action_mapping")),
+      suit_isomorphism_(ParameterValue<bool>("suit_isomorphism")),
       total_cards_((num_players_ + 1) * kNumSuits) {
   SPIEL_CHECK_GE(num_players_, kGameType.min_num_players);
   SPIEL_CHECK_LE(num_players_, kGameType.max_num_players);
 }
 
 std::unique_ptr<State> LeducGame::NewInitialState() const {
-  return std::unique_ptr<State>(new LeducState(shared_from_this()));
+  return std::unique_ptr<State>(new LeducState(shared_from_this(),
+                                /*action_mapping=*/action_mapping_,
+                                /*suit_isomorphism=*/suit_isomorphism_));
+}
+
+int LeducGame::MaxChanceOutcomes() const {
+  if (suit_isomorphism_) {
+    return total_cards_ / 2;
+  } else {
+    return total_cards_;
+  }
 }
 
 std::vector<int> LeducGame::InformationStateTensorShape() const {
   // One-hot encoding for player number (who is to play).
   // 2 slots of cards (total_cards_ bits each): private card, public card
   // Followed by maximum game length * 2 bits each (call / raise)
-  return {(num_players_) + (total_cards_ * 2) + (MaxGameLength() * 2)};
+  if (suit_isomorphism_) {
+    return {(num_players_) + (total_cards_) + (MaxGameLength() * 2)};
+  } else {
+    return {(num_players_) + (total_cards_ * 2) + (MaxGameLength() * 2)};
+  }
 }
 
 std::vector<int> LeducGame::ObservationTensorShape() const {
   // One-hot encoding for player number (who is to play).
   // 2 slots of cards (total_cards_ bits each): private card, public card
   // Followed by the contribution of each player to the pot
-  return {(num_players_) + (total_cards_ * 2) + (num_players_)};
+  if (suit_isomorphism_) {
+    return {(num_players_) + (total_cards_) + (num_players_)};
+  } else {
+    return {(num_players_) + (total_cards_ * 2) + (num_players_)};
+  }
 }
 
 double LeducGame::MaxUtility() const {
