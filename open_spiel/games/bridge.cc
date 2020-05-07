@@ -151,7 +151,7 @@ std::string BridgeState::ToString() const {
   }
   // Report the original deal in the terminal state, so that we can easily
   // follow the play.
-  if (phase_ == Phase::kGameOver && !use_double_dummy_result_) {
+  if (phase_ == Phase::kGameOver && !holder_[0]) {
     std::array<Player, kNumCards> deal{};
     for (int i = 0; i < kNumCards; ++i)
       deal[history_[i].action] = (i % kNumPlayers);
