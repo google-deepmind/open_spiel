@@ -30,8 +30,14 @@ void BasicGoofspielTests() {
   testing::ChanceOutcomesTest(*LoadGame("goofspiel"));
   testing::RandomSimTest(*LoadGame("goofspiel"), 100);
   for (Player players = 3; players <= 5; players++) {
-    testing::RandomSimTest(
-        *LoadGame("goofspiel", {{"players", GameParameter(players)}}), 100);
+    for (const std::string& returns_type :
+         {"win_loss", "point_difference", "total_points"}) {
+      testing::RandomSimTest(
+          *LoadGame("goofspiel",
+                    {{"players", GameParameter(players)},
+                     {"returns_type", GameParameter(returns_type)}}),
+          10);
+    }
   }
 }
 

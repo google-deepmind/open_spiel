@@ -38,11 +38,21 @@
 // of http://mlanctot.info/files/papers/PhD_Thesis_MarcLanctot.pdf, where only
 // the sequences of wins / losses is revealed (not the players' hands).
 //
+// The returns_type parameter determines how returns (utilities) are defined:
+//   - win_loss distributed 1 point divided by number of winners (i.e. players
+//     with highest points), and similarly to -1 among losers
+//   - point_difference means each player gets utility as number of points
+//     collected minus the average over players.
+//   - total_points means each player's return is equal to the number of points
+//     they collected.
+//
 // Parameters:
 //   "imp_info"      bool     Enable the imperfect info variant (default: false)
 //   "num_cards"     int      The highest bid card, and point card (default: 13)
 //   "players"       int      number of players (default: 2)
 //   "points_order"  string   "random" (default), "descending", or "ascending"
+//   "returns_type"  string   "win_loss" (default), "point_difference", or
+//                            "total_points".
 
 namespace open_spiel {
 namespace goofspiel {
@@ -50,6 +60,7 @@ namespace goofspiel {
 inline constexpr int kDefaultNumPlayers = 2;
 inline constexpr int kDefaultNumCards = 13;
 inline constexpr const char* kDefaultPointsOrder = "random";
+inline constexpr const char* kDefaultReturnsType = "win_loss";
 inline constexpr const bool kDefaultImpInfo = false;
 
 enum class PointsOrder {
@@ -58,12 +69,19 @@ enum class PointsOrder {
   kAscending,
 };
 
+enum class ReturnsType {
+  kWinLoss,
+  kPointDifference,
+  kTotalPoints,
+};
+
 inline constexpr const int kInvalidCard = -1;
 
 class GoofspielState : public SimMoveState {
  public:
   explicit GoofspielState(std::shared_ptr<const Game> game, int num_cards,
-                          PointsOrder points_order, bool impinfo);
+                          PointsOrder points_order, bool impinfo,
+                          ReturnsType returns_type);
 
   Player CurrentPlayer() const override;
   std::string ActionToString(Player player, Action action_id) const override;
@@ -92,6 +110,7 @@ class GoofspielState : public SimMoveState {
 
   int num_cards_;
   PointsOrder points_order_;
+  ReturnsType returns_type_;
   bool impinfo_;
 
   Player current_player_;
@@ -114,8 +133,8 @@ class GoofspielGame : public Game {
   std::unique_ptr<State> NewInitialState() const override;
   int MaxChanceOutcomes() const override;
   int NumPlayers() const override { return num_players_; }
-  double MinUtility() const override { return -1; }
-  double MaxUtility() const override { return +1; }
+  double MinUtility() const override;
+  double MaxUtility() const override;
   double UtilitySum() const override { return 0; }
   std::shared_ptr<const Game> Clone() const override {
     return std::shared_ptr<const Game>(new GoofspielGame(*this));
@@ -128,6 +147,7 @@ class GoofspielGame : public Game {
   int num_cards_;    // The K in Goofspiel(K)
   int num_players_;  // Number of players
   PointsOrder points_order_;
+  ReturnsType returns_type_;
   bool impinfo_;
 };
 

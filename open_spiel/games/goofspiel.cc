@@ -21,6 +21,7 @@
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
 namespace goofspiel {
@@ -45,7 +46,9 @@ const GameType kGameType{
      {"num_cards", GameParameter(kDefaultNumCards)},
      {"players", GameParameter(kDefaultNumPlayers)},
      {"points_order",
-      GameParameter(static_cast<std::string>(kDefaultPointsOrder))}}};
+      GameParameter(static_cast<std::string>(kDefaultPointsOrder))},
+     {"returns_type",
+      GameParameter(static_cast<std::string>(kDefaultReturnsType))}}};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new GoofspielGame(params));
@@ -61,17 +64,33 @@ PointsOrder ParsePointsOrder(const std::string& po_str) {
   } else if (po_str == "ascending") {
     return PointsOrder::kAscending;
   } else {
-    SpielFatalError("Unrecognized pointsorder parameter: " + po_str);
+    SpielFatalError(
+        absl::StrCat("Unrecognized points_order parameter: ", po_str));
+  }
+}
+
+ReturnsType ParseReturnsType(const std::string& returns_type_str) {
+  if (returns_type_str == "win_loss") {
+    return ReturnsType::kWinLoss;
+  } else if (returns_type_str == "point_difference") {
+    return ReturnsType::kPointDifference;
+  } else if (returns_type_str == "total_points") {
+    return ReturnsType::kTotalPoints;
+  } else {
+    SpielFatalError(absl::StrCat("Unrecognized returns_type parameter: ",
+                                 returns_type_str));
   }
 }
 
 }  // namespace
 
 GoofspielState::GoofspielState(std::shared_ptr<const Game> game, int num_cards,
-                               PointsOrder points_order, bool impinfo)
+                               PointsOrder points_order, bool impinfo,
+                               ReturnsType returns_type)
     : SimMoveState(game),
       num_cards_(num_cards),
       points_order_(points_order),
+      returns_type_(returns_type),
       impinfo_(impinfo),
       current_player_(kInvalidPlayer),
       winners_({}),
@@ -301,17 +320,38 @@ std::vector<double> GoofspielState::Returns() const {
     return std::vector<double>(num_players_, 0.0);
   }
 
-  if (winners_.size() == num_players_) {
-    // All players have same number of points? This is a draw.
-    return std::vector<double>(num_players_, 0.0);
-  } else {
-    int num_winners = winners_.size();
-    int num_losers = num_players_ - num_winners;
-    std::vector<double> returns(num_players_, (-1.0 / num_losers));
-    for (const auto& winner : winners_) {
-      returns[winner] = 1.0 / num_winners;
+  if (returns_type_ == ReturnsType::kWinLoss) {
+    if (winners_.size() == num_players_) {
+      // All players have same number of points? This is a draw.
+      return std::vector<double>(num_players_, 0.0);
+    } else {
+      int num_winners = winners_.size();
+      int num_losers = num_players_ - num_winners;
+      std::vector<double> returns(num_players_, (-1.0 / num_losers));
+      for (const auto& winner : winners_) {
+        returns[winner] = 1.0 / num_winners;
+      }
+      return returns;
+    }
+  } else if (returns_type_ == ReturnsType::kPointDifference) {
+    std::vector<double> returns(num_players_, 0);
+    double sum = 0;
+    for (Player p = 0; p < num_players_; ++p) {
+      returns[p] = points_[p];
+      sum += points_[p];
+    }
+    for (Player p = 0; p < num_players_; ++p) {
+      returns[p] -= sum / num_players_;
     }
     return returns;
+  } else if (returns_type_ == ReturnsType::kTotalPoints) {
+    std::vector<double> returns(num_players_, 0);
+    for (Player p = 0; p < num_players_; ++p) {
+      returns[p] = points_[p];
+    }
+    return returns;
+  } else {
+    SpielFatalError(absl::StrCat("Unrecognized returns type: ", returns_type_));
   }
 }
 
@@ -589,11 +629,18 @@ GoofspielGame::GoofspielGame(const GameParameters& params)
       num_players_(ParameterValue<int>("players")),
       points_order_(
           ParsePointsOrder(ParameterValue<std::string>("points_order"))),
-      impinfo_(ParameterValue<bool>("imp_info")) {}
+      returns_type_(
+          ParseReturnsType(ParameterValue<std::string>("returns_type"))),
+      impinfo_(ParameterValue<bool>("imp_info")) {
+  // Override the zero-sum utility in the game type if general-sum returns.
+  if (returns_type_ == ReturnsType::kTotalPoints) {
+    game_type_.utility = GameType::Utility::kGeneralSum;
+  }
+}
 
 std::unique_ptr<State> GoofspielGame::NewInitialState() const {
   return std::unique_ptr<State>(new GoofspielState(
-      shared_from_this(), num_cards_, points_order_, impinfo_));
+      shared_from_this(), num_cards_, points_order_, impinfo_, returns_type_));
 }
 
 int GoofspielGame::MaxChanceOutcomes() const {
@@ -658,6 +705,35 @@ std::vector<int> GoofspielGame::ObservationTensorShape() const {
             num_players_ * ((num_cards_ * (num_cards_ + 1)) / 2 + 1) +
             // Bit vector for each card per player
             num_players_ * num_cards_};
+  }
+}
+
+double GoofspielGame::MinUtility() const {
+  if (returns_type_ == ReturnsType::kWinLoss) {
+    return -1;
+  } else if (returns_type_ == ReturnsType::kPointDifference) {
+    // 0 - (1 + 2 + ... + K) / n
+    return -(num_cards_ * (num_cards_ + 1) / 2) / num_players_;
+  } else if (returns_type_ == ReturnsType::kTotalPoints) {
+    return 0;
+  } else {
+    SpielFatalError("Unrecognized returns type.");
+  }
+}
+
+double GoofspielGame::MaxUtility() const {
+  if (returns_type_ == ReturnsType::kWinLoss) {
+    return 1;
+  } else if (returns_type_ == ReturnsType::kPointDifference) {
+    // (1 + 2 + ... + K) - (1 + 2 + ... + K) / n
+    // = (n-1) (1 + 2 + ... + K) / n
+    double sum = num_cards_ * (num_cards_ + 1) / 2;
+    return (num_players_ - 1) * sum / num_players_;
+  } else if (returns_type_ == ReturnsType::kTotalPoints) {
+    // 1 + 2 + ... + K.
+    return num_cards_ * (num_cards_ + 1) / 2;
+  } else {
+    SpielFatalError("Unrecognized returns type.");
   }
 }
 
