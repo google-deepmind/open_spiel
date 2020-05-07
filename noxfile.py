@@ -27,7 +27,7 @@ def get_distutils_tempdir():
   )
 
 
-@nox.session
+@nox.session(python="3")
 def tests(session):
   session.install("-r", "requirements.txt")
   session.run("python3", "setup.py", "build")
