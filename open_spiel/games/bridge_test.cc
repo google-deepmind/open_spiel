@@ -54,7 +54,7 @@ void SerializeDoubleDummyResults() {
     state->ApplyAction(action);
   }
   auto str = state->Serialize();
-  str = StringReplace(str, "\n", ",", true);  // Makes the test easier to read
+  str = absl::StrReplaceAll(str, {{"\n", ","}});
   SPIEL_CHECK_EQ(str,
                  "33,25,3,44,47,28,23,46,1,43,30,26,29,48,"
                  "24,42,13,21,17,8,5,34,6,7,37,49,11,38,51,"
@@ -75,7 +75,7 @@ void DeserializeDoubleDummyResults() {
       "18,27,31,41,40,4,36,19,2,52,59,52,61,"
       "Double Dummy Results,"
       "12,12,0,12,7,5,7,5,9,12,0,12,6,5,8,5,3,7,0,7,";
-  serialized = StringReplace(serialized, ",", "\n", true);
+  serialized = absl::StrReplaceAll(serialized, {{",", "\n"}});
   auto new_state = game->DeserializeState(serialized);
   SPIEL_CHECK_EQ(serialized, new_state->Serialize());
 }
