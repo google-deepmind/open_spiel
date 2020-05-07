@@ -156,9 +156,9 @@ bool GameRegisterer::IsValidName(const std::string& short_name) {
   return factories().find(short_name) != factories().end();
 }
 
-void GameRegisterer::RegisterGame(const GameType& game_info,
+void GameRegisterer::RegisterGame(const GameType& game_type,
                                   GameRegisterer::CreateFunc creator) {
-  factories()[game_info.short_name] = std::make_pair(game_info, creator);
+  factories()[game_type.short_name] = std::make_pair(game_type, creator);
 }
 
 bool IsGameRegistered(const std::string& short_name) {
@@ -405,6 +405,7 @@ std::unique_ptr<State> Game::DeserializeState(const std::string& str) const {
   }
   std::vector<std::string> lines = absl::StrSplit(str, '\n');
   for (int i = 0; i < lines.size(); ++i) {
+    if (lines[i].empty()) continue;
     if (state->IsSimultaneousNode()) {
       std::vector<Action> actions;
       for (int p = 0; p < state->NumPlayers(); ++p, ++i) {

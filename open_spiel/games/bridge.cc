@@ -17,6 +17,8 @@
 #include <cstring>
 #include <memory>
 
+#include "open_spiel/abseil-cpp/absl/algorithm/container.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_format.h"
 #include "open_spiel/abseil-cpp/absl/strings/string_view.h"
 #include "open_spiel/games/bridge/double_dummy_solver/include/dll.h"
@@ -458,21 +460,28 @@ void BridgeState::ObservationTensor(Player player,
   }
 }
 
+void BridgeState::SetDoubleDummyResults(ddTableResults double_dummy_results) {
+  double_dummy_results_ = double_dummy_results;
+}
+
 void BridgeState::ComputeDoubleDummyTricks() {
-  ddTableDeal dd_table_deal{};
-  for (int suit = 0; suit < kNumSuits; ++suit) {
-    for (int rank = 0; rank < kNumCardsPerSuit; ++rank) {
-      const int player = holder_[Card(Suit(suit), rank)].value();
-      dd_table_deal.cards[player][suit] += 1 << (2 + rank);
+  if (!double_dummy_results_.has_value()) {
+    double_dummy_results_ = ddTableResults{};
+    ddTableDeal dd_table_deal{};
+    for (int suit = 0; suit < kNumSuits; ++suit) {
+      for (int rank = 0; rank < kNumCardsPerSuit; ++rank) {
+        const int player = holder_[Card(Suit(suit), rank)].value();
+        dd_table_deal.cards[player][suit] += 1 << (2 + rank);
+      }
     }
-  }
-  DDS_EXTERNAL(SetMaxThreads)(0);
-  const int return_code =
-      DDS_EXTERNAL(CalcDDtable)(dd_table_deal, &double_dummy_results_);
-  if (return_code != RETURN_NO_FAULT) {
-    char error_message[80];
-    DDS_EXTERNAL(ErrorMessage)(return_code, error_message);
-    SpielFatalError(absl::StrCat("double_dummy_solver:", error_message));
+    DDS_EXTERNAL(SetMaxThreads)(0);
+    const int return_code = DDS_EXTERNAL(CalcDDtable)(
+        dd_table_deal, &double_dummy_results_.value());
+    if (return_code != RETURN_NO_FAULT) {
+      char error_message[80];
+      DDS_EXTERNAL(ErrorMessage)(return_code, error_message);
+      SpielFatalError(absl::StrCat("double_dummy_solver:", error_message));
+    }
   }
 }
 
@@ -596,10 +605,11 @@ void BridgeState::ApplyBiddingAction(int call) {
     } else if (num_passes_ == 3 && contract_.level > 0) {
       // After there has been a bid, three consecutive passes end the auction.
       if (use_double_dummy_result_) {
+        SPIEL_CHECK_TRUE(double_dummy_results_.has_value());
         phase_ = Phase::kGameOver;
         num_declarer_tricks_ =
             double_dummy_results_
-                .resTable[contract_.trumps][contract_.declarer];
+                ->resTable[contract_.trumps][contract_.declarer];
         ScoreUp();
       } else {
         phase_ = Phase::kPlay;
@@ -685,6 +695,51 @@ void Trick::Play(Player player, int card) {
     winning_rank_ = CardRank(card);
     winning_player_ = player;
   }
+}
+
+// We have custom State serialization to avoid recomputing double-dummy results.
+std::string BridgeState::Serialize() const {
+  std::string serialized = State::Serialize();
+  if (use_double_dummy_result_ && double_dummy_results_.has_value()) {
+    std::string dd;
+    for (int trumps = 0; trumps < kNumDenominations; ++trumps) {
+      for (int player = 0; player < kNumPlayers; ++player) {
+        absl::StrAppend(&dd, double_dummy_results_->resTable[trumps][player],
+                        "\n");
+      }
+    }
+    absl::StrAppend(&serialized, "Double Dummy Results\n", dd);
+  }
+  return serialized;
+}
+
+std::unique_ptr<State> BridgeGame::DeserializeState(
+    const std::string& str) const {
+  if (!UseDoubleDummyResult()) return Game::DeserializeState(str);
+  auto state = absl::make_unique<BridgeState>(
+      shared_from_this(), UseDoubleDummyResult(), IsDealerVulnerable(),
+      IsNonDealerVulnerable());
+  std::vector<std::string> lines = absl::StrSplit(str, '\n');
+  const auto separator = absl::c_find(lines, "Double Dummy Results");
+  // Double-dummy results.
+  if (separator != lines.end()) {
+    ddTableResults double_dummy_results;
+    auto it = separator;
+    int i = 0;
+    while (++it != lines.end()) {
+      if (it->empty()) continue;
+      double_dummy_results.resTable[i / kNumPlayers][i % kNumPlayers] =
+          std::stol(*it);
+      ++i;
+    }
+    state->SetDoubleDummyResults(double_dummy_results);
+  }
+  // Actions in the game.
+  for (auto it = lines.begin(); it != separator; ++it) {
+    if (it->empty()) continue;
+    state->ApplyAction(std::stol(*it));
+  }
+  return state;
 }
 
 }  // namespace bridge

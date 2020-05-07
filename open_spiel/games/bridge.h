@@ -141,6 +141,8 @@ class BridgeState : public State {
   }
   std::vector<Action> LegalActions() const override;
   std::vector<std::pair<Action, double>> ChanceOutcomes() const override;
+  std::string Serialize() const override;
+  void SetDoubleDummyResults(ddTableResults double_dummy_results);
 
  protected:
   void DoApplyAction(Action action) override;
@@ -176,7 +178,7 @@ class BridgeState : public State {
   std::array<Trick, kNumTricks> tricks_{};
   std::vector<double> returns_ = std::vector<double>(kNumPlayers);
   std::array<std::optional<Player>, kNumCards> holder_{};
-  ddTableResults double_dummy_results_{};
+  absl::optional<ddTableResults> double_dummy_results_{};
 };
 
 class BridgeGame : public Game {
@@ -203,6 +205,8 @@ class BridgeGame : public Game {
     return UseDoubleDummyResult() ? kMaxAuctionLength
                                   : kMaxAuctionLength + kNumCards;
   }
+  std::unique_ptr<State> DeserializeState(
+      const std::string& str) const override;
 
  private:
   bool UseDoubleDummyResult() const {
