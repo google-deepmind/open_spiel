@@ -1,6 +1,8 @@
 add_library (game_transforms OBJECT
   coop_to_1p.cc
   coop_to_1p.h
+  efg_writer.cc
+  efg_writer.h
   misere.cc
   misere.h
   turn_based_simultaneous_game.cc
@@ -27,6 +29,12 @@ add_executable(coop_to_1p_test
                ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(coop_to_1p_test coop_to_1p_test)
+
+add_executable(efg_writer_test
+               efg_writer_test.cc
+               ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(efg_writer_test efg_writer_test)
 
 add_executable(normal_form_extensive_game_test
                normal_form_extensive_game_test.cc
