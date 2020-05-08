@@ -22,6 +22,7 @@
 
 #include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
 #include "open_spiel/game_parameters.h"
+#include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
@@ -67,6 +68,17 @@ struct Node {
 // using this function will not be serializable (nor will their states). Use
 // the general LoadGame with the filename argument if serialization is required.
 std::shared_ptr<const Game> LoadEFGGame(const std::string& data);
+
+// Helper function to construct a tabular policy explicitly. The game must be
+// an EFG game. The map uses is
+// (player, information ste strings) -> vector of (action string, prob), e.g.:
+//     { {{0, "infoset1"}, {{"actionA, prob1"}, {"actionB", prob2}}},
+//       {{1, "infoset2"}, {{"actionC, prob1"}, {"actionD", prob2}}} }
+TabularPolicy EFGGameTabularPolicy(
+    std::shared_ptr<const Game> game,
+    const absl::flat_hash_map<std::pair<Player, std::string>,
+                              std::vector<std::pair<std::string, double>>>&
+        policy_map);
 
 class EFGState : public State {
  public:

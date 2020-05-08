@@ -37,6 +37,10 @@ void SetProb(ActionsAndProbs* actions_and_probs, Action action, double prob);
 // is deterministic, otherwise returns kInvalidAction.
 Action GetAction(const ActionsAndProbs& action_and_probs);
 
+// Returns a policy where every legal action has probability 1 / (number of
+// legal actions).
+ActionsAndProbs UniformStatePolicy(const State& state);
+
 // A general policy object. A policy is a mapping from states to list of
 // (action, prob) pairs for all the legal actions at the state.
 class Policy {
@@ -156,6 +160,11 @@ class TabularPolicy : public Policy {
     open_spiel::SetProb(&(iter->second), action, prob);
   }
 
+  void SetStatePolicy(const std::string& info_state,
+                      const ActionsAndProbs& state_policy) {
+    policy_table_[info_state] = state_policy;
+  }
+
   std::unordered_map<std::string, ActionsAndProbs>& PolicyTable() {
     return policy_table_;
   }
@@ -184,14 +193,8 @@ class TabularPolicy : public Policy {
 // tabular version, except that this works for large games.
 class UniformPolicy : public Policy {
  public:
-  ActionsAndProbs GetStatePolicy(const State& state) const {
-    ActionsAndProbs probs;
-    std::vector<Action> actions = state.LegalActions();
-    probs.reserve(actions.size());
-    absl::c_for_each(actions, [&probs, &actions](Action a) {
-      probs.push_back({a, 1. / static_cast<double>(actions.size())});
-    });
-    return probs;
+  ActionsAndProbs GetStatePolicy(const State& state) const override {
+    return UniformStatePolicy(state);
   }
 };
 

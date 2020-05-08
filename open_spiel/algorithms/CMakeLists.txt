@@ -5,6 +5,8 @@ add_library (algorithms OBJECT
   cfr.cc
   cfr_br.h
   cfr_br.cc
+  corr_dist.h
+  corr_dist.cc
   deterministic_policy.h
   deterministic_policy.cc
   evaluate_bots.h
@@ -53,6 +55,10 @@ add_test(cfr_test cfr_test)
 add_executable(cfr_br_test cfr_br_test.cc
         $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})
 add_test(cfr_br_test cfr_br_test)
+
+add_executable(corr_dist_test corr_dist_test.cc
+        $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})
+add_test(corr_dist_test corr_dist_test)
 
 add_executable(deterministic_policy_test deterministic_policy_test.cc
     $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})

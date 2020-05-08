@@ -683,5 +683,36 @@ void EFGGame::ParseGame() {
   game_type_.min_num_players = num_players_;
 }
 
+TabularPolicy EFGGameTabularPolicy(
+    std::shared_ptr<const Game> game,
+    const absl::flat_hash_map<std::pair<Player, std::string>,
+                              std::vector<std::pair<std::string, double>>>&
+        policy_map) {
+  const EFGGame* efg_game = dynamic_cast<const EFGGame*>(game.get());
+  SPIEL_CHECK_TRUE(efg_game != nullptr);
+
+  TabularPolicy policy;
+  for (const auto& outer_iter : policy_map) {
+    Player player = outer_iter.first.first;
+    std::string infoset_label = outer_iter.first.second;
+    std::string infoset_str =
+        efg_game->GetInformationStateStringByName(player, infoset_label);
+
+    ActionsAndProbs state_policy;
+    state_policy.reserve(outer_iter.second.size());
+    for (const auto& inner_iter : outer_iter.second) {
+      std::string action_label = inner_iter.first;
+      double prob = inner_iter.second;
+      Action action = efg_game->GetAction(action_label);
+      state_policy.push_back({action, prob});
+    }
+
+    policy.SetStatePolicy(infoset_str, state_policy);
+  }
+
+  return policy;
+}
+
+
 }  // namespace efg_game
 }  // namespace open_spiel

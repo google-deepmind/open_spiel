@@ -59,6 +59,16 @@ Action GetAction(const ActionsAndProbs& action_and_probs) {
   return kInvalidAction;
 }
 
+ActionsAndProbs UniformStatePolicy(const State& state) {
+  ActionsAndProbs actions_and_probs;
+  std::vector<Action> actions = state.LegalActions();
+  actions_and_probs.reserve(actions.size());
+  absl::c_for_each(actions, [&actions_and_probs, &actions](Action a) {
+    actions_and_probs.push_back({a, 1. / static_cast<double>(actions.size())});
+  });
+  return actions_and_probs;
+}
+
 TabularPolicy::TabularPolicy(const Game& game)
     : TabularPolicy(GetRandomPolicy(game)) {}
 
