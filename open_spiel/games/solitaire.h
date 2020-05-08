@@ -10,37 +10,53 @@
 #include <any>
 #include <unordered_map>
 #include <set>
+#include <optional>
+
 #include "open_spiel/spiel.h"
 
-#define RESET   "\033[0m"
-#define GREEN   "\033[32m"
-#define BLUE    "\033[34m"
-#define MAGENTA "\033[35m"
-#define CYAN    "\033[36m"
+// ANSI color codes
+#define RESET "\033[0m"
+#define RED   "\033[31m"
+#define BLACK "\033[37m"
+
+// TODO: Clion automatically inverts colors based on light/dark theme. So even though "\033[30m" is black,
+//       it shows up as white with a dark theme. Colab doesn't do this, so using a dark theme, it shows black
+//       on a dark theme.
+
+// Glyphs & Strings
+
+#define GLYPH_HIDDEN   "\U0001F0A0"
+#define GLYPH_EMPTY    "\U0001F0BF"
+#define GLYPH_SPADES   "\U00002660"
+#define GLYPH_HEARTS   "\U00002665"
+#define GLYPH_CLUBS    "\U00002663"
+#define GLYPH_DIAMONDS "\U00002666"
+#define GLYPH_ARROW    "\U00002190"
+
 
 namespace open_spiel::solitaire {
 
-    // Sets default number of players
-    inline constexpr int    kDefaultPlayers = 1;
+    // Default Game Parameters =========================================================================================
 
-    // Special "card" indices used in ObservationTensor
-    inline constexpr double HIDDEN_CARD = 98.0;
-    inline constexpr double NO_CARD     = 99.0;
+    inline constexpr int    kDefaultPlayers    = 1;
+    inline constexpr int    kPlayerId          = 0;
+    inline constexpr int    kDepthLimit        = 500;
+    inline constexpr bool   kDefaultColored    = true;
+    inline constexpr bool   kDefaultThoughtful = false;
 
-    template <typename Container, typename Element>
-    int GetIndex (Container container, Element element) {
-        return std::distance(std::begin(container), std::find(container.begin(), container.end(), element));
-    }
+    // Enumerations ====================================================================================================
 
-    /*
-    enum Suit {
-        kSpades = 0,
-        kHearts,
-        kClubs,
-        kDiamonds
+    enum SuitType     {
+        kNoSuit = 0,
+        kS,
+        kH,
+        kC,
+        kD,
+        kHiddenSuit,
     };
-    enum Rank {
-        kA = 0,
+    enum RankType     {
+        kNoRank = 0,
+        kA,
         k2,
         k3,
         k4,
@@ -53,41 +69,23 @@ namespace open_spiel::solitaire {
         kJ,
         kQ,
         kK,
+        kHiddenRank,
     };
-    */
-
-    const std::vector<std::string> SUITS = {"s", "h", "c", "d"};
-
-    const std::vector<std::string> RANKS = {"A", "2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K"};
-
-    const std::map<std::string, double> FOUNDATION_POINTS = {
-            //region Reward for move to the foundation with a source card of this rank
-            {"A", 100.0},
-            {"2", 90.0},
-            {"3", 80.0},
-            {"4", 70.0},
-            {"5", 60.0},
-            {"6", 50.0},
-            {"7", 40.0},
-            {"8", 30.0},
-            {"9", 20.0},
-            {"T", 10.0},
-            {"J", 10.0},
-            {"Q", 10.0},
-            {"K", 10.0}
-            //endregion
+    enum LocationType {
+        kDeck       = 0,
+        kWaste      = 1,
+        kFoundation = 2,
+        kTableau    = 3,
+        kMissing    = 4,
     };
+    enum ActionType   {
 
-    // Enumerations ====================================================================================================
+        // Draw Action (1) =============================================================================================
+        kDraw = 0,
 
-    enum ActionType {
-
-        // Setup Action (1) ============================================================================================
-        kSetup = 0,
-        
         // Reveal Actions (52) =========================================================================================
         // Spades ------------------------------------------------------------------------------------------------------
-        kRevealAs = 1,          
+        kRevealAs = 1,
         kReveal2s = 2,
         kReveal3s = 3,
         kReveal4s = 4,
@@ -100,7 +98,7 @@ namespace open_spiel::solitaire {
         kRevealJs = 11,
         kRevealQs = 12,
         kRevealKs = 13,
-        
+
         // Hearts ------------------------------------------------------------------------------------------------------
         kRevealAh = 14,
         kReveal2h = 15,
@@ -115,7 +113,7 @@ namespace open_spiel::solitaire {
         kRevealJh = 24,
         kRevealQh = 25,
         kRevealKh = 26,
-        
+
         // Clubs -------------------------------------------------------------------------------------------------------
         kRevealAc = 27,
         kReveal2c = 28,
@@ -130,7 +128,7 @@ namespace open_spiel::solitaire {
         kRevealJc = 37,
         kRevealQc = 38,
         kRevealKc = 39,
-        
+
         // Diamonds ----------------------------------------------------------------------------------------------------
         kRevealAd = 40,
         kReveal2d = 41,
@@ -145,17 +143,14 @@ namespace open_spiel::solitaire {
         kRevealJd = 50,
         kRevealQd = 51,
         kRevealKd = 52,
-        
-        // Draw Action (1) =============================================================================================
-        kDraw = 53,
-        
+
         // Special Moves (8) ===========================================================================================
         // To Empty Tableau --------------------------------------------------------------------------------------------
         kMove__Ks,
         kMove__Kh,
         kMove__Kc,
         kMove__Kd,
-        
+
         // To Empty Foundation -----------------------------------------------------------------------------------------
         kMove__Ah,
         kMove__As,
@@ -176,9 +171,9 @@ namespace open_spiel::solitaire {
         kMoveTsJs,
         kMoveJsQs,
         kMoveQsKs,
-        
+
         // To Hearts ---------------------------------------------------------------------------------------------------
-        kMoveAh2h, 
+        kMoveAh2h,
         kMove2h3h,
         kMove3h4h,
         kMove4h5h,
@@ -190,7 +185,7 @@ namespace open_spiel::solitaire {
         kMoveThJh,
         kMoveJhQh,
         kMoveQhKh,
-        
+
         // To Clubs ----------------------------------------------------------------------------------------------------
         kMoveAc2c,
         kMove2c3c,
@@ -204,7 +199,7 @@ namespace open_spiel::solitaire {
         kMoveTcJc,
         kMoveJcQc,
         kMoveQcKc,
-        
+
         // To Diamonds -------------------------------------------------------------------------------------------------
         kMoveAd2d,
         kMove2d3d,
@@ -325,13 +320,51 @@ namespace open_spiel::solitaire {
         kMoveKdQc,
     };
 
-    enum Location {
-        kDeck       = 0,
-        kWaste      = 1,
-        kFoundation = 2,
-        kTableau    = 3,
-        kMissing    = 4,
+    // Constants =======================================================================================================
+
+    //region Indices for special cards
+    inline constexpr int HIDDEN_CARD          = 99;
+    inline constexpr int NO_CARD              =  0;
+    inline constexpr int EMPTY_TABLEAU_CARD   = -1;
+    inline constexpr int EMPTY_SPADE_CARD     = -2;
+    inline constexpr int EMPTY_HEART_CARD     = -3;
+    inline constexpr int EMPTY_CLUB_CARD      = -4;
+    inline constexpr int EMPTY_DIAMOND_CARD   = -5;
+
+    // Other lists and maps
+    using ranksuit = std::pair<RankType, SuitType>;
+    const std::vector<SuitType> SUITS = {kS, kH, kC, kD};
+    const std::vector<RankType> RANKS = {kA, k2, k3, k4, k5, k6, k7, k8, k9, kT, kJ, kQ, kK};
+
+    // These correspond with their enums, not with the two vectors directly above
+    const std::vector<std::string> SUIT_STRS = {"", GLYPH_SPADES, GLYPH_HEARTS, GLYPH_CLUBS, GLYPH_DIAMONDS, ""};
+    const std::vector<std::string> RANK_STRS = {"", "A", "2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K", ""};
+
+    const std::map<RankType, double> FOUNDATION_POINTS = {
+            //region Maps a RankType to a double that represents the reward for moving a card of that rank to the foundation
+            {kA, 100.0},
+            {k2, 90.0},
+            {k3, 80.0},
+            {k4, 70.0},
+            {k5, 60.0},
+            {k6, 50.0},
+            {k7, 40.0},
+            {k8, 30.0},
+            {k9, 20.0},
+            {kT, 10.0},
+            {kJ, 10.0},
+            {kQ, 10.0},
+            {kK, 10.0}
+            //endregion
     };
+
+    // Miscellaneous Functions =========================================================================================
+
+    std::vector<SuitType> GetOppositeSuits(const SuitType & suit);
+
+    int GetCardIndex(RankType rank, SuitType suit);
+
+    int GetMaxSize(LocationType location);
 
     // Support Classes =================================================================================================
 
@@ -339,552 +372,481 @@ namespace open_spiel::solitaire {
     public:
 
         // Attributes ==================================================================================================
-
-        std::string rank;       // Indicates the rank of the card, cannot be changed once set
-        std::string suit;       // Indicates the suit of the card, cannot be changed once set
-        bool        hidden;     // Indicates whether the card is hidden or not
-        Location    location;   // Indicates the type of pile the card is in
+        RankType      rank     = kHiddenRank;       // Indicates the rank of the card, cannot be changed once set
+        SuitType      suit     = kHiddenSuit;       // Indicates the suit of the card, cannot be changed once set
+        LocationType  location = kMissing;          // Indicates the type of pile the card is in
+        bool          hidden   = false;             // Indicates whether the card is hidden or not
+        int index = HIDDEN_CARD;
 
         // Constructors ================================================================================================
-
-        Card();                                     // Create an empty card, default constructor
-        Card(std::string rank, std::string suit);   // Create a card from rank, suit, and hidden
-        explicit Card(int index);                   // Create a card from its index (e.g. 0 -> As)
-
-        // Type Casting ================================================================================================
-
-        explicit operator int() const;                    // Represent a card as its integer index (e.g. As -> 0)
-
-        // Operators ===================================================================================================
-
-        bool operator==(Card & other_card) const;          // Compare two cards for equality
-        bool operator==(const Card & other_card) const;    // Compare two cards for equality
+        Card(bool hidden = false, SuitType suit = kHiddenSuit, RankType rank = kHiddenRank, LocationType location = kMissing);
+        Card(int index, bool hidden = false, LocationType location = kMissing);
 
         // Other Methods ===============================================================================================
-
-        std::vector<Card> LegalChildren() const;    // Get legal children of the card depending on its location
-        std::string ToString() const;               // Gets human-readable representation of the card as a string
+        int GetIndex(bool force = false);
+        std::string ToString(bool colored = true) const;
+        std::vector<Card> LegalChildren() const;
+        bool operator==(Card & other_card) const;
+        bool operator==(const Card & other_card) const;
+        bool operator<(const Card & other_card) const;
 
     };
 
-    class Deck {
+    class Pile {
     public:
 
         // Attributes ==================================================================================================
-
-        std::deque<Card> cards;             // Holds the card current in the deck
-        std::deque<Card> waste;             // Holds the waste cards, the top of which can be played
-        std::deque<Card> initial_order;     // Holds the initial order of the deck, so that it can be rebuilt
-        int times_rebuilt = 0;              // Number of times Rebuild() is called, used for score or terminality
-
-        // Constructors ================================================================================================
-
-        Deck();     // Default constructor
-
-        // Other Methods ===============================================================================================
-
-        std::vector<Card> Sources() const;      // Returns vector containing the top card of the waste pile
-        std::vector<Card> Split(Card card);     // Returns split card from waste
-        void draw(unsigned long num_cards);     // Moves cards to the waste
-        void rebuild();                         // Repopulates the deck in the order cards were originally drawn
-
-    };
-
-    class Foundation {
-    public:
-
-        // Attributes ==================================================================================================
-
-        const std::string suit;                                // Indicates the suit of cards that can be added
-        std::deque<Card>  cards;                               // Contains the cards inside the foundation
+        std::vector<Card>  cards;
+        const LocationType type;
+        const SuitType     suit;
+        const int          max_size;
 
         // Constructors ================================================================================================
-
-        Foundation();                                          // Default constructor
-        explicit Foundation(std::string suit);                 // Construct an empty foundation of a given suit
+        Pile(LocationType type, SuitType suit = kNoSuit);
 
         // Other Methods ===============================================================================================
+        std::vector<Card>   Sources() const;
+        std::vector<Card>   Targets() const;
+        std::vector<double> Tensor() const;
+        std::string         ToString(bool colored = true) const;
 
-        std::vector<Card> Sources() const;                     // Cards in the foundation that can be moved
-        std::vector<Card> Targets() const;                     // A card in the foundation that can have cards moved to it
-
-        std::vector<Card> Split(Card card);                    // Splits on given card and returns it and all cards beneath it
-        void Extend(const std::vector<Card>& source_cards);    // Adds cards to the foundation
-
-    };
-
-    class Tableau {
-    public:
-
-        // Attributes ==================================================================================================
-
-        std::deque<Card> cards;                               // Contains the cards inside the foundation
-
-        // Constructors ================================================================================================
-
-        Tableau();                                            // Default constructor
-        explicit Tableau(int num_cards);                      // Construct a tableau with the given cards
-
-        // Other Methods ===============================================================================================
-
-        std::vector<Card> Sources() const;                    // Cards in the foundation that can be moved
-        std::vector<Card> Targets() const;                    // A card in the foundation that can have cards moved to it
-
-        std::vector<Card> Split(Card card);                   // Splits on given card and returns it and all cards beneath it
-        void Extend(const std::vector<Card>& source_cards);   // Adds cards to the foundation
     };
 
     class Move {
     public:
 
         // Attributes ==================================================================================================
-
-        Card target;    // The card that the source will be moved to
-        Card source;    // The card that will be moved to the target
+        Card target;
+        Card source;
 
         // Constructors ================================================================================================
-
-        Move(Card target_card, Card source_card);   // Creates Move object from target and source cards
-        explicit Move(Action action_id);            // Creates Move object from Action kMove... (54 -> 206)
+        Move(Card target, Card source);
+        Move(RankType target_rank, SuitType target_suit, RankType source_rank, SuitType source_suit);
+        explicit Move(Action action);
 
         // Other Methods ===============================================================================================
-
-        std::string ToString() const;       // Gets human-readable representation of the move as a string
-        Action      ActionId() const;       // Gets Action kMove... from the Move object
-
+        std::string ToString(bool colored = true) const;
+        bool operator<(const Move & other_move) const;
+        Action ActionId() const;
 
     };
 
-    const std::map<std::pair<std::string, std::string>, int> RANKSUIT_TO_INDEX = {
-            //region Mapping of a pair of rank and suit to a card index
+    // More Constants ==================================================================================================
 
-            // Special Cards
-            {std::pair<std::string, std::string>("", "s"), -1},
-            {std::pair<std::string, std::string>("", "h"), -2},
-            {std::pair<std::string, std::string>("", "c"), -3},
-            {std::pair<std::string, std::string>("", "d"), -4},
-            {std::pair<std::string, std::string>("", ""),  -5},
+    const std::map<Move, Action> MOVE_TO_ACTION = {
+            // region Mapping of a move to an action declared in ActionType;
+            
+            // region Moves To Empty Tableau
+            {Move(kNoRank, kNoSuit, kK, kS), kMove__Ks},
+            {Move(kNoRank, kNoSuit, kK, kH), kMove__Kh},
+            {Move(kNoRank, kNoSuit, kK, kC), kMove__Kc},
+            {Move(kNoRank, kNoSuit, kK, kD), kMove__Kd},
+            // endregion
 
-            // Spades
-            {std::pair<std::string, std::string>("A", "s"), 0},
-            {std::pair<std::string, std::string>("2", "s"), 1},
-            {std::pair<std::string, std::string>("3", "s"), 2},
-            {std::pair<std::string, std::string>("4", "s"), 3},
-            {std::pair<std::string, std::string>("5", "s"), 4},
-            {std::pair<std::string, std::string>("6", "s"), 5},
-            {std::pair<std::string, std::string>("7", "s"), 6},
-            {std::pair<std::string, std::string>("8", "s"), 7},
-            {std::pair<std::string, std::string>("9", "s"), 8},
-            {std::pair<std::string, std::string>("T", "s"), 9},
-            {std::pair<std::string, std::string>("J", "s"), 10},
-            {std::pair<std::string, std::string>("Q", "s"), 11},
-            {std::pair<std::string, std::string>("K", "s"), 12},
+            // region Moves To Empty Foundation
+            {Move(kNoRank, kS, kA, kS),      kMove__As},
+            {Move(kNoRank, kH, kA, kH),      kMove__Ah},
+            {Move(kNoRank, kC, kA, kC),      kMove__Ac},
+            {Move(kNoRank, kD, kA, kD),      kMove__Ad},
+            // endregion
 
-            // Hearts
-            {std::pair<std::string, std::string>("A", "h"), 13},
-            {std::pair<std::string, std::string>("2", "h"), 14},
-            {std::pair<std::string, std::string>("3", "h"), 15},
-            {std::pair<std::string, std::string>("4", "h"), 16},
-            {std::pair<std::string, std::string>("5", "h"), 17},
-            {std::pair<std::string, std::string>("6", "h"), 18},
-            {std::pair<std::string, std::string>("7", "h"), 19},
-            {std::pair<std::string, std::string>("8", "h"), 20},
-            {std::pair<std::string, std::string>("9", "h"), 21},
-            {std::pair<std::string, std::string>("T", "h"), 22},
-            {std::pair<std::string, std::string>("J", "h"), 23},
-            {std::pair<std::string, std::string>("Q", "h"), 24},
-            {std::pair<std::string, std::string>("K", "h"), 25},
+            // region Moves to Foundation (To Spades)
+            {Move(kA, kS, k2, kS),           kMoveAs2s},
+            {Move(k2, kS, k3, kS),           kMove2s3s},
+            {Move(k3, kS, k4, kS),           kMove3s4s},
+            {Move(k4, kS, k5, kS),           kMove4s5s},
+            {Move(k5, kS, k6, kS),           kMove5s6s},
+            {Move(k6, kS, k7, kS),           kMove6s7s},
+            {Move(k7, kS, k8, kS),           kMove7s8s},
+            {Move(k8, kS, k9, kS),           kMove8s9s},
+            {Move(k9, kS, kT, kS),           kMove9sTs},
+            {Move(kT, kS, kJ, kS),           kMoveTsJs},
+            {Move(kJ, kS, kQ, kS),           kMoveJsQs},
+            {Move(kQ, kS, kK, kS),           kMoveQsKs},
+            // endregion
 
-            // Clubs
-            {std::pair<std::string, std::string>("A", "c"), 26},
-            {std::pair<std::string, std::string>("2", "c"), 27},
-            {std::pair<std::string, std::string>("3", "c"), 28},
-            {std::pair<std::string, std::string>("4", "c"), 29},
-            {std::pair<std::string, std::string>("5", "c"), 30},
-            {std::pair<std::string, std::string>("6", "c"), 31},
-            {std::pair<std::string, std::string>("7", "c"), 32},
-            {std::pair<std::string, std::string>("8", "c"), 33},
-            {std::pair<std::string, std::string>("9", "c"), 34},
-            {std::pair<std::string, std::string>("T", "c"), 35},
-            {std::pair<std::string, std::string>("J", "c"), 36},
-            {std::pair<std::string, std::string>("Q", "c"), 37},
-            {std::pair<std::string, std::string>("K", "c"), 38},
+            // region Moves to Foundation (To Hearts)
+            {Move(kA, kH, k2, kH),           kMoveAh2h},
+            {Move(k2, kH, k3, kH),           kMove2h3h},
+            {Move(k3, kH, k4, kH),           kMove3h4h},
+            {Move(k4, kH, k5, kH),           kMove4h5h},
+            {Move(k5, kH, k6, kH),           kMove5h6h},
+            {Move(k6, kH, k7, kH),           kMove6h7h},
+            {Move(k7, kH, k8, kH),           kMove7h8h},
+            {Move(k8, kH, k9, kH),           kMove8h9h},
+            {Move(k9, kH, kT, kH),           kMove9hTh},
+            {Move(kT, kH, kJ, kH),           kMoveThJh},
+            {Move(kJ, kH, kQ, kH),           kMoveJhQh},
+            {Move(kQ, kH, kK, kH),           kMoveQhKh},
+            // endregion
 
-            // Diamonds
-            {std::pair<std::string, std::string>("A", "d"), 39},
-            {std::pair<std::string, std::string>("2", "d"), 40},
-            {std::pair<std::string, std::string>("3", "d"), 41},
-            {std::pair<std::string, std::string>("4", "d"), 42},
-            {std::pair<std::string, std::string>("5", "d"), 43},
-            {std::pair<std::string, std::string>("6", "d"), 44},
-            {std::pair<std::string, std::string>("7", "d"), 45},
-            {std::pair<std::string, std::string>("8", "d"), 46},
-            {std::pair<std::string, std::string>("9", "d"), 47},
-            {std::pair<std::string, std::string>("T", "d"), 48},
-            {std::pair<std::string, std::string>("J", "d"), 49},
-            {std::pair<std::string, std::string>("Q", "d"), 50},
-            {std::pair<std::string, std::string>("K", "d"), 51},
-            //endregion
+            // region Moves to Foundation (To Clubs)
+            {Move(kA, kC, k2, kC),           kMoveAc2c},
+            {Move(k2, kC, k3, kC),           kMove2c3c},
+            {Move(k3, kC, k4, kC),           kMove3c4c},
+            {Move(k4, kC, k5, kC),           kMove4c5c},
+            {Move(k5, kC, k6, kC),           kMove5c6c},
+            {Move(k6, kC, k7, kC),           kMove6c7c},
+            {Move(k7, kC, k8, kC),           kMove7c8c},
+            {Move(k8, kC, k9, kC),           kMove8c9c},
+            {Move(k9, kC, kT, kC),           kMove9cTc},
+            {Move(kT, kC, kJ, kC),           kMoveTcJc},
+            {Move(kJ, kC, kQ, kC),           kMoveJcQc},
+            {Move(kQ, kC, kK, kC),           kMoveQcKc},
+            // endregion
+
+            // region Moves to Foundation (To Diamonds)
+            {Move(kA, kD, k2, kD),           kMoveAd2d},
+            {Move(k2, kD, k3, kD),           kMove2d3d},
+            {Move(k3, kD, k4, kD),           kMove3d4d},
+            {Move(k4, kD, k5, kD),           kMove4d5d},
+            {Move(k5, kD, k6, kD),           kMove5d6d},
+            {Move(k6, kD, k7, kD),           kMove6d7d},
+            {Move(k7, kD, k8, kD),           kMove7d8d},
+            {Move(k8, kD, k9, kD),           kMove8d9d},
+            {Move(k9, kD, kT, kD),           kMove9dTd},
+            {Move(kT, kD, kJ, kD),           kMoveTdJd},
+            {Move(kJ, kD, kQ, kD),           kMoveJdQd},
+            {Move(kQ, kD, kK, kD),           kMoveQdKd},
+            // endregion
+
+            // Spades --------------------------------------------------------------------------------------------------
+            
+            // region Moves to Tableau (Spades <- Hearts)
+            {Move(k2, kS, kA, kH), kMove2sAh},
+            {Move(k3, kS, k2, kH), kMove3s2h},
+            {Move(k4, kS, k3, kH), kMove4s3h},
+            {Move(k5, kS, k4, kH), kMove5s4h},
+            {Move(k6, kS, k5, kH), kMove6s5h},
+            {Move(k7, kS, k6, kH), kMove7s6h},
+            {Move(k8, kS, k7, kH), kMove8s7h},
+            {Move(k9, kS, k8, kH), kMove9s8h},
+            {Move(kT, kS, k9, kH), kMoveTs9h},
+            {Move(kJ, kS, kT, kH), kMoveJsTh},
+            {Move(kQ, kS, kJ, kH), kMoveQsJh},
+            {Move(kK, kS, kQ, kH), kMoveKsQh},
+            // endregion
+
+            // region Moves to Tableau (Spades <- Diamonds)
+            {Move(k2, kS, kA, kD), kMove2sAd},
+            {Move(k3, kS, k2, kD), kMove3s2d},
+            {Move(k4, kS, k3, kD), kMove4s3d},
+            {Move(k5, kS, k4, kD), kMove5s4d},
+            {Move(k6, kS, k5, kD), kMove6s5d},
+            {Move(k7, kS, k6, kD), kMove7s6d},
+            {Move(k8, kS, k7, kD), kMove8s7d},
+            {Move(k9, kS, k8, kD), kMove9s8d},
+            {Move(kT, kS, k9, kD), kMoveTs9d},
+            {Move(kJ, kS, kT, kD), kMoveJsTd},
+            {Move(kQ, kS, kJ, kD), kMoveQsJd},
+            {Move(kK, kS, kQ, kD), kMoveKsQd},
+            // endregion
+            
+            // Hearts --------------------------------------------------------------------------------------------------
+            
+            // region Moves to Tableau (Hearts <- Spades)
+            {Move(k2, kH, kA, kS), kMove2hAs},
+            {Move(k3, kH, k2, kS), kMove3h2s},
+            {Move(k4, kH, k3, kS), kMove4h3s},
+            {Move(k5, kH, k4, kS), kMove5h4s},
+            {Move(k6, kH, k5, kS), kMove6h5s},
+            {Move(k7, kH, k6, kS), kMove7h6s},
+            {Move(k8, kH, k7, kS), kMove8h7s},
+            {Move(k9, kH, k8, kS), kMove9h8s},
+            {Move(kT, kH, k9, kS), kMoveTh9s},
+            {Move(kJ, kH, kT, kS), kMoveJhTs},
+            {Move(kQ, kH, kJ, kS), kMoveQhJs},
+            {Move(kK, kH, kQ, kS), kMoveKhQs},
+            // endregion
+
+            // region Moves to Tableau (Hearts <- Clubs)
+            {Move(k2, kH, kA, kC), kMove2hAc},
+            {Move(k3, kH, k2, kC), kMove3h2c},
+            {Move(k4, kH, k3, kC), kMove4h3c},
+            {Move(k5, kH, k4, kC), kMove5h4c},
+            {Move(k6, kH, k5, kC), kMove6h5c},
+            {Move(k7, kH, k6, kC), kMove7h6c},
+            {Move(k8, kH, k7, kC), kMove8h7c},
+            {Move(k9, kH, k8, kC), kMove9h8c},
+            {Move(kT, kH, k9, kC), kMoveTh9c},
+            {Move(kJ, kH, kT, kC), kMoveJhTc},
+            {Move(kQ, kH, kJ, kC), kMoveQhJc},
+            {Move(kK, kH, kQ, kC), kMoveKhQc},
+            // endregion
+            
+            // Clubs ---------------------------------------------------------------------------------------------------
+            
+            // region Moves to Tableau (Clubs <- Hearts)
+            {Move(k2, kC, kA, kH), kMove2cAh},
+            {Move(k3, kC, k2, kH), kMove3c2h},
+            {Move(k4, kC, k3, kH), kMove4c3h},
+            {Move(k5, kC, k4, kH), kMove5c4h},
+            {Move(k6, kC, k5, kH), kMove6c5h},
+            {Move(k7, kC, k6, kH), kMove7c6h},
+            {Move(k8, kC, k7, kH), kMove8c7h},
+            {Move(k9, kC, k8, kH), kMove9c8h},
+            {Move(kT, kC, k9, kH), kMoveTc9h},
+            {Move(kJ, kC, kT, kH), kMoveJcTh},
+            {Move(kQ, kC, kJ, kH), kMoveQcJh},
+            {Move(kK, kC, kQ, kH), kMoveKcQh},
+            // endregion
+
+            // region Moves to Tableau (Clubs <- Diamonds)
+            {Move(k2, kC, kA, kD), kMove2cAd},
+            {Move(k3, kC, k2, kD), kMove3c2d},
+            {Move(k4, kC, k3, kD), kMove4c3d},
+            {Move(k5, kC, k4, kD), kMove5c4d},
+            {Move(k6, kC, k5, kD), kMove6c5d},
+            {Move(k7, kC, k6, kD), kMove7c6d},
+            {Move(k8, kC, k7, kD), kMove8c7d},
+            {Move(k9, kC, k8, kD), kMove9c8d},
+            {Move(kT, kC, k9, kD), kMoveTc9d},
+            {Move(kJ, kC, kT, kD), kMoveJcTd},
+            {Move(kQ, kC, kJ, kD), kMoveQcJd},
+            {Move(kK, kC, kQ, kD), kMoveKcQd},
+            // endregion
+
+            // Diamonds ------------------------------------------------------------------------------------------------
+
+            // region Moves to Tableau (Diamonds <- Spades)
+            {Move(k2, kD, kA, kS), kMove2dAs},
+            {Move(k3, kD, k2, kS), kMove3d2s},
+            {Move(k4, kD, k3, kS), kMove4d3s},
+            {Move(k5, kD, k4, kS), kMove5d4s},
+            {Move(k6, kD, k5, kS), kMove6d5s},
+            {Move(k7, kD, k6, kS), kMove7d6s},
+            {Move(k8, kD, k7, kS), kMove8d7s},
+            {Move(k9, kD, k8, kS), kMove9d8s},
+            {Move(kT, kD, k9, kS), kMoveTd9s},
+            {Move(kJ, kD, kT, kS), kMoveJdTs},
+            {Move(kQ, kD, kJ, kS), kMoveQdJs},
+            {Move(kK, kD, kQ, kS), kMoveKdQs},
+            // endregion
+
+            // region Moves to Tableau (Diamonds <- Clubs)
+            {Move(k2, kD, kA, kC), kMove2dAc},
+            {Move(k3, kD, k2, kC), kMove3d2c},
+            {Move(k4, kD, k3, kC), kMove4d3c},
+            {Move(k5, kD, k4, kC), kMove5d4c},
+            {Move(k6, kD, k5, kC), kMove6d5c},
+            {Move(k7, kD, k6, kC), kMove7d6c},
+            {Move(k8, kD, k7, kC), kMove8d7c},
+            {Move(k9, kD, k8, kC), kMove9d8c},
+            {Move(kT, kD, k9, kC), kMoveTd9c},
+            {Move(kJ, kD, kT, kC), kMoveJdTc},
+            {Move(kQ, kD, kJ, kC), kMoveQdJc},
+            {Move(kK, kD, kQ, kC), kMoveKdQc},
+            // endregion
+            
+            // endregion
     };
 
-    const std::map<std::pair<int, int>, Action> MOVE_TO_ACTION = {
-            //region Mapping of std::pair<int, int> where ints are card indices to an action declared in ActionType
+    const std::map<Action, Move> ACTION_TO_MOVE = {
+            // region Mapping of an action declared in ActionType to a move;
 
-            // Special Moves ===========================================================================================
-            // To Empty Tableau ----------------------------------------------------------------------------------------
-            {{(int) Card("", ""), (int) Card("K", "s")}, kMove__Ks},
-            {{(int) Card("", ""), (int) Card("K", "h")}, kMove__Kh},
-            {{(int) Card("", ""), (int) Card("K", "c")}, kMove__Kc},
-            {{(int) Card("", ""), (int) Card("K", "d")}, kMove__Kd},
+            // region Moves To Empty Tableau
+            {kMove__Ks, Move(kNoRank, kNoSuit, kK, kS)},
+            {kMove__Kh, Move(kNoRank, kNoSuit, kK, kH)},
+            {kMove__Kc, Move(kNoRank, kNoSuit, kK, kC)},
+            {kMove__Kd, Move(kNoRank, kNoSuit, kK, kD)},
+            // endregion
 
-            // To Empty Foundation -------------------------------------------------------------------------------------
-            {{(int) Card("", "h"), (int) Card("A", "h")}, kMove__Ah},
-            {{(int) Card("", "s"), (int) Card("A", "s")}, kMove__As},
-            {{(int) Card("", "c"), (int) Card("A", "c")}, kMove__Ac},
-            {{(int) Card("", "d"), (int) Card("A", "d")}, kMove__Ad},
+            // region Moves To Empty Foundation
+            {kMove__As, Move(kNoRank, kS, kA, kS)},
+            {kMove__Ah, Move(kNoRank, kH, kA, kH)},
+            {kMove__Ac, Move(kNoRank, kC, kA, kC)},
+            {kMove__Ad, Move(kNoRank, kD, kA, kD)},
+            // endregion
 
-            // Foundation Moves ========================================================================================
-            // To Spades -----------------------------------------------------------------------------------------------
-            {{(int) Card("A", "s"), (int) Card("2", "s")}, kMoveAs2s},
-            {{(int) Card("2", "s"), (int) Card("3", "s")}, kMove2s3s},
-            {{(int) Card("3", "s"), (int) Card("4", "s")}, kMove3s4s},
-            {{(int) Card("4", "s"), (int) Card("5", "s")}, kMove4s5s},
-            {{(int) Card("5", "s"), (int) Card("6", "s")}, kMove5s6s},
-            {{(int) Card("6", "s"), (int) Card("7", "s")}, kMove6s7s},
-            {{(int) Card("7", "s"), (int) Card("8", "s")}, kMove7s8s},
-            {{(int) Card("8", "s"), (int) Card("9", "s")}, kMove8s9s},
-            {{(int) Card("9", "s"), (int) Card("T", "s")}, kMove9sTs},
-            {{(int) Card("T", "s"), (int) Card("J", "s")}, kMoveTsJs},
-            {{(int) Card("J", "s"), (int) Card("Q", "s")}, kMoveJsQs},
-            {{(int) Card("Q", "s"), (int) Card("K", "s")}, kMoveQsKs},
+            // region Moves to Foundation (To Spades)
+            {kMoveAs2s, Move(kA, kS, k2, kS)},
+            {kMove2s3s, Move(k2, kS, k3, kS)},
+            {kMove3s4s, Move(k3, kS, k4, kS)},
+            {kMove4s5s, Move(k4, kS, k5, kS)},
+            {kMove5s6s, Move(k5, kS, k6, kS)},
+            {kMove6s7s, Move(k6, kS, k7, kS)},
+            {kMove7s8s, Move(k7, kS, k8, kS)},
+            {kMove8s9s, Move(k8, kS, k9, kS)},
+            {kMove9sTs, Move(k9, kS, kT, kS)},
+            {kMoveTsJs, Move(kT, kS, kJ, kS)},
+            {kMoveJsQs, Move(kJ, kS, kQ, kS)},
+            {kMoveQsKs, Move(kQ, kS, kK, kS)},
+            // endregion
 
-            // To Hearts -----------------------------------------------------------------------------------------------
-            {{(int) Card("A", "h"), (int) Card("2", "h")}, kMoveAh2h},
-            {{(int) Card("2", "h"), (int) Card("3", "h")}, kMove2h3h},
-            {{(int) Card("3", "h"), (int) Card("4", "h")}, kMove3h4h},
-            {{(int) Card("4", "h"), (int) Card("5", "h")}, kMove4h5h},
-            {{(int) Card("5", "h"), (int) Card("6", "h")}, kMove5h6h},
-            {{(int) Card("6", "h"), (int) Card("7", "h")}, kMove6h7h},
-            {{(int) Card("7", "h"), (int) Card("8", "h")}, kMove7h8h},
-            {{(int) Card("8", "h"), (int) Card("9", "h")}, kMove8h9h},
-            {{(int) Card("9", "h"), (int) Card("T", "h")}, kMove9hTh},
-            {{(int) Card("T", "h"), (int) Card("J", "h")}, kMoveThJh},
-            {{(int) Card("J", "h"), (int) Card("Q", "h")}, kMoveJhQh},
-            {{(int) Card("Q", "h"), (int) Card("K", "h")}, kMoveQhKh},
+            // region Moves to Foundation (To Hearts)
+            {kMoveAh2h, Move(kA, kH, k2, kH)},
+            {kMove2h3h, Move(k2, kH, k3, kH)},
+            {kMove3h4h, Move(k3, kH, k4, kH)},
+            {kMove4h5h, Move(k4, kH, k5, kH)},
+            {kMove5h6h, Move(k5, kH, k6, kH)},
+            {kMove6h7h, Move(k6, kH, k7, kH)},
+            {kMove7h8h, Move(k7, kH, k8, kH)},
+            {kMove8h9h, Move(k8, kH, k9, kH)},
+            {kMove9hTh, Move(k9, kH, kT, kH)},
+            {kMoveThJh, Move(kT, kH, kJ, kH)},
+            {kMoveJhQh, Move(kJ, kH, kQ, kH)},
+            {kMoveQhKh, Move(kQ, kH, kK, kH)},
+            // endregion
 
-            // To Clubs ------------------------------------------------------------------------------------------------
-            {{(int) Card("A", "c"), (int) Card("2", "c")}, kMoveAc2c},
-            {{(int) Card("2", "c"), (int) Card("3", "c")}, kMove2c3c},
-            {{(int) Card("3", "c"), (int) Card("4", "c")}, kMove3c4c},
-            {{(int) Card("4", "c"), (int) Card("5", "c")}, kMove4c5c},
-            {{(int) Card("5", "c"), (int) Card("6", "c")}, kMove5c6c},
-            {{(int) Card("6", "c"), (int) Card("7", "c")}, kMove6c7c},
-            {{(int) Card("7", "c"), (int) Card("8", "c")}, kMove7c8c},
-            {{(int) Card("8", "c"), (int) Card("9", "c")}, kMove8c9c},
-            {{(int) Card("9", "c"), (int) Card("T", "c")}, kMove9cTc},
-            {{(int) Card("T", "c"), (int) Card("J", "c")}, kMoveTcJc},
-            {{(int) Card("J", "c"), (int) Card("Q", "c")}, kMoveJcQc},
-            {{(int) Card("Q", "c"), (int) Card("K", "c")}, kMoveQcKc},
+            // region Moves to Foundation (To Clubs)
+            {kMoveAc2c, Move(kA, kC, k2, kC)},
+            {kMove2c3c, Move(k2, kC, k3, kC)},
+            {kMove3c4c, Move(k3, kC, k4, kC)},
+            {kMove4c5c, Move(k4, kC, k5, kC)},
+            {kMove5c6c, Move(k5, kC, k6, kC)},
+            {kMove6c7c, Move(k6, kC, k7, kC)},
+            {kMove7c8c, Move(k7, kC, k8, kC)},
+            {kMove8c9c, Move(k8, kC, k9, kC)},
+            {kMove9cTc, Move(k9, kC, kT, kC)},
+            {kMoveTcJc, Move(kT, kC, kJ, kC)},
+            {kMoveJcQc, Move(kJ, kC, kQ, kC)},
+            {kMoveQcKc, Move(kQ, kC, kK, kC)},
+            // endregion
 
-            // To Diamonds ---------------------------------------------------------------------------------------------
-            {{(int) Card("A", "d"), (int) Card("2", "d")}, kMoveAd2d},
-            {{(int) Card("2", "d"), (int) Card("3", "d")}, kMove2d3d},
-            {{(int) Card("3", "d"), (int) Card("4", "d")}, kMove3d4d},
-            {{(int) Card("4", "d"), (int) Card("5", "d")}, kMove4d5d},
-            {{(int) Card("5", "d"), (int) Card("6", "d")}, kMove5d6d},
-            {{(int) Card("6", "d"), (int) Card("7", "d")}, kMove6d7d},
-            {{(int) Card("7", "d"), (int) Card("8", "d")}, kMove7d8d},
-            {{(int) Card("8", "d"), (int) Card("9", "d")}, kMove8d9d},
-            {{(int) Card("9", "d"), (int) Card("T", "d")}, kMove9dTd},
-            {{(int) Card("T", "d"), (int) Card("J", "d")}, kMoveTdJd},
-            {{(int) Card("J", "d"), (int) Card("Q", "d")}, kMoveJdQd},
-            {{(int) Card("Q", "d"), (int) Card("K", "d")}, kMoveQdKd},
+            // region Moves to Foundation (To Diamonds)
+            {kMoveAd2d, Move(kA, kD, k2, kD)},
+            {kMove2d3d, Move(k2, kD, k3, kD)},
+            {kMove3d4d, Move(k3, kD, k4, kD)},
+            {kMove4d5d, Move(k4, kD, k5, kD)},
+            {kMove5d6d, Move(k5, kD, k6, kD)},
+            {kMove6d7d, Move(k6, kD, k7, kD)},
+            {kMove7d8d, Move(k7, kD, k8, kD)},
+            {kMove8d9d, Move(k8, kD, k9, kD)},
+            {kMove9dTd, Move(k9, kD, kT, kD)},
+            {kMoveTdJd, Move(kT, kD, kJ, kD)},
+            {kMoveJdQd, Move(kJ, kD, kQ, kD)},
+            {kMoveQdKd, Move(kQ, kD, kK, kD)},
+            // endregion
 
-            // Tableau Moves ===========================================================================================
-            // To Spades -----------------------------------------------------------------------------------------------
-            {{(int) Card("2", "s"), (int) Card("A", "h")}, kMove2sAh},
-            {{(int) Card("3", "s"), (int) Card("2", "h")}, kMove3s2h},
-            {{(int) Card("4", "s"), (int) Card("3", "h")}, kMove4s3h},
-            {{(int) Card("5", "s"), (int) Card("4", "h")}, kMove5s4h},
-            {{(int) Card("6", "s"), (int) Card("5", "h")}, kMove6s5h},
-            {{(int) Card("7", "s"), (int) Card("6", "h")}, kMove7s6h},
-            {{(int) Card("8", "s"), (int) Card("7", "h")}, kMove8s7h},
-            {{(int) Card("9", "s"), (int) Card("8", "h")}, kMove9s8h},
-            {{(int) Card("T", "s"), (int) Card("9", "h")}, kMoveTs9h},
-            {{(int) Card("J", "s"), (int) Card("T", "h")}, kMoveJsTh},
-            {{(int) Card("Q", "s"), (int) Card("J", "h")}, kMoveQsJh},
-            {{(int) Card("K", "s"), (int) Card("Q", "h")}, kMoveKsQh},
-            {{(int) Card("2", "s"), (int) Card("A", "d")}, kMove2sAd},
-            {{(int) Card("3", "s"), (int) Card("2", "d")}, kMove3s2d},
-            {{(int) Card("4", "s"), (int) Card("3", "d")}, kMove4s3d},
-            {{(int) Card("5", "s"), (int) Card("4", "d")}, kMove5s4d},
-            {{(int) Card("6", "s"), (int) Card("5", "d")}, kMove6s5d},
-            {{(int) Card("7", "s"), (int) Card("6", "d")}, kMove7s6d},
-            {{(int) Card("8", "s"), (int) Card("7", "d")}, kMove8s7d},
-            {{(int) Card("9", "s"), (int) Card("8", "d")}, kMove9s8d},
-            {{(int) Card("T", "s"), (int) Card("9", "d")}, kMoveTs9d},
-            {{(int) Card("J", "s"), (int) Card("T", "d")}, kMoveJsTd},
-            {{(int) Card("Q", "s"), (int) Card("J", "d")}, kMoveQsJd},
-            {{(int) Card("K", "s"), (int) Card("Q", "d")}, kMoveKsQd},
+            // Spades --------------------------------------------------------------------------------------------------
 
-            // To Hearts -----------------------------------------------------------------------------------------------
-            {{(int) Card("2", "h"), (int) Card("A", "s")}, kMove2hAs},
-            {{(int) Card("3", "h"), (int) Card("2", "s")}, kMove3h2s},
-            {{(int) Card("4", "h"), (int) Card("3", "s")}, kMove4h3s},
-            {{(int) Card("5", "h"), (int) Card("4", "s")}, kMove5h4s},
-            {{(int) Card("6", "h"), (int) Card("5", "s")}, kMove6h5s},
-            {{(int) Card("7", "h"), (int) Card("6", "s")}, kMove7h6s},
-            {{(int) Card("8", "h"), (int) Card("7", "s")}, kMove8h7s},
-            {{(int) Card("9", "h"), (int) Card("8", "s")}, kMove9h8s},
-            {{(int) Card("T", "h"), (int) Card("9", "s")}, kMoveTh9s},
-            {{(int) Card("J", "h"), (int) Card("T", "s")}, kMoveJhTs},
-            {{(int) Card("Q", "h"), (int) Card("J", "s")}, kMoveQhJs},
-            {{(int) Card("K", "h"), (int) Card("Q", "s")}, kMoveKhQs},
-            {{(int) Card("2", "h"), (int) Card("A", "c")}, kMove2hAc},
-            {{(int) Card("3", "h"), (int) Card("2", "c")}, kMove3h2c},
-            {{(int) Card("4", "h"), (int) Card("3", "c")}, kMove4h3c},
-            {{(int) Card("5", "h"), (int) Card("4", "c")}, kMove5h4c},
-            {{(int) Card("6", "h"), (int) Card("5", "c")}, kMove6h5c},
-            {{(int) Card("7", "h"), (int) Card("6", "c")}, kMove7h6c},
-            {{(int) Card("8", "h"), (int) Card("7", "c")}, kMove8h7c},
-            {{(int) Card("9", "h"), (int) Card("8", "c")}, kMove9h8c},
-            {{(int) Card("T", "h"), (int) Card("9", "c")}, kMoveTh9c},
-            {{(int) Card("J", "h"), (int) Card("T", "c")}, kMoveJhTc},
-            {{(int) Card("Q", "h"), (int) Card("J", "c")}, kMoveQhJc},
-            {{(int) Card("K", "h"), (int) Card("Q", "c")}, kMoveKhQc},
+            // region Moves to Tableau (Spades <- Hearts)
+            {kMove2sAh, Move(k2, kS, kA, kH)},
+            {kMove3s2h, Move(k3, kS, k2, kH)},
+            {kMove4s3h, Move(k4, kS, k3, kH)},
+            {kMove5s4h, Move(k5, kS, k4, kH)},
+            {kMove6s5h, Move(k6, kS, k5, kH)},
+            {kMove7s6h, Move(k7, kS, k6, kH)},
+            {kMove8s7h, Move(k8, kS, k7, kH)},
+            {kMove9s8h, Move(k9, kS, k8, kH)},
+            {kMoveTs9h, Move(kT, kS, k9, kH)},
+            {kMoveJsTh, Move(kJ, kS, kT, kH)},
+            {kMoveQsJh, Move(kQ, kS, kJ, kH)},
+            {kMoveKsQh, Move(kK, kS, kQ, kH)},
+            // endregion
 
-            // To Clubs ------------------------------------------------------------------------------------------------
-            {{(int) Card("2", "c"), (int) Card("A", "h")}, kMove2cAh},
-            {{(int) Card("3", "c"), (int) Card("2", "h")}, kMove3c2h},
-            {{(int) Card("4", "c"), (int) Card("3", "h")}, kMove4c3h},
-            {{(int) Card("5", "c"), (int) Card("4", "h")}, kMove5c4h},
-            {{(int) Card("6", "c"), (int) Card("5", "h")}, kMove6c5h},
-            {{(int) Card("7", "c"), (int) Card("6", "h")}, kMove7c6h},
-            {{(int) Card("8", "c"), (int) Card("7", "h")}, kMove8c7h},
-            {{(int) Card("9", "c"), (int) Card("8", "h")}, kMove9c8h},
-            {{(int) Card("T", "c"), (int) Card("9", "h")}, kMoveTc9h},
-            {{(int) Card("J", "c"), (int) Card("T", "h")}, kMoveJcTh},
-            {{(int) Card("Q", "c"), (int) Card("J", "h")}, kMoveQcJh},
-            {{(int) Card("K", "c"), (int) Card("Q", "h")}, kMoveKcQh},
-            {{(int) Card("2", "c"), (int) Card("A", "d")}, kMove2cAd},
-            {{(int) Card("3", "c"), (int) Card("2", "d")}, kMove3c2d},
-            {{(int) Card("4", "c"), (int) Card("3", "d")}, kMove4c3d},
-            {{(int) Card("5", "c"), (int) Card("4", "d")}, kMove5c4d},
-            {{(int) Card("6", "c"), (int) Card("5", "d")}, kMove6c5d},
-            {{(int) Card("7", "c"), (int) Card("6", "d")}, kMove7c6d},
-            {{(int) Card("8", "c"), (int) Card("7", "d")}, kMove8c7d},
-            {{(int) Card("9", "c"), (int) Card("8", "d")}, kMove9c8d},
-            {{(int) Card("T", "c"), (int) Card("9", "d")}, kMoveTc9d},
-            {{(int) Card("J", "c"), (int) Card("T", "d")}, kMoveJcTd},
-            {{(int) Card("Q", "c"), (int) Card("J", "d")}, kMoveQcJd},
-            {{(int) Card("K", "c"), (int) Card("Q", "d")}, kMoveKcQd},
+            // region Moves to Tableau (Spades <- Diamonds)
+            {kMove2sAd, Move(k2, kS, kA, kD)},
+            {kMove3s2d, Move(k3, kS, k2, kD)},
+            {kMove4s3d, Move(k4, kS, k3, kD)},
+            {kMove5s4d, Move(k5, kS, k4, kD)},
+            {kMove6s5d, Move(k6, kS, k5, kD)},
+            {kMove7s6d, Move(k7, kS, k6, kD)},
+            {kMove8s7d, Move(k8, kS, k7, kD)},
+            {kMove9s8d, Move(k9, kS, k8, kD)},
+            {kMoveTs9d, Move(kT, kS, k9, kD)},
+            {kMoveJsTd, Move(kJ, kS, kT, kD)},
+            {kMoveQsJd, Move(kQ, kS, kJ, kD)},
+            {kMoveKsQd, Move(kK, kS, kQ, kD)},
+            // endregion
 
-            // To Diamonds ---------------------------------------------------------------------------------------------
-            {{(int) Card("2", "d"), (int) Card("A", "s")}, kMove2dAs},
-            {{(int) Card("3", "d"), (int) Card("2", "s")}, kMove3d2s},
-            {{(int) Card("4", "d"), (int) Card("3", "s")}, kMove4d3s},
-            {{(int) Card("5", "d"), (int) Card("4", "s")}, kMove5d4s},
-            {{(int) Card("6", "d"), (int) Card("5", "s")}, kMove6d5s},
-            {{(int) Card("7", "d"), (int) Card("6", "s")}, kMove7d6s},
-            {{(int) Card("8", "d"), (int) Card("7", "s")}, kMove8d7s},
-            {{(int) Card("9", "d"), (int) Card("8", "s")}, kMove9d8s},
-            {{(int) Card("T", "d"), (int) Card("9", "s")}, kMoveTd9s},
-            {{(int) Card("J", "d"), (int) Card("T", "s")}, kMoveJdTs},
-            {{(int) Card("Q", "d"), (int) Card("J", "s")}, kMoveQdJs},
-            {{(int) Card("K", "d"), (int) Card("Q", "s")}, kMoveKdQs},
-            {{(int) Card("2", "d"), (int) Card("A", "c")}, kMove2dAc},
-            {{(int) Card("3", "d"), (int) Card("2", "c")}, kMove3d2c},
-            {{(int) Card("4", "d"), (int) Card("3", "c")}, kMove4d3c},
-            {{(int) Card("5", "d"), (int) Card("4", "c")}, kMove5d4c},
-            {{(int) Card("6", "d"), (int) Card("5", "c")}, kMove6d5c},
-            {{(int) Card("7", "d"), (int) Card("6", "c")}, kMove7d6c},
-            {{(int) Card("8", "d"), (int) Card("7", "c")}, kMove8d7c},
-            {{(int) Card("9", "d"), (int) Card("8", "c")}, kMove9d8c},
-            {{(int) Card("T", "d"), (int) Card("9", "c")}, kMoveTd9c},
-            {{(int) Card("J", "d"), (int) Card("T", "c")}, kMoveJdTc},
-            {{(int) Card("Q", "d"), (int) Card("J", "c")}, kMoveQdJc},
-            {{(int) Card("K", "d"), (int) Card("Q", "c")}, kMoveKdQc},
-            //endregion
-    };
+            // Hearts --------------------------------------------------------------------------------------------------
 
-    const std::map<Action, std::pair<int, int>> ACTION_TO_MOVE = {
-            //region Mapping of Action to a std::pair<int, int>, representing target & source card indices
+            // region Moves to Tableau (Hearts <- Spades)
+            {kMove2hAs, Move(k2, kH, kA, kS)},
+            {kMove3h2s, Move(k3, kH, k2, kS)},
+            {kMove4h3s, Move(k4, kH, k3, kS)},
+            {kMove5h4s, Move(k5, kH, k4, kS)},
+            {kMove6h5s, Move(k6, kH, k5, kS)},
+            {kMove7h6s, Move(k7, kH, k6, kS)},
+            {kMove8h7s, Move(k8, kH, k7, kS)},
+            {kMove9h8s, Move(k9, kH, k8, kS)},
+            {kMoveTh9s, Move(kT, kH, k9, kS)},
+            {kMoveJhTs, Move(kJ, kH, kT, kS)},
+            {kMoveQhJs, Move(kQ, kH, kJ, kS)},
+            {kMoveKhQs, Move(kK, kH, kQ, kS)},
+            // endregion
 
-            // Special Moves ===============================================================================================
-            // To Empty Tableau --------------------------------------------------------------------------------------------
-            {kMove__Ks, {(int) Card("", ""), (int) Card("K", "s")}},
-            {kMove__Kh, {(int) Card("", ""), (int) Card("K", "h")}},
-            {kMove__Kc, {(int) Card("", ""), (int) Card("K", "c")}},
-            {kMove__Kd, {(int) Card("", ""), (int) Card("K", "d")}},
+            // region Moves to Tableau (Hearts <- Clubs)
+            {kMove2hAc, Move(k2, kH, kA, kC)},
+            {kMove3h2c, Move(k3, kH, k2, kC)},
+            {kMove4h3c, Move(k4, kH, k3, kC)},
+            {kMove5h4c, Move(k5, kH, k4, kC)},
+            {kMove6h5c, Move(k6, kH, k5, kC)},
+            {kMove7h6c, Move(k7, kH, k6, kC)},
+            {kMove8h7c, Move(k8, kH, k7, kC)},
+            {kMove9h8c, Move(k9, kH, k8, kC)},
+            {kMoveTh9c, Move(kT, kH, k9, kC)},
+            {kMoveJhTc, Move(kJ, kH, kT, kC)},
+            {kMoveQhJc, Move(kQ, kH, kJ, kC)},
+            {kMoveKhQc, Move(kK, kH, kQ, kC)},
+            // endregion
 
-            // To Empty Foundation -------------------------------------------------------------------------------------
-            {kMove__Ah, {(int) Card("", "h"), (int) Card("A", "h")}},
-            {kMove__As, {(int) Card("", "s"), (int) Card("A", "s")}},
-            {kMove__Ac, {(int) Card("", "c"), (int) Card("A", "c")}}, // <-----
-            {kMove__Ad, {(int) Card("", "d"), (int) Card("A", "d")}},
+            // Clubs ---------------------------------------------------------------------------------------------------
 
-            // Foundation Moves ========================================================================================
-            // To Spades -----------------------------------------------------------------------------------------------
-            {kMoveAs2s, {(int) Card("A", "s"), (int) Card("2", "s")}},
-            {kMove2s3s, {(int) Card("2", "s"), (int) Card("3", "s")}},
-            {kMove3s4s, {(int) Card("3", "s"), (int) Card("4", "s")}},
-            {kMove4s5s, {(int) Card("4", "s"), (int) Card("5", "s")}},
-            {kMove5s6s, {(int) Card("5", "s"), (int) Card("6", "s")}},
-            {kMove6s7s, {(int) Card("6", "s"), (int) Card("7", "s")}},
-            {kMove7s8s, {(int) Card("7", "s"), (int) Card("8", "s")}},
-            {kMove8s9s, {(int) Card("8", "s"), (int) Card("9", "s")}},
-            {kMove9sTs, {(int) Card("9", "s"), (int) Card("T", "s")}},
-            {kMoveTsJs, {(int) Card("T", "s"), (int) Card("J", "s")}},
-            {kMoveJsQs, {(int) Card("J", "s"), (int) Card("Q", "s")}},
-            {kMoveQsKs, {(int) Card("Q", "s"), (int) Card("K", "s")}},
+            // region Moves to Tableau (Clubs <- Hearts)
+            {kMove2cAh, Move(k2, kC, kA, kH)},
+            {kMove3c2h, Move(k3, kC, k2, kH)},
+            {kMove4c3h, Move(k4, kC, k3, kH)},
+            {kMove5c4h, Move(k5, kC, k4, kH)},
+            {kMove6c5h, Move(k6, kC, k5, kH)},
+            {kMove7c6h, Move(k7, kC, k6, kH)},
+            {kMove8c7h, Move(k8, kC, k7, kH)},
+            {kMove9c8h, Move(k9, kC, k8, kH)},
+            {kMoveTc9h, Move(kT, kC, k9, kH)},
+            {kMoveJcTh, Move(kJ, kC, kT, kH)},
+            {kMoveQcJh, Move(kQ, kC, kJ, kH)},
+            {kMoveKcQh, Move(kK, kC, kQ, kH)},
+            // endregion
 
-            // To Hearts -----------------------------------------------------------------------------------------------
-            {kMoveAh2h, {(int) Card("A", "h"), (int) Card("2", "h")}},
-            {kMove2h3h, {(int) Card("2", "h"), (int) Card("3", "h")}},
-            {kMove3h4h, {(int) Card("3", "h"), (int) Card("4", "h")}},
-            {kMove4h5h, {(int) Card("4", "h"), (int) Card("5", "h")}},
-            {kMove5h6h, {(int) Card("5", "h"), (int) Card("6", "h")}},
-            {kMove6h7h, {(int) Card("6", "h"), (int) Card("7", "h")}},
-            {kMove7h8h, {(int) Card("7", "h"), (int) Card("8", "h")}},
-            {kMove8h9h, {(int) Card("8", "h"), (int) Card("9", "h")}},
-            {kMove9hTh, {(int) Card("9", "h"), (int) Card("T", "h")}},
-            {kMoveThJh, {(int) Card("T", "h"), (int) Card("J", "h")}},
-            {kMoveJhQh, {(int) Card("J", "h"), (int) Card("Q", "h")}},
-            {kMoveQhKh, {(int) Card("Q", "h"), (int) Card("K", "h")}},
+            // region Moves to Tableau (Clubs <- Diamonds)
+            {kMove2cAd, Move(k2, kC, kA, kD)},
+            {kMove3c2d, Move(k3, kC, k2, kD)},
+            {kMove4c3d, Move(k4, kC, k3, kD)},
+            {kMove5c4d, Move(k5, kC, k4, kD)},
+            {kMove6c5d, Move(k6, kC, k5, kD)},
+            {kMove7c6d, Move(k7, kC, k6, kD)},
+            {kMove8c7d, Move(k8, kC, k7, kD)},
+            {kMove9c8d, Move(k9, kC, k8, kD)},
+            {kMoveTc9d, Move(kT, kC, k9, kD)},
+            {kMoveJcTd, Move(kJ, kC, kT, kD)},
+            {kMoveQcJd, Move(kQ, kC, kJ, kD)},
+            {kMoveKcQd, Move(kK, kC, kQ, kD)},
+            // endregion
 
-            // To Clubs ------------------------------------------------------------------------------------------------
-            {kMoveAc2c, {(int) Card("A", "c"), (int) Card("2", "c")}},
-            {kMove2c3c, {(int) Card("2", "c"), (int) Card("3", "c")}},
-            {kMove3c4c, {(int) Card("3", "c"), (int) Card("4", "c")}},
-            {kMove4c5c, {(int) Card("4", "c"), (int) Card("5", "c")}},
-            {kMove5c6c, {(int) Card("5", "c"), (int) Card("6", "c")}},
-            {kMove6c7c, {(int) Card("6", "c"), (int) Card("7", "c")}},
-            {kMove7c8c, {(int) Card("7", "c"), (int) Card("8", "c")}},
-            {kMove8c9c, {(int) Card("8", "c"), (int) Card("9", "c")}},
-            {kMove9cTc, {(int) Card("9", "c"), (int) Card("T", "c")}},
-            {kMoveTcJc, {(int) Card("T", "c"), (int) Card("J", "c")}},
-            {kMoveJcQc, {(int) Card("J", "c"), (int) Card("Q", "c")}},
-            {kMoveQcKc, {(int) Card("Q", "c"), (int) Card("K", "c")}},
+            // Diamonds ------------------------------------------------------------------------------------------------
 
-            // To Diamonds ---------------------------------------------------------------------------------------------
-            {kMoveAd2d, {(int) Card("A", "d"), (int) Card("2", "d")}},
-            {kMove2d3d, {(int) Card("2", "d"), (int) Card("3", "d")}},
-            {kMove3d4d, {(int) Card("3", "d"), (int) Card("4", "d")}},
-            {kMove4d5d, {(int) Card("4", "d"), (int) Card("5", "d")}},
-            {kMove5d6d, {(int) Card("5", "d"), (int) Card("6", "d")}},
-            {kMove6d7d, {(int) Card("6", "d"), (int) Card("7", "d")}},
-            {kMove7d8d, {(int) Card("7", "d"), (int) Card("8", "d")}},
-            {kMove8d9d, {(int) Card("8", "d"), (int) Card("9", "d")}},
-            {kMove9dTd, {(int) Card("9", "d"), (int) Card("T", "d")}},
-            {kMoveTdJd, {(int) Card("T", "d"), (int) Card("J", "d")}},
-            {kMoveJdQd, {(int) Card("J", "d"), (int) Card("Q", "d")}},
-            {kMoveQdKd, {(int) Card("Q", "d"), (int) Card("K", "d")}},
+            // region Moves to Tableau (Diamonds <- Spades)
+            {kMove2dAs, Move(k2, kD, kA, kS)},
+            {kMove3d2s, Move(k3, kD, k2, kS)},
+            {kMove4d3s, Move(k4, kD, k3, kS)},
+            {kMove5d4s, Move(k5, kD, k4, kS)},
+            {kMove6d5s, Move(k6, kD, k5, kS)},
+            {kMove7d6s, Move(k7, kD, k6, kS)},
+            {kMove8d7s, Move(k8, kD, k7, kS)},
+            {kMove9d8s, Move(k9, kD, k8, kS)},
+            {kMoveTd9s, Move(kT, kD, k9, kS)},
+            {kMoveJdTs, Move(kJ, kD, kT, kS)},
+            {kMoveQdJs, Move(kQ, kD, kJ, kS)},
+            {kMoveKdQs, Move(kK, kD, kQ, kS)},
+            // endregion
 
-            // Tableau Moves ===========================================================================================
-            // To Spades -----------------------------------------------------------------------------------------------
-            {kMove2sAh, {(int) Card("2", "s"), (int) Card("A", "h")}},
-            {kMove3s2h, {(int) Card("3", "s"), (int) Card("2", "h")}},
-            {kMove4s3h, {(int) Card("4", "s"), (int) Card("3", "h")}},
-            {kMove5s4h, {(int) Card("5", "s"), (int) Card("4", "h")}},
-            {kMove6s5h, {(int) Card("6", "s"), (int) Card("5", "h")}},
-            {kMove7s6h, {(int) Card("7", "s"), (int) Card("6", "h")}},
-            {kMove8s7h, {(int) Card("8", "s"), (int) Card("7", "h")}},
-            {kMove9s8h, {(int) Card("9", "s"), (int) Card("8", "h")}},
-            {kMoveTs9h, {(int) Card("T", "s"), (int) Card("9", "h")}},
-            {kMoveJsTh, {(int) Card("J", "s"), (int) Card("T", "h")}},
-            {kMoveQsJh, {(int) Card("Q", "s"), (int) Card("J", "h")}},
-            {kMoveKsQh, {(int) Card("K", "s"), (int) Card("Q", "h")}},
-            {kMove2sAd, {(int) Card("2", "s"), (int) Card("A", "d")}},
-            {kMove3s2d, {(int) Card("3", "s"), (int) Card("2", "d")}},
-            {kMove4s3d, {(int) Card("4", "s"), (int) Card("3", "d")}},
-            {kMove5s4d, {(int) Card("5", "s"), (int) Card("4", "d")}},
-            {kMove6s5d, {(int) Card("6", "s"), (int) Card("5", "d")}},
-            {kMove7s6d, {(int) Card("7", "s"), (int) Card("6", "d")}},
-            {kMove8s7d, {(int) Card("8", "s"), (int) Card("7", "d")}},
-            {kMove9s8d, {(int) Card("9", "s"), (int) Card("8", "d")}},
-            {kMoveTs9d, {(int) Card("T", "s"), (int) Card("9", "d")}},
-            {kMoveJsTd, {(int) Card("J", "s"), (int) Card("T", "d")}},
-            {kMoveQsJd, {(int) Card("Q", "s"), (int) Card("J", "d")}},
-            {kMoveKsQd, {(int) Card("K", "s"), (int) Card("Q", "d")}},
+            // region Moves to Tableau (Diamonds <- Clubs)
+            {kMove2dAc, Move(k2, kD, kA, kC)},
+            {kMove3d2c, Move(k3, kD, k2, kC)},
+            {kMove4d3c, Move(k4, kD, k3, kC)},
+            {kMove5d4c, Move(k5, kD, k4, kC)},
+            {kMove6d5c, Move(k6, kD, k5, kC)},
+            {kMove7d6c, Move(k7, kD, k6, kC)},
+            {kMove8d7c, Move(k8, kD, k7, kC)},
+            {kMove9d8c, Move(k9, kD, k8, kC)},
+            {kMoveTd9c, Move(kT, kD, k9, kC)},
+            {kMoveJdTc, Move(kJ, kD, kT, kC)},
+            {kMoveQdJc, Move(kQ, kD, kJ, kC)},
+            {kMoveKdQc, Move(kK, kD, kQ, kC)},
+            // endregion
 
-            // To Hearts -----------------------------------------------------------------------------------------------
-            {kMove2hAs, {(int) Card("2", "h"), (int) Card("A", "s")}},
-            {kMove3h2s, {(int) Card("3", "h"), (int) Card("2", "s")}},
-            {kMove4h3s, {(int) Card("4", "h"), (int) Card("3", "s")}},
-            {kMove5h4s, {(int) Card("5", "h"), (int) Card("4", "s")}},
-            {kMove6h5s, {(int) Card("6", "h"), (int) Card("5", "s")}},
-            {kMove7h6s, {(int) Card("7", "h"), (int) Card("6", "s")}},
-            {kMove8h7s, {(int) Card("8", "h"), (int) Card("7", "s")}},
-            {kMove9h8s, {(int) Card("9", "h"), (int) Card("8", "s")}},
-            {kMoveTh9s, {(int) Card("T", "h"), (int) Card("9", "s")}},
-            {kMoveJhTs, {(int) Card("J", "h"), (int) Card("T", "s")}},
-            {kMoveQhJs, {(int) Card("Q", "h"), (int) Card("J", "s")}},
-            {kMoveKhQs, {(int) Card("K", "h"), (int) Card("Q", "s")}},
-            {kMove2hAc, {(int) Card("2", "h"), (int) Card("A", "c")}},
-            {kMove3h2c, {(int) Card("3", "h"), (int) Card("2", "c")}},
-            {kMove4h3c, {(int) Card("4", "h"), (int) Card("3", "c")}},
-            {kMove5h4c, {(int) Card("5", "h"), (int) Card("4", "c")}},
-            {kMove6h5c, {(int) Card("6", "h"), (int) Card("5", "c")}},
-            {kMove7h6c, {(int) Card("7", "h"), (int) Card("6", "c")}},
-            {kMove8h7c, {(int) Card("8", "h"), (int) Card("7", "c")}},
-            {kMove9h8c, {(int) Card("9", "h"), (int) Card("8", "c")}},
-            {kMoveTh9c, {(int) Card("T", "h"), (int) Card("9", "c")}},
-            {kMoveJhTc, {(int) Card("J", "h"), (int) Card("T", "c")}},
-            {kMoveQhJc, {(int) Card("Q", "h"), (int) Card("J", "c")}},
-            {kMoveKhQc, {(int) Card("K", "h"), (int) Card("Q", "c")}},
-
-            // To Clubs ------------------------------------------------------------------------------------------------
-            {kMove2cAh, {(int) Card("2", "c"), (int) Card("A", "h")}},
-            {kMove3c2h, {(int) Card("3", "c"), (int) Card("2", "h")}},
-            {kMove4c3h, {(int) Card("4", "c"), (int) Card("3", "h")}},
-            {kMove5c4h, {(int) Card("5", "c"), (int) Card("4", "h")}},
-            {kMove6c5h, {(int) Card("6", "c"), (int) Card("5", "h")}},
-            {kMove7c6h, {(int) Card("7", "c"), (int) Card("6", "h")}},
-            {kMove8c7h, {(int) Card("8", "c"), (int) Card("7", "h")}},
-            {kMove9c8h, {(int) Card("9", "c"), (int) Card("8", "h")}},
-            {kMoveTc9h, {(int) Card("T", "c"), (int) Card("9", "h")}},
-            {kMoveJcTh, {(int) Card("J", "c"), (int) Card("T", "h")}},
-            {kMoveQcJh, {(int) Card("Q", "c"), (int) Card("J", "h")}},
-            {kMoveKcQh, {(int) Card("K", "c"), (int) Card("Q", "h")}},
-            {kMove2cAd, {(int) Card("2", "c"), (int) Card("A", "d")}},
-            {kMove3c2d, {(int) Card("3", "c"), (int) Card("2", "d")}},
-            {kMove4c3d, {(int) Card("4", "c"), (int) Card("3", "d")}},
-            {kMove5c4d, {(int) Card("5", "c"), (int) Card("4", "d")}},
-            {kMove6c5d, {(int) Card("6", "c"), (int) Card("5", "d")}},
-            {kMove7c6d, {(int) Card("7", "c"), (int) Card("6", "d")}},
-            {kMove8c7d, {(int) Card("8", "c"), (int) Card("7", "d")}},
-            {kMove9c8d, {(int) Card("9", "c"), (int) Card("8", "d")}},
-            {kMoveTc9d, {(int) Card("T", "c"), (int) Card("9", "d")}},
-            {kMoveJcTd, {(int) Card("J", "c"), (int) Card("T", "d")}},
-            {kMoveQcJd, {(int) Card("Q", "c"), (int) Card("J", "d")}},
-            {kMoveKcQd, {(int) Card("K", "c"), (int) Card("Q", "d")}},
-
-            // To Diamonds ---------------------------------------------------------------------------------------------
-            {kMove2dAs, {(int) Card("2", "d"), (int) Card("A", "s")}},
-            {kMove3d2s, {(int) Card("3", "d"), (int) Card("2", "s")}},
-            {kMove4d3s, {(int) Card("4", "d"), (int) Card("3", "s")}},
-            {kMove5d4s, {(int) Card("5", "d"), (int) Card("4", "s")}},
-            {kMove6d5s, {(int) Card("6", "d"), (int) Card("5", "s")}},
-            {kMove7d6s, {(int) Card("7", "d"), (int) Card("6", "s")}},
-            {kMove8d7s, {(int) Card("8", "d"), (int) Card("7", "s")}},
-            {kMove9d8s, {(int) Card("9", "d"), (int) Card("8", "s")}},
-            {kMoveTd9s, {(int) Card("T", "d"), (int) Card("9", "s")}},
-            {kMoveJdTs, {(int) Card("J", "d"), (int) Card("T", "s")}},
-            {kMoveQdJs, {(int) Card("Q", "d"), (int) Card("J", "s")}},
-            {kMoveKdQs, {(int) Card("K", "d"), (int) Card("Q", "s")}},
-            {kMove2dAc, {(int) Card("2", "d"), (int) Card("A", "c")}},
-            {kMove3d2c, {(int) Card("3", "d"), (int) Card("2", "c")}},
-            {kMove4d3c, {(int) Card("4", "d"), (int) Card("3", "c")}},
-            {kMove5d4c, {(int) Card("5", "d"), (int) Card("4", "c")}},
-            {kMove6d5c, {(int) Card("6", "d"), (int) Card("5", "c")}},
-            {kMove7d6c, {(int) Card("7", "d"), (int) Card("6", "c")}},
-            {kMove8d7c, {(int) Card("8", "d"), (int) Card("7", "c")}},
-            {kMove9d8c, {(int) Card("9", "d"), (int) Card("8", "c")}},
-            {kMoveTd9c, {(int) Card("T", "d"), (int) Card("9", "c")}},
-            {kMoveJdTc, {(int) Card("J", "d"), (int) Card("T", "c")}},
-            {kMoveQdJc, {(int) Card("Q", "d"), (int) Card("J", "c")}},
-            {kMoveKdQc, {(int) Card("K", "d"), (int) Card("Q", "c")}},
-            //endregion
+            // endregion
     };
 
     // OpenSpiel Classes ===============================================================================================
@@ -896,57 +858,52 @@ namespace open_spiel::solitaire {
 
         // Attributes ==================================================================================================
 
-        Deck                    deck;
-        std::vector<Foundation> foundations;
-        std::vector<Tableau>    tableaus;
-        std::vector<Action>     revealed_cards;
+        Pile                waste;
+        std::vector<Pile>   foundations;
+        std::vector<Pile>   tableaus;
+        std::vector<Action> revealed_cards;
 
         // Constructors ================================================================================================
 
         explicit SolitaireState(std::shared_ptr<const Game> game);
 
-        // Overriden Methods ===========================================================================================
+        // Overridden Methods ==========================================================================================
 
-        Player                 CurrentPlayer() const override;
-        std::unique_ptr<State> Clone() const override;
-        bool                   IsTerminal() const override;
-        bool                   IsChanceNode() const override;
-        std::string            ToString() const override;
-        std::string            ActionToString(Player player, Action action_id) const override;
-        std::string            InformationStateString(Player player) const override;
-        std::string            ObservationString(Player player) const override;
-        void                   InformationStateTensor(Player player, std::vector<double> * values) const override;
-        void                   ObservationTensor(Player player, std::vector<double> * values) const override;
-        void                   DoApplyAction(Action move) override;
-        std::vector<double>    Returns() const override;
-        std::vector<double>    Rewards() const override;
-        std::vector<Action>    LegalActions() const override;
+        Player                  CurrentPlayer() const override;
+        std::unique_ptr<State>  Clone() const override;
+        bool                    IsTerminal() const override;
+        bool                    IsChanceNode() const override;
+        std::string             ToString() const override;
+        std::string             ActionToString(Player player, Action action_id) const override;
+        std::string             InformationStateString(Player player) const override;
+        std::string             ObservationString(Player player) const override;
+        void                    InformationStateTensor(Player player, std::vector<double> * values) const override;
+        void                    ObservationTensor(Player player, std::vector<double> * values) const override;
+        void                    DoApplyAction(Action move) override;
+        std::vector<double>     Returns() const override;
+        std::vector<double>     Rewards() const override;
+        std::vector<Action>     LegalActions() const override;
         std::vector<std::pair<Action, double>> ChanceOutcomes() const override;
 
         // Other Methods ===============================================================================================
 
-        std::vector<Card>      Targets(const std::optional<std::string> & location = {}) const;
-        std::vector<Card>      Sources(const std::optional<std::string> & location = {}) const;
-        std::vector<Move>      CandidateMoves() const;
-        Tableau *              FindTableau(const Card & card) const;
-        Foundation *           FindFoundation(const Card & card) const;
-        Location               FindLocation(const Card & card) const;
-        void                   MoveCards(const Move & move);
-        bool                   IsOverHidden(const Card & card) const;
-        bool                   IsReversible(const Move & move) const;
-        bool                   IsBottomCard(Card card) const;
-        bool                   IsTopCard(const Card & card) const;
-        bool                   IsSolvable() const;
+        std::vector<Card>       Targets(const std::optional<LocationType> & location = kMissing) const;
+        std::vector<Card>       Sources(const std::optional<LocationType> & location = kMissing) const;
+        std::vector<Move>       CandidateMoves() const;
+        LocationType            FindLocation(const Card & card) const;
+        void                    MoveCards(const Move & move);
+
 
     private:
-        bool   is_setup;
-        bool   is_started = false;
-        bool   is_finished = false;
-        bool   is_reversible = false;
-        int    draw_counter = 0;
-        int    current_depth = 0;
-        double previous_score;
+
+        // Attributes ==================================================================================================
+
+        bool   is_finished    = false;
+        bool   is_reversible  = false;
+        int    current_depth  = 0;
+        double previous_score = 0.0;
         std::set<std::size_t> previous_states = {};
+        std::map<Card, std::shared_ptr<Pile>> card_map;
 
     };
 
@@ -955,25 +912,26 @@ namespace open_spiel::solitaire {
 
         // Constructor =================================================================================================
 
-        explicit SolitaireGame(const GameParameters & params);
+        explicit    SolitaireGame(const GameParameters & params);
 
-        // Overriden Methods ===========================================================================================
+        // Overridden Methods ==========================================================================================
 
-        int     NumDistinctActions() const override;
-        int     MaxGameLength() const override;
-        int     NumPlayers() const override;
-        double  MinUtility() const override;
-        double  MaxUtility() const override;
+        int         NumDistinctActions() const override;
+        int         MaxGameLength() const override;
+        int         NumPlayers() const override;
+        double      MinUtility() const override;
+        double      MaxUtility() const override;
 
         std::vector<int> InformationStateTensorShape() const override;
         std::vector<int> ObservationTensorShape() const override;
 
-        std::unique_ptr<State>       NewInitialState() const override;
-        std::shared_ptr<const Game>  Clone() const override;
-        
+        std::unique_ptr<State> NewInitialState() const override;
+        std::shared_ptr<const Game> Clone() const override;
+
     private:
         int num_players_;
-
+        int depth_limit_;
+        bool is_colored_;
     };
 
 } // namespace open_spiel::solitaire
