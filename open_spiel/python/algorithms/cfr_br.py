@@ -103,7 +103,7 @@ class CFRBRSolver(_CFRSolverBase):
       key = state.information_state_string()
       return self._get_infostate_policy(key)
 
-    current_policy = policy.DeprecatedPolicyFromCallable(self._game, policy_fn)
+    current_policy = policy.tabular_policy_from_callable(self._game, policy_fn)
 
     for player_id in range(self._game.num_players()):
       self._best_responses[player_id] = exploitability.best_response(
