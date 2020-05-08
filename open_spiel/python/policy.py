@@ -226,13 +226,11 @@ class TabularPolicy(Policy):
       return str(state)
 
   def action_probabilities(self, state, player_id=None):
-    """See base-class. Important: do not iterate over these to walk the tree."""
-    policy = self.policy_for_key(self._state_key(state, player_id))
-    return {
-        action: probability
-        for action, probability in enumerate(policy)
-        if probability > 0
-    }
+    """Returns an {action: probability} dict, covering all legal actions."""
+    probability = self.policy_for_key(self._state_key(state, player_id))
+    legal_actions = (state.legal_actions() if player_id is None
+                     else state.legal_actions(player_id))
+    return {action: probability[action] for action in legal_actions}
 
   def state_index(self, state):
     """Returns the index in the TabularPolicy associated to `state`."""
@@ -338,9 +336,8 @@ class UniformRandomPolicy(Policy):
       supplied state. This will contain all legal actions, each with the same
       probability, equal to 1 / num_legal_actions.
     """
-    legal_actions = (
-        state.legal_actions()
-        if player_id is None else state.legal_actions(player_id))
+    legal_actions = (state.legal_actions() if player_id is None
+                     else state.legal_actions(player_id))
     probability = 1 / len(legal_actions)
     return {action: probability for action in legal_actions}
 
@@ -376,8 +373,11 @@ class FirstActionPolicy(Policy):
     super(FirstActionPolicy, self).__init__(game, all_players)
 
   def action_probabilities(self, state, player_id=None):
-    min_action = min(state.legal_actions())
-    return {min_action: 1.0}
+    legal_actions = (state.legal_actions() if player_id is None
+                     else state.legal_actions(player_id))
+    min_action = min(legal_actions)
+    return {action: 1.0 if action == min_action else 0.0
+            for action in legal_actions}
 
 
 def tabular_policy_from_callable(game, callable_policy):
