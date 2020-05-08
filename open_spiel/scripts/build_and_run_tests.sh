@@ -41,6 +41,7 @@ ArgsLibAddArg virtualenv bool true "Whether to use virtualenv. We enter a virtua
 ArgsLibAddArg install string "default" 'Whether to install requirements.txt packages. Doing it is slow. By default, it will be true (a) the first-time a virtualenv is being setup (if system_wide_packages is false), (b) if the user overrides it with "true".'
 ArgsLibAddArg system_wide_packages bool false 'Whether to use --system-site-packages on the virtualenv.'
 ArgsLibAddArg build_with_pip bool false 'Whether to use "python3 -m pip install ." or the usual cmake&make and ctest.'
+ArgsLibAddArg build_only bool false 'Builds only the library, without running tests.'
 ArgsLibAddArg test_only string "all" 'Builds and runs the specified test only (use "all" to run all tests)'
 ArgsLibParse $@
 
@@ -157,6 +158,10 @@ function print_tests_failed {
   exit 1
 }
 
+function print_skipping_tests {
+  echo -e "\033[32m*** Skipping to run tests.\e[0m"
+}
+
 # Build / install everything and run tests (C++, Python, optionally Julia).
 if [[ $ARG_build_with_pip == "true" ]]; then
   # TODO(author2): We probably want to use `python3 -m pip install .` directly
@@ -197,19 +202,27 @@ else
       make -j$MAKE_NUM_PROCS $ARG_test_only
     fi
 
-    if ctest -j$TEST_NUM_PROCS --output-on-failure -R "^$ARG_test_only\$" ../open_spiel; then
-      print_tests_passed
+    if [[ ! $ARG_build_only ]]; then
+      if ctest -j$TEST_NUM_PROCS --output-on-failure -R "^$ARG_test_only\$" ../open_spiel; then
+        print_tests_passed
+      else
+        print_tests_failed
+      fi
     else
-      print_tests_failed
+      print_skipping_tests
     fi
   else
     # Make and test everything
     echo "Building and running all tests"
     make -j$MAKE_NUM_PROCS
-    if ctest -j$TEST_NUM_PROCS --output-on-failure ../open_spiel; then
-      print_tests_passed
+    if [[ ! $ARG_build_only ]]; then
+      if ctest -j$TEST_NUM_PROCS --output-on-failure ../open_spiel; then
+        print_tests_passed
+      else
+        print_tests_failed
+      fi
     else
-      print_tests_failed
+      print_skipping_tests
     fi
   fi
 
