@@ -146,8 +146,8 @@ class Calculator(object):
         player:
             player_policy,
         opponent:
-            policy.DeprecatedPolicyFromCallable(self.game,
-                                                best_response_policy),
+            policy.tabular_policy_from_callable(
+                self.game, best_response_policy, [opponent]),
     })
     obj = self._action_value_calculator._get_tabular_statistics(  # pylint: disable=protected-access
         ((player, s) for s in info_states))

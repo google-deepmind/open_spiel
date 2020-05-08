@@ -102,7 +102,7 @@ class Policy(object):
 
   def to_tabular(self):
     """Returns a new `TabularPolicy` equivalent to this policy."""
-    tabular_policy = TabularPolicy(self.game)
+    tabular_policy = TabularPolicy(self.game, self.player_ids)
     for index, state in enumerate(tabular_policy.states):
       tabular_policy.action_probability_array[index, :] = 0
       for action, probability in self.action_probabilities(state).items():
@@ -162,10 +162,10 @@ class TabularPolicy(Policy):
       the tabular policy.
   """
 
-  def __init__(self, game):
+  def __init__(self, game, players=None):
     """Initializes a uniform random policy for all players in the game."""
-    all_players = list(range(game.num_players()))
-    super(TabularPolicy, self).__init__(game, all_players)
+    players = sorted(players or range(game.num_players()))
+    super(TabularPolicy, self).__init__(game, players)
     self.game_type = game.get_type()
 
     # Get all states in the game at which players have to make decisions.
@@ -178,11 +178,11 @@ class TabularPolicy(Policy):
     # Assemble legal actions for every valid (state, player) pair, keyed by
     # information state string.
     self.state_lookup = {}
-    self.states_per_player = [[] for _ in all_players]
+    self.states_per_player = [[] for _ in range(game.num_players())]
     self.states = []
     legal_actions_list = []
     state_in_list = []
-    for player in all_players:
+    for player in players:
       # States are ordered by their history.
       for _, state in sorted(states.items(), key=lambda pair: pair[0]):
         if state.is_simultaneous_node() or player == state.current_player():
@@ -342,29 +342,6 @@ class UniformRandomPolicy(Policy):
     return {action: probability for action in legal_actions}
 
 
-class DeprecatedPolicyFromCallable(Policy):
-  """For backwards-compatibility reasons, create a policy from a callable."""
-  # TODO(author11) - remove all uses of this class
-
-  def __init__(self, game, callable_policy):
-    # When creating a Policy from a pyspiel_policy, we do not have the game.
-    if game is None:
-      all_players = None
-    else:
-      all_players = list(range(game.num_players()))
-    super(DeprecatedPolicyFromCallable, self).__init__(game, all_players)
-    self._callable_policy = callable_policy
-
-  def action_probabilities(self, state, player_id=None):
-    action_probs = dict(self._callable_policy(state))
-    if isinstance(state, pyspiel.State):
-      legal_actions = state.legal_actions(player_id or state.current_player())
-      illegal_actions = set(action_probs.keys()) - set(legal_actions)
-      if illegal_actions:
-        raise ValueError(f"Illegal actions {illegal_actions} in state {state}")
-    return action_probs
-
-
 class FirstActionPolicy(Policy):
   """A policy that always takes the lowest-numbered legal action."""
 
@@ -380,7 +357,7 @@ class FirstActionPolicy(Policy):
             for action in legal_actions}
 
 
-def tabular_policy_from_callable(game, callable_policy):
+def tabular_policy_from_callable(game, callable_policy, players=None):
   """Converts a legacy callable policy into a TabularPolicy.
 
   Recommendation - instead of using this to convert your policy for evaluation
@@ -390,20 +367,20 @@ def tabular_policy_from_callable(game, callable_policy):
   Args:
     game: The game for which we want a TabularPolicy.
     callable_policy: A callable: state -> action probabilities dict or list.
-
+    players: List of players this policy applies to. If `None`, applies to
+      all players.
   Returns:
     A TabularPolicy that materializes the callable policy.
   """
-  empty_tabular_policy = TabularPolicy(game)
-  for state_index, state in enumerate(empty_tabular_policy.states):
+  tabular_policy = TabularPolicy(game, players)
+  for state_index, state in enumerate(tabular_policy.states):
     action_probabilities = dict(callable_policy(state))
     infostate_policy = [
         action_probabilities.get(action, 0.)
         for action in range(game.num_distinct_actions())
     ]
-    empty_tabular_policy.action_probability_array[
-        state_index, :] = infostate_policy
-  return empty_tabular_policy
+    tabular_policy.action_probability_array[state_index, :] = infostate_policy
+  return tabular_policy
 
 
 def python_policy_to_pyspiel_policy(python_tabular_policy):
