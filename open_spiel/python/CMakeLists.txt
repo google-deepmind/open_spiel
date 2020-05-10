@@ -15,7 +15,17 @@ elseif(Python_TARGET_VERSION VERSION_GREATER_EQUAL "3.0.0")
   endif()
 endif()
 
-add_library(pyspiel MODULE pybind11/pyspiel.cc ${OPEN_SPIEL_OBJECTS})
+add_library(pyspiel MODULE
+  pybind11/algorithms_trajectories.cc
+  pybind11/algorithms_trajectories.h
+  pybind11/bots.cc
+  pybind11/bots.h
+  pybind11/game_transforms.cc
+  pybind11/game_transforms.h
+  pybind11/policy.cc
+  pybind11/policy.h
+  pybind11/pyspiel.cc
+  ${OPEN_SPIEL_OBJECTS})
 
 # Without this, the binary is called `libpyspiel.so`
 set_target_properties(pyspiel PROPERTIES PREFIX "")
