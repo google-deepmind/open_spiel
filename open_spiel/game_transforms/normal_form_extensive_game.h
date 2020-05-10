@@ -15,6 +15,8 @@
 #ifndef OPEN_SPIEL_GAME_TRANSFORMS_NORMAL_FORM_EXTENSIVE_GAME_H
 #define OPEN_SPIEL_GAME_TRANSFORMS_NORMAL_FORM_EXTENSIVE_GAME_H
 
+#include <memory>
+
 #include "open_spiel/spiel.h"
 #include "open_spiel/tensor_game.h"
 

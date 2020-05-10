@@ -15,10 +15,13 @@
 #ifndef OPEN_SPIEL_ALGORITHMS_DETERMINISTIC_POLICY_H_
 #define OPEN_SPIEL_ALGORITHMS_DETERMINISTIC_POLICY_H_
 
+#include <stdint.h>
+
 #include <algorithm>
 #include <iterator>
-#include <string>
 #include <map>
+#include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "open_spiel/policy.h"

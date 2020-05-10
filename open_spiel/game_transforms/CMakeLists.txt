@@ -3,10 +3,10 @@ add_library (game_transforms OBJECT
   coop_to_1p.h
   misere.cc
   misere.h
-  turn_based_simultaneous_game.cc
-  turn_based_simultaneous_game.h
   normal_form_extensive_game.cc
   normal_form_extensive_game.h
+  turn_based_simultaneous_game.cc
+  turn_based_simultaneous_game.h
 )
 target_include_directories (game_transforms PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 

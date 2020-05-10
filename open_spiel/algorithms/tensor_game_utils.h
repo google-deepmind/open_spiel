@@ -15,6 +15,9 @@
 #ifndef OPEN_SPIEL_ALGORITHMS_TENSOR_GAMES_UTILS_H_
 #define OPEN_SPIEL_ALGORITHMS_TENSOR_GAMES_UTILS_H_
 
+#include <memory>
+#include <string>
+
 #include "open_spiel/spiel.h"
 #include "open_spiel/tensor_game.h"
 

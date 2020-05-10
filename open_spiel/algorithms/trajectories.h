@@ -15,8 +15,11 @@
 #ifndef OPEN_SPIEL_ALGORITHMS_TRAJECTORIES_H_
 #define OPEN_SPIEL_ALGORITHMS_TRAJECTORIES_H_
 
-#include <limits>
+#include <stdint.h>
+
+#include <memory>
 #include <random>
+#include <string>
 #include <unordered_map>
 #include <vector>
 

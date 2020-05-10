@@ -18,6 +18,8 @@
 #include <memory>
 #include <random>
 #include <string>
+#include <utility>
+#include <vector>
 
 #include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
 #include "open_spiel/algorithms/mcts.h"

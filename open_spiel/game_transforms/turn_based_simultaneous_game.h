@@ -17,6 +17,7 @@
 
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "open_spiel/spiel.h"

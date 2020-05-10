@@ -16,6 +16,7 @@
 #define OPEN_SPIEL_ALGORITHMS_MATRIX_GAMES_UTILS_H_
 
 #include <memory>
+#include <string>
 
 #include "open_spiel/matrix_game.h"
 #include "open_spiel/spiel.h"

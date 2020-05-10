@@ -15,8 +15,13 @@
 #ifndef OPEN_SPIEL_ALGORITHMS_MCTS_H_
 #define OPEN_SPIEL_ALGORITHMS_MCTS_H_
 
+#include <stdint.h>
+
 #include <memory>
 #include <random>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_bots.h"

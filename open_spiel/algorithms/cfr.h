@@ -15,6 +15,12 @@
 #ifndef OPEN_SPIEL_ALGORITHMS_CFR_H_
 #define OPEN_SPIEL_ALGORITHMS_CFR_H_
 
+#include <memory>
+#include <optional>
+#include <string>
+#include <unordered_map>
+#include <vector>
+
 #include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"
 

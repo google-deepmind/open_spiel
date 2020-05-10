@@ -15,7 +15,7 @@
 #ifndef OPEN_SPIEL_ALGORITHMS_EXPECTED_RETURNS_H_
 #define OPEN_SPIEL_ALGORITHMS_EXPECTED_RETURNS_H_
 
-#include <string>
+#include <vector>
 
 #include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"

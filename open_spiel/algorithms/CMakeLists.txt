@@ -1,46 +1,46 @@
 add_library (algorithms OBJECT
-  best_response.h
   best_response.cc
-  cfr.h
+  best_response.h
   cfr.cc
-  cfr_br.h
+  cfr.h
   cfr_br.cc
-  corr_dist.h
+  cfr_br.h
   corr_dist.cc
-  deterministic_policy.h
+  corr_dist.h
   deterministic_policy.cc
-  evaluate_bots.h
+  deterministic_policy.h
   evaluate_bots.cc
-  expected_returns.h
+  evaluate_bots.h
   expected_returns.cc
-  external_sampling_mccfr.h
+  expected_returns.h
   external_sampling_mccfr.cc
-  get_all_states.h
+  external_sampling_mccfr.h
   get_all_states.cc
-  get_legal_actions_map.h
+  get_all_states.h
   get_legal_actions_map.cc
-  history_tree.h
+  get_legal_actions_map.h
   history_tree.cc
-  is_mcts.h
+  history_tree.h
   is_mcts.cc
-  matrix_game_utils.h
+  is_mcts.h
   matrix_game_utils.cc
-  mcts.h
+  matrix_game_utils.h
   mcts.cc
-  minimax.h
+  mcts.h
   minimax.cc
-  outcome_sampling_mccfr.h
+  minimax.h
   outcome_sampling_mccfr.cc
-  state_distribution.h
+  outcome_sampling_mccfr.h
   state_distribution.cc
-  tabular_exploitability.h
+  state_distribution.h
   tabular_exploitability.cc
-  tensor_game_utils.h
+  tabular_exploitability.h
   tensor_game_utils.cc
-  trajectories.h
+  tensor_game_utils.h
   trajectories.cc
-  value_iteration.h
+  trajectories.h
   value_iteration.cc
+  value_iteration.h
 )
 target_include_directories (algorithms PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 

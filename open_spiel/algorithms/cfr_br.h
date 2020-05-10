@@ -16,6 +16,7 @@
 #define OPEN_SPIEL_ALGORITHMS_CFR_BR_H_
 
 #include <memory>
+#include <vector>
 
 #include "open_spiel/algorithms/best_response.h"
 #include "open_spiel/algorithms/cfr.h"

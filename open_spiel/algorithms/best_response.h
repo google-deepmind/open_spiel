@@ -15,10 +15,11 @@
 #ifndef OPEN_SPIEL_ALGORITHMS_BEST_RESPONSE_H_
 #define OPEN_SPIEL_ALGORITHMS_BEST_RESPONSE_H_
 
-#include <iostream>
-#include <map>
+#include <memory>
+#include <string>
 #include <unordered_map>
-#include <unordered_set>
+#include <utility>
+#include <vector>
 
 #include "open_spiel/algorithms/history_tree.h"
 #include "open_spiel/policy.h"

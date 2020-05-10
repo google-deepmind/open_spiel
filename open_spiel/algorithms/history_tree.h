@@ -15,10 +15,13 @@
 #ifndef OPEN_SPIEL_ALGORITHMS_HISTORY_TREE_H_
 #define OPEN_SPIEL_ALGORITHMS_HISTORY_TREE_H_
 
-#include <iostream>
 #include <map>
+#include <memory>
+#include <string>
 #include <unordered_map>
 #include <unordered_set>
+#include <utility>
+#include <vector>
 
 #include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"
