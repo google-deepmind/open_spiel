@@ -25,8 +25,8 @@
 #include "open_spiel/python/pybind11/algorithms_trajectories.h"
 #include "open_spiel/python/pybind11/bots.h"
 #include "open_spiel/python/pybind11/game_transforms.h"
+#include "open_spiel/python/pybind11/games_negotiation.h"
 #include "open_spiel/python/pybind11/policy.h"
-#include "open_spiel/query.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 #include "pybind11/include/pybind11/functional.h"
@@ -468,10 +468,6 @@ PYBIND11_MODULE(pyspiel, m) {
         "A general implementation of deserialization of a game and state "
         "string serialized by serialize_game_and_state.");
 
-  // Game-Specific Query API.
-  m.def("negotiation_item_pool", &open_spiel::query::NegotiationItemPool);
-  m.def("negotiation_agent_utils", &open_spiel::query::NegotiationAgentUtils);
-
   // Set an error handler that will raise exceptions. These exceptions are for
   // the Python interface only. When used from C++, OpenSpiel will never raise
   // exceptions - the process will be terminated instead.
@@ -483,6 +479,7 @@ PYBIND11_MODULE(pyspiel, m) {
   init_pyspiel_policy(m);           // Policies and policy-related algorithms.
   init_pyspiel_game_transforms(m);  // Game transformations.
   init_pyspiel_algorithms_trajectories(m);  // Trajectories.
+  init_pyspiel_games_negotiation(m);        // Negotiation game.
 }
 
 }  // namespace

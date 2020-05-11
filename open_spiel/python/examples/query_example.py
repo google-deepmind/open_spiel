@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""game-specific query API example."""
+"""Game-specific query example."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -39,9 +39,9 @@ def main(_):
   # Need to apply the first chance node for items and utilities to be generated
   state.apply_action(0)
 
-  print("Item pool: {}".format(pyspiel.negotiation_item_pool(state)))
-  print("Player 0 utils: {}".format(pyspiel.negotiation_agent_utils(state, 0)))
-  print("Player 1 utils: {}".format(pyspiel.negotiation_agent_utils(state, 1)))
+  print("Item pool: {}".format(state.item_pool()))
+  print("Player 0 utils: {}".format(state.agent_utils(0)))
+  print("Player 1 utils: {}".format(state.agent_utils(1)))
 
   state = game.new_initial_state()
 
@@ -50,9 +50,9 @@ def main(_):
   # Need to apply the first chance node for items and utilities to be generated
   state.apply_action(0)
 
-  print("Item pool: {}".format(pyspiel.negotiation_item_pool(state)))
-  print("Player 0 utils: {}".format(pyspiel.negotiation_agent_utils(state, 0)))
-  print("Player 1 utils: {}".format(pyspiel.negotiation_agent_utils(state, 1)))
+  print("Item pool: {}".format(state.item_pool()))
+  print("Player 0 utils: {}".format(state.agent_utils(0)))
+  print("Player 1 utils: {}".format(state.agent_utils(1)))
 
 
 if __name__ == "__main__":
