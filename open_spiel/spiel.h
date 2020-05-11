@@ -153,6 +153,7 @@ std::ostream& operator<<(std::ostream& stream, GameType::Dynamics value);
 std::ostream& operator<<(std::ostream& stream, GameType::ChanceMode value);
 std::ostream& operator<<(std::ostream& stream, GameType::Information value);
 std::ostream& operator<<(std::ostream& stream, GameType::Utility value);
+std::ostream& operator<<(std::ostream& stream, GameType::RewardModel value);
 
 // The probability of taking each possible action in a particular info state.
 using ActionsAndProbs = std::vector<std::pair<Action, double>>;
