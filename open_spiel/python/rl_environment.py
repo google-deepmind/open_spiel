@@ -230,11 +230,15 @@ class Environment(object):
 
       observations["legal_actions"].append(self._state.legal_actions(player_id))
     observations["current_player"] = self._state.current_player()
+    discounts = self._discounts
+    if step_type == StepType.LAST:
+      # When the game is in a terminal state set the discount to 0.
+      discounts = [0. for _ in discounts]
 
     return TimeStep(
         observations=observations,
         rewards=rewards,
-        discounts=self._discounts,
+        discounts=discounts,
         step_type=step_type)
 
   def step(self, actions):
