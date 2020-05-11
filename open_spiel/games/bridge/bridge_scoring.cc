@@ -14,6 +14,8 @@
 
 #include "open_spiel/games/bridge/bridge_scoring.h"
 
+#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+
 namespace open_spiel {
 namespace bridge {
 namespace {
@@ -77,6 +79,7 @@ int ScoreBonuses(int level, int contract_score, bool is_vulnerable) {
 }  // namespace
 
 int Score(Contract contract, int declarer_tricks, bool is_vulnerable) {
+  if (contract.level == 0) return 0;
   int contracted_tricks = 6 + contract.level;
   int contract_result = declarer_tricks - contracted_tricks;
   if (contract_result < 0) {
@@ -90,6 +93,28 @@ int Score(Contract contract, int declarer_tricks, bool is_vulnerable) {
                                   is_vulnerable, contract.double_status);
     return contract_score + bonuses;
   }
+}
+
+std::string Contract::ToString() const {
+  if (level == 0) return "Passed Out";
+  std::string str = absl::StrCat(level, std::string{kDenominationChar[trumps]});
+  if (double_status == kDoubled) absl::StrAppend(&str, "X");
+  if (double_status == kRedoubled) absl::StrAppend(&str, "XX");
+  absl::StrAppend(&str, " ", std::string{kPlayerChar[declarer]});
+  return str;
+}
+
+int Contract::Index() const {
+  if (level == 0) return 0;
+  int index = level - 1;
+  index *= kNumDenominations;
+  index += static_cast<int>(trumps);
+  index *= kNumPlayers;
+  index += static_cast<int>(declarer);
+  index *= kNumDoubleStates;
+  if (double_status == kRedoubled) index += 2;
+  if (double_status == kDoubled) index += 1;
+  return index + 1;
 }
 
 }  // namespace bridge

@@ -115,7 +115,7 @@ std::string BidString(int bid) {
 // There are two partnerships: players 0 and 2 versus players 1 and 3.
 // We call 0 and 2 partnership 0, and 1 and 3 partnership 1.
 int Partnership(Player player) { return player & 1; }
-
+int Partner(Player player) { return player ^ 2; }
 }  // namespace
 
 BridgeGame::BridgeGame(const GameParameters& params)
@@ -127,7 +127,9 @@ BridgeState::BridgeState(std::shared_ptr<const Game> game,
                          bool is_non_dealer_vulnerable)
     : State(game),
       use_double_dummy_result_(use_double_dummy_result),
-      is_vulnerable_{is_dealer_vulnerable, is_non_dealer_vulnerable} {}
+      is_vulnerable_{is_dealer_vulnerable, is_non_dealer_vulnerable} {
+  possible_contracts_.fill(true);
+}
 
 std::string BridgeState::ActionToString(Player player, Action action) const {
   return (action < kBiddingActionBase) ? CardString(action)
@@ -387,7 +389,7 @@ void BridgeState::ObservationTensor(Player player,
     ptr += kNumCards;
 
     // Dummy's remaining cards.
-    const int dummy = contract_.declarer ^ 2;
+    const int dummy = Partner(contract_.declarer);
     for (int i = 0; i < kNumCards; ++i)
       if (holder_[i] == dummy) ptr[i] = 1;
     ptr += kNumCards;
@@ -462,6 +464,7 @@ void BridgeState::ObservationTensor(Player player,
 
 void BridgeState::SetDoubleDummyResults(ddTableResults double_dummy_results) {
   double_dummy_results_ = double_dummy_results;
+  ComputeScoreByContract();
 }
 
 void BridgeState::ComputeDoubleDummyTricks() {
@@ -483,6 +486,7 @@ void BridgeState::ComputeDoubleDummyTricks() {
       SpielFatalError(absl::StrCat("double_dummy_solver:", error_message));
     }
   }
+  ComputeScoreByContract();
 }
 
 std::vector<Action> BridgeState::LegalActions() const {
@@ -593,17 +597,23 @@ void BridgeState::ApplyBiddingAction(int call) {
 
   if (call == kDouble) {
     SPIEL_CHECK_EQ(contract_.double_status, kUndoubled);
+    possible_contracts_[contract_.Index()] = false;
     contract_.double_status = kDoubled;
   } else if (call == kRedouble) {
     SPIEL_CHECK_EQ(contract_.double_status, kDoubled);
+    possible_contracts_[contract_.Index()] = false;
     contract_.double_status = kRedoubled;
   } else if (call == kPass) {
     if (num_passes_ == 4) {
       // Four consecutive passes can only happen if no-one makes a bid.
       // The hand is then over, and each side scores zero points.
       phase_ = Phase::kGameOver;
+      possible_contracts_.fill(false);
+      possible_contracts_[0] = true;
     } else if (num_passes_ == 3 && contract_.level > 0) {
       // After there has been a bid, three consecutive passes end the auction.
+      possible_contracts_.fill(false);
+      possible_contracts_[contract_.Index()] = true;
       if (use_double_dummy_result_) {
         SPIEL_CHECK_TRUE(double_dummy_results_.has_value());
         phase_ = Phase::kGameOver;
@@ -619,14 +629,39 @@ void BridgeState::ApplyBiddingAction(int call) {
     }
   } else {
     // A bid was made.
-    auto partnership = Partnership(current_player_);
-    auto suit = BidSuit(call);
-    if (!first_bidder_[partnership][suit].has_value())
-      first_bidder_[partnership][suit] = current_player_;
     contract_.level = BidLevel(call);
-    contract_.trumps = suit;
-    contract_.declarer = first_bidder_[partnership][suit].value();
+    contract_.trumps = BidSuit(call);
     contract_.double_status = kUndoubled;
+    auto partnership = Partnership(current_player_);
+    if (!first_bidder_[partnership][contract_.trumps].has_value()) {
+      // Partner cannot declare this denomination.
+      first_bidder_[partnership][contract_.trumps] = current_player_;
+      const int partner = Partner(current_player_);
+      for (int level = contract_.level + 1; level <= kNumBidLevels; ++level) {
+        for (DoubleStatus double_status : {kUndoubled, kDoubled, kRedoubled}) {
+          possible_contracts_[Contract{level, contract_.trumps, double_status,
+                                       partner}
+                                  .Index()] = false;
+        }
+      }
+    }
+    contract_.declarer = first_bidder_[partnership][contract_.trumps].value();
+    // No lower contract is possible.
+    std::fill(
+        possible_contracts_.begin(),
+        possible_contracts_.begin() +
+            Contract{contract_.level, contract_.trumps, kUndoubled, 0}.Index(),
+        false);
+    // No-one else can declare this precise contract.
+    for (int player = 0; player < kNumPlayers; ++player) {
+      if (player != current_player_) {
+        for (DoubleStatus double_status : {kUndoubled, kDoubled, kRedoubled}) {
+          possible_contracts_[Contract{contract_.level, contract_.trumps,
+                                       double_status, player}
+                                  .Index()] = false;
+        }
+      }
+    }
   }
   current_player_ = (current_player_ + 1) % kNumPlayers;
 }
@@ -673,6 +708,20 @@ void BridgeState::ScoreUp() {
     returns_[pl] = Partnership(pl) == Partnership(contract_.declarer)
                        ? declarer_score
                        : -declarer_score;
+  }
+}
+
+void BridgeState::ComputeScoreByContract() {
+  SPIEL_CHECK_TRUE(double_dummy_results_.has_value());
+  for (int i = 0; i < kNumContracts; ++i) {
+    Contract contract = kAllContracts[i];
+    const int num_declarer_tricks =
+        double_dummy_results_->resTable[contract.trumps][contract.declarer];
+    const int declarer_score =
+        Score(contract, num_declarer_tricks,
+              is_vulnerable_[Partnership(contract.declarer)]);
+    score_by_contract_[i] =
+        Partnership(contract.declarer) == 0 ? declarer_score : -declarer_score;
   }
 }
 
@@ -740,6 +789,15 @@ std::unique_ptr<State> BridgeGame::DeserializeState(
     state->ApplyAction(std::stol(*it));
   }
   return state;
+}
+
+int BridgeState::ContractIndex() const {
+  SPIEL_CHECK_TRUE(phase_ == Phase::kPlay || phase_ == Phase::kGameOver);
+  return contract_.Index();
+}
+
+std::string BridgeGame::ContractString(int index) const {
+  return kAllContracts[index].ToString();
 }
 
 }  // namespace bridge

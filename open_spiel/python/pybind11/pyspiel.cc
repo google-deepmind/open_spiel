@@ -25,6 +25,7 @@
 #include "open_spiel/python/pybind11/algorithms_trajectories.h"
 #include "open_spiel/python/pybind11/bots.h"
 #include "open_spiel/python/pybind11/game_transforms.h"
+#include "open_spiel/python/pybind11/games_bridge.h"
 #include "open_spiel/python/pybind11/games_negotiation.h"
 #include "open_spiel/python/pybind11/policy.h"
 #include "open_spiel/spiel.h"
@@ -480,6 +481,7 @@ PYBIND11_MODULE(pyspiel, m) {
   init_pyspiel_game_transforms(m);  // Game transformations.
   init_pyspiel_algorithms_trajectories(m);  // Trajectories.
   init_pyspiel_games_negotiation(m);        // Negotiation game.
+  init_pyspiel_games_bridge(m);  // Game-specific functions for bridge.
 }
 
 }  // namespace

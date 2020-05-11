@@ -144,11 +144,8 @@ std::string UncontestedBiddingState::ToString() const {
   if (IsTerminal()) {
     absl::StrAppend(&rv, " Score:", score_);
     for (int i = 0; i < reference_contracts_.size(); ++i) {
-      absl::StrAppend(
-          &rv, " ", reference_contracts_[i].level,
-          std::string(1, kDenominationChar[reference_contracts_[i].trumps]),
-          "(", std::string(1, "WE"[reference_contracts_[i].declarer]),
-          "):", reference_scores_[i]);
+      absl::StrAppend(&rv, " ", reference_contracts_[i].ToString(), ":",
+                      reference_scores_[i]);
     }
   }
   return rv;
