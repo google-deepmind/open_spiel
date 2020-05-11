@@ -207,8 +207,9 @@ class EFGGame : public Game {
   bool general_sum_;
   bool perfect_information_;
 
-  // Maintains a count of states for each infoset (indexed by infoset number).
-  absl::flat_hash_map<int, int> infoset_num_to_states_count_;
+  // Maintains a map of infoset number -> count of states in the infoset
+  // (one for each player).
+  std::vector<absl::flat_hash_map<int, int>> infoset_num_to_states_count_;
 
   // Maintains a (player, infoset number) -> infoset name mapping and vice
   // versa, for retrieval of information set strings externally

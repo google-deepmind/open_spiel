@@ -20,6 +20,7 @@
 #include <fstream>
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
+#include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
 #include "open_spiel/abseil-cpp/absl/strings/numbers.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_split.h"
@@ -387,6 +388,7 @@ void EFGGame::ParsePrologue() {
     token = NextToken();
   }
   num_players_ = player_names_.size();
+  infoset_num_to_states_count_.resize(num_players_, {});
   if (string_data_.at(pos_) == '"') {
     description_ = NextToken();
   }
@@ -497,8 +499,10 @@ void EFGGame::ParsePlayerNode(Node* parent, Node* child, int depth) {
   SPIEL_CHECK_FALSE(string_data_.at(pos_) == '"');
   SPIEL_CHECK_TRUE(absl::SimpleAtoi(NextToken(), &child->player_number));
   SPIEL_CHECK_TRUE(absl::SimpleAtoi(NextToken(), &child->infoset_number));
-  infoset_num_to_states_count_[child->infoset_number] += 1;
-  if (infoset_num_to_states_count_[child->infoset_number] > 1) {
+  infoset_num_to_states_count_[child->player_number - 1]
+                              [child->infoset_number]++;
+  if (infoset_num_to_states_count_[child->player_number - 1]
+                                  [child->infoset_number] > 1) {
     perfect_information_ = false;
   }
   child->infoset_name = "";
