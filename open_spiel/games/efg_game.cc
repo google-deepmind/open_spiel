@@ -14,10 +14,12 @@
 
 #include "open_spiel/games/efg_game.h"
 
+#include <algorithm>
 #include <cstdlib>
 #include <cstring>
 #include <fstream>
 
+#include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/abseil-cpp/absl/strings/numbers.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_split.h"
@@ -434,6 +436,7 @@ void EFGGame::ParseChanceNode(Node* parent, Node* child, int depth) {
     chance_outcomes++;
   }
   SPIEL_CHECK_GT(child->actions.size(), 0);
+  absl::c_sort(child->action_ids);
   SPIEL_CHECK_TRUE(Near(prob_sum, 1.0));
   SPIEL_CHECK_TRUE(NextToken() == "}");
   SPIEL_CHECK_TRUE(absl::SimpleAtoi(NextToken(), &child->outcome_number));
@@ -516,6 +519,7 @@ void EFGGame::ParsePlayerNode(Node* parent, Node* child, int depth) {
     actions++;
   }
   SPIEL_CHECK_GT(child->actions.size(), 0);
+  absl::c_sort(child->action_ids);
   max_actions_ = std::max(max_actions_, actions);
   SPIEL_CHECK_TRUE(NextToken() == "}");
   SPIEL_CHECK_TRUE(absl::SimpleAtoi(NextToken(), &child->outcome_number));
