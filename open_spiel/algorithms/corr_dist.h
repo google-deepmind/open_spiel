@@ -46,7 +46,7 @@ namespace algorithms {
 //
 // **WARNING**: the implementations of the metrics for the extensive-form
 // versions of the correlated equilibria have only been lightly tested (on a
-// single example game!). We plan to add more thorough tests as we implement
+// few simple examples). We plan to add more thorough tests as we implement
 // more benchmark general-sum games and more worked-out examples.
 //
 // For formal definitions and algorithms, please refer to:
@@ -122,7 +122,7 @@ double EFCEDist(const Game& game, CorrDistConfig config,
 double EFCCEDist(const Game& game, CorrDistConfig config,
                  const CorrelationDevice& mu);
 
-// Analog to the functions about but for normal-form games. The game can be a
+// Analog to the functions above but for normal-form games. The game can be a
 // normal-form game *or* a TurnBasedSimultaneousGame wrapping a normal-form
 // game.
 double CEDist(const Game& game, const NormalFormCorrelationDevice& mu);
