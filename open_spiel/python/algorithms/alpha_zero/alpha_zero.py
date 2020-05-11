@@ -91,6 +91,9 @@ class Buffer(object):
   def __len__(self):
     return len(self.data)
 
+  def __bool__(self):
+    return bool(self.data)
+
   def append(self, val):
     return self.extend([val])
 
@@ -449,7 +452,7 @@ def learner(*, game, config, actors, evaluators, broadcast_fn, logger):
         "value_prediction": [v.as_dict for v in value_predictions],
         "eval": {
             "count": evals[0].total_seen,
-            "results": [sum(e.data) / len(e) for e in evals],
+            "results": [sum(e.data) / len(e) if e else 0 for e in evals],
         },
         "batch_size": batch_size_stats.as_dict,
         "batch_size_hist": [0, 1],
