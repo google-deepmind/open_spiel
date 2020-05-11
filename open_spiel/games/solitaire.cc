@@ -119,12 +119,15 @@ namespace open_spiel::solitaire {
 
     Card::Card(bool hidden, SuitType suit, RankType rank, LocationType location) :
         hidden(hidden), suit(suit), rank(rank), location(location) {
-        // Nothing here for now
+        hidden   = hidden;
+        suit     = suit;
+        rank     = rank;
+        location = location;
     }
 
     Card::Card(int index, bool hidden, LocationType location) :
         index(index), hidden(hidden), location(location) {
-        index == HIDDEN_CARD ? hidden = true : hidden = false;
+        // index == HIDDEN_CARD ? hidden = true : hidden = false;
 
         if (!hidden) {
             switch (index) {
@@ -167,20 +170,11 @@ namespace open_spiel::solitaire {
         }
     }
 
-    int Card::GetIndex(bool force) {
+    int Card::GetIndex() const {
         /* Basically it just calculates the index if it hasn't been calculated before, otherwise
          * it will just return a stored value. If `force` is true and the card isn't hidden, then
          * the index is calculated again. */
-
-        if (hidden) {
-            // If the card is hidden, set its index to equal `HIDDEN_CARD`
-            index = HIDDEN_CARD;
-        } else if (force || index == HIDDEN_CARD ) {
-            // Calculates and stores the card index the first time it is needed
-            index = GetCardIndex(rank, suit);
-        }
-        // Returns the value stored in `index`
-        return index;
+        return hidden ? HIDDEN_CARD : GetCardIndex(rank, suit);
     }
 
     std::string Card::ToString(bool colored) const {
@@ -196,7 +190,7 @@ namespace open_spiel::solitaire {
         }
 
         // Determine contents of string
-        if (hidden or rank == kHiddenRank or suit == kHiddenSuit) {
+        if (rank == kHiddenRank or suit == kHiddenSuit) {
             absl::StrAppend(&result, GLYPH_HIDDEN, " ");
         } else if (rank == kNoRank and suit == kNoSuit) {
             absl::StrAppend(&result, GLYPH_EMPTY);
@@ -305,14 +299,21 @@ namespace open_spiel::solitaire {
     }
 
     bool Card::operator<(const Card & other_card) const {
-        return index < other_card.index;
+        if (suit != other_card.suit) {
+            return suit < other_card.suit;
+        } else if (rank != other_card.rank) {
+            return rank < other_card.rank;
+        } else {
+            return false;
+        }
     }
 
     // endregion
 
     // region Pile Methods ====================================================================================================
 
-    Pile::Pile(LocationType type, SuitType suit) : type(type), suit(suit), max_size(GetMaxSize(type)) {
+    Pile::Pile(LocationType type, PileID id, SuitType suit) :
+        type(type), id(id), suit(suit), max_size(GetMaxSize(type)) {
         cards.reserve(max_size);
     }
 
@@ -395,11 +396,71 @@ namespace open_spiel::solitaire {
         }
     }
 
+    std::vector<Card> Pile::Split(Card card) {
+        // TODO: Refactor this method
+
+        std::vector<Card> split_cards;
+        switch (type) {
+            case kFoundation : {
+                if (cards.back() == card) {
+                    split_cards = {cards.back()};
+                    cards.pop_back();
+                }
+                break;
+            }
+            case kTableau : {
+                if (!cards.empty()) {
+                    bool split_flag = false;
+                    for (auto it = cards.begin(); it != cards.end();) {
+                        if (*it == card) {
+                            split_flag = true;
+                        }
+                        if (split_flag) {
+                            split_cards.push_back(*it);
+                            it = cards.erase(it);
+                        } else {
+                            ++it;
+                        }
+                    }
+                }
+                break;
+            }
+            case kWaste : {
+                if (!cards.empty()) {
+                    for (auto it = cards.begin(); it != cards.end();) {
+                        if (*it == card) {
+                            split_cards.push_back(*it);
+                            it = cards.erase(it);
+                            break;
+                        } else {
+                            ++it;
+                        }
+                    }
+                }
+                break;
+            }
+            default : {
+                return {};
+            }
+        }
+
+        return split_cards;
+    }
+
+    void Pile::Extend(std::vector<Card> source_cards) {
+        for (auto & card : source_cards) {
+            // TODO: FIX THIS IMMEDIATELY
+            card.location = type;
+            cards.push_back(card);
+        }
+    }
+
     std::vector<double> Pile::Tensor() const {
         std::vector<double> dv;
+        dv.reserve(max_size);
         if (!cards.empty()) {
             for (auto & card : cards) {
-                card.hidden ? dv.push_back(HIDDEN_CARD) : dv.push_back(card.index);
+                card.hidden ? dv.push_back(HIDDEN_CARD) : dv.push_back(card.GetIndex());
             }
         }
         dv.resize(max_size, NO_CARD);
@@ -418,9 +479,9 @@ namespace open_spiel::solitaire {
 
     // region Move Methods ====================================================================================================
 
-    Move::Move(Card target, Card source) {
-        target = std::move(target);
-        source = std::move(source);
+    Move::Move(Card target_card, Card source_card) {
+        target = target_card;
+        source = source_card;
     }
 
     Move::Move(RankType target_rank, SuitType target_suit, RankType source_rank, SuitType source_suit) {
@@ -445,8 +506,9 @@ namespace open_spiel::solitaire {
     }
 
     bool Move::operator<(const Move & other_move) const {
-        // TODO: Is it faster to compute card indices and compare those or just compare move strings?
-        return (this->ToString(false) < other_move.ToString(false));
+        int index = target.GetIndex() * 100 + source.GetIndex();
+        int other_index = other_move.target.GetIndex() * 100 + other_move.source.GetIndex();
+        return index < other_index;
     }
 
     // endregion
@@ -454,11 +516,11 @@ namespace open_spiel::solitaire {
     // region SolitaireState Methods ==========================================================================================
 
     SolitaireState::SolitaireState(std::shared_ptr<const Game> game) :
-        State(game), waste(kWaste) {
+        State(game), waste(kWaste, kPileWaste) {
 
         // Create foundations
         for (const auto & suit : SUITS) {
-            foundations.emplace_back(kFoundation, suit);
+            foundations.emplace_back(kFoundation, SUIT_TO_PILE.at(suit), suit);
         }
 
         // Create tableaus
@@ -471,12 +533,11 @@ namespace open_spiel::solitaire {
             }
 
             // Create a new tableau and add cards
-            auto tableau  = Pile(kTableau);
+            auto tableau  = Pile(kTableau, INT_TO_PILE.at(i));
             tableau.cards = cards_to_add;
 
             // Add resulting tableau to tableaus
             tableaus.push_back(tableau);
-
         }
 
         // Create waste
@@ -524,16 +585,17 @@ namespace open_spiel::solitaire {
     }
 
     std::string             SolitaireState::ToString() const {
+
         std::string result;
 
-        absl::StrAppend(&result, "\nWASTE : ", waste.ToString());
+        absl::StrAppend(&result, "WASTE       : ", waste.ToString());
 
         absl::StrAppend(&result, "\nFOUNDATIONS : ");
         for (const auto & foundation : foundations) {
             absl::StrAppend(&result, foundation.Targets()[0].ToString(true), " ");
         }
 
-        absl::StrAppend(&result, "\nTABLEAUS : ");
+        absl::StrAppend(&result, "\nTABLEAUS    : ");
         for (const auto & tableau : tableaus) {
             if (!tableau.cards.empty()) {
                 absl::StrAppend(&result, "\n", tableau.ToString(true));
@@ -549,6 +611,25 @@ namespace open_spiel::solitaire {
         for (const auto & card : Sources()) {
             absl::StrAppend(&result, card.ToString(true), " ");
         }
+
+        /*
+        if (!IsChanceNode()) {
+            absl::StrAppend(&result, "\nCANDIDATE MOVES : ");
+            for (auto & move : CandidateMoves()) {
+                absl::StrAppend(&result, "\n", move.ToString(true));
+            }
+        }
+        */
+        /*
+        absl::StrAppend(&result, "\nCARD MAP : ");
+        for (auto & pair : card_map) {
+            absl::StrAppend(&result, "\n",
+                    pair.first.ToString(true),
+                    " ", GLYPH_ARROW, " ",
+                    GetPile(pair.first)->ToString(true)
+                    );
+        }
+        */
 
         return result;
     }
@@ -620,12 +701,14 @@ namespace open_spiel::solitaire {
 
     void                    SolitaireState::DoApplyAction(Action action) {
 
+        if (!IsChanceNode()) {
+            previous_score = Returns().front();
+        }
+
         switch (action) {
             case kRevealAs ... kRevealKd : {
-                // Reveals the first hidden card encountered, starting with tableaus and then waste
-
                 auto revealed_card = Card((int) action);
-                bool found_card    = false;
+                bool found_card = false;
 
                 for (auto & tableau : tableaus) {
                     if (!tableau.cards.empty() && tableau.cards.back().hidden) {
@@ -633,62 +716,119 @@ namespace open_spiel::solitaire {
                         tableau.cards.back().suit = revealed_card.suit;
                         tableau.cards.back().hidden = false;
 
+                        tableau.cards.back().GetIndex();
+                        card_map.insert_or_assign(tableau.cards.back(), tableau.id);
                         found_card = true;
                         break;
                     }
                 }
-
                 if (!found_card && !waste.cards.empty()) {
                     for (auto & card : waste.cards) {
                         if (card.hidden) {
                             card.rank = revealed_card.rank;
                             card.suit = revealed_card.suit;
                             card.hidden = false;
+
+                            card.GetIndex();
+                            card_map.insert_or_assign(card, waste.id);
                             break;
                         }
                     }
                 }
-
                 revealed_cards.push_back(action);
+
+                break;
+            }
+            case kMove__Ks ... kMoveKdQc : {
+                /* TODO: Figure out if move is reversible and add to previous states if so
+                 */
+                Move selected_move = Move(action);
+                MoveCards(selected_move);
+                current_returns += current_rewards;
+                break;
             }
             default : {
                 // Do nothing
             }
         }
 
+
         ++current_depth;
-        if (current_depth >= 40) {
+        if (current_depth >= 300) {
             is_finished = true;
         }
     }
 
     std::vector<double>     SolitaireState::Returns() const {
-        // TODO: Implement this
-        return {0.0};
+        // Returns the sum of rewards up to and including the most recent state transition.
+
+        /*
+        double old_returns;
+        double f_score = 0.0;
+        double t_score = 0.0;
+        double w_score = 0.0;
+
+        for (auto & foundation : foundations) {
+            for (auto & card : foundation.cards) {
+                f_score += FOUNDATION_POINTS.at(card.rank);
+            }
+        }
+
+        int num_hidden = 0;
+        for (auto & tableau : tableaus) {
+            if (!tableau.cards.empty()) {
+                for (auto & card : tableau.cards) {
+                    if (card.hidden) {
+                        num_hidden += 1;
+                    }
+                }
+                if (tableau.cards.back().hidden) {
+                    num_hidden -= 1;
+                }
+            }
+        }
+        t_score = (21 - num_hidden) * 20;
+
+        w_score = (24 - waste.cards.size()) * 20;
+
+        old_returns = f_score + t_score + w_score;
+
+        if (old_returns != current_returns) {
+            std::cout << RED << "Discrepancy in Returns()" << RESET << std::endl;
+            std::cout << RED << "Old Returns = " << old_returns << RESET << std::endl;
+            std::cout << RED << "New Returns = " << current_returns << RESET << std::endl;
+        }
+        */
+
+        return {current_returns};
     }
 
     std::vector<double>     SolitaireState::Rewards() const {
-        // TODO: Implement this
-        return {0.0};
+        // Should be the reward for the action that created this state, not the action
+        // taken at this state that produces a new one.
+        return {current_rewards};
     }
 
     std::vector<Action>     SolitaireState::LegalActions() const {
-        // TODO: Implement this
         if (IsTerminal()) {
             return {};
         } else if (IsChanceNode()) {
             return LegalChanceOutcomes();
         } else {
-            /*
+            // TODO: Add loop detection later
             std::vector<Action> legal_actions;
             for (const auto & move : CandidateMoves()) {
                 legal_actions.push_back(move.ActionId());
-            } */
-            return {kDraw};
+            }
+
+            if (!legal_actions.empty()) {
+                std::sort(legal_actions.begin(), legal_actions.end());
+            } else {
+                legal_actions.push_back(kDraw);
+            }
+
+            return legal_actions;
         }
-
-
-
     }
 
     std::vector<std::pair<Action, double>> SolitaireState::ChanceOutcomes() const {
@@ -755,23 +895,70 @@ namespace open_spiel::solitaire {
         return sources;
     }
 
-    LocationType            SolitaireState::FindLocation(const Card & card) const {
-        // OPTIMIZE: Minimize the amount of times this is called
+    Pile *                  SolitaireState::GetPile(const Card & card) const {
+        PileID pile_id;
 
         if (card.rank == kNoRank) {
-            return card.suit == kNoSuit ? kTableau : kFoundation;
+            if (card.suit == kNoSuit) {
+                for (auto & tableau : tableaus) {
+                    if (tableau.cards.empty()) {
+                        return const_cast<Pile *>(& tableau);
+                    }
+                }
+            } else if (card.suit != kHiddenSuit){
+                for (auto & foundation : foundations) {
+                    if (foundation.suit == card.suit) {
+                        return const_cast<Pile *>(& foundation);
+                    }
+                }
+            } else {
+                std::cout << "Some error" << std::endl;
+            }
+        } else {
+            pile_id = card_map.at(card);
         }
 
-        std::vector<Card> sources;
-        std::vector<LocationType> locations = {kTableau, kFoundation, kWaste};
-
-        for (const auto & loc : locations) {
-            sources = Sources(loc);
-            if (std::find(sources.begin(), sources.end(), card) != sources.end()) {
-                return loc;
+        /*
+        try {
+            pile_id = card_map.at(card);
+        } catch (std::out_of_range) {
+            if (card.rank == kNoRank) {
+                if (card.suit == kNoSuit) {
+                    // Handle finding an empty tableau pile
+                    for (auto & tableau : tableaus) {
+                        if (tableau.cards.empty()) {
+                            return const_cast<Pile *>(& tableau);
+                        }
+                    }
+                } else {
+                    // Handle finding an empty foundation pile
+                    for (auto & foundation : foundations) {
+                        if (foundation.suit == card.suit) {
+                            return const_cast<Pile *>(& foundation);
+                        }
+                    }
+                }
+            } else {
+                // Shouldn't ever reach this point
+                pile_id = kNoPile;
             }
         }
-        return kMissing;
+        */
+
+        switch (pile_id) {
+            case kPileWaste : {
+                return const_cast<Pile *>(& waste);
+            }
+            case kPileSpades ... kPileDiamonds : {
+                return const_cast<Pile *>(& foundations.at(pile_id - 1));
+            }
+            case kPile1stTableau ... kPile7thTableau : {
+                return const_cast<Pile *>(& tableaus.at(pile_id - 5));
+            }
+            default : {
+                std::cout << "The pile containing the card wasn't found" << std::endl;
+            }
+        }
     }
 
     std::vector<Move>       SolitaireState::CandidateMoves() const {
@@ -780,7 +967,8 @@ namespace open_spiel::solitaire {
         std::vector<Card> sources = Sources();
         bool found_empty_tableau  = false;
 
-        for (const auto & target : targets) {
+        for (auto & target : targets) {
+            // std::cout << "Target = " << target.ToString() << std::endl; //
 
             if (target.suit == kNoSuit && target.rank == kNoRank) {
                 if (found_empty_tableau) {
@@ -789,17 +977,84 @@ namespace open_spiel::solitaire {
                     found_empty_tableau = true;
                 }
             }
-
             for (auto & source : target.LegalChildren()) {
-                if (std::find(sources.begin(), sources.end(), source) != sources.end()) {
+                // std::cout << "Source = " << source.ToString() << std::endl; //
 
+                if (std::find(sources.begin(), sources.end(), source) != sources.end()) {
+                    // std::cout << source.ToString() << " is in sources" << std::endl;
+                    auto source_pile = GetPile(source);
+
+                    if (target.location == kFoundation && source_pile->type == kTableau) {
+                        // Check if source is a top card
+                        if (source_pile->cards.back() == source) {
+                            candidate_moves.emplace_back(target, source);
+                        }
+                    } else if (source.rank == kK && target.suit == kNoSuit && target.rank == kNoRank) {
+                        // Check is source is not a bottom
+                        if (source_pile->type == kTableau && !(source_pile->cards.front() == source)) {
+                            candidate_moves.emplace_back(target, source);
+                        } else if (source_pile->type == kWaste) {
+                            candidate_moves.emplace_back(target, source);
+                        }
+                    } else {
+                        auto move = Move(target, source);
+                        candidate_moves.emplace_back(target, source);
+                    }
+                } else {
+                    continue;
                 }
             }
         }
+
+        /*
+        std::cout << "\n";
+        for (auto & move : candidate_moves) {
+            std::cout << "Move = " << move.ToString() << std::endl;
+        }
+        */
+
+        return candidate_moves;
     }
 
+    void                    SolitaireState::MoveCards(const Move & move) {
+        Card target = move.target;
+        Card source = move.source;
 
+        auto target_pile = GetPile(target);
+        auto source_pile = GetPile(source);
 
+        std::vector<Card> split_cards = source_pile->Split(source);
+        for (auto & card : split_cards) {
+            card_map.insert_or_assign(card, target_pile->id);
+            target_pile->Extend({card});
+        }
+
+        // Calculate rewards/returns for this move in the current state
+        // Reset current reward to 0
+        double move_reward = 0.0;
+
+        // Reward for moving a card to or from a foundation
+        if (target_pile->type == kFoundation) {
+            // Adds points for moving TO a foundation
+            move_reward += FOUNDATION_POINTS.at(source.rank);
+        } else if (source_pile->type == kFoundation) {
+            // Subtracts points for moving AWAY from a foundation
+            move_reward -= FOUNDATION_POINTS.at(source.rank);
+        }
+
+        // Reward for revealing a hidden card
+        if (source_pile->type == kTableau && !source_pile->cards.empty() && source_pile->cards.back().hidden) {
+            move_reward += 20.0;    // TODO: Don't hardcode this
+        }
+
+        // Reward for moving a card from the waste
+        if (source_pile->type == kWaste) {
+            move_reward += 20.0;    // TODO: Don't hardcode this
+        }
+
+        // Add current rewards to current returns
+        current_rewards = move_reward;
+    }
 
     // endregion
 
@@ -839,7 +1094,7 @@ namespace open_spiel::solitaire {
 
     std::vector<int> SolitaireGame::ObservationTensorShape() const {
         // TODO: Fix this later
-        return {233};
+        return {209};
     }
 
     std::unique_ptr<State> SolitaireGame::NewInitialState() const {

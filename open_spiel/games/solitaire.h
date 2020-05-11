@@ -11,6 +11,7 @@
 #include <unordered_map>
 #include <set>
 #include <optional>
+#include <tuple>
 
 #include "open_spiel/spiel.h"
 
@@ -18,6 +19,7 @@
 #define RESET "\033[0m"
 #define RED   "\033[31m"
 #define BLACK "\033[37m"
+#define BLUE  "\033[34m"
 
 // TODO: Clion automatically inverts colors based on light/dark theme. So even though "\033[30m" is black,
 //       it shows up as white with a dark theme. Colab doesn't do this, so using a dark theme, it shows black
@@ -319,6 +321,21 @@ namespace open_spiel::solitaire {
         kMoveQdJc,
         kMoveKdQc,
     };
+    enum PileID       {
+        kPileWaste      = 0,
+        kPileSpades     = 1,
+        kPileHearts     = 2,
+        kPileClubs      = 3,
+        kPileDiamonds   = 4,
+        kPile1stTableau = 5,
+        kPile2ndTableau = 6,
+        kPile3rdTableau = 7,
+        kPile4thTableau = 8,
+        kPile5thTableau = 9,
+        kPile6thTableau = 10,
+        kPile7thTableau = 11,
+        kNoPile         = 12
+    };
 
     // Constants =======================================================================================================
 
@@ -331,8 +348,10 @@ namespace open_spiel::solitaire {
     inline constexpr int EMPTY_CLUB_CARD      = -4;
     inline constexpr int EMPTY_DIAMOND_CARD   = -5;
 
+    // Type aliases
+    using Ranksuit = std::pair<RankType, SuitType>;
+
     // Other lists and maps
-    using ranksuit = std::pair<RankType, SuitType>;
     const std::vector<SuitType> SUITS = {kS, kH, kC, kD};
     const std::vector<RankType> RANKS = {kA, k2, k3, k4, k5, k6, k7, k8, k9, kT, kJ, kQ, kK};
 
@@ -358,6 +377,27 @@ namespace open_spiel::solitaire {
             //endregion
     };
 
+    const std::map<SuitType, PileID> SUIT_TO_PILE = {
+            // region Maps a foundation suit to the ID of the foundation
+            {kS, kPileSpades},
+            {kH, kPileHearts},
+            {kC, kPileClubs},
+            {kD, kPileDiamonds}
+            // endregion
+    };
+
+    const std::map<int, PileID> INT_TO_PILE = {
+            // region Maps an integer to a tableau pile ID (used when initializing SolitaireState)
+            {1, kPile1stTableau},
+            {2, kPile2ndTableau},
+            {3, kPile3rdTableau},
+            {4, kPile4thTableau},
+            {5, kPile5thTableau},
+            {6, kPile6thTableau},
+            {7, kPile7thTableau}
+            // endregion
+    };
+
     // Miscellaneous Functions =========================================================================================
 
     std::vector<SuitType> GetOppositeSuits(const SuitType & suit);
@@ -372,18 +412,18 @@ namespace open_spiel::solitaire {
     public:
 
         // Attributes ==================================================================================================
-        RankType      rank     = kHiddenRank;       // Indicates the rank of the card, cannot be changed once set
-        SuitType      suit     = kHiddenSuit;       // Indicates the suit of the card, cannot be changed once set
+        RankType      rank     = kHiddenRank;       // Indicates the rank of the card
+        SuitType      suit     = kHiddenSuit;       // Indicates the suit of the card
         LocationType  location = kMissing;          // Indicates the type of pile the card is in
         bool          hidden   = false;             // Indicates whether the card is hidden or not
-        int index = HIDDEN_CARD;
+        int           index    = HIDDEN_CARD;       // Identifies the card with an integer
 
         // Constructors ================================================================================================
         Card(bool hidden = false, SuitType suit = kHiddenSuit, RankType rank = kHiddenRank, LocationType location = kMissing);
         Card(int index, bool hidden = false, LocationType location = kMissing);
 
         // Other Methods ===============================================================================================
-        int GetIndex(bool force = false);
+        int GetIndex() const ;
         std::string ToString(bool colored = true) const;
         std::vector<Card> LegalChildren() const;
         bool operator==(Card & other_card) const;
@@ -399,14 +439,18 @@ namespace open_spiel::solitaire {
         std::vector<Card>  cards;
         const LocationType type;
         const SuitType     suit;
+        const PileID       id;
         const int          max_size;
 
         // Constructors ================================================================================================
-        Pile(LocationType type, SuitType suit = kNoSuit);
+        Pile(LocationType type, PileID id, SuitType suit = kNoSuit);
 
         // Other Methods ===============================================================================================
         std::vector<Card>   Sources() const;
         std::vector<Card>   Targets() const;
+        std::vector<Card>   Split(Card card);
+        void                Extend(std::vector<Card> source_cards);
+
         std::vector<double> Tensor() const;
         std::string         ToString(bool colored = true) const;
 
@@ -420,7 +464,7 @@ namespace open_spiel::solitaire {
         Card source;
 
         // Constructors ================================================================================================
-        Move(Card target, Card source);
+        Move(Card target_card, Card source_card);
         Move(RankType target_rank, SuitType target_suit, RankType source_rank, SuitType source_suit);
         explicit Move(Action action);
 
@@ -891,20 +935,20 @@ namespace open_spiel::solitaire {
         std::vector<Card>       Sources(const std::optional<LocationType> & location = kMissing) const;
         std::vector<Move>       CandidateMoves() const;
         LocationType            FindLocation(const Card & card) const;
+        Pile *                  GetPile(const Card &card) const;
         void                    MoveCards(const Move & move);
 
-
     private:
-
-        // Attributes ==================================================================================================
-
         bool   is_finished    = false;
         bool   is_reversible  = false;
         int    current_depth  = 0;
         double previous_score = 0.0;
         std::set<std::size_t> previous_states = {};
-        std::map<Card, std::shared_ptr<Pile>> card_map;
+        std::map<Card, PileID> card_map;
 
+        double current_returns  = 0.0;
+        double current_rewards  = 0.0;
+        double previous_rewards = 0.0;
     };
 
     class SolitaireGame : public Game {

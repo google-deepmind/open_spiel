@@ -171,6 +171,12 @@ namespace {
         }
     }
 
+    void BasicSolitaireTests() {
+        testing::LoadGameTest("solitaire");
+        testing::RandomSimTest(*LoadGame("solitaire"), 1);
+    }
+
+    /*
     void TestTableauPile() {
         std::cout << "\nTestTableauPile()" << std::endl;
 
@@ -313,7 +319,7 @@ namespace {
     void TestWastePile() {
         std::cout << "\nTestWastePile()" << std::endl;
 
-        Pile waste = Pile(kWaste);
+        Pile waste = Pile(kWaste, );
         std::vector<Card> cards_to_add = {
                 Card(false, kH, kQ, kTableau),
                 Card(false, kS, k9, kTableau),
@@ -350,6 +356,7 @@ namespace {
 
         std::cout << std::endl;
     }
+    */
 
 } // namespace
 } // namespace open_spiel::solitaire
@@ -366,6 +373,6 @@ int main(int argc, char** argv) {
     //open_spiel::solitaire::TestEmptyTableauPile();
     //open_spiel::solitaire::TestEmptyFoundationPile();
     //open_spiel::solitaire::TestHiddenTableauPile();
-    open_spiel::solitaire::TestWastePile();
-
+    //open_spiel::solitaire::TestWastePile();
+    open_spiel::solitaire::BasicSolitaireTests();
 }
