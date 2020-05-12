@@ -69,12 +69,14 @@ class Policy(object):
 
     IMPORTANT: We assume the following properties hold:
     - All probabilities are >=0 and sum to 1
-    - Only legal actions are present in the mapping, but it does not have to
-      be exhaustive: missing actions are considered to be associated to a zero
-      probability. This means that one should not iterate over the returned
-      dictionary if they want to iterate over the full history tree.
-      If bugs are caused by this, we can change it to force policies to
-      exhaustively give the probabilities for all legal actions.
+    - TLDR: Policy implementations should list the (action, prob) for all legal
+      actions, but algorithms should not rely on this (yet).
+      Details: Before May 2020, only legal actions were present in the mapping,
+      but it did not have to be exhaustive: missing actions were considered to
+      be associated to a zero probability.
+      For example, a deterministic state-poliy was previously {action: 1.0}.
+      Given this change of convention is new and hard to enforce, algorithms
+      should not rely on the fact that all legal actions should be present.
 
     Args:
       state: A `pyspiel.State` object.
