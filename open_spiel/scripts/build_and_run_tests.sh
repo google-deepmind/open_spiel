@@ -188,7 +188,7 @@ else
 
   if [ "$ARG_test_only" != "all" ]
   then
-    # Check for building and runnin a specific test.
+    # Check for building and running a specific test.
     # TODO(author5): generlize this; currently only covers Python and C++ tests
     echo "Build and testing only $ARG_test_only"
     if [[ $ARG_test_only == python_* ]]; then
@@ -202,20 +202,23 @@ else
       make -j$MAKE_NUM_PROCS $ARG_test_only
     fi
 
-    if [[ ! $ARG_build_only ]]; then
+    if [[ $ARG_build_only == "true" ]]; then
+      echo -e "\033[32m*** Skipping runing tests as build_only is $(ARG_build_only) \e[0m"
+    else
       if ctest -j$TEST_NUM_PROCS --output-on-failure -R "^$ARG_test_only\$" ../open_spiel; then
         print_tests_passed
       else
         print_tests_failed
       fi
-    else
-      print_skipping_tests
     fi
   else
     # Make everything
     echo "Building project"
     make -j$MAKE_NUM_PROCS
-    if [[ ! $ARG_build_only ]]; then
+
+    if [[ $ARG_build_only == "true" ]]; then
+      echo -e "\033[32m*** Skipping runing tests as build_only is $(ARG_build_only) \e[0m"
+    else
       # Test everything
       echo "Running all tests"
       if ctest -j$TEST_NUM_PROCS --output-on-failure ../open_spiel; then
@@ -223,8 +226,6 @@ else
       else
         print_tests_failed
       fi
-    else
-      print_skipping_tests
     fi
   fi
 
