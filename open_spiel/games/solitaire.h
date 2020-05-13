@@ -935,15 +935,16 @@ namespace open_spiel::solitaire {
         std::vector<Card>       Sources(const std::optional<LocationType> & location = kMissing) const;
         std::vector<Move>       CandidateMoves() const;
         LocationType            FindLocation(const Card & card) const;
-        Pile *                  GetPile(const Card &card) const;
+        Pile *                  GetPile(const Card & card) const;
         void                    MoveCards(const Move & move);
+        bool                    IsReversible(const Card & source, const Pile * source_pile) const;
 
     private:
         bool   is_finished    = false;
         bool   is_reversible  = false;
         int    current_depth  = 0;
         double previous_score = 0.0;
-        std::set<std::size_t> previous_states = {};
+        std::set<std::size_t>  previous_states = {};
         std::map<Card, PileID> card_map;
 
         double current_returns  = 0.0;

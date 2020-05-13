@@ -36,7 +36,7 @@ namespace open_spiel::solitaire {
         REGISTER_SPIEL_GAME(kGameType, Factory);
     }
 
-    // region Miscellaneous Functions =========================================================================================
+    // region Miscellaneous ===================================================================================================
 
     std::vector<SuitType> GetOppositeSuits(const SuitType & suit) {
         /* Just returns a vector of the suits of opposite color. For red suits (kH and kD), this returns the
@@ -112,6 +112,8 @@ namespace open_spiel::solitaire {
             }
         }
     }
+
+    std::hash<std::string> hasher;
 
     // endregion
 
@@ -740,9 +742,16 @@ namespace open_spiel::solitaire {
                 break;
             }
             case kMove__Ks ... kMoveKdQc : {
-                /* TODO: Figure out if move is reversible and add to previous states if so
-                 */
                 Move selected_move = Move(action);
+                is_reversible = IsReversible(selected_move.source, GetPile(selected_move.source));
+
+                if (is_reversible) {
+                    std::string current_observation = ObservationString(0);
+                    previous_states.insert(hasher(current_observation));
+                } else {
+                    previous_states.clear();
+                }
+
                 MoveCards(selected_move);
                 current_returns += current_rewards;
                 break;
@@ -752,9 +761,8 @@ namespace open_spiel::solitaire {
             }
         }
 
-
         ++current_depth;
-        if (current_depth >= 300) {
+        if (current_depth >= 150) {
             is_finished = true;
         }
     }
@@ -815,10 +823,32 @@ namespace open_spiel::solitaire {
         } else if (IsChanceNode()) {
             return LegalChanceOutcomes();
         } else {
-            // TODO: Add loop detection later
             std::vector<Action> legal_actions;
-            for (const auto & move : CandidateMoves()) {
-                legal_actions.push_back(move.ActionId());
+
+            if (is_reversible) {
+                // If the state is reversible, we need to check each move to see if it is too.
+                for (const auto & move : CandidateMoves()) {
+                    if (IsReversible(move.source, GetPile(move.source))) {
+                        auto action_id = move.ActionId();
+                        auto child     = Child(action_id);
+
+                        if (child->CurrentPlayer() == kChancePlayerId) {
+                            legal_actions.push_back(action_id);
+                        } else {
+                            auto child_hash = hasher(child->ObservationString());
+                            if (previous_states.count(child_hash) == 0) {
+                                legal_actions.push_back(action_id);
+                            }
+                        }
+                    } else {
+                        legal_actions.push_back(move.ActionId());
+                    }
+                }
+            } else {
+                // If the state isn't reversible, all candidate moves are legal
+                for (const auto & move : CandidateMoves()) {
+                    legal_actions.push_back(move.ActionId());
+                }
             }
 
             if (!legal_actions.empty()) {
@@ -1054,6 +1084,37 @@ namespace open_spiel::solitaire {
 
         // Add current rewards to current returns
         current_rewards = move_reward;
+    }
+
+    bool                    SolitaireState::IsReversible(const Card & source, const Pile * source_pile) const {
+        switch (source.location) {
+            case kWaste : {
+                return false;
+            }
+            case kFoundation : {
+                return true;
+            }
+            case kTableau : {
+                // Move is irreversible if its source is a bottom card or over a hidden card.
+                // Basically if it's the first non-hidden card in the pile/tableau.
+
+                auto it = std::find_if(
+                        source_pile->cards.begin(),
+                        source_pile->cards.end(),
+                        [] (const Card & card) { return card.hidden; });
+
+                if (*it == source) {
+                    return false;
+                } else {
+                    return true;
+                }
+
+            }
+            default : {
+                // TODO: Log error or raise exception
+                return false;
+            }
+        }
     }
 
     // endregion
