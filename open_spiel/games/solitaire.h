@@ -40,11 +40,9 @@ namespace open_spiel::solitaire {
 
     // Default Game Parameters =========================================================================================
 
-    inline constexpr int    kDefaultPlayers    = 1;
-    inline constexpr int    kPlayerId          = 0;
-    inline constexpr int    kDepthLimit        = 500;
-    inline constexpr bool   kDefaultColored    = true;
-    inline constexpr bool   kDefaultThoughtful = false;
+    inline constexpr int    kDefaultPlayers      = 1;
+    inline constexpr int    kDefaultDepthLimit   = 300;
+    inline constexpr bool   kDefaultIsColored    = true;
 
     // Enumerations ====================================================================================================
 
@@ -347,6 +345,9 @@ namespace open_spiel::solitaire {
     inline constexpr int EMPTY_HEART_CARD     = -3;
     inline constexpr int EMPTY_CLUB_CARD      = -4;
     inline constexpr int EMPTY_DIAMOND_CARD   = -5;
+
+    // Only used in one place and just for consistency (to match kChancePlayerId & kTerminalPlayerId)
+    inline constexpr int kPlayerId = 0;
 
     // Type aliases
     using Ranksuit = std::pair<RankType, SuitType>;
@@ -934,7 +935,6 @@ namespace open_spiel::solitaire {
         std::vector<Card>       Targets(const std::optional<LocationType> & location = kMissing) const;
         std::vector<Card>       Sources(const std::optional<LocationType> & location = kMissing) const;
         std::vector<Move>       CandidateMoves() const;
-        LocationType            FindLocation(const Card & card) const;
         Pile *                  GetPile(const Card & card) const;
         void                    MoveCards(const Move & move);
         bool                    IsReversible(const Card & source, const Pile * source_pile) const;
@@ -943,13 +943,17 @@ namespace open_spiel::solitaire {
         bool   is_finished    = false;
         bool   is_reversible  = false;
         int    current_depth  = 0;
-        double previous_score = 0.0;
+
         std::set<std::size_t>  previous_states = {};
         std::map<Card, PileID> card_map;
 
         double current_returns  = 0.0;
         double current_rewards  = 0.0;
-        double previous_rewards = 0.0;
+
+        // Parameters
+        int  depth_limit = kDefaultDepthLimit;
+        bool is_colored  = kDefaultIsColored;
+
     };
 
     class SolitaireGame : public Game {
@@ -974,9 +978,10 @@ namespace open_spiel::solitaire {
         std::shared_ptr<const Game> Clone() const override;
 
     private:
-        int num_players_;
-        int depth_limit_;
+        int  num_players_;
+        int  depth_limit_;
         bool is_colored_;
+
     };
 
 } // namespace open_spiel::solitaire

@@ -25,8 +25,8 @@ namespace open_spiel::solitaire {
             true,
             true,
             {{"players", GameParameter(kDefaultPlayers)},
-             {"colored", GameParameter(kDefaultColored)},
-             {"depth_limit", GameParameter(kDepthLimit)}}
+             {"is_colored", GameParameter(kDefaultIsColored)},
+             {"depth_limit", GameParameter(kDefaultDepthLimit)}}
         };
 
         std::shared_ptr<const Game> Factory(const GameParameters & params) {
@@ -487,6 +487,7 @@ namespace open_spiel::solitaire {
     }
 
     Move::Move(RankType target_rank, SuitType target_suit, RankType source_rank, SuitType source_suit) {
+        // Used to create moves inside std::maps like `MOVE_TO_ACTION` and `ACTION_TO_MOVE`
         target = Card(false, target_suit, target_rank, kMissing);
         source = Card(false, source_suit, source_rank, kMissing);
     }
@@ -519,6 +520,11 @@ namespace open_spiel::solitaire {
 
     SolitaireState::SolitaireState(std::shared_ptr<const Game> game) :
         State(game), waste(kWaste, kPileWaste) {
+
+        // Extract parameters from `game`
+        auto parameters = game->GetParameters();
+        is_colored  = parameters.at("is_colored").bool_value();
+        depth_limit = parameters.at("depth_limit").int_value();
 
         // Create foundations
         for (const auto & suit : SUITS) {
@@ -590,48 +596,29 @@ namespace open_spiel::solitaire {
 
         std::string result;
 
-        absl::StrAppend(&result, "WASTE       : ", waste.ToString());
+        absl::StrAppend(&result, "WASTE       : ", waste.ToString(is_colored));
 
         absl::StrAppend(&result, "\nFOUNDATIONS : ");
         for (const auto & foundation : foundations) {
-            absl::StrAppend(&result, foundation.Targets()[0].ToString(true), " ");
+            absl::StrAppend(&result, foundation.Targets()[0].ToString(is_colored), " ");
         }
 
         absl::StrAppend(&result, "\nTABLEAUS    : ");
         for (const auto & tableau : tableaus) {
             if (!tableau.cards.empty()) {
-                absl::StrAppend(&result, "\n", tableau.ToString(true));
+                absl::StrAppend(&result, "\n", tableau.ToString(is_colored));
             }
         }
 
         absl::StrAppend(&result, "\nTARGETS : ");
         for (const auto & card : Targets()) {
-            absl::StrAppend(&result, card.ToString(true), " ");
+            absl::StrAppend(&result, card.ToString(is_colored), " ");
         }
 
         absl::StrAppend(&result, "\nSOURCES : ");
         for (const auto & card : Sources()) {
-            absl::StrAppend(&result, card.ToString(true), " ");
+            absl::StrAppend(&result, card.ToString(is_colored), " ");
         }
-
-        /*
-        if (!IsChanceNode()) {
-            absl::StrAppend(&result, "\nCANDIDATE MOVES : ");
-            for (auto & move : CandidateMoves()) {
-                absl::StrAppend(&result, "\n", move.ToString(true));
-            }
-        }
-        */
-        /*
-        absl::StrAppend(&result, "\nCARD MAP : ");
-        for (auto & pair : card_map) {
-            absl::StrAppend(&result, "\n",
-                    pair.first.ToString(true),
-                    " ", GLYPH_ARROW, " ",
-                    GetPile(pair.first)->ToString(true)
-                    );
-        }
-        */
 
         return result;
     }
@@ -644,12 +631,12 @@ namespace open_spiel::solitaire {
             case kRevealAs ... kRevealKd : {
                 auto revealed_card = Card((int) action_id);
                 std::string result;
-                absl::StrAppend(&result, "kReveal", revealed_card.ToString(false));
+                absl::StrAppend(&result, "kReveal", revealed_card.ToString(is_colored));
                 return result;
             }
             case kMove__Ks ... kMoveKdQc : {
                 auto move = Move(action_id);
-                return move.ToString(true);
+                return move.ToString(is_colored);
             }
             default : {
                 return "Missing Action";
@@ -702,10 +689,6 @@ namespace open_spiel::solitaire {
     }
 
     void                    SolitaireState::DoApplyAction(Action action) {
-
-        if (!IsChanceNode()) {
-            previous_score = Returns().front();
-        }
 
         switch (action) {
             case kRevealAs ... kRevealKd : {
@@ -762,7 +745,7 @@ namespace open_spiel::solitaire {
         }
 
         ++current_depth;
-        if (current_depth >= 150) {
+        if (current_depth >= depth_limit) {
             is_finished = true;
         }
     }
@@ -1103,11 +1086,7 @@ namespace open_spiel::solitaire {
                         source_pile->cards.end(),
                         [] (const Card & card) { return card.hidden; });
 
-                if (*it == source) {
-                    return false;
-                } else {
-                    return true;
-                }
+                return !(*it == source);
 
             }
             default : {
@@ -1125,8 +1104,8 @@ namespace open_spiel::solitaire {
         Game(kGameType, params),
         num_players_(ParameterValue<int>("players")),
         depth_limit_(ParameterValue<int>("depth_limit")),
-        is_colored_(ParameterValue<bool>("colored")) {
-        // Nothing here yet
+        is_colored_(ParameterValue<bool>("is_colored")) {
+        // Nothing here
     }
 
     int SolitaireGame::NumDistinctActions() const {
@@ -1154,7 +1133,6 @@ namespace open_spiel::solitaire {
     }
 
     std::vector<int> SolitaireGame::ObservationTensorShape() const {
-        // TODO: Fix this later
         return {209};
     }
 
