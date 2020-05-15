@@ -649,33 +649,31 @@ double EFCCEDist(const Game& game, CorrDistConfig config,
 }
 
 double CEDist(const Game& game, const NormalFormCorrelationDevice& mu) {
-  std::shared_ptr<const Game> actual_game;
   if (game.GetType().information == GameType::Information::kOneShot) {
-    actual_game = ConvertToTurnBased(game);
+    std::shared_ptr<const Game> actual_game = ConvertToTurnBased(game);
+    CorrelationDevice converted_mu = ConvertCorrelationDevice(*actual_game, mu);
+    CorrDistConfig config;
+    return EFCEDist(*actual_game, config, converted_mu);
   } else {
-    SPIEL_CHECK_EQ(actual_game->GetType().dynamics,
-                   GameType::Dynamics::kSequential);
-    actual_game = game.Clone();
+    SPIEL_CHECK_EQ(game.GetType().dynamics, GameType::Dynamics::kSequential);
+    CorrelationDevice converted_mu = ConvertCorrelationDevice(game, mu);
+    CorrDistConfig config;
+    return EFCEDist(game, config, converted_mu);
   }
-
-  CorrelationDevice converted_mu = ConvertCorrelationDevice(*actual_game, mu);
-  CorrDistConfig config;
-  return EFCEDist(*actual_game, config, converted_mu);
 }
 
 double CCEDist(const Game& game, const NormalFormCorrelationDevice& mu) {
-  std::shared_ptr<const Game> actual_game;
   if (game.GetType().information == GameType::Information::kOneShot) {
-    actual_game = ConvertToTurnBased(game);
+    std::shared_ptr<const Game> actual_game = ConvertToTurnBased(game);
+    CorrelationDevice converted_mu = ConvertCorrelationDevice(*actual_game, mu);
+    CorrDistConfig config;
+    return EFCCEDist(*actual_game, config, converted_mu);
   } else {
-    SPIEL_CHECK_EQ(actual_game->GetType().dynamics,
-                   GameType::Dynamics::kSequential);
-    actual_game = game.Clone();
+    SPIEL_CHECK_EQ(game.GetType().dynamics, GameType::Dynamics::kSequential);
+    CorrelationDevice converted_mu = ConvertCorrelationDevice(game, mu);
+    CorrDistConfig config;
+    return EFCCEDist(game, config, converted_mu);
   }
-
-  CorrelationDevice converted_mu = ConvertCorrelationDevice(*actual_game, mu);
-  CorrDistConfig config;
-  return EFCCEDist(*actual_game, config, converted_mu);
 }
 
 }  // namespace algorithms

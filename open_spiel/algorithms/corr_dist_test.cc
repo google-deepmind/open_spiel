@@ -17,6 +17,7 @@
 #include <numeric>
 #include <unordered_map>
 
+#include "open_spiel/game_transforms/turn_based_simultaneous_game.h"
 #include "open_spiel/games/efg_game.h"
 #include "open_spiel/games/efg_game_data.h"
 #include "open_spiel/matrix_game.h"
@@ -59,6 +60,10 @@ void TestGibson13MatrixGameExample() {
   // mu is not a CE, because first player gains 1 by deviating to B after
   // receiving the third recommendation, which happens with prob 0.25
   SPIEL_CHECK_TRUE(Near(CEDist(*gibson_game, mu), 0.25));
+
+  // Repeat these tests with a turn-based simultaneous game.
+  SPIEL_CHECK_TRUE(Near(CCEDist(*ConvertToTurnBased(*gibson_game), mu), 0.0));
+  SPIEL_CHECK_TRUE(Near(CEDist(*ConvertToTurnBased(*gibson_game), mu), 0.25));
 }
 
 void TestShapleysGame() {
