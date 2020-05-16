@@ -26,7 +26,7 @@ CFRBRSolver::CFRBRSolver(const Game& game)
                     /*linear_averaging=*/false,
                     /*regret_matching_plus=*/false),
       policy_overrides_(game.NumPlayers(), nullptr),
-      uniform_policy_(GetUniformPolicy(game)) {
+      uniform_policy_(UniformPolicy()) {
   for (int p = 0; p < game_.NumPlayers(); ++p) {
     best_response_computers_.push_back(std::unique_ptr<TabularBestResponse>(
         new TabularBestResponse(game_, p, &uniform_policy_)));
