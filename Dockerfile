@@ -31,16 +31,12 @@ RUN cmake -DPython_TARGET_VERSION=${PYVERSION} -DCMAKE_CXX_COMPILER=`which clang
 RUN make -j12
 ENV PYTHONPATH=${PYTHONPATH}:/repo
 ENV PYTHONPATH=${PYTHONPATH}:/repo/build/python
+# ctest can be disabled for faster builds when tests are not required
 RUN ctest -j12
 WORKDIR /repo/open_spiel
 
-# minimal image for development in Python
-FROM python:3.6-slim-buster as python-slim
-RUN mkdir repo
-WORKDIR /repo
-COPY --from=base /repo .
-RUN pip3 install --upgrade -r requirements.txt
-RUN pip3 install matplotlib
-ENV PYTHONPATH=${PYTHONPATH}:/repo
-ENV PYTHONPATH=${PYTHONPATH}:/repo/build/python
-WORKDIR /repo/open_spiel
+# Jupyterlab Environment
+FROM base as jupyterlab
+RUN pip install jupyter -U && pip install jupyterlab
+EXPOSE 8888
+ENTRYPOINT ["jupyter", "lab","--ip=0.0.0.0","--allow-root"]
