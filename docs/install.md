@@ -89,31 +89,36 @@ Linux versions).
 
 ## Installing via Docker
 
-Option 1 (Basic, 3.13GB):
+Option 1 (3.13GB, 1.14GB Compressed): Base Image without JupyterLab 
+
+_Add --compress for a smaller image size_
 
 ```bash
 docker build --target base -t openspiel . --rm
 ```
 
-Option 2 (Slim, 2.26GB):
-
-```bash
-docker build --target python-slim -t openspiel . --rm
-```
-
-If you are only interested in developing in Python, use the second image. You
-can navigate through the runtime of the container (after the build step) with:
-
 ```bash
 docker run -it --entrypoint /bin/bash openspiel
 ```
-
-Finally you can run examples using:
 
 ```bash
 docker run openspiel python3 python/examples/matrix_game_example.py
 docker run openspiel python3 python/examples/example.py
 ```
+
+Option 2: Base image with JupyterLab (_very useful for a 'Google Colab' experience_)
+
+```bash
+docker build --target jupyterlab -t openspiel . --rm
+```
+
+```bash
+docker run -d -p 8888:8888 openspiel
+```
+> Check the container logs in order to get the endpoint and connection token
+
+_You can use this both locally and on a remote VM for heavy tasks / long running jobs!_
+
 
 ## Running the first examples
 
