@@ -70,7 +70,7 @@ int ScoreBonuses(int level, int contract_score, bool is_vulnerable) {
     return is_vulnerable ? 2000 : 1300;
   } else if (level == 6) {  // 750/500 for small slam + 500/300 for game
     return is_vulnerable ? 1250 : 800;
-  } else if (contract_score > 100) {  // game bonus
+  } else if (contract_score >= 100) {  // game bonus
     return is_vulnerable ? 500 : 300;
   } else {  // partscore bonus
     return 50;
