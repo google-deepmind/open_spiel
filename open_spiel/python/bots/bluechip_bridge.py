@@ -53,6 +53,9 @@ import pyspiel
 # Send: EAST bids 1C
 # Recv: WEST ready for  SOUTH's bid
 
+# The game we support
+GAME_STR = "bridge(use_double_dummy_result=False)"
+
 # Template regular expressions for messages we receive
 _CONNECT = 'Connecting "(?P<client_name>.*)" as ANYPL using protocol version 18'
 _PLAYER_ACTION = ("(?P<seat>NORTH|SOUTH|EAST|WEST) "
@@ -197,13 +200,15 @@ class BlueChipBridgeBot(pyspiel.Bot):
 
     Args:
       game: The OpenSpiel game object, should be an instance of
-        bridge_uncontested_bidding, without forced actions.
+        `bridge(use_double_dummy_result=false)`.
       player_id: The id of the player the bot will act as, 0 = North (dealer), 1
         = East, 2 = South, 3 = West.
       controller: The BlueChip controller; must support methods `start`,
         `read_line`, and `send_line`.
     """
     pyspiel.Bot.__init__(self)
+    if str(game) != GAME_STR:
+      raise ValueError(f"BlueChipBridgeBot invoked with {game}")
     self._game = game
     self._player_id = player_id
     self._controller = controller
@@ -299,16 +304,12 @@ class BlueChipBridgeBot(pyspiel.Bot):
       self.is_play_phase = False
       self.cards_played = 0
 
-  def step(self, state):
-    """Returns an action for the given state."""
+  def inform_action(self, state, player, action):
+    del player, action
+    self._inform_state(state)
 
-    # Restart if this is a fresh state.
-    # (We could alternatively insist that the caller calls restart() itself)
+  def _inform_state(self, state):
     full_history = state.history()
-    if len(full_history) <= 55:  # Deal plus one action for each other player
-      self.restart()
-
-    # Catch up on events since our last turn.
     known_history = self._state.history()
     if full_history[:len(known_history)] != known_history:
       raise ValueError(
@@ -319,6 +320,12 @@ class BlueChipBridgeBot(pyspiel.Bot):
       self._state.apply_action(action)
       if not self._state.is_chance_node():
         self._update_for_state()
+
+  def step(self, state):
+    """Returns an action for the given state."""
+
+    # Bring the external bot up-to-date.
+    self._inform_state(state)
 
     # If we're on a new trick, tell the bot it is its turn.
     if self.is_play_phase and self.cards_played % 4 == 0:
