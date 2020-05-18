@@ -178,6 +178,8 @@ class EFGGame : public Game {
   void ParseGame();
   void ParsePrologue();
   std::string NextToken();
+  void AdvancePosition();
+  std::string GetLine(int line) const;
   bool ParseDoubleValue(const std::string& str, double* value) const;
   bool IsWhiteSpace(char c) const;
   bool IsNodeToken(char c) const;
@@ -191,6 +193,7 @@ class EFGGame : public Game {
   std::string filename_;
   std::string string_data_;
   int pos_;
+  int line_ = 1;
   std::vector<std::unique_ptr<Node>> nodes_;
   std::string name_;
   std::string description_;
