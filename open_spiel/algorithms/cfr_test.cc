@@ -182,6 +182,45 @@ void CFRTest_TicTacToe(int num_iterations, double nashconv_upper_bound) {
   }
 }
 
+void CFRTest_InfoStateValuesTableSerialization() {
+  // check empty
+  CFRInfoStateValuesTable info_state = {};
+  auto deserialized = DeserializeCFRInfoStateValuesTable(
+      SerializeCFRInfoStateValuesTable(info_state));
+  SPIEL_CHECK_TRUE(deserialized.empty());
+
+  // check non-empty
+  info_state = {
+    {"0", CFRInfoStateValues({0, 1, 2}, 0.1)},
+    {"1", CFRInfoStateValues({0, 1, 2, 3}, 0.2)}
+  };
+  deserialized = DeserializeCFRInfoStateValuesTable(
+      SerializeCFRInfoStateValuesTable(info_state));
+
+  SPIEL_CHECK_EQ(info_state.size(), deserialized.size());
+  SPIEL_CHECK_EQ(deserialized.at("0").legal_actions,
+      info_state.at("0").legal_actions);
+  for (int i = 0; i < 3; i++) {
+    SPIEL_CHECK_FLOAT_EQ(deserialized.at("0").cumulative_regrets.at(i),
+        info_state.at("0").cumulative_regrets.at(i));
+    SPIEL_CHECK_FLOAT_EQ(deserialized.at("0").cumulative_policy.at(i),
+        info_state.at("0").cumulative_policy.at(i));
+    SPIEL_CHECK_FLOAT_EQ(deserialized.at("0").current_policy.at(i),
+        info_state.at("0").current_policy.at(i));
+  }
+
+  SPIEL_CHECK_EQ(deserialized.at("1").legal_actions,
+      info_state.at("1").legal_actions);
+  for (int i = 0; i < 4; i++) {
+    SPIEL_CHECK_FLOAT_EQ(deserialized.at("1").cumulative_regrets.at(i),
+        info_state.at("1").cumulative_regrets.at(i));
+    SPIEL_CHECK_FLOAT_EQ(deserialized.at("1").cumulative_policy.at(i),
+        info_state.at("1").cumulative_policy.at(i));
+    SPIEL_CHECK_FLOAT_EQ(deserialized.at("1").current_policy.at(i),
+        info_state.at("1").current_policy.at(i));
+  }
+}
+
 }  // namespace
 }  // namespace algorithms
 }  // namespace open_spiel
@@ -245,4 +284,6 @@ int main(int argc, char** argv) {
   // when we add a version that can handle safe imperfect recall information
   // states.
   // algorithms::CFRTest_TicTacToe(10, 2.0);
+
+  algorithms::CFRTest_InfoStateValuesTableSerialization();
 }

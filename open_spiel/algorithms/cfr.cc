@@ -17,6 +17,8 @@
 #include <algorithm>
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
+#include "open_spiel/abseil-cpp/absl/strings/numbers.h"
+#include "open_spiel/abseil-cpp/absl/strings/string_view.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
@@ -384,6 +386,51 @@ std::string CFRInfoStateValues::ToString() const {
   return str;
 }
 
+std::string CFRInfoStateValues::Serialize() const {
+  std::string str = "";
+  absl::StrAppend(&str, absl::StrJoin(legal_actions, ","), ";");
+  absl::StrAppend(&str, absl::StrJoin(cumulative_regrets, ","), ";");
+  absl::StrAppend(&str, absl::StrJoin(cumulative_policy, ","), ";");
+  absl::StrAppend(&str, absl::StrJoin(current_policy, ","));
+  return str;
+}
+
+CFRInfoStateValues DeserializeCFRInfoStateValues(const std::string& str) {
+  CFRInfoStateValues res = CFRInfoStateValues();
+  if (str.empty()) return res;
+
+  std::vector<std::vector<absl::string_view>> str_values;
+  str_values.reserve(4);
+  for (absl::string_view sv: absl::StrSplit(str, ";")) {
+    str_values.push_back(absl::StrSplit(sv, ","));
+  }
+
+  // all vectors should have the same number of elements
+  int num_elements = str_values.at(0).size();
+  res.legal_actions.reserve(num_elements);
+  res.cumulative_regrets.reserve(num_elements);
+  res.cumulative_policy.reserve(num_elements);
+  res.current_policy.reserve(num_elements);
+
+  // insert the actual values
+  for (auto const& str_value : str_values.at(0)) {
+    int value;
+    absl::SimpleAtoi(str_value, &value);
+    res.legal_actions.push_back(value);
+  }
+  for (int i = 0; i < num_elements; i++) {
+    double value1, value2, value3;
+    absl::SimpleAtod(str_values.at(1).at(i), &value1);
+    absl::SimpleAtod(str_values.at(2).at(i), &value2);
+    absl::SimpleAtod(str_values.at(3).at(i), &value3);
+
+    res.cumulative_regrets.push_back(value1);
+    res.cumulative_policy.push_back(value2);
+    res.current_policy.push_back(value3);
+  }
+  return res;
+}
+
 void CFRInfoStateValues::ApplyRegretMatching() {
   double sum_positive_regrets = 0.0;
   for (int aidx = 0; aidx < num_actions(); ++aidx) {
@@ -415,6 +462,34 @@ int CFRInfoStateValues::SampleActionIndex(double epsilon, double z) {
     sum += prob;
   }
   SpielFatalError(absl::StrCat("SampleActionIndex: sum of probs is ", sum));
+}
+
+std::string SerializeCFRInfoStateValuesTable(
+    const CFRInfoStateValuesTable& info_states) {
+  std::string str = "";
+  if (info_states.empty()) return str;
+
+  for (auto const& [info_state, values] : info_states) {
+    absl::StrAppend(&str, info_state, ":", values.Serialize(), "\n");
+  }
+
+  // remove the trailing newline character
+  str.erase(str.length() - 1);
+  return str;
+}
+
+CFRInfoStateValuesTable DeserializeCFRInfoStateValuesTable(
+    const std::string& str) {
+  CFRInfoStateValuesTable res;
+  if (str.empty()) return res;
+
+  for (absl::string_view line : absl::StrSplit(str, '\n')) {
+    std::vector<std::string> info_state_and_values = absl::StrSplit(line, ':');
+    res.insert({
+      info_state_and_values.at(0),
+      DeserializeCFRInfoStateValues(info_state_and_values.at(1))});
+  }
+  return res;
 }
 
 //  Resets negative cumulative regrets to 0.
