@@ -1,7 +1,5 @@
 #include "solitaire.h"
-
 #include <optional>
-#include <exception>
 
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
 #include "open_spiel/game_parameters.h"
@@ -674,18 +672,127 @@ namespace open_spiel::solitaire {
         SPIEL_CHECK_GE(player, 0);
         SPIEL_CHECK_LT(player, num_players_);
 
-        for (const auto & tableau : tableaus) {
-            std::vector<double> dv = tableau.Tensor();
-            values->insert(values->end(), dv.begin(), dv.end());
+        values->resize(game_->ObservationTensorSize());
+        std::fill(values->begin(), values->end(), 0.0);
+        auto ptr = values->begin();
+
+        for (auto & foundation : foundations) {
+            if (foundation.cards.empty()) {
+                ptr[0] = 1;
+            } else {
+                auto last_rank = foundation.cards.back().rank;
+                if (last_rank >= kA and last_rank <= kK) {
+                    ptr[last_rank] = 1;
+                }
+            }
+            ptr += FOUNDATION_TENSOR_LENGTH;
         }
 
-        for (const auto & foundation : foundations) {
-            std::vector<double> dv = foundation.Tensor();
-            values->insert(values->end(), dv.begin(), dv.end());
+        for (auto & tableau : tableaus) {
+            if (tableau.cards.empty()) {
+                ptr[7] = 1.0;
+                continue;
+            } else {
+                int num_hidden_cards = 0;
+                for (auto & card : tableau.cards) {
+                    if (card.hidden && num_hidden_cards <= MAX_HIDDEN_CARDS) {
+                        ptr[num_hidden_cards] = 1.0;
+                        ++num_hidden_cards;
+                    } else {
+                        auto tensor_index = card.GetIndex() + MAX_HIDDEN_CARDS;
+                        ptr[tensor_index] = 1.0;
+                    }
+                }
+            }
+            ptr += TABLEAU_TENSOR_LENGTH;
         }
 
-        std::vector<double> dv = waste.Tensor();
-        values->insert(values->end(), dv.begin(), dv.end());
+        if (waste.cards.empty()) {
+            return;
+        } else {
+            for (auto & card : waste.cards) {
+                if (card.hidden) {
+                    ptr[0] = 1;
+                } else {
+                    auto tensor_index = card.GetIndex() + 1;
+                    ptr[tensor_index] = 1.0;
+                }
+                ptr += WASTE_TENSOR_LENGTH;
+            }
+        }
+
+        /*
+        // region For debugging purposes
+        std::vector<std::pair<int, int>> slices = {
+                // region Slices to print out
+                // Foundation Tensors
+                {0, 13},
+                {14, 27},
+                {28, 41},
+                {42, 55},
+
+                // Tableau Tensors
+                {56, 114},
+                {115, 173},
+                {174, 232},
+                {233, 291},
+                {292, 350},
+                {351, 409},
+                {410, 468},
+
+                // Waste Tensors
+                {469, 521},
+                {522, 574},
+                {575, 627},
+                {628, 680},
+                {681, 733},
+                {734, 786},
+                {787, 839},
+                {840, 892},
+                {893, 945},
+                {946, 998},
+                {999, 1051},
+                {1052, 1104},
+                {1105, 1157},
+                {1158, 1210},
+                {1211, 1263},
+                {1264, 1316},
+                {1317, 1369},
+                {1370, 1422},
+                {1423, 1475},
+                {1476, 1528},
+                {1529, 1581},
+                {1582, 1634},
+                {1635, 1687},
+                {1688, 1740}
+                // endregion
+        };
+
+        int i = 1;
+        for (auto & slice : slices) {
+            switch (i) {
+                case 1 : {
+                    std::cout << "FOUNDATION TENSORS" << std::endl;
+                    break;
+                }
+                case 5 : {
+                    std::cout << "TABLEAU TENSORS" << std::endl;
+                    break;
+                }
+                case 12 : {
+                    std::cout << "WASTE TENSORS" << std::endl;
+                    break;
+                }
+                default : {
+                    // Do nothing
+                }
+            }
+            std::cout << std::vector<double>(values->begin() + slice.first, values->begin() + slice.second) << std::endl;
+            ++i;
+        }
+        // endregion
+        */
+
     }
 
     void                    SolitaireState::DoApplyAction(Action action) {
@@ -1133,7 +1240,7 @@ namespace open_spiel::solitaire {
     }
 
     std::vector<int> SolitaireGame::ObservationTensorShape() const {
-        return {209};
+        return {1740};
     }
 
     std::unique_ptr<State> SolitaireGame::NewInitialState() const {

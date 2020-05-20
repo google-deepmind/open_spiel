@@ -171,9 +171,68 @@ namespace {
         }
     }
 
+    void TestTableauTensor() {
+        std::cout << "\nTestTableauTensor()" << std::endl;
+        Pile tableau = Pile(kTableau, kPile1stTableau);
+        std::vector<Card> cards_to_add = {
+                Card(true),
+                Card(true),
+                Card(true),
+                Card(false, kS, kT, kTableau),
+                Card(false, kH, k9, kTableau),
+                Card(false, kC, k8, kTableau),
+                Card(false, kD, k7, kTableau),
+        };
+        tableau.Extend(cards_to_add);
+
+        std::cout << tableau.ToString(true) << std::endl;
+        std::cout << tableau.Tensor() << std::endl;
+    }
+
+    void TestFoundationTensor() {
+        std::cout << "\nTestFoundationTensor()" << std::endl;
+        Pile foundation = Pile(kFoundation, kPileSpades);
+        std::vector<Card> cards_to_add = {
+                Card(false, kS, kA, kFoundation),
+                Card(false, kS, k2, kFoundation),
+                Card(false, kS, k3, kFoundation),
+                Card(false, kS, k4, kFoundation),
+                Card(false, kS, k5, kFoundation),
+        };
+        foundation.Extend(cards_to_add);
+
+        std::cout << foundation.ToString(true) << std::endl;
+        std::cout << foundation.Tensor() << std::endl;
+    }
+    
+    void TestWasteTensor() {
+        std::cout << "\nTestWasteTensor()" << std::endl;
+        Pile waste = Pile(kWaste, kPileWaste);
+        std::vector<Card> cards_to_add = {
+                Card(false, kS, kA, kWaste),
+                Card(false, kH, kA, kWaste),
+                Card(false, kH, k6, kWaste),
+                Card(false, kD, k7, kWaste),
+                Card(true),
+                Card(true),
+                Card(true),
+        };
+        waste.Extend(cards_to_add);
+        std::vector<double> tensor = waste.Tensor();
+
+        std::cout << waste.ToString(true) << std::endl;
+
+        auto tensor_index = tensor.begin();
+
+        while (tensor_index != tensor.end()) {
+            std::cout << std::vector<double>(tensor_index, tensor_index + 53) << std::endl;
+            tensor_index += 53;
+        }
+    }
+
     void BasicSolitaireTests() {
         testing::LoadGameTest("solitaire");
-        testing::RandomSimTest(*LoadGame("solitaire"), 1);
+        testing::RandomSimTest(*LoadGame("solitaire"), 10);
     }
 
     /*
@@ -362,17 +421,23 @@ namespace {
 } // namespace open_spiel::solitaire
 
 int main(int argc, char** argv) {
-    //open_spiel::solitaire::TestGetOppositeSuits();
-    //open_spiel::solitaire::TestDefaultCardConstructor();
-    //open_spiel::solitaire::TestCardGetIndex();
-    //open_spiel::solitaire::TestCardToString();
-    //open_spiel::solitaire::TestLegalChildren();
-    //open_spiel::solitaire::TestCardConstructorFromIndex();
-    //open_spiel::solitaire::TestTableauPile();
-    //open_spiel::solitaire::TestFoundationPile();
-    //open_spiel::solitaire::TestEmptyTableauPile();
-    //open_spiel::solitaire::TestEmptyFoundationPile();
-    //open_spiel::solitaire::TestHiddenTableauPile();
-    //open_spiel::solitaire::TestWastePile();
+    /*
+    open_spiel::solitaire::TestGetOppositeSuits();
+    open_spiel::solitaire::TestDefaultCardConstructor();
+    open_spiel::solitaire::TestCardGetIndex();
+    open_spiel::solitaire::TestCardToString();
+    open_spiel::solitaire::TestLegalChildren();
+    open_spiel::solitaire::TestCardConstructorFromIndex();
+    open_spiel::solitaire::TestTableauPile();
+    open_spiel::solitaire::TestFoundationPile();
+    open_spiel::solitaire::TestEmptyTableauPile();
+    open_spiel::solitaire::TestEmptyFoundationPile();
+    open_spiel::solitaire::TestHiddenTableauPile();
+    open_spiel::solitaire::TestWastePile();
+
+    */
+    // open_spiel::solitaire::TestTableauTensor();
+    // open_spiel::solitaire::TestFoundationTensor();
+    // open_spiel::solitaire::TestWasteTensor();
     open_spiel::solitaire::BasicSolitaireTests();
 }

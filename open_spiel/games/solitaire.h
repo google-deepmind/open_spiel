@@ -41,7 +41,7 @@ namespace open_spiel::solitaire {
     // Default Game Parameters =========================================================================================
 
     inline constexpr int    kDefaultPlayers      = 1;
-    inline constexpr int    kDefaultDepthLimit   = 300;
+    inline constexpr int    kDefaultDepthLimit   = 150;
     inline constexpr bool   kDefaultIsColored    = true;
 
     // Enumerations ====================================================================================================
@@ -337,7 +337,7 @@ namespace open_spiel::solitaire {
 
     // Constants =======================================================================================================
 
-    //region Indices for special cards
+    // Indices for special cards
     inline constexpr int HIDDEN_CARD          = 99;
     inline constexpr int NO_CARD              =  0;
     inline constexpr int EMPTY_TABLEAU_CARD   = -1;
@@ -345,6 +345,14 @@ namespace open_spiel::solitaire {
     inline constexpr int EMPTY_HEART_CARD     = -3;
     inline constexpr int EMPTY_CLUB_CARD      = -4;
     inline constexpr int EMPTY_DIAMOND_CARD   = -5;
+
+    // Lengths of pile tensor representations
+    inline constexpr int FOUNDATION_TENSOR_LENGTH = 14;
+    inline constexpr int TABLEAU_TENSOR_LENGTH    = 59;
+    inline constexpr int WASTE_TENSOR_LENGTH      = 53;
+
+    // Constant for how many hidden cards can show up in a tableau
+    inline constexpr int MAX_HIDDEN_CARDS = 6;
 
     // Only used in one place and just for consistency (to match kChancePlayerId & kTerminalPlayerId)
     inline constexpr int kPlayerId = 0;
