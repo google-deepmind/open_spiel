@@ -16,6 +16,7 @@
 
 #include <sstream>
 
+#include "open_spiel/abseil-cpp/absl/strings/str_format.h"
 #include "open_spiel/abseil-cpp/absl/strings/string_view.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/games/go/go_board.h"
@@ -161,6 +162,9 @@ std::vector<Action> CursorGoState::LegalActions() const {
 std::string CursorGoState::ActionToString(Player player, Action action) const {
   static constexpr std::array<absl::string_view, kNumDistinctActions>
       kActionNames{"Up", "Down", "Left", "Right", "Place Stone", "Pass"};
+  if (action < 0 || action >= kActionNames.size()) {
+    return absl::StrFormat("invalid action %d", action);
+  }
   return std::string(kActionNames[action]);
 }
 
