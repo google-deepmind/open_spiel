@@ -19,7 +19,7 @@ namespace open_spiel::solitaire {
             1,
             1,
             true,
-            true,
+            false,
             true,
             true,
             {{"players", GameParameter(kDefaultPlayers)},
@@ -654,20 +654,6 @@ namespace open_spiel::solitaire {
         return ToString();
     }
 
-    void                    SolitaireState::InformationStateTensor(Player player, std::vector<double> *values) const {
-        SPIEL_CHECK_GE(player, 0);
-        SPIEL_CHECK_LT(player, num_players_);
-
-        values->resize(game_->InformationStateTensorSize());
-        std::fill(values->begin(), values->end(), kInvalidAction);
-
-        int i = 0;
-        for (auto & action : History()) {
-            (*values)[i] = action;
-            ++i;
-        }
-    }
-
     void                    SolitaireState::ObservationTensor(Player player, std::vector<double> *values) const {
         SPIEL_CHECK_GE(player, 0);
         SPIEL_CHECK_LT(player, num_players_);
@@ -859,45 +845,6 @@ namespace open_spiel::solitaire {
 
     std::vector<double>     SolitaireState::Returns() const {
         // Returns the sum of rewards up to and including the most recent state transition.
-
-        /*
-        double old_returns;
-        double f_score = 0.0;
-        double t_score = 0.0;
-        double w_score = 0.0;
-
-        for (auto & foundation : foundations) {
-            for (auto & card : foundation.cards) {
-                f_score += FOUNDATION_POINTS.at(card.rank);
-            }
-        }
-
-        int num_hidden = 0;
-        for (auto & tableau : tableaus) {
-            if (!tableau.cards.empty()) {
-                for (auto & card : tableau.cards) {
-                    if (card.hidden) {
-                        num_hidden += 1;
-                    }
-                }
-                if (tableau.cards.back().hidden) {
-                    num_hidden -= 1;
-                }
-            }
-        }
-        t_score = (21 - num_hidden) * 20;
-
-        w_score = (24 - waste.cards.size()) * 20;
-
-        old_returns = f_score + t_score + w_score;
-
-        if (old_returns != current_returns) {
-            std::cout << RED << "Discrepancy in Returns()" << RESET << std::endl;
-            std::cout << RED << "Old Returns = " << old_returns << RESET << std::endl;
-            std::cout << RED << "New Returns = " << current_returns << RESET << std::endl;
-        }
-        */
-
         return {current_returns};
     }
 
@@ -1038,33 +985,6 @@ namespace open_spiel::solitaire {
             pile_id = card_map.at(card);
         }
 
-        /*
-        try {
-            pile_id = card_map.at(card);
-        } catch (std::out_of_range) {
-            if (card.rank == kNoRank) {
-                if (card.suit == kNoSuit) {
-                    // Handle finding an empty tableau pile
-                    for (auto & tableau : tableaus) {
-                        if (tableau.cards.empty()) {
-                            return const_cast<Pile *>(& tableau);
-                        }
-                    }
-                } else {
-                    // Handle finding an empty foundation pile
-                    for (auto & foundation : foundations) {
-                        if (foundation.suit == card.suit) {
-                            return const_cast<Pile *>(& foundation);
-                        }
-                    }
-                }
-            } else {
-                // Shouldn't ever reach this point
-                pile_id = kNoPile;
-            }
-        }
-        */
-
         switch (pile_id) {
             case kPileWaste : {
                 return const_cast<Pile *>(& waste);
@@ -1125,13 +1045,6 @@ namespace open_spiel::solitaire {
                 }
             }
         }
-
-        /*
-        std::cout << "\n";
-        for (auto & move : candidate_moves) {
-            std::cout << "Move = " << move.ToString() << std::endl;
-        }
-        */
 
         return candidate_moves;
     }
@@ -1233,10 +1146,6 @@ namespace open_spiel::solitaire {
 
     double SolitaireGame::MaxUtility() const {
         return 3220.0;
-    }
-
-    std::vector<int> SolitaireGame::InformationStateTensorShape() const {
-        return {depth_limit_};
     }
 
     std::vector<int> SolitaireGame::ObservationTensorShape() const {

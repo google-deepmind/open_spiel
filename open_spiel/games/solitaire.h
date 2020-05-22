@@ -930,7 +930,6 @@ namespace open_spiel::solitaire {
         std::string             ActionToString(Player player, Action action_id) const override;
         std::string             InformationStateString(Player player) const override;
         std::string             ObservationString(Player player) const override;
-        void                    InformationStateTensor(Player player, std::vector<double> * values) const override;
         void                    ObservationTensor(Player player, std::vector<double> * values) const override;
         void                    DoApplyAction(Action move) override;
         std::vector<double>     Returns() const override;
@@ -979,9 +978,7 @@ namespace open_spiel::solitaire {
         double      MinUtility() const override;
         double      MaxUtility() const override;
 
-        std::vector<int> InformationStateTensorShape() const override;
         std::vector<int> ObservationTensorShape() const override;
-
         std::unique_ptr<State> NewInitialState() const override;
         std::shared_ptr<const Game> Clone() const override;
 
