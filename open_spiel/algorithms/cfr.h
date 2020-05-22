@@ -43,7 +43,7 @@ struct CFRInfoStateValues {
 
   // A string representation of the information state values
   std::string ToString() const;
-  // a less verbose string representation used for serialization purposes
+  // A less verbose string representation used for serialization purposes
   std::string Serialize() const;
 
   // Samples from current policy using randomly generated z, adding epsilon
@@ -56,7 +56,9 @@ struct CFRInfoStateValues {
   std::vector<double> current_policy;
 };
 
-CFRInfoStateValues DeserializeCFRInfoStateValues(const std::string& str);
+// Parameter str is string_view since CFRInfoStateValuesTable is expected to
+// potentially hold a large number of values
+CFRInfoStateValues DeserializeCFRInfoStateValues(absl::string_view str);
 
 // A type for tables holding CFR values.
 using CFRInfoStateValuesTable =
@@ -65,8 +67,10 @@ using CFRInfoStateValuesTable =
 std::string SerializeCFRInfoStateValuesTable(
     const CFRInfoStateValuesTable& info_states);
 
+// Parameter str is string_view since CFRInfoStateValuesTable is expected to
+// potentially hold a large number of values
 CFRInfoStateValuesTable DeserializeCFRInfoStateValuesTable(
-    const std::string& str);
+    absl::string_view str);
 
 // A policy that extracts the average policy from the CFR table values, which
 // can be passed to tabular exploitability.
