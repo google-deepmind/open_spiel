@@ -145,7 +145,7 @@ def main(_):
     # Play from the command line against the trained DQN agent.
     human_player = 1
     while True:
-      logging.info("You are playing as %s", "O" if human_player else "X")
+      logging.info("You are playing as %s", "X" if human_player else "0")
       time_step = env.reset()
       while not time_step.last():
         player_id = time_step.observations["current_player"]
