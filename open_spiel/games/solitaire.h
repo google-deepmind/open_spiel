@@ -443,7 +443,6 @@ namespace open_spiel::solitaire {
 
     class Pile {
     public:
-
         // Attributes ==================================================================================================
         std::vector<Card>  cards;
         const LocationType type;
@@ -455,14 +454,45 @@ namespace open_spiel::solitaire {
         Pile(LocationType type, PileID id, SuitType suit = kNoSuit);
 
         // Other Methods ===============================================================================================
-        std::vector<Card>   Sources() const;
-        std::vector<Card>   Targets() const;
-        std::vector<Card>   Split(Card card);
-        void                Extend(std::vector<Card> source_cards);
+        virtual std::vector<Card> Sources() const;
+        virtual std::vector<Card> Targets() const;
+        virtual std::vector<Card> Split(Card card);
+        void                      Extend(std::vector<Card> source_cards);
+        std::vector<double>       Tensor() const;
+        std::string               ToString(bool colored = true) const;
+    };
 
-        std::vector<double> Tensor() const;
-        std::string         ToString(bool colored = true) const;
+    class Tableau : public Pile {
+    public:
+        // Constructors ================================================================================================
+        Tableau(PileID id);
 
+        // Other Methods ===============================================================================================
+        std::vector<Card> Sources() const override;
+        std::vector<Card> Targets() const override;
+        std::vector<Card> Split(Card card) override;
+    };
+
+    class Foundation : public Pile {
+    public:
+        // Constructors ================================================================================================
+        Foundation(PileID id, SuitType suit);
+
+        // Other Methods ===============================================================================================
+        std::vector<Card> Sources() const override;
+        std::vector<Card> Targets() const override;
+        std::vector<Card> Split(Card card) override;
+    };
+
+    class Waste : public Pile {
+    public:
+        // Constructors ================================================================================================
+        Waste();
+
+        // Other Methods ===============================================================================================
+        std::vector<Card> Sources() const override;
+        std::vector<Card> Targets() const override;
+        std::vector<Card> Split(Card card) override;
     };
 
     class Move {

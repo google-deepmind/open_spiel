@@ -10,6 +10,7 @@ namespace {
 
     namespace testing = open_spiel::testing;
 
+    /*
     void TestGetOppositeSuits() {
         std::cout << "\nTestGetOppositeSuits()" << std::endl;
 
@@ -229,10 +230,123 @@ namespace {
             tensor_index += 53;
         }
     }
+    */
 
     void BasicSolitaireTests() {
         testing::LoadGameTest("solitaire");
         testing::RandomSimTest(*LoadGame("solitaire"), 10);
+    }
+
+    void TestTableau() {
+        std::cout << "\nTestTableau()" << std::endl;
+        Tableau tableau = Tableau(kPile1stTableau);
+        std::vector<Card> cards_to_add = {
+                Card(true),
+                Card(true),
+                Card(true),
+                Card(false, kS, kT, kTableau),
+                Card(false, kH, k9, kTableau),
+                Card(false, kC, k8, kTableau),
+                Card(false, kD, k7, kTableau),
+        };
+        tableau.Extend(cards_to_add);
+        std::cout << tableau.ToString(true) << std::endl;
+
+        std::cout << "\nTableau::Targets()" << std::endl;
+        for (auto & card : tableau.Targets()) {
+            std::cout << card.ToString(true) << " ";
+        }
+        std::cout << std::endl;
+
+        std::cout << "\nTableau::Sources()" << std::endl;
+        for (auto & card : tableau.Sources()) {
+            std::cout << card.ToString(true) << " ";
+        }
+        std::cout << std::endl;
+
+        std::cout << "\nTableau::Split()" << std::endl;
+        auto split_cards = tableau.Split(Card(false, kC, k8, kTableau));
+
+        std::cout << tableau.ToString(true) << std::endl;
+
+        for (auto & card : split_cards) {
+            std::cout << card.ToString(true) << " ";
+        }
+        std::cout << std::endl;
+    }
+
+    void TestFoundation() {
+        std::cout << "\nTestFoundation()" << std::endl;
+        Foundation foundation = Foundation(kPileSpades, kS);
+        std::vector<Card> cards_to_add = {
+                Card(false, kS, kA, kFoundation),
+                Card(false, kS, k2, kFoundation),
+                Card(false, kS, k3, kFoundation),
+                Card(false, kS, k4, kFoundation),
+                Card(false, kS, k5, kFoundation),
+        };
+        foundation.Extend(cards_to_add);
+        std::cout << foundation.ToString(true) << std::endl;
+
+        std::cout << "\nFoundation::Targets()" << std::endl;
+        for (auto & card : foundation.Targets()) {
+            std::cout << card.ToString(true) << " ";
+        }
+        std::cout << std::endl;
+
+        std::cout << "\nFoundation::Sources()" << std::endl;
+        for (auto & card : foundation.Sources()) {
+            std::cout << card.ToString(true) << " ";
+        }
+        std::cout << std::endl;
+
+        std::cout << "\nFoundation::Split()" << std::endl;
+        auto split_cards = foundation.Split(Card(false, kS, k5, kFoundation));
+
+        std::cout << foundation.ToString(true) << std::endl;
+
+        for (auto & card : split_cards) {
+            std::cout << card.ToString(true) << " ";
+        }
+        std::cout << std::endl;
+    }
+
+    void TestWaste() {
+        std::cout << "\nTestWaste()" << std::endl;
+        Waste waste = Waste();
+        std::vector<Card> cards_to_add = {
+                Card(false, kS, kA, kWaste),
+                Card(false, kH, kA, kWaste),
+                Card(false, kH, k6, kWaste),
+                Card(false, kD, k7, kWaste),
+                Card(true),
+                Card(true),
+                Card(true),
+        };
+        waste.Extend(cards_to_add);
+        std::cout << waste.ToString(true) << std::endl;
+
+        std::cout << "\nWaste::Targets()" << std::endl;
+        for (auto & card : waste.Targets()) {
+            std::cout << card.ToString(true) << " ";
+        }
+        std::cout << std::endl;
+
+        std::cout << "\nWaste::Sources()" << std::endl;
+        for (auto & card : waste.Sources()) {
+            std::cout << card.ToString(true) << " ";
+        }
+        std::cout << std::endl;
+
+        std::cout << "\nWaste::Split()" << std::endl;
+        auto split_cards = waste.Split(Card(false, kH, kA, kWaste));
+
+        std::cout << waste.ToString(true) << std::endl;
+
+        for (auto & card : split_cards) {
+            std::cout << card.ToString(true) << " ";
+        }
+        std::cout << std::endl;
     }
 
     /*
@@ -434,10 +548,12 @@ int main(int argc, char** argv) {
     open_spiel::solitaire::TestEmptyFoundationPile();
     open_spiel::solitaire::TestHiddenTableauPile();
     open_spiel::solitaire::TestWastePile();
-
     */
     // open_spiel::solitaire::TestTableauTensor();
     // open_spiel::solitaire::TestFoundationTensor();
     // open_spiel::solitaire::TestWasteTensor();
-    open_spiel::solitaire::BasicSolitaireTests();
+    // open_spiel::solitaire::BasicSolitaireTests();
+    open_spiel::solitaire::TestTableau();
+    open_spiel::solitaire::TestFoundation();
+    open_spiel::solitaire::TestWaste();
 }

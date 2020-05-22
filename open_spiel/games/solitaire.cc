@@ -369,7 +369,6 @@ namespace open_spiel::solitaire {
                 } else {
                     return {};
                 }
-
             }
             case kWaste : {
                 if (!cards.empty()) {
@@ -397,8 +396,6 @@ namespace open_spiel::solitaire {
     }
 
     std::vector<Card> Pile::Split(Card card) {
-        // TODO: Refactor this method
-
         std::vector<Card> split_cards;
         switch (type) {
             case kFoundation : {
@@ -449,7 +446,6 @@ namespace open_spiel::solitaire {
 
     void Pile::Extend(std::vector<Card> source_cards) {
         for (auto & card : source_cards) {
-            // TODO: FIX THIS IMMEDIATELY
             card.location = type;
             cards.push_back(card);
         }
@@ -473,6 +469,150 @@ namespace open_spiel::solitaire {
             absl::StrAppend(&result, card.ToString(colored), " ");
         }
         return result;
+    }
+
+    // endregion
+
+    // region Tableau Methods =================================================================================================
+
+    Tableau::Tableau(PileID id) :
+        Pile(kTableau, id, kNoSuit) {
+        // Nothing here
+    }
+
+    std::vector<Card> Tableau::Targets() const {
+        if (!cards.empty()) {
+            auto back_card = cards.back();
+            if (!back_card.hidden) {
+                return {cards.back()};
+            } else {
+                return {};
+            }
+        } else {
+            // Empty tableau card (no rank or suit)
+            return {Card(false, kNoSuit, kNoRank, kTableau)};
+        }
+    }
+
+    std::vector<Card> Tableau::Sources() const {
+        std::vector<Card> sources;
+        sources.reserve(13);
+        if (!cards.empty()) {
+            for (auto & card : cards) {
+                if (!card.hidden) {
+                    sources.push_back(card);
+                }
+            }
+            return sources;
+        } else {
+            return {};
+        }
+    }
+
+    std::vector<Card> Tableau::Split(Card card) {
+        std::vector<Card> split_cards;
+        if (!cards.empty()) {
+            bool split_flag = false;
+            for (auto it = cards.begin(); it != cards.end();) {
+                if (*it == card) {
+                    split_flag = true;
+                }
+                if (split_flag) {
+                    split_cards.push_back(*it);
+                    it = cards.erase(it);
+                } else {
+                    ++it;
+                }
+            }
+        }
+        return split_cards;
+    }
+
+    // endregion
+
+    // region Foundation Methods ==============================================================================================
+
+    Foundation::Foundation(PileID id, SuitType suit) :
+        Pile(kFoundation, id, suit) {
+        // Nothing here
+    }
+
+    std::vector<Card> Foundation::Targets() const {
+        if (!cards.empty()) {
+            return {cards.back()};
+        } else {
+            // Empty foundation card with the same suit as the pile
+            return {Card(false, suit, kNoRank, kFoundation)};
+        }
+    }
+
+    std::vector<Card> Foundation::Sources() const {
+        std::vector<Card> sources;
+        sources.reserve(13);
+        if (!cards.empty()) {
+            return {cards.back()};
+        } else {
+            return {};
+        }
+    }
+
+    std::vector<Card> Foundation::Split(Card card) {
+        std::vector<Card> split_cards;
+        if (cards.back() == card) {
+            split_cards = {cards.back()};
+            cards.pop_back();
+        }
+        return split_cards;
+    }
+
+    // endregion
+
+    // region Waste Methods ===================================================================================================
+
+    Waste::Waste() :
+        Pile(kWaste, kPileWaste, kNoSuit) {
+        // Nothing here
+    }
+
+    std::vector<Card> Waste::Targets() const {
+        return {};
+    }
+
+    std::vector<Card> Waste::Sources() const {
+        std::vector<Card> sources;
+        sources.reserve(13);
+        if (!cards.empty()) {
+            int i = 0;
+            for (auto & card : cards) {
+                if (!card.hidden) {
+                    if (i % 3 == 0) {
+                        sources.push_back(card);
+                    }
+                    ++i;
+                } else {
+                    break;
+                }
+            }
+            return sources;
+        } else {
+            return {};
+        }
+    }
+
+    std::vector<Card> Waste::Split(Card card) {
+        std::vector<Card> split_cards;
+        if (!cards.empty()) {
+            for (auto it = cards.begin(); it != cards.end();) {
+                if (*it == card) {
+                    split_cards.push_back(*it);
+                    it = cards.erase(it);
+                    break;
+                } else {
+                    ++it;
+                }
+            }
+        }
+        return split_cards;
     }
 
     // endregion
