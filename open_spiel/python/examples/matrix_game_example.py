@@ -19,9 +19,12 @@ from __future__ import division
 from __future__ import print_function
 
 import random
+
 from absl import app
+import numpy as np
 
 import pyspiel
+from open_spiel.python.utils import file_utils
 
 
 def _manually_create_game():
@@ -37,9 +40,9 @@ def _manually_create_game():
       2,  # max num players
       2,  # min_num_players
       True,  # provides_information_state
-      True,  # provides_information_state_as_normalized_vector
+      True,  # provides_information_state_tensor
       False,  # provides_observation
-      False,  # provides_observation_as_normalized_vector
+      False,  # provides_observation_tensor
       dict()  # parameter_specification
   )
   game = pyspiel.MatrixGame(
@@ -65,6 +68,14 @@ def _even_easier_create_game():
   return pyspiel.create_matrix_game([[-1, 1], [1, -1]], [[1, -1], [-1, 1]])
 
 
+def _import_data_create_game():
+  """Creates a game via imported payoff data."""
+  payoff_file = file_utils.find_file(
+      "open_spiel/data/paper_data/response_graph_ucb/soccer.txt", 2)
+  payoffs = np.loadtxt(payoff_file)*2-1
+  return pyspiel.create_matrix_game(payoffs, payoffs.T)
+
+
 def main(_):
   games_list = pyspiel.registered_games()
   print("Registered games:")
@@ -79,6 +90,7 @@ def main(_):
   print("Creating matrix game...")
   game = pyspiel.load_matrix_game("matrix_mp")
   game = _manually_create_game()
+  game = _import_data_create_game()
   game = _easy_create_game()
   game = _even_easier_create_game()
 

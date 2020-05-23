@@ -21,14 +21,52 @@ git:
 # and the virtualenv.
 matrix:
   include:
+  # Build and run tests without all optional dependencies (default behavior)
   - os: linux
     dist: bionic # Ubuntu 18.04.2 LTS released on 26 April 2018
     env: OS_PYTHON_VERSION=3.6
-  # - os: osx
-  #   # macOS 10.14 (Mojave), release on September 24, 2018.
-  #   osx_image: xcode11
+  # Build and run tests with all optional dependencies
+  - os: linux
+    dist: bionic # Ubuntu 18.04.2 LTS released on 26 April 2018
+    env:
+      - OS_PYTHON_VERSION=3.6
+      - DEFAULT_OPTIONAL_DEPENDENCY="ON"
+  # Build and test on MacOS. We use a single target, with all dependencies.
+  - os: osx
+    osx_image: xcode10.3  # macOS 10.14 (Mojave), release on March 25, 2019.
+    env:
+      # Unfortunately, the build fails on MacOs for universal poker.
+      - BUILD_WITH_ACPC="OFF"
+      - DEFAULT_OPTIONAL_DEPENDENCY="ON"
+
+  ## Tests using PIP
+  # Build and run tests without all optional dependencies (default behavior) and
+  # use nox
+  - os: linux
+    dist: bionic # Ubuntu 18.04.2 LTS released on 26 April 2018
+    env:
+      - OS_PYTHON_VERSION=3.6
+      - TRAVIS_USE_NOX=1
+  # Build and run tests with all optional dependencies and use nox
+  - os: linux
+    dist: bionic # Ubuntu 18.04.2 LTS released on 26 April 2018
+    env:
+      - OS_PYTHON_VERSION=3.6
+      - DEFAULT_OPTIONAL_DEPENDENCY="ON"
+      - TRAVIS_USE_NOX=1
+  # Build and test on MacOS. We use a single target, with all dependencies and
+  # use nox.
+  - os: osx
+    osx_image: xcode10.3  # macOS 10.14 (Mojave), release on March 25, 2019.
+    env:
+      # Unfortunately, the build fails on MacOs for universal poker.
+      - BUILD_WITH_ACPC="OFF"
+      - DEFAULT_OPTIONAL_DEPENDENCY="ON"
+      - TRAVIS_USE_NOX=1
 
 script:
+  - pwd
+  - chmod +x install.sh
   - ./install.sh
-  - python --version
+  - python3 --version
   - ./open_spiel/scripts/travis_script.sh

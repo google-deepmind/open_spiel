@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef THIRD_PARTY_OPEN_SPIEL_ALGORITHMS_GET_LEGAL_ACTIONS_MAP_H_
-#define THIRD_PARTY_OPEN_SPIEL_ALGORITHMS_GET_LEGAL_ACTIONS_MAP_H_
+#ifndef OPEN_SPIEL_ALGORITHMS_GET_LEGAL_ACTIONS_MAP_H_
+#define OPEN_SPIEL_ALGORITHMS_GET_LEGAL_ACTIONS_MAP_H_
 
 #include <string>
 #include <unordered_map>
@@ -35,4 +35,4 @@ std::unordered_map<std::string, std::vector<Action>> GetLegalActionsMap(
 }  // namespace algorithms
 }  // namespace open_spiel
 
-#endif  // THIRD_PARTY_OPEN_SPIEL_ALGORITHMS_GET_LEGAL_ACTIONS_MAP_H_
+#endif  // OPEN_SPIEL_ALGORITHMS_GET_LEGAL_ACTIONS_MAP_H_

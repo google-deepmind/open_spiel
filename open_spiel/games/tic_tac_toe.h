@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef THIRD_PARTY_OPEN_SPIEL_GAMES_TIC_TAC_TOE_H_
-#define THIRD_PARTY_OPEN_SPIEL_GAMES_TIC_TAC_TOE_H_
+#ifndef OPEN_SPIEL_GAMES_TIC_TAC_TOE_H_
+#define OPEN_SPIEL_GAMES_TIC_TAC_TOE_H_
 
 #include <array>
 #include <map>
@@ -63,10 +63,10 @@ class TicTacToeState : public State {
   std::string ToString() const override;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
-  std::string InformationState(Player player) const override;
-  std::string Observation(Player player) const override;
-  void ObservationAsNormalizedVector(
-      Player player, std::vector<double>* values) const override;
+  std::string InformationStateString(Player player) const override;
+  std::string ObservationString(Player player) const override;
+  void ObservationTensor(Player player,
+                         std::vector<double>* values) const override;
   std::unique_ptr<State> Clone() const override;
   void UndoAction(Player player, Action move) override;
   std::vector<Action> LegalActions() const override;
@@ -102,10 +102,10 @@ class TicTacToeGame : public Game {
   std::shared_ptr<const Game> Clone() const override {
     return std::shared_ptr<const Game>(new TicTacToeGame(*this));
   }
-  std::vector<int> ObservationNormalizedVectorShape() const override {
+  std::vector<int> ObservationTensorShape() const override {
     return {kCellStates, kNumRows, kNumCols};
   }
-  int MaxGameLength() const { return kNumCells; }
+  int MaxGameLength() const override { return kNumCells; }
 };
 
 CellState PlayerToState(Player player);
@@ -118,4 +118,4 @@ inline std::ostream& operator<<(std::ostream& stream, const CellState& state) {
 }  // namespace tic_tac_toe
 }  // namespace open_spiel
 
-#endif  // THIRD_PARTY_OPEN_SPIEL_GAMES_TIC_TAC_TOE_H_
+#endif  // OPEN_SPIEL_GAMES_TIC_TAC_TOE_H_

@@ -23,6 +23,8 @@ import math
 
 import numpy as np
 
+import pyspiel
+
 
 def n_choose_k(n, k):
   """Returns the combination choose k among n items."""
@@ -70,30 +72,26 @@ def sample_from_simplex(n, dim=3, vmin=0.):
   return (p[:, 1:] - p[:, 0:-1]) * (1 - 2 * vmin) + vmin
 
 
-def nfg_to_ndarray(game):
-  """Returns a `numpy.ndarray` of utilities for a normal form game.
+def game_payoffs_array(game):
+  """Returns a `numpy.ndarray` of utilities for a game.
+
+  NOTE: if the game is not a MatrixGame or a TensorGame then this may be costly.
 
   Args:
-    game: A normal form game.
+    game: A game.
 
   Returns:
     `numpy.ndarray` of dimension `num_players` + 1.
     First dimension is the player, followed by the actions of all players, e.g.
     a 3x3 game (2 players) has dimension [2,3,3].
   """
-  state = game.new_initial_state()
-  actions = [
-      state.legal_actions(player) for player in range(game.num_players())
-  ]
-  shape = [int(game.num_players())] + [len(arr) for arr in actions]
-  payoff_tensor = np.empty(shape)
-  for joint_action in itertools.product(*actions):
-    state.apply_actions(joint_action)
-    returns = state.returns()
-    # Move first axis (player) to last to ease vector assignment of returns
-    np.moveaxis(payoff_tensor, 0, -1)[joint_action] = returns
-    state = game.new_initial_state()
-  return payoff_tensor
+  if isinstance(game, pyspiel.MatrixGame):
+    return np.stack([game.row_utilities(), game.col_utilities()])
+
+  if not isinstance(game, pyspiel.TensorGame):
+    game = pyspiel.extensive_to_tensor_game(game)
+  return np.stack(
+      [game.player_utilities(player) for player in range(game.num_players())])
 
 
 def distribute(num_items, num_slots, normalize=False):

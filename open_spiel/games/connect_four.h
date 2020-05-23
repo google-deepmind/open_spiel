@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef THIRD_PARTY_OPEN_SPIEL_GAMES_CONNECT_FOUR_H_
-#define THIRD_PARTY_OPEN_SPIEL_GAMES_CONNECT_FOUR_H_
+#ifndef OPEN_SPIEL_GAMES_CONNECT_FOUR_H_
+#define OPEN_SPIEL_GAMES_CONNECT_FOUR_H_
 
 #include <array>
 #include <map>
@@ -71,9 +71,10 @@ class ConnectFourState : public State {
   std::string ToString() const override;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
-  std::string InformationState(Player player) const override;
-  void InformationStateAsNormalizedVector(
-      Player player, std::vector<double>* values) const override;
+  std::string InformationStateString(Player player) const override;
+  std::string ObservationString(Player player) const override;
+  void ObservationTensor(Player player,
+                         std::vector<double>* values) const override;
   std::unique_ptr<State> Clone() const override;
   std::string Serialize() const override;
 
@@ -108,7 +109,7 @@ class ConnectFourGame : public Game {
   std::shared_ptr<const Game> Clone() const override {
     return std::shared_ptr<const Game>(new ConnectFourGame(*this));
   }
-  std::vector<int> InformationStateNormalizedVectorShape() const override {
+  std::vector<int> ObservationTensorShape() const override {
     return {kCellStates, kRows, kCols};
   }
   int MaxGameLength() const override { return kNumCells; }
@@ -132,4 +133,4 @@ inline std::ostream& operator<<(std::ostream& stream, const CellState& state) {
 }  // namespace connect_four
 }  // namespace open_spiel
 
-#endif  // THIRD_PARTY_OPEN_SPIEL_GAMES_CONNECT_FOUR_H_
+#endif  // OPEN_SPIEL_GAMES_CONNECT_FOUR_H_

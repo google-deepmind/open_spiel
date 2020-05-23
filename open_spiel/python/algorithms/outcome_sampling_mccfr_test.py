@@ -37,7 +37,9 @@ class OutcomeSamplingMCCFRTest(absltest.TestCase):
     for _ in range(1000):
       os_solver.iteration()
     conv = exploitability.nash_conv(
-        game, policy.PolicyFromCallable(game, os_solver.callable_avg_policy()))
+        game,
+        policy.tabular_policy_from_callable(game,
+                                            os_solver.callable_avg_policy()))
     print("Leduc2P, conv = {}".format(conv))
     self.assertGreater(conv, 4.5)
     self.assertLess(conv, 4.6)
@@ -49,7 +51,9 @@ class OutcomeSamplingMCCFRTest(absltest.TestCase):
     for _ in range(1000):
       os_solver.iteration()
     conv = exploitability.nash_conv(
-        game, policy.PolicyFromCallable(game, os_solver.callable_avg_policy()))
+        game,
+        policy.tabular_policy_from_callable(game,
+                                            os_solver.callable_avg_policy()))
     print("Kuhn2P, conv = {}".format(conv))
     self.assertGreater(conv, 0.2)
     self.assertLess(conv, 0.3)
@@ -62,7 +66,9 @@ class OutcomeSamplingMCCFRTest(absltest.TestCase):
     for _ in range(1000):
       os_solver.iteration()
     conv = exploitability.nash_conv(
-        game, policy.PolicyFromCallable(game, os_solver.callable_avg_policy()))
+        game,
+        policy.tabular_policy_from_callable(game,
+                                            os_solver.callable_avg_policy()))
     print("Kuhn3P, conv = {}".format(conv))
     self.assertGreater(conv, 0.3)
     self.assertLess(conv, 0.4)

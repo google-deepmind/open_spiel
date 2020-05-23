@@ -55,8 +55,8 @@ void CFRBRTest_LeducPoker() {
   }
   const std::unique_ptr<Policy> average_policy = solver.AveragePolicy();
   double nash_conv = NashConv(*game, *average_policy);
-  std::cout << "Iters " << num_iters << ", nash_conv = "
-            << nash_conv << std::endl;
+  std::cout << "Iters " << num_iters << ", nash_conv = " << nash_conv
+            << std::endl;
 }
 
 }  // namespace

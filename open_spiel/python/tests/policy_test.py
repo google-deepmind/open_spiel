@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for google3.third_party.open_spiel.python.policy."""
+"""Tests for open_spiel.python.policy."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -70,7 +70,7 @@ def test_policy_on_game(self, game, policy_object):
       depth_limit=-1,
       include_terminals=False,
       include_chance_states=False,
-      to_string=lambda s: s.information_state())
+      to_string=lambda s: s.information_state_string())
 
   for state in all_states.values():
     legal_actions = set(state.legal_actions())
@@ -255,7 +255,7 @@ class TabularPolicyTest(parameterized.TestCase):
   def test_can_turn_policy_into_tabular_policy(self, policy_class, game_name):
     game = pyspiel.load_game(game_name)
     realized_policy = policy_class(game)
-    tabular_policy = policy.tabular_policy_from_policy(game, realized_policy)
+    tabular_policy = realized_policy.to_tabular()
     for state in tabular_policy.states:
       self.assertEqual(
           realized_policy.action_probabilities(state),
@@ -286,9 +286,9 @@ class TabularRockPaperScissorsPolicyTest(absltest.TestCase):
     # Test that there are two valid states, indexed as 0 and 1.
     game = pyspiel.load_game_as_turn_based("matrix_rps")
     state = game.new_initial_state()
-    first_info_state = state.information_state()
+    first_info_state = state.information_state_string()
     state.apply_action(state.legal_actions()[0])
-    second_info_state = state.information_state()
+    second_info_state = state.information_state_string()
     self.assertCountEqual(self.tabular_policy.state_lookup,
                           [first_info_state, second_info_state])
     self.assertCountEqual(self.tabular_policy.state_lookup.values(), [0, 1])
@@ -342,20 +342,6 @@ class UniformRandomPolicyTest(absltest.TestCase):
             0: 0.5,
             1: 0.5
         })
-
-
-class PoliciesConversions(absltest.TestCase):
-
-  def test_cpp_to_python_policy(self):
-    game = pyspiel.load_game("kuhn_poker")
-    pyspiel_policy = pyspiel.UniformRandomPolicy(game)
-    python_policy = policy.policy_from_pyspiel_policy(pyspiel_policy)
-
-    for info_state_str in policy.TabularPolicy(game).state_lookup.keys():
-      self.assertEqual({
-          0: 0.5,
-          1: 0.5
-      }, python_policy.action_probabilities(info_state_str))
 
 
 if __name__ == "__main__":

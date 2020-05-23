@@ -87,7 +87,7 @@ def _construct_lps(state, infosets, infoset_actions, infoset_action_maps,
     return
 
   player = state.current_player()
-  info_state = state.information_state(player)
+  info_state = state.information_state_string(player)
   legal_actions = state.legal_actions(player)
 
   # p and q variables, inequality constraints, and part of equality constraints

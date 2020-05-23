@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef THIRD_PARTY_OPEN_SPIEL_ALGORITHMS_EXTERNAL_SAMPLING_MCCFR_H_
-#define THIRD_PARTY_OPEN_SPIEL_ALGORITHMS_EXTERNAL_SAMPLING_MCCFR_H_
+#ifndef OPEN_SPIEL_ALGORITHMS_EXTERNAL_SAMPLING_MCCFR_H_
+#define OPEN_SPIEL_ALGORITHMS_EXTERNAL_SAMPLING_MCCFR_H_
 
 #include <memory>
 #include <random>
@@ -58,8 +58,16 @@ class ExternalSamplingMCCFRSolver {
  public:
   static inline constexpr double kInitialTableValues = 0.000001;
 
-  // Creates a solver with a specific seed and average type.
+  // Creates a solver with a specific seed, average type and an explicit
+  // default uniform policy for states that have not been visited.
   ExternalSamplingMCCFRSolver(const Game& game, int seed = 0,
+                              AverageType avg_type = AverageType::kSimple);
+
+  // Creates a solver with a specific seed and average type, and also allows
+  // for a custom default policy for nodes that have not been visited.
+  ExternalSamplingMCCFRSolver(const Game& game,
+                              std::shared_ptr<Policy> default_policy,
+                              int seed = 0,
                               AverageType avg_type = AverageType::kSimple);
 
   // Performs one iteration of external sampling MCCFR, updating the regrets
@@ -75,7 +83,7 @@ class ExternalSamplingMCCFRSolver {
   // the CFRSolver object.
   std::unique_ptr<Policy> AveragePolicy() const {
     return std::unique_ptr<Policy>(
-        new CFRAveragePolicy(info_states_, uniform_policy_));
+        new CFRAveragePolicy(info_states_, default_policy_));
   }
 
  private:
@@ -88,10 +96,10 @@ class ExternalSamplingMCCFRSolver {
   AverageType avg_type_;
   CFRInfoStateValuesTable info_states_;
   std::uniform_real_distribution<double> dist_;
-  std::shared_ptr<TabularPolicy> uniform_policy_;
+  std::shared_ptr<Policy> default_policy_;
 };
 
 }  // namespace algorithms
 }  // namespace open_spiel
 
-#endif  // THIRD_PARTY_OPEN_SPIEL_ALGORITHMS_EXTERNAL_SAMPLING_MCCFR_H_
+#endif  // OPEN_SPIEL_ALGORITHMS_EXTERNAL_SAMPLING_MCCFR_H_

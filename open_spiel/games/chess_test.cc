@@ -15,6 +15,7 @@
 #include "open_spiel/games/chess.h"
 
 #include <memory>
+#include <string>
 
 #include "open_spiel/games/chess/chess_board.h"
 #include "open_spiel/spiel.h"
@@ -39,10 +40,10 @@ int CountNumLegalMoves(const StandardChessBoard& board) {
 void CheckUndo(const char* fen, const char* move_san, const char* fen_after) {
   std::shared_ptr<const Game> game = LoadGame("chess");
   ChessState state(game, fen);
-  auto player = state.CurrentPlayer();
-  auto maybe_move = state.Board().ParseSANMove(move_san);
+  Player player = state.CurrentPlayer();
+  std::optional<Move> maybe_move = state.Board().ParseSANMove(move_san);
   SPIEL_CHECK_TRUE(maybe_move);
-  auto action = MoveToAction(*maybe_move);
+  Action action = MoveToAction(*maybe_move);
   state.ApplyAction(action);
   SPIEL_CHECK_EQ(state.Board().ToFEN(), fen_after);
   state.UndoAction(player, action);
@@ -50,7 +51,7 @@ void CheckUndo(const char* fen, const char* move_san, const char* fen_after) {
 }
 
 void ApplySANMove(const char* move_san, ChessState* state) {
-  auto maybe_move = state->Board().ParseSANMove(move_san);
+  std::optional<Move> maybe_move = state->Board().ParseSANMove(move_san);
   SPIEL_CHECK_TRUE(maybe_move);
   state->ApplyAction(MoveToAction(*maybe_move));
 }
@@ -122,13 +123,12 @@ double ValueAt(const std::vector<double>& v, const std::vector<int>& shape,
   return ValueAt(v, shape, plane, sq.x, sq.y);
 }
 
-void InformationStateVectorTests() {
+void ObservationTensorTests() {
   std::shared_ptr<const Game> game = LoadGame("chess");
   ChessState initial_state(game);
-  auto shape = game->InformationStateNormalizedVectorShape();
+  auto shape = game->ObservationTensorShape();
   std::vector<double> v;
-  initial_state.InformationStateAsNormalizedVector(
-      initial_state.CurrentPlayer(), &v);
+  initial_state.ObservationTensor(initial_state.CurrentPlayer(), &v);
 
   // For each piece type, check one square that's supposed to be occupied, and
   // one that isn't.
@@ -191,9 +191,8 @@ void InformationStateVectorTests() {
   ApplySANMove("e5", &initial_state);
   ApplySANMove("Ke2", &initial_state);
 
-  initial_state.InformationStateAsNormalizedVector(
-      initial_state.CurrentPlayer(), &v);
-  SPIEL_CHECK_EQ(v.size(), game->InformationStateNormalizedVectorSize());
+  initial_state.ObservationTensor(initial_state.CurrentPlayer(), &v);
+  SPIEL_CHECK_EQ(v.size(), game->ObservationTensorSize());
 
   // Now it's black to move.
   SPIEL_CHECK_EQ(ValueAt(v, shape, 14, 0, 0), 0.0);
@@ -214,6 +213,34 @@ void InformationStateVectorTests() {
   SPIEL_CHECK_EQ(ValueAt(v, shape, 19, 3, 3), 1.0);
 }
 
+void MoveConversionTests() {
+  auto game = LoadGame("chess");
+  std::mt19937 rng(23);
+  for (int i = 0; i < 100; ++i) {
+    std::unique_ptr<State> state = game->NewInitialState();
+    while (!state->IsTerminal()) {
+      const ChessState* chess_state =
+          dynamic_cast<const ChessState*>(state.get());
+      std::vector<Action> legal_actions = state->LegalActions();
+      absl::uniform_int_distribution<int> dist(0, legal_actions.size() - 1);
+      int action_index = dist(rng);
+      Action action = legal_actions[action_index];
+      Move move = ActionToMove(action, chess_state->Board());
+      Action action_from_move = MoveToAction(move);
+      SPIEL_CHECK_EQ(action, action_from_move);
+      const StandardChessBoard& board = chess_state->Board();
+      StandardChessBoard fresh_board = chess_state->StartBoard();
+      for (Move move : chess_state->MovesHistory()) {
+        fresh_board.ApplyMove(move);
+      }
+      SPIEL_CHECK_EQ(board.ToFEN(), fresh_board.ToFEN());
+      Action action_from_lan = MoveToAction(*board.ParseLANMove(move.ToLAN()));
+      SPIEL_CHECK_EQ(action, action_from_lan);
+      state->ApplyAction(action);
+    }
+  }
+}
+
 }  // namespace
 }  // namespace chess
 }  // namespace open_spiel
@@ -223,5 +250,6 @@ int main(int argc, char** argv) {
   open_spiel::chess::MoveGenerationTests();
   open_spiel::chess::UndoTests();
   open_spiel::chess::TerminalReturnTests();
-  open_spiel::chess::InformationStateVectorTests();
+  open_spiel::chess::ObservationTensorTests();
+  open_spiel::chess::MoveConversionTests();
 }

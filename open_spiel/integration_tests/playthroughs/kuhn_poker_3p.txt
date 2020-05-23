@@ -1,5 +1,4 @@
 game: kuhn_poker(players=3)
-seed: 3023298744
 
 GameType.chance_mode = ChanceMode.EXPLICIT_STOCHASTIC
 GameType.dynamics = Dynamics.SEQUENTIAL
@@ -8,48 +7,50 @@ GameType.long_name = "Kuhn Poker"
 GameType.max_num_players = 10
 GameType.min_num_players = 2
 GameType.parameter_specification = ["players"]
-GameType.provides_information_state = True
-GameType.provides_information_state_as_normalized_vector = True
-GameType.provides_observation = True
-GameType.provides_observation_as_normalized_vector = True
+GameType.provides_information_state_string = True
+GameType.provides_information_state_tensor = True
+GameType.provides_observation_string = True
+GameType.provides_observation_tensor = True
 GameType.reward_model = RewardModel.TERMINAL
 GameType.short_name = "kuhn_poker"
 GameType.utility = Utility.ZERO_SUM
 
 NumDistinctActions() = 2
+PolicyTensorShape() = [2]
 MaxChanceOutcomes() = 4
 GetParameters() = {players=3}
 NumPlayers() = 3
 MinUtility() = -2.0
 MaxUtility() = 4.0
 UtilitySum() = 0.0
-InformationStateNormalizedVectorShape() = [17]
-InformationStateNormalizedVectorSize() = 17
-ObservationNormalizedVectorShape() = [10]
-ObservationNormalizedVectorSize() = 10
+InformationStateTensorShape() = [17]
+InformationStateTensorLayout() = TensorLayout.CHW
+InformationStateTensorSize() = 17
+ObservationTensorShape() = [10]
+ObservationTensorLayout() = TensorLayout.CHW
+ObservationTensorSize() = 10
 MaxGameLength() = 5
 ToString() = "kuhn_poker(players=3)"
 
 # State 0
 IsTerminal() = False
-ToString() = ""
 History() = []
 HistoryString() = ""
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
-InformationState(0) = ""
-InformationState(1) = ""
-InformationState(2) = ""
-InformationStateAsNormalizedVector(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateAsNormalizedVector(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateAsNormalizedVector(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-Observation(0) = ""
-Observation(1) = ""
-Observation(2) = ""
-ObservationAsNormalizedVector(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0]
-ObservationAsNormalizedVector(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0]
-ObservationAsNormalizedVector(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0]
+InformationStateString(0) = ""
+InformationStateString(1) = ""
+InformationStateString(2) = ""
+InformationStateTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(2): ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationString(0) = ""
+ObservationString(1) = ""
+ObservationString(2) = ""
+ObservationTensor(0): ◉◯◯◯◯◯◯◉◉◉
+ObservationTensor(1): ◯◉◯◯◯◯◯◉◉◉
+ObservationTensor(2): ◯◯◉◯◯◯◯◉◉◉
 ChanceOutcomes() = [{0, 0.250000000000}, {1, 0.250000000000}, {2, 0.250000000000}, {3, 0.250000000000}]
 LegalActions() = [0, 1, 2, 3]
 StringLegalActions() = ["Deal:0", "Deal:1", "Deal:2", "Deal:3"]
@@ -58,25 +59,25 @@ StringLegalActions() = ["Deal:0", "Deal:1", "Deal:2", "Deal:3"]
 action: 1
 
 # State 1
+# 1
 IsTerminal() = False
-ToString() = "1"
 History() = [1]
 HistoryString() = "1"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
-InformationState(0) = "1"
-InformationState(1) = ""
-InformationState(2) = ""
-InformationStateAsNormalizedVector(0) = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateAsNormalizedVector(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateAsNormalizedVector(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-Observation(0) = "1111"
-Observation(1) = ""
-Observation(2) = ""
-ObservationAsNormalizedVector(0) = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0]
-ObservationAsNormalizedVector(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0]
-ObservationAsNormalizedVector(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0]
+InformationStateString(0) = "1"
+InformationStateString(1) = ""
+InformationStateString(2) = ""
+InformationStateTensor(0): ◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(2): ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationString(0) = "1111"
+ObservationString(1) = ""
+ObservationString(2) = ""
+ObservationTensor(0): ◉◯◯◯◉◯◯◉◉◉
+ObservationTensor(1): ◯◉◯◯◯◯◯◉◉◉
+ObservationTensor(2): ◯◯◉◯◯◯◯◉◉◉
 ChanceOutcomes() = [{0, 0.333333333333}, {2, 0.333333333333}, {3, 0.333333333333}]
 LegalActions() = [0, 2, 3]
 StringLegalActions() = ["Deal:0", "Deal:2", "Deal:3"]
@@ -85,25 +86,25 @@ StringLegalActions() = ["Deal:0", "Deal:2", "Deal:3"]
 action: 3
 
 # State 2
+# 1 3
 IsTerminal() = False
-ToString() = "1 3"
 History() = [1, 3]
 HistoryString() = "1 3"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
-InformationState(0) = "1"
-InformationState(1) = "3"
-InformationState(2) = ""
-InformationStateAsNormalizedVector(0) = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateAsNormalizedVector(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateAsNormalizedVector(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-Observation(0) = "1111"
-Observation(1) = "3111"
-Observation(2) = ""
-ObservationAsNormalizedVector(0) = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0]
-ObservationAsNormalizedVector(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0]
-ObservationAsNormalizedVector(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0]
+InformationStateString(0) = "1"
+InformationStateString(1) = "3"
+InformationStateString(2) = ""
+InformationStateTensor(0): ◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(1): ◯◉◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(2): ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationString(0) = "1111"
+ObservationString(1) = "3111"
+ObservationString(2) = ""
+ObservationTensor(0): ◉◯◯◯◉◯◯◉◉◉
+ObservationTensor(1): ◯◉◯◯◯◯◉◉◉◉
+ObservationTensor(2): ◯◯◉◯◯◯◯◉◉◉
 ChanceOutcomes() = [{0, 0.500000000000}, {2, 0.500000000000}]
 LegalActions() = [0, 2]
 StringLegalActions() = ["Deal:0", "Deal:2"]
@@ -112,27 +113,27 @@ StringLegalActions() = ["Deal:0", "Deal:2"]
 action: 2
 
 # State 3
+# 1 3 2
 IsTerminal() = False
-ToString() = "1 3 2"
 History() = [1, 3, 2]
 HistoryString() = "1 3 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationState(0) = "1"
-InformationState(1) = "3"
-InformationState(2) = "2"
-InformationStateAsNormalizedVector(0) = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateAsNormalizedVector(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateAsNormalizedVector(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-Observation(0) = "1111"
-Observation(1) = "3111"
-Observation(2) = "2111"
-ObservationAsNormalizedVector(0) = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0]
-ObservationAsNormalizedVector(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0]
-ObservationAsNormalizedVector(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0]
+InformationStateString(0) = "1"
+InformationStateString(1) = "3"
+InformationStateString(2) = "2"
+InformationStateTensor(0): ◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(1): ◯◉◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(2): ◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯
+ObservationString(0) = "1111"
+ObservationString(1) = "3111"
+ObservationString(2) = "2111"
+ObservationTensor(0): ◉◯◯◯◉◯◯◉◉◉
+ObservationTensor(1): ◯◉◯◯◯◯◉◉◉◉
+ObservationTensor(2): ◯◯◉◯◯◉◯◉◉◉
 Rewards() = [0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0]
+Returns() = [0.0, 0.0, 0.0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["Pass", "Bet"]
 
@@ -140,27 +141,27 @@ StringLegalActions() = ["Pass", "Bet"]
 action: 0
 
 # State 4
+# 1 3 2 p
 IsTerminal() = False
-ToString() = "1 3 2 p"
 History() = [1, 3, 2, 0]
 HistoryString() = "1 3 2 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationState(0) = "1p"
-InformationState(1) = "3p"
-InformationState(2) = "2p"
-InformationStateAsNormalizedVector(0) = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateAsNormalizedVector(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateAsNormalizedVector(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-Observation(0) = "1111"
-Observation(1) = "3111"
-Observation(2) = "2111"
-ObservationAsNormalizedVector(0) = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0]
-ObservationAsNormalizedVector(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0]
-ObservationAsNormalizedVector(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0]
+InformationStateString(0) = "1p"
+InformationStateString(1) = "3p"
+InformationStateString(2) = "2p"
+InformationStateTensor(0): ◉◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯
+InformationStateTensor(1): ◯◉◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯
+InformationStateTensor(2): ◯◯◉◯◯◉◯◉◯◯◯◯◯◯◯◯◯
+ObservationString(0) = "1111"
+ObservationString(1) = "3111"
+ObservationString(2) = "2111"
+ObservationTensor(0): ◉◯◯◯◉◯◯◉◉◉
+ObservationTensor(1): ◯◉◯◯◯◯◉◉◉◉
+ObservationTensor(2): ◯◯◉◯◯◉◯◉◉◉
 Rewards() = [0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0]
+Returns() = [0.0, 0.0, 0.0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["Pass", "Bet"]
 
@@ -168,27 +169,27 @@ StringLegalActions() = ["Pass", "Bet"]
 action: 0
 
 # State 5
+# 1 3 2 pp
 IsTerminal() = False
-ToString() = "1 3 2 pp"
 History() = [1, 3, 2, 0, 0]
 HistoryString() = "1 3 2 0 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 2
-InformationState(0) = "1pp"
-InformationState(1) = "3pp"
-InformationState(2) = "2pp"
-InformationStateAsNormalizedVector(0) = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateAsNormalizedVector(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateAsNormalizedVector(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-Observation(0) = "1111"
-Observation(1) = "3111"
-Observation(2) = "2111"
-ObservationAsNormalizedVector(0) = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0]
-ObservationAsNormalizedVector(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0]
-ObservationAsNormalizedVector(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0]
+InformationStateString(0) = "1pp"
+InformationStateString(1) = "3pp"
+InformationStateString(2) = "2pp"
+InformationStateTensor(0): ◉◯◯◯◉◯◯◉◯◉◯◯◯◯◯◯◯
+InformationStateTensor(1): ◯◉◯◯◯◯◉◉◯◉◯◯◯◯◯◯◯
+InformationStateTensor(2): ◯◯◉◯◯◉◯◉◯◉◯◯◯◯◯◯◯
+ObservationString(0) = "1111"
+ObservationString(1) = "3111"
+ObservationString(2) = "2111"
+ObservationTensor(0): ◉◯◯◯◉◯◯◉◉◉
+ObservationTensor(1): ◯◉◯◯◯◯◉◉◉◉
+ObservationTensor(2): ◯◯◉◯◯◉◯◉◉◉
 Rewards() = [0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0]
+Returns() = [0.0, 0.0, 0.0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["Pass", "Bet"]
 
@@ -196,27 +197,27 @@ StringLegalActions() = ["Pass", "Bet"]
 action: 1
 
 # State 6
+# 1 3 2 ppb
 IsTerminal() = False
-ToString() = "1 3 2 ppb"
 History() = [1, 3, 2, 0, 0, 1]
 HistoryString() = "1 3 2 0 0 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationState(0) = "1ppb"
-InformationState(1) = "3ppb"
-InformationState(2) = "2ppb"
-InformationStateAsNormalizedVector(0) = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateAsNormalizedVector(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateAsNormalizedVector(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0]
-Observation(0) = "1112"
-Observation(1) = "3112"
-Observation(2) = "2112"
-ObservationAsNormalizedVector(0) = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 2.0]
-ObservationAsNormalizedVector(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 2.0]
-ObservationAsNormalizedVector(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 2.0]
+InformationStateString(0) = "1ppb"
+InformationStateString(1) = "3ppb"
+InformationStateString(2) = "2ppb"
+InformationStateTensor(0): ◉◯◯◯◉◯◯◉◯◉◯◯◉◯◯◯◯
+InformationStateTensor(1): ◯◉◯◯◯◯◉◉◯◉◯◯◉◯◯◯◯
+InformationStateTensor(2): ◯◯◉◯◯◉◯◉◯◉◯◯◉◯◯◯◯
+ObservationString(0) = "1112"
+ObservationString(1) = "3112"
+ObservationString(2) = "2112"
+ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 2.0]
+ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 2.0]
+ObservationTensor(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 2.0]
 Rewards() = [0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0]
+Returns() = [0.0, 0.0, 0.0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["Pass", "Bet"]
 
@@ -224,27 +225,27 @@ StringLegalActions() = ["Pass", "Bet"]
 action: 1
 
 # State 7
+# 1 3 2 ppbb
 IsTerminal() = False
-ToString() = "1 3 2 ppbb"
 History() = [1, 3, 2, 0, 0, 1, 1]
 HistoryString() = "1 3 2 0 0 1 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationState(0) = "1ppbb"
-InformationState(1) = "3ppbb"
-InformationState(2) = "2ppbb"
-InformationStateAsNormalizedVector(0) = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0]
-InformationStateAsNormalizedVector(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0]
-InformationStateAsNormalizedVector(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0]
-Observation(0) = "1212"
-Observation(1) = "3212"
-Observation(2) = "2212"
-ObservationAsNormalizedVector(0) = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 2.0, 1.0, 2.0]
-ObservationAsNormalizedVector(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 2.0, 1.0, 2.0]
-ObservationAsNormalizedVector(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 2.0, 1.0, 2.0]
+InformationStateString(0) = "1ppbb"
+InformationStateString(1) = "3ppbb"
+InformationStateString(2) = "2ppbb"
+InformationStateTensor(0): ◉◯◯◯◉◯◯◉◯◉◯◯◉◯◉◯◯
+InformationStateTensor(1): ◯◉◯◯◯◯◉◉◯◉◯◯◉◯◉◯◯
+InformationStateTensor(2): ◯◯◉◯◯◉◯◉◯◉◯◯◉◯◉◯◯
+ObservationString(0) = "1212"
+ObservationString(1) = "3212"
+ObservationString(2) = "2212"
+ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 2.0, 1.0, 2.0]
+ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 2.0, 1.0, 2.0]
+ObservationTensor(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 2.0, 1.0, 2.0]
 Rewards() = [0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0]
+Returns() = [0.0, 0.0, 0.0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["Pass", "Bet"]
 
@@ -252,24 +253,24 @@ StringLegalActions() = ["Pass", "Bet"]
 action: 0
 
 # State 8
+# 1 3 2 ppbbp
 IsTerminal() = True
-ToString() = "1 3 2 ppbbp"
 History() = [1, 3, 2, 0, 0, 1, 1, 0]
 HistoryString() = "1 3 2 0 0 1 1 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
-InformationState(0) = "1ppbbp"
-InformationState(1) = "3ppbbp"
-InformationState(2) = "2ppbbp"
-InformationStateAsNormalizedVector(0) = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0]
-InformationStateAsNormalizedVector(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0]
-InformationStateAsNormalizedVector(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0]
-Observation(0) = "1212"
-Observation(1) = "3212"
-Observation(2) = "2212"
-ObservationAsNormalizedVector(0) = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 2.0, 1.0, 2.0]
-ObservationAsNormalizedVector(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 2.0, 1.0, 2.0]
-ObservationAsNormalizedVector(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 2.0, 1.0, 2.0]
+InformationStateString(0) = "1ppbbp"
+InformationStateString(1) = "3ppbbp"
+InformationStateString(2) = "2ppbbp"
+InformationStateTensor(0): ◉◯◯◯◉◯◯◉◯◉◯◯◉◯◉◉◯
+InformationStateTensor(1): ◯◉◯◯◯◯◉◉◯◉◯◯◉◯◉◉◯
+InformationStateTensor(2): ◯◯◉◯◯◉◯◉◯◉◯◯◉◯◉◉◯
+ObservationString(0) = "1212"
+ObservationString(1) = "3212"
+ObservationString(2) = "2212"
+ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 2.0, 1.0, 2.0]
+ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 2.0, 1.0, 2.0]
+ObservationTensor(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 2.0, 1.0, 2.0]
 Rewards() = [-2.0, -1.0, 3.0]
 Returns() = [-2.0, -1.0, 3.0]

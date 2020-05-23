@@ -78,7 +78,7 @@ public extension DeterministicPolicy {
 public struct TabularPolicy<Game: GameProtocol>: StochasticPolicy {
   let table: [String: [Game.Action: Double]]
   public func actionProbabilities(forState state: Game.State) -> [Game.Action: Double] {
-    return self.table[state.informationState()]!
+    return self.table[state.informationStateString()]!
   }
 }
 
@@ -119,30 +119,6 @@ public struct TensorFlowLogitTable<Game: GameProtocol>: Differentiable {
   }
 }
 
-// Remove these when array literal or map differentiation has landed in google3
-@differentiable(vjp: _vjpMapSoftmax)
-func mapSoftmax(_ inputs: [Tensor<Double>]) -> [Tensor<Double>] {
-  return inputs.map(softmax)
-}
-
-func _vjpMapSoftmax(_ inputs: [Tensor<Double>]) -> (
-    value: [Tensor<Double>],
-    pullback: (Array<Tensor<Double>>.DifferentiableView)
-      -> Array<Tensor<Double>>.DifferentiableView
-  ) {
-  let values = inputs.map(softmax)
-  return (value: values, pullback: { seeds in
-    let valuesAndSeeds = zip(values, seeds.base)
-    let result = valuesAndSeeds.map {
-      (valueAndSeed: (Tensor<Double>, Tensor<Double>)) -> Tensor<Double> in
-      let (value, seed) = valueAndSeed
-      let sumChannels = (seed * value).sum(alongAxes: -1)
-      return (seed - sumChannels) * value
-    }
-    return Array<Tensor<Double>>.DifferentiableView(result)
-  })
-}
-
 /// A tabular stochastic policy based on an optimizable logit table.
 /// This is a tractable representation only for games with a small state space.
 public struct TensorFlowTabularPolicy<Game: GameProtocol>: StochasticPolicy, Differentiable {
@@ -154,13 +130,13 @@ public struct TensorFlowTabularPolicy<Game: GameProtocol>: StochasticPolicy, Dif
   @differentiable
   public init(_ logitTable: TensorFlowLogitTable<Game>) {
     informationStateCache = logitTable.informationStateCache
-    probabilities = mapSoftmax(logitTable.logits)
+    probabilities = logitTable.logits.differentiableMap(softmax)
   }
 
   public func actionProbabilities(forState state: Game.State) -> [Game.Action : Double] {
     switch state.currentPlayer {
     case let .player(playerID):
-      let informationState = state.informationState(for: state.currentPlayer)
+      let informationState = state.informationStateString(for: state.currentPlayer)
       let probs = probabilities[playerID][
         informationStateCache.informationStateIndices[playerID][informationState]!]
       let transitions = zip(state.game.allActions, probs.scalars).filter { action, probability in

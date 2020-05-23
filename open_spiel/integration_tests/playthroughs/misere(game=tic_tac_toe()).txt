@@ -1,5 +1,4 @@
 game: misere(game=tic_tac_toe())
-seed: 3292290572
 
 GameType.chance_mode = ChanceMode.DETERMINISTIC
 GameType.dynamics = Dynamics.SEQUENTIAL
@@ -8,194 +7,260 @@ GameType.long_name = "Misere Tic Tac Toe"
 GameType.max_num_players = 2
 GameType.min_num_players = 2
 GameType.parameter_specification = []
-GameType.provides_information_state = True
-GameType.provides_information_state_as_normalized_vector = False
-GameType.provides_observation = True
-GameType.provides_observation_as_normalized_vector = True
+GameType.provides_information_state_string = True
+GameType.provides_information_state_tensor = False
+GameType.provides_observation_string = True
+GameType.provides_observation_tensor = True
 GameType.reward_model = RewardModel.TERMINAL
 GameType.short_name = "misere"
 GameType.utility = Utility.ZERO_SUM
 
 NumDistinctActions() = 9
+PolicyTensorShape() = [9]
 MaxChanceOutcomes() = 0
 GetParameters() = {game=tic_tac_toe()}
 NumPlayers() = 2
 MinUtility() = -1.0
 MaxUtility() = 1.0
 UtilitySum() = -0.0
-ObservationNormalizedVectorShape() = [3, 3, 3]
-ObservationNormalizedVectorSize() = 27
+ObservationTensorShape() = [3, 3, 3]
+ObservationTensorLayout() = TensorLayout.CHW
+ObservationTensorSize() = 27
 MaxGameLength() = 9
 ToString() = "misere(game=tic_tac_toe())"
 
 # State 0
+# ...
+# ...
+# ...
 IsTerminal() = False
-ToString() = "...\n...\n..."
 History() = []
 HistoryString() = ""
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationState(0) = ""
-InformationState(1) = ""
-Observation(0) = "...\n...\n..."
-Observation(1) = "...\n...\n..."
-ObservationAsNormalizedVector(0) = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-ObservationAsNormalizedVector(1) = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+InformationStateString(0) = ""
+InformationStateString(1) = ""
+ObservationString(0) = "...\n...\n..."
+ObservationString(1) = "...\n...\n..."
+ObservationTensor(0):
+◉◉◉  ◯◯◯  ◯◯◯
+◉◉◉  ◯◯◯  ◯◯◯
+◉◉◉  ◯◯◯  ◯◯◯
+ObservationTensor(1):
+◉◉◉  ◯◯◯  ◯◯◯
+◉◉◉  ◯◯◯  ◯◯◯
+◉◉◉  ◯◯◯  ◯◯◯
 Rewards() = [-0.0, -0.0]
 Returns() = [-0.0, -0.0]
 LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8]
-StringLegalActions() = ["x(0,0)", "x(1,0)", "x(2,0)", "x(0,1)", "x(1,1)", "x(2,1)", "x(0,2)", "x(1,2)", "x(2,2)"]
+StringLegalActions() = ["x(0,0)", "x(0,1)", "x(0,2)", "x(1,0)", "x(1,1)", "x(1,2)", "x(2,0)", "x(2,1)", "x(2,2)"]
 
-# Apply action "x(1,0)"
+# Apply action "x(0,1)"
 action: 1
 
 # State 1
+# .x.
+# ...
+# ...
 IsTerminal() = False
-ToString() = ".x.\n...\n..."
 History() = [1]
 HistoryString() = "1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationState(0) = "1"
-InformationState(1) = "1"
-Observation(0) = ".x.\n...\n..."
-Observation(1) = ".x.\n...\n..."
-ObservationAsNormalizedVector(0) = [1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-ObservationAsNormalizedVector(1) = [1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+InformationStateString(0) = "1"
+InformationStateString(1) = "1"
+ObservationString(0) = ".x.\n...\n..."
+ObservationString(1) = ".x.\n...\n..."
+ObservationTensor(0):
+◉◯◉  ◯◯◯  ◯◉◯
+◉◉◉  ◯◯◯  ◯◯◯
+◉◉◉  ◯◯◯  ◯◯◯
+ObservationTensor(1):
+◉◯◉  ◯◯◯  ◯◉◯
+◉◉◉  ◯◯◯  ◯◯◯
+◉◉◉  ◯◯◯  ◯◯◯
 Rewards() = [-0.0, -0.0]
 Returns() = [-0.0, -0.0]
 LegalActions() = [0, 2, 3, 4, 5, 6, 7, 8]
-StringLegalActions() = ["o(0,0)", "o(2,0)", "o(0,1)", "o(1,1)", "o(2,1)", "o(0,2)", "o(1,2)", "o(2,2)"]
+StringLegalActions() = ["o(0,0)", "o(0,2)", "o(1,0)", "o(1,1)", "o(1,2)", "o(2,0)", "o(2,1)", "o(2,2)"]
 
-# Apply action "o(2,0)"
+# Apply action "o(0,2)"
 action: 2
 
 # State 2
+# .xo
+# ...
+# ...
 IsTerminal() = False
-ToString() = ".xo\n...\n..."
 History() = [1, 2]
 HistoryString() = "1 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationState(0) = "1 2"
-InformationState(1) = "1 2"
-Observation(0) = ".xo\n...\n..."
-Observation(1) = ".xo\n...\n..."
-ObservationAsNormalizedVector(0) = [1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-ObservationAsNormalizedVector(1) = [1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+InformationStateString(0) = "1 2"
+InformationStateString(1) = "1 2"
+ObservationString(0) = ".xo\n...\n..."
+ObservationString(1) = ".xo\n...\n..."
+ObservationTensor(0):
+◉◯◯  ◯◯◉  ◯◉◯
+◉◉◉  ◯◯◯  ◯◯◯
+◉◉◉  ◯◯◯  ◯◯◯
+ObservationTensor(1):
+◉◯◯  ◯◯◉  ◯◉◯
+◉◉◉  ◯◯◯  ◯◯◯
+◉◉◉  ◯◯◯  ◯◯◯
 Rewards() = [-0.0, -0.0]
 Returns() = [-0.0, -0.0]
 LegalActions() = [0, 3, 4, 5, 6, 7, 8]
-StringLegalActions() = ["x(0,0)", "x(0,1)", "x(1,1)", "x(2,1)", "x(0,2)", "x(1,2)", "x(2,2)"]
+StringLegalActions() = ["x(0,0)", "x(1,0)", "x(1,1)", "x(1,2)", "x(2,0)", "x(2,1)", "x(2,2)"]
 
-# Apply action "x(1,2)"
+# Apply action "x(2,1)"
 action: 7
 
 # State 3
+# .xo
+# ...
+# .x.
 IsTerminal() = False
-ToString() = ".xo\n...\n.x."
 History() = [1, 2, 7]
 HistoryString() = "1 2 7"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationState(0) = "1 2 7"
-InformationState(1) = "1 2 7"
-Observation(0) = ".xo\n...\n.x."
-Observation(1) = ".xo\n...\n.x."
-ObservationAsNormalizedVector(0) = [1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0]
-ObservationAsNormalizedVector(1) = [1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0]
+InformationStateString(0) = "1 2 7"
+InformationStateString(1) = "1 2 7"
+ObservationString(0) = ".xo\n...\n.x."
+ObservationString(1) = ".xo\n...\n.x."
+ObservationTensor(0):
+◉◯◯  ◯◯◉  ◯◉◯
+◉◉◉  ◯◯◯  ◯◯◯
+◉◯◉  ◯◯◯  ◯◉◯
+ObservationTensor(1):
+◉◯◯  ◯◯◉  ◯◉◯
+◉◉◉  ◯◯◯  ◯◯◯
+◉◯◉  ◯◯◯  ◯◉◯
 Rewards() = [-0.0, -0.0]
 Returns() = [-0.0, -0.0]
 LegalActions() = [0, 3, 4, 5, 6, 8]
-StringLegalActions() = ["o(0,0)", "o(0,1)", "o(1,1)", "o(2,1)", "o(0,2)", "o(2,2)"]
+StringLegalActions() = ["o(0,0)", "o(1,0)", "o(1,1)", "o(1,2)", "o(2,0)", "o(2,2)"]
 
 # Apply action "o(2,2)"
 action: 8
 
 # State 4
+# .xo
+# ...
+# .xo
 IsTerminal() = False
-ToString() = ".xo\n...\n.xo"
 History() = [1, 2, 7, 8]
 HistoryString() = "1 2 7 8"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationState(0) = "1 2 7 8"
-InformationState(1) = "1 2 7 8"
-Observation(0) = ".xo\n...\n.xo"
-Observation(1) = ".xo\n...\n.xo"
-ObservationAsNormalizedVector(0) = [1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0]
-ObservationAsNormalizedVector(1) = [1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0]
+InformationStateString(0) = "1 2 7 8"
+InformationStateString(1) = "1 2 7 8"
+ObservationString(0) = ".xo\n...\n.xo"
+ObservationString(1) = ".xo\n...\n.xo"
+ObservationTensor(0):
+◉◯◯  ◯◯◉  ◯◉◯
+◉◉◉  ◯◯◯  ◯◯◯
+◉◯◯  ◯◯◉  ◯◉◯
+ObservationTensor(1):
+◉◯◯  ◯◯◉  ◯◉◯
+◉◉◉  ◯◯◯  ◯◯◯
+◉◯◯  ◯◯◉  ◯◉◯
 Rewards() = [-0.0, -0.0]
 Returns() = [-0.0, -0.0]
 LegalActions() = [0, 3, 4, 5, 6]
-StringLegalActions() = ["x(0,0)", "x(0,1)", "x(1,1)", "x(2,1)", "x(0,2)"]
+StringLegalActions() = ["x(0,0)", "x(1,0)", "x(1,1)", "x(1,2)", "x(2,0)"]
 
-# Apply action "x(2,1)"
+# Apply action "x(1,2)"
 action: 5
 
 # State 5
+# .xo
+# ..x
+# .xo
 IsTerminal() = False
-ToString() = ".xo\n..x\n.xo"
 History() = [1, 2, 7, 8, 5]
 HistoryString() = "1 2 7 8 5"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationState(0) = "1 2 7 8 5"
-InformationState(1) = "1 2 7 8 5"
-Observation(0) = ".xo\n..x\n.xo"
-Observation(1) = ".xo\n..x\n.xo"
-ObservationAsNormalizedVector(0) = [1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0]
-ObservationAsNormalizedVector(1) = [1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0]
+InformationStateString(0) = "1 2 7 8 5"
+InformationStateString(1) = "1 2 7 8 5"
+ObservationString(0) = ".xo\n..x\n.xo"
+ObservationString(1) = ".xo\n..x\n.xo"
+ObservationTensor(0):
+◉◯◯  ◯◯◉  ◯◉◯
+◉◉◯  ◯◯◯  ◯◯◉
+◉◯◯  ◯◯◉  ◯◉◯
+ObservationTensor(1):
+◉◯◯  ◯◯◉  ◯◉◯
+◉◉◯  ◯◯◯  ◯◯◉
+◉◯◯  ◯◯◉  ◯◉◯
 Rewards() = [-0.0, -0.0]
 Returns() = [-0.0, -0.0]
 LegalActions() = [0, 3, 4, 6]
-StringLegalActions() = ["o(0,0)", "o(0,1)", "o(1,1)", "o(0,2)"]
+StringLegalActions() = ["o(0,0)", "o(1,0)", "o(1,1)", "o(2,0)"]
 
-# Apply action "o(0,2)"
+# Apply action "o(2,0)"
 action: 6
 
 # State 6
+# .xo
+# ..x
+# oxo
 IsTerminal() = False
-ToString() = ".xo\n..x\noxo"
 History() = [1, 2, 7, 8, 5, 6]
 HistoryString() = "1 2 7 8 5 6"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationState(0) = "1 2 7 8 5 6"
-InformationState(1) = "1 2 7 8 5 6"
-Observation(0) = ".xo\n..x\noxo"
-Observation(1) = ".xo\n..x\noxo"
-ObservationAsNormalizedVector(0) = [1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0]
-ObservationAsNormalizedVector(1) = [1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0]
+InformationStateString(0) = "1 2 7 8 5 6"
+InformationStateString(1) = "1 2 7 8 5 6"
+ObservationString(0) = ".xo\n..x\noxo"
+ObservationString(1) = ".xo\n..x\noxo"
+ObservationTensor(0):
+◉◯◯  ◯◯◉  ◯◉◯
+◉◉◯  ◯◯◯  ◯◯◉
+◯◯◯  ◉◯◉  ◯◉◯
+ObservationTensor(1):
+◉◯◯  ◯◯◉  ◯◉◯
+◉◉◯  ◯◯◯  ◯◯◉
+◯◯◯  ◉◯◉  ◯◉◯
 Rewards() = [-0.0, -0.0]
 Returns() = [-0.0, -0.0]
 LegalActions() = [0, 3, 4]
-StringLegalActions() = ["x(0,0)", "x(0,1)", "x(1,1)"]
+StringLegalActions() = ["x(0,0)", "x(1,0)", "x(1,1)"]
 
-# Apply action "x(0,1)"
+# Apply action "x(1,0)"
 action: 3
 
 # State 7
+# .xo
+# x.x
+# oxo
 IsTerminal() = False
-ToString() = ".xo\nx.x\noxo"
 History() = [1, 2, 7, 8, 5, 6, 3]
 HistoryString() = "1 2 7 8 5 6 3"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationState(0) = "1 2 7 8 5 6 3"
-InformationState(1) = "1 2 7 8 5 6 3"
-Observation(0) = ".xo\nx.x\noxo"
-Observation(1) = ".xo\nx.x\noxo"
-ObservationAsNormalizedVector(0) = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0]
-ObservationAsNormalizedVector(1) = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0]
+InformationStateString(0) = "1 2 7 8 5 6 3"
+InformationStateString(1) = "1 2 7 8 5 6 3"
+ObservationString(0) = ".xo\nx.x\noxo"
+ObservationString(1) = ".xo\nx.x\noxo"
+ObservationTensor(0):
+◉◯◯  ◯◯◉  ◯◉◯
+◯◉◯  ◯◯◯  ◉◯◉
+◯◯◯  ◉◯◉  ◯◉◯
+ObservationTensor(1):
+◉◯◯  ◯◯◉  ◯◉◯
+◯◉◯  ◯◯◯  ◉◯◉
+◯◯◯  ◉◯◉  ◯◉◯
 Rewards() = [-0.0, -0.0]
 Returns() = [-0.0, -0.0]
 LegalActions() = [0, 4]
@@ -205,18 +270,26 @@ StringLegalActions() = ["o(0,0)", "o(1,1)"]
 action: 4
 
 # State 8
+# .xo
+# xox
+# oxo
 IsTerminal() = True
-ToString() = ".xo\nxox\noxo"
 History() = [1, 2, 7, 8, 5, 6, 3, 4]
 HistoryString() = "1 2 7 8 5 6 3 4"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
-InformationState(0) = "1 2 7 8 5 6 3 4"
-InformationState(1) = "1 2 7 8 5 6 3 4"
-Observation(0) = ".xo\nxox\noxo"
-Observation(1) = ".xo\nxox\noxo"
-ObservationAsNormalizedVector(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0]
-ObservationAsNormalizedVector(1) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0]
+InformationStateString(0) = "1 2 7 8 5 6 3 4"
+InformationStateString(1) = "1 2 7 8 5 6 3 4"
+ObservationString(0) = ".xo\nxox\noxo"
+ObservationString(1) = ".xo\nxox\noxo"
+ObservationTensor(0):
+◉◯◯  ◯◯◉  ◯◉◯
+◯◯◯  ◯◉◯  ◉◯◉
+◯◯◯  ◉◯◉  ◯◉◯
+ObservationTensor(1):
+◉◯◯  ◯◯◉  ◯◉◯
+◯◯◯  ◯◉◯  ◉◯◉
+◯◯◯  ◉◯◉  ◯◉◯
 Rewards() = [1.0, -1.0]
 Returns() = [1.0, -1.0]

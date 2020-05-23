@@ -12,14 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for google3.third_party.open_spiel.python.algorithms.deep_cfr."""
+"""Tests for open_spiel.python.algorithms.deep_cfr."""
 
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
 from absl.testing import parameterized
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 
 from open_spiel.python import policy
 from open_spiel.python.algorithms import deep_cfr
@@ -50,7 +50,7 @@ class DeepCFRTest(parameterized.TestCase):
   def test_matching_pennies_3p(self):
     # We don't expect Deep CFR to necessarily converge on 3-player games but
     # it's nonetheless interesting to see this result.
-    game = pyspiel.load_game('matching_pennies_3p')
+    game = pyspiel.load_game_as_turn_based('matching_pennies_3p')
     with tf.Session() as sess:
       deep_cfr_solver = deep_cfr.DeepCFRSolver(
           sess,
@@ -67,9 +67,9 @@ class DeepCFRTest(parameterized.TestCase):
       deep_cfr_solver.solve()
       conv = exploitability.nash_conv(
           game,
-          policy.PolicyFromCallable(game, deep_cfr_solver.action_probabilities))
+          policy.tabular_policy_from_callable(
+              game, deep_cfr_solver.action_probabilities))
       print('Deep CFR in Matching Pennies 3p. NashConv: {}'.format(conv))
-      self.assertLess(conv, 0.05)
 
 
 if __name__ == '__main__':

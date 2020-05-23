@@ -12,6 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "open_spiel/algorithms/evaluate_bots.h"
+
+#include <vector>
+
+#include "open_spiel/spiel.h"
 #include "open_spiel/spiel_bots.h"
 
 namespace open_spiel {
@@ -20,24 +25,35 @@ std::vector<double> EvaluateBots(State* state, const std::vector<Bot*>& bots,
                                  int seed) {
   const int num_players = bots.size();
   std::mt19937 rng(seed);
-  std::uniform_real_distribution<> uniform(0, 1);
   std::vector<Action> joint_actions(bots.size());
-  for (auto bot : bots) bot->Restart(*state);
+  if (state->History().empty()) {
+    for (auto bot : bots) bot->Restart();
+  } else {
+    for (auto bot : bots) bot->RestartAt(*state);
+  }
   while (!state->IsTerminal()) {
     if (state->IsChanceNode()) {
-      state->ApplyAction(
-          SampleChanceOutcome(state->ChanceOutcomes(), uniform(rng)).first);
+      Action action = SampleAction(state->ChanceOutcomes(), rng).first;
+      for (auto bot : bots) bot->InformAction(*state, kChancePlayerId, action);
+      state->ApplyAction(action);
     } else if (state->IsSimultaneousNode()) {
-      for (auto p = Player{0}; p < num_players; ++p) {
+      for (Player p = 0; p < num_players; ++p) {
         if (state->LegalActions(p).empty()) {
           joint_actions[p] = kInvalidAction;
         } else {
-          joint_actions[p] = bots[p]->Step(*state).second;
+          joint_actions[p] = bots[p]->Step(*state);
         }
       }
       state->ApplyActions(joint_actions);
     } else {
-      state->ApplyAction(bots[state->CurrentPlayer()]->Step(*state).second);
+      Player current_player = state->CurrentPlayer();
+      Action action = bots[current_player]->Step(*state);
+      for (Player p = 0; p < num_players; ++p) {
+        if (p != current_player) {
+          bots[p]->InformAction(*state, current_player, action);
+        }
+      }
+      state->ApplyAction(action);
     }
   }
 

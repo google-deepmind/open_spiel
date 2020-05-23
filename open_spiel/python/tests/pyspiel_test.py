@@ -12,12 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for google3.third_party.open_spiel.python.pybind11.pyspiel."""
+"""Tests for open_spiel.python.pybind11.pyspiel."""
 
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import os
 from absl.testing import absltest
 import six
 
@@ -31,17 +32,24 @@ class PyspielTest(absltest.TestCase):
     game_names = pyspiel.registered_names()
 
     # Specify game names in alphabetical order, to make the test easier to read.
-    expected = [
+    expected = set([
         "backgammon",
         "blotto",
         "breakthrough",
+        "bridge",
         "bridge_uncontested_bidding",
         "catch",
         "chess",
+        "cliff_walking",
         "coin_game",
         "connect_four",
         "coop_box_pushing",
+        "coop_to_1p",
+        "cursor_go",
+        "deep_sea",
+        "efg_game",
         "first_sealed_auction",
+        "gin_rummy",
         "go",
         "goofspiel",
         "havannah",
@@ -62,19 +70,29 @@ class PyspielTest(absltest.TestCase):
         "matrix_shapleys_game",
         "misere",
         "negotiation",
+        "normal_form_extensive_game",
         "oshi_zumo",
+        "othello",
         "oware",
         "pentago",
         "phantom_ttt",
         "pig",
         "quoridor",
+        "skat",
         "tic_tac_toe",
         "tiny_bridge_2p",
         "tiny_bridge_4p",
         "tiny_hanabi",
+        "trade_comm",
         "turn_based_simultaneous_game",
         "y",
-    ]
+    ])
+
+    if os.environ.get("BUILD_WITH_HANABI", "OFF") == "ON":
+      expected.add("hanabi")
+    if os.environ.get("BUILD_WITH_ACPC", "OFF") == "ON":
+      expected.add("universal_poker")
+    expected = sorted(list(expected))
     self.assertCountEqual(game_names, expected)
 
   def test_no_mandatory_parameters(self):
@@ -96,6 +114,7 @@ class PyspielTest(absltest.TestCase):
         # Only add games here if there is no sensible default for a parameter.
         "misere",
         "turn_based_simultaneous_game",
+        "normal_form_extensive_game",
     ]
     self.assertCountEqual(games_with_mandatory_parameters, expected)
 
@@ -130,6 +149,17 @@ class PyspielTest(absltest.TestCase):
     state.apply_action(2)
     self.assertEqual(state.is_chance_node(), False)
     self.assertEqual(state.legal_actions(), [0, 1])
+    sampler = pyspiel.UniformProbabilitySampler(0., 1.)
+    clone = state.resample_from_infostate(1, sampler)
+    self.assertEqual(
+        clone.information_state_string(1), state.information_state_string(1))
+
+  def test_othello(self):
+    game = pyspiel.load_game("othello")
+    state = game.new_initial_state()
+    self.assertFalse(state.is_chance_node())
+    self.assertFalse(state.is_terminal())
+    self.assertEqual(state.legal_actions(), [19, 26, 37, 44])
 
   def test_tic_tac_toe(self):
     game = pyspiel.load_game("tic_tac_toe")
@@ -138,7 +168,7 @@ class PyspielTest(absltest.TestCase):
     self.assertFalse(state.is_terminal())
     self.assertEqual(state.legal_actions(), [0, 1, 2, 3, 4, 5, 6, 7, 8])
 
-  def test_game_parameter(self):
+  def test_game_parameter_representation(self):
     param = pyspiel.GameParameter(True)
     self.assertEqual(repr(param), "GameParameter(bool_value=True)")
     param = pyspiel.GameParameter(False)
@@ -151,6 +181,13 @@ class PyspielTest(absltest.TestCase):
     self.assertEqual(repr(param), "GameParameter(double_value=1)")
     param = pyspiel.GameParameter(1.2)
     self.assertEqual(repr(param), "GameParameter(double_value=1.2)")
+
+  def test_game_parameter_equality(self):
+    param1 = pyspiel.GameParameter("one")
+    param1_again = pyspiel.GameParameter("one")
+    param2 = pyspiel.GameParameter("two")
+    self.assertEqual(param1, param1_again)
+    self.assertNotEqual(param1, param2)
 
   def test_game_type(self):
     game_type = pyspiel.GameType(

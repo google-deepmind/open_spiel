@@ -17,11 +17,23 @@
 set -e
 set -x
 
-virtualenv -p python ./venv
+if [ ! $TRAVIS_USE_NOX -eq 0 ]; then
+  # Build and run tests using nox
+  sudo -H pip3 install nox
+  PWD=`pwd`  # normally defined, but just in case!
+  PYTHONPATH="$PYTHONPATH:$PWD:$PWD/build:$PWD/build/python" nox -s tests
+  exit 0
+fi
+
+sudo -H pip3 install --upgrade pip
+sudo -H pip3 install --upgrade setuptools
+sudo -H pip3 install --force-reinstall virtualenv
+
+virtualenv -p python3 ./venv
 source ./venv/bin/activate
 
-python --version
-pip3 install -r requirements.txt
+python3 --version
+pip3 install --upgrade -r requirements.txt -q
 
 ./open_spiel/scripts/build_and_run_tests.sh
 deactivate

@@ -30,12 +30,12 @@ namespace algorithms {
 namespace {
 std::string StateKey(const Game& game, const State& state,
                      Player player = kInvalidPlayer) {
-  if (game.GetType().provides_information_state) {
-    if (player == kInvalidPlayer) return state.InformationState();
-    return state.InformationState(player);
-  } else if (game.GetType().provides_observation) {
-    if (player == kInvalidPlayer) return state.Observation();
-    return state.Observation(player);
+  if (game.GetType().provides_information_state_string) {
+    if (player == kInvalidPlayer) return state.InformationStateString();
+    return state.InformationStateString(player);
+  } else if (game.GetType().provides_observation_string) {
+    if (player == kInvalidPlayer) return state.ObservationString();
+    return state.ObservationString(player);
   }
   return state.ToString();
 }
@@ -143,7 +143,7 @@ BatchedTrajectory RecordTrajectory(
   while (!state->IsTerminal()) {
     Action action = kInvalidAction;
     if (state->IsChanceNode()) {
-      action = open_spiel::SampleChanceOutcome(
+      action = open_spiel::SampleAction(
                    state->ChanceOutcomes(),
                    std::uniform_real_distribution<double>(0.0, 1.0)(*rng))
                    .first;
@@ -158,11 +158,11 @@ BatchedTrajectory RecordTrajectory(
         SPIEL_CHECK_TRUE(it != state_to_index.end());
         trajectory.state_indices[0].push_back(it->second);
       } else {
-        trajectory.observations[0].push_back(
-            state->InformationStateAsNormalizedVector());
+        trajectory.observations[0].push_back(state->InformationStateTensor());
       }
-      ActionsAndProbs policy = policies.at(state->CurrentPlayer())
-                                   .GetStatePolicy(state->InformationState());
+      ActionsAndProbs policy =
+          policies.at(state->CurrentPlayer())
+              .GetStatePolicy(state->InformationStateString());
       if (policy.size() > state->LegalActions().size()) {
         std::string policy_str = "";
         for (const auto& item : policy) {
@@ -180,10 +180,7 @@ BatchedTrajectory RecordTrajectory(
       }
       trajectory.player_policies[0].push_back(probs);
       trajectory.player_ids[0].push_back(state->CurrentPlayer());
-      action =
-          SampleChanceOutcome(
-              policy, std::uniform_real_distribution<double>(0.0, 1.0)(*rng))
-              .first;
+      action = SampleAction(policy, *rng).first;
       trajectory.actions[0].push_back(action);
     }
     SPIEL_CHECK_NE(action, kInvalidAction);

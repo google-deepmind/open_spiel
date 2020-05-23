@@ -18,7 +18,7 @@
 #include <memory>
 #include <utility>
 
-#include "open_spiel/tensor_view.h"
+#include "open_spiel/utils/tensor_view.h"
 
 namespace open_spiel {
 namespace connect_four {
@@ -35,10 +35,10 @@ const GameType kGameType{
     GameType::RewardModel::kTerminal,
     /*max_num_players=*/2,
     /*min_num_players=*/2,
-    /*provides_information_state=*/true,
-    /*provides_information_state_as_normalized_vector=*/true,
-    /*provides_observation=*/false,
-    /*provides_observation_as_normalized_vector=*/false,
+    /*provides_information_state_string=*/true,
+    /*provides_information_state_tensor=*/false,
+    /*provides_observation_string=*/true,
+    /*provides_observation_tensor=*/true,
     /*parameter_specification=*/{}  // no parameters
 };
 
@@ -183,21 +183,40 @@ std::vector<double> ConnectFourState::Returns() const {
   return {0.0, 0.0};
 }
 
-std::string ConnectFourState::InformationState(Player player) const {
+std::string ConnectFourState::InformationStateString(Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+  return HistoryString();
+}
+
+std::string ConnectFourState::ObservationString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   return ToString();
 }
 
-void ConnectFourState::InformationStateAsNormalizedVector(
-    Player player, std::vector<double>* values) const {
+int PlayerRelative(CellState state, Player current) {
+  switch (state) {
+    case CellState::kNought:
+      return current == 0 ? 0 : 1;
+    case CellState::kCross:
+      return current == 1 ? 0 : 1;
+    case CellState::kEmpty:
+      return 2;
+    default:
+      SpielFatalError("Unknown player type.");
+  }
+}
+
+void ConnectFourState::ObservationTensor(Player player,
+                                         std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
   TensorView<2> view(values, {kCellStates, kNumCells}, true);
 
   for (int cell = 0; cell < kNumCells; ++cell) {
-    view[{static_cast<int>(board_[cell]), cell}] = 1.0;
+    view[{PlayerRelative(board_[cell], player), cell}] = 1.0;
   }
 }
 

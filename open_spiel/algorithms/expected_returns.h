@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef THIRD_PARTY_OPEN_SPIEL_ALGORITHMS_EXPECTED_RETURNS_H_
-#define THIRD_PARTY_OPEN_SPIEL_ALGORITHMS_EXPECTED_RETURNS_H_
+#ifndef OPEN_SPIEL_ALGORITHMS_EXPECTED_RETURNS_H_
+#define OPEN_SPIEL_ALGORITHMS_EXPECTED_RETURNS_H_
 
-#include <string>
+#include <vector>
 
 #include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"
@@ -29,14 +29,20 @@ namespace algorithms {
 //
 // The second overloaded function acts the same way, except assumes that all of
 // the players' policies are encapsulated in one joint policy.
+//
+// The `use_infostate_get_policy` flag indicates whether to call
+// Policy::GetStatePolicy(const std::string&) rather than
+// Policy::GetStatePolicy(const State&) instead for retrieving the policy at
+// each information state; we use a default of true for performance reasons.
 std::vector<double> ExpectedReturns(const State& state,
                                     const std::vector<const Policy*>& policies,
-                                    int depth_limit);
+                                    int depth_limit,
+                                    bool use_infostate_get_policy = true);
 std::vector<double> ExpectedReturns(const State& state,
-                                    const Policy& joint_policy,
-                                    int depth_limit);
+                                    const Policy& joint_policy, int depth_limit,
+                                    bool use_infostate_get_policy = true);
 
 }  // namespace algorithms
 }  // namespace open_spiel
 
-#endif  // THIRD_PARTY_OPEN_SPIEL_ALGORITHMS_EXPECTED_RETURNS_H_
+#endif  // OPEN_SPIEL_ALGORITHMS_EXPECTED_RETURNS_H_

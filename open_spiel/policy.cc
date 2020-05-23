@@ -14,13 +14,32 @@
 
 #include "open_spiel/policy.h"
 
+#include <iterator>
 #include <list>
 #include <memory>
+#include <optional>
+#include <random>
+#include <string>
+#include <unordered_map>
+#include <utility>
+#include <vector>
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_format.h"
+#include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
+
+void SetProb(ActionsAndProbs* actions_and_probs, Action action, double prob) {
+  for (auto& iter : *actions_and_probs) {
+    if (iter.first == action) {
+      iter.second = prob;
+      return;
+    }
+  }
+  actions_and_probs->push_back({action, prob});
+}
 
 double GetProb(const ActionsAndProbs& action_and_probs, Action action) {
   auto it = absl::c_find_if(action_and_probs,
@@ -29,6 +48,25 @@ double GetProb(const ActionsAndProbs& action_and_probs, Action action) {
                             });
   if (it == action_and_probs.end()) return -1.;
   return it->second;
+}
+
+Action GetAction(const ActionsAndProbs& action_and_probs) {
+  for (const auto& iter : action_and_probs) {
+    if (iter.second == 1.0) {
+      return iter.first;
+    }
+  }
+  return kInvalidAction;
+}
+
+ActionsAndProbs UniformStatePolicy(const State& state) {
+  ActionsAndProbs actions_and_probs;
+  std::vector<Action> actions = state.LegalActions();
+  actions_and_probs.reserve(actions.size());
+  absl::c_for_each(actions, [&actions_and_probs, &actions](Action a) {
+    actions_and_probs.push_back({a, 1. / static_cast<double>(actions.size())});
+  });
+  return actions_and_probs;
 }
 
 TabularPolicy::TabularPolicy(const Game& game)
@@ -71,7 +109,7 @@ TabularPolicy GetEmptyTabularPolicy(const Game& game,
       if (infostate_policy.empty()) {
         SpielFatalError("State has zero legal actions.");
       }
-      policy.insert({state->InformationState(), infostate_policy});
+      policy.insert({state->InformationStateString(), infostate_policy});
     }
   }
   return TabularPolicy(policy);
@@ -157,10 +195,18 @@ TabularPolicy GetFirstActionPolicy(const Game& game) {
       if (infostate_policy.empty()) {
         SpielFatalError("State has zero legal actions.");
       }
-      policy.insert({state->InformationState(), infostate_policy});
+      policy.insert({state->InformationStateString(), infostate_policy});
     }
   }
   return TabularPolicy(policy);
+}
+
+std::string PrintPolicy(const ActionsAndProbs& policy) {
+  std::string policy_string;
+  for (auto [a, p] : policy) {
+    absl::StrAppend(&policy_string, absl::StrFormat("(%i, %f), ", a, p));
+  }
+  return policy_string;
 }
 
 }  // namespace open_spiel

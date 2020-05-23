@@ -38,7 +38,7 @@ void MCCFR_2PGameTest(const std::string& game_name, std::mt19937* rng,
     solver.RunIteration(rng);
   }
   const std::unique_ptr<Policy> average_policy = solver.AveragePolicy();
-  double nash_conv = NashConv(*game, *average_policy);
+  double nash_conv = NashConv(*game, *average_policy, true);
   std::cout << "Game: " << game_name << ", iters = " << iterations
             << ", NashConv: " << nash_conv << std::endl;
   SPIEL_CHECK_LE(nash_conv, nashconv_upperbound);
@@ -47,15 +47,15 @@ void MCCFR_2PGameTest(const std::string& game_name, std::mt19937* rng,
 void MCCFR_KuhnPoker3PTest(std::mt19937* rng) {
   std::shared_ptr<const Game> game = LoadGame("kuhn_poker(players=3)");
   ExternalSamplingMCCFRSolver solver(*game);
-  for (int i = 0; i < 1000; i++) {
+  for (int i = 0; i < 100; i++) {
     solver.RunIteration(rng);
   }
   const std::unique_ptr<Policy> average_policy = solver.AveragePolicy();
   std::cout << "Kuhn 3P (standard averaging) NashConv = "
-            << NashConv(*game, *average_policy) << std::endl;
+            << NashConv(*game, *average_policy, true) << std::endl;
 
   ExternalSamplingMCCFRSolver full_solver(*game, 39693847, AverageType::kFull);
-  for (int i = 0; i < 1000; i++) {
+  for (int i = 0; i < 100; i++) {
     full_solver.RunIteration(rng);
   }
   auto full_average_policy = full_solver.AveragePolicy();
@@ -75,7 +75,7 @@ int main(int argc, char** argv) {
   // and Decision-Making in Large Extensive Form Games", 2013).
   std::mt19937 rng(algorithms::kSeed);
   algorithms::MCCFR_2PGameTest("kuhn_poker", &rng, 1000, 0.05);
-  algorithms::MCCFR_2PGameTest("leduc_poker", &rng, 1000, 3.0);
-  algorithms::MCCFR_2PGameTest("liars_dice", &rng, 1000, 1.0);
+  algorithms::MCCFR_2PGameTest("leduc_poker", &rng, 1000, 2.5);
+  algorithms::MCCFR_2PGameTest("liars_dice", &rng, 100, 1.6);
   algorithms::MCCFR_KuhnPoker3PTest(&rng);
 }

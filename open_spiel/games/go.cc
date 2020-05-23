@@ -35,16 +35,20 @@ const GameType kGameType{
     GameType::RewardModel::kTerminal,
     /*max_num_players=*/2,
     /*min_num_players=*/2,
-    /*provides_information_state=*/true,
-    /*provides_information_state_as_normalized_vector=*/false,
-    /*provides_observation=*/true,
-    /*provides_observation_as_normalized_vector=*/true,
+    /*provides_information_state_string=*/true,
+    /*provides_information_state_tensor=*/false,
+    /*provides_observation_string=*/true,
+    /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
-    {
-        {"komi", GameParameter(7.5)},
-        {"board_size", GameParameter(19)},
-        {"handicap", GameParameter(0)},
-    },
+    {{"komi", GameParameter(7.5)},
+     {"board_size", GameParameter(19)},
+     {"handicap", GameParameter(0)},
+     // After the maximum game length, the game will end arbitrarily and the
+     // score is computed as usual (i.e. number of stones + komi).
+     // It's advised to only use shorter games to compute win-rates.
+     // When not provided, it defaults to DefaultMaxGameLength(board_size)
+     {"max_game_length",
+      GameParameter(GameParameter::Type::kInt, /*is_mandatory=*/false)}},
 };
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
@@ -53,16 +57,16 @@ std::shared_ptr<const Game> Factory(const GameParameters& params) {
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
 
-std::vector<GoPoint> HandicapStones(int num_handicap) {
+std::vector<VirtualPoint> HandicapStones(int num_handicap) {
   if (num_handicap < 2 || num_handicap > 9) return {};
 
-  static std::array<GoPoint, 9> placement = {
+  static std::array<VirtualPoint, 9> placement = {
       {MakePoint("d4"), MakePoint("q16"), MakePoint("d16"), MakePoint("q4"),
        MakePoint("d10"), MakePoint("q10"), MakePoint("k4"), MakePoint("k16"),
        MakePoint("k10")}};
-  static GoPoint center = MakePoint("k10");
+  static VirtualPoint center = MakePoint("k10");
 
-  std::vector<GoPoint> points;
+  std::vector<VirtualPoint> points;
   points.reserve(num_handicap);
   for (int i = 0; i < num_handicap; ++i) {
     points.push_back(placement[i]);
@@ -79,22 +83,28 @@ std::vector<GoPoint> HandicapStones(int num_handicap) {
 
 GoState::GoState(std::shared_ptr<const Game> game, int board_size, float komi,
                  int handicap)
-    : State(game),
+    : State(std::move(game)),
       board_(board_size),
       komi_(komi),
       handicap_(handicap),
+      max_game_length_(game_->MaxGameLength()),
       to_play_(GoColor::kBlack) {
   ResetBoard();
 }
 
-std::string GoState::InformationState(int player) const {
+std::string GoState::InformationStateString(int player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
   return HistoryString();
 }
 
-std::string GoState::Observation(int player) const { return ToString(); }
+std::string GoState::ObservationString(int player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+  return ToString();
+}
 
-void GoState::ObservationAsNormalizedVector(int player,
-                                            std::vector<double>* values) const {
+void GoState::ObservationTensor(int player, std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
@@ -104,7 +114,7 @@ void GoState::ObservationAsNormalizedVector(int player,
 
   // Add planes: black, white, empty.
   int cell = 0;
-  for (GoPoint p : BoardPoints(board_.board_size())) {
+  for (VirtualPoint p : BoardPoints(board_.board_size())) {
     int color_val = static_cast<int>(board_.PointColor(p));
     (*values)[num_cells * color_val + cell] = 1.0;
     ++cell;
@@ -119,33 +129,34 @@ void GoState::ObservationAsNormalizedVector(int player,
 std::vector<Action> GoState::LegalActions() const {
   std::vector<Action> actions{};
   if (IsTerminal()) return actions;
-  for (GoPoint p : BoardPoints(board_.board_size())) {
+  for (VirtualPoint p : BoardPoints(board_.board_size())) {
     if (board_.IsLegalMove(p, to_play_)) {
-      actions.push_back(p);
+      actions.push_back(board_.VirtualActionToAction(p));
     }
   }
-  actions.push_back(kPass);
+  actions.push_back(board_.pass_action());
   return actions;
 }
 
 std::string GoState::ActionToString(Player player, Action action) const {
-  return absl::StrCat(GoColorToString(static_cast<GoColor>(player)), " ",
-                      GoPointToString(action));
+  return absl::StrCat(
+      GoColorToString(static_cast<GoColor>(player)), " ",
+      VirtualPointToString(board_.ActionToVirtualAction(action)));
 }
 
 std::string GoState::ToString() const {
   std::stringstream ss;
   ss << "GoState(komi=" << komi_ << ", to_play=" << GoColorToString(to_play_)
-     << "history.size()=" << history_.size() << ")\n";
+     << ", history.size()=" << history_.size() << ")\n";
   ss << board_;
   return ss.str();
 }
 
 bool GoState::IsTerminal() const {
   if (history_.size() < 2) return false;
-  return (history_.size() >= MaxGameLength(board_.board_size())) || superko_ ||
-         (history_[history_.size() - 1] == kPass &&
-          history_[history_.size() - 2] == kPass);
+  return (history_.size() >= max_game_length_) || superko_ ||
+         (history_[history_.size() - 1].action == board_.pass_action() &&
+          history_[history_.size() - 2].action == board_.pass_action());
 }
 
 std::vector<double> GoState::Returns() const {
@@ -185,17 +196,18 @@ void GoState::UndoAction(Player player, Action action) {
   // replaying all actions is still pretty fast (> 1 million undos/second).
   history_.pop_back();
   ResetBoard();
-  for (Action action : history_) {
+  for (auto [_, action] : history_) {
     DoApplyAction(action);
   }
 }
 
 void GoState::DoApplyAction(Action action) {
-  SPIEL_CHECK_TRUE(board_.PlayMove(action, to_play_));
+  SPIEL_CHECK_TRUE(
+      board_.PlayMove(board_.ActionToVirtualAction(action), to_play_));
   to_play_ = OppColor(to_play_);
 
   bool was_inserted = repetitions_.insert(board_.HashValue()).second;
-  if (!was_inserted && action != kPass) {
+  if (!was_inserted && action != board_.pass_action()) {
     // We have encountered this position before.
     superko_ = true;
   }
@@ -206,7 +218,7 @@ void GoState::ResetBoard() {
   if (handicap_ < 2) {
     to_play_ = GoColor::kBlack;
   } else {
-    for (GoPoint p : HandicapStones(handicap_)) {
+    for (VirtualPoint p : HandicapStones(handicap_)) {
       board_.PlayMove(p, GoColor::kBlack);
     }
     to_play_ = GoColor::kWhite;
@@ -221,7 +233,9 @@ GoGame::GoGame(const GameParameters& params)
     : Game(kGameType, params),
       komi_(ParameterValue<double>("komi")),
       board_size_(ParameterValue<int>("board_size")),
-      handicap_(ParameterValue<int>("handicap")) {}
+      handicap_(ParameterValue<int>("handicap")),
+      max_game_length_(ParameterValue<int>(
+          "max_game_length", DefaultMaxGameLength(board_size_))) {}
 
 }  // namespace go
 }  // namespace open_spiel

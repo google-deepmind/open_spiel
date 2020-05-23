@@ -14,7 +14,12 @@
 
 #include "open_spiel/game_parameters.h"
 
-#include <iostream>
+#include <map>
+#include <string>
+#include <utility>
+
+#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
 
@@ -65,7 +70,7 @@ inline std::string GameParametersToString(const GameParameters& game_params) {
   if (game_params.count("name")) str = game_params.at("name").string_value();
   str.push_back('(');
   bool first = true;
-  for (auto key_val : game_params) {
+  for (const auto& key_val : game_params) {
     if (key_val.first != "name") {
       if (!first) str.push_back(',');
       str.append(key_val.first);
@@ -122,6 +127,25 @@ GameParameters GameParametersFromString(const std::string& game_string) {
     }
   }
   return params;
+}
+
+std::string GameParameterTypeToString(const GameParameter::Type& type) {
+  switch (type) {
+    case GameParameter::Type::kUnset:
+      return "kUnset";
+    case GameParameter::Type::kInt:
+      return "kInt";
+    case GameParameter::Type::kDouble:
+      return "kDouble";
+    case GameParameter::Type::kString:
+      return "kString";
+    case GameParameter::Type::kBool:
+      return "kBool";
+    case GameParameter::Type::kGame:
+      return "kGame";
+    default:
+      SpielFatalError("Invalid GameParameter");
+  }
 }
 
 }  // namespace open_spiel

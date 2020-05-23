@@ -12,12 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef THIRD_PARTY_OPEN_SPIEL_GAME_PARAMETERS_H_
-#define THIRD_PARTY_OPEN_SPIEL_GAME_PARAMETERS_H_
+#ifndef OPEN_SPIEL_GAME_PARAMETERS_H_
+#define OPEN_SPIEL_GAME_PARAMETERS_H_
 
 #include <map>
 #include <memory>
 #include <string>
+#include <utility>
 
 #include "open_spiel/spiel_utils.h"
 
@@ -29,6 +30,7 @@ namespace open_spiel {
 // - when specifying in Python a parameter value.
 //
 class GameParameter;
+
 using GameParameters = std::map<std::string, GameParameter>;
 std::string GameParametersToString(const GameParameters& game_params);
 GameParameters GameParametersFromString(const std::string& game_string);
@@ -115,6 +117,8 @@ class GameParameter {
   Type type_;
 };
 
+std::string GameParameterTypeToString(const GameParameter::Type& type);
+
 inline bool IsParameterSpecified(const GameParameters& table,
                                  const std::string& key) {
   return table.find(key) != table.end();
@@ -122,4 +126,4 @@ inline bool IsParameterSpecified(const GameParameters& table,
 
 }  // namespace open_spiel
 
-#endif  // THIRD_PARTY_OPEN_SPIEL_GAME_PARAMETERS_H_
+#endif  // OPEN_SPIEL_GAME_PARAMETERS_H_

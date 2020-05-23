@@ -14,10 +14,12 @@
 
 #include "open_spiel/algorithms/external_sampling_mccfr.h"
 
+#include <memory>
 #include <numeric>
 #include <random>
 
 #include "open_spiel/algorithms/cfr.h"
+#include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
@@ -27,12 +29,17 @@ namespace algorithms {
 ExternalSamplingMCCFRSolver::ExternalSamplingMCCFRSolver(const Game& game,
                                                          int seed,
                                                          AverageType avg_type)
+    : ExternalSamplingMCCFRSolver(game, std::make_shared<UniformPolicy>(), seed,
+                                  avg_type) {}
+
+ExternalSamplingMCCFRSolver::ExternalSamplingMCCFRSolver(
+    const Game& game, std::shared_ptr<Policy> default_policy, int seed,
+    AverageType avg_type)
     : game_(game.Clone()),
       rng_(new std::mt19937(seed)),
       avg_type_(avg_type),
       dist_(0.0, 1.0),
-      uniform_policy_(std::shared_ptr<TabularPolicy>(
-          new TabularPolicy(GetUniformPolicy(game)))) {
+      default_policy_(default_policy) {
   if (game_->GetType().dynamics != GameType::Dynamics::kSequential) {
     SpielFatalError(
         "MCCFR requires sequential games. If you're trying to run it "
@@ -60,8 +67,7 @@ double ExternalSamplingMCCFRSolver::UpdateRegrets(const State& state,
   if (state.IsTerminal()) {
     return state.PlayerReturn(player);
   } else if (state.IsChanceNode()) {
-    Action action =
-        SampleChanceOutcome(state.ChanceOutcomes(), dist_(*rng)).first;
+    Action action = SampleAction(state.ChanceOutcomes(), dist_(*rng)).first;
     return UpdateRegrets(*state.Child(action), player, rng);
   } else if (state.IsSimultaneousNode()) {
     SpielFatalError(
@@ -70,7 +76,7 @@ double ExternalSamplingMCCFRSolver::UpdateRegrets(const State& state,
   }
 
   Player cur_player = state.CurrentPlayer();
-  std::string is_key = state.InformationState(cur_player);
+  std::string is_key = state.InformationStateString(cur_player);
   std::vector<Action> legal_actions = state.LegalActions();
 
   // The insert here only inserts the default value if the key is not found,
@@ -141,7 +147,7 @@ void ExternalSamplingMCCFRSolver::FullUpdateAverage(
   if (sum == 0.0) return;
 
   Player cur_player = state.CurrentPlayer();
-  std::string is_key = state.InformationState(cur_player);
+  std::string is_key = state.InformationStateString(cur_player);
   std::vector<Action> legal_actions = state.LegalActions();
 
   // The insert here only inserts the default value if the key is not found,

@@ -22,6 +22,7 @@ import collections
 import numpy as np
 
 from open_spiel.python import rl_agent
+from open_spiel.python import rl_tools
 
 
 class QLearner(rl_agent.AbstractAgent):
@@ -33,18 +34,20 @@ class QLearner(rl_agent.AbstractAgent):
   def __init__(self,
                player_id,
                num_actions,
-               step_size=0.5,
-               epsilon=0.2,
+               step_size=0.1,
+               epsilon_schedule=rl_tools.ConstantSchedule(0.2),
                discount_factor=1.0):
     """Initialize the Q-Learning agent."""
     self._player_id = player_id
     self._num_actions = num_actions
     self._step_size = step_size
-    self._epsilon = epsilon
+    self._epsilon_schedule = epsilon_schedule
+    self._epsilon = epsilon_schedule.value
     self._discount_factor = discount_factor
     self._q_values = collections.defaultdict(
         lambda: collections.defaultdict(float))
     self._prev_info_state = None
+    self._last_loss_value = None
 
   def _epsilon_greedy(self, info_state, legal_actions, epsilon):
     """Returns a valid epsilon-greedy action and valid action probs.
@@ -61,8 +64,9 @@ class QLearner(rl_agent.AbstractAgent):
     """
     probs = np.zeros(self._num_actions)
     greedy_q = max([self._q_values[info_state][a] for a in legal_actions])
-    greedy_actions = [a for a in legal_actions
-                      if self._q_values[info_state][a] == greedy_q]
+    greedy_actions = [
+        a for a in legal_actions if self._q_values[info_state][a] == greedy_q
+    ]
     probs[legal_actions] = epsilon / len(legal_actions)
     probs[greedy_actions] += (1 - epsilon) / len(greedy_actions)
     action = np.random.choice(range(self._num_actions), p=probs)
@@ -80,6 +84,10 @@ class QLearner(rl_agent.AbstractAgent):
     """
     info_state = str(time_step.observations["info_state"][self._player_id])
     legal_actions = time_step.observations["legal_actions"][self._player_id]
+
+    # Prevent undefined errors if this agent never plays until terminal step
+    action, probs = None, None
+
     # Act step: don't act at terminal states.
     if not time_step.last():
       epsilon = 0.0 if is_evaluation else self._epsilon
@@ -97,6 +105,9 @@ class QLearner(rl_agent.AbstractAgent):
       self._last_loss_value = target - prev_q_value
       self._q_values[self._prev_info_state][self._prev_action] += (
           self._step_size * self._last_loss_value)
+
+      # Decay epsilon, if necessary.
+      self._epsilon = self._epsilon_schedule.step()
 
       if time_step.last():  # prepare for the next episode.
         self._prev_info_state = None

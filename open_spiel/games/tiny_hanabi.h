@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef THIRD_PARTY_OPEN_SPIEL_GAMES_TINY_HANABI_H_
-#define THIRD_PARTY_OPEN_SPIEL_GAMES_TINY_HANABI_H_
+#ifndef OPEN_SPIEL_GAMES_TINY_HANABI_H_
+#define OPEN_SPIEL_GAMES_TINY_HANABI_H_
 
 #include <memory>
 
@@ -43,13 +43,13 @@ namespace tiny_hanabi {
 
 class TinyHanabiPayoffMatrix {
  public:
-  int operator()(const std::vector<Action>& history) const {
+  int operator()(const std::vector<State::PlayerAction>& history) const {
     SPIEL_CHECK_EQ(num_players_ * 2, history.size());
     int idx = 0;
     for (int i = 0; i < num_players_; ++i)
-      idx = (idx * num_chance_) + history[i];
+      idx = (idx * num_chance_) + history[i].action;
     for (int i = num_players_; i < 2 * num_players_; ++i)
-      idx = (idx * num_actions_) + history[i];
+      idx = (idx * num_actions_) + history[i].action;
     return payoff_[idx];
   }
   TinyHanabiPayoffMatrix(int num_players, int num_chance, int num_actions,
@@ -91,11 +91,11 @@ class TinyHanabiGame : public Game {
   std::shared_ptr<const Game> Clone() const override {
     return std::shared_ptr<const Game>(new TinyHanabiGame(*this));
   }
-  std::vector<int> InformationStateNormalizedVectorShape() const {
+  std::vector<int> InformationStateTensorShape() const override {
     return {payoff_.NumChance() + payoff_.NumActions() * payoff_.NumPlayers()};
   }
-  std::vector<int> ObservationNormalizedVectorShape() const override {
-    return InformationStateNormalizedVectorShape();
+  std::vector<int> ObservationTensorShape() const override {
+    return InformationStateTensorShape();
   }
 
  private:
@@ -117,12 +117,12 @@ class TinyHanabiState : public State {
   std::vector<double> Returns() const override;
   std::unique_ptr<State> Clone() const override;
   std::vector<Action> LegalActions() const override;
-  std::string InformationState(Player player) const override;
-  void InformationStateAsNormalizedVector(
-      Player player, std::vector<double>* values) const override;
-  std::string Observation(Player player) const override;
-  void ObservationAsNormalizedVector(
-      Player player, std::vector<double>* values) const override;
+  std::string InformationStateString(Player player) const override;
+  void InformationStateTensor(Player player,
+                              std::vector<double>* values) const override;
+  std::string ObservationString(Player player) const override;
+  void ObservationTensor(Player player,
+                         std::vector<double>* values) const override;
 
  private:
   void DoApplyAction(Action action) override;
@@ -132,4 +132,4 @@ class TinyHanabiState : public State {
 }  // namespace tiny_hanabi
 }  // namespace open_spiel
 
-#endif  // THIRD_PARTY_OPEN_SPIEL_GAMES_TINY_HANABI_H_
+#endif  // OPEN_SPIEL_GAMES_TINY_HANABI_H_

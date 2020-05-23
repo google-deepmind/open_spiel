@@ -38,6 +38,7 @@ public class GridMaze: GameProtocol {
     public var history = [GridMaze.Action]()
     public var currentPlayer: Player { return isTerminal ? .terminal : .player(0) }
     public var isTerminal: Bool { return gridCell.isTerminal }
+    public var isGoal: Bool { return gridCell.isGoal }
     public var gridCell: GridCell  // Cell in the maze where we are currently positioned
     var utility = 0.0
   }
@@ -46,12 +47,16 @@ public class GridMaze: GameProtocol {
   // Many of the things could instead of fatalError return nil if that was supported by GameProtocol
   // Crashing or -Double.infinity are only current alteratives
   public var minUtility: Double { fatalError("Cannot be calcuated for GridMaze") }
+
   /// TODO: Ok? It is not known
   public var maxUtility: Double { fatalError("Cannot be calcuated for GridMaze") }
+
   /// TODO: Ok? It is not known
   public var utilitySum: Double? { return nil }  // Only known for very specific (and trivial) mazes
+
   public var playerCount: Int { return 1 }  // Only one player navigating (and terminal player does not count)
   public var maxGameLength: Int { fatalError("Cannot be calcuated for GridMaze") }
+
   /// TODO: Ok? It is not known
   public static var info: GameInfo {
     fatalError("Cannot be (easily) caluated for GridMaze")
@@ -66,8 +71,8 @@ public class GridMaze: GameProtocol {
     //        rewardModel: .rewards, /// TODO: Can change dynamically (even after init)
     //        maxPlayers: 1,
     //        minPlayers: 1,
-    //        providesInformationState: true,
-    //        providesInformationStateAsNormalizedVector: true
+    //        providesInformationStateString: true,
+    //        providesInformationStateTensor: true
     //      )
   }
 
@@ -84,63 +89,51 @@ public class GridMaze: GameProtocol {
   public var allActions: [Action] { return GridMaze.Action.allCases }
 
   // TODO
-  // Spiel docs refer to ImperfectInformationState.informationStateAsNormalizedVector`
+  // Spiel docs refer to ImperfectInformationState.informationStateTensor`
   // cannot find ImperfectInformationState so
   // "see the documentation of that function for details of the data layout." not possible
   // Full inforation state is position (of robot) in maze, either [1] if we
   // flatMap maze and use position index, alt [1, 1] if we use (row,col)?
   // What should we return, TicTacToe returns [3*boardSize*boardSize]
-  public var informationStateNormalizedVectorShape: [Int] { [1] }
+  public var informationStateTensorShape: [Int] { [1] }
 
   // *** Section 2: Native things for GridMaze
   public var maze: [[GridCell]] = [[GridCell]]()
 
   public var rowCount: Int
-  public var colCount: Int
+  public var columnCount: Int
 
   //----
   public init(
-    rowCount: Int, colCount: Int,
-    cellLeftSide: GridCell = BOUNCE(reward: -1.0),
-    cellTopSide: GridCell = BOUNCE(reward: -1.0),
-    cellBottomSide: GridCell = BOUNCE(reward: -1.0),
-    cellRightSide: GridCell = BOUNCE(reward: -1.0),
-    cellTopLeft: GridCell = BOUNCE(reward: -1.0),
-    cellTopRight: GridCell = BOUNCE(reward: -1.0),
-    cellBottomLeft: GridCell = BOUNCE(reward: -1.0),
-    cellBottomRight: GridCell = BOUNCE(reward: -1.0),
-    cellAllOthers: GridCell = SPACE(reward: -1.0)
+    rowCount: Int,
+    columnCount: Int,
+    borderCell: GridCell = GridCell.wall,
+    innerCell: GridCell = GridCell.space(reward: -1.0)
   ) {
-    precondition(rowCount > 0 && colCount > 0, "Row and column count must be larger than 0")
+    precondition(rowCount > 0 && columnCount > 0, "Row and column count must be larger than 0")
 
     self.rowCount = rowCount
-    self.colCount = colCount
+    self.columnCount = columnCount
 
-    // Allocate and assign state entries for each cell in grid
+    // Allocate and assign innerCell entries for each cell in grid
     // TODO: Can we use init(repeating: ..., count: ...) with [[GridCell]] in an elegant way?
     maze.reserveCapacity(rowCount)
     for ridx in 0..<rowCount {
       maze.append([GridCell]())
-      for cidx in 0..<colCount {
-        maze[ridx].append(cellAllOthers)
-        self[ridx, cidx] = cellAllOthers  // Sets state in cell element
+      for cidx in 0..<columnCount {
+        maze[ridx].append(innerCell)
+        self[ridx, cidx] = innerCell  // Sets state in cell element
       }
     }
 
     for i in 0..<rowCount {
-      self[i, 0] = cellLeftSide
-      self[i, 0] = cellLeftSide
-      self[i, colCount - 1] = cellRightSide
+      self[i, 0] = borderCell
+      self[i, columnCount - 1] = borderCell
     }
-    for i in 0..<colCount {
-      self[0, i] = cellTopSide
-      self[rowCount - 1, i] = cellBottomSide
+    for i in 0..<columnCount {
+      self[0, i] = borderCell
+      self[rowCount - 1, i] = borderCell
     }
-
-    self[0, 0] = cellTopLeft
-    self[0, colCount - 1] = cellTopRight
-    self[rowCount - 1, 0] = cellBottomLeft
-    self[rowCount - 1, colCount - 1] = cellBottomRight
   }
 
   //---
@@ -170,10 +163,9 @@ extension GridMaze.GameState {
     }
 
     var mask: [Bool] = Array(repeating: false, count: GridMaze.Action.allCases.count)
-    mask
-      = zip(mask, GridMaze.Action.allCases).map {
-        gridCell.getTargetWOJumpSpecification(takingAction: $0.1).canAttemptToBeEntered
-      }
+    mask = zip(mask, GridMaze.Action.allCases).map {
+      gridCell.getTargetWOJumpSpecification(takingAction: $0.1).canAttemptToBeEntered
+    }
     return mask
   }
 
@@ -203,12 +195,12 @@ extension GridMaze.GameState {
   }
 
   // TODO: Correct understanding?
-  public func informationStateAsNormalizedVector(for player: Player) -> [Double] {
-    return [Double(game.colCount * gridCell.row! + gridCell.col!)]  // Each position is a unique info state
+  public func informationStateTensor(for player: Player) -> [Double] {
+    return [Double(game.columnCount * gridCell.row! + gridCell.col!)]  // Each position is a unique info state
   }
 
   // TODO: Correct understanding?
-  public func informationState(for player: Player) -> String {
+  public func informationStateString(for player: Player) -> String {
     return GridMaze.GameState.informationStateImpl(gridCell: gridCell)
   }
 
@@ -225,8 +217,8 @@ public typealias JumpSpecificationProbability = (js: JumpSpecification, prob: Do
 public enum JumpSpecification: Equatable, CustomStringConvertible {
   case Welcome  // I am happy to welcome you to my space
   case BounceBack  // You cannot enter my space, bounce back (e.g. Wall)
-  case Relative(Int, Int)  // Teleport (extend to also support a function argument)
-  case Absolute(Int, Int)  // Teleport (extend to also support a function argument)
+  case Relative(Int, Int)  // Teleport(row,col) (extend to also support a function argument)
+  case Absolute(Int, Int)  // Teleport(row,col) (extend to also support a function argument)
 
   public var description: String {
     switch self {
@@ -249,13 +241,18 @@ public struct GridCell {
 
   // TODO: Need to read these from public scope, can we statically limit write to private scope?
   public var canAttemptToBeEntered: Bool  // True if it is legal to take an action towards entering this cell
+
   public var canBeEntered: Bool {  // False if you can never actually arrive at this cell, i.e. does not have a welcoming JS)
-    return entryJumpProbabilities.count == 0
-      || entryJumpProbabilities.contains { $0.js == .Welcome && $0.prob > 0 }
+    return canAttemptToBeEntered
+      && (
+        entryJumpProbabilities.count == 0
+          || entryJumpProbabilities.contains { $0.js == .Welcome && $0.prob > 0 }
+      )
   }
 
   public var isInitial: Bool
   public var isTerminal: Bool
+  public var isGoal: Bool
 
   // Stoachstic behavior for cell
   // When attempting to enter cell, this specification can specify alternative behavior than just entering cell
@@ -280,12 +277,14 @@ public struct GridCell {
     entryJumpProbabilities: [JumpSpecificationProbability] = [],
     isInitial: Bool,
     isTerminal: Bool,
+    isGoal: Bool,
     canAttemptToBeEntered: Bool
   ) {
     self.oneWordDescription = oneWordDescription
     self.rewardOnEnter = reward
     self.isInitial = isInitial
     self.isTerminal = isTerminal
+    self.isGoal = isGoal
     self.canAttemptToBeEntered = canAttemptToBeEntered
     self.entryJumpProbabilities = entryJumpProbabilities
   }
@@ -300,7 +299,7 @@ public struct GridCell {
     case .LEFT:
       newCol -= 1
       if col == 0 {
-        newCol = game!.colCount - 1
+        newCol = game!.columnCount - 1
       }
     case .UP:
       newRow -= 1
@@ -314,7 +313,7 @@ public struct GridCell {
       }
     case .RIGHT:
       newCol += 1
-      if col == game!.colCount - 1 {
+      if col == game!.columnCount - 1 {
         newCol = 0
       }
     }
@@ -336,6 +335,7 @@ public struct GridCell {
       originCell: self,
       targetCell: targetCell,
       js: targetCell.entryJumpProbabilities[probabilityIndex].js)
+
     return targetCell2
   }
 
@@ -393,47 +393,55 @@ public struct GridCell {
 // ***************************************************************************
 // Create factory functions for common Cell Types to use in GridMazes
 
-public func SPACE(reward: Double = -1) -> GridCell {
-  return GridCell(
-    oneWordDescription: "SPACE", reward: reward,
-    isInitial: false, isTerminal: false,
-    canAttemptToBeEntered: true)
-}
+extension GridCell {
+  /// Creates a start cell with the given reward.
+  public static func start(reward: Double = -1) -> GridCell {
+    return GridCell(
+      oneWordDescription: "START", reward: reward,
+      isInitial: true, isTerminal: false, isGoal: false,
+      canAttemptToBeEntered: true)
+  }
 
-public func START(reward: Double = -1) -> GridCell {
-  return GridCell(
-    oneWordDescription: "START", reward: reward,
-    isInitial: true, isTerminal: false,
-    canAttemptToBeEntered: true)
-}
+  /// Creates a goal cell with the given reward.
+  public static func goal(reward: Double) -> GridCell {
+    return GridCell(
+      oneWordDescription: "GOAL", reward: reward,
+      isInitial: false, isTerminal: true, isGoal: true,
+      canAttemptToBeEntered: true)
+  }
 
-public func GOAL(reward: Double) -> GridCell {
-  return GridCell(
-    oneWordDescription: "GOAL", reward: reward,
-    isInitial: false, isTerminal: true,
-    canAttemptToBeEntered: true)
-}
+  /// Creates a start cell with the given reward.
+  public static func space(reward: Double) -> GridCell {
+    return GridCell(
+      oneWordDescription: "SPACE", reward: reward,
+      isInitial: false, isTerminal: false, isGoal: false,
+      canAttemptToBeEntered: true)
+  }
 
-public func HOLE(reward: Double) -> GridCell {
-  return GridCell(
-    oneWordDescription: "HOLE", reward: reward,
-    isInitial: false, isTerminal: true,
-    canAttemptToBeEntered: true)
-}
+  /// Creates a hole cell with the given reward.
+  public static func hole(reward: Double) -> GridCell {
+    return GridCell(
+      oneWordDescription: "HOLE", reward: reward,
+      isInitial: false, isTerminal: true, isGoal: false,
+      canAttemptToBeEntered: true)
+  }
 
-public func WALL(reward: Double = -Double.infinity) -> GridCell {
-  return GridCell(
-    oneWordDescription: "WALL", reward: reward,
-    isInitial: false, isTerminal: false,
-    canAttemptToBeEntered: false)
-}
+  /// Creates a wall cell with the given reward.
+  public static var wall: GridCell {
+    return GridCell(
+      oneWordDescription: "WALL", reward: -1.0,  // Reward is no-op because !canAttemptToBeEntered
+      isInitial: false, isTerminal: false, isGoal: false,
+      canAttemptToBeEntered: false)
+  }
 
-public func BOUNCE(reward: Double = -1) -> GridCell {
-  return GridCell(
-    oneWordDescription: "BOUNCE", reward: reward,
-    entryJumpProbabilities: [(prob: 1.0, js: .BounceBack)],
-    isInitial: false, isTerminal: false,
-    canAttemptToBeEntered: true)
+  /// A bounce cell.
+  public static var bounce: GridCell {
+    return GridCell(
+      oneWordDescription: "BOUNCE", reward: -1.0,  // Reward is irrelevant, you receive reward of cell you bounce back to
+      entryJumpProbabilities: [(prob: 1.0, js: .BounceBack)],
+      isInitial: false, isTerminal: false, isGoal: false,
+      canAttemptToBeEntered: true)
+  }
 }
 
 // ***************************************************************************
@@ -581,8 +589,10 @@ extension GridMaze {
         {
           jsStr = "(JS)"
         }
-        str
-          = "\(cell.oneWordDescription)\(jsStr):\(double2Str(printFullFloat: printFullFloat, value: cell.rewardOnEnter))"
+        str = "\(cell.oneWordDescription)\(jsStr)"
+        if cell.canBeEntered {
+          str = "\(str):\(double2Str(printFullFloat: printFullFloat, value: cell.rewardOnEnter))"
+        }
         if cell.isTerminal {
           str += ":T"
         } else if cell.isInitial {
@@ -640,16 +650,15 @@ extension GridMaze {
             let qvaluePart = 1.0 / Double(gs.legalActions.count)
             q = gs.legalActions.map { ($0, qvaluePart) }
           }
-          _
-            = q.map {
-              if $0 == .UP || $0 == .DOWN {
-                if qs1.count > 0 { qs1 += " " }
-                qs1 += "\($0.description):\(double2Str(printFullFloat: printFullFloat, value: $1))"
-              } else {
-                if qs2.count > 0 { qs2 += " " }
-                qs2 += "\($0.description):\(double2Str(printFullFloat: printFullFloat, value: $1))"
-              }
+          _ = q.map {
+            if $0 == .UP || $0 == .DOWN {
+              if qs1.count > 0 { qs1 += " " }
+              qs1 += "\($0.description):\(double2Str(printFullFloat: printFullFloat, value: $1))"
+            } else {
+              if qs2.count > 0 { qs2 += " " }
+              qs2 += "\($0.description):\(double2Str(printFullFloat: printFullFloat, value: $1))"
             }
+          }
         }
         if qtable != nil {
           qtableStrs.append([qs1, qs2])

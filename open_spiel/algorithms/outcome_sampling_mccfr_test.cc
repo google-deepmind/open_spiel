@@ -38,7 +38,7 @@ void MCCFR_2PGameTest(const std::string& game_name, std::mt19937* rng,
     solver.RunIteration(rng);
   }
   const std::unique_ptr<Policy> average_policy = solver.AveragePolicy();
-  double nash_conv = NashConv(*game, *average_policy);
+  double nash_conv = NashConv(*game, *average_policy, true);
   std::cout << "Game: " << game_name << ", iters = " << iterations
             << ", NashConv: " << nash_conv << std::endl;
   SPIEL_CHECK_LE(nash_conv, nashconv_upperbound);
@@ -55,7 +55,7 @@ int main(int argc, char** argv) {
   // Values double-checked with the original implementation used in (Lanctot,
   // "Monte Carlo Sampling and Regret Minimization For Equilibrium Computation
   // and Decision-Making in Large Extensive Form Games", 2013).
-  algorithms::MCCFR_2PGameTest("kuhn_poker", &rng, 10000, 0.1);
-  algorithms::MCCFR_2PGameTest("leduc_poker", &rng, 100000, 1.5);
-  algorithms::MCCFR_2PGameTest("liars_dice", &rng, 100000, 1);
+  algorithms::MCCFR_2PGameTest("kuhn_poker", &rng, 10000, 0.04);
+  algorithms::MCCFR_2PGameTest("leduc_poker", &rng, 10000, 3);
+  algorithms::MCCFR_2PGameTest("liars_dice", &rng, 1000, 1.7);
 }

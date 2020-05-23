@@ -8,7 +8,7 @@ well as Heuristic Payoff Tables (HPTs).
 
 The following presents several typical use cases for Alpha-Rank. For an example
 complete python script, refer to
-`./open_spiel/python/egt/examples/alpharank_example.py`.
+[open_spiel/python/egt/examples/alpharank_example.py](https://github.com/deepmind/open_spiel/blob/master/open_spiel/python/egt/examples/alpharank_example.py).
 
 ## Importing the Alpha-Rank module
 
@@ -29,7 +29,7 @@ Heuristic Payoff Tables (HPTs), as both are supported by the ranking code.
 ```python
 # Load the game
 game = pyspiel.load_matrix_game("matrix_rps")
-payoff_tables = utils.nfg_to_ndarray(game)
+payoff_tables = utils.game_payoffs_array(game)
 
 # Convert to heuristic payoff tables
 payoff_tables= [heuristic_payoff_table.from_matrix_game(payoff_tables[0]),

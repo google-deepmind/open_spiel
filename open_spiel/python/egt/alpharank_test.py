@@ -68,7 +68,7 @@ class AlphaRankTest(absltest.TestCase):
     """Tests closed-form transition matrix computation for constant-sum case."""
 
     game = pyspiel.load_matrix_game("matrix_rps")
-    payoff_tables = utils.nfg_to_ndarray(game)
+    payoff_tables = utils.game_payoffs_array(game)
 
     # Checks if the game is symmetric and runs single-population analysis if so
     _, payoff_tables = utils.is_symmetric_matrix_game(payoff_tables)

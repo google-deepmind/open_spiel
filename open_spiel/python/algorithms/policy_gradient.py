@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Lint as python3.
 r"""Policy Gradient based agents implemented in TensorFlow.
 
 This class is composed of three policy gradient (PG) algorithms:
@@ -71,11 +72,12 @@ loss computation.
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-
 import collections
+import os
+from absl import logging
 import numpy as np
 import sonnet as snt
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 
 from open_spiel.python import rl_agent
 from open_spiel.python.algorithms.losses import rl_losses
@@ -95,16 +97,17 @@ class PolicyGradient(rl_agent.AbstractAgent):
                player_id,
                info_state_size,
                num_actions,
-               loss_str="rpg",
+               loss_str="a2c",
                loss_class=None,
                hidden_layers_sizes=(128,),
-               batch_size=128,
+               batch_size=16,
                critic_learning_rate=0.01,
                pi_learning_rate=0.001,
                entropy_cost=0.01,
                num_critic_before_pi=8,
                additional_discount_factor=1.0,
-               max_global_gradient_norm=None):
+               max_global_gradient_norm=None,
+               optimizer_str="sgd"):
     """Initialize the PolicyGradient agent.
 
     Args:
@@ -114,7 +117,7 @@ class PolicyGradient(rl_agent.AbstractAgent):
       num_actions: int, number of actions per info state.
       loss_str: string or None. If string, must be one of ["rpg", "qpg", "rm",
         "a2c"] and defined in `_get_loss_class`. If None, a loss class must be
-        passed through `loss_class`. Defaults to "rpg".
+        passed through `loss_class`. Defaults to "a2c".
       loss_class: Class or None. If Class, it must define the policy gradient
         loss. If None a loss class in a string format must be passed through
         `loss_str`. Defaults to None.
@@ -134,9 +137,13 @@ class PolicyGradient(rl_agent.AbstractAgent):
         users must provide *only one of* `loss_str` or `loss_class`.
       max_global_gradient_norm: float or None, maximum global norm of a gradient
         to which the gradient is shrunk if its value is larger.
+      optimizer_str: String defining which optimizer to use. Supported values
+        are {sgd, adam}
     """
     assert bool(loss_str) ^ bool(loss_class), "Please provide only one option."
+    self._kwargs = locals()
     loss_class = loss_class if loss_class else self._get_loss_class(loss_str)
+    self._loss_class = loss_class
 
     self.player_id = player_id
     self._session = session
@@ -169,23 +176,28 @@ class PolicyGradient(rl_agent.AbstractAgent):
 
     # Network
     # activate final as we plug logit and qvalue heads afterwards.
-    net_torso = snt.nets.MLP(
+    self._net_torso = snt.nets.MLP(
         output_sizes=self._layer_sizes, activate_final=True)
-    torso_out = net_torso(self._info_state_ph)
-    self._policy_logits = snt.Linear(
-        output_size=self._num_actions, name="policy_head")(
-            torso_out)
+    torso_out = self._net_torso(self._info_state_ph)
+    self._policy_logits_layer = snt.Linear(
+        output_size=self._num_actions, name="policy_head")
+
+    self.policy_logits_network = snt.Sequential([self._net_torso,
+                                                 self._policy_logits_layer])
+
+    self._policy_logits = self._policy_logits_layer(torso_out)
     self._policy_probs = tf.nn.softmax(self._policy_logits)
+
+    self._savers = []
 
     # Add baseline (V) head for A2C.
     if loss_class.__name__ == "BatchA2CLoss":
-      self._baseline = tf.squeeze(
-          snt.Linear(output_size=1, name="baseline")(torso_out), axis=1)
+      self._baseline_layer = snt.Linear(output_size=1, name="baseline")
+      self._baseline = tf.squeeze(self._baseline_layer(torso_out), axis=1)
     else:
-      # Add q-values head otherwise
-      self._q_values = snt.Linear(
-          output_size=self._num_actions, name="q_values_head")(
-              torso_out)
+      self._q_values_layer = snt.Linear(
+          output_size=self._num_actions, name="q_values_head")
+      self._q_values = self._q_values_layer(torso_out)
 
     # Critic loss
     # Baseline loss in case of A2C
@@ -201,8 +213,14 @@ class PolicyGradient(rl_agent.AbstractAgent):
       self._critic_loss = tf.reduce_mean(
           tf.losses.mean_squared_error(
               labels=self._return_ph, predictions=value_predictions))
-    critic_optimizer = tf.train.GradientDescentOptimizer(
-        learning_rate=critic_learning_rate)
+    if optimizer_str == "adam":
+      self._critic_optimizer = tf.train.AdamOptimizer(
+          learning_rate=critic_learning_rate)
+    elif optimizer_str == "sgd":
+      self._critic_optimizer = tf.train.GradientDescentOptimizer(
+          learning_rate=critic_learning_rate)
+    else:
+      raise ValueError("Not implemented, choose from 'adam' and 'sgd'.")
 
     def minimize_with_clipping(optimizer, loss):
       grads_and_vars = optimizer.compute_gradients(loss)
@@ -213,7 +231,7 @@ class PolicyGradient(rl_agent.AbstractAgent):
 
       return optimizer.apply_gradients(grads_and_vars)
 
-    self._critic_learn_step = minimize_with_clipping(critic_optimizer,
+    self._critic_learn_step = minimize_with_clipping(self._critic_optimizer,
                                                      self._critic_loss)
 
     # Pi loss
@@ -227,10 +245,17 @@ class PolicyGradient(rl_agent.AbstractAgent):
     else:
       self._pi_loss = pg_class.loss(
           policy_logits=self._policy_logits, action_values=self._q_values)
-    pi_optimizer = tf.train.GradientDescentOptimizer(
-        learning_rate=pi_learning_rate)
+    if optimizer_str == "adam":
+      self._pi_optimizer = tf.train.AdamOptimizer(
+          learning_rate=pi_learning_rate)
+    elif optimizer_str == "sgd":
+      self._pi_optimizer = tf.train.GradientDescentOptimizer(
+          learning_rate=pi_learning_rate)
 
-    self._pi_learn_step = minimize_with_clipping(pi_optimizer, self._pi_loss)
+    self._pi_learn_step = minimize_with_clipping(self._pi_optimizer,
+                                                 self._pi_loss)
+    self._loss_str = loss_str
+    self._initialize()
 
   def _get_loss_class(self, loss_str):
     if loss_str == "rpg":
@@ -243,7 +268,7 @@ class PolicyGradient(rl_agent.AbstractAgent):
       return rl_losses.BatchA2CLoss
 
   def _act(self, info_state, legal_actions):
-    # make a singleton batch for NN compatibility: [1, info_state_size]
+    # Make a singleton batch for NN compatibility: [1, info_state_size]
     info_state = np.reshape(info_state, [1, -1])
     policy_probs = self._session.run(
         self._policy_probs, feed_dict={self._info_state_ph: info_state})
@@ -251,7 +276,10 @@ class PolicyGradient(rl_agent.AbstractAgent):
     # Remove illegal actions, re-normalize probs
     probs = np.zeros(self._num_actions)
     probs[legal_actions] = policy_probs[0][legal_actions]
-    probs /= sum(probs)
+    if sum(probs) != 0:
+      probs /= sum(probs)
+    else:
+      probs[legal_actions] = 1 / len(legal_actions)
     action = np.random.choice(len(probs), p=probs)
     return action, probs
 
@@ -303,6 +331,39 @@ class PolicyGradient(rl_agent.AbstractAgent):
         self._prev_action = action
 
     return rl_agent.StepOutput(action=action, probs=probs)
+
+  def _full_checkpoint_name(self, checkpoint_dir, name):
+    checkpoint_filename = "_".join(
+        [self._loss_str, name, "pid" + str(self.player_id)])
+    return os.path.join(checkpoint_dir, checkpoint_filename)
+
+  def _latest_checkpoint_filename(self, name):
+    checkpoint_filename = "_".join(
+        [self._loss_str, name, "pid" + str(self.player_id)])
+    return checkpoint_filename + "_latest"
+
+  def save(self, checkpoint_dir):
+    for name, saver in self._savers:
+      path = saver.save(
+          self._session,
+          self._full_checkpoint_name(checkpoint_dir, name),
+          latest_filename=self._latest_checkpoint_filename(name))
+      logging.info("saved to path: %s", path)
+
+  def has_checkpoint(self, checkpoint_dir):
+    for name, _ in self._savers:
+      if tf.train.latest_checkpoint(
+          self._full_checkpoint_name(checkpoint_dir, name),
+          os.path.join(checkpoint_dir,
+                       self._latest_checkpoint_filename(name))) is None:
+        return False
+    return True
+
+  def restore(self, checkpoint_dir):
+    for name, saver in self._savers:
+      full_checkpoint_dir = self._full_checkpoint_name(checkpoint_dir, name)
+      logging.info("Restoring checkpoint: %s", (full_checkpoint_dir))
+      saver.restore(self._session, full_checkpoint_dir)
 
   @property
   def loss(self):
@@ -384,3 +445,94 @@ class PolicyGradient(rl_agent.AbstractAgent):
         })
     self._last_pi_loss_value = pi_loss
     return pi_loss
+
+  def get_weights(self):
+    variables = [self._session.run(self._net_torso.variables)]
+    variables.append(self._session.run(self._policy_logits_layer.variables))
+    variables.append(self._session.run(self._q_values_layer.variables))
+    return variables
+
+  def _initialize(self):
+    initialization_torso = tf.group(
+        *[var.initializer for var in self._net_torso.variables])
+    initialization_logit = tf.group(
+        *[var.initializer for var in self._policy_logits_layer.variables])
+    if self._loss_class.__name__ == "BatchA2CLoss":
+      initialization_baseline_or_q_val = tf.group(
+          *[var.initializer for var in self._baseline_layer.variables])
+    else:
+      initialization_baseline_or_q_val = tf.group(
+          *[var.initializer for var in self._q_values_layer.variables])
+    initialization_crit_opt = tf.group(
+        *[var.initializer for var in self._critic_optimizer.variables()])
+    initialization_pi_opt = tf.group(
+        *[var.initializer for var in self._pi_optimizer.variables()])
+
+    self._session.run(
+        tf.group(*[
+            initialization_torso, initialization_logit,
+            initialization_baseline_or_q_val, initialization_crit_opt,
+            initialization_pi_opt
+        ]))
+    self._savers = [("torso", snt.get_saver(self._net_torso)),
+                    ("policy_head", snt.get_saver(self._policy_logits_layer))]
+    if self._loss_class.__name__ == "BatchA2CLoss":
+      self._savers.append(("baseline", snt.get_saver(self._baseline_layer)))
+    else:
+      self._savers.append(("q_head", snt.get_saver(self._q_values_layer)))
+
+  def copy_with_noise(self, sigma=0.0, copy_weights=True):
+    """Copies the object and perturbates its network's weights with noise.
+
+    Args:
+      sigma: gaussian dropout variance term : Multiplicative noise following
+        (1+sigma*epsilon), epsilon standard gaussian variable, multiplies each
+        model weight. sigma=0 means no perturbation.
+      copy_weights: Boolean determining whether to copy model weights (True) or
+        just model hyperparameters.
+
+    Returns:
+      Perturbated copy of the model.
+    """
+    _ = self._kwargs.pop("self", None)
+    copied_object = PolicyGradient(**self._kwargs)
+
+    net_torso = getattr(copied_object, "_net_torso")
+    policy_logits_layer = getattr(copied_object, "_policy_logits_layer")
+    if hasattr(copied_object, "_q_values_layer"):
+      q_values_layer = getattr(copied_object, "_q_values_layer")
+    if hasattr(copied_object, "_baseline_layer"):
+      baseline_layer = getattr(copied_object, "_baseline_layer")
+
+    if copy_weights:
+      copy_mlp_weights = tf.group(*[
+          va.assign(vb * (1 + sigma * tf.random.normal(vb.shape)))
+          for va, vb in zip(net_torso.variables, self._net_torso.variables)
+      ])
+      self._session.run(copy_mlp_weights)
+
+      copy_logit_weights = tf.group(*[
+          va.assign(vb * (1 + sigma * tf.random.normal(vb.shape)))
+          for va, vb in zip(policy_logits_layer.variables,
+                            self._policy_logits_layer.variables)
+      ])
+      self._session.run(copy_logit_weights)
+      if hasattr(copied_object, "_q_values_layer"):
+        copy_q_value_weights = tf.group(*[
+            va.assign(vb * (1 + sigma * tf.random.normal(vb.shape))) for va, vb
+            in zip(q_values_layer.variables, self._q_values_layer.variables)
+        ])
+        self._session.run(copy_q_value_weights)
+      if hasattr(copied_object, "_baseline_layer"):
+        copy_baseline_weights = tf.group(*[
+            va.assign(vb * (1 + sigma * tf.random.normal(vb.shape))) for va, vb
+            in zip(baseline_layer.variables, self._baseline_layer.variables)
+        ])
+        self._session.run(copy_baseline_weights)
+
+    for var in getattr(copied_object, "_critic_optimizer").variables():
+      self._session.run(var.initializer)
+    for var in getattr(copied_object, "_pi_optimizer").variables():
+      self._session.run(var.initializer)
+
+    return copied_object

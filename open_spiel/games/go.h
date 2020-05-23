@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef THIRD_PARTY_OPEN_SPIEL_GAMES_GO_H_
-#define THIRD_PARTY_OPEN_SPIEL_GAMES_GO_H_
+#ifndef OPEN_SPIEL_GAMES_GO_H_
+#define OPEN_SPIEL_GAMES_GO_H_
 
 #include <array>
 #include <cstring>
@@ -49,16 +49,24 @@ inline constexpr int CellStates() { return 3; }  // Black, white, empty.
 inline constexpr double DrawUtility() { return 0; }
 
 // All actions must be in [0; NumDistinctActions).
-inline int NumDistinctActions(int board_size) { return kPass + 1; }
+inline int NumDistinctActions(int board_size) {
+  return board_size * board_size + 1;
+}
 
 // In theory Go games have no length limit, but we limit them to twice the
 // number of points on the board for practicality - only random games last
-// this long.
-inline int MaxGameLength(int board_size) { return board_size * board_size * 2; }
+// this long. This value can also be overriden when creating the game.
+inline int DefaultMaxGameLength(int board_size) {
+  return board_size * board_size * 2;
+}
 
 inline int ColorToPlayer(GoColor c) { return static_cast<int>(c); }
+inline GoColor PlayerToColor(Player p) { return static_cast<GoColor>(p); }
 
 // State of an in-play game.
+// Actions are contiguous from 0 to board_size * board_size - 1, row-major, i.e.
+// the (row, col) action is encoded as row * board_size + col.
+// The pass action is board_size * board_size.
 class GoState : public State {
  public:
   // Constructs a Go state for the empty board.
@@ -74,13 +82,13 @@ class GoState : public State {
 
   bool IsTerminal() const override;
 
-  std::string InformationState(int player) const override;
-  std::string Observation(int player) const override;
+  std::string InformationStateString(int player) const override;
+  std::string ObservationString(int player) const override;
 
   // Four planes: black, white, empty, and a bias plane of bits indicating komi
   // (whether white is to play).
-  void ObservationAsNormalizedVector(
-      int player, std::vector<double>* values) const override;
+  void ObservationTensor(int player,
+                         std::vector<double>* values) const override;
 
   std::vector<double> Returns() const override;
 
@@ -111,6 +119,7 @@ class GoState : public State {
 
   const float komi_;
   const int handicap_;
+  const int max_game_length_;
   GoColor to_play_;
   bool superko_;
 };
@@ -129,10 +138,14 @@ class GoGame : public Game {
         new GoState(shared_from_this(), board_size_, komi_, handicap_));
   }
 
-  std::vector<int> ObservationNormalizedVectorShape() const override {
+  std::vector<int> ObservationTensorShape() const override {
     // Planes: black, white, empty, and a bias plane indicating komi (whether
     // white is to play).
     return {CellStates() + 1, board_size_, board_size_};
+  }
+
+  TensorLayout ObservationTensorLayout() const override {
+    return TensorLayout::kCHW;
   }
 
   int NumPlayers() const override { return go::NumPlayers(); }
@@ -144,15 +157,16 @@ class GoGame : public Game {
     return std::shared_ptr<const Game>(new GoGame(*this));
   }
 
-  int MaxGameLength() const override { return go::MaxGameLength(board_size_); }
+  int MaxGameLength() const override { return max_game_length_; }
 
  private:
   const float komi_;
   const int board_size_;
   const int handicap_;
+  const int max_game_length_;
 };
 
 }  // namespace go
 }  // namespace open_spiel
 
-#endif  // THIRD_PARTY_OPEN_SPIEL_GAMES_GO_H_
+#endif  // OPEN_SPIEL_GAMES_GO_H_

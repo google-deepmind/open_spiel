@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for google3.learning.deepmind.research.iig.ps2ro.policy_aggregator."""
+"""Tests for open_spiel.python.algorithms.policy_aggregator."""
 
 from __future__ import absolute_import
 from __future__ import division

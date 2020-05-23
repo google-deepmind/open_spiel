@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for google3.third_party.open_spiel.python.algorithms.evaluate_bots."""
+"""Tests for open_spiel.python.algorithms.evaluate_bots."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -32,8 +32,8 @@ class EvaluateBotsTest(absltest.TestCase):
   def test_cpp_vs_python(self):
     game = pyspiel.load_game("kuhn_poker")
     bots = [
-        pyspiel.make_uniform_random_bot(game, 0, 1234),
-        uniform_random.UniformRandomBot(game, 1, np.random.RandomState(4321))
+        pyspiel.make_uniform_random_bot(0, 1234),
+        uniform_random.UniformRandomBot(1, np.random.RandomState(4321))
     ]
     results = np.array([
         evaluate_bots.evaluate_bots(game.new_initial_state(), bots, np.random)
@@ -41,6 +41,15 @@ class EvaluateBotsTest(absltest.TestCase):
     ])
     average_results = np.mean(results, axis=0)
     np.testing.assert_allclose(average_results, [0.125, -0.125], atol=0.1)
+
+  def test_random_vs_stateful(self):
+    game = pyspiel.load_game("tic_tac_toe")
+    bots = [
+        pyspiel.make_stateful_random_bot(game, 0, 1234),
+        uniform_random.UniformRandomBot(1, np.random.RandomState(4321))
+    ]
+    for _ in range(1000):
+      evaluate_bots.evaluate_bots(game.new_initial_state(), bots, np.random)
 
 
 if __name__ == "__main__":

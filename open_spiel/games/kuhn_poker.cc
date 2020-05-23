@@ -31,22 +31,21 @@ constexpr int kDefaultPlayers = 2;
 constexpr double kAnte = 1;
 
 // Facts about the game
-const GameType kGameType{
-    /*short_name=*/"kuhn_poker",
-    /*long_name=*/"Kuhn Poker",
-    GameType::Dynamics::kSequential,
-    GameType::ChanceMode::kExplicitStochastic,
-    GameType::Information::kImperfectInformation,
-    GameType::Utility::kZeroSum,
-    GameType::RewardModel::kTerminal,
-    /*max_num_players=*/10,
-    /*min_num_players=*/2,
-    /*provides_information_state=*/true,
-    /*provides_information_state_as_normalized_vector=*/true,
-    /*provides_observation=*/true,
-    /*provides_observation_as_normalized_vector=*/true,
-    /*parameter_specification=*/
-    {{"players", GameParameter(kDefaultPlayers)}}};
+const GameType kGameType{/*short_name=*/"kuhn_poker",
+                         /*long_name=*/"Kuhn Poker",
+                         GameType::Dynamics::kSequential,
+                         GameType::ChanceMode::kExplicitStochastic,
+                         GameType::Information::kImperfectInformation,
+                         GameType::Utility::kZeroSum,
+                         GameType::RewardModel::kTerminal,
+                         /*max_num_players=*/10,
+                         /*min_num_players=*/2,
+                         /*provides_information_state_string=*/true,
+                         /*provides_information_state_tensor=*/true,
+                         /*provides_observation_string=*/true,
+                         /*provides_observation_tensor=*/true,
+                         /*parameter_specification=*/
+                         {{"players", GameParameter(kDefaultPlayers)}}};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new KuhnGame(params));
@@ -87,7 +86,7 @@ void KuhnState::DoApplyAction(Action move) {
 
   // We undo that before exiting the method.
   // This is used in `DidBet`.
-  history_.push_back(move);
+  history_.push_back({CurrentPlayer(), move});
 
   // Check for the game being over.
   const int num_actions = history_.size() - num_players_;
@@ -141,13 +140,13 @@ std::string KuhnState::ToString() const {
   std::string str;
   for (int i = 0; i < history_.size() && i < num_players_; ++i) {
     if (!str.empty()) str.push_back(' ');
-    absl::StrAppend(&str, history_[i]);
+    absl::StrAppend(&str, history_[i].action);
   }
 
   // The betting history: p for Pass, b for Bet
   if (history_.size() > num_players_) str.push_back(' ');
   for (int i = num_players_; i < history_.size(); ++i) {
-    str.push_back(history_[i] ? 'b' : 'p');
+    str.push_back(history_[i].action ? 'b' : 'p');
   }
 
   return str;
@@ -157,7 +156,7 @@ bool KuhnState::IsTerminal() const { return winner_ != kInvalidPlayer; }
 
 std::vector<double> KuhnState::Returns() const {
   if (!IsTerminal()) {
-    return {0.0, 0.0};
+    return std::vector<double>(num_players_, 0.0);
   }
 
   std::vector<double> returns(num_players_);
@@ -169,24 +168,24 @@ std::vector<double> KuhnState::Returns() const {
 }
 
 // Information state is card then bets, e.g. 1pb
-std::string KuhnState::InformationState(Player player) const {
+std::string KuhnState::InformationStateString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
   if (history_.size() <= player) return "";
-  std::string str = std::to_string(history_[player]);
+  std::string str = std::to_string(history_[player].action);
   for (int i = num_players_; i < history_.size(); ++i)
-    str.push_back(history_[i] ? 'b' : 'p');
+    str.push_back(history_[i].action ? 'b' : 'p');
   return str;
 }
 
 // Observation is card then contributions to the pot, e.g. 111
-std::string KuhnState::Observation(Player player) const {
+std::string KuhnState::ObservationString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
   if (history_.size() <= player) return "";
-  std::string str = std::to_string(history_[player]);
+  std::string str = std::to_string(history_[player].action);
 
   // Adding the contribution of each players to the pot. These values are not
   // between 0 and 1.
@@ -196,8 +195,8 @@ std::string KuhnState::Observation(Player player) const {
   return str;
 }
 
-void KuhnState::InformationStateAsNormalizedVector(
-    Player player, std::vector<double>* values) const {
+void KuhnState::InformationStateTensor(Player player,
+                                       std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
@@ -209,19 +208,20 @@ void KuhnState::InformationStateAsNormalizedVector(
   (*values)[player] = 1;
 
   // The player's card, if one has been dealt.
-  if (history_.size() > player) (*values)[num_players_ + history_[player]] = 1;
+  if (history_.size() > player)
+    (*values)[num_players_ + history_[player].action] = 1;
 
   // Betting sequence.
   for (int i = num_players_; i < history_.size(); ++i) {
-    (*values)[1 + 2 * i + history_[i]] = 1;
+    (*values)[1 + 2 * i + history_[i].action] = 1;
   }
 }
 
-void KuhnState::ObservationAsNormalizedVector(
-    Player player, std::vector<double>* values) const {
+void KuhnState::ObservationTensor(Player player,
+                                  std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
-  // The format is described in ObservationNormalizedVectorShape
+  // The format is described in ObservationTensorShape
   // The last elements of this vector contain the contribution to the pot of
   // each player. These values are thus not normalized.
 
@@ -233,7 +233,8 @@ void KuhnState::ObservationAsNormalizedVector(
   (*values)[player] = 1;
 
   // The player's card, if one has been dealt.
-  if (history_.size() > player) (*values)[num_players_ + history_[player]] = 1;
+  if (history_.size() > player)
+    (*values)[num_players_ + history_[player].action] = 1;
 
   int offset = 2 * num_players_ + 1;
   // Adding the contribution of each players to the pot. These values are not
@@ -278,10 +279,34 @@ bool KuhnState::DidBet(Player player) const {
   } else if (player == first_bettor_) {
     return true;
   } else if (player > first_bettor_) {
-    return history_[num_players_ + player] == ActionType::kBet;
+    return history_[num_players_ + player].action == ActionType::kBet;
   } else {
-    return history_[num_players_ * 2 + player] == ActionType::kBet;
+    return history_[num_players_ * 2 + player].action == ActionType::kBet;
   }
+}
+
+std::unique_ptr<State> KuhnState::ResampleFromInfostate(
+    int player_id, std::function<double()> rng) const {
+  std::unique_ptr<State> state = game_->NewInitialState();
+  Action player_chance = history_.at(player_id).action;
+  for (int p = 0; p < game_->NumPlayers(); ++p) {
+    if (p == history_.size()) return state;
+    if (p == player_id) {
+      state->ApplyAction(player_chance);
+    } else {
+      Action other_chance = player_chance;
+      while (other_chance == player_chance) {
+        other_chance = SampleAction(state->ChanceOutcomes(), rng()).first;
+      }
+      state->ApplyAction(other_chance);
+    }
+  }
+  SPIEL_CHECK_GE(state->CurrentPlayer(), 0);
+  if (game_->NumPlayers() == history_.size()) return state;
+  for (int i = game_->NumPlayers(); i < history_.size(); ++i) {
+    state->ApplyAction(history_.at(i).action);
+  }
+  return state;
 }
 
 KuhnGame::KuhnGame(const GameParameters& params)
@@ -294,7 +319,7 @@ std::unique_ptr<State> KuhnGame::NewInitialState() const {
   return std::unique_ptr<State>(new KuhnState(shared_from_this()));
 }
 
-std::vector<int> KuhnGame::InformationStateNormalizedVectorShape() const {
+std::vector<int> KuhnGame::InformationStateTensorShape() const {
   // One-hot for whose turn it is.
   // One-hot encoding for the single private card. (n+1 cards = n+1 bits)
   // Followed by 2 (n - 1 + n) bits for betting sequence (longest sequence:
@@ -303,7 +328,7 @@ std::vector<int> KuhnGame::InformationStateNormalizedVectorShape() const {
   return {6 * num_players_ - 1};
 }
 
-std::vector<int> KuhnGame::ObservationNormalizedVectorShape() const {
+std::vector<int> KuhnGame::ObservationTensorShape() const {
   // One-hot for whose turn it is.
   // One-hot encoding for the single private card. (n+1 cards = n+1 bits)
   // Followed by the contribution of each player to the pot (n).

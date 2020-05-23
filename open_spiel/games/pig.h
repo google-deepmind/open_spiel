@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef THIRD_PARTY_OPEN_SPIEL_GAMES_PIG_H_
-#define THIRD_PARTY_OPEN_SPIEL_GAMES_PIG_H_
+#ifndef OPEN_SPIEL_GAMES_PIG_H_
+#define OPEN_SPIEL_GAMES_PIG_H_
 
 #include <memory>
 #include <string>
@@ -48,9 +48,9 @@ class PigState : public State {
   std::string ToString() const override;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
-  std::string InformationState(Player player) const override;
-  void InformationStateAsNormalizedVector(
-      Player player, std::vector<double>* values) const override;
+  std::string ObservationString(Player player) const override;
+  void ObservationTensor(Player player,
+                         std::vector<double>* values) const override;
 
   std::unique_ptr<State> Clone() const override;
 
@@ -97,7 +97,7 @@ class PigGame : public Game {
   std::shared_ptr<const Game> Clone() const override {
     return std::shared_ptr<const Game>(new PigGame(*this));
   }
-  std::vector<int> InformationStateNormalizedVectorShape() const override;
+  std::vector<int> ObservationTensorShape() const override;
 
  private:
   // Number of different dice outcomes, i.e. 6.
@@ -116,4 +116,4 @@ class PigGame : public Game {
 }  // namespace pig
 }  // namespace open_spiel
 
-#endif  // THIRD_PARTY_OPEN_SPIEL_GAMES_PIG_H_
+#endif  // OPEN_SPIEL_GAMES_PIG_H_

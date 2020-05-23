@@ -12,20 +12,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Lint as python3
 """Functions to manipulate game playthoughs.
 
 Used by examples/playthrough.py and tests/playthrough_test.py.
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import os
 import re
 import numpy as np
 
+from open_spiel.python.games import tic_tac_toe
 import pyspiel
+
+
+def _load_game(game_string):
+  """Loads a game, including special-cases for Python-implemented games."""
+  if game_string == "python_tic_tac_toe":
+    return tic_tac_toe.TicTacToeGame()
+  else:
+    return pyspiel.load_game(game_string)
 
 
 def _escape(x):
@@ -35,7 +41,60 @@ def _escape(x):
   return x
 
 
-def playthrough(game_string, seed, alsologtostdout=False):
+def _format_value(v):
+  """Format a single value."""
+  if v == 0:
+    return "◯"
+  elif v == 1:
+    return "◉"
+  else:
+    return ValueError("Values must all be 0 or 1")
+
+
+def _format_vec(vec):
+  return "".join(_format_value(v) for v in vec)
+
+
+def _format_matrix(mat):
+  return np.char.array([_format_vec(row) for row in mat])
+
+
+def _format_tensor(tensor, tensor_name, max_cols=120):
+  """Formats a tensor in an easy-to-view format as a list of lines."""
+  if ((tensor.shape == (0,)) or (len(tensor.shape) > 3) or
+      not np.logical_or(tensor == 0, tensor == 1).all()):
+    vec = ", ".join(str(round(v, 5)) for v in tensor.ravel())
+    return ["{} = [{}]".format(tensor_name, vec)]
+  elif len(tensor.shape) == 1:
+    return ["{}: {}".format(tensor_name, _format_vec(tensor))]
+  elif len(tensor.shape) == 2:
+    if len(tensor_name) + tensor.shape[0] + 2 < max_cols:
+      lines = ["{}: {}".format(tensor_name, _format_vec(tensor[0]))]
+      prefix = " " * (len(tensor_name) + 2)
+    else:
+      lines = ["{}:".format(tensor_name), _format_vec(tensor[0])]
+      prefix = ""
+    for row in tensor[1:]:
+      lines.append(prefix + _format_vec(row))
+    return lines
+  elif len(tensor.shape) == 3:
+    lines = ["{}:".format(tensor_name)]
+    rows = []
+    for m in tensor:
+      formatted_matrix = _format_matrix(m)
+      if (not rows) or (len(rows[-1][0] + formatted_matrix[0]) + 2 > max_cols):
+        rows.append(formatted_matrix)
+      else:
+        rows[-1] = rows[-1] + "  " + formatted_matrix
+    for i, big_row in enumerate(rows):
+      if i > 0:
+        lines.append("")
+      for row in big_row:
+        lines.append("".join(row))
+    return lines
+
+
+def playthrough(game_string, action_sequence, alsologtostdout=False):
   """Returns a playthrough of the specified game as a single text.
 
   Actions are selected uniformly at random, including chance actions.
@@ -43,29 +102,27 @@ def playthrough(game_string, seed, alsologtostdout=False):
   Args:
     game_string: string, e.g. 'markov_soccer', with possible optional params,
       e.g. 'go(komi=4.5,board_size=19)'.
-    seed: an integer to seed the random number generator governing action
-      choices.
+    action_sequence: A (possibly partial) list of action choices to make.
     alsologtostdout: Whether to also print the trace to stdout. This can be
       useful when an error occurs, to still be able to get context information.
   """
-  lines = playthrough_lines(
-      game_string=game_string, seed=seed, alsologtostdout=alsologtostdout)
+  lines = playthrough_lines(game_string, alsologtostdout, action_sequence)
   return "\n".join(lines) + "\n"
 
 
-def playthrough_lines(game_string, seed, alsologtostdout=False):
+def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None):
   """Returns a playthrough of the specified game as a list of lines.
 
   Actions are selected uniformly at random, including chance actions.
 
   Args:
     game_string: string, e.g. 'markov_soccer' or 'kuhn_poker(players=4)'.
-    seed: an integer to seed the random number generator governing action
-      choices.
     alsologtostdout: Whether to also print the trace to stdout. This can be
       useful when an error occurs, to still be able to get context information.
+    action_sequence: A (possibly partial) list of action choices to make.
   """
   lines = []
+  action_sequence = action_sequence or []
   if alsologtostdout:
 
     def add_line(v):
@@ -74,11 +131,9 @@ def playthrough_lines(game_string, seed, alsologtostdout=False):
   else:
     add_line = lines.append
 
-  game = pyspiel.load_game(game_string)
+  game = _load_game(game_string)
   add_line("game: {}".format(game_string))
-  if seed is None:
-    seed = np.random.randint(2**32 - 1)
-  add_line("seed: {}".format(seed))
+  seed = np.random.randint(2**32 - 1)
 
   add_line("")
   game_type = game.get_type()
@@ -91,15 +146,14 @@ def playthrough_lines(game_string, seed, alsologtostdout=False):
   add_line("GameType.parameter_specification = {}".format("[{}]".format(
       ", ".join('"{}"'.format(param)
                 for param in sorted(game_type.parameter_specification)))))
-  add_line("GameType.provides_information_state = {}".format(
-      game_type.provides_information_state))
-  add_line(
-      "GameType.provides_information_state_as_normalized_vector = {}".format(
-          game_type.provides_information_state_as_normalized_vector))
-  add_line("GameType.provides_observation = {}".format(
-      game_type.provides_observation))
-  add_line("GameType.provides_observation_as_normalized_vector = {}".format(
-      game_type.provides_observation_as_normalized_vector))
+  add_line("GameType.provides_information_state_string = {}".format(
+      game_type.provides_information_state_string))
+  add_line("GameType.provides_information_state_tensor = {}".format(
+      game_type.provides_information_state_tensor))
+  add_line("GameType.provides_observation_string = {}".format(
+      game_type.provides_observation_string))
+  add_line("GameType.provides_observation_tensor = {}".format(
+      game_type.provides_observation_tensor))
   add_line("GameType.reward_model = {}".format(game_type.reward_model))
   add_line("GameType.short_name = {}".format('"{}"'.format(
       game_type.short_name)))
@@ -107,6 +161,7 @@ def playthrough_lines(game_string, seed, alsologtostdout=False):
 
   add_line("")
   add_line("NumDistinctActions() = {}".format(game.num_distinct_actions()))
+  add_line("PolicyTensorShape() = {}".format(game.policy_tensor_shape()))
   add_line("MaxChanceOutcomes() = {}".format(game.max_chance_outcomes()))
   add_line("GetParameters() = {{{}}}".format(",".join(
       "{}={}".format(key, _escape(str(value)))
@@ -119,16 +174,20 @@ def playthrough_lines(game_string, seed, alsologtostdout=False):
   except RuntimeError:
     utility_sum = None
   add_line("UtilitySum() = {}".format(utility_sum))
-  if game_type.provides_information_state_as_normalized_vector:
-    add_line("InformationStateNormalizedVectorShape() = {}".format(
-        [int(x) for x in game.information_state_normalized_vector_shape()]))
-    add_line("InformationStateNormalizedVectorSize() = {}".format(
-        game.information_state_normalized_vector_size()))
-  if game_type.provides_observation_as_normalized_vector:
-    add_line("ObservationNormalizedVectorShape() = {}".format(
-        [int(x) for x in game.observation_normalized_vector_shape()]))
-    add_line("ObservationNormalizedVectorSize() = {}".format(
-        game.observation_normalized_vector_size()))
+  if game_type.provides_information_state_tensor:
+    add_line("InformationStateTensorShape() = {}".format(
+        game.information_state_tensor_shape()))
+    add_line("InformationStateTensorLayout() = {}".format(
+        game.information_state_tensor_layout()))
+    add_line("InformationStateTensorSize() = {}".format(
+        game.information_state_tensor_size()))
+  if game_type.provides_observation_tensor:
+    add_line("ObservationTensorShape() = {}".format(
+        game.observation_tensor_shape()))
+    add_line("ObservationTensorLayout() = {}".format(
+        game.observation_tensor_layout()))
+    add_line("ObservationTensorSize() = {}".format(
+        game.observation_tensor_size()))
   add_line("MaxGameLength() = {}".format(game.max_game_length()))
   add_line('ToString() = "{}"'.format(str(game)))
 
@@ -140,34 +199,36 @@ def playthrough_lines(game_string, seed, alsologtostdout=False):
   while True:
     add_line("")
     add_line("# State {}".format(state_idx))
+    for line in str(state).splitlines():
+      add_line("# {}".format(line).rstrip())
     add_line("IsTerminal() = {}".format(state.is_terminal()))
-    add_line('ToString() = "{}"'.format(_escape(str(state))))
     add_line("History() = {}".format([int(a) for a in state.history()]))
     add_line('HistoryString() = "{}"'.format(state.history_str()))
     add_line("IsChanceNode() = {}".format(state.is_chance_node()))
     add_line("IsSimultaneousNode() = {}".format(state.is_simultaneous_node()))
     add_line("CurrentPlayer() = {}".format(state.current_player()))
-    if game.get_type().provides_information_state:
+    if game.get_type().provides_information_state_string:
       for player in players:
-        add_line('InformationState({}) = "{}"'.format(
-            player, _escape(state.information_state(player))))
-    if game.get_type().provides_information_state_as_normalized_vector:
+        add_line('InformationStateString({}) = "{}"'.format(
+            player, _escape(state.information_state_string(player))))
+    if game.get_type().provides_information_state_tensor:
       for player in players:
-        vec = ", ".join(
-            str(round(x, 5))
-            for x in state.information_state_as_normalized_vector(player))
-        add_line("InformationStateAsNormalizedVector({}) = [{}]".format(
-            player, vec))
-    if game.get_type().provides_observation:
+        label = "InformationStateTensor({})".format(player)
+        lines += _format_tensor(
+            np.reshape(
+                state.information_state_tensor(player),
+                game.information_state_tensor_shape()), label)
+    if game.get_type().provides_observation_string:
       for player in players:
-        add_line('Observation({}) = "{}"'.format(
-            player, _escape(state.observation(player))))
-    if game.get_type().provides_observation_as_normalized_vector:
+        add_line('ObservationString({}) = "{}"'.format(
+            player, _escape(state.observation_string(player))))
+    if game.get_type().provides_observation_tensor:
       for player in players:
-        vec = ", ".join(
-            str(round(x, 5))
-            for x in state.observation_as_normalized_vector(player))
-        add_line("ObservationAsNormalizedVector({}) = [{}]".format(player, vec))
+        label = "ObservationTensor({})".format(player)
+        lines += _format_tensor(
+            np.reshape(
+                state.observation_tensor(player),
+                game.observation_tensor_shape()), label)
     if game_type.chance_mode == pyspiel.GameType.ChanceMode.SAMPLED_STOCHASTIC:
       add_line('SerializeState() = "{}"'.format(_escape(state.serialize())))
     if not state.is_chance_node():
@@ -189,7 +250,10 @@ def playthrough_lines(game_string, seed, alsologtostdout=False):
         add_line("StringLegalActions({}) = [{}]".format(
             player, ", ".join('"{}"'.format(state.action_to_string(player, x))
                               for x in state.legal_actions(player))))
-      actions = [rng.choice(state.legal_actions(player)) for player in players]
+      if state_idx < len(action_sequence):
+        actions = action_sequence[state_idx]
+      else:
+        actions = [rng.choice(state.legal_actions(pl)) for pl in players]
       add_line("")
       add_line("# Apply joint action [{}]".format(
           format(", ".join(
@@ -204,7 +268,10 @@ def playthrough_lines(game_string, seed, alsologtostdout=False):
       add_line("StringLegalActions() = [{}]".format(", ".join(
           '"{}"'.format(state.action_to_string(state.current_player(), x))
           for x in state.legal_actions())))
-      action = rng.choice(state.legal_actions())
+      if state_idx < len(action_sequence):
+        action = action_sequence[state_idx]
+      else:
+        action = rng.choice(state.legal_actions())
       add_line("")
       add_line('# Apply action "{}"'.format(
           state.action_to_string(state.current_player(), action)))
@@ -228,29 +295,32 @@ def _playthrough_params(lines):
   Returns:
     A `dict` with entries:
       game_string: string, e.g. 'markov_soccer'.
-      seed: an optional integerString to seed the random number generator
-        governing action choices.
+      action_sequence: a list of action choices made in the playthrough.
     Suitable for passing to playthrough to re-generate the playthrough.
 
   Raises:
     ValueError if the playthrough is not valid.
   """
-  params = dict()
+  params = {"action_sequence": []}
   for line in lines:
     match_game = re.match(r"^game: (.*)$", line)
-    match_seed = re.match(r"^seed: (.*)$", line)
+    match_action = re.match(r"^action: (.*)$", line)
+    match_actions = re.match(r"^actions: \[(.*)\]$", line)
     if match_game:
       params["game_string"] = match_game.group(1)
-    if match_seed:
-      params["seed"] = int(match_seed.group(1))
-    if "game_string" in params and "seed" in params:
-      return params
+    if match_action:
+      params["action_sequence"].append(int(match_action.group(1)))
+    if match_actions:
+      params["action_sequence"].append(
+          [int(x) for x in match_actions.group(1).split(", ")])
+  if "game_string" in params:
+    return params
   raise ValueError("Could not find params")
 
 
 def replay(filename):
   """Re-runs the playthrough in the specified file. Returns (original, new)."""
-  with open(filename, "r") as f:
+  with open(filename, "r", encoding="utf-8") as f:
     original = f.read()
   kwargs = _playthrough_params(original.splitlines())
   return (original, playthrough(**kwargs))

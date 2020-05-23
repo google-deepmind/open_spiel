@@ -45,6 +45,7 @@ This process has been written for Windows 10, and tested on Windows 10 build
     git clone https://github.com/deepmind/open_spiel.git
     cd open_spiel
     ./install.sh # you will be prompted for the password created at stage 3. Press Y to continue and install. During installation press Yes to restart services during package upgrades
+    pip install -U pip # Upgrade pip (required for TF >= 1.15)
     pip3 install --upgrade -r requirements.txt # Install Python dependencies
     ```
 
@@ -76,13 +77,14 @@ This process has been written for Windows 10, and tested on Windows 10 build
     ctest -j12 # Run the tests to verify that the installation succeeded
     ```
 
-    The CMake variable `Python_TARGET_VERSION` is used to specify a Python version.
-    Any Python library found with CMake modules FindPython2/FindPython3 that agrees
-    with the major version and is at least as high for minor version and patch
-    number is accepted. If the variable is not set, the FindPython module is used:
-    it builds for Python 3 if both Python 2 and Python 3 are available. In the two
-    examples above, CMake will search for Python 2 and accept any version >= 2.7 or
-    search for Python 3 and accept any version >= 3.6.
+    The CMake variable `Python_TARGET_VERSION` is used to specify a Python
+    version. Any Python library found with CMake modules FindPython2/FindPython3
+    that agrees with the major version and is at least as high for minor version
+    and patch number is accepted. If the variable is not set, the FindPython
+    module is used: it builds for Python 3 if both Python 2 and Python 3 are
+    available. In the two examples above, CMake will search for Python 2 and
+    accept any version >= 2.7 or search for Python 3 and accept any version >=
+    3.6.
 
     One can run an example of a game running (in the `build/` folder):
 
@@ -90,15 +92,15 @@ This process has been written for Windows 10, and tested on Windows 10 build
     ./examples/example --game=tic_tac_toe
     ```
 
-8. Setting Your PYTHONPATH environment variable
+8.  Setting Your PYTHONPATH environment variable
 
     To be able to import the Python code (both the C++ binding `pyspiel` and the
     rest) from any location, you will need to add to your PYTHONPATH the root
     directory and the `open_spiel` directory.
 
     When using a virtualenv, the following should be added to
-    `<virtualenv>/bin/activate`. For a system-wide install, ddd it in your `.bashrc`
-    or `.profile`.
+    `<virtualenv>/bin/activate`. For a system-wide install, ddd it in your
+    `.bashrc` or `.profile`.
 
     ```bash
     # For the python modules in open_spiel.
@@ -107,11 +109,11 @@ This process has been written for Windows 10, and tested on Windows 10 build
     export PYTHONPATH=$PYTHONPATH:/<path_to_open_spiel>/build/python
     ```
 
-9. Running the first example
+9.  Running the first example
 
-    In the `build` directory, running `examples/example` will prints out a list of
-    registered games and the usage. Now, let’s play game of Tic-Tac-Toe with uniform
-    random players:
+    In the `build` directory, running `examples/example` will prints out a list
+    of registered games and the usage. Now, let’s play game of Tic-Tac-Toe with
+    uniform random players:
 
     ```bash
     examples/example --game=tic_tac_toe

@@ -40,7 +40,7 @@ void SimulateGames(std::mt19937* rng, const Game& game, State* sim_state,
       std::vector<std::pair<Action, double>> outcomes =
           sim_state->ChanceOutcomes();
       Action action =
-          open_spiel::SampleChanceOutcome(
+          open_spiel::SampleAction(
               outcomes, std::uniform_real_distribution<double>(0.0, 1.0)(*rng))
               .first;
 
@@ -58,10 +58,10 @@ void SimulateGames(std::mt19937* rng, const Game& game, State* sim_state,
 
       // Sample an action for each player
       for (auto p = Player{0}; p < game.NumPlayers(); p++) {
-        if (game.GetType().provides_information_state) {
+        if (game.GetType().provides_information_state_string) {
           // Check the information states to each player are consistent.
-          SPIEL_CHECK_EQ(sim_state->InformationState(p),
-                         wrapped_sim_state->InformationState(p));
+          SPIEL_CHECK_EQ(sim_state->InformationStateString(p),
+                         wrapped_sim_state->InformationStateString(p));
         }
 
         std::vector<Action> actions;

@@ -22,10 +22,23 @@
 namespace open_spiel {
 namespace algorithms {
 
-CFRAveragePolicy::CFRAveragePolicy(
-    const CFRInfoStateValuesTable& info_states,
-    std::shared_ptr<TabularPolicy> default_policy)
+CFRAveragePolicy::CFRAveragePolicy(const CFRInfoStateValuesTable& info_states,
+                                   std::shared_ptr<Policy> default_policy)
     : info_states_(info_states), default_policy_(default_policy) {}
+
+ActionsAndProbs CFRAveragePolicy::GetStatePolicy(const State& state) const {
+  ActionsAndProbs actions_and_probs;
+  auto entry = info_states_.find(state.InformationStateString());
+  if (entry == info_states_.end()) {
+    if (default_policy_) {
+      return default_policy_->GetStatePolicy(state);
+    } else {
+      return actions_and_probs;
+    }
+  }
+  GetStatePolicyFromInformationStateValues(entry->second, &actions_and_probs);
+  return actions_and_probs;
+}
 
 ActionsAndProbs CFRAveragePolicy::GetStatePolicy(
     const std::string& info_state) const {
@@ -38,9 +51,13 @@ ActionsAndProbs CFRAveragePolicy::GetStatePolicy(
       return actions_and_probs;
     }
   }
+  GetStatePolicyFromInformationStateValues(entry->second, &actions_and_probs);
+  return actions_and_probs;
+}
 
-  const CFRInfoStateValues& is_vals = entry->second;
-
+void CFRAveragePolicy::GetStatePolicyFromInformationStateValues(
+    const CFRInfoStateValues& is_vals,
+    ActionsAndProbs* actions_and_probs) const {
   double sum_prob = 0.0;
   for (int aidx = 0; aidx < is_vals.num_actions(); ++aidx) {
     sum_prob += is_vals.cumulative_policy[aidx];
@@ -48,24 +65,36 @@ ActionsAndProbs CFRAveragePolicy::GetStatePolicy(
 
   if (sum_prob == 0.0) {
     // Return a uniform policy at this node
-    double prob = 1. / is_vals.num_actions();;
+    double prob = 1. / is_vals.num_actions();
     for (Action action : is_vals.legal_actions) {
-      actions_and_probs.push_back({action, prob});
+      actions_and_probs->push_back({action, prob});
     }
-    return actions_and_probs;
+    return;
   }
 
   for (int aidx = 0; aidx < is_vals.num_actions(); ++aidx) {
-    actions_and_probs.push_back({is_vals.legal_actions[aidx],
-                                 is_vals.cumulative_policy[aidx] / sum_prob});
+    actions_and_probs->push_back({is_vals.legal_actions[aidx],
+                                  is_vals.cumulative_policy[aidx] / sum_prob});
   }
-  return actions_and_probs;
 }
 
-CFRCurrentPolicy::CFRCurrentPolicy(
-    const CFRInfoStateValuesTable& info_states,
-    std::shared_ptr<TabularPolicy> default_policy)
+CFRCurrentPolicy::CFRCurrentPolicy(const CFRInfoStateValuesTable& info_states,
+                                   std::shared_ptr<Policy> default_policy)
     : info_states_(info_states), default_policy_(default_policy) {}
+
+ActionsAndProbs CFRCurrentPolicy::GetStatePolicy(const State& state) const {
+  ActionsAndProbs actions_and_probs;
+  auto entry = info_states_.find(state.InformationStateString());
+  if (entry == info_states_.end()) {
+    if (default_policy_) {
+      return default_policy_->GetStatePolicy(state);
+    } else {
+      return actions_and_probs;
+    }
+  }
+  return GetStatePolicyFromInformationStateValues(entry->second,
+                                                  actions_and_probs);
+}
 
 ActionsAndProbs CFRCurrentPolicy::GetStatePolicy(
     const std::string& info_state) const {
@@ -78,8 +107,13 @@ ActionsAndProbs CFRCurrentPolicy::GetStatePolicy(
       return actions_and_probs;
     }
   }
+  return GetStatePolicyFromInformationStateValues(entry->second,
+                                                  actions_and_probs);
+}
 
-  const CFRInfoStateValues& is_vals = entry->second;
+ActionsAndProbs CFRCurrentPolicy::GetStatePolicyFromInformationStateValues(
+    const CFRInfoStateValues& is_vals,
+    ActionsAndProbs& actions_and_probs) const {
   for (int aidx = 0; aidx < is_vals.num_actions(); ++aidx) {
     actions_and_probs.push_back(
         {is_vals.legal_actions[aidx], is_vals.current_policy[aidx]});
@@ -118,7 +152,7 @@ void CFRSolverBase::InitializeInfostateNodes(const State& state) {
   }
 
   int current_player = state.CurrentPlayer();
-  std::string info_state = state.InformationState(current_player);
+  std::string info_state = state.InformationStateString(current_player);
   std::vector<Action> legal_actions = state.LegalActions();
 
   CFRInfoStateValues is_vals(legal_actions);
@@ -199,7 +233,7 @@ std::vector<double> CFRSolverBase::ComputeCounterFactualRegret(
   }
 
   int current_player = state.CurrentPlayer();
-  std::string info_state = state.InformationState();
+  std::string info_state = state.InformationStateString();
   std::vector<Action> legal_actions = state.LegalActions(current_player);
 
   // Load current policy.
@@ -260,11 +294,11 @@ void CFRSolverBase::GetInfoStatePolicyFromPolicy(
 
   // The policy may have extra ones not at this infostate
   for (Action action : legal_actions) {
-    const auto& iter = std::find_if(
-        actions_and_probs.begin(), actions_and_probs.end(),
-        [action](const std::pair<Action, double>& ap) {
-          return ap.first == action;
-        });
+    const auto& iter =
+        std::find_if(actions_and_probs.begin(), actions_and_probs.end(),
+                     [action](const std::pair<Action, double>& ap) {
+                       return ap.first == action;
+                     });
     info_state_policy->push_back(iter->second);
   }
 

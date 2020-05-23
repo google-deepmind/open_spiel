@@ -18,8 +18,10 @@
 #include <memory>
 #include <utility>
 
+#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
 namespace goofspiel {
@@ -35,16 +37,18 @@ const GameType kGameType{
     GameType::RewardModel::kTerminal,
     /*max_num_players=*/10,
     /*min_num_players=*/2,
-    /*provides_information_state=*/true,
-    /*provides_information_state_as_normalized_vector=*/true,
-    /*provides_observation=*/false,
-    /*provides_observation_as_normalized_vector=*/false,
+    /*provides_information_state_string=*/true,
+    /*provides_information_state_tensor=*/true,
+    /*provides_observation_string=*/true,
+    /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
     {{"imp_info", GameParameter(kDefaultImpInfo)},
      {"num_cards", GameParameter(kDefaultNumCards)},
      {"players", GameParameter(kDefaultNumPlayers)},
      {"points_order",
-      GameParameter(static_cast<std::string>(kDefaultPointsOrder))}}};
+      GameParameter(static_cast<std::string>(kDefaultPointsOrder))},
+     {"returns_type",
+      GameParameter(static_cast<std::string>(kDefaultReturnsType))}}};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new GoofspielGame(params));
@@ -60,22 +64,41 @@ PointsOrder ParsePointsOrder(const std::string& po_str) {
   } else if (po_str == "ascending") {
     return PointsOrder::kAscending;
   } else {
-    SpielFatalError("Unrecognized pointsorder parameter: " + po_str);
+    SpielFatalError(
+        absl::StrCat("Unrecognized points_order parameter: ", po_str));
+  }
+}
+
+ReturnsType ParseReturnsType(const std::string& returns_type_str) {
+  if (returns_type_str == "win_loss") {
+    return ReturnsType::kWinLoss;
+  } else if (returns_type_str == "point_difference") {
+    return ReturnsType::kPointDifference;
+  } else if (returns_type_str == "total_points") {
+    return ReturnsType::kTotalPoints;
+  } else {
+    SpielFatalError(absl::StrCat("Unrecognized returns_type parameter: ",
+                                 returns_type_str));
   }
 }
 
 }  // namespace
 
 GoofspielState::GoofspielState(std::shared_ptr<const Game> game, int num_cards,
-                               PointsOrder points_order, bool impinfo)
+                               PointsOrder points_order, bool impinfo,
+                               ReturnsType returns_type)
     : SimMoveState(game),
       num_cards_(num_cards),
       points_order_(points_order),
+      returns_type_(returns_type),
       impinfo_(impinfo),
       current_player_(kInvalidPlayer),
       winners_({}),
       turns_(0),
-      point_card_index_(-1) {
+      point_card_index_(-1),
+      point_card_sequence_({}),
+      win_sequence_({}),
+      actions_history_({}) {
   // Points and point-card deck.
   points_.resize(num_players_);
   std::fill(points_.begin(), points_.end(), 0);
@@ -102,9 +125,6 @@ GoofspielState::GoofspielState(std::shared_ptr<const Game> game, int num_cards,
     point_card_index_ = num_cards - 1;
     current_player_ = kSimultaneousPlayerId;
   }
-
-  win_sequence_.clear();
-  actions_history_.clear();
 }
 
 int GoofspielState::CurrentPlayer() const {
@@ -122,6 +142,9 @@ void GoofspielState::DoApplyAction(Action action_id) {
   }
   SPIEL_CHECK_TRUE(IsChanceNode());
   point_card_index_ = action_id;
+  SPIEL_CHECK_GE(point_card_index_, 0);
+  SPIEL_CHECK_LT(point_card_index_, point_deck_.size());
+  point_card_sequence_.push_back(point_deck_[point_card_index_]);
   current_player_ = kSimultaneousPlayerId;
 }
 
@@ -281,11 +304,12 @@ std::string GoofspielState::ToString() const {
     }
   }
 
-  if (point_card_index_ >= 0) {
-    absl::StrAppend(&result, "Point card: ");
-    absl::StrAppend(&result, point_deck_[point_card_index_]);
-    absl::StrAppend(&result, "\n");
+  absl::StrAppend(&result, "Point card sequence: ");
+  for (int i = 0; i < point_card_sequence_.size(); ++i) {
+    absl::StrAppend(&result, point_card_sequence_[i], " ");
   }
+  absl::StrAppend(&result, "\n");
+
   return result + points_line + "\n";
 }
 
@@ -296,21 +320,42 @@ std::vector<double> GoofspielState::Returns() const {
     return std::vector<double>(num_players_, 0.0);
   }
 
-  if (winners_.size() == num_players_) {
-    // All players have same number of points? This is a draw.
-    return std::vector<double>(num_players_, 0.0);
-  } else {
-    int num_winners = winners_.size();
-    int num_losers = num_players_ - num_winners;
-    std::vector<double> returns(num_players_, (-1.0 / num_losers));
-    for (const auto& winner : winners_) {
-      returns[winner] = 1.0 / num_winners;
+  if (returns_type_ == ReturnsType::kWinLoss) {
+    if (winners_.size() == num_players_) {
+      // All players have same number of points? This is a draw.
+      return std::vector<double>(num_players_, 0.0);
+    } else {
+      int num_winners = winners_.size();
+      int num_losers = num_players_ - num_winners;
+      std::vector<double> returns(num_players_, (-1.0 / num_losers));
+      for (const auto& winner : winners_) {
+        returns[winner] = 1.0 / num_winners;
+      }
+      return returns;
+    }
+  } else if (returns_type_ == ReturnsType::kPointDifference) {
+    std::vector<double> returns(num_players_, 0);
+    double sum = 0;
+    for (Player p = 0; p < num_players_; ++p) {
+      returns[p] = points_[p];
+      sum += points_[p];
+    }
+    for (Player p = 0; p < num_players_; ++p) {
+      returns[p] -= sum / num_players_;
     }
     return returns;
+  } else if (returns_type_ == ReturnsType::kTotalPoints) {
+    std::vector<double> returns(num_players_, 0);
+    for (Player p = 0; p < num_players_; ++p) {
+      returns[p] = points_[p];
+    }
+    return returns;
+  } else {
+    SpielFatalError(absl::StrCat("Unrecognized returns type: ", returns_type_));
   }
 }
 
-std::string GoofspielState::InformationState(Player player) const {
+std::string GoofspielState::InformationStateString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
@@ -323,6 +368,7 @@ std::string GoofspielState::InformationState(Player player) const {
     // Only know the observing player's hand.
     // Only know the observing player's action sequence.
     // Know the win-loss outcome of each step.
+    // Show the point card sequence from the start.
 
     for (auto p = Player{0}; p < num_players_; ++p) {
       absl::StrAppend(&points_line, points_[p]);
@@ -360,11 +406,12 @@ std::string GoofspielState::InformationState(Player player) const {
       win_sequence.push_back(' ');
     }
 
-    if (point_card_index_ >= 0) {
-      absl::StrAppend(&result, "Point card: ");
-      absl::StrAppend(&result, point_deck_[point_card_index_]);
-      absl::StrAppend(&result, "\n");
+    absl::StrAppend(&result, "Point card sequence: ");
+    for (int i = 0; i < point_card_sequence_.size(); ++i) {
+      absl::StrAppend(&result, point_card_sequence_[i], " ");
     }
+    absl::StrAppend(&result, "\n");
+
     return result + win_sequence + "\n" + points_line + "\n";
   } else {
     // All the information is public.
@@ -372,21 +419,75 @@ std::string GoofspielState::InformationState(Player player) const {
   }
 }
 
-void GoofspielState::InformationStateAsNormalizedVector(
-    Player player, std::vector<double>* values) const {
+std::string GoofspielState::ObservationString(Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+
+  // Perfect info case, show:
+  //   - current point card
+  //   - everyone's current points
+  //   - everyone's current hands
+  // Imperfect info case, show:
+  //   - current point card
+  //   - everyone's current points
+  //   - my current hand
+  //   - current win sequence
+  std::string current_trick =
+      absl::StrCat("Current point card: ", point_card_index_ + 1);
+  std::string points_line = "Points: ";
+  std::string hands = "";
+  std::string win_seq = "Win Sequence: ";
+  for (auto p = Player{0}; p < num_players_; ++p) {
+    absl::StrAppend(&points_line, points_[p], " ");
+  }
+
+  if (impinfo_) {
+    // Only my hand
+    absl::StrAppend(&hands, "P", player, " hand: ");
+    for (int c = 0; c < num_cards_; ++c) {
+      if (player_hands_[player][c]) {
+        absl::StrAppend(&hands, c + 1, " ");
+      }
+    }
+    absl::StrAppend(&hands, "\n");
+
+    // Show the win sequence.
+    for (int i = 0; i < win_sequence_.size(); ++i) {
+      absl::StrAppend(&win_seq, win_sequence_[i], " ");
+    }
+    return absl::StrCat(current_trick, "\n", points_line, "\n", hands, win_seq,
+                        "\n");
+  } else {
+    // Show the hands in the perfect info case.
+    for (auto p = Player{0}; p < num_players_; ++p) {
+      absl::StrAppend(&hands, "P", p, " hand: ");
+      for (int c = 0; c < num_cards_; ++c) {
+        if (player_hands_[p][c]) {
+          absl::StrAppend(&hands, c + 1, " ");
+        }
+      }
+      absl::StrAppend(&hands, "\n");
+    }
+    return absl::StrCat(current_trick, "\n", points_line, "\n", hands);
+  }
+}
+
+void GoofspielState::NextPlayer(int* count, Player* player) const {
+  *count += 1;
+  *player = (*player + 1) % num_players_;
+}
+
+void GoofspielState::InformationStateTensor(Player player,
+                                            std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
   values->clear();
-  values->reserve(game_->InformationStateNormalizedVectorSize());
-
-  // 1-hot vector for the observing player.
-  for (auto p = Player{0}; p < num_players_; ++p) {
-    values->push_back(p == player ? 1 : 0);
-  }
+  values->reserve(game_->InformationStateTensorSize());
 
   // Point totals: one-hot vector encoding points, per player.
-  for (auto p = Player{0}; p < num_players_; ++p) {
+  Player p = player;
+  for (int n = 0; n < num_players_; NextPlayer(&n, &p)) {
     // Cards numbered 1 .. K
     int max_points_slots = (num_cards_ * (num_cards_ + 1)) / 2 + 1;
     for (int i = 0; i < max_points_slots; ++i) {
@@ -408,8 +509,19 @@ void GoofspielState::InformationStateAsNormalizedVector(
     }
 
     // Padding for future tricks
-    const int future_tricks = num_cards_ - win_sequence_.size();
+    int future_tricks = num_cards_ - win_sequence_.size();
     for (int i = 0; i < future_tricks * num_players_; ++i) values->push_back(0);
+
+    // Point card sequence.
+    for (int i = 0; i < point_card_sequence_.size(); ++i) {
+      for (int j = 0; j < num_cards_; ++j) {
+        values->push_back(point_card_sequence_[i] == (j + 1) ? 1 : 0);
+      }
+    }
+
+    // Padding for future tricks
+    future_tricks = num_cards_ - point_card_sequence_.size();
+    for (int i = 0; i < future_tricks * num_cards_; ++i) values->push_back(0);
 
     // The observing player's action sequence.
     for (int i = 0; i < num_cards_; ++i) {
@@ -422,13 +534,89 @@ void GoofspielState::InformationStateAsNormalizedVector(
     }
 
   } else {
+    // Point card sequence.
+    for (int i = 0; i < point_card_sequence_.size(); ++i) {
+      for (int j = 0; j < num_cards_; ++j) {
+        values->push_back(point_card_sequence_[i] == (j + 1) ? 1 : 0);
+      }
+    }
+
+    // Padding for future tricks
+    int future_tricks = num_cards_ - point_card_sequence_.size();
+    for (int i = 0; i < future_tricks * num_cards_; ++i) values->push_back(0);
+
     // Bit vectors encoding all players' hands.
-    for (auto p = Player{0}; p < num_players_; ++p) {
+    p = player;
+    for (int n = 0; n < num_players_; NextPlayer(&n, &p)) {
       for (int c = 0; c < num_cards_; ++c) {
         values->push_back(player_hands_[p][c] ? 1 : 0);
       }
     }
   }
+
+  SPIEL_CHECK_EQ(values->size(), game_->InformationStateTensorSize());
+}
+
+void GoofspielState::ObservationTensor(Player player,
+                                       std::vector<double>* values) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+
+  values->clear();
+  values->reserve(game_->ObservationTensorSize());
+
+  // Perfect info case, show:
+  //   - one-hot encoding the current point card
+  //   - everyone's current points
+  //   - everyone's current hands
+  // Imperfect info case, show:
+  //   - one-hot encoding the current point card
+  //   - everyone's current points
+  //   - my current hand
+  //   - current win sequence
+
+  // Current point card.
+  for (int i = 0; i < num_cards_; ++i) {
+    values->push_back(i == point_card_index_ ? 1.0 : 0.0);
+  }
+
+  // Point totals: one-hot vector encoding points, per player.
+  Player p = player;
+  for (int n = 0; n < num_players_; NextPlayer(&n, &p)) {
+    // Cards numbered 1 .. K
+    int max_points_slots = (num_cards_ * (num_cards_ + 1)) / 2 + 1;
+    for (int i = 0; i < max_points_slots; ++i) {
+      values->push_back(i == points_[p] ? 1 : 0);
+    }
+  }
+
+  if (impinfo_) {
+    // Bit vector of observing player's hand.
+    for (int c = 0; c < num_cards_; ++c) {
+      values->push_back(player_hands_[player][c] ? 1 : 0);
+    }
+
+    // Sequence of who won each trick.
+    for (int i = 0; i < win_sequence_.size(); ++i) {
+      for (auto p = Player{0}; p < num_players_; ++p) {
+        values->push_back(win_sequence_[i] == p ? 1 : 0);
+      }
+    }
+
+    // Padding for future tricks
+    int future_tricks = num_cards_ - win_sequence_.size();
+    for (int i = 0; i < future_tricks * num_players_; ++i) values->push_back(0);
+  } else {
+    // Bit vectors encoding all players' hands.
+    p = player;
+    for (int n = 0; n < num_players_; NextPlayer(&n, &p)) {
+      for (int c = 0; c < num_cards_; ++c) {
+        values->push_back(player_hands_[p][c] ? 1 : 0);
+      }
+    }
+  }
+
+  SPIEL_CHECK_EQ(values->size(), game_->ObservationTensorSize());
 }
 
 std::unique_ptr<State> GoofspielState::Clone() const {
@@ -441,11 +629,18 @@ GoofspielGame::GoofspielGame(const GameParameters& params)
       num_players_(ParameterValue<int>("players")),
       points_order_(
           ParsePointsOrder(ParameterValue<std::string>("points_order"))),
-      impinfo_(ParameterValue<bool>("imp_info")) {}
+      returns_type_(
+          ParseReturnsType(ParameterValue<std::string>("returns_type"))),
+      impinfo_(ParameterValue<bool>("imp_info")) {
+  // Override the zero-sum utility in the game type if general-sum returns.
+  if (returns_type_ == ReturnsType::kTotalPoints) {
+    game_type_.utility = GameType::Utility::kGeneralSum;
+  }
+}
 
 std::unique_ptr<State> GoofspielGame::NewInitialState() const {
   return std::unique_ptr<State>(new GoofspielState(
-      shared_from_this(), num_cards_, points_order_, impinfo_));
+      shared_from_this(), num_cards_, points_order_, impinfo_, returns_type_));
 }
 
 int GoofspielGame::MaxChanceOutcomes() const {
@@ -456,11 +651,9 @@ int GoofspielGame::MaxChanceOutcomes() const {
   }
 }
 
-std::vector<int> GoofspielGame::InformationStateNormalizedVectorShape() const {
+std::vector<int> GoofspielGame::InformationStateTensorShape() const {
   if (impinfo_) {
-    return {// 1-hot bit vector for observing player
-            num_players_ +
-            // 1-hot bit vector for point total per player; upper bound is 1 +
+    return {// 1-hot bit vector for point total per player; upper bound is 1 +
             // 2 + ... + K = K*(K+1) / 2, but must add one to include 0 points.
             num_players_ * ((num_cards_ * (num_cards_ + 1)) / 2 + 1) +
             // Bit vector for my remaining cards:
@@ -468,16 +661,79 @@ std::vector<int> GoofspielGame::InformationStateNormalizedVectorShape() const {
             // A sequence of 1-hot bit vectors encoding the player who won that
             // turn, where max number of turns is num_cards
             num_cards_ * num_players_ +
+            // A sequence of 1-hot bit vectors encoding the point card sequence
+            num_cards_ * num_cards_ +
             // The observing player's own action sequence
             num_cards_ * num_cards_};
   } else {
-    return {// 1-hot bit vector for observing player
-            num_players_ +
+    return {// 1-hot bit vector for point total per player; upper bound is 1 +
+            // 2 + ... + K = K*(K+1) / 2, but must add one to include 0 points.
+            num_players_ * ((num_cards_ * (num_cards_ + 1)) / 2 + 1) +
+            // A sequence of 1-hot bit vectors encoding the point card sequence
+            num_cards_ * num_cards_ +
+            // Bit vector for each card per player
+            num_players_ * num_cards_};
+  }
+}
+
+std::vector<int> GoofspielGame::ObservationTensorShape() const {
+  // Perfect info case, show:
+  //   - current point card showing
+  //   - everyone's current points
+  //   - everyone's current hands
+  // Imperfect info case, show:
+  //   - current point card showing
+  //   - everyone's current points
+  //   - my current hand
+  //   - current win sequence
+  if (impinfo_) {
+    return {// 1-hot bit to encode the current point card
+            num_cards_ +
+            // 1-hot bit vector for point total per player; upper bound is 1 +
+            // 2 + ... + K = K*(K+1) / 2, but must add one to include 0 points.
+            num_players_ * ((num_cards_ * (num_cards_ + 1)) / 2 + 1) +
+            // Bit vector for my remaining cards:
+            num_cards_ +
+            // A sequence of 1-hot bit vectors encoding the player who won that
+            // turn, where max number of turns is num_cards
+            num_cards_ * num_players_};
+  } else {
+    return {// 1-hot bit to encode the current point card
+            num_cards_ +
             // 1-hot bit vector for point total per player; upper bound is 1 +
             // 2 + ... + K = K*(K+1) / 2, but must add one to include 0 points.
             num_players_ * ((num_cards_ * (num_cards_ + 1)) / 2 + 1) +
             // Bit vector for each card per player
             num_players_ * num_cards_};
+  }
+}
+
+double GoofspielGame::MinUtility() const {
+  if (returns_type_ == ReturnsType::kWinLoss) {
+    return -1;
+  } else if (returns_type_ == ReturnsType::kPointDifference) {
+    // 0 - (1 + 2 + ... + K) / n
+    return -(num_cards_ * (num_cards_ + 1) / 2) / num_players_;
+  } else if (returns_type_ == ReturnsType::kTotalPoints) {
+    return 0;
+  } else {
+    SpielFatalError("Unrecognized returns type.");
+  }
+}
+
+double GoofspielGame::MaxUtility() const {
+  if (returns_type_ == ReturnsType::kWinLoss) {
+    return 1;
+  } else if (returns_type_ == ReturnsType::kPointDifference) {
+    // (1 + 2 + ... + K) - (1 + 2 + ... + K) / n
+    // = (n-1) (1 + 2 + ... + K) / n
+    double sum = num_cards_ * (num_cards_ + 1) / 2;
+    return (num_players_ - 1) * sum / num_players_;
+  } else if (returns_type_ == ReturnsType::kTotalPoints) {
+    // 1 + 2 + ... + K.
+    return num_cards_ * (num_cards_ + 1) / 2;
+  } else {
+    SpielFatalError("Unrecognized returns type.");
   }
 }
 

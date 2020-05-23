@@ -19,9 +19,9 @@ from __future__ import division
 from __future__ import print_function
 
 import collections
-import numpy as np
 
 from open_spiel.python import policy
+from open_spiel.python.algorithms import action_value
 from open_spiel.python.algorithms import get_all_states
 from open_spiel.python.algorithms import policy_utils
 import pyspiel
@@ -72,78 +72,21 @@ class Calculator(object):
       raise ValueError("Only supports 2-player games.")
     self.game = game
     self._num_players = game.num_players()
-    self.action_values = None
-    self.num_actions = game.num_distinct_actions()
-    self.info_state_prob = None
-    self.info_state_cf_prob = None
-    self.info_state_chance_prob = None
+    self._num_actions = game.num_distinct_actions()
+
+    self._action_value_calculator = action_value.TreeWalkCalculator(game)
+    # best_responder[i] is a best response to the provided policy for player i.
+    # It is therefore a policy for player (1-i).
     self._best_responder = {0: None, 1: None}
     self._all_states = None
-
-  def get_action_values(self, state, policies, reach_probabilities=None):
-    """Computes the value of the state given the policies.
-
-    Args:
-      state: The state to start analysis from.
-      policies: List of `policy.Policy` objects, one per player.
-      reach_probabilities: A numpy array of shape `[num_players + 1]`.
-        reach_probabilities[i] is the product of the player i action
-        probabilities along the current trajectory. Note that
-        reach_probabilities[-1] corresponds to the chance player.
-
-    Returns:
-      The value of the root state to each player.
-
-    Side-effects - populates:
-      `self.action_values[(player, infostate)][action]`.
-      `self.info_state_prob[(player, infostate)]`.
-      `self.info_state_player_prob[(player, infostate)]`:
-      `self.info_state_cf_prob[(player, infostate)]`.
-      `self.info_state_chance_prob[(player, infostate)]`.
-
-    We use `(player, infostate)` as a key in case the same infostate is shared
-    by multiple players, e.g. in a simultaneous-move game.
-    """
-    if reach_probabilities is None:
-      reach_probabilities = np.ones(self._num_players + 1)
-
-    if state.is_terminal():
-      return np.array(state.returns())
-
-    current_player = state.current_player()
-    reach_prob = np.prod(reach_probabilities)
-
-    is_chance = state.is_chance_node()
-    if not is_chance:
-      key = (state.current_player(), state.information_state())
-      counterfactual_reach_prob = (
-          np.prod(reach_probabilities[:current_player]) *
-          np.prod(reach_probabilities[current_player + 1:]))
-      self.info_state_prob[key] += reach_prob
-      self.info_state_cf_prob[key] += counterfactual_reach_prob
-      self.info_state_chance_prob[key] += reach_probabilities[-1]
-      # Mind that we have "=" here and not "+=", because we just need to use
-      # the reach prob for the player for *any* of the histories leading to
-      # the current info_state (they are all equal because of perfect recall).
-      self.info_state_player_prob[key] = reach_probabilities[current_player]
-
-    value = np.zeros(len(policies))
-    for action, prob in _transitions(state, policies):
-      child = state.child(action)
-      new_reach_probabilities = reach_probabilities.copy()
-      new_reach_probabilities[current_player] *= prob
-      child_value = self.get_action_values(
-          child, policies, reach_probabilities=new_reach_probabilities)
-      if not is_chance:
-        self.action_values[key][action] += child_value * reach_prob
-      value += child_value * prob
-    return value
 
   def __call__(self, player, player_policy, info_states):
     """Computes action values per state for the player.
 
     Args:
-      player: The id of the player 0 <= player < game.num_players().
+      player: The id of the player (0 <= player < game.num_players()). This
+        player will play `player_policy`, while the opponent will play a best
+        response.
       player_policy: A `policy.Policy` object.
       info_states: A list of info state strings.
 
@@ -154,7 +97,7 @@ class Calculator(object):
     opponent = 1 - player
 
     def best_response_policy(state):
-      infostate = state.information_state(opponent)
+      infostate = state.information_state_string(opponent)
       action = best_response_actions[infostate]
       return [(action, 1.0)]
 
@@ -177,7 +120,7 @@ class Calculator(object):
             include_terminals=False,
             include_chance_states=False)
         self._state_to_information_state = {
-            state: self._all_states[state].information_state()
+            state: self._all_states[state].information_state_string()
             for state in self._all_states
         }
       tabular_policy = policy_utils.policy_to_dict(
@@ -199,37 +142,19 @@ class Calculator(object):
         player].get_best_response_actions()
 
     # Compute action values
-    self.action_values = collections.defaultdict(
-        lambda: collections.defaultdict(lambda: np.zeros(2)))
-    self.info_state_prob = collections.defaultdict(float)
-    self.info_state_player_prob = collections.defaultdict(float)
-    self.info_state_cf_prob = collections.defaultdict(float)
-    self.info_state_chance_prob = collections.defaultdict(float)
-    self.get_action_values(
-        self.game.new_initial_state(), {
-            player:
-                player_policy,
-            opponent:
-                policy.PolicyFromCallable(self.game, best_response_policy),
-        })
-
-    # Collect normalized action values for each information state
-    rv = []
-    cfrp = []
-    player_reach_probs_vs_br = []
-    for info_state in info_states:
-      key = (player, info_state)
-      av = self.action_values[key]
-      norm_prob = self.info_state_prob[key]
-      rv.append([(av[a][player] / norm_prob) if
-                 (a in av and norm_prob > 0) else 0
-                 for a in range(self.num_actions)])
-      cfrp.append(self.info_state_cf_prob[key])
-      player_reach_probs_vs_br.append(self.info_state_player_prob[key])
+    self._action_value_calculator.compute_all_states_action_values({
+        player:
+            player_policy,
+        opponent:
+            policy.tabular_policy_from_callable(
+                self.game, best_response_policy, [opponent]),
+    })
+    obj = self._action_value_calculator._get_tabular_statistics(  # pylint: disable=protected-access
+        ((player, s) for s in info_states))
 
     # Return values
     return _CalculatorReturn(
         exploitability=best_response_value,
-        values_vs_br=rv,
-        counterfactual_reach_probs_vs_br=cfrp,
-        player_reach_probs_vs_br=player_reach_probs_vs_br)
+        values_vs_br=obj.action_values,
+        counterfactual_reach_probs_vs_br=obj.counterfactual_reach_probs,
+        player_reach_probs_vs_br=obj.player_reach_probs)

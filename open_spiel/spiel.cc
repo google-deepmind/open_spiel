@@ -14,16 +14,19 @@
 
 #include "open_spiel/spiel.h"
 
-#include <cstdlib>
-#include <iomanip>
+#include <algorithm>
+#include <functional>
 #include <iostream>
-#include <list>
+#include <map>
 #include <memory>
-#include <ostream>
+#include <optional>
+#include <string>
+#include <utility>
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_split.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel_utils.h"
 
@@ -35,6 +38,18 @@ constexpr const char* kSerializeMetaSectionHeader = "[Meta]";
 constexpr const char* kSerializeGameSectionHeader = "[Game]";
 constexpr const char* kSerializeStateSectionHeader = "[State]";
 
+// Returns the available parameter keys, to be used as a utility function.
+std::string ListValidParameters(
+    const std::map<std::string, GameParameter>& param_spec) {
+  std::vector<std::string> available_keys;
+  available_keys.reserve(param_spec.size());
+  for (const auto& item : param_spec) {
+    available_keys.push_back(item.first);
+  }
+  std::sort(available_keys.begin(), available_keys.end());
+  return absl::StrJoin(available_keys, ", ");
+}
+
 // Check on supplied parameters for game creation.
 // Issues a SpielFatalError if any are missing, of the wrong type, or
 // unexpectedly present.
@@ -43,10 +58,17 @@ void ValidateParams(const GameParameters& params,
   // Check all supplied parameters are supported and of the right type.
   for (const auto& param : params) {
     const auto it = param_spec.find(param.first);
-    if (it == param_spec.end())
-      SpielFatalError(absl::StrCat("Unknown parameter ", param.first));
+    if (it == param_spec.end()) {
+      SpielFatalError(absl::StrCat(
+          "Unknown parameter ", param.first,
+          ". Available parameters are: ", ListValidParameters(param_spec)));
+    }
     if (it->second.type() != param.second.type()) {
-      SpielFatalError(absl::StrCat("Wrong type for parameter ", param.first));
+      SpielFatalError(absl::StrCat(
+          "Wrong type for parameter ", param.first,
+          ". Expected type: ", GameParameterTypeToString(it->second.type()),
+          ", got ", GameParameterTypeToString(param.second.type()), " with ",
+          param.second.ToString()));
     }
   }
   // Check we aren't missing any mandatory parameters.
@@ -134,9 +156,9 @@ bool GameRegisterer::IsValidName(const std::string& short_name) {
   return factories().find(short_name) != factories().end();
 }
 
-void GameRegisterer::RegisterGame(const GameType& game_info,
+void GameRegisterer::RegisterGame(const GameType& game_type,
                                   GameRegisterer::CreateFunc creator) {
-  factories()[game_info.short_name] = std::make_pair(game_info, creator);
+  factories()[game_type.short_name] = std::make_pair(game_type, creator);
 }
 
 bool IsGameRegistered(const std::string& short_name) {
@@ -302,11 +324,27 @@ bool Game::ParameterValue<bool>(const std::string& key,
   }
 }
 
-std::pair<Action, double> SampleChanceOutcome(const ActionsAndProbs& outcomes,
-                                              double z) {
+void NormalizePolicy(ActionsAndProbs* policy) {
   double sum = 0;
+  for (const std::pair<Action, double>& outcome : *policy) {
+    sum += outcome.second;
+  }
+  for (std::pair<Action, double>& outcome : *policy) {
+    outcome.second /= sum;
+  }
+}
+
+std::pair<Action, double> SampleAction(const ActionsAndProbs& outcomes,
+                                       absl::BitGenRef rng) {
+  return SampleAction(outcomes, absl::Uniform(rng, 0.0, 1.0));
+}
+std::pair<Action, double> SampleAction(const ActionsAndProbs& outcomes,
+                                       double z) {
+  SPIEL_CHECK_GE(z, 0);
+  SPIEL_CHECK_LT(z, 1);
 
   // First do a check that this is indeed a proper discrete distribution.
+  double sum = 0;
   for (const std::pair<Action, double>& outcome : outcomes) {
     double prob = outcome.second;
     SPIEL_CHECK_GE(prob, 0);
@@ -317,18 +355,17 @@ std::pair<Action, double> SampleChanceOutcome(const ActionsAndProbs& outcomes,
 
   // Now sample an outcome.
   sum = 0;
-
-  for (const auto& outcome : outcomes) {
+  for (const std::pair<Action, double>& outcome : outcomes) {
     double prob = outcome.second;
     if (sum <= z && z < (sum + prob)) {
-      return {outcome.first, prob};
+      return outcome;
     }
     sum += prob;
   }
 
   // If we get here, something has gone wrong
   std::cerr << "Chance sampling failed; outcomes:" << std::endl;
-  for (const auto& outcome : outcomes) {
+  for (const std::pair<Action, double>& outcome : outcomes) {
     std::cerr << outcome.first << "  " << outcome.second << std::endl;
   }
   SpielFatalError(
@@ -345,6 +382,15 @@ std::string State::Serialize() const {
   return absl::StrCat(absl::StrJoin(History(), "\n"), "\n");
 }
 
+Action State::StringToAction(Player player,
+                             const std::string& action_str) const {
+  for (const Action action : LegalActions()) {
+    if (action_str == ActionToString(player, action)) return action;
+  }
+  SpielFatalError(
+      absl::StrCat("Couldn't find an action matching ", action_str));
+}
+
 std::unique_ptr<State> Game::DeserializeState(const std::string& str) const {
   // This simple deserialization doesn't work for games with sampled chance
   // nodes, since the history doesn't give us enough information to reconstruct
@@ -359,6 +405,7 @@ std::unique_ptr<State> Game::DeserializeState(const std::string& str) const {
   }
   std::vector<std::string> lines = absl::StrSplit(str, '\n');
   for (int i = 0; i < lines.size(); ++i) {
+    if (lines[i].empty()) continue;
     if (state->IsSimultaneousNode()) {
       std::vector<Action> actions;
       for (int p = 0; p < state->NumPlayers(); ++p, ++i) {

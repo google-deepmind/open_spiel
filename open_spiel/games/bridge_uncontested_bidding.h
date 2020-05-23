@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef THIRD_PARTY_OPEN_SPIEL_GAMES_BRIDGE_UNCONTESTED_BIDDING_H_
-#define THIRD_PARTY_OPEN_SPIEL_GAMES_BRIDGE_UNCONTESTED_BIDDING_H_
+#ifndef OPEN_SPIEL_GAMES_BRIDGE_UNCONTESTED_BIDDING_H_
+#define OPEN_SPIEL_GAMES_BRIDGE_UNCONTESTED_BIDDING_H_
 
 #include <array>
 
@@ -96,7 +96,9 @@
 #include "open_spiel/spiel.h"
 
 namespace open_spiel {
-namespace bridge {
+namespace bridge_uncontested_bidding {
+
+using bridge::Contract;
 
 inline constexpr int kNumSuits = 4;
 inline constexpr int kNumDenominations = 1 + kNumSuits;
@@ -112,6 +114,7 @@ inline constexpr int kMinScore = -650;  // 13 undertricks, at 50 each
 inline constexpr int kMaxScore = 1520;  // 7NT making
 inline constexpr int kStateSize =
     kNumCards + kNumPlayers * kNumActions + kNumPlayers;
+inline constexpr char kRankChar[] = "23456789TJQKA";
 
 class Deal {
  public:
@@ -167,9 +170,9 @@ class UncontestedBiddingState : public State {
   std::string ToString() const override;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
-  std::string InformationState(Player player) const override;
-  void InformationStateAsNormalizedVector(
-      Player player, std::vector<double>* values) const override;
+  std::string InformationStateString(Player player) const override;
+  void InformationStateTensor(Player player,
+                              std::vector<double>* values) const override;
   std::unique_ptr<State> Clone() const override;
   std::vector<Action> LegalActions() const override;
   std::vector<std::pair<Action, double>> ChanceOutcomes() const override;
@@ -216,7 +219,7 @@ class UncontestedBiddingGame : public Game {
   std::shared_ptr<const Game> Clone() const override {
     return std::shared_ptr<const Game>(new UncontestedBiddingGame(*this));
   }
-  std::vector<int> InformationStateNormalizedVectorShape() const override {
+  std::vector<int> InformationStateTensorShape() const override {
     return {kStateSize};
   }
   int MaxGameLength() const override { return kNumActions; }
@@ -230,7 +233,7 @@ class UncontestedBiddingGame : public Game {
   mutable int rng_seed_;
 };
 
-}  // namespace bridge
+}  // namespace bridge_uncontested_bidding
 }  // namespace open_spiel
 
-#endif  // THIRD_PARTY_OPEN_SPIEL_GAMES_BRIDGE_UNCONTESTED_BIDDING_H_
+#endif  // OPEN_SPIEL_GAMES_BRIDGE_UNCONTESTED_BIDDING_H_

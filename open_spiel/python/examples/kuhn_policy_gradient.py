@@ -21,7 +21,7 @@ from __future__ import print_function
 from absl import app
 from absl import flags
 from absl import logging
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 
 from open_spiel.python import policy
 from open_spiel.python import rl_environment
@@ -51,7 +51,7 @@ class PolicyGradientPolicies(policy.Policy):
 
     self._obs["current_player"] = cur_player
     self._obs["info_state"][cur_player] = (
-        state.information_state_as_normalized_vector(cur_player))
+        state.information_state_tensor(cur_player))
     self._obs["legal_actions"][cur_player] = legal_actions
 
     info_state = rl_environment.TimeStep(

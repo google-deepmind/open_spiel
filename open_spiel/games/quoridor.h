@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef THIRD_PARTY_OPEN_SPIEL_GAMES_QUORIDOR_H_
-#define THIRD_PARTY_OPEN_SPIEL_GAMES_QUORIDOR_H_
+#ifndef OPEN_SPIEL_GAMES_QUORIDOR_H_
+#define OPEN_SPIEL_GAMES_QUORIDOR_H_
 
 #include <cstdint>
 #include <memory>
@@ -98,10 +98,10 @@ class QuoridorState : public State {
   std::string ToString() const override;
   bool IsTerminal() const override { return outcome_ != kPlayerNone; }
   std::vector<double> Returns() const override;
-  std::string InformationState(Player player) const override;
-  std::string Observation(Player player) const override;
-  void ObservationAsNormalizedVector(
-      Player player, std::vector<double>* values) const override;
+  std::string InformationStateString(Player player) const override;
+  std::string ObservationString(Player player) const override;
+  void ObservationTensor(Player player,
+                         std::vector<double>* values) const override;
   std::unique_ptr<State> Clone() const override;
   std::vector<Action> LegalActions() const override;
 
@@ -166,10 +166,10 @@ class QuoridorGame : public Game {
   std::shared_ptr<const Game> Clone() const override {
     return std::shared_ptr<const Game>(new QuoridorGame(*this));
   }
-  std::vector<int> ObservationNormalizedVectorShape() const override {
+  std::vector<int> ObservationTensorShape() const override {
     return {kCellStates + kNumPlayers, Diameter(), Diameter()};
   }
-  int MaxGameLength() const {
+  int MaxGameLength() const override {
     // There's no anti-repetition rule, so this could be infinite, but no sane
     // agent would take more moves than placing all the walls and visiting
     // all squares.
@@ -186,4 +186,4 @@ class QuoridorGame : public Game {
 }  // namespace quoridor
 }  // namespace open_spiel
 
-#endif  // THIRD_PARTY_OPEN_SPIEL_GAMES_QUORIDOR_H_
+#endif  // OPEN_SPIEL_GAMES_QUORIDOR_H_

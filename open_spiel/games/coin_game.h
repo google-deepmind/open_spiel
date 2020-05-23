@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef THIRD_PARTY_OPEN_SPIEL_GAMES_COIN_GAME_H_
-#define THIRD_PARTY_OPEN_SPIEL_GAMES_COIN_GAME_H_
+#ifndef OPEN_SPIEL_GAMES_COIN_GAME_H_
+#define OPEN_SPIEL_GAMES_COIN_GAME_H_
 
 #include <memory>
 #include <set>
@@ -80,7 +80,7 @@ class CoinState : public State {
   std::unique_ptr<State> Clone() const override;
 
   ActionsAndProbs ChanceOutcomes() const override;
-  std::string Observation(Player player) const override;
+  std::string ObservationString(Player player) const override;
 
  protected:
   void DoApplyAction(Action action) override;
@@ -150,4 +150,4 @@ class CoinGame : public Game {
 }  // namespace coin_game
 }  // namespace open_spiel
 
-#endif  // THIRD_PARTY_OPEN_SPIEL_GAMES_COIN_GAME_H_
+#endif  // OPEN_SPIEL_GAMES_COIN_GAME_H_

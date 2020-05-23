@@ -79,7 +79,7 @@ double TabularBestResponse::HandleDecisionCase(HistoryNode* node) {
   // expected utility of that node by looking at their policy.
   // We take child probabilities from the policy as that is what we are
   // calculating a best response to.
-  ActionsAndProbs state_policy = policy_->GetStatePolicy(node->GetInfoState());
+  ActionsAndProbs state_policy = policy_->GetStatePolicy(*node->GetState());
   if (state_policy.empty())
     SpielFatalError(absl::StrCat("InfoState ", node->GetInfoState(),
                                  " not found in policy."));

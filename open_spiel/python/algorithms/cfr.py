@@ -198,7 +198,7 @@ class _CFRSolverBase(object):
       return
 
     current_player = state.current_player()
-    info_state = state.information_state(current_player)
+    info_state = state.information_state_string(current_player)
 
     info_state_node = self._info_state_nodes.get(info_state)
     if info_state_node is None:
@@ -278,7 +278,7 @@ class _CFRSolverBase(object):
       return state_value
 
     current_player = state.current_player()
-    info_state = state.information_state(current_player)
+    info_state = state.information_state_string(current_player)
 
     # No need to continue on this history branch as no update will be performed
     # for any player.

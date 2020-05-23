@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef THIRD_PARTY_OPEN_SPIEL_GAME_TRANSFORMS_TURN_BASED_SIMULTANEOUS_GAME_H_
-#define THIRD_PARTY_OPEN_SPIEL_GAME_TRANSFORMS_TURN_BASED_SIMULTANEOUS_GAME_H_
+#ifndef OPEN_SPIEL_GAME_TRANSFORMS_TURN_BASED_SIMULTANEOUS_GAME_H_
+#define OPEN_SPIEL_GAME_TRANSFORMS_TURN_BASED_SIMULTANEOUS_GAME_H_
 
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "open_spiel/spiel.h"
@@ -24,8 +25,8 @@
 // This wrapper turns any n-player simultaneous move game into an equivalent
 // turn-based game where simultaneous move nodes are encoded as n turns.
 //
-// The underlying game must provide InformationState and
-// InformationStateAsNormalizedVector for the wrapped functions to work.
+// The underlying game must provide InformationStateString and
+// InformationStateTensor for the wrapped functions to work.
 //
 // TODO:
 //   - implement UndoAction for these games.
@@ -44,9 +45,12 @@ class TurnBasedSimultaneousState : public State {
   std::string ToString() const override;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
-  std::string InformationState(Player player) const override;
-  void InformationStateAsNormalizedVector(
-      Player player, std::vector<double>* values) const override;
+  std::string InformationStateString(Player player) const override;
+  void InformationStateTensor(Player player,
+                              std::vector<double>* values) const override;
+  std::string ObservationString(Player player) const override;
+  void ObservationTensor(Player player,
+                         std::vector<double>* values) const override;
   std::unique_ptr<State> Clone() const override;
   std::vector<std::pair<Action, double>> ChanceOutcomes() const override;
 
@@ -92,10 +96,15 @@ class TurnBasedSimultaneousGame : public Game {
   double MinUtility() const override { return game_->MinUtility(); }
   double MaxUtility() const override { return game_->MaxUtility(); }
   double UtilitySum() const override { return game_->UtilitySum(); }
-  std::vector<int> InformationStateNormalizedVectorShape() const override {
+  std::vector<int> InformationStateTensorShape() const override {
     // We flatten the representation of the underlying game and add one-hot
     // indications of the to-play player and the observing player.
-    return {2 * NumPlayers() + game_->InformationStateNormalizedVectorSize()};
+    return {2 * NumPlayers() + game_->InformationStateTensorSize()};
+  }
+  std::vector<int> ObservationTensorShape() const override {
+    // We flatten the representation of the underlying game and add one-hot
+    // indications of the to-play player and the observing player.
+    return {2 * NumPlayers() + game_->ObservationTensorSize()};
   }
   int MaxGameLength() const override {
     return game_->MaxGameLength() * NumPlayers();
@@ -108,16 +117,15 @@ class TurnBasedSimultaneousGame : public Game {
   std::shared_ptr<const Game> game_;
 };
 
-// Equivalent loader functions that return back the transformed game.
-// Important: takes ownership of the game that is passed in.
+// Return back a transformed clone of the game.
 std::shared_ptr<const Game> ConvertToTurnBased(const Game& game);
 
-// These are equivalent to LoadGame but return a converted game. They are simple
-// wrappers provided for the Python API.
+// These are equivalent to LoadGame but converts the game to turn-based if it is
+// not already one. They are simple wrappers provided for the Python API.
 std::shared_ptr<const Game> LoadGameAsTurnBased(const std::string& name);
 std::shared_ptr<const Game> LoadGameAsTurnBased(const std::string& name,
                                                 const GameParameters& params);
 
 }  // namespace open_spiel
 
-#endif  // THIRD_PARTY_OPEN_SPIEL_GAME_TRANSFORMS_TURN_BASED_SIMULTANEOUS_GAME_H_
+#endif  // OPEN_SPIEL_GAME_TRANSFORMS_TURN_BASED_SIMULTANEOUS_GAME_H_

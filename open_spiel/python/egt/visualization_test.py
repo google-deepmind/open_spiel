@@ -45,14 +45,14 @@ import pyspiel
 def _build_dynamics2x2():
   """Build multi-population dynamics."""
   game = pyspiel.load_game("matrix_pd")
-  payoff_tensor = utils.nfg_to_ndarray(game)
+  payoff_tensor = utils.game_payoffs_array(game)
   return dynamics.MultiPopulationDynamics(payoff_tensor, dynamics.replicator)
 
 
 def _build_dynamics3x3():
   """Build single-population dynamics."""
   game = pyspiel.load_game("matrix_rps")
-  payoff_tensor = utils.nfg_to_ndarray(game)
+  payoff_tensor = utils.game_payoffs_array(game)
   return dynamics.SinglePopulationDynamics(payoff_tensor, dynamics.replicator)
 
 

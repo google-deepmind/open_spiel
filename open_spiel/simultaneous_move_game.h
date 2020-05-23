@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef THIRD_PARTY_OPEN_SPIEL_SIMULTANEOUS_MOVE_GAME_H_
-#define THIRD_PARTY_OPEN_SPIEL_SIMULTANEOUS_MOVE_GAME_H_
+#ifndef OPEN_SPIEL_SIMULTANEOUS_MOVE_GAME_H_
+#define OPEN_SPIEL_SIMULTANEOUS_MOVE_GAME_H_
 
 #include <memory>
+#include <string>
+#include <vector>
 
 #include "open_spiel/spiel.h"
 
@@ -35,7 +37,7 @@ class SimMoveState : public State {
   SimMoveState(const SimMoveState&) = default;
 
   // Subclasses must implement a per-player LegalActions function.
-  virtual std::vector<Action> LegalActions(Player player) const = 0;
+  std::vector<Action> LegalActions(Player player) const override = 0;
 
   // LegalActions() returns either the chance outcomes (at a chance node),
   // or a flattened form of the joint legal actions (at simultaneous move
@@ -57,8 +59,9 @@ class SimMoveState : public State {
     if (IsSimultaneousNode()) {
       ApplyFlatJointAction(action);
     } else {
+      const Player player = CurrentPlayer();
       DoApplyAction(action);
-      history_.push_back(action);
+      history_.push_back({player, action});
     }
   }
 
@@ -116,4 +119,4 @@ class SimMoveGame : public Game {
 
 }  // namespace open_spiel
 
-#endif  // THIRD_PARTY_OPEN_SPIEL_SIMULTANEOUS_MOVE_GAME_H_
+#endif  // OPEN_SPIEL_SIMULTANEOUS_MOVE_GAME_H_

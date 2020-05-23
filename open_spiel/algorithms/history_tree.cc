@@ -85,9 +85,13 @@ HistoryNode::HistoryNode(Player player_id, std::unique_ptr<State> game_state)
   // Unless it's the opposing player's turn, we always view the game from the
   // view of player player_id.
   if (type_ == StateType::kDecision && state_->CurrentPlayer() != player_id) {
-    infostate_ = state_->InformationState();
+    infostate_ = state_->InformationStateString();
+  } else if (type_ == StateType::kChance) {
+    infostate_ = kChanceNodeInfostateString;
+  } else if (type_ == StateType::kTerminal) {
+    infostate_ = kTerminalNodeInfostateString;
   } else {
-    infostate_ = state_->InformationState(player_id);
+    infostate_ = state_->InformationStateString(player_id);
   }
   // Compute & store the legal actions so we can check that all actions we're
   // adding are legal.
@@ -177,9 +181,9 @@ ActionsAndProbs GetSuccessorsWithProbs(const State& state,
   } else {
     // Finally, we look at the policy we are finding a best response to, and
     // get our probabilities from there.
-    auto state_policy = policy->GetStatePolicy(state.InformationState());
+    auto state_policy = policy->GetStatePolicy(state);
     if (state_policy.empty()) {
-      SpielFatalError(state.InformationState() + " not found in policy.");
+      SpielFatalError(state.InformationStateString() + " not found in policy.");
     }
     return state_policy;
   }
@@ -236,7 +240,7 @@ GetAllInfoSets(std::unique_ptr<State> state, Player best_responder,
   for (const auto& state_and_prob : states_and_probs) {
     // We look at each decision from the perspective of the best_responder.
     std::string infostate =
-        state_and_prob.first->InformationState(best_responder);
+        state_and_prob.first->InformationStateString(best_responder);
     infosets[infostate].push_back(
         {tree->GetByHistory(state_and_prob.first->ToString()),
          state_and_prob.second});

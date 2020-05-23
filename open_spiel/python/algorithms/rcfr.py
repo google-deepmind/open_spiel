@@ -42,7 +42,7 @@ from __future__ import division
 from __future__ import print_function
 
 import numpy as np
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 
 
 def tensor_to_matrix(tensor):
@@ -117,9 +117,9 @@ def sequence_features(state, num_distinct_actions):
   Returns:
     A `tf.Tensor` feature matrix with one row for each sequence.
   """
-  return with_one_hot_action_features(
-      state.information_state_as_normalized_vector(), state.legal_actions(),
-      num_distinct_actions)
+  return with_one_hot_action_features(state.information_state_tensor(),
+                                      state.legal_actions(),
+                                      num_distinct_actions)
 
 
 def num_features(game):
@@ -128,8 +128,7 @@ def num_features(game):
   Args:
     game: An OpenSpiel `Game`.
   """
-  return (game.information_state_normalized_vector_size() +
-          game.num_distinct_actions())
+  return game.information_state_tensor_size() + game.num_distinct_actions()
 
 
 class RootStateWrapper(object):
@@ -182,7 +181,7 @@ class RootStateWrapper(object):
       return
 
     player = state.current_player()
-    info_state = state.information_state(player)
+    info_state = state.information_state_string(player)
     actions = state.legal_actions()
 
     if info_state not in self.info_state_to_sequence_idx:
@@ -212,7 +211,7 @@ class RootStateWrapper(object):
     Raises:
       ValueError: If there are too few sequence weights at `state`.
     """
-    info_state = state.information_state()
+    info_state = state.information_state_string()
     sequence_offset = self.info_state_to_sequence_idx[info_state]
     actions = state.legal_actions()
 
@@ -317,7 +316,7 @@ class RootStateWrapper(object):
         return v
 
       player = state.current_player()
-      info_state = state.information_state(player)
+      info_state = state.information_state_string(player)
       sequence_idx_offset = self.info_state_to_sequence_idx[info_state]
       actions = state.legal_actions(player)
 
@@ -493,7 +492,7 @@ def sequence_weights_to_tabular_profile(root, policy_fn):
       legal_actions = state.legal_actions(player)
       if len(legal_actions) < 1:
         continue
-      info_state = state.information_state(player)
+      info_state = state.information_state_string(player)
       if info_state in tabular_policy:
         continue
       my_policy = policy_fn(state)
@@ -786,47 +785,34 @@ class ReservoirBuffer(object):
   """A generic reservoir buffer data structure.
 
   After every insertion, its contents represents a `size`-size uniform
-  random sample from the stream of elements that have been inserted.
+  random sample from the stream of candidates that have been encountered.
   """
 
   def __init__(self, size):
     self.size = size
     self.num_elements = 0
     self._buffer = np.full([size], None, dtype=object)
+    self._num_candidates = 0
 
   @property
   def buffer(self):
     return self._buffer[:self.num_elements]
 
-  def insert(self, element):
-    """Insert `element` into this buffer."""
+  def insert(self, candidate):
+    """Consider this `candidate` for inclusion in this sampling buffer."""
+    self._num_candidates += 1
     if self.num_elements < self.size:
-      self._buffer[self.num_elements] = element
+      self._buffer[self.num_elements] = candidate
       self.num_elements += 1
-    elif np.random.uniform() > 0.5:
-      self._buffer[np.random.choice(self.size)] = element
-
-  def insert_all(self, elements):
-    """Insert all `elements` into this buffer."""
-    num_inserted = 0
-    if self.num_available_spaces() > 0:
-      num_inserted = min(self.num_available_spaces(), len(elements))
-      self._buffer[self.num_elements:self.num_elements + num_inserted][:] = (
-          elements[:num_inserted])
-      self.num_elements += num_inserted
-      if num_inserted == len(elements):
-        return
-
-    num_remaining = len(elements) - num_inserted
-    if num_remaining < 1:
       return
+    idx = np.random.choice(self._num_candidates)
+    if idx < self.size:
+      self._buffer[idx] = candidate
 
-    insert_element = np.random.uniform(size=[num_remaining]) > 0.5
-    num_swapped = insert_element.sum()
-    if num_swapped > 0:
-      swap_indices = np.random.choice(self.size, size=num_swapped, replace=True)
-      self._buffer[swap_indices] = np.array(
-          elements[num_inserted:], dtype=object)[insert_element].tolist()
+  def insert_all(self, candidates):
+    """Consider all `candidates` for inclusion in this sampling buffer."""
+    for candidate in candidates:
+      self.insert(candidate)
 
   def num_available_spaces(self):
     """The number of freely available spaces in this buffer."""

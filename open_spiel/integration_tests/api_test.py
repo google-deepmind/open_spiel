@@ -12,11 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for google3.third_party.open_spiel.integration_tests.api."""
-
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
+# Lint as: python3
+"""Tests for open_spiel.integration_tests.api."""
 
 import random
 import unittest
@@ -29,18 +26,20 @@ import numpy as np
 from open_spiel.python.algorithms import get_all_states
 import pyspiel
 
-_MANDATORY_PARAMETERS_GAMES = [
-    "misere",
-    "turn_based_simultaneous_game",
-]
+_ALL_GAMES = pyspiel.registered_games()
 
-_GAMES_TO_TEST = list(
-    set(pyspiel.registered_names()) - set(_MANDATORY_PARAMETERS_GAMES))
+_GAMES_TO_TEST = [g.short_name for g in _ALL_GAMES if g.default_loadable]
+
+_GAMES_NOT_UNDER_TEST = [
+    g.short_name for g in _ALL_GAMES if not g.default_loadable
+]
 
 # The list of game instances to test on the full tree as tuples
 # (name to display, string to pass to load_game).
 _GAMES_FULL_TREE_TRAVERSAL_TESTS = [
     ("catch", "catch(rows=6,columns=3)"),
+    ("cliff_walking", "cliff_walking(horizon=7)"),
+    ("deep_sea", "deep_sea(size=3)"),
     ("kuhn_poker", "kuhn_poker"),
     ("leduc_poker", "leduc_poker"),
     ("iigoofspiel4", "turn_based_simultaneous_game(game=goofspiel("
@@ -48,6 +47,9 @@ _GAMES_FULL_TREE_TRAVERSAL_TESTS = [
     ("kuhn_poker3p", "kuhn_poker(players=3)"),
     ("first_sealed_auction", "first_sealed_auction(max_value=2)"),
     ("tiny_hanabi", "tiny_hanabi"),
+    ("nf_auction", "turn_based_simultaneous_game(game="
+     "normal_form_extensive_game(game="
+     "first_sealed_auction(max_value=3)))"),
     # Disabled by default - big games, slow tests.
     # Uncomment to check the games if you modify them.
     # ("liars_dice", "liars_dice"),
@@ -57,6 +59,8 @@ _GAMES_FULL_TREE_TRAVERSAL_TESTS = [
 TOTAL_NUM_STATES = {
     # This maps the game name to (chance, playable, terminal)
     "catch": (1, 363, 729),
+    "cliff_walking": (0, 2119, 6358),
+    "deep_sea": (0, 7, 8),
     "kuhn_poker": (4, 24, 30),
     "leduc_poker": (157, 3780, 5520),
     "liars_dice": (7, 147456, 147420),
@@ -65,12 +69,15 @@ TOTAL_NUM_STATES = {
     "first_sealed_auction": (12, 10, 14),
     "tiny_bridge_2p": (29, 53760, 53340),
     "tiny_hanabi": (3, 16, 36),
+    "nf_auction": (0, 7, 36),
 }
 
 # This is kept to ensure non-regression, but we would like to remove that
 # when we can interpret what are these numbers.
 PERFECT_RECALL_NUM_STATES = {
     "catch": 363,
+    "cliff_walking": 2119,
+    "deep_sea": 7,
     "kuhn_poker": 12,
     "leduc_poker": 936,
     "liars_dice": 24576,
@@ -79,6 +86,7 @@ PERFECT_RECALL_NUM_STATES = {
     "first_sealed_auction": 4,
     "tiny_bridge_2p": 3584,
     "tiny_hanabi": 8,
+    "nf_auction": 2,
 }
 
 
@@ -118,7 +126,7 @@ class EnforceAPIOnFullTreeBase(parameterized.TestCase):
                  (self.game_name, player, str(state)))
           self.assertEmpty(state.legal_actions(player), msg=msg)
       elif state.is_simultaneous_node():
-        # TODO(open_spiel) - check simultaneous nodes
+        # No requirement for legal_actions to be empty, since all players act.
         pass
       elif state.is_chance_node():
         # Would be an error to request legal actions for a non-chance player.
@@ -159,7 +167,7 @@ class EnforceAPIOnFullTreeBase(parameterized.TestCase):
     for state in self.all_states:
       if state.is_terminal():
         with self.assertRaises(RuntimeError):
-          state.information_state()
+          state.information_state_string()
 
   def test_game_is_perfect_recall(self):
     # We do not count the terminal nodes here.
@@ -201,9 +209,9 @@ class EnforceAPIOnFullTreeBase(parameterized.TestCase):
 
       if state.is_chance_node():
         with self.assertRaises(RuntimeError):
-          state.information_state()
+          state.information_state_string()
         with self.assertRaises(RuntimeError):
-          state.information_state_as_normalized_vector()
+          state.information_state_tensor()
 
     for state in self.all_states:
       _assert_information_state_on_chance_nodes_raises(state)
@@ -211,7 +219,7 @@ class EnforceAPIOnFullTreeBase(parameterized.TestCase):
   def test_current_player_infosets_no_overlap_between_players(self):
     # This is the stronger property we can currently verify. In particular,
     # we can find some state h0 where player 0 plays such that:
-    # h0.information_state(0) == h0.information_state(0).
+    # h0.information_state_string(0) == h0.information_state_string(0).
 
     states_for_player = [set() for _ in range(self.game.num_players())]
     for state in self.all_states:
@@ -222,14 +230,12 @@ class EnforceAPIOnFullTreeBase(parameterized.TestCase):
       else:
         self.assertEqual(state.get_type(), pyspiel.StateType.TERMINAL)
 
-    infoset_functions = [lambda s, player: s.information_state(player)]
+    infoset_functions = [lambda s, player: s.information_state_string(player)]
 
-    def _information_state_as_normalized_vector(state, player):
-      return tuple(
-          np.asarray(
-              state.information_state_as_normalized_vector(player)).flatten())
+    def _information_state_tensor(state, player):
+      return tuple(np.asarray(state.information_state_tensor(player)).flatten())
 
-    infoset_functions.append(_information_state_as_normalized_vector)
+    infoset_functions.append(_information_state_tensor)
 
     for infoset_function in infoset_functions:
 
@@ -261,6 +267,86 @@ def _get_some_states(game, num_plays=10, include_terminals=True):
 class PartialEnforceAPIConventionsTest(parameterized.TestCase):
   """This only partially test some properties."""
 
+  def _assert_observations_raises_error_on_invalid_player(self, game, state):
+    game_type = game.get_type()
+    game_name = game_type.short_name
+    num_players = game.num_players()
+
+    if game_type.provides_information_state_string:
+      for p in range(num_players):
+        state.information_state_string(p)
+      msg = f"information_state_string did not raise an error for {game_name}"
+      with self.assertRaisesRegex(RuntimeError, "player >= 0", mgs=msg):
+        state.information_state_string(-1)
+      with self.assertRaisesRegex(RuntimeError, "player <", mgs=msg):
+        state.information_state_string(num_players + 1)
+
+    if game_type.provides_information_state_tensor:
+      for p in range(num_players):
+        v = state.information_state_tensor(p)
+        self.assertLen(v, game.information_state_tensor_size())
+      msg = f"information_state_tensor did not raise an error for {game_name}"
+      with self.assertRaisesRegex(RuntimeError, "player >= 0", mgs=msg):
+        state.information_state_tensor(-1)
+      with self.assertRaisesRegex(RuntimeError, "player <", mgs=msg):
+        state.information_state_tensor(num_players + 1)
+
+    if game_type.provides_observation_tensor:
+      for p in range(num_players):
+        v = state.observation_tensor(p)
+        self.assertLen(v, game.observation_tensor_size())
+      msg = f"observation_tensor did not raise an error for {game_name}"
+      with self.assertRaisesRegex(RuntimeError, "player >= 0", msg=msg):
+        state.observation_tensor(-1)
+      with self.assertRaisesRegex(RuntimeError, "player <", msg=msg):
+        state.observation_tensor(num_players + 1)
+
+    if game_type.provides_observation_string:
+      for p in range(num_players):
+        state.observation_string(p)
+      msg = f"observation_string did not raise an error for {game_name}"
+      with self.assertRaisesRegex(RuntimeError, "player >= 0", msg=msg):
+        state.observation_string(-1)
+      with self.assertRaisesRegex(RuntimeError, "player <", msg=msg):
+        state.observation_string(num_players + 1)
+
+  @parameterized.parameters(_GAMES_TO_TEST)
+  def test_observations_raises_error_on_invalid_player(self, game_name):
+    print(f"Testing observations for {game_name}")
+    game = pyspiel.load_game(game_name)
+    state = game.new_initial_state()
+
+    # Some games cannot be finished by always taking the first legal actions.
+    give_up_after = float("inf")
+    if game.get_type().short_name in ["backgammon", "laser_tag"]:
+      give_up_after = 100
+
+    while not state.is_terminal():
+      if len(state.history()) > give_up_after:
+        break
+
+      if not state.is_chance_node():
+        self._assert_observations_raises_error_on_invalid_player(game, state)
+
+      if state.is_chance_node():
+        for action, prob in state.chance_outcomes():
+          if prob != 0:
+            state.apply_action(action)
+            break
+      elif state.is_simultaneous_node():
+        # Simultaneous node: sample actions for all players.
+        chosen_actions = [
+            state.legal_actions(pid)[0] for pid in range(game.num_players())
+        ]
+        state.apply_actions(chosen_actions)
+      else:
+        # Decision node: sample action for the single current player
+        action = random.choice(state.legal_actions(state.current_player()))
+        state.action_to_string(state.current_player(), action)
+        state.apply_action(action)
+
+    self._assert_observations_raises_error_on_invalid_player(game, state)
+
   @parameterized.parameters(_GAMES_TO_TEST)
   def test_legal_actions_returns_empty_list_on_opponent(self, game_name):
     game = pyspiel.load_game(game_name)
@@ -282,7 +368,7 @@ class PartialEnforceAPIConventionsTest(parameterized.TestCase):
                  "legal_actions(%i) for state %s" % (game, player, state))
           self.assertEmpty(state.legal_actions(player), msg=msg)
       elif state.is_simultaneous_node():
-        # TODO(open_spiel) - check simultaneous nodes
+        # No requirement for legal_actions to be empty, since all players act.
         pass
       elif state.is_chance_node():
         # Would be an error to request legal actions for a non-chance player.
@@ -336,12 +422,12 @@ def _assert_is_perfect_recall(game):
 
   In particular, note that:
   - we want to check that holds both for
-    + `std::string information_state(current_player)`
-    + `information_state_as_normalized_vector`.
+    + `std::string information_state_string(current_player)`
+    + `information_state_tensor`.
   - we check that currently only from the point of view of the current
     player at the information state (i.e. we compare
-    `prev_state.information_state(current_player)` but not
-    `prev_state.information_state(opponent_player)`
+    `prev_state.information_state_string(current_player)` but not
+    `prev_state.information_state_string(opponent_player)`
 
   The strategy is the following: we traverse the full tree (of states, not
   infostates), and make sure for each node that the history we get for
@@ -388,7 +474,7 @@ def _assert_is_perfect_recall_recursive(state, current_history,
 
   if not state.is_chance_node() and not state.is_terminal():
     current_player = state.current_player()
-    infostate_str = state.information_state(current_player)
+    infostate_str = state.information_state_string(current_player)
     key = (infostate_str, current_player)
 
     if key not in infostate_player_to_history:
@@ -410,10 +496,11 @@ def _assert_is_perfect_recall_recursive(state, current_history,
                                  "|".join([str(sa) for sa in current_history])))
 
       # Check for `information_state`
-      expected_infosets_history = [(s.information_state(current_player), a)
-                                   for s, a in previous_history
-                                   if s.current_player() == current_player]
-      infosets_history = [(s.information_state(current_player), a)
+      expected_infosets_history = [
+          (s.information_state_string(current_player), a)
+          for s, a in previous_history
+          if s.current_player() == current_player]  # pylint: disable=g-complex-comprehension
+      infosets_history = [(s.information_state_string(current_player), a)
                           for s, a in current_history
                           if s.current_player() == current_player]
 
@@ -437,23 +524,21 @@ def _assert_is_perfect_recall_recursive(state, current_history,
                                  "|".join([str(sa) for sa in current_history])))
         # pyformat: enable
 
-      # Check for `information_state_as_normalized_vector`
+      # Check for `information_state_tensor`
       expected_infosets_history = [
-          (s.information_state_as_normalized_vector(s.current_player()), a)
+          (s.information_state_tensor(s.current_player()), a)
           for s, a in previous_history
           if s.current_player() == current_player
       ]
-      infosets_history = [
-          (s.information_state_as_normalized_vector(s.current_player()), a)
-          for s, a in current_history
-          if s.current_player() == current_player
-      ]
+      infosets_history = [(s.information_state_tensor(s.current_player()), a)
+                          for s, a in current_history
+                          if s.current_player() == current_player]
 
       if not all([
           np.array_equal(x, y)
           for x, y in zip(expected_infosets_history, infosets_history)
       ]):
-        raise ValueError("The history as NormalizedVector in the same infoset "
+        raise ValueError("The history as tensor in the same infoset "
                          "are different:\n"
                          "History: {!r}\n".format(state.history()))
 

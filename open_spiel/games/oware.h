@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef THIRD_PARTY_OPEN_SPIEL_GAMES_OWARE_H_
-#define THIRD_PARTY_OPEN_SPIEL_GAMES_OWARE_H_
+#ifndef OPEN_SPIEL_GAMES_OWARE_H_
+#define OPEN_SPIEL_GAMES_OWARE_H_
 
 #include <memory>
 #include <unordered_set>
@@ -71,15 +71,15 @@ class OwareState : public State {
   std::vector<double> Returns() const override;
   std::unique_ptr<State> Clone() const override;
   const OwareBoard& Board() const { return board_; }
-  std::string Observation(Player player) const override;
+  std::string ObservationString(Player player) const override;
 
   // The game board is provided as a vector, encoding the players' seeds
   // and their score, as a fraction of the number of total number of seeds in
   // the game. This provides an interface that can be used for neural network
   // training, although the given representation is not necessary the best
   // for that purpose.
-  void ObservationAsNormalizedVector(
-      Player player, std::vector<double>* values) const override;
+  void ObservationTensor(Player player,
+                         std::vector<double>* values) const override;
 
  protected:
   void DoApplyAction(Action action) override;
@@ -175,7 +175,7 @@ class OwareGame : public Game {
   }
 
   int MaxGameLength() const override { return kMaxGameLength; }
-  std::vector<int> ObservationNormalizedVectorShape() const override;
+  std::vector<int> ObservationTensorShape() const override;
 
  private:
   const int num_houses_per_player_;
@@ -185,4 +185,4 @@ class OwareGame : public Game {
 }  // namespace oware
 }  // namespace open_spiel
 
-#endif  // THIRD_PARTY_OPEN_SPIEL_GAMES_OWARE_H_
+#endif  // OPEN_SPIEL_GAMES_OWARE_H_

@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef THIRD_PARTY_OPEN_SPIEL_TESTS_BASIC_TESTS_H_
-#define THIRD_PARTY_OPEN_SPIEL_TESTS_BASIC_TESTS_H_
+#ifndef OPEN_SPIEL_TESTS_BASIC_TESTS_H_
+#define OPEN_SPIEL_TESTS_BASIC_TESTS_H_
 
 #include <random>
 #include <string>
@@ -55,7 +55,10 @@ void CheckChanceOutcomes(const Game& game);
 // mode kSampledStochastic).
 void RandomSimTestNoSerialize(const Game& game, int num_sims);
 
+// Verifies that ResampleFromInfostate is correctly implemented.
+void ResampleInfostateTest(const Game& game, int num_sims);
+
 }  // namespace testing
 }  // namespace open_spiel
 
-#endif  // THIRD_PARTY_OPEN_SPIEL_TESTS_BASIC_TESTS_H_
+#endif  // OPEN_SPIEL_TESTS_BASIC_TESTS_H_

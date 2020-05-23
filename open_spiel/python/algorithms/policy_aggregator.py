@@ -47,16 +47,16 @@ class PolicyFunction(policy.Policy):
 
   def _state_key(self, state, player_id=None):
     """Returns the key to use to look up this (state, player_id) pair."""
-    if self._game_type.provides_information_state:
+    if self._game_type.provides_information_state_string:
       if player_id is None:
-        return state.information_state()
+        return state.information_state_string()
       else:
-        return state.information_state(player_id)
-    elif self._game_type.provides_observation:
+        return state.information_state_string(player_id)
+    elif self._game_type.provides_observation_tensor:
       if player_id is None:
-        return state.observation()
+        return state.observation_tensor()
       else:
-        return state.observation(player_id)
+        return state.observation_tensor(player_id)
     else:
       return str(state)
 
@@ -77,6 +77,13 @@ class PolicyFunction(policy.Policy):
       supplied state.
     """
     state_key = self._state_key(state, player_id=player_id)
+    if state.is_simultaneous_node():
+      # Policy aggregator doesn't yet support simultaneous moves nodes.
+      # The below lines are one step towards that direction.
+      result = []
+      for player_pol in self._policies:
+        result.append(player_pol[state_key])
+      return result
     if player_id is None:
       player_id = state.current_player()
     return self._policies[player_id][state_key]
@@ -95,8 +102,8 @@ class PolicyPool(object):
 
   def __call__(self, state, player):
     return [
-        a.action_probabilities(state, player_id=player) for a
-        in self._policies[player]
+        a.action_probabilities(state, player_id=player)
+        for a in self._policies[player]
     ]
 
 
@@ -115,16 +122,16 @@ class PolicyAggregator(object):
   def _state_key(self, state, player_id=None):
     """Returns the key to use to look up this (state, player) pair."""
     # TODO(somidshafiei): fuse this with the identical PolicyFunction._state_key
-    if self._game_type.provides_information_state:
+    if self._game_type.provides_information_state_string:
       if player_id is None:
-        return state.information_state()
+        return state.information_state_string()
       else:
-        return state.information_state(player_id)
-    elif self._game_type.provides_observation:
+        return state.information_state_string(player_id)
+    elif self._game_type.provides_observation_string:
       if player_id is None:
-        return state.observation()
+        return state.observation_string()
       else:
-        return state.observation(player_id)
+        return state.observation_string(player_id)
     else:
       return str(state)
 
@@ -173,7 +180,7 @@ class PolicyAggregator(object):
       actions, probabilities = zip(*self._policy[key].items())
       # Add some small proba mass to avoid divide by zero, which happens for
       # games with low reach probabilities for certain states (keys)
-      new_probs = [prob+self._epsilon for prob in probabilities]
+      new_probs = [prob + self._epsilon for prob in probabilities]
       denom = sum(new_probs)
       for i in range(len(actions)):
         self._policy[key][actions[i]] = new_probs[i] / denom

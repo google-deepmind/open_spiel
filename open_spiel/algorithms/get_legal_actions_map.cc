@@ -37,7 +37,7 @@ void FillMap(const State& state,
     // Many players can play at this node.
     for (auto p = Player{0}; p < state.NumPlayers(); ++p) {
       if (player == kInvalidPlayer || p == player) {
-        std::string info_state = state.InformationState(p);
+        std::string info_state = state.InformationStateString(p);
         if (map->find(info_state) == map->end()) {
           // Only add it if we don't already have it.
           std::vector<Action> legal_actions = state.LegalActions(p);
@@ -48,7 +48,7 @@ void FillMap(const State& state,
   } else {
     // Regular decision node.
     if (player == kInvalidPlayer || state.CurrentPlayer() == player) {
-      std::string info_state = state.InformationState();
+      std::string info_state = state.InformationStateString();
       if (map->find(info_state) == map->end()) {
         // Only add it if we don't already have it.
         std::vector<Action> legal_actions = state.LegalActions();

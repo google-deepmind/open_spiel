@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef THIRD_PARTY_OPEN_SPIEL_GAMES_MARKOV_SOCCER_H_
-#define THIRD_PARTY_OPEN_SPIEL_GAMES_MARKOV_SOCCER_H_
+#ifndef OPEN_SPIEL_GAMES_MARKOV_SOCCER_H_
+#define OPEN_SPIEL_GAMES_MARKOV_SOCCER_H_
 
 #include <array>
 #include <memory>
@@ -73,19 +73,19 @@ class MarkovSoccerState : public SimMoveState {
   std::string ToString() const override;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
-  std::string InformationState(Player player) const {
+  std::string ObservationString(Player player) const override {
     SPIEL_CHECK_GE(player, 0);
     SPIEL_CHECK_LT(player, num_players_);
     return ToString();
   }
-  void InformationStateAsNormalizedVector(Player player,
-                                          std::vector<double>* values) const;
+  void ObservationTensor(Player player,
+                         std::vector<double>* values) const override;
   Player CurrentPlayer() const override {
     return IsTerminal() ? kTerminalPlayerId : cur_player_;
   }
   std::unique_ptr<State> Clone() const override;
 
-  ActionsAndProbs ChanceOutcomes() const;
+  ActionsAndProbs ChanceOutcomes() const override;
 
   void Reset(int horizon);
   std::vector<Action> LegalActions(Player player) const override;
@@ -129,7 +129,7 @@ class MarkovSoccerGame : public SimMoveGame {
   std::shared_ptr<const Game> Clone() const override {
     return std::shared_ptr<const Game>(new MarkovSoccerGame(*this));
   }
-  std::vector<int> InformationStateNormalizedVectorShape() const override;
+  std::vector<int> ObservationTensorShape() const override;
   int MaxGameLength() const override { return horizon_; }
 
  private:
@@ -140,4 +140,4 @@ class MarkovSoccerGame : public SimMoveGame {
 }  // namespace markov_soccer
 }  // namespace open_spiel
 
-#endif  // THIRD_PARTY_OPEN_SPIEL_GAMES_MARKOV_SOCCER_H_
+#endif  // OPEN_SPIEL_GAMES_MARKOV_SOCCER_H_

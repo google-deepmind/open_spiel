@@ -26,6 +26,16 @@ import pyspiel
 
 class MatrixGamesUtilsTest(absltest.TestCase):
 
+  def test_num_deterministic_policies(self):
+    # Kuhn poker has six information sets with two actions each (2^6 = 64).
+    game = pyspiel.load_game("kuhn_poker")
+    self.assertEqual(pyspiel.num_deterministic_policies(game, 0), 64)
+    self.assertEqual(pyspiel.num_deterministic_policies(game, 1), 64)
+    # Leduc poker has larger than 2^64 - 1, so -1 will be returned.
+    game = pyspiel.load_game("leduc_poker")
+    self.assertEqual(pyspiel.num_deterministic_policies(game, 0), -1)
+    self.assertEqual(pyspiel.num_deterministic_policies(game, 1), -1)
+
   def test_extensive_to_matrix_game(self):
     kuhn_game = pyspiel.load_game("kuhn_poker")
     kuhn_matrix_game = pyspiel.extensive_to_matrix_game(kuhn_game)

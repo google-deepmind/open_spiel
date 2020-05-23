@@ -1,5 +1,4 @@
 game: negotiation(rng_seed=100,utterance_dim=2,num_symbols=3)
-seed: 1370999156
 
 GameType.chance_mode = ChanceMode.SAMPLED_STOCHASTIC
 GameType.dynamics = Dynamics.SEQUENTIAL
@@ -8,38 +7,40 @@ GameType.long_name = "Negotiation"
 GameType.max_num_players = 2
 GameType.min_num_players = 2
 GameType.parameter_specification = ["enable_proposals", "enable_utterances", "num_items", "num_symbols", "rng_seed", "utterance_dim"]
-GameType.provides_information_state = False
-GameType.provides_information_state_as_normalized_vector = False
-GameType.provides_observation = True
-GameType.provides_observation_as_normalized_vector = True
+GameType.provides_information_state_string = False
+GameType.provides_information_state_tensor = False
+GameType.provides_observation_string = True
+GameType.provides_observation_tensor = True
 GameType.reward_model = RewardModel.TERMINAL
 GameType.short_name = "negotiation"
 GameType.utility = Utility.GENERAL_SUM
 
 NumDistinctActions() = 226
+PolicyTensorShape() = [226]
 MaxChanceOutcomes() = 1
 GetParameters() = {enable_proposals=True,enable_utterances=True,num_items=3,num_symbols=3,rng_seed=100,utterance_dim=2}
 NumPlayers() = 2
 MinUtility() = -150.0
 MaxUtility() = 150.0
 UtilitySum() = None
-ObservationNormalizedVectorShape() = [81]
-ObservationNormalizedVectorSize() = 81
+ObservationTensorShape() = [81]
+ObservationTensorLayout() = TensorLayout.CHW
+ObservationTensorSize() = 81
 MaxGameLength() = 20
 ToString() = "negotiation(num_symbols=3,rng_seed=100,utterance_dim=2)"
 
 # State 0
+# Initial chance node
 IsTerminal() = False
-ToString() = "Initial chance node"
 History() = []
 HistoryString() = ""
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
-Observation(0) = "ChanceNode -- no observation"
-Observation(1) = "ChanceNode -- no observation"
-ObservationAsNormalizedVector(0) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-ObservationAsNormalizedVector(1) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationString(0) = "ChanceNode -- no observation"
+ObservationString(1) = "ChanceNode -- no observation"
+ObservationTensor(0): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(1): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 SerializeState() = "chance"
 ChanceOutcomes() = [{0, 1.000000000000}]
 LegalActions() = [0]
@@ -49,17 +50,22 @@ StringLegalActions() = ["chance outcome 0"]
 action: 0
 
 # State 1
+# Max steps: 4
+# Item pool: 0 1 4
+# Agent 0 util vec: 2 9 4
+# Agent 1 util vec: 1 9 6
+# Current player: 0
+# Turn Type: Proposal
 IsTerminal() = False
-ToString() = "Max steps: 4\nItem pool: 0 1 4\nAgent 0 util vec: 2 9 4\nAgent 1 util vec: 1 9 6\nCurrent player: 0\nTurn Type: Proposal\n"
 History() = [0]
 HistoryString() = "0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-Observation(0) = "Max steps: 4\nItem pool: 0 1 4\nAgent 0 util vec: 2 9 4\nCurrent player: 0\nTurn Type: Proposal\n"
-Observation(1) = "Max steps: 4\nItem pool: 0 1 4\nAgent 1 util vec: 1 9 6\nCurrent player: 0\nTurn Type: Proposal\n"
-ObservationAsNormalizedVector(0) = [1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-ObservationAsNormalizedVector(1) = [1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationString(0) = "Max steps: 4\nItem pool: 0 1 4\nAgent 0 util vec: 2 9 4\nCurrent player: 0\nTurn Type: Proposal\n"
+ObservationString(1) = "Max steps: 4\nItem pool: 0 1 4\nAgent 1 util vec: 1 9 6\nCurrent player: 0\nTurn Type: Proposal\n"
+ObservationTensor(0): ◉◯◉◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(1): ◉◯◉◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 SerializeState() = "4\n0 1 4\n2 9 4\n1 9 6\n0\n"
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
@@ -70,17 +76,23 @@ StringLegalActions() = ["Proposal: [0, 0, 0]", "Proposal: [0, 0, 1]", "Proposal:
 action: 9
 
 # State 2
+# Max steps: 4
+# Item pool: 0 1 4
+# Agent 0 util vec: 2 9 4
+# Agent 1 util vec: 1 9 6
+# Current player: 0
+# Turn Type: Utterance
+# Player 0 proposes: [0, 1, 3]
 IsTerminal() = False
-ToString() = "Max steps: 4\nItem pool: 0 1 4\nAgent 0 util vec: 2 9 4\nAgent 1 util vec: 1 9 6\nCurrent player: 0\nTurn Type: Utterance\nPlayer 0 proposes: [0, 1, 3]\n"
 History() = [0, 9]
 HistoryString() = "0 9"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-Observation(0) = "Max steps: 4\nItem pool: 0 1 4\nAgent 0 util vec: 2 9 4\nCurrent player: 0\nTurn Type: Utterance\nMost recent proposal: [0, 1, 3]\n"
-Observation(1) = "Max steps: 4\nItem pool: 0 1 4\nAgent 1 util vec: 1 9 6\nCurrent player: 0\nTurn Type: Utterance\nMost recent proposal: [0, 1, 3]\n"
-ObservationAsNormalizedVector(0) = [1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-ObservationAsNormalizedVector(1) = [1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationString(0) = "Max steps: 4\nItem pool: 0 1 4\nAgent 0 util vec: 2 9 4\nCurrent player: 0\nTurn Type: Utterance\nMost recent proposal: [0, 1, 3]\n"
+ObservationString(1) = "Max steps: 4\nItem pool: 0 1 4\nAgent 1 util vec: 1 9 6\nCurrent player: 0\nTurn Type: Utterance\nMost recent proposal: [0, 1, 3]\n"
+ObservationTensor(0): ◉◯◯◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
+ObservationTensor(1): ◉◯◯◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
 SerializeState() = "4\n0 1 4\n2 9 4\n1 9 6\n0 9\n"
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
@@ -91,17 +103,23 @@ StringLegalActions() = [", Utterance: [0, 0]", ", Utterance: [0, 1]", ", Utteran
 action: 223
 
 # State 3
+# Max steps: 4
+# Item pool: 0 1 4
+# Agent 0 util vec: 2 9 4
+# Agent 1 util vec: 1 9 6
+# Current player: 1
+# Turn Type: Proposal
+# Player 0 proposes: [0, 1, 3] utters: [2, 0]
 IsTerminal() = False
-ToString() = "Max steps: 4\nItem pool: 0 1 4\nAgent 0 util vec: 2 9 4\nAgent 1 util vec: 1 9 6\nCurrent player: 1\nTurn Type: Proposal\nPlayer 0 proposes: [0, 1, 3] utters: [2, 0]\n"
 History() = [0, 9, 223]
 HistoryString() = "0 9 223"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-Observation(0) = "Max steps: 4\nItem pool: 0 1 4\nAgent 0 util vec: 2 9 4\nCurrent player: 1\nTurn Type: Proposal\nMost recent proposal: [0, 1, 3]\nMost recent utterance: [2, 0]\n"
-Observation(1) = "Max steps: 4\nItem pool: 0 1 4\nAgent 1 util vec: 1 9 6\nCurrent player: 1\nTurn Type: Proposal\nMost recent proposal: [0, 1, 3]\nMost recent utterance: [2, 0]\n"
-ObservationAsNormalizedVector(0) = [0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0]
-ObservationAsNormalizedVector(1) = [0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0]
+ObservationString(0) = "Max steps: 4\nItem pool: 0 1 4\nAgent 0 util vec: 2 9 4\nCurrent player: 1\nTurn Type: Proposal\nMost recent proposal: [0, 1, 3]\nMost recent utterance: [2, 0]\n"
+ObservationString(1) = "Max steps: 4\nItem pool: 0 1 4\nAgent 1 util vec: 1 9 6\nCurrent player: 1\nTurn Type: Proposal\nMost recent proposal: [0, 1, 3]\nMost recent utterance: [2, 0]\n"
+ObservationTensor(0): ◯◉◉◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◉◉◯◯
+ObservationTensor(1): ◯◉◉◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◉◉◯◯
 SerializeState() = "4\n0 1 4\n2 9 4\n1 9 6\n0 9 223\n"
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
@@ -112,17 +130,24 @@ StringLegalActions() = ["Proposal: [0, 0, 0]", "Proposal: [0, 0, 1]", "Proposal:
 action: 1
 
 # State 4
+# Max steps: 4
+# Item pool: 0 1 4
+# Agent 0 util vec: 2 9 4
+# Agent 1 util vec: 1 9 6
+# Current player: 1
+# Turn Type: Utterance
+# Player 0 proposes: [0, 1, 3] utters: [2, 0]
+# Player 1 proposes: [0, 0, 1]
 IsTerminal() = False
-ToString() = "Max steps: 4\nItem pool: 0 1 4\nAgent 0 util vec: 2 9 4\nAgent 1 util vec: 1 9 6\nCurrent player: 1\nTurn Type: Utterance\nPlayer 0 proposes: [0, 1, 3] utters: [2, 0]\nPlayer 1 proposes: [0, 0, 1]\n"
 History() = [0, 9, 223, 1]
 HistoryString() = "0 9 223 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-Observation(0) = "Max steps: 4\nItem pool: 0 1 4\nAgent 0 util vec: 2 9 4\nCurrent player: 1\nTurn Type: Utterance\nMost recent proposal: [0, 0, 1]\nMost recent utterance: [2, 0]\n"
-Observation(1) = "Max steps: 4\nItem pool: 0 1 4\nAgent 1 util vec: 1 9 6\nCurrent player: 1\nTurn Type: Utterance\nMost recent proposal: [0, 0, 1]\nMost recent utterance: [2, 0]\n"
-ObservationAsNormalizedVector(0) = [0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0]
-ObservationAsNormalizedVector(1) = [0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0]
+ObservationString(0) = "Max steps: 4\nItem pool: 0 1 4\nAgent 0 util vec: 2 9 4\nCurrent player: 1\nTurn Type: Utterance\nMost recent proposal: [0, 0, 1]\nMost recent utterance: [2, 0]\n"
+ObservationString(1) = "Max steps: 4\nItem pool: 0 1 4\nAgent 1 util vec: 1 9 6\nCurrent player: 1\nTurn Type: Utterance\nMost recent proposal: [0, 0, 1]\nMost recent utterance: [2, 0]\n"
+ObservationTensor(0): ◯◉◯◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◉◉◯◯
+ObservationTensor(1): ◯◉◯◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◉◉◯◯
 SerializeState() = "4\n0 1 4\n2 9 4\n1 9 6\n0 9 223 1\n"
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
@@ -133,17 +158,24 @@ StringLegalActions() = [", Utterance: [0, 0]", ", Utterance: [0, 1]", ", Utteran
 action: 225
 
 # State 5
+# Max steps: 4
+# Item pool: 0 1 4
+# Agent 0 util vec: 2 9 4
+# Agent 1 util vec: 1 9 6
+# Current player: 0
+# Turn Type: Proposal
+# Player 0 proposes: [0, 1, 3] utters: [2, 0]
+# Player 1 proposes: [0, 0, 1] utters: [2, 2]
 IsTerminal() = False
-ToString() = "Max steps: 4\nItem pool: 0 1 4\nAgent 0 util vec: 2 9 4\nAgent 1 util vec: 1 9 6\nCurrent player: 0\nTurn Type: Proposal\nPlayer 0 proposes: [0, 1, 3] utters: [2, 0]\nPlayer 1 proposes: [0, 0, 1] utters: [2, 2]\n"
 History() = [0, 9, 223, 1, 225]
 HistoryString() = "0 9 223 1 225"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-Observation(0) = "Max steps: 4\nItem pool: 0 1 4\nAgent 0 util vec: 2 9 4\nCurrent player: 0\nTurn Type: Proposal\nMost recent proposal: [0, 0, 1]\nMost recent utterance: [2, 2]\n"
-Observation(1) = "Max steps: 4\nItem pool: 0 1 4\nAgent 1 util vec: 1 9 6\nCurrent player: 0\nTurn Type: Proposal\nMost recent proposal: [0, 0, 1]\nMost recent utterance: [2, 2]\n"
-ObservationAsNormalizedVector(0) = [1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0]
-ObservationAsNormalizedVector(1) = [1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0]
+ObservationString(0) = "Max steps: 4\nItem pool: 0 1 4\nAgent 0 util vec: 2 9 4\nCurrent player: 0\nTurn Type: Proposal\nMost recent proposal: [0, 0, 1]\nMost recent utterance: [2, 2]\n"
+ObservationString(1) = "Max steps: 4\nItem pool: 0 1 4\nAgent 1 util vec: 1 9 6\nCurrent player: 0\nTurn Type: Proposal\nMost recent proposal: [0, 0, 1]\nMost recent utterance: [2, 2]\n"
+ObservationTensor(0): ◉◯◉◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉
+ObservationTensor(1): ◉◯◉◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉
 SerializeState() = "4\n0 1 4\n2 9 4\n1 9 6\n0 9 223 1 225\n"
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
@@ -154,17 +186,25 @@ StringLegalActions() = ["Proposal: [0, 0, 0]", "Proposal: [0, 0, 1]", "Proposal:
 action: 7
 
 # State 6
+# Max steps: 4
+# Item pool: 0 1 4
+# Agent 0 util vec: 2 9 4
+# Agent 1 util vec: 1 9 6
+# Current player: 0
+# Turn Type: Utterance
+# Player 0 proposes: [0, 1, 3] utters: [2, 0]
+# Player 1 proposes: [0, 0, 1] utters: [2, 2]
+# Player 0 proposes: [0, 1, 1]
 IsTerminal() = False
-ToString() = "Max steps: 4\nItem pool: 0 1 4\nAgent 0 util vec: 2 9 4\nAgent 1 util vec: 1 9 6\nCurrent player: 0\nTurn Type: Utterance\nPlayer 0 proposes: [0, 1, 3] utters: [2, 0]\nPlayer 1 proposes: [0, 0, 1] utters: [2, 2]\nPlayer 0 proposes: [0, 1, 1]\n"
 History() = [0, 9, 223, 1, 225, 7]
 HistoryString() = "0 9 223 1 225 7"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-Observation(0) = "Max steps: 4\nItem pool: 0 1 4\nAgent 0 util vec: 2 9 4\nCurrent player: 0\nTurn Type: Utterance\nMost recent proposal: [0, 1, 1]\nMost recent utterance: [2, 2]\n"
-Observation(1) = "Max steps: 4\nItem pool: 0 1 4\nAgent 1 util vec: 1 9 6\nCurrent player: 0\nTurn Type: Utterance\nMost recent proposal: [0, 1, 1]\nMost recent utterance: [2, 2]\n"
-ObservationAsNormalizedVector(0) = [1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0]
-ObservationAsNormalizedVector(1) = [1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0]
+ObservationString(0) = "Max steps: 4\nItem pool: 0 1 4\nAgent 0 util vec: 2 9 4\nCurrent player: 0\nTurn Type: Utterance\nMost recent proposal: [0, 1, 1]\nMost recent utterance: [2, 2]\n"
+ObservationString(1) = "Max steps: 4\nItem pool: 0 1 4\nAgent 1 util vec: 1 9 6\nCurrent player: 0\nTurn Type: Utterance\nMost recent proposal: [0, 1, 1]\nMost recent utterance: [2, 2]\n"
+ObservationTensor(0): ◉◯◯◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉
+ObservationTensor(1): ◉◯◯◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉
 SerializeState() = "4\n0 1 4\n2 9 4\n1 9 6\n0 9 223 1 225 7\n"
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
@@ -175,17 +215,25 @@ StringLegalActions() = [", Utterance: [0, 0]", ", Utterance: [0, 1]", ", Utteran
 action: 220
 
 # State 7
+# Max steps: 4
+# Item pool: 0 1 4
+# Agent 0 util vec: 2 9 4
+# Agent 1 util vec: 1 9 6
+# Current player: 1
+# Turn Type: Proposal
+# Player 0 proposes: [0, 1, 3] utters: [2, 0]
+# Player 1 proposes: [0, 0, 1] utters: [2, 2]
+# Player 0 proposes: [0, 1, 1] utters: [1, 0]
 IsTerminal() = False
-ToString() = "Max steps: 4\nItem pool: 0 1 4\nAgent 0 util vec: 2 9 4\nAgent 1 util vec: 1 9 6\nCurrent player: 1\nTurn Type: Proposal\nPlayer 0 proposes: [0, 1, 3] utters: [2, 0]\nPlayer 1 proposes: [0, 0, 1] utters: [2, 2]\nPlayer 0 proposes: [0, 1, 1] utters: [1, 0]\n"
 History() = [0, 9, 223, 1, 225, 7, 220]
 HistoryString() = "0 9 223 1 225 7 220"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-Observation(0) = "Max steps: 4\nItem pool: 0 1 4\nAgent 0 util vec: 2 9 4\nCurrent player: 1\nTurn Type: Proposal\nMost recent proposal: [0, 1, 1]\nMost recent utterance: [1, 0]\n"
-Observation(1) = "Max steps: 4\nItem pool: 0 1 4\nAgent 1 util vec: 1 9 6\nCurrent player: 1\nTurn Type: Proposal\nMost recent proposal: [0, 1, 1]\nMost recent utterance: [1, 0]\n"
-ObservationAsNormalizedVector(0) = [0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0]
-ObservationAsNormalizedVector(1) = [0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0]
+ObservationString(0) = "Max steps: 4\nItem pool: 0 1 4\nAgent 0 util vec: 2 9 4\nCurrent player: 1\nTurn Type: Proposal\nMost recent proposal: [0, 1, 1]\nMost recent utterance: [1, 0]\n"
+ObservationString(1) = "Max steps: 4\nItem pool: 0 1 4\nAgent 1 util vec: 1 9 6\nCurrent player: 1\nTurn Type: Proposal\nMost recent proposal: [0, 1, 1]\nMost recent utterance: [1, 0]\n"
+ObservationTensor(0): ◯◉◉◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◯◉◯◯
+ObservationTensor(1): ◯◉◉◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◯◉◯◯
 SerializeState() = "4\n0 1 4\n2 9 4\n1 9 6\n0 9 223 1 225 7 220\n"
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
@@ -196,17 +244,26 @@ StringLegalActions() = ["Proposal: [0, 0, 0]", "Proposal: [0, 0, 1]", "Proposal:
 action: 9
 
 # State 8
+# Max steps: 4
+# Item pool: 0 1 4
+# Agent 0 util vec: 2 9 4
+# Agent 1 util vec: 1 9 6
+# Current player: 1
+# Turn Type: Utterance
+# Player 0 proposes: [0, 1, 3] utters: [2, 0]
+# Player 1 proposes: [0, 0, 1] utters: [2, 2]
+# Player 0 proposes: [0, 1, 1] utters: [1, 0]
+# Player 1 proposes: [0, 1, 3]
 IsTerminal() = False
-ToString() = "Max steps: 4\nItem pool: 0 1 4\nAgent 0 util vec: 2 9 4\nAgent 1 util vec: 1 9 6\nCurrent player: 1\nTurn Type: Utterance\nPlayer 0 proposes: [0, 1, 3] utters: [2, 0]\nPlayer 1 proposes: [0, 0, 1] utters: [2, 2]\nPlayer 0 proposes: [0, 1, 1] utters: [1, 0]\nPlayer 1 proposes: [0, 1, 3]\n"
 History() = [0, 9, 223, 1, 225, 7, 220, 9]
 HistoryString() = "0 9 223 1 225 7 220 9"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-Observation(0) = "Max steps: 4\nItem pool: 0 1 4\nAgent 0 util vec: 2 9 4\nCurrent player: 1\nTurn Type: Utterance\nMost recent proposal: [0, 1, 3]\nMost recent utterance: [1, 0]\n"
-Observation(1) = "Max steps: 4\nItem pool: 0 1 4\nAgent 1 util vec: 1 9 6\nCurrent player: 1\nTurn Type: Utterance\nMost recent proposal: [0, 1, 3]\nMost recent utterance: [1, 0]\n"
-ObservationAsNormalizedVector(0) = [0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0]
-ObservationAsNormalizedVector(1) = [0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0]
+ObservationString(0) = "Max steps: 4\nItem pool: 0 1 4\nAgent 0 util vec: 2 9 4\nCurrent player: 1\nTurn Type: Utterance\nMost recent proposal: [0, 1, 3]\nMost recent utterance: [1, 0]\n"
+ObservationString(1) = "Max steps: 4\nItem pool: 0 1 4\nAgent 1 util vec: 1 9 6\nCurrent player: 1\nTurn Type: Utterance\nMost recent proposal: [0, 1, 3]\nMost recent utterance: [1, 0]\n"
+ObservationTensor(0): ◯◉◯◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◉◯◉◯◯
+ObservationTensor(1): ◯◉◯◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◉◯◉◯◯
 SerializeState() = "4\n0 1 4\n2 9 4\n1 9 6\n0 9 223 1 225 7 220 9\n"
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
@@ -217,17 +274,26 @@ StringLegalActions() = [", Utterance: [0, 0]", ", Utterance: [0, 1]", ", Utteran
 action: 223
 
 # State 9
+# Max steps: 4
+# Item pool: 0 1 4
+# Agent 0 util vec: 2 9 4
+# Agent 1 util vec: 1 9 6
+# Current player: 0
+# Turn Type: Proposal
+# Player 0 proposes: [0, 1, 3] utters: [2, 0]
+# Player 1 proposes: [0, 0, 1] utters: [2, 2]
+# Player 0 proposes: [0, 1, 1] utters: [1, 0]
+# Player 1 proposes: [0, 1, 3] utters: [2, 0]
 IsTerminal() = True
-ToString() = "Max steps: 4\nItem pool: 0 1 4\nAgent 0 util vec: 2 9 4\nAgent 1 util vec: 1 9 6\nCurrent player: 0\nTurn Type: Proposal\nPlayer 0 proposes: [0, 1, 3] utters: [2, 0]\nPlayer 1 proposes: [0, 0, 1] utters: [2, 2]\nPlayer 0 proposes: [0, 1, 1] utters: [1, 0]\nPlayer 1 proposes: [0, 1, 3] utters: [2, 0]\n"
 History() = [0, 9, 223, 1, 225, 7, 220, 9, 223]
 HistoryString() = "0 9 223 1 225 7 220 9 223"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
-Observation(0) = "Max steps: 4\nItem pool: 0 1 4\nAgent 0 util vec: 2 9 4\nCurrent player: -4\nTurn Type: Proposal\nMost recent proposal: [0, 1, 3]\nMost recent utterance: [2, 0]\n"
-Observation(1) = "Max steps: 4\nItem pool: 0 1 4\nAgent 1 util vec: 1 9 6\nCurrent player: -4\nTurn Type: Proposal\nMost recent proposal: [0, 1, 3]\nMost recent utterance: [2, 0]\n"
-ObservationAsNormalizedVector(0) = [0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0]
-ObservationAsNormalizedVector(1) = [0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0]
+ObservationString(0) = "Max steps: 4\nItem pool: 0 1 4\nAgent 0 util vec: 2 9 4\nCurrent player: -4\nTurn Type: Proposal\nMost recent proposal: [0, 1, 3]\nMost recent utterance: [2, 0]\n"
+ObservationString(1) = "Max steps: 4\nItem pool: 0 1 4\nAgent 1 util vec: 1 9 6\nCurrent player: -4\nTurn Type: Proposal\nMost recent proposal: [0, 1, 3]\nMost recent utterance: [2, 0]\n"
+ObservationTensor(0): ◯◯◉◯◉◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◉◉◯◯
+ObservationTensor(1): ◯◯◉◯◉◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◉◉◯◯
 SerializeState() = "4\n0 1 4\n2 9 4\n1 9 6\n0 9 223 1 225 7 220 9 223\n"
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]

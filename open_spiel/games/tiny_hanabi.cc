@@ -38,7 +38,7 @@ constexpr char kDefaultPayoffString[] =
 std::vector<int> ParsePayoffString(const std::string& str) {
   std::vector<std::string> pieces = absl::StrSplit(str, ';');
   std::vector<int> payoff;
-  for (const auto piece : pieces) {
+  for (const auto& piece : pieces) {
     int val;
     if (!absl::SimpleAtoi(piece, &val)) {
       SpielFatalError(absl::StrCat("Could not parse piece '", piece,
@@ -61,10 +61,10 @@ const GameType kGameType{
     GameType::RewardModel::kTerminal,
     /*max_num_players=*/10,
     /*min_num_players=*/2,
-    /*provides_information_state=*/true,
-    /*provides_information_state_as_normalized_vector=*/true,
-    /*provides_observation=*/true,
-    /*provides_observation_as_normalized_vector=*/true,
+    /*provides_information_state_string=*/true,
+    /*provides_information_state_tensor=*/true,
+    /*provides_observation_string=*/true,
+    /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
     {
         {"num_players", GameParameter(2)},
@@ -122,10 +122,10 @@ std::string TinyHanabiState::ToString() const {
   std::string rv;
   for (int i = 0; i < payoff_.NumPlayers() && i < history_.size(); ++i) {
     if (i != 0) absl::StrAppend(&rv, " ");
-    absl::StrAppend(&rv, "p", i, ":d", history_[i]);
+    absl::StrAppend(&rv, "p", i, ":d", history_[i].action);
   }
   for (int i = payoff_.NumPlayers(); i < history_.size(); ++i) {
-    absl::StrAppend(&rv, " p", i - payoff_.NumPlayers(), ":a", history_[i]);
+    absl::StrAppend(&rv, " p", history_[i].player, ":a", history_[i].action);
   }
   return rv;
 }
@@ -151,19 +151,21 @@ std::vector<Action> TinyHanabiState::LegalActions() const {
   return actions;
 }
 
-std::string TinyHanabiState::InformationState(Player player) const {
+std::string TinyHanabiState::InformationStateString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
   std::string rv = absl::StrCat("p", player);
-  if (history_.size() > player) absl::StrAppend(&rv, ":d", history_[player]);
+  if (history_.size() > player)
+    absl::StrAppend(&rv, ":d", history_[player].action);
   for (int i = payoff_.NumPlayers(); i < history_.size(); ++i) {
-    absl::StrAppend(&rv, " p", i - payoff_.NumPlayers(), ":a", history_[i]);
+    absl::StrAppend(&rv, " p", i - payoff_.NumPlayers(), ":a",
+                    history_[i].action);
   }
   return rv;
 }
 
-void TinyHanabiState::InformationStateAsNormalizedVector(
+void TinyHanabiState::InformationStateTensor(
     Player player, std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
@@ -171,27 +173,27 @@ void TinyHanabiState::InformationStateAsNormalizedVector(
   values->resize(payoff_.NumChance() +
                  payoff_.NumActions() * payoff_.NumPlayers());
   std::fill(values->begin(), values->end(), 0);
-  if (history_.size() > player) values->at(history_[player]) = 1;
+  if (history_.size() > player) values->at(history_[player].action) = 1;
   for (int i = payoff_.NumPlayers(); i < history_.size(); ++i) {
     values->at(payoff_.NumChance() +
                (i - payoff_.NumPlayers()) * payoff_.NumActions() +
-               history_[i]) = 1;
+               history_[i].action) = 1;
   }
 }
 
-void TinyHanabiState::ObservationAsNormalizedVector(
-    Player player, std::vector<double>* values) const {
+void TinyHanabiState::ObservationTensor(Player player,
+                                        std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  InformationStateAsNormalizedVector(player, values);
+  InformationStateTensor(player, values);
 }
 
-std::string TinyHanabiState::Observation(Player player) const {
+std::string TinyHanabiState::ObservationString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  return InformationState(player);
+  return InformationStateString(player);
 }
 
 void TinyHanabiState::DoApplyAction(Action action) {}

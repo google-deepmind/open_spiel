@@ -34,7 +34,7 @@ std::unordered_map<std::string, int> GetStatesToIndices(const Game& game) {
     std::unique_ptr<State> state = std::move(to_visit.back());
     to_visit.pop_back();
     if (!state->IsChanceNode() && !state->IsTerminal()) {
-      state_index[state->InformationState()] = index;
+      state_index[state->InformationStateString()] = index;
     }
     ++index;
     for (Action action : state->LegalActions()) {

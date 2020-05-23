@@ -18,22 +18,22 @@ namespace open_spiel {
 namespace {
 
 // These parameters are the most-general case. The actual game may be simpler.
-const GameType kGameType{
-    /*short_name=*/"misere",
-    /*long_name=*/"Misere Version of a Regular Game",
-    GameType::Dynamics::kSequential,
-    GameType::ChanceMode::kSampledStochastic,
-    GameType::Information::kImperfectInformation,
-    GameType::Utility::kGeneralSum,
-    GameType::RewardModel::kRewards,
-    /*max_num_players=*/100,
-    /*min_num_players=*/1,
-    /*provides_information_state=*/true,
-    /*provides_information_state_as_normalized_vector=*/true,
-    /*provides_observation=*/true,
-    /*provides_observation_as_normalized_vector=*/true,
-    {{"game",
-      GameParameter(GameParameter::Type::kGame, /*is_mandatory=*/true)}}};
+const GameType kGameType{/*short_name=*/"misere",
+                         /*long_name=*/"Misere Version of a Regular Game",
+                         GameType::Dynamics::kSequential,
+                         GameType::ChanceMode::kSampledStochastic,
+                         GameType::Information::kImperfectInformation,
+                         GameType::Utility::kGeneralSum,
+                         GameType::RewardModel::kRewards,
+                         /*max_num_players=*/100,
+                         /*min_num_players=*/1,
+                         /*provides_information_state_string=*/true,
+                         /*provides_information_state_tensor=*/true,
+                         /*provides_observation_string=*/true,
+                         /*provides_observation_tensor=*/true,
+                         {{"game", GameParameter(GameParameter::Type::kGame,
+                                                 /*is_mandatory=*/true)}},
+                         /*default_loadable=*/false};
 
 GameType MisereGameType(GameType game_type) {
   game_type.short_name = kGameType.short_name;

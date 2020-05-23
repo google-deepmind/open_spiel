@@ -31,7 +31,7 @@ import collections
 import copy
 import numpy as np
 import sonnet as snt
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 
 from open_spiel.python import rl_agent
 from open_spiel.python.algorithms import dqn
@@ -98,7 +98,7 @@ class EVAAgent(object):
                num_neighbours=5,
                learning_rate=1e-4,
                mixing_parameter=0.9,
-               memory_capacity=1e6,
+               memory_capacity=int(1e6),
                discount_factor=1.0,
                update_target_network_every=1000,
                epsilon_start=1.0,
@@ -157,6 +157,10 @@ class EVAAgent(object):
     self._embedding_network = snt.nets.MLP(
         list(embedding_network_layers) + [embedding_size])
     self._embedding = self._embedding_network(self._info_state_ph)
+
+    # The DQN agent requires this be an integer.
+    if not isinstance(memory_capacity, int):
+      raise ValueError("Memory capacity not an integer.")
 
     # Initialize the parametric & non-parametric Q-networks.
     self._agent = dqn.DQN(
@@ -401,11 +405,10 @@ class EVAAgent(object):
   def action_probabilities(self, state):
     """Returns action probabilites dict for a single batch."""
     # TODO(author3, author6): Refactor this to expect pre-normalized form.
-    if hasattr(state, "information_state_as_normalized_vector"):
-      state_rep = tuple(
-          state.information_state_as_normalized_vector(self.player_id))
-    elif hasattr(state, "observation_as_normalized_vector"):
-      state_rep = tuple(state.observation_as_normalized_vector(self.player_id))
+    if hasattr(state, "information_state_tensor"):
+      state_rep = tuple(state.information_state_tensor(self.player_id))
+    elif hasattr(state, "observation_tensor"):
+      state_rep = tuple(state.observation_tensor(self.player_id))
     else:
       raise AttributeError("Unable to extract normalized state vector.")
     legal_actions = state.legal_actions(self.player_id)

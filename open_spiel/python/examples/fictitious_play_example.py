@@ -22,7 +22,6 @@ import sys
 from absl import app
 from absl import flags
 
-from open_spiel.python import policy
 from open_spiel.python.algorithms import exploitability
 from open_spiel.python.algorithms import fictitious_play
 import pyspiel
@@ -41,9 +40,7 @@ def main(_):
   xfp_solver = fictitious_play.XFPSolver(game)
   for i in range(FLAGS.iterations):
     xfp_solver.iteration()
-    conv = exploitability.exploitability(
-        game,
-        policy.PolicyFromCallable(game, xfp_solver.average_policy_callable()))
+    conv = exploitability.exploitability(game, xfp_solver.average_policy())
     if i % FLAGS.print_freq == 0:
       print("Iteration: {} Conv: {}".format(i, conv))
       sys.stdout.flush()

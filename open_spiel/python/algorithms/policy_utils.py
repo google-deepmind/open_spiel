@@ -50,7 +50,8 @@ def policy_to_dict(player_policy,
         include_terminals=False,
         include_chance_states=False)
     state_to_information_state = {
-        state: all_states[state].information_state() for state in all_states
+        state: all_states[state].information_state_string()
+        for state in all_states
     }
   tabular_policy = dict()
   for state in all_states:

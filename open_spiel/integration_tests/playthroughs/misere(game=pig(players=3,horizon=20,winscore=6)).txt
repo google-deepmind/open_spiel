@@ -1,5 +1,4 @@
 game: misere(game=pig(players=3,horizon=20,winscore=6))
-seed: 1358622266
 
 GameType.chance_mode = ChanceMode.EXPLICIT_STOCHASTIC
 GameType.dynamics = Dynamics.SEQUENTIAL
@@ -8,40 +7,52 @@ GameType.long_name = "Misere Pig"
 GameType.max_num_players = 10
 GameType.min_num_players = 2
 GameType.parameter_specification = ["diceoutcomes", "horizon", "players", "winscore"]
-GameType.provides_information_state = True
-GameType.provides_information_state_as_normalized_vector = True
-GameType.provides_observation = False
-GameType.provides_observation_as_normalized_vector = False
+GameType.provides_information_state_string = False
+GameType.provides_information_state_tensor = False
+GameType.provides_observation_string = True
+GameType.provides_observation_tensor = True
 GameType.reward_model = RewardModel.TERMINAL
 GameType.short_name = "misere"
 GameType.utility = Utility.ZERO_SUM
 
 NumDistinctActions() = 6
+PolicyTensorShape() = [6]
 MaxChanceOutcomes() = 6
 GetParameters() = {game=pig(horizon=20,players=3,winscore=6)}
 NumPlayers() = 3
 MinUtility() = -1.0
 MaxUtility() = 1.0
 UtilitySum() = -0.0
-InformationStateNormalizedVectorShape() = [4, 7]
-InformationStateNormalizedVectorSize() = 28
+ObservationTensorShape() = [4, 7]
+ObservationTensorLayout() = TensorLayout.CHW
+ObservationTensorSize() = 28
 MaxGameLength() = 20
 ToString() = "misere(game=pig(horizon=20,players=3,winscore=6))"
 
 # State 0
+# Scores: 0 0 0, Turn total: 0
+# Current player: 0
 IsTerminal() = False
-ToString() = "Scores: 0 0 0, Turn total: 0\nCurrent player: 0\n"
 History() = []
 HistoryString() = ""
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationState(0) = "Scores: 0 0 0, Turn total: 0\nCurrent player: 0\n"
-InformationState(1) = "Scores: 0 0 0, Turn total: 0\nCurrent player: 0\n"
-InformationState(2) = "Scores: 0 0 0, Turn total: 0\nCurrent player: 0\n"
-InformationStateAsNormalizedVector(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateAsNormalizedVector(1) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateAsNormalizedVector(2) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationString(0) = "Scores: 0 0 0, Turn total: 0\nCurrent player: 0\n"
+ObservationString(1) = "Scores: 0 0 0, Turn total: 0\nCurrent player: 0\n"
+ObservationString(2) = "Scores: 0 0 0, Turn total: 0\nCurrent player: 0\n"
+ObservationTensor(0): ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
+ObservationTensor(2): ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
 Rewards() = [-0.0, -0.0, -0.0]
 Returns() = [-0.0, -0.0, -0.0]
 LegalActions() = [0, 1]
@@ -51,19 +62,29 @@ StringLegalActions() = ["roll", "stop"]
 action: 0
 
 # State 1
+# Scores: 0 0 0, Turn total: 0
+# Current player: 0 (rolling)
 IsTerminal() = False
-ToString() = "Scores: 0 0 0, Turn total: 0\nCurrent player: 0 (rolling)\n"
 History() = [0]
 HistoryString() = "0"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
-InformationState(0) = "Scores: 0 0 0, Turn total: 0\nCurrent player: 0 (rolling)\n"
-InformationState(1) = "Scores: 0 0 0, Turn total: 0\nCurrent player: 0 (rolling)\n"
-InformationState(2) = "Scores: 0 0 0, Turn total: 0\nCurrent player: 0 (rolling)\n"
-InformationStateAsNormalizedVector(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateAsNormalizedVector(1) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateAsNormalizedVector(2) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationString(0) = "Scores: 0 0 0, Turn total: 0\nCurrent player: 0 (rolling)\n"
+ObservationString(1) = "Scores: 0 0 0, Turn total: 0\nCurrent player: 0 (rolling)\n"
+ObservationString(2) = "Scores: 0 0 0, Turn total: 0\nCurrent player: 0 (rolling)\n"
+ObservationTensor(0): ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
+ObservationTensor(2): ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
 ChanceOutcomes() = [{1, 0.166666666667}, {2, 0.166666666667}, {3, 0.166666666667}, {4, 0.166666666667}, {5, 0.166666666667}, {6, 0.166666666667}]
 LegalActions() = [1, 2, 3, 4, 5, 6]
 StringLegalActions() = ["chance outcome 1", "chance outcome 2", "chance outcome 3", "chance outcome 4", "chance outcome 5", "chance outcome 6"]
@@ -72,19 +93,29 @@ StringLegalActions() = ["chance outcome 1", "chance outcome 2", "chance outcome 
 action: 1
 
 # State 2
+# Scores: 0 0 0, Turn total: 0
+# Current player: 1
 IsTerminal() = False
-ToString() = "Scores: 0 0 0, Turn total: 0\nCurrent player: 1\n"
 History() = [0, 1]
 HistoryString() = "0 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationState(0) = "Scores: 0 0 0, Turn total: 0\nCurrent player: 1\n"
-InformationState(1) = "Scores: 0 0 0, Turn total: 0\nCurrent player: 1\n"
-InformationState(2) = "Scores: 0 0 0, Turn total: 0\nCurrent player: 1\n"
-InformationStateAsNormalizedVector(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateAsNormalizedVector(1) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateAsNormalizedVector(2) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationString(0) = "Scores: 0 0 0, Turn total: 0\nCurrent player: 1\n"
+ObservationString(1) = "Scores: 0 0 0, Turn total: 0\nCurrent player: 1\n"
+ObservationString(2) = "Scores: 0 0 0, Turn total: 0\nCurrent player: 1\n"
+ObservationTensor(0): ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
+ObservationTensor(2): ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
 Rewards() = [-0.0, -0.0, -0.0]
 Returns() = [-0.0, -0.0, -0.0]
 LegalActions() = [0, 1]
@@ -94,19 +125,29 @@ StringLegalActions() = ["roll", "stop"]
 action: 0
 
 # State 3
+# Scores: 0 0 0, Turn total: 0
+# Current player: 1 (rolling)
 IsTerminal() = False
-ToString() = "Scores: 0 0 0, Turn total: 0\nCurrent player: 1 (rolling)\n"
 History() = [0, 1, 0]
 HistoryString() = "0 1 0"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
-InformationState(0) = "Scores: 0 0 0, Turn total: 0\nCurrent player: 1 (rolling)\n"
-InformationState(1) = "Scores: 0 0 0, Turn total: 0\nCurrent player: 1 (rolling)\n"
-InformationState(2) = "Scores: 0 0 0, Turn total: 0\nCurrent player: 1 (rolling)\n"
-InformationStateAsNormalizedVector(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateAsNormalizedVector(1) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateAsNormalizedVector(2) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationString(0) = "Scores: 0 0 0, Turn total: 0\nCurrent player: 1 (rolling)\n"
+ObservationString(1) = "Scores: 0 0 0, Turn total: 0\nCurrent player: 1 (rolling)\n"
+ObservationString(2) = "Scores: 0 0 0, Turn total: 0\nCurrent player: 1 (rolling)\n"
+ObservationTensor(0): ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
+ObservationTensor(2): ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
 ChanceOutcomes() = [{1, 0.166666666667}, {2, 0.166666666667}, {3, 0.166666666667}, {4, 0.166666666667}, {5, 0.166666666667}, {6, 0.166666666667}]
 LegalActions() = [1, 2, 3, 4, 5, 6]
 StringLegalActions() = ["chance outcome 1", "chance outcome 2", "chance outcome 3", "chance outcome 4", "chance outcome 5", "chance outcome 6"]
@@ -115,19 +156,29 @@ StringLegalActions() = ["chance outcome 1", "chance outcome 2", "chance outcome 
 action: 3
 
 # State 4
+# Scores: 0 0 0, Turn total: 4
+# Current player: 1
 IsTerminal() = False
-ToString() = "Scores: 0 0 0, Turn total: 4\nCurrent player: 1\n"
 History() = [0, 1, 0, 3]
 HistoryString() = "0 1 0 3"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationState(0) = "Scores: 0 0 0, Turn total: 4\nCurrent player: 1\n"
-InformationState(1) = "Scores: 0 0 0, Turn total: 4\nCurrent player: 1\n"
-InformationState(2) = "Scores: 0 0 0, Turn total: 4\nCurrent player: 1\n"
-InformationStateAsNormalizedVector(0) = [0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateAsNormalizedVector(1) = [0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateAsNormalizedVector(2) = [0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationString(0) = "Scores: 0 0 0, Turn total: 4\nCurrent player: 1\n"
+ObservationString(1) = "Scores: 0 0 0, Turn total: 4\nCurrent player: 1\n"
+ObservationString(2) = "Scores: 0 0 0, Turn total: 4\nCurrent player: 1\n"
+ObservationTensor(0): ◯◯◯◯◉◯◯
+                      ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
+ObservationTensor(1): ◯◯◯◯◉◯◯
+                      ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
+ObservationTensor(2): ◯◯◯◯◉◯◯
+                      ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
 Rewards() = [-0.0, -0.0, -0.0]
 Returns() = [-0.0, -0.0, -0.0]
 LegalActions() = [0, 1]
@@ -137,19 +188,29 @@ StringLegalActions() = ["roll", "stop"]
 action: 1
 
 # State 5
+# Scores: 0 4 0, Turn total: 0
+# Current player: 2
 IsTerminal() = False
-ToString() = "Scores: 0 4 0, Turn total: 0\nCurrent player: 2\n"
 History() = [0, 1, 0, 3, 1]
 HistoryString() = "0 1 0 3 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 2
-InformationState(0) = "Scores: 0 4 0, Turn total: 0\nCurrent player: 2\n"
-InformationState(1) = "Scores: 0 4 0, Turn total: 0\nCurrent player: 2\n"
-InformationState(2) = "Scores: 0 4 0, Turn total: 0\nCurrent player: 2\n"
-InformationStateAsNormalizedVector(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateAsNormalizedVector(1) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateAsNormalizedVector(2) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationString(0) = "Scores: 0 4 0, Turn total: 0\nCurrent player: 2\n"
+ObservationString(1) = "Scores: 0 4 0, Turn total: 0\nCurrent player: 2\n"
+ObservationString(2) = "Scores: 0 4 0, Turn total: 0\nCurrent player: 2\n"
+ObservationTensor(0): ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
+                      ◯◯◯◯◉◯◯
+                      ◉◯◯◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
+                      ◯◯◯◯◉◯◯
+                      ◉◯◯◯◯◯◯
+ObservationTensor(2): ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
+                      ◯◯◯◯◉◯◯
+                      ◉◯◯◯◯◯◯
 Rewards() = [-0.0, -0.0, -0.0]
 Returns() = [-0.0, -0.0, -0.0]
 LegalActions() = [0, 1]
@@ -159,19 +220,29 @@ StringLegalActions() = ["roll", "stop"]
 action: 1
 
 # State 6
+# Scores: 0 4 0, Turn total: 0
+# Current player: 0
 IsTerminal() = False
-ToString() = "Scores: 0 4 0, Turn total: 0\nCurrent player: 0\n"
 History() = [0, 1, 0, 3, 1, 1]
 HistoryString() = "0 1 0 3 1 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationState(0) = "Scores: 0 4 0, Turn total: 0\nCurrent player: 0\n"
-InformationState(1) = "Scores: 0 4 0, Turn total: 0\nCurrent player: 0\n"
-InformationState(2) = "Scores: 0 4 0, Turn total: 0\nCurrent player: 0\n"
-InformationStateAsNormalizedVector(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateAsNormalizedVector(1) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateAsNormalizedVector(2) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationString(0) = "Scores: 0 4 0, Turn total: 0\nCurrent player: 0\n"
+ObservationString(1) = "Scores: 0 4 0, Turn total: 0\nCurrent player: 0\n"
+ObservationString(2) = "Scores: 0 4 0, Turn total: 0\nCurrent player: 0\n"
+ObservationTensor(0): ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
+                      ◯◯◯◯◉◯◯
+                      ◉◯◯◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
+                      ◯◯◯◯◉◯◯
+                      ◉◯◯◯◯◯◯
+ObservationTensor(2): ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
+                      ◯◯◯◯◉◯◯
+                      ◉◯◯◯◯◯◯
 Rewards() = [-0.0, -0.0, -0.0]
 Returns() = [-0.0, -0.0, -0.0]
 LegalActions() = [0, 1]
@@ -181,19 +252,29 @@ StringLegalActions() = ["roll", "stop"]
 action: 1
 
 # State 7
+# Scores: 0 4 0, Turn total: 0
+# Current player: 1
 IsTerminal() = False
-ToString() = "Scores: 0 4 0, Turn total: 0\nCurrent player: 1\n"
 History() = [0, 1, 0, 3, 1, 1, 1]
 HistoryString() = "0 1 0 3 1 1 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationState(0) = "Scores: 0 4 0, Turn total: 0\nCurrent player: 1\n"
-InformationState(1) = "Scores: 0 4 0, Turn total: 0\nCurrent player: 1\n"
-InformationState(2) = "Scores: 0 4 0, Turn total: 0\nCurrent player: 1\n"
-InformationStateAsNormalizedVector(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateAsNormalizedVector(1) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateAsNormalizedVector(2) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationString(0) = "Scores: 0 4 0, Turn total: 0\nCurrent player: 1\n"
+ObservationString(1) = "Scores: 0 4 0, Turn total: 0\nCurrent player: 1\n"
+ObservationString(2) = "Scores: 0 4 0, Turn total: 0\nCurrent player: 1\n"
+ObservationTensor(0): ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
+                      ◯◯◯◯◉◯◯
+                      ◉◯◯◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
+                      ◯◯◯◯◉◯◯
+                      ◉◯◯◯◯◯◯
+ObservationTensor(2): ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
+                      ◯◯◯◯◉◯◯
+                      ◉◯◯◯◯◯◯
 Rewards() = [-0.0, -0.0, -0.0]
 Returns() = [-0.0, -0.0, -0.0]
 LegalActions() = [0, 1]
@@ -203,19 +284,29 @@ StringLegalActions() = ["roll", "stop"]
 action: 1
 
 # State 8
+# Scores: 0 4 0, Turn total: 0
+# Current player: 2
 IsTerminal() = False
-ToString() = "Scores: 0 4 0, Turn total: 0\nCurrent player: 2\n"
 History() = [0, 1, 0, 3, 1, 1, 1, 1]
 HistoryString() = "0 1 0 3 1 1 1 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 2
-InformationState(0) = "Scores: 0 4 0, Turn total: 0\nCurrent player: 2\n"
-InformationState(1) = "Scores: 0 4 0, Turn total: 0\nCurrent player: 2\n"
-InformationState(2) = "Scores: 0 4 0, Turn total: 0\nCurrent player: 2\n"
-InformationStateAsNormalizedVector(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateAsNormalizedVector(1) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateAsNormalizedVector(2) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationString(0) = "Scores: 0 4 0, Turn total: 0\nCurrent player: 2\n"
+ObservationString(1) = "Scores: 0 4 0, Turn total: 0\nCurrent player: 2\n"
+ObservationString(2) = "Scores: 0 4 0, Turn total: 0\nCurrent player: 2\n"
+ObservationTensor(0): ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
+                      ◯◯◯◯◉◯◯
+                      ◉◯◯◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
+                      ◯◯◯◯◉◯◯
+                      ◉◯◯◯◯◯◯
+ObservationTensor(2): ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
+                      ◯◯◯◯◉◯◯
+                      ◉◯◯◯◯◯◯
 Rewards() = [-0.0, -0.0, -0.0]
 Returns() = [-0.0, -0.0, -0.0]
 LegalActions() = [0, 1]
@@ -225,19 +316,29 @@ StringLegalActions() = ["roll", "stop"]
 action: 0
 
 # State 9
+# Scores: 0 4 0, Turn total: 0
+# Current player: 2 (rolling)
 IsTerminal() = False
-ToString() = "Scores: 0 4 0, Turn total: 0\nCurrent player: 2 (rolling)\n"
 History() = [0, 1, 0, 3, 1, 1, 1, 1, 0]
 HistoryString() = "0 1 0 3 1 1 1 1 0"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
-InformationState(0) = "Scores: 0 4 0, Turn total: 0\nCurrent player: 2 (rolling)\n"
-InformationState(1) = "Scores: 0 4 0, Turn total: 0\nCurrent player: 2 (rolling)\n"
-InformationState(2) = "Scores: 0 4 0, Turn total: 0\nCurrent player: 2 (rolling)\n"
-InformationStateAsNormalizedVector(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateAsNormalizedVector(1) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateAsNormalizedVector(2) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationString(0) = "Scores: 0 4 0, Turn total: 0\nCurrent player: 2 (rolling)\n"
+ObservationString(1) = "Scores: 0 4 0, Turn total: 0\nCurrent player: 2 (rolling)\n"
+ObservationString(2) = "Scores: 0 4 0, Turn total: 0\nCurrent player: 2 (rolling)\n"
+ObservationTensor(0): ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
+                      ◯◯◯◯◉◯◯
+                      ◉◯◯◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
+                      ◯◯◯◯◉◯◯
+                      ◉◯◯◯◯◯◯
+ObservationTensor(2): ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
+                      ◯◯◯◯◉◯◯
+                      ◉◯◯◯◯◯◯
 ChanceOutcomes() = [{1, 0.166666666667}, {2, 0.166666666667}, {3, 0.166666666667}, {4, 0.166666666667}, {5, 0.166666666667}, {6, 0.166666666667}]
 LegalActions() = [1, 2, 3, 4, 5, 6]
 StringLegalActions() = ["chance outcome 1", "chance outcome 2", "chance outcome 3", "chance outcome 4", "chance outcome 5", "chance outcome 6"]
@@ -246,19 +347,29 @@ StringLegalActions() = ["chance outcome 1", "chance outcome 2", "chance outcome 
 action: 2
 
 # State 10
+# Scores: 0 4 0, Turn total: 3
+# Current player: 2
 IsTerminal() = False
-ToString() = "Scores: 0 4 0, Turn total: 3\nCurrent player: 2\n"
 History() = [0, 1, 0, 3, 1, 1, 1, 1, 0, 2]
 HistoryString() = "0 1 0 3 1 1 1 1 0 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 2
-InformationState(0) = "Scores: 0 4 0, Turn total: 3\nCurrent player: 2\n"
-InformationState(1) = "Scores: 0 4 0, Turn total: 3\nCurrent player: 2\n"
-InformationState(2) = "Scores: 0 4 0, Turn total: 3\nCurrent player: 2\n"
-InformationStateAsNormalizedVector(0) = [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateAsNormalizedVector(1) = [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateAsNormalizedVector(2) = [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationString(0) = "Scores: 0 4 0, Turn total: 3\nCurrent player: 2\n"
+ObservationString(1) = "Scores: 0 4 0, Turn total: 3\nCurrent player: 2\n"
+ObservationString(2) = "Scores: 0 4 0, Turn total: 3\nCurrent player: 2\n"
+ObservationTensor(0): ◯◯◯◉◯◯◯
+                      ◉◯◯◯◯◯◯
+                      ◯◯◯◯◉◯◯
+                      ◉◯◯◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯◯◯
+                      ◉◯◯◯◯◯◯
+                      ◯◯◯◯◉◯◯
+                      ◉◯◯◯◯◯◯
+ObservationTensor(2): ◯◯◯◉◯◯◯
+                      ◉◯◯◯◯◯◯
+                      ◯◯◯◯◉◯◯
+                      ◉◯◯◯◯◯◯
 Rewards() = [-0.0, -0.0, -0.0]
 Returns() = [-0.0, -0.0, -0.0]
 LegalActions() = [0, 1]
@@ -268,19 +379,29 @@ StringLegalActions() = ["roll", "stop"]
 action: 0
 
 # State 11
+# Scores: 0 4 0, Turn total: 3
+# Current player: 2 (rolling)
 IsTerminal() = False
-ToString() = "Scores: 0 4 0, Turn total: 3\nCurrent player: 2 (rolling)\n"
 History() = [0, 1, 0, 3, 1, 1, 1, 1, 0, 2, 0]
 HistoryString() = "0 1 0 3 1 1 1 1 0 2 0"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
-InformationState(0) = "Scores: 0 4 0, Turn total: 3\nCurrent player: 2 (rolling)\n"
-InformationState(1) = "Scores: 0 4 0, Turn total: 3\nCurrent player: 2 (rolling)\n"
-InformationState(2) = "Scores: 0 4 0, Turn total: 3\nCurrent player: 2 (rolling)\n"
-InformationStateAsNormalizedVector(0) = [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateAsNormalizedVector(1) = [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateAsNormalizedVector(2) = [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationString(0) = "Scores: 0 4 0, Turn total: 3\nCurrent player: 2 (rolling)\n"
+ObservationString(1) = "Scores: 0 4 0, Turn total: 3\nCurrent player: 2 (rolling)\n"
+ObservationString(2) = "Scores: 0 4 0, Turn total: 3\nCurrent player: 2 (rolling)\n"
+ObservationTensor(0): ◯◯◯◉◯◯◯
+                      ◉◯◯◯◯◯◯
+                      ◯◯◯◯◉◯◯
+                      ◉◯◯◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯◯◯
+                      ◉◯◯◯◯◯◯
+                      ◯◯◯◯◉◯◯
+                      ◉◯◯◯◯◯◯
+ObservationTensor(2): ◯◯◯◉◯◯◯
+                      ◉◯◯◯◯◯◯
+                      ◯◯◯◯◉◯◯
+                      ◉◯◯◯◯◯◯
 ChanceOutcomes() = [{1, 0.166666666667}, {2, 0.166666666667}, {3, 0.166666666667}, {4, 0.166666666667}, {5, 0.166666666667}, {6, 0.166666666667}]
 LegalActions() = [1, 2, 3, 4, 5, 6]
 StringLegalActions() = ["chance outcome 1", "chance outcome 2", "chance outcome 3", "chance outcome 4", "chance outcome 5", "chance outcome 6"]
@@ -289,19 +410,29 @@ StringLegalActions() = ["chance outcome 1", "chance outcome 2", "chance outcome 
 action: 3
 
 # State 12
+# Scores: 0 4 0, Turn total: 7
+# Current player: 2
 IsTerminal() = False
-ToString() = "Scores: 0 4 0, Turn total: 7\nCurrent player: 2\n"
 History() = [0, 1, 0, 3, 1, 1, 1, 1, 0, 2, 0, 3]
 HistoryString() = "0 1 0 3 1 1 1 1 0 2 0 3"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 2
-InformationState(0) = "Scores: 0 4 0, Turn total: 7\nCurrent player: 2\n"
-InformationState(1) = "Scores: 0 4 0, Turn total: 7\nCurrent player: 2\n"
-InformationState(2) = "Scores: 0 4 0, Turn total: 7\nCurrent player: 2\n"
-InformationStateAsNormalizedVector(0) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateAsNormalizedVector(1) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateAsNormalizedVector(2) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationString(0) = "Scores: 0 4 0, Turn total: 7\nCurrent player: 2\n"
+ObservationString(1) = "Scores: 0 4 0, Turn total: 7\nCurrent player: 2\n"
+ObservationString(2) = "Scores: 0 4 0, Turn total: 7\nCurrent player: 2\n"
+ObservationTensor(0): ◯◯◯◯◯◯◉
+                      ◉◯◯◯◯◯◯
+                      ◯◯◯◯◉◯◯
+                      ◉◯◯◯◯◯◯
+ObservationTensor(1): ◯◯◯◯◯◯◉
+                      ◉◯◯◯◯◯◯
+                      ◯◯◯◯◉◯◯
+                      ◉◯◯◯◯◯◯
+ObservationTensor(2): ◯◯◯◯◯◯◉
+                      ◉◯◯◯◯◯◯
+                      ◯◯◯◯◉◯◯
+                      ◉◯◯◯◯◯◯
 Rewards() = [-0.0, -0.0, -0.0]
 Returns() = [-0.0, -0.0, -0.0]
 LegalActions() = [1]
@@ -311,18 +442,28 @@ StringLegalActions() = ["stop"]
 action: 1
 
 # State 13
+# Scores: 0 4 7, Turn total: 0
+# Current player: 0
 IsTerminal() = True
-ToString() = "Scores: 0 4 7, Turn total: 0\nCurrent player: 0\n"
 History() = [0, 1, 0, 3, 1, 1, 1, 1, 0, 2, 0, 3, 1]
 HistoryString() = "0 1 0 3 1 1 1 1 0 2 0 3 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
-InformationState(0) = "Scores: 0 4 7, Turn total: 0\nCurrent player: 0\n"
-InformationState(1) = "Scores: 0 4 7, Turn total: 0\nCurrent player: 0\n"
-InformationState(2) = "Scores: 0 4 7, Turn total: 0\nCurrent player: 0\n"
-InformationStateAsNormalizedVector(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0]
-InformationStateAsNormalizedVector(1) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0]
-InformationStateAsNormalizedVector(2) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0]
+ObservationString(0) = "Scores: 0 4 7, Turn total: 0\nCurrent player: 0\n"
+ObservationString(1) = "Scores: 0 4 7, Turn total: 0\nCurrent player: 0\n"
+ObservationString(2) = "Scores: 0 4 7, Turn total: 0\nCurrent player: 0\n"
+ObservationTensor(0): ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
+                      ◯◯◯◯◉◯◯
+                      ◯◯◯◯◯◯◉
+ObservationTensor(1): ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
+                      ◯◯◯◯◉◯◯
+                      ◯◯◯◯◯◯◉
+ObservationTensor(2): ◉◯◯◯◯◯◯
+                      ◉◯◯◯◯◯◯
+                      ◯◯◯◯◉◯◯
+                      ◯◯◯◯◯◯◉
 Rewards() = [0.5, 0.5, -1.0]
 Returns() = [0.5, 0.5, -1.0]

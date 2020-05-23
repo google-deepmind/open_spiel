@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef THIRD_PARTY_OPEN_SPIEL_GAMES_PHANTOM_TTT_H_
-#define THIRD_PARTY_OPEN_SPIEL_GAMES_PHANTOM_TTT_H_
+#ifndef OPEN_SPIEL_GAMES_PHANTOM_TTT_H_
+#define OPEN_SPIEL_GAMES_PHANTOM_TTT_H_
 
 #include <array>
 #include <map>
@@ -60,24 +60,20 @@ class PhantomTTTState : public State {
 
   // Forward to underlying game state
   Player CurrentPlayer() const override { return state_.CurrentPlayer(); }
-  std::string ActionToString(Player player, Action action_id) const {
+  std::string ActionToString(Player player, Action action_id) const override {
     return state_.ActionToString(player, action_id);
   }
   std::string ToString() const override { return state_.ToString(); }
   bool IsTerminal() const override { return state_.IsTerminal(); }
   std::vector<double> Returns() const override { return state_.Returns(); }
-  std::string Observation(Player player) const override {
-    return state_.Observation(player);
-  }
-  void ObservationAsNormalizedVector(
-      Player player, std::vector<double>* values) const override {
-    state_.ObservationAsNormalizedVector(player, values);
-  }
+  std::string ObservationString(Player player) const override;
+  void ObservationTensor(Player player,
+                         std::vector<double>* values) const override;
 
   // These are implemented for phantom games
-  std::string InformationState(Player player) const override;
-  void InformationStateAsNormalizedVector(
-      Player player, std::vector<double>* values) const override;
+  std::string InformationStateString(Player player) const override;
+  void InformationStateTensor(Player player,
+                              std::vector<double>* values) const override;
   std::unique_ptr<State> Clone() const override;
   void UndoAction(Player player, Action move) override;
   std::vector<Action> LegalActions() const override;
@@ -112,16 +108,14 @@ class PhantomTTTGame : public Game {
   double MinUtility() const override { return game_->MinUtility(); }
   double UtilitySum() const override { return game_->UtilitySum(); }
   double MaxUtility() const override { return game_->MaxUtility(); }
-  std::vector<int> ObservationNormalizedVectorShape() const {
-    return game_->ObservationNormalizedVectorShape();
-  }
 
   std::shared_ptr<const Game> Clone() const override {
     return std::shared_ptr<const Game>(new PhantomTTTGame(*this));
   }
-  // This will depend on the obstype parameter.
-  std::vector<int> InformationStateNormalizedVectorShape() const override;
-  int MaxGameLength() const { return kLongestSequence; }
+  // These will depend on the obstype parameter.
+  std::vector<int> InformationStateTensorShape() const override;
+  std::vector<int> ObservationTensorShape() const override;
+  int MaxGameLength() const override { return kLongestSequence; }
 
  private:
   std::shared_ptr<const tic_tac_toe::TicTacToeGame> game_;
@@ -143,4 +137,4 @@ inline std::ostream& operator<<(std::ostream& stream,
 }  // namespace phantom_ttt
 }  // namespace open_spiel
 
-#endif  // THIRD_PARTY_OPEN_SPIEL_GAMES_PHANTOM_TTT_H_
+#endif  // OPEN_SPIEL_GAMES_PHANTOM_TTT_H_

@@ -36,8 +36,8 @@ int main(int argc, char** argv) {
            open_spiel::GameType::RewardModel::kTerminal,
            /*max_num_players=*/2,
            /*min_num_players=*/2,
-           /*provides_information_state=*/true,
-           /*provides_information_state_as_normalized_vector=*/true,
+           /*provides_information_state_string=*/true,
+           /*provides_information_state_tensor=*/true,
            /*parameter_specification=*/{}},
           {},                       // Empty parameters
           {"Cooperate", "Defect"},  // (Row) Player 0's actions

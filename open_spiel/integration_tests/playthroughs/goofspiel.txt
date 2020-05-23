@@ -1,5 +1,4 @@
 game: goofspiel(imp_info=True,num_cards=4,points_order=descending)
-seed: 3694876523
 
 GameType.chance_mode = ChanceMode.EXPLICIT_STOCHASTIC
 GameType.dynamics = Dynamics.SIMULTANEOUS
@@ -7,39 +6,53 @@ GameType.information = Information.PERFECT_INFORMATION
 GameType.long_name = "Goofspiel"
 GameType.max_num_players = 10
 GameType.min_num_players = 2
-GameType.parameter_specification = ["imp_info", "num_cards", "players", "points_order"]
-GameType.provides_information_state = True
-GameType.provides_information_state_as_normalized_vector = True
-GameType.provides_observation = False
-GameType.provides_observation_as_normalized_vector = False
+GameType.parameter_specification = ["imp_info", "num_cards", "players", "points_order", "returns_type"]
+GameType.provides_information_state_string = True
+GameType.provides_information_state_tensor = True
+GameType.provides_observation_string = True
+GameType.provides_observation_tensor = True
 GameType.reward_model = RewardModel.TERMINAL
 GameType.short_name = "goofspiel"
 GameType.utility = Utility.ZERO_SUM
 
 NumDistinctActions() = 4
+PolicyTensorShape() = [4]
 MaxChanceOutcomes() = 0
-GetParameters() = {imp_info=True,num_cards=4,players=2,points_order=descending}
+GetParameters() = {imp_info=True,num_cards=4,players=2,points_order=descending,returns_type=win_loss}
 NumPlayers() = 2
 MinUtility() = -1.0
 MaxUtility() = 1.0
 UtilitySum() = 0.0
-InformationStateNormalizedVectorShape() = [52]
-InformationStateNormalizedVectorSize() = 52
+InformationStateTensorShape() = [66]
+InformationStateTensorLayout() = TensorLayout.CHW
+InformationStateTensorSize() = 66
+ObservationTensorShape() = [38]
+ObservationTensorLayout() = TensorLayout.CHW
+ObservationTensorSize() = 38
 MaxGameLength() = 4
 ToString() = "goofspiel(imp_info=True,num_cards=4,points_order=descending)"
 
 # State 0
+# P0 hand: 1 2 3 4
+# P1 hand: 1 2 3 4
+# P0 actions:
+# P1 actions:
+# Point card sequence:
+# Points: 0 0
 IsTerminal() = False
-ToString() = "P0 hand: 1 2 3 4 \nP1 hand: 1 2 3 4 \nP0 actions: \nP1 actions: \nPoint card: 4\nPoints: 0 0 \n"
 History() = []
 HistoryString() = ""
 IsChanceNode() = False
 IsSimultaneousNode() = True
 CurrentPlayer() = -2
-InformationState(0) = "P0 hand: 1 2 3 4 \nP0 action sequence: \nPoint card: 4\nWin sequence: \nPoints: 0 0 \n"
-InformationState(1) = "P1 hand: 1 2 3 4 \nP1 action sequence: \nPoint card: 4\nWin sequence: \nPoints: 0 0 \n"
-InformationStateAsNormalizedVector(0) = [1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateAsNormalizedVector(1) = [0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+InformationStateString(0) = "P0 hand: 1 2 3 4 \nP0 action sequence: \nPoint card sequence: \nWin sequence: \nPoints: 0 0 \n"
+InformationStateString(1) = "P1 hand: 1 2 3 4 \nP1 action sequence: \nPoint card sequence: \nWin sequence: \nPoints: 0 0 \n"
+InformationStateTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(1): ◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationString(0) = "Current point card: 4\nPoints: 0 0 \nP0 hand: 1 2 3 4 \nWin Sequence: \n"
+ObservationString(1) = "Current point card: 4\nPoints: 0 0 \nP1 hand: 1 2 3 4 \nWin Sequence: \n"
+ObservationTensor(0): ◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◉◉◉◯◯◯◯◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◉◉◉◯◯◯◯◯◯◯◯
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions(0) = [0, 1, 2, 3]
@@ -51,17 +64,26 @@ StringLegalActions(1) = ["[P1]Bid: 1", "[P1]Bid: 2", "[P1]Bid: 3", "[P1]Bid: 4"]
 actions: [2, 3]
 
 # State 1
+# P0 hand: 1 2 4
+# P1 hand: 1 2 3
+# P0 actions: 2
+# P1 actions: 3
+# Point card sequence:
+# Points: 0 4
 IsTerminal() = False
-ToString() = "P0 hand: 1 2 4 \nP1 hand: 1 2 3 \nP0 actions: 2 \nP1 actions: 3 \nPoint card: 3\nPoints: 0 4 \n"
 History() = [2, 3]
 HistoryString() = "2 3"
 IsChanceNode() = False
 IsSimultaneousNode() = True
 CurrentPlayer() = -2
-InformationState(0) = "P0 hand: 1 2 4 \nP0 action sequence: 2 \nPoint card: 3\nWin sequence: 1 \nPoints: 0 4 \n"
-InformationState(1) = "P1 hand: 1 2 3 \nP1 action sequence: 3 \nPoint card: 3\nWin sequence: 1 \nPoints: 0 4 \n"
-InformationStateAsNormalizedVector(0) = [1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateAsNormalizedVector(1) = [0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+InformationStateString(0) = "P0 hand: 1 2 4 \nP0 action sequence: 2 \nPoint card sequence: \nWin sequence: 1 \nPoints: 0 4 \n"
+InformationStateString(1) = "P1 hand: 1 2 3 \nP1 action sequence: 3 \nPoint card sequence: \nWin sequence: 1 \nPoints: 0 4 \n"
+InformationStateTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(1): ◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◉◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationString(0) = "Current point card: 3\nPoints: 0 4 \nP0 hand: 1 2 4 \nWin Sequence: 1 \n"
+ObservationString(1) = "Current point card: 3\nPoints: 0 4 \nP1 hand: 1 2 3 \nWin Sequence: 1 \n"
+ObservationTensor(0): ◯◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◉◉◯◉◯◉◯◯◯◯◯◯
+ObservationTensor(1): ◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◉◉◯◯◉◯◯◯◯◯◯
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions(0) = [0, 1, 3]
@@ -73,17 +95,26 @@ StringLegalActions(1) = ["[P1]Bid: 1", "[P1]Bid: 2", "[P1]Bid: 3"]
 actions: [1, 0]
 
 # State 2
+# P0 hand: 1 4
+# P1 hand: 2 3
+# P0 actions: 2 1
+# P1 actions: 3 0
+# Point card sequence:
+# Points: 3 4
 IsTerminal() = False
-ToString() = "P0 hand: 1 4 \nP1 hand: 2 3 \nP0 actions: 2 1 \nP1 actions: 3 0 \nPoint card: 2\nPoints: 3 4 \n"
 History() = [2, 3, 1, 0]
 HistoryString() = "2 3 1 0"
 IsChanceNode() = False
 IsSimultaneousNode() = True
 CurrentPlayer() = -2
-InformationState(0) = "P0 hand: 1 4 \nP0 action sequence: 2 1 \nPoint card: 2\nWin sequence: 1 0 \nPoints: 3 4 \n"
-InformationState(1) = "P1 hand: 2 3 \nP1 action sequence: 3 0 \nPoint card: 2\nWin sequence: 1 0 \nPoints: 3 4 \n"
-InformationStateAsNormalizedVector(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-InformationStateAsNormalizedVector(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+InformationStateString(0) = "P0 hand: 1 4 \nP0 action sequence: 2 1 \nPoint card sequence: \nWin sequence: 1 0 \nPoints: 3 4 \n"
+InformationStateString(1) = "P1 hand: 2 3 \nP1 action sequence: 3 0 \nPoint card sequence: \nWin sequence: 1 0 \nPoints: 3 4 \n"
+InformationStateTensor(0): ◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(1): ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◉◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯
+ObservationString(0) = "Current point card: 2\nPoints: 3 4 \nP0 hand: 1 4 \nWin Sequence: 1 0 \n"
+ObservationString(1) = "Current point card: 2\nPoints: 3 4 \nP1 hand: 2 3 \nWin Sequence: 1 0 \n"
+ObservationTensor(0): ◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◉◉◯◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◉◯◯◉◉◯◯◯◯◯
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions(0) = [0, 3]
@@ -95,16 +126,25 @@ StringLegalActions(1) = ["[P1]Bid: 2", "[P1]Bid: 3"]
 actions: [3, 1]
 
 # State 3
+# P0 hand:
+# P1 hand:
+# P0 actions: 2 1 3 0
+# P1 actions: 3 0 1 2
+# Point card sequence:
+# Points: 5 5
 IsTerminal() = True
-ToString() = "P0 hand: \nP1 hand: \nP0 actions: 2 1 3 0 \nP1 actions: 3 0 1 2 \nPoints: 5 5 \n"
 History() = [2, 3, 1, 0, 3, 1]
 HistoryString() = "2 3 1 0 3 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
-InformationState(0) = "P0 hand: \nP0 action sequence: 2 1 3 0 \nWin sequence: 1 0 0 1 \nPoints: 5 5 \n"
-InformationState(1) = "P1 hand: \nP1 action sequence: 3 0 1 2 \nWin sequence: 1 0 0 1 \nPoints: 5 5 \n"
-InformationStateAsNormalizedVector(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0]
-InformationStateAsNormalizedVector(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0]
+InformationStateString(0) = "P0 hand: \nP0 action sequence: 2 1 3 0 \nPoint card sequence: \nWin sequence: 1 0 0 1 \nPoints: 5 5 \n"
+InformationStateString(1) = "P1 hand: \nP1 action sequence: 3 0 1 2 \nPoint card sequence: \nWin sequence: 1 0 0 1 \nPoints: 5 5 \n"
+InformationStateTensor(0): ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◉◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◉◉◯◯◯
+InformationStateTensor(1): ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◉◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◉◯◯◯◯◉◯
+ObservationString(0) = "Current point card: 0\nPoints: 5 5 \nP0 hand: \nWin Sequence: 1 0 0 1 \n"
+ObservationString(1) = "Current point card: 0\nPoints: 5 5 \nP1 hand: \nWin Sequence: 1 0 0 1 \n"
+ObservationTensor(0): ◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◉◯◉◯◯◉
+ObservationTensor(1): ◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◉◯◉◯◯◉
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]

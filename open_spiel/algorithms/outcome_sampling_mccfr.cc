@@ -28,14 +28,26 @@ namespace algorithms {
 
 OutcomeSamplingMCCFRSolver::OutcomeSamplingMCCFRSolver(const Game& game,
                                                        double epsilon, int seed)
+    : OutcomeSamplingMCCFRSolver(game, std::make_shared<UniformPolicy>(),
+                                 epsilon, seed) {}
+
+OutcomeSamplingMCCFRSolver::OutcomeSamplingMCCFRSolver(
+    const Game& game, std::shared_ptr<Policy> default_policy, double epsilon,
+    int seed)
     : game_(game),
       epsilon_(epsilon),
       num_players_(game.NumPlayers()),
       update_player_(-1),
       rng_(seed >= 0 ? seed : std::mt19937::default_seed),
       dist_(0.0, 1.0),
-      uniform_policy_(std::shared_ptr<TabularPolicy>(
-          new TabularPolicy(GetUniformPolicy(game)))) {}
+      default_policy_(default_policy) {
+  if (game_.GetType().dynamics != GameType::Dynamics::kSequential) {
+    SpielFatalError(
+        "MCCFR requires sequential games. If you're trying to run it "
+        "on a simultaneous (or normal-form) game, please first transform it "
+        "using turn_based_simultaneous_game.");
+  }
+}
 
 void OutcomeSamplingMCCFRSolver::RunIteration(std::mt19937* rng) {
   update_player_ = (update_player_ + 1) % num_players_;
@@ -79,7 +91,7 @@ double OutcomeSamplingMCCFRSolver::SampleEpisode(State* state,
     return state->PlayerReturn(update_player_);
   } else if (state->IsChanceNode()) {
     std::pair<Action, double> outcome_and_prob =
-        SampleChanceOutcome(state->ChanceOutcomes(), dist_(*rng));
+        SampleAction(state->ChanceOutcomes(), dist_(*rng));
     SPIEL_CHECK_PROB(outcome_and_prob.second);
     SPIEL_CHECK_GT(outcome_and_prob.second, 0);
     state->ApplyAction(outcome_and_prob.first);
@@ -95,7 +107,7 @@ double OutcomeSamplingMCCFRSolver::SampleEpisode(State* state,
   SPIEL_CHECK_PROB(sample_reach);
 
   int player = state->CurrentPlayer();
-  std::string is_key = state->InformationState(player);
+  std::string is_key = state->InformationStateString(player);
   std::vector<Action> legal_actions = state->LegalActions();
 
   // The insert here only inserts the default value if the key is not found,

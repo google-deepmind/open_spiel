@@ -34,8 +34,8 @@ public struct KuhnPoker: GameProtocol {
     rewardModel: .terminal,
     maxPlayers: 10,
     minPlayers: 2,
-    providesInformationState: true,
-    providesInformationStateAsNormalizedVector: true
+    providesInformationStateString: true,
+    providesInformationStateTensor: true
   )
 
   public enum Action: Hashable {
@@ -58,7 +58,7 @@ public struct KuhnPoker: GameProtocol {
       return Double(player == winner ? (pot - bet) : -bet)
     }
     /// Information state is card then bets, e.g. 1pb.
-    public func informationState(for player: Player) -> String {
+    public func informationStateString(for player: Player) -> String {
       switch player {
       case let .player(playerID) where playerID < game.playerCount:
         if history.count <= playerID { return "" }
@@ -72,7 +72,7 @@ public struct KuhnPoker: GameProtocol {
       }
     }
 
-    public func informationStateAsNormalizedVector(for player: Player) -> [Double] {
+    public func informationStateTensor(for player: Player) -> [Double] {
       // Initialize the vector with zeros.
       var values = Array<Double>(repeating: 0, count: 6 * game.playerCount - 1)
       switch player {
@@ -119,7 +119,7 @@ public struct KuhnPoker: GameProtocol {
     return State(game: self)
   }
 
-  public var informationStateNormalizedVectorShape: [Int] {
+  public var informationStateTensorShape: [Int] {
     return [6 * playerCount - 1]
   }
 }

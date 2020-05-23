@@ -45,10 +45,10 @@ const GameType kGameType{
     GameType::RewardModel::kTerminal,
     /*max_num_players=*/2,
     /*min_num_players=*/2,
-    /*provides_information_state=*/false,
-    /*provides_information_state_as_normalized_vector=*/false,
-    /*provides_observation=*/true,
-    /*provides_observation_as_normalized_vector=*/true,
+    /*provides_information_state_string=*/false,
+    /*provides_information_state_tensor=*/false,
+    /*provides_observation_string=*/true,
+    /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
     {{"enable_proposals", GameParameter(kDefaultEnableProposals)},
      {"enable_utterances", GameParameter(kDefaultEnableUtterances)},
@@ -126,7 +126,10 @@ std::vector<double> NegotiationState::Returns() const {
   return returns;
 }
 
-std::string NegotiationState::Observation(Player player) const {
+std::string NegotiationState::ObservationString(Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+
   if (IsChanceNode()) {
     return "ChanceNode -- no observation";
   }
@@ -166,15 +169,18 @@ std::string NegotiationState::Observation(Player player) const {
 //   - Last proposal:   (num_items * (max_quantity + 1) bits)
 // If utterances are enabled, another:
 //   - Last utterance:  (utterance_dim * num_symbols) bits)
-std::vector<int> NegotiationGame::ObservationNormalizedVectorShape() const {
+std::vector<int> NegotiationGame::ObservationTensorShape() const {
   return {kNumPlayers + 2 + 2 + (num_items_ * (kMaxQuantity + 1)) +
           (num_items_ * (kMaxValue + 1)) + (num_items_ * (kMaxQuantity + 1)) +
           (enable_utterances_ ? utterance_dim_ * num_symbols_ : 0)};
 }
 
-void NegotiationState::ObservationAsNormalizedVector(
-    Player player, std::vector<double>* values) const {
-  values->resize(parent_game_.ObservationNormalizedVectorSize());
+void NegotiationState::ObservationTensor(Player player,
+                                         std::vector<double>* values) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+
+  values->resize(parent_game_.ObservationTensorSize());
   std::fill(values->begin(), values->end(), 0);
 
   // No observations at chance nodes.

@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef THIRD_PARTY_OPEN_SPIEL_GAMES_HANABI_H_
-#define THIRD_PARTY_OPEN_SPIEL_GAMES_HANABI_H_
+#ifndef OPEN_SPIEL_GAMES_HANABI_H_
+#define OPEN_SPIEL_GAMES_HANABI_H_
 
 // Hanabi is a cooperative card game, described here:
 // https://en.wikipedia.org/wiki/Hanabi_(card_game)
@@ -26,14 +26,8 @@
 // can be found here: https://github.com/deepmind/hanabi-learning-environment
 //
 // Since Hanabi relies on an (optional) external dependency, it is not included
-// in the list of compiled games by default. To enable it, follow these steps:
-//   1. git clone the Hanabi Learning Environment above (e.g. in $HOME)
-//   2. Set the path of HANABI_HOME in games/hanabi/CMakeLists.txt
-//   3. Uncomment hanabi.cc, hanabi.h, and the add_subdirectory (hanabi) in
-//      games/CMakeLists.txt
-//   4. Uncomment the $<TARGET_OBJECTS:hanabi_learning_environment> in the
-//      top-level CMakeLists.txt
-//   5. Enjoy the fireworks!
+// in the list of compiled games by default. To enable it, read `install.md`
+// (TLDR: Set the environment variable BUILD_WITH_HANABI to ON).
 
 #include <memory>
 
@@ -55,7 +49,7 @@ class OpenSpielHanabiGame : public Game {
   double MinUtility() const override;
   double MaxUtility() const override;
   std::shared_ptr<const Game> Clone() const override;
-  std::vector<int> ObservationNormalizedVectorShape() const override;
+  std::vector<int> ObservationTensorShape() const override;
   int MaxGameLength() const override;
 
   const hanabi_learning_env::ObservationEncoder& Encoder() const {
@@ -83,9 +77,9 @@ class OpenSpielHanabiState : public State {
   // state would have to include the entire history of the game, and is
   // impractically large.
   // The observation by default includes knowledge inferred from past hints.
-  std::string Observation(Player player) const override;
-  void ObservationAsNormalizedVector(Player player,
-                                     std::vector<double>* values) const;
+  std::string ObservationString(Player player) const override;
+  void ObservationTensor(Player player,
+                         std::vector<double>* values) const override;
 
   std::unique_ptr<State> Clone() const override;
   ActionsAndProbs ChanceOutcomes() const override;
@@ -104,4 +98,4 @@ class OpenSpielHanabiState : public State {
 }  // namespace hanabi
 }  // namespace open_spiel
 
-#endif  // THIRD_PARTY_OPEN_SPIEL_GAMES_HANABI_H_
+#endif  // OPEN_SPIEL_GAMES_HANABI_H_

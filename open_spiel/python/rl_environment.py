@@ -50,7 +50,8 @@ from __future__ import division
 from __future__ import print_function
 
 import collections
-import logging
+
+from absl import logging
 import enum
 import numpy as np
 
@@ -124,6 +125,9 @@ class ChanceEventSampler(object):
   """Default sampler for external chance events."""
 
   def __init__(self, seed=None):
+    self.seed(seed)
+
+  def seed(self, seed=None):
     self._rng = np.random.RandomState(seed)
 
   def __call__(self, state):
@@ -132,34 +136,46 @@ class ChanceEventSampler(object):
     return self._rng.choice(actions, p=probs)
 
 
+class ObservationType(enum.Enum):
+  """Defines what kind of observation to use."""
+  OBSERVATION = 0  # Use observation_tensor
+  INFORMATION_STATE = 1  # Use information_state_tensor
+
+
 class Environment(object):
   """Open Spiel reinforcement learning environment class."""
 
   def __init__(self,
-               game_name,
+               game,
                discount=1.0,
                chance_event_sampler=None,
+               observation_type=None,
                **kwargs):
     """Constructor.
 
     Args:
-      game_name: string, Open Spiel game name.
+      game: [string, pyspiel.Game] Open Spiel game name or game instance.
       discount: float, discount used in non-initial steps. Defaults to 1.0.
       chance_event_sampler: optional object with `sample_external_events` method
         to sample chance events.
+      observation_type: what kind of observation to use. If not specified, will
+        default to INFORMATION_STATE unless the game doesn't provide it.
       **kwargs: dict, additional settings passed to the Open Spiel game.
     """
     self._chance_event_sampler = chance_event_sampler or ChanceEventSampler()
 
-    if kwargs:
+    if isinstance(game, pyspiel.Game):
+      logging.info("Using game instance: %s", game.get_type().short_name)
+      self._game = game
+    elif kwargs:
       game_settings = {
           key: pyspiel.GameParameter(val) for (key, val) in kwargs.items()
       }
       logging.info("Using game settings: %s", game_settings)
-      self._game = pyspiel.load_game(game_name, game_settings)
+      self._game = pyspiel.load_game(game, game_settings)
     else:
-      logging.info("Using game string: %s", game_name)
-      self._game = pyspiel.load_game(game_name)
+      logging.info("Using game string: %s", game)
+      self._game = pyspiel.load_game(game)
 
     self._num_players = self._game.num_players()
     self._state = None
@@ -168,14 +184,62 @@ class Environment(object):
     # Discount returned at non-initial steps.
     self._discounts = [discount] * self._num_players
 
-    # Decide whether to use observation or information_state
-    if self._game.get_type().provides_information_state_as_normalized_vector:
-      self._use_observation = False
-    elif self._game.get_type().provides_observation_as_normalized_vector:
-      self._use_observation = True
-    else:
-      raise ValueError("Game must provide either information state or "
-                       "observation as a normalized vector")
+    # Determine what observation type to use.
+    if observation_type is None:
+      if self._game.get_type().provides_information_state_tensor:
+        observation_type = ObservationType.INFORMATION_STATE
+      else:
+        observation_type = ObservationType.OBSERVATION
+
+    # Check the requested observation type is supported.
+    if observation_type == ObservationType.OBSERVATION:
+      if not self._game.get_type().provides_observation_tensor:
+        raise ValueError("observation_tensor not supported by " + game)
+    elif observation_type == ObservationType.INFORMATION_STATE:
+      if not self._game.get_type().provides_information_state_tensor:
+        raise ValueError("information_state_tensor not supported by " + game)
+    self._use_observation = (observation_type == ObservationType.OBSERVATION)
+
+  def seed(self, seed=None):
+    self._chance_event_sampler.seed(seed)
+
+  def get_time_step(self):
+    """Returns a `TimeStep` without updating the environment.
+
+    Returns:
+      A `TimeStep` namedtuple containing:
+        observation: list of dicts containing one observations per player, each
+          corresponding to `observation_spec()`.
+        reward: list of rewards at this timestep, or None if step_type is
+          `StepType.FIRST`.
+        discount: list of discounts in the range [0, 1], or None if step_type is
+          `StepType.FIRST`.
+        step_type: A `StepType` value.
+    """
+    observations = {"info_state": [], "legal_actions": [], "current_player": []}
+    rewards = []
+    step_type = StepType.LAST if self._state.is_terminal() else StepType.MID
+    self._should_reset = step_type == StepType.LAST
+
+    cur_rewards = self._state.rewards()
+    for player_id in range(self.num_players):
+      rewards.append(cur_rewards[player_id])
+      observations["info_state"].append(
+          self._state.observation_tensor(player_id) if self._use_observation
+          else self._state.information_state_tensor(player_id))
+
+      observations["legal_actions"].append(self._state.legal_actions(player_id))
+    observations["current_player"] = self._state.current_player()
+    discounts = self._discounts
+    if step_type == StepType.LAST:
+      # When the game is in a terminal state set the discount to 0.
+      discounts = [0. for _ in discounts]
+
+    return TimeStep(
+        observations=observations,
+        rewards=rewards,
+        discounts=discounts,
+        step_type=step_type)
 
   def step(self, actions):
     """Updates the environment according to `actions` and returns a `TimeStep`.
@@ -203,7 +267,8 @@ class Environment(object):
         step_type: A `StepType` value.
     """
     assert len(actions) == self.num_actions_per_step, (
-        "Invalid number of actions! Expected {}".format(self.num_players))
+        "Invalid number of actions! Expected {}".format(
+            self.num_actions_per_step))
     if self._should_reset:
       return self.reset()
 
@@ -213,27 +278,7 @@ class Environment(object):
       self._state.apply_actions(actions)
     self._sample_external_events()
 
-    observations = {"info_state": [], "legal_actions": [], "current_player": []}
-    rewards = []
-    step_type = StepType.LAST if self._state.is_terminal() else StepType.MID
-    self._should_reset = step_type == StepType.LAST
-
-    cur_rewards = self._state.rewards()
-    for player_id in range(self.num_players):
-      rewards.append(cur_rewards[player_id])
-      observations["info_state"].append(
-          self._state.observation_as_normalized_vector(player_id) if self
-          ._use_observation else self._state
-          .information_state_as_normalized_vector(player_id))
-
-      observations["legal_actions"].append(self._state.legal_actions(player_id))
-    observations["current_player"] = self._state.current_player()
-
-    return TimeStep(
-        observations=observations,
-        rewards=rewards,
-        discounts=self._discounts,
-        step_type=step_type)
+    return self.get_time_step()
 
   def reset(self):
     """Starts a new sequence and returns the first `TimeStep` of this sequence.
@@ -255,9 +300,8 @@ class Environment(object):
     observations = {"info_state": [], "legal_actions": [], "current_player": []}
     for player_id in range(self.num_players):
       observations["info_state"].append(
-          self._state.observation_as_normalized_vector(player_id) if self
-          ._use_observation else self._state
-          .information_state_as_normalized_vector(player_id))
+          self._state.observation_tensor(player_id) if self._use_observation
+          else self._state.information_state_tensor(player_id))
       observations["legal_actions"].append(self._state.legal_actions(player_id))
     observations["current_player"] = self._state.current_player()
 
@@ -284,9 +328,8 @@ class Environment(object):
     """
     return dict(
         info_state=tuple([
-            self._game.observation_normalized_vector_size()
-            if self._use_observation else
-            self._game.information_state_normalized_vector_size()
+            self._game.observation_tensor_size() if self._use_observation else
+            self._game.information_state_tensor_size()
         ]),
         legal_actions=(self._game.num_distinct_actions(),),
         current_player=(),
@@ -339,12 +382,12 @@ class Environment(object):
   def game(self):
     return self._game
 
-  def set_state(self, unused_new_state):
+  def set_state(self, new_state):
     """Updates the game state."""
-    # TODO(author3): add set/get state methods
-    pass
+    assert new_state.get_game() == self.game, (
+        "State must have been created by the same game.")
+    self._state = new_state
 
   @property
   def get_state(self):
-    # TODO(author3): add set/get state methods
-    pass
+    return self._state

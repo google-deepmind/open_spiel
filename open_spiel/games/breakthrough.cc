@@ -20,7 +20,7 @@
 #include <vector>
 
 #include "open_spiel/game_parameters.h"
-#include "open_spiel/tensor_view.h"
+#include "open_spiel/utils/tensor_view.h"
 
 namespace open_spiel {
 namespace breakthrough {
@@ -40,23 +40,22 @@ constexpr std::array<int, kNumDirections> kDirColOffsets = {
     {-1, 0, 1, -1, 0, 1}};
 
 // Facts about the game
-const GameType kGameType{
-    /*short_name=*/"breakthrough",
-    /*long_name=*/"Breakthrough",
-    GameType::Dynamics::kSequential,
-    GameType::ChanceMode::kDeterministic,
-    GameType::Information::kPerfectInformation,
-    GameType::Utility::kZeroSum,
-    GameType::RewardModel::kTerminal,
-    /*max_num_players=*/2,
-    /*min_num_players=*/2,
-    /*provides_information_state=*/true,
-    /*provides_information_state_as_normalized_vector=*/true,
-    /*provides_observation=*/false,
-    /*provides_observation_as_normalized_vector=*/false,
-    /*parameter_specification=*/
-    {{"rows", GameParameter(kDefaultRows)},
-     {"columns", GameParameter(kDefaultColumns)}}};
+const GameType kGameType{/*short_name=*/"breakthrough",
+                         /*long_name=*/"Breakthrough",
+                         GameType::Dynamics::kSequential,
+                         GameType::ChanceMode::kDeterministic,
+                         GameType::Information::kPerfectInformation,
+                         GameType::Utility::kZeroSum,
+                         GameType::RewardModel::kTerminal,
+                         /*max_num_players=*/2,
+                         /*min_num_players=*/2,
+                         /*provides_information_state_string=*/false,
+                         /*provides_information_state_tensor=*/false,
+                         /*provides_observation_string=*/true,
+                         /*provides_observation_tensor=*/true,
+                         /*parameter_specification=*/
+                         {{"rows", GameParameter(kDefaultRows)},
+                          {"columns", GameParameter(kDefaultColumns)}}};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new BreakthroughGame(params));
@@ -318,14 +317,14 @@ std::vector<double> BreakthroughState::Returns() const {
   }
 }
 
-std::string BreakthroughState::InformationState(Player player) const {
+std::string BreakthroughState::ObservationString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   return ToString();
 }
 
-void BreakthroughState::InformationStateAsNormalizedVector(
-    Player player, std::vector<double>* values) const {
+void BreakthroughState::ObservationTensor(Player player,
+                                          std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 

@@ -20,7 +20,7 @@
 
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
-#include "open_spiel/tensor_view.h"
+#include "open_spiel/utils/tensor_view.h"
 
 namespace open_spiel {
 namespace laser_tag {
@@ -42,10 +42,10 @@ const GameType kGameTypeGeneralSum{
     GameType::RewardModel::kRewards,
     /*max_num_players=*/2,
     /*min_num_players=*/2,
-    /*provides_information_state=*/false,
-    /*provides_information_state_as_normalized_vector=*/false,
-    /*provides_observation=*/true,
-    /*provides_observation_as_normalized_vector=*/true,
+    /*provides_information_state_string=*/false,
+    /*provides_information_state_tensor=*/false,
+    /*provides_observation_string=*/true,
+    /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
     {{"horizon", GameParameter(kDefaultHorizon)},
      {"zero_sum", GameParameter(kDefaultZeroSum)},
@@ -467,8 +467,8 @@ int LaserTagState::observation_plane(int r, int c) const {
   return plane;
 }
 
-void LaserTagState::ObservationAsNormalizedVector(
-    int player, std::vector<double>* values) const {
+void LaserTagState::ObservationTensor(int player,
+                                      std::vector<double>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
@@ -479,7 +479,7 @@ void LaserTagState::ObservationAsNormalizedVector(
     for (int c = 0; c < grid_.num_cols; c++) {
       int plane = observation_plane(r, c);
       SPIEL_CHECK_TRUE(plane >= 0 && plane < kCellStates);
-      view[{plane, r,  c}] = 1.0;
+      view[{plane, r, c}] = 1.0;
     }
   }
 }
@@ -519,7 +519,7 @@ double LaserTagGame::MaxUtility() const {
   }
 }
 
-std::vector<int> LaserTagGame::ObservationNormalizedVectorShape() const {
+std::vector<int> LaserTagGame::ObservationTensorShape() const {
   return {kCellStates, grid_.num_rows, grid_.num_cols};
 }
 

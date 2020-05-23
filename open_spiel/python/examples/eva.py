@@ -22,7 +22,7 @@ from absl import app
 from absl import flags
 from absl import logging
 
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 
 from open_spiel.python import policy
 from open_spiel.python import rl_environment
@@ -36,13 +36,13 @@ flags.DEFINE_integer("num_episodes", 1000, "Number of iterations")
 flags.DEFINE_string("game_name", "kuhn_poker", "Name of the game")
 
 
-class JointPolicy(object):
+class JointPolicy(policy.Policy):
   """Joint policy to be evaluated."""
 
   def __init__(self, agents):
     self._agents = agents
 
-  def action_probabilities(self, state):
+  def action_probabilities(self, state, player_id=None):
     cur_player = state.current_player()
     return self._agents[cur_player].action_probabilities(state)
 
@@ -67,7 +67,7 @@ def main(unused_argv):
               embedding_size=12,
               learning_rate=1e-4,
               mixing_parameter=0.5,
-              memory_capacity=1e6,
+              memory_capacity=int(1e6),
               discount_factor=1.0,
               epsilon_start=1.0,
               epsilon_end=0.1,
@@ -86,9 +86,7 @@ def main(unused_argv):
 
     game = pyspiel.load_game(FLAGS.game_name)
     joint_policy = JointPolicy(eva_agents)
-    conv = exploitability.nash_conv(
-        game, policy.PolicyFromCallable(game,
-                                        joint_policy.action_probabilities))
+    conv = exploitability.nash_conv(game, joint_policy)
     logging.info("EVA in '%s' - NashConv: %s", FLAGS.game_name, conv)
 
 

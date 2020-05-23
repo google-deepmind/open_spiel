@@ -27,7 +27,7 @@ import random
 import enum
 import numpy as np
 import sonnet as snt
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 
 from open_spiel.python import rl_agent
 from open_spiel.python.algorithms import dqn
@@ -43,7 +43,7 @@ MODE = enum.Enum("mode", "best_response average_policy")
 class NFSP(rl_agent.AbstractAgent):
   """NFSP Agent implementation in TensorFlow.
 
-  See open_spiel/python/examples/nfsp.py for an usage example.
+  See open_spiel/python/examples/kuhn_nfsp.py for an usage example.
   """
 
   def __init__(self,

@@ -12,10 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef THIRD_PARTY_OPEN_SPIEL_ALGORITHMS_MATRIX_GAMES_UTILS_H_
-#define THIRD_PARTY_OPEN_SPIEL_ALGORITHMS_MATRIX_GAMES_UTILS_H_
+#ifndef OPEN_SPIEL_ALGORITHMS_MATRIX_GAMES_UTILS_H_
+#define OPEN_SPIEL_ALGORITHMS_MATRIX_GAMES_UTILS_H_
 
 #include <memory>
+#include <string>
 
 #include "open_spiel/matrix_game.h"
 #include "open_spiel/spiel.h"
@@ -57,4 +58,4 @@ std::shared_ptr<const matrix_game::MatrixGame> ExtensiveToMatrixGame(
 }  // namespace algorithms
 }  // namespace open_spiel
 
-#endif  // THIRD_PARTY_OPEN_SPIEL_ALGORITHMS_MATRIX_GAME_UTILS_H_
+#endif  // OPEN_SPIEL_ALGORITHMS_MATRIX_GAME_UTILS_H_

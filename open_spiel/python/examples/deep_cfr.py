@@ -23,7 +23,7 @@ from absl import flags
 from absl import logging
 import six
 
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 
 from open_spiel.python import policy
 from open_spiel.python.algorithms import deep_cfr
@@ -64,7 +64,8 @@ def main(unused_argv):
     logging.info("Final policy loss: '%s'", policy_loss)
     conv = exploitability.nash_conv(
         game,
-        policy.PolicyFromCallable(game, deep_cfr_solver.action_probabilities))
+        policy.tabular_policy_from_callable(
+            game, deep_cfr_solver.action_probabilities))
     logging.info("Deep CFR in '%s' - NashConv: %s", FLAGS.game_name, conv)
 
 

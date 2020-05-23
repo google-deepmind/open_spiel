@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Lint as python3
 """Representation of a policy for a game.
 
 This is a standard representation for passing policies into algorithms,
@@ -68,12 +69,14 @@ class Policy(object):
 
     IMPORTANT: We assume the following properties hold:
     - All probabilities are >=0 and sum to 1
-    - Only legal actions are present in the mapping, but it does not have to
-      be exhaustive: missing actions are considered to be associated to a zero
-      probability. This means that one should not iterate over the returned
-      dictionary if they want to iteratve over the full history tree.
-      If bugs are caused by this, we can change it to force policies to
-      exhaustively give the probabilities for all legal actions.
+    - TLDR: Policy implementations should list the (action, prob) for all legal
+      actions, but algorithms should not rely on this (yet).
+      Details: Before May 2020, only legal actions were present in the mapping,
+      but it did not have to be exhaustive: missing actions were considered to
+      be associated to a zero probability.
+      For example, a deterministic state-poliy was previously {action: 1.0}.
+      Given this change of convention is new and hard to enforce, algorithms
+      should not rely on the fact that all legal actions should be present.
 
     Args:
       state: A `pyspiel.State` object.
@@ -83,17 +86,6 @@ class Policy(object):
     Returns:
       A `dict` of `{action: probability}` for the specified player in the
       supplied state.
-    """
-    raise NotImplementedError()
-
-  def copy_with_noise(self, **noise_kwargs):
-    """Returns a copy of this policy perturbed with noise.
-
-    Noise shape depends on policy. It can be parameter perturbation,
-    probability perturbation, etc.
-
-    Args:
-      **noise_kwargs: Eventual arguments for noise generation functions.
     """
     raise NotImplementedError()
 
@@ -109,6 +101,15 @@ class Policy(object):
       Dictionary of action: probability.
     """
     return self.action_probabilities(state, player_id)
+
+  def to_tabular(self):
+    """Returns a new `TabularPolicy` equivalent to this policy."""
+    tabular_policy = TabularPolicy(self.game, self.player_ids)
+    for index, state in enumerate(tabular_policy.states):
+      tabular_policy.action_probability_array[index, :] = 0
+      for action, probability in self.action_probabilities(state).items():
+        tabular_policy.action_probability_array[index, action] = probability
+    return tabular_policy
 
 
 class TabularPolicy(Policy):
@@ -129,14 +130,14 @@ class TabularPolicy(Policy):
   - Set `policy(info_state, action)`:
   ```
   tabular_policy = TabularPolicy(game)
-  info_state_str = state.information_state(<optional player>)
+  info_state_str = state.information_state_string(<optional player>)
   state_policy = tabular_policy.policy_for_key(info_state_str)
   state_policy[action] = <value>
   ```
   - Set `policy(info_state)`:
   ```
   tabular_policy = TabularPolicy(game)
-  info_state_str = state.information_state(<optional player>)
+  info_state_str = state.information_state_string(<optional player>)
   state_policy = tabular_policy.policy_for_key(info_state_str)
   state_policy[:] = <list or numpy.array>
   ```
@@ -157,17 +158,16 @@ class TabularPolicy(Policy):
     states: A `list` of the states as ordered in the `action_probability_array`.
     state_in: array of shape `(num_states, state_vector_size)` containing the
       normalised vector representation of each information state. Populated only
-      for games which support information_state_as_normalized_vector(), and is
-      None otherwise.
+      for games which support information_state_tensor(), and is None otherwise.
     game_type: The game attributes as returned by `Game::GetType`; used to
       determine whether to use information state or observation as the key in
       the tabular policy.
   """
 
-  def __init__(self, game):
+  def __init__(self, game, players=None):
     """Initializes a uniform random policy for all players in the game."""
-    all_players = list(range(game.num_players()))
-    super(TabularPolicy, self).__init__(game, all_players)
+    players = sorted(players or range(game.num_players()))
+    super(TabularPolicy, self).__init__(game, players)
     self.game_type = game.get_type()
 
     # Get all states in the game at which players have to make decisions.
@@ -180,11 +180,11 @@ class TabularPolicy(Policy):
     # Assemble legal actions for every valid (state, player) pair, keyed by
     # information state string.
     self.state_lookup = {}
-    self.states_per_player = [[] for _ in all_players]
+    self.states_per_player = [[] for _ in range(game.num_players())]
     self.states = []
     legal_actions_list = []
     state_in_list = []
-    for player in all_players:
+    for player in players:
       # States are ordered by their history.
       for _, state in sorted(states.items(), key=lambda pair: pair[0]):
         if state.is_simultaneous_node() or player == state.current_player():
@@ -197,12 +197,10 @@ class TabularPolicy(Policy):
               legal_actions_list.append(legal_actions)
               self.states_per_player[player].append(key)
               self.states.append(state)
-              if self.game_type.provides_information_state_as_normalized_vector:
-                state_in_list.append(
-                    state.information_state_as_normalized_vector(player))
-              elif self.game_type.provides_observation_as_normalized_vector:
-                state_in_list.append(
-                    state.observation_as_normalized_vector(player))
+              if self.game_type.provides_information_state_tensor:
+                state_in_list.append(state.information_state_tensor(player))
+              elif self.game_type.provides_observation_tensor:
+                state_in_list.append(state.observation_tensor(player))
 
     # Put legal action masks in a numpy array and create the uniform random
     # policy.
@@ -216,37 +214,25 @@ class TabularPolicy(Policy):
 
   def _state_key(self, state, player):
     """Returns the key to use to look up this (state, player) pair."""
-    if self.game_type.provides_information_state:
+    if self.game_type.provides_information_state_string:
       if player is None:
-        return state.information_state()
+        return state.information_state_string()
       else:
-        return state.information_state(player)
-    elif self.game_type.provides_observation:
+        return state.information_state_string(player)
+    elif self.game_type.provides_observation_string:
       if player is None:
-        return state.observation()
+        return state.observation_string()
       else:
-        return state.observation(player)
+        return state.observation_string(player)
     else:
       return str(state)
 
   def action_probabilities(self, state, player_id=None):
-    """Returns the policy for a player in a state.
-
-    Args:
-      state: A `pyspiel.State` object.
-      player_id: Optional, the player id for which we want an action. Optional
-        unless this is a simultaneous state at which multiple players can act.
-
-    Returns:
-      A `dict` of `{action: probability}` for the specified player in the
-      supplied state.
-    """
-    policy = self.policy_for_key(self._state_key(state, player_id))
-    return {
-        action: probability
-        for action, probability in enumerate(policy)
-        if probability > 0
-    }
+    """Returns an {action: probability} dict, covering all legal actions."""
+    probability = self.policy_for_key(self._state_key(state, player_id))
+    legal_actions = (state.legal_actions() if player_id is None
+                     else state.legal_actions(player_id))
+    return {action: probability[action] for action in legal_actions}
 
   def state_index(self, state):
     """Returns the index in the TabularPolicy associated to `state`."""
@@ -352,27 +338,10 @@ class UniformRandomPolicy(Policy):
       supplied state. This will contain all legal actions, each with the same
       probability, equal to 1 / num_legal_actions.
     """
-    legal_actions = (
-        state.legal_actions()
-        if player_id is None else state.legal_actions(player_id))
+    legal_actions = (state.legal_actions() if player_id is None
+                     else state.legal_actions(player_id))
     probability = 1 / len(legal_actions)
     return {action: probability for action in legal_actions}
-
-
-class PolicyFromCallable(Policy):
-  """For backwards-compatibility reasons, create a policy from a callable."""
-
-  def __init__(self, game, callable_policy):
-    # When creating a Policy from a pyspiel_policy, we do not have the game.
-    if game is None:
-      all_players = None
-    else:
-      all_players = list(range(game.num_players()))
-    super(PolicyFromCallable, self).__init__(game, all_players)
-    self._callable_policy = callable_policy
-
-  def action_probabilities(self, state, player_id=None):
-    return dict(self._callable_policy(state))
 
 
 class FirstActionPolicy(Policy):
@@ -383,30 +352,37 @@ class FirstActionPolicy(Policy):
     super(FirstActionPolicy, self).__init__(game, all_players)
 
   def action_probabilities(self, state, player_id=None):
-    min_action = min(state.legal_actions())
-    return {min_action: 1.0}
+    legal_actions = (state.legal_actions() if player_id is None
+                     else state.legal_actions(player_id))
+    min_action = min(legal_actions)
+    return {action: 1.0 if action == min_action else 0.0
+            for action in legal_actions}
 
 
-def tabular_policy_from_policy(game, policy):
-  """Converts any Policy instance into a TabularPolicy.
+def tabular_policy_from_callable(game, callable_policy, players=None):
+  """Converts a legacy callable policy into a TabularPolicy.
+
+  Recommendation - instead of using this to convert your policy for evaluation
+  purposes, work directly with a `TabularPolicy` if possible.
+  Second choice - work with a `Policy` class and call `to_tabular` as needed.
 
   Args:
     game: The game for which we want a TabularPolicy.
-    policy: An instance of Policy for which we want a TabularPolicy.
-
+    callable_policy: A callable: state -> action probabilities dict or list.
+    players: List of players this policy applies to. If `None`, applies to
+      all players.
   Returns:
-    A TabularPolicy that's identical to policy.
+    A TabularPolicy that materializes the callable policy.
   """
-  empty_tabular_policy = TabularPolicy(game)
-  for state_index, state in enumerate(empty_tabular_policy.states):
-    action_probabilities = policy.action_probabilities(state)
+  tabular_policy = TabularPolicy(game, players)
+  for state_index, state in enumerate(tabular_policy.states):
+    action_probabilities = dict(callable_policy(state))
     infostate_policy = [
         action_probabilities.get(action, 0.)
         for action in range(game.num_distinct_actions())
     ]
-    empty_tabular_policy.action_probability_array[
-        state_index, :] = infostate_policy
-  return empty_tabular_policy
+    tabular_policy.action_probability_array[state_index, :] = infostate_policy
+  return tabular_policy
 
 
 def python_policy_to_pyspiel_policy(python_tabular_policy):
@@ -422,8 +398,3 @@ def python_policy_to_pyspiel_policy(python_tabular_policy):
         action_probs.append((action, prob))
     infostates_to_probabilities[infostate] = action_probs
   return pyspiel.TabularPolicy(infostates_to_probabilities)
-
-
-def policy_from_pyspiel_policy(pyspiel_policy):
-  """Returns a `policy.Policy` object from a `pyspiel.Policy` object."""
-  return PolicyFromCallable(None, pyspiel_policy.get_state_policy_as_map)
