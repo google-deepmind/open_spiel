@@ -15,18 +15,20 @@
 
 #include "open_spiel/spiel.h"
 
+// An implementation of klondike solitaire: https://en.wikipedia.org/wiki/Klondike_(solitaire)
+// More specifically, it is K+ solitaire, which allows the player to play any card from the deck/waste that would
+// normally become playable after some number of draws in standard klondike solitaire. For a more in-depth
+// description of K+ solitaire, see http://web.engr.oregonstate.edu/~afern/papers/solitaire.pdf. This implementation
+// also gives rewards at intermediate states like most electronic versions of solitaire do, rather than only at
+// terminal states.
+
 // ANSI color codes
 #define RESET "\033[0m"
 #define RED   "\033[31m"
 #define BLACK "\033[37m"
 #define BLUE  "\033[34m"
 
-// TODO: Clion automatically inverts colors based on light/dark theme. So even though "\033[30m" is black,
-//       it shows up as white with a dark theme. Colab doesn't do this, so using a dark theme, it shows black
-//       on a dark theme.
-
 // Glyphs & Strings
-
 #define GLYPH_HIDDEN   "\U0001F0A0"
 #define GLYPH_EMPTY    "\U0001F0BF"
 #define GLYPH_SPADES   "\U00002660"
@@ -34,7 +36,6 @@
 #define GLYPH_CLUBS    "\U00002663"
 #define GLYPH_DIAMONDS "\U00002666"
 #define GLYPH_ARROW    "\U00002190"
-
 
 namespace open_spiel::solitaire {
 
@@ -458,7 +459,6 @@ namespace open_spiel::solitaire {
         virtual std::vector<Card> Targets() const;
         virtual std::vector<Card> Split(Card card);
         void                      Extend(std::vector<Card> source_cards);
-        std::vector<double>       Tensor() const;
         std::string               ToString(bool colored = true) const;
     };
 
@@ -941,10 +941,10 @@ namespace open_spiel::solitaire {
 
         // Attributes ==================================================================================================
 
-        Pile                waste;
-        std::vector<Pile>   foundations;
-        std::vector<Pile>   tableaus;
-        std::vector<Action> revealed_cards;
+        Waste                    waste;
+        std::vector<Foundation>  foundations;
+        std::vector<Tableau>     tableaus;
+        std::vector<Action>      revealed_cards;
 
         // Constructors ================================================================================================
 
@@ -973,8 +973,9 @@ namespace open_spiel::solitaire {
         std::vector<Card>       Sources(const std::optional<LocationType> & location = kMissing) const;
         std::vector<Move>       CandidateMoves() const;
         Pile *                  GetPile(const Card & card) const;
+        Pile *                  GetPile(const PileID & pile_id) const;
         void                    MoveCards(const Move & move);
-        bool                    IsReversible(const Card & source, const Pile * source_pile) const;
+        bool                    IsReversible(const Card & source, Pile * source_pile) const;
 
     private:
         bool   is_finished    = false;

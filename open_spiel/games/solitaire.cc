@@ -60,7 +60,7 @@ namespace open_spiel::solitaire {
     int GetCardIndex(RankType rank, SuitType suit) {
         /* Using a given rank and/or suit, gets an integer representing the index of the card. */
 
-        if (rank == kHiddenRank or suit == kHiddenSuit) {
+        if (rank == kHiddenRank || suit == kHiddenSuit) {
             // Handles hidden cards
             return HIDDEN_CARD;
         } else if (rank == kNoRank) {
@@ -127,8 +127,6 @@ namespace open_spiel::solitaire {
 
     Card::Card(int index, bool hidden, LocationType location) :
         index(index), hidden(hidden), location(location) {
-        // index == HIDDEN_CARD ? hidden = true : hidden = false;
-
         if (!hidden) {
             switch (index) {
                 case HIDDEN_CARD : {
@@ -190,9 +188,9 @@ namespace open_spiel::solitaire {
         }
 
         // Determine contents of string
-        if (rank == kHiddenRank or suit == kHiddenSuit) {
+        if (rank == kHiddenRank || suit == kHiddenSuit) {
             absl::StrAppend(&result, GLYPH_HIDDEN, " ");
-        } else if (rank == kNoRank and suit == kNoSuit) {
+        } else if (rank == kNoRank && suit == kNoSuit) {
             absl::StrAppend(&result, GLYPH_EMPTY);
         } else {
             absl::StrAppend(&result, RANK_STRS.at(rank));
@@ -275,7 +273,6 @@ namespace open_spiel::solitaire {
             std::vector<Card> legal_children;
             legal_children.reserve(4);
 
-            // TODO: `child_suits` should never be empty at this line
             if (child_suits.empty()) {
                 std::cerr << "WARNING: `child_suits` should never be empty" << std::endl;
                 return {};
@@ -449,18 +446,6 @@ namespace open_spiel::solitaire {
             card.location = type;
             cards.push_back(card);
         }
-    }
-
-    std::vector<double> Pile::Tensor() const {
-        std::vector<double> dv;
-        dv.reserve(max_size);
-        if (!cards.empty()) {
-            for (auto & card : cards) {
-                card.hidden ? dv.push_back(HIDDEN_CARD) : dv.push_back(card.GetIndex());
-            }
-        }
-        dv.resize(max_size, NO_CARD);
-        return dv;
     }
 
     std::string Pile::ToString(bool colored) const {
@@ -657,7 +642,7 @@ namespace open_spiel::solitaire {
     // region SolitaireState Methods ==========================================================================================
 
     SolitaireState::SolitaireState(std::shared_ptr<const Game> game) :
-        State(game), waste(kWaste, kPileWaste) {
+        State(game), waste() {
 
         // Extract parameters from `game`
         auto parameters = game->GetParameters();
@@ -666,7 +651,7 @@ namespace open_spiel::solitaire {
 
         // Create foundations
         for (const auto & suit : SUITS) {
-            foundations.emplace_back(kFoundation, SUIT_TO_PILE.at(suit), suit);
+            foundations.emplace_back(SUIT_TO_PILE.at(suit), suit);
         }
 
         // Create tableaus
@@ -679,7 +664,7 @@ namespace open_spiel::solitaire {
             }
 
             // Create a new tableau and add cards
-            auto tableau  = Pile(kTableau, INT_TO_PILE.at(i));
+            auto tableau  = Tableau(INT_TO_PILE.at(i));
             tableau.cards = cards_to_add;
 
             // Add resulting tableau to tableaus
@@ -807,7 +792,7 @@ namespace open_spiel::solitaire {
                 ptr[0] = 1;
             } else {
                 auto last_rank = foundation.cards.back().rank;
-                if (last_rank >= kA and last_rank <= kK) {
+                if (last_rank >= kA && last_rank <= kK) {
                     ptr[last_rank] = 1;
                 }
             }
@@ -973,7 +958,7 @@ namespace open_spiel::solitaire {
                 break;
             }
             default : {
-                // Do nothing
+                // TODO: Add warning message
             }
         }
 
@@ -989,8 +974,7 @@ namespace open_spiel::solitaire {
     }
 
     std::vector<double>     SolitaireState::Rewards() const {
-        // Should be the reward for the action that created this state, not the action
-        // taken at this state that produces a new one.
+        // Should be the reward for the action that created this state, not the action applied to this state
         return {current_rewards};
     }
 
@@ -1103,19 +1087,20 @@ namespace open_spiel::solitaire {
     }
 
     Pile *                  SolitaireState::GetPile(const Card & card) const {
+
         PileID pile_id;
 
         if (card.rank == kNoRank) {
             if (card.suit == kNoSuit) {
                 for (auto & tableau : tableaus) {
                     if (tableau.cards.empty()) {
-                        return const_cast<Pile *>(& tableau);
+                        return (Pile *) & tableau;
                     }
                 }
-            } else if (card.suit != kHiddenSuit){
+            } else if (card.suit != kHiddenSuit) {
                 for (auto & foundation : foundations) {
                     if (foundation.suit == card.suit) {
-                        return const_cast<Pile *>(& foundation);
+                        return (Pile *) & foundation;
                     }
                 }
             } else {
@@ -1127,13 +1112,30 @@ namespace open_spiel::solitaire {
 
         switch (pile_id) {
             case kPileWaste : {
-                return const_cast<Pile *>(& waste);
+                return (Pile *) & waste;
             }
             case kPileSpades ... kPileDiamonds : {
-                return const_cast<Pile *>(& foundations.at(pile_id - 1));
+                return (Pile *) & foundations.at(pile_id - 1);
             }
             case kPile1stTableau ... kPile7thTableau : {
-                return const_cast<Pile *>(& tableaus.at(pile_id - 5));
+                return (Pile *) & tableaus.at(pile_id - 5);
+            }
+            default : {
+                std::cout << "The pile containing the card wasn't found" << std::endl;
+            }
+        }
+    }
+
+    Pile *                  SolitaireState::GetPile(const PileID & pile_id) const {
+        switch (pile_id) {
+            case kPileWaste : {
+                return (Pile *) & waste;
+            }
+            case kPileSpades ... kPileDiamonds : {
+                return (Pile *) & foundations.at(pile_id - 1);
+            }
+            case kPile1stTableau ... kPile7thTableau : {
+                return (Pile *) & tableaus.at(pile_id - 5);
             }
             default : {
                 std::cout << "The pile containing the card wasn't found" << std::endl;
@@ -1148,8 +1150,6 @@ namespace open_spiel::solitaire {
         bool found_empty_tableau  = false;
 
         for (auto & target : targets) {
-            // std::cout << "Target = " << target.ToString() << std::endl; //
-
             if (target.suit == kNoSuit && target.rank == kNoRank) {
                 if (found_empty_tableau) {
                     continue;
@@ -1158,14 +1158,9 @@ namespace open_spiel::solitaire {
                 }
             }
             for (auto & source : target.LegalChildren()) {
-                // std::cout << "Source = " << source.ToString() << std::endl; //
-
                 if (std::find(sources.begin(), sources.end(), source) != sources.end()) {
-                    // std::cout << source.ToString() << " is in sources" << std::endl;
                     auto source_pile = GetPile(source);
-
                     if (target.location == kFoundation && source_pile->type == kTableau) {
-                        // Check if source is a top card
                         if (source_pile->cards.back() == source) {
                             candidate_moves.emplace_back(target, source);
                         }
@@ -1217,19 +1212,19 @@ namespace open_spiel::solitaire {
 
         // Reward for revealing a hidden card
         if (source_pile->type == kTableau && !source_pile->cards.empty() && source_pile->cards.back().hidden) {
-            move_reward += 20.0;    // TODO: Don't hardcode this
+            move_reward += 20.0;
         }
 
         // Reward for moving a card from the waste
         if (source_pile->type == kWaste) {
-            move_reward += 20.0;    // TODO: Don't hardcode this
+            move_reward += 20.0;
         }
 
         // Add current rewards to current returns
         current_rewards = move_reward;
     }
 
-    bool                    SolitaireState::IsReversible(const Card & source, const Pile * source_pile) const {
+    bool                    SolitaireState::IsReversible(const Card & source, Pile * source_pile) const {
         switch (source.location) {
             case kWaste : {
                 return false;
@@ -1240,7 +1235,6 @@ namespace open_spiel::solitaire {
             case kTableau : {
                 // Move is irreversible if its source is a bottom card or over a hidden card.
                 // Basically if it's the first non-hidden card in the pile/tableau.
-
                 auto it = std::find_if(
                         source_pile->cards.begin(),
                         source_pile->cards.end(),
