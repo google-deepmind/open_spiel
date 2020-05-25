@@ -45,6 +45,7 @@ class PyspielTest(absltest.TestCase):
         "connect_four",
         "coop_box_pushing",
         "coop_to_1p",
+        "coordinated_mp",
         "cursor_go",
         "deep_sea",
         "efg_game",

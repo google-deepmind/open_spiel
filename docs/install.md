@@ -17,7 +17,7 @@ In a nutshell:
 
 ```bash
 ./install.sh  # Needed to run once and when major changes are released.
-./build_and_run_tests.sh  # Run this every-time you need to rebuild.
+./open_spiel/scripts/build_and_run_tests.sh # Run this every-time you need to rebuild.
 ```
 
 1.  Install system packages (e.g. cmake) and download some dependencies. Only
