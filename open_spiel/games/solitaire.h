@@ -15,6 +15,8 @@
 
 #include "open_spiel/spiel.h"
 
+// TODO: Please run `clang-format -style=google` on your code. There are also some `clang-tidy` issues.
+
 // An implementation of klondike solitaire: https://en.wikipedia.org/wiki/Klondike_(solitaire)
 // More specifically, it is K+ solitaire, which allows the player to play any card from the deck/waste that would
 // normally become playable after some number of draws in standard klondike solitaire. For a more in-depth
@@ -23,19 +25,18 @@
 // terminal states.
 
 // ANSI color codes
-#define RESET "\033[0m"
-#define RED   "\033[31m"
-#define BLACK "\033[37m"
-#define BLUE  "\033[34m"
+inline constexpr const char* kReset = "\033[0m";
+inline constexpr const char* kRed   = "\033[31m";
+inline constexpr const char* kBlack = "\033[37m";
 
 // Glyphs & Strings
-#define GLYPH_HIDDEN   "\U0001F0A0"
-#define GLYPH_EMPTY    "\U0001F0BF"
-#define GLYPH_SPADES   "\U00002660"
-#define GLYPH_HEARTS   "\U00002665"
-#define GLYPH_CLUBS    "\U00002663"
-#define GLYPH_DIAMONDS "\U00002666"
-#define GLYPH_ARROW    "\U00002190"
+inline constexpr const char* kGlyphHidden   = "\U0001F0A0";
+inline constexpr const char* kGlyphEmpty    = "\U0001F0BF";
+inline constexpr const char* kGlyphSpades   = "\U00002660";
+inline constexpr const char* kGlyphHearts   = "\U00002665";
+inline constexpr const char* kGlyphClubs    = "\U00002663";
+inline constexpr const char* kGlyphDiamonds = "\U00002666";
+inline constexpr const char* kGlyphArrow    = "\U00002190";
 
 namespace open_spiel::solitaire {
 
@@ -48,29 +49,29 @@ namespace open_spiel::solitaire {
     // Enumerations ====================================================================================================
 
     enum SuitType     {
-        kNoSuit = 0,
-        kS,
-        kH,
-        kC,
-        kD,
-        kHiddenSuit,
+        kSuitNone = 0,
+        kSuitSpades,
+        kSuitHearts,
+        kSuitClubs,
+        kSuitDiamonds,
+        kSuitHidden,
     };
     enum RankType     {
-        kNoRank = 0,
-        kA,
-        k2,
-        k3,
-        k4,
-        k5,
-        k6,
-        k7,
-        k8,
-        k9,
-        kT,
-        kJ,
-        kQ,
-        kK,
-        kHiddenRank,
+        kRankNone = 0,
+        kRankA,
+        kRank2,
+        kRank3,
+        kRank4,
+        kRank5,
+        kRank6,
+        kRank7,
+        kRank8,
+        kRank9,
+        kRankT,
+        kRankJ,
+        kRankQ,
+        kRankK,
+        kRankHidden,
     };
     enum LocationType {
         kDeck       = 0,
@@ -79,10 +80,28 @@ namespace open_spiel::solitaire {
         kTableau    = 3,
         kMissing    = 4,
     };
+    enum PileID       {
+        kPileWaste      = 0,
+        kPileSpades     = 1,
+        kPileHearts     = 2,
+        kPileClubs      = 3,
+        kPileDiamonds   = 4,
+        kPile1stTableau = 5,
+        kPile2ndTableau = 6,
+        kPile3rdTableau = 7,
+        kPile4thTableau = 8,
+        kPile5thTableau = 9,
+        kPile6thTableau = 10,
+        kPile7thTableau = 11,
+        kNoPile         = 12
+    };
+
+    // TODO: This is hard to read and check. Is it really necessary or could you just define an int representation of actions and a function to map from the int to a set of fields?
+
     enum ActionType   {
 
-        // Draw Action (1) =============================================================================================
-        kDraw = 0,
+        // End Action (1) =============================================================================================
+        kEnd = 0,
 
         // Reveal Actions (52) =========================================================================================
         // Spades ------------------------------------------------------------------------------------------------------
@@ -320,40 +339,29 @@ namespace open_spiel::solitaire {
         kMoveQdJc,
         kMoveKdQc,
     };
-    enum PileID       {
-        kPileWaste      = 0,
-        kPileSpades     = 1,
-        kPileHearts     = 2,
-        kPileClubs      = 3,
-        kPileDiamonds   = 4,
-        kPile1stTableau = 5,
-        kPile2ndTableau = 6,
-        kPile3rdTableau = 7,
-        kPile4thTableau = 8,
-        kPile5thTableau = 9,
-        kPile6thTableau = 10,
-        kPile7thTableau = 11,
-        kNoPile         = 12
-    };
 
     // Constants =======================================================================================================
 
     // Indices for special cards
-    inline constexpr int HIDDEN_CARD          = 99;
-    inline constexpr int NO_CARD              =  0;
-    inline constexpr int EMPTY_TABLEAU_CARD   = -1;
-    inline constexpr int EMPTY_SPADE_CARD     = -2;
-    inline constexpr int EMPTY_HEART_CARD     = -3;
-    inline constexpr int EMPTY_CLUB_CARD      = -4;
-    inline constexpr int EMPTY_DIAMOND_CARD   = -5;
+    inline constexpr int kHiddenCard       = 99;
+    inline constexpr int kNoCard           =  0;
+    inline constexpr int kEmptyTableauCard = -1;
+    inline constexpr int kEmptySpadeCard   = -2;
+    inline constexpr int kEmptyHeartCard   = -3;
+    inline constexpr int kEmptyClubCard    = -4;
+    inline constexpr int kEmptyDiamondCard = -5;
 
-    // Lengths of pile tensor representations
-    inline constexpr int FOUNDATION_TENSOR_LENGTH = 14;
-    inline constexpr int TABLEAU_TENSOR_LENGTH    = 59;
-    inline constexpr int WASTE_TENSOR_LENGTH      = 53;
+    // 1 empty + 13 ranks
+    inline constexpr int kFoundationTensorLength = 14;
+
+    // 6 hidden cards + 1 empty tableau + 52 ordinary cards
+    inline constexpr int kTableauTensorLength = 59;
+
+    // 1 hidden card + 52 ordinary cards
+    inline constexpr int kWasteTensorLength = 53;
 
     // Constant for how many hidden cards can show up in a tableau
-    inline constexpr int MAX_HIDDEN_CARDS = 6;
+    inline constexpr int kMaxHiddenCard = 6;
 
     // Only used in one place and just for consistency (to match kChancePlayerId & kTerminalPlayerId)
     inline constexpr int kPlayerId = 0;
@@ -362,41 +370,41 @@ namespace open_spiel::solitaire {
     using Ranksuit = std::pair<RankType, SuitType>;
 
     // Other lists and maps
-    const std::vector<SuitType> SUITS = {kS, kH, kC, kD};
-    const std::vector<RankType> RANKS = {kA, k2, k3, k4, k5, k6, k7, k8, k9, kT, kJ, kQ, kK};
+    const std::vector<SuitType> kSuits = {kSuitSpades, kSuitHearts, kSuitClubs, kSuitDiamonds};
+    const std::vector<RankType> kRanks = {kRankA, kRank2, kRank3, kRank4, kRank5, kRank6, kRank7, kRank8, kRank9, kRankT, kRankJ, kRankQ, kRankK};
 
     // These correspond with their enums, not with the two vectors directly above
-    const std::vector<std::string> SUIT_STRS = {"", GLYPH_SPADES, GLYPH_HEARTS, GLYPH_CLUBS, GLYPH_DIAMONDS, ""};
-    const std::vector<std::string> RANK_STRS = {"", "A", "2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K", ""};
+    const std::vector<std::string> kSuitStrs = {"", kGlyphSpades, kGlyphHearts, kGlyphClubs, kGlyphDiamonds, ""};
+    const std::vector<std::string> kRankStrs = {"", "A", "2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K", ""};
 
-    const std::map<RankType, double> FOUNDATION_POINTS = {
+    const std::map<RankType, double> kFoundationPoints = {
             //region Maps a RankType to a double that represents the reward for moving a card of that rank to the foundation
-            {kA, 100.0},
-            {k2, 90.0},
-            {k3, 80.0},
-            {k4, 70.0},
-            {k5, 60.0},
-            {k6, 50.0},
-            {k7, 40.0},
-            {k8, 30.0},
-            {k9, 20.0},
-            {kT, 10.0},
-            {kJ, 10.0},
-            {kQ, 10.0},
-            {kK, 10.0}
+            {kRankA, 100.0},
+            {kRank2, 90.0},
+            {kRank3, 80.0},
+            {kRank4, 70.0},
+            {kRank5, 60.0},
+            {kRank6, 50.0},
+            {kRank7, 40.0},
+            {kRank8, 30.0},
+            {kRank9, 20.0},
+            {kRankT, 10.0},
+            {kRankJ, 10.0},
+            {kRankQ, 10.0},
+            {kRankK, 10.0}
             //endregion
     };
 
-    const std::map<SuitType, PileID> SUIT_TO_PILE = {
+    const std::map<SuitType, PileID> kSuitToPile = {
             // region Maps a foundation suit to the ID of the foundation
-            {kS, kPileSpades},
-            {kH, kPileHearts},
-            {kC, kPileClubs},
-            {kD, kPileDiamonds}
+            {kSuitSpades, kPileSpades},
+            {kSuitHearts, kPileHearts},
+            {kSuitClubs,  kPileClubs},
+            {kSuitDiamonds, kPileDiamonds}
             // endregion
     };
 
-    const std::map<int, PileID> INT_TO_PILE = {
+    const std::map<int, PileID> kIntToPile = {
             // region Maps an integer to a tableau pile ID (used when initializing SolitaireState)
             {1, kPile1stTableau},
             {2, kPile2ndTableau},
@@ -408,28 +416,21 @@ namespace open_spiel::solitaire {
             // endregion
     };
 
-    // Miscellaneous Functions =========================================================================================
-
-    std::vector<SuitType> GetOppositeSuits(const SuitType & suit);
-
-    int GetCardIndex(RankType rank, SuitType suit);
-
-    int GetMaxSize(LocationType location);
-
     // Support Classes =================================================================================================
 
     class Card {
     public:
+        // TODO: Attributes should be private
 
         // Attributes ==================================================================================================
-        RankType      rank     = kHiddenRank;       // Indicates the rank of the card
-        SuitType      suit     = kHiddenSuit;       // Indicates the suit of the card
+        RankType      rank     = kRankHidden;       // Indicates the rank of the card
+        SuitType      suit     = kSuitHidden;       // Indicates the suit of the card
         LocationType  location = kMissing;          // Indicates the type of pile the card is in
         bool          hidden   = false;             // Indicates whether the card is hidden or not
-        int           index    = HIDDEN_CARD;       // Identifies the card with an integer
+        int           index    = kHiddenCard;       // Identifies the card with an integer
 
         // Constructors ================================================================================================
-        Card(bool hidden = false, SuitType suit = kHiddenSuit, RankType rank = kHiddenRank, LocationType location = kMissing);
+        Card(bool hidden = false, SuitType suit = kSuitHidden, RankType rank = kRankHidden, LocationType location = kMissing);
         Card(int index, bool hidden = false, LocationType location = kMissing);
 
         // Other Methods ===============================================================================================
@@ -444,6 +445,9 @@ namespace open_spiel::solitaire {
 
     class Pile {
     public:
+
+        // TODO: Needs a virtual destructor
+        // TODO: Attributes should be private
         // Attributes ==================================================================================================
         std::vector<Card>  cards;
         const LocationType type;
@@ -452,7 +456,7 @@ namespace open_spiel::solitaire {
         const int          max_size;
 
         // Constructors ================================================================================================
-        Pile(LocationType type, PileID id, SuitType suit = kNoSuit);
+        Pile(LocationType type, PileID id, SuitType suit = kSuitNone);
 
         // Other Methods ===============================================================================================
         virtual std::vector<Card> Sources() const;
@@ -498,6 +502,7 @@ namespace open_spiel::solitaire {
     class Move {
     public:
 
+        // TODO: Attributes should be private
         // Attributes ==================================================================================================
         Card target;
         Card source;
@@ -516,417 +521,419 @@ namespace open_spiel::solitaire {
 
     // More Constants ==================================================================================================
 
-    const std::map<Move, Action> MOVE_TO_ACTION = {
+    // TODO: Please compute this on-the-fly instead of having this long mapping
+    const std::map<Move, Action> kMoveToAction = {
             // region Mapping of a move to an action declared in ActionType;
             
             // region Moves To Empty Tableau
-            {Move(kNoRank, kNoSuit, kK, kS), kMove__Ks},
-            {Move(kNoRank, kNoSuit, kK, kH), kMove__Kh},
-            {Move(kNoRank, kNoSuit, kK, kC), kMove__Kc},
-            {Move(kNoRank, kNoSuit, kK, kD), kMove__Kd},
+            {Move(kRankNone, kSuitNone, kRankK, kSuitSpades),       kMove__Ks},
+            {Move(kRankNone, kSuitNone, kRankK, kSuitHearts),       kMove__Kh},
+            {Move(kRankNone, kSuitNone, kRankK, kSuitClubs),        kMove__Kc},
+            {Move(kRankNone, kSuitNone, kRankK, kSuitDiamonds),     kMove__Kd},
             // endregion
 
             // region Moves To Empty Foundation
-            {Move(kNoRank, kS, kA, kS),      kMove__As},
-            {Move(kNoRank, kH, kA, kH),      kMove__Ah},
-            {Move(kNoRank, kC, kA, kC),      kMove__Ac},
-            {Move(kNoRank, kD, kA, kD),      kMove__Ad},
+            {Move(kRankNone, kSuitSpades, kRankA, kSuitSpades),     kMove__As},
+            {Move(kRankNone, kSuitHearts, kRankA, kSuitHearts),     kMove__Ah},
+            {Move(kRankNone, kSuitClubs, kRankA, kSuitClubs),       kMove__Ac},
+            {Move(kRankNone, kSuitDiamonds, kRankA, kSuitDiamonds), kMove__Ad},
             // endregion
 
             // region Moves to Foundation (To Spades)
-            {Move(kA, kS, k2, kS),           kMoveAs2s},
-            {Move(k2, kS, k3, kS),           kMove2s3s},
-            {Move(k3, kS, k4, kS),           kMove3s4s},
-            {Move(k4, kS, k5, kS),           kMove4s5s},
-            {Move(k5, kS, k6, kS),           kMove5s6s},
-            {Move(k6, kS, k7, kS),           kMove6s7s},
-            {Move(k7, kS, k8, kS),           kMove7s8s},
-            {Move(k8, kS, k9, kS),           kMove8s9s},
-            {Move(k9, kS, kT, kS),           kMove9sTs},
-            {Move(kT, kS, kJ, kS),           kMoveTsJs},
-            {Move(kJ, kS, kQ, kS),           kMoveJsQs},
-            {Move(kQ, kS, kK, kS),           kMoveQsKs},
+            {Move(kRankA, kSuitSpades, kRank2, kSuitSpades),     kMoveAs2s},
+            {Move(kRank2, kSuitSpades, kRank3, kSuitSpades),        kMove2s3s},
+            {Move(kRank3, kSuitSpades, kRank4, kSuitSpades),        kMove3s4s},
+            {Move(kRank4, kSuitSpades, kRank5, kSuitSpades),        kMove4s5s},
+            {Move(kRank5, kSuitSpades, kRank6, kSuitSpades),        kMove5s6s},
+            {Move(kRank6, kSuitSpades, kRank7, kSuitSpades),        kMove6s7s},
+            {Move(kRank7, kSuitSpades, kRank8, kSuitSpades),        kMove7s8s},
+            {Move(kRank8, kSuitSpades, kRank9, kSuitSpades),        kMove8s9s},
+            {Move(kRank9, kSuitSpades, kRankT, kSuitSpades),        kMove9sTs},
+            {Move(kRankT, kSuitSpades, kRankJ, kSuitSpades),        kMoveTsJs},
+            {Move(kRankJ, kSuitSpades, kRankQ, kSuitSpades),        kMoveJsQs},
+            {Move(kRankQ, kSuitSpades, kRankK, kSuitSpades),        kMoveQsKs},
             // endregion
 
             // region Moves to Foundation (To Hearts)
-            {Move(kA, kH, k2, kH),           kMoveAh2h},
-            {Move(k2, kH, k3, kH),           kMove2h3h},
-            {Move(k3, kH, k4, kH),           kMove3h4h},
-            {Move(k4, kH, k5, kH),           kMove4h5h},
-            {Move(k5, kH, k6, kH),           kMove5h6h},
-            {Move(k6, kH, k7, kH),           kMove6h7h},
-            {Move(k7, kH, k8, kH),           kMove7h8h},
-            {Move(k8, kH, k9, kH),           kMove8h9h},
-            {Move(k9, kH, kT, kH),           kMove9hTh},
-            {Move(kT, kH, kJ, kH),           kMoveThJh},
-            {Move(kJ, kH, kQ, kH),           kMoveJhQh},
-            {Move(kQ, kH, kK, kH),           kMoveQhKh},
+            {Move(kRankA, kSuitHearts, kRank2, kSuitHearts),        kMoveAh2h},
+            {Move(kRank2, kSuitHearts, kRank3, kSuitHearts),        kMove2h3h},
+            {Move(kRank3, kSuitHearts, kRank4, kSuitHearts),        kMove3h4h},
+            {Move(kRank4, kSuitHearts, kRank5, kSuitHearts),        kMove4h5h},
+            {Move(kRank5, kSuitHearts, kRank6, kSuitHearts),        kMove5h6h},
+            {Move(kRank6, kSuitHearts, kRank7, kSuitHearts),        kMove6h7h},
+            {Move(kRank7, kSuitHearts, kRank8, kSuitHearts),        kMove7h8h},
+            {Move(kRank8, kSuitHearts, kRank9, kSuitHearts),        kMove8h9h},
+            {Move(kRank9, kSuitHearts, kRankT, kSuitHearts),        kMove9hTh},
+            {Move(kRankT, kSuitHearts, kRankJ, kSuitHearts),        kMoveThJh},
+            {Move(kRankJ, kSuitHearts, kRankQ, kSuitHearts),        kMoveJhQh},
+            {Move(kRankQ, kSuitHearts, kRankK, kSuitHearts),        kMoveQhKh},
             // endregion
 
             // region Moves to Foundation (To Clubs)
-            {Move(kA, kC, k2, kC),           kMoveAc2c},
-            {Move(k2, kC, k3, kC),           kMove2c3c},
-            {Move(k3, kC, k4, kC),           kMove3c4c},
-            {Move(k4, kC, k5, kC),           kMove4c5c},
-            {Move(k5, kC, k6, kC),           kMove5c6c},
-            {Move(k6, kC, k7, kC),           kMove6c7c},
-            {Move(k7, kC, k8, kC),           kMove7c8c},
-            {Move(k8, kC, k9, kC),           kMove8c9c},
-            {Move(k9, kC, kT, kC),           kMove9cTc},
-            {Move(kT, kC, kJ, kC),           kMoveTcJc},
-            {Move(kJ, kC, kQ, kC),           kMoveJcQc},
-            {Move(kQ, kC, kK, kC),           kMoveQcKc},
+            {Move(kRankA, kSuitClubs, kRank2, kSuitClubs),          kMoveAc2c},
+            {Move(kRank2, kSuitClubs, kRank3, kSuitClubs),          kMove2c3c},
+            {Move(kRank3, kSuitClubs, kRank4, kSuitClubs),          kMove3c4c},
+            {Move(kRank4, kSuitClubs, kRank5, kSuitClubs),          kMove4c5c},
+            {Move(kRank5, kSuitClubs, kRank6, kSuitClubs),          kMove5c6c},
+            {Move(kRank6, kSuitClubs, kRank7, kSuitClubs),          kMove6c7c},
+            {Move(kRank7, kSuitClubs, kRank8, kSuitClubs),          kMove7c8c},
+            {Move(kRank8, kSuitClubs, kRank9, kSuitClubs),          kMove8c9c},
+            {Move(kRank9, kSuitClubs, kRankT, kSuitClubs),          kMove9cTc},
+            {Move(kRankT, kSuitClubs, kRankJ, kSuitClubs),          kMoveTcJc},
+            {Move(kRankJ, kSuitClubs, kRankQ, kSuitClubs),          kMoveJcQc},
+            {Move(kRankQ, kSuitClubs, kRankK, kSuitClubs),          kMoveQcKc},
             // endregion
 
             // region Moves to Foundation (To Diamonds)
-            {Move(kA, kD, k2, kD),           kMoveAd2d},
-            {Move(k2, kD, k3, kD),           kMove2d3d},
-            {Move(k3, kD, k4, kD),           kMove3d4d},
-            {Move(k4, kD, k5, kD),           kMove4d5d},
-            {Move(k5, kD, k6, kD),           kMove5d6d},
-            {Move(k6, kD, k7, kD),           kMove6d7d},
-            {Move(k7, kD, k8, kD),           kMove7d8d},
-            {Move(k8, kD, k9, kD),           kMove8d9d},
-            {Move(k9, kD, kT, kD),           kMove9dTd},
-            {Move(kT, kD, kJ, kD),           kMoveTdJd},
-            {Move(kJ, kD, kQ, kD),           kMoveJdQd},
-            {Move(kQ, kD, kK, kD),           kMoveQdKd},
+            {Move(kRankA, kSuitDiamonds, kRank2, kSuitDiamonds),    kMoveAd2d},
+            {Move(kRank2, kSuitDiamonds, kRank3, kSuitDiamonds),    kMove2d3d},
+            {Move(kRank3, kSuitDiamonds, kRank4, kSuitDiamonds),    kMove3d4d},
+            {Move(kRank4, kSuitDiamonds, kRank5, kSuitDiamonds),    kMove4d5d},
+            {Move(kRank5, kSuitDiamonds, kRank6, kSuitDiamonds),    kMove5d6d},
+            {Move(kRank6, kSuitDiamonds, kRank7, kSuitDiamonds),    kMove6d7d},
+            {Move(kRank7, kSuitDiamonds, kRank8, kSuitDiamonds),    kMove7d8d},
+            {Move(kRank8, kSuitDiamonds, kRank9, kSuitDiamonds),    kMove8d9d},
+            {Move(kRank9, kSuitDiamonds, kRankT, kSuitDiamonds),    kMove9dTd},
+            {Move(kRankT, kSuitDiamonds, kRankJ, kSuitDiamonds),    kMoveTdJd},
+            {Move(kRankJ, kSuitDiamonds, kRankQ, kSuitDiamonds),    kMoveJdQd},
+            {Move(kRankQ, kSuitDiamonds, kRankK, kSuitDiamonds),    kMoveQdKd},
             // endregion
 
             // Spades --------------------------------------------------------------------------------------------------
             
             // region Moves to Tableau (Spades <- Hearts)
-            {Move(k2, kS, kA, kH), kMove2sAh},
-            {Move(k3, kS, k2, kH), kMove3s2h},
-            {Move(k4, kS, k3, kH), kMove4s3h},
-            {Move(k5, kS, k4, kH), kMove5s4h},
-            {Move(k6, kS, k5, kH), kMove6s5h},
-            {Move(k7, kS, k6, kH), kMove7s6h},
-            {Move(k8, kS, k7, kH), kMove8s7h},
-            {Move(k9, kS, k8, kH), kMove9s8h},
-            {Move(kT, kS, k9, kH), kMoveTs9h},
-            {Move(kJ, kS, kT, kH), kMoveJsTh},
-            {Move(kQ, kS, kJ, kH), kMoveQsJh},
-            {Move(kK, kS, kQ, kH), kMoveKsQh},
+            {Move(kRank2, kSuitSpades, kRankA, kSuitHearts),        kMove2sAh},
+            {Move(kRank3, kSuitSpades, kRank2, kSuitHearts),        kMove3s2h},
+            {Move(kRank4, kSuitSpades, kRank3, kSuitHearts),        kMove4s3h},
+            {Move(kRank5, kSuitSpades, kRank4, kSuitHearts),        kMove5s4h},
+            {Move(kRank6, kSuitSpades, kRank5, kSuitHearts),        kMove6s5h},
+            {Move(kRank7, kSuitSpades, kRank6, kSuitHearts),        kMove7s6h},
+            {Move(kRank8, kSuitSpades, kRank7, kSuitHearts),        kMove8s7h},
+            {Move(kRank9, kSuitSpades, kRank8, kSuitHearts),        kMove9s8h},
+            {Move(kRankT, kSuitSpades, kRank9, kSuitHearts),        kMoveTs9h},
+            {Move(kRankJ, kSuitSpades, kRankT, kSuitHearts),        kMoveJsTh},
+            {Move(kRankQ, kSuitSpades, kRankJ, kSuitHearts),        kMoveQsJh},
+            {Move(kRankK, kSuitSpades, kRankQ, kSuitHearts),        kMoveKsQh},
             // endregion
 
             // region Moves to Tableau (Spades <- Diamonds)
-            {Move(k2, kS, kA, kD), kMove2sAd},
-            {Move(k3, kS, k2, kD), kMove3s2d},
-            {Move(k4, kS, k3, kD), kMove4s3d},
-            {Move(k5, kS, k4, kD), kMove5s4d},
-            {Move(k6, kS, k5, kD), kMove6s5d},
-            {Move(k7, kS, k6, kD), kMove7s6d},
-            {Move(k8, kS, k7, kD), kMove8s7d},
-            {Move(k9, kS, k8, kD), kMove9s8d},
-            {Move(kT, kS, k9, kD), kMoveTs9d},
-            {Move(kJ, kS, kT, kD), kMoveJsTd},
-            {Move(kQ, kS, kJ, kD), kMoveQsJd},
-            {Move(kK, kS, kQ, kD), kMoveKsQd},
+            {Move(kRank2, kSuitSpades, kRankA, kSuitDiamonds),      kMove2sAd},
+            {Move(kRank3, kSuitSpades, kRank2, kSuitDiamonds),      kMove3s2d},
+            {Move(kRank4, kSuitSpades, kRank3, kSuitDiamonds),      kMove4s3d},
+            {Move(kRank5, kSuitSpades, kRank4, kSuitDiamonds),      kMove5s4d},
+            {Move(kRank6, kSuitSpades, kRank5, kSuitDiamonds),      kMove6s5d},
+            {Move(kRank7, kSuitSpades, kRank6, kSuitDiamonds),      kMove7s6d},
+            {Move(kRank8, kSuitSpades, kRank7, kSuitDiamonds),      kMove8s7d},
+            {Move(kRank9, kSuitSpades, kRank8, kSuitDiamonds),      kMove9s8d},
+            {Move(kRankT, kSuitSpades, kRank9, kSuitDiamonds),      kMoveTs9d},
+            {Move(kRankJ, kSuitSpades, kRankT, kSuitDiamonds),      kMoveJsTd},
+            {Move(kRankQ, kSuitSpades, kRankJ, kSuitDiamonds),      kMoveQsJd},
+            {Move(kRankK, kSuitSpades, kRankQ, kSuitDiamonds),      kMoveKsQd},
             // endregion
             
             // Hearts --------------------------------------------------------------------------------------------------
             
             // region Moves to Tableau (Hearts <- Spades)
-            {Move(k2, kH, kA, kS), kMove2hAs},
-            {Move(k3, kH, k2, kS), kMove3h2s},
-            {Move(k4, kH, k3, kS), kMove4h3s},
-            {Move(k5, kH, k4, kS), kMove5h4s},
-            {Move(k6, kH, k5, kS), kMove6h5s},
-            {Move(k7, kH, k6, kS), kMove7h6s},
-            {Move(k8, kH, k7, kS), kMove8h7s},
-            {Move(k9, kH, k8, kS), kMove9h8s},
-            {Move(kT, kH, k9, kS), kMoveTh9s},
-            {Move(kJ, kH, kT, kS), kMoveJhTs},
-            {Move(kQ, kH, kJ, kS), kMoveQhJs},
-            {Move(kK, kH, kQ, kS), kMoveKhQs},
+            {Move(kRank2, kSuitHearts, kRankA, kSuitSpades),        kMove2hAs},
+            {Move(kRank3, kSuitHearts, kRank2, kSuitSpades),        kMove3h2s},
+            {Move(kRank4, kSuitHearts, kRank3, kSuitSpades),        kMove4h3s},
+            {Move(kRank5, kSuitHearts, kRank4, kSuitSpades),        kMove5h4s},
+            {Move(kRank6, kSuitHearts, kRank5, kSuitSpades),        kMove6h5s},
+            {Move(kRank7, kSuitHearts, kRank6, kSuitSpades),        kMove7h6s},
+            {Move(kRank8, kSuitHearts, kRank7, kSuitSpades),        kMove8h7s},
+            {Move(kRank9, kSuitHearts, kRank8, kSuitSpades),        kMove9h8s},
+            {Move(kRankT, kSuitHearts, kRank9, kSuitSpades),        kMoveTh9s},
+            {Move(kRankJ, kSuitHearts, kRankT, kSuitSpades),        kMoveJhTs},
+            {Move(kRankQ, kSuitHearts, kRankJ, kSuitSpades),        kMoveQhJs},
+            {Move(kRankK, kSuitHearts, kRankQ, kSuitSpades),        kMoveKhQs},
             // endregion
 
             // region Moves to Tableau (Hearts <- Clubs)
-            {Move(k2, kH, kA, kC), kMove2hAc},
-            {Move(k3, kH, k2, kC), kMove3h2c},
-            {Move(k4, kH, k3, kC), kMove4h3c},
-            {Move(k5, kH, k4, kC), kMove5h4c},
-            {Move(k6, kH, k5, kC), kMove6h5c},
-            {Move(k7, kH, k6, kC), kMove7h6c},
-            {Move(k8, kH, k7, kC), kMove8h7c},
-            {Move(k9, kH, k8, kC), kMove9h8c},
-            {Move(kT, kH, k9, kC), kMoveTh9c},
-            {Move(kJ, kH, kT, kC), kMoveJhTc},
-            {Move(kQ, kH, kJ, kC), kMoveQhJc},
-            {Move(kK, kH, kQ, kC), kMoveKhQc},
+            {Move(kRank2, kSuitHearts, kRankA, kSuitClubs),         kMove2hAc},
+            {Move(kRank3, kSuitHearts, kRank2, kSuitClubs),         kMove3h2c},
+            {Move(kRank4, kSuitHearts, kRank3, kSuitClubs),         kMove4h3c},
+            {Move(kRank5, kSuitHearts, kRank4, kSuitClubs),         kMove5h4c},
+            {Move(kRank6, kSuitHearts, kRank5, kSuitClubs),         kMove6h5c},
+            {Move(kRank7, kSuitHearts, kRank6, kSuitClubs),         kMove7h6c},
+            {Move(kRank8, kSuitHearts, kRank7, kSuitClubs),         kMove8h7c},
+            {Move(kRank9, kSuitHearts, kRank8, kSuitClubs),         kMove9h8c},
+            {Move(kRankT, kSuitHearts, kRank9, kSuitClubs),         kMoveTh9c},
+            {Move(kRankJ, kSuitHearts, kRankT, kSuitClubs),         kMoveJhTc},
+            {Move(kRankQ, kSuitHearts, kRankJ, kSuitClubs),         kMoveQhJc},
+            {Move(kRankK, kSuitHearts, kRankQ, kSuitClubs),         kMoveKhQc},
             // endregion
             
             // Clubs ---------------------------------------------------------------------------------------------------
             
             // region Moves to Tableau (Clubs <- Hearts)
-            {Move(k2, kC, kA, kH), kMove2cAh},
-            {Move(k3, kC, k2, kH), kMove3c2h},
-            {Move(k4, kC, k3, kH), kMove4c3h},
-            {Move(k5, kC, k4, kH), kMove5c4h},
-            {Move(k6, kC, k5, kH), kMove6c5h},
-            {Move(k7, kC, k6, kH), kMove7c6h},
-            {Move(k8, kC, k7, kH), kMove8c7h},
-            {Move(k9, kC, k8, kH), kMove9c8h},
-            {Move(kT, kC, k9, kH), kMoveTc9h},
-            {Move(kJ, kC, kT, kH), kMoveJcTh},
-            {Move(kQ, kC, kJ, kH), kMoveQcJh},
-            {Move(kK, kC, kQ, kH), kMoveKcQh},
+            {Move(kRank2, kSuitClubs, kRankA, kSuitHearts),         kMove2cAh},
+            {Move(kRank3, kSuitClubs, kRank2, kSuitHearts),         kMove3c2h},
+            {Move(kRank4, kSuitClubs, kRank3, kSuitHearts),         kMove4c3h},
+            {Move(kRank5, kSuitClubs, kRank4, kSuitHearts),         kMove5c4h},
+            {Move(kRank6, kSuitClubs, kRank5, kSuitHearts),         kMove6c5h},
+            {Move(kRank7, kSuitClubs, kRank6, kSuitHearts),         kMove7c6h},
+            {Move(kRank8, kSuitClubs, kRank7, kSuitHearts),         kMove8c7h},
+            {Move(kRank9, kSuitClubs, kRank8, kSuitHearts),         kMove9c8h},
+            {Move(kRankT, kSuitClubs, kRank9, kSuitHearts),         kMoveTc9h},
+            {Move(kRankJ, kSuitClubs, kRankT, kSuitHearts),         kMoveJcTh},
+            {Move(kRankQ, kSuitClubs, kRankJ, kSuitHearts),         kMoveQcJh},
+            {Move(kRankK, kSuitClubs, kRankQ, kSuitHearts),         kMoveKcQh},
             // endregion
 
             // region Moves to Tableau (Clubs <- Diamonds)
-            {Move(k2, kC, kA, kD), kMove2cAd},
-            {Move(k3, kC, k2, kD), kMove3c2d},
-            {Move(k4, kC, k3, kD), kMove4c3d},
-            {Move(k5, kC, k4, kD), kMove5c4d},
-            {Move(k6, kC, k5, kD), kMove6c5d},
-            {Move(k7, kC, k6, kD), kMove7c6d},
-            {Move(k8, kC, k7, kD), kMove8c7d},
-            {Move(k9, kC, k8, kD), kMove9c8d},
-            {Move(kT, kC, k9, kD), kMoveTc9d},
-            {Move(kJ, kC, kT, kD), kMoveJcTd},
-            {Move(kQ, kC, kJ, kD), kMoveQcJd},
-            {Move(kK, kC, kQ, kD), kMoveKcQd},
+            {Move(kRank2, kSuitClubs, kRankA, kSuitDiamonds),       kMove2cAd},
+            {Move(kRank3, kSuitClubs, kRank2, kSuitDiamonds),       kMove3c2d},
+            {Move(kRank4, kSuitClubs, kRank3, kSuitDiamonds),       kMove4c3d},
+            {Move(kRank5, kSuitClubs, kRank4, kSuitDiamonds),       kMove5c4d},
+            {Move(kRank6, kSuitClubs, kRank5, kSuitDiamonds),       kMove6c5d},
+            {Move(kRank7, kSuitClubs, kRank6, kSuitDiamonds),       kMove7c6d},
+            {Move(kRank8, kSuitClubs, kRank7, kSuitDiamonds),       kMove8c7d},
+            {Move(kRank9, kSuitClubs, kRank8, kSuitDiamonds),       kMove9c8d},
+            {Move(kRankT, kSuitClubs, kRank9, kSuitDiamonds),       kMoveTc9d},
+            {Move(kRankJ, kSuitClubs, kRankT, kSuitDiamonds),       kMoveJcTd},
+            {Move(kRankQ, kSuitClubs, kRankJ, kSuitDiamonds),       kMoveQcJd},
+            {Move(kRankK, kSuitClubs, kRankQ, kSuitDiamonds),       kMoveKcQd},
             // endregion
 
             // Diamonds ------------------------------------------------------------------------------------------------
 
             // region Moves to Tableau (Diamonds <- Spades)
-            {Move(k2, kD, kA, kS), kMove2dAs},
-            {Move(k3, kD, k2, kS), kMove3d2s},
-            {Move(k4, kD, k3, kS), kMove4d3s},
-            {Move(k5, kD, k4, kS), kMove5d4s},
-            {Move(k6, kD, k5, kS), kMove6d5s},
-            {Move(k7, kD, k6, kS), kMove7d6s},
-            {Move(k8, kD, k7, kS), kMove8d7s},
-            {Move(k9, kD, k8, kS), kMove9d8s},
-            {Move(kT, kD, k9, kS), kMoveTd9s},
-            {Move(kJ, kD, kT, kS), kMoveJdTs},
-            {Move(kQ, kD, kJ, kS), kMoveQdJs},
-            {Move(kK, kD, kQ, kS), kMoveKdQs},
+            {Move(kRank2, kSuitDiamonds, kRankA, kSuitSpades),      kMove2dAs},
+            {Move(kRank3, kSuitDiamonds, kRank2, kSuitSpades),      kMove3d2s},
+            {Move(kRank4, kSuitDiamonds, kRank3, kSuitSpades),      kMove4d3s},
+            {Move(kRank5, kSuitDiamonds, kRank4, kSuitSpades),      kMove5d4s},
+            {Move(kRank6, kSuitDiamonds, kRank5, kSuitSpades),      kMove6d5s},
+            {Move(kRank7, kSuitDiamonds, kRank6, kSuitSpades),      kMove7d6s},
+            {Move(kRank8, kSuitDiamonds, kRank7, kSuitSpades),      kMove8d7s},
+            {Move(kRank9, kSuitDiamonds, kRank8, kSuitSpades),      kMove9d8s},
+            {Move(kRankT, kSuitDiamonds, kRank9, kSuitSpades),      kMoveTd9s},
+            {Move(kRankJ, kSuitDiamonds, kRankT, kSuitSpades),      kMoveJdTs},
+            {Move(kRankQ, kSuitDiamonds, kRankJ, kSuitSpades),      kMoveQdJs},
+            {Move(kRankK, kSuitDiamonds, kRankQ, kSuitSpades),      kMoveKdQs},
             // endregion
 
             // region Moves to Tableau (Diamonds <- Clubs)
-            {Move(k2, kD, kA, kC), kMove2dAc},
-            {Move(k3, kD, k2, kC), kMove3d2c},
-            {Move(k4, kD, k3, kC), kMove4d3c},
-            {Move(k5, kD, k4, kC), kMove5d4c},
-            {Move(k6, kD, k5, kC), kMove6d5c},
-            {Move(k7, kD, k6, kC), kMove7d6c},
-            {Move(k8, kD, k7, kC), kMove8d7c},
-            {Move(k9, kD, k8, kC), kMove9d8c},
-            {Move(kT, kD, k9, kC), kMoveTd9c},
-            {Move(kJ, kD, kT, kC), kMoveJdTc},
-            {Move(kQ, kD, kJ, kC), kMoveQdJc},
-            {Move(kK, kD, kQ, kC), kMoveKdQc},
+            {Move(kRank2, kSuitDiamonds, kRankA, kSuitClubs),       kMove2dAc},
+            {Move(kRank3, kSuitDiamonds, kRank2, kSuitClubs),       kMove3d2c},
+            {Move(kRank4, kSuitDiamonds, kRank3, kSuitClubs),       kMove4d3c},
+            {Move(kRank5, kSuitDiamonds, kRank4, kSuitClubs),       kMove5d4c},
+            {Move(kRank6, kSuitDiamonds, kRank5, kSuitClubs),       kMove6d5c},
+            {Move(kRank7, kSuitDiamonds, kRank6, kSuitClubs),       kMove7d6c},
+            {Move(kRank8, kSuitDiamonds, kRank7, kSuitClubs),       kMove8d7c},
+            {Move(kRank9, kSuitDiamonds, kRank8, kSuitClubs),       kMove9d8c},
+            {Move(kRankT, kSuitDiamonds, kRank9, kSuitClubs),       kMoveTd9c},
+            {Move(kRankJ, kSuitDiamonds, kRankT, kSuitClubs),       kMoveJdTc},
+            {Move(kRankQ, kSuitDiamonds, kRankJ, kSuitClubs),       kMoveQdJc},
+            {Move(kRankK, kSuitDiamonds, kRankQ, kSuitClubs),       kMoveKdQc},
             // endregion
             
             // endregion
     };
 
-    const std::map<Action, Move> ACTION_TO_MOVE = {
+    // TODO: Please compute this on-the-fly instead of having this long mapping
+    const std::map<Action, Move> kActionToMove = {
             // region Mapping of an action declared in ActionType to a move;
 
             // region Moves To Empty Tableau
-            {kMove__Ks, Move(kNoRank, kNoSuit, kK, kS)},
-            {kMove__Kh, Move(kNoRank, kNoSuit, kK, kH)},
-            {kMove__Kc, Move(kNoRank, kNoSuit, kK, kC)},
-            {kMove__Kd, Move(kNoRank, kNoSuit, kK, kD)},
+            {kMove__Ks, Move(kRankNone, kSuitNone, kRankK, kSuitSpades)},
+            {kMove__Kh, Move(kRankNone, kSuitNone, kRankK, kSuitHearts)},
+            {kMove__Kc, Move(kRankNone, kSuitNone, kRankK, kSuitClubs)},
+            {kMove__Kd, Move(kRankNone, kSuitNone, kRankK, kSuitDiamonds)},
             // endregion
 
             // region Moves To Empty Foundation
-            {kMove__As, Move(kNoRank, kS, kA, kS)},
-            {kMove__Ah, Move(kNoRank, kH, kA, kH)},
-            {kMove__Ac, Move(kNoRank, kC, kA, kC)},
-            {kMove__Ad, Move(kNoRank, kD, kA, kD)},
+            {kMove__As, Move(kRankNone, kSuitSpades, kRankA, kSuitSpades)},
+            {kMove__Ah, Move(kRankNone, kSuitHearts, kRankA, kSuitHearts)},
+            {kMove__Ac, Move(kRankNone, kSuitClubs, kRankA, kSuitClubs)},
+            {kMove__Ad, Move(kRankNone, kSuitDiamonds, kRankA, kSuitDiamonds)},
             // endregion
 
             // region Moves to Foundation (To Spades)
-            {kMoveAs2s, Move(kA, kS, k2, kS)},
-            {kMove2s3s, Move(k2, kS, k3, kS)},
-            {kMove3s4s, Move(k3, kS, k4, kS)},
-            {kMove4s5s, Move(k4, kS, k5, kS)},
-            {kMove5s6s, Move(k5, kS, k6, kS)},
-            {kMove6s7s, Move(k6, kS, k7, kS)},
-            {kMove7s8s, Move(k7, kS, k8, kS)},
-            {kMove8s9s, Move(k8, kS, k9, kS)},
-            {kMove9sTs, Move(k9, kS, kT, kS)},
-            {kMoveTsJs, Move(kT, kS, kJ, kS)},
-            {kMoveJsQs, Move(kJ, kS, kQ, kS)},
-            {kMoveQsKs, Move(kQ, kS, kK, kS)},
+            {kMoveAs2s, Move(kRankA, kSuitSpades, kRank2, kSuitSpades)},
+            {kMove2s3s, Move(kRank2, kSuitSpades, kRank3, kSuitSpades)},
+            {kMove3s4s, Move(kRank3, kSuitSpades, kRank4, kSuitSpades)},
+            {kMove4s5s, Move(kRank4, kSuitSpades, kRank5, kSuitSpades)},
+            {kMove5s6s, Move(kRank5, kSuitSpades, kRank6, kSuitSpades)},
+            {kMove6s7s, Move(kRank6, kSuitSpades, kRank7, kSuitSpades)},
+            {kMove7s8s, Move(kRank7, kSuitSpades, kRank8, kSuitSpades)},
+            {kMove8s9s, Move(kRank8, kSuitSpades, kRank9, kSuitSpades)},
+            {kMove9sTs, Move(kRank9, kSuitSpades, kRankT, kSuitSpades)},
+            {kMoveTsJs, Move(kRankT, kSuitSpades, kRankJ, kSuitSpades)},
+            {kMoveJsQs, Move(kRankJ, kSuitSpades, kRankQ, kSuitSpades)},
+            {kMoveQsKs, Move(kRankQ, kSuitSpades, kRankK, kSuitSpades)},
             // endregion
 
             // region Moves to Foundation (To Hearts)
-            {kMoveAh2h, Move(kA, kH, k2, kH)},
-            {kMove2h3h, Move(k2, kH, k3, kH)},
-            {kMove3h4h, Move(k3, kH, k4, kH)},
-            {kMove4h5h, Move(k4, kH, k5, kH)},
-            {kMove5h6h, Move(k5, kH, k6, kH)},
-            {kMove6h7h, Move(k6, kH, k7, kH)},
-            {kMove7h8h, Move(k7, kH, k8, kH)},
-            {kMove8h9h, Move(k8, kH, k9, kH)},
-            {kMove9hTh, Move(k9, kH, kT, kH)},
-            {kMoveThJh, Move(kT, kH, kJ, kH)},
-            {kMoveJhQh, Move(kJ, kH, kQ, kH)},
-            {kMoveQhKh, Move(kQ, kH, kK, kH)},
+            {kMoveAh2h, Move(kRankA, kSuitHearts, kRank2, kSuitHearts)},
+            {kMove2h3h, Move(kRank2, kSuitHearts, kRank3, kSuitHearts)},
+            {kMove3h4h, Move(kRank3, kSuitHearts, kRank4, kSuitHearts)},
+            {kMove4h5h, Move(kRank4, kSuitHearts, kRank5, kSuitHearts)},
+            {kMove5h6h, Move(kRank5, kSuitHearts, kRank6, kSuitHearts)},
+            {kMove6h7h, Move(kRank6, kSuitHearts, kRank7, kSuitHearts)},
+            {kMove7h8h, Move(kRank7, kSuitHearts, kRank8, kSuitHearts)},
+            {kMove8h9h, Move(kRank8, kSuitHearts, kRank9, kSuitHearts)},
+            {kMove9hTh, Move(kRank9, kSuitHearts, kRankT, kSuitHearts)},
+            {kMoveThJh, Move(kRankT, kSuitHearts, kRankJ, kSuitHearts)},
+            {kMoveJhQh, Move(kRankJ, kSuitHearts, kRankQ, kSuitHearts)},
+            {kMoveQhKh, Move(kRankQ, kSuitHearts, kRankK, kSuitHearts)},
             // endregion
 
             // region Moves to Foundation (To Clubs)
-            {kMoveAc2c, Move(kA, kC, k2, kC)},
-            {kMove2c3c, Move(k2, kC, k3, kC)},
-            {kMove3c4c, Move(k3, kC, k4, kC)},
-            {kMove4c5c, Move(k4, kC, k5, kC)},
-            {kMove5c6c, Move(k5, kC, k6, kC)},
-            {kMove6c7c, Move(k6, kC, k7, kC)},
-            {kMove7c8c, Move(k7, kC, k8, kC)},
-            {kMove8c9c, Move(k8, kC, k9, kC)},
-            {kMove9cTc, Move(k9, kC, kT, kC)},
-            {kMoveTcJc, Move(kT, kC, kJ, kC)},
-            {kMoveJcQc, Move(kJ, kC, kQ, kC)},
-            {kMoveQcKc, Move(kQ, kC, kK, kC)},
+            {kMoveAc2c, Move(kRankA, kSuitClubs, kRank2, kSuitClubs)},
+            {kMove2c3c, Move(kRank2, kSuitClubs, kRank3, kSuitClubs)},
+            {kMove3c4c, Move(kRank3, kSuitClubs, kRank4, kSuitClubs)},
+            {kMove4c5c, Move(kRank4, kSuitClubs, kRank5, kSuitClubs)},
+            {kMove5c6c, Move(kRank5, kSuitClubs, kRank6, kSuitClubs)},
+            {kMove6c7c, Move(kRank6, kSuitClubs, kRank7, kSuitClubs)},
+            {kMove7c8c, Move(kRank7, kSuitClubs, kRank8, kSuitClubs)},
+            {kMove8c9c, Move(kRank8, kSuitClubs, kRank9, kSuitClubs)},
+            {kMove9cTc, Move(kRank9, kSuitClubs, kRankT, kSuitClubs)},
+            {kMoveTcJc, Move(kRankT, kSuitClubs, kRankJ, kSuitClubs)},
+            {kMoveJcQc, Move(kRankJ, kSuitClubs, kRankQ, kSuitClubs)},
+            {kMoveQcKc, Move(kRankQ, kSuitClubs, kRankK, kSuitClubs)},
             // endregion
 
             // region Moves to Foundation (To Diamonds)
-            {kMoveAd2d, Move(kA, kD, k2, kD)},
-            {kMove2d3d, Move(k2, kD, k3, kD)},
-            {kMove3d4d, Move(k3, kD, k4, kD)},
-            {kMove4d5d, Move(k4, kD, k5, kD)},
-            {kMove5d6d, Move(k5, kD, k6, kD)},
-            {kMove6d7d, Move(k6, kD, k7, kD)},
-            {kMove7d8d, Move(k7, kD, k8, kD)},
-            {kMove8d9d, Move(k8, kD, k9, kD)},
-            {kMove9dTd, Move(k9, kD, kT, kD)},
-            {kMoveTdJd, Move(kT, kD, kJ, kD)},
-            {kMoveJdQd, Move(kJ, kD, kQ, kD)},
-            {kMoveQdKd, Move(kQ, kD, kK, kD)},
+            {kMoveAd2d, Move(kRankA, kSuitDiamonds, kRank2, kSuitDiamonds)},
+            {kMove2d3d, Move(kRank2, kSuitDiamonds, kRank3, kSuitDiamonds)},
+            {kMove3d4d, Move(kRank3, kSuitDiamonds, kRank4, kSuitDiamonds)},
+            {kMove4d5d, Move(kRank4, kSuitDiamonds, kRank5, kSuitDiamonds)},
+            {kMove5d6d, Move(kRank5, kSuitDiamonds, kRank6, kSuitDiamonds)},
+            {kMove6d7d, Move(kRank6, kSuitDiamonds, kRank7, kSuitDiamonds)},
+            {kMove7d8d, Move(kRank7, kSuitDiamonds, kRank8, kSuitDiamonds)},
+            {kMove8d9d, Move(kRank8, kSuitDiamonds, kRank9, kSuitDiamonds)},
+            {kMove9dTd, Move(kRank9, kSuitDiamonds, kRankT, kSuitDiamonds)},
+            {kMoveTdJd, Move(kRankT, kSuitDiamonds, kRankJ, kSuitDiamonds)},
+            {kMoveJdQd, Move(kRankJ, kSuitDiamonds, kRankQ, kSuitDiamonds)},
+            {kMoveQdKd, Move(kRankQ, kSuitDiamonds, kRankK, kSuitDiamonds)},
             // endregion
 
             // Spades --------------------------------------------------------------------------------------------------
 
             // region Moves to Tableau (Spades <- Hearts)
-            {kMove2sAh, Move(k2, kS, kA, kH)},
-            {kMove3s2h, Move(k3, kS, k2, kH)},
-            {kMove4s3h, Move(k4, kS, k3, kH)},
-            {kMove5s4h, Move(k5, kS, k4, kH)},
-            {kMove6s5h, Move(k6, kS, k5, kH)},
-            {kMove7s6h, Move(k7, kS, k6, kH)},
-            {kMove8s7h, Move(k8, kS, k7, kH)},
-            {kMove9s8h, Move(k9, kS, k8, kH)},
-            {kMoveTs9h, Move(kT, kS, k9, kH)},
-            {kMoveJsTh, Move(kJ, kS, kT, kH)},
-            {kMoveQsJh, Move(kQ, kS, kJ, kH)},
-            {kMoveKsQh, Move(kK, kS, kQ, kH)},
+            {kMove2sAh, Move(kRank2, kSuitSpades, kRankA, kSuitHearts)},
+            {kMove3s2h, Move(kRank3, kSuitSpades, kRank2, kSuitHearts)},
+            {kMove4s3h, Move(kRank4, kSuitSpades, kRank3, kSuitHearts)},
+            {kMove5s4h, Move(kRank5, kSuitSpades, kRank4, kSuitHearts)},
+            {kMove6s5h, Move(kRank6, kSuitSpades, kRank5, kSuitHearts)},
+            {kMove7s6h, Move(kRank7, kSuitSpades, kRank6, kSuitHearts)},
+            {kMove8s7h, Move(kRank8, kSuitSpades, kRank7, kSuitHearts)},
+            {kMove9s8h, Move(kRank9, kSuitSpades, kRank8, kSuitHearts)},
+            {kMoveTs9h, Move(kRankT, kSuitSpades, kRank9, kSuitHearts)},
+            {kMoveJsTh, Move(kRankJ, kSuitSpades, kRankT, kSuitHearts)},
+            {kMoveQsJh, Move(kRankQ, kSuitSpades, kRankJ, kSuitHearts)},
+            {kMoveKsQh, Move(kRankK, kSuitSpades, kRankQ, kSuitHearts)},
             // endregion
 
             // region Moves to Tableau (Spades <- Diamonds)
-            {kMove2sAd, Move(k2, kS, kA, kD)},
-            {kMove3s2d, Move(k3, kS, k2, kD)},
-            {kMove4s3d, Move(k4, kS, k3, kD)},
-            {kMove5s4d, Move(k5, kS, k4, kD)},
-            {kMove6s5d, Move(k6, kS, k5, kD)},
-            {kMove7s6d, Move(k7, kS, k6, kD)},
-            {kMove8s7d, Move(k8, kS, k7, kD)},
-            {kMove9s8d, Move(k9, kS, k8, kD)},
-            {kMoveTs9d, Move(kT, kS, k9, kD)},
-            {kMoveJsTd, Move(kJ, kS, kT, kD)},
-            {kMoveQsJd, Move(kQ, kS, kJ, kD)},
-            {kMoveKsQd, Move(kK, kS, kQ, kD)},
+            {kMove2sAd, Move(kRank2, kSuitSpades, kRankA, kSuitDiamonds)},
+            {kMove3s2d, Move(kRank3, kSuitSpades, kRank2, kSuitDiamonds)},
+            {kMove4s3d, Move(kRank4, kSuitSpades, kRank3, kSuitDiamonds)},
+            {kMove5s4d, Move(kRank5, kSuitSpades, kRank4, kSuitDiamonds)},
+            {kMove6s5d, Move(kRank6, kSuitSpades, kRank5, kSuitDiamonds)},
+            {kMove7s6d, Move(kRank7, kSuitSpades, kRank6, kSuitDiamonds)},
+            {kMove8s7d, Move(kRank8, kSuitSpades, kRank7, kSuitDiamonds)},
+            {kMove9s8d, Move(kRank9, kSuitSpades, kRank8, kSuitDiamonds)},
+            {kMoveTs9d, Move(kRankT, kSuitSpades, kRank9, kSuitDiamonds)},
+            {kMoveJsTd, Move(kRankJ, kSuitSpades, kRankT, kSuitDiamonds)},
+            {kMoveQsJd, Move(kRankQ, kSuitSpades, kRankJ, kSuitDiamonds)},
+            {kMoveKsQd, Move(kRankK, kSuitSpades, kRankQ, kSuitDiamonds)},
             // endregion
 
             // Hearts --------------------------------------------------------------------------------------------------
 
             // region Moves to Tableau (Hearts <- Spades)
-            {kMove2hAs, Move(k2, kH, kA, kS)},
-            {kMove3h2s, Move(k3, kH, k2, kS)},
-            {kMove4h3s, Move(k4, kH, k3, kS)},
-            {kMove5h4s, Move(k5, kH, k4, kS)},
-            {kMove6h5s, Move(k6, kH, k5, kS)},
-            {kMove7h6s, Move(k7, kH, k6, kS)},
-            {kMove8h7s, Move(k8, kH, k7, kS)},
-            {kMove9h8s, Move(k9, kH, k8, kS)},
-            {kMoveTh9s, Move(kT, kH, k9, kS)},
-            {kMoveJhTs, Move(kJ, kH, kT, kS)},
-            {kMoveQhJs, Move(kQ, kH, kJ, kS)},
-            {kMoveKhQs, Move(kK, kH, kQ, kS)},
+            {kMove2hAs, Move(kRank2, kSuitHearts, kRankA, kSuitSpades)},
+            {kMove3h2s, Move(kRank3, kSuitHearts, kRank2, kSuitSpades)},
+            {kMove4h3s, Move(kRank4, kSuitHearts, kRank3, kSuitSpades)},
+            {kMove5h4s, Move(kRank5, kSuitHearts, kRank4, kSuitSpades)},
+            {kMove6h5s, Move(kRank6, kSuitHearts, kRank5, kSuitSpades)},
+            {kMove7h6s, Move(kRank7, kSuitHearts, kRank6, kSuitSpades)},
+            {kMove8h7s, Move(kRank8, kSuitHearts, kRank7, kSuitSpades)},
+            {kMove9h8s, Move(kRank9, kSuitHearts, kRank8, kSuitSpades)},
+            {kMoveTh9s, Move(kRankT, kSuitHearts, kRank9, kSuitSpades)},
+            {kMoveJhTs, Move(kRankJ, kSuitHearts, kRankT, kSuitSpades)},
+            {kMoveQhJs, Move(kRankQ, kSuitHearts, kRankJ, kSuitSpades)},
+            {kMoveKhQs, Move(kRankK, kSuitHearts, kRankQ, kSuitSpades)},
             // endregion
 
             // region Moves to Tableau (Hearts <- Clubs)
-            {kMove2hAc, Move(k2, kH, kA, kC)},
-            {kMove3h2c, Move(k3, kH, k2, kC)},
-            {kMove4h3c, Move(k4, kH, k3, kC)},
-            {kMove5h4c, Move(k5, kH, k4, kC)},
-            {kMove6h5c, Move(k6, kH, k5, kC)},
-            {kMove7h6c, Move(k7, kH, k6, kC)},
-            {kMove8h7c, Move(k8, kH, k7, kC)},
-            {kMove9h8c, Move(k9, kH, k8, kC)},
-            {kMoveTh9c, Move(kT, kH, k9, kC)},
-            {kMoveJhTc, Move(kJ, kH, kT, kC)},
-            {kMoveQhJc, Move(kQ, kH, kJ, kC)},
-            {kMoveKhQc, Move(kK, kH, kQ, kC)},
+            {kMove2hAc, Move(kRank2, kSuitHearts, kRankA, kSuitClubs)},
+            {kMove3h2c, Move(kRank3, kSuitHearts, kRank2, kSuitClubs)},
+            {kMove4h3c, Move(kRank4, kSuitHearts, kRank3, kSuitClubs)},
+            {kMove5h4c, Move(kRank5, kSuitHearts, kRank4, kSuitClubs)},
+            {kMove6h5c, Move(kRank6, kSuitHearts, kRank5, kSuitClubs)},
+            {kMove7h6c, Move(kRank7, kSuitHearts, kRank6, kSuitClubs)},
+            {kMove8h7c, Move(kRank8, kSuitHearts, kRank7, kSuitClubs)},
+            {kMove9h8c, Move(kRank9, kSuitHearts, kRank8, kSuitClubs)},
+            {kMoveTh9c, Move(kRankT, kSuitHearts, kRank9, kSuitClubs)},
+            {kMoveJhTc, Move(kRankJ, kSuitHearts, kRankT, kSuitClubs)},
+            {kMoveQhJc, Move(kRankQ, kSuitHearts, kRankJ, kSuitClubs)},
+            {kMoveKhQc, Move(kRankK, kSuitHearts, kRankQ, kSuitClubs)},
             // endregion
 
             // Clubs ---------------------------------------------------------------------------------------------------
 
             // region Moves to Tableau (Clubs <- Hearts)
-            {kMove2cAh, Move(k2, kC, kA, kH)},
-            {kMove3c2h, Move(k3, kC, k2, kH)},
-            {kMove4c3h, Move(k4, kC, k3, kH)},
-            {kMove5c4h, Move(k5, kC, k4, kH)},
-            {kMove6c5h, Move(k6, kC, k5, kH)},
-            {kMove7c6h, Move(k7, kC, k6, kH)},
-            {kMove8c7h, Move(k8, kC, k7, kH)},
-            {kMove9c8h, Move(k9, kC, k8, kH)},
-            {kMoveTc9h, Move(kT, kC, k9, kH)},
-            {kMoveJcTh, Move(kJ, kC, kT, kH)},
-            {kMoveQcJh, Move(kQ, kC, kJ, kH)},
-            {kMoveKcQh, Move(kK, kC, kQ, kH)},
+            {kMove2cAh, Move(kRank2, kSuitClubs, kRankA, kSuitHearts)},
+            {kMove3c2h, Move(kRank3, kSuitClubs, kRank2, kSuitHearts)},
+            {kMove4c3h, Move(kRank4, kSuitClubs, kRank3, kSuitHearts)},
+            {kMove5c4h, Move(kRank5, kSuitClubs, kRank4, kSuitHearts)},
+            {kMove6c5h, Move(kRank6, kSuitClubs, kRank5, kSuitHearts)},
+            {kMove7c6h, Move(kRank7, kSuitClubs, kRank6, kSuitHearts)},
+            {kMove8c7h, Move(kRank8, kSuitClubs, kRank7, kSuitHearts)},
+            {kMove9c8h, Move(kRank9, kSuitClubs, kRank8, kSuitHearts)},
+            {kMoveTc9h, Move(kRankT, kSuitClubs, kRank9, kSuitHearts)},
+            {kMoveJcTh, Move(kRankJ, kSuitClubs, kRankT, kSuitHearts)},
+            {kMoveQcJh, Move(kRankQ, kSuitClubs, kRankJ, kSuitHearts)},
+            {kMoveKcQh, Move(kRankK, kSuitClubs, kRankQ, kSuitHearts)},
             // endregion
 
             // region Moves to Tableau (Clubs <- Diamonds)
-            {kMove2cAd, Move(k2, kC, kA, kD)},
-            {kMove3c2d, Move(k3, kC, k2, kD)},
-            {kMove4c3d, Move(k4, kC, k3, kD)},
-            {kMove5c4d, Move(k5, kC, k4, kD)},
-            {kMove6c5d, Move(k6, kC, k5, kD)},
-            {kMove7c6d, Move(k7, kC, k6, kD)},
-            {kMove8c7d, Move(k8, kC, k7, kD)},
-            {kMove9c8d, Move(k9, kC, k8, kD)},
-            {kMoveTc9d, Move(kT, kC, k9, kD)},
-            {kMoveJcTd, Move(kJ, kC, kT, kD)},
-            {kMoveQcJd, Move(kQ, kC, kJ, kD)},
-            {kMoveKcQd, Move(kK, kC, kQ, kD)},
+            {kMove2cAd, Move(kRank2, kSuitClubs, kRankA, kSuitDiamonds)},
+            {kMove3c2d, Move(kRank3, kSuitClubs, kRank2, kSuitDiamonds)},
+            {kMove4c3d, Move(kRank4, kSuitClubs, kRank3, kSuitDiamonds)},
+            {kMove5c4d, Move(kRank5, kSuitClubs, kRank4, kSuitDiamonds)},
+            {kMove6c5d, Move(kRank6, kSuitClubs, kRank5, kSuitDiamonds)},
+            {kMove7c6d, Move(kRank7, kSuitClubs, kRank6, kSuitDiamonds)},
+            {kMove8c7d, Move(kRank8, kSuitClubs, kRank7, kSuitDiamonds)},
+            {kMove9c8d, Move(kRank9, kSuitClubs, kRank8, kSuitDiamonds)},
+            {kMoveTc9d, Move(kRankT, kSuitClubs, kRank9, kSuitDiamonds)},
+            {kMoveJcTd, Move(kRankJ, kSuitClubs, kRankT, kSuitDiamonds)},
+            {kMoveQcJd, Move(kRankQ, kSuitClubs, kRankJ, kSuitDiamonds)},
+            {kMoveKcQd, Move(kRankK, kSuitClubs, kRankQ, kSuitDiamonds)},
             // endregion
 
             // Diamonds ------------------------------------------------------------------------------------------------
 
             // region Moves to Tableau (Diamonds <- Spades)
-            {kMove2dAs, Move(k2, kD, kA, kS)},
-            {kMove3d2s, Move(k3, kD, k2, kS)},
-            {kMove4d3s, Move(k4, kD, k3, kS)},
-            {kMove5d4s, Move(k5, kD, k4, kS)},
-            {kMove6d5s, Move(k6, kD, k5, kS)},
-            {kMove7d6s, Move(k7, kD, k6, kS)},
-            {kMove8d7s, Move(k8, kD, k7, kS)},
-            {kMove9d8s, Move(k9, kD, k8, kS)},
-            {kMoveTd9s, Move(kT, kD, k9, kS)},
-            {kMoveJdTs, Move(kJ, kD, kT, kS)},
-            {kMoveQdJs, Move(kQ, kD, kJ, kS)},
-            {kMoveKdQs, Move(kK, kD, kQ, kS)},
+            {kMove2dAs, Move(kRank2, kSuitDiamonds, kRankA, kSuitSpades)},
+            {kMove3d2s, Move(kRank3, kSuitDiamonds, kRank2, kSuitSpades)},
+            {kMove4d3s, Move(kRank4, kSuitDiamonds, kRank3, kSuitSpades)},
+            {kMove5d4s, Move(kRank5, kSuitDiamonds, kRank4, kSuitSpades)},
+            {kMove6d5s, Move(kRank6, kSuitDiamonds, kRank5, kSuitSpades)},
+            {kMove7d6s, Move(kRank7, kSuitDiamonds, kRank6, kSuitSpades)},
+            {kMove8d7s, Move(kRank8, kSuitDiamonds, kRank7, kSuitSpades)},
+            {kMove9d8s, Move(kRank9, kSuitDiamonds, kRank8, kSuitSpades)},
+            {kMoveTd9s, Move(kRankT, kSuitDiamonds, kRank9, kSuitSpades)},
+            {kMoveJdTs, Move(kRankJ, kSuitDiamonds, kRankT, kSuitSpades)},
+            {kMoveQdJs, Move(kRankQ, kSuitDiamonds, kRankJ, kSuitSpades)},
+            {kMoveKdQs, Move(kRankK, kSuitDiamonds, kRankQ, kSuitSpades)},
             // endregion
 
             // region Moves to Tableau (Diamonds <- Clubs)
-            {kMove2dAc, Move(k2, kD, kA, kC)},
-            {kMove3d2c, Move(k3, kD, k2, kC)},
-            {kMove4d3c, Move(k4, kD, k3, kC)},
-            {kMove5d4c, Move(k5, kD, k4, kC)},
-            {kMove6d5c, Move(k6, kD, k5, kC)},
-            {kMove7d6c, Move(k7, kD, k6, kC)},
-            {kMove8d7c, Move(k8, kD, k7, kC)},
-            {kMove9d8c, Move(k9, kD, k8, kC)},
-            {kMoveTd9c, Move(kT, kD, k9, kC)},
-            {kMoveJdTc, Move(kJ, kD, kT, kC)},
-            {kMoveQdJc, Move(kQ, kD, kJ, kC)},
-            {kMoveKdQc, Move(kK, kD, kQ, kC)},
+            {kMove2dAc, Move(kRank2, kSuitDiamonds, kRankA, kSuitClubs)},
+            {kMove3d2c, Move(kRank3, kSuitDiamonds, kRank2, kSuitClubs)},
+            {kMove4d3c, Move(kRank4, kSuitDiamonds, kRank3, kSuitClubs)},
+            {kMove5d4c, Move(kRank5, kSuitDiamonds, kRank4, kSuitClubs)},
+            {kMove6d5c, Move(kRank6, kSuitDiamonds, kRank5, kSuitClubs)},
+            {kMove7d6c, Move(kRank7, kSuitDiamonds, kRank6, kSuitClubs)},
+            {kMove8d7c, Move(kRank8, kSuitDiamonds, kRank7, kSuitClubs)},
+            {kMove9d8c, Move(kRank9, kSuitDiamonds, kRank8, kSuitClubs)},
+            {kMoveTd9c, Move(kRankT, kSuitDiamonds, kRank9, kSuitClubs)},
+            {kMoveJdTc, Move(kRankJ, kSuitDiamonds, kRankT, kSuitClubs)},
+            {kMoveQdJc, Move(kRankQ, kSuitDiamonds, kRankJ, kSuitClubs)},
+            {kMoveKdQc, Move(kRankK, kSuitDiamonds, kRankQ, kSuitClubs)},
             // endregion
 
             // endregion
@@ -938,14 +945,7 @@ namespace open_spiel::solitaire {
 
     class SolitaireState : public State {
     public:
-
-        // Attributes ==================================================================================================
-
-        Waste                    waste;
-        std::vector<Foundation>  foundations;
-        std::vector<Tableau>     tableaus;
-        std::vector<Action>      revealed_cards;
-
+        
         // Constructors ================================================================================================
 
         explicit SolitaireState(std::shared_ptr<const Game> game);
@@ -978,6 +978,11 @@ namespace open_spiel::solitaire {
         bool                    IsReversible(const Card & source, Pile * source_pile) const;
 
     private:
+        Waste                    waste;
+        std::vector<Foundation>  foundations;
+        std::vector<Tableau>     tableaus;
+        std::vector<Action>      revealed_cards;
+
         bool   is_finished    = false;
         bool   is_reversible  = false;
         int    current_depth  = 0;

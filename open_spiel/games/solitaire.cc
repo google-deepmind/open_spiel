@@ -8,6 +8,9 @@
 namespace open_spiel::solitaire {
 
     namespace {
+
+        // TODO: https://clang..llvm.org/extra/clang-tidy/checks/bugprone-argument-comment.html
+
         const GameType kGameType {
             "solitaire",
             "Klondike Solitaire",
@@ -37,54 +40,62 @@ namespace open_spiel::solitaire {
     // region Miscellaneous ===================================================================================================
 
     std::vector<SuitType> GetOppositeSuits(const SuitType & suit) {
-        /* Just returns a vector of the suits of opposite color. For red suits (kH and kD), this returns the
-           black suits (kS and kC). For a black suit, this returns the red suits. The last `SuitType` would be
-          `kNoSuit` which should only occur with empty tableau cards or hidden cards. Empty tableau cards should
+        /* Just returns a vector of the suits of opposite color. For red suits (kSuitHearts and kSuitDiamonds), this returns the
+           black suits (kSuitSpades and kSuitClubs). For a black suit, this returns the red suits. The last `SuitType` would be
+          `kSuitNone` which should only occur with empty tableau cards or hidden cards. Empty tableau cards should
            accept any suit, but hidden cards are the opposite; they shouldn't accept any. There isn't really a use
-           case for calling this function with the suit of a hidden card though.
+           case for calling this function with the suit of a hidden card though. */
 
-        WARNING: Don't use this to find opposite suits of a hidden card, the result is meaningless */
-
-        if (suit == kS || suit == kC) {
-            return {kH, kD};
-        } else if (suit == kH || suit == kD) {
-            return {kS, kC};
-        } else if (suit == kNoSuit) {
-            return {kS, kH, kC, kD};
-        } else {
-            std::cerr << "WARNING: `suit` is not in (s, h, c, d)" << std::endl;
-            return {};
+        switch (suit) {
+            case kSuitSpades : {
+                return {kSuitHearts, kSuitDiamonds};
+            }
+            case kSuitHearts : {
+                return {kSuitSpades, kSuitClubs};
+            }
+            case kSuitClubs : {
+                return {kSuitHearts, kSuitDiamonds};
+            }
+            case kSuitDiamonds : {
+                return {kSuitSpades, kSuitClubs};
+            }
+            case kSuitNone :{
+                return {kSuitSpades, kSuitHearts, kSuitClubs, kSuitDiamonds};
+            }
+            default : {
+                SpielFatalError("suit is not in (s, h, c, d)");
+            }
         }
     }
 
     int GetCardIndex(RankType rank, SuitType suit) {
         /* Using a given rank and/or suit, gets an integer representing the index of the card. */
 
-        if (rank == kHiddenRank || suit == kHiddenSuit) {
+        if (rank == kRankHidden || suit == kSuitHidden) {
             // Handles hidden cards
-            return HIDDEN_CARD;
-        } else if (rank == kNoRank) {
+            return kHiddenCard;
+        } else if (rank == kRankNone) {
             // Handles special cards
-            if (suit == kNoSuit) {
+            if (suit == kSuitNone) {
                 // Handles empty tableau cards
-                return EMPTY_TABLEAU_CARD;
+                return kEmptyTableauCard;
             } else {
                 // Handles empty foundation cards
                 switch (suit) {
-                    case kS : {
-                        return EMPTY_SPADE_CARD;
+                    case kSuitSpades : {
+                        return kEmptySpadeCard;
                     }
-                    case kH : {
-                        return EMPTY_HEART_CARD;
+                    case kSuitHearts : {
+                        return kEmptyHeartCard;
                     }
-                    case kC : {
-                        return EMPTY_CLUB_CARD;
+                    case kSuitClubs : {
+                        return kEmptyClubCard;
                     }
-                    case kD : {
-                        return EMPTY_DIAMOND_CARD;
+                    case kSuitDiamonds : {
+                        return kEmptyDiamondCard;
                     }
                     default : {
-                        std::cerr << "WARNING: Something went wrong in GetCardIndex()" << std::endl;
+                        SpielFatalError("Failed to get card index");
                     }
                 }
             }
@@ -129,38 +140,37 @@ namespace open_spiel::solitaire {
         index(index), hidden(hidden), location(location) {
         if (!hidden) {
             switch (index) {
-                case HIDDEN_CARD : {
-                    rank = kHiddenRank;
-                    suit = kHiddenSuit;
+                case kHiddenCard : {
+                    rank = kRankHidden;
+                    suit = kSuitHidden;
                     break;
                 }
-                case EMPTY_TABLEAU_CARD : {
-                    rank = kNoRank;
-                    suit = kNoSuit;
+                case kEmptyTableauCard : {
+                    rank = kRankNone;
+                    suit = kSuitNone;
                     break;
                 }
-                case EMPTY_SPADE_CARD : {
-                    rank = kNoRank;
-                    suit = kS;
+                case kEmptySpadeCard : {
+                    rank = kRankNone;
+                    suit = kSuitSpades;
                     break;
                 }
-                case EMPTY_HEART_CARD : {
-                    rank = kNoRank;
-                    suit = kH;
+                case kEmptyHeartCard : {
+                    rank = kRankNone;
+                    suit = kSuitHearts;
                     break;
                 }
-                case EMPTY_CLUB_CARD : {
-                    rank = kNoRank;
-                    suit = kC;
+                case kEmptyClubCard : {
+                    rank = kRankNone;
+                    suit = kSuitClubs;
                     break;
                 }
-                case EMPTY_DIAMOND_CARD : {
-                    rank = kNoRank;
-                    suit = kD;
+                case kEmptyDiamondCard : {
+                    rank = kRankNone;
+                    suit = kSuitDiamonds;
                     break;
                 }
                 default : {
-                    // TODO: Find a more elegant way of doing while keeping kNoX inside enums for LegalChildren()
                     rank = static_cast<RankType>(1 + ((index - 1) % 13));
                     suit = static_cast<SuitType>(1 + floor((index - 1) / 13));
                 }
@@ -172,7 +182,7 @@ namespace open_spiel::solitaire {
         /* Basically it just calculates the index if it hasn't been calculated before, otherwise
          * it will just return a stored value. If `force` is true and the card isn't hidden, then
          * the index is calculated again. */
-        return hidden ? HIDDEN_CARD : GetCardIndex(rank, suit);
+        return hidden ? kHiddenCard : GetCardIndex(rank, suit);
     }
 
     std::string Card::ToString(bool colored) const {
@@ -180,26 +190,26 @@ namespace open_spiel::solitaire {
 
         // Determine color of string
         if (colored && !hidden) {
-            if (suit == kS || suit == kC) {
-                absl::StrAppend(&result, BLACK);
-            } else if (suit == kH || suit == kD) {
-                absl::StrAppend(&result, RED);
+            if (suit == kSuitSpades || suit == kSuitClubs) {
+                absl::StrAppend(&result, kBlack);
+            } else if (suit == kSuitHearts || suit == kSuitDiamonds) {
+                absl::StrAppend(&result, kRed);
             }
         }
 
         // Determine contents of string
-        if (rank == kHiddenRank || suit == kHiddenSuit) {
-            absl::StrAppend(&result, GLYPH_HIDDEN, " ");
-        } else if (rank == kNoRank && suit == kNoSuit) {
-            absl::StrAppend(&result, GLYPH_EMPTY);
+        if (rank == kRankHidden || suit == kSuitHidden) {
+            absl::StrAppend(&result, kGlyphHidden, " ");
+        } else if (rank == kRankNone && suit == kSuitNone) {
+            absl::StrAppend(&result, kGlyphEmpty);
         } else {
-            absl::StrAppend(&result, RANK_STRS.at(rank));
-            absl::StrAppend(&result, SUIT_STRS.at(suit));
+            absl::StrAppend(&result, kRankStrs.at(rank));
+            absl::StrAppend(&result, kSuitStrs.at(suit));
         }
 
         if (colored) {
             // Reset color if applicable
-            absl::StrAppend(&result, RESET);
+            absl::StrAppend(&result, kReset);
         }
 
         return result;
@@ -217,24 +227,24 @@ namespace open_spiel::solitaire {
             switch (location) {
                 case kTableau : {
                     switch (rank) {
-                        case kNoRank : {
-                            if (suit == kNoSuit) {
+                        case kRankNone : {
+                            if (suit == kSuitNone) {
                                 // Empty tableaus can accept a king of any suit
-                                child_rank  = kK;
-                                child_suits = SUITS;
+                                child_rank  = kRankK;
+                                child_suits = kSuits;
                                 break;
                             } else {
                                 return {};
                             }
                         }
-                        case k2 ... kK : {
+                        case kRank2 ... kRankK : {
                             // Ordinary cards (except aces) can accept cards of an opposite suit that is one rank lower
                             child_rank  = static_cast<RankType>(rank - 1);
                             child_suits = GetOppositeSuits(suit);
                             break;
                         }
                         default : {
-                            // This will catch kA and kHiddenRank
+                            // This will catch kRankA and kRankHidden
                             return {};
                         }
                     }
@@ -242,8 +252,8 @@ namespace open_spiel::solitaire {
                 }
                 case kFoundation : {
                     switch (rank) {
-                        case kNoRank : {
-                            if (suit != kNoSuit) {
+                        case kRankNone : {
+                            if (suit != kSuitNone) {
                                 child_rank  = static_cast<RankType>(rank + 1);
                                 child_suits = {suit};
                                 break;
@@ -251,14 +261,14 @@ namespace open_spiel::solitaire {
                                 return {};
                             }
                         }
-                        case kA ... kQ : {
+                        case kRankA ... kRankQ : {
                             // Cards (except kings) can accept a card of the same suit that is one rank higher
                             child_rank  = static_cast<RankType>(rank + 1);
                             child_suits = {suit};
                             break;
                         }
                         default : {
-                            // This could catch kK and kHiddenRank
+                            // This could catch kRankK and kRankHidden
                             return {};
                         }
                     }
@@ -274,8 +284,7 @@ namespace open_spiel::solitaire {
             legal_children.reserve(4);
 
             if (child_suits.empty()) {
-                std::cerr << "WARNING: `child_suits` should never be empty" << std::endl;
-                return {};
+                SpielFatalError("child_suits should not be empty");
             }
 
             for (const auto & child_suit : child_suits) {
@@ -321,7 +330,7 @@ namespace open_spiel::solitaire {
                     return {cards.back()};
                 } else {
                     // Empty foundation card with the same suit as the pile
-                    return {Card(false, suit, kNoRank, kFoundation)};
+                    return {Card(false, suit, kRankNone, kFoundation)};
                 }
             }
             case kTableau : {
@@ -334,12 +343,11 @@ namespace open_spiel::solitaire {
                     }
                 } else {
                     // Empty tableau card (no rank or suit)
-                    return {Card(false, kNoSuit, kNoRank, kTableau)};
+                    return {Card(false, kSuitNone, kRankNone, kTableau)};
                 }
             }
             default : {
-                std::cout << "WARNING: Pile::Targets() called with unsupported type: " << type << std::endl;
-                return {};
+                SpielFatalError("Pile::Targets() called with unsupported type");
             }
         }
     }
@@ -386,8 +394,7 @@ namespace open_spiel::solitaire {
                 }
             }
             default : {
-                std::cout << "WARNING: Pile::Sources() called with unsupported type: " << type << std::endl;
-                return {};
+                SpielFatalError("Pile::Sources() called with unsupported type");
             }
         }
     }
@@ -461,7 +468,7 @@ namespace open_spiel::solitaire {
     // region Tableau Methods =================================================================================================
 
     Tableau::Tableau(PileID id) :
-        Pile(kTableau, id, kNoSuit) {
+        Pile(kTableau, id, kSuitNone) {
         // Nothing here
     }
 
@@ -475,7 +482,7 @@ namespace open_spiel::solitaire {
             }
         } else {
             // Empty tableau card (no rank or suit)
-            return {Card(false, kNoSuit, kNoRank, kTableau)};
+            return {Card(false, kSuitNone, kRankNone, kTableau)};
         }
     }
 
@@ -527,7 +534,7 @@ namespace open_spiel::solitaire {
             return {cards.back()};
         } else {
             // Empty foundation card with the same suit as the pile
-            return {Card(false, suit, kNoRank, kFoundation)};
+            return {Card(false, suit, kRankNone, kFoundation)};
         }
     }
 
@@ -555,7 +562,7 @@ namespace open_spiel::solitaire {
     // region Waste Methods ===================================================================================================
 
     Waste::Waste() :
-        Pile(kWaste, kPileWaste, kNoSuit) {
+        Pile(kWaste, kPileWaste, kSuitNone) {
         // Nothing here
     }
 
@@ -610,24 +617,24 @@ namespace open_spiel::solitaire {
     }
 
     Move::Move(RankType target_rank, SuitType target_suit, RankType source_rank, SuitType source_suit) {
-        // Used to create moves inside std::maps like `MOVE_TO_ACTION` and `ACTION_TO_MOVE`
+        // Used to create moves inside std::maps like `kMoveToAction` and `kActionToMove`
         target = Card(false, target_suit, target_rank, kMissing);
         source = Card(false, source_suit, source_rank, kMissing);
     }
 
     Move::Move(Action action) {
-        auto value = ACTION_TO_MOVE.at(action);
+        auto value = kActionToMove.at(action);
         target = value.target;
         source = value.source;
     }
 
     Action Move::ActionId() const {
-        return MOVE_TO_ACTION.at(*this);
+        return kMoveToAction.at(*this);
     }
 
     std::string Move::ToString(bool colored) const {
         std::string result;
-        absl::StrAppend(&result, target.ToString(colored), " ", GLYPH_ARROW, " ", source.ToString(colored));
+        absl::StrAppend(&result, target.ToString(colored), " ", kGlyphArrow, " ", source.ToString(colored));
         return result;
     }
 
@@ -650,8 +657,8 @@ namespace open_spiel::solitaire {
         depth_limit = parameters.at("depth_limit").int_value();
 
         // Create foundations
-        for (const auto & suit : SUITS) {
-            foundations.emplace_back(SUIT_TO_PILE.at(suit), suit);
+        for (const auto & suit : kSuits) {
+            foundations.emplace_back(kSuitToPile.at(suit), suit);
         }
 
         // Create tableaus
@@ -660,11 +667,11 @@ namespace open_spiel::solitaire {
             // Create `i` hidden cards
             std::vector<Card> cards_to_add;
             for (int j = 1; j <= i; j++) {
-                cards_to_add.emplace_back(true, kHiddenSuit, kHiddenRank, kTableau);
+                cards_to_add.emplace_back(true, kSuitHidden, kRankHidden, kTableau);
             }
 
             // Create a new tableau and add cards
-            auto tableau  = Tableau(INT_TO_PILE.at(i));
+            auto tableau  = Tableau(kIntToPile.at(i));
             tableau.cards = cards_to_add;
 
             // Add resulting tableau to tableaus
@@ -673,7 +680,7 @@ namespace open_spiel::solitaire {
 
         // Create waste
         for (int i = 1; i <= 24; i++) {
-            waste.cards.emplace_back(true, kHiddenSuit, kHiddenRank, kWaste);
+            waste.cards.emplace_back(true, kSuitHidden, kRankHidden, kWaste);
         }
     }
 
@@ -748,8 +755,8 @@ namespace open_spiel::solitaire {
 
     std::string             SolitaireState::ActionToString(Player player, Action action_id) const {
         switch (action_id) {
-            case kDraw : {
-                return "kDraw";
+            case kEnd : {
+                return "kEnd";
             }
             case kRevealAs ... kRevealKd : {
                 auto revealed_card = Card((int) action_id);
@@ -792,11 +799,11 @@ namespace open_spiel::solitaire {
                 ptr[0] = 1;
             } else {
                 auto last_rank = foundation.cards.back().rank;
-                if (last_rank >= kA && last_rank <= kK) {
+                if (last_rank >= kRankA && last_rank <= kRankK) {
                     ptr[last_rank] = 1;
                 }
             }
-            ptr += FOUNDATION_TENSOR_LENGTH;
+            ptr += kFoundationTensorLength;
         }
 
         for (auto & tableau : tableaus) {
@@ -806,16 +813,16 @@ namespace open_spiel::solitaire {
             } else {
                 int num_hidden_cards = 0;
                 for (auto & card : tableau.cards) {
-                    if (card.hidden && num_hidden_cards <= MAX_HIDDEN_CARDS) {
+                    if (card.hidden && num_hidden_cards <= kMaxHiddenCard) {
                         ptr[num_hidden_cards] = 1.0;
                         ++num_hidden_cards;
                     } else {
-                        auto tensor_index = card.GetIndex() + MAX_HIDDEN_CARDS;
+                        auto tensor_index = card.GetIndex() + kMaxHiddenCard;
                         ptr[tensor_index] = 1.0;
                     }
                 }
             }
-            ptr += TABLEAU_TENSOR_LENGTH;
+            ptr += kTableauTensorLength;
         }
 
         if (waste.cards.empty()) {
@@ -828,82 +835,9 @@ namespace open_spiel::solitaire {
                     auto tensor_index = card.GetIndex() + 1;
                     ptr[tensor_index] = 1.0;
                 }
-                ptr += WASTE_TENSOR_LENGTH;
+                ptr += kWasteTensorLength;
             }
         }
-
-        /*
-        // region For debugging purposes
-        std::vector<std::pair<int, int>> slices = {
-                // region Slices to print out
-                // Foundation Tensors
-                {0, 13},
-                {14, 27},
-                {28, 41},
-                {42, 55},
-
-                // Tableau Tensors
-                {56, 114},
-                {115, 173},
-                {174, 232},
-                {233, 291},
-                {292, 350},
-                {351, 409},
-                {410, 468},
-
-                // Waste Tensors
-                {469, 521},
-                {522, 574},
-                {575, 627},
-                {628, 680},
-                {681, 733},
-                {734, 786},
-                {787, 839},
-                {840, 892},
-                {893, 945},
-                {946, 998},
-                {999, 1051},
-                {1052, 1104},
-                {1105, 1157},
-                {1158, 1210},
-                {1211, 1263},
-                {1264, 1316},
-                {1317, 1369},
-                {1370, 1422},
-                {1423, 1475},
-                {1476, 1528},
-                {1529, 1581},
-                {1582, 1634},
-                {1635, 1687},
-                {1688, 1740}
-                // endregion
-        };
-
-        int i = 1;
-        for (auto & slice : slices) {
-            switch (i) {
-                case 1 : {
-                    std::cout << "FOUNDATION TENSORS" << std::endl;
-                    break;
-                }
-                case 5 : {
-                    std::cout << "TABLEAU TENSORS" << std::endl;
-                    break;
-                }
-                case 12 : {
-                    std::cout << "WASTE TENSORS" << std::endl;
-                    break;
-                }
-                default : {
-                    // Do nothing
-                }
-            }
-            std::cout << std::vector<double>(values->begin() + slice.first, values->begin() + slice.second) << std::endl;
-            ++i;
-        }
-        // endregion
-        */
-
     }
 
     void                    SolitaireState::DoApplyAction(Action action) {
@@ -958,7 +892,7 @@ namespace open_spiel::solitaire {
                 break;
             }
             default : {
-                // TODO: Add warning message
+                SpielFatalError("Provided action is undefined");
             }
         }
 
@@ -1015,7 +949,7 @@ namespace open_spiel::solitaire {
             if (!legal_actions.empty()) {
                 std::sort(legal_actions.begin(), legal_actions.end());
             } else {
-                legal_actions.push_back(kDraw);
+                legal_actions.push_back(kEnd);
             }
 
             return legal_actions;
@@ -1038,7 +972,6 @@ namespace open_spiel::solitaire {
     // Other Methods ---------------------------------------------------------------------------------------------------
 
     std::vector<Card>       SolitaireState::Targets(const std::optional<LocationType> & location) const {
-        // OPTIMIZE: Store values, calculate changes
         LocationType loc = location.value_or(kMissing);
         std::vector<Card> targets;
 
@@ -1060,7 +993,6 @@ namespace open_spiel::solitaire {
     }
 
     std::vector<Card>       SolitaireState::Sources(const std::optional<LocationType> & location) const {
-        // OPTIMIZE: Store values, calculate changes
         LocationType loc = location.value_or(kMissing);
         std::vector<Card> sources;
 
@@ -1090,21 +1022,21 @@ namespace open_spiel::solitaire {
 
         PileID pile_id;
 
-        if (card.rank == kNoRank) {
-            if (card.suit == kNoSuit) {
+        if (card.rank == kRankNone) {
+            if (card.suit == kSuitNone) {
                 for (auto & tableau : tableaus) {
                     if (tableau.cards.empty()) {
                         return (Pile *) & tableau;
                     }
                 }
-            } else if (card.suit != kHiddenSuit) {
+            } else if (card.suit != kSuitHidden) {
                 for (auto & foundation : foundations) {
                     if (foundation.suit == card.suit) {
                         return (Pile *) & foundation;
                     }
                 }
             } else {
-                std::cout << "Some error" << std::endl;
+                SpielFatalError("The pile containing the card wasn't found");
             }
         } else {
             pile_id = card_map.at(card);
@@ -1121,7 +1053,7 @@ namespace open_spiel::solitaire {
                 return (Pile *) & tableaus.at(pile_id - 5);
             }
             default : {
-                std::cout << "The pile containing the card wasn't found" << std::endl;
+                SpielFatalError("The pile containing the card wasn't found");
             }
         }
     }
@@ -1138,7 +1070,7 @@ namespace open_spiel::solitaire {
                 return (Pile *) & tableaus.at(pile_id - 5);
             }
             default : {
-                std::cout << "The pile containing the card wasn't found" << std::endl;
+                SpielFatalError("The pile containing the card wasn't found");
             }
         }
     }
@@ -1150,7 +1082,7 @@ namespace open_spiel::solitaire {
         bool found_empty_tableau  = false;
 
         for (auto & target : targets) {
-            if (target.suit == kNoSuit && target.rank == kNoRank) {
+            if (target.suit == kSuitNone && target.rank == kRankNone) {
                 if (found_empty_tableau) {
                     continue;
                 } else {
@@ -1164,7 +1096,7 @@ namespace open_spiel::solitaire {
                         if (source_pile->cards.back() == source) {
                             candidate_moves.emplace_back(target, source);
                         }
-                    } else if (source.rank == kK && target.suit == kNoSuit && target.rank == kNoRank) {
+                    } else if (source.rank == kRankK && target.suit == kSuitNone && target.rank == kRankNone) {
                         // Check is source is not a bottom
                         if (source_pile->type == kTableau && !(source_pile->cards.front() == source)) {
                             candidate_moves.emplace_back(target, source);
@@ -1204,10 +1136,10 @@ namespace open_spiel::solitaire {
         // Reward for moving a card to or from a foundation
         if (target_pile->type == kFoundation) {
             // Adds points for moving TO a foundation
-            move_reward += FOUNDATION_POINTS.at(source.rank);
+            move_reward += kFoundationPoints.at(source.rank);
         } else if (source_pile->type == kFoundation) {
             // Subtracts points for moving AWAY from a foundation
-            move_reward -= FOUNDATION_POINTS.at(source.rank);
+            move_reward -= kFoundationPoints.at(source.rank);
         }
 
         // Reward for revealing a hidden card
@@ -1244,8 +1176,7 @@ namespace open_spiel::solitaire {
 
             }
             default : {
-                // TODO: Log error or raise exception
-                return false;
+                SpielFatalError("Card is not in the waste, foundations, or tableaus");
             }
         }
     }
@@ -1263,6 +1194,11 @@ namespace open_spiel::solitaire {
     }
 
     int SolitaireGame::NumDistinctActions() const {
+        /* 52 kReveal Moves (one for each ordinary card)
+         * 52 Foundation Moves (one for every ordinary card)
+         * 96 Tableau Moves (two for every ordinary card except aces)
+         *  4 King to Empty Tableau (one for every king)
+         *  1 End Game Move */
         return 205;
     }
 
@@ -1279,11 +1215,26 @@ namespace open_spiel::solitaire {
     }
 
     double SolitaireGame::MaxUtility() const {
+        /* Waste (24 * 20 = 480)
+             24 cards are in the waste initially. 20 points are rewarded for every one that is moved from the waste.
+           Tableau (21 * 20 = 420)
+             21 cards are hidden in the tableaus initially. 20 points are rewarded for every one that is revealed.
+           Foundation (4 * (100 + 90 + 80 + 70 + 60 + 50 + 40 + 30 + 20 + 10 + 10 + 10 + 10) = 4 * 580 = 2,320)
+             0 cards are in the foundations initially. A varying number of points, based on the cards rank, are awarded
+             when the card is moved to the foundation. Each complete suit in the foundation is worth 580 points.
+             `kFoundationPoints` in `solitaire.h` outlines how much each rank is worth. */
         return 3220.0;
     }
 
     std::vector<int> SolitaireGame::ObservationTensorShape() const {
-        return {1740};
+        /* Waste (24 * 53 = 1,272)
+             24 locations and each location is a 53 element vector (52 normal cards + 1 hidden)
+           Tableau (7 * 59 = 413)
+             Each tableau is represented as a 59 element vector (6 hidden cards + 1 empty tableau + 52 normal cards)
+          Foundation (4 * 14 = 56)
+             Each foundation is represented as a 14 element vector (13 ranks + 1 empty foundation)
+          Total Length = 1,272 + 413 + 56 = 1,741 */
+        return {1741};
     }
 
     std::unique_ptr<State> SolitaireGame::NewInitialState() const {
