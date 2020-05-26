@@ -282,6 +282,30 @@ void GameParametersTest() {
   SPIEL_CHECK_EQ(game2["param"].string_value(), "val");
 }
 
+void PolicySerializationTest() {
+  // Tabular policy
+  auto game = LoadGame("tic_tac_toe");
+  auto policy = std::make_unique<TabularPolicy>(*game);
+  std::shared_ptr<Policy> deserialized_policy =
+      DeserializePolicy(policy->Serialize());
+  auto deserialized =
+      std::static_pointer_cast<TabularPolicy>(deserialized_policy);
+
+  SPIEL_CHECK_EQ(
+      policy->PolicyTable().size(), deserialized->PolicyTable().size());
+  for (const auto& [info_state, policy] : policy->PolicyTable()) {
+    for (int i = 0; i < policy.size(); i++) {
+      auto original_val = policy.at(i);
+      auto deserialized_val = deserialized->PolicyTable().at(info_state).at(i);
+      SPIEL_CHECK_EQ(original_val.first, deserialized_val.first);
+      SPIEL_CHECK_FLOAT_EQ(original_val.second, deserialized_val.second);
+    }
+  }
+
+  // Uniform policy
+  DeserializePolicy(std::make_unique<UniformPolicy>()->Serialize());
+}
+
 }  // namespace
 }  // namespace testing
 }  // namespace open_spiel
@@ -294,4 +318,5 @@ int main(int argc, char** argv) {
   open_spiel::testing::PolicyTest();
   open_spiel::testing::LeducPokerDeserializeTest();
   open_spiel::testing::GameParametersTest();
+  open_spiel::testing::PolicySerializationTest();
 }

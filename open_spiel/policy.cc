@@ -69,8 +69,75 @@ ActionsAndProbs UniformStatePolicy(const State& state) {
   return actions_and_probs;
 }
 
+std::unique_ptr<Policy> DeserializePolicy(const std::string& str) {
+  // Class’s identity is the very first line, see Policy::Serialize
+  // for more info
+  std::pair<std::string, absl::string_view> cls_and_content = absl::StrSplit(
+      str, absl::MaxSplits('\n', 1));
+  std::string class_identity = cls_and_content.first;
+
+  if (class_identity == "TabularPolicy") {
+    return DeserializeTabularPolicy(str);
+  }
+  else if (class_identity == "UniformPolicy") {
+    return std::make_unique<UniformPolicy>();
+  }
+  else {
+    SpielFatalError(absl::StrCat(
+      "Deserialization of ", class_identity, " is not supported."));
+  }
+}
+
 TabularPolicy::TabularPolicy(const Game& game)
     : TabularPolicy(GetRandomPolicy(game)) {}
+
+std::unique_ptr<TabularPolicy> DeserializeTabularPolicy(
+    const std::string& str) {
+  // Class’s identity is the very first line, see Policy::Serialize
+  // for more info
+  std::pair<std::string, absl::string_view> cls_and_content =
+      absl::StrSplit(str, absl::MaxSplits('\n', 1));
+  SPIEL_CHECK_EQ(cls_and_content.first, "TabularPolicy");
+
+  std::unique_ptr<TabularPolicy> res = std::make_unique<TabularPolicy>();
+  if (cls_and_content.second.empty()) return res;
+
+  for (absl::string_view line : absl::StrSplit(cls_and_content.second, '\n')) {
+    // The info_state data is prefixed with an integer length, see
+    // TabularPolicy::Serialize for more info
+    std::pair<std::string, absl::string_view> info_state_len_and_rest =
+        absl::StrSplit(line, absl::MaxSplits(':', 1));
+    int info_state_len = std::stoi(info_state_len_and_rest.first);
+
+    std::pair<std::string, absl::string_view> info_state_and_policy;
+    if (info_state_len == 0) {
+      info_state_and_policy = std::make_pair(
+          "", info_state_len_and_rest.second);
+    } else {
+      info_state_and_policy = absl::StrSplit(
+          info_state_len_and_rest.second,
+          absl::MaxSplits(absl::ByLength(info_state_len), 1));
+    }
+    std::vector<absl::string_view> policy_values =
+        absl::StrSplit(info_state_and_policy.second, ',');
+
+    // Insert the actual values
+    ActionsAndProbs res_policy;
+    res_policy.reserve(policy_values.size());
+    Action action;
+    double prob;
+    for (absl::string_view policy_value : policy_values) {
+      std::pair<absl::string_view, absl::string_view> action_and_prob =
+          absl::StrSplit(policy_value, '=');
+      absl::SimpleAtoi(action_and_prob.first, &action);
+      absl::SimpleAtod(action_and_prob.second, &prob);
+      res_policy.push_back({action, prob});
+    }
+    res->SetStatePolicy(info_state_and_policy.first, res_policy);
+  }
+
+  return res;
+}
 
 TabularPolicy GetEmptyTabularPolicy(const Game& game,
                                     bool initialize_to_uniform) {

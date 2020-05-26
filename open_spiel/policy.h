@@ -15,6 +15,7 @@
 #ifndef OPEN_SPIEL_POLICY_H_
 #define OPEN_SPIEL_POLICY_H_
 
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -100,7 +101,17 @@ class Policy {
   virtual ActionsAndProbs GetStatePolicy(const std::string& info_state) const {
     SpielFatalError("GetStatePolicy(const std::string&) unimplemented.");
   }
+
+  // Each override must write out the class’s identity as the very first
+  // thing so that the DeserializePolicy method can then call the Deserialize
+  // method for the correct subclass. See TabularPolicy and DeserializePolicy
+  // below for an example.
+  virtual std::string Serialize() const {
+    SpielFatalError("Serialize() unimplemented.");
+  }
 };
+
+std::unique_ptr<Policy> DeserializePolicy(const std::string& str);
 
 // A tabular policy represented internally as a map. Note that this
 // implementation is not directly compatible with the Python TabularPolicy
@@ -148,6 +159,21 @@ class TabularPolicy : public Policy {
     }
   }
 
+  std::string Serialize() const override {
+    std::string str = "TabularPolicy\n";
+    for (auto const& [info_state, policy] : policy_table_) {
+      // Prefix the info_state data with an integer length so that
+      // deserialization is done based on length rather than special
+      // delimiters that could be present in the data itself
+      absl::StrAppend(&str, info_state.length(), ":", info_state);
+      absl::StrAppend(
+          &str, absl::StrJoin(policy, ",", absl::PairFormatter("=")), "\n");
+    }
+    // Remove the trailing newline character
+    str.erase(str.length() - 1);
+    return str;
+  }
+
   // Set the probability for action at the info state. If the info state is not
   // in the policy, it is added. If the action is not in the info state policy,
   // it is added. Otherwise it is modified.
@@ -189,6 +215,8 @@ class TabularPolicy : public Policy {
   std::unordered_map<std::string, ActionsAndProbs> policy_table_;
 };
 
+std::unique_ptr<TabularPolicy> DeserializeTabularPolicy(const std::string& str);
+
 // Chooses all legal actions with equal probability. This is equivalent to the
 // tabular version, except that this works for large games.
 class UniformPolicy : public Policy {
@@ -196,6 +224,8 @@ class UniformPolicy : public Policy {
   ActionsAndProbs GetStatePolicy(const State& state) const override {
     return UniformStatePolicy(state);
   }
+
+  std::string Serialize() const override { return "UniformPolicy\n"; }
 };
 
 // Helper functions that generate policies for testing.
