@@ -283,14 +283,20 @@ void GameParametersTest() {
 }
 
 void PolicySerializationTest() {
-  // Tabular policy
-  auto game = LoadGame("tic_tac_toe");
-  auto policy = std::make_unique<TabularPolicy>(*game);
+  // Check empty tabular policy
+  auto policy = std::make_unique<TabularPolicy>();
   std::shared_ptr<Policy> deserialized_policy =
       DeserializePolicy(policy->Serialize());
   auto deserialized =
       std::static_pointer_cast<TabularPolicy>(deserialized_policy);
+  SPIEL_CHECK_EQ(policy->PolicyTable().size(), 0);
+  SPIEL_CHECK_EQ(deserialized->PolicyTable().size(), 0);
 
+  // Check non-empty tabular policy
+  auto game = LoadGame("tic_tac_toe");
+  policy = std::make_unique<TabularPolicy>(*game);
+  deserialized_policy = DeserializePolicy(policy->Serialize());
+  deserialized = std::static_pointer_cast<TabularPolicy>(deserialized_policy);
   SPIEL_CHECK_EQ(
       policy->PolicyTable().size(), deserialized->PolicyTable().size());
   for (const auto& [info_state, policy] : policy->PolicyTable()) {
@@ -302,7 +308,7 @@ void PolicySerializationTest() {
     }
   }
 
-  // Uniform policy
+  // Check uniform policy
   DeserializePolicy(std::make_unique<UniformPolicy>()->Serialize());
 }
 

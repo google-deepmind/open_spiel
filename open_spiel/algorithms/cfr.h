@@ -42,9 +42,9 @@ struct CFRInfoStateValues {
   bool empty() const { return legal_actions.empty(); }
   int num_actions() const { return legal_actions.size(); }
 
-  // A string representation of the information state values
+  // A string representation of the information state values.
   std::string ToString() const;
-  // A less verbose string representation used for serialization purposes
+  // A less verbose string representation used for serialization purposes.
   std::string Serialize() const;
 
   // Samples from current policy using randomly generated z, adding epsilon
@@ -58,7 +58,7 @@ struct CFRInfoStateValues {
 };
 
 // Parameter str is string_view since CFRInfoStateValuesTable is expected to
-// potentially hold a large number of values
+// potentially hold a large number of values.
 CFRInfoStateValues DeserializeCFRInfoStateValues(absl::string_view str);
 
 // A type for tables holding CFR values.
@@ -69,7 +69,7 @@ std::string SerializeCFRInfoStateValuesTable(
     const CFRInfoStateValuesTable& info_states);
 
 // Parameter str is string_view since CFRInfoStateValuesTable is expected to
-// potentially hold a large number of values
+// potentially hold a large number of values.
 CFRInfoStateValuesTable DeserializeCFRInfoStateValuesTable(
     absl::string_view str);
 

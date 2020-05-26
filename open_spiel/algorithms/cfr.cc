@@ -410,7 +410,7 @@ CFRInfoStateValues DeserializeCFRInfoStateValues(absl::string_view str) {
   res.cumulative_policy.reserve(num_elements);
   res.current_policy.reserve(num_elements);
 
-  // insert the actual values
+  // Insert the actual values
   int la_value;
   double cumu_regret_value, cumu_policy_value, curr_policy_value;
   for (int i = 0; i < num_elements; i++) {
@@ -471,7 +471,7 @@ std::string SerializeCFRInfoStateValuesTable(
     absl::StrAppend(
         &str, info_state.length(), ":", info_state, values.Serialize(), "\n");
   }
-  // remove the trailing newline character
+  // Remove the trailing newline character
   str.erase(str.length() - 1);
   return str;
 }

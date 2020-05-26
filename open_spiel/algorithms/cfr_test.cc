@@ -183,13 +183,13 @@ void CFRTest_TicTacToe(int num_iterations, double nashconv_upper_bound) {
 }
 
 void CFRTest_InfoStateValuesTableSerialization() {
-  // check empty
+  // Check empty
   CFRInfoStateValuesTable info_state_values_table = {};
   auto deserialized = DeserializeCFRInfoStateValuesTable(
       SerializeCFRInfoStateValuesTable(info_state_values_table));
   SPIEL_CHECK_TRUE(deserialized.empty());
 
-  // check non-empty
+  // Check non-empty
   info_state_values_table = {
     {"", CFRInfoStateValues({0}, 1.0)},
     {"0:0,0;0", CFRInfoStateValues({0, 1, 2}, 0.1)},

@@ -161,10 +161,12 @@ class TabularPolicy : public Policy {
 
   std::string Serialize() const override {
     std::string str = "TabularPolicy\n";
+    if (policy_table_.size() == 0) return str;
+
     for (auto const& [info_state, policy] : policy_table_) {
       // Prefix the info_state data with an integer length so that
       // deserialization is done based on length rather than special
-      // delimiters that could be present in the data itself
+      // delimiters that could be present in the data itself.
       absl::StrAppend(&str, info_state.length(), ":", info_state);
       absl::StrAppend(
           &str, absl::StrJoin(policy, ",", absl::PairFormatter("=")), "\n");

@@ -71,7 +71,7 @@ ActionsAndProbs UniformStatePolicy(const State& state) {
 
 std::unique_ptr<Policy> DeserializePolicy(const std::string& str) {
   // Class’s identity is the very first line, see Policy::Serialize
-  // for more info
+  // for more info.
   std::pair<std::string, absl::string_view> cls_and_content = absl::StrSplit(
       str, absl::MaxSplits('\n', 1));
   std::string class_identity = cls_and_content.first;
@@ -94,7 +94,7 @@ TabularPolicy::TabularPolicy(const Game& game)
 std::unique_ptr<TabularPolicy> DeserializeTabularPolicy(
     const std::string& str) {
   // Class’s identity is the very first line, see Policy::Serialize
-  // for more info
+  // for more info.
   std::pair<std::string, absl::string_view> cls_and_content =
       absl::StrSplit(str, absl::MaxSplits('\n', 1));
   SPIEL_CHECK_EQ(cls_and_content.first, "TabularPolicy");
@@ -104,7 +104,7 @@ std::unique_ptr<TabularPolicy> DeserializeTabularPolicy(
 
   for (absl::string_view line : absl::StrSplit(cls_and_content.second, '\n')) {
     // The info_state data is prefixed with an integer length, see
-    // TabularPolicy::Serialize for more info
+    // TabularPolicy::Serialize for more info.
     std::pair<std::string, absl::string_view> info_state_len_and_rest =
         absl::StrSplit(line, absl::MaxSplits(':', 1));
     int info_state_len = std::stoi(info_state_len_and_rest.first);
