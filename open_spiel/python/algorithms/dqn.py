@@ -274,8 +274,7 @@ class DQN(rl_agent.AbstractAgent):
       time_step: current ts, an instance of rl_environment.TimeStep.
     """
     assert prev_time_step is not None
-    legal_actions = (
-        prev_time_step.observations["legal_actions"][self.player_id])
+    legal_actions = (time_step.observations["legal_actions"][self.player_id])
     legal_actions_mask = np.zeros(self._num_actions)
     legal_actions_mask[legal_actions] = 1.0
     transition = Transition(
