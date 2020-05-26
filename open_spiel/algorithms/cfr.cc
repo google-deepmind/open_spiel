@@ -488,10 +488,15 @@ CFRInfoStateValuesTable DeserializeCFRInfoStateValuesTable(
         absl::StrSplit(line, absl::MaxSplits(':', 1));
     int info_state_len = std::stoi(info_state_len_and_rest.first);
 
-    std::pair<std::string, absl::string_view> info_state_and_values =
-        absl::StrSplit(
-            info_state_len_and_rest.second,
-            absl::MaxSplits(absl::ByLength(info_state_len), 1));
+    std::pair<std::string, absl::string_view> info_state_and_values;
+    if (info_state_len == 0) {
+      info_state_and_values = std::make_pair(
+          "", info_state_len_and_rest.second);
+    } else {
+      info_state_and_values = absl::StrSplit(
+          info_state_len_and_rest.second,
+          absl::MaxSplits(absl::ByLength(info_state_len), 1));
+    }
 
     res.insert({
         info_state_and_values.first,
