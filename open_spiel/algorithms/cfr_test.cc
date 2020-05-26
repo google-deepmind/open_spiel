@@ -191,33 +191,33 @@ void CFRTest_InfoStateValuesTableSerialization() {
 
   // check non-empty
   info_state = {
-    {"0", CFRInfoStateValues({0, 1, 2}, 0.1)},
-    {"1", CFRInfoStateValues({0, 1, 2, 3}, 0.2)}
+    {"0:0,0;0", CFRInfoStateValues({0, 1, 2}, 0.1)},
+    {"1:1,1;1", CFRInfoStateValues({0, 1, 2, 3}, 0.2)}
   };
   deserialized = DeserializeCFRInfoStateValuesTable(
       SerializeCFRInfoStateValuesTable(info_state));
 
   SPIEL_CHECK_EQ(info_state.size(), deserialized.size());
-  SPIEL_CHECK_EQ(deserialized.at("0").legal_actions,
-      info_state.at("0").legal_actions);
+  SPIEL_CHECK_EQ(deserialized.at("0:0,0;0").legal_actions,
+      info_state.at("0:0,0;0").legal_actions);
   for (int i = 0; i < 3; i++) {
-    SPIEL_CHECK_FLOAT_EQ(deserialized.at("0").cumulative_regrets.at(i),
-        info_state.at("0").cumulative_regrets.at(i));
-    SPIEL_CHECK_FLOAT_EQ(deserialized.at("0").cumulative_policy.at(i),
-        info_state.at("0").cumulative_policy.at(i));
-    SPIEL_CHECK_FLOAT_EQ(deserialized.at("0").current_policy.at(i),
-        info_state.at("0").current_policy.at(i));
+    SPIEL_CHECK_FLOAT_EQ(deserialized.at("0:0,0;0").cumulative_regrets.at(i),
+        info_state.at("0:0,0;0").cumulative_regrets.at(i));
+    SPIEL_CHECK_FLOAT_EQ(deserialized.at("0:0,0;0").cumulative_policy.at(i),
+        info_state.at("0:0,0;0").cumulative_policy.at(i));
+    SPIEL_CHECK_FLOAT_EQ(deserialized.at("0:0,0;0").current_policy.at(i),
+        info_state.at("0:0,0;0").current_policy.at(i));
   }
 
-  SPIEL_CHECK_EQ(deserialized.at("1").legal_actions,
-      info_state.at("1").legal_actions);
+  SPIEL_CHECK_EQ(deserialized.at("1:1,1;1").legal_actions,
+      info_state.at("1:1,1;1").legal_actions);
   for (int i = 0; i < 4; i++) {
-    SPIEL_CHECK_FLOAT_EQ(deserialized.at("1").cumulative_regrets.at(i),
-        info_state.at("1").cumulative_regrets.at(i));
-    SPIEL_CHECK_FLOAT_EQ(deserialized.at("1").cumulative_policy.at(i),
-        info_state.at("1").cumulative_policy.at(i));
-    SPIEL_CHECK_FLOAT_EQ(deserialized.at("1").current_policy.at(i),
-        info_state.at("1").current_policy.at(i));
+    SPIEL_CHECK_FLOAT_EQ(deserialized.at("1:1,1;1").cumulative_regrets.at(i),
+        info_state.at("1:1,1;1").cumulative_regrets.at(i));
+    SPIEL_CHECK_FLOAT_EQ(deserialized.at("1:1,1;1").cumulative_policy.at(i),
+        info_state.at("1:1,1;1").cumulative_policy.at(i));
+    SPIEL_CHECK_FLOAT_EQ(deserialized.at("1:1,1;1").current_policy.at(i),
+        info_state.at("1:1,1;1").current_policy.at(i));
   }
 }
 
