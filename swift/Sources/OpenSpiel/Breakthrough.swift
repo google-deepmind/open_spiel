@@ -253,6 +253,7 @@ public extension Breakthrough.State {
   
   var legalActions: [Game.Action] {
     var actions = [Game.Action]()
+    actions.reserveCapacity(Int(game.boardWidth * game.boardHeight))
     let curBTPlayer = currentBTPlayer!
     for i in 0..<game.boardWidth {
       for j in 0..<game.boardHeight {
