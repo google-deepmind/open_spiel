@@ -34,6 +34,9 @@ let package = Package(
       name: "TexasHoldemBenchmark",
       targets: ["TexasHoldemBenchmark"]),
   ],
+  dependencies: [
+    .package(url: "https://github.com/google/swift-benchmark.git", .branch("master")),
+  ],
   targets: [
     .target(
       name: "OpenSpiel",
@@ -55,5 +58,9 @@ let package = Package(
       name: "TexasHoldemBenchmark",
       dependencies: ["OpenSpiel"],
       path: "swift/Examples/TexasHoldemBenchmark"),
+    .target(
+      name: "Benchmarks",
+      dependencies: ["OpenSpiel", "Benchmark"],
+      path: "swift/Benchmarks"),
   ]
 )

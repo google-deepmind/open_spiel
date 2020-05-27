@@ -250,6 +250,32 @@ public extension Breakthrough.State {
   var currentBTPlayer: Breakthrough.BreakthroughPlayer? {
     Breakthrough.BreakthroughPlayer(currentPlayer)
   }
+  
+  var legalActions: [Game.Action] {
+    var actions = [Game.Action]()
+    let curBTPlayer = currentBTPlayer!
+    for i in 0..<game.boardWidth {
+      for j in 0..<game.boardHeight {
+        let boardLoc = Breakthrough.BoardLocation(x: i, y: j)
+        // Skip all board locations that don't have a pawn that corresponds to the current player.
+        if self[boardLoc] != curBTPlayer { continue }
+        // Iterate across all possible directions.
+        for direction in Breakthrough.Direction.allCases {
+          // Compute the moved board location & verify it's still on the board.
+          guard case let movedBoardLoc? = boardLoc.move(in: direction, for: curBTPlayer),
+              game.isValid(location: movedBoardLoc) else { continue }
+          // If the moved board location is already occupied by one of our own pawns, it's
+          // not an available move.
+          if self[movedBoardLoc] == curBTPlayer { continue }
+          // If we're trying to move forward and it's not empty, it's not a valid move.
+          if direction == .forward && self[movedBoardLoc] != nil { continue }
+          // Append the available actions to the possible actions list.
+          actions.append(Game.Action(location: boardLoc, direction: direction))
+        }
+      }
+    }
+    return actions
+  }
 
   var legalActionsMask: [Bool] {
     let directionCount = Breakthrough.Direction.allCases.count

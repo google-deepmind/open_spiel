@@ -109,6 +109,11 @@ public protocol StateProtocol: Hashable {
   /// the sampling of an outcome should be done in this function and then applied.
   mutating func apply(_ action: Game.Action)
 
+  /// All actions that are legal for the current player in this state.
+  ///
+  /// Default implementation provided.
+  var legalActions: [Game.Action] { get }
+
   /// An array of the same length as `game.allActions` representing which of those
   /// actions are legal for the current player in this state. Not valid in chance nodes.
   var legalActionsMask: [Bool] { get }
