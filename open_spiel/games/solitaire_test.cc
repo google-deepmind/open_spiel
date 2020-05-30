@@ -46,10 +46,24 @@ namespace {
         }
     }
 
+    void TestPileDestructor() {
+        Pile * p = new Tableau(kPile1stTableau);
+        delete p;
+    }
+
+    void TestMoveToAction() {
+        for (const auto &[key, value] : kMoveToAction) {
+            std::cout << "Move   = " << key.ToString() << std::endl;
+            std::cout << "Action = " << value << std::endl;
+        }
+    }
+
 } // namespace
 } // namespace open_spiel::solitaire
 
 int main(int argc, char** argv) {
-    open_spiel::solitaire::BasicSolitaireTests();
+    //open_spiel::solitaire::BasicSolitaireTests();
     //open_spiel::solitaire::TestGame();
+    //open_spiel::solitaire::TestPileDestructor();
+    open_spiel::solitaire::TestMoveToAction();
 }

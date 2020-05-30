@@ -419,67 +419,94 @@ namespace open_spiel::solitaire {
     // Support Classes =================================================================================================
 
     class Card {
-    public:
-        // TODO: Attributes should be private
-
-        // Attributes ==================================================================================================
+    private:
         RankType      rank     = kRankHidden;       // Indicates the rank of the card
         SuitType      suit     = kSuitHidden;       // Indicates the suit of the card
         LocationType  location = kMissing;          // Indicates the type of pile the card is in
         bool          hidden   = false;             // Indicates whether the card is hidden or not
         int           index    = kHiddenCard;       // Identifies the card with an integer
 
+    public:
         // Constructors ================================================================================================
         Card(bool hidden = false, SuitType suit = kSuitHidden, RankType rank = kRankHidden, LocationType location = kMissing);
         Card(int index, bool hidden = false, LocationType location = kMissing);
 
-        // Other Methods ===============================================================================================
-        int GetIndex() const ;
-        std::string ToString(bool colored = true) const;
-        std::vector<Card> LegalChildren() const;
+        // Getters =====================================================================================================
+        RankType GetRank() const;
+        SuitType GetSuit() const;
+        LocationType GetLocation() const;
+        bool GetHidden() const;
+        int GetIndex() const;
+
+        // Setters =====================================================================================================
+        void SetRank(RankType new_rank);
+        void SetSuit(SuitType new_suit);
+        void SetLocation(LocationType new_location);
+        void SetHidden(bool new_hidden);
+
+        // Operators ===================================================================================================
         bool operator==(Card & other_card) const;
         bool operator==(const Card & other_card) const;
         bool operator<(const Card & other_card) const;
 
+        // Other Methods ===============================================================================================
+        std::string ToString(bool colored = true) const;
+        std::vector<Card> LegalChildren() const;
+
     };
 
     class Pile {
-    public:
 
-        // TODO: Needs a virtual destructor
-        // TODO: Attributes should be private
-        // Attributes ==================================================================================================
-        std::vector<Card>  cards;
+    protected:
+        std::vector<Card> cards;
         const LocationType type;
         const SuitType     suit;
         const PileID       id;
         const int          max_size;
 
-        // Constructors ================================================================================================
+    public:
+
+        // Constructor =================================================================================================
         Pile(LocationType type, PileID id, SuitType suit = kSuitNone);
+
+        // Destructor ==================================================================================================
+        virtual ~Pile();
+
+        // Getters/Setters =============================================================================================
+        bool              GetIsEmpty() const;
+        SuitType          GetSuit() const;
+        LocationType      GetType() const;
+        PileID            GetID() const;
+        Card              GetFirstCard() const;
+        Card              GetLastCard() const;
+        std::vector<Card> GetCards() const;
+        void              SetCards(std::vector<Card> new_cards);
 
         // Other Methods ===============================================================================================
         virtual std::vector<Card> Sources() const;
         virtual std::vector<Card> Targets() const;
         virtual std::vector<Card> Split(Card card);
+        virtual void              Reveal(Card card_to_reveal);
         void                      Extend(std::vector<Card> source_cards);
         std::string               ToString(bool colored = true) const;
+
     };
 
     class Tableau : public Pile {
     public:
-        // Constructors ================================================================================================
+        // Constructor =================================================================================================
         Tableau(PileID id);
 
         // Other Methods ===============================================================================================
         std::vector<Card> Sources() const override;
         std::vector<Card> Targets() const override;
         std::vector<Card> Split(Card card) override;
+        void              Reveal(Card card_to_reveal) override;
     };
 
     class Foundation : public Pile {
     public:
-        // Constructors ================================================================================================
+        // Constructor =================================================================================================
         Foundation(PileID id, SuitType suit);
 
         // Other Methods ===============================================================================================
@@ -490,27 +517,30 @@ namespace open_spiel::solitaire {
 
     class Waste : public Pile {
     public:
-        // Constructors ================================================================================================
+        // Constructor =================================================================================================
         Waste();
 
         // Other Methods ===============================================================================================
         std::vector<Card> Sources() const override;
         std::vector<Card> Targets() const override;
         std::vector<Card> Split(Card card) override;
+        void              Reveal(Card card_to_reveal) override;
     };
 
     class Move {
-    public:
-
-        // TODO: Attributes should be private
-        // Attributes ==================================================================================================
+    private:
         Card target;
         Card source;
 
+    public:
         // Constructors ================================================================================================
         Move(Card target_card, Card source_card);
         Move(RankType target_rank, SuitType target_suit, RankType source_rank, SuitType source_suit);
         explicit Move(Action action);
+
+        // Getters =====================================================================================================
+        Card GetTarget() const;
+        Card GetSource() const;
 
         // Other Methods ===============================================================================================
         std::string ToString(bool colored = true) const;
@@ -522,6 +552,7 @@ namespace open_spiel::solitaire {
     // More Constants ==================================================================================================
 
     // TODO: Please compute this on-the-fly instead of having this long mapping
+    // TODO: Make this a method of `Move`
     const std::map<Move, Action> kMoveToAction = {
             // region Mapping of a move to an action declared in ActionType;
             
