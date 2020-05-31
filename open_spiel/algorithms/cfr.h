@@ -66,12 +66,12 @@ using CFRInfoStateValuesTable =
     std::unordered_map<std::string, CFRInfoStateValues>;
 
 std::string SerializeCFRInfoStateValuesTable(
-    const CFRInfoStateValuesTable& info_states);
+    const CFRInfoStateValuesTable& info_states, std::string delimiter = "<~>");
 
 // Parameter str is string_view since CFRInfoStateValuesTable is expected to
 // potentially hold a large number of values.
 CFRInfoStateValuesTable DeserializeCFRInfoStateValuesTable(
-    absl::string_view str);
+    absl::string_view str, std::string delimiter = "<~>");
 
 // A policy that extracts the average policy from the CFR table values, which
 // can be passed to tabular exploitability.

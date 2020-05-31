@@ -460,47 +460,38 @@ int CFRInfoStateValues::SampleActionIndex(double epsilon, double z) {
 }
 
 std::string SerializeCFRInfoStateValuesTable(
-    const CFRInfoStateValuesTable& info_states) {
+    const CFRInfoStateValuesTable& info_states, std::string delimiter) {
+  if (delimiter == "," || delimiter == ";") {
+    // The two delimiters are used for de/serialization of CFRInfoStateValues
+    SpielFatalError("Please select a different delimiter,"
+        "invalid values are \",\" and \";\".");
+  }
   std::string str = "";
   if (info_states.empty()) return str;
 
   for (auto const& [info_state, values] : info_states) {
-    // Prefix the info_state data with an integer length so that
-    // deserialization is done based on length rather than special
-    // delimiters that could be present in the data itself.
-    absl::StrAppend(
-        &str, info_state.length(), ":", info_state, values.Serialize(), "\n");
+    if (info_state.find(delimiter) != std::string::npos) {
+      SpielFatalError(absl::StrCat(
+          "Info state contains delimiter \"", delimiter,
+          "\", please fix the info state or select a different delimiter."));
+    }
+    absl::StrAppend(&str, info_state, delimiter, values.Serialize(), delimiter);
   }
-  // Remove the trailing newline character
-  str.erase(str.length() - 1);
+  // Remove the trailing delimiter
+  str.erase(str.length() - delimiter.length());
   return str;
 }
 
 CFRInfoStateValuesTable DeserializeCFRInfoStateValuesTable(
-    absl::string_view str) {
+    absl::string_view str, std::string delimiter) {
   CFRInfoStateValuesTable res;
   if (str.empty()) return res;
 
-  for (absl::string_view line : absl::StrSplit(str, '\n')) {
-    // The info_state data is prefixed with an integer length, see
-    // SerializeCFRInfoStateValuesTable above for more info.
-    std::pair<std::string, absl::string_view> info_state_len_and_rest =
-        absl::StrSplit(line, absl::MaxSplits(':', 1));
-    int info_state_len = std::stoi(info_state_len_and_rest.first);
-
-    std::pair<std::string, absl::string_view> info_state_and_values;
-    if (info_state_len == 0) {
-      info_state_and_values = std::make_pair(
-          "", info_state_len_and_rest.second);
-    } else {
-      info_state_and_values = absl::StrSplit(
-          info_state_len_and_rest.second,
-          absl::MaxSplits(absl::ByLength(info_state_len), 1));
-    }
-
+  std::vector<absl::string_view> splits = absl::StrSplit(str, delimiter);
+  for (int i = 0; i < splits.size(); i += 2) {
     res.insert({
-        info_state_and_values.first,
-        DeserializeCFRInfoStateValues(info_state_and_values.second)});
+        std::string(splits.at(i)),
+        DeserializeCFRInfoStateValues(splits.at(i + 1))});
   }
   return res;
 }

@@ -193,6 +193,7 @@ void CFRTest_InfoStateValuesTableSerialization() {
   info_state_values_table = {
     {"", CFRInfoStateValues({0}, 1.0)},
     {"0:0,0;0", CFRInfoStateValues({0, 1, 2}, 0.1)},
+    {"<->\n<->", CFRInfoStateValues({0, 1, 2}, 0.1)},
     {"1:1,1;1", CFRInfoStateValues({0, 1, 2, 3}, 0.2)}
   };
   deserialized = DeserializeCFRInfoStateValuesTable(

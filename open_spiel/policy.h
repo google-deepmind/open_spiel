@@ -102,16 +102,17 @@ class Policy {
     SpielFatalError("GetStatePolicy(const std::string&) unimplemented.");
   }
 
-  // Each override must write out the class’s identity as the very first
-  // thing so that the DeserializePolicy method can then call the Deserialize
-  // method for the correct subclass. See TabularPolicy and DeserializePolicy
-  // below for an example.
-  virtual std::string Serialize() const {
-    SpielFatalError("Serialize() unimplemented.");
+  // Each override must write out the class’s identity followed by ":" as the
+  // very first thing so that the DeserializePolicy method can then call the
+  // Deserialize method for the correct subclass. See TabularPolicy and
+  // DeserializePolicy below for an example.
+  virtual std::string Serialize(std::string delimiter = "<~>") const {
+    SpielFatalError("Serialize(std::string delimiter) unimplemented.");
   }
 };
 
-std::unique_ptr<Policy> DeserializePolicy(const std::string& str);
+std::unique_ptr<Policy> DeserializePolicy(const std::string& str,
+    std::string delimiter = "<~>");
 
 // A tabular policy represented internally as a map. Note that this
 // implementation is not directly compatible with the Python TabularPolicy
@@ -159,20 +160,26 @@ class TabularPolicy : public Policy {
     }
   }
 
-  std::string Serialize() const override {
-    std::string str = "TabularPolicy\n";
+  std::string Serialize(std::string delimiter = "<~>") const override {
+    if (delimiter == "," || delimiter == "=") {
+      // The two delimiters are used for de/serialization of policy_table_
+      SpielFatalError("Please select a different delimiter,"
+          "invalid values are \",\" and \"=\".");
+    }
+    std::string str = "TabularPolicy:";
     if (policy_table_.size() == 0) return str;
 
     for (auto const& [info_state, policy] : policy_table_) {
-      // Prefix the info_state data with an integer length so that
-      // deserialization is done based on length rather than special
-      // delimiters that could be present in the data itself.
-      absl::StrAppend(&str, info_state.length(), ":", info_state);
-      absl::StrAppend(
-          &str, absl::StrJoin(policy, ",", absl::PairFormatter("=")), "\n");
+      if (info_state.find(delimiter) != std::string::npos) {
+        SpielFatalError(absl::StrCat(
+            "Info state contains delimiter \"", delimiter,
+            "\", please fix the info state or select a different delimiter."));
+      }
+      absl::StrAppend(&str, info_state, delimiter,
+          absl::StrJoin(policy, ",", absl::PairFormatter("=")), delimiter);
     }
-    // Remove the trailing newline character
-    str.erase(str.length() - 1);
+    // Remove the trailing delimiter
+    str.erase(str.length() - delimiter.length());
     return str;
   }
 
@@ -217,7 +224,8 @@ class TabularPolicy : public Policy {
   std::unordered_map<std::string, ActionsAndProbs> policy_table_;
 };
 
-std::unique_ptr<TabularPolicy> DeserializeTabularPolicy(const std::string& str);
+std::unique_ptr<TabularPolicy> DeserializeTabularPolicy(const std::string& str,
+    std::string delimiter = "<~>");
 
 // Chooses all legal actions with equal probability. This is equivalent to the
 // tabular version, except that this works for large games.
@@ -227,7 +235,9 @@ class UniformPolicy : public Policy {
     return UniformStatePolicy(state);
   }
 
-  std::string Serialize() const override { return "UniformPolicy\n"; }
+  std::string Serialize(std::string delimiter = "") const override {
+    return "UniformPolicy:";
+  }
 };
 
 // Helper functions that generate policies for testing.

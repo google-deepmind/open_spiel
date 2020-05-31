@@ -69,15 +69,16 @@ ActionsAndProbs UniformStatePolicy(const State& state) {
   return actions_and_probs;
 }
 
-std::unique_ptr<Policy> DeserializePolicy(const std::string& str) {
+std::unique_ptr<Policy> DeserializePolicy(const std::string& str,
+    std::string delimiter) {
   // Class’s identity is the very first line, see Policy::Serialize
   // for more info.
   std::pair<std::string, absl::string_view> cls_and_content = absl::StrSplit(
-      str, absl::MaxSplits('\n', 1));
+      str, absl::MaxSplits(':', 1));
   std::string class_identity = cls_and_content.first;
 
   if (class_identity == "TabularPolicy") {
-    return DeserializeTabularPolicy(str);
+    return DeserializeTabularPolicy(str, delimiter);
   }
   else if (class_identity == "UniformPolicy") {
     return std::make_unique<UniformPolicy>();
@@ -92,40 +93,27 @@ TabularPolicy::TabularPolicy(const Game& game)
     : TabularPolicy(GetRandomPolicy(game)) {}
 
 std::unique_ptr<TabularPolicy> DeserializeTabularPolicy(
-    const std::string& str) {
+    const std::string& str, std::string delimiter) {
   // Class’s identity is the very first line, see Policy::Serialize
   // for more info.
   std::pair<std::string, absl::string_view> cls_and_content =
-      absl::StrSplit(str, absl::MaxSplits('\n', 1));
+      absl::StrSplit(str, absl::MaxSplits(':', 1));
   SPIEL_CHECK_EQ(cls_and_content.first, "TabularPolicy");
 
   std::unique_ptr<TabularPolicy> res = std::make_unique<TabularPolicy>();
   if (cls_and_content.second.empty()) return res;
 
-  for (absl::string_view line : absl::StrSplit(cls_and_content.second, '\n')) {
-    // The info_state data is prefixed with an integer length, see
-    // TabularPolicy::Serialize for more info.
-    std::pair<std::string, absl::string_view> info_state_len_and_rest =
-        absl::StrSplit(line, absl::MaxSplits(':', 1));
-    int info_state_len = std::stoi(info_state_len_and_rest.first);
+  std::vector<absl::string_view> splits = absl::StrSplit(cls_and_content.second,
+      delimiter);
 
-    std::pair<std::string, absl::string_view> info_state_and_policy;
-    if (info_state_len == 0) {
-      info_state_and_policy = std::make_pair(
-          "", info_state_len_and_rest.second);
-    } else {
-      info_state_and_policy = absl::StrSplit(
-          info_state_len_and_rest.second,
-          absl::MaxSplits(absl::ByLength(info_state_len), 1));
-    }
+  // Insert the actual values
+  Action action; double prob;
+  for (int i = 0; i < splits.size(); i += 2) {
     std::vector<absl::string_view> policy_values =
-        absl::StrSplit(info_state_and_policy.second, ',');
-
-    // Insert the actual values
+        absl::StrSplit(splits.at(i + 1), ',');
     ActionsAndProbs res_policy;
     res_policy.reserve(policy_values.size());
-    Action action;
-    double prob;
+
     for (absl::string_view policy_value : policy_values) {
       std::pair<absl::string_view, absl::string_view> action_and_prob =
           absl::StrSplit(policy_value, '=');
@@ -133,9 +121,8 @@ std::unique_ptr<TabularPolicy> DeserializeTabularPolicy(
       absl::SimpleAtod(action_and_prob.second, &prob);
       res_policy.push_back({action, prob});
     }
-    res->SetStatePolicy(info_state_and_policy.first, res_policy);
+    res->SetStatePolicy(std::string(splits.at(i)), res_policy);
   }
-
   return res;
 }
 
