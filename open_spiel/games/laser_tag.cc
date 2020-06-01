@@ -234,7 +234,7 @@ bool LaserTagState::ResolveMove(int player, int move) {
     player_facing_[player] = rightMapping.find(current_orientation)->second;
     return false;
   } else if (move == kForwardMove || move == kBackwardMove ||
-             move == kStepLeft || move == kStepLeft || move == kForwardLeft ||
+             move == kStepLeft || move == kStepRight || move == kForwardLeft ||
              move == kForwardRight) {  // move left or right or forward or
                                        // backward if able
 
