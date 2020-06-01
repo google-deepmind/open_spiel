@@ -47,6 +47,10 @@ benchmark("random game: Breakthrough") {
   playRandomGame(Breakthrough())
 }
 
+benchmark("random game: FastBreakthrough") {
+  playRandomGame(FastBreakthrough())
+}
+
 benchmark("random game: Texas Hold'em") {
   playRandomGame(TexasHoldem(playerCount: 3))
 }
