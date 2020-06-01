@@ -10,6 +10,7 @@ Names are ordered lexicographically. Typo or similar contributors are omitted.
 -   Daniel Hennes
 -   David Ding
 -   Dustin Morrill
+-   Elnaz Davoodi
 -   Finbarr Timbers
 -   Ivo Danihelka
 -   Jean-Baptiste Lespiau <jblespiau@google.com>
@@ -21,6 +22,7 @@ Names are ordered lexicographically. Typo or similar contributors are omitted.
 -   Manuel Kroiss
 -   Marc Lanctot <lanctot@google.com>
 -   Matthew Lai
+-   Michal Sustr <michal.sustr@aic.fel.cvut.cz>
 -   Paul Muller
 -   Ryan Faulkner
 -   Satyaki Upadhyay
