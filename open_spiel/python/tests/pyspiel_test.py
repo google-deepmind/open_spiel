@@ -38,6 +38,7 @@ class PyspielTest(absltest.TestCase):
         "breakthrough",
         "bridge",
         "bridge_uncontested_bidding",
+        "catan",
         "catch",
         "chess",
         "cliff_walking",

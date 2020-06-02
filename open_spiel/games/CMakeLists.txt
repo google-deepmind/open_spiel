@@ -11,6 +11,8 @@ set(GAME_SOURCES
   bridge/bridge_scoring.h
   bridge_uncontested_bidding.cc
   bridge_uncontested_bidding.h
+  catan.cc
+  catan.h
   catch.cc
   catch.h
   chess.cc
@@ -196,6 +198,10 @@ add_test(breakthrough_test breakthrough_test)
 add_executable(bridge_test bridge_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(bridge_test bridge_test)
+
+add_executable(catan_test catan_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(catan_test catan_test)
 
 add_executable(catch_test catch_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
