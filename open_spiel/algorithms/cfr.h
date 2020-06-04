@@ -134,6 +134,9 @@ class CFRSolverBase {
  public:
   CFRSolverBase(const Game& game, bool alternating_updates,
                 bool linear_averaging, bool regret_matching_plus);
+  CFRSolverBase(const Game& game, bool alternating_updates,
+                bool linear_averaging, bool regret_matching_plus, int iteration,
+                CFRInfoStateValuesTable info_states);
   virtual ~CFRSolverBase() = default;
 
   // Performs one step of the CFR algorithm.
@@ -152,6 +155,8 @@ class CFRSolverBase {
   std::unique_ptr<Policy> CurrentPolicy() const {
     return std::unique_ptr<Policy>(new CFRCurrentPolicy(info_states_, nullptr));
   }
+
+  std::string Serialize(std::string delimiter = "<~>") const;
 
  protected:
   const Game& game_;
@@ -176,6 +181,13 @@ class CFRSolverBase {
 
   // Update the current policy for all information states.
   void ApplyRegretMatching();
+
+  // Return the type of itself in string format so that it can be written to
+  // the serialized string result. The type is then checked in different
+  // deserialization methods (one method for each subtype).
+  virtual std::string SerializeThisType() const {
+    SpielFatalError("Serialization of the base class is not supported.");
+  }
 
  private:
   std::vector<double> ComputeCounterFactualRegretForActionProbs(
@@ -225,7 +237,20 @@ class CFRSolver : public CFRSolverBase {
                       /*alternating_updates=*/true,
                       /*linear_averaging=*/false,
                       /*regret_matching_plus=*/false) {}
+
+  CFRSolver(const Game& game, int iteration,
+            CFRInfoStateValuesTable info_states)
+      : CFRSolverBase(game,
+                      /*alternating_updates=*/true,
+                      /*linear_averaging=*/false,
+                      /*regret_matching_plus=*/false,
+                      iteration, info_states) {}
+ protected:
+  std::string SerializeThisType() const { return "CFRSolver"; }
 };
+
+CFRSolver DeserializeCFRSolver(const std::string& str, const Game& game,
+    std::string delimiter = "<~>");
 
 // CFR+ implementation.
 //
@@ -242,7 +267,23 @@ class CFRPlusSolver : public CFRSolverBase {
                       /*alternating_updates=*/true,
                       /*linear_averaging=*/true,
                       /*regret_matching_plus=*/true) {}
+  CFRPlusSolver(const Game& game, int iteration,
+                CFRInfoStateValuesTable info_states)
+      : CFRSolverBase(game,
+                      /*alternating_updates=*/true,
+                      /*linear_averaging=*/false,
+                      /*regret_matching_plus=*/false,
+                      iteration, info_states) {}
+
+ protected:
+  std::string SerializeThisType() const { return "CFRPlusSolver"; }
 };
+
+CFRPlusSolver DeserializeCFRPlusSolver(const std::string& str, const Game& game,
+    std::string delimiter = "<~>");
+
+std::vector<absl::string_view> DeserializeCFRSolverStateSection(
+    const std::string& str, const Game& game);
 
 }  // namespace algorithms
 }  // namespace open_spiel

@@ -219,6 +219,30 @@ void CFRTest_InfoStateValuesTableSerialization() {
   }
 }
 
+void CFRTest_CFRSolverSerialization() {
+  auto game = LoadGame("kuhn_poker");
+  auto solver = CFRSolver(*game);
+  double exploitability0 = Exploitability(*game, *solver.AveragePolicy());
+
+  for (int i = 0; i < 10; i++) {
+    solver.EvaluateAndUpdatePolicy();
+  }
+  double exploitability1 = Exploitability(*game, *solver.AveragePolicy());
+  SPIEL_CHECK_GT(exploitability0, exploitability1);
+
+  auto deserialized_solver = DeserializeCFRSolver(solver.Serialize(), *game);
+  double exploitability2 = Exploitability(*game,
+      *deserialized_solver.AveragePolicy());
+  SPIEL_CHECK_FLOAT_EQ(exploitability1, exploitability2);
+
+  for (int i = 0; i < 10; i++) {
+    deserialized_solver.EvaluateAndUpdatePolicy();
+  }
+  double exploitability3 = Exploitability(*game,
+      *deserialized_solver.AveragePolicy());
+  SPIEL_CHECK_GT(exploitability2, exploitability3);
+}
+
 }  // namespace
 }  // namespace algorithms
 }  // namespace open_spiel
@@ -284,4 +308,5 @@ int main(int argc, char** argv) {
   // algorithms::CFRTest_TicTacToe(10, 2.0);
 
   algorithms::CFRTest_InfoStateValuesTableSerialization();
+  algorithms::CFRTest_CFRSolverSerialization();
 }
