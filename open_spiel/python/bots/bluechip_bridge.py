@@ -31,7 +31,6 @@ bridge bot, and obtains an action in return.
 """
 
 import re
-from absl import logging
 import pyspiel
 
 # Example session:
@@ -175,7 +174,6 @@ def _hand_string(cards):
 
 def _connect(controller, seat):
   """Performs the initial handshake with a BlueChip bot."""
-  controller.start()
   client_name = _expect_regex(controller, _CONNECT)["client_name"]
   controller.send_line(_SEATED.format(seat=seat, client_name=client_name))
   _expect(controller, _READY_FOR_TEAMS.format(seat=seat))
@@ -195,7 +193,7 @@ def _new_deal(controller, seat, hand, board):
 class BlueChipBridgeBot(pyspiel.Bot):
   """An OpenSpiel bot, wrapping a BlueChip bridge bot implementation."""
 
-  def __init__(self, game, player_id, controller):
+  def __init__(self, game, player_id, controller_factory):
     """Initializes an OpenSpiel `Bot` wrapping a BlueChip-compatible bot.
 
     Args:
@@ -203,23 +201,24 @@ class BlueChipBridgeBot(pyspiel.Bot):
         `bridge(use_double_dummy_result=false)`.
       player_id: The id of the player the bot will act as, 0 = North (dealer), 1
         = East, 2 = South, 3 = West.
-      controller: The BlueChip controller; must support methods `start`,
-        `read_line`, and `send_line`.
+      controller_factory: Callable that returns new BlueChip controllers which
+        must support methods `read_line` and `send_line`, and `terminate`.
     """
     pyspiel.Bot.__init__(self)
     if str(game) != GAME_STR:
       raise ValueError(f"BlueChipBridgeBot invoked with {game}")
     self._game = game
     self._player_id = player_id
-    self._controller = controller
+    self._controller_factory = controller_factory
     self._seat = _SEATS[player_id]
-    self._connected = False
     self._num_actions = 52
     self.dummy = None
     self.is_play_phase = False
     self.cards_played = 0
     self._board = 0
     self._state = self._game.new_initial_state()
+    self._controller = self._controller_factory()
+    _connect(self._controller, self._seat)
 
   def player_id(self):
     return self._player_id
@@ -235,20 +234,24 @@ class BlueChipBridgeBot(pyspiel.Bot):
     self.cards_played = 0
     # We didn't see the end of the episode, so the external bot will still
     # be expecting it. If we can autoplay other people's actions to the end
-    # (e.g. everyone passes or player play their last card), then do that.
+    # (e.g. everyone passes or players play their last card), then do that.
     if not self._state.is_terminal():
-      while (not self._state.is_terminal()
-             and self._state.current_player() != self._player_id):
-        legal_actions = self._state.legal_actions()
+      state = self._state.clone()
+      while (not state.is_terminal()
+             and state.current_player() != self._player_id):
+        legal_actions = state.legal_actions()
         if _ACTION_PASS in legal_actions:
-          self._state.apply(_ACTION_PASS)
-        else:
-          self._state.apply_action(legal_actions[0])
-        self._update_for_state()
-    # Otherwise, we will have to kill and restart the external bot, because
+          state.apply(_ACTION_PASS)
+        elif len(legal_actions) == 1:
+          state.apply_action(legal_actions[0])
+      if state.is_terminal():
+        self._inform_state(state)
+    # Otherwise, we will have to restart the external bot, because
     # the protocol makes no provision for this case.
     if not self._state.is_terminal():
-      self._connected = False
+      self._controller.terminate()
+      self._controller = self._controller_factory()
+      _connect(self._controller, self._seat)
     self._state = self._game.new_initial_state()
 
   def _update_for_state(self):
@@ -259,11 +262,6 @@ class BlueChipBridgeBot(pyspiel.Bot):
                           max(self._state.legal_actions()) < 52)
     self.cards_played = sum(1 if a < 52 else 0 for a in actions) - 52
 
-    # Connect if necessary.
-    if not self._connected:
-      _connect(self._controller, self._seat)
-      self._connected = True
-
     # If this is the first time we've seen the deal, send our hand.
     if len(actions) == 52:
       self._board += 1
@@ -272,8 +270,6 @@ class BlueChipBridgeBot(pyspiel.Bot):
 
     # Send actions since last `step` call.
     for other_player_action in actions[self._num_actions:]:
-      logging.info("Sending action %s",
-                   self._state.action_to_string(other_player_action))
       other = _expect_regex(self._controller,
                             _READY_FOR_OTHER.format(seat=self._seat))
       other_player = other["other"]
@@ -344,3 +340,7 @@ class BlueChipBridgeBot(pyspiel.Bot):
       return _bid_to_action(our_action["bid"])
     elif our_action["play"]:
       return _play_to_action(our_action["play"])
+
+  def terminate(self):
+    self._controller.terminate()
+
