@@ -18,6 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import pickle
 from absl.testing import absltest
 from absl.testing import parameterized
 import numpy as np
@@ -261,6 +262,17 @@ class TabularPolicyTest(parameterized.TestCase):
           realized_policy.action_probabilities(state),
           tabular_policy.action_probabilities(state))
 
+  @parameterized.parameters([
+      policy.TabularPolicy(_LEDUC_POKER)
+  ])
+  def test_pickle_unpickle(self, policy_object):
+    serialized_policy = pickle.dumps(policy_object)
+    loaded_policy = pickle.loads(serialized_policy)
+  
+    for state in policy_object.states:
+      self.assertEqual(
+          loaded_policy.action_probabilities(state),
+          policy_object.action_probabilities(state))
 
 class TabularRockPaperScissorsPolicyTest(absltest.TestCase):
 

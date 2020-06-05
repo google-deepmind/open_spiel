@@ -312,6 +312,14 @@ class TabularPolicy(Policy):
         1 - alpha) * probability_array + alpha * noise_mask
     return copied_instance
 
+  def __getstate__(self):
+    state = self.__dict__.copy()
+    del state['game_type']
+    return state
+
+  def __setstate__(self, state):
+    self.__dict__.update(state)
+    self.game_type = self.game.get_type()
 
 class UniformRandomPolicy(Policy):
   """Policy where the action distribution is uniform over all legal actions.
