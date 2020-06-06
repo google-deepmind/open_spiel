@@ -196,29 +196,26 @@ void CFRTest_InfoStateValuesTableSerialization() {
       {"", CFRInfoStateValues({0}, 1.0)},
       {"0:0,0;0", CFRInfoStateValues({0, 1, 2}, 0.1)},
       {"<->\n<->", CFRInfoStateValues({0, 1, 2}, 0.1)},
-    {"1:1,1;1", CFRInfoStateValues({0, 1, 2, 3}, 0.2)}
-  };
+      {"1:1,1;1", CFRInfoStateValues({0, 1, 2, 3}, 0.2)}};
   std::string serialized1 = "";
   SerializeCFRInfoStateValuesTable(info_state_values_table, &serialized1);
   CFRInfoStateValuesTable deserialized1;
   DeserializeCFRInfoStateValuesTable(serialized1, &deserialized1);
 
-  SPIEL_CHECK_EQ(
-      info_state_values_table.size(), info_state_values_table.size());
+  SPIEL_CHECK_EQ(info_state_values_table.size(),
+                 info_state_values_table.size());
   for (const auto& [info_state, values] : info_state_values_table) {
     for (int i = 0; i < values.legal_actions.size(); i++) {
-      SPIEL_CHECK_EQ(
-          values.legal_actions.at(i),
-          deserialized1.at(info_state).legal_actions.at(i));
+      SPIEL_CHECK_EQ(values.legal_actions.at(i),
+                     deserialized1.at(info_state).legal_actions.at(i));
       SPIEL_CHECK_FLOAT_EQ(
           values.cumulative_regrets.at(i),
           deserialized1.at(info_state).cumulative_regrets.at(i));
       SPIEL_CHECK_FLOAT_EQ(
           values.cumulative_policy.at(i),
           deserialized1.at(info_state).cumulative_policy.at(i));
-      SPIEL_CHECK_FLOAT_EQ(
-          values.current_policy.at(i),
-          deserialized1.at(info_state).current_policy.at(i));
+      SPIEL_CHECK_FLOAT_EQ(values.current_policy.at(i),
+                           deserialized1.at(info_state).current_policy.at(i));
     }
   }
 }
@@ -237,15 +234,17 @@ void CFRTest_CFRSolverSerialization() {
   std::unique_ptr<std::string> serialized = solver.Serialize();
   std::unique_ptr<CFRSolver> deserialized_solver =
       DeserializeCFRSolver(*serialized, *game);
-  double exploitability2 = Exploitability(*game,
-      *deserialized_solver->AveragePolicy());
+  SPIEL_CHECK_EQ(solver.InfoStateValuesTable().size(),
+                 deserialized_solver->InfoStateValuesTable().size());
+  double exploitability2 =
+      Exploitability(*game, *deserialized_solver->AveragePolicy());
   SPIEL_CHECK_FLOAT_EQ(exploitability1, exploitability2);
 
   for (int i = 0; i < 10; i++) {
     deserialized_solver->EvaluateAndUpdatePolicy();
   }
-  double exploitability3 = Exploitability(*game,
-      *deserialized_solver->AveragePolicy());
+  double exploitability3 =
+      Exploitability(*game, *deserialized_solver->AveragePolicy());
   SPIEL_CHECK_GT(exploitability2, exploitability3);
 }
 

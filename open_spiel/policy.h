@@ -112,7 +112,7 @@ class Policy {
 };
 
 std::unique_ptr<Policy> DeserializePolicy(const std::string& serialized,
-    std::string delimiter = "<~>");
+                                          std::string delimiter = "<~>");
 
 // A tabular policy represented internally as a map. Note that this
 // implementation is not directly compatible with the Python TabularPolicy
@@ -163,7 +163,8 @@ class TabularPolicy : public Policy {
   std::string Serialize(std::string delimiter = "<~>") const override {
     if (delimiter == "," || delimiter == "=") {
       // The two delimiters are used for de/serialization of policy_table_
-      SpielFatalError("Please select a different delimiter,"
+      SpielFatalError(
+          "Please select a different delimiter,"
           "invalid values are \",\" and \"=\".");
     }
     std::string str = "TabularPolicy:";
@@ -176,7 +177,8 @@ class TabularPolicy : public Policy {
             "\", please fix the info state or select a different delimiter."));
       }
       absl::StrAppend(&str, info_state, delimiter,
-          absl::StrJoin(policy, ",", absl::PairFormatter("=")), delimiter);
+                      absl::StrJoin(policy, ",", absl::PairFormatter("=")),
+                      delimiter);
     }
     // Remove the trailing delimiter
     str.erase(str.length() - delimiter.length());

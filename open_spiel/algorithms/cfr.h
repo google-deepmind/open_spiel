@@ -74,7 +74,8 @@ void SerializeCFRInfoStateValuesTable(
 // Similarly as above, the result parameter is passed by pointer in order to
 // avoid copying/moving the table once fully deserialized.
 void DeserializeCFRInfoStateValuesTable(absl::string_view serialized,
-    CFRInfoStateValuesTable* result, std::string delimiter = "<~>");
+                                        CFRInfoStateValuesTable* result,
+                                        std::string delimiter = "<~>");
 
 // A policy that extracts the average policy from the CFR table values, which
 // can be passed to tabular exploitability.
@@ -246,14 +247,15 @@ class CFRSolver : public CFRSolverBase {
       : CFRSolverBase(game,
                       /*alternating_updates=*/true,
                       /*linear_averaging=*/false,
-                      /*regret_matching_plus=*/false,
-                      iteration) {}
+                      /*regret_matching_plus=*/false, iteration) {}
+
  protected:
   std::string SerializeThisType() const { return "CFRSolver"; }
 };
 
 std::unique_ptr<CFRSolver> DeserializeCFRSolver(const std::string& serialized,
-    const Game& game, std::string delimiter = "<~>");
+                                                const Game& game,
+                                                std::string delimiter = "<~>");
 
 // CFR+ implementation.
 //
@@ -274,8 +276,7 @@ class CFRPlusSolver : public CFRSolverBase {
       : CFRSolverBase(game,
                       /*alternating_updates=*/true,
                       /*linear_averaging=*/false,
-                      /*regret_matching_plus=*/false,
-                      iteration) {}
+                      /*regret_matching_plus=*/false, iteration) {}
 
  protected:
   std::string SerializeThisType() const { return "CFRPlusSolver"; }

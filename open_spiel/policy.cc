@@ -70,22 +70,20 @@ ActionsAndProbs UniformStatePolicy(const State& state) {
 }
 
 std::unique_ptr<Policy> DeserializePolicy(const std::string& serialized,
-    std::string delimiter) {
+                                          std::string delimiter) {
   // Class’s identity is the very first line, see Policy::Serialize
   // for more info.
-  std::pair<std::string, absl::string_view> cls_and_content = absl::StrSplit(
-      serialized, absl::MaxSplits(':', 1));
+  std::pair<std::string, absl::string_view> cls_and_content =
+      absl::StrSplit(serialized, absl::MaxSplits(':', 1));
   std::string class_identity = cls_and_content.first;
 
   if (class_identity == "TabularPolicy") {
     return DeserializeTabularPolicy(serialized, delimiter);
-  }
-  else if (class_identity == "UniformPolicy") {
+  } else if (class_identity == "UniformPolicy") {
     return std::make_unique<UniformPolicy>();
-  }
-  else {
-    SpielFatalError(absl::StrCat(
-      "Deserialization of ", class_identity, " is not supported."));
+  } else {
+    SpielFatalError(absl::StrCat("Deserialization of ", class_identity,
+                                 " is not supported."));
   }
 }
 
@@ -103,11 +101,12 @@ std::unique_ptr<TabularPolicy> DeserializeTabularPolicy(
   std::unique_ptr<TabularPolicy> res = std::make_unique<TabularPolicy>();
   if (cls_and_content.second.empty()) return res;
 
-  std::vector<absl::string_view> splits = absl::StrSplit(cls_and_content.second,
-      delimiter);
+  std::vector<absl::string_view> splits =
+      absl::StrSplit(cls_and_content.second, delimiter);
 
   // Insert the actual values
-  Action action; double prob;
+  Action action;
+  double prob;
   for (int i = 0; i < splits.size(); i += 2) {
     std::vector<absl::string_view> policy_values =
         absl::StrSplit(splits.at(i + 1), ',');

@@ -297,8 +297,8 @@ void PolicySerializationTest() {
   policy = std::make_unique<TabularPolicy>(*game);
   deserialized_policy = DeserializePolicy(policy->Serialize());
   deserialized = std::static_pointer_cast<TabularPolicy>(deserialized_policy);
-  SPIEL_CHECK_EQ(
-      policy->PolicyTable().size(), deserialized->PolicyTable().size());
+  SPIEL_CHECK_EQ(policy->PolicyTable().size(),
+                 deserialized->PolicyTable().size());
   for (const auto& [info_state, policy] : policy->PolicyTable()) {
     for (int i = 0; i < policy.size(); i++) {
       auto original_val = policy.at(i);
