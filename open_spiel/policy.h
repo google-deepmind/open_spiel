@@ -111,7 +111,7 @@ class Policy {
   }
 };
 
-std::unique_ptr<Policy> DeserializePolicy(const std::string& str,
+std::unique_ptr<Policy> DeserializePolicy(const std::string& serialized,
     std::string delimiter = "<~>");
 
 // A tabular policy represented internally as a map. Note that this
@@ -224,8 +224,8 @@ class TabularPolicy : public Policy {
   std::unordered_map<std::string, ActionsAndProbs> policy_table_;
 };
 
-std::unique_ptr<TabularPolicy> DeserializeTabularPolicy(const std::string& str,
-    std::string delimiter = "<~>");
+std::unique_ptr<TabularPolicy> DeserializeTabularPolicy(
+    const std::string& serialized, std::string delimiter = "<~>");
 
 // Chooses all legal actions with equal probability. This is equivalent to the
 // tabular version, except that this works for large games.

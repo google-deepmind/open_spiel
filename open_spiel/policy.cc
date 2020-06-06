@@ -69,16 +69,16 @@ ActionsAndProbs UniformStatePolicy(const State& state) {
   return actions_and_probs;
 }
 
-std::unique_ptr<Policy> DeserializePolicy(const std::string& str,
+std::unique_ptr<Policy> DeserializePolicy(const std::string& serialized,
     std::string delimiter) {
   // Class’s identity is the very first line, see Policy::Serialize
   // for more info.
   std::pair<std::string, absl::string_view> cls_and_content = absl::StrSplit(
-      str, absl::MaxSplits(':', 1));
+      serialized, absl::MaxSplits(':', 1));
   std::string class_identity = cls_and_content.first;
 
   if (class_identity == "TabularPolicy") {
-    return DeserializeTabularPolicy(str, delimiter);
+    return DeserializeTabularPolicy(serialized, delimiter);
   }
   else if (class_identity == "UniformPolicy") {
     return std::make_unique<UniformPolicy>();
@@ -93,11 +93,11 @@ TabularPolicy::TabularPolicy(const Game& game)
     : TabularPolicy(GetRandomPolicy(game)) {}
 
 std::unique_ptr<TabularPolicy> DeserializeTabularPolicy(
-    const std::string& str, std::string delimiter) {
+    const std::string& serialized, std::string delimiter) {
   // Class’s identity is the very first line, see Policy::Serialize
   // for more info.
   std::pair<std::string, absl::string_view> cls_and_content =
-      absl::StrSplit(str, absl::MaxSplits(':', 1));
+      absl::StrSplit(serialized, absl::MaxSplits(':', 1));
   SPIEL_CHECK_EQ(cls_and_content.first, "TabularPolicy");
 
   std::unique_ptr<TabularPolicy> res = std::make_unique<TabularPolicy>();
