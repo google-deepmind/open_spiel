@@ -432,8 +432,15 @@ std::string GoofspielState::ObservationString(Player player) const {
   //   - everyone's current points
   //   - my current hand
   //   - current win sequence
+  int curr_point_card_;
+  if (!point_card_sequence_.empty()) {
+	curr_point_card_ = point_card_sequence_.back();
+  }
+  else {
+	curr_point_card_ = 0;
+  }
   std::string current_trick =
-      absl::StrCat("Current point card: ", point_card_sequence_.back());
+      absl::StrCat("Current point card: ", curr_point_card_);
   std::string points_line = "Points: ";
   std::string hands = "";
   std::string win_seq = "Win Sequence: ";
@@ -576,9 +583,18 @@ void GoofspielState::ObservationTensor(Player player,
   //   - current win sequence
 
   // Current point card.
-  for (int i = 0; i < num_cards_; ++i) {
-    values->push_back(i == point_card_sequence_.back() ? 1.0 : 0.0);
+  int curr_point_card_;
+  if (!point_card_sequence_.empty()) {
+	curr_point_card_ = point_card_sequence_.back();
   }
+  else {
+	curr_point_card_ = 0;
+  }
+	
+  for (int i = 0; i < num_cards_; ++i) {
+	values->push_back(i == (curr_point_card_ - 1) ? 1.0 : 0.0);
+  }
+
 
   // Point totals: one-hot vector encoding points, per player.
   Player p = player;
