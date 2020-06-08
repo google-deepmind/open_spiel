@@ -27,6 +27,7 @@ import pyspiel
 FLAGS = flags.FLAGS
 
 flags.DEFINE_integer("iterations", 100, "Number of iterations")
+flags.DEFINE_enum('solver', 'cfr', ['cfr', 'cfrplus', 'cfrbr'], 'CFR solver')
 flags.DEFINE_string("game", "kuhn_poker", "Name of the game")
 flags.DEFINE_integer("players", 2, "Number of players")
 flags.DEFINE_integer("print_freq", 10, "How often to print the exploitability")
@@ -37,23 +38,37 @@ def main(_):
         FLAGS.game,
         {"players": pyspiel.GameParameter(FLAGS.players)},
     )
-    cfr_solver = pyspiel.CFRSolver(game)
 
-    for i in range(FLAGS.iterations):
+    if (FLAGS.solver == 'cfr'):
+        cfr_solver = pyspiel.CFRSolver(game)
+    elif(FLAGS.solver == 'cfrplus'):
+        cfr_solver = pyspiel.CFRPlusSolver(game)
+    elif(FLAGS.solver == 'cfrbr'):
+        cfr_solver = pyspiel.CFRBRSolver(game)
+
+    for i in range(int(FLAGS.iterations / 2)):
         cfr_solver.evaluate_and_update_policy()
         if i % FLAGS.print_freq == 0:
-          conv = pyspiel.exploitability(game, cfr_solver.average_policy())
-          print("Iteration {} exploitability {}".format(i, conv))
+            conv = pyspiel.exploitability(game, cfr_solver.average_policy())
+            print("Iteration {} exploitability {}".format(i, conv))
 
     print("Persisting the model...")
     with open('cfr_solver.pickle', 'wb') as file:
         pickle.dump(cfr_solver, file, pickle.HIGHEST_PROTOCOL)
 
+    print("Loading the model...")
     with open('cfr_solver.pickle', 'rb') as file:
         loaded_cfr_solver = pickle.load(file)
     conv = pyspiel.exploitability(game, loaded_cfr_solver.average_policy())
-    print("Exploitability of the persisted model {}".format(conv))
+    print("Exploitability of the loaded model {}".format(conv))
+
+    for i in range(int(FLAGS.iterations / 2)):
+        loaded_cfr_solver.evaluate_and_update_policy()
+        if i % FLAGS.print_freq == 0:
+            conv = pyspiel.exploitability(
+                game, loaded_cfr_solver.average_policy())
+            print("Iteration {} exploitability {}".format(i, conv))
 
 
 if __name__ == "__main__":
-  app.run(main)
+    app.run(main)

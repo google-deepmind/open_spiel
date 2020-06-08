@@ -189,9 +189,10 @@ class CFRSolverBase {
   // Update the current policy for all information states.
   void ApplyRegretMatching();
 
-  // Return the type of itself in string format so that it can be written to
-  // the serialized string result. The type is then checked in different
-  // deserialization methods (one method for each subtype).
+  // This method should return the type of itself so that it can be checked
+  // in different deserialization methods; one method for each subtype.
+  // For an example take a look at the CFRSolver::SerializeSelfState() and
+  // DeserializeCFRSolver() methods.
   virtual std::string SerializeThisType() const {
     SpielFatalError("Serialization of the base class is not supported.");
   }
@@ -287,8 +288,22 @@ class CFRPlusSolver : public CFRSolverBase {
 std::unique_ptr<CFRPlusSolver> DeserializeCFRPlusSolver(
     const std::string& serialized, std::string delimiter = "<~>");
 
-std::pair<std::vector<absl::string_view>, std::shared_ptr<const Game>>
-DeserializeCFRSolverStateSectionAndGame(const std::string& serialized);
+struct PartiallyDeserializedCFRSolver {
+  PartiallyDeserializedCFRSolver(std::shared_ptr<const Game> game,
+                                 std::string solver_type, int solver_iteration,
+                                 std::string_view serialized_cfr_values_table)
+      : game(game),
+        solver_type(solver_type),
+        solver_iteration(solver_iteration),
+        serialized_cfr_values_table(serialized_cfr_values_table) {}
+  std::shared_ptr<const Game> game;
+  std::string solver_type;
+  int solver_iteration;
+  absl::string_view serialized_cfr_values_table;
+};
+
+PartiallyDeserializedCFRSolver PartiallyDeserializeCFRSolver(
+    const std::string& serialized);
 
 }  // namespace algorithms
 }  // namespace open_spiel

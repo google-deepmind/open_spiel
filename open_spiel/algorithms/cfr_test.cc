@@ -225,7 +225,7 @@ void CFRTest_CFRSolverSerialization() {
   CFRSolver solver = CFRSolver(*game);
   double exploitability0 = Exploitability(*game, *solver.AveragePolicy());
 
-  for (int i = 0; i < 10; i++) {
+  for (int i = 0; i < 50; i++) {
     solver.EvaluateAndUpdatePolicy();
   }
   double exploitability1 = Exploitability(*game, *solver.AveragePolicy());
@@ -240,7 +240,7 @@ void CFRTest_CFRSolverSerialization() {
       Exploitability(*game, *deserialized_solver->AveragePolicy());
   SPIEL_CHECK_FLOAT_EQ(exploitability1, exploitability2);
 
-  for (int i = 0; i < 10; i++) {
+  for (int i = 0; i < 50; i++) {
     deserialized_solver->EvaluateAndUpdatePolicy();
   }
   double exploitability3 =

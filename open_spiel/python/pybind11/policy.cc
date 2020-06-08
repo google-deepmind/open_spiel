@@ -129,7 +129,15 @@ void init_pyspiel_policy(py::module& m) {
            &open_spiel::algorithms::CFRPlusSolver::EvaluateAndUpdatePolicy)
       .def("current_policy", &open_spiel::algorithms::CFRSolver::CurrentPolicy)
       .def("average_policy",
-           &open_spiel::algorithms::CFRPlusSolver::AveragePolicy);
+           &open_spiel::algorithms::CFRPlusSolver::AveragePolicy)
+      .def(py::pickle(
+          [](const open_spiel::algorithms::CFRBRSolver&
+                 solver) {  // __getstate__
+            return solver.Serialize();
+          },
+          [](const std::string& serialized) {  // __setstate__
+            return open_spiel::algorithms::DeserializeCFRBRSolver(serialized);
+          }));
 
   py::enum_<open_spiel::algorithms::AverageType>(m, "MCCFRAverageType")
       .value("SIMPLE", open_spiel::algorithms::AverageType::kSimple)

@@ -27,6 +27,20 @@ CFRBRSolver::CFRBRSolver(const Game& game)
                     /*regret_matching_plus=*/false),
       policy_overrides_(game.NumPlayers(), nullptr),
       uniform_policy_(UniformPolicy()) {
+  InitializeBestResponseComputers();
+}
+
+CFRBRSolver::CFRBRSolver(std::shared_ptr<const Game> game, int iteration)
+    : CFRSolverBase(game,
+                    /*alternating_updates=*/false,
+                    /*linear_averaging=*/false,
+                    /*regret_matching_plus=*/false, iteration),
+      policy_overrides_(game->NumPlayers(), nullptr),
+      uniform_policy_(UniformPolicy()) {
+  InitializeBestResponseComputers();
+}
+
+void CFRBRSolver::InitializeBestResponseComputers() {
   for (int p = 0; p < game_->NumPlayers(); ++p) {
     best_response_computers_.push_back(std::unique_ptr<TabularBestResponse>(
         new TabularBestResponse(*game_, p, &uniform_policy_)));
@@ -65,6 +79,18 @@ void CFRBRSolver::EvaluateAndUpdatePolicy() {
                                 &policy_overrides_);
   }
   ApplyRegretMatching();
+}
+
+std::unique_ptr<CFRBRSolver> DeserializeCFRBRSolver(
+    const std::string& serialized, std::string delimiter) {
+  auto partial = PartiallyDeserializeCFRSolver(serialized);
+  SPIEL_CHECK_EQ(partial.solver_type, "CFRBRSolver");
+  auto solver =
+      std::make_unique<CFRBRSolver>(partial.game, partial.solver_iteration);
+  DeserializeCFRInfoStateValuesTable(partial.serialized_cfr_values_table,
+                                     &solver->InfoStateValuesTable(),
+                                     delimiter);
+  return solver;
 }
 
 }  // namespace algorithms
