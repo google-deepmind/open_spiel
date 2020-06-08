@@ -163,7 +163,7 @@ class CFRSolverBase {
 
   CFRInfoStateValuesTable& InfoStateValuesTable() { return info_states_; }
 
-  std::unique_ptr<std::string> Serialize(std::string delimiter = "<~>") const;
+  std::string Serialize(std::string delimiter = "<~>") const;
 
  protected:
   std::shared_ptr<const Game> game_;

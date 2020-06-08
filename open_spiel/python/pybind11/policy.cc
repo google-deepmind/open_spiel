@@ -98,7 +98,14 @@ void init_pyspiel_policy(py::module& m) {
       .def("evaluate_and_update_policy",
            &open_spiel::algorithms::CFRSolver::EvaluateAndUpdatePolicy)
       .def("current_policy", &open_spiel::algorithms::CFRSolver::CurrentPolicy)
-      .def("average_policy", &open_spiel::algorithms::CFRSolver::AveragePolicy);
+      .def("average_policy", &open_spiel::algorithms::CFRSolver::AveragePolicy)
+      .def(py::pickle(
+          [](const open_spiel::algorithms::CFRSolver& solver) {  // __getstate__
+            return solver.Serialize();
+          },
+          [](const std::string& serialized) {  // __setstate__
+            return open_spiel::algorithms::DeserializeCFRSolver(serialized);
+          }));
 
   py::class_<open_spiel::algorithms::CFRPlusSolver>(m, "CFRPlusSolver")
       .def(py::init<const Game&>())
@@ -106,7 +113,15 @@ void init_pyspiel_policy(py::module& m) {
            &open_spiel::algorithms::CFRPlusSolver::EvaluateAndUpdatePolicy)
       .def("current_policy", &open_spiel::algorithms::CFRSolver::CurrentPolicy)
       .def("average_policy",
-           &open_spiel::algorithms::CFRPlusSolver::AveragePolicy);
+           &open_spiel::algorithms::CFRPlusSolver::AveragePolicy)
+      .def(py::pickle(
+          [](const open_spiel::algorithms::CFRPlusSolver&
+                 solver) {  // __getstate__
+            return solver.Serialize();
+          },
+          [](const std::string& serialized) {  // __setstate__
+            return open_spiel::algorithms::DeserializeCFRPlusSolver(serialized);
+          }));
 
   py::class_<open_spiel::algorithms::CFRBRSolver>(m, "CFRBRSolver")
       .def(py::init<const Game&>())

@@ -231,9 +231,9 @@ void CFRTest_CFRSolverSerialization() {
   double exploitability1 = Exploitability(*game, *solver.AveragePolicy());
   SPIEL_CHECK_GT(exploitability0, exploitability1);
 
-  std::unique_ptr<std::string> serialized = solver.Serialize();
+  std::string serialized = solver.Serialize();
   std::unique_ptr<CFRSolver> deserialized_solver =
-      DeserializeCFRSolver(*serialized);
+      DeserializeCFRSolver(serialized);
   SPIEL_CHECK_EQ(solver.InfoStateValuesTable().size(),
                  deserialized_solver->InfoStateValuesTable().size());
   double exploitability2 =
