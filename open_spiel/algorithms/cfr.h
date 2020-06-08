@@ -138,7 +138,8 @@ class CFRSolverBase {
  public:
   CFRSolverBase(const Game& game, bool alternating_updates,
                 bool linear_averaging, bool regret_matching_plus);
-  CFRSolverBase(const Game& game, bool alternating_updates,
+  // The constructor below is used for deserialization purposes.
+  CFRSolverBase(std::shared_ptr<const Game> game, bool alternating_updates,
                 bool linear_averaging, bool regret_matching_plus,
                 int iteration);
   virtual ~CFRSolverBase() = default;
@@ -165,7 +166,7 @@ class CFRSolverBase {
   std::unique_ptr<std::string> Serialize(std::string delimiter = "<~>") const;
 
  protected:
-  const Game& game_;
+  std::shared_ptr<const Game> game_;
 
   // Iteration to support linear_policy.
   int iteration_ = 0;
@@ -243,7 +244,8 @@ class CFRSolver : public CFRSolverBase {
                       /*alternating_updates=*/true,
                       /*linear_averaging=*/false,
                       /*regret_matching_plus=*/false) {}
-  CFRSolver(const Game& game, int iteration)
+  // The constructor below is used for deserialization purposes.
+  CFRSolver(std::shared_ptr<const Game> game, int iteration)
       : CFRSolverBase(game,
                       /*alternating_updates=*/true,
                       /*linear_averaging=*/false,
@@ -254,7 +256,6 @@ class CFRSolver : public CFRSolverBase {
 };
 
 std::unique_ptr<CFRSolver> DeserializeCFRSolver(const std::string& serialized,
-                                                const Game& game,
                                                 std::string delimiter = "<~>");
 
 // CFR+ implementation.
@@ -272,7 +273,8 @@ class CFRPlusSolver : public CFRSolverBase {
                       /*alternating_updates=*/true,
                       /*linear_averaging=*/true,
                       /*regret_matching_plus=*/true) {}
-  CFRPlusSolver(const Game& game, int iteration)
+  // The constructor below is used for deserialization purposes.
+  CFRPlusSolver(std::shared_ptr<const Game> game, int iteration)
       : CFRSolverBase(game,
                       /*alternating_updates=*/true,
                       /*linear_averaging=*/false,
@@ -283,11 +285,10 @@ class CFRPlusSolver : public CFRSolverBase {
 };
 
 std::unique_ptr<CFRPlusSolver> DeserializeCFRPlusSolver(
-    const std::string& serialized, const Game& game,
-    std::string delimiter = "<~>");
+    const std::string& serialized, std::string delimiter = "<~>");
 
-std::vector<absl::string_view> DeserializeCFRSolverStateSection(
-    const std::string& serialized, const Game& game);
+std::pair<std::vector<absl::string_view>, std::shared_ptr<const Game>>
+DeserializeCFRSolverStateSectionAndGame(const std::string& serialized);
 
 }  // namespace algorithms
 }  // namespace open_spiel

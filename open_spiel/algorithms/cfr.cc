@@ -131,14 +131,14 @@ ActionsAndProbs CFRCurrentPolicy::GetStatePolicyFromInformationStateValues(
 
 CFRSolverBase::CFRSolverBase(const Game& game, bool alternating_updates,
                              bool linear_averaging, bool regret_matching_plus)
-    : game_(game),
+    : game_(game.Clone()),
       root_state_(game.NewInitialState()),
-      root_reach_probs_(game_.NumPlayers() + 1, 1.0),
+      root_reach_probs_(game_->NumPlayers() + 1, 1.0),
       regret_matching_plus_(regret_matching_plus),
       alternating_updates_(alternating_updates),
       linear_averaging_(linear_averaging),
       chance_player_(game.NumPlayers()) {
-  if (game_.GetType().dynamics != GameType::Dynamics::kSequential) {
+  if (game_->GetType().dynamics != GameType::Dynamics::kSequential) {
     SpielFatalError(
         "CFR requires sequential games. If you're trying to run it "
         "on a simultaneous (or normal-form) game, please first transform it "
@@ -147,18 +147,18 @@ CFRSolverBase::CFRSolverBase(const Game& game, bool alternating_updates,
   InitializeInfostateNodes(*root_state_);
 }
 
-CFRSolverBase::CFRSolverBase(const Game& game, bool alternating_updates,
-                             bool linear_averaging, bool regret_matching_plus,
-                             int iteration)
+CFRSolverBase::CFRSolverBase(std::shared_ptr<const Game> game,
+                             bool alternating_updates, bool linear_averaging,
+                             bool regret_matching_plus, int iteration)
     : game_(game),
-      root_state_(game.NewInitialState()),
-      root_reach_probs_(game_.NumPlayers() + 1, 1.0),
+      root_state_(game->NewInitialState()),
+      root_reach_probs_(game_->NumPlayers() + 1, 1.0),
       regret_matching_plus_(regret_matching_plus),
       alternating_updates_(alternating_updates),
       linear_averaging_(linear_averaging),
-      chance_player_(game.NumPlayers()),
+      chance_player_(game->NumPlayers()),
       iteration_(iteration) {
-  if (game_.GetType().dynamics != GameType::Dynamics::kSequential) {
+  if (game_->GetType().dynamics != GameType::Dynamics::kSequential) {
     SpielFatalError(
         "CFR requires sequential games. If you're trying to run it "
         "on a simultaneous (or normal-form) game, please first transform it "
@@ -192,7 +192,7 @@ void CFRSolverBase::InitializeInfostateNodes(const State& state) {
 void CFRSolverBase::EvaluateAndUpdatePolicy() {
   ++iteration_;
   if (alternating_updates_) {
-    for (int player = 0; player < game_.NumPlayers(); player++) {
+    for (int player = 0; player < game_->NumPlayers(); player++) {
       ComputeCounterFactualRegret(*root_state_, player, root_reach_probs_,
                                   nullptr);
       if (regret_matching_plus_) {
@@ -224,7 +224,7 @@ std::unique_ptr<std::string> CFRSolverBase::Serialize(
 
   // Game section
   absl::StrAppend(str.get(), kSerializeGameSectionHeader, "\n");
-  absl::StrAppend(str.get(), game_.ToString(), "\n");
+  absl::StrAppend(str.get(), game_->ToString(), "\n");
 
   // Internal solver state section
   absl::StrAppend(str.get(), kSerializeCFRSolverStateSectionHeader, "\n");
@@ -279,7 +279,7 @@ std::vector<double> CFRSolverBase::ComputeCounterFactualRegret(
     // The value returned is not used: if the reach probability for all players
     // is 0, then the last taken action has probability 0, so the
     // returned value is not impacting the parent node value.
-    return std::vector<double>(game_.NumPlayers(), 0.0);
+    return std::vector<double>(game_->NumPlayers(), 0.0);
   }
 
   int current_player = state.CurrentPlayer();
@@ -375,7 +375,7 @@ std::vector<double> CFRSolverBase::ComputeCounterFactualRegretForActionProbs(
     const std::vector<Action>& legal_actions,
     std::vector<double>* child_values_out,
     const std::vector<const Policy*>* policy_overrides) {
-  std::vector<double> state_value(game_.NumPlayers());
+  std::vector<double> state_value(game_->NumPlayers());
 
   for (int aidx = 0; aidx < legal_actions.size(); ++aidx) {
     const Action action = legal_actions[aidx];
@@ -398,7 +398,7 @@ std::vector<double> CFRSolverBase::ComputeCounterFactualRegretForActionProbs(
 
 bool CFRSolverBase::AllPlayersHaveZeroReachProb(
     const std::vector<double>& reach_probabilities) const {
-  for (int i = 0; i < game_.NumPlayers(); i++) {
+  for (int i = 0; i < game_->NumPlayers(); i++) {
     if (reach_probabilities[i] != 0.0) {
       return false;
     }
@@ -569,42 +569,41 @@ void CFRSolverBase::ApplyRegretMatching() {
 }
 
 std::unique_ptr<CFRSolver> DeserializeCFRSolver(const std::string& serialized,
-                                                const Game& game,
                                                 std::string delimiter) {
-  std::vector<absl::string_view> lines =
-      DeserializeCFRSolverStateSection(serialized, game);
-  SPIEL_CHECK_EQ(std::string(lines.front()), "CFRSolver");
+  auto [cfr_state_lines, game] =
+      DeserializeCFRSolverStateSectionAndGame(serialized);
+  SPIEL_CHECK_EQ(std::string(cfr_state_lines.front()), "CFRSolver");
 
   int iteration;
-  absl::SimpleAtoi(lines[1], &iteration);
+  absl::SimpleAtoi(cfr_state_lines[1], &iteration);
 
   auto solver = std::make_unique<CFRSolver>(game, iteration);
   DeserializeCFRInfoStateValuesTable(
-      absl::StrJoin(lines.begin() + 2, lines.end(), "\n"),
+      absl::StrJoin(cfr_state_lines.begin() + 2, cfr_state_lines.end(), "\n"),
       &solver->InfoStateValuesTable(), delimiter);
 
   return solver;
 }
 
 std::unique_ptr<CFRPlusSolver> DeserializeCFRPlusSolver(
-    const std::string& serialized, const Game& game, std::string delimiter) {
-  std::vector<absl::string_view> lines =
-      DeserializeCFRSolverStateSection(serialized, game);
-  SPIEL_CHECK_EQ(std::string(lines.front()), "CFRPlusSolver");
+    const std::string& serialized, std::string delimiter) {
+  auto [cfr_state_lines, game] =
+      DeserializeCFRSolverStateSectionAndGame(serialized);
+  SPIEL_CHECK_EQ(std::string(cfr_state_lines.front()), "CFRPlusSolver");
 
   int iteration;
-  absl::SimpleAtoi(lines[1], &iteration);
+  absl::SimpleAtoi(cfr_state_lines[1], &iteration);
 
   auto solver = std::make_unique<CFRPlusSolver>(game, iteration);
   DeserializeCFRInfoStateValuesTable(
-      absl::StrJoin(lines.begin() + 2, lines.end(), "\n"),
+      absl::StrJoin(cfr_state_lines.begin() + 2, cfr_state_lines.end(), "\n"),
       &solver->InfoStateValuesTable(), delimiter);
 
   return solver;
 }
 
-std::vector<absl::string_view> DeserializeCFRSolverStateSection(
-    const std::string& serialized, const Game& game) {
+std::pair<std::vector<absl::string_view>, std::shared_ptr<const Game>>
+DeserializeCFRSolverStateSectionAndGame(const std::string& serialized) {
   std::vector<absl::string_view> lines = absl::StrSplit(serialized, '\n');
   // We don't copy the internal solver state section due to potential large size
   enum Section { kInvalid = -1, kMeta = 0, kGame = 1 };
@@ -631,9 +630,9 @@ std::vector<absl::string_view> DeserializeCFRSolverStateSection(
   }
 
   // We currently just ignore the meta section
-  SPIEL_CHECK_EQ(section_strings[kGame], game.ToString());
-  std::vector<absl::string_view> res(lines.begin() + i + 1, lines.end());
-  return res;
+  std::shared_ptr<const Game> game = LoadGame(section_strings[kGame]);
+  std::vector<absl::string_view> cfr_state(lines.begin() + i + 1, lines.end());
+  return {cfr_state, game};
 }
 
 }  // namespace algorithms
