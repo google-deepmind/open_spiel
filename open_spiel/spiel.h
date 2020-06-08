@@ -877,6 +877,14 @@ DeserializeGameAndState(const std::string& serialized_state);
 using HistoryDistribution =
     std::pair<std::vector<std::unique_ptr<State>>, std::vector<double>>;
 
+// Convert GameTypes from and to strings. Used for serialization of objects
+// that contain them.
+// Note: these are not finished! They will be finished by an external
+// contributor. See https://github.com/deepmind/open_spiel/issues/234 for
+// details.
+std::string GameTypeToString(const GameType& game_type);
+GameType GameTypeFromString(const std::string& game_type_str);
+
 }  // namespace open_spiel
 
 #endif  // OPEN_SPIEL_SPIEL_H_

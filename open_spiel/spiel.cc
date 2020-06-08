@@ -570,4 +570,28 @@ std::string Game::ToString() const {
   return GameParametersToString(params);
 }
 
+std::string GameTypeToString(const GameType& game_type) {
+  SpielFatalError("Unimplemented!");
+  std::string str = absl::StrCat("short_name: ", game_type.short_name, "\n");
+  absl::StrAppend(&str, "long_name: ", game_type.long_name, "\n");
+
+  switch (game_type.dynamics) {
+    case GameType::Dynamics::kSequential:
+      absl::StrAppend(&str, "dynamics: kSequential\n");
+      break;
+    case GameType::Dynamics::kSimultaneous:
+      absl::StrAppend(&str, "dynamics: kSimultaneous\n");
+      break;
+    default:
+      SpielFatalError("Unrecognized dynamics");
+  }
+
+  return str;
+}
+
+GameType GameTypeFromString(const std::string& game_type_str) {
+  SpielFatalError("Unimplemented!");
+  return {};
+}
+
 }  // namespace open_spiel

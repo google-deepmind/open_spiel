@@ -19,6 +19,7 @@
 #include <utility>
 
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_split.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
@@ -62,6 +63,37 @@ std::string GameParameter::ToString() const {
     default:
       SpielFatalError("Unknown type.");
       return "This will never return.";
+  }
+}
+
+std::string GameParameter::Serialize(const std::string& delimiter) const {
+  SpielFatalError("Unimplemented!");
+  return absl::StrCat(GameParameterTypeToString(type_), delimiter, ToString(),
+                      delimiter, is_mandatory());
+}
+
+GameParameter DeserializeGameParameter(const std::string& data,
+                                       const std::string& delimiter) {
+  SpielFatalError("Unimplemented!");
+  std::vector<std::string> parts = absl::StrSplit(data, delimiter);
+  SPIEL_CHECK_EQ(parts.size(), 3);
+  bool mandatory = (parts[2] == "True" || parts[2] == "true");
+  if (parts[0] == "kUnset") {
+    return GameParameter(GameParameter::Type::kUnset, mandatory);
+  } else if (parts[0] == "kInt") {
+    int value;
+    SPIEL_CHECK_TRUE(absl::SimpleAtoi(parts[1], &value));
+    return GameParameter(value, mandatory);
+  } else if (parts[0] == "kDouble") {
+    double value;
+    SPIEL_CHECK_TRUE(absl::SimpleAtod(parts[1], &value));
+    return GameParameter(value, mandatory);
+  } else if (parts[0] == "kString") {
+    return GameParameter(parts[1], mandatory);
+  } else if (parts[0] == "kBool") {
+    return GameParameter(parts[1] == "True" || parts[1] == "true", mandatory);
+  } else {
+    SpielFatalError(absl::StrCat("Unrecognized type: ", parts[0]));
   }
 }
 

@@ -81,6 +81,12 @@ class GameParameter {
   // Used for __repr__ in the Python interface.
   std::string ToReprString() const;
 
+  // Everything necessary to reconstruct the parameter in string form:
+  // type;value;is_mandatory.
+  // Note: this is not yet finished nor tested. Will be finished as part of
+  // https://github.com/deepmind/open_spiel/issues/234.
+  std::string Serialize(const std::string& delimiter = ";") const;
+
   int int_value() const {
     SPIEL_CHECK_TRUE(type_ == Type::kInt);
     return int_value_;
@@ -118,6 +124,11 @@ class GameParameter {
 };
 
 std::string GameParameterTypeToString(const GameParameter::Type& type);
+
+// Note: unfinished and not yet tested. Will be finished and tested in
+// https://github.com/deepmind/open_spiel/issues/234.
+GameParameter DeserializeGameParameter(const std::string& data,
+                                       const std::string& delimiter = ";");
 
 inline bool IsParameterSpecified(const GameParameters& table,
                                  const std::string& key) {
