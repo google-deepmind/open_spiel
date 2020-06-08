@@ -370,6 +370,12 @@ class State {
   // when the only part of the state that differs is not observable by that
   // player (e.g. opponents' cards in Poker.)
 
+  // The identifiers must be unique across all players. For example, in a card
+  // game, if both players can hold the card Jack, the identifier should
+  // contain player identification as well, like P1Jack and P2Jack. This allows
+  // the algorithms to maintain a single table of identifiers instead of
+  // maintaining a table per player to avoid name collisions.
+
   // Games that do not have imperfect information do not need to implement
   // these methods, but most algorithms intended for imperfect information
   // games will work on perfect information games provided the InformationState
@@ -386,6 +392,13 @@ class State {
   // For example, in tic-tac-toe, the current state of the board would not be
   // a perfect-recall representation, but the sequence of moves played would
   // be.
+
+  // If you implement both InformationState and Observation, the two must be
+  // consistent for all the players (even the non-acting player(s)).
+  // By consistency we mean that when you maintain an Action-Observation
+  // history (AOH) for different ground states, the (in)equality of two AOHs
+  // implies the (in)equality of two InformationStates.
+  // In other words, AOH is a factored representation of InformationState.
 
   // There are currently no use-case for calling this function with
   // `kChancePlayerId` or `kTerminalPlayerId`. Thus, games are expected to raise
@@ -430,13 +443,17 @@ class State {
   //  - It has at most the same information content as the information state
   //  - The complete history of observations and our actions over the
   //    course of the game is sufficient to reconstruct the information
-  //    state.
+  //    state for any players at any point in the game.
   //
   // For example, the cards revealed and bets made since our previous move in
   // poker, or the current state of the board in chess.
   // Note that neither of these are valid information states, since the same
   // observation may arise from two different observation histories (i.e. they
   // are not perfect recall).
+  //
+  // Observations should cover all observations: a combination of both public
+  // (common) and private observations. They are not factored into these
+  // individual constituent parts.
   //
   // Implementations should start with (and it's tested in api_test.py):
   //   SPIEL_CHECK_GE(player, 0);
