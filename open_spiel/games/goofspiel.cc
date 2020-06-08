@@ -239,7 +239,8 @@ void GoofspielState::DoApplyActions(const std::vector<Action>& actions) {
 
 std::vector<std::pair<Action, double>> GoofspielState::ChanceOutcomes() const {
   SPIEL_CHECK_TRUE(IsChanceNode());
-  std::set played(point_card_sequence_.begin(), point_card_sequence_.end());
+  std::set<int> played(point_card_sequence_.begin(),
+                       point_card_sequence_.end());
   std::vector<std::pair<Action, double>> outcomes;
   const int n = num_cards_ - played.size();
   const double p = 1.0 / n;
