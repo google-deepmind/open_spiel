@@ -77,7 +77,7 @@ void CFRBRTest_CFRBRSolverSerialization() {
                  deserialized_solver->InfoStateValuesTable().size());
   double exploitability2 =
       Exploitability(*game, *deserialized_solver->AveragePolicy());
-  SPIEL_CHECK_FLOAT_EQ(exploitability1, exploitability2);
+  SPIEL_CHECK_FLOAT_NEAR(exploitability1, exploitability2, 1e-4);
 
   for (int i = 0; i < 50; i++) {
     deserialized_solver->EvaluateAndUpdatePolicy();

@@ -208,14 +208,15 @@ void CFRTest_InfoStateValuesTableSerialization() {
     for (int i = 0; i < values.legal_actions.size(); i++) {
       SPIEL_CHECK_EQ(values.legal_actions.at(i),
                      deserialized1.at(info_state).legal_actions.at(i));
-      SPIEL_CHECK_FLOAT_EQ(
+      SPIEL_CHECK_FLOAT_NEAR(
           values.cumulative_regrets.at(i),
-          deserialized1.at(info_state).cumulative_regrets.at(i));
-      SPIEL_CHECK_FLOAT_EQ(
+          deserialized1.at(info_state).cumulative_regrets.at(i), 1e-4);
+      SPIEL_CHECK_FLOAT_NEAR(
           values.cumulative_policy.at(i),
-          deserialized1.at(info_state).cumulative_policy.at(i));
-      SPIEL_CHECK_FLOAT_EQ(values.current_policy.at(i),
-                           deserialized1.at(info_state).current_policy.at(i));
+          deserialized1.at(info_state).cumulative_policy.at(i), 1e-4);
+      SPIEL_CHECK_FLOAT_NEAR(values.current_policy.at(i),
+                             deserialized1.at(info_state).current_policy.at(i),
+                             1e-4);
     }
   }
 }
@@ -238,7 +239,7 @@ void CFRTest_CFRSolverSerialization() {
                  deserialized_solver->InfoStateValuesTable().size());
   double exploitability2 =
       Exploitability(*game, *deserialized_solver->AveragePolicy());
-  SPIEL_CHECK_FLOAT_EQ(exploitability1, exploitability2);
+  SPIEL_CHECK_FLOAT_NEAR(exploitability1, exploitability2, 1e-4);
 
   for (int i = 0; i < 50; i++) {
     deserialized_solver->EvaluateAndUpdatePolicy();
