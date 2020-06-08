@@ -438,9 +438,11 @@ std::string CFRInfoStateValues::ToString() const {
 std::string CFRInfoStateValues::Serialize() const {
   std::string str = "";
   absl::StrAppend(&str, absl::StrJoin(legal_actions, ","), ";");
-  absl::StrAppend(&str, absl::StrJoin(cumulative_regrets, ","), ";");
-  absl::StrAppend(&str, absl::StrJoin(cumulative_policy, ","), ";");
-  absl::StrAppend(&str, absl::StrJoin(current_policy, ","));
+  absl::StrAppend(
+      &str, absl::StrJoin(cumulative_regrets, ",", DoubleFormatter()), ";");
+  absl::StrAppend(
+      &str, absl::StrJoin(cumulative_policy, ",", DoubleFormatter()), ";");
+  absl::StrAppend(&str, absl::StrJoin(current_policy, ",", DoubleFormatter()));
   return str;
 }
 

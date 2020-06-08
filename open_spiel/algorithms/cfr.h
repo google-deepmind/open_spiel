@@ -15,7 +15,9 @@
 #ifndef OPEN_SPIEL_ALGORITHMS_CFR_H_
 #define OPEN_SPIEL_ALGORITHMS_CFR_H_
 
+#include <iomanip>
 #include <memory>
+#include <sstream>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -304,6 +306,16 @@ struct PartiallyDeserializedCFRSolver {
 
 PartiallyDeserializedCFRSolver PartiallyDeserializeCFRSolver(
     const std::string& serialized);
+
+// Formats doubles to strings with a specified number of decimal places, used
+// for serialization of CFRInfoStateValues.
+struct DoubleFormatter {
+  void operator()(std::string* out, const double& d) const {
+    std::stringstream stream;
+    stream << std::fixed << std::setprecision(4) << d;
+    absl::StrAppend(out, stream.str());
+  }
+};
 
 }  // namespace algorithms
 }  // namespace open_spiel

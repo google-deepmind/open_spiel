@@ -26,11 +26,10 @@ import pyspiel
 
 FLAGS = flags.FLAGS
 
-flags.DEFINE_integer("iterations", 100, "Number of iterations")
 flags.DEFINE_enum('solver', 'cfr', ['cfr', 'cfrplus', 'cfrbr'], 'CFR solver')
+flags.DEFINE_integer("iterations", 20, "Number of iterations")
 flags.DEFINE_string("game", "kuhn_poker", "Name of the game")
 flags.DEFINE_integer("players", 2, "Number of players")
-flags.DEFINE_integer("print_freq", 10, "How often to print the exploitability")
 
 
 def main(_):
@@ -40,34 +39,32 @@ def main(_):
     )
 
     if (FLAGS.solver == 'cfr'):
-        cfr_solver = pyspiel.CFRSolver(game)
+        solver = pyspiel.CFRSolver(game)
     elif(FLAGS.solver == 'cfrplus'):
-        cfr_solver = pyspiel.CFRPlusSolver(game)
+        solver = pyspiel.CFRPlusSolver(game)
     elif(FLAGS.solver == 'cfrbr'):
-        cfr_solver = pyspiel.CFRBRSolver(game)
+        solver = pyspiel.CFRBRSolver(game)
 
     for i in range(int(FLAGS.iterations / 2)):
-        cfr_solver.evaluate_and_update_policy()
-        if i % FLAGS.print_freq == 0:
-            conv = pyspiel.exploitability(game, cfr_solver.average_policy())
-            print("Iteration {} exploitability {}".format(i, conv))
+        solver.evaluate_and_update_policy()
+        print("Iteration {} exploitability: {:.6f}".format(
+            i, pyspiel.exploitability(game, solver.average_policy())))
 
     print("Persisting the model...")
-    with open('cfr_solver.pickle', 'wb') as file:
-        pickle.dump(cfr_solver, file, pickle.HIGHEST_PROTOCOL)
+    with open('{}_solver.pickle'.format(FLAGS.solver), 'wb') as file:
+        pickle.dump(solver, file, pickle.HIGHEST_PROTOCOL)
 
     print("Loading the model...")
-    with open('cfr_solver.pickle', 'rb') as file:
-        loaded_cfr_solver = pickle.load(file)
-    conv = pyspiel.exploitability(game, loaded_cfr_solver.average_policy())
-    print("Exploitability of the loaded model {}".format(conv))
+    with open('{}_solver.pickle'.format(FLAGS.solver), 'rb') as file:
+        loaded_solver = pickle.load(file)
+    print("Exploitability of the loaded model: {:.6f}".format(
+        pyspiel.exploitability(game, loaded_solver.average_policy())))
 
     for i in range(int(FLAGS.iterations / 2)):
-        loaded_cfr_solver.evaluate_and_update_policy()
-        if i % FLAGS.print_freq == 0:
-            conv = pyspiel.exploitability(
-                game, loaded_cfr_solver.average_policy())
-            print("Iteration {} exploitability {}".format(i, conv))
+        loaded_solver.evaluate_and_update_policy()
+        print("Iteration {} exploitability: {:.6f}".format(
+            int(FLAGS.iterations / 2) + i,
+            pyspiel.exploitability(game, loaded_solver.average_policy())))
 
 
 if __name__ == "__main__":
