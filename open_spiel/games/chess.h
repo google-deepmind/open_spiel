@@ -194,7 +194,7 @@ class ChessState : public State {
   // IsTerminal(), which is also called by LegalActions().
   void MaybeGenerateLegalActions() const;
 
-  std::optional<std::vector<double>> MaybeFinalReturns() const;
+  absl::optional<std::vector<double>> MaybeFinalReturns() const;
 
   // We have to store every move made to check for repetitions and to implement
   // undo. We store the current board position as an optimization.
@@ -217,7 +217,7 @@ class ChessState : public State {
   };
   using RepetitionTable = absl::flat_hash_map<uint64_t, int, PassthroughHash>;
   RepetitionTable repetitions_;
-  mutable std::optional<std::vector<Action>> cached_legal_actions_;
+  mutable absl::optional<std::vector<Action>> cached_legal_actions_;
 };
 
 // Game object.

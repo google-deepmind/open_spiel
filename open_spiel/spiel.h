@@ -20,7 +20,6 @@
 #include <map>
 #include <memory>
 #include <numeric>
-#include <optional>
 #include <random>
 #include <sstream>
 #include <string>
@@ -30,6 +29,7 @@
 
 #include "open_spiel/abseil-cpp/absl/random/bit_gen_ref.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel_utils.h"
 
@@ -756,7 +756,7 @@ class Game : public std::enable_shared_from_this<Game> {
   // - Returns `default_value` if provided.
   template <typename T>
   T ParameterValue(const std::string& key,
-                   std::optional<T> default_value = std::nullopt) const;
+                   absl::optional<T> default_value = std::nullopt) const;
 
   // The game type.
   GameType game_type_;

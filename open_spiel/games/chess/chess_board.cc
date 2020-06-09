@@ -53,7 +53,7 @@ std::string ColorToString(Color c) {
   }
 }
 
-std::optional<PieceType> PieceTypeFromChar(char c) {
+absl::optional<PieceType> PieceTypeFromChar(char c) {
   switch (toupper(c)) {
     case 'P':
       return PieceType::kPawn;
@@ -151,7 +151,7 @@ std::string Piece::ToString() const {
                                 : absl::AsciiStrToLower(base);
 }
 
-std::optional<Square> SquareFromString(const std::string &s) {
+absl::optional<Square> SquareFromString(const std::string &s) {
   if (s.size() != 2) return InvalidSquare();
 
   auto file = ParseFile(s[0]);
@@ -324,7 +324,7 @@ ChessBoard<kBoardSize>::ChessBoard()
 }
 
 template <uint32_t kBoardSize>
-/*static*/ std::optional<ChessBoard<kBoardSize>>
+/*static*/ absl::optional<ChessBoard<kBoardSize>>
 ChessBoard<kBoardSize>::BoardFromFEN(const std::string &fen) {
   /* An FEN string includes a board position, side to play, castling
    * rights, ep square, 50 moves clock, and full move number. In that order.
@@ -646,7 +646,7 @@ bool ChessBoard<kBoardSize>::HasSufficientMaterial() const {
 }
 
 template <uint32_t kBoardSize>
-std::optional<Move> ChessBoard<kBoardSize>::ParseMove(
+absl::optional<Move> ChessBoard<kBoardSize>::ParseMove(
     const std::string &move) const {
   // First see if they are in the long form -
   // "anan" (eg. "e2e4") or "anana" (eg. "f7f8q")
@@ -667,7 +667,7 @@ std::optional<Move> ChessBoard<kBoardSize>::ParseMove(
 }
 
 template <uint32_t kBoardSize>
-std::optional<Move> ChessBoard<kBoardSize>::ParseSANMove(
+absl::optional<Move> ChessBoard<kBoardSize>::ParseSANMove(
     const std::string &move_str) const {
   std::string move = move_str;
 
@@ -748,7 +748,7 @@ std::optional<Move> ChessBoard<kBoardSize>::ParseSANMove(
 
   // If necessary, source rank and/or file are also included for
   // disambiguation.
-  std::optional<int8_t> source_file, source_rank;
+  absl::optional<int8_t> source_file, source_rank;
   if (!move.empty()) {
     source_file = ParseFile(move[0]);
     if (source_file) {
@@ -765,11 +765,11 @@ std::optional<Move> ChessBoard<kBoardSize>::ParseSANMove(
   SPIEL_CHECK_TRUE(move.empty());
 
   // Pawn promations are annotated with =Q to indicate the promotion type.
-  std::optional<PieceType> promotion_type;
+  absl::optional<PieceType> promotion_type;
   if (!annotation.empty() && annotation[0] == '=') {
     SPIEL_CHECK_GE(annotation.size(), 2);
     auto maybe_piece = PieceTypeFromChar(annotation[1]);
-    if (!maybe_piece) return std::optional<Move>();
+    if (!maybe_piece) return absl::optional<Move>();
     promotion_type = maybe_piece;
   }
 
@@ -789,11 +789,11 @@ std::optional<Move> ChessBoard<kBoardSize>::ParseSANMove(
   if (candidates.size() == 1) return candidates[0];
   std::cerr << "expected exactly one matching move, got " << candidates.size()
             << std::endl;
-  return std::optional<Move>();
+  return absl::optional<Move>();
 }
 
 template <uint32_t kBoardSize>
-std::optional<Move> ChessBoard<kBoardSize>::ParseLANMove(
+absl::optional<Move> ChessBoard<kBoardSize>::ParseLANMove(
     const std::string &move) const {
   SPIEL_CHECK_FALSE(move.empty());
 
@@ -816,7 +816,7 @@ std::optional<Move> ChessBoard<kBoardSize>::ParseLANMove(
     auto from = SquareFromString(move.substr(0, 2));
     auto to = SquareFromString(std::string(absl::ClippedSubstr(move, 2, 2)));
     if (from && to) {
-      std::optional<PieceType> promotion_type;
+      absl::optional<PieceType> promotion_type;
       if (move.size() == 5) {
         promotion_type = PieceTypeFromChar(move[4]);
         if (!promotion_type) {

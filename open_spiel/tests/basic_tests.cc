@@ -17,13 +17,13 @@
 #include <iostream>
 #include <memory>
 #include <numeric>
-#include <optional>
 #include <random>
 #include <set>
 #include <string>
 
 #include "open_spiel/abseil-cpp/absl/random/uniform_int_distribution.h"
 #include "open_spiel/abseil-cpp/absl/time/clock.h"
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/game_transforms/turn_based_simultaneous_game.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"

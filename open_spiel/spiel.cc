@@ -19,7 +19,6 @@
 #include <iostream>
 #include <map>
 #include <memory>
-#include <optional>
 #include <string>
 #include <utility>
 #include <vector>
@@ -28,6 +27,7 @@
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_split.h"
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel_utils.h"
 
@@ -211,7 +211,8 @@ State::State(std::shared_ptr<const Game> game)
 
 template <>
 GameParameters Game::ParameterValue<GameParameters>(
-    const std::string& key, std::optional<GameParameters> default_value) const {
+    const std::string& key,
+    absl::optional<GameParameters> default_value) const {
   auto iter = game_parameters_.find(key);
   if (iter != game_parameters_.end()) {
     return iter->second.game_value();
@@ -231,7 +232,7 @@ GameParameters Game::ParameterValue<GameParameters>(
 
 template <>
 int Game::ParameterValue<int>(const std::string& key,
-                              std::optional<int> default_value) const {
+                              absl::optional<int> default_value) const {
   auto iter = game_parameters_.find(key);
   if (iter == game_parameters_.end()) {
     GameParameter default_game_parameter;
@@ -254,8 +255,8 @@ int Game::ParameterValue<int>(const std::string& key,
 }
 
 template <>
-double Game::ParameterValue<double>(const std::string& key,
-                                    std::optional<double> default_value) const {
+double Game::ParameterValue<double>(
+    const std::string& key, absl::optional<double> default_value) const {
   auto iter = game_parameters_.find(key);
   if (iter == game_parameters_.end()) {
     GameParameter default_game_parameter;
@@ -279,7 +280,7 @@ double Game::ParameterValue<double>(const std::string& key,
 
 template <>
 std::string Game::ParameterValue<std::string>(
-    const std::string& key, std::optional<std::string> default_value) const {
+    const std::string& key, absl::optional<std::string> default_value) const {
   auto iter = game_parameters_.find(key);
   if (iter == game_parameters_.end()) {
     GameParameter default_game_parameter;
@@ -303,7 +304,7 @@ std::string Game::ParameterValue<std::string>(
 
 template <>
 bool Game::ParameterValue<bool>(const std::string& key,
-                                std::optional<bool> default_value) const {
+                                absl::optional<bool> default_value) const {
   auto iter = game_parameters_.find(key);
   if (iter == game_parameters_.end()) {
     GameParameter default_game_parameter;

@@ -41,7 +41,7 @@ void CheckUndo(const char* fen, const char* move_san, const char* fen_after) {
   std::shared_ptr<const Game> game = LoadGame("chess");
   ChessState state(game, fen);
   Player player = state.CurrentPlayer();
-  std::optional<Move> maybe_move = state.Board().ParseSANMove(move_san);
+  absl::optional<Move> maybe_move = state.Board().ParseSANMove(move_san);
   SPIEL_CHECK_TRUE(maybe_move);
   Action action = MoveToAction(*maybe_move);
   state.ApplyAction(action);
@@ -51,7 +51,7 @@ void CheckUndo(const char* fen, const char* move_san, const char* fen_after) {
 }
 
 void ApplySANMove(const char* move_san, ChessState* state) {
-  std::optional<Move> maybe_move = state->Board().ParseSANMove(move_san);
+  absl::optional<Move> maybe_move = state->Board().ParseSANMove(move_san);
   SPIEL_CHECK_TRUE(maybe_move);
   state->ApplyAction(MoveToAction(*maybe_move));
 }

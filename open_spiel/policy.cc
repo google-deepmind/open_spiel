@@ -17,7 +17,6 @@
 #include <iterator>
 #include <list>
 #include <memory>
-#include <optional>
 #include <random>
 #include <string>
 #include <unordered_map>
@@ -26,6 +25,7 @@
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_format.h"
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 

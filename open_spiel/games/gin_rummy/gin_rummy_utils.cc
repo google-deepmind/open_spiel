@@ -31,7 +31,7 @@ int CardRank(int card) { return card % kNumRanks; }
 constexpr char kRankChar[] = "A23456789TJQK";
 constexpr char kSuitChar[] = "scdh";
 
-std::string CardString(std::optional<int> card) {
+std::string CardString(absl::optional<int> card) {
   if (!card.has_value()) return "XX";
   SPIEL_CHECK_GE(card.value(), 0);
   SPIEL_CHECK_LT(card.value(), kNumCards);
@@ -307,7 +307,7 @@ VecVecInt BestMeldGroup(const VecInt &cards) {
 }
 
 // Minimum deadwood count over all meld groups.
-int MinDeadwood(VecInt hand, std::optional<int> card) {
+int MinDeadwood(VecInt hand, absl::optional<int> card) {
   if (card.has_value()) hand.push_back(card.value());
   return MinDeadwood(hand);
 }

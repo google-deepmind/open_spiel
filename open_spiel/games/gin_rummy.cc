@@ -575,7 +575,7 @@ std::string GinRummyState::ObservationString(Player player) const {
   std::vector<int> hand;
   std::vector<int> discard_pile;
   std::vector<int> layed_melds;
-  std::optional<int> upcard;
+  absl::optional<int> upcard;
   int knock_card = 0;
   int stock_size = 0;
 

@@ -17,9 +17,10 @@
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
-#include <optional>
 #include <string>
 #include <vector>
+
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
 
 
 namespace open_spiel {
@@ -72,7 +73,7 @@ void UnrankActionMixedBase(Action action, const std::vector<int>& bases,
   SPIEL_CHECK_EQ(action, 0);
 }
 
-std::optional<std::string> FindFile(const std::string& filename, int levels) {
+absl::optional<std::string> FindFile(const std::string& filename, int levels) {
   std::string candidate_filename = filename;
   for (int i = 0; i <= levels; ++i) {
     if (i == 0) {

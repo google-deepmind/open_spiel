@@ -15,9 +15,9 @@
 #ifndef OPEN_SPIEL_ALGORITHMS_CORR_DIST_H_
 #define OPEN_SPIEL_ALGORITHMS_CORR_DIST_H_
 
-#include <optional>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"
 

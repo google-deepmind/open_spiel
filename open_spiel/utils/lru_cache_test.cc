@@ -40,7 +40,7 @@ void TestLRUCache() {
   SPIEL_CHECK_FALSE(cache.Get(1));
 
   {
-    std::optional<const std::string> v = cache.Get(13);
+    absl::optional<const std::string> v = cache.Get(13);
     SPIEL_CHECK_TRUE(v);
     SPIEL_CHECK_EQ(*v, "13");
   }

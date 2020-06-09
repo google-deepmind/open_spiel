@@ -14,11 +14,10 @@
 
 #include "open_spiel/utils/threaded_queue.h"
 
-#include <optional>
-
 #include "open_spiel/abseil-cpp/absl/time/clock.h"
-#include "open_spiel/spiel_utils.h"
 #include "open_spiel/abseil-cpp/absl/time/time.h"
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
 namespace {
@@ -27,7 +26,7 @@ void TestThreadedQueue() {
   ThreadedQueue<int> q(4);
 
   auto CheckPopEq = [&q](int expected) {
-    std::optional<int> v = q.Pop();
+    absl::optional<int> v = q.Pop();
     SPIEL_CHECK_TRUE(v);
     SPIEL_CHECK_EQ(*v, expected);
   };

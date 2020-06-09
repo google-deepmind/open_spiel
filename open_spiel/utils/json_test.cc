@@ -53,7 +53,7 @@ void TestToString() {
 }
 
 void TestFromString() {
-  std::optional<Value> v;
+  absl::optional<Value> v;
 
   v = FromString("null");
   SPIEL_CHECK_TRUE(v);

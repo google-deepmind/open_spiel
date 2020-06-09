@@ -303,7 +303,7 @@ void learner(const open_spiel::Game& game,
     int num_states = 0;
     int num_trajectories = 0;
     while (!stop->StopRequested() && num_states < learn_rate) {
-      std::optional<Trajectory> trajectory = trajectory_queue->Pop();
+      absl::optional<Trajectory> trajectory = trajectory_queue->Pop();
       if (trajectory) {
         num_trajectories += 1;
         total_trajectories += 1;

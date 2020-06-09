@@ -16,7 +16,6 @@
 #define OPEN_SPIEL_UTILS_JSON_H_
 
 #include <cstdint>
-
 #include <map>
 #include <ostream>
 #include <string>
@@ -24,6 +23,7 @@
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/strings/string_view.h"
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
 
 namespace open_spiel::json {
 
@@ -126,7 +126,7 @@ std::ostream& operator<<(std::ostream& os, const Object& o);
 std::ostream& operator<<(std::ostream& os, const Value& v);
 
 // Deserialize a string into a JSON value. Returns nullopt on parse failure.
-std::optional<Value> FromString(absl::string_view str);
+absl::optional<Value> FromString(absl::string_view str);
 
 }  // namespace open_spiel::json
 

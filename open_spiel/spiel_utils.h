@@ -22,7 +22,6 @@
 #include <cstdint>
 #include <limits>
 #include <locale>
-#include <optional>
 #include <random>
 #include <sstream>
 #include <string>
@@ -38,6 +37,7 @@
 #include "open_spiel/abseil-cpp/absl/strings/str_split.h"
 #include "open_spiel/abseil-cpp/absl/time/clock.h"
 #include "open_spiel/abseil-cpp/absl/time/time.h"
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
 
 // Code that is not part of the API, but is widely useful in implementations
 
@@ -127,7 +127,7 @@ int PreviousPlayerRoundRobin(Player player, int nplayers);
 // 3 and filename is my.txt, it will look for ./my.txt, ../my.txt, ../../my.txt,
 // and ../../../my.txt, return the first file found or std::nullopt if not
 // found.
-std::optional<std::string> FindFile(const std::string& filename, int levels);
+absl::optional<std::string> FindFile(const std::string& filename, int levels);
 
 // Returns whether the absolute difference between floating point values a and
 // b is less than or equal to FloatingPointThresholdRatio() * max(|a|, |b|).

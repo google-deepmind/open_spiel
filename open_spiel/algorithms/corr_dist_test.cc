@@ -200,7 +200,7 @@ void TestSignalingExampleVonStengelForges2008() {
 }
 
 void TestGreenwaldSarfatiExample1() {
-  std::optional<std::string> file = FindFile(kGreenwaldSarfatiEg1File, 2);
+  absl::optional<std::string> file = FindFile(kGreenwaldSarfatiEg1File, 2);
   if (file != std::nullopt) {
     std::shared_ptr<const Game> efg_game =
         LoadGame(absl::StrCat("efg_game(filename=", file.value(), ")"));
@@ -229,7 +229,7 @@ void TestGreenwaldSarfatiExample1() {
 }
 
 void TestGreenwaldSarfatiExample2() {
-  std::optional<std::string> file = FindFile(kGreenwaldSarfatiEg2File, 2);
+  absl::optional<std::string> file = FindFile(kGreenwaldSarfatiEg2File, 2);
   if (file != std::nullopt) {
     std::shared_ptr<const Game> efg_game =
         LoadGame(absl::StrCat("efg_game(filename=", file.value(), ")"));

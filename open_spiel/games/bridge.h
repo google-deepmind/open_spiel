@@ -43,8 +43,7 @@
 // partner). There will thus be 26 turns for declarer, and 13 turns for each
 // of the defenders during the play.
 
-#include <optional>
-
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/games/bridge/double_dummy_solver/include/dll.h"
 #include "open_spiel/games/bridge/bridge_scoring.h"
 #include "open_spiel/spiel.h"
@@ -182,12 +181,12 @@ class BridgeState : public State {
   Player current_player_ = 0;  // During the play phase, the hand to play.
   Phase phase_ = Phase::kDeal;
   Contract contract_{0};
-  std::array<std::array<std::optional<Player>, kNumDenominations>,
+  std::array<std::array<absl::optional<Player>, kNumDenominations>,
              kNumPartnerships>
       first_bidder_{};
   std::array<Trick, kNumTricks> tricks_{};
   std::vector<double> returns_ = std::vector<double>(kNumPlayers);
-  std::array<std::optional<Player>, kNumCards> holder_{};
+  std::array<absl::optional<Player>, kNumCards> holder_{};
   absl::optional<ddTableResults> double_dummy_results_{};
   std::array<bool, kNumContracts> possible_contracts_;
   std::array<int, kNumContracts> score_by_contract_;
