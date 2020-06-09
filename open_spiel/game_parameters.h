@@ -82,10 +82,8 @@ class GameParameter {
   std::string ToReprString() const;
 
   // Everything necessary to reconstruct the parameter in string form:
-  // type;value;is_mandatory.
-  // Note: this is not yet finished nor tested. Will be finished as part of
-  // https://github.com/deepmind/open_spiel/issues/234.
-  std::string Serialize(const std::string& delimiter = ";") const;
+  // type/value/is_mandatory.
+  std::string Serialize(const std::string& delimiter = "/") const;
 
   int int_value() const {
     SPIEL_CHECK_TRUE(type_ == Type::kInt);
@@ -125,10 +123,19 @@ class GameParameter {
 
 std::string GameParameterTypeToString(const GameParameter::Type& type);
 
-// Note: unfinished and not yet tested. Will be finished and tested in
-// https://github.com/deepmind/open_spiel/issues/234.
+// Game Parameters and Game Parameter Serialization/Deserialization form:
+// param_name=type/value/is_mandatory|param_name_2=type2/value2/is_mandatory2
+// assumes none of the delimeters appears in the string values
+std::string SerializeGameParameters(
+  const GameParameters& game_params,
+  const std::string& name_delimiter = "=",
+  const std::string& parameter_delimeter = "|");
+GameParameters DeserializeGameParameters(
+  const std::string& data,
+  const std::string& name_delimiter = "=",
+  const std::string& parameter_delimeter = "|");                                        
 GameParameter DeserializeGameParameter(const std::string& data,
-                                       const std::string& delimiter = ";");
+                                       const std::string& delimiter = "/");
 
 inline bool IsParameterSpecified(const GameParameters& table,
                                  const std::string& key) {
