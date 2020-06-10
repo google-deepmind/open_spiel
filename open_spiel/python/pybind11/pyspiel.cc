@@ -135,9 +135,24 @@ PYBIND11_MODULE(pyspiel, m) {
       .def_readonly("parameter_specification",
                     &GameType::parameter_specification)
       .def_readonly("default_loadable", &GameType::default_loadable)
-      .def("__repr__", [](const GameType& gt) {
-        return "<GameType '" + gt.short_name + "'>";
-      });
+      .def("pretty_print",
+           [](const GameType& value) { return GameTypeToString(value); })
+      .def("__repr__",
+           [](const GameType& gt) {
+             return "<GameType '" + gt.short_name + "'>";
+           })
+      .def("__eq__",
+           [](const GameType& value, GameType* value2) {
+             return value2 &&
+                    GameTypeToString(value) == GameTypeToString(*value2);
+           })
+      .def(py::pickle(                     // Pickle support
+          [](const GameType& game_type) {  // __getstate__
+            return GameTypeToString(game_type);
+          },
+          [](const std::string& data) {  // __setstate__
+            return GameTypeFromString(data);
+          }));
 
   py::enum_<GameType::Dynamics>(game_type, "Dynamics")
       .value("SEQUENTIAL", GameType::Dynamics::kSequential)

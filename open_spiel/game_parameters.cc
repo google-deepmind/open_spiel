@@ -14,15 +14,20 @@
 
 #include "open_spiel/game_parameters.h"
 
+#include <list>
 #include <map>
 #include <string>
 #include <utility>
 
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_replace.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_split.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
+namespace {
+constexpr const char* kSerializedNewline = "\\\\n";
+}
 
 std::string GameParameter::ToReprString() const {
   switch (type_) {
@@ -67,14 +72,23 @@ std::string GameParameter::ToString() const {
 }
 
 std::string GameParameter::Serialize(const std::string& delimiter) const {
-  SpielFatalError("Unimplemented!");
-  return absl::StrCat(GameParameterTypeToString(type_), delimiter, ToString(),
-                      delimiter, is_mandatory());
+  std::string val;
+  switch (type_) {
+    case Type::kString:
+      val = absl::StrReplaceAll(ToString(), {{"\n", kSerializedNewline}});
+      break;
+    case Type::kGame:
+      val = SerializeGameParameters(game_value());
+      break;
+    default:
+      val = ToString();
+  }
+  return absl::StrCat(GameParameterTypeToString(type_), delimiter, val,
+                      delimiter, is_mandatory() ? "true" : "false");
 }
 
 GameParameter DeserializeGameParameter(const std::string& data,
                                        const std::string& delimiter) {
-  SpielFatalError("Unimplemented!");
   std::vector<std::string> parts = absl::StrSplit(data, delimiter);
   SPIEL_CHECK_EQ(parts.size(), 3);
   bool mandatory = (parts[2] == "True" || parts[2] == "true");
@@ -89,12 +103,48 @@ GameParameter DeserializeGameParameter(const std::string& data,
     SPIEL_CHECK_TRUE(absl::SimpleAtod(parts[1], &value));
     return GameParameter(value, mandatory);
   } else if (parts[0] == "kString") {
-    return GameParameter(parts[1], mandatory);
+    return GameParameter(
+        absl::StrReplaceAll(parts[1], {{kSerializedNewline, "\n"}}), mandatory);
   } else if (parts[0] == "kBool") {
     return GameParameter(parts[1] == "True" || parts[1] == "true", mandatory);
+  } else if (parts[0] == "kGame") {
+    return GameParameter(DeserializeGameParameters(parts[1]), mandatory);
   } else {
     SpielFatalError(absl::StrCat("Unrecognized type: ", parts[0]));
   }
+}
+
+std::string SerializeGameParameters(const GameParameters& game_params,
+                                    const std::string& name_delimiter,
+                                    const std::string& parameter_delimeter) {
+  std::list<std::string> serialized_params;
+
+  for (const auto& key_val : game_params) {
+    std::string name = key_val.first;
+    GameParameter parameter = key_val.second;
+
+    serialized_params.push_back(
+        absl::StrCat(name, name_delimiter, parameter.Serialize()));
+  }
+
+  return absl::StrJoin(serialized_params, parameter_delimeter);
+}
+
+GameParameters DeserializeGameParameters(
+    const std::string& data, const std::string& name_delimiter,
+    const std::string& parameter_delimeter) {
+  GameParameters game_params;
+  std::vector<std::string> parts = absl::StrSplit(data, parameter_delimeter);
+
+  for (const auto& part : parts) {
+    if (!part.empty()) {
+      std::pair<std::string, std::string> pair =
+          absl::StrSplit(part, name_delimiter);
+      game_params.insert(std::pair<std::string, GameParameter>(
+          pair.first, DeserializeGameParameter(pair.second)));
+    }
+  }
+  return game_params;
 }
 
 inline std::string GameParametersToString(const GameParameters& game_params) {

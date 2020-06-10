@@ -509,6 +509,19 @@ std::ostream& operator<<(std::ostream& stream, GameType::Dynamics value) {
   }
 }
 
+std::istream& operator>>(std::istream& stream, GameType::Dynamics& var) {
+  std::string str;
+  stream >> str;
+  if (str == "Simultaneous") {
+    var = GameType::Dynamics::kSimultaneous;
+  } else if (str == "Sequential") {
+    var = GameType::Dynamics::kSequential;
+  } else {
+    SpielFatalError(absl::StrCat("Unknown dynamics ", str, "."));
+  }
+  return stream;
+}
+
 std::ostream& operator<<(std::ostream& stream, GameType::ChanceMode value) {
   switch (value) {
     case GameType::ChanceMode::kDeterministic:
@@ -523,6 +536,21 @@ std::ostream& operator<<(std::ostream& stream, GameType::ChanceMode value) {
   }
 }
 
+std::istream& operator>>(std::istream& stream, GameType::ChanceMode& var) {
+  std::string str;
+  stream >> str;
+  if (str == "Deterministic") {
+    var = GameType::ChanceMode::kDeterministic;
+  } else if (str == "ExplicitStochastic") {
+    var = GameType::ChanceMode::kExplicitStochastic;
+  } else if (str == "SampledStochastic") {
+    var = GameType::ChanceMode::kSampledStochastic;
+  } else {
+    SpielFatalError(absl::StrCat("Unknown chance mode ", str, "."));
+  }
+  return stream;
+}
+
 std::ostream& operator<<(std::ostream& stream, GameType::Information value) {
   switch (value) {
     case GameType::Information::kOneShot:
@@ -535,6 +563,21 @@ std::ostream& operator<<(std::ostream& stream, GameType::Information value) {
       SpielFatalError("Unknown value.");
       return stream << "This will never return.";
   }
+}
+
+std::istream& operator>>(std::istream& stream, GameType::Information& var) {
+  std::string str;
+  stream >> str;
+  if (str == "OneShot") {
+    var = GameType::Information::kOneShot;
+  } else if (str == "PerfectInformation") {
+    var = GameType::Information::kPerfectInformation;
+  } else if (str == "ImperfectInformation") {
+    var = GameType::Information::kImperfectInformation;
+  } else {
+    SpielFatalError(absl::StrCat("Unknown information ", str, "."));
+  }
+  return stream;
 }
 
 std::ostream& operator<<(std::ostream& stream, GameType::Utility value) {
@@ -553,6 +596,23 @@ std::ostream& operator<<(std::ostream& stream, GameType::Utility value) {
   }
 }
 
+std::istream& operator>>(std::istream& stream, GameType::Utility& var) {
+  std::string str;
+  stream >> str;
+  if (str == "ZeroSum") {
+    var = GameType::Utility::kZeroSum;
+  } else if (str == "ConstantSum") {
+    var = GameType::Utility::kConstantSum;
+  } else if (str == "GeneralSum") {
+    var = GameType::Utility::kGeneralSum;
+  } else if (str == "Identical") {
+    var = GameType::Utility::kIdentical;
+  } else {
+    SpielFatalError(absl::StrCat("Unknown utility ", str, "."));
+  }
+  return stream;
+}
+
 std::ostream& operator<<(std::ostream& stream, GameType::RewardModel value) {
   switch (value) {
     case GameType::RewardModel::kRewards:
@@ -565,6 +625,19 @@ std::ostream& operator<<(std::ostream& stream, GameType::RewardModel value) {
   }
 }
 
+std::istream& operator>>(std::istream& stream, GameType::RewardModel& var) {
+  std::string str;
+  stream >> str;
+  if (str == "Rewards") {
+    var = GameType::RewardModel::kRewards;
+  } else if (str == "Terminal") {
+    var = GameType::RewardModel::kTerminal;
+  } else {
+    SpielFatalError(absl::StrCat("Unknown reward model ", str, "."));
+  }
+  return stream;
+}
+
 std::string Game::ToString() const {
   GameParameters params = game_parameters_;
   params["name"] = GameParameter(game_type_.short_name);
@@ -572,27 +645,99 @@ std::string Game::ToString() const {
 }
 
 std::string GameTypeToString(const GameType& game_type) {
-  SpielFatalError("Unimplemented!");
-  std::string str = absl::StrCat("short_name: ", game_type.short_name, "\n");
+  std::string str = "";
+
+  absl::StrAppend(&str, "short_name: ", game_type.short_name, "\n");
   absl::StrAppend(&str, "long_name: ", game_type.long_name, "\n");
 
-  switch (game_type.dynamics) {
-    case GameType::Dynamics::kSequential:
-      absl::StrAppend(&str, "dynamics: kSequential\n");
-      break;
-    case GameType::Dynamics::kSimultaneous:
-      absl::StrAppend(&str, "dynamics: kSimultaneous\n");
-      break;
-    default:
-      SpielFatalError("Unrecognized dynamics");
-  }
+  absl::StrAppend(&str, "dynamics: ",
+                  open_spiel::internal::SpielStrCat(game_type.dynamics), "\n");
+
+  absl::StrAppend(&str, "chance_mode: ",
+                  open_spiel::internal::SpielStrCat(game_type.chance_mode),
+                  "\n");
+
+  absl::StrAppend(&str, "information: ",
+                  open_spiel::internal::SpielStrCat(game_type.information),
+                  "\n");
+
+  absl::StrAppend(&str, "utility: ",
+                  open_spiel::internal::SpielStrCat(game_type.utility), "\n");
+
+  absl::StrAppend(&str, "reward_model: ",
+                  open_spiel::internal::SpielStrCat(game_type.reward_model),
+                  "\n");
+
+  absl::StrAppend(&str, "max_num_players: ", game_type.max_num_players, "\n");
+  absl::StrAppend(&str, "min_num_players: ", game_type.min_num_players, "\n");
+
+  absl::StrAppend(
+      &str, "provides_information_state_string: ",
+      game_type.provides_information_state_string ? "true" : "false", "\n");
+  absl::StrAppend(
+      &str, "provides_information_state_tensor: ",
+      game_type.provides_information_state_tensor ? "true" : "false", "\n");
+
+  absl::StrAppend(&str, "provides_observation_string: ",
+                  game_type.provides_observation_string ? "true" : "false",
+                  "\n");
+  absl::StrAppend(&str, "provides_observation_tensor: ",
+                  game_type.provides_observation_tensor ? "true" : "false",
+                  "\n");
+
+  // Check that there are no newlines in the serialized params.
+  std::string serialized_params =
+      SerializeGameParameters(game_type.parameter_specification);
+  SPIEL_CHECK_TRUE(serialized_params.find("\n") == std::string::npos);
+  absl::StrAppend(&str, "parameter_specification: ", serialized_params);
 
   return str;
 }
 
 GameType GameTypeFromString(const std::string& game_type_str) {
-  SpielFatalError("Unimplemented!");
-  return {};
+  std::map<std::string, std::string> game_type_values;
+  std::vector<std::string> parts = absl::StrSplit(game_type_str, '\n');
+
+  SPIEL_CHECK_EQ(parts.size(), 14);
+
+  for (const auto& part : parts) {
+    std::pair<std::string, std::string> pair =
+        absl::StrSplit(part, absl::MaxSplits(": ", 1));
+    game_type_values.insert(pair);
+  }
+
+  GameType game_type = GameType();
+  game_type.short_name = game_type_values.at("short_name");
+  game_type.long_name = game_type_values.at("long_name");
+
+  std::istringstream(game_type_values.at("dynamics")) >> game_type.dynamics;
+  std::istringstream(game_type_values.at("chance_mode")) >>
+      game_type.chance_mode;
+  std::istringstream(game_type_values.at("information")) >>
+      game_type.information;
+  std::istringstream(game_type_values.at("utility")) >> game_type.utility;
+  std::istringstream(game_type_values.at("reward_model")) >>
+      game_type.reward_model;
+
+  SPIEL_CHECK_TRUE(absl::SimpleAtoi(game_type_values.at("max_num_players"),
+                                    &(game_type.max_num_players)));
+  SPIEL_CHECK_TRUE(absl::SimpleAtoi(game_type_values.at("min_num_players"),
+                                    &(game_type.min_num_players)));
+
+  game_type.provides_information_state_string =
+      game_type_values.at("provides_information_state_string") == "true";
+  game_type.provides_information_state_tensor =
+      game_type_values.at("provides_information_state_tensor") == "true";
+
+  game_type.provides_observation_string =
+      game_type_values.at("provides_observation_string") == "true";
+  game_type.provides_observation_tensor =
+      game_type_values.at("provides_observation_tensor") == "true";
+
+  game_type.parameter_specification =
+      DeserializeGameParameters(game_type_values.at("parameter_specification"));
+
+  return game_type;
 }
 
 }  // namespace open_spiel
