@@ -58,7 +58,7 @@ namespace open_spiel::solitaire {
             case kSuitDiamonds : {
                 return {kSuitSpades, kSuitClubs};
             }
-            case kSuitNone :{
+            case kSuitNone : {
                 return {kSuitSpades, kSuitHearts, kSuitClubs, kSuitDiamonds};
             }
             default : {
@@ -589,7 +589,6 @@ namespace open_spiel::solitaire {
                 }
                 if (split_flag) {
                     split_cards.push_back(*it);
-                    // TODO: Need someway to modify private attribute
                     it = cards.erase(it);
                 } else {
                     ++it;
@@ -713,15 +712,84 @@ namespace open_spiel::solitaire {
     }
 
     Move::Move(RankType target_rank, SuitType target_suit, RankType source_rank, SuitType source_suit) {
-        // Used to create moves inside std::maps like `kMoveToAction` and `kActionToMove`
         target = Card(false, target_suit, target_rank, kMissing);
         source = Card(false, source_suit, source_rank, kMissing);
     }
 
     Move::Move(Action action) {
-        auto value = kActionToMove.at(action);
-        target = value.target;
-        source = value.source;
+        int base;
+        int residual;
+
+        int target_rank;
+        int source_rank;
+        int target_suit;
+        int source_suit;
+
+        std::vector<SuitType> opposite_suits;
+        action -= kActionOffset;
+
+        // The numbers used in the cases below are just used to divide action ids into groups (e.g. 1-132 are regular
+        // moves, 133-136 are the action ids of moves that move an ace to an empty foundation, etc.)
+
+        switch (action) {
+            case   1 ... 132 : {
+                // Handles ordinary moves
+                target_rank = ((action - 1) / 3) % 11 + 2;
+                target_suit = ((action - 1) / 33) + 1;
+                residual    = ((action - 1) % 3);
+                if (residual == 0) {
+                    source_rank = target_rank + 1;
+                    source_suit = target_suit;
+                } else {
+                    opposite_suits = GetOppositeSuits(static_cast<SuitType>(target_suit));
+                    source_rank = target_rank - 1;
+                    source_suit = opposite_suits[residual - 1];
+                }
+                break;
+            }
+            case 133 ... 136 : {
+                // Handles ace to empty foundation moves
+                target_rank = 0;
+                target_suit = action - 132;
+                source_rank = 1;
+                source_suit = target_suit;
+                break;
+            }
+            case 137 ... 140 : {
+                // Handles king to empty tableau moves
+                target_rank = 0;
+                target_suit = 0;
+                source_rank = 13;
+                source_suit = action - 136;
+                break;
+            }
+            case 141 ... 144 : {
+                // Handles moves with ace targets
+                target_rank = 1;
+                target_suit = action - 140;
+                source_rank = 2;
+                source_suit = target_suit;
+                break;
+            }
+            case 145 ... 152 : {
+                // Handles moves with king targets
+                target_rank = 13;
+                target_suit = (action - 143) / 2;
+
+                residual = (action - 143) % 2;
+                opposite_suits = GetOppositeSuits(static_cast<SuitType>(target_suit));
+
+                source_rank = 12;
+                source_suit = opposite_suits[residual];
+                break;
+            }
+            default : {
+                SpielFatalError("action provided does not correspond with a move");
+            }
+        }
+
+        target = Card(false, static_cast<SuitType>(target_suit), static_cast<RankType>(target_rank));
+        source = Card(false, static_cast<SuitType>(source_suit), static_cast<RankType>(source_rank));
     }
 
     // Getters ---------------------------------------------------------------------------------------------------------
@@ -737,7 +805,58 @@ namespace open_spiel::solitaire {
     // Other Methods ---------------------------------------------------------------------------------------------------
 
     Action Move::ActionId() const {
-        return kMoveToAction.at(*this);
+        RankType target_rank = target.GetRank();
+        RankType source_rank = source.GetRank();
+        SuitType target_suit = target.GetSuit();
+        SuitType source_suit = source.GetSuit();
+
+        int base;
+        int residual;
+
+        switch (target_rank) {
+            case kRankNone : {
+                switch (source_rank) {
+                    case kRankA : {
+                        base = 132;
+                        break;
+                    }
+                    case kRankK : {
+                        base = 136;
+                        break;
+                    }
+                    default : {
+                        base = -999;
+                        break;
+                        // SpielFatalError("source.rank has an incorrect value");
+                    }
+                }
+                return base + source_suit + kActionOffset;
+            }
+            case kRankA : {
+                base = 140;
+                return base + source_suit + kActionOffset;
+            }
+            case kRankK : {
+                base = 144;
+                if (source_suit <= 2) {
+                    residual = -1;
+                } else {
+                    residual = 0;
+                }
+                return base + (2 * target_suit) + residual + kActionOffset;
+            }
+            default : {
+                base = (target_suit - 1) * 33 + (target_rank - 2) * 3;
+                if (target_suit == source_suit) {
+                    residual = 1;
+                } else if (source_suit <= 2) {
+                    residual = 2;
+                } else {
+                    residual = 3;
+                }
+                return base + residual + kActionOffset;
+            }
+        }
     }
 
     std::string Move::ToString(bool colored) const {
@@ -865,13 +984,13 @@ namespace open_spiel::solitaire {
             case kEnd : {
                 return "kEnd";
             }
-            case kRevealAs ... kRevealKd : {
+            case kRevealStart ... kRevealEnd : {
                 auto revealed_card = Card((int) action_id);
                 std::string result;
                 absl::StrAppend(&result, "kReveal", revealed_card.ToString(is_colored));
                 return result;
             }
-            case kMove__Ks ... kMoveKdQc : {
+            case kMoveStart ... kMoveEnd : {
                 auto move = Move(action_id);
                 return move.ToString(is_colored);
             }
@@ -950,7 +1069,12 @@ namespace open_spiel::solitaire {
     void                    SolitaireState::DoApplyAction(Action action) {
 
         switch (action) {
-            case kRevealAs ... kRevealKd : {
+            case kEnd : {
+                is_finished = true;
+                current_rewards = 0;
+                break;
+            }
+            case kRevealStart ... kRevealEnd : {
                 auto revealed_card = Card((int) action);
                 bool found_card = false;
 
@@ -969,7 +1093,7 @@ namespace open_spiel::solitaire {
                 revealed_cards.push_back(action);
                 break;
             }
-            case kMove__Ks ... kMoveKdQc : {
+            case kMoveStart ... kMoveEnd : {
                 Move selected_move = Move(action);
                 is_reversible = IsReversible(selected_move.GetSource(), GetPile(selected_move.GetSource()));
 
