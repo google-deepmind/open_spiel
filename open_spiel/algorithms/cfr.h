@@ -127,15 +127,15 @@ class CFRSolverBase {
   // Computes the average policy, containing the policy for all players.
   // The returned policy instance should only be used during the lifetime of
   // the CFRSolver object.
-  std::unique_ptr<Policy> AveragePolicy() const {
-    return std::unique_ptr<Policy>(new CFRAveragePolicy(info_states_, nullptr));
+  std::shared_ptr<Policy> AveragePolicy() const {
+    return std::shared_ptr<Policy>(new CFRAveragePolicy(info_states_, nullptr));
   }
 
   // Computes the current policy, containing the policy for all players.
   // The returned policy instance should only be used during the lifetime of
   // the CFRSolver object.
-  std::unique_ptr<Policy> CurrentPolicy() const {
-    return std::unique_ptr<Policy>(new CFRCurrentPolicy(info_states_, nullptr));
+  std::shared_ptr<Policy> CurrentPolicy() const {
+    return std::shared_ptr<Policy>(new CFRCurrentPolicy(info_states_, nullptr));
   }
 
  protected:

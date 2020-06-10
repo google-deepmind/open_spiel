@@ -18,25 +18,39 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from absl.testing import absltest
+from absl.testing import absltest, parameterized
 
 import numpy as np
 
 from open_spiel.python.algorithms import evaluate_bots
 from open_spiel.python.bots import uniform_random
+from open_spiel.python import policy
+from open_spiel.python.bots.policy import PolicyBot
 import pyspiel
 
 
-class EvaluateBotsTest(absltest.TestCase):
+GAME = pyspiel.load_game("kuhn_poker")
 
-  def test_cpp_vs_python(self):
-    game = pyspiel.load_game("kuhn_poker")
-    bots = [
-        pyspiel.make_uniform_random_bot(0, 1234),
-        uniform_random.UniformRandomBot(1, np.random.RandomState(4321))
-    ]
+def policy_bots():
+  random_policy = policy.UniformRandomPolicy(GAME)
+
+  py_bot = PolicyBot(0,  np.random.RandomState(4321), random_policy)
+  cpp_bot = pyspiel.make_policy_bot(GAME, 1, 1234, 
+    policy.python_policy_to_pyspiel_policy(random_policy.to_tabular()))
+
+  return [py_bot, cpp_bot]
+  
+
+class EvaluateBotsTest(parameterized.TestCase):
+  
+  @parameterized.parameters([
+    ([pyspiel.make_uniform_random_bot(0, 1234),
+      uniform_random.UniformRandomBot(1, np.random.RandomState(4321))], ), 
+    (policy_bots(), )
+  ])
+  def test_cpp_vs_python(self, bots):
     results = np.array([
-        evaluate_bots.evaluate_bots(game.new_initial_state(), bots, np.random)
+        evaluate_bots.evaluate_bots(GAME.new_initial_state(), bots, np.random)
         for _ in range(10000)
     ])
     average_results = np.mean(results, axis=0)
