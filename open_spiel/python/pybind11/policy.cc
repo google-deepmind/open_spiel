@@ -21,8 +21,10 @@
 #include "open_spiel/algorithms/cfr_br.h"
 #include "open_spiel/algorithms/deterministic_policy.h"
 #include "open_spiel/algorithms/expected_returns.h"
+#include "open_spiel/algorithms/external_sampling_mccfr.h"
 #include "open_spiel/algorithms/is_mcts.h"
 #include "open_spiel/algorithms/mcts.h"
+#include "open_spiel/algorithms/outcome_sampling_mccfr.h"
 #include "open_spiel/algorithms/tabular_exploitability.h"
 #include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"
@@ -113,6 +115,33 @@ void init_pyspiel_policy(py::module& m) {
       .def("current_policy", &open_spiel::algorithms::CFRSolver::CurrentPolicy)
       .def("average_policy",
            &open_spiel::algorithms::CFRPlusSolver::AveragePolicy);
+
+  py::enum_<open_spiel::algorithms::AverageType>(m, "MCCFRAverageType")
+      .value("SIMPLE", open_spiel::algorithms::AverageType::kSimple)
+      .value("FULL", open_spiel::algorithms::AverageType::kFull);
+
+  py::class_<open_spiel::algorithms::ExternalSamplingMCCFRSolver>(
+      m, "ExternalSamplingMCCFRSolver")
+      .def(py::init<const Game&, int, open_spiel::algorithms::AverageType>(),
+           py::arg("game"), py::arg("seed") = 0,
+           py::arg("avg_type") = open_spiel::algorithms::AverageType::kSimple)
+      .def("run_iteration",
+           py::overload_cast<>(&open_spiel::algorithms::
+                                   ExternalSamplingMCCFRSolver::RunIteration))
+      .def("average_policy",
+           &open_spiel::algorithms::ExternalSamplingMCCFRSolver::AveragePolicy);
+
+  py::class_<open_spiel::algorithms::OutcomeSamplingMCCFRSolver>(
+      m, "OutcomeSamplingMCCFRSolver")
+      .def(py::init<const Game&, double, int>(), py::arg("game"),
+           py::arg("epsilon") = open_spiel::algorithms::
+               OutcomeSamplingMCCFRSolver::kDefaultEpsilon,
+           py::arg("seed") = -1)
+      .def("run_iteration",
+           py::overload_cast<>(&open_spiel::algorithms::
+                                   OutcomeSamplingMCCFRSolver::RunIteration))
+      .def("average_policy",
+           &open_spiel::algorithms::OutcomeSamplingMCCFRSolver::AveragePolicy);
 
   m.def("expected_returns",
         py::overload_cast<const State&, const std::vector<const Policy*>&, int,
