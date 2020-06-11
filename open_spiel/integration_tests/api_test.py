@@ -15,7 +15,10 @@
 # Lint as: python3
 """Tests for open_spiel.integration_tests.api."""
 
+import collections
+import logging
 import random
+import time
 import unittest
 
 from absl.testing import absltest
@@ -88,6 +91,10 @@ PERFECT_RECALL_NUM_STATES = {
     "tiny_hanabi": 8,
     "nf_auction": 2,
 }
+
+# Some tests run for a fixed time budget.
+# This specified approximately how many seconds they should run.
+TIMEABLE_TEST_RUNTIME = 10
 
 
 class EnforceAPIOnFullTreeBase(parameterized.TestCase):
@@ -267,6 +274,7 @@ def _get_some_states(game, num_plays=10, include_terminals=True):
 class PartialEnforceAPIConventionsTest(parameterized.TestCase):
   """This only partially test some properties."""
 
+  # pylint: disable=g-unreachable-test-method
   def _assert_observations_raises_error_on_invalid_player(self, game, state):
     game_type = game.get_type()
     game_name = game_type.short_name
@@ -311,41 +319,151 @@ class PartialEnforceAPIConventionsTest(parameterized.TestCase):
         state.observation_string(num_players + 1)
 
   @parameterized.parameters(_GAMES_TO_TEST)
-  def test_observations_raises_error_on_invalid_player(self, game_name):
-    print(f"Testing observations for {game_name}")
+  def test_observations_are_consistent_with_info_states(self, game_name):
+    print(f"Testing observation <-> info_state consistency for '{game_name}'")
     game = pyspiel.load_game(game_name)
-    state = game.new_initial_state()
+    game_type = game.get_type()
 
-    # Some games cannot be finished by always taking the first legal actions.
-    give_up_after = float("inf")
-    if game.get_type().short_name in ["backgammon", "laser_tag"]:
-      give_up_after = 100
+    if not game_type.provides_information_state_string \
+      or not game_type.provides_observation_string:
+      print(f"Skipping test for '{game_name}', as it doesn't provide both "
+            "information_state_string and observation_string")
+      return
 
-    while not state.is_terminal():
-      if len(state.history()) > give_up_after:
-        break
+    if game_type.dynamics == pyspiel.GameType.Dynamics.SIMULTANEOUS:
+      logging.warning(
+          "'%s' is not turn-based. Trying to reload game as turn-based.",
+          game_name)
+      game = pyspiel.load_game_as_turn_based(game_name)
 
-      if not state.is_chance_node():
-        self._assert_observations_raises_error_on_invalid_player(game, state)
+    # Idea of the test: make rollouts in the game, and collect both
+    # Action-Observation histories (AOH) and InformationState for different
+    # ground states. Check that there is a unique bijection between them.
+    #
+    # Of course, this test does not exclude the possibility the game might
+    # have a bug! But it is a fast way to discover a possible inconsistency
+    # in a new implementation.
+    aoh_is = dict()  # aoh -> info_state
+    is_aoh = dict()  # info_state -> aoh
+    aoh_histories = collections.defaultdict(set)  # aoh -> states
+    is_histories = collections.defaultdict(set)  # info_states -> states
 
-      if state.is_chance_node():
-        for action, prob in state.chance_outcomes():
-          if prob != 0:
-            state.apply_action(action)
-            break
-      elif state.is_simultaneous_node():
-        # Simultaneous node: sample actions for all players.
-        chosen_actions = [
-            state.legal_actions(pid)[0] for pid in range(game.num_players())
-        ]
-        state.apply_actions(chosen_actions)
+    # Some games have very long play-throughs.
+    give_up_after = 100  # actions
+
+    # Show a helpful error message for debugging the observations in a game.
+    def show_error(histories, player, dump_collections=True):
+      aohs = list()
+      info_states = list()
+      descriptions = list()
+      # Emulate the histories to collect relevant lists.
+      for history in histories:
+        state = game.new_initial_state()
+        aoh = [("obs", state.observation_string(player))]
+        for action in history:
+          state.apply_action(action)
+          if state.current_player() == player:
+            aoh.append(("action", action))
+          aoh.append(("obs", state.observation_string(player)))
+        aohs.append(aoh)
+        info_states.append(state.information_state_string(player))
+        descriptions.append(str(state))
+
+      histories_str = "\n".join([str(history) for history in histories])
+      descriptions_str = "\n".join(descriptions)
+      aohs_str = "\n".join([str(aoh) for aoh in aohs])
+      info_states_str = "\n".join([str(s) for s in info_states])
+
+      if dump_collections:
+        def format_dump(xs):
+          return "\n".join([f"{str(key)}  ->  {str(value)}"
+                            for key, value in xs.items()])
+        # pylint: disable=g-backslash-continuation
+        extras = "Dumping colections:\n" \
+                 f"aoh -> info_state:\n{format_dump(aoh_is)}\n\n" \
+                 f"info_state -> aoh:\n{format_dump(is_aoh)}\n\n" \
+                 f"aoh -> histories:\n{format_dump(aoh_histories)}\n\n" \
+                 f"info_state -> histories:\n{format_dump(is_histories)}\n\n"
       else:
-        # Decision node: sample action for the single current player
-        action = random.choice(state.legal_actions(state.current_player()))
-        state.action_to_string(state.current_player(), action)
-        state.apply_action(action)
+        # pylint: disable=g-backslash-continuation
+        extras = "Rerun this test with dump_collections=True " \
+                 "for extra information."
 
-    self._assert_observations_raises_error_on_invalid_player(game, state)
+      # pylint: disable=g-backslash-continuation
+      msg = \
+        f"\n\n" \
+        f"The action-observation histories (AOH) are not consistent with " \
+        f"information states for player {player}.\n\n" \
+        f"The conflicting set of states (histories) is:\n{histories_str}\n\n" \
+        f"Their domain-specific descriptions are:\n{descriptions_str}\n\n" \
+        f"The corresponding AOH are:\n{aohs_str}\n\n" \
+        f"The corresponding info states are:\n{info_states_str}\n\n" \
+        f"{extras}\n" \
+        f"What to do to fix this? Consult the documentation to " \
+        f"State::InformationStateString and State::ObservationString."
+      return msg
+
+    def collect_and_test_rollouts(player):
+      random.seed(0)
+      nonlocal aoh_is, is_aoh, aoh_histories, is_histories
+      state = game.new_initial_state()
+      aoh = [("obs", state.observation_string(player))]
+
+      # TODO(author13): we want to check terminals for consistency too, but info
+      # state string is not defined there and neither are observations by
+      # design.
+      while not state.is_terminal():
+        if len(state.history()) > give_up_after:
+          break
+
+        # Do not collect over chance nodes.
+        if not state.is_chance_node():
+          info_state = state.information_state_string()
+          aoh_histories[str(aoh)].add(tuple(state.history()))
+          is_histories[info_state].add(tuple(state.history()))
+
+          states = {tuple(state.history())}
+          states = states.union(aoh_histories[str(aoh)])
+          states = states.union(is_histories[info_state])
+          if str(aoh) in aoh_is:
+            states = states.union(is_histories[aoh_is[str(aoh)]])
+            self.assertEqual(aoh_is[str(aoh)], info_state,
+                             show_error(states, player))
+          else:
+            aoh_is[str(aoh)] = info_state
+          if info_state in is_aoh:
+            states = states.union(aoh_histories[str(is_aoh[info_state])])
+            self.assertEqual(is_aoh[info_state], str(aoh),
+                             show_error(states, player))
+          else:
+            is_aoh[info_state] = str(aoh)
+
+        # Make random actions.
+        action = random.choice(state.legal_actions(state.current_player()))
+        if state.current_player() == player:
+          aoh.append(("action", action))
+        state.apply_action(action)
+        aoh.append(("obs", state.observation_string(player)))
+
+    # Run (very roughly!) for this many seconds. This very much depends on the
+    # machine the test runs on, as some games take a long time to produce
+    # a single rollout.
+    time_limit = TIMEABLE_TEST_RUNTIME / game.num_players()
+    start = time.time()
+    is_time_out = lambda: time.time() - start > time_limit
+
+    rollouts = 0
+    for player in range(game.num_players()):
+      aoh_is.clear()
+      is_aoh.clear()
+      aoh_histories.clear()
+      is_histories.clear()
+      while not is_time_out():
+        collect_and_test_rollouts(player)
+        rollouts += 1
+
+    print(f"Test for {game_name} took {time.time()-start} seconds "
+          f"to make {rollouts} rollouts.")
 
   @parameterized.parameters(_GAMES_TO_TEST)
   def test_legal_actions_returns_empty_list_on_opponent(self, game_name):
