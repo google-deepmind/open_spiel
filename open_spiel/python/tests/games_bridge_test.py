@@ -78,6 +78,55 @@ class GamesBridgeTest(absltest.TestCase):
     self.assertEqual(score['1DX N'], -300)
     self.assertEqual(score['1CXX W'], -430)
 
+  def test_public_observation(self):
+    game = pyspiel.load_game('bridge')
+    state = game.new_initial_state()
+    for a in range(52):
+      state.apply_action(a)
+    state.apply_action(52)  # Pass
+    state.apply_action(59)  # 1NT
+    obs = state.public_observation_tensor()
+    self.assertLen(obs, game.public_observation_tensor_size())
+
+  def test_private_observation(self):
+    game = pyspiel.load_game('bridge')
+    state = game.new_initial_state()
+    #         S T3
+    #         H QT42
+    #         D A82
+    #         C A632
+    # S KJ5           S Q7
+    # H A965          H KJ8
+    # D Q43           D KJT5
+    # C T87           C Q954
+    #         S A98642
+    #         H 73
+    #         D 976
+    #         C KJ
+    for a in [
+        49, 45, 31, 5, 10, 40, 27, 47, 35, 38, 17, 14, 0, 33, 21, 39, 34, 12,
+        22, 41, 1, 13, 36, 9, 4, 46, 11, 32, 2, 37, 29, 30, 7, 8, 19, 24, 16,
+        43, 51, 15, 48, 23, 6, 20, 42, 26, 44, 50, 25, 28, 3, 18
+    ]:
+      state.apply_action(a)
+    obs = state.private_observation_tensor(0)
+    self.assertLen(obs, game.private_observation_tensor_size())
+    self.assertEqual(obs, [
+        1.0, 1.0, 1.0, 0.0,  # C2, D2, H2
+        1.0, 0.0, 0.0, 1.0,  # C3, S3
+        0.0, 0.0, 1.0, 0.0,  # H4
+        0.0, 0.0, 0.0, 0.0,  # No 5s
+        1.0, 0.0, 0.0, 0.0,  # C6
+        0.0, 0.0, 0.0, 0.0,  # No 7s
+        0.0, 1.0, 0.0, 0.0,  # D8
+        0.0, 0.0, 0.0, 0.0,  # No 9s
+        0.0, 0.0, 1.0, 1.0,  # H10, S10
+        0.0, 0.0, 0.0, 0.0,  # No Jacks
+        0.0, 0.0, 1.0, 0.0,  # HQ
+        0.0, 0.0, 0.0, 0.0,  # No kings
+        1.0, 1.0, 0.0, 0.0   # CA, DA
+    ])
+
 
 if __name__ == '__main__':
   absltest.main()

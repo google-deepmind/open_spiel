@@ -378,6 +378,48 @@ void BridgeState::ObservationTensor(Player player,
   }
 }
 
+std::vector<double> BridgeState::PublicObservationTensor() const {
+  SPIEL_CHECK_TRUE(phase_ == Phase::kAuction);
+  std::vector<double> rv(kPublicInfoTensorSize);
+  auto ptr = rv.begin();
+  ptr[is_vulnerable_[0]] = 1;
+  ptr += kNumVulnerabilities;
+  ptr[is_vulnerable_[1]] = 1;
+  ptr += kNumVulnerabilities;
+  auto bidding = ptr + 2 * kNumPlayers;  // initial and recent passes
+  int last_bid = 0;
+  for (int i = kNumCards; i < history_.size(); ++i) {
+    const int player = i % kNumPlayers;
+    const int this_call = history_[i].action - kBiddingActionBase;
+    if (this_call == kPass) {
+      if (last_bid == 0) ptr[player] = 1;  // Leading passes
+      ptr[kNumPlayers + player] = 1;       // Trailing passes
+    } else {
+      // Call is a non-Pass, so clear the trailing pass markers.
+      for (int i = 0; i < kNumPlayers; ++i) ptr[kNumPlayers + i] = 0;
+      if (this_call == kDouble) {
+        auto base = bidding + (last_bid - kFirstBid) * kNumPlayers * 3;
+        base[kNumPlayers + player] = 1;
+      } else if (this_call == kRedouble) {
+        auto base = bidding + (last_bid - kFirstBid) * kNumPlayers * 3;
+        base[kNumPlayers * 2 + player] = 1;
+      } else {
+        last_bid = this_call;
+        auto base = bidding + (last_bid - kFirstBid) * kNumPlayers * 3;
+        base[player] = 1;
+      }
+    }
+  }
+  return rv;
+}
+
+std::vector<double> BridgeState::PrivateObservationTensor(Player player) const {
+  std::vector<double> rv(kNumCards);
+  for (int i = 0; i < kNumCards; ++i)
+    if (holder_[i] == player) rv[i] = 1;
+  return rv;
+}
+
 void BridgeState::SetDoubleDummyResults(ddTableResults double_dummy_results) {
   double_dummy_results_ = double_dummy_results;
   ComputeScoreByContract();
