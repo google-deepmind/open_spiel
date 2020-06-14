@@ -29,7 +29,7 @@ inline constexpr const char* kReset = "\033[0m";
 inline constexpr const char* kRed   = "\033[31m";
 inline constexpr const char* kBlack = "\033[37m";
 
-// Glyphs & Strings
+// Unicode Glyphs
 inline constexpr const char* kGlyphHidden   = "\U0001F0A0";
 inline constexpr const char* kGlyphEmpty    = "\U0001F0BF";
 inline constexpr const char* kGlyphSpades   = "\U00002660";
@@ -93,7 +93,6 @@ namespace open_spiel::solitaire {
         kPile5thTableau = 9,
         kPile6thTableau = 10,
         kPile7thTableau = 11,
-        kNoPile         = 12
     };
 
     // Constants =======================================================================================================
@@ -108,6 +107,7 @@ namespace open_spiel::solitaire {
     inline constexpr int kRevealEnd   = 52;
 
     // kMove actions are ones that are taken at decision nodes; they involve moving a card to another cards location.
+    // It starts at 53 because there are 52 reveal actions before it. See `NumDistinctActions()` in solitaire.cc.
     inline constexpr int kMoveStart = 53;
     inline constexpr int kMoveEnd   = 204;
 
@@ -128,13 +128,14 @@ namespace open_spiel::solitaire {
     // 1 hidden card + 52 ordinary cards
     inline constexpr int kWasteTensorLength = 53;
 
-    // Constant for how many hidden cards can show up in a tableau
+    // Constant for how many hidden cards can show up in a tableau. As hidden cards can't be added, the max is the
+    // highest number in a tableau at the start of the game: 6
     inline constexpr int kMaxHiddenCard = 6;
 
     // Only used in one place and just for consistency (to match kChancePlayerId & kTerminalPlayerId)
     inline constexpr int kPlayerId = 0;
 
-    // Indicates the last index before the first player action
+    // Indicates the last index before the first player action (the last kReveal action has an ID of 52)
     inline constexpr int kActionOffset = 52;
 
     // Order of suits
@@ -145,7 +146,7 @@ namespace open_spiel::solitaire {
     const std::vector<std::string> kRankStrs = {"", "A", "2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K", ""};
 
     const std::map<RankType, double> kFoundationPoints = {
-            //region Maps a RankType to a double that represents the reward for moving a card of that rank to the foundation
+            //region Maps a RankType to the reward for moving a card of that rank to the foundation
             {kRankA, 100.0},
             {kRank2, 90.0},
             {kRank3, 80.0},
@@ -262,7 +263,7 @@ namespace open_spiel::solitaire {
     class Tableau : public Pile {
     public:
         // Constructor =================================================================================================
-        Tableau(PileID id);
+        explicit Tableau(PileID id);
 
         // Other Methods ===============================================================================================
         std::vector<Card> Sources() const override;
@@ -350,7 +351,6 @@ namespace open_spiel::solitaire {
         std::vector<Card>       Sources(const std::optional<LocationType> & location = kMissing) const;
         std::vector<Move>       CandidateMoves() const;
         Pile *                  GetPile(const Card & card) const;
-        Pile *                  GetPile(const PileID & pile_id) const;
         void                    MoveCards(const Move & move);
         bool                    IsReversible(const Card & source, Pile * source_pile) const;
 

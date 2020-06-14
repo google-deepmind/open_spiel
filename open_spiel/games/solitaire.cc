@@ -1,10 +1,4 @@
 #include "solitaire.h"
-#include <optional>
-#include <utility>
-
-#include "open_spiel/abseil-cpp/absl/strings/str_join.h"
-#include "open_spiel/game_parameters.h"
-#include "open_spiel/spiel_utils.h"
 
 namespace open_spiel::solitaire {
 
@@ -33,17 +27,17 @@ namespace open_spiel::solitaire {
             return std::shared_ptr<const Game>(new SolitaireGame(params));
         }
 
-        REGISTER_SPIEL_GAME(kGameType, Factory);
+        REGISTER_SPIEL_GAME(kGameType, Factory)
     }
 
-    // region Miscellaneous ===================================================================================================
+    // region Miscellaneous ============================================================================================
 
     std::vector<SuitType> GetOppositeSuits(const SuitType & suit) {
-        /* Just returns a vector of the suits of opposite color. For red suits (kSuitHearts and kSuitDiamonds), this returns the
-           black suits (kSuitSpades and kSuitClubs). For a black suit, this returns the red suits. The last `SuitType` would be
-          `kSuitNone` which should only occur with empty tableau cards or hidden cards. Empty tableau cards should
-           accept any suit, but hidden cards are the opposite; they shouldn't accept any. There isn't really a use
-           case for calling this function with the suit of a hidden card though. */
+        /* Just returns a vector of the suits of opposite color. For red suits (kSuitHearts and kSuitDiamonds), this
+         * returns the black suits (kSuitSpades and kSuitClubs). For a black suit, this returns the red suits. The last
+         * `SuitType` would be `kSuitNone` which should only occur with empty tableau cards or hidden cards. Empty
+         * tableau cards should accept any suit, but hidden cards are the opposite; they shouldn't accept any.
+         * There isn't really a use case for calling this function with the suit of a hidden card though. */
 
         switch (suit) {
             case kSuitSpades : {
@@ -99,7 +93,7 @@ namespace open_spiel::solitaire {
                 }
             }
         } else {
-            // Handles ordinary cards
+            // Handles ordinary cards (e.g. 0-13 -> spades, 14-26 -> hearts, etc.)
             return (suit - 1) * 13 + rank;
         }
     }
@@ -107,12 +101,15 @@ namespace open_spiel::solitaire {
     int GetMaxSize(LocationType location) {
         switch (location) {
             case kDeck ... kWaste : {
+                // Cards can only be removed from the waste & there are 24 cards in it at the start of the game
                 return 24;
             }
             case kFoundation : {
+                // There are 13 cards in a suit
                 return 13;
             }
             case kTableau : {
+                // There are a maximum of 6 hidden cards and 13 non-hidden cards in a tableau (1 for each rank)
                 return 19;
             }
             default : {
@@ -125,14 +122,10 @@ namespace open_spiel::solitaire {
 
     // endregion
 
-    // region Card Methods ====================================================================================================
+    // region Card Methods =============================================================================================
 
     Card::Card(bool hidden, SuitType suit, RankType rank, LocationType location) :
         hidden(hidden), suit(suit), rank(rank), location(location) {
-        hidden   = hidden;
-        suit     = suit;
-        rank     = rank;
-        location = location;
     }
 
     Card::Card(int index, bool hidden, LocationType location) :
@@ -170,6 +163,7 @@ namespace open_spiel::solitaire {
                     break;
                 }
                 default : {
+                    // Converts an index back into a rank and suit for ordinary cards
                     rank = static_cast<RankType>(1 + ((index - 1) % 13));
                     suit = static_cast<SuitType>(1 + floor((index - 1) / 13));
                 }
@@ -259,6 +253,9 @@ namespace open_spiel::solitaire {
         } else {
             RankType child_rank;
             std::vector<SuitType> child_suits;
+
+            // A card can have a maximum of 4 children
+            // (specifically, an empty tableau card can accept a king of any suit)
             child_suits.reserve(4);
 
             switch (location) {
@@ -353,7 +350,7 @@ namespace open_spiel::solitaire {
 
     // endregion
 
-    // region Pile Methods ====================================================================================================
+    // region Pile Methods =============================================================================================
 
     Pile::Pile(LocationType type, PileID id, SuitType suit) :
         type(type), id(id), suit(suit), max_size(GetMaxSize(type)) {
@@ -429,6 +426,7 @@ namespace open_spiel::solitaire {
 
     std::vector<Card> Pile::Sources() const {
         std::vector<Card> sources;
+        // A pile can have a maximum of 13 cards as sources (1 for each rank)
         sources.reserve(13);
         switch (type) {
             case kFoundation : {
@@ -543,11 +541,10 @@ namespace open_spiel::solitaire {
 
     // endregion
 
-    // region Tableau Methods =================================================================================================
+    // region Tableau Methods ==========================================================================================
 
     Tableau::Tableau(PileID id) :
         Pile(kTableau, id, kSuitNone) {
-        // Nothing here
     }
 
     std::vector<Card> Tableau::Targets() const {
@@ -606,7 +603,7 @@ namespace open_spiel::solitaire {
 
     // endregion
 
-    // region Foundation Methods ==============================================================================================
+    // region Foundation Methods =======================================================================================
 
     Foundation::Foundation(PileID id, SuitType suit) :
         Pile(kFoundation, id, suit) {
@@ -643,7 +640,7 @@ namespace open_spiel::solitaire {
 
     // endregion
 
-    // region Waste Methods ===================================================================================================
+    // region Waste Methods ============================================================================================
 
     Waste::Waste() :
         Pile(kWaste, kPileWaste, kSuitNone) {
@@ -661,6 +658,7 @@ namespace open_spiel::solitaire {
             int i = 0;
             for (auto & card : cards) {
                 if (!card.GetHidden()) {
+                    // Every 3rd card in the waste can be moved
                     if (i % 3 == 0) {
                         sources.push_back(card);
                     }
@@ -704,7 +702,7 @@ namespace open_spiel::solitaire {
 
     // endregion
 
-    // region Move Methods ====================================================================================================
+    // region Move Methods =============================================================================================
 
     Move::Move(Card target_card, Card source_card) {
         target = target_card;
@@ -717,6 +715,9 @@ namespace open_spiel::solitaire {
     }
 
     Move::Move(Action action) {
+        // `base` refers to the starting point that indices start from (e.g. if it's 7, and there's 3 cards in its
+        // group, their action ids will be 8, 9, 10). `residual` is just the difference between the id and the base.
+
         int base;
         int residual;
 
@@ -813,6 +814,9 @@ namespace open_spiel::solitaire {
         int base;
         int residual;
 
+        // `base` refers to the starting point that indices start from (e.g. if it's 7, and there's 3 cards in its
+        // group, their action ids will be 8, 9, 10). `residual` is just the difference between the id and the base.
+
         switch (target_rank) {
             case kRankNone : {
                 switch (source_rank) {
@@ -873,7 +877,7 @@ namespace open_spiel::solitaire {
 
     // endregion
 
-    // region SolitaireState Methods ==========================================================================================
+    // region SolitaireState Methods ===================================================================================
 
     SolitaireState::SolitaireState(std::shared_ptr<const Game> game) :
         State(game), waste() {
@@ -1274,23 +1278,6 @@ namespace open_spiel::solitaire {
         }
     }
 
-    Pile *                  SolitaireState::GetPile(const PileID & pile_id) const {
-        switch (pile_id) {
-            case kPileWaste : {
-                return (Pile *) & waste;
-            }
-            case kPileSpades ... kPileDiamonds : {
-                return (Pile *) & foundations.at(pile_id - 1);
-            }
-            case kPile1stTableau ... kPile7thTableau : {
-                return (Pile *) & tableaus.at(pile_id - 5);
-            }
-            default : {
-                SpielFatalError("The pile containing the card wasn't found");
-            }
-        }
-    }
-
     std::vector<Move>       SolitaireState::CandidateMoves() const {
         std::vector<Move> candidate_moves;
         std::vector<Card> targets = Targets();
@@ -1312,7 +1299,9 @@ namespace open_spiel::solitaire {
                         if (source_pile->GetLastCard() == source) {
                             candidate_moves.emplace_back(target, source);
                         }
-                    } else if (source.GetRank() == kRankK && target.GetSuit() == kSuitNone && target.GetRank() == kRankNone) {
+                    } else if (source.GetRank() == kRankK &&
+                               target.GetSuit() == kSuitNone &&
+                               target.GetRank() == kRankNone) {
                         // Check is source is not a bottom
                         if (source_pile->GetType() == kTableau && !(source_pile->GetFirstCard() == source)) {
                             candidate_moves.emplace_back(target, source);
@@ -1320,7 +1309,7 @@ namespace open_spiel::solitaire {
                             candidate_moves.emplace_back(target, source);
                         }
                     } else {
-                        auto move = Move(target, source);
+                        auto move = Move(target, source); // TODO: Remove this line
                         candidate_moves.emplace_back(target, source);
                     }
                 } else {
@@ -1358,7 +1347,9 @@ namespace open_spiel::solitaire {
         }
 
         // Reward for revealing a hidden card
-        if (source_pile->GetType() == kTableau && !source_pile->GetIsEmpty() && source_pile->GetLastCard().GetHidden()) {
+        if (source_pile->GetType() == kTableau &&
+            !source_pile->GetIsEmpty() &&
+            source_pile->GetLastCard().GetHidden()) {
             move_reward += 20.0;
         }
 
@@ -1398,7 +1389,7 @@ namespace open_spiel::solitaire {
 
     // endregion
 
-    // region SolitaireGame Methods ===========================================================================================
+    // region SolitaireGame Methods ====================================================================================
 
     SolitaireGame::SolitaireGame(const GameParameters & params) :
         Game(kGameType, params),
@@ -1426,12 +1417,14 @@ namespace open_spiel::solitaire {
     }
 
     double SolitaireGame::MinUtility() const {
+        /* Returns start at zero and the only negative rewards come from undoing an action. Undoing an action just takes
+         * away the reward that was gained from the action, so utility can never go below 0. */
         return 0.0;
     }
 
     double SolitaireGame::MaxUtility() const {
         /* Waste (24 * 20 = 480)
-             24 cards are in the waste initially. 20 points are rewarded for every one that is moved from the waste.
+            24 cards are in the waste initially. 20 points are rewarded for every one that is moved from the waste.
            Tableau (21 * 20 = 420)
              21 cards are hidden in the tableaus initially. 20 points are rewarded for every one that is revealed.
            Foundation (4 * (100 + 90 + 80 + 70 + 60 + 50 + 40 + 30 + 20 + 10 + 10 + 10 + 10) = 4 * 580 = 2,320)
