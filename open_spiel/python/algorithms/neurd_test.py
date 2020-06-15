@@ -20,6 +20,9 @@ from absl.testing import absltest
 
 import tensorflow.compat.v1 as tf
 
+# Temporarily disable TF2 behavior while the code is not updated.
+tf.disable_v2_behavior()
+
 from open_spiel.python.algorithms import neurd
 import pyspiel
 
