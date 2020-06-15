@@ -22,6 +22,9 @@ from absl.testing import parameterized
 import numpy as np
 import tensorflow.compat.v1 as tf
 
+# Temporarily disable v2 behavior until code is updated.
+tf.disable_v2_behavior()
+
 from open_spiel.python.algorithms.losses import rl_losses
 
 

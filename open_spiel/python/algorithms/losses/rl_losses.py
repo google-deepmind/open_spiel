@@ -31,6 +31,9 @@ from __future__ import print_function
 
 import tensorflow.compat.v1 as tf
 
+# Temporarily disable v2 behavior until code is updated.
+tf.disable_v2_behavior()
+
 
 def _assert_rank_and_shape_compatibility(tensors, rank):
   if not tensors:
