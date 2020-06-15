@@ -26,6 +26,9 @@ from absl.testing import parameterized
 import numpy as np
 import tensorflow.compat.v1 as tf
 
+# Temporarily disable TF2 behavior until the code is updated.
+tf.disable_v2_behavior()
+
 from open_spiel.python.algorithms import masked_softmax
 
 
