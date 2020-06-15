@@ -26,8 +26,10 @@ import contextlib
 import random
 import enum
 import numpy as np
-import sonnet as snt
 import tensorflow.compat.v1 as tf
+
+# Temporarily disable TF2 behavior until code is updated.
+tf.disable_v2_behavior()
 
 from open_spiel.python import rl_agent
 from open_spiel.python.algorithms import dqn
@@ -65,7 +67,7 @@ class NFSP(rl_agent.AbstractAgent):
     self.player_id = player_id
     self._session = session
     self._num_actions = num_actions
-    self._layer_sizes = hidden_layers_sizes + [num_actions]
+    self._layer_sizes = hidden_layers_sizes
     self._batch_size = batch_size
     self._learn_every = learn_every
     self._anticipatory_param = anticipatory_param
@@ -108,8 +110,11 @@ class NFSP(rl_agent.AbstractAgent):
         name="legal_actions_mask_ph")
 
     # Average policy network.
-    self._avg_network = snt.nets.MLP(output_sizes=self._layer_sizes)
-    self._avg_policy = self._avg_network(self._info_state_ph)
+    self._avg_network = self._info_state_ph
+    for layer_size in self._layer_sizes:
+      self._avg_network = tf.layers.dense(self._avg_network, layer_size,
+                                          activation=tf.nn.relu)
+    self._avg_policy = tf.layers.dense(self._avg_network, num_actions)
     self._avg_policy_probs = tf.nn.softmax(self._avg_policy)
 
     # Loss

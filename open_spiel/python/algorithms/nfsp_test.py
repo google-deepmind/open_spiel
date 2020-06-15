@@ -22,6 +22,9 @@ import collections
 from scipy import stats
 import tensorflow.compat.v1 as tf
 
+# Temporarily disable TF2 behavior until code is updated.
+tf.disable_v2_behavior()
+
 from open_spiel.python import rl_environment
 from open_spiel.python.algorithms import nfsp
 
