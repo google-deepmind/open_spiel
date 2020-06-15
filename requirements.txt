@@ -1,17 +1,17 @@
 # The single source of truth for the OpenSpiel pip dependencies.
 pip >= 20.0.2
 absl-py == 0.9.0
-tensorflow < 2.0, >= 1.15.1
+tensorflow >= 1.15.1
 dm-sonnet == 1.32
 IPython == 5.8.0
 tensorflow-probability < 0.8.0, >= 0.7.0
-cvxopt == 1.2.3
+cvxopt >= 1.2.3
 networkx == 2.2
 mock == 3.0.5
-matplotlib == 3.1.1
+matplotlib >= 3.1.1
 nashpy == 0.0.19
 scipy == 1.4.1
-attrs == 19.1.0
+attrs >= 19.1.0
 jax >= 0.1.67
 jaxlib >= 0.1.47
 git+git://github.com/deepmind/dm-haiku@master
