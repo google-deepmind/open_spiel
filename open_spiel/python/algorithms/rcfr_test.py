@@ -26,6 +26,9 @@ import numpy as np
 import pyspiel  # pylint: disable=g-bad-import-order
 import tensorflow.compat.v1 as tf
 
+# Temporarily disable TF2 behavior while the code is not updated.
+tf.disable_v2_behavior()
+
 from open_spiel.python.algorithms import rcfr
 
 tf.enable_eager_execution()
