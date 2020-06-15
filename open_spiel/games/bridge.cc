@@ -176,7 +176,7 @@ std::array<std::string, kNumSuits> BridgeState::FormatHand(
     cards[suit].push_back(' ');
     bool is_void = true;
     for (int rank = kNumCardsPerSuit - 1; rank >= 0; --rank) {
-      if (player == holder_[Card(Suit(suit), rank)]) {
+      if (player == deal[Card(Suit(suit), rank)]) {
         cards[suit].push_back(kRankChar[rank]);
         is_void = false;
       }
