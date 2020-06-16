@@ -1,7 +1,7 @@
+#include "cassert"
 #include "open_spiel/spiel.h"
 #include "open_spiel/tests/basic_tests.h"
 #include "solitaire.h"
-#include "assert.h"
 
 namespace open_spiel::solitaire {
 namespace {
@@ -10,7 +10,7 @@ namespace {
 
     void BasicSolitaireTests() {
         testing::LoadGameTest("solitaire");
-        testing::RandomSimTest(*LoadGame("solitaire"), 200);
+        testing::RandomSimTest(*LoadGame("solitaire"), 100);
     }
 
     void TestMoveActionId() {

@@ -28,7 +28,7 @@ namespace open_spiel::solitaire {
         }
 
         REGISTER_SPIEL_GAME(kGameType, Factory)
-    }
+    } // namespace
 
     // region Miscellaneous ============================================================================================
 
@@ -94,7 +94,7 @@ namespace open_spiel::solitaire {
             }
         } else {
             // Handles ordinary cards (e.g. 0-13 -> spades, 14-26 -> hearts, etc.)
-            return (suit - 1) * 13 + rank;
+            return (suit - 1) * kNumRanks + rank;
         }
     }
 
@@ -102,15 +102,15 @@ namespace open_spiel::solitaire {
         switch (location) {
             case kDeck ... kWaste : {
                 // Cards can only be removed from the waste & there are 24 cards in it at the start of the game
-                return 24;
+                return kMaxSizeWaste;
             }
             case kFoundation : {
                 // There are 13 cards in a suit
-                return 13;
+                return kMaxSizeFoundation;
             }
             case kTableau : {
                 // There are a maximum of 6 hidden cards and 13 non-hidden cards in a tableau (1 for each rank)
-                return 19;
+                return kMaxSizeTableau;
             }
             default : {
                 return 0;
@@ -164,8 +164,8 @@ namespace open_spiel::solitaire {
                 }
                 default : {
                     // Converts an index back into a rank and suit for ordinary cards
-                    rank = static_cast<RankType>(1 + ((index - 1) % 13));
-                    suit = static_cast<SuitType>(1 + floor((index - 1) / 13));
+                    rank = static_cast<RankType>(1 + ((index - 1) % kNumRanks));
+                    suit = static_cast<SuitType>(static_cast<int>(1 + floor((index - 1) / 13.0)));
                 }
             }
         }
@@ -330,10 +330,6 @@ namespace open_spiel::solitaire {
         }
     }
 
-    bool Card::operator==(Card & other_card) const {
-        return rank == other_card.rank && suit == other_card.suit;
-    }
-
     bool Card::operator==(const Card & other_card) const {
         return rank == other_card.rank && suit == other_card.suit;
     }
@@ -356,8 +352,6 @@ namespace open_spiel::solitaire {
         type(type), id(id), suit(suit), max_size(GetMaxSize(type)) {
         cards.reserve(max_size);
     }
-
-    Pile::~Pile() = default;
 
     // Getters/Setters -------------------------------------------------------------------------------------------------
 
@@ -427,7 +421,7 @@ namespace open_spiel::solitaire {
     std::vector<Card> Pile::Sources() const {
         std::vector<Card> sources;
         // A pile can have a maximum of 13 cards as sources (1 for each rank)
-        sources.reserve(13);
+        sources.reserve(kNumRanks);
         switch (type) {
             case kFoundation : {
                 if (!cards.empty()) {
@@ -438,7 +432,7 @@ namespace open_spiel::solitaire {
             }
             case kTableau : {
                 if (!cards.empty()) {
-                    for (auto & card : cards) {
+                    for (const auto & card : cards) {
                         if (!card.GetHidden()) {
                             sources.push_back(card);
                         }
@@ -451,7 +445,7 @@ namespace open_spiel::solitaire {
             case kWaste : {
                 if (!cards.empty()) {
                     int i = 0;
-                    for (auto & card : cards) {
+                    for (const auto & card : cards) {
                         if (!card.GetHidden()) {
                             if (i % 3 == 0) {
                                 sources.push_back(card);
@@ -563,9 +557,9 @@ namespace open_spiel::solitaire {
 
     std::vector<Card> Tableau::Sources() const {
         std::vector<Card> sources;
-        sources.reserve(13);
+        sources.reserve(kMaxSourcesTableau);
         if (!cards.empty()) {
-            for (auto & card : cards) {
+            for (const auto & card : cards) {
                 if (!card.GetHidden()) {
                     sources.push_back(card);
                 }
@@ -607,7 +601,6 @@ namespace open_spiel::solitaire {
 
     Foundation::Foundation(PileID id, SuitType suit) :
         Pile(kFoundation, id, suit) {
-        // Nothing here
     }
 
     std::vector<Card> Foundation::Targets() const {
@@ -621,7 +614,7 @@ namespace open_spiel::solitaire {
 
     std::vector<Card> Foundation::Sources() const {
         std::vector<Card> sources;
-        sources.reserve(13);
+        sources.reserve(kMaxSourcesFoundation);
         if (!cards.empty()) {
             return {cards.back()};
         } else {
@@ -644,7 +637,6 @@ namespace open_spiel::solitaire {
 
     Waste::Waste() :
         Pile(kWaste, kPileWaste, kSuitNone) {
-        // Nothing here
     }
 
     std::vector<Card> Waste::Targets() const {
@@ -653,10 +645,10 @@ namespace open_spiel::solitaire {
 
     std::vector<Card> Waste::Sources() const {
         std::vector<Card> sources;
-        sources.reserve(13);
+        sources.reserve(kMaxSourcesWaste);
         if (!cards.empty()) {
             int i = 0;
-            for (auto & card : cards) {
+            for (const auto & card : cards) {
                 if (!card.GetHidden()) {
                     // Every 3rd card in the waste can be moved
                     if (i % 3 == 0) {
@@ -718,9 +710,7 @@ namespace open_spiel::solitaire {
         // `base` refers to the starting point that indices start from (e.g. if it's 7, and there's 3 cards in its
         // group, their action ids will be 8, 9, 10). `residual` is just the difference between the id and the base.
 
-        int base;
         int residual;
-
         int target_rank;
         int source_rank;
         int target_suit;
@@ -935,7 +925,7 @@ namespace open_spiel::solitaire {
 
     bool                    SolitaireState::IsChanceNode() const {
 
-        for (auto & tableau : tableaus) {
+        for (const auto & tableau : tableaus) {
             if (!tableau.GetIsEmpty() && tableau.GetLastCard().GetHidden()) {
                 return true;
             }
@@ -989,7 +979,7 @@ namespace open_spiel::solitaire {
                 return "kEnd";
             }
             case kRevealStart ... kRevealEnd : {
-                auto revealed_card = Card((int) action_id);
+                auto revealed_card = Card(static_cast<int>(action_id));
                 std::string result;
                 absl::StrAppend(&result, "kReveal", revealed_card.ToString(is_colored));
                 return result;
@@ -1024,7 +1014,7 @@ namespace open_spiel::solitaire {
         std::fill(values->begin(), values->end(), 0.0);
         auto ptr = values->begin();
 
-        for (auto & foundation : foundations) {
+        for (const auto & foundation : foundations) {
             if (foundation.GetIsEmpty()) {
                 ptr[0] = 1;
             } else {
@@ -1036,7 +1026,7 @@ namespace open_spiel::solitaire {
             ptr += kFoundationTensorLength;
         }
 
-        for (auto & tableau : tableaus) {
+        for (const auto & tableau : tableaus) {
             if (tableau.GetIsEmpty()) {
                 ptr[7] = 1.0;
                 continue;
@@ -1060,9 +1050,9 @@ namespace open_spiel::solitaire {
         } else {
             for (auto & card : waste.GetCards()) {
                 if (card.GetHidden()) {
-                    ptr[0] = 1;
+                    ptr[0] = 1.0;
                 } else {
-                    auto tensor_index = card.GetIndex() + 1;
+                    auto tensor_index = card.GetIndex();
                     ptr[tensor_index] = 1.0;
                 }
                 ptr += kWasteTensorLength;
@@ -1079,7 +1069,7 @@ namespace open_spiel::solitaire {
                 break;
             }
             case kRevealStart ... kRevealEnd : {
-                auto revealed_card = Card((int) action);
+                auto revealed_card = Card(static_cast<int>(action));
                 bool found_card = false;
 
                 for (auto & tableau : tableaus) {
@@ -1240,17 +1230,17 @@ namespace open_spiel::solitaire {
 
     Pile *                  SolitaireState::GetPile(const Card & card) const {
 
-        PileID pile_id;
+        PileID pile_id = kPileMissing;
 
         if (card.GetRank() == kRankNone) {
             if (card.GetSuit() == kSuitNone) {
-                for (auto & tableau : tableaus) {
+                for (const auto & tableau : tableaus) {
                     if (tableau.GetIsEmpty()) {
-                        return (Pile *) & tableau;
+                        return (Pile *) &tableau;
                     }
                 }
             } else if (card.GetSuit() != kSuitHidden) {
-                for (auto & foundation : foundations) {
+                for (const auto & foundation : foundations) {
                     if (foundation.GetSuit() == card.GetSuit()) {
                         return (Pile *) & foundation;
                     }
@@ -1294,7 +1284,7 @@ namespace open_spiel::solitaire {
             }
             for (auto & source : target.LegalChildren()) {
                 if (std::find(sources.begin(), sources.end(), source) != sources.end()) {
-                    auto source_pile = GetPile(source);
+                    auto * source_pile = GetPile(source);
                     if (target.GetLocation() == kFoundation && source_pile->GetType() == kTableau) {
                         if (source_pile->GetLastCard() == source) {
                             candidate_moves.emplace_back(target, source);
@@ -1303,13 +1293,10 @@ namespace open_spiel::solitaire {
                                target.GetSuit() == kSuitNone &&
                                target.GetRank() == kRankNone) {
                         // Check is source is not a bottom
-                        if (source_pile->GetType() == kTableau && !(source_pile->GetFirstCard() == source)) {
-                            candidate_moves.emplace_back(target, source);
-                        } else if (source_pile->GetType() == kWaste) {
+                        if (source_pile->GetType() == kWaste || (source_pile->GetType() == kTableau && !(source_pile->GetFirstCard() == source))) {
                             candidate_moves.emplace_back(target, source);
                         }
                     } else {
-                        auto move = Move(target, source); // TODO: Remove this line
                         candidate_moves.emplace_back(target, source);
                     }
                 } else {
@@ -1325,8 +1312,8 @@ namespace open_spiel::solitaire {
         Card target = move.GetTarget();
         Card source = move.GetSource();
 
-        auto target_pile = GetPile(target);
-        auto source_pile = GetPile(source);
+        auto * target_pile = GetPile(target);
+        auto * source_pile = GetPile(source);
 
         std::vector<Card> split_cards = source_pile->Split(source);
         for (auto & card : split_cards) {

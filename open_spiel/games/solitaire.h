@@ -1,21 +1,21 @@
 #ifndef THIRD_PARTY_OPEN_SPIEL_GAMES_SOLITAIRE_H
 #define THIRD_PARTY_OPEN_SPIEL_GAMES_SOLITAIRE_H
 
-#include <array>
-#include <memory>
-#include <string>
-#include <vector>
-#include <deque>
-#include <variant>
 #include <any>
-#include <unordered_map>
-#include <set>
+#include <array>
+#include <deque>
+#include <memory>
 #include <optional>
+#include <set>
+#include <string>
 #include <tuple>
+#include <unordered_map>
+#include <variant>
+#include <vector>
 
 #include "open_spiel/spiel.h"
 
-// TODO: Please run `clang-format -style=google` on your code. There are also some `clang-tidy` issues.
+// TODO(tyjch): Please run `clang-format -style=google` on your code. There are also some `clang-tidy` issues.
 
 // An implementation of klondike solitaire: https://en.wikipedia.org/wiki/Klondike_(solitaire)
 // More specifically, it is K+ solitaire, which allows the player to play any card from the deck/waste that would
@@ -93,9 +93,22 @@ namespace open_spiel::solitaire {
         kPile5thTableau = 9,
         kPile6thTableau = 10,
         kPile7thTableau = 11,
+        kPileMissing    = 12
     };
 
     // Constants =======================================================================================================
+
+    inline constexpr int kNumRanks = 13;
+
+    // Number of cards that can be in each pile type
+    inline constexpr int kMaxSizeWaste      = 24;
+    inline constexpr int kMaxSizeFoundation = 13;
+    inline constexpr int kMaxSizeTableau    = 19;
+
+    // Number of sources that can be in each pile type
+    inline constexpr int kMaxSourcesWaste      = 8;
+    inline constexpr int kMaxSourcesFoundation = 1;
+    inline constexpr int kMaxSourcesTableau    = 13;
 
     // These divide up the action ids into sections. kEnd is a single action that is used to end the game when no
     // other actions are available.
@@ -110,6 +123,17 @@ namespace open_spiel::solitaire {
     // It starts at 53 because there are 52 reveal actions before it. See `NumDistinctActions()` in solitaire.cc.
     inline constexpr int kMoveStart = 53;
     inline constexpr int kMoveEnd   = 204;
+
+    // Used in Move::Move(action) to create a move from an action. Moves are actions from 53 -> 204, we subtract the
+    // action by kActionOffset (52) to find range it falls into below. This is done so that the method doesn't depend
+    // on the number of chance actions before it.
+    /*
+    inline constexpr std::pair<int, int> kRangeOfNormalMoves           = {  1, 132};
+    inline constexpr std::pair<int, int> kRangeOfAceToFoundationMoves  = {133, 136};
+    inline constexpr std::pair<int, int> kRangeOfKingToFoundationMoves = {137, 140};
+    inline constexpr std::pair<int, int> kRangeOfAceMoves              = {141, 144};
+    inline constexpr std::pair<int, int> kRangeOfKingMoves             = {145, 152};
+    */
 
     // Indices for special cards
     inline constexpr int kHiddenCard       = 99;
@@ -213,7 +237,7 @@ namespace open_spiel::solitaire {
         void SetHidden(bool new_hidden);
 
         // Operators ===================================================================================================
-        bool operator==(Card & other_card) const;
+
         bool operator==(const Card & other_card) const;
         bool operator<(const Card & other_card) const;
 
@@ -226,7 +250,7 @@ namespace open_spiel::solitaire {
     class Pile {
 
     protected:
-        std::vector<Card> cards;
+        std::vector<Card>  cards;
         const LocationType type;
         const SuitType     suit;
         const PileID       id;
@@ -238,7 +262,7 @@ namespace open_spiel::solitaire {
         Pile(LocationType type, PileID id, SuitType suit = kSuitNone);
 
         // Destructor ==================================================================================================
-        virtual ~Pile();
+        virtual ~Pile() = default;
 
         // Getters/Setters =============================================================================================
         bool              GetIsEmpty() const;
