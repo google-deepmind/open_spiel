@@ -1,7 +1,8 @@
+#include "solitaire.h"
+
 #include "cassert"
 #include "open_spiel/spiel.h"
 #include "open_spiel/tests/basic_tests.h"
-#include "solitaire.h"
 
 namespace open_spiel::solitaire {
 namespace {
@@ -229,13 +230,14 @@ void TestMoveActionId() {
   };
 
   for (const auto &move : valid_moves) {
-    std::cout << move.ToString() << " == " << Move(move.ActionId()).ToString() << std::endl;
+    std::cout << move.ToString() << " == " << Move(move.ActionId()).ToString()
+              << std::endl;
     assert(move.ToString() == Move(move.ActionId()).ToString());
   }
 }
 
-} // namespace
-} // namespace open_spiel::solitaire
+}  // namespace
+}  // namespace open_spiel::solitaire
 
 int main(int argc, char **argv) {
   open_spiel::solitaire::TestMoveActionId();

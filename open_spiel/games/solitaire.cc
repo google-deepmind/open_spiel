@@ -3,66 +3,69 @@
 namespace open_spiel::solitaire {
 
 namespace {
-const GameType kGameType{
-    /*short_name=*/"solitaire",
-    /*long_name=*/"Klondike Solitaire",
-                   GameType::Dynamics::kSequential,
-                   GameType::ChanceMode::kExplicitStochastic,
-                   GameType::Information::kImperfectInformation,
-                   GameType::Utility::kGeneralSum,
-                   GameType::RewardModel::kRewards,
-    /*max_num_players=*/1,
-    /*min_num_players=*/1,
-    /*provides_information_state_string=*/true,
-    /*provides_information_state_tensor=*/false,
-    /*provides_observation_string=*/true,
-    /*provides_observation_tensor=*/true,
-    /*parameter_specification=*/
-                   {{"players", GameParameter(kDefaultPlayers)},
-                    {"is_colored", GameParameter(kDefaultIsColored)},
-                    {"depth_limit", GameParameter(kDefaultDepthLimit)}}
-};
+const GameType kGameType{/*short_name=*/"solitaire",
+                         /*long_name=*/"Klondike Solitaire",
+                         GameType::Dynamics::kSequential,
+                         GameType::ChanceMode::kExplicitStochastic,
+                         GameType::Information::kImperfectInformation,
+                         GameType::Utility::kGeneralSum,
+                         GameType::RewardModel::kRewards,
+                         /*max_num_players=*/1,
+                         /*min_num_players=*/1,
+                         /*provides_information_state_string=*/true,
+                         /*provides_information_state_tensor=*/false,
+                         /*provides_observation_string=*/true,
+                         /*provides_observation_tensor=*/true,
+                         /*parameter_specification=*/
+                         {{"players", GameParameter(kDefaultPlayers)},
+                          {"is_colored", GameParameter(kDefaultIsColored)},
+                          {"depth_limit", GameParameter(kDefaultDepthLimit)}}};
 
 std::shared_ptr<const Game> Factory(const GameParameters &params) {
   return std::shared_ptr<const Game>(new SolitaireGame(params));
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory)
-} // namespace
+}  // namespace
 
-// region Miscellaneous ============================================================================================
+// region Miscellaneous
+// =============================================================================
 
 std::vector<SuitType> GetOppositeSuits(const SuitType &suit) {
-  /* Just returns a vector of the suits of opposite color. For red suits (kSuitHearts and kSuitDiamonds), this
-   * returns the black suits (kSuitSpades and kSuitClubs). For a black suit, this returns the red suits. The last
-   * `SuitType` would be `kSuitNone` which should only occur with empty tableau cards or hidden cards. Empty
-   * tableau cards should accept any suit, but hidden cards are the opposite; they shouldn't accept any.
-   * There isn't really a use case for calling this function with the suit of a hidden card though. */
+  /* Just returns a vector of the suits of opposite color. For red suits
+   * (kSuitHearts and kSuitDiamonds), this returns the black suits (kSuitSpades
+   * and kSuitClubs). For a black suit, this returns the red suits. The last
+   * `SuitType` would be `kSuitNone` which should only occur with empty tableau
+   * cards or hidden cards. Empty tableau cards should accept any suit, but
+   * hidden cards are the opposite; they shouldn't accept any. There isn't
+   * really a use case for calling this function with the suit of a hidden card
+   * though. */
 
   switch (suit) {
-    case kSuitSpades : {
+    case kSuitSpades: {
       return {kSuitHearts, kSuitDiamonds};
     }
-    case kSuitHearts : {
+    case kSuitHearts: {
       return {kSuitSpades, kSuitClubs};
     }
-    case kSuitClubs : {
+    case kSuitClubs: {
       return {kSuitHearts, kSuitDiamonds};
     }
-    case kSuitDiamonds : {
+    case kSuitDiamonds: {
       return {kSuitSpades, kSuitClubs};
     }
-    case kSuitNone : {
+    case kSuitNone: {
       return {kSuitSpades, kSuitHearts, kSuitClubs, kSuitDiamonds};
     }
-    default : {
+    default: {
       SpielFatalError("suit is not in (s, h, c, d)");
     }
   }
 }
 
 int GetCardIndex(RankType rank, SuitType suit) {
-  /* Using a given rank and/or suit, gets an integer representing the index of the card. */
+  /* Using a given rank and/or suit, gets an integer representing the index of
+   * the card. */
 
   if (rank == kRankHidden || suit == kSuitHidden) {
     // Handles hidden cards
@@ -75,19 +78,19 @@ int GetCardIndex(RankType rank, SuitType suit) {
     } else {
       // Handles empty foundation cards
       switch (suit) {
-        case kSuitSpades : {
+        case kSuitSpades: {
           return kEmptySpadeCard;
         }
-        case kSuitHearts : {
+        case kSuitHearts: {
           return kEmptyHeartCard;
         }
-        case kSuitClubs : {
+        case kSuitClubs: {
           return kEmptyClubCard;
         }
-        case kSuitDiamonds : {
+        case kSuitDiamonds: {
           return kEmptyDiamondCard;
         }
-        default : {
+        default: {
           SpielFatalError("Failed to get card index");
         }
       }
@@ -100,19 +103,21 @@ int GetCardIndex(RankType rank, SuitType suit) {
 
 int GetMaxSize(LocationType location) {
   switch (location) {
-    case kDeck ... kWaste : {
-      // Cards can only be removed from the waste & there are 24 cards in it at the start of the game
+    case kDeck ... kWaste: {
+      // Cards can only be removed from the waste & there are 24 cards in it at
+      // the start of the game
       return kMaxSizeWaste;
     }
-    case kFoundation : {
+    case kFoundation: {
       // There are 13 cards in a suit
       return kMaxSizeFoundation;
     }
-    case kTableau : {
-      // There are a maximum of 6 hidden cards and 13 non-hidden cards in a tableau (1 for each rank)
+    case kTableau: {
+      // There are a maximum of 6 hidden cards and 13 non-hidden cards in a
+      // tableau (1 for each rank)
       return kMaxSizeTableau;
     }
-    default : {
+    default: {
       return 0;
     }
   }
@@ -122,99 +127,87 @@ std::hash<std::string> hasher;
 
 // endregion
 
-// region Card Methods =============================================================================================
+// region Card Methods
+// =============================================================================
 
-Card::Card(bool hidden, SuitType suit, RankType rank, LocationType location) :
-    hidden(hidden), suit(suit), rank(rank), location(location) {
-}
+Card::Card(bool hidden, SuitType suit, RankType rank, LocationType location)
+    : hidden(hidden), suit(suit), rank(rank), location(location) {}
 
-Card::Card(int index, bool hidden, LocationType location) :
-    index(index), hidden(hidden), location(location) {
+Card::Card(int index, bool hidden, LocationType location)
+    : index(index), hidden(hidden), location(location) {
   if (!hidden) {
     switch (index) {
-      case kHiddenCard : {
+      case kHiddenCard: {
         rank = kRankHidden;
         suit = kSuitHidden;
         break;
       }
-      case kEmptyTableauCard : {
+      case kEmptyTableauCard: {
         rank = kRankNone;
         suit = kSuitNone;
         break;
       }
-      case kEmptySpadeCard : {
+      case kEmptySpadeCard: {
         rank = kRankNone;
         suit = kSuitSpades;
         break;
       }
-      case kEmptyHeartCard : {
+      case kEmptyHeartCard: {
         rank = kRankNone;
         suit = kSuitHearts;
         break;
       }
-      case kEmptyClubCard : {
+      case kEmptyClubCard: {
         rank = kRankNone;
         suit = kSuitClubs;
         break;
       }
-      case kEmptyDiamondCard : {
+      case kEmptyDiamondCard: {
         rank = kRankNone;
         suit = kSuitDiamonds;
         break;
       }
-      default : {
+      default: {
         // Converts an index back into a rank and suit for ordinary cards
         rank = static_cast<RankType>(1 + ((index - 1) % kNumRanks));
-        suit = static_cast<SuitType>(static_cast<int>(1 + floor((index - 1) / 13.0)));
+        suit = static_cast<SuitType>(
+            static_cast<int>(1 + floor((index - 1) / 13.0)));
       }
     }
   }
 }
 
-// Getters ---------------------------------------------------------------------------------------------------------
+// Getters
+// -----------------------------------------------------------------------------
 
-RankType Card::GetRank() const {
-  return rank;
-}
+RankType Card::GetRank() const { return rank; }
 
-SuitType Card::GetSuit() const {
-  return suit;
-}
+SuitType Card::GetSuit() const { return suit; }
 
-LocationType Card::GetLocation() const {
-  return location;
-}
+LocationType Card::GetLocation() const { return location; }
 
-bool Card::GetHidden() const {
-  return hidden;
-}
+bool Card::GetHidden() const { return hidden; }
 
 int Card::GetIndex() const {
-  /* Basically it just calculates the index if it hasn't been calculated before, otherwise
-   * it will just return a stored value. If `force` is true and the card isn't hidden, then
-   * the index is calculated again. */
+  /* Basically it just calculates the index if it hasn't been calculated before,
+   * otherwise it will just return a stored value. If `force` is true and the
+   * card isn't hidden, then the index is calculated again. */
   return hidden ? kHiddenCard : GetCardIndex(rank, suit);
 }
 
-// Setters ---------------------------------------------------------------------------------------------------------
+// Setters
+// -----------------------------------------------------------------------------
 
-void Card::SetRank(RankType new_rank) {
-  rank = new_rank;
-}
+void Card::SetRank(RankType new_rank) { rank = new_rank; }
 
-void Card::SetSuit(SuitType new_suit) {
-  suit = new_suit;
-}
+void Card::SetSuit(SuitType new_suit) { suit = new_suit; }
 
-void Card::SetLocation(LocationType new_location) {
-  location = new_location;
-}
+void Card::SetLocation(LocationType new_location) { location = new_location; }
 
-void Card::SetHidden(bool new_hidden) {
-  hidden = new_hidden;
-}
+void Card::SetHidden(bool new_hidden) { hidden = new_hidden; }
 
-// Other Methods ---------------------------------------------------------------------------------------------------
+// Other Methods
+// -----------------------------------------------------------------------------
 
 std::string Card::ToString(bool colored) const {
   std::string result;
@@ -247,7 +240,6 @@ std::string Card::ToString(bool colored) const {
 }
 
 std::vector<Card> Card::LegalChildren() const {
-
   if (hidden) {
     return {};
   } else {
@@ -259,9 +251,9 @@ std::vector<Card> Card::LegalChildren() const {
     child_suits.reserve(4);
 
     switch (location) {
-      case kTableau : {
+      case kTableau: {
         switch (rank) {
-          case kRankNone : {
+          case kRankNone: {
             if (suit == kSuitNone) {
               // Empty tableaus can accept a king of any suit
               child_rank = kRankK;
@@ -271,22 +263,23 @@ std::vector<Card> Card::LegalChildren() const {
               return {};
             }
           }
-          case kRank2 ... kRankK : {
-            // Ordinary cards (except aces) can accept cards of an opposite suit that is one rank lower
+          case kRank2 ... kRankK: {
+            // Ordinary cards (except aces) can accept cards of an opposite suit
+            // that is one rank lower
             child_rank = static_cast<RankType>(rank - 1);
             child_suits = GetOppositeSuits(suit);
             break;
           }
-          default : {
+          default: {
             // This will catch kRankA and kRankHidden
             return {};
           }
         }
         break;
       }
-      case kFoundation : {
+      case kFoundation: {
         switch (rank) {
-          case kRankNone : {
+          case kRankNone: {
             if (suit != kSuitNone) {
               child_rank = static_cast<RankType>(rank + 1);
               child_suits = {suit};
@@ -295,20 +288,21 @@ std::vector<Card> Card::LegalChildren() const {
               return {};
             }
           }
-          case kRankA ... kRankQ : {
-            // Cards (except kings) can accept a card of the same suit that is one rank higher
+          case kRankA ... kRankQ: {
+            // Cards (except kings) can accept a card of the same suit that is
+            // one rank higher
             child_rank = static_cast<RankType>(rank + 1);
             child_suits = {suit};
             break;
           }
-          default : {
+          default: {
             // This could catch kRankK and kRankHidden
             return {};
           }
         }
         break;
       }
-      default : {
+      default: {
         // This catches all cards that aren't located in a tableau or foundation
         return {};
       }
@@ -346,52 +340,41 @@ bool Card::operator<(const Card &other_card) const {
 
 // endregion
 
-// region Pile Methods =============================================================================================
+// region Pile Methods
+// =============================================================================
 
-Pile::Pile(LocationType type, PileID id, SuitType suit) :
-    type(type), id(id), suit(suit), max_size(GetMaxSize(type)) {
+Pile::Pile(LocationType type, PileID id, SuitType suit)
+    : type(type), id(id), suit(suit), max_size(GetMaxSize(type)) {
   cards.reserve(max_size);
 }
 
-// Getters/Setters -------------------------------------------------------------------------------------------------
+// Getters/Setters
+// -----------------------------------------------------------------------------
 
-bool Pile::GetIsEmpty() const {
-  return cards.empty();
-}
+bool Pile::GetIsEmpty() const { return cards.empty(); }
 
-Card Pile::GetFirstCard() const {
-  return cards.front();
-}
+Card Pile::GetFirstCard() const { return cards.front(); }
 
-Card Pile::GetLastCard() const {
-  return cards.back();
-}
+Card Pile::GetLastCard() const { return cards.back(); }
 
-SuitType Pile::GetSuit() const {
-  return suit;
-}
+SuitType Pile::GetSuit() const { return suit; }
 
-LocationType Pile::GetType() const {
-  return type;
-}
+LocationType Pile::GetType() const { return type; }
 
-PileID Pile::GetID() const {
-  return id;
-}
+PileID Pile::GetID() const { return id; }
 
-std::vector<Card> Pile::GetCards() const {
-  return cards;
-}
+std::vector<Card> Pile::GetCards() const { return cards; }
 
 void Pile::SetCards(std::vector<Card> new_cards) {
   cards = std::move(new_cards);
 }
 
-//  Other Methods --------------------------------------------------------------------------------------------------
+//  Other Methods
+//  ----------------------------------------------------------------------------
 
 std::vector<Card> Pile::Targets() const {
   switch (type) {
-    case kFoundation : {
+    case kFoundation: {
       if (!cards.empty()) {
         return {cards.back()};
       } else {
@@ -399,7 +382,7 @@ std::vector<Card> Pile::Targets() const {
         return {Card(false, suit, kRankNone, kFoundation)};
       }
     }
-    case kTableau : {
+    case kTableau: {
       if (!cards.empty()) {
         auto back_card = cards.back();
         if (!back_card.GetHidden()) {
@@ -412,7 +395,7 @@ std::vector<Card> Pile::Targets() const {
         return {Card(false, kSuitNone, kRankNone, kTableau)};
       }
     }
-    default : {
+    default: {
       SpielFatalError("Pile::Targets() called with unsupported type");
     }
   }
@@ -423,14 +406,14 @@ std::vector<Card> Pile::Sources() const {
   // A pile can have a maximum of 13 cards as sources (1 for each rank)
   sources.reserve(kNumRanks);
   switch (type) {
-    case kFoundation : {
+    case kFoundation: {
       if (!cards.empty()) {
         return {cards.back()};
       } else {
         return {};
       }
     }
-    case kTableau : {
+    case kTableau: {
       if (!cards.empty()) {
         for (const auto &card : cards) {
           if (!card.GetHidden()) {
@@ -442,7 +425,7 @@ std::vector<Card> Pile::Sources() const {
         return {};
       }
     }
-    case kWaste : {
+    case kWaste: {
       if (!cards.empty()) {
         int i = 0;
         for (const auto &card : cards) {
@@ -460,7 +443,7 @@ std::vector<Card> Pile::Sources() const {
         return {};
       }
     }
-    default : {
+    default: {
       SpielFatalError("Pile::Sources() called with unsupported type");
     }
   }
@@ -469,14 +452,14 @@ std::vector<Card> Pile::Sources() const {
 std::vector<Card> Pile::Split(Card card) {
   std::vector<Card> split_cards;
   switch (type) {
-    case kFoundation : {
+    case kFoundation: {
       if (cards.back() == card) {
         split_cards = {cards.back()};
         cards.pop_back();
       }
       break;
     }
-    case kTableau : {
+    case kTableau: {
       if (!cards.empty()) {
         bool split_flag = false;
         for (auto it = cards.begin(); it != cards.end();) {
@@ -493,7 +476,7 @@ std::vector<Card> Pile::Split(Card card) {
       }
       break;
     }
-    case kWaste : {
+    case kWaste: {
       if (!cards.empty()) {
         for (auto it = cards.begin(); it != cards.end();) {
           if (*it == card) {
@@ -507,7 +490,7 @@ std::vector<Card> Pile::Split(Card card) {
       }
       break;
     }
-    default : {
+    default: {
       return {};
     }
   }
@@ -535,11 +518,10 @@ std::string Pile::ToString(bool colored) const {
 
 // endregion
 
-// region Tableau Methods ==========================================================================================
+// region Tableau Methods
+// =============================================================================
 
-Tableau::Tableau(PileID id) :
-    Pile(kTableau, id, kSuitNone) {
-}
+Tableau::Tableau(PileID id) : Pile(kTableau, id, kSuitNone) {}
 
 std::vector<Card> Tableau::Targets() const {
   if (!cards.empty()) {
@@ -597,11 +579,11 @@ void Tableau::Reveal(Card card_to_reveal) {
 
 // endregion
 
-// region Foundation Methods =======================================================================================
+// region Foundation Methods
+// =============================================================================
 
-Foundation::Foundation(PileID id, SuitType suit) :
-    Pile(kFoundation, id, suit) {
-}
+Foundation::Foundation(PileID id, SuitType suit)
+    : Pile(kFoundation, id, suit) {}
 
 std::vector<Card> Foundation::Targets() const {
   if (!cards.empty()) {
@@ -633,15 +615,12 @@ std::vector<Card> Foundation::Split(Card card) {
 
 // endregion
 
-// region Waste Methods ============================================================================================
+// region Waste Methods
+// =============================================================================
 
-Waste::Waste() :
-    Pile(kWaste, kPileWaste, kSuitNone) {
-}
+Waste::Waste() : Pile(kWaste, kPileWaste, kSuitNone) {}
 
-std::vector<Card> Waste::Targets() const {
-  return {};
-}
+std::vector<Card> Waste::Targets() const { return {}; }
 
 std::vector<Card> Waste::Sources() const {
   std::vector<Card> sources;
@@ -694,21 +673,24 @@ void Waste::Reveal(Card card_to_reveal) {
 
 // endregion
 
-// region Move Methods =============================================================================================
+// region Move Methods
+// =============================================================================
 
 Move::Move(Card target_card, Card source_card) {
   target = target_card;
   source = source_card;
 }
 
-Move::Move(RankType target_rank, SuitType target_suit, RankType source_rank, SuitType source_suit) {
+Move::Move(RankType target_rank, SuitType target_suit, RankType source_rank,
+           SuitType source_suit) {
   target = Card(false, target_suit, target_rank, kMissing);
   source = Card(false, source_suit, source_rank, kMissing);
 }
 
 Move::Move(Action action) {
-  // `base` refers to the starting point that indices start from (e.g. if it's 7, and there's 3 cards in its
-  // group, their action ids will be 8, 9, 10). `residual` is just the difference between the id and the base.
+  // `base` refers to the starting point that indices start from (e.g. if it's
+  // 7, and there's 3 cards in its group, their action ids will be 8, 9, 10).
+  // `residual` is just the difference between the id and the base.
 
   int residual;
   int target_rank;
@@ -719,11 +701,12 @@ Move::Move(Action action) {
   std::vector<SuitType> opposite_suits;
   action -= kActionOffset;
 
-  // The numbers used in the cases below are just used to divide action ids into groups (e.g. 1-132 are regular
-  // moves, 133-136 are the action ids of moves that move an ace to an empty foundation, etc.)
+  // The numbers used in the cases below are just used to divide action ids into
+  // groups (e.g. 1-132 are regular moves, 133-136 are the action ids of moves
+  // that move an ace to an empty foundation, etc.)
 
   switch (action) {
-    case 1 ... 132 : {
+    case 1 ... 132: {
       // Handles ordinary moves
       target_rank = ((action - 1) / 3) % 11 + 2;
       target_suit = ((action - 1) / 33) + 1;
@@ -738,7 +721,7 @@ Move::Move(Action action) {
       }
       break;
     }
-    case 133 ... 136 : {
+    case 133 ... 136: {
       // Handles ace to empty foundation moves
       target_rank = 0;
       target_suit = action - 132;
@@ -746,7 +729,7 @@ Move::Move(Action action) {
       source_suit = target_suit;
       break;
     }
-    case 137 ... 140 : {
+    case 137 ... 140: {
       // Handles king to empty tableau moves
       target_rank = 0;
       target_suit = 0;
@@ -754,7 +737,7 @@ Move::Move(Action action) {
       source_suit = action - 136;
       break;
     }
-    case 141 ... 144 : {
+    case 141 ... 144: {
       // Handles moves with ace targets
       target_rank = 1;
       target_suit = action - 140;
@@ -762,7 +745,7 @@ Move::Move(Action action) {
       source_suit = target_suit;
       break;
     }
-    case 145 ... 152 : {
+    case 145 ... 152: {
       // Handles moves with king targets
       target_rank = 13;
       target_suit = (action - 143) / 2;
@@ -774,26 +757,26 @@ Move::Move(Action action) {
       source_suit = opposite_suits[residual];
       break;
     }
-    default : {
+    default: {
       SpielFatalError("action provided does not correspond with a move");
     }
   }
 
-  target = Card(false, static_cast<SuitType>(target_suit), static_cast<RankType>(target_rank));
-  source = Card(false, static_cast<SuitType>(source_suit), static_cast<RankType>(source_rank));
+  target = Card(false, static_cast<SuitType>(target_suit),
+                static_cast<RankType>(target_rank));
+  source = Card(false, static_cast<SuitType>(source_suit),
+                static_cast<RankType>(source_rank));
 }
 
-// Getters ---------------------------------------------------------------------------------------------------------
+// Getters
+// -----------------------------------------------------------------------------
 
-Card Move::GetTarget() const {
-  return target;
-}
+Card Move::GetTarget() const { return target; }
 
-Card Move::GetSource() const {
-  return source;
-}
+Card Move::GetSource() const { return source; }
 
-// Other Methods ---------------------------------------------------------------------------------------------------
+// Other Methods
+// -----------------------------------------------------------------------------
 
 Action Move::ActionId() const {
   RankType target_rank = target.GetRank();
@@ -804,21 +787,22 @@ Action Move::ActionId() const {
   int base;
   int residual;
 
-  // `base` refers to the starting point that indices start from (e.g. if it's 7, and there's 3 cards in its
-  // group, their action ids will be 8, 9, 10). `residual` is just the difference between the id and the base.
+  // `base` refers to the starting point that indices start from (e.g. if it's
+  // 7, and there's 3 cards in its group, their action ids will be 8, 9, 10).
+  // `residual` is just the difference between the id and the base.
 
   switch (target_rank) {
-    case kRankNone : {
+    case kRankNone: {
       switch (source_rank) {
-        case kRankA : {
+        case kRankA: {
           base = 132;
           break;
         }
-        case kRankK : {
+        case kRankK: {
           base = 136;
           break;
         }
-        default : {
+        default: {
           base = -999;
           break;
           // SpielFatalError("source.rank has an incorrect value");
@@ -826,11 +810,11 @@ Action Move::ActionId() const {
       }
       return base + source_suit + kActionOffset;
     }
-    case kRankA : {
+    case kRankA: {
       base = 140;
       return base + source_suit + kActionOffset;
     }
-    case kRankK : {
+    case kRankK: {
       base = 144;
       if (source_suit <= 2) {
         residual = -1;
@@ -839,7 +823,7 @@ Action Move::ActionId() const {
       }
       return base + (2 * target_suit) + residual + kActionOffset;
     }
-    default : {
+    default: {
       base = (target_suit - 1) * 33 + (target_rank - 2) * 3;
       if (target_suit == source_suit) {
         residual = 1;
@@ -855,23 +839,25 @@ Action Move::ActionId() const {
 
 std::string Move::ToString(bool colored) const {
   std::string result;
-  absl::StrAppend(&result, target.ToString(colored), " ", kGlyphArrow, " ", source.ToString(colored));
+  absl::StrAppend(&result, target.ToString(colored), " ", kGlyphArrow, " ",
+                  source.ToString(colored));
   return result;
 }
 
 bool Move::operator<(const Move &other_move) const {
   int index = target.GetIndex() * 100 + source.GetIndex();
-  int other_index = other_move.target.GetIndex() * 100 + other_move.source.GetIndex();
+  int other_index =
+      other_move.target.GetIndex() * 100 + other_move.source.GetIndex();
   return index < other_index;
 }
 
 // endregion
 
-// region SolitaireState Methods ===================================================================================
+// region SolitaireState Methods
+// =============================================================================
 
-SolitaireState::SolitaireState(std::shared_ptr<const Game> game) :
-    State(game), waste() {
-
+SolitaireState::SolitaireState(std::shared_ptr<const Game> game)
+    : State(game), waste() {
   // Extract parameters from `game`
   auto parameters = game->GetParameters();
   is_colored = parameters.at("is_colored").bool_value();
@@ -919,12 +905,9 @@ std::unique_ptr<State> SolitaireState::Clone() const {
   return std::unique_ptr<State>(new SolitaireState(*this));
 }
 
-bool SolitaireState::IsTerminal() const {
-  return is_finished;
-}
+bool SolitaireState::IsTerminal() const { return is_finished; }
 
 bool SolitaireState::IsChanceNode() const {
-
   for (const auto &tableau : tableaus) {
     if (!tableau.GetIsEmpty() && tableau.GetLastCard().GetHidden()) {
       return true;
@@ -943,7 +926,6 @@ bool SolitaireState::IsChanceNode() const {
 }
 
 std::string SolitaireState::ToString() const {
-
   std::string result;
 
   absl::StrAppend(&result, "WASTE       : ", waste.ToString(is_colored));
@@ -973,22 +955,23 @@ std::string SolitaireState::ToString() const {
   return result;
 }
 
-std::string SolitaireState::ActionToString(Player player, Action action_id) const {
+std::string SolitaireState::ActionToString(Player player,
+                                           Action action_id) const {
   switch (action_id) {
-    case kEnd : {
+    case kEnd: {
       return "kEnd";
     }
-    case kRevealStart ... kRevealEnd : {
+    case kRevealStart ... kRevealEnd: {
       auto revealed_card = Card(static_cast<int>(action_id));
       std::string result;
       absl::StrAppend(&result, "kReveal", revealed_card.ToString(is_colored));
       return result;
     }
-    case kMoveStart ... kMoveEnd : {
+    case kMoveStart ... kMoveEnd: {
       auto move = Move(action_id);
       return move.ToString(is_colored);
     }
-    default : {
+    default: {
       return "Missing Action";
     }
   }
@@ -1006,7 +989,8 @@ std::string SolitaireState::ObservationString(Player player) const {
   return ToString();
 }
 
-void SolitaireState::ObservationTensor(Player player, std::vector<double> *values) const {
+void SolitaireState::ObservationTensor(Player player,
+                                       std::vector<double> *values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
@@ -1061,14 +1045,13 @@ void SolitaireState::ObservationTensor(Player player, std::vector<double> *value
 }
 
 void SolitaireState::DoApplyAction(Action action) {
-
   switch (action) {
-    case kEnd : {
+    case kEnd: {
       is_finished = true;
       current_rewards = 0;
       break;
     }
-    case kRevealStart ... kRevealEnd : {
+    case kRevealStart ... kRevealEnd: {
       auto revealed_card = Card(static_cast<int>(action));
       bool found_card = false;
 
@@ -1087,9 +1070,10 @@ void SolitaireState::DoApplyAction(Action action) {
       revealed_cards.push_back(action);
       break;
     }
-    case kMoveStart ... kMoveEnd : {
+    case kMoveStart ... kMoveEnd: {
       Move selected_move = Move(action);
-      is_reversible = IsReversible(selected_move.GetSource(), GetPile(selected_move.GetSource()));
+      is_reversible = IsReversible(selected_move.GetSource(),
+                                   GetPile(selected_move.GetSource()));
 
       if (is_reversible) {
         std::string current_observation = ObservationString(0);
@@ -1102,7 +1086,7 @@ void SolitaireState::DoApplyAction(Action action) {
       current_returns += current_rewards;
       break;
     }
-    default : {
+    default: {
     }
   }
 
@@ -1113,12 +1097,14 @@ void SolitaireState::DoApplyAction(Action action) {
 }
 
 std::vector<double> SolitaireState::Returns() const {
-  // Returns the sum of rewards up to and including the most recent state transition.
+  // Returns the sum of rewards up to and including the most recent state
+  // transition.
   return {current_returns};
 }
 
 std::vector<double> SolitaireState::Rewards() const {
-  // Should be the reward for the action that created this state, not the action applied to this state
+  // Should be the reward for the action that created this state, not the action
+  // applied to this state
   return {current_rewards};
 }
 
@@ -1131,7 +1117,8 @@ std::vector<Action> SolitaireState::LegalActions() const {
     std::vector<Action> legal_actions;
 
     if (is_reversible) {
-      // If the state is reversible, we need to check each move to see if it is too.
+      // If the state is reversible, we need to check each move to see if it is
+      // too.
       for (const auto &move : CandidateMoves()) {
         if (IsReversible(move.GetSource(), GetPile(move.GetSource()))) {
           auto action_id = move.ActionId();
@@ -1171,7 +1158,8 @@ std::vector<std::pair<Action, double>> SolitaireState::ChanceOutcomes() const {
   const double p = 1.0 / (52 - revealed_cards.size());
 
   for (int i = 1; i <= 52; i++) {
-    if (std::find(revealed_cards.begin(), revealed_cards.end(), i) == revealed_cards.end()) {
+    if (std::find(revealed_cards.begin(), revealed_cards.end(), i) ==
+        revealed_cards.end()) {
       outcomes.emplace_back(i, p);
     }
   }
@@ -1179,70 +1167,77 @@ std::vector<std::pair<Action, double>> SolitaireState::ChanceOutcomes() const {
   return outcomes;
 }
 
-// Other Methods ---------------------------------------------------------------------------------------------------
+// Other Methods
+// -----------------------------------------------------------------------------
 
-std::vector<Card> SolitaireState::Targets(const std::optional<LocationType> &location) const {
+std::vector<Card> SolitaireState::Targets(
+    const std::optional<LocationType> &location) const {
   LocationType loc = location.value_or(kMissing);
   std::vector<Card> targets;
 
   if (loc == kTableau || loc == kMissing) {
     for (const auto &tableau : tableaus) {
       std::vector<Card> current_targets = tableau.Targets();
-      targets.insert(targets.end(), current_targets.begin(), current_targets.end());
+      targets.insert(targets.end(), current_targets.begin(),
+                     current_targets.end());
     }
   }
 
   if (loc == kFoundation || loc == kMissing) {
     for (const auto &foundation : foundations) {
       std::vector<Card> current_targets = foundation.Targets();
-      targets.insert(targets.end(), current_targets.begin(), current_targets.end());
+      targets.insert(targets.end(), current_targets.begin(),
+                     current_targets.end());
     }
   }
 
   return targets;
 }
 
-std::vector<Card> SolitaireState::Sources(const std::optional<LocationType> &location) const {
+std::vector<Card> SolitaireState::Sources(
+    const std::optional<LocationType> &location) const {
   LocationType loc = location.value_or(kMissing);
   std::vector<Card> sources;
 
   if (loc == kTableau || loc == kMissing) {
     for (const auto &tableau : tableaus) {
       std::vector<Card> current_sources = tableau.Sources();
-      sources.insert(sources.end(), current_sources.begin(), current_sources.end());
+      sources.insert(sources.end(), current_sources.begin(),
+                     current_sources.end());
     }
   }
 
   if (loc == kFoundation || loc == kMissing) {
     for (const auto &foundation : foundations) {
       std::vector<Card> current_sources = foundation.Sources();
-      sources.insert(sources.end(), current_sources.begin(), current_sources.end());
+      sources.insert(sources.end(), current_sources.begin(),
+                     current_sources.end());
     }
   }
 
   if (loc == kWaste || loc == kMissing) {
     std::vector<Card> current_sources = waste.Sources();
-    sources.insert(sources.end(), current_sources.begin(), current_sources.end());
+    sources.insert(sources.end(), current_sources.begin(),
+                   current_sources.end());
   }
 
   return sources;
 }
 
 Pile *SolitaireState::GetPile(const Card &card) const {
-
   PileID pile_id = kPileMissing;
 
   if (card.GetRank() == kRankNone) {
     if (card.GetSuit() == kSuitNone) {
       for (const auto &tableau : tableaus) {
         if (tableau.GetIsEmpty()) {
-          return (Pile *) &tableau;
+          return (Pile *)&tableau;
         }
       }
     } else if (card.GetSuit() != kSuitHidden) {
       for (const auto &foundation : foundations) {
         if (foundation.GetSuit() == card.GetSuit()) {
-          return (Pile *) &foundation;
+          return (Pile *)&foundation;
         }
       }
     } else {
@@ -1253,16 +1248,16 @@ Pile *SolitaireState::GetPile(const Card &card) const {
   }
 
   switch (pile_id) {
-    case kPileWaste : {
-      return (Pile *) &waste;
+    case kPileWaste: {
+      return (Pile *)&waste;
     }
-    case kPileSpades ... kPileDiamonds : {
-      return (Pile *) &foundations.at(pile_id - 1);
+    case kPileSpades ... kPileDiamonds: {
+      return (Pile *)&foundations.at(pile_id - 1);
     }
-    case kPile1stTableau ... kPile7thTableau : {
-      return (Pile *) &tableaus.at(pile_id - 5);
+    case kPile1stTableau ... kPile7thTableau: {
+      return (Pile *)&tableaus.at(pile_id - 5);
     }
-    default : {
+    default: {
       SpielFatalError("The pile containing the card wasn't found");
     }
   }
@@ -1285,16 +1280,18 @@ std::vector<Move> SolitaireState::CandidateMoves() const {
     for (auto &source : target.LegalChildren()) {
       if (std::find(sources.begin(), sources.end(), source) != sources.end()) {
         auto *source_pile = GetPile(source);
-        if (target.GetLocation() == kFoundation && source_pile->GetType() == kTableau) {
+        if (target.GetLocation() == kFoundation &&
+            source_pile->GetType() == kTableau) {
           if (source_pile->GetLastCard() == source) {
             candidate_moves.emplace_back(target, source);
           }
         } else if (source.GetRank() == kRankK &&
-            target.GetSuit() == kSuitNone &&
-            target.GetRank() == kRankNone) {
+                   target.GetSuit() == kSuitNone &&
+                   target.GetRank() == kRankNone) {
           // Check is source is not a bottom
-          if (source_pile->GetType() == kWaste
-              || (source_pile->GetType() == kTableau && !(source_pile->GetFirstCard() == source))) {
+          if (source_pile->GetType() == kWaste ||
+              (source_pile->GetType() == kTableau &&
+               !(source_pile->GetFirstCard() == source))) {
             candidate_moves.emplace_back(target, source);
           }
         } else {
@@ -1335,8 +1332,7 @@ void SolitaireState::MoveCards(const Move &move) {
   }
 
   // Reward for revealing a hidden card
-  if (source_pile->GetType() == kTableau &&
-      !source_pile->GetIsEmpty() &&
+  if (source_pile->GetType() == kTableau && !source_pile->GetIsEmpty() &&
       source_pile->GetLastCard().GetHidden()) {
     move_reward += 20.0;
   }
@@ -1352,24 +1348,24 @@ void SolitaireState::MoveCards(const Move &move) {
 
 bool SolitaireState::IsReversible(const Card &source, Pile *source_pile) const {
   switch (source.GetLocation()) {
-    case kWaste : {
+    case kWaste: {
       return false;
     }
-    case kFoundation : {
+    case kFoundation: {
       return true;
     }
-    case kTableau : {
-      // Move is irreversible if its source is a bottom card or over a hidden card.
-      // Basically if it's the first non-hidden card in the pile/tableau.
-      auto it = std::find_if(
-          source_pile->GetCards().begin(),
-          source_pile->GetCards().end(),
-          [](const Card &card) { return card.GetHidden(); });
+    case kTableau: {
+      // Move is irreversible if its source is a bottom card or over a hidden
+      // card. Basically if it's the first non-hidden card in the pile/tableau.
+      auto it = std::find_if(source_pile->GetCards().begin(),
+                             source_pile->GetCards().end(),
+                             [](const Card &card) { return card.GetHidden(); });
 
       return !(*it == source);
     }
-    default : {
-      // Returns false if the source card is not in the waste, foundations, or tableaus
+    default: {
+      // Returns false if the source card is not in the waste, foundations, or
+      // tableaus
       return false;
     }
   }
@@ -1377,13 +1373,14 @@ bool SolitaireState::IsReversible(const Card &source, Pile *source_pile) const {
 
 // endregion
 
-// region SolitaireGame Methods ====================================================================================
+// region SolitaireGame Methods
+// =============================================================================
 
-SolitaireGame::SolitaireGame(const GameParameters &params) :
-    Game(kGameType, params),
-    num_players_(ParameterValue<int>("players")),
-    depth_limit_(ParameterValue<int>("depth_limit")),
-    is_colored_(ParameterValue<bool>("is_colored")) {
+SolitaireGame::SolitaireGame(const GameParameters &params)
+    : Game(kGameType, params),
+      num_players_(ParameterValue<int>("players")),
+      depth_limit_(ParameterValue<int>("depth_limit")),
+      is_colored_(ParameterValue<bool>("is_colored")) {
   // Nothing here
 }
 
@@ -1396,40 +1393,38 @@ int SolitaireGame::NumDistinctActions() const {
   return 205;
 }
 
-int SolitaireGame::MaxGameLength() const {
-  return depth_limit_;
-}
+int SolitaireGame::MaxGameLength() const { return depth_limit_; }
 
-int SolitaireGame::NumPlayers() const {
-  return 1;
-}
+int SolitaireGame::NumPlayers() const { return 1; }
 
 double SolitaireGame::MinUtility() const {
-  /* Returns start at zero and the only negative rewards come from undoing an action. Undoing an action just takes
-   * away the reward that was gained from the action, so utility can never go below 0. */
+  /* Returns start at zero and the only negative rewards come from undoing an
+   * action. Undoing an action just takes away the reward that was gained from
+   * the action, so utility can never go below 0. */
   return 0.0;
 }
 
 double SolitaireGame::MaxUtility() const {
   /* Waste (24 * 20 = 480)
-      24 cards are in the waste initially. 20 points are rewarded for every one that is moved from the waste.
-     Tableau (21 * 20 = 420)
-       21 cards are hidden in the tableaus initially. 20 points are rewarded for every one that is revealed.
-     Foundation (4 * (100 + 90 + 80 + 70 + 60 + 50 + 40 + 30 + 20 + 10 + 10 + 10 + 10) = 4 * 580 = 2,320)
-       0 cards are in the foundations initially. A varying number of points, based on the cards rank, are awarded
-       when the card is moved to the foundation. Each complete suit in the foundation is worth 580 points.
-       `kFoundationPoints` in `solitaire.h` outlines how much each rank is worth. */
+      24 cards are in the waste initially. 20 points are rewarded for every one
+     that is moved from the waste. Tableau (21 * 20 = 420) 21 cards are hidden
+     in the tableaus initially. 20 points are rewarded for every one that is
+     revealed. Foundation (4 * (100 + 90 + 80 + 70 + 60 + 50 + 40 + 30 + 20 + 10
+     + 10 + 10 + 10) = 4 * 580 = 2,320) 0 cards are in the foundations
+     initially. A varying number of points, based on the cards rank, are awarded
+       when the card is moved to the foundation. Each complete suit in the
+     foundation is worth 580 points. `kFoundationPoints` in `solitaire.h`
+     outlines how much each rank is worth. */
   return 3220.0;
 }
 
 std::vector<int> SolitaireGame::ObservationTensorShape() const {
   /* Waste (24 * 53 = 1,272)
-       24 locations and each location is a 53 element vector (52 normal cards + 1 hidden)
-     Tableau (7 * 59 = 413)
-       Each tableau is represented as a 59 element vector (6 hidden cards + 1 empty tableau + 52 normal cards)
-    Foundation (4 * 14 = 56)
-       Each foundation is represented as a 14 element vector (13 ranks + 1 empty foundation)
-    Total Length = 1,272 + 413 + 56 = 1,741 */
+       24 locations and each location is a 53 element vector (52 normal cards +
+    1 hidden) Tableau (7 * 59 = 413) Each tableau is represented as a 59 element
+    vector (6 hidden cards + 1 empty tableau + 52 normal cards) Foundation (4 *
+    14 = 56) Each foundation is represented as a 14 element vector (13 ranks + 1
+    empty foundation) Total Length = 1,272 + 413 + 56 = 1,741 */
   return {1741};
 }
 
@@ -1443,5 +1438,4 @@ std::shared_ptr<const Game> SolitaireGame::Clone() const {
 
 // endregion
 
-} // namespace open_spiel::solitaire
-
+}  // namespace open_spiel::solitaire
