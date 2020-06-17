@@ -21,6 +21,9 @@ from __future__ import print_function
 from absl.testing import parameterized
 import tensorflow.compat.v1 as tf
 
+# Temporarily disable TF2 behavior until we update the code.
+tf.disable_v2_behavior()
+
 from open_spiel.python import rl_environment
 from open_spiel.python.algorithms import eva
 
