@@ -30,8 +30,10 @@ from __future__ import print_function
 import collections
 import random
 import numpy as np
-import sonnet as snt
 import tensorflow.compat.v1 as tf
+
+# Temporarily disable TF2 behavior until we update the code.
+tf.disable_v2_behavior()
 
 from open_spiel.python import policy
 import pyspiel
@@ -186,9 +188,14 @@ class DeepCFRSolver(policy.Policy):
 
     # Define strategy network, loss & memory.
     self._strategy_memories = FixedSizeRingBuffer(memory_capacity)
-    self._policy_network = snt.nets.MLP(
-        list(policy_network_layers) + [self._num_actions])
-    action_logits = self._policy_network(self._info_state_ph)
+    # self._policy_network = snt.nets.MLP(
+    #    list(policy_network_layers) + [self._num_actions])
+    # action_logits = self._policy_network(self._info_state_ph)
+    self._policy_network = self._info_state_ph
+    for layer_size in policy_network_layers:
+      self._policy_network = tf.layers.dense(self._policy_network, layer_size,
+                                             activation=tf.nn.relu)
+    action_logits = tf.layers.dense(self._policy_network, self._num_actions)
     # Illegal actions are handled in the traversal code where expected payoff
     # and sampled regret is computed from the advantage networks.
     self._action_probs = tf.nn.softmax(action_logits)
@@ -203,14 +210,24 @@ class DeepCFRSolver(policy.Policy):
     self._advantage_memories = [
         FixedSizeRingBuffer(memory_capacity) for _ in range(self._num_players)
     ]
-    self._advantage_networks = [
-        snt.nets.MLP(list(advantage_network_layers) + [self._num_actions])
-        for _ in range(self._num_players)
-    ]
-    self._advantage_outputs = [
-        self._advantage_networks[i](self._info_state_ph)
-        for i in range(self._num_players)
-    ]
+    # self._advantage_networks = [
+    #    snt.nets.MLP(list(advantage_network_layers) + [self._num_actions])
+    #    for _ in range(self._num_players)
+    #]
+    #self._advantage_outputs = [
+    #    self._advantage_networks[i](self._info_state_ph)
+    #    for i in range(self._num_players)
+    #]
+    self._advantage_networks = []
+    # self._advantage_outputs = []
+    with tf.name_scope("adv_nets"):
+      for _ in range(self._num_players):
+        adv_net = self._info_state_ph      
+        for layer_size in advantage_network_layers:
+          adv_net = tf.layers.dense(adv_net, layer_size,
+                                    activation=tf.nn.relu)
+        adv_net = tf.layers.dense(adv_net, self._num_actions)
+        self._advantage_networks.append(adv_net)
     self._loss_advantages = []
     self._optimizer_advantages = []
     self._learn_step_advantages = []
@@ -220,7 +237,7 @@ class DeepCFRSolver(policy.Policy):
               tf.losses.mean_squared_error(
                   labels=tf.math.sqrt(self._iter_ph) * self._advantage_ph[p],
                   predictions=tf.math.sqrt(self._iter_ph) *
-                  self._advantage_outputs[p])))
+                  self._advantage_networks[p])))
       self._optimizer_advantages.append(
           tf.train.AdamOptimizer(learning_rate=learning_rate))
       self._learn_step_advantages.append(self._optimizer_advantages[p].minimize(
@@ -239,9 +256,11 @@ class DeepCFRSolver(policy.Policy):
       self._advantage_memories[p].clear()
 
   def reinitialize_advantage_networks(self):
-    for p in range(self._num_players):
-      for key in self._advantage_networks[p].initializers:
-        self._advantage_networks[p].initializers[key]()
+    self._adv_net_variables = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES,
+                                                scope="adv_nets")
+    initializers = tf.group(
+        *[var.initializer for var in self._adv_net_variables])
+    self._session.run(initializers)
 
   def solve(self):
     """Solution logic for Deep CFR."""
@@ -321,7 +340,7 @@ class DeepCFRSolver(policy.Policy):
     info_state = state.information_state_tensor(player)
     legal_actions = state.legal_actions(player)
     advantages = self._session.run(
-        self._advantage_outputs[player],
+        self._advantage_networks[player],
         feed_dict={self._info_state_ph: np.expand_dims(info_state, axis=0)})[0]
     advantages = [max(0., advantage) for advantage in advantages]
     cumulative_regret = np.sum([advantages[action] for action in legal_actions])
