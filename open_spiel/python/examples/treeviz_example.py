@@ -30,8 +30,8 @@ flags.DEFINE_string("game", "kuhn_poker", "Name of the game")
 flags.DEFINE_string("out", "/tmp/gametree.png", "Name of output file, e.g., "
                     "[*.png|*.pdf].")
 flags.DEFINE_enum("prog", "dot", ["dot", "neato", "circo"], "Graphviz layout.")
-flags.DEFINE_boolean("group_infosets", False, "Wether to group infosets.")
-flags.DEFINE_boolean("group_terminal", False, "Wether to group terminal nodes.")
+flags.DEFINE_boolean("group_infosets", False, "Whether to group infosets.")
+flags.DEFINE_boolean("group_terminal", False, "Whether to group terminal nodes.")
 flags.DEFINE_boolean("verbose", False, "Wether to print verbose output.")
 
 
