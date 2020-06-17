@@ -297,9 +297,12 @@ class DeepCFRSolver(policy.Policy):
         sampled_regret[action] = expected_payoff[action]
         for a_ in state.legal_actions():
           sampled_regret[action] -= strategy[a_] * expected_payoff[a_]
+      sampled_regret_arr = [0] * self._num_actions
+      for action in sampled_regret:
+        sampled_regret_arr[action] = sampled_regret[action]
       self._advantage_memories[player].add(
           AdvantageMemory(state.information_state_tensor(), self._iteration,
-                          [r for _,r in sorted(sampled_regret.items())], action))
+                          sampled_regret_arr, action))
       return max(expected_payoff.values())
     else:
       other_player = state.current_player()
