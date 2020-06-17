@@ -32,7 +32,7 @@ FLAGS = flags.FLAGS
 
 flags.DEFINE_integer("num_episodes", int(1e6), "Number of train episodes.")
 flags.DEFINE_integer("eval_every", int(1e4), "Eval agents every x episodes.")
-flags.DEFINE_enum("loss_str", "rpg", ["rpg", "qpg", "rm"], "PG loss to use.")
+flags.DEFINE_enum("loss_str", "rpg", ["a2c", "rpg", "qpg", "rm"], "PG loss to use.")
 
 
 class PolicyGradientPolicies(policy.Policy):
