@@ -126,7 +126,9 @@ class DeepCFRSolver(policy.Policy):
                learning_rate=1e-4,
                batch_size_advantage=None,
                batch_size_strategy=None,
-               memory_capacity=int(1e6)):
+               memory_capacity=int(1e6),
+               policy_network_epochs=1,
+               advantage_network_epochs=1):
     """Initialize the Deep CFR algorithm.
 
     Args:
@@ -152,6 +154,8 @@ class DeepCFRSolver(policy.Policy):
     self._session = session
     self._batch_size_advantage = batch_size_advantage
     self._batch_size_strategy = batch_size_strategy
+    self._policy_network_epochs = policy_network_epochs
+    self._advantage_network_epochs = advantage_network_epochs
     self._num_players = game.num_players()
     self._root_node = self._game.new_initial_state()
     # TODO(author6) Allow embedding size (and network) to be specified.
@@ -240,8 +244,11 @@ class DeepCFRSolver(policy.Policy):
 
   def reinitialize_advantage_networks(self):
     for p in range(self._num_players):
-      for key in self._advantage_networks[p].initializers:
-        self._advantage_networks[p].initializers[key]()
+      self.reinitialize_advantage_network(p)
+
+  def reinitialize_advantage_network(self, player):
+    for key in self._advantage_networks[player].initializers:
+      self._advantage_networks[player].initializers[key]()
 
   def solve(self):
     """Solution logic for Deep CFR."""
@@ -250,8 +257,8 @@ class DeepCFRSolver(policy.Policy):
       for p in range(self._num_players):
         for _ in range(self._num_traversals):
           self._traverse_game_tree(self._root_node, p)
-        self.reinitialize_advantage_networks()
-        # Re-initialize advantage networks and train from scratch.
+        self.reinitialize_advantage_network(p)
+        # Re-initialize advantage network for player and train from scratch.
         advantage_losses[p].append(self._learn_advantage_network(p))
       self._iteration += 1
     # Train policy network.
@@ -290,9 +297,9 @@ class DeepCFRSolver(policy.Policy):
         sampled_regret[action] = expected_payoff[action]
         for a_ in state.legal_actions():
           sampled_regret[action] -= strategy[a_] * expected_payoff[a_]
-        self._advantage_memories[player].add(
-            AdvantageMemory(state.information_state_tensor(), self._iteration,
-                            advantages, action))
+      self._advantage_memories[player].add(
+          AdvantageMemory(state.information_state_tensor(), self._iteration,
+                          [r for _,r in sorted(sampled_regret.items())], action))
       return max(expected_payoff.values())
     else:
       other_player = state.current_player()
@@ -356,28 +363,33 @@ class DeepCFRSolver(policy.Policy):
     Returns:
       The average loss over the advantage network.
     """
-    if self._batch_size_advantage:
-      samples = self._advantage_memories[player].sample(
-          self._batch_size_advantage)
-    else:
-      samples = self._advantage_memories[player]
-    info_states = []
-    advantages = []
-    iterations = []
-    for s in samples:
-      info_states.append(s.info_state)
-      advantages.append(s.advantage)
-      iterations.append([s.iteration])
-    # Ensure some samples have been gathered.
-    if not info_states:
-      return None
-    loss_advantages, _ = self._session.run(
-        [self._loss_advantages[player], self._learn_step_advantages[player]],
-        feed_dict={
-            self._info_state_ph: np.array(info_states),
-            self._advantage_ph[player]: np.array(advantages),
-            self._iter_ph: np.array(iterations),
-        })
+    for _ in range(self._advantage_network_epochs):
+      if self._batch_size_advantage:
+        if self._batch_size_advantage > len(self._advantage_memories[player]):
+          ## Skip if there aren't enough samples
+          return None
+        samples = self._advantage_memories[player].sample(
+            self._batch_size_advantage)
+      else:
+        samples = self._advantage_memories[player]
+      info_states = []
+      advantages = []
+      iterations = []
+      for s in samples:
+        info_states.append(s.info_state)
+        advantages.append(s.advantage)
+        iterations.append([s.iteration])
+      # Ensure some samples have been gathered.
+      if not info_states:
+        return None
+
+      loss_advantages, _ = self._session.run(
+          [self._loss_advantages[player], self._learn_step_advantages[player]],
+          feed_dict={
+              self._info_state_ph: np.array(info_states),
+              self._advantage_ph[player]: np.array(advantages),
+              self._iter_ph: np.array(iterations),
+          })
     return loss_advantages
 
   def _learn_strategy_network(self):
@@ -386,22 +398,27 @@ class DeepCFRSolver(policy.Policy):
     Returns:
       The average loss obtained on this batch of transitions or `None`.
     """
-    if self._batch_size_strategy:
-      samples = self._strategy_memories.sample(self._batch_size_strategy)
-    else:
-      samples = self._strategy_memories
-    info_states = []
-    action_probs = []
-    iterations = []
-    for s in samples:
-      info_states.append(s.info_state)
-      action_probs.append(s.strategy_action_probs)
-      iterations.append([s.iteration])
-    loss_strategy, _ = self._session.run(
-        [self._loss_policy, self._learn_step_policy],
-        feed_dict={
-            self._info_state_ph: np.array(info_states),
-            self._action_probs_ph: np.array(np.squeeze(action_probs)),
-            self._iter_ph: np.array(iterations),
-        })
+    for k in range(self._policy_network_epochs):
+      if self._batch_size_strategy:
+        if self._batch_size_strategy > len(self._strategy_memories):
+          ## Skip if there aren't enough samples
+          return None
+        samples = self._strategy_memories.sample(self._batch_size_strategy)
+      else:
+        samples = self._strategy_memories
+      info_states = []
+      action_probs = []
+      iterations = []
+      for s in samples:
+        info_states.append(s.info_state)
+        action_probs.append(s.strategy_action_probs)
+        iterations.append([s.iteration])
+
+      loss_strategy, _ = self._session.run(
+          [self._loss_policy, self._learn_step_policy],
+          feed_dict={
+              self._info_state_ph: np.array(info_states),
+              self._action_probs_ph: np.array(np.squeeze(action_probs)),
+              self._iter_ph: np.array(iterations),
+          })
     return loss_strategy
