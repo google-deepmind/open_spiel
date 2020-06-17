@@ -188,9 +188,6 @@ class DeepCFRSolver(policy.Policy):
 
     # Define strategy network, loss & memory.
     self._strategy_memories = FixedSizeRingBuffer(memory_capacity)
-    # self._policy_network = snt.nets.MLP(
-    #    list(policy_network_layers) + [self._num_actions])
-    # action_logits = self._policy_network(self._info_state_ph)
     self._policy_network = self._info_state_ph
     for layer_size in policy_network_layers:
       self._policy_network = tf.layers.dense(self._policy_network, layer_size,
@@ -210,14 +207,6 @@ class DeepCFRSolver(policy.Policy):
     self._advantage_memories = [
         FixedSizeRingBuffer(memory_capacity) for _ in range(self._num_players)
     ]
-    # self._advantage_networks = [
-    #    snt.nets.MLP(list(advantage_network_layers) + [self._num_actions])
-    #    for _ in range(self._num_players)
-    #]
-    #self._advantage_outputs = [
-    #    self._advantage_networks[i](self._info_state_ph)
-    #    for i in range(self._num_players)
-    #]
     self._advantage_networks = []
     # self._advantage_outputs = []
     with tf.name_scope("adv_nets"):
