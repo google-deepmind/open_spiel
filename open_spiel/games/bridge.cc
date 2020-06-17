@@ -21,6 +21,7 @@
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_format.h"
 #include "open_spiel/abseil-cpp/absl/strings/string_view.h"
+#include "open_spiel/abseil-cpp/absl/synchronization/mutex.h"
 #include "open_spiel/games/bridge/double_dummy_solver/include/dll.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/games/bridge/bridge_scoring.h"
@@ -436,8 +437,11 @@ void BridgeState::SetDoubleDummyResults(ddTableResults double_dummy_results) {
   ComputeScoreByContract();
 }
 
+ABSL_CONST_INIT absl::Mutex dds_mutex(absl::kConstInit);
+
 void BridgeState::ComputeDoubleDummyTricks() {
   if (!double_dummy_results_.has_value()) {
+    absl::MutexLock lock(&dds_mutex);  // TODO(author11) Make DDS code thread-safe
     double_dummy_results_ = ddTableResults{};
     ddTableDeal dd_table_deal{};
     for (int suit = 0; suit < kNumSuits; ++suit) {
