@@ -27,6 +27,8 @@ import tensorflow.compat.v1 as tf
 tf.disable_v2_behavior()
 
 from open_spiel.python import rl_agent
+from open_spiel.python import simple_nets
+
 
 Transition = collections.namedtuple(
     "Transition",
@@ -168,25 +170,33 @@ class DQN(rl_agent.AbstractAgent):
         dtype=tf.float32,
         name="legal_actions_mask_ph")
 
-    self._q_network = self._info_state_ph
-    with tf.name_scope("q_network"):
-      for layer_size in self._layer_sizes:
-        self._q_network = tf.layers.dense(self._q_network, layer_size,
-                                          activation=tf.nn.relu)
-      self._q_values = tf.layers.dense(self._q_network, num_actions)
+    #self._q_network = self._info_state_ph
+    #with tf.name_scope("q_network"):
+    #  for layer_size in self._layer_sizes:
+    #    self._q_network = tf.layers.dense(self._q_network, layer_size,
+    #                                      activation=tf.nn.relu)
+    # self._q_values = tf.layers.dense(self._q_network, num_actions)
+    self._q_network = simple_nets.MLP(state_representation_size,
+                                      self._layer_sizes,
+                                      num_actions)
+    self._q_values = self._q_network(self._info_state_ph)
   
-    self._target_q_network = self._next_info_state_ph
-    with tf.name_scope("target_net"):
-      for layer_size in self._layer_sizes:
-        self._target_q_network = tf.layers.dense(
-            self._target_q_network, layer_size, activation=tf.nn.relu)
-      self._target_q_values = tf.layers.dense(self._target_q_network, num_actions)
+    # self._target_q_network = self._next_info_state_ph
+    # with tf.name_scope("target_net"):
+    #   for layer_size in self._layer_sizes:
+    #    self._target_q_network = tf.layers.dense(
+    #        self._target_q_network, layer_size, activation=tf.nn.relu)
+    #  self._target_q_values = tf.layers.dense(self._target_q_network, num_actions)
+    self._target_q_network = simple_nets.MLP(state_representation_size,
+                                             self._layer_sizes,
+                                             num_actions)
+    self._target_q_values = self._target_q_network(self._info_state_ph)
 
     # Stop gradient to prevent updates to the target network while learning
     self._target_q_values = tf.stop_gradient(self._target_q_values)
 
     self._update_target_network = self._create_target_network_update_op(
-        "q_network", "target_net")
+        self._q_network, self._target_q_network)
 
     # Create the loss operations.
     # Sum a large negative constant to illegal action logits before taking the
@@ -298,22 +308,21 @@ class DQN(rl_agent.AbstractAgent):
         legal_actions_mask=legal_actions_mask)
     self._replay_buffer.add(transition)
 
-  def _create_target_network_update_op(self, q_network_scope,
-                                       target_q_network_scope):
+  def _create_target_network_update_op(self, q_network, target_q_network):
     """Create TF ops copying the params of the Q-network to the target network.
 
     Args:
-      q_network_scope: Tensorflow op name scope for q-values.
-                       Values are copied from these variables.
-      target_q_network: Tensorflow op. Values are copied to this network.
+      q_network: A q-network object that implements provides the `variables`
+                 property representing the TF variable list.
+      target_q_network: A target q-net object that provides the `variables`
+                        property representing the TF variable list.
 
     Returns:
       A `tf.Operation` that updates the variables of the target.
     """
-    self._variables = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES,
-                                        scope=q_network_scope)
-    self._target_variables = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES,
-                                               scope=target_q_network_scope)
+    self._variables = q_network.variables[:]
+    self._target_variables = target_q_network.variables[:]
+    # assert len(self._variables) > 0
     return tf.group([
         tf.assign(target_v, v)
         for (target_v, v) in zip(self._target_variables, self._variables)
