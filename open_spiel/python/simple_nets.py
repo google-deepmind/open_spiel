@@ -64,3 +64,19 @@ class MLP(tf.Module):
     for layer in self._layers:
       x = layer(x)
     return x
+
+
+class MLPTorso(tf.Module):
+  def __init__(self, input_size, hidden_sizes, name=None):
+    super(MLPTorso, self).__init__(name=name)    
+    self._layers = []
+    with self.name_scope:
+      for size in hidden_sizes:
+        self._layers.append(Dense(in_size=input_size, out_size=size))
+        input_size = size
+
+  @tf.Module.with_name_scope
+  def __call__(self, x):
+    for layer in self._layers:
+      x = layer(x)
+    return x
