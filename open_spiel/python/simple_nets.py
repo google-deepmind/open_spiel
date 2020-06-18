@@ -18,6 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import math
 import tensorflow.compat.v1 as tf
 
 # Temporarily disable TF2 behavior until code is updated.
@@ -27,16 +28,21 @@ tf.disable_v2_behavior()
 # https://www.tensorflow.org/versions/r1.15/api_docs/python/tf/Module
 
 class Dense(tf.Module):
-   def __init__(self, in_size, out_size, activate_relu=True, name=None):
-     super(Dense, self).__init__(name=name)
-     self._activate_relu = activate_relu
-     self._weights = tf.Variable(
-         tf.random.normal([in_size, out_size]), name="weights")
-     self._bias = tf.Variable(tf.zeros([out_size]), name="bias")
+  def __init__(self, in_size, out_size, activate_relu=True, name=None):
+    super(Dense, self).__init__(name=name)
+    self._activate_relu = activate_relu
+    # Weight initialization inspired by Sonnet's Linear layer, 
+    # which cites https://arxiv.org/abs/1502.03167v3
+    stddev = 1 / math.sqrt(in_size)
+    self._weights = tf.Variable(
+        tf.random.truncated_normal([in_size, out_size],
+                                   mean=0.0, stddev=stddev),
+        name="weights")
+    self._bias = tf.Variable(tf.zeros([out_size]), name="bias")
 
-   def __call__(self, tensor):
-     y = tf.matmul(tensor, self._weights) + self._bias
-     return tf.nn.relu(y) if self._activate_relu else y
+  def __call__(self, tensor):
+    y = tf.matmul(tensor, self._weights) + self._bias
+    return tf.nn.relu(y) if self._activate_relu else y
 
 
 class MLP(tf.Module):
