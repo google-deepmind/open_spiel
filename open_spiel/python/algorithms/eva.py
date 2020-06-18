@@ -36,6 +36,7 @@ import tensorflow.compat.v1 as tf
 tf.disable_v2_behavior()
 
 from open_spiel.python import rl_agent
+from open_spiel.python import simple_nets
 from open_spiel.python.algorithms import dqn
 
 MEM_KEY_NAME = "embedding"
@@ -156,11 +157,10 @@ class EVAAgent(object):
         shape=[None, self._info_state_size],
         dtype=tf.float32,
         name="info_state_ph")
-    self._embedding_network = self._info_state_ph
-    for layer_size in list(embedding_network_layers):
-      self._embedding_network = tf.layers.dense(
-          self._embedding_network, layer_size, activation=tf.nn.relu)
-    self._embedding = tf.layers.dense(self._embedding_network, embedding_size)
+    self._embedding_network = simple_nets.MLP(self._info_state_size,
+                                              list(embedding_network_layers),
+                                              embedding_size)                                              
+    self._embedding = self._embedding_network(self._info_state_ph)
 
     # The DQN agent requires this be an integer.
     if not isinstance(memory_capacity, int):
