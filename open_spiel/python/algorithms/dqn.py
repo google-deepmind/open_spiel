@@ -170,27 +170,15 @@ class DQN(rl_agent.AbstractAgent):
         dtype=tf.float32,
         name="legal_actions_mask_ph")
 
-    #self._q_network = self._info_state_ph
-    #with tf.name_scope("q_network"):
-    #  for layer_size in self._layer_sizes:
-    #    self._q_network = tf.layers.dense(self._q_network, layer_size,
-    #                                      activation=tf.nn.relu)
-    # self._q_values = tf.layers.dense(self._q_network, num_actions)
     self._q_network = simple_nets.MLP(state_representation_size,
                                       self._layer_sizes,
                                       num_actions)
     self._q_values = self._q_network(self._info_state_ph)
   
-    # self._target_q_network = self._next_info_state_ph
-    # with tf.name_scope("target_net"):
-    #   for layer_size in self._layer_sizes:
-    #    self._target_q_network = tf.layers.dense(
-    #        self._target_q_network, layer_size, activation=tf.nn.relu)
-    #  self._target_q_values = tf.layers.dense(self._target_q_network, num_actions)
     self._target_q_network = simple_nets.MLP(state_representation_size,
                                              self._layer_sizes,
                                              num_actions)
-    self._target_q_values = self._target_q_network(self._info_state_ph)
+    self._target_q_values = self._target_q_network(self._next_info_state_ph)
 
     # Stop gradient to prevent updates to the target network while learning
     self._target_q_values = tf.stop_gradient(self._target_q_values)
