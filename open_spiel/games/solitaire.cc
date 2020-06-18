@@ -28,8 +28,7 @@ std::shared_ptr<const Game> Factory(const GameParameters &params) {
 REGISTER_SPIEL_GAME(kGameType, Factory)
 }  // namespace
 
-// region Miscellaneous
-// =============================================================================
+// Miscellaneous ===============================================================
 
 std::vector<SuitType> GetOppositeSuits(const SuitType &suit) {
   /* Just returns a vector of the suits of opposite color. For red suits
@@ -125,10 +124,7 @@ int GetMaxSize(LocationType location) {
 
 std::hash<std::string> hasher;
 
-// endregion
-
-// region Card Methods
-// =============================================================================
+// Card Methods ================================================================
 
 Card::Card(bool hidden, SuitType suit, RankType rank, LocationType location)
     : hidden(hidden), suit(suit), rank(rank), location(location) {}
@@ -178,7 +174,6 @@ Card::Card(int index, bool hidden, LocationType location)
 }
 
 // Getters
-// -----------------------------------------------------------------------------
 
 RankType Card::GetRank() const { return rank; }
 
@@ -196,7 +191,6 @@ int Card::GetIndex() const {
 }
 
 // Setters
-// -----------------------------------------------------------------------------
 
 void Card::SetRank(RankType new_rank) { rank = new_rank; }
 
@@ -207,7 +201,6 @@ void Card::SetLocation(LocationType new_location) { location = new_location; }
 void Card::SetHidden(bool new_hidden) { hidden = new_hidden; }
 
 // Other Methods
-// -----------------------------------------------------------------------------
 
 std::string Card::ToString(bool colored) const {
   std::string result;
@@ -338,10 +331,7 @@ bool Card::operator<(const Card &other_card) const {
   }
 }
 
-// endregion
-
-// region Pile Methods
-// =============================================================================
+// Pile Methods ================================================================
 
 Pile::Pile(LocationType type, PileID id, SuitType suit)
     : type(type), id(id), suit(suit), max_size(GetMaxSize(type)) {
@@ -349,7 +339,6 @@ Pile::Pile(LocationType type, PileID id, SuitType suit)
 }
 
 // Getters/Setters
-// -----------------------------------------------------------------------------
 
 bool Pile::GetIsEmpty() const { return cards.empty(); }
 
@@ -369,8 +358,7 @@ void Pile::SetCards(std::vector<Card> new_cards) {
   cards = std::move(new_cards);
 }
 
-//  Other Methods
-//  ----------------------------------------------------------------------------
+// Other Methods
 
 std::vector<Card> Pile::Targets() const {
   switch (type) {
@@ -516,10 +504,7 @@ std::string Pile::ToString(bool colored) const {
   return result;
 }
 
-// endregion
-
-// region Tableau Methods
-// =============================================================================
+// Tableau Methods =============================================================
 
 Tableau::Tableau(PileID id) : Pile(kTableau, id, kSuitNone) {}
 
@@ -577,10 +562,7 @@ void Tableau::Reveal(Card card_to_reveal) {
   cards.back().SetHidden(false);
 }
 
-// endregion
-
-// region Foundation Methods
-// =============================================================================
+// Foundation Methods ==========================================================
 
 Foundation::Foundation(PileID id, SuitType suit)
     : Pile(kFoundation, id, suit) {}
@@ -613,10 +595,7 @@ std::vector<Card> Foundation::Split(Card card) {
   return split_cards;
 }
 
-// endregion
-
-// region Waste Methods
-// =============================================================================
+// Waste Methods ===============================================================
 
 Waste::Waste() : Pile(kWaste, kPileWaste, kSuitNone) {}
 
@@ -671,10 +650,7 @@ void Waste::Reveal(Card card_to_reveal) {
   }
 }
 
-// endregion
-
-// region Move Methods
-// =============================================================================
+// Move Methods ================================================================
 
 Move::Move(Card target_card, Card source_card) {
   target = target_card;
@@ -769,14 +745,12 @@ Move::Move(Action action) {
 }
 
 // Getters
-// -----------------------------------------------------------------------------
 
 Card Move::GetTarget() const { return target; }
 
 Card Move::GetSource() const { return source; }
 
 // Other Methods
-// -----------------------------------------------------------------------------
 
 Action Move::ActionId() const {
   RankType target_rank = target.GetRank();
@@ -851,10 +825,7 @@ bool Move::operator<(const Move &other_move) const {
   return index < other_index;
 }
 
-// endregion
-
-// region SolitaireState Methods
-// =============================================================================
+// SolitaireState Methods ======================================================
 
 SolitaireState::SolitaireState(std::shared_ptr<const Game> game)
     : State(game), waste() {
@@ -1168,10 +1139,9 @@ std::vector<std::pair<Action, double>> SolitaireState::ChanceOutcomes() const {
 }
 
 // Other Methods
-// -----------------------------------------------------------------------------
 
 std::vector<Card> SolitaireState::Targets(
-    const std::optional<LocationType> &location) const {
+    const absl::optional<LocationType> &location) const {
   LocationType loc = location.value_or(kMissing);
   std::vector<Card> targets;
 
@@ -1195,7 +1165,7 @@ std::vector<Card> SolitaireState::Targets(
 }
 
 std::vector<Card> SolitaireState::Sources(
-    const std::optional<LocationType> &location) const {
+    const absl::optional<LocationType> &location) const {
   LocationType loc = location.value_or(kMissing);
   std::vector<Card> sources;
 
@@ -1371,18 +1341,13 @@ bool SolitaireState::IsReversible(const Card &source, Pile *source_pile) const {
   }
 }
 
-// endregion
-
-// region SolitaireGame Methods
-// =============================================================================
+// SolitaireGame Methods =======================================================
 
 SolitaireGame::SolitaireGame(const GameParameters &params)
     : Game(kGameType, params),
       num_players_(ParameterValue<int>("players")),
       depth_limit_(ParameterValue<int>("depth_limit")),
-      is_colored_(ParameterValue<bool>("is_colored")) {
-  // Nothing here
-}
+      is_colored_(ParameterValue<bool>("is_colored")) {}
 
 int SolitaireGame::NumDistinctActions() const {
   /* 52 kReveal Moves (one for each ordinary card)
@@ -1435,7 +1400,5 @@ std::unique_ptr<State> SolitaireGame::NewInitialState() const {
 std::shared_ptr<const Game> SolitaireGame::Clone() const {
   return std::shared_ptr<const Game>(new SolitaireGame(*this));
 }
-
-// endregion
 
 }  // namespace open_spiel::solitaire

@@ -5,7 +5,6 @@
 #include <array>
 #include <deque>
 #include <memory>
-#include <optional>
 #include <set>
 #include <string>
 #include <tuple>
@@ -14,6 +13,7 @@
 #include <vector>
 
 #include "open_spiel/spiel.h"
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
 
 // An implementation of klondike solitaire:
 // https://en.wikipedia.org/wiki/Klondike_(solitaire) More specifically, it is
@@ -40,15 +40,13 @@ inline constexpr const char *kGlyphArrow = "\U00002190";
 
 namespace open_spiel::solitaire {
 
-// Default Game Parameters
-// =============================================================================
+// Default Game Parameters =====================================================
 
 inline constexpr int kDefaultPlayers = 1;
 inline constexpr int kDefaultDepthLimit = 150;
-inline constexpr bool kDefaultIsColored = true;
+inline constexpr bool kDefaultIsColored = false;
 
-// Enumerations
-// =============================================================================
+// Enumerations ================================================================
 
 enum SuitType {
   kSuitNone = 0,
@@ -98,8 +96,7 @@ enum PileID {
   kPileMissing = 12
 };
 
-// Constants
-// =============================================================================
+// Constants ===================================================================
 
 inline constexpr int kNumRanks = 13;
 
@@ -197,28 +194,24 @@ const std::map<int, PileID> kIntToPile = {
     // endregion
 };
 
-// Support Classes
-// =============================================================================
+// Support Classes =============================================================
 
 class Card {
  private:
   RankType rank = kRankHidden;  // Indicates the rank of the card
   SuitType suit = kSuitHidden;  // Indicates the suit of the card
-  LocationType location =
-      kMissing;             // Indicates the type of pile the card is in
+  LocationType location = kMissing; // Indicates the type of pile the card is in
   bool hidden = false;      // Indicates whether the card is hidden or not
   int index = kHiddenCard;  // Identifies the card with an integer
 
  public:
   // Constructors
-  // ===========================================================================
   explicit Card(bool hidden = false, SuitType suit = kSuitHidden,
                 RankType rank = kRankHidden, LocationType location = kMissing);
   explicit Card(int index, bool hidden = false,
                 LocationType location = kMissing);
 
   // Getters
-  // ===========================================================================
   RankType GetRank() const;
   SuitType GetSuit() const;
   LocationType GetLocation() const;
@@ -226,20 +219,16 @@ class Card {
   int GetIndex() const;
 
   // Setters
-  // ===========================================================================
   void SetRank(RankType new_rank);
   void SetSuit(SuitType new_suit);
   void SetLocation(LocationType new_location);
   void SetHidden(bool new_hidden);
 
   // Operators
-  // ===========================================================================
-
   bool operator==(const Card &other_card) const;
   bool operator<(const Card &other_card) const;
 
   // Other Methods
-  // ===========================================================================
   std::string ToString(bool colored = true) const;
   std::vector<Card> LegalChildren() const;
 };
@@ -254,15 +243,12 @@ class Pile {
 
  public:
   // Constructor
-  // ===========================================================================
   Pile(LocationType type, PileID id, SuitType suit = kSuitNone);
 
   // Destructor
-  // ===========================================================================
   virtual ~Pile() = default;
 
   // Getters/Setters
-  // ===========================================================================
   bool GetIsEmpty() const;
   SuitType GetSuit() const;
   LocationType GetType() const;
@@ -273,7 +259,6 @@ class Pile {
   void SetCards(std::vector<Card> new_cards);
 
   // Other Methods
-  // ===========================================================================
   virtual std::vector<Card> Sources() const;
   virtual std::vector<Card> Targets() const;
   virtual std::vector<Card> Split(Card card);
@@ -285,11 +270,9 @@ class Pile {
 class Tableau : public Pile {
  public:
   // Constructor
-  // ===========================================================================
   explicit Tableau(PileID id);
 
   // Other Methods
-  // ===========================================================================
   std::vector<Card> Sources() const override;
   std::vector<Card> Targets() const override;
   std::vector<Card> Split(Card card) override;
@@ -299,11 +282,9 @@ class Tableau : public Pile {
 class Foundation : public Pile {
  public:
   // Constructor
-  // ===========================================================================
   Foundation(PileID id, SuitType suit);
 
   // Other Methods
-  // ===========================================================================
   std::vector<Card> Sources() const override;
   std::vector<Card> Targets() const override;
   std::vector<Card> Split(Card card) override;
@@ -312,11 +293,9 @@ class Foundation : public Pile {
 class Waste : public Pile {
  public:
   // Constructor
-  // ===========================================================================
   Waste();
 
   // Other Methods
-  // ===========================================================================
   std::vector<Card> Sources() const override;
   std::vector<Card> Targets() const override;
   std::vector<Card> Split(Card card) override;
@@ -330,14 +309,12 @@ class Move {
 
  public:
   // Constructors
-  // ===========================================================================
   Move(Card target_card, Card source_card);
   Move(RankType target_rank, SuitType target_suit, RankType source_rank,
        SuitType source_suit);
   explicit Move(Action action);
 
   // Getters
-  // ===========================================================================
   Card GetTarget() const;
   Card GetSource() const;
 
@@ -348,21 +325,16 @@ class Move {
   Action ActionId() const;
 };
 
-// OpenSpiel Classes
-// =============================================================================
+// OpenSpiel Classes ===========================================================
 
 class SolitaireGame;
 
 class SolitaireState : public State {
  public:
   // Constructors
-  // ===========================================================================
-
   explicit SolitaireState(std::shared_ptr<const Game> game);
 
   // Overridden Methods
-  // ===========================================================================
-
   Player CurrentPlayer() const override;
   std::unique_ptr<State> Clone() const override;
   bool IsTerminal() const override;
@@ -380,12 +352,10 @@ class SolitaireState : public State {
   std::vector<std::pair<Action, double>> ChanceOutcomes() const override;
 
   // Other Methods
-  // ===========================================================================
-
   std::vector<Card> Targets(
-      const std::optional<LocationType> &location = kMissing) const;
+      const absl::optional<LocationType> &location = kMissing) const;
   std::vector<Card> Sources(
-      const std::optional<LocationType> &location = kMissing) const;
+      const absl::optional<LocationType> &location = kMissing) const;
   std::vector<Move> CandidateMoves() const;
   Pile *GetPile(const Card &card) const;
   void MoveCards(const Move &move);
@@ -415,13 +385,9 @@ class SolitaireState : public State {
 class SolitaireGame : public Game {
  public:
   // Constructor
-  // ===========================================================================
-
   explicit SolitaireGame(const GameParameters &params);
 
   // Overridden Methods
-  // ===========================================================================
-
   int NumDistinctActions() const override;
   int MaxGameLength() const override;
   int NumPlayers() const override;
