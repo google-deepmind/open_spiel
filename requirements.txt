@@ -2,7 +2,6 @@
 pip >= 20.0.2
 absl-py == 0.9.0
 tensorflow >= 1.15.1
-dm-sonnet == 1.32
 IPython == 5.8.0
 tensorflow-probability < 0.8.0, >= 0.7.0
 cvxopt >= 1.2.3
