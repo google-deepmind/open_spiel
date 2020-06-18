@@ -32,6 +32,7 @@ import tensorflow.compat.v1 as tf
 tf.disable_v2_behavior()
 
 from open_spiel.python import rl_agent
+from open_spiel.python import simple_nets
 from open_spiel.python.algorithms import dqn
 
 Transition = collections.namedtuple(
@@ -110,11 +111,10 @@ class NFSP(rl_agent.AbstractAgent):
         name="legal_actions_mask_ph")
 
     # Average policy network.
-    self._avg_network = self._info_state_ph
-    for layer_size in self._layer_sizes:
-      self._avg_network = tf.layers.dense(self._avg_network, layer_size,
-                                          activation=tf.nn.relu)
-    self._avg_policy = tf.layers.dense(self._avg_network, num_actions)
+    self._avg_network = simple_nets.MLP(state_representation_size,
+                                        self._layer_sizes,
+                                        num_actions)
+    self._avg_policy = self._avg_network(self._info_state_ph)
     self._avg_policy_probs = tf.nn.softmax(self._avg_policy)
 
     # Loss

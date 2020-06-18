@@ -322,7 +322,8 @@ class DQN(rl_agent.AbstractAgent):
     """
     self._variables = q_network.variables[:]
     self._target_variables = target_q_network.variables[:]
-    # assert len(self._variables) > 0
+    assert len(self._variables) > 0
+    assert len(self._variables) == len(self._target_variables)
     return tf.group([
         tf.assign(target_v, v)
         for (target_v, v) in zip(self._target_variables, self._variables)
