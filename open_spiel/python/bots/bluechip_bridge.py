@@ -217,8 +217,7 @@ class BlueChipBridgeBot(pyspiel.Bot):
     self.cards_played = 0
     self._board = 0
     self._state = self._game.new_initial_state()
-    self._controller = self._controller_factory()
-    _connect(self._controller, self._seat)
+    self._controller = None
 
   def player_id(self):
     return self._player_id
@@ -250,8 +249,7 @@ class BlueChipBridgeBot(pyspiel.Bot):
     # the protocol makes no provision for this case.
     if not self._state.is_terminal():
       self._controller.terminate()
-      self._controller = self._controller_factory()
-      _connect(self._controller, self._seat)
+      self._controller = None
     self._state = self._game.new_initial_state()
 
   def _update_for_state(self):
@@ -320,6 +318,11 @@ class BlueChipBridgeBot(pyspiel.Bot):
   def step(self, state):
     """Returns an action for the given state."""
 
+    # Connect if we need to.
+    if self._controller is None:
+      self._controller = self._controller_factory()
+      _connect(self._controller, self._seat)
+
     # Bring the external bot up-to-date.
     self._inform_state(state)
 
@@ -343,4 +346,5 @@ class BlueChipBridgeBot(pyspiel.Bot):
 
   def terminate(self):
     self._controller.terminate()
+    self._controller = None
 
