@@ -23,7 +23,7 @@
 
 #include "open_spiel/abseil-cpp/absl/random/uniform_int_distribution.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
-#include "third_party/eigen3/unsupported/Eigen/CXX11/src/Tensor/TensorMap.h"
+#include "unsupported/Eigen/CXX11/src/Tensor/TensorMap.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {

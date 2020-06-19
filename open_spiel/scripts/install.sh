@@ -86,6 +86,13 @@ if [[ ${BUILD_WITH_ACPC:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; then
   git clone -b 'master' --single-branch --depth 1  https://github.com/jblespiau/project_acpc_server.git ${DIR}
 fi
 
+# Add EIGEN template library for linear algebra.
+# http://eigen.tuxfamily.org/index.php?title=Main_Page
+DIR="open_spiel/eigen/libeigen"
+if [[ ${BUILD_WITH_EIGEN:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; then
+  git clone -b '3.3.7' --single-branch --depth 1  https://gitlab.com/libeigen/eigen.git ${DIR}
+fi
+
 # 2. Install other required system-wide dependencies
 
 # Install Julia if required and not present already.
