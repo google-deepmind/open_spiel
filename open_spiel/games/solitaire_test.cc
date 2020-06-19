@@ -1,6 +1,5 @@
 #include "solitaire.h"
 
-#include "cassert"
 #include "open_spiel/spiel.h"
 #include "open_spiel/tests/basic_tests.h"
 
@@ -15,6 +14,7 @@ void BasicSolitaireTests() {
 }
 
 void TestMoveActionId() {
+  // TODO: Use a for loop here
   std::vector<Move> valid_moves = {
       // region List of valid moves in order
       // Spades
@@ -232,7 +232,7 @@ void TestMoveActionId() {
   for (const auto &move : valid_moves) {
     std::cout << move.ToString() << " == " << Move(move.ActionId()).ToString()
               << std::endl;
-    assert(move.ToString() == Move(move.ActionId()).ToString());
+    SPIEL_CHECK_EQ(move.ToString(), Move(move.ActionId()).ToString());
   }
 }
 

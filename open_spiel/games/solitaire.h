@@ -24,30 +24,17 @@
 // implementation also gives rewards at intermediate states like most electronic
 // versions of solitaire do, rather than only at terminal states.
 
-// ANSI color codes
-inline constexpr const char *kReset = "\033[0m";
-inline constexpr const char *kRed = "\033[31m";
-inline constexpr const char *kBlack = "\033[37m";
-
-// Unicode Glyphs
-inline constexpr const char *kGlyphHidden = "\U0001F0A0";
-inline constexpr const char *kGlyphEmpty = "\U0001F0BF";
-inline constexpr const char *kGlyphSpades = "\U00002660";
-inline constexpr const char *kGlyphHearts = "\U00002665";
-inline constexpr const char *kGlyphClubs = "\U00002663";
-inline constexpr const char *kGlyphDiamonds = "\U00002666";
-inline constexpr const char *kGlyphArrow = "\U00002190";
-
 namespace open_spiel::solitaire {
 
 // Default Game Parameters =====================================================
 
 inline constexpr int kDefaultPlayers = 1;
 inline constexpr int kDefaultDepthLimit = 150;
-inline constexpr bool kDefaultIsColored = false;
+inline constexpr bool kDefaultIsColored = false;   // TODO: Turn this to false before committing
 
 // Enumerations ================================================================
 
+// TODO: Use `enum class` for SuitType
 enum SuitType {
   kSuitNone = 0,
   kSuitSpades,
@@ -56,6 +43,8 @@ enum SuitType {
   kSuitDiamonds,
   kSuitHidden,
 };
+
+// TODO: Use `enum class` for RankType
 enum RankType {
   kRankNone = 0,
   kRankA,
@@ -73,6 +62,8 @@ enum RankType {
   kRankK,
   kRankHidden,
 };
+
+// TODO: Use `enum class` for LocationType
 enum LocationType {
   kDeck = 0,
   kWaste = 1,
@@ -80,6 +71,8 @@ enum LocationType {
   kTableau = 3,
   kMissing = 4,
 };
+
+// TODO: Use `enum class` for PileID
 enum PileID {
   kPileWaste = 0,
   kPileSpades = 1,
@@ -98,104 +91,11 @@ enum PileID {
 
 // Constants ===================================================================
 
-inline constexpr int kNumRanks = 13;
-
-// Number of cards that can be in each pile type
-inline constexpr int kMaxSizeWaste = 24;
-inline constexpr int kMaxSizeFoundation = 13;
-inline constexpr int kMaxSizeTableau = 19;
-
-// Number of sources that can be in each pile type
-inline constexpr int kMaxSourcesWaste = 8;
-inline constexpr int kMaxSourcesFoundation = 1;
-inline constexpr int kMaxSourcesTableau = 13;
-
-// These divide up the action ids into sections. kEnd is a single action that is
-// used to end the game when no other actions are available.
-inline constexpr int kEnd = 0;
-
-// kReveal actions are ones that can be taken at chance nodes; they change a
-// hidden card to a card of the same index as the action id (e.g. 2 would reveal
-// a 2 of spades)
-inline constexpr int kRevealStart = 1;
-inline constexpr int kRevealEnd = 52;
-
-// kMove actions are ones that are taken at decision nodes; they involve moving
-// a card to another cards location. It starts at 53 because there are 52 reveal
-// actions before it. See `NumDistinctActions()` in solitaire.cc.
-inline constexpr int kMoveStart = 53;
-inline constexpr int kMoveEnd = 204;
-
-// Indices for special cards
 inline constexpr int kHiddenCard = 99;
-inline constexpr int kEmptySpadeCard = -5;
-inline constexpr int kEmptyHeartCard = -4;
-inline constexpr int kEmptyClubCard = -3;
-inline constexpr int kEmptyDiamondCard = -2;
-inline constexpr int kEmptyTableauCard = -1;
-
-// 1 empty + 13 ranks
-inline constexpr int kFoundationTensorLength = 14;
-
-// 6 hidden cards + 1 empty tableau + 52 ordinary cards
-inline constexpr int kTableauTensorLength = 59;
-
-// 1 hidden card + 52 ordinary cards
-inline constexpr int kWasteTensorLength = 53;
-
-// Constant for how many hidden cards can show up in a tableau. As hidden cards
-// can't be added, the max is the highest number in a tableau at the start of
-// the game: 6
-inline constexpr int kMaxHiddenCard = 6;
-
-// Only used in one place and just for consistency (to match kChancePlayerId &
-// kTerminalPlayerId)
-inline constexpr int kPlayerId = 0;
-
-// Indicates the last index before the first player action (the last kReveal
-// action has an ID of 52)
-inline constexpr int kActionOffset = 52;
-
-// Order of suits
-const std::vector<SuitType> kSuits = {kSuitSpades, kSuitHearts, kSuitClubs,
-                                      kSuitDiamonds};
-
-// These correspond with their enums, not with the two vectors directly above
-const std::vector<std::string> kSuitStrs = {
-    "", kGlyphSpades, kGlyphHearts, kGlyphClubs, kGlyphDiamonds, ""};
-const std::vector<std::string> kRankStrs = {
-    "", "A", "2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K", ""};
-
-const std::map<RankType, double> kFoundationPoints = {
-    // region Maps a RankType to the reward for moving a card of that rank to
-    // the foundation
-    {kRankA, 100.0}, {kRank2, 90.0}, {kRank3, 80.0}, {kRank4, 70.0},
-    {kRank5, 60.0},  {kRank6, 50.0}, {kRank7, 40.0}, {kRank8, 30.0},
-    {kRank9, 20.0},  {kRankT, 10.0}, {kRankJ, 10.0}, {kRankQ, 10.0},
-    {kRankK, 10.0}
-    // endregion
-};
-
-const std::map<SuitType, PileID> kSuitToPile = {
-    // region Maps a foundation suit to the ID of the foundation
-    {kSuitSpades, kPileSpades},
-    {kSuitHearts, kPileHearts},
-    {kSuitClubs, kPileClubs},
-    {kSuitDiamonds, kPileDiamonds}
-    // endregion
-};
-
-const std::map<int, PileID> kIntToPile = {
-    // region Maps an integer to a tableau pile ID (used when initializing
-    // SolitaireState)
-    {1, kPile1stTableau}, {2, kPile2ndTableau}, {3, kPile3rdTableau},
-    {4, kPile4thTableau}, {5, kPile5thTableau}, {6, kPile6thTableau},
-    {7, kPile7thTableau}
-    // endregion
-};
 
 // Support Classes =============================================================
 
+// TODO: Can we move support classes to anonymous namespace in .cc file?
 class Card {
  private:
   RankType rank = kRankHidden;  // Indicates the rank of the card
@@ -327,8 +227,30 @@ class Move {
 
 // OpenSpiel Classes ===========================================================
 
-class SolitaireGame;
+// TODO: Move SolitaireGame to top of the file
+class SolitaireGame : public Game {
+ public:
+  // Constructor
+  explicit SolitaireGame(const GameParameters &params);
 
+  // Overridden Methods
+  int NumDistinctActions() const override;
+  int MaxGameLength() const override;
+  int NumPlayers() const override;
+  double MinUtility() const override;
+  double MaxUtility() const override;
+
+  std::vector<int> ObservationTensorShape() const override;
+  std::unique_ptr<State> NewInitialState() const override;
+  std::shared_ptr<const Game> Clone() const override;
+
+ private:
+  int num_players_;
+  int depth_limit_;
+  bool is_colored_;
+};
+
+// TODO: Move SolitaireState to top of the file
 class SolitaireState : public State {
  public:
   // Constructors
@@ -380,28 +302,6 @@ class SolitaireState : public State {
   // Parameters
   int depth_limit = kDefaultDepthLimit;
   bool is_colored = kDefaultIsColored;
-};
-
-class SolitaireGame : public Game {
- public:
-  // Constructor
-  explicit SolitaireGame(const GameParameters &params);
-
-  // Overridden Methods
-  int NumDistinctActions() const override;
-  int MaxGameLength() const override;
-  int NumPlayers() const override;
-  double MinUtility() const override;
-  double MaxUtility() const override;
-
-  std::vector<int> ObservationTensorShape() const override;
-  std::unique_ptr<State> NewInitialState() const override;
-  std::shared_ptr<const Game> Clone() const override;
-
- private:
-  int num_players_;
-  int depth_limit_;
-  bool is_colored_;
 };
 
 }  // namespace open_spiel::solitaire
