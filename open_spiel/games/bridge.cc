@@ -145,12 +145,31 @@ std::string BridgeState::ToString() const {
   return rv;
 }
 
+std::array<std::string, kNumSuits> FormatHand(
+    int player, bool mark_voids,
+    const std::array<absl::optional<Player>, kNumCards>& deal) {
+  std::array<std::string, kNumSuits> cards;
+  for (int suit = 0; suit < kNumSuits; ++suit) {
+    cards[suit].push_back(kSuitChar[suit]);
+    cards[suit].push_back(' ');
+    bool is_void = true;
+    for (int rank = kNumCardsPerSuit - 1; rank >= 0; --rank) {
+      if (player == deal[Card(Suit(suit), rank)]) {
+        cards[suit].push_back(kRankChar[rank]);
+        is_void = false;
+      }
+    }
+    if (is_void && mark_voids) absl::StrAppend(&cards[suit], "none");
+  }
+  return cards;
+}
+
 std::string BridgeState::ObservationString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   if (IsTerminal()) return ToString();
   std::string rv = FormatVulnerability();
-  auto cards = FormatHand(player, /*mark_voids=*/true);
+  auto cards = FormatHand(player, /*mark_voids=*/true, holder_);
   for (int suit = kNumSuits - 1; suit >= 0; --suit)
     absl::StrAppend(&rv, cards[suit], "\n");
   if (history_.size() > kNumCards)
@@ -161,35 +180,27 @@ std::string BridgeState::ObservationString(Player player) const {
   return rv;
 }
 
-std::array<std::string, kNumSuits> BridgeState::FormatHand(
-    int player, bool mark_voids) const {
-  // Current hand, except in the terminal state when we use the original hand
-  // to enable an easy review of the whole deal.
-  auto deal = holder_;
-  if (IsTerminal()) {
-    for (int i = 0; i < kNumCards; ++i)
-      deal[history_[i].action] = (i % kNumPlayers);
-  }
-  std::array<std::string, kNumSuits> cards;
-  for (int suit = 0; suit < kNumSuits; ++suit) {
-    cards[suit].push_back(kSuitChar[suit]);
-    cards[suit].push_back(' ');
-    bool is_void = true;
-    for (int rank = kNumCardsPerSuit - 1; rank >= 0; --rank) {
-      if (player == holder_[Card(Suit(suit), rank)]) {
-        cards[suit].push_back(kRankChar[rank]);
-        is_void = false;
-      }
-    }
-    if (is_void && mark_voids) absl::StrAppend(&cards[suit], "none");
-  }
-  return cards;
+std::array<absl::optional<Player>, kNumCards> BridgeState::OriginalDeal()
+    const {
+  SPIEL_CHECK_GE(history_.size(), kNumCards);
+  std::array<absl::optional<Player>, kNumCards> deal;
+  for (int i = 0; i < kNumCards; ++i)
+    deal[history_[i].action] = (i % kNumPlayers);
+  return deal;
 }
 
 std::string BridgeState::FormatDeal() const {
   std::array<std::array<std::string, kNumSuits>, kNumPlayers> cards;
-  for (auto player : {kNorth, kEast, kSouth, kWest}) {
-    cards[player] = FormatHand(player, /*mark_voids=*/false);
+  if (IsTerminal()) {
+    // Include all cards in the terminal state to make reviewing the deal easier
+    auto deal = OriginalDeal();
+    for (auto player : {kNorth, kEast, kSouth, kWest}) {
+      cards[player] = FormatHand(player, /*mark_voids=*/false, deal);
+    }
+  } else {
+    for (auto player : {kNorth, kEast, kSouth, kWest}) {
+      cards[player] = FormatHand(player, /*mark_voids=*/false, holder_);
+    }
   }
   constexpr int kColumnWidth = 8;
   std::string padding(kColumnWidth, ' ');

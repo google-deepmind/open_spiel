@@ -174,8 +174,7 @@ class BridgeState : public State {
   const Trick& CurrentTrick() const {
     return tricks_[num_cards_played_ / kNumPlayers];
   }
-  std::array<std::string, kNumSuits> FormatHand(int player,
-                                                bool mark_voids) const;
+  std::array<absl::optional<Player>, kNumCards> OriginalDeal() const;
   std::string FormatDeal() const;
   std::string FormatVulnerability() const;
   std::string FormatAuction(bool trailing_query) const;
