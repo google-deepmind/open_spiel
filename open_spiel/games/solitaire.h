@@ -30,41 +30,38 @@ namespace open_spiel::solitaire {
 
 inline constexpr int kDefaultPlayers = 1;
 inline constexpr int kDefaultDepthLimit = 150;
-inline constexpr bool kDefaultIsColored = false;   // TODO: Turn this to false before committing
+inline constexpr bool kDefaultIsColored = false;
 
 // Enumerations ================================================================
 
-// TODO: Use `enum class` for SuitType
-enum SuitType {
-  kSuitNone = 0,
-  kSuitSpades,
-  kSuitHearts,
-  kSuitClubs,
-  kSuitDiamonds,
-  kSuitHidden,
+enum class SuitType {
+  kNone = 0,
+  kSpades,
+  kHearts,
+  kClubs,
+  kDiamonds,
+  kHidden,
 };
 
-// TODO: Use `enum class` for RankType
-enum RankType {
-  kRankNone = 0,
-  kRankA,
-  kRank2,
-  kRank3,
-  kRank4,
-  kRank5,
-  kRank6,
-  kRank7,
-  kRank8,
-  kRank9,
-  kRankT,
-  kRankJ,
-  kRankQ,
-  kRankK,
-  kRankHidden,
+enum class RankType {
+  kNone = 0,
+  kA,
+  k2,
+  k3,
+  k4,
+  k5,
+  k6,
+  k7,
+  k8,
+  k9,
+  kT,
+  kJ,
+  kQ,
+  kK,
+  kHidden,
 };
 
-// TODO: Use `enum class` for LocationType
-enum LocationType {
+enum class LocationType {
   kDeck = 0,
   kWaste = 1,
   kFoundation = 2,
@@ -72,21 +69,20 @@ enum LocationType {
   kMissing = 4,
 };
 
-// TODO: Use `enum class` for PileID
-enum PileID {
-  kPileWaste = 0,
-  kPileSpades = 1,
-  kPileHearts = 2,
-  kPileClubs = 3,
-  kPileDiamonds = 4,
-  kPile1stTableau = 5,
-  kPile2ndTableau = 6,
-  kPile3rdTableau = 7,
-  kPile4thTableau = 8,
-  kPile5thTableau = 9,
-  kPile6thTableau = 10,
-  kPile7thTableau = 11,
-  kPileMissing = 12
+enum class PileID {
+  kWaste = 0,
+  kSpades = 1,
+  kHearts = 2,
+  kClubs = 3,
+  kDiamonds = 4,
+  k1stTableau = 5,
+  k2ndTableau = 6,
+  k3rdTableau = 7,
+  k4thTableau = 8,
+  k5thTableau = 9,
+  k6thTableau = 10,
+  k7thTableau = 11,
+  kMissing = 12
 };
 
 // Constants ===================================================================
@@ -95,21 +91,20 @@ inline constexpr int kHiddenCard = 99;
 
 // Support Classes =============================================================
 
-// TODO: Can we move support classes to anonymous namespace in .cc file?
 class Card {
  private:
-  RankType rank = kRankHidden;  // Indicates the rank of the card
-  SuitType suit = kSuitHidden;  // Indicates the suit of the card
-  LocationType location = kMissing; // Indicates the type of pile the card is in
+  RankType rank = RankType::kHidden;  // Indicates the rank of the card
+  SuitType suit = SuitType::kHidden;  // Indicates the suit of the card
+  LocationType location = LocationType::kMissing; // Indicates the type of pile the card is in
   bool hidden = false;      // Indicates whether the card is hidden or not
   int index = kHiddenCard;  // Identifies the card with an integer
 
  public:
   // Constructors
-  explicit Card(bool hidden = false, SuitType suit = kSuitHidden,
-                RankType rank = kRankHidden, LocationType location = kMissing);
+  explicit Card(bool hidden = false, SuitType suit = SuitType::kHidden,
+                RankType rank = RankType::kHidden, LocationType location = LocationType::kMissing);
   explicit Card(int index, bool hidden = false,
-                LocationType location = kMissing);
+                LocationType location = LocationType::kMissing);
 
   // Getters
   RankType GetRank() const;
@@ -143,7 +138,7 @@ class Pile {
 
  public:
   // Constructor
-  Pile(LocationType type, PileID id, SuitType suit = kSuitNone);
+  Pile(LocationType type, PileID id, SuitType suit = SuitType::kNone);
 
   // Destructor
   virtual ~Pile() = default;
@@ -227,7 +222,6 @@ class Move {
 
 // OpenSpiel Classes ===========================================================
 
-// TODO: Move SolitaireGame to top of the file
 class SolitaireGame : public Game {
  public:
   // Constructor
@@ -250,7 +244,6 @@ class SolitaireGame : public Game {
   bool is_colored_;
 };
 
-// TODO: Move SolitaireState to top of the file
 class SolitaireState : public State {
  public:
   // Constructors
@@ -275,9 +268,9 @@ class SolitaireState : public State {
 
   // Other Methods
   std::vector<Card> Targets(
-      const absl::optional<LocationType> &location = kMissing) const;
+      const absl::optional<LocationType> &location = LocationType::kMissing) const;
   std::vector<Card> Sources(
-      const absl::optional<LocationType> &location = kMissing) const;
+      const absl::optional<LocationType> &location = LocationType::kMissing) const;
   std::vector<Move> CandidateMoves() const;
   Pile *GetPile(const Card &card) const;
   void MoveCards(const Move &move);
