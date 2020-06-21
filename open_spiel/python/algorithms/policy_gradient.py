@@ -183,7 +183,7 @@ class PolicyGradient(rl_agent.AbstractAgent):
                                            self._layer_sizes)
     torso_out = self._net_torso(self._info_state_ph)
     torso_out_size = self._layer_sizes[-1]
-    self._policy_logits_layer = simple_nets.Dense(
+    self._policy_logits_layer = simple_nets.Linear(
         torso_out_size, self._num_actions, activate_relu=False,
         name="policy_head")
     self._policy_logits = self._policy_logits_layer(torso_out)
@@ -193,12 +193,12 @@ class PolicyGradient(rl_agent.AbstractAgent):
 
     # Add baseline (V) head for A2C (or Q-head for QPG / RPG / RMPG)
     if loss_class.__name__ == "BatchA2CLoss":
-      self._baseline_layer = simple_nets.Dense(torso_out_size, 1,
+      self._baseline_layer = simple_nets.Linear(torso_out_size, 1,
                                                activate_relu=False,
                                                name="baseline")
       self._baseline = tf.squeeze(self._baseline_layer(torso_out), axis=1)
     else:
-      self._q_values_layer = simple_nets.Dense(
+      self._q_values_layer = simple_nets.Linear(
           torso_out_size, self._num_actions, activate_relu=False,
           name="q_values_head")
       self._q_values = self._q_values_layer(torso_out)

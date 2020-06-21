@@ -27,9 +27,9 @@ tf.disable_v2_behavior()
 # This code is based directly on the TF docs:
 # https://www.tensorflow.org/versions/r1.15/api_docs/python/tf/Module
 
-class Dense(tf.Module):
+class Linear(tf.Module):
   def __init__(self, in_size, out_size, activate_relu=True, name=None):
-    super(Dense, self).__init__(name=name)
+    super(Linear, self).__init__(name=name)
     self._activate_relu = activate_relu
     # Weight initialization inspired by Sonnet's Linear layer, 
     # which cites https://arxiv.org/abs/1502.03167v3
@@ -53,10 +53,10 @@ class MLP(tf.Module):
     with self.name_scope:
       # Hidden layers
       for size in hidden_sizes:
-        self._layers.append(Dense(in_size=input_size, out_size=size))
+        self._layers.append(Linear(in_size=input_size, out_size=size))
         input_size = size
       # Output layer
-      self._layers.append(Dense(in_size=input_size, out_size=output_size,
+      self._layers.append(Linear(in_size=input_size, out_size=output_size,
                                 activate_relu=activate_final))
 
   @tf.Module.with_name_scope
@@ -72,7 +72,7 @@ class MLPTorso(tf.Module):
     self._layers = []
     with self.name_scope:
       for size in hidden_sizes:
-        self._layers.append(Dense(in_size=input_size, out_size=size))
+        self._layers.append(Linear(in_size=input_size, out_size=size))
         input_size = size
 
   @tf.Module.with_name_scope
