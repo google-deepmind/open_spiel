@@ -90,6 +90,14 @@ endif()
 set (BUILD_WITH_EIGEN $ENV{BUILD_WITH_EIGEN})
 message("${BoldYellow}BUILD_WITH_EIGEN: ${BUILD_WITH_EIGEN} ${ColourReset}")
 
+set (BUILD_WITH_XINXIN OFF CACHE BOOL "Build against xinxin Hearts program.")
+if(NOT DEFINED ENV{BUILD_WITH_XINXIN})
+    message("${BoldRed}BUILD_WITH_XINXIN not set. Defaults to OFF${ColourReset}")
+    set (ENV{BUILD_WITH_XINXIN} OFF)
+endif()
+set (BUILD_WITH_XINXIN $ENV{BUILD_WITH_XINXIN})
+message("${BoldYellow}BUILD_WITH_XINXIN: ${BUILD_WITH_XINXIN} ${ColourReset}")
+
 ##
 
 
@@ -164,6 +172,9 @@ if (BUILD_WITH_EIGEN)
   # This is needed so that pybind11/eigen.h locates <Eigen/Core>
   include_directories(eigen/libeigen)
   set(OPEN_SPIEL_OBJECTS ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:eigen>)
+endif()
+if (BUILD_WITH_XINXIN)
+  set(OPEN_SPIEL_OBJECTS ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:xinxin>)
 endif()
 
 # We have the parent of this directory in the include path, so that we can
