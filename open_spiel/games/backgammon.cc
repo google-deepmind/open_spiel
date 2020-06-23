@@ -64,6 +64,10 @@ const std::vector<std::vector<int>> kChanceOutcomeValues = {
     {2, 5}, {2, 6}, {3, 4}, {3, 5}, {3, 6}, {4, 5}, {4, 6},
     {5, 6}, {1, 1}, {2, 2}, {3, 3}, {4, 4}, {5, 5}, {6, 6}};
 
+int NumCheckersPerPlayer(const Game* game) {
+  return static_cast<const BackgammonGame*>(game)->NumCheckersPerPlayer();
+}
+
 // Facts about the game
 const GameType kGameType{
     /*short_name=*/"backgammon",
@@ -80,7 +84,8 @@ const GameType kGameType{
     /*provides_observation_string=*/true,
     /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
-    {{"scoring_type",
+    {{"hyper_backgammon", GameParameter(kDefaultHyperBackgammon)},
+     {"scoring_type",
       GameParameter(static_cast<std::string>(kDefaultScoringType))}}};
 
 static std::shared_ptr<const Game> Factory(const GameParameters& params) {
@@ -112,6 +117,21 @@ std::string PositionToString(int pos) {
       return "Pass";
     default:
       return absl::StrCat(pos);
+  }
+}
+
+std::string CurPlayerToString(Player cur_player) {
+  switch (cur_player) {
+    case kXPlayerId:
+      return "x";
+    case kOPlayerId:
+      return "o";
+    case kChancePlayerId:
+      return "*";
+    case kTerminalPlayerId:
+      return "T";
+    default:
+      SpielFatalError(absl::StrCat("Unrecognized player id: ", cur_player));
   }
 }
 
@@ -296,9 +316,11 @@ void BackgammonState::ObservationTensor(Player player,
 }
 
 BackgammonState::BackgammonState(std::shared_ptr<const Game> game,
-                                 ScoringType scoring_type)
+                                 ScoringType scoring_type,
+                                 bool hyper_backgammon)
     : State(game),
       scoring_type_(scoring_type),
+      hyper_backgammon_(hyper_backgammon),
       cur_player_(kChancePlayerId),
       prev_player_(kChancePlayerId),
       turns_(-1),
@@ -311,16 +333,28 @@ BackgammonState::BackgammonState(std::shared_ptr<const Game> game,
       board_(
           {std::vector<int>(kNumPoints, 0), std::vector<int>(kNumPoints, 0)}),
       turn_history_info_({}) {
-  // Setup the board. First, XPlayer.
-  board_[kXPlayerId][0] = 2;
-  board_[kXPlayerId][11] = 5;
-  board_[kXPlayerId][16] = 3;
-  board_[kXPlayerId][18] = 5;
-  // OPlayer.
-  board_[kOPlayerId][23] = 2;
-  board_[kOPlayerId][12] = 5;
-  board_[kOPlayerId][7] = 3;
-  board_[kOPlayerId][5] = 5;
+  SetupInitialBoard();
+}
+
+void BackgammonState::SetupInitialBoard() {
+  if (hyper_backgammon_) {
+    // https://bkgm.com/variants/HyperBackgammon.html
+    // Each player has one checker on each of the furthest points.
+    board_[kXPlayerId][0] = board_[kXPlayerId][1] = board_[kXPlayerId][2] = 1;
+    board_[kOPlayerId][23] = board_[kOPlayerId][22] = board_[kOPlayerId][21] =
+        1;
+  } else {
+    // Setup the board. First, XPlayer.
+    board_[kXPlayerId][0] = 2;
+    board_[kXPlayerId][11] = 5;
+    board_[kXPlayerId][16] = 3;
+    board_[kXPlayerId][18] = 5;
+    // OPlayer.
+    board_[kOPlayerId][23] = 2;
+    board_[kOPlayerId][12] = 5;
+    board_[kOPlayerId][7] = 3;
+    board_[kOPlayerId][5] = 5;
+  }
 }
 
 int BackgammonState::board(int player, int pos) const {
@@ -831,11 +865,25 @@ int BackgammonState::CountTotalCheckers(int player) const {
 }
 
 int BackgammonState::IsGammoned(int player) const {
+  if (hyper_backgammon_) {
+    // TODO(author5): remove this when the doubling cube is implemented.
+    // In Hyper-backgammon, gammons and backgammons only multiply when the cube
+    // has been offered and accepted. However, we do not yet support the cube.
+    return false;
+  }
+
   // Does the player not have any checkers borne off?
   return scores_[player] == 0;
 }
 
 int BackgammonState::IsBackgammoned(int player) const {
+  if (hyper_backgammon_) {
+    // TODO(author5): remove this when the doubling cube is implemented.
+    // In Hyper-backgammon, gammons and backgammons only multiply when the cube
+    // has been offered and accepted. However, we do not yet support the cube.
+    return false;
+  }
+
   // Does the player not have any checkers borne off and either has a checker
   // still in the bar or still in the opponent's home?
   if (scores_[player] > 0) {
@@ -1082,8 +1130,10 @@ std::vector<Action> BackgammonState::LegalActions() const {
   if (IsChanceNode()) return LegalChanceOutcomes();
   if (IsTerminal()) return {};
 
-  SPIEL_CHECK_EQ(CountTotalCheckers(kXPlayerId), kNumCheckersPerPlayer);
-  SPIEL_CHECK_EQ(CountTotalCheckers(kOPlayerId), kNumCheckersPerPlayer);
+  SPIEL_CHECK_EQ(CountTotalCheckers(kXPlayerId),
+                 NumCheckersPerPlayer(game_.get()));
+  SPIEL_CHECK_EQ(CountTotalCheckers(kOPlayerId),
+                 NumCheckersPerPlayer(game_.get()));
 
   std::unique_ptr<State> cstate = this->Clone();
   BackgammonState* state = dynamic_cast<BackgammonState*>(cstate.get());
@@ -1147,7 +1197,7 @@ std::string BackgammonState::ToString() const {
 
   // Extra info like whose turn it is etc.
   absl::StrAppend(&board_str, "Turn: ");
-  absl::StrAppend(&board_str, cur_player_ == kXPlayerId ? "x" : "o");
+  absl::StrAppend(&board_str, CurPlayerToString(cur_player_));
   absl::StrAppend(&board_str, "\n");
   absl::StrAppend(&board_str, "Dice: ");
   absl::StrAppend(&board_str, !dice_.empty() ? DiceToString(dice_[0]) : "");
@@ -1169,7 +1219,8 @@ std::string BackgammonState::ToString() const {
 }
 
 bool BackgammonState::IsTerminal() const {
-  return (scores_[kXPlayerId] == 15 || scores_[kOPlayerId] == 15);
+  return (scores_[kXPlayerId] == NumCheckersPerPlayer(game_.get()) ||
+          scores_[kOPlayerId] == NumCheckersPerPlayer(game_.get()));
 }
 
 std::vector<double> BackgammonState::Returns() const {
@@ -1223,16 +1274,25 @@ void BackgammonState::SetState(int cur_player, bool double_turn,
   scores_ = scores;
   board_ = board;
 
-  SPIEL_CHECK_EQ(CountTotalCheckers(kXPlayerId), kNumCheckersPerPlayer);
-  SPIEL_CHECK_EQ(CountTotalCheckers(kOPlayerId), kNumCheckersPerPlayer);
+  SPIEL_CHECK_EQ(CountTotalCheckers(kXPlayerId),
+                 NumCheckersPerPlayer(game_.get()));
+  SPIEL_CHECK_EQ(CountTotalCheckers(kOPlayerId),
+                 NumCheckersPerPlayer(game_.get()));
 }
 
 BackgammonGame::BackgammonGame(const GameParameters& params)
     : Game(kGameType, params),
       scoring_type_(
-          ParseScoringType(ParameterValue<std::string>("scoring_type"))) {}
+          ParseScoringType(ParameterValue<std::string>("scoring_type"))),
+      hyper_backgammon_(ParameterValue<bool>("hyper_backgammon")) {}
 
 double BackgammonGame::MaxUtility() const {
+  if (hyper_backgammon_) {
+    // We do not have the cube implemented, so Hyper-backgammon us currently
+    // restricted to a win-loss game regardless of the scoring type.
+    return 1;
+  }
+
   switch (scoring_type_) {
     case ScoringType::kWinLossScoring:
       return 1;
@@ -1242,6 +1302,14 @@ double BackgammonGame::MaxUtility() const {
       return 3;
     default:
       SpielFatalError("Unknown scoring_type");
+  }
+}
+
+int BackgammonGame::NumCheckersPerPlayer() const {
+  if (hyper_backgammon_) {
+    return 3;
+  } else {
+    return kNumCheckersPerPlayer;
   }
 }
 

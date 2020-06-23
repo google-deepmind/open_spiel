@@ -42,6 +42,18 @@ void BasicBackgammonTestsVaryScoring() {
   }
 }
 
+void BasicHyperBackgammonTestsVaryScoring() {
+  for (std::string scoring :
+       {"winloss_scoring", "enable_gammons", "full_scoring"}) {
+    auto game =
+        LoadGame("backgammon", {{"scoring_type", GameParameter(scoring)},
+                                {"hyper_backgammon", GameParameter(true)}});
+    testing::ChanceOutcomesTest(*game);
+    testing::RandomSimTestWithUndo(*game, 10);
+    testing::RandomSimTest(*game, 10);
+  }
+}
+
 void BasicBackgammonTestsDoNotStartWithDoubles() {
   std::mt19937 rng;
   for (int i = 0; i < 100; ++i) {
@@ -333,6 +345,7 @@ void DoublesBearOffOutsideHome() {
   action = bstate->CheckerMovesToSpielMove({{20, 4, false}, {20, 4, false}});
   SPIEL_CHECK_TRUE(ActionsContains(legal_actions, action));
 }
+
 void HumanReadableNotation() {
   std::shared_ptr<const Game> game = LoadGame("backgammon");
   std::unique_ptr<State> state = game->NewInitialState();
@@ -522,6 +535,15 @@ void HumanReadableNotation() {
   SPIEL_CHECK_EQ(notation, absl::StrCat(legal_actions[0], " - 24/18 Pass"));
 }
 
+void BasicHyperBackgammonTest() {
+  std::shared_ptr<const Game> game =
+      LoadGame("backgammon", {{"hyper_backgammon", GameParameter(true)}});
+  std::unique_ptr<State> state = game->NewInitialState();
+  BackgammonState* bstate = static_cast<BackgammonState*>(state.get());
+  SPIEL_CHECK_EQ(bstate->CountTotalCheckers(kXPlayerId), 3);
+  SPIEL_CHECK_EQ(bstate->CountTotalCheckers(kOPlayerId), 3);
+}
+
 }  // namespace
 }  // namespace backgammon
 }  // namespace open_spiel
@@ -529,11 +551,13 @@ void HumanReadableNotation() {
 int main(int argc, char** argv) {
   open_spiel::testing::LoadGameTest("backgammon");
   open_spiel::backgammon::BasicBackgammonTestsDoNotStartWithDoubles();
+  open_spiel::backgammon::BasicBackgammonTestsVaryScoring();
+  open_spiel::backgammon::BasicHyperBackgammonTestsVaryScoring();
   open_spiel::backgammon::BearOffFurthestFirstTest();
   open_spiel::backgammon::NormalBearOffSituation();
   open_spiel::backgammon::NormalBearOffSituation2();
   open_spiel::backgammon::BearOffOutsideHome();
   open_spiel::backgammon::DoublesBearOffOutsideHome();
-  open_spiel::backgammon::BasicBackgammonTestsVaryScoring();
   open_spiel::backgammon::HumanReadableNotation();
+  open_spiel::backgammon::BasicHyperBackgammonTest();
 }
