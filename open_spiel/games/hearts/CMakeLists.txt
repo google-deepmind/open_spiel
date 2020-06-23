@@ -37,6 +37,8 @@ add_library(xinxin OBJECT
   hearts/iiMonteCarlo.h
   hearts/mt_random.cpp
   hearts/mt_random.h
+  xinxin_bot.cc
+  xinxin_bot.h
 )
 
 target_include_directories (xinxin PUBLIC hearts)
