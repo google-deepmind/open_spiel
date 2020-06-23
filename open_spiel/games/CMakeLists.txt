@@ -117,6 +117,9 @@ endif()
 if (${BUILD_WITH_ACPC})
   add_subdirectory(universal_poker)
 endif()
+if (${BUILD_WITH_XINXIN})
+  add_subdirectory(hearts)
+endif()
 
 # Uncomment to build the Ludii demo
 # add_subdirectory (ludii)

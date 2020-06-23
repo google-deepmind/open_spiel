@@ -93,6 +93,13 @@ if [[ ${BUILD_WITH_EIGEN:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; then
   git clone -b '3.3.7' --single-branch --depth 1  https://gitlab.com/libeigen/eigen.git ${DIR}
 fi
 
+# This GitHub repository contains Nathan Sturtevant's state of the art
+# Hearts program xinxin.
+DIR="open_spiel/games/hearts/hearts"
+if [[ ${BUILD_WITH_XINXIN:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; then
+  git clone -b 'master' --single-branch --depth 1  https://github.com/nathansttt/hearts.git ${DIR}
+fi
+
 # 2. Install other required system-wide dependencies
 
 # Install Julia if required and not present already.
