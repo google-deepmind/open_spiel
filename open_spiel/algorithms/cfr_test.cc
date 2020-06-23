@@ -186,7 +186,7 @@ void CFRTest_InfoStateValuesTableSerialization() {
   // Check empty
   CFRInfoStateValuesTable info_state_values_table = {};
   std::string serialized0 = "";
-  SerializeCFRInfoStateValuesTable(info_state_values_table, &serialized0);
+  SerializeCFRInfoStateValuesTable(info_state_values_table, &serialized0, -1);
   CFRInfoStateValuesTable deserialized0;
   DeserializeCFRInfoStateValuesTable(serialized0, &deserialized0);
   SPIEL_CHECK_TRUE(deserialized0.empty());
@@ -198,7 +198,7 @@ void CFRTest_InfoStateValuesTableSerialization() {
       {"<->\n<->", CFRInfoStateValues({0, 1, 2}, 0.1)},
       {"1:1,1;1", CFRInfoStateValues({0, 1, 2, 3}, 0.2)}};
   std::string serialized1 = "";
-  SerializeCFRInfoStateValuesTable(info_state_values_table, &serialized1);
+  SerializeCFRInfoStateValuesTable(info_state_values_table, &serialized1, -1);
   CFRInfoStateValuesTable deserialized1;
   DeserializeCFRInfoStateValuesTable(serialized1, &deserialized1);
 
@@ -210,13 +210,13 @@ void CFRTest_InfoStateValuesTableSerialization() {
                      deserialized1.at(info_state).legal_actions.at(i));
       SPIEL_CHECK_FLOAT_NEAR(
           values.cumulative_regrets.at(i),
-          deserialized1.at(info_state).cumulative_regrets.at(i), 1e-4);
+          deserialized1.at(info_state).cumulative_regrets.at(i), 1e-15);
       SPIEL_CHECK_FLOAT_NEAR(
           values.cumulative_policy.at(i),
-          deserialized1.at(info_state).cumulative_policy.at(i), 1e-4);
+          deserialized1.at(info_state).cumulative_policy.at(i), 1e-15);
       SPIEL_CHECK_FLOAT_NEAR(values.current_policy.at(i),
                              deserialized1.at(info_state).current_policy.at(i),
-                             1e-4);
+                             1e-15);
     }
   }
 }
@@ -239,7 +239,7 @@ void CFRTest_CFRSolverSerialization() {
                  deserialized_solver->InfoStateValuesTable().size());
   double exploitability2 =
       Exploitability(*game, *deserialized_solver->AveragePolicy());
-  SPIEL_CHECK_FLOAT_NEAR(exploitability1, exploitability2, 1e-4);
+  SPIEL_CHECK_FLOAT_NEAR(exploitability1, exploitability2, 1e-15);
 
   for (int i = 0; i < 50; i++) {
     deserialized_solver->EvaluateAndUpdatePolicy();

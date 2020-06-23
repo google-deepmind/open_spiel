@@ -18,8 +18,10 @@
 #include <array>
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
+#include "open_spiel/abseil-cpp/absl/strings/charconv.h"
 #include "open_spiel/abseil-cpp/absl/strings/numbers.h"
 #include "open_spiel/spiel_utils.h"
+#include "open_spiel/utils/serialization.h"
 
 namespace open_spiel {
 namespace algorithms {
@@ -213,7 +215,9 @@ void CFRSolverBase::EvaluateAndUpdatePolicy() {
   }
 }
 
-std::string CFRSolverBase::Serialize(std::string delimiter) const {
+std::string CFRSolverBase::Serialize(int double_precision,
+                                     std::string delimiter) const {
+  SPIEL_CHECK_GE(double_precision, -1);
   std::string str = "";
   // Meta section
   absl::StrAppend(&str,
@@ -231,7 +235,8 @@ std::string CFRSolverBase::Serialize(std::string delimiter) const {
   absl::StrAppend(&str, kSerializeSolverIterationSectionHeader, "\n");
   absl::StrAppend(&str, iteration_, "\n");
   absl::StrAppend(&str, kSerializeSolverValuesTableSectionHeader, "\n");
-  SerializeCFRInfoStateValuesTable(info_states_, &str, delimiter);
+  SerializeCFRInfoStateValuesTable(info_states_, &str, double_precision,
+                                   delimiter);
   return str;
 }
 
@@ -435,14 +440,28 @@ std::string CFRInfoStateValues::ToString() const {
   return str;
 }
 
-std::string CFRInfoStateValues::Serialize() const {
+std::string CFRInfoStateValues::Serialize(int double_precision) const {
   std::string str = "";
+  std::string cumulative_regrets_str, cumulative_policy_str, current_policy_str;
+  if (double_precision == -1) {
+    cumulative_regrets_str =
+        absl::StrJoin(cumulative_regrets, ",", HexDoubleFormatter());
+    cumulative_policy_str =
+        absl::StrJoin(cumulative_policy, ",", HexDoubleFormatter());
+    current_policy_str =
+        absl::StrJoin(current_policy, ",", HexDoubleFormatter());
+  } else {
+    cumulative_regrets_str = absl::StrJoin(
+        cumulative_regrets, ",", SimpleDoubleFormatter(double_precision));
+    cumulative_policy_str = absl::StrJoin(
+        cumulative_policy, ",", SimpleDoubleFormatter(double_precision));
+    current_policy_str = absl::StrJoin(current_policy, ",",
+                                       SimpleDoubleFormatter(double_precision));
+  }
   absl::StrAppend(&str, absl::StrJoin(legal_actions, ","), ";");
-  absl::StrAppend(
-      &str, absl::StrJoin(cumulative_regrets, ",", DoubleFormatter()), ";");
-  absl::StrAppend(
-      &str, absl::StrJoin(cumulative_policy, ",", DoubleFormatter()), ";");
-  absl::StrAppend(&str, absl::StrJoin(current_policy, ",", DoubleFormatter()));
+  absl::StrAppend(&str, cumulative_regrets_str, ";");
+  absl::StrAppend(&str, cumulative_policy_str, ";");
+  absl::StrAppend(&str, current_policy_str);
   return str;
 }
 
@@ -467,9 +486,19 @@ CFRInfoStateValues DeserializeCFRInfoStateValues(absl::string_view serialized) {
   double cumu_regret_value, cumu_policy_value, curr_policy_value;
   for (int i = 0; i < num_elements; i++) {
     absl::SimpleAtoi(str_values.at(0).at(i), &la_value);
-    absl::SimpleAtod(str_values.at(1).at(i), &cumu_regret_value);
-    absl::SimpleAtod(str_values.at(2).at(i), &cumu_policy_value);
-    absl::SimpleAtod(str_values.at(3).at(i), &curr_policy_value);
+    absl::from_chars(
+        str_values.at(1).at(i).data(),
+        str_values.at(1).at(i).data() + str_values.at(1).at(i).size(),
+        cumu_regret_value);
+    absl::from_chars(
+        str_values.at(2).at(i).data(),
+        str_values.at(2).at(i).data() + str_values.at(2).at(i).size(),
+        cumu_policy_value);
+    absl::from_chars(
+        str_values.at(3).at(i).data(),
+        str_values.at(3).at(i).data() + str_values.at(3).at(i).size(),
+        curr_policy_value);
+
     res.legal_actions.push_back(la_value);
     res.cumulative_regrets.push_back(cumu_regret_value);
     res.cumulative_policy.push_back(cumu_policy_value);
@@ -513,7 +542,7 @@ int CFRInfoStateValues::SampleActionIndex(double epsilon, double z) {
 
 void SerializeCFRInfoStateValuesTable(
     const CFRInfoStateValuesTable& info_states, std::string* result,
-    std::string delimiter) {
+    int double_precision, std::string delimiter) {
   if (delimiter == "," || delimiter == ";") {
     // The two delimiters are used for de/serialization of CFRInfoStateValues
     SpielFatalError(
@@ -528,8 +557,8 @@ void SerializeCFRInfoStateValuesTable(
           "Info state contains delimiter \"", delimiter,
           "\", please fix the info state or select a different delimiter."));
     }
-    absl::StrAppend(result, info_state, delimiter, values.Serialize(),
-                    delimiter);
+    absl::StrAppend(result, info_state, delimiter,
+                    values.Serialize(double_precision), delimiter);
   }
   // Remove the trailing delimiter
   result->erase(result->length() - delimiter.length());

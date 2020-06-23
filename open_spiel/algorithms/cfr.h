@@ -15,9 +15,7 @@
 #ifndef OPEN_SPIEL_ALGORITHMS_CFR_H_
 #define OPEN_SPIEL_ALGORITHMS_CFR_H_
 
-#include <iomanip>
 #include <memory>
-#include <sstream>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -47,8 +45,11 @@ struct CFRInfoStateValues {
   // A string representation of the information state values.
   std::string ToString() const;
 
-  // A less verbose string representation used for serialization purposes.
-  std::string Serialize() const;
+  // A less verbose string representation used for serialization purposes. The
+  // double_precision parameter indicates the number of decimal places in
+  // floating point numbers formatting, value -1 formats doubles with lossless,
+  // non-portable bitwise representation hex strings.
+  std::string Serialize(int double_precision) const;
 
   // Samples from current policy using randomly generated z, adding epsilon
   // exploration (mixing in uniform).
@@ -68,10 +69,12 @@ using CFRInfoStateValuesTable =
 
 // The result parameter is passed by pointer in order to avoid copying/moving
 // the string once the table is fully serialized (CFRInfoStateValuesTable
-// instances could be very large).
+// instances could be very large). See comments above
+// CFRInfoStateValues::Serialize(double_precision) for notes about the
+// double_precision parameter.
 void SerializeCFRInfoStateValuesTable(
     const CFRInfoStateValuesTable& info_states, std::string* result,
-    std::string delimiter = "<~>");
+    int double_precision, std::string delimiter = "<~>");
 
 // Similarly as above, the result parameter is passed by pointer in order to
 // avoid copying/moving the table once fully deserialized.
@@ -165,7 +168,10 @@ class CFRSolverBase {
 
   CFRInfoStateValuesTable& InfoStateValuesTable() { return info_states_; }
 
-  std::string Serialize(std::string delimiter = "<~>") const;
+  // See comments above CFRInfoStateValues::Serialize(double_precision) for
+  // notes about the double_precision parameter.
+  std::string Serialize(int double_precision = -1,
+                        std::string delimiter = "<~>") const;
 
  protected:
   std::shared_ptr<const Game> game_;
@@ -306,16 +312,6 @@ struct PartiallyDeserializedCFRSolver {
 
 PartiallyDeserializedCFRSolver PartiallyDeserializeCFRSolver(
     const std::string& serialized);
-
-// Formats doubles to strings with a specified number of decimal places, used
-// for serialization of CFRInfoStateValues.
-struct DoubleFormatter {
-  void operator()(std::string* out, const double& d) const {
-    std::stringstream stream;
-    stream << std::fixed << std::setprecision(4) << d;
-    absl::StrAppend(out, stream.str());
-  }
-};
 
 }  // namespace algorithms
 }  // namespace open_spiel

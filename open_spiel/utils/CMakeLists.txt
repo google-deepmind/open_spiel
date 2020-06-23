@@ -10,6 +10,7 @@ add_library (utils OBJECT
   lru_cache.h
   run_python.h
   run_python.cc
+  serialization.h
   stats.h
   tensor_view.h
   thread.h
