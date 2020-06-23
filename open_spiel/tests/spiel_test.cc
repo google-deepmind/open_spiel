@@ -295,7 +295,7 @@ void PolicySerializationTest() {
   // Check non-empty tabular policy
   auto game = LoadGame("tic_tac_toe");
   policy = std::make_unique<TabularPolicy>(*game);
-  deserialized_policy = DeserializePolicy(policy->Serialize());
+  deserialized_policy = DeserializePolicy(policy->Serialize(6));
   deserialized = std::static_pointer_cast<TabularPolicy>(deserialized_policy);
   SPIEL_CHECK_EQ(policy->PolicyTable().size(),
                  deserialized->PolicyTable().size());
@@ -304,7 +304,8 @@ void PolicySerializationTest() {
       auto original_val = policy.at(i);
       auto deserialized_val = deserialized->PolicyTable().at(info_state).at(i);
       SPIEL_CHECK_EQ(original_val.first, deserialized_val.first);
-      SPIEL_CHECK_FLOAT_EQ(original_val.second, deserialized_val.second);
+      SPIEL_CHECK_FLOAT_NEAR(original_val.second, deserialized_val.second,
+                             1e-6);
     }
   }
 

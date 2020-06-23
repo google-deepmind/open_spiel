@@ -24,6 +24,7 @@
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
+#include "open_spiel/abseil-cpp/absl/strings/charconv.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_format.h"
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/spiel.h"
@@ -117,7 +118,9 @@ std::unique_ptr<TabularPolicy> DeserializeTabularPolicy(
       std::pair<absl::string_view, absl::string_view> action_and_prob =
           absl::StrSplit(policy_value, '=');
       absl::SimpleAtoi(action_and_prob.first, &action);
-      absl::SimpleAtod(action_and_prob.second, &prob);
+      absl::from_chars(
+          action_and_prob.second.data(),
+          action_and_prob.second.data() + action_and_prob.second.size(), prob);
       res_policy.push_back({action, prob});
     }
     res->SetStatePolicy(std::string(splits.at(i)), res_policy);
