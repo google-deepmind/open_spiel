@@ -39,9 +39,10 @@ class SimMoveState : public State {
   // Subclasses must implement a per-player LegalActions function.
   std::vector<Action> LegalActions(Player player) const override = 0;
 
-  // LegalActions() returns either the chance outcomes (at a chance node),
-  // or a flattened form of the joint legal actions (at simultaneous move
-  // nodes) - see discussion below.
+  // LegalActions() returns either the chance outcomes (at a chance node), a
+  // flattened form of the joint legal actions (at simultaneous move nodes) -
+  // see discussion below, or the actions for the current player (at nodes
+  // where only a single player is making a decision).
   std::vector<Action> LegalActions() const override {
     if (IsSimultaneousNode()) {
       return LegalFlatJointActions();
