@@ -47,9 +47,10 @@ class SimMoveState : public State {
       return LegalFlatJointActions();
     } else if (IsTerminal()) {
       return {};
-    } else {
-      SPIEL_CHECK_TRUE(IsChanceNode());
+    } else if(IsChanceNode()) {
       return LegalChanceOutcomes();
+    } else {
+      return LegalActions(CurrentPlayer());
     }
   }
 
