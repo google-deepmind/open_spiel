@@ -69,36 +69,6 @@ std::shared_ptr<const Game> Factory(const GameParameters& params) {
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
 
-enum Seat { kNorth, kEast, kSouth, kWest };
-// Cards are represented as rank * kNumSuits + suit.
-Suit CardSuit(int card) { return Suit(card % kNumSuits); }
-int CardRank(int card) { return card / kNumSuits; }
-int Card(Suit suit, int rank) {
-  return rank * kNumSuits + static_cast<int>(suit);
-}
-int CardPoints(int card, bool jd_bonus) {
-  if (CardSuit(card) == Suit::kHearts) {
-    return kPointsForHeart;
-  } else if (card == Card(Suit::kSpades, 10)) {
-    return kPointsForQS;
-  } else if (card == Card(Suit::kDiamonds, 9) && jd_bonus) {
-    return kPointsForJD;
-  } else {
-    return 0;
-  }
-}
-
-constexpr char kRankChar[] = "23456789TJQKA";
-constexpr char kSuitChar[] = "CDHS";
-constexpr char kDirChar[] = "NESW";
-std::string DirString(int dir) { return {kDirChar[dir]}; }
-std::string CardString(int card) {
-  return {kRankChar[CardRank(card)],
-          kSuitChar[static_cast<int>(CardSuit(card))]};
-}
-std::map<int, std::string> pass_dir_str = {
-    {0, "No Pass"}, {1, "Left"}, {2, "Across"}, {3, "Right"}};
-
 }  // namespace
 
 HeartsGame::HeartsGame(const GameParameters& params)
