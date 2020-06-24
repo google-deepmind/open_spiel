@@ -60,7 +60,7 @@ const GameType kGameType{
         // If aside from QS only hearts remain, player is
         // permitted to lead hearts even if hearts are
         // not broken.
-        {"can_lead_hearts_instead_of_qs", GameParameter(true)},
+        {"can_lead_hearts_instead_of_qs", GameParameter(false)},
     }};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
