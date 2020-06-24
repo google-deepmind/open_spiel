@@ -8,6 +8,8 @@ add_library (utils OBJECT
   json.cc
   logger.h
   lru_cache.h
+  random.h
+  random.cc
   run_python.h
   run_python.cc
   stats.h
@@ -41,6 +43,10 @@ add_test(logger_test logger_test)
 add_executable(lru_cache_test lru_cache_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(lru_cache_test lru_cache_test)
+
+add_executable(random_test random_test.cc ${OPEN_SPIEL_OBJECTS}
+        $<TARGET_OBJECTS:tests>)
+add_test(random_test random_test)
 
 if (BUILD_WITH_PYTHON)
   add_executable(run_python_test run_python_test.cc ${OPEN_SPIEL_OBJECTS}
