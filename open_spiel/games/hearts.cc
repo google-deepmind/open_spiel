@@ -69,36 +69,6 @@ std::shared_ptr<const Game> Factory(const GameParameters& params) {
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
 
-enum Seat { kNorth, kEast, kSouth, kWest };
-// Cards are represented as rank * kNumSuits + suit.
-Suit CardSuit(int card) { return Suit(card % kNumSuits); }
-int CardRank(int card) { return card / kNumSuits; }
-int Card(Suit suit, int rank) {
-  return rank * kNumSuits + static_cast<int>(suit);
-}
-int CardPoints(int card, bool jd_bonus) {
-  if (CardSuit(card) == Suit::kHearts) {
-    return kPointsForHeart;
-  } else if (card == Card(Suit::kSpades, 10)) {
-    return kPointsForQS;
-  } else if (card == Card(Suit::kDiamonds, 9) && jd_bonus) {
-    return kPointsForJD;
-  } else {
-    return 0;
-  }
-}
-
-constexpr char kRankChar[] = "23456789TJQKA";
-constexpr char kSuitChar[] = "CDHS";
-constexpr char kDirChar[] = "NESW";
-std::string DirString(int dir) { return {kDirChar[dir]}; }
-std::string CardString(int card) {
-  return {kRankChar[CardRank(card)],
-          kSuitChar[static_cast<int>(CardSuit(card))]};
-}
-std::map<int, std::string> pass_dir_str = {
-    {0, "No Pass"}, {1, "Left"}, {2, "Across"}, {3, "Right"}};
-
 }  // namespace
 
 HeartsGame::HeartsGame(const GameParameters& params)
@@ -127,12 +97,7 @@ HeartsState::HeartsState(std::shared_ptr<const Game> game, bool pass_cards,
       qs_breaks_hearts_(qs_breaks_hearts),
       must_break_hearts_(must_break_hearts),
       can_lead_hearts_instead_of_qs_(can_lead_hearts_instead_of_qs),
-      hearts_broken_(!must_break_hearts) {
-  if (!pass_cards_) {
-    ApplyAction(static_cast<int>(pass_dir_));
-    phase_ = Phase::kDeal;
-  }
-}
+      hearts_broken_(!must_break_hearts) {}
 
 std::string HeartsState::ActionToString(Player player, Action action) const {
   if (history_.empty()) return pass_dir_str[action];
@@ -158,7 +123,7 @@ std::string HeartsState::InformationStateString(Player player) const {
   auto cards = FormatHand(player, /*mark_voids=*/true);
   for (int suit = kNumSuits - 1; suit >= 0; --suit)
     absl::StrAppend(&rv, cards[suit], "\n");
-  if (!passed_cards_[0].empty()) absl::StrAppend(&rv, FormatPass(player));
+  if (!passed_cards_[player].empty()) absl::StrAppend(&rv, FormatPass(player));
   if (num_cards_played_ > 0) absl::StrAppend(&rv, FormatPlay(), FormatPoints());
   return rv;
 }
@@ -228,18 +193,21 @@ std::string HeartsState::FormatPass() const {
 
 std::string HeartsState::FormatPass(Player player) const {
   std::string rv = "\nPassed Cards: ";
-  for (int card : passed_cards_[player]) {
-    absl::StrAppend(&rv, CardString(card), " ");
-  }
+  std::vector<int> passed_cards = passed_cards_[player];
+  // Sort cards because players don't have access to the order in which the
+  // cards were selected to be passed. Knowing the order could allow for
+  // information leakage.
+  absl::c_sort(passed_cards);
+  for (int card : passed_cards) absl::StrAppend(&rv, CardString(card), " ");
   // Cards are not received until all players have completed passing.
   // West is the last player to pass.
   if (passed_cards_[static_cast<int>(kWest)].size() == kNumCardsInPass) {
     absl::StrAppend(&rv, "\n\nReceived Cards: ");
     int passing_player =
         (player + kNumPlayers - static_cast<int>(pass_dir_)) % kNumPlayers;
-    for (int card : passed_cards_[passing_player]) {
-      absl::StrAppend(&rv, CardString(card), " ");
-    }
+    std::vector<int> received_cards = passed_cards_[passing_player];
+    absl::c_sort(received_cards);
+    for (int card : received_cards) absl::StrAppend(&rv, CardString(card), " ");
   }
   absl::StrAppend(&rv, "\n");
   return rv;
@@ -300,8 +268,9 @@ void HeartsState::InformationStateTensor(Player player,
   ptr += kNumCards;
   // Point totals
   for (int i = 0; i < kNumPlayers; ++i) {
+    // Use thermometer representation instead of one-hot for point totals.
     // Players can have negative points so we need to offset
-    ptr[points_[i] + std::abs(kPointsForJD)] = 1;
+    for (int j = 0; j < points_[i] + std::abs(kPointsForJD); ++j) ptr[j] = 1;
     ptr += kMaxScore;
   }
   // History of tricks, presented in the format: N E S W N E S
@@ -316,16 +285,18 @@ void HeartsState::InformationStateTensor(Player player,
     ptr += (kNumPlayers - leader - 1) * kNumCards;
   }
   Player leader = tricks_[current_trick].Leader();
-  ptr += leader * kNumCards;
-  auto cards = tricks_[current_trick].Cards();
-  for (int i = 0; i < cards.size(); ++i) {
-    ptr[cards[i]] = 1;
-    ptr += kNumCards;
+  if (leader != kInvalidPlayer) {
+    auto cards = tricks_[current_trick].Cards();
+    ptr += leader * kNumCards;
+    for (auto card : cards) {
+      ptr[card] = 1;
+      ptr += kNumCards;
+    }
   }
   // Current trick may contain less than four cards.
-  ptr += (kNumPlayers - cards.size()) * kNumCards;
+  ptr += (kNumPlayers - (num_cards_played_ % kNumPlayers)) * kNumCards;
   // Move to the end of current trick.
-  ptr += (kNumPlayers - leader - 1) * kNumCards;
+  ptr += (kNumPlayers - std::max(leader, 0) - 1) * kNumCards;
   // Skip over unplayed tricks.
   ptr += (kNumTricks - current_trick - 1) * kTrickTensorSize;
   SPIEL_CHECK_EQ(std::distance(values->begin(), ptr),
@@ -350,8 +321,12 @@ std::vector<Action> HeartsState::LegalActions() const {
 std::vector<Action> HeartsState::PassDirLegalActions() const {
   SPIEL_CHECK_EQ(history_.size(), 0);
   std::vector<Action> legal_actions;
-  legal_actions.reserve(kNumPlayers);
-  for (int i = 0; i < kNumPlayers; ++i) legal_actions.push_back(i);
+  if (!pass_cards_) {
+    legal_actions.push_back(static_cast<int>(PassDir::kNoPass));
+  } else {
+    legal_actions.reserve(kNumPlayers);
+    for (int i = 0; i < kNumPlayers; ++i) legal_actions.push_back(i);
+  }
   return legal_actions;
 }
 

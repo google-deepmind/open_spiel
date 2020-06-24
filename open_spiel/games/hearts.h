@@ -22,8 +22,10 @@
 //
 // - Pass Direction
 // The direction of the pass is decided by the first chance action. If the
-// "pass_cards" game parameter is set to false, the "No Pass" action is taken
-// automatically. In standard play, the direction of the pass alternates in
+// "pass_cards" game parameter is set to false, the "No Pass" action will be
+// the only legal action at the first chance node.
+//
+// In standard play, the direction of the pass alternates in
 // a fixed pattern. Here, however, state is not preserved between hands, so
 // the game itself cannot enforce that pattern. By using the first chance
 // action to set the pass direction, the game can be dropped in to pre-existing
@@ -70,6 +72,35 @@ inline constexpr int kInformationStateTensorSize =
     + kNumTricks * kTrickTensorSize;  // History of tricks
 
 enum class Suit { kClubs = 0, kDiamonds = 1, kHearts = 2, kSpades = 3 };
+enum class PassDir { kNoPass = 0, kLeft = 1, kAcross = 2, kRight = 3 };
+enum Seat { kNorth, kEast, kSouth, kWest };
+// Cards are represented as rank * kNumSuits + suit.
+inline Suit CardSuit(int card) { return Suit(card % kNumSuits); }
+inline int CardRank(int card) { return card / kNumSuits; }
+inline int Card(Suit suit, int rank) {
+  return rank * kNumSuits + static_cast<int>(suit);
+}
+inline int CardPoints(int card, bool jd_bonus) {
+  if (CardSuit(card) == Suit::kHearts) {
+    return kPointsForHeart;
+  } else if (card == Card(Suit::kSpades, 10)) {
+    return kPointsForQS;
+  } else if (card == Card(Suit::kDiamonds, 9) && jd_bonus) {
+    return kPointsForJD;
+  } else {
+    return 0;
+  }
+}
+constexpr char kRankChar[] = "23456789TJQKA";
+constexpr char kSuitChar[] = "CDHS";
+constexpr char kDirChar[] = "NESW";
+inline std::string DirString(int dir) { return {kDirChar[dir]}; }
+inline std::string CardString(int card) {
+  return {kRankChar[CardRank(card)],
+          kSuitChar[static_cast<int>(CardSuit(card))]};
+}
+inline std::map<int, std::string> pass_dir_str = {
+    {0, "No Pass"}, {1, "Left"}, {2, "Across"}, {3, "Right"}};
 
 // State of a single trick.
 class Trick {
@@ -118,7 +149,6 @@ class HeartsState : public State {
 
  private:
   enum class Phase { kPassDir, kDeal, kPass, kPlay, kGameOver };
-  enum class PassDir { kNoPass = 0, kLeft = 1, kAcross = 2, kRight = 3 };
 
   std::vector<Action> PassDirLegalActions() const;
   std::vector<Action> DealLegalActions() const;
