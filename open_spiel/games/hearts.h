@@ -72,6 +72,7 @@ inline constexpr int kInformationStateTensorSize =
     + kNumTricks * kTrickTensorSize;  // History of tricks
 
 enum class Suit { kClubs = 0, kDiamonds = 1, kHearts = 2, kSpades = 3 };
+enum class PassDir { kNoPass = 0, kLeft = 1, kAcross = 2, kRight = 3 };
 enum Seat { kNorth, kEast, kSouth, kWest };
 // Cards are represented as rank * kNumSuits + suit.
 inline Suit CardSuit(int card) { return Suit(card % kNumSuits); }
@@ -148,7 +149,6 @@ class HeartsState : public State {
 
  private:
   enum class Phase { kPassDir, kDeal, kPass, kPlay, kGameOver };
-  enum class PassDir { kNoPass = 0, kLeft = 1, kAcross = 2, kRight = 3 };
 
   std::vector<Action> PassDirLegalActions() const;
   std::vector<Action> DealLegalActions() const;
