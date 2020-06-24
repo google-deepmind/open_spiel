@@ -33,7 +33,7 @@ class Linear(tf.Module):
     self._activate_relu = activate_relu
     # Weight initialization inspired by Sonnet's Linear layer, 
     # which cites https://arxiv.org/abs/1502.03167v3
-    stddev = 1 / math.sqrt(in_size)
+    stddev = 1.0 / math.sqrt(in_size)
     self._weights = tf.Variable(
         tf.random.truncated_normal([in_size, out_size],
                                    mean=0.0, stddev=stddev),
@@ -57,7 +57,7 @@ class MLP(tf.Module):
         input_size = size
       # Output layer
       self._layers.append(Linear(in_size=input_size, out_size=output_size,
-                                activate_relu=activate_final))
+                                 activate_relu=activate_final))
 
   @tf.Module.with_name_scope
   def __call__(self, x):
