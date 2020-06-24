@@ -127,12 +127,7 @@ HeartsState::HeartsState(std::shared_ptr<const Game> game, bool pass_cards,
       qs_breaks_hearts_(qs_breaks_hearts),
       must_break_hearts_(must_break_hearts),
       can_lead_hearts_instead_of_qs_(can_lead_hearts_instead_of_qs),
-      hearts_broken_(!must_break_hearts) {
-  if (!pass_cards_) {
-    ApplyAction(static_cast<int>(pass_dir_));
-    phase_ = Phase::kDeal;
-  }
-}
+      hearts_broken_(!must_break_hearts) {}
 
 std::string HeartsState::ActionToString(Player player, Action action) const {
   if (history_.empty()) return pass_dir_str[action];
@@ -350,8 +345,12 @@ std::vector<Action> HeartsState::LegalActions() const {
 std::vector<Action> HeartsState::PassDirLegalActions() const {
   SPIEL_CHECK_EQ(history_.size(), 0);
   std::vector<Action> legal_actions;
-  legal_actions.reserve(kNumPlayers);
-  for (int i = 0; i < kNumPlayers; ++i) legal_actions.push_back(i);
+  if (!pass_cards_) {
+    legal_actions.push_back(static_cast<int>(PassDir::kNoPass));
+  } else {
+    legal_actions.reserve(kNumPlayers);
+    for (int i = 0; i < kNumPlayers; ++i) legal_actions.push_back(i);
+  }
   return legal_actions;
 }
 

@@ -22,8 +22,10 @@
 //
 // - Pass Direction
 // The direction of the pass is decided by the first chance action. If the
-// "pass_cards" game parameter is set to false, the "No Pass" action is taken
-// automatically. In standard play, the direction of the pass alternates in
+// "pass_cards" game parameter is set to false, the "No Pass" action will be
+// the only legal action at the first chance node.
+//
+// In standard play, the direction of the pass alternates in
 // a fixed pattern. Here, however, state is not preserved between hands, so
 // the game itself cannot enforce that pattern. By using the first chance
 // action to set the pass direction, the game can be dropped in to pre-existing
