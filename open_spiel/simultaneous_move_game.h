@@ -23,9 +23,11 @@
 
 // This is the generic superclass for simultaneous move games. A simultaneous
 // move game (AKA Markov Game) is one where all agents submit actions on each
-// time step, and the state transists to a new state as a function of the
-// joint action. All players know the exact current state of the game.
-// For normal-form or matrix games, see normal_form_game.h or matrix.h.
+// time step, and the state transists to a new state as a function of the joint
+// action. Note that this implementation also supports steps at which only a
+// single player submits an action. All players know the exact current state of
+// the game.  For normal-form or matrix games, see normal_form_game.h or
+// matrix.h.
 
 namespace open_spiel {
 
