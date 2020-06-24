@@ -223,18 +223,22 @@ std::string HeartsState::FormatPass() const {
 
 std::string HeartsState::FormatPass(Player player) const {
   std::string rv = "\nPassed Cards: ";
-  for (int card : passed_cards_[player]) {
-    absl::StrAppend(&rv, CardString(card), " ");
-  }
+  std::vector<int> passed_cards = passed_cards_[player];
+  // Sort cards because players don't have access to the order in which the
+  // cards were selected to be passed. Knowing the order could allow for
+  // information leakage.
+  absl::c_sort(passed_cards);
+  for (int card : passed_cards) absl::StrAppend(&rv, CardString(card),  " ");
   // Cards are not received until all players have completed passing.
   // West is the last player to pass.
   if (passed_cards_[static_cast<int>(kWest)].size() == kNumCardsInPass) {
     absl::StrAppend(&rv, "\n\nReceived Cards: ");
     int passing_player =
         (player + kNumPlayers - static_cast<int>(pass_dir_)) % kNumPlayers;
-    for (int card : passed_cards_[passing_player]) {
-      absl::StrAppend(&rv, CardString(card), " ");
-    }
+    std::vector<int> received_cards = passed_cards_[passing_player];
+    absl::c_sort(received_cards);
+    for (int card : received_cards)
+      absl::StrAppend(&rv, CardString(card),  " ");
   }
   absl::StrAppend(&rv, "\n");
   return rv;
