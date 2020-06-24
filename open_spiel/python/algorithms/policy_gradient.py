@@ -453,7 +453,10 @@ class PolicyGradient(rl_agent.AbstractAgent):
   def get_weights(self):
     variables = [self._session.run(self._net_torso.variables)]
     variables.append(self._session.run(self._policy_logits_layer.variables))
-    variables.append(self._session.run(self._q_values_layer.variables))
+    if self._loss_class.__name__ == "BatchA2CLoss":
+      variables.append(self._session.run(self._baseline_layer.variables))
+    else:
+      variables.append(self._session.run(self._q_values_layer.variables))
     return variables
 
   def _initialize(self):

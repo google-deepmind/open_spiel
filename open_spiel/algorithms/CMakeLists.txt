@@ -7,6 +7,10 @@ add_library (algorithms OBJECT
   cfr_br.h
   corr_dist.cc
   corr_dist.h
+  corr_dist/efcce.cc
+  corr_dist/efcce.h
+  corr_dist/efce.cc
+  corr_dist/efce.h
   deterministic_policy.cc
   deterministic_policy.h
   evaluate_bots.cc

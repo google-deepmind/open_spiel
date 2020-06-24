@@ -217,8 +217,7 @@ class BlueChipBridgeBot(pyspiel.Bot):
     self.cards_played = 0
     self._board = 0
     self._state = self._game.new_initial_state()
-    self._controller = self._controller_factory()
-    _connect(self._controller, self._seat)
+    self._controller = None
 
   def player_id(self):
     return self._player_id
@@ -245,13 +244,12 @@ class BlueChipBridgeBot(pyspiel.Bot):
         elif len(legal_actions) == 1:
           state.apply_action(legal_actions[0])
       if state.is_terminal():
-        self._inform_state(state)
+        self.inform_state(state)
     # Otherwise, we will have to restart the external bot, because
     # the protocol makes no provision for this case.
     if not self._state.is_terminal():
       self._controller.terminate()
-      self._controller = self._controller_factory()
-      _connect(self._controller, self._seat)
+      self._controller = None
     self._state = self._game.new_initial_state()
 
   def _update_for_state(self):
@@ -302,9 +300,14 @@ class BlueChipBridgeBot(pyspiel.Bot):
 
   def inform_action(self, state, player, action):
     del player, action
-    self._inform_state(state)
+    self.inform_state(state)
 
-  def _inform_state(self, state):
+  def inform_state(self, state):
+    # Connect if we need to.
+    if self._controller is None:
+      self._controller = self._controller_factory()
+      _connect(self._controller, self._seat)
+
     full_history = state.history()
     known_history = self._state.history()
     if full_history[:len(known_history)] != known_history:
@@ -319,9 +322,8 @@ class BlueChipBridgeBot(pyspiel.Bot):
 
   def step(self, state):
     """Returns an action for the given state."""
-
     # Bring the external bot up-to-date.
-    self._inform_state(state)
+    self.inform_state(state)
 
     # If we're on a new trick, tell the bot it is its turn.
     if self.is_play_phase and self.cards_played % 4 == 0:
@@ -343,4 +345,5 @@ class BlueChipBridgeBot(pyspiel.Bot):
 
   def terminate(self):
     self._controller.terminate()
+    self._controller = None
 

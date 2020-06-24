@@ -21,6 +21,7 @@
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_format.h"
 #include "open_spiel/abseil-cpp/absl/strings/string_view.h"
+#include "open_spiel/abseil-cpp/absl/synchronization/mutex.h"
 #include "open_spiel/games/bridge/double_dummy_solver/include/dll.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/games/bridge/bridge_scoring.h"
@@ -145,12 +146,31 @@ std::string BridgeState::ToString() const {
   return rv;
 }
 
+std::array<std::string, kNumSuits> FormatHand(
+    int player, bool mark_voids,
+    const std::array<absl::optional<Player>, kNumCards>& deal) {
+  std::array<std::string, kNumSuits> cards;
+  for (int suit = 0; suit < kNumSuits; ++suit) {
+    cards[suit].push_back(kSuitChar[suit]);
+    cards[suit].push_back(' ');
+    bool is_void = true;
+    for (int rank = kNumCardsPerSuit - 1; rank >= 0; --rank) {
+      if (player == deal[Card(Suit(suit), rank)]) {
+        cards[suit].push_back(kRankChar[rank]);
+        is_void = false;
+      }
+    }
+    if (is_void && mark_voids) absl::StrAppend(&cards[suit], "none");
+  }
+  return cards;
+}
+
 std::string BridgeState::ObservationString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   if (IsTerminal()) return ToString();
   std::string rv = FormatVulnerability();
-  auto cards = FormatHand(player, /*mark_voids=*/true);
+  auto cards = FormatHand(player, /*mark_voids=*/true, holder_);
   for (int suit = kNumSuits - 1; suit >= 0; --suit)
     absl::StrAppend(&rv, cards[suit], "\n");
   if (history_.size() > kNumCards)
@@ -161,35 +181,27 @@ std::string BridgeState::ObservationString(Player player) const {
   return rv;
 }
 
-std::array<std::string, kNumSuits> BridgeState::FormatHand(
-    int player, bool mark_voids) const {
-  // Current hand, except in the terminal state when we use the original hand
-  // to enable an easy review of the whole deal.
-  auto deal = holder_;
-  if (IsTerminal()) {
-    for (int i = 0; i < kNumCards; ++i)
-      deal[history_[i].action] = (i % kNumPlayers);
-  }
-  std::array<std::string, kNumSuits> cards;
-  for (int suit = 0; suit < kNumSuits; ++suit) {
-    cards[suit].push_back(kSuitChar[suit]);
-    cards[suit].push_back(' ');
-    bool is_void = true;
-    for (int rank = kNumCardsPerSuit - 1; rank >= 0; --rank) {
-      if (player == holder_[Card(Suit(suit), rank)]) {
-        cards[suit].push_back(kRankChar[rank]);
-        is_void = false;
-      }
-    }
-    if (is_void && mark_voids) absl::StrAppend(&cards[suit], "none");
-  }
-  return cards;
+std::array<absl::optional<Player>, kNumCards> BridgeState::OriginalDeal()
+    const {
+  SPIEL_CHECK_GE(history_.size(), kNumCards);
+  std::array<absl::optional<Player>, kNumCards> deal;
+  for (int i = 0; i < kNumCards; ++i)
+    deal[history_[i].action] = (i % kNumPlayers);
+  return deal;
 }
 
 std::string BridgeState::FormatDeal() const {
   std::array<std::array<std::string, kNumSuits>, kNumPlayers> cards;
-  for (auto player : {kNorth, kEast, kSouth, kWest}) {
-    cards[player] = FormatHand(player, /*mark_voids=*/false);
+  if (IsTerminal()) {
+    // Include all cards in the terminal state to make reviewing the deal easier
+    auto deal = OriginalDeal();
+    for (auto player : {kNorth, kEast, kSouth, kWest}) {
+      cards[player] = FormatHand(player, /*mark_voids=*/false, deal);
+    }
+  } else {
+    for (auto player : {kNorth, kEast, kSouth, kWest}) {
+      cards[player] = FormatHand(player, /*mark_voids=*/false, holder_);
+    }
   }
   constexpr int kColumnWidth = 8;
   std::string padding(kColumnWidth, ' ');
@@ -378,13 +390,58 @@ void BridgeState::ObservationTensor(Player player,
   }
 }
 
+std::vector<double> BridgeState::PublicObservationTensor() const {
+  SPIEL_CHECK_TRUE(phase_ == Phase::kAuction);
+  std::vector<double> rv(kPublicInfoTensorSize);
+  auto ptr = rv.begin();
+  ptr[is_vulnerable_[0]] = 1;
+  ptr += kNumVulnerabilities;
+  ptr[is_vulnerable_[1]] = 1;
+  ptr += kNumVulnerabilities;
+  auto bidding = ptr + 2 * kNumPlayers;  // initial and recent passes
+  int last_bid = 0;
+  for (int i = kNumCards; i < history_.size(); ++i) {
+    const int player = i % kNumPlayers;
+    const int this_call = history_[i].action - kBiddingActionBase;
+    if (this_call == kPass) {
+      if (last_bid == 0) ptr[player] = 1;  // Leading passes
+      ptr[kNumPlayers + player] = 1;       // Trailing passes
+    } else {
+      // Call is a non-Pass, so clear the trailing pass markers.
+      for (int i = 0; i < kNumPlayers; ++i) ptr[kNumPlayers + i] = 0;
+      if (this_call == kDouble) {
+        auto base = bidding + (last_bid - kFirstBid) * kNumPlayers * 3;
+        base[kNumPlayers + player] = 1;
+      } else if (this_call == kRedouble) {
+        auto base = bidding + (last_bid - kFirstBid) * kNumPlayers * 3;
+        base[kNumPlayers * 2 + player] = 1;
+      } else {
+        last_bid = this_call;
+        auto base = bidding + (last_bid - kFirstBid) * kNumPlayers * 3;
+        base[player] = 1;
+      }
+    }
+  }
+  return rv;
+}
+
+std::vector<double> BridgeState::PrivateObservationTensor(Player player) const {
+  std::vector<double> rv(kNumCards);
+  for (int i = 0; i < kNumCards; ++i)
+    if (holder_[i] == player) rv[i] = 1;
+  return rv;
+}
+
 void BridgeState::SetDoubleDummyResults(ddTableResults double_dummy_results) {
   double_dummy_results_ = double_dummy_results;
   ComputeScoreByContract();
 }
 
+ABSL_CONST_INIT absl::Mutex dds_mutex(absl::kConstInit);
+
 void BridgeState::ComputeDoubleDummyTricks() {
   if (!double_dummy_results_.has_value()) {
+    absl::MutexLock lock(&dds_mutex);  // TODO(author11) Make DDS code thread-safe
     double_dummy_results_ = ddTableResults{};
     ddTableDeal dd_table_deal{};
     for (int suit = 0; suit < kNumSuits; ++suit) {

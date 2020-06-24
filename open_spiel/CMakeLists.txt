@@ -82,6 +82,22 @@ endif()
 set (BUILD_WITH_PYTHON $ENV{BUILD_WITH_PYTHON})
 message("${BoldYellow}BUILD_WITH_PYTHON: ${BUILD_WITH_PYTHON} ${ColourReset}")
 
+set (BUILD_WITH_EIGEN OFF CACHE BOOL "Build with support for Eigen in C++.")
+if(NOT DEFINED ENV{BUILD_WITH_EIGEN})
+    message("${BoldRed}BUILD_WITH_EIGEN not set. Defaults to OFF${ColourReset}")
+    set (ENV{BUILD_WITH_EIGEN} OFF)
+endif()
+set (BUILD_WITH_EIGEN $ENV{BUILD_WITH_EIGEN})
+message("${BoldYellow}BUILD_WITH_EIGEN: ${BUILD_WITH_EIGEN} ${ColourReset}")
+
+set (BUILD_WITH_XINXIN OFF CACHE BOOL "Build against xinxin Hearts program.")
+if(NOT DEFINED ENV{BUILD_WITH_XINXIN})
+    message("${BoldRed}BUILD_WITH_XINXIN not set. Defaults to OFF${ColourReset}")
+    set (ENV{BUILD_WITH_XINXIN} OFF)
+endif()
+set (BUILD_WITH_XINXIN $ENV{BUILD_WITH_XINXIN})
+message("${BoldYellow}BUILD_WITH_XINXIN: ${BUILD_WITH_XINXIN} ${ColourReset}")
+
 ##
 
 
@@ -148,6 +164,17 @@ if (BUILD_WITH_HANABI)
 endif()
 if (BUILD_WITH_ACPC)
   set(OPEN_SPIEL_OBJECTS ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:universal_poker_clib> $<TARGET_OBJECTS:universal_poker_lib>)
+endif()
+if (BUILD_WITH_EIGEN)
+  # Add Eigen dependency.
+  add_subdirectory(eigen/)
+  # Now we can use #include "Eigen/Dense"
+  # This is needed so that pybind11/eigen.h locates <Eigen/Core>
+  include_directories(eigen/libeigen)
+  set(OPEN_SPIEL_OBJECTS ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:eigen>)
+endif()
+if (BUILD_WITH_XINXIN)
+  set(OPEN_SPIEL_OBJECTS ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:xinxin>)
 endif()
 
 # We have the parent of this directory in the include path, so that we can

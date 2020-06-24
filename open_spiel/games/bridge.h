@@ -69,6 +69,10 @@ inline constexpr int kAuctionTensorSize =
                    ) +
     kNumCards                                  // Our hand
     + kNumVulnerabilities * kNumPartnerships;  // Vulnerability of each side
+inline constexpr int kPublicInfoTensorSize =
+    kAuctionTensorSize  // The auction
+    - kNumCards         // But not any player's cards
+    + kNumPlayers;      // Plus trailing passes
 inline constexpr int kPlayTensorSize =
     kNumBidLevels              // What the contract is
     + kNumDenominations        // What trumps are
@@ -145,6 +149,12 @@ class BridgeState : public State {
     return score_by_contract_;
   }
 
+  // Private information tensor per player.
+  std::vector<double> PrivateObservationTensor(Player player) const;
+
+  // Public information.
+  std::vector<double> PublicObservationTensor() const;
+
  protected:
   void DoApplyAction(Action action) override;
 
@@ -164,8 +174,7 @@ class BridgeState : public State {
   const Trick& CurrentTrick() const {
     return tricks_[num_cards_played_ / kNumPlayers];
   }
-  std::array<std::string, kNumSuits> FormatHand(int player,
-                                                bool mark_voids) const;
+  std::array<absl::optional<Player>, kNumCards> OriginalDeal() const;
   std::string FormatDeal() const;
   std::string FormatVulnerability() const;
   std::string FormatAuction(bool trailing_query) const;
@@ -219,8 +228,15 @@ class BridgeGame : public Game {
   std::unique_ptr<State> DeserializeState(
       const std::string& str) const override;
 
+  // How many contracts there are (including declarer and double status).
+  int NumPossibleContracts() const { return kNumContracts; }
+
   // A string representation of a contract.
   std::string ContractString(int index) const;
+
+  // Extra observation tensors.
+  int PrivateObservationTensorSize() const { return kNumCards; }
+  int PublicObservationTensorSize() const { return kPublicInfoTensorSize; }
 
  private:
   bool UseDoubleDummyResult() const {

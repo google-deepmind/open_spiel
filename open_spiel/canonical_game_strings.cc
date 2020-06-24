@@ -31,9 +31,9 @@ std::string HunlGameString(const std::string &betting_abstraction) {
 
 std::string HulhGameString(const std::string &betting_abstraction) {
   return absl::StrFormat(
-      "universal_poker(betting=limit,numPlayers=2,numRounds=4,blind=100 50,"
+      "universal_poker(betting=limit,numPlayers=2,numRounds=4,blind=10 5,"
       "firstPlayer=2 1,numSuits=4,numRanks=13,numHoleCards=2,numBoardCards=0 3 "
-      "1 1,raiseSize=200 200 400 400,maxRaises=3 4 4 4,bettingAbstraction=%s)",
+      "1 1,raiseSize=10 10 20 20,maxRaises=3 4 4 4,bettingAbstraction=%s)",
       betting_abstraction);
 }
 

@@ -51,6 +51,8 @@ set(GAME_SOURCES
   goofspiel.h
   havannah.cc
   havannah.h
+  hearts.cc
+  hearts.h
   hex.cc
   hex.h
   kuhn_poker.cc
@@ -114,6 +116,9 @@ if (${BUILD_WITH_HANABI})
 endif()
 if (${BUILD_WITH_ACPC})
   add_subdirectory(universal_poker)
+endif()
+if (${BUILD_WITH_XINXIN})
+  add_subdirectory(hearts)
 endif()
 
 # Uncomment to build the Ludii demo
@@ -262,6 +267,10 @@ add_test(goofspiel_test goofspiel_test)
 add_executable(havannah_test havannah_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(havannah_test havannah_test)
+
+add_executable(hearts_test hearts_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(hearts_test hearts_test)
 
 add_executable(hex_test hex_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)

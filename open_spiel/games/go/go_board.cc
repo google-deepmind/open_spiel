@@ -603,7 +603,7 @@ void GoBoard::GroupIter::step() {
 int NumSurroundedPoints(const GoBoard& board, const VirtualPoint p,
                         std::array<bool, kVirtualBoardPoints>* marked,
                         bool* reached_black, bool* reached_white) {
-  if ((*marked)[p] || (*reached_black && *reached_white)) return 0;
+  if ((*marked)[p]) return 0;
   (*marked)[p] = true;
 
   int num_points = 1;
@@ -631,7 +631,7 @@ int NumSurroundedPoints(const GoBoard& board, const VirtualPoint p,
 
 float TrompTaylorScore(const GoBoard& board, float komi, int handicap) {
   // The delta of how many points on the board black and white have occupied,
-  // from black's point of view.
+  // from black's point of view, i.e. Black points - White points.
   int occupied_delta = 0;
 
   // We need to keep track of which empty points we've already counted as part

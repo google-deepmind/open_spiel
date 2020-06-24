@@ -32,6 +32,8 @@ void init_pyspiel_games_bridge(py::module& m) {
       .def("contract_index", &BridgeState::ContractIndex)
       .def("possible_contracts", &BridgeState::PossibleContracts)
       .def("score_by_contract", &BridgeState::ScoreByContract)
+      .def("private_observation_tensor", &BridgeState::PrivateObservationTensor)
+      .def("public_observation_tensor", &BridgeState::PublicObservationTensor)
       // Pickle support
       .def(py::pickle(
           [](const BridgeState& state) {  // __getstate__
@@ -44,7 +46,12 @@ void init_pyspiel_games_bridge(py::module& m) {
           }));
 
   py::class_<BridgeGame, std::shared_ptr<BridgeGame>, Game>(m, "BridgeGame")
+      .def("num_possible_contracts", &BridgeGame::NumPossibleContracts)
       .def("contract_string", &BridgeGame::ContractString)
+      .def("private_observation_tensor_size",
+           &BridgeGame::PrivateObservationTensorSize)
+      .def("public_observation_tensor_size",
+           &BridgeGame::PublicObservationTensorSize)
       // Pickle support
       .def(py::pickle(
           [](std::shared_ptr<const BridgeGame> game) {  // __getstate__
