@@ -41,6 +41,7 @@ class PyspielTest(absltest.TestCase):
         "catch",
         "chess",
         "cliff_walking",
+        "clobber",
         "coin_game",
         "connect_four",
         "coop_box_pushing",
