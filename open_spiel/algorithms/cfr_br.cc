@@ -85,8 +85,8 @@ std::unique_ptr<CFRBRSolver> DeserializeCFRBRSolver(
     const std::string& serialized, std::string delimiter) {
   auto partial = PartiallyDeserializeCFRSolver(serialized);
   SPIEL_CHECK_EQ(partial.solver_type, "CFRBRSolver");
-  auto solver =
-      std::make_unique<CFRBRSolver>(partial.game, partial.solver_iteration);
+  auto solver = std::make_unique<CFRBRSolver>(
+      partial.game, std::stoi(partial.solver_specific_state));
   DeserializeCFRInfoStateValuesTable(partial.serialized_cfr_values_table,
                                      &solver->InfoStateValuesTable(),
                                      delimiter);

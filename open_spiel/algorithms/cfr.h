@@ -199,7 +199,7 @@ class CFRSolverBase {
 
   // This method should return the type of itself so that it can be checked
   // in different deserialization methods; one method for each subtype.
-  // For an example take a look at the CFRSolver::SerializeSelfState() and
+  // For an example take a look at the CFRSolver::SerializeThisType() and
   // DeserializeCFRSolver() methods.
   virtual std::string SerializeThisType() const {
     SpielFatalError("Serialization of the base class is not supported.");
@@ -298,15 +298,16 @@ std::unique_ptr<CFRPlusSolver> DeserializeCFRPlusSolver(
 
 struct PartiallyDeserializedCFRSolver {
   PartiallyDeserializedCFRSolver(std::shared_ptr<const Game> game,
-                                 std::string solver_type, int solver_iteration,
+                                 std::string solver_type,
+                                 std::string solver_specific_state,
                                  std::string_view serialized_cfr_values_table)
       : game(game),
         solver_type(solver_type),
-        solver_iteration(solver_iteration),
+        solver_specific_state(solver_specific_state),
         serialized_cfr_values_table(serialized_cfr_values_table) {}
   std::shared_ptr<const Game> game;
   std::string solver_type;
-  int solver_iteration;
+  std::string solver_specific_state;
   absl::string_view serialized_cfr_values_table;
 };
 

@@ -30,8 +30,8 @@ constexpr const int kSerializationVersion = 1;
 constexpr const char* kSerializeMetaSectionHeader = "[Meta]";
 constexpr const char* kSerializeGameSectionHeader = "[Game]";
 constexpr const char* kSerializeSolverTypeSectionHeader = "[SolverType]";
-constexpr const char* kSerializeSolverIterationSectionHeader =
-    "[SolverIteration]";
+constexpr const char* kSerializeSolverSpecificStateSectionHeader =
+    "[SolverSpecificState]";
 constexpr const char* kSerializeSolverValuesTableSectionHeader =
     "[SolverValuesTable]";
 
@@ -232,7 +232,7 @@ std::string CFRSolverBase::Serialize(int double_precision,
   // Internal solver state section
   absl::StrAppend(&str, kSerializeSolverTypeSectionHeader, "\n");
   absl::StrAppend(&str, SerializeThisType(), "\n");
-  absl::StrAppend(&str, kSerializeSolverIterationSectionHeader, "\n");
+  absl::StrAppend(&str, kSerializeSolverSpecificStateSectionHeader, "\n");
   absl::StrAppend(&str, iteration_, "\n");
   absl::StrAppend(&str, kSerializeSolverValuesTableSectionHeader, "\n");
   SerializeCFRInfoStateValuesTable(info_states_, &str, double_precision,
@@ -604,8 +604,8 @@ std::unique_ptr<CFRSolver> DeserializeCFRSolver(const std::string& serialized,
                                                 std::string delimiter) {
   auto partial = PartiallyDeserializeCFRSolver(serialized);
   SPIEL_CHECK_EQ(partial.solver_type, "CFRSolver");
-  auto solver =
-      std::make_unique<CFRSolver>(partial.game, partial.solver_iteration);
+  auto solver = std::make_unique<CFRSolver>(
+      partial.game, std::stoi(partial.solver_specific_state));
   DeserializeCFRInfoStateValuesTable(partial.serialized_cfr_values_table,
                                      &solver->InfoStateValuesTable(),
                                      delimiter);
@@ -616,8 +616,8 @@ std::unique_ptr<CFRPlusSolver> DeserializeCFRPlusSolver(
     const std::string& serialized, std::string delimiter) {
   auto partial = PartiallyDeserializeCFRSolver(serialized);
   SPIEL_CHECK_EQ(partial.solver_type, "CFRPlusSolver");
-  auto solver =
-      std::make_unique<CFRPlusSolver>(partial.game, partial.solver_iteration);
+  auto solver = std::make_unique<CFRPlusSolver>(
+      partial.game, std::stoi(partial.solver_specific_state));
   DeserializeCFRInfoStateValuesTable(partial.serialized_cfr_values_table,
                                      &solver->InfoStateValuesTable(),
                                      delimiter);
@@ -634,7 +634,7 @@ PartiallyDeserializedCFRSolver PartiallyDeserializeCFRSolver(
     kMeta = 0,
     kGame = 1,
     kSolverType = 2,
-    kSolverIteration = 3
+    kSolverSpecificState = 3
   };
 
   std::array<std::string, 4> section_strings = {"", "", "", ""};
@@ -652,15 +652,19 @@ PartiallyDeserializedCFRSolver PartiallyDeserializeCFRSolver(
     } else if (lines[i] == kSerializeSolverTypeSectionHeader) {
       SPIEL_CHECK_EQ(current_section, kGame);
       current_section = kSolverType;
-    } else if (lines[i] == kSerializeSolverIterationSectionHeader) {
+    } else if (lines[i] == kSerializeSolverSpecificStateSectionHeader) {
       SPIEL_CHECK_EQ(current_section, kSolverType);
-      current_section = kSolverIteration;
+      current_section = kSolverSpecificState;
     } else if (lines[i] == kSerializeSolverValuesTableSectionHeader) {
-      SPIEL_CHECK_EQ(current_section, kSolverIteration);
+      SPIEL_CHECK_EQ(current_section, kSolverSpecificState);
       break;
     } else {
       SPIEL_CHECK_NE(current_section, kInvalid);
-      absl::StrAppend(&section_strings[current_section], lines[i]);
+      if (current_section == kSolverSpecificState) {
+        absl::StrAppend(&section_strings[current_section], lines[i], "\n");
+      } else {
+        absl::StrAppend(&section_strings[current_section], lines[i]);
+      }
     }
   }
 
@@ -674,10 +678,10 @@ PartiallyDeserializedCFRSolver PartiallyDeserializeCFRSolver(
           serialized,
           absl::StrCat(kSerializeSolverValuesTableSectionHeader, "\n"));
 
-  return PartiallyDeserializedCFRSolver(
-      LoadGame(section_strings[kGame]), section_strings[kSolverType],
-      std::stoi(section_strings[kSolverIteration]),
-      other_and_values_table_data.second);
+  return PartiallyDeserializedCFRSolver(LoadGame(section_strings[kGame]),
+                                        section_strings[kSolverType],
+                                        section_strings[kSolverSpecificState],
+                                        other_and_values_table_data.second);
 }
 
 }  // namespace algorithms
