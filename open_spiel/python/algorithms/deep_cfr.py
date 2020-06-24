@@ -252,10 +252,13 @@ class DeepCFRSolver(policy.Policy):
       self._advantage_memories[p].clear()
 
   def reinitialize_advantage_networks(self):
-    initializers = []
     for p in range(self._num_players):
-      initializers.append(tf.group(
-          *[var.initializer for var in self._advantage_networks[p].variables]))
+      self.reinitialize_advantage_network(p)
+
+  def reinitialize_advantage_network(self, player):
+    initializers = []
+    initializers.append(tf.group(*[var.initializer for var in
+        self._advantage_networks[player].variables]))
     self._session.run(tf.group(*initializers))
 
   def solve(self):
