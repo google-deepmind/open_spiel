@@ -11,6 +11,6 @@ matplotlib >= 3.1.1
 nashpy == 0.0.19
 scipy == 1.4.1
 attrs >= 19.1.0
-jax >= 0.1.67
-jaxlib >= 0.1.47
-git+git://github.com/deepmind/dm-haiku@master
+jax == 0.1.67
+jaxlib == 0.1.47
+dm-haiku == 0.0.1
