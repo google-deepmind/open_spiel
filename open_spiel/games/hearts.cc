@@ -295,8 +295,9 @@ void HeartsState::InformationStateTensor(Player player,
   ptr += kNumCards;
   // Point totals
   for (int i = 0; i < kNumPlayers; ++i) {
+    // Use thermometer representation instead of one-hot for point totals.
     // Players can have negative points so we need to offset
-    ptr[points_[i] + std::abs(kPointsForJD)] = 1;
+    for (int j = 0; j < points_[i] + std::abs(kPointsForJD); ++j) ptr[j] = 1;
     ptr += kMaxScore;
   }
   // History of tricks, presented in the format: N E S W N E S
