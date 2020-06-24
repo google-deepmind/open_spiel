@@ -626,8 +626,6 @@ std::unique_ptr<CFRPlusSolver> DeserializeCFRPlusSolver(
 
 PartiallyDeserializedCFRSolver PartiallyDeserializeCFRSolver(
     const std::string& serialized) {
-  std::vector<absl::string_view> lines = absl::StrSplit(serialized, '\n');
-
   // We don't copy the CFR values table section due to potential large size.
   enum Section {
     kInvalid = -1,
@@ -636,10 +634,10 @@ PartiallyDeserializedCFRSolver PartiallyDeserializeCFRSolver(
     kSolverType = 2,
     kSolverSpecificState = 3
   };
-
   std::array<std::string, 4> section_strings = {"", "", "", ""};
   Section current_section = kInvalid;
 
+  std::vector<absl::string_view> lines = absl::StrSplit(serialized, '\n');
   for (int i = 0; i < lines.size(); i++) {
     if (lines[i].length() == 0 || lines[i].at(0) == '#') {
       // Skip comments and blank lines
@@ -669,7 +667,6 @@ PartiallyDeserializedCFRSolver PartiallyDeserializeCFRSolver(
   }
 
   // We currently just ignore the meta section.
-
   // In order to avod copying the CFR values table data we rather split it again
   // and obtain a single string_view that can be deserialized later using the
   // DeserializeCFRInfoStateValuesTable method.
@@ -677,7 +674,6 @@ PartiallyDeserializedCFRSolver PartiallyDeserializeCFRSolver(
       absl::StrSplit(
           serialized,
           absl::StrCat(kSerializeSolverValuesTableSectionHeader, "\n"));
-
   return PartiallyDeserializedCFRSolver(LoadGame(section_strings[kGame]),
                                         section_strings[kSolverType],
                                         section_strings[kSolverSpecificState],

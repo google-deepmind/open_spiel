@@ -70,6 +70,13 @@ class ExternalSamplingMCCFRSolver {
                               int seed = 0,
                               AverageType avg_type = AverageType::kSimple);
 
+  // The constructor below is meant mainly for deserialization purposes and
+  // should not be used directly.
+  ExternalSamplingMCCFRSolver(std::shared_ptr<const Game> game,
+                              std::shared_ptr<Policy> default_policy,
+                              std::unique_ptr<std::mt19937> rng,
+                              AverageType avg_type);
+
   // Performs one iteration of external sampling MCCFR, updating the regrets
   // and average strategy for all players. This method uses the internal random
   // number generator.
@@ -78,6 +85,8 @@ class ExternalSamplingMCCFRSolver {
   // Same as above, but uses the specified random number generator instead.
   void RunIteration(std::mt19937* rng);
 
+  CFRInfoStateValuesTable& InfoStateValuesTable() { return info_states_; }
+
   // Computes the average policy, containing the policy for all players.
   // The returned policy instance should only be used during the lifetime of
   // the CFRSolver object.
@@ -85,6 +94,11 @@ class ExternalSamplingMCCFRSolver {
     return std::unique_ptr<Policy>(
         new CFRAveragePolicy(info_states_, default_policy_));
   }
+
+  // See comments above CFRInfoStateValues::Serialize(double_precision) for
+  // notes about the double_precision parameter.
+  std::string Serialize(int double_precision = -1,
+                        std::string delimiter = "<~>") const;
 
  private:
   double UpdateRegrets(const State& state, Player player, std::mt19937* rng);
@@ -98,6 +112,10 @@ class ExternalSamplingMCCFRSolver {
   std::uniform_real_distribution<double> dist_;
   std::shared_ptr<Policy> default_policy_;
 };
+
+std::unique_ptr<ExternalSamplingMCCFRSolver>
+DeserializeExternalSamplingMCCFRSolver(const std::string& serialized,
+                                       std::string delimiter = "<~>");
 
 }  // namespace algorithms
 }  // namespace open_spiel
