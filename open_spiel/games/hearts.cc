@@ -123,7 +123,7 @@ std::string HeartsState::InformationStateString(Player player) const {
   auto cards = FormatHand(player, /*mark_voids=*/true);
   for (int suit = kNumSuits - 1; suit >= 0; --suit)
     absl::StrAppend(&rv, cards[suit], "\n");
-  if (!passed_cards_[0].empty()) absl::StrAppend(&rv, FormatPass(player));
+  if (!passed_cards_[player].empty()) absl::StrAppend(&rv, FormatPass(player));
   if (num_cards_played_ > 0) absl::StrAppend(&rv, FormatPlay(), FormatPoints());
   return rv;
 }
