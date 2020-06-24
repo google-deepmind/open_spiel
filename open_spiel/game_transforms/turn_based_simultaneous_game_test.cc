@@ -77,8 +77,27 @@ void SimulateGames(std::mt19937* rng, const Game& game, State* sim_state,
 
       sim_state->ApplyActions(joint_action);
     } else {
-      std::cerr << "Reach a decision node in a simultaneous game.";
-      SPIEL_CHECK_TRUE(false);
+      SPIEL_CHECK_EQ(sim_state->CurrentPlayer(), wrapped_sim_state->CurrentPlayer());
+      SPIEL_CHECK_EQ(sim_state->CurrentPlayer(), turn_based_state->CurrentPlayer());
+
+      Player p = sim_state->CurrentPlayer();
+
+      if (game.GetType().provides_information_state_string) {
+        // Check the information states to each player are consistent.
+        SPIEL_CHECK_EQ(sim_state->InformationStateString(p),
+                       wrapped_sim_state->InformationStateString(p));
+      }
+
+      std::vector<Action> actions;
+      actions = sim_state->LegalActions(p);
+      absl::uniform_int_distribution<> dis(0, actions.size() - 1);
+      Action action = actions[dis(*rng)];
+
+      std::cout << "player " << p << " chose "
+                << sim_state->ActionToString(p, action) << std::endl;
+
+      turn_based_state->ApplyAction(action);
+      sim_state->ApplyAction(action);
     }
 
     std::cout << "State: " << std::endl << sim_state->ToString() << std::endl;
