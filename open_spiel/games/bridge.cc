@@ -568,11 +568,15 @@ void BridgeState::ApplyBiddingAction(int call) {
     num_passes_ = 0;
   }
 
+  auto partnership = Partnership(current_player_);
   if (call == kDouble) {
+    SPIEL_CHECK_NE(Partnership(contract_.declarer), partnership);
     SPIEL_CHECK_EQ(contract_.double_status, kUndoubled);
+    SPIEL_CHECK_GT(contract_.level, 0);
     possible_contracts_[contract_.Index()] = false;
     contract_.double_status = kDoubled;
   } else if (call == kRedouble) {
+    SPIEL_CHECK_EQ(Partnership(contract_.declarer), partnership);
     SPIEL_CHECK_EQ(contract_.double_status, kDoubled);
     possible_contracts_[contract_.Index()] = false;
     contract_.double_status = kRedoubled;
@@ -602,6 +606,9 @@ void BridgeState::ApplyBiddingAction(int call) {
     }
   } else {
     // A bid was made.
+    SPIEL_CHECK_TRUE((BidLevel(call) > contract_.level) ||
+                     (BidLevel(call) == contract_.level &&
+                      BidSuit(call) > contract_.trumps));
     contract_.level = BidLevel(call);
     contract_.trumps = BidSuit(call);
     contract_.double_status = kUndoubled;

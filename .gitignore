@@ -28,6 +28,7 @@ pyspiel.egg-info/
 
  # External git modules
 open_spiel/abseil-cpp/
+open_spiel/eigen/libeigen/
 open_spiel/games/bridge/double_dummy_solver/
 open_spiel/games/universal_poker/double_dummy_solver/
 open_spiel/games/hanabi/hanabi-learning-environment/
