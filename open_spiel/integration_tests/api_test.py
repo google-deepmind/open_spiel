@@ -318,6 +318,15 @@ class PartialEnforceAPIConventionsTest(parameterized.TestCase):
       with self.assertRaisesRegex(RuntimeError, "player <", msg=msg):
         state.observation_string(num_players + 1)
 
+    if game_type.provides_factored_observation_string:
+      for p in range(num_players):
+        state.private_observation_string(p)
+      msg = f"private_observation_string did not raise an error for {game_name}"
+      with self.assertRaisesRegex(RuntimeError, "player >= 0", msg=msg):
+        state.private_observation_string(-1)
+      with self.assertRaisesRegex(RuntimeError, "player <", msg=msg):
+        state.private_observation_string(num_players + 1)
+
   @parameterized.parameters(_GAMES_TO_TEST)
   def test_observations_are_consistent_with_info_states(self, game_name):
     print(f"Testing observation <-> info_state consistency for '{game_name}'")

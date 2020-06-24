@@ -135,6 +135,8 @@ PYBIND11_MODULE(pyspiel, m) {
       .def_readonly("parameter_specification",
                     &GameType::parameter_specification)
       .def_readonly("default_loadable", &GameType::default_loadable)
+      .def_readonly("provides_factored_observation_string",
+                    &GameType::provides_factored_observation_string)
       .def("pretty_print",
            [](const GameType& value) { return GameTypeToString(value); })
       .def("__repr__",
@@ -240,6 +242,12 @@ PYBIND11_MODULE(pyspiel, m) {
                                      State::ObservationTensor)
       .def("observation_tensor",
            (std::vector<double>(State::*)() const) & State::ObservationTensor)
+      .def("public_observation_string",
+           (std::string(State::*)() const) & State::PublicObservationString)
+      .def("private_observation_string",
+           (std::string(State::*)(int) const) & State::PrivateObservationString)
+      .def("private_observation_string",
+           (std::string(State::*)() const) & State::PrivateObservationString)
       .def("clone", &State::Clone)
       .def("child", &State::Child)
       .def("undo_action", &State::UndoAction)

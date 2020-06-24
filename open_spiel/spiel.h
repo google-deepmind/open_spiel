@@ -140,6 +140,18 @@ struct GameType {
   // Can the game be loaded with no parameters? It is strongly recommended that
   // games be loadable with default arguments.
   bool default_loadable = true;
+
+  // Can we factorize observations into public and private parts?
+  // This is similar to observation fields before, but adds additional
+  // distinction between public and private observations.
+  // The public observations correspond to information that all the players know
+  // that all the players know, like upward-facing cards on a table.
+  // The private observation is then the remaining information, distinct from
+  // the public observation. The private and public observations are
+  // non-overlaping, and their union of corresponds to the (undistinguished)
+  // player observation. See the Factored-Observation Game (FOG) paper
+  // for more details: https://arxiv.org/pdf/1906.11110.pdf
+  bool provides_factored_observation_string = false;
 };
 
 enum class StateType {
@@ -453,15 +465,15 @@ class State {
   //    course of the game is sufficient to reconstruct the information
   //    state for any players at any point in the game.
   //
-  // For example, the cards revealed and bets made since our previous move in
-  // poker, or the current state of the board in chess.
+  // For example, an observation is the cards revealed and bets made in Poker,
+  // or the current state of the board in Chess.
   // Note that neither of these are valid information states, since the same
   // observation may arise from two different observation histories (i.e. they
   // are not perfect recall).
   //
   // Observations should cover all observations: a combination of both public
-  // (common) and private observations. They are not factored into these
-  // individual constituent parts.
+  // and private observations. They are not factored into these individual
+  // constituent parts.
   //
   // Implementations should start with (and it's tested in api_test.py):
   //   SPIEL_CHECK_GE(player, 0);
@@ -496,6 +508,79 @@ class State {
   }
   std::vector<double> ObservationTensor() const {
     return ObservationTensor(CurrentPlayer());
+  }
+
+  // The public / private observations factorize observations into their
+  // consituent non-overlapping parts.
+  //
+  // The public observations correspond to information that all the players know
+  // that all the players know, like upward-facing cards on a table.
+  // Perfect information games, like Chess, have only public observations and
+  // private observations for the players are empty.
+  //
+  // All games have non-empty public observations. The minimum public
+  // information is time: we assume that all the players can perceive absolute
+  // time (we do not consider any relativistic effects). The implemented games
+  // must be 1-timeable (see [1] for details), a property that is trivially
+  // satisfied with all human-played board games, so you don't have to typically
+  // worry about this. (You'd have to knock players out to make non-timeable
+  // games.) The public observations are used to create a list of observations:
+  // a public observation history. If you return any non-empty public
+  // observation, you implicitly encode time as well within this history
+  // sequence.
+  //
+  // Public observations are not required to be "common knowledge" observations.
+  // Example: In imperfect-info version of card game Goofspiel, players make
+  // bets with cards on their hand, and the imperfect information consists of
+  // not knowing exactly what cards the opponent currently holds, as the players
+  // only learn public information whether they have won/lost/draw the bet.
+  // However, when the player bets a card "5" and learns it drew the round,
+  // it can infer that the opponent must have also bet the card "5", just as the
+  // player did. In principle we could ask the game to make this inference
+  // automatically, and return observation "draw-5". We do not require this, as
+  // it is in general expensive to compute. Returning public observation "draw"
+  // is sufficient.
+  //
+  // See the Factored-Observation Game (FOG) paper for more details.
+  // [1] https://arxiv.org/abs/1906.11110
+
+  virtual std::string PublicObservationString() const {
+    SpielFatalError("PublicObservationString is not implemented.");
+  }
+
+  // The public / private observations factorize observations into their
+  // consituent non-overlapping parts.
+  //
+  // The private observations correspond to the part of the observation that
+  // is not public. In Poker, this would be the cards the player holds in his
+  // hand. Note that this does not imply that other players don't have access
+  // to this information.
+  //
+  // For example, consider there is a mirror behind an unaware player, betraying
+  // his hand in the reflection. Even if everyone was aware of the mirror, then
+  // this information still may not be public, because the players do not know
+  // for certain that everyone is aware of this. It would become public if and
+  // only if all the players were aware of the mirror, and they also knew that
+  // indeed everyone else knows about it too. Then this would effectively make
+  // it the same as if the player just placed his cards on the table for
+  // everyone to see.
+  //
+  // Perfect information games have no private observations: implementations
+  // can just return an empty string. Imperfect-information games should return
+  // a non-empty string at least once in the game (otherwise they would be
+  // perfect-info games).
+  //
+  // Implementations should start with (and it's tested in api_test.py):
+  //   SPIEL_CHECK_GE(player, 0);
+  //   SPIEL_CHECK_LT(player, num_players_);
+  //
+  // See the Factored-Observation Game (FOG) paper for more details.
+  // [1] https://arxiv.org/pdf/1906.11110.pdf
+  virtual std::string PrivateObservationString(Player player) const {
+    SpielFatalError("PrivateObservationString is not implemented.");
+  }
+  std::string PrivateObservationString() const {
+    return PrivateObservationString(CurrentPlayer());
   }
 
   // Return a copy of this state.

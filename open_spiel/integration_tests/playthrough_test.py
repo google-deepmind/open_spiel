@@ -68,9 +68,10 @@ class PlaythroughTest(absltest.TestCase):
           continue
 
       expected, actual = generate_playthrough.replay(file_path)
-      for expected_line, actual_line in zip(
-          expected.split("\n"), actual.split("\n")):
-        self.assertEqual(expected_line, actual_line)
+      for line_num, (expected_line, actual_line) in enumerate(zip(
+          expected.split("\n"), actual.split("\n"))):
+        self.assertEqual(expected_line, actual_line,
+                         msg="Wrong line {} in {}".format(line_num, basename))
 
       self.assertMultiLineEqual(
           expected, actual, msg="Issue with basename {}".format(basename))
