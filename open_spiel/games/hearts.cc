@@ -312,16 +312,18 @@ void HeartsState::InformationStateTensor(Player player,
     ptr += (kNumPlayers - leader - 1) * kNumCards;
   }
   Player leader = tricks_[current_trick].Leader();
-  ptr += leader * kNumCards;
-  auto cards = tricks_[current_trick].Cards();
-  for (int i = 0; i < cards.size(); ++i) {
-    ptr[cards[i]] = 1;
-    ptr += kNumCards;
+  if (leader != kInvalidPlayer) {
+    auto cards = tricks_[current_trick].Cards();
+    ptr += leader * kNumCards;
+    for (auto card : cards) {
+      ptr[card] = 1;
+      ptr += kNumCards;
+    }
   }
   // Current trick may contain less than four cards.
-  ptr += (kNumPlayers - cards.size()) * kNumCards;
+  ptr += (kNumPlayers - (num_cards_played_ % kNumPlayers)) * kNumCards;
   // Move to the end of current trick.
-  ptr += (kNumPlayers - leader - 1) * kNumCards;
+  ptr += (kNumPlayers - std::max(leader, 0) - 1) * kNumCards;
   // Skip over unplayed tricks.
   ptr += (kNumTricks - current_trick - 1) * kTrickTensorSize;
   SPIEL_CHECK_EQ(std::distance(values->begin(), ptr),
