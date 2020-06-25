@@ -21,6 +21,8 @@ set(GAME_SOURCES
   chess/chess_common.h
   cliff_walking.cc
   cliff_walking.h
+  clobber.cc
+  clobber.h
   coin_game.cc
   coin_game.h
   connect_four.cc
@@ -213,6 +215,10 @@ add_test(chess_test chess_test)
 add_executable(cliff_walking_test cliff_walking_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(cliff_walking_test cliff_walking_test)
+
+add_executable(clobber_test clobber_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(clobber_test clobber_test)
 
 add_executable(coin_game_test coin_game_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>
