@@ -501,7 +501,7 @@ void HeartsState::ApplyPlayAction(int card) {
     CurrentTrick().Play(current_player_, card);
   }
   // Check if action breaks hearts.
-  if (Suit(card) == Suit::kHearts) hearts_broken_ = true;
+  if (CardSuit(card) == Suit::kHearts) hearts_broken_ = true;
   if (qs_breaks_hearts_ && card == Card(Suit::kSpades, 10))
     hearts_broken_ = true;
   // Update player and point totals.
