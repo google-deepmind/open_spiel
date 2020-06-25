@@ -33,7 +33,7 @@ std::map<std::string, int> card_int = BuildCardIntMap();
 
 void BasicGameTests() {
   testing::LoadGameTest("hearts");
-  testing::NoChanceOutcomesTest(*LoadGame("hearts"));
+  testing::ChanceOutcomesTest(*LoadGame("hearts"));
   testing::RandomSimTest(*LoadGame("hearts"), 10);
 }
 
