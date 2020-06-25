@@ -150,7 +150,7 @@ struct GameType {
   // the public observation. The private and public observations are
   // non-overlaping, and their union of corresponds to the (undistinguished)
   // player observation. See the Factored-Observation Game (FOG) paper
-  // for more details: https://arxiv.org/pdf/1906.11110.pdf
+  // for more details: https://arxiv.org/abs/1906.11110
   bool provides_factored_observation_string = false;
 };
 
@@ -418,7 +418,7 @@ class State {
   // In other words, AOH is a factored representation of InformationState.
   //
   // For details, see Section 3.1 of https://arxiv.org/abs/1908.09453
-  // or Section 2.1 of https://arxiv.org/pdf/1906.11110.pdf
+  // or Section 2.1 of https://arxiv.org/abs/1906.11110
 
   // There are currently no use-case for calling this function with
   // `kChancePlayerId` or `kTerminalPlayerId`. Thus, games are expected to raise
@@ -575,7 +575,7 @@ class State {
   //   SPIEL_CHECK_LT(player, num_players_);
   //
   // See the Factored-Observation Game (FOG) paper for more details.
-  // [1] https://arxiv.org/pdf/1906.11110.pdf
+  // [1] https://arxiv.org/abs/1906.11110
   virtual std::string PrivateObservationString(Player player) const {
     SpielFatalError("PrivateObservationString is not implemented.");
   }
@@ -843,7 +843,7 @@ class Game : public std::enable_shared_from_this<Game> {
   // that is taken from the initial state.
   //
   // If this method is overridden, then it should be the inverse of
-  // Game::SerializeState (i.e. that method should also be overridden).
+  // State::Serialize (i.e. that method should also be overridden).
   virtual std::unique_ptr<State> DeserializeState(const std::string& str) const;
 
   // The maximum length of any one game (in terms of number of decision nodes
