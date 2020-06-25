@@ -97,12 +97,39 @@ void XinxinBot::NewDeal(std::vector<std::vector<::hearts::card>>* initial_cards,
   game_state_->setFirstPlayer(first_player);
 }
 
-Action XinxinBot::Step(const State&) {
+Action XinxinBot::Step(const State& state) {
+  // check that xinxin and open_spiel agree on legal actions
+  ::hearts::Move *all_moves = game_state_->getAllMoves();
+  std::vector<Action> xinxin_actions;
+  while (all_moves != nullptr) {
+    ::hearts::card card = static_cast<::hearts::CardMove*>(all_moves)->c;
+    xinxin_actions.push_back(GetOpenSpielAction(card));
+    all_moves = all_moves->next;
+  }
+  absl::c_sort(xinxin_actions);
+  std::vector<Action> legal_actions = state.LegalActions();
+  if (legal_actions != xinxin_actions) {
+    std::cout << "Begin error message: " << std::endl;
+    std::cout << "xinxin game state: " << std::endl;
+    game_state_->Print();
+    std::cout << "xinxin legal moves: " << std::endl;
+    all_moves = game_state_->getAllMoves();
+    all_moves->Print(1);
+    std::cout << "OpenSpiel game state: " << std::endl;
+    std::cout << state.ToString() << std::endl;
+    std::cout << "OpenSpiel legal actions: " << std::endl;
+    std::cout << legal_actions << std::endl;
+    std::cout << "OpenSpiel history: " << std::endl;
+    std::cout << state.History() << std::endl;
+    SpielFatalError("xinxin legal actions != OpenSpiel legal actions.");
+  }
+  // test passed!
   ::hearts::CardMove* move =
       static_cast<::hearts::CardMove*>(game_state_->getNextPlayer()->Play());
   game_state_->ApplyMove(move);
   Action act = GetOpenSpielAction(move->c);
   game_state_->freeMove(move);
+  SPIEL_CHECK_TRUE(absl::c_binary_search(legal_actions, act));
   return act;
 }
 
