@@ -198,6 +198,7 @@ class HeartsGame : public Game {
  public:
   explicit HeartsGame(const GameParameters& params);
   int NumDistinctActions() const override { return kNumCards; }
+  int MaxChanceOutcomes() const override { return kNumCards; }
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(new HeartsState(
         shared_from_this(), /*pass_cards=*/pass_cards_,

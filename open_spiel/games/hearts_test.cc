@@ -33,7 +33,7 @@ std::map<std::string, int> card_int = BuildCardIntMap();
 
 void BasicGameTests() {
   testing::LoadGameTest("hearts");
-  testing::NoChanceOutcomesTest(*LoadGame("hearts"));
+  testing::ChanceOutcomesTest(*LoadGame("hearts"));
   testing::RandomSimTest(*LoadGame("hearts"), 10);
 }
 
@@ -165,12 +165,11 @@ std::string InformationStateTensorToString(Player player,
   ptr += kNumCards;
   // Points
   for (int i = 0; i < kNumPlayers; ++i) {
+    int player_score = kPointsForJD;
     for (int j = 0; j < kMaxScore; ++j) {
-      if (ptr[j] == 0) {
-        points.push_back(j - 10);
-        break;
-      }
+      if (ptr[j] == 1) ++player_score;
     }
+    points.push_back(player_score);
     ptr += kMaxScore;
   }
   // Trick history
