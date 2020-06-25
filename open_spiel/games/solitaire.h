@@ -32,6 +32,10 @@ inline constexpr int kDefaultPlayers = 1;
 inline constexpr int kDefaultDepthLimit = 150;
 inline constexpr bool kDefaultIsColored = false;
 
+// Constants ===================================================================
+
+inline constexpr int kHiddenCard = 99;
+
 // Enumerations ================================================================
 
 enum class SuitType {
@@ -84,10 +88,6 @@ enum class PileID {
   k7thTableau = 11,
   kMissing = 12
 };
-
-// Constants ===================================================================
-
-inline constexpr int kHiddenCard = 99;
 
 // Support Classes =============================================================
 

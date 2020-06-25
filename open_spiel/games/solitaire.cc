@@ -1486,13 +1486,13 @@ double SolitaireGame::MinUtility() const {
 
 double SolitaireGame::MaxUtility() const {
   /* Waste (24 * 20 = 480)
-      24 cards are in the waste initially. 20 points are rewarded for every one
+     24 cards are in the waste initially. 20 points are rewarded for every one
      that is moved from the waste. Tableau (21 * 20 = 420) 21 cards are hidden
      in the tableaus initially. 20 points are rewarded for every one that is
      revealed. Foundation (4 * (100 + 90 + 80 + 70 + 60 + 50 + 40 + 30 + 20 + 10
      + 10 + 10 + 10) = 4 * 580 = 2,320) 0 cards are in the foundations
      initially. A varying number of points, based on the cards rank, are awarded
-       when the card is moved to the foundation. Each complete suit in the
+     when the card is moved to the foundation. Each complete suit in the
      foundation is worth 580 points. `kFoundationPoints` in `solitaire.h`
      outlines how much each rank is worth. */
   return 3220.0;
