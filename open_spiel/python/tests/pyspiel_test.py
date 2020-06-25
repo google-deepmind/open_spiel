@@ -58,6 +58,7 @@ class PyspielTest(absltest.TestCase):
         "hearts",
         "kuhn_poker",
         "laser_tag",
+        "lewis_signaling",
         "leduc_poker",
         "liars_dice",
         "markov_soccer",
