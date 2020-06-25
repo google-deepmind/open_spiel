@@ -114,8 +114,8 @@ inline constexpr float FloatingPointDefaultThresholdRatio() { return 1e-5; }
 Action RankActionMixedBase(const std::vector<int>& bases,
                            const std::vector<int>& digits);
 
-void UnrankActionMixedBase(Action action, const std::vector<int>& bases,
-                           std::vector<int>* digits);
+std::vector<int> UnrankActionMixedBase(Action action,
+                                       const std::vector<int>& bases);
 
 // Helper function to determine the next player in a round robin.
 int NextPlayerRoundRobin(Player player, int nplayers);
