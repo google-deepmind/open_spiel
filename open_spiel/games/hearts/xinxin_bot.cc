@@ -97,6 +97,26 @@ void XinxinBot::NewDeal(std::vector<std::vector<::hearts::card>>* initial_cards,
   game_state_->setFirstPlayer(first_player);
 }
 
+void XinxinBot::LogStateMismatchError(const State& state, std::string msg) {
+  std::cout << "Begin error message: " << std::endl;
+  std::cout << "xinxin game state: " << std::endl;
+  game_state_->Print();
+  std::cout << "xinxin legal moves: " << std::endl;
+  ::hearts::Move *all_moves = game_state_->getAllMoves();
+  if (all_moves!= nullptr) all_moves->Print(1);
+  std::cout << "xinxin points (N E S W): " << std::endl;
+  for (Player p = 0; p < game_state_->getNumPlayers(); p++)
+    std::cout << game_state_->score(p) << " ";
+  std::cout << std::endl;
+  std::cout << "OpenSpiel game state: " << std::endl;
+  std::cout << state.ToString() << std::endl;
+  std::cout << "OpenSpiel legal actions: " << std::endl;
+  std::cout << state.LegalActions() << std::endl;
+  std::cout << "OpenSpiel history: " << std::endl;
+  std::cout << state.History() << std::endl;
+  SpielFatalError(msg);
+}
+
 Action XinxinBot::Step(const State& state) {
   // check that xinxin and open_spiel agree on legal actions
   ::hearts::Move *all_moves = game_state_->getAllMoves();
@@ -109,19 +129,8 @@ Action XinxinBot::Step(const State& state) {
   absl::c_sort(xinxin_actions);
   std::vector<Action> legal_actions = state.LegalActions();
   if (legal_actions != xinxin_actions) {
-    std::cout << "Begin error message: " << std::endl;
-    std::cout << "xinxin game state: " << std::endl;
-    game_state_->Print();
-    std::cout << "xinxin legal moves: " << std::endl;
-    all_moves = game_state_->getAllMoves();
-    all_moves->Print(1);
-    std::cout << "OpenSpiel game state: " << std::endl;
-    std::cout << state.ToString() << std::endl;
-    std::cout << "OpenSpiel legal actions: " << std::endl;
-    std::cout << legal_actions << std::endl;
-    std::cout << "OpenSpiel history: " << std::endl;
-    std::cout << state.History() << std::endl;
-    SpielFatalError("xinxin legal actions != OpenSpiel legal actions.");
+    LogStateMismatchError(state,
+                          "xinxin legal actions != OpenSpiel legal actions.");
   }
   // test passed!
   ::hearts::CardMove* move =
@@ -149,10 +158,24 @@ void XinxinBot::InformAction(const State& state, Player player_id,
       }
     }
   } else {
-    ::hearts::Move* move =
-        new ::hearts::CardMove(GetXinxinAction(action), player_id);
-    game_state_->ApplyMove(move);
-    game_state_->freeMove(move);
+    if (state.IsTerminal()) {
+      if (!game_state_->Done()) {
+        LogStateMismatchError(state, "xinxin state is not terminal.");
+      }
+      std::vector<double> returns = state.Returns();
+      for (Player p = 0; p < returns.size(); p++) {
+        // returns in open_spiel hearts are transformed from the score
+        // to reflect that getting the least number of total points is better
+        if (returns[p] != kTotalPositivePoints - game_state_->score(p)) {
+          LogStateMismatchError(state, "xinxin score != OpenSpiel score");
+        }
+      }
+    } else {
+      ::hearts::Move* move =
+          new ::hearts::CardMove(GetXinxinAction(action), player_id);
+      game_state_->ApplyMove(move);
+      game_state_->freeMove(move);
+    }
   }
 }
 
@@ -164,7 +187,7 @@ void XinxinBot::ForceAction(const State& state, Action action) {
 }
 
 int XinxinBot::XinxinRules(GameParameters params) {
-  int rules = 0;
+  int rules = ::hearts::kQueenPenalty;
   if (params["pass_cards"].bool_value()) rules |= ::hearts::kDoPassCards;
   if (params["no_pts_on_first_trick"].bool_value())
     rules |= ::hearts::kNoHeartsFirstTrick | ::hearts::kNoQueenFirstTrick;
@@ -174,8 +197,8 @@ int XinxinBot::XinxinRules(GameParameters params) {
     rules |= ::hearts::kLead2Clubs;
   }
   if (params["jd_bonus"].bool_value()) rules |= ::hearts::kJackBonus;
-  if (!params["avoid_all_tricks_bonus"].bool_value())
-    rules |= ::hearts::kNoShooting;
+  if (params["avoid_all_tricks_bonus"].bool_value())
+    rules |= ::hearts::kNoTrickBonus;
   if (params["qs_breaks_hearts"].bool_value())
     rules |= ::hearts::kQueenBreaksHearts;
   if (params["must_break_hearts"].bool_value())

@@ -84,6 +84,10 @@ void XinxinBot_GenerateGames(int num_games, std::string path) {
         state->ApplyAction(action);
       }
     }
+    for (Player p = 0; p < num_players; ++p) {
+      // allows checking for differences in the returns
+      bots[p]->InformAction(*state, kTerminalPlayerId, kInvalidAction);
+    }
     game_logs << absl::StrJoin(state->History(), " ") << "\n";
   }
   game_logs.close();
