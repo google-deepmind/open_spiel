@@ -18,14 +18,12 @@ namespace open_spiel {
 namespace hearts {
 namespace {
 
-constexpr int kUCTNumRuns = 50;
-constexpr int kUCTcVal = 0.4;
-constexpr int kIIMCNumWorlds = 20;
 constexpr Suit kXinxinSuits[] = {Suit::kSpades, Suit::kDiamonds, Suit::kClubs,
                                  Suit::kHearts};
 constexpr ::hearts::tPassDir kXinxinPassDir[] = {
     ::hearts::tPassDir::kHold, ::hearts::tPassDir::kLeftDir,
     ::hearts::tPassDir::kAcrossDir, ::hearts::tPassDir::kRightDir};
+
 }  // namespace
 
 Action GetOpenSpielAction(::hearts::card card) {
@@ -44,21 +42,25 @@ Action GetOpenSpielAction(::hearts::card card) {
 }
 
 std::unique_ptr<::hearts::SafeSimpleHeartsPlayer> XinxinBot::CreatePlayer() {
-  xinxin_uct_.push_back(std::make_unique<::hearts::UCT>(kUCTNumRuns, kUCTcVal));
+  xinxin_uct_.push_back(
+      std::make_unique<::hearts::UCT>(uct_num_runs_, uct_c_val_));
   xinxin_playouts_.push_back(std::make_unique<::hearts::HeartsPlayout>());
   xinxin_uct_.back()->setPlayoutModule(xinxin_playouts_.back().get());
   xinxin_mc_.push_back(std::make_unique<::hearts::iiMonteCarlo>(
-      xinxin_uct_.back().get(), kIIMCNumWorlds));
-  // single-threaded xinxin is currently broken
-  // (https://github.com/nathansttt/hearts/issues/5)
-  xinxin_mc_.back()->setUseThreads(true);
+      xinxin_uct_.back().get(), iimc_num_worlds_));
+  xinxin_mc_.back()->setUseThreads(use_threads_);
   auto player = std::make_unique<::hearts::SafeSimpleHeartsPlayer>(
       xinxin_mc_.back().get());
   player->setModelLevel(2);
   return player;
 }
 
-XinxinBot::XinxinBot(int rules, int num_players) : kNumPlayers(num_players) {
+XinxinBot::XinxinBot(int rules, int uct_num_runs, double uct_c_val,
+                     int iimc_num_worlds, bool use_threads)
+    : uct_num_runs_(uct_num_runs),
+      uct_c_val_(uct_c_val),
+      iimc_num_worlds_(iimc_num_worlds),
+      use_threads_(use_threads) {
   pass_dir_ = ::hearts::tPassDir::kHold;
   num_cards_dealt_ = 0;
   game_state_ = std::make_unique<::hearts::HeartsGameState>();
@@ -209,9 +211,12 @@ int XinxinBot::XinxinRules(GameParameters params) {
   return rules;
 }
 
-std::unique_ptr<Bot> MakeXinxinBot(GameParameters params, int num_players) {
+std::unique_ptr<Bot> MakeXinxinBot(GameParameters params, int uct_num_runs,
+                                   double uct_c_val, int iimc_num_worlds,
+                                   bool use_threads) {
   int rules = XinxinBot::XinxinRules(params);
-  return std::make_unique<XinxinBot>(rules, num_players);
+  return std::make_unique<XinxinBot>(rules, uct_num_runs, uct_c_val,
+                                     iimc_num_worlds, use_threads);
 }
 
 }  // namespace hearts

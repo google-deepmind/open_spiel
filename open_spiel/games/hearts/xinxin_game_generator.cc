@@ -43,13 +43,20 @@
 ABSL_FLAG(int, num_games, 5, "How many games to run.");
 ABSL_FLAG(std::string, path, "/tmp/xinxin_logs.txt",
           "Where to output the logs.");
+ABSL_FLAG(int, uct_num_runs, 50, "Number of MCTS simulations.");
+ABSL_FLAG(double, uct_c_val, 0.4, "UCT exploration parameter.");
+ABSL_FLAG(int, iimc_num_worlds, 20,
+          "Num of worlds to sample from at the start of each simulation.");
+ABSL_FLAG(bool, use_threads, true, "Use multiple threads for MCTS.");
 
 namespace open_spiel {
 namespace {
 
 uint_fast32_t Seed() { return absl::ToUnixMicros(absl::Now()); }
 
-void XinxinBot_GenerateGames(int num_games, std::string path) {
+void XinxinBot_GenerateGames(int num_games, std::string path, int uct_num_runs,
+                             double uct_c_val, int iimc_num_worlds,
+                             bool use_threads) {
   std::mt19937 rng(Seed());
   std::ofstream game_logs(path);
   auto game = open_spiel::LoadGame("hearts");
@@ -58,7 +65,9 @@ void XinxinBot_GenerateGames(int num_games, std::string path) {
 
   for (int i = 0; i < hearts::kNumPlayers; i++) {
     bots.push_back(open_spiel::hearts::MakeXinxinBot(game->GetParameters(),
-                                                     game->NumPlayers()));
+                                                     uct_num_runs, uct_c_val,
+                                                     iimc_num_worlds,
+                                                     use_threads));
     bot_ptrs.push_back(bots.back().get());
   }
 
@@ -98,5 +107,9 @@ void XinxinBot_GenerateGames(int num_games, std::string path) {
 int main(int argc, char **argv) {
   absl::ParseCommandLine(argc, argv);
   open_spiel::XinxinBot_GenerateGames(absl::GetFlag(FLAGS_num_games),
-                                      absl::GetFlag(FLAGS_path));
+                                      absl::GetFlag(FLAGS_path),
+                                      absl::GetFlag(FLAGS_uct_num_runs),
+                                      absl::GetFlag(FLAGS_uct_c_val),
+                                      absl::GetFlag(FLAGS_iimc_num_worlds),
+                                      absl::GetFlag(FLAGS_use_threads));
 }
