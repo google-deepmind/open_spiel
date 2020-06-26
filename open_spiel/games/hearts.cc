@@ -552,7 +552,7 @@ void HeartsState::ComputeScore() {
     }
   }
   // Did anyone avoid taking any tricks?
-  if (avoid_all_tricks_bonus_) {
+  if (avoid_all_tricks_bonus_ && !moon_shot) {
     std::vector<int> tricks_taken(kNumPlayers, 0);
     for (int i = 0; i < kNumTricks; ++i) {
       tricks_taken[tricks_[i].Winner()] += 1;

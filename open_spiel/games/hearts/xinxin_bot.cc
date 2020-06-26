@@ -164,7 +164,7 @@ void XinxinBot::ForceAction(const State& state, Action action) {
 }
 
 int XinxinBot::XinxinRules(GameParameters params) {
-  int rules = 0;
+  int rules = ::hearts::kQueenPenalty;
   if (params["pass_cards"].bool_value()) rules |= ::hearts::kDoPassCards;
   if (params["no_pts_on_first_trick"].bool_value())
     rules |= ::hearts::kNoHeartsFirstTrick | ::hearts::kNoQueenFirstTrick;
@@ -174,8 +174,8 @@ int XinxinBot::XinxinRules(GameParameters params) {
     rules |= ::hearts::kLead2Clubs;
   }
   if (params["jd_bonus"].bool_value()) rules |= ::hearts::kJackBonus;
-  if (!params["avoid_all_tricks_bonus"].bool_value())
-    rules |= ::hearts::kNoShooting;
+  if (params["avoid_all_tricks_bonus"].bool_value())
+    rules |= ::hearts::kNoTrickBonus;
   if (params["qs_breaks_hearts"].bool_value())
     rules |= ::hearts::kQueenBreaksHearts;
   if (params["must_break_hearts"].bool_value())
