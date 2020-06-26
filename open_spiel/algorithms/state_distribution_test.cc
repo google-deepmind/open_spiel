@@ -99,6 +99,7 @@ void LeducStateDistributionTest() {
                                          /*player_id=*/1, nullptr);
   std::cerr << "Comparing dists 1..." << std::endl;
   CompareDists(dist, *incremental_dist);
+  CompareDists(dist, *CloneBeliefs(dist));
   std::cerr << "Check infostates2..." << std::endl;
   CheckDistHasSameInfostate(*incremental_dist, *state, /*player_id=*/1);
 
@@ -139,6 +140,7 @@ void LeducStateDistributionTest() {
 
   std::cerr << "Comparing dists 2..." << std::endl;
   CompareDists(dist, *incremental_dist);
+  CompareDists(dist, *CloneBeliefs(dist));
 }
 
 constexpr absl::string_view kHUNLGameString =
