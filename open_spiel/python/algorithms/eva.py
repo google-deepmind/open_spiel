@@ -30,11 +30,14 @@ from __future__ import print_function
 import collections
 import copy
 import numpy as np
-import sonnet as snt
 import tensorflow.compat.v1 as tf
 
 from open_spiel.python import rl_agent
+from open_spiel.python import simple_nets
 from open_spiel.python.algorithms import dqn
+
+# Temporarily disable TF2 behavior until we update the code.
+tf.disable_v2_behavior()
 
 MEM_KEY_NAME = "embedding"
 
@@ -154,8 +157,9 @@ class EVAAgent(object):
         shape=[None, self._info_state_size],
         dtype=tf.float32,
         name="info_state_ph")
-    self._embedding_network = snt.nets.MLP(
-        list(embedding_network_layers) + [embedding_size])
+    self._embedding_network = simple_nets.MLP(self._info_state_size,
+                                              list(embedding_network_layers),
+                                              embedding_size)
     self._embedding = self._embedding_network(self._info_state_ph)
 
     # The DQN agent requires this be an integer.

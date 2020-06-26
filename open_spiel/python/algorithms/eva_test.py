@@ -24,6 +24,9 @@ import tensorflow.compat.v1 as tf
 from open_spiel.python import rl_environment
 from open_spiel.python.algorithms import eva
 
+# Temporarily disable TF2 behavior until we update the code.
+tf.disable_v2_behavior()
+
 
 class EVATest(parameterized.TestCase):
 

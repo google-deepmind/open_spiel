@@ -23,14 +23,17 @@ from __future__ import print_function
 
 import collections
 import contextlib
-import random
 import enum
+import random
 import numpy as np
-import sonnet as snt
 import tensorflow.compat.v1 as tf
 
 from open_spiel.python import rl_agent
+from open_spiel.python import simple_nets
 from open_spiel.python.algorithms import dqn
+
+# Temporarily disable TF2 behavior until code is updated.
+tf.disable_v2_behavior()
 
 Transition = collections.namedtuple(
     "Transition", "info_state action_probs legal_actions_mask")
@@ -65,7 +68,7 @@ class NFSP(rl_agent.AbstractAgent):
     self.player_id = player_id
     self._session = session
     self._num_actions = num_actions
-    self._layer_sizes = hidden_layers_sizes + [num_actions]
+    self._layer_sizes = hidden_layers_sizes
     self._batch_size = batch_size
     self._learn_every = learn_every
     self._anticipatory_param = anticipatory_param
@@ -108,7 +111,8 @@ class NFSP(rl_agent.AbstractAgent):
         name="legal_actions_mask_ph")
 
     # Average policy network.
-    self._avg_network = snt.nets.MLP(output_sizes=self._layer_sizes)
+    self._avg_network = simple_nets.MLP(state_representation_size,
+                                        self._layer_sizes, num_actions)
     self._avg_policy = self._avg_network(self._info_state_ph)
     self._avg_policy_probs = tf.nn.softmax(self._avg_policy)
 

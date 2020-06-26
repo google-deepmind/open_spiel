@@ -21,10 +21,13 @@ from __future__ import print_function
 import collections
 import random
 import numpy as np
-import sonnet as snt
 import tensorflow.compat.v1 as tf
 
 from open_spiel.python import rl_agent
+from open_spiel.python import simple_nets
+
+# Temporarily disable TF2 behavior until code is updated.
+tf.disable_v2_behavior()
 
 Transition = collections.namedtuple(
     "Transition",
@@ -122,7 +125,7 @@ class DQN(rl_agent.AbstractAgent):
     self._num_actions = num_actions
     if isinstance(hidden_layers_sizes, int):
       hidden_layers_sizes = [hidden_layers_sizes]
-    self._layer_sizes = hidden_layers_sizes + [num_actions]
+    self._layer_sizes = hidden_layers_sizes
     self._batch_size = batch_size
     self._update_target_network_every = update_target_network_every
     self._learn_every = learn_every
@@ -166,9 +169,12 @@ class DQN(rl_agent.AbstractAgent):
         dtype=tf.float32,
         name="legal_actions_mask_ph")
 
-    self._q_network = snt.nets.MLP(output_sizes=self._layer_sizes)
+    self._q_network = simple_nets.MLP(state_representation_size,
+                                      self._layer_sizes, num_actions)
     self._q_values = self._q_network(self._info_state_ph)
-    self._target_q_network = snt.nets.MLP(output_sizes=self._layer_sizes)
+
+    self._target_q_network = simple_nets.MLP(state_representation_size,
+                                             self._layer_sizes, num_actions)
     self._target_q_values = self._target_q_network(self._next_info_state_ph)
 
     # Stop gradient to prevent updates to the target network while learning
@@ -291,17 +297,21 @@ class DQN(rl_agent.AbstractAgent):
     """Create TF ops copying the params of the Q-network to the target network.
 
     Args:
-      q_network: `snt.AbstractModule`. Values are copied from this network.
-      target_q_network: `snt.AbstractModule`. Values are copied to this network.
+      q_network: A q-network object that implements provides the `variables`
+                 property representing the TF variable list.
+      target_q_network: A target q-net object that provides the `variables`
+                        property representing the TF variable list.
 
     Returns:
       A `tf.Operation` that updates the variables of the target.
     """
-    variables = q_network.get_variables()
-    target_variables = target_q_network.get_variables()
+    self._variables = q_network.variables[:]
+    self._target_variables = target_q_network.variables[:]
+    assert self._variables
+    assert len(self._variables) == len(self._target_variables)
     return tf.group([
         tf.assign(target_v, v)
-        for (target_v, v) in zip(target_variables, variables)
+        for (target_v, v) in zip(self._target_variables, self._variables)
     ])
 
   def _epsilon_greedy(self, info_state, legal_actions, epsilon):
@@ -403,9 +413,9 @@ class DQN(rl_agent.AbstractAgent):
 
   def _initialize(self):
     initialization_weights = tf.group(
-        *[var.initializer for var in self._q_network.variables])
+        *[var.initializer for var in self._variables])
     initialization_target_weights = tf.group(
-        *[var.initializer for var in self._target_q_network.variables])
+        *[var.initializer for var in self._target_variables])
     initialization_opt = tf.group(
         *[var.initializer for var in self._optimizer.variables()])
 

@@ -25,6 +25,9 @@ import tensorflow.compat.v1 as tf
 from open_spiel.python import rl_environment
 from open_spiel.python.algorithms import nfsp
 
+# Temporarily disable TF2 behavior until code is updated.
+tf.disable_v2_behavior()
+
 
 class NFSPTest(tf.test.TestCase):
 

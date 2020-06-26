@@ -31,6 +31,9 @@ from open_spiel.python.algorithms import expected_game_score
 from open_spiel.python.algorithms import exploitability
 import pyspiel
 
+# Temporarily disable TF2 behavior until we update the code.
+tf.disable_v2_behavior()
+
 FLAGS = flags.FLAGS
 
 flags.DEFINE_integer("num_iterations", 400, "Number of iterations")
@@ -54,7 +57,8 @@ def main(unused_argv):
         batch_size_strategy=1024,
         memory_capacity=1e7,
         policy_network_train_steps=400,
-        advantage_network_train_steps=20)
+        advantage_network_train_steps=20,
+        reinitialize_advantage_networks=False)
     sess.run(tf.global_variables_initializer())
     _, advantage_losses, policy_loss = deep_cfr_solver.solve()
     for player, losses in six.iteritems(advantage_losses):
