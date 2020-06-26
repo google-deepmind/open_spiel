@@ -61,6 +61,10 @@ void XinxinBot_BasicPlayGame() {
     std::unique_ptr<open_spiel::State> state = game->NewInitialState();
     EvaluateBots(state.get(), bot_ptrs,
                  absl::Uniform<int>(rng, 0, std::numeric_limits<int>::max()));
+    // call xinxinbot with terminal state so that xinxin's internal state's
+    // returns can be checked against the OpenSpiel returns
+    for (auto bot : bot_ptrs)
+      bot->InformAction(*state, kTerminalPlayerId, kInvalidAction);
   }
 }
 

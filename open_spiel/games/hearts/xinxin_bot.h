@@ -18,6 +18,7 @@
 
 #include <memory>
 #include <vector>
+#include <string>
 
 #include "open_spiel/games/hearts.h"
 #include "open_spiel/games/hearts/hearts/Hearts.h"
@@ -61,6 +62,7 @@ class XinxinBot : public Bot {
 
   void NewDeal(std::vector<std::vector<::hearts::card>>* initial_cards,
                ::hearts::tPassDir pass_dir, int first_player);
+  void LogStateMismatchError(const State& state, std::string msg);
 };
 
 std::unique_ptr<Bot> MakeXinxinBot(GameParameters params, int num_players);
