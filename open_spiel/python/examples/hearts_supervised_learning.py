@@ -56,6 +56,8 @@ flags.DEFINE_list('hidden_layer_sizes', [1024, 1024, 1024, 1024],
                   'Number of hidden units and layers in the network'),
 flags.DEFINE_integer('rng_seed', 42, 'Seed for initial network weights')
 flags.DEFINE_string('save_path', None, 'Location for saved networks')
+flags.DEFINE_string('checkpoint_file', None,
+                    'Provides weights and optimzer state to resume training')
 
 
 def _trajectory(line: str):
@@ -198,10 +200,14 @@ def main(argv):
                FLAGS.eval_batch)
 
   # Initialize network and optimiser.
-  rng = jax.random.PRNGKey(FLAGS.rng_seed)  # seed used for network weights
-  inputs, unused_targets = next(train)
-  params = net.init(rng, inputs)
-  opt_state = opt.init(params)
+  if FLAGS.checkpoint_file:
+    with open(FLAGS.checkpoint_file, 'rb') as pkl_file:
+      params, opt_state = pickle.load(pkl_file)
+  else:
+    rng = jax.random.PRNGKey(FLAGS.rng_seed)  # seed used for network weights
+    inputs, unused_targets = next(train)
+    params = net.init(rng, inputs)
+    opt_state = opt.init(params)
 
   # Train/eval loop.
   for step in range(FLAGS.iterations):
@@ -215,9 +221,9 @@ def main(argv):
       test_accuracy = accuracy(params, inputs, targets)
       print(f'After {1+step} steps, test accuracy: {test_accuracy}.')
       if FLAGS.save_path:
-        filename = os.path.join(FLAGS.save_path, f'params-{1 + step}.pkl')
+        filename = os.path.join(FLAGS.save_path, f'checkpoint-{1 + step}.pkl')
         with open(filename, 'wb') as pkl_file:
-          pickle.dump(params, pkl_file)
+          pickle.dump((params, opt_state), pkl_file)
       output_samples(params, FLAGS.num_examples)
 
 
