@@ -1,6 +1,8 @@
 set(GAME_SOURCES
   backgammon.cc
   backgammon.h
+  bd_mines.cc
+  bd_mines.h
   blotto.cc
   blotto.h
   breakthrough.cc
@@ -193,6 +195,10 @@ target_compile_definitions(bridge_double_dummy_solver PUBLIC DDS_NO_STATIC_INIT)
 add_executable(backgammon_test backgammon_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(backgammon_test backgammon_test)
+
+add_executable(bd_mines_test bd_mines_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(bd_mines_test bd_mines_test)
 
 add_executable(blotto_test blotto_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
