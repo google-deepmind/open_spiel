@@ -106,6 +106,14 @@ endif()
 set (BUILD_WITH_XINXIN $ENV{BUILD_WITH_XINXIN})
 message("${BoldYellow}BUILD_WITH_XINXIN: ${BUILD_WITH_XINXIN} ${ColourReset}")
 
+set (BUILD_WITH_LIBTORCH OFF CACHE BOOL "Build with support for libtorch.")
+if(NOT DEFINED ENV{BUILD_WITH_LIBTORCH})
+    message("${BoldRed}BUILD_WITH_LIBTORCH not set. Defaults to OFF${ColourReset}")
+    set (ENV{BUILD_WITH_LIBTORCH} OFF)
+endif()
+set (BUILD_WITH_LIBTORCH $ENV{BUILD_WITH_LIBTORCH})
+message("${BoldYellow}BUILD_WITH_LIBTORCH: ${BUILD_WITH_LIBTORCH} ${ColourReset}")
+
 ##
 
 
@@ -192,6 +200,13 @@ if (BUILD_WITH_PUBLIC_STATES)
 endif()
 if (BUILD_WITH_XINXIN)
   set(OPEN_SPIEL_OBJECTS ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:xinxin>)
+endif()
+if (BUILD_WITH_LIBTORCH)
+  list(APPEND CMAKE_PREFIX_PATH "${CMAKE_CURRENT_SOURCE_DIR}/libtorch/libtorch")
+  find_package(Torch REQUIRED)
+  add_subdirectory(libtorch)
+  # Use following to link your_target_executable with torch libraries:
+  # target_link_libraries(your_target_executable ${TORCH_LIBRARIES})
 endif()
 
 # We have the parent of this directory in the include path, so that we can
