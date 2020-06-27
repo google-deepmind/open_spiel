@@ -37,7 +37,8 @@ MYDIR="$(dirname "$(realpath "$0")")"
 # Instead, just call project-root install.sh file:
 # $ ./install.sh
 if [[ `basename $MYDIR` == "scripts" ]]; then
-  die "Please run this file from the directory where you cloned the project."
+  die "Please run ./install.sh from the directory where you cloned the" \
+      "project, do not run $0"
 fi
 
 # Load all the build settings.
