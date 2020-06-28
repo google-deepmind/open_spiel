@@ -18,7 +18,7 @@ See https://arxiv.org/abs/1811.00164.
 
 The algorithm defines an `advantage` and `strategy` networks that compute
 advantages used to do regret matching across information sets and to approximate
-the strategy profiles of the game. To train these networks a fixed ring buffer
+the strategy profiles of the game. To train these networks a reservoir buffer
 (other data structures may be used) memory is used to accumulate samples to
 train the networks.
 """
@@ -47,39 +47,43 @@ StrategyMemory = collections.namedtuple(
 
 
 # TODO(author3) Refactor into data structures lib.
-class FixedSizeRingBuffer(object):
-  """ReplayBuffer of fixed size with a FIFO replacement policy.
+class ReservoirBuffer(object):
+  """Allows uniform sampling over a stream of data.
 
-  Stored transitions can be sampled uniformly. The underlying datastructure is a
-  ring buffer, allowing 0(1) adding and sampling.
+  This class supports the storage of arbitrary elements, such as observation
+  tensors, integer actions, etc.
+
+  See https://en.wikipedia.org/wiki/Reservoir_sampling for more details.
   """
 
-  def __init__(self, replay_buffer_capacity):
-    self._replay_buffer_capacity = replay_buffer_capacity
+  def __init__(self, reservoir_buffer_capacity):
+    self._reservoir_buffer_capacity = reservoir_buffer_capacity
     self._data = []
-    self._next_entry_index = 0
+    self._add_calls = 0
 
   def add(self, element):
-    """Adds `element` to the buffer.
+    """Potentially adds `element` to the reservoir buffer.
 
-    If the buffer is full, the oldest element will be replaced.
     Args:
-      element: data to be added to the buffer.
+      element: data to be added to the reservoir buffer.
     """
-    if len(self._data) < self._replay_buffer_capacity:
+    if len(self._data) < self._reservoir_buffer_capacity:
       self._data.append(element)
     else:
-      self._data[self._next_entry_index] = element
-      self._next_entry_index += 1
-      self._next_entry_index %= self._replay_buffer_capacity
+      idx = np.random.randint(0, self._add_calls + 1)
+      if idx < self._reservoir_buffer_capacity:
+        self._data[idx] = element
+    self._add_calls += 1
 
   def sample(self, num_samples):
     """Returns `num_samples` uniformly sampled from the buffer.
 
     Args:
       num_samples: `int`, number of samples to draw.
+
     Returns:
       An iterable over `num_samples` random elements of the buffer.
+
     Raises:
       ValueError: If there are less than `num_samples` elements in the buffer
     """
@@ -90,7 +94,7 @@ class FixedSizeRingBuffer(object):
 
   def clear(self):
     self._data = []
-    self._next_entry_index = 0
+    self._add_calls = 0
 
   def __len__(self):
     return len(self._data)
@@ -194,7 +198,7 @@ class DeepCFRSolver(policy.Policy):
               name="advantage_ph_" + str(p)))
 
     # Define strategy network, loss & memory.
-    self._strategy_memories = FixedSizeRingBuffer(memory_capacity)
+    self._strategy_memories = ReservoirBuffer(memory_capacity)
     self._policy_network = simple_nets.MLP(self._embedding_size,
                                            list(policy_network_layers),
                                            self._num_actions)
@@ -211,7 +215,7 @@ class DeepCFRSolver(policy.Policy):
 
     # Define advantage network, loss & memory. (One per player)
     self._advantage_memories = [
-        FixedSizeRingBuffer(memory_capacity) for _ in range(self._num_players)
+        ReservoirBuffer(memory_capacity) for _ in range(self._num_players)
     ]
     self._advantage_networks = [
         simple_nets.MLP(self._embedding_size, list(advantage_network_layers),
