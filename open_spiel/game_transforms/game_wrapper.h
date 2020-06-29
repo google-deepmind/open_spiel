@@ -64,6 +64,14 @@ class WrappedState : public State {
     return state_->ObservationString(player);
   }
 
+  std::string PublicObservationString() const override {
+    return state_->PublicObservationString();
+  }
+
+  std::string PrivateObservationString(Player player) const override {
+    return state_->PrivateObservationString(player);
+  }
+
   void ObservationTensor(Player player,
                                  std::vector<double>* values) const override{
     state_->ObservationTensor(player, values);
