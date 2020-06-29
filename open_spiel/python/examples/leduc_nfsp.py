@@ -69,6 +69,10 @@ flags.DEFINE_float("epsilon_end", 0.001,
                    "Final exploration parameter.")
 flags.DEFINE_string("evaluation_metric", "nash_conv",
                     "Choose from 'exploitability', 'nash_conv'.")
+flags.DEFINE_bool("use_checkpoints", True,
+                  "Save/load neural network weights.")
+flags.DEFINE_string("checkpoint_dir", "/tmp/nfsp_test",
+                    "Directory to save/load the agent.")
 
 
 class NFSPPolicies(policy.Policy):
@@ -143,6 +147,12 @@ def main(unused_argv):
     joint_avg_policy = NFSPPolicies(env, agents, nfsp.MODE.average_policy)
 
     sess.run(tf.global_variables_initializer())
+
+    if FLAGS.use_checkpoints:
+      for agent in agents:
+        if agent.has_checkpoint(FLAGS.checkpoint_dir):
+           agent.restore(FLAGS.checkpoint_dir)
+
     for ep in range(FLAGS.num_train_episodes):
       if (ep + 1) % FLAGS.eval_every == 0:
         losses = [agent.loss for agent in agents]
@@ -158,6 +168,9 @@ def main(unused_argv):
         else:
           raise ValueError(" ".join(("Invalid evaluation metric, choose from",
                                      "'exploitability', 'nash_conv'.")))
+        if FLAGS.use_checkpoints:
+          for agent in agents:
+            agent.save(FLAGS.checkpoint_dir)
         logging.info("_____________________________________________")
 
       time_step = env.reset()
