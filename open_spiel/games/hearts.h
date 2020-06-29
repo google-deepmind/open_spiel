@@ -143,6 +143,9 @@ class HeartsState : public State {
   }
   std::vector<Action> LegalActions() const override;
   std::vector<std::pair<Action, double>> ChanceOutcomes() const override;
+  std::unique_ptr<State> ResampleFromInfostate(
+      int player_id, std::function<double()> rng) const override;
+
 
  protected:
   void DoApplyAction(Action action) override;
@@ -171,6 +174,9 @@ class HeartsState : public State {
   std::string FormatPass(Player player) const;
   std::string FormatDeal() const;
   std::string FormatPoints() const;
+
+  std::optional<Player> Played(int card) const;
+  bool KnowsLocation(Player player, int card) const;
 
   const bool pass_cards_;
   const bool no_pts_on_first_trick_;

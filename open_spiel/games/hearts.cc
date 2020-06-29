@@ -15,6 +15,7 @@
 #include "open_spiel/games/hearts.h"
 
 #include <map>
+#include <algorithm>
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
@@ -575,6 +576,172 @@ std::vector<double> HeartsState::Returns() const {
   for (int i = 0; i < returns.size(); ++i)
     returns[i] = kTotalPositivePoints - returns[i];
   return returns;
+}
+
+std::optional<Player> HeartsState::Played(int card) const {
+  if (phase_ == Phase::kPlay && holder_[card] == std::nullopt) {
+    Player p = *(initial_deal_[card]);
+    // check if they kept the card or not
+    auto it = std::find(passed_cards_[p].begin(), passed_cards_[p].end(), card);
+    if (it != passed_cards_[p].end()) {
+      p = (p + static_cast<int>(pass_dir_)) % kNumPlayers;
+    }
+    return p;
+  }
+
+  return std::nullopt;
+}
+
+bool HeartsState::KnowsLocation(Player player, int card) const {
+  bool dealt, received, played, two_clubs;
+  dealt = initial_deal_[card] == player;
+  int pass_dir = static_cast<int>(pass_dir_);
+  Player recv_from = (player + kNumPlayers - pass_dir) % kNumPlayers;
+  auto it = std::find(passed_cards_[recv_from].begin(),
+                      passed_cards_[recv_from].end(), card);
+  received = it != passed_cards_[recv_from].end() && phase_ == Phase::kPlay;
+  played = holder_[card] == std::nullopt && phase_ == Phase::kPlay;
+  two_clubs = card == Card(Suit::kClubs, 0) && phase_ == Phase::kPlay;
+  return dealt || received || played || two_clubs;
+}
+
+// Does not account for void suit information exposed by other players during
+// the play phase
+std::unique_ptr<State> HeartsState::ResampleFromInfostate(
+    int player_id, std::function<double()> rng) const {
+  std::unique_ptr<State> clone = game_->NewInitialState();
+  Action pass_dir = static_cast<int>(pass_dir_);
+  clone->ApplyAction(pass_dir);
+
+  // start by gathering all public and private info known to player_id to
+  // simplify the logic for applying deal / pass actions
+  // first thing we know is the player's entire hand
+  std::vector<int> initial_hand;
+  for (int card = 0; card < kNumCards; card++) {
+    if (initial_deal_[card] == player_id) initial_hand.push_back(card);
+  }
+
+  // collect cards that have been revealed through the play phase
+  std::vector<std::vector<int>> play_known(kNumPlayers);
+  if (phase_ == Phase::kPlay) {
+    for (int card = 0; card < kNumCards; card++) {
+      std::optional<Player> p = Played(card);
+      if (p && *p != player_id) {
+        play_known[*p].push_back(card);
+      }
+    }
+  }
+
+  // the two of clubs is also known once a player has played first
+  std::optional<Player> two_clubs_holder = holder_[Card(Suit::kClubs, 0)];
+  if (phase_ == Phase::kPlay && two_clubs_holder) {
+    play_known[*two_clubs_holder].push_back(Card(Suit::kClubs, 0));
+  }
+
+  // set up pass cards greedily using known cards so that passes are
+  // consistent
+  // this shouldn't affect the distribution of resampled states much because
+  // we have no way to model unobserved opponent pass actions anyway
+  std::vector<std::vector<int>> pass_actions(kNumPlayers);
+  for (Player p = 0; p < kNumPlayers; p++) {
+    for (int pass_num = 0; pass_num < passed_cards_[p].size(); pass_num++) {
+      if (p == player_id) {
+        pass_actions[p].push_back(passed_cards_[p][pass_num]);
+      } else {
+        Player pass_to = (p + pass_dir) % kNumPlayers;
+        // once the play phase has started, player_id knows the cards that were
+        // passed to them
+        if (phase_ == Phase::kPlay && pass_to == player_id) {
+          pass_actions[p].push_back(passed_cards_[p][pass_num]);
+        } else if (pass_num < play_known[pass_to].size()) {
+          pass_actions[p].push_back(play_known[pass_to][pass_num]);
+        }
+      }
+    }
+  }
+
+  // at this point we have all the information we need about which card
+  // locations are known to player_id, so we can start applying deal actions
+  Player deal_to, pass_to, recv_from;
+  int card_num;
+  std::vector<bool> dealt(kNumCards, false);
+  std::vector<int> known_dealt_counter(kNumPlayers, 0);
+  for (int num_dealt = 0; num_dealt < kNumCards; num_dealt++) {
+    card_num = num_dealt / kNumPlayers;
+    deal_to = num_dealt % kNumPlayers;
+    pass_to = (deal_to + pass_dir) % kNumPlayers;
+    recv_from = (deal_to + kNumPlayers - pass_dir) % kNumPlayers;
+    Action action = kInvalidAction;
+    // deal out the pass moves first so those constraints are satisfied
+    if (card_num < pass_actions[deal_to].size()) {
+      action = pass_actions[deal_to][card_num];
+    } else {
+      // now try to find any cards that deal_to has shown they have that
+      // haven't already been allocated as a pass action for recv_from and have
+      // not already been dealt
+      auto& known = (deal_to == player_id) ? initial_hand : play_known[deal_to];
+      while ((action == kInvalidAction || dealt[action]) &&
+            known_dealt_counter[deal_to] < known.size()) {
+        action = known[known_dealt_counter[deal_to]];
+        auto it = std::find(pass_actions[recv_from].begin(),
+                            pass_actions[recv_from].end(), action);
+        if (it != pass_actions[recv_from].end())  action = kInvalidAction;
+        known_dealt_counter[deal_to]++;
+      }
+    }
+
+    // all known card constraints for to_deal have been satisfied, so we can
+    // deal them a random card that does not violate other player constraints
+    while (action == kInvalidAction) {
+      Action candidate = SampleAction(clone->ChanceOutcomes(), rng()).first;
+      if (!KnowsLocation(player_id, candidate)) {
+        action = candidate;
+        // we can also use this card as a pass action later because its
+        // location is unknown
+        if (pass_actions[deal_to].size() < passed_cards_[deal_to].size()) {
+          pass_actions[deal_to].push_back(action);
+        }
+      }
+    }
+
+    clone->ApplyAction(action);
+    dealt[action] = true;
+  }
+
+  // now handle the pass phase
+  if (pass_dir_ != PassDir::kNoPass) {
+    for (Player to_move = 0; to_move < kNumPlayers; to_move++) {
+      SPIEL_CHECK_EQ(pass_actions[to_move].size(),
+                     passed_cards_[to_move].size());
+      pass_to = (to_move + pass_dir) % kNumPlayers;
+      for (int passes = 0; passes < passed_cards_[to_move].size(); passes++) {
+        Action action = kInvalidAction;
+        if (to_move == player_id || pass_to == player_id) {
+          // player_id knows exactly which cards were passed by player_id and
+          // the player who passed cards to player_id
+          action = passed_cards_[to_move][passes];
+        } else {
+          action = pass_actions[to_move][passes];
+        }
+        clone->ApplyAction(action);
+      }
+    }
+  }
+
+  // given that we should now have a state consistent with the public actions
+  // and player_id's private cards, we can just copy the action sequence in
+  // the play phase
+  int play_start_index = kNumCards + 1;
+  if (pass_dir_ != PassDir::kNoPass)
+    play_start_index += kNumPlayers * kNumCardsInPass;
+  for (size_t i = play_start_index; i < history_.size(); i++) {
+    clone->ApplyAction(history_.at(i).action);
+  }
+
+  SPIEL_CHECK_EQ(History().size(), clone->History().size());
+  SPIEL_CHECK_EQ(InformationStateString(player_id),
+                 clone->InformationStateString(player_id));
+  return clone;
 }
 
 Trick::Trick(Player leader, int card, bool jd_bonus)
