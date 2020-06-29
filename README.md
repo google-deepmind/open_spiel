@@ -2,8 +2,8 @@
 # OpenSpiel: A Framework for Reinforcement Learning in Games
 
 [![Documentation Status](https://readthedocs.org/projects/openspiel/badge/?version=latest)](https://openspiel.readthedocs.io/en/latest/?badge=latest)
+[![Build Status](https://github.com/deepmind/open_spiel/blob/master/docs/_static/passing.svg)](https://travis-ci.org/deepmind/open_spiel)
 <!-- There is currently a problem with Travis-CI reporting of our build status. Will re-enable when fixed. [![Build Status](https://travis-ci.org/deepmind/open_spiel.svg?branch=master)](https://travis-ci.org/deepmind/open_spiel) -->
-<img src="docs/_static/passing.svg">
 
 OpenSpiel is a collection of environments and algorithms for research in general
 reinforcement learning and search/planning in games. OpenSpiel supports n-player
