@@ -16,71 +16,19 @@
 
 #include <unordered_map>
 #include <algorithm>    // std::find, min
-#include <sstream>
 #include <sys/types.h>
 
 #include <utility>
 
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_utils.h"
 #include "open_spiel/utils/tensor_view.h"
 
 namespace open_spiel {
 namespace bd_mines {
 
 namespace {
-// // Cell types supported from Boulderdash/Emerald Mines
-// enum class HiddenCellType {
-//   kRockford = 0,
-//   kEmpty = 1,
-//   kDirt = 2,
-//   kBoulder = 3,
-//   kBoulderFalling = 4,
-//   KDiamond = 5,
-//   kDiamondFalling = 6,
-//   kExitClosed = 7,
-//   kExitOpen = 8,
-//   kRockfordInExit = 9,
-//   kFireflyUp = 10,
-//   kFireflyLeft = 11,
-//   kFireflyDown = 12,
-//   kFireflyRight = 13,
-//   kButterflyUp = 14,
-//   kButterflyLeft = 15,
-//   kButterflyDown = 16,
-//   kButterflyRight = 17,
-//   kWallBrick = 18,
-//   kWallSteel = 19,
-//   kWallMagicDormant = 20,
-//   kWallMagicOn = 21,
-//   kWallMagicExpired = 22,
-//   kAmoeba = 23,
-//   kExplosionDiamond = 24,
-//   kExplosionBoulder = 25,
-//   kExplosionEmpty = 26
-// };
-
-// // Cell types which are observable
-// enum class VisibleCellType {
-//   kRockford = 0,
-//   kEmpty = 1,
-//   kDirt = 2,
-//   kBoulder = 3,
-//   KDiamond = 4,
-//   kExitClosed = 5,
-//   kExitOpen = 6,
-//   kRockfordInExit = 7,
-//   kFirefly = 8,
-//   kButterfly = 9,
-//   kWallBrick = 10,
-//   kWallSteel = 11,
-//   kWallMagicOff = 12,
-//   kWallMagicOn = 13,
-//   kAmoeba = 14,
-//   kExplosion = 15,
-// };
-
-constexpr int kNumVisibleCellType = 16;
 
 // Property bit flags
 enum ElementProperties {
@@ -91,11 +39,9 @@ enum ElementProperties {
 };
 
 // All possible elements
-const Element kNullElement = {HiddenCellType::kNull, VisibleCellType::kNull, -1, 0};
-
 const Element kElRockford = {
   HiddenCellType::kRockford, VisibleCellType::kRockford,
-  ElementProperties::kConsumable | ElementProperties::kCanExplode, 'R'
+  ElementProperties::kConsumable | ElementProperties::kCanExplode, '@'
 };
 const Element kElRockfordInExit = {
   HiddenCellType::kRockfordInExit, VisibleCellType::kRockfordInExit,
@@ -103,7 +49,7 @@ const Element kElRockfordInExit = {
 };
 const Element kElExitOpen = {
   HiddenCellType::kExitOpen, VisibleCellType::kExitOpen,
-  ElementProperties::kNone, 'O'
+  ElementProperties::kNone, '#'
 };
 const Element kElExitClosed = {
   HiddenCellType::kExitClosed, VisibleCellType::kExitClosed,
@@ -127,11 +73,11 @@ const Element kElBoulderFalling = {
 };
 const Element kElDiamond = {
   HiddenCellType::KDiamond, VisibleCellType::KDiamond,
-  ElementProperties::kConsumable | ElementProperties::kRounded, 'D'
+  ElementProperties::kConsumable | ElementProperties::kRounded, '*'
 };
 const Element kElDiamondFalling = {
   HiddenCellType::kDiamondFalling, VisibleCellType::KDiamond,
-  ElementProperties::kConsumable, 'D'
+  ElementProperties::kConsumable, '*'
 };
 const Element kElFireflyUp = {
   HiddenCellType::kFireflyUp, VisibleCellType::kFirefly,
@@ -202,21 +148,6 @@ const Element kElExplosionEmpty = {
   ElementProperties::kNone, 'E'
 };
 
-// // Directions the interactions take place
-// enum Directions {
-//   kNone = 0, kUp = 1, kRight = 2, kDown = 3, kLeft = 4, kUpRight = 5, 
-//   kDownRight = 6, kDownLeft = 7, kUpLeft = 8
-// };
-
-// // Actions which the agent can perform
-// // enum RockfordActions {
-// //   kNone = Directions::kNone, kUp = Directions::kUp, kLeft = Directions::kLeft, 
-// //   kDown = Directions::kDown, kRight = Directions::kRight
-// // };
-
-// constexpr int kNumDirections = 9;
-// constexpr int kNumActions = 5;
-
 struct ElementHash {
   std::size_t operator()(const Element& e) const {
     return static_cast<int>(e.cell_type) - static_cast<int>(HiddenCellType::kNull);
@@ -224,20 +155,36 @@ struct ElementHash {
 };
 
 // ----- Conversion maps -----
-// Input chars to cell types
-const std::unordered_map<char, Element> kCharElementMap {
-  {'R', kElRockford},
-  {' ', kElEmpty},
-  {'.', kElDirt},
-  {'o', kElBoulder},
-  {'D', kElDiamond},
-  {'C', kElExitClosed},
-  {'F', kElFireflyLeft},
-  {'U', kElButterflyDown},
-  {'B', kElWallBrick},
-  {'S', kElWallSteel},
-  {'Q', kElWallMagicDormant},
-  {'A', kElAmoeba},
+// Swap map for DeserializeState
+const std::unordered_map<int, Element> kCellTypeToElement {
+  {static_cast<int>(HiddenCellType::kNull), kNullElement}, 
+  {static_cast<int>(HiddenCellType::kRockford), kElRockford}, 
+  {static_cast<int>(HiddenCellType::kEmpty), kElEmpty}, 
+  {static_cast<int>(HiddenCellType::kDirt), kElDirt}, 
+  {static_cast<int>(HiddenCellType::kBoulder), kElBoulder}, 
+  {static_cast<int>(HiddenCellType::kBoulderFalling), kElBoulderFalling}, 
+  {static_cast<int>(HiddenCellType::KDiamond), kElDiamond}, 
+  {static_cast<int>(HiddenCellType::kDiamondFalling), kElDiamondFalling}, 
+  {static_cast<int>(HiddenCellType::kExitClosed), kElExitClosed}, 
+  {static_cast<int>(HiddenCellType::kExitOpen), kElExitOpen}, 
+  {static_cast<int>(HiddenCellType::kRockfordInExit), kElRockfordInExit}, 
+  {static_cast<int>(HiddenCellType::kFireflyUp), kElFireflyUp}, 
+  {static_cast<int>(HiddenCellType::kFireflyLeft), kElFireflyLeft}, 
+  {static_cast<int>(HiddenCellType::kFireflyDown), kElFireflyDown}, 
+  {static_cast<int>(HiddenCellType::kFireflyRight), kElFireflyRight}, 
+  {static_cast<int>(HiddenCellType::kButterflyUp), kElButterflyUp}, 
+  {static_cast<int>(HiddenCellType::kButterflyLeft), kElButterflyLeft}, 
+  {static_cast<int>(HiddenCellType::kButterflyDown), kElButterflyDown}, 
+  {static_cast<int>(HiddenCellType::kButterflyRight), kElButterflyRight}, 
+  {static_cast<int>(HiddenCellType::kWallBrick), kElWallBrick}, 
+  {static_cast<int>(HiddenCellType::kWallSteel), kElWallSteel}, 
+  {static_cast<int>(HiddenCellType::kWallMagicOn), kElWallMagicOn}, 
+  {static_cast<int>(HiddenCellType::kWallMagicDormant), kElWallMagicDormant}, 
+  {static_cast<int>(HiddenCellType::kWallMagicExpired), kElWallMagicExpired}, 
+  {static_cast<int>(HiddenCellType::kAmoeba), kElAmoeba}, 
+  {static_cast<int>(HiddenCellType::kExplosionBoulder), kElExplosionBoulder}, 
+  {static_cast<int>(HiddenCellType::kExplosionDiamond), kElExplosionDiamond}, 
+  {static_cast<int>(HiddenCellType::kExplosionEmpty), kElExplosionEmpty}, 
 };
 
 // Rotate actions right
@@ -293,10 +240,10 @@ const std::unordered_map<Element, int, ElementHash> kButterflyToDirection {
 
 // Element explosion maps
 const std::unordered_map<Element, Element, ElementHash> kElementToExplosion {
-  {kElFireflyUp, kElExplosionDiamond}, {kElFireflyLeft, kElExplosionDiamond}, 
-  {kElFireflyDown, kElExplosionDiamond}, {kElFireflyRight, kElExplosionDiamond},
-  {kElButterflyUp, kElExplosionEmpty}, {kElButterflyLeft, kElExplosionEmpty}, 
-  {kElButterflyDown, kElExplosionEmpty}, {kElButterflyRight, kElExplosionEmpty},
+  {kElFireflyUp, kElExplosionEmpty}, {kElFireflyLeft, kElExplosionEmpty}, 
+  {kElFireflyDown, kElExplosionEmpty}, {kElFireflyRight, kElExplosionEmpty},
+  {kElButterflyUp, kElExplosionDiamond}, {kElButterflyLeft, kElExplosionDiamond}, 
+  {kElButterflyDown, kElExplosionDiamond}, {kElButterflyRight, kElExplosionDiamond},
   {kElRockford, kElExplosionEmpty},
 };
 
@@ -328,6 +275,7 @@ const GameType kGameType{
     /*long_name=*/"Boulder Dash Mines",
     GameType::Dynamics::kSequential,
     GameType::ChanceMode::kSampledStochastic,
+    // GameType::ChanceMode::kDeterministic,
     GameType::Information::kPerfectInformation,
     GameType::Utility::kGeneralSum,
     GameType::RewardModel::kRewards,
@@ -346,7 +294,7 @@ const GameType kGameType{
         {"grid", GameParameter(std::string(kDefaultGrid))}
     }};
 
-static std::shared_ptr<const Game> Factory(const GameParameters& params) {
+std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new BDMinesGame(params));
 }
 
@@ -359,6 +307,9 @@ std::string BDMinesState::ActionToString(Player player, Action move_id) const {
   } else {
     SPIEL_CHECK_GE(move_id, 0);
     SPIEL_CHECK_LT(move_id, kNumActions);
+    if (kActionsToString.find(move_id) == kActionsToString.end()) {
+      SpielFatalError("Unknown move_id");
+    }
     return kActionsToString.at(move_id);
   }
 }
@@ -391,35 +342,20 @@ void BDMinesState::ObservationTensor(Player player,
   SPIEL_CHECK_LT(player, num_players_);
 
   // Treat `values` as a 2-d tensor.
-  TensorView<2> view(values, {kNumVisibleCellType, grid_.num_rows * grid_.num_cols}, true);
+  TensorView<3> view(values, {kNumVisibleCellType, grid_.num_rows, grid_.num_cols}, true);
 
-  for (int i = 0; i < grid_.num_rows * grid_.num_cols; ++i) {
-    int channel = static_cast<int>(grid_.elements[i].visible_type);
-    view[{channel, i}] = 1;
+  int i = 0;
+  for (int row = 0; row < grid_.num_rows; ++row) {
+    for (int col = 0; col < grid_.num_cols; ++col) {
+      int channel = static_cast<int>(grid_.elements[i].visible_type);
+      view[{channel, row, col}] = 1.0;
+      ++i;
+    }
   }
 }
 
-BDMinesState::BDMinesState(std::shared_ptr<const Game> game, int max_steps, int magic_wall_steps,
-               int amoeba_max_size, int gems_required, Grid grid, int rng_seed)
-    : State(game),
-      steps_remaining_(max_steps),
-      magic_wall_steps_(magic_wall_steps),
-      amoeba_max_size_(amoeba_max_size),
-      gems_required_(gems_required),
-      grid_(grid),
-      rng_(rng_seed) {
-  gems_collected_ = 0;
-  magic_active_ = false;
-  amoeba_size_ = 0;
-  amoeba_swap_ = kNullElement;
-  amoeba_enclosed_ = true;
-  sum_reward_ = 0.0;
-  current_reward_ = 0.0;
-  cur_player_ = 0;
-}
-
 int BDMinesState::CurrentPlayer() const {
-  return IsTerminal() ? kTerminalPlayerId : cur_player_;
+  return IsTerminal() ? kTerminalPlayerId : 0;
 }
 
 // element helper functions
@@ -485,7 +421,7 @@ bool BDMinesState::IsType(int index, Element element, int action) const {
 // Check if the index after applying action has an element with the given property
 bool BDMinesState::HasProperty(int index, int property, int action) const {
   int new_index = IndexFromAction(index, action);
-  return InBounds(index, action) && grid_.elements[new_index].properties & property > 0;
+  return InBounds(index, action) && ((grid_.elements[new_index].properties & property) > 0);
 }
 
 // Move the element given the action, and set the old index to empty
@@ -566,16 +502,18 @@ void BDMinesState::MoveThroughMagic(int index, Element element) {
 }
 
 // Explode the item
-void BDMinesState::Explode(int index, int action) {
+void BDMinesState::Explode(int index, Element element, int action) {
   int new_index = IndexFromAction(index, action);
-  SetItem(new_index, kElementToExplosion.at(GetItem(new_index)));
+  auto it = kElementToExplosion.find(GetItem(new_index));
+  Element ex = (it == kElementToExplosion.end()) ? kElExplosionEmpty : it->second;
+  SetItem(new_index, element);
   // Recursively check all directions for chain explosions
   for (int dir = 0; dir < kNumDirections; ++dir) {
     if (dir == Directions::kNone || !InBounds(new_index, dir)) {continue;}
     if (HasProperty(new_index, ElementProperties::kCanExplode, dir)) {
-      Explode(new_index, dir);
+      Explode(new_index, ex, dir);
     } else if (HasProperty(new_index, ElementProperties::kConsumable, dir)) {
-      SetItem(new_index, kElExplosionEmpty, dir);
+      SetItem(new_index, ex, dir);
     }
   }
 }
@@ -597,7 +535,9 @@ void BDMinesState::UpdateBoulderFalling(int index) {
   if (IsType(index, kElEmpty, Directions::kDown)) {
     MoveItem(index, Directions::kDown);
   } else if (HasProperty(index, ElementProperties::kCanExplode, Directions::kDown)) {
-    Explode(index, Directions::kDown);
+    auto it = kElementToExplosion.find(GetItem(index, Directions::kDown));
+    Element ex = (it == kElementToExplosion.end()) ? kElExplosionEmpty : it->second;
+    Explode(index, ex, Directions::kDown);
   } else if (IsType(index, kElWallMagicOn, Directions::kDown) || 
              IsType(index, kElWallMagicOn, Directions::kDown)) {
     MoveThroughMagic(index, kMagicWallConversion.at(GetItem(index)));
@@ -627,7 +567,9 @@ void BDMinesState::UpdateDiamondFalling(int index) {
   if (IsType(index, kElEmpty, Directions::kDown)) {
     MoveItem(index, Directions::kDown);
   } else if (HasProperty(index, ElementProperties::kCanExplode, Directions::kDown)) {
-    Explode(index, Directions::kDown);
+    auto it = kElementToExplosion.find(GetItem(index, Directions::kDown));
+    Element ex = (it == kElementToExplosion.end()) ? kElExplosionEmpty : it->second;
+    Explode(index, ex, Directions::kDown);
   } else if (IsType(index, kElWallMagicOn, Directions::kDown) || 
              IsType(index, kElWallMagicOn, Directions::kDown)) {
     MoveThroughMagic(index, kMagicWallConversion.at(GetItem(index)));
@@ -654,8 +596,8 @@ void BDMinesState::UpdateRockford(int index, int action) {
   } else if (IsType(index, kElDiamond, action) || IsType(index, kElDiamondFalling, action)) {
     // Collect gems
     ++gems_collected_;
-    current_reward_ += kGemPoints.at(GetItem(index));
-    sum_reward_ += kGemPoints.at(GetItem(index));
+    current_reward_ += kGemPoints.at(GetItem(index, action));
+    sum_reward_ += kGemPoints.at(GetItem(index, action));
     MoveItem(index, action);
   } else if (IsActionHorz(action) && IsType(index, kElBoulder, action)) {
     // Push boulder only if action is horizontal
@@ -673,7 +615,9 @@ void BDMinesState::UpdateFirefly(int index, int action) {
   int new_dir = kRotateLeft.at(action);
   if (IsTypeAdjacent(index, kElRockford) || IsTypeAdjacent(index, kElAmoeba)) {
     // Explode if touching rockford/amoeba
-    Explode(index);
+    auto it = kElementToExplosion.find(GetItem(index));
+    Element ex = (it == kElementToExplosion.end()) ? kElExplosionEmpty : it->second;
+    Explode(index, ex);
   } else if (IsType(index, kElEmpty, new_dir)) {
     // Fireflys always try to rotate left, otherwise continue forward
     SetItem(index, kDirectionToFirefly.at(new_dir));
@@ -691,7 +635,9 @@ void BDMinesState::UpdateButterfly(int index, int action) {
   int new_dir = kRotateRight.at(action);
   if (IsTypeAdjacent(index, kElRockford) || IsTypeAdjacent(index, kElAmoeba)) {
     // Explode if touching rockford/amoeba
-    Explode(index);
+    auto it = kElementToExplosion.find(GetItem(index));
+    Element ex = (it == kElementToExplosion.end()) ? kElExplosionEmpty : it->second;
+    Explode(index, ex);
   } else if (IsType(index, kElEmpty, new_dir)) {
     // Fireflys always try to rotate right, otherwise continue forward
     SetItem(index, kDirectionToButterfly.at(new_dir));
@@ -746,7 +692,7 @@ void BDMinesState::StartScan() {
   amoeba_size_ = 0;
   amoeba_enclosed_ = true;
   // Reset element flags
-  for (auto e : grid_.elements) {
+  for (auto & e : grid_.elements) {
     e.has_updated = false;
   }
 }
@@ -772,7 +718,34 @@ void BDMinesState::EndScan() {
 
 void BDMinesState::DoApplyAction(Action move) {
   StartScan();
-
+  for (int index = 0; index < grid_.num_cols *  grid_.num_rows; ++index) {
+    Element &e = grid_.elements[index];
+    if (e.has_updated) {
+      continue;
+    } else if (e == kElRockford) {
+      UpdateRockford(index, move);
+    } else if (e == kElBoulder) {
+      UpdateBoulder(index);
+    } else if (e == kElBoulderFalling) {
+      UpdateBoulderFalling(index);
+    } else if (e == kElDiamond) {
+      UpdateDiamond(index);
+    } else if (e == kElDiamondFalling) {
+      UpdateDiamondFalling(index);
+    } else if (e == kElExitClosed) {
+      UpdateExit(index);
+    } else if (IsButterfly(e)) {
+      UpdateButterfly(index, kButterflyToDirection.at(e));
+    } else if (IsFirefly(e)) {
+      UpdateFirefly(index, kFireflyToDirection.at(e));
+    } else if (IsMagicWall(e)) {
+      UpdateMagicWall(index);
+    } else if (e == kElAmoeba) {
+      UpdateAmoeba(index);
+    } else if (IsExplosion(e)) {
+      UpdateExplosions(index);
+    }
+  }
   EndScan();
 }
 
@@ -783,7 +756,7 @@ std::vector<Action> BDMinesState::LegalActions() const {
   } else if (IsTerminal()) {
     return {};
   } else {
-    return {Directions::kNone, Directions::kUp, Directions::kLeft, Directions::kDown, Directions::kRight};
+    return {Directions::kNone, Directions::kUp, Directions::kRight, Directions::kDown, Directions::kLeft};
   }
 }
 
@@ -799,6 +772,7 @@ std::string BDMinesState::ToString() const {
     out_str += el.id;
     if (col_counter == grid_.num_cols) {
       out_str += '\n';
+      col_counter = 0;
     }
   }
   out_str += "time left: " + std::to_string(steps_remaining_) + ", ";
@@ -807,11 +781,109 @@ std::string BDMinesState::ToString() const {
   return out_str;
 }
 
+std::string BDMinesState::Serialize() const {
+  std::string out_str;
+  // grid properties
+  out_str += std::to_string(grid_.num_cols) + ",";
+  out_str += std::to_string(grid_.num_rows) + ",";
+  out_str += std::to_string(steps_remaining_) + ",";
+  out_str += std::to_string(magic_wall_steps_) + ",";
+  out_str += std::to_string(magic_active_) + ",";
+  out_str += std::to_string(amoeba_max_size_) + ",";
+  out_str += std::to_string(amoeba_size_) + ",";
+  out_str += std::to_string(static_cast<int>(amoeba_swap_.cell_type)) + ",";
+  out_str += std::to_string(amoeba_enclosed_) + ",";
+  out_str += std::to_string(gems_required_) + ",";
+  out_str += std::to_string(gems_collected_) + ",";
+  out_str += std::to_string(current_reward_) + ",";
+  out_str += std::to_string(sum_reward_) + "\n";
+  // grid contents
+  int col_counter = 0;
+  for (const auto el : grid_.elements) {
+    ++col_counter;
+    out_str += std::to_string(static_cast<int>(el.cell_type)) + ",";
+    if (col_counter == grid_.num_cols) {
+      out_str.pop_back();
+      out_str += '\n';
+      col_counter = 0;
+    }
+  }
+  // remove trailing newline
+  out_str.pop_back();
+  return out_str;
+}
+
 std::unique_ptr<State> BDMinesState::Clone() const {
   return std::unique_ptr<State>(new BDMinesState(*this));
 }
 
 // ------ game -------
+
+std::unique_ptr<State> BDMinesGame::DeserializeState(const std::string& str) const {
+  // empty string
+  if (str.empty()) {return NewInitialState();}
+  std::vector<std::string> lines = absl::StrSplit(str, '\n');
+  if (lines.size() < 2) {
+    SpielFatalError("Empty map string passed.");
+  }
+  // Read grid properties
+  std::vector<std::string> property_line = absl::StrSplit(lines[0], ',');
+  Grid grid;
+  int steps_remaining, magic_wall_steps, amoeba_max_size, amoeba_size,
+      gems_required, gems_collected, current_reward, sum_reward;
+  bool magic_active, amoeba_enclosed;
+  Element amoeba_swap;
+  try {
+    grid.num_cols = std::stoi(property_line[0]);
+    grid.num_rows = std::stoi(property_line[1]);
+    steps_remaining = std::stoi(property_line[2]);
+    magic_wall_steps = std::stoi(property_line[3]);
+    magic_active = std::stoi(property_line[4]);
+    amoeba_max_size = std::stoi(property_line[5]);
+    amoeba_size = std::stoi(property_line[6]);
+    amoeba_swap = kCellTypeToElement.at(std::stoi(property_line[7]));
+    amoeba_enclosed = std::stoi(property_line[8]);
+    gems_required = std::stoi(property_line[9]);
+    gems_collected = std::stoi(property_line[10]);
+    current_reward = std::stoi(property_line[11]);
+    sum_reward = std::stoi(property_line[12]);
+  } catch (...) {
+    SpielFatalError("Invalid grid properties");
+  }
+  // Set grid elements
+  for (std::size_t i = 1; i < lines.size(); ++i) {
+    std::vector<std::string> grid_line = absl::StrSplit(lines[i], ',');
+    // Check for proper number of columns
+    if (grid_line.size() != grid.num_cols) {
+      SpielFatalError("Grid line " + std::to_string(i-1) + "doesn't have correct number of elements.");
+    }
+    // Check each element in row
+    for (const auto & type : grid_line) {
+      auto it = kCellTypeToElement.find(std::stoi(type));
+      if (it != kCellTypeToElement.end()) {
+        grid.elements.push_back(it->second);
+      } else {
+        SpielFatalError("Unknown element id: " + type);
+      }
+    }
+  }
+  // Ensure we read proper number of rows
+  if (lines.size() - 1 != grid.num_rows) {
+    SpielFatalError("Incorrect number of rows, got " + std::to_string(lines.size() - 1) + 
+                    " but need " + std::to_string(grid.num_rows));
+  }
+  // Ensure rockford exists in the map
+  auto it = std::find(grid_.elements.begin(), grid_.elements.end(), kElRockford);
+  if (it == grid_.elements.end()) {
+    SpielFatalError("Grid string doesn't contain agent rockford.");
+  }
+
+  return std::unique_ptr<State>(
+      new BDMinesState(shared_from_this(), steps_remaining, magic_wall_steps,
+               magic_active, amoeba_max_size, amoeba_size, amoeba_swap,
+               amoeba_enclosed, gems_required, gems_collected, current_reward,
+               sum_reward, grid, ++rng_seed_));
+}
 
 int BDMinesGame::NumDistinctActions() const { 
   return kNumActions;
@@ -827,11 +899,11 @@ int BDMinesGame::NumPlayers() const {
 }
 
 double BDMinesGame::MinUtility() const {
-  return -max_steps_; 
+  return 0; 
 }
 
 double BDMinesGame::MaxUtility() const {
-  return max_steps_;
+  return max_steps_ + 500;
 }
 
 std::vector<int> BDMinesGame::ObservationTensorShape() const {
@@ -839,38 +911,47 @@ std::vector<int> BDMinesGame::ObservationTensorShape() const {
 }
 
 Grid BDMinesGame::ParseGrid(const std::string& grid_string) {
-  std::istringstream ss(grid_string);
-  std::string curr_line;
   Grid grid;
-
-  // Level properties are on first line
-  if (!(ss >> grid_.num_cols >> grid_.num_rows >> max_steps_ >> gems_required_)) {
+  std::vector<std::string> lines = absl::StrSplit(grid_string, '\n');
+  if (lines.size() < 2) {
+    SpielFatalError("Empty map string passed.");
+  }
+  // Parse first line which contains level properties
+  std::vector<std::string> property_line = absl::StrSplit(lines[0], ',');
+  try {
+    grid.num_cols = std::stoi(property_line[0]);
+    grid.num_rows = std::stoi(property_line[1]);
+    max_steps_ = std::stoi(property_line[2]);
+    gems_required_ = std::stoi(property_line[3]);
+  } catch (...) {
     SpielFatalError("Missing width, height, maximum steps, and/or gems required on first line");
   }
-  std::getline(ss, curr_line, '\n'); // Clear remaining new line
-
-  // Grid content follows
-  int row_counter = 0;
-  while (std::getline(ss, curr_line, '\n')) {
-    ++row_counter;
+  // Parse grid contents
+  for (std::size_t i = 1; i < lines.size(); ++i) {
     // Check for proper number of columns
-    if (curr_line.size() != grid_.num_cols) {
-      SpielFatalError("Grid line" + std::to_string(row_counter) + "doesn't have correct number of elements.");
+    std::vector<std::string> grid_line = absl::StrSplit(lines[i], ',');
+    if (grid_line.size() != grid.num_cols) {
+      SpielFatalError("Grid line " + std::to_string(i-1) + "doesn't have correct number of elements.");
     }
     // Check each element in row
-    for (const auto c : curr_line) {
-      auto it = kCharElementMap.find(c);
-      if (it != kCharElementMap.end()) {
-        grid_.elements.push_back(it->second);
+    for (const auto & type : grid_line) {
+      auto it = kCellTypeToElement.find(std::stoi(type));
+      if (it != kCellTypeToElement.end()) {
+        grid.elements.push_back(it->second);
       } else {
-        SpielFatalError("Unknown element char: " + c);
+        SpielFatalError("Unknown element id: " + type);
       }
     }
   }
-
   // Ensure we read proper number of rows
-  if (row_counter != grid_.num_rows) {
-    SpielFatalError("Incorrect number of rows, got " + std::to_string(row_counter) + " but need " + std::to_string(grid_.num_rows));
+  if (lines.size() - 1 != grid.num_rows) {
+    SpielFatalError("Incorrect number of rows, got " + std::to_string(lines.size() - 1) + 
+                    " but need " + std::to_string(grid.num_rows));
+  }
+  // Ensure rockford exists in the map
+  auto it = std::find(grid_.elements.begin(), grid_.elements.end(), kElRockford);
+  if (it == grid_.elements.end()) {
+    SpielFatalError("Grid string doesn't contain agent rockford.");
   }
 
   return grid;

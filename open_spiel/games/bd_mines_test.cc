@@ -25,7 +25,7 @@ namespace testing = open_spiel::testing;
 
 void BasicBDMinesTests() {
   testing::LoadGameTest("bd_mines");
-  testing::ChanceOutcomesTest(*LoadGame("bd_mines"));
+  testing::NoChanceOutcomesTest(*LoadGame("bd_mines"));
   testing::RandomSimTest(*LoadGame("bd_mines"), 100);
 }
 

@@ -87,17 +87,13 @@ enum class VisibleCellType {
   kExplosion = 15,
 };
 
+constexpr int kNumVisibleCellType = 16;
+
 // Directions the interactions take place
 enum Directions {
   kNone = 0, kUp = 1, kRight = 2, kDown = 3, kLeft = 4, kUpRight = 5, 
   kDownRight = 6, kDownLeft = 7, kUpLeft = 8
 };
-
-// Actions which the agent can perform
-// enum RockfordActions {
-//   kNone = Directions::kNone, kUp = Directions::kUp, kLeft = Directions::kLeft, 
-//   kDown = Directions::kDown, kRight = Directions::kRight
-// };
 
 constexpr int kNumDirections = 9;
 constexpr int kNumActions = 5;
@@ -118,15 +114,6 @@ struct Element {
     cell_type(cell_type), visible_type(visible_type), properties(properties), 
     id(id), has_updated(false) {}
 
-  // bool operator==(const Element & rhs) const {
-  //   return this->cell_type == rhs.cell_type && this->visible_type == rhs.visible_type && 
-  //     this->properties == rhs.properties && this->id == rhs.id;
-  // }
-  // bool operator!=(const Element & rhs) const {
-  //   return this->cell_type != rhs.cell_type || this->visible_type != rhs.visible_type || 
-  //     this->properties != rhs.properties || this->id != rhs.id;
-  // }
-
   bool operator==(const Element & rhs) const {
     return this->cell_type == rhs.cell_type;
   }
@@ -136,6 +123,8 @@ struct Element {
   }
 };
 
+const Element kNullElement = {HiddenCellType::kNull, VisibleCellType::kNull, -1, 0};
+
 struct Grid {
   int num_rows;
   int num_cols;
@@ -143,37 +132,51 @@ struct Grid {
 };
 
 inline constexpr char kDefaultGrid[] =
-    "40 22 1280 12\n"
-    "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS\n"
-    "S...... ..D.o .....o.o....... ....o....S\n"
-    "S oRo...... .........oD..o.... ..... ..S\n"
-    "S.......... ..o.....o.o..o........o....S\n"
-    "So.oo.........o......o..o....o...o.....S\n"
-    "So. o......... o..o........o......o.oo.S\n"
-    "S... ..o........o.....o. o........o.oo.S\n"
-    "SBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB...o..o.S\n"
-    "S. ...o..D. ..o.o..........D.oD...... .S\n"
-    "S..D.....o..... ........oo o..o....o...S\n"
-    "S...o..o.o..............o .o..o........S\n"
-    "S.o.....o........ooo.......o.. .D....o.S\n"
-    "S.D.. ..o.  .....o.oD..D....o...o..D. .S\n"
-    "S. o..............o o..o........D.....oS\n"
-    "S........BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBS\n"
-    "S o.........o...D....o.....o...o.......S\n"
-    "S o......... o..o........o......o.oo..eS\n"
-    "S. ..o........o.....o.  ....D...o.oo...S\n"
-    "S....oD..o........o......o.oD......o...S\n"
-    "S... ..o. ..o.oo.........o.oD...... ..oS\n"
-    "S.D.... ..... ......... .o..o....o...o.S\n"
-    "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS";
-
-class BDMinesGame;
+    "40,22,1280,12\n"
+    "19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19\n"
+    "19,02,02,02,02,02,02,01,02,02,05,02,03,01,02,02,02,02,02,03,02,03,02,02,02,02,02,02,02,01,02,02,02,02,03,02,02,02,02,19\n"
+    "19,01,03,00,03,02,02,02,02,02,02,01,02,02,02,02,02,02,02,02,02,03,05,02,02,03,02,02,02,02,01,02,02,02,02,02,01,02,02,19\n"
+    "19,02,02,02,02,02,02,02,02,02,02,01,02,02,03,02,02,02,02,02,03,02,03,02,02,03,02,02,02,02,02,02,02,02,03,02,02,02,02,19\n"
+    "19,03,02,03,03,02,02,02,02,02,02,02,02,02,03,02,02,02,02,02,02,03,02,02,03,02,02,02,02,03,02,02,02,03,02,02,02,02,02,19\n"
+    "19,03,02,01,03,02,02,02,02,02,02,02,02,02,01,03,02,02,03,02,02,02,02,02,02,02,02,03,02,02,02,02,02,02,03,02,03,03,02,19\n"
+    "19,02,02,02,01,02,02,03,02,02,02,02,02,02,02,02,03,02,02,02,02,02,03,02,01,03,02,02,02,02,02,02,02,02,03,02,03,03,02,19\n"
+    "19,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,02,02,02,03,02,02,03,02,19\n"
+    "19,02,01,02,02,02,03,02,02,05,02,01,02,02,03,02,03,02,02,02,02,02,02,02,02,02,02,05,02,03,05,02,02,02,02,02,02,01,02,19\n"
+    "19,02,02,05,02,02,02,02,02,03,02,02,02,02,02,01,02,02,02,02,02,02,02,02,03,03,01,03,02,02,03,02,02,02,02,03,02,02,02,19\n"
+    "19,02,02,02,03,02,02,03,02,03,02,02,02,02,02,02,02,02,02,02,02,02,02,02,03,01,02,03,02,02,03,02,02,02,02,02,02,02,02,19\n"
+    "19,02,03,02,02,02,02,02,03,02,02,02,02,02,02,02,02,03,03,03,02,02,02,02,02,02,02,03,02,02,01,02,05,02,02,02,02,03,02,19\n"
+    "19,02,05,02,02,01,02,02,03,02,01,01,02,02,02,02,02,03,02,03,05,02,02,05,02,02,02,02,03,02,02,02,03,02,02,05,02,01,02,19\n"
+    "19,02,01,03,02,02,02,02,02,02,02,02,02,02,02,02,02,02,03,01,03,02,02,03,02,02,02,02,02,02,02,02,05,02,02,02,02,02,03,19\n"
+    "19,02,02,02,02,02,02,02,02,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,19\n"
+    "19,01,03,02,02,02,02,02,02,02,02,02,03,02,02,02,05,02,02,02,02,03,02,02,02,02,02,03,02,02,02,03,02,02,02,02,02,02,02,19\n"
+    "19,01,03,02,02,02,02,02,02,02,02,02,01,03,02,02,03,02,02,02,02,02,02,02,02,03,02,02,02,02,02,02,03,02,03,03,02,02,07,19\n"
+    "19,02,01,02,02,03,02,02,02,02,02,02,02,02,03,02,02,02,02,02,03,02,01,01,02,02,02,02,05,02,02,02,03,02,03,03,02,02,02,19\n"
+    "19,02,02,02,02,03,05,02,02,03,02,02,02,02,02,02,02,02,03,02,02,02,02,02,02,03,02,03,05,02,02,02,02,02,02,03,02,02,02,19\n"
+    "19,02,02,02,01,02,02,03,02,01,02,02,03,02,03,03,02,02,02,02,02,02,02,02,02,03,02,03,05,02,02,02,02,02,02,01,02,02,03,19\n"
+    "19,02,05,02,02,02,02,01,02,02,02,02,02,01,02,02,02,02,02,02,02,02,02,01,02,03,02,02,03,02,02,02,02,03,02,02,02,03,02,19\n"
+    "19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19";
 
 class BDMinesState : public State {
  public:
   BDMinesState(const BDMinesState&) = default;
-  BDMinesState(std::shared_ptr<const Game> game, int max_steps, int magic_wall_steps,
-               int amoeba_max_size, int gems_required, Grid grid, int rng_seed);
+  BDMinesState(std::shared_ptr<const Game> game, int steps_remaining, int magic_wall_steps,
+               bool magic_active, int amoeba_max_size, int amoeba_size, Element amoeba_swap,
+               bool amoeba_enclosed, int gems_required, int gems_collected, int current_reward,
+               int sum_reward, Grid grid, int rng_seed) : 
+      State(game),
+      steps_remaining_(steps_remaining),
+      magic_wall_steps_(magic_wall_steps),
+      magic_active_(magic_active),
+      amoeba_max_size_(amoeba_max_size),
+      amoeba_size_(amoeba_size),
+      amoeba_swap_(amoeba_swap),
+      amoeba_enclosed_(amoeba_enclosed),
+      gems_required_(gems_required),
+      gems_collected_(gems_collected),
+      current_reward_(current_reward),
+      sum_reward_(sum_reward),
+      grid_(grid),
+      rng_(rng_seed) {}
 
   Player CurrentPlayer() const override;
   std::string ActionToString(Player player, Action move_id) const override;
@@ -183,6 +186,7 @@ class BDMinesState : public State {
   std::vector<double> Returns() const override;
   std::vector<double> Rewards() const override;
   std::string ObservationString(Player player) const override;
+  std::string Serialize() const override;
   void ObservationTensor(Player player,
                          std::vector<double>* values) const override;
 
@@ -209,7 +213,7 @@ class BDMinesState : public State {
   void RollRight(int index, Element element);
   void Push(int index, int action);
   void MoveThroughMagic(int index, Element element);
-  void Explode(int index, int action=Directions::kNone);
+  void Explode(int index, Element element, int action=Directions::kNone);
 
   void UpdateBoulder(int index);
   void UpdateBoulderFalling(int index);
@@ -226,21 +230,19 @@ class BDMinesState : public State {
   void StartScan();
   void EndScan();
 
-
   int steps_remaining_;   // Max steps before game over
   int magic_wall_steps_;  //steps before magic wall expire (after active)
+  bool magic_active_;     // flag for magic wall state
   int amoeba_max_size_;   // size before amoebas collapse
+  int amoeba_size_;       // current number of amoebas
+  Element amoeba_swap_;   // Element which amoebas swap to
+  bool amoeba_enclosed_;  // internal flag to check if amoeba trapped
   int gems_required_;     // gems required to open exit
+  int gems_collected_;    // gems collected thus far
+  double current_reward_; // reset at every step
+  double sum_reward_;     // cumulative reward
   Grid grid_;             // grid representing elements/positions
   mutable std::mt19937 rng_;      // Internal rng
-
-  double current_reward_ = 0.0;   // reset at every step
-  double sum_reward_ = 0.0;       // cumulative reward
-  int gems_collected_ = 0;        // gems collected thus far
-  bool magic_active_ = false;     // flag for magic wall state
-  int amoeba_size_ = 0;           // current number of amoebas
-  Element amoeba_swap_;           // Element which amoebas swap to
-  bool amoeba_enclosed_ = true;   // internal flag to check if amoeba trapped
 
   // Initialize to bad/invalid values. Use open_spiel::NewInitialState()
   Player cur_player_ = -1;  // Player to play.
@@ -253,8 +255,9 @@ class BDMinesGame : public Game {
   int NumDistinctActions() const override;
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(
-        new BDMinesState(shared_from_this(), max_steps_, magic_wall_steps_, amoeba_max_size_,
-                         gems_required_, grid_, ++rng_seed_));
+        new BDMinesState(shared_from_this(), max_steps_, magic_wall_steps_, false, amoeba_max_size_,
+                         0, kNullElement, true, gems_required_, 0, 0, 0, 
+                         grid_, ++rng_seed_));
   }
   int MaxGameLength() const override;
   int NumPlayers() const override;
@@ -264,15 +267,16 @@ class BDMinesGame : public Game {
     return std::shared_ptr<const Game>(new BDMinesGame(*this));
   }
   std::vector<int> ObservationTensorShape() const override;
+  std::unique_ptr<State> DeserializeState(const std::string& str) const override;
 
 protected:
   Grid ParseGrid(const std::string& grid_string);
 
  private:
-  int max_steps_;          // Max steps before game over
+  int max_steps_;         // Max steps before game over
   int magic_wall_steps_;  //steps before magic wall expire (after active)
   int amoeba_max_size_;   // size before amoebas collapse
-  mutable int rng_seed_;          // Seed for stochastic element transitions
+  mutable int rng_seed_;  // Seed for stochastic element transitions
   Grid grid_;             // grid representing elements/positions
   int gems_required_;     // gems required to open exit
 };
