@@ -1,0 +1,48 @@
+[2020-06-29 17:59:05.591] learner started
+[2020-06-29 17:59:05.592] Initializing model
+[2020-06-29 17:59:10.386] Model type: resnet(64, 10)
+[2020-06-29 17:59:10.387] Model size: 745593 variables
+[2020-06-29 17:59:11.195] Initial checkpoint: ./data/hex2/checkpoint-0
+[2020-06-29 18:10:02.689] Step: 1
+[2020-06-29 18:10:02.689] Collected 21847 states from 3121 games, 30.7 states/s. 15.4 states/(s*actor), game length: 7.0
+[2020-06-29 18:10:02.689] Buffer size: 21847. States seen: 21847
+[2020-06-29 18:10:28.227] Losses(total: 0.158, policy: 0.000, value: 0.022, l2: 0.135)
+[2020-06-29 18:10:28.227] Checkpoint saved: ./data/hex2/checkpoint-1
+[2020-06-29 18:10:28.263]
+[2020-06-29 18:21:09.890] Step: 2
+[2020-06-29 18:21:09.890] Collected 21847 states from 3121 games, 32.7 states/s. 16.4 states/(s*actor), game length: 7.0
+[2020-06-29 18:21:09.890] Buffer size: 43694. States seen: 43694
+[2020-06-29 18:21:54.084] Losses(total: 0.136, policy: 0.000, value: 0.000, l2: 0.136)
+[2020-06-29 18:21:54.084] Checkpoint saved: ./data/hex2/checkpoint-2
+[2020-06-29 18:21:54.121]
+[2020-06-29 19:35:36.631] Step: 3
+[2020-06-29 19:35:36.631] Collected 21847 states from 3121 games, 4.9 states/s. 2.4 states/(s*actor), game length: 7.0
+[2020-06-29 19:35:36.631] Buffer size: 65536. States seen: 65541
+[2020-06-29 19:36:51.806] Losses(total: 0.135, policy: 0.000, value: 0.000, l2: 0.135)
+[2020-06-29 19:36:51.806] Checkpoint saved: ./data/hex2/checkpoint-3
+[2020-06-29 19:36:51.845]
+[2020-06-29 19:49:04.444] Step: 4
+[2020-06-29 19:49:04.445] Collected 21847 states from 3121 games, 27.0 states/s. 13.5 states/(s*actor), game length: 7.0
+[2020-06-29 19:49:04.445] Buffer size: 65536. States seen: 87388
+[2020-06-29 19:50:41.175] Losses(total: 0.134, policy: 0.000, value: 0.000, l2: 0.134)
+[2020-06-29 19:50:41.176] Checkpoint saved: ./data/hex2/checkpoint-4
+[2020-06-29 19:50:41.241]
+[2020-06-29 20:05:19.541] Step: 5
+[2020-06-29 20:05:19.542] Collected 21847 states from 3121 games, 22.4 states/s. 11.2 states/(s*actor), game length: 7.0
+[2020-06-29 20:05:19.542] Buffer size: 65536. States seen: 109235
+[2020-06-29 20:06:33.751] Losses(total: 0.133, policy: 0.000, value: 0.000, l2: 0.133)
+[2020-06-29 20:06:33.751] Checkpoint saved: ./data/hex2/checkpoint-5
+[2020-06-29 20:06:33.792]
+[2020-06-29 20:18:14.699] Step: 6
+[2020-06-29 20:18:14.700] Collected 21847 states from 3121 games, 28.2 states/s. 14.1 states/(s*actor), game length: 7.0
+[2020-06-29 20:18:14.700] Buffer size: 65536. States seen: 131082
+[2020-06-29 20:19:28.763] Losses(total: 0.132, policy: 0.000, value: 0.000, l2: 0.132)
+[2020-06-29 20:19:28.763] Checkpoint saved: ./data/hex2/checkpoint-6
+[2020-06-29 20:19:28.803]
+[2020-06-29 20:31:32.488] Step: 7
+[2020-06-29 20:31:32.489] Collected 21847 states from 3121 games, 27.4 states/s. 13.7 states/(s*actor), game length: 7.0
+[2020-06-29 20:31:32.489] Buffer size: 65536. States seen: 152929
+[2020-06-29 20:33:04.599] Losses(total: 0.131, policy: 0.000, value: 0.000, l2: 0.131)
+[2020-06-29 20:33:04.599] Checkpoint saved: ./data/hex2/checkpoint-7
+[2020-06-29 20:33:04.656]
+[2020-06-29 20:40:34.870] learner exiting
