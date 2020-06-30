@@ -536,6 +536,10 @@ std::ostream& operator<<(std::ostream& stream, GameType::ChanceMode value) {
   }
 }
 
+std::ostream& operator<<(std::ostream& stream, const State& state) {
+  return stream << state.History();
+}
+
 std::istream& operator>>(std::istream& stream, GameType::ChanceMode& var) {
   std::string str;
   stream >> str;

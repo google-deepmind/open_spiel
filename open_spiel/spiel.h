@@ -745,6 +745,9 @@ class State {
   std::shared_ptr<const Game> game_;
 };
 
+
+std::ostream& operator<<(std::ostream& stream, const State& state);
+
 // A class that refers to a particular game instantiation, for example
 // Breakthrough(8x8).
 //
