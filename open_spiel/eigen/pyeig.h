@@ -17,28 +17,23 @@
 
 #include "Eigen/Dense"
 
-
 // Defines matrix types that use the library Eigen in a way that is compatible
 // with numpy arrays. The aim is to use an arrangement of the C++ matrices
 // so that no unncessary copying is done to expose them as numpy arrays.
 // The known "gotchas" are listed in the README in this directory.
 // If you want to use Eigen, include this file.
+//
+// Relevant docs (recommended reading):
+// - https://pybind11.readthedocs.io/en/stable/advanced/cast/eigen.html#storage-orders
+// - https://eigen.tuxfamily.org/dox/classEigen_1_1Ref.html
 namespace open_spiel {
 
-// Something similar to py::EigenDRef<MatrixType>,
-// but available in the open_spiel namespace directly.
-//
-// Docs:
-// https://pybind11.readthedocs.io/en/stable/advanced/cast/eigen.html#storage-orders
-template<class T>
-using PyEig = Eigen::Matrix<
+// Use this type for dynamically sized matrices of doubles.
+using MatrixXd = Eigen::Matrix<
     double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
 
-// Use this type for dynamically sized matrices of doubles.
-using MatrixXd = PyEig<Eigen::MatrixXd>;
-
 // Use this type for dynamically sized vectors of doubles.
-using VectorXd = PyEig<Eigen::VectorXd>;
+using VectorXd = Eigen::VectorXd;
 
 }  // namespace open_spiel
 
