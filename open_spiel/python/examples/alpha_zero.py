@@ -22,7 +22,7 @@ from open_spiel.python.algorithms.alpha_zero_mm import alpha_zero
 from open_spiel.python.algorithms.alpha_zero_mm import model as model_lib
 from open_spiel.python.utils import spawn
 
-flags.DEFINE_string("game", "hex", "Name of the game.")
+flags.DEFINE_string("game", "tic_tac_toe", "Name of the game.")
 flags.DEFINE_integer("uct_c", 2, "UCT's exploration constant.")
 flags.DEFINE_integer("max_simulations", 100, "How many simulations to run.")
 flags.DEFINE_integer("train_batch_size", 2 ** 10, "Batch size for learning.")
@@ -53,6 +53,7 @@ flags.DEFINE_integer(
     ("Play evaluation games vs MCTS+Solver, with max_simulations*10^(n/2)"
      " simulations for n in range(eval_levels). Default of 7 means "
      "running mcts with up to 1000 times more simulations."))
+flags.DEFINE_string("search_type", 'mcts', 'Search type that will be used, either mcts or minimax')
 flags.DEFINE_integer("max_steps", 20, "How many learn steps before exiting.")
 flags.DEFINE_bool("quiet", False, "Don't show the moves as they're played.")
 flags.DEFINE_bool("verbose", False, "Show the MCTS stats of possible moves.")
@@ -82,6 +83,7 @@ def main(unused_argv):
       temperature_drop=FLAGS.temperature_drop,
       evaluation_window=FLAGS.evaluation_window,
       eval_levels=FLAGS.eval_levels,
+      search_type=FLAGS.search_type,
 
       nn_model=FLAGS.nn_model,
       nn_width=FLAGS.nn_width,
