@@ -51,11 +51,29 @@ enum PlayerId {
 // Constant representing an invalid action.
 inline constexpr Action kInvalidAction = -1;
 
-// Constant that signifies that player did not receive any private observation.
-// See GameType::provides_factored_observation_string for details.
-inline const char* kNoPrivateObservation = "no private obs";
-inline const char* kStartOfGamePublicObservation = "start game";
-inline const char* kClockTickPublicObservation = "clock tick";
+// In the initial state of the game (root node of the world tree)
+// all players receive a "dummy" observation that the game just started.
+//
+// This is checked for PrivateObservationString and PublicObservationString
+// methods.
+inline const char* kStartOfGameObservation = "start game";
+
+// Imagine the following:
+//
+// All players sit in a room and play a game. There is a clock on the wall.
+// Everyone can see this clock, and therefore perceive the flow of time.
+// The clock ticking is a public observation: all players see that time goes on,
+// and all players are aware of this fact.
+//
+// Therefore, if there is no other public observation than clock ticking,
+// the state should return this constant. However, if there is another
+// observation, you do not need to encode the time, because that is done
+// implicitly through that game observation.
+//
+// This "implicit-coding-of-time-through-observations" also happens for private
+// observations. Therefore, for technical reasons, the state should also return
+// this value for private observations.
+inline const char* kClockTickObservation = "clock tick";
 
 // Static information for a game. This will determine what algorithms are
 // applicable. For example, minimax search is only applicable to two-player,
