@@ -149,11 +149,20 @@ class BridgeState : public State {
     return score_by_contract_;
   }
 
+  // Returns the double-dummy score for a list of contracts from the point
+  // of view of the specified player.
+  // Will compute the double-dummy results if needed.
+  std::vector<int> ScoreForContracts(int player,
+                                     const std::vector<int>& contracts) const;
+
   // Private information tensor per player.
   std::vector<double> PrivateObservationTensor(Player player) const;
 
   // Public information.
   std::vector<double> PublicObservationTensor() const;
+
+  // Current phase.
+  int CurrentPhase() const { return static_cast<int>(phase_); }
 
  protected:
   void DoApplyAction(Action action) override;
@@ -167,8 +176,8 @@ class BridgeState : public State {
   void ApplyDealAction(int card);
   void ApplyBiddingAction(int call);
   void ApplyPlayAction(int card);
-  void ComputeDoubleDummyTricks();
-  void ComputeScoreByContract();
+  void ComputeDoubleDummyTricks() const;
+  void ComputeScoreByContract() const;
   void ScoreUp();
   Trick& CurrentTrick() { return tricks_[num_cards_played_ / kNumPlayers]; }
   const Trick& CurrentTrick() const {
@@ -196,9 +205,9 @@ class BridgeState : public State {
   std::array<Trick, kNumTricks> tricks_{};
   std::vector<double> returns_ = std::vector<double>(kNumPlayers);
   std::array<absl::optional<Player>, kNumCards> holder_{};
-  absl::optional<ddTableResults> double_dummy_results_{};
+  mutable absl::optional<ddTableResults> double_dummy_results_{};
   std::array<bool, kNumContracts> possible_contracts_;
-  std::array<int, kNumContracts> score_by_contract_;
+  mutable std::array<int, kNumContracts> score_by_contract_;
 };
 
 class BridgeGame : public Game {

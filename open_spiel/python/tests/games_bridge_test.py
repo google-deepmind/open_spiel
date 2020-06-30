@@ -78,6 +78,41 @@ class GamesBridgeTest(absltest.TestCase):
     self.assertEqual(score['1DX N'], -300)
     self.assertEqual(score['1CXX W'], -430)
 
+  def test_score_single_contract(self):
+    game = pyspiel.load_game('bridge(use_double_dummy_result=false)')
+    state = game.new_initial_state()
+    #         S T3
+    #         H QT42
+    #         D A82
+    #         C A632
+    # S KJ5           S Q7
+    # H A965          H KJ8
+    # D Q43           D KJT5
+    # C T87           C Q954
+    #         S A98642
+    #         H 73
+    #         D 976
+    #         C KJ
+    for a in [
+        49, 45, 31, 5, 10, 40, 27, 47, 35, 38, 17, 14, 0, 33, 21, 39, 34, 12,
+        22, 41, 1, 13, 36, 9, 4, 46, 11, 32, 2, 37, 29, 30, 7, 8, 19, 24, 16,
+        43, 51, 15, 48, 23, 6, 20, 42, 26, 44, 50, 25, 28, 3, 18
+    ]:
+      state.apply_action(a)
+    cid = {
+        game.contract_string(i): i for i in range(game.num_possible_contracts())
+    }
+    self.assertEqual(state.score_for_contracts(0, [cid['1H E']]), [-110])
+    self.assertEqual(
+        state.score_for_contracts(1, [cid['1H E'], cid['1H W']]), [110, 80])
+    self.assertEqual(
+        state.score_for_contracts(2, [cid['1H E'], cid['2H E'], cid['3H E']]),
+        [-110, -110, 50])
+    self.assertEqual(
+        state.score_for_contracts(3, [cid['1H W'], cid['3N W']]), [80, -50])
+    self.assertEqual(state.score_for_contracts(0, [cid['1DX N']]), [-300])
+    self.assertEqual(state.score_for_contracts(1, [cid['1CXX W']]), [430])
+
   def test_public_observation(self):
     game = pyspiel.load_game('bridge')
     state = game.new_initial_state()

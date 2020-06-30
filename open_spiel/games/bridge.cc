@@ -439,7 +439,7 @@ void BridgeState::SetDoubleDummyResults(ddTableResults double_dummy_results) {
 
 ABSL_CONST_INIT absl::Mutex dds_mutex(absl::kConstInit);
 
-void BridgeState::ComputeDoubleDummyTricks() {
+void BridgeState::ComputeDoubleDummyTricks() const {
   if (!double_dummy_results_.has_value()) {
     absl::MutexLock lock(&dds_mutex);  // TODO(author11) Make DDS code thread-safe
     double_dummy_results_ = ddTableResults{};
@@ -460,6 +460,19 @@ void BridgeState::ComputeDoubleDummyTricks() {
     }
   }
   ComputeScoreByContract();
+}
+
+std::vector<int> BridgeState::ScoreForContracts(
+    int player, const std::vector<int>& contracts) const {
+  ComputeDoubleDummyTricks();
+  const bool score_ns = (Partnership(player) == Partnership(kNorth));
+  std::vector<int> scores;
+  scores.reserve(contracts.size());
+  for (int contract : contracts) {
+    scores.push_back(score_ns ? score_by_contract_[contract]
+                              : -score_by_contract_[contract]);
+  }
+  return scores;
 }
 
 std::vector<Action> BridgeState::LegalActions() const {
@@ -691,7 +704,7 @@ void BridgeState::ScoreUp() {
   }
 }
 
-void BridgeState::ComputeScoreByContract() {
+void BridgeState::ComputeScoreByContract() const {
   SPIEL_CHECK_TRUE(double_dummy_results_.has_value());
   for (int i = 0; i < kNumContracts; ++i) {
     Contract contract = kAllContracts[i];

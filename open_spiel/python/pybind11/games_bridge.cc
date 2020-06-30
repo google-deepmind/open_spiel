@@ -32,6 +32,8 @@ void init_pyspiel_games_bridge(py::module& m) {
       .def("contract_index", &BridgeState::ContractIndex)
       .def("possible_contracts", &BridgeState::PossibleContracts)
       .def("score_by_contract", &BridgeState::ScoreByContract)
+      .def("score_for_contracts", &BridgeState::ScoreForContracts)
+      .def("current_phase", &BridgeState::CurrentPhase)
       .def("private_observation_tensor", &BridgeState::PrivateObservationTensor)
       .def("public_observation_tensor", &BridgeState::PublicObservationTensor)
       // Pickle support
