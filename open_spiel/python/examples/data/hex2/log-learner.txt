@@ -1,6 +1,0 @@
-[2020-06-30 08:45:17.132] learner started
-[2020-06-30 08:45:17.132] Initializing model
-[2020-06-30 08:45:22.029] Model type: resnet(64, 10)
-[2020-06-30 08:45:22.030] Model size: 747418 variables
-[2020-06-30 08:45:22.868] Initial checkpoint: ./data/hex2/checkpoint-0
-[2020-06-30 10:21:57.936] learner exiting

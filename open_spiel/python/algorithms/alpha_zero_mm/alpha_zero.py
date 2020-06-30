@@ -477,7 +477,7 @@ def learner(*, game, config, actors, evaluators, broadcast_fn, logger):
 
 def alpha_zero(config: Config):
   """Start all the worker processes for a full alphazero setup."""
-  game = pyspiel.load_game('hex', {'board_size': pyspiel.GameParameter(3)})
+  game = pyspiel.load_game('hex', {'board_size': pyspiel.GameParameter(4)})
   config = config._replace(
       observation_shape=game.observation_tensor_shape(),
       output_size=game.num_distinct_actions())
