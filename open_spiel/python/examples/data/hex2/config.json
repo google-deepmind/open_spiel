@@ -13,10 +13,10 @@
   "nn_width": 64,
   "observation_shape": [
     9,
-    3,
-    3
+    4,
+    4
   ],
-  "output_size": 9,
+  "output_size": 16,
   "path": "./data/hex2/",
   "policy_alpha": 1.0,
   "policy_epsilon": 0.25,
