@@ -20,8 +20,8 @@
 #include <string>
 #include <vector>
 
-#include "open_spiel/games/kuhn_poker.h"
 #include "open_spiel/public_states/public_states.h"
+#include "open_spiel/games/kuhn_poker.h"
 
 // This is a public state API version of Kuhn Poker:
 // http://en.wikipedia.org/wiki/Kuhn_poker
@@ -30,15 +30,119 @@
 // actually coincide with perfect recall on this game.
 //
 // There is a visualization of world/public/private trees available in [1]
+// for the two-player variant.
+//
+// This implementation works for N players (N >= 2).
+//
+// The multiplayer (n>2) version is the one described in
+// http://mlanctot.info/files/papers/aamas14sfrd-cfr-kuhn.pdf
+//
 // [1] https://arxiv.org/abs/1906.11110
+// TODO: Base Game API observations description.
 
 namespace open_spiel {
 namespace public_states {
 namespace kuhn_poker {
 
-// TODO(author13): This is just a stub.
-class KuhnPrivateInformation : public PrivateInformation {};
-class KuhnPublicState : public PublicState {};
+using namespace open_spiel::kuhn_poker;
+
+class KuhnGameWithPublicStates: public GameWithPublicStates {
+ public:
+  KuhnGameWithPublicStates(std::shared_ptr<const KuhnGame> base_game);
+  std::unique_ptr<PublicState> NewInitialPublicState() const override;
+  std::vector<ReachProbs> NewInitialReachProbs() const override;
+  int NumPublicFeatures() const override;
+  std::vector<int> MaxDistinctPrivateInformationsCount() const override;
+ private:
+  const std::shared_ptr<const KuhnGame> kuhn_game_;
+};
+
+class KuhnPrivateInformation: public PrivateInformation {
+ public:
+  KuhnPrivateInformation(std::shared_ptr<const Game> base_game,
+                         Player player, int player_card);
+  Player GetPlayer() const override;
+  int GetPlayerCard() const;
+  unsigned int ReachProbsIndex() const override;
+  unsigned int NetworkIndex() const override;
+  bool IsStateCompatible(const State& state) const override;
+  std::string ToString() const override;
+  std::unique_ptr<PrivateInformation> Clone() const override;
+  std::string Serialize() const override;
+  bool operator==(const PrivateInformation& other) const override;
+ private:
+  const std::shared_ptr<const KuhnGame> kuhn_game_;
+  const Player player_;
+  const int player_card_;
+};
+
+class KuhnPublicState: public PublicState {
+ public:
+  explicit KuhnPublicState(
+      std::shared_ptr<const GameWithPublicStates> public_game);
+  KuhnPublicState(const KuhnPublicState&) = default;
+  KuhnPublicState(
+      std::shared_ptr<const GameWithPublicStates> public_game,
+      std::vector<PublicTransition> public_obs);
+
+  // Perspectives over the public state.
+  std::vector<int> NumDistinctPrivateInformations() const override;
+  std::vector<PrivateInformation> GetPrivateInformations(
+      Player player) const override;
+  std::vector<std::unique_ptr<State>> GetPublicSet() const override;
+  std::string GetInformationState(
+      const PrivateInformation& information) const override;
+  std::vector<State> GetInformationSet(
+      const PrivateInformation& information) const override;
+  std::unique_ptr<State> GetWorldState(
+      const std::vector<PrivateInformation*>& informations) const override;
+
+  // Fetch a random subset from a perspective
+  std::unique_ptr<State> ResampleFromPublicSet(Random* random) const override;
+  std::unique_ptr<State> ResampleFromInformationSet(
+      const PrivateInformation&, Random* random) const override;
+
+  // Traversal of public state
+  std::vector<PublicTransition> GetPublicTransitions() const override;
+  std::vector<std::vector<Action>> GetPrivateActions(
+      Player player) const override;
+  void UndoTransition(const PublicTransition& transition) override;
+
+  // Public state types
+  bool IsChance() const override;
+  bool IsTerminal() const override;
+  bool IsPlayer() const override;
+  std::vector<Player> ActingPlayers() const override;
+
+  // CFR-related computations
+  ReachProbs ComputeReachProbs(const PublicTransition& transition,
+                               const std::vector<VectorXd>& strategy,
+                               ReachProbs reach_probs) override;
+  std::vector<CfPrivValues> TerminalCfValues(
+      const std::vector<ReachProbs>& reach_probs) const override;
+  CfPrivValues ComputeCfPrivValues(
+      const std::vector<CfActionValues>& children_values,
+      const std::vector<VectorXd>& privates_policies) const override;
+  std::vector<CfActionValues> ComputeCfActionValues(
+      const std::vector<CfPrivValues>& children_values) const override;
+
+  // Neural networks
+  std::vector<double> PublicFeaturesTensor() const override;
+
+  // Miscellaneous
+  std::unique_ptr<PublicState> Clone() const override;
+
+  bool PlayerHasSeenHisCard(Player p) const;
+  bool AllPlayerHaveSeenTheirCards() const;
+  int NumPlayers() const;
+  int NumCards() const;
+
+ private:
+  const std::shared_ptr<const KuhnGame> kuhn_game_;
+  // Public action of each player.
+  std::vector<ActionType> public_actions_;
+  void DoApplyPublicTransition(const PublicTransition& transition) override;
+};
 
 }  // namespace kuhn_poker
 }  // namespace public_states

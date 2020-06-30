@@ -24,14 +24,73 @@
 namespace open_spiel {
 namespace public_states {
 
-PrivateInformation::PrivateInformation(std::shared_ptr<const Game> game)
-    : game_(std::move(game)) {
-  SPIEL_CHECK_TRUE(game_->GetType().provides_factored_observation_string);
+PrivateInformation::PrivateInformation(std::shared_ptr<const Game> base_game)
+    : base_game_(std::move(base_game)) {
+  SPIEL_CHECK_TRUE(base_game_->GetType().provides_factored_observation_string);
 }
 
-PublicState::PublicState(std::shared_ptr<const Game> game)
-    : game_(std::move(game)) {
-  SPIEL_CHECK_TRUE(game_->GetType().provides_factored_observation_string);
+PublicState::PublicState(
+    std::shared_ptr<const GameWithPublicStates> public_game)
+    : public_game_(std::move(public_game)), base_game_(
+    public_game->GetBaseGame()) {
+  SPIEL_CHECK_TRUE(base_game_->GetType().provides_factored_observation_string);
+}
+
+PublicState::PublicState(
+    std::shared_ptr<const GameWithPublicStates> public_game,
+    std::vector<PublicTransition> pub_obs_history)
+    : public_game_(std::move(public_game)), base_game_(
+    public_game->GetBaseGame()) {
+  SPIEL_CHECK_TRUE(base_game_->GetType().provides_factored_observation_string);
+  SPIEL_CHECK_EQ(pub_obs_history[0], kStartOfGameObservation);
+  for (int i = 1; i < pub_obs_history.size(); ++i) {
+    SPIEL_CHECK_TRUE(IsPublicTransitionApplicable(pub_obs_history[i]));
+    ApplyPublicTransition(pub_obs_history[i]);
+  }
+}
+
+std::vector<double> PublicState::ReachProbsTensor(
+    const std::vector<ReachProbs>& reach_probs) const {
+  std::vector<int> sizes = public_game_->MaxDistinctPrivateInformationsCount();
+  int reach_probs_size = 1;
+  for (int j = 0; j < sizes.size(); ++j) reach_probs_size *= sizes[j];
+
+  std::vector<double> tensor(reach_probs_size, kTensorUnusedSlotValue);
+  // Place reach probs of each player.
+  int player_offset = 0;
+  for (int i = 0; i < base_game_->NumPlayers(); ++i) {
+    const std::vector<PrivateInformation> player_privates =
+        GetPrivateInformations(i);
+    SPIEL_CHECK_EQ(player_privates.size(), reach_probs[i].probs.size());
+    for (int j = 0; j < player_privates.size(); ++j) {
+      SPIEL_CHECK_EQ(player_privates[j].ReachProbsIndex(), j);
+      // We use NetworkIndex because there can be "holes" in the input
+      // These "holes" have value 0 by default.
+      const int placement = player_offset + player_privates[j].NetworkIndex();
+      tensor[placement] = reach_probs[i].probs[j];
+    }
+    player_offset += sizes[i];
+  }
+  SPIEL_CHECK_EQ(player_offset, reach_probs_size);
+  return tensor;
+}
+
+std::vector<double> PublicState::ToTensor(
+    const std::vector<ReachProbs>& reach_probs) const {
+  std::vector<double> tensor = ReachProbsTensor(reach_probs);
+  SPIEL_CHECK_EQ(
+      tensor.size(), public_game_->SumMaxDistinctPrivateInformations());
+
+  const std::vector<double> public_features = PublicFeaturesTensor();
+  SPIEL_CHECK_EQ(public_features.size(), public_game_->NumPublicFeatures());
+
+  const int reach_probs_size = tensor.size();
+  const int features_size = public_features.size();
+  tensor.resize(reach_probs_size + features_size);
+
+//  std::copy(tensor.begin() + reach_probs_size, tensor.end(),
+//            public_features.begin());
+  return tensor;
 }
 
 GameWithPublicStatesRegisterer::GameWithPublicStatesRegisterer(

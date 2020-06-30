@@ -51,23 +51,23 @@ namespace public_states {
 // Static information for a game. This will determine what algorithms,
 // solution concepts and automatic consistency checks are applicable.
 struct GameWithPublicStatesType {
-  // A short name with no spaces that uniquely identifies the game, e.g.
-  // "msoccer". This is the key used to distinguish games. It must be the same
-  // as GameType::short_name of the underlying Base API.
-  std::string short_name;
+    // A short name with no spaces that uniquely identifies the game, e.g.
+    // "msoccer". This is the key used to distinguish games. It must be the same
+    // as GameType::short_name of the underlying Base API.
+    std::string short_name;
 
-  // Provides methods that compute values needed to run counter-factual
-  // regret minimization: reach probs and cf. values.
-  bool provides_cfr_computation;
+    // Provides methods that compute values needed to run counter-factual
+    // regret minimization: reach probs and cf. values.
+    bool provides_cfr_computation;
 
-  // Does the implementation provide IsStateCompatible() implementations?
-  // These are useful for automatic consistency checks with Base API.
-  //
-  // They provide a way of comparing imperfect-recall public / private
-  // informations with perfect recall public-observation histories /
-  // action private-observation histories, as these are uniquely defined for
-  // each State.
-  bool provides_state_compatibility_check;
+    // Does the implementation provide IsStateCompatible() implementations?
+    // These are useful for automatic consistency checks with Base API.
+    //
+    // They provide a way of comparing imperfect-recall public / private
+    // informations with perfect recall public-observation histories /
+    // action private-observation histories, as these are uniquely defined for
+    // each State.
+    bool provides_state_compatibility_check;
 };
 
 // An abstract class that represents a private information in the game.
@@ -79,7 +79,7 @@ struct GameWithPublicStatesType {
 // The private information does not contain any piece of public information!
 class PrivateInformation {
  public:
-  explicit PrivateInformation(std::shared_ptr<const Game> game);
+  explicit PrivateInformation(std::shared_ptr<const Game> base_game);
   PrivateInformation(const PrivateInformation&) = default;
   virtual ~PrivateInformation() = default;
 
@@ -102,13 +102,6 @@ class PrivateInformation {
   // Equality of PrivateInformation implies the same NetworkIndex().
   virtual unsigned int NetworkIndex() const {
     SpielFatalError("NetworkIndex() is not implemented.");
-  }
-
-  // Return representation for neural networks.
-  // TODO(author13): tensor layouts.
-  // Equality of PrivateInformation implies they have the same ToTensor()
-  virtual std::vector<double> ToTensor() const {
-    SpielFatalError("ToTensor() is not implemented.");
   }
 
   // Can State produce this private information?
@@ -152,11 +145,11 @@ class PrivateInformation {
   }
 
   // Get the game object that generated this state.
-  std::shared_ptr<const Game> GetGame() const { return game_; }
+  std::shared_ptr<const Game> GetGame() const { return base_game_; }
 
  protected:
   // A pointer to the game that created this public information.
-  const std::shared_ptr<const Game> game_;
+  const std::shared_ptr<const Game> base_game_;
 };
 
 // An edge in the public tree. This is the same as output of
@@ -170,8 +163,8 @@ using PublicTransition = std::string;
 // The values are always accompanied by the owning player. The values must be
 // always within the range of game's Max/Min Returns.
 struct CfPrivValues {
-  const Player player;
-  VectorXd cfvs;
+    const Player player;
+    VectorXd cfvs;
 };
 
 // A container for counter-factual action-values for each action of a private
@@ -181,8 +174,8 @@ struct CfPrivValues {
 // The values are always accompanied by the owning player. The values must be
 // always within the range of game's Max/Min Returns.
 struct CfActionValues {
-  const Player player;
-  VectorXd cfavs;
+    const Player player;
+    VectorXd cfavs;
 };
 
 // A container for reach probabilities of the player, for each of its
@@ -190,16 +183,28 @@ struct CfActionValues {
 // The values are always accompanied by the owning player.
 // The reach probs must sum to 1.
 struct ReachProbs {
-  const Player player;
-  VectorXd probs;
+    const Player player;
+    VectorXd probs;
 };
+
+// Defines symbol for PublicState, implemented later.
+class GameWithPublicStates;
+
+// todo:comment
+constexpr inline double kTensorUnusedSlotValue = -1.;
 
 // A public state is perfect recall - it corresponds to an object specified by
 // public-observation history and provides methods on top of it.
 // It corresponds to a specific node within a public tree.
 class PublicState {
  public:
-  explicit PublicState(std::shared_ptr<const Game> game);
+  explicit PublicState(std::shared_ptr<const GameWithPublicStates> public_game);
+  // Construct public state based on public observation history.
+  // The default implementation trivially tries to apply the public transitions,
+  // while checking each supplied transition is valid.
+  explicit PublicState(
+      std::shared_ptr<const GameWithPublicStates> public_game,
+      std::vector<PublicTransition> pub_obs_history);
   PublicState(const PublicState&) = default;
   virtual ~PublicState() = default;
 
@@ -209,6 +214,7 @@ class PublicState {
 
   // Return the public observation history.
   const std::vector<PublicTransition>& GetPublicObservationHistory() const {
+    SPIEL_CHECK_GE(pub_obs_history_.size(), 1);
     return pub_obs_history_;
   }
 
@@ -233,7 +239,7 @@ class PublicState {
   // recall abstraction. Therefore, return a minimally sized set of these
   // states such that there is no other state that is isomorphic to any
   // of them.
-  virtual std::vector<State> GetPublicSet() const {
+  virtual std::vector<std::unique_ptr<State>> GetPublicSet() const {
     SpielFatalError("GetPublicSet() is not implemented.");
   }
 
@@ -267,8 +273,9 @@ class PublicState {
     SpielFatalError("ResampleFromPublicSet() is not implemented.");
   }
 
-  virtual std::unique_ptr<State> ResampleFromInformationSet(Random*) const {
-    SpielFatalError("ResampleFromPublicSet() is not implemented.");
+  virtual std::unique_ptr<State> ResampleFromInformationSet(
+      const PrivateInformation&, Random*) const {
+    SpielFatalError("ResampleFromInformationSet() is not implemented.");
   }
 
   // </editor-fold>
@@ -298,8 +305,10 @@ class PublicState {
     return transition;
   }
 
-  virtual std::unique_ptr<PublicState> Child(const PublicTransition&) const {
-    SpielFatalError("Child() is not implemented.");
+  std::unique_ptr<PublicState> Child(const PublicTransition& transition) const {
+    std::unique_ptr<PublicState> child = Clone();
+    child->ApplyPublicTransition(transition);
+    return child;
   }
 
   virtual std::vector<PublicTransition> GetPublicTransitions() const {
@@ -316,10 +325,22 @@ class PublicState {
 
   // Undoes the last transition, which must be supplied. This is a method
   // to get a parent public state.
+  // One must call pub_obs_history_.pop_back() in the implementations.
   //
   // Mutates public state!
   virtual void UndoTransition(const PublicTransition&) {
     SpielFatalError("UndoTransition() is not implemented.");
+  }
+
+  // Can this public transition be applied in this public state?
+  // This implementation checks if the transition is in the list provided
+  // by GetPublicTransitions.
+  bool IsPublicTransitionApplicable(
+      const PublicTransition& transition) const {
+    for (PublicTransition& valid_transition : GetPublicTransitions()) {
+      if (valid_transition == transition) return true;
+    }
+    return false;
   }
 
   // </editor-fold>
@@ -387,7 +408,7 @@ class PublicState {
   // Each element of the vector should be a valid probability distribution.
   virtual ReachProbs ComputeReachProbs(const PublicTransition&,
                                        const std::vector<VectorXd>& strategy,
-                                       const ReachProbs&) {
+                                       ReachProbs) {
     SpielFatalError("ComputeReachProbs() is not implemented.");
   }
 
@@ -451,21 +472,23 @@ class PublicState {
   // <editor-fold desc="Neural networks">
   // ---------------------------------------------------------------------------
 
-  // Return appropriate representation of this public state.
-  // TODO(author13): tensor layouts.
-  // This function uses PrivateInformation::NetworkIndex()
-  // to place features of private informations.
-  virtual std::vector<double> ToTensor() const {
-    SpielFatalError("ToTensor() is not implemented.");
-    // TODO(author13): default implementation concat public + privates?
+  // Return feature representation of this public state.
+  virtual std::vector<double> PublicFeaturesTensor() const {
+    SpielFatalError("PublicFeaturesTensor() is not implemented.");
   }
 
-  // TODO(author13): tensor layouts.
-  // This function uses PrivateInformation::NetworkIndex() to place reach probs.
-  virtual std::vector<double> ToTensor(const std::vector<ReachProbs>&) const {
-    SpielFatalError("ToTensor() is not implemented.");
-    // TODO(author13): default implementation concat ToTensor() + ReachProbs?
-  }
+  // Encode reach probabilities into a tensor of size
+  // product of MaxDistinctPrivateInformationsCount
+  virtual std::vector<double> ReachProbsTensor(
+      const std::vector<ReachProbs>&) const;
+
+  // Return tensor that builds tensor representation for the public state
+  // given the reach probs of all players. The default representation
+  // concatenates at first the ReachProbs of all players and then it adds
+  // PublicFeaturesTensor().
+  // Additionally, the ReachProbs are placed within the tensor at locations
+  // specified by PrivateInformation::NetworkIndex()
+  virtual std::vector<double> ToTensor(const std::vector<ReachProbs>&) const;
 
   // </editor-fold>
 
@@ -475,11 +498,18 @@ class PublicState {
 
   // Human readable description of the public state.
   virtual std::string ToString() const {
-    SpielFatalError("ToString() is not implemented.");
+    std::stringstream ss;
+    ss << pub_obs_history_;
+    return ss.str();
   }
 
   // Depth of the public state within the public tree.
-  virtual int GetDepth() const { return pub_obs_history_.size(); }
+  // The root public state has depth of 0, but contains already
+  // the first public observation - start of the game.
+  virtual int GetDepth() const { return pub_obs_history_.size() - 1; }
+
+  // Is the current public state root of the public tree?
+  virtual bool IsRoot() const { return GetDepth() == 0; }
 
   virtual std::unique_ptr<PublicState> Clone() const {
     SpielFatalError("Clone() is not implemented.");
@@ -494,12 +524,17 @@ class PublicState {
   }
 
   // Get the game object that generated this state.
-  std::shared_ptr<const Game> GetGame() const { return game_; }
+  std::shared_ptr<const Game> GetBaseGame() const { return base_game_; }
+
+  // Get the game object that generated this state.
+  std::shared_ptr<const GameWithPublicStates> GetPublicGame() const {
+    return public_game_;
+  }
 
   // Compare if the public state has exactly the same public observation
   // history. This is not the same as comparing two PublicInformations!
-  virtual bool operator==(const PublicState& other) const {
-    SpielFatalError("operator==() is not implemented.");
+  bool operator==(const PublicState& other) const {
+    return pub_obs_history_ == other.pub_obs_history_;
   }
 
   bool operator!=(const PublicState& other) const { return !operator==(other); }
@@ -515,23 +550,32 @@ class PublicState {
   // See ApplyStateAction.
   // Mutates public state!
   virtual PublicTransition DoApplyStateAction(
-      const std::vector<PrivateInformation*>&, Action) {
-    SpielFatalError("DoApplyStateAction() is not implemented.");
+      const std::vector<PrivateInformation*>&informations, Action a) {
+    std::unique_ptr<State> state = GetWorldState(informations);
+    SPIEL_CHECK_FALSE(state->IsTerminal());
+    state->ApplyAction(a);
+    PublicTransition transition = state->PublicObservationString();
+    ApplyPublicTransition(transition);
+    return transition;
   }
 
   // Public observations received so far.
-  std::vector<PublicTransition> pub_obs_history_;
+  std::vector<PublicTransition> pub_obs_history_ = {
+      kStartOfGameObservation
+  };
 
   // A pointer to the game that created this public state.
-  const std::shared_ptr<const Game> game_;
+  const std::shared_ptr<const Game> base_game_;
+  const std::shared_ptr<const GameWithPublicStates> public_game_;
 };
 
 // An abstract game class that provides methods for constructing
 // public state API objects and asking for properties of the public tree.
-class GameWithPublicStates {
+class GameWithPublicStates:
+    public std::enable_shared_from_this<GameWithPublicStates> {
  public:
-  GameWithPublicStates(std::shared_ptr<const Game> game)
-      : game_(std::move(game)) {}
+  GameWithPublicStates(std::shared_ptr<const Game> base_game)
+      : base_game_(std::move(base_game)) {}
   GameWithPublicStates(const GameWithPublicStates&) = default;
   virtual ~GameWithPublicStates() = default;
 
@@ -546,10 +590,10 @@ class GameWithPublicStates {
   }
 
   // Provide information about the maximum number of distinct private
-  // informations in any public state in the game. Note that this should not
-  // be an arbitrary upper bound, but indeed the maximum number, because
-  // it serves to specify the sizes of neural network inputs. Some algorithms
-  // will likely use it to preallocate memory.
+  // informations per player in any public state in the game. Note that this
+  // should not be an arbitrary upper bound, but indeed the maximum number,
+  // because it serves to specify the sizes of neural network inputs. Some
+  // algorithms will likely use it to preallocate memory.
   //
   // Example: in HUNL Poker players receive 2 cards from the pile of 52 cards,
   // which makes it 52 * 51 / 2 = 1326 for each player.
@@ -558,13 +602,35 @@ class GameWithPublicStates {
         "MaxDistinctPrivateInformationsCount() is not implemented.");
   }
 
+  // Returns the sum of the maximum number of distinct private informations
+  // over all the players
+  int SumMaxDistinctPrivateInformations() const {
+    int sum = 0;
+    for (int cnt : MaxDistinctPrivateInformationsCount()) sum += cnt;
+    return sum;
+  }
+
+  // Returns the number of public features. Each public state should be
+  // represented by the same number of features.
+  virtual int NumPublicFeatures() const {
+    SpielFatalError("NumPublicFeatures() is not implemented.");
+  }
+
+  // Returns the size of the neural network input.
+  virtual int NetworkInputSize() const {
+    int size = NumPublicFeatures();
+    std::vector<int> private_info_sizes = MaxDistinctPrivateInformationsCount();
+    for (int private_info_size : private_info_sizes) size += private_info_size;
+    return size;
+  }
+
   // Returns a newly allocated private information built from a string.
   // Caller takes ownership of the object.
   //
   // If this method is overridden, then it should be the inverse of
   // PrivateInformation::Serialize (i.e. that method should also be overridden).
   virtual std::unique_ptr<PrivateInformation> DeserializePrivateInformation()
-      const {
+  const {
     SpielFatalError("DeserializePrivateInformation() is not implemented.");
   }
 
@@ -577,7 +643,10 @@ class GameWithPublicStates {
     SpielFatalError("DeserializePublicState() is not implemented.");
   }
 
-  std::shared_ptr<const Game> game_;
+  std::shared_ptr<const Game> GetBaseGame() const { return base_game_; }
+
+ protected:
+  std::shared_ptr<const Game> base_game_;
 };
 
 #define REGISTER_SPIEL_GAME_WITH_PUBLIC_STATE_API(info, factory) \
@@ -640,7 +709,7 @@ std::shared_ptr<const GameWithPublicStates> LoadGameWithPublicStates(
 
 // Returns a new game object from the underlying Base API game object.
 std::shared_ptr<const GameWithPublicStates> LoadGameWithPublicStates(
-    std::shared_ptr<const Game> game);
+    std::shared_ptr<const Game> base_game);
 
 std::string SerializeGameWithPublicState(const GameWithPublicStates& game,
                                          const PublicState& state);
