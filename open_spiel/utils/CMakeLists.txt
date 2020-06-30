@@ -2,6 +2,7 @@ add_library (utils OBJECT
   circular_buffer.h
   data_logger.h
   data_logger.cc
+  down_cast.h
   file.h
   file.cc
   json.h
