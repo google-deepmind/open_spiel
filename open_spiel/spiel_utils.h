@@ -66,6 +66,15 @@ std::ostream& operator<<(std::ostream& stream, const std::array<T, N>& v) {
   stream << "]";
   return stream;
 }
+template <typename T>
+std::ostream& operator<<(std::ostream& stream, const std::unique_ptr<T>& v) {
+  return stream << *v;
+}
+template <typename T, typename U>
+std::ostream& operator<<(std::ostream& stream, const std::pair<T, U>& v) {
+  stream << "(" << v.first << "," << v.second << ")";
+  return stream;
+}
 
 namespace internal {
 // SpielStrOut(out, a, b, c) is equivalent to:
