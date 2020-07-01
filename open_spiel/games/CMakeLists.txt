@@ -96,6 +96,12 @@ set(GAME_SOURCES
   skat.h
   solitaire.cc
   solitaire.h
+  tarok.cc
+  tarok.h
+  tarok/cards.cc
+  tarok/cards.h
+  tarok/contracts.cc
+  tarok/contracts.h
   tic_tac_toe.cc
   tic_tac_toe.h
   tiny_bridge.cc
