@@ -280,14 +280,20 @@ std::string BridgeState::FormatResult() const {
 
 void BridgeState::ObservationTensor(Player player,
                                     std::vector<double>* values) const {
+  values->resize(game_->ObservationTensorSize());
+  WriteObservationTensor<double>(player, absl::MakeSpan(*values));
+}
+
+template <typename T>
+void BridgeState::WriteObservationTensor(Player player,
+                                         absl::Span<T> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  std::fill(values->begin(), values->end(), 0.0);
-  values->resize(game_->ObservationTensorSize());
+  std::fill(values.begin(), values.end(), 0.0);
   if (phase_ == Phase::kGameOver || phase_ == Phase::kDeal) return;
   int partnership = Partnership(player);
-  auto ptr = values->begin();
+  auto ptr = values.begin();
   if (num_cards_played_ > 0) {
     // Observation for play phase
     if (phase_ == Phase::kPlay) ptr[2] = 1;
@@ -355,9 +361,9 @@ void BridgeState::ObservationTensor(Player player,
     ptr += kNumTricks;
     ptr[num_cards_played_ / 4 - num_declarer_tricks_] = 1;
     ptr += kNumTricks;
-    SPIEL_CHECK_EQ(std::distance(values->begin(), ptr),
+    SPIEL_CHECK_EQ(std::distance(values.begin(), ptr),
                    kPlayTensorSize + kNumObservationTypes);
-    SPIEL_CHECK_LE(std::distance(values->begin(), ptr), values->size());
+    SPIEL_CHECK_LE(std::distance(values.begin(), ptr), values.size());
   } else {
     // Observation for auction or opening lead.
     ptr[phase_ == Phase::kPlay ? 1 : 0] = 1;
@@ -387,11 +393,17 @@ void BridgeState::ObservationTensor(Player player,
     for (int i = 0; i < kNumCards; ++i)
       if (holder_[i] == player) ptr[i] = 1;
     ptr += kNumCards;
-    SPIEL_CHECK_EQ(std::distance(values->begin(), ptr),
+    SPIEL_CHECK_EQ(std::distance(values.begin(), ptr),
                    kAuctionTensorSize + kNumObservationTypes);
-    SPIEL_CHECK_LE(std::distance(values->begin(), ptr), values->size());
+    SPIEL_CHECK_LE(std::distance(values.begin(), ptr), values.size());
   }
 }
+
+template void BridgeState::WriteObservationTensor<float>(
+    Player player, absl::Span<float> values) const;
+
+template void BridgeState::WriteObservationTensor<double>(
+    Player player, absl::Span<double> values) const;
 
 std::vector<double> BridgeState::PublicObservationTensor() const {
   SPIEL_CHECK_TRUE(phase_ == Phase::kAuction);

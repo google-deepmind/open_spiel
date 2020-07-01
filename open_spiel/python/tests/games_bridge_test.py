@@ -15,6 +15,7 @@
 # Lint as: python3
 """Tests for the game-specific functions for bridge."""
 
+import random
 import timeit
 
 from absl.testing import absltest
@@ -141,7 +142,7 @@ class GamesBridgeTest(absltest.TestCase):
       def benchmark(cids=cids):
         working_state = state.clone()
         _ = working_state.score_for_contracts(0, cids)
-      repeat = 10
+      repeat = 3
       times = np.array(timeit.repeat(benchmark, number=1, repeat=repeat))
       print(f'{contracts} mean {times.mean():.4}s, min {times.min():.4}s')
 
@@ -193,6 +194,43 @@ class GamesBridgeTest(absltest.TestCase):
         0.0, 0.0, 0.0, 0.0,  # No kings
         1.0, 1.0, 0.0, 0.0   # CA, DA
     ])
+
+  def test_benchmark_observation(self):
+    game = pyspiel.load_game('bridge')
+
+    def make_state():
+      state = game.new_initial_state()
+      for _ in range(60):
+        a = random.choice(state.legal_actions())
+        state.apply_action(a)
+        if state.is_terminal(): break
+      return state
+
+    batch_size = 256
+    obs_shape = [batch_size] + game.observation_tensor_shape()
+    states = [make_state() for _ in range(batch_size)]
+
+    def make_obs_copy():
+      inputs = np.zeros(obs_shape)
+      for i in range(batch_size):
+        inputs[i, :] = states[i].observation_tensor()
+      return inputs
+
+    def make_obs_inplace():
+      inputs = np.zeros(obs_shape, np.float32)
+      for i in range(batch_size):
+        states[i].write_observation_tensor(inputs[i])
+      return inputs
+
+    repeat = 2
+    number = 2
+    times = np.array(timeit.repeat(make_obs_copy, number=number, repeat=repeat))
+    print(f'OpenSpiel {times.mean():.4}s, min {times.min():.4}s')
+    times = np.array(
+        timeit.repeat(make_obs_inplace, number=number, repeat=repeat))
+    print(f'In-place {times.mean():.4}s, min {times.min():.4}s')
+
+    np.testing.assert_array_equal(make_obs_copy(), make_obs_inplace())
 
 
 if __name__ == '__main__':
