@@ -15,7 +15,11 @@
 # Lint as: python3
 """Tests for the game-specific functions for bridge."""
 
+import timeit
+
 from absl.testing import absltest
+import numpy as np
+
 import pyspiel
 
 
@@ -112,6 +116,34 @@ class GamesBridgeTest(absltest.TestCase):
         state.score_for_contracts(3, [cid['1H W'], cid['3N W']]), [80, -50])
     self.assertEqual(state.score_for_contracts(0, [cid['1DX N']]), [-300])
     self.assertEqual(state.score_for_contracts(1, [cid['1CXX W']]), [430])
+
+  def test_benchmark_score_single(self):
+    game = pyspiel.load_game('bridge(use_double_dummy_result=false)')
+    state = game.new_initial_state()
+    for a in [
+        49, 45, 31, 5, 10, 40, 27, 47, 35, 38, 17, 14, 0, 33, 21, 39, 34, 12,
+        22, 41, 1, 13, 36, 9, 4, 46, 11, 32, 2, 37, 29, 30, 7, 8, 19, 24, 16,
+        43, 51, 15, 48, 23, 6, 20, 42, 26, 44, 50, 25, 28, 3, 18
+    ]:
+      state.apply_action(a)
+    cid = {
+        game.contract_string(i): i for i in range(game.num_possible_contracts())
+    }
+
+    for contracts in (
+        ['1H E'],
+        ['1H E', '1H W'],
+        ['1H E', '2H E', '3H E'],
+        ['1H E', '1CXX W'],
+        list(cid),
+        ):
+      cids = [cid[c] for c in contracts]
+      def benchmark(cids=cids):
+        working_state = state.clone()
+        _ = working_state.score_for_contracts(0, cids)
+      repeat = 10
+      times = np.array(timeit.repeat(benchmark, number=1, repeat=repeat))
+      print(f'{contracts} mean {times.mean():.4}s, min {times.min():.4}s')
 
   def test_public_observation(self):
     game = pyspiel.load_game('bridge')
