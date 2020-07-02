@@ -69,7 +69,10 @@ def main(argv):
         group_infosets=FLAGS.group_infosets,
         group_terminal=FLAGS.group_terminal)
   else:
-    gametree = treeviz.GameTree(game)  # use default decorators
+    # use default decorators
+    gametree = treeviz.GameTree(game,
+                                group_infosets=FLAGS.group_infosets,
+                                group_terminal=FLAGS.group_terminal)
 
   if FLAGS.verbose:
     logging.info("Game tree:\n%s", gametree.to_string())
