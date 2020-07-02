@@ -228,6 +228,7 @@ class UncontestedBiddingGame : public Game {
     return {kStateSize};
   }
   int MaxGameLength() const override { return kNumActions; }
+  std::string ToString() const override;
   std::unique_ptr<State> DeserializeState(
       const std::string& str) const override;
 

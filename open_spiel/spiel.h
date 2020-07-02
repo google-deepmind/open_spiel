@@ -361,7 +361,6 @@ class State {
   // a requirement. The only thing that is necessary is that it is unambiguous
   // who is the observer.
 
-
   // Games that do not have imperfect information do not need to implement
   // these methods, but most algorithms intended for imperfect information
   // games will work on perfect information games provided the InformationState
@@ -818,7 +817,10 @@ class Game : public std::enable_shared_from_this<Game> {
   virtual int MaxGameLength() const = 0;
 
   // A string representation of the game, which can be passed to LoadGame.
-  std::string ToString() const;
+  // This method should only be overridden by implicitly stochastic games
+  // that need to also persist the state of the internal RNG by adding it to
+  // game parameters.
+  virtual std::string ToString() const;
 
   // Returns an Observer, used to obtain observations of the game state.
   // See `spiel_observer.h` for further information.

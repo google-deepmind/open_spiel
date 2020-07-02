@@ -17,9 +17,9 @@
 #include <cstring>
 #include <memory>
 
-#include "open_spiel/games/bridge/double_dummy_solver/include/dll.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/games/bridge/bridge_scoring.h"
+#include "open_spiel/games/bridge/double_dummy_solver/include/dll.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
@@ -389,6 +389,14 @@ UncontestedBiddingGame::UncontestedBiddingGame(const GameParameters& params)
           {7, kNoTrump, kUndoubled, 1}};
     }
   }
+}
+
+// Override ToString() so that internal RNG state is also peristed.
+std::string UncontestedBiddingGame::ToString() const {
+  GameParameters params = game_parameters_;
+  params["name"] = GameParameter(game_type_.short_name);
+  params["rng_seed"] = GameParameter(rng_seed_);
+  return GameParametersToString(params);
 }
 
 // Deserialize the deal and auction
