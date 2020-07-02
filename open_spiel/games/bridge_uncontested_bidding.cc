@@ -446,8 +446,8 @@ std::unique_ptr<State> UncontestedBiddingGame::DeserializeState(
   }
 
   return absl::make_unique<UncontestedBiddingState>(
-      shared_from_this(), reference_contracts_, Deal(cards), actions,
-      ++rng_seed_, num_redeals_);
+      shared_from_this(), reference_contracts_, Deal(cards), actions, rng_seed_,
+      num_redeals_);
 }
 
 }  // namespace bridge_uncontested_bidding
