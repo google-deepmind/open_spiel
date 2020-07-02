@@ -55,6 +55,7 @@ const GameType kGameType{
      {"num_items", GameParameter(kDefaultNumItems)},
      {"num_symbols", GameParameter(kDefaultNumSymbols)},
      {"rng_seed", GameParameter(kDefaultSeed)},
+     {"rng_state", GameParameter(std::string(kDefaultRNGState))},
      {"utterance_dim", GameParameter(kDefaultUtteranceDim)}}};
 
 static std::shared_ptr<const Game> Factory(const GameParameters& params) {
@@ -508,6 +509,13 @@ NegotiationGame::NegotiationGame(const GameParameters& params)
       seed_(ParameterValue<int>("rng_seed", kDefaultSeed)),
       legal_utterances_({}),
       rng_(new std::mt19937(seed_ >= 0 ? seed_ : std::mt19937::default_seed)) {
+  // Internal RNG state is set when serializing the game instance with
+  // NegotiationGame::ToString() so we try to deserialize it here.
+  std::string rng_state = ParameterValue<std::string>("rng_state");
+  if (rng_state != kDefaultRNGState) {
+    std::istringstream rng_stream(rng_state);
+    rng_stream >> *rng_;
+  }
   ConstructLegalUtterances();
 }
 
@@ -573,6 +581,16 @@ std::string NegotiationState::Serialize() const {
     absl::StrAppend(&state_str, HistoryString(), "\n");
     return state_str;
   }
+}
+
+// Override ToString() so that internal RNG state is also peristed.
+std::string NegotiationGame::ToString() const {
+  GameParameters params = game_parameters_;
+  params["name"] = GameParameter(game_type_.short_name);
+  std::ostringstream rng_stream;
+  rng_stream << *rng_;
+  params["rng_state"] = GameParameter(rng_stream.str());
+  return GameParametersToString(params);
 }
 
 std::unique_ptr<State> NegotiationGame::DeserializeState(
