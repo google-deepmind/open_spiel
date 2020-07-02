@@ -54,7 +54,7 @@ _KNOWN_PLAYERS = [
     "az"
 ]
 
-flags.DEFINE_string("game", "hex", "Name of the game.")
+flags.DEFINE_string("game", "tic_tac_toe", "Name of the game.")
 flags.DEFINE_enum("player1", "mcts", _KNOWN_PLAYERS, "Who controls player 1.")
 flags.DEFINE_enum("player2", "random", _KNOWN_PLAYERS, "Who controls player 2.")
 flags.DEFINE_string("gtp_path", None, "Where to find a binary for gtp.")
@@ -190,7 +190,7 @@ def _play_game(game, bots, initial_actions):
 
 
 def main(argv):
-  game = pyspiel.load_game('hex', {'board_size': pyspiel.GameParameter(3)})
+  game = pyspiel.load_game(FLAGS.game)
   if game.num_players() > 2:
     sys.exit("This game requires more players than the example can handle.")
   bots = [
