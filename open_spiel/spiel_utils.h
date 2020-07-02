@@ -66,6 +66,15 @@ std::ostream& operator<<(std::ostream& stream, const std::array<T, N>& v) {
   stream << "]";
   return stream;
 }
+template <typename T>
+std::ostream& operator<<(std::ostream& stream, const std::unique_ptr<T>& v) {
+  return stream << *v;
+}
+template <typename T, typename U>
+std::ostream& operator<<(std::ostream& stream, const std::pair<T, U>& v) {
+  stream << "(" << v.first << "," << v.second << ")";
+  return stream;
+}
 
 namespace internal {
 // SpielStrOut(out, a, b, c) is equivalent to:
@@ -257,6 +266,46 @@ class UniformProbabilitySampler {
   const double min_;
   const double max_;
 };
+
+// Utility functions intended to be used for casting
+// from a Base class to a Derived subclass.
+// These functions handle various use cases, such as pointers, const references,
+// shared or unique pointers.
+// When you use debug mode, a more expensive dynamic_cast is used and it checks
+// whether the casting has been successful. In optimized builds only static_cast
+// is used when possible.
+
+// use like this: subclass_cast<T*>(foo);
+template <typename To, typename From>
+inline To subclass_cast(From* f) {
+#if !defined(NDEBUG)
+  if (f != nullptr && dynamic_cast<To>(f) == nullptr) {
+    std::string from = typeid(From).name();
+    std::string to = typeid(From).name();
+    SpielFatalError(
+        absl::StrCat("Cast failure: could not cast a pointer from '", from,
+                     "' to '", to, "'"));
+  }
+#endif
+  return static_cast<To>(f);
+}
+
+// use like this: subclass_cast<T&>(foo);
+template <typename To, typename From>
+inline To subclass_cast(From& f) {
+  typedef typename std::remove_reference<To>::type* ToAsPointer;
+#if !defined(NDEBUG)
+  if (dynamic_cast<ToAsPointer>(&f) == nullptr) {
+    std::string from = typeid(From).name();
+    std::string to = typeid(From).name();
+    SpielFatalError(
+        absl::StrCat("Cast failure: could not cast a reference from '", from,
+                     "' to '", to, "'"));
+  }
+#endif
+  return *static_cast<ToAsPointer>(&f);
+}
+
 
 }  // namespace open_spiel
 

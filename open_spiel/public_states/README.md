@@ -36,27 +36,8 @@ the subtle issues that arise in imperfect info games.
 
 To understand this API, it is beneficial to understand how Base API relates to
 FOGs. Base API does not implement FOGs exactly, it is rather a hybrid between
-FOGs and EFGs. There are a number of subtle differences, significant for PS-API:
-
--   In FOGs players take joint actions, and each player has at least one action.
-    In Base API, there is a version of simultaneous-move games, which does this.
-    The sequential game can be interpreted as simultaneous-move game where all
-    the other players just played a "no-op" action.
--   However, after the joint actions is taken, in FOGs there is always a
-    transition function to new world states, which encodes stochasticity, and is
-    deterministic if there is only one outcome. In Base API, this is done via
-    explicit chance `State`.
--   In FOGs the players receive observations only after the stochastic
-    transition. In Base API we can ask for the latest difference of observations
-    at any `State`: a player or terminal `State`, and importantly also at chance
-    `State`.
--   In FOGs there is one way how imperfect information is encoded: it is by
-    using Action-Observation histories (AOH), where Observation here represents
-    \
-    the joint private and public observations. In Base API, besides AOH there is
-    "information state", which is a non-factored variant of AOH (it is not
-    factored into the respective actions and observations). Both of these ways
-    of representation have a string and tensor representation.
+FOGs and EFGs. There are a number of subtle differences, significant for PS-API,
+described in the file `fog_constants.h`.
 
 The factored observations in `State`, accessed by `PrivateObservationString` or
 `PublicObservationString` can be used to create the public state API via a game

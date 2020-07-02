@@ -47,8 +47,8 @@ InformationStateTensor(1): ◯◉◯◯◯◯◯◯◯◯◯
 ObservationString(0) = ""
 ObservationString(1) = ""
 PublicObservationString() = "start game"
-PrivateObservationString(0) = "no private obs"
-PrivateObservationString(1) = "no private obs"
+PrivateObservationString(0) = "start game"
+PrivateObservationString(1) = "start game"
 ObservationTensor(0): ◉◯◯◯◯◉◉
 ObservationTensor(1): ◯◉◯◯◯◉◉
 ChanceOutcomes() = [{0, 0.333333333333}, {1, 0.333333333333}, {2, 0.333333333333}]
@@ -74,7 +74,7 @@ ObservationString(0) = "111"
 ObservationString(1) = ""
 PublicObservationString() = "deal 0"
 PrivateObservationString(0) = "1"
-PrivateObservationString(1) = "no private obs"
+PrivateObservationString(1) = "clock tick"
 ObservationTensor(0): ◉◯◯◉◯◉◉
 ObservationTensor(1): ◯◉◯◯◯◉◉
 ChanceOutcomes() = [{0, 0.500000000000}, {2, 0.500000000000}]
@@ -99,7 +99,7 @@ InformationStateTensor(1): ◯◉◯◯◉◯◯◯◯◯◯
 ObservationString(0) = "111"
 ObservationString(1) = "211"
 PublicObservationString() = "deal 1"
-PrivateObservationString(0) = "no private obs"
+PrivateObservationString(0) = "clock tick"
 PrivateObservationString(1) = "2"
 ObservationTensor(0): ◉◯◯◉◯◉◉
 ObservationTensor(1): ◯◉◯◯◉◉◉
@@ -126,8 +126,8 @@ InformationStateTensor(1): ◯◉◯◯◉◉◯◯◯◯◯
 ObservationString(0) = "111"
 ObservationString(1) = "211"
 PublicObservationString() = "0"
-PrivateObservationString(0) = "no private obs"
-PrivateObservationString(1) = "no private obs"
+PrivateObservationString(0) = "clock tick"
+PrivateObservationString(1) = "clock tick"
 ObservationTensor(0): ◉◯◯◉◯◉◉
 ObservationTensor(1): ◯◉◯◯◉◉◉
 Rewards() = [-0.0, -0.0]
@@ -153,8 +153,8 @@ InformationStateTensor(1): ◯◉◯◯◉◉◯◯◉◯◯
 ObservationString(0) = "112"
 ObservationString(1) = "212"
 PublicObservationString() = "1"
-PrivateObservationString(0) = "no private obs"
-PrivateObservationString(1) = "no private obs"
+PrivateObservationString(0) = "clock tick"
+PrivateObservationString(1) = "clock tick"
 ObservationTensor(0) = [1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 2.0]
 ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 2.0]
 Rewards() = [-0.0, -0.0]
@@ -180,8 +180,8 @@ InformationStateTensor(1): ◯◉◯◯◉◉◯◯◉◯◉
 ObservationString(0) = "122"
 ObservationString(1) = "222"
 PublicObservationString() = "1"
-PrivateObservationString(0) = "no private obs"
-PrivateObservationString(1) = "no private obs"
+PrivateObservationString(0) = "clock tick"
+PrivateObservationString(1) = "clock tick"
 ObservationTensor(0) = [1.0, 0.0, 0.0, 1.0, 0.0, 2.0, 2.0]
 ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 1.0, 2.0, 2.0]
 Rewards() = [2.0, -2.0]
