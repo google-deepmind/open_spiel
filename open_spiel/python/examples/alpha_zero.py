@@ -18,8 +18,8 @@
 from absl import app
 from absl import flags
 
-from open_spiel.python.algorithms.alpha_zero_mm import alpha_zero
-from open_spiel.python.algorithms.alpha_zero_mm import model as model_lib
+from open_spiel.python.algorithms.alpha_zero import alpha_zero
+from open_spiel.python.algorithms.alpha_zero import model as model_lib
 from open_spiel.python.utils import spawn
 
 flags.DEFINE_string("game", "tic_tac_toe", "Name of the game.")
