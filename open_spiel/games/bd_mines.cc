@@ -117,7 +117,7 @@ const Element kElAmoeba = {
 };
 const Element kElWallBrick = {
   HiddenCellType::kWallBrick, VisibleCellType::kWallBrick,
-  ElementProperties::kConsumable | ElementProperties::kRounded, 'B'
+  ElementProperties::kConsumable | ElementProperties::kRounded, 'H'
 };
 const Element kElWallSteel = {
   HiddenCellType::kWallSteel, VisibleCellType::kWallSteel,
@@ -146,6 +146,70 @@ const Element kElExplosionBoulder = {
 const Element kElExplosionEmpty = {
   HiddenCellType::kExplosionEmpty, VisibleCellType::kExplosion,
   ElementProperties::kNone, 'E'
+};
+const Element kElGateRedClosed = {
+  HiddenCellType::kGateRedClosed, VisibleCellType::kGateRedClosed,
+  ElementProperties::kNone, 'r'
+};
+const Element kElGateRedOpen = {
+  HiddenCellType::kGateRedOpen, VisibleCellType::kGateRedOpen,
+  ElementProperties::kNone, 'R'
+};
+const Element kElKeyRed = {
+  HiddenCellType::kKeyRed, VisibleCellType::kKeyRed,
+  ElementProperties::kNone, '1'
+};
+const Element kElGateBlueClosed = {
+  HiddenCellType::kGateBlueClosed, VisibleCellType::kGateBlueClosed,
+  ElementProperties::kNone, 'b'
+};
+const Element kElGateBlueOpen = {
+  HiddenCellType::kGateBlueOpen, VisibleCellType::kGateBlueOpen,
+  ElementProperties::kNone, 'B'
+};
+const Element kElKeyBlue = {
+  HiddenCellType::kKeyBlue, VisibleCellType::kKeyBlue,
+  ElementProperties::kNone, '2'
+};
+const Element kElGateGreenClosed = {
+  HiddenCellType::kGateGreenClosed, VisibleCellType::kGateGreenClosed,
+  ElementProperties::kNone, 'g'
+};
+const Element kElGateGreenOpen = {
+  HiddenCellType::kGateGreenOpen, VisibleCellType::kGateGreenOpen,
+  ElementProperties::kNone, 'G'
+};
+const Element kElKeyGreen = {
+  HiddenCellType::kKeyGreen, VisibleCellType::kKeyGreen,
+  ElementProperties::kNone, '3'
+};
+const Element kElGateYellowClosed = {
+  HiddenCellType::kGateYellowClosed, VisibleCellType::kGateYellowClosed,
+  ElementProperties::kNone, 'y'
+};
+const Element kElGateYellowOpen = {
+  HiddenCellType::kGateYellowOpen, VisibleCellType::kGateYellowOpen,
+  ElementProperties::kNone, 'Y'
+};
+const Element kElKeyYellow = {
+  HiddenCellType::kKeyYellow, VisibleCellType::kKeyYellow,
+  ElementProperties::kNone, '4'
+};
+const Element kElNut = {
+  HiddenCellType::kNut, VisibleCellType::kNut,
+  ElementProperties::kRounded | ElementProperties::kConsumable, '+'
+};
+const Element kElNutFalling = {
+  HiddenCellType::kNutFalling, VisibleCellType::kNut,
+  ElementProperties::kRounded | ElementProperties::kConsumable, '+'
+};
+const Element kElBomb = {
+  HiddenCellType::kBomb, VisibleCellType::kBomb,
+  ElementProperties::kRounded | ElementProperties::kConsumable | ElementProperties::kCanExplode, '^'
+};
+const Element kElBombFalling = {
+  HiddenCellType::kBombFalling, VisibleCellType::kBomb,
+  ElementProperties::kRounded | ElementProperties::kConsumable | ElementProperties::kCanExplode, '^'
 };
 
 // Hash for Element, so we can use as a map key
@@ -186,6 +250,22 @@ const std::unordered_map<int, Element> kCellTypeToElement {
   {static_cast<int>(HiddenCellType::kExplosionBoulder), kElExplosionBoulder}, 
   {static_cast<int>(HiddenCellType::kExplosionDiamond), kElExplosionDiamond}, 
   {static_cast<int>(HiddenCellType::kExplosionEmpty), kElExplosionEmpty}, 
+  {static_cast<int>(HiddenCellType::kGateRedClosed), kElGateRedClosed}, 
+  {static_cast<int>(HiddenCellType::kGateRedOpen), kElGateRedOpen}, 
+  {static_cast<int>(HiddenCellType::kKeyRed), kElKeyRed},
+  {static_cast<int>(HiddenCellType::kGateBlueClosed), kElGateBlueClosed}, 
+  {static_cast<int>(HiddenCellType::kGateBlueOpen), kElGateBlueOpen}, 
+  {static_cast<int>(HiddenCellType::kKeyBlue), kElKeyBlue},
+  {static_cast<int>(HiddenCellType::kGateGreenClosed), kElGateGreenClosed}, 
+  {static_cast<int>(HiddenCellType::kGateGreenOpen), kElGateGreenOpen}, 
+  {static_cast<int>(HiddenCellType::kKeyGreen), kElKeyGreen},
+  {static_cast<int>(HiddenCellType::kGateYellowClosed), kElGateYellowClosed}, 
+  {static_cast<int>(HiddenCellType::kGateYellowOpen), kElGateYellowOpen}, 
+  {static_cast<int>(HiddenCellType::kKeyYellow), kElKeyYellow},
+  {static_cast<int>(HiddenCellType::kNut), kElNut},
+  {static_cast<int>(HiddenCellType::kNutFalling), kElNutFalling},
+  {static_cast<int>(HiddenCellType::kBomb), kElBomb},
+  {static_cast<int>(HiddenCellType::kBombFalling), kElBombFalling},
 };
 
 // Rotate actions right
@@ -245,7 +325,8 @@ const std::unordered_map<Element, Element, ElementHash> kElementToExplosion {
   {kElFireflyDown, kElExplosionEmpty}, {kElFireflyRight, kElExplosionEmpty},
   {kElButterflyUp, kElExplosionDiamond}, {kElButterflyLeft, kElExplosionDiamond}, 
   {kElButterflyDown, kElExplosionDiamond}, {kElButterflyRight, kElExplosionDiamond},
-  {kElRockford, kElExplosionEmpty},
+  {kElRockford, kElExplosionEmpty}, {kElBomb, kElExplosionEmpty},
+  {kElBombFalling, kElExplosionEmpty}
 };
 
 // Explosions back to elements
@@ -264,6 +345,22 @@ const std::unordered_map<Element, int, ElementHash> kGemPoints {
   {kElDiamond, 10}, {kElDiamondFalling, 10},
 };
 
+// Gate open conversion map
+const std::unordered_map<Element, Element, ElementHash> kGateOpenMap {
+  {kElGateRedClosed, kElGateRedOpen}, {kElGateBlueClosed, kElGateBlueOpen},
+  {kElGateGreenClosed, kElGateGreenOpen}, {kElGateYellowClosed, kElGateYellowOpen},
+};
+// Gate key map
+const std::unordered_map<Element, Element, ElementHash> kKeyToGate {
+  {kElKeyRed, kElGateRedClosed}, {kElKeyBlue, kElGateBlueClosed},
+  {kElKeyGreen, kElGateGreenClosed}, {kElKeyYellow, kElGateYellowClosed},
+};
+
+// Stationary to falling
+const std::unordered_map<Element, Element, ElementHash> kElToFalling {
+  {kElDiamond, kElDiamondFalling}, {kElBoulder, kElBoulderFalling},
+  {kElNut, kElNutFalling}, {kElBomb, kElBombFalling},
+};
 
 // Default parameters.
 constexpr int kDefaultMagicWallSteps = 140; // Number of steps before magic walls expire
@@ -398,6 +495,16 @@ bool IsMagicWall(const Element &element) {
     element == kElWallMagicOn;
 }
 
+bool IsOpenGate(const Element &element) {
+  return element == kElGateRedOpen || element == kElGateBlueOpen ||
+         element == kElGateGreenOpen || element == kElGateYellowOpen;
+}
+
+bool IsKey(const Element &element) {
+  return element == kElKeyRed || element == kElKeyBlue ||
+         element == kElKeyGreen || element == kElKeyYellow;
+}
+
 } // namespace
 
 
@@ -486,16 +593,16 @@ void BDMinesState::RollRight(int index, Element element) {
 }
 
 // Push the item
-void BDMinesState::Push(int index, int action) {
+void BDMinesState::Push(int index, Element stationary, Element falling, int action) {
   int new_index = IndexFromAction(index, action);
-  // Check if same direction past boulder is empty so that theres room to push
+  // Check if same direction past element is empty so that theres room to push
   if (IsType(new_index, kElEmpty, action)) {
     SetItem(index, kElEmpty);
     SetItem(new_index, kElRockford);
-    // Check if the boulder will become stationary or falling
-    int rock_index = IndexFromAction(new_index, action);
-    bool is_empty = IsType(rock_index, kElEmpty, Directions::kDown);
-    SetItem(new_index, is_empty ? kElBoulderFalling : kElBoulder, action);
+    // Check if the element will become stationary or falling
+    int next_index = IndexFromAction(new_index, action);
+    bool is_empty = IsType(next_index, kElEmpty, Directions::kDown);
+    SetItem(new_index, is_empty ? falling : stationary, action);
   }
 }
 
@@ -529,6 +636,14 @@ void BDMinesState::Explode(int index, Element element, int action) {
   }
 }
 
+void BDMinesState::OpenGate(Element element) {
+  auto it = std::find(grid_.elements.begin(), grid_.elements.end(), element);
+  if (it != grid_.elements.end()) {
+    int index = std::distance(grid_.elements.begin(), it);
+    SetItem(index, kGateOpenMap.at(GetItem(index)));
+  }
+}
+
 void BDMinesState::UpdateBoulder(int index) {
   // Boulder falls if empty below
   if (IsType(index, kElEmpty, Directions::kDown)) {
@@ -546,12 +661,21 @@ void BDMinesState::UpdateBoulderFalling(int index) {
   if (IsType(index, kElEmpty, Directions::kDown)) {
     MoveItem(index, Directions::kDown);
   } else if (HasProperty(index, ElementProperties::kCanExplode, Directions::kDown)) {
+    // Falling boulders can cause elements to explode
     auto it = kElementToExplosion.find(GetItem(index, Directions::kDown));
     Element ex = (it == kElementToExplosion.end()) ? kElExplosionEmpty : it->second;
     Explode(index, ex, Directions::kDown);
   } else if (IsType(index, kElWallMagicOn, Directions::kDown) || 
              IsType(index, kElWallMagicDormant, Directions::kDown)) {
     MoveThroughMagic(index, kMagicWallConversion.at(GetItem(index)));
+  } else if (IsType(index, kElNut, Directions::kDown)) {
+    // Falling on a nut, crack it open to reveal a diamond!
+    SetItem(index, kElDiamond, Directions::kDown);
+  } else if (IsType(index, kElNut, Directions::kDown)) {
+    // Falling on a bomb, explode!
+    auto it = kElementToExplosion.find(GetItem(index));
+    Element ex = (it == kElementToExplosion.end()) ? kElExplosionEmpty : it->second;
+    Explode(index, ex);
   } else if (CanRollLeft(index)) {    // Roll left/right
     RollLeft(index, kElBoulderFalling);
   } else if (CanRollRight(index)) {
@@ -578,7 +702,10 @@ void BDMinesState::UpdateDiamondFalling(int index) {
   // Continue to fall as normal
   if (IsType(index, kElEmpty, Directions::kDown)) {
     MoveItem(index, Directions::kDown);
-  } else if (HasProperty(index, ElementProperties::kCanExplode, Directions::kDown)) {
+  } else if (HasProperty(index, ElementProperties::kCanExplode, Directions::kDown) &&
+             !IsType(index, kElBomb, Directions::kDown) &&
+             !IsType(index, kElBombFalling, Directions::kDown)) {
+    // Falling diamonds can cause elements to explode (but not bombs)
     auto it = kElementToExplosion.find(GetItem(index, Directions::kDown));
     Element ex = (it == kElementToExplosion.end()) ? kElExplosionEmpty : it->second;
     Explode(index, ex, Directions::kDown);
@@ -592,6 +719,60 @@ void BDMinesState::UpdateDiamondFalling(int index) {
   } else {
     // Default options is for falling diamond to become stationary
     SetItem(index, kElDiamond);
+  }
+}
+
+void BDMinesState::UpdateNut(int index) {
+  // Nut falls if empty below
+  if (IsType(index, kElEmpty, Directions::kDown)) {
+    SetItem(index, kElNutFalling);
+    UpdateNutFalling(index);
+  } else if (CanRollLeft(index)) {    // Roll left/right
+    RollLeft(index, kElNutFalling);
+  } else if (CanRollRight(index)) {
+    RollRight(index, kElNutFalling);
+  }
+}
+
+void BDMinesState::UpdateNutFalling(int index) {
+  // Continue to fall as normal
+  if (IsType(index, kElEmpty, Directions::kDown)) {
+    MoveItem(index, Directions::kDown);
+  } else if (CanRollLeft(index)) {    // Roll left/right
+    RollLeft(index, kElNutFalling);
+  } else if (CanRollRight(index)) {
+    RollRight(index, kElNutFalling);
+  } else {
+    // Default options is for falling nut to become stationary
+    SetItem(index, kElNut);
+  }
+}
+
+void BDMinesState::UpdateBomb(int index) {
+  // Nut falls if empty below
+  if (IsType(index, kElEmpty, Directions::kDown)) {
+    SetItem(index, kElBombFalling);
+    UpdateBombFalling(index);
+  } else if (CanRollLeft(index)) {    // Roll left/right
+    RollLeft(index, kElBomb);
+  } else if (CanRollRight(index)) {
+    RollRight(index, kElBomb);
+  }
+}
+
+void BDMinesState::UpdateBombFalling(int index) {
+  // Continue to fall as normal
+  if (IsType(index, kElEmpty, Directions::kDown)) {
+    MoveItem(index, Directions::kDown);
+  } else if (CanRollLeft(index)) {    // Roll left/right
+    RollLeft(index, kElBombFalling);
+  } else if (CanRollRight(index)) {
+    RollRight(index, kElBombFalling);
+  } else {
+    // Default options is for bomb to explode if stopped falling
+    auto it = kElementToExplosion.find(GetItem(index));
+    Element ex = (it == kElementToExplosion.end()) ? kElExplosionEmpty : it->second;
+    Explode(index, ex);
   }
 }
 
@@ -612,9 +793,22 @@ void BDMinesState::UpdateRockford(int index, int action) {
     current_reward_ += kGemPoints.at(GetItem(index, action));
     sum_reward_ += kGemPoints.at(GetItem(index, action));
     MoveItem(index, action);
-  } else if (IsActionHorz(action) && IsType(index, kElBoulder, action)) {
-    // Push boulder only if action is horizontal
-    Push(index, action);
+  } else if (IsActionHorz(action) && (IsType(index, kElBoulder, action) ||
+                                    IsType(index, kElNut, action) ||
+                                    IsType(index, kElBomb, action))) {
+    // Push boulder, nut, or bomb if action is horizontal
+    Push(index, GetItem(index, action), kElToFalling.at(GetItem(index, action)), action);                                 
+  } else if (IsKey(GetItem(index, action))) {
+    // Collecting key, set gate open
+    OpenGate(kKeyToGate.at(GetItem(index, action)));
+    MoveItem(index, action);
+  } else if (IsOpenGate(GetItem(index, action))) {
+    // Walking through an open gate
+    int index_gate = IndexFromAction(index, action);
+      if (IsType(index_gate, kElEmpty, action)) {
+      SetItem(index, kElEmpty);
+      SetItem(index_gate, kElRockford, action);
+    }
   } else if (IsType(index, kElExitOpen, action)) {
     // Walking into exit after collecting enough gems
     MoveItem(index, action);
@@ -744,6 +938,14 @@ void BDMinesState::DoApplyAction(Action move) {
         UpdateDiamond(index);
       } else if (e == kElDiamondFalling) {
         UpdateDiamondFalling(index);
+      } else if (e == kElNut) {
+        UpdateNut(index);
+      } else if (e == kElNutFalling) {
+        UpdateNutFalling(index);
+      } else if (e == kElBomb) {
+        UpdateBomb(index);
+      } else if (e == kElBombFalling) {
+        UpdateBombFalling(index);
       } else if (e == kElExitClosed) {
         UpdateExit(index);
       } else if (IsButterfly(e)) {

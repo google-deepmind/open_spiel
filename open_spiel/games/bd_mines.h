@@ -40,6 +40,9 @@
 //       after a set amount of time.
 //     - Amoebas grow randomly. If trapped, they become diamonds. If they grow too large, they
 //       turn into rocks.
+//     - Keys and gates come in 4 colours: red, blue, green, and yellow. The gates remain closed until 
+//       Rockford collects the corresponding key. Once open, Rockford can pass through.
+//     - Nuts can fall down like diamonds and boulders. If a boulder falls on it, it will open to reveal a diamond.
 // See https://www.c64-wiki.com/wiki/Boulder_Dash for details.
 //
 // NOTE: Formatted levels from the original games such as Boulder Dash can be found here
@@ -90,7 +93,23 @@ enum class HiddenCellType {
   kAmoeba = 23,
   kExplosionDiamond = 24,
   kExplosionBoulder = 25,
-  kExplosionEmpty = 26
+  kExplosionEmpty = 26,
+  kGateRedClosed = 27,
+  kGateRedOpen = 28,
+  kKeyRed = 29,
+  kGateBlueClosed = 30,
+  kGateBlueOpen = 31,
+  kKeyBlue = 32,
+  kGateGreenClosed = 33,
+  kGateGreenOpen = 34,
+  kKeyGreen = 35,
+  kGateYellowClosed = 36,
+  kGateYellowOpen = 37,
+  kKeyYellow = 38,
+  kNut = 39,
+  kNutFalling = 40,
+  kBomb = 41,
+  kBombFalling = 42
 };
 
 // Cell types which are observable
@@ -112,9 +131,23 @@ enum class VisibleCellType {
   kWallMagicOn = 13,
   kAmoeba = 14,
   kExplosion = 15,
+  kGateRedClosed = 16,
+  kGateRedOpen = 17,
+  kKeyRed = 18,
+  kGateBlueClosed = 19,
+  kGateBlueOpen = 20,
+  kKeyBlue = 21,
+  kGateGreenClosed = 22,
+  kGateGreenOpen = 23,
+  kKeyGreen = 24,
+  kGateYellowClosed = 25,
+  kGateYellowOpen = 26,
+  kKeyYellow = 27,
+  kNut = 28,
+  kBomb = 29
 };
 
-constexpr int kNumVisibleCellType = 16;
+constexpr int kNumVisibleCellType = 30;
 
 // Directions the interactions take place
 enum Directions {
@@ -162,7 +195,7 @@ struct Grid {
 
 // Default map, first level of Boulder Dash
 inline constexpr char kDefaultGrid[] =
-    "40,22,1280,12\n"
+    "40,22,800,12\n"
     "19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19\n"
     "19,02,02,02,02,02,02,01,02,02,05,02,03,01,02,02,02,02,02,03,02,03,02,02,02,02,02,02,02,01,02,02,02,02,03,02,02,02,02,19\n"
     "19,01,03,00,03,02,02,02,02,02,02,01,02,02,02,02,02,02,02,02,02,03,05,02,02,03,02,02,02,02,01,02,02,02,02,02,01,02,02,19\n"
@@ -243,7 +276,7 @@ class BDMinesState : public State {
   bool CanRollRight(int index) const;
   void RollLeft(int index, Element element);
   void RollRight(int index, Element element);
-  void Push(int index, int action);
+  void Push(int index, Element stationary, Element falling, int action);
   void MoveThroughMagic(int index, Element element);
   void Explode(int index, Element element, int action=Directions::kNone);
 
@@ -251,6 +284,10 @@ class BDMinesState : public State {
   void UpdateBoulderFalling(int index);
   void UpdateDiamond(int index);
   void UpdateDiamondFalling(int index);
+  void UpdateNut(int index);
+  void UpdateNutFalling(int index);
+  void UpdateBomb(int index);
+  void UpdateBombFalling(int index);
   void UpdateExit(int index);
   void UpdateRockford(int index, int action);
   void UpdateFirefly(int index, int action);
@@ -258,6 +295,7 @@ class BDMinesState : public State {
   void UpdateMagicWall(int index);
   void UpdateAmoeba(int index);
   void UpdateExplosions(int index);
+  void OpenGate(Element element);
 
   void StartScan();
   void EndScan();
