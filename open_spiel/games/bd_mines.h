@@ -22,18 +22,45 @@
 
 #include "open_spiel/spiel.h"
 
-// A simple jeopardy dice game that includes chance nodes.
-// See http://cs.gettysburg.edu/projects/pig/index.html for details.
-// Also https://en.wikipedia.org/wiki/Pig_(dice_game)
+// A simplified version of the Boulder Dash/Emerald Mines games.
+// Brief:
+//     - Rockford's (the agent) goal is to go through the exit door.
+//     - Agent can move up, down, left, right, or stand still.
+//     - In order to open the exit, a minimum number of gems need to be collected.
+//     - Objects are suspended by dirt, or otherwise fall. Rockford can move in all directions,
+//       and can remove dirt by walking over it.
+//     - Rockford can push rocks horizontally if there is room to do so.
+//     - Rockford can die if objects fall on top of him, or if he collides with enemies.
+//     - Fireflies try to move clockwise.
+//     - Butterflies try to move counter-clockwise.
+//     - Both fireflies and butterflies explode if rocks fall on them.
+//     - Butterflies can drop diamonds upon being killed.
+//     - Magic walls convert diamonds to rocks, and rocks to diamonds, but only when activated.
+//       Magic walls can be activated by dropping a rock through it, and will stop being active
+//       after a set amount of time.
+//     - Amoebas grow randomly. If trapped, they become diamonds. If they grow too large, they
+//       turn into rocks.
+// See https://www.c64-wiki.com/wiki/Boulder_Dash for details.
+//
+// NOTE: Formatted levels from the original games such as Boulder Dash can be found here
+//       https://github.com/tuero/bd_open_spiel_levels 
 //
 // Parameters:
-//     "diceoutcomes"  int    number of outcomes of the dice  (default = 6)
-//     "horizon"       int    max number of moves before draw (default = 1000)
-//     "players"       int    number of players               (default = 2)
-//     "winscore"      int    number of point needed to win   (default = 100)
+//     "magic_wall_steps"       int    steps magic walls remain active once turned on (default = 140)
+//     "amoeba_chance"          int    chance out of 256 each amoeba will spawn another (default = 20)
+//     "amoeba_max_percentage"  double maximum amoeba growth size, as percentage of map (default = 0.16)
+//     "rng_seed"               int    seed for internal rng   (default = 0)
+//     "grid"                   std::string string representing map  (see kDefaultGrid below)
+//
+// Grid parameter specification
+//     - The grid string parameter is a comma-separated string representing the map
+//     - The first line should contain the # of cols, # of rows, max_steps, and gems required
+//     - The following lines represent the rows, with elements column separated
+//     - Item values are the cell type ints given by HiddenCellType (see below) 
 
 namespace open_spiel {
 namespace bd_mines {
+
 // Cell types supported from Boulderdash/Emerald Mines
 enum class HiddenCellType {
   kNull = -1,
@@ -95,6 +122,7 @@ enum Directions {
   kDownRight = 6, kDownLeft = 7, kUpLeft = 8
 };
 
+// Agent can only take a subset of all directions
 constexpr int kNumDirections = 9;
 constexpr int kNumActions = 5;
 
@@ -123,6 +151,7 @@ struct Element {
   }
 };
 
+// Default base element
 const Element kNullElement = {HiddenCellType::kNull, VisibleCellType::kNull, -1, 0};
 
 struct Grid {
@@ -131,6 +160,7 @@ struct Grid {
   std::vector<Element> elements;
 };
 
+// Default map, first level of Boulder Dash
 inline constexpr char kDefaultGrid[] =
     "40,22,1280,12\n"
     "19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19\n"
@@ -160,15 +190,16 @@ class BDMinesState : public State {
  public:
   BDMinesState(const BDMinesState&) = default;
   BDMinesState(std::shared_ptr<const Game> game, int steps_remaining, int magic_wall_steps,
-               bool magic_active, int amoeba_max_size, int amoeba_size, Element amoeba_swap,
-               bool amoeba_enclosed, int gems_required, int gems_collected, int current_reward,
-               int sum_reward, Grid grid, int rng_seed) : 
+               bool magic_active, int amoeba_max_size, int amoeba_size, int amoeba_chance, 
+               Element amoeba_swap, bool amoeba_enclosed, int gems_required, int gems_collected, 
+               int current_reward, int sum_reward, Grid grid, int rng_seed, Player player) : 
       State(game),
       steps_remaining_(steps_remaining),
       magic_wall_steps_(magic_wall_steps),
       magic_active_(magic_active),
       amoeba_max_size_(amoeba_max_size),
       amoeba_size_(amoeba_size),
+      amoeba_chance_(amoeba_chance),
       amoeba_swap_(amoeba_swap),
       amoeba_enclosed_(amoeba_enclosed),
       gems_required_(gems_required),
@@ -176,7 +207,8 @@ class BDMinesState : public State {
       current_reward_(current_reward),
       sum_reward_(sum_reward),
       grid_(grid),
-      rng_(rng_seed) {}
+      rng_(rng_seed),
+      cur_player_(player) {}
 
   Player CurrentPlayer() const override;
   std::string ActionToString(Player player, Action move_id) const override;
@@ -235,16 +267,16 @@ class BDMinesState : public State {
   bool magic_active_;     // flag for magic wall state
   int amoeba_max_size_;   // size before amoebas collapse
   int amoeba_size_;       // current number of amoebas
+  int amoeba_chance_;     // Chance to spawn another amoeba (out of 256)
   Element amoeba_swap_;   // Element which amoebas swap to
   bool amoeba_enclosed_;  // internal flag to check if amoeba trapped
   int gems_required_;     // gems required to open exit
   int gems_collected_;    // gems collected thus far
-  double current_reward_; // reset at every step
-  double sum_reward_;     // cumulative reward
+  int current_reward_;    // reset at every step
+  int sum_reward_;        // cumulative reward
   Grid grid_;             // grid representing elements/positions
   mutable std::mt19937 rng_;      // Internal rng
 
-  // Initialize to bad/invalid values. Use open_spiel::NewInitialState()
   Player cur_player_ = -1;  // Player to play.
 };
 
@@ -256,11 +288,12 @@ class BDMinesGame : public Game {
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(
         new BDMinesState(shared_from_this(), max_steps_, magic_wall_steps_, false, amoeba_max_size_,
-                         0, kNullElement, true, gems_required_, 0, 0, 0, 
-                         grid_, ++rng_seed_));
+                         0, amoeba_chance_, kNullElement, true, gems_required_, 0, 0, 0, 
+                         grid_, ++rng_seed_, 0));
   }
   int MaxGameLength() const override;
   int NumPlayers() const override;
+  int MaxChanceOutcomes() const override {return 1;}
   double MinUtility() const override;
   double MaxUtility() const override;
   std::shared_ptr<const Game> Clone() const override {
@@ -270,15 +303,16 @@ class BDMinesGame : public Game {
   std::unique_ptr<State> DeserializeState(const std::string& str) const override;
 
 protected:
-  Grid ParseGrid(const std::string& grid_string);
+  Grid ParseGrid(const std::string& grid_string, double amoeba_max_percentage);
 
  private:
-  int max_steps_;         // Max steps before game over
-  int magic_wall_steps_;  //steps before magic wall expire (after active)
-  int amoeba_max_size_;   // size before amoebas collapse
+  int magic_wall_steps_;  // steps before magic wall expire (after active)
+  int amoeba_chance_;     // Chance to spawn another amoeba (out of 256)
   mutable int rng_seed_;  // Seed for stochastic element transitions
   Grid grid_;             // grid representing elements/positions
+  int max_steps_;         // Max steps before game over
   int gems_required_;     // gems required to open exit
+  int amoeba_max_size_;   // size before amoebas collapse
 };
 
 }  // namespace bd_mines

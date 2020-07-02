@@ -148,6 +148,7 @@ const Element kElExplosionEmpty = {
   ElementProperties::kNone, 'E'
 };
 
+// Hash for Element, so we can use as a map key
 struct ElementHash {
   std::size_t operator()(const Element& e) const {
     return static_cast<int>(e.cell_type) - static_cast<int>(HiddenCellType::kNull);
@@ -265,9 +266,9 @@ const std::unordered_map<Element, int, ElementHash> kGemPoints {
 
 
 // Default parameters.
-constexpr int kDefaultMaxSteps = 1000;      // Maximum number of steps before time expires
-constexpr int kDefaultMagicWallSteps = 20;  // Number of steps before magic walls expire
-constexpr int kDefaultAmoebaMaxSize = 20;   // Maximum number of amoeba before they collapse
+constexpr int kDefaultMagicWallSteps = 140; // Number of steps before magic walls expire
+constexpr int kDefaultAmoebaChance = 20;    // Chance to spawn another amoeba (out of 256)
+constexpr double kDefaultAmoebaMaxPercentage = 0.16;   // Maximum number of amoeba before they collapse (percentage of map size)
 
 // Facts about the game
 const GameType kGameType{
@@ -275,7 +276,6 @@ const GameType kGameType{
     /*long_name=*/"Boulder Dash Mines",
     GameType::Dynamics::kSequential,
     GameType::ChanceMode::kSampledStochastic,
-    // GameType::ChanceMode::kDeterministic,
     GameType::Information::kPerfectInformation,
     GameType::Utility::kGeneralSum,
     GameType::RewardModel::kRewards,
@@ -287,9 +287,9 @@ const GameType kGameType{
     /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
     {
-        {"max_steps", GameParameter(kDefaultMaxSteps)},
         {"magic_wall_steps", GameParameter(kDefaultMagicWallSteps)},
-        {"amoeba_max_size", GameParameter(kDefaultAmoebaMaxSize)},
+        {"amoeba_chance", GameParameter(kDefaultAmoebaChance)},
+        {"amoeba_max_percentage", GameParameter(kDefaultAmoebaMaxPercentage)},
         {"rng_seed", GameParameter(0)},
         {"grid", GameParameter(std::string(kDefaultGrid))}
     }};
@@ -303,7 +303,7 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 
 std::string BDMinesState::ActionToString(Player player, Action move_id) const {
   if (player == kChancePlayerId) {
-    return absl::StrCat("Chance outcome:", move_id);
+    return absl::StrCat("Chance outcome: ", move_id);
   } else {
     SPIEL_CHECK_GE(move_id, 0);
     SPIEL_CHECK_LT(move_id, kNumActions);
@@ -322,17 +322,20 @@ bool BDMinesState::IsTerminal() const {
 
 std::vector<double> BDMinesState::Returns() const {
   // Sum of rewards, and should agree with Rewards()
-  return std::vector<double>{sum_reward_};
+  return std::vector<double>{(double)sum_reward_};
 }
 
 std::vector<double> BDMinesState::Rewards() const {
   // reward for most recent state transition
-  return std::vector<double>{current_reward_};
+  return std::vector<double>{(double)current_reward_};
 }
 
 std::string BDMinesState::ObservationString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
+  if (IsChanceNode()) {
+    return "ChanceNode -- no observation";
+  }
   return ToString();
 }
 
@@ -341,8 +344,14 @@ void BDMinesState::ObservationTensor(Player player,
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  // Treat `values` as a 2-d tensor.
+  // Treat `values` as a 3-d tensor.
   TensorView<3> view(values, {kNumVisibleCellType, grid_.num_rows, grid_.num_cols}, true);
+
+  // No observations at chance nodes.
+  if (IsChanceNode()) {
+    std::fill(values->begin(), values->end(), 0);
+    return;
+  }
 
   int i = 0;
   for (int row = 0; row < grid_.num_rows; ++row) {
@@ -355,7 +364,7 @@ void BDMinesState::ObservationTensor(Player player,
 }
 
 int BDMinesState::CurrentPlayer() const {
-  return IsTerminal() ? kTerminalPlayerId : 0;
+  return IsTerminal() ? kTerminalPlayerId : cur_player_;
 }
 
 // element helper functions
@@ -388,10 +397,12 @@ bool IsMagicWall(const Element &element) {
   return element == kElWallMagicDormant || element == kElWallMagicExpired ||
     element == kElWallMagicOn;
 }
+
 } // namespace
 
 
-// Game dynamic function
+// ---------- Game dynamic function ----------
+
 // Given an index and action, get the new flat index
 int BDMinesState::IndexFromAction(int index, int action) const {
   int col = index % grid_.num_cols;
@@ -539,13 +550,14 @@ void BDMinesState::UpdateBoulderFalling(int index) {
     Element ex = (it == kElementToExplosion.end()) ? kElExplosionEmpty : it->second;
     Explode(index, ex, Directions::kDown);
   } else if (IsType(index, kElWallMagicOn, Directions::kDown) || 
-             IsType(index, kElWallMagicOn, Directions::kDown)) {
+             IsType(index, kElWallMagicDormant, Directions::kDown)) {
     MoveThroughMagic(index, kMagicWallConversion.at(GetItem(index)));
   } else if (CanRollLeft(index)) {    // Roll left/right
     RollLeft(index, kElBoulderFalling);
   } else if (CanRollRight(index)) {
     RollRight(index, kElBoulderFalling);
-  } else {    // Default options is for falling boulder to become stationary
+  } else {
+    // Default options is for falling boulder to become stationary
     SetItem(index, kElBoulder);
   }
 }
@@ -571,13 +583,14 @@ void BDMinesState::UpdateDiamondFalling(int index) {
     Element ex = (it == kElementToExplosion.end()) ? kElExplosionEmpty : it->second;
     Explode(index, ex, Directions::kDown);
   } else if (IsType(index, kElWallMagicOn, Directions::kDown) || 
-             IsType(index, kElWallMagicOn, Directions::kDown)) {
+             IsType(index, kElWallMagicDormant, Directions::kDown)) {
     MoveThroughMagic(index, kMagicWallConversion.at(GetItem(index)));
   } else if (CanRollLeft(index)) {    // Roll left/right
     RollLeft(index, kElDiamondFalling);
   } else if (CanRollRight(index)) {
     RollRight(index, kElDiamondFalling);
-  } else {    // Default options is for falling diamond to become stationary
+  } else {
+    // Default options is for falling diamond to become stationary
     SetItem(index, kElDiamond);
   }
 }
@@ -619,7 +632,7 @@ void BDMinesState::UpdateFirefly(int index, int action) {
     Element ex = (it == kElementToExplosion.end()) ? kElExplosionEmpty : it->second;
     Explode(index, ex);
   } else if (IsType(index, kElEmpty, new_dir)) {
-    // Fireflys always try to rotate left, otherwise continue forward
+    // Fireflies always try to rotate left, otherwise continue forward
     SetItem(index, kDirectionToFirefly.at(new_dir));
     MoveItem(index, new_dir);
   } else if (IsType(index, kElEmpty, action)) {
@@ -639,7 +652,7 @@ void BDMinesState::UpdateButterfly(int index, int action) {
     Element ex = (it == kElementToExplosion.end()) ? kElExplosionEmpty : it->second;
     Explode(index, ex);
   } else if (IsType(index, kElEmpty, new_dir)) {
-    // Fireflys always try to rotate right, otherwise continue forward
+    // Butterflies always try to rotate right, otherwise continue forward
     SetItem(index, kDirectionToButterfly.at(new_dir));
     MoveItem(index, new_dir);
   } else if (IsType(index, kElEmpty, action)) {
@@ -674,9 +687,9 @@ void BDMinesState::UpdateAmoeba(int index) {
     amoeba_enclosed_ = false;
   }
   // Roll if to grow and direction
-  bool will_grow = (rng_() % 128) > 32;
+  bool will_grow = (rng_() % 256) < amoeba_chance_;
   int grow_dir = rng_() % kNumActions;
-  if (will_grow && IsType(index, kElEmpty, grow_dir) || IsType(index, kElDirt, grow_dir)) {
+  if (will_grow && (IsType(index, kElEmpty, grow_dir) || IsType(index, kElDirt, grow_dir))) {
     SetItem(index, kElAmoeba, grow_dir);
   }
 }
@@ -710,49 +723,56 @@ void BDMinesState::EndScan() {
   }
   // Reduce magic wall steps if active
   if (magic_active_) {
-    magic_wall_steps_ = std::min(magic_wall_steps_ - 1, 0);
+    magic_wall_steps_ = std::max(magic_wall_steps_ - 1, 0);
   }
   // Check if still active
   magic_active_ = (magic_active_ && magic_wall_steps_ > 0);
 }
 
 void BDMinesState::DoApplyAction(Action move) {
-  StartScan();
-  for (int index = 0; index < grid_.num_cols *  grid_.num_rows; ++index) {
-    Element &e = grid_.elements[index];
-    if (e.has_updated) {
-      continue;
-    } else if (e == kElRockford) {
-      UpdateRockford(index, move);
-    } else if (e == kElBoulder) {
-      UpdateBoulder(index);
-    } else if (e == kElBoulderFalling) {
-      UpdateBoulderFalling(index);
-    } else if (e == kElDiamond) {
-      UpdateDiamond(index);
-    } else if (e == kElDiamondFalling) {
-      UpdateDiamondFalling(index);
-    } else if (e == kElExitClosed) {
-      UpdateExit(index);
-    } else if (IsButterfly(e)) {
-      UpdateButterfly(index, kButterflyToDirection.at(e));
-    } else if (IsFirefly(e)) {
-      UpdateFirefly(index, kFireflyToDirection.at(e));
-    } else if (IsMagicWall(e)) {
-      UpdateMagicWall(index);
-    } else if (e == kElAmoeba) {
-      UpdateAmoeba(index);
-    } else if (IsExplosion(e)) {
-      UpdateExplosions(index);
+  if (cur_player_ == kChancePlayerId) {
+    // Check each cell and apply respective dynamics function
+    for (int index = 0; index < grid_.num_cols *  grid_.num_rows; ++index) {
+      Element &e = grid_.elements[index];
+      if (e.has_updated) {
+        continue;
+      } else if (e == kElBoulder) {
+        UpdateBoulder(index);
+      } else if (e == kElBoulderFalling) {
+        UpdateBoulderFalling(index);
+      } else if (e == kElDiamond) {
+        UpdateDiamond(index);
+      } else if (e == kElDiamondFalling) {
+        UpdateDiamondFalling(index);
+      } else if (e == kElExitClosed) {
+        UpdateExit(index);
+      } else if (IsButterfly(e)) {
+        UpdateButterfly(index, kButterflyToDirection.at(e));
+      } else if (IsFirefly(e)) {
+        UpdateFirefly(index, kFireflyToDirection.at(e));
+      } else if (IsMagicWall(e)) {
+        UpdateMagicWall(index);
+      } else if (e == kElAmoeba) {
+        UpdateAmoeba(index);
+      } else if (IsExplosion(e)) {
+        UpdateExplosions(index);
+      }
     }
+    EndScan();
+    cur_player_ = 0;
+  } else {
+    StartScan();
+    // Find where rockford is, and update his position
+    auto it = std::find(grid_.elements.begin(), grid_.elements.end(), kElRockford);
+    int index = std::distance(grid_.elements.begin(), it);
+    UpdateRockford(index, move);
+    cur_player_ = kChancePlayerId;
   }
-  EndScan();
 }
 
 std::vector<Action> BDMinesState::LegalActions() const {
   if (IsChanceNode()) {
-    // <TODO> Does this use None, or is this a dummy??
-    return {0};
+    return LegalChanceOutcomes();;
   } else if (IsTerminal()) {
     return {};
   } else {
@@ -761,17 +781,22 @@ std::vector<Action> BDMinesState::LegalActions() const {
 }
 
 std::vector<std::pair<Action, double>> BDMinesState::ChanceOutcomes() const {
-  return {{0, 1.0}};
+  SPIEL_CHECK_TRUE(IsChanceNode());
+  std::vector<std::pair<Action, double>> outcomes = {std::make_pair(0, 1.0)};
+  return outcomes;
 }
 
 std::string BDMinesState::ToString() const {
+  if (IsChanceNode()) {
+    return "chance node";
+  }
   std::string out_str;
   int col_counter = 0;
   for (const auto el : grid_.elements) {
     ++col_counter;
     out_str += el.id;
     if (col_counter == grid_.num_cols) {
-      out_str += '\n';
+      out_str += "\n";
       col_counter = 0;
     }
   }
@@ -784,27 +809,29 @@ std::string BDMinesState::ToString() const {
 std::string BDMinesState::Serialize() const {
   std::string out_str;
   // grid properties
-  out_str += std::to_string(grid_.num_cols) + ",";
-  out_str += std::to_string(grid_.num_rows) + ",";
-  out_str += std::to_string(steps_remaining_) + ",";
-  out_str += std::to_string(magic_wall_steps_) + ",";
-  out_str += std::to_string(magic_active_) + ",";
-  out_str += std::to_string(amoeba_max_size_) + ",";
-  out_str += std::to_string(amoeba_size_) + ",";
-  out_str += std::to_string(static_cast<int>(amoeba_swap_.cell_type)) + ",";
-  out_str += std::to_string(amoeba_enclosed_) + ",";
-  out_str += std::to_string(gems_required_) + ",";
-  out_str += std::to_string(gems_collected_) + ",";
-  out_str += std::to_string(current_reward_) + ",";
-  out_str += std::to_string(sum_reward_) + "\n";
+  absl::StrAppend(&out_str, grid_.num_cols, ",");
+  absl::StrAppend(&out_str, grid_.num_rows, ",");
+  absl::StrAppend(&out_str, steps_remaining_, ",");
+  absl::StrAppend(&out_str, magic_wall_steps_, ",");
+  absl::StrAppend(&out_str, magic_active_, ",");
+  absl::StrAppend(&out_str, amoeba_max_size_, ",");
+  absl::StrAppend(&out_str, amoeba_size_, ",");
+  absl::StrAppend(&out_str, amoeba_chance_, ",");
+  absl::StrAppend(&out_str, std::to_string(static_cast<int>(amoeba_swap_.cell_type)) + ",");
+  absl::StrAppend(&out_str, amoeba_enclosed_, ",");
+  absl::StrAppend(&out_str, gems_required_, ",");
+  absl::StrAppend(&out_str, gems_collected_, ",");
+  absl::StrAppend(&out_str, current_reward_, ",");
+  absl::StrAppend(&out_str, sum_reward_, ",");
+  absl::StrAppend(&out_str, cur_player_, "\n");
   // grid contents
   int col_counter = 0;
   for (const auto el : grid_.elements) {
     ++col_counter;
-    out_str += std::to_string(static_cast<int>(el.cell_type)) + ",";
+    absl::StrAppend(&out_str, static_cast<int>(el.cell_type), ",");
     if (col_counter == grid_.num_cols) {
       out_str.pop_back();
-      out_str += '\n';
+      absl::StrAppend(&out_str, "\n");
       col_counter = 0;
     }
   }
@@ -829,8 +856,8 @@ std::unique_ptr<State> BDMinesGame::DeserializeState(const std::string& str) con
   // Read grid properties
   std::vector<std::string> property_line = absl::StrSplit(lines[0], ',');
   Grid grid;
-  int steps_remaining, magic_wall_steps, amoeba_max_size, amoeba_size,
-      gems_required, gems_collected, current_reward, sum_reward;
+  int steps_remaining, magic_wall_steps, amoeba_max_size, amoeba_size, amoeba_chance,
+      gems_required, gems_collected, current_reward, sum_reward, cur_player;
   bool magic_active, amoeba_enclosed;
   Element amoeba_swap;
   try {
@@ -841,14 +868,16 @@ std::unique_ptr<State> BDMinesGame::DeserializeState(const std::string& str) con
     magic_active = std::stoi(property_line[4]);
     amoeba_max_size = std::stoi(property_line[5]);
     amoeba_size = std::stoi(property_line[6]);
-    amoeba_swap = kCellTypeToElement.at(std::stoi(property_line[7]));
-    amoeba_enclosed = std::stoi(property_line[8]);
-    gems_required = std::stoi(property_line[9]);
-    gems_collected = std::stoi(property_line[10]);
-    current_reward = std::stoi(property_line[11]);
-    sum_reward = std::stoi(property_line[12]);
+    amoeba_chance = std::stoi(property_line[7]);
+    amoeba_swap = kCellTypeToElement.at(std::stoi(property_line[8]));
+    amoeba_enclosed = std::stoi(property_line[9]);
+    gems_required = std::stoi(property_line[10]);
+    gems_collected = std::stoi(property_line[11]);
+    current_reward = std::stoi(property_line[12]);
+    sum_reward = std::stoi(property_line[13]);
+    cur_player = std::stoi(property_line[14]);
   } catch (...) {
-    SpielFatalError("Invalid grid properties");
+    SpielFatalError("Invalid grid properties2 ");
   }
   // Set grid elements
   for (std::size_t i = 1; i < lines.size(); ++i) {
@@ -880,9 +909,9 @@ std::unique_ptr<State> BDMinesGame::DeserializeState(const std::string& str) con
 
   return std::unique_ptr<State>(
       new BDMinesState(shared_from_this(), steps_remaining, magic_wall_steps,
-               magic_active, amoeba_max_size, amoeba_size, amoeba_swap,
+               magic_active, amoeba_max_size, amoeba_size, amoeba_chance, amoeba_swap,
                amoeba_enclosed, gems_required, gems_collected, current_reward,
-               sum_reward, grid, ++rng_seed_));
+               sum_reward, grid, ++rng_seed_, cur_player));
 }
 
 int BDMinesGame::NumDistinctActions() const { 
@@ -910,7 +939,7 @@ std::vector<int> BDMinesGame::ObservationTensorShape() const {
   return {kNumVisibleCellType, grid_.num_rows, grid_.num_cols};
 }
 
-Grid BDMinesGame::ParseGrid(const std::string& grid_string) {
+Grid BDMinesGame::ParseGrid(const std::string& grid_string, double amoeba_max_percentage) {
   Grid grid;
   std::vector<std::string> lines = absl::StrSplit(grid_string, '\n');
   if (lines.size() < 2) {
@@ -931,7 +960,8 @@ Grid BDMinesGame::ParseGrid(const std::string& grid_string) {
     // Check for proper number of columns
     std::vector<std::string> grid_line = absl::StrSplit(lines[i], ',');
     if (grid_line.size() != grid.num_cols) {
-      SpielFatalError("Grid line " + std::to_string(i-1) + "doesn't have correct number of elements.");
+      SpielFatalError("Grid line " + std::to_string(i-1) + " doesn't have correct number of elements." +
+        " Received " + std::to_string(grid_line.size()) + ", expected " + std::to_string(grid.num_cols));
     }
     // Check each element in row
     for (const auto & type : grid_line) {
@@ -945,25 +975,26 @@ Grid BDMinesGame::ParseGrid(const std::string& grid_string) {
   }
   // Ensure we read proper number of rows
   if (lines.size() - 1 != grid.num_rows) {
-    SpielFatalError("Incorrect number of rows, got " + std::to_string(lines.size() - 1) + 
-                    " but need " + std::to_string(grid.num_rows));
+    SpielFatalError("Incorrect number of rows, received " + std::to_string(lines.size() - 1) + 
+                    ", expected " + std::to_string(grid.num_rows));
   }
   // Ensure rockford exists in the map
   auto it = std::find(grid_.elements.begin(), grid_.elements.end(), kElRockford);
   if (it == grid_.elements.end()) {
     SpielFatalError("Grid string doesn't contain agent rockford.");
   }
+  amoeba_max_size_ = (int)(grid_.num_cols * grid_.num_rows * amoeba_max_percentage);
 
   return grid;
 }
 
 BDMinesGame::BDMinesGame(const GameParameters& params)
     : Game(kGameType, params),
-      max_steps_(ParameterValue<int>("max_steps")),
       magic_wall_steps_(ParameterValue<int>("magic_wall_steps")),
-      amoeba_max_size_(ParameterValue<int>("amoeba_max_size")),
+      amoeba_chance_(ParameterValue<int>("amoeba_chance")),
       rng_seed_(ParameterValue<int>("rng_seed")),
-      grid_(ParseGrid(ParameterValue<std::string>("grid"))) {}
+      grid_(ParseGrid(ParameterValue<std::string>("grid"), 
+            ParameterValue<double>("amoeba_max_percentage"))) {}
 
 }  // namespace bd_mines
 }  // namespace open_spiel
