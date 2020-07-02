@@ -211,6 +211,22 @@ const Element kElBombFalling = {
   HiddenCellType::kBombFalling, VisibleCellType::kBomb,
   ElementProperties::kRounded | ElementProperties::kConsumable | ElementProperties::kCanExplode, '^'
 };
+const Element kElYamYamUp = {
+  HiddenCellType::kYamYamUp, VisibleCellType::kYamYam,
+  ElementProperties::kConsumable | ElementProperties::kCanExplode, 'X'
+};
+const Element kElYamYamLeft = {
+  HiddenCellType::kYamYamLeft, VisibleCellType::kYamYam,
+  ElementProperties::kConsumable | ElementProperties::kCanExplode, 'X'
+};
+const Element kElYamYamDown = {
+  HiddenCellType::kYamYamDown, VisibleCellType::kYamYam,
+  ElementProperties::kConsumable | ElementProperties::kCanExplode, 'X'
+};
+const Element kElYamYamRight = {
+  HiddenCellType::kYamYamRight, VisibleCellType::kYamYam,
+  ElementProperties::kConsumable | ElementProperties::kCanExplode, 'X'
+};
 
 // Hash for Element, so we can use as a map key
 struct ElementHash {
@@ -266,6 +282,10 @@ const std::unordered_map<int, Element> kCellTypeToElement {
   {static_cast<int>(HiddenCellType::kNutFalling), kElNutFalling},
   {static_cast<int>(HiddenCellType::kBomb), kElBomb},
   {static_cast<int>(HiddenCellType::kBombFalling), kElBombFalling},
+  {static_cast<int>(HiddenCellType::kYamYamUp), kElYamYamUp},
+  {static_cast<int>(HiddenCellType::kYamYamLeft), kElYamYamLeft},
+  {static_cast<int>(HiddenCellType::kYamYamDown), kElYamYamDown},
+  {static_cast<int>(HiddenCellType::kYamYamRight), kElYamYamRight},
 };
 
 // Rotate actions right
@@ -307,16 +327,28 @@ const std::unordered_map<Element, int, ElementHash> kFireflyToDirection {
   {kElFireflyDown, Directions::kDown}, {kElFireflyRight, Directions::kRight},
 };
 
-// Butterfly to directions
+// Directions to butterflys
 const std::unordered_map<int, Element> kDirectionToButterfly {
   {Directions::kUp, kElButterflyUp}, {Directions::kLeft, kElButterflyLeft}, 
   {Directions::kDown, kElButterflyDown}, {Directions::kRight, kElButterflyRight},
 };
 
-// Directions to butterflys
+// Butterfly to directions
 const std::unordered_map<Element, int, ElementHash> kButterflyToDirection {
   {kElButterflyUp, Directions::kUp}, {kElButterflyLeft, Directions::kLeft}, 
   {kElButterflyDown, Directions::kDown}, {kElButterflyRight, Directions::kRight},
+};
+
+// YamYam to directions
+const std::unordered_map<Element, int, ElementHash> kYamYamToDirection {
+  {kElYamYamUp, Directions::kUp}, {kElYamYamLeft, Directions::kLeft}, 
+  {kElYamYamDown, Directions::kDown}, {kElYamYamRight, Directions::kRight},
+};
+
+// Direction to YamYam
+const std::unordered_map<int, Element> kDirectionToYamYam {
+  {Directions::kUp, kElYamYamUp}, {Directions::kLeft, kElYamYamLeft}, 
+  {Directions::kDown, kElYamYamDown}, {Directions::kRight, kElYamYamRight},
 };
 
 // Element explosion maps
@@ -326,7 +358,9 @@ const std::unordered_map<Element, Element, ElementHash> kElementToExplosion {
   {kElButterflyUp, kElExplosionDiamond}, {kElButterflyLeft, kElExplosionDiamond}, 
   {kElButterflyDown, kElExplosionDiamond}, {kElButterflyRight, kElExplosionDiamond},
   {kElRockford, kElExplosionEmpty}, {kElBomb, kElExplosionEmpty},
-  {kElBombFalling, kElExplosionEmpty}
+  {kElBombFalling, kElExplosionEmpty}, {kElYamYamUp, kElExplosionEmpty},
+  {kElYamYamLeft, kElExplosionEmpty}, {kElYamYamDown, kElExplosionEmpty},
+  {kElYamYamRight, kElExplosionEmpty},
 };
 
 // Explosions back to elements
@@ -464,7 +498,7 @@ int BDMinesState::CurrentPlayer() const {
   return IsTerminal() ? kTerminalPlayerId : cur_player_;
 }
 
-// element helper functions
+// Element helper functions
 namespace {
 
 bool IsActionHorz(int action) {
@@ -483,6 +517,11 @@ bool IsFirefly(const Element &element) {
 bool IsButterfly(const Element &element) {
   return element == kElButterflyUp || element == kElButterflyLeft ||
     element == kElButterflyDown || element == kElButterflyRight;
+}
+
+bool IsYamYam(const Element &element) {
+  return element == kElYamYamUp || element == kElYamYamLeft ||
+    element == kElYamYamDown || element == kElYamYamRight;
 }
 
 bool IsExplosion(const Element &element) {
@@ -858,6 +897,32 @@ void BDMinesState::UpdateButterfly(int index, int action) {
   }
 }
 
+void BDMinesState::UpdateYamYam(int index, int action) {
+  if (IsType(index, kElEmpty, action)) {
+    // Continue moving in direction
+    MoveItem(index, action);
+  } else if (IsTypeAdjacent(index, kElRockford)) {
+    // Run into rockford, explode!
+    auto it = kElementToExplosion.find(GetItem(index));
+    Element ex = (it == kElementToExplosion.end()) ? kElExplosionEmpty : it->second;
+    Explode(index, ex);
+  } else {
+    // Blocked, roll for new direction
+    std::vector<int> open_dirs;
+    for (int dir = 0; dir < kNumActions; ++dir) {
+      if (dir == Directions::kNone || !InBounds(index, dir)) {continue;}
+      if (IsType(index, kElEmpty, dir)) {
+        open_dirs.push_back(dir);
+      }
+    }
+    // Roll available directions
+    if (open_dirs.size() > 0) {
+      int new_dir = open_dirs[rng_() % open_dirs.size()];
+      SetItem(index, kDirectionToYamYam.at(new_dir));
+    }
+  }
+}
+
 void BDMinesState::UpdateMagicWall(int index) {
   // Dorminant, active, then expired once time runs out
   if (magic_active_) {
@@ -952,6 +1017,8 @@ void BDMinesState::DoApplyAction(Action move) {
         UpdateButterfly(index, kButterflyToDirection.at(e));
       } else if (IsFirefly(e)) {
         UpdateFirefly(index, kFireflyToDirection.at(e));
+      } else if (IsYamYam(e)) {
+        UpdateYamYam(index, kYamYamToDirection.at(e));
       } else if (IsMagicWall(e)) {
         UpdateMagicWall(index);
       } else if (e == kElAmoeba) {
@@ -1134,7 +1201,24 @@ double BDMinesGame::MinUtility() const {
 }
 
 double BDMinesGame::MaxUtility() const {
-  return max_steps_ + 500;
+  // Max utility really depends on the number of gems in the map,
+  // so we have a lose upper bound.
+  // Diamonds give points
+  // Boulders can be converted to diamonds
+  // Butterflies can drop diamonds
+  // Nuts drop diamonds if cracked
+  double max_util = max_steps_;
+  max_util += kGemPoints.at(kElDiamond) * std::count(grid_.elements.begin(), grid_.elements.end(), kElDiamond);
+  max_util += kGemPoints.at(kElDiamond) * std::count(grid_.elements.begin(), grid_.elements.end(), kElDiamondFalling);
+  max_util += std::count(grid_.elements.begin(), grid_.elements.end(), kElBoulder);
+  max_util += std::count(grid_.elements.begin(), grid_.elements.end(), kElBoulderFalling);
+  max_util += 9 * std::count(grid_.elements.begin(), grid_.elements.end(), kElButterflyUp);
+  max_util += 9 * std::count(grid_.elements.begin(), grid_.elements.end(), kElButterflyLeft);
+  max_util += 9 * std::count(grid_.elements.begin(), grid_.elements.end(), kElButterflyDown);
+  max_util += 9 * std::count(grid_.elements.begin(), grid_.elements.end(), kElButterflyRight);
+  max_util += std::count(grid_.elements.begin(), grid_.elements.end(), kElNut);
+  max_util += std::count(grid_.elements.begin(), grid_.elements.end(), kElNutFalling);
+  return max_util;
 }
 
 std::vector<int> BDMinesGame::ObservationTensorShape() const {

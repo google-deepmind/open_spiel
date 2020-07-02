@@ -90,6 +90,9 @@ void ExtendedBDMinesTest() {
                              });
   std::unique_ptr<State> state = game->NewInitialState();
 
+  // Check max utility
+  SPIEL_CHECK_EQ(game->MaxUtility(), 20+1+(2*10));
+
   // Check string functions
   SPIEL_CHECK_EQ(state->ToString(), std::string(kStateToString));
   SPIEL_CHECK_EQ(state->Serialize(), std::string(kStateSerialize));
