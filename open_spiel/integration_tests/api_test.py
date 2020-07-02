@@ -327,8 +327,12 @@ class PartialEnforceAPIConventionsTest(parameterized.TestCase):
       with self.assertRaisesRegex(RuntimeError, "player <", msg=msg):
         state.private_observation_string(num_players + 1)
 
-  @parameterized.parameters(_GAMES_TO_TEST)
-  def test_observations_are_consistent_with_info_states(self, game_name):
+  def test_observations_are_consistent_with_info_states(self,
+                                                        game_name="kuhn_poker"):
+    # Right now we just test the consistency of observations with information
+    # state in kuhn_poker.
+    # TODO(author14): test the consistency of observations and
+    # information states in other games
     print(f"Testing observation <-> info_state consistency for '{game_name}'")
     game = pyspiel.load_game(game_name)
     game_type = game.get_type()
@@ -413,7 +417,6 @@ class PartialEnforceAPIConventionsTest(parameterized.TestCase):
       return msg
 
     def collect_and_test_rollouts(player):
-      random.seed(0)
       nonlocal aoh_is, is_aoh, aoh_histories, is_histories
       state = game.new_initial_state()
       aoh = [("obs", state.observation_string(player))]
@@ -427,7 +430,7 @@ class PartialEnforceAPIConventionsTest(parameterized.TestCase):
 
         # Do not collect over chance nodes.
         if not state.is_chance_node():
-          info_state = state.information_state_string()
+          info_state = state.information_state_string(player)
           aoh_histories[str(aoh)].add(tuple(state.history()))
           is_histories[info_state].add(tuple(state.history()))
 
@@ -458,18 +461,19 @@ class PartialEnforceAPIConventionsTest(parameterized.TestCase):
     # machine the test runs on, as some games take a long time to produce
     # a single rollout.
     time_limit = TIMEABLE_TEST_RUNTIME / game.num_players()
-    start = time.time()
-    is_time_out = lambda: time.time() - start > time_limit
+    is_time_out = lambda start: time.time() - start > time_limit
 
     rollouts = 0
+    start = time.time()
     for player in range(game.num_players()):
       aoh_is.clear()
       is_aoh.clear()
       aoh_histories.clear()
       is_histories.clear()
-      while not is_time_out():
+      while not is_time_out(start):
         collect_and_test_rollouts(player)
         rollouts += 1
+      start = time.time()
 
     print(f"Test for {game_name} took {time.time()-start} seconds "
           f"to make {rollouts} rollouts.")

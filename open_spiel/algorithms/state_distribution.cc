@@ -39,6 +39,17 @@ std::vector<double> Normalize(const std::vector<double>& weights) {
   return probs;
 }
 
+std::unique_ptr<open_spiel::HistoryDistribution> CloneBeliefs(
+    const open_spiel::HistoryDistribution& beliefs) {
+  auto beliefs_copy = absl::make_unique<open_spiel::HistoryDistribution>();
+  for (int i = 0; i < beliefs.first.size(); ++i) {
+    beliefs_copy->first.push_back(beliefs.first[i]->Clone());
+    beliefs_copy->second.push_back(beliefs.second[i]);
+  }
+  return beliefs_copy;
+}
+
+
 HistoryDistribution GetStateDistribution(const State& state,
                                          const Policy* opponent_policy) {
   std::shared_ptr<const Game> game = state.GetGame();

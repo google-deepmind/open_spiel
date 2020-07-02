@@ -44,20 +44,18 @@ namespace {
 uint_fast32_t Seed() { return absl::ToUnixMicros(absl::Now()); }
 
 void XinxinBot_BasicPlayGame() {
-  int kNumPlayers = 4;
-  int kNumGames = 5;
+  int num_games = 5;
   std::mt19937 rng(Seed());
   auto game = open_spiel::LoadGame("hearts");
   std::vector<std::unique_ptr<open_spiel::Bot>> bots;
   std::vector<Bot *> bot_ptrs;
 
-  for (int i = 0; i < kNumPlayers; i++) {
-    bots.push_back(open_spiel::hearts::MakeXinxinBot(game->GetParameters(),
-                                                     game->NumPlayers()));
+  for (int i = 0; i < hearts::kNumPlayers; i++) {
+    bots.push_back(open_spiel::hearts::MakeXinxinBot(game->GetParameters()));
     bot_ptrs.push_back(bots.back().get());
   }
 
-  for (int i = 0; i < kNumGames; i++) {
+  for (int i = 0; i < num_games; i++) {
     std::unique_ptr<open_spiel::State> state = game->NewInitialState();
     EvaluateBots(state.get(), bot_ptrs,
                  absl::Uniform<int>(rng, 0, std::numeric_limits<int>::max()));

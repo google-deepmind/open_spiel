@@ -6,7 +6,7 @@ GameType.information = Information.PERFECT_INFORMATION
 GameType.long_name = "Havannah"
 GameType.max_num_players = 2
 GameType.min_num_players = 2
-GameType.parameter_specification = ["ansi_color_output", "board_size"]
+GameType.parameter_specification = ["ansi_color_output", "board_size", "swap"]
 GameType.provides_information_state_string = True
 GameType.provides_information_state_tensor = False
 GameType.provides_observation_string = True
@@ -19,7 +19,7 @@ GameType.utility = Utility.ZERO_SUM
 NumDistinctActions() = 49
 PolicyTensorShape() = [49]
 MaxChanceOutcomes() = 0
-GetParameters() = {ansi_color_output=False,board_size=4}
+GetParameters() = {ansi_color_output=False,board_size=4,swap=False}
 NumPlayers() = 2
 MinUtility() = -1.0
 MaxUtility() = 1.0

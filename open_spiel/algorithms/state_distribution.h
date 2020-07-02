@@ -46,6 +46,10 @@ namespace algorithms {
 HistoryDistribution GetStateDistribution(const State& state,
                                          const Policy* opponent_policy);
 
+// Clones a HistoryDistribution.
+std::unique_ptr<open_spiel::HistoryDistribution> CloneBeliefs(
+    const open_spiel::HistoryDistribution& beliefs);
+
 // Incrementally builds the state distribution vectors. Must be called at each
 // state in a trajectory. All of the states should correspond to the same
 // information state (i.e. all states should have identical

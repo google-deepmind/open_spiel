@@ -19,6 +19,8 @@
 #include <string>
 #include <utility>
 
+#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_join.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
 
@@ -45,7 +47,10 @@ const GameType kGameType{/*short_name=*/"kuhn_poker",
                          /*provides_observation_string=*/true,
                          /*provides_observation_tensor=*/true,
                          /*parameter_specification=*/
-                         {{"players", GameParameter(kDefaultPlayers)}}};
+                         {{"players", GameParameter(kDefaultPlayers)}},
+                         /*default_loadable=*/true,
+                         /*provides_factored_observation_string=*/true,
+                        };
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new KuhnGame(params));
@@ -193,6 +198,26 @@ std::string KuhnState::ObservationString(Player player) const {
     str += std::to_string(ante_[p]);
   }
   return str;
+}
+
+std::string KuhnState::PublicObservationString() const {
+  if (history_.empty()){
+    return kStartOfGamePublicObservation;
+  }
+  if (history_.size() <= num_players_) {
+    int currently_dealing_to_player = history_.size() - 1;
+    return absl::StrCat("deal ", currently_dealing_to_player);
+  }
+  return std::to_string(history_.back().action);
+}
+
+std::string KuhnState::PrivateObservationString(Player player) const {
+  // Returns private observation string if available.
+  if (history_.size() - 1 == player) {
+    return std::to_string(history_[player].action);
+  }
+  // Returns constant kNoPrivateObservation when there is no private observation
+  return kNoPrivateObservation;
 }
 
 void KuhnState::InformationStateTensor(Player player,

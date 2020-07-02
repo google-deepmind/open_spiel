@@ -51,6 +51,12 @@ enum PlayerId {
 // Constant representing an invalid action.
 inline constexpr Action kInvalidAction = -1;
 
+// Constant that signifies that player did not receive any private observation.
+// See GameType::provides_factored_observation_string for details.
+inline const char* kNoPrivateObservation = "no private obs";
+inline const char* kStartOfGamePublicObservation = "start game";
+inline const char* kClockTickPublicObservation = "clock tick";
+
 // Static information for a game. This will determine what algorithms are
 // applicable. For example, minimax search is only applicable to two-player,
 // zero-sum games with perfect information. (Though can be made applicable to

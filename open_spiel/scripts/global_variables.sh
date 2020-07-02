@@ -39,5 +39,19 @@ export BUILD_WITH_JULIA=${BUILD_WITH_JULIA:-$DEFAULT_OPTIONAL_DEPENDENCY}
 export BUILD_WITH_EIGEN=${BUILD_WITH_EIGEN:-$DEFAULT_OPTIONAL_DEPENDENCY}
 export BUILD_WITH_XINXIN=${BUILD_WITH_XINXIN:-$DEFAULT_OPTIONAL_DEPENDENCY}
 
+# Download precompiled binaries for libtorch (PyTorch C++ API).
+# See https://pytorch.org/cppdocs/ for C++ documentation.
+# This dependency is currently not supported by Travis CI test.
+#
+# From PyTorch documentation:
+#
+# > If you would prefer to write Python, and can afford to write Python, we
+# > recommend using the Python interface to PyTorch. However, if you would
+# > prefer to write C++, or need to write C++ (because of multithreading,
+# > latency or deployment requirements), the C++ frontend to PyTorch provides
+# > an API that is approximately as convenient, flexible, friendly and intuitive
+# > as its Python counterpart.
+export BUILD_WITH_LIBTORCH="OFF"
+
 # Turn off public states as it is Work-In-Progress.
-export BUILD_WITH_PUBLIC_STATES=OFF
+export BUILD_WITH_PUBLIC_STATES="OFF"
