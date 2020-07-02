@@ -586,7 +586,11 @@ class State {
     SpielFatalError("PrivateObservationString is not implemented.");
   }
   std::string PrivateObservationString() const {
-    return PrivateObservationString(CurrentPlayer());
+    const int player = CurrentPlayer();
+    // PrivateObservationString is only valid for actual players, not any of the
+    // special values. See PlayerId.
+    SPIEL_CHECK_GE(player, 0);
+    return PrivateObservationString(player);
   }
 
   // Return a copy of this state.

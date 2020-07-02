@@ -212,6 +212,9 @@ std::string KuhnState::PublicObservationString() const {
 }
 
 std::string KuhnState::PrivateObservationString(Player player) const {
+  // player cannot be a special value. See the definition for PlayerId.
+  SPIEL_CHECK_GE(player, 0);
+
   // Returns private observation string if available.
   if (history_.size() - 1 == player) {
     return std::to_string(history_[player].action);
