@@ -11,6 +11,7 @@ GameType.provides_information_state_string = True
 GameType.provides_information_state_tensor = True
 GameType.provides_observation_string = True
 GameType.provides_observation_tensor = True
+GameType.provides_factored_observation_string = False
 GameType.reward_model = RewardModel.TERMINAL
 GameType.short_name = "lewis_signaling"
 GameType.utility = Utility.GENERAL_SUM
@@ -100,14 +101,14 @@ Returns() = [0.0, 0.0]
 LegalActions() = [0, 1, 2]
 StringLegalActions() = ["Action 0", "Action 1", "Action 2"]
 
-# Apply action "Action 2"
-action: 2
+# Apply action "Action 1"
+action: 1
 
 # State 3
-# State 2, Message 2, Action 2
+# State 2, Message 2, Action 1
 IsTerminal() = True
-History() = [2, 2, 2]
-HistoryString() = "2 2 2"
+History() = [2, 2, 1]
+HistoryString() = "2 2 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
@@ -119,5 +120,5 @@ ObservationString(0) = "Current turn: 1\nMessage: 2\n"
 ObservationString(1) = "Current turn: 1\nMessage: 2\n"
 ObservationTensor(0): ◯◉◉◯◯◉
 ObservationTensor(1): ◯◉◉◯◯◉
-Rewards() = [1.0, 1.0]
-Returns() = [1.0, 1.0]
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
