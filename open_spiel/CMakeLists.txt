@@ -54,6 +54,7 @@ enable_testing()
 set (OPEN_SPIEL_CORE_FILES
   canonical_game_strings.h
   canonical_game_strings.cc
+  fog_constants.h
   game_parameters.h
   game_parameters.cc
   spiel.h
@@ -183,8 +184,13 @@ if (BUILD_WITH_PUBLIC_STATES)
     message(FATAL_ERROR "You want to build with public states API, but Eigen dependency is not enabled. Please enable BUILD_WITH_EIGEN=ON")
   endif()
   add_compile_definitions(BUILD_WITH_PUBLIC_STATES)
+  set(OPEN_SPIEL_OBJECTS
+    $<TARGET_OBJECTS:public_states_core>
+    $<TARGET_OBJECTS:public_states_games>
+    $<TARGET_OBJECTS:public_states_algorithms>
+    $<TARGET_OBJECTS:public_states_game_transforms>
+    ${OPEN_SPIEL_OBJECTS})
   add_subdirectory(public_states)
-  set(OPEN_SPIEL_OBJECTS ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:public_states>)
 endif()
 if (BUILD_WITH_PYTHON)
   add_subdirectory (python)

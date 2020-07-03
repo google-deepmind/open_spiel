@@ -51,7 +51,7 @@ export BUILD_WITH_XINXIN=${BUILD_WITH_XINXIN:-$DEFAULT_OPTIONAL_DEPENDENCY}
 # > latency or deployment requirements), the C++ frontend to PyTorch provides
 # > an API that is approximately as convenient, flexible, friendly and intuitive
 # > as its Python counterpart.
-export BUILD_WITH_LIBTORCH="OFF"
+export BUILD_WITH_LIBTORCH="${BUILD_WITH_LIBTORCH:-OFF}"
 
 # Turn off public states as it is Work-In-Progress.
-export BUILD_WITH_PUBLIC_STATES="OFF"
+export BUILD_WITH_PUBLIC_STATES="${BUILD_WITH_PUBLIC_STATES:-OFF}"

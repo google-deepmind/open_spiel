@@ -20,9 +20,9 @@
 #include <utility>
 
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_join.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
 namespace kuhn_poker {
@@ -201,9 +201,7 @@ std::string KuhnState::ObservationString(Player player) const {
 }
 
 std::string KuhnState::PublicObservationString() const {
-  if (history_.empty()){
-    return kStartOfGamePublicObservation;
-  }
+  if (history_.empty()) return kStartOfGameObservation;
   if (history_.size() <= num_players_) {
     int currently_dealing_to_player = history_.size() - 1;
     return absl::StrCat("deal ", currently_dealing_to_player);
@@ -212,12 +210,16 @@ std::string KuhnState::PublicObservationString() const {
 }
 
 std::string KuhnState::PrivateObservationString(Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+
+  if (history_.empty()) return kStartOfGameObservation;
   // Returns private observation string if available.
   if (history_.size() - 1 == player) {
     return std::to_string(history_[player].action);
   }
-  // Returns constant kNoPrivateObservation when there is no private observation
-  return kNoPrivateObservation;
+  // Returns clock tick when there is no private observation.
+  return kClockTickObservation;
 }
 
 void KuhnState::InformationStateTensor(Player player,

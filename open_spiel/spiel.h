@@ -30,6 +30,7 @@
 #include "open_spiel/abseil-cpp/absl/random/bit_gen_ref.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "open_spiel/fog_constants.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel_utils.h"
 
@@ -51,11 +52,6 @@ enum PlayerId {
 // Constant representing an invalid action.
 inline constexpr Action kInvalidAction = -1;
 
-// Constant that signifies that player did not receive any private observation.
-// See GameType::provides_factored_observation_string for details.
-inline const char* kNoPrivateObservation = "no private obs";
-inline const char* kStartOfGamePublicObservation = "start game";
-inline const char* kClockTickPublicObservation = "clock tick";
 
 // Static information for a game. This will determine what algorithms are
 // applicable. For example, minimax search is only applicable to two-player,
@@ -150,13 +146,7 @@ struct GameType {
   // Can we factorize observations into public and private parts?
   // This is similar to observation fields before, but adds additional
   // distinction between public and private observations.
-  // The public observations correspond to information that all the players know
-  // that all the players know, like upward-facing cards on a table.
-  // The private observation is then the remaining information, distinct from
-  // the public observation. The private and public observations are
-  // non-overlaping, and their union of corresponds to the (undistinguished)
-  // player observation. See the Factored-Observation Game (FOG) paper
-  // for more details: https://arxiv.org/abs/1906.11110
+  // See fog_constants.h for more details.
   bool provides_factored_observation_string = false;
 };
 
@@ -517,27 +507,28 @@ class State {
   }
 
   // The public / private observations factorize observations into their
-  // consituent non-overlapping parts.
+  // (mostly) non-overlapping public and private parts (they overlap only for
+  // the start of the game and time). See also <open_spiel/fog_constants.h>
   //
   // The public observations correspond to information that all the players know
   // that all the players know, like upward-facing cards on a table.
-  // Perfect information games, like Chess, have only public observations and
-  // private observations for the players are empty.
+  // Perfect information games, like Chess, have only public observations.
   //
   // All games have non-empty public observations. The minimum public
   // information is time: we assume that all the players can perceive absolute
   // time (we do not consider any relativistic effects). The implemented games
   // must be 1-timeable (see [1] for details), a property that is trivially
   // satisfied with all human-played board games, so you don't have to typically
-  // worry about this. (You'd have to knock players out to make non-timeable
-  // games.) The public observations are used to create a list of observations:
+  // worry about this. (You'd have to knock players out / consider Einstein's
+  // time-relativistic effects to make non-timeable games.).
+  //
+  // The public observations are used to create a list of observations:
   // a public observation history. If you return any non-empty public
-  // observation, you implicitly encode time as well within this history
-  // sequence.
+  // observation, you implicitly encode time as well within this sequence.
   //
   // Public observations are not required to be "common knowledge" observations.
   // Example: In imperfect-info version of card game Goofspiel, players make
-  // bets with cards on their hand, and the imperfect information consists of
+  // bets with cards on their hand, and their imperfect information consists of
   // not knowing exactly what cards the opponent currently holds, as the players
   // only learn public information whether they have won/lost/draw the bet.
   // However, when the player bets a card "5" and learns it drew the round,
@@ -547,6 +538,11 @@ class State {
   // it is in general expensive to compute. Returning public observation "draw"
   // is sufficient.
   //
+  // In the initial state this function must return kStartOfGameObservation.
+  // If there is no public observation available except time, the implementation
+  // should return kClockTickObservation.
+  // Note that empty strings for observations are forbidden.
+  //
   // See the Factored-Observation Game (FOG) paper for more details.
   // [1] https://arxiv.org/abs/1906.11110
 
@@ -555,7 +551,8 @@ class State {
   }
 
   // The public / private observations factorize observations into their
-  // consituent non-overlapping parts.
+  // (mostly) non-overlapping public and private parts (they overlap only for
+  // the start of the game and time). See also <open_spiel/fog_constants.h>
   //
   // The private observations correspond to the part of the observation that
   // is not public. In Poker, this would be the cards the player holds in his
@@ -571,10 +568,17 @@ class State {
   // it the same as if the player just placed his cards on the table for
   // everyone to see.
   //
+  // In the initial state this function must return kStartOfGameObservation.
+  // If there is no private observation available, the implementation should
+  // return kClockTickObservation. These two types of observations are shared
+  // with the public observations. This is done for technical reasons discussed
+  // in <open_spiel/fog_constants.h>
+  //
   // Perfect information games have no private observations: implementations
-  // can just return an empty string. Imperfect-information games should return
-  // a non-empty string at least once in the game (otherwise they would be
-  // perfect-info games).
+  // should just return a start of game and clock ticking. Imperfect-information
+  // games should return a different string string at least once in the game
+  // (otherwise they would be considered perfect-info games).
+  // Note that empty strings for observations are forbidden.
   //
   // Implementations should start with (and it's tested in api_test.py):
   //   SPIEL_CHECK_GE(player, 0);
@@ -586,7 +590,11 @@ class State {
     SpielFatalError("PrivateObservationString is not implemented.");
   }
   std::string PrivateObservationString() const {
-    return PrivateObservationString(CurrentPlayer());
+    const int player = CurrentPlayer();
+    // PrivateObservationString is only valid for actual players, not any of the
+    // special values. See PlayerId.
+    SPIEL_CHECK_GE(player, 0);
+    return PrivateObservationString(player);
   }
 
   // Return a copy of this state.
@@ -726,6 +734,8 @@ class State {
   // A pointer to the game that created this state.
   std::shared_ptr<const Game> game_;
 };
+
+std::ostream& operator<<(std::ostream& stream, const State& state);
 
 // A class that refers to a particular game instantiation, for example
 // Breakthrough(8x8).

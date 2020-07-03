@@ -72,6 +72,8 @@ class KuhnState : public State {
   std::string PublicObservationString() const override;
   std::string PrivateObservationString(Player player) const override;
 
+  const std::vector<int>& CardDealt() const { return card_dealt_; }
+
  protected:
   void DoApplyAction(Action move) override;
 

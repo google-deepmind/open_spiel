@@ -18,6 +18,7 @@
 
 #include "open_spiel/games/bridge.h"
 #include "open_spiel/spiel.h"
+#include "pybind11/include/pybind11/numpy.h"
 #include "pybind11/include/pybind11/pybind11.h"
 #include "pybind11/include/pybind11/stl.h"
 
@@ -34,6 +35,17 @@ void init_pyspiel_games_bridge(py::module& m) {
       .def("score_by_contract", &BridgeState::ScoreByContract)
       .def("score_for_contracts", &BridgeState::ScoreForContracts)
       .def("current_phase", &BridgeState::CurrentPhase)
+      .def("write_observation_tensor",
+           [](const BridgeState& state,
+              py::array_t<float, py::array::c_style> array) {
+             py::buffer_info buf = array.request();
+             SPIEL_CHECK_EQ(buf.ndim, 1);
+             SPIEL_CHECK_EQ(buf.strides.front(), buf.itemsize);
+             state.WriteObservationTensor(
+                 state.CurrentPlayer(),
+                 absl::MakeSpan(static_cast<float*>(buf.ptr),
+                                buf.shape.front()));
+           })
       .def("private_observation_tensor", &BridgeState::PrivateObservationTensor)
       .def("public_observation_tensor", &BridgeState::PublicObservationTensor)
       // Pickle support

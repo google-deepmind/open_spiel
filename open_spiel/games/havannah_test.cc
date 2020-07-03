@@ -33,6 +33,9 @@ void BasicHavannahTests() {
         *LoadGame(absl::StrCat("havannah(board_size=", i, ")")), 10);
   }
 
+  // Run many tests hoping swap happens at least once.
+  testing::RandomSimTest(*LoadGame("havannah(board_size=3,swap=True)"), 20);
+
   // Ansi colors!
   testing::RandomSimTest(
       *LoadGame("havannah", {{"board_size", GameParameter(6)},
