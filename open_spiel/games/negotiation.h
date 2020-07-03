@@ -209,7 +209,7 @@ class NegotiationGame : public Game {
   int utterance_dim_;
   int seed_;
   std::vector<Action> legal_utterances_;
-  std::unique_ptr<std::mt19937> rng_;
+  mutable std::unique_ptr<std::mt19937> rng_;
 };
 
 }  // namespace negotiation
