@@ -18,7 +18,7 @@ See https://arxiv.org/abs/1811.00164.
 
 The algorithm defines an `advantage` and `strategy` networks that compute
 advantages used to do regret matching across information sets and to approximate
-the strategy profiles of the game.  To train these networks a fixed ring buffer
+the strategy profiles of the game. To train these networks a fixed ring buffer
 (other data structures may be used) memory is used to accumulate samples to
 train the networks.
 """
@@ -30,12 +30,14 @@ from __future__ import print_function
 import collections
 import random
 import numpy as np
-import sonnet as snt
 import tensorflow.compat.v1 as tf
 
 from open_spiel.python import policy
+from open_spiel.python import simple_nets
 import pyspiel
 
+# Temporarily Disable TF2 behavior until we update the code.
+tf.disable_v2_behavior()
 
 AdvantageMemory = collections.namedtuple(
     "AdvantageMemory", "info_state iteration advantage action")
@@ -48,10 +50,8 @@ StrategyMemory = collections.namedtuple(
 class FixedSizeRingBuffer(object):
   """ReplayBuffer of fixed size with a FIFO replacement policy.
 
-  Stored transitions can be sampled uniformly.
-
-  The underlying datastructure is a ring buffer, allowing 0(1) adding and
-  sampling.
+  Stored transitions can be sampled uniformly. The underlying datastructure is a
+  ring buffer, allowing 0(1) adding and sampling.
   """
 
   def __init__(self, replay_buffer_capacity):
@@ -63,7 +63,6 @@ class FixedSizeRingBuffer(object):
     """Adds `element` to the buffer.
 
     If the buffer is full, the oldest element will be replaced.
-
     Args:
       element: data to be added to the buffer.
     """
@@ -79,10 +78,8 @@ class FixedSizeRingBuffer(object):
 
     Args:
       num_samples: `int`, number of samples to draw.
-
     Returns:
       An iterable over `num_samples` random elements of the buffer.
-
     Raises:
       ValueError: If there are less than `num_samples` elements in the buffer
     """
@@ -121,14 +118,15 @@ class DeepCFRSolver(policy.Policy):
                game,
                policy_network_layers=(256, 256),
                advantage_network_layers=(128, 128),
-               num_iterations=100,
-               num_traversals=20,
-               learning_rate=1e-4,
+               num_iterations: int = 100,
+               num_traversals: int = 20,
+               learning_rate: float = 1e-4,
                batch_size_advantage=None,
                batch_size_strategy=None,
-               memory_capacity=int(1e6),
-               policy_network_train_steps=1,
-               advantage_network_train_steps=1):
+               memory_capacity: int = int(1e6),
+               policy_network_train_steps: int = 1,
+               advantage_network_train_steps: int = 1,
+               reinitialize_advantage_networks: bool = True):
     """Initialize the Deep CFR algorithm.
 
     Args:
@@ -136,9 +134,9 @@ class DeepCFRSolver(policy.Policy):
       game: Open Spiel game.
       policy_network_layers: (list[int]) Layer sizes of strategy net MLP.
       advantage_network_layers: (list[int]) Layer sizes of advantage net MLP.
-      num_iterations: (int) Number of iterations.
-      num_traversals: (int) Number of traversals per iteration.
-      learning_rate: (float) Learning rate.
+      num_iterations: Number of iterations.
+      num_traversals: Number of traversals per iteration.
+      learning_rate: Learning rate.
       batch_size_advantage: (int or None) Batch size to sample from advantage
         memories.
       batch_size_strategy: (int or None) Batch size to sample from strategy
@@ -148,6 +146,8 @@ class DeepCFRSolver(policy.Policy):
         iteration).
       advantage_network_train_steps: Number of advantage network training steps
         (per iteration).
+      reinitialize_advantage_networks: Whether to re-initialize the
+        advantage network before training on each iteration.
     """
     all_players = list(range(game.num_players()))
     super(DeepCFRSolver, self).__init__(game, all_players)
@@ -166,6 +166,7 @@ class DeepCFRSolver(policy.Policy):
     self._embedding_size = len(self._root_node.information_state_tensor(0))
     self._num_iterations = num_iterations
     self._num_traversals = num_traversals
+    self._reinitialize_advantage_networks = reinitialize_advantage_networks
     self._num_actions = game.num_distinct_actions()
     self._iteration = 1
 
@@ -194,8 +195,9 @@ class DeepCFRSolver(policy.Policy):
 
     # Define strategy network, loss & memory.
     self._strategy_memories = FixedSizeRingBuffer(memory_capacity)
-    self._policy_network = snt.nets.MLP(
-        list(policy_network_layers) + [self._num_actions])
+    self._policy_network = simple_nets.MLP(self._embedding_size,
+                                           list(policy_network_layers),
+                                           self._num_actions)
     action_logits = self._policy_network(self._info_state_ph)
     # Illegal actions are handled in the traversal code where expected payoff
     # and sampled regret is computed from the advantage networks.
@@ -212,8 +214,8 @@ class DeepCFRSolver(policy.Policy):
         FixedSizeRingBuffer(memory_capacity) for _ in range(self._num_players)
     ]
     self._advantage_networks = [
-        snt.nets.MLP(list(advantage_network_layers) + [self._num_actions])
-        for _ in range(self._num_players)
+        simple_nets.MLP(self._embedding_size, list(advantage_network_layers),
+                        self._num_actions) for _ in range(self._num_players)
     ]
     self._advantage_outputs = [
         self._advantage_networks[i](self._info_state_ph)
@@ -251,8 +253,11 @@ class DeepCFRSolver(policy.Policy):
       self.reinitialize_advantage_network(p)
 
   def reinitialize_advantage_network(self, player):
-    for key in self._advantage_networks[player].initializers:
-      self._advantage_networks[player].initializers[key]()
+    self._session.run(
+        tf.group(*[
+            var.initializer
+            for var in self._advantage_networks[player].variables
+        ]))
 
   def solve(self):
     """Solution logic for Deep CFR."""
@@ -261,8 +266,9 @@ class DeepCFRSolver(policy.Policy):
       for p in range(self._num_players):
         for _ in range(self._num_traversals):
           self._traverse_game_tree(self._root_node, p)
-        self.reinitialize_advantage_network(p)
-        # Re-initialize advantage network for player and train from scratch.
+        if self._reinitialize_advantage_networks:
+          # Re-initialize advantage network for player and train from scratch.
+          self.reinitialize_advantage_network(p)
         advantage_losses[p].append(self._learn_advantage_network(p))
       self._iteration += 1
     # Train policy network.
@@ -274,11 +280,9 @@ class DeepCFRSolver(policy.Policy):
 
     Over a traversal the advantage and strategy memories are populated with
     computed advantage values and matched regrets respectively.
-
     Args:
       state: Current OpenSpiel game state.
       player: (int) Player index for this traversal.
-
     Returns:
       Recursively returns expected payoffs for each action.
     """
@@ -327,7 +331,6 @@ class DeepCFRSolver(policy.Policy):
     Args:
       state: Current OpenSpiel game state.
       player: (int) Player index over which to compute regrets.
-
     Returns:
       1. (list) Advantage values for info state actions indexed by action.
       2. (list) Matched regrets, prob for actions indexed by action.
@@ -366,7 +369,6 @@ class DeepCFRSolver(policy.Policy):
 
     Args:
       player: (int) player index.
-
     Returns:
       The average loss over the advantage network.
     """

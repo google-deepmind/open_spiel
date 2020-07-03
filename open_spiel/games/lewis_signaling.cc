@@ -34,23 +34,24 @@ namespace lewis_signaling {
 namespace {
 
 // Facts about the game
-const GameType kGameType{/*short_name=*/"lewis_signaling",
-                         /*long_name=*/"Lewis Signaling Game",
-                         GameType::Dynamics::kSequential,
-                         GameType::ChanceMode::kExplicitStochastic,
-                         GameType::Information::kImperfectInformation,
-                         GameType::Utility::kGeneralSum,
-                         GameType::RewardModel::kTerminal,
-                         /*max_num_players=*/2,
-                         /*min_num_players=*/2,
-                         /*provides_information_state_string=*/true,
-                         /*provides_information_state_tensor=*/true,
-                         /*provides_observation_string=*/true,
-                         /*provides_observation_tensor=*/true,
-                         /*parameter_specification=*/
-                         {{"num_states", GameParameter(kDefaultNumStates)},
-                          {"num_messages", GameParameter(kDefaultNumMessages)},
-                          {"payoffs", GameParameter(kDefaultPayoffs)}}};
+const GameType kGameType{
+    /*short_name=*/"lewis_signaling",
+    /*long_name=*/"Lewis Signaling Game",
+    GameType::Dynamics::kSequential,
+    GameType::ChanceMode::kExplicitStochastic,
+    GameType::Information::kImperfectInformation,
+    GameType::Utility::kGeneralSum,
+    GameType::RewardModel::kTerminal,
+    /*max_num_players=*/2,
+    /*min_num_players=*/2,
+    /*provides_information_state_string=*/true,
+    /*provides_information_state_tensor=*/true,
+    /*provides_observation_string=*/true,
+    /*provides_observation_tensor=*/true,
+    /*parameter_specification=*/
+    {{"num_states", GameParameter(kDefaultNumStates)},
+     {"num_messages", GameParameter(kDefaultNumMessages)},
+     {"payoffs", GameParameter(std::string(kDefaultPayoffs))}}};
 
 static std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new LewisSignalingGame(params));

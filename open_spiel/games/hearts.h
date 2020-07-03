@@ -143,6 +143,8 @@ class HeartsState : public State {
   }
   std::vector<Action> LegalActions() const override;
   std::vector<std::pair<Action, double>> ChanceOutcomes() const override;
+  std::unique_ptr<State> ResampleFromInfostate(
+      int player_id, std::function<double()> rng) const override;
 
  protected:
   void DoApplyAction(Action action) override;
@@ -172,6 +174,9 @@ class HeartsState : public State {
   std::string FormatDeal() const;
   std::string FormatPoints() const;
 
+  absl::optional<Player> Played(int card) const;
+  bool KnowsLocation(Player player, int card) const;
+
   const bool pass_cards_;
   const bool no_pts_on_first_trick_;
   const bool can_lead_any_club_;
@@ -198,6 +203,7 @@ class HeartsGame : public Game {
  public:
   explicit HeartsGame(const GameParameters& params);
   int NumDistinctActions() const override { return kNumCards; }
+  int MaxChanceOutcomes() const override { return kNumCards; }
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(new HeartsState(
         shared_from_this(), /*pass_cards=*/pass_cards_,

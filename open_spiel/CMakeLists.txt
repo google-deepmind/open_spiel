@@ -82,6 +82,14 @@ endif()
 set (BUILD_WITH_PYTHON $ENV{BUILD_WITH_PYTHON})
 message("${BoldYellow}BUILD_WITH_PYTHON: ${BUILD_WITH_PYTHON} ${ColourReset}")
 
+set (BUILD_WITH_PUBLIC_STATES OFF CACHE BOOL "Build with support for public states in C++.")
+if(NOT DEFINED ENV{BUILD_WITH_PUBLIC_STATES})
+  message("${BoldRed}BUILD_WITH_PUBLIC_STATES not set. Defaults to OFF${ColourReset}")
+  set (ENV{BUILD_WITH_PUBLIC_STATES} OFF)
+endif()
+set (BUILD_WITH_PUBLIC_STATES $ENV{BUILD_WITH_PUBLIC_STATES})
+message("${BoldYellow}BUILD_WITH_PUBLIC_STATES: ${BUILD_WITH_PUBLIC_STATES} ${ColourReset}")
+
 set (BUILD_WITH_EIGEN OFF CACHE BOOL "Build with support for Eigen in C++.")
 if(NOT DEFINED ENV{BUILD_WITH_EIGEN})
     message("${BoldRed}BUILD_WITH_EIGEN not set. Defaults to OFF${ColourReset}")
@@ -98,6 +106,14 @@ endif()
 set (BUILD_WITH_XINXIN $ENV{BUILD_WITH_XINXIN})
 message("${BoldYellow}BUILD_WITH_XINXIN: ${BUILD_WITH_XINXIN} ${ColourReset}")
 
+set (BUILD_WITH_LIBTORCH OFF CACHE BOOL "Build with support for libtorch.")
+if(NOT DEFINED ENV{BUILD_WITH_LIBTORCH})
+    message("${BoldRed}BUILD_WITH_LIBTORCH not set. Defaults to OFF${ColourReset}")
+    set (ENV{BUILD_WITH_LIBTORCH} OFF)
+endif()
+set (BUILD_WITH_LIBTORCH $ENV{BUILD_WITH_LIBTORCH})
+message("${BoldYellow}BUILD_WITH_LIBTORCH: ${BUILD_WITH_LIBTORCH} ${ColourReset}")
+
 ##
 
 
@@ -111,6 +127,7 @@ enable_testing()
 set (OPEN_SPIEL_CORE_FILES
   canonical_game_strings.h
   canonical_game_strings.cc
+  fog_constants.h
   game_parameters.h
   game_parameters.cc
   spiel.h
@@ -166,6 +183,7 @@ if (BUILD_WITH_ACPC)
   set(OPEN_SPIEL_OBJECTS ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:universal_poker_clib> $<TARGET_OBJECTS:universal_poker_lib>)
 endif()
 if (BUILD_WITH_EIGEN)
+  add_compile_definitions(BUILD_WITH_EIGEN)
   # Add Eigen dependency.
   add_subdirectory(eigen/)
   # Now we can use #include "Eigen/Dense"
@@ -173,8 +191,28 @@ if (BUILD_WITH_EIGEN)
   include_directories(eigen/libeigen)
   set(OPEN_SPIEL_OBJECTS ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:eigen>)
 endif()
+if (BUILD_WITH_PUBLIC_STATES)
+  if (NOT BUILD_WITH_EIGEN)
+    message(FATAL_ERROR "You want to build with public states API, but Eigen dependency is not enabled. Please enable BUILD_WITH_EIGEN=ON")
+  endif()
+  add_compile_definitions(BUILD_WITH_PUBLIC_STATES)
+  set(OPEN_SPIEL_OBJECTS
+    $<TARGET_OBJECTS:public_states_core>
+    $<TARGET_OBJECTS:public_states_games>
+    $<TARGET_OBJECTS:public_states_algorithms>
+    $<TARGET_OBJECTS:public_states_game_transforms>
+    ${OPEN_SPIEL_OBJECTS})
+  add_subdirectory(public_states)
+endif()
 if (BUILD_WITH_XINXIN)
   set(OPEN_SPIEL_OBJECTS ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:xinxin>)
+endif()
+if (BUILD_WITH_LIBTORCH)
+  list(APPEND CMAKE_PREFIX_PATH "${CMAKE_CURRENT_SOURCE_DIR}/libtorch/libtorch")
+  find_package(Torch REQUIRED)
+  add_subdirectory(libtorch)
+  # Use following to link your_target_executable with torch libraries:
+  # target_link_libraries(your_target_executable ${TORCH_LIBRARIES})
 endif()
 
 # We have the parent of this directory in the include path, so that we can

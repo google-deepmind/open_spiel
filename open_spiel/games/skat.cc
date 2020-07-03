@@ -608,8 +608,10 @@ std::vector<Action> SkatState::PlayLegalActions() const {
       // (which is required), which the special status of jacks makes hard
       // otherwise.
       for (int card = 0; card < kNumCards; ++card) {
-        if ((IsTrump(first_card) && CardRank(card) == kJack) ||
-            (suit == CardSuit(card) && CardRank(card) != kJack)) {
+        if ((IsTrump(first_card) && IsTrump(card)) ||
+            (suit == CardSuit(card) &&
+             CardRank(card) != kJack &&
+             CardRank(first_card) != kJack)) {
           if (card_locations_[card] == PlayerToLocation(current_player_)) {
             legal_actions.push_back(card);
           }

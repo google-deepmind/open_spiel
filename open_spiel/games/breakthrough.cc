@@ -150,8 +150,8 @@ int BreakthroughState::CurrentPlayer() const {
 }
 
 void BreakthroughState::DoApplyAction(Action action) {
-  std::vector<int> values(4, -1);
-  UnrankActionMixedBase(action, {rows_, cols_, kNumDirections, 2}, &values);
+  std::vector<int> values =
+      UnrankActionMixedBase(action, {rows_, cols_, kNumDirections, 2});
   int r1 = values[0];
   int c1 = values[1];
   int dir = values[2];
@@ -193,8 +193,8 @@ void BreakthroughState::DoApplyAction(Action action) {
 
 std::string BreakthroughState::ActionToString(Player player,
                                               Action action) const {
-  std::vector<int> values(4, -1);
-  UnrankActionMixedBase(action, {rows_, cols_, kNumDirections, 2}, &values);
+  std::vector<int> values =
+      UnrankActionMixedBase(action, {rows_, cols_, kNumDirections, 2});
   int r1 = values[0];
   int c1 = values[1];
   int dir = values[2];
@@ -340,8 +340,8 @@ void BreakthroughState::ObservationTensor(Player player,
 }
 
 void BreakthroughState::UndoAction(Player player, Action action) {
-  std::vector<int> values(4, -1);
-  UnrankActionMixedBase(action, {rows_, cols_, kNumDirections, 2}, &values);
+  std::vector<int> values =
+      UnrankActionMixedBase(action, {rows_, cols_, kNumDirections, 2});
   int r1 = values[0];
   int c1 = values[1];
   int dir = values[2];

@@ -22,7 +22,7 @@
 
 #include "open_spiel/spiel.h"
 
-// Lewis Signaling Game
+// Lewis Signaling Game: https://en.wikipedia.org/wiki/Lewis_signaling_game
 //
 // First agent (sender) receives a random private state from a set of N states.
 // It then sends a message from a set of M messages to the second agent
@@ -32,11 +32,11 @@
 // agents receive the same reward.
 //
 // Parameters:
-//     "num_states"     int           number of distinct states (N) (default =3)
-//     "num_messages"   int           number of distinct messages (M) (default = 3)
-//     "payoffs"        std::string   string with comma separated payoff values
-//                                    (N*N elements required)
-//                                    (default = flattened identity matrix)
+//     "num_states"     int      number of distinct states (N) (default = 3)
+//     "num_messages"   int      number of distinct messages (M) (default = 3)
+//     "payoffs"        string   string with comma separated payoff values
+//                               (N*N elements required)
+//                               (default = flattened identity matrix)
 
 namespace open_spiel {
 namespace lewis_signaling {
@@ -44,7 +44,7 @@ namespace lewis_signaling {
 constexpr int kDefaultNumStates = 3;
 constexpr int kDefaultNumMessages = 3;
 constexpr int kDefaultNumPlayers = 2;
-const std::string kDefaultPayoffs = "1, 0, 0, 0, 1, 0, 0, 0, 1";
+constexpr const char* kDefaultPayoffs = "1, 0, 0, 0, 1, 0, 0, 0, 1";
 
 enum class Players {
   kSender,

@@ -48,6 +48,10 @@ if (BUILD_WITH_EIGEN)
   set(PYTHON_TESTS ${PYTHON_TESTS}
     ../eigen/eigen_binding_test.py)
 endif()
+if (BUILD_WITH_PUBLIC_STATES)
+  set(PYTHON_TESTS ${PYTHON_TESTS}
+    ../integration_tests/public_states_api_test.py)
+endif()
 
 # List of all Python tests to run.
 set(PYTHON_TESTS ${PYTHON_TESTS}

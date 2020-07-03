@@ -24,6 +24,9 @@ import tensorflow.compat.v1 as tf
 
 from open_spiel.python.algorithms.losses import rl_losses
 
+# Temporarily disable v2 behavior until code is updated.
+tf.disable_v2_behavior()
+
 
 class RLLossesTest(parameterized.TestCase, tf.test.TestCase):
 
