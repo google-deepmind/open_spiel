@@ -281,15 +281,15 @@ std::unique_ptr<State> KuhnPublicState::ResampleFromInformationSet(
 std::vector<PublicTransition> KuhnPublicState::LegalTransitions() const {
   // Deal cards.
   if (GetDepth() < NumPlayers()) {
-    return {absl::StrCat("deal ", GetDepth())};
+    return {absl::StrCat("Deal to player ", GetDepth())};
   }
   // First round.
   if (GetDepth() < 2 * NumPlayers()) {
-    return {"pass", "bet"};
+    return {"Pass", "Bet"};
   }
   // Second round.
   if (NumPassesWithoutBet() + 2 * NumPlayers() > GetDepth()) {
-    return {"pass", "bet"};
+    return {"Pass", "Bet"};
   }
   // Terminal.
   SPIEL_CHECK_TRUE(IsTerminal());
@@ -441,15 +441,15 @@ std::unique_ptr<PublicState> KuhnPublicState::Clone() const {
 void KuhnPublicState::DoApplyPublicTransition(
     const PublicTransition& transition) {
   if (GetDepth() < NumPlayers()) {
-    SPIEL_CHECK_EQ(transition, absl::StrCat("deal ", GetDepth()));
+    SPIEL_CHECK_EQ(transition, absl::StrCat("Deal to player ", GetDepth()));
     return;  // Do not push back to public actions.
   }
 
-  if (transition == "pass") {
+  if (transition == "Pass") {
     public_actions_.push_back(base_kuhn::ActionType::kPass);
     return;
   }
-  if (transition == "bet") {
+  if (transition == "Bet") {
     public_actions_.push_back(base_kuhn::ActionType::kBet);
     return;
   }
