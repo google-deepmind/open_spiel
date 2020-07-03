@@ -72,7 +72,7 @@ InformationStateTensor(0): ◉◯◯◉◯◯◯◯◯◯◯
 InformationStateTensor(1): ◯◉◯◯◯◯◯◯◯◯◯
 ObservationString(0) = "111"
 ObservationString(1) = ""
-PublicObservationString() = "deal 0"
+PublicObservationString() = "Deal to player 0"
 PrivateObservationString(0) = "1"
 PrivateObservationString(1) = "clock tick"
 ObservationTensor(0): ◉◯◯◉◯◉◉
@@ -98,7 +98,7 @@ InformationStateTensor(0): ◉◯◯◉◯◯◯◯◯◯◯
 InformationStateTensor(1): ◯◉◯◯◉◯◯◯◯◯◯
 ObservationString(0) = "111"
 ObservationString(1) = "211"
-PublicObservationString() = "deal 1"
+PublicObservationString() = "Deal to player 1"
 PrivateObservationString(0) = "clock tick"
 PrivateObservationString(1) = "2"
 ObservationTensor(0): ◉◯◯◉◯◉◉
@@ -125,7 +125,7 @@ InformationStateTensor(0): ◉◯◯◉◯◉◯◯◯◯◯
 InformationStateTensor(1): ◯◉◯◯◉◉◯◯◯◯◯
 ObservationString(0) = "111"
 ObservationString(1) = "211"
-PublicObservationString() = "0"
+PublicObservationString() = "Pass"
 PrivateObservationString(0) = "clock tick"
 PrivateObservationString(1) = "clock tick"
 ObservationTensor(0): ◉◯◯◉◯◉◉
@@ -152,7 +152,7 @@ InformationStateTensor(0): ◉◯◯◉◯◉◯◯◉◯◯
 InformationStateTensor(1): ◯◉◯◯◉◉◯◯◉◯◯
 ObservationString(0) = "112"
 ObservationString(1) = "212"
-PublicObservationString() = "1"
+PublicObservationString() = "Bet"
 PrivateObservationString(0) = "clock tick"
 PrivateObservationString(1) = "clock tick"
 ObservationTensor(0) = [1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 2.0]
@@ -179,7 +179,7 @@ InformationStateTensor(0): ◉◯◯◉◯◉◯◯◉◯◉
 InformationStateTensor(1): ◯◉◯◯◉◉◯◯◉◯◉
 ObservationString(0) = "122"
 ObservationString(1) = "222"
-PublicObservationString() = "1"
+PublicObservationString() = "Bet"
 PrivateObservationString(0) = "clock tick"
 PrivateObservationString(1) = "clock tick"
 ObservationTensor(0) = [1.0, 0.0, 0.0, 1.0, 0.0, 2.0, 2.0]

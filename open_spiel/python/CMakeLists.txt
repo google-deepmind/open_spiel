@@ -15,7 +15,16 @@ elseif(Python_TARGET_VERSION VERSION_GREATER_EQUAL "3.0.0")
   endif()
 endif()
 
-add_library(pyspiel MODULE
+# Optional pyspiel sub-modules, which can specify their python bindings.
+if (BUILD_WITH_PUBLIC_STATES)
+  set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
+      ../public_states/pybind11/public_states.h
+      ../public_states/pybind11/public_states.cc
+      )
+endif()
+
+# List of all Python bindings to add to pyspiel.
+set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
   pybind11/algorithms_trajectories.cc
   pybind11/algorithms_trajectories.h
   pybind11/bots.cc
@@ -29,7 +38,9 @@ add_library(pyspiel MODULE
   pybind11/policy.cc
   pybind11/policy.h
   pybind11/pyspiel.cc
-  ${OPEN_SPIEL_OBJECTS})
+  )
+
+add_library(pyspiel MODULE ${PYTHON_BINDINGS} ${OPEN_SPIEL_OBJECTS})
 
 # Without this, the binary is called `libpyspiel.so`
 set_target_properties(pyspiel PROPERTIES PREFIX "")

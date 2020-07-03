@@ -204,9 +204,13 @@ std::string KuhnState::PublicObservationString() const {
   if (history_.empty()) return kStartOfGameObservation;
   if (history_.size() <= num_players_) {
     int currently_dealing_to_player = history_.size() - 1;
-    return absl::StrCat("deal ", currently_dealing_to_player);
+    return absl::StrCat("Deal to player ", currently_dealing_to_player);
   }
-  return std::to_string(history_.back().action);
+  auto type = static_cast<ActionType>(history_.back().action);
+  if (type == ActionType::kPass) return "Pass";
+  if (type == ActionType::kBet) return "Bet";
+  SpielFatalError(absl::StrCat(
+      "Invalid action for last history: ", history_.back().action));
 }
 
 std::string KuhnState::PrivateObservationString(Player player) const {

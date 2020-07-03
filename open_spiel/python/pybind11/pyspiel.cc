@@ -36,6 +36,11 @@
 #include "pybind11/include/pybind11/pybind11.h"
 #include "pybind11/include/pybind11/stl.h"
 
+// List of optional python submodules.
+#if BUILD_WITH_PUBLIC_STATES
+#include "open_spiel/public_states/pybind11/public_states.h"
+#endif
+
 // This file contains OpenSpiel's Python API. The best place to see an overview
 // of the API is to refer to python/examples/example.py. Generally, all the core
 // functions are exposed as snake case in Python (i.e. CurrentPlayer becomes
@@ -505,6 +510,12 @@ PYBIND11_MODULE(pyspiel, m) {
   init_pyspiel_algorithms_trajectories(m);  // Trajectories.
   init_pyspiel_games_negotiation(m);        // Negotiation game.
   init_pyspiel_games_bridge(m);  // Game-specific functions for bridge.
+
+  // List of optional python submodules.
+#if BUILD_WITH_PUBLIC_STATES
+  init_pyspiel_public_states(m);
+#endif
+
 }
 
 }  // namespace
