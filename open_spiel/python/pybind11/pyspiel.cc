@@ -253,6 +253,7 @@ PYBIND11_MODULE(pyspiel, m) {
            (std::string(State::*)(int) const) & State::PrivateObservationString)
       .def("private_observation_string",
            (std::string(State::*)() const) & State::PrivateObservationString)
+      .def("public_observation_history", &State::PublicObservationHistory)
       .def("clone", &State::Clone)
       .def("child", &State::Child)
       .def("undo_action", &State::UndoAction)

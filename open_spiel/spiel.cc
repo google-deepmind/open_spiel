@@ -207,7 +207,28 @@ std::shared_ptr<const Game> LoadGame(GameParameters params) {
 State::State(std::shared_ptr<const Game> game)
     : num_distinct_actions_(game->NumDistinctActions()),
       num_players_(game->NumPlayers()),
-      game_(game) {}
+      game_(game) {
+  if (game_->GetType().provides_factored_observation_string) {
+    pub_obs_history_.emplace_back(kStartOfGameObservation);
+  }
+}
+
+void State::ApplyAction(Action action_id) {
+  // history_ needs to be modified *after* DoApplyAction which could
+  // be using it.
+  Player player = CurrentPlayer();
+  DoApplyAction(action_id);
+  history_.push_back({player, action_id});
+
+  if (game_->GetType().provides_factored_observation_string) {
+    pub_obs_history_.push_back(PublicObservationString());
+  }
+}
+
+std::vector<std::string> State::PublicObservationHistory() const {
+  SPIEL_CHECK_TRUE(game_->GetType().provides_factored_observation_string);
+  return pub_obs_history_;
+}
 
 template <>
 GameParameters Game::ParameterValue<GameParameters>(

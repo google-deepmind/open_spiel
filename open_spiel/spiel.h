@@ -211,13 +211,7 @@ class State {
   // sampling of and outcome should be done in this function and then applied.
   //
   // Games should implement DoApplyAction.
-  virtual void ApplyAction(Action action_id) {
-    // history_ needs to be modified *after* DoApplyAction which could
-    // be using it.
-    Player player = CurrentPlayer();
-    DoApplyAction(action_id);
-    history_.push_back({player, action_id});
-  }
+  virtual void ApplyAction(Action action_id);
 
   // `LegalActions(Player player)` is valid for all nodes in all games,
   // returning an empty list for players who don't act at this state. The
@@ -597,6 +591,10 @@ class State {
     return PrivateObservationString(player);
   }
 
+  // Return public observation history.
+  // This method can be called only if the game provides factored observations.
+  std::vector<std::string> PublicObservationHistory() const;
+
   // Return a copy of this state.
   virtual std::unique_ptr<State> Clone() const = 0;
 
@@ -729,7 +727,10 @@ class State {
   // Fields common to every game state.
   int num_distinct_actions_;
   int num_players_;
-  std::vector<PlayerAction> history_;  // Actions taken so far.
+  // Actions taken so far.
+  std::vector<PlayerAction> history_;
+  // Public observations received so far.
+  std::vector<std::string> pub_obs_history_;
 
   // A pointer to the game that created this state.
   std::shared_ptr<const Game> game_;
