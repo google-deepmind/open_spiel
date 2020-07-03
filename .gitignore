@@ -50,3 +50,6 @@ Manifest.toml
 
 
 open_spiel/cmake-build-debug/
+
+# Swift generated build file
+Package.resolved
