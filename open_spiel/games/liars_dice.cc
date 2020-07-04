@@ -410,7 +410,7 @@ std::unique_ptr<State> LiarsDiceGame::NewInitialState() const {
   return state;
 }
 
-int LiarsDiceGame::MaxChanceOutcomes() const { return kDiceSides + 1; }
+int LiarsDiceGame::MaxChanceOutcomes() const { return kDiceSides; }
 
 int LiarsDiceGame::MaxGameLength() const {
   // A bet for each side and number of total dice, plus "liar" action.
