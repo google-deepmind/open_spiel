@@ -119,8 +119,7 @@ void LegalActionsAreSorted(const Game& game, State& state) {
 
 void LegalActionsMaskTest(const Game& game, const State& state,
                           const std::vector<Action>& legal_actions) {
-  std::vector<int> legal_actions_mask =
-      state.LegalActionsMask(state.CurrentPlayer());
+  std::vector<int> legal_actions_mask = state.LegalActionsMask(state.CurrentPlayer());
   int expected_length = state.IsChanceNode() ? game.MaxChanceOutcomes() : game.NumDistinctActions();
   SPIEL_CHECK_EQ(legal_actions_mask.size(), expected_length);
   for (Action action : legal_actions) {
@@ -297,7 +296,7 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
     }
 
     if (state->IsChanceNode()) {
-      LegalActionsMaskTest(game, *state, state->LegalActions());
+      LegalActionsMaskTest(game, *state, state->LegalActions(kChancePlayerId));
       // Chance node; sample one according to underlying distribution
       std::vector<std::pair<Action, double>> outcomes = state->ChanceOutcomes();
       Action action = open_spiel::SampleAction(outcomes, *rng).first;
@@ -325,7 +324,6 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
       // Sample an action for each player
       for (auto p = Player{0}; p < game.NumPlayers(); p++) {
         std::vector<Action> actions = state->LegalActions(p);
-        LegalActionsMaskTest(game, *state, actions);
         std::uniform_int_distribution<int> dis(0, actions.size() - 1);
         Action action = actions[dis(*rng)];
         joint_action.push_back(action);

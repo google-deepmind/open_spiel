@@ -253,7 +253,7 @@ class State {
   // legal actions and 0 for illegal actions. For chances nodes, the length
   // is `game.MaxChanceOutcomes()`.
   std::vector<int> LegalActionsMask(Player player) const {
-    int length = IsChanceNode() ? max_chance_outcomes_ : num_distinct_actions_;
+    int length = player == kChancePlayerId ? max_chance_outcomes_ : num_distinct_actions_;
     std::vector<int> mask(length, 0);
     std::vector<Action> legal_actions = LegalActions(player);
 

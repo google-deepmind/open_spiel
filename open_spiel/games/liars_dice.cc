@@ -139,7 +139,7 @@ void LiarsDiceState::DoApplyAction(Action action) {
     int slot = num_dice_rolled_[cur_roller_];
 
     // Assign the roll.
-    dice_outcomes_[cur_roller_][slot] = action;
+    dice_outcomes_[cur_roller_][slot] = action + 1;
     num_dice_rolled_[cur_roller_]++;
 
     // Check to see if we must change the roller.
@@ -212,7 +212,7 @@ std::vector<std::pair<Action, double>> LiarsDiceState::ChanceOutcomes() const {
   // A chance node is a single die roll.
   outcomes.reserve(kDiceSides);
   for (int i = 0; i < kDiceSides; i++) {
-    outcomes.emplace_back(1 + i, 1.0 / kDiceSides);
+    outcomes.emplace_back(i, 1.0 / kDiceSides);
   }
 
   return outcomes;
@@ -410,7 +410,7 @@ std::unique_ptr<State> LiarsDiceGame::NewInitialState() const {
   return state;
 }
 
-int LiarsDiceGame::MaxChanceOutcomes() const { return kDiceSides; }
+int LiarsDiceGame::MaxChanceOutcomes() const { return kDiceSides + 1; }
 
 int LiarsDiceGame::MaxGameLength() const {
   // A bet for each side and number of total dice, plus "liar" action.

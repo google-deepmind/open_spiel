@@ -83,7 +83,7 @@ class FPSBAGame : public Game {
     return std::unique_ptr<State>(new FPSBAState(shared_from_this()));
   }
   int MaxChanceOutcomes() const override {
-    return std::max(max_value_, num_players_);
+    return std::max(max_value_, num_players_) + 1;
   }
   int NumPlayers() const override { return num_players_; }
   double MinUtility() const override { return 0; }
