@@ -201,7 +201,7 @@ void PigState::DoApplyAction(Action move) {
   } else if (IsChanceNode()) {
     // Resolve chance node outcome. If 1, reset turn total and change players;
     // else, add to total and keep going.
-    if (move == 1) {
+    if (move == 0) {
       // Reset turn total and loses turn!
       turn_total_ = 0;
       turn_player_ = NextPlayerRoundRobin(turn_player_, num_players_);
@@ -237,7 +237,7 @@ std::vector<std::pair<Action, double>> PigState::ChanceOutcomes() const {
   // All the chance outcomes come after roll and stop.
   outcomes.reserve(dice_outcomes_);
   for (int i = 0; i < dice_outcomes_; i++) {
-    outcomes.push_back(std::make_pair(i + 1, 1.0 / dice_outcomes_));
+    outcomes.push_back(std::make_pair(i, 1.0 / dice_outcomes_));
   }
 
   return outcomes;
