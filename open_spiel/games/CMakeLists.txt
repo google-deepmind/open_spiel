@@ -86,6 +86,7 @@ set(GAME_SOURCES
   skat.h
   solitaire.cc
   solitaire.h
+  solitaire/solitaire_common.h
   tic_tac_toe.cc
   tic_tac_toe.h
   tiny_bridge.cc

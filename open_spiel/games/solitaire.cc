@@ -1,4 +1,8 @@
-#include "solitaire.h"
+#include "open_spiel/games/solitaire.h"
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "open_spiel/games/solitaire/solitaire_common.h"
+#include "open_spiel/spiel.h"
+#include <open_spiel/spiel_utils.h>
 
 namespace open_spiel::solitaire {
 
@@ -476,6 +480,7 @@ void Pile::SetCards(std::vector<Card> new_cards) {
 // Other Methods
 
 std::vector<Card> Pile::Targets() const {
+  std::cout << "Pile::Targets()" << std::endl;
   switch (type) {
     case LocationType::kFoundation: {
       if (!cards.empty()) {
@@ -505,6 +510,7 @@ std::vector<Card> Pile::Targets() const {
 }
 
 std::vector<Card> Pile::Sources() const {
+  std::cout << "Pile::Targets()" << std::endl;
   std::vector<Card> sources;
   // A pile can have a maximum of 13 cards as sources (1 for each rank)
   sources.reserve(kNumRanks);
