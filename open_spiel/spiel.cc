@@ -207,6 +207,7 @@ std::shared_ptr<const Game> LoadGame(GameParameters params) {
 State::State(std::shared_ptr<const Game> game)
     : num_distinct_actions_(game->NumDistinctActions()),
       num_players_(game->NumPlayers()),
+      max_chance_outcomes_(game->MaxChanceOutcomes()),
       game_(game) {}
 
 template <>

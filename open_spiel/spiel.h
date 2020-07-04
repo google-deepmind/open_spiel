@@ -250,9 +250,11 @@ class State {
   virtual std::vector<Action> LegalActions() const = 0;
 
   // Returns a vector of length `game.NumDistinctActions()` containing 1 for
-  // legal actions and 0 for illegal actions.
+  // legal actions and 0 for illegal actions. For chances nodes, the length
+  // is `game.MaxChanceOutcomes()`.
   std::vector<int> LegalActionsMask(Player player) const {
-    std::vector<int> mask(num_distinct_actions_, 0);
+    int length = IsChanceNode() ? max_chance_outcomes_ : num_distinct_actions_;
+    std::vector<int> mask(length, 0);
     std::vector<Action> legal_actions = LegalActions(player);
 
     for (auto const& value : legal_actions) {
@@ -729,6 +731,7 @@ class State {
   // Fields common to every game state.
   int num_distinct_actions_;
   int num_players_;
+  int max_chance_outcomes_;
   std::vector<PlayerAction> history_;  // Actions taken so far.
 
   // A pointer to the game that created this state.
