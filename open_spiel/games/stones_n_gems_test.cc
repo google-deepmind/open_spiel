@@ -74,7 +74,7 @@ void ExtendedStonesNGemsTest() {
       "time left: 20, gems required: 2, gems collectred: 0";
 
     constexpr const char kStateSerialize[] = 
-      "6,7,20,20,0,10,0,50,-1,1,2,0,0,0,1,27,0\n"
+      "6,7,20,20,0,10,0,50,-1,1,2,0,0,0,1,42,0\n"
       "19,19,19,19,19,19\n"
       "19,1,1,1,3,19\n"
       "19,2,2,1,1,19\n"
@@ -86,31 +86,45 @@ void ExtendedStonesNGemsTest() {
     // observation tensor index along with corresponding IDs
     const int offset = 6*7;
     const std::unordered_map<int, int> obs_ids_init {
-      {0*offset + 25, 15},  {3*offset + 10, 8}, {3*offset + 26, 16}, 
-      {4*offset + 31, 19}, {4*offset + 33, 20}, {5*offset + 35, 21}, 
+      {0*offset + 25, 26}, 
+      {1*offset + 7, 8}, {1*offset + 8, 9}, {1*offset + 9, 10},
+      {1*offset + 15, 16}, {1*offset + 16, 17}, {1*offset + 19, 20},
+      {1*offset + 20, 21}, {1*offset + 21, 22}, {1*offset + 27, 28},
+      {1*offset + 34, 35},
+      {2*offset + 13, 14}, {2*offset + 14, 15}, {2*offset + 22, 23},
+      {2*offset + 28, 29}, {2*offset + 32, 33},
+      {3*offset + 10, 11}, {3*offset + 26, 27}, 
+      {4*offset + 31, 32}, {4*offset + 33, 34}, {5*offset + 35, 36}, 
       {11*offset + 0, 1}, {11*offset + 1, 2}, {11*offset + 2, 3},
       {11*offset + 3, 4}, {11*offset + 4, 5}, {11*offset + 5, 6},
-      {11*offset + 6, 7}, {11*offset + 11, 9},
-      {11*offset + 12, 10}, {11*offset + 17, 11},
-      {11*offset + 18, 12}, {11*offset + 23, 13},
-      {11*offset + 24, 14}, {11*offset + 29, 17},
-      {11*offset + 30, 18},
-      {11*offset + 36, 22}, {11*offset + 37, 23}, {11*offset + 38, 24},
-      {11*offset + 39, 25}, {11*offset + 40, 26}, {11*offset + 41, 27},
+      {11*offset + 6, 7}, {11*offset + 11, 12},
+      {11*offset + 12, 13}, {11*offset + 17, 18},
+      {11*offset + 18, 19}, {11*offset + 23, 24},
+      {11*offset + 24, 25}, {11*offset + 29, 30},
+      {11*offset + 30, 31},
+      {11*offset + 36, 37}, {11*offset + 37, 38}, {11*offset + 38, 39},
+      {11*offset + 39, 40}, {11*offset + 40, 41}, {11*offset + 41, 42},
     };
 
     const std::unordered_map<int, int> obs_ids_after {
-      {0*offset + 31, 15},  {3*offset + 16, 8}, {3*offset + 26, 16}, 
-      {4*offset + 33, 20}, {5*offset + 35, 21}, 
+      {0*offset + 31, 26}, 
+      {1*offset + 7, 8}, {1*offset + 8, 9}, {1*offset + 9, 10},
+      {1*offset + 15, 16}, {1*offset + 19, 20},
+      {1*offset + 20, 21}, {1*offset + 21, 22}, {1*offset + 27, 28},
+      {1*offset + 34, 35}, {1*offset + 25, 43}, {1*offset + 10, 44}, 
+      {2*offset + 13, 14}, {2*offset + 14, 15}, {2*offset + 22, 23},
+      {2*offset + 28, 29}, {2*offset + 32, 33},
+      {3*offset + 16, 11}, {3*offset + 26, 27}, 
+      {4*offset + 33, 34}, {5*offset + 35, 36}, 
       {11*offset + 0, 1}, {11*offset + 1, 2}, {11*offset + 2, 3},
       {11*offset + 3, 4}, {11*offset + 4, 5}, {11*offset + 5, 6},
-      {11*offset + 6, 7}, {11*offset + 11, 9},
-      {11*offset + 12, 10}, {11*offset + 17, 11},
-      {11*offset + 18, 12}, {11*offset + 23, 13},
-      {11*offset + 24, 14}, {11*offset + 29, 17},
-      {11*offset + 30, 18},
-      {11*offset + 36, 22}, {11*offset + 37, 23}, {11*offset + 38, 24},
-      {11*offset + 39, 25}, {11*offset + 40, 26}, {11*offset + 41, 27},
+      {11*offset + 6, 7}, {11*offset + 11, 12},
+      {11*offset + 12, 13}, {11*offset + 17, 18},
+      {11*offset + 18, 19}, {11*offset + 23, 24},
+      {11*offset + 24, 25}, {11*offset + 29, 30},
+      {11*offset + 30, 31},
+      {11*offset + 36, 37}, {11*offset + 37, 38}, {11*offset + 38, 39},
+      {11*offset + 39, 40}, {11*offset + 40, 41}, {11*offset + 41, 42},
     };
 
   std::shared_ptr<const Game> game =

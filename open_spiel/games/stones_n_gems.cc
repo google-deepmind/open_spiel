@@ -590,7 +590,7 @@ void StonesNGemsState::MoveItem(int index, int action) {
   grid_.ids[new_index] = grid_.ids[index];
   grid_.elements[new_index].has_updated = true;
   grid_.elements[index] = kElEmpty;
-  grid_.ids[index] = 0;
+  grid_.ids[index] = ++id_counter_;
 }
 
 // Set the new index to the given element
@@ -658,7 +658,7 @@ void StonesNGemsState::MoveThroughMagic(int index, Element element) {
   int index_below = IndexFromAction(index, Directions::kDown);
   // Need to ensure cell below magic wall is empty (so item can pass through)
   if (IsType(index_below, kElEmpty, Directions::kDown)) {
-    SetItem(index, kElEmpty, 0);
+    SetItem(index, kElEmpty, ++id_counter_);
     SetItem(index_below, element, ++id_counter_, Directions::kDown);
   }
 }
@@ -851,7 +851,7 @@ void StonesNGemsState::UpdateAgent(int index, int action) {
     int index_gate = IndexFromAction(index, action);
       if (IsType(index_gate, kElEmpty, action)) {
       SetItem(index_gate, kElAgent, grid_.ids[index], action);
-      SetItem(index, kElEmpty, 0);
+      SetItem(index, kElEmpty, ++id_counter_);
     }
   } else if (IsType(index, kElExitOpen, action)) {
     // Walking into exit after collecting enough gems
@@ -1135,8 +1135,7 @@ StonesNGemsState::StonesNGemsState(std::shared_ptr<const Game> game, int steps_r
         // Initialize the grid element IDs
         grid_.ids.clear();
         for (std::size_t i = 0; i < grid.elements.size(); ++i) {
-          int id = (grid.elements[i] == kElEmpty || grid.elements[i] == kElDirt) ? 0 : ++id_counter_;
-          grid_.ids.push_back(id);
+          grid_.ids.push_back(++id_counter_);
         }
       }
 
