@@ -184,39 +184,36 @@ std::string KuhnState::InformationStateString(Player player) const {
   return str;
 }
 
-// Observation is card then contributions to the pot, e.g. 111
 std::string KuhnState::ObservationString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
-
-  if (history_.size() <= player) return "";
-  std::string str = std::to_string(history_[player].action);
-
-  // Adding the contribution of each players to the pot. These values are not
-  // between 0 and 1.
-  for (auto p = Player{0}; p < num_players_; p++) {
-    str += std::to_string(ante_[p]);
+  if (history_.empty()) return kStartOfGameObservation;
+  if (history_.size() - 1 == player) {
+    return absl::StrCat("Received card ", history_[player].action);
   }
-  return str;
+  if (history_.size() <= num_players_) {
+    int currently_dealing_to_player = history_.size() - 1;
+    return absl::StrCat("Deal to player ", currently_dealing_to_player);
+  }
+  return history_.back().action ? "Bet" : "Pass";
 }
 
 std::string KuhnState::PublicObservationString() const {
   if (history_.empty()) return kStartOfGameObservation;
   if (history_.size() <= num_players_) {
     int currently_dealing_to_player = history_.size() - 1;
-    return absl::StrCat("deal ", currently_dealing_to_player);
+    return absl::StrCat("Deal to player ", currently_dealing_to_player);
   }
-  return std::to_string(history_.back().action);
+  return history_.back().action ? "Bet" : "Pass";
 }
 
 std::string KuhnState::PrivateObservationString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
-
   if (history_.empty()) return kStartOfGameObservation;
   // Returns private observation string if available.
   if (history_.size() - 1 == player) {
-    return std::to_string(history_[player].action);
+    return absl::StrCat("Received card ", history_[player].action);
   }
   // Returns clock tick when there is no private observation.
   return kClockTickObservation;
