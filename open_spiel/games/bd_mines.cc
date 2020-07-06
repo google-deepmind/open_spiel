@@ -400,6 +400,7 @@ const std::unordered_map<Element, Element, ElementHash> kElToFalling {
 constexpr int kDefaultMagicWallSteps = 140; // Number of steps before magic walls expire
 constexpr int kDefaultAmoebaChance = 20;    // Chance to spawn another amoeba (out of 256)
 constexpr double kDefaultAmoebaMaxPercentage = 0.16;   // Maximum number of amoeba before they collapse (percentage of map size)
+constexpr bool kDefaultObsShowIDs = false;  // Flag to show IDs instead of one-hot encoding
 
 // Facts about the game
 const GameType kGameType{
@@ -418,6 +419,7 @@ const GameType kGameType{
     /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
     {
+        {"obs_show_ids", GameParameter(kDefaultObsShowIDs)},
         {"magic_wall_steps", GameParameter(kDefaultMagicWallSteps)},
         {"amoeba_chance", GameParameter(kDefaultAmoebaChance)},
         {"amoeba_max_percentage", GameParameter(kDefaultAmoebaMaxPercentage)},
@@ -488,7 +490,7 @@ void BDMinesState::ObservationTensor(Player player,
   for (int row = 0; row < grid_.num_rows; ++row) {
     for (int col = 0; col < grid_.num_cols; ++col) {
       int channel = static_cast<int>(grid_.elements[i].visible_type);
-      view[{channel, row, col}] = 1.0;
+      view[{channel, row, col}] = obs_show_ids_ ? grid_.ids[i] : 1.0;
       ++i;
     }
   }
@@ -585,14 +587,17 @@ bool BDMinesState::HasProperty(int index, int property, int action) const {
 void BDMinesState::MoveItem(int index, int action) {
   int new_index = IndexFromAction(index, action);
   grid_.elements[new_index] = grid_.elements[index];
+  grid_.ids[new_index] = grid_.ids[index];
   grid_.elements[new_index].has_updated = true;
   grid_.elements[index] = kElEmpty;
+  grid_.ids[index] = 0;
 }
 
 // Set the new index to the given element
-void BDMinesState::SetItem(int index, Element element, int action) {
+void BDMinesState::SetItem(int index, Element element, int id, int action) {
   int new_index = IndexFromAction(index, action);
   grid_.elements[new_index] = element;
+  grid_.ids[new_index] = id;
   grid_.elements[new_index].has_updated = true;
 }
 
@@ -621,13 +626,13 @@ bool BDMinesState::CanRollRight(int index) const {
 
 // Roll the item to the left
 void BDMinesState::RollLeft(int index, Element element) {
-  SetItem(index, element);
+  SetItem(index, element, grid_.ids[index]);
   MoveItem(index, Directions::kLeft);
 }
 
 // Roll the item to the right
 void BDMinesState::RollRight(int index, Element element) {
-  SetItem(index, element);
+  SetItem(index, element, grid_.ids[index]);
   MoveItem(index, Directions::kRight);
 }
 
@@ -636,12 +641,12 @@ void BDMinesState::Push(int index, Element stationary, Element falling, int acti
   int new_index = IndexFromAction(index, action);
   // Check if same direction past element is empty so that theres room to push
   if (IsType(new_index, kElEmpty, action)) {
-    SetItem(index, kElEmpty);
-    SetItem(new_index, kElRockford);
     // Check if the element will become stationary or falling
     int next_index = IndexFromAction(new_index, action);
     bool is_empty = IsType(next_index, kElEmpty, Directions::kDown);
-    SetItem(new_index, is_empty ? falling : stationary, action);
+    SetItem(new_index, is_empty ? falling : stationary, grid_.ids[new_index], action);
+    // Move Rockford
+    MoveItem(index, action);
   }
 }
 
@@ -651,10 +656,10 @@ void BDMinesState::MoveThroughMagic(int index, Element element) {
   if (magic_wall_steps_ <= 0) {return;}
   magic_active_ = true;
   int index_below = IndexFromAction(index, Directions::kDown);
-  // Ned to ensure cell below magic wall is empty (so item can pass through)
+  // Need to ensure cell below magic wall is empty (so item can pass through)
   if (IsType(index_below, kElEmpty, Directions::kDown)) {
-    SetItem(index, kElEmpty);
-    SetItem(index_below, element, Directions::kDown);
+    SetItem(index, kElEmpty, 0);
+    SetItem(index_below, element, ++id_counter_, Directions::kDown);
   }
 }
 
@@ -663,14 +668,14 @@ void BDMinesState::Explode(int index, Element element, int action) {
   int new_index = IndexFromAction(index, action);
   auto it = kElementToExplosion.find(GetItem(new_index));
   Element ex = (it == kElementToExplosion.end()) ? kElExplosionEmpty : it->second;
-  SetItem(new_index, element);
+  SetItem(new_index, element, ++id_counter_);
   // Recursively check all directions for chain explosions
   for (int dir = 0; dir < kNumDirections; ++dir) {
     if (dir == Directions::kNone || !InBounds(new_index, dir)) {continue;}
     if (HasProperty(new_index, ElementProperties::kCanExplode, dir)) {
       Explode(new_index, ex, dir);
     } else if (HasProperty(new_index, ElementProperties::kConsumable, dir)) {
-      SetItem(new_index, ex, dir);
+      SetItem(new_index, ex, ++id_counter_, dir);
     }
   }
 }
@@ -679,14 +684,14 @@ void BDMinesState::OpenGate(Element element) {
   auto it = std::find(grid_.elements.begin(), grid_.elements.end(), element);
   if (it != grid_.elements.end()) {
     int index = std::distance(grid_.elements.begin(), it);
-    SetItem(index, kGateOpenMap.at(GetItem(index)));
+    SetItem(index, kGateOpenMap.at(GetItem(index)), grid_.ids[index]);
   }
 }
 
 void BDMinesState::UpdateBoulder(int index) {
   // Boulder falls if empty below
   if (IsType(index, kElEmpty, Directions::kDown)) {
-    SetItem(index, kElBoulderFalling);
+    SetItem(index, kElBoulderFalling, grid_.ids[index]);
     UpdateBoulderFalling(index);
   } else if (CanRollLeft(index)) {    // Roll left/right if possible
     RollLeft(index, kElBoulderFalling);
@@ -709,7 +714,7 @@ void BDMinesState::UpdateBoulderFalling(int index) {
     MoveThroughMagic(index, kMagicWallConversion.at(GetItem(index)));
   } else if (IsType(index, kElNut, Directions::kDown)) {
     // Falling on a nut, crack it open to reveal a diamond!
-    SetItem(index, kElDiamond, Directions::kDown);
+    SetItem(index, kElDiamond, ++id_counter_, Directions::kDown);
   } else if (IsType(index, kElNut, Directions::kDown)) {
     // Falling on a bomb, explode!
     auto it = kElementToExplosion.find(GetItem(index));
@@ -721,14 +726,14 @@ void BDMinesState::UpdateBoulderFalling(int index) {
     RollRight(index, kElBoulderFalling);
   } else {
     // Default options is for falling boulder to become stationary
-    SetItem(index, kElBoulder);
+    SetItem(index, kElBoulder, grid_.ids[index]);
   }
 }
 
 void BDMinesState::UpdateDiamond(int index) {
   // Diamond falls if empty below
   if (IsType(index, kElEmpty, Directions::kDown)) {
-    SetItem(index, kElDiamondFalling);
+    SetItem(index, kElDiamondFalling, grid_.ids[index]);
     UpdateDiamondFalling(index);
   } else if (CanRollLeft(index)) {    // Roll left/right if possible
     RollLeft(index, kElDiamondFalling);
@@ -757,14 +762,14 @@ void BDMinesState::UpdateDiamondFalling(int index) {
     RollRight(index, kElDiamondFalling);
   } else {
     // Default options is for falling diamond to become stationary
-    SetItem(index, kElDiamond);
+    SetItem(index, kElDiamond, grid_.ids[index]);
   }
 }
 
 void BDMinesState::UpdateNut(int index) {
   // Nut falls if empty below
   if (IsType(index, kElEmpty, Directions::kDown)) {
-    SetItem(index, kElNutFalling);
+    SetItem(index, kElNutFalling, grid_.ids[index]);
     UpdateNutFalling(index);
   } else if (CanRollLeft(index)) {    // Roll left/right
     RollLeft(index, kElNutFalling);
@@ -783,14 +788,14 @@ void BDMinesState::UpdateNutFalling(int index) {
     RollRight(index, kElNutFalling);
   } else {
     // Default options is for falling nut to become stationary
-    SetItem(index, kElNut);
+    SetItem(index, kElNut, grid_.ids[index]);
   }
 }
 
 void BDMinesState::UpdateBomb(int index) {
-  // Nut falls if empty below
+  // Bomb falls if empty below
   if (IsType(index, kElEmpty, Directions::kDown)) {
-    SetItem(index, kElBombFalling);
+    SetItem(index, kElBombFalling, grid_.ids[index]);
     UpdateBombFalling(index);
   } else if (CanRollLeft(index)) {    // Roll left/right
     RollLeft(index, kElBomb);
@@ -818,7 +823,7 @@ void BDMinesState::UpdateBombFalling(int index) {
 void BDMinesState::UpdateExit(int index) {
   // Open exit if enough gems collected
   if (gems_collected_ >= gems_required_) {
-    SetItem(index, kElExitOpen);
+    SetItem(index, kElExitOpen, grid_.ids[index]);
   }
 }
 
@@ -845,13 +850,13 @@ void BDMinesState::UpdateRockford(int index, int action) {
     // Walking through an open gate
     int index_gate = IndexFromAction(index, action);
       if (IsType(index_gate, kElEmpty, action)) {
-      SetItem(index, kElEmpty);
-      SetItem(index_gate, kElRockford, action);
+      SetItem(index_gate, kElRockford, grid_.ids[index], action);
+      SetItem(index, kElEmpty, 0);
     }
   } else if (IsType(index, kElExitOpen, action)) {
     // Walking into exit after collecting enough gems
     MoveItem(index, action);
-    SetItem(index, kElRockfordInExit, action);
+    SetItem(index, kElRockfordInExit, ++id_counter_, action);
     current_reward_ += steps_remaining_;
     sum_reward_ += steps_remaining_;
   }
@@ -866,14 +871,14 @@ void BDMinesState::UpdateFirefly(int index, int action) {
     Explode(index, ex);
   } else if (IsType(index, kElEmpty, new_dir)) {
     // Fireflies always try to rotate left, otherwise continue forward
-    SetItem(index, kDirectionToFirefly.at(new_dir));
+    SetItem(index, kDirectionToFirefly.at(new_dir), grid_.ids[index]);
     MoveItem(index, new_dir);
   } else if (IsType(index, kElEmpty, action)) {
-    SetItem(index, kDirectionToFirefly.at(action));
+    SetItem(index, kDirectionToFirefly.at(action), grid_.ids[index]);
     MoveItem(index, action);
   } else {
     // No other options, rotate right
-    SetItem(index, kDirectionToFirefly.at(kRotateRight.at(action)));
+    SetItem(index, kDirectionToFirefly.at(kRotateRight.at(action)), grid_.ids[index]);
   }
 }
 
@@ -886,14 +891,14 @@ void BDMinesState::UpdateButterfly(int index, int action) {
     Explode(index, ex);
   } else if (IsType(index, kElEmpty, new_dir)) {
     // Butterflies always try to rotate right, otherwise continue forward
-    SetItem(index, kDirectionToButterfly.at(new_dir));
+    SetItem(index, kDirectionToButterfly.at(new_dir), grid_.ids[index]);
     MoveItem(index, new_dir);
   } else if (IsType(index, kElEmpty, action)) {
-    SetItem(index, kDirectionToButterfly.at(action));
+    SetItem(index, kDirectionToButterfly.at(action), grid_.ids[index]);
     MoveItem(index, action);
   } else {
     // No other options, rotate right
-    SetItem(index, kDirectionToButterfly.at(kRotateLeft.at(action)));
+    SetItem(index, kDirectionToButterfly.at(kRotateLeft.at(action)), grid_.ids[index]);
   }
 }
 
@@ -918,7 +923,7 @@ void BDMinesState::UpdateYamYam(int index, int action) {
     // Roll available directions
     if (open_dirs.size() > 0) {
       int new_dir = open_dirs[rng_() % open_dirs.size()];
-      SetItem(index, kDirectionToYamYam.at(new_dir));
+      SetItem(index, kDirectionToYamYam.at(new_dir), grid_.ids[index]);
     }
   }
 }
@@ -926,18 +931,18 @@ void BDMinesState::UpdateYamYam(int index, int action) {
 void BDMinesState::UpdateMagicWall(int index) {
   // Dorminant, active, then expired once time runs out
   if (magic_active_) {
-    SetItem(index, kElWallMagicOn);
+    SetItem(index, kElWallMagicOn, grid_.ids[index]);
   } else if (magic_wall_steps_ > 0) {
-    SetItem(index, kElWallMagicDormant);
+    SetItem(index, kElWallMagicDormant, grid_.ids[index]);
   } else {
-    SetItem(index, kElWallMagicExpired);
+    SetItem(index, kElWallMagicExpired, grid_.ids[index]);
   }
 }
 
 void BDMinesState::UpdateAmoeba(int index) {
   // Replace amoebas if swap element set
   if (amoeba_swap_ != kNullElement) {
-    SetItem(index, amoeba_swap_);
+    SetItem(index, amoeba_swap_, ++id_counter_);
     return;
   }
   ++amoeba_size_;
@@ -949,12 +954,12 @@ void BDMinesState::UpdateAmoeba(int index) {
   bool will_grow = (rng_() % 256) < amoeba_chance_;
   int grow_dir = rng_() % kNumActions;
   if (will_grow && (IsType(index, kElEmpty, grow_dir) || IsType(index, kElDirt, grow_dir))) {
-    SetItem(index, kElAmoeba, grow_dir);
+    SetItem(index, kElAmoeba, grow_dir, ++id_counter_);
   }
 }
 
 void BDMinesState::UpdateExplosions(int index) {
-  SetItem(index, kExplosionToElement.at(GetItem(index)));
+  SetItem(index, kExplosionToElement.at(GetItem(index)), ++id_counter_);
 }
 
 void BDMinesState::StartScan() {
@@ -1092,6 +1097,8 @@ std::string BDMinesState::Serialize() const {
   absl::StrAppend(&out_str, gems_collected_, ",");
   absl::StrAppend(&out_str, current_reward_, ",");
   absl::StrAppend(&out_str, sum_reward_, ",");
+  absl::StrAppend(&out_str, obs_show_ids_, ",");
+  absl::StrAppend(&out_str, id_counter_, ",");
   absl::StrAppend(&out_str, cur_player_, "\n");
   // grid contents
   int col_counter = 0;
@@ -1113,6 +1120,26 @@ std::unique_ptr<State> BDMinesState::Clone() const {
   return std::unique_ptr<State>(new BDMinesState(*this));
 }
 
+BDMinesState::BDMinesState(std::shared_ptr<const Game> game, int steps_remaining, int magic_wall_steps,
+               bool magic_active, int amoeba_max_size, int amoeba_size, int amoeba_chance, 
+               Element amoeba_swap, bool amoeba_enclosed, int gems_required, int gems_collected, 
+               int current_reward, int sum_reward, Grid grid, int rng_seed, bool obs_show_ids, 
+               int id_counter, Player player) : 
+      State(game), steps_remaining_(steps_remaining), magic_wall_steps_(magic_wall_steps),
+      magic_active_(magic_active), amoeba_max_size_(amoeba_max_size), amoeba_size_(amoeba_size),
+      amoeba_chance_(amoeba_chance), amoeba_swap_(amoeba_swap), amoeba_enclosed_(amoeba_enclosed),
+      gems_required_(gems_required), gems_collected_(gems_collected), current_reward_(current_reward),
+      sum_reward_(sum_reward), grid_(grid), rng_(rng_seed), obs_show_ids_(obs_show_ids),
+      id_counter_(id_counter), cur_player_(player) 
+      {
+        // Initialize the grid element IDs
+        grid_.ids.clear();
+        for (std::size_t i = 0; i < grid.elements.size(); ++i) {
+          int id = (grid.elements[i] == kElEmpty || grid.elements[i] == kElDirt) ? 0 : ++id_counter_;
+          grid_.ids.push_back(id);
+        }
+      }
+
 // ------ game -------
 
 std::unique_ptr<State> BDMinesGame::DeserializeState(const std::string& str) const {
@@ -1126,8 +1153,8 @@ std::unique_ptr<State> BDMinesGame::DeserializeState(const std::string& str) con
   std::vector<std::string> property_line = absl::StrSplit(lines[0], ',');
   Grid grid;
   int steps_remaining, magic_wall_steps, amoeba_max_size, amoeba_size, amoeba_chance,
-      gems_required, gems_collected, current_reward, sum_reward, cur_player;
-  bool magic_active, amoeba_enclosed;
+      gems_required, gems_collected, current_reward, sum_reward, id_counter, cur_player;
+  bool magic_active, amoeba_enclosed, obs_show_ids;
   Element amoeba_swap;
   try {
     grid.num_cols = std::stoi(property_line[0]);
@@ -1144,7 +1171,9 @@ std::unique_ptr<State> BDMinesGame::DeserializeState(const std::string& str) con
     gems_collected = std::stoi(property_line[11]);
     current_reward = std::stoi(property_line[12]);
     sum_reward = std::stoi(property_line[13]);
-    cur_player = std::stoi(property_line[14]);
+    obs_show_ids = std::stoi(property_line[14]);
+    id_counter = std::stoi(property_line[15]);
+    cur_player = std::stoi(property_line[16]);
   } catch (...) {
     SpielFatalError("Invalid grid properties2 ");
   }
@@ -1180,7 +1209,7 @@ std::unique_ptr<State> BDMinesGame::DeserializeState(const std::string& str) con
       new BDMinesState(shared_from_this(), steps_remaining, magic_wall_steps,
                magic_active, amoeba_max_size, amoeba_size, amoeba_chance, amoeba_swap,
                amoeba_enclosed, gems_required, gems_collected, current_reward,
-               sum_reward, grid, ++rng_seed_, cur_player));
+               sum_reward, grid, ++rng_seed_, obs_show_ids, id_counter, cur_player));
 }
 
 int BDMinesGame::NumDistinctActions() const { 
@@ -1227,6 +1256,7 @@ std::vector<int> BDMinesGame::ObservationTensorShape() const {
 
 Grid BDMinesGame::ParseGrid(const std::string& grid_string, double amoeba_max_percentage) {
   Grid grid;
+
   std::vector<std::string> lines = absl::StrSplit(grid_string, '\n');
   if (lines.size() < 2) {
     SpielFatalError("Empty map string passed.");
@@ -1276,6 +1306,7 @@ Grid BDMinesGame::ParseGrid(const std::string& grid_string, double amoeba_max_pe
 
 BDMinesGame::BDMinesGame(const GameParameters& params)
     : Game(kGameType, params),
+      obs_show_ids_(ParameterValue<bool>("obs_show_ids")),
       magic_wall_steps_(ParameterValue<int>("magic_wall_steps")),
       amoeba_chance_(ParameterValue<int>("amoeba_chance")),
       rng_seed_(ParameterValue<int>("rng_seed")),

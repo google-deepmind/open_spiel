@@ -155,6 +155,7 @@ enum class VisibleCellType {
   kYamYam = 30
 };
 
+constexpr int kNumHiddenCellType = 47;
 constexpr int kNumVisibleCellType = 31;
 
 // Directions the interactions take place
@@ -199,6 +200,7 @@ struct Grid {
   int num_rows;
   int num_cols;
   std::vector<Element> elements;
+  std::vector<int> ids;
 };
 
 // Default map, first level of Boulder Dash
@@ -223,23 +225,8 @@ class BDMinesState : public State {
   BDMinesState(std::shared_ptr<const Game> game, int steps_remaining, int magic_wall_steps,
                bool magic_active, int amoeba_max_size, int amoeba_size, int amoeba_chance, 
                Element amoeba_swap, bool amoeba_enclosed, int gems_required, int gems_collected, 
-               int current_reward, int sum_reward, Grid grid, int rng_seed, Player player) : 
-      State(game),
-      steps_remaining_(steps_remaining),
-      magic_wall_steps_(magic_wall_steps),
-      magic_active_(magic_active),
-      amoeba_max_size_(amoeba_max_size),
-      amoeba_size_(amoeba_size),
-      amoeba_chance_(amoeba_chance),
-      amoeba_swap_(amoeba_swap),
-      amoeba_enclosed_(amoeba_enclosed),
-      gems_required_(gems_required),
-      gems_collected_(gems_collected),
-      current_reward_(current_reward),
-      sum_reward_(sum_reward),
-      grid_(grid),
-      rng_(rng_seed),
-      cur_player_(player) {}
+               int current_reward, int sum_reward, Grid grid, int rng_seed, bool obs_show_ids, 
+               int id_counter, Player player);
 
   Player CurrentPlayer() const override;
   std::string ActionToString(Player player, Action move_id) const override;
@@ -266,7 +253,7 @@ class BDMinesState : public State {
   bool IsType(int index, Element element, int action=Directions::kNone) const;
   bool HasProperty(int index, int property, int action=Directions::kNone) const;
   void MoveItem(int index, int action);
-  void SetItem(int index, Element element, int action=Directions::kNone);
+  void SetItem(int index, Element element, int id, int action=Directions::kNone);
   Element GetItem(int index, int action=Directions::kNone) const;
   bool IsTypeAdjacent(int index, Element element) const;
 
@@ -313,6 +300,8 @@ class BDMinesState : public State {
   int sum_reward_;        // cumulative reward
   Grid grid_;             // grid representing elements/positions
   mutable std::mt19937 rng_;      // Internal rng
+  bool obs_show_ids_;     // Flag to show IDs in observation tensor
+  int id_counter_;        // Next ID tracker
 
   Player cur_player_ = -1;  // Player to play.
 };
@@ -326,7 +315,7 @@ class BDMinesGame : public Game {
     return std::unique_ptr<State>(
         new BDMinesState(shared_from_this(), max_steps_, magic_wall_steps_, false, amoeba_max_size_,
                          0, amoeba_chance_, kNullElement, true, gems_required_, 0, 0, 0, 
-                         grid_, ++rng_seed_, 0));
+                         grid_, ++rng_seed_, obs_show_ids_, 0, 0));
   }
   int MaxGameLength() const override;
   int NumPlayers() const override;
@@ -343,6 +332,7 @@ protected:
   Grid ParseGrid(const std::string& grid_string, double amoeba_max_percentage);
 
  private:
+  bool obs_show_ids_;     // Flag to show IDs in observation tensor
   int magic_wall_steps_;  // steps before magic wall expire (after active)
   int amoeba_chance_;     // Chance to spawn another amoeba (out of 256)
   mutable int rng_seed_;  // Seed for stochastic element transitions
