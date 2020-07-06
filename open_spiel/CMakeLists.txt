@@ -125,29 +125,29 @@ set (BUILD_TESTING OFF)
 enable_testing()
 
 set (OPEN_SPIEL_CORE_FILES
-  canonical_game_strings.h
   canonical_game_strings.cc
-  fog_constants.h
-  game_parameters.h
+  canonical_game_strings.h
+  fog/fog_constants.h
+  fog/observation_history.cc
+  fog/observation_history.h
   game_parameters.cc
-  spiel.h
-  spiel.cc
-  spiel_bots.h
-  spiel_bots.cc
-  matrix_game.h
+  game_parameters.h
   matrix_game.cc
+  matrix_game.h
   normal_form_game.h
-  observation_history.h
-  observation_history.cc
-  policy.h
   policy.cc
-  simultaneous_move_game.h
+  policy.h
   simultaneous_move_game.cc
+  simultaneous_move_game.h
+  spiel.cc
+  spiel.h
+  spiel_bots.cc
+  spiel_bots.h
   spiel_constants.h
-  spiel_utils.h
   spiel_utils.cc
-  tensor_game.h
+  spiel_utils.h
   tensor_game.cc
+  tensor_game.h
 )
 
 # We add the subdirectory here so open_spiel_core can #include absl.

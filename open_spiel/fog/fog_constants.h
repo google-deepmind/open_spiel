@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPEN_SPIEL_FOG_CONSTANTS_H_
-#define OPEN_SPIEL_FOG_CONSTANTS_H_
+#ifndef OPEN_SPIEL_FOG_FOG_CONSTANTS_H_
+#define OPEN_SPIEL_FOG_FOG_CONSTANTS_H_
 
 // This file describes constants that are used for games that implement
 // factored observations. We use them for Factored-Observation Games
@@ -117,4 +117,4 @@ inline const char* kClockTickObservation = "clock tick";
 
 }  // namespace open_spiel
 
-#endif  // OPEN_SPIEL_FOG_CONSTANTS_H_
+#endif  // OPEN_SPIEL_FOG_FOG_CONSTANTS_H_

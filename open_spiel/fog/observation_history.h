@@ -18,7 +18,7 @@
 #include <utility>
 #include <vector>
 
-#include "open_spiel/fog_constants.h"
+#include "open_spiel/fog/fog_constants.h"
 #include "open_spiel/spiel_constants.h"
 
 namespace open_spiel {

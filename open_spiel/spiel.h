@@ -30,9 +30,9 @@
 #include "open_spiel/abseil-cpp/absl/random/bit_gen_ref.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
-#include "open_spiel/fog_constants.h"
+#include "open_spiel/fog/fog_constants.h"
+#include "open_spiel/fog/observation_history.h"
 #include "open_spiel/game_parameters.h"
-#include "open_spiel/observation_history.h"
 #include "open_spiel/spiel_constants.h"
 #include "open_spiel/spiel_utils.h"
 

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "open_spiel/observation_history.h"
+#include "open_spiel/fog/observation_history.h"
 
 namespace open_spiel {
 
