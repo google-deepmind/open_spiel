@@ -1,8 +1,6 @@
 set(GAME_SOURCES
   backgammon.cc
   backgammon.h
-  bd_mines.cc
-  bd_mines.h
   blotto.cc
   blotto.h
   breakthrough.cc
@@ -94,6 +92,8 @@ set(GAME_SOURCES
   quoridor.h
   skat.cc
   skat.h
+  stones_n_gems.cc
+  stones_n_gems.h
   tic_tac_toe.cc
   tic_tac_toe.h
   tiny_bridge.cc
@@ -195,10 +195,6 @@ target_compile_definitions(bridge_double_dummy_solver PUBLIC DDS_NO_STATIC_INIT)
 add_executable(backgammon_test backgammon_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(backgammon_test backgammon_test)
-
-add_executable(bd_mines_test bd_mines_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(bd_mines_test bd_mines_test)
 
 add_executable(blotto_test blotto_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
@@ -362,6 +358,10 @@ add_test(quoridor_test quoridor_test)
 add_executable(skat_test skat_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(skat_test skat_test)
+
+add_executable(stones_n_gems_test stones_n_gems_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(stones_n_gems_test stones_n_gems_test)
 
 add_executable(tic_tac_toe_test tic_tac_toe_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)

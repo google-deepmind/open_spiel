@@ -34,7 +34,6 @@ class PyspielTest(absltest.TestCase):
     # Specify game names in alphabetical order, to make the test easier to read.
     expected = set([
         "backgammon",
-        "bd_mines",
         "blotto",
         "breakthrough",
         "bridge",
@@ -84,6 +83,7 @@ class PyspielTest(absltest.TestCase):
         "pig",
         "quoridor",
         "skat",
+        "stones_n_gems",
         "tic_tac_toe",
         "tiny_bridge_2p",
         "tiny_bridge_4p",
