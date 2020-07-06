@@ -32,6 +32,8 @@
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/fog_constants.h"
 #include "open_spiel/game_parameters.h"
+#include "open_spiel/observation_history.h"
+#include "open_spiel/spiel_constants.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
@@ -48,10 +50,6 @@ enum PlayerId {
   // What is returned as the player id on terminal nodes.
   kTerminalPlayerId = -4
 };
-
-// Constant representing an invalid action.
-inline constexpr Action kInvalidAction = -1;
-
 
 // Static information for a game. This will determine what algorithms are
 // applicable. For example, minimax search is only applicable to two-player,
@@ -214,6 +212,9 @@ class State {
   virtual void ApplyAction(Action action_id) {
     // history_ needs to be modified *after* DoApplyAction which could
     // be using it.
+
+    // Cannot apply an invalid action.
+    SPIEL_CHECK_NE(action_id, kInvalidAction);
     Player player = CurrentPlayer();
     DoApplyAction(action_id);
     history_.push_back({player, action_id});
@@ -340,6 +341,11 @@ class State {
   // player with a fixed (randomized) policy.
   virtual bool IsChanceNode() const {
     return CurrentPlayer() == kChancePlayerId;
+  }
+
+  // Is this state a player node, with a single player acting?
+  virtual bool IsPlayerNode() const {
+    return CurrentPlayer() >= 0;
   }
 
   // Is this state a node that requires simultaneous action choices from more
@@ -506,6 +512,26 @@ class State {
     return ObservationTensor(CurrentPlayer());
   }
 
+  // Return a history of actions and observations for a given player.
+  // This method can be called only if the game provides observations strings.
+  //
+  // Action-Observation histories partition the game tree in the same way
+  // as information states, but they contain more structured information.
+  // Algorithms can use this structured information for targeted traversal
+  // of imperfect information games.
+  //
+  // As this method requires a storage of vectors of strings, it is not
+  // implemented in State by default. You can use WithObservationHistory
+  // game transformation that will populate these vectors automatically.
+  virtual const AOHistory& ActionObservationHistory(Player) const {
+    SpielFatalError("ActionObservationHistory is not implemented.");
+  }
+
+  // Return Action-Observation history for the current player.
+  const AOHistory& ActionObservationHistory() const {
+    return ActionObservationHistory(CurrentPlayer());
+  }
+
   // The public / private observations factorize observations into their
   // (mostly) non-overlapping public and private parts (they overlap only for
   // the start of the game and time). See also <open_spiel/fog_constants.h>
@@ -595,6 +621,21 @@ class State {
     // special values. See PlayerId.
     SPIEL_CHECK_GE(player, 0);
     return PrivateObservationString(player);
+  }
+
+  // Return a history of public observations.
+  // This method can be called only if the game provides factored observations
+  // strings.
+  //
+  // Public observation history identifies the current public state, and is
+  // useful for integration with public state API -- you can construct a
+  // PublicState by using the public observation history.
+  //
+  // As this method requires a storage of vectors of strings, it is not
+  // implemented in State by default. You can use WithObservationHistory
+  // game transformation that will populate these vectors automatically.
+  virtual const std::vector<std::string>& PublicObservationHistory() const {
+    SpielFatalError("PublicObservationHistory is not implemented.");
   }
 
   // Return a copy of this state.

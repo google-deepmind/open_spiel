@@ -137,10 +137,13 @@ set (OPEN_SPIEL_CORE_FILES
   matrix_game.h
   matrix_game.cc
   normal_form_game.h
+  observation_history.h
+  observation_history.cc
   policy.h
   policy.cc
   simultaneous_move_game.h
   simultaneous_move_game.cc
+  spiel_constants.h
   spiel_utils.h
   spiel_utils.cc
   tensor_game.h

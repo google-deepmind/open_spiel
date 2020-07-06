@@ -9,6 +9,8 @@ add_library (game_transforms OBJECT
   normal_form_extensive_game.h
   turn_based_simultaneous_game.cc
   turn_based_simultaneous_game.h
+  with_observation_history.cc
+  with_observation_history.h
 )
 target_include_directories (game_transforms PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -17,6 +19,12 @@ add_executable(turn_based_simultaneous_game_test
                ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(turn_based_simultaneous_game_test turn_based_simultaneous_game_test)
+
+add_executable(with_observation_history_test
+               with_observation_history_test.cc
+               ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(with_observation_history_test with_observation_history_test)
 
 add_executable(misere_test
                misere_test.cc
