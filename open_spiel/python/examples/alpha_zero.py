@@ -54,6 +54,7 @@ flags.DEFINE_integer(
      " simulations for n in range(eval_levels). Default of 7 means "
      "running mcts with up to 1000 times more simulations."))
 flags.DEFINE_string("search_type", 'mcts', 'Search type that will be used, either mcts or minimax')
+flags.DEFINE_integer("max_depth", 30, "The maximum depth for alpha beta search.")
 flags.DEFINE_integer("max_steps", 0, "How many learn steps before exiting.")
 flags.DEFINE_bool("quiet", True, "Don't show the moves as they're played.")
 flags.DEFINE_bool("verbose", False, "Show the MCTS stats of possible moves.")

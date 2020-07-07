@@ -210,20 +210,18 @@ def expectiminimax(state, depth, value_function, maximizing_player_id):
     return value, best_action
 
 
-class minimaxBot(pyspiel.Bot):
+class MinimaxBot(pyspiel.Bot):
 
   def __init__(self,
                game,
-               max_simulations,
                evaluator):
    
-    pyspiel.Bot.__init__(self) 
+    super().__init__(self) 
     self._game = game
-    # self.max_simulations = max_simulations
     # self.evaluator = evaluator
 
   def alpha_beta_search(self, state=None,
                       value_function=None,
-                      maximum_depth=100,
+                      maximum_depth=30,
                       maximizing_player_id=None):
     return alpha_beta_search(self._game, state, value_function, maximum_depth, maximizing_player_id)

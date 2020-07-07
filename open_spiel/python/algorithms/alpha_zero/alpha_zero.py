@@ -43,10 +43,12 @@ import sys
 import tempfile
 import time
 import traceback
+import enum
 
 import numpy as np
 
-from open_spiel.python.algorithms import mcts, minimax
+from open_spiel.python.algorithms import mcts
+from open_spiel.python.algorithms import minimax
 from open_spiel.python.algorithms.alpha_zero import evaluator as evaluator_lib
 from open_spiel.python.algorithms.alpha_zero import model as model_lib
 import pyspiel
@@ -59,7 +61,8 @@ from open_spiel.python.utils import stats
 class TrajectoryState(object):
   """A particular point along a trajectory."""
 
-  def __init__(self, observation, current_player, legals_mask, action, policy, value):
+  def __init__(self, observation, current_player, legals_mask, action, policy, 
+              value):
     self.observation = observation
     self.current_player = current_player
     self.legals_mask = legals_mask
@@ -106,6 +109,16 @@ class Buffer(object):
     return random.sample(self.data, count)
 
 
+class valid_search_types(enum.Enum):
+    minimax = "minimax"
+    mcts = "mcts"
+
+
+class valid_bot_types(enum.Enum):
+    minimaxBot = minimax.MinimaxBot
+    mctsBot = mcts.MCTSBot
+
+
 class Config(collections.namedtuple(
     "Config", [
         "game",
@@ -129,6 +142,7 @@ class Config(collections.namedtuple(
         "temperature",
         "temperature_drop",
         "search_type",
+        "max_depth",
 
         "nn_model",
         "nn_width",
@@ -184,14 +198,15 @@ def watcher(fn):
 
 def _init_bot(config, game, evaluator_, evaluation):
   """Initializes a bot."""
-  if config.search_type.lower() == "minimax":
-    return minimax.minimaxBot(
+  if config.search_type is valid_search_types.minimax:
+    return minimax.MinimaxBot(
       game,
       max_simulations=config.max_simulations,
       evaluator=evaluator_)
 
-  elif config.search_type.lower() == "mcts": # default 
-    noise = None if evaluation else (config.policy_epsilon, config.policy_alpha)
+  elif config.search_type is valid_search_types.mcts: # default 
+    noise = None if evaluation else (config.policy_epsilon, 
+                                     config.policy_alpha)
     return mcts.MCTSBot(
       game,
       config.uct_c,
@@ -201,11 +216,12 @@ def _init_bot(config, game, evaluator_, evaluation):
       dirichlet_noise=noise,
       child_selection_fn=mcts.SearchNode.puct_value,
       verbose=False)
+  else:
+    raise
   
   
-
-
-def _play_game(logger, game_num, game, bots, temperature, temperature_drop):
+def _play_game(config, logger, game_num, game, bots, temperature, 
+               temperature_drop, maximum_depth=30):
   """Play one game, return the trajectory."""
   trajectory = Trajectory()
   actions = []
@@ -215,9 +231,10 @@ def _play_game(logger, game_num, game, bots, temperature, temperature_drop):
   while not state.is_terminal():
     cur_bot = bots[state.current_player()]
     policy = np.zeros(game.num_distinct_actions())
-    if type(cur_bot) == minimax.minimaxBot:
-      value, action = cur_bot.alpha_beta_search(state=state, maximum_depth=30)
-    elif type(cur_bot) == mcts.MCTSBot:
+    if isinstance(cur_bot, valid_bot_types.minimaxBot):
+      value, action = cur_bot.alpha_beta_search(state=state, 
+                                                maximum_depth=maximum_depth)
+    elif type(cur_bot) == valid_bot_types.mctsBot:
       root = cur_bot.mcts_search(state)
       for c in root.children:
         policy[c.action] = c.explore_count
@@ -228,6 +245,8 @@ def _play_game(logger, game_num, game, bots, temperature, temperature_drop):
       else:
         action = np.random.choice(len(policy), p=policy)
       value = root.total_reward / root.explore_count
+    else:
+      raise ValueError("Given bot is not a valid choice")
 
     trajectory.states.append(TrajectoryState(
         state.observation_tensor(), state.current_player(),
@@ -279,7 +298,7 @@ def actor(*, config, game, logger, queue):
     if not update_checkpoint(logger, queue, model, az_evaluator):
       return
     queue.put(_play_game(logger, game_num, game, bots, config.temperature,
-                         config.temperature_drop))
+                         config.temperature_drop, config.max_depth))
 
 
 @watcher
@@ -299,35 +318,27 @@ def evaluator(*, game, config, logger, queue):
     az_player = game_num % 2
     difficulty = (game_num // 2) % config.eval_levels
     max_simulations = int(config.max_simulations * (10 ** (difficulty / 2)))
-    bots = [_init_bot(config, game, az_evaluator, True)]
-    if config.search_type.lower() == "minimax":
-      bots.append(
-          minimax.minimaxBot( # HERE 
-            game,
-            random_evaluator,
-            max_simulations)
-      )
-    elif config.search_type.lower() == "mcts":
-      bots.append(
-          mcts.MCTSBot(
+    bots = [
+      _init_bot(config, game, az_evaluator, True),
+      mcts.MCTSBot(
             game,
             config.uct_c,
             max_simulations,
             random_evaluator,
             solve=True,
-            verbose=False)
-      )
+            verbose=False)]
+
     if az_player == 1:
       bots = list(reversed(bots))
 
     trajectory = _play_game(logger, game_num, game, bots, temperature=1,
-                            temperature_drop=0)
+                            temperature_drop=0, config.max_depth)
     results.append(trajectory.returns[az_player])
     queue.put((difficulty, trajectory.returns[az_player]))
 
     logger.print("AZ: {}, {}: {}, AZ avg/{}: {:.3f}".format(
         trajectory.returns[az_player],
-        config.search_type,
+        config.search_type.value,
         trajectory.returns[1 - az_player],
         len(results), np.mean(results.data)))
 
@@ -511,7 +522,8 @@ def alpha_zero(config: Config):
   game = pyspiel.load_game(config.game)
   config = config._replace(
       observation_shape=game.observation_tensor_shape(),
-      output_size=game.num_distinct_actions())
+      output_size=game.num_distinct_actions(),
+      search_type=valid_search_types(config.search_type.lower()))
   
   print("Starting game", config.game)
   if game.num_players() != 2:
@@ -523,7 +535,7 @@ def alpha_zero(config: Config):
     raise ValueError("Game must have sequential turns.")
   if game_type.chance_mode != pyspiel.GameType.ChanceMode.DETERMINISTIC:
     raise ValueError("Game must be deterministic.")
-  if config.search_type.lower() not in ["minimax", "mcts"]:
+  if config.search_type not in valid_search_types:
     raise ValueError("Search type can be either minimax or mcts.")
 
   path = config.path
