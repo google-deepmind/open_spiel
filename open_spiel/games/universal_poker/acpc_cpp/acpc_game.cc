@@ -129,6 +129,7 @@ bool ACPCGame::operator==(const ACPCGame &other) const {
 
 std::string ACPCGame::ToString() const {
   char buf[STRING_BUFFERSIZE];
+  memset(buf, 0, STRING_BUFFERSIZE);
   FILE *f = fmemopen(&buf, STRING_BUFFERSIZE, "w");
   project_acpc_server::printGame(f, acpc_game_.get());
   std::ostringstream result;
