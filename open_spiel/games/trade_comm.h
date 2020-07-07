@@ -55,8 +55,6 @@ enum class Phase {
   kTrade,
 };
 
-class TradeCommGame;
-
 class TradeCommState : public State {
  public:
   TradeCommState(std::shared_ptr<const Game> game, int num_items);
