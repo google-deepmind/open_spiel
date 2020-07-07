@@ -31,7 +31,6 @@
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/fog/fog_constants.h"
-#include "open_spiel/fog/observation_history.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel_constants.h"
 #include "open_spiel/spiel_utils.h"
@@ -355,6 +354,10 @@ class State {
     return CurrentPlayer() == kSimultaneousPlayerId;
   }
 
+  bool IsRoot() const {
+    return History().empty();
+  }
+
   // We store (player, action) pairs in the history.
   struct PlayerAction {
     Player player;
@@ -363,7 +366,7 @@ class State {
 
   // For backward-compatibility reasons, this is the history of actions only.
   // To get the (player, action) pairs, use `FullHistory` instead.
-  std::vector<Action> History() const {
+  virtual std::vector<Action> History() const {
     std::vector<Action> history;
     history.reserve(history_.size());
     for (auto& h : history_) history.push_back(h.action);
@@ -371,7 +374,7 @@ class State {
   }
 
   // The full (player, action) history.
-  std::vector<PlayerAction> FullHistory() const { return history_; }
+  virtual std::vector<PlayerAction> FullHistory() const { return history_; }
 
   // A string representation for the history. There should be a one to one
   // mapping between histories (i.e. sequences of actions for all players,
@@ -512,26 +515,6 @@ class State {
     return ObservationTensor(CurrentPlayer());
   }
 
-  // Return a history of actions and observations for a given player.
-  // This method can be called only if the game provides observations strings.
-  //
-  // Action-Observation histories partition the game tree in the same way
-  // as information states, but they contain more structured information.
-  // Algorithms can use this structured information for targeted traversal
-  // of imperfect information games.
-  //
-  // As this method requires a storage of vectors of strings, it is not
-  // implemented in State by default. You can use WithObservationHistory
-  // game transformation that will populate these vectors automatically.
-  virtual const AOHistory& ActionObservationHistory(Player) const {
-    SpielFatalError("ActionObservationHistory is not implemented.");
-  }
-
-  // Return Action-Observation history for the current player.
-  const AOHistory& ActionObservationHistory() const {
-    return ActionObservationHistory(CurrentPlayer());
-  }
-
   // The public / private observations factorize observations into their
   // (mostly) non-overlapping public and private parts (they overlap only for
   // the start of the game and time). See also <open_spiel/fog_constants.h>
@@ -621,21 +604,6 @@ class State {
     // special values. See PlayerId.
     SPIEL_CHECK_GE(player, 0);
     return PrivateObservationString(player);
-  }
-
-  // Return a history of public observations.
-  // This method can be called only if the game provides factored observations
-  // strings.
-  //
-  // Public observation history identifies the current public state, and is
-  // useful for integration with public state API -- you can construct a
-  // PublicState by using the public observation history.
-  //
-  // As this method requires a storage of vectors of strings, it is not
-  // implemented in State by default. You can use WithObservationHistory
-  // game transformation that will populate these vectors automatically.
-  virtual const std::vector<std::string>& PublicObservationHistory() const {
-    SpielFatalError("PublicObservationHistory is not implemented.");
   }
 
   // Return a copy of this state.

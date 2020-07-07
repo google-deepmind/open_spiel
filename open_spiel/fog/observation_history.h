@@ -99,11 +99,69 @@ class AOHistory {
 
   const ActionOrObservation& back() const { history_.back(); }
 
-  bool operator==(const AOHistory& other) const;
+  bool operator==(const AOHistory& other) const {
+    return history_ == other.history_;
+  };
+};
+
+// Public-observation histories partition the game tree in the same way
+// as information states, but they contain more structured information.
+// Some algorithms use this structured information for targeted traversal
+// of the imperfect information tree.
+class POHistory {
+ private:
+  std::vector<std::string> history_;
+
+ public:
+  POHistory() = default;
+
+  POHistory(std::initializer_list<std::string> history)
+      : history_(std::move(history)) {
+    SPIEL_CHECK_FALSE(history_.empty());
+    SPIEL_CHECK_EQ(history_.at(0), kStartOfGameObservation);
+  }
+
+  POHistory(const POHistory&) = default;
+  ~POHistory() = default;
+
+  const std::vector<std::string>& History() const { return history_; }
+
+  // Is the current history prefix of the other one?
+  // Empty POHistory is a prefix of all POHistories.
+  bool IsPrefix(const POHistory& other) const;
+
+  // Does the Public-observation history correspond to the initial state
+  // (root node)?
+  bool IsRoot() const {
+    SPIEL_CHECK_EQ(history_.at(0), kStartOfGameObservation);
+    return history_.size() == 1;
+  }
+
+  // A number of helper methods, so we don't need to access history directly.
+  void reserve(size_t n) {
+    history_.reserve(n);
+  }
+  void push_back(const std::string& observation) {
+    SPIEL_CHECK_TRUE(
+        !history_.empty() || observation == kStartOfGameObservation);
+    history_.push_back(observation);
+  }
+  void pop_back() {
+    // Do not pop the kStartOfGameObservation.
+    SPIEL_CHECK_GE(history_.size(), 2);
+    history_.pop_back();
+  }
+
+  const std::string& back() const { history_.back(); }
+
+  bool operator==(const POHistory& other) const {
+    return history_ == other.history_;
+  };
 };
 
 std::ostream& operator<<(std::ostream& os, const ActionOrObservation& aoo);
 std::ostream& operator<<(std::ostream& os, const AOHistory& aoh);
+std::ostream& operator<<(std::ostream& os, const POHistory& aoh);
 
 }  // namespace open_spiel
 

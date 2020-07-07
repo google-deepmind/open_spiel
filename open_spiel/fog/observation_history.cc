@@ -24,16 +24,6 @@ bool ActionOrObservation::operator==(const ActionOrObservation& other) const {
   return "This will never return.";
 }
 
-std::ostream& operator<<(std::ostream& os, const ActionOrObservation& aoo) {
-  if (aoo.tag == ActionOrObservation::Either::kAction) {
-    return os << "action='" << aoo.action << "'";
-  } else if (aoo.tag == ActionOrObservation::Either::kObservation) {
-    return os << "observation='" << aoo.observation << "'";
-  }
-  SpielFatalError("Unrecognized tag.");
-  return;  // "This will never return.";
-}
-
 bool AOHistory::IsPrefix(const AOHistory& other) const {
   const auto& a = history_;
   const auto& b = other.history_;
@@ -44,12 +34,32 @@ bool AOHistory::IsPrefix(const AOHistory& other) const {
   return std::equal(a.begin(), a.end(), b.begin());
 }
 
-bool AOHistory::operator==(const AOHistory& other) const {
-  return history_ == other.history_;
+bool POHistory::IsPrefix(const POHistory& other) const {
+  const auto& a = history_;
+  const auto& b = other.history_;
+  if (a.empty()) return true;
+  if (b.empty()) return false;  // True only if a is empty, handled before.
+  if (a.size() > b.size()) return false;
+  if (a.size() == b.size()) return a == b;
+  return std::equal(a.begin(), a.end(), b.begin());
+}
+
+std::ostream& operator<<(std::ostream& os, const ActionOrObservation& aoo) {
+  if (aoo.tag == ActionOrObservation::Either::kAction) {
+    return os << "action='" << aoo.action << "'";
+  } else if (aoo.tag == ActionOrObservation::Either::kObservation) {
+    return os << "observation='" << aoo.observation << "'";
+  }
+  SpielFatalError("Unrecognized tag.");
+  return;  // "This will never return.";
 }
 
 std::ostream& operator<<(std::ostream& os, const AOHistory& aoh) {
   return os << aoh.History();
+}
+
+std::ostream& operator<<(std::ostream& os, const POHistory& poh) {
+  return os << poh.History();
 }
 
 }  // namespace open_spiel

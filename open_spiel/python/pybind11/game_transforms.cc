@@ -18,7 +18,6 @@
 
 #include "open_spiel/game_transforms/normal_form_extensive_game.h"
 #include "open_spiel/game_transforms/turn_based_simultaneous_game.h"
-#include "open_spiel/game_transforms/with_observation_history.h"
 #include "pybind11/include/pybind11/detail/common.h"
 #include "pybind11/include/pybind11/detail/descr.h"
 #include "pybind11/include/pybind11/functional.h"
@@ -39,15 +38,6 @@ void init_pyspiel_game_transforms(py::module& m) {
         py::overload_cast<const std::string&, const GameParameters&>(
             &open_spiel::LoadGameAsTurnBased),
         "Converts a simultaneous game into an turn-based game with infosets.");
-
-  m.def("load_game_with_observation_history",
-        py::overload_cast<const std::string&>(&open_spiel::LoadGameWithObservationHistory),
-        "Provides saving of observation histories for State.");
-
-  m.def("load_game_with_observation_history",
-        py::overload_cast<const std::string&, const GameParameters&>(
-            &open_spiel::LoadGameWithObservationHistory),
-        "Provides saving of observation histories for State.");
 
   m.def("extensive_to_tensor_game", open_spiel::ExtensiveToTensorGame,
         "Converts an extensive-game to its equivalent tensor game, "
