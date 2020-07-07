@@ -85,6 +85,7 @@ def main(unused_argv):
       evaluation_window=FLAGS.evaluation_window,
       eval_levels=FLAGS.eval_levels,
       search_type=FLAGS.search_type,
+      max_depth=FLAGS.max_depth,
 
       nn_model=FLAGS.nn_model,
       nn_width=FLAGS.nn_width,
