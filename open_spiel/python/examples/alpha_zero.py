@@ -46,6 +46,7 @@ flags.DEFINE_string("path", None, "Where to save checkpoints.")
 flags.DEFINE_integer("checkpoint_freq", 100, "Save a checkpoint every N steps.")
 flags.DEFINE_integer("actors", 2, "How many actors to run.")
 flags.DEFINE_integer("evaluators", 1, "How many evaluators to run.")
+flags.DEFINE_integer("max_depth", 30, "The maximum depth for alpha beta search.")
 flags.DEFINE_integer("evaluation_window", 100,
                      "How many games to average results over.")
 flags.DEFINE_integer(
@@ -53,8 +54,7 @@ flags.DEFINE_integer(
     ("Play evaluation games vs MCTS+Solver, with max_simulations*10^(n/2)"
      " simulations for n in range(eval_levels). Default of 7 means "
      "running mcts with up to 1000 times more simulations."))
-flags.DEFINE_string("search_type", 'mcts', 'Search type that will be used, either mcts or minimax')
-flags.DEFINE_integer("max_depth", 30, "The maximum depth for alpha beta search.")
+flags.DEFINE_string("search_type", "mcts", "Search type that will be used, either mcts or minimax.")
 flags.DEFINE_integer("max_steps", 0, "How many learn steps before exiting.")
 flags.DEFINE_bool("quiet", True, "Don't show the moves as they're played.")
 flags.DEFINE_bool("verbose", False, "Show the MCTS stats of possible moves.")
