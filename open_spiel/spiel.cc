@@ -393,6 +393,41 @@ Action State::StringToAction(Player player,
       absl::StrCat("Couldn't find an action matching ", action_str));
 }
 
+std::unique_ptr<PubObsHistory> State::PublicObservationHistory() const {
+  SPIEL_CHECK_TRUE(game_->GetType().provides_factored_observation_string);
+  auto public_observation_history = std::make_unique<PubObsHistory>();
+  public_observation_history->reserve(history_.size());
+
+  std::unique_ptr<State> state = game_->NewInitialState();
+  for (const auto&[player, action] : history_) {
+    public_observation_history->push_back(state->PublicObservationString());
+    state->ApplyAction(action);
+  }
+  public_observation_history->push_back(state->PublicObservationString());
+  return public_observation_history;
+}
+
+std::unique_ptr<ActionObsHistory> State::ActionObservationHistory(
+    Player player) const {
+  SPIEL_CHECK_TRUE(game_->GetType().provides_observation_string);
+  auto action_observation_history = std::make_unique<ActionObsHistory>();
+  action_observation_history->reserve(2 * history_.size());
+
+  std::unique_ptr<State> state = game_->NewInitialState();
+  for (int i = 0; i < history_.size(); i++) {
+    const auto&[history_player, action] = history_[i];
+    action_observation_history->push_back(
+        state->ObservationString(player));
+    if (state->CurrentPlayer() == player) {
+      action_observation_history->push_back(action);
+    }
+    state->ApplyAction(action);
+  }
+  action_observation_history->push_back(
+      state->ObservationString(player));
+  return action_observation_history;
+}
+
 std::unique_ptr<State> Game::DeserializeState(const std::string& str) const {
   // This simple deserialization doesn't work for games with sampled chance
   // nodes, since the history doesn't give us enough information to reconstruct

@@ -27,8 +27,8 @@
 #include "open_spiel/python/pybind11/game_transforms.h"
 #include "open_spiel/python/pybind11/games_bridge.h"
 #include "open_spiel/python/pybind11/games_negotiation.h"
+#include "open_spiel/python/pybind11/observation_history.h"
 #include "open_spiel/python/pybind11/policy.h"
-#include "open_spiel/path.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 #include "pybind11/include/pybind11/functional.h"
@@ -218,12 +218,14 @@ PYBIND11_MODULE(pyspiel, m) {
            (Action(State::*)(const std::string&) const) & State::StringToAction)
       .def("__str__", &State::ToString)
       .def("is_terminal", &State::IsTerminal)
+      .def("is_root", &State::IsRoot)
       .def("rewards", &State::Rewards)
       .def("returns", &State::Returns)
       .def("player_reward", &State::PlayerReward)
       .def("player_return", &State::PlayerReturn)
       .def("is_chance_node", &State::IsChanceNode)
       .def("is_simultaneous_node", &State::IsSimultaneousNode)
+      .def("is_player_node", &State::IsPlayerNode)
       .def("history", &State::History)
       .def("history_str", &State::HistoryString)
       .def("information_state_string",
@@ -243,12 +245,19 @@ PYBIND11_MODULE(pyspiel, m) {
                                      State::ObservationTensor)
       .def("observation_tensor",
            (std::vector<double>(State::*)() const) & State::ObservationTensor)
+      .def("action_observation_history",
+          (std::unique_ptr<ActionObsHistory>(State::*)(int) const)
+            &State::ActionObservationHistory)
+      .def("action_observation_history",
+          (std::unique_ptr<ActionObsHistory>(State::*)(void) const)
+            &State::ActionObservationHistory)
       .def("public_observation_string",
            (std::string(State::*)() const) & State::PublicObservationString)
       .def("private_observation_string",
            (std::string(State::*)(int) const) & State::PrivateObservationString)
       .def("private_observation_string",
            (std::string(State::*)() const) & State::PrivateObservationString)
+      .def("public_observation_history", &State::PublicObservationHistory)
       .def("clone", &State::Clone)
       .def("child", &State::Child)
       .def("undo_action", &State::UndoAction)
@@ -305,73 +314,6 @@ PYBIND11_MODULE(pyspiel, m) {
             // set the holder type to std::shared_ptr<const Game> either.
             return std::const_pointer_cast<Game>(LoadGame(data));
           }));
-
-  py::class_<Path> path(m, "Path");
-  path.def("current_player", &Path::CurrentPlayer)
-      .def("apply_action", &Path::ApplyAction)
-      .def("legal_actions",
-           (std::vector<open_spiel::Action>(Path::*)(int) const) &
-               Path::LegalActions)
-      .def("legal_actions",
-           (std::vector<open_spiel::Action>(Path::*)(void) const) &
-               Path::LegalActions)
-      .def("legal_actions_mask",
-           (std::vector<int>(Path::*)(int) const) & Path::LegalActionsMask)
-      .def("legal_actions_mask",
-           (std::vector<int>(Path::*)(void) const) & Path::LegalActionsMask)
-      .def("action_to_string", (std::string(Path::*)(Player, Action) const) &
-          Path::ActionToString)
-      .def("action_to_string",
-           (std::string(Path::*)(Action) const) & Path::ActionToString)
-      .def("string_to_action",
-           (Action(Path::*)(Player, const std::string&) const) &
-               Path::StringToAction)
-      .def("string_to_action",
-           (Action(Path::*)(const std::string&) const) & Path::StringToAction)
-      .def("__str__", &Path::ToString)
-      .def("is_terminal", &Path::IsTerminal)
-      .def("rewards", &Path::Rewards)
-      .def("returns", &Path::Returns)
-      .def("player_reward", &Path::PlayerReward)
-      .def("player_return", &Path::PlayerReturn)
-      .def("is_chance_node", &Path::IsChanceNode)
-      .def("is_simultaneous_node", &Path::IsSimultaneousNode)
-      .def("history", &Path::History)
-      .def("history_str", &Path::HistoryString)
-      .def("information_state_string",
-           (std::string(Path::*)(int) const) & Path::InformationStateString)
-      .def("information_state_string",
-           (std::string(Path::*)() const) & Path::InformationStateString)
-      .def("information_state_tensor",
-           (std::vector<double>(Path::*)(int) const) &
-               Path::InformationStateTensor)
-      .def("information_state_tensor", (std::vector<double>(Path::*)() const) &
-          Path::InformationStateTensor)
-      .def("observation_string",
-           (std::string(Path::*)(int) const) & Path::ObservationString)
-      .def("observation_string",
-           (std::string(Path::*)() const) & Path::ObservationString)
-      .def("observation_tensor", (std::vector<double>(Path::*)(int) const) &
-          Path::ObservationTensor)
-      .def("observation_tensor",
-           (std::vector<double>(Path::*)() const) & Path::ObservationTensor)
-      .def("public_observation_string",
-           (std::string(Path::*)() const) & Path::PublicObservationString)
-      .def("private_observation_string",
-           (std::string(Path::*)(int) const) & Path::PrivateObservationString)
-      .def("private_observation_string",
-           (std::string(Path::*)() const) & Path::PrivateObservationString)
-      .def("clone", &Path::Clone)
-      .def("child", &Path::Child)
-      .def("undo_action", &Path::UndoAction)
-      .def("apply_actions", &Path::ApplyActions)
-      .def("num_distinct_actions", &Path::NumDistinctActions)
-      .def("num_players", &Path::NumPlayers)
-      .def("chance_outcomes", &Path::ChanceOutcomes)
-      .def("get_game", &Path::GetGame)
-      .def("get_type", &Path::GetType)
-      .def("serialize", &Path::Serialize)
-      .def("resample_from_infostate", &Path::ResampleFromInfostate);
 
   py::class_<NormalFormGame, std::shared_ptr<NormalFormGame>> normal_form_game(
       m, "NormalFormGame", game);
@@ -568,6 +510,7 @@ PYBIND11_MODULE(pyspiel, m) {
 
   // Register other bits of the API.
   init_pyspiel_bots(m);             // Bots and bot-related algorithms.
+  init_pyspiel_observation_histories(m);  // Histories related to observations.
   init_pyspiel_policy(m);           // Policies and policy-related algorithms.
   init_pyspiel_game_transforms(m);  // Game transformations.
   init_pyspiel_algorithms_trajectories(m);  // Trajectories.

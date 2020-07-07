@@ -89,7 +89,6 @@ class PyspielTest(absltest.TestCase):
         "tiny_hanabi",
         "trade_comm",
         "turn_based_simultaneous_game",
-        "with_observation_history",
         "y",
     ])
 
@@ -120,7 +119,6 @@ class PyspielTest(absltest.TestCase):
         "misere",
         "turn_based_simultaneous_game",
         "normal_form_extensive_game",
-        "with_observation_history",
     ]
     self.assertCountEqual(games_with_mandatory_parameters, expected)
 

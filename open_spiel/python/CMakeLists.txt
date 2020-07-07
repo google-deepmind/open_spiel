@@ -26,6 +26,8 @@ add_library(pyspiel MODULE
   pybind11/games_negotiation.h
   pybind11/game_transforms.cc
   pybind11/game_transforms.h
+  pybind11/observation_history.cc
+  pybind11/observation_history.h
   pybind11/policy.cc
   pybind11/policy.h
   pybind11/pyspiel.cc
@@ -116,6 +118,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   tests/games_bridge_test.py
   tests/games_sim_test.py
   tests/matrix_game_utils_test.py
+  tests/observation_history_test.py
   tests/policy_test.py
   tests/pyspiel_test.py
   tests/rl_environment_test.py

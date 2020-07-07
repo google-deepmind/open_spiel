@@ -17,6 +17,7 @@
 
 #include <utility>
 #include <vector>
+#include <string>
 
 #include "open_spiel/fog/fog_constants.h"
 #include "open_spiel/spiel_constants.h"
@@ -25,110 +26,117 @@ namespace open_spiel {
 
 // Store either action or observation.
 // We cannot use C++ unions for this, because observations are strings.
-struct ActionOrObservation {
-    enum class Either { kAction, kObservation };
-    const Either tag;
-    const Action action = kInvalidAction;
-    const std::string observation = kInvalidObservation;
+class ActionOrObs {
+ private:
+  enum class Either { kAction, kObservation };
+  const Either tag;
+  const Action action = kInvalidAction;
+  const std::string observation = kInvalidObservation;
+ public:
+  explicit ActionOrObs(Action act)
+      : tag(Either::kAction), action(act) {
+    SPIEL_CHECK_NE(action, kInvalidAction);
+  }
+  explicit ActionOrObs(std::string obs)
+      : tag(Either::kObservation), observation(std::move(obs)) {
+    SPIEL_CHECK_NE(observation, kInvalidObservation);
+  }
 
-    explicit ActionOrObservation(Action act)
-        : tag(Either::kAction), action(act) {
-      SPIEL_CHECK_NE(action, kInvalidAction);
-    }
-
-    explicit ActionOrObservation(std::string obs)
-        : tag(Either::kObservation), observation(std::move(obs)) {
-      SPIEL_CHECK_NE(observation, kInvalidObservation);
-    }
-
-    bool IsAction() const { return tag == Either::kAction; }
-    bool IsObservation() const { return tag == Either::kObservation; }
-    bool operator==(const ActionOrObservation& other) const;
+  bool IsAction() const { return tag == Either::kAction; }
+  bool IsObservation() const { return tag == Either::kObservation; }
+  Action Action() const {
+    SPIEL_CHECK_TRUE(tag == Either::kAction);
+    return action;
+  }
+  const std::string& Observation() const {
+    SPIEL_CHECK_TRUE(tag == Either::kObservation);
+    return observation;
+  }
+  std::string ToString() const;
+  bool operator==(const ActionOrObs& other) const;
 };
 
 // Action-Observation histories partition the game tree in the same way
 // as information states, but they contain more structured information.
 // Some algorithms use this structured information for targeted traversal
 // of the imperfect information tree.
-class AOHistory {
+class ActionObsHistory {
  private:
-  std::vector<ActionOrObservation> history_;
+  std::vector<ActionOrObs> history_;
 
  public:
-  AOHistory() : history_({ActionOrObservation(kStartOfGameObservation)}) {}
+  ActionObsHistory() = default;
 
-  AOHistory(std::initializer_list<ActionOrObservation> history)
+  ActionObsHistory(std::vector<ActionOrObs> history)
       : history_(std::move(history)) {
     SPIEL_CHECK_FALSE(history_.empty());
-    SPIEL_CHECK_EQ(history_.at(0),
-                   ActionOrObservation(kStartOfGameObservation));
+    SPIEL_CHECK_EQ(
+        history_.at(0), ActionOrObs(kStartOfGameObservation));
   }
 
-  AOHistory(const AOHistory&) = default;
-  ~AOHistory() = default;
+  ActionObsHistory(const ActionObsHistory&) = default;
+  ~ActionObsHistory() = default;
 
-  const std::vector<ActionOrObservation>& History() const { return history_; }
+  const std::vector<ActionOrObs>& History() const { return history_; }
 
   // Is the current history prefix of the other one?
-  // Empty AOHistory is a prefix of all AOHistories.
-  bool IsPrefix(const AOHistory& other) const;
+  // Empty AO History is a prefix of all AO histories.
+  bool IsPrefix(const ActionObsHistory& other) const;
 
   // Does the Action-Observation history correspond to the initial state
   // (root node)?
   bool IsRoot() const {
     SPIEL_CHECK_EQ(
-        history_.at(0), ActionOrObservation(kStartOfGameObservation));
+        history_.at(0), ActionOrObs(kStartOfGameObservation));
     return history_.size() == 1;
   }
 
-  // A number of helper methods, so we don't need to access history directly.
+  std::string ToString() const;
+
+  bool operator==(const ActionObsHistory& other) const {
+    return history_ == other.history_;
+  }
+
+  // A number of helper methods, so we don't access history directly.
   void reserve(size_t n) {
     history_.reserve(n);
   }
+  void push_back(const ActionOrObs& aoo) {
+    history_.push_back(aoo);
+  }
   void push_back(const Action& action) {
-    history_.push_back(ActionOrObservation(action));
+    history_.push_back(ActionOrObs(action));
   }
   void push_back(const std::string& observation) {
-    history_.push_back(ActionOrObservation(observation));
+    history_.push_back(ActionOrObs(observation));
   }
-  void pop_back() {
-    // Do not pop the kStartOfGameObservation.
-    SPIEL_CHECK_GE(history_.size(), 2);
-    history_.pop_back();
-  }
-
-  const ActionOrObservation& back() const { history_.back(); }
-
-  bool operator==(const AOHistory& other) const {
-    return history_ == other.history_;
-  };
 };
 
 // Public-observation histories partition the game tree in the same way
 // as information states, but they contain more structured information.
 // Some algorithms use this structured information for targeted traversal
 // of the imperfect information tree.
-class POHistory {
+class PubObsHistory {
  private:
   std::vector<std::string> history_;
 
  public:
-  POHistory() = default;
+  PubObsHistory() = default;
 
-  POHistory(std::initializer_list<std::string> history)
+  PubObsHistory(std::vector<std::string> history)
       : history_(std::move(history)) {
     SPIEL_CHECK_FALSE(history_.empty());
     SPIEL_CHECK_EQ(history_.at(0), kStartOfGameObservation);
   }
 
-  POHistory(const POHistory&) = default;
-  ~POHistory() = default;
+  PubObsHistory(const PubObsHistory&) = default;
+  ~PubObsHistory() = default;
 
   const std::vector<std::string>& History() const { return history_; }
 
   // Is the current history prefix of the other one?
-  // Empty POHistory is a prefix of all POHistories.
-  bool IsPrefix(const POHistory& other) const;
+  // Empty PO history is a prefix of all PO histories.
+  bool IsPrefix(const PubObsHistory& other) const;
 
   // Does the Public-observation history correspond to the initial state
   // (root node)?
@@ -137,7 +145,18 @@ class POHistory {
     return history_.size() == 1;
   }
 
-  // A number of helper methods, so we don't need to access history directly.
+  std::string ToString() const;
+
+  bool operator==(const PubObsHistory& other) const {
+    return history_ == other.history_;
+  }
+
+  bool operator==(const std::vector<std::string>& other) const {
+    if (other.empty() || other[0] != kStartOfGameObservation) return false;
+    return history_ == other;
+  }
+
+  // A number of helper methods, so we don't access history directly.
   void reserve(size_t n) {
     history_.reserve(n);
   }
@@ -146,22 +165,11 @@ class POHistory {
         !history_.empty() || observation == kStartOfGameObservation);
     history_.push_back(observation);
   }
-  void pop_back() {
-    // Do not pop the kStartOfGameObservation.
-    SPIEL_CHECK_GE(history_.size(), 2);
-    history_.pop_back();
-  }
-
-  const std::string& back() const { history_.back(); }
-
-  bool operator==(const POHistory& other) const {
-    return history_ == other.history_;
-  };
 };
 
-std::ostream& operator<<(std::ostream& os, const ActionOrObservation& aoo);
-std::ostream& operator<<(std::ostream& os, const AOHistory& aoh);
-std::ostream& operator<<(std::ostream& os, const POHistory& aoh);
+std::ostream& operator<<(std::ostream& os, const ActionOrObs& aoo);
+std::ostream& operator<<(std::ostream& os, const ActionObsHistory& aoh);
+std::ostream& operator<<(std::ostream& os, const PubObsHistory& aoh);
 
 }  // namespace open_spiel
 

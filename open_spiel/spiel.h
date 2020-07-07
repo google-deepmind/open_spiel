@@ -31,6 +31,7 @@
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/fog/fog_constants.h"
+#include "open_spiel/fog/observation_history.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel_constants.h"
 #include "open_spiel/spiel_utils.h"
@@ -515,6 +516,24 @@ class State {
     return ObservationTensor(CurrentPlayer());
   }
 
+  // Return a history of actions and observations for a given player.
+  // This method can be called only if the game provides observations strings.
+  //
+  // Action-Observation histories partition the game tree in the same way
+  // as information states, but they contain more structured information.
+  // Algorithms can use this structured information for targeted traversal
+  // of imperfect information games.
+  //
+  // Note that this method makes a traversal of the current game trajectory
+  // to collect player's observations and this can be expensive.
+  virtual std::unique_ptr<ActionObsHistory> ActionObservationHistory(
+      Player) const;
+
+  // Return Action-Observation history for the current player.
+  std::unique_ptr<ActionObsHistory> ActionObservationHistory() const {
+    return ActionObservationHistory(CurrentPlayer());
+  }
+
   // The public / private observations factorize observations into their
   // (mostly) non-overlapping public and private parts (they overlap only for
   // the start of the game and time). See also <open_spiel/fog_constants.h>
@@ -605,6 +624,18 @@ class State {
     SPIEL_CHECK_GE(player, 0);
     return PrivateObservationString(player);
   }
+
+  // Return a history of public observations.
+  // This method can be called only if the game provides factored observations
+  // strings.
+  //
+  // Public observation history identifies the current public state, and is
+  // useful for integration with public state API -- you can construct a
+  // PublicState by using the public observation history.
+  //
+  // Note that this method makes a traversal of the current game trajectory
+  // to collect public observations and this can be expensive.
+  virtual std::unique_ptr<PubObsHistory> PublicObservationHistory() const;
 
   // Return a copy of this state.
   virtual std::unique_ptr<State> Clone() const = 0;

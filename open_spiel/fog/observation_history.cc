@@ -16,7 +16,7 @@
 
 namespace open_spiel {
 
-bool ActionOrObservation::operator==(const ActionOrObservation& other) const {
+bool ActionOrObs::operator==(const ActionOrObs& other) const {
   if (tag != other.tag) return false;
   if (tag == Either::kAction) return action == other.action;
   if (tag == Either::kObservation) return observation == other.observation;
@@ -24,42 +24,55 @@ bool ActionOrObservation::operator==(const ActionOrObservation& other) const {
   return "This will never return.";
 }
 
-bool AOHistory::IsPrefix(const AOHistory& other) const {
-  const auto& a = history_;
-  const auto& b = other.history_;
-  if (a.empty()) return true;
-  if (b.empty()) return false;  // True only if a is empty, handled before.
-  if (a.size() > b.size()) return false;
-  if (a.size() == b.size()) return a == b;
-  return std::equal(a.begin(), a.end(), b.begin());
-}
-
-bool POHistory::IsPrefix(const POHistory& other) const {
-  const auto& a = history_;
-  const auto& b = other.history_;
-  if (a.empty()) return true;
-  if (b.empty()) return false;  // True only if a is empty, handled before.
-  if (a.size() > b.size()) return false;
-  if (a.size() == b.size()) return a == b;
-  return std::equal(a.begin(), a.end(), b.begin());
-}
-
-std::ostream& operator<<(std::ostream& os, const ActionOrObservation& aoo) {
-  if (aoo.tag == ActionOrObservation::Either::kAction) {
-    return os << "action='" << aoo.action << "'";
-  } else if (aoo.tag == ActionOrObservation::Either::kObservation) {
-    return os << "observation='" << aoo.observation << "'";
+std::string ActionOrObs::ToString() const {
+  if (tag == ActionOrObs::Either::kAction) {
+    return absl::StrCat("action='", action, "'");
+  }
+  if (tag == ActionOrObs::Either::kObservation) {
+    return absl::StrCat("observation='", observation, "'");
   }
   SpielFatalError("Unrecognized tag.");
   return;  // "This will never return.";
 }
 
-std::ostream& operator<<(std::ostream& os, const AOHistory& aoh) {
-  return os << aoh.History();
+bool ActionObsHistory::IsPrefix(const ActionObsHistory& other) const {
+  const auto& a = history_;
+  const auto& b = other.history_;
+  if (a.empty()) return true;
+  if (b.empty()) return false;  // True only if a is empty, handled before.
+  if (a.size() > b.size()) return false;
+  if (a.size() == b.size()) return a == b;
+  return std::equal(a.begin(), a.end(), b.begin());
 }
 
-std::ostream& operator<<(std::ostream& os, const POHistory& poh) {
-  return os << poh.History();
+std::string ActionObsHistory::ToString() const {
+  return absl::StrJoin(history_, ", ", absl::StreamFormatter());
+}
+
+bool PubObsHistory::IsPrefix(const PubObsHistory& other) const {
+  const auto& a = history_;
+  const auto& b = other.history_;
+  if (a.empty()) return true;
+  if (b.empty()) return false;  // True only if a is empty, handled before.
+  if (a.size() > b.size()) return false;
+  if (a.size() == b.size()) return a == b;
+  return std::equal(a.begin(), a.end(), b.begin());
+}
+
+std::string PubObsHistory::ToString() const {
+  return absl::StrJoin(history_, ", ");
+}
+
+std::ostream& operator<<(std::ostream& os, const ActionOrObs& aoo) {
+  return os << aoo.ToString();
+}
+
+std::ostream& operator<<(std::ostream& os, const ActionObsHistory& aoh) {
+  return os << aoh.ToString();
+}
+
+std::ostream& operator<<(std::ostream& os, const PubObsHistory& poh) {
+  return os << poh.ToString();
 }
 
 }  // namespace open_spiel

@@ -135,8 +135,6 @@ set (OPEN_SPIEL_CORE_FILES
   matrix_game.cc
   matrix_game.h
   normal_form_game.h
-  path.h
-  path.cc
   policy.cc
   policy.h
   simultaneous_move_game.cc
