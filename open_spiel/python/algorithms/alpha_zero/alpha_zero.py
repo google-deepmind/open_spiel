@@ -109,9 +109,7 @@ class Buffer(object):
     return random.sample(self.data, count)
 
 
-class valid_search_types(enum.Enum):
-    minimax = "minimax"
-    mcts = "mcts"
+valid_search_types = ["minimax", "mcts"]
 
 
 class valid_bot_types(enum.Enum):
@@ -198,13 +196,12 @@ def watcher(fn):
 
 def _init_bot(config, game, evaluator_, evaluation):
   """Initializes a bot."""
-  if config.search_type is valid_search_types.minimax:
+  if config.search_type == valid_search_types[0]:
     return minimax.MinimaxBot(
       game,
-      max_simulations=config.max_simulations,
       evaluator=evaluator_)
 
-  elif config.search_type is valid_search_types.mcts: # default 
+  elif config.search_type == valid_search_types[1]: # default 
     noise = None if evaluation else (config.policy_epsilon, 
                                      config.policy_alpha)
     return mcts.MCTSBot(
@@ -220,8 +217,8 @@ def _init_bot(config, game, evaluator_, evaluation):
     raise
   
   
-def _play_game(config, logger, game_num, game, bots, temperature, 
-               temperature_drop, maximum_depth=30):
+def _play_game(config, logger, game_num, game, bots, maximum_depth, 
+                 temperature, temperature_drop):
   """Play one game, return the trajectory."""
   trajectory = Trajectory()
   actions = []
@@ -234,7 +231,7 @@ def _play_game(config, logger, game_num, game, bots, temperature,
     if isinstance(cur_bot, valid_bot_types.minimaxBot):
       value, action = cur_bot.alpha_beta_search(state=state, 
                                                 maximum_depth=maximum_depth)
-    elif type(cur_bot) == valid_bot_types.mctsBot:
+    elif isinstance(cur_bot, valid_bot_types.mctsBot): 
       root = cur_bot.mcts_search(state)
       for c in root.children:
         policy[c.action] = c.explore_count
@@ -297,8 +294,8 @@ def actor(*, config, game, logger, queue):
   for game_num in itertools.count():
     if not update_checkpoint(logger, queue, model, az_evaluator):
       return
-    queue.put(_play_game(logger, game_num, game, bots, config.temperature,
-                         config.temperature_drop, config.max_depth))
+    queue.put(_play_game(logger, game_num, game, bots, confix.max_depth,
+        config.temperature, config.temperature_drop))
 
 
 @watcher
@@ -331,14 +328,14 @@ def evaluator(*, game, config, logger, queue):
     if az_player == 1:
       bots = list(reversed(bots))
 
-    trajectory = _play_game(logger, game_num, game, bots, temperature=1,
-                            temperature_drop=0, config.max_depth)
+    trajectory = _play_game(logger, game_num, game, bots, config.max_depth,
+            temperature=1, temperature_drop=0)
     results.append(trajectory.returns[az_player])
     queue.put((difficulty, trajectory.returns[az_player]))
 
     logger.print("AZ: {}, {}: {}, AZ avg/{}: {:.3f}".format(
         trajectory.returns[az_player],
-        config.search_type.value,
+        config.search_type,
         trajectory.returns[1 - az_player],
         len(results), np.mean(results.data)))
 
@@ -522,8 +519,7 @@ def alpha_zero(config: Config):
   game = pyspiel.load_game(config.game)
   config = config._replace(
       observation_shape=game.observation_tensor_shape(),
-      output_size=game.num_distinct_actions(),
-      search_type=valid_search_types(config.search_type.lower()))
+      output_size=game.num_distinct_actions())
   
   print("Starting game", config.game)
   if game.num_players() != 2:
