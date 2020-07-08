@@ -766,7 +766,7 @@ class Game : public std::enable_shared_from_this<Game> {
   // Returns a newly allocated initial state.
   virtual std::unique_ptr<State> NewInitialState() const = 0;
 
-  // Maximum number of chance outcomes for each chance node.
+  // Maximum number of distinct chance outcomes for chance nodes in the game.
   virtual int MaxChanceOutcomes() const { return 0; }
 
   // If the game is parameterizable, returns an object with the current
