@@ -120,7 +120,7 @@ def main(argv):
     raise app.UsageError('Too many command-line arguments.')
 
   # Make the network.
-  net = hk.transform(net_fn)
+  net = hk.without_apply_rng(hk.transform(net_fn, apply_rng=True))
 
   # Make the optimiser.
   opt = optix.adam(1e-4)

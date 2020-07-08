@@ -266,20 +266,22 @@ std::vector<Action> ClobberState::LegalActions() const {
         for (int direction = 0; direction < kNumDirections; direction++) {
           int adjacent_row = row + kDirRowOffsets[direction];
           int adjacent_column = column + kDirColumnOffsets[direction];
-          CellState adjacent_state = BoardAt(adjacent_row, adjacent_column);
-          CellState opponent_state = OpponentState(current_player_state);
 
-          if (InBounds(adjacent_row, adjacent_column) &&
-              adjacent_state == opponent_state) {
-            // The adjacent cell is in bounds and contains the opponent
-            // player, therefore playing to this adjacent cell would be
-            // a valid move.
-            action_values[0] = row;
-            action_values[1] = column;
-            action_values[2] = direction;
+          if (InBounds(adjacent_row, adjacent_column)) {
+            CellState adjacent_state = BoardAt(adjacent_row, adjacent_column);
+            CellState opponent_state = OpponentState(current_player_state);
 
-            move_list.push_back(
-                RankActionMixedBase(action_bases, action_values));
+            if (adjacent_state == opponent_state) {
+              // The adjacent cell is in bounds and contains the opponent
+              // player, therefore playing to this adjacent cell would be
+              // a valid move.
+              action_values[0] = row;
+              action_values[1] = column;
+              action_values[2] = direction;
+
+              move_list.push_back(
+                  RankActionMixedBase(action_bases, action_values));
+            }
           }
         }
       }
@@ -343,12 +345,14 @@ bool ClobberState::MovesRemaining() const {
       for (int direction = 0; direction < kNumDirections; direction++) {
         int adjacent_row = row + kDirRowOffsets[direction];
         int adjacent_column = column + kDirColumnOffsets[direction];
-        CellState adjacent_state = BoardAt(adjacent_row, adjacent_column);
-        CellState opponent_state = OpponentState(current_cell_state);
 
-        if (InBounds(adjacent_row, adjacent_column) &&
-            adjacent_state == opponent_state) {
-          return true;
+        if (InBounds(adjacent_row, adjacent_column)) {
+          CellState adjacent_state = BoardAt(adjacent_row, adjacent_column);
+          CellState opponent_state = OpponentState(current_cell_state);
+
+          if (adjacent_state == opponent_state) {
+            return true;
+          }
         }
       }
     }
