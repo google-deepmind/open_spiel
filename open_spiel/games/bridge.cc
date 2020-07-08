@@ -829,13 +829,18 @@ void BridgeState::ComputeScoreByContract() const {
   SPIEL_CHECK_TRUE(double_dummy_results_.has_value());
   for (int i = 0; i < kNumContracts; ++i) {
     Contract contract = kAllContracts[i];
-    const int num_declarer_tricks =
-        double_dummy_results_->resTable[contract.trumps][contract.declarer];
-    const int declarer_score =
-        Score(contract, num_declarer_tricks,
-              is_vulnerable_[Partnership(contract.declarer)]);
-    score_by_contract_[i] =
-        Partnership(contract.declarer) == 0 ? declarer_score : -declarer_score;
+    if (contract.level == 0) {
+      score_by_contract_[i] = 0;
+    } else {
+      const int num_declarer_tricks =
+          double_dummy_results_->resTable[contract.trumps][contract.declarer];
+      const int declarer_score =
+          Score(contract, num_declarer_tricks,
+                is_vulnerable_[Partnership(contract.declarer)]);
+      score_by_contract_[i] = Partnership(contract.declarer) == 0
+                                  ? declarer_score
+                                  : -declarer_score;
+    }
   }
 }
 
