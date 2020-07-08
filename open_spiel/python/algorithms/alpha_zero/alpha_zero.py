@@ -43,7 +43,6 @@ import sys
 import tempfile
 import time
 import traceback
-import enum
 
 import numpy as np
 
@@ -110,11 +109,7 @@ class Buffer(object):
 
 
 valid_search_types = ["minimax", "mcts"]
-
-
-class valid_bot_types(enum.Enum):
-    minimaxBot = minimax.MinimaxBot
-    mctsBot = mcts.MCTSBot
+valid_bot_types = [minimax.MinimaxBot, mcts.MCTSBot]
 
 
 class Config(collections.namedtuple(
@@ -217,7 +212,7 @@ def _init_bot(config, game, evaluator_, evaluation):
     raise
   
   
-def _play_game(config, logger, game_num, game, bots, maximum_depth, 
+def _play_game(logger, game_num, game, bots, maximum_depth, 
                  temperature, temperature_drop):
   """Play one game, return the trajectory."""
   trajectory = Trajectory()
@@ -228,10 +223,10 @@ def _play_game(config, logger, game_num, game, bots, maximum_depth,
   while not state.is_terminal():
     cur_bot = bots[state.current_player()]
     policy = np.zeros(game.num_distinct_actions())
-    if isinstance(cur_bot, valid_bot_types.minimaxBot):
+    if isinstance(cur_bot, valid_bot_types[0]):
       value, action = cur_bot.alpha_beta_search(state=state, 
                                                 maximum_depth=maximum_depth)
-    elif isinstance(cur_bot, valid_bot_types.mctsBot): 
+    elif isinstance(cur_bot, valid_bot_types[1]): 
       root = cur_bot.mcts_search(state)
       for c in root.children:
         policy[c.action] = c.explore_count
@@ -294,7 +289,7 @@ def actor(*, config, game, logger, queue):
   for game_num in itertools.count():
     if not update_checkpoint(logger, queue, model, az_evaluator):
       return
-    queue.put(_play_game(logger, game_num, game, bots, confix.max_depth,
+    queue.put(_play_game(logger, game_num, game, bots, config.max_depth,
         config.temperature, config.temperature_drop))
 
 
