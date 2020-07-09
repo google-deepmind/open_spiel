@@ -227,7 +227,8 @@ class ChessGame : public Game {
   int NumDistinctActions() const override {
     return chess::NumDistinctActions();
   }
-  std::unique_ptr<State> NewInitialState(const std::string& fen) const {
+  std::unique_ptr<State> NewInitialState(
+        const std::string& fen) const override {
     return std::unique_ptr<State>(new ChessState(shared_from_this(), fen));
   }
   std::unique_ptr<State> NewInitialState() const override {

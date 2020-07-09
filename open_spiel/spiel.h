@@ -762,6 +762,10 @@ class Game : public std::enable_shared_from_this<Game> {
 
   // Returns a newly allocated initial state.
   virtual std::unique_ptr<State> NewInitialState() const = 0;
+  virtual std::unique_ptr<State> NewInitialState(
+      const std::string& str) const {
+    SpielFatalError("NewInitialState from string is not implemented.");
+  }
 
   // Maximum number of chance outcomes for each chance node.
   virtual int MaxChanceOutcomes() const { return 0; }

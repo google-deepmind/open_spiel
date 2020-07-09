@@ -132,7 +132,7 @@ class ClobberGame : public Game {
   explicit ClobberGame(const GameParameters& params);
   int NumDistinctActions() const override;
   std::unique_ptr<State> NewInitialState(
-      const std::string& board_string) const {
+      const std::string& board_string) const override {
     return std::unique_ptr<State>(
         new ClobberState(shared_from_this(), rows_, columns_, board_string));
   }
