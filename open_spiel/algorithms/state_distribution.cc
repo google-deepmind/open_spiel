@@ -27,8 +27,8 @@
 #include "open_spiel/simultaneous_move_game.h"
 #include "open_spiel/spiel.h"
 
-namespace open_spiel {
-namespace algorithms {
+namespace open_spiel::algorithms {
+namespace {
 
 std::vector<double> Normalize(const std::vector<double>& weights) {
   std::vector<double> probs(weights);
@@ -38,6 +38,60 @@ std::vector<double> Normalize(const std::vector<double>& weights) {
   });
   return probs;
 }
+
+void AdvanceBeliefHistoryOneAction(HistoryDistribution* previous, Action action,
+                                   Player player_id,
+                                   const Policy* opponent_policy) {
+  for (int i = 0; i < previous->first.size(); ++i) {
+    std::unique_ptr<State>& parent = previous->first[i];
+    double& prob = previous->second[i];
+    if (Near(prob, 0.)) continue;
+    switch (parent->GetType()) {
+      case StateType::kChance: {
+        open_spiel::ActionsAndProbs outcomes = parent->ChanceOutcomes();
+        double action_prob = GetProb(outcomes, action);
+
+        // If we don't find the chance outcome, then the state we're in is
+        // impossible, so we set it to zero.
+        if (action_prob == -1) {
+          prob = 0;
+          continue;
+        }
+        SPIEL_CHECK_PROB(action_prob);
+        prob *= action_prob;
+        break;
+      }
+      case StateType::kDecision: {
+        if (parent->CurrentPlayer() == player_id) break;
+        open_spiel::ActionsAndProbs policy =
+            opponent_policy->GetStatePolicy(*parent);
+        double action_prob = GetProb(policy, action);
+        SPIEL_CHECK_PROB(action_prob);
+        prob *= action_prob;
+        break;
+      }
+      case StateType::kTerminal:
+        ABSL_FALLTHROUGH_INTENDED;
+      default:
+        SpielFatalError("Unknown state type.");
+    }
+    if (prob == 0) continue;
+    parent->ApplyAction(action);
+  }
+  previous->second = Normalize(previous->second);
+}
+
+int GetBeliefHistorySize(HistoryDistribution* beliefs) {
+  int belief_history_size = 0;
+  for (int i = 0; i < beliefs->first.size(); ++i) {
+    belief_history_size =
+        std::max(belief_history_size,
+                 static_cast<int>(beliefs->first[i]->History().size()));
+  }
+  return belief_history_size;
+}
+
+}  // namespace
 
 std::unique_ptr<open_spiel::HistoryDistribution> CloneBeliefs(
     const open_spiel::HistoryDistribution& beliefs) {
@@ -178,47 +232,13 @@ std::unique_ptr<HistoryDistribution> UpdateIncrementalStateDistribution(
   }
   // The current state must be one action ahead of the dist ones.
   const std::vector<Action> history = state.History();
-  Action action = history.back();
-  for (int i = 0; i < previous->first.size(); ++i) {
-    std::unique_ptr<State>& parent = previous->first[i];
-    double& prob = previous->second[i];
-    if (Near(prob, 0.)) continue;
-    SPIEL_CHECK_EQ(history.size(), parent->History().size() + 1);
-    switch (parent->GetType()) {
-      case StateType::kChance: {
-        open_spiel::ActionsAndProbs outcomes = parent->ChanceOutcomes();
-        double action_prob = GetProb(outcomes, action);
-
-        // If we don't find the chance outcome, then the state we're in is
-        // impossible, so we set it to zero.
-        if (action_prob == -1) {
-          prob = 0;
-          continue;
-        }
-        SPIEL_CHECK_PROB(action_prob);
-        prob *= action_prob;
-        break;
-      }
-      case StateType::kDecision: {
-        if (parent->CurrentPlayer() == player_id) break;
-        open_spiel::ActionsAndProbs policy =
-            opponent_policy->GetStatePolicy(*parent);
-        double action_prob = GetProb(policy, action);
-        SPIEL_CHECK_PROB(action_prob);
-        prob *= action_prob;
-        break;
-      }
-      case StateType::kTerminal:
-        ABSL_FALLTHROUGH_INTENDED;
-      default:
-        SpielFatalError("Unknown state type.");
-    }
-    if (prob == 0) continue;
-    parent->ApplyAction(action);
+  int belief_history_size = GetBeliefHistorySize(previous.get());
+  while (belief_history_size < history.size()) {
+    AdvanceBeliefHistoryOneAction(previous.get(), history[belief_history_size],
+                                  player_id, opponent_policy);
+    belief_history_size = GetBeliefHistorySize(previous.get());
   }
-  previous->second = Normalize(previous->second);
   return previous;
 }
 
-}  // namespace algorithms
-}  // namespace open_spiel
+}  // namespace open_spiel::algorithms
