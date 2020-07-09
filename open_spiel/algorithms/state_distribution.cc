@@ -24,6 +24,7 @@
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_format.h"
 #include "open_spiel/simultaneous_move_game.h"
 #include "open_spiel/spiel.h"
 
@@ -239,6 +240,19 @@ std::unique_ptr<HistoryDistribution> UpdateIncrementalStateDistribution(
     belief_history_size = GetBeliefHistorySize(previous.get());
   }
   return previous;
+}
+
+std::string PrintBeliefs(const HistoryDistribution& beliefs) {
+  const int num_states = beliefs.first.size();
+  SPIEL_CHECK_EQ(num_states, beliefs.second.size());
+  std::string str;
+  for (int i = 0; i < num_states; ++i) {
+    absl::StrAppend(
+        &str, absl::StrFormat("(%s, %f)", beliefs.first[i]->HistoryString(),
+                              beliefs.second[i]));
+    if (i < num_states - 1) absl::StrAppend(&str, ", ");
+  }
+  return str;
 }
 
 }  // namespace open_spiel::algorithms
