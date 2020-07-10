@@ -14,6 +14,7 @@
 
 #include "open_spiel/policy.h"
 
+#include <algorithm>
 #include <iterator>
 #include <list>
 #include <memory>
@@ -24,6 +25,7 @@
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_format.h"
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/spiel.h"
@@ -59,6 +61,16 @@ Action GetAction(const ActionsAndProbs& action_and_probs) {
   return kInvalidAction;
 }
 
+ActionsAndProbs ToDeterministicPolicy(const ActionsAndProbs& actions_and_probs,
+                                      Action action) {
+  ActionsAndProbs new_policy;
+  new_policy.reserve(actions_and_probs.size());
+  for (const auto& iter : actions_and_probs) {
+    new_policy.push_back({iter.first, iter.first == action ? 1.0 : 0.0});
+  }
+  return new_policy;
+}
+
 ActionsAndProbs UniformStatePolicy(const State& state) {
   ActionsAndProbs actions_and_probs;
   std::vector<Action> actions = state.LegalActions();
@@ -71,6 +83,39 @@ ActionsAndProbs UniformStatePolicy(const State& state) {
 
 TabularPolicy::TabularPolicy(const Game& game)
     : TabularPolicy(GetRandomPolicy(game)) {}
+
+const std::string TabularPolicy::ToString() const {
+  std::string str = "";
+  for (const auto& infostate_and_policy : policy_table_) {
+    absl::StrAppend(&str, infostate_and_policy.first, ": ");
+    for (const auto& policy : infostate_and_policy.second) {
+      absl::StrAppend(&str, " ", policy.first, "=", policy.second);
+    }
+    absl::StrAppend(&str, "\n");
+  }
+  return str;
+}
+
+const std::string TabularPolicy::ToStringSorted() const {
+  std::vector<std::string> keys;
+  keys.reserve(policy_table_.size());
+
+  for (const auto& infostate_and_policy : policy_table_) {
+    keys.push_back(infostate_and_policy.first);
+  }
+
+  std::sort(keys.begin(), keys.end());
+  std::string str = "";
+  for (const std::string& key : keys) {
+    absl::StrAppend(&str, key, ": ");
+    for (const auto& policy : policy_table_.at(key)) {
+      absl::StrAppend(&str, " ", policy.first, "=", policy.second);
+    }
+    absl::StrAppend(&str, "\n");
+  }
+
+  return str;
+}
 
 TabularPolicy GetEmptyTabularPolicy(const Game& game,
                                     bool initialize_to_uniform) {

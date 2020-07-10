@@ -67,6 +67,9 @@ namespace algorithms {
 // Monte Carlo sampling of deterministic joint policies from the mixtures.
 using CorrelationDevice = std::vector<std::pair<double, TabularPolicy>>;
 
+// Return a string representation of the correlation device.
+std::string ToString(const CorrelationDevice& corr_dev);
+
 // A helper class for the normal-form functions.
 struct NormalFormJointPolicyWithProb {
   // Probability of this joint policy.

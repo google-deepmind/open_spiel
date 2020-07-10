@@ -121,8 +121,18 @@ double CustomNashConv(const Game& game, const Policy& policy,
   }
   return nash_conv;
 }
-
 }  // namespace
+
+// Return a string representation of the correlation device.
+std::string ToString(const CorrelationDevice& corr_dev) {
+  std::string corr_dev_str;
+  for (const auto& prob_and_policy : corr_dev) {
+    absl::StrAppend(&corr_dev_str, "Prob: ", prob_and_policy.first, "\n");
+    absl::StrAppend(&corr_dev_str, prob_and_policy.second.ToStringSorted(),
+                    "\n");
+  }
+  return corr_dev_str;
+}
 
 std::vector<double> ExpectedValues(const Game& game,
                                    const CorrelationDevice& mu) {

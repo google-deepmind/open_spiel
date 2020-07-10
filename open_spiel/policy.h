@@ -21,7 +21,6 @@
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
@@ -40,6 +39,11 @@ Action GetAction(const ActionsAndProbs& action_and_probs);
 // Returns a policy where every legal action has probability 1 / (number of
 // legal actions).
 ActionsAndProbs UniformStatePolicy(const State& state);
+
+// Return a new policy with all the same actions, but with probability 1 on the
+// specified action, and 0 on the others.
+ActionsAndProbs ToDeterministicPolicy(const ActionsAndProbs& actions_and_probs,
+                                      Action action);
 
 // A general policy object. A policy is a mapping from states to list of
 // (action, prob) pairs for all the legal actions at the state.
@@ -173,17 +177,10 @@ class TabularPolicy : public Policy {
     return policy_table_;
   }
 
-  const std::string ToString() const {
-    std::string str = "";
-    for (const auto& infostate_and_policy : policy_table_) {
-      absl::StrAppend(&str, infostate_and_policy.first, ": ");
-      for (const auto& policy : infostate_and_policy.second) {
-        absl::StrAppend(&str, " ", policy.first, "=", policy.second);
-      }
-      absl::StrAppend(&str, "\n");
-    }
-    return str;
-  }
+  const std::string ToString() const;
+
+  // A ToString where the keys are sorted.
+  const std::string ToStringSorted() const;
 
  private:
   std::unordered_map<std::string, ActionsAndProbs> policy_table_;
