@@ -228,8 +228,8 @@ InformationStateString(0) = "[Round 2][Player: 0][Pot: 6][Money: 97 97[Private: 
 InformationStateString(1) = "[Round 2][Player: 0][Pot: 6][Money: 97 97[Private: 0]][Round1]: 1 2 1[Public: 3]\nRound 2 sequence: "
 InformationStateTensor(0): ◉◯◯◉◯◯◯◯◯◯◯◉◯◯◉◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(1): ◯◉◉◯◯◯◯◯◯◯◯◉◯◯◉◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯
-ObservationString(0) = "[Round 2][Player: 0][Pot: 6][Money: 97 97[Private: 1][Ante: 3 3]"
-ObservationString(1) = "[Round 2][Player: 0][Pot: 6][Money: 97 97[Private: 0][Ante: 3 3]"
+ObservationString(0) = "[Round 2][Player: 0][Pot: 6][Money: 97 97[Private: 1][Ante: 3 3][Public: 3]"
+ObservationString(1) = "[Round 2][Player: 0][Pot: 6][Money: 97 97[Private: 0][Ante: 3 3][Public: 3]"
 ObservationTensor(0) = [1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 3.0, 3.0]
 ObservationTensor(1) = [0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 3.0, 3.0]
 Rewards() = [0.0, 0.0]
@@ -258,8 +258,8 @@ InformationStateString(0) = "[Round 2][Player: 1][Pot: 6][Money: 97 97[Private: 
 InformationStateString(1) = "[Round 2][Player: 1][Pot: 6][Money: 97 97[Private: 0]][Round1]: 1 2 1[Public: 3]\nRound 2 sequence: 1"
 InformationStateTensor(0): ◉◯◯◉◯◯◯◯◯◯◯◉◯◯◉◯◯◉◉◯◯◯◉◯◯◯◯◯◯◯
 InformationStateTensor(1): ◯◉◉◯◯◯◯◯◯◯◯◉◯◯◉◯◯◉◉◯◯◯◉◯◯◯◯◯◯◯
-ObservationString(0) = "[Round 2][Player: 1][Pot: 6][Money: 97 97[Private: 1][Ante: 3 3]"
-ObservationString(1) = "[Round 2][Player: 1][Pot: 6][Money: 97 97[Private: 0][Ante: 3 3]"
+ObservationString(0) = "[Round 2][Player: 1][Pot: 6][Money: 97 97[Private: 1][Ante: 3 3][Public: 3]"
+ObservationString(1) = "[Round 2][Player: 1][Pot: 6][Money: 97 97[Private: 0][Ante: 3 3][Public: 3]"
 ObservationTensor(0) = [1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 3.0, 3.0]
 ObservationTensor(1) = [0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 3.0, 3.0]
 Rewards() = [0.0, 0.0]
@@ -288,8 +288,8 @@ InformationStateString(0) = "[Round 2][Player: 1][Pot: 0][Money: 100 100[Private
 InformationStateString(1) = "[Round 2][Player: 1][Pot: 0][Money: 100 100[Private: 0]][Round1]: 1 2 1[Public: 3]\nRound 2 sequence: 1 1"
 InformationStateTensor(0): ◉◯◯◉◯◯◯◯◯◯◯◉◯◯◉◯◯◉◉◯◯◯◉◯◉◯◯◯◯◯
 InformationStateTensor(1): ◯◉◉◯◯◯◯◯◯◯◯◉◯◯◉◯◯◉◉◯◯◯◉◯◉◯◯◯◯◯
-ObservationString(0) = "[Round 2][Player: 1][Pot: 0][Money: 100 100[Private: 1][Ante: 3 3]"
-ObservationString(1) = "[Round 2][Player: 1][Pot: 0][Money: 100 100[Private: 0][Ante: 3 3]"
+ObservationString(0) = "[Round 2][Player: 1][Pot: 0][Money: 100 100[Private: 1][Ante: 3 3][Public: 3]"
+ObservationString(1) = "[Round 2][Player: 1][Pot: 0][Money: 100 100[Private: 0][Ante: 3 3][Public: 3]"
 ObservationTensor(0) = [1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 3.0, 3.0]
 ObservationTensor(1) = [0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 3.0, 3.0]
 Rewards() = [0.0, 0.0]

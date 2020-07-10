@@ -321,9 +321,9 @@ InformationStateString(2) = "[Round 2][Player: 1][Pot: 7][Money: 99 97 97[Privat
 InformationStateTensor(0): ◉◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(1): ◯◉◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(2): ◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationString(0) = "[Round 2][Player: 1][Pot: 7][Money: 99 97 97[Private: 4][Ante: 1 3 3]"
-ObservationString(1) = "[Round 2][Player: 1][Pot: 7][Money: 99 97 97[Private: 2][Ante: 1 3 3]"
-ObservationString(2) = "[Round 2][Player: 1][Pot: 7][Money: 99 97 97[Private: 3][Ante: 1 3 3]"
+ObservationString(0) = "[Round 2][Player: 1][Pot: 7][Money: 99 97 97[Private: 4][Ante: 1 3 3][Public: 1]"
+ObservationString(1) = "[Round 2][Player: 1][Pot: 7][Money: 99 97 97[Private: 2][Ante: 1 3 3][Public: 1]"
+ObservationString(2) = "[Round 2][Player: 1][Pot: 7][Money: 99 97 97[Private: 3][Ante: 1 3 3][Public: 1]"
 ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 3.0, 3.0]
 ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 3.0, 3.0]
 ObservationTensor(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 3.0, 3.0]
@@ -355,9 +355,9 @@ InformationStateString(2) = "[Round 2][Player: 2][Pot: 11][Money: 99 93 97[Priva
 InformationStateTensor(0): ◉◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(1): ◯◉◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(2): ◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationString(0) = "[Round 2][Player: 2][Pot: 11][Money: 99 93 97[Private: 4][Ante: 1 7 3]"
-ObservationString(1) = "[Round 2][Player: 2][Pot: 11][Money: 99 93 97[Private: 2][Ante: 1 7 3]"
-ObservationString(2) = "[Round 2][Player: 2][Pot: 11][Money: 99 93 97[Private: 3][Ante: 1 7 3]"
+ObservationString(0) = "[Round 2][Player: 2][Pot: 11][Money: 99 93 97[Private: 4][Ante: 1 7 3][Public: 1]"
+ObservationString(1) = "[Round 2][Player: 2][Pot: 11][Money: 99 93 97[Private: 2][Ante: 1 7 3][Public: 1]"
+ObservationString(2) = "[Round 2][Player: 2][Pot: 11][Money: 99 93 97[Private: 3][Ante: 1 7 3][Public: 1]"
 ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 7.0, 3.0]
 ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 7.0, 3.0]
 ObservationTensor(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 7.0, 3.0]
@@ -389,9 +389,9 @@ InformationStateString(2) = "[Round 2][Player: 2][Pot: 0][Money: 99 100.5 100.5[
 InformationStateTensor(0): ◉◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◉◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(1): ◯◉◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◉◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(2): ◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◉◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯
-ObservationString(0) = "[Round 2][Player: 2][Pot: 0][Money: 99 100.5 100.5[Private: 4][Ante: 1 7 7]"
-ObservationString(1) = "[Round 2][Player: 2][Pot: 0][Money: 99 100.5 100.5[Private: 2][Ante: 1 7 7]"
-ObservationString(2) = "[Round 2][Player: 2][Pot: 0][Money: 99 100.5 100.5[Private: 3][Ante: 1 7 7]"
+ObservationString(0) = "[Round 2][Player: 2][Pot: 0][Money: 99 100.5 100.5[Private: 4][Ante: 1 7 7][Public: 1]"
+ObservationString(1) = "[Round 2][Player: 2][Pot: 0][Money: 99 100.5 100.5[Private: 2][Ante: 1 7 7][Public: 1]"
+ObservationString(2) = "[Round 2][Player: 2][Pot: 0][Money: 99 100.5 100.5[Private: 3][Ante: 1 7 7][Public: 1]"
 ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 7.0, 7.0]
 ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 7.0, 7.0]
 ObservationTensor(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 7.0, 7.0]

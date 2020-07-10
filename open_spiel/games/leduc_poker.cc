@@ -361,6 +361,11 @@ std::string LeducState::ObservationString(Player player) const {
   }
   absl::StrAppend(&result, "]");
 
+  // Add the public card
+  if (public_card_ != kInvalidCard) {
+    absl::StrAppend(&result, "[Public: ", public_card_, "]");
+  }
+
   return result;
 }
 
