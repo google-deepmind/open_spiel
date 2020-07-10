@@ -70,6 +70,7 @@ EXPECTED_GAMES = set([
     "negotiation",
     "nfg_game",
     "normal_form_extensive_game",
+    "oh_hell",
     "oshi_zumo",
     "othello",
     "oware",

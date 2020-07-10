@@ -35,6 +35,7 @@ Status                                       | Game
 <font color="orange"><b>~</b></font>         | [Markov Soccer](#markov-soccer)
 ![](_static/green_circ10.png "green circle") | [Matching Pennies (Three-player)](#matching-pennies-three-player)
 ![](_static/green_circ10.png "green circle") | [Negotiation](#negotiation)
+<font color="orange"><b>~</b></font>         | [Oh Hell](#oh-hell)
 ![](_static/green_circ10.png "green circle") | [Oshi-Zumo](#oshi-zumo)
 ![](_static/green_circ10.png "green circle") | [Oware](#oware)
 ![](_static/green_circ10.png "green circle") | [Pentago](#pentago)
@@ -356,6 +357,16 @@ Status                                       | Game
 *   2 players.
 *   [Lewis et al. '17](https://arxiv.org/abs/1706.05125),
     [Cao et al. '18](https://arxiv.org/abs/1804.03980)
+
+### Oh Hell
+
+*   A card game where players try to win exactly a declared number of tricks. 
+*   Card game.
+*   Traditional game.
+*   Non-deterministic.
+*   Imperfect information.
+*   3-7 players.
+*   [Wikipedia](https://en.wikipedia.org/wiki/Oh_Hell)
 
 ### Oshi-Zumo
 
