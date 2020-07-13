@@ -12,10 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPEN_SPIEL_ALGORITHMS_CORR_DIST_EFCCE_H_
-#define OPEN_SPIEL_ALGORITHMS_CORR_DIST_EFCCE_H_
-
-#include <vector>
+#ifndef OPEN_SPIEL_ALGORITHMS_CORR_DIST_AFCE_H_
+#define OPEN_SPIEL_ALGORITHMS_CORR_DIST_AFCE_H_
 
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/algorithms/corr_dist.h"
@@ -26,22 +24,13 @@
 namespace open_spiel {
 namespace algorithms {
 
-// This is an EFCCE extended game similar to the one described in von Stengel
-// and Forges 2008, Definition 2.2. The incentive to deviate to a best response
-// is computed by running NashConv on this auxiliary game.
-
-// The main difference in the EFCCE auxiliary game (from the EFCE game) is that
-// players must decide whether to accept or reject the recommendation *before*
-// seeing it. This changes the action space of the game, adding two new actions
-// that must be taken at each state before the actual decision is made.
-class EFCCEState : public WrappedState {
+class AFCEState : public WrappedState {
  public:
-  EFCCEState(std::shared_ptr<const Game> game, std::unique_ptr<State> state,
-             CorrDistConfig config, const CorrelationDevice& mu,
-             Action follow_action, Action defect_action);
+  AFCEState(std::shared_ptr<const Game> game, std::unique_ptr<State> state,
+            CorrDistConfig config, const CorrelationDevice& mu);
 
   std::unique_ptr<State> Clone() const override {
-    return std::make_unique<EFCCEState>(*this);
+    return std::make_unique<AFCEState>(*this);
   }
 
   // Need to override this because otherwise WrappedState forwards the
@@ -55,7 +44,7 @@ class EFCCEState : public WrappedState {
   ActionsAndProbs ChanceOutcomes() const override;
   std::vector<Action> LegalActions() const override;
   std::string InformationStateString(Player player) const override;
-  std::string ToString() const override;
+  std::string ToString() const;
 
   bool HasDefected(Player player) const;
 
@@ -64,11 +53,8 @@ class EFCCEState : public WrappedState {
   void DoApplyAction(Action action_id) override;
 
  private:
-  const CorrDistConfig config_;
+  CorrDistConfig config_;
   const CorrelationDevice& mu_;
-
-  Action follow_action_;
-  Action defect_action_;
 
   // Which joint policy was chosen?
   int rec_index_;
@@ -76,49 +62,39 @@ class EFCCEState : public WrappedState {
   // Has the player defected?
   std::vector<int> defected_;
 
+  // Where did the player defect? This is the information set of the original
+  // game. Indexed by player.
+  std::vector<absl::optional<std::string>> defection_infoset_;
+
   // The sequence of recommendations, indexed by player
   std::vector<std::vector<Action>> recommendation_seq_;
 };
 
-class EFCCEGame : public WrappedGame {
+class AFCEGame : public WrappedGame {
  public:
-  EFCCEGame(std::shared_ptr<const Game> game, CorrDistConfig config,
-            const CorrelationDevice& mu)
+  AFCEGame(std::shared_ptr<const Game> game, CorrDistConfig config,
+           const CorrelationDevice& mu)
       : WrappedGame(game, game->GetType(), game->GetParameters()),
         config_(config),
-        mu_(mu),
-        orig_num_distinct_actions_(game->NumDistinctActions()) {}
+        mu_(mu) {}
 
   std::unique_ptr<State> NewInitialState() const override {
-    return std::make_unique<EFCCEState>(shared_from_this(),
-                                        game_->NewInitialState(), config_, mu_,
-                                        FollowAction(), DefectAction());
+    return std::make_unique<AFCEState>(shared_from_this(),
+                                       game_->NewInitialState(), config_, mu_);
   }
 
   std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new EFCCEGame(*this));
+    return std::shared_ptr<const Game>(new AFCEGame(*this));
   }
 
-  int NumDistinctActions() const override {
-    // 2 extra actions: cooperate/follow or defect
-    return orig_num_distinct_actions_ + 2;
-  }
-
-  int FollowAction() const { return orig_num_distinct_actions_; }
-  int DefectAction() const { return orig_num_distinct_actions_ + 1; }
-
- private:
+ protected:
   const CorrDistConfig config_;
   const CorrelationDevice& mu_;
-
-  // Number of distinct actions in the original game.
-  int orig_num_distinct_actions_;
 };
 
-class EFCCETabularPolicy : public TabularPolicy {
+class AFCETabularPolicy : public TabularPolicy {
  public:
-  EFCCETabularPolicy(Action follow_action, Action defect_action)
-      : follow_action_(follow_action), defect_action_(defect_action) {}
+  AFCETabularPolicy(const CorrDistConfig& config) : config_(config) {}
 
   ActionsAndProbs GetStatePolicy(const std::string& info_state) const override {
     SpielFatalError("GetStatePolicy(const std::string&) should not be called.");
@@ -128,11 +104,10 @@ class EFCCETabularPolicy : public TabularPolicy {
   ActionsAndProbs GetStatePolicy(const State& state) const override;
 
  private:
-  const Action follow_action_;
-  const Action defect_action_;
+  const CorrDistConfig config_;
 };
 
 }  // namespace algorithms
 }  // namespace open_spiel
 
-#endif  // OPEN_SPIEL_ALGORITHMS_CORR_DIST_EFCCE_H_
+#endif  // OPEN_SPIEL_ALGORITHMS_CORR_DIST_AFCE_H_

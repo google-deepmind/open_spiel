@@ -221,8 +221,13 @@ void TestGreenwaldSarfatiExample1() {
          {{0, "Right P1 infoset"}, {{"l2", 0.0}, {"r2", 1.0}}}});
 
     CorrelationDevice mu = {{0.5, LAl1_policy}, {0.5, LBl1_policy}};
-
     CorrDistConfig config;
+
+    // This *is* an AFCE and AFCCE.
+    SPIEL_CHECK_FLOAT_NEAR(AFCEDist(*efg_game, config, mu), 0.0, 1e-6);
+    SPIEL_CHECK_FLOAT_NEAR(AFCCEDist(*efg_game, config, mu), 0.0, 1e-6);
+
+    // However, *not* an EFCE nor EFCCE.
     SPIEL_CHECK_GT(EFCEDist(*efg_game, config, mu), 0.0);
     SPIEL_CHECK_GT(EFCCEDist(*efg_game, config, mu), 0.0);
   }

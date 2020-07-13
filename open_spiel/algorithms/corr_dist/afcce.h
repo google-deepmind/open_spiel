@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPEN_SPIEL_ALGORITHMS_CORR_DIST_EFCCE_H_
-#define OPEN_SPIEL_ALGORITHMS_CORR_DIST_EFCCE_H_
+#ifndef OPEN_SPIEL_ALGORITHMS_CORR_DIST_AFCCE_H_
+#define OPEN_SPIEL_ALGORITHMS_CORR_DIST_AFCCE_H_
 
 #include <vector>
 
@@ -26,22 +26,18 @@
 namespace open_spiel {
 namespace algorithms {
 
-// This is an EFCCE extended game similar to the one described in von Stengel
-// and Forges 2008, Definition 2.2. The incentive to deviate to a best response
-// is computed by running NashConv on this auxiliary game.
-
-// The main difference in the EFCCE auxiliary game (from the EFCE game) is that
-// players must decide whether to accept or reject the recommendation *before*
-// seeing it. This changes the action space of the game, adding two new actions
-// that must be taken at each state before the actual decision is made.
-class EFCCEState : public WrappedState {
+// The AFCCE auxiliary game is very similar to the EFCCE auxiliary game. The
+// only difference is that the number of deviations is limited to 1. Once the
+// player has deviated, they can no longer deviate and must follow for the
+// rest of the game.
+class AFCCEState : public WrappedState {
  public:
-  EFCCEState(std::shared_ptr<const Game> game, std::unique_ptr<State> state,
+  AFCCEState(std::shared_ptr<const Game> game, std::unique_ptr<State> state,
              CorrDistConfig config, const CorrelationDevice& mu,
              Action follow_action, Action defect_action);
 
   std::unique_ptr<State> Clone() const override {
-    return std::make_unique<EFCCEState>(*this);
+    return std::make_unique<AFCCEState>(*this);
   }
 
   // Need to override this because otherwise WrappedState forwards the
@@ -76,13 +72,17 @@ class EFCCEState : public WrappedState {
   // Has the player defected?
   std::vector<int> defected_;
 
+  // Where did the player defect? This is the information set of the original
+  // game. Indexed by player.
+  std::vector<absl::optional<std::string>> defection_infoset_;
+
   // The sequence of recommendations, indexed by player
   std::vector<std::vector<Action>> recommendation_seq_;
 };
 
-class EFCCEGame : public WrappedGame {
+class AFCCEGame : public WrappedGame {
  public:
-  EFCCEGame(std::shared_ptr<const Game> game, CorrDistConfig config,
+  AFCCEGame(std::shared_ptr<const Game> game, CorrDistConfig config,
             const CorrelationDevice& mu)
       : WrappedGame(game, game->GetType(), game->GetParameters()),
         config_(config),
@@ -90,13 +90,13 @@ class EFCCEGame : public WrappedGame {
         orig_num_distinct_actions_(game->NumDistinctActions()) {}
 
   std::unique_ptr<State> NewInitialState() const override {
-    return std::make_unique<EFCCEState>(shared_from_this(),
+    return std::make_unique<AFCCEState>(shared_from_this(),
                                         game_->NewInitialState(), config_, mu_,
                                         FollowAction(), DefectAction());
   }
 
   std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new EFCCEGame(*this));
+    return std::shared_ptr<const Game>(new AFCCEGame(*this));
   }
 
   int NumDistinctActions() const override {
@@ -115,9 +115,9 @@ class EFCCEGame : public WrappedGame {
   int orig_num_distinct_actions_;
 };
 
-class EFCCETabularPolicy : public TabularPolicy {
+class AFCCETabularPolicy : public TabularPolicy {
  public:
-  EFCCETabularPolicy(Action follow_action, Action defect_action)
+  AFCCETabularPolicy(Action follow_action, Action defect_action)
       : follow_action_(follow_action), defect_action_(defect_action) {}
 
   ActionsAndProbs GetStatePolicy(const std::string& info_state) const override {
@@ -135,4 +135,4 @@ class EFCCETabularPolicy : public TabularPolicy {
 }  // namespace algorithms
 }  // namespace open_spiel
 
-#endif  // OPEN_SPIEL_ALGORITHMS_CORR_DIST_EFCCE_H_
+#endif  // OPEN_SPIEL_ALGORITHMS_CORR_DIST_AFCCE_H_
