@@ -19,8 +19,8 @@ from __future__ import print_function
 import pickle
 from absl.testing import absltest
 from absl.testing import parameterized
+from open_spiel.python.tests.test_utils import random_playout
 
-import numpy as np
 import pyspiel
 
 # All games with kSampledStochastic chance mode.
@@ -32,28 +32,22 @@ assert len(SPIEL_SAMPLED_STOCHASTIC_GAMES_LIST) >= 2
 
 
 class SampledStochasticGamesTest(parameterized.TestCase):
-    def random_playout(self, state):
-        np.random.seed(0)
-        while not state.is_terminal():
-            state.apply_action(np.random.choice(state.legal_actions()))
-        return state
-
     @parameterized.parameters(*SPIEL_SAMPLED_STOCHASTIC_GAMES_LIST)
     def test_stateful_game_serialization(self, game_info):
         game = pyspiel.load_game(game_info.short_name,
                                  {"rng_seed": pyspiel.GameParameter(0)})
         # mutate game's internal RNG state
-        state = self.random_playout(game.new_initial_state())
+        state = random_playout(game.new_initial_state())
         deserialized_game = pickle.loads(pickle.dumps(game))
 
         # make sure initial states are the same after game deserialization
-        state1 = self.random_playout(game.new_initial_state())
-        d_state1 = self.random_playout(deserialized_game.new_initial_state())
+        state1 = random_playout(game.new_initial_state())
+        d_state1 = random_playout(deserialized_game.new_initial_state())
         self.assertNotEqual(str(state1), str(state))
         self.assertEqual(str(state1), str(d_state1))
         # try one more time
-        state2 = self.random_playout(game.new_initial_state())
-        d_state2 = self.random_playout(deserialized_game.new_initial_state())
+        state2 = random_playout(game.new_initial_state())
+        d_state2 = random_playout(deserialized_game.new_initial_state())
         self.assertNotEqual(str(state2), str(state1))
         self.assertEqual(str(state2), str(d_state2))
 

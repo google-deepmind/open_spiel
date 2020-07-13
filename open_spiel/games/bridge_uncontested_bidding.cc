@@ -404,9 +404,9 @@ std::string UncontestedBiddingGame::ToString() const {
 std::unique_ptr<State> UncontestedBiddingGame::DeserializeState(
     const std::string& str) const {
   if (str.empty()) {
-    return std::unique_ptr<State>(
-        new UncontestedBiddingState(shared_from_this(), reference_contracts_,
-                                    deal_filter_, forced_actions_, rng_seed_));
+    return std::make_unique<UncontestedBiddingState>(
+        shared_from_this(), reference_contracts_, deal_filter_, forced_actions_,
+        rng_seed_);
   }
   SPIEL_CHECK_GE(str.length(),
                  kNumPlayers * (kNumCardsPerHand + kNumSuits) - 1);
