@@ -861,7 +861,7 @@ class Game : public std::enable_shared_from_this<Game> {
   // - Returns `default_value` if provided.
   template <typename T>
   T ParameterValue(const std::string& key,
-                   absl::optional<T> default_value = std::nullopt) const;
+                   absl::optional<T> default_value = absl::nullopt) const;
 
   // The game type.
   GameType game_type_;

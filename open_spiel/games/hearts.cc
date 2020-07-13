@@ -20,6 +20,7 @@
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_format.h"
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
@@ -625,7 +626,7 @@ std::unique_ptr<State> HeartsState::ResampleFromInfostate(
   std::vector<std::vector<int>> play_known(kNumPlayers);
   if (phase_ == Phase::kPlay) {
     for (int card = 0; card < kNumCards; card++) {
-      std::optional<Player> p = Played(card);
+      absl::optional<Player> p = Played(card);
       if (p && *p != player_id) {
         play_known[*p].push_back(card);
       }
@@ -633,7 +634,7 @@ std::unique_ptr<State> HeartsState::ResampleFromInfostate(
   }
 
   // the two of clubs is also known once a player has played first
-  std::optional<Player> two_clubs_holder = holder_[Card(Suit::kClubs, 0)];
+  absl::optional<Player> two_clubs_holder = holder_[Card(Suit::kClubs, 0)];
   if (phase_ == Phase::kPlay && two_clubs_holder) {
     play_known[*two_clubs_holder].push_back(Card(Suit::kClubs, 0));
   }
