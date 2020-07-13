@@ -23,7 +23,6 @@ import unittest
 
 from absl.testing import absltest
 from absl.testing import parameterized
-
 import numpy as np
 
 from open_spiel.python.algorithms import get_all_states
@@ -275,6 +274,45 @@ def _get_some_states(game, num_plays=10, include_terminals=True):
   return states
 
 
+def _run_until_timeout(callback, time_limit=TIMEABLE_TEST_RUNTIME):
+  is_time_out = lambda t: time.time() - t > time_limit
+  num_calls = 0
+  start = time.time()
+  while not is_time_out(start):
+    callback()
+    num_calls += 1
+  time_elapsed = time.time() - start
+  print(f"Timed test took {time_elapsed} seconds and made {num_calls} calls.")
+  return num_calls, time_elapsed
+
+
+def _rollout_and_callback(game, callback, give_up_after=100):
+  state = game.new_initial_state()
+  while not state.is_terminal():
+    if len(state.history()) > give_up_after:
+      break
+    action = random.choice(state.legal_actions(state.current_player()))
+    state.apply_action(action)
+    callback(state)
+
+
+def _rollout_callback_until_timeout(game, state_callback):
+  def timed_callback():
+    _rollout_and_callback(game, state_callback)
+  return _run_until_timeout(timed_callback)
+
+
+def _load_if_provides_factored_observation_string(game_name):
+  game = pyspiel.load_game(game_name)
+  game_type = game.get_type()
+  if game_type.provides_factored_observation_string:
+    return game
+
+  print(f"Skipping test for '{game_name}', as it doesn't provide "
+        "factored_observation_string.")
+  return None
+
+
 class PartialEnforceAPIConventionsTest(parameterized.TestCase):
   """This only partially test some properties."""
 
@@ -331,138 +369,49 @@ class PartialEnforceAPIConventionsTest(parameterized.TestCase):
       with self.assertRaisesRegex(RuntimeError, "player <", msg=msg):
         state.private_observation_string(num_players + 1)
 
-  @parameterized.parameters(_GAMES_FULL_TREE_TRAVERSAL_TESTS_NAMES)
-  def test_non_empty_private_information(self, game_name):
-    print("Testing private information is not empty in at least one state.")
-    game = pyspiel.load_game(game_name)
-    game_type = game.get_type()
-    if not game_type.provides_factored_observation_string:
-      print(f"Skipping test for '{game_name}', as it doesn't provide "
-            " factored_observation_string.")
+  @parameterized.parameters(_GAMES_TO_TEST)
+  def test_private_information_contents(self, game_name):
+    game = _load_if_provides_factored_observation_string(game_name)
+    if game is None:
       return
 
-    # pylint: disable=g-backslash-continuation
-    def show_error(player):
-      msg = f"All private states in game{game_name} for "\
-            f" player {player} are empty.\n \n" \
-            f"What to do to fix this? Consult the documentation to \n\n" \
-            f"State::PublicObservationString, State::PrivateObservationString."
-      return msg
+    player_has_private_info = [False] * game.num_players()
 
-    give_up_after = 1000
-    def collect_and_test_rollouts(player):
-      private_observations = []
-      state = game.new_initial_state()
-      private_observations.append(
-          state.private_observation_string(player).strip())
-      while not state.is_terminal():
-        if len(state.history()) > give_up_after:
-          break
-        action = random.choice(state.legal_actions(state.current_player()))
-        state.apply_action(action)
-        if state.private_observation_string(player).strip() not in [
-            "clock tick", "start game"
-        ]:
-          private_observations.append(
-              state.private_observation_string(player).strip())
-      self.assertNotEmpty(private_observations, show_error(player))
-    time_limit = TIMEABLE_TEST_RUNTIME / game.num_players()
-    is_time_out = lambda start: time.time() - start > time_limit
-    rollouts = 0
-    start = time.time()
-    for player in range(game.num_players()):
-      while not is_time_out(start):
-        collect_and_test_rollouts(player)
-        rollouts += 1
-      start = time.time()
-    print(f"Test for {game_name} took {time.time()-start} seconds "
-          f"to make {rollouts} rollouts.")
+    def update_info(state):
+      nonlocal player_has_private_info
+      for i in range(game.num_players()):
+        if state.private_observation_string(i) != \
+            pyspiel.PrivateObservation.NOTHING:
+          player_has_private_info[i] = True
+
+    _rollout_callback_until_timeout(game, update_info)
+
+    if game.get_type().information == \
+        pyspiel.GameType.Information.IMPERFECT_INFORMATION:
+      self.assertTrue(any(player_has_private_info))
+    if game.get_type().information == \
+        pyspiel.GameType.Information.PERFECT_INFORMATION:
+      none_of = lambda x: not any(x)
+      self.assertTrue(none_of(player_has_private_info))
 
   @parameterized.parameters(_GAMES_TO_TEST)
-  def test_start_of_game(self, game_name):
-    print("Testing public and private obsevation at the start of the game.")
-    game = pyspiel.load_game(game_name)
-    game_type = game.get_type()
-    if not game_type.provides_factored_observation_string:
-      print(f"Skipping test for '{game_name}', as it doesn't provide "
-            "factored_observation_string.")
+  def test_no_invalid_public_observations(self, game_name):
+    game = _load_if_provides_factored_observation_string(game_name)
+    if game is None:
       return
-
-    # pylint: disable=g-backslash-continuation
-    def show_error(state, player):
-      msg = \
-        f"\n\n" \
-        f"Public state or private state at the beginning of the game " \
-        f"{game_name} is not correct. \n\n" \
-        f"Current player: {player}.\n\n" \
-        f"State of game:\n{state}\n\n" \
-        f"Public state:\n{state.public_observation_string()}\n\n" \
-        f"The corresponding private state of player " \
-        f"{player}:\n{state.private_observation_string(player)}\n\n" \
-        f"What to do to fix this? Consult the documentation to " \
-        f"State::PublicObservationString and State::PrivateObservationString."
-      return msg
-
-    def collect_and_test_rollouts(player):
-      state = game.new_initial_state()
-      self.assertEqual(state.public_observation_string(), "start game",
-                       show_error(state, player))
-      self.assertEqual(
-          state.private_observation_string(player), "start game",
-          show_error(state, player))
-    start = time.time()
-    for player in range(game.num_players()):
-      collect_and_test_rollouts(player)
-    print(f"Test for {game_name} took {time.time()-start} seconds.")
+    def check_public_observation(state):
+      self.assertNotEqual(
+          state.public_observation_string(), pyspiel.PublicObservation.INVALID)
+    _rollout_callback_until_timeout(game, check_public_observation)
 
   @parameterized.parameters(_GAMES_TO_TEST)
-  def test_non_empty_public_observation(self, game_name):
-    print("Testing non_empty public observation at all states.")
-    game = pyspiel.load_game(game_name)
-    game_type = game.get_type()
-    if not game_type.provides_factored_observation_string:
-      print(f"Skipping test for '{game_name}', as it doesn't provide "
-            "factored_observation_string.")
+  def test_public_observations_start_game(self, game_name):
+    game = _load_if_provides_factored_observation_string(game_name)
+    if not game:
       return
-
-    # pylint: disable=g-backslash-continuation
-    def show_error(state, player):
-      msg = \
-        f"\n\n" \
-        f"Public state can never be empty. \n\n" \
-        f"Current player: {player}.\n\n" \
-        f"State of game:\n{state}\n\n" \
-        f"Public state:\n{state.public_observation_string()}\n\n" \
-        f"The corresponding private state of player " \
-        f"{player}:\n{state.private_observation_string(player)}\n\n" \
-        f"What to do to fix this? Consult the documentation to " \
-        f"State::PublicObservationString."
-      return msg
-
-    give_up_after = 100
-    def collect_and_test_rollouts(player):
-      state = game.new_initial_state()
-      self.assertNotEmpty(state.public_observation_string().strip(),
-                          show_error(state, player))
-      while not state.is_terminal():
-        if len(state.history()) > give_up_after:
-          break
-        action = random.choice(state.legal_actions(state.current_player()))
-        state.apply_action(action)
-        self.assertNotEmpty(state.public_observation_string().strip(),
-                            show_error(state, player))
-
-    time_limit = TIMEABLE_TEST_RUNTIME / game.num_players()
-    is_time_out = lambda start: time.time() - start > time_limit
-    rollouts = 0
-    start = time.time()
-    for player in range(game.num_players()):
-      while not is_time_out(start):
-        collect_and_test_rollouts(player)
-        rollouts += 1
-      start = time.time()
-    print(f"Test for {game_name} took {time.time()-start} seconds "
-          f"to make {rollouts} rollouts.")
+    state = game.new_initial_state()
+    self.assertEqual(
+        state.public_observation_string(), pyspiel.PublicObservation.START_GAME)
 
   def test_observations_are_consistent_with_info_states(self,
                                                         game_name="kuhn_poker"):

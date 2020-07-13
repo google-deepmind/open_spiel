@@ -50,9 +50,9 @@ ObservationString(0) = ""
 ObservationString(1) = ""
 ObservationString(2) = ""
 PublicObservationString() = "start game"
-PrivateObservationString(0) = "start game"
-PrivateObservationString(1) = "start game"
-PrivateObservationString(2) = "start game"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
+PrivateObservationString(2) = ""
 ObservationTensor(0): ◉◯◯◯◯◯◯◉◉◉
 ObservationTensor(1): ◯◉◯◯◯◯◯◉◉◉
 ObservationTensor(2): ◯◯◉◯◯◯◯◉◉◉
@@ -80,10 +80,10 @@ InformationStateTensor(2): ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationString(0) = "1111"
 ObservationString(1) = ""
 ObservationString(2) = ""
-PublicObservationString() = "deal 0"
-PrivateObservationString(0) = "1"
-PrivateObservationString(1) = "clock tick"
-PrivateObservationString(2) = "clock tick"
+PublicObservationString() = "Deal to player 0"
+PrivateObservationString(0) = "Received card 1"
+PrivateObservationString(1) = ""
+PrivateObservationString(2) = ""
 ObservationTensor(0): ◉◯◯◯◉◯◯◉◉◉
 ObservationTensor(1): ◯◉◯◯◯◯◯◉◉◉
 ObservationTensor(2): ◯◯◉◯◯◯◯◉◉◉
@@ -111,10 +111,10 @@ InformationStateTensor(2): ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationString(0) = "1111"
 ObservationString(1) = "3111"
 ObservationString(2) = ""
-PublicObservationString() = "deal 1"
-PrivateObservationString(0) = "clock tick"
-PrivateObservationString(1) = "3"
-PrivateObservationString(2) = "clock tick"
+PublicObservationString() = "Deal to player 1"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = "Received card 3"
+PrivateObservationString(2) = ""
 ObservationTensor(0): ◉◯◯◯◉◯◯◉◉◉
 ObservationTensor(1): ◯◉◯◯◯◯◉◉◉◉
 ObservationTensor(2): ◯◯◉◯◯◯◯◉◉◉
@@ -142,10 +142,10 @@ InformationStateTensor(2): ◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯
 ObservationString(0) = "1111"
 ObservationString(1) = "3111"
 ObservationString(2) = "2111"
-PublicObservationString() = "deal 2"
-PrivateObservationString(0) = "clock tick"
-PrivateObservationString(1) = "clock tick"
-PrivateObservationString(2) = "2"
+PublicObservationString() = "Deal to player 2"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
+PrivateObservationString(2) = "Received card 2"
 ObservationTensor(0): ◉◯◯◯◉◯◯◉◉◉
 ObservationTensor(1): ◯◉◯◯◯◯◉◉◉◉
 ObservationTensor(2): ◯◯◉◯◯◉◯◉◉◉
@@ -174,10 +174,10 @@ InformationStateTensor(2): ◯◯◉◯◯◉◯◉◯◯◯◯◯◯◯◯◯
 ObservationString(0) = "1111"
 ObservationString(1) = "3111"
 ObservationString(2) = "2111"
-PublicObservationString() = "0"
-PrivateObservationString(0) = "clock tick"
-PrivateObservationString(1) = "clock tick"
-PrivateObservationString(2) = "clock tick"
+PublicObservationString() = "Pass"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
+PrivateObservationString(2) = ""
 ObservationTensor(0): ◉◯◯◯◉◯◯◉◉◉
 ObservationTensor(1): ◯◉◯◯◯◯◉◉◉◉
 ObservationTensor(2): ◯◯◉◯◯◉◯◉◉◉
@@ -206,10 +206,10 @@ InformationStateTensor(2): ◯◯◉◯◯◉◯◉◯◉◯◯◯◯◯◯◯
 ObservationString(0) = "1111"
 ObservationString(1) = "3111"
 ObservationString(2) = "2111"
-PublicObservationString() = "0"
-PrivateObservationString(0) = "clock tick"
-PrivateObservationString(1) = "clock tick"
-PrivateObservationString(2) = "clock tick"
+PublicObservationString() = "Pass"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
+PrivateObservationString(2) = ""
 ObservationTensor(0): ◉◯◯◯◉◯◯◉◉◉
 ObservationTensor(1): ◯◉◯◯◯◯◉◉◉◉
 ObservationTensor(2): ◯◯◉◯◯◉◯◉◉◉
@@ -238,10 +238,10 @@ InformationStateTensor(2): ◯◯◉◯◯◉◯◉◯◉◯◯◉◯◯◯◯
 ObservationString(0) = "1112"
 ObservationString(1) = "3112"
 ObservationString(2) = "2112"
-PublicObservationString() = "1"
-PrivateObservationString(0) = "clock tick"
-PrivateObservationString(1) = "clock tick"
-PrivateObservationString(2) = "clock tick"
+PublicObservationString() = "Bet"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
+PrivateObservationString(2) = ""
 ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 2.0]
 ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 2.0]
 ObservationTensor(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 2.0]
@@ -270,10 +270,10 @@ InformationStateTensor(2): ◯◯◉◯◯◉◯◉◯◉◯◯◉◯◉◯◯
 ObservationString(0) = "1212"
 ObservationString(1) = "3212"
 ObservationString(2) = "2212"
-PublicObservationString() = "1"
-PrivateObservationString(0) = "clock tick"
-PrivateObservationString(1) = "clock tick"
-PrivateObservationString(2) = "clock tick"
+PublicObservationString() = "Bet"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
+PrivateObservationString(2) = ""
 ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 2.0, 1.0, 2.0]
 ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 2.0, 1.0, 2.0]
 ObservationTensor(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 2.0, 1.0, 2.0]
@@ -302,10 +302,10 @@ InformationStateTensor(2): ◯◯◉◯◯◉◯◉◯◉◯◯◉◯◉◉◯
 ObservationString(0) = "1212"
 ObservationString(1) = "3212"
 ObservationString(2) = "2212"
-PublicObservationString() = "0"
-PrivateObservationString(0) = "clock tick"
-PrivateObservationString(1) = "clock tick"
-PrivateObservationString(2) = "clock tick"
+PublicObservationString() = "Pass"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
+PrivateObservationString(2) = ""
 ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 2.0, 1.0, 2.0]
 ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 2.0, 1.0, 2.0]
 ObservationTensor(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 2.0, 1.0, 2.0]

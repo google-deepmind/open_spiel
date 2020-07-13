@@ -557,7 +557,8 @@ class PublicState {
   }
 
   // Public observations received so far.
-  std::vector<PublicTransition> pub_obs_history_ = {kStartOfGameObservation};
+  std::vector<PublicTransition> pub_obs_history_ = {
+      kStartOfGamePublicObservation};
 
   // A pointer to the game that created this public state.
   const std::shared_ptr<const GameWithPublicStates> public_game_;

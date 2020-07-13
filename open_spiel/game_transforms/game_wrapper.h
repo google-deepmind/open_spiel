@@ -73,7 +73,7 @@ class WrappedState : public State {
   }
 
   void ObservationTensor(Player player,
-                                 std::vector<double>* values) const override{
+                         std::vector<double>* values) const override {
     state_->ObservationTensor(player, values);
   }
 

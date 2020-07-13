@@ -30,28 +30,12 @@
 #include "open_spiel/abseil-cpp/absl/random/bit_gen_ref.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
-#include "open_spiel/fog_constants.h"
+#include "open_spiel/fog/fog_constants.h"
 #include "open_spiel/game_parameters.h"
+#include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
-
-// Player ids are 0, 1, 2, ...
-// Negative numbers are used for various special values.
-enum PlayerId {
-  // The fixed player id for chance/nature.
-  kChancePlayerId = -1,
-  // What is returned as a player id when the game is simultaneous.
-  kSimultaneousPlayerId = -2,
-  // Invalid player.
-  kInvalidPlayer = -3,
-  // What is returned as the player id on terminal nodes.
-  kTerminalPlayerId = -4
-};
-
-// Constant representing an invalid action.
-inline constexpr Action kInvalidAction = -1;
-
 
 // Static information for a game. This will determine what algorithms are
 // applicable. For example, minimax search is only applicable to two-player,
@@ -150,11 +134,6 @@ struct GameType {
   bool provides_factored_observation_string = false;
 };
 
-enum class StateType {
-  kTerminal,  // If the state is terminal.
-  kChance,    // If the player to act equals kChanceId.
-  kDecision,  // If a player other than kChanceId is acting.
-};
 std::ostream& operator<<(std::ostream& os, const StateType& type);
 
 std::ostream& operator<<(std::ostream& stream, GameType::Dynamics value);
@@ -165,15 +144,6 @@ std::ostream& operator<<(std::ostream& stream, GameType::RewardModel value);
 
 // The probability of taking each possible action in a particular info state.
 using ActionsAndProbs = std::vector<std::pair<Action, double>>;
-
-// Layouts for 3-D tensors. For 2-D tensors, we assume that the layout is a
-// single spatial dimension and a channel dimension. If a 2-D tensor should be
-// interpreted as a 2-D space, report it as 3-D with a channel dimension of
-// size 1. We have no standard for higher-dimensional tensors.
-enum class TensorLayout {
-  kHWC,  // indexes are in the order (height, width, channels)
-  kCHW,  // indexes are in the order (channels, height, width)
-};
 
 // Forward declaration needed for the backpointer within State.
 class Game;
@@ -214,6 +184,9 @@ class State {
   virtual void ApplyAction(Action action_id) {
     // history_ needs to be modified *after* DoApplyAction which could
     // be using it.
+
+    // Cannot apply an invalid action.
+    SPIEL_CHECK_NE(action_id, kInvalidAction);
     Player player = CurrentPlayer();
     DoApplyAction(action_id);
     history_.push_back({player, action_id});
@@ -342,6 +315,9 @@ class State {
     return CurrentPlayer() == kChancePlayerId;
   }
 
+  // Is this state a player node, with a single player acting?
+  virtual bool IsPlayerNode() const { return CurrentPlayer() >= 0; }
+
   // Is this state a node that requires simultaneous action choices from more
   // than one player? If this is ever true, then the game should be marked as
   // a simultaneous game.
@@ -371,6 +347,9 @@ class State {
   // mapping between histories (i.e. sequences of actions for all players,
   // including chance) and the `State` objects.
   std::string HistoryString() const { return absl::StrJoin(History(), " "); }
+
+  // Is this a first state in the game, i.e. the initial state (root node)?
+  bool IsInitialState() const { return History().empty(); }
 
   // For imperfect information games. Returns an identifier for the current
   // information state for the specified player.

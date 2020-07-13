@@ -41,7 +41,7 @@ PublicState::PublicState(
     : public_game_(std::move(public_game)),
       base_game_(public_game_->GetBaseGame()) {
   SPIEL_CHECK_TRUE(base_game_->GetType().provides_factored_observation_string);
-  SPIEL_CHECK_EQ(pub_obs_history[0], kStartOfGameObservation);
+  SPIEL_CHECK_EQ(pub_obs_history[0], kStartOfGamePublicObservation);
   for (int i = 1; i < pub_obs_history.size(); ++i) {
     SPIEL_CHECK_TRUE(IsPublicTransitionApplicable(pub_obs_history[i]));
     ApplyPublicTransition(pub_obs_history[i]);

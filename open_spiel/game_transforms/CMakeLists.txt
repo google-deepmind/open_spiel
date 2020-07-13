@@ -18,6 +18,12 @@ add_executable(turn_based_simultaneous_game_test
                $<TARGET_OBJECTS:tests>)
 add_test(turn_based_simultaneous_game_test turn_based_simultaneous_game_test)
 
+#add_executable(with_observation_history_test
+#               with_observation_history_test.cc
+#               ${OPEN_SPIEL_OBJECTS}
+#               $<TARGET_OBJECTS:tests>)
+#add_test(with_observation_history_test with_observation_history_test)
+
 add_executable(misere_test
                misere_test.cc
                ${OPEN_SPIEL_OBJECTS}
