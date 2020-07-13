@@ -207,3 +207,28 @@ add_subdirectory (utils)
 if (BUILD_WITH_JULIA)
   add_subdirectory (julia)
 endif()
+
+# Build a shared library, i.e. libopen_spiel.so. We generally only enable this
+# for binary releases.
+# Note that there are known problems when trying to use absl::flags within a
+# shared library, hence is intentionally left out. To use ABSL flags, link with
+# absl::flags and absl::flags_parse separately.
+set (BUILD_SHARED_LIB OFF CACHE BOOL "Build a shared library?")
+if(NOT DEFINED ENV{BUILD_SHARED_LIB})
+  set (ENV{BUILD_SHARED_LIB} OFF)
+endif()
+set (BUILD_SHARED_LIB $ENV{BUILD_SHARED_LIB})
+if (BUILD_SHARED_LIB)
+  add_library(open_spiel SHARED ${OPEN_SPIEL_OBJECTS})
+  target_include_directories(open_spiel PUBLIC
+      ${CMAKE_CURRENT_SOURCE_DIR} abseil-cpp)
+  target_link_libraries(open_spiel PUBLIC
+    absl::container
+    absl::flat_hash_map
+    absl::optional
+    absl::random_random
+    absl::str_format
+    absl::strings
+    absl::time
+  )
+endif()
