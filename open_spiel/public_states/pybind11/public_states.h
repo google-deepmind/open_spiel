@@ -12,14 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPEN_SPIEL_PYTHON_PYBIND11_GAMES_BRIDGE_H_
-#define OPEN_SPIEL_PYTHON_PYBIND11_GAMES_BRIDGE_H_
+#ifndef OPEN_SPIEL_PUBLIC_STATES_PYTHON_PYBIND11_PUBLIC_STATES_H_
+#define OPEN_SPIEL_PUBLIC_STATES_PYTHON_PYBIND11_PUBLIC_STATES_H_
 
 #include "pybind11/include/pybind11/pybind11.h"
 
-// Initialize the Python interface for bridge.
 namespace open_spiel {
-void init_pyspiel_games_bridge(::pybind11::module &m);
-}
+void init_pyspiel_public_states(::pybind11::module& m);
+}  // namespace open_spiel
 
-#endif  // OPEN_SPIEL_PYTHON_PYBIND11_GAMES_BRIDGE_H_
+#endif  // OPEN_SPIEL_PUBLIC_STATES_PYTHON_PYBIND11_PUBLIC_STATES_H_

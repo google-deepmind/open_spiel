@@ -136,6 +136,15 @@ bool KuhnPublicState::AllPlayerHaveSeenTheirCards() const {
 }
 int KuhnPublicState::NumPlayers() const { return base_game_->NumPlayers(); }
 int KuhnPublicState::NumCards() const { return base_game_->NumPlayers() + 1; }
+int KuhnPublicState::NumPassesWithoutBet() const {
+  int num_passes_without_bet = 0;
+  for (int i = 0; i < std::fmin(public_actions_.size(), NumPlayers()); ++i) {
+    if (public_actions_[i] == base_kuhn::ActionType::kBet) break;
+    SPIEL_CHECK_EQ(public_actions_[i], base_kuhn::ActionType::kPass);
+    num_passes_without_bet++;
+  }
+  return num_passes_without_bet;
+}
 
 KuhnPublicState::KuhnPublicState(
     std::shared_ptr<const GameWithPublicStates> public_game)
@@ -269,26 +278,18 @@ std::unique_ptr<State> KuhnPublicState::ResampleFromInformationSet(
   for (const auto& a : public_actions_) state->ApplyAction(a);
   return state;
 }
-std::vector<PublicTransition> KuhnPublicState::GetPublicTransitions() const {
+std::vector<PublicTransition> KuhnPublicState::LegalTransitions() const {
   // Deal cards.
   if (GetDepth() < NumPlayers()) {
-    return {absl::StrCat("deal ", GetDepth())};
+    return {absl::StrCat("Deal to player ", GetDepth())};
   }
   // First round.
   if (GetDepth() < 2 * NumPlayers()) {
-    return {std::to_string(base_kuhn::ActionType::kPass),
-            std::to_string(base_kuhn::ActionType::kBet)};
+    return {"Pass", "Bet"};
   }
   // Second round.
-  int num_passes_without_bet = 0;
-  for (int i = 0; i < GetDepth() - NumPlayers(); ++i) {
-    if (public_actions_[i] == base_kuhn::ActionType::kBet) break;
-    SPIEL_CHECK_EQ(public_actions_[i], base_kuhn::ActionType::kPass);
-    num_passes_without_bet++;
-  }
-  if (num_passes_without_bet + 2 * NumPlayers() > GetDepth()) {
-    return {std::to_string(base_kuhn::ActionType::kPass),
-            std::to_string(base_kuhn::ActionType::kBet)};
+  if (NumPassesWithoutBet() + 2 * NumPlayers() > GetDepth()) {
+    return {"Pass", "Bet"};
   }
   // Terminal.
   SPIEL_CHECK_TRUE(IsTerminal());
@@ -310,7 +311,10 @@ void KuhnPublicState::UndoTransition(const PublicTransition& transition) {
 bool KuhnPublicState::IsChance() const {
   return !AllPlayerHaveSeenTheirCards();
 }
-bool KuhnPublicState::IsTerminal() const { return PublicState::IsTerminal(); }
+bool KuhnPublicState::IsTerminal() const {
+  return public_actions_.size() == NumPlayers() + NumPassesWithoutBet() ||
+         NumPlayers() == NumPassesWithoutBet();
+}
 bool KuhnPublicState::IsPlayer() const {
   if (IsTerminal()) return false;
   return AllPlayerHaveSeenTheirCards();
@@ -436,10 +440,22 @@ std::unique_ptr<PublicState> KuhnPublicState::Clone() const {
 }
 void KuhnPublicState::DoApplyPublicTransition(
     const PublicTransition& transition) {
-  if (GetDepth() < NumPlayers()) return;
-  SPIEL_CHECK_TRUE(transition == "0" || transition == "1");
-  public_actions_.push_back(
-      static_cast<base_kuhn::ActionType>(std::stoi(transition)));
+  if (GetDepth() < NumPlayers()) {
+    SPIEL_CHECK_EQ(transition, absl::StrCat("Deal to player ", GetDepth()));
+    return;  // Do not push back to public actions.
+  }
+
+  if (transition == "Pass") {
+    public_actions_.push_back(base_kuhn::ActionType::kPass);
+    return;
+  }
+  if (transition == "Bet") {
+    public_actions_.push_back(base_kuhn::ActionType::kBet);
+    return;
+  }
+
+  SpielFatalError(
+      absl::StrCat("Applying illegal transition '", transition, "'"));
 }
 
 }  // namespace kuhn_poker

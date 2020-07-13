@@ -12,6 +12,11 @@ This document is best viewed with
 
 --------------------------------------------------------------------------------
 
+<p align="center">
+  <img src="docs/_static/public_tree_kuhn.png"
+       alt="Visualization of Base API and Public State API for Kuhn Poker">
+</p>
+
 This directory contains Public State API: a special OpenSpiel sub-API that
 enables implementation of algorithms that are used to efficiently solve large
 games of imperfect information, primarily by taking advantage of value function

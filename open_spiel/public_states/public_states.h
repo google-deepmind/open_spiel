@@ -293,6 +293,7 @@ class PublicState {
   //
   // Mutates public state!
   void ApplyPublicTransition(const PublicTransition& transition) {
+    SPIEL_CHECK_FALSE(IsTerminal());
     DoApplyPublicTransition(transition);
     pub_obs_history_.push_back(transition);
   }
@@ -315,8 +316,8 @@ class PublicState {
     return child;
   }
 
-  virtual std::vector<PublicTransition> GetPublicTransitions() const {
-    SpielFatalError("GetPublicTransitions() is not implemented.");
+  virtual std::vector<PublicTransition> LegalTransitions() const {
+    SpielFatalError("LegalTransitions() is not implemented.");
   }
 
   // For each private information of a player return its private actions.
@@ -338,9 +339,9 @@ class PublicState {
 
   // Checks if this public transition can be applied in this public state.
   // The implementation checks if the transition is in the list provided
-  // by GetPublicTransitions().
-  bool IsPublicTransitionApplicable(const PublicTransition& transition) const {
-    for (const PublicTransition& valid_transition : GetPublicTransitions()) {
+  // by LegalTransitions().
+  bool IsTransitionLegal(const PublicTransition& transition) const {
+    for (const PublicTransition& valid_transition : LegalTransitions()) {
       if (valid_transition == transition) return true;
     }
     return false;
@@ -680,8 +681,12 @@ class GameWithPublicStatesRegisterer {
 // false otherwise.
 bool IsGameRegisteredWithPublicStates(const std::string& short_name);
 
-// Returns a list of games that have public state API.
+// Returns a list of registered games' short names for games that have
+// public state API.
 std::vector<std::string> RegisteredGamesWithPublicStates();
+
+// Returns a list of registered game types for games that have public state API.
+std::vector<GameWithPublicStatesType> RegisteredGameTypesWithPublicStates();
 
 // Returns a new game object from the specified string, which is the short
 // name plus optional parameters, e.g. "go(komi=4.5,board_size=19)"

@@ -43,7 +43,6 @@ PublicState::PublicState(
   SPIEL_CHECK_TRUE(base_game_->GetType().provides_factored_observation_string);
   SPIEL_CHECK_EQ(pub_obs_history[0], kStartOfGamePublicObservation);
   for (int i = 1; i < pub_obs_history.size(); ++i) {
-    SPIEL_CHECK_TRUE(IsPublicTransitionApplicable(pub_obs_history[i]));
     ApplyPublicTransition(pub_obs_history[i]);
   }
 }
@@ -159,6 +158,10 @@ bool IsGameRegisteredWithPublicStates(const std::string& short_name) {
 
 std::vector<std::string> RegisteredGamesWithPublicStates() {
   return GameWithPublicStatesRegisterer::RegisteredNames();
+}
+
+std::vector<GameWithPublicStatesType> RegisteredGameTypesWithPublicStates() {
+  return GameWithPublicStatesRegisterer::RegisteredGames();
 }
 
 std::shared_ptr<const GameWithPublicStates> LoadGameWithPublicStates(
