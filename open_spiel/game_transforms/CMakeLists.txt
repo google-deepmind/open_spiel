@@ -7,6 +7,8 @@ add_library (game_transforms OBJECT
   misere.h
   normal_form_extensive_game.cc
   normal_form_extensive_game.h
+  repeated_game.cc
+  repeated_game.h
   turn_based_simultaneous_game.cc
   turn_based_simultaneous_game.h
 )
@@ -47,3 +49,9 @@ add_executable(normal_form_extensive_game_test
                ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(normal_form_extensive_game_test normal_form_extensive_game_test)
+
+add_executable(repeated_game_test
+               repeated_game_test.cc
+               ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(repeated_game_test repeated_game_test)
