@@ -275,17 +275,31 @@ uint32_t ACPCState::CurrentSpent(const uint8_t player) const {
   return acpcState_->spent[player];
 }
 
+std::string ACPCState::ActionToString(
+    const project_acpc_server::Action &action) const {
+  switch (action.type) {
+    case ACPCState::ACPC_CALL:
+      return "c";
+    case ACPCState::ACPC_FOLD:
+      return "f";
+    case ACPCState::ACPC_RAISE:
+      if (game_->acpc_game_->bettingType ==
+          project_acpc_server::noLimitBetting) {
+        return absl::StrCat("r", action.size);
+      }
+      return "r";
+    default:
+      SpielFatalError("Should never happen.");
+  }
+}
+
 std::string ACPCState::BettingSequence(uint8_t round) const {
   assert(round < game_->acpc_game_->numRounds);
-  std::ostringstream out;
-  char buf[10];
+  std::string out;
   for (int a = 0; a < acpcState_->numActions[round]; a++) {
-    project_acpc_server::Action *action = &acpcState_->action[round][a];
-    printAction(game_->acpc_game_.get(), action, 10, buf);
-    out << buf;
+    absl::StrAppend(&out, ActionToString(acpcState_->action[round][a]));
   }
-
-  return out.str();
+  return out;
 }
 
 void ACPCState::SetHoleAndBoardCards(uint8_t holeCards[10][3],

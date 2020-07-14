@@ -76,17 +76,18 @@ CardSet::CardSet(uint16_t num_suits, uint16_t num_ranks) : cs() {
 }
 
 std::string CardSet::ToString() const {
-  std::ostringstream result;
+  std::string result;
   for (int r = MAX_RANKS - 1; r >= 0; r--) {
     for (int s = MAX_SUITS - 1; s >= 0; s--) {
       uint32_t mask = (uint32_t)1 << r;
       if (cs.bySuit[s] & mask) {
-        result << kRankChars[r] << kSuitChars[s];
+        absl::StrAppend(&result, std::string(1, kRankChars[r]),
+                        std::string(1, kSuitChars[s]));
       }
     }
   }
 
-  return result.str();
+  return result;
 }
 
 std::vector<uint8_t> CardSet::ToCardArray() const {

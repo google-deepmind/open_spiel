@@ -34,7 +34,6 @@ class ACPCState {
  public:
   enum ACPCActionType { ACPC_FOLD, ACPC_CALL, ACPC_RAISE, ACPC_INVALID };
 
- public:
   ACPCState(const ACPCGame* game);
   ACPCState(const ACPCState& other);
   virtual ~ACPCState();
@@ -66,6 +65,9 @@ class ACPCState {
 
   const ACPCGame* game_;
   std::unique_ptr<RawACPCState> acpcState_;
+
+ private:
+  std::string ActionToString(const project_acpc_server::Action& action) const;
 };
 
 class ACPCGame {
