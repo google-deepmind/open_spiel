@@ -82,6 +82,8 @@ openspiel_optional_dependency(
   BUILD_WITH_PYTHON        "Build binary for Python.")
 openspiel_optional_dependency(
   BUILD_WITH_XINXIN        "Build against xinxin Hearts program.")
+openspiel_optional_dependency(
+  BUILD_WITH_ROSHAMBO      "Build against RoShamBo bots.")
 
 # Needed to disable Abseil tests.
 set (BUILD_TESTING OFF)
@@ -179,6 +181,9 @@ endif()
 if (BUILD_WITH_XINXIN)
   set(OPEN_SPIEL_OBJECTS ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:xinxin>)
 endif()
+if (BUILD_WITH_ROSHAMBO)
+  set(OPEN_SPIEL_OBJECTS ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:roshambo>)
+endif()
 if (BUILD_WITH_LIBTORCH)
   list(APPEND CMAKE_PREFIX_PATH "${CMAKE_CURRENT_SOURCE_DIR}/libtorch/libtorch")
   find_package(Torch REQUIRED)
@@ -193,6 +198,7 @@ endif()
 include_directories(..)
 
 add_subdirectory (algorithms)
+add_subdirectory (bots)
 add_subdirectory (examples)
 add_subdirectory (games)
 add_subdirectory (game_transforms)
