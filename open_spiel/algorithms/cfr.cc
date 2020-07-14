@@ -27,13 +27,38 @@ namespace open_spiel {
 namespace algorithms {
 
 constexpr const int kSerializationVersion = 1;
-constexpr const char* kSerializeMetaSectionHeader = "[Meta]";
-constexpr const char* kSerializeGameSectionHeader = "[Game]";
-constexpr const char* kSerializeSolverTypeSectionHeader = "[SolverType]";
-constexpr const char* kSerializeSolverSpecificStateSectionHeader =
-    "[SolverSpecificState]";
-constexpr const char* kSerializeSolverValuesTableSectionHeader =
-    "[SolverValuesTable]";
+
+// All CFR solvers support serialization. CFRSolver, CFRPlusSolver and
+// CFRBRSolver all rely on CFRSolverBase::Serialize() to provide the
+// functionality (each subtype only implements the SerializeThisType() method
+// which returns the name of the serialized subclass).
+// ExternalSamplingMCCFRSolver and OutcomeSamplingMCCFRSolver implement
+// their own versions of Serialize().
+//
+// During the serialization we store multiple different sections which are
+// described below:
+//   - [SolverType] is the name of the serialized class.
+//   - [SolverSpecificState] is a section to which different solvers write state
+//       that is specific to their own type. Note that serialization and
+//       deserialization of this section is left entirely to each of the
+//       subtypes.
+//   - [SolverValuesTable] is the section to which CFRInfoStateValuesTable is
+//       written.
+//
+// During deserialization all solvers rely on the
+// PartiallyDeserializeCFRSolver() method which deserializes common properties
+// but leaves deserialization of [SolverSpecificState] section to the caller.
+//
+// Note that there are some specifics that need to be taken into account when
+// reading the de/serialization code:
+//   - Each solver's Serialize() method has two parameters which are not exposed
+//       in Python, i.e. int double_precision and std::string delimiter.
+//   - We try to avoid copying/moving of CFRInfoStateValuesTable where possible
+//       due to its potentially large size (mainly due to memory concerns). For
+//       that reason the PartiallyDeserializeCFRSolver() method also returns a
+//       string_view of the table and leaves deserialization to the callers
+//       which then in turn call the efficient
+//       DeserializeCFRInfoStateValuesTable().
 
 CFRAveragePolicy::CFRAveragePolicy(const CFRInfoStateValuesTable& info_states,
                                    std::shared_ptr<Policy> default_policy)

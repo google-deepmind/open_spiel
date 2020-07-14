@@ -28,6 +28,14 @@
 namespace open_spiel {
 namespace algorithms {
 
+constexpr const char* kSerializeMetaSectionHeader = "[Meta]";
+constexpr const char* kSerializeGameSectionHeader = "[Game]";
+constexpr const char* kSerializeSolverTypeSectionHeader = "[SolverType]";
+constexpr const char* kSerializeSolverSpecificStateSectionHeader =
+    "[SolverSpecificState]";
+constexpr const char* kSerializeSolverValuesTableSectionHeader =
+    "[SolverValuesTable]";
+
 // A basic structure to store the relevant quantities.
 struct CFRInfoStateValues {
   CFRInfoStateValues() {}

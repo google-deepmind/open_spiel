@@ -30,17 +30,10 @@ namespace algorithms {
 // regular CFR solvers, i.e. take a look at the PartiallyDeserializedCFRSolver()
 // method for more info.
 constexpr const int kSerializationVersion = 1;
-constexpr const char* kSerializeMetaSectionHeader = "[Meta]";
-constexpr const char* kSerializeGameSectionHeader = "[Game]";
-constexpr const char* kSerializeSolverTypeSectionHeader = "[SolverType]";
-constexpr const char* kSerializeSolverSpecificStateSectionHeader =
-    "[SolverSpecificState]";
 constexpr const char* kSerializeSolverRNGSectionHeader = "[SolverRNG]";
 constexpr const char* kSerializeSolverScalarsSectionHeader = "[SolverScalars]";
 constexpr const char* kSerializeSolverDefaultPolicySectionHeader =
     "[SolverDefaultPolicy]";
-constexpr const char* kSerializeSolverValuesTableSectionHeader =
-    "[SolverValuesTable]";
 
 OutcomeSamplingMCCFRSolver::OutcomeSamplingMCCFRSolver(const Game& game,
                                                        double epsilon, int seed)
