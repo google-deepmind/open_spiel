@@ -63,20 +63,20 @@ const Element kElDirt = {
   HiddenCellType::kDirt, VisibleCellType::kDirt,
   ElementProperties::kConsumable, '.'
 };
-const Element kElBoulder = {
-  HiddenCellType::kBoulder, VisibleCellType::kBoulder,
+const Element kElStone = {
+  HiddenCellType::kStone, VisibleCellType::kStone,
   ElementProperties::kConsumable | ElementProperties::kRounded, 'o'
 };
-const Element kElBoulderFalling = {
-  HiddenCellType::kBoulderFalling, VisibleCellType::kBoulder,
+const Element kElStoneFalling = {
+  HiddenCellType::kStoneFalling, VisibleCellType::kStone,
   ElementProperties::kConsumable, 'o'
 };
 const Element kElDiamond = {
-  HiddenCellType::KDiamond, VisibleCellType::KDiamond,
+  HiddenCellType::kDiamond, VisibleCellType::kDiamond,
   ElementProperties::kConsumable | ElementProperties::kRounded, '*'
 };
 const Element kElDiamondFalling = {
-  HiddenCellType::kDiamondFalling, VisibleCellType::KDiamond,
+  HiddenCellType::kDiamondFalling, VisibleCellType::kDiamond,
   ElementProperties::kConsumable, '*'
 };
 const Element kElFireflyUp = {
@@ -242,9 +242,9 @@ const std::unordered_map<int, Element> kCellTypeToElement {
   {static_cast<int>(HiddenCellType::kAgent), kElAgent}, 
   {static_cast<int>(HiddenCellType::kEmpty), kElEmpty}, 
   {static_cast<int>(HiddenCellType::kDirt), kElDirt}, 
-  {static_cast<int>(HiddenCellType::kBoulder), kElBoulder}, 
-  {static_cast<int>(HiddenCellType::kBoulderFalling), kElBoulderFalling}, 
-  {static_cast<int>(HiddenCellType::KDiamond), kElDiamond}, 
+  {static_cast<int>(HiddenCellType::kStone), kElStone}, 
+  {static_cast<int>(HiddenCellType::kStoneFalling), kElStoneFalling}, 
+  {static_cast<int>(HiddenCellType::kDiamond), kElDiamond}, 
   {static_cast<int>(HiddenCellType::kDiamondFalling), kElDiamondFalling}, 
   {static_cast<int>(HiddenCellType::kExitClosed), kElExitClosed}, 
   {static_cast<int>(HiddenCellType::kExitOpen), kElExitOpen}, 
@@ -365,13 +365,13 @@ const std::unordered_map<Element, Element, ElementHash> kElementToExplosion {
 
 // Explosions back to elements
 const std::unordered_map<Element, Element, ElementHash> kExplosionToElement {
-  {kElExplosionDiamond, kElDiamond}, {kElExplosionBoulder, kElBoulder},
+  {kElExplosionDiamond, kElDiamond}, {kElExplosionBoulder, kElStone},
   {kElExplosionEmpty, kElEmpty},
 };
 
 // Magic wall conversion map
 const std::unordered_map<Element, Element, ElementHash> kMagicWallConversion {
-  {kElBoulderFalling, kElDiamondFalling}, {kElDiamondFalling, kElBoulderFalling},
+  {kElStoneFalling, kElDiamondFalling}, {kElDiamondFalling, kElStoneFalling},
 };
 
 // Gem point maps
@@ -392,7 +392,7 @@ const std::unordered_map<Element, Element, ElementHash> kKeyToGate {
 
 // Stationary to falling
 const std::unordered_map<Element, Element, ElementHash> kElToFalling {
-  {kElDiamond, kElDiamondFalling}, {kElBoulder, kElBoulderFalling},
+  {kElDiamond, kElDiamondFalling}, {kElStone, kElStoneFalling},
   {kElNut, kElNutFalling}, {kElBomb, kElBombFalling},
 };
 
@@ -688,24 +688,24 @@ void StonesNGemsState::OpenGate(Element element) {
   }
 }
 
-void StonesNGemsState::UpdateBoulder(int index) {
+void StonesNGemsState::UpdateStone(int index) {
   // Boulder falls if empty below
   if (IsType(index, kElEmpty, Directions::kDown)) {
-    SetItem(index, kElBoulderFalling, grid_.ids[index]);
-    UpdateBoulderFalling(index);
+    SetItem(index, kElStoneFalling, grid_.ids[index]);
+    UpdateStoneFalling(index);
   } else if (CanRollLeft(index)) {    // Roll left/right if possible
-    RollLeft(index, kElBoulderFalling);
+    RollLeft(index, kElStoneFalling);
   } else if (CanRollRight(index)) {
-    RollRight(index, kElBoulderFalling);
+    RollRight(index, kElStoneFalling);
   }
 }
 
-void StonesNGemsState::UpdateBoulderFalling(int index) {
+void StonesNGemsState::UpdateStoneFalling(int index) {
   // Continue to fall as normal
   if (IsType(index, kElEmpty, Directions::kDown)) {
     MoveItem(index, Directions::kDown);
   } else if (HasProperty(index, ElementProperties::kCanExplode, Directions::kDown)) {
-    // Falling boulders can cause elements to explode
+    // Falling stones can cause elements to explode
     auto it = kElementToExplosion.find(GetItem(index, Directions::kDown));
     Element ex = (it == kElementToExplosion.end()) ? kElExplosionEmpty : it->second;
     Explode(index, ex, Directions::kDown);
@@ -721,12 +721,12 @@ void StonesNGemsState::UpdateBoulderFalling(int index) {
     Element ex = (it == kElementToExplosion.end()) ? kElExplosionEmpty : it->second;
     Explode(index, ex);
   } else if (CanRollLeft(index)) {    // Roll left/right
-    RollLeft(index, kElBoulderFalling);
+    RollLeft(index, kElStoneFalling);
   } else if (CanRollRight(index)) {
-    RollRight(index, kElBoulderFalling);
+    RollRight(index, kElStoneFalling);
   } else {
-    // Default options is for falling boulder to become stationary
-    SetItem(index, kElBoulder, grid_.ids[index]);
+    // Default options is for falling stones to become stationary
+    SetItem(index, kElStone, grid_.ids[index]);
   }
 }
 
@@ -837,10 +837,10 @@ void StonesNGemsState::UpdateAgent(int index, int action) {
     current_reward_ += kGemPoints.at(GetItem(index, action));
     sum_reward_ += kGemPoints.at(GetItem(index, action));
     MoveItem(index, action);
-  } else if (IsActionHorz(action) && (IsType(index, kElBoulder, action) ||
+  } else if (IsActionHorz(action) && (IsType(index, kElStone, action) ||
                                     IsType(index, kElNut, action) ||
                                     IsType(index, kElBomb, action))) {
-    // Push boulder, nut, or bomb if action is horizontal
+    // Push stone, nut, or bomb if action is horizontal
     Push(index, GetItem(index, action), kElToFalling.at(GetItem(index, action)), action);                                 
   } else if (IsKey(GetItem(index, action))) {
     // Collecting key, set gate open
@@ -981,8 +981,8 @@ void StonesNGemsState::EndScan() {
       // blobs become diamonds if enclosed
       blob_swap_ = kElDiamond;
     } else if (blob_size_ > blob_max_size_) {
-      // blobs become boulders is they grow too large
-      blob_swap_ = kElBoulder;
+      // blobs become stones is they grow too large
+      blob_swap_ = kElStone;
     }
   }
   // Reduce magic wall steps if active
@@ -1000,10 +1000,10 @@ void StonesNGemsState::DoApplyAction(Action move) {
       Element &e = grid_.elements[index];
       if (e.has_updated) {
         continue;
-      } else if (e == kElBoulder) {
-        UpdateBoulder(index);
-      } else if (e == kElBoulderFalling) {
-        UpdateBoulderFalling(index);
+      } else if (e == kElStone) {
+        UpdateStone(index);
+      } else if (e == kElStoneFalling) {
+        UpdateStoneFalling(index);
       } else if (e == kElDiamond) {
         UpdateDiamond(index);
       } else if (e == kElDiamondFalling) {
@@ -1139,7 +1139,7 @@ StonesNGemsState::StonesNGemsState(std::shared_ptr<const Game> game, int steps_r
         }
       }
 
-// ------ game -------
+// ------ Game -------
 
 std::unique_ptr<State> StonesNGemsGame::DeserializeState(const std::string& str) const {
   // empty string
@@ -1238,8 +1238,8 @@ double StonesNGemsGame::MaxUtility() const {
   double max_util = max_steps_;
   max_util += kGemPoints.at(kElDiamond) * std::count(grid_.elements.begin(), grid_.elements.end(), kElDiamond);
   max_util += kGemPoints.at(kElDiamond) * std::count(grid_.elements.begin(), grid_.elements.end(), kElDiamondFalling);
-  max_util += std::count(grid_.elements.begin(), grid_.elements.end(), kElBoulder);
-  max_util += std::count(grid_.elements.begin(), grid_.elements.end(), kElBoulderFalling);
+  max_util += std::count(grid_.elements.begin(), grid_.elements.end(), kElStone);
+  max_util += std::count(grid_.elements.begin(), grid_.elements.end(), kElStoneFalling);
   max_util += 9 * std::count(grid_.elements.begin(), grid_.elements.end(), kElButterflyUp);
   max_util += 9 * std::count(grid_.elements.begin(), grid_.elements.end(), kElButterflyLeft);
   max_util += 9 * std::count(grid_.elements.begin(), grid_.elements.end(), kElButterflyDown);

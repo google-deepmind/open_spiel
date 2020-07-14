@@ -29,23 +29,23 @@
 //     - In order to open the exit, a minimum number of gems need to be collected.
 //     - Objects are suspended by dirt, or otherwise fall. The agent can move in all directions,
 //       and can remove dirt by walking over it.
-//     - The agent can push rocks horizontally if there is room to do so.
+//     - The agent can push stones horizontally if there is room to do so.
 //     - The agent can die if objects fall on top of him, or if he collides with enemies.
 //     - Fireflies try to move clockwise.
 //     - Butterflies try to move counter-clockwise.
-//     - Both fireflies and butterflies explode if rocks fall on them.
+//     - Both fireflies and butterflies explode if stones fall on them.
 //     - Butterflies can drop diamonds upon being killed.
 //     - Oranges move either up, left, down, or right. If they hit another object, they randomly
 //       start to move in another direction. The agent will die if he runs into an Orange.
-//     - Magic walls convert diamonds to rocks, and rocks to diamonds, but only when activated.
-//       Magic walls can be activated by dropping a rock through it, and will stop being active
+//     - Magic walls convert diamonds to stones, and stones to diamonds, but only when activated.
+//       Magic walls can be activated by dropping a stone through it, and will stop being active
 //       after a set amount of time.
 //     - Blobs grow randomly. If trapped, they become diamonds. If they grow too large, they
-//       turn into rocks.
+//       turn into stones.
 //     - Keys and gates come in 4 colours: red, blue, green, and yellow. The gates remain closed until 
 //       the agent collects the corresponding key. Once open, the agent can pass through.
-//     - Nuts can fall down like diamonds and boulders. If a boulder falls on it, it will open to reveal a diamond.
-//     - Bombs will explode if they fall onto an object, or a rock falls on top of it. The agent can push bombs.
+//     - Nuts can fall down like diamonds and stones. If a stones falls on it, it will open to reveal a diamond.
+//     - Bombs will explode if they fall onto an object, or a stone falls on top of it. The agent can push bombs.
 //
 // NOTE: Formatted levels from various popular stone and gem games such as Boulder Dash, as well as various
 //       simple RL levels can be found here
@@ -73,9 +73,9 @@ enum class HiddenCellType {
   kAgent = 0,
   kEmpty = 1,
   kDirt = 2,
-  kBoulder = 3,
-  kBoulderFalling = 4,
-  KDiamond = 5,
+  kStone = 3,
+  kStoneFalling = 4,
+  kDiamond = 5,
   kDiamondFalling = 6,
   kExitClosed = 7,
   kExitOpen = 8,
@@ -125,8 +125,8 @@ enum class VisibleCellType {
   kAgent = 0,
   kEmpty = 1,
   kDirt = 2,
-  kBoulder = 3,
-  KDiamond = 4,
+  kStone = 3,
+  kDiamond = 4,
   kExitClosed = 5,
   kExitOpen = 6,
   kAgentInExit = 7,
@@ -203,7 +203,7 @@ struct Grid {
   std::vector<int> ids;
 };
 
-// Default map, first level of Boulder Dash
+// Default map, simple level of gems/stones/exit
 inline constexpr char kDefaultGrid[] =
     "20,12,600,4\n"
     "19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19\n"
@@ -265,8 +265,8 @@ class StonesNGemsState : public State {
   void MoveThroughMagic(int index, Element element);
   void Explode(int index, Element element, int action=Directions::kNone);
 
-  void UpdateBoulder(int index);
-  void UpdateBoulderFalling(int index);
+  void UpdateStone(int index);
+  void UpdateStoneFalling(int index);
   void UpdateDiamond(int index);
   void UpdateDiamondFalling(int index);
   void UpdateNut(int index);
