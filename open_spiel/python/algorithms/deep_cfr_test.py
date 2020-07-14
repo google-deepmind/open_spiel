@@ -26,6 +26,9 @@ from open_spiel.python.algorithms import deep_cfr
 from open_spiel.python.algorithms import exploitability
 import pyspiel
 
+# Temporarily disable TF2 behavior until we update the code.
+tf.disable_v2_behavior()
+
 
 class DeepCFRTest(parameterized.TestCase):
 

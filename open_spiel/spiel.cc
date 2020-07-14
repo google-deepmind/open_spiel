@@ -536,6 +536,10 @@ std::ostream& operator<<(std::ostream& stream, GameType::ChanceMode value) {
   }
 }
 
+std::ostream& operator<<(std::ostream& stream, const State& state) {
+  return stream << state.ToString();
+}
+
 std::istream& operator>>(std::istream& stream, GameType::ChanceMode& var) {
   std::string str;
   stream >> str;
@@ -684,6 +688,10 @@ std::string GameTypeToString(const GameType& game_type) {
   absl::StrAppend(&str, "provides_observation_tensor: ",
                   game_type.provides_observation_tensor ? "true" : "false",
                   "\n");
+  absl::StrAppend(&str, "provides_factored_observation_string: ",
+                  game_type.provides_factored_observation_string
+                  ? "true" : "false",
+                  "\n");
 
   // Check that there are no newlines in the serialized params.
   std::string serialized_params =
@@ -698,7 +706,7 @@ GameType GameTypeFromString(const std::string& game_type_str) {
   std::map<std::string, std::string> game_type_values;
   std::vector<std::string> parts = absl::StrSplit(game_type_str, '\n');
 
-  SPIEL_CHECK_EQ(parts.size(), 14);
+  SPIEL_CHECK_EQ(parts.size(), 15);
 
   for (const auto& part : parts) {
     std::pair<std::string, std::string> pair =
@@ -733,10 +741,11 @@ GameType GameTypeFromString(const std::string& game_type_str) {
       game_type_values.at("provides_observation_string") == "true";
   game_type.provides_observation_tensor =
       game_type_values.at("provides_observation_tensor") == "true";
+  game_type.provides_factored_observation_string =
+      game_type_values.at("provides_factored_observation_string") == "true";
 
   game_type.parameter_specification =
       DeserializeGameParameters(game_type_values.at("parameter_specification"));
-
   return game_type;
 }
 

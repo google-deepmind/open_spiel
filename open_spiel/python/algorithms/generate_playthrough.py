@@ -154,6 +154,8 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None):
       game_type.provides_observation_string))
   add_line("GameType.provides_observation_tensor = {}".format(
       game_type.provides_observation_tensor))
+  add_line("GameType.provides_factored_observation_string = {}".format(
+      game_type.provides_factored_observation_string))
   add_line("GameType.reward_model = {}".format(game_type.reward_model))
   add_line("GameType.short_name = {}".format('"{}"'.format(
       game_type.short_name)))
@@ -222,6 +224,12 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None):
       for player in players:
         add_line('ObservationString({}) = "{}"'.format(
             player, _escape(state.observation_string(player))))
+    if game.get_type().provides_factored_observation_string:
+      add_line('PublicObservationString() = "{}"'.format(
+          _escape(state.public_observation_string())))
+      for player in players:
+        add_line('PrivateObservationString({}) = "{}"'.format(
+            player, _escape(state.private_observation_string(player))))
     if game.get_type().provides_observation_tensor:
       for player in players:
         label = "ObservationTensor({})".format(player)

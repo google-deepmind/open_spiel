@@ -11,6 +11,7 @@ GameType.provides_information_state_string = True
 GameType.provides_information_state_tensor = True
 GameType.provides_observation_string = True
 GameType.provides_observation_tensor = True
+GameType.provides_factored_observation_string = True
 GameType.reward_model = RewardModel.TERMINAL
 GameType.short_name = "kuhn_poker"
 GameType.utility = Utility.ZERO_SUM
@@ -45,6 +46,9 @@ InformationStateTensor(0): ◉◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(1): ◯◉◯◯◯◯◯◯◯◯◯
 ObservationString(0) = ""
 ObservationString(1) = ""
+PublicObservationString() = "start game"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0): ◉◯◯◯◯◉◉
 ObservationTensor(1): ◯◉◯◯◯◉◉
 ChanceOutcomes() = [{0, 0.333333333333}, {1, 0.333333333333}, {2, 0.333333333333}]
@@ -68,6 +72,9 @@ InformationStateTensor(0): ◉◯◯◉◯◯◯◯◯◯◯
 InformationStateTensor(1): ◯◉◯◯◯◯◯◯◯◯◯
 ObservationString(0) = "111"
 ObservationString(1) = ""
+PublicObservationString() = "Deal to player 0"
+PrivateObservationString(0) = "Received card 1"
+PrivateObservationString(1) = ""
 ObservationTensor(0): ◉◯◯◉◯◉◉
 ObservationTensor(1): ◯◉◯◯◯◉◉
 ChanceOutcomes() = [{0, 0.500000000000}, {2, 0.500000000000}]
@@ -91,6 +98,9 @@ InformationStateTensor(0): ◉◯◯◉◯◯◯◯◯◯◯
 InformationStateTensor(1): ◯◉◯◯◉◯◯◯◯◯◯
 ObservationString(0) = "111"
 ObservationString(1) = "211"
+PublicObservationString() = "Deal to player 1"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = "Received card 2"
 ObservationTensor(0): ◉◯◯◉◯◉◉
 ObservationTensor(1): ◯◉◯◯◉◉◉
 Rewards() = [0.0, 0.0]
@@ -115,6 +125,9 @@ InformationStateTensor(0): ◉◯◯◉◯◉◯◯◯◯◯
 InformationStateTensor(1): ◯◉◯◯◉◉◯◯◯◯◯
 ObservationString(0) = "111"
 ObservationString(1) = "211"
+PublicObservationString() = "Pass"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0): ◉◯◯◉◯◉◉
 ObservationTensor(1): ◯◉◯◯◉◉◉
 Rewards() = [0.0, 0.0]
@@ -139,6 +152,9 @@ InformationStateTensor(0): ◉◯◯◉◯◉◯◉◯◯◯
 InformationStateTensor(1): ◯◉◯◯◉◉◯◉◯◯◯
 ObservationString(0) = "111"
 ObservationString(1) = "211"
+PublicObservationString() = "Pass"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0): ◉◯◯◉◯◉◉
 ObservationTensor(1): ◯◉◯◯◉◉◉
 Rewards() = [-1.0, 1.0]

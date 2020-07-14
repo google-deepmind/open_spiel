@@ -11,6 +11,7 @@ GameType.provides_information_state_string = True
 GameType.provides_information_state_tensor = True
 GameType.provides_observation_string = True
 GameType.provides_observation_tensor = True
+GameType.provides_factored_observation_string = False
 GameType.reward_model = RewardModel.TERMINAL
 GameType.short_name = "tiny_bridge_4p"
 GameType.utility = Utility.ZERO_SUM

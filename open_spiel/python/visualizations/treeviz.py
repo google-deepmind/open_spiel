@@ -33,6 +33,7 @@ from __future__ import division
 from __future__ import print_function
 
 import collections
+import pyspiel
 
 # pylint: disable=g-import-not-at-top
 try:
@@ -102,7 +103,7 @@ def default_edge_decorator(parent, unused_child, action):
   """
   player = parent.current_player()
   attrs = {
-      "label": parent.action_to_string(player, action),
+      "label": " " + parent.action_to_string(player, action),
       "fontsize": _FONTSIZE,
       "arrowsize": _ARROWSIZE
   }
@@ -122,8 +123,11 @@ class GameTree(pygraphviz.AGraph):
       `treeviz.default_edge_decorator`.
     group_terminal: Whether to display all terminal states at same level,
       default=False.
-    group_infosets: Wheter to group infosets together, default=False.
+    group_infosets: Whether to group infosets together, default=False.
+    group_pubsets: Whether to group public sets together, default=False.
+    target_pubset: Whether to group all public sets "*" or a specific one.
     infoset_attrs: Attributes to style infoset grouping.
+    pubset_attrs: Attributes to style public set grouping.
     kwargs: Keyword arguments passed on to `pygraphviz.AGraph.__init__`.
   """
 
@@ -134,7 +138,10 @@ class GameTree(pygraphviz.AGraph):
                edge_decorator=default_edge_decorator,
                group_terminal=False,
                group_infosets=False,
+               group_pubsets=False,
+               target_pubset="*",
                infoset_attrs=None,
+               pubset_attrs=None,
                **kwargs):
 
     kwargs["directed"] = kwargs.get("directed", True)
@@ -149,18 +156,39 @@ class GameTree(pygraphviz.AGraph):
     self._node_decorator = node_decorator
     self._edge_decorator = edge_decorator
 
+    self._group_infosets = group_infosets
+    self._group_pubsets = group_pubsets
+    if self._group_infosets:
+      if not self.game.get_type().provides_information_state_string:
+        raise RuntimeError(
+            "Grouping of infosets requested, but the game does not "
+            "provide information state string.")
+    if self._group_pubsets:
+      if not self.game.get_type().provides_factored_observation_string:
+        raise RuntimeError(
+            "Grouping of public sets requested, but the game does not "
+            "provide factored observations strings.")
+
     self._infosets = collections.defaultdict(lambda: [])
+    self._pubsets = collections.defaultdict(lambda: [])
     self._terminal_nodes = []
 
     root = game.new_initial_state()
     self.add_node(self.state_to_str(root), **self._node_decorator(root))
     self._build_tree(root, 0, depth_limit)
 
-    if group_infosets:
-      for (player, info_state), sibblings in self._infosets.items():
-        cluster_name = "cluster_{}_{}".format(player, info_state)
+    for (player, info_state), sibblings in self._infosets.items():
+      cluster_name = "cluster_{}_{}".format(player, info_state)
+      self.add_subgraph(sibblings, cluster_name,
+                        **(infoset_attrs or {
+                            "style": "dashed"
+                        }))
+
+    for pubset, sibblings in self._pubsets.items():
+      if target_pubset == "*" or target_pubset == pubset:
+        cluster_name = "cluster_{}".format(pubset)
         self.add_subgraph(sibblings, cluster_name,
-                          **(infoset_attrs or {
+                          **(pubset_attrs or {
                               "style": "dashed"
                           }))
 
@@ -197,10 +225,15 @@ class GameTree(pygraphviz.AGraph):
       self.add_edge(state_str, child_str,
                     **self._edge_decorator(state, child, action))
 
-      if not child.is_chance_node() and not child.is_terminal():
+      if self._group_infosets and not child.is_chance_node() \
+          and not child.is_terminal():
         player = child.current_player()
         info_state = child.information_state_string()
         self._infosets[(player, info_state)].append(child_str)
+
+      if self._group_pubsets:
+        pub_obs_history = str(pyspiel.PublicObservationHistory(child))
+        self._pubsets[pub_obs_history].append(child_str)
 
       self._build_tree(child, depth + 1, depth_limit)
 

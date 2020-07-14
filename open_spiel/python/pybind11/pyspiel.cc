@@ -18,6 +18,7 @@
 #include "open_spiel/algorithms/matrix_game_utils.h"
 #include "open_spiel/algorithms/tensor_game_utils.h"
 #include "open_spiel/canonical_game_strings.h"
+#include "open_spiel/fog/fog_constants.h"
 #include "open_spiel/games/efg_game.h"
 #include "open_spiel/games/efg_game_data.h"
 #include "open_spiel/matrix_game.h"
@@ -27,14 +28,21 @@
 #include "open_spiel/python/pybind11/game_transforms.h"
 #include "open_spiel/python/pybind11/games_bridge.h"
 #include "open_spiel/python/pybind11/games_negotiation.h"
+#include "open_spiel/python/pybind11/observation_history.h"
 #include "open_spiel/python/pybind11/policy.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
 #include "pybind11/include/pybind11/functional.h"
 #include "pybind11/include/pybind11/numpy.h"
 #include "pybind11/include/pybind11/operators.h"
 #include "pybind11/include/pybind11/pybind11.h"
 #include "pybind11/include/pybind11/stl.h"
+
+// List of optional python submodules.
+#if BUILD_WITH_PUBLIC_STATES
+#include "open_spiel/public_states/pybind11/public_states.h"
+#endif
 
 // This file contains OpenSpiel's Python API. The best place to see an overview
 // of the API is to refer to python/examples/example.py. Generally, all the core
@@ -135,6 +143,8 @@ PYBIND11_MODULE(pyspiel, m) {
       .def_readonly("parameter_specification",
                     &GameType::parameter_specification)
       .def_readonly("default_loadable", &GameType::default_loadable)
+      .def_readonly("provides_factored_observation_string",
+                    &GameType::provides_factored_observation_string)
       .def("pretty_print",
            [](const GameType& value) { return GameTypeToString(value); })
       .def("__repr__",
@@ -187,6 +197,22 @@ PYBIND11_MODULE(pyspiel, m) {
 
   m.attr("INVALID_ACTION") = py::int_(open_spiel::kInvalidAction);
 
+  // We cannot have these as enums on C++ side, but we can encode it for Python.
+  // Technically it is a submodule, but a Python user will not typically
+  // need to tell these apart. The pybind11 API does not provide a way
+  // for constructing arbitrary (enum) classes, so we do it this way.
+  auto public_observation = m.def_submodule("PublicObservation");
+  public_observation.attr("CLOCK_TICK") =
+      py::str(open_spiel::kClockTickPublicObservation);
+  public_observation.attr("START_GAME") =
+      py::str(open_spiel::kStartOfGamePublicObservation);
+  public_observation.attr("INVALID") =
+      py::str(open_spiel::kInvalidPublicObservation);
+
+  auto private_observation = m.def_submodule("PrivateObservation");
+  private_observation.attr("NOTHING") =
+      py::str(open_spiel::kNothingPrivateObservation);
+
   py::enum_<open_spiel::TensorLayout>(m, "TensorLayout")
       .value("HWC", open_spiel::TensorLayout::kHWC)
       .value("CHW", open_spiel::TensorLayout::kCHW);
@@ -215,12 +241,14 @@ PYBIND11_MODULE(pyspiel, m) {
            (Action(State::*)(const std::string&) const) & State::StringToAction)
       .def("__str__", &State::ToString)
       .def("is_terminal", &State::IsTerminal)
+      .def("is_initial_state", &State::IsInitialState)
       .def("rewards", &State::Rewards)
       .def("returns", &State::Returns)
       .def("player_reward", &State::PlayerReward)
       .def("player_return", &State::PlayerReturn)
       .def("is_chance_node", &State::IsChanceNode)
       .def("is_simultaneous_node", &State::IsSimultaneousNode)
+      .def("is_player_node", &State::IsPlayerNode)
       .def("history", &State::History)
       .def("history_str", &State::HistoryString)
       .def("information_state_string",
@@ -240,6 +268,12 @@ PYBIND11_MODULE(pyspiel, m) {
                                      State::ObservationTensor)
       .def("observation_tensor",
            (std::vector<double>(State::*)() const) & State::ObservationTensor)
+      .def("public_observation_string",
+           (std::string(State::*)() const) & State::PublicObservationString)
+      .def("private_observation_string",
+           (std::string(State::*)(int) const) & State::PrivateObservationString)
+      .def("private_observation_string",
+           (std::string(State::*)() const) & State::PrivateObservationString)
       .def("clone", &State::Clone)
       .def("child", &State::Child)
       .def("undo_action", &State::UndoAction)
@@ -492,11 +526,17 @@ PYBIND11_MODULE(pyspiel, m) {
 
   // Register other bits of the API.
   init_pyspiel_bots(m);             // Bots and bot-related algorithms.
+  init_pyspiel_observation_histories(m);  // Histories related to observations.
   init_pyspiel_policy(m);           // Policies and policy-related algorithms.
   init_pyspiel_game_transforms(m);  // Game transformations.
   init_pyspiel_algorithms_trajectories(m);  // Trajectories.
   init_pyspiel_games_negotiation(m);        // Negotiation game.
   init_pyspiel_games_bridge(m);  // Game-specific functions for bridge.
+
+  // List of optional python submodules.
+#if BUILD_WITH_PUBLIC_STATES
+  init_pyspiel_public_states(m);
+#endif
 }
 
 }  // namespace

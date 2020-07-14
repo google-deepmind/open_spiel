@@ -87,8 +87,7 @@ then
   continue
 fi
 
-PY_VERSION_MAJOR=$($PYBIN -c 'import sys; print(sys.version_info.major)')
-PYVERSION=$($PYBIN -c 'import sys; print(sys.version.split(" ")[0])')
+PYVERSION=$($PYBIN -c 'import sys; print(".".join(map(str, sys.version_info[:3])))')
 
 VENV_DIR="./venv"
 if [[ $ARG_virtualenv == "true" ]]; then

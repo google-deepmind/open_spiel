@@ -14,11 +14,13 @@
 
 #include "open_spiel/games/hearts.h"
 
+#include <algorithm>
 #include <map>
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_format.h"
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
@@ -60,7 +62,7 @@ const GameType kGameType{
         // If aside from QS only hearts remain, player is
         // permitted to lead hearts even if hearts are
         // not broken.
-        {"can_lead_hearts_instead_of_qs", GameParameter(true)},
+        {"can_lead_hearts_instead_of_qs", GameParameter(false)},
     }};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
@@ -68,36 +70,6 @@ std::shared_ptr<const Game> Factory(const GameParameters& params) {
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
-
-enum Seat { kNorth, kEast, kSouth, kWest };
-// Cards are represented as rank * kNumSuits + suit.
-Suit CardSuit(int card) { return Suit(card % kNumSuits); }
-int CardRank(int card) { return card / kNumSuits; }
-int Card(Suit suit, int rank) {
-  return rank * kNumSuits + static_cast<int>(suit);
-}
-int CardPoints(int card, bool jd_bonus) {
-  if (CardSuit(card) == Suit::kHearts) {
-    return kPointsForHeart;
-  } else if (card == Card(Suit::kSpades, 10)) {
-    return kPointsForQS;
-  } else if (card == Card(Suit::kDiamonds, 9) && jd_bonus) {
-    return kPointsForJD;
-  } else {
-    return 0;
-  }
-}
-
-constexpr char kRankChar[] = "23456789TJQKA";
-constexpr char kSuitChar[] = "CDHS";
-constexpr char kDirChar[] = "NESW";
-std::string DirString(int dir) { return {kDirChar[dir]}; }
-std::string CardString(int card) {
-  return {kRankChar[CardRank(card)],
-          kSuitChar[static_cast<int>(CardSuit(card))]};
-}
-std::map<int, std::string> pass_dir_str = {
-    {0, "No Pass"}, {1, "Left"}, {2, "Across"}, {3, "Right"}};
 
 }  // namespace
 
@@ -127,12 +99,7 @@ HeartsState::HeartsState(std::shared_ptr<const Game> game, bool pass_cards,
       qs_breaks_hearts_(qs_breaks_hearts),
       must_break_hearts_(must_break_hearts),
       can_lead_hearts_instead_of_qs_(can_lead_hearts_instead_of_qs),
-      hearts_broken_(!must_break_hearts) {
-  if (!pass_cards_) {
-    ApplyAction(static_cast<int>(pass_dir_));
-    phase_ = Phase::kDeal;
-  }
-}
+      hearts_broken_(!must_break_hearts) {}
 
 std::string HeartsState::ActionToString(Player player, Action action) const {
   if (history_.empty()) return pass_dir_str[action];
@@ -158,7 +125,7 @@ std::string HeartsState::InformationStateString(Player player) const {
   auto cards = FormatHand(player, /*mark_voids=*/true);
   for (int suit = kNumSuits - 1; suit >= 0; --suit)
     absl::StrAppend(&rv, cards[suit], "\n");
-  if (!passed_cards_[0].empty()) absl::StrAppend(&rv, FormatPass(player));
+  if (!passed_cards_[player].empty()) absl::StrAppend(&rv, FormatPass(player));
   if (num_cards_played_ > 0) absl::StrAppend(&rv, FormatPlay(), FormatPoints());
   return rv;
 }
@@ -228,18 +195,21 @@ std::string HeartsState::FormatPass() const {
 
 std::string HeartsState::FormatPass(Player player) const {
   std::string rv = "\nPassed Cards: ";
-  for (int card : passed_cards_[player]) {
-    absl::StrAppend(&rv, CardString(card), " ");
-  }
+  std::vector<int> passed_cards = passed_cards_[player];
+  // Sort cards because players don't have access to the order in which the
+  // cards were selected to be passed. Knowing the order could allow for
+  // information leakage.
+  absl::c_sort(passed_cards);
+  for (int card : passed_cards) absl::StrAppend(&rv, CardString(card), " ");
   // Cards are not received until all players have completed passing.
   // West is the last player to pass.
   if (passed_cards_[static_cast<int>(kWest)].size() == kNumCardsInPass) {
     absl::StrAppend(&rv, "\n\nReceived Cards: ");
     int passing_player =
         (player + kNumPlayers - static_cast<int>(pass_dir_)) % kNumPlayers;
-    for (int card : passed_cards_[passing_player]) {
-      absl::StrAppend(&rv, CardString(card), " ");
-    }
+    std::vector<int> received_cards = passed_cards_[passing_player];
+    absl::c_sort(received_cards);
+    for (int card : received_cards) absl::StrAppend(&rv, CardString(card), " ");
   }
   absl::StrAppend(&rv, "\n");
   return rv;
@@ -300,8 +270,9 @@ void HeartsState::InformationStateTensor(Player player,
   ptr += kNumCards;
   // Point totals
   for (int i = 0; i < kNumPlayers; ++i) {
+    // Use thermometer representation instead of one-hot for point totals.
     // Players can have negative points so we need to offset
-    ptr[points_[i] + std::abs(kPointsForJD)] = 1;
+    for (int j = 0; j < points_[i] + std::abs(kPointsForJD); ++j) ptr[j] = 1;
     ptr += kMaxScore;
   }
   // History of tricks, presented in the format: N E S W N E S
@@ -316,16 +287,18 @@ void HeartsState::InformationStateTensor(Player player,
     ptr += (kNumPlayers - leader - 1) * kNumCards;
   }
   Player leader = tricks_[current_trick].Leader();
-  ptr += leader * kNumCards;
-  auto cards = tricks_[current_trick].Cards();
-  for (int i = 0; i < cards.size(); ++i) {
-    ptr[cards[i]] = 1;
-    ptr += kNumCards;
+  if (leader != kInvalidPlayer) {
+    auto cards = tricks_[current_trick].Cards();
+    ptr += leader * kNumCards;
+    for (auto card : cards) {
+      ptr[card] = 1;
+      ptr += kNumCards;
+    }
   }
   // Current trick may contain less than four cards.
-  ptr += (kNumPlayers - cards.size()) * kNumCards;
+  ptr += (kNumPlayers - (num_cards_played_ % kNumPlayers)) * kNumCards;
   // Move to the end of current trick.
-  ptr += (kNumPlayers - leader - 1) * kNumCards;
+  ptr += (kNumPlayers - std::max(leader, 0) - 1) * kNumCards;
   // Skip over unplayed tricks.
   ptr += (kNumTricks - current_trick - 1) * kTrickTensorSize;
   SPIEL_CHECK_EQ(std::distance(values->begin(), ptr),
@@ -350,8 +323,12 @@ std::vector<Action> HeartsState::LegalActions() const {
 std::vector<Action> HeartsState::PassDirLegalActions() const {
   SPIEL_CHECK_EQ(history_.size(), 0);
   std::vector<Action> legal_actions;
-  legal_actions.reserve(kNumPlayers);
-  for (int i = 0; i < kNumPlayers; ++i) legal_actions.push_back(i);
+  if (!pass_cards_) {
+    legal_actions.push_back(static_cast<int>(PassDir::kNoPass));
+  } else {
+    legal_actions.reserve(kNumPlayers);
+    for (int i = 0; i < kNumPlayers; ++i) legal_actions.push_back(i);
+  }
   return legal_actions;
 }
 
@@ -501,7 +478,7 @@ void HeartsState::ApplyDealAction(int card) {
 
 void HeartsState::ApplyPassAction(int card) {
   passed_cards_[current_player_].push_back(card);
-  holder_[card] = std::nullopt;
+  holder_[card] = absl::nullopt;
   if (passed_cards_[current_player_].size() % kNumCardsInPass == 0)
     ++current_player_;
   if (current_player_ == kNumPlayers) {
@@ -519,14 +496,14 @@ void HeartsState::ApplyPassAction(int card) {
 
 void HeartsState::ApplyPlayAction(int card) {
   SPIEL_CHECK_TRUE(holder_[card] == current_player_);
-  holder_[card] = std::nullopt;
+  holder_[card] = absl::nullopt;
   if (num_cards_played_ % kNumPlayers == 0) {
     CurrentTrick() = Trick(current_player_, card, jd_bonus_);
   } else {
     CurrentTrick().Play(current_player_, card);
   }
   // Check if action breaks hearts.
-  if (Suit(card) == Suit::kHearts) hearts_broken_ = true;
+  if (CardSuit(card) == Suit::kHearts) hearts_broken_ = true;
   if (qs_breaks_hearts_ && card == Card(Suit::kSpades, 10))
     hearts_broken_ = true;
   // Update player and point totals.
@@ -577,7 +554,7 @@ void HeartsState::ComputeScore() {
     }
   }
   // Did anyone avoid taking any tricks?
-  if (avoid_all_tricks_bonus_) {
+  if (avoid_all_tricks_bonus_ && !moon_shot) {
     std::vector<int> tricks_taken(kNumPlayers, 0);
     for (int i = 0; i < kNumTricks; ++i) {
       tricks_taken[tricks_[i].Winner()] += 1;
@@ -600,6 +577,172 @@ std::vector<double> HeartsState::Returns() const {
   for (int i = 0; i < returns.size(); ++i)
     returns[i] = kTotalPositivePoints - returns[i];
   return returns;
+}
+
+absl::optional<Player> HeartsState::Played(int card) const {
+  if (phase_ == Phase::kPlay && !holder_[card].has_value()) {
+    Player p = *(initial_deal_[card]);
+    // check if they kept the card or not
+    auto it = std::find(passed_cards_[p].begin(), passed_cards_[p].end(), card);
+    if (it != passed_cards_[p].end()) {
+      p = (p + static_cast<int>(pass_dir_)) % kNumPlayers;
+    }
+    return p;
+  }
+
+  return absl::nullopt;
+}
+
+bool HeartsState::KnowsLocation(Player player, int card) const {
+  bool dealt, received, played, two_clubs;
+  dealt = initial_deal_[card] == player;
+  int pass_dir = static_cast<int>(pass_dir_);
+  Player recv_from = (player + kNumPlayers - pass_dir) % kNumPlayers;
+  auto it = std::find(passed_cards_[recv_from].begin(),
+                      passed_cards_[recv_from].end(), card);
+  received = it != passed_cards_[recv_from].end() && phase_ == Phase::kPlay;
+  played = !holder_[card].has_value() && phase_ == Phase::kPlay;
+  two_clubs = card == Card(Suit::kClubs, 0) && phase_ == Phase::kPlay;
+  return dealt || received || played || two_clubs;
+}
+
+// Does not account for void suit information exposed by other players during
+// the play phase
+std::unique_ptr<State> HeartsState::ResampleFromInfostate(
+    int player_id, std::function<double()> rng) const {
+  std::unique_ptr<State> clone = game_->NewInitialState();
+  Action pass_dir = static_cast<int>(pass_dir_);
+  clone->ApplyAction(pass_dir);
+
+  // start by gathering all public and private info known to player_id to
+  // simplify the logic for applying deal / pass actions
+  // first thing we know is the player's entire hand
+  std::vector<int> initial_hand;
+  for (int card = 0; card < kNumCards; card++) {
+    if (initial_deal_[card] == player_id) initial_hand.push_back(card);
+  }
+
+  // collect cards that have been revealed through the play phase
+  std::vector<std::vector<int>> play_known(kNumPlayers);
+  if (phase_ == Phase::kPlay) {
+    for (int card = 0; card < kNumCards; card++) {
+      absl::optional<Player> p = Played(card);
+      if (p && *p != player_id) {
+        play_known[*p].push_back(card);
+      }
+    }
+  }
+
+  // the two of clubs is also known once a player has played first
+  absl::optional<Player> two_clubs_holder = holder_[Card(Suit::kClubs, 0)];
+  if (phase_ == Phase::kPlay && two_clubs_holder) {
+    play_known[*two_clubs_holder].push_back(Card(Suit::kClubs, 0));
+  }
+
+  // set up pass cards greedily using known cards so that passes are
+  // consistent
+  // this shouldn't affect the distribution of resampled states much because
+  // we have no way to model unobserved opponent pass actions anyway
+  std::vector<std::vector<int>> pass_actions(kNumPlayers);
+  for (Player p = 0; p < kNumPlayers; p++) {
+    for (int pass_num = 0; pass_num < passed_cards_[p].size(); pass_num++) {
+      if (p == player_id) {
+        pass_actions[p].push_back(passed_cards_[p][pass_num]);
+      } else {
+        Player pass_to = (p + pass_dir) % kNumPlayers;
+        // once the play phase has started, player_id knows the cards that were
+        // passed to them
+        if (phase_ == Phase::kPlay && pass_to == player_id) {
+          pass_actions[p].push_back(passed_cards_[p][pass_num]);
+        } else if (pass_num < play_known[pass_to].size()) {
+          pass_actions[p].push_back(play_known[pass_to][pass_num]);
+        }
+      }
+    }
+  }
+
+  // at this point we have all the information we need about which card
+  // locations are known to player_id, so we can start applying deal actions
+  Player deal_to, pass_to, recv_from;
+  int card_num;
+  std::vector<bool> dealt(kNumCards, false);
+  std::vector<int> known_dealt_counter(kNumPlayers, 0);
+  for (int num_dealt = 0; num_dealt < kNumCards; num_dealt++) {
+    card_num = num_dealt / kNumPlayers;
+    deal_to = num_dealt % kNumPlayers;
+    pass_to = (deal_to + pass_dir) % kNumPlayers;
+    recv_from = (deal_to + kNumPlayers - pass_dir) % kNumPlayers;
+    Action action = kInvalidAction;
+    // deal out the pass moves first so those constraints are satisfied
+    if (card_num < pass_actions[deal_to].size()) {
+      action = pass_actions[deal_to][card_num];
+    } else {
+      // now try to find any cards that deal_to has shown they have that
+      // haven't already been allocated as a pass action for recv_from and have
+      // not already been dealt
+      auto& known = (deal_to == player_id) ? initial_hand : play_known[deal_to];
+      while ((action == kInvalidAction || dealt[action]) &&
+             known_dealt_counter[deal_to] < known.size()) {
+        action = known[known_dealt_counter[deal_to]];
+        auto it = std::find(pass_actions[recv_from].begin(),
+                            pass_actions[recv_from].end(), action);
+        if (it != pass_actions[recv_from].end()) action = kInvalidAction;
+        known_dealt_counter[deal_to]++;
+      }
+    }
+
+    // all known card constraints for to_deal have been satisfied, so we can
+    // deal them a random card that does not violate other player constraints
+    while (action == kInvalidAction) {
+      Action candidate = SampleAction(clone->ChanceOutcomes(), rng()).first;
+      if (!KnowsLocation(player_id, candidate)) {
+        action = candidate;
+        // we can also use this card as a pass action later because its
+        // location is unknown
+        if (pass_actions[deal_to].size() < passed_cards_[deal_to].size()) {
+          pass_actions[deal_to].push_back(action);
+        }
+      }
+    }
+
+    clone->ApplyAction(action);
+    dealt[action] = true;
+  }
+
+  // now handle the pass phase
+  if (pass_dir_ != PassDir::kNoPass) {
+    for (Player to_move = 0; to_move < kNumPlayers; to_move++) {
+      SPIEL_CHECK_EQ(pass_actions[to_move].size(),
+                     passed_cards_[to_move].size());
+      pass_to = (to_move + pass_dir) % kNumPlayers;
+      for (int passes = 0; passes < passed_cards_[to_move].size(); passes++) {
+        Action action = kInvalidAction;
+        if (to_move == player_id || pass_to == player_id) {
+          // player_id knows exactly which cards were passed by player_id and
+          // the player who passed cards to player_id
+          action = passed_cards_[to_move][passes];
+        } else {
+          action = pass_actions[to_move][passes];
+        }
+        clone->ApplyAction(action);
+      }
+    }
+  }
+
+  // given that we should now have a state consistent with the public actions
+  // and player_id's private cards, we can just copy the action sequence in
+  // the play phase
+  int play_start_index = kNumCards + 1;
+  if (pass_dir_ != PassDir::kNoPass)
+    play_start_index += kNumPlayers * kNumCardsInPass;
+  for (size_t i = play_start_index; i < history_.size(); i++) {
+    clone->ApplyAction(history_.at(i).action);
+  }
+
+  SPIEL_CHECK_EQ(History().size(), clone->History().size());
+  SPIEL_CHECK_EQ(InformationStateString(player_id),
+                 clone->InformationStateString(player_id));
+  return clone;
 }
 
 Trick::Trick(Player leader, int card, bool jd_bonus)

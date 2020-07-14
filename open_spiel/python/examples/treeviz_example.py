@@ -33,6 +33,9 @@ flags.DEFINE_enum("prog", "dot", ["dot", "neato", "circo"], "Graphviz layout.")
 flags.DEFINE_boolean("group_infosets", False, "Whether to group infosets.")
 flags.DEFINE_boolean("group_terminal", False,
                      "Whether to group terminal nodes.")
+flags.DEFINE_boolean("group_pubsets", False, "Whether to group public states.")
+flags.DEFINE_string("target_pubset", "*",
+                    "Limit grouping of public states only to specified state.")
 flags.DEFINE_boolean("verbose", False, "Whether to print verbose output.")
 
 
@@ -67,9 +70,17 @@ def main(argv):
         game,
         node_decorator=_zero_sum_node_decorator,
         group_infosets=FLAGS.group_infosets,
-        group_terminal=FLAGS.group_terminal)
+        group_terminal=FLAGS.group_terminal,
+        group_pubsets=FLAGS.group_pubsets,
+        target_pubset=FLAGS.target_pubset)
   else:
-    gametree = treeviz.GameTree(game)  # use default decorators
+    # use default decorators
+    gametree = treeviz.GameTree(
+        game,
+        group_infosets=FLAGS.group_infosets,
+        group_terminal=FLAGS.group_terminal,
+        group_pubsets=FLAGS.group_pubsets,
+        target_pubset=FLAGS.target_pubset)
 
   if FLAGS.verbose:
     logging.info("Game tree:\n%s", gametree.to_string())

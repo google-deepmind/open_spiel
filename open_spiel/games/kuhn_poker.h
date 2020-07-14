@@ -21,6 +21,7 @@
 #include <vector>
 
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_utils.h"
 
 // A simple game that includes chance and imperfect information
 // http://en.wikipedia.org/wiki/Kuhn_poker
@@ -68,6 +69,10 @@ class KuhnState : public State {
   std::vector<int> hand() const { return {card_dealt_[CurrentPlayer()]}; }
   std::unique_ptr<State> ResampleFromInfostate(
       int player_id, std::function<double()> rng) const override;
+  std::string PublicObservationString() const override;
+  std::string PrivateObservationString(Player player) const override;
+
+  const std::vector<int>& CardDealt() const { return card_dealt_; }
 
  protected:
   void DoApplyAction(Action move) override;

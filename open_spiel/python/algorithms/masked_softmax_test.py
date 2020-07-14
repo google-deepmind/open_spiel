@@ -28,6 +28,9 @@ import tensorflow.compat.v1 as tf
 
 from open_spiel.python.algorithms import masked_softmax
 
+# Temporarily disable TF2 behavior until the code is updated.
+tf.disable_v2_behavior()
+
 
 exp = math.exp  # For shorter lines
 

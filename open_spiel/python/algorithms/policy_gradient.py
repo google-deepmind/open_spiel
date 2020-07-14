@@ -76,11 +76,14 @@ import collections
 import os
 from absl import logging
 import numpy as np
-import sonnet as snt
 import tensorflow.compat.v1 as tf
 
 from open_spiel.python import rl_agent
+from open_spiel.python import simple_nets
 from open_spiel.python.algorithms.losses import rl_losses
+
+# Temporarily disable TF2 behavior until we update the code.
+tf.disable_v2_behavior()
 
 Transition = collections.namedtuple(
     "Transition", "info_state action reward discount legal_actions_mask")
@@ -176,27 +179,34 @@ class PolicyGradient(rl_agent.AbstractAgent):
 
     # Network
     # activate final as we plug logit and qvalue heads afterwards.
-    self._net_torso = snt.nets.MLP(
-        output_sizes=self._layer_sizes, activate_final=True)
+    self._net_torso = simple_nets.MLPTorso(info_state_size, self._layer_sizes)
     torso_out = self._net_torso(self._info_state_ph)
-    self._policy_logits_layer = snt.Linear(
-        output_size=self._num_actions, name="policy_head")
-
-    self.policy_logits_network = snt.Sequential([self._net_torso,
-                                                 self._policy_logits_layer])
-
+    torso_out_size = self._layer_sizes[-1]
+    self._policy_logits_layer = simple_nets.Linear(
+        torso_out_size,
+        self._num_actions,
+        activate_relu=False,
+        name="policy_head")
+    # Do not remove policy_logits_network. Even if it's not used directly here,
+    # other code outside this file refers to it.
+    self.policy_logits_network = simple_nets.Sequential(
+        [self._net_torso, self._policy_logits_layer])
     self._policy_logits = self._policy_logits_layer(torso_out)
     self._policy_probs = tf.nn.softmax(self._policy_logits)
 
     self._savers = []
 
-    # Add baseline (V) head for A2C.
+    # Add baseline (V) head for A2C (or Q-head for QPG / RPG / RMPG)
     if loss_class.__name__ == "BatchA2CLoss":
-      self._baseline_layer = snt.Linear(output_size=1, name="baseline")
+      self._baseline_layer = simple_nets.Linear(
+          torso_out_size, 1, activate_relu=False, name="baseline")
       self._baseline = tf.squeeze(self._baseline_layer(torso_out), axis=1)
     else:
-      self._q_values_layer = snt.Linear(
-          output_size=self._num_actions, name="q_values_head")
+      self._q_values_layer = simple_nets.Linear(
+          torso_out_size,
+          self._num_actions,
+          activate_relu=False,
+          name="q_values_head")
       self._q_values = self._q_values_layer(torso_out)
 
     # Critic loss
@@ -477,12 +487,15 @@ class PolicyGradient(rl_agent.AbstractAgent):
             initialization_baseline_or_q_val, initialization_crit_opt,
             initialization_pi_opt
         ]))
-    self._savers = [("torso", snt.get_saver(self._net_torso)),
-                    ("policy_head", snt.get_saver(self._policy_logits_layer))]
+    self._savers = [("torso", tf.train.Saver(self._net_torso.variables)),
+                    ("policy_head",
+                     tf.train.Saver(self._policy_logits_layer.variables))]
     if self._loss_class.__name__ == "BatchA2CLoss":
-      self._savers.append(("baseline", snt.get_saver(self._baseline_layer)))
+      self._savers.append(
+          ("baseline", tf.train.Saver(self._baseline_layer.variables)))
     else:
-      self._savers.append(("q_head", snt.get_saver(self._q_values_layer)))
+      self._savers.append(
+          ("q_head", tf.train.Saver(self._q_values_layer.variables)))
 
   def copy_with_noise(self, sigma=0.0, copy_weights=True):
     """Copies the object and perturbates its network's weights with noise.

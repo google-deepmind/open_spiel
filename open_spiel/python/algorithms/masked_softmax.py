@@ -22,6 +22,9 @@ from __future__ import print_function
 import numpy as np
 import tensorflow.compat.v1 as tf
 
+# Temporarily disable TF2 behavior until the code is updated.
+tf.disable_v2_behavior()
+
 
 def tf_masked_softmax(logits, legal_actions_mask):
   """Returns the softmax over the valid actions defined by `legal_actions_mask`.

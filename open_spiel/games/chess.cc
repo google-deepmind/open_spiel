@@ -359,12 +359,6 @@ bool ChessState::IsRepetitionDraw() const {
 }
 
 absl::optional<std::vector<double>> ChessState::MaybeFinalReturns() const {
-  if (Board().IrreversibleMoveCounter() >= kNumReversibleMovesToDraw) {
-    // This is theoretically a draw that needs to be claimed, but we implement
-    // it as a forced draw for now.
-    return std::vector<double>{DrawUtility(), DrawUtility()};
-  }
-
   if (!Board().HasSufficientMaterial()) {
     return std::vector<double>{DrawUtility(), DrawUtility()};
   }
@@ -389,6 +383,12 @@ absl::optional<std::vector<double>> ChessState::MaybeFinalReturns() const {
       returns[OtherPlayer(next_to_play)] = WinUtility();
       return returns;
     }
+  }
+
+  if (Board().IrreversibleMoveCounter() >= kNumReversibleMovesToDraw) {
+    // This is theoretically a draw that needs to be claimed, but we implement
+    // it as a forced draw for now.
+    return std::vector<double>{DrawUtility(), DrawUtility()};
   }
 
   return std::nullopt;

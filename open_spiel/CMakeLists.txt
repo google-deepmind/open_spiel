@@ -24,12 +24,7 @@ endif()
 # Position-independent code is needed for Python extension modules.
 set (CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-## Optional dependencies
-# One can optionally build and link against specific external dependencies.
-# We expect these arguments to be always defined, when building using any script
-# in `open_spiel/scripts/`, thus, we emit a warning when it's not, with a
-# conservative default.
-# See the documentation in install.md.
+# Define some nice terminal colors.
 if(NOT WIN32)
   string(ASCII 27 Esc)
   set(ColourReset "${Esc}[m")
@@ -50,57 +45,43 @@ if(NOT WIN32)
   set(BoldWhite   "${Esc}[1;37m")
 endif()
 
-set (BUILD_WITH_HANABI OFF CACHE BOOL "Build against the Hanabi game.")
-if(NOT DEFINED ENV{BUILD_WITH_HANABI})
-    message("${BoldRed}BUILD_WITH_HANABI not set. Defaults to OFF${ColourReset}")
-    set (ENV{BUILD_WITH_HANABI} OFF)
-endif()
-set (BUILD_WITH_HANABI $ENV{BUILD_WITH_HANABI})
-message("${BoldYellow}BUILD_WITH_HANABI: ${BUILD_WITH_HANABI} ${ColourReset}")
+## Optional dependencies
+# One can optionally build and link against specific external dependencies.
+# We expect these arguments to be always defined, when building using any script
+# in `open_spiel/scripts/`, thus, we emit a warning when it's not, with a
+# conservative default.
+# See the documentation in install.md.
 
-set (BUILD_WITH_ACPC OFF CACHE BOOL "Build against the Universal Poker library.")
-if(NOT DEFINED ENV{BUILD_WITH_ACPC})
-    message("${BoldRed}BUILD_WITH_ACPC not set. Defaults to OFF${ColourReset}")
-    set (ENV{BUILD_WITH_ACPC} OFF)
-endif()
-set (BUILD_WITH_ACPC $ENV{BUILD_WITH_ACPC})
-message("${BoldYellow}BUILD_WITH_ACPC: ${BUILD_WITH_ACPC} ${ColourReset}")
+# Use this macro to define optional dependencies.
+# You can then use your chosen DEP_NAME as a variable to check if that
+# dependency is enabled -- see code below.
+macro(openspiel_optional_dependency DEP_NAME DEP_DESCRIPTION)
+  set (${DEP_NAME} OFF CACHE BOOL ${DEP_DESCRIPTION})
+  if(NOT DEFINED ENV{${DEP_NAME}})
+    message("${BoldRed}${DEP_NAME} not set. Defaults to OFF${ColourReset}")
+    set (ENV{${DEP_NAME}} OFF)
+  endif()
+  set (${DEP_NAME} $ENV{${DEP_NAME}})
+  message("${BoldYellow}${DEP_NAME}: ${${DEP_NAME}} ${ColourReset}")
+endmacro()
 
-set (BUILD_WITH_JULIA OFF CACHE BOOL "Build binary for Julia.")
-if(NOT DEFINED ENV{BUILD_WITH_JULIA})
-    message("${BoldRed}BUILD_WITH_JULIA not set. Defaults to OFF${ColourReset}")
-    set (ENV{BUILD_WITH_JULIA} OFF)
-endif()
-set (BUILD_WITH_JULIA $ENV{BUILD_WITH_JULIA})
-message("${BoldYellow}BUILD_WITH_JULIA: ${BUILD_WITH_JULIA} ${ColourReset}")
-
-set (BUILD_WITH_PYTHON ON CACHE BOOL "Build binary for Python.")
-if(NOT DEFINED ENV{BUILD_WITH_PYTHON})
-    message("${BoldRed}BUILD_WITH_PYTHON not set. Defaults to ON${ColourReset}")
-    set (ENV{BUILD_WITH_PYTHON} ON)
-endif()
-set (BUILD_WITH_PYTHON $ENV{BUILD_WITH_PYTHON})
-message("${BoldYellow}BUILD_WITH_PYTHON: ${BUILD_WITH_PYTHON} ${ColourReset}")
-
-set (BUILD_WITH_EIGEN OFF CACHE BOOL "Build with support for Eigen in C++.")
-if(NOT DEFINED ENV{BUILD_WITH_EIGEN})
-    message("${BoldRed}BUILD_WITH_EIGEN not set. Defaults to OFF${ColourReset}")
-    set (ENV{BUILD_WITH_EIGEN} OFF)
-endif()
-set (BUILD_WITH_EIGEN $ENV{BUILD_WITH_EIGEN})
-message("${BoldYellow}BUILD_WITH_EIGEN: ${BUILD_WITH_EIGEN} ${ColourReset}")
-
-set (BUILD_WITH_XINXIN OFF CACHE BOOL "Build against xinxin Hearts program.")
-if(NOT DEFINED ENV{BUILD_WITH_XINXIN})
-    message("${BoldRed}BUILD_WITH_XINXIN not set. Defaults to OFF${ColourReset}")
-    set (ENV{BUILD_WITH_XINXIN} OFF)
-endif()
-set (BUILD_WITH_XINXIN $ENV{BUILD_WITH_XINXIN})
-message("${BoldYellow}BUILD_WITH_XINXIN: ${BUILD_WITH_XINXIN} ${ColourReset}")
-
-##
-
-
+# List of all optional dependencies:
+openspiel_optional_dependency(
+  BUILD_WITH_ACPC          "Build against the Universal Poker library.")
+openspiel_optional_dependency(
+  BUILD_WITH_EIGEN         "Build with support for Eigen in C++.")
+openspiel_optional_dependency(
+  BUILD_WITH_HANABI        "Build against the Hanabi game.")
+openspiel_optional_dependency(
+  BUILD_WITH_JULIA         "Build binary for Julia.")
+openspiel_optional_dependency(
+  BUILD_WITH_LIBTORCH      "Build with support for libtorch.")
+openspiel_optional_dependency(
+  BUILD_WITH_PUBLIC_STATES "Build with support for public states in C++.")
+openspiel_optional_dependency(
+  BUILD_WITH_PYTHON        "Build binary for Python.")
+openspiel_optional_dependency(
+  BUILD_WITH_XINXIN        "Build against xinxin Hearts program.")
 
 # Needed to disable Abseil tests.
 set (BUILD_TESTING OFF)
@@ -109,25 +90,29 @@ set (BUILD_TESTING OFF)
 enable_testing()
 
 set (OPEN_SPIEL_CORE_FILES
-  canonical_game_strings.h
   canonical_game_strings.cc
-  game_parameters.h
+  canonical_game_strings.h
+  fog/fog_constants.h
+  fog/observation_history.cc
+  fog/observation_history.h
   game_parameters.cc
-  spiel.h
-  spiel.cc
-  spiel_bots.h
-  spiel_bots.cc
-  matrix_game.h
+  game_parameters.h
   matrix_game.cc
+  matrix_game.h
   normal_form_game.h
-  policy.h
   policy.cc
-  simultaneous_move_game.h
+  policy.h
   simultaneous_move_game.cc
-  spiel_utils.h
+  simultaneous_move_game.h
+  spiel.cc
+  spiel.h
+  spiel_bots.cc
+  spiel_bots.h
+  spiel_globals.h
   spiel_utils.cc
-  tensor_game.h
+  spiel_utils.h
   tensor_game.cc
+  tensor_game.h
 )
 
 # We add the subdirectory here so open_spiel_core can #include absl.
@@ -135,7 +120,8 @@ add_subdirectory (abseil-cpp)
 
 # Just the core without any of the games
 add_library(open_spiel_core OBJECT ${OPEN_SPIEL_CORE_FILES})
-target_include_directories (open_spiel_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} abseil-cpp)
+target_include_directories (
+  open_spiel_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} abseil-cpp)
 link_libraries(open_spiel_core
   absl::container
   absl::flags
@@ -160,12 +146,16 @@ set (OPEN_SPIEL_OBJECTS
   $<TARGET_OBJECTS:utils>
 )
 if (BUILD_WITH_HANABI)
-  set(OPEN_SPIEL_OBJECTS ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:hanabi_learning_environment>)
+  set(OPEN_SPIEL_OBJECTS ${OPEN_SPIEL_OBJECTS}
+      $<TARGET_OBJECTS:hanabi_learning_environment>)
 endif()
 if (BUILD_WITH_ACPC)
-  set(OPEN_SPIEL_OBJECTS ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:universal_poker_clib> $<TARGET_OBJECTS:universal_poker_lib>)
+  set(OPEN_SPIEL_OBJECTS ${OPEN_SPIEL_OBJECTS}
+      $<TARGET_OBJECTS:universal_poker_clib>
+      $<TARGET_OBJECTS:universal_poker_lib>)
 endif()
 if (BUILD_WITH_EIGEN)
+  add_compile_definitions(BUILD_WITH_EIGEN)
   # Add Eigen dependency.
   add_subdirectory(eigen/)
   # Now we can use #include "Eigen/Dense"
@@ -173,8 +163,28 @@ if (BUILD_WITH_EIGEN)
   include_directories(eigen/libeigen)
   set(OPEN_SPIEL_OBJECTS ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:eigen>)
 endif()
+if (BUILD_WITH_PUBLIC_STATES)
+  if (NOT BUILD_WITH_EIGEN)
+    message(FATAL_ERROR "You want to build with public states API, but Eigen dependency is not enabled. Please enable BUILD_WITH_EIGEN=ON")
+  endif()
+  add_compile_definitions(BUILD_WITH_PUBLIC_STATES)
+  set(OPEN_SPIEL_OBJECTS
+    $<TARGET_OBJECTS:public_states_core>
+    $<TARGET_OBJECTS:public_states_games>
+    $<TARGET_OBJECTS:public_states_algorithms>
+    $<TARGET_OBJECTS:public_states_game_transforms>
+    ${OPEN_SPIEL_OBJECTS})
+  add_subdirectory(public_states)
+endif()
 if (BUILD_WITH_XINXIN)
   set(OPEN_SPIEL_OBJECTS ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:xinxin>)
+endif()
+if (BUILD_WITH_LIBTORCH)
+  list(APPEND CMAKE_PREFIX_PATH "${CMAKE_CURRENT_SOURCE_DIR}/libtorch/libtorch")
+  find_package(Torch REQUIRED)
+  add_subdirectory(libtorch)
+  # Use following to link your_target_executable with torch libraries:
+  # target_link_libraries(your_target_executable ${TORCH_LIBRARIES})
 endif()
 
 # We have the parent of this directory in the include path, so that we can

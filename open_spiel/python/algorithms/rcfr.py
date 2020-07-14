@@ -44,6 +44,9 @@ from __future__ import print_function
 import numpy as np
 import tensorflow.compat.v1 as tf
 
+# Temporarily disable TF2 behavior while the code is not updated.
+tf.disable_v2_behavior()
+
 
 def tensor_to_matrix(tensor):
   """Converts `tensor` to a matrix (a rank-2 tensor) or raises an exception.

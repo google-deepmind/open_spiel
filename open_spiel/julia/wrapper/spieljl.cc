@@ -255,6 +255,10 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod) {
               [](const open_spiel::GameType& gt) {
                 return gt.provides_observation_tensor;
               })
+      .method("provides_factored_observation_string",
+              [](const open_spiel::GameType& gt) {
+                return gt.provides_factored_observation_string;
+              })
       .method("parameter_specification", [](const open_spiel::GameType& gt) {
         return gt.parameter_specification;
       });
@@ -341,6 +345,14 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod) {
               [](open_spiel::State& s, open_spiel::Player p,
                  std::vector<double> data) {
                 return s.ObservationTensor(p, &data);
+              })
+      .method("public_observation_string",
+              [](open_spiel::State& s) { return s.PublicObservationString(); })
+      .method("private_observation_string",
+              [](open_spiel::State& s) { return s.PrivateObservationString(); })
+      .method("private_observation_string",
+              [](open_spiel::State& s, open_spiel::Player p) {
+                return s.PrivateObservationString(p);
               })
       .method("clone", &open_spiel::State::Clone)
       .method("child", &open_spiel::State::Child)

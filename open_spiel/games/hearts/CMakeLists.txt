@@ -37,6 +37,14 @@ add_library(xinxin OBJECT
   hearts/iiMonteCarlo.h
   hearts/mt_random.cpp
   hearts/mt_random.h
+  xinxin_bot.cc
+  xinxin_bot.h
 )
 
 target_include_directories (xinxin PUBLIC hearts)
+
+add_executable (xinxin_bot_test xinxin_bot_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(xinxin_bot_test xinxin_bot_test)
+
+add_executable (xinxin_game_generator xinxin_game_generator.cc ${OPEN_SPIEL_OBJECTS})
