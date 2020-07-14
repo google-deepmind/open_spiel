@@ -369,7 +369,14 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod) {
 
   mod.add_type<open_spiel::Game>("Game")
       .method("num_distinct_actions", &open_spiel::Game::NumDistinctActions)
-      .method("new_initial_state", &open_spiel::Game::NewInitialState)
+      .method("new_initial_state",
+              [](open_spiel::Game& g) {
+                return g.NewInitialState();
+              })
+      .method("new_initial_state",
+              [](open_spiel::Game& g, const std::string& s) {
+                return g.NewInitialState(s);
+              })
       .method("max_chance_outcomes", &open_spiel::Game::MaxChanceOutcomes)
       .method("get_parameters", &open_spiel::Game::GetParameters)
       .method("num_players", &open_spiel::Game::NumPlayers)
