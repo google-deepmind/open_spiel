@@ -21,6 +21,7 @@
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
+#include "open_spiel/utils/functional.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
@@ -35,6 +36,9 @@ void SetProb(ActionsAndProbs* actions_and_probs, Action action, double prob);
 // Helper for deterministic policies: returns the single action if the policy
 // is deterministic, otherwise returns kInvalidAction.
 Action GetAction(const ActionsAndProbs& action_and_probs);
+
+// Helper to create ActionsAndProbs from two vectors of actions and probs.
+constexpr auto ZipActionsProbs = Zip<Action, double>;
 
 // Returns a policy where every legal action has probability 1 / (number of
 // legal actions).

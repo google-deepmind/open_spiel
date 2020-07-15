@@ -6,6 +6,7 @@ add_library (utils OBJECT
   data_logger.cc
   file.h
   file.cc
+  functional.h
   json.h
   json.cc
   logger.h
