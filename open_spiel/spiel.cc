@@ -393,6 +393,33 @@ Action State::StringToAction(Player player,
       absl::StrCat("Couldn't find an action matching ", action_str));
 }
 
+int State::MoveNumber() const {
+  if (game_->GetType().dynamics == GameType::Dynamics::kSequential)
+    return history_.size();
+  if (game_->GetType().dynamics == GameType::Dynamics::kSimultaneous) {
+    std::vector<int> moves_per_player(num_players_, 0);
+    int moves = 0;
+    for (const PlayerAction& player_action : history_) {
+      if (player_action.player == kChancePlayerId) {
+        moves++;
+        continue;
+      }
+
+      // History contains only "flattened" actions of players in sim-move games.
+      SPIEL_CHECK_GE(player_action.player, 0);
+      SPIEL_CHECK_LT(player_action.player, num_players_);
+      ++moves_per_player[player_action.player];
+    }
+    const int max_per_player = *std::max_element(moves_per_player.begin(),
+                                                 moves_per_player.end());
+    return moves + max_per_player;
+  }
+
+  SpielFatalError("This shouldn't happen.");
+  return 0;
+}
+
+
 std::unique_ptr<State> Game::DeserializeState(const std::string& str) const {
   // This simple deserialization doesn't work for games with sampled chance
   // nodes, since the history doesn't give us enough information to reconstruct

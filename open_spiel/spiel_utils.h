@@ -39,7 +39,7 @@
 #include "open_spiel/abseil-cpp/absl/time/time.h"
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
 
-// Code that is not part of the API, but is widely useful in implementations
+// Code that is not part of the API, but is widely useful in implementations.
 
 namespace open_spiel {
 
@@ -48,6 +48,20 @@ namespace open_spiel {
 // lookup here since that requires putting these overloads into std::, which is
 // not allowed (only template specializations on std:: template classes may be
 // added to std::, and this is not one of them).
+
+// Make sure that arbitrary structures can be printed out.
+// (Fix for GCC, as it cannot process structures out of order.
+// Otherwise it produces several pages of templating errors.)
+template <typename T>
+std::ostream& operator<<(std::ostream& stream, const std::unique_ptr<T>& v);
+template <typename T, typename U>
+std::ostream& operator<<(std::ostream& stream, const std::pair<T, U>& v);
+template <typename T>
+std::ostream& operator<<(std::ostream& stream, const std::vector<T>& v);
+template <typename T, std::size_t N>
+std::ostream& operator<<(std::ostream& stream, const std::array<T, N>& v);
+
+// Actual template implementations.
 template <typename T>
 std::ostream& operator<<(std::ostream& stream, const std::vector<T>& v) {
   stream << "[";
@@ -197,6 +211,8 @@ bool Near(T a, T b, T epsilon) {
 #define SPIEL_CHECK_LT(x, y) SPIEL_CHECK_OP(x, <, y)
 #define SPIEL_CHECK_EQ(x, y) SPIEL_CHECK_OP(x, ==, y)
 #define SPIEL_CHECK_NE(x, y) SPIEL_CHECK_OP(x, !=, y)
+// check an implication:  x => y  |=|  !x || y
+#define SPIEL_CHECK_IMPLY(x, y) SPIEL_CHECK_OP(!(x), ||, y)
 #define SPIEL_CHECK_PROB(x) \
   SPIEL_CHECK_GE(x, 0);     \
   SPIEL_CHECK_LE(x, 1);     \
