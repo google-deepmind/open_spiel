@@ -54,6 +54,8 @@ class PenniesState : public State {
   std::unique_ptr<State> Clone() const override;
   std::vector<std::pair<Action, double>> ChanceOutcomes() const override;
   std::vector<Action> LegalActions() const override;
+  std::string PublicObservationString() const override;
+  std::string PrivateObservationString(Player player) const override;
 
  protected:
   void DoApplyAction(Action move) override;
