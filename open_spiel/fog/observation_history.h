@@ -45,11 +45,11 @@ class ActionOrObs {
 
   bool IsAction() const { return tag == Either::kAction; }
   bool IsObservation() const { return tag == Either::kObservation; }
-  Action Action() const {
+  Action GetAction() const {
     SPIEL_CHECK_TRUE(tag == Either::kAction);
     return action;
   }
-  const std::string& Observation() const {
+  const std::string& GetObservation() const {
     SPIEL_CHECK_TRUE(tag == Either::kObservation);
     return observation;
   }
