@@ -143,21 +143,24 @@ class UncontestedBiddingState : public State {
   UncontestedBiddingState(std::shared_ptr<const Game> game,
                           std::vector<Contract> reference_contracts,
                           std::function<bool(const Deal&)> deal_filter,
-                          std::vector<Action> actions, int rng_seed)
+                          std::vector<Action> actions, int rng_seed,
+                          int num_redeals)
       : State(game),
         reference_contracts_(std::move(reference_contracts)),
         actions_(std::move(actions)),
         deal_filter_(deal_filter),
         rng_(rng_seed),
+        num_redeals_(num_redeals),
         dealt_(false) {}
   UncontestedBiddingState(std::shared_ptr<const Game> game,
                           std::vector<Contract> reference_contracts,
                           const Deal& deal, std::vector<Action> actions,
-                          int rng_seed)
+                          int rng_seed, int num_redeals)
       : State(game),
         reference_contracts_(std::move(reference_contracts)),
         actions_(std::move(actions)),
         rng_(rng_seed),
+        num_redeals_(num_redeals),
         deal_(deal),
         dealt_(true) {
     if (IsTerminal()) ScoreDeal();
@@ -194,6 +197,7 @@ class UncontestedBiddingState : public State {
   // balanced hand with 20-21 HCP (a 2NT opener - see above).
   std::function<bool(const Deal&)> deal_filter_;
   mutable std::mt19937 rng_;
+  const int num_redeals_;
   mutable Deal deal_;
   bool dealt_;
   double score_;                          // score for the achieved contract
@@ -205,9 +209,9 @@ class UncontestedBiddingGame : public Game {
   explicit UncontestedBiddingGame(const GameParameters& params);
   int NumDistinctActions() const override { return kNumActions; }
   std::unique_ptr<State> NewInitialState() const override {
-    return std::unique_ptr<State>(new UncontestedBiddingState(
+    return absl::make_unique<UncontestedBiddingState>(
         shared_from_this(), reference_contracts_, deal_filter_, forced_actions_,
-        ++rng_seed_));
+        ++rng_seed_, num_redeals_);
   }
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override {
@@ -231,6 +235,7 @@ class UncontestedBiddingGame : public Game {
   std::vector<Action> forced_actions_;
   std::function<bool(const Deal&)> deal_filter_;
   mutable int rng_seed_;
+  const int num_redeals_;
 };
 
 }  // namespace bridge_uncontested_bidding
