@@ -12,13 +12,13 @@ set (CMAKE_CXX_STANDARD 17)
 if(APPLE)
   # On MacOS:
   #   -undefined dynamic_lookup is necessary for pybind11 linking
-  set (CMAKE_CXX_FLAGS "-Wno-everything -w -undefined dynamic_lookup")
+  set (CMAKE_CXX_FLAGS "-Wno-everything -w -undefined dynamic_lookup -O2")
 
   # On MacOS, we need this so that CMake will use the right Python if the user
   # has a virtual environment active
   set (CMAKE_FIND_FRAMEWORK LAST)
 else()
-  set (CMAKE_CXX_FLAGS "-Wno-everything")
+  set (CMAKE_CXX_FLAGS "-Wno-everything -O2")
 endif()
 
 # Position-independent code is needed for Python extension modules.

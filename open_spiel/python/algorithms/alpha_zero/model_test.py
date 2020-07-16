@@ -63,7 +63,7 @@ def solve_game(state):
 def build_model(game, model_type):
   return model_lib.Model.build_model(
       model_type, game.observation_tensor_shape(), game.num_distinct_actions(),
-      nn_width=64, nn_depth=2, weight_decay=1e-4, learning_rate=0.01, path=None)
+      nn_width=32, nn_depth=2, weight_decay=1e-4, learning_rate=0.01, path=None)
 
 
 class ModelTest(parameterized.TestCase):
@@ -92,7 +92,7 @@ class ModelTest(parameterized.TestCase):
       self.assertLen(value[0], 1)
 
     losses = []
-    for i in range(1000):
+    for i in range(200):
       loss = model.update(train_inputs)
       print(i, loss)
       losses.append(loss)
@@ -117,7 +117,7 @@ class ModelTest(parameterized.TestCase):
     train_inputs = list(solved.values())
     print("states:", len(train_inputs))
     losses = []
-    for i in range(2000):
+    for i in range(300):
       loss = model.update(train_inputs)
       print(i, loss)
       losses.append(loss)
@@ -127,8 +127,8 @@ class ModelTest(parameterized.TestCase):
     self.assertGreater(losses[0].policy, losses[-1].policy)
     self.assertGreater(losses[0].value, losses[-1].value)
     self.assertGreater(losses[0].total, losses[-1].total)
-    self.assertLess(losses[-1].value, 0.1)
-    self.assertLess(losses[-1].policy, 0.1)
+    self.assertLess(losses[-1].value, 0.2)
+    self.assertLess(losses[-1].policy, 0.25)
 
 
 if __name__ == "__main__":
