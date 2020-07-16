@@ -171,13 +171,13 @@ uint32_t ACPCGame::BlindSize(uint8_t player) const {
 
 std::string ACPCState::ToString() const {
   char buf[kStringBuffersize];
-  project_acpc_server::printState(game_->MutableGame(), acpcState_.get(),
+  project_acpc_server::printState(game_->MutableGame(), &acpcState_,
                                   kStringBuffersize, buf);
   std::ostringstream out;
 
   out << buf << std::endl << "Spent: [";
   for (int p = 0; p < game_->GetNbPlayers(); ++p) {
-    out << "P" << p << ": " << acpcState_->spent[p] << "  ";
+    out << "P" << p << ": " << acpcState_.spent[p] << "  ";
   }
   out << "]" << std::endl;
 
@@ -186,63 +186,63 @@ std::string ACPCState::ToString() const {
 
 
 double ACPCState::ValueOfState(const uint8_t player) const {
-  SPIEL_CHECK_TRUE(stateFinished(acpcState_.get()));
-  return project_acpc_server::valueOfState(game_->MutableGame(),
-                                           acpcState_.get(), player);
+  SPIEL_CHECK_TRUE(stateFinished(&acpcState_));
+  return project_acpc_server::valueOfState(game_->MutableGame(), &acpcState_,
+                                           player);
 }
 int ACPCState::RaiseIsValid(int32_t *minSize, int32_t *maxSize) const {
-  return raiseIsValid(game_->MutableGame(), acpcState_.get(), minSize, maxSize);
+  return raiseIsValid(game_->MutableGame(), &acpcState_, minSize, maxSize);
 }
 
 uint8_t ACPCState::NumFolded() const {
-  return project_acpc_server::numFolded(game_->MutableGame(), acpcState_.get());
+  return project_acpc_server::numFolded(game_->MutableGame(), &acpcState_);
 }
 
 uint8_t ACPCState::CurrentPlayer() const {
-  return project_acpc_server::currentPlayer(game_->MutableGame(),
-                                            acpcState_.get());
+  return project_acpc_server::currentPlayer(game_->MutableGame(), &acpcState_);
 }
 
 ACPCState::ACPCState(const ACPCGame *game)
-    : game_(game), acpcState_(absl::make_unique<RawACPCState>()) {
+    // This is necessary as we need to value-initialize acpcState_.
+    : game_(game), acpcState_() {
   project_acpc_server::initState(game_->MutableGame(),
                                  game_->HandId()
                                  /*TODO this make a unit test fail++*/,
-                                 acpcState_.get());
+                                 &acpcState_);
 }
 
 void ACPCState::DoAction(const ACPCState::ACPCActionType actionType,
                          const int32_t size) {
   project_acpc_server::Action a = GetAction(actionType, size);
-  SPIEL_CHECK_TRUE(project_acpc_server::isValidAction(
-      game_->MutableGame(), acpcState_.get(), false, &a));
-  project_acpc_server::doAction(game_->MutableGame(), &a, acpcState_.get());
+  SPIEL_CHECK_TRUE(project_acpc_server::isValidAction(game_->MutableGame(),
+                                                      &acpcState_, false, &a));
+  project_acpc_server::doAction(game_->MutableGame(), &a, &acpcState_);
 }
 
 int ACPCState::IsValidAction(const ACPCState::ACPCActionType actionType,
                              const int32_t size) const {
   project_acpc_server::Action a = GetAction(actionType, size);
-  return project_acpc_server::isValidAction(game_->MutableGame(),
-                                            acpcState_.get(), false, &a);
+  return project_acpc_server::isValidAction(game_->MutableGame(), &acpcState_,
+                                            false, &a);
 }
 
 uint32_t ACPCState::Money(const uint8_t player) const {
   SPIEL_CHECK_LE(player, game_->GetNbPlayers());
-  return game_->StackSize(player) - acpcState_->spent[player];
+  return game_->StackSize(player) - acpcState_.spent[player];
 }
 
 uint32_t ACPCState::Ante(const uint8_t player) const {
   SPIEL_CHECK_LE(player, game_->GetNbPlayers());
-  return acpcState_->spent[player];
+  return acpcState_.spent[player];
 }
 
 uint32_t ACPCState::TotalSpent() const {
-  return static_cast<uint32_t>(absl::c_accumulate(acpcState_->spent, 0));
+  return static_cast<uint32_t>(absl::c_accumulate(acpcState_.spent, 0));
 }
 
 uint32_t ACPCState::CurrentSpent(const uint8_t player) const {
   SPIEL_CHECK_LE(player, game_->GetNbPlayers());
-  return acpcState_->spent[player];
+  return acpcState_.spent[player];
 }
 
 std::string ACPCState::ActionToString(
@@ -263,8 +263,8 @@ std::string ACPCState::ActionToString(
 std::string ACPCState::BettingSequence(uint8_t round) const {
   SPIEL_CHECK_LT(round, game_->NumRounds());
   std::string out;
-  for (int a = 0; a < acpcState_->numActions[round]; a++) {
-    absl::StrAppend(&out, ActionToString(acpcState_->action[round][a]));
+  for (int a = 0; a < acpcState_.numActions[round]; a++) {
+    absl::StrAppend(&out, ActionToString(acpcState_.action[round][a]));
   }
   return out;
 }
@@ -276,13 +276,13 @@ void ACPCState::SetHoleAndBoardCards(uint8_t holeCards[10][3],
   for (int p = 0; p < game_->GetNbPlayers(); ++p) {
     SPIEL_CHECK_EQ(nbHoleCards[p], game_->GetNbHoleCardsRequired());
     for (int c = 0; c < nbHoleCards[p]; ++c) {
-      acpcState_->holeCards[p][c] = holeCards[p][c];
+      acpcState_.holeCards[p][c] = holeCards[p][c];
     }
   }
 
   SPIEL_CHECK_EQ(nbBoardCards, game_->GetNbBoardCardsRequired(GetRound()));
   for (int c = 0; c < nbBoardCards; ++c) {
-    acpcState_->boardCards[c] = boardCards[c];
+    acpcState_.boardCards[c] = boardCards[c];
   }
 }
 

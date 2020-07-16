@@ -73,8 +73,7 @@ class ACPCState {
 
   explicit ACPCState(const ACPCGame* game);
   explicit ACPCState(const ACPCState& other)
-      : game_(other.game_),
-        acpcState_(absl::make_unique<RawACPCState>(*other.acpcState_)) {}
+      : game_(other.game_), acpcState_(other.acpcState_) {}
 
   void SetHoleAndBoardCards(uint8_t holeCards[10][3], uint8_t boardCards[7],
                             uint8_t nbHoleCards[10], uint8_t nbBoardCards);
@@ -95,18 +94,18 @@ class ACPCState {
   double ValueOfState(const uint8_t player) const;
 
   // Trivial methods.
-  bool IsFinished() const { return stateFinished(acpcState_.get()); }
-  uint32_t MaxSpend() const { return acpcState_->maxSpent; }
+  bool IsFinished() const { return stateFinished(&acpcState_); }
+  uint32_t MaxSpend() const { return acpcState_.maxSpent; }
 
   // Returns the current round 0-indexed round id (<= game.NumRounds() - 1).
   // A showdown is still in game.NumRounds()-1, not a separate round
-  int GetRound() const { return acpcState_->round; }
+  int GetRound() const { return acpcState_.round; }
 
  private:
   std::string ActionToString(const project_acpc_server::Action& action) const;
 
   const ACPCGame* game_;
-  std::unique_ptr<RawACPCState> acpcState_;
+  mutable RawACPCState acpcState_;
 };
 
 }  // namespace acpc_cpp
