@@ -90,12 +90,21 @@ class UniversalPokerState : public State {
   static constexpr ActionType ALL_ACTIONS[5] = {
       ACTION_DEAL, ACTION_FOLD, ACTION_CHECK_CALL, ACTION_BET, ACTION_ALL_IN};
 
- public:
+ private:
+  void _CalculateActionsAndNodeType();
+
+  double GetTotalReward(Player player) const;
+
+  const uint32_t &GetPossibleActionsMask() const { return possibleActions_; }
+  const int GetPossibleActionCount() const;
+
+  void ApplyChoiceAction(ActionType action_type, int size);
+  const std::string &GetActionSequence() const { return actionSequence_; }
+
   const acpc_cpp::ACPCGame *acpc_game_;
-  acpc_cpp::ACPCState acpc_state_;
+  mutable acpc_cpp::ACPCState acpc_state_;
   logic::CardSet deck_;  // The remaining cards to deal.
-  // The cards already owned by each player
-  std::vector<logic::CardSet> hole_cards_;
+  std::vector<logic::CardSet> hole_cards_;  // The cards owned by each player
   logic::CardSet board_cards_;  // The public cards.
   // The current player:
   // kChancePlayerId for chance nodes
@@ -109,16 +118,6 @@ class UniversalPokerState : public State {
   std::string actionSequence_;
 
   BettingAbstraction betting_abstraction_;
-
-  void _CalculateActionsAndNodeType();
-
-  double GetTotalReward(Player player) const;
-
-  const uint32_t &GetPossibleActionsMask() const { return possibleActions_; }
-  const int GetPossibleActionCount() const;
-
-  void ApplyChoiceAction(ActionType action_type, int size);
-  std::string GetActionSequence() const { return actionSequence_; }
 };
 
 class UniversalPokerGame : public Game {

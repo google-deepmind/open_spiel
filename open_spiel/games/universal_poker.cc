@@ -30,6 +30,29 @@
 
 namespace open_spiel {
 namespace universal_poker {
+namespace {
+
+std::string BettingAbstractionToString(const BettingAbstraction &betting) {
+  switch (betting) {
+    case BettingAbstraction::kFC: {
+      return "BettingAbstration: FC";
+      break;
+    }
+    case BettingAbstraction::kFCPA: {
+      return "BettingAbstration: FCPA";
+      break;
+    }
+    case BettingAbstraction::kFULLGAME: {
+      return "BettingAbstraction: FULLGAME";
+      break;
+    }
+    default:
+      SpielFatalError("Unknown betting abstraction.");
+      break;
+  }
+}
+
+}  // namespace
 
 const GameType kGameType{
     /*short_name=*/"universal_poker",
@@ -136,50 +159,50 @@ UniversalPokerState::UniversalPokerState(std::shared_ptr<const Game> game,
                                ->betting_abstraction()) {}
 
 std::string UniversalPokerState::ToString() const {
-  std::ostringstream buf;
-  buf << betting_abstraction_ << std::endl;
+  std::string str =
+      absl::StrCat(BettingAbstractionToString(betting_abstraction_), "\n");
   for (int p = 0; p < acpc_game_->GetNbPlayers(); ++p) {
-    buf << "P" << p << " Cards: " << hole_cards_[p].ToString()
-        << std::endl;
+    absl::StrAppend(&str, "P", p, " Cards: ", hole_cards_[p].ToString(), "\n");
   }
-  buf << "BoardCards " << board_cards_.ToString() << std::endl;
+  absl::StrAppend(&str, "BoardCards ", board_cards_.ToString(), "\n");
 
   if (IsChanceNode()) {
-    buf << "PossibleCardsToDeal " << deck_.ToString() << std::endl;
+    absl::StrAppend(&str, "PossibleCardsToDeal ", deck_.ToString(), "\n");
   }
   if (IsTerminal()) {
     for (int p = 0; p < acpc_game_->GetNbPlayers(); ++p) {
-      buf << "P" << p << " Reward: " << GetTotalReward(p) << std::endl;
+      absl::StrAppend(&str, "P", p, " Reward: ", GetTotalReward(p), "\n");
     }
   }
-  buf << "Node type?: ";
+  absl::StrAppend(&str, "Node type?: ");
   if (IsChanceNode()) {
-    buf << "Chance node" << std::endl;
+    absl::StrAppend(&str, "Chance node\n");
   } else if (IsTerminal()) {
-    buf << "Terminal Node!" << std::endl;
+    absl::StrAppend(&str, "Terminal Node!\n");
   } else {
-    buf << "Player node for player " << cur_player_ << std::endl;
+    absl::StrAppend(&str, "Player node for player ", cur_player_, "\n");
   }
 
   if (betting_abstraction_ == BettingAbstraction::kFC ||
       betting_abstraction_ == BettingAbstraction::kFCPA) {
-    buf << "PossibleActions (" << GetPossibleActionCount() << "): [";
-    for (auto action : ALL_ACTIONS) {
+    absl::StrAppend(&str, "PossibleActions (", GetPossibleActionCount(),
+                    "): [");
+    for (UniversalPokerState::ActionType action : ALL_ACTIONS) {
       if (action & possibleActions_) {
-        buf << ((action == ACTION_ALL_IN) ? " ACTION_ALL_IN " : "");
-        buf << ((action == ACTION_BET) ? " ACTION_BET " : "");
-        buf << ((action == ACTION_CHECK_CALL) ? " ACTION_CHECK_CALL " : "");
-        buf << ((action == ACTION_FOLD) ? " ACTION_FOLD " : "");
-        buf << ((action == ACTION_DEAL) ? " ACTION_DEAL " : "");
+        if (action == ACTION_ALL_IN) absl::StrAppend(&str, " ACTION_ALL_IN ");
+        if (action == ACTION_BET) absl::StrAppend(&str, " ACTION_BET ");
+        if (action == ACTION_CHECK_CALL) {
+          absl::StrAppend(&str, " ACTION_CHECK_CALL ");
+        }
+        if (action == ACTION_FOLD) absl::StrAppend(&str, " ACTION_FOLD ");
+        if (action == ACTION_DEAL) absl::StrAppend(&str, " ACTION_DEAL ");
       }
     }
   }
-  buf << "]" << std::endl;
-  buf << "Round: " << acpc_state_.GetRound() << std::endl;
-  buf << "ACPC State: " << acpc_state_.ToString() << std::endl;
-  buf << "Action Sequence: " << actionSequence_ << std::endl;
-
-  return buf.str();
+  absl::StrAppend(&str, "]", "\nRound: ", acpc_state_.GetRound(),
+                  "\nACPC State: ", acpc_state_.ToString(),
+                  "\nAction Sequence: ", actionSequence_);
+  return str;
 }
 
 std::string UniversalPokerState::ActionToString(Player player,
@@ -875,23 +898,7 @@ const int UniversalPokerState::GetPossibleActionCount() const {
 }
 
 std::ostream &operator<<(std::ostream &os, const BettingAbstraction &betting) {
-  switch (betting) {
-    case BettingAbstraction::kFC: {
-      os << "BettingAbstration: FC";
-      break;
-    }
-    case BettingAbstraction::kFCPA: {
-      os << "BettingAbstration: FCPA";
-      break;
-    }
-    case BettingAbstraction::kFULLGAME: {
-      os << "BettingAbstraction: FULLGAME";
-      break;
-    }
-    default:
-      SpielFatalError("Unknown betting abstraction.");
-      break;
-  }
+  os << BettingAbstractionToString(betting);
   return os;
 }
 
