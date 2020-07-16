@@ -55,33 +55,33 @@ endif()
 # Use this macro to define optional dependencies.
 # You can then use your chosen DEP_NAME as a variable to check if that
 # dependency is enabled -- see code below.
-macro(openspiel_optional_dependency DEP_NAME DEP_DESCRIPTION)
-  set (${DEP_NAME} OFF CACHE BOOL ${DEP_DESCRIPTION})
+macro(openspiel_optional_dependency DEP_NAME DEP_DEFAULT DEP_DESCRIPTION)
+  set (${DEP_NAME} ${DEP_DEFAULT} CACHE BOOL ${DEP_DESCRIPTION})
   if(NOT DEFINED ENV{${DEP_NAME}})
-    message("${BoldRed}${DEP_NAME} not set. Defaults to OFF${ColourReset}")
-    set (ENV{${DEP_NAME}} OFF)
+    message("${BoldRed}${DEP_NAME} not set. Defaults to ${DEP_DEFAULT}${ColourReset}")
+    set (ENV{${DEP_NAME}} ${DEP_DEFAULT})
   endif()
   set (${DEP_NAME} $ENV{${DEP_NAME}})
   message("${BoldYellow}${DEP_NAME}: ${${DEP_NAME}} ${ColourReset}")
 endmacro()
 
 # List of all optional dependencies:
-openspiel_optional_dependency(
-  BUILD_WITH_ACPC          "Build against the Universal Poker library.")
-openspiel_optional_dependency(
-  BUILD_WITH_EIGEN         "Build with support for Eigen in C++.")
-openspiel_optional_dependency(
-  BUILD_WITH_HANABI        "Build against the Hanabi game.")
-openspiel_optional_dependency(
-  BUILD_WITH_JULIA         "Build binary for Julia.")
-openspiel_optional_dependency(
-  BUILD_WITH_LIBTORCH      "Build with support for libtorch.")
-openspiel_optional_dependency(
-  BUILD_WITH_PUBLIC_STATES "Build with support for public states in C++.")
-openspiel_optional_dependency(
-  BUILD_WITH_PYTHON        "Build binary for Python.")
-openspiel_optional_dependency(
-  BUILD_WITH_XINXIN        "Build against xinxin Hearts program.")
+openspiel_optional_dependency(BUILD_WITH_ACPC           OFF
+  "Build against the Universal Poker library.")
+openspiel_optional_dependency(BUILD_WITH_EIGEN          OFF
+  "Build with support for Eigen in C++.")
+openspiel_optional_dependency(BUILD_WITH_HANABI         OFF
+  "Build against the Hanabi game.")
+openspiel_optional_dependency(BUILD_WITH_JULIA          OFF
+  "Build binary for Julia.")
+openspiel_optional_dependency(BUILD_WITH_LIBTORCH       OFF
+  "Build with support for libtorch.")
+openspiel_optional_dependency(BUILD_WITH_PUBLIC_STATES  OFF
+  "Build with support for public states in C++.")
+openspiel_optional_dependency(BUILD_WITH_PYTHON         ON
+  "Build binary for Python.")
+openspiel_optional_dependency(BUILD_WITH_XINXIN         OFF
+  "Build against xinxin Hearts program.")
 
 # Needed to disable Abseil tests.
 set (BUILD_TESTING OFF)
