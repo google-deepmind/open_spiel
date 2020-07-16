@@ -92,18 +92,20 @@ class ModelTest(parameterized.TestCase):
       self.assertLen(value[0], 1)
 
     losses = []
+    policy_loss_goal = 0.05
+    value_loss_goal = 0.05
     for i in range(200):
       loss = model.update(train_inputs)
       print(i, loss)
       losses.append(loss)
-      if loss.policy < 0.05 and loss.value < 0.05:
+      if loss.policy < policy_loss_goal and loss.value < value_loss_goal:
         break
 
     self.assertGreater(losses[0].total, losses[-1].total)
     self.assertGreater(losses[0].policy, losses[-1].policy)
     self.assertGreater(losses[0].value, losses[-1].value)
-    self.assertLess(losses[-1].value, 0.05)
-    self.assertLess(losses[-1].policy, 0.05)
+    self.assertLess(losses[-1].value, value_loss_goal)
+    self.assertLess(losses[-1].policy, policy_loss_goal)
 
   @parameterized.parameters(model_lib.Model.valid_model_types)
   def test_model_learns_optimal(self, model_type):
@@ -117,18 +119,20 @@ class ModelTest(parameterized.TestCase):
     train_inputs = list(solved.values())
     print("states:", len(train_inputs))
     losses = []
-    for i in range(300):
+    policy_loss_goal = 0.1
+    value_loss_goal = 0.1
+    for i in range(500):
       loss = model.update(train_inputs)
       print(i, loss)
       losses.append(loss)
-      if loss.policy < 0.1 and loss.value < 0.1:
+      if loss.policy < policy_loss_goal and loss.value < value_loss_goal:
         break
 
     self.assertGreater(losses[0].policy, losses[-1].policy)
     self.assertGreater(losses[0].value, losses[-1].value)
     self.assertGreater(losses[0].total, losses[-1].total)
-    self.assertLess(losses[-1].value, 0.2)
-    self.assertLess(losses[-1].policy, 0.25)
+    self.assertLess(losses[-1].value, value_loss_goal)
+    self.assertLess(losses[-1].policy, policy_loss_goal)
 
 
 if __name__ == "__main__":
