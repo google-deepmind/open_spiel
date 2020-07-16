@@ -14,10 +14,10 @@
 
 #include "open_spiel/games/stones_n_gems.h"
 
-#include <unordered_map>
-#include <algorithm>    // std::find, min
 #include <sys/types.h>
 
+#include <algorithm>  // std::find, min
+#include <unordered_map>
 #include <utility>
 
 #include "open_spiel/game_parameters.h"
@@ -40,367 +40,360 @@ enum ElementProperties {
 
 // All possible elements
 const Element kElAgent = {
-  HiddenCellType::kAgent, VisibleCellType::kAgent,
-  ElementProperties::kConsumable | ElementProperties::kCanExplode, '@'
-};
-const Element kElAgentInExit = {
-  HiddenCellType::kAgentInExit, VisibleCellType::kAgentInExit,
-  ElementProperties::kNone, '!'
-};
-const Element kElExitOpen = {
-  HiddenCellType::kExitOpen, VisibleCellType::kExitOpen,
-  ElementProperties::kNone, '#'
-};
-const Element kElExitClosed = {
-  HiddenCellType::kExitClosed, VisibleCellType::kExitClosed,
-  ElementProperties::kNone, 'C'
-};
-const Element kElEmpty = {
-  HiddenCellType::kEmpty, VisibleCellType::kEmpty,
-  ElementProperties::kConsumable, ' '
-};
-const Element kElDirt = {
-  HiddenCellType::kDirt, VisibleCellType::kDirt,
-  ElementProperties::kConsumable, '.'
-};
+    HiddenCellType::kAgent, VisibleCellType::kAgent,
+    ElementProperties::kConsumable | ElementProperties::kCanExplode, '@'};
+const Element kElAgentInExit = {HiddenCellType::kAgentInExit,
+                                VisibleCellType::kAgentInExit,
+                                ElementProperties::kNone, '!'};
+const Element kElExitOpen = {HiddenCellType::kExitOpen,
+                             VisibleCellType::kExitOpen,
+                             ElementProperties::kNone, '#'};
+const Element kElExitClosed = {HiddenCellType::kExitClosed,
+                               VisibleCellType::kExitClosed,
+                               ElementProperties::kNone, 'C'};
+const Element kElEmpty = {HiddenCellType::kEmpty, VisibleCellType::kEmpty,
+                          ElementProperties::kConsumable, ' '};
+const Element kElDirt = {HiddenCellType::kDirt, VisibleCellType::kDirt,
+                         ElementProperties::kConsumable, '.'};
 const Element kElStone = {
-  HiddenCellType::kStone, VisibleCellType::kStone,
-  ElementProperties::kConsumable | ElementProperties::kRounded, 'o'
-};
-const Element kElStoneFalling = {
-  HiddenCellType::kStoneFalling, VisibleCellType::kStone,
-  ElementProperties::kConsumable, 'o'
-};
+    HiddenCellType::kStone, VisibleCellType::kStone,
+    ElementProperties::kConsumable | ElementProperties::kRounded, 'o'};
+const Element kElStoneFalling = {HiddenCellType::kStoneFalling,
+                                 VisibleCellType::kStone,
+                                 ElementProperties::kConsumable, 'o'};
 const Element kElDiamond = {
-  HiddenCellType::kDiamond, VisibleCellType::kDiamond,
-  ElementProperties::kConsumable | ElementProperties::kRounded, '*'
-};
-const Element kElDiamondFalling = {
-  HiddenCellType::kDiamondFalling, VisibleCellType::kDiamond,
-  ElementProperties::kConsumable, '*'
-};
+    HiddenCellType::kDiamond, VisibleCellType::kDiamond,
+    ElementProperties::kConsumable | ElementProperties::kRounded, '*'};
+const Element kElDiamondFalling = {HiddenCellType::kDiamondFalling,
+                                   VisibleCellType::kDiamond,
+                                   ElementProperties::kConsumable, '*'};
 const Element kElFireflyUp = {
-  HiddenCellType::kFireflyUp, VisibleCellType::kFirefly,
-  ElementProperties::kConsumable | ElementProperties::kCanExplode, 'F'
-};
+    HiddenCellType::kFireflyUp, VisibleCellType::kFirefly,
+    ElementProperties::kConsumable | ElementProperties::kCanExplode, 'F'};
 const Element kElFireflyLeft = {
-  HiddenCellType::kFireflyLeft, VisibleCellType::kFirefly,
-  ElementProperties::kConsumable | ElementProperties::kCanExplode, 'F'
-};
+    HiddenCellType::kFireflyLeft, VisibleCellType::kFirefly,
+    ElementProperties::kConsumable | ElementProperties::kCanExplode, 'F'};
 const Element kElFireflyDown = {
-  HiddenCellType::kFireflyDown, VisibleCellType::kFirefly,
-  ElementProperties::kConsumable | ElementProperties::kCanExplode, 'F'
-};
+    HiddenCellType::kFireflyDown, VisibleCellType::kFirefly,
+    ElementProperties::kConsumable | ElementProperties::kCanExplode, 'F'};
 const Element kElFireflyRight = {
-  HiddenCellType::kFireflyRight, VisibleCellType::kFirefly,
-  ElementProperties::kConsumable | ElementProperties::kCanExplode, 'F'
-};
+    HiddenCellType::kFireflyRight, VisibleCellType::kFirefly,
+    ElementProperties::kConsumable | ElementProperties::kCanExplode, 'F'};
 const Element kElButterflyUp = {
-  HiddenCellType::kButterflyUp, VisibleCellType::kButterfly,
-  ElementProperties::kConsumable | ElementProperties::kCanExplode, 'U'
-};
+    HiddenCellType::kButterflyUp, VisibleCellType::kButterfly,
+    ElementProperties::kConsumable | ElementProperties::kCanExplode, 'U'};
 const Element kElButterflyLeft = {
-  HiddenCellType::kButterflyLeft, VisibleCellType::kButterfly,
-  ElementProperties::kConsumable | ElementProperties::kCanExplode, 'U'
-};
+    HiddenCellType::kButterflyLeft, VisibleCellType::kButterfly,
+    ElementProperties::kConsumable | ElementProperties::kCanExplode, 'U'};
 const Element kElButterflyDown = {
-  HiddenCellType::kButterflyDown, VisibleCellType::kButterfly,
-  ElementProperties::kConsumable | ElementProperties::kCanExplode, 'U'
-};
+    HiddenCellType::kButterflyDown, VisibleCellType::kButterfly,
+    ElementProperties::kConsumable | ElementProperties::kCanExplode, 'U'};
 const Element kElButterflyRight = {
-  HiddenCellType::kButterflyRight, VisibleCellType::kButterfly,
-  ElementProperties::kConsumable | ElementProperties::kCanExplode, 'U'
-};
-const Element kElBlob = {
-  HiddenCellType::kBlob, VisibleCellType::kBlob,
-  ElementProperties::kConsumable, 'A'
-};
+    HiddenCellType::kButterflyRight, VisibleCellType::kButterfly,
+    ElementProperties::kConsumable | ElementProperties::kCanExplode, 'U'};
+const Element kElBlob = {HiddenCellType::kBlob, VisibleCellType::kBlob,
+                         ElementProperties::kConsumable, 'A'};
 const Element kElWallBrick = {
-  HiddenCellType::kWallBrick, VisibleCellType::kWallBrick,
-  ElementProperties::kConsumable | ElementProperties::kRounded, 'H'
-};
-const Element kElWallSteel = {
-  HiddenCellType::kWallSteel, VisibleCellType::kWallSteel,
-  ElementProperties::kNone, 'S'
-};
-const Element kElWallMagicOn = {
-  HiddenCellType::kWallMagicOn, VisibleCellType::kWallMagicOn,
-  ElementProperties::kConsumable, 'M'
-};
-const Element kElWallMagicDormant = {
-  HiddenCellType::kWallMagicDormant, VisibleCellType::kWallMagicOff,
-  ElementProperties::kConsumable, 'Q'
-};
-const Element kElWallMagicExpired = {
-  HiddenCellType::kWallMagicExpired, VisibleCellType::kWallMagicOff,
-  ElementProperties::kConsumable, 'Q'
-};
-const Element kElExplosionDiamond = {
-  HiddenCellType::kExplosionDiamond, VisibleCellType::kExplosion,
-  ElementProperties::kNone, 'E'
-};
-const Element kElExplosionBoulder = {
-  HiddenCellType::kExplosionBoulder, VisibleCellType::kExplosion,
-  ElementProperties::kNone, 'E'
-};
-const Element kElExplosionEmpty = {
-  HiddenCellType::kExplosionEmpty, VisibleCellType::kExplosion,
-  ElementProperties::kNone, 'E'
-};
-const Element kElGateRedClosed = {
-  HiddenCellType::kGateRedClosed, VisibleCellType::kGateRedClosed,
-  ElementProperties::kNone, 'r'
-};
-const Element kElGateRedOpen = {
-  HiddenCellType::kGateRedOpen, VisibleCellType::kGateRedOpen,
-  ElementProperties::kNone, 'R'
-};
-const Element kElKeyRed = {
-  HiddenCellType::kKeyRed, VisibleCellType::kKeyRed,
-  ElementProperties::kNone, '1'
-};
-const Element kElGateBlueClosed = {
-  HiddenCellType::kGateBlueClosed, VisibleCellType::kGateBlueClosed,
-  ElementProperties::kNone, 'b'
-};
-const Element kElGateBlueOpen = {
-  HiddenCellType::kGateBlueOpen, VisibleCellType::kGateBlueOpen,
-  ElementProperties::kNone, 'B'
-};
-const Element kElKeyBlue = {
-  HiddenCellType::kKeyBlue, VisibleCellType::kKeyBlue,
-  ElementProperties::kNone, '2'
-};
-const Element kElGateGreenClosed = {
-  HiddenCellType::kGateGreenClosed, VisibleCellType::kGateGreenClosed,
-  ElementProperties::kNone, 'g'
-};
-const Element kElGateGreenOpen = {
-  HiddenCellType::kGateGreenOpen, VisibleCellType::kGateGreenOpen,
-  ElementProperties::kNone, 'G'
-};
-const Element kElKeyGreen = {
-  HiddenCellType::kKeyGreen, VisibleCellType::kKeyGreen,
-  ElementProperties::kNone, '3'
-};
-const Element kElGateYellowClosed = {
-  HiddenCellType::kGateYellowClosed, VisibleCellType::kGateYellowClosed,
-  ElementProperties::kNone, 'y'
-};
-const Element kElGateYellowOpen = {
-  HiddenCellType::kGateYellowOpen, VisibleCellType::kGateYellowOpen,
-  ElementProperties::kNone, 'Y'
-};
-const Element kElKeyYellow = {
-  HiddenCellType::kKeyYellow, VisibleCellType::kKeyYellow,
-  ElementProperties::kNone, '4'
-};
+    HiddenCellType::kWallBrick, VisibleCellType::kWallBrick,
+    ElementProperties::kConsumable | ElementProperties::kRounded, 'H'};
+const Element kElWallSteel = {HiddenCellType::kWallSteel,
+                              VisibleCellType::kWallSteel,
+                              ElementProperties::kNone, 'S'};
+const Element kElWallMagicOn = {HiddenCellType::kWallMagicOn,
+                                VisibleCellType::kWallMagicOn,
+                                ElementProperties::kConsumable, 'M'};
+const Element kElWallMagicDormant = {HiddenCellType::kWallMagicDormant,
+                                     VisibleCellType::kWallMagicOff,
+                                     ElementProperties::kConsumable, 'Q'};
+const Element kElWallMagicExpired = {HiddenCellType::kWallMagicExpired,
+                                     VisibleCellType::kWallMagicOff,
+                                     ElementProperties::kConsumable, 'Q'};
+const Element kElExplosionDiamond = {HiddenCellType::kExplosionDiamond,
+                                     VisibleCellType::kExplosion,
+                                     ElementProperties::kNone, 'E'};
+const Element kElExplosionBoulder = {HiddenCellType::kExplosionBoulder,
+                                     VisibleCellType::kExplosion,
+                                     ElementProperties::kNone, 'E'};
+const Element kElExplosionEmpty = {HiddenCellType::kExplosionEmpty,
+                                   VisibleCellType::kExplosion,
+                                   ElementProperties::kNone, 'E'};
+const Element kElGateRedClosed = {HiddenCellType::kGateRedClosed,
+                                  VisibleCellType::kGateRedClosed,
+                                  ElementProperties::kNone, 'r'};
+const Element kElGateRedOpen = {HiddenCellType::kGateRedOpen,
+                                VisibleCellType::kGateRedOpen,
+                                ElementProperties::kNone, 'R'};
+const Element kElKeyRed = {HiddenCellType::kKeyRed, VisibleCellType::kKeyRed,
+                           ElementProperties::kNone, '1'};
+const Element kElGateBlueClosed = {HiddenCellType::kGateBlueClosed,
+                                   VisibleCellType::kGateBlueClosed,
+                                   ElementProperties::kNone, 'b'};
+const Element kElGateBlueOpen = {HiddenCellType::kGateBlueOpen,
+                                 VisibleCellType::kGateBlueOpen,
+                                 ElementProperties::kNone, 'B'};
+const Element kElKeyBlue = {HiddenCellType::kKeyBlue, VisibleCellType::kKeyBlue,
+                            ElementProperties::kNone, '2'};
+const Element kElGateGreenClosed = {HiddenCellType::kGateGreenClosed,
+                                    VisibleCellType::kGateGreenClosed,
+                                    ElementProperties::kNone, 'g'};
+const Element kElGateGreenOpen = {HiddenCellType::kGateGreenOpen,
+                                  VisibleCellType::kGateGreenOpen,
+                                  ElementProperties::kNone, 'G'};
+const Element kElKeyGreen = {HiddenCellType::kKeyGreen,
+                             VisibleCellType::kKeyGreen,
+                             ElementProperties::kNone, '3'};
+const Element kElGateYellowClosed = {HiddenCellType::kGateYellowClosed,
+                                     VisibleCellType::kGateYellowClosed,
+                                     ElementProperties::kNone, 'y'};
+const Element kElGateYellowOpen = {HiddenCellType::kGateYellowOpen,
+                                   VisibleCellType::kGateYellowOpen,
+                                   ElementProperties::kNone, 'Y'};
+const Element kElKeyYellow = {HiddenCellType::kKeyYellow,
+                              VisibleCellType::kKeyYellow,
+                              ElementProperties::kNone, '4'};
 const Element kElNut = {
-  HiddenCellType::kNut, VisibleCellType::kNut,
-  ElementProperties::kRounded | ElementProperties::kConsumable, '+'
-};
+    HiddenCellType::kNut, VisibleCellType::kNut,
+    ElementProperties::kRounded | ElementProperties::kConsumable, '+'};
 const Element kElNutFalling = {
-  HiddenCellType::kNutFalling, VisibleCellType::kNut,
-  ElementProperties::kRounded | ElementProperties::kConsumable, '+'
-};
-const Element kElBomb = {
-  HiddenCellType::kBomb, VisibleCellType::kBomb,
-  ElementProperties::kRounded | ElementProperties::kConsumable | ElementProperties::kCanExplode, '^'
-};
+    HiddenCellType::kNutFalling, VisibleCellType::kNut,
+    ElementProperties::kRounded | ElementProperties::kConsumable, '+'};
+const Element kElBomb = {HiddenCellType::kBomb, VisibleCellType::kBomb,
+                         ElementProperties::kRounded |
+                             ElementProperties::kConsumable |
+                             ElementProperties::kCanExplode,
+                         '^'};
 const Element kElBombFalling = {
-  HiddenCellType::kBombFalling, VisibleCellType::kBomb,
-  ElementProperties::kRounded | ElementProperties::kConsumable | ElementProperties::kCanExplode, '^'
-};
+    HiddenCellType::kBombFalling, VisibleCellType::kBomb,
+    ElementProperties::kRounded | ElementProperties::kConsumable |
+        ElementProperties::kCanExplode,
+    '^'};
 const Element kElOrangeUp = {
-  HiddenCellType::kOrangeUp, VisibleCellType::kOrange,
-  ElementProperties::kConsumable | ElementProperties::kCanExplode, 'X'
-};
+    HiddenCellType::kOrangeUp, VisibleCellType::kOrange,
+    ElementProperties::kConsumable | ElementProperties::kCanExplode, 'X'};
 const Element kElOrangeLeft = {
-  HiddenCellType::kOrangeLeft, VisibleCellType::kOrange,
-  ElementProperties::kConsumable | ElementProperties::kCanExplode, 'X'
-};
+    HiddenCellType::kOrangeLeft, VisibleCellType::kOrange,
+    ElementProperties::kConsumable | ElementProperties::kCanExplode, 'X'};
 const Element kElOrangeDown = {
-  HiddenCellType::kOrangeDown, VisibleCellType::kOrange,
-  ElementProperties::kConsumable | ElementProperties::kCanExplode, 'X'
-};
+    HiddenCellType::kOrangeDown, VisibleCellType::kOrange,
+    ElementProperties::kConsumable | ElementProperties::kCanExplode, 'X'};
 const Element kElOrangeRight = {
-  HiddenCellType::kOrangeRight, VisibleCellType::kOrange,
-  ElementProperties::kConsumable | ElementProperties::kCanExplode, 'X'
-};
+    HiddenCellType::kOrangeRight, VisibleCellType::kOrange,
+    ElementProperties::kConsumable | ElementProperties::kCanExplode, 'X'};
 
 // Hash for Element, so we can use as a map key
 struct ElementHash {
-  std::size_t operator()(const Element& e) const {
-    return static_cast<int>(e.cell_type) - static_cast<int>(HiddenCellType::kNull);
+  std::size_t operator()(const Element &e) const {
+    return static_cast<int>(e.cell_type) -
+           static_cast<int>(HiddenCellType::kNull);
   }
 };
 
 // ----- Conversion maps -----
 // Swap map for DeserializeState
-const std::unordered_map<int, Element> kCellTypeToElement {
-  {static_cast<int>(HiddenCellType::kNull), kNullElement}, 
-  {static_cast<int>(HiddenCellType::kAgent), kElAgent}, 
-  {static_cast<int>(HiddenCellType::kEmpty), kElEmpty}, 
-  {static_cast<int>(HiddenCellType::kDirt), kElDirt}, 
-  {static_cast<int>(HiddenCellType::kStone), kElStone}, 
-  {static_cast<int>(HiddenCellType::kStoneFalling), kElStoneFalling}, 
-  {static_cast<int>(HiddenCellType::kDiamond), kElDiamond}, 
-  {static_cast<int>(HiddenCellType::kDiamondFalling), kElDiamondFalling}, 
-  {static_cast<int>(HiddenCellType::kExitClosed), kElExitClosed}, 
-  {static_cast<int>(HiddenCellType::kExitOpen), kElExitOpen}, 
-  {static_cast<int>(HiddenCellType::kAgentInExit), kElAgentInExit}, 
-  {static_cast<int>(HiddenCellType::kFireflyUp), kElFireflyUp}, 
-  {static_cast<int>(HiddenCellType::kFireflyLeft), kElFireflyLeft}, 
-  {static_cast<int>(HiddenCellType::kFireflyDown), kElFireflyDown}, 
-  {static_cast<int>(HiddenCellType::kFireflyRight), kElFireflyRight}, 
-  {static_cast<int>(HiddenCellType::kButterflyUp), kElButterflyUp}, 
-  {static_cast<int>(HiddenCellType::kButterflyLeft), kElButterflyLeft}, 
-  {static_cast<int>(HiddenCellType::kButterflyDown), kElButterflyDown}, 
-  {static_cast<int>(HiddenCellType::kButterflyRight), kElButterflyRight}, 
-  {static_cast<int>(HiddenCellType::kWallBrick), kElWallBrick}, 
-  {static_cast<int>(HiddenCellType::kWallSteel), kElWallSteel}, 
-  {static_cast<int>(HiddenCellType::kWallMagicOn), kElWallMagicOn}, 
-  {static_cast<int>(HiddenCellType::kWallMagicDormant), kElWallMagicDormant}, 
-  {static_cast<int>(HiddenCellType::kWallMagicExpired), kElWallMagicExpired}, 
-  {static_cast<int>(HiddenCellType::kBlob), kElBlob}, 
-  {static_cast<int>(HiddenCellType::kExplosionBoulder), kElExplosionBoulder}, 
-  {static_cast<int>(HiddenCellType::kExplosionDiamond), kElExplosionDiamond}, 
-  {static_cast<int>(HiddenCellType::kExplosionEmpty), kElExplosionEmpty}, 
-  {static_cast<int>(HiddenCellType::kGateRedClosed), kElGateRedClosed}, 
-  {static_cast<int>(HiddenCellType::kGateRedOpen), kElGateRedOpen}, 
-  {static_cast<int>(HiddenCellType::kKeyRed), kElKeyRed},
-  {static_cast<int>(HiddenCellType::kGateBlueClosed), kElGateBlueClosed}, 
-  {static_cast<int>(HiddenCellType::kGateBlueOpen), kElGateBlueOpen}, 
-  {static_cast<int>(HiddenCellType::kKeyBlue), kElKeyBlue},
-  {static_cast<int>(HiddenCellType::kGateGreenClosed), kElGateGreenClosed}, 
-  {static_cast<int>(HiddenCellType::kGateGreenOpen), kElGateGreenOpen}, 
-  {static_cast<int>(HiddenCellType::kKeyGreen), kElKeyGreen},
-  {static_cast<int>(HiddenCellType::kGateYellowClosed), kElGateYellowClosed}, 
-  {static_cast<int>(HiddenCellType::kGateYellowOpen), kElGateYellowOpen}, 
-  {static_cast<int>(HiddenCellType::kKeyYellow), kElKeyYellow},
-  {static_cast<int>(HiddenCellType::kNut), kElNut},
-  {static_cast<int>(HiddenCellType::kNutFalling), kElNutFalling},
-  {static_cast<int>(HiddenCellType::kBomb), kElBomb},
-  {static_cast<int>(HiddenCellType::kBombFalling), kElBombFalling},
-  {static_cast<int>(HiddenCellType::kOrangeUp), kElOrangeUp},
-  {static_cast<int>(HiddenCellType::kOrangeLeft), kElOrangeLeft},
-  {static_cast<int>(HiddenCellType::kOrangeDown), kElOrangeDown},
-  {static_cast<int>(HiddenCellType::kOrangeRight), kElOrangeRight},
+const std::unordered_map<int, Element> kCellTypeToElement{
+    {static_cast<int>(HiddenCellType::kNull), kNullElement},
+    {static_cast<int>(HiddenCellType::kAgent), kElAgent},
+    {static_cast<int>(HiddenCellType::kEmpty), kElEmpty},
+    {static_cast<int>(HiddenCellType::kDirt), kElDirt},
+    {static_cast<int>(HiddenCellType::kStone), kElStone},
+    {static_cast<int>(HiddenCellType::kStoneFalling), kElStoneFalling},
+    {static_cast<int>(HiddenCellType::kDiamond), kElDiamond},
+    {static_cast<int>(HiddenCellType::kDiamondFalling), kElDiamondFalling},
+    {static_cast<int>(HiddenCellType::kExitClosed), kElExitClosed},
+    {static_cast<int>(HiddenCellType::kExitOpen), kElExitOpen},
+    {static_cast<int>(HiddenCellType::kAgentInExit), kElAgentInExit},
+    {static_cast<int>(HiddenCellType::kFireflyUp), kElFireflyUp},
+    {static_cast<int>(HiddenCellType::kFireflyLeft), kElFireflyLeft},
+    {static_cast<int>(HiddenCellType::kFireflyDown), kElFireflyDown},
+    {static_cast<int>(HiddenCellType::kFireflyRight), kElFireflyRight},
+    {static_cast<int>(HiddenCellType::kButterflyUp), kElButterflyUp},
+    {static_cast<int>(HiddenCellType::kButterflyLeft), kElButterflyLeft},
+    {static_cast<int>(HiddenCellType::kButterflyDown), kElButterflyDown},
+    {static_cast<int>(HiddenCellType::kButterflyRight), kElButterflyRight},
+    {static_cast<int>(HiddenCellType::kWallBrick), kElWallBrick},
+    {static_cast<int>(HiddenCellType::kWallSteel), kElWallSteel},
+    {static_cast<int>(HiddenCellType::kWallMagicOn), kElWallMagicOn},
+    {static_cast<int>(HiddenCellType::kWallMagicDormant), kElWallMagicDormant},
+    {static_cast<int>(HiddenCellType::kWallMagicExpired), kElWallMagicExpired},
+    {static_cast<int>(HiddenCellType::kBlob), kElBlob},
+    {static_cast<int>(HiddenCellType::kExplosionBoulder), kElExplosionBoulder},
+    {static_cast<int>(HiddenCellType::kExplosionDiamond), kElExplosionDiamond},
+    {static_cast<int>(HiddenCellType::kExplosionEmpty), kElExplosionEmpty},
+    {static_cast<int>(HiddenCellType::kGateRedClosed), kElGateRedClosed},
+    {static_cast<int>(HiddenCellType::kGateRedOpen), kElGateRedOpen},
+    {static_cast<int>(HiddenCellType::kKeyRed), kElKeyRed},
+    {static_cast<int>(HiddenCellType::kGateBlueClosed), kElGateBlueClosed},
+    {static_cast<int>(HiddenCellType::kGateBlueOpen), kElGateBlueOpen},
+    {static_cast<int>(HiddenCellType::kKeyBlue), kElKeyBlue},
+    {static_cast<int>(HiddenCellType::kGateGreenClosed), kElGateGreenClosed},
+    {static_cast<int>(HiddenCellType::kGateGreenOpen), kElGateGreenOpen},
+    {static_cast<int>(HiddenCellType::kKeyGreen), kElKeyGreen},
+    {static_cast<int>(HiddenCellType::kGateYellowClosed), kElGateYellowClosed},
+    {static_cast<int>(HiddenCellType::kGateYellowOpen), kElGateYellowOpen},
+    {static_cast<int>(HiddenCellType::kKeyYellow), kElKeyYellow},
+    {static_cast<int>(HiddenCellType::kNut), kElNut},
+    {static_cast<int>(HiddenCellType::kNutFalling), kElNutFalling},
+    {static_cast<int>(HiddenCellType::kBomb), kElBomb},
+    {static_cast<int>(HiddenCellType::kBombFalling), kElBombFalling},
+    {static_cast<int>(HiddenCellType::kOrangeUp), kElOrangeUp},
+    {static_cast<int>(HiddenCellType::kOrangeLeft), kElOrangeLeft},
+    {static_cast<int>(HiddenCellType::kOrangeDown), kElOrangeDown},
+    {static_cast<int>(HiddenCellType::kOrangeRight), kElOrangeRight},
 };
 
 // Rotate actions right
-const std::unordered_map<int, int> kRotateRight {
-  {Directions::kUp, Directions::kRight}, {Directions::kRight, Directions::kDown}, 
-  {Directions::kDown, Directions::kLeft}, {Directions::kLeft, Directions::kUp},
-  {Directions::kNone, Directions::kNone}, 
+const std::unordered_map<int, int> kRotateRight{
+    {Directions::kUp, Directions::kRight},
+    {Directions::kRight, Directions::kDown},
+    {Directions::kDown, Directions::kLeft},
+    {Directions::kLeft, Directions::kUp},
+    {Directions::kNone, Directions::kNone},
 };
 
 // Rotate actions left
-const std::unordered_map<int, int> kRotateLeft {
-  {Directions::kUp, Directions::kLeft}, {Directions::kLeft, Directions::kDown}, 
-  {Directions::kDown, Directions::kRight}, {Directions::kRight, Directions::kUp},
-  {Directions::kNone, Directions::kNone}, 
+const std::unordered_map<int, int> kRotateLeft{
+    {Directions::kUp, Directions::kLeft},
+    {Directions::kLeft, Directions::kDown},
+    {Directions::kDown, Directions::kRight},
+    {Directions::kRight, Directions::kUp},
+    {Directions::kNone, Directions::kNone},
 };
 
 // actions to strings
-const std::unordered_map<int, std::string> kActionsToString {
-  {Directions::kUp, "up"}, {Directions::kLeft, "left"}, {Directions::kDown, "down"}, 
-  {Directions::kRight, "right"}, {Directions::kNone, "none"},
+const std::unordered_map<int, std::string> kActionsToString{
+    {Directions::kUp, "up"},     {Directions::kLeft, "left"},
+    {Directions::kDown, "down"}, {Directions::kRight, "right"},
+    {Directions::kNone, "none"},
 };
 
-// directions to offsets (col, row) 
-const std::unordered_map<int, std::pair<int, int>> kDirectionOffsets {
-  {Directions::kUp, {0, -1}}, {Directions::kUpLeft, {-1, -1}}, {Directions::kLeft, {-1, 0}}, 
-  {Directions::kDownLeft, {-1, 1}}, {Directions::kDown, {0, 1}}, {Directions::kDownRight, {1, 1}}, 
-  {Directions::kRight, {1, 0}}, {Directions::kUpRight, {1, -1}}, {Directions::kNone, {0, 0}},
+// directions to offsets (col, row)
+const std::unordered_map<int, std::pair<int, int>> kDirectionOffsets{
+    {Directions::kUp, {0, -1}},   {Directions::kUpLeft, {-1, -1}},
+    {Directions::kLeft, {-1, 0}}, {Directions::kDownLeft, {-1, 1}},
+    {Directions::kDown, {0, 1}},  {Directions::kDownRight, {1, 1}},
+    {Directions::kRight, {1, 0}}, {Directions::kUpRight, {1, -1}},
+    {Directions::kNone, {0, 0}},
 };
 
 // Directions to fireflys
-const std::unordered_map<int, Element> kDirectionToFirefly {
-  {Directions::kUp, kElFireflyUp}, {Directions::kLeft, kElFireflyLeft}, 
-  {Directions::kDown, kElFireflyDown}, {Directions::kRight, kElFireflyRight},
+const std::unordered_map<int, Element> kDirectionToFirefly{
+    {Directions::kUp, kElFireflyUp},
+    {Directions::kLeft, kElFireflyLeft},
+    {Directions::kDown, kElFireflyDown},
+    {Directions::kRight, kElFireflyRight},
 };
 
 // Firefly to directions
-const std::unordered_map<Element, int, ElementHash> kFireflyToDirection {
-  {kElFireflyUp, Directions::kUp}, {kElFireflyLeft, Directions::kLeft}, 
-  {kElFireflyDown, Directions::kDown}, {kElFireflyRight, Directions::kRight},
+const std::unordered_map<Element, int, ElementHash> kFireflyToDirection{
+    {kElFireflyUp, Directions::kUp},
+    {kElFireflyLeft, Directions::kLeft},
+    {kElFireflyDown, Directions::kDown},
+    {kElFireflyRight, Directions::kRight},
 };
 
 // Directions to butterflys
-const std::unordered_map<int, Element> kDirectionToButterfly {
-  {Directions::kUp, kElButterflyUp}, {Directions::kLeft, kElButterflyLeft}, 
-  {Directions::kDown, kElButterflyDown}, {Directions::kRight, kElButterflyRight},
+const std::unordered_map<int, Element> kDirectionToButterfly{
+    {Directions::kUp, kElButterflyUp},
+    {Directions::kLeft, kElButterflyLeft},
+    {Directions::kDown, kElButterflyDown},
+    {Directions::kRight, kElButterflyRight},
 };
 
 // Butterfly to directions
-const std::unordered_map<Element, int, ElementHash> kButterflyToDirection {
-  {kElButterflyUp, Directions::kUp}, {kElButterflyLeft, Directions::kLeft}, 
-  {kElButterflyDown, Directions::kDown}, {kElButterflyRight, Directions::kRight},
+const std::unordered_map<Element, int, ElementHash> kButterflyToDirection{
+    {kElButterflyUp, Directions::kUp},
+    {kElButterflyLeft, Directions::kLeft},
+    {kElButterflyDown, Directions::kDown},
+    {kElButterflyRight, Directions::kRight},
 };
 
 // Orange to directions
-const std::unordered_map<Element, int, ElementHash> kOrangeToDirection {
-  {kElOrangeUp, Directions::kUp}, {kElOrangeLeft, Directions::kLeft}, 
-  {kElOrangeDown, Directions::kDown}, {kElOrangeRight, Directions::kRight},
+const std::unordered_map<Element, int, ElementHash> kOrangeToDirection{
+    {kElOrangeUp, Directions::kUp},
+    {kElOrangeLeft, Directions::kLeft},
+    {kElOrangeDown, Directions::kDown},
+    {kElOrangeRight, Directions::kRight},
 };
 
 // Direction to Orange
-const std::unordered_map<int, Element> kDirectionToOrange {
-  {Directions::kUp, kElOrangeUp}, {Directions::kLeft, kElOrangeLeft}, 
-  {Directions::kDown, kElOrangeDown}, {Directions::kRight, kElOrangeRight},
+const std::unordered_map<int, Element> kDirectionToOrange{
+    {Directions::kUp, kElOrangeUp},
+    {Directions::kLeft, kElOrangeLeft},
+    {Directions::kDown, kElOrangeDown},
+    {Directions::kRight, kElOrangeRight},
 };
 
 // Element explosion maps
-const std::unordered_map<Element, Element, ElementHash> kElementToExplosion {
-  {kElFireflyUp, kElExplosionEmpty}, {kElFireflyLeft, kElExplosionEmpty}, 
-  {kElFireflyDown, kElExplosionEmpty}, {kElFireflyRight, kElExplosionEmpty},
-  {kElButterflyUp, kElExplosionDiamond}, {kElButterflyLeft, kElExplosionDiamond}, 
-  {kElButterflyDown, kElExplosionDiamond}, {kElButterflyRight, kElExplosionDiamond},
-  {kElAgent, kElExplosionEmpty}, {kElBomb, kElExplosionEmpty},
-  {kElBombFalling, kElExplosionEmpty}, {kElOrangeUp, kElExplosionEmpty},
-  {kElOrangeLeft, kElExplosionEmpty}, {kElOrangeDown, kElExplosionEmpty},
-  {kElOrangeRight, kElExplosionEmpty},
+const std::unordered_map<Element, Element, ElementHash> kElementToExplosion{
+    {kElFireflyUp, kElExplosionEmpty},
+    {kElFireflyLeft, kElExplosionEmpty},
+    {kElFireflyDown, kElExplosionEmpty},
+    {kElFireflyRight, kElExplosionEmpty},
+    {kElButterflyUp, kElExplosionDiamond},
+    {kElButterflyLeft, kElExplosionDiamond},
+    {kElButterflyDown, kElExplosionDiamond},
+    {kElButterflyRight, kElExplosionDiamond},
+    {kElAgent, kElExplosionEmpty},
+    {kElBomb, kElExplosionEmpty},
+    {kElBombFalling, kElExplosionEmpty},
+    {kElOrangeUp, kElExplosionEmpty},
+    {kElOrangeLeft, kElExplosionEmpty},
+    {kElOrangeDown, kElExplosionEmpty},
+    {kElOrangeRight, kElExplosionEmpty},
 };
 
 // Explosions back to elements
-const std::unordered_map<Element, Element, ElementHash> kExplosionToElement {
-  {kElExplosionDiamond, kElDiamond}, {kElExplosionBoulder, kElStone},
-  {kElExplosionEmpty, kElEmpty},
+const std::unordered_map<Element, Element, ElementHash> kExplosionToElement{
+    {kElExplosionDiamond, kElDiamond},
+    {kElExplosionBoulder, kElStone},
+    {kElExplosionEmpty, kElEmpty},
 };
 
 // Magic wall conversion map
-const std::unordered_map<Element, Element, ElementHash> kMagicWallConversion {
-  {kElStoneFalling, kElDiamondFalling}, {kElDiamondFalling, kElStoneFalling},
+const std::unordered_map<Element, Element, ElementHash> kMagicWallConversion{
+    {kElStoneFalling, kElDiamondFalling},
+    {kElDiamondFalling, kElStoneFalling},
 };
 
 // Gem point maps
-const std::unordered_map<Element, int, ElementHash> kGemPoints {
-  {kElDiamond, 10}, {kElDiamondFalling, 10},
+const std::unordered_map<Element, int, ElementHash> kGemPoints{
+    {kElDiamond, 10},
+    {kElDiamondFalling, 10},
 };
 
 // Gate open conversion map
-const std::unordered_map<Element, Element, ElementHash> kGateOpenMap {
-  {kElGateRedClosed, kElGateRedOpen}, {kElGateBlueClosed, kElGateBlueOpen},
-  {kElGateGreenClosed, kElGateGreenOpen}, {kElGateYellowClosed, kElGateYellowOpen},
+const std::unordered_map<Element, Element, ElementHash> kGateOpenMap{
+    {kElGateRedClosed, kElGateRedOpen},
+    {kElGateBlueClosed, kElGateBlueOpen},
+    {kElGateGreenClosed, kElGateGreenOpen},
+    {kElGateYellowClosed, kElGateYellowOpen},
 };
 // Gate key map
-const std::unordered_map<Element, Element, ElementHash> kKeyToGate {
-  {kElKeyRed, kElGateRedClosed}, {kElKeyBlue, kElGateBlueClosed},
-  {kElKeyGreen, kElGateGreenClosed}, {kElKeyYellow, kElGateYellowClosed},
+const std::unordered_map<Element, Element, ElementHash> kKeyToGate{
+    {kElKeyRed, kElGateRedClosed},
+    {kElKeyBlue, kElGateBlueClosed},
+    {kElKeyGreen, kElGateGreenClosed},
+    {kElKeyYellow, kElGateYellowClosed},
 };
 
 // Stationary to falling
-const std::unordered_map<Element, Element, ElementHash> kElToFalling {
-  {kElDiamond, kElDiamondFalling}, {kElStone, kElStoneFalling},
-  {kElNut, kElNutFalling}, {kElBomb, kElBombFalling},
+const std::unordered_map<Element, Element, ElementHash> kElToFalling{
+    {kElDiamond, kElDiamondFalling},
+    {kElStone, kElStoneFalling},
+    {kElNut, kElNutFalling},
+    {kElBomb, kElBombFalling},
 };
 
 // Default parameters.
-constexpr int kDefaultMagicWallSteps = 140; // Number of steps before magic walls expire
-constexpr int kDefaultBlobChance = 20;    // Chance to spawn another blob (out of 256)
-constexpr double kDefaultBlobMaxPercentage = 0.16;   // Maximum number of blob before they collapse (percentage of map size)
-constexpr bool kDefaultObsShowIDs = false;  // Flag to show IDs instead of one-hot encoding
+constexpr int kDefaultMagicWallSteps =
+    140;  // Number of steps before magic walls expire
+constexpr int kDefaultBlobChance =
+    20;  // Chance to spawn another blob (out of 256)
+constexpr double kDefaultBlobMaxPercentage =
+    0.16;  // Maximum number of blob before they collapse (percentage of map
+           // size)
+constexpr bool kDefaultObsShowIDs =
+    false;  // Flag to show IDs instead of one-hot encoding
 
 // Facts about the game
 const GameType kGameType{
@@ -418,23 +411,22 @@ const GameType kGameType{
     /*provides_observation_string=*/true,
     /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
-    {
-        {"obs_show_ids", GameParameter(kDefaultObsShowIDs)},
-        {"magic_wall_steps", GameParameter(kDefaultMagicWallSteps)},
-        {"blob_chance", GameParameter(kDefaultBlobChance)},
-        {"blob_max_percentage", GameParameter(kDefaultBlobMaxPercentage)},
-        {"rng_seed", GameParameter(0)},
-        {"grid", GameParameter(std::string(kDefaultGrid))}
-    }};
+    {{"obs_show_ids", GameParameter(kDefaultObsShowIDs)},
+     {"magic_wall_steps", GameParameter(kDefaultMagicWallSteps)},
+     {"blob_chance", GameParameter(kDefaultBlobChance)},
+     {"blob_max_percentage", GameParameter(kDefaultBlobMaxPercentage)},
+     {"rng_seed", GameParameter(0)},
+     {"grid", GameParameter(std::string(kDefaultGrid))}}};
 
-std::shared_ptr<const Game> Factory(const GameParameters& params) {
+std::shared_ptr<const Game> Factory(const GameParameters &params) {
   return std::shared_ptr<const Game>(new StonesNGemsGame(params));
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
 }  // namespace
 
-std::string StonesNGemsState::ActionToString(Player player, Action move_id) const {
+std::string StonesNGemsState::ActionToString(Player player,
+                                             Action move_id) const {
   if (player == kChancePlayerId) {
     return absl::StrCat("Chance outcome: ", move_id);
   } else {
@@ -473,12 +465,13 @@ std::string StonesNGemsState::ObservationString(Player player) const {
 }
 
 void StonesNGemsState::ObservationTensor(Player player,
-                                 std::vector<double>* values) const {
+                                         std::vector<double> *values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
   // Treat `values` as a 3-d tensor.
-  TensorView<3> view(values, {kNumVisibleCellType, grid_.num_rows, grid_.num_cols}, true);
+  TensorView<3> view(
+      values, {kNumVisibleCellType, grid_.num_rows, grid_.num_cols}, true);
 
   // No observations at chance nodes.
   if (IsChanceNode()) {
@@ -513,27 +506,27 @@ bool IsActionVert(int action) {
 
 bool IsFirefly(const Element &element) {
   return element == kElFireflyUp || element == kElFireflyLeft ||
-    element == kElFireflyDown || element == kElFireflyRight;
+         element == kElFireflyDown || element == kElFireflyRight;
 }
 
 bool IsButterfly(const Element &element) {
   return element == kElButterflyUp || element == kElButterflyLeft ||
-    element == kElButterflyDown || element == kElButterflyRight;
+         element == kElButterflyDown || element == kElButterflyRight;
 }
 
 bool IsOrange(const Element &element) {
   return element == kElOrangeUp || element == kElOrangeLeft ||
-    element == kElOrangeDown || element == kElOrangeRight;
+         element == kElOrangeDown || element == kElOrangeRight;
 }
 
 bool IsExplosion(const Element &element) {
   return element == kElExplosionBoulder || element == kElExplosionDiamond ||
-    element == kElExplosionEmpty;
+         element == kElExplosionEmpty;
 }
 
 bool IsMagicWall(const Element &element) {
   return element == kElWallMagicDormant || element == kElWallMagicExpired ||
-    element == kElWallMagicOn;
+         element == kElWallMagicOn;
 }
 
 bool IsOpenGate(const Element &element) {
@@ -546,8 +539,7 @@ bool IsKey(const Element &element) {
          element == kElKeyGreen || element == kElKeyYellow;
 }
 
-} // namespace
-
+}  // namespace
 
 // ---------- Game dynamic function ----------
 
@@ -577,10 +569,12 @@ bool StonesNGemsState::IsType(int index, Element element, int action) const {
   return InBounds(index, action) && grid_.elements[new_index] == element;
 }
 
-// Check if the index after applying action has an element with the given property
+// Check if the index after applying action has an element with the given
+// property
 bool StonesNGemsState::HasProperty(int index, int property, int action) const {
   int new_index = IndexFromAction(index, action);
-  return InBounds(index, action) && ((grid_.elements[new_index].properties & property) > 0);
+  return InBounds(index, action) &&
+         ((grid_.elements[new_index].properties & property) > 0);
 }
 
 // Move the element given the action, and set the old index to empty
@@ -608,20 +602,24 @@ Element StonesNGemsState::GetItem(int index, int action) const {
 
 // Check if the element is adjacent to and cell around the given index
 bool StonesNGemsState::IsTypeAdjacent(int index, Element element) const {
-  return IsType(index, element, Directions::kUp) || IsType(index, element, Directions::kLeft) ||
-         IsType(index, element, Directions::kDown) || IsType(index, element, Directions::kRight);
+  return IsType(index, element, Directions::kUp) ||
+         IsType(index, element, Directions::kLeft) ||
+         IsType(index, element, Directions::kDown) ||
+         IsType(index, element, Directions::kRight);
 }
 
 // Can roll left if sitting on rounded element, left and bottom left clear
 bool StonesNGemsState::CanRollLeft(int index) const {
   return HasProperty(index, ElementProperties::kRounded, Directions::kDown) &&
-         IsType(index, kElEmpty, Directions::kLeft) && IsType(index, kElEmpty, Directions::kDownLeft);
+         IsType(index, kElEmpty, Directions::kLeft) &&
+         IsType(index, kElEmpty, Directions::kDownLeft);
 }
 
 // Can roll right if sitting on rounded element, right and bottom right clear
 bool StonesNGemsState::CanRollRight(int index) const {
   return HasProperty(index, ElementProperties::kRounded, Directions::kDown) &&
-         IsType(index, kElEmpty, Directions::kRight) && IsType(index, kElEmpty, Directions::kDownRight);
+         IsType(index, kElEmpty, Directions::kRight) &&
+         IsType(index, kElEmpty, Directions::kDownRight);
 }
 
 // Roll the item to the left
@@ -637,14 +635,16 @@ void StonesNGemsState::RollRight(int index, Element element) {
 }
 
 // Push the item
-void StonesNGemsState::Push(int index, Element stationary, Element falling, int action) {
+void StonesNGemsState::Push(int index, Element stationary, Element falling,
+                            int action) {
   int new_index = IndexFromAction(index, action);
   // Check if same direction past element is empty so that theres room to push
   if (IsType(new_index, kElEmpty, action)) {
     // Check if the element will become stationary or falling
     int next_index = IndexFromAction(new_index, action);
     bool is_empty = IsType(next_index, kElEmpty, Directions::kDown);
-    SetItem(new_index, is_empty ? falling : stationary, grid_.ids[new_index], action);
+    SetItem(new_index, is_empty ? falling : stationary, grid_.ids[new_index],
+            action);
     // Move the agent
     MoveItem(index, action);
   }
@@ -653,7 +653,9 @@ void StonesNGemsState::Push(int index, Element stationary, Element falling, int 
 // Move the item through the magic wall
 void StonesNGemsState::MoveThroughMagic(int index, Element element) {
   // Check if magic wall is still active
-  if (magic_wall_steps_ <= 0) {return;}
+  if (magic_wall_steps_ <= 0) {
+    return;
+  }
   magic_active_ = true;
   int index_below = IndexFromAction(index, Directions::kDown);
   // Need to ensure cell below magic wall is empty (so item can pass through)
@@ -667,11 +669,14 @@ void StonesNGemsState::MoveThroughMagic(int index, Element element) {
 void StonesNGemsState::Explode(int index, Element element, int action) {
   int new_index = IndexFromAction(index, action);
   auto it = kElementToExplosion.find(GetItem(new_index));
-  Element ex = (it == kElementToExplosion.end()) ? kElExplosionEmpty : it->second;
+  Element ex =
+      (it == kElementToExplosion.end()) ? kElExplosionEmpty : it->second;
   SetItem(new_index, element, ++id_counter_);
   // Recursively check all directions for chain explosions
   for (int dir = 0; dir < kNumDirections; ++dir) {
-    if (dir == Directions::kNone || !InBounds(new_index, dir)) {continue;}
+    if (dir == Directions::kNone || !InBounds(new_index, dir)) {
+      continue;
+    }
     if (HasProperty(new_index, ElementProperties::kCanExplode, dir)) {
       Explode(new_index, ex, dir);
     } else if (HasProperty(new_index, ElementProperties::kConsumable, dir)) {
@@ -693,7 +698,7 @@ void StonesNGemsState::UpdateStone(int index) {
   if (IsType(index, kElEmpty, Directions::kDown)) {
     SetItem(index, kElStoneFalling, grid_.ids[index]);
     UpdateStoneFalling(index);
-  } else if (CanRollLeft(index)) {    // Roll left/right if possible
+  } else if (CanRollLeft(index)) {  // Roll left/right if possible
     RollLeft(index, kElStoneFalling);
   } else if (CanRollRight(index)) {
     RollRight(index, kElStoneFalling);
@@ -704,12 +709,14 @@ void StonesNGemsState::UpdateStoneFalling(int index) {
   // Continue to fall as normal
   if (IsType(index, kElEmpty, Directions::kDown)) {
     MoveItem(index, Directions::kDown);
-  } else if (HasProperty(index, ElementProperties::kCanExplode, Directions::kDown)) {
+  } else if (HasProperty(index, ElementProperties::kCanExplode,
+                         Directions::kDown)) {
     // Falling stones can cause elements to explode
     auto it = kElementToExplosion.find(GetItem(index, Directions::kDown));
-    Element ex = (it == kElementToExplosion.end()) ? kElExplosionEmpty : it->second;
+    Element ex =
+        (it == kElementToExplosion.end()) ? kElExplosionEmpty : it->second;
     Explode(index, ex, Directions::kDown);
-  } else if (IsType(index, kElWallMagicOn, Directions::kDown) || 
+  } else if (IsType(index, kElWallMagicOn, Directions::kDown) ||
              IsType(index, kElWallMagicDormant, Directions::kDown)) {
     MoveThroughMagic(index, kMagicWallConversion.at(GetItem(index)));
   } else if (IsType(index, kElNut, Directions::kDown)) {
@@ -718,9 +725,10 @@ void StonesNGemsState::UpdateStoneFalling(int index) {
   } else if (IsType(index, kElNut, Directions::kDown)) {
     // Falling on a bomb, explode!
     auto it = kElementToExplosion.find(GetItem(index));
-    Element ex = (it == kElementToExplosion.end()) ? kElExplosionEmpty : it->second;
+    Element ex =
+        (it == kElementToExplosion.end()) ? kElExplosionEmpty : it->second;
     Explode(index, ex);
-  } else if (CanRollLeft(index)) {    // Roll left/right
+  } else if (CanRollLeft(index)) {  // Roll left/right
     RollLeft(index, kElStoneFalling);
   } else if (CanRollRight(index)) {
     RollRight(index, kElStoneFalling);
@@ -735,7 +743,7 @@ void StonesNGemsState::UpdateDiamond(int index) {
   if (IsType(index, kElEmpty, Directions::kDown)) {
     SetItem(index, kElDiamondFalling, grid_.ids[index]);
     UpdateDiamondFalling(index);
-  } else if (CanRollLeft(index)) {    // Roll left/right if possible
+  } else if (CanRollLeft(index)) {  // Roll left/right if possible
     RollLeft(index, kElDiamondFalling);
   } else if (CanRollRight(index)) {
     RollRight(index, kElDiamondFalling);
@@ -746,17 +754,19 @@ void StonesNGemsState::UpdateDiamondFalling(int index) {
   // Continue to fall as normal
   if (IsType(index, kElEmpty, Directions::kDown)) {
     MoveItem(index, Directions::kDown);
-  } else if (HasProperty(index, ElementProperties::kCanExplode, Directions::kDown) &&
+  } else if (HasProperty(index, ElementProperties::kCanExplode,
+                         Directions::kDown) &&
              !IsType(index, kElBomb, Directions::kDown) &&
              !IsType(index, kElBombFalling, Directions::kDown)) {
     // Falling diamonds can cause elements to explode (but not bombs)
     auto it = kElementToExplosion.find(GetItem(index, Directions::kDown));
-    Element ex = (it == kElementToExplosion.end()) ? kElExplosionEmpty : it->second;
+    Element ex =
+        (it == kElementToExplosion.end()) ? kElExplosionEmpty : it->second;
     Explode(index, ex, Directions::kDown);
-  } else if (IsType(index, kElWallMagicOn, Directions::kDown) || 
+  } else if (IsType(index, kElWallMagicOn, Directions::kDown) ||
              IsType(index, kElWallMagicDormant, Directions::kDown)) {
     MoveThroughMagic(index, kMagicWallConversion.at(GetItem(index)));
-  } else if (CanRollLeft(index)) {    // Roll left/right
+  } else if (CanRollLeft(index)) {  // Roll left/right
     RollLeft(index, kElDiamondFalling);
   } else if (CanRollRight(index)) {
     RollRight(index, kElDiamondFalling);
@@ -771,7 +781,7 @@ void StonesNGemsState::UpdateNut(int index) {
   if (IsType(index, kElEmpty, Directions::kDown)) {
     SetItem(index, kElNutFalling, grid_.ids[index]);
     UpdateNutFalling(index);
-  } else if (CanRollLeft(index)) {    // Roll left/right
+  } else if (CanRollLeft(index)) {  // Roll left/right
     RollLeft(index, kElNutFalling);
   } else if (CanRollRight(index)) {
     RollRight(index, kElNutFalling);
@@ -782,7 +792,7 @@ void StonesNGemsState::UpdateNutFalling(int index) {
   // Continue to fall as normal
   if (IsType(index, kElEmpty, Directions::kDown)) {
     MoveItem(index, Directions::kDown);
-  } else if (CanRollLeft(index)) {    // Roll left/right
+  } else if (CanRollLeft(index)) {  // Roll left/right
     RollLeft(index, kElNutFalling);
   } else if (CanRollRight(index)) {
     RollRight(index, kElNutFalling);
@@ -797,7 +807,7 @@ void StonesNGemsState::UpdateBomb(int index) {
   if (IsType(index, kElEmpty, Directions::kDown)) {
     SetItem(index, kElBombFalling, grid_.ids[index]);
     UpdateBombFalling(index);
-  } else if (CanRollLeft(index)) {    // Roll left/right
+  } else if (CanRollLeft(index)) {  // Roll left/right
     RollLeft(index, kElBomb);
   } else if (CanRollRight(index)) {
     RollRight(index, kElBomb);
@@ -808,14 +818,15 @@ void StonesNGemsState::UpdateBombFalling(int index) {
   // Continue to fall as normal
   if (IsType(index, kElEmpty, Directions::kDown)) {
     MoveItem(index, Directions::kDown);
-  } else if (CanRollLeft(index)) {    // Roll left/right
+  } else if (CanRollLeft(index)) {  // Roll left/right
     RollLeft(index, kElBombFalling);
   } else if (CanRollRight(index)) {
     RollRight(index, kElBombFalling);
   } else {
     // Default options is for bomb to explode if stopped falling
     auto it = kElementToExplosion.find(GetItem(index));
-    Element ex = (it == kElementToExplosion.end()) ? kElExplosionEmpty : it->second;
+    Element ex =
+        (it == kElementToExplosion.end()) ? kElExplosionEmpty : it->second;
     Explode(index, ex);
   }
 }
@@ -831,17 +842,19 @@ void StonesNGemsState::UpdateAgent(int index, int action) {
   if (IsType(index, kElEmpty, action) || IsType(index, kElDirt, action)) {
     // Move if empty/dirt
     MoveItem(index, action);
-  } else if (IsType(index, kElDiamond, action) || IsType(index, kElDiamondFalling, action)) {
+  } else if (IsType(index, kElDiamond, action) ||
+             IsType(index, kElDiamondFalling, action)) {
     // Collect gems
     ++gems_collected_;
     current_reward_ += kGemPoints.at(GetItem(index, action));
     sum_reward_ += kGemPoints.at(GetItem(index, action));
     MoveItem(index, action);
   } else if (IsActionHorz(action) && (IsType(index, kElStone, action) ||
-                                    IsType(index, kElNut, action) ||
-                                    IsType(index, kElBomb, action))) {
+                                      IsType(index, kElNut, action) ||
+                                      IsType(index, kElBomb, action))) {
     // Push stone, nut, or bomb if action is horizontal
-    Push(index, GetItem(index, action), kElToFalling.at(GetItem(index, action)), action);                                 
+    Push(index, GetItem(index, action), kElToFalling.at(GetItem(index, action)),
+         action);
   } else if (IsKey(GetItem(index, action))) {
     // Collecting key, set gate open
     OpenGate(kKeyToGate.at(GetItem(index, action)));
@@ -849,7 +862,7 @@ void StonesNGemsState::UpdateAgent(int index, int action) {
   } else if (IsOpenGate(GetItem(index, action))) {
     // Walking through an open gate
     int index_gate = IndexFromAction(index, action);
-      if (IsType(index_gate, kElEmpty, action)) {
+    if (IsType(index_gate, kElEmpty, action)) {
       SetItem(index_gate, kElAgent, grid_.ids[index], action);
       SetItem(index, kElEmpty, ++id_counter_);
     }
@@ -867,7 +880,8 @@ void StonesNGemsState::UpdateFirefly(int index, int action) {
   if (IsTypeAdjacent(index, kElAgent) || IsTypeAdjacent(index, kElBlob)) {
     // Explode if touching the agent/blob
     auto it = kElementToExplosion.find(GetItem(index));
-    Element ex = (it == kElementToExplosion.end()) ? kElExplosionEmpty : it->second;
+    Element ex =
+        (it == kElementToExplosion.end()) ? kElExplosionEmpty : it->second;
     Explode(index, ex);
   } else if (IsType(index, kElEmpty, new_dir)) {
     // Fireflies always try to rotate left, otherwise continue forward
@@ -878,7 +892,8 @@ void StonesNGemsState::UpdateFirefly(int index, int action) {
     MoveItem(index, action);
   } else {
     // No other options, rotate right
-    SetItem(index, kDirectionToFirefly.at(kRotateRight.at(action)), grid_.ids[index]);
+    SetItem(index, kDirectionToFirefly.at(kRotateRight.at(action)),
+            grid_.ids[index]);
   }
 }
 
@@ -887,7 +902,8 @@ void StonesNGemsState::UpdateButterfly(int index, int action) {
   if (IsTypeAdjacent(index, kElAgent) || IsTypeAdjacent(index, kElBlob)) {
     // Explode if touching the agent/blob
     auto it = kElementToExplosion.find(GetItem(index));
-    Element ex = (it == kElementToExplosion.end()) ? kElExplosionEmpty : it->second;
+    Element ex =
+        (it == kElementToExplosion.end()) ? kElExplosionEmpty : it->second;
     Explode(index, ex);
   } else if (IsType(index, kElEmpty, new_dir)) {
     // Butterflies always try to rotate right, otherwise continue forward
@@ -898,7 +914,8 @@ void StonesNGemsState::UpdateButterfly(int index, int action) {
     MoveItem(index, action);
   } else {
     // No other options, rotate right
-    SetItem(index, kDirectionToButterfly.at(kRotateLeft.at(action)), grid_.ids[index]);
+    SetItem(index, kDirectionToButterfly.at(kRotateLeft.at(action)),
+            grid_.ids[index]);
   }
 }
 
@@ -909,13 +926,16 @@ void StonesNGemsState::UpdateOrange(int index, int action) {
   } else if (IsTypeAdjacent(index, kElAgent)) {
     // Run into the agent, explode!
     auto it = kElementToExplosion.find(GetItem(index));
-    Element ex = (it == kElementToExplosion.end()) ? kElExplosionEmpty : it->second;
+    Element ex =
+        (it == kElementToExplosion.end()) ? kElExplosionEmpty : it->second;
     Explode(index, ex);
   } else {
     // Blocked, roll for new direction
     std::vector<int> open_dirs;
     for (int dir = 0; dir < kNumActions; ++dir) {
-      if (dir == Directions::kNone || !InBounds(index, dir)) {continue;}
+      if (dir == Directions::kNone || !InBounds(index, dir)) {
+        continue;
+      }
       if (IsType(index, kElEmpty, dir)) {
         open_dirs.push_back(dir);
       }
@@ -953,7 +973,8 @@ void StonesNGemsState::UpdateBlob(int index) {
   // Roll if to grow and direction
   bool will_grow = (rng_() % 256) < blob_chance_;
   int grow_dir = rng_() % kNumActions;
-  if (will_grow && (IsType(index, kElEmpty, grow_dir) || IsType(index, kElDirt, grow_dir))) {
+  if (will_grow &&
+      (IsType(index, kElEmpty, grow_dir) || IsType(index, kElDirt, grow_dir))) {
     SetItem(index, kElBlob, grow_dir, ++id_counter_);
   }
 }
@@ -969,7 +990,7 @@ void StonesNGemsState::StartScan() {
   blob_size_ = 0;
   blob_enclosed_ = true;
   // Reset element flags
-  for (auto & e : grid_.elements) {
+  for (auto &e : grid_.elements) {
     e.has_updated = false;
   }
 }
@@ -996,7 +1017,7 @@ void StonesNGemsState::EndScan() {
 void StonesNGemsState::DoApplyAction(Action move) {
   if (cur_player_ == kChancePlayerId) {
     // Check each cell and apply respective dynamics function
-    for (int index = 0; index < grid_.num_cols *  grid_.num_rows; ++index) {
+    for (int index = 0; index < grid_.num_cols * grid_.num_rows; ++index) {
       Element &e = grid_.elements[index];
       if (e.has_updated) {
         continue;
@@ -1046,15 +1067,18 @@ void StonesNGemsState::DoApplyAction(Action move) {
 
 std::vector<Action> StonesNGemsState::LegalActions() const {
   if (IsChanceNode()) {
-    return LegalChanceOutcomes();;
+    return LegalChanceOutcomes();
+    ;
   } else if (IsTerminal()) {
     return {};
   } else {
-    return {Directions::kNone, Directions::kUp, Directions::kRight, Directions::kDown, Directions::kLeft};
+    return {Directions::kNone, Directions::kUp, Directions::kRight,
+            Directions::kDown, Directions::kLeft};
   }
 }
 
-std::vector<std::pair<Action, double>> StonesNGemsState::ChanceOutcomes() const {
+std::vector<std::pair<Action, double>> StonesNGemsState::ChanceOutcomes()
+    const {
   SPIEL_CHECK_TRUE(IsChanceNode());
   std::vector<std::pair<Action, double>> outcomes = {std::make_pair(0, 1.0)};
   return outcomes;
@@ -1075,7 +1099,7 @@ std::string StonesNGemsState::ToString() const {
     }
   }
   out_str += "time left: " + std::to_string(steps_remaining_) + ", ";
-  out_str += "gems required: " + std::to_string(gems_required_)  + ", ";
+  out_str += "gems required: " + std::to_string(gems_required_) + ", ";
   out_str += "gems collectred: " + std::to_string(gems_collected_);
   return out_str;
 }
@@ -1091,7 +1115,8 @@ std::string StonesNGemsState::Serialize() const {
   absl::StrAppend(&out_str, blob_max_size_, ",");
   absl::StrAppend(&out_str, blob_size_, ",");
   absl::StrAppend(&out_str, blob_chance_, ",");
-  absl::StrAppend(&out_str, std::to_string(static_cast<int>(blob_swap_.cell_type)) + ",");
+  absl::StrAppend(&out_str,
+                  std::to_string(static_cast<int>(blob_swap_.cell_type)) + ",");
   absl::StrAppend(&out_str, blob_enclosed_, ",");
   absl::StrAppend(&out_str, gems_required_, ",");
   absl::StrAppend(&out_str, gems_collected_, ",");
@@ -1120,30 +1145,45 @@ std::unique_ptr<State> StonesNGemsState::Clone() const {
   return std::unique_ptr<State>(new StonesNGemsState(*this));
 }
 
-StonesNGemsState::StonesNGemsState(std::shared_ptr<const Game> game, int steps_remaining, int magic_wall_steps,
-               bool magic_active, int blob_max_size, int blob_size, int blob_chance, 
-               Element blob_swap, bool blob_enclosed, int gems_required, int gems_collected, 
-               int current_reward, int sum_reward, Grid grid, int rng_seed, bool obs_show_ids, 
-               int id_counter, Player player) : 
-      State(game), steps_remaining_(steps_remaining), magic_wall_steps_(magic_wall_steps),
-      magic_active_(magic_active), blob_max_size_(blob_max_size), blob_size_(blob_size),
-      blob_chance_(blob_chance), blob_swap_(blob_swap), blob_enclosed_(blob_enclosed),
-      gems_required_(gems_required), gems_collected_(gems_collected), current_reward_(current_reward),
-      sum_reward_(sum_reward), grid_(grid), rng_(rng_seed), obs_show_ids_(obs_show_ids),
-      id_counter_(id_counter), cur_player_(player) 
-      {
-        // Initialize the grid element IDs
-        grid_.ids.clear();
-        for (std::size_t i = 0; i < grid.elements.size(); ++i) {
-          grid_.ids.push_back(++id_counter_);
-        }
-      }
+StonesNGemsState::StonesNGemsState(
+    std::shared_ptr<const Game> game, int steps_remaining, int magic_wall_steps,
+    bool magic_active, int blob_max_size, int blob_size, int blob_chance,
+    Element blob_swap, bool blob_enclosed, int gems_required,
+    int gems_collected, int current_reward, int sum_reward, Grid grid,
+    int rng_seed, bool obs_show_ids, int id_counter, Player player)
+    : State(game),
+      steps_remaining_(steps_remaining),
+      magic_wall_steps_(magic_wall_steps),
+      magic_active_(magic_active),
+      blob_max_size_(blob_max_size),
+      blob_size_(blob_size),
+      blob_chance_(blob_chance),
+      blob_swap_(blob_swap),
+      blob_enclosed_(blob_enclosed),
+      gems_required_(gems_required),
+      gems_collected_(gems_collected),
+      current_reward_(current_reward),
+      sum_reward_(sum_reward),
+      grid_(grid),
+      rng_(rng_seed),
+      obs_show_ids_(obs_show_ids),
+      id_counter_(id_counter),
+      cur_player_(player) {
+  // Initialize the grid element IDs
+  grid_.ids.clear();
+  for (std::size_t i = 0; i < grid.elements.size(); ++i) {
+    grid_.ids.push_back(++id_counter_);
+  }
+}
 
 // ------ Game -------
 
-std::unique_ptr<State> StonesNGemsGame::DeserializeState(const std::string& str) const {
+std::unique_ptr<State> StonesNGemsGame::DeserializeState(
+    const std::string &str) const {
   // empty string
-  if (str.empty()) {return NewInitialState();}
+  if (str.empty()) {
+    return NewInitialState();
+  }
   std::vector<std::string> lines = absl::StrSplit(str, '\n');
   if (lines.size() < 2) {
     SpielFatalError("Empty map string passed.");
@@ -1152,7 +1192,8 @@ std::unique_ptr<State> StonesNGemsGame::DeserializeState(const std::string& str)
   std::vector<std::string> property_line = absl::StrSplit(lines[0], ',');
   Grid grid;
   int steps_remaining, magic_wall_steps, blob_max_size, blob_size, blob_chance,
-      gems_required, gems_collected, current_reward, sum_reward, id_counter, cur_player;
+      gems_required, gems_collected, current_reward, sum_reward, id_counter,
+      cur_player;
   bool magic_active, blob_enclosed, obs_show_ids;
   Element blob_swap;
   try {
@@ -1181,10 +1222,11 @@ std::unique_ptr<State> StonesNGemsGame::DeserializeState(const std::string& str)
     std::vector<std::string> grid_line = absl::StrSplit(lines[i], ',');
     // Check for proper number of columns
     if (grid_line.size() != grid.num_cols) {
-      SpielFatalError("Grid line " + std::to_string(i-1) + "doesn't have correct number of elements.");
+      SpielFatalError("Grid line " + std::to_string(i - 1) +
+                      "doesn't have correct number of elements.");
     }
     // Check each element in row
-    for (const auto & type : grid_line) {
+    for (const auto &type : grid_line) {
       auto it = kCellTypeToElement.find(std::stoi(type));
       if (it != kCellTypeToElement.end()) {
         grid.elements.push_back(it->second);
@@ -1195,8 +1237,9 @@ std::unique_ptr<State> StonesNGemsGame::DeserializeState(const std::string& str)
   }
   // Ensure we read proper number of rows
   if (lines.size() - 1 != grid.num_rows) {
-    SpielFatalError("Incorrect number of rows, got " + std::to_string(lines.size() - 1) + 
-                    " but need " + std::to_string(grid.num_rows));
+    SpielFatalError("Incorrect number of rows, got " +
+                    std::to_string(lines.size() - 1) + " but need " +
+                    std::to_string(grid.num_rows));
   }
   // Ensure the agent exists in the map
   auto it = std::find(grid_.elements.begin(), grid_.elements.end(), kElAgent);
@@ -1204,29 +1247,21 @@ std::unique_ptr<State> StonesNGemsGame::DeserializeState(const std::string& str)
     SpielFatalError("Grid string doesn't contain the agent.");
   }
 
-  return std::unique_ptr<State>(
-      new StonesNGemsState(shared_from_this(), steps_remaining, magic_wall_steps,
-               magic_active, blob_max_size, blob_size, blob_chance, blob_swap,
-               blob_enclosed, gems_required, gems_collected, current_reward,
-               sum_reward, grid, ++rng_seed_, obs_show_ids, id_counter, cur_player));
+  return std::unique_ptr<State>(new StonesNGemsState(
+      shared_from_this(), steps_remaining, magic_wall_steps, magic_active,
+      blob_max_size, blob_size, blob_chance, blob_swap, blob_enclosed,
+      gems_required, gems_collected, current_reward, sum_reward, grid,
+      ++rng_seed_, obs_show_ids, id_counter, cur_player));
 }
 
-int StonesNGemsGame::NumDistinctActions() const { 
-  return kNumActions;
-}
+int StonesNGemsGame::NumDistinctActions() const { return kNumActions; }
 
 // There is arbitrarily chosen number to ensure the game is finite.
-int StonesNGemsGame::MaxGameLength() const {
-  return max_steps_;
-}
+int StonesNGemsGame::MaxGameLength() const { return max_steps_; }
 
-int StonesNGemsGame::NumPlayers() const {
-  return 1; 
-}
+int StonesNGemsGame::NumPlayers() const { return 1; }
 
-double StonesNGemsGame::MinUtility() const {
-  return 0; 
-}
+double StonesNGemsGame::MinUtility() const { return 0; }
 
 double StonesNGemsGame::MaxUtility() const {
   // Max utility really depends on the number of gems in the map,
@@ -1236,16 +1271,27 @@ double StonesNGemsGame::MaxUtility() const {
   // Butterflies can drop diamonds
   // Nuts drop diamonds if cracked
   double max_util = max_steps_;
-  max_util += kGemPoints.at(kElDiamond) * std::count(grid_.elements.begin(), grid_.elements.end(), kElDiamond);
-  max_util += kGemPoints.at(kElDiamond) * std::count(grid_.elements.begin(), grid_.elements.end(), kElDiamondFalling);
-  max_util += std::count(grid_.elements.begin(), grid_.elements.end(), kElStone);
-  max_util += std::count(grid_.elements.begin(), grid_.elements.end(), kElStoneFalling);
-  max_util += 9 * std::count(grid_.elements.begin(), grid_.elements.end(), kElButterflyUp);
-  max_util += 9 * std::count(grid_.elements.begin(), grid_.elements.end(), kElButterflyLeft);
-  max_util += 9 * std::count(grid_.elements.begin(), grid_.elements.end(), kElButterflyDown);
-  max_util += 9 * std::count(grid_.elements.begin(), grid_.elements.end(), kElButterflyRight);
+  max_util +=
+      kGemPoints.at(kElDiamond) *
+      std::count(grid_.elements.begin(), grid_.elements.end(), kElDiamond);
+  max_util += kGemPoints.at(kElDiamond) * std::count(grid_.elements.begin(),
+                                                     grid_.elements.end(),
+                                                     kElDiamondFalling);
+  max_util +=
+      std::count(grid_.elements.begin(), grid_.elements.end(), kElStone);
+  max_util +=
+      std::count(grid_.elements.begin(), grid_.elements.end(), kElStoneFalling);
+  max_util += 9 * std::count(grid_.elements.begin(), grid_.elements.end(),
+                             kElButterflyUp);
+  max_util += 9 * std::count(grid_.elements.begin(), grid_.elements.end(),
+                             kElButterflyLeft);
+  max_util += 9 * std::count(grid_.elements.begin(), grid_.elements.end(),
+                             kElButterflyDown);
+  max_util += 9 * std::count(grid_.elements.begin(), grid_.elements.end(),
+                             kElButterflyRight);
   max_util += std::count(grid_.elements.begin(), grid_.elements.end(), kElNut);
-  max_util += std::count(grid_.elements.begin(), grid_.elements.end(), kElNutFalling);
+  max_util +=
+      std::count(grid_.elements.begin(), grid_.elements.end(), kElNutFalling);
   return max_util;
 }
 
@@ -1253,7 +1299,8 @@ std::vector<int> StonesNGemsGame::ObservationTensorShape() const {
   return {kNumVisibleCellType, grid_.num_rows, grid_.num_cols};
 }
 
-Grid StonesNGemsGame::ParseGrid(const std::string& grid_string, double blob_max_percentage) {
+Grid StonesNGemsGame::ParseGrid(const std::string &grid_string,
+                                double blob_max_percentage) {
   Grid grid;
 
   std::vector<std::string> lines = absl::StrSplit(grid_string, '\n');
@@ -1268,18 +1315,22 @@ Grid StonesNGemsGame::ParseGrid(const std::string& grid_string, double blob_max_
     max_steps_ = std::stoi(property_line[2]);
     gems_required_ = std::stoi(property_line[3]);
   } catch (...) {
-    SpielFatalError("Missing width, height, maximum steps, and/or gems required on first line");
+    SpielFatalError(
+        "Missing width, height, maximum steps, and/or gems required on first "
+        "line");
   }
   // Parse grid contents
   for (std::size_t i = 1; i < lines.size(); ++i) {
     // Check for proper number of columns
     std::vector<std::string> grid_line = absl::StrSplit(lines[i], ',');
     if (grid_line.size() != grid.num_cols) {
-      SpielFatalError("Grid line " + std::to_string(i-1) + " doesn't have correct number of elements." +
-        " Received " + std::to_string(grid_line.size()) + ", expected " + std::to_string(grid.num_cols));
+      SpielFatalError("Grid line " + std::to_string(i - 1) +
+                      " doesn't have correct number of elements." +
+                      " Received " + std::to_string(grid_line.size()) +
+                      ", expected " + std::to_string(grid.num_cols));
     }
     // Check each element in row
-    for (const auto & type : grid_line) {
+    for (const auto &type : grid_line) {
       auto it = kCellTypeToElement.find(std::stoi(type));
       if (it != kCellTypeToElement.end()) {
         grid.elements.push_back(it->second);
@@ -1290,8 +1341,9 @@ Grid StonesNGemsGame::ParseGrid(const std::string& grid_string, double blob_max_
   }
   // Ensure we read proper number of rows
   if (lines.size() - 1 != grid.num_rows) {
-    SpielFatalError("Incorrect number of rows, received " + std::to_string(lines.size() - 1) + 
-                    ", expected " + std::to_string(grid.num_rows));
+    SpielFatalError("Incorrect number of rows, received " +
+                    std::to_string(lines.size() - 1) + ", expected " +
+                    std::to_string(grid.num_rows));
   }
   // Ensure the agent exists in the map
   auto it = std::find(grid_.elements.begin(), grid_.elements.end(), kElAgent);
@@ -1303,14 +1355,14 @@ Grid StonesNGemsGame::ParseGrid(const std::string& grid_string, double blob_max_
   return grid;
 }
 
-StonesNGemsGame::StonesNGemsGame(const GameParameters& params)
+StonesNGemsGame::StonesNGemsGame(const GameParameters &params)
     : Game(kGameType, params),
       obs_show_ids_(ParameterValue<bool>("obs_show_ids")),
       magic_wall_steps_(ParameterValue<int>("magic_wall_steps")),
       blob_chance_(ParameterValue<int>("blob_chance")),
       rng_seed_(ParameterValue<int>("rng_seed")),
-      grid_(ParseGrid(ParameterValue<std::string>("grid"), 
-            ParameterValue<double>("blob_max_percentage"))) {}
+      grid_(ParseGrid(ParameterValue<std::string>("grid"),
+                      ParameterValue<double>("blob_max_percentage"))) {}
 
 }  // namespace stones_n_gems
 }  // namespace open_spiel
