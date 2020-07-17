@@ -43,14 +43,23 @@ constexpr uint8_t kMaxUniversalPokerPlayers = 10;
 
 // This is the mapping from int to action. E.g. the legal action "0" is fold,
 // the legal action "1" is check/call, etc.
-enum ActionType { kFold = 0, kCall = 1, kBet = 2, kAllIn = 3 };
+enum ActionType { kFold = 0, kCall = 1, kBet = 2, kAllIn = 3, kDeal = 4 };
 enum BettingAbstraction { kFCPA = 0, kFC = 1, kFULLGAME = 2 };
-std::ostream &operator<<(std::ostream &os, const BettingAbstraction &betting);
+
+enum StateActionType {
+  ACTION_DEAL = 1,
+  ACTION_FOLD = 2,
+  ACTION_CHECK_CALL = 4,
+  ACTION_BET = 8,
+  ACTION_ALL_IN = 16
+};
+
+constexpr StateActionType ALL_ACTIONS[5] = {
+    ACTION_DEAL, ACTION_FOLD, ACTION_CHECK_CALL, ACTION_BET, ACTION_ALL_IN};
 
 class UniversalPokerState : public State {
  public:
-  explicit UniversalPokerState(std::shared_ptr<const Game> game, int big_blind,
-                               int starting_stack_big_blinds);
+  explicit UniversalPokerState(std::shared_ptr<const Game> game);
 
   bool IsTerminal() const override;
   bool IsChanceNode() const override;
@@ -77,19 +86,6 @@ class UniversalPokerState : public State {
  protected:
   void DoApplyAction(Action action_id) override;
 
-  int big_blind_;
-  int starting_stack_big_blinds_;
-
-  enum ActionType {
-    ACTION_DEAL = 1,
-    ACTION_FOLD = 2,
-    ACTION_CHECK_CALL = 4,
-    ACTION_BET = 8,
-    ACTION_ALL_IN = 16
-  };
-  static constexpr ActionType ALL_ACTIONS[5] = {
-      ACTION_DEAL, ACTION_FOLD, ACTION_CHECK_CALL, ACTION_BET, ACTION_ALL_IN};
-
  private:
   void _CalculateActionsAndNodeType();
 
@@ -98,14 +94,52 @@ class UniversalPokerState : public State {
   const uint32_t &GetPossibleActionsMask() const { return possibleActions_; }
   const int GetPossibleActionCount() const;
 
-  void ApplyChoiceAction(ActionType action_type, int size);
+  void ApplyChoiceAction(StateActionType action_type, int size);
   const std::string &GetActionSequence() const { return actionSequence_; }
+
+  void AddHoleCard(uint8_t card) {
+    Player p = hole_cards_dealt_ / acpc_game_->GetNbHoleCardsRequired();
+    const int card_index =
+        hole_cards_dealt_ % acpc_game_->GetNbHoleCardsRequired();
+    acpc_state_.AddHoleCard(p, card_index, card);
+    ++hole_cards_dealt_;
+  }
+
+  void AddBoardCard(uint8_t card) {
+    acpc_state_.AddBoardCard(board_cards_dealt_, card);
+    ++board_cards_dealt_;
+  }
+
+  logic::CardSet HoleCards(Player player) const {
+    logic::CardSet hole_cards;
+    const int num_players = acpc_game_->GetNbPlayers();
+    const int num_cards_dealt_to_all = hole_cards_dealt_ / num_players;
+    const int num_cards_dealt_to_player =
+        num_cards_dealt_to_all +
+        std::max(0, (hole_cards_dealt_ % num_players) - player);
+    for (int i = 0; i < num_cards_dealt_to_player; ++i) {
+      hole_cards.AddCard(acpc_state_.hole_cards(player, i));
+    }
+    return hole_cards;
+  }
+
+  logic::CardSet BoardCards() const {
+    logic::CardSet board_cards;
+    const int num_board_cards =
+        std::min(board_cards_dealt_,
+                 static_cast<int>(acpc_game_->GetTotalNbBoardCards()));
+    for (int i = 0; i < num_board_cards; ++i) {
+      board_cards.AddCard(acpc_state_.board_cards(i));
+    }
+    return board_cards;
+  }
 
   const acpc_cpp::ACPCGame *acpc_game_;
   mutable acpc_cpp::ACPCState acpc_state_;
   logic::CardSet deck_;  // The remaining cards to deal.
-  std::vector<logic::CardSet> hole_cards_;  // The cards owned by each player
-  logic::CardSet board_cards_;  // The public cards.
+  int hole_cards_dealt_ = 0;
+  int board_cards_dealt_ = 0;
+
   // The current player:
   // kChancePlayerId for chance nodes
   // kTerminalPlayerId when we everyone except one player has fold, or that
@@ -138,6 +172,9 @@ class UniversalPokerGame : public Game {
   BettingAbstraction betting_abstraction() const {
     return betting_abstraction_;
   }
+
+  int big_blind() const { return big_blind_; }
+  int starting_stack_big_blinds() const { return starting_stack_big_blinds_; }
 
  private:
   std::string gameDesc_;
@@ -194,6 +231,7 @@ class UniformRestrictedActions : public Policy {
   std::vector<ActionType> actions_;
 };
 
+std::ostream &operator<<(std::ostream &os, const BettingAbstraction &betting);
 }  // namespace universal_poker
 }  // namespace open_spiel
 

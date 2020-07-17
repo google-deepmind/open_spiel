@@ -19,6 +19,7 @@
 #include <string>
 
 #include "open_spiel/abseil-cpp/absl/memory/memory.h"
+#include "open_spiel/abseil-cpp/absl/types/span.h"
 #include "open_spiel/games/universal_poker/acpc/project_acpc_server/game.h"
 
 namespace open_spiel {
@@ -57,6 +58,9 @@ class ACPCGame {
   ::project_acpc_server::Game* MutableGame() const { return &acpc_game_; }
   const project_acpc_server::Game& Game() const { return acpc_game_; }
   uint32_t HandId() const { return handId_; }
+  absl::Span<const int32_t> blinds() const {
+    return absl::Span<const int32_t>(acpc_game_.blind, acpc_game_.numPlayers);
+  }
 
   // Checks that the underlying acpc_game_ structs have all their fields equal.
   bool operator==(const ACPCGame& other) const;
@@ -96,6 +100,20 @@ class ACPCState {
   // Trivial methods.
   bool IsFinished() const { return stateFinished(&acpcState_); }
   uint32_t MaxSpend() const { return acpcState_.maxSpent; }
+  uint8_t hole_cards(int player_index, int card_index) const {
+    return acpcState_.holeCards[player_index][card_index];
+  }
+  uint8_t board_cards(int card_index) const {
+    return acpcState_.boardCards[card_index];
+  }
+
+  void AddHoleCard(int player_index, int card_index, uint8_t card) {
+    acpcState_.holeCards[player_index][card_index] = card;
+  }
+
+  void AddBoardCard(int card_index, uint8_t card) {
+    acpcState_.boardCards[card_index] = card;
+  }
 
   // Returns the current round 0-indexed round id (<= game.NumRounds() - 1).
   // A showdown is still in game.NumRounds()-1, not a separate round
