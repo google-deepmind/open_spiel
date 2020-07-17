@@ -159,6 +159,8 @@ bool Near(T a, T b, T epsilon) {
 // Macros to check for error conditions.
 // These trigger SpielFatalError if the condition is violated.
 
+#if !defined(NDEBUG)
+
 #define SPIEL_CHECK_OP(x_exp, op, y_exp)                             \
   do {                                                               \
     auto x = x_exp;                                                  \
@@ -222,6 +224,26 @@ bool Near(T a, T b, T epsilon) {
   while (x)                                                      \
   open_spiel::SpielFatalError(open_spiel::internal::SpielStrCat( \
       __FILE__, ":", __LINE__, " CHECK_FALSE(", #x, ")"))
+
+#else  // defined(NDEBUG)
+
+// Turn off checks for (optimized) release build.
+#define SPIEL_CHECK_OP(x_exp, op, y_exp)
+#define SPIEL_CHECK_FN2(x_exp, y_exp, fn)
+#define SPIEL_CHECK_FN3(x_exp, y_exp, z_exp, fn)
+#define SPIEL_CHECK_GE(x, y)
+#define SPIEL_CHECK_GT(x, y)
+#define SPIEL_CHECK_LE(x, y)
+#define SPIEL_CHECK_LT(x, y)
+#define SPIEL_CHECK_EQ(x, y)
+#define SPIEL_CHECK_NE(x, y)
+#define SPIEL_CHECK_PROB(x)
+#define SPIEL_CHECK_FLOAT_EQ(x, y)
+#define SPIEL_CHECK_FLOAT_NEAR(x, y, epsilon)
+#define SPIEL_CHECK_TRUE(x)
+#define SPIEL_CHECK_FALSE(x)
+
+#endif  // !defined(NDEBUG)
 
 // When an error is encountered, OpenSpiel code should call SpielFatalError()
 // which will forward the message to the current error handler.

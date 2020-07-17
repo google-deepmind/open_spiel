@@ -3,6 +3,13 @@
 cmake_minimum_required (VERSION 3.12)
 project (open_spiel)
 
+# Basic build for debugging.
+set(CMAKE_CXX_FLAGS_DEBUG "-g")
+# Optimized release build: turn off runtime checks (assert, SPIEL_CHECK_*)
+# and turn on highest speed optimizations. The difference in perfomance can be
+# up to 10x higher.
+set(CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG -O3")
+
 set (Python_TARGET_VERSION "" CACHE STRING "Specify a target Python version. \
 Any Python library found with CMake modules FindPython2/FindPython3 that \
 agrees  with the major version and is at least as high for minor version and \
