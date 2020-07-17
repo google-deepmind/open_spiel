@@ -35,6 +35,8 @@ add_library (algorithms OBJECT
   is_mcts.h
   matrix_game_utils.cc
   matrix_game_utils.h
+  nfg_writer.cc
+  nfg_writer.h
   mcts.cc
   mcts.h
   minimax.cc
