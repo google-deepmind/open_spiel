@@ -41,7 +41,9 @@ const GameType kGameType{/*short_name=*/"coordinated_mp",
                          /*provides_information_state_tensor=*/false,
                          /*provides_observation_string=*/true,
                          /*provides_observation_tensor=*/false,
-                         /*parameter_specification=*/{}};
+                         /*parameter_specification=*/{},
+                         /*default_loadable*/true,
+                         /*provides_factored_observation_string*/true};
 
 std::shared_ptr<const Game> Factory(const GameParameters &params) {
   return std::shared_ptr<const Game>(new PenniesGame(params));
@@ -150,11 +152,23 @@ std::string PenniesState::InformationStateString(Player player) const {
 std::string PenniesState::ObservationString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
-
   if (infoset_ == kTop) return "T";
   if (infoset_ == kBottom) return "B";
-
   return "";
+}
+
+std::string PenniesState::PublicObservationString() const {
+  if (IsInitialState()) return kStartOfGamePublicObservation;
+  return kClockTickPublicObservation;
+}
+
+// No private observations - show only time.
+std::string PenniesState::PrivateObservationString(Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+  if (infoset_ == kTop) return "T";
+  if (infoset_ == kBottom) return "B";
+  return kNothingPrivateObservation;
 }
 
 std::unique_ptr<State> PenniesState::Clone() const {
