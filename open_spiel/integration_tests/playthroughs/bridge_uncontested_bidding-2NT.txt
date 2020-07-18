@@ -18,7 +18,7 @@ GameType.utility = Utility.IDENTICAL
 
 NumDistinctActions() = 36
 PolicyTensorShape() = [36]
-MaxChanceOutcomes() = 0
+MaxChanceOutcomes() = 1
 GetParameters() = {num_redeals=1,relative_scoring=True,rng_seed=0,subgame=2NT}
 NumPlayers() = 2
 MinUtility() = -2170.0

@@ -91,7 +91,7 @@ std::string LiarsDiceState::ActionToString(Player player,
       return absl::StrCat(bid.first, "-", bid.second);
     }
   }
-  return absl::StrCat("chance outcome ", action_id);
+  return absl::StrCat("Roll ", action_id + 1);
 }
 
 int LiarsDiceState::CurrentPlayer() const {
@@ -139,7 +139,7 @@ void LiarsDiceState::DoApplyAction(Action action) {
     int slot = num_dice_rolled_[cur_roller_];
 
     // Assign the roll.
-    dice_outcomes_[cur_roller_][slot] = action;
+    dice_outcomes_[cur_roller_][slot] = action + 1;
     num_dice_rolled_[cur_roller_]++;
 
     // Check to see if we must change the roller.
@@ -184,7 +184,7 @@ std::vector<Action> LiarsDiceState::LegalActions() const {
   if (IsChanceNode()) {
     std::vector<Action> outcomes(kDiceSides);
     for (int i = 0; i < kDiceSides; i++) {
-      outcomes[i] = 1 + i;
+      outcomes[i] = i;
     }
     return outcomes;
   }
@@ -212,7 +212,7 @@ std::vector<std::pair<Action, double>> LiarsDiceState::ChanceOutcomes() const {
   // A chance node is a single die roll.
   outcomes.reserve(kDiceSides);
   for (int i = 0; i < kDiceSides; i++) {
-    outcomes.emplace_back(1 + i, 1.0 / kDiceSides);
+    outcomes.emplace_back(i, 1.0 / kDiceSides);
   }
 
   return outcomes;

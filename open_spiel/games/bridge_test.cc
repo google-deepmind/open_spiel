@@ -34,7 +34,6 @@ void ScoringTests() {
 
 void BasicGameTests() {
   testing::LoadGameTest("bridge_uncontested_bidding(num_redeals=1)");
-  testing::NoChanceOutcomesTest(*LoadGame("bridge_uncontested_bidding"));
   testing::RandomSimTest(*LoadGame("bridge_uncontested_bidding(num_redeals=1)"),
                          3);
 }

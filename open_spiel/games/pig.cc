@@ -70,7 +70,7 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 
 std::string PigState::ActionToString(Player player, Action move_id) const {
   if (player == kChancePlayerId) {
-    return absl::StrCat("chance outcome ", move_id);
+    return absl::StrCat("Roll ", 1 + move_id);
   } else if (move_id == kRoll) {
     return "roll";
   } else {
@@ -186,7 +186,7 @@ int PigState::CurrentPlayer() const {
 
 void PigState::DoApplyAction(Action move) {
   // For decision node: 0 means roll, 1 means stop.
-  // For chance node: outcome of the dice (1-x).
+  // For chance node: outcome of the dice (x-1).
   if (cur_player_ >= 0 && move == kRoll) {
     // Player roll -> chance node.
     cur_player_ = kChancePlayerId;
@@ -201,7 +201,7 @@ void PigState::DoApplyAction(Action move) {
   } else if (IsChanceNode()) {
     // Resolve chance node outcome. If 1, reset turn total and change players;
     // else, add to total and keep going.
-    if (move == 1) {
+    if (move == 0) {
       // Reset turn total and loses turn!
       turn_total_ = 0;
       turn_player_ = NextPlayerRoundRobin(turn_player_, num_players_);
@@ -234,10 +234,10 @@ std::vector<std::pair<Action, double>> PigState::ChanceOutcomes() const {
   SPIEL_CHECK_TRUE(IsChanceNode());
   std::vector<std::pair<Action, double>> outcomes;
 
-  // All the chance outcomes come after roll and stop.
+  // Chance outcomes are labelled 0+, corresponding to rolling 1+x.
   outcomes.reserve(dice_outcomes_);
   for (int i = 0; i < dice_outcomes_; i++) {
-    outcomes.push_back(std::make_pair(i + 1, 1.0 / dice_outcomes_));
+    outcomes.push_back(std::make_pair(i, 1.0 / dice_outcomes_));
   }
 
   return outcomes;

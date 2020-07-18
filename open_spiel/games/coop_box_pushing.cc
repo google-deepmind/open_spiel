@@ -366,6 +366,13 @@ std::vector<Action> CoopBoxPushingState::LegalActions(Player player) const {
     return LegalFlatJointActions();
   } else if (IsTerminal()) {
     return {};
+  } else if (IsChanceNode()) {
+    if (action_status_[0] == ActionStatusType::kUnresolved ||
+        action_status_[1] == ActionStatusType::kUnresolved) {
+      return {0, 1};
+    } else {
+      return {2, 3};
+    }
   }
   // All the actions are legal at every state.
   return {0, 1, 2, 3};

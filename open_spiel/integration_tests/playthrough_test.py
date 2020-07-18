@@ -51,7 +51,7 @@ class PlaythroughTest(absltest.TestCase):
     test_srcdir = os.environ.get("TEST_SRCDIR", "")
     path = os.path.join(test_srcdir, _DATA_DIR)
 
-    basenames = list(os.listdir(path))
+    basenames = sorted(os.listdir(path))
     self.assertGreaterEqual(len(basenames), 40)
 
     for basename in basenames:

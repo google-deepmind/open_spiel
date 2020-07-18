@@ -208,6 +208,7 @@ class UncontestedBiddingGame : public Game {
  public:
   explicit UncontestedBiddingGame(const GameParameters& params);
   int NumDistinctActions() const override { return kNumActions; }
+  int MaxChanceOutcomes() const override { return 1; }
   std::unique_ptr<State> NewInitialState() const override {
     return absl::make_unique<UncontestedBiddingState>(
         shared_from_this(), reference_contracts_, deal_filter_, forced_actions_,

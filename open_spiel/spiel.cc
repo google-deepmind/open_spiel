@@ -393,6 +393,14 @@ Action State::StringToAction(Player player,
       absl::StrCat("Couldn't find an action matching ", action_str));
 }
 
+std::vector<int> State::LegalActionsMask(Player player) const {
+  int length = (player == kChancePlayerId) ? game_->MaxChanceOutcomes()
+                                           : num_distinct_actions_;
+  std::vector<int> mask(length, 0);
+  for (int action : LegalActions(player)) mask[action] = 1;
+  return mask;
+}
+
 std::unique_ptr<State> Game::DeserializeState(const std::string& str) const {
   // This simple deserialization doesn't work for games with sampled chance
   // nodes, since the history doesn't give us enough information to reconstruct

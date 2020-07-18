@@ -94,7 +94,7 @@ class TradeCommGame : public Game {
     return std::unique_ptr<State>(
         new TradeCommState(shared_from_this(), num_items_));
   }
-  int MaxChanceOutcomes() const override { return num_items_; }
+  int MaxChanceOutcomes() const override { return num_items_ * num_items_; }
 
   int MaxGameLength() const override { return 4; }
 

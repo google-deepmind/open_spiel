@@ -18,7 +18,7 @@ GameType.utility = Utility.GENERAL_SUM
 
 NumDistinctActions() = 10
 PolicyTensorShape() = [10]
-MaxChanceOutcomes() = 10
+MaxChanceOutcomes() = 11
 GetParameters() = {max_value=10,players=2}
 NumPlayers() = 2
 MinUtility() = 0.0

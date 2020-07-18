@@ -418,7 +418,7 @@ std::unique_ptr<State> UniversalPokerState::Clone() const {
 std::vector<std::pair<Action, double>> UniversalPokerState::ChanceOutcomes()
     const {
   SPIEL_CHECK_TRUE(IsChanceNode());
-  std::vector<uint8_t> available_cards = deck_.ToCardArray();
+  auto available_cards = LegalActions();
   const int num_cards = available_cards.size();
   const double p = 1.0 / num_cards;
 
@@ -433,11 +433,13 @@ std::vector<std::pair<Action, double>> UniversalPokerState::ChanceOutcomes()
 
 std::vector<Action> UniversalPokerState::LegalActions() const {
   if (IsChanceNode()) {
-    std::vector<uint8_t> available_cards = deck_.ToCardArray();
+    const logic::CardSet full_deck(acpc_game_->NumSuitsDeck(),
+                                   acpc_game_->NumRanksDeck());
+    const std::vector<uint8_t> all_cards = full_deck.ToCardArray();
     std::vector<Action> actions;
-    actions.reserve(available_cards.size());
-    for (const auto &card : available_cards) {
-      actions.push_back(card);
+    actions.reserve(deck_.NumCards());
+    for (uint32_t i = 0; i < full_deck.NumCards(); i++) {
+      if (deck_.ContainsCards(all_cards[i])) actions.push_back(i);
     }
     return actions;
   }
@@ -478,8 +480,10 @@ std::vector<Action> UniversalPokerState::LegalActions() const {
 // cards.
 void UniversalPokerState::DoApplyAction(Action action_id) {
   if (IsChanceNode()) {
-    // In chance nodes, the action_id is exactly the card being dealt.
-    uint8_t card = action_id;
+    // In chance nodes, the action_id is an index into the full deck.
+    uint8_t card =
+        logic::CardSet(acpc_game_->NumSuitsDeck(), acpc_game_->NumRanksDeck())
+            .ToCardArray()[action_id];
     deck_.RemoveCard(card);
     actionSequence_ += 'd';
 

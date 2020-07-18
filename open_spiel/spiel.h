@@ -222,17 +222,10 @@ class State {
   // is added.
   virtual std::vector<Action> LegalActions() const = 0;
 
-  // Returns a vector of length `game.NumDistinctActions()` containing 1 for
-  // legal actions and 0 for illegal actions.
-  std::vector<int> LegalActionsMask(Player player) const {
-    std::vector<int> mask(num_distinct_actions_, 0);
-    std::vector<Action> legal_actions = LegalActions(player);
-
-    for (auto const& value : legal_actions) {
-      mask[value] = 1;
-    }
-    return mask;
-  }
+  // Returns a vector containing 1 for legal actions and 0 for illegal actions.
+  // The length is `game.NumDistinctActions()` for player nodes, and
+  // `game.MaxChanceOutcomes()` for chance nodes.
+  std::vector<int> LegalActionsMask(Player player) const;
 
   // Convenience function for turn-based games.
   std::vector<int> LegalActionsMask() const {
@@ -745,7 +738,7 @@ class Game : public std::enable_shared_from_this<Game> {
     SpielFatalError("NewInitialState from string is not implemented.");
   }
 
-  // Maximum number of chance outcomes for each chance node.
+  // Maximum number of distinct chance outcomes for chance nodes in the game.
   virtual int MaxChanceOutcomes() const { return 0; }
 
   // If the game is parameterizable, returns an object with the current
