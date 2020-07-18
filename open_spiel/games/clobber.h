@@ -132,20 +132,19 @@ class ClobberGame : public Game {
   explicit ClobberGame(const GameParameters& params);
   int NumDistinctActions() const override;
   std::unique_ptr<State> NewInitialState(
-      const std::string& board_string) const {
-    return std::unique_ptr<State>(
-        new ClobberState(shared_from_this(), rows_, columns_, board_string));
+      const std::string& board_string) const override {
+    return absl::make_unique<ClobberState>(shared_from_this(), rows_, columns_,
+                                           board_string);
   }
   std::unique_ptr<State> NewInitialState() const override {
-    return std::unique_ptr<State>(
-        new ClobberState(shared_from_this(), rows_, columns_));
+    return absl::make_unique<ClobberState>(shared_from_this(), rows_, columns_);
   }
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override { return -1; }
   double UtilitySum() const override { return 0; }
   double MaxUtility() const override { return 1; }
   std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new ClobberGame(*this));
+    return std::make_shared<ClobberGame>(*this);
   }
   std::vector<int> ObservationTensorShape() const override {
     return {kNumPlayers + 1, rows_, columns_};

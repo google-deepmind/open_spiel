@@ -227,18 +227,19 @@ class ChessGame : public Game {
   int NumDistinctActions() const override {
     return chess::NumDistinctActions();
   }
-  std::unique_ptr<State> NewInitialState(const std::string& fen) const {
-    return std::unique_ptr<State>(new ChessState(shared_from_this(), fen));
+  std::unique_ptr<State> NewInitialState(
+      const std::string& fen) const override {
+    return absl::make_unique<ChessState>(shared_from_this(), fen);
   }
   std::unique_ptr<State> NewInitialState() const override {
-    return std::unique_ptr<State>(new ChessState(shared_from_this()));
+    return absl::make_unique<ChessState>(shared_from_this());
   }
   int NumPlayers() const override { return chess::NumPlayers(); }
   double MinUtility() const override { return LossUtility(); }
   double UtilitySum() const override { return DrawUtility(); }
   double MaxUtility() const override { return WinUtility(); }
   std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new ChessGame(*this));
+    return std::make_shared<ChessGame>(*this);
   }
   std::vector<int> ObservationTensorShape() const override {
     return chess::ObservationTensorShape();

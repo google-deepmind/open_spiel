@@ -297,7 +297,10 @@ PYBIND11_MODULE(pyspiel, m) {
 
   py::class_<Game, std::shared_ptr<Game>> game(m, "Game");
   game.def("num_distinct_actions", &Game::NumDistinctActions)
-      .def("new_initial_state", &Game::NewInitialState)
+      .def("new_initial_state",
+           py::overload_cast<>(&Game::NewInitialState, py::const_))
+      .def("new_initial_state", py::overload_cast<const std::string&>(
+                                    &Game::NewInitialState, py::const_))
       .def("max_chance_outcomes", &Game::MaxChanceOutcomes)
       .def("get_parameters", &Game::GetParameters)
       .def("num_players", &Game::NumPlayers)
