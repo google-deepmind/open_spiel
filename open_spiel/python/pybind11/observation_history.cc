@@ -57,8 +57,8 @@ void init_pyspiel_observation_histories(py::module& m) {
   action_or_observation
       .def(py::init<std::string>())
       .def(py::init<Action>())
-      .def("action", &ActionOrObs::Action)
-      .def("observation", &ActionOrObs::Observation)
+      .def("action", &ActionOrObs::GetAction)
+      .def("observation", &ActionOrObs::GetObservation)
       .def("is_action", &ActionOrObs::IsAction)
       .def("is_observation", &ActionOrObs::IsObservation)
       .def("__str__", &ActionOrObs::ToString)
