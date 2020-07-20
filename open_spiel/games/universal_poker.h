@@ -114,9 +114,17 @@ class UniversalPokerState : public State {
     logic::CardSet hole_cards;
     const int num_players = acpc_game_->GetNbPlayers();
     const int num_cards_dealt_to_all = hole_cards_dealt_ / num_players;
-    const int num_cards_dealt_to_player =
-        num_cards_dealt_to_all +
-        std::max(0, (hole_cards_dealt_ % num_players) - player);
+    int num_cards_dealt_to_player = num_cards_dealt_to_all;
+    // We deal to players in order from 0 to n - 1. So if the number of cards
+    // dealt % num_players is > the player, we haven't dealt them a card yet;
+    // otherwise we have.
+    if (player < (hole_cards_dealt_ % num_players) &&
+        num_cards_dealt_to_all < acpc_game_->GetNbHoleCardsRequired()) {
+      ++num_cards_dealt_to_player;
+    }
+    SPIEL_CHECK_LT(player, acpc_game_->GetNbPlayers());
+    SPIEL_CHECK_LE(num_cards_dealt_to_player,
+                   static_cast<int>(acpc_game_->GetNbHoleCardsRequired()));
     for (int i = 0; i < num_cards_dealt_to_player; ++i) {
       hole_cards.AddCard(acpc_state_.hole_cards(player, i));
     }

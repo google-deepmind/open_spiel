@@ -21,6 +21,7 @@
 #include "open_spiel/abseil-cpp/absl/memory/memory.h"
 #include "open_spiel/abseil-cpp/absl/types/span.h"
 #include "open_spiel/games/universal_poker/acpc/project_acpc_server/game.h"
+#include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
 namespace universal_poker {
@@ -101,17 +102,23 @@ class ACPCState {
   bool IsFinished() const { return stateFinished(&acpcState_); }
   uint32_t MaxSpend() const { return acpcState_.maxSpent; }
   uint8_t hole_cards(int player_index, int card_index) const {
+    SPIEL_CHECK_LT(player_index, MAX_PLAYERS);
+    SPIEL_CHECK_LT(card_index, MAX_HOLE_CARDS);
     return acpcState_.holeCards[player_index][card_index];
   }
   uint8_t board_cards(int card_index) const {
+    SPIEL_CHECK_LT(card_index, MAX_BOARD_CARDS);
     return acpcState_.boardCards[card_index];
   }
 
   void AddHoleCard(int player_index, int card_index, uint8_t card) {
+    SPIEL_CHECK_LT(player_index, MAX_PLAYERS);
+    SPIEL_CHECK_LT(card_index, MAX_HOLE_CARDS);
     acpcState_.holeCards[player_index][card_index] = card;
   }
 
   void AddBoardCard(int card_index, uint8_t card) {
+    SPIEL_CHECK_LT(card_index, MAX_BOARD_CARDS);
     acpcState_.boardCards[card_index] = card;
   }
 
