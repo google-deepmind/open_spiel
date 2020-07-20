@@ -165,8 +165,8 @@ std::string TinyHanabiState::InformationStateString(Player player) const {
   return rv;
 }
 
-void TinyHanabiState::InformationStateTensor(
-    Player player, std::vector<double>* values) const {
+void TinyHanabiState::InformationStateTensor(Player player,
+                                             std::vector<float>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
@@ -182,7 +182,7 @@ void TinyHanabiState::InformationStateTensor(
 }
 
 void TinyHanabiState::ObservationTensor(Player player,
-                                        std::vector<double>* values) const {
+                                        std::vector<float>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 

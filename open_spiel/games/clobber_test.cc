@@ -23,7 +23,7 @@ namespace {
 
 namespace testing = open_spiel::testing;
 
-double ValueAt(const std::vector<double>& v, const std::vector<int>& shape,
+double ValueAt(const std::vector<float>& v, const std::vector<int>& shape,
                int plane, int x, int y) {
   return v[plane * shape[1] * shape[2] + y * shape[2] + x];
 }
@@ -76,7 +76,7 @@ void ObservationTensorTests() {
       LoadGame("clobber(rows=8,columns=8)");
   std::unique_ptr<State> clobber_state = clobber8x8->NewInitialState();
   auto shape = clobber8x8->ObservationTensorShape();
-  std::vector<double> v;
+  std::vector<float> v;
   clobber_state->ObservationTensor(clobber_state->CurrentPlayer(), &v);
 
   SPIEL_CHECK_EQ(ValueAt(v, shape, 0, 4, 4), 0.0);

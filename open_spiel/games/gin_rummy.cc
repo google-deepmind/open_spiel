@@ -570,7 +570,7 @@ std::string GinRummyState::ObservationString(Player player) const {
   SPIEL_CHECK_LT(player, num_players_);
 
   // Built from ObservationTensor to provide an extra check.
-  std::vector<double> tensor(game_->ObservationTensorSize());
+  std::vector<float> tensor(game_->ObservationTensorSize());
   ObservationTensor(player, &tensor);
   std::vector<int> hand;
   std::vector<int> discard_pile;
@@ -625,7 +625,7 @@ std::string GinRummyState::ObservationString(Player player) const {
 }
 
 void GinRummyState::ObservationTensor(Player player,
-                                      std::vector<double>* values) const {
+                                      std::vector<float>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, kNumPlayers);
 

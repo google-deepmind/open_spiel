@@ -257,18 +257,18 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("information_state_string",
            (std::string(State::*)() const) & State::InformationStateString)
       .def("information_state_tensor",
-           (std::vector<double>(State::*)(int) const) &
+           (std::vector<float>(State::*)(int) const) &
                State::InformationStateTensor)
-      .def("information_state_tensor", (std::vector<double>(State::*)() const) &
+      .def("information_state_tensor", (std::vector<float>(State::*)() const) &
                                            State::InformationStateTensor)
       .def("observation_string",
            (std::string(State::*)(int) const) & State::ObservationString)
       .def("observation_string",
            (std::string(State::*)() const) & State::ObservationString)
-      .def("observation_tensor", (std::vector<double>(State::*)(int) const) &
-                                     State::ObservationTensor)
       .def("observation_tensor",
-           (std::vector<double>(State::*)() const) & State::ObservationTensor)
+           (std::vector<float>(State::*)(int) const) & State::ObservationTensor)
+      .def("observation_tensor",
+           (std::vector<float>(State::*)() const) & State::ObservationTensor)
       .def("public_observation_string",
            (std::string(State::*)() const) & State::PublicObservationString)
       .def("private_observation_string",

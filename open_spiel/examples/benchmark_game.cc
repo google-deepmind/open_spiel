@@ -37,7 +37,7 @@ int RandomSimulation(std::mt19937* rng, const Game& game, bool verbose) {
               << state->ToString() << std::endl;
   }
 
-  std::vector<double> obs;
+  std::vector<float> obs;
   bool provides_info_state = game.GetType().provides_information_state_tensor;
   bool provides_observations = game.GetType().provides_observation_tensor;
 

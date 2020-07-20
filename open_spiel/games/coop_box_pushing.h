@@ -76,7 +76,7 @@ class CoopBoxPushingState : public SimMoveState {
   std::vector<double> Returns() const override;
   std::vector<double> Rewards() const override;
   void ObservationTensor(Player player,
-                         std::vector<double>* values) const override;
+                         std::vector<float>* values) const override;
   std::string ObservationString(Player player) const override;
 
   Player CurrentPlayer() const override {

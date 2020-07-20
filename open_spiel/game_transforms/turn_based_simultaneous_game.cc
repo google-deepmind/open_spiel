@@ -170,7 +170,7 @@ std::string TurnBasedSimultaneousState::InformationStateString(
 }
 
 void TurnBasedSimultaneousState::InformationStateTensor(
-    Player player, std::vector<double>* values) const {
+    Player player, std::vector<float>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
@@ -187,7 +187,7 @@ void TurnBasedSimultaneousState::InformationStateTensor(
   }
 
   // Then get the underlying info set
-  std::vector<double> infoset;
+  std::vector<float> infoset;
   state_->InformationStateTensor(player, &infoset);
 
   int offset = values->size();
@@ -219,7 +219,7 @@ std::string TurnBasedSimultaneousState::ObservationString(Player player) const {
 }
 
 void TurnBasedSimultaneousState::ObservationTensor(
-    Player player, std::vector<double>* values) const {
+    Player player, std::vector<float>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
@@ -236,7 +236,7 @@ void TurnBasedSimultaneousState::ObservationTensor(
   }
 
   // Then get the underlying observation
-  std::vector<double> observation;
+  std::vector<float> observation;
   state_->ObservationTensor(player, &observation);
 
   int offset = values->size();

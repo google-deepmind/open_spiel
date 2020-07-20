@@ -126,7 +126,7 @@ void ShootTheMoonTest() {
 }
 
 std::string InformationStateTensorToString(Player player,
-                                           const std::vector<double>& tensor) {
+                                           const std::vector<float>& tensor) {
   PassDir pass_dir;
   std::array<absl::optional<Player>, kNumCards> dealt_hand;
   std::array<absl::optional<Player>, kNumCards> current_hand;
@@ -274,7 +274,7 @@ void InformationStateTensorTest(int num_games = 100) {
         state->ApplyAction(action);
       } else {
         auto player = state->CurrentPlayer();
-        std::vector<double> infostate;
+        std::vector<float> infostate;
         state->InformationStateTensor(player, &infostate);
 
         std::string infostate_string = state->InformationStateString(player);

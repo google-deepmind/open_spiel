@@ -119,10 +119,10 @@ class TinyHanabiState : public State {
   std::vector<Action> LegalActions() const override;
   std::string InformationStateString(Player player) const override;
   void InformationStateTensor(Player player,
-                              std::vector<double>* values) const override;
+                              std::vector<float>* values) const override;
   std::string ObservationString(Player player) const override;
   void ObservationTensor(Player player,
-                         std::vector<double>* values) const override;
+                         std::vector<float>* values) const override;
 
  private:
   void DoApplyAction(Action action) override;

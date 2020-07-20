@@ -414,15 +414,15 @@ class State {
   //   SPIEL_CHECK_GE(player, 0);
   //   SPIEL_CHECK_LT(player, num_players_);
   virtual void InformationStateTensor(Player player,
-                                      std::vector<double>* values) const {
+                                      std::vector<float>* values) const {
     SpielFatalError("InformationStateTensor unimplemented!");
   }
-  std::vector<double> InformationStateTensor(Player player) const {
-    std::vector<double> normalized_info_state;
-    InformationStateTensor(player, &normalized_info_state);
-    return normalized_info_state;
+  std::vector<float> InformationStateTensor(Player player) const {
+    std::vector<float> info_state;
+    InformationStateTensor(player, &info_state);
+    return info_state;
   }
-  std::vector<double> InformationStateTensor() const {
+  std::vector<float> InformationStateTensor() const {
     return InformationStateTensor(CurrentPlayer());
   }
 
@@ -459,10 +459,10 @@ class State {
   //   SPIEL_CHECK_GE(player, 0);
   //   SPIEL_CHECK_LT(player, num_players_);
   virtual void ObservationTensor(Player player,
-                                 std::vector<double>* values) const {
+                                 std::vector<float>* values) const {
     SpielFatalError("ObservationTensor unimplemented!");
   }
-  std::vector<double> ObservationTensor(Player player) const {
+  std::vector<float> ObservationTensor(Player player) const {
     // We add this player check, to prevent errors if the game implementation
     // lacks that check (in particular as this function is the one used in
     // Python). This can lead to doing this check twice.
@@ -470,11 +470,11 @@ class State {
     // that implement it?
     SPIEL_CHECK_GE(player, 0);
     SPIEL_CHECK_LT(player, num_players_);
-    std::vector<double> normalized_observation;
-    ObservationTensor(player, &normalized_observation);
-    return normalized_observation;
+    std::vector<float> observation;
+    ObservationTensor(player, &observation);
+    return observation;
   }
-  std::vector<double> ObservationTensor() const {
+  std::vector<float> ObservationTensor() const {
     return ObservationTensor(CurrentPlayer());
   }
 

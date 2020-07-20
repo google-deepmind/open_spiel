@@ -147,7 +147,7 @@ std::string CoopTo1pState::ObservationString(Player player) const {
 }
 
 void CoopTo1pState::ObservationTensor(Player player,
-                                      std::vector<double>* values) const {
+                                      std::vector<float>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   const int num_actions = state_->NumDistinctActions();

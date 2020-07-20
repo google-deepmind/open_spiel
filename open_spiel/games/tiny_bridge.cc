@@ -602,7 +602,7 @@ std::string TinyBridgeAuctionState::ObservationString(Player player) const {
 //     and 4 bits showing who redoubled it.
 //     Each set of 4 bits is relative the the current player.
 void TinyBridgeAuctionState::InformationStateTensor(
-    Player player, std::vector<double>* values) const {
+    Player player, std::vector<float>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
@@ -663,7 +663,7 @@ void TinyBridgeAuctionState::InformationStateTensor(
 //   4 bits showing who redoubled it (relative to the observing player)
 //   4 bits for the dealer
 void TinyBridgeAuctionState::ObservationTensor(
-    Player player, std::vector<double>* values) const {
+    Player player, std::vector<float>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 

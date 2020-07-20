@@ -139,7 +139,7 @@ std::string CliffWalkingState::ObservationString(Player player) const {
 }
 
 void CliffWalkingState::ObservationTensor(Player player,
-                                          std::vector<double>* values) const {
+                                          std::vector<float>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   values->resize(height_ * width_);
@@ -148,7 +148,7 @@ void CliffWalkingState::ObservationTensor(Player player,
 }
 
 void CliffWalkingState::InformationStateTensor(
-    Player player, std::vector<double>* values) const {
+    Player player, std::vector<float>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   values->resize(kNumActions * horizon_);

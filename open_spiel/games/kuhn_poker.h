@@ -59,9 +59,9 @@ class KuhnState : public State {
   std::string InformationStateString(Player player) const override;
   std::string ObservationString(Player player) const override;
   void InformationStateTensor(Player player,
-                              std::vector<double>* values) const override;
+                              std::vector<float>* values) const override;
   void ObservationTensor(Player player,
-                         std::vector<double>* values) const override;
+                         std::vector<float>* values) const override;
   std::unique_ptr<State> Clone() const override;
   void UndoAction(Player player, Action move) override;
   std::vector<std::pair<Action, double>> ChanceOutcomes() const override;

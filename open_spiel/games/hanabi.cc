@@ -203,8 +203,8 @@ std::string OpenSpielHanabiState::ObservationString(Player player) const {
   return hanabi_learning_env::HanabiObservation(state_, player).ToString();
 }
 
-void OpenSpielHanabiState::ObservationTensor(
-    Player player, std::vector<double>* values) const {
+void OpenSpielHanabiState::ObservationTensor(Player player,
+                                             std::vector<float>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 

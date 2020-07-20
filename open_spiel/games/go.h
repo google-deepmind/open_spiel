@@ -87,8 +87,7 @@ class GoState : public State {
 
   // Four planes: black, white, empty, and a bias plane of bits indicating komi
   // (whether white is to play).
-  void ObservationTensor(int player,
-                         std::vector<double>* values) const override;
+  void ObservationTensor(int player, std::vector<float>* values) const override;
 
   std::vector<double> Returns() const override;
 

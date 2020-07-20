@@ -55,7 +55,7 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 // and absence of the given piece type and colour at each square.
 void AddPieceTypePlane(Color color, PieceType piece_type,
                        const StandardChessBoard& board,
-                       std::vector<double>* values) {
+                       std::vector<float>* values) {
   for (int8_t y = 0; y < BoardSize(); ++y) {
     for (int8_t x = 0; x < BoardSize(); ++x) {
       Piece piece_on_board = board.at(Square{x, y});
@@ -69,13 +69,13 @@ void AddPieceTypePlane(Color color, PieceType piece_type,
 
 // Adds a uniform scalar plane scaled with min and max.
 template <typename T>
-void AddScalarPlane(T val, T min, T max, std::vector<double>* values) {
+void AddScalarPlane(T val, T min, T max, std::vector<float>* values) {
   double normalized_val = static_cast<double>(val - min) / (max - min);
   values->insert(values->end(), BoardSize() * BoardSize(), normalized_val);
 }
 
 // Adds a binary scalar plane.
-void AddBinaryPlane(bool val, std::vector<double>* values) {
+void AddBinaryPlane(bool val, std::vector<float>* values) {
   AddScalarPlane<int>(val ? 1 : 0, 0, 1, values);
 }
 }  // namespace
@@ -294,7 +294,7 @@ std::string ChessState::ObservationString(Player player) const {
 }
 
 void ChessState::ObservationTensor(Player player,
-                                   std::vector<double>* values) const {
+                                   std::vector<float>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 

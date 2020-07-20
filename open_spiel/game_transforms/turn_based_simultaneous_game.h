@@ -47,10 +47,10 @@ class TurnBasedSimultaneousState : public State {
   std::vector<double> Returns() const override;
   std::string InformationStateString(Player player) const override;
   void InformationStateTensor(Player player,
-                              std::vector<double>* values) const override;
+                              std::vector<float>* values) const override;
   std::string ObservationString(Player player) const override;
   void ObservationTensor(Player player,
-                         std::vector<double>* values) const override;
+                         std::vector<float>* values) const override;
   std::unique_ptr<State> Clone() const override;
   std::vector<std::pair<Action, double>> ChanceOutcomes() const override;
 

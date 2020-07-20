@@ -221,7 +221,7 @@ std::string KuhnState::PrivateObservationString(Player player) const {
 }
 
 void KuhnState::InformationStateTensor(Player player,
-                                       std::vector<double>* values) const {
+                                       std::vector<float>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
@@ -243,7 +243,7 @@ void KuhnState::InformationStateTensor(Player player,
 }
 
 void KuhnState::ObservationTensor(Player player,
-                                  std::vector<double>* values) const {
+                                  std::vector<float>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   // The format is described in ObservationTensorShape

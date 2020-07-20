@@ -189,7 +189,7 @@ std::string UncontestedBiddingState::InformationStateString(
 }
 
 void UncontestedBiddingState::InformationStateTensor(
-    Player player, std::vector<double>* values) const {
+    Player player, std::vector<float>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 

@@ -277,7 +277,7 @@ std::vector<double> LiarsDiceState::Returns() const {
 }
 
 void LiarsDiceState::InformationStateTensor(Player player,
-                                            std::vector<double>* values) const {
+                                            std::vector<float>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
@@ -316,8 +316,8 @@ void LiarsDiceState::InformationStateTensor(Player player,
   }
 }
 
-void LiarsDiceState::ObservationTensor(
-    Player player, std::vector<double>* values) const {
+void LiarsDiceState::ObservationTensor(Player player,
+                                       std::vector<float>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 

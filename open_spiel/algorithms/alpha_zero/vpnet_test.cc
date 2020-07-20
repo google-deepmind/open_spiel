@@ -43,7 +43,7 @@ double SolveState(
   }
 
   bool max_player = state.CurrentPlayer() == 0;
-  std::vector<double> obs = state.ObservationTensor();
+  std::vector<float> obs = state.ObservationTensor();
   std::vector<Action> legal_actions = state.LegalActions();
 
   Action best_action = kInvalidAction;
@@ -108,7 +108,7 @@ void TestModelCreation(const std::string& nn_model) {
 
   std::unique_ptr<open_spiel::State> state = game->NewInitialState();
   std::vector<Action> legal_actions = state->LegalActions();
-  std::vector<double> obs = state->ObservationTensor();
+  std::vector<float> obs = state->ObservationTensor();
   VPNetModel::InferenceInputs inputs = {legal_actions, obs};
 
   // Check that inference runs at all.
@@ -132,7 +132,7 @@ void TestModelLearnsSimple(const std::string& nn_model) {
   std::unique_ptr<open_spiel::State> state = game->NewInitialState();
 
   while (!state->IsTerminal()) {
-    std::vector<double> obs = state->ObservationTensor();
+    std::vector<float> obs = state->ObservationTensor();
     std::vector<Action> legal_actions = state->LegalActions();
     Action action = legal_actions[0];
     ActionsAndProbs policy({{action, 1}});

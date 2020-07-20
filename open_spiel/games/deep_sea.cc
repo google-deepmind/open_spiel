@@ -148,7 +148,7 @@ std::string DeepSeaState::ObservationString(Player player) const {
 }
 
 void DeepSeaState::ObservationTensor(Player player,
-                                     std::vector<double>* values) const {
+                                     std::vector<float>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
@@ -159,7 +159,7 @@ void DeepSeaState::ObservationTensor(Player player,
 }
 
 void DeepSeaState::InformationStateTensor(Player player,
-                                          std::vector<double>* values) const {
+                                          std::vector<float>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 

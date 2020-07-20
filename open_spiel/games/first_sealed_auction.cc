@@ -146,7 +146,7 @@ std::string FPSBAState::InformationStateString(Player player) const {
 }
 
 void FPSBAState::InformationStateTensor(Player player,
-                                        std::vector<double>* values) const {
+                                        std::vector<float>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   values->resize(2 * max_value_ + num_players_);
@@ -173,7 +173,7 @@ std::string FPSBAState::ObservationString(Player player) const {
 }
 
 void FPSBAState::ObservationTensor(Player player,
-                                   std::vector<double>* values) const {
+                                   std::vector<float>* values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   values->resize(max_value_);

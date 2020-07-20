@@ -94,7 +94,7 @@ int main(int argc, char** argv) {
     } else if (state->IsSimultaneousNode()) {
       // open_spiel::Players choose simultaneously?
       std::vector<open_spiel::Action> joint_action;
-      std::vector<double> infostate;
+      std::vector<float> infostate;
 
       // Sample a action for each player
       for (auto player = open_spiel::Player{0}; player < game->NumPlayers();
@@ -129,7 +129,7 @@ int main(int argc, char** argv) {
       auto player = state->CurrentPlayer();
       if (show_infostate) {
         if (game->GetType().provides_information_state_tensor) {
-          std::vector<double> infostate;
+          std::vector<float> infostate;
           state->InformationStateTensor(player, &infostate);
           std::cerr << "player " << player << ": "
                     << absl::StrJoin(infostate, " ") << std::endl;

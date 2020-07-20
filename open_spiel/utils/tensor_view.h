@@ -23,7 +23,7 @@
 
 namespace open_spiel {
 
-// Treat a `std::vector<double>` as a tensor of fixed shape. The rank (number of
+// Treat a `std::vector<float>` as a tensor of fixed shape. The rank (number of
 // dimensions) must be known at compile time, though the actual sizes of the
 // dimensions can be supplied at construction time. It then lets you index into
 // the vector easily without having to compute the 1d-vector's indices manually.
@@ -33,7 +33,7 @@ namespace open_spiel {
 template <int Rank>
 class TensorView {
  public:
-  constexpr TensorView(std::vector<double>* values,
+  constexpr TensorView(std::vector<float>* values,
                        const std::array<int, Rank>& shape, bool reset)
       : values_(values), shape_(shape) {
     if (reset) {
@@ -62,10 +62,10 @@ class TensorView {
     return ind;
   }
 
-  constexpr double& operator[](const std::array<int, Rank>& args) {
+  constexpr float& operator[](const std::array<int, Rank>& args) {
     return (*values_)[index(args)];
   }
-  constexpr const double& operator[](const std::array<int, Rank>& args) const {
+  constexpr const float& operator[](const std::array<int, Rank>& args) const {
     return (*values_)[index(args)];
   }
 
@@ -74,7 +74,7 @@ class TensorView {
   constexpr int shape(int i) const { return shape_[i]; }
 
  private:
-  std::vector<double>* values_;
+  std::vector<float>* values_;
   const std::array<int, Rank> shape_;
 };
 

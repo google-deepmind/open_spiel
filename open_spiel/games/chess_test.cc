@@ -112,13 +112,13 @@ void UndoTests() {
             "rnbqkbnr/pppp1p1p/6P1/4p3/8/8/PPPPP1PP/RNBQKBNR b KQkq - 0 2");
 }
 
-double ValueAt(const std::vector<double>& v, const std::vector<int>& shape,
-               int plane, int x, int y) {
+float ValueAt(const std::vector<float>& v, const std::vector<int>& shape,
+              int plane, int x, int y) {
   return v[plane * shape[1] * shape[2] + y * shape[2] + x];
 }
 
-double ValueAt(const std::vector<double>& v, const std::vector<int>& shape,
-               int plane, const std::string& square) {
+float ValueAt(const std::vector<float>& v, const std::vector<int>& shape,
+              int plane, const std::string& square) {
   Square sq = *SquareFromString(square);
   return ValueAt(v, shape, plane, sq.x, sq.y);
 }
@@ -127,7 +127,7 @@ void ObservationTensorTests() {
   std::shared_ptr<const Game> game = LoadGame("chess");
   ChessState initial_state(game);
   auto shape = game->ObservationTensorShape();
-  std::vector<double> v;
+  std::vector<float> v;
   initial_state.ObservationTensor(initial_state.CurrentPlayer(), &v);
 
   // For each piece type, check one square that's supposed to be occupied, and

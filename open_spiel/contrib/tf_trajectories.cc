@@ -118,7 +118,7 @@ void TFBatchTrajectoryRecorder::FillInputsAndMasks() {
   TensorMap inputs_matrix = tf_inputs_.matrix<float>();
   TensorMap mask_matrix = tf_legal_mask_.matrix<float>();
 
-  std::vector<double> info_state_vector;
+  std::vector<float> info_state_vector;
   for (int b = 0; b < batch_size_; ++b) {
     if (!terminal_flags_[b]) {
       std::vector<int> mask = states_[b]->LegalActionsMask();

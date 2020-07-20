@@ -23,7 +23,7 @@ namespace open_spiel {
 namespace {
 
 void TestTensorView() {
-  std::vector<double> values;
+  std::vector<float> values;
 
   SPIEL_CHECK_EQ(values.size(), 0);
 

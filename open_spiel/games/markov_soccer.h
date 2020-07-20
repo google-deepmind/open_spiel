@@ -79,7 +79,7 @@ class MarkovSoccerState : public SimMoveState {
     return ToString();
   }
   void ObservationTensor(Player player,
-                         std::vector<double>* values) const override;
+                         std::vector<float>* values) const override;
   Player CurrentPlayer() const override {
     return IsTerminal() ? kTerminalPlayerId : cur_player_;
   }

@@ -227,20 +227,20 @@ void CheckReturnsSum(const Game& game, const State& state) {
 // The following functions should return valid outputs for valid player, even
 // on terminal states:
 // - std::string InformationStateString(Player player)
-// - std::vector<double> InformationStateTensor(Player player)
+// - std::vector<float> InformationStateTensor(Player player)
 // - std::string ObservationString(Player player)
-// - std::vector<double> ObservationTensor(Player player)
+// - std::vector<float> ObservationTensor(Player player)
 //
 // These functions should crash on invalid players: this is tested in
 // api_test.py as it's simpler to catch the error from Python.
 void CheckObservables(const Game& game, const State& state) {
   for (auto p = Player{0}; p < game.NumPlayers(); ++p) {
     if (game.GetType().provides_information_state_tensor) {
-      std::vector<double> v = state.InformationStateTensor(p);
+      std::vector<float> v = state.InformationStateTensor(p);
       SPIEL_CHECK_EQ(v.size(), game.InformationStateTensorSize());
     }
     if (game.GetType().provides_observation_tensor) {
-      std::vector<double> v = state.ObservationTensor(p);
+      std::vector<float> v = state.ObservationTensor(p);
       SPIEL_CHECK_EQ(v.size(), game.ObservationTensorSize());
     }
     if (game.GetType().provides_information_state_string) {

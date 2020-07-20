@@ -90,8 +90,7 @@ class LaserTagState : public SimMoveState {
     SPIEL_CHECK_LT(player, num_players_);
     return ToString();
   }
-  void ObservationTensor(int player,
-                         std::vector<double>* values) const override;
+  void ObservationTensor(int player, std::vector<float>* values) const override;
   int CurrentPlayer() const override {
     return IsTerminal() ? kTerminalPlayerId : cur_player_;
   }

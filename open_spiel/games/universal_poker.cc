@@ -241,7 +241,7 @@ std::vector<double> UniversalPokerState::Returns() const {
 }
 
 void UniversalPokerState::InformationStateTensor(
-    Player player, std::vector<double> *values) const {
+    Player player, std::vector<float> *values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
@@ -316,7 +316,7 @@ void UniversalPokerState::InformationStateTensor(
 }
 
 void UniversalPokerState::ObservationTensor(Player player,
-                                            std::vector<double> *values) const {
+                                            std::vector<float> *values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, NumPlayers());
 
