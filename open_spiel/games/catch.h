@@ -69,12 +69,9 @@ class CatchState : public State {
   std::string ToString() const override;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
-  std::string InformationStateString(Player player) const override;
   std::string ObservationString(Player player) const override;
   void ObservationTensor(Player player,
                          std::vector<double>* values) const override;
-  void InformationStateTensor(Player player,
-                              std::vector<double>* values) const override;
   std::unique_ptr<State> Clone() const override;
   void UndoAction(Player player, Action move) override;
   std::vector<Action> LegalActions() const override;
@@ -105,9 +102,6 @@ class CatchGame : public Game {
   }
   std::vector<int> ObservationTensorShape() const override {
     return {num_rows_, num_columns_};
-  }
-  std::vector<int> InformationStateTensorShape() const override {
-    return {num_columns_ + kNumActions * num_rows_};
   }
 
   int NumDistinctActions() const override { return kNumActions; }
