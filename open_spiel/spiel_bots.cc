@@ -103,7 +103,7 @@ class StatefulRandomBot : public UniformRandomBot {
 
 class PolicyBot : public Bot {
  public:
-  PolicyBot(int seed, std::unique_ptr<Policy> policy)
+  PolicyBot(int seed, std::shared_ptr<Policy> policy)
       : Bot(), rng_(seed), policy_(std::move(policy)) {}
   ~PolicyBot() = default;
 
@@ -124,7 +124,7 @@ class PolicyBot : public Bot {
 
  private:
   std::mt19937 rng_;
-  std::unique_ptr<Policy> policy_;
+  std::shared_ptr<Policy> policy_;
 };
 
 class FixedActionPreferenceBot : public Bot {
@@ -170,7 +170,7 @@ std::unique_ptr<Bot> MakeUniformRandomBot(Player player_id, int seed) {
 
 // A bot that samples from a policy.
 std::unique_ptr<Bot> MakePolicyBot(const Game& game, Player player_id, int seed,
-                                   std::unique_ptr<Policy> policy) {
+                                   std::shared_ptr<Policy> policy) {
   return std::make_unique<PolicyBot>(seed, std::move(policy));
 }
 // A bot with a fixed action preference, for test purposes.

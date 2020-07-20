@@ -153,7 +153,7 @@ std::unique_ptr<Bot> MakeStatefulRandomBot(const Game& game, Player player_id,
 
 // A bot that samples from a policy.
 std::unique_ptr<Bot> MakePolicyBot(const Game& game, Player player_id, int seed,
-                                   std::unique_ptr<Policy> policy);
+                                   std::shared_ptr<Policy> policy);
 
 // A bot with a fixed action preference, for test purposes.
 // Picks the first legal action found in the list of actions.

@@ -366,7 +366,7 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod) {
       .method("num_distinct_actions", &open_spiel::Game::NumDistinctActions)
       .method("new_initial_state",
               [](open_spiel::Game& g) { return g.NewInitialState(); })
-      .method("new_initial_state",
+      .method("new_initial_state_from_string",
               [](open_spiel::Game& g, const std::string& s) {
                 return g.NewInitialState(s);
               })
