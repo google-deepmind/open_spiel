@@ -139,21 +139,21 @@ std::string CliffWalkingState::ObservationString(Player player) const {
 }
 
 void CliffWalkingState::ObservationTensor(Player player,
-                                          std::vector<float>* values) const {
+                                          absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
-  values->resize(height_ * width_);
-  std::fill(values->begin(), values->end(), 0.);
-  (*values)[player_row_ * width_ + player_col_] = 1.0;
+  SPIEL_CHECK_EQ(values.size(), height_ * width_);
+  std::fill(values.begin(), values.end(), 0.);
+  values[player_row_ * width_ + player_col_] = 1.0;
 }
 
-void CliffWalkingState::InformationStateTensor(
-    Player player, std::vector<float>* values) const {
+void CliffWalkingState::InformationStateTensor(Player player,
+                                               absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
-  values->resize(kNumActions * horizon_);
+  SPIEL_CHECK_EQ(values.size(), kNumActions * horizon_);
   for (int i = 0; i < history_.size(); i++) {
-    (*values)[i * kNumActions + history_[i].action] = 1;
+    values[i * kNumActions + history_[i].action] = 1;
   }
 }
 

@@ -60,8 +60,8 @@ void GetAllStatesTest() {
 
   // Verify normalized observation matches string represtation.
   for (const auto& pair : states) {
-    std::vector<float> obs;
-    pair.second->ObservationTensor(0, &obs);
+    std::vector<float> obs(catch_game->ObservationTensorSize());
+    pair.second->ObservationTensor(0, absl::MakeSpan(obs));
     const std::string& str = pair.first;
     SPIEL_CHECK_EQ(obs.size(), str.size() - kDefaultRows);
     for (int i = 0; i < obs.size(); i++) {

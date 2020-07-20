@@ -384,7 +384,7 @@ std::string ClobberState::ObservationString(Player player) const {
 }
 
 void ClobberState::ObservationTensor(Player player,
-                                     std::vector<float>* values) const {
+                                     absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 

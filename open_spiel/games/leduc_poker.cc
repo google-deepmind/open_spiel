@@ -370,12 +370,12 @@ std::string LeducState::ObservationString(Player player) const {
 }
 
 void LeducState::InformationStateTensor(Player player,
-                                        std::vector<float>* values) const {
+                                        absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  values->resize(game_->InformationStateTensorShape()[0]);
-  std::fill(values->begin(), values->end(), 0.);
+  SPIEL_CHECK_EQ(values.size(), game_->InformationStateTensorShape()[0]);
+  std::fill(values.begin(), values.end(), 0.);
 
   // Layout of observation:
   //   my player number: num_players bits
@@ -387,11 +387,11 @@ void LeducState::InformationStateTensor(Player player,
   int offset = 0;
 
   // Mark who I am.
-  (*values)[player] = 1;
+  values[player] = 1;
   offset += num_players_;
 
   if (private_cards_[player] >= 0) {
-    (*values)[offset + private_cards_[player]] = 1;
+    values[offset + private_cards_[player]] = 1;
   }
   if (suit_isomorphism_) {
     offset += deck_.size() / 2;
@@ -400,7 +400,7 @@ void LeducState::InformationStateTensor(Player player,
   }
 
   if (public_card_ >= 0) {
-    (*values)[offset + public_card_] = 1;
+    values[offset + public_card_] = 1;
   }
   if (suit_isomorphism_) {
     offset += deck_.size() / 2;
@@ -413,19 +413,19 @@ void LeducState::InformationStateTensor(Player player,
         (r == 1 ? round1_sequence_ : round2_sequence_);
 
     for (int i = 0; i < round_sequence.size(); ++i) {
-      SPIEL_CHECK_LT(offset + i + 1, values->size());
+      SPIEL_CHECK_LT(offset + i + 1, values.size());
       if (round_sequence[i] == ActionType::kCall) {
         // Encode call as 10.
-        (*values)[offset + (2 * i)] = 1;
-        (*values)[offset + (2 * i) + 1] = 0;
+        values[offset + (2 * i)] = 1;
+        values[offset + (2 * i) + 1] = 0;
       } else if (round_sequence[i] == ActionType::kRaise) {
         // Encode raise as 01.
-        (*values)[offset + (2 * i)] = 0;
-        (*values)[offset + (2 * i) + 1] = 1;
+        values[offset + (2 * i)] = 0;
+        values[offset + (2 * i) + 1] = 1;
       } else {
         // Encode fold as 00.
-        (*values)[offset + (2 * i)] = 0;
-        (*values)[offset + (2 * i) + 1] = 0;
+        values[offset + (2 * i)] = 0;
+        values[offset + (2 * i) + 1] = 0;
       }
     }
 
@@ -435,12 +435,12 @@ void LeducState::InformationStateTensor(Player player,
 }
 
 void LeducState::ObservationTensor(Player player,
-                                   std::vector<float>* values) const {
+                                   absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  values->resize(game_->ObservationTensorShape()[0]);
-  std::fill(values->begin(), values->end(), 0.);
+  SPIEL_CHECK_EQ(values.size(), game_->ObservationTensorShape()[0]);
+  std::fill(values.begin(), values.end(), 0.);
 
   // Layout of observation:
   //   my player number: num_players bits
@@ -451,11 +451,11 @@ void LeducState::ObservationTensor(Player player,
   int offset = 0;
 
   // Mark who I am.
-  (*values)[player] = 1;
+  values[player] = 1;
   offset += num_players_;
 
   if (private_cards_[player] >= 0) {
-    (*values)[offset + private_cards_[player]] = 1;
+    values[offset + private_cards_[player]] = 1;
   }
   if (suit_isomorphism_) {
     offset += deck_.size() / 2;
@@ -464,7 +464,7 @@ void LeducState::ObservationTensor(Player player,
   }
 
   if (public_card_ >= 0) {
-    (*values)[offset + public_card_] = 1;
+    values[offset + public_card_] = 1;
   }
   if (suit_isomorphism_) {
     offset += deck_.size() / 2;
@@ -474,7 +474,7 @@ void LeducState::ObservationTensor(Player player,
 
   // Adding the contribution of each players to the pot.
   for (auto p = Player{0}; p < num_players_; p++) {
-    (*values)[offset + p] = ante_[p];
+    values[offset + p] = ante_[p];
   }
 }
 

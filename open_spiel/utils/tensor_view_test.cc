@@ -25,9 +25,8 @@ namespace {
 void TestTensorView() {
   std::vector<float> values;
 
-  SPIEL_CHECK_EQ(values.size(), 0);
-
-  TensorView<2> view2(&values, {2, 3}, true);
+  values.resize(6);
+  TensorView<2> view2(absl::MakeSpan(values), {2, 3}, true);
   SPIEL_CHECK_EQ(view2.size(), 6);
   SPIEL_CHECK_EQ(values.size(), 6);
   SPIEL_CHECK_EQ(view2.rank(), 2);
@@ -64,7 +63,8 @@ void TestTensorView() {
   }
 
   // Works for more dimensions
-  TensorView<3> view3(&values, {4, 2, 3}, true);
+  values.resize(24);
+  TensorView<3> view3(absl::MakeSpan(values), {4, 2, 3}, true);
   SPIEL_CHECK_EQ(view3.size(), 24);
   SPIEL_CHECK_EQ(values.size(), 24);
   SPIEL_CHECK_EQ(view3.rank(), 3);
@@ -96,7 +96,8 @@ void TestTensorView() {
   }
 
   // Works for a single dimension
-  TensorView<1> view1(&values, {8}, true);
+  values.resize(8);
+  TensorView<1> view1(absl::MakeSpan(values), {8}, true);
   SPIEL_CHECK_EQ(view1.size(), 8);
   SPIEL_CHECK_EQ(values.size(), 8);
   SPIEL_CHECK_EQ(view1.rank(), 1);
@@ -117,7 +118,7 @@ void TestTensorView() {
   }
 
   // Keeps the previous values.
-  TensorView<2> view_keep(&values, {2, 4}, false);
+  TensorView<2> view_keep(absl::MakeSpan(values), {2, 4}, false);
   SPIEL_CHECK_EQ(view_keep.size(), 8);
   SPIEL_CHECK_EQ(values.size(), 8);
   SPIEL_CHECK_EQ(view_keep.rank(), 2);

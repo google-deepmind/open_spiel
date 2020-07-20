@@ -326,7 +326,7 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod) {
               })
       .method("information_state_as_normalized_vector",
               [](open_spiel::State& s, open_spiel::Player p,
-                 std::vector<double> data) {
+                 std::vector<float> data) {
                 return s.InformationStateTensor(p, &data);
               })
       .method("observation_string",
@@ -340,11 +340,6 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod) {
       .method("observation_tensor",
               [](open_spiel::State& s, open_spiel::Player p) {
                 return s.ObservationTensor(p);
-              })
-      .method("observation_tensor",
-              [](open_spiel::State& s, open_spiel::Player p,
-                 std::vector<double> data) {
-                return s.ObservationTensor(p, &data);
               })
       .method("public_observation_string",
               [](open_spiel::State& s) { return s.PublicObservationString(); })

@@ -324,7 +324,7 @@ std::string BreakthroughState::ObservationString(Player player) const {
 }
 
 void BreakthroughState::ObservationTensor(Player player,
-                                          std::vector<float>* values) const {
+                                          absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 

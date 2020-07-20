@@ -279,9 +279,9 @@ std::string BridgeState::FormatResult() const {
 }
 
 void BridgeState::ObservationTensor(Player player,
-                                    std::vector<float>* values) const {
-  values->resize(game_->ObservationTensorSize());
-  WriteObservationTensor(player, absl::MakeSpan(*values));
+                                    absl::Span<float> values) const {
+  SPIEL_CHECK_EQ(values.size(), game_->ObservationTensorSize());
+  WriteObservationTensor(player, values);
 }
 
 void BridgeState::WriteObservationTensor(Player player,

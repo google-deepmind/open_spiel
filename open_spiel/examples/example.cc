@@ -94,14 +94,14 @@ int main(int argc, char** argv) {
     } else if (state->IsSimultaneousNode()) {
       // open_spiel::Players choose simultaneously?
       std::vector<open_spiel::Action> joint_action;
-      std::vector<float> infostate;
+      std::vector<float> infostate(game->InformationStateTensorSize());
 
       // Sample a action for each player
       for (auto player = open_spiel::Player{0}; player < game->NumPlayers();
            ++player) {
         if (show_infostate) {
           if (game->GetType().provides_information_state_tensor) {
-            state->InformationStateTensor(player, &infostate);
+            state->InformationStateTensor(player, absl::MakeSpan(infostate));
             std::cerr << "player " << player << ": "
                       << absl::StrJoin(infostate, " ") << std::endl;
           }
@@ -130,7 +130,7 @@ int main(int argc, char** argv) {
       if (show_infostate) {
         if (game->GetType().provides_information_state_tensor) {
           std::vector<float> infostate;
-          state->InformationStateTensor(player, &infostate);
+          state->InformationStateTensor(player, absl::MakeSpan(infostate));
           std::cerr << "player " << player << ": "
                     << absl::StrJoin(infostate, " ") << std::endl;
         }

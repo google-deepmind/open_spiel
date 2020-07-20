@@ -270,7 +270,7 @@ class StonesNGemsState : public State {
   std::string ObservationString(Player player) const override;
   std::string Serialize() const override;
   void ObservationTensor(Player player,
-                         std::vector<float>* values) const override;
+                         absl::Span<float> values) const override;
 
   std::unique_ptr<State> Clone() const override;
 

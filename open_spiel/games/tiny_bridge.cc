@@ -602,7 +602,7 @@ std::string TinyBridgeAuctionState::ObservationString(Player player) const {
 //     and 4 bits showing who redoubled it.
 //     Each set of 4 bits is relative the the current player.
 void TinyBridgeAuctionState::InformationStateTensor(
-    Player player, std::vector<float>* values) const {
+    Player player, absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
@@ -610,21 +610,21 @@ void TinyBridgeAuctionState::InformationStateTensor(
   const int auction_size = (num_players_ == 2)
                                ? kNumActions2p * num_players_
                                : num_players_ + kNumBids * num_players_ * 3;
-  std::fill(values->begin(), values->end(), 0);
-  values->resize(hand_size + auction_size);
+  std::fill(values.begin(), values.end(), 0);
+  SPIEL_CHECK_EQ(values.size(), hand_size + auction_size);
   if (IsDealt(player)) {
     if (is_abstracted_) {
       const int abstraction = ChanceOutcomeToHandAbstraction(actions_[player]);
-      values->at(abstraction) = 1;
+      values.at(abstraction) = 1;
     } else {
       const auto cards = ChanceOutcomeToCards(actions_[player]);
-      values->at(cards.first) = 1;
-      values->at(cards.second) = 1;
+      values.at(cards.first) = 1;
+      values.at(cards.second) = 1;
     }
   }
   if (num_players_ == 2) {
     for (int i = num_players_; i < actions_.size(); ++i) {
-      values->at(hand_size + actions_[i] * 2 + (i - player) % num_players_) = 1;
+      values.at(hand_size + actions_[i] * 2 + (i - player) % num_players_) = 1;
     }
   } else {
     auto last_bid = Call::kPass;
@@ -633,20 +633,20 @@ void TinyBridgeAuctionState::InformationStateTensor(
       int bidder = RelativeSeatIndex(Seat(i % num_players_), observer);
       if (actions_[i] == Call::kPass) {
         if (last_bid == Call::kPass) {
-          values->at(hand_size + bidder) = 1;
+          values.at(hand_size + bidder) = 1;
         }
       } else if (actions_[i] == Call::kDouble) {
-        values->at(hand_size + num_players_ +
-                   (last_bid - 1) * (3 * num_players_) + bidder) = 1;
+        values.at(hand_size + num_players_ +
+                  (last_bid - 1) * (3 * num_players_) + bidder) = 1;
       } else if (actions_[i] == Call::kRedouble) {
-        values->at(hand_size + num_players_ +
-                   (last_bid - 1) * (3 * num_players_) + num_players_ +
-                   bidder) = 1;
+        values.at(hand_size + num_players_ +
+                  (last_bid - 1) * (3 * num_players_) + num_players_ + bidder) =
+            1;
       } else {
         last_bid = Call(actions_[i]);
-        values->at(hand_size + num_players_ +
-                   (last_bid - 1) * (3 * num_players_) + num_players_ * 2 +
-                   bidder) = 1;
+        values.at(hand_size + num_players_ +
+                  (last_bid - 1) * (3 * num_players_) + num_players_ * 2 +
+                  bidder) = 1;
       }
     }
   }
@@ -662,45 +662,45 @@ void TinyBridgeAuctionState::InformationStateTensor(
 //   4 bits showing who doubled it (relative to the observing player)
 //   4 bits showing who redoubled it (relative to the observing player)
 //   4 bits for the dealer
-void TinyBridgeAuctionState::ObservationTensor(
-    Player player, std::vector<float>* values) const {
+void TinyBridgeAuctionState::ObservationTensor(Player player,
+                                               absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
   const int hand_size = is_abstracted_ ? kNumAbstractHands : kDeckSize;
   const int auction_size =
       num_players_ == 2 ? kNumActions2p : kNumBids + 4 * num_players_;
-  std::fill(values->begin(), values->end(), 0);
-  values->resize(hand_size + auction_size);
+  std::fill(values.begin(), values.end(), 0);
+  SPIEL_CHECK_EQ(values.size(), hand_size + auction_size);
   if (IsDealt(player)) {
     if (is_abstracted_) {
       const int abstraction = ChanceOutcomeToHandAbstraction(actions_[player]);
-      values->at(abstraction) = 1;
+      values.at(abstraction) = 1;
     } else {
       const auto cards = ChanceOutcomeToCards(actions_[player]);
-      values->at(cards.first) = 1;
-      values->at(cards.second) = 1;
+      values.at(cards.first) = 1;
+      values.at(cards.second) = 1;
     }
   }
   if (num_players_ == 2) {
     if (HasAuctionStarted()) {
-      values->at(hand_size + actions_.back()) = 1;
+      values.at(hand_size + actions_.back()) = 1;
     }
   } else {
     auto state = AnalyzeAuction();
     auto seat = PlayerToSeat(player);
     if (state.last_bidder != kInvalidSeat)
-      values->at(hand_size + RelativeSeatIndex(state.last_bidder, seat)) = 1;
+      values.at(hand_size + RelativeSeatIndex(state.last_bidder, seat)) = 1;
     if (state.doubler != kInvalidSeat)
-      values->at(hand_size + kNumSeats +
-                 RelativeSeatIndex(state.doubler, seat)) = 1;
+      values.at(hand_size + kNumSeats +
+                RelativeSeatIndex(state.doubler, seat)) = 1;
     if (state.redoubler != kInvalidSeat)
-      values->at(hand_size + kNumSeats * 2 +
-                 RelativeSeatIndex(state.redoubler, seat)) = 1;
-    values->at(hand_size + kNumSeats * 3 +
-               RelativeSeatIndex(Seat::kWest, seat)) = 1;
+      values.at(hand_size + kNumSeats * 2 +
+                RelativeSeatIndex(state.redoubler, seat)) = 1;
+    values.at(hand_size + kNumSeats * 3 +
+              RelativeSeatIndex(Seat::kWest, seat)) = 1;
     if (state.last_bidder != kInvalidSeat)
-      values->at(hand_size + kNumSeats * 4 + state.last_bid - 1) = 1;
+      values.at(hand_size + kNumSeats * 4 + state.last_bid - 1) = 1;
   }
 }
 

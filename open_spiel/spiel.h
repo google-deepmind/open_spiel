@@ -30,6 +30,7 @@
 #include "open_spiel/abseil-cpp/absl/random/bit_gen_ref.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "open_spiel/abseil-cpp/absl/types/span.h"
 #include "open_spiel/fog/fog_constants.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel_globals.h"
@@ -414,17 +415,15 @@ class State {
   //   SPIEL_CHECK_GE(player, 0);
   //   SPIEL_CHECK_LT(player, num_players_);
   virtual void InformationStateTensor(Player player,
-                                      std::vector<float>* values) const {
+                                      absl::Span<float> values) const {
     SpielFatalError("InformationStateTensor unimplemented!");
   }
-  std::vector<float> InformationStateTensor(Player player) const {
-    std::vector<float> info_state;
-    InformationStateTensor(player, &info_state);
-    return info_state;
-  }
+  std::vector<float> InformationStateTensor(Player player) const;
   std::vector<float> InformationStateTensor() const {
     return InformationStateTensor(CurrentPlayer());
   }
+  virtual void InformationStateTensor(Player player,
+                                      std::vector<float>* values) const;
 
   // We have functions for observations which are parallel to those for
   // information states. An observation should have the following properties:
@@ -459,24 +458,14 @@ class State {
   //   SPIEL_CHECK_GE(player, 0);
   //   SPIEL_CHECK_LT(player, num_players_);
   virtual void ObservationTensor(Player player,
-                                 std::vector<float>* values) const {
+                                 absl::Span<float> values) const {
     SpielFatalError("ObservationTensor unimplemented!");
   }
-  std::vector<float> ObservationTensor(Player player) const {
-    // We add this player check, to prevent errors if the game implementation
-    // lacks that check (in particular as this function is the one used in
-    // Python). This can lead to doing this check twice.
-    // TODO(author2): Do we want to prevent executing this twice for games
-    // that implement it?
-    SPIEL_CHECK_GE(player, 0);
-    SPIEL_CHECK_LT(player, num_players_);
-    std::vector<float> observation;
-    ObservationTensor(player, &observation);
-    return observation;
-  }
+  std::vector<float> ObservationTensor(Player player) const;
   std::vector<float> ObservationTensor() const {
     return ObservationTensor(CurrentPlayer());
   }
+  void ObservationTensor(Player player, std::vector<float>* values) const;
 
   // The public / private observations factorize observations into their
   // (mostly) non-overlapping public and private parts (they overlap only for

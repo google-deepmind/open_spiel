@@ -516,7 +516,7 @@ int CoopBoxPushingState::ObservationPlane(std::pair<int, int> coord,
 }
 
 void CoopBoxPushingState::ObservationTensor(Player player,
-                                            std::vector<float>* values) const {
+                                            absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   if (fully_observable_) {
@@ -530,10 +530,10 @@ void CoopBoxPushingState::ObservationTensor(Player player,
       }
     }
   } else {
-    values->resize(kNumObservations);
-    std::fill(values->begin(), values->end(), 0);
+    SPIEL_CHECK_EQ(values.size(), kNumObservations);
+    std::fill(values.begin(), values.end(), 0);
     ObservationType obs = PartialObservation(player);
-    (*values)[obs] = 1;
+    values[obs] = 1;
   }
 }
 

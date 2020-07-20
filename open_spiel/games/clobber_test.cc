@@ -76,8 +76,7 @@ void ObservationTensorTests() {
       LoadGame("clobber(rows=8,columns=8)");
   std::unique_ptr<State> clobber_state = clobber8x8->NewInitialState();
   auto shape = clobber8x8->ObservationTensorShape();
-  std::vector<float> v;
-  clobber_state->ObservationTensor(clobber_state->CurrentPlayer(), &v);
+  auto v = clobber_state->ObservationTensor(clobber_state->CurrentPlayer());
 
   SPIEL_CHECK_EQ(ValueAt(v, shape, 0, 4, 4), 0.0);
   SPIEL_CHECK_EQ(ValueAt(v, shape, 0, 5, 6), 1.0);
@@ -102,7 +101,8 @@ void ObservationTensorTests() {
     return;
   }
 
-  clobber_state->ObservationTensor(clobber_state->CurrentPlayer(), &v);
+  clobber_state->ObservationTensor(clobber_state->CurrentPlayer(),
+                                   absl::MakeSpan(v));
 
   SPIEL_CHECK_EQ(ValueAt(v, shape, 0, 7, 2), 0.0);
   SPIEL_CHECK_EQ(ValueAt(v, shape, 0, 4, 6), 1.0);

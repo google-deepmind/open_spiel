@@ -160,7 +160,7 @@ std::string CatchState::ObservationString(Player player) const {
 }
 
 void CatchState::ObservationTensor(Player player,
-                                   std::vector<float>* values) const {
+                                   absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
@@ -172,18 +172,17 @@ void CatchState::ObservationTensor(Player player,
 }
 
 void CatchState::InformationStateTensor(Player player,
-                                        std::vector<float>* values) const {
+                                        absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  values->resize(num_columns_ + kNumActions * num_rows_);
-  std::fill(values->begin(), values->end(), 0.);
+  SPIEL_CHECK_EQ(values.size(), num_columns_ + kNumActions * num_rows_);
+  std::fill(values.begin(), values.end(), 0.);
   if (initialized_) {
-    (*values)[ball_col_] = 1;
+    values[ball_col_] = 1;
     int offset = history_.size() - ball_row_ - 1;
     for (int i = 0; i < ball_row_; i++) {
-      (*values)[num_columns_ + i * kNumActions + history_[offset + i].action] =
-          1;
+      values[num_columns_ + i * kNumActions + history_[offset + i].action] = 1;
     }
   }
 }

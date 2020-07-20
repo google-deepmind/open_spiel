@@ -19,32 +19,23 @@
 #include <numeric>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/types/span.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
 
-// Treat a `std::vector<float>` as a tensor of fixed shape. The rank (number of
+// Treat a `absl::Span<float>` as a tensor of fixed shape. The rank (number of
 // dimensions) must be known at compile time, though the actual sizes of the
 // dimensions can be supplied at construction time. It then lets you index into
 // the vector easily without having to compute the 1d-vector's indices manually.
-// Given the common use case is to fill the observations in
-// ObservationTensor and InformationStateTensor it offers a way to resize and
-// clear the vector to match the specified shape at construction.
 template <int Rank>
 class TensorView {
  public:
-  constexpr TensorView(std::vector<float>* values,
+  constexpr TensorView(absl::Span<float> values,
                        const std::array<int, Rank>& shape, bool reset)
       : values_(values), shape_(shape) {
-    if (reset) {
-      int old_size = values_->size();
-      int new_size = size();
-      values_->resize(new_size, 0.0);
-      std::fill(values_->begin(),
-                values_->begin() + std::min(old_size, new_size), 0.0);
-    } else {
-      SPIEL_CHECK_EQ(size(), values_->size());
-    }
+    SPIEL_CHECK_EQ(size(), values_.size());
+    if (reset) std::fill(values.begin(), values.end(), 0);
   }
 
   constexpr int size() const {
@@ -52,7 +43,7 @@ class TensorView {
                            std::multiplies<int>());
   }
 
-  void clear() { std::fill(values_->begin(), values_->end(), 0.0); }
+  void clear() { std::fill(values_.begin(), values_.end(), 0.0); }
 
   constexpr int index(const std::array<int, Rank>& args) const {
     int ind = 0;
@@ -63,10 +54,10 @@ class TensorView {
   }
 
   constexpr float& operator[](const std::array<int, Rank>& args) {
-    return (*values_)[index(args)];
+    return values_[index(args)];
   }
   constexpr const float& operator[](const std::array<int, Rank>& args) const {
-    return (*values_)[index(args)];
+    return values_[index(args)];
   }
 
   constexpr int rank() const { return Rank; }
@@ -74,7 +65,7 @@ class TensorView {
   constexpr int shape(int i) const { return shape_[i]; }
 
  private:
-  std::vector<float>* values_;
+  absl::Span<float> values_;
   const std::array<int, Rank> shape_;
 };
 

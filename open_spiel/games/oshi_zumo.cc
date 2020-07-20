@@ -206,25 +206,25 @@ std::string OshiZumoState::ObservationString(Player player) const {
 }
 
 void OshiZumoState::ObservationTensor(Player player,
-                                      std::vector<float>* values) const {
+                                      absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  values->resize(parent_game_.ObservationTensorShape()[0]);
-  std::fill(values->begin(), values->end(), 0.);
+  SPIEL_CHECK_EQ(values.size(), parent_game_.ObservationTensorShape()[0]);
+  std::fill(values.begin(), values.end(), 0.);
 
   // 1 bit per coin value of player 1. { 0, 1, ... , starting_coins_ }
   // 1 bit per coin value of player 2. { 0, 1, ... , starting_coins_ }
   // 1 bit per position of the field. { 0, 1, ... , 2*size_+2 }
 
   int offset = 0;
-  (*values)[offset + coins_[0]] = 1;
+  values[offset + coins_[0]] = 1;
 
   offset += (starting_coins_ + 1);
-  (*values)[offset + coins_[1]] = 1;
+  values[offset + coins_[1]] = 1;
 
   offset += (starting_coins_ + 1);
-  (*values)[offset + wrestler_pos_] = 1;
+  values[offset + wrestler_pos_] = 1;
 }
 
 std::unique_ptr<State> OshiZumoState::Clone() const {

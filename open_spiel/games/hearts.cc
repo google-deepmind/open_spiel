@@ -237,14 +237,14 @@ std::string HeartsState::FormatPoints() const {
 }
 
 void HeartsState::InformationStateTensor(Player player,
-                                         std::vector<float>* values) const {
+                                         absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  std::fill(values->begin(), values->end(), 0.0);
-  values->resize(game_->InformationStateTensorSize());
+  std::fill(values.begin(), values.end(), 0.0);
+  SPIEL_CHECK_EQ(values.size(), kInformationStateTensorSize);
   if (phase_ != Phase::kPass && phase_ != Phase::kPlay) return;
-  auto ptr = values->begin();
+  auto ptr = values.begin();
   // Pass direction
   ptr[static_cast<int>(pass_dir_)] = 1;
   ptr += kNumPlayers;
@@ -301,8 +301,7 @@ void HeartsState::InformationStateTensor(Player player,
   ptr += (kNumPlayers - std::max(leader, 0) - 1) * kNumCards;
   // Skip over unplayed tricks.
   ptr += (kNumTricks - current_trick - 1) * kTrickTensorSize;
-  SPIEL_CHECK_EQ(std::distance(values->begin(), ptr),
-                 kInformationStateTensorSize);
+  SPIEL_CHECK_EQ(ptr, values.end());
 }
 
 std::vector<Action> HeartsState::LegalActions() const {

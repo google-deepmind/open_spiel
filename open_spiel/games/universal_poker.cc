@@ -241,12 +241,12 @@ std::vector<double> UniversalPokerState::Returns() const {
 }
 
 void UniversalPokerState::InformationStateTensor(
-    Player player, std::vector<float> *values) const {
+    Player player, absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  values->resize(game_->InformationStateTensorShape()[0]);
-  std::fill(values->begin(), values->end(), 0.);
+  SPIEL_CHECK_EQ(values.size(), game_->InformationStateTensorShape()[0]);
+  std::fill(values.begin(), values.end(), 0.);
 
   // Layout of observation:
   //   my player number: num_players bits
@@ -257,7 +257,7 @@ void UniversalPokerState::InformationStateTensor(
   int offset = 0;
 
   // Mark who I am.
-  (*values)[player] = 1;
+  values[player] = 1;
   offset += NumPlayers();
 
   const logic::CardSet full_deck(acpc_game_->NumSuitsDeck(),
@@ -269,13 +269,13 @@ void UniversalPokerState::InformationStateTensor(
   // TODO(author2): it should be way more efficient to iterate over the cards
   // of the player, rather than iterating over all the cards.
   for (uint32_t i = 0; i < full_deck.NumCards(); i++) {
-    (*values)[i + offset] = holeCards.ContainsCards(deckCards[i]) ? 1.0 : 0.0;
+    values[i + offset] = holeCards.ContainsCards(deckCards[i]) ? 1.0 : 0.0;
   }
   offset += full_deck.NumCards();
 
   // Public cards
   for (int i = 0; i < full_deck.NumCards(); ++i) {
-    (*values)[i + offset] = boardCards.ContainsCards(deckCards[i]) ? 1.0 : 0.0;
+    values[i + offset] = boardCards.ContainsCards(deckCards[i]) ? 1.0 : 0.0;
   }
   offset += full_deck.NumCards();
 
@@ -284,27 +284,27 @@ void UniversalPokerState::InformationStateTensor(
   SPIEL_CHECK_LT(length, game_->MaxGameLength());
 
   for (int i = 0; i < length; ++i) {
-    SPIEL_CHECK_LT(offset + i + 1, values->size());
+    SPIEL_CHECK_LT(offset + i + 1, values.size());
     if (actionSeq[i] == 'c') {
       // Encode call as 10.
-      (*values)[offset + (2 * i)] = 1;
-      (*values)[offset + (2 * i) + 1] = 0;
+      values[offset + (2 * i)] = 1;
+      values[offset + (2 * i) + 1] = 0;
     } else if (actionSeq[i] == 'p') {
       // Encode raise as 01.
-      (*values)[offset + (2 * i)] = 0;
-      (*values)[offset + (2 * i) + 1] = 1;
+      values[offset + (2 * i)] = 0;
+      values[offset + (2 * i) + 1] = 1;
     } else if (actionSeq[i] == 'a') {
       // Encode raise as 01.
-      (*values)[offset + (2 * i)] = 1;
-      (*values)[offset + (2 * i) + 1] = 1;
+      values[offset + (2 * i)] = 1;
+      values[offset + (2 * i) + 1] = 1;
     } else if (actionSeq[i] == 'f') {
       // Encode fold as 00.
       // TODO(author2): Should this be 11?
-      (*values)[offset + (2 * i)] = 0;
-      (*values)[offset + (2 * i) + 1] = 0;
+      values[offset + (2 * i)] = 0;
+      values[offset + (2 * i) + 1] = 0;
     } else if (actionSeq[i] == 'd') {
-      (*values)[offset + (2 * i)] = 0;
-      (*values)[offset + (2 * i) + 1] = 0;
+      values[offset + (2 * i)] = 0;
+      values[offset + (2 * i) + 1] = 0;
     } else {
       SPIEL_CHECK_EQ(actionSeq[i], 'd');
     }
@@ -316,12 +316,12 @@ void UniversalPokerState::InformationStateTensor(
 }
 
 void UniversalPokerState::ObservationTensor(Player player,
-                                            std::vector<float> *values) const {
+                                            absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, NumPlayers());
 
-  values->resize(game_->ObservationTensorShape()[0]);
-  std::fill(values->begin(), values->end(), 0.);
+  SPIEL_CHECK_EQ(values.size(), game_->ObservationTensorShape()[0]);
+  std::fill(values.begin(), values.end(), 0.);
 
   // Layout of observation:
   //   my player number: num_players bits
@@ -332,7 +332,7 @@ void UniversalPokerState::ObservationTensor(Player player,
   int offset = 0;
 
   // Mark who I am.
-  (*values)[player] = 1;
+  values[player] = 1;
   offset += NumPlayers();
 
   const logic::CardSet full_deck(acpc_game_->NumSuitsDeck(),
@@ -342,18 +342,18 @@ void UniversalPokerState::ObservationTensor(Player player,
   logic::CardSet boardCards = BoardCards();
 
   for (uint32_t i = 0; i < full_deck.NumCards(); i++) {
-    (*values)[i + offset] = holeCards.ContainsCards(all_cards[i]) ? 1.0 : 0.0;
+    values[i + offset] = holeCards.ContainsCards(all_cards[i]) ? 1.0 : 0.0;
   }
   offset += full_deck.NumCards();
 
   for (uint32_t i = 0; i < full_deck.NumCards(); i++) {
-    (*values)[i + offset] = boardCards.ContainsCards(all_cards[i]) ? 1.0 : 0.0;
+    values[i + offset] = boardCards.ContainsCards(all_cards[i]) ? 1.0 : 0.0;
   }
   offset += full_deck.NumCards();
 
   // Adding the contribution of each players to the pot.
   for (auto p = Player{0}; p < NumPlayers(); p++) {
-    (*values)[offset + p] = acpc_state_.Ante(p);
+    values[offset + p] = acpc_state_.Ante(p);
   }
   offset += NumPlayers();
   SPIEL_CHECK_EQ(offset, game_->ObservationTensorShape()[0]);

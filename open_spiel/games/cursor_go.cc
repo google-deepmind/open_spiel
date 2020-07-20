@@ -110,19 +110,19 @@ std::string CursorGoState::ObservationString(Player player) const {
 }
 
 void CursorGoState::ObservationTensor(Player player,
-                                      std::vector<float>* values) const {
+                                      absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
   int num_cells = board_.board_size() * board_.board_size();
-  values->resize(num_cells * (kCellStates + 3));
-  std::fill(values->begin(), values->end(), 0.);
+  SPIEL_CHECK_EQ(values.size(), num_cells * (kCellStates + 3));
+  std::fill(values.begin(), values.end(), 0.);
 
   // Add planes: black, white, empty.
   int cell = 0;
   for (VirtualPoint p : BoardPoints(board_.board_size())) {
     int color_val = static_cast<int>(board_.PointColor(p));
-    (*values)[num_cells * color_val + cell] = 1.0;
+    values[num_cells * color_val + cell] = 1.0;
     ++cell;
   }
   SPIEL_CHECK_EQ(cell, num_cells);
@@ -130,15 +130,15 @@ void CursorGoState::ObservationTensor(Player player,
   // Fourth plane for cursor position.
   const auto [row, col] = cursor_[ColorToPlayer(to_play_)];
   const int cursor_cell = row * board_.board_size() + col;
-  (*values)[num_cells * kCellStates + cursor_cell] = 1.0;
+  values[num_cells * kCellStates + cursor_cell] = 1.0;
 
   // Add a fifth binary plane for komi (whether white is to play).
-  std::fill(values->begin() + ((1 + kCellStates) * num_cells),
-            values->begin() + ((2 + kCellStates) * num_cells),
+  std::fill(values.begin() + ((1 + kCellStates) * num_cells),
+            values.begin() + ((2 + kCellStates) * num_cells),
             (to_play_ == GoColor::kWhite ? 1.0 : 0.0));
 
   // Add a sixth binary plane for the number of cursor moves.
-  std::fill(values->begin() + ((2 + kCellStates) * num_cells), values->end(),
+  std::fill(values.begin() + ((2 + kCellStates) * num_cells), values.end(),
             static_cast<float>(cursor_moves_count_) / max_cursor_moves_);
 }
 

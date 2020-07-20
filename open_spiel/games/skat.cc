@@ -645,14 +645,14 @@ std::vector<std::pair<Action, double>> SkatState::ChanceOutcomes() const {
 }
 
 void SkatState::ObservationTensor(Player player,
-                                  std::vector<float>* values) const {
+                                  absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  std::fill(values->begin(), values->end(), 0.0);
-  values->resize(game_->ObservationTensorSize());
+  std::fill(values.begin(), values.end(), 0.0);
+  SPIEL_CHECK_EQ(values.size(), game_->ObservationTensorSize());
   if (phase_ == Phase::kGameOver || phase_ == Phase::kDeal) return;
-  auto ptr = values->begin();
+  auto ptr = values.begin();
   // Position:
   ptr[player] = 1;
   ptr += kNumPlayers;
@@ -732,7 +732,7 @@ std::string SkatState::ObservationString(Player player) const {
     return "No Observation";
   }
   std::vector<float> tensor(game_->ObservationTensorSize());
-  ObservationTensor(player, &tensor);
+  ObservationTensor(player, absl::MakeSpan(tensor));
   std::string rv;
   auto ptr = tensor.begin();
   int player_pos = GetIntFromOneHot(ptr, kNumPlayers);

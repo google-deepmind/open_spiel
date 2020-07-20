@@ -134,12 +134,12 @@ std::string TradeCommState::ObservationString(Player player) const {
 }
 
 void TradeCommState::ObservationTensor(Player player,
-                                       std::vector<float>* values) const {
+                                       absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  values->resize(game_->ObservationTensorSize());
-  std::fill(values->begin(), values->end(), 0);
+  SPIEL_CHECK_EQ(values.size(), game_->ObservationTensorSize());
+  std::fill(values.begin(), values.end(), 0);
 
   if (IsChanceNode()) {
     // No observations at chance nodes.
@@ -150,38 +150,38 @@ void TradeCommState::ObservationTensor(Player player,
 
   // 2 bits to indicate whose turn it is.
   int offset = 0;
-  (*values)[cur_player_] = 1;
+  values[cur_player_] = 1;
   offset += 2;
 
   // 1 bit to indicate whether it's terminal
-  (*values)[offset] = IsTerminal() ? 1 : 0;
+  values[offset] = IsTerminal() ? 1 : 0;
   offset += 1;
 
   // Single bit for the phase: 0 = comm, 1 = trade.
-  (*values)[offset] = (phase_ == Phase::kCommunication ? 0 : 1);
+  values[offset] = (phase_ == Phase::kCommunication ? 0 : 1);
   offset += 1;
 
   // one-hot vector for the item the observing player got
-  (*values)[offset + items_[player]] = 1;
+  values[offset + items_[player]] = 1;
   offset += num_items_;
 
   if (player < comm_history_.size()) {
     // one-hot vector for the utterance the observing player made
-    (*values)[offset + comm_history_[player]] = 1;
+    values[offset + comm_history_[player]] = 1;
   }
   offset += num_items_;
 
   // one-hot vector for the utterance the observing player observed
   if (1 - player < comm_history_.size()) {
-    (*values)[offset + comm_history_[1 - player]] = 1;
+    values[offset + comm_history_[1 - player]] = 1;
   }
   offset += num_items_;
 
   // one-hot vector for the size of the trade history
-  (*values)[offset + trade_history_.size()] = 1;
+  values[offset + trade_history_.size()] = 1;
   offset += 3;
 
-  SPIEL_CHECK_EQ(offset, values->size());
+  SPIEL_CHECK_EQ(offset, values.size());
 }
 
 TradeCommState::TradeCommState(std::shared_ptr<const Game> game, int num_items)

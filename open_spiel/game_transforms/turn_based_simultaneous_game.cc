@@ -170,33 +170,25 @@ std::string TurnBasedSimultaneousState::InformationStateString(
 }
 
 void TurnBasedSimultaneousState::InformationStateTensor(
-    Player player, std::vector<float>* values) const {
+    Player player, absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  values->clear();
-  values->reserve(game_->InformationStateTensorSize());
+  SPIEL_CHECK_EQ(values.size(), game_->InformationStateTensorSize());
+  auto value_it = values.begin();
 
   // First, get the 2 * num_players bits to encode whose turn it is and who
   // the observer is.
   for (auto p = Player{0}; p < num_players_; ++p) {
-    values->push_back(p == current_player_ ? 1 : 0);
+    *value_it++ = (p == current_player_ ? 1 : 0);
   }
   for (auto p = Player{0}; p < num_players_; ++p) {
-    values->push_back(p == player ? 1 : 0);
+    *value_it++ = (p == player ? 1 : 0);
   }
 
-  // Then get the underlying info set
-  std::vector<float> infoset;
-  state_->InformationStateTensor(player, &infoset);
-
-  int offset = values->size();
-  values->resize(values->size() + infoset.size());
-
-  // Now copy it over.
-  for (int i = 0; i < infoset.size(); i++) {
-    (*values)[offset + i] = infoset[i];
-  }
+  // Then get the underlying observation
+  state_->InformationStateTensor(player,
+                                 absl::MakeSpan(value_it, values.end()));
 }
 
 std::string TurnBasedSimultaneousState::ObservationString(Player player) const {
@@ -219,33 +211,24 @@ std::string TurnBasedSimultaneousState::ObservationString(Player player) const {
 }
 
 void TurnBasedSimultaneousState::ObservationTensor(
-    Player player, std::vector<float>* values) const {
+    Player player, absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  values->clear();
-  values->reserve(game_->ObservationTensorSize());
+  SPIEL_CHECK_EQ(values.size(), game_->ObservationTensorSize());
+  auto value_it = values.begin();
 
   // First, get the 2 * num_players bits to encode whose turn it is and who
   // the observer is.
   for (auto p = Player{0}; p < num_players_; ++p) {
-    values->push_back(p == current_player_ ? 1 : 0);
+    *value_it++ = (p == current_player_ ? 1 : 0);
   }
   for (auto p = Player{0}; p < num_players_; ++p) {
-    values->push_back(p == player ? 1 : 0);
+    *value_it++ = (p == player ? 1 : 0);
   }
 
   // Then get the underlying observation
-  std::vector<float> observation;
-  state_->ObservationTensor(player, &observation);
-
-  int offset = values->size();
-  values->resize(values->size() + observation.size());
-
-  // Now copy it over.
-  for (int i = 0; i < observation.size(); i++) {
-    (*values)[offset + i] = observation[i];
-  }
+  state_->ObservationTensor(player, absl::MakeSpan(value_it, values.end()));
 }
 
 TurnBasedSimultaneousState::TurnBasedSimultaneousState(

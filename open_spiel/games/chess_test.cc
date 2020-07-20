@@ -127,8 +127,9 @@ void ObservationTensorTests() {
   std::shared_ptr<const Game> game = LoadGame("chess");
   ChessState initial_state(game);
   auto shape = game->ObservationTensorShape();
-  std::vector<float> v;
-  initial_state.ObservationTensor(initial_state.CurrentPlayer(), &v);
+  std::vector<float> v(game->ObservationTensorSize());
+  initial_state.ObservationTensor(initial_state.CurrentPlayer(),
+                                  absl::MakeSpan(v));
 
   // For each piece type, check one square that's supposed to be occupied, and
   // one that isn't.
@@ -191,7 +192,8 @@ void ObservationTensorTests() {
   ApplySANMove("e5", &initial_state);
   ApplySANMove("Ke2", &initial_state);
 
-  initial_state.ObservationTensor(initial_state.CurrentPlayer(), &v);
+  initial_state.ObservationTensor(initial_state.CurrentPlayer(),
+                                  absl::MakeSpan(v));
   SPIEL_CHECK_EQ(v.size(), game->ObservationTensorSize());
 
   // Now it's black to move.

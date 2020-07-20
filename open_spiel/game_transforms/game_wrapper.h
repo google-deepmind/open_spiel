@@ -56,7 +56,7 @@ class WrappedState : public State {
   }
 
   void InformationStateTensor(Player player,
-                              std::vector<float>* values) const override {
+                              absl::Span<float> values) const override {
     state_->InformationStateTensor(player, values);
   }
 
@@ -73,7 +73,7 @@ class WrappedState : public State {
   }
 
   void ObservationTensor(Player player,
-                         std::vector<float>* values) const override {
+                         absl::Span<float> values) const override {
     state_->ObservationTensor(player, values);
   }
 

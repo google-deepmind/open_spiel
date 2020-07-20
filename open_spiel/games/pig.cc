@@ -122,7 +122,7 @@ std::vector<int> PigGame::ObservationTensorShape() const {
 }
 
 void PigState::ObservationTensor(Player player,
-                                 std::vector<float>* values) const {
+                                 absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
@@ -131,8 +131,8 @@ void PigState::ObservationTensor(Player player,
   int num_bins = (win_score_ / kBinSize) + 1;
 
   // One-hot encoding: turn total (#bin) followed by p1, p2, ...
-  values->resize(num_bins + num_players_ * num_bins);
-  std::fill(values->begin(), values->end(), 0.);
+  SPIEL_CHECK_EQ(values.size(), num_bins + num_players_ * num_bins);
+  std::fill(values.begin(), values.end(), 0.);
   int pos = 0;
 
   // One-hot encoding:
@@ -146,9 +146,9 @@ void PigState::ObservationTensor(Player player,
   int bin = turn_total_ / kBinSize;
   if (bin >= num_bins) {
     // When the value is too large, use last bin.
-    (*values)[pos + (num_bins - 1)] = 1;
+    values[pos + (num_bins - 1)] = 1;
   } else {
-    (*values)[pos + bin] = 1;
+    values[pos + bin] = 1;
   }
 
   pos += num_bins;
@@ -158,9 +158,9 @@ void PigState::ObservationTensor(Player player,
     bin = scores_[p] / kBinSize;
     if (bin >= num_bins) {
       // When the value is too large, use last bin.
-      (*values)[pos + (num_bins - 1)] = 1;
+      values[pos + (num_bins - 1)] = 1;
     } else {
-      (*values)[pos + bin] = 1;
+      values[pos + bin] = 1;
     }
 
     pos += num_bins;

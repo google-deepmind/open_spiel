@@ -189,13 +189,13 @@ std::string UncontestedBiddingState::InformationStateString(
 }
 
 void UncontestedBiddingState::InformationStateTensor(
-    Player player, std::vector<float>* values) const {
+    Player player, absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  values->resize(kStateSize);
-  std::fill(values->begin(), values->end(), 0.);
-  auto ptr = values->begin();
+  SPIEL_CHECK_EQ(values.size(), kStateSize);
+  std::fill(values.begin(), values.end(), 0.);
+  auto ptr = values.begin();
 
   for (int i = kNumCardsPerHand * player; i < kNumCardsPerHand * (1 + player);
        ++i) {

@@ -277,7 +277,7 @@ std::vector<double> LiarsDiceState::Returns() const {
 }
 
 void LiarsDiceState::InformationStateTensor(Player player,
-                                            std::vector<float>* values) const {
+                                            absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
@@ -287,10 +287,11 @@ void LiarsDiceState::InformationStateTensor(Player player,
   // One slot(bit) for calling liar. (Necessary because observations and
   // information states need to be defined at terminals)
   int offset = 0;
-  std::fill(values->begin(), values->end(), 0.);
-  values->resize(num_players_ + (max_dice_per_player_ * kDiceSides) +
-                 (total_num_dice_ * kDiceSides) + 1);
-  (*values)[player] = 1;
+  std::fill(values.begin(), values.end(), 0.);
+  SPIEL_CHECK_EQ(values.size(), num_players_ +
+                                    (max_dice_per_player_ * kDiceSides) +
+                                    (total_num_dice_ * kDiceSides) + 1);
+  values[player] = 1;
   offset += num_players_;
 
   int my_num_dice = num_dice_[player];
@@ -300,7 +301,7 @@ void LiarsDiceState::InformationStateTensor(Player player,
     if (outcome != kInvalidOutcome) {
       SPIEL_CHECK_GE(outcome, 1);
       SPIEL_CHECK_LE(outcome, kDiceSides);
-      (*values)[offset + (outcome - 1)] = 1;
+      values[offset + (outcome - 1)] = 1;
     }
     offset += kDiceSides;
   }
@@ -312,12 +313,12 @@ void LiarsDiceState::InformationStateTensor(Player player,
   for (int b = 0; b < bidseq_.size(); b++) {
     SPIEL_CHECK_GE(bidseq_[b], 0);
     SPIEL_CHECK_LE(bidseq_[b], total_num_dice_ * kDiceSides);
-    (*values)[offset + bidseq_[b]] = 1;
+    values[offset + bidseq_[b]] = 1;
   }
 }
 
 void LiarsDiceState::ObservationTensor(Player player,
-                                       std::vector<float>* values) const {
+                                       absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
@@ -327,10 +328,11 @@ void LiarsDiceState::ObservationTensor(Player player,
   // One slot(bit) for calling liar. (Necessary because observations and
   // information states need to be defined at terminals)
   int offset = 0;
-  std::fill(values->begin(), values->end(), 0.);
-  values->resize(num_players_ + (max_dice_per_player_ * kDiceSides) +
-                 (total_num_dice_ * kDiceSides) + 1);
-  (*values)[player] = 1;
+  std::fill(values.begin(), values.end(), 0.);
+  SPIEL_CHECK_EQ(values.size(), num_players_ +
+                                    (max_dice_per_player_ * kDiceSides) +
+                                    (total_num_dice_ * kDiceSides) + 1);
+  values[player] = 1;
   offset += num_players_;
 
   int my_num_dice = num_dice_[player];
@@ -340,7 +342,7 @@ void LiarsDiceState::ObservationTensor(Player player,
     if (outcome != kInvalidOutcome) {
       SPIEL_CHECK_GE(outcome, 1);
       SPIEL_CHECK_LE(outcome, kDiceSides);
-      (*values)[offset + (outcome - 1)] = 1;
+      values[offset + (outcome - 1)] = 1;
     }
     offset += kDiceSides;
   }
@@ -355,7 +357,7 @@ void LiarsDiceState::ObservationTensor(Player player,
   for (int b = bid_offset; b < size_bid; b++) {
     SPIEL_CHECK_GE(bidseq_[b], 0);
     SPIEL_CHECK_LE(bidseq_[b], total_num_dice_ * kDiceSides);
-    (*values)[offset + bidseq_[b]] = 1;
+    values[offset + bidseq_[b]] = 1;
   }
 }
 

@@ -153,7 +153,7 @@ std::string PhantomTTTState::InformationStateString(Player player) const {
 }
 
 void PhantomTTTState::InformationStateTensor(Player player,
-                                             std::vector<float>* values) const {
+                                             absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
@@ -162,11 +162,11 @@ void PhantomTTTState::InformationStateTensor(Player player,
   // Encoded in the same way as InformationStateAsString, so full sequences
   // which may contain action value 10 to represent "I don't know."
   const auto& player_view = player == Player{0} ? x_view_ : o_view_;
-  values->resize(kNumCells * kCellStates +
-                 kLongestSequence * (1 + kBitsPerAction));
-  std::fill(values->begin(), values->end(), 0.);
+  SPIEL_CHECK_EQ(values.size(), kNumCells * kCellStates +
+                                    kLongestSequence * (1 + kBitsPerAction));
+  std::fill(values.begin(), values.end(), 0.);
   for (int cell = 0; cell < kNumCells; ++cell) {
-    (*values)[kNumCells * static_cast<int>(player_view[cell]) + cell] = 1.0;
+    values[kNumCells * static_cast<int>(player_view[cell]) + cell] = 1.0;
   }
 
   // Now encode the sequence. Each (player, action) pair uses 11 bits:
@@ -176,13 +176,13 @@ void PhantomTTTState::InformationStateTensor(Player player,
   for (const auto& player_with_action : action_sequence_) {
     if (player_with_action.first == player) {
       // Always include the observing player's actions.
-      (*values)[offset] = player_with_action.first;  // Player 0 or 1
-      (*values)[offset + 1 + player_with_action.second] = 1.0;
+      values[offset] = player_with_action.first;  // Player 0 or 1
+      values[offset + 1 + player_with_action.second] = 1.0;
     } else if (obs_type_ == ObservationType::kRevealNumTurns) {
       // If the number of turns are revealed, then each of the other player's
       // actions will show up as unknowns.
-      (*values)[offset] = player_with_action.first;
-      (*values)[offset + 1 + 10] = 1.0;  // I don't know.
+      values[offset] = player_with_action.first;
+      values[offset + 1 + 10] = 1.0;  // I don't know.
     } else {
       // Do not reveal anything about the number of actions taken by opponent.
       SPIEL_CHECK_EQ(obs_type_, ObservationType::kRevealNothing);
@@ -203,21 +203,21 @@ std::string PhantomTTTState::ObservationString(Player player) const {
 }
 
 void PhantomTTTState::ObservationTensor(Player player,
-                                        std::vector<float>* values) const {
+                                        absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
-  values->resize(game_->ObservationTensorSize());
-  std::fill(values->begin(), values->end(), 0.);
+  SPIEL_CHECK_EQ(values.size(), game_->ObservationTensorSize());
+  std::fill(values.begin(), values.end(), 0.);
 
   // First 27 bits encodes the player's view in the same way as TicTacToe.
   const auto& player_view = player == Player{0} ? x_view_ : o_view_;
   for (int cell = 0; cell < kNumCells; ++cell) {
-    (*values)[kNumCells * static_cast<int>(player_view[cell]) + cell] = 1.0;
+    values[kNumCells * static_cast<int>(player_view[cell]) + cell] = 1.0;
   }
 
   // Then a one-hot to represent total number of turns.
   if (obs_type_ == ObservationType::kRevealNumTurns) {
-    (*values)[kNumCells * kCellStates + action_sequence_.size()] = 1.0;
+    values[kNumCells * kCellStates + action_sequence_.size()] = 1.0;
   }
 }
 

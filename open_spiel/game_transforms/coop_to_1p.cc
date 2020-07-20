@@ -147,25 +147,26 @@ std::string CoopTo1pState::ObservationString(Player player) const {
 }
 
 void CoopTo1pState::ObservationTensor(Player player,
-                                      std::vector<float>* values) const {
+                                      absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   const int num_actions = state_->NumDistinctActions();
   const int num_players = state_->NumPlayers();
-  values->resize(num_privates_ * (num_players + num_actions + 1) + num_actions);
-  std::fill(values->begin(), values->end(), 0);
+  SPIEL_CHECK_EQ(values.size(),
+                 num_privates_ * (num_players + num_actions + 1) + num_actions);
+  std::fill(values.begin(), values.end(), 0);
   if (IsChanceNode()) return;
 
   // Last action in the underlying game
   int base = 0;
-  if (prev_action_ != kInvalidAction) values->at(prev_action_) = 1;
+  if (prev_action_ != kInvalidAction) values.at(prev_action_) = 1;
   base += num_actions;
 
   // Possible privates for every player (multi-hot)
   for (int p = 0; p < num_players; ++p) {
     const auto& pvt = privates_[p];
     for (int i = 0; i < num_privates_; ++i) {
-      values->at(base + i) = (pvt.assignments[i] != PlayerPrivate::kImpossible);
+      values.at(base + i) = (pvt.assignments[i] != PlayerPrivate::kImpossible);
     }
     base += num_privates_;
   }
@@ -178,13 +179,13 @@ void CoopTo1pState::ObservationTensor(Player player,
   const auto& pvt = privates_[current_player];
   for (Action a = 0; a < num_actions; ++a) {
     for (int i = 0; i < num_privates_; ++i) {
-      values->at(base + i) = (pvt.assignments[i] == a);
+      values.at(base + i) = (pvt.assignments[i] == a);
     }
     base += num_privates_;
   }
 
   // The private we are currently considering (one-hot)
-  if (!pvt.AssignmentsComplete()) values->at(base + pvt.next_unassigned) = 1;
+  if (!pvt.AssignmentsComplete()) values.at(base + pvt.next_unassigned) = 1;
   base += num_privates_;
 }
 

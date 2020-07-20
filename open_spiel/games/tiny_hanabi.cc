@@ -166,23 +166,23 @@ std::string TinyHanabiState::InformationStateString(Player player) const {
 }
 
 void TinyHanabiState::InformationStateTensor(Player player,
-                                             std::vector<float>* values) const {
+                                             absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  values->resize(payoff_.NumChance() +
-                 payoff_.NumActions() * payoff_.NumPlayers());
-  std::fill(values->begin(), values->end(), 0);
-  if (history_.size() > player) values->at(history_[player].action) = 1;
+  SPIEL_CHECK_EQ(values.size(), payoff_.NumChance() + payoff_.NumActions() *
+                                                          payoff_.NumPlayers());
+  std::fill(values.begin(), values.end(), 0);
+  if (history_.size() > player) values.at(history_[player].action) = 1;
   for (int i = payoff_.NumPlayers(); i < history_.size(); ++i) {
-    values->at(payoff_.NumChance() +
-               (i - payoff_.NumPlayers()) * payoff_.NumActions() +
-               history_[i].action) = 1;
+    values.at(payoff_.NumChance() +
+              (i - payoff_.NumPlayers()) * payoff_.NumActions() +
+              history_[i].action) = 1;
   }
 }
 
 void TinyHanabiState::ObservationTensor(Player player,
-                                        std::vector<float>* values) const {
+                                        absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 

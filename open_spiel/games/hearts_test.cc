@@ -274,8 +274,7 @@ void InformationStateTensorTest(int num_games = 100) {
         state->ApplyAction(action);
       } else {
         auto player = state->CurrentPlayer();
-        std::vector<float> infostate;
-        state->InformationStateTensor(player, &infostate);
+        auto infostate = state->InformationStateTensor(player);
 
         std::string infostate_string = state->InformationStateString(player);
         std::string rebuilt_infostate_string =
