@@ -30,7 +30,7 @@
 #include "open_spiel/utils/file.h"
 #include "open_spiel/utils/run_python.h"
 #include "tensorflow/core/graph/default_device.h"
-#include "tensorflow/core/protobuf/saver.proto.h"
+#include "tensorflow/core/protobuf/saver.pb.h"
 
 namespace open_spiel {
 namespace algorithms {
