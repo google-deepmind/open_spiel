@@ -103,6 +103,14 @@ def _project_on_clipped_simplex(v, gamma=0):
     
     Returns:
       Projected distribution
+      
+    Algorithm description:
+    It aims to find a scalar lam to be substracted by each dimension of v
+    with the restriction that the resulted quantity should lie in [gamma, 1]
+    until the resulted vector summed up to 1
+    Example: [0.4, 0.7, 0.6], 0.2 -- > find lam=0.25 
+              --> [max(0.4-0.25, 0.2), max(0.7-0.25, 0.2), max(0.6-0.25, 0.2)]
+              --> [0.2,  0.45, 0.35]
     """
     
     N = len(v)
