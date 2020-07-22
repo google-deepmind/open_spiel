@@ -74,8 +74,8 @@ def _project_distribution(updated_strategy, gamma):
 
 
 
-def _project_distribution(updated_strategy, gamma):
-  """Projects the distribution in updated_x to have minimal probabilities.
+def _approx_simplex_projection(updated_strategy, gamma=0.0):
+  """Approximately projects the distribution in updated_x to have minimal probabilities.
 
   Minimal probabilities are set as gamma, and the probabilities are then
   renormalized to sum to 1.
@@ -92,13 +92,13 @@ def _project_distribution(updated_strategy, gamma):
   updated_strategy = updated_strategy / np.sum(updated_strategy)
   return updated_strategy
 
-def _project_on_clipped_simplex(v, gamma=0):
+def _simplex_projection(updated_strategy, gamma=0.0):
     """
-    Project v on the closest point in L2-norm on gamma-simplex 
+    Project updated_strategy on the closest point in L2-norm on gamma-simplex 
     Based on: https://eng.ucmerced.edu/people/wwang5/papers/SimplexProj.pdf
     
     Args:
-      v: New distribution value after being updated by update rule.
+      updated_strategy: New distribution value after being updated by update rule.
       gamma: minimal probability value when divided by number of actions.
     
     Returns:
@@ -113,17 +113,14 @@ def _project_on_clipped_simplex(v, gamma=0):
               --> [0.2,  0.45, 0.35]
     """
     
-    N = len(v)
-    l = np.sort(v)
-    lam = (np.sum(l)-1)/N
-    for i in range(N-1, 0, -1):
-        pho = (1/(N-i)) * (np.sum(l[i:])-1+gamma * i)
-        if(l[i-1] - pho < gamma):
-            lam = pho
-            break
-    return np.maximum(v-lam, gamma)
+  n = len(updated_strategy)
+  idx = np.arange(1, n + 1)
+  u = np.sort(updated_strategy)[::-1]
+  u_tmp = (1 - np.cumsum(u) - (n - idx) * gamma) / idx
+  rho = np.searchsorted(u + u_tmp <= gamma, True)
+  return np.maximum(updated_strategy + u_tmp[rho - 1], gamma)
 
-def _projected_replicator_dynamics_step(payoff_tensors, strategies, dt, gamma):
+def _projected_replicator_dynamics_step(payoff_tensors, strategies, dt, gamma, use_approx=False):
   """Does one step of the projected replicator dynamics algorithm.
 
   Args:
@@ -148,7 +145,8 @@ def _projected_replicator_dynamics_step(payoff_tensors, strategies, dt, gamma):
     delta = current_strategy * (values_per_strategy - average_return)
 
     updated_strategy = current_strategy + dt * delta
-    updated_strategy = _project_distribution(updated_strategy, gamma)
+    updated_strategy = _approx_simplex_projection(updated_strategy, gamma) if use_approx
+                        else _simplex_projection(updated_strategy, gamma)
     new_strategies.append(updated_strategy)
   return new_strategies
 
@@ -159,6 +157,7 @@ def projected_replicator_dynamics(payoff_tensors,
                                   prd_dt=1e-3,
                                   prd_gamma=1e-6,
                                   average_over_last_n_strategies=None,
+                                  use_approx=False,
                                   **unused_kwargs):
   """The Projected Replicator Dynamics algorithm.
 
@@ -194,7 +193,7 @@ def projected_replicator_dynamics(payoff_tensors,
   meta_strategy_window = []
   for i in range(prd_iterations):
     new_strategies = _projected_replicator_dynamics_step(
-        payoff_tensors, new_strategies, prd_dt, prd_gamma)
+        payoff_tensors, new_strategies, prd_dt, prd_gamma, use_approx)
     if i >= prd_iterations - average_over_last_n_strategies:
       meta_strategy_window.append(new_strategies)
   average_new_strategies = np.mean(meta_strategy_window, axis=0)
