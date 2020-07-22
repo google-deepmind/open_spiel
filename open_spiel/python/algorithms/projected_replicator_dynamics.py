@@ -73,6 +73,48 @@ def _project_distribution(updated_strategy, gamma):
   return updated_strategy
 
 
+
+def _project_distribution(updated_strategy, gamma):
+  """Projects the distribution in updated_x to have minimal probabilities.
+
+  Minimal probabilities are set as gamma, and the probabilities are then
+  renormalized to sum to 1.
+
+  Args:
+    updated_strategy: New distribution value after being updated by update rule.
+    gamma: minimal probability value when divided by number of actions.
+
+  Returns:
+    Projected distribution.
+  """
+  # Epsilon approximation of L2-norm projection onto the Delta_gamma space.
+  updated_strategy[updated_strategy < gamma] = gamma
+  updated_strategy = updated_strategy / np.sum(updated_strategy)
+  return updated_strategy
+
+def _project_on_clipped_simplex(v, gamma=0):
+    """
+    Project v on the closest point in L2-norm on gamma-simplex 
+    Based on: https://eng.ucmerced.edu/people/wwang5/papers/SimplexProj.pdf
+    
+    Args:
+      v: New distribution value after being updated by update rule.
+      gamma: minimal probability value when divided by number of actions.
+    
+    Returns:
+      Projected distribution
+    """
+    
+    N = len(v)
+    l = np.sort(v)
+    lam = (np.sum(l)-1)/N
+    for i in range(N-1, 0, -1):
+        pho = (1/(N-i)) * (np.sum(l[i:])-1+gamma * i)
+        if(l[i-1] - pho < gamma):
+            lam = pho
+            break
+    return np.maximum(v-lam, gamma)
+
 def _projected_replicator_dynamics_step(payoff_tensors, strategies, dt, gamma):
   """Does one step of the projected replicator dynamics algorithm.
 
