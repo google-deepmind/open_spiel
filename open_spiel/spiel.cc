@@ -62,8 +62,8 @@ void ValidateParams(const GameParameters& params,
     const auto it = param_spec.find(param.first);
     if (it == param_spec.end()) {
       SpielFatalError(absl::StrCat(
-          "Unknown parameter ", param.first,
-          ". Available parameters are: ", ListValidParameters(param_spec)));
+          "Unknown parameter '", param.first,
+          "'. Available parameters are: ", ListValidParameters(param_spec)));
     }
     if (it->second.type() != param.second.type()) {
       SpielFatalError(absl::StrCat(
