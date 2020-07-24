@@ -826,9 +826,12 @@ class Game : public std::enable_shared_from_this<Game> {
   // - Defaults to the value stored as the default in
   // game_type.parameter_specification if the `default_value` is std::nullopt
   // - Returns `default_value` if provided.
+  //
+  // Only a fixed set of template arguments are supported; see below.
   template <typename T>
-  T ParameterValue(const std::string& key,
-                   absl::optional<T> default_value = absl::nullopt) const;
+  T ParameterValue(
+      const std::string& key,
+      absl::optional<T> default_value = absl::nullopt) const = delete;
 
   // The game type.
   GameType game_type_;
@@ -840,6 +843,31 @@ class Game : public std::enable_shared_from_this<Game> {
   // enables us to report the actual value used for every parameter.
   mutable GameParameters defaulted_parameters_;
 };
+
+template <>
+GameParameters Game::ParameterValue<GameParameters>(
+    const std::string& key,
+    absl::optional<GameParameters> default_value) const;
+
+template <>
+int Game::ParameterValue<int>(
+    const std::string& key,
+    absl::optional<int> default_value) const;
+
+template <>
+double Game::ParameterValue<double>(
+    const std::string& key,
+    absl::optional<double> default_value) const;
+
+template <>
+std::string Game::ParameterValue<std::string>(
+    const std::string& key,
+    absl::optional<std::string> default_value) const;
+
+template <>
+bool Game::ParameterValue<bool>(
+    const std::string& key,
+    absl::optional<bool> default_value) const;
 
 #define CONCAT_(x, y) x##y
 #define CONCAT(x, y) CONCAT_(x, y)
