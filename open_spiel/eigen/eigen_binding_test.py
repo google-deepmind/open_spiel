@@ -20,7 +20,7 @@ import time
 from absl.testing import absltest
 import numpy as np
 
-import pyspiel_eigen_test as eigen
+import open_spiel.eigen.pyspiel_eigen_test as eigen
 
 
 class PyEigenTest(absltest.TestCase):
