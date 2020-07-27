@@ -47,18 +47,18 @@ InformationStateTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯�
 InformationStateTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ChanceOutcomes() = [{1, 0.166666666667}, {2, 0.166666666667}, {3, 0.166666666667}, {4, 0.166666666667}, {5, 0.166666666667}, {6, 0.166666666667}]
-LegalActions() = [1, 2, 3, 4, 5, 6]
-StringLegalActions() = ["chance outcome 1", "chance outcome 2", "chance outcome 3", "chance outcome 4", "chance outcome 5", "chance outcome 6"]
+ChanceOutcomes() = [{0, 0.166666666667}, {1, 0.166666666667}, {2, 0.166666666667}, {3, 0.166666666667}, {4, 0.166666666667}, {5, 0.166666666667}]
+LegalActions() = [0, 1, 2, 3, 4, 5]
+StringLegalActions() = ["Roll 1", "Roll 2", "Roll 3", "Roll 4", "Roll 5", "Roll 6"]
 
-# Apply action "chance outcome 2"
-action: 2
+# Apply action "Roll 2"
+action: 1
 
 # State 1
 # 2 -1 - chance node, current roller is player 1
 IsTerminal() = False
-History() = [2]
-HistoryString() = "2"
+History() = [1]
+HistoryString() = "1"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -68,18 +68,18 @@ InformationStateTensor(0): ◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯�
 InformationStateTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(0): ◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ChanceOutcomes() = [{1, 0.166666666667}, {2, 0.166666666667}, {3, 0.166666666667}, {4, 0.166666666667}, {5, 0.166666666667}, {6, 0.166666666667}]
-LegalActions() = [1, 2, 3, 4, 5, 6]
-StringLegalActions() = ["chance outcome 1", "chance outcome 2", "chance outcome 3", "chance outcome 4", "chance outcome 5", "chance outcome 6"]
+ChanceOutcomes() = [{0, 0.166666666667}, {1, 0.166666666667}, {2, 0.166666666667}, {3, 0.166666666667}, {4, 0.166666666667}, {5, 0.166666666667}]
+LegalActions() = [0, 1, 2, 3, 4, 5]
+StringLegalActions() = ["Roll 1", "Roll 2", "Roll 3", "Roll 4", "Roll 5", "Roll 6"]
 
-# Apply action "chance outcome 5"
-action: 5
+# Apply action "Roll 5"
+action: 4
 
 # State 2
 # 2 5
 IsTerminal() = False
-History() = [2, 5]
-HistoryString() = "2 5"
+History() = [1, 4]
+HistoryString() = "1 4"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -100,8 +100,8 @@ action: 1
 # State 3
 # 2 5 1-2
 IsTerminal() = False
-History() = [2, 5, 1]
-HistoryString() = "2 5 1"
+History() = [1, 4, 1]
+HistoryString() = "1 4 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -122,8 +122,8 @@ action: 4
 # State 4
 # 2 5 1-2 1-5
 IsTerminal() = False
-History() = [2, 5, 1, 4]
-HistoryString() = "2 5 1 4"
+History() = [1, 4, 1, 4]
+HistoryString() = "1 4 1 4"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -144,8 +144,8 @@ action: 8
 # State 5
 # 2 5 1-2 1-5 2-3
 IsTerminal() = False
-History() = [2, 5, 1, 4, 8]
-HistoryString() = "2 5 1 4 8"
+History() = [1, 4, 1, 4, 8]
+HistoryString() = "1 4 1 4 8"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -166,8 +166,8 @@ action: 12
 # State 6
 # 2 5 1-2 1-5 2-3 Liar
 IsTerminal() = True
-History() = [2, 5, 1, 4, 8, 12]
-HistoryString() = "2 5 1 4 8 12"
+History() = [1, 4, 1, 4, 8, 12]
+HistoryString() = "1 4 1 4 8 12"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4

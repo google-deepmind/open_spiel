@@ -269,9 +269,16 @@ void FullNLBettingTest1() {
   state->ApplyAction(state->LegalActions()[0]);  // deal turn
   state->ApplyAction(state->LegalActions()[0]);  // deal river
   SPIEL_CHECK_EQ(state->Returns()[0], state->Returns()[1]);  // hand is a draw
-  SPIEL_CHECK_TRUE(absl::StrContains(state->ToString(),
-      "ACPC State: STATE:0:cc/r4r6r8r10r12r14r16r18r20c//"
-      ":2c2d|2h2s/3c3d3h/3s/4c"));
+  std::string state_str = state->ToString();
+  if (!absl::StrContains(state_str,
+                         "ACPC State: STATE:0:cc/r4r6r8r10r12r14r16r18r20c//"
+                         ":2c2d|2h2s/3c3d3h/3s/4c")) {
+    std::cout << "history: " << state->HistoryString() << std::endl;
+    SpielFatalError(
+        absl::StrCat("State str: ", state_str, " should contain ",
+                     "ACPC State: STATE:0:cc/r4r6r8r10r12r14r16r18r20c//"
+                     ":2c2d|2h2s/3c3d3h/3s/4c"));
+  }
 }
 
 // Checks that raises must double previous bet within the same round but
@@ -413,11 +420,48 @@ void FullNLBettingTest3() {
       ":2c2d|2h2s|3c3d/3h3s4c/4d/4h"));
 }
 
+void ChanceDealRegressionTest() {
+  std::shared_ptr<const Game> game = LoadGame(
+      "universal_poker(betting=nolimit,"
+      "numPlayers=3,"
+      "numRounds=4,"
+      "blind=100 50 0,"
+      "firstPlayer=2 1 1 1,"
+      "numSuits=4,"
+      "numRanks=13,"
+      "numHoleCards=2,"
+      "numBoardCards=0 3 1 1,"
+      "stack=500 1000 2000,"
+      "bettingAbstraction=fullgame)");
+  std::unique_ptr<State> state = game->NewInitialState();
+  for (Action action :
+       {0, 1, 2, 3, 4, 5, 1, 1, 1, 6, 7, 8, 1, 1, 3, 6, 9, 21, 1, 9, 10}) {
+    state->ApplyAction(action);
+  }
+  SPIEL_CHECK_EQ(
+      state->ToString(),
+      "BettingAbstraction: FULLGAME\n"
+      "P0 Cards: 2d2c\n"
+      "P1 Cards: 2s2h\n"
+      "P2 Cards: 3d3c\n"
+      "BoardCards 4h4d4c3s3h\n"
+      "P0 Reward: -500\n"
+      "P1 Reward: -1000\n"
+      "P2 Reward: 1500\n"
+      "Node type?: Terminal Node!\n"
+      "]\n"
+      "Round: 3\n"
+      "ACPC State: "
+      "STATE:0:ccc/ccr200r500r800r2000c//:2c2d|2h2s|3c3d/3h3s4c/4d/4h\n"
+      "Spent: [P0: 500  P1: 1000  P2: 2000  ]\n\n"
+      "Action Sequence: ddddddcccdddccppppcdd");
+}
 }  // namespace
 }  // namespace universal_poker
 }  // namespace open_spiel
 
 int main(int argc, char **argv) {
+  open_spiel::universal_poker::ChanceDealRegressionTest();
   open_spiel::universal_poker::LoadKuhnLimitWithAndWithoutGameDef();
   open_spiel::universal_poker::LoadHoldemNoLimit6PWithAndWithoutGameDef();
   open_spiel::universal_poker::LoadAndRunGamesFullParameters();

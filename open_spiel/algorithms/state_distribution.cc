@@ -226,6 +226,16 @@ std::unique_ptr<HistoryDistribution> UpdateIncrementalStateDistribution(
     std::unique_ptr<HistoryDistribution> previous) {
   if (previous == nullptr) previous = std::make_unique<HistoryDistribution>();
   if (previous->first.empty()) {
+    // This allows for games to special case this scenario. It only works if
+    // this is only called at the first decision node after chance nodes. We
+    // leave it to the caller to verify this is the case.
+    std::unique_ptr<HistoryDistribution> dist =
+        state.GetHistoriesConsistentWithInfostate();
+
+    // If the game didn't implement GetHistoriesConsistentWithInfostate, then
+    // this is empty, otherwise, we're good.
+    if (dist && !dist->first.empty()) return dist;
+
     // If the previous pair is empty, then we have to do a BFS to find all
     // relevant nodes:
     return std::make_unique<HistoryDistribution>(

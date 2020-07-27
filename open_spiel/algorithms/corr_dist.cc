@@ -23,6 +23,8 @@
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_split.h"
 #include "open_spiel/algorithms/best_response.h"
+#include "open_spiel/algorithms/corr_dist/afcce.h"
+#include "open_spiel/algorithms/corr_dist/afce.h"
 #include "open_spiel/algorithms/corr_dist/efcce.h"
 #include "open_spiel/algorithms/corr_dist/efce.h"
 #include "open_spiel/algorithms/expected_returns.h"
@@ -138,7 +140,6 @@ double EFCEDist(const Game& game, CorrDistConfig config,
                 const CorrelationDevice& mu) {
   // Check that the config matches what is supported.
   SPIEL_CHECK_TRUE(config.deterministic);
-  SPIEL_CHECK_FALSE(config.convert_policy);
 
   // Check for proper probability distribution.
   CheckCorrelationDeviceProbDist(mu);
@@ -156,7 +157,6 @@ double EFCCEDist(const Game& game, CorrDistConfig config,
                  const CorrelationDevice& mu) {
   // Check that the config matches what is supported.
   SPIEL_CHECK_TRUE(config.deterministic);
-  SPIEL_CHECK_FALSE(config.convert_policy);
 
   // Check for proper probability distribution.
   CheckCorrelationDeviceProbDist(mu);
@@ -170,6 +170,42 @@ double EFCCEDist(const Game& game, CorrDistConfig config,
   EFCCETabularPolicy policy(efcce_game->FollowAction(),
                             efcce_game->DefectAction());
   return NashConv(*efcce_game, policy, true);
+}
+
+double AFCEDist(const Game& game, CorrDistConfig config,
+                const CorrelationDevice& mu) {
+  // Check that the config matches what is supported.
+  SPIEL_CHECK_TRUE(config.deterministic);
+
+  // Check for proper probability distribution.
+  CheckCorrelationDeviceProbDist(mu);
+
+  std::shared_ptr<const Game> afce_game(new AFCEGame(game.Clone(), config, mu));
+
+  // Note that the policies are already inside the game via the correlation
+  // device, mu. So this is a simple wrapper policy that simply follows the
+  // recommendations.
+  AFCETabularPolicy policy(config);
+  return NashConv(*afce_game, policy, true);
+}
+
+double AFCCEDist(const Game& game, CorrDistConfig config,
+                 const CorrelationDevice& mu) {
+  // Check that the config matches what is supported.
+  SPIEL_CHECK_TRUE(config.deterministic);
+
+  // Check for proper probability distribution.
+  CheckCorrelationDeviceProbDist(mu);
+
+  std::shared_ptr<const AFCCEGame> afcce_game(
+      new AFCCEGame(game.Clone(), config, mu));
+
+  // Note that the policies are already inside the game via the correlation
+  // device, mu. So this is a simple wrapper policy that simply follows the
+  // recommendations.
+  AFCCETabularPolicy policy(afcce_game->FollowAction(),
+                            afcce_game->DefectAction());
+  return NashConv(*afcce_game, policy, true);
 }
 
 double CEDist(const Game& game, const NormalFormCorrelationDevice& mu) {

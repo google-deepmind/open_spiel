@@ -28,6 +28,7 @@
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_split.h"
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "open_spiel/abseil-cpp/absl/types/span.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel_utils.h"
 
@@ -393,6 +394,14 @@ Action State::StringToAction(Player player,
       absl::StrCat("Couldn't find an action matching ", action_str));
 }
 
+std::vector<int> State::LegalActionsMask(Player player) const {
+  int length = (player == kChancePlayerId) ? game_->MaxChanceOutcomes()
+                                           : num_distinct_actions_;
+  std::vector<int> mask(length, 0);
+  for (int action : LegalActions(player)) mask[action] = 1;
+  return mask;
+}
+
 std::unique_ptr<State> Game::DeserializeState(const std::string& str) const {
   // This simple deserialization doesn't work for games with sampled chance
   // nodes, since the history doesn't give us enough information to reconstruct
@@ -747,6 +756,45 @@ GameType GameTypeFromString(const std::string& game_type_str) {
   game_type.parameter_specification =
       DeserializeGameParameters(game_type_values.at("parameter_specification"));
   return game_type;
+}
+
+std::vector<float> State::ObservationTensor(Player player) const {
+  // We add this player check, to prevent errors if the game implementation
+  // lacks that check (in particular as this function is the one used in
+  // Python). This can lead to doing this check twice.
+  // TODO(author2): Do we want to prevent executing this twice for games
+  // that implement it?
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+  std::vector<float> observation(game_->ObservationTensorSize());
+  ObservationTensor(player, absl::MakeSpan(observation));
+  return observation;
+}
+
+void State::ObservationTensor(Player player, std::vector<float>* values) const {
+  // Retained for backwards compatibility.
+  values->resize(game_->ObservationTensorSize());
+  ObservationTensor(player, absl::MakeSpan(*values));
+}
+
+std::vector<float> State::InformationStateTensor(Player player) const {
+  // We add this player check, to prevent errors if the game implementation
+  // lacks that check (in particular as this function is the one used in
+  // Python). This can lead to doing this check twice.
+  // TODO(author2): Do we want to prevent executing this twice for games
+  // that implement it?
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+  std::vector<float> info_state(game_->InformationStateTensorSize());
+  InformationStateTensor(player, absl::MakeSpan(info_state));
+  return info_state;
+}
+
+void State::InformationStateTensor(Player player,
+                                   std::vector<float>* values) const {
+  // Retained for backwards compatibility.
+  values->resize(game_->InformationStateTensorSize());
+  InformationStateTensor(player, absl::MakeSpan(*values));
 }
 
 }  // namespace open_spiel

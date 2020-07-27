@@ -645,14 +645,14 @@ std::vector<std::pair<Action, double>> SkatState::ChanceOutcomes() const {
 }
 
 void SkatState::ObservationTensor(Player player,
-                                  std::vector<double>* values) const {
+                                  absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  std::fill(values->begin(), values->end(), 0.0);
-  values->resize(game_->ObservationTensorSize());
+  std::fill(values.begin(), values.end(), 0.0);
+  SPIEL_CHECK_EQ(values.size(), game_->ObservationTensorSize());
   if (phase_ == Phase::kGameOver || phase_ == Phase::kDeal) return;
-  auto ptr = values->begin();
+  auto ptr = values.begin();
   // Position:
   ptr[player] = 1;
   ptr += kNumPlayers;
@@ -706,7 +706,8 @@ void SkatState::ObservationTensor(Player player,
   }
 }
 
-std::vector<int> GetCardsFromMultiHot(std::vector<double>::iterator multi_hot) {
+template <typename It>
+std::vector<int> GetCardsFromMultiHot(It multi_hot) {
   std::vector<int> cards;
   for (int i = 0; i < kNumCards; i++) {
     if (multi_hot[i]) cards.push_back(i);
@@ -714,7 +715,8 @@ std::vector<int> GetCardsFromMultiHot(std::vector<double>::iterator multi_hot) {
   return cards;
 }
 
-int GetIntFromOneHot(std::vector<double>::iterator one_hot, int num_values) {
+template <typename It>
+int GetIntFromOneHot(It one_hot, int num_values) {
   for (int i = 0; i < num_values; i++) {
     if (one_hot[i]) return i;
   }
@@ -729,8 +731,8 @@ std::string SkatState::ObservationString(Player player) const {
   if (phase_ == Phase::kGameOver || phase_ == Phase::kDeal) {
     return "No Observation";
   }
-  std::vector<double> tensor(game_->ObservationTensorSize());
-  ObservationTensor(player, &tensor);
+  std::vector<float> tensor(game_->ObservationTensorSize());
+  ObservationTensor(player, absl::MakeSpan(tensor));
   std::string rv;
   auto ptr = tensor.begin();
   int player_pos = GetIntFromOneHot(ptr, kNumPlayers);

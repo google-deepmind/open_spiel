@@ -16,6 +16,7 @@
 #include <unordered_map>
 
 #include "open_spiel/algorithms/matrix_game_utils.h"
+#include "open_spiel/algorithms/nfg_writer.h"
 #include "open_spiel/algorithms/tensor_game_utils.h"
 #include "open_spiel/canonical_game_strings.h"
 #include "open_spiel/fog/fog_constants.h"
@@ -256,18 +257,18 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("information_state_string",
            (std::string(State::*)() const) & State::InformationStateString)
       .def("information_state_tensor",
-           (std::vector<double>(State::*)(int) const) &
+           (std::vector<float>(State::*)(int) const) &
                State::InformationStateTensor)
-      .def("information_state_tensor", (std::vector<double>(State::*)() const) &
+      .def("information_state_tensor", (std::vector<float>(State::*)() const) &
                                            State::InformationStateTensor)
       .def("observation_string",
            (std::string(State::*)(int) const) & State::ObservationString)
       .def("observation_string",
            (std::string(State::*)() const) & State::ObservationString)
-      .def("observation_tensor", (std::vector<double>(State::*)(int) const) &
-                                     State::ObservationTensor)
       .def("observation_tensor",
-           (std::vector<double>(State::*)() const) & State::ObservationTensor)
+           (std::vector<float>(State::*)(int) const) & State::ObservationTensor)
+      .def("observation_tensor",
+           (std::vector<float>(State::*)() const) & State::ObservationTensor)
       .def("public_observation_string",
            (std::string(State::*)() const) & State::PublicObservationString)
       .def("private_observation_string",
@@ -297,7 +298,10 @@ PYBIND11_MODULE(pyspiel, m) {
 
   py::class_<Game, std::shared_ptr<Game>> game(m, "Game");
   game.def("num_distinct_actions", &Game::NumDistinctActions)
-      .def("new_initial_state", &Game::NewInitialState)
+      .def("new_initial_state",
+           py::overload_cast<>(&Game::NewInitialState, py::const_))
+      .def("new_initial_state", py::overload_cast<const std::string&>(
+                                    &Game::NewInitialState, py::const_))
       .def("max_chance_outcomes", &Game::MaxChanceOutcomes)
       .def("get_parameters", &Game::GetParameters)
       .def("num_players", &Game::NumPlayers)
@@ -475,6 +479,9 @@ PYBIND11_MODULE(pyspiel, m) {
         return open_spiel::tensor_game::CreateTensorGame(flat_utilities, shape);
       },
       "Creates an arbitrary matrix game from dimensions and utilities.");
+
+  m.def("game_to_nfg_string", open_spiel::GameToNFGString,
+        "Get the Gambit .nfg text for a normal-form game.");
 
   m.def("load_game",
         py::overload_cast<const std::string&>(&open_spiel::LoadGame),

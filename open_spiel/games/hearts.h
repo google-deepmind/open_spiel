@@ -137,7 +137,7 @@ class HeartsState : public State {
   std::vector<double> Returns() const override;
   std::string InformationStateString(Player player) const override;
   void InformationStateTensor(Player player,
-                              std::vector<double>* values) const override;
+                              absl::Span<float> values) const override;
   std::unique_ptr<State> Clone() const override {
     return std::unique_ptr<State>(new HeartsState(*this));
   }

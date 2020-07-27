@@ -41,7 +41,7 @@ using open_spiel::bridge::kNoTrump;
 using open_spiel::bridge::kSpades;
 using open_spiel::bridge::kUndoubled;
 
-constexpr int kNumRedeals = 10;  // how many possible layouts to analyse
+constexpr int kDefaultNumRedeals = 10;  // how many possible layouts to analyse
 
 const GameType kGameType{
     /*short_name=*/"bridge_uncontested_bidding",
@@ -62,7 +62,9 @@ const GameType kGameType{
         {"subgame", GameParameter(static_cast<std::string>(""))},
         {"rng_seed", GameParameter(0)},
         {"relative_scoring", GameParameter(false)},
-    }};
+        {"num_redeals", GameParameter(kDefaultNumRedeals)},
+    },
+};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new UncontestedBiddingGame(params));
@@ -187,13 +189,13 @@ std::string UncontestedBiddingState::InformationStateString(
 }
 
 void UncontestedBiddingState::InformationStateTensor(
-    Player player, std::vector<double>* values) const {
+    Player player, absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  values->resize(kStateSize);
-  std::fill(values->begin(), values->end(), 0.);
-  auto ptr = values->begin();
+  SPIEL_CHECK_EQ(values.size(), kStateSize);
+  std::fill(values.begin(), values.end(), 0.);
+  auto ptr = values.begin();
 
   for (int i = kNumCardsPerHand * player; i < kNumCardsPerHand * (1 + player);
        ++i) {
@@ -264,7 +266,7 @@ void UncontestedBiddingState::ScoreDeal() {
   std::fill(reference_scores_.begin(), reference_scores_.end(), 0);
 
   // For each redeal
-  for (int ideal = 0; ideal < kNumRedeals; ++ideal) {
+  for (int ideal = 0; ideal < num_redeals_; ++ideal) {
     if (ideal > 0) deal_.Shuffle(&rng_, kNumCardsPerHand * 2, kNumCards);
 
     // Populate (reshuffled) North-South cards
@@ -296,7 +298,7 @@ void UncontestedBiddingState::ScoreDeal() {
           results.resTable[contract.trumps][2 * contract.declarer];
       const int declarer_score =
           Score(contract, declarer_tricks, /*is_vulnerable=*/false);
-      score_ += static_cast<double>(declarer_score) / kNumRedeals;
+      score_ += static_cast<double>(declarer_score) / num_redeals_;
     }
 
     // Compute the scores for reference contracts.
@@ -306,7 +308,8 @@ void UncontestedBiddingState::ScoreDeal() {
                           [2 * reference_contracts_[i].declarer];
       const int declarer_score = Score(reference_contracts_[i], declarer_tricks,
                                        /*is_vulnerable=*/false);
-      reference_scores_[i] += static_cast<double>(declarer_score) / kNumRedeals;
+      reference_scores_[i] +=
+          static_cast<double>(declarer_score) / num_redeals_;
     }
   }
 }
@@ -332,7 +335,8 @@ UncontestedBiddingGame::UncontestedBiddingGame(const GameParameters& params)
     : Game(kGameType, params),
       forced_actions_{},
       deal_filter_{NoFilter},
-      rng_seed_(ParameterValue<int>("rng_seed")) {
+      rng_seed_(ParameterValue<int>("rng_seed")),
+      num_redeals_(ParameterValue<int>("num_redeals")) {
   std::string subgame = ParameterValue<std::string>("subgame");
   if (subgame == "2NT") {
     deal_filter_ = Is2NTDeal;
@@ -433,9 +437,9 @@ std::unique_ptr<State> UncontestedBiddingGame::DeserializeState(
     SPIEL_CHECK_EQ(actions[i], forced_actions_[i]);
   }
 
-  return std::unique_ptr<State>(
-      new UncontestedBiddingState(shared_from_this(), reference_contracts_,
-                                  Deal(cards), actions, ++rng_seed_));
+  return absl::make_unique<UncontestedBiddingState>(
+      shared_from_this(), reference_contracts_, Deal(cards), actions,
+      ++rng_seed_, num_redeals_);
 }
 
 }  // namespace bridge_uncontested_bidding

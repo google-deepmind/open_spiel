@@ -59,6 +59,8 @@ def batch_norm(training, updates, name):
   """
   bn = tfkl.BatchNormalization(name=name)
   def batch_norm_layer(x):
+    # This emits a warning that training is a placeholder instead of a concrete
+    # bool, but seems to work anyway.
     applied = bn(x, training)
     updates.extend(bn.updates)
     return applied

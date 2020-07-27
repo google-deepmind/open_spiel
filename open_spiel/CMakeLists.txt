@@ -12,13 +12,13 @@ set (CMAKE_CXX_STANDARD 17)
 if(APPLE)
   # On MacOS:
   #   -undefined dynamic_lookup is necessary for pybind11 linking
-  set (CMAKE_CXX_FLAGS "-Wno-everything -w -undefined dynamic_lookup")
+  set (CMAKE_CXX_FLAGS "-Wno-everything -w -undefined dynamic_lookup -O2")
 
   # On MacOS, we need this so that CMake will use the right Python if the user
   # has a virtual environment active
   set (CMAKE_FIND_FRAMEWORK LAST)
 else()
-  set (CMAKE_CXX_FLAGS "-Wno-everything")
+  set (CMAKE_CXX_FLAGS "-Wno-everything -O2")
 endif()
 
 # Position-independent code is needed for Python extension modules.
@@ -55,33 +55,33 @@ endif()
 # Use this macro to define optional dependencies.
 # You can then use your chosen DEP_NAME as a variable to check if that
 # dependency is enabled -- see code below.
-macro(openspiel_optional_dependency DEP_NAME DEP_DESCRIPTION)
-  set (${DEP_NAME} OFF CACHE BOOL ${DEP_DESCRIPTION})
+macro(openspiel_optional_dependency DEP_NAME DEP_DEFAULT DEP_DESCRIPTION)
+  set (${DEP_NAME} ${DEP_DEFAULT} CACHE BOOL ${DEP_DESCRIPTION})
   if(NOT DEFINED ENV{${DEP_NAME}})
-    message("${BoldRed}${DEP_NAME} not set. Defaults to OFF${ColourReset}")
-    set (ENV{${DEP_NAME}} OFF)
+    message("${BoldRed}${DEP_NAME} not set. Defaults to ${DEP_DEFAULT}${ColourReset}")
+    set (ENV{${DEP_NAME}} ${DEP_DEFAULT})
   endif()
   set (${DEP_NAME} $ENV{${DEP_NAME}})
   message("${BoldYellow}${DEP_NAME}: ${${DEP_NAME}} ${ColourReset}")
 endmacro()
 
 # List of all optional dependencies:
-openspiel_optional_dependency(
-  BUILD_WITH_ACPC          "Build against the Universal Poker library.")
-openspiel_optional_dependency(
-  BUILD_WITH_EIGEN         "Build with support for Eigen in C++.")
-openspiel_optional_dependency(
-  BUILD_WITH_HANABI        "Build against the Hanabi game.")
-openspiel_optional_dependency(
-  BUILD_WITH_JULIA         "Build binary for Julia.")
-openspiel_optional_dependency(
-  BUILD_WITH_LIBTORCH      "Build with support for libtorch.")
-openspiel_optional_dependency(
-  BUILD_WITH_PUBLIC_STATES "Build with support for public states in C++.")
-openspiel_optional_dependency(
-  BUILD_WITH_PYTHON        "Build binary for Python.")
-openspiel_optional_dependency(
-  BUILD_WITH_XINXIN        "Build against xinxin Hearts program.")
+openspiel_optional_dependency(BUILD_WITH_ACPC           OFF
+  "Build against the Universal Poker library.")
+openspiel_optional_dependency(BUILD_WITH_EIGEN          OFF
+  "Build with support for Eigen in C++.")
+openspiel_optional_dependency(BUILD_WITH_HANABI         OFF
+  "Build against the Hanabi game.")
+openspiel_optional_dependency(BUILD_WITH_JULIA          OFF
+  "Build binary for Julia.")
+openspiel_optional_dependency(BUILD_WITH_LIBTORCH       OFF
+  "Build with support for libtorch.")
+openspiel_optional_dependency(BUILD_WITH_PUBLIC_STATES  OFF
+  "Build with support for public states in C++.")
+openspiel_optional_dependency(BUILD_WITH_PYTHON         ON
+  "Build binary for Python.")
+openspiel_optional_dependency(BUILD_WITH_XINXIN         OFF
+  "Build against xinxin Hearts program.")
 
 # Needed to disable Abseil tests.
 set (BUILD_TESTING OFF)
@@ -206,4 +206,29 @@ add_subdirectory (utils)
 
 if (BUILD_WITH_JULIA)
   add_subdirectory (julia)
+endif()
+
+# Build a shared library, i.e. libopen_spiel.so. We generally only enable this
+# for binary releases.
+# Note that there are known problems when trying to use absl::flags within a
+# shared library, hence is intentionally left out. To use ABSL flags, link with
+# absl::flags and absl::flags_parse separately.
+set (BUILD_SHARED_LIB OFF CACHE BOOL "Build a shared library?")
+if(NOT DEFINED ENV{BUILD_SHARED_LIB})
+  set (ENV{BUILD_SHARED_LIB} OFF)
+endif()
+set (BUILD_SHARED_LIB $ENV{BUILD_SHARED_LIB})
+if (BUILD_SHARED_LIB)
+  add_library(open_spiel SHARED ${OPEN_SPIEL_OBJECTS})
+  target_include_directories(open_spiel PUBLIC
+      ${CMAKE_CURRENT_SOURCE_DIR} abseil-cpp)
+  target_link_libraries(open_spiel PUBLIC
+    absl::container
+    absl::flat_hash_map
+    absl::optional
+    absl::random_random
+    absl::str_format
+    absl::strings
+    absl::time
+  )
 endif()

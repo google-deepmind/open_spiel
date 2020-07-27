@@ -336,7 +336,7 @@ def replay(filename):
 
 def update_path(path):
   """Regenerates all playthroughs in the path."""
-  for filename in os.listdir(path):
+  for filename in sorted(os.listdir(path)):
     try:
       original, new = replay(os.path.join(path, filename))
       if original == new:

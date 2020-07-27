@@ -33,13 +33,13 @@ void ScoringTests() {
 }
 
 void BasicGameTests() {
-  testing::LoadGameTest("bridge_uncontested_bidding");
-  testing::NoChanceOutcomesTest(*LoadGame("bridge_uncontested_bidding"));
-  testing::RandomSimTest(*LoadGame("bridge_uncontested_bidding"), 3);
+  testing::LoadGameTest("bridge_uncontested_bidding(num_redeals=1)");
+  testing::RandomSimTest(*LoadGame("bridge_uncontested_bidding(num_redeals=1)"),
+                         3);
 }
 
 void DeserializeStateTest() {
-  auto game = LoadGame("bridge_uncontested_bidding");
+  auto game = LoadGame("bridge_uncontested_bidding(num_redeals=1)");
   auto state = game->DeserializeState("AKQJ.543.QJ8.T92 97532.A2.9.QJ853");
   SPIEL_CHECK_EQ(state->ToString(), "AKQJ.543.QJ8.T92 97532.A2.9.QJ853 ");
 }

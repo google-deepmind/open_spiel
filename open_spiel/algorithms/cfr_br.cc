@@ -51,7 +51,7 @@ void CFRBRSolver::EvaluateAndUpdatePolicy() {
   ++iteration_;
 
   std::vector<TabularPolicy> br_policies(game_->NumPlayers());
-  std::unique_ptr<Policy> current_policy = CurrentPolicy();
+  std::shared_ptr<Policy> current_policy = CurrentPolicy();
 
   // Set all the player's policies first.
   for (int p = 0; p < game_->NumPlayers(); ++p) {

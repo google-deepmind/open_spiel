@@ -68,7 +68,7 @@ class TradeCommState : public State {
   std::vector<double> Returns() const override;
   std::string ObservationString(Player player) const override;
   void ObservationTensor(Player player,
-                         std::vector<double>* values) const override;
+                         absl::Span<float> values) const override;
 
   std::unique_ptr<State> Clone() const override;
   std::vector<Action> LegalActions() const override;
@@ -94,7 +94,7 @@ class TradeCommGame : public Game {
     return std::unique_ptr<State>(
         new TradeCommState(shared_from_this(), num_items_));
   }
-  int MaxChanceOutcomes() const override { return num_items_; }
+  int MaxChanceOutcomes() const override { return num_items_ * num_items_; }
 
   int MaxGameLength() const override { return 4; }
 

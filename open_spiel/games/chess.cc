@@ -55,28 +55,30 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 // and absence of the given piece type and colour at each square.
 void AddPieceTypePlane(Color color, PieceType piece_type,
                        const StandardChessBoard& board,
-                       std::vector<double>* values) {
+                       absl::Span<float>::iterator& value_it) {
   for (int8_t y = 0; y < BoardSize(); ++y) {
     for (int8_t x = 0; x < BoardSize(); ++x) {
       Piece piece_on_board = board.at(Square{x, y});
-      values->push_back(piece_on_board.color == color &&
-                                piece_on_board.type == piece_type
-                            ? 1.0
-                            : 0.0);
+      *value_it++ =
+          (piece_on_board.color == color && piece_on_board.type == piece_type
+               ? 1.0
+               : 0.0);
     }
   }
 }
 
 // Adds a uniform scalar plane scaled with min and max.
 template <typename T>
-void AddScalarPlane(T val, T min, T max, std::vector<double>* values) {
+void AddScalarPlane(T val, T min, T max,
+                    absl::Span<float>::iterator& value_it) {
   double normalized_val = static_cast<double>(val - min) / (max - min);
-  values->insert(values->end(), BoardSize() * BoardSize(), normalized_val);
+  for (int i = 0; i < BoardSize() * BoardSize(); ++i)
+    *value_it++ = normalized_val;
 }
 
 // Adds a binary scalar plane.
-void AddBinaryPlane(bool val, std::vector<double>* values) {
-  AddScalarPlane<int>(val ? 1 : 0, 0, 1, values);
+void AddBinaryPlane(bool val, absl::Span<float>::iterator& value_it) {
+  AddScalarPlane<int>(val ? 1 : 0, 0, 1, value_it);
 }
 }  // namespace
 
@@ -294,46 +296,49 @@ std::string ChessState::ObservationString(Player player) const {
 }
 
 void ChessState::ObservationTensor(Player player,
-                                   std::vector<double>* values) const {
+                                   absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  values->clear();
-  values->reserve(game_->ObservationTensorSize());
+  auto value_it = values.begin();
 
   // Piece cconfiguration.
   for (const auto& piece_type : kPieceTypes) {
-    AddPieceTypePlane(Color::kWhite, piece_type, Board(), values);
-    AddPieceTypePlane(Color::kBlack, piece_type, Board(), values);
+    AddPieceTypePlane(Color::kWhite, piece_type, Board(), value_it);
+    AddPieceTypePlane(Color::kBlack, piece_type, Board(), value_it);
   }
 
-  AddPieceTypePlane(Color::kEmpty, PieceType::kEmpty, Board(), values);
+  AddPieceTypePlane(Color::kEmpty, PieceType::kEmpty, Board(), value_it);
 
   const auto entry = repetitions_.find(Board().HashValue());
   SPIEL_CHECK_FALSE(entry == repetitions_.end());
   int repetitions = entry->second;
 
   // Num repetitions for the current board.
-  AddScalarPlane(repetitions, 1, 3, values);
+  AddScalarPlane(repetitions, 1, 3, value_it);
 
   // Side to play.
-  AddScalarPlane(ColorToPlayer(Board().ToPlay()), 0, 1, values);
+  AddScalarPlane(ColorToPlayer(Board().ToPlay()), 0, 1, value_it);
 
   // Irreversible move counter.
-  AddScalarPlane(Board().IrreversibleMoveCounter(), 0, 101, values);
+  AddScalarPlane(Board().IrreversibleMoveCounter(), 0, 101, value_it);
 
   // Castling rights.
   AddBinaryPlane(Board().CastlingRight(Color::kWhite, CastlingDirection::kLeft),
-                 values);
+                 value_it);
 
   AddBinaryPlane(
-      Board().CastlingRight(Color::kWhite, CastlingDirection::kRight), values);
+      Board().CastlingRight(Color::kWhite, CastlingDirection::kRight),
+      value_it);
 
   AddBinaryPlane(Board().CastlingRight(Color::kBlack, CastlingDirection::kLeft),
-                 values);
+                 value_it);
 
   AddBinaryPlane(
-      Board().CastlingRight(Color::kBlack, CastlingDirection::kRight), values);
+      Board().CastlingRight(Color::kBlack, CastlingDirection::kRight),
+      value_it);
+
+  SPIEL_CHECK_EQ(value_it, values.end());
 }
 
 std::unique_ptr<State> ChessState::Clone() const {

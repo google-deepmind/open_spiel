@@ -226,5 +226,8 @@ void init_pyspiel_bots(py::module& m) {
 
   m.def("make_stateful_random_bot", open_spiel::MakeStatefulRandomBot,
         "A stateful random bot, for test purposes.");
+
+  m.def("make_policy_bot", open_spiel::MakePolicyBot,
+        "A bot that samples from a policy.");
 }
 }  // namespace open_spiel

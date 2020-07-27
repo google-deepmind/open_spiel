@@ -30,6 +30,7 @@
 #include "open_spiel/abseil-cpp/absl/random/bit_gen_ref.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "open_spiel/abseil-cpp/absl/types/span.h"
 #include "open_spiel/fog/fog_constants.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel_globals.h"
@@ -222,17 +223,10 @@ class State {
   // is added.
   virtual std::vector<Action> LegalActions() const = 0;
 
-  // Returns a vector of length `game.NumDistinctActions()` containing 1 for
-  // legal actions and 0 for illegal actions.
-  std::vector<int> LegalActionsMask(Player player) const {
-    std::vector<int> mask(num_distinct_actions_, 0);
-    std::vector<Action> legal_actions = LegalActions(player);
-
-    for (auto const& value : legal_actions) {
-      mask[value] = 1;
-    }
-    return mask;
-  }
+  // Returns a vector containing 1 for legal actions and 0 for illegal actions.
+  // The length is `game.NumDistinctActions()` for player nodes, and
+  // `game.MaxChanceOutcomes()` for chance nodes.
+  std::vector<int> LegalActionsMask(Player player) const;
 
   // Convenience function for turn-based games.
   std::vector<int> LegalActionsMask() const {
@@ -421,17 +415,15 @@ class State {
   //   SPIEL_CHECK_GE(player, 0);
   //   SPIEL_CHECK_LT(player, num_players_);
   virtual void InformationStateTensor(Player player,
-                                      std::vector<double>* values) const {
+                                      absl::Span<float> values) const {
     SpielFatalError("InformationStateTensor unimplemented!");
   }
-  std::vector<double> InformationStateTensor(Player player) const {
-    std::vector<double> normalized_info_state;
-    InformationStateTensor(player, &normalized_info_state);
-    return normalized_info_state;
-  }
-  std::vector<double> InformationStateTensor() const {
+  std::vector<float> InformationStateTensor(Player player) const;
+  std::vector<float> InformationStateTensor() const {
     return InformationStateTensor(CurrentPlayer());
   }
+  virtual void InformationStateTensor(Player player,
+                                      std::vector<float>* values) const;
 
   // We have functions for observations which are parallel to those for
   // information states. An observation should have the following properties:
@@ -466,24 +458,14 @@ class State {
   //   SPIEL_CHECK_GE(player, 0);
   //   SPIEL_CHECK_LT(player, num_players_);
   virtual void ObservationTensor(Player player,
-                                 std::vector<double>* values) const {
+                                 absl::Span<float> values) const {
     SpielFatalError("ObservationTensor unimplemented!");
   }
-  std::vector<double> ObservationTensor(Player player) const {
-    // We add this player check, to prevent errors if the game implementation
-    // lacks that check (in particular as this function is the one used in
-    // Python). This can lead to doing this check twice.
-    // TODO(author2): Do we want to prevent executing this twice for games
-    // that implement it?
-    SPIEL_CHECK_GE(player, 0);
-    SPIEL_CHECK_LT(player, num_players_);
-    std::vector<double> normalized_observation;
-    ObservationTensor(player, &normalized_observation);
-    return normalized_observation;
-  }
-  std::vector<double> ObservationTensor() const {
+  std::vector<float> ObservationTensor(Player player) const;
+  std::vector<float> ObservationTensor() const {
     return ObservationTensor(CurrentPlayer());
   }
+  void ObservationTensor(Player player, std::vector<float>* values) const;
 
   // The public / private observations factorize observations into their
   // (mostly) non-overlapping public and private parts (they overlap only for
@@ -741,8 +723,11 @@ class Game : public std::enable_shared_from_this<Game> {
 
   // Returns a newly allocated initial state.
   virtual std::unique_ptr<State> NewInitialState() const = 0;
+  virtual std::unique_ptr<State> NewInitialState(const std::string& str) const {
+    SpielFatalError("NewInitialState from string is not implemented.");
+  }
 
-  // Maximum number of chance outcomes for each chance node.
+  // Maximum number of distinct chance outcomes for chance nodes in the game.
   virtual int MaxChanceOutcomes() const { return 0; }
 
   // If the game is parameterizable, returns an object with the current

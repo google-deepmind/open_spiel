@@ -18,7 +18,7 @@ GameType.utility = Utility.GENERAL_SUM
 
 NumDistinctActions() = 5
 PolicyTensorShape() = [5]
-MaxChanceOutcomes() = 0
+MaxChanceOutcomes() = 64
 GetParameters() = {columns=8,episode_length=20,num_coins_per_color=4,num_extra_coin_colors=1,players=2,rows=8}
 NumPlayers() = 2
 MinUtility() = -144.0

@@ -221,29 +221,29 @@ std::string KuhnState::PrivateObservationString(Player player) const {
 }
 
 void KuhnState::InformationStateTensor(Player player,
-                                       std::vector<double>* values) const {
+                                       absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
   // Initialize the vector with zeroes.
-  values->resize(6 * num_players_ - 1);
-  std::fill(values->begin(), values->end(), 0.);
+  SPIEL_CHECK_EQ(values.size(), 6 * num_players_ - 1);
+  std::fill(values.begin(), values.end(), 0.);
 
   // The current player
-  (*values)[player] = 1;
+  values[player] = 1;
 
   // The player's card, if one has been dealt.
   if (history_.size() > player)
-    (*values)[num_players_ + history_[player].action] = 1;
+    values[num_players_ + history_[player].action] = 1;
 
   // Betting sequence.
   for (int i = num_players_; i < history_.size(); ++i) {
-    (*values)[1 + 2 * i + history_[i].action] = 1;
+    values[1 + 2 * i + history_[i].action] = 1;
   }
 }
 
 void KuhnState::ObservationTensor(Player player,
-                                  std::vector<double>* values) const {
+                                  absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   // The format is described in ObservationTensorShape
@@ -251,21 +251,21 @@ void KuhnState::ObservationTensor(Player player,
   // each player. These values are thus not normalized.
 
   // Initialize the vector with zeroes.
-  values->resize(3 * num_players_ + 1);
-  std::fill(values->begin(), values->end(), 0.);
+  SPIEL_CHECK_EQ(values.size(), 3 * num_players_ + 1);
+  std::fill(values.begin(), values.end(), 0.);
 
   // The current player
-  (*values)[player] = 1;
+  values[player] = 1;
 
   // The player's card, if one has been dealt.
   if (history_.size() > player)
-    (*values)[num_players_ + history_[player].action] = 1;
+    values[num_players_ + history_[player].action] = 1;
 
   int offset = 2 * num_players_ + 1;
   // Adding the contribution of each players to the pot. These values are not
   // between 0 and 1.
   for (auto p = Player{0}; p < num_players_; p++) {
-    (*values)[offset + p] = ante_[p];
+    values[offset + p] = ante_[p];
   }
 }
 

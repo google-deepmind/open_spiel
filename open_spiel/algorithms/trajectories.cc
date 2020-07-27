@@ -90,7 +90,7 @@ void BatchedTrajectory::ResizeFields(int length) {
     // the existing vectors.
     if (!observations[0].empty()) {
       observations[i].resize(max_trajectory_length,
-                             std::vector<double>(observations[0][0].size(), 0));
+                             std::vector<float>(observations[0][0].size(), 0));
     }
     state_indices[i].resize(max_trajectory_length, 0);
     legal_actions[i].resize(max_trajectory_length,

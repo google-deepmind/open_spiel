@@ -98,20 +98,8 @@ Action EFCEState::CurRecommendation() const {
   SPIEL_CHECK_LT(rec_index_, mu_.size());
   ActionsAndProbs actions_and_probs =
       mu_[rec_index_].second.GetStatePolicy(state_->InformationStateString());
-  Action rec_action = kInvalidAction;
-  int num_zeros = 0;
-  int num_ones = 0;
-  for (const auto& action_and_prob : actions_and_probs) {
-    if (action_and_prob.second == 0.0) {
-      num_zeros++;
-    } else if (action_and_prob.second == 1.0) {
-      rec_action = action_and_prob.first;
-      num_ones++;
-    } else {
-      SpielFatalError("Policy not deterministic!");
-    }
-  }
-  SPIEL_CHECK_EQ(num_ones, 1);
+  Action rec_action = GetAction(actions_and_probs);
+  SPIEL_CHECK_TRUE(rec_action != kInvalidAction);
   return rec_action;
 }
 
@@ -159,8 +147,9 @@ ActionsAndProbs EFCETabularPolicy::GetStatePolicy(const State& state) const {
     return UniformStatePolicy(state);
   }
 
-  // Simply returns a fixed policy with prob 1 on the recommended action
-  // (extrapolated from the information state string) and 0 on the others.
+  // Otherwise, simply returns a fixed policy with prob 1 on the recommended
+  // action (extrapolated from the information state string) and 0 on the
+  // others.
   std::string info_state = state.InformationStateString();
   const size_t idx = info_state.find(config_.recommendation_delimiter);
   SPIEL_CHECK_NE(idx, std::string::npos);

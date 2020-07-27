@@ -56,7 +56,7 @@ void CFRTest_KuhnPoker() {
   for (int i = 0; i < 300; i++) {
     solver.EvaluateAndUpdatePolicy();
   }
-  const std::unique_ptr<Policy> average_policy = solver.AveragePolicy();
+  const std::shared_ptr<Policy> average_policy = solver.AveragePolicy();
   CheckNashKuhnPoker(*game, *average_policy);
   CheckExploitabilityKuhnPoker(*game, *average_policy);
 }
@@ -73,7 +73,7 @@ void CFRTest_IIGoof4() {
     solver.EvaluateAndUpdatePolicy();
   }
   // Values checked with Marc's thesis implementation.
-  const std::unique_ptr<Policy> average_policy = solver.AveragePolicy();
+  const std::shared_ptr<Policy> average_policy = solver.AveragePolicy();
   SPIEL_CHECK_LE(Exploitability(*game, *average_policy), 0.1);
 
   // Fixed points order.
@@ -87,7 +87,7 @@ void CFRTest_IIGoof4() {
     solver2.EvaluateAndUpdatePolicy();
   }
   // Values checkes with Marc's thesis implementation.
-  const std::unique_ptr<Policy> average_policy2 = solver2.AveragePolicy();
+  const std::shared_ptr<Policy> average_policy2 = solver2.AveragePolicy();
   SPIEL_CHECK_LE(Exploitability(*game, *average_policy2), 0.01);
 }
 
@@ -97,7 +97,7 @@ void CFRPlusTest_KuhnPoker() {
   for (int i = 0; i < 200; i++) {
     solver.EvaluateAndUpdatePolicy();
   }
-  const std::unique_ptr<Policy> average_policy = solver.AveragePolicy();
+  const std::shared_ptr<Policy> average_policy = solver.AveragePolicy();
   CheckNashKuhnPoker(*game, *average_policy);
   CheckExploitabilityKuhnPoker(*game, *average_policy);
 }
@@ -113,7 +113,7 @@ void CFRTest_KuhnPokerRunsWithThreePlayers(bool linear_averaging,
   for (int i = 0; i < 10; i++) {
     solver.EvaluateAndUpdatePolicy();
   }
-  std::unique_ptr<Policy> average_policy = solver.AveragePolicy();
+  std::shared_ptr<Policy> average_policy = solver.AveragePolicy();
   // Value upper-bounds inspired by Fig 2 of (Srinivasan et al., Actor-Critic
   // Policy Optimization in Partially Observable Multiagent Environments, 2018)
   // https://arxiv.org/abs/1810.09026
@@ -136,7 +136,7 @@ void CFRTest_GeneralMultiplePlayerTest(const std::string& game_name,
   }
 
   if (nashconv_upper_bound > 0) {
-    std::unique_ptr<Policy> average_policy = solver.AveragePolicy();
+    std::shared_ptr<Policy> average_policy = solver.AveragePolicy();
     SPIEL_CHECK_LE(NashConv(*game, *average_policy), nashconv_upper_bound);
   }
 }
@@ -156,7 +156,7 @@ void CFRTest_OneShotGameTest(int iterations, std::string one_shot_game,
   for (int i = 0; i < iterations; i++) {
     solver.EvaluateAndUpdatePolicy();
     if (i % 10 == 0) {
-      std::unique_ptr<Policy> average_policy = solver.AveragePolicy();
+      std::shared_ptr<Policy> average_policy = solver.AveragePolicy();
       nash_conv = NashConv(*game, *average_policy);
       std::cout << "iter " << i << ", nashconv = " << nash_conv << std::endl;
     }
@@ -177,7 +177,7 @@ void CFRTest_TicTacToe(int num_iterations, double nashconv_upper_bound) {
   }
 
   if (nashconv_upper_bound > 0) {
-    std::unique_ptr<Policy> average_policy = solver.AveragePolicy();
+    std::shared_ptr<Policy> average_policy = solver.AveragePolicy();
     SPIEL_CHECK_LE(NashConv(*game, *average_policy), nashconv_upper_bound);
   }
 }

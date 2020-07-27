@@ -26,6 +26,7 @@
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/game_transforms/turn_based_simultaneous_game.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
@@ -117,19 +118,20 @@ void LegalActionsAreSorted(const Game& game, State& state) {
   }
 }
 
-void LegalActionsMaskTest(const Game& game, const State& state,
+void LegalActionsMaskTest(const Game& game, const State& state, int player,
                           const std::vector<Action>& legal_actions) {
-  std::vector<int> legal_actions_mask =
-      state.LegalActionsMask(state.CurrentPlayer());
-  SPIEL_CHECK_EQ(legal_actions_mask.size(), game.NumDistinctActions());
+  std::vector<int> legal_actions_mask = state.LegalActionsMask(player);
+  int expected_length = state.IsChanceNode() ? game.MaxChanceOutcomes()
+                                             : game.NumDistinctActions();
+  SPIEL_CHECK_EQ(legal_actions_mask.size(), expected_length);
   for (Action action : legal_actions) {
     SPIEL_CHECK_GE(action, 0);
-    SPIEL_CHECK_LT(action, game.NumDistinctActions());
+    SPIEL_CHECK_LT(action, expected_length);
     SPIEL_CHECK_EQ(legal_actions_mask[action], 1);
   }
 
   int num_ones = 0;
-  for (int i = 0; i < game.NumDistinctActions(); ++i) {
+  for (int i = 0; i < expected_length; ++i) {
     SPIEL_CHECK_TRUE(legal_actions_mask[i] == 0 || legal_actions_mask[i] == 1);
     if (legal_actions_mask[i] == 1) {
       num_ones++;
@@ -225,20 +227,20 @@ void CheckReturnsSum(const Game& game, const State& state) {
 // The following functions should return valid outputs for valid player, even
 // on terminal states:
 // - std::string InformationStateString(Player player)
-// - std::vector<double> InformationStateTensor(Player player)
+// - std::vector<float> InformationStateTensor(Player player)
 // - std::string ObservationString(Player player)
-// - std::vector<double> ObservationTensor(Player player)
+// - std::vector<float> ObservationTensor(Player player)
 //
 // These functions should crash on invalid players: this is tested in
 // api_test.py as it's simpler to catch the error from Python.
 void CheckObservables(const Game& game, const State& state) {
   for (auto p = Player{0}; p < game.NumPlayers(); ++p) {
     if (game.GetType().provides_information_state_tensor) {
-      std::vector<double> v = state.InformationStateTensor(p);
+      std::vector<float> v = state.InformationStateTensor(p);
       SPIEL_CHECK_EQ(v.size(), game.InformationStateTensorSize());
     }
     if (game.GetType().provides_observation_tensor) {
-      std::vector<double> v = state.ObservationTensor(p);
+      std::vector<float> v = state.ObservationTensor(p);
       SPIEL_CHECK_EQ(v.size(), game.ObservationTensorSize());
     }
     if (game.GetType().provides_information_state_string) {
@@ -296,6 +298,8 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
     }
 
     if (state->IsChanceNode()) {
+      LegalActionsMaskTest(game, *state, kChancePlayerId,
+                           state->LegalActions());
       // Chance node; sample one according to underlying distribution
       std::vector<std::pair<Action, double>> outcomes = state->ChanceOutcomes();
       Action action = open_spiel::SampleAction(outcomes, *rng).first;
@@ -323,6 +327,7 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
       // Sample an action for each player
       for (auto p = Player{0}; p < game.NumPlayers(); p++) {
         std::vector<Action> actions = state->LegalActions(p);
+        LegalActionsMaskTest(game, *state, p, actions);
         std::uniform_int_distribution<int> dis(0, actions.size() - 1);
         Action action = actions[dis(*rng)];
         joint_action.push_back(action);
@@ -354,7 +359,7 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
 
       // Sample an action uniformly.
       std::vector<Action> actions = state->LegalActions();
-      LegalActionsMaskTest(game, *state, actions);
+      LegalActionsMaskTest(game, *state, state->CurrentPlayer(), actions);
       if (state->IsTerminal())
         SPIEL_CHECK_TRUE(actions.empty());
       else

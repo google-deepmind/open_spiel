@@ -30,11 +30,13 @@ import pyspiel
 
 _ALL_GAMES = pyspiel.registered_games()
 
-_GAMES_TO_TEST = [g.short_name for g in _ALL_GAMES if g.default_loadable]
+_GAMES_TO_TEST = set([g.short_name for g in _ALL_GAMES if g.default_loadable])
 
 _GAMES_NOT_UNDER_TEST = [
     g.short_name for g in _ALL_GAMES if not g.default_loadable
 ]
+
+_GAMES_TO_OMIT_LEGAL_ACTIONS_CHECK = set(["bridge_uncontested_bidding"])
 
 # The list of game instances to test on the full tree as tuples
 # (name to display, string to pass to load_game).
@@ -719,7 +721,7 @@ class PartialEnforceAPIConventionsTest(parameterized.TestCase):
     print(f"Test for {game_name} took {time.time()-start} seconds "
           f"to make {rollouts} rollouts.")
 
-  @parameterized.parameters(_GAMES_TO_TEST)
+  @parameterized.parameters(_GAMES_TO_TEST - _GAMES_TO_OMIT_LEGAL_ACTIONS_CHECK)
   def test_legal_actions_returns_empty_list_on_opponent(self, game_name):
     game = pyspiel.load_game(game_name)
 

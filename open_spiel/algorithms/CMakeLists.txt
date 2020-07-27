@@ -7,6 +7,10 @@ add_library (algorithms OBJECT
   cfr_br.h
   corr_dist.cc
   corr_dist.h
+  corr_dist/afcce.cc
+  corr_dist/afcce.h
+  corr_dist/afce.cc
+  corr_dist/afce.h
   corr_dist/efcce.cc
   corr_dist/efcce.h
   corr_dist/efce.cc
@@ -31,6 +35,8 @@ add_library (algorithms OBJECT
   is_mcts.h
   matrix_game_utils.cc
   matrix_game_utils.h
+  nfg_writer.cc
+  nfg_writer.h
   mcts.cc
   mcts.h
   minimax.cc
