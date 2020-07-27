@@ -33,6 +33,7 @@
 #include "open_spiel/abseil-cpp/absl/types/span.h"
 #include "open_spiel/fog/fog_constants.h"
 #include "open_spiel/game_parameters.h"
+#include "open_spiel/observer.h"
 #include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
 
@@ -146,8 +147,9 @@ std::ostream& operator<<(std::ostream& stream, GameType::RewardModel value);
 // The probability of taking each possible action in a particular info state.
 using ActionsAndProbs = std::vector<std::pair<Action, double>>;
 
-// Forward declaration needed for the backpointer within State.
+// Forward declarations.
 class Game;
+class Observer;
 
 // An abstract class that represents a state of the game.
 class State {
@@ -817,6 +819,12 @@ class Game : public std::enable_shared_from_this<Game> {
 
   // A string representation of the game, which can be passed to LoadGame.
   std::string ToString() const;
+
+  // Returns an Observer, used to obtain observations of the game state.
+  // See `spiel_observer.h` for further information.
+  virtual std::shared_ptr<Observer> MakeObserver(
+      absl::optional<IIGObservationType> iig_obs_type,
+      const GameParameters& params) const;
 
  protected:
   Game(GameType game_type, GameParameters game_parameters)

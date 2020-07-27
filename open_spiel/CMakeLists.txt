@@ -131,6 +131,8 @@ set (OPEN_SPIEL_CORE_FILES
   matrix_game.cc
   matrix_game.h
   normal_form_game.h
+  observer.cc
+  observer.h
   policy.cc
   policy.h
   simultaneous_move_game.cc

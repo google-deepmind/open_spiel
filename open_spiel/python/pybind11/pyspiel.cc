@@ -20,16 +20,19 @@
 #include "open_spiel/algorithms/tensor_game_utils.h"
 #include "open_spiel/canonical_game_strings.h"
 #include "open_spiel/fog/fog_constants.h"
+#include "open_spiel/game_parameters.h"
 #include "open_spiel/games/efg_game.h"
 #include "open_spiel/games/efg_game_data.h"
 #include "open_spiel/matrix_game.h"
 #include "open_spiel/normal_form_game.h"
+#include "open_spiel/observer.h"
 #include "open_spiel/python/pybind11/algorithms_trajectories.h"
 #include "open_spiel/python/pybind11/bots.h"
 #include "open_spiel/python/pybind11/game_transforms.h"
 #include "open_spiel/python/pybind11/games_bridge.h"
 #include "open_spiel/python/pybind11/games_negotiation.h"
 #include "open_spiel/python/pybind11/observation_history.h"
+#include "open_spiel/python/pybind11/observer.h"
 #include "open_spiel/python/pybind11/policy.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_globals.h"
@@ -96,6 +99,16 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("__eq__", [](const GameParameter &value, GameParameter *value2) {
          return value2 && value.ToReprString() == value2->ToReprString();
        });
+
+  py::enum_<PrivateInfoType>(m, "PrivateInfoType")
+      .value("ALL_PLAYERS", PrivateInfoType::kAllPlayers)
+      .value("NONE", PrivateInfoType::kNone)
+      .value("SINGLE_PLAYER", PrivateInfoType::kSinglePlayer);
+
+  py::class_<IIGObservationType>(m, "IIGObservationType")
+      .def(py::init<bool, bool, PrivateInfoType>(),
+           py::arg("public_info") = true, py::arg("perfect_recall"),
+           py::arg("private_info") = PrivateInfoType::kSinglePlayer);
 
   py::class_<UniformProbabilitySampler> uniform_sampler(
       m, "UniformProbabilitySampler");
@@ -319,6 +332,9 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("policy_tensor_shape", &Game::PolicyTensorShape)
       .def("deserialize_state", &Game::DeserializeState)
       .def("max_game_length", &Game::MaxGameLength)
+      .def("make_observer", &Game::MakeObserver,
+           py::arg("imperfect_information_observation_type") = absl::nullopt,
+           py::arg("params") = GameParameters())
       .def("__str__", &Game::ToString)
       .def("__eq__",
            [](const Game& value, Game* value2) {
@@ -539,6 +555,7 @@ PYBIND11_MODULE(pyspiel, m) {
   init_pyspiel_algorithms_trajectories(m);  // Trajectories.
   init_pyspiel_games_negotiation(m);        // Negotiation game.
   init_pyspiel_games_bridge(m);  // Game-specific functions for bridge.
+  init_pyspiel_observer(m);      // Observers and observations.
 
   // List of optional python submodules.
 #if BUILD_WITH_PUBLIC_STATES
