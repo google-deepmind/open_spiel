@@ -65,12 +65,9 @@ class DeepSeaState : public State {
   bool IsTerminal() const override;
   std::vector<double> Rewards() const override;
   std::vector<double> Returns() const override;
-  std::string InformationStateString(Player player) const override;
   std::string ObservationString(Player player) const override;
   void ObservationTensor(Player player,
                          absl::Span<float> values) const override;
-  void InformationStateTensor(Player player,
-                              absl::Span<float> values) const override;
   std::unique_ptr<State> Clone() const override;
   void UndoAction(Player player, Action move) override;
   std::vector<Action> LegalActions() const override;
@@ -104,9 +101,6 @@ class DeepSeaGame : public Game {
   }
   std::vector<int> ObservationTensorShape() const override {
     return {size_, size_};
-  }
-  std::vector<int> InformationStateTensorShape() const override {
-    return {2 * size_};
   }
 
   int NumDistinctActions() const override { return kNumActions; }

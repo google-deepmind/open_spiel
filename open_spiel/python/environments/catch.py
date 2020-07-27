@@ -150,9 +150,9 @@ class Environment(object):
         step_type=step_type)
 
   def _get_observation(self):
-    board = np.zeros((2, self._height, self._width), dtype=np.float32)
-    board[0, self._ball_pos.y, self._ball_pos.x] = 1.0
-    board[1, self._paddle_pos.y, self._paddle_pos.x] = 1.0
+    board = np.zeros((self._height, self._width), dtype=np.float32)
+    board[self._ball_pos.y, self._ball_pos.x] = 1.0
+    board[self._paddle_pos.y, self._paddle_pos.x] = 1.0
     return board.flatten()
 
   def observation_spec(self):
@@ -164,7 +164,7 @@ class Environment(object):
       A specification dict describing the observation fields and shapes.
     """
     return dict(
-        info_state=tuple([2 * self._height * self._width]),
+        info_state=tuple([self._height * self._width]),
         legal_actions=(self._num_actions,),
         current_player=(),
     )
