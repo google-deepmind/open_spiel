@@ -60,6 +60,10 @@ struct CFRInfoStateValues {
   // Extracts the current policy. Note: assumes it is filled.
   ActionsAndProbs GetCurrentPolicy() const;
 
+  // Return index of the action within the vector of legal_actions,
+  // or exit with an error.
+  unsigned int GetActionIndex(Action a);
+
   std::vector<Action> legal_actions;
   std::vector<double> cumulative_regrets;
   std::vector<double> cumulative_policy;

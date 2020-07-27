@@ -462,6 +462,13 @@ int CFRInfoStateValues::SampleActionIndex(double epsilon, double z) {
   SpielFatalError(absl::StrCat("SampleActionIndex: sum of probs is ", sum));
 }
 
+unsigned int CFRInfoStateValues::GetActionIndex(Action a) {
+  for (int i = 0; i < legal_actions.size(); ++i) {
+    if(legal_actions[i] == a) return i;
+  }
+  SpielFatalError(absl::StrCat("GetActionIndex: the action was not found: ", a));
+}
+
 //  Resets negative cumulative regrets to 0.
 //
 //  Regret Matching+ corresponds to the following cumulative regrets update:
