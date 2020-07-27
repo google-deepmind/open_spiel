@@ -42,6 +42,7 @@ void BasicGameTests() {
   testing::LoadGameTest("oh_hell");
   testing::ChanceOutcomesTest(*LoadGame("oh_hell"));
   testing::RandomSimTest(*LoadGame("oh_hell"), 3);
+  testing::ResampleInfostateTest(*LoadGame("oh_hell"), /*num_sims=*/10);
 }
 
 std::string InformationStateTensorToString(Player player,

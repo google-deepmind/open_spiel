@@ -490,6 +490,73 @@ void OhHellState::InformationStateTensor(Player player,
   SPIEL_CHECK_EQ(ptr, values.end());
 }
 
+// This implementation produces samples that may be inconsistent w.r.t. voids.
+// i.e. if a player has played another suit when a diamond was lead,
+// this player cannot have any diamonds according to the rules of the game, but
+// the generated sample could be a state that contradicts this rule.
+std::unique_ptr<State> OhHellState::ResampleFromInfostate(
+    int player_id, std::function<double()> rng) const {
+  std::unique_ptr<State> clone = game_->NewInitialState();
+  if (phase_ != Phase::kBid && phase_ != Phase::kPlay) return clone;
+
+  // initial chance actions (choose num tricks and dealer)
+  clone->ApplyAction(num_tricks_);
+  clone->ApplyAction(dealer_);
+
+  // deal needs to be consistent with the player's hand, and the opponent's
+  // played cards
+  std::vector<std::vector<int>> known(num_players_);
+  for (int card = 0; card < deck_props_.NumCards(); ++card) {
+    absl::optional<Player> p = initial_deal_[card];
+    if (p.has_value() && (*p == player_id || !holder_[card].has_value())) {
+      // if player_id was initially dealt the card, or if anyone was but no
+      // longer holds it (because it was played), player_id knows where it was
+      // dealt
+      known[*p].push_back(card);
+    }
+  }
+
+  // the only other known card is trump
+  // apply num_tricks * num_players deal actions
+  std::vector<int> known_deal_counter(num_players_, 0);
+  for (int i = 0; i < num_players_ * num_tricks_; ++i) {
+    Player deal_to = i % num_players_;
+    if (known_deal_counter[deal_to] < known[deal_to].size()) {
+      clone->ApplyAction(known[deal_to][known_deal_counter[deal_to]]);
+      known_deal_counter[deal_to]++;
+    } else {
+      // deal randomly from the remaining unknown cards
+      Action candidate = kInvalidAction;
+      while (candidate == kInvalidAction) {
+        candidate = SampleAction(clone->ChanceOutcomes(), rng()).first;
+        absl::optional<Player> p = initial_deal_[candidate];
+        if (candidate == trump_ ||  p.has_value() &&
+            (*p == player_id || !holder_[candidate].has_value())) {
+          // can't use this card if player_id has it, or if it was played by
+          // any player
+          candidate = kInvalidAction;
+        }
+      }
+      clone->ApplyAction(candidate);
+    }
+  }
+
+  // deal the trump card
+  clone->ApplyAction(trump_);
+
+  // now apply all of the bid and play phase actions in the same order as the
+  // original state
+  int start = kNumPreDealChanceActions + num_players_ * num_tricks_ + 1;
+  for (size_t i = start; i < history_.size(); i++) {
+    clone->ApplyAction(history_.at(i).action);
+  }
+
+  SPIEL_CHECK_EQ(History().size(), clone->History().size());
+  SPIEL_CHECK_EQ(InformationStateString(player_id),
+                 clone->InformationStateString(player_id));
+  return clone;
+}
+
 Trick::Trick() : Trick(kInvalidPlayer, Suit::kInvalidSuit, kInvalidRank,
                        DeckProperties()) {}
 

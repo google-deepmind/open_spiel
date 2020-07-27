@@ -143,6 +143,8 @@ class OhHellState : public State {
   }
   std::vector<Action> LegalActions() const override;
   std::vector<std::pair<Action, double>> ChanceOutcomes() const override;
+  std::unique_ptr<State> ResampleFromInfostate(
+      int player_id, std::function<double()> rng) const override;
 
  protected:
   void DoApplyAction(Action action) override;
