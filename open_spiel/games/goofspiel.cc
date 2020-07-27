@@ -644,6 +644,10 @@ GoofspielGame::GoofspielGame(const GameParameters& params)
   if (returns_type_ == ReturnsType::kTotalPoints) {
     game_type_.utility = GameType::Utility::kGeneralSum;
   }
+  // Maybe override the perfect information in the game type.
+  if (impinfo_) {
+    game_type_.information = GameType::Information::kImperfectInformation;
+  }
 }
 
 std::unique_ptr<State> GoofspielGame::NewInitialState() const {
