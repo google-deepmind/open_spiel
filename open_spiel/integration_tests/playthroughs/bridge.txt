@@ -19,7 +19,7 @@ GameType.utility = Utility.ZERO_SUM
 NumDistinctActions() = 90
 PolicyTensorShape() = [90]
 MaxChanceOutcomes() = 52
-GetParameters() = {}
+GetParameters() = {dealer_vul=False,non_dealer_vul=False,use_double_dummy_result=True}
 NumPlayers() = 4
 MinUtility() = -7600.0
 MaxUtility() = 7600.0

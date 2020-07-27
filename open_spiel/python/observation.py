@@ -62,24 +62,31 @@ class _Observation:
   def __init__(self, game, imperfect_information_observation_type, params):
     obs = game.make_observer(imperfect_information_observation_type, params)
     self._observation = pyspiel._Observation(game, obs)
-    self.tensor = np.frombuffer(self._observation, np.float32)
     self.dict = {}
-    offset = 0
-    for tensor_info in self._observation.tensor_info():
-      size = np.product(tensor_info.shape)
-      values = self.tensor[offset:offset + size].reshape(tensor_info.shape)
-      self.dict[tensor_info.name] = values
-      offset += size
+    if self._observation.has_tensor():
+      self.tensor = np.frombuffer(self._observation, np.float32)
+      offset = 0
+      for tensor_info in self._observation.tensor_info():
+        size = np.product(tensor_info.shape)
+        values = self.tensor[offset:offset + size].reshape(tensor_info.shape)
+        self.dict[tensor_info.name] = values
+        offset += size
+    else:
+      self.tensor = None
 
   def set_from(self, state, player):
     self._observation.set_from(state, player)
 
   def string_from(self, state, player):
-    return self._observation.string_from(state, player)
+    return (self._observation.string_from(state, player)
+            if self._observation.has_string() else None)
 
 
 def make_observation(game,
                      imperfect_information_observation_type=None,
                      params=None):
-  return _Observation(game, imperfect_information_observation_type, params or
-                      {})
+  if hasattr(game, 'make_py_observer'):
+    return game.make_py_observer(imperfect_information_observation_type, params)
+  else:
+    return _Observation(game, imperfect_information_observation_type, params or
+                        {})

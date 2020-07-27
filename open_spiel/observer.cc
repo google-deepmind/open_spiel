@@ -35,9 +35,13 @@ namespace {
 class InformationStateObserver : public Observer {
  public:
   InformationStateObserver(const Game& game)
-      : size_(game.InformationStateTensorSize()) {
-    auto shape = game.InformationStateTensorShape();
-    shape_.assign(shape.begin(), shape.end());
+      : has_string_(game.GetType().provides_information_state_string),
+        has_tensor_(game.GetType().provides_information_state_tensor),
+        size_(has_tensor_ ? game.InformationStateTensorSize() : 0) {
+    if (has_tensor_) {
+      auto shape = game.InformationStateTensorShape();
+      shape_.assign(shape.begin(), shape.end());
+    }
   }
   void WriteTensor(const State& state, int player,
                    Allocator* allocator) const override {
@@ -46,19 +50,29 @@ class InformationStateObserver : public Observer {
   }
 
   std::string StringFrom(const State& state, int player) const override {
-    return state.InformationStateString();
+    return state.InformationStateString(player);
   }
+
+  bool HasString() const { return has_string_; }
+  bool HasTensor() const { return has_tensor_; }
 
  private:
   absl::InlinedVector<int, 4> shape_;
+  bool has_string_;
+  bool has_tensor_;
   int size_;
 };
 
 class DefaultObserver : public Observer {
  public:
-  DefaultObserver(const Game& game) : size_(game.ObservationTensorSize()) {
-    auto shape = game.ObservationTensorShape();
-    shape_.assign(shape.begin(), shape.end());
+  DefaultObserver(const Game& game)
+      : has_string_(game.GetType().provides_observation_string),
+        has_tensor_(game.GetType().provides_observation_tensor),
+        size_(has_tensor_ ? game.ObservationTensorSize() : 0) {
+    if (has_tensor_) {
+      auto shape = game.ObservationTensorShape();
+      shape_.assign(shape.begin(), shape.end());
+    }
   }
 
   void WriteTensor(const State& state, int player,
@@ -71,8 +85,13 @@ class DefaultObserver : public Observer {
     return state.ObservationString(player);
   }
 
+  bool HasString() const { return has_string_; }
+  bool HasTensor() const { return has_tensor_; }
+
  private:
   absl::InlinedVector<int, 4> shape_;
+  bool has_string_;
+  bool has_tensor_;
   int size_;
 };
 
@@ -86,8 +105,9 @@ std::shared_ptr<Observer> Game::MakeObserver(
   // game-specific observer.
   if (!params.empty()) SpielFatalError("Observer params not supported.");
   if (!iig_obs_type) return absl::make_unique<DefaultObserver>(*this);
-  SPIEL_CHECK_EQ(GetType().information,
-                 GameType::Information::kImperfectInformation);
+  // TODO(author11) Reinstate this check
+  // SPIEL_CHECK_EQ(GetType().information,
+  //                GameType::Information::kImperfectInformation);
   if (iig_obs_type->public_info && !iig_obs_type->perfect_recall &&
       iig_obs_type->private_info == PrivateInfoType::kSinglePlayer) {
     if (game_type_.provides_observation_tensor ||
@@ -124,11 +144,13 @@ class TrackingVectorAllocator : public Allocator {
 Observation::Observation(const Game& game, std::shared_ptr<Observer> observer)
     : observer_(std::move(observer)) {
   // Get an observation of the initial state to set up.
-  auto state = game.NewInitialState();
-  TrackingVectorAllocator allocator;
-  observer_->WriteTensor(*state, /*player=*/0, &allocator);
-  buffer_ = std::move(allocator.data);
-  tensors_ = std::move(allocator.tensors);
+  if (HasTensor()) {
+    auto state = game.NewInitialState();
+    TrackingVectorAllocator allocator;
+    observer_->WriteTensor(*state, /*player=*/0, &allocator);
+    buffer_ = std::move(allocator.data);
+    tensors_ = std::move(allocator.tensors);
+  }
 }
 
 void Observation::SetFrom(const State& state, int player) {

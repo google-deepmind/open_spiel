@@ -48,6 +48,8 @@ void init_pyspiel_observer(py::module& m) {
       .def("tensor_info", &Observation::tensor_info)
       .def("string_from", &Observation::StringFrom)
       .def("set_from", &Observation::SetFrom)
+      .def("has_string", &Observation::HasString)
+      .def("has_tensor", &Observation::HasTensor)
       .def_buffer([](Observation& buffer_observer) -> py::buffer_info {
         return py::buffer_info(
             buffer_observer.Tensor().data(),         // Pointer to buffer

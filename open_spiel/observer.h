@@ -113,6 +113,20 @@ struct IIGObservationType {
   PrivateInfoType private_info;
 };
 
+// Default observation type for imperfect information games.
+// Corresponds to the ObservationTensor method.
+inline constexpr IIGObservationType kDefaultObsType{
+    .public_info = true,
+    .perfect_recall = false,
+    .private_info = PrivateInfoType::kSinglePlayer};
+
+// Default observation type for imperfect information games.
+// Corresponds to the InformationStateTensor method.
+inline constexpr IIGObservationType kInfoStateObsType{
+    .public_info = true,
+    .perfect_recall = true,
+    .private_info = PrivateInfoType::kSinglePlayer};
+
 // An Observer is something which can produce an observation of a State,
 // e.g. a Tensor or collection of Tensors or a string.
 // Observers are game-specific. They are created by a Game object, and
@@ -126,6 +140,11 @@ class Observer {
   // Return a string observation. For human-readability or for tabular
   // algorithms on small games.
   virtual std::string StringFrom(const State& state, int player) const = 0;
+
+  // What observations do we support?
+  // TODO(author11) Remove when all games support both types of observations
+  virtual bool HasString() const { return true; }
+  virtual bool HasTensor() const { return true; }
 
   virtual ~Observer() = default;
 };
@@ -161,6 +180,11 @@ class Observation {
   std::string StringFrom(const State& state, int player) const {
     return observer_->StringFrom(state, player);
   }
+
+  // What observations do we support?
+  // TODO(author11) Remove when all games support both types of observations
+  bool HasString() const { return observer_->HasString(); }
+  bool HasTensor() const { return observer_->HasTensor(); }
 
  private:
   std::shared_ptr<Observer> observer_;

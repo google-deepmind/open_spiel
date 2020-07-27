@@ -38,10 +38,15 @@ class ObservationTest(absltest.TestCase):
     observation.set_from(state, player=0)
     np.testing.assert_array_equal(
         observation.tensor, [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 3, 3])
-    self.assertEqual(list(observation.dict), ["observation"])
-    np.testing.assert_array_equal(
-        observation.dict["observation"],
-        [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 3, 3])
+    self.assertEqual(
+        list(observation.dict),
+        ["player", "private_card", "community_card", "pot_contribution"])
+    np.testing.assert_array_equal(observation.dict["player"], [1, 0])
+    np.testing.assert_array_equal(observation.dict["private_card"],
+                                  [0, 1, 0, 0, 0, 0])
+    np.testing.assert_array_equal(observation.dict["community_card"],
+                                  [0, 0, 0, 1, 0, 0])
+    np.testing.assert_array_equal(observation.dict["pot_contribution"], [3, 3])
     self.assertEqual(
         observation.string_from(state, 0),
         "[Round 2][Player: 0][Pot: 6][Money: 97 97[Private: 1]"
@@ -62,24 +67,43 @@ class ObservationTest(absltest.TestCase):
         1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0
     ])
-    self.assertEqual(list(observation.dict), ["info_state"])
-    np.testing.assert_array_equal(observation.dict["info_state"], [
-        1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0
-    ])
+    self.assertEqual(
+        list(observation.dict),
+        ["player", "private_card", "community_card", "betting"])
+    np.testing.assert_array_equal(observation.dict["player"], [1, 0])
+    np.testing.assert_array_equal(observation.dict["private_card"],
+                                  [0, 1, 0, 0, 0, 0])
+    np.testing.assert_array_equal(observation.dict["community_card"],
+                                  [0, 0, 0, 1, 0, 0])
+    np.testing.assert_array_equal(
+        observation.dict["betting"],
+        [
+            [[0, 1], [1, 0], [0, 0], [0, 0]],  # First round
+            [[0, 0], [0, 0], [0, 0], [0, 0]],  # Second round
+        ])
     self.assertEqual(
         observation.string_from(state, 0),
         "[Round 2][Player: 0][Pot: 6][Money: 97 97[Private: 1]]"
         "[Round1]: 2 1[Public: 3]\nRound 2 sequence: ")
 
-  def test_leduc_unsupported(self):
+  def test_leduc_all_player_privates(self):
     game = pyspiel.load_game("leduc_poker")
-    with self.assertRaises(RuntimeError):
-      unused_observation = make_observation(
-          game,
-          pyspiel.IIGObservationType(
-              perfect_recall=True,
-              private_info=pyspiel.PrivateInfoType.ALL_PLAYERS))
+    observation = make_observation(
+        game,
+        pyspiel.IIGObservationType(
+            perfect_recall=True,
+            private_info=pyspiel.PrivateInfoType.ALL_PLAYERS))
+    state = game.new_initial_state()
+    state.apply_action(1)  # Deal 1
+    state.apply_action(2)  # Deal 2
+    state.apply_action(2)  # Bet
+    state.apply_action(1)  # Call
+    state.apply_action(3)  # Deal 3
+    observation.set_from(state, player=0)
+    np.testing.assert_array_equal(observation.dict["private_cards"], [
+        [0, 1, 0, 0, 0, 0],
+        [0, 0, 1, 0, 0, 0],
+    ])
 
   def test_benchmark_state_generation(self):
     # Generate trajectories to test on

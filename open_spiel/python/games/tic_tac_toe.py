@@ -23,6 +23,7 @@ Nonetheless, there are many cases where this is desirable (or required), hence
 we provide this example.
 """
 
+import copy
 import pickle
 
 import numpy as np
@@ -54,26 +55,18 @@ class TicTacToeState(object):
 
   def __init__(self, game):
     self._game = game
-    self.set_state(
-        cur_player=0,
-        winner=None,
-        is_terminal=False,
-        history=[],
-        board=np.full((_NUM_ROWS, _NUM_COLS), "."))
+    self._cur_player = 0
+    self._winner = None
+    self._is_terminal = False
+    self._history = []
+    self._board = np.full((_NUM_ROWS, _NUM_COLS), ".")
 
   # Helper functions (not part of the OpenSpiel API).
 
-  def set_state(self, cur_player, winner, is_terminal, history, board):
-    self._cur_player = cur_player
-    self._winner = winner
-    self._is_terminal = is_terminal
-    self._history = history
-    self._board = board
-
-  def coord(self, move):
+  def _coord(self, move):
     return (move // _NUM_COLS, move % _NUM_COLS)
 
-  def line_exists(self):
+  def _line_exists(self):
     """Checks if a line exists, returns "x" or "o" if so, and None otherwise."""
     return (_line_value(self._board[0]) or _line_value(self._board[1]) or
             _line_value(self._board[2]) or _line_value(self._board[:, 0]) or
@@ -105,7 +98,7 @@ class TicTacToeState(object):
     else:
       actions = []
       for action in range(_NUM_CELLS):
-        if self._board[self.coord(action)] == ".":
+        if self._board[self._coord(action)] == ".":
           actions.append(action)
       return actions
 
@@ -132,9 +125,9 @@ class TicTacToeState(object):
 
   def apply_action(self, action):
     """Applies the specified action to the state."""
-    self._board[self.coord(action)] = "x" if self._cur_player == 0 else "o"
+    self._board[self._coord(action)] = "x" if self._cur_player == 0 else "o"
     self._history.append(action)
-    if self.line_exists():
+    if self._line_exists():
       self._is_terminal = True
       self._winner = self._cur_player
     elif len(self._history) == _NUM_CELLS:
@@ -144,7 +137,7 @@ class TicTacToeState(object):
 
   def undo_action(self, action):
     # Optional function. Not used in many places.
-    self._board[self.coord(action)] = "."
+    self._board[self._coord(action)] = "."
     self._cur_player = 1 - self._cur_player
     self._history.pop()
     self._winner = None
@@ -154,7 +147,7 @@ class TicTacToeState(object):
     """Action -> string. Args either (player, action) or (action)."""
     player = self.current_player() if arg1 is None else arg0
     action = arg0 if arg1 is None else arg1
-    row, col = self.coord(action)
+    row, col = self._coord(action)
     return "{}({},{})".format("x" if player == 0 else "o", row, col)
 
   def is_terminal(self):
@@ -189,26 +182,6 @@ class TicTacToeState(object):
   def history_str(self):
     return str(self._history)
 
-  def information_state_string(self, player=None):
-    del player  # Same information state for both players.
-    return self.history_str()
-
-  def information_state_tensor(self, player=None):
-    raise NotImplementedError
-
-  def observation_string(self, player=None):
-    del player  # Same observation for both players.
-    return str(self)
-
-  def observation_tensor(self, player=None):
-    del player  # Same observation for both players.
-    observation = np.zeros((1 + _NUM_PLAYERS, _NUM_ROWS, _NUM_COLS))
-    for row in range(_NUM_ROWS):
-      for col in range(_NUM_COLS):
-        index = ".ox".index(self._board[row, col])
-        observation[index, row, col] = 1.0
-    return list(observation.flatten())
-
   def child(self, action):
     cloned_state = self.clone()
     cloned_state.apply_action(action)
@@ -242,10 +215,7 @@ class TicTacToeState(object):
     return "\n".join("".join(row) for row in self._board)
 
   def clone(self):
-    cloned_state = TicTacToeState(self._game)
-    cloned_state.set_state(self._cur_player, self._winner, self._is_terminal,
-                           self._history[:], np.array(self._board))
-    return cloned_state
+    return copy.deepcopy(self)
 
 
 class TicTacToeGame(object):
@@ -310,14 +280,8 @@ class TicTacToeGame(object):
   def utility_sum(self):
     return 0.0
 
-  def observation_tensor_shape(self):
-    return [1 + _NUM_PLAYERS, _NUM_ROWS, _NUM_COLS]
-
   def observation_tensor_layout(self):
     return pyspiel.TensorLayout.CHW
-
-  def observation_tensor_size(self):
-    return np.product(self.observation_tensor_shape())
 
   def deserialize_state(self, string):
     return pickle.loads(string)
@@ -327,3 +291,32 @@ class TicTacToeGame(object):
 
   def __str__(self):
     return "python_tic_tac_toe"
+
+  def make_py_observer(self, iig_obs_type, params):
+    if params:
+      raise ValueError("Params not supported")
+    if iig_obs_type:
+      raise ValueError("Not an imperfect information game")
+    return TicTacToeObserver()
+
+
+class TicTacToeObserver:
+  """Observer, conforming to the PyObserver interface (see observer.py)."""
+
+  def __init__(self):
+    self._obs = np.zeros((3, 3, 3), np.float32)
+    self.tensor = np.ravel(self._obs)
+    self.dict = {"observation": self._obs}
+
+  def set_from(self, state, player):
+    del player
+    self._obs[:] = 0
+    board = state._board  # pylint: disable=protected-access
+    for row in range(_NUM_ROWS):
+      for col in range(_NUM_COLS):
+        index = ".ox".index(board[row, col])
+        self._obs[index, row, col] = 1.0
+
+  def string_from(self, state, player):
+    del player
+    return str(state)

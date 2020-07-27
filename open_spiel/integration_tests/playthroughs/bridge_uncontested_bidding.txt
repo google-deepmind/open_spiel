@@ -1,4 +1,4 @@
-game: bridge_uncontested_bidding(relative_scoring=True,num_redeals=1)
+game: bridge_uncontested_bidding(relative_scoring=True,num_redeals=1,rng_seed=-1)
 
 GameType.chance_mode = ChanceMode.SAMPLED_STOCHASTIC
 GameType.dynamics = Dynamics.SEQUENTIAL
@@ -19,7 +19,7 @@ GameType.utility = Utility.IDENTICAL
 NumDistinctActions() = 36
 PolicyTensorShape() = [36]
 MaxChanceOutcomes() = 1
-GetParameters() = {num_redeals=1,relative_scoring=True,rng_seed=0,subgame=}
+GetParameters() = {num_redeals=1,relative_scoring=True,rng_seed=-1,subgame=}
 NumPlayers() = 2
 MinUtility() = -2170.0
 MaxUtility() = 0.0
@@ -28,7 +28,7 @@ InformationStateTensorShape() = [126]
 InformationStateTensorLayout() = TensorLayout.CHW
 InformationStateTensorSize() = 126
 MaxGameLength() = 36
-ToString() = "bridge_uncontested_bidding(num_redeals=1,relative_scoring=True)"
+ToString() = "bridge_uncontested_bidding(num_redeals=1,relative_scoring=True,rng_seed=-1)"
 
 # State 0
 IsTerminal() = False
