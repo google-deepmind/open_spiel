@@ -158,6 +158,8 @@ bool Near(T a, T b, T epsilon) {
 
 // Macros to check for error conditions.
 // These trigger SpielFatalError if the condition is violated.
+// These macros are always executed. If you want to use checks
+// only for debugging, use SPIEL_DCHECK_*
 
 #define SPIEL_CHECK_OP(x_exp, op, y_exp)                             \
   do {                                                               \
@@ -222,6 +224,47 @@ bool Near(T a, T b, T epsilon) {
   while (x)                                                      \
   open_spiel::SpielFatalError(open_spiel::internal::SpielStrCat( \
       __FILE__, ":", __LINE__, " CHECK_FALSE(", #x, ")"))
+
+#if !defined(NDEBUG)
+
+// Checks that are executed in Debug / Testing build type,
+// and turned off for Release build type.
+#define SPIEL_DCHECK_OP(x_exp, op, y_exp) SPIEL_CHECK_OP(x_exp, op, y_exp)
+#define SPIEL_DCHECK_FN2(x_exp, y_exp, fn) SPIEL_CHECK_FN2(x_exp, y_exp, fn)
+#define SPIEL_DCHECK_FN3(x_exp, y_exp, z_exp, fn) \
+  SPIEL_CHECK_FN3(x_exp, y_exp, z_exp, fn)
+#define SPIEL_DCHECK_GE(x, y) SPIEL_CHECK_GE(x, y)
+#define SPIEL_DCHECK_GT(x, y) SPIEL_CHECK_GT(x, y)
+#define SPIEL_DCHECK_LE(x, y) SPIEL_CHECK_LE(x, y)
+#define SPIEL_DCHECK_LT(x, y) SPIEL_CHECK_LT(x, y)
+#define SPIEL_DCHECK_EQ(x, y) SPIEL_CHECK_EQ(x, y)
+#define SPIEL_DCHECK_NE(x, y) SPIEL_CHECK_NE(x, y)
+#define SPIEL_DCHECK_PROB(x) SPIEL_DCHECK_PROB(x)
+#define SPIEL_DCHECK_FLOAT_EQ(x, y) SPIEL_CHECK_FLOAT_EQ(x, y)
+#define SPIEL_DCHECK_FLOAT_NEAR(x, y, epsilon) \
+  SPIEL_CHECK_FLOAT_NEAR(x, y, epsilon)
+#define SPIEL_DCHECK_TRUE(x) SPIEL_CHECK_TRUE(x)
+#define SPIEL_DCHECK_FALSE(x) SPIEL_CHECK_FALSE(x)
+
+#else  // defined(NDEBUG)
+
+// Turn off checks for the (optimized) Release build type.
+#define SPIEL_DCHECK_OP(x_exp, op, y_exp)
+#define SPIEL_DCHECK_FN2(x_exp, y_exp, fn)
+#define SPIEL_DCHECK_FN3(x_exp, y_exp, z_exp, fn)
+#define SPIEL_DCHECK_GE(x, y)
+#define SPIEL_DCHECK_GT(x, y)
+#define SPIEL_DCHECK_LE(x, y)
+#define SPIEL_DCHECK_LT(x, y)
+#define SPIEL_DCHECK_EQ(x, y)
+#define SPIEL_DCHECK_NE(x, y)
+#define SPIEL_DCHECK_PROB(x)
+#define SPIEL_DCHECK_FLOAT_EQ(x, y)
+#define SPIEL_DCHECK_FLOAT_NEAR(x, y, epsilon)
+#define SPIEL_DCHECK_TRUE(x)
+#define SPIEL_DCHECK_FALSE(x)
+
+#endif  // !defined(NDEBUG)
 
 // When an error is encountered, OpenSpiel code should call SpielFatalError()
 // which will forward the message to the current error handler.

@@ -3,27 +3,6 @@
 cmake_minimum_required (VERSION 3.12)
 project (open_spiel)
 
-set (Python_TARGET_VERSION "" CACHE STRING "Specify a target Python version. \
-Any Python library found with CMake modules FindPython2/FindPython3 that \
-agrees  with the major version and is at least as high for minor version and \
-patch number is accepted. If the variable is not set, we use the FindPython \
-module which favours Python 3 over Python 2 if both are available.")
-set (CMAKE_CXX_STANDARD 17)
-if(APPLE)
-  # On MacOS:
-  #   -undefined dynamic_lookup is necessary for pybind11 linking
-  set (CMAKE_CXX_FLAGS "-Wno-everything -w -undefined dynamic_lookup -O2")
-
-  # On MacOS, we need this so that CMake will use the right Python if the user
-  # has a virtual environment active
-  set (CMAKE_FIND_FRAMEWORK LAST)
-else()
-  set (CMAKE_CXX_FLAGS "-Wno-everything -O2")
-endif()
-
-# Position-independent code is needed for Python extension modules.
-set (CMAKE_POSITION_INDEPENDENT_CODE ON)
-
 # Define some nice terminal colors.
 if(NOT WIN32)
   string(ASCII 27 Esc)
@@ -44,6 +23,58 @@ if(NOT WIN32)
   set(BoldCyan    "${Esc}[1;36m")
   set(BoldWhite   "${Esc}[1;37m")
 endif()
+
+set (Python_TARGET_VERSION "" CACHE STRING "Specify a target Python version. \
+Any Python library found with CMake modules FindPython2/FindPython3 that \
+agrees  with the major version and is at least as high for minor version and \
+patch number is accepted. If the variable is not set, we use the FindPython \
+module which favours Python 3 over Python 2 if both are available.")
+
+set (CMAKE_CXX_STANDARD 17)
+
+# Set default build type.
+if(NOT BUILD_TYPE)
+   set(BUILD_TYPE Debug
+       CACHE STRING "Choose the type of build: Debug Release Testing."
+       FORCE)
+endif()
+message("${BoldYellow}Current build type is: ${BUILD_TYPE}${ColourReset}")
+
+if(${BUILD_TYPE} EQUAL "Debug")
+  # Basic build for debugging (default).
+  # -Og enables optimizations that do not interfere with debugging.
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Og")
+endif()
+
+if(${BUILD_TYPE} EQUAL "Testing")
+  # A build used for running tests: keep all runtime checks (assert,
+  # SPIEL_CHECK_*, SPIEL_DCHECK_*), but turn on some speed optimizations,
+  # otherwise tests run for too long.
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2")
+endif()
+
+if(${BUILD_TYPE} EQUAL "Release")
+  # Optimized release build: turn off debug runtime checks (assert,
+  # SPIEL_DCHECK_*) and turn on highest speed optimizations.
+  # The difference in perfomance can be up to 10x higher.
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNDEBUG -O3")
+endif()
+
+if(APPLE)
+  # On MacOS:
+  #   -undefined dynamic_lookup is necessary for pybind11 linking
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-everything -w -undefined dynamic_lookup")
+
+  # On MacOS, we need this so that CMake will use the right Python if the user
+  # has a virtual environment active
+  set (CMAKE_FIND_FRAMEWORK LAST)
+else()
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-everything")
+endif()
+
+# Position-independent code is needed for Python extension modules.
+set (CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 
 ## Optional dependencies
 # One can optionally build and link against specific external dependencies.

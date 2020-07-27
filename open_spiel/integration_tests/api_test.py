@@ -99,7 +99,7 @@ PERFECT_RECALL_NUM_STATES = {
 
 # Some tests run for a fixed time budget.
 # This specified approximately how many seconds they should run.
-TIMEABLE_TEST_RUNTIME = 10
+TIMEABLE_TEST_RUNTIME = 1
 
 
 class EnforceAPIOnFullTreeBase(parameterized.TestCase):
