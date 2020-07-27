@@ -48,8 +48,6 @@
 //     "num_symbols"       int     number of distinct symbols (default = 5)
 //     "rng_seed"          int     seed for the random number generator
 //                                 (default -1 = not set, seeded by clock)
-//     "rng_state"         string  state of the random number generator
-//                                 (used for de/serialization purposes)
 //     "utterance_dim"     int     dimensionality of the utterances, i.e. number
 //                                 of symbols per utterance (default = 3)
 
@@ -66,7 +64,6 @@ inline constexpr int kMaxSteps = 10;
 inline constexpr int kNumPlayers = 2;
 inline constexpr int kDefaultNumItems = 3;
 inline constexpr int kDefaultSeed = -1;
-inline constexpr char kDefaultRNGState[] = "";
 
 // The utterances and proposals are done in separate repeated turns by the same
 // agent. This enum is used to keep track what the type of turn it is.
@@ -181,7 +178,6 @@ class NegotiationGame : public Game {
   }
   std::vector<int> ObservationTensorShape() const override;
 
-  std::string ToString() const override;
   std::unique_ptr<State> DeserializeState(
       const std::string& str) const override;
 

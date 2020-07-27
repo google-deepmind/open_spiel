@@ -391,22 +391,14 @@ UncontestedBiddingGame::UncontestedBiddingGame(const GameParameters& params)
   }
 }
 
-// Override ToString() so that internal RNG state is also peristed.
-std::string UncontestedBiddingGame::ToString() const {
-  GameParameters params = game_parameters_;
-  params["name"] = GameParameter(game_type_.short_name);
-  params["rng_seed"] = GameParameter(rng_seed_);
-  return GameParametersToString(params);
-}
-
 // Deserialize the deal and auction
 // e.g. "AKQJ.543.QJ8.T92 97532.A2.9.QJ853 2N-3C"
 std::unique_ptr<State> UncontestedBiddingGame::DeserializeState(
     const std::string& str) const {
   if (str.empty()) {
-    return std::make_unique<UncontestedBiddingState>(
+    return absl::make_unique<UncontestedBiddingState>(
         shared_from_this(), reference_contracts_, deal_filter_, forced_actions_,
-        rng_seed_);
+        rng_seed_, num_redeals_);
   }
   SPIEL_CHECK_GE(str.length(),
                  kNumPlayers * (kNumCardsPerHand + kNumSuits) - 1);

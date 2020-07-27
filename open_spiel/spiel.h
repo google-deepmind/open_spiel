@@ -817,10 +817,18 @@ class Game : public std::enable_shared_from_this<Game> {
   virtual int MaxGameLength() const = 0;
 
   // A string representation of the game, which can be passed to LoadGame.
-  // This method should only be overridden by implicitly stochastic games
-  // that need to also persist the state of the internal RNG by adding it to
-  // game parameters.
-  virtual std::string ToString() const;
+  std::string ToString() const;
+
+  // Get and set game's internal RNG state for de/serialization purposes. These
+  // two methods only need to be overridden by sampled stochastic games that
+  // need to hold an RNG state. Note that stateful game implementations are
+  // discouraged in general.
+  virtual std::string GetRNGState() const {
+    SpielFatalError("GetRNGState unimplemented.");
+  }
+  virtual void SetRNGState(const std::string& rng_state) {
+    SpielFatalError("SetRNGState unimplemented.");
+  }
 
   // Returns an Observer, used to obtain observations of the game state.
   // See `spiel_observer.h` for further information.
