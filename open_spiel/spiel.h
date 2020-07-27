@@ -182,16 +182,7 @@ class State {
   // sampling of and outcome should be done in this function and then applied.
   //
   // Games should implement DoApplyAction.
-  virtual void ApplyAction(Action action_id) {
-    // history_ needs to be modified *after* DoApplyAction which could
-    // be using it.
-
-    // Cannot apply an invalid action.
-    SPIEL_CHECK_NE(action_id, kInvalidAction);
-    Player player = CurrentPlayer();
-    DoApplyAction(action_id);
-    history_.push_back({player, action_id});
-  }
+  virtual void ApplyAction(Action action_id);
 
   // `LegalActions(Player player)` is valid for all nodes in all games,
   // returning an empty list for players who don't act at this state. The
@@ -342,8 +333,15 @@ class State {
   // including chance) and the `State` objects.
   std::string HistoryString() const { return absl::StrJoin(History(), " "); }
 
+  // Return how many moves have been done so far in the game.
+  // When players make simultaneous moves, this counts only as a one move.
+  // Chance transitions count also as one move.
+  // Note that game transformations are not required to preserve the move
+  // number in the transformed game.
+  int MoveNumber() const { return move_number_; }
+
   // Is this a first state in the game, i.e. the initial state (root node)?
-  bool IsInitialState() const { return History().empty(); }
+  bool IsInitialState() const { return history_.empty(); }
 
   // For imperfect information games. Returns an identifier for the current
   // information state for the specified player.
@@ -469,7 +467,7 @@ class State {
 
   // The public / private observations factorize observations into their
   // (mostly) non-overlapping public and private parts (they overlap only for
-  // the start of the game and time). See also <open_spiel/fog_constants.h>
+  // the start of the game and time). See also fog/ directory for details.
   //
   // The public observations correspond to information that all the players know
   // that all the players know, like upward-facing cards on a table.
@@ -477,15 +475,16 @@ class State {
   //
   // All games have non-empty public observations. The minimum public
   // information is time: we assume that all the players can perceive absolute
-  // time (we do not consider any relativistic effects). The implemented games
-  // must be 1-timeable (see [1] for details), a property that is trivially
-  // satisfied with all human-played board games, so you don't have to typically
-  // worry about this. (You'd have to knock players out / consider Einstein's
-  // time-relativistic effects to make non-timeable games.).
+  // time (which can be accessed via the MoveNumber method). The implemented
+  // games must be 1-timeable, a property that is trivially satisfied with all
+  // human-played board games, so you typically don't have to worry about this.
+  // (You'd have to knock players out / consider Einstein's time-relativistic
+  // effects to make non-timeable games.).
   //
   // The public observations are used to create a list of observations:
-  // a public observation history. If you return any non-empty public
-  // observation, you implicitly encode time as well within this sequence.
+  // a public observation history. Because of the list structure, when you
+  // return any non-empty public observation, you implicitly encode time as well
+  // within this sequence.
   //
   // Public observations are not required to be "common knowledge" observations.
   // Example: In imperfect-info version of card game Goofspiel, players make
@@ -499,21 +498,18 @@ class State {
   // it is in general expensive to compute. Returning public observation "draw"
   // is sufficient.
   //
-  // In the initial state this function must return kStartOfGameObservation.
-  // If there is no public observation available except time, the implementation
-  // should return kClockTickObservation.
-  // Note that empty strings for observations are forbidden.
-  //
-  // See the Factored-Observation Game (FOG) paper for more details.
-  // [1] https://arxiv.org/abs/1906.11110
-
+  // In the initial state this function must return
+  // kStartOfGamePublicObservation. If there is no public observation available
+  // except time, the implementation must return kClockTickObservation. Note
+  // that empty strings for observations are forbidden - they correspond
+  // to kInvalidPublicObservation.
   virtual std::string PublicObservationString() const {
     SpielFatalError("PublicObservationString is not implemented.");
   }
 
   // The public / private observations factorize observations into their
   // (mostly) non-overlapping public and private parts (they overlap only for
-  // the start of the game and time). See also <open_spiel/fog_constants.h>
+  // the start of the game and time). See also fog/ directory for details.
   //
   // The private observations correspond to the part of the observation that
   // is not public. In Poker, this would be the cards the player holds in his
@@ -529,24 +525,16 @@ class State {
   // it the same as if the player just placed his cards on the table for
   // everyone to see.
   //
-  // In the initial state this function must return kStartOfGameObservation.
   // If there is no private observation available, the implementation should
-  // return kClockTickObservation. These two types of observations are shared
-  // with the public observations. This is done for technical reasons discussed
-  // in <open_spiel/fog_constants.h>
-  //
-  // Perfect information games have no private observations: implementations
-  // should just return a start of game and clock ticking. Imperfect-information
-  // games should return a different string string at least once in the game
-  // (otherwise they would be considered perfect-info games).
-  // Note that empty strings for observations are forbidden.
+  // return kNothingPrivateObservation. Perfect information games have no
+  // private observations and should return only this constant.
+  // Imperfect-information games should return a different string
+  // at least once in at least one possible trajectory of the game (otherwise
+  // they would be considered perfect-info games).
   //
   // Implementations should start with (and it's tested in api_test.py):
   //   SPIEL_CHECK_GE(player, 0);
   //   SPIEL_CHECK_LT(player, num_players_);
-  //
-  // See the Factored-Observation Game (FOG) paper for more details.
-  // [1] https://arxiv.org/abs/1906.11110
   virtual std::string PrivateObservationString(Player player) const {
     SpielFatalError("PrivateObservationString is not implemented.");
   }
@@ -571,7 +559,8 @@ class State {
   // Undoes the last action, which must be supplied. This is a fast method to
   // undo an action. It is only necessary for algorithms that need a fast undo
   // (e.g. minimax search).
-  // One must call history_.pop_back() in the implementations.
+  // One must call history_.pop_back() and --move_number_ in the implementations
+  // (and do these appropriately especially in simultaneous games).
   virtual void UndoAction(Player player, Action action) {
     SpielFatalError("UndoAction function is not overridden; not undoing.");
   }
@@ -583,15 +572,7 @@ class State {
   // this node, then kInvalidAction should be passed instead.
   //
   // Simultaneous games should implement DoApplyActions.
-  void ApplyActions(const std::vector<Action>& actions) {
-    // history_ needs to be modified *after* DoApplyActions which could
-    // be using it.
-    DoApplyActions(actions);
-    history_.reserve(history_.size() + actions.size());
-    for (int player = 0; player < actions.size(); ++player) {
-      history_.push_back({player, actions[player]});
-    }
-  }
+  void ApplyActions(const std::vector<Action>& actions);
 
   // The size of the action space. See `Game` for a full description.
   int NumDistinctActions() const { return num_distinct_actions_; }
@@ -691,6 +672,7 @@ class State {
   int num_distinct_actions_;
   int num_players_;
   std::vector<PlayerAction> history_;  // Actions taken so far.
+  int move_number_;
 
   // A pointer to the game that created this state.
   std::shared_ptr<const Game> game_;

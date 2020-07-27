@@ -225,6 +225,7 @@ include_directories(..)
 
 add_subdirectory (algorithms)
 add_subdirectory (examples)
+add_subdirectory (fog)
 add_subdirectory (games)
 add_subdirectory (game_transforms)
 add_subdirectory (tests)

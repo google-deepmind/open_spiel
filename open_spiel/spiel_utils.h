@@ -22,6 +22,7 @@
 #include <cstdint>
 #include <limits>
 #include <locale>
+#include <optional>
 #include <random>
 #include <sstream>
 #include <string>
@@ -39,7 +40,7 @@
 #include "open_spiel/abseil-cpp/absl/time/time.h"
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
 
-// Code that is not part of the API, but is widely useful in implementations
+// Code that is not part of the API, but is widely useful in implementations.
 
 namespace open_spiel {
 
@@ -48,6 +49,21 @@ namespace open_spiel {
 // lookup here since that requires putting these overloads into std::, which is
 // not allowed (only template specializations on std:: template classes may be
 // added to std::, and this is not one of them).
+
+// Make sure that arbitrary structures can be printed out.
+template <typename T>
+std::ostream& operator<<(std::ostream& stream, const std::unique_ptr<T>& v);
+template <typename T, typename U>
+std::ostream& operator<<(std::ostream& stream, const std::pair<T, U>& v);
+template <typename T>
+std::ostream& operator<<(std::ostream& stream, const std::vector<T>& v);
+template <typename T, std::size_t N>
+std::ostream& operator<<(std::ostream& stream, const std::array<T, N>& v);
+template <typename T>
+std::ostream& operator<<(std::ostream& stream, const std::optional<T>& v);
+std::ostream& operator<<(std::ostream& stream, const std::nullopt_t& v);
+
+// Actual template implementations.
 template <typename T>
 std::ostream& operator<<(std::ostream& stream, const std::vector<T>& v) {
   stream << "[";
@@ -68,6 +84,10 @@ std::ostream& operator<<(std::ostream& stream, const std::array<T, N>& v) {
 }
 template <typename T>
 std::ostream& operator<<(std::ostream& stream, const std::unique_ptr<T>& v) {
+  return stream << *v;
+}
+template <typename T>
+std::ostream& operator<<(std::ostream& stream, const std::optional<T>& v) {
   return stream << *v;
 }
 template <typename T, typename U>
