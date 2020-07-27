@@ -1095,7 +1095,7 @@ std::string StonesNGemsState::ToString() const {
   }
   absl::StrAppend(&out_str, "time left: ", steps_remaining_, ", ");
   absl::StrAppend(&out_str, "gems required: ", gems_required_, ", ");
-  absl::StrAppend(&out_str, "gems collectred: ", gems_collected_);
+  absl::StrAppend(&out_str, "gems collected: ", gems_collected_);
   return out_str;
 }
 
@@ -1176,7 +1176,10 @@ std::unique_ptr<State> StonesNGemsGame::DeserializeState(
     const std::string &str) const {
   // empty string
   if (str.empty()) {
-    return NewInitialState();
+    return absl::make_unique<StonesNGemsState>(
+        shared_from_this(), max_steps_, magic_wall_steps_, false,
+        blob_max_size_, 0, blob_chance_, kNullElement, true, gems_required_, 0,
+        0, 0, grid_, rng_seed_, obs_show_ids_, 0, 0);
   }
   std::vector<std::string> lines = absl::StrSplit(str, '\n');
   if (lines.size() < 2) {
@@ -1241,11 +1244,20 @@ std::unique_ptr<State> StonesNGemsGame::DeserializeState(
     SpielFatalError("Grid string doesn't contain the agent.");
   }
 
-  return std::unique_ptr<State>(new StonesNGemsState(
+  return absl::make_unique<StonesNGemsState>(
       shared_from_this(), steps_remaining, magic_wall_steps, magic_active,
       blob_max_size, blob_size, blob_chance, blob_swap, blob_enclosed,
       gems_required, gems_collected, current_reward, sum_reward, grid,
-      ++rng_seed_, obs_show_ids, id_counter, cur_player));
+      rng_seed_, obs_show_ids, id_counter, cur_player);
+}
+
+std::string StonesNGemsGame::GetRNGState() const {
+  return std::to_string(rng_seed_);
+}
+
+void StonesNGemsGame::SetRNGState(const std::string &rng_state) const {
+  if (rng_state == "") return;
+  rng_seed_ = std::stoi(rng_state);
 }
 
 int StonesNGemsGame::NumDistinctActions() const { return kNumActions; }

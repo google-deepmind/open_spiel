@@ -69,7 +69,7 @@ void ExtendedStonesNGemsTest() {
       "S@o .S\n"
       "S*.* C\n"
       "SSSSSS\n"
-      "time left: 20, gems required: 2, gems collectred: 0";
+      "time left: 20, gems required: 2, gems collected: 0";
 
   constexpr const char kStateSerialize[] =
       "6,7,20,20,0,10,0,50,-1,1,2,0,0,0,1,42,0\n"
@@ -117,13 +117,14 @@ void ExtendedStonesNGemsTest() {
       {11 * offset + 39, 40}, {11 * offset + 40, 41}, {11 * offset + 41, 42},
   };
 
-  std::shared_ptr<const Game> game = LoadGame(
-      "stones_and_gems", {{"magic_wall_steps", GameParameter(20)},
-                        {"blob_chance", GameParameter(50)},
-                        {"blob_max_percentage", GameParameter(0.25)},
-                        {"rng_seed", GameParameter(1)},
-                        {"grid", GameParameter(std::string(kTestDefaultGrid))},
-                        {"obs_show_ids", GameParameter(true)}});
+  std::shared_ptr<const Game> game =
+      LoadGame("stones_and_gems",
+               {{"magic_wall_steps", GameParameter(20)},
+                {"blob_chance", GameParameter(50)},
+                {"blob_max_percentage", GameParameter(0.25)},
+                {"rng_seed", GameParameter(1)},
+                {"grid", GameParameter(std::string(kTestDefaultGrid))},
+                {"obs_show_ids", GameParameter(true)}});
   std::unique_ptr<State> state = game->NewInitialState();
 
   // Check max utility

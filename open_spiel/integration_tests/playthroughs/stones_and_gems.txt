@@ -43,14 +43,14 @@ ToString() = "stones_and_gems()"
 # S..*......*o..o..o.S
 # S.............o....C
 # SSSSSSSSSSSSSSSSSSSS
-# time left: 600, gems required: 4, gems collectred: 0
+# time left: 600, gems required: 4, gems collected: 0
 IsTerminal() = False
 History() = []
 HistoryString() = ""
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-ObservationString(0) = "SSSSSSSSSSSSSSSSSSSS\nSo..o....o.....o...S\nS.@...... .........S\nS...*......o.......S\nSHHHHHHHHHHHHH...o.S\nS.....*............S\nS..o.......*..o..  S\nS..o...o......... FS\nS.....HHHHHHHHHHHHHS\nS..*......*o..o..o.S\nS.............o....C\nSSSSSSSSSSSSSSSSSSSS\ntime left: 600, gems required: 4, gems collectred: 0"
+ObservationString(0) = "SSSSSSSSSSSSSSSSSSSS\nSo..o....o.....o...S\nS.@...... .........S\nS...*......o.......S\nSHHHHHHHHHHHHH...o.S\nS.....*............S\nS..o.......*..o..  S\nS..o...o......... FS\nS.....HHHHHHHHHHHHHS\nS..*......*o..o..o.S\nS.............o....C\nSSSSSSSSSSSSSSSSSSSS\ntime left: 600, gems required: 4, gems collected: 0"
 ObservationTensor(0):
 ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◉◉◯◉◉◉◉◯◉◉◉◉◉◯◉◉◉◯  ◯◉◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -272,14 +272,14 @@ action: 0
 # S..*......*o..o..o.S
 # S.............o....C
 # SSSSSSSSSSSSSSSSSSSS
-# time left: 599, gems required: 4, gems collectred: 0
+# time left: 599, gems required: 4, gems collected: 0
 IsTerminal() = False
 History() = [4, 0]
 HistoryString() = "4 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-ObservationString(0) = "SSSSSSSSSSSSSSSSSSSS\nSo..o.... .....o...S\nS@ ......o.........S\nS...*......o.......S\nSHHHHHHHHHHHHH...o.S\nS.....*............S\nS..o.......*..o..  S\nS..o...o.........F S\nS.....HHHHHHHHHHHHHS\nS..*......*o..o..o.S\nS.............o....C\nSSSSSSSSSSSSSSSSSSSS\ntime left: 599, gems required: 4, gems collectred: 0"
+ObservationString(0) = "SSSSSSSSSSSSSSSSSSSS\nSo..o.... .....o...S\nS@ ......o.........S\nS...*......o.......S\nSHHHHHHHHHHHHH...o.S\nS.....*............S\nS..o.......*..o..  S\nS..o...o.........F S\nS.....HHHHHHHHHHHHHS\nS..*......*o..o..o.S\nS.............o....C\nSSSSSSSSSSSSSSSSSSSS\ntime left: 599, gems required: 4, gems collected: 0"
 ObservationTensor(0):
 ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯  ◯◯◉◉◯◉◉◉◉◯◉◉◉◉◉◯◉◉◉◯  ◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -501,14 +501,14 @@ action: 0
 # S..*......*o..o..o.S
 # S.............o....C
 # SSSSSSSSSSSSSSSSSSSS
-# time left: 598, gems required: 4, gems collectred: 0
+# time left: 598, gems required: 4, gems collected: 0
 IsTerminal() = False
 History() = [4, 0, 1, 0]
 HistoryString() = "4 0 1 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-ObservationString(0) = "SSSSSSSSSSSSSSSSSSSS\nSo..o.... .....o...S\nS@ ......o.........S\nS...*......o.......S\nSHHHHHHHHHHHHH...o.S\nS.....*............S\nS..o.......*..o..  S\nS..o...o.........F S\nS.....HHHHHHHHHHHHHS\nS..*......*o..o..o.S\nS.............o....C\nSSSSSSSSSSSSSSSSSSSS\ntime left: 598, gems required: 4, gems collectred: 0"
+ObservationString(0) = "SSSSSSSSSSSSSSSSSSSS\nSo..o.... .....o...S\nS@ ......o.........S\nS...*......o.......S\nSHHHHHHHHHHHHH...o.S\nS.....*............S\nS..o.......*..o..  S\nS..o...o.........F S\nS.....HHHHHHHHHHHHHS\nS..*......*o..o..o.S\nS.............o....C\nSSSSSSSSSSSSSSSSSSSS\ntime left: 598, gems required: 4, gems collected: 0"
 ObservationTensor(0):
 ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯  ◯◯◉◉◯◉◉◉◉◯◉◉◉◉◉◯◉◉◉◯  ◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -730,14 +730,14 @@ action: 0
 # S..*......*o..o..o.S
 # S.............o....C
 # SSSSSSSSSSSSSSSSSSSS
-# time left: 597, gems required: 4, gems collectred: 0
+# time left: 597, gems required: 4, gems collected: 0
 IsTerminal() = False
 History() = [4, 0, 1, 0, 0, 0]
 HistoryString() = "4 0 1 0 0 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-ObservationString(0) = "SSSSSSSSSSSSSSSSSSSS\nSo..o.... .....o...S\nS@ ......o.........S\nS...*......o.......S\nSHHHHHHHHHHHHH...o.S\nS.....*............S\nS..o.......*..o..F S\nS..o...o.........  S\nS.....HHHHHHHHHHHHHS\nS..*......*o..o..o.S\nS.............o....C\nSSSSSSSSSSSSSSSSSSSS\ntime left: 597, gems required: 4, gems collectred: 0"
+ObservationString(0) = "SSSSSSSSSSSSSSSSSSSS\nSo..o.... .....o...S\nS@ ......o.........S\nS...*......o.......S\nSHHHHHHHHHHHHH...o.S\nS.....*............S\nS..o.......*..o..F S\nS..o...o.........  S\nS.....HHHHHHHHHHHHHS\nS..*......*o..o..o.S\nS.............o....C\nSSSSSSSSSSSSSSSSSSSS\ntime left: 597, gems required: 4, gems collected: 0"
 ObservationTensor(0):
 ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯  ◯◯◉◉◯◉◉◉◉◯◉◉◉◉◉◯◉◉◉◯  ◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -959,14 +959,14 @@ action: 0
 # S..*......*o..o..o.S
 # S.............o....C
 # SSSSSSSSSSSSSSSSSSSS
-# time left: 596, gems required: 4, gems collectred: 0
+# time left: 596, gems required: 4, gems collected: 0
 IsTerminal() = False
 History() = [4, 0, 1, 0, 0, 0, 3, 0]
 HistoryString() = "4 0 1 0 0 0 3 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-ObservationString(0) = "SSSSSSSSSSSSSSSSSSSS\nS ..o.... .....o...S\nSo ......o.........S\nS@..*......o.......S\nSHHHHHHHHHHHHH...o.S\nS.....*............S\nS..o.......*..o..F S\nS..o...o.........  S\nS.....HHHHHHHHHHHHHS\nS..*......*o..o..o.S\nS.............o....C\nSSSSSSSSSSSSSSSSSSSS\ntime left: 596, gems required: 4, gems collectred: 0"
+ObservationString(0) = "SSSSSSSSSSSSSSSSSSSS\nS ..o.... .....o...S\nSo ......o.........S\nS@..*......o.......S\nSHHHHHHHHHHHHH...o.S\nS.....*............S\nS..o.......*..o..F S\nS..o...o.........  S\nS.....HHHHHHHHHHHHHS\nS..*......*o..o..o.S\nS.............o....C\nSSSSSSSSSSSSSSSSSSSS\ntime left: 596, gems required: 4, gems collected: 0"
 ObservationTensor(0):
 ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯  ◯◯◉◉◯◉◉◉◉◯◉◉◉◉◉◯◉◉◉◯  ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -1188,14 +1188,14 @@ action: 0
 # S..*......*o..o..o.S
 # S.............o....C
 # SSSSSSSSSSSSSSSSSSSS
-# time left: 595, gems required: 4, gems collectred: 0
+# time left: 595, gems required: 4, gems collected: 0
 IsTerminal() = True
 History() = [4, 0, 1, 0, 0, 0, 3, 0, 4, 0]
 HistoryString() = "4 0 1 0 0 0 3 0 4 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
-ObservationString(0) = "SSSSSSSSSSSSSSSSSSSS\nS ..o.... .....o...S\nSEE......o.........S\nSEE.*......o.......S\nSEEHHHHHHHHHHH...o.S\nS.....*............S\nS..o.......*..o.. FS\nS..o...o.........  S\nS.....HHHHHHHHHHHHHS\nS..*......*o..o..o.S\nS.............o....C\nSSSSSSSSSSSSSSSSSSSS\ntime left: 595, gems required: 4, gems collectred: 0"
+ObservationString(0) = "SSSSSSSSSSSSSSSSSSSS\nS ..o.... .....o...S\nSEE......o.........S\nSEE.*......o.......S\nSEEHHHHHHHHHHH...o.S\nS.....*............S\nS..o.......*..o.. FS\nS..o...o.........  S\nS.....HHHHHHHHHHHHHS\nS..*......*o..o..o.S\nS.............o....C\nSSSSSSSSSSSSSSSSSSSS\ntime left: 595, gems required: 4, gems collected: 0"
 ObservationTensor(0):
 ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯  ◯◯◉◉◯◉◉◉◉◯◉◉◉◉◉◯◉◉◉◯  ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯

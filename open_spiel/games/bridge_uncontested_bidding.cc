@@ -446,5 +446,14 @@ std::unique_ptr<State> UncontestedBiddingGame::DeserializeState(
       num_redeals_);
 }
 
+std::string UncontestedBiddingGame::GetRNGState() const {
+  return std::to_string(rng_seed_);
+}
+
+void UncontestedBiddingGame::SetRNGState(const std::string& rng_state) const {
+  if (rng_state == "") return;
+  rng_seed_ = std::stoi(rng_state);
+}
+
 }  // namespace bridge_uncontested_bidding
 }  // namespace open_spiel

@@ -621,5 +621,17 @@ std::unique_ptr<State> NegotiationGame::DeserializeState(
   }
 }
 
+std::string NegotiationGame::GetRNGState() const {
+  std::ostringstream rng_stream;
+  rng_stream << *rng_;
+  return rng_stream.str();
+}
+
+void NegotiationGame::SetRNGState(const std::string& rng_state) const {
+  if (rng_state == "") return;
+  std::istringstream rng_stream(rng_state);
+  rng_stream >> *rng_;
+}
+
 }  // namespace negotiation
 }  // namespace open_spiel

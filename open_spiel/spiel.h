@@ -816,6 +816,12 @@ class Game : public std::enable_shared_from_this<Game> {
   // of chance nodes are not included in this length.
   virtual int MaxGameLength() const = 0;
 
+  // A string representation of the game, which can be passed to
+  // DeserializeGame. The difference with Game::ToString is that it also
+  // serializes internal RNG state used with sampled stochastic game
+  // implementations.
+  std::string Serialize() const;
+
   // A string representation of the game, which can be passed to LoadGame.
   std::string ToString() const;
 
@@ -826,7 +832,10 @@ class Game : public std::enable_shared_from_this<Game> {
   virtual std::string GetRNGState() const {
     SpielFatalError("GetRNGState unimplemented.");
   }
-  virtual void SetRNGState(const std::string& rng_state) {
+  // SetRNGState is const despite the fact that it changes game's internal
+  // state. Sampled stochastic games need to be explicit about mutability of the
+  // RNG, i.e. have to use the mutable keyword.
+  virtual void SetRNGState(const std::string& rng_state) const {
     SpielFatalError("SetRNGState unimplemented.");
   }
 
@@ -926,6 +935,8 @@ std::vector<std::string> RegisteredGames();
 
 // Returns a list of registered game types.
 std::vector<GameType> RegisteredGameTypes();
+
+std::shared_ptr<const Game> DeserializeGame(const std::string& serialized);
 
 // Returns a new game object from the specified string, which is the short
 // name plus optional parameters, e.g. "go(komi=4.5,board_size=19)"
