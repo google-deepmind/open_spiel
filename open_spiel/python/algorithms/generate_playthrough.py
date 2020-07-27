@@ -362,7 +362,7 @@ def replay(filename):
 
 def update_path(path, shard_index=0, num_shards=1):
   """Regenerates all playthroughs in the path."""
-  for filename in sorted(os.listdir(path)):
+  for filename in sorted(os.listdir(path))[shard_index::num_shards]:
     try:
       original, new = replay(os.path.join(path, filename))
       if original == new:
