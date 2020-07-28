@@ -39,6 +39,7 @@
 #include "open_spiel/abseil-cpp/absl/time/clock.h"
 #include "open_spiel/abseil-cpp/absl/time/time.h"
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "open_spiel/abseil-cpp/absl/types/span.h"
 
 // Code that is not part of the API, but is widely useful in implementations.
 
@@ -62,16 +63,23 @@ std::ostream& operator<<(std::ostream& stream, const std::array<T, N>& v);
 template <typename T>
 std::ostream& operator<<(std::ostream& stream, const std::optional<T>& v);
 std::ostream& operator<<(std::ostream& stream, const std::nullopt_t& v);
+template <typename T>
+std::ostream& operator<<(std::ostream& stream, absl::Span<const T> v);
 
 // Actual template implementations.
 template <typename T>
-std::ostream& operator<<(std::ostream& stream, const std::vector<T>& v) {
+std::ostream& operator<<(std::ostream& stream, absl::Span<const T> v) {
   stream << "[";
   for (const auto& element : v) {
     stream << element << " ";
   }
   stream << "]";
   return stream;
+}
+// Actual template implementations.
+template <typename T>
+std::ostream& operator<<(std::ostream& stream, const std::vector<T>& v) {
+  return stream << absl::MakeSpan(v);
 }
 template <typename T, std::size_t N>
 std::ostream& operator<<(std::ostream& stream, const std::array<T, N>& v) {
