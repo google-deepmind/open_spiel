@@ -61,9 +61,9 @@ void TestGeneratePublicSets() {
   std::shared_ptr<const GameWithPublicStates> game =
       LoadGameWithPublicStates("kuhn_poker(players=2)");
 
-  // We use subclass_cast for easier navigation in IDEs
+  // We use down_cast for easier navigation in IDEs
   std::unique_ptr<PublicState> public_state = game->NewInitialPublicState();
-  auto* s = subclass_cast<KuhnPublicState*>(public_state.get());
+  auto* s = down_cast<KuhnPublicState*>(public_state.get());
 
   SPIEL_CHECK_TRUE(s->IsChance());
   CheckPublicSet(s, {{}});  // Start of game

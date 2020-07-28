@@ -332,15 +332,15 @@ class UniformProbabilitySampler {
 
 // Utility functions intended to be used for casting
 // from a Base class to a Derived subclass.
-// These functions handle various use cases, such as pointers, const references,
-// shared or unique pointers.
+// These functions handle various use cases, such as pointers and const
+// references. For shared or unique pointers you can get the underlying pointer.
 // When you use debug mode, a more expensive dynamic_cast is used and it checks
 // whether the casting has been successful. In optimized builds only static_cast
 // is used when possible.
 
-// use like this: subclass_cast<T*>(foo);
+// use like this: down_cast<T*>(foo);
 template <typename To, typename From>
-inline To subclass_cast(From* f) {
+inline To down_cast(From* f) {
 #if !defined(NDEBUG)
   if (f != nullptr && dynamic_cast<To>(f) == nullptr) {
     std::string from = typeid(From).name();
@@ -353,9 +353,9 @@ inline To subclass_cast(From* f) {
   return static_cast<To>(f);
 }
 
-// use like this: subclass_cast<T&>(foo);
+// use like this: down_cast<T&>(foo);
 template <typename To, typename From>
-inline To subclass_cast(From& f) {
+inline To down_cast(From& f) {
   typedef typename std::remove_reference<To>::type* ToAsPointer;
 #if !defined(NDEBUG)
   if (dynamic_cast<ToAsPointer>(&f) == nullptr) {

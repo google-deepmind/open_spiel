@@ -36,7 +36,7 @@ void StartsAtCorrectHistoryTest() {
   std::shared_ptr<const Game> game = LoadGame(
       "start_at(history=0;1;0;0,game=kuhn_poker())");
   std::unique_ptr<State> initial_state = game->NewInitialState();
-  const StartAtTransformationState& state = subclass_cast<
+  const StartAtTransformationState& state = open_spiel::down_cast<
       const StartAtTransformationState&>(*initial_state);
 
   const std::string expected_observation_string = "011";

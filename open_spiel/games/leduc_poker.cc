@@ -69,8 +69,10 @@ class LeducObserver : public Observer {
 
   void WriteTensor(const State& observed_state, int player,
                    Allocator* allocator) const override {
-    const LeducState& state = static_cast<const LeducState&>(observed_state);
-    const LeducGame& game = subclass_cast<const LeducGame&>(*state.game_);
+    const LeducState& state =
+        open_spiel::down_cast<const LeducState&>(observed_state);
+    const LeducGame& game =
+        open_spiel::down_cast<const LeducGame&>(*state.game_);
     SPIEL_CHECK_GE(player, 0);
     SPIEL_CHECK_LT(player, state.num_players_);
     const int num_players = state.num_players_;
@@ -137,7 +139,8 @@ class LeducObserver : public Observer {
 
   std::string StringFrom(const State& observed_state,
                          int player) const override {
-    const LeducState& state = static_cast<const LeducState&>(observed_state);
+    const LeducState& state =
+        open_spiel::down_cast<const LeducState&>(observed_state);
     SPIEL_CHECK_GE(player, 0);
     SPIEL_CHECK_LT(player, state.num_players_);
     std::string result;
@@ -453,27 +456,27 @@ std::vector<double> LeducState::Returns() const {
 
 // Information state is card then bets.
 std::string LeducState::InformationStateString(Player player) const {
-  const LeducGame& game = static_cast<const LeducGame&>(*game_);
+  const LeducGame& game = open_spiel::down_cast<const LeducGame&>(*game_);
   return game.info_state_observer_->StringFrom(*this, player);
 }
 
 // Observation is card then contribution of each players to the pot.
 std::string LeducState::ObservationString(Player player) const {
-  const LeducGame& game = static_cast<const LeducGame&>(*game_);
+  const LeducGame& game = open_spiel::down_cast<const LeducGame&>(*game_);
   return game.default_observer_->StringFrom(*this, player);
 }
 
 void LeducState::InformationStateTensor(Player player,
                                         absl::Span<float> values) const {
   ContiguousAllocator allocator(values);
-  const LeducGame& game = static_cast<const LeducGame&>(*game_);
+  const LeducGame& game = open_spiel::down_cast<const LeducGame&>(*game_);
   game.info_state_observer_->WriteTensor(*this, player, &allocator);
 }
 
 void LeducState::ObservationTensor(Player player,
                                    absl::Span<float> values) const {
   ContiguousAllocator allocator(values);
-  const LeducGame& game = static_cast<const LeducGame&>(*game_);
+  const LeducGame& game = open_spiel::down_cast<const LeducGame&>(*game_);
   game.default_observer_->WriteTensor(*this, player, &allocator);
 }
 

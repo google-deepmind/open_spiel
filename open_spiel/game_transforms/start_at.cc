@@ -103,7 +103,7 @@ std::unique_ptr<State> StartAtTransformationGame::NewInitialState() const {
 StartAtTransformationState::StartAtTransformationState(
     std::shared_ptr<const Game> transformed_game, std::unique_ptr<State> state)
     : WrappedState(transformed_game, std::move(state)) {
-  const auto* start_at_game = subclass_cast<
+  const auto* start_at_game = open_spiel::down_cast<
       const StartAtTransformationGame*>(game_.get());
   const std::vector<State::PlayerAction> start_history =
       start_at_game->StartAtHistory();
