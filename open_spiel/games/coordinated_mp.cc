@@ -135,13 +135,16 @@ std::string PenniesState::InformationStateString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  std::string str = "";
+  std::string str = std::to_string(MoveNumber());
+
   if (player == Player(0)) {
     if (actionA_ == kHeads) str.push_back('H');
     if (actionA_ == kTails) str.push_back('T');
   }
+
   if (infoset_ == kTop) str.push_back('T');
   if (infoset_ == kBottom) str.push_back('B');
+
   if (player == Player(1)) {
     if (actionB_ == kHeads) str.push_back('H');
     if (actionB_ == kTails) str.push_back('T');
