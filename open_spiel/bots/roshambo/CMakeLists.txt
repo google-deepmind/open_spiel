@@ -1,5 +1,7 @@
 add_library(roshambo OBJECT
   roshambo/rsb-ts1-modified.c
+  roshambo/bot_map.cc
+  roshambo/bot_map.h
   roshambo_bot.cc
   roshambo_bot.h
 )

@@ -47,8 +47,6 @@ namespace roshambo {
 inline constexpr int kNumThrows = 1000;
 inline constexpr int kNumBots = 43;
 
-extern std::map<std::string, std::function<int()>> bot_map;
-
 class RoshamboBot : public Bot {
  public:
   explicit RoshamboBot(int player_id, std::string bot_name);

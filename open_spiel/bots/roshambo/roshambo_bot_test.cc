@@ -19,7 +19,9 @@
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_bots.h"
 #include "open_spiel/bots/roshambo/roshambo_bot.h"
+#include "open_spiel/bots/roshambo/roshambo/bot_map.h"
 #include "open_spiel/game_transforms/repeated_game.h"
+
 
 namespace open_spiel {
 namespace {
@@ -29,7 +31,7 @@ uint_fast32_t Seed() { return absl::ToUnixMicros(absl::Now()); }
 void MakeAllRoshamboBots() {
   std::vector<std::unique_ptr<Bot>> bots;
   for (std::pair<std::string, std::function<int()>> bot_pair
-       : roshambo::bot_map) {
+       : ::roshambo_tournament::bot_map) {
     bots.push_back(roshambo::MakeRoshamboBot(0, bot_pair.first));
   }
   SPIEL_CHECK_EQ(bots.size(), roshambo::kNumBots);
