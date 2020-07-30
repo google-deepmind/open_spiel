@@ -34,7 +34,7 @@ set (CMAKE_CXX_STANDARD 17)
 
 # Set default build type.
 if(NOT BUILD_TYPE)
-   set(BUILD_TYPE Debug
+   set(BUILD_TYPE Testing
        CACHE STRING "Choose the type of build: Debug Release Testing."
        FORCE)
 endif()
