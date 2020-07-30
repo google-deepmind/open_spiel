@@ -224,15 +224,8 @@ std::unique_ptr<State> ConnectFourState::Clone() const {
   return std::unique_ptr<State>(new ConnectFourState(*this));
 }
 
-std::string ConnectFourState::Serialize() const { return ToString(); }
-
 ConnectFourGame::ConnectFourGame(const GameParameters& params)
     : Game(kGameType, params) {}
-
-std::unique_ptr<State> ConnectFourGame::DeserializeState(
-    const std::string& str) const {
-  return std::unique_ptr<State>(new ConnectFourState(shared_from_this(), str));
-}
 
 ConnectFourState::ConnectFourState(std::shared_ptr<const Game> game,
                                    const std::string& str)
