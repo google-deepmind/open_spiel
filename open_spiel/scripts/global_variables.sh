@@ -53,6 +53,17 @@ export BUILD_WITH_XINXIN=${BUILD_WITH_XINXIN:-$DEFAULT_OPTIONAL_DEPENDENCY}
 # > as its Python counterpart.
 export BUILD_WITH_LIBTORCH="${BUILD_WITH_LIBTORCH:-OFF}"
 
+# Build against TensorflowCC project which makes possible the usage of
+# Tensorflow C++ API for AlphaZero implementation.
+# AZ C++ requires and tested with Tensorflow v2.2.x,
+# but it may also work with older versions (v2.x and v1.15.x).
+# Please see
+# https://github.com/deepmind/open_spiel/blob/master/open_spiel/docs/alpha_zero.md
+# for more information on building Tensorflow C++ API via tensorflow_cc.
+#
+# Setting this flag activates building TF-dependent targets;
+# which are the following at the moment:
+# alpha_zero, vpnet_test, alpha_zero_example and tf_trajectories_example.
 export BUILD_WITH_TENSORFLOW_CC="${BUILD_WITH_TENSORFLOW_CC:-OFF}"
 
 # Turn off public states as it is Work-In-Progress.
