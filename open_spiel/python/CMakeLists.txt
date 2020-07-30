@@ -65,6 +65,10 @@ if (BUILD_WITH_PUBLIC_STATES)
   set(PYTHON_TESTS ${PYTHON_TESTS}
     ../integration_tests/public_states_api_test.py)
 endif()
+if (BUILD_WITH_TENSORFLOW_CC)
+  set(PYTHON_TESTS ${PYTHON_TESTS}
+      ../contrib/python/export_graph.py)
+endif()
 
 # List of all Python tests to run.
 set(PYTHON_TESTS ${PYTHON_TESTS}
