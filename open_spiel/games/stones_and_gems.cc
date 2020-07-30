@@ -1256,8 +1256,8 @@ std::string StonesNGemsGame::GetRNGState() const {
 }
 
 void StonesNGemsGame::SetRNGState(const std::string &rng_state) const {
-  if (rng_state == "") return;
-  rng_seed_ = std::stoi(rng_state);
+  if (rng_state.empty()) return;
+  absl::SimpleAtoi(rng_state, &rng_seed_);
 }
 
 int StonesNGemsGame::NumDistinctActions() const { return kNumActions; }

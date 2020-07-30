@@ -697,8 +697,8 @@ std::istream& operator>>(std::istream& stream, GameType::RewardModel& var) {
 std::string Game::Serialize() const {
   std::string str = ToString();
   if (GetType().chance_mode == GameType::ChanceMode::kSampledStochastic) {
-    absl::StrAppend(&str, "\n", kSerializeGameRNGStateSectionHeader, "\n");
-    absl::StrAppend(&str, GetRNGState());
+    absl::StrAppend(&str, "\n", kSerializeGameRNGStateSectionHeader, "\n",
+                    GetRNGState());
   }
   return str;
 }

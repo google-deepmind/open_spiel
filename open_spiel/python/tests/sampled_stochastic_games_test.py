@@ -36,22 +36,22 @@ class SampledStochasticGamesTest(parameterized.TestCase):
     def test_stateful_game_serialization(self, game_info):
         game = pyspiel.load_game(game_info.short_name,
                                  {"rng_seed": pyspiel.GameParameter(0)})
-        # mutate game's internal RNG state
+        # Mutate game's internal RNG state.
         state = random_playout(game.new_initial_state())
         deserialized_game = pickle.loads(pickle.dumps(game))
 
-        # make sure initial states are the same after game deserialization
+        # Make sure initial states are the same after game deserialization.
         state1 = random_playout(game.new_initial_state())
         d_state1 = random_playout(deserialized_game.new_initial_state())
-        # todo: if game with default parameters doesn't use the RNG
-        # below assertion fails
+        # TODO: If game with default parameters doesn't use the RNG
+        # below assertion fails.
         # self.assertNotEqual(str(state1), str(state))
         self.assertEqual(str(state1), str(d_state1))
         # try one more time
         state2 = random_playout(game.new_initial_state())
         d_state2 = random_playout(deserialized_game.new_initial_state())
-        # todo: if game with default parameters doesn't use the RNG
-        # below assertion fails
+        # TODO: If game with default parameters doesn't use the RNG
+        # below assertion fails.
         # self.assertNotEqual(str(state2), str(state1))
         self.assertEqual(str(state2), str(d_state2))
 
