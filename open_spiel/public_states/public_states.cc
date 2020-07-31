@@ -18,6 +18,7 @@
 #include <utility>
 
 #include "open_spiel/game_parameters.h"
+#include "open_spiel/observer.h"
 #include "open_spiel/spiel.h"
 
 namespace open_spiel {
@@ -31,7 +32,12 @@ PrivateInformation::PrivateInformation(std::shared_ptr<const Game> base_game)
 PublicState::PublicState(
     std::shared_ptr<const GameWithPublicStates> public_game)
     : public_game_(std::move(public_game)),
-      base_game_(public_game_->GetBaseGame()) {
+      base_game_(public_game_->GetBaseGame()),
+      observer_(base_game_->MakeObserver(
+          IIGObservationType{.public_info = true,
+                             .perfect_recall = true,
+                             .private_info = PrivateInfoType::kNone},
+          {})) {
   SPIEL_CHECK_TRUE(base_game_->GetType().provides_factored_observation_string);
 }
 

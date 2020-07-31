@@ -18,6 +18,8 @@
 #include <string>
 
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/observer.h"
+#include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
@@ -26,6 +28,7 @@ namespace open_spiel {
 // ActionObservationHistory
 // -----------------------------------------------------------------------------
 
+// TODO(author13) Switch to the new Observation API
 ActionObservationHistory::ActionObservationHistory(Player player,
                                                    const State& target)
     : player_(player) {
@@ -184,19 +187,22 @@ std::string ActionObservationHistory::ToString() const {
 // PublicObservationHistory
 // -----------------------------------------------------------------------------
 
-PublicObservationHistory::PublicObservationHistory(const State& target) {
-  SPIEL_CHECK_TRUE(
-      target.GetGame()->GetType().provides_factored_observation_string);
+PublicObservationHistory::PublicObservationHistory(const State& target)
+    : observer_(target.GetGame()->MakeObserver(
+          IIGObservationType{.public_info = true,
+                             .perfect_recall = false,
+                             .private_info = PrivateInfoType::kNone},
+          {})) {
   history_.reserve(target.FullHistory().size());
 
   std::unique_ptr<State> state = target.GetGame()->NewInitialState();
   // Use FullHistory even though we don't need the player -- prevent
   // doing a copy.
-  for (const auto& [player, action] : target.FullHistory()) {
-    history_.push_back(state->PublicObservationString());
+  for (const auto& [_, action] : target.FullHistory()) {
+    history_.push_back(observer_->StringFrom(*state, kDefaultPlayerId));
     state->ApplyAction(action);
   }
-  history_.push_back(state->PublicObservationString());
+  history_.push_back(observer_->StringFrom(*state, kDefaultPlayerId));
 }
 
 PublicObservationHistory::PublicObservationHistory(
@@ -242,9 +248,6 @@ bool PublicObservationHistory::IsPrefixOf(
 }
 
 bool PublicObservationHistory::IsPrefixOf(const State& state) const {
-  const std::shared_ptr<const Game> game = state.GetGame();
-  SPIEL_CHECK_TRUE(game->GetType().provides_factored_observation_string);
-
   if (CorrespondsToInitialState()) return true;
   // Cannot be prefix if state is earlier.
   if (state.MoveNumber() < MoveNumber()) return false;
@@ -258,14 +261,12 @@ bool PublicObservationHistory::IsExtensionOf(
 }
 
 bool PublicObservationHistory::IsExtensionOf(const State& state) const {
-  const std::shared_ptr<const Game> game = state.GetGame();
-  SPIEL_CHECK_TRUE(game->GetType().provides_factored_observation_string);
-
   if (state.MoveNumber() > MoveNumber()) return false;
 
   // Check the latest observation is identical -- most observations
   // will differ only in the last items.
-  if (state.PublicObservationString() != ObservationAt(state.MoveNumber()))
+  if (observer_->StringFrom(state, kDefaultPlayerId) !=
+      ObservationAt(state.MoveNumber()))
     return false;
 
   return CheckStateCorrespondenceInSimulation(state, state.MoveNumber());
@@ -286,7 +287,7 @@ bool PublicObservationHistory::CheckStateCorrespondenceInSimulation(
     const State& state, int until_time) const {
   const std::vector<State::PlayerAction>& state_history = state.FullHistory();
   std::unique_ptr<State> simulation = state.GetGame()->NewInitialState();
-  SPIEL_CHECK_EQ(simulation->PublicObservationString(),
+  SPIEL_CHECK_EQ(observer_->StringFrom(*simulation, kDefaultPlayerId),
                  kStartOfGamePublicObservation);
 
   int i = 0;  // The index for state_history access.
@@ -299,7 +300,8 @@ bool PublicObservationHistory::CheckStateCorrespondenceInSimulation(
     simulation->ApplyAction(state_history[i].action);
     i++;
 
-    if (history_.at(j) != simulation->PublicObservationString()) return false;
+    if (history_.at(j) != observer_->StringFrom(*simulation, kDefaultPlayerId))
+      return false;
     j++;
   }
   return true;
