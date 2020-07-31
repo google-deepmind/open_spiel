@@ -25,6 +25,7 @@
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/abseil-cpp/absl/container/inlined_vector.h"
+#include "open_spiel/abseil-cpp/absl/strings/string_view.h"
 #include "open_spiel/abseil-cpp/absl/types/span.h"
 #include "open_spiel/spiel_utils.h"
 
@@ -180,6 +181,15 @@ class Observation {
   std::string StringFrom(const State& state, int player) const {
     return observer_->StringFrom(state, player);
   }
+
+  // Return compressed representation of the observations. This is useful for
+  // memory-intensive algorithms, e.g. that store large replay buffers.
+  //
+  // The first byte of the compressed data is reserved for the specific
+  // compression scheme. Note that currently there is only one supported, which
+  // requires bitwise observations.
+  std::string Compress() const;
+  void Decompress(absl::string_view compressed);
 
   // What observations do we support?
   // TODO(author11) Remove when all games support both types of observations

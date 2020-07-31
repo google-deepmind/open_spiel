@@ -14,12 +14,14 @@
 
 """Tests for third_party.open_spiel.python.observation."""
 
+import collections
 import random
 import time
 
 from absl.testing import absltest
 import numpy as np
 
+from open_spiel.python.algorithms import get_all_states
 from open_spiel.python.observation import make_observation
 import pyspiel
 
@@ -142,6 +144,45 @@ class ObservationTest(absltest.TestCase):
     end = time.time()
     print("Old API time per iteration "
           f"{1000*(end-start)/len(trajectories)}msec")
+
+  def test_compression_binary(self):
+    # All infostates for leduc are binary, so we can compress them effectively.
+    game = pyspiel.load_game("leduc_poker")
+    obs1 = make_observation(game,
+                            pyspiel.IIGObservationType(perfect_recall=True))
+    obs2 = make_observation(game,
+                            pyspiel.IIGObservationType(perfect_recall=True))
+    self.assertLen(obs1.tensor, 30)  # 30 floats = 120 bytes
+    for state in get_all_states.get_all_states(game).values():
+      for player in range(game.num_players()):
+        obs1.set_from(state, player)
+        compressed = obs1.compress()
+        self.assertEqual(type(compressed), bytes)
+        self.assertLen(compressed, 5)
+        obs2.decompress(compressed)
+        np.testing.assert_array_equal(obs1.tensor, obs2.tensor)
+
+  def test_compression_none(self):
+    # Most observations for leduc have non-binary data, so we can't
+    # currently compress them.
+    game = pyspiel.load_game("leduc_poker")
+    obs1 = make_observation(game)
+    obs2 = make_observation(game)
+    self.assertLen(obs1.tensor, 16)  # 16 floats = 64 bytes
+    freq = collections.Counter()
+    for state in get_all_states.get_all_states(game).values():
+      for player in range(game.num_players()):
+        obs1.set_from(state, player)
+        compressed = obs1.compress()
+        self.assertEqual(type(compressed), bytes)
+        freq[len(compressed)] += 1
+        obs2.decompress(compressed)
+        np.testing.assert_array_equal(obs1.tensor, obs2.tensor)
+    expected_freq = {
+        3: 840,     # Compressible states take 3 bytes
+        65: 17760,  # Uncompressible states take 65 bytes
+    }
+    self.assertEqual(freq, expected_freq)
 
 
 if __name__ == "__main__":

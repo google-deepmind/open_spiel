@@ -81,6 +81,12 @@ class _Observation:
     return (self._observation.string_from(state, player)
             if self._observation.has_string() else None)
 
+  def compress(self):
+    return self._observation.compress()
+
+  def decompress(self, compressed_observation):
+    self._observation.decompress(compressed_observation)
+
 
 def make_observation(game,
                      imperfect_information_observation_type=None,

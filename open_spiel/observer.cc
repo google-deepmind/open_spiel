@@ -18,7 +18,9 @@
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/abseil-cpp/absl/memory/memory.h"
+#include "open_spiel/abseil-cpp/absl/strings/string_view.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
 
@@ -156,6 +158,86 @@ Observation::Observation(const Game& game, std::shared_ptr<Observer> observer)
 void Observation::SetFrom(const State& state, int player) {
   ContiguousAllocator allocator(absl::MakeSpan(buffer_));
   observer_->WriteTensor(state, player, &allocator);
+}
+
+// We may in the future support multiple compression schemes.
+// The Compress() method should select the most effective scheme adaptively.
+enum CompressionScheme : char {
+  kCompressionNone,   // We weren't able to compress the data.
+  kCompressionBinary  // Data is binary (all elements zero or one).
+};
+constexpr int kNumHeaderBytes = 1;
+
+// Binary compression.
+struct BinaryCompress {
+  static constexpr int kBitsPerByte = 8;
+
+  static std::string Compress(absl::Span<const float> buffer) {
+    const int num_bytes = (buffer.size() + kBitsPerByte - 1) / kBitsPerByte;
+    std::string str(num_bytes + kNumHeaderBytes, '\0');
+    str[0] = kCompressionBinary;
+
+    for (int byte = 0; byte < num_bytes; ++byte) {
+      for (int bit = 0; bit < kBitsPerByte; ++bit) {
+        if (buffer[byte * kBitsPerByte + bit]) {
+          str[kNumHeaderBytes + byte] += (1 << bit);
+        }
+      }
+    }
+    return str;
+  }
+
+  static void Decompress(absl::string_view compressed,
+                         absl::Span<float> buffer) {
+    const int num_bytes = (buffer.size() + kBitsPerByte - 1) / kBitsPerByte;
+    absl::c_fill(buffer, 0);
+    SPIEL_CHECK_EQ(compressed.size(), num_bytes + kNumHeaderBytes);
+    for (int byte = 0; byte < num_bytes; ++byte) {
+      for (int bit = 0; bit < kBitsPerByte; ++bit) {
+        if (compressed[kNumHeaderBytes + byte] & (1 << bit)) {
+          buffer[byte * kBitsPerByte + bit] = 1;
+        }
+      }
+    }
+  }
+};
+
+// No compression.
+struct NoCompress {
+  static std::string Compress(absl::Span<const float> buffer) {
+    const int num_bytes = sizeof(float) * buffer.size();
+    std::string str(num_bytes + 1, '\0');
+    str[0] = kCompressionNone;
+    memcpy(&str[kNumHeaderBytes], &buffer[0], num_bytes);
+    return str;
+  }
+
+  static void Decompress(absl::string_view compressed,
+                         absl::Span<float> buffer) {
+    const int num_bytes = sizeof(float) * buffer.size();
+    SPIEL_CHECK_EQ(compressed.size(), num_bytes + kNumHeaderBytes);
+    memcpy(&buffer[0], &compressed[kNumHeaderBytes], num_bytes);
+  }
+};
+
+std::string Observation::Compress() const {
+  const bool data_is_binary =
+      absl::c_all_of(buffer_, [](float x) { return x == 0 || x == 1; });
+  return data_is_binary ? BinaryCompress::Compress(buffer_)
+                        : NoCompress::Compress(buffer_);
+}
+
+void Observation::Decompress(absl::string_view compressed) {
+  SPIEL_CHECK_GT(compressed.size(), 0);
+  switch (compressed[0]) {
+    case kCompressionBinary:
+      return BinaryCompress::Decompress(compressed, absl::MakeSpan(buffer_));
+    case kCompressionNone:
+      return NoCompress::Decompress(compressed, absl::MakeSpan(buffer_));
+    default:
+      SpielFatalError(absl::StrCat("Unrecognized compression scheme in '",
+                                   compressed, "'"));
+  }
 }
 
 }  // namespace open_spiel

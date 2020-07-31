@@ -50,6 +50,9 @@ void init_pyspiel_observer(py::module& m) {
       .def("set_from", &Observation::SetFrom)
       .def("has_string", &Observation::HasString)
       .def("has_tensor", &Observation::HasTensor)
+      .def("compress",
+           [](const Observation& self) { return py::bytes(self.Compress()); })
+      .def("decompress", &Observation::Decompress)
       .def_buffer([](Observation& buffer_observer) -> py::buffer_info {
         return py::buffer_info(
             buffer_observer.Tensor().data(),         // Pointer to buffer
