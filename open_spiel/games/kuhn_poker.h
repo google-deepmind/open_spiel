@@ -70,8 +70,6 @@ class KuhnState : public State {
   std::vector<int> hand() const { return {card_dealt_[CurrentPlayer()]}; }
   std::unique_ptr<State> ResampleFromInfostate(
       int player_id, std::function<double()> rng) const override;
-  std::string PublicObservationString() const override;
-  std::string PrivateObservationString(Player player) const override;
 
   const std::vector<int>& CardDealt() const { return card_dealt_; }
 

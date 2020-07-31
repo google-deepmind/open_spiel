@@ -23,6 +23,7 @@ import numpy as np
 
 from open_spiel.python.algorithms import get_all_states
 from open_spiel.python.algorithms import sample_some_states
+from open_spiel.python.observation import make_observation
 import pyspiel
 
 _ALL_GAMES = pyspiel.registered_games()
@@ -314,16 +315,6 @@ class EnforceAPIOnPartialTreeBase(parameterized.TestCase):
         with self.assertRaisesRegex(RuntimeError, "player <", msg=msg):
           state.observation_string(num_players + 1)
 
-      if game_type.provides_factored_observation_string:
-        for p in range(num_players):
-          state.private_observation_string(p)
-        msg = (f"private_observation_string did not raise an error for "
-               f"{game_name}")
-        with self.assertRaisesRegex(RuntimeError, "player >= 0", msg=msg):
-          state.private_observation_string(-1)
-        with self.assertRaisesRegex(RuntimeError, "player <", msg=msg):
-          state.private_observation_string(num_players + 1)
-
   def test_legal_actions_returns_empty_list_on_opponent(self):
     if self.game_name in _GAMES_TO_OMIT_LEGAL_ACTIONS_CHECK:
       return
@@ -356,14 +347,21 @@ class EnforceAPIOnPartialTreeBase(parameterized.TestCase):
             self.assertEmpty(state.legal_actions(player), msg=msg)
 
   def test_private_information_contents(self):
-    if not self.game_type.provides_factored_observation_string:
+    try:
+      private_observation = make_observation(
+          self.game,
+          pyspiel.IIGObservationType(
+              public_info=False,
+              perfect_recall=False,
+              private_info=pyspiel.PrivateInfoType.SINGLE_PLAYER))
+    except (RuntimeError, ValueError):
       return
 
     player_has_private_info = [False] * self.game.num_players()
 
     for state in self.some_states:
       for i in range(self.game.num_players()):
-        if state.private_observation_string(i) != \
+        if private_observation.string_from(state, i) != \
             pyspiel.PrivateObservation.NOTHING:
           player_has_private_info[i] = True
 
@@ -376,20 +374,20 @@ class EnforceAPIOnPartialTreeBase(parameterized.TestCase):
       self.assertTrue(none_of(player_has_private_info))
 
   def test_no_invalid_public_observations(self):
-    if not self.game_type.provides_factored_observation_string:
+    try:
+      public_observation = make_observation(
+          self.game,
+          pyspiel.IIGObservationType(
+              public_info=True,
+              perfect_recall=False,
+              private_info=pyspiel.PrivateInfoType.NONE))
+    except (ValueError, RuntimeError):
       return
 
     for state in self.some_states:
       self.assertNotEqual(
-          state.public_observation_string(), pyspiel.PublicObservation.INVALID)
-
-  def test_public_observations_start_game(self):
-    if not self.game_type.provides_factored_observation_string:
-      return
-
-    state = self.game.new_initial_state()
-    self.assertEqual(
-        state.public_observation_string(), pyspiel.PublicObservation.START_GAME)
+          public_observation.string_from(state, 0),
+          pyspiel.PublicObservation.INVALID)
 
 
 def _assert_properties_recursive(state, assert_functions):

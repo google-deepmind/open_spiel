@@ -284,12 +284,6 @@ PYBIND11_MODULE(pyspiel, m) {
            (std::vector<float>(State::*)(int) const) & State::ObservationTensor)
       .def("observation_tensor",
            (std::vector<float>(State::*)() const) & State::ObservationTensor)
-      .def("public_observation_string",
-           (std::string(State::*)() const) & State::PublicObservationString)
-      .def("private_observation_string",
-           (std::string(State::*)(int) const) & State::PrivateObservationString)
-      .def("private_observation_string",
-           (std::string(State::*)() const) & State::PrivateObservationString)
       .def("clone", &State::Clone)
       .def("child", &State::Child)
       .def("undo_action", &State::UndoAction)

@@ -291,16 +291,6 @@ std::string KuhnState::ObservationString(Player player) const {
   return game.default_observer_->StringFrom(*this, player);
 }
 
-std::string KuhnState::PublicObservationString() const {
-  const KuhnGame& game = open_spiel::down_cast<const KuhnGame&>(*game_);
-  return game.public_observer_->StringFrom(*this, kDefaultPlayerId);
-}
-
-std::string KuhnState::PrivateObservationString(Player player) const {
-  const KuhnGame& game = open_spiel::down_cast<const KuhnGame&>(*game_);
-  return game.private_observer_->StringFrom(*this, player);
-}
-
 void KuhnState::InformationStateTensor(Player player,
                                        absl::Span<float> values) const {
   ContiguousAllocator allocator(values);

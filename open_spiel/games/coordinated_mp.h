@@ -56,8 +56,6 @@ class PenniesState : public State {
   std::unique_ptr<State> Clone() const override;
   std::vector<std::pair<Action, double>> ChanceOutcomes() const override;
   std::vector<Action> LegalActions() const override;
-  std::string PublicObservationString() const override;
-  std::string PrivateObservationString(Player player) const override;
 
  protected:
   void DoApplyAction(Action move) override;
@@ -93,8 +91,6 @@ class PenniesGame : public Game {
   // Used to implement the old observation API.
   std::shared_ptr<PenniesObserver> default_observer_;
   std::shared_ptr<PenniesObserver> info_state_observer_;
-  std::shared_ptr<PenniesObserver> private_observer_;
-  std::shared_ptr<PenniesObserver> public_observer_;
 };
 
 }  // namespace coordinated_mp

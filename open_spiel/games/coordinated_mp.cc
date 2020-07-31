@@ -204,15 +204,6 @@ std::string PenniesState::ObservationString(Player player) const {
   return game.default_observer_->StringFrom(*this, player);
 }
 
-std::string PenniesState::PublicObservationString() const {
-  const PenniesGame &game = open_spiel::down_cast<const PenniesGame &>(*game_);
-  return game.public_observer_->StringFrom(*this, kDefaultPlayerId);
-}
-
-std::string PenniesState::PrivateObservationString(Player player) const {
-  const PenniesGame &game = open_spiel::down_cast<const PenniesGame &>(*game_);
-  return game.private_observer_->StringFrom(*this, player);
-}
 std::unique_ptr<State> PenniesState::Clone() const {
   return absl::make_unique<PenniesState>(*this);
 }
@@ -226,14 +217,6 @@ PenniesGame::PenniesGame(const GameParameters &params)
     : Game(kGameType, params) {
   default_observer_ = std::make_shared<PenniesObserver>(kDefaultObsType);
   info_state_observer_ = std::make_shared<PenniesObserver>(kInfoStateObsType);
-  private_observer_ = std::make_shared<PenniesObserver>(
-      IIGObservationType{.public_info = false,
-                         .perfect_recall = false,
-                         .private_info = PrivateInfoType::kSinglePlayer});
-  public_observer_ = std::make_shared<PenniesObserver>(
-      IIGObservationType{.public_info = true,
-                         .perfect_recall = false,
-                         .private_info = PrivateInfoType::kNone});
 }
 
 std::unique_ptr<State> PenniesGame::NewInitialState() const {
