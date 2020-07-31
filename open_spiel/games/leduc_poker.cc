@@ -65,7 +65,8 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 class LeducObserver : public Observer {
  public:
   LeducObserver(IIGObservationType iig_obs_type)
-      : iig_obs_type_(iig_obs_type) {}
+      : Observer(/*has_string=*/true, /*has_tensor=*/true),
+        iig_obs_type_(iig_obs_type) {}
 
   void WriteTensor(const State& observed_state, int player,
                    Allocator* allocator) const override {

@@ -37,8 +37,9 @@ namespace {
 class InformationStateObserver : public Observer {
  public:
   InformationStateObserver(const Game& game)
-      : has_string_(game.GetType().provides_information_state_string),
-        has_tensor_(game.GetType().provides_information_state_tensor),
+      : Observer(
+            /*has_string=*/game.GetType().provides_information_state_string,
+            /*has_tensor=*/game.GetType().provides_information_state_tensor),
         size_(has_tensor_ ? game.InformationStateTensorSize() : 0) {
     if (has_tensor_) {
       auto shape = game.InformationStateTensorShape();
@@ -55,21 +56,17 @@ class InformationStateObserver : public Observer {
     return state.InformationStateString(player);
   }
 
-  bool HasString() const { return has_string_; }
-  bool HasTensor() const { return has_tensor_; }
-
  private:
   absl::InlinedVector<int, 4> shape_;
-  bool has_string_;
-  bool has_tensor_;
   int size_;
 };
 
 class DefaultObserver : public Observer {
  public:
   DefaultObserver(const Game& game)
-      : has_string_(game.GetType().provides_observation_string),
-        has_tensor_(game.GetType().provides_observation_tensor),
+      : Observer(/*has_string=*/
+                 game.GetType().provides_observation_string,
+                 /*has_tensor=*/game.GetType().provides_observation_tensor),
         size_(has_tensor_ ? game.ObservationTensorSize() : 0) {
     if (has_tensor_) {
       auto shape = game.ObservationTensorShape();
@@ -79,6 +76,7 @@ class DefaultObserver : public Observer {
 
   void WriteTensor(const State& state, int player,
                    Allocator* allocator) const override {
+    SPIEL_CHECK_TRUE(has_tensor_);
     auto tensor = allocator->Get("observation", shape_);
     state.ObservationTensor(player, tensor.data);
   }
@@ -87,13 +85,8 @@ class DefaultObserver : public Observer {
     return state.ObservationString(player);
   }
 
-  bool HasString() const { return has_string_; }
-  bool HasTensor() const { return has_tensor_; }
-
  private:
   absl::InlinedVector<int, 4> shape_;
-  bool has_string_;
-  bool has_tensor_;
   int size_;
 };
 

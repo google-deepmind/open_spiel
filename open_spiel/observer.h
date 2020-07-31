@@ -134,6 +134,11 @@ inline constexpr IIGObservationType kInfoStateObsType{
 // may only be applied to a State class generated from the same Game instance.
 class Observer {
  public:
+  Observer(bool has_string, bool has_tensor)
+      : has_string_(has_string), has_tensor_(has_tensor) {
+    SPIEL_CHECK_TRUE(has_string || has_tensor);
+  }
+
   // Write a tensor observation to the memory returned by the Allocator.
   virtual void WriteTensor(const State& state, int player,
                            Allocator* allocator) const = 0;
@@ -143,11 +148,15 @@ class Observer {
   virtual std::string StringFrom(const State& state, int player) const = 0;
 
   // What observations do we support?
-  // TODO(author11) Remove when all games support both types of observations
-  virtual bool HasString() const { return true; }
-  virtual bool HasTensor() const { return true; }
+  bool HasString() const { return has_string_; }
+  bool HasTensor() const { return has_tensor_; }
 
   virtual ~Observer() = default;
+
+ protected:
+  // TODO(author11) Remove when all games support both types of observations
+  bool has_string_;
+  bool has_tensor_;
 };
 
 // Information about a tensor (shape and type).
