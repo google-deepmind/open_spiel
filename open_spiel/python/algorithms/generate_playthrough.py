@@ -152,11 +152,34 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None):
     pass
 
   infostate_observation = None
+  # TODO(author11) reinstate this restriction
   # if game_type.information in (pyspiel.IMPERFECT_INFORMATION,
   #                              pyspiel.ONE_SHOT):
   try:
     infostate_observation = make_observation(
         game, pyspiel.IIGObservationType(perfect_recall=True))
+  except (RuntimeError, ValueError):
+    pass
+
+  public_observation = None
+  try:
+    public_observation = make_observation(
+        game,
+        pyspiel.IIGObservationType(
+            public_info=True,
+            perfect_recall=False,
+            private_info=pyspiel.PrivateInfoType.NONE))
+  except (RuntimeError, ValueError):
+    pass
+
+  private_observation = None
+  try:
+    private_observation = make_observation(
+        game,
+        pyspiel.IIGObservationType(
+            public_info=False,
+            perfect_recall=False,
+            private_info=pyspiel.PrivateInfoType.SINGLE_PLAYER))
   except (RuntimeError, ValueError):
     pass
 
@@ -250,12 +273,12 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None):
         s = default_observation.string_from(state, player)
         if s is not None:
           add_line(f'ObservationString({player}) = "{_escape(s)}"')
-    if game.get_type().provides_factored_observation_string:
+    if public_observation:
       add_line('PublicObservationString() = "{}"'.format(
-          _escape(state.public_observation_string())))
+          _escape(public_observation.string_from(state, 0))))
       for player in players:
         add_line('PrivateObservationString({}) = "{}"'.format(
-            player, _escape(state.private_observation_string(player))))
+            player, _escape(private_observation.string_from(state, player))))
     if default_observation and default_observation.tensor is not None:
       for player in players:
         default_observation.set_from(state, player)

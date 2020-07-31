@@ -67,6 +67,9 @@ InformationStateTensor(1).betting:
 ◯◯  ◯◯
 ObservationString(0) = "[Round 1][Player: -1][Pot: 2][Money: 99 99[Private: -10000][Ante: 1 1]"
 ObservationString(1) = "[Round 1][Player: -1][Pot: 2][Money: 99 99[Private: -10000][Ante: 1 1]"
+PublicObservationString() = "[Round 1][Player: -1][Pot: 2][Money: 99 99[Ante: 1 1]"
+PrivateObservationString(0) = "[Private: -10000]"
+PrivateObservationString(1) = "[Private: -10000]"
 ObservationTensor(0).player: ◉◯
 ObservationTensor(0).private_card: ◯◯◯◯◯◯
 ObservationTensor(0).community_card: ◯◯◯◯◯◯
@@ -116,6 +119,9 @@ InformationStateTensor(1).betting:
 ◯◯  ◯◯
 ObservationString(0) = "[Round 1][Player: -1][Pot: 2][Money: 99 99[Private: 5][Ante: 1 1]"
 ObservationString(1) = "[Round 1][Player: -1][Pot: 2][Money: 99 99[Private: -10000][Ante: 1 1]"
+PublicObservationString() = "[Round 1][Player: -1][Pot: 2][Money: 99 99[Ante: 1 1]"
+PrivateObservationString(0) = "[Private: 5]"
+PrivateObservationString(1) = "[Private: -10000]"
 ObservationTensor(0).player: ◉◯
 ObservationTensor(0).private_card: ◯◯◯◯◯◉
 ObservationTensor(0).community_card: ◯◯◯◯◯◯
@@ -165,6 +171,9 @@ InformationStateTensor(1).betting:
 ◯◯  ◯◯
 ObservationString(0) = "[Round 1][Player: 0][Pot: 2][Money: 99 99[Private: 5][Ante: 1 1]"
 ObservationString(1) = "[Round 1][Player: 0][Pot: 2][Money: 99 99[Private: 1][Ante: 1 1]"
+PublicObservationString() = "[Round 1][Player: 0][Pot: 2][Money: 99 99[Ante: 1 1]"
+PrivateObservationString(0) = "[Private: 5]"
+PrivateObservationString(1) = "[Private: 1]"
 ObservationTensor(0).player: ◉◯
 ObservationTensor(0).private_card: ◯◯◯◯◯◉
 ObservationTensor(0).community_card: ◯◯◯◯◯◯
@@ -215,6 +224,9 @@ InformationStateTensor(1).betting:
 ◯◯  ◯◯
 ObservationString(0) = "[Round 1][Player: 1][Pot: 4][Money: 97 99[Private: 5][Ante: 3 1]"
 ObservationString(1) = "[Round 1][Player: 1][Pot: 4][Money: 97 99[Private: 1][Ante: 3 1]"
+PublicObservationString() = "[Round 1][Player: 1][Pot: 4][Money: 97 99[Ante: 3 1]"
+PrivateObservationString(0) = "[Private: 5]"
+PrivateObservationString(1) = "[Private: 1]"
 ObservationTensor(0).player: ◉◯
 ObservationTensor(0).private_card: ◯◯◯◯◯◉
 ObservationTensor(0).community_card: ◯◯◯◯◯◯
@@ -265,6 +277,9 @@ InformationStateTensor(1).betting:
 ◯◯  ◯◯
 ObservationString(0) = "[Round 1][Player: 1][Pot: 0][Money: 101 99[Private: 5][Ante: 3 1]"
 ObservationString(1) = "[Round 1][Player: 1][Pot: 0][Money: 101 99[Private: 1][Ante: 3 1]"
+PublicObservationString() = "[Round 1][Player: 1][Pot: 0][Money: 101 99[Ante: 3 1]"
+PrivateObservationString(0) = "[Private: 5]"
+PrivateObservationString(1) = "[Private: 1]"
 ObservationTensor(0).player: ◉◯
 ObservationTensor(0).private_card: ◯◯◯◯◯◉
 ObservationTensor(0).community_card: ◯◯◯◯◯◯

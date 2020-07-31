@@ -103,7 +103,8 @@ PYBIND11_MODULE(pyspiel, m) {
   py::enum_<PrivateInfoType>(m, "PrivateInfoType")
       .value("ALL_PLAYERS", PrivateInfoType::kAllPlayers)
       .value("NONE", PrivateInfoType::kNone)
-      .value("SINGLE_PLAYER", PrivateInfoType::kSinglePlayer);
+      .value("SINGLE_PLAYER", PrivateInfoType::kSinglePlayer)
+      .export_values();
 
   py::class_<IIGObservationType>(m, "IIGObservationType")
       .def(py::init<bool, bool, PrivateInfoType>(),
