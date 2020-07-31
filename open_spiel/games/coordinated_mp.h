@@ -38,6 +38,8 @@ namespace coordinated_mp {
 enum ActionType { kNoAction = -1, kHeads = 0, kTails = 1 };
 enum InfosetPosition { kNoInfoset = -1, kTop = 0, kBottom = 1 };
 
+class PenniesObserver;
+
 class PenniesState : public State {
  public:
   explicit PenniesState(std::shared_ptr<const Game> game);
@@ -61,6 +63,8 @@ class PenniesState : public State {
   void DoApplyAction(Action move) override;
 
  private:
+  friend class PenniesObserver;
+
   ActionType actionA_ = kNoAction;  // Action of the first player.
   ActionType actionB_ = kNoAction;  // Action of the second player.
   InfosetPosition infoset_ = kNoInfoset;  // The infoset position in the game.
@@ -80,6 +84,17 @@ class PenniesGame : public Game {
     return std::shared_ptr<const Game>(new PenniesGame(*this));
   }
   int MaxGameLength() const override { return 2; }
+
+  // New Observation API
+  std::shared_ptr<Observer> MakeObserver(
+      absl::optional<IIGObservationType> iig_obs_type,
+      const GameParameters& params) const override;
+
+  // Used to implement the old observation API.
+  std::shared_ptr<PenniesObserver> default_observer_;
+  std::shared_ptr<PenniesObserver> info_state_observer_;
+  std::shared_ptr<PenniesObserver> private_observer_;
+  std::shared_ptr<PenniesObserver> public_observer_;
 };
 
 }  // namespace coordinated_mp
