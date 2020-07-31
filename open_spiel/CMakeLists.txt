@@ -97,23 +97,24 @@ macro(openspiel_optional_dependency DEP_NAME DEP_DEFAULT DEP_DESCRIPTION)
 endmacro()
 
 # List of all optional dependencies:
-openspiel_optional_dependency(BUILD_WITH_ACPC           OFF
-  "Build against the Universal Poker library.")
-openspiel_optional_dependency(BUILD_WITH_EIGEN          OFF
-  "Build with support for Eigen in C++.")
-openspiel_optional_dependency(BUILD_WITH_HANABI         OFF
-  "Build against the Hanabi game.")
-openspiel_optional_dependency(BUILD_WITH_JULIA          OFF
-  "Build binary for Julia.")
-openspiel_optional_dependency(BUILD_WITH_LIBTORCH       OFF
-  "Build with support for libtorch.")
-openspiel_optional_dependency(BUILD_WITH_PUBLIC_STATES  OFF
-  "Build with support for public states in C++.")
-openspiel_optional_dependency(BUILD_WITH_PYTHON         ON
-  "Build binary for Python.")
-openspiel_optional_dependency(BUILD_WITH_XINXIN         OFF
-  "Build against xinxin Hearts program.")
-
+openspiel_optional_dependency(
+  BUILD_WITH_ACPC          "Build against the Universal Poker library.")
+openspiel_optional_dependency(
+  BUILD_WITH_EIGEN         "Build with support for Eigen in C++.")
+openspiel_optional_dependency(
+  BUILD_WITH_HANABI        "Build against the Hanabi game.")
+openspiel_optional_dependency(
+  BUILD_WITH_JULIA         "Build binary for Julia.")
+openspiel_optional_dependency(
+  BUILD_WITH_LIBTORCH      "Build with support for libtorch.")
+openspiel_optional_dependency(
+  BUILD_WITH_PUBLIC_STATES "Build with support for public states in C++.")
+openspiel_optional_dependency(
+  BUILD_WITH_PYTHON        "Build binary for Python.")
+openspiel_optional_dependency(
+  BUILD_WITH_XINXIN        "Build against xinxin Hearts program.")
+openspiel_optional_dependency(
+  BUILD_WITH_ROSHAMBO      "Build against RoShamBo bots.")
 # Needed to disable Abseil tests.
 set (BUILD_TESTING OFF)
 
@@ -212,6 +213,9 @@ endif()
 if (BUILD_WITH_XINXIN)
   set(OPEN_SPIEL_OBJECTS ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:xinxin>)
 endif()
+if (BUILD_WITH_ROSHAMBO)
+  set(OPEN_SPIEL_OBJECTS ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:roshambo>)
+endif()
 if (BUILD_WITH_LIBTORCH)
   list(APPEND CMAKE_PREFIX_PATH "${CMAKE_CURRENT_SOURCE_DIR}/libtorch/libtorch")
   find_package(Torch REQUIRED)
@@ -226,6 +230,7 @@ endif()
 include_directories(..)
 
 add_subdirectory (algorithms)
+add_subdirectory (bots)
 add_subdirectory (examples)
 add_subdirectory (fog)
 add_subdirectory (games)
