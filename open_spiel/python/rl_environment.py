@@ -313,6 +313,10 @@ class Environment(object):
       observations["legal_actions"].append(self._state.legal_actions(player_id))
     observations["current_player"] = self._state.current_player()
 
+    if self._include_full_state:
+      observations["serialized_state"] = pyspiel.serialize_game_and_state(
+          self._game, self._state)
+
     return TimeStep(
         observations=observations,
         rewards=None,
