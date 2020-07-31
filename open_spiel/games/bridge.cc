@@ -290,7 +290,7 @@ void BridgeState::WriteObservationTensor(Player player,
   SPIEL_CHECK_LT(player, num_players_);
 
   std::fill(values.begin(), values.end(), 0.0);
-  if (phase_ == Phase::kGameOver || phase_ == Phase::kDeal) return;
+  if (phase_ == Phase::kDeal) return;
   int partnership = Partnership(player);
   auto ptr = values.begin();
   if (num_cards_played_ > 0) {
