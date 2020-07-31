@@ -316,6 +316,7 @@ class State {
   struct PlayerAction {
     Player player;
     Action action;
+    bool operator==(const PlayerAction&) const;
   };
 
   // For backward-compatibility reasons, this is the history of actions only.

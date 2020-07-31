@@ -92,6 +92,8 @@ class WrappedState : public State {
     return state_->LegalChanceOutcomes();
   }
 
+  const State& GetWrappedState() const { return *state_; }
+
  protected:
   void DoApplyAction(Action action_id) override {
     state_->ApplyAction(action_id);

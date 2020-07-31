@@ -62,8 +62,8 @@ void ValidateParams(const GameParameters& params,
     const auto it = param_spec.find(param.first);
     if (it == param_spec.end()) {
       SpielFatalError(absl::StrCat(
-          "Unknown parameter ", param.first,
-          ". Available parameters are: ", ListValidParameters(param_spec)));
+          "Unknown parameter '", param.first,
+          "'. Available parameters are: ", ListValidParameters(param_spec)));
     }
     if (it->second.type() != param.second.type()) {
       SpielFatalError(absl::StrCat(
@@ -819,6 +819,10 @@ void State::InformationStateTensor(Player player,
   // Retained for backwards compatibility.
   values->resize(game_->InformationStateTensorSize());
   InformationStateTensor(player, absl::MakeSpan(*values));
+}
+
+bool State::PlayerAction::operator==(const PlayerAction& other) const {
+  return player == other.player && action == other.action;
 }
 
 }  // namespace open_spiel
