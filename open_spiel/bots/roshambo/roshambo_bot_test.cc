@@ -14,6 +14,7 @@
 
 #include "open_spiel/bots/roshambo/roshambo_bot.h"
 
+#include <functional>
 #include <utility>
 
 #include "open_spiel/abseil-cpp/absl/time/clock.h"
