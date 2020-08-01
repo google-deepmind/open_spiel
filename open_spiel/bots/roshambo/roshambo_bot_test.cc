@@ -22,7 +22,7 @@
 #include "open_spiel/game_transforms/repeated_game.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_bots.h"
-#include "third_party/roshambo/bot_map.h"
+#include "open_spiel/bots/roshambo/roshambo/bot_map.h"
 
 namespace open_spiel {
 namespace {
