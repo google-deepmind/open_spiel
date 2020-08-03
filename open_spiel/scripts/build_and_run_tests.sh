@@ -163,7 +163,7 @@ function print_skipping_tests {
 
 function execute_export_graph {
   echo "Running tf_trajectories_example preliminary Python script"
-  python ../open_spiel/contrib/python/export_graph.py
+  python ../open_spiel/tensorflow/python/export_graph.py
 }
 
 # Build / install everything and run tests (C++, Python, optionally Julia).

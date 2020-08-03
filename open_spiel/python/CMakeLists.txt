@@ -67,7 +67,7 @@ if (BUILD_WITH_PUBLIC_STATES)
 endif()
 if (BUILD_WITH_TENSORFLOW_CC)
   set(PYTHON_TESTS ${PYTHON_TESTS}
-      ../contrib/python/export_graph.py)
+      ../tensorflow/python/export_graph.py)
 endif()
 
 # List of all Python tests to run.

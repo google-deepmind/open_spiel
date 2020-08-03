@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "open_spiel/contrib/tf_trajectories.h"
+#include "open_spiel/tensorflow/tf_trajectories.h"
 
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"

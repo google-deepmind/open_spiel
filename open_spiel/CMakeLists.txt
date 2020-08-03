@@ -202,7 +202,7 @@ add_subdirectory (examples)
 add_subdirectory (games)
 add_subdirectory (game_transforms)
 add_subdirectory (tests)
-add_subdirectory (contrib)
+add_subdirectory (tensorflow)
 
 if (BUILD_WITH_PYTHON)
   add_subdirectory (python)

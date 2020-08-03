@@ -31,7 +31,7 @@
 // This is a class to generate a batch of trajectories entirely in C++ using
 // Tensorflow policies:
 // - The graph is created in Python and serialized into a file (using
-//   tf.train.write_graph). See contrib/python/export_graph.py.
+//   tf.train.write_graph). See tensorflow/python/export_graph.py.
 // - The graph is loaded in C++ and we use the TF C++ API to execute ops.
 //
 // This code has been adapted from the Travis Ebesu's blog post:
