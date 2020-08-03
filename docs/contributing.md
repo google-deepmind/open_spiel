@@ -237,5 +237,6 @@ release!). Contributions are certainly not limited to these suggestions!
 
 -   **TF_Trajectories**. The source code currently includes a batch inference
     for running a batch of episodes using Tensorflow directly from C++ (in
-    `tensorflow/`). It has not yet been tested with CMake and public Tensorflow. We
-    would like to officially support this and move it into the core library.
+    `tensorflow/`). While it has been tested with CMake and public Tensorflow,
+    we are not yet confident enough to officially support this and move it
+    into the core library.
