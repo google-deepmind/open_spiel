@@ -142,6 +142,11 @@ def main(_):
         payoffs = np.random.random((num_states, num_states))
         payoffs_str = ",".join([str(x) for x in payoffs.flatten()])
     elif FLAGS.payoffs == "climbing":
+        # This is a particular payoff matrix that is hard for decentralized algorithms.
+        # Introduced in C. Claus and C. Boutilier, "The dynamics of
+        # reinforcement learning in cooperative multiagent systems", 1998, for
+        # simultaneous action games, but it is difficult even in the case of
+        # signaling games.
         payoffs = np.array([[11, -30, 0], [-30, 7, 6], [0, 0, 5]]) / 30
         payoffs_str = ",".join([str(x) for x in payoffs.flatten()])
     else:
@@ -215,14 +220,16 @@ def main(_):
                 title: Figure title
                 ax_labels: Labels for x and y axis (list of 2 strings)
             """
-            assert all([len(s.shape) == 2 for s in scalars
-                       ]), "Only 2D arrays supported for plotting"
+            if not all([len(s.shape) == 2 for s in scalars]):
+                raise ValueError("Only 2D arrays supported for plotting")
 
             if scalar_labels is None:
                 scalar_labels = [None] * len(scalars)
 
-            assert len(scalars) == len(
-                scalar_labels), "Wrong number of scalar labels"
+            if len(scalars) != len(scalar_labels):
+                raise ValueError(
+                    "Wrong number of scalar labels, expected {} but received {}"
+                    .format(len(scalars), len(scalar_labels)))
 
             _, plot_axis = init_fig()
             for i, scalar in enumerate(scalars):
@@ -271,7 +278,10 @@ def main(_):
                 ax.set_title(title)
             return fig, ax
 
-        labels = ["Centralized", "Decentralized"]
+        if FLAGS.compare:
+            labels = ["Centralized", "Decentralized"]
+        else:
+            labels = ["Centralized"] if FLAGS.centralized else ["Decentralized"]
         plot_scalars(rewards_list,
                      scalar_labels=labels,
                      title="Reward graph (Tabular Q-Learning)",

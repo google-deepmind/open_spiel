@@ -136,12 +136,12 @@ void LewisSignalingState::ObservationTensor(Player player,
 
   // one-hot vector for the state/message
   if (static_cast<Players>(player) == Players::kSender) {
-    if (state_ != -1) {
+    if (state_ != kUnassignedValue) {
       (*values)[offset + state_] = 1;
       offset += num_states_;
     }
   } else if (static_cast<Players>(player) == Players::kReceiver) {
-    if (message_ != -1) {
+    if (message_ != kUnassignedValue) {
       (*values)[offset + message_] = 1;
       offset += num_messages_;
     }
@@ -158,9 +158,9 @@ LewisSignalingState::LewisSignalingState(std::shared_ptr<const Game> game,
       num_messages_(num_messages),
       payoffs_(payoffs),
       cur_player_(kChancePlayerId),
-      state_(-1),
-      message_(-1),
-      action_(-1) {}
+      state_(kUnassignedValue),
+      message_(kUnassignedValue),
+      action_(kUnassignedValue) {}
 
 int LewisSignalingState::CurrentPlayer() const {
   return IsTerminal() ? kTerminalPlayerId : cur_player_;

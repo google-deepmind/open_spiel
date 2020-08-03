@@ -45,6 +45,7 @@ constexpr int kDefaultNumStates = 3;
 constexpr int kDefaultNumMessages = 3;
 constexpr int kDefaultNumPlayers = 2;
 constexpr const char* kDefaultPayoffs = "1, 0, 0, 0, 1, 0, 0, 0, 1";
+constexpr int kUnassignedValue = -1;
 
 enum class Players {
   kSender,

@@ -38,13 +38,14 @@ flags.DEFINE_string("payoffs", "1, 0, 0, 0, 1, 0, 0, 0, 1",
                     "Payoffs to use ('random' for random [0, 1) payoffs)")
 
 # Alg parameters
-flags.DEFINE_bool("centralized", False, "Set to use centralized Q-Learning")
 flags.DEFINE_integer("num_episodes", 50000, "Number of train episodes")
 flags.DEFINE_float("step_size", 0.1, "Step size for updates")
 flags.DEFINE_float("eps_init", 1.0, "Initial value of epsilon")
 flags.DEFINE_float("eps_final", 0.0, "Final value of epsilon")
 flags.DEFINE_integer("eps_decay_steps", 49000,
                      "Number of episodes to decay epsilon")
+flags.DEFINE_integer("replay_buffer_capacity", int(1e4),
+                     "Size of replay buffer")
 
 # Misc paramters
 flags.DEFINE_integer("num_runs", 10, "Number of repetitions")
@@ -63,6 +64,11 @@ def main(_):
         payoffs = np.random.random((num_states, num_states))
         payoffs_str = ",".join([str(x) for x in payoffs.flatten()])
     elif FLAGS.payoffs == "climbing":
+        # This is a particular payoff matrix that is hard for decentralized algorithms.
+        # Introduced in C. Claus and C. Boutilier, "The dynamics of
+        # reinforcement learning in cooperative multiagent systems", 1998, for
+        # simultaneous action games, but it is difficult even in the case of
+        # signaling games.
         payoffs = np.array([[11, -30, 0], [-30, 7, 6], [0, 0, 5]]) / 30
         payoffs_str = ",".join([str(x) for x in payoffs.flatten()])
     else:
@@ -84,7 +90,7 @@ def main(_):
     env = rl_environment.Environment(game, **env_configs)
     state_size = env.observation_spec()["info_state"][0]
     num_actions = env.action_spec()["num_actions"]
-    replay_buffer_capacity = int(1e4)
+    replay_buffer_capacity = FLAGS.replay_buffer_capacity
 
     # Results to store
     num_runs = FLAGS.num_runs
@@ -181,14 +187,16 @@ def main(_):
                 title: Figure title
                 ax_labels: Labels for x and y axis (list of 2 strings)
             """
-            assert all([len(s.shape) == 2 for s in scalars
-                       ]), "Only 2D arrays supported for plotting"
+            if not all([len(s.shape) == 2 for s in scalars]):
+                raise ValueError("Only 2D arrays supported for plotting")
 
             if scalar_labels is None:
                 scalar_labels = [None] * len(scalars)
 
-            assert len(scalars) == len(
-                scalar_labels), "Wrong number of scalar labels"
+            if len(scalars) != len(scalar_labels):
+                raise ValueError(
+                    "Wrong number of scalar labels, expected {} but received {}"
+                    .format(len(scalars), len(scalar_labels)))
 
             _, plot_axis = init_fig()
             for i, scalar in enumerate(scalars):
@@ -244,7 +252,8 @@ def main(_):
                      title="Percentage of optimal actions (DQN)",
                      ax_labels=["Episodes", "% optimal actions"])
 
-        plot_confusion_matrix(converge_point.astype(np.int), title="Final policy (DQN)")
+        plot_confusion_matrix(converge_point.astype(np.int),
+                              title="Final policy (DQN)")
 
         plt.show()
 
