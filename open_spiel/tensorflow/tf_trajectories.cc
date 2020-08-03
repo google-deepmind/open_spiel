@@ -118,7 +118,7 @@ void TFBatchTrajectoryRecorder::FillInputsAndMasks() {
   TensorMap inputs_matrix = tf_inputs_.matrix<float>();
   TensorMap mask_matrix = tf_legal_mask_.matrix<float>();
 
-  std::vector<float> info_state_vector(game_->ObservationTensorSize());
+  std::vector<float> observation_shape_vector(game_->ObservationTensorSize());
   for (int b = 0; b < batch_size_; ++b) {
     if (!terminal_flags_[b]) {
       std::vector<int> mask = states_[b]->LegalActionsMask();
@@ -128,9 +128,9 @@ void TFBatchTrajectoryRecorder::FillInputsAndMasks() {
       }
 
       states_[b]->ObservationTensor(states_[b]->CurrentPlayer(),
-                                         absl::MakeSpan(info_state_vector));
-      for (int i = 0; i < info_state_vector.size(); ++i) {
-        inputs_matrix(b, i) = info_state_vector[i];
+                                         absl::MakeSpan(observation_shape_vector));
+      for (int i = 0; i < observation_shape_vector.size(); ++i) {
+        inputs_matrix(b, i) = observation_shape_vector[i];
       }
     }
   }

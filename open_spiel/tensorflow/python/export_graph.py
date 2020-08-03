@@ -37,16 +37,16 @@ flags.DEFINE_string("filename", "graph.pb", "Filename for the graph")
 def main(_):
   game = pyspiel.load_game(FLAGS.game)
 
-  # Information state length
-  info_state_shape = game.observation_tensor_shape()
-  flat_info_state_length = np.prod(info_state_shape)
+  # Observation tensor shape
+  observation_shape = game.observation_tensor_shape()
+  flat_observation_shape = np.prod(observation_shape)
 
   # Output
   num_actions = game.num_distinct_actions()
 
   with tf.Session() as sess:
     net_input = tf.placeholder(
-        tf.float32, [None, flat_info_state_length], name="input")
+        tf.float32, [None, flat_observation_shape], name="input")
 
     # pylint: disable=unused-variable
     output = tf.placeholder(tf.float32, [None, num_actions], name="output")
