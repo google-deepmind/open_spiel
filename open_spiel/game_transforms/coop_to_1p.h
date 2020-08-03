@@ -131,7 +131,7 @@ class CoopTo1pState : public State {
   std::string ToString() const override;
   std::string ObservationString(Player player) const override;
   void ObservationTensor(Player player,
-                         std::vector<double>* values) const override;
+                         absl::Span<float> values) const override;
   ActionsAndProbs ChanceOutcomes() const override {
     return state_->ChanceOutcomes();
   }

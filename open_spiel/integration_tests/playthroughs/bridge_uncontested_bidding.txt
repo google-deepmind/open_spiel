@@ -1,4 +1,4 @@
-game: bridge_uncontested_bidding(relative_scoring=True)
+game: bridge_uncontested_bidding(relative_scoring=True,num_redeals=1,rng_seed=-1)
 
 GameType.chance_mode = ChanceMode.SAMPLED_STOCHASTIC
 GameType.dynamics = Dynamics.SEQUENTIAL
@@ -6,7 +6,7 @@ GameType.information = Information.IMPERFECT_INFORMATION
 GameType.long_name = "Bridge: Uncontested Bidding"
 GameType.max_num_players = 2
 GameType.min_num_players = 2
-GameType.parameter_specification = ["relative_scoring", "rng_seed", "subgame"]
+GameType.parameter_specification = ["num_redeals", "relative_scoring", "rng_seed", "subgame"]
 GameType.provides_information_state_string = True
 GameType.provides_information_state_tensor = True
 GameType.provides_observation_string = False
@@ -18,8 +18,8 @@ GameType.utility = Utility.IDENTICAL
 
 NumDistinctActions() = 36
 PolicyTensorShape() = [36]
-MaxChanceOutcomes() = 0
-GetParameters() = {relative_scoring=True,rng_seed=0,subgame=}
+MaxChanceOutcomes() = 1
+GetParameters() = {num_redeals=1,relative_scoring=True,rng_seed=-1,subgame=}
 NumPlayers() = 2
 MinUtility() = -2170.0
 MaxUtility() = 0.0
@@ -28,7 +28,7 @@ InformationStateTensorShape() = [126]
 InformationStateTensorLayout() = TensorLayout.CHW
 InformationStateTensorSize() = 126
 MaxGameLength() = 36
-ToString() = "bridge_uncontested_bidding(relative_scoring=True)"
+ToString() = "bridge_uncontested_bidding(num_redeals=1,relative_scoring=True,rng_seed=-1)"
 
 # State 0
 IsTerminal() = False
@@ -134,7 +134,7 @@ StringLegalActions() = ["Pass", "7N"]
 action: 0
 
 # State 5
-# T8643.KQ983.K2.A K972.AJT6.64.853 4C-7H-7S-Pass Score:-170 Passed Out:0 1C N:-185 1C E:-180 1D N:-170 1D E:-175 1H N:170 1H E:161 1S N:158 1S E:155 1N N:6 1N E:-18 3N N:-130 3N E:-145 4H N:286 4H E:275 4S N:270 4S E:267 5C N:-385 5C E:-380 5D N:-370 5D E:-375 6C N:-435 6C E:-430 6D N:-420 6D E:-425 6H N:-100 6H E:-115 6S N:-120 6S E:-125 6N N:-280 6N E:-295 7C N:-485 7C E:-480 7D N:-470 7D E:-475 7H N:-150 7H E:-165 7S N:-170 7S E:-175 7N N:-330 7N E:-345
+# T8643.KQ983.K2.A K972.AJT6.64.853 4C-7H-7S-Pass Score:-150 Passed Out:0 1C N:-150 1C E:-150 1D N:-150 1D E:-150 1H N:170 1H E:170 1S N:170 1S E:170 1N N:-50 1N E:-50 3N N:-150 3N E:-150 4H N:420 4H E:420 4S N:420 4S E:420 5C N:-350 5C E:-350 5D N:-350 5D E:-350 6C N:-400 6C E:-400 6D N:-400 6D E:-400 6H N:-100 6H E:-100 6S N:-100 6S E:-100 6N N:-300 6N E:-300 7C N:-450 7C E:-450 7D N:-450 7D E:-450 7H N:-150 7H E:-150 7S N:-150 7S E:-150 7N N:-350 7N E:-350
 IsTerminal() = True
 History() = [0, 16, 33, 34, 0]
 HistoryString() = "0 16 33 34 0"
@@ -145,6 +145,6 @@ InformationStateString(0) = "T8643.KQ983.K2.A 4C-7H-7S-Pass"
 InformationStateString(1) = "K972.AJT6.64.853 4C-7H-7S-Pass"
 InformationStateTensor(0): ◯◉◯◯◯◯◉◉◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◉◉◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◉◯◉◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◉◯
 InformationStateTensor(1): ◯◯◯◉◉◯◯◯◯◉◯◯◉◯◯◯◯◉◉◯◯◯◯◉◉◯◯◯◯◯◯◉◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◉
-SerializeState() = "T8643.KQ983.K2.A K972.AJT6.64.853 4C-7H-7S-Pass Score:-170 Passed Out:0 1C N:-185 1C E:-180 1D N:-170 1D E:-175 1H N:170 1H E:161 1S N:158 1S E:155 1N N:6 1N E:-18 3N N:-130 3N E:-145 4H N:286 4H E:275 4S N:270 4S E:267 5C N:-385 5C E:-380 5D N:-370 5D E:-375 6C N:-435 6C E:-430 6D N:-420 6D E:-425 6H N:-100 6H E:-115 6S N:-120 6S E:-125 6N N:-280 6N E:-295 7C N:-485 7C E:-480 7D N:-470 7D E:-475 7H N:-150 7H E:-165 7S N:-170 7S E:-175 7N N:-330 7N E:-345"
-Rewards() = [-170.0, -456.0]
-Returns() = [-170.0, -456.0]
+SerializeState() = "T8643.KQ983.K2.A K972.AJT6.64.853 4C-7H-7S-Pass Score:-150 Passed Out:0 1C N:-150 1C E:-150 1D N:-150 1D E:-150 1H N:170 1H E:170 1S N:170 1S E:170 1N N:-50 1N E:-50 3N N:-150 3N E:-150 4H N:420 4H E:420 4S N:420 4S E:420 5C N:-350 5C E:-350 5D N:-350 5D E:-350 6C N:-400 6C E:-400 6D N:-400 6D E:-400 6H N:-100 6H E:-100 6S N:-100 6S E:-100 6N N:-300 6N E:-300 7C N:-450 7C E:-450 7D N:-450 7D E:-450 7H N:-150 7H E:-150 7S N:-150 7S E:-150 7N N:-350 7N E:-350"
+Rewards() = [-150.0, -570.0]
+Returns() = [-150.0, -570.0]

@@ -486,12 +486,12 @@ void GoofspielState::NextPlayer(int* count, Player* player) const {
 }
 
 void GoofspielState::InformationStateTensor(Player player,
-                                            std::vector<double>* values) const {
+                                            absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  values->clear();
-  values->reserve(game_->InformationStateTensorSize());
+  SPIEL_CHECK_EQ(values.size(), game_->InformationStateTensorSize());
+  auto value_it = values.begin();
 
   // Point totals: one-hot vector encoding points, per player.
   Player p = player;
@@ -499,45 +499,45 @@ void GoofspielState::InformationStateTensor(Player player,
     // Cards numbered 1 .. K
     int max_points_slots = (num_cards_ * (num_cards_ + 1)) / 2 + 1;
     for (int i = 0; i < max_points_slots; ++i) {
-      values->push_back(i == points_[p]);
+      *value_it++ = (i == points_[p]);
     }
   }
 
   if (impinfo_) {
     // Bit vector of observing player's hand.
     for (int c = 0; c < num_cards_; ++c) {
-      values->push_back(player_hands_[player][c]);
+      *value_it++ = (player_hands_[player][c]);
     }
 
     // Sequence of who won each trick.
     for (int i = 0; i < win_sequence_.size(); ++i) {
       for (auto p = Player{0}; p < num_players_; ++p) {
-        values->push_back(win_sequence_[i] == p);
+        *value_it++ = (win_sequence_[i] == p);
       }
     }
 
     // Padding for future tricks
     int future_tricks = num_cards_ - win_sequence_.size();
-    for (int i = 0; i < future_tricks * num_players_; ++i) values->push_back(0);
+    for (int i = 0; i < future_tricks * num_players_; ++i) *value_it++ = (0);
 
     // Point card sequence.
     for (int i = 0; i < point_card_sequence_.size(); ++i) {
       for (int j = 0; j < num_cards_; ++j) {
-        values->push_back(point_card_sequence_[i] == j);
+        *value_it++ = (point_card_sequence_[i] == j);
       }
     }
 
     // Padding for future tricks
     future_tricks = num_cards_ - point_card_sequence_.size();
-    for (int i = 0; i < future_tricks * num_cards_; ++i) values->push_back(0);
+    for (int i = 0; i < future_tricks * num_cards_; ++i) *value_it++ = (0);
 
     // The observing player's action sequence.
     for (int i = 0; i < num_cards_; ++i) {
       for (int c = 0; c < num_cards_; ++c) {
-        values->push_back(i < actions_history_.size() &&
-                                  actions_history_[i][player] == c
-                              ? 1
-                              : 0);
+        *value_it++ =
+            (i < actions_history_.size() && actions_history_[i][player] == c
+                 ? 1
+                 : 0);
       }
     }
 
@@ -545,33 +545,33 @@ void GoofspielState::InformationStateTensor(Player player,
     // Point card sequence.
     for (int i = 0; i < point_card_sequence_.size(); ++i) {
       for (int j = 0; j < num_cards_; ++j) {
-        values->push_back(point_card_sequence_[i] == j);
+        *value_it++ = (point_card_sequence_[i] == j);
       }
     }
 
     // Padding for future tricks
     int future_tricks = num_cards_ - point_card_sequence_.size();
-    for (int i = 0; i < future_tricks * num_cards_; ++i) values->push_back(0);
+    for (int i = 0; i < future_tricks * num_cards_; ++i) *value_it++ = (0);
 
     // Bit vectors encoding all players' hands.
     p = player;
     for (int n = 0; n < num_players_; NextPlayer(&n, &p)) {
       for (int c = 0; c < num_cards_; ++c) {
-        values->push_back(player_hands_[p][c]);
+        *value_it++ = (player_hands_[p][c]);
       }
     }
   }
 
-  SPIEL_CHECK_EQ(values->size(), game_->InformationStateTensorSize());
+  SPIEL_CHECK_EQ(value_it, values.end());
 }
 
 void GoofspielState::ObservationTensor(Player player,
-                                       std::vector<double>* values) const {
+                                       absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  values->clear();
-  values->reserve(game_->ObservationTensorSize());
+  SPIEL_CHECK_EQ(values.size(), game_->ObservationTensorSize());
+  auto value_it = values.begin();
 
   // Perfect info case, show:
   //   - one-hot encoding the current point card
@@ -585,7 +585,7 @@ void GoofspielState::ObservationTensor(Player player,
 
   // Current point card.
   for (int i = 0; i < num_cards_; ++i) {
-    values->push_back(i == point_card_);
+    *value_it++ = (i == point_card_);
   }
 
   // Point totals: one-hot vector encoding points, per player.
@@ -594,37 +594,37 @@ void GoofspielState::ObservationTensor(Player player,
     // Cards numbered 1 .. K
     int max_points_slots = (num_cards_ * (num_cards_ + 1)) / 2 + 1;
     for (int i = 0; i < max_points_slots; ++i) {
-      values->push_back(i == points_[p]);
+      *value_it++ = (i == points_[p]);
     }
   }
 
   if (impinfo_) {
     // Bit vector of observing player's hand.
     for (int c = 0; c < num_cards_; ++c) {
-      values->push_back(player_hands_[player][c]);
+      *value_it++ = (player_hands_[player][c]);
     }
 
     // Sequence of who won each trick.
     for (int i = 0; i < win_sequence_.size(); ++i) {
       for (auto p = Player{0}; p < num_players_; ++p) {
-        values->push_back(win_sequence_[i] == p);
+        *value_it++ = (win_sequence_[i] == p);
       }
     }
 
     // Padding for future tricks
     int future_tricks = num_cards_ - win_sequence_.size();
-    for (int i = 0; i < future_tricks * num_players_; ++i) values->push_back(0);
+    for (int i = 0; i < future_tricks * num_players_; ++i) *value_it++ = (0);
   } else {
     // Bit vectors encoding all players' hands.
     p = player;
     for (int n = 0; n < num_players_; NextPlayer(&n, &p)) {
       for (int c = 0; c < num_cards_; ++c) {
-        values->push_back(player_hands_[p][c]);
+        *value_it++ = (player_hands_[p][c]);
       }
     }
   }
 
-  SPIEL_CHECK_EQ(values->size(), game_->ObservationTensorSize());
+  SPIEL_CHECK_EQ(value_it, values.end());
 }
 
 std::unique_ptr<State> GoofspielState::Clone() const {
@@ -643,6 +643,10 @@ GoofspielGame::GoofspielGame(const GameParameters& params)
   // Override the zero-sum utility in the game type if general-sum returns.
   if (returns_type_ == ReturnsType::kTotalPoints) {
     game_type_.utility = GameType::Utility::kGeneralSum;
+  }
+  // Maybe override the perfect information in the game type.
+  if (impinfo_) {
+    game_type_.information = GameType::Information::kImperfectInformation;
   }
 }
 

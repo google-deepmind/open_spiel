@@ -280,16 +280,16 @@ std::string OwareState::ObservationString(Player player) const {
 }
 
 void OwareState::ObservationTensor(Player player,
-                                   std::vector<double>* values) const {
+                                   absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  values->resize(/*seeds*/ NumHouses() + /*scores*/ kNumPlayers);
+  SPIEL_CHECK_EQ(values.size(), /*seeds*/ NumHouses() + /*scores*/ kNumPlayers);
   for (int house = 0; house < NumHouses(); ++house) {
-    (*values)[house] = ((double)board_.seeds[house]) / total_seeds_;
+    values[house] = ((double)board_.seeds[house]) / total_seeds_;
   }
   for (Player player = 0; player < kNumPlayers; ++player) {
-    (*values)[NumHouses() + player] =
+    values[NumHouses() + player] =
         ((double)board_.score[player]) / total_seeds_;
   }
 }

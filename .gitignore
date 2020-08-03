@@ -19,6 +19,7 @@ ENV/
 
  # Build products
 build/
+build*/
 cmake-build-*/
 dist/
 pyspiel.egg-info/
@@ -35,6 +36,7 @@ open_spiel/games/hanabi/hanabi-learning-environment/
 pybind11/
 
 # Install artifacts
+download_cache/
 get-pip.py
 open_spiel/scripts/shflags
 open_spiel/scripts/jill.sh

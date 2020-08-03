@@ -28,6 +28,7 @@
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_split.h"
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "open_spiel/abseil-cpp/absl/types/span.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel_utils.h"
 
@@ -61,8 +62,8 @@ void ValidateParams(const GameParameters& params,
     const auto it = param_spec.find(param.first);
     if (it == param_spec.end()) {
       SpielFatalError(absl::StrCat(
-          "Unknown parameter ", param.first,
-          ". Available parameters are: ", ListValidParameters(param_spec)));
+          "Unknown parameter '", param.first,
+          "'. Available parameters are: ", ListValidParameters(param_spec)));
     }
     if (it->second.type() != param.second.type()) {
       SpielFatalError(absl::StrCat(
@@ -207,6 +208,7 @@ std::shared_ptr<const Game> LoadGame(GameParameters params) {
 State::State(std::shared_ptr<const Game> game)
     : num_distinct_actions_(game->NumDistinctActions()),
       num_players_(game->NumPlayers()),
+      move_number_(0),
       game_(game) {}
 
 template <>
@@ -391,6 +393,37 @@ Action State::StringToAction(Player player,
   }
   SpielFatalError(
       absl::StrCat("Couldn't find an action matching ", action_str));
+}
+
+void State::ApplyAction(Action action_id) {
+  // history_ needs to be modified *after* DoApplyAction which could
+  // be using it.
+
+  // Cannot apply an invalid action.
+  SPIEL_CHECK_NE(action_id, kInvalidAction);
+  Player player = CurrentPlayer();
+  DoApplyAction(action_id);
+  history_.push_back({player, action_id});
+  ++move_number_;
+}
+
+void State::ApplyActions(const std::vector<Action>& actions) {
+  // history_ needs to be modified *after* DoApplyActions which could
+  // be using it.
+  DoApplyActions(actions);
+  history_.reserve(history_.size() + actions.size());
+  for (int player = 0; player < actions.size(); ++player) {
+    history_.push_back({player, actions[player]});
+  }
+  ++move_number_;
+}
+
+std::vector<int> State::LegalActionsMask(Player player) const {
+  int length = (player == kChancePlayerId) ? game_->MaxChanceOutcomes()
+                                           : num_distinct_actions_;
+  std::vector<int> mask(length, 0);
+  for (int action : LegalActions(player)) mask[action] = 1;
+  return mask;
 }
 
 std::unique_ptr<State> Game::DeserializeState(const std::string& str) const {
@@ -747,6 +780,49 @@ GameType GameTypeFromString(const std::string& game_type_str) {
   game_type.parameter_specification =
       DeserializeGameParameters(game_type_values.at("parameter_specification"));
   return game_type;
+}
+
+std::vector<float> State::ObservationTensor(Player player) const {
+  // We add this player check, to prevent errors if the game implementation
+  // lacks that check (in particular as this function is the one used in
+  // Python). This can lead to doing this check twice.
+  // TODO(author2): Do we want to prevent executing this twice for games
+  // that implement it?
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+  std::vector<float> observation(game_->ObservationTensorSize());
+  ObservationTensor(player, absl::MakeSpan(observation));
+  return observation;
+}
+
+void State::ObservationTensor(Player player, std::vector<float>* values) const {
+  // Retained for backwards compatibility.
+  values->resize(game_->ObservationTensorSize());
+  ObservationTensor(player, absl::MakeSpan(*values));
+}
+
+std::vector<float> State::InformationStateTensor(Player player) const {
+  // We add this player check, to prevent errors if the game implementation
+  // lacks that check (in particular as this function is the one used in
+  // Python). This can lead to doing this check twice.
+  // TODO(author2): Do we want to prevent executing this twice for games
+  // that implement it?
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+  std::vector<float> info_state(game_->InformationStateTensorSize());
+  InformationStateTensor(player, absl::MakeSpan(info_state));
+  return info_state;
+}
+
+void State::InformationStateTensor(Player player,
+                                   std::vector<float>* values) const {
+  // Retained for backwards compatibility.
+  values->resize(game_->InformationStateTensorSize());
+  InformationStateTensor(player, absl::MakeSpan(*values));
+}
+
+bool State::PlayerAction::operator==(const PlayerAction& other) const {
+  return player == other.player && action == other.action;
 }
 
 }  // namespace open_spiel

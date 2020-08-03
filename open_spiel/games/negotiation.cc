@@ -176,12 +176,12 @@ std::vector<int> NegotiationGame::ObservationTensorShape() const {
 }
 
 void NegotiationState::ObservationTensor(Player player,
-                                         std::vector<double>* values) const {
+                                         absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  values->resize(parent_game_.ObservationTensorSize());
-  std::fill(values->begin(), values->end(), 0);
+  SPIEL_CHECK_EQ(values.size(), parent_game_.ObservationTensorSize());
+  std::fill(values.begin(), values.end(), 0);
 
   // No observations at chance nodes.
   if (IsChanceNode()) {
@@ -202,39 +202,39 @@ void NegotiationState::ObservationTensor(Player player,
   // Current player.
   int offset = 0;
   if (!IsTerminal()) {
-    (*values)[offset + CurrentPlayer()] = 1;
+    values[offset + CurrentPlayer()] = 1;
   }
   offset += kNumPlayers;
 
   // Current turn type.
   if (turn_type_ == TurnType::kProposal) {
-    (*values)[offset] = 1;
+    values[offset] = 1;
   } else {
-    (*values)[offset + 1] = 1;
+    values[offset + 1] = 1;
   }
   offset += 2;
 
   // Terminal status: 2 bits
-  (*values)[offset] = IsTerminal() ? 1 : 0;
-  (*values)[offset + 1] = agreement_reached_ ? 1 : 0;
+  values[offset] = IsTerminal() ? 1 : 0;
+  values[offset + 1] = agreement_reached_ ? 1 : 0;
   offset += 2;
 
   // Item pool.
   for (int item = 0; item < num_items_; ++item) {
-    (*values)[offset + item_pool_[item]] = 1;
+    values[offset + item_pool_[item]] = 1;
     offset += kMaxQuantity + 1;
   }
 
   // Utilities.
   for (int item = 0; item < num_items_; ++item) {
-    (*values)[offset + agent_utils_[player][item]] = 1;
+    values[offset + agent_utils_[player][item]] = 1;
     offset += kMaxValue + 1;
   }
 
   // Last proposal.
   if (!proposals_.empty()) {
     for (int item = 0; item < num_items_; ++item) {
-      (*values)[offset + proposals_.back()[item]] = 1;
+      values[offset + proposals_.back()[item]] = 1;
       offset += kMaxQuantity + 1;
     }
   } else {
@@ -245,7 +245,7 @@ void NegotiationState::ObservationTensor(Player player,
   if (enable_utterances_) {
     if (!utterances_.empty()) {
       for (int dim = 0; dim < utterance_dim_; ++dim) {
-        (*values)[offset + utterances_.back()[dim]] = 1;
+        values[offset + utterances_.back()[dim]] = 1;
         offset += num_symbols_;
       }
     } else {
@@ -253,7 +253,7 @@ void NegotiationState::ObservationTensor(Player player,
     }
   }
 
-  SPIEL_CHECK_EQ(offset, values->size());
+  SPIEL_CHECK_EQ(offset, values.size());
 }
 
 NegotiationState::NegotiationState(std::shared_ptr<const Game> game)

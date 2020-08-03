@@ -20,6 +20,7 @@
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_format.h"
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
@@ -236,14 +237,14 @@ std::string HeartsState::FormatPoints() const {
 }
 
 void HeartsState::InformationStateTensor(Player player,
-                                         std::vector<double>* values) const {
+                                         absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  std::fill(values->begin(), values->end(), 0.0);
-  values->resize(game_->InformationStateTensorSize());
-  if (phase_ != Phase::kPass && phase_ != Phase::kPlay) return;
-  auto ptr = values->begin();
+  std::fill(values.begin(), values.end(), 0.0);
+  SPIEL_CHECK_EQ(values.size(), kInformationStateTensorSize);
+  if (phase_ == Phase::kPassDir || phase_ == Phase::kDeal) return;
+  auto ptr = values.begin();
   // Pass direction
   ptr[static_cast<int>(pass_dir_)] = 1;
   ptr += kNumPlayers;
@@ -275,7 +276,8 @@ void HeartsState::InformationStateTensor(Player player,
     ptr += kMaxScore;
   }
   // History of tricks, presented in the format: N E S W N E S
-  int current_trick = num_cards_played_ / kNumPlayers;
+  int current_trick = std::min(num_cards_played_ / kNumPlayers,
+                               static_cast<int>(tricks_.size() - 1));
   for (int i = 0; i < current_trick; ++i) {
     Player leader = tricks_[i].Leader();
     ptr += leader * kNumCards;
@@ -295,13 +297,14 @@ void HeartsState::InformationStateTensor(Player player,
     }
   }
   // Current trick may contain less than four cards.
-  ptr += (kNumPlayers - (num_cards_played_ % kNumPlayers)) * kNumCards;
+  if (num_cards_played_ < kNumCards) {
+    ptr += (kNumPlayers - (num_cards_played_ % kNumPlayers)) * kNumCards;
+  }
   // Move to the end of current trick.
   ptr += (kNumPlayers - std::max(leader, 0) - 1) * kNumCards;
   // Skip over unplayed tricks.
   ptr += (kNumTricks - current_trick - 1) * kTrickTensorSize;
-  SPIEL_CHECK_EQ(std::distance(values->begin(), ptr),
-                 kInformationStateTensorSize);
+  SPIEL_CHECK_EQ(ptr, values.end());
 }
 
 std::vector<Action> HeartsState::LegalActions() const {
@@ -625,7 +628,7 @@ std::unique_ptr<State> HeartsState::ResampleFromInfostate(
   std::vector<std::vector<int>> play_known(kNumPlayers);
   if (phase_ == Phase::kPlay) {
     for (int card = 0; card < kNumCards; card++) {
-      std::optional<Player> p = Played(card);
+      absl::optional<Player> p = Played(card);
       if (p && *p != player_id) {
         play_known[*p].push_back(card);
       }
@@ -633,7 +636,7 @@ std::unique_ptr<State> HeartsState::ResampleFromInfostate(
   }
 
   // the two of clubs is also known once a player has played first
-  std::optional<Player> two_clubs_holder = holder_[Card(Suit::kClubs, 0)];
+  absl::optional<Player> two_clubs_holder = holder_[Card(Suit::kClubs, 0)];
   if (phase_ == Phase::kPlay && two_clubs_holder) {
     play_known[*two_clubs_holder].push_back(Card(Suit::kClubs, 0));
   }

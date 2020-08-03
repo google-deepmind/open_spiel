@@ -113,12 +113,12 @@ std::string LewisSignalingState::ObservationString(Player player) const {
 }
 
 void LewisSignalingState::ObservationTensor(Player player,
-                                            std::vector<double>* values) const {
+                                            absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  values->resize(game_->ObservationTensorSize());
-  std::fill(values->begin(), values->end(), 0);
+  SPIEL_CHECK_EQ(values.size(), game_->ObservationTensorSize());
+  std::fill(values.begin(), values.end(), 0);
 
   if (IsChanceNode()) {
     // No observations at chance nodes.
@@ -127,22 +127,22 @@ void LewisSignalingState::ObservationTensor(Player player,
 
   // 2 bits to indicate whose turn it is.
   int offset = 0;
-  (*values)[cur_player_] = 1;
+  values[cur_player_] = 1;
   offset += 2;
 
   // 1 bit to indicate whether it's terminal
-  (*values)[offset] = IsTerminal() ? 1 : 0;
+  values[offset] = IsTerminal() ? 1 : 0;
   offset += 1;
 
   // one-hot vector for the state/message
   if (static_cast<Players>(player) == Players::kSender) {
     if (state_ != kUnassignedValue) {
-      (*values)[offset + state_] = 1;
+      values[offset + state_] = 1;
       offset += num_states_;
     }
   } else if (static_cast<Players>(player) == Players::kReceiver) {
     if (message_ != kUnassignedValue) {
-      (*values)[offset + message_] = 1;
+      values[offset + message_] = 1;
       offset += num_messages_;
     }
   } else {

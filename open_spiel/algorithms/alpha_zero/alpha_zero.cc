@@ -49,7 +49,7 @@ namespace open_spiel::algorithms {
 
 struct Trajectory {
   struct State {
-    std::vector<double> observation;
+    std::vector<float> observation;
     open_spiel::Player current_player;
     std::vector<open_spiel::Action> legal_actions;
     open_spiel::Action action;

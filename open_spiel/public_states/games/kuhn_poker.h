@@ -99,7 +99,7 @@ class KuhnPublicState : public PublicState {
       const PrivateInformation&, Random* random) const override;
 
   // Traversal of public state
-  std::vector<PublicTransition> GetPublicTransitions() const override;
+  std::vector<PublicTransition> LegalTransitions() const override;
   std::vector<std::vector<Action>> GetPrivateActions(
       Player player) const override;
   void UndoTransition(const PublicTransition& transition) override;
@@ -132,6 +132,7 @@ class KuhnPublicState : public PublicState {
   bool AllPlayerHaveSeenTheirCards() const;
   int NumPlayers() const;
   int NumCards() const;
+  int NumPassesWithoutBet() const;
 
  private:
   // Public action of each player.

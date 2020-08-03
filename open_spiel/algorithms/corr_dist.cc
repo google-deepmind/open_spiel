@@ -23,9 +23,12 @@
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_split.h"
 #include "open_spiel/algorithms/best_response.h"
+#include "open_spiel/algorithms/corr_dist/afcce.h"
+#include "open_spiel/algorithms/corr_dist/afce.h"
 #include "open_spiel/algorithms/corr_dist/efcce.h"
 #include "open_spiel/algorithms/corr_dist/efce.h"
 #include "open_spiel/algorithms/expected_returns.h"
+#include "open_spiel/algorithms/tabular_exploitability.h"
 #include "open_spiel/game_transforms/turn_based_simultaneous_game.h"
 #include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"
@@ -93,36 +96,18 @@ CorrelationDevice ConvertCorrelationDevice(
 
   return new_mu;
 }
-
-// This is essentially the same as NashConv, but we need to add a max(0, di) to
-// the incentive to deviate, di, because the best response can be negative if
-// the pi_{-i} is correlated (there may not be any single action / strategy to
-// switch to for this player that gets higher value than playing the correlated
-// joint policy).
-double CustomNashConv(const Game& game, const Policy& policy,
-                      bool use_state_get_policy) {
-  GameType game_type = game.GetType();
-  if (game_type.dynamics != GameType::Dynamics::kSequential) {
-    SpielFatalError("The game must be turn-based.");
-  }
-
-  std::unique_ptr<State> root = game.NewInitialState();
-  std::vector<double> best_response_values(game.NumPlayers());
-  for (auto p = Player{0}; p < game.NumPlayers(); ++p) {
-    TabularBestResponse best_response(game, p, &policy);
-    best_response_values[p] = best_response.Value(root->ToString());
-  }
-  std::vector<double> on_policy_values =
-      ExpectedReturns(*root, policy, -1, !use_state_get_policy);
-  SPIEL_CHECK_EQ(best_response_values.size(), on_policy_values.size());
-  double nash_conv = 0;
-  for (auto p = Player{0}; p < game.NumPlayers(); ++p) {
-    nash_conv += std::max(0.0, best_response_values[p] - on_policy_values[p]);
-  }
-  return nash_conv;
-}
-
 }  // namespace
+
+// Return a string representation of the correlation device.
+std::string ToString(const CorrelationDevice& corr_dev) {
+  std::string corr_dev_str;
+  for (const auto& prob_and_policy : corr_dev) {
+    absl::StrAppend(&corr_dev_str, "Prob: ", prob_and_policy.first, "\n");
+    absl::StrAppend(&corr_dev_str, prob_and_policy.second.ToStringSorted(),
+                    "\n");
+  }
+  return corr_dev_str;
+}
 
 std::vector<double> ExpectedValues(const Game& game,
                                    const CorrelationDevice& mu) {
@@ -155,7 +140,6 @@ double EFCEDist(const Game& game, CorrDistConfig config,
                 const CorrelationDevice& mu) {
   // Check that the config matches what is supported.
   SPIEL_CHECK_TRUE(config.deterministic);
-  SPIEL_CHECK_FALSE(config.convert_policy);
 
   // Check for proper probability distribution.
   CheckCorrelationDeviceProbDist(mu);
@@ -166,14 +150,13 @@ double EFCEDist(const Game& game, CorrDistConfig config,
   // device, mu. So this is a simple wrapper policy that simply follows the
   // recommendations.
   EFCETabularPolicy policy(config);
-  return CustomNashConv(*efce_game, policy, true);
+  return NashConv(*efce_game, policy, true);
 }
 
 double EFCCEDist(const Game& game, CorrDistConfig config,
                  const CorrelationDevice& mu) {
   // Check that the config matches what is supported.
   SPIEL_CHECK_TRUE(config.deterministic);
-  SPIEL_CHECK_FALSE(config.convert_policy);
 
   // Check for proper probability distribution.
   CheckCorrelationDeviceProbDist(mu);
@@ -186,7 +169,43 @@ double EFCCEDist(const Game& game, CorrDistConfig config,
   // recommendations.
   EFCCETabularPolicy policy(efcce_game->FollowAction(),
                             efcce_game->DefectAction());
-  return CustomNashConv(*efcce_game, policy, true);
+  return NashConv(*efcce_game, policy, true);
+}
+
+double AFCEDist(const Game& game, CorrDistConfig config,
+                const CorrelationDevice& mu) {
+  // Check that the config matches what is supported.
+  SPIEL_CHECK_TRUE(config.deterministic);
+
+  // Check for proper probability distribution.
+  CheckCorrelationDeviceProbDist(mu);
+
+  std::shared_ptr<const Game> afce_game(new AFCEGame(game.Clone(), config, mu));
+
+  // Note that the policies are already inside the game via the correlation
+  // device, mu. So this is a simple wrapper policy that simply follows the
+  // recommendations.
+  AFCETabularPolicy policy(config);
+  return NashConv(*afce_game, policy, true);
+}
+
+double AFCCEDist(const Game& game, CorrDistConfig config,
+                 const CorrelationDevice& mu) {
+  // Check that the config matches what is supported.
+  SPIEL_CHECK_TRUE(config.deterministic);
+
+  // Check for proper probability distribution.
+  CheckCorrelationDeviceProbDist(mu);
+
+  std::shared_ptr<const AFCCEGame> afcce_game(
+      new AFCCEGame(game.Clone(), config, mu));
+
+  // Note that the policies are already inside the game via the correlation
+  // device, mu. So this is a simple wrapper policy that simply follows the
+  // recommendations.
+  AFCCETabularPolicy policy(afcce_game->FollowAction(),
+                            afcce_game->DefectAction());
+  return NashConv(*afcce_game, policy, true);
 }
 
 double CEDist(const Game& game, const NormalFormCorrelationDevice& mu) {

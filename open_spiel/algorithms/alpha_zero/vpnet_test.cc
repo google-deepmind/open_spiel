@@ -43,7 +43,7 @@ double SolveState(
   }
 
   bool max_player = state.CurrentPlayer() == 0;
-  std::vector<double> obs = state.ObservationTensor();
+  std::vector<float> obs = state.ObservationTensor();
   std::vector<Action> legal_actions = state.LegalActions();
 
   Action best_action = kInvalidAction;
@@ -90,7 +90,7 @@ VPNetModel BuildModel(const Game& game, const std::string& nn_model,
         /*learning_rate=*/0.01,
         /*weight_decay=*/0.0001,
         tmp_dir, filename,
-        nn_model, /*nn_width=*/64, /*nn_depth=*/2, /*verbose=*/true));
+        nn_model, /*nn_width=*/32, /*nn_depth=*/2, /*verbose=*/true));
   }
 
   std::string model_path = absl::StrCat(tmp_dir, "/", filename);
@@ -108,7 +108,7 @@ void TestModelCreation(const std::string& nn_model) {
 
   std::unique_ptr<open_spiel::State> state = game->NewInitialState();
   std::vector<Action> legal_actions = state->LegalActions();
-  std::vector<double> obs = state->ObservationTensor();
+  std::vector<float> obs = state->ObservationTensor();
   VPNetModel::InferenceInputs inputs = {legal_actions, obs};
 
   // Check that inference runs at all.
@@ -132,7 +132,7 @@ void TestModelLearnsSimple(const std::string& nn_model) {
   std::unique_ptr<open_spiel::State> state = game->NewInitialState();
 
   while (!state->IsTerminal()) {
-    std::vector<double> obs = state->ObservationTensor();
+    std::vector<float> obs = state->ObservationTensor();
     std::vector<Action> legal_actions = state->LegalActions();
     Action action = legal_actions[0];
     ActionsAndProbs policy({{action, 1}});
@@ -151,21 +151,23 @@ void TestModelLearnsSimple(const std::string& nn_model) {
 
   std::cout << "states: " << train_inputs.size() << std::endl;
   std::vector<VPNetModel::LossInfo> losses;
-  for (int i = 0; i < 1000; i++) {
+  const double policy_loss_goal = 0.05;
+  const double value_loss_goal = 0.05;
+  for (int i = 0; i < 200; i++) {
     VPNetModel::LossInfo loss = model.Learn(train_inputs);
     std::cout << absl::StrFormat(
         "%d: Losses(total: %.3f, policy: %.3f, value: %.3f, l2: %.3f)\n",
          i, loss.Total(), loss.Policy(), loss.Value(), loss.L2());
     losses.push_back(loss);
-    if (loss.Policy() < 0.05 && loss.Value() < 0.05) {
+    if (loss.Policy() < policy_loss_goal && loss.Value() < value_loss_goal) {
       break;
     }
   }
   SPIEL_CHECK_GT(losses.front().Total(), losses.back().Total());
   SPIEL_CHECK_GT(losses.front().Policy(), losses.back().Policy());
   SPIEL_CHECK_GT(losses.front().Value(), losses.back().Value());
-  SPIEL_CHECK_LT(losses.back().Value(), 0.05);
-  SPIEL_CHECK_LT(losses.back().Policy(), 0.05);
+  SPIEL_CHECK_LT(losses.back().Value(), value_loss_goal);
+  SPIEL_CHECK_LT(losses.back().Policy(), policy_loss_goal);
 }
 
 // Can learn the optimal policy.
@@ -178,21 +180,23 @@ void TestModelLearnsOptimal(
 
   std::cout << "states: " << train_inputs.size() << std::endl;
   std::vector<VPNetModel::LossInfo> losses;
-  for (int i = 0; i < 1000; i++) {
+  const double policy_loss_goal = 0.1;
+  const double value_loss_goal = 0.1;
+  for (int i = 0; i < 500; i++) {
     VPNetModel::LossInfo loss = model.Learn(train_inputs);
     std::cout << absl::StrFormat(
         "%d: Losses(total: %.3f, policy: %.3f, value: %.3f, l2: %.3f)\n",
          i, loss.Total(), loss.Policy(), loss.Value(), loss.L2());
     losses.push_back(loss);
-    if (loss.Policy() < 0.1 && loss.Value() < 0.1) {
+    if (loss.Policy() < policy_loss_goal && loss.Value() < value_loss_goal) {
       break;
     }
   }
   SPIEL_CHECK_GT(losses.front().Total(), losses.back().Total());
   SPIEL_CHECK_GT(losses.front().Policy(), losses.back().Policy());
   SPIEL_CHECK_GT(losses.front().Value(), losses.back().Value());
-  SPIEL_CHECK_LT(losses.back().Value(), 0.1);
-  SPIEL_CHECK_LT(losses.back().Policy(), 0.1);
+  SPIEL_CHECK_LT(losses.back().Value(), value_loss_goal);
+  SPIEL_CHECK_LT(losses.back().Policy(), policy_loss_goal);
 }
 
 }  // namespace

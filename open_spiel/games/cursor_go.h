@@ -100,7 +100,7 @@ class CursorGoState : public State {
   // Five planes: black, white, empty, cursor position, and a bias plane of bits
   // indicating komi (whether white is to play).
   void ObservationTensor(Player player,
-                         std::vector<double>* values) const override;
+                         absl::Span<float> values) const override;
 
   std::vector<double> Returns() const override;
 

@@ -85,7 +85,10 @@ class Bot {
   // stateful, the default implementation is a no-op.
   virtual void InformAction(const State& state, Player player_id,
                             Action action) {}
-  // TODO(author7): Add an InformActions for simultaneous move games.
+  // In simultaneous move games the bot receives a vector containing the
+  // actions taken by all players in the given state.
+  virtual void InformActions(const State& state,
+                             const std::vector<Action>& actions) {}
 
   // Restarts the bot to its initial state, ready to start a new trajectory.
   virtual void Restart() {}
@@ -150,7 +153,7 @@ std::unique_ptr<Bot> MakeStatefulRandomBot(const Game& game, Player player_id,
 
 // A bot that samples from a policy.
 std::unique_ptr<Bot> MakePolicyBot(const Game& game, Player player_id, int seed,
-                                   std::unique_ptr<Policy> policy);
+                                   std::shared_ptr<Policy> policy);
 
 // A bot with a fixed action preference, for test purposes.
 // Picks the first legal action found in the list of actions.

@@ -63,7 +63,8 @@ void init_pyspiel_policy(py::module& m) {
       .def("set_policy",
            py::overload_cast<const Policy*>(&TabularBestResponse::SetPolicy));
 
-  py::class_<open_spiel::Policy>(m, "Policy")
+  py::class_<open_spiel::Policy, std::shared_ptr<open_spiel::Policy>>(m,
+                                                                      "Policy")
       .def("action_probabilities",
            (std::unordered_map<Action, double>(open_spiel::Policy::*)(
                const open_spiel::State&) const) &
@@ -82,14 +83,18 @@ void init_pyspiel_policy(py::module& m) {
   // [num_states, num_actions], while this is implemented as a map. It is
   // non-trivial to convert between the two, but we have a function that does so
   // in the open_spiel/python/policy.py file.
-  py::class_<open_spiel::TabularPolicy, open_spiel::Policy>(m, "TabularPolicy")
+  py::class_<open_spiel::TabularPolicy,
+             std::shared_ptr<open_spiel::TabularPolicy>, open_spiel::Policy>(
+      m, "TabularPolicy")
       .def(py::init<const std::unordered_map<std::string, ActionsAndProbs>&>())
       .def("get_state_policy", &open_spiel::TabularPolicy::GetStatePolicy)
       .def("policy_table",
            py::overload_cast<>(&open_spiel::TabularPolicy::PolicyTable));
 
   m.def("UniformRandomPolicy", &open_spiel::GetUniformPolicy);
-  py::class_<open_spiel::UniformPolicy, open_spiel::Policy>(m, "UniformPolicy")
+  py::class_<open_spiel::UniformPolicy,
+             std::shared_ptr<open_spiel::UniformPolicy>, open_spiel::Policy>(
+      m, "UniformPolicy")
       .def(py::init<>())
       .def("get_state_policy", &open_spiel::UniformPolicy::GetStatePolicy);
 

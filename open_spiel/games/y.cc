@@ -251,8 +251,7 @@ int PlayerRelative(YPlayer state, Player current) {
   }
 }
 
-void YState::ObservationTensor(Player player,
-                               std::vector<double>* values) const {
+void YState::ObservationTensor(Player player, absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 

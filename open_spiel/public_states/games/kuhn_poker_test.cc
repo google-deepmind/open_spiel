@@ -61,22 +61,36 @@ void TestGeneratePublicSets() {
   std::shared_ptr<const GameWithPublicStates> game =
       LoadGameWithPublicStates("kuhn_poker(players=2)");
 
-  // We use subclass_cast for easier navigation in IDEs
+  // We use down_cast for easier navigation in IDEs
   std::unique_ptr<PublicState> public_state = game->NewInitialPublicState();
-  auto* s = subclass_cast<KuhnPublicState*>(public_state.get());
+  auto* s = down_cast<KuhnPublicState*>(public_state.get());
 
+  SPIEL_CHECK_TRUE(s->IsChance());
   CheckPublicSet(s, {{}});  // Start of game
-  s->ApplyPublicTransition("deal 0");
+  s->ApplyPublicTransition("Deal to player 0");
+
+  SPIEL_CHECK_TRUE(s->IsChance());
   CheckPublicSet(s, {{2}, {1}, {0}});
-  s->ApplyPublicTransition("deal 1");
+  s->ApplyPublicTransition("Deal to player 1");
+
+  SPIEL_CHECK_TRUE(s->IsPlayer());
+  SPIEL_CHECK_EQ(s->ActingPlayers(), std::vector<int>{0});
   CheckPublicSet(s, {{2, 1}, {2, 0}, {1, 2}, {1, 0}, {0, 1}, {0, 2}});
-  s->ApplyPublicTransition("0");  // Player 0 pass
+  s->ApplyPublicTransition("Pass");
+
+  SPIEL_CHECK_TRUE(s->IsPlayer());
+  SPIEL_CHECK_EQ(s->ActingPlayers(), std::vector<int>{1});
   CheckPublicSet(s, {{2, 1, 0}, {2, 0, 0}, {1, 2, 0},
                      {1, 0, 0}, {0, 1, 0}, {0, 2, 0}});
-  s->ApplyPublicTransition("1");  // Player 1 bet
+  s->ApplyPublicTransition("Bet");
+
+  SPIEL_CHECK_TRUE(s->IsPlayer());
+  SPIEL_CHECK_EQ(s->ActingPlayers(), std::vector<int>{0});
   CheckPublicSet(s, {{2, 1, 0, 1}, {2, 0, 0, 1}, {1, 2, 0, 1},
                      {1, 0, 0, 1}, {0, 1, 0, 1}, {0, 2, 0, 1}});
-  s->ApplyPublicTransition("1");  // Player 0 bet
+  s->ApplyPublicTransition("Bet");
+
+  SPIEL_CHECK_TRUE(s->IsTerminal());
   CheckPublicSet(s, {{2, 1, 0, 1, 1}, {2, 0, 0, 1, 1}, {1, 2, 0, 1, 1},
                      {1, 0, 0, 1, 1}, {0, 1, 0, 1, 1}, {0, 2, 0, 1, 1}});
 }

@@ -29,9 +29,11 @@ namespace open_spiel {
 namespace algorithms {
 namespace {
 
-const char* kGreenwaldSarfatiEg1File =
+inline constexpr double kFloatTolerance = 1e-12;
+
+inline constexpr const char* kGreenwaldSarfatiEg1File =
     "open_spiel/games/efg/greenwald_sarfati_example1.efg";
-const char* kGreenwaldSarfatiEg2File =
+inline constexpr const char* kGreenwaldSarfatiEg2File =
     "open_spiel/games/efg/greenwald_sarfati_example2.efg";
 
 void TestGibson13MatrixGameExample() {
@@ -199,6 +201,46 @@ void TestSignalingExampleVonStengelForges2008() {
   SPIEL_CHECK_TRUE(Near(EFCCEDist(*efg_game, config, mu), 0.0));
 }
 
+void Test1PInOutGame() {
+  // Example game described in Section 2.4 of von Stengel & Forges,
+  // Extensive Form Correlated Equilibrium: Definition and Computational
+  // Complexity. CDAM Research Report LSE-CDAM-2006-04.
+  // http://www.cdam.lse.ac.uk/Reports/Files/cdam-2006-04.pdf
+  //
+  // This is a simple example that illustrates the difference between AFCE and
+  // EFCE.
+  const char* kInOutGameData = R"###(
+    EFG 2 R "InOutGame" { "P1" } ""
+
+    p "ROOT" 1 1 "Root Infoset" { "In" "Out" } 0
+      p "In" 1 2 "In Infoset" { "In" "Out" } 0
+        t "In In" 1 "Outcome In In" { 1.0 }
+        t "In Out" 2 "Outcome In Out" { 0.0 }
+      p "Out" 1 3 "Out Infoset" { "In" "Out" } 0
+        t "Out In" 3 "Outcome Out In" { 0.0 }
+        t "Out Out" 4 "Outcome Out Out" { 0.0 }
+  )###";
+  std::shared_ptr<const Game> efg_game = efg_game::LoadEFGGame(kInOutGameData);
+
+  TabularPolicy single_policy = efg_game::EFGGameTabularPolicy(
+      efg_game, {{{0, "Root Infoset"}, {{"In", 0.0}, {"Out", 1.0}}},
+                 {{0, "In Infoset"}, {{"In", 0.0}, {"Out", 1.0}}},
+                 {{0, "Out Infoset"}, {{"In", 0.0}, {"Out", 1.0}}}});
+
+  CorrelationDevice mu = {{1.0, single_policy}};
+
+  std::vector<double> expected_values = ExpectedValues(*efg_game, mu);
+  SPIEL_CHECK_TRUE(Near(expected_values[0], 0.0));
+
+  CorrDistConfig config;
+  SPIEL_CHECK_TRUE(Near(AFCEDist(*efg_game, config, mu), 0.0));
+
+  // Player has incentive to switch to In at the first decision and, once having
+  // deviated switch to In again, achieving a value of 1. This is 1 more than
+  // the correlation device's expected value of 0.
+  SPIEL_CHECK_FLOAT_NEAR(EFCEDist(*efg_game, config, mu), 1.0, kFloatTolerance);
+}
+
 void TestGreenwaldSarfatiExample1() {
   absl::optional<std::string> file = FindFile(kGreenwaldSarfatiEg1File, 2);
   if (file != std::nullopt) {
@@ -221,8 +263,15 @@ void TestGreenwaldSarfatiExample1() {
          {{0, "Right P1 infoset"}, {{"l2", 0.0}, {"r2", 1.0}}}});
 
     CorrelationDevice mu = {{0.5, LAl1_policy}, {0.5, LBl1_policy}};
-
     CorrDistConfig config;
+
+    // This *is* an AFCE and AFCCE.
+    SPIEL_CHECK_FLOAT_NEAR(AFCEDist(*efg_game, config, mu), 0.0,
+                           kFloatTolerance);
+    SPIEL_CHECK_FLOAT_NEAR(AFCCEDist(*efg_game, config, mu), 0.0,
+                           kFloatTolerance);
+
+    // However, *not* an EFCE nor EFCCE.
     SPIEL_CHECK_GT(EFCEDist(*efg_game, config, mu), 0.0);
     SPIEL_CHECK_GT(EFCCEDist(*efg_game, config, mu), 0.0);
   }
@@ -301,6 +350,7 @@ int main(int argc, char** argv) {
   algorithms::TestBoS();
   algorithms::TestChicken();
   algorithms::TestSignalingExampleVonStengelForges2008();
+  algorithms::Test1PInOutGame();
   algorithms::TestGreenwaldSarfatiExample1();
   algorithms::TestGreenwaldSarfatiExample2();
 }

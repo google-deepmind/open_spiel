@@ -40,7 +40,7 @@ void CFRBRTest_KuhnPoker() {
   for (int i = 0; i < 300; i++) {
     solver.EvaluateAndUpdatePolicy();
   }
-  const std::unique_ptr<Policy> average_policy = solver.AveragePolicy();
+  const std::shared_ptr<Policy> average_policy = solver.AveragePolicy();
   // 1/18 is the Nash value. See https://en.wikipedia.org/wiki/Kuhn_poker
   CheckNashValues(*game, *average_policy, -1.0 / 18, 0.001);
   SPIEL_CHECK_LE(Exploitability(*game, *average_policy), 0.05);
@@ -53,7 +53,7 @@ void CFRBRTest_LeducPoker() {
   for (int i = 0; i < num_iters; i++) {
     solver.EvaluateAndUpdatePolicy();
   }
-  const std::unique_ptr<Policy> average_policy = solver.AveragePolicy();
+  const std::shared_ptr<Policy> average_policy = solver.AveragePolicy();
   double nash_conv = NashConv(*game, *average_policy);
   std::cout << "Iters " << num_iters << ", nash_conv = " << nash_conv
             << std::endl;

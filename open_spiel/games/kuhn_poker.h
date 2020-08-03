@@ -44,6 +44,7 @@ inline constexpr const int kNumInfoStatesP1 = 6;
 enum ActionType { kPass = 0, kBet = 1 };
 
 class KuhnGame;
+class KuhnObserver;
 
 class KuhnState : public State {
  public:
@@ -59,9 +60,9 @@ class KuhnState : public State {
   std::string InformationStateString(Player player) const override;
   std::string ObservationString(Player player) const override;
   void InformationStateTensor(Player player,
-                              std::vector<double>* values) const override;
+                              absl::Span<float> values) const override;
   void ObservationTensor(Player player,
-                         std::vector<double>* values) const override;
+                         absl::Span<float> values) const override;
   std::unique_ptr<State> Clone() const override;
   void UndoAction(Player player, Action move) override;
   std::vector<std::pair<Action, double>> ChanceOutcomes() const override;
@@ -69,8 +70,6 @@ class KuhnState : public State {
   std::vector<int> hand() const { return {card_dealt_[CurrentPlayer()]}; }
   std::unique_ptr<State> ResampleFromInfostate(
       int player_id, std::function<double()> rng) const override;
-  std::string PublicObservationString() const override;
-  std::string PrivateObservationString(Player player) const override;
 
   const std::vector<int>& CardDealt() const { return card_dealt_; }
 
@@ -78,6 +77,8 @@ class KuhnState : public State {
   void DoApplyAction(Action move) override;
 
  private:
+  friend class KuhnObserver;
+
   // Whether the specified player made a bet
   bool DidBet(Player player) const;
 
@@ -111,6 +112,15 @@ class KuhnGame : public Game {
   std::vector<int> InformationStateTensorShape() const override;
   std::vector<int> ObservationTensorShape() const override;
   int MaxGameLength() const override { return num_players_ * 2 - 1; }
+  std::shared_ptr<Observer> MakeObserver(
+      absl::optional<IIGObservationType> iig_obs_type,
+      const GameParameters& params) const override;
+
+  // Used to implement the old observation API.
+  std::shared_ptr<KuhnObserver> default_observer_;
+  std::shared_ptr<KuhnObserver> info_state_observer_;
+  std::shared_ptr<KuhnObserver> public_observer_;
+  std::shared_ptr<KuhnObserver> private_observer_;
 
  private:
   // Number of players.

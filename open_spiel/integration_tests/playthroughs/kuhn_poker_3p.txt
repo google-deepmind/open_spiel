@@ -24,10 +24,10 @@ NumPlayers() = 3
 MinUtility() = -2.0
 MaxUtility() = 4.0
 UtilitySum() = 0.0
-InformationStateTensorShape() = [17]
+InformationStateTensorShape() = player: [3], private_card: [4], betting: [5, 2]
 InformationStateTensorLayout() = TensorLayout.CHW
 InformationStateTensorSize() = 17
-ObservationTensorShape() = [10]
+ObservationTensorShape() = player: [3], private_card: [4], pot_contribution: [3]
 ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 10
 MaxGameLength() = 5
@@ -43,19 +43,43 @@ CurrentPlayer() = -1
 InformationStateString(0) = ""
 InformationStateString(1) = ""
 InformationStateString(2) = ""
-InformationStateTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-InformationStateTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-InformationStateTensor(2): ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(0).player: ◉◯◯
+InformationStateTensor(0).private_card: ◯◯◯◯
+InformationStateTensor(0).betting: ◯◯
+                                   ◯◯
+                                   ◯◯
+                                   ◯◯
+                                   ◯◯
+InformationStateTensor(1).player: ◯◉◯
+InformationStateTensor(1).private_card: ◯◯◯◯
+InformationStateTensor(1).betting: ◯◯
+                                   ◯◯
+                                   ◯◯
+                                   ◯◯
+                                   ◯◯
+InformationStateTensor(2).player: ◯◯◉
+InformationStateTensor(2).private_card: ◯◯◯◯
+InformationStateTensor(2).betting: ◯◯
+                                   ◯◯
+                                   ◯◯
+                                   ◯◯
+                                   ◯◯
 ObservationString(0) = ""
 ObservationString(1) = ""
 ObservationString(2) = ""
 PublicObservationString() = "start game"
-PrivateObservationString(0) = "start game"
-PrivateObservationString(1) = "start game"
-PrivateObservationString(2) = "start game"
-ObservationTensor(0): ◉◯◯◯◯◯◯◉◉◉
-ObservationTensor(1): ◯◉◯◯◯◯◯◉◉◉
-ObservationTensor(2): ◯◯◉◯◯◯◯◉◉◉
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
+PrivateObservationString(2) = ""
+ObservationTensor(0).player: ◉◯◯
+ObservationTensor(0).private_card: ◯◯◯◯
+ObservationTensor(0).pot_contribution: ◉◉◉
+ObservationTensor(1).player: ◯◉◯
+ObservationTensor(1).private_card: ◯◯◯◯
+ObservationTensor(1).pot_contribution: ◉◉◉
+ObservationTensor(2).player: ◯◯◉
+ObservationTensor(2).private_card: ◯◯◯◯
+ObservationTensor(2).pot_contribution: ◉◉◉
 ChanceOutcomes() = [{0, 0.250000000000}, {1, 0.250000000000}, {2, 0.250000000000}, {3, 0.250000000000}]
 LegalActions() = [0, 1, 2, 3]
 StringLegalActions() = ["Deal:0", "Deal:1", "Deal:2", "Deal:3"]
@@ -74,19 +98,43 @@ CurrentPlayer() = -1
 InformationStateString(0) = "1"
 InformationStateString(1) = ""
 InformationStateString(2) = ""
-InformationStateTensor(0): ◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-InformationStateTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-InformationStateTensor(2): ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(0).player: ◉◯◯
+InformationStateTensor(0).private_card: ◯◉◯◯
+InformationStateTensor(0).betting: ◯◯
+                                   ◯◯
+                                   ◯◯
+                                   ◯◯
+                                   ◯◯
+InformationStateTensor(1).player: ◯◉◯
+InformationStateTensor(1).private_card: ◯◯◯◯
+InformationStateTensor(1).betting: ◯◯
+                                   ◯◯
+                                   ◯◯
+                                   ◯◯
+                                   ◯◯
+InformationStateTensor(2).player: ◯◯◉
+InformationStateTensor(2).private_card: ◯◯◯◯
+InformationStateTensor(2).betting: ◯◯
+                                   ◯◯
+                                   ◯◯
+                                   ◯◯
+                                   ◯◯
 ObservationString(0) = "1111"
 ObservationString(1) = ""
 ObservationString(2) = ""
-PublicObservationString() = "deal 0"
-PrivateObservationString(0) = "1"
-PrivateObservationString(1) = "clock tick"
-PrivateObservationString(2) = "clock tick"
-ObservationTensor(0): ◉◯◯◯◉◯◯◉◉◉
-ObservationTensor(1): ◯◉◯◯◯◯◯◉◉◉
-ObservationTensor(2): ◯◯◉◯◯◯◯◉◉◉
+PublicObservationString() = "Deal to player 0"
+PrivateObservationString(0) = "Received card 1"
+PrivateObservationString(1) = ""
+PrivateObservationString(2) = ""
+ObservationTensor(0).player: ◉◯◯
+ObservationTensor(0).private_card: ◯◉◯◯
+ObservationTensor(0).pot_contribution: ◉◉◉
+ObservationTensor(1).player: ◯◉◯
+ObservationTensor(1).private_card: ◯◯◯◯
+ObservationTensor(1).pot_contribution: ◉◉◉
+ObservationTensor(2).player: ◯◯◉
+ObservationTensor(2).private_card: ◯◯◯◯
+ObservationTensor(2).pot_contribution: ◉◉◉
 ChanceOutcomes() = [{0, 0.333333333333}, {2, 0.333333333333}, {3, 0.333333333333}]
 LegalActions() = [0, 2, 3]
 StringLegalActions() = ["Deal:0", "Deal:2", "Deal:3"]
@@ -105,19 +153,43 @@ CurrentPlayer() = -1
 InformationStateString(0) = "1"
 InformationStateString(1) = "3"
 InformationStateString(2) = ""
-InformationStateTensor(0): ◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-InformationStateTensor(1): ◯◉◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯
-InformationStateTensor(2): ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(0).player: ◉◯◯
+InformationStateTensor(0).private_card: ◯◉◯◯
+InformationStateTensor(0).betting: ◯◯
+                                   ◯◯
+                                   ◯◯
+                                   ◯◯
+                                   ◯◯
+InformationStateTensor(1).player: ◯◉◯
+InformationStateTensor(1).private_card: ◯◯◯◉
+InformationStateTensor(1).betting: ◯◯
+                                   ◯◯
+                                   ◯◯
+                                   ◯◯
+                                   ◯◯
+InformationStateTensor(2).player: ◯◯◉
+InformationStateTensor(2).private_card: ◯◯◯◯
+InformationStateTensor(2).betting: ◯◯
+                                   ◯◯
+                                   ◯◯
+                                   ◯◯
+                                   ◯◯
 ObservationString(0) = "1111"
 ObservationString(1) = "3111"
 ObservationString(2) = ""
-PublicObservationString() = "deal 1"
-PrivateObservationString(0) = "clock tick"
-PrivateObservationString(1) = "3"
-PrivateObservationString(2) = "clock tick"
-ObservationTensor(0): ◉◯◯◯◉◯◯◉◉◉
-ObservationTensor(1): ◯◉◯◯◯◯◉◉◉◉
-ObservationTensor(2): ◯◯◉◯◯◯◯◉◉◉
+PublicObservationString() = "Deal to player 1"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = "Received card 3"
+PrivateObservationString(2) = ""
+ObservationTensor(0).player: ◉◯◯
+ObservationTensor(0).private_card: ◯◉◯◯
+ObservationTensor(0).pot_contribution: ◉◉◉
+ObservationTensor(1).player: ◯◉◯
+ObservationTensor(1).private_card: ◯◯◯◉
+ObservationTensor(1).pot_contribution: ◉◉◉
+ObservationTensor(2).player: ◯◯◉
+ObservationTensor(2).private_card: ◯◯◯◯
+ObservationTensor(2).pot_contribution: ◉◉◉
 ChanceOutcomes() = [{0, 0.500000000000}, {2, 0.500000000000}]
 LegalActions() = [0, 2]
 StringLegalActions() = ["Deal:0", "Deal:2"]
@@ -136,19 +208,43 @@ CurrentPlayer() = 0
 InformationStateString(0) = "1"
 InformationStateString(1) = "3"
 InformationStateString(2) = "2"
-InformationStateTensor(0): ◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-InformationStateTensor(1): ◯◉◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯
-InformationStateTensor(2): ◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(0).player: ◉◯◯
+InformationStateTensor(0).private_card: ◯◉◯◯
+InformationStateTensor(0).betting: ◯◯
+                                   ◯◯
+                                   ◯◯
+                                   ◯◯
+                                   ◯◯
+InformationStateTensor(1).player: ◯◉◯
+InformationStateTensor(1).private_card: ◯◯◯◉
+InformationStateTensor(1).betting: ◯◯
+                                   ◯◯
+                                   ◯◯
+                                   ◯◯
+                                   ◯◯
+InformationStateTensor(2).player: ◯◯◉
+InformationStateTensor(2).private_card: ◯◯◉◯
+InformationStateTensor(2).betting: ◯◯
+                                   ◯◯
+                                   ◯◯
+                                   ◯◯
+                                   ◯◯
 ObservationString(0) = "1111"
 ObservationString(1) = "3111"
 ObservationString(2) = "2111"
-PublicObservationString() = "deal 2"
-PrivateObservationString(0) = "clock tick"
-PrivateObservationString(1) = "clock tick"
-PrivateObservationString(2) = "2"
-ObservationTensor(0): ◉◯◯◯◉◯◯◉◉◉
-ObservationTensor(1): ◯◉◯◯◯◯◉◉◉◉
-ObservationTensor(2): ◯◯◉◯◯◉◯◉◉◉
+PublicObservationString() = "Deal to player 2"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
+PrivateObservationString(2) = "Received card 2"
+ObservationTensor(0).player: ◉◯◯
+ObservationTensor(0).private_card: ◯◉◯◯
+ObservationTensor(0).pot_contribution: ◉◉◉
+ObservationTensor(1).player: ◯◉◯
+ObservationTensor(1).private_card: ◯◯◯◉
+ObservationTensor(1).pot_contribution: ◉◉◉
+ObservationTensor(2).player: ◯◯◉
+ObservationTensor(2).private_card: ◯◯◉◯
+ObservationTensor(2).pot_contribution: ◉◉◉
 Rewards() = [0.0, 0.0, 0.0]
 Returns() = [0.0, 0.0, 0.0]
 LegalActions() = [0, 1]
@@ -168,19 +264,43 @@ CurrentPlayer() = 1
 InformationStateString(0) = "1p"
 InformationStateString(1) = "3p"
 InformationStateString(2) = "2p"
-InformationStateTensor(0): ◉◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯
-InformationStateTensor(1): ◯◉◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯
-InformationStateTensor(2): ◯◯◉◯◯◉◯◉◯◯◯◯◯◯◯◯◯
+InformationStateTensor(0).player: ◉◯◯
+InformationStateTensor(0).private_card: ◯◉◯◯
+InformationStateTensor(0).betting: ◉◯
+                                   ◯◯
+                                   ◯◯
+                                   ◯◯
+                                   ◯◯
+InformationStateTensor(1).player: ◯◉◯
+InformationStateTensor(1).private_card: ◯◯◯◉
+InformationStateTensor(1).betting: ◉◯
+                                   ◯◯
+                                   ◯◯
+                                   ◯◯
+                                   ◯◯
+InformationStateTensor(2).player: ◯◯◉
+InformationStateTensor(2).private_card: ◯◯◉◯
+InformationStateTensor(2).betting: ◉◯
+                                   ◯◯
+                                   ◯◯
+                                   ◯◯
+                                   ◯◯
 ObservationString(0) = "1111"
 ObservationString(1) = "3111"
 ObservationString(2) = "2111"
-PublicObservationString() = "0"
-PrivateObservationString(0) = "clock tick"
-PrivateObservationString(1) = "clock tick"
-PrivateObservationString(2) = "clock tick"
-ObservationTensor(0): ◉◯◯◯◉◯◯◉◉◉
-ObservationTensor(1): ◯◉◯◯◯◯◉◉◉◉
-ObservationTensor(2): ◯◯◉◯◯◉◯◉◉◉
+PublicObservationString() = "Pass"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
+PrivateObservationString(2) = ""
+ObservationTensor(0).player: ◉◯◯
+ObservationTensor(0).private_card: ◯◉◯◯
+ObservationTensor(0).pot_contribution: ◉◉◉
+ObservationTensor(1).player: ◯◉◯
+ObservationTensor(1).private_card: ◯◯◯◉
+ObservationTensor(1).pot_contribution: ◉◉◉
+ObservationTensor(2).player: ◯◯◉
+ObservationTensor(2).private_card: ◯◯◉◯
+ObservationTensor(2).pot_contribution: ◉◉◉
 Rewards() = [0.0, 0.0, 0.0]
 Returns() = [0.0, 0.0, 0.0]
 LegalActions() = [0, 1]
@@ -200,19 +320,43 @@ CurrentPlayer() = 2
 InformationStateString(0) = "1pp"
 InformationStateString(1) = "3pp"
 InformationStateString(2) = "2pp"
-InformationStateTensor(0): ◉◯◯◯◉◯◯◉◯◉◯◯◯◯◯◯◯
-InformationStateTensor(1): ◯◉◯◯◯◯◉◉◯◉◯◯◯◯◯◯◯
-InformationStateTensor(2): ◯◯◉◯◯◉◯◉◯◉◯◯◯◯◯◯◯
+InformationStateTensor(0).player: ◉◯◯
+InformationStateTensor(0).private_card: ◯◉◯◯
+InformationStateTensor(0).betting: ◉◯
+                                   ◉◯
+                                   ◯◯
+                                   ◯◯
+                                   ◯◯
+InformationStateTensor(1).player: ◯◉◯
+InformationStateTensor(1).private_card: ◯◯◯◉
+InformationStateTensor(1).betting: ◉◯
+                                   ◉◯
+                                   ◯◯
+                                   ◯◯
+                                   ◯◯
+InformationStateTensor(2).player: ◯◯◉
+InformationStateTensor(2).private_card: ◯◯◉◯
+InformationStateTensor(2).betting: ◉◯
+                                   ◉◯
+                                   ◯◯
+                                   ◯◯
+                                   ◯◯
 ObservationString(0) = "1111"
 ObservationString(1) = "3111"
 ObservationString(2) = "2111"
-PublicObservationString() = "0"
-PrivateObservationString(0) = "clock tick"
-PrivateObservationString(1) = "clock tick"
-PrivateObservationString(2) = "clock tick"
-ObservationTensor(0): ◉◯◯◯◉◯◯◉◉◉
-ObservationTensor(1): ◯◉◯◯◯◯◉◉◉◉
-ObservationTensor(2): ◯◯◉◯◯◉◯◉◉◉
+PublicObservationString() = "Pass"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
+PrivateObservationString(2) = ""
+ObservationTensor(0).player: ◉◯◯
+ObservationTensor(0).private_card: ◯◉◯◯
+ObservationTensor(0).pot_contribution: ◉◉◉
+ObservationTensor(1).player: ◯◉◯
+ObservationTensor(1).private_card: ◯◯◯◉
+ObservationTensor(1).pot_contribution: ◉◉◉
+ObservationTensor(2).player: ◯◯◉
+ObservationTensor(2).private_card: ◯◯◉◯
+ObservationTensor(2).pot_contribution: ◉◉◉
 Rewards() = [0.0, 0.0, 0.0]
 Returns() = [0.0, 0.0, 0.0]
 LegalActions() = [0, 1]
@@ -232,19 +376,43 @@ CurrentPlayer() = 0
 InformationStateString(0) = "1ppb"
 InformationStateString(1) = "3ppb"
 InformationStateString(2) = "2ppb"
-InformationStateTensor(0): ◉◯◯◯◉◯◯◉◯◉◯◯◉◯◯◯◯
-InformationStateTensor(1): ◯◉◯◯◯◯◉◉◯◉◯◯◉◯◯◯◯
-InformationStateTensor(2): ◯◯◉◯◯◉◯◉◯◉◯◯◉◯◯◯◯
+InformationStateTensor(0).player: ◉◯◯
+InformationStateTensor(0).private_card: ◯◉◯◯
+InformationStateTensor(0).betting: ◉◯
+                                   ◉◯
+                                   ◯◉
+                                   ◯◯
+                                   ◯◯
+InformationStateTensor(1).player: ◯◉◯
+InformationStateTensor(1).private_card: ◯◯◯◉
+InformationStateTensor(1).betting: ◉◯
+                                   ◉◯
+                                   ◯◉
+                                   ◯◯
+                                   ◯◯
+InformationStateTensor(2).player: ◯◯◉
+InformationStateTensor(2).private_card: ◯◯◉◯
+InformationStateTensor(2).betting: ◉◯
+                                   ◉◯
+                                   ◯◉
+                                   ◯◯
+                                   ◯◯
 ObservationString(0) = "1112"
 ObservationString(1) = "3112"
 ObservationString(2) = "2112"
-PublicObservationString() = "1"
-PrivateObservationString(0) = "clock tick"
-PrivateObservationString(1) = "clock tick"
-PrivateObservationString(2) = "clock tick"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 2.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 2.0]
-ObservationTensor(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 2.0]
+PublicObservationString() = "Bet"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
+PrivateObservationString(2) = ""
+ObservationTensor(0).player: ◉◯◯
+ObservationTensor(0).private_card: ◯◉◯◯
+ObservationTensor(0).pot_contribution = [1.0, 1.0, 2.0]
+ObservationTensor(1).player: ◯◉◯
+ObservationTensor(1).private_card: ◯◯◯◉
+ObservationTensor(1).pot_contribution = [1.0, 1.0, 2.0]
+ObservationTensor(2).player: ◯◯◉
+ObservationTensor(2).private_card: ◯◯◉◯
+ObservationTensor(2).pot_contribution = [1.0, 1.0, 2.0]
 Rewards() = [0.0, 0.0, 0.0]
 Returns() = [0.0, 0.0, 0.0]
 LegalActions() = [0, 1]
@@ -264,19 +432,43 @@ CurrentPlayer() = 1
 InformationStateString(0) = "1ppbb"
 InformationStateString(1) = "3ppbb"
 InformationStateString(2) = "2ppbb"
-InformationStateTensor(0): ◉◯◯◯◉◯◯◉◯◉◯◯◉◯◉◯◯
-InformationStateTensor(1): ◯◉◯◯◯◯◉◉◯◉◯◯◉◯◉◯◯
-InformationStateTensor(2): ◯◯◉◯◯◉◯◉◯◉◯◯◉◯◉◯◯
+InformationStateTensor(0).player: ◉◯◯
+InformationStateTensor(0).private_card: ◯◉◯◯
+InformationStateTensor(0).betting: ◉◯
+                                   ◉◯
+                                   ◯◉
+                                   ◯◉
+                                   ◯◯
+InformationStateTensor(1).player: ◯◉◯
+InformationStateTensor(1).private_card: ◯◯◯◉
+InformationStateTensor(1).betting: ◉◯
+                                   ◉◯
+                                   ◯◉
+                                   ◯◉
+                                   ◯◯
+InformationStateTensor(2).player: ◯◯◉
+InformationStateTensor(2).private_card: ◯◯◉◯
+InformationStateTensor(2).betting: ◉◯
+                                   ◉◯
+                                   ◯◉
+                                   ◯◉
+                                   ◯◯
 ObservationString(0) = "1212"
 ObservationString(1) = "3212"
 ObservationString(2) = "2212"
-PublicObservationString() = "1"
-PrivateObservationString(0) = "clock tick"
-PrivateObservationString(1) = "clock tick"
-PrivateObservationString(2) = "clock tick"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 2.0, 1.0, 2.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 2.0, 1.0, 2.0]
-ObservationTensor(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 2.0, 1.0, 2.0]
+PublicObservationString() = "Bet"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
+PrivateObservationString(2) = ""
+ObservationTensor(0).player: ◉◯◯
+ObservationTensor(0).private_card: ◯◉◯◯
+ObservationTensor(0).pot_contribution = [2.0, 1.0, 2.0]
+ObservationTensor(1).player: ◯◉◯
+ObservationTensor(1).private_card: ◯◯◯◉
+ObservationTensor(1).pot_contribution = [2.0, 1.0, 2.0]
+ObservationTensor(2).player: ◯◯◉
+ObservationTensor(2).private_card: ◯◯◉◯
+ObservationTensor(2).pot_contribution = [2.0, 1.0, 2.0]
 Rewards() = [0.0, 0.0, 0.0]
 Returns() = [0.0, 0.0, 0.0]
 LegalActions() = [0, 1]
@@ -296,18 +488,42 @@ CurrentPlayer() = -4
 InformationStateString(0) = "1ppbbp"
 InformationStateString(1) = "3ppbbp"
 InformationStateString(2) = "2ppbbp"
-InformationStateTensor(0): ◉◯◯◯◉◯◯◉◯◉◯◯◉◯◉◉◯
-InformationStateTensor(1): ◯◉◯◯◯◯◉◉◯◉◯◯◉◯◉◉◯
-InformationStateTensor(2): ◯◯◉◯◯◉◯◉◯◉◯◯◉◯◉◉◯
+InformationStateTensor(0).player: ◉◯◯
+InformationStateTensor(0).private_card: ◯◉◯◯
+InformationStateTensor(0).betting: ◉◯
+                                   ◉◯
+                                   ◯◉
+                                   ◯◉
+                                   ◉◯
+InformationStateTensor(1).player: ◯◉◯
+InformationStateTensor(1).private_card: ◯◯◯◉
+InformationStateTensor(1).betting: ◉◯
+                                   ◉◯
+                                   ◯◉
+                                   ◯◉
+                                   ◉◯
+InformationStateTensor(2).player: ◯◯◉
+InformationStateTensor(2).private_card: ◯◯◉◯
+InformationStateTensor(2).betting: ◉◯
+                                   ◉◯
+                                   ◯◉
+                                   ◯◉
+                                   ◉◯
 ObservationString(0) = "1212"
 ObservationString(1) = "3212"
 ObservationString(2) = "2212"
-PublicObservationString() = "0"
-PrivateObservationString(0) = "clock tick"
-PrivateObservationString(1) = "clock tick"
-PrivateObservationString(2) = "clock tick"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 2.0, 1.0, 2.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 2.0, 1.0, 2.0]
-ObservationTensor(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 2.0, 1.0, 2.0]
+PublicObservationString() = "Pass"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
+PrivateObservationString(2) = ""
+ObservationTensor(0).player: ◉◯◯
+ObservationTensor(0).private_card: ◯◉◯◯
+ObservationTensor(0).pot_contribution = [2.0, 1.0, 2.0]
+ObservationTensor(1).player: ◯◉◯
+ObservationTensor(1).private_card: ◯◯◯◉
+ObservationTensor(1).pot_contribution = [2.0, 1.0, 2.0]
+ObservationTensor(2).player: ◯◯◉
+ObservationTensor(2).private_card: ◯◯◉◯
+ObservationTensor(2).pot_contribution = [2.0, 1.0, 2.0]
 Rewards() = [-2.0, -1.0, 3.0]
 Returns() = [-2.0, -1.0, 3.0]

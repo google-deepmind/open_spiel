@@ -22,6 +22,7 @@
 #include <cstdint>
 #include <limits>
 #include <locale>
+#include <optional>
 #include <random>
 #include <sstream>
 #include <string>
@@ -38,8 +39,9 @@
 #include "open_spiel/abseil-cpp/absl/time/clock.h"
 #include "open_spiel/abseil-cpp/absl/time/time.h"
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "open_spiel/abseil-cpp/absl/types/span.h"
 
-// Code that is not part of the API, but is widely useful in implementations
+// Code that is not part of the API, but is widely useful in implementations.
 
 namespace open_spiel {
 
@@ -48,14 +50,36 @@ namespace open_spiel {
 // lookup here since that requires putting these overloads into std::, which is
 // not allowed (only template specializations on std:: template classes may be
 // added to std::, and this is not one of them).
+
+// Make sure that arbitrary structures can be printed out.
 template <typename T>
-std::ostream& operator<<(std::ostream& stream, const std::vector<T>& v) {
+std::ostream& operator<<(std::ostream& stream, const std::unique_ptr<T>& v);
+template <typename T, typename U>
+std::ostream& operator<<(std::ostream& stream, const std::pair<T, U>& v);
+template <typename T>
+std::ostream& operator<<(std::ostream& stream, const std::vector<T>& v);
+template <typename T, std::size_t N>
+std::ostream& operator<<(std::ostream& stream, const std::array<T, N>& v);
+template <typename T>
+std::ostream& operator<<(std::ostream& stream, const std::optional<T>& v);
+std::ostream& operator<<(std::ostream& stream, const std::nullopt_t& v);
+template <typename T>
+std::ostream& operator<<(std::ostream& stream, absl::Span<const T> v);
+
+// Actual template implementations.
+template <typename T>
+std::ostream& operator<<(std::ostream& stream, absl::Span<const T> v) {
   stream << "[";
   for (const auto& element : v) {
     stream << element << " ";
   }
   stream << "]";
   return stream;
+}
+// Actual template implementations.
+template <typename T>
+std::ostream& operator<<(std::ostream& stream, const std::vector<T>& v) {
+  return stream << absl::MakeSpan(v);
 }
 template <typename T, std::size_t N>
 std::ostream& operator<<(std::ostream& stream, const std::array<T, N>& v) {
@@ -68,6 +92,10 @@ std::ostream& operator<<(std::ostream& stream, const std::array<T, N>& v) {
 }
 template <typename T>
 std::ostream& operator<<(std::ostream& stream, const std::unique_ptr<T>& v) {
+  return stream << *v;
+}
+template <typename T>
+std::ostream& operator<<(std::ostream& stream, const std::optional<T>& v) {
   return stream << *v;
 }
 template <typename T, typename U>
@@ -158,6 +186,8 @@ bool Near(T a, T b, T epsilon) {
 
 // Macros to check for error conditions.
 // These trigger SpielFatalError if the condition is violated.
+// These macros are always executed. If you want to use checks
+// only for debugging, use SPIEL_DCHECK_*
 
 #define SPIEL_CHECK_OP(x_exp, op, y_exp)                             \
   do {                                                               \
@@ -223,6 +253,47 @@ bool Near(T a, T b, T epsilon) {
   open_spiel::SpielFatalError(open_spiel::internal::SpielStrCat( \
       __FILE__, ":", __LINE__, " CHECK_FALSE(", #x, ")"))
 
+#if !defined(NDEBUG)
+
+// Checks that are executed in Debug / Testing build type,
+// and turned off for Release build type.
+#define SPIEL_DCHECK_OP(x_exp, op, y_exp) SPIEL_CHECK_OP(x_exp, op, y_exp)
+#define SPIEL_DCHECK_FN2(x_exp, y_exp, fn) SPIEL_CHECK_FN2(x_exp, y_exp, fn)
+#define SPIEL_DCHECK_FN3(x_exp, y_exp, z_exp, fn) \
+  SPIEL_CHECK_FN3(x_exp, y_exp, z_exp, fn)
+#define SPIEL_DCHECK_GE(x, y) SPIEL_CHECK_GE(x, y)
+#define SPIEL_DCHECK_GT(x, y) SPIEL_CHECK_GT(x, y)
+#define SPIEL_DCHECK_LE(x, y) SPIEL_CHECK_LE(x, y)
+#define SPIEL_DCHECK_LT(x, y) SPIEL_CHECK_LT(x, y)
+#define SPIEL_DCHECK_EQ(x, y) SPIEL_CHECK_EQ(x, y)
+#define SPIEL_DCHECK_NE(x, y) SPIEL_CHECK_NE(x, y)
+#define SPIEL_DCHECK_PROB(x) SPIEL_DCHECK_PROB(x)
+#define SPIEL_DCHECK_FLOAT_EQ(x, y) SPIEL_CHECK_FLOAT_EQ(x, y)
+#define SPIEL_DCHECK_FLOAT_NEAR(x, y, epsilon) \
+  SPIEL_CHECK_FLOAT_NEAR(x, y, epsilon)
+#define SPIEL_DCHECK_TRUE(x) SPIEL_CHECK_TRUE(x)
+#define SPIEL_DCHECK_FALSE(x) SPIEL_CHECK_FALSE(x)
+
+#else  // defined(NDEBUG)
+
+// Turn off checks for the (optimized) Release build type.
+#define SPIEL_DCHECK_OP(x_exp, op, y_exp)
+#define SPIEL_DCHECK_FN2(x_exp, y_exp, fn)
+#define SPIEL_DCHECK_FN3(x_exp, y_exp, z_exp, fn)
+#define SPIEL_DCHECK_GE(x, y)
+#define SPIEL_DCHECK_GT(x, y)
+#define SPIEL_DCHECK_LE(x, y)
+#define SPIEL_DCHECK_LT(x, y)
+#define SPIEL_DCHECK_EQ(x, y)
+#define SPIEL_DCHECK_NE(x, y)
+#define SPIEL_DCHECK_PROB(x)
+#define SPIEL_DCHECK_FLOAT_EQ(x, y)
+#define SPIEL_DCHECK_FLOAT_NEAR(x, y, epsilon)
+#define SPIEL_DCHECK_TRUE(x)
+#define SPIEL_DCHECK_FALSE(x)
+
+#endif  // !defined(NDEBUG)
+
 // When an error is encountered, OpenSpiel code should call SpielFatalError()
 // which will forward the message to the current error handler.
 // The default error handler outputs the error message to stderr, and exits
@@ -269,15 +340,15 @@ class UniformProbabilitySampler {
 
 // Utility functions intended to be used for casting
 // from a Base class to a Derived subclass.
-// These functions handle various use cases, such as pointers, const references,
-// shared or unique pointers.
+// These functions handle various use cases, such as pointers and const
+// references. For shared or unique pointers you can get the underlying pointer.
 // When you use debug mode, a more expensive dynamic_cast is used and it checks
 // whether the casting has been successful. In optimized builds only static_cast
 // is used when possible.
 
-// use like this: subclass_cast<T*>(foo);
+// use like this: down_cast<T*>(foo);
 template <typename To, typename From>
-inline To subclass_cast(From* f) {
+inline To down_cast(From* f) {
 #if !defined(NDEBUG)
   if (f != nullptr && dynamic_cast<To>(f) == nullptr) {
     std::string from = typeid(From).name();
@@ -290,9 +361,9 @@ inline To subclass_cast(From* f) {
   return static_cast<To>(f);
 }
 
-// use like this: subclass_cast<T&>(foo);
+// use like this: down_cast<T&>(foo);
 template <typename To, typename From>
-inline To subclass_cast(From& f) {
+inline To down_cast(From& f) {
   typedef typename std::remove_reference<To>::type* ToAsPointer;
 #if !defined(NDEBUG)
   if (dynamic_cast<ToAsPointer>(&f) == nullptr) {

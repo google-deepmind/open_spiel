@@ -103,6 +103,16 @@ class PyBot : public Bot {
         player_id,
         action);
   }
+  void InformActions(const State& state,
+                     const std::vector<Action>& actions) override {
+    PYBIND11_OVERLOAD_NAME(
+        void,  // Return type (must be a simple token for macro parser)
+        Bot,   // Parent class
+        "inform_actions",  // Name of function in Python
+        InformActions,     // Name of function in C++
+        state,             // Arguments
+        actions);
+  }
 
   void RestartAt(const State& state) override {
     PYBIND11_OVERLOAD_NAME(
@@ -152,6 +162,7 @@ void init_pyspiel_bots(py::module& m) {
       .def("provides_force_action", &Bot::ProvidesForceAction)
       .def("force_action", &Bot::ForceAction)
       .def("inform_action", &Bot::InformAction)
+      .def("inform_actions", &Bot::InformActions)
       .def("provides_policy", &Bot::ProvidesPolicy)
       .def("get_policy", &Bot::GetPolicy)
       .def("step_with_policy", &Bot::StepWithPolicy);
@@ -215,5 +226,8 @@ void init_pyspiel_bots(py::module& m) {
 
   m.def("make_stateful_random_bot", open_spiel::MakeStatefulRandomBot,
         "A stateful random bot, for test purposes.");
+
+  m.def("make_policy_bot", open_spiel::MakePolicyBot,
+        "A bot that samples from a policy.");
 }
 }  // namespace open_spiel

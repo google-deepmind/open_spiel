@@ -47,35 +47,44 @@ def _is_optional_game(basename):
 
 class PlaythroughTest(absltest.TestCase):
 
-  def test_rerun_playthroughs(self):
-    test_srcdir = os.environ.get("TEST_SRCDIR", "")
-    path = os.path.join(test_srcdir, _DATA_DIR)
+  def run_test(self, path, basename):
+    """Instantiated for each test case in main, below."""
 
-    basenames = list(os.listdir(path))
-    self.assertGreaterEqual(len(basenames), 40)
+    # We check whether the game is optional, and if it is, whether we do
+    # have the game.
+    is_optional, game_name = _is_optional_game(basename)
+    if is_optional:
+      if game_name not in _AVAILABLE_GAMES:
+        logging.info("Skipping %s because %s is not built in.", basename,
+                     game_name)
+        return
 
-    for basename in basenames:
-      file_path = os.path.join(path, basename)
-      logging.info(basename)
+    file_path = os.path.join(path, basename)
+    expected, actual = generate_playthrough.replay(file_path)
+    for line_num, (expected_line, actual_line) in enumerate(zip(
+        expected.split("\n"), actual.split("\n"))):
+      self.assertEqual(expected_line, actual_line,
+                       msg="Wrong line {} in {}".format(line_num, basename))
+    self.assertMultiLineEqual(expected, actual)
 
-      # We check whether the game is optional, and if it is, whether we do
-      # have the game.
-      is_optional, game_name = _is_optional_game(basename)
-      if is_optional:
-        if game_name not in _AVAILABLE_GAMES:
-          logging.info("Skipping %s because %s is not built in.", basename,
-                       game_name)
-          continue
 
-      expected, actual = generate_playthrough.replay(file_path)
-      for line_num, (expected_line, actual_line) in enumerate(zip(
-          expected.split("\n"), actual.split("\n"))):
-        self.assertEqual(expected_line, actual_line,
-                         msg="Wrong line {} in {}".format(line_num, basename))
-
-      self.assertMultiLineEqual(
-          expected, actual, msg="Issue with basename {}".format(basename))
+def _add_tests():
+  """Adds a test for each playthrough to the test class (above)."""
+  test_srcdir = os.environ.get("TEST_SRCDIR", "")
+  path = os.path.join(test_srcdir, _DATA_DIR)
+  basenames = sorted(os.listdir(path))
+  if len(basenames) < 40:
+    raise ValueError(f"Playthroughs are missing from {path}")
+  for basename in basenames:
+    test_name = f"test_playthrough_{basename}"
+    test_func = lambda self, basename=basename: self.run_test(path, basename)
+    test_func.__name__ = test_name
+    setattr(PlaythroughTest, test_name, test_func)
 
 
 if __name__ == "__main__":
+  _add_tests()
   absltest.main()
+
+
+

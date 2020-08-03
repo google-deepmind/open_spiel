@@ -51,8 +51,8 @@ from __future__ import print_function
 
 import collections
 
-from absl import logging
 import enum
+from absl import logging
 import numpy as np
 
 import pyspiel
@@ -150,6 +150,7 @@ class Environment(object):
                discount=1.0,
                chance_event_sampler=None,
                observation_type=None,
+               include_full_state=False,
                **kwargs):
     """Constructor.
 
@@ -160,9 +161,12 @@ class Environment(object):
         to sample chance events.
       observation_type: what kind of observation to use. If not specified, will
         default to INFORMATION_STATE unless the game doesn't provide it.
+      include_full_state: whether or not to include the full serialized
+        OpenSpiel state in the observations (sometimes useful for debugging).
       **kwargs: dict, additional settings passed to the Open Spiel game.
     """
     self._chance_event_sampler = chance_event_sampler or ChanceEventSampler()
+    self._include_full_state = include_full_state
 
     if isinstance(game, pyspiel.Game):
       logging.info("Using game instance: %s", game.get_type().short_name)
@@ -235,6 +239,10 @@ class Environment(object):
       # When the game is in a terminal state set the discount to 0.
       discounts = [0. for _ in discounts]
 
+    if self._include_full_state:
+      observations["serialized_state"] = pyspiel.serialize_game_and_state(
+          self._game, self._state)
+
     return TimeStep(
         observations=observations,
         rewards=rewards,
@@ -304,6 +312,10 @@ class Environment(object):
           else self._state.information_state_tensor(player_id))
       observations["legal_actions"].append(self._state.legal_actions(player_id))
     observations["current_player"] = self._state.current_player()
+
+    if self._include_full_state:
+      observations["serialized_state"] = pyspiel.serialize_game_and_state(
+          self._game, self._state)
 
     return TimeStep(
         observations=observations,

@@ -15,6 +15,7 @@
 #include "open_spiel/algorithms/corr_dist/efcce.h"
 
 #include "open_spiel/abseil-cpp/absl/strings/str_format.h"
+#include "open_spiel/spiel_globals.h"
 
 namespace open_spiel {
 namespace algorithms {
@@ -103,20 +104,8 @@ bool EFCCEState::HasDefected(Player player) const {
 Action EFCCEState::CurRecommendation() const {
   ActionsAndProbs actions_and_probs =
       mu_[rec_index_].second.GetStatePolicy(state_->InformationStateString());
-  Action rec_action = kInvalidAction;
-  int num_zeros = 0;
-  int num_ones = 0;
-  for (const auto& action_and_prob : actions_and_probs) {
-    if (action_and_prob.second == 0.0) {
-      num_zeros++;
-    } else if (action_and_prob.second == 1.0) {
-      rec_action = action_and_prob.first;
-      num_ones++;
-    } else {
-      SpielFatalError("Policy not deterministic!");
-    }
-  }
-  SPIEL_CHECK_EQ(num_ones, 1);
+  Action rec_action = GetAction(actions_and_probs);
+  SPIEL_CHECK_TRUE(rec_action != kInvalidAction);
   return rec_action;
 }
 

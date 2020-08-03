@@ -27,12 +27,12 @@ import pyspiel
 class GamesBridgeTest(absltest.TestCase):
 
   def test_contract_names(self):
-    game = pyspiel.load_game('bridge')
+    game = pyspiel.load_game('bridge(use_double_dummy_result=false)')
     self.assertEqual(game.contract_string(0), 'Passed Out')
     self.assertEqual(game.contract_string(38), '1SX N')
 
   def test_possible_contracts(self):
-    game = pyspiel.load_game('bridge')
+    game = pyspiel.load_game('bridge(use_double_dummy_result=false)')
     state = game.new_initial_state()
     for a in range(52):
       state.apply_action(a)
@@ -55,33 +55,34 @@ class GamesBridgeTest(absltest.TestCase):
   def test_scoring(self):
     game = pyspiel.load_game('bridge')
     state = game.new_initial_state()
-    #         S T3
-    #         H QT42
-    #         D A82
-    #         C A632
-    # S KJ5           S Q7
-    # H A965          H KJ8
-    # D Q43           D KJT5
-    # C T87           C Q954
-    #         S A98642
-    #         H 73
-    #         D 976
-    #         C KJ
+    #         S J9873
+    #         H A7
+    #         D KT74
+    #         C KT
+    # S AKQT          S 42
+    # H T852          H K63
+    # D AQ            D 52
+    # C Q64           C A98732
+    #         S 65
+    #         H QJ94
+    #         D J9863
+    #         C J5
     for a in [
-        49, 45, 31, 5, 10, 40, 27, 47, 35, 38, 17, 14, 0, 33, 21, 39, 34, 12,
-        22, 41, 1, 13, 36, 9, 4, 46, 11, 32, 2, 37, 29, 30, 7, 8, 19, 24, 16,
-        43, 51, 15, 48, 23, 6, 20, 42, 26, 44, 50, 25, 28, 3, 18
+        7, 28, 37, 2, 45, 3, 25, 51, 27, 48, 5, 43, 23, 13, 12, 8, 22, 46, 38,
+        26, 9, 20, 36, 34, 32, 11, 29, 35, 44, 1, 10, 14, 39, 4, 19, 40, 50, 6,
+        17, 41, 33, 0, 42, 16, 21, 18, 30, 49, 31, 24, 15, 47
     ]:
       state.apply_action(a)
     score = {
         game.contract_string(i): s
         for i, s in enumerate(state.score_by_contract())
     }
-    self.assertEqual(score['1H E'], -110)
-    self.assertEqual(score['1H W'], -80)
-    self.assertEqual(score['3N W'], 50)
-    self.assertEqual(score['1DX N'], -300)
-    self.assertEqual(score['1CXX W'], -430)
+    self.assertEqual(score['3N E'], 100)
+    self.assertEqual(score['3N W'], -460)
+    self.assertEqual(score['1N W'], -210)
+    self.assertEqual(score['3DX S'], -100)
+    self.assertEqual(score['1CXX E'], -830)
+    self.assertEqual(score['1CXX W'], -1030)
 
   def test_score_single_contract(self):
     game = pyspiel.load_game('bridge(use_double_dummy_result=false)')
@@ -142,12 +143,12 @@ class GamesBridgeTest(absltest.TestCase):
       def benchmark(cids=cids):
         working_state = state.clone()
         _ = working_state.score_for_contracts(0, cids)
-      repeat = 3
+      repeat = 1
       times = np.array(timeit.repeat(benchmark, number=1, repeat=repeat))
       print(f'{contracts} mean {times.mean():.4}s, min {times.min():.4}s')
 
   def test_public_observation(self):
-    game = pyspiel.load_game('bridge')
+    game = pyspiel.load_game('bridge(use_double_dummy_result=false)')
     state = game.new_initial_state()
     for a in range(52):
       state.apply_action(a)
@@ -157,7 +158,7 @@ class GamesBridgeTest(absltest.TestCase):
     self.assertLen(obs, game.public_observation_tensor_size())
 
   def test_private_observation(self):
-    game = pyspiel.load_game('bridge')
+    game = pyspiel.load_game('bridge(use_double_dummy_result=false)')
     state = game.new_initial_state()
     #         S T3
     #         H QT42
@@ -196,7 +197,7 @@ class GamesBridgeTest(absltest.TestCase):
     ])
 
   def test_benchmark_observation(self):
-    game = pyspiel.load_game('bridge')
+    game = pyspiel.load_game('bridge(use_double_dummy_result=false)')
 
     def make_state():
       state = game.new_initial_state()
@@ -206,7 +207,7 @@ class GamesBridgeTest(absltest.TestCase):
         if state.is_terminal(): break
       return state
 
-    batch_size = 256
+    batch_size = 16
     obs_shape = [batch_size] + game.observation_tensor_shape()
     states = [make_state() for _ in range(batch_size)]
 

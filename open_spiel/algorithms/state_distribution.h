@@ -61,6 +61,8 @@ std::unique_ptr<HistoryDistribution> UpdateIncrementalStateDistribution(
     const State& state, const Policy* opponent_policy, int player_id,
     std::unique_ptr<HistoryDistribution> previous);
 
+std::string PrintBeliefs(const HistoryDistribution& beliefs);
+
 }  // namespace algorithms
 }  // namespace open_spiel
 

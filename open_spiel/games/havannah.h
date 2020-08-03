@@ -152,7 +152,7 @@ class HavannahState : public State {
   // A 3d tensor, 3 player-relative one-hot 2d planes. The layers are: the
   // specified player, the other player, and empty.
   void ObservationTensor(Player player,
-                         std::vector<double>* values) const override;
+                         absl::Span<float> values) const override;
   std::unique_ptr<State> Clone() const override;
   std::vector<Action> LegalActions() const override;
 
