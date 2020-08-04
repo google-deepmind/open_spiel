@@ -220,7 +220,7 @@ GameParameters Game::ParameterValue<GameParameters>(
     return iter->second.game_value();
   }
 
-  if (default_value == std::nullopt) {
+  if (default_value.has_value()) {
     std::vector<std::string> available_keys;
     for (auto const& element : game_parameters_) {
       available_keys.push_back(element.first);
@@ -238,7 +238,7 @@ int Game::ParameterValue<int>(const std::string& key,
   auto iter = game_parameters_.find(key);
   if (iter == game_parameters_.end()) {
     GameParameter default_game_parameter;
-    if (default_value != std::nullopt) {
+    if (default_value.has_value()) {
       default_game_parameter = GameParameter(default_value.value());
     } else {
       auto default_iter = game_type_.parameter_specification.find(key);
@@ -262,7 +262,7 @@ double Game::ParameterValue<double>(
   auto iter = game_parameters_.find(key);
   if (iter == game_parameters_.end()) {
     GameParameter default_game_parameter;
-    if (default_value != std::nullopt) {
+    if (default_value.has_value()) {
       default_game_parameter = GameParameter(default_value.value());
     } else {
       auto default_iter = game_type_.parameter_specification.find(key);
@@ -286,7 +286,7 @@ std::string Game::ParameterValue<std::string>(
   auto iter = game_parameters_.find(key);
   if (iter == game_parameters_.end()) {
     GameParameter default_game_parameter;
-    if (default_value != std::nullopt) {
+    if (default_value.has_value()) {
       default_game_parameter = GameParameter(default_value.value());
     } else {
       auto default_iter = game_type_.parameter_specification.find(key);
@@ -310,7 +310,7 @@ bool Game::ParameterValue<bool>(const std::string& key,
   auto iter = game_parameters_.find(key);
   if (iter == game_parameters_.end()) {
     GameParameter default_game_parameter;
-    if (default_value != std::nullopt) {
+    if (default_value.has_value()) {
       default_game_parameter = GameParameter(default_value.value());
     } else {
       auto default_iter = game_type_.parameter_specification.find(key);
