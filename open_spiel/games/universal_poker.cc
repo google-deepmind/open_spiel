@@ -202,7 +202,29 @@ std::string UniversalPokerState::ToString() const {
 
 std::string UniversalPokerState::ActionToString(Player player,
                                                 Action move) const {
-  return absl::StrCat("player=", player, " move=", move);
+  std::string move_str;
+  if (IsChanceNode()) {
+    move_str = absl::StrCat("Deal(", move, ")");
+  } else if (static_cast<ActionType>(move) == ActionType::kFold) {
+    move_str = "Fold";
+  } else if (static_cast<ActionType>(move) == ActionType::kCall) {
+    move_str = "Call";
+  } else if (betting_abstraction_ == BettingAbstraction::kFULLGAME) {
+    SPIEL_CHECK_GE(move, 2);
+    const int big_blind =
+        static_cast<const UniversalPokerGame *>(GetGame().get())->big_blind();
+    const int raise_size = (move - 1) * big_blind;
+    move_str = absl::StrCat("Bet", raise_size);
+  } else if (static_cast<ActionType>(move) == ActionType::kBet) {
+    SPIEL_CHECK_EQ(betting_abstraction_, BettingAbstraction::kFCPA);
+    move_str = "Bet";
+  } else if (static_cast<ActionType>(move) == ActionType::kAllIn) {
+    SPIEL_CHECK_EQ(betting_abstraction_, BettingAbstraction::kFCPA);
+    move_str = "AllIn";
+  } else {
+    SpielFatalError(absl::StrCat("Unknown action: ", move));
+  }
+  return absl::StrCat("player=", player, " move=", move_str);
 }
 
 bool UniversalPokerState::IsTerminal() const {
