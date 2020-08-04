@@ -46,10 +46,11 @@ class RLEnvironmentTest(absltest.TestCase):
     env = rl_environment.Environment("kuhn_poker", **{"players": 3})
     time_step = env.reset()
     self.assertEqual(time_step.observations["current_player"], 0)
+    self.assertEmpty(time_step.observations["serialized_state"], 0)
     self.assertLen(time_step.observations["info_state"], 3)
     self.assertLen(time_step.observations["legal_actions"], 3)
-    self.assertEqual(time_step.rewards, None)
-    self.assertEqual(time_step.discounts, None)
+    self.assertIsNone(time_step.rewards)
+    self.assertIsNone(time_step.discounts)
     self.assertEqual(time_step.step_type.first(), True)
 
   def test_initial_info_state_is_decision_node(self):
@@ -59,7 +60,7 @@ class RLEnvironmentTest(absltest.TestCase):
     self.assertEqual(env.is_chance_node, False)
 
   def test_full_game(self):
-    env = rl_environment.Environment("tic_tac_toe")
+    env = rl_environment.Environment("tic_tac_toe", include_full_state=True)
     _ = env.reset()
     time_step = env.step([0])
     self.assertEqual(time_step.observations["current_player"], 1)
@@ -67,7 +68,7 @@ class RLEnvironmentTest(absltest.TestCase):
     self.assertLen(time_step.observations["legal_actions"], 2)
     self.assertLen(time_step.rewards, 2)
     self.assertLen(time_step.discounts, 2)
-    self.assertLen(time_step.observations, 3)
+    self.assertLen(time_step.observations, 4)
 
     # O X O   # Moves 0, 1, 2
     # X O X   # Moves 3, 4, 5
@@ -88,8 +89,9 @@ class RLEnvironmentTest(absltest.TestCase):
 
     self.assertEqual(action_spec["num_actions"], ttt_max_actions)
     self.assertEqual(env_spec["info_state"], ttt_normalized_info_set_shape)
-    self.assertCountEqual(env_spec.keys(),
-                          ["current_player", "info_state", "legal_actions"])
+    self.assertCountEqual(
+        env_spec.keys(),
+        ["current_player", "info_state", "serialized_state", "legal_actions"])
     self.assertCountEqual(action_spec.keys(),
                           ["dtype", "max", "min", "num_actions"])
 
@@ -103,7 +105,7 @@ class RLEnvironmentTest(absltest.TestCase):
     self.assertLen(time_step.observations["legal_actions"], 2)
     self.assertLen(time_step.rewards, 2)
     self.assertLen(time_step.discounts, 2)
-    self.assertLen(time_step.observations, 3)
+    self.assertLen(time_step.observations, 4)
 
     actions = [act[0] for act in time_step.observations["legal_actions"]]
     time_step = env.step(actions)

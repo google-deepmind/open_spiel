@@ -220,7 +220,12 @@ class Environment(object):
           `StepType.FIRST`.
         step_type: A `StepType` value.
     """
-    observations = {"info_state": [], "legal_actions": [], "current_player": []}
+    observations = {
+        "info_state": [],
+        "legal_actions": [],
+        "current_player": [],
+        "serialized_state": []
+    }
     rewards = []
     step_type = StepType.LAST if self._state.is_terminal() else StepType.MID
     self._should_reset = step_type == StepType.LAST
@@ -305,7 +310,12 @@ class Environment(object):
     self._state = self._game.new_initial_state()
     self._sample_external_events()
 
-    observations = {"info_state": [], "legal_actions": [], "current_player": []}
+    observations = {
+        "info_state": [],
+        "legal_actions": [],
+        "current_player": [],
+        "serialized_state": []
+    }
     for player_id in range(self.num_players):
       observations["info_state"].append(
           self._state.observation_tensor(player_id) if self._use_observation
@@ -333,7 +343,8 @@ class Environment(object):
     """Defines the observation per player provided by the environment.
 
     Each dict member will contain its expected structure and shape. E.g.: for
-    Kuhn Poker {"info_state": (6,), "legal_actions": (2,), "current_player": ()}
+    Kuhn Poker {"info_state": (6,), "legal_actions": (2,), "current_player": (),
+                "serialized_state": ()}
 
     Returns:
       A specification dict describing the observation fields and shapes.
@@ -345,6 +356,7 @@ class Environment(object):
         ]),
         legal_actions=(self._game.num_distinct_actions(),),
         current_player=(),
+        serialized_state=(),
     )
 
   def action_spec(self):
