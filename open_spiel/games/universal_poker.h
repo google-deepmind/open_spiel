@@ -199,12 +199,11 @@ class UniversalPokerGame : public Game {
 };
 
 // Only supported for UniversalPoker. Randomly plays an action from a fixed list
-// of actions. If none of the actions are legal, selects uniformly from the
-// list of legal actions.
+// of actions. If none of the actions are legal, checks/calls.
 class UniformRestrictedActions : public Policy {
  public:
   // Actions will be restricted to this list when legal. If no such action is
-  // legal, uniform random over all legal actions will be returned.
+  // legal, checks/calls.
   explicit UniformRestrictedActions(std::vector<ActionType> actions)
       : actions_(std::move(actions)) {}
 
@@ -226,13 +225,10 @@ class UniformRestrictedActions : public Policy {
       return policy;
     }
 
-    // Otherwise, we return uniform random.
-    policy.reserve(legal_actions.size());
-    absl::c_for_each(legal_actions, [&policy, &legal_actions](Action a) {
-      policy.push_back({a, 1. / static_cast<double>(legal_actions.size())});
-    });
-    SPIEL_CHECK_EQ(policy.size(), legal_actions.size());
-    return policy;
+    // It is always legal to check/call.
+    SPIEL_DCHECK_TRUE(absl::c_find(legal_actions, ActionType::kCall) !=
+                      legal_actions.end());
+    return {{static_cast<Action>(ActionType::kCall), 1.}};
   }
 
  private:
