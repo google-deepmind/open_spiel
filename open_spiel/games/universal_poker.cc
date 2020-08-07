@@ -509,6 +509,11 @@ void UniversalPokerState::DoApplyAction(Action action_id) {
       ApplyChoiceAction(ACTION_CHECK_CALL, 0);
       return;
     }
+    if (betting_abstraction_ == BettingAbstraction::kFC) {
+      SpielFatalError(absl::StrCat(
+          "Tried to apply action that was not fold or call. Action: ",
+          State::ActionToString(action_id)));
+    }
     if (betting_abstraction_ != BettingAbstraction::kFULLGAME) {
       if (action_int == kBet) {
         ApplyChoiceAction(ACTION_BET, potSize_);
@@ -518,6 +523,12 @@ void UniversalPokerState::DoApplyAction(Action action_id) {
         ApplyChoiceAction(ACTION_ALL_IN, allInSize_);
         return;
       }
+    }
+    if (betting_abstraction_ != BettingAbstraction::kFULLGAME) {
+      SpielFatalError(absl::StrCat(
+          "Tried to apply action that was not allowed by the betting "
+          "abstraction. Action: ",
+          State::ActionToString(action_id)));
     }
     if (action_int >= 2 && action_int <= NumDistinctActions()) {
       const int big_blind =

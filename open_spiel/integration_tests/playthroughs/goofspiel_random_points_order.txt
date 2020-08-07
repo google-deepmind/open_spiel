@@ -2,7 +2,7 @@ game: goofspiel(imp_info=True,num_cards=4)
 
 GameType.chance_mode = ChanceMode.EXPLICIT_STOCHASTIC
 GameType.dynamics = Dynamics.SIMULTANEOUS
-GameType.information = Information.PERFECT_INFORMATION
+GameType.information = Information.IMPERFECT_INFORMATION
 GameType.long_name = "Goofspiel"
 GameType.max_num_players = 10
 GameType.min_num_players = 2

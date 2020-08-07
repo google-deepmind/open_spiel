@@ -62,8 +62,8 @@ void ValidateParams(const GameParameters& params,
     const auto it = param_spec.find(param.first);
     if (it == param_spec.end()) {
       SpielFatalError(absl::StrCat(
-          "Unknown parameter ", param.first,
-          ". Available parameters are: ", ListValidParameters(param_spec)));
+          "Unknown parameter '", param.first,
+          "'. Available parameters are: ", ListValidParameters(param_spec)));
     }
     if (it->second.type() != param.second.type()) {
       SpielFatalError(absl::StrCat(
@@ -208,6 +208,7 @@ std::shared_ptr<const Game> LoadGame(GameParameters params) {
 State::State(std::shared_ptr<const Game> game)
     : num_distinct_actions_(game->NumDistinctActions()),
       num_players_(game->NumPlayers()),
+      move_number_(0),
       game_(game) {}
 
 template <>
@@ -219,7 +220,7 @@ GameParameters Game::ParameterValue<GameParameters>(
     return iter->second.game_value();
   }
 
-  if (default_value == std::nullopt) {
+  if (default_value.has_value()) {
     std::vector<std::string> available_keys;
     for (auto const& element : game_parameters_) {
       available_keys.push_back(element.first);
@@ -237,7 +238,7 @@ int Game::ParameterValue<int>(const std::string& key,
   auto iter = game_parameters_.find(key);
   if (iter == game_parameters_.end()) {
     GameParameter default_game_parameter;
-    if (default_value != std::nullopt) {
+    if (default_value.has_value()) {
       default_game_parameter = GameParameter(default_value.value());
     } else {
       auto default_iter = game_type_.parameter_specification.find(key);
@@ -261,7 +262,7 @@ double Game::ParameterValue<double>(
   auto iter = game_parameters_.find(key);
   if (iter == game_parameters_.end()) {
     GameParameter default_game_parameter;
-    if (default_value != std::nullopt) {
+    if (default_value.has_value()) {
       default_game_parameter = GameParameter(default_value.value());
     } else {
       auto default_iter = game_type_.parameter_specification.find(key);
@@ -285,7 +286,7 @@ std::string Game::ParameterValue<std::string>(
   auto iter = game_parameters_.find(key);
   if (iter == game_parameters_.end()) {
     GameParameter default_game_parameter;
-    if (default_value != std::nullopt) {
+    if (default_value.has_value()) {
       default_game_parameter = GameParameter(default_value.value());
     } else {
       auto default_iter = game_type_.parameter_specification.find(key);
@@ -309,7 +310,7 @@ bool Game::ParameterValue<bool>(const std::string& key,
   auto iter = game_parameters_.find(key);
   if (iter == game_parameters_.end()) {
     GameParameter default_game_parameter;
-    if (default_value != std::nullopt) {
+    if (default_value.has_value()) {
       default_game_parameter = GameParameter(default_value.value());
     } else {
       auto default_iter = game_type_.parameter_specification.find(key);
@@ -392,6 +393,29 @@ Action State::StringToAction(Player player,
   }
   SpielFatalError(
       absl::StrCat("Couldn't find an action matching ", action_str));
+}
+
+void State::ApplyAction(Action action_id) {
+  // history_ needs to be modified *after* DoApplyAction which could
+  // be using it.
+
+  // Cannot apply an invalid action.
+  SPIEL_CHECK_NE(action_id, kInvalidAction);
+  Player player = CurrentPlayer();
+  DoApplyAction(action_id);
+  history_.push_back({player, action_id});
+  ++move_number_;
+}
+
+void State::ApplyActions(const std::vector<Action>& actions) {
+  // history_ needs to be modified *after* DoApplyActions which could
+  // be using it.
+  DoApplyActions(actions);
+  history_.reserve(history_.size() + actions.size());
+  for (int player = 0; player < actions.size(); ++player) {
+    history_.push_back({player, actions[player]});
+  }
+  ++move_number_;
 }
 
 std::vector<int> State::LegalActionsMask(Player player) const {
@@ -795,6 +819,10 @@ void State::InformationStateTensor(Player player,
   // Retained for backwards compatibility.
   values->resize(game_->InformationStateTensorSize());
   InformationStateTensor(player, absl::MakeSpan(*values));
+}
+
+bool State::PlayerAction::operator==(const PlayerAction& other) const {
+  return player == other.player && action == other.action;
 }
 
 }  // namespace open_spiel

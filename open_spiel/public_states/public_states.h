@@ -37,6 +37,7 @@
 #include "open_spiel/eigen/pyeig.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/utils/random.h"
 
@@ -552,7 +553,8 @@ class PublicState {
     std::unique_ptr<State> state = GetWorldState(informations);
     SPIEL_CHECK_FALSE(state->IsTerminal());
     state->ApplyAction(a);
-    PublicTransition transition = state->PublicObservationString();
+    PublicTransition transition =
+        observer_->StringFrom(*state, kDefaultPlayerId);
     ApplyPublicTransition(transition);
     return transition;
   }
@@ -564,6 +566,7 @@ class PublicState {
   // A pointer to the game that created this public state.
   const std::shared_ptr<const GameWithPublicStates> public_game_;
   const std::shared_ptr<const Game> base_game_;
+  const std::shared_ptr<const Observer> observer_;
 };
 
 // An abstract game class that provides methods for constructing

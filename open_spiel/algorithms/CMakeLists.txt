@@ -41,6 +41,8 @@ add_library (algorithms OBJECT
   mcts.h
   minimax.cc
   minimax.h
+  oos.h
+  oos.cc
   outcome_sampling_mccfr.cc
   outcome_sampling_mccfr.h
   state_distribution.cc
@@ -111,6 +113,10 @@ add_test(matrix_game_utils_test matrix_game_utils_test)
 add_executable(minimax_test minimax_test.cc
     $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})
 add_test(minimax_test minimax_test)
+
+add_executable(oos_test oos_test.cc
+    $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})
+add_test(oos_test oos_test)
 
 add_executable(outcome_sampling_mccfr_test outcome_sampling_mccfr_test.cc
     $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})

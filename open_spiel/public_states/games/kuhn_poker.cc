@@ -100,7 +100,8 @@ int KuhnPrivateInformation::NetworkIndex() const {
   return player_card_ == kNoCardDealt ? 0 : player_card_;
 }
 bool KuhnPrivateInformation::IsStateCompatible(const State& state) const {
-  const auto kuhn_state = subclass_cast<const base_kuhn::KuhnState&>(state);
+  const auto kuhn_state =
+      open_spiel::down_cast<const base_kuhn::KuhnState&>(state);
   if (kuhn_state.History().size() < player_ && player_card_ == kNoCardDealt)
     return true;
   if (kuhn_state.CardDealt().at(player_) == player_card_) return true;
@@ -121,7 +122,8 @@ std::string KuhnPrivateInformation::Serialize() const {
   return absl::StrCat(player_, "-", player_card_);
 }
 bool KuhnPrivateInformation::operator==(const PrivateInformation& other) const {
-  const auto& other_kuhn = subclass_cast<const KuhnPrivateInformation&>(other);
+  const auto& other_kuhn =
+    open_spiel::down_cast<const KuhnPrivateInformation&>(other);
   return player_ == other_kuhn.player_ &&
          player_card_ == other_kuhn.player_card_;
 }
@@ -198,7 +200,7 @@ std::vector<std::unique_ptr<State>> KuhnPublicState::GetPublicSet() const {
 std::string KuhnPublicState::GetInformationState(
     const PrivateInformation& information) const {
   const auto& kuhn_information =
-      subclass_cast<const KuhnPrivateInformation&>(information);
+      open_spiel::down_cast<const KuhnPrivateInformation&>(information);
   std::string info_state = std::to_string(kuhn_information.GetPlayerCard());
   for (int i = 0; i < public_actions_.size(); ++i) {
     absl::StrAppend(&info_state,
@@ -209,7 +211,7 @@ std::string KuhnPublicState::GetInformationState(
 std::vector<std::unique_ptr<State>> KuhnPublicState::GetInformationSet(
     const PrivateInformation& information) const {
   const auto& kuhn_information =
-      subclass_cast<const KuhnPrivateInformation&>(information);
+      open_spiel::down_cast<const KuhnPrivateInformation&>(information);
   const Player asked_player = kuhn_information.GetPlayer();
   const int asked_card = kuhn_information.GetPlayerCard();
 
@@ -237,7 +239,7 @@ std::unique_ptr<State> KuhnPublicState::GetWorldState(
     const std::vector<PrivateInformation*>& informations) const {
   std::unique_ptr<State> state = base_game_->NewInitialState();
   for (int i = 0; i < informations.size(); ++i) {
-    auto* kuhn_information = subclass_cast<KuhnPrivateInformation*>(
+    auto* kuhn_information = open_spiel::down_cast<KuhnPrivateInformation*>(
         informations[i]);
     SPIEL_CHECK_TRUE(kuhn_information != nullptr);
     SPIEL_CHECK_EQ(kuhn_information->GetPlayer(), i);
@@ -263,7 +265,7 @@ std::unique_ptr<State> KuhnPublicState::ResampleFromPublicSet(
 std::unique_ptr<State> KuhnPublicState::ResampleFromInformationSet(
     const PrivateInformation& information, Random* random) const {
   const auto& kuhn_information =
-      subclass_cast<const KuhnPrivateInformation&>(information);
+      open_spiel::down_cast<const KuhnPrivateInformation&>(information);
   std::unique_ptr<State> state = base_game_->NewInitialState();
   for (int i = 0; i < std::fmin(NumPlayers(), GetDepth()); ++i) {
     SPIEL_CHECK_TRUE(state->IsChanceNode());

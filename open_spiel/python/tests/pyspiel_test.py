@@ -82,7 +82,9 @@ class PyspielTest(absltest.TestCase):
         "phantom_ttt",
         "pig",
         "quoridor",
+        "repeated_game",
         "skat",
+        "start_at",
         "stones_and_gems",
         "tic_tac_toe",
         "tiny_bridge_2p",
@@ -120,6 +122,8 @@ class PyspielTest(absltest.TestCase):
         "misere",
         "turn_based_simultaneous_game",
         "normal_form_extensive_game",
+        "repeated_game",
+        "start_at",
     ]
     self.assertCountEqual(games_with_mandatory_parameters, expected)
 

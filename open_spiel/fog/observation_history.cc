@@ -13,140 +13,311 @@
 // limitations under the License.
 
 #include "open_spiel/fog/observation_history.h"
+
+#include <optional>
+#include <string>
+
+#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/observer.h"
+#include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
 
-bool ActionOrObs::operator==(const ActionOrObs& other) const {
-  if (tag != other.tag) return false;
-  if (tag == Either::kAction) return action == other.action;
-  if (tag == Either::kObservation) return observation == other.observation;
-  SpielFatalError("Unknown tag.");
-  return false;  // This will never return.
-}
+// -----------------------------------------------------------------------------
+// ActionObservationHistory
+// -----------------------------------------------------------------------------
 
-std::string ActionOrObs::ToString() const {
-  if (tag == ActionOrObs::Either::kAction) {
-    return absl::StrCat("action='", action, "'");
-  }
-  if (tag == ActionOrObs::Either::kObservation) {
-    return absl::StrCat("observation='", observation, "'");
-  }
-  SpielFatalError("Unknown tag.");
-  return "";  // This will never return.
-}
-
-ActionObservationHistory::ActionObservationHistory(
-    Player player, const State& target) : player_(player) {
+// TODO(author13) Switch to the new Observation API
+ActionObservationHistory::ActionObservationHistory(Player player,
+                                                   const State& target)
+    : player_(player) {
   SPIEL_CHECK_GE(player_, 0);
   SPIEL_CHECK_LT(player_, target.NumPlayers());
   SPIEL_CHECK_TRUE(target.GetGame()->GetType().provides_observation_string);
+
   const std::vector<State::PlayerAction>& history = target.FullHistory();
-  history_.reserve(2 * history.size());
+  history_.reserve(history.size());
 
   std::unique_ptr<State> state = target.GetGame()->NewInitialState();
+  history_.push_back({std::nullopt, state->ObservationString(player)});
   for (int i = 0; i < history.size(); i++) {
     const auto& [history_player, action] = history[i];
-    push_back(state->ObservationString(player));
-    if (state->CurrentPlayer() == player) {
-      push_back(action);
-    }
+    const bool is_acting = state->CurrentPlayer() == player;
     state->ApplyAction(action);
+    history_.push_back({
+      is_acting ? action : static_cast<std::optional<Action>>(std::nullopt),
+      state->ObservationString(player)
+    });
   }
-  push_back(state->ObservationString(player));
 }
 
 ActionObservationHistory::ActionObservationHistory(const State& target)
     : ActionObservationHistory(target.CurrentPlayer(), target) {}
 
 ActionObservationHistory::ActionObservationHistory(
-    Player player, std::vector<ActionOrObs> history)
-    : history_(std::move(history)), player_(player) {
+    Player player,
+    std::vector<std::pair<std::optional<Action>, std::string>> history)
+    : player_(player), history_(std::move(history)) {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_FALSE(history_.empty());  // There is always an obs for root node.
-  SPIEL_CHECK_TRUE(history_[0].IsObservation());
-  for (int i = 1; i < history.size(); i++)
-    // Implication  history[i].IsAction() => history[i-1].IsObservation()
-    SPIEL_CHECK_TRUE(!history[i].IsAction() || history[i-1].IsObservation());
+  SPIEL_CHECK_EQ(history_[0].first, std::nullopt);  // No action available.
 }
 
-bool ActionObservationHistory::IsPrefix(
+int ActionObservationHistory::MoveNumber() const {
+  SPIEL_CHECK_FALSE(history_.empty());
+  SPIEL_CHECK_EQ(history_.at(0).first, std::nullopt);
+  return history_.size() - 1;
+}
+
+const std::string& ActionObservationHistory::ObservationAt(int time) const {
+  return history_.at(time).second;
+}
+
+std::optional<Action> ActionObservationHistory::ActionAt(int time) const {
+  return history_.at(time).first;
+}
+
+bool ActionObservationHistory::CorrespondsTo(Player pl,
+                                             const State& state) const {
+  if (MoveNumber() != state.MoveNumber()) return false;
+  bool equal = CheckStateCorrespondenceInSimulation(pl, state, MoveNumber());
+  SPIEL_CHECK_TRUE(!equal || IsPrefixOf(pl, state));
+  SPIEL_CHECK_TRUE(!equal || IsExtensionOf(pl, state));
+  return equal;
+}
+
+bool ActionObservationHistory::CorrespondsTo(
     const ActionObservationHistory& other) const {
+  bool equal = player_ == other.player_ && history_ == other.history_;
+  SPIEL_CHECK_TRUE(!equal || IsPrefixOf(other));
+  SPIEL_CHECK_TRUE(!equal || IsExtensionOf(other));
+  return equal;
+}
+
+bool ActionObservationHistory::IsPrefixOf(
+    const ActionObservationHistory& other) const {
+  if (player_ != other.player_) return false;
+
+  if (CorrespondsToInitialState()) return true;
+  if (other.CorrespondsToInitialState()) return false;
+
   const auto& a = history_;
   const auto& b = other.history_;
-  if (a.empty()) return true;
-  if (b.empty()) return false;  // True only if a is empty, handled before.
   if (a.size() > b.size()) return false;
   if (a.size() == b.size()) return a == b;
   return std::equal(a.begin(), a.end(), b.begin());
+}
+
+bool ActionObservationHistory::IsPrefixOf(Player pl, const State& state) const {
+  const std::shared_ptr<const Game> game = state.GetGame();
+  SPIEL_CHECK_TRUE(game->GetType().provides_observation_string);
+
+  if (CorrespondsToInitialState()) return true;
+  // Cannot be prefix if state is earlier.
+  if (MoveNumber() > state.MoveNumber()) return false;
+
+  return CheckStateCorrespondenceInSimulation(pl, state, MoveNumber());
+}
+
+bool ActionObservationHistory::IsExtensionOf(
+    const ActionObservationHistory& other) const {
+  return other.IsPrefixOf(*this);
+}
+
+bool ActionObservationHistory::IsExtensionOf(Player pl,
+                                             const State& state) const {
+  const std::shared_ptr<const Game> game = state.GetGame();
+  SPIEL_CHECK_TRUE(game->GetType().provides_observation_string);
+
+  if (state.IsInitialState()) return true;
+  // Cannot be extension if state is later.
+  if (state.MoveNumber() > MoveNumber()) return false;
+
+  // Check the latest observation is identical -- most observations
+  // will differ only in the last items.
+  if (state.ObservationString(pl) != ObservationAt(state.MoveNumber()))
+    return false;
+
+  return CheckStateCorrespondenceInSimulation(pl, state, state.MoveNumber());
+}
+
+bool ActionObservationHistory::CheckStateCorrespondenceInSimulation(
+    Player pl, const State& state, int until_time) const {
+  const std::vector<State::PlayerAction>& state_history = state.FullHistory();
+  std::unique_ptr<State> simulation = state.GetGame()->NewInitialState();
+
+  int i = 0;  // The index for state_history access.
+  int j = 1;  // The index for history_ access.
+  while (simulation->MoveNumber() < until_time) {
+    SPIEL_CHECK_LT(i, state_history.size());
+    SPIEL_CHECK_LT(j, history_.size());
+    SPIEL_CHECK_FALSE(simulation->IsTerminal());
+
+    if (simulation->CurrentPlayer() == pl) {
+      if (history_[j].first != state_history[i].action) return false;
+    } else {
+      if (history_[j].first != std::nullopt) return false;
+    }
+
+    simulation->ApplyAction(state_history[i].action);
+    i++;
+
+    if (history_[j].second != simulation->ObservationString(pl)) return false;
+    j++;
+  }
+  return true;
 }
 
 std::string ActionObservationHistory::ToString() const {
-  return absl::StrJoin(history_, ", ", absl::StreamFormatter());
+  std::string s;
+  for (int i = 0; i < history_.size(); i++) {
+    const auto& action_observation = history_[i];
+    if (i > 0) absl::StrAppend(&s, ", ");
+    absl::StrAppend(&s, "(action=",
+                    (action_observation.first == std::nullopt
+                         ? "None"
+                         : std::to_string(*action_observation.first)),
+                    ", observation=\"", action_observation.second, "\")");
+  }
+  return s;
 }
 
-void ActionObservationHistory::push_back(const ActionOrObs& aoo) {
-  // Action observation history must start with an initial observation.
-  const bool starts_with_observation =
-      !history_.empty() || aoo.IsObservation();
-  SPIEL_CHECK_TRUE(starts_with_observation);
+// -----------------------------------------------------------------------------
+// PublicObservationHistory
+// -----------------------------------------------------------------------------
 
-  // Action observation history cannot have two consecutive actions pushed,
-  // there should be at least one observation between them.
-  const bool not_two_consecutive_actions =
-      (history_.empty()) || (aoo.IsAction() && history_.back().IsObservation());
-  SPIEL_CHECK_TRUE(aoo.IsObservation() || not_two_consecutive_actions);
-
-  history_.push_back(aoo);
-}
-
-bool PublicObservationHistory::IsPrefix(
-    const PublicObservationHistory& other) const {
-  const auto& a = history_;
-  const auto& b = other.history_;
-  if (a.empty()) return true;
-  if (b.empty()) return false;  // True only if a is empty, handled before.
-  if (a.size() > b.size()) return false;
-  if (a.size() == b.size()) return a == b;
-  return std::equal(a.begin(), a.end(), b.begin());
-}
-
-PublicObservationHistory::PublicObservationHistory(const State& target) {
-  SPIEL_CHECK_TRUE(
-      target.GetGame()->GetType().provides_factored_observation_string);
+PublicObservationHistory::PublicObservationHistory(const State& target)
+    : observer_(target.GetGame()->MakeObserver(
+          IIGObservationType{.public_info = true,
+                             .perfect_recall = false,
+                             .private_info = PrivateInfoType::kNone},
+          {})) {
   history_.reserve(target.FullHistory().size());
 
   std::unique_ptr<State> state = target.GetGame()->NewInitialState();
   // Use FullHistory even though we don't need the player -- prevent
   // doing a copy.
-  for (const auto& [player, action] : target.FullHistory()) {
-    history_.push_back(state->PublicObservationString());
+  for (const auto& [_, action] : target.FullHistory()) {
+    history_.push_back(observer_->StringFrom(*state, kDefaultPlayerId));
     state->ApplyAction(action);
   }
-  history_.push_back(state->PublicObservationString());
+  history_.push_back(observer_->StringFrom(*state, kDefaultPlayerId));
 }
 
 PublicObservationHistory::PublicObservationHistory(
-    std::vector<std::string> history) : history_(std::move(history)) {
+    std::vector<std::string> history)
+    : history_(std::move(history)) {
   SPIEL_CHECK_FALSE(history_.empty());
   SPIEL_CHECK_EQ(history_.at(0), kStartOfGamePublicObservation);
+}
+
+int PublicObservationHistory::MoveNumber() const {
+  SPIEL_CHECK_FALSE(history_.empty());
+  SPIEL_CHECK_EQ(history_.at(0), kStartOfGamePublicObservation);
+  return history_.size() - 1;
+}
+
+const std::string& PublicObservationHistory::ObservationAt(int time) const {
+  return history_.at(time);
+}
+
+bool PublicObservationHistory::CorrespondsTo(
+    const PublicObservationHistory& other) const {
+  return history_ == other.history_;
+}
+
+bool PublicObservationHistory::CorrespondsTo(const State& state) const {
+  if (MoveNumber() != state.MoveNumber()) return false;
+  bool equal = CheckStateCorrespondenceInSimulation(state, MoveNumber());
+  SPIEL_CHECK_TRUE(!equal || IsPrefixOf(state));
+  SPIEL_CHECK_TRUE(!equal || IsExtensionOf(state));
+  return equal;
+}
+
+bool PublicObservationHistory::IsPrefixOf(
+    const PublicObservationHistory& other) const {
+  if (CorrespondsToInitialState()) return true;
+  if (other.CorrespondsToInitialState()) return false;
+
+  const auto& a = history_;
+  const auto& b = other.history_;
+  if (a.size() > b.size()) return false;
+  if (a.size() == b.size()) return a == b;
+  return std::equal(a.begin(), a.end(), b.begin());
+}
+
+bool PublicObservationHistory::IsPrefixOf(const State& state) const {
+  if (CorrespondsToInitialState()) return true;
+  // Cannot be prefix if state is earlier.
+  if (state.MoveNumber() < MoveNumber()) return false;
+
+  return CheckStateCorrespondenceInSimulation(state, MoveNumber());
+}
+
+bool PublicObservationHistory::IsExtensionOf(
+    const PublicObservationHistory& other) const {
+  return other.IsPrefixOf(*this);
+}
+
+bool PublicObservationHistory::IsExtensionOf(const State& state) const {
+  if (state.MoveNumber() > MoveNumber()) return false;
+
+  // Check the latest observation is identical -- most observations
+  // will differ only in the last items.
+  if (observer_->StringFrom(state, kDefaultPlayerId) !=
+      ObservationAt(state.MoveNumber()))
+    return false;
+
+  return CheckStateCorrespondenceInSimulation(state, state.MoveNumber());
 }
 
 std::string PublicObservationHistory::ToString() const {
   return absl::StrJoin(history_, ", ");
 }
 
-std::ostream& operator<<(std::ostream& os, const ActionOrObs& aoo) {
-  return os << aoo.ToString();
+void PublicObservationHistory::push_back(const std::string& observation) {
+  SPIEL_CHECK_TRUE(!history_.empty() ||
+                   observation == kStartOfGamePublicObservation);
+  SPIEL_CHECK_NE(observation, kInvalidPublicObservation);
+  history_.push_back(observation);
 }
 
-std::ostream& operator<<(
-    std::ostream& os, const ActionObservationHistory& aoh) {
+bool PublicObservationHistory::CheckStateCorrespondenceInSimulation(
+    const State& state, int until_time) const {
+  const std::vector<State::PlayerAction>& state_history = state.FullHistory();
+  std::unique_ptr<State> simulation = state.GetGame()->NewInitialState();
+  SPIEL_CHECK_EQ(observer_->StringFrom(*simulation, kDefaultPlayerId),
+                 kStartOfGamePublicObservation);
+
+  int i = 0;  // The index for state_history access.
+  int j = 1;  // The index for history_ access.
+  while (simulation->MoveNumber() < until_time) {
+    SPIEL_CHECK_LT(i, state_history.size());
+    SPIEL_CHECK_LT(j, history_.size());
+    SPIEL_CHECK_FALSE(simulation->IsTerminal());
+
+    simulation->ApplyAction(state_history[i].action);
+    i++;
+
+    if (history_.at(j) != observer_->StringFrom(*simulation, kDefaultPlayerId))
+      return false;
+    j++;
+  }
+  return true;
+}
+
+// -----------------------------------------------------------------------------
+// Streaming.
+// -----------------------------------------------------------------------------
+
+std::ostream& operator<<(std::ostream& os,
+                         const ActionObservationHistory& aoh) {
   return os << aoh.ToString();
 }
 
-std::ostream& operator<<(
-    std::ostream& os, const PublicObservationHistory& poh) {
+std::ostream& operator<<(std::ostream& os,
+                         const PublicObservationHistory& poh) {
   return os << poh.ToString();
 }
 

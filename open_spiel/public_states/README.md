@@ -13,7 +13,7 @@ This document is best viewed with
 --------------------------------------------------------------------------------
 
 <p align="center">
-  <img src="docs/_static/public_tree_kuhn.png"
+  <img src="../../docs/_static/public_tree_kuhn.png"
        alt="Visualization of Base API and Public State API for Kuhn Poker">
 </p>
 

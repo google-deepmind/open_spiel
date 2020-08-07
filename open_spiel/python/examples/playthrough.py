@@ -45,11 +45,14 @@ flags.DEFINE_bool(
     "alsologtostdout", False,
     "If True, the trace will be written to std-out while it "
     "is being constructed (in addition to the usual behavior).")
+flags.DEFINE_integer("shard", 0, "The shard to update.")
+flags.DEFINE_integer("num_shards", 1, "How many shards to use for updates.")
 
 
 def main(unused_argv):
   if FLAGS.update_path:
-    generate_playthrough.update_path(FLAGS.update_path)
+    generate_playthrough.update_path(FLAGS.update_path, FLAGS.shard,
+                                     FLAGS.num_shards)
   else:
     if not FLAGS.game:
       raise ValueError("Must specify game")

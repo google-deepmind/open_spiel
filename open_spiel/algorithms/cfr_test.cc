@@ -108,8 +108,8 @@ void CFRTest_KuhnPokerRunsWithThreePlayers(bool linear_averaging,
   int num_players = 3;
   std::shared_ptr<const Game> game =
       LoadGame("kuhn_poker", {{"players", GameParameter(num_players)}});
-  CFRSolverBase solver(*game, regret_matching_plus, alternating_updates,
-                       linear_averaging);
+  CFRSolverBase solver(*game, alternating_updates, linear_averaging,
+                       regret_matching_plus);
   for (int i = 0; i < 10; i++) {
     solver.EvaluateAndUpdatePolicy();
   }

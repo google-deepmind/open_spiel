@@ -15,11 +15,13 @@
 #include "open_spiel/games/coordinated_mp.h"
 
 #include <algorithm>
+#include <memory>
 #include <string>
 #include <utility>
 
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/game_parameters.h"
+#include "open_spiel/observer.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
@@ -51,6 +53,67 @@ std::shared_ptr<const Game> Factory(const GameParameters &params) {
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
 }  // namespace
+
+class PenniesObserver : public Observer {
+ public:
+  PenniesObserver(IIGObservationType iig_obs_type)
+      : Observer(/*has_string=*/true, /*has_tensor=*/false),
+        iig_obs_type_(iig_obs_type) {}
+
+  void WriteTensor(const State &observed_state, int player,
+                   Allocator *allocator) const override {
+    SpielFatalError("Unimplemented");
+  }
+
+  std::string StringFrom(const State &observed_state, int player) const {
+    const PenniesState &state =
+        open_spiel::down_cast<const PenniesState &>(observed_state);
+    SPIEL_CHECK_GE(player, 0);
+    SPIEL_CHECK_LT(player, state.num_players_);
+
+    std::string str;
+    if (iig_obs_type_.perfect_recall) {
+      absl::StrAppend(&str, state.MoveNumber());
+    }
+
+    if (iig_obs_type_.perfect_recall &&
+        (iig_obs_type_.private_info == PrivateInfoType::kAllPlayers ||
+         (player == 0 &&
+          iig_obs_type_.private_info == PrivateInfoType::kSinglePlayer))) {
+      if (state.actionA_ == kHeads) str.push_back('H');
+      if (state.actionA_ == kTails) str.push_back('T');
+    }
+
+    if (iig_obs_type_.private_info != PrivateInfoType::kNone) {
+      // TODO(author13)
+      // This information appears to be private information for both players,
+      // but not public information. Is this a bug?
+      if (state.infoset_ == kTop) str.push_back('T');
+      if (state.infoset_ == kBottom) str.push_back('B');
+    }
+
+    if (iig_obs_type_.perfect_recall &&
+        (iig_obs_type_.private_info == PrivateInfoType::kAllPlayers ||
+         (player == 1 &&
+          iig_obs_type_.private_info == PrivateInfoType::kSinglePlayer))) {
+      if (state.actionB_ == kHeads) str.push_back('H');
+      if (state.actionB_ == kTails) str.push_back('T');
+    }
+
+    if (iig_obs_type_.public_info &&
+        iig_obs_type_.private_info == PrivateInfoType::kNone) {
+      if (state.IsInitialState())
+        absl::StrAppend(&str, kStartOfGamePublicObservation);
+      else
+        absl::StrAppend(&str, kClockTickPublicObservation);
+    }
+
+    return str;
+  }
+
+ private:
+  IIGObservationType iig_obs_type_;
+};
 
 PenniesState::PenniesState(std::shared_ptr<const Game> game) : State(game) {}
 
@@ -132,43 +195,13 @@ std::vector<double> PenniesState::Returns() const {
 }
 
 std::string PenniesState::InformationStateString(Player player) const {
-  SPIEL_CHECK_GE(player, 0);
-  SPIEL_CHECK_LT(player, num_players_);
-
-  std::string str = "";
-  if (player == Player(0)) {
-    if (actionA_ == kHeads) str.push_back('H');
-    if (actionA_ == kTails) str.push_back('T');
-  }
-  if (infoset_ == kTop) str.push_back('T');
-  if (infoset_ == kBottom) str.push_back('B');
-  if (player == Player(1)) {
-    if (actionB_ == kHeads) str.push_back('H');
-    if (actionB_ == kTails) str.push_back('T');
-  }
-  return str;
+  const PenniesGame &game = open_spiel::down_cast<const PenniesGame &>(*game_);
+  return game.info_state_observer_->StringFrom(*this, player);
 }
 
 std::string PenniesState::ObservationString(Player player) const {
-  SPIEL_CHECK_GE(player, 0);
-  SPIEL_CHECK_LT(player, num_players_);
-  if (infoset_ == kTop) return "T";
-  if (infoset_ == kBottom) return "B";
-  return "";
-}
-
-std::string PenniesState::PublicObservationString() const {
-  if (IsInitialState()) return kStartOfGamePublicObservation;
-  return kClockTickPublicObservation;
-}
-
-// No private observations - show only time.
-std::string PenniesState::PrivateObservationString(Player player) const {
-  SPIEL_CHECK_GE(player, 0);
-  SPIEL_CHECK_LT(player, num_players_);
-  if (infoset_ == kTop) return "T";
-  if (infoset_ == kBottom) return "B";
-  return kNothingPrivateObservation;
+  const PenniesGame &game = open_spiel::down_cast<const PenniesGame &>(*game_);
+  return game.default_observer_->StringFrom(*this, player);
 }
 
 std::unique_ptr<State> PenniesState::Clone() const {
@@ -181,10 +214,21 @@ std::vector<std::pair<Action, double>> PenniesState::ChanceOutcomes() const {
 }
 
 PenniesGame::PenniesGame(const GameParameters &params)
-    : Game(kGameType, params) {}
+    : Game(kGameType, params) {
+  default_observer_ = std::make_shared<PenniesObserver>(kDefaultObsType);
+  info_state_observer_ = std::make_shared<PenniesObserver>(kInfoStateObsType);
+}
 
 std::unique_ptr<State> PenniesGame::NewInitialState() const {
   return absl::make_unique<PenniesState>(shared_from_this());
+}
+
+std::shared_ptr<Observer> PenniesGame::MakeObserver(
+    absl::optional<IIGObservationType> iig_obs_type,
+    const GameParameters &params) const {
+  SPIEL_CHECK_TRUE(params.empty());
+  return std::make_shared<PenniesObserver>(
+      iig_obs_type.value_or(kDefaultObsType));
 }
 
 }  // namespace coordinated_mp

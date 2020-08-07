@@ -16,7 +16,10 @@
 
 // Python bindings for policies and algorithms handling them.
 
+#include <string>
+
 #include "open_spiel/game_transforms/normal_form_extensive_game.h"
+#include "open_spiel/game_transforms/repeated_game.h"
 #include "open_spiel/game_transforms/turn_based_simultaneous_game.h"
 #include "pybind11/include/pybind11/detail/common.h"
 #include "pybind11/include/pybind11/detail/descr.h"
@@ -45,5 +48,15 @@ void init_pyspiel_game_transforms(py::module& m) {
 
   m.def("convert_to_turn_based", open_spiel::ConvertToTurnBased,
         "Returns a turn-based version of the given game.");
+
+  m.def("create_repeated_game",
+        py::overload_cast<const Game&, const GameParameters&>(
+            &open_spiel::CreateRepeatedGame),
+        "Creates a repeated game from a stage game.");
+
+  m.def("create_repeated_game",
+        py::overload_cast<const std::string&, const GameParameters&>(
+            &open_spiel::CreateRepeatedGame),
+        "Creates a repeated game from a stage game.");
 }
 }  // namespace open_spiel

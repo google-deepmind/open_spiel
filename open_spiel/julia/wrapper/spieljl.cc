@@ -341,14 +341,6 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod) {
               [](open_spiel::State& s, open_spiel::Player p) {
                 return s.ObservationTensor(p);
               })
-      .method("public_observation_string",
-              [](open_spiel::State& s) { return s.PublicObservationString(); })
-      .method("private_observation_string",
-              [](open_spiel::State& s) { return s.PrivateObservationString(); })
-      .method("private_observation_string",
-              [](open_spiel::State& s, open_spiel::Player p) {
-                return s.PrivateObservationString(p);
-              })
       .method("clone", &open_spiel::State::Clone)
       .method("child", &open_spiel::State::Child)
       .method("undo_action", &open_spiel::State::UndoAction)

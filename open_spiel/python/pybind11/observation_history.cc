@@ -27,74 +27,93 @@ namespace py = ::pybind11;
 
 std::unique_ptr<ActionObservationHistory> ActionObservationHistoryFromPyList(
     const Player& player, const py::list& xs) {
-  std::vector<ActionOrObs> history;
+  SPIEL_CHECK_GT(xs.size(), 0);
+  std::vector<std::pair<std::optional<Action>, std::string>> history;
   for (const auto& x : xs) {
-    // Try action
-    try {
-      history.push_back(ActionOrObs(x.cast<int>()));
-      continue;
-    } catch (const py::cast_error& e) {
+    py::tuple act_obs_tuple = x.cast<py::tuple>();
+    SPIEL_CHECK_EQ(act_obs_tuple.size(), 2);
+
+    std::optional<Action> action = std::nullopt;
+    if (!py::cast<py::none>(act_obs_tuple[0]).is_none()) {
+      action = act_obs_tuple[0].cast<int>();
     }
 
-    // Try observation
-    try {
-      history.push_back(ActionOrObs(x.cast<std::string>()));
-      continue;
-    } catch (const py::cast_error& e) {
-    }
-
-    // Otherwise error
-    SpielFatalError(absl::StrCat(
-        "Could not initialize ActionOrObs: must be an int "
-        "for an Action or a string for an Observation. The found type was ",
-        (std::string)py::str(x.get_type())));
+    std::string observation = act_obs_tuple[1].cast<std::string>();
+    history.push_back({action, observation});
   }
   return std::make_unique<ActionObservationHistory>(player, history);
 }
 
 void init_pyspiel_observation_histories(py::module& m) {
-  py::class_<ActionOrObs> action_or_observation(m, "ActionOrObs");
-  action_or_observation
-      .def(py::init<std::string>())
-      .def(py::init<Action>())
-      .def("action", &ActionOrObs::GetAction)
-      .def("observation", &ActionOrObs::GetObservation)
-      .def("is_action", &ActionOrObs::IsAction)
-      .def("is_observation", &ActionOrObs::IsObservation)
-      .def("__str__", &ActionOrObs::ToString)
-      .def("__eq__", &ActionOrObs::operator==);
-
-  py::class_<ActionObservationHistory>
-    act_obs_history(m, "ActionObservationHistory");
+  py::class_<ActionObservationHistory> act_obs_history(
+      m, "ActionObservationHistory");
   act_obs_history
       .def(py::init<Player, const State&>())
       .def(py::init<const State&>())
-      .def(py::init<Player, std::vector<ActionOrObs>>())
       .def(py::init(&ActionObservationHistoryFromPyList))
       .def("history", &ActionObservationHistory::History)
-      .def("is_prefix", &ActionObservationHistory::IsPrefix)
-      .def("is_root", &ActionObservationHistory::IsRoot)
+      .def("get_player", &ActionObservationHistory::GetPlayer)
+      .def("move_number", &ActionObservationHistory::MoveNumber)
+      .def("observation_at", &ActionObservationHistory::ObservationAt)
+      .def("action_at", &ActionObservationHistory::ActionAt)
+      .def("corresponds_to_initial_state",
+           &ActionObservationHistory::CorrespondsToInitialState)
+      .def("corresponds_to",
+           (bool (ActionObservationHistory::*)(Player, const State&) const) &
+               ActionObservationHistory::CorrespondsTo)
+      .def("corresponds_to", (bool (ActionObservationHistory::*)(
+                                 const ActionObservationHistory&) const) &
+                                 ActionObservationHistory::CorrespondsTo)
+      .def("is_prefix_of",
+           (bool (ActionObservationHistory::*)(Player, const State&) const) &
+               ActionObservationHistory::IsPrefixOf)
+      .def("is_prefix_of", (bool (ActionObservationHistory::*)(
+                               const ActionObservationHistory&) const) &
+                               ActionObservationHistory::IsPrefixOf)
+      .def("is_extension_of",
+           (bool (ActionObservationHistory::*)(Player, const State&) const) &
+               ActionObservationHistory::IsExtensionOf)
+      .def("is_extension_of", (bool (ActionObservationHistory::*)(
+                                  const ActionObservationHistory&) const) &
+                                  ActionObservationHistory::IsExtensionOf)
       .def("__str__", &ActionObservationHistory::ToString)
-      .def("__eq__",
-           [](const ActionObservationHistory& value,
-              ActionObservationHistory* value2) {
-             return value2 && value == *value2;
-           });
+      .def("__eq__", [](const ActionObservationHistory& value,
+                        const ActionObservationHistory& value2) {
+        return value == value2;
+      });
 
-  py::class_<PublicObservationHistory>
-    pub_obs_history(m, "PublicObservationHistory");
-  pub_obs_history
-      .def(py::init<const State&>())
+  py::class_<PublicObservationHistory> pub_obs_history(
+      m, "PublicObservationHistory");
+  pub_obs_history.def(py::init<const State&>())
       .def(py::init<std::vector<std::string>>())
       .def("history", &PublicObservationHistory::History)
-      .def("is_prefix", &PublicObservationHistory::IsPrefix)
-      .def("is_root", &PublicObservationHistory::IsRoot)
+      .def("move_number", &PublicObservationHistory::MoveNumber)
+      .def("observation_at", &PublicObservationHistory::ObservationAt)
+      .def("corresponds_to_initial_state",
+           &PublicObservationHistory::CorrespondsToInitialState)
+      .def("corresponds_to",
+           (bool (PublicObservationHistory::*)(const State&) const) &
+               PublicObservationHistory::CorrespondsTo)
+      .def("corresponds_to", (bool (PublicObservationHistory::*)(
+                                 const PublicObservationHistory&) const) &
+                                 PublicObservationHistory::CorrespondsTo)
+      .def("is_prefix_of",
+           (bool (PublicObservationHistory::*)(const State&) const) &
+               PublicObservationHistory::IsPrefixOf)
+      .def("is_prefix_of", (bool (PublicObservationHistory::*)(
+                               const PublicObservationHistory&) const) &
+                               PublicObservationHistory::IsPrefixOf)
+      .def("is_extension_of",
+           (bool (PublicObservationHistory::*)(const State&) const) &
+               PublicObservationHistory::IsExtensionOf)
+      .def("is_extension_of", (bool (PublicObservationHistory::*)(
+                                  const PublicObservationHistory&) const) &
+                                  PublicObservationHistory::IsExtensionOf)
       .def("__str__", &PublicObservationHistory::ToString)
-      .def("__eq__",
-           [](const PublicObservationHistory& value,
-              PublicObservationHistory* value2) {
-             return value2 && value == *value2;
-           });
+      .def("__eq__", [](const PublicObservationHistory& value,
+                        const PublicObservationHistory& value2) {
+        return value == value2;
+      });
 }
 
 }  // namespace open_spiel

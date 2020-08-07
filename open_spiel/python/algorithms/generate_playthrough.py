@@ -23,6 +23,7 @@ import re
 import numpy as np
 
 from open_spiel.python.games import tic_tac_toe
+from open_spiel.python.observation import make_observation
 import pyspiel
 
 
@@ -110,6 +111,14 @@ def playthrough(game_string, action_sequence, alsologtostdout=False):
   return "\n".join(lines) + "\n"
 
 
+def format_shapes(d):
+  """Returns a string representing the shapes of a dict of tensors."""
+  if len(d) == 1:
+    return str(list(d[min(d)].shape))
+  else:
+    return ", ".join(f"{key}: {list(value.shape)}" for key, value in d.items())
+
+
 def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None):
   """Returns a playthrough of the specified game as a list of lines.
 
@@ -134,9 +143,47 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None):
   game = _load_game(game_string)
   add_line("game: {}".format(game_string))
   seed = np.random.randint(2**32 - 1)
+  game_type = game.get_type()
+
+  default_observation = None
+  try:
+    default_observation = make_observation(game)
+  except (RuntimeError, ValueError):
+    pass
+
+  infostate_observation = None
+  # TODO(author11) reinstate this restriction
+  # if game_type.information in (pyspiel.IMPERFECT_INFORMATION,
+  #                              pyspiel.ONE_SHOT):
+  try:
+    infostate_observation = make_observation(
+        game, pyspiel.IIGObservationType(perfect_recall=True))
+  except (RuntimeError, ValueError):
+    pass
+
+  public_observation = None
+  try:
+    public_observation = make_observation(
+        game,
+        pyspiel.IIGObservationType(
+            public_info=True,
+            perfect_recall=False,
+            private_info=pyspiel.PrivateInfoType.NONE))
+  except (RuntimeError, ValueError):
+    pass
+
+  private_observation = None
+  try:
+    private_observation = make_observation(
+        game,
+        pyspiel.IIGObservationType(
+            public_info=False,
+            perfect_recall=False,
+            private_info=pyspiel.PrivateInfoType.SINGLE_PLAYER))
+  except (RuntimeError, ValueError):
+    pass
 
   add_line("")
-  game_type = game.get_type()
   add_line("GameType.chance_mode = {}".format(game_type.chance_mode))
   add_line("GameType.dynamics = {}".format(game_type.dynamics))
   add_line("GameType.information = {}".format(game_type.information))
@@ -176,20 +223,20 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None):
   except RuntimeError:
     utility_sum = None
   add_line("UtilitySum() = {}".format(utility_sum))
-  if game_type.provides_information_state_tensor:
+  if infostate_observation and infostate_observation.tensor is not None:
     add_line("InformationStateTensorShape() = {}".format(
-        game.information_state_tensor_shape()))
+        format_shapes(infostate_observation.dict)))
     add_line("InformationStateTensorLayout() = {}".format(
         game.information_state_tensor_layout()))
     add_line("InformationStateTensorSize() = {}".format(
-        game.information_state_tensor_size()))
-  if game_type.provides_observation_tensor:
+        len(infostate_observation.tensor)))
+  if default_observation and default_observation.tensor is not None:
     add_line("ObservationTensorShape() = {}".format(
-        game.observation_tensor_shape()))
+        format_shapes(default_observation.dict)))
     add_line("ObservationTensorLayout() = {}".format(
         game.observation_tensor_layout()))
     add_line("ObservationTensorSize() = {}".format(
-        game.observation_tensor_size()))
+        len(default_observation.tensor)))
   add_line("MaxGameLength() = {}".format(game.max_game_length()))
   add_line('ToString() = "{}"'.format(str(game)))
 
@@ -209,34 +256,36 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None):
     add_line("IsChanceNode() = {}".format(state.is_chance_node()))
     add_line("IsSimultaneousNode() = {}".format(state.is_simultaneous_node()))
     add_line("CurrentPlayer() = {}".format(state.current_player()))
-    if game.get_type().provides_information_state_string:
+    if infostate_observation:
       for player in players:
-        add_line('InformationStateString({}) = "{}"'.format(
-            player, _escape(state.information_state_string(player))))
-    if game.get_type().provides_information_state_tensor:
+        s = infostate_observation.string_from(state, player)
+        if s is not None:
+          add_line(f'InformationStateString({player}) = "{_escape(s)}"')
+    if infostate_observation and infostate_observation.tensor is not None:
       for player in players:
-        label = "InformationStateTensor({})".format(player)
-        lines += _format_tensor(
-            np.reshape(
-                state.information_state_tensor(player),
-                game.information_state_tensor_shape()), label)
-    if game.get_type().provides_observation_string:
+        infostate_observation.set_from(state, player)
+        for name, tensor in infostate_observation.dict.items():
+          label = f"InformationStateTensor({player})"
+          label += f".{name}" if name != "info_state" else ""
+          lines += _format_tensor(tensor, label)
+    if default_observation:
       for player in players:
-        add_line('ObservationString({}) = "{}"'.format(
-            player, _escape(state.observation_string(player))))
-    if game.get_type().provides_factored_observation_string:
+        s = default_observation.string_from(state, player)
+        if s is not None:
+          add_line(f'ObservationString({player}) = "{_escape(s)}"')
+    if public_observation:
       add_line('PublicObservationString() = "{}"'.format(
-          _escape(state.public_observation_string())))
+          _escape(public_observation.string_from(state, 0))))
       for player in players:
         add_line('PrivateObservationString({}) = "{}"'.format(
-            player, _escape(state.private_observation_string(player))))
-    if game.get_type().provides_observation_tensor:
+            player, _escape(private_observation.string_from(state, player))))
+    if default_observation and default_observation.tensor is not None:
       for player in players:
-        label = "ObservationTensor({})".format(player)
-        lines += _format_tensor(
-            np.reshape(
-                state.observation_tensor(player),
-                game.observation_tensor_shape()), label)
+        default_observation.set_from(state, player)
+        for name, tensor in default_observation.dict.items():
+          label = f"ObservationTensor({player})"
+          label += f".{name}" if name != "observation" else ""
+          lines += _format_tensor(tensor, label)
     if game_type.chance_mode == pyspiel.GameType.ChanceMode.SAMPLED_STOCHASTIC:
       add_line('SerializeState() = "{}"'.format(_escape(state.serialize())))
     if not state.is_chance_node():
@@ -334,9 +383,9 @@ def replay(filename):
   return (original, playthrough(**kwargs))
 
 
-def update_path(path):
+def update_path(path, shard_index=0, num_shards=1):
   """Regenerates all playthroughs in the path."""
-  for filename in sorted(os.listdir(path)):
+  for filename in sorted(os.listdir(path))[shard_index::num_shards]:
     try:
       original, new = replay(os.path.join(path, filename))
       if original == new:

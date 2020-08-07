@@ -612,6 +612,15 @@ int CFRInfoStateValues::SampleActionIndex(double epsilon, double z) {
   }
   SpielFatalError(absl::StrCat("SampleActionIndex: sum of probs is ", sum));
 }
+  
+int CFRInfoStateValues::GetActionIndex(Action a) {
+  auto it = std::find(legal_actions.begin(), legal_actions.end(), a);
+  if (it != legal_actions.end()) {
+    return std::distance(legal_actions.begin(), it);
+  }
+  SpielFatalError(
+      absl::StrCat("GetActionIndex: the action was not found: ", a));
+}
 
 void SerializeCFRInfoStateValuesTable(
     const CFRInfoStateValuesTable& info_states, std::string* result,

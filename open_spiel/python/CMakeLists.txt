@@ -37,6 +37,8 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
   pybind11/game_transforms.h
   pybind11/observation_history.cc
   pybind11/observation_history.h
+  pybind11/observer.cc
+  pybind11/observer.h
   pybind11/policy.cc
   pybind11/policy.h
   pybind11/pyspiel.cc

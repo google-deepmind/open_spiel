@@ -651,7 +651,7 @@ void SkatState::ObservationTensor(Player player,
 
   std::fill(values.begin(), values.end(), 0.0);
   SPIEL_CHECK_EQ(values.size(), game_->ObservationTensorSize());
-  if (phase_ == Phase::kGameOver || phase_ == Phase::kDeal) return;
+  if (phase_ == Phase::kDeal) return;
   auto ptr = values.begin();
   // Position:
   ptr[player] = 1;
@@ -728,7 +728,7 @@ std::string SkatState::ObservationString(Player player) const {
   SPIEL_CHECK_LT(player, num_players_);
   // We construct the ObservationString from the ObservationTensor to give
   // some indication that the tensor representation is correct & complete.
-  if (phase_ == Phase::kGameOver || phase_ == Phase::kDeal) {
+  if (phase_ == Phase::kDeal) {
     return "No Observation";
   }
   std::vector<float> tensor(game_->ObservationTensorSize());
@@ -742,6 +742,8 @@ std::string SkatState::ObservationString(Player player) const {
   if (ptr[0]) phase = kBidding;
   else if (ptr[1]) phase = kDiscardCards;
   else if (ptr[2]) phase = kPlay;
+  else
+    phase = kGameOver;
   absl::StrAppend(&rv, "|Phase:", PhaseToString(phase));
   ptr += 3;
   std::vector<int> player_cards = GetCardsFromMultiHot(ptr);

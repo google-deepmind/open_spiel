@@ -15,47 +15,17 @@
 #ifndef OPEN_SPIEL_FOG_OBSERVATION_HISTORY_H_
 #define OPEN_SPIEL_FOG_OBSERVATION_HISTORY_H_
 
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
 
 #include "open_spiel/fog/fog_constants.h"
+#include "open_spiel/spiel.h"
 #include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
-#include "open_spiel/spiel.h"
 
 namespace open_spiel {
-
-// Store either action or observation.
-// We cannot use C++ unions for this, because observations are strings.
-class ActionOrObs {
- private:
-  enum class Either { kAction, kObservation };
-  const Either tag;
-  const Action action = kInvalidAction;
-  const std::string observation;
-
- public:
-  explicit ActionOrObs(Action act)
-      : tag(Either::kAction), action(act) {
-    SPIEL_CHECK_NE(action, kInvalidAction);
-  }
-  explicit ActionOrObs(std::string obs)
-      : tag(Either::kObservation), observation(std::move(obs)) {}
-
-  bool IsAction() const { return tag == Either::kAction; }
-  bool IsObservation() const { return tag == Either::kObservation; }
-  Action GetAction() const {
-    SPIEL_CHECK_TRUE(tag == Either::kAction);
-    return action;
-  }
-  const std::string& GetObservation() const {
-    SPIEL_CHECK_TRUE(tag == Either::kObservation);
-    return observation;
-  }
-  std::string ToString() const;
-  bool operator==(const ActionOrObs& other) const;
-};
 
 // Action-Observation histories partition the game tree in the same way
 // as information states, but they contain more structured information.
@@ -73,22 +43,21 @@ class ActionOrObs {
 //
 // However in OpenSpiel the player is not always acting, as in sequential games,
 // but we'd like to support those as well. So we make a compromise to just have
-// AOH as a vector of action OR observation, and we make sure that:
-//
-// 1) The first element is an observation.
-// 2) We don't have two consecutive actions (there should be an observation
-//    between them).
+// AOH as a vector of *optional* action and observation.
 class ActionObservationHistory {
  private:
-  std::vector<ActionOrObs> history_;
+  // Player to which this Action-Observation history belongs.
   const Player player_;
+
+  // Actual Action-Observation history.
+  std::vector<std::pair<std::optional<Action>, std::string>> history_;
 
  public:
   // Constructs an Action-Observation history for a given player at the target
-  // state. This method can be called only if the game provides
-  // ObservationString().
+  // state. This method can be called only if the game provides an
+  // implementation of ObservationString().
   //
-  // Note that this method makes a traversal of the state's history
+  // Note that this constructor makes a traversal of the state's history
   // to collect player's observations and this can be expensive.
   ActionObservationHistory(Player player, const State& target);
 
@@ -96,44 +65,81 @@ class ActionObservationHistory {
   // at the target state.
   ActionObservationHistory(const State& target);
 
-  // Constructs an Action-Observation history "manually".
+  // Constructs an Action-Observation history "manually" from history vector.
   ActionObservationHistory(
-      Player player, std::vector<ActionOrObs> history);
+      Player player,
+      std::vector<std::pair<std::optional<Action>, std::string>> history);
 
   ActionObservationHistory(const ActionObservationHistory&) = default;
   ~ActionObservationHistory() = default;
 
-  const std::vector<ActionOrObs>& History() const { return history_; }
+  const std::vector<std::pair<std::optional<Action>, std::string>>& History()
+      const { return history_; }
   Player GetPlayer() const { return player_; }
 
-  // Is the current history prefix of the other one?
-  // Empty AO History is a prefix of all AO histories.
-  bool IsPrefix(const ActionObservationHistory& other) const;
+  // Gets the current move number (time on the clock) - this allows to relate
+  // the "depth"of Action-Observation history to the "depth" of State,
+  // as it should correspond to the State::MoveNumber().
+  int MoveNumber() const;
 
-  // Does the Action-Observation history correspond to the initial state
-  // (root node)?
-  bool IsRoot() const {
-    // We receive observations also in the initial state!
-    return history_.size() == 1;
-  }
+  // Returns the player's observation (i.e. public+private observation)
+  // at the given time. Root node has time 0.
+  const std::string& ObservationAt(int time) const;
+
+  // Returns the action at the given time.
+  // If player was not acting at requested time, returns a nullopt.
+  std::optional<Action> ActionAt(int time) const;
+
+  // Does the Action-Observation history correspond to the initial state?
+  bool CorrespondsToInitialState() const { return MoveNumber() == 0; }
+
+  // Does the Action-Observation history correspond to the other
+  // Action-Observation history? This is just like an equality operator.
+  bool CorrespondsTo(const ActionObservationHistory& other) const;
+
+  // Does the Action-Observation history correspond to the requested state?
+  //
+  // In other words, if we constructed Action-Observation history for the state,
+  // would that correspond to this Action-Observation history?
+  //
+  // As in the following:
+  //
+  //   CorrespondsTo(pl, state) == CorrespondsTo(
+  //      ActionObservationHistory(pl, state))
+  //
+  // This method is provided so that you do not need to construct
+  // Action-Observation History explicitly and is more efficient.
+  // There can be state1 != state2 but AOH(state1) == AOH(state2).
+  bool CorrespondsTo(Player pl, const State& state) const;
+
+  // Is the current Action-Observation history prefix (or equal) of the other?
+  bool IsPrefixOf(const ActionObservationHistory& other) const;
+
+  // Is the current Action-Observation history prefix (or equal) of the
+  // Action-Observation history that we could construct from the State?
+  bool IsPrefixOf(Player pl, const State& state) const;
+
+  // Is the current Action-Observation history extension (or equal)
+  // of the other one?
+  bool IsExtensionOf(const ActionObservationHistory& other) const;
+
+  // Is the current Action-Observation history extension (or equal)
+  // of the Action-Observation history that we could construct from the State?
+  bool IsExtensionOf(Player pl, const State& state) const;
 
   std::string ToString() const;
 
   bool operator==(const ActionObservationHistory& other) const {
-    return player_ == other.player_ && history_ == other.history_;
+    return CorrespondsTo(other);
   }
 
-  // A number of helper methods for extending AO history.
  private:
-  void push_back(const ActionOrObs& aoo);
-  void push_back(const Action& action) { push_back(ActionOrObs(action)); }
-  void push_back(const std::string& observation) {
-    push_back(ActionOrObs(observation));
-  }
+  bool CheckStateCorrespondenceInSimulation(Player pl, const State& state,
+                                            int until_time) const;
 };
 
-// Public-observation histories partition the game tree according to public
-// available information into a corresponding public tree. Public observation
+// Public-observation histories partition the game tree according to available
+// public information into a corresponding public tree. Public observation
 // history identifies the current public state (a node in the public tree),
 // and is useful for integration with public state API -- you can construct
 // a PublicState by using the public observation history.
@@ -147,13 +153,14 @@ class PublicObservationHistory {
  public:
   // Construct a history of public observations.
   // This method can be called only if the game provides factored observations
-  // strings.
+  // strings, mainly State::PublicObservationString() -- private observations
+  // are not used.
   //
-  // Note that this method makes a traversal of the current game trajectory
-  // to collect public observations and this can be expensive.
+  // Note that this constructor makes a traversal of the state's history
+  // to collect public  observations and this can be expensive.
   PublicObservationHistory(const State& target);
 
-  // Construct Public-observation history "manually".
+  // Constructs Public-Observation history "manually".
   PublicObservationHistory(std::vector<std::string> history);
 
   PublicObservationHistory(const PublicObservationHistory&) = default;
@@ -161,40 +168,63 @@ class PublicObservationHistory {
 
   const std::vector<std::string>& History() const { return history_; }
 
-  // Is the current history prefix of the other one?
-  // Empty PO history is a prefix of all PO histories.
-  bool IsPrefix(const PublicObservationHistory& other) const;
+  // Gets the current move number (time on the clock) - this allows to relate
+  // the "depth"of Public-Observation history to the "depth" of State,
+  // as it should correspond to the State::MoveNumber().
+  int MoveNumber() const;
 
-  // Does the Public-observation history correspond to the initial state
-  // (root node)?
-  bool IsRoot() const {
-    SPIEL_CHECK_EQ(history_.at(0), kStartOfGamePublicObservation);
-    return history_.size() == 1;
-  }
+  // Returns the public observation at the given time. Root node has time 0.
+  const std::string& ObservationAt(int time) const;
+
+  // Does the Public-Observation history correspond to the initial state?
+  bool CorrespondsToInitialState() const { return MoveNumber() == 0; }
+
+  // Does the Public-Observation history correspond to the other
+  // Public-Observation history? This is just like an equality operator.
+  bool CorrespondsTo(const PublicObservationHistory& other) const;
+
+  // Does the Public-Observation history correspond to the requested state?
+  //
+  // In other words, if we constructed Public-Observation history for the state,
+  // would that correspond to this Public-Observation history?
+  // As in the following:
+  //
+  //   CorrespondsTo(state) == CorrespondsTo(PublicObservationHistory(state))
+  //
+  // This method is provided so that you do not need to construct
+  // Public-Observation history explicitly and is more efficient.
+  // This is like an equality operator.
+  bool CorrespondsTo(const State& state) const;
+
+  // Is the current Public-Observation history prefix (or equal) of the other?
+  bool IsPrefixOf(const PublicObservationHistory& other) const;
+
+  // Is the current Public-Observation history prefix (or equal) of the
+  // Public-Observation history that we could construct from the State?
+  bool IsPrefixOf(const State& state) const;
+
+  // Is the current Public-Observation history extension (or equal)
+  // of the other one?
+  bool IsExtensionOf(const PublicObservationHistory& other) const;
+
+  // Is the current Public-Observation history extension (or equal)
+  // of the Public-Observation history that we could construct from the State?
+  bool IsExtensionOf(const State& state) const;
 
   std::string ToString() const;
 
   bool operator==(const PublicObservationHistory& other) const {
-    return history_ == other.history_;
-  }
-
-  bool operator==(const std::vector<std::string>& other) const {
-    return history_ == other;
+    return CorrespondsTo(other);
   }
 
  private:
-  // A number of helper methods for extending the history.
-  void reserve(size_t n) {  }
-  void push_back(const std::string& observation) {
-    SPIEL_CHECK_TRUE(!history_.empty() ||
-                     observation == kStartOfGamePublicObservation);
-    SPIEL_CHECK_NE(observation, kInvalidPublicObservation);
-    history_.push_back(observation);
-  }
+  std::shared_ptr<Observer> observer_;
+
+  void push_back(const std::string& observation);
+  bool CheckStateCorrespondenceInSimulation(const State& state,
+                                            int until_time) const;
 };
 
-
-std::ostream& operator<<(std::ostream& os, const ActionOrObs& aoo);
 std::ostream& operator<<(std::ostream& os, const ActionObservationHistory& aoh);
 std::ostream& operator<<(std::ostream& os, const PublicObservationHistory& poh);
 
