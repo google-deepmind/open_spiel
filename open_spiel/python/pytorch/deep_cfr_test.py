@@ -60,9 +60,9 @@ class DeepCFRPyTorchTest(parameterized.TestCase):
     deep_cfr_solver.solve()
     conv = pyspiel.nash_conv(
         game,
-        policy.tabular_policy_from_callable(game, 
-          policy.python_policy_to_pyspiel_policy(
-            deep_cfr_solver.action_probabilities)))
+        policy.python_policy_to_pyspiel_policy(
+          policy.tabular_policy_from_callable(
+            game, deep_cfr_solver.action_probabilities)))
     logging.info('Deep CFR in Matching Pennies 3p. NashConv: {}'.format(conv))
 
 
