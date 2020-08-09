@@ -79,6 +79,9 @@ class DeterministicTabularPolicy : public Policy {
   ActionsAndProbs GetStatePolicy(const std::string& info_state) const override;
   Action GetAction(const std::string& info_state) const;
 
+  // Returns the current deterministic policy as a TabularPolicy.
+  TabularPolicy GetTabularPolicy() const;
+
   // Determinstic policies are ordered. First, we define some order to the
   // information states (which is the order defined by the legal_actions_map
   // for the game). Then the total order over policies is defined in a

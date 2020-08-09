@@ -20,15 +20,16 @@ https://console.cloud.google.com/storage/browser/openspiel-data/bridge
 """
 
 import os
+import pickle
 from typing import Any, Tuple
 
 from absl import app
 from absl import flags
 
+import haiku as hk
 import jax
 from jax import numpy as jnp
 from jax.experimental import optix
-from jax.experimental import stax
 import numpy as np
 
 import pyspiel
@@ -51,7 +52,8 @@ flags.DEFINE_integer('num_examples', 3,
                      'How many examples to print per evaluation')
 flags.DEFINE_integer('train_batch', 128, 'Batch size for training step')
 flags.DEFINE_integer('eval_batch', 10000, 'Batch size when evaluating')
-flags.DEFINE_integer('rng_seed', 42, 'Batch size when evaluating')
+flags.DEFINE_integer('rng_seed', 42, 'Seed for initial network weights')
+flags.DEFINE_string('save_path', None, 'Location for saved networks')
 
 
 def _no_play_trajectory(line: str):
@@ -96,24 +98,32 @@ def one_hot(x, k):
   return jnp.array(x[..., jnp.newaxis] == jnp.arange(k), dtype=np.float32)
 
 
+def net_fn(x):
+  """Haiku module for our network."""
+  net = hk.Sequential([
+      hk.Linear(1024),
+      jax.nn.relu,
+      hk.Linear(1024),
+      jax.nn.relu,
+      hk.Linear(1024),
+      jax.nn.relu,
+      hk.Linear(1024),
+      jax.nn.relu,
+      hk.Linear(NUM_ACTIONS),
+      jax.nn.log_softmax,
+  ])
+  return net(x)
+
+
 def main(argv):
   if len(argv) > 1:
     raise app.UsageError('Too many command-line arguments.')
 
   # Make the network.
-  net_init, net_apply = stax.serial(
-      stax.Dense(256),
-      stax.Relu,
-      stax.Dense(256),
-      stax.Relu,
-      stax.Dense(256),
-      stax.Relu,
-      stax.Dense(NUM_ACTIONS),
-      stax.LogSoftmax,
-  )
+  net = hk.without_apply_rng(hk.transform(net_fn, apply_rng=True))
 
   # Make the optimiser.
-  opt_init, opt_update = optix.adam(1e-4)
+  opt = optix.adam(1e-4)
 
   @jax.jit
   def loss(
@@ -123,7 +133,7 @@ def main(argv):
   ) -> jnp.DeviceArray:
     """Cross-entropy loss."""
     assert targets.dtype == np.int32
-    log_probs = net_apply(params, inputs)
+    log_probs = net.apply(params, inputs)
     return -jnp.mean(one_hot(targets, NUM_ACTIONS) * log_probs)
 
   @jax.jit
@@ -133,7 +143,7 @@ def main(argv):
       targets: np.ndarray,
   ) -> jnp.DeviceArray:
     """Classification accuracy."""
-    predictions = net_apply(params, inputs)
+    predictions = net.apply(params, inputs)
     return jnp.mean(jnp.argmax(predictions, axis=-1) == targets)
 
   @jax.jit
@@ -145,7 +155,7 @@ def main(argv):
   ) -> Tuple[Params, OptState]:
     """Learning rule (stochastic gradient descent)."""
     _, gradient = jax.value_and_grad(loss)(params, inputs, targets)
-    updates, opt_state = opt_update(gradient, opt_state)
+    updates, opt_state = opt.update(gradient, opt_state)
     new_params = optix.apply_updates(params, updates)
     return new_params, opt_state
 
@@ -163,7 +173,7 @@ def main(argv):
       for action in actions:
         if not state.is_chance_node():
           observation = np.array(state.observation_tensor(), np.float32)
-          policy = np.exp(net_apply(params, observation))
+          policy = np.exp(net.apply(params, observation))
           probs_actions = [(p, a + MIN_ACTION) for a, p in enumerate(policy)]
           pred = max(probs_actions)[1]
           if pred != action:
@@ -191,9 +201,9 @@ def main(argv):
 
   # Initialize network and optimiser.
   rng = jax.random.PRNGKey(FLAGS.rng_seed)  # seed used for network weights
-  in_shape = tuple([-1] + GAME.observation_tensor_shape())
-  unused_out_shape, params = net_init(rng, in_shape)
-  opt_state = opt_init(params)
+  inputs, unused_targets = next(train)
+  params = net.init(rng, inputs)
+  opt_state = opt.init(params)
 
   # Train/eval loop.
   for step in range(FLAGS.iterations):
@@ -206,6 +216,10 @@ def main(argv):
       inputs, targets = next(test)
       test_accuracy = accuracy(params, inputs, targets)
       print(f'After {1+step} steps, test accuracy: {test_accuracy}.')
+      if FLAGS.save_path:
+        filename = os.path.join(FLAGS.save_path, f'params-{1 + step}.pkl')
+        with open(filename, 'wb') as pkl_file:
+          pickle.dump(params, pkl_file)
       output_samples(params, FLAGS.num_examples)
 
 

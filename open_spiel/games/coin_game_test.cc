@@ -22,7 +22,6 @@ namespace coin_game {
 
 void BasicCoinGameTests() {
   testing::LoadGameTest("coin_game");
-  testing::NoChanceOutcomesTest(*LoadGame("coin_game"));
   testing::RandomSimTest(*LoadGame("coin_game"), 10);
   testing::RandomSimTest(
       *LoadGame("coin_game",

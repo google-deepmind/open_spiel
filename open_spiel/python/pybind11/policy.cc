@@ -21,8 +21,10 @@
 #include "open_spiel/algorithms/cfr_br.h"
 #include "open_spiel/algorithms/deterministic_policy.h"
 #include "open_spiel/algorithms/expected_returns.h"
+#include "open_spiel/algorithms/external_sampling_mccfr.h"
 #include "open_spiel/algorithms/is_mcts.h"
 #include "open_spiel/algorithms/mcts.h"
+#include "open_spiel/algorithms/outcome_sampling_mccfr.h"
 #include "open_spiel/algorithms/tabular_exploitability.h"
 #include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"
@@ -61,7 +63,8 @@ void init_pyspiel_policy(py::module& m) {
       .def("set_policy",
            py::overload_cast<const Policy*>(&TabularBestResponse::SetPolicy));
 
-  py::class_<open_spiel::Policy>(m, "Policy")
+  py::class_<open_spiel::Policy, std::shared_ptr<open_spiel::Policy>>(m,
+                                                                      "Policy")
       .def("action_probabilities",
            (std::unordered_map<Action, double>(open_spiel::Policy::*)(
                const open_spiel::State&) const) &
@@ -80,14 +83,18 @@ void init_pyspiel_policy(py::module& m) {
   // [num_states, num_actions], while this is implemented as a map. It is
   // non-trivial to convert between the two, but we have a function that does so
   // in the open_spiel/python/policy.py file.
-  py::class_<open_spiel::TabularPolicy, open_spiel::Policy>(m, "TabularPolicy")
+  py::class_<open_spiel::TabularPolicy,
+             std::shared_ptr<open_spiel::TabularPolicy>, open_spiel::Policy>(
+      m, "TabularPolicy")
       .def(py::init<const std::unordered_map<std::string, ActionsAndProbs>&>())
       .def("get_state_policy", &open_spiel::TabularPolicy::GetStatePolicy)
       .def("policy_table",
            py::overload_cast<>(&open_spiel::TabularPolicy::PolicyTable));
 
   m.def("UniformRandomPolicy", &open_spiel::GetUniformPolicy);
-  py::class_<open_spiel::UniformPolicy, open_spiel::Policy>(m, "UniformPolicy")
+  py::class_<open_spiel::UniformPolicy,
+             std::shared_ptr<open_spiel::UniformPolicy>, open_spiel::Policy>(
+      m, "UniformPolicy")
       .def(py::init<>())
       .def("get_state_policy", &open_spiel::UniformPolicy::GetStatePolicy);
 
@@ -113,6 +120,33 @@ void init_pyspiel_policy(py::module& m) {
       .def("current_policy", &open_spiel::algorithms::CFRSolver::CurrentPolicy)
       .def("average_policy",
            &open_spiel::algorithms::CFRPlusSolver::AveragePolicy);
+
+  py::enum_<open_spiel::algorithms::AverageType>(m, "MCCFRAverageType")
+      .value("SIMPLE", open_spiel::algorithms::AverageType::kSimple)
+      .value("FULL", open_spiel::algorithms::AverageType::kFull);
+
+  py::class_<open_spiel::algorithms::ExternalSamplingMCCFRSolver>(
+      m, "ExternalSamplingMCCFRSolver")
+      .def(py::init<const Game&, int, open_spiel::algorithms::AverageType>(),
+           py::arg("game"), py::arg("seed") = 0,
+           py::arg("avg_type") = open_spiel::algorithms::AverageType::kSimple)
+      .def("run_iteration",
+           py::overload_cast<>(&open_spiel::algorithms::
+                                   ExternalSamplingMCCFRSolver::RunIteration))
+      .def("average_policy",
+           &open_spiel::algorithms::ExternalSamplingMCCFRSolver::AveragePolicy);
+
+  py::class_<open_spiel::algorithms::OutcomeSamplingMCCFRSolver>(
+      m, "OutcomeSamplingMCCFRSolver")
+      .def(py::init<const Game&, double, int>(), py::arg("game"),
+           py::arg("epsilon") = open_spiel::algorithms::
+               OutcomeSamplingMCCFRSolver::kDefaultEpsilon,
+           py::arg("seed") = -1)
+      .def("run_iteration",
+           py::overload_cast<>(&open_spiel::algorithms::
+                                   OutcomeSamplingMCCFRSolver::RunIteration))
+      .def("average_policy",
+           &open_spiel::algorithms::OutcomeSamplingMCCFRSolver::AveragePolicy);
 
   m.def("expected_returns",
         py::overload_cast<const State&, const std::vector<const Policy*>&, int,

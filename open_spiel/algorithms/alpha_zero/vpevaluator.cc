@@ -86,7 +86,7 @@ VPNetModel::InferenceOutputs VPNetEvaluator::Inference(const State& state) {
   if (!cache_.empty()) {
     key = absl::Hash<VPNetModel::InferenceInputs>{}(inputs);
     cache_shard = key % cache_.size();
-    std::optional<const VPNetModel::InferenceOutputs> opt_outputs =
+    absl::optional<const VPNetModel::InferenceOutputs> opt_outputs =
         cache_[cache_shard]->Get(key);
     if (opt_outputs) {
       return *opt_outputs;
@@ -119,7 +119,7 @@ void VPNetEvaluator::Runner() {
       absl::MutexLock lock(&inference_queue_m_);
       absl::Time deadline = absl::Now() + absl::InfiniteDuration();
       for (int i = 0; i < batch_size_; ++i) {
-        std::optional<QueueItem> item = queue_.Pop(deadline);
+        absl::optional<QueueItem> item = queue_.Pop(deadline);
         if (!item) {  // Hit the deadline.
           break;
         }

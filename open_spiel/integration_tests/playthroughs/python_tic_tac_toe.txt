@@ -11,6 +11,7 @@ GameType.provides_information_state_string = True
 GameType.provides_information_state_tensor = False
 GameType.provides_observation_string = True
 GameType.provides_observation_tensor = True
+GameType.provides_factored_observation_string = False
 GameType.reward_model = RewardModel.TERMINAL
 GameType.short_name = "python_tic_tac_toe"
 GameType.utility = Utility.ZERO_SUM
@@ -39,8 +40,6 @@ HistoryString() = "[]"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "[]"
-InformationStateString(1) = "[]"
 ObservationString(0) = "...\n...\n..."
 ObservationString(1) = "...\n...\n..."
 ObservationTensor(0):
@@ -69,8 +68,6 @@ HistoryString() = "[8]"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "[8]"
-InformationStateString(1) = "[8]"
 ObservationString(0) = "...\n...\n..x"
 ObservationString(1) = "...\n...\n..x"
 ObservationTensor(0):
@@ -99,8 +96,6 @@ HistoryString() = "[8, 3]"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "[8, 3]"
-InformationStateString(1) = "[8, 3]"
 ObservationString(0) = "...\no..\n..x"
 ObservationString(1) = "...\no..\n..x"
 ObservationTensor(0):
@@ -129,8 +124,6 @@ HistoryString() = "[8, 3, 6]"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "[8, 3, 6]"
-InformationStateString(1) = "[8, 3, 6]"
 ObservationString(0) = "...\no..\nx.x"
 ObservationString(1) = "...\no..\nx.x"
 ObservationTensor(0):
@@ -159,8 +152,6 @@ HistoryString() = "[8, 3, 6, 0]"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "[8, 3, 6, 0]"
-InformationStateString(1) = "[8, 3, 6, 0]"
 ObservationString(0) = "o..\no..\nx.x"
 ObservationString(1) = "o..\no..\nx.x"
 ObservationTensor(0):
@@ -189,8 +180,6 @@ HistoryString() = "[8, 3, 6, 0, 2]"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "[8, 3, 6, 0, 2]"
-InformationStateString(1) = "[8, 3, 6, 0, 2]"
 ObservationString(0) = "o.x\no..\nx.x"
 ObservationString(1) = "o.x\no..\nx.x"
 ObservationTensor(0):
@@ -219,8 +208,6 @@ HistoryString() = "[8, 3, 6, 0, 2, 1]"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "[8, 3, 6, 0, 2, 1]"
-InformationStateString(1) = "[8, 3, 6, 0, 2, 1]"
 ObservationString(0) = "oox\no..\nx.x"
 ObservationString(1) = "oox\no..\nx.x"
 ObservationTensor(0):
@@ -249,8 +236,6 @@ HistoryString() = "[8, 3, 6, 0, 2, 1, 5]"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = PlayerId.TERMINAL
-InformationStateString(0) = "[8, 3, 6, 0, 2, 1, 5]"
-InformationStateString(1) = "[8, 3, 6, 0, 2, 1, 5]"
 ObservationString(0) = "oox\no.x\nx.x"
 ObservationString(1) = "oox\no.x\nx.x"
 ObservationTensor(0):

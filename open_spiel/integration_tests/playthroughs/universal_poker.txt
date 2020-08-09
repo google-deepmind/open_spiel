@@ -11,6 +11,7 @@ GameType.provides_information_state_string = True
 GameType.provides_information_state_tensor = True
 GameType.provides_observation_string = True
 GameType.provides_observation_tensor = True
+GameType.provides_factored_observation_string = False
 GameType.reward_model = RewardModel.TERMINAL
 GameType.short_name = "universal_poker"
 GameType.utility = Utility.ZERO_SUM
@@ -75,7 +76,7 @@ action: 12
 # Node type?: Chance node
 # PossibleActions (1): [ ACTION_DEAL ]
 # Round: 0
-# ACPC State: STATE:0::2c|2c
+# ACPC State: STATE:0::5c|2c
 # Spent: [P0: 100  P1: 100  ]
 #
 # Action Sequence: d
@@ -108,7 +109,7 @@ action: 13
 # Node type?: Player node for player 0
 # PossibleActions (3): [ ACTION_CHECK_CALL  ACTION_BET  ACTION_ALL_IN ]
 # Round: 0
-# ACPC State: STATE:0::2c|2c
+# ACPC State: STATE:0::5c|5d
 # Spent: [P0: 100  P1: 100  ]
 #
 # Action Sequence: dd
@@ -142,7 +143,7 @@ action: 1
 # Node type?: Player node for player 1
 # PossibleActions (3): [ ACTION_CHECK_CALL  ACTION_BET  ACTION_ALL_IN ]
 # Round: 0
-# ACPC State: STATE:0:c:2c|2c
+# ACPC State: STATE:0:c:5c|5d
 # Spent: [P0: 100  P1: 100  ]
 #
 # Action Sequence: ddc
@@ -176,7 +177,7 @@ action: 2
 # Node type?: Player node for player 0
 # PossibleActions (4): [ ACTION_FOLD  ACTION_CHECK_CALL  ACTION_BET  ACTION_ALL_IN ]
 # Round: 0
-# ACPC State: STATE:0:cr300:2c|2c
+# ACPC State: STATE:0:cr300:5c|5d
 # Spent: [P0: 100  P1: 300  ]
 #
 # Action Sequence: ddcp

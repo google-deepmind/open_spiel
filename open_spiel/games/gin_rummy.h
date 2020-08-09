@@ -41,6 +41,7 @@
 #include <utility>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/games/gin_rummy/gin_rummy_utils.h"
 #include "open_spiel/spiel.h"
 
@@ -83,7 +84,7 @@ class GinRummyState : public State {
   std::vector<double> Returns() const override;
   std::string ObservationString(Player player) const override;
   void ObservationTensor(Player player,
-                         std::vector<double>* values) const override;
+                         absl::Span<float> values) const override;
   std::unique_ptr<State> Clone() const override;
   std::vector<Action> LegalActions() const override;
   std::vector<std::pair<Action, double>> ChanceOutcomes() const override;
@@ -140,8 +141,8 @@ class GinRummyState : public State {
   Player cur_player_ = kChancePlayerId;
   Player prev_player_ = kChancePlayerId;
   bool finished_layoffs_ = false;
-  std::optional<int> upcard_;
-  std::optional<int> prev_upcard_;  // Used to track repeated moves.
+  absl::optional<int> upcard_;
+  absl::optional<int> prev_upcard_;  // Used to track repeated moves.
   int stock_size_ = kNumCards;      // Number of cards remaining in stock.
   // True if the prev player drew the upcard only to immediately discard it.
   // If both players do this in succession the game is declared a draw.

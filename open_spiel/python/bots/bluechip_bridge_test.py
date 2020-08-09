@@ -152,7 +152,7 @@ class BluechipBridgeWrapperTest(absltest.TestCase):
                 'EAST plays qs',
             ]
         })
-    bot = bluechip_bridge.BlueChipBridgeBot(game, 1, mock_client)
+    bot = bluechip_bridge.BlueChipBridgeBot(game, 1, lambda: mock_client)
     state = game.new_initial_state()
     history = [
         33, 25, 3, 44, 47, 28, 23, 46, 1, 43, 30, 26, 29, 48, 24, 42, 13, 21,
@@ -174,7 +174,6 @@ class BluechipBridgeWrapperTest(absltest.TestCase):
     # Check the session went as expected; send_line calls are us sending
     # data to the (mock) external bot.
     mock_client.assert_has_calls([
-        absltest.mock.call.start(),
         absltest.mock.call.read_line(),
         absltest.mock.call.send_line('EAST ("WBridge5") seated'),
         absltest.mock.call.read_line(),

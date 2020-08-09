@@ -15,31 +15,31 @@
 # Lint as: python3
 """Tests for open_spiel.integration_tests.api."""
 
-import random
 import unittest
 
 from absl.testing import absltest
 from absl.testing import parameterized
-
 import numpy as np
 
 from open_spiel.python.algorithms import get_all_states
+from open_spiel.python.algorithms import sample_some_states
+from open_spiel.python.observation import make_observation
 import pyspiel
 
 _ALL_GAMES = pyspiel.registered_games()
 
-_GAMES_TO_TEST = [g.short_name for g in _ALL_GAMES if g.default_loadable]
+_GAMES_TO_TEST = set([g.short_name for g in _ALL_GAMES if g.default_loadable])
 
 _GAMES_NOT_UNDER_TEST = [
     g.short_name for g in _ALL_GAMES if not g.default_loadable
 ]
 
+_GAMES_TO_OMIT_LEGAL_ACTIONS_CHECK = set(["bridge_uncontested_bidding"])
+
 # The list of game instances to test on the full tree as tuples
 # (name to display, string to pass to load_game).
 _GAMES_FULL_TREE_TRAVERSAL_TESTS = [
-    ("catch", "catch(rows=6,columns=3)"),
     ("cliff_walking", "cliff_walking(horizon=7)"),
-    ("deep_sea", "deep_sea(size=3)"),
     ("kuhn_poker", "kuhn_poker"),
     ("leduc_poker", "leduc_poker"),
     ("iigoofspiel4", "turn_based_simultaneous_game(game=goofspiel("
@@ -56,11 +56,13 @@ _GAMES_FULL_TREE_TRAVERSAL_TESTS = [
     # ("tiny_bridge_2p", "tiny_bridge_2p"),
 ]
 
+_GAMES_FULL_TREE_TRAVERSAL_TESTS_NAMES = [
+    g[1] for g in _GAMES_FULL_TREE_TRAVERSAL_TESTS
+]
+
 TOTAL_NUM_STATES = {
     # This maps the game name to (chance, playable, terminal)
-    "catch": (1, 363, 729),
     "cliff_walking": (0, 2119, 6358),
-    "deep_sea": (0, 7, 8),
     "kuhn_poker": (4, 24, 30),
     "leduc_poker": (157, 3780, 5520),
     "liars_dice": (7, 147456, 147420),
@@ -75,9 +77,7 @@ TOTAL_NUM_STATES = {
 # This is kept to ensure non-regression, but we would like to remove that
 # when we can interpret what are these numbers.
 PERFECT_RECALL_NUM_STATES = {
-    "catch": 363,
     "cliff_walking": 2119,
-    "deep_sea": 7,
     "kuhn_poker": 12,
     "leduc_poker": 936,
     "liars_dice": 24576,
@@ -88,6 +88,10 @@ PERFECT_RECALL_NUM_STATES = {
     "tiny_hanabi": 8,
     "nf_auction": 2,
 }
+
+# Some tests run for a fixed time budget.
+# This specified approximately how many seconds they should run.
+TIMEABLE_TEST_RUNTIME = 1
 
 
 class EnforceAPIOnFullTreeBase(parameterized.TestCase):
@@ -251,121 +255,80 @@ class EnforceAPIOnFullTreeBase(parameterized.TestCase):
       self.assertLen(union, sum([len(x) for x in information_sets_per_player]))
 
 
-# Assembles all states seen in a specified number of game playthroughs.
-def _get_some_states(game, num_plays=10, include_terminals=True):
-  states = dict()
-  for _ in range(num_plays):
-    state = game.new_initial_state()
-    while not state.is_terminal():
-      states[state.history_str()] = state.clone()
-      state.apply_action(random.choice(state.legal_actions()))
-    if include_terminals:
-      states[state.history_str()] = state
-  return states
-
-
-class PartialEnforceAPIConventionsTest(parameterized.TestCase):
+class EnforceAPIOnPartialTreeBase(parameterized.TestCase):
   """This only partially test some properties."""
 
-  def _assert_observations_raises_error_on_invalid_player(self, game, state):
-    game_type = game.get_type()
-    game_name = game_type.short_name
+  @classmethod
+  def setUpClass(cls):
+    super(EnforceAPIOnPartialTreeBase, cls).setUpClass()
+
+    cls.some_states = set(
+        sample_some_states.sample_some_states(
+            cls.game,
+            max_states=-1,  # Limit only by time.
+            time_limit=TIMEABLE_TEST_RUNTIME,
+            depth_limit=7).values())
+    cls.game_type = cls.game.get_type()
+
+  def test_observations_raises_error_on_invalid_player(self):
+    game = self.game
+    game_type = self.game_type
+    game_name = self.game_name
     num_players = game.num_players()
 
-    if game_type.provides_information_state_string:
-      for p in range(num_players):
-        state.information_state_string(p)
-      msg = f"information_state_string did not raise an error for {game_name}"
-      with self.assertRaisesRegex(RuntimeError, "player >= 0", mgs=msg):
-        state.information_state_string(-1)
-      with self.assertRaisesRegex(RuntimeError, "player <", mgs=msg):
-        state.information_state_string(num_players + 1)
+    for state in self.some_states:
+      if game_type.provides_information_state_string:
+        for p in range(num_players):
+          state.information_state_string(p)
+        msg = f"information_state_string did not raise an error for {game_name}"
+        with self.assertRaisesRegex(RuntimeError, "player >= 0", msg=msg):
+          state.information_state_string(-1)
+        with self.assertRaisesRegex(RuntimeError, "player <", msg=msg):
+          state.information_state_string(num_players + 1)
 
-    if game_type.provides_information_state_tensor:
-      for p in range(num_players):
-        v = state.information_state_tensor(p)
-        self.assertLen(v, game.information_state_tensor_size())
-      msg = f"information_state_tensor did not raise an error for {game_name}"
-      with self.assertRaisesRegex(RuntimeError, "player >= 0", mgs=msg):
-        state.information_state_tensor(-1)
-      with self.assertRaisesRegex(RuntimeError, "player <", mgs=msg):
-        state.information_state_tensor(num_players + 1)
+      if game_type.provides_information_state_tensor:
+        for p in range(num_players):
+          v = state.information_state_tensor(p)
+          self.assertLen(v, game.information_state_tensor_size())
+        msg = f"information_state_tensor did not raise an error for {game_name}"
+        with self.assertRaisesRegex(RuntimeError, "player >= 0", msg=msg):
+          state.information_state_tensor(-1)
+        with self.assertRaisesRegex(RuntimeError, "player <", msg=msg):
+          state.information_state_tensor(num_players + 1)
 
-    if game_type.provides_observation_tensor:
-      for p in range(num_players):
-        v = state.observation_tensor(p)
-        self.assertLen(v, game.observation_tensor_size())
-      msg = f"observation_tensor did not raise an error for {game_name}"
-      with self.assertRaisesRegex(RuntimeError, "player >= 0", msg=msg):
-        state.observation_tensor(-1)
-      with self.assertRaisesRegex(RuntimeError, "player <", msg=msg):
-        state.observation_tensor(num_players + 1)
+      if game_type.provides_observation_tensor:
+        for p in range(num_players):
+          v = state.observation_tensor(p)
+          self.assertLen(v, game.observation_tensor_size())
+        msg = f"observation_tensor did not raise an error for {game_name}"
+        with self.assertRaisesRegex(RuntimeError, "player >= 0", msg=msg):
+          state.observation_tensor(-1)
+        with self.assertRaisesRegex(RuntimeError, "player <", msg=msg):
+          state.observation_tensor(num_players + 1)
 
-    if game_type.provides_observation_string:
-      for p in range(num_players):
-        state.observation_string(p)
-      msg = f"observation_string did not raise an error for {game_name}"
-      with self.assertRaisesRegex(RuntimeError, "player >= 0", msg=msg):
-        state.observation_string(-1)
-      with self.assertRaisesRegex(RuntimeError, "player <", msg=msg):
-        state.observation_string(num_players + 1)
+      if game_type.provides_observation_string:
+        for p in range(num_players):
+          state.observation_string(p)
+        msg = f"observation_string did not raise an error for {game_name}"
+        with self.assertRaisesRegex(RuntimeError, "player >= 0", msg=msg):
+          state.observation_string(-1)
+        with self.assertRaisesRegex(RuntimeError, "player <", msg=msg):
+          state.observation_string(num_players + 1)
 
-  @parameterized.parameters(_GAMES_TO_TEST)
-  def test_observations_raises_error_on_invalid_player(self, game_name):
-    print(f"Testing observations for {game_name}")
-    game = pyspiel.load_game(game_name)
-    state = game.new_initial_state()
+  def test_legal_actions_returns_empty_list_on_opponent(self):
+    if self.game_name in _GAMES_TO_OMIT_LEGAL_ACTIONS_CHECK:
+      return
 
-    # Some games cannot be finished by always taking the first legal actions.
-    give_up_after = float("inf")
-    if game.get_type().short_name in ["backgammon", "laser_tag"]:
-      give_up_after = 100
-
-    while not state.is_terminal():
-      if len(state.history()) > give_up_after:
-        break
-
-      if not state.is_chance_node():
-        self._assert_observations_raises_error_on_invalid_player(game, state)
-
-      if state.is_chance_node():
-        for action, prob in state.chance_outcomes():
-          if prob != 0:
-            state.apply_action(action)
-            break
-      elif state.is_simultaneous_node():
-        # Simultaneous node: sample actions for all players.
-        chosen_actions = [
-            state.legal_actions(pid)[0] for pid in range(game.num_players())
-        ]
-        state.apply_actions(chosen_actions)
-      else:
-        # Decision node: sample action for the single current player
-        action = random.choice(state.legal_actions(state.current_player()))
-        state.action_to_string(state.current_player(), action)
-        state.apply_action(action)
-
-    self._assert_observations_raises_error_on_invalid_player(game, state)
-
-  @parameterized.parameters(_GAMES_TO_TEST)
-  def test_legal_actions_returns_empty_list_on_opponent(self, game_name):
-    game = pyspiel.load_game(game_name)
-
-    some_states = _get_some_states(game)
-    # We check we have some non-terminal non-random states
-    self.assertTrue(
-        any(not s.is_terminal() and not s.is_chance_node()
-            for s in some_states.values()))
-
-    for state in some_states.values():
+    for state in self.some_states:
       if state.is_terminal():
         # Empty on terminal
         msg = ("The game %s does not return an empty list on "
-               "legal_actions() for state %s" % (game, state))
+               "legal_actions() for state %s" % (self.game_name, state))
         self.assertEmpty(state.legal_actions(), msg=msg)
-        for player in range(game.num_players()):
+        for player in range(self.game.num_players()):
           msg = ("The game %s does not return an empty list on "
-                 "legal_actions(%i) for state %s" % (game, player, state))
+                 "legal_actions(%i) for state %s" %
+                 (self.game_name, player, state))
           self.assertEmpty(state.legal_actions(player), msg=msg)
       elif state.is_simultaneous_node():
         # No requirement for legal_actions to be empty, since all players act.
@@ -376,12 +339,55 @@ class PartialEnforceAPIConventionsTest(parameterized.TestCase):
       else:
         # Empty for players other than the current player
         current_player = state.current_player()
-        for player in range(game.num_players()):
+        for player in range(self.game.num_players()):
           if player != current_player:
             msg = ("The game {!r} does not return an empty list on "
                    "legal_actions(<not current player>) in state {}".format(
-                       game, state))
+                       self.game_name, state))
             self.assertEmpty(state.legal_actions(player), msg=msg)
+
+  def test_private_information_contents(self):
+    try:
+      private_observation = make_observation(
+          self.game,
+          pyspiel.IIGObservationType(
+              public_info=False,
+              perfect_recall=False,
+              private_info=pyspiel.PrivateInfoType.SINGLE_PLAYER))
+    except (RuntimeError, ValueError):
+      return
+
+    player_has_private_info = [False] * self.game.num_players()
+
+    for state in self.some_states:
+      for i in range(self.game.num_players()):
+        if private_observation.string_from(state, i) != \
+            pyspiel.PrivateObservation.NOTHING:
+          player_has_private_info[i] = True
+
+    if self.game_type.information == \
+        pyspiel.GameType.Information.IMPERFECT_INFORMATION:
+      self.assertTrue(any(player_has_private_info))
+    if self.game_type.information == \
+        pyspiel.GameType.Information.PERFECT_INFORMATION:
+      none_of = lambda x: not any(x)
+      self.assertTrue(none_of(player_has_private_info))
+
+  def test_no_invalid_public_observations(self):
+    try:
+      public_observation = make_observation(
+          self.game,
+          pyspiel.IIGObservationType(
+              public_info=True,
+              perfect_recall=False,
+              private_info=pyspiel.PrivateInfoType.NONE))
+    except (ValueError, RuntimeError):
+      return
+
+    for state in self.some_states:
+      self.assertNotEqual(
+          public_observation.string_from(state, 0),
+          pyspiel.PublicObservation.INVALID)
 
 
 def _assert_properties_recursive(state, assert_functions):
@@ -496,10 +502,12 @@ def _assert_is_perfect_recall_recursive(state, current_history,
                                  "|".join([str(sa) for sa in current_history])))
 
       # Check for `information_state`
-      expected_infosets_history = [
-          (s.information_state_string(current_player), a)
-          for s, a in previous_history
-          if s.current_player() == current_player]  # pylint: disable=g-complex-comprehension
+      # pylint: disable=g-complex-comprehension
+      expected_infosets_history = [(s.information_state_string(current_player),
+                                    a)
+                                   for s, a in previous_history
+                                   if s.current_player() == current_player]
+      # pylint: disable=g-complex-comprehension
       infosets_history = [(s.information_state_string(current_player), a)
                           for s, a in current_history
                           if s.current_player() == current_player]
@@ -567,6 +575,14 @@ def _create_test_case_classes():
     new_class.game = game
     yield new_class
 
+  for game_name in _GAMES_TO_TEST:
+    game = pyspiel.load_game(game_name)
+    new_class = type("EnforceAPIPartialTree_{}_Test".format(game_name),
+                     (EnforceAPIOnPartialTreeBase,), {})
+    new_class.game_name = game_name
+    new_class.game = game
+    yield new_class
+
 
 def load_tests(loader, tests, pattern):  # pylint: disable=invalid-name,g-doc-args
   """Returns Dynamically created TestSuite.
@@ -578,8 +594,7 @@ def load_tests(loader, tests, pattern):  # pylint: disable=invalid-name,g-doc-ar
   del pattern
   tests = tuple(
       loader.loadTestsFromTestCase(test_case_class)
-      for test_case_class in list(_create_test_case_classes()) +
-      [PartialEnforceAPIConventionsTest])
+      for test_case_class in _create_test_case_classes())
   return unittest.TestSuite(tests=tests)
 
 

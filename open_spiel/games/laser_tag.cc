@@ -234,7 +234,7 @@ bool LaserTagState::ResolveMove(int player, int move) {
     player_facing_[player] = rightMapping.find(current_orientation)->second;
     return false;
   } else if (move == kForwardMove || move == kBackwardMove ||
-             move == kStepLeft || move == kStepLeft || move == kForwardLeft ||
+             move == kStepLeft || move == kStepRight || move == kForwardLeft ||
              move == kForwardRight) {  // move left or right or forward or
                                        // backward if able
 
@@ -468,7 +468,7 @@ int LaserTagState::observation_plane(int r, int c) const {
 }
 
 void LaserTagState::ObservationTensor(int player,
-                                      std::vector<double>* values) const {
+                                      absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 

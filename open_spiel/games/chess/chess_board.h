@@ -18,12 +18,12 @@
 #include <array>
 #include <cstdint>
 #include <functional>
-#include <optional>
 #include <ostream>
 #include <string>
 #include <utility>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/games/chess/chess_common.h"
 #include "open_spiel/spiel_utils.h"
 
@@ -77,7 +77,7 @@ static inline constexpr std::array<float, 6> kPieceRepresentation = {
 
 // Tries to parse piece type from char ('K', 'Q', 'R', 'B', 'N', 'P').
 // Case-insensitive.
-std::optional<PieceType> PieceTypeFromChar(char c);
+absl::optional<PieceType> PieceTypeFromChar(char c);
 
 // Converts piece type to one character strings - "K", "Q", "R", "B", "N", "P".
 // p must be one of the enumerator values of PieceType.
@@ -104,12 +104,12 @@ inline std::ostream& operator<<(std::ostream& stream, const Piece& p) {
   return stream << p.ToString();
 }
 
-inline std::optional<int8_t> ParseRank(char c) {
+inline absl::optional<int8_t> ParseRank(char c) {
   if (c >= '1' && c <= '8') return c - '1';
   return std::nullopt;
 }
 
-inline std::optional<int8_t> ParseFile(char c) {
+inline absl::optional<int8_t> ParseFile(char c) {
   if (c >= 'a' && c <= 'h') return c - 'a';
   return std::nullopt;
 }
@@ -128,7 +128,7 @@ inline std::string FileToString(int8_t file) {
 inline constexpr std::array<Offset, 8> kKnightOffsets = {
     {{-2, -1}, {-2, 1}, {-1, -2}, {-1, 2}, {2, -1}, {2, 1}, {1, -2}, {1, 2}}};
 
-std::optional<Square> SquareFromString(const std::string& s);
+absl::optional<Square> SquareFromString(const std::string& s);
 
 // Forward declare ChessBoard here because it's needed in Move::ToSAN.
 template <uint32_t kBoardSize>
@@ -228,7 +228,7 @@ class ChessBoard {
  public:
   ChessBoard();
 
-  static std::optional<ChessBoard> BoardFromFEN(const std::string& fen);
+  static absl::optional<ChessBoard> BoardFromFEN(const std::string& fen);
 
   const Piece& at(Square sq) const { return board_[SquareToIndex_(sq)]; }
 
@@ -289,17 +289,17 @@ class ChessBoard {
 
   // Parses a move in standard algebraic notation or long algebraic notation (
   // see below).
-  std::optional<Move> ParseMove(const std::string& move) const;
+  absl::optional<Move> ParseMove(const std::string& move) const;
 
   // Parses a move in standard algebraic notation as defined by FIDE.
   // https://en.wikipedia.org/wiki/Algebraic_notation_(chess)
-  std::optional<Move> ParseSANMove(const std::string& move) const;
+  absl::optional<Move> ParseSANMove(const std::string& move) const;
 
   // Parses a move in long algebraic notation.
   // Long algebraic notation is not standardized and there are many variants,
   // but the one we care about is of the form "e2e4" and "f7f8q". This is the
   // form used by chess engine text protocols that are of interest to us.
-  std::optional<Move> ParseLANMove(const std::string& move) const;
+  absl::optional<Move> ParseLANMove(const std::string& move) const;
 
   void ApplyMove(const Move& move);
 

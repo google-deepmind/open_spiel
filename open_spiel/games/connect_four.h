@@ -74,9 +74,8 @@ class ConnectFourState : public State {
   std::string InformationStateString(Player player) const override;
   std::string ObservationString(Player player) const override;
   void ObservationTensor(Player player,
-                         std::vector<double>* values) const override;
+                         absl::Span<float> values) const override;
   std::unique_ptr<State> Clone() const override;
-  std::string Serialize() const override;
 
  protected:
   void DoApplyAction(Action move) override;
@@ -113,8 +112,6 @@ class ConnectFourGame : public Game {
     return {kCellStates, kRows, kCols};
   }
   int MaxGameLength() const override { return kNumCells; }
-  std::unique_ptr<State> DeserializeState(
-      const std::string& str) const override;
 };
 
 inline std::ostream& operator<<(std::ostream& stream, const CellState& state) {

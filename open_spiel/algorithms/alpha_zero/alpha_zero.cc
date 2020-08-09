@@ -49,7 +49,7 @@ namespace open_spiel::algorithms {
 
 struct Trajectory {
   struct State {
-    std::vector<double> observation;
+    std::vector<float> observation;
     open_spiel::Player current_player;
     std::vector<open_spiel::Action> legal_actions;
     open_spiel::Action action;
@@ -303,7 +303,7 @@ void learner(const open_spiel::Game& game,
     int num_states = 0;
     int num_trajectories = 0;
     while (!stop->StopRequested() && num_states < learn_rate) {
-      std::optional<Trajectory> trajectory = trajectory_queue->Pop();
+      absl::optional<Trajectory> trajectory = trajectory_queue->Pop();
       if (trajectory) {
         num_trajectories += 1;
         total_trajectories += 1;

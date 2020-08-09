@@ -255,6 +255,10 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod) {
               [](const open_spiel::GameType& gt) {
                 return gt.provides_observation_tensor;
               })
+      .method("provides_factored_observation_string",
+              [](const open_spiel::GameType& gt) {
+                return gt.provides_factored_observation_string;
+              })
       .method("parameter_specification", [](const open_spiel::GameType& gt) {
         return gt.parameter_specification;
       });
@@ -322,7 +326,7 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod) {
               })
       .method("information_state_as_normalized_vector",
               [](open_spiel::State& s, open_spiel::Player p,
-                 std::vector<double> data) {
+                 std::vector<float> data) {
                 return s.InformationStateTensor(p, &data);
               })
       .method("observation_string",
@@ -336,11 +340,6 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod) {
       .method("observation_tensor",
               [](open_spiel::State& s, open_spiel::Player p) {
                 return s.ObservationTensor(p);
-              })
-      .method("observation_tensor",
-              [](open_spiel::State& s, open_spiel::Player p,
-                 std::vector<double> data) {
-                return s.ObservationTensor(p, &data);
               })
       .method("clone", &open_spiel::State::Clone)
       .method("child", &open_spiel::State::Child)
@@ -357,7 +356,12 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod) {
 
   mod.add_type<open_spiel::Game>("Game")
       .method("num_distinct_actions", &open_spiel::Game::NumDistinctActions)
-      .method("new_initial_state", &open_spiel::Game::NewInitialState)
+      .method("new_initial_state",
+              [](open_spiel::Game& g) { return g.NewInitialState(); })
+      .method("new_initial_state_from_string",
+              [](open_spiel::Game& g, const std::string& s) {
+                return g.NewInitialState(s);
+              })
       .method("max_chance_outcomes", &open_spiel::Game::MaxChanceOutcomes)
       .method("get_parameters", &open_spiel::Game::GetParameters)
       .method("num_players", &open_spiel::Game::NumPlayers)

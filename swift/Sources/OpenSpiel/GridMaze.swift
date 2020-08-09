@@ -438,7 +438,7 @@ extension GridCell {
   public static var bounce: GridCell {
     return GridCell(
       oneWordDescription: "BOUNCE", reward: -1.0,  // Reward is irrelevant, you receive reward of cell you bounce back to
-      entryJumpProbabilities: [(prob: 1.0, js: .BounceBack)],
+      entryJumpProbabilities: [(js: .BounceBack, prob: 1.0)],
       isInitial: false, isTerminal: false, isGoal: false,
       canAttemptToBeEntered: true)
   }

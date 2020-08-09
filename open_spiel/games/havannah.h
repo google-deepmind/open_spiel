@@ -25,10 +25,10 @@
 #include "open_spiel/spiel.h"
 
 // https://en.wikipedia.org/wiki/Havannah
-// Does not implement pie rule to balance the game
 //
 // Parameters:
 //   "board_size"        int     radius of the board   (default = 8)
+//   "swap"              bool    Whether to allow the swap rule.
 //   "ansi_color_output" bool    Whether to color the output for a terminal.
 
 namespace open_spiel {
@@ -135,7 +135,7 @@ class HavannahState : public State {
 
  public:
   HavannahState(std::shared_ptr<const Game> game, int board_size,
-                bool ansi_color_output = false);
+                bool ansi_color_output = false, bool allow_swap = false);
 
   HavannahState(const HavannahState&) = default;
 
@@ -152,7 +152,7 @@ class HavannahState : public State {
   // A 3d tensor, 3 player-relative one-hot 2d planes. The layers are: the
   // specified player, the other player, and empty.
   void ObservationTensor(Player player,
-                         std::vector<double>* values) const override;
+                         absl::Span<float> values) const override;
   std::unique_ptr<State> Clone() const override;
   std::vector<Action> LegalActions() const override;
 
@@ -178,6 +178,8 @@ class HavannahState : public State {
   // Turn an action id into a `Move` with an x,y.
   Move ActionToMove(Action action_id) const;
 
+  bool AllowSwap() const;
+
  private:
   std::vector<Cell> board_;
   HavannahPlayer current_player_ = kPlayer1;
@@ -189,6 +191,7 @@ class HavannahState : public State {
   Move last_move_ = kMoveNone;
   const NeighborList& neighbors_;
   const bool ansi_color_output_;
+  const bool allow_swap_;
 };
 
 // Game object.
@@ -203,7 +206,8 @@ class HavannahGame : public Game {
   }
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(
-        new HavannahState(shared_from_this(), board_size_, ansi_color_output_));
+        new HavannahState(shared_from_this(), board_size_, ansi_color_output_,
+                          allow_swap_));
   }
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override { return -1; }
@@ -218,14 +222,15 @@ class HavannahGame : public Game {
   int MaxGameLength() const override {
     // The true number of playable cells on the board.
     // No stones are removed, and it is possible to draw by filling the board.
-    // Increase this by one if swap is ever implemented.
-    return Diameter() * Diameter() - board_size_ * (board_size_ - 1);
+    return Diameter() * Diameter() - board_size_ * (board_size_ - 1) +
+           allow_swap_;
   }
 
  private:
   int Diameter() const { return board_size_ * 2 - 1; }
   const int board_size_;
   const bool ansi_color_output_ = false;
+  const bool allow_swap_ = false;
 };
 
 }  // namespace havannah

@@ -15,9 +15,9 @@
 #ifndef OPEN_SPIEL_ALGORITHMS_CORR_DIST_H_
 #define OPEN_SPIEL_ALGORITHMS_CORR_DIST_H_
 
-#include <optional>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"
 
@@ -67,6 +67,9 @@ namespace algorithms {
 // Monte Carlo sampling of deterministic joint policies from the mixtures.
 using CorrelationDevice = std::vector<std::pair<double, TabularPolicy>>;
 
+// Return a string representation of the correlation device.
+std::string ToString(const CorrelationDevice& corr_dev);
+
 // A helper class for the normal-form functions.
 struct NormalFormJointPolicyWithProb {
   // Probability of this joint policy.
@@ -80,24 +83,15 @@ using NormalFormCorrelationDevice = std::vector<NormalFormJointPolicyWithProb>;
 
 // A configuration object for the metrics.
 struct CorrDistConfig {
-  // Are the underlying policies deterministic (pure)? If false, then a Monte
-  // Carlo approximation is done by sampling deterministic joint policies
-  // Only 'true' is currently supported.
+  // Are the underlying policies deterministic (pure)? Currently this is the
+  // only supported mode. To obtain the CorrDist metrics for distributions over
+  // mixed policies, see the helper functions in corr_dev_builder, with examples
+  // in corr_dev_builder_test.cc.
   bool deterministic = true;
-
-  // Should the distribution over mixed policies be converted to an equivalent
-  // one over determinstic policies before computing the metric?
-  // Only 'false' is currently supported.
-  bool convert_policy = false;
 
   // A tag used to delimit recommendation sequences from the normal part of the
   // information state string.
   std::string recommendation_delimiter = " R-*-=-*-R ";
-
-  // If determinstic is false, how many deterministic joint policies should be
-  // samples in order to assemble an approximate empirical joint distribution?
-  // Note: not yet implemented, but coming soon.
-  // int num_samples = 1000;
 };
 
 // Return the expected values (one per player) of a correlation device.
@@ -120,6 +114,16 @@ double EFCEDist(const Game& game, CorrDistConfig config,
 // their recommendations at their information states only after they've decided
 // whether or not to follow them.
 double EFCCEDist(const Game& game, CorrDistConfig config,
+                 const CorrelationDevice& mu);
+
+// Agent-form variants: these are similar to EFCCE + EFCE distances above,
+// except that there is at most one deviation allowed, at a single information
+// set, but any information set. Other than this restriction, each one is
+// analogous to EFCCE or EFCE.
+// **Note: these have not yet been extensively tested.**
+double AFCEDist(const Game& game, CorrDistConfig config,
+                const CorrelationDevice& mu);
+double AFCCEDist(const Game& game, CorrDistConfig config,
                  const CorrelationDevice& mu);
 
 // Analog to the functions above but for normal-form games. The game can be a

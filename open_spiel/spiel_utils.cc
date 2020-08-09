@@ -17,9 +17,10 @@
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
-#include <optional>
 #include <string>
 #include <vector>
+
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
 
 
 namespace open_spiel {
@@ -61,18 +62,19 @@ Action RankActionMixedBase(const std::vector<int>& bases,
   return action;
 }
 
-void UnrankActionMixedBase(Action action, const std::vector<int>& bases,
-                           std::vector<int>* digits) {
-  SPIEL_CHECK_EQ(bases.size(), digits->size());
-  for (int i = digits->size() - 1; i >= 0; --i) {
+std::vector<int> UnrankActionMixedBase(Action action,
+                                       const std::vector<int>& bases) {
+  std::vector<int> digits(bases.size());
+  for (int i = digits.size() - 1; i >= 0; --i) {
     SPIEL_CHECK_GT(bases[i], 1);
-    (*digits)[i] = action % bases[i];
+    digits[i] = action % bases[i];
     action /= bases[i];
   }
   SPIEL_CHECK_EQ(action, 0);
+  return digits;
 }
 
-std::optional<std::string> FindFile(const std::string& filename, int levels) {
+absl::optional<std::string> FindFile(const std::string& filename, int levels) {
   std::string candidate_filename = filename;
   for (int i = 0; i <= levels; ++i) {
     if (i == 0) {
@@ -107,6 +109,10 @@ void SpielFatalError(const std::string& error_msg) {
   // The error handler should not return. If it does, we will abort the process.
   std::cerr << "Error handler failure - exiting" << std::endl;
   std::exit(1);
+}
+
+std::ostream& operator<<(std::ostream& stream, const std::nullopt_t& v) {
+  return stream << "(nullopt)";
 }
 
 }  // namespace open_spiel

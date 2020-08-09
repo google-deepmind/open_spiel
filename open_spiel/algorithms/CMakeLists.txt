@@ -7,6 +7,16 @@ add_library (algorithms OBJECT
   cfr_br.h
   corr_dist.cc
   corr_dist.h
+  corr_dist/afcce.cc
+  corr_dist/afcce.h
+  corr_dist/afce.cc
+  corr_dist/afce.h
+  corr_dist/efcce.cc
+  corr_dist/efcce.h
+  corr_dist/efce.cc
+  corr_dist/efce.h
+  corr_dev_builder.cc
+  corr_dev_builder.h
   deterministic_policy.cc
   deterministic_policy.h
   evaluate_bots.cc
@@ -25,10 +35,14 @@ add_library (algorithms OBJECT
   is_mcts.h
   matrix_game_utils.cc
   matrix_game_utils.h
+  nfg_writer.cc
+  nfg_writer.h
   mcts.cc
   mcts.h
   minimax.cc
   minimax.h
+  oos.h
+  oos.cc
   outcome_sampling_mccfr.cc
   outcome_sampling_mccfr.h
   state_distribution.cc
@@ -59,6 +73,10 @@ add_test(cfr_br_test cfr_br_test)
 add_executable(corr_dist_test corr_dist_test.cc
         $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})
 add_test(corr_dist_test corr_dist_test)
+
+add_executable(corr_dev_builder_test corr_dev_builder_test.cc
+        $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})
+add_test(corr_dev_builder_test corr_dev_builder_test)
 
 add_executable(deterministic_policy_test deterministic_policy_test.cc
     $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})
@@ -95,6 +113,10 @@ add_test(matrix_game_utils_test matrix_game_utils_test)
 add_executable(minimax_test minimax_test.cc
     $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})
 add_test(minimax_test minimax_test)
+
+add_executable(oos_test oos_test.cc
+    $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})
+add_test(oos_test oos_test)
 
 add_executable(outcome_sampling_mccfr_test outcome_sampling_mccfr_test.cc
     $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})

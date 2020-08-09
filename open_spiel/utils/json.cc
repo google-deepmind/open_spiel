@@ -16,7 +16,6 @@
 
 #include <cmath>
 #include <cstdint>
-#include <optional>
 #include <string>
 
 #include "open_spiel/abseil-cpp/absl/strings/numbers.h"
@@ -79,15 +78,15 @@ bool ConsumeToken(absl::string_view* str, absl::string_view token) {
 }
 
 template <typename T>
-std::optional<Value> ParseConstant(absl::string_view* str,
-                                   absl::string_view token, T value) {
+absl::optional<Value> ParseConstant(absl::string_view* str,
+                                    absl::string_view token, T value) {
   if (ConsumeToken(str, token)) {
     return value;
   }
   return ParseError("Invalid constant: ", *str);
 }
 
-std::optional<Value> ParseNumber(absl::string_view* str) {
+absl::optional<Value> ParseNumber(absl::string_view* str) {
   size_t valid_double =
       std::min(str->find_first_not_of("-+.0123456789eE"), str->size());
   size_t valid_int =
@@ -106,7 +105,7 @@ std::optional<Value> ParseNumber(absl::string_view* str) {
   return ParseError("Invalid number", *str);
 }
 
-std::optional<std::string> ParseString(absl::string_view* str) {
+absl::optional<std::string> ParseString(absl::string_view* str) {
   if (!ConsumeToken(str, "\"")) {
     return ParseError("Expected '\"'", *str);
   }
@@ -149,9 +148,9 @@ std::optional<std::string> ParseString(absl::string_view* str) {
   return ParseError("Unfinished string", *str);
 }
 
-std::optional<Value> ParseValue(absl::string_view* str);
+absl::optional<Value> ParseValue(absl::string_view* str);
 
-std::optional<Array> ParseArray(absl::string_view* str) {
+absl::optional<Array> ParseArray(absl::string_view* str) {
   if (!ConsumeToken(str, "[")) {
     return ParseError("Expected '['", *str);
   }
@@ -167,7 +166,7 @@ std::optional<Array> ParseArray(absl::string_view* str) {
     }
     first = false;
     ConsumeWhitespace(str);
-    std::optional<Value> v = ParseValue(str);
+    absl::optional<Value> v = ParseValue(str);
     if (!v) {
       return std::nullopt;
     }
@@ -176,7 +175,7 @@ std::optional<Array> ParseArray(absl::string_view* str) {
   return ParseError("Unfinished array", *str);
 }
 
-std::optional<Object> ParseObject(absl::string_view* str) {
+absl::optional<Object> ParseObject(absl::string_view* str) {
   if (!ConsumeToken(str, "{")) {
     return ParseError("Expected '{'", *str);
   }
@@ -192,7 +191,7 @@ std::optional<Object> ParseObject(absl::string_view* str) {
     }
     first = false;
     ConsumeWhitespace(str);
-    std::optional<std::string> key = ParseString(str);
+    absl::optional<std::string> key = ParseString(str);
     if (!key) {
       return std::nullopt;
     }
@@ -201,7 +200,7 @@ std::optional<Object> ParseObject(absl::string_view* str) {
       return ParseError("Expected ':'", *str);
     }
     ConsumeWhitespace(str);
-    std::optional<Value> v = ParseValue(str);
+    absl::optional<Value> v = ParseValue(str);
     if (!v) {
       return std::nullopt;
     }
@@ -210,7 +209,7 @@ std::optional<Object> ParseObject(absl::string_view* str) {
   return ParseError("Unfinished object", *str);
 }
 
-std::optional<Value> ParseValue(absl::string_view* str) {
+absl::optional<Value> ParseValue(absl::string_view* str) {
   ConsumeWhitespace(str);
   if (str->empty()) {
     return ParseError("Empty string", *str);
@@ -332,7 +331,7 @@ std::ostream& operator<<(std::ostream& os, const Value& v) {
   return os << ToString(v);
 }
 
-std::optional<Value> FromString(absl::string_view str) {
+absl::optional<Value> FromString(absl::string_view str) {
   return ParseValue(&str);
 }
 

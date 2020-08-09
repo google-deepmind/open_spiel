@@ -56,7 +56,7 @@ class WrappedState : public State {
   }
 
   void InformationStateTensor(Player player,
-                              std::vector<double>* values) const override {
+                              absl::Span<float> values) const override {
     state_->InformationStateTensor(player, values);
   }
 
@@ -65,7 +65,7 @@ class WrappedState : public State {
   }
 
   void ObservationTensor(Player player,
-                                 std::vector<double>* values) const override{
+                         absl::Span<float> values) const override {
     state_->ObservationTensor(player, values);
   }
 
@@ -83,6 +83,8 @@ class WrappedState : public State {
   std::vector<Action> LegalChanceOutcomes() const override {
     return state_->LegalChanceOutcomes();
   }
+
+  const State& GetWrappedState() const { return *state_; }
 
  protected:
   void DoApplyAction(Action action_id) override {

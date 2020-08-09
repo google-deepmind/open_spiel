@@ -23,9 +23,15 @@
 
 // This is the generic superclass for simultaneous move games. A simultaneous
 // move game (AKA Markov Game) is one where all agents submit actions on each
-// time step, and the state transists to a new state as a function of the
-// joint action. All players know the exact current state of the game.
-// For normal-form or matrix games, see normal_form_game.h or matrix.h.
+// time step, and the state transists to a new state as a function of the joint
+// action.
+//
+// Note that this implementation also supports mixed turn-based and simultaneous
+// steps at which it is only a single player submits an action, when not at
+// simultaneous nodes and not at chance nodes.
+//
+// For normal-form or matrix games, see normal_form_game.h or
+// matrix.h.
 
 namespace open_spiel {
 
@@ -39,17 +45,19 @@ class SimMoveState : public State {
   // Subclasses must implement a per-player LegalActions function.
   std::vector<Action> LegalActions(Player player) const override = 0;
 
-  // LegalActions() returns either the chance outcomes (at a chance node),
-  // or a flattened form of the joint legal actions (at simultaneous move
-  // nodes) - see discussion below.
+  // LegalActions() returns either the chance outcomes (at a chance node), a
+  // flattened form of the joint legal actions (at simultaneous move nodes) -
+  // see discussion below, or the actions for the current player (at nodes
+  // where only a single player is making a decision).
   std::vector<Action> LegalActions() const override {
     if (IsSimultaneousNode()) {
       return LegalFlatJointActions();
     } else if (IsTerminal()) {
       return {};
-    } else {
-      SPIEL_CHECK_TRUE(IsChanceNode());
+    } else if (IsChanceNode()) {
       return LegalChanceOutcomes();
+    } else {
+      return LegalActions(CurrentPlayer());
     }
   }
 

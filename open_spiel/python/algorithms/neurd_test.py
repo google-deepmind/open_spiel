@@ -23,6 +23,9 @@ import tensorflow.compat.v1 as tf
 from open_spiel.python.algorithms import neurd
 import pyspiel
 
+# Temporarily disable TF2 behavior while the code is not updated.
+tf.disable_v2_behavior()
+
 tf.enable_eager_execution()
 
 _GAME = pyspiel.load_game('kuhn_poker')

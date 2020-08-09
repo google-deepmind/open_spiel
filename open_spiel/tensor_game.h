@@ -49,6 +49,7 @@ class TensorGame : public NormalFormGame {
       size *= action_names_[player].size();
       shape_[player] = action_names_[player].size();
     }
+    ComputeMinMaxUtility();
     SPIEL_CHECK_TRUE(std::all_of(utilities_.begin(), utilities_.end(),
                                  [size](const auto& player_utils) {
                                    return player_utils.size() == size;
@@ -64,25 +65,9 @@ class TensorGame : public NormalFormGame {
 
   int NumPlayers() const override { return utilities_.size(); }
 
-  double MinUtility() const override {
-    double utility =
-        *std::min_element(begin(utilities_[0]), end(utilities_[0]));
-    for (Player player = 1; player < NumPlayers(); ++player) {
-      utility = std::min(utility, *std::min_element(begin(utilities_[player]),
-                                                    end(utilities_[player])));
-    }
-    return utility;
-  }
+  double MinUtility() const override { return min_utility_; }
 
-  double MaxUtility() const override {
-    double utility =
-        *std::max_element(begin(utilities_[0]), end(utilities_[0]));
-    for (Player player = 1; player < NumPlayers(); ++player) {
-      utility = std::max(utility, *std::max_element(begin(utilities_[player]),
-                                                    end(utilities_[player])));
-    }
-    return utility;
-  }
+  double MaxUtility() const override { return max_utility_; }
 
   std::shared_ptr<const Game> Clone() const override {
     return std::shared_ptr<const Game>(new TensorGame(*this));
@@ -115,12 +100,31 @@ class TensorGame : public NormalFormGame {
     }
     return ind;
   }
+
+  void ComputeMinMaxUtility() {
+    min_utility_ = *std::min_element(begin(utilities_[0]), end(utilities_[0]));
+    for (Player player = 1; player < NumPlayers(); ++player) {
+      min_utility_ =
+          std::min(min_utility_, *std::min_element(begin(utilities_[player]),
+                                                   end(utilities_[player])));
+    }
+
+    max_utility_ = *std::max_element(begin(utilities_[0]), end(utilities_[0]));
+    for (Player player = 1; player < NumPlayers(); ++player) {
+      max_utility_ =
+          std::max(max_utility_, *std::max_element(begin(utilities_[player]),
+                                                   end(utilities_[player])));
+    }
+  }
+
   // action_names_[player] is the list of action names for player.
   const std::vector<std::vector<std::string>> action_names_;
   // utilities_[player] is a flattened tensor of utilities for player, in
   // row-major/C-style/lexicographic order of all players' actions.
   const std::vector<std::vector<double>> utilities_;
   std::vector<int> shape_;
+  double min_utility_;
+  double max_utility_;
 };
 
 class TensorState : public NFGState {

@@ -92,9 +92,9 @@ class GoofspielState : public SimMoveState {
   std::string ObservationString(Player player) const override;
 
   void InformationStateTensor(Player player,
-                              std::vector<double>* values) const override;
+                              absl::Span<float> values) const override;
   void ObservationTensor(Player player,
-                         std::vector<double>* values) const override;
+                         absl::Span<float> values) const override;
   std::unique_ptr<State> Clone() const override;
   std::vector<std::pair<Action, double>> ChanceOutcomes() const override;
 
@@ -107,6 +107,8 @@ class GoofspielState : public SimMoveState {
  private:
   // Increments the count and increments the player mod num_players_.
   void NextPlayer(int* count, Player* player) const;
+  void DealPointCard(int point_card);
+  int CurrentPointValue() const { return 1 + point_card_; }
 
   int num_cards_;
   PointsOrder points_order_;
@@ -116,9 +118,8 @@ class GoofspielState : public SimMoveState {
   Player current_player_;
   std::set<int> winners_;
   int turns_;
-  int point_card_index_;
+  int point_card_;
   std::vector<int> points_;
-  std::vector<int> point_deck_;                  // Current point deck.
   std::vector<std::vector<bool>> player_hands_;  // true if card is in hand.
   std::vector<int> point_card_sequence_;
   std::vector<int> win_sequence_;  // Which player won

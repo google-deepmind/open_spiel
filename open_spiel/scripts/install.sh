@@ -24,10 +24,34 @@ die() {
 }
 
 set -e  # exit when any command fails
-set -x
+set -x  # show evaluation trace
 
 MYDIR="$(dirname "$(realpath "$0")")"
+
+# Calling this file from the project root is not allowed,
+# as all the paths here are hard-coded to be relative to it.
+#
+# So this is not allowed:
+# $ ./open_spiel/scripts/install.sh
+#
+# Instead, just call project-root install.sh file:
+# $ ./install.sh
+if [[ `basename $MYDIR` == "scripts" ]]; then
+  die "Please run ./install.sh from the directory where you cloned the" \
+      "project, do not run $0"
+fi
+
+# Load all the build settings.
 source "${MYDIR}/open_spiel/scripts/global_variables.sh"
+
+# Specify a download cache directory for external dependencies.
+DEFAULT_DOWNLOAD_CACHE_DIR="$MYDIR/download_cache"
+
+# Use the ENV variable if defined, or the default location otherwise.
+DOWNLOAD_CACHE_DIR=${DOWNLOAD_CACHE_DIR:-$DEFAULT_DOWNLOAD_CACHE_DIR}
+
+# Create the cache directory.
+[[ -d "${DOWNLOAD_CACHE_DIR}" ]] || mkdir "${DOWNLOAD_CACHE_DIR}"
 
 # 1. Clone the external dependencies before installing systen packages, to make
 # sure they are present even if later commands fail.
@@ -84,6 +108,46 @@ fi
 DIR="open_spiel/games/universal_poker/acpc"
 if [[ ${BUILD_WITH_ACPC:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; then
   git clone -b 'master' --single-branch --depth 1  https://github.com/jblespiau/project_acpc_server.git ${DIR}
+fi
+
+# Add EIGEN template library for linear algebra.
+# http://eigen.tuxfamily.org/index.php?title=Main_Page
+DIR="open_spiel/eigen/libeigen"
+if [[ ${BUILD_WITH_EIGEN:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; then
+  git clone -b '3.3.7' --single-branch --depth 1  https://gitlab.com/libeigen/eigen.git ${DIR}
+fi
+
+# This GitHub repository contains Nathan Sturtevant's state of the art
+# Hearts program xinxin.
+DIR="open_spiel/games/hearts/hearts"
+if [[ ${BUILD_WITH_XINXIN:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; then
+  git clone -b 'master' --single-branch --depth 1  https://github.com/nathansttt/hearts.git ${DIR}
+fi
+
+# This GitHub repository contains bots from the RoShamBo Programming Competition
+DIR="open_spiel/bots/roshambo/roshambo"
+if [[ ${BUILD_WITH_ROSHAMBO:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; then
+  git clone -b 'open_spiel' --single-branch --depth 1  https://github.com/jhtschultz/roshambo.git ${DIR}
+fi
+
+# Add libtorch (PyTorch C++ API).
+# This downloads the precompiled binaries available from the pytorch website.
+DIR="open_spiel/libtorch/libtorch"
+if [[ ${BUILD_WITH_LIBTORCH:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; then
+  # CPU-only
+  DOWNLOAD_URL="https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.5.1%2Bcpu.zip"
+
+  # Uncomment one of the following if you want GPU support with CUDA:
+  # # CUDA 9.2
+  # DOWNLOAD_URL="https://download.pytorch.org/libtorch/cu92/libtorch-cxx11-abi-shared-with-deps-1.5.1%2Bcu92.zip"
+  # # CUDA 10.1
+  # DOWNLOAD_URL="https://download.pytorch.org/libtorch/cu101/libtorch-cxx11-abi-shared-with-deps-1.5.1%2Bcu101.zip"
+  # # CUDA 10.2
+  # DOWNLOAD_URL="https://download.pytorch.org/libtorch/cu102/libtorch-cxx11-abi-shared-with-deps-1.5.1.zip"
+
+  DOWNLOAD_FILE="${DOWNLOAD_CACHE_DIR}/libtorch.zip"
+  [[ -f "${DOWNLOAD_FILE}" ]] || wget --show-progress -O "${DOWNLOAD_FILE}" "$DOWNLOAD_URL"
+  unzip "${DOWNLOAD_FILE}" -d "open_spiel/libtorch/"
 fi
 
 # 2. Install other required system-wide dependencies

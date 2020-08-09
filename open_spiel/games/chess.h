@@ -165,7 +165,7 @@ class ChessState : public State {
   std::string InformationStateString(Player player) const override;
   std::string ObservationString(Player player) const override;
   void ObservationTensor(Player player,
-                         std::vector<double>* values) const override;
+                         absl::Span<float> values) const override;
   std::unique_ptr<State> Clone() const override;
   void UndoAction(Player player, Action action) override;
 
@@ -194,7 +194,7 @@ class ChessState : public State {
   // IsTerminal(), which is also called by LegalActions().
   void MaybeGenerateLegalActions() const;
 
-  std::optional<std::vector<double>> MaybeFinalReturns() const;
+  absl::optional<std::vector<double>> MaybeFinalReturns() const;
 
   // We have to store every move made to check for repetitions and to implement
   // undo. We store the current board position as an optimization.
@@ -217,7 +217,7 @@ class ChessState : public State {
   };
   using RepetitionTable = absl::flat_hash_map<uint64_t, int, PassthroughHash>;
   RepetitionTable repetitions_;
-  mutable std::optional<std::vector<Action>> cached_legal_actions_;
+  mutable absl::optional<std::vector<Action>> cached_legal_actions_;
 };
 
 // Game object.
@@ -227,18 +227,19 @@ class ChessGame : public Game {
   int NumDistinctActions() const override {
     return chess::NumDistinctActions();
   }
-  std::unique_ptr<State> NewInitialState(const std::string& fen) const {
-    return std::unique_ptr<State>(new ChessState(shared_from_this(), fen));
+  std::unique_ptr<State> NewInitialState(
+      const std::string& fen) const override {
+    return absl::make_unique<ChessState>(shared_from_this(), fen);
   }
   std::unique_ptr<State> NewInitialState() const override {
-    return std::unique_ptr<State>(new ChessState(shared_from_this()));
+    return absl::make_unique<ChessState>(shared_from_this());
   }
   int NumPlayers() const override { return chess::NumPlayers(); }
   double MinUtility() const override { return LossUtility(); }
   double UtilitySum() const override { return DrawUtility(); }
   double MaxUtility() const override { return WinUtility(); }
   std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new ChessGame(*this));
+    return std::make_shared<ChessGame>(*this);
   }
   std::vector<int> ObservationTensorShape() const override {
     return chess::ObservationTensorShape();

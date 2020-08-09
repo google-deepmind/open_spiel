@@ -35,8 +35,8 @@ const GameType kGameType{/*short_name=*/"catch",
                          GameType::RewardModel::kTerminal,
                          /*max_num_players=*/1,
                          /*min_num_players=*/1,
-                         /*provides_information_state_string=*/true,
-                         /*provides_information_state_tensor=*/true,
+                         /*provides_information_state_string=*/false,
+                         /*provides_information_state_tensor=*/false,
                          /*provides_observation_string=*/true,
                          /*provides_observation_tensor=*/true,
                          /*parameter_specification=*/
@@ -147,12 +147,6 @@ std::vector<double> CatchState::Returns() const {
   }
 }
 
-std::string CatchState::InformationStateString(Player player) const {
-  SPIEL_CHECK_GE(player, 0);
-  SPIEL_CHECK_LT(player, num_players_);
-  return HistoryString();
-}
-
 std::string CatchState::ObservationString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
@@ -160,7 +154,7 @@ std::string CatchState::ObservationString(Player player) const {
 }
 
 void CatchState::ObservationTensor(Player player,
-                                   std::vector<double>* values) const {
+                                   absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
@@ -168,23 +162,6 @@ void CatchState::ObservationTensor(Player player,
   if (initialized_) {
     view[{ball_row_, ball_col_}] = 1.0;
     view[{num_rows_ - 1, paddle_col_}] = 1.0;
-  }
-}
-
-void CatchState::InformationStateTensor(Player player,
-                                        std::vector<double>* values) const {
-  SPIEL_CHECK_GE(player, 0);
-  SPIEL_CHECK_LT(player, num_players_);
-
-  values->resize(num_columns_ + kNumActions * num_rows_);
-  std::fill(values->begin(), values->end(), 0.);
-  if (initialized_) {
-    (*values)[ball_col_] = 1;
-    int offset = history_.size() - ball_row_ - 1;
-    for (int i = 0; i < ball_row_; i++) {
-      (*values)[num_columns_ + i * kNumActions + history_[offset + i].action] =
-          1;
-    }
   }
 }
 

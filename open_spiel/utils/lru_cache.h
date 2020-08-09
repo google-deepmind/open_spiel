@@ -96,7 +96,7 @@ class LRUCache {  // Least Recently Used Cache.
     }
   }
 
-  std::optional<const V> Get(const K& key) {
+  absl::optional<const V> Get(const K& key) {
     absl::MutexLock lock(&m_);
     auto pos = map_.find(key);
     if (pos == map_.end()) {  // Not found.

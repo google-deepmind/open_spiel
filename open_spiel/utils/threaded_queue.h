@@ -15,12 +15,12 @@
 #ifndef OPEN_SPIEL_UTILS_THREADED_QUEUE_H_
 #define OPEN_SPIEL_UTILS_THREADED_QUEUE_H_
 
-#include <optional>
 #include <queue>
 
 #include "open_spiel/abseil-cpp/absl/synchronization/mutex.h"
 #include "open_spiel/abseil-cpp/absl/time/clock.h"
 #include "open_spiel/abseil-cpp/absl/time/time.h"
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
 
 namespace open_spiel {
 
@@ -51,9 +51,9 @@ class ThreadedQueue {
     return true;
   }
 
-  std::optional<T> Pop() { return Pop(absl::InfiniteDuration()); }
-  std::optional<T> Pop(absl::Duration wait) { return Pop(absl::Now() + wait); }
-  std::optional<T> Pop(absl::Time deadline) {
+  absl::optional<T> Pop() { return Pop(absl::InfiniteDuration()); }
+  absl::optional<T> Pop(absl::Duration wait) { return Pop(absl::Now() + wait); }
+  absl::optional<T> Pop(absl::Time deadline) {
     absl::MutexLock lock(&m_);
     while (q_.empty()) {
       if (absl::Now() > deadline || block_new_values_) {

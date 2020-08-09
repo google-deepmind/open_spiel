@@ -3,33 +3,7 @@
 cmake_minimum_required (VERSION 3.12)
 project (open_spiel)
 
-set (Python_TARGET_VERSION "" CACHE STRING "Specify a target Python version. \
-Any Python library found with CMake modules FindPython2/FindPython3 that \
-agrees  with the major version and is at least as high for minor version and \
-patch number is accepted. If the variable is not set, we use the FindPython \
-module which favours Python 3 over Python 2 if both are available.")
-set (CMAKE_CXX_STANDARD 17)
-if(APPLE)
-  # On MacOS:
-  #   -undefined dynamic_lookup is necessary for pybind11 linking
-  set (CMAKE_CXX_FLAGS "-Wno-everything -w -undefined dynamic_lookup")
-
-  # On MacOS, we need this so that CMake will use the right Python if the user
-  # has a virtual environment active
-  set (CMAKE_FIND_FRAMEWORK LAST)
-else()
-  set (CMAKE_CXX_FLAGS "-Wno-everything")
-endif()
-
-# Position-independent code is needed for Python extension modules.
-set (CMAKE_POSITION_INDEPENDENT_CODE ON)
-
-## Optional dependencies
-# One can optionally build and link against specific external dependencies.
-# We expect these arguments to be always defined, when building using any script
-# in `open_spiel/scripts/`, thus, we emit a warning when it's not, with a
-# conservative default.
-# See the documentation in install.md.
+# Define some nice terminal colors.
 if(NOT WIN32)
   string(ASCII 27 Esc)
   set(ColourReset "${Esc}[m")
@@ -50,41 +24,97 @@ if(NOT WIN32)
   set(BoldWhite   "${Esc}[1;37m")
 endif()
 
-set (BUILD_WITH_HANABI OFF CACHE BOOL "Build against the Hanabi game.")
-if(NOT DEFINED ENV{BUILD_WITH_HANABI})
-    message("${BoldRed}BUILD_WITH_HANABI not set. Defaults to OFF${ColourReset}")
-    set (ENV{BUILD_WITH_HANABI} OFF)
+set (Python_TARGET_VERSION "" CACHE STRING "Specify a target Python version. \
+Any Python library found with CMake modules FindPython2/FindPython3 that \
+agrees  with the major version and is at least as high for minor version and \
+patch number is accepted. If the variable is not set, we use the FindPython \
+module which favours Python 3 over Python 2 if both are available.")
+
+set (CMAKE_CXX_STANDARD 17)
+
+# Set default build type.
+if(NOT BUILD_TYPE)
+   set(BUILD_TYPE Testing
+       CACHE STRING "Choose the type of build: Debug Release Testing."
+       FORCE)
 endif()
-set (BUILD_WITH_HANABI $ENV{BUILD_WITH_HANABI})
-message("${BoldYellow}BUILD_WITH_HANABI: ${BUILD_WITH_HANABI} ${ColourReset}")
+message("${BoldYellow}Current build type is: ${BUILD_TYPE}${ColourReset}")
 
-set (BUILD_WITH_ACPC OFF CACHE BOOL "Build against the Universal Poker library.")
-if(NOT DEFINED ENV{BUILD_WITH_ACPC})
-    message("${BoldRed}BUILD_WITH_ACPC not set. Defaults to OFF${ColourReset}")
-    set (ENV{BUILD_WITH_ACPC} OFF)
+if(${BUILD_TYPE} EQUAL "Debug")
+  # Basic build for debugging (default).
+  # -Og enables optimizations that do not interfere with debugging.
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Og")
 endif()
-set (BUILD_WITH_ACPC $ENV{BUILD_WITH_ACPC})
-message("${BoldYellow}BUILD_WITH_ACPC: ${BUILD_WITH_ACPC} ${ColourReset}")
 
-set (BUILD_WITH_JULIA OFF CACHE BOOL "Build binary for Julia.")
-if(NOT DEFINED ENV{BUILD_WITH_JULIA})
-    message("${BoldRed}BUILD_WITH_JULIA not set. Defaults to OFF${ColourReset}")
-    set (ENV{BUILD_WITH_JULIA} OFF)
+if(${BUILD_TYPE} EQUAL "Testing")
+  # A build used for running tests: keep all runtime checks (assert,
+  # SPIEL_CHECK_*, SPIEL_DCHECK_*), but turn on some speed optimizations,
+  # otherwise tests run for too long.
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2")
 endif()
-set (BUILD_WITH_JULIA $ENV{BUILD_WITH_JULIA})
-message("${BoldYellow}BUILD_WITH_JULIA: ${BUILD_WITH_JULIA} ${ColourReset}")
 
-set (BUILD_WITH_PYTHON ON CACHE BOOL "Build binary for Python.")
-if(NOT DEFINED ENV{BUILD_WITH_PYTHON})
-    message("${BoldRed}BUILD_WITH_PYTHON not set. Defaults to ON${ColourReset}")
-    set (ENV{BUILD_WITH_PYTHON} ON)
+if(${BUILD_TYPE} EQUAL "Release")
+  # Optimized release build: turn off debug runtime checks (assert,
+  # SPIEL_DCHECK_*) and turn on highest speed optimizations.
+  # The difference in perfomance can be up to 10x higher.
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNDEBUG -O3")
 endif()
-set (BUILD_WITH_PYTHON $ENV{BUILD_WITH_PYTHON})
-message("${BoldYellow}BUILD_WITH_PYTHON: ${BUILD_WITH_PYTHON} ${ColourReset}")
 
-##
+if(APPLE)
+  # On MacOS:
+  #   -undefined dynamic_lookup is necessary for pybind11 linking
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-everything -w -undefined dynamic_lookup")
+
+  # On MacOS, we need this so that CMake will use the right Python if the user
+  # has a virtual environment active
+  set (CMAKE_FIND_FRAMEWORK LAST)
+else()
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-everything")
+endif()
+
+# Position-independent code is needed for Python extension modules.
+set (CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 
+## Optional dependencies
+# One can optionally build and link against specific external dependencies.
+# We expect these arguments to be always defined, when building using any script
+# in `open_spiel/scripts/`, thus, we emit a warning when it's not, with a
+# conservative default.
+# See the documentation in install.md.
+
+# Use this macro to define optional dependencies.
+# You can then use your chosen DEP_NAME as a variable to check if that
+# dependency is enabled -- see code below.
+macro(openspiel_optional_dependency DEP_NAME DEP_DEFAULT DEP_DESCRIPTION)
+  set (${DEP_NAME} ${DEP_DEFAULT} CACHE BOOL ${DEP_DESCRIPTION})
+  if(NOT DEFINED ENV{${DEP_NAME}})
+    message("${BoldRed}${DEP_NAME} not set. Defaults to ${DEP_DEFAULT}${ColourReset}")
+    set (ENV{${DEP_NAME}} ${DEP_DEFAULT})
+  endif()
+  set (${DEP_NAME} $ENV{${DEP_NAME}})
+  message("${BoldYellow}${DEP_NAME}: ${${DEP_NAME}} ${ColourReset}")
+endmacro()
+
+# List of all optional dependencies:
+openspiel_optional_dependency(BUILD_WITH_ACPC           OFF
+  "Build against the Universal Poker library.")
+openspiel_optional_dependency(BUILD_WITH_EIGEN          OFF
+  "Build with support for Eigen in C++.")
+openspiel_optional_dependency(BUILD_WITH_HANABI         OFF
+  "Build against the Hanabi game.")
+openspiel_optional_dependency(BUILD_WITH_JULIA          OFF
+  "Build binary for Julia.")
+openspiel_optional_dependency(BUILD_WITH_LIBTORCH       OFF
+  "Build with support for libtorch.")
+openspiel_optional_dependency(BUILD_WITH_PUBLIC_STATES  OFF
+  "Build with support for public states in C++.")
+openspiel_optional_dependency(BUILD_WITH_PYTHON         ON
+  "Build binary for Python.")
+openspiel_optional_dependency(BUILD_WITH_XINXIN         OFF
+  "Build against xinxin Hearts program.")
+openspiel_optional_dependency(BUILD_WITH_ROSHAMBO       OFF
+  "Build against RoShamBo bots.")
 
 # Needed to disable Abseil tests.
 set (BUILD_TESTING OFF)
@@ -93,25 +123,31 @@ set (BUILD_TESTING OFF)
 enable_testing()
 
 set (OPEN_SPIEL_CORE_FILES
-  canonical_game_strings.h
   canonical_game_strings.cc
-  game_parameters.h
+  canonical_game_strings.h
+  fog/fog_constants.h
+  fog/observation_history.cc
+  fog/observation_history.h
   game_parameters.cc
-  spiel.h
-  spiel.cc
-  spiel_bots.h
-  spiel_bots.cc
-  matrix_game.h
+  game_parameters.h
   matrix_game.cc
+  matrix_game.h
   normal_form_game.h
-  policy.h
+  observer.cc
+  observer.h
   policy.cc
-  simultaneous_move_game.h
+  policy.h
   simultaneous_move_game.cc
-  spiel_utils.h
+  simultaneous_move_game.h
+  spiel.cc
+  spiel.h
+  spiel_bots.cc
+  spiel_bots.h
+  spiel_globals.h
   spiel_utils.cc
-  tensor_game.h
+  spiel_utils.h
   tensor_game.cc
+  tensor_game.h
 )
 
 # We add the subdirectory here so open_spiel_core can #include absl.
@@ -119,7 +155,8 @@ add_subdirectory (abseil-cpp)
 
 # Just the core without any of the games
 add_library(open_spiel_core OBJECT ${OPEN_SPIEL_CORE_FILES})
-target_include_directories (open_spiel_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} abseil-cpp)
+target_include_directories (
+  open_spiel_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} abseil-cpp)
 link_libraries(open_spiel_core
   absl::container
   absl::flags
@@ -144,10 +181,48 @@ set (OPEN_SPIEL_OBJECTS
   $<TARGET_OBJECTS:utils>
 )
 if (BUILD_WITH_HANABI)
-  set(OPEN_SPIEL_OBJECTS ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:hanabi_learning_environment>)
+  set(OPEN_SPIEL_OBJECTS ${OPEN_SPIEL_OBJECTS}
+      $<TARGET_OBJECTS:hanabi_learning_environment>)
 endif()
 if (BUILD_WITH_ACPC)
-  set(OPEN_SPIEL_OBJECTS ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:universal_poker_clib> $<TARGET_OBJECTS:universal_poker_lib>)
+  set(OPEN_SPIEL_OBJECTS ${OPEN_SPIEL_OBJECTS}
+      $<TARGET_OBJECTS:universal_poker_clib>
+      $<TARGET_OBJECTS:universal_poker_lib>)
+endif()
+if (BUILD_WITH_EIGEN)
+  add_compile_definitions(BUILD_WITH_EIGEN)
+  # Add Eigen dependency.
+  add_subdirectory(eigen/)
+  # Now we can use #include "Eigen/Dense"
+  # This is needed so that pybind11/eigen.h locates <Eigen/Core>
+  include_directories(eigen/libeigen)
+  set(OPEN_SPIEL_OBJECTS ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:eigen>)
+endif()
+if (BUILD_WITH_PUBLIC_STATES)
+  if (NOT BUILD_WITH_EIGEN)
+    message(FATAL_ERROR "You want to build with public states API, but Eigen dependency is not enabled. Please enable BUILD_WITH_EIGEN=ON")
+  endif()
+  add_compile_definitions(BUILD_WITH_PUBLIC_STATES)
+  set(OPEN_SPIEL_OBJECTS
+    $<TARGET_OBJECTS:public_states_core>
+    $<TARGET_OBJECTS:public_states_games>
+    $<TARGET_OBJECTS:public_states_algorithms>
+    $<TARGET_OBJECTS:public_states_game_transforms>
+    ${OPEN_SPIEL_OBJECTS})
+  add_subdirectory(public_states)
+endif()
+if (BUILD_WITH_XINXIN)
+  set(OPEN_SPIEL_OBJECTS ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:xinxin>)
+endif()
+if (BUILD_WITH_ROSHAMBO)
+  set(OPEN_SPIEL_OBJECTS ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:roshambo>)
+endif()
+if (BUILD_WITH_LIBTORCH)
+  list(APPEND CMAKE_PREFIX_PATH "${CMAKE_CURRENT_SOURCE_DIR}/libtorch/libtorch")
+  find_package(Torch REQUIRED)
+  add_subdirectory(libtorch)
+  # Use following to link your_target_executable with torch libraries:
+  # target_link_libraries(your_target_executable ${TORCH_LIBRARIES})
 endif()
 
 # We have the parent of this directory in the include path, so that we can
@@ -156,7 +231,9 @@ endif()
 include_directories(..)
 
 add_subdirectory (algorithms)
+add_subdirectory (bots)
 add_subdirectory (examples)
+add_subdirectory (fog)
 add_subdirectory (games)
 add_subdirectory (game_transforms)
 add_subdirectory (tests)
@@ -169,4 +246,29 @@ add_subdirectory (utils)
 
 if (BUILD_WITH_JULIA)
   add_subdirectory (julia)
+endif()
+
+# Build a shared library, i.e. libopen_spiel.so. We generally only enable this
+# for binary releases.
+# Note that there are known problems when trying to use absl::flags within a
+# shared library, hence is intentionally left out. To use ABSL flags, link with
+# absl::flags and absl::flags_parse separately.
+set (BUILD_SHARED_LIB OFF CACHE BOOL "Build a shared library?")
+if(NOT DEFINED ENV{BUILD_SHARED_LIB})
+  set (ENV{BUILD_SHARED_LIB} OFF)
+endif()
+set (BUILD_SHARED_LIB $ENV{BUILD_SHARED_LIB})
+if (BUILD_SHARED_LIB)
+  add_library(open_spiel SHARED ${OPEN_SPIEL_OBJECTS})
+  target_include_directories(open_spiel PUBLIC
+      ${CMAKE_CURRENT_SOURCE_DIR} abseil-cpp)
+  target_link_libraries(open_spiel PUBLIC
+    absl::container
+    absl::flat_hash_map
+    absl::optional
+    absl::random_random
+    absl::str_format
+    absl::strings
+    absl::time
+  )
 endif()

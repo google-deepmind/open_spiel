@@ -67,6 +67,11 @@ flags.DEFINE_float("epsilon_start", 0.06,
                    "Starting exploration parameter.")
 flags.DEFINE_float("epsilon_end", 0.001,
                    "Final exploration parameter.")
+flags.DEFINE_string("evaluation_metric", "nash_conv",
+                    "Choose from 'exploitability', 'nash_conv'.")
+flags.DEFINE_bool("use_checkpoints", True, "Save/load neural network weights.")
+flags.DEFINE_string("checkpoint_dir", "/tmp/nfsp_test",
+                    "Directory to save/load the agent.")
 
 
 class NFSPPolicies(policy.Policy):
@@ -74,11 +79,14 @@ class NFSPPolicies(policy.Policy):
 
   def __init__(self, env, nfsp_policies, mode):
     game = env.game
-    player_ids = [0, 1]
+    player_ids = list(range(FLAGS.num_players))
     super(NFSPPolicies, self).__init__(game, player_ids)
     self._policies = nfsp_policies
     self._mode = mode
-    self._obs = {"info_state": [None, None], "legal_actions": [None, None]}
+    self._obs = {
+        "info_state": [None] * FLAGS.num_players,
+        "legal_actions": [None] * FLAGS.num_players
+    }
 
   def action_probabilities(self, state, player_id=None):
     cur_player = state.current_player()
@@ -133,15 +141,33 @@ def main(unused_argv):
         nfsp.NFSP(sess, idx, info_state_size, num_actions, hidden_layers_sizes,
                   **kwargs) for idx in range(num_players)
     ]
-    expl_policies_avg = NFSPPolicies(env, agents, nfsp.MODE.average_policy)
+    joint_avg_policy = NFSPPolicies(env, agents, nfsp.MODE.average_policy)
 
     sess.run(tf.global_variables_initializer())
+
+    if FLAGS.use_checkpoints:
+      for agent in agents:
+        if agent.has_checkpoint(FLAGS.checkpoint_dir):
+          agent.restore(FLAGS.checkpoint_dir)
+
     for ep in range(FLAGS.num_train_episodes):
       if (ep + 1) % FLAGS.eval_every == 0:
         losses = [agent.loss for agent in agents]
         logging.info("Losses: %s", losses)
-        expl = exploitability.exploitability(env.game, expl_policies_avg)
-        logging.info("[%s] Exploitability AVG %s", ep + 1, expl)
+        if FLAGS.evaluation_metric == "exploitability":
+          # Avg exploitability is implemented only for 2 players constant-sum
+          # games, use nash_conv otherwise.
+          expl = exploitability.exploitability(env.game, joint_avg_policy)
+          logging.info("[%s] Exploitability AVG %s", ep + 1, expl)
+        elif FLAGS.evaluation_metric == "nash_conv":
+          nash_conv = exploitability.nash_conv(env.game, joint_avg_policy)
+          logging.info("[%s] NashConv %s", ep + 1, nash_conv)
+        else:
+          raise ValueError(" ".join(("Invalid evaluation metric, choose from",
+                                     "'exploitability', 'nash_conv'.")))
+        if FLAGS.use_checkpoints:
+          for agent in agents:
+            agent.save(FLAGS.checkpoint_dir)
         logging.info("_____________________________________________")
 
       time_step = env.reset()

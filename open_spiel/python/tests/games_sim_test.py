@@ -113,6 +113,11 @@ class GamesSimTest(parameterized.TestCase):
       unpickled_game = pickle.loads(pickled_game)
       self.assertEqual(str(game), str(unpickled_game))
 
+      # Pickle serialization + deserialization (of the game type).
+      pickled_game_type = pickle.dumps(game.get_type())
+      unpickled_game_type = pickle.loads(pickled_game_type)
+      self.assertEqual(game.get_type(), unpickled_game_type)
+
     # Get a new state
     state = game.new_initial_state()
     total_actions = 0

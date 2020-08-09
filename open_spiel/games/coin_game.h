@@ -124,6 +124,7 @@ class CoinGame : public Game {
   explicit CoinGame(const GameParameters& params);
 
   int NumDistinctActions() const override;
+  int MaxChanceOutcomes() const override;
   std::unique_ptr<State> NewInitialState() const override;
   int NumPlayers() const override { return num_players_; }
   double MaxUtility() const override;

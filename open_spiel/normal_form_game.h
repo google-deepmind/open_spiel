@@ -68,14 +68,14 @@ class NFGState : public SimMoveState {
   }
 
   void InformationStateTensor(Player player,
-                              std::vector<double>* values) const override {
+                              absl::Span<float> values) const override {
     SPIEL_CHECK_GE(player, 0);
     SPIEL_CHECK_LT(player, num_players_);
-    values->resize(1);
+    SPIEL_CHECK_EQ(values.size(), 1);
     if (IsTerminal()) {
-      (*values)[0] = 1;
+      values[0] = 1;
     } else {
-      (*values)[0] = 0;
+      values[0] = 0;
     }
   }
 };

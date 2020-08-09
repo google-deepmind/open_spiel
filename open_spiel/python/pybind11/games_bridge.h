@@ -17,7 +17,7 @@
 
 #include "pybind11/include/pybind11/pybind11.h"
 
-// Initialze the Python interface for game transforms.
+// Initialize the Python interface for bridge.
 namespace open_spiel {
 void init_pyspiel_games_bridge(::pybind11::module &m);
 }

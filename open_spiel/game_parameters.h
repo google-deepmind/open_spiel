@@ -81,6 +81,10 @@ class GameParameter {
   // Used for __repr__ in the Python interface.
   std::string ToReprString() const;
 
+  // Everything necessary to reconstruct the parameter in string form:
+  // type/value/is_mandatory.
+  std::string Serialize(const std::string& delimiter = "/") const;
+
   int int_value() const {
     SPIEL_CHECK_TRUE(type_ == Type::kInt);
     return int_value_;
@@ -109,15 +113,34 @@ class GameParameter {
  private:
   bool is_mandatory_;
 
-  int int_value_;
-  double double_value_;
-  std::string string_value_;
-  bool bool_value_;
-  std::map<std::string, GameParameter> game_value_;
+  // Default initializations are required here. This is because some games mark
+  // parameters as not mandatory and also do not specify default values when
+  // registering the game type.. instead, setting the documented defaults upon
+  // game creation (often due to missing information at registration time).
+  // This causes a problem when inspecting the game types themselves, even after
+  // the game is created via Game::GetType(), which returns the type as it was
+  // when it was registered. These initial values are used for those cases.
+  int int_value_ = 0;
+  double double_value_ = 0.0;
+  std::string string_value_ = "";
+  bool bool_value_ = false;
+  std::map<std::string, GameParameter> game_value_ = {};
   Type type_;
 };
 
 std::string GameParameterTypeToString(const GameParameter::Type& type);
+
+// Game Parameters and Game Parameter Serialization/Deserialization form:
+// param_name=type/value/is_mandatory|param_name_2=type2/value2/is_mandatory2
+// assumes none of the delimeters appears in the string values
+std::string SerializeGameParameters(
+    const GameParameters& game_params, const std::string& name_delimiter = "=",
+    const std::string& parameter_delimeter = "|");
+GameParameters DeserializeGameParameters(
+    const std::string& data, const std::string& name_delimiter = "=",
+    const std::string& parameter_delimeter = "|");
+GameParameter DeserializeGameParameter(const std::string& data,
+                                       const std::string& delimiter = "/");
 
 inline bool IsParameterSpecified(const GameParameters& table,
                                  const std::string& key) {

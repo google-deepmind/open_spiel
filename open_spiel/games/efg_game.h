@@ -16,11 +16,11 @@
 #define OPEN_SPIEL_GAMES_EFG_GAME_H_
 
 #include <memory>
-#include <optional>
 #include <string>
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"
@@ -202,9 +202,9 @@ class EFGGame : public Game {
   int num_players_;
   int max_actions_;
   int max_depth_;
-  std::optional<double> util_sum_;
-  std::optional<double> max_util_;
-  std::optional<double> min_util_;
+  absl::optional<double> util_sum_;
+  absl::optional<double> max_util_;
+  absl::optional<double> min_util_;
   bool constant_sum_;
   bool identical_payoffs_;
   bool general_sum_;

@@ -23,7 +23,7 @@
 
 #include "open_spiel/abseil-cpp/absl/random/uniform_int_distribution.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
-#include "third_party/eigen3/unsupported/Eigen/CXX11/src/Tensor/TensorMap.h"
+#include "unsupported/Eigen/CXX11/src/Tensor/TensorMap.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
@@ -118,7 +118,7 @@ void TFBatchTrajectoryRecorder::FillInputsAndMasks() {
   TensorMap inputs_matrix = tf_inputs_.matrix<float>();
   TensorMap mask_matrix = tf_legal_mask_.matrix<float>();
 
-  std::vector<double> info_state_vector;
+  std::vector<float> info_state_vector(game_->InformationStateTensorSize());
   for (int b = 0; b < batch_size_; ++b) {
     if (!terminal_flags_[b]) {
       std::vector<int> mask = states_[b]->LegalActionsMask();
@@ -128,7 +128,7 @@ void TFBatchTrajectoryRecorder::FillInputsAndMasks() {
       }
 
       states_[b]->InformationStateTensor(states_[b]->CurrentPlayer(),
-                                         &info_state_vector);
+                                         absl::MakeSpan(info_state_vector));
       for (int i = 0; i < info_state_vector.size(); ++i) {
         inputs_matrix(b, i) = info_state_vector[i];
       }
