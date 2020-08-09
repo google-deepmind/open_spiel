@@ -173,7 +173,7 @@ class DeepCFRSolver(policy.Policy):
         advantage network before training on each iteration.
     """
     all_players = list(range(game.num_players()))
-    super(DeepCFR, self).__init__(game, all_players)
+    super(DeepCFRSolver, self).__init__(game, all_players)
     self._game = game
     if game.get_type().dynamics == pyspiel.GameType.Dynamics.SIMULTANEOUS:
       # `_traverse_game_tree` does not take into account this option.
