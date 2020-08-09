@@ -18,11 +18,11 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+from absl import logging
 from absl.testing import parameterized
 
 from open_spiel.python import policy
 from open_spiel.python.pytorch import deep_cfr
-from open_spiel.python.algorithms import exploitability
 import pyspiel
 
 
@@ -56,11 +56,12 @@ class DeepCFRPyTorchTest(parameterized.TestCase):
         batch_size_strategy=None,
         memory_capacity=1e7)
     deep_cfr_solver.solve()
-    conv = exploitability.nash_conv(
+    conv = pyspiel.nash_conv(
         game,
         policy.tabular_policy_from_callable(
-            game, deep_cfr_solver.action_probabilities))
-    print('Deep CFR in Matching Pennies 3p. NashConv: {}'.format(conv))
+          policy.python_policy_to_pyspiel_policy(
+            game, deep_cfr_solver.action_probabilities)))
+    logging.info('Deep CFR in Matching Pennies 3p. NashConv: {}'.format(conv))
 
 
 if __name__ == '__main__':

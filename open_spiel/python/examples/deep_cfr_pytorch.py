@@ -27,7 +27,7 @@ import tensorflow.compat.v1 as tf
 
 from open_spiel.python import policy
 from open_spiel.python.pytorch import deep_cfr
-from open_spiel.python.algorithms import exploitability
+from open_spiel.python.algorithms import expected_game_score
 import pyspiel
 
 FLAGS = flags.FLAGS
@@ -53,7 +53,6 @@ def main(unused_argv):
       memory_capacity=1e7)
   
   _, advantage_losses, policy_loss = deep_cfr_solver.solve()
-  
   for player, losses in six.iteritems(advantage_losses):
     logging.info("Advantage for player %d: %s", player,
                   losses[:2] + ["..."] + losses[-2:])
@@ -62,11 +61,19 @@ def main(unused_argv):
   logging.info("Strategy Buffer Size: '%s'",
                 len(deep_cfr_solver.strategy_buffer))
   logging.info("Final policy loss: '%s'", policy_loss)
-  conv = exploitability.nash_conv(
-      game,
-      policy.tabular_policy_from_callable(
-          game, deep_cfr_solver.action_probabilities))
-  logging.info("Deep CFR PyTorch in '%s' - NashConv: %s", FLAGS.game_name, conv)
+
+  average_policy = policy.tabular_policy_from_callable(
+      game, deep_cfr_solver.action_probabilities)
+  pyspiel_policy = policy.python_policy_to_pyspiel_policy(average_policy)
+  conv = pyspiel.nash_conv(game, pyspiel_policy)
+  logging.info("Deep CFR in '%s' - NashConv: %s", FLAGS.game_name, conv)
+
+  average_policy_values = expected_game_score.policy_value(
+      game.new_initial_state(), [average_policy] * 2)
+  print("Computed player 0 value: {}".format(average_policy_values[0]))
+  print("Expected player 0 value: {}".format(-1 / 18))
+  print("Computed player 1 value: {}".format(average_policy_values[1]))
+  print("Expected player 1 value: {}".format(1 / 18))
 
 
 if __name__ == "__main__":
