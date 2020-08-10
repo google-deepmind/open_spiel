@@ -137,9 +137,6 @@ class GoofspielGame : public Game {
   double MinUtility() const override;
   double MaxUtility() const override;
   double UtilitySum() const override { return 0; }
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new GoofspielGame(*this));
-  }
   std::vector<int> InformationStateTensorShape() const override;
   std::vector<int> ObservationTensorShape() const override;
   int MaxGameLength() const override { return num_cards_; }

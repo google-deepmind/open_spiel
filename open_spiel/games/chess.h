@@ -238,9 +238,6 @@ class ChessGame : public Game {
   double MinUtility() const override { return LossUtility(); }
   double UtilitySum() const override { return DrawUtility(); }
   double MaxUtility() const override { return WinUtility(); }
-  std::shared_ptr<const Game> Clone() const override {
-    return std::make_shared<ChessGame>(*this);
-  }
   std::vector<int> ObservationTensorShape() const override {
     return chess::ObservationTensorShape();
   }

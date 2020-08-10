@@ -356,9 +356,6 @@ class StonesNGemsGame : public Game {
   int MaxChanceOutcomes() const override { return 1; }
   double MinUtility() const override;
   double MaxUtility() const override;
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new StonesNGemsGame(*this));
-  }
   std::vector<int> ObservationTensorShape() const override;
   std::unique_ptr<State> DeserializeState(
       const std::string& str) const override;

@@ -68,9 +68,6 @@ class FlatJointActionTestGame : public SimMoveGame {
   int NumPlayers() const override { return 3; }
   double MinUtility() const override { return -10; }
   double MaxUtility() const override { return 10; }
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new FlatJointActionTestGame(*this));
-  }
   std::vector<int> InformationStateTensorShape() const override { return {}; }
   int MaxGameLength() const override { return 1; }
 };

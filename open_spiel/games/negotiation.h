@@ -173,9 +173,6 @@ class NegotiationGame : public Game {
     return kMaxQuantity * kMaxValue * num_items_;
   }
   double MinUtility() const override { return -MaxUtility(); }
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new NegotiationGame(*this));
-  }
   std::vector<int> ObservationTensorShape() const override;
 
   std::unique_ptr<State> DeserializeState(

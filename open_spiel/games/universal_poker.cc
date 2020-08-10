@@ -688,10 +688,6 @@ int UniversalPokerGame::NumDistinctActions() const {
   }
 }
 
-std::shared_ptr<const Game> UniversalPokerGame::Clone() const {
-  return std::shared_ptr<const Game>(new UniversalPokerGame(*this));
-}
-
 int UniversalPokerGame::MaxGameLength() const {
   // We cache this as this is very slow to calculate.
   if (max_game_length_) return *max_game_length_;

@@ -184,9 +184,6 @@ class LeducGame : public Game {
   double MinUtility() const override;
   double MaxUtility() const override;
   double UtilitySum() const override { return 0; }
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new LeducGame(*this));
-  }
   std::vector<int> InformationStateTensorShape() const override;
   std::vector<int> ObservationTensorShape() const override;
   constexpr int MaxBetsPerRound() const {

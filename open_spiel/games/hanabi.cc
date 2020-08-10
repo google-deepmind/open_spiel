@@ -128,10 +128,6 @@ double OpenSpielHanabiGame::MaxUtility() const {
   return game_.NumColors() * game_.NumRanks();
 }
 
-std::shared_ptr<const Game> OpenSpielHanabiGame::Clone() const {
-  return std::shared_ptr<Game>(new OpenSpielHanabiGame(GetParameters()));
-}
-
 std::vector<int> OpenSpielHanabiGame::ObservationTensorShape() const {
   return encoder_.Shape();
 }

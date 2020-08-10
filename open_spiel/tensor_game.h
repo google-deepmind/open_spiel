@@ -69,10 +69,6 @@ class TensorGame : public NormalFormGame {
 
   double MaxUtility() const override { return max_utility_; }
 
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new TensorGame(*this));
-  }
-
   const std::vector<int>& Shape() const { return shape_; }
   const double PlayerUtility(const Player player,
                              const std::vector<Action>& actions) const {

@@ -112,9 +112,6 @@ class LewisSignalingGame : public Game {
   double MinUtility() const override {
     return *std::min_element(payoffs_.begin(), payoffs_.end());
   }
-  std::shared_ptr<const Game> Clone() const override {
-    return std::make_shared<const LewisSignalingGame>(*this);
-  }
   std::vector<int> ObservationTensorShape() const override;
   std::vector<int> InformationStateTensorShape() const override {
     return ObservationTensorShape();

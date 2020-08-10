@@ -468,10 +468,6 @@ int CoinGame::MaxChanceOutcomes() const {
   return std::max(num_coin_colors_, num_rows_ * num_columns_);
 }
 
-std::shared_ptr<const Game> CoinGame::Clone() const {
-  return std::shared_ptr<const Game>(new CoinGame(*this));
-}
-
 std::unique_ptr<State> CoinGame::NewInitialState() const {
   return std::unique_ptr<State>(new CoinState(shared_from_this()));
 }

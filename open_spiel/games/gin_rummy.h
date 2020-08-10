@@ -197,9 +197,6 @@ class GinRummyGame : public Game {
         new GinRummyState(shared_from_this(), oklahoma_, knock_card_,
                           gin_bonus_, undercut_bonus_));
   }
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new GinRummyGame(*this));
-  }
   std::vector<int> ObservationTensorShape() const override {
     return {kObservationTensorSize};
   }

@@ -121,9 +121,6 @@ class CliffWalkingGame : public Game {
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(new CliffWalkingState(shared_from_this()));
   }
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<Game>(new CliffWalkingGame(*this));
-  }
   std::vector<int> ObservationTensorShape() const override {
     return {height_, width_};
   }

@@ -511,18 +511,6 @@ NegotiationGame::NegotiationGame(const GameParameters& params)
   ConstructLegalUtterances();
 }
 
-// Need to provide a custom copy constructor to clone the RNG.
-NegotiationGame::NegotiationGame(const NegotiationGame& other)
-    : Game(other),
-      enable_proposals_(other.enable_proposals_),
-      enable_utterances_(other.enable_utterances_),
-      num_items_(other.num_items_),
-      num_symbols_(other.num_symbols_),
-      utterance_dim_(other.utterance_dim_),
-      seed_(other.seed_),
-      legal_utterances_(other.legal_utterances_),
-      rng_(new std::mt19937(*other.rng_)) {}
-
 void NegotiationGame::ConstructLegalUtterances() {
   if (enable_utterances_) {
     legal_utterances_.resize(NumDistinctUtterances());

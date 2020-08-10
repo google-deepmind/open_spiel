@@ -48,7 +48,6 @@ class OpenSpielHanabiGame : public Game {
   int NumPlayers() const override;
   double MinUtility() const override;
   double MaxUtility() const override;
-  std::shared_ptr<const Game> Clone() const override;
   std::vector<int> ObservationTensorShape() const override;
   int MaxGameLength() const override;
 

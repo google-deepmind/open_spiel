@@ -101,9 +101,6 @@ class TradeCommGame : public Game {
   int NumPlayers() const override { return kDefaultNumPlayers; }
   double MaxUtility() const override { return kWinUtility; }
   double MinUtility() const override { return 0; }
-  std::shared_ptr<const Game> Clone() const override {
-    return std::make_shared<const TradeCommGame>(*this);
-  }
   std::vector<int> ObservationTensorShape() const override;
 
  private:

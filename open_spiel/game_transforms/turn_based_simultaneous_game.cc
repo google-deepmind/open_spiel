@@ -271,7 +271,7 @@ TurnBasedSimultaneousGame::TurnBasedSimultaneousGame(
 std::shared_ptr<const Game> ConvertToTurnBased(const Game& game) {
   SPIEL_CHECK_EQ(game.GetType().dynamics, GameType::Dynamics::kSimultaneous);
   return std::shared_ptr<const TurnBasedSimultaneousGame>(
-      new TurnBasedSimultaneousGame(game.Clone()));
+      new TurnBasedSimultaneousGame(game.shared_from_this()));
 }
 
 std::shared_ptr<const Game> LoadGameAsTurnBased(const std::string& name) {

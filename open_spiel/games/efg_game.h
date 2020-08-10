@@ -120,14 +120,6 @@ class EFGGame : public Game {
   double MaxUtility() const override;
   int MaxGameLength() const override;
 
-  std::shared_ptr<const Game> Clone() const override {
-    if (!filename_.empty()) {
-      return LoadGame("efg_game", {{"filename", GameParameter(filename_)}});
-    } else {
-      return LoadEFGGame(string_data_);
-    }
-  }
-
   // Gets the player / decision node action associated to this label.
   Action GetAction(const std::string& label) const {
     auto iter = action_ids_.find(label);

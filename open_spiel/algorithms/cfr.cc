@@ -176,7 +176,7 @@ TabularPolicy CFRCurrentPolicy::AsTabular() const {
 CFRSolverBase::CFRSolverBase(const Game& game, bool alternating_updates,
                              bool linear_averaging, bool regret_matching_plus,
                              bool random_initial_regrets, int seed)
-    : game_(game.Clone()),
+    : game_(game.shared_from_this()),
       root_state_(game.NewInitialState()),
       root_reach_probs_(game_->NumPlayers() + 1, 1.0),
       regret_matching_plus_(regret_matching_plus),

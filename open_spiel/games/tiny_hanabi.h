@@ -88,9 +88,6 @@ class TinyHanabiGame : public Game {
   double MaxUtility() const override { return payoff_.MaxUtility(); }
   int MaxGameLength() const override { return payoff_.NumPlayers(); }
   int MaxChanceOutcomes() const override { return payoff_.NumChance(); }
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new TinyHanabiGame(*this));
-  }
   std::vector<int> InformationStateTensorShape() const override {
     return {payoff_.NumChance() + payoff_.NumActions() * payoff_.NumPlayers()};
   }

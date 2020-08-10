@@ -70,16 +70,6 @@ class BlottoState : public NFGState {
 class BlottoGame : public NormalFormGame {
  public:
   explicit BlottoGame(const GameParameters& params);
-  BlottoGame(const BlottoGame& other)
-      : NormalFormGame(other),
-        num_distinct_actions_(other.num_distinct_actions_),
-        coins_(other.coins_),
-        fields_(other.fields_),
-        players_(other.players_),
-        action_map_(
-            std::unique_ptr<ActionMap>(new ActionMap(*other.action_map_))),
-        legal_actions_(std::unique_ptr<std::vector<Action>>(
-            new std::vector<Action>(*other.legal_actions_))) {}
 
   int NumDistinctActions() const override;
   std::unique_ptr<State> NewInitialState() const override {
@@ -92,9 +82,6 @@ class BlottoGame : public NormalFormGame {
   double MinUtility() const override { return -1; }
   double UtilitySum() const override { return 0; }
   double MaxUtility() const override { return +1; }
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new BlottoGame(*this));
-  }
 
  private:
   void CreateActionMapRec(int* count, int coins_left,

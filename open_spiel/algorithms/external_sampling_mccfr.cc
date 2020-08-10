@@ -45,7 +45,7 @@ ExternalSamplingMCCFRSolver::ExternalSamplingMCCFRSolver(const Game& game,
 ExternalSamplingMCCFRSolver::ExternalSamplingMCCFRSolver(
     const Game& game, std::shared_ptr<Policy> default_policy, int seed,
     AverageType avg_type)
-    : ExternalSamplingMCCFRSolver(game.Clone(), default_policy,
+    : ExternalSamplingMCCFRSolver(game.shared_from_this(), default_policy,
                                   std::make_unique<std::mt19937>(seed),
                                   avg_type) {}
 

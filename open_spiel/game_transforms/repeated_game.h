@@ -76,9 +76,6 @@ class RepeatedGame : public SimMoveGame {
     return stage_game_->MaxUtility() * num_repetitions_;
   }
   std::vector<int> ObservationTensorShape() const override;
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new RepeatedGame(*this));
-  }
 
  private:
   std::shared_ptr<const Game> stage_game_;

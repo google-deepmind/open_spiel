@@ -39,7 +39,7 @@ TFBatchTrajectoryRecorder::TFBatchTrajectoryRecorder(
       states_(),
       terminal_flags_(std::vector<int>(batch_size, 0)),
       num_terminals_(0),
-      game_(game.Clone()),
+      game_(game.shared_from_this()),
       graph_filename_(graph_filename),
       rng_(),
       dist_(0.0, 1.0),

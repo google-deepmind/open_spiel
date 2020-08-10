@@ -107,9 +107,6 @@ class HexGame : public Game {
   double MinUtility() const override { return -1; }
   double UtilitySum() const override { return 0; }
   double MaxUtility() const override { return 1; }
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new HexGame(*this));
-  }
   std::vector<int> ObservationTensorShape() const override {
     return {kCellStates, board_size_, board_size_};
   }

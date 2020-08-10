@@ -44,7 +44,7 @@ OutcomeSamplingMCCFRSolver::OutcomeSamplingMCCFRSolver(
     const Game& game, std::shared_ptr<Policy> default_policy, double epsilon,
     int seed)
     : OutcomeSamplingMCCFRSolver(
-          game.Clone(), default_policy, epsilon, -1,
+          game.shared_from_this(), default_policy, epsilon, -1,
           std::mt19937(seed >= 0 ? seed : std::mt19937::default_seed)) {}
 
 OutcomeSamplingMCCFRSolver::OutcomeSamplingMCCFRSolver(

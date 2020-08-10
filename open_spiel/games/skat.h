@@ -219,9 +219,6 @@ class SkatGame : public Game {
   double UtilitySum() const override { return 0; }
   int MaxGameLength() const override { return kNumCards + kNumPlayers; }
   int MaxChanceOutcomes() const override { return kNumCards; }
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new SkatGame(*this));
-  }
   std::vector<int> ObservationTensorShape() const override {
     return {kObservationTensorSize};
   }

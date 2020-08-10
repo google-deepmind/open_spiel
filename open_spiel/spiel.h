@@ -612,6 +612,8 @@ std::ostream& operator<<(std::ostream& stream, const State& state);
 class Game : public std::enable_shared_from_this<Game> {
  public:
   virtual ~Game() = default;
+  Game(const Game&) = delete;
+  Game& operator=(const Game&) = delete;
 
   // Maximum number of distinct actions in the game for any one player. This is
   // not the same as max number of legal actions in any state as distinct
@@ -655,9 +657,6 @@ class Game : public std::enable_shared_from_this<Game> {
   // are common among games and should use the standard values of {-1,0,1}.
   virtual double MinUtility() const = 0;
   virtual double MaxUtility() const = 0;
-
-  // Return a clone of this game.
-  virtual std::shared_ptr<const Game> Clone() const = 0;
 
   // Static information on the game type. This should match the information
   // provided when registering the game.

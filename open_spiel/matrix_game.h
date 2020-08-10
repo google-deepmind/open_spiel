@@ -85,10 +85,6 @@ class MatrixGame : public NormalFormGame {
         *std::max_element(begin(col_utilities_), end(col_utilities_)));
   }
 
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new MatrixGame(*this));
-  }
-
   // Methods for MatrixState to call.
   int NumRows() const { return row_action_names_.size(); }
   int NumCols() const { return col_action_names_.size(); }

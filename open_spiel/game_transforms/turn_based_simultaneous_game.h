@@ -109,9 +109,6 @@ class TurnBasedSimultaneousGame : public Game {
   int MaxGameLength() const override {
     return game_->MaxGameLength() * NumPlayers();
   }
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new TurnBasedSimultaneousGame(*this));
-  }
 
  private:
   std::shared_ptr<const Game> game_;

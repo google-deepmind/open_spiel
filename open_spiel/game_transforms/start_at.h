@@ -39,11 +39,7 @@ class StartAtTransformationGame : public WrappedGame {
  public:
   StartAtTransformationGame(std::shared_ptr<const Game> game,
                             GameType game_type, GameParameters game_parameters);
-  StartAtTransformationGame(const StartAtTransformationGame& other);
   std::unique_ptr<State> NewInitialState() const override;
-  std::shared_ptr<const Game> Clone() const override {
-    return std::make_shared<StartAtTransformationGame>(*this);
-  }
   std::vector<State::PlayerAction> StartAtHistory() const {
     return start_state_->FullHistory();
   }

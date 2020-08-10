@@ -101,9 +101,6 @@ class BreakthroughGame : public Game {
   double MinUtility() const override { return -1; }
   double UtilitySum() const override { return 0; }
   double MaxUtility() const override { return 1; }
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new BreakthroughGame(*this));
-  }
   std::vector<int> ObservationTensorShape() const override {
     return {kCellStates, rows_, cols_};
   }

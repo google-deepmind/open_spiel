@@ -226,9 +226,6 @@ class BridgeGame : public Game {
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override { return -kMaxScore; }
   double MaxUtility() const override { return kMaxScore; }
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new BridgeGame(*this));
-  }
   std::vector<int> ObservationTensorShape() const override {
     return {kObservationTensorSize};
   }

@@ -95,10 +95,6 @@ class EFCCEGame : public WrappedGame {
                                         FollowAction(), DefectAction());
   }
 
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new EFCCEGame(*this));
-  }
-
   int NumDistinctActions() const override {
     // 2 extra actions: cooperate/follow or defect
     return orig_num_distinct_actions_ + 2;

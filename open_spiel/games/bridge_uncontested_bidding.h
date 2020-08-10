@@ -221,9 +221,6 @@ class UncontestedBiddingGame : public Game {
   double MaxUtility() const override {
     return reference_contracts_.empty() ? kMaxScore : 0;
   }
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new UncontestedBiddingGame(*this));
-  }
   std::vector<int> InformationStateTensorShape() const override {
     return {kStateSize};
   }

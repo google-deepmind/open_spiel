@@ -105,10 +105,6 @@ class EFCEGame : public WrappedGame {
                                        game_->NewInitialState(), config_, mu_);
   }
 
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new EFCEGame(*this));
-  }
-
  protected:
   const CorrDistConfig config_;
   const CorrelationDevice& mu_;

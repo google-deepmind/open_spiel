@@ -162,9 +162,6 @@ class CursorGoGame : public Game {
   double MinUtility() const override { return kLossUtility; }
   double UtilitySum() const override { return kLossUtility + kWinUtility; }
   double MaxUtility() const override { return kWinUtility; }
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new CursorGoGame(*this));
-  }
 
   int MaxGameLength() const override {
     return cursor_go::MaxGameLength(board_size_) * (1 + max_cursor_moves_);
