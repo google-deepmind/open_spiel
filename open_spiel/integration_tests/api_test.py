@@ -15,6 +15,9 @@
 # Lint as: python3
 """Tests for open_spiel.integration_tests.api."""
 
+import collections
+import enum
+from typing import Callable, Dict, List, Tuple
 import unittest
 
 from absl.testing import absltest
@@ -255,6 +258,11 @@ class EnforceAPIOnFullTreeBase(parameterized.TestCase):
       self.assertLen(union, sum([len(x) for x in information_sets_per_player]))
 
 
+class Relation(enum.Enum):
+  SUBSET_OR_EQUALS = 1
+  EQUALS = 2
+
+
 class EnforceAPIOnPartialTreeBase(parameterized.TestCase):
   """This only partially test some properties."""
 
@@ -388,6 +396,114 @@ class EnforceAPIOnPartialTreeBase(parameterized.TestCase):
       self.assertNotEqual(
           public_observation.string_from(state, 0),
           pyspiel.PublicObservation.INVALID)
+
+  def _check_partition_consistency(
+      self, partition_callbacks: Dict[str, Callable[[int, pyspiel.State], str]],
+      partition_relations: List[Tuple[str, Relation, str]]):
+
+    for player in range(self.game.num_players()):
+      states_representations = collections.defaultdict(dict)
+      partitioned_sets = {
+          name: collections.defaultdict(set)
+          for name in partition_callbacks.keys()
+      }
+      for state in self.some_states:
+        history = state.history_str()
+        for name, callback in partition_callbacks.items():
+          representation = callback(player, state)
+          states_representations[history][name] = representation
+          partitioned_sets[name][representation].add(history)
+
+      for x, relation, y in partition_relations:
+        for state in self.some_states:
+          history = state.history_str()
+          rep_x = states_representations[history][x]
+          rep_y = states_representations[history][y]
+          histories_x = partitioned_sets[x][rep_x]
+          histories_y = partitioned_sets[y][rep_y]
+          if relation == Relation.EQUALS:
+            if histories_x != histories_y:
+              self.assertEqual(
+                  histories_x, histories_y,
+                  self._show_error(player, state, x, relation, y, rep_x, rep_y,
+                                   histories_x, histories_y))
+          elif relation == Relation.SUBSET_OR_EQUALS:
+            if not histories_x.issubset(histories_y):
+              self.assertTrue(
+                  histories_x.issubset(histories_y),
+                  self._show_error(player, state, x, relation, y, rep_x, rep_y,
+                                   histories_x, histories_y))
+          else:
+            raise RuntimeError(f"Unknown relation {relation}")
+
+  def _show_error(self, pl, state, x, relation, y, rep_x, rep_y, histories_x,
+                  histories_y):
+    s = "Observation consistency failed.\n"
+    s += f"It should hold that partition of '{x}' is {relation} of '{y}'\n"
+    s += "Problem occurred while evaluating action history "
+    s += f"'{state.history_str()}' for player {pl}.\n"
+    s += f"The state representation is:\n{state}\n"
+    s += "-" * 80
+    s += "\nDetailed information:\n"
+    s += f"The set of histories that have the same '{x}':\n{histories_x}\n"
+    s += f"The set of histories that have the same '{y}':\n{histories_y}\n"
+    s += f"The set difference is:\n{histories_y - histories_x}\n"
+    s += f"The problematic {x} is '{rep_x}'\n"
+    s += f"The problematic {y} is '{rep_y}'\n"
+    return s
+
+  def test_observation_consistency(self):
+    if self.game_type.dynamics != pyspiel.GameType.Dynamics.SEQUENTIAL:
+      return  # TODO(author13): support also other types of games.
+
+    # TODO(author13): Following games need to be fixed -- they currently
+    # do not pass the observation consistency test.
+    broken_games = [
+        "first_sealed_auction", "hearts", "kuhn_poker", "leduc_poker",
+        "lewis_signaling", "liars_dice", "pentago", "phantom_ttt",
+        "tiny_bridge_2p", "tiny_bridge_4p", "tiny_hanabi", "universal_poker"
+    ]
+    if self.game_name in broken_games:
+      return
+
+    callbacks = dict()
+    callbacks["move_number"] = lambda _, state: str(state.move_number())
+    # pylint: disable=g-long-lambda
+    if self.game_type.provides_information_state_string:
+      callbacks["information_state_string"] = lambda player, state: \
+        state.information_state_string(player)
+    if self.game_type.provides_observation_string:
+      callbacks["action_observation_history"] = lambda player, state: \
+        str(pyspiel.ActionObservationHistory(player, state))
+    if self.game_type.provides_factored_observation_string:
+      callbacks["public_observation_history"] = lambda player, state: \
+        str(pyspiel.PublicObservationHistory(state))
+
+    # TODO(author13): Add testing of tensor variants.
+
+    relations = []
+
+    def add_relation(x, relation, y):
+      if x in callbacks and y in callbacks:
+        relations.append((x, relation, y))
+
+    # All observations should be subsets of move_number.
+    add_relation("information_state_string", Relation.SUBSET_OR_EQUALS,
+                 "move_number")
+    add_relation("public_observation_history", Relation.SUBSET_OR_EQUALS,
+                 "move_number")
+    add_relation("action_observation_history", Relation.SUBSET_OR_EQUALS,
+                 "move_number")
+
+    # Other relations:
+    add_relation("information_state_string", Relation.EQUALS,
+                 "action_observation_history")
+    add_relation("information_state_string", Relation.SUBSET_OR_EQUALS,
+                 "public_observation_history")
+    add_relation("action_observation_history", Relation.SUBSET_OR_EQUALS,
+                 "public_observation_history")
+
+    self._check_partition_consistency(callbacks, relations)
 
 
 def _assert_properties_recursive(state, assert_functions):
