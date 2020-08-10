@@ -170,11 +170,11 @@ struct BinaryCompress {
     std::string str(num_bytes + kNumHeaderBytes, '\0');
     str[0] = kCompressionBinary;
 
-    for (int byte = 0; byte < num_bytes; ++byte) {
-      for (int bit = 0; bit < kBitsPerByte; ++bit) {
-        if (buffer[byte * kBitsPerByte + bit]) {
-          str[kNumHeaderBytes + byte] += (1 << bit);
-        }
+    for (int i = 0; i < buffer.size(); ++i) {
+      if (buffer[i]) {
+        const int byte = i / kBitsPerByte;
+        const int bit = i % kBitsPerByte;
+        str[kNumHeaderBytes + byte] += (1 << bit);
       }
     }
     return str;
