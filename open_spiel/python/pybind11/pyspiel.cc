@@ -438,6 +438,9 @@ PYBIND11_MODULE(pyspiel, m) {
 
   m.def("hulh_game_string", &open_spiel::HulhGameString);
   m.def("hunl_game_string", &open_spiel::HunlGameString);
+  m.def("turn_based_goofspiel_game_string",
+        &open_spiel::TurnBasedGoofspielGameString);
+
   m.def("create_matrix_game",
         py::overload_cast<const std::string&, const std::string&,
                           const std::vector<std::string>&,

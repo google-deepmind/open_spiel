@@ -37,4 +37,12 @@ std::string HulhGameString(const std::string &betting_abstraction) {
       betting_abstraction);
 }
 
+std::string TurnBasedGoofspielGameString(int num_cards) {
+  return absl::StrFormat(
+      "turn_based_simultaneous_game(game=goofspiel("
+      "imp_info=true,num_cards=%i,players=2,"
+      "points_order=descending,returns_type=win_loss))",
+      num_cards);
+}
+
 }  // namespace open_spiel
