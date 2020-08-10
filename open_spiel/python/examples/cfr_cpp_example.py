@@ -12,12 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Example use of the C++ MCCFR algorithms on Kuhn Poker.
-
-This examples calls the underlying C++ implementations via the Python bindings.
-Note that there are some pure Python implementations of some of these algorithms
-in python/algorithms as well.
-"""
+"""Example use of the CFR algorithm on Kuhn Poker."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -31,17 +26,10 @@ import pyspiel
 
 FLAGS = flags.FLAGS
 
-flags.DEFINE_enum(
-    "sampling",
-    "external",
-    ["external", "outcome"],
-    "Sampling for the MCCFR solver",
-)
-flags.DEFINE_integer("iterations", 50, "Number of iterations")
+flags.DEFINE_enum("solver", "cfr", ["cfr", "cfrplus", "cfrbr"], "CFR solver")
+flags.DEFINE_integer("iterations", 20, "Number of iterations")
 flags.DEFINE_string("game", "kuhn_poker", "Name of the game")
 flags.DEFINE_integer("players", 2, "Number of players")
-
-MODEL_FILE_NAME = "{}_sampling_mccfr_solver.pickle"
 
 
 def main(_):
@@ -50,34 +38,33 @@ def main(_):
       {"players": pyspiel.GameParameter(FLAGS.players)},
   )
 
-  if FLAGS.sampling == "external":
-    solver = pyspiel.ExternalSamplingMCCFRSolver(
-        game,
-        avg_type=pyspiel.MCCFRAverageType.FULL,
-    )
-  elif FLAGS.sampling == "outcome":
-    solver = pyspiel.OutcomeSamplingMCCFRSolver(game)
+  if FLAGS.solver == "cfr":
+    solver = pyspiel.CFRSolver(game)
+  elif FLAGS.solver == "cfrplus":
+    solver = pyspiel.CFRPlusSolver(game)
+  elif FLAGS.solver == "cfrbr":
+    solver = pyspiel.CFRBRSolver(game)
 
   for i in range(int(FLAGS.iterations / 2)):
-    solver.run_iteration()
+    solver.evaluate_and_update_policy()
     print("Iteration {} exploitability: {:.6f}".format(
         i, pyspiel.exploitability(game, solver.average_policy())))
 
   print("Persisting the model...")
-  with open(MODEL_FILE_NAME.format(FLAGS.sampling), "wb") as file:
+  with open("{}_solver.pickle".format(FLAGS.solver), "wb") as file:
     pickle.dump(solver, file, pickle.HIGHEST_PROTOCOL)
 
   print("Loading the model...")
-  with open(MODEL_FILE_NAME.format(FLAGS.sampling), "rb") as file:
+  with open("{}_solver.pickle".format(FLAGS.solver), "rb") as file:
     loaded_solver = pickle.load(file)
   print("Exploitability of the loaded model: {:.6f}".format(
       pyspiel.exploitability(game, loaded_solver.average_policy())))
 
   for i in range(int(FLAGS.iterations / 2)):
-    solver.run_iteration()
+    loaded_solver.evaluate_and_update_policy()
     print("Iteration {} exploitability: {:.6f}".format(
         int(FLAGS.iterations / 2) + i,
-        pyspiel.exploitability(game, solver.average_policy())))
+        pyspiel.exploitability(game, loaded_solver.average_policy())))
 
 
 if __name__ == "__main__":

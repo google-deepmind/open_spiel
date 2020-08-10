@@ -25,6 +25,7 @@
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
+#include "open_spiel/abseil-cpp/absl/strings/charconv.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_format.h"
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
@@ -81,8 +82,63 @@ ActionsAndProbs UniformStatePolicy(const State& state) {
   return actions_and_probs;
 }
 
+std::unique_ptr<Policy> DeserializePolicy(const std::string& serialized,
+                                          std::string delimiter) {
+  // Class’s identity is the very first line, see Policy::Serialize
+  // for more info.
+  std::pair<std::string, absl::string_view> cls_and_content =
+      absl::StrSplit(serialized, absl::MaxSplits(':', 1));
+  std::string class_identity = cls_and_content.first;
+
+  if (class_identity == "TabularPolicy") {
+    return DeserializeTabularPolicy(serialized, delimiter);
+  } else if (class_identity == "UniformPolicy") {
+    return std::make_unique<UniformPolicy>();
+  } else {
+    SpielFatalError(absl::StrCat("Deserialization of ", class_identity,
+                                 " is not supported."));
+  }
+}
+
 TabularPolicy::TabularPolicy(const Game& game)
     : TabularPolicy(GetRandomPolicy(game)) {}
+
+std::unique_ptr<TabularPolicy> DeserializeTabularPolicy(
+    const std::string& serialized, std::string delimiter) {
+  // Class’s identity is the very first line, see Policy::Serialize
+  // for more info.
+  std::pair<std::string, absl::string_view> cls_and_content =
+      absl::StrSplit(serialized, absl::MaxSplits(':', 1));
+  SPIEL_CHECK_EQ(cls_and_content.first, "TabularPolicy");
+
+  std::unique_ptr<TabularPolicy> res = std::make_unique<TabularPolicy>();
+  if (cls_and_content.second.empty()) return res;
+
+  std::vector<absl::string_view> splits =
+      absl::StrSplit(cls_and_content.second, delimiter);
+
+  // Insert the actual values
+  Action action;
+  double prob;
+  for (int i = 0; i < splits.size(); i += 2) {
+    std::vector<absl::string_view> policy_values =
+        absl::StrSplit(splits.at(i + 1), ',');
+    ActionsAndProbs res_policy;
+    res_policy.reserve(policy_values.size());
+
+    for (absl::string_view policy_value : policy_values) {
+      std::pair<absl::string_view, absl::string_view> action_and_prob =
+          absl::StrSplit(policy_value, '=');
+      SPIEL_CHECK_TRUE(absl::SimpleAtoi(action_and_prob.first, &action));
+      absl::from_chars(
+          action_and_prob.second.data(),
+          action_and_prob.second.data() + action_and_prob.second.size(), prob);
+      res_policy.push_back({action, prob});
+    }
+    res->SetStatePolicy(std::string(splits.at(i)), res_policy);
+  }
+  return res;
+}
 
 const std::string TabularPolicy::ToString() const {
   std::string str = "";

@@ -15,6 +15,7 @@ add_library (utils OBJECT
   random.cc
   run_python.h
   run_python.cc
+  serialization.h
   stats.h
   tensor_view.h
   thread.h

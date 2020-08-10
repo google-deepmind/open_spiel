@@ -182,6 +182,73 @@ void CFRTest_TicTacToe(int num_iterations, double nashconv_upper_bound) {
   }
 }
 
+void CFRTest_InfoStateValuesTableSerialization() {
+  // Check empty
+  CFRInfoStateValuesTable info_state_values_table = {};
+  std::string serialized0 = "";
+  SerializeCFRInfoStateValuesTable(info_state_values_table, &serialized0, -1);
+  CFRInfoStateValuesTable deserialized0;
+  DeserializeCFRInfoStateValuesTable(serialized0, &deserialized0);
+  SPIEL_CHECK_TRUE(deserialized0.empty());
+
+  // Check non-empty
+  info_state_values_table = {
+      {"", CFRInfoStateValues({0}, 1.0)},
+      {"0:0,0;0", CFRInfoStateValues({0, 1, 2}, 0.1)},
+      {"<->\n<->", CFRInfoStateValues({0, 1, 2}, 0.1)},
+      {"1:1,1;1", CFRInfoStateValues({0, 1, 2, 3}, 0.2)}};
+  std::string serialized1 = "";
+  SerializeCFRInfoStateValuesTable(info_state_values_table, &serialized1, -1);
+  CFRInfoStateValuesTable deserialized1;
+  DeserializeCFRInfoStateValuesTable(serialized1, &deserialized1);
+
+  SPIEL_CHECK_EQ(info_state_values_table.size(),
+                 info_state_values_table.size());
+  for (const auto& [info_state, values] : info_state_values_table) {
+    for (int i = 0; i < values.legal_actions.size(); i++) {
+      SPIEL_CHECK_EQ(values.legal_actions.at(i),
+                     deserialized1.at(info_state).legal_actions.at(i));
+      SPIEL_CHECK_FLOAT_NEAR(
+          values.cumulative_regrets.at(i),
+          deserialized1.at(info_state).cumulative_regrets.at(i), 1e-15);
+      SPIEL_CHECK_FLOAT_NEAR(
+          values.cumulative_policy.at(i),
+          deserialized1.at(info_state).cumulative_policy.at(i), 1e-15);
+      SPIEL_CHECK_FLOAT_NEAR(values.current_policy.at(i),
+                             deserialized1.at(info_state).current_policy.at(i),
+                             1e-15);
+    }
+  }
+}
+
+void CFRTest_CFRSolverSerialization() {
+  auto game = LoadGame("kuhn_poker");
+  CFRSolver solver = CFRSolver(*game);
+  double exploitability0 = Exploitability(*game, *solver.AveragePolicy());
+
+  for (int i = 0; i < 50; i++) {
+    solver.EvaluateAndUpdatePolicy();
+  }
+  double exploitability1 = Exploitability(*game, *solver.AveragePolicy());
+  SPIEL_CHECK_GT(exploitability0, exploitability1);
+
+  std::string serialized = solver.Serialize();
+  std::unique_ptr<CFRSolver> deserialized_solver =
+      DeserializeCFRSolver(serialized);
+  SPIEL_CHECK_EQ(solver.InfoStateValuesTable().size(),
+                 deserialized_solver->InfoStateValuesTable().size());
+  double exploitability2 =
+      Exploitability(*game, *deserialized_solver->AveragePolicy());
+  SPIEL_CHECK_FLOAT_NEAR(exploitability1, exploitability2, 1e-15);
+
+  for (int i = 0; i < 50; i++) {
+    deserialized_solver->EvaluateAndUpdatePolicy();
+  }
+  double exploitability3 =
+      Exploitability(*game, *deserialized_solver->AveragePolicy());
+  SPIEL_CHECK_GT(exploitability2, exploitability3);
+}
+
 }  // namespace
 }  // namespace algorithms
 }  // namespace open_spiel
@@ -245,4 +312,7 @@ int main(int argc, char** argv) {
   // when we add a version that can handle safe imperfect recall information
   // states.
   // algorithms::CFRTest_TicTacToe(10, 2.0);
+
+  algorithms::CFRTest_InfoStateValuesTableSerialization();
+  algorithms::CFRTest_CFRSolverSerialization();
 }

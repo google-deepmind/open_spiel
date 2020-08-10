@@ -15,6 +15,7 @@
 #ifndef OPEN_SPIEL_POLICY_H_
 #define OPEN_SPIEL_POLICY_H_
 
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -23,6 +24,7 @@
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
+#include "open_spiel/utils/serialization.h"
 
 namespace open_spiel {
 
@@ -104,7 +106,22 @@ class Policy {
   virtual ActionsAndProbs GetStatePolicy(const std::string& info_state) const {
     SpielFatalError("GetStatePolicy(const std::string&) unimplemented.");
   }
+
+  // Each override must write out the class’s identity followed by ":" as the
+  // very first thing so that the DeserializePolicy method can then call the
+  // Deserialize method for the correct subclass. See TabularPolicy and
+  // DeserializePolicy below for an example. The double_precision parameter
+  // indicates the number of decimal places in floating point numbers
+  // formatting, value -1 formats doubles with lossless, non-portable bitwise
+  // representation hex strings.
+  virtual std::string Serialize(int double_precision = -1,
+                                std::string delimiter = "<~>") const {
+    SpielFatalError("Serialize(std::string delimiter) unimplemented.");
+  }
 };
+
+std::unique_ptr<Policy> DeserializePolicy(const std::string& serialized,
+                                          std::string delimiter = "<~>");
 
 // A tabular policy represented internally as a map. Note that this
 // implementation is not directly compatible with the Python TabularPolicy
@@ -152,6 +169,44 @@ class TabularPolicy : public Policy {
     }
   }
 
+  std::string Serialize(int double_precision = -1,
+                        std::string delimiter = "<~>") const override {
+    SPIEL_CHECK_GE(double_precision, -1);
+    if (delimiter == "," || delimiter == "=") {
+      // The two delimiters are used for de/serialization of policy_table_
+      SpielFatalError(
+          "Please select a different delimiter,"
+          "invalid values are \",\" and \"=\".");
+    }
+    std::string str = "TabularPolicy:";
+    if (policy_table_.size() == 0) return str;
+
+    for (auto const& [info_state, policy] : policy_table_) {
+      if (info_state.find(delimiter) != std::string::npos) {
+        SpielFatalError(absl::StrCat(
+            "Info state contains delimiter \"", delimiter,
+            "\", please fix the info state or select a different delimiter."));
+      }
+
+      std::string policy_str;
+      if (double_precision == -1) {
+        policy_str =
+            absl::StrJoin(policy, ",",
+                          absl::PairFormatter(absl::AlphaNumFormatter(), "=",
+                                              HexDoubleFormatter()));
+      } else {
+        policy_str = absl::StrJoin(
+            policy, ",",
+            absl::PairFormatter(absl::AlphaNumFormatter(), "=",
+                                SimpleDoubleFormatter(double_precision)));
+      }
+      absl::StrAppend(&str, info_state, delimiter, policy_str, delimiter);
+    }
+    // Remove the trailing delimiter
+    str.erase(str.length() - delimiter.length());
+    return str;
+  }
+
   // Set the probability for action at the info state. If the info state is not
   // in the policy, it is added. If the action is not in the info state policy,
   // it is added. Otherwise it is modified.
@@ -186,12 +241,20 @@ class TabularPolicy : public Policy {
   std::unordered_map<std::string, ActionsAndProbs> policy_table_;
 };
 
+std::unique_ptr<TabularPolicy> DeserializeTabularPolicy(
+    const std::string& serialized, std::string delimiter = "<~>");
+
 // Chooses all legal actions with equal probability. This is equivalent to the
 // tabular version, except that this works for large games.
 class UniformPolicy : public Policy {
  public:
   ActionsAndProbs GetStatePolicy(const State& state) const override {
     return UniformStatePolicy(state);
+  }
+
+  std::string Serialize(int double_precision = -1,
+                        std::string delimiter = "") const override {
+    return "UniformPolicy:";
   }
 };
 
