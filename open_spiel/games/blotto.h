@@ -23,7 +23,7 @@
 #include "open_spiel/normal_form_game.h"
 
 // An implementation of the Blotto: https://en.wikipedia.org/wiki/Blotto_game
-// This version is supports n>2 players. Each player distributes M coins on N
+// This version supports n >= 2 players. Each player distributes M coins on N
 // fields. Each field is won by at most one player: the one with the most
 // coins on the specific field; if there is a draw, the field is considered
 // drawn (not won by any player), and hence ignored in the scoring. The winner
