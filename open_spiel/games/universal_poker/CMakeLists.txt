@@ -1,6 +1,8 @@
 set(HEADER_FILES
   acpc_cpp/acpc_game.h
   logic/card_set.h
+  card_abstraction/card_abstraction.h
+  card_abstraction/isomorphic.h
 )
 
 set(CLIB_FILES
@@ -8,11 +10,16 @@ set(CLIB_FILES
   acpc/project_acpc_server/game.cc
   acpc/project_acpc_server/rng.h
   acpc/project_acpc_server/rng.cc
+  hand-isomorphism/src/hand_index.h
+  hand-isomorphism/src/hand_index.c
+  hand-isomorphism/src/deck.h
+  hand-isomorphism/src/deck.c
 )
 
 set(SOURCE_FILES
   acpc_cpp/acpc_game.cc
   logic/card_set.cc
+  card_abstraction/isomorphic.cc
 )
 
 add_library(universal_poker_clib OBJECT ${CLIB_FILES} )
@@ -36,3 +43,8 @@ target_link_libraries(universal_poker_card_set_test universal_poker_clib)
 
 add_test(universal_poker_card_set_test universal_poker_card_set_test)
 
+add_executable(universal_poker_isomorphic_abstraction_test card_abstraction/isomorphic_test.cc
+        ${SOURCE_FILES} $<TARGET_OBJECTS:tests>)
+target_link_libraries(universal_poker_isomorphic_abstraction_test universal_poker_clib)
+
+add_test(universal_poker_isomorphic_abstraction_test universal_poker_isomorphic_abstraction_test)

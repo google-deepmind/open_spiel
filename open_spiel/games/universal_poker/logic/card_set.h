@@ -60,8 +60,10 @@ class CardSet {
 
   // Returns all the possible nbCards-subsets of this CardSet.
   std::vector<CardSet> SampleCards(int nbCards);
+  bool operator==(const CardSet &other) const;
 };
 
+std::ostream &operator<<(std::ostream &os, const CardSet &cs);
 }  // namespace logic
 }  // namespace universal_poker
 }  // namespace open_spiel

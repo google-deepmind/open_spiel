@@ -24,6 +24,7 @@
 #include "open_spiel/abseil-cpp/absl/strings/str_format.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
 #include "open_spiel/game_parameters.h"
+#include "open_spiel/games/universal_poker/card_abstraction/isomorphic.h"
 #include "open_spiel/games/universal_poker/logic/card_set.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
@@ -124,7 +125,8 @@ const GameType kGameType{
      // nolimit games. Available options are: "fc" for fold and check/call.
      // "fcpa" for fold, check/call, bet pot and all in (default).
      // Use "fullgame" for the unabstracted game.
-     {"bettingAbstraction", GameParameter(std::string("fcpa"))}}};
+     {"bettingAbstraction", GameParameter(std::string("fcpa"))},
+     {"cardAbstraction", GameParameter(std::string("noop"))}}};
 
 std::shared_ptr<const Game> Factory(const GameParameters &params) {
   return std::shared_ptr<const Game>(new UniversalPokerGame(params));
@@ -151,7 +153,9 @@ UniversalPokerState::UniversalPokerState(std::shared_ptr<const Game> game)
       cur_player_(kChancePlayerId),
       possibleActions_(ACTION_DEAL),
       betting_abstraction_(static_cast<const UniversalPokerGame *>(game.get())
-                               ->betting_abstraction()) {}
+                               ->betting_abstraction()),
+      card_abstraction_(static_cast<const UniversalPokerGame *>(game.get())
+                               ->card_abstraction()){}
 
 std::string UniversalPokerState::ToString() const {
   std::string str =
@@ -263,8 +267,7 @@ void UniversalPokerState::InformationStateTensor(
   const logic::CardSet full_deck(acpc_game_->NumSuitsDeck(),
                                  acpc_game_->NumRanksDeck());
   const std::vector<uint8_t> deckCards = full_deck.ToCardArray();
-  logic::CardSet holeCards = HoleCards(player);
-  logic::CardSet boardCards = BoardCards();
+  auto [holeCards, boardCards] = AbstractedHoleAndBoardCards(player);
 
   // TODO(author2): it should be way more efficient to iterate over the cards
   // of the player, rather than iterating over all the cards.
@@ -338,8 +341,7 @@ void UniversalPokerState::ObservationTensor(Player player,
   const logic::CardSet full_deck(acpc_game_->NumSuitsDeck(),
                                  acpc_game_->NumRanksDeck());
   const std::vector<uint8_t> all_cards = full_deck.ToCardArray();
-  logic::CardSet holeCards = HoleCards(player);
-  logic::CardSet boardCards = BoardCards();
+  auto [holeCards, boardCards] = AbstractedHoleAndBoardCards(player);
 
   for (uint32_t i = 0; i < full_deck.NumCards(); i++) {
     values[i + offset] = holeCards.ContainsCards(all_cards[i]) ? 1.0 : 0.0;
@@ -373,11 +375,13 @@ std::string UniversalPokerState::InformationStateString(Player player) const {
     sequences.emplace_back(acpc_state_.BettingSequence(r));
   }
 
+  auto [holeCards, boardCards] = AbstractedHoleAndBoardCards(player);
+
   return absl::StrFormat(
       "[Round %i][Player: %i][Pot: %i][Money: %s][Private: %s][Public: "
       "%s][Sequences: %s]",
       acpc_state_.GetRound(), CurrentPlayer(), pot, absl::StrJoin(money, " "),
-      HoleCards(player).ToString(), BoardCards().ToString(),
+      holeCards.ToString(), boardCards.ToString(),
       absl::StrJoin(sequences, "|"));
 }
 
@@ -394,8 +398,9 @@ std::string UniversalPokerState::ObservationString(Player player) const {
     absl::StrAppend(&result, " ", acpc_state_.Money(p));
   }
   // Add the player's private cards
+  auto [holeCards, boardCards] = AbstractedHoleAndBoardCards(player);
   if (player != kChancePlayerId) {
-    absl::StrAppend(&result, "[Private: ", HoleCards(player).ToString(), "]");
+    absl::StrAppend(&result, "][Private: ", holeCards.ToString(), "]");
   }
   // Adding the contribution of each players to the pot
   absl::StrAppend(&result, "[Ante:");
@@ -606,6 +611,27 @@ UniversalPokerGame::UniversalPokerGame(const GameParameters &params)
     SpielFatalError(absl::StrFormat("bettingAbstraction: %s not supported.",
                                     betting_abstraction));
   }
+
+  std::string card_abstraction =
+      ParameterValue<std::string>("cardAbstraction");
+  if (card_abstraction == "isomorphic") {
+    if (acpc_game_.NumSuitsDeck() != 4 || acpc_game_.NumRanksDeck() != 13) {
+        SpielFatalError(
+            "Isomorphic card abstraction is only supported standard 52 card deck.");
+    }
+    std::vector<int> cards_per_round;
+    int i;
+    for( i = 0; i < acpc_game_.NumRounds(); ++i ) {
+        cards_per_round.push_back(acpc_game_.GetNbBoardCardsRequired(i));
+    }
+    cards_per_round[0] += cards_per_round[0] + acpc_game_.GetNbHoleCardsRequired();
+    card_abstraction_ = new card_abstraction::IsomorphicCardAbstraction(cards_per_round);
+  } else if (card_abstraction == "noop"){
+    card_abstraction_ = new card_abstraction::NoopCardAbstraction();
+  } else {
+    SpielFatalError(absl::StrFormat("cardAbstraction: %s not supported.",
+                                    card_abstraction));
+  }
 }
 
 std::unique_ptr<State> UniversalPokerGame::NewInitialState() const {
@@ -709,19 +735,6 @@ int UniversalPokerGame::MaxGameLength() const {
  */
 std::string UniversalPokerGame::parseParameters(const GameParameters &map) {
   if (map.find("gamedef") != map.end()) {
-    // We check for sanity that all parameters are empty
-    if (map.size() != 1) {
-      std::vector<std::string> game_parameter_keys;
-      game_parameter_keys.reserve(map.size());
-      for (auto const &imap : map) {
-        game_parameter_keys.push_back(imap.first);
-      }
-      SpielFatalError(
-          absl::StrCat("When loading a 'universal_poker' game, the 'gamedef' "
-                       "field was present, but other fields were present too: ",
-                       absl::StrJoin(game_parameter_keys, ", "),
-                       "gamedef is exclusive with other paraemters."));
-    }
     return ParameterValue<std::string>("gamedef");
   }
 

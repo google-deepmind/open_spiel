@@ -157,4 +157,13 @@ bool CardSet::ContainsCards(uint8_t card) const {
   return (cs.bySuit[suit] & ((uint16_t)1 << rank)) > 0;
 }
 
+bool CardSet::operator==(const CardSet &other) const {
+    return ToCardArray() == other.ToCardArray();
+}
+
+std::ostream &operator<<(std::ostream &os, const CardSet &cs) {
+  os << cs.ToString();
+  return os;
+}
+
 }  // namespace open_spiel::universal_poker::logic

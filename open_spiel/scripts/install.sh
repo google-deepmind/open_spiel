@@ -105,9 +105,10 @@ fi
 # This Github repository contains the raw code from the ACPC server
 # http://www.computerpokercompetition.org/downloads/code/competition_server/project_acpc_server_v1.0.42.tar.bz2
 # with the code compiled as C++ within a namespace.
-DIR="open_spiel/games/universal_poker/acpc"
+DIR="open_spiel/games/universal_poker"
 if [[ ${BUILD_WITH_ACPC:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; then
-  git clone -b 'master' --single-branch --depth 1  https://github.com/jblespiau/project_acpc_server.git ${DIR}
+  git clone -b 'master' --single-branch --depth 1  https://github.com/jblespiau/project_acpc_server.git ${DIR}/acpc
+  git clone -b 'master' --single-branch --depth 1  https://github.com/aliyakamercan/hand-isomorphism.git ${DIR}/hand-isomorphism
 fi
 
 # Add EIGEN template library for linear algebra.

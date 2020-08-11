@@ -23,6 +23,7 @@
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/games/universal_poker/acpc_cpp/acpc_game.h"
+#include "open_spiel/games/universal_poker/card_abstraction/card_abstraction.h"
 #include "open_spiel/games/universal_poker/logic/card_set.h"
 #include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"
@@ -110,6 +111,11 @@ class UniversalPokerState : public State {
     ++board_cards_dealt_;
   }
 
+  std::pair<logic::CardSet, logic::CardSet>
+  AbstractedHoleAndBoardCards(Player player) const {
+    return card_abstraction_->abstract(HoleCards(player), BoardCards());
+  }
+
   logic::CardSet HoleCards(Player player) const {
     logic::CardSet hole_cards;
     const int num_players = acpc_game_->GetNbPlayers();
@@ -160,6 +166,7 @@ class UniversalPokerState : public State {
   std::string actionSequence_;
 
   BettingAbstraction betting_abstraction_;
+  card_abstraction::CardAbstraction *card_abstraction_;
 };
 
 class UniversalPokerGame : public Game {
@@ -180,6 +187,9 @@ class UniversalPokerGame : public Game {
   BettingAbstraction betting_abstraction() const {
     return betting_abstraction_;
   }
+  card_abstraction::CardAbstraction* card_abstraction() const {
+    return card_abstraction_;
+  }
 
   int big_blind() const { return big_blind_; }
   int starting_stack_big_blinds() const { return starting_stack_big_blinds_; }
@@ -189,6 +199,7 @@ class UniversalPokerGame : public Game {
   const acpc_cpp::ACPCGame acpc_game_;
   absl::optional<int> max_game_length_;
   BettingAbstraction betting_abstraction_ = BettingAbstraction::kFULLGAME;
+  card_abstraction::CardAbstraction *card_abstraction_;
 
  public:
   const acpc_cpp::ACPCGame *GetACPCGame() const { return &acpc_game_; }
