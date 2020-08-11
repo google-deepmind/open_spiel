@@ -24,6 +24,7 @@
 #include "open_spiel/algorithms/evaluate_bots.h"
 #include "open_spiel/algorithms/is_mcts.h"
 #include "open_spiel/algorithms/mcts.h"
+#include "open_spiel/games/hearts/xinxin_bot.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_bots.h"
 #include "pybind11/include/pybind11/cast.h"
@@ -215,6 +216,11 @@ void init_pyspiel_bots(py::module& m) {
       .def("step_with_policy", &algorithms::ISMCTSBot::StepWithPolicy)
       .def("restart", &algorithms::ISMCTSBot::Restart)
       .def("restart_at", &algorithms::ISMCTSBot::RestartAt);
+
+  m.def("make_xinxin_bot", open_spiel::hearts::MakeXinxinBot, py::arg("params"),
+        py::arg("uct_num_runs") = 50, py::arg("uct_c_val") = 0.4,
+        py::arg("iimc_num_worlds") = 20, py::arg("use_threads") = true,
+        "Make the XinXin bot.");
 
   m.def("evaluate_bots", open_spiel::EvaluateBots, py::arg("state"),
         py::arg("bots"), py::arg("seed"),

@@ -20,9 +20,9 @@
 #include <string>
 #include <vector>
 
-#include "open_spiel/games/hearts.h"
 #include "open_spiel/games/hearts/hearts/Hearts.h"
 #include "open_spiel/games/hearts/hearts/iiMonteCarlo.h"
+#include "open_spiel/games/hearts.h"
 #include "open_spiel/spiel_bots.h"
 
 namespace open_spiel {
@@ -40,6 +40,7 @@ class XinxinBot : public Bot {
   void InformAction(const State& state, Player player_id,
                     Action action) override;
   void Restart() override;
+  void RestartAt(const State& state) override;  // Currently just restarts.
   bool ProvidesForceAction() override { return true; }
   void ForceAction(const State& state, Action action) override;
 
@@ -55,6 +56,10 @@ class XinxinBot : public Bot {
   int num_cards_dealt_;
   ::hearts::tPassDir pass_dir_;
   std::vector<std::vector<::hearts::card>> initial_deal_;
+
+  // Keep a copy of the initial state around, to check that RestartAt only takes
+  // place from the initial state.
+  std::unique_ptr<State> initial_state_;
 
   // A number of pointers to objects need to be created externally, and sent
   // into the xinxin. We use these containers to store them. The vectors are

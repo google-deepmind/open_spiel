@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include "open_spiel/games/hearts/xinxin_bot.h"
+#include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
 namespace hearts {
@@ -60,7 +61,8 @@ XinxinBot::XinxinBot(int rules, int uct_num_runs, double uct_c_val,
     : uct_num_runs_(uct_num_runs),
       uct_c_val_(uct_c_val),
       iimc_num_worlds_(iimc_num_worlds),
-      use_threads_(use_threads) {
+      use_threads_(use_threads),
+      initial_state_(nullptr) {
   pass_dir_ = ::hearts::tPassDir::kHold;
   num_cards_dealt_ = 0;
   game_state_ = std::make_unique<::hearts::HeartsGameState>();
@@ -87,6 +89,20 @@ void XinxinBot::Restart() {
   for (auto& hand : initial_deal_) {
     hand.clear();
   }
+}
+
+void XinxinBot::RestartAt(const State& state) {
+  if (initial_state_ == nullptr) {
+    initial_state_ = state.GetGame()->NewInitialState();
+  }
+
+  // TODO(author5): define a default operator== in State.
+  if (state.ToString() != initial_state_->ToString()) {
+    SpielFatalError("XinxinBot::RestartAt only supports restarts from the "
+                    "initial state.");
+  }
+
+  Restart();
 }
 
 void XinxinBot::NewDeal(std::vector<std::vector<::hearts::card>>* initial_cards,
