@@ -50,11 +50,13 @@ void AdvanceBeliefHistoryOneAction(HistoryDistribution* previous, Action action,
     switch (parent->GetType()) {
       case StateType::kChance: {
         open_spiel::ActionsAndProbs outcomes = parent->ChanceOutcomes();
-        double action_prob = GetProb(outcomes, action);
+        // If we can't find the action in the policy, then set it to 0.
+        // const double action_prob = std::max(GetProb(outcomes, action), 0.);
+        const double action_prob = GetProb(outcomes, action);
 
         // If we don't find the chance outcome, then the state we're in is
         // impossible, so we set it to zero.
-        if (action_prob == -1) {
+        if (action_prob < 0) {
           prob = 0;
           continue;
         }
@@ -66,7 +68,12 @@ void AdvanceBeliefHistoryOneAction(HistoryDistribution* previous, Action action,
         if (parent->CurrentPlayer() == player_id) break;
         open_spiel::ActionsAndProbs policy =
             opponent_policy->GetStatePolicy(*parent);
-        double action_prob = GetProb(policy, action);
+        // If we can't find the action in the policy, then set it to 0.
+        const double action_prob = GetProb(policy, action);
+        if (action_prob < 0) {
+          prob = 0;
+          continue;
+        }
         SPIEL_CHECK_PROB(action_prob);
         prob *= action_prob;
         break;
@@ -173,6 +180,7 @@ HistoryDistribution GetStateDistribution(const State& state,
         // At opponent nodes, similar to chance nodes but get the probability
         // from the policy instead.
         std::string opp_infostate_str = states[idx]->InformationStateString();
+        SPIEL_CHECK_NE(opponent_policy, nullptr);
         ActionsAndProbs state_policy =
             opponent_policy->GetStatePolicy(*states[idx]);
         for (Action action : states[idx]->LegalActions()) {
