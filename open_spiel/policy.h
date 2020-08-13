@@ -93,10 +93,19 @@ class Policy {
     return pmap;
   }
 
-  // Returns a list of (action, prob) pairs for the policy at this state.
-  // If the policy is not available at the state, returns and empty list.
+  // Returns a list of (action, prob) pairs for the policy for the current
+  // player at this state. If the policy is not available at the state, returns
+  // an empty list.
   virtual ActionsAndProbs GetStatePolicy(const State& state) const {
-    return GetStatePolicy(state.InformationStateString());
+    return GetStatePolicy(state, state.CurrentPlayer());
+  }
+
+  // Returns a list of (action, prob) pairs for the policy for the specified
+  // player at this state. If the policy is not available at the state, returns
+  // an empty list.
+  virtual ActionsAndProbs GetStatePolicy(
+      const State& state, Player player) const {
+    return GetStatePolicy(state.InformationStateString(player));
   }
 
   // Returns a list of (action, prob) pairs for the policy at this info state.
@@ -179,7 +188,7 @@ class TabularPolicy : public Policy {
           "invalid values are \",\" and \"=\".");
     }
     std::string str = "TabularPolicy:";
-    if (policy_table_.size() == 0) return str;
+    if (policy_table_.empty()) return str;
 
     for (auto const& [info_state, policy] : policy_table_) {
       if (info_state.find(delimiter) != std::string::npos) {

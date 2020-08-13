@@ -166,8 +166,10 @@ using PublicTransition = std::string;
 // always within the range of game's Max/Min Returns.
 struct CfPrivValues {
   const Player player;
-  VectorXd cfvs;
+  ArrayXd cfvs;
 };
+
+std::ostream& operator<<(std::ostream& stream, const CfPrivValues& values);
 
 // A container for counter-factual action-values for each action of a private
 // state (private information). The cf. action-values correspond conceptually to
@@ -177,8 +179,10 @@ struct CfPrivValues {
 // always within the range of game's Max/Min Returns.
 struct CfActionValues {
   const Player player;
-  VectorXd cfavs;
+  ArrayXd cfavs;
 };
+
+std::ostream& operator<<(std::ostream& stream, const CfActionValues& values);
 
 // A container for reach probabilities of the player, for each of its
 // private state within a public state.
@@ -186,7 +190,7 @@ struct CfActionValues {
 // The reach probs must sum to 1.
 struct ReachProbs {
   const Player player;
-  VectorXd probs;
+  ArrayXd probs;
 };
 
 // Defines symbol for PublicState, implemented later.
@@ -223,6 +227,12 @@ class PublicState {
     return pub_obs_history_;
   }
 
+  // Return the last public transition that was made
+  // to get to this public state.
+  const PublicTransition& LastTransition() const {
+    return pub_obs_history_.back();
+  }
+
   // Return numbers of the private informations consistent with the
   // public information (for each player).
   virtual std::vector<int> NumDistinctPrivateInformations() const {
@@ -248,8 +258,8 @@ class PublicState {
     SpielFatalError("GetPublicSet() is not implemented.");
   }
 
-  // Return an information state string description for this public state
-  // + private information.
+  // Return an information state string description
+  // for this public state + private information.
   virtual std::string GetInformationState(const PrivateInformation&) const {
     SpielFatalError("GetPublicSet() is not implemented.");
   }
@@ -266,6 +276,20 @@ class PublicState {
   virtual std::unique_ptr<State> GetWorldState(
       const std::vector<PrivateInformation*>&) const {
     SpielFatalError("GetWorldState() is not implemented.");
+  }
+
+  // Return the private information at specified State and player
+  // at this public state.
+  virtual std::unique_ptr<PrivateInformation> GetPrivateInformation(
+      const State&, Player) const {
+    SpielFatalError("GetPrivateInformation() is not implemented.");
+  }
+
+  // Return actions that are available to player in his information state,
+  // corresponding the the this public state and player's private information.
+  virtual std::vector<Action> GetPrivateActions(
+      const PrivateInformation& information) const {
+    SpielFatalError("GetPrivateActions() is not implemented.");
   }
 
   // </editor-fold>
@@ -321,12 +345,11 @@ class PublicState {
     SpielFatalError("LegalTransitions() is not implemented.");
   }
 
-  // For each private information of a player return its private actions.
-  // Note that if the player is not acting in this public state, the returned
-  // actions should be empty.
-  // [PrivateInformation x Private Actions]
-  virtual std::vector<std::vector<Action>> GetPrivateActions(Player) const {
-    SpielFatalError("GetPrivateActions() is not implemented.");
+  // For each private information of a specified player return the number
+  // of private actions. Note that if the player is not acting in this public
+  // state, the returned vector should be empty.
+  virtual std::vector<int> CountPrivateActions(Player player) const {;
+    SpielFatalError("CountPrivateActions() is not implemented.");
   }
 
   // Undoes the last transition, which must be supplied. This is a method
@@ -376,6 +399,14 @@ class PublicState {
     SpielFatalError("IsPlayer() is not implemented.");
   }
 
+  // Is the specified player acting in this public state?
+  virtual bool IsPlayerActing(Player player) const {
+    for (const Player& acting_player : ActingPlayers()) {
+      if (acting_player == player) return true;
+    }
+    return false;
+  }
+
   // </editor-fold>
 
   // ---------------------------------------------------------------------------
@@ -405,18 +436,19 @@ class PublicState {
   //
   // Strategy of the player: [private_states x private_actions]
   // Each element of the vector should be a valid probability distribution.
-  virtual ReachProbs ComputeReachProbs(const PublicTransition&,
-                                       const std::vector<VectorXd>& strategy,
-                                       ReachProbs) {
+  virtual ReachProbs ComputeReachProbs(
+      const PublicTransition&, const std::vector<ArrayXd>& strategy,
+      ReachProbs) const {
     SpielFatalError("ComputeReachProbs() is not implemented.");
   }
 
   // Counter-factual values ----------------------------------------------------
 
-  // Return the counter-factual values for terminals for each player,
-  // given their respective reach probs.
-  virtual std::vector<CfPrivValues> TerminalCfValues(
-      const std::vector<ReachProbs>&) const {
+  // Return the counter-factual values for terminals for requested player,
+  // given each players' respective reach probs. The reach probs of the
+  // requested player may be empty, as they are not used in the computation.
+  virtual CfPrivValues TerminalCfValues(
+      const std::vector<ReachProbs>&, Player) const {
     SpielFatalError("TerminalCfValues() is not implemented.");
   }
 
@@ -439,7 +471,7 @@ class PublicState {
   // Returned values: [cf. value per private_state I]
   virtual CfPrivValues ComputeCfPrivValues(
       const std::vector<CfActionValues>& children_values,
-      const std::vector<VectorXd>& children_policy) const {
+      const std::vector<ArrayXd>& children_policy) const {
     SpielFatalError("ComputeCfPrivValues() is not implemented.");
   }
 
@@ -497,18 +529,16 @@ class PublicState {
 
   // Human readable description of the public state.
   virtual std::string ToString() const {
-    std::stringstream ss;
-    ss << pub_obs_history_;
-    return ss.str();
+    return absl::StrJoin(pub_obs_history_, ",");
   }
 
   // Depth of the public state within the public tree.
   // The root public state has depth of 0, but contains already
   // the first public observation - start of the game.
-  virtual int GetDepth() const { return pub_obs_history_.size() - 1; }
+  virtual int MoveNumber() const { return pub_obs_history_.size() - 1; }
 
   // Is the current public state root of the public tree?
-  virtual bool IsRoot() const { return GetDepth() == 0; }
+  virtual bool IsRoot() const { return MoveNumber() == 0; }
 
   virtual std::unique_ptr<PublicState> Clone() const {
     SpielFatalError("Clone() is not implemented.");
@@ -637,6 +667,8 @@ class GameWithPublicStates
   virtual std::unique_ptr<PublicState> DeserializePublicState() const {
     SpielFatalError("DeserializePublicState() is not implemented.");
   }
+
+  int NumPlayers() const { return base_game_->NumPlayers(); }
 
   std::shared_ptr<const Game> GetBaseGame() const { return base_game_; }
 

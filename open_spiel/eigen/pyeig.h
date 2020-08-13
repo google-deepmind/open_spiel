@@ -36,6 +36,9 @@ using MatrixXd =
 // Use this type for dynamically sized vectors of doubles.
 using VectorXd = Eigen::VectorXd;
 
+// Use this type for dynamically sized arrays of doubles.
+using ArrayXd = Eigen::ArrayXd;
+
 }  // namespace open_spiel
 
 #endif  // OPEN_SPIEL_EIGEN_PYEIG_H_

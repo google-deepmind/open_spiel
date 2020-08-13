@@ -229,5 +229,16 @@ DeserializeGameWithPublicState(const std::string& serialized_state) {
   SpielFatalError("DeserializeGameWithPublicState() is not implemented yet.");
 }
 
+std::ostream& operator<<(std::ostream& stream, const CfPrivValues& values) {
+  return stream << "CfPrivValues{player=" << values.player
+        << ", cfvs=" << values.cfvs << "}";
+}
+
+std::ostream& operator<<(std::ostream& stream, const CfActionValues& values) {
+  return stream << "CfActionValues{player=" << values.player
+        << ", cfavs=" << values.cfavs << "}";
+}
+
+
 }  // namespace public_states
 }  // namespace open_spiel

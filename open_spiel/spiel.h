@@ -313,6 +313,13 @@ class State {
     return CurrentPlayer() == kSimultaneousPlayerId;
   }
 
+  // Is the specified player acting at this state?
+  bool IsPlayerActing(Player player) const {
+    SPIEL_CHECK_GE(player, 0);
+    SPIEL_CHECK_LT(player, NumPlayers());
+    return CurrentPlayer() == player || IsSimultaneousNode();
+  }
+
   // We store (player, action) pairs in the history.
   struct PlayerAction {
     Player player;
