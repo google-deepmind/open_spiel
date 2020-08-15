@@ -7,6 +7,10 @@ add_library (algorithms OBJECT
   cfr_br.h
   corr_dist.cc
   corr_dist.h
+  corr_dist/afcce.cc
+  corr_dist/afcce.h
+  corr_dist/afce.cc
+  corr_dist/afce.h
   corr_dist/efcce.cc
   corr_dist/efcce.h
   corr_dist/efce.cc
@@ -31,10 +35,14 @@ add_library (algorithms OBJECT
   is_mcts.h
   matrix_game_utils.cc
   matrix_game_utils.h
+  nfg_writer.cc
+  nfg_writer.h
   mcts.cc
   mcts.h
   minimax.cc
   minimax.h
+  oos.h
+  oos.cc
   outcome_sampling_mccfr.cc
   outcome_sampling_mccfr.h
   state_distribution.cc
@@ -106,6 +114,10 @@ add_executable(minimax_test minimax_test.cc
     $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})
 add_test(minimax_test minimax_test)
 
+add_executable(oos_test oos_test.cc
+    $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})
+add_test(oos_test oos_test)
+
 add_executable(outcome_sampling_mccfr_test outcome_sampling_mccfr_test.cc
     $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})
 add_test(outcome_sampling_mccfr_test outcome_sampling_mccfr_test)
@@ -127,3 +139,4 @@ add_executable(trajectories_test trajectories_test.cc
 add_test(trajectories_test trajectories_test)
 
 add_subdirectory (alpha_zero)
+add_subdirectory (alpha_zero_torch)
