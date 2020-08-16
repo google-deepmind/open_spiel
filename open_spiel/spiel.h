@@ -246,9 +246,19 @@ class State {
     return StringToAction(CurrentPlayer(), action_str);
   }
 
-  // Returns a string representation of the state. This has no particular
-  // semantics and is targeting debugging code.
+  // Returns a string representation of the state. Also used as in the default
+  // implementation of operator==.
   virtual std::string ToString() const = 0;
+
+  // Returns true if these states are equal, false otherwise. Two states are
+  // equal if they are the same state; the interpretation might differ across
+  // games. For instance, in an imperfect information game, the full history
+  // might be relevant for distinguishing states whereas it might not be
+  // relevant for single-player games or perfect information games such as
+  // Tic-Tac-Toe, where only the current board state is necessary.
+  virtual bool operator==(const State& other) {
+    return ToString() == other.ToString();
+  }
 
   // Is this a terminal state? (i.e. has the game ended?)
   virtual bool IsTerminal() const = 0;
@@ -747,6 +757,11 @@ class Game : public std::enable_shared_from_this<Game> {
 
   // A string representation of the game, which can be passed to LoadGame.
   std::string ToString() const;
+
+  // Returns true if these games are equal, false otherwise.
+  virtual bool operator==(const Game& other) {
+    return ToString() == other.ToString();
+  }
 
   // Returns an Observer, used to obtain observations of the game state.
   // See `spiel_observer.h` for further information.
