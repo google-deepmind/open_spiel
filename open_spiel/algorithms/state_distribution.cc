@@ -180,7 +180,7 @@ HistoryDistribution GetStateDistribution(const State& state,
         // At opponent nodes, similar to chance nodes but get the probability
         // from the policy instead.
         std::string opp_infostate_str = states[idx]->InformationStateString();
-        SPIEL_CHECK_NE(opponent_policy, nullptr);
+        SPIEL_CHECK_TRUE(opponent_policy != nullptr);
         ActionsAndProbs state_policy =
             opponent_policy->GetStatePolicy(*states[idx]);
         for (Action action : states[idx]->LegalActions()) {
