@@ -47,6 +47,9 @@
 #if BUILD_WITH_PUBLIC_STATES
 #include "open_spiel/public_states/pybind11/public_states.h"
 #endif
+#if BUILD_WITH_XINXIN
+#include "open_spiel/games/hearts/xinxin_pybind11.h"
+#endif
 
 // This file contains OpenSpiel's Python API. The best place to see an overview
 // of the API is to refer to python/examples/example.py. Generally, all the core
@@ -559,6 +562,9 @@ PYBIND11_MODULE(pyspiel, m) {
   // List of optional python submodules.
 #if BUILD_WITH_PUBLIC_STATES
   init_pyspiel_public_states(m);
+#endif
+#if BUILD_WITH_XINXIN
+  init_pyspiel_xinxin(m);
 #endif
 }
 

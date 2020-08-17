@@ -94,6 +94,11 @@ macro(openspiel_optional_dependency DEP_NAME DEP_DEFAULT DEP_DESCRIPTION)
   endif()
   set (${DEP_NAME} $ENV{${DEP_NAME}})
   message("${BoldYellow}${DEP_NAME}: ${${DEP_NAME}} ${ColourReset}")
+  # If the dependency is on, pass in compiler flags to enable conditional code,
+  # e.g. #if BUILD_WITH_...
+  if (${DEP_NAME})
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D${DEP_NAME}")
+  endif()
 endmacro()
 
 # List of all optional dependencies:
