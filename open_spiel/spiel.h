@@ -256,7 +256,7 @@ class State {
   // might be relevant for distinguishing states whereas it might not be
   // relevant for single-player games or perfect information games such as
   // Tic-Tac-Toe, where only the current board state is necessary.
-  virtual bool operator==(const State& other) {
+  virtual bool operator==(const State& other) const {
     return ToString() == other.ToString();
   }
 
@@ -759,7 +759,7 @@ class Game : public std::enable_shared_from_this<Game> {
   std::string ToString() const;
 
   // Returns true if these games are equal, false otherwise.
-  virtual bool operator==(const Game& other) {
+  virtual bool operator==(const Game& other) const {
     return ToString() == other.ToString();
   }
 
