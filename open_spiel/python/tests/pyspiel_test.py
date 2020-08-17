@@ -85,7 +85,6 @@ class PyspielTest(absltest.TestCase):
         "repeated_game",
         "skat",
         "start_at",
-        "stones_and_gems",
         "tic_tac_toe",
         "tiny_bridge_2p",
         "tiny_bridge_4p",

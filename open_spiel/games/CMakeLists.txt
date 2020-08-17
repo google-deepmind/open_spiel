@@ -92,8 +92,6 @@ set(GAME_SOURCES
   quoridor.h
   skat.cc
   skat.h
-  stones_and_gems.cc
-  stones_and_gems.h
   tic_tac_toe.cc
   tic_tac_toe.h
   tiny_bridge.cc
@@ -359,8 +357,6 @@ add_executable(skat_test skat_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(skat_test skat_test)
 
-add_executable(stones_and_gems_test stones_and_gems_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
 add_test(stones_and_gems_test stones_and_gems_test)
 
 add_executable(tic_tac_toe_test tic_tac_toe_test.cc ${OPEN_SPIEL_OBJECTS}
