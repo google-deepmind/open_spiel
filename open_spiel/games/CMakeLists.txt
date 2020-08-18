@@ -357,8 +357,6 @@ add_executable(skat_test skat_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(skat_test skat_test)
 
-add_test(stones_and_gems_test stones_and_gems_test)
-
 add_executable(tic_tac_toe_test tic_tac_toe_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(tic_tac_toe_test tic_tac_toe_test)
