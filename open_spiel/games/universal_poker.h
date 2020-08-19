@@ -22,6 +22,7 @@
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
+#include "open_spiel/abseil-cpp/absl/container/flat_hash_set.h"
 #include "open_spiel/games/universal_poker/acpc_cpp/acpc_game.h"
 #include "open_spiel/games/universal_poker/logic/card_set.h"
 #include "open_spiel/policy.h"
@@ -203,35 +204,36 @@ class UniformRestrictedActions : public Policy {
  public:
   // Actions will be restricted to this list when legal. If no such action is
   // legal, checks/calls.
-  explicit UniformRestrictedActions(std::vector<ActionType> actions)
-      : actions_(std::move(actions)) {}
+  explicit UniformRestrictedActions(absl::Span<const ActionType> actions)
+      : actions_(actions.begin(), actions.end()),
+        max_action_(*absl::c_max_element(actions)) {}
 
   ActionsAndProbs GetStatePolicy(const State &state) const {
     ActionsAndProbs policy;
-    std::vector<Action> legal_actions = state.LegalActions();
+    policy.reserve(actions_.size());
+    const std::vector<Action> legal_actions = state.LegalActions();
     for (Action action : legal_actions) {
-      if (absl::c_find(actions_, action) != actions_.end()) {
+      if (actions_.contains(static_cast<ActionType>(action))) {
         policy.emplace_back(action, 1.);
       }
-    }
-
-    // If we have a non-empty policy, normalize it!
-    if (!policy.empty()) {
-      const double size = static_cast<double>(policy.size());
-      absl::c_for_each(policy, [size](std::pair<Action, double> &a_and_p) {
-        a_and_p.second /= size;
-      });
-      return policy;
+      if (policy.size() >= actions_.size() || action > max_action_) break;
     }
 
     // It is always legal to check/call.
-    SPIEL_DCHECK_TRUE(absl::c_find(legal_actions, ActionType::kCall) !=
-                      legal_actions.end());
-    return {{static_cast<Action>(ActionType::kCall), 1.}};
+    if (policy.empty()) {
+      SPIEL_DCHECK_TRUE(absl::c_find(legal_actions, ActionType::kCall) !=
+                        legal_actions.end());
+      policy.push_back({static_cast<Action>(ActionType::kCall), 1.});
+    }
+
+    // If we have a non-empty policy, normalize it!
+    if (policy.size() > 1) NormalizePolicy(&policy);
+    return policy;
   }
 
  private:
-  std::vector<ActionType> actions_;
+  const absl::flat_hash_set<ActionType> actions_;
+  const ActionType max_action_;
 };
 
 std::ostream &operator<<(std::ostream &os, const BettingAbstraction &betting);
