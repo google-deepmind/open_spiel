@@ -88,6 +88,24 @@ class TensorGame : public NormalFormGame {
     return action_names_[player][action];
   }
 
+  bool operator==(const Game& other_game) const override {
+    const auto& other = down_cast<const TensorGame&>(other_game);
+    return (shape_ == other.shape_ && utilities_ == other.utilities_);
+  }
+
+  bool ApproxEqual(const Game& other_game, double tolerance) const {
+    const auto& other = down_cast<const TensorGame&>(other_game);
+    if (shape_ != other.shape_) {
+      return false;
+    }
+    for (Player p = 0; p < NumPlayers(); ++p) {
+      if (!AllNear(utilities_[p], other.utilities_[p], tolerance)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
  private:
   const int index(const std::vector<Action>& args) const {
     int ind = 0;

@@ -184,6 +184,20 @@ bool Near(T a, T b, T epsilon) {
   return fabs(a - b) <= epsilon;
 }
 
+template <typename T>
+bool AllNear(const std::vector<T>& vector1, const std::vector<T>& vector2,
+             T epsilon) {
+  if (vector1.size() != vector2.size()) {
+    return false;
+  }
+  for (int i = 0; i < vector1.size(); ++i) {
+    if (!Near(vector1[i], vector2[i], epsilon)) {
+      return false;
+    }
+  }
+  return true;
+}
+
 // Macros to check for error conditions.
 // These trigger SpielFatalError if the condition is violated.
 // These macros are always executed. If you want to use checks

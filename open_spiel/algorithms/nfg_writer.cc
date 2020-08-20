@@ -17,6 +17,7 @@
 #include <fstream>
 
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_format.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
 #include "open_spiel/normal_form_game.h"
 #include "open_spiel/spiel.h"
@@ -55,10 +56,13 @@ const std::string GameToNFGString(const Game& game) {
 
   // Now the payoffs.
   for (auto flat_joint_action : initial_state->LegalActions()) {
-    absl::StrAppend(
-        &nfg_text,
-        absl::StrJoin(initial_state->Child(flat_joint_action)->Returns(), " "),
-        "\n");
+    std::vector<double> returns =
+        initial_state->Child(flat_joint_action)->Returns();
+    for (Player p = 0; p < returns.size(); ++p) {
+      absl::StrAppendFormat(&nfg_text, "%.15g ", returns[p]);
+    }
+    absl::StripAsciiWhitespace(&nfg_text);
+    absl::StrAppend(&nfg_text, "\n");
   }
 
   return nfg_text;

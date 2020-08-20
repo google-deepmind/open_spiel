@@ -113,6 +113,22 @@ class MatrixGame : public NormalFormGame {
     return col_action_names_[col];
   }
 
+  bool operator==(const Game& other_game) const override {
+    const auto& other = down_cast<const MatrixGame&>(other_game);
+    return (row_action_names_.size() == other.row_action_names_.size() &&
+            col_action_names_.size() == other.col_action_names_.size() &&
+            row_utilities_ == other.row_utilities_ &&
+            col_utilities_ == other.col_utilities_);
+  }
+
+  bool ApproxEqual(const Game& other_game, double tolerance) const {
+    const auto& other = down_cast<const MatrixGame&>(other_game);
+    return (row_action_names_.size() == other.row_action_names_.size() &&
+            col_action_names_.size() == other.col_action_names_.size() &&
+            AllNear(row_utilities_, other.row_utilities_, tolerance) &&
+            AllNear(col_utilities_, other.col_utilities_, tolerance));
+  }
+
  private:
   int Index(int row, int col) const { return row * NumCols() + col; }
   std::vector<std::string> row_action_names_;
@@ -187,6 +203,16 @@ std::shared_ptr<const MatrixGame> CreateMatrixGame(
     const std::vector<std::string>& col_names,
     const std::vector<std::vector<double>>& row_player_utils,
     const std::vector<std::vector<double>>& col_player_utils);
+
+// Create a matrix game with the specified utilities, with default names
+// ("short_name", "Long Name", row player utilities, col player utilities).
+// Utilities must be in row-major order.
+std::shared_ptr<const MatrixGame> CreateMatrixGame(
+    const std::string& short_name, const std::string& long_name,
+    const std::vector<std::string>& row_names,
+    const std::vector<std::string>& col_names,
+    const std::vector<double>& flat_row_utils,
+    const std::vector<double>& flat_col_utils);
 
 // Create a matrix game with the specified utilities, with default names
 // ("short_name", "Long Name", row0, row1.., col0, col1, ...).

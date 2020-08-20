@@ -23,6 +23,7 @@
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/games/efg_game.h"
 #include "open_spiel/games/efg_game_data.h"
+#include "open_spiel/games/nfg_game.h"
 #include "open_spiel/matrix_game.h"
 #include "open_spiel/normal_form_game.h"
 #include "open_spiel/observer.h"
@@ -519,11 +520,14 @@ PYBIND11_MODULE(pyspiel, m) {
         "Loads a game as a tensor game (will fail if not a tensor game.");
 
   m.def("load_efg_game", open_spiel::efg_game::LoadEFGGame,
-        "Load a gambit extensive form game from data.");
+        "Load a gambit extensive form game (.efg) from string data.");
   m.def("get_sample_efg_data", open_spiel::efg_game::GetSampleEFGData,
         "Get Kuhn poker EFG data.");
   m.def("get_kuhn_poker_efg_data", open_spiel::efg_game::GetKuhnPokerEFGData,
         "Get sample EFG data.");
+
+  m.def("load_nfg_game", open_spiel::nfg_game::LoadNFGGame,
+        "Load a gambit normal form game (.nfg) from string data.");
 
   m.def("extensive_to_matrix_game",
         open_spiel::algorithms::ExtensiveToMatrixGame,
