@@ -31,13 +31,12 @@
 namespace open_spiel::algorithms {
 namespace {
 
-std::vector<double> Normalize(const std::vector<double>& weights) {
-  std::vector<double> probs(weights);
+void Normalize(absl::Span<double> weights) {
   const double normalizer = absl::c_accumulate(weights, 0.);
-  absl::c_for_each(probs, [&probs, normalizer](double& w) {
-    w = (normalizer == 0.0 ? 1.0 / probs.size() : w / normalizer);
+  const double uniform_prob = 1.0 / weights.size();
+  absl::c_for_each(weights, [&](double& w) {
+    w = (normalizer == 0.0 ? uniform_prob : w / normalizer);
   });
-  return probs;
 }
 
 void AdvanceBeliefHistoryOneAction(HistoryDistribution* previous, Action action,
@@ -86,7 +85,7 @@ void AdvanceBeliefHistoryOneAction(HistoryDistribution* previous, Action action,
     if (prob == 0) continue;
     parent->ApplyAction(action);
   }
-  previous->second = Normalize(previous->second);
+  Normalize(absl::MakeSpan(previous->second));
 }
 
 int GetBeliefHistorySize(HistoryDistribution* beliefs) {
@@ -225,8 +224,8 @@ HistoryDistribution GetStateDistribution(const State& state,
   }
 
   // Now normalize the probs
-
-  return {std::move(final_states), Normalize(final_probs)};
+  Normalize(absl::MakeSpan(final_probs));
+  return {std::move(final_states), std::move(final_probs)};
 }
 
 std::unique_ptr<HistoryDistribution> UpdateIncrementalStateDistribution(
