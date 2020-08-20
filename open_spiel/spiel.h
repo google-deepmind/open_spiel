@@ -148,6 +148,11 @@ std::ostream& operator<<(std::ostream& stream, GameType::RewardModel value);
 // The probability of taking each possible action in a particular info state.
 using ActionsAndProbs = std::vector<std::pair<Action, double>>;
 
+// We alias this here as we can't import state_distribution.h or we'd have a
+// circular dependency.
+using HistoryDistribution =
+    std::pair<std::vector<std::unique_ptr<State>>, std::vector<double>>;
+
 // Forward declarations.
 class Game;
 class Observer;
@@ -586,14 +591,12 @@ class State {
   // implemented and returns an empty list. This doesn't make any attempt to
   // correct for the opponent's policy in the probabilities, and so this is
   // wrong for any state that's not the first non-chance node.
-  virtual std::unique_ptr<
-      std::pair<std::vector<std::unique_ptr<State>>, std::vector<double>>>
+  virtual std::unique_ptr<HistoryDistribution>
   GetHistoriesConsistentWithInfostate(int player_id) const {
     return {};
   }
 
-  virtual std::unique_ptr<
-      std::pair<std::vector<std::unique_ptr<State>>, std::vector<double>>>
+  virtual std::unique_ptr<HistoryDistribution>
   GetHistoriesConsistentWithInfostate() const {
     return GetHistoriesConsistentWithInfostate(CurrentPlayer());
   }
@@ -936,11 +939,6 @@ std::string SerializeGameAndState(const Game& game, const State& state);
 // seed.
 std::pair<std::shared_ptr<const Game>, std::unique_ptr<State>>
 DeserializeGameAndState(const std::string& serialized_state);
-
-// We alias this here as we can't import state_distribution.h or we'd have a
-// circular dependency.
-using HistoryDistribution =
-    std::pair<std::vector<std::unique_ptr<State>>, std::vector<double>>;
 
 // Convert GameTypes from and to strings. Used for serialization of objects
 // that contain them.
