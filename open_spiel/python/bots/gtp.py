@@ -49,6 +49,7 @@ class GTPBot(pyspiel.Bot):
           command to tell it which player made the move.
       suppress_stderr: Whether to suppress stderr from the binary.
     """
+    pyspiel.Bot.__init__(self)
     self._process = subprocess.Popen(
         exec_path, bufsize=0, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
         stderr=(subprocess.DEVNULL if suppress_stderr else None))
