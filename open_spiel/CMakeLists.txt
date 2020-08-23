@@ -120,6 +120,8 @@ openspiel_optional_dependency(BUILD_WITH_XINXIN         OFF
   "Build against xinxin Hearts program.")
 openspiel_optional_dependency(BUILD_WITH_ROSHAMBO       OFF
   "Build against RoShamBo bots.")
+openspiel_optional_dependency(BUILD_WITH_GAMUT          OFF
+  "Build with GAMUT generator integration.")
 
 # Needed to disable Abseil tests.
 set (BUILD_TESTING OFF)
@@ -229,6 +231,10 @@ if (BUILD_WITH_LIBTORCH)
   # Use following to link your_target_executable with torch libraries:
   # target_link_libraries(your_target_executable ${TORCH_LIBRARIES})
 endif()
+if (BUILD_WITH_GAMUT)
+  set(OPEN_SPIEL_OBJECTS ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:gamut>)
+endif()
+
 
 # We have the parent of this directory in the include path, so that we can
 # include for example "open_spiel/spiel.h" (assuming this directory is named

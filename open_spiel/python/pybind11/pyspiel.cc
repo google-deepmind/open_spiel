@@ -45,6 +45,9 @@
 #include "pybind11/include/pybind11/stl.h"
 
 // List of optional python submodules.
+#if BUILD_WITH_GAMUT
+#include "open_spiel/games/gamut/gamut_pybind11.h"
+#endif
 #if BUILD_WITH_PUBLIC_STATES
 #include "open_spiel/public_states/pybind11/public_states.h"
 #endif
@@ -564,6 +567,9 @@ PYBIND11_MODULE(pyspiel, m) {
   init_pyspiel_observer(m);      // Observers and observations.
 
   // List of optional python submodules.
+#if BUILD_WITH_GAMUT
+  init_pyspiel_gamut(m);
+#endif
 #if BUILD_WITH_PUBLIC_STATES
   init_pyspiel_public_states(m);
 #endif

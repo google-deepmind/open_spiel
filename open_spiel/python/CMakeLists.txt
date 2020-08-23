@@ -37,6 +37,12 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
   )
 
 # Optional pyspiel sub-modules, which can specify their python bindings.
+if (BUILD_WITH_GAMUT)
+  set (PYTHON_BINDINGS ${PYTHON_BINDINGS}
+      ../games/gamut/gamut_pybind11.h
+      ../games/gamut/gamut_pybind11.cc
+      )
+endif()
 if (BUILD_WITH_PUBLIC_STATES)
   set (PYTHON_BINDINGS ${PYTHON_BINDINGS}
       ../public_states/pybind11/public_states.h
@@ -75,6 +81,9 @@ if (BUILD_WITH_PUBLIC_STATES)
 endif()
 if (BUILD_WITH_XINXIN)
   set(PYTHON_TESTS ${PYTHON_TESTS} ../games/hearts/xinxin_bot_test.py)
+endif()
+if (BUILD_WITH_GAMUT)
+  set(PYTHON_TESTS ${PYTHON_TESTS} ../games/gamut/gamut_test.py)
 endif()
 
 

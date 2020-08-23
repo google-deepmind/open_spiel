@@ -56,3 +56,7 @@ export BUILD_WITH_LIBTORCH="${BUILD_WITH_LIBTORCH:-OFF}"
 
 # Turn off public states as it is Work-In-Progress.
 export BUILD_WITH_PUBLIC_STATES="${BUILD_WITH_PUBLIC_STATES:-OFF}"
+
+# Enable integration with GAMUT game generator (see games/gamut).
+# Requires java and GAMUT, so disabled by default.
+export BUILD_WITH_GAMUT="${BUILD_WITH_GAMUT:-OFF}"

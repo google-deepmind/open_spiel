@@ -126,6 +126,10 @@ endif()
 if (${BUILD_WITH_XINXIN})
   add_subdirectory(hearts)
 endif()
+if (${BUILD_WITH_GAMUT})
+  add_subdirectory(gamut)
+endif()
+
 
 # Uncomment to build the Ludii demo
 # add_subdirectory (ludii)
