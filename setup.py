@@ -20,6 +20,7 @@ See https://setuptools.readthedocs.io/en/latest/setuptools.html
 
 import os
 import subprocess
+import sys
 
 import setuptools
 from setuptools.command.build_ext import build_ext
@@ -59,7 +60,7 @@ class BuildExt(build_ext):
     extension_dir = os.path.abspath(
         os.path.dirname(self.get_ext_fullpath(ext.name)))
     cmake_args = [
-        "-DPython_TARGET_VERSION=3.6",
+        f"-DPython3_EXECUTABLE={sys.executable}",
         "-DCMAKE_CXX_COMPILER=clang++",
         f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={extension_dir}",
     ]

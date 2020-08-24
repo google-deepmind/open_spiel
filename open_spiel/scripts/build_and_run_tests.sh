@@ -184,7 +184,7 @@ else
   export PYTHONPATH=$PYTHONPATH:$pwd/python  # For pyspiel bindings
 
   # Build in testing, so that we can run tests fast.
-  cmake -DPython_TARGET_VERSION=${PYVERSION}         \
+  cmake -DPython3_EXECUTABLE=${PYBIN} \
         -DCMAKE_CXX_COMPILER=${CXX}                  \
         -DCMAKE_PREFIX_PATH=${LIBCXXWRAP_JULIA_DIR}  \
         -DBUILD_TYPE=Testing                         \
