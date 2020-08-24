@@ -168,18 +168,19 @@ class Environment(object):
     self._chance_event_sampler = chance_event_sampler or ChanceEventSampler()
     self._include_full_state = include_full_state
 
-    if isinstance(game, pyspiel.Game):
+    if isinstance(game, str):
+      if kwargs:
+        game_settings = {
+            key: pyspiel.GameParameter(val) for (key, val) in kwargs.items()
+        }
+        logging.info("Using game settings: %s", game_settings)
+        self._game = pyspiel.load_game(game, game_settings)
+      else:
+        logging.info("Using game string: %s", game)
+        self._game = pyspiel.load_game(game)
+    else:  # pyspiel.Game or API-compatible object.
       logging.info("Using game instance: %s", game.get_type().short_name)
       self._game = game
-    elif kwargs:
-      game_settings = {
-          key: pyspiel.GameParameter(val) for (key, val) in kwargs.items()
-      }
-      logging.info("Using game settings: %s", game_settings)
-      self._game = pyspiel.load_game(game, game_settings)
-    else:
-      logging.info("Using game string: %s", game)
-      self._game = pyspiel.load_game(game)
 
     self._num_players = self._game.num_players()
     self._state = None
