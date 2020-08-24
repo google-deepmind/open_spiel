@@ -31,14 +31,6 @@
 namespace open_spiel::algorithms {
 namespace {
 
-void Normalize(absl::Span<double> weights) {
-  const double normalizer = absl::c_accumulate(weights, 0.);
-  const double uniform_prob = 1.0 / weights.size();
-  absl::c_for_each(weights, [&](double& w) {
-    w = (normalizer == 0.0 ? uniform_prob : w / normalizer);
-  });
-}
-
 void AdvanceBeliefHistoryOneAction(HistoryDistribution* previous, Action action,
                                    Player player_id,
                                    const Policy* opponent_policy) {
@@ -50,7 +42,6 @@ void AdvanceBeliefHistoryOneAction(HistoryDistribution* previous, Action action,
       case StateType::kChance: {
         open_spiel::ActionsAndProbs outcomes = parent->ChanceOutcomes();
         // If we can't find the action in the policy, then set it to 0.
-        // const double action_prob = std::max(GetProb(outcomes, action), 0.);
         const double action_prob = GetProb(outcomes, action);
 
         // If we don't find the chance outcome, then the state we're in is

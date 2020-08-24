@@ -23,6 +23,7 @@
 #include <utility>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/abseil-cpp/absl/random/distributions.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
@@ -212,13 +213,9 @@ State::State(std::shared_ptr<const Game> game)
       game_(game) {}
 
 void NormalizePolicy(ActionsAndProbs* policy) {
-  double sum = 0;
-  for (const std::pair<Action, double>& outcome : *policy) {
-    sum += outcome.second;
-  }
-  for (std::pair<Action, double>& outcome : *policy) {
-    outcome.second /= sum;
-  }
+  const double sum = absl::c_accumulate(
+      *policy, 0.0, [](double& a, auto& b) { return a + b.second; });
+  absl::c_for_each(*policy, [sum](auto& o) { o.second /= sum; });
 }
 
 std::pair<Action, double> SampleAction(const ActionsAndProbs& outcomes,

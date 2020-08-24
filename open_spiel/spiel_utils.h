@@ -166,6 +166,9 @@ int PreviousPlayerRoundRobin(Player player, int nplayers);
 // found.
 absl::optional<std::string> FindFile(const std::string& filename, int levels);
 
+// Normalizes the span.
+void Normalize(absl::Span<double> weights);
+
 // Returns whether the absolute difference between floating point values a and
 // b is less than or equal to FloatingPointThresholdRatio() * max(|a|, |b|).
 template <typename T>
