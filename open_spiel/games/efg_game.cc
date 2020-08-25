@@ -26,6 +26,7 @@
 #include "open_spiel/abseil-cpp/absl/strings/str_split.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
+#include "open_spiel/utils/file.h"
 
 namespace open_spiel {
 namespace efg_game {
@@ -224,21 +225,8 @@ EFGGame::EFGGame(const GameParameters& params)
       general_sum_(true),
       perfect_information_(true) {
   filename_ = ParameterValue<std::string>("filename");
-
-  std::ifstream file;
-  file.open(filename_.c_str());
-  if (!file.is_open()) {
-    SpielFatalError(absl::StrCat("Could not open input file: ", filename_));
-  }
-
-  string_data_ = "";
-  char buffer[kBuffSize];
-  while (!file.eof()) {
-    memset(buffer, 0, kBuffSize);
-    file.read(buffer, kBuffSize - 1);
-    absl::StrAppend(&string_data_, buffer);
-  }
-  file.close();
+  file::File file(filename_, "r");
+  string_data_ = file.ReadContents();
 
   SPIEL_CHECK_GT(string_data_.size(), 0);
 

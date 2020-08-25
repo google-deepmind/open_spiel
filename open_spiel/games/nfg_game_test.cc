@@ -26,6 +26,7 @@
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/tensor_game.h"
 #include "open_spiel/tests/basic_tests.h"
+#include "open_spiel/utils/init.h"
 
 namespace open_spiel {
 namespace nfg_game {
@@ -177,6 +178,7 @@ void NFGExportReloadTestInternalGames() {
 }  // namespace open_spiel
 
 int main(int argc, char** argv) {
+  open_spiel::Init("", &argc, &argv, true);
   open_spiel::nfg_game::NFGLoadSampleFromString();
   open_spiel::nfg_game::NFGLoadSampleScientificNotationFromString();
   open_spiel::nfg_game::NFGLoadSampleFromFile();

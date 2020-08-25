@@ -7,6 +7,8 @@ add_library (utils OBJECT
   file.h
   file.cc
   functional.h
+  init.h
+  init.cc
   json.h
   json.cc
   logger.h

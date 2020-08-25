@@ -21,6 +21,7 @@ from __future__ import print_function
 import collections
 import tempfile
 
+from absl import app
 from absl.testing import absltest
 
 from open_spiel.python.algorithms.gambit import export_gambit
@@ -79,5 +80,10 @@ class GambitTest(absltest.TestCase):
     self.assertCountEqual(a_prime, b_prime)
 
 
-if __name__ == "__main__":
+def main(_):
   absltest.main()
+
+
+if __name__ == "__main__":
+  # Necessary to run main via app.run for internal tests.
+  app.run(main)

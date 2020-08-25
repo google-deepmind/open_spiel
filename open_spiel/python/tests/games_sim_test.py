@@ -19,6 +19,7 @@ from __future__ import division
 from __future__ import print_function
 
 import pickle
+from absl import app
 from absl.testing import absltest
 from absl.testing import parameterized
 import numpy as np
@@ -248,5 +249,10 @@ class GamesSimTest(parameterized.TestCase):
         self.sim_game(game)
 
 
-if __name__ == "__main__":
+def main(_):
   absltest.main()
+
+
+if __name__ == "__main__":
+  # Necessary to run main via app.run for internal tests.
+  app.run(main)

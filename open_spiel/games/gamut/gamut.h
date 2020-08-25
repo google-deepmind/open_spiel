@@ -17,6 +17,7 @@
 
 #include <cstring>
 #include <memory>
+#include <random>
 #include <string>
 
 #include "open_spiel/abseil-cpp/absl/synchronization/mutex.h"
@@ -32,12 +33,14 @@ namespace gamut {
 class GamutGenerator {
  public:
   // Create a game generator with the specified java executable and GAMUT jar
-  // file.
-  GamutGenerator(const std::string& java_path, const std::string& jar_path);
+  // file. The seed is used for random file names (if 0, uses the current time).
+  GamutGenerator(const std::string& java_path, const std::string& jar_path,
+                 int tmpfile_seed = 0);
 
   // Create a game generator using the default path to java executable, defined
-  // in gamut.cc
-  GamutGenerator(const std::string& jar_path);
+  // in gamut.cc. The seed is used for random file names (if 0, uses the
+  // current time).
+  GamutGenerator(const std::string& jar_path, int tmpfile_seed = 0);
 
   // Generate a game using GAMUT command-line arguments. Do not use -f nor
   // -output, as they are added to the command-line arguments inside this
@@ -47,9 +50,13 @@ class GamutGenerator {
       const std::vector<std::string>& cmdline_args);
 
  private:
+  std::string TmpFile();
+
   std::string java_path_;
   std::string jar_path_;
   absl::Mutex generation_mutex_;
+  std::mt19937 rng_;
+  std::string rand_string_;  // Random string used for temp file names.
 };
 
 }  // namespace gamut

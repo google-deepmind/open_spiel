@@ -15,6 +15,7 @@
 #include "open_spiel/games/gamut/gamut.h"
 
 #include "open_spiel/spiel_utils.h"
+#include "open_spiel/utils/init.h"
 
 namespace open_spiel {
 namespace gamut {
@@ -40,4 +41,7 @@ void BasicLoadGamutTest() {
 }  // namespace gamut
 }  // namespace open_spiel
 
-int main(int argc, char** argv) { open_spiel::gamut::BasicLoadGamutTest(); }
+int main(int argc, char** argv) {
+  open_spiel::Init("", &argc, &argv, true);
+  open_spiel::gamut::BasicLoadGamutTest();
+}

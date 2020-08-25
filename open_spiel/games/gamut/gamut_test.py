@@ -14,6 +14,7 @@
 
 """Unit test for GamutGenerator."""
 
+from absl import app
 from absl.testing import absltest
 import pyspiel
 
@@ -38,5 +39,10 @@ class GamutGeneratorTest(absltest.TestCase):
     self.assertIsNotNone(game)
 
 
-if __name__ == "__main__":
+def main(_):
   absltest.main()
+
+
+if __name__ == "__main__":
+  # Calling main via app.run here is necessary for internal uses.
+  app.run(main)

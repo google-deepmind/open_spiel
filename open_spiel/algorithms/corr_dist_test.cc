@@ -24,6 +24,7 @@
 #include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
+#include "open_spiel/utils/init.h"
 
 namespace open_spiel {
 namespace algorithms {
@@ -345,6 +346,7 @@ void TestGreenwaldSarfatiExample2() {
 namespace algorithms = open_spiel::algorithms;
 
 int main(int argc, char** argv) {
+  open_spiel::Init("", &argc, &argv, true);
   algorithms::TestGibson13MatrixGameExample();
   algorithms::TestShapleysGame();
   algorithms::TestBoS();

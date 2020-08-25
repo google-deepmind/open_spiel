@@ -26,6 +26,7 @@
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/tensor_game.h"
+#include "open_spiel/utils/file.h"
 
 namespace open_spiel {
 namespace nfg_game {
@@ -290,21 +291,8 @@ class NFGGameParser {
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   // return std::shared_ptr<const Game>(new EFGGame(params));
   std::string filename = params.at("filename").string_value();
-
-  std::ifstream file;
-  file.open(filename.c_str());
-  if (!file.is_open()) {
-    SpielFatalError(absl::StrCat("Could not open input file: ", filename));
-  }
-
-  std::string string_data = "";
-  char buffer[kBuffSize];
-  while (!file.eof()) {
-    memset(buffer, 0, kBuffSize);
-    file.read(buffer, kBuffSize - 1);
-    absl::StrAppend(&string_data, buffer);
-  }
-  file.close();
+  file::File file(filename, "r");
+  std::string string_data = file.ReadContents();
 
   SPIEL_CHECK_GT(string_data.size(), 0);
   NFGGameParser parser(string_data);

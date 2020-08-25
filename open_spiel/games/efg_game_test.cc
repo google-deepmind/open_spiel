@@ -22,6 +22,7 @@
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/tests/basic_tests.h"
+#include "open_spiel/utils/init.h"
 
 namespace open_spiel {
 namespace efg_game {
@@ -148,6 +149,7 @@ void EFGGameSimTestsSignalingFromFile() {
 }  // namespace open_spiel
 
 int main(int argc, char** argv) {
+  open_spiel::Init("", &argc, &argv, true);
   open_spiel::efg_game::EFGGameSimTestsSampleFromData();
   open_spiel::efg_game::EFGGameSimTestsKuhnFromData();
   open_spiel::efg_game::EFGGameSimTestsSampleFromFile();

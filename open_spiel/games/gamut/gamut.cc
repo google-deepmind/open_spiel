@@ -14,35 +14,59 @@
 
 #include "open_spiel/games/gamut/gamut.h"
 
-#include <cstdio>
-#include <cstdlib>
+#include <algorithm>
 #include <cstring>
 #include <ctime>
 #include <fstream>
 #include <iostream>
+#include <random>
 #include <string>
 
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
 #include "open_spiel/games/nfg_game.h"
 #include "open_spiel/spiel_utils.h"
+#include "open_spiel/utils/file.h"
 
 namespace open_spiel {
 namespace gamut {
 namespace {
 constexpr const char* kDefaultJavaPath = "java";
+constexpr const int kNumTmpfileRetries = 16;
+constexpr const int kNumRandomChars = 32;
+constexpr const char* kAlphaChars =
+    "abcdefghijklmnopqrstuvwxyxABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 }  // namespace
 
-GamutGenerator::GamutGenerator(const std::string& jar_path)
-    : java_path_(kDefaultJavaPath), jar_path_(jar_path) {}
+GamutGenerator::GamutGenerator(const std::string& jar_path, int tmpfile_seed)
+    : GamutGenerator(kDefaultJavaPath, jar_path, tmpfile_seed) {}
 
 GamutGenerator::GamutGenerator(const std::string& java_path,
-                               const std::string& jar_path)
-    : java_path_(java_path), jar_path_(jar_path) {}
+                               const std::string& jar_path, int tmpfile_seed)
+    : java_path_(java_path),
+      jar_path_(jar_path),
+      rng_(tmpfile_seed == 0 ? time(nullptr) : tmpfile_seed),
+      rand_string_(kAlphaChars) {}
 
 std::shared_ptr<const Game> GamutGenerator::GenerateGame(
     const std::string& cmdline_args) {
   return GenerateGame(absl::StrSplit(cmdline_args, ' '));
+}
+
+std::string GamutGenerator::TmpFile() {
+  for (int retries = 0; retries < kNumTmpfileRetries; ++retries) {
+    // Try random files until we find one that does not exist.
+    absl::c_shuffle(rand_string_, rng_);
+    std::string candidate =
+        absl::StrCat(file::GetTmpDir(), "/gamut_tmpgame_",
+                     rand_string_.substr(0, kNumRandomChars));
+    if (!file::Exists(candidate)) {
+      return candidate;
+    }
+  }
+
+  SpielFatalError(absl::StrCat("Could not get a temporary file after ",
+                               kNumTmpfileRetries, " tries."));
 }
 
 std::shared_ptr<const Game> GamutGenerator::GenerateGame(
@@ -65,15 +89,15 @@ std::shared_ptr<const Game> GamutGenerator::GenerateGame(
   std::shared_ptr<const Game> game;
   {
     absl::MutexLock lock(&generation_mutex_);
-    // Get a temprary file and add it to the arguments.
-    std::string tmp_filename = tmpnam(nullptr);
+    // Get a temporary file and add it to the arguments.
+    std::string tmp_filename = TmpFile();
     arguments.push_back("-f");
     arguments.push_back(tmp_filename);
     std::string full_cmd = absl::StrCat(java_path_, " -jar ", jar_path_, " ",
                                         absl::StrJoin(arguments, " "));
     system(full_cmd.c_str());
     game = LoadGame("nfg_game", {{"filename", GameParameter(tmp_filename)}});
-    remove(tmp_filename.c_str());
+    file::Remove(tmp_filename);
   }
   return game;
 }
