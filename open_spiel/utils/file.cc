@@ -124,8 +124,8 @@ bool Remove(const std::string& path) {
 }
 
 std::string GetEnv(const std::string& key, const std::string& default_value) {
-    char* val = std::getenv(key.c_str());
-    return ((val != nullptr) ? std::string(val) : default_value);
+  char* val = std::getenv(key.c_str());
+  return ((val != nullptr) ? std::string(val) : default_value);
 }
 
 std::string GetTmpDir() { return GetEnv("TMPDIR", "/tmp"); }
