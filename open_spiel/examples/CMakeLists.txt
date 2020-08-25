@@ -21,3 +21,5 @@ add_test(mcts_example_test mcts_example)
 
 add_executable(value_iteration_example value_iteration_example.cc ${OPEN_SPIEL_OBJECTS})
 add_test(value_iteration_example_test value_iteration_example)
+
+add_executable(count_all_states count_all_states.cc ${OPEN_SPIEL_OBJECTS})
