@@ -54,6 +54,10 @@ class File {
   std::unique_ptr<FileImpl> fd_;
 };
 
+// Reads the file at filename to a string. Dies if this doesn't succeed.
+std::string ReadContentsFromFile(const std::string& filename,
+                                 const std::string& mode);
+
 bool Exists(const std::string& path);  // Does the file/directory exist?
 bool IsDirectory(const std::string& path);  // Is it a directory?
 bool Mkdir(const std::string& path, int mode = 0755);  // Make a directory.

@@ -291,8 +291,7 @@ class NFGGameParser {
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   // return std::shared_ptr<const Game>(new EFGGame(params));
   std::string filename = params.at("filename").string_value();
-  file::File file(filename, "r");
-  std::string string_data = file.ReadContents();
+  std::string string_data = file::ReadContentsFromFile(filename, "r");
 
   SPIEL_CHECK_GT(string_data.size(), 0);
   NFGGameParser parser(string_data);

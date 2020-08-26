@@ -215,7 +215,8 @@ int EFGGame::MaxGameLength() const { return max_depth_; }
 
 EFGGame::EFGGame(const GameParameters& params)
     : Game(kGameType, params),
-      string_data_(""),
+      filename_(ParameterValue<std::string>("filename")),
+      string_data_(file::ReadContentsFromFile(filename_, "r")),
       pos_(0),
       num_chance_nodes_(0),
       max_actions_(0),
@@ -224,10 +225,6 @@ EFGGame::EFGGame(const GameParameters& params)
       identical_payoffs_(true),
       general_sum_(true),
       perfect_information_(true) {
-  filename_ = ParameterValue<std::string>("filename");
-  file::File file(filename_, "r");
-  string_data_ = file.ReadContents();
-
   SPIEL_CHECK_GT(string_data_.size(), 0);
 
   // Now parse the string data into a data structure.

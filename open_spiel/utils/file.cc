@@ -81,6 +81,12 @@ std::int64_t File::Length() {
   return length;
 }
 
+std::string ReadContentsFromFile(const std::string& filename,
+                                 const std::string& mode) {
+  File f(filename, mode);
+  return f.ReadContents();
+}
+
 bool Exists(const std::string& path) {
   struct stat info;
   return stat(path.c_str(), &info) == 0;
