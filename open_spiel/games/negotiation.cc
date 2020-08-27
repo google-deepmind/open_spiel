@@ -572,8 +572,12 @@ std::unique_ptr<State> NegotiationGame::DeserializeState(
     std::unique_ptr<State> state = NewInitialState();
     SPIEL_CHECK_EQ(lines.size(), 5);
     NegotiationState& nstate = static_cast<NegotiationState&>(*state);
-    // Take the chance action, but then reset the quantities.
+    // Take the chance action, but then reset the quantities. Make sure game's
+    // RNG state is not advanced during deserialization so copy it beforehand
+    // in order to be able to restore after the chance action.
+    std::unique_ptr<std::mt19937> rng = std::make_unique<std::mt19937>(*rng_);
     nstate.ApplyAction(0);
+    rng_ = std::move(rng);
     nstate.ItemPool().clear();
     nstate.AgentUtils().clear();
     // Max steps
@@ -603,6 +607,18 @@ std::unique_ptr<State> NegotiationGame::DeserializeState(
     }
     return state;
   }
+}
+
+std::string NegotiationGame::GetRNGState() const {
+  std::ostringstream rng_stream;
+  rng_stream << *rng_;
+  return rng_stream.str();
+}
+
+void NegotiationGame::SetRNGState(const std::string& rng_state) const {
+  if (rng_state.empty()) return;
+  std::istringstream rng_stream(rng_state);
+  rng_stream >> *rng_;
 }
 
 }  // namespace negotiation

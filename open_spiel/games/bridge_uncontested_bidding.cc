@@ -395,7 +395,11 @@ UncontestedBiddingGame::UncontestedBiddingGame(const GameParameters& params)
 // e.g. "AKQJ.543.QJ8.T92 97532.A2.9.QJ853 2N-3C"
 std::unique_ptr<State> UncontestedBiddingGame::DeserializeState(
     const std::string& str) const {
-  if (str.empty()) return NewInitialState();
+  if (str.empty()) {
+    return absl::make_unique<UncontestedBiddingState>(
+        shared_from_this(), reference_contracts_, deal_filter_, forced_actions_,
+        rng_seed_, num_redeals_);
+  }
   SPIEL_CHECK_GE(str.length(),
                  kNumPlayers * (kNumCardsPerHand + kNumSuits) - 1);
   std::array<int, kNumCards> cards{};
@@ -438,8 +442,17 @@ std::unique_ptr<State> UncontestedBiddingGame::DeserializeState(
   }
 
   return absl::make_unique<UncontestedBiddingState>(
-      shared_from_this(), reference_contracts_, Deal(cards), actions,
-      ++rng_seed_, num_redeals_);
+      shared_from_this(), reference_contracts_, Deal(cards), actions, rng_seed_,
+      num_redeals_);
+}
+
+std::string UncontestedBiddingGame::GetRNGState() const {
+  return std::to_string(rng_seed_);
+}
+
+void UncontestedBiddingGame::SetRNGState(const std::string& rng_state) const {
+  if (rng_state.empty()) return;
+  SPIEL_CHECK_TRUE(absl::SimpleAtoi(rng_state, &rng_seed_));
 }
 
 }  // namespace bridge_uncontested_bidding

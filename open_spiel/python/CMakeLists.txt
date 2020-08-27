@@ -145,6 +145,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   tests/policy_test.py
   tests/pyspiel_test.py
   tests/rl_environment_test.py
+  tests/sampled_stochastic_games_test.py
   tests/tensor_game_utils_test.py
   utils/file_logger_test.py
   utils/lru_cache_test.py

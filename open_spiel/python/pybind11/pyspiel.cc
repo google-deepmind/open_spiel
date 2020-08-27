@@ -103,9 +103,9 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("is_mandatory", &GameParameter::is_mandatory)
       .def("__str__", &GameParameter::ToString)
       .def("__repr__", &GameParameter::ToReprString)
-      .def("__eq__", [](const GameParameter &value, GameParameter *value2) {
-         return value2 && value.ToReprString() == value2->ToReprString();
-       });
+      .def("__eq__", [](const GameParameter& value, GameParameter* value2) {
+        return value2 && value.ToReprString() == value2->ToReprString();
+      });
 
   py::enum_<PrivateInfoType>(m, "PrivateInfoType")
       .value("ALL_PLAYERS", PrivateInfoType::kAllPlayers)
@@ -345,13 +345,13 @@ PYBIND11_MODULE(pyspiel, m) {
            })
       .def(py::pickle(                            // Pickle support
           [](std::shared_ptr<const Game> game) {  // __getstate__
-            return game->ToString();
+            return game->Serialize();
           },
           [](const std::string& data) {  // __setstate__
             // Have to remove the const here for this to compile, presumably
             // because the holder type is non-const. But seems like you can't
             // set the holder type to std::shared_ptr<const Game> either.
-            return std::const_pointer_cast<Game>(LoadGame(data));
+            return std::const_pointer_cast<Game>(DeserializeGame(data));
           }));
 
   py::class_<NormalFormGame, std::shared_ptr<NormalFormGame>> normal_form_game(
@@ -557,7 +557,7 @@ PYBIND11_MODULE(pyspiel, m) {
       [](const std::string& string) { throw SpielException(string); });
 
   // Register other bits of the API.
-  init_pyspiel_bots(m);             // Bots and bot-related algorithms.
+  init_pyspiel_bots(m);                   // Bots and bot-related algorithms.
   init_pyspiel_observation_histories(m);  // Histories related to observations.
   init_pyspiel_policy(m);           // Policies and policy-related algorithms.
   init_pyspiel_game_transforms(m);  // Game transformations.
