@@ -208,8 +208,8 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
     echo -e "\e[33mSystem wide packages already installed, skipping their installation.\e[0m"
   else
     echo "System wide packages missing. Installing them..."
-    sudo apt-get update
-    sudo apt-get install $EXT_DEPS
+    sudo apt-get -y update
+    sudo apt-get -y install $EXT_DEPS
   fi
 
   if [[ "$TRAVIS" ]]; then
