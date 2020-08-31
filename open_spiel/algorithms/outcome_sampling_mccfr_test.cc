@@ -37,7 +37,7 @@ void MCCFR_2PGameTest(const std::string& game_name, std::mt19937* rng,
   for (int i = 0; i < iterations; i++) {
     solver.RunIteration(rng);
   }
-  const std::unique_ptr<Policy> average_policy = solver.AveragePolicy();
+  const std::shared_ptr<Policy> average_policy = solver.AveragePolicy();
   double nash_conv = NashConv(*game, *average_policy, true);
   std::cout << "Game: " << game_name << ", iters = " << iterations
             << ", NashConv: " << nash_conv << std::endl;
