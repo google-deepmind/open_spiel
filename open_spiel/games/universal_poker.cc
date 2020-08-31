@@ -580,7 +580,13 @@ UniversalPokerState::GetHistoriesConsistentWithInfostate(int player_id) const {
   logic::CardSet fresh_deck(/*num_suits=*/acpc_game_->NumSuitsDeck(),
                             /*num_ranks=*/acpc_game_->NumRanksDeck());
   for (uint8_t card : is_cards.ToCardArray()) fresh_deck.RemoveCard(card);
-  auto dist = std::make_unique<HistoryDistribution>();
+  auto dist = absl::make_unique<HistoryDistribution>();
+
+  // We only consider half the possible hands as we only look at each pair of
+  // hands once, i.e. order does not matter.
+  const int num_hands =
+      0.5 * fresh_deck.NumCards() * (fresh_deck.NumCards() - 1);
+  dist->first.reserve(num_hands);
   for (uint8_t hole_card1 : fresh_deck.ToCardArray()) {
     logic::CardSet subset_deck = fresh_deck;
     subset_deck.RemoveCard(hole_card1);
@@ -598,11 +604,11 @@ UniversalPokerState::GetHistoriesConsistentWithInfostate(int player_id) const {
       }
       SPIEL_CHECK_FALSE(root->IsChanceNode());
       dist->first.push_back(std::move(root));
-      dist->second.push_back(1.);
     }
   }
-  dist->second.resize(dist->first.size(),
-                      1. / static_cast<double>(dist->first.size()));
+  SPIEL_DCHECK_EQ(dist->first.size(), num_hands);
+  const double divisor = 1. / static_cast<double>(dist->first.size());
+  dist->second.assign(dist->first.size(), divisor);
   return dist;
 }
 
