@@ -56,7 +56,6 @@ class TarokGame : public Game {
   int NumPlayers() const override;
   double MinUtility() const override;
   double MaxUtility() const override;
-  std::shared_ptr<const Game> Clone() const override;
   int MaxGameLength() const override;
 
  private:

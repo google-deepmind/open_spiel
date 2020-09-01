@@ -78,10 +78,6 @@ double TarokGame::MinUtility() const { return -500.0; }
 
 double TarokGame::MaxUtility() const { return 500.0; }
 
-std::shared_ptr<const Game> TarokGame::Clone() const {
-  return std::shared_ptr<const Game>(new TarokGame(*this));
-}
-
 int TarokGame::MaxGameLength() const {
   if (num_players_ == 3) {
     // 17 actions + 16 cards each
