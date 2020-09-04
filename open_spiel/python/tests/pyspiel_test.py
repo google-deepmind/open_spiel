@@ -210,9 +210,14 @@ class PyspielTest(absltest.TestCase):
                      pyspiel.GameType.ChanceMode.DETERMINISTIC)
 
   def test_error_handling(self):
-    with six.assertRaisesRegex(self, RuntimeError,
-                               "Unknown game 'invalid_game_name'"):
+    try:
       unused_game = pyspiel.load_game("invalid_game_name")
+    except pyspiel.SpielException as e:
+      self.assertRegex(str(e), "Unknown game 'invalid_game_name'")
+    except RuntimeError:
+      self.assertFail("Should have been caught as SpielException.")
+    else:
+      self.assertFail("Should have thrown an exception.")
 
   def test_can_create_cpp_tabular_policy(self):
     for game_name in ["kuhn_poker", "leduc_poker", "liars_dice"]:
