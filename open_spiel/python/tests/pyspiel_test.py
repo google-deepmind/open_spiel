@@ -214,8 +214,18 @@ class PyspielTest(absltest.TestCase):
       unused_game = pyspiel.load_game("invalid_game_name")
     except pyspiel.SpielError as e:
       self.assertRegex(str(e), "Unknown game 'invalid_game_name'")
-    except RuntimeError:
+    except Exception:
       self.assertFail("Should have been caught as SpielError.")
+    else:
+      self.assertFail("Should have thrown an exception.")
+
+    # Test that pyspiel.SpielError can be caught also as a RuntimeError.
+    try:
+      unused_game = pyspiel.load_game("invalid_game_name")
+    except RuntimeError as e:
+      self.assertRegex(str(e), "Unknown game 'invalid_game_name'")
+    except Exception:
+      self.assertFail("Should have been caught as RuntimeError.")
     else:
       self.assertFail("Should have thrown an exception.")
 
