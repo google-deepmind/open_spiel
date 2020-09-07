@@ -57,6 +57,8 @@ class TarokGame : public Game {
   double MinUtility() const override;
   double MaxUtility() const override;
   int MaxGameLength() const override;
+  std::string GetRNGState() const override;
+  void SetRNGState(const std::string& rng_state) const override;
 
  private:
   friend class TarokState;

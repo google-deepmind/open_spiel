@@ -38,7 +38,7 @@ const GameType kGameType{"tarok",            // short_name
                          false,  // provides_observation_tensor
                          // parameter_specification
                          {{"players", GameParameter(kDefaultNumPLayers)},
-                          {"seed", GameParameter(kDefaultSeed)}}};
+                          {"rng_seed", GameParameter(kDefaultSeed)}}};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new TarokGame(params));
@@ -50,9 +50,9 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 TarokGame::TarokGame(const GameParameters& params)
     : Game(kGameType, params),
       num_players_(ParameterValue<int>("players")),
-      rng_(std::mt19937(ParameterValue<int>("seed") == -1
+      rng_(std::mt19937(ParameterValue<int>("rng_seed") == -1
                             ? std::time(0)
-                            : ParameterValue<int>("seed"))) {
+                            : ParameterValue<int>("rng_seed"))) {
   SPIEL_CHECK_GE(num_players_, kGameType.min_num_players);
   SPIEL_CHECK_LE(num_players_, kGameType.max_num_players);
 }
@@ -86,6 +86,18 @@ int TarokGame::MaxGameLength() const {
     // 24 actions + 12 cards each
     return 72;
   }
+}
+
+std::string TarokGame::GetRNGState() const {
+  std::ostringstream rng_stream;
+  rng_stream << rng_;
+  return rng_stream.str();
+}
+
+void TarokGame::SetRNGState(const std::string& rng_state) const {
+  if (rng_state.empty()) return;
+  std::istringstream rng_stream(rng_state);
+  rng_stream >> rng_;
 }
 
 int TarokGame::RNG() const { return rng_(); }
