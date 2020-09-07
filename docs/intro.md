@@ -40,3 +40,8 @@ available from Python.
 
 OpenSpiel has been tested on Linux (Debian 10 and Ubuntu 19.04), MacOS, and
 [Windows 10 (through Windows Subsystem for Linux)](windows.md).
+
+**Visualization of games**
+ 
+There is an interactive viewer for OpenSpiel games called 
+[SpielViz](https://github.com/michalsustr/spielviz).

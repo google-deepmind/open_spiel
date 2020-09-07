@@ -103,3 +103,11 @@ When you add a new conditional dependency, you need to touch:
 -   change `install.sh` to make sure the dependency is installed
 -   use constructs like `if (${BUILD_WITH_HANABI})` in CMake to optionally add
     the targets to build.
+
+## Debugging tools
+
+For complex games it may be tricky to get all the details right. You can 
+visualize (very small) game trees using 
+`open_spiel/python/examples/treeviz_example.py` or for large games there is 
+an interactive viewer for OpenSpiel games called 
+[SpielViz](https://github.com/michalsustr/spielviz).

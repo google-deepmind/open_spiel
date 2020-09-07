@@ -237,3 +237,7 @@ release!). Contributions are certainly not limited to these suggestions!
     for running a batch of episodes using Tensorflow directly from C++ (in
     `contrib/`). It has not yet been tested with CMake and public Tensorflow. We
     would like to officially support this and move it into the core library.
+
+-   **Visualizations of games**. There exists an interactive viewer for
+    OpenSpiel games called [SpielViz](https://github.com/michalsustr/spielviz).
+    Contributions to this project are welcome.  
