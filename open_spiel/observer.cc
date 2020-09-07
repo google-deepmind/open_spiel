@@ -100,6 +100,16 @@ std::shared_ptr<Observer> Game::MakeObserver(
   // game-specific observer.
   if (!params.empty()) SpielFatalError("Observer params not supported.");
   if (!iig_obs_type) return absl::make_unique<DefaultObserver>(*this);
+
+  // Perfect information games provide public information regardless
+  // of requested PrivateInfoType (as they have no private information).
+  if (GetType().information == GameType::Information::kPerfectInformation
+      && iig_obs_type->public_info && !iig_obs_type->perfect_recall) {
+    if (game_type_.provides_observation_tensor ||
+        game_type_.provides_observation_string)
+      return absl::make_unique<DefaultObserver>(*this);
+  }
+
   // TODO(author11) Reinstate this check
   // SPIEL_CHECK_EQ(GetType().information,
   //                GameType::Information::kImperfectInformation);
