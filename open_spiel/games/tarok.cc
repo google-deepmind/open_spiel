@@ -596,22 +596,24 @@ void TarokState::DoApplyActionInTalonExchange(Action action_id) {
     MoveActionFromTo(action_id, &player_cards,
                      &players_collected_cards_.at(current_player_));
 
+    bool talon_exchange_finished = player_cards.size() == 48 / num_players_;
+    std::string info_state_delimiter = talon_exchange_finished ? ";" : ",";
+
     // note that all players see discarded tarok cards but only the discarder
     // knows about discarded non-taroks
-    if (player_cards.size() == 48 / num_players_) {
-      // talon exchange phase is finished
-      if (ActionToCard(action_id).suit == CardSuit::kTaroks)
-        AppendToAllInformationStates(absl::StrCat(action_id, ";"));
-      else
-        AppendToInformationState(current_player_, absl::StrCat(action_id, ";"));
-      StartTricksPlayingPhase();
+    if (ActionToCard(action_id).suit == CardSuit::kTaroks) {
+      AppendToAllInformationStates(
+          absl::StrCat(action_id, info_state_delimiter));
     } else {
-      // talon exchange phase will continue
-      if (ActionToCard(action_id).suit == CardSuit::kTaroks)
-        AppendToAllInformationStates(absl::StrCat(action_id, ","));
-      else
-        AppendToInformationState(current_player_, absl::StrCat(action_id, ","));
+      AppendToInformationState(current_player_,
+                               absl::StrCat(action_id, info_state_delimiter));
+      for (Player p = 0; p < num_players_; p++) {
+        if (p == current_player_) continue;
+        AppendToInformationState(p, absl::StrCat("d", info_state_delimiter));
+      }
     }
+
+    if (talon_exchange_finished) StartTricksPlayingPhase();
   }
 }
 
