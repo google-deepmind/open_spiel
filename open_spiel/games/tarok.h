@@ -57,6 +57,9 @@ class TarokGame : public Game {
   double MinUtility() const override;
   double MaxUtility() const override;
   int MaxGameLength() const override;
+
+  std::unique_ptr<State> DeserializeState(
+      const std::string& str) const override;
   std::string GetRNGState() const override;
   void SetRNGState(const std::string& rng_state) const override;
 
@@ -124,12 +127,15 @@ class TarokState : public State {
   std::string InformationStateString(Player player) const override;
 
   std::string ToString() const override;
+  std::string Serialize() const override;
   std::unique_ptr<State> Clone() const override;
 
  protected:
   void DoApplyAction(Action action_id) override;
 
  private:
+  friend class TarokGame;
+
   std::vector<Action> LegalActionsInBidding() const;
   std::vector<Action> LegalActionsInTalonExchange() const;
   std::vector<Action> LegalActionsInTricksPlaying() const;
@@ -150,6 +156,7 @@ class TarokState : public State {
 
   void DoApplyActionInCardDealing();
   bool AnyPlayerWithoutTaroks() const;
+  void AddPrivateCardsToInfoStates();
   void DoApplyActionInBidding(Action action_id);
   bool AllButCurrentPlayerPassedBidding() const;
   void FinishBiddingPhase(Action action_id);
@@ -184,6 +191,8 @@ class TarokState : public State {
   void AppendToInformationState(Player player, const std::string& appendix);
 
   std::shared_ptr<const TarokGame> tarok_parent_game_;
+  int card_dealing_seed_ = kDefaultSeed;
+
   GamePhase current_game_phase_ = GamePhase::kCardDealing;
   Player current_player_ = kInvalidPlayer;
   std::vector<Action> talon_;

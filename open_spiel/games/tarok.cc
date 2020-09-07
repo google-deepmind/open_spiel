@@ -88,6 +88,28 @@ int TarokGame::MaxGameLength() const {
   }
 }
 
+std::unique_ptr<State> TarokGame::DeserializeState(
+    const std::string& str) const {
+  std::unique_ptr<TarokState> state = NewInitialTarokState();
+  if (str.empty()) return state;
+
+  std::vector<std::string> lines = absl::StrSplit(str, "\n");
+  for (int i = 0; i < lines.size(); i++) {
+    if (i == 0) {
+      // chance node where we presisted the card dealing seed, see
+      // TarokState::DoApplyActionInCardDealing for more info
+      std::tie(state->talon_, state->players_cards_) =
+          DealCards(num_players_, std::stoi(lines.at(i)));
+      state->current_game_phase_ = GamePhase::kBidding;
+      state->current_player_ = 1;
+      state->AddPrivateCardsToInfoStates();
+    } else {
+      state->ApplyAction(std::stol(lines.at(i)));
+    }
+  }
+  return state;
+}
+
 std::string TarokGame::GetRNGState() const {
   std::ostringstream rng_stream;
   rng_stream << rng_;
@@ -460,20 +482,17 @@ void TarokState::DoApplyAction(Action action_id) {
 void TarokState::DoApplyActionInCardDealing() {
   // do the actual sampling here due to implicit stochasticity
   do {
+    // seed is persisted for serialization purposes
+    card_dealing_seed_ = tarok_parent_game_->RNG();
     // hands without taroks are illegal
     std::tie(talon_, players_cards_) =
-        DealCards(num_players_, tarok_parent_game_->RNG());
+        DealCards(num_players_, card_dealing_seed_);
   } while (AnyPlayerWithoutTaroks());
   current_game_phase_ = GamePhase::kBidding;
   // lower player indices correspond to higher bidding priority,
   // i.e. 0 is the forehand, num_players - 1 is the dealer
   current_player_ = 1;
-
-  // add private cards to info states
-  for (int i = 0; i < num_players_; i++) {
-    AppendToInformationState(
-        i, absl::StrCat(absl::StrJoin(players_cards_.at(i), ","), ";"));
-  }
+  AddPrivateCardsToInfoStates();
 }
 
 bool TarokState::AnyPlayerWithoutTaroks() const {
@@ -484,6 +503,13 @@ bool TarokState::AnyPlayerWithoutTaroks() const {
     }
   }
   return false;
+}
+
+void TarokState::AddPrivateCardsToInfoStates() {
+  for (int i = 0; i < num_players_; i++) {
+    AppendToInformationState(
+        i, absl::StrCat(absl::StrJoin(players_cards_.at(i), ","), ";"));
+  }
 }
 
 void TarokState::DoApplyActionInBidding(Action action_id) {
@@ -930,6 +956,15 @@ std::string TarokState::ToString() const {
                     "\n");
   }
   return str;
+}
+
+std::string TarokState::Serialize() const {
+  if (current_game_phase_ == GamePhase::kCardDealing) return "";
+  // replace the dummy stochastic action with the seed that was used
+  // for dealing the cards
+  std::vector<Action> history = History();
+  history.front() = card_dealing_seed_;
+  return absl::StrJoin(history, "\n");
 }
 
 std::unique_ptr<State> TarokState::Clone() const {
