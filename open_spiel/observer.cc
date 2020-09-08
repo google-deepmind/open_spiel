@@ -115,7 +115,8 @@ std::shared_ptr<Observer> Game::MakeObserver(
         game_type_.provides_information_state_string)
       return absl::make_unique<InformationStateObserver>(*this);
   }
-  SpielFatalError("Requested Observer type not available.");
+  SpielFatalError(absl::StrCat(
+      "Requested Observer type not available: ", iig_obs_type->ToString()));
 }
 
 class TrackingVectorAllocator : public Allocator {
@@ -231,6 +232,21 @@ void Observation::Decompress(absl::string_view compressed) {
       SpielFatalError(absl::StrCat("Unrecognized compression scheme in '",
                                    compressed, "'"));
   }
+}
+std::string PrivateInfoTypeAsString(const PrivateInfoType& type) {
+  if (type == PrivateInfoType::kNone) return "kNone";
+  if (type == PrivateInfoType::kSinglePlayer) return "kSinglePlayer";
+  if (type == PrivateInfoType::kAllPlayers) return "kAllPlayers";
+  SpielFatalError("Unknown PrivateInfoType!");
+}
+
+std::string IIGObservationType::ToString() const {
+  return absl::StrCat(
+      "IIGObservationType",
+      "{ perfect_recall=", perfect_recall ? "true" : "false",
+      ", public_info=", public_info ? "true" : "false",
+      ", private_info=", PrivateInfoTypeAsString(private_info),
+      " }");
 }
 
 }  // namespace open_spiel

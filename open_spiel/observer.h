@@ -99,6 +99,10 @@ enum class PrivateInfoType {
                   // the player passed to WriteTensor / StringFrom)
   kAllPlayers     // Private information for all players
 };
+std::string PrivateInfoTypeAsString(const PrivateInfoType& type);
+std::ostream& operator<<(std::ostream& os, const PrivateInfoType& type) {
+  return os << PrivateInfoTypeAsString(type);
+}
 
 // Observation types for imperfect-information games.
 
@@ -176,7 +180,13 @@ struct IIGObservationType {
 
   // Which players' private information to include in the observation
   PrivateInfoType private_info;
+
+  std::string ToString() const;
 };
+
+std::ostream& operator<<(std::ostream& os, const IIGObservationType& type) {
+  return os << type.ToString();
+}
 
 // Default observation type for imperfect information games.
 // Corresponds to the ObservationTensor method.
