@@ -51,6 +51,9 @@ InformationStateString(0) = ""
 InformationStateString(1) = ""
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=0)\n\n 7 +++++++\n 6 +++++++\n 5 +++++++\n 4 +++++++\n 3 +++++++\n 2 +++++++\n 1 +++++++\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=0)\n\n 7 +++++++\n 6 +++++++\n 5 +++++++\n 4 +++++++\n 3 +++++++\n 2 +++++++\n 1 +++++++\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=0)\n\n 7 +++++++\n 6 +++++++\n 5 +++++++\n 4 +++++++\n 3 +++++++\n 2 +++++++\n 1 +++++++\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
@@ -96,6 +99,9 @@ InformationStateString(0) = "24"
 InformationStateString(1) = "24"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=1)\n\n 7 +++++++\n 6 +++++++\n 5 +++++++\n 4 +++X+++\n 3 +++++++\n 2 +++++++\n 1 +++++++\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=1)\n\n 7 +++++++\n 6 +++++++\n 5 +++++++\n 4 +++X+++\n 3 +++++++\n 2 +++++++\n 1 +++++++\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=1)\n\n 7 +++++++\n 6 +++++++\n 5 +++++++\n 4 +++X+++\n 3 +++++++\n 2 +++++++\n 1 +++++++\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◉◉◉◉◉◉◉
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◉◉◉◉◉◉◉
@@ -141,6 +147,9 @@ InformationStateString(0) = "24 17"
 InformationStateString(1) = "24 17"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=2)\n\n 7 +++++++\n 6 +++++++\n 5 +++++++\n 4 +++X+++\n 3 +++O+++\n 2 +++++++\n 1 +++++++\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=2)\n\n 7 +++++++\n 6 +++++++\n 5 +++++++\n 4 +++X+++\n 3 +++O+++\n 2 +++++++\n 1 +++++++\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=2)\n\n 7 +++++++\n 6 +++++++\n 5 +++++++\n 4 +++X+++\n 3 +++O+++\n 2 +++++++\n 1 +++++++\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
@@ -186,6 +195,9 @@ InformationStateString(0) = "24 17 8"
 InformationStateString(1) = "24 17 8"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=3)\n\n 7 +++++++\n 6 +++++++\n 5 +++++++\n 4 +++X+++\n 3 +++O+++\n 2 +X+++++\n 1 +++++++\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=3)\n\n 7 +++++++\n 6 +++++++\n 5 +++++++\n 4 +++X+++\n 3 +++O+++\n 2 +X+++++\n 1 +++++++\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=3)\n\n 7 +++++++\n 6 +++++++\n 5 +++++++\n 4 +++X+++\n 3 +++O+++\n 2 +X+++++\n 1 +++++++\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◉◉◉◉◉◉◉
 ◯◉◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◉◉◉◉◉  ◉◉◉◉◉◉◉
@@ -231,6 +243,9 @@ InformationStateString(0) = "24 17 8 29"
 InformationStateString(1) = "24 17 8 29"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=4)\n\n 7 +++++++\n 6 +++++++\n 5 +O+++++\n 4 +++X+++\n 3 +++O+++\n 2 +X+++++\n 1 +++++++\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=4)\n\n 7 +++++++\n 6 +++++++\n 5 +O+++++\n 4 +++X+++\n 3 +++O+++\n 2 +X+++++\n 1 +++++++\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=4)\n\n 7 +++++++\n 6 +++++++\n 5 +O+++++\n 4 +++X+++\n 3 +++O+++\n 2 +X+++++\n 1 +++++++\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
 ◯◉◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◉◉◉◉◉  ◯◯◯◯◯◯◯
@@ -276,6 +291,9 @@ InformationStateString(0) = "24 17 8 29 41"
 InformationStateString(1) = "24 17 8 29 41"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=5)\n\n 7 +++++++\n 6 ++++++X\n 5 +O+++++\n 4 +++X+++\n 3 +++O+++\n 2 +X+++++\n 1 +++++++\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=5)\n\n 7 +++++++\n 6 ++++++X\n 5 +O+++++\n 4 +++X+++\n 3 +++O+++\n 2 +X+++++\n 1 +++++++\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=5)\n\n 7 +++++++\n 6 ++++++X\n 5 +O+++++\n 4 +++X+++\n 3 +++O+++\n 2 +X+++++\n 1 +++++++\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◉◉◉◉◉◉◉
 ◯◉◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◉◉◉◉◉  ◉◉◉◉◉◉◉
@@ -321,6 +339,9 @@ InformationStateString(0) = "24 17 8 29 41 2"
 InformationStateString(1) = "24 17 8 29 41 2"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=6)\n\n 7 +++++++\n 6 ++++++X\n 5 +O+++++\n 4 +++X+++\n 3 +++O+++\n 2 +X+++++\n 1 ++O++++\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=6)\n\n 7 +++++++\n 6 ++++++X\n 5 +O+++++\n 4 +++X+++\n 3 +++O+++\n 2 +X+++++\n 1 ++O++++\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=6)\n\n 7 +++++++\n 6 ++++++X\n 5 +O+++++\n 4 +++X+++\n 3 +++O+++\n 2 +X+++++\n 1 ++O++++\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯  ◉◉◯◉◉◉◉  ◯◯◯◯◯◯◯
 ◯◉◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◉◉◉◉◉  ◯◯◯◯◯◯◯
@@ -366,6 +387,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42"
 InformationStateString(1) = "24 17 8 29 41 2 42"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=7)\n\n 7 X++++++\n 6 ++++++X\n 5 +O+++++\n 4 +++X+++\n 3 +++O+++\n 2 +X+++++\n 1 ++O++++\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=7)\n\n 7 X++++++\n 6 ++++++X\n 5 +O+++++\n 4 +++X+++\n 3 +++O+++\n 2 +X+++++\n 1 ++O++++\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=7)\n\n 7 X++++++\n 6 ++++++X\n 5 +O+++++\n 4 +++X+++\n 3 +++O+++\n 2 +X+++++\n 1 ++O++++\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯  ◉◉◯◉◉◉◉  ◉◉◉◉◉◉◉
 ◯◉◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◉◉◉◉◉  ◉◉◉◉◉◉◉
@@ -411,6 +435,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37"
 InformationStateString(1) = "24 17 8 29 41 2 42 37"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=8)\n\n 7 X++++++\n 6 ++O+++X\n 5 +O+++++\n 4 +++X+++\n 3 +++O+++\n 2 +X+++++\n 1 ++O++++\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=8)\n\n 7 X++++++\n 6 ++O+++X\n 5 +O+++++\n 4 +++X+++\n 3 +++O+++\n 2 +X+++++\n 1 ++O++++\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=8)\n\n 7 X++++++\n 6 ++O+++X\n 5 +O+++++\n 4 +++X+++\n 3 +++O+++\n 2 +X+++++\n 1 ++O++++\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯  ◉◉◯◉◉◉◉  ◯◯◯◯◯◯◯
 ◯◉◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◉◉◉◉◉  ◯◯◯◯◯◯◯
@@ -456,6 +483,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18"
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=9)\n\n 7 X++++++\n 6 ++O+++X\n 5 +O+++++\n 4 +++X+++\n 3 +++OX++\n 2 +X+++++\n 1 ++O++++\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=9)\n\n 7 X++++++\n 6 ++O+++X\n 5 +O+++++\n 4 +++X+++\n 3 +++OX++\n 2 +X+++++\n 1 ++O++++\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=9)\n\n 7 X++++++\n 6 ++O+++X\n 5 +O+++++\n 4 +++X+++\n 3 +++OX++\n 2 +X+++++\n 1 ++O++++\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯  ◉◉◯◉◉◉◉  ◉◉◉◉◉◉◉
 ◯◉◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◉◉◉◉◉  ◉◉◉◉◉◉◉
@@ -501,6 +531,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4"
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=10)\n\n 7 X++++++\n 6 ++O+++X\n 5 +O+++++\n 4 +++X+++\n 3 +++OX++\n 2 +X+++++\n 1 ++O+O++\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=10)\n\n 7 X++++++\n 6 ++O+++X\n 5 +O+++++\n 4 +++X+++\n 3 +++OX++\n 2 +X+++++\n 1 ++O+O++\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=10)\n\n 7 X++++++\n 6 ++O+++X\n 5 +O+++++\n 4 +++X+++\n 3 +++OX++\n 2 +X+++++\n 1 ++O+O++\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◉◯◉◯◯  ◉◉◯◉◯◉◉  ◯◯◯◯◯◯◯
 ◯◉◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◉◉◉◉◉  ◯◯◯◯◯◯◯
@@ -546,6 +579,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47"
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=11)\n\n 7 X++++X+\n 6 ++O+++X\n 5 +O+++++\n 4 +++X+++\n 3 +++OX++\n 2 +X+++++\n 1 ++O+O++\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=11)\n\n 7 X++++X+\n 6 ++O+++X\n 5 +O+++++\n 4 +++X+++\n 3 +++OX++\n 2 +X+++++\n 1 ++O+O++\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=11)\n\n 7 X++++X+\n 6 ++O+++X\n 5 +O+++++\n 4 +++X+++\n 3 +++OX++\n 2 +X+++++\n 1 ++O+O++\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◉◯◉◯◯  ◉◉◯◉◯◉◉  ◉◉◉◉◉◉◉
 ◯◉◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◉◉◉◉◉  ◉◉◉◉◉◉◉
@@ -591,6 +627,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0"
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=12)\n\n 7 X++++X+\n 6 ++O+++X\n 5 +O+++++\n 4 +++X+++\n 3 +++OX++\n 2 +X+++++\n 1 O+O+O++\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=12)\n\n 7 X++++X+\n 6 ++O+++X\n 5 +O+++++\n 4 +++X+++\n 3 +++OX++\n 2 +X+++++\n 1 O+O+O++\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=12)\n\n 7 X++++X+\n 6 ++O+++X\n 5 +O+++++\n 4 +++X+++\n 3 +++OX++\n 2 +X+++++\n 1 O+O+O++\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◉◯◉◯◉◯◯  ◯◉◯◉◯◉◉  ◯◯◯◯◯◯◯
 ◯◉◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◉◉◉◉◉  ◯◯◯◯◯◯◯
@@ -636,6 +675,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16"
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=13)\n\n 7 X++++X+\n 6 ++O+++X\n 5 +O+++++\n 4 +++X+++\n 3 ++XOX++\n 2 +X+++++\n 1 O+O+O++\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=13)\n\n 7 X++++X+\n 6 ++O+++X\n 5 +O+++++\n 4 +++X+++\n 3 ++XOX++\n 2 +X+++++\n 1 O+O+O++\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=13)\n\n 7 X++++X+\n 6 ++O+++X\n 5 +O+++++\n 4 +++X+++\n 3 ++XOX++\n 2 +X+++++\n 1 O+O+O++\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◉◯◉◯◉◯◯  ◯◉◯◉◯◉◉  ◉◉◉◉◉◉◉
 ◯◉◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◉◉◉◉◉  ◉◉◉◉◉◉◉
@@ -681,6 +723,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23"
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=14)\n\n 7 X++++X+\n 6 ++O+++X\n 5 +O+++++\n 4 ++OX+++\n 3 ++XOX++\n 2 +X+++++\n 1 O+O+O++\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=14)\n\n 7 X++++X+\n 6 ++O+++X\n 5 +O+++++\n 4 ++OX+++\n 3 ++XOX++\n 2 +X+++++\n 1 O+O+O++\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=14)\n\n 7 X++++X+\n 6 ++O+++X\n 5 +O+++++\n 4 ++OX+++\n 3 ++XOX++\n 2 +X+++++\n 1 O+O+O++\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◉◯◉◯◉◯◯  ◯◉◯◉◯◉◉  ◯◯◯◯◯◯◯
 ◯◉◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◉◉◉◉◉  ◯◯◯◯◯◯◯
@@ -726,6 +771,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34"
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=15)\n\n 7 X++++X+\n 6 ++O+++X\n 5 +O++++X\n 4 ++OX+++\n 3 ++XOX++\n 2 +X+++++\n 1 O+O+O++\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=15)\n\n 7 X++++X+\n 6 ++O+++X\n 5 +O++++X\n 4 ++OX+++\n 3 ++XOX++\n 2 +X+++++\n 1 O+O+O++\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=15)\n\n 7 X++++X+\n 6 ++O+++X\n 5 +O++++X\n 4 ++OX+++\n 3 ++XOX++\n 2 +X+++++\n 1 O+O+O++\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◉◯◉◯◉◯◯  ◯◉◯◉◯◉◉  ◉◉◉◉◉◉◉
 ◯◉◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◉◉◉◉◉  ◉◉◉◉◉◉◉
@@ -771,6 +819,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20"
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=16)\n\n 7 X++++X+\n 6 ++O+++X\n 5 +O++++X\n 4 ++OX+++\n 3 ++XOX+O\n 2 +X+++++\n 1 O+O+O++\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=16)\n\n 7 X++++X+\n 6 ++O+++X\n 5 +O++++X\n 4 ++OX+++\n 3 ++XOX+O\n 2 +X+++++\n 1 O+O+O++\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=16)\n\n 7 X++++X+\n 6 ++O+++X\n 5 +O++++X\n 4 ++OX+++\n 3 ++XOX+O\n 2 +X+++++\n 1 O+O+O++\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◉◯◉◯◉◯◯  ◯◉◯◉◯◉◉  ◯◯◯◯◯◯◯
 ◯◉◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◉◉◉◉◉  ◯◯◯◯◯◯◯
@@ -816,6 +867,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39"
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=17)\n\n 7 X++++X+\n 6 ++O+X+X\n 5 +O++++X\n 4 ++OX+++\n 3 ++XOX+O\n 2 +X+++++\n 1 O+O+O++\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=17)\n\n 7 X++++X+\n 6 ++O+X+X\n 5 +O++++X\n 4 ++OX+++\n 3 ++XOX+O\n 2 +X+++++\n 1 O+O+O++\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=17)\n\n 7 X++++X+\n 6 ++O+X+X\n 5 +O++++X\n 4 ++OX+++\n 3 ++XOX+O\n 2 +X+++++\n 1 O+O+O++\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◉◯◉◯◉◯◯  ◯◉◯◉◯◉◉  ◉◉◉◉◉◉◉
 ◯◉◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◉◉◉◉◉  ◉◉◉◉◉◉◉
@@ -861,6 +915,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5"
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=18)\n\n 7 X++++X+\n 6 ++O+X+X\n 5 +O++++X\n 4 ++OX+++\n 3 ++XOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=18)\n\n 7 X++++X+\n 6 ++O+X+X\n 5 +O++++X\n 4 ++OX+++\n 3 ++XOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=18)\n\n 7 X++++X+\n 6 ++O+X+X\n 5 +O++++X\n 4 ++OX+++\n 3 ++XOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◉◯◉◯◉◉◯  ◯◉◯◉◯◯◉  ◯◯◯◯◯◯◯
 ◯◉◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◉◉◉◉◉  ◯◯◯◯◯◯◯
@@ -906,6 +963,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=19)\n\n 7 X++++X+\n 6 ++O+X+X\n 5 +O++++X\n 4 ++OX+X+\n 3 ++XOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=19)\n\n 7 X++++X+\n 6 ++O+X+X\n 5 +O++++X\n 4 ++OX+X+\n 3 ++XOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=19)\n\n 7 X++++X+\n 6 ++O+X+X\n 5 +O++++X\n 4 ++OX+X+\n 3 ++XOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◉◯◉◯◉◉◯  ◯◉◯◉◯◯◉  ◉◉◉◉◉◉◉
 ◯◉◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◉◉◉◉◉  ◉◉◉◉◉◉◉
@@ -951,6 +1011,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=20)\n\n 7 X++++X+\n 6 ++O+X+X\n 5 +O++++X\n 4 O+OX+X+\n 3 ++XOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=20)\n\n 7 X++++X+\n 6 ++O+X+X\n 5 +O++++X\n 4 O+OX+X+\n 3 ++XOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=20)\n\n 7 X++++X+\n 6 ++O+X+X\n 5 +O++++X\n 4 O+OX+X+\n 3 ++XOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◉◯◉◯◉◉◯  ◯◉◯◉◯◯◉  ◯◯◯◯◯◯◯
 ◯◉◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◉◉◉◉◉  ◯◯◯◯◯◯◯
@@ -996,6 +1059,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=21)\n\n 7 X++++X+\n 6 ++O+X+X\n 5 +O++++X\n 4 O+OX+X+\n 3 ++XOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=21)\n\n 7 X++++X+\n 6 ++O+X+X\n 5 +O++++X\n 4 O+OX+X+\n 3 ++XOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=21)\n\n 7 X++++X+\n 6 ++O+X+X\n 5 +O++++X\n 4 O+OX+X+\n 3 ++XOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◉◯◉◯◉◉◯  ◯◉◯◉◯◯◉  ◉◉◉◉◉◉◉
 ◯◉◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◉◉◉◉◉  ◉◉◉◉◉◉◉
@@ -1041,6 +1107,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=22)\n\n 7 X++++X+\n 6 ++O+X+X\n 5 +O++++X\n 4 O+OX+X+\n 3 +OXOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=22)\n\n 7 X++++X+\n 6 ++O+X+X\n 5 +O++++X\n 4 O+OX+X+\n 3 +OXOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=22)\n\n 7 X++++X+\n 6 ++O+X+X\n 5 +O++++X\n 4 O+OX+X+\n 3 +OXOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◉◯◉◯◉◉◯  ◯◉◯◉◯◯◉  ◯◯◯◯◯◯◯
 ◯◉◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◉◉◉◉◉  ◯◯◯◯◯◯◯
@@ -1086,6 +1155,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=23)\n\n 7 X++++X+\n 6 ++O+X+X\n 5 XO++++X\n 4 O+OX+X+\n 3 +OXOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=23)\n\n 7 X++++X+\n 6 ++O+X+X\n 5 XO++++X\n 4 O+OX+X+\n 3 +OXOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=23)\n\n 7 X++++X+\n 6 ++O+X+X\n 5 XO++++X\n 4 O+OX+X+\n 3 +OXOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◉◯◉◯◉◉◯  ◯◉◯◉◯◯◉  ◉◉◉◉◉◉◉
 ◯◉◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◉◉◉◉◉  ◉◉◉◉◉◉◉
@@ -1131,6 +1203,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=24)\n\n 7 X++++X+\n 6 ++OOX+X\n 5 XO++++X\n 4 O+OX+X+\n 3 +OXOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=24)\n\n 7 X++++X+\n 6 ++OOX+X\n 5 XO++++X\n 4 O+OX+X+\n 3 +OXOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=24)\n\n 7 X++++X+\n 6 ++OOX+X\n 5 XO++++X\n 4 O+OX+X+\n 3 +OXOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◉◯◉◯◉◉◯  ◯◉◯◉◯◯◉  ◯◯◯◯◯◯◯
 ◯◉◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◉◉◉◉◉  ◯◯◯◯◯◯◯
@@ -1176,6 +1251,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=25)\n\n 7 X++++X+\n 6 +XOOX+X\n 5 XO++++X\n 4 O+OX+X+\n 3 +OXOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=25)\n\n 7 X++++X+\n 6 +XOOX+X\n 5 XO++++X\n 4 O+OX+X+\n 3 +OXOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=25)\n\n 7 X++++X+\n 6 +XOOX+X\n 5 XO++++X\n 4 O+OX+X+\n 3 +OXOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◉◯◉◯◉◉◯  ◯◉◯◉◯◯◉  ◉◉◉◉◉◉◉
 ◯◉◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◉◉◉◉◉  ◉◉◉◉◉◉◉
@@ -1221,6 +1299,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=26)\n\n 7 X++++X+\n 6 +XOOX+X\n 5 XO+O++X\n 4 O+OX+X+\n 3 +OXOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=26)\n\n 7 X++++X+\n 6 +XOOX+X\n 5 XO+O++X\n 4 O+OX+X+\n 3 +OXOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=26)\n\n 7 X++++X+\n 6 +XOOX+X\n 5 XO+O++X\n 4 O+OX+X+\n 3 +OXOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◉◯◉◯◉◉◯  ◯◉◯◉◯◯◉  ◯◯◯◯◯◯◯
 ◯◉◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◉◉◉◉◉  ◯◯◯◯◯◯◯
@@ -1266,6 +1347,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=27)\n\n 7 X+++XX+\n 6 +XOOX+X\n 5 XO+O++X\n 4 O+OX+X+\n 3 +OXOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=27)\n\n 7 X+++XX+\n 6 +XOOX+X\n 5 XO+O++X\n 4 O+OX+X+\n 3 +OXOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=27)\n\n 7 X+++XX+\n 6 +XOOX+X\n 5 XO+O++X\n 4 O+OX+X+\n 3 +OXOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◉◯◉◯◉◉◯  ◯◉◯◉◯◯◉  ◉◉◉◉◉◉◉
 ◯◉◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◉◉◉◉◉  ◉◉◉◉◉◉◉
@@ -1311,6 +1395,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=28)\n\n 7 X+++XX+\n 6 +XOOX+X\n 5 XO+O++X\n 4 O+OX+X+\n 3 +OXOX+O\n 2 +X+++++\n 1 OOO+OO+\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=28)\n\n 7 X+++XX+\n 6 +XOOX+X\n 5 XO+O++X\n 4 O+OX+X+\n 3 +OXOX+O\n 2 +X+++++\n 1 OOO+OO+\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=28)\n\n 7 X+++XX+\n 6 +XOOX+X\n 5 XO+O++X\n 4 O+OX+X+\n 3 +OXOX+O\n 2 +X+++++\n 1 OOO+OO+\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◉◉◉◯◉◉◯  ◯◯◯◉◯◯◉  ◯◯◯◯◯◯◯
 ◯◉◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◉◉◉◉◉  ◯◯◯◯◯◯◯
@@ -1356,6 +1443,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=29)\n\n 7 X+++XX+\n 6 +XOOX+X\n 5 XO+OX+X\n 4 O+OX+X+\n 3 +OXOX+O\n 2 +X+++++\n 1 OOO+OO+\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=29)\n\n 7 X+++XX+\n 6 +XOOX+X\n 5 XO+OX+X\n 4 O+OX+X+\n 3 +OXOX+O\n 2 +X+++++\n 1 OOO+OO+\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=29)\n\n 7 X+++XX+\n 6 +XOOX+X\n 5 XO+OX+X\n 4 O+OX+X+\n 3 +OXOX+O\n 2 +X+++++\n 1 OOO+OO+\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◉◉◉◯◉◉◯  ◯◯◯◉◯◯◉  ◉◉◉◉◉◉◉
 ◯◉◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◉◉◉◉◉  ◉◉◉◉◉◉◉
@@ -1401,6 +1491,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=30)\n\n 7 X+++XX+\n 6 +XOOX+X\n 5 XO+OX+X\n 4 O+O+OX+\n 3 +OXOX+O\n 2 +X+++++\n 1 OOO+OO+\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=30)\n\n 7 X+++XX+\n 6 +XOOX+X\n 5 XO+OX+X\n 4 O+O+OX+\n 3 +OXOX+O\n 2 +X+++++\n 1 OOO+OO+\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=30)\n\n 7 X+++XX+\n 6 +XOOX+X\n 5 XO+OX+X\n 4 O+O+OX+\n 3 +OXOX+O\n 2 +X+++++\n 1 OOO+OO+\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◉◉◉◯◉◉◯  ◯◯◯◉◯◯◉  ◯◯◯◯◯◯◯
 ◯◉◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◉◉◉◉◉  ◯◯◯◯◯◯◯
@@ -1446,6 +1539,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=31)\n\n 7 XX++XX+\n 6 +XOOX+X\n 5 XO+OX+X\n 4 O+O+OX+\n 3 +OXOX+O\n 2 +X+++++\n 1 OOO+OO+\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=31)\n\n 7 XX++XX+\n 6 +XOOX+X\n 5 XO+OX+X\n 4 O+O+OX+\n 3 +OXOX+O\n 2 +X+++++\n 1 OOO+OO+\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=31)\n\n 7 XX++XX+\n 6 +XOOX+X\n 5 XO+OX+X\n 4 O+O+OX+\n 3 +OXOX+O\n 2 +X+++++\n 1 OOO+OO+\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◉◉◉◯◉◉◯  ◯◯◯◉◯◯◉  ◉◉◉◉◉◉◉
 ◯◉◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◉◉◉◉◉  ◉◉◉◉◉◉◉
@@ -1491,6 +1587,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=32)\n\n 7 XX++XX+\n 6 +XOOX+X\n 5 XO+OX+X\n 4 O+OOOX+\n 3 +OXOX+O\n 2 +X+++++\n 1 OOO+OO+\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=32)\n\n 7 XX++XX+\n 6 +XOOX+X\n 5 XO+OX+X\n 4 O+OOOX+\n 3 +OXOX+O\n 2 +X+++++\n 1 OOO+OO+\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=32)\n\n 7 XX++XX+\n 6 +XOOX+X\n 5 XO+OX+X\n 4 O+OOOX+\n 3 +OXOX+O\n 2 +X+++++\n 1 OOO+OO+\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◉◉◉◯◉◉◯  ◯◯◯◉◯◯◉  ◯◯◯◯◯◯◯
 ◯◉◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◉◉◉◉◉  ◯◯◯◯◯◯◯
@@ -1536,6 +1635,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=33)\n\n 7 XX++XX+\n 6 +XOOX+X\n 5 XO+OX+X\n 4 O+OOOX+\n 3 XOXOX+O\n 2 +X+++++\n 1 OOO+OO+\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=33)\n\n 7 XX++XX+\n 6 +XOOX+X\n 5 XO+OX+X\n 4 O+OOOX+\n 3 XOXOX+O\n 2 +X+++++\n 1 OOO+OO+\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=33)\n\n 7 XX++XX+\n 6 +XOOX+X\n 5 XO+OX+X\n 4 O+OOOX+\n 3 XOXOX+O\n 2 +X+++++\n 1 OOO+OO+\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◉◉◉◯◉◉◯  ◯◯◯◉◯◯◉  ◉◉◉◉◉◉◉
 ◯◉◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◉◉◉◉◉  ◉◉◉◉◉◉◉
@@ -1581,6 +1683,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=34)\n\n 7 XX++XX+\n 6 +XOOX+X\n 5 XO+OX+X\n 4 O+OOOX+\n 3 XOXOX+O\n 2 +X+++++\n 1 OOO+OOO\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=34)\n\n 7 XX++XX+\n 6 +XOOX+X\n 5 XO+OX+X\n 4 O+OOOX+\n 3 XOXOX+O\n 2 +X+++++\n 1 OOO+OOO\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=34)\n\n 7 XX++XX+\n 6 +XOOX+X\n 5 XO+OX+X\n 4 O+OOOX+\n 3 XOXOX+O\n 2 +X+++++\n 1 OOO+OOO\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◉◉◉◯◉◉◉  ◯◯◯◉◯◯◯  ◯◯◯◯◯◯◯
 ◯◉◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◉◉◉◉◉  ◯◯◯◯◯◯◯
@@ -1626,6 +1731,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=35)\n\n 7 XX++XX+\n 6 +XOOX+X\n 5 XO+OX+X\n 4 O+OOOX+\n 3 XOXOX+O\n 2 +X+++X+\n 1 OOO+OOO\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=35)\n\n 7 XX++XX+\n 6 +XOOX+X\n 5 XO+OX+X\n 4 O+OOOX+\n 3 XOXOX+O\n 2 +X+++X+\n 1 OOO+OOO\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=35)\n\n 7 XX++XX+\n 6 +XOOX+X\n 5 XO+OX+X\n 4 O+OOOX+\n 3 XOXOX+O\n 2 +X+++X+\n 1 OOO+OOO\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◉◉◉◯◉◉◉  ◯◯◯◉◯◯◯  ◉◉◉◉◉◉◉
 ◯◉◯◯◯◉◯  ◯◯◯◯◯◯◯  ◉◯◉◉◉◯◉  ◉◉◉◉◉◉◉
@@ -1671,6 +1779,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=36)\n\n 7 XX++XX+\n 6 +XOOX+X\n 5 XO+OX+X\n 4 O+OOOX+\n 3 XO+OX+O\n 2 +XO++X+\n 1 OOO+OOO\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=36)\n\n 7 XX++XX+\n 6 +XOOX+X\n 5 XO+OX+X\n 4 O+OOOX+\n 3 XO+OX+O\n 2 +XO++X+\n 1 OOO+OOO\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=36)\n\n 7 XX++XX+\n 6 +XOOX+X\n 5 XO+OX+X\n 4 O+OOOX+\n 3 XO+OX+O\n 2 +XO++X+\n 1 OOO+OOO\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◉◉◉◯◉◉◉  ◯◯◯◉◯◯◯  ◯◯◯◯◯◯◯
 ◯◉◯◯◯◉◯  ◯◯◉◯◯◯◯  ◉◯◯◉◉◯◉  ◯◯◯◯◯◯◯
@@ -1716,6 +1827,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=37)\n\n 7 XX++XX+\n 6 +XOOXXX\n 5 XO+OX+X\n 4 O+OOOX+\n 3 XO+OX+O\n 2 +XO++X+\n 1 OOO+OOO\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=37)\n\n 7 XX++XX+\n 6 +XOOXXX\n 5 XO+OX+X\n 4 O+OOOX+\n 3 XO+OX+O\n 2 +XO++X+\n 1 OOO+OOO\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=37)\n\n 7 XX++XX+\n 6 +XOOXXX\n 5 XO+OX+X\n 4 O+OOOX+\n 3 XO+OX+O\n 2 +XO++X+\n 1 OOO+OOO\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◉◉◉◯◉◉◉  ◯◯◯◉◯◯◯  ◉◉◉◉◉◉◉
 ◯◉◯◯◯◉◯  ◯◯◉◯◯◯◯  ◉◯◯◉◉◯◉  ◉◉◉◉◉◉◉
@@ -1761,6 +1875,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=38)\n\n 7 XX++XX+\n 6 +XOOXXX\n 5 XO+OX+X\n 4 O+OOOX+\n 3 XO+OX+O\n 2 +XO++X+\n 1 OOO+OOO\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=38)\n\n 7 XX++XX+\n 6 +XOOXXX\n 5 XO+OX+X\n 4 O+OOOX+\n 3 XO+OX+O\n 2 +XO++X+\n 1 OOO+OOO\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=38)\n\n 7 XX++XX+\n 6 +XOOXXX\n 5 XO+OX+X\n 4 O+OOOX+\n 3 XO+OX+O\n 2 +XO++X+\n 1 OOO+OOO\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◉◉◉◯◉◉◉  ◯◯◯◉◯◯◯  ◯◯◯◯◯◯◯
 ◯◉◯◯◯◉◯  ◯◯◉◯◯◯◯  ◉◯◯◉◉◯◉  ◯◯◯◯◯◯◯
@@ -1806,6 +1923,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=39)\n\n 7 XX++XX+\n 6 +XOOXXX\n 5 XO+OX+X\n 4 O+OOOX+\n 3 XO+OXXO\n 2 +XO++X+\n 1 OOO+OOO\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=39)\n\n 7 XX++XX+\n 6 +XOOXXX\n 5 XO+OX+X\n 4 O+OOOX+\n 3 XO+OXXO\n 2 +XO++X+\n 1 OOO+OOO\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=39)\n\n 7 XX++XX+\n 6 +XOOXXX\n 5 XO+OX+X\n 4 O+OOOX+\n 3 XO+OXXO\n 2 +XO++X+\n 1 OOO+OOO\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◉◉◉◯◉◉◉  ◯◯◯◉◯◯◯  ◉◉◉◉◉◉◉
 ◯◉◯◯◯◉◯  ◯◯◉◯◯◯◯  ◉◯◯◉◉◯◉  ◉◉◉◉◉◉◉
@@ -1851,6 +1971,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=40)\n\n 7 XX++XX+\n 6 +XOOXXX\n 5 XO+OX+X\n 4 O+OOOXO\n 3 XO+OXXO\n 2 +XO++X+\n 1 OOO+OOO\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=40)\n\n 7 XX++XX+\n 6 +XOOXXX\n 5 XO+OX+X\n 4 O+OOOXO\n 3 XO+OXXO\n 2 +XO++X+\n 1 OOO+OOO\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=40)\n\n 7 XX++XX+\n 6 +XOOXXX\n 5 XO+OX+X\n 4 O+OOOXO\n 3 XO+OXXO\n 2 +XO++X+\n 1 OOO+OOO\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◉◉◉◯◉◉◉  ◯◯◯◉◯◯◯  ◯◯◯◯◯◯◯
 ◯◉◯◯◯◉◯  ◯◯◉◯◯◯◯  ◉◯◯◉◉◯◉  ◯◯◯◯◯◯◯
@@ -1896,6 +2019,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=41)\n\n 7 XX+XXX+\n 6 +XOOXXX\n 5 XO+OX+X\n 4 O+OOOXO\n 3 XO+OXXO\n 2 +XO++X+\n 1 OOO+OOO\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=41)\n\n 7 XX+XXX+\n 6 +XOOXXX\n 5 XO+OX+X\n 4 O+OOOXO\n 3 XO+OXXO\n 2 +XO++X+\n 1 OOO+OOO\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=41)\n\n 7 XX+XXX+\n 6 +XOOXXX\n 5 XO+OX+X\n 4 O+OOOXO\n 3 XO+OXXO\n 2 +XO++X+\n 1 OOO+OOO\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◉◉◉◯◉◉◉  ◯◯◯◉◯◯◯  ◉◉◉◉◉◉◉
 ◯◉◯◯◯◉◯  ◯◯◉◯◯◯◯  ◉◯◯◉◉◯◉  ◉◉◉◉◉◉◉
@@ -1941,6 +2067,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=42)\n\n 7 XX+XXX+\n 6 +XOOXXX\n 5 XO+OX+X\n 4 O+OOOXO\n 3 +O+OXXO\n 2 O+O++X+\n 1 OOO+OOO\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=42)\n\n 7 XX+XXX+\n 6 +XOOXXX\n 5 XO+OX+X\n 4 O+OOOXO\n 3 +O+OXXO\n 2 O+O++X+\n 1 OOO+OOO\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=42)\n\n 7 XX+XXX+\n 6 +XOOXXX\n 5 XO+OX+X\n 4 O+OOOXO\n 3 +O+OXXO\n 2 O+O++X+\n 1 OOO+OOO\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◉◉◉◯◉◉◉  ◯◯◯◉◯◯◯  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◉◯  ◉◯◉◯◯◯◯  ◯◉◯◉◉◯◉  ◯◯◯◯◯◯◯
@@ -1986,6 +2115,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=43)\n\n 7 XX+XXX+\n 6 +XOOXXX\n 5 XO+OX+X\n 4 O+OOOXO\n 3 +O+OXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=43)\n\n 7 XX+XXX+\n 6 +XOOXXX\n 5 XO+OX+X\n 4 O+OOOXO\n 3 +O+OXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=43)\n\n 7 XX+XXX+\n 6 +XOOXXX\n 5 XO+OX+X\n 4 O+OOOXO\n 3 +O+OXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◉◯◯◯  ◉◉◉◯◉◉◉  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
 ◯◯◯◯◯◉◯  ◉◯◉◯◯◯◯  ◯◉◯◉◉◯◉  ◉◉◉◉◉◉◉
@@ -2031,6 +2163,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=44)\n\n 7 XX+XXX+\n 6 OXOOXXX\n 5 +O+OX+X\n 4 O+OOOXO\n 3 +O+OXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=44)\n\n 7 XX+XXX+\n 6 OXOOXXX\n 5 +O+OX+X\n 4 O+OOOXO\n 3 +O+OXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=44)\n\n 7 XX+XXX+\n 6 OXOOXXX\n 5 +O+OX+X\n 4 O+OOOXO\n 3 +O+OXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◉◯◯◯  ◉◉◉◯◉◉◉  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◉◯  ◉◯◉◯◯◯◯  ◯◉◯◉◉◯◉  ◯◯◯◯◯◯◯
@@ -2076,6 +2211,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=45)\n\n 7 XX+XXX+\n 6 OXOOXXX\n 5 +O+OX+X\n 4 O+OOOXO\n 3 +O+OXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=45)\n\n 7 XX+XXX+\n 6 OXOOXXX\n 5 +O+OX+X\n 4 O+OOOXO\n 3 +O+OXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=45)\n\n 7 XX+XXX+\n 6 OXOOXXX\n 5 +O+OX+X\n 4 O+OOOXO\n 3 +O+OXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◉◯◯◯  ◉◉◉◯◉◉◉  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
 ◯◯◯◯◯◉◯  ◉◯◉◯◯◯◯  ◯◉◯◉◉◯◉  ◉◉◉◉◉◉◉
@@ -2121,6 +2259,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=46)\n\n 7 ++OXXX+\n 6 O+OOXXX\n 5 +O+OX+X\n 4 O+OOOXO\n 3 +O+OXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=46)\n\n 7 ++OXXX+\n 6 O+OOXXX\n 5 +O+OX+X\n 4 O+OOOXO\n 3 +O+OXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=46)\n\n 7 ++OXXX+\n 6 O+OOXXX\n 5 +O+OX+X\n 4 O+OOOXO\n 3 +O+OXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◉◯◯◯  ◉◉◉◯◉◉◉  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◉◯  ◉◯◉◯◯◯◯  ◯◉◯◉◉◯◉  ◯◯◯◯◯◯◯
@@ -2166,6 +2307,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=47)\n\n 7 +XOXXX+\n 6 O+OOXXX\n 5 +O+OX+X\n 4 O+OOOXO\n 3 +O+OXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=47)\n\n 7 +XOXXX+\n 6 O+OOXXX\n 5 +O+OX+X\n 4 O+OOOXO\n 3 +O+OXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=47)\n\n 7 +XOXXX+\n 6 O+OOXXX\n 5 +O+OX+X\n 4 O+OOOXO\n 3 +O+OXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◉◯◯◯  ◉◉◉◯◉◉◉  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
 ◯◯◯◯◯◉◯  ◉◯◉◯◯◯◯  ◯◉◯◉◉◯◉  ◉◉◉◉◉◉◉
@@ -2211,6 +2355,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=48)\n\n 7 +XOXXX+\n 6 O+OOXXX\n 5 +OOOX+X\n 4 O+OOOXO\n 3 +O+OXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=48)\n\n 7 +XOXXX+\n 6 O+OOXXX\n 5 +OOOX+X\n 4 O+OOOXO\n 3 +O+OXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=48)\n\n 7 +XOXXX+\n 6 O+OOXXX\n 5 +OOOX+X\n 4 O+OOOXO\n 3 +O+OXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◉◯◯◯  ◉◉◉◯◉◉◉  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◉◯  ◉◯◉◯◯◯◯  ◯◉◯◉◉◯◉  ◯◯◯◯◯◯◯
@@ -2256,6 +2403,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=49)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 +OOOX+X\n 4 O+OOOXO\n 3 +O+OXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=49)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 +OOOX+X\n 4 O+OOOXO\n 3 +O+OXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=49)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 +OOOX+X\n 4 O+OOOXO\n 3 +O+OXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◉◯◯◯  ◉◉◉◯◉◉◉  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
 ◯◯◯◯◯◉◯  ◉◯◉◯◯◯◯  ◯◉◯◉◉◯◉  ◉◉◉◉◉◉◉
@@ -2301,6 +2451,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=50)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 +OOOX+X\n 4 O+OOOXO\n 3 +OOOXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=50)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 +OOOX+X\n 4 O+OOOXO\n 3 +OOOXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=50)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 +OOOX+X\n 4 O+OOOXO\n 3 +OOOXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◉◯◯◯  ◉◉◉◯◉◉◉  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◉◯  ◉◯◉◯◯◯◯  ◯◉◯◉◉◯◉  ◯◯◯◯◯◯◯
@@ -2346,6 +2499,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=51)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 +OOOX+X\n 4 O+OOOXO\n 3 +OOOXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=51)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 +OOOX+X\n 4 O+OOOXO\n 3 +OOOXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=51)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 +OOOX+X\n 4 O+OOOXO\n 3 +OOOXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◉◯◯◯  ◉◉◉◯◉◉◉  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
 ◯◯◯◯◯◉◯  ◉◯◉◯◯◯◯  ◯◉◯◉◉◯◉  ◉◉◉◉◉◉◉
@@ -2391,6 +2547,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=52)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 +OOOX+X\n 4 O+OOOXO\n 3 OOOOXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=52)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 +OOOX+X\n 4 O+OOOXO\n 3 OOOOXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=52)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 +OOOX+X\n 4 O+OOOXO\n 3 OOOOXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◉◯◯◯  ◉◉◉◯◉◉◉  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◉◯  ◉◯◉◯◯◯◯  ◯◉◯◉◉◯◉  ◯◯◯◯◯◯◯
@@ -2436,6 +2595,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=53)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 +OOOX+X\n 4 O+OOOXO\n 3 OOOOXXO\n 2 O+OX+X+\n 1 OOOXOOO\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=53)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 +OOOX+X\n 4 O+OOOXO\n 3 OOOOXXO\n 2 O+OX+X+\n 1 OOOXOOO\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=53)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 +OOOX+X\n 4 O+OOOXO\n 3 OOOOXXO\n 2 O+OX+X+\n 1 OOOXOOO\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◉◯◯◯  ◉◉◉◯◉◉◉  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
 ◯◯◯◉◯◉◯  ◉◯◉◯◯◯◯  ◯◉◯◯◉◯◉  ◉◉◉◉◉◉◉
@@ -2481,6 +2643,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=54)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 +OOOX+X\n 4 O+OOOXO\n 3 OOOOXXO\n 2 OOOX+X+\n 1 OOOXOOO\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=54)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 +OOOX+X\n 4 O+OOOXO\n 3 OOOOXXO\n 2 OOOX+X+\n 1 OOOXOOO\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=54)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 +OOOX+X\n 4 O+OOOXO\n 3 OOOOXXO\n 2 OOOX+X+\n 1 OOOXOOO\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◉◯◯◯  ◉◉◉◯◉◉◉  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯
 ◯◯◯◉◯◉◯  ◉◉◉◯◯◯◯  ◯◯◯◯◉◯◉  ◯◯◯◯◯◯◯
@@ -2526,6 +2691,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=55)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 +OOOX+X\n 4 O+OOOX+\n 3 OOOOXX+\n 2 OOOX+XX\n 1 OOOXOOO\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=55)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 +OOOX+X\n 4 O+OOOX+\n 3 OOOOXX+\n 2 OOOX+XX\n 1 OOOXOOO\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=55)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 +OOOX+X\n 4 O+OOOX+\n 3 OOOOXX+\n 2 OOOX+XX\n 1 OOOXOOO\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◉◯◯◯  ◉◉◉◯◉◉◉  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
 ◯◯◯◉◯◉◉  ◉◉◉◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◉◉◉◉◉
@@ -2571,6 +2739,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13 28"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=56)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 OOOOX+X\n 4 O+OOOX+\n 3 OOOOXX+\n 2 OOOX+XX\n 1 OOOXOOO\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=56)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 OOOOX+X\n 4 O+OOOX+\n 3 OOOOXX+\n 2 OOOX+XX\n 1 OOOXOOO\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=56)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 OOOOX+X\n 4 O+OOOX+\n 3 OOOOXX+\n 2 OOOX+XX\n 1 OOOXOOO\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◉◯◯◯  ◉◉◉◯◉◉◉  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯
 ◯◯◯◉◯◉◉  ◉◉◉◯◯◯◯  ◯◯◯◯◉◯◯  ◯◯◯◯◯◯◯
@@ -2616,6 +2787,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13 28 33"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=57)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXX+\n 2 OOOX+XX\n 1 OOOXOOO\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=57)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXX+\n 2 OOOX+XX\n 1 OOOXOOO\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=57)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXX+\n 2 OOOX+XX\n 1 OOOXOOO\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◉◯◯◯  ◉◉◉◯◉◉◉  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
 ◯◯◯◉◯◉◉  ◉◉◉◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◉◉◉◉◉
@@ -2661,6 +2835,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13 28 33 20"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=58)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOX+XX\n 1 OOOXOOO\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=58)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOX+XX\n 1 OOOXOOO\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=58)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOX+XX\n 1 OOOXOOO\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◉◯◯◯  ◉◉◉◯◉◉◉  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯
 ◯◯◯◉◯◉◉  ◉◉◉◯◯◯◯  ◯◯◯◯◉◯◯  ◯◯◯◯◯◯◯
@@ -2706,6 +2883,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13 28 33 20 49"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=59)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOX+XX\n 1 OOOXOOO\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=59)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOX+XX\n 1 OOOXOOO\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=59)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOX+XX\n 1 OOOXOOO\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◉◯◯◯  ◉◉◉◯◉◉◉  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
 ◯◯◯◉◯◉◉  ◉◉◉◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◉◉◉◉◉
@@ -2751,6 +2931,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13 28 33 20 49 42"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=60)\n\n 7 O+OXXX+\n 6 O+OOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOX+XX\n 1 OOOXOOO\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=60)\n\n 7 O+OXXX+\n 6 O+OOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOX+XX\n 1 OOOXOOO\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=60)\n\n 7 O+OXXX+\n 6 O+OOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOX+XX\n 1 OOOXOOO\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◉◯◯◯  ◉◉◉◯◉◉◉  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯
 ◯◯◯◉◯◉◉  ◉◉◉◯◯◯◯  ◯◯◯◯◉◯◯  ◯◯◯◯◯◯◯
@@ -2796,6 +2979,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13 28 33 20 49 42 11"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=61)\n\n 7 O+OXXX+\n 6 O+OOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOXXXX\n 1 OOOX+++\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=61)\n\n 7 O+OXXX+\n 6 O+OOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOXXXX\n 1 OOOX+++\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=61)\n\n 7 O+OXXX+\n 6 O+OOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOXXXX\n 1 OOOX+++\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◉◯◯◯  ◉◉◉◯◯◯◯  ◯◯◯◯◉◉◉  ◉◉◉◉◉◉◉
 ◯◯◯◉◉◉◉  ◉◉◉◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
@@ -2841,6 +3027,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13 28 33 20 49 42 11 36"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=62)\n\n 7 O+OXXX+\n 6 OOOOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOXXXX\n 1 OOOX+++\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=62)\n\n 7 O+OXXX+\n 6 OOOOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOXXXX\n 1 OOOX+++\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=62)\n\n 7 O+OXXX+\n 6 OOOOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOXXXX\n 1 OOOX+++\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◉◯◯◯  ◉◉◉◯◯◯◯  ◯◯◯◯◉◉◉  ◯◯◯◯◯◯◯
 ◯◯◯◉◉◉◉  ◉◉◉◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯
@@ -2886,6 +3075,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13 28 33 20 49 42 11 36 4"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=63)\n\n 7 O+OXXX+\n 6 OOOOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOXXXX\n 1 OOOXX++\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=63)\n\n 7 O+OXXX+\n 6 OOOOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOXXXX\n 1 OOOXX++\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=63)\n\n 7 O+OXXX+\n 6 OOOOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOXXXX\n 1 OOOXX++\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◉◉◯◯  ◉◉◉◯◯◯◯  ◯◯◯◯◯◉◉  ◉◉◉◉◉◉◉
 ◯◯◯◉◉◉◉  ◉◉◉◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
@@ -2931,6 +3123,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13 28 33 20 49 42 11 36 4 6"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=64)\n\n 7 O+OXXX+\n 6 OOOOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOXXXX\n 1 OOOXX+O\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=64)\n\n 7 O+OXXX+\n 6 OOOOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOXXXX\n 1 OOOXX+O\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=64)\n\n 7 O+OXXX+\n 6 OOOOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOXXXX\n 1 OOOXX+O\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◉◉◯◯  ◉◉◉◯◯◯◉  ◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯
 ◯◯◯◉◉◉◉  ◉◉◉◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯
@@ -2976,6 +3171,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13 28 33 20 49 42 11 36 4 6 48"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=65)\n\n 7 O+OXXXX\n 6 OOOOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOXXXX\n 1 OOOXX+O\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=65)\n\n 7 O+OXXXX\n 6 OOOOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOXXXX\n 1 OOOXX+O\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=65)\n\n 7 O+OXXXX\n 6 OOOOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOXXXX\n 1 OOOXX+O\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◉◉◯◯  ◉◉◉◯◯◯◉  ◯◯◯◯◯◉◯  ◉◉◉◉◉◉◉
 ◯◯◯◉◉◉◉  ◉◉◉◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
@@ -3021,6 +3219,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13 28 33 20 49 42 11 36 4 6 48 49"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=66)\n\n 7 O+OXXXX\n 6 OOOOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOXXXX\n 1 OOOXX+O\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=66)\n\n 7 O+OXXXX\n 6 OOOOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOXXXX\n 1 OOOXX+O\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=66)\n\n 7 O+OXXXX\n 6 OOOOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOXXXX\n 1 OOOXX+O\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◉◉◯◯  ◉◉◉◯◯◯◉  ◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯
 ◯◯◯◉◉◉◉  ◉◉◉◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯
@@ -3066,6 +3267,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13 28 33 20 49 42 11 36 4 6 48 49 27"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=67)\n\n 7 O+OXXXX\n 6 OOOOXXX\n 5 OOOOXXX\n 4 O+OOOXX\n 3 OOOOXX+\n 2 OOOXXXX\n 1 OOOXX+O\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=67)\n\n 7 O+OXXXX\n 6 OOOOXXX\n 5 OOOOXXX\n 4 O+OOOXX\n 3 OOOOXX+\n 2 OOOXXXX\n 1 OOOXX+O\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=67)\n\n 7 O+OXXXX\n 6 OOOOXXX\n 5 OOOOXXX\n 4 O+OOOXX\n 3 OOOOXX+\n 2 OOOXXXX\n 1 OOOXX+O\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◉◉◯◯  ◉◉◉◯◯◯◉  ◯◯◯◯◯◉◯  ◉◉◉◉◉◉◉
 ◯◯◯◉◉◉◉  ◉◉◉◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
@@ -3111,6 +3315,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13 28 33 20 49 42 11 36 4 6 48 49 27 49"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=68)\n\n 7 O+OXXXX\n 6 OOOOXXX\n 5 OOOOXXX\n 4 O+OOOXX\n 3 OOOOXX+\n 2 OOOXXXX\n 1 OOOXX+O\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=68)\n\n 7 O+OXXXX\n 6 OOOOXXX\n 5 OOOOXXX\n 4 O+OOOXX\n 3 OOOOXX+\n 2 OOOXXXX\n 1 OOOXX+O\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=68)\n\n 7 O+OXXXX\n 6 OOOOXXX\n 5 OOOOXXX\n 4 O+OOOXX\n 3 OOOOXX+\n 2 OOOXXXX\n 1 OOOXX+O\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◉◉◯◯  ◉◉◉◯◯◯◉  ◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯
 ◯◯◯◉◉◉◉  ◉◉◉◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯
@@ -3156,6 +3363,9 @@ InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26
 InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13 28 33 20 49 42 11 36 4 6 48 49 27 49 49"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=69)\n\n 7 O+OXXXX\n 6 OOOOXXX\n 5 OOOOXXX\n 4 O+OOOXX\n 3 OOOOXX+\n 2 OOOXXXX\n 1 OOOXX+O\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=69)\n\n 7 O+OXXXX\n 6 OOOOXXX\n 5 OOOOXXX\n 4 O+OOOXX\n 3 OOOOXX+\n 2 OOOXXXX\n 1 OOOXX+O\n   ABCDEFG\n"
+PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=69)\n\n 7 O+OXXXX\n 6 OOOOXXX\n 5 OOOOXXX\n 4 O+OOOXX\n 3 OOOOXX+\n 2 OOOXXXX\n 1 OOOXX+O\n   ABCDEFG\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◉◉◯◯  ◉◉◉◯◯◯◉  ◯◯◯◯◯◉◯  ◉◉◉◉◉◉◉
 ◯◯◯◉◉◉◉  ◉◉◉◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
