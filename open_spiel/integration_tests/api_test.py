@@ -17,9 +17,11 @@
 
 import collections
 import enum
+import re
 from typing import Callable, Dict, List, Tuple
 import unittest
 
+from absl import flags
 from absl.testing import absltest
 from absl.testing import parameterized
 import numpy as np
@@ -28,6 +30,11 @@ from open_spiel.python.algorithms import get_all_states
 from open_spiel.python.algorithms import sample_some_states
 from open_spiel.python.observation import make_observation
 import pyspiel
+
+FLAGS = flags.FLAGS
+flags.DEFINE_string("test_only_games", ".*",
+                    "Test only selected games (regex). Defaults to all.")
+
 
 _ALL_GAMES = pyspiel.registered_games()
 
@@ -684,6 +691,8 @@ def _assert_is_perfect_recall_recursive(state, current_history,
 def _create_test_case_classes():
   """Yields one Testing class per game to test."""
   for game_name, game_string in _GAMES_FULL_TREE_TRAVERSAL_TESTS:
+    if not re.match(FLAGS.test_only_games, game_string):
+      continue
     game = pyspiel.load_game(game_string)
     new_class = type("EnforceAPIFullTree_{}_Test".format(game_name),
                      (EnforceAPIOnFullTreeBase,), {})
@@ -692,6 +701,8 @@ def _create_test_case_classes():
     yield new_class
 
   for game_name in _GAMES_TO_TEST:
+    if not re.match(FLAGS.test_only_games, game_name):
+      continue
     game = pyspiel.load_game(game_name)
     new_class = type("EnforceAPIPartialTree_{}_Test".format(game_name),
                      (EnforceAPIOnPartialTreeBase,), {})
