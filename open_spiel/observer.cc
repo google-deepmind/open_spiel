@@ -27,6 +27,7 @@ namespace open_spiel {
 DimensionedSpan ContiguousAllocator::Get(
     absl::string_view name, const absl::InlinedVector<int, 4>& shape) {
   const int size = absl::c_accumulate(shape, 1, std::multiplies<int>());
+  SPIEL_DCHECK_LE(offset_, data_.size());
   auto piece = data_.subspan(offset_, size);
   offset_ += size;
   return DimensionedSpan(piece, shape);
