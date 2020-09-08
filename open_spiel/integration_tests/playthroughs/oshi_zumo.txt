@@ -42,6 +42,9 @@ InformationStateString(0) = ""
 InformationStateString(1) = ""
 ObservationString(0) = "Coins: 10 10, Field: #...W...#\n"
 ObservationString(1) = "Coins: 10 10, Field: #...W...#\n"
+PublicObservationString() = "Coins: 10 10, Field: #...W...#\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0): ◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯
 ObservationTensor(1): ◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯
 Rewards() = [0.0, 0.0]
@@ -66,6 +69,9 @@ InformationStateString(0) = "6 10"
 InformationStateString(1) = "6 10"
 ObservationString(0) = "Coins: 4 0, Field: #..W....#\n"
 ObservationString(1) = "Coins: 4 0, Field: #..W....#\n"
+PublicObservationString() = "Coins: 4 0, Field: #..W....#\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0): ◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
 ObservationTensor(1): ◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
 Rewards() = [0.0, 0.0]
@@ -90,6 +96,9 @@ InformationStateString(0) = "6 10 1 0"
 InformationStateString(1) = "6 10 1 0"
 ObservationString(0) = "Coins: 3 0, Field: #...W...#\n"
 ObservationString(1) = "Coins: 3 0, Field: #...W...#\n"
+PublicObservationString() = "Coins: 3 0, Field: #...W...#\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0): ◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯
 ObservationTensor(1): ◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯
 Rewards() = [0.0, 0.0]
@@ -114,6 +123,9 @@ InformationStateString(0) = "6 10 1 0 1 0"
 InformationStateString(1) = "6 10 1 0 1 0"
 ObservationString(0) = "Coins: 2 0, Field: #....W..#\n"
 ObservationString(1) = "Coins: 2 0, Field: #....W..#\n"
+PublicObservationString() = "Coins: 2 0, Field: #....W..#\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0): ◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯
 ObservationTensor(1): ◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯
 Rewards() = [0.0, 0.0]
@@ -138,6 +150,9 @@ InformationStateString(0) = "6 10 1 0 1 0 1 0"
 InformationStateString(1) = "6 10 1 0 1 0 1 0"
 ObservationString(0) = "Coins: 1 0, Field: #.....W.#\n"
 ObservationString(1) = "Coins: 1 0, Field: #.....W.#\n"
+PublicObservationString() = "Coins: 1 0, Field: #.....W.#\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0): ◯◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯
 ObservationTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯
 Rewards() = [0.0, 0.0]
@@ -162,6 +177,9 @@ InformationStateString(0) = "6 10 1 0 1 0 1 0 1 0"
 InformationStateString(1) = "6 10 1 0 1 0 1 0 1 0"
 ObservationString(0) = "Coins: 0 0, Field: #......W#\n"
 ObservationString(1) = "Coins: 0 0, Field: #......W#\n"
+PublicObservationString() = "Coins: 0 0, Field: #......W#\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
 ObservationTensor(1): ◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
 Rewards() = [1.0, -1.0]
