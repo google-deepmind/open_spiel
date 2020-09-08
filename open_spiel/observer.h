@@ -100,7 +100,7 @@ enum class PrivateInfoType {
   kAllPlayers     // Private information for all players
 };
 std::string PrivateInfoTypeAsString(const PrivateInfoType& type);
-std::ostream& operator<<(std::ostream& os, const PrivateInfoType& type) {
+inline std::ostream& operator<<(std::ostream& os, const PrivateInfoType& type) {
   return os << PrivateInfoTypeAsString(type);
 }
 
@@ -184,7 +184,8 @@ struct IIGObservationType {
   std::string ToString() const;
 };
 
-std::ostream& operator<<(std::ostream& os, const IIGObservationType& type) {
+inline std::ostream& operator<<(
+    std::ostream& os, const IIGObservationType& type) {
   return os << type.ToString();
 }
 
