@@ -176,6 +176,14 @@ struct IIGObservationType {
 
   // Which players' private information to include in the observation
   PrivateInfoType private_info;
+
+  // Shorthand methods.
+  bool IsPrivateInfoNone() const {
+    return private_info == PrivateInfoType::kNone; }
+  bool IsPrivateInfoSinglePlayer() const {
+    return private_info == PrivateInfoType::kSinglePlayer; }
+  bool IsPrivateInfoAllPlayers() const {
+    return private_info == PrivateInfoType::kAllPlayers; }
 };
 
 // Default observation type for imperfect information games.
