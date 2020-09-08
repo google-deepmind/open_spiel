@@ -118,24 +118,6 @@ std::shared_ptr<Observer> Game::MakeObserver(
   SpielFatalError("Requested Observer type not available.");
 }
 
-class TrackingVectorAllocator : public Allocator {
- public:
-  TrackingVectorAllocator() {}
-  DimensionedSpan Get(absl::string_view name,
-                      const absl::InlinedVector<int, 4>& shape) {
-    tensors.push_back(
-        TensorInfo{std::string(name), {shape.begin(), shape.end()}});
-    const int begin_size = data.size();
-    const int size = absl::c_accumulate(shape, 1, std::multiplies<int>());
-    data.resize(begin_size + size);
-    return DimensionedSpan(absl::MakeSpan(data).subspan(begin_size, size),
-                           shape);
-  }
-
-  std::vector<TensorInfo> tensors;
-  std::vector<float> data;
-};
-
 Observation::Observation(const Game& game, std::shared_ptr<Observer> observer)
     : observer_(std::move(observer)) {
   // Get an observation of the initial state to set up.
@@ -230,6 +212,24 @@ void Observation::Decompress(absl::string_view compressed) {
     default:
       SpielFatalError(absl::StrCat("Unrecognized compression scheme in '",
                                    compressed, "'"));
+  }
+}
+
+std::vector<int> InferTensorShape(
+    const Game& game, const std::shared_ptr<Observer>& observer) {
+  TrackingVectorAllocator allocator;
+  observer->WriteTensor(*game.NewInitialState(), kDefaultPlayerId,
+                        &allocator);
+  SPIEL_CHECK_FALSE(allocator.tensors.empty());
+  if (allocator.tensors.size() == 1) {
+    return allocator.tensors[0].shape;
+  } else {
+    // Otherwise flatten:
+    auto flat_shape_sum = [](const int& acc, const TensorInfo& next) {
+        return acc + next.FlatShape();
+    };
+    return {std::accumulate(allocator.tensors.begin(), allocator.tensors.end(),
+                            0, flat_shape_sum)};
   }
 }
 
