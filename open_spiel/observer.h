@@ -232,6 +232,9 @@ struct TensorInfo {
     return absl::StrCat("TensorInfo(name='", name, "', shape=(",
                         absl::StrJoin(shape, ","), ")");
   }
+  int FlatShape() const {
+    return absl::c_accumulate(shape, 1, std::multiplies<int>());
+  }
 };
 
 // Holds an Observer and a vector for it to write values into.
@@ -274,6 +277,31 @@ class Observation {
   std::vector<float> buffer_;
   std::vector<TensorInfo> tensors_;
 };
+
+class TrackingVectorAllocator : public Allocator {
+ public:
+  TrackingVectorAllocator() {}
+  DimensionedSpan Get(absl::string_view name,
+                      const absl::InlinedVector<int, 4>& shape) {
+    tensors.push_back(
+        TensorInfo{std::string(name), {shape.begin(), shape.end()}});
+    const int begin_size = data.size();
+    const int size = absl::c_accumulate(shape, 1, std::multiplies<int>());
+    data.resize(begin_size + size);
+    return DimensionedSpan(absl::MakeSpan(data).subspan(begin_size, size),
+                           shape);
+  }
+
+  std::vector<TensorInfo> tensors;
+  std::vector<float> data;
+};
+
+// Infer tensor shape for backward-compatibility use cases in methods like
+// State::InformationStateTensorShape() or State::ObservationTensorShape().
+// If there is more than one Observer's tensor, all the tensors are flattened.
+// TODO(author11)  Remove when all games support the Observer interface.
+std::vector<int> InferTensorShape(const Game& game,
+                                  const std::shared_ptr<Observer>& observer);
 
 }  // namespace open_spiel
 
