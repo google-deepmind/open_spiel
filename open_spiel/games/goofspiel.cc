@@ -182,37 +182,25 @@ class GoofspielObserver : public Observer {
     SPIEL_CHECK_LT(player, game.NumPlayers());
     std::string result;
 
-    if (iig_obs_type_.private_info == PrivateInfoType::kSinglePlayer) {
-      if (game.IsImpInfo()) {
-        // Only my hand
-        absl::StrAppend(&result, "P", player, " hand: ");
-        for (int c = 0; c < game.NumCards(); ++c) {
-          if (state.player_hands_[player][c])
-            absl::StrAppend(&result, c + 1, " ");
+    if (game.IsImpInfo()
+        && iig_obs_type_.private_info == PrivateInfoType::kSinglePlayer) {
+      // Only my hand
+      absl::StrAppend(&result, "P", player, " hand: ");
+      for (int c = 0; c < game.NumCards(); ++c) {
+        if (state.player_hands_[player][c])
+          absl::StrAppend(&result, c + 1, " ");
+      }
+      absl::StrAppend(&result, "\n");
+
+      if (iig_obs_type_.perfect_recall) {
+        // Also show the player's sequence. We need this to ensure perfect
+        // recall because two betting sequences can lead to the same hand and
+        // outcomes if the opponent chooses differently.
+        absl::StrAppend(&result, "P", player, " action sequence: ");
+        for (int i = 0; i < state.actions_history_.size(); ++i) {
+          absl::StrAppend(&result, state.actions_history_[i][player], " ");
         }
         absl::StrAppend(&result, "\n");
-
-        if (iig_obs_type_.perfect_recall) {
-          // Also show the player's sequence. We need this to ensure perfect
-          // recall because two betting sequences can lead to the same hand and
-          // outcomes if the opponent chooses differently.
-          absl::StrAppend(&result, "P", player, " action sequence: ");
-          for (int i = 0; i < state.actions_history_.size(); ++i) {
-            absl::StrAppend(&result, state.actions_history_[i][player], " ");
-          }
-          absl::StrAppend(&result, "\n");
-        }
-
-      } else {
-        // Show the hands in the perfect info case.
-        for (auto p = Player{0}; p < game.NumPlayers(); ++p) {
-          absl::StrAppend(&result, "P", p, " hand: ");
-          for (int c = 0; c < game.NumCards(); ++c) {
-            if (state.player_hands_[p][c])
-              absl::StrAppend(&result, c + 1, " ");
-          }
-          absl::StrAppend(&result, "\n");
-        }
       }
     }
 
@@ -226,6 +214,18 @@ class GoofspielObserver : public Observer {
       } else {
         absl::StrAppend(&result, "Current point card: ",
                         state.CurrentPointValue(), "\n");
+      }
+
+      if (!game.IsImpInfo()) {
+        // Show the hands in the perfect info case.
+        for (auto p = Player{0}; p < game.NumPlayers(); ++p) {
+          absl::StrAppend(&result, "P", p, " hand: ");
+          for (int c = 0; c < game.NumCards(); ++c) {
+            if (state.player_hands_[p][c])
+              absl::StrAppend(&result, c + 1, " ");
+          }
+          absl::StrAppend(&result, "\n");
+        }
       }
 
       absl::StrAppend(&result, "Win sequence: ");
@@ -608,60 +608,11 @@ int GoofspielGame::MaxChanceOutcomes() const {
 }
 
 std::vector<int> GoofspielGame::InformationStateTensorShape() const {
-  if (impinfo_) {
-    return {// 1-hot bit vector for point total per player; upper bound is 1 +
-        // 2 + ... + K = K*(K+1) / 2, but must add one to include 0 points.
-        num_players_ * ((num_cards_ * (num_cards_ + 1)) / 2 + 1) +
-            // Bit vector for my remaining cards:
-            num_cards_ +
-            // A sequence of 1-hot bit vectors encoding the player who won that
-            // turn, where max number of turns is num_cards
-            num_cards_ * num_players_ +
-            // A sequence of 1-hot bit vectors encoding the point card sequence
-            num_cards_ * num_cards_ +
-            // The observing player's own action sequence
-            num_cards_ * num_cards_};
-  } else {
-    return {// 1-hot bit vector for point total per player; upper bound is 1 +
-        // 2 + ... + K = K*(K+1) / 2, but must add one to include 0 points.
-        num_players_ * ((num_cards_ * (num_cards_ + 1)) / 2 + 1) +
-            // A sequence of 1-hot bit vectors encoding the point card sequence
-            num_cards_ * num_cards_ +
-            // Bit vector for each card per player
-            num_players_ * num_cards_};
-  }
+  return InferTensorShape(*this, info_state_observer_);
 }
 
 std::vector<int> GoofspielGame::ObservationTensorShape() const {
-  // Perfect info case, show:
-  //   - current point card showing
-  //   - everyone's current points
-  //   - everyone's current hands
-  // Imperfect info case, show:
-  //   - current point card showing
-  //   - everyone's current points
-  //   - my current hand
-  //   - current win sequence
-  if (impinfo_) {
-    return {// 1-hot bit to encode the current point card
-        num_cards_ +
-            // 1-hot bit vector for point total per player; upper bound is 1 +
-            // 2 + ... + K = K*(K+1) / 2, but must add one to include 0 points.
-            num_players_ * ((num_cards_ * (num_cards_ + 1)) / 2 + 1) +
-            // Bit vector for my remaining cards:
-            num_cards_ +
-            // A sequence of 1-hot bit vectors encoding the player who won that
-            // turn, where max number of turns is num_cards
-            num_cards_ * num_players_};
-  } else {
-    return {// 1-hot bit to encode the current point card
-        num_cards_ +
-            // 1-hot bit vector for point total per player; upper bound is 1 +
-            // 2 + ... + K = K*(K+1) / 2, but must add one to include 0 points.
-            num_players_ * ((num_cards_ * (num_cards_ + 1)) / 2 + 1) +
-            // Bit vector for each card per player
-            num_players_ * num_cards_};
-  }
+  return InferTensorShape(*this, default_observer_);
 }
 
 double GoofspielGame::MinUtility() const {
