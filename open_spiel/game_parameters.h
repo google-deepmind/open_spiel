@@ -24,10 +24,11 @@
 
 namespace open_spiel {
 
-// A GameParameter can be used in 2 contexts:
+// A GameParameter can be used in 3 contexts:
 // - when defining the parameters for a game, with their optional default value
 //   and whether they are mandatory or not.
 // - when specifying in Python a parameter value.
+// - when passing a parametrization of additional Observer fields.
 //
 class GameParameter;
 
