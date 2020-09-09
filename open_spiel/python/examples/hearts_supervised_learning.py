@@ -29,8 +29,8 @@ from absl import flags
 import haiku as hk
 import jax
 from jax import numpy as jnp
-from jax.experimental import optix
 import numpy as np
+import optax
 
 import pyspiel
 
@@ -123,7 +123,7 @@ def main(argv):
   net = hk.without_apply_rng(hk.transform(net_fn, apply_rng=True))
 
   # Make the optimiser.
-  opt = optix.adam(FLAGS.step_size)
+  opt = optax.adam(FLAGS.step_size)
 
   @jax.jit
   def loss(
@@ -156,7 +156,7 @@ def main(argv):
     """Learning rule (stochastic gradient descent)."""
     _, gradient = jax.value_and_grad(loss)(params, inputs, targets)
     updates, opt_state = opt.update(gradient, opt_state)
-    new_params = optix.apply_updates(params, updates)
+    new_params = optax.apply_updates(params, updates)
     return new_params, opt_state
 
   def output_samples(params: Params, max_samples: int):

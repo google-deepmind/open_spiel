@@ -20,6 +20,7 @@ tensorflow-probability < 0.8.0, >= 0.7.0
 cvxopt == 1.2.5
 networkx == 2.4
 mock == 4.0.2
+optax == 0.0.1
 matplotlib == 3.2.2
 nashpy == 0.0.19
 scipy == 1.4.1
