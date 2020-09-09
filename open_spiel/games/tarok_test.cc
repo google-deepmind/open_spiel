@@ -669,6 +669,255 @@ void BiddingPhase4PlayersTest5() {
 }
 
 // talon exchange phase tests
+void TalonExchangePhaseTest1() {
+  // 3 talon exchanges, select the first set
+  auto state = StateAfterActions(
+      GameParameters(),
+      {kDealCardsAction, kBidPassAction, kBidPassAction, kBidThreeAction});
+  SPIEL_CHECK_EQ(state->CurrentGamePhase(), GamePhase::kTalonExchange);
+  SPIEL_CHECK_EQ(state->SelectedContractName(), ContractName::kThree);
+  auto talon_initial = state->TalonSets();
+  SPIEL_CHECK_EQ(talon_initial.size(), 2);
+  SPIEL_CHECK_TRUE(AllEq(state->LegalActions(), {0, 1}));
+  for (auto const& talon_set : talon_initial) {
+    SPIEL_CHECK_EQ(talon_set.size(), 3);
+  }
+
+  // select the first set
+  state->ApplyAction(0);
+  auto talon_end = state->TalonSets();
+  SPIEL_CHECK_EQ(talon_end.size(), 1);
+  SPIEL_CHECK_EQ(talon_initial.at(1), talon_end.at(0));
+  SPIEL_CHECK_TRUE(AllActionsInOtherActions(
+      talon_initial.at(0), state->PlayerCards(state->CurrentPlayer())));
+
+  // discard the first three cards
+  auto legal_actions = state->LegalActions();
+  for (int i = 0; i < 3; i++) {
+    state->ApplyAction(legal_actions.at(i));
+    SPIEL_CHECK_FALSE(AllActionsInOtherActions(
+        {legal_actions.at(i)}, state->PlayerCards(state->CurrentPlayer())));
+  }
+  SPIEL_CHECK_EQ(state->CurrentGamePhase(), GamePhase::kTricksPlaying);
+}
+
+void TalonExchangePhaseTest2() {
+  // 3 talon exchanges, select the second set
+  auto state = StateAfterActions(
+      GameParameters(),
+      {kDealCardsAction, kBidPassAction, kBidPassAction, kBidThreeAction});
+  SPIEL_CHECK_EQ(state->CurrentGamePhase(), GamePhase::kTalonExchange);
+  SPIEL_CHECK_EQ(state->SelectedContractName(), ContractName::kThree);
+  auto talon_initial = state->TalonSets();
+  SPIEL_CHECK_EQ(talon_initial.size(), 2);
+  SPIEL_CHECK_TRUE(AllEq(state->LegalActions(), {0, 1}));
+  for (auto const& talon_set : talon_initial) {
+    SPIEL_CHECK_EQ(talon_set.size(), 3);
+  }
+
+  // select the second set
+  state->ApplyAction(1);
+  auto talon_end = state->TalonSets();
+  SPIEL_CHECK_EQ(talon_end.size(), 1);
+  SPIEL_CHECK_EQ(talon_initial.at(0), talon_end.at(0));
+  SPIEL_CHECK_TRUE(AllActionsInOtherActions(
+      talon_initial.at(1), state->PlayerCards(state->CurrentPlayer())));
+
+  // discard the first three cards
+  auto legal_actions = state->LegalActions();
+  for (int i = 0; i < 3; i++) {
+    state->ApplyAction(legal_actions.at(i));
+    SPIEL_CHECK_FALSE(AllActionsInOtherActions(
+        {legal_actions.at(i)}, state->PlayerCards(state->CurrentPlayer())));
+  }
+  SPIEL_CHECK_EQ(state->CurrentGamePhase(), GamePhase::kTricksPlaying);
+}
+
+void TalonExchangePhaseTest3() {
+  // 2 talon exchanges, select the middle set
+  auto state = StateAfterActions(
+      GameParameters(),
+      {kDealCardsAction, kBidPassAction, kBidPassAction, kBidTwoAction});
+  SPIEL_CHECK_EQ(state->CurrentGamePhase(), GamePhase::kTalonExchange);
+  SPIEL_CHECK_EQ(state->SelectedContractName(), ContractName::kTwo);
+  auto talon_initial = state->TalonSets();
+  SPIEL_CHECK_EQ(talon_initial.size(), 3);
+  SPIEL_CHECK_TRUE(AllEq(state->LegalActions(), {0, 1, 2}));
+  for (auto const& talon_set : talon_initial) {
+    SPIEL_CHECK_EQ(talon_set.size(), 2);
+  }
+
+  // select the middle set
+  state->ApplyAction(1);
+  auto talon_end = state->TalonSets();
+  SPIEL_CHECK_EQ(talon_end.size(), 2);
+  SPIEL_CHECK_EQ(talon_initial.at(0), talon_end.at(0));
+  SPIEL_CHECK_EQ(talon_initial.at(2), talon_end.at(1));
+  SPIEL_CHECK_TRUE(AllActionsInOtherActions(
+      talon_initial.at(1), state->PlayerCards(state->CurrentPlayer())));
+
+  // discard the first two cards
+  auto legal_actions = state->LegalActions();
+  for (int i = 0; i < 2; i++) {
+    state->ApplyAction(legal_actions.at(i));
+    SPIEL_CHECK_FALSE(AllActionsInOtherActions(
+        {legal_actions.at(i)}, state->PlayerCards(state->CurrentPlayer())));
+  }
+  SPIEL_CHECK_EQ(state->CurrentGamePhase(), GamePhase::kTricksPlaying);
+}
+
+void TalonExchangePhaseTest4() {
+  // 1 talon exchange, select the first set
+  auto state = StateAfterActions(
+      GameParameters(),
+      {kDealCardsAction, kBidPassAction, kBidPassAction, kBidOneAction});
+  SPIEL_CHECK_EQ(state->CurrentGamePhase(), GamePhase::kTalonExchange);
+  SPIEL_CHECK_EQ(state->SelectedContractName(), ContractName::kOne);
+  auto talon_initial = state->TalonSets();
+  SPIEL_CHECK_EQ(talon_initial.size(), 6);
+  SPIEL_CHECK_TRUE(AllEq(state->LegalActions(), {0, 1, 2, 3, 4, 5}));
+  for (auto const& talon_set : talon_initial) {
+    SPIEL_CHECK_EQ(talon_set.size(), 1);
+  }
+
+  // select the first set
+  state->ApplyAction(0);
+  auto talon_end = state->TalonSets();
+  SPIEL_CHECK_EQ(talon_end.size(), 5);
+  for (int i = 1; i < 6; i++) {
+    SPIEL_CHECK_EQ(talon_initial.at(i), talon_end.at(i - 1));
+  }
+  SPIEL_CHECK_TRUE(AllActionsInOtherActions(
+      talon_initial.at(0), state->PlayerCards(state->CurrentPlayer())));
+
+  // discard the last card
+  auto legal_actions = state->LegalActions();
+  state->ApplyAction(legal_actions.at(legal_actions.size() - 1));
+  SPIEL_CHECK_FALSE(
+      AllActionsInOtherActions({legal_actions.at(legal_actions.size() - 1)},
+                               state->PlayerCards(state->CurrentPlayer())));
+  SPIEL_CHECK_EQ(state->CurrentGamePhase(), GamePhase::kTricksPlaying);
+}
+
+void TalonExchangePhaseTest5() {
+  // 1 talon exchange, select the fourth set
+  auto state = StateAfterActions(
+      GameParameters(),
+      {kDealCardsAction, kBidPassAction, kBidPassAction, kBidOneAction});
+  SPIEL_CHECK_EQ(state->CurrentGamePhase(), GamePhase::kTalonExchange);
+  SPIEL_CHECK_EQ(state->SelectedContractName(), ContractName::kOne);
+  auto talon_initial = state->TalonSets();
+  SPIEL_CHECK_EQ(talon_initial.size(), 6);
+  SPIEL_CHECK_TRUE(AllEq(state->LegalActions(), {0, 1, 2, 3, 4, 5}));
+  for (auto const& talon_set : talon_initial) {
+    SPIEL_CHECK_EQ(talon_set.size(), 1);
+  }
+
+  // select the fourth set
+  state->ApplyAction(3);
+  auto talon_end = state->TalonSets();
+  SPIEL_CHECK_EQ(talon_end.size(), 5);
+  for (int i = 0; i < 5; i++) {
+    if (i < 3)
+      SPIEL_CHECK_EQ(talon_initial.at(i), talon_end.at(i));
+    else
+      SPIEL_CHECK_EQ(talon_initial.at(i + 1), talon_end.at(i));
+  }
+  SPIEL_CHECK_TRUE(AllActionsInOtherActions(
+      talon_initial.at(3), state->PlayerCards(state->CurrentPlayer())));
+
+  // discard the second card
+  auto legal_actions = state->LegalActions();
+  state->ApplyAction(legal_actions.at(1));
+  SPIEL_CHECK_FALSE(AllActionsInOtherActions(
+      {legal_actions.at(1)}, state->PlayerCards(state->CurrentPlayer())));
+  SPIEL_CHECK_EQ(state->CurrentGamePhase(), GamePhase::kTricksPlaying);
+}
+
+void TalonExchangePhaseTest6() {
+  // 1 talon exchange, select the last set
+  auto state = StateAfterActions(
+      GameParameters(),
+      {kDealCardsAction, kBidPassAction, kBidPassAction, kBidOneAction});
+  SPIEL_CHECK_EQ(state->CurrentGamePhase(), GamePhase::kTalonExchange);
+  SPIEL_CHECK_EQ(state->SelectedContractName(), ContractName::kOne);
+  auto talon_initial = state->TalonSets();
+  SPIEL_CHECK_EQ(talon_initial.size(), 6);
+  SPIEL_CHECK_TRUE(AllEq(state->LegalActions(), {0, 1, 2, 3, 4, 5}));
+  for (auto const& talon_set : talon_initial) {
+    SPIEL_CHECK_EQ(talon_set.size(), 1);
+  }
+
+  // select the last set
+  state->ApplyAction(5);
+  auto talon_end = state->TalonSets();
+  SPIEL_CHECK_EQ(talon_end.size(), 5);
+  for (int i = 0; i < 5; i++) {
+    SPIEL_CHECK_EQ(talon_initial.at(i), talon_end.at(i));
+  }
+  SPIEL_CHECK_TRUE(AllActionsInOtherActions(
+      talon_initial.at(5), state->PlayerCards(state->CurrentPlayer())));
+
+  // discard the first card
+  auto legal_actions = state->LegalActions();
+  state->ApplyAction(legal_actions.at(0));
+  SPIEL_CHECK_FALSE(AllActionsInOtherActions(
+      {legal_actions.at(0)}, state->PlayerCards(state->CurrentPlayer())));
+  SPIEL_CHECK_EQ(state->CurrentGamePhase(), GamePhase::kTricksPlaying);
+}
+
+void TalonExchangePhaseTest7() {
+  // check that taroks and kings cannot be exchanged
+  auto state =
+      StateAfterActions(GameParameters({{"rng_seed", GameParameter(42)}}),
+                        {kDealCardsAction, kBidPassAction, kBidOneAction,
+                         kBidPassAction, kBidOneAction, 1});
+  SPIEL_CHECK_EQ(state->CurrentGamePhase(), GamePhase::kTalonExchange);
+  SPIEL_CHECK_EQ(state->SelectedContractName(), ContractName::kOne);
+
+  // check taroks and kings are not in legal actions
+  for (auto const& action : state->LegalActions()) {
+    const Card& card = card_deck.at(action);
+    SPIEL_CHECK_TRUE(card.suit != CardSuit::kTaroks);
+    SPIEL_CHECK_NE(card.points, 5);
+  }
+}
+
+void TalonExchangePhaseTest8() {
+  // check that tarok can be exchanged if player has no other choice
+  auto state =
+      StateAfterActions(GameParameters({{"players", GameParameter(4)},
+                                        {"rng_seed", GameParameter(141750)}}),
+                        {kDealCardsAction, kBidPassAction, kBidPassAction,
+                         kBidPassAction, kBidSoloTwoAction});
+  SPIEL_CHECK_EQ(state->CurrentGamePhase(), GamePhase::kTalonExchange);
+  SPIEL_CHECK_EQ(state->SelectedContractName(), ContractName::kSoloTwo);
+
+  // select first set from talon
+  state->ApplyAction(0);
+  SPIEL_CHECK_EQ(state->CurrentGamePhase(), GamePhase::kTalonExchange);
+
+  // first the player must exchange non-tarok or non-king card
+  // check taroks and kings are not in legal actions
+  for (auto const& action : state->LegalActions()) {
+    const Card& card = card_deck.at(action);
+    SPIEL_CHECK_TRUE(card.suit != CardSuit::kTaroks);
+    SPIEL_CHECK_NE(card.points, 5);
+  }
+  state->ApplyAction(state->LegalActions().at(0));
+  SPIEL_CHECK_EQ(state->CurrentGamePhase(), GamePhase::kTalonExchange);
+
+  // at this point the player has only taroks and kings in his hand but still
+  // needs to exchange one card
+  // check only taroks (no trula or kings) are in legal actions
+  for (auto const& action : state->LegalActions()) {
+    const Card& card = card_deck.at(action);
+    SPIEL_CHECK_TRUE(card.suit == CardSuit::kTaroks);
+    SPIEL_CHECK_NE(card.points, 5);
+  }
+  state->ApplyAction(state->LegalActions().at(0));
+  SPIEL_CHECK_EQ(state->CurrentGamePhase(), GamePhase::kTricksPlaying);
+}
 
 }  // namespace tarok
 }  // namespace open_spiel
@@ -693,4 +942,12 @@ int main(int argc, char** argv) {
   open_spiel::tarok::BiddingPhase4PlayersTest4();
   open_spiel::tarok::BiddingPhase4PlayersTest5();
   // talon exchange phase tests
+  open_spiel::tarok::TalonExchangePhaseTest1();
+  open_spiel::tarok::TalonExchangePhaseTest2();
+  open_spiel::tarok::TalonExchangePhaseTest3();
+  open_spiel::tarok::TalonExchangePhaseTest4();
+  open_spiel::tarok::TalonExchangePhaseTest5();
+  open_spiel::tarok::TalonExchangePhaseTest6();
+  open_spiel::tarok::TalonExchangePhaseTest7();
+  open_spiel::tarok::TalonExchangePhaseTest8();
 }
