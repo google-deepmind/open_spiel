@@ -36,6 +36,16 @@ void init_pyspiel_tarok(py::module& m) {
                   &tarok::TarokState::CapturedMondPenalties);
   tarok_state.def("scores_without_captured_mond_penalties",
                   &tarok::TarokState::ScoresWithoutCapturedMondPenalties);
+  tarok_state.def(py::pickle(
+      [](const tarok::TarokState& state) {  // __getstate__
+        return SerializeGameAndState(*state.GetGame(), state);
+      },
+      [](const std::string& data) {  // __setstate__
+        std::pair<std::shared_ptr<const Game>, std::unique_ptr<State>>
+            game_and_state = DeserializeGameAndState(data);
+        return std::move(std::unique_ptr<tarok::TarokState>{
+            static_cast<tarok::TarokState*>(game_and_state.second.release())});
+      }));
 
   // game phase object
   py::enum_<tarok::GamePhase> game_phase(m, "TarokGamePhase");
