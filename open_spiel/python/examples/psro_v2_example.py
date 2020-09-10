@@ -296,8 +296,8 @@ def main(argv):
 
   np.random.seed(FLAGS.seed)
 
-  game = pyspiel.load_game(FLAGS.game_name,
-                           {"players": pyspiel.GameParameter(FLAGS.n_players)})
+  game = pyspiel.load_game_as_turn_based(
+      FLAGS.game_name, {"players": pyspiel.GameParameter(FLAGS.n_players)})
   env = rl_environment.Environment(game)
 
   # Initialize oracle and agents
