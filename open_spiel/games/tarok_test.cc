@@ -919,6 +919,298 @@ void TalonExchangePhaseTest8() {
   SPIEL_CHECK_EQ(state->CurrentGamePhase(), GamePhase::kTricksPlaying);
 }
 
+// tricks playing phase tests
+static inline const GameParameters kTricksPlayingGameParams = GameParameters(
+    {{"players", GameParameter(3)}, {"rng_seed", GameParameter(634317)}});
+
+// the above "rng_seed" yields:
+//
+// player 0 cards:
+// ('II', 1), ('IIII', 3), ('V', 4), ('VIII', 7), ('XI', 10), ('XIX', 18),
+// ('Mond', 20), ('Jack of Hearts', 26), ('Knight of Hearts', 27), ('4 of
+// Diamonds', 30), ('8 of Spades', 39), ('Jack of Spades', 42), ('King of
+// Spades', 45), ('10 of Clubs', 49), ('Jack of Clubs', 50), ('Knight of Clubs',
+// 51)
+//
+// player 1 cards:
+// ('III', 2), ('VII', 6), ('XII', 11), ('XIII', 12), ('XIV', 13), ('XX', 19),
+// ('Skis', 21), ('1 of Hearts', 25), ('3 of Diamonds', 31), ('Knight of
+// Diamonds', 35), ('Queen of Diamonds', 36), ('King of Diamonds', 37), ('7 of
+// Spades', 38), ('Knight of Spades', 43), ('8 of Clubs', 47), ('Queen of
+// Clubs', 52)
+//
+// player 2 cards:
+// ('Pagat', 0), ('VI', 5), ('IX', 8), ('X', 9), ('XV', 14), ('XVI', 15),
+// ('XVII', 16), ('XVIII', 17), ('4 of Hearts', 22), ('2 of Diamonds', 32), ('1
+// of Diamonds', 33), ('Jack of Diamonds', 34), ('9 of Spades', 40), ('10 of
+// Spades', 41), ('9 of Clubs', 48), ('King of Clubs', 53)
+
+void TricksPlayingPhaseTest1() {
+  // check forced pagat in klop
+  auto state = StateAfterActions(
+      kTricksPlayingGameParams,
+      {kDealCardsAction, kBidPassAction, kBidPassAction, kBidKlopAction});
+  SPIEL_CHECK_EQ(state->CurrentGamePhase(), GamePhase::kTricksPlaying);
+  SPIEL_CHECK_EQ(state->SelectedContractName(), ContractName::kKlop);
+
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 0);
+  SPIEL_CHECK_TRUE(state->TrickCards().empty());
+  SPIEL_CHECK_TRUE(AllEq(state->LegalActions(), {1, 3, 4, 7, 10, 18, 20, 26, 27,
+                                                 30, 39, 42, 45, 49, 50, 51}));
+  state->ApplyAction(20);
+
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 1);
+  SPIEL_CHECK_TRUE(AllEq(state->TrickCards(), {20}));
+  SPIEL_CHECK_TRUE(AllEq(state->LegalActions(), {21}));
+  state->ApplyAction(21);
+
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 2);
+  SPIEL_CHECK_TRUE(AllEq(state->TrickCards(), {20, 21}));
+  // pagat is forced
+  SPIEL_CHECK_TRUE(AllEq(state->LegalActions(), {0}));
+  state->ApplyAction(0);
+  // pagat won the trick
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 2);
+  SPIEL_CHECK_TRUE(state->TrickCards().empty());
+}
+
+void TricksPlayingPhaseTest2() {
+  // check pagat not a legal action in klop when following and all taroks lower
+  auto state = StateAfterActions(
+      kTricksPlayingGameParams,
+      {kDealCardsAction, kBidPassAction, kBidPassAction, kBidKlopAction});
+  SPIEL_CHECK_EQ(state->CurrentGamePhase(), GamePhase::kTricksPlaying);
+  SPIEL_CHECK_EQ(state->SelectedContractName(), ContractName::kKlop);
+
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 0);
+  SPIEL_CHECK_TRUE(state->TrickCards().empty());
+  SPIEL_CHECK_TRUE(AllEq(state->LegalActions(), {1, 3, 4, 7, 10, 18, 20, 26, 27,
+                                                 30, 39, 42, 45, 49, 50, 51}));
+  state->ApplyAction(18);
+
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 1);
+  SPIEL_CHECK_TRUE(AllEq(state->TrickCards(), {18}));
+  SPIEL_CHECK_TRUE(AllEq(state->LegalActions(), {19, 21}));
+  state->ApplyAction(21);
+
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 2);
+  SPIEL_CHECK_TRUE(AllEq(state->TrickCards(), {18, 21}));
+  // pagat not available but all other taroks available
+  SPIEL_CHECK_TRUE(AllEq(state->LegalActions(), {5, 8, 9, 14, 15, 16, 17}));
+  state->ApplyAction(17);
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 1);
+  SPIEL_CHECK_TRUE(state->TrickCards().empty());
+}
+
+void TricksPlayingPhaseTest3() {
+  // check pagat not a legal action in klop when opening
+  auto state = StateAfterActions(
+      kTricksPlayingGameParams,
+      {kDealCardsAction, kBidPassAction, kBidPassAction, kBidKlopAction});
+  SPIEL_CHECK_EQ(state->CurrentGamePhase(), GamePhase::kTricksPlaying);
+  SPIEL_CHECK_EQ(state->SelectedContractName(), ContractName::kKlop);
+
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 0);
+  SPIEL_CHECK_TRUE(state->TrickCards().empty());
+  SPIEL_CHECK_TRUE(AllEq(state->LegalActions(), {1, 3, 4, 7, 10, 18, 20, 26, 27,
+                                                 30, 39, 42, 45, 49, 50, 51}));
+  state->ApplyAction(4);
+
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 1);
+  SPIEL_CHECK_TRUE(AllEq(state->TrickCards(), {4}));
+  SPIEL_CHECK_TRUE(AllEq(state->LegalActions(), {6, 11, 12, 13, 19, 21}));
+  state->ApplyAction(6);
+
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 2);
+  SPIEL_CHECK_TRUE(AllEq(state->TrickCards(), {4, 6}));
+  SPIEL_CHECK_TRUE(AllEq(state->LegalActions(), {8, 9, 14, 15, 16, 17}));
+  state->ApplyAction(8);
+
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 2);
+  SPIEL_CHECK_TRUE(state->TrickCards().empty());
+  SPIEL_CHECK_TRUE(AllEq(state->LegalActions(), {5, 9, 14, 15, 16, 17, 22, 32,
+                                                 33, 34, 40, 41, 48, 53}));
+}
+
+void TricksPlayingPhaseTest4() {
+  // check legal non-tarok cards in klop
+  auto state = StateAfterActions(
+      kTricksPlayingGameParams,
+      {kDealCardsAction, kBidPassAction, kBidPassAction, kBidKlopAction});
+  SPIEL_CHECK_EQ(state->CurrentGamePhase(), GamePhase::kTricksPlaying);
+  SPIEL_CHECK_EQ(state->SelectedContractName(), ContractName::kKlop);
+
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 0);
+  SPIEL_CHECK_TRUE(state->TrickCards().empty());
+  SPIEL_CHECK_TRUE(AllEq(state->LegalActions(), {1, 3, 4, 7, 10, 18, 20, 26, 27,
+                                                 30, 39, 42, 45, 49, 50, 51}));
+  state->ApplyAction(42);
+
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 1);
+  SPIEL_CHECK_TRUE(AllEq(state->TrickCards(), {42}));
+  SPIEL_CHECK_TRUE(AllEq(state->LegalActions(), {43}));
+  state->ApplyAction(43);
+
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 2);
+  SPIEL_CHECK_TRUE(AllEq(state->TrickCards(), {42, 43}));
+  SPIEL_CHECK_TRUE(AllEq(state->LegalActions(), {40, 41}));
+  state->ApplyAction(41);
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 1);
+  SPIEL_CHECK_TRUE(state->TrickCards().empty());
+}
+
+void TricksPlayingPhaseTest5() {
+  // check scenarios where no card has to be beaten in klop
+  auto state = StateAfterActions(
+      kTricksPlayingGameParams,
+      {kDealCardsAction, kBidPassAction, kBidPassAction, kBidKlopAction});
+  SPIEL_CHECK_EQ(state->CurrentGamePhase(), GamePhase::kTricksPlaying);
+  SPIEL_CHECK_EQ(state->SelectedContractName(), ContractName::kKlop);
+
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 0);
+  SPIEL_CHECK_TRUE(state->TrickCards().empty());
+  SPIEL_CHECK_TRUE(AllEq(state->LegalActions(), {1, 3, 4, 7, 10, 18, 20, 26, 27,
+                                                 30, 39, 42, 45, 49, 50, 51}));
+  state->ApplyAction(30);
+
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 1);
+  SPIEL_CHECK_TRUE(AllEq(state->TrickCards(), {30}));
+  SPIEL_CHECK_TRUE(AllEq(state->LegalActions(), {31, 35, 36, 37}));
+  state->ApplyAction(37);
+
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 2);
+  SPIEL_CHECK_TRUE(AllEq(state->TrickCards(), {30, 37}));
+  SPIEL_CHECK_TRUE(AllEq(state->LegalActions(), {32, 33, 34}));
+  state->ApplyAction(34);
+
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 1);
+  SPIEL_CHECK_TRUE(state->TrickCards().empty());
+  SPIEL_CHECK_TRUE(AllEq(state->LegalActions(), {2, 6, 11, 12, 13, 19, 21, 25,
+                                                 31, 35, 36, 38, 43, 47, 52}));
+  state->ApplyAction(52);
+  state->ApplyAction(53);
+  state->ApplyAction(51);
+
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 2);
+  SPIEL_CHECK_TRUE(state->TrickCards().empty());
+  SPIEL_CHECK_TRUE(AllEq(state->LegalActions(),
+                         {5, 8, 9, 14, 15, 16, 17, 22, 32, 33, 40, 41, 48}));
+  state->ApplyAction(32);
+
+  // can't follow suit, i.e. forced to play tarok
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 0);
+  SPIEL_CHECK_TRUE(AllEq(state->TrickCards(), {32}));
+  SPIEL_CHECK_TRUE(AllEq(state->LegalActions(), {1, 3, 4, 7, 10, 18, 20}));
+  state->ApplyAction(1);
+
+  // doesn't have to beat the opening card due to the second card being tarok
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 1);
+  SPIEL_CHECK_TRUE(AllEq(state->TrickCards(), {32, 1}));
+  SPIEL_CHECK_TRUE(AllEq(state->LegalActions(), {31, 35, 36}));
+  state->ApplyAction(36);
+
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 0);
+  SPIEL_CHECK_TRUE(state->TrickCards().empty());
+}
+
+void TricksPlayingPhaseTest6() {
+  // check taroks don't win in colour valat
+  auto state = StateAfterActions(
+      kTricksPlayingGameParams,
+      {kDealCardsAction, kBidColourValatAction, kBidPassAction, kBidPassAction,
+       kBidColourValatAction});
+  SPIEL_CHECK_EQ(state->CurrentGamePhase(), GamePhase::kTricksPlaying);
+  SPIEL_CHECK_EQ(state->SelectedContractName(),
+                 ContractName::kColourValatWithout);
+
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 1);
+  SPIEL_CHECK_TRUE(state->TrickCards().empty());
+  SPIEL_CHECK_TRUE(
+      AllEq(state->LegalActions(),
+            {2, 6, 11, 12, 13, 19, 21, 25, 31, 35, 36, 37, 38, 43, 47, 52}));
+  state->ApplyAction(35);
+
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 2);
+  SPIEL_CHECK_TRUE(AllEq(state->TrickCards(), {35}));
+  SPIEL_CHECK_TRUE(AllEq(state->LegalActions(), {32, 33, 34}));
+  state->ApplyAction(32);
+
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 0);
+  SPIEL_CHECK_TRUE(AllEq(state->TrickCards(), {35, 32}));
+  SPIEL_CHECK_TRUE(AllEq(state->LegalActions(), {30}));
+  state->ApplyAction(30);
+
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 1);
+  SPIEL_CHECK_TRUE(state->TrickCards().empty());
+  SPIEL_CHECK_TRUE(AllEq(state->LegalActions(), {2, 6, 11, 12, 13, 19, 21, 25,
+                                                 31, 36, 37, 38, 43, 47, 52}));
+  state->ApplyAction(37);
+
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 2);
+  SPIEL_CHECK_TRUE(AllEq(state->TrickCards(), {37}));
+  SPIEL_CHECK_TRUE(AllEq(state->LegalActions(), {33, 34}));
+  state->ApplyAction(33);
+
+  // can't follow suit, i.e. forced to play tarok
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 0);
+  SPIEL_CHECK_TRUE(AllEq(state->TrickCards(), {37, 33}));
+  SPIEL_CHECK_TRUE(AllEq(state->LegalActions(), {1, 3, 4, 7, 10, 18, 20}));
+  state->ApplyAction(1);
+
+  // tarok didn't win the trick
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 1);
+  SPIEL_CHECK_TRUE(state->TrickCards().empty());
+}
+
+void TricksPlayingPhaseTest7() {
+  // check positive contracts scenarios
+  auto state =
+      StateAfterActions(kTricksPlayingGameParams,
+                        {kDealCardsAction, kBidPassAction, kBidTwoAction,
+                         kBidPassAction, kBidTwoAction, 0, 40, 41});
+  SPIEL_CHECK_EQ(state->CurrentGamePhase(), GamePhase::kTricksPlaying);
+  SPIEL_CHECK_EQ(state->SelectedContractName(), ContractName::kTwo);
+
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 0);
+  SPIEL_CHECK_TRUE(state->TrickCards().empty());
+  SPIEL_CHECK_TRUE(AllEq(state->LegalActions(), {1, 3, 4, 7, 10, 18, 20, 26, 27,
+                                                 30, 39, 42, 45, 49, 50, 51}));
+  state->ApplyAction(30);
+
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 1);
+  SPIEL_CHECK_TRUE(AllEq(state->TrickCards(), {30}));
+  SPIEL_CHECK_TRUE(AllEq(state->LegalActions(), {31, 35, 36, 37}));
+  state->ApplyAction(31);
+
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 2);
+  SPIEL_CHECK_TRUE(AllEq(state->TrickCards(), {30, 31}));
+  SPIEL_CHECK_TRUE(AllEq(state->LegalActions(), {32, 33, 34}));
+  state->ApplyAction(32);
+
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 2);
+  SPIEL_CHECK_TRUE(state->TrickCards().empty());
+  SPIEL_CHECK_TRUE(AllEq(state->LegalActions(), {0, 5, 8, 9, 14, 15, 16, 17, 22,
+                                                 24, 28, 33, 34, 48, 53}));
+  state->ApplyAction(33);
+
+  // can't follow suit, i.e. forced to play tarok
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 0);
+  SPIEL_CHECK_TRUE(AllEq(state->TrickCards(), {33}));
+  SPIEL_CHECK_TRUE(AllEq(state->LegalActions(), {1, 3, 4, 7, 10, 18, 20}));
+  state->ApplyAction(18);
+
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 1);
+  SPIEL_CHECK_TRUE(AllEq(state->TrickCards(), {33, 18}));
+  SPIEL_CHECK_TRUE(AllEq(state->LegalActions(), {35, 36, 37}));
+  state->ApplyAction(37);
+
+  // tarok won the trick
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 0);
+  SPIEL_CHECK_TRUE(state->TrickCards().empty());
+}
+
+// captured mond tests
+
 }  // namespace tarok
 }  // namespace open_spiel
 
@@ -950,4 +1242,13 @@ int main(int argc, char** argv) {
   open_spiel::tarok::TalonExchangePhaseTest6();
   open_spiel::tarok::TalonExchangePhaseTest7();
   open_spiel::tarok::TalonExchangePhaseTest8();
+  // tricks playing phase tests
+  open_spiel::tarok::TricksPlayingPhaseTest1();
+  open_spiel::tarok::TricksPlayingPhaseTest2();
+  open_spiel::tarok::TricksPlayingPhaseTest3();
+  open_spiel::tarok::TricksPlayingPhaseTest4();
+  open_spiel::tarok::TricksPlayingPhaseTest5();
+  open_spiel::tarok::TricksPlayingPhaseTest6();
+  open_spiel::tarok::TricksPlayingPhaseTest7();
+  // captured mond tests
 }
