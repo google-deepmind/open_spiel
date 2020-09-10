@@ -70,10 +70,10 @@ def main(unused_argv):
 
   average_policy_values = expected_game_score.policy_value(
       game.new_initial_state(), [average_policy] * 2)
-  print("Computed player 0 value: {}".format(average_policy_values[0]))
-  print("Expected player 0 value: {}".format(-1 / 18))
-  print("Computed player 1 value: {}".format(average_policy_values[1]))
-  print("Expected player 1 value: {}".format(1 / 18))
+  logging.info("Computed player 0 value: {}".format(average_policy_values[0]))
+  logging.info("Expected player 0 value: {}".format(-1 / 18))
+  logging.info("Computed player 1 value: {}".format(average_policy_values[1]))
+  logging.info("Expected player 1 value: {}".format(1 / 18))
 
 
 if __name__ == "__main__":
