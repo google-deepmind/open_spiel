@@ -26,6 +26,9 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
   pybind11/policy.cc
   pybind11/policy.h
   pybind11/pyspiel.cc
+  # Custom game bindings.
+  ../games/tarok/tarok_pybind11.h
+  ../games/tarok/tarok_pybind11.cc
   )
 
 # Optional pyspiel sub-modules, which can specify their python bindings.

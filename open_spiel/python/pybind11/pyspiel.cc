@@ -24,6 +24,7 @@
 #include "open_spiel/games/efg_game.h"
 #include "open_spiel/games/efg_game_data.h"
 #include "open_spiel/games/nfg_game.h"
+#include "open_spiel/games/tarok/tarok_pybind11.h"
 #include "open_spiel/matrix_game.h"
 #include "open_spiel/normal_form_game.h"
 #include "open_spiel/observer.h"
@@ -565,6 +566,9 @@ PYBIND11_MODULE(pyspiel, m) {
   init_pyspiel_games_negotiation(m);        // Negotiation game.
   init_pyspiel_games_bridge(m);  // Game-specific functions for bridge.
   init_pyspiel_observer(m);      // Observers and observations.
+
+  // List of custom game bindings.
+  init_pyspiel_tarok(m);
 
   // List of optional python submodules.
 #if BUILD_WITH_GAMUT
