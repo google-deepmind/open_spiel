@@ -1210,6 +1210,188 @@ void TricksPlayingPhaseTest7() {
 }
 
 // captured mond tests
+void CapturedMondTest1() {
+  // mond captured by skis
+  auto state = StateAfterActions(
+      GameParameters({{"rng_seed", GameParameter(634317)}}),
+      {kDealCardsAction, kBidPassAction, kBidPassAction, kBidOneAction, 0, 49});
+  SPIEL_CHECK_EQ(state->CurrentGamePhase(), GamePhase::kTricksPlaying);
+  SPIEL_CHECK_EQ(state->SelectedContractName(), ContractName::kOne);
+
+  // play mond
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 0);
+  state->ApplyAction(CardLongNameToAction("Mond"));
+  // play skis
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 1);
+  state->ApplyAction(CardLongNameToAction("Skis"));
+  // play low tarok
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 2);
+  state->ApplyAction(CardLongNameToAction("VI"));
+
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 1);
+  SPIEL_CHECK_TRUE(AllEq(state->CapturedMondPenalties(), {-20, 0, 0}));
+}
+
+void CapturedMondTest2() {
+  // mond captured by pagat (emperor trick)
+  auto state = StateAfterActions(
+      GameParameters({{"rng_seed", GameParameter(634317)}}),
+      {kDealCardsAction, kBidPassAction, kBidPassAction, kBidOneAction, 0, 49});
+  SPIEL_CHECK_EQ(state->CurrentGamePhase(), GamePhase::kTricksPlaying);
+  SPIEL_CHECK_EQ(state->SelectedContractName(), ContractName::kOne);
+
+  // play mond
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 0);
+  state->ApplyAction(CardLongNameToAction("Mond"));
+  // play skis
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 1);
+  state->ApplyAction(CardLongNameToAction("Skis"));
+  // play pagat
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 2);
+  state->ApplyAction(CardLongNameToAction("Pagat"));
+
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 2);
+  SPIEL_CHECK_TRUE(AllEq(state->CapturedMondPenalties(), {-20, 0, 0}));
+}
+
+void CapturedMondTest3() {
+  // mond taken from talon
+  auto state = StateAfterActions(
+      GameParameters({{"rng_seed", GameParameter(497200)}}),
+      {kDealCardsAction, kBidPassAction, kBidPassAction, kBidOneAction, 3, 49});
+  SPIEL_CHECK_EQ(state->CurrentGamePhase(), GamePhase::kTricksPlaying);
+  SPIEL_CHECK_EQ(state->SelectedContractName(), ContractName::kOne);
+
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 0);
+  SPIEL_CHECK_TRUE(AllEq(state->CapturedMondPenalties(), {0, 0, 0}));
+}
+
+void CapturedMondTest4() {
+  // mond left in talon
+  auto state = StateAfterActions(
+      GameParameters({{"rng_seed", GameParameter(497200)}}),
+      {kDealCardsAction, kBidPassAction, kBidPassAction, kBidOneAction, 0, 49});
+  SPIEL_CHECK_EQ(state->CurrentGamePhase(), GamePhase::kTricksPlaying);
+  SPIEL_CHECK_EQ(state->SelectedContractName(), ContractName::kOne);
+
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 0);
+  SPIEL_CHECK_TRUE(AllEq(state->CapturedMondPenalties(), {-20, 0, 0}));
+}
+
+void CapturedMondTest5() {
+  // mond left in talon but won with a called king
+  auto state = StateAfterActions(
+      GameParameters(
+          {{"players", GameParameter(4)}, {"rng_seed", GameParameter(297029)}}),
+      {kDealCardsAction, kBidPassAction, kBidPassAction, kBidPassAction,
+       kBidOneAction, kKingOfSpadesAction, 2, 49});
+  SPIEL_CHECK_EQ(state->CurrentGamePhase(), GamePhase::kTricksPlaying);
+  SPIEL_CHECK_EQ(state->SelectedContractName(), ContractName::kOne);
+
+  // play the called king and win the trick
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 0);
+  SPIEL_CHECK_TRUE(AllEq(state->CapturedMondPenalties(), {-20, 0, 0, 0}));
+  state->ApplyAction(CardLongNameToAction("King of Spades"));
+
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 1);
+  state->ApplyAction(CardLongNameToAction("Queen of Spades"));
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 2);
+  state->ApplyAction(CardLongNameToAction("8 of Spades"));
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 3);
+  state->ApplyAction(CardLongNameToAction("7 of Spades"));
+
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 0);
+  SPIEL_CHECK_TRUE(AllEq(state->CapturedMondPenalties(), {0, 0, 0, 0}));
+}
+
+void CapturedMondTest6() {
+  // mond captured by ally should also be penalized
+  auto state =
+      StateAfterActions(GameParameters({{"rng_seed", GameParameter(634317)}}),
+                        {kDealCardsAction, kBidPassAction, kBidOneAction,
+                         kBidPassAction, kBidOneAction, 0, 22});
+  SPIEL_CHECK_EQ(state->CurrentGamePhase(), GamePhase::kTricksPlaying);
+  SPIEL_CHECK_EQ(state->SelectedContractName(), ContractName::kOne);
+
+  // play mond
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 0);
+  state->ApplyAction(CardLongNameToAction("Mond"));
+  // play skis
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 1);
+  state->ApplyAction(CardLongNameToAction("Skis"));
+  // play low tarok
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 2);
+  state->ApplyAction(CardLongNameToAction("VI"));
+
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 1);
+  SPIEL_CHECK_TRUE(AllEq(state->CapturedMondPenalties(), {-20, 0, 0}));
+}
+
+void CapturedMondTest7() {
+  // mond captured in klop should not be penalized
+  auto state = StateAfterActions(
+      GameParameters({{"rng_seed", GameParameter(634317)}}),
+      {kDealCardsAction, kBidPassAction, kBidPassAction, kBidKlopAction});
+  SPIEL_CHECK_EQ(state->CurrentGamePhase(), GamePhase::kTricksPlaying);
+  SPIEL_CHECK_EQ(state->SelectedContractName(), ContractName::kKlop);
+
+  // play mond
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 0);
+  state->ApplyAction(CardLongNameToAction("Mond"));
+  // play skis
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 1);
+  state->ApplyAction(CardLongNameToAction("Skis"));
+  // play pagat
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 2);
+  state->ApplyAction(CardLongNameToAction("Pagat"));
+
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 2);
+  SPIEL_CHECK_TRUE(AllEq(state->CapturedMondPenalties(), {0, 0, 0}));
+}
+
+void CapturedMondTest8() {
+  // mond captured in bagger should not be penalized
+  auto state = StateAfterActions(
+      GameParameters({{"rng_seed", GameParameter(634317)}}),
+      {kDealCardsAction, kBidPassAction, kBidPassAction, kBidBeggarAction});
+  SPIEL_CHECK_EQ(state->CurrentGamePhase(), GamePhase::kTricksPlaying);
+  SPIEL_CHECK_EQ(state->SelectedContractName(), ContractName::kBeggar);
+
+  // play mond
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 0);
+  state->ApplyAction(CardLongNameToAction("Mond"));
+  // play skis
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 1);
+  state->ApplyAction(CardLongNameToAction("Skis"));
+  // play pagat
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 2);
+  state->ApplyAction(CardLongNameToAction("Pagat"));
+
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 2);
+  SPIEL_CHECK_TRUE(AllEq(state->CapturedMondPenalties(), {0, 0, 0}));
+}
+
+void CapturedMondTest9() {
+  // mond captured in open bagger should not be penalized
+  auto state = StateAfterActions(
+      GameParameters({{"rng_seed", GameParameter(634317)}}),
+      {kDealCardsAction, kBidPassAction, kBidPassAction, kBidOpenBeggarAction});
+  SPIEL_CHECK_EQ(state->CurrentGamePhase(), GamePhase::kTricksPlaying);
+  SPIEL_CHECK_EQ(state->SelectedContractName(), ContractName::kOpenBeggar);
+
+  // play mond
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 0);
+  state->ApplyAction(CardLongNameToAction("Mond"));
+  // play skis
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 1);
+  state->ApplyAction(CardLongNameToAction("Skis"));
+  // play pagat
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 2);
+  state->ApplyAction(CardLongNameToAction("Pagat"));
+
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 2);
+  SPIEL_CHECK_TRUE(AllEq(state->CapturedMondPenalties(), {0, 0, 0}));
+}
 
 }  // namespace tarok
 }  // namespace open_spiel
@@ -1251,4 +1433,13 @@ int main(int argc, char** argv) {
   open_spiel::tarok::TricksPlayingPhaseTest6();
   open_spiel::tarok::TricksPlayingPhaseTest7();
   // captured mond tests
+  open_spiel::tarok::CapturedMondTest1();
+  open_spiel::tarok::CapturedMondTest2();
+  open_spiel::tarok::CapturedMondTest3();
+  open_spiel::tarok::CapturedMondTest4();
+  open_spiel::tarok::CapturedMondTest5();
+  open_spiel::tarok::CapturedMondTest6();
+  open_spiel::tarok::CapturedMondTest7();
+  open_spiel::tarok::CapturedMondTest8();
+  open_spiel::tarok::CapturedMondTest9();
 }
