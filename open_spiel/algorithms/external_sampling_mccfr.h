@@ -90,9 +90,8 @@ class ExternalSamplingMCCFRSolver {
   // Computes the average policy, containing the policy for all players.
   // The returned policy instance should only be used during the lifetime of
   // the CFRSolver object.
-  std::unique_ptr<Policy> AveragePolicy() const {
-    return std::unique_ptr<Policy>(
-        new CFRAveragePolicy(info_states_, default_policy_));
+  std::shared_ptr<Policy> AveragePolicy() const {
+    return std::make_shared<CFRAveragePolicy>(info_states_, default_policy_);
   }
 
   // See comments above CFRInfoStateValues::Serialize(double_precision) for
