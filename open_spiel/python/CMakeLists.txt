@@ -1,4 +1,5 @@
 find_package(Python3 COMPONENTS Interpreter Development)
+message(NOTICE "Python include dirs: ${Python3_INCLUDE_DIRS}")
 include_directories(SYSTEM ${Python3_INCLUDE_DIRS})
 
 if(Python3_VERSION VERSION_LESS "3.6.0")
