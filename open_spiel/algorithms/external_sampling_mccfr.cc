@@ -91,7 +91,7 @@ std::string ExternalSamplingMCCFRSolver::Serialize(
   absl::StrAppend(&str, "\n");
   // Game section
   absl::StrAppend(&str, kSerializeGameSectionHeader, "\n");
-  absl::StrAppend(&str, game_->ToString(), "\n");
+  absl::StrAppend(&str, game_->Serialize(), "\n");
   // Internal solver state section
   absl::StrAppend(&str, kSerializeSolverTypeSectionHeader, "\n");
   absl::StrAppend(&str, "ExternalSamplingMCCFRSolver", "\n");

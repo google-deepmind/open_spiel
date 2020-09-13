@@ -280,7 +280,7 @@ std::string CFRSolverBase::Serialize(int double_precision,
   absl::StrAppend(&str, "\n");
   // Game section
   absl::StrAppend(&str, kSerializeGameSectionHeader, "\n");
-  absl::StrAppend(&str, game_->ToString(), "\n");
+  absl::StrAppend(&str, game_->Serialize(), "\n");
   // Internal solver state section
   absl::StrAppend(&str, kSerializeSolverTypeSectionHeader, "\n");
   absl::StrAppend(&str, SerializeThisType(), "\n");
@@ -756,7 +756,7 @@ PartiallyDeserializedCFRSolver PartiallyDeserializeCFRSolver(
       absl::StrSplit(
           serialized,
           absl::StrCat(kSerializeSolverValuesTableSectionHeader, "\n"));
-  return PartiallyDeserializedCFRSolver(LoadGame(section_strings[kGame]),
+  return PartiallyDeserializedCFRSolver(DeserializeGame(section_strings[kGame]),
                                         section_strings[kSolverType],
                                         section_strings[kSolverSpecificState],
                                         other_and_values_table_data.second);
