@@ -94,6 +94,8 @@ set(GAME_SOURCES
   quoridor.h
   skat.cc
   skat.h
+  solitaire.cc
+  solitaire.h
   tic_tac_toe.cc
   tic_tac_toe.h
   tiny_bridge.cc
@@ -367,6 +369,10 @@ add_test(quoridor_test quoridor_test)
 add_executable(skat_test skat_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(skat_test skat_test)
+
+add_executable(solitaire_test solitaire_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(solitaire_test solitaire_test)
 
 add_executable(tic_tac_toe_test tic_tac_toe_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
