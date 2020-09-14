@@ -256,9 +256,9 @@ class State {
   virtual std::string ToString() const = 0;
 
   // Returns true if these states are equal, false otherwise. Two states are
-  // equal if they are the same state; the interpretation might differ across
-  // games. For instance, in an imperfect information game, the full history
-  // might be relevant for distinguishing states whereas it might not be
+  // equal if they are the same world state; the interpretation might differ
+  // across games. For instance, in an imperfect information game, the full
+  // history might be relevant for distinguishing states whereas it might not be
   // relevant for single-player games or perfect information games such as
   // Tic-Tac-Toe, where only the current board state is necessary.
   virtual bool operator==(const State& other) const {
