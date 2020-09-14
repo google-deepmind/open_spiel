@@ -152,6 +152,7 @@ class TrackingVectorAllocator : public Allocator {
   TrackingVectorAllocator() {}
   DimensionedSpan Get(absl::string_view name,
                       const absl::InlinedVector<int, 4>& shape) {
+    SPIEL_DCHECK_TRUE(IsNameUnique(name));
     tensors.push_back(
         TensorInfo{std::string(name), {shape.begin(), shape.end()}});
     const int begin_size = data.size();
@@ -159,6 +160,13 @@ class TrackingVectorAllocator : public Allocator {
     data.resize(begin_size + size);
     return DimensionedSpan(absl::MakeSpan(data).subspan(begin_size, size),
                            shape);
+  }
+
+  bool IsNameUnique(absl::string_view name) {
+    for (const TensorInfo& tensor : tensors) {
+      if (tensor.name == name) return false;
+    }
+    return true;
   }
 
   std::vector<TensorInfo> tensors;
