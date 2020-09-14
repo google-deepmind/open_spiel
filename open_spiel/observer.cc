@@ -91,6 +91,20 @@ class DefaultObserver : public Observer {
   int size_;
 };
 
+// A dummy class that provides private observations for games with perfect
+// information. As these games have no private information, we return dummy
+// values.
+class NoPrivateObserver : public Observer {
+ public:
+  NoPrivateObserver(const Game& game)
+      : Observer(/*has_string=*/true, /*has_tensor=*/true) {}
+  void WriteTensor(const State& state, int player,
+                   Allocator* allocator) const override {}
+  std::string StringFrom(const State& state, int player) const override {
+    return kNothingPrivateObservation;
+  }
+};
+
 }  // namespace
 
 std::shared_ptr<Observer> Game::MakeObserver(
@@ -101,6 +115,20 @@ std::shared_ptr<Observer> Game::MakeObserver(
   // game-specific observer.
   if (!params.empty()) SpielFatalError("Observer params not supported.");
   if (!iig_obs_type) return absl::make_unique<DefaultObserver>(*this);
+
+  // Perfect information games provide public information regardless
+  // of requested PrivateInfoType (as they have no private information).
+  if (GetType().information == GameType::Information::kPerfectInformation &&
+      !iig_obs_type->perfect_recall &&
+      (game_type_.provides_observation_tensor ||
+       game_type_.provides_observation_string)) {
+    if (iig_obs_type->public_info) {
+      return absl::make_unique<DefaultObserver>(*this);
+    } else {
+      return absl::make_unique<NoPrivateObserver>(*this);
+    }
+  }
+
   // TODO(author11) Reinstate this check
   // SPIEL_CHECK_EQ(GetType().information,
   //                GameType::Information::kImperfectInformation);

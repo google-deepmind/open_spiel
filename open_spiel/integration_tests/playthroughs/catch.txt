@@ -48,6 +48,8 @@ IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = ".....\n.....\n.....\n.....\n.....\n.....\n.....\n.....\n.....\n.....\n"
+PublicObservationString() = ".....\n.....\n.....\n.....\n.....\n.....\n.....\n.....\n.....\n.....\n"
+PrivateObservationString(0) = ""
 ObservationTensor(0): ◯◯◯◯◯
                       ◯◯◯◯◯
                       ◯◯◯◯◯
@@ -83,6 +85,8 @@ IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
 ObservationString(0) = ".o...\n.....\n.....\n.....\n.....\n.....\n.....\n.....\n.....\n..x..\n"
+PublicObservationString() = ".o...\n.....\n.....\n.....\n.....\n.....\n.....\n.....\n.....\n..x..\n"
+PrivateObservationString(0) = ""
 ObservationTensor(0): ◯◉◯◯◯
                       ◯◯◯◯◯
                       ◯◯◯◯◯
@@ -119,6 +123,8 @@ IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
 ObservationString(0) = ".....\n.o...\n.....\n.....\n.....\n.....\n.....\n.....\n.....\n..x..\n"
+PublicObservationString() = ".....\n.o...\n.....\n.....\n.....\n.....\n.....\n.....\n.....\n..x..\n"
+PrivateObservationString(0) = ""
 ObservationTensor(0): ◯◯◯◯◯
                       ◯◉◯◯◯
                       ◯◯◯◯◯
@@ -155,6 +161,8 @@ IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
 ObservationString(0) = ".....\n.....\n.o...\n.....\n.....\n.....\n.....\n.....\n.....\n.x...\n"
+PublicObservationString() = ".....\n.....\n.o...\n.....\n.....\n.....\n.....\n.....\n.....\n.x...\n"
+PrivateObservationString(0) = ""
 ObservationTensor(0): ◯◯◯◯◯
                       ◯◯◯◯◯
                       ◯◉◯◯◯
@@ -191,6 +199,8 @@ IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
 ObservationString(0) = ".....\n.....\n.....\n.o...\n.....\n.....\n.....\n.....\n.....\nx....\n"
+PublicObservationString() = ".....\n.....\n.....\n.o...\n.....\n.....\n.....\n.....\n.....\nx....\n"
+PrivateObservationString(0) = ""
 ObservationTensor(0): ◯◯◯◯◯
                       ◯◯◯◯◯
                       ◯◯◯◯◯
@@ -227,6 +237,8 @@ IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
 ObservationString(0) = ".....\n.....\n.....\n.....\n.o...\n.....\n.....\n.....\n.....\nx....\n"
+PublicObservationString() = ".....\n.....\n.....\n.....\n.o...\n.....\n.....\n.....\n.....\nx....\n"
+PrivateObservationString(0) = ""
 ObservationTensor(0): ◯◯◯◯◯
                       ◯◯◯◯◯
                       ◯◯◯◯◯
@@ -263,6 +275,8 @@ IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
 ObservationString(0) = ".....\n.....\n.....\n.....\n.....\n.o...\n.....\n.....\n.....\nx....\n"
+PublicObservationString() = ".....\n.....\n.....\n.....\n.....\n.o...\n.....\n.....\n.....\nx....\n"
+PrivateObservationString(0) = ""
 ObservationTensor(0): ◯◯◯◯◯
                       ◯◯◯◯◯
                       ◯◯◯◯◯
@@ -299,6 +313,8 @@ IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
 ObservationString(0) = ".....\n.....\n.....\n.....\n.....\n.....\n.o...\n.....\n.....\nx....\n"
+PublicObservationString() = ".....\n.....\n.....\n.....\n.....\n.....\n.o...\n.....\n.....\nx....\n"
+PrivateObservationString(0) = ""
 ObservationTensor(0): ◯◯◯◯◯
                       ◯◯◯◯◯
                       ◯◯◯◯◯
@@ -335,6 +351,8 @@ IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
 ObservationString(0) = ".....\n.....\n.....\n.....\n.....\n.....\n.....\n.o...\n.....\nx....\n"
+PublicObservationString() = ".....\n.....\n.....\n.....\n.....\n.....\n.....\n.o...\n.....\nx....\n"
+PrivateObservationString(0) = ""
 ObservationTensor(0): ◯◯◯◯◯
                       ◯◯◯◯◯
                       ◯◯◯◯◯
@@ -371,6 +389,8 @@ IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
 ObservationString(0) = ".....\n.....\n.....\n.....\n.....\n.....\n.....\n.....\n.o...\n.x...\n"
+PublicObservationString() = ".....\n.....\n.....\n.....\n.....\n.....\n.....\n.....\n.o...\n.x...\n"
+PrivateObservationString(0) = ""
 ObservationTensor(0): ◯◯◯◯◯
                       ◯◯◯◯◯
                       ◯◯◯◯◯
@@ -407,6 +427,8 @@ IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
 ObservationString(0) = ".....\n.....\n.....\n.....\n.....\n.....\n.....\n.....\n.....\n.x...\n"
+PublicObservationString() = ".....\n.....\n.....\n.....\n.....\n.....\n.....\n.....\n.....\n.x...\n"
+PrivateObservationString(0) = ""
 ObservationTensor(0): ◯◯◯◯◯
                       ◯◯◯◯◯
                       ◯◯◯◯◯

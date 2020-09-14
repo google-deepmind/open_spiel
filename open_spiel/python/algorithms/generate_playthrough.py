@@ -274,11 +274,13 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None):
         if s is not None:
           add_line(f'ObservationString({player}) = "{_escape(s)}"')
     if public_observation:
-      add_line('PublicObservationString() = "{}"'.format(
-          _escape(public_observation.string_from(state, 0))))
+      s = public_observation.string_from(state, 0)
+      if s is not None:
+        add_line('PublicObservationString() = "{}"'.format(_escape(s)))
       for player in players:
-        add_line('PrivateObservationString({}) = "{}"'.format(
-            player, _escape(private_observation.string_from(state, player))))
+        s = private_observation.string_from(state, player)
+        if s is not None:
+          add_line(f'PrivateObservationString({player}) = "{_escape(s)}"')
     if default_observation and default_observation.tensor is not None:
       for player in players:
         default_observation.set_from(state, player)

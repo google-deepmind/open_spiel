@@ -42,6 +42,10 @@ CurrentPlayer() = 0
 ObservationString(0) = "Scores: 0 0 0, Turn total: 0\nCurrent player: 0\n"
 ObservationString(1) = "Scores: 0 0 0, Turn total: 0\nCurrent player: 0\n"
 ObservationString(2) = "Scores: 0 0 0, Turn total: 0\nCurrent player: 0\n"
+PublicObservationString() = "Scores: 0 0 0, Turn total: 0\nCurrent player: 0\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
+PrivateObservationString(2) = ""
 ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯
@@ -74,6 +78,10 @@ CurrentPlayer() = 1
 ObservationString(0) = "Scores: 0 0 0, Turn total: 0\nCurrent player: 1\n"
 ObservationString(1) = "Scores: 0 0 0, Turn total: 0\nCurrent player: 1\n"
 ObservationString(2) = "Scores: 0 0 0, Turn total: 0\nCurrent player: 1\n"
+PublicObservationString() = "Scores: 0 0 0, Turn total: 0\nCurrent player: 1\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
+PrivateObservationString(2) = ""
 ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯
@@ -106,6 +114,10 @@ CurrentPlayer() = -1
 ObservationString(0) = "Scores: 0 0 0, Turn total: 0\nCurrent player: 1 (rolling)\n"
 ObservationString(1) = "Scores: 0 0 0, Turn total: 0\nCurrent player: 1 (rolling)\n"
 ObservationString(2) = "Scores: 0 0 0, Turn total: 0\nCurrent player: 1 (rolling)\n"
+PublicObservationString() = "Scores: 0 0 0, Turn total: 0\nCurrent player: 1 (rolling)\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
+PrivateObservationString(2) = ""
 ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯
@@ -137,6 +149,10 @@ CurrentPlayer() = 1
 ObservationString(0) = "Scores: 0 0 0, Turn total: 4\nCurrent player: 1\n"
 ObservationString(1) = "Scores: 0 0 0, Turn total: 4\nCurrent player: 1\n"
 ObservationString(2) = "Scores: 0 0 0, Turn total: 4\nCurrent player: 1\n"
+PublicObservationString() = "Scores: 0 0 0, Turn total: 4\nCurrent player: 1\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
+PrivateObservationString(2) = ""
 ObservationTensor(0): ◯◯◯◯◉◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯
@@ -169,6 +185,10 @@ CurrentPlayer() = 2
 ObservationString(0) = "Scores: 0 4 0, Turn total: 0\nCurrent player: 2\n"
 ObservationString(1) = "Scores: 0 4 0, Turn total: 0\nCurrent player: 2\n"
 ObservationString(2) = "Scores: 0 4 0, Turn total: 0\nCurrent player: 2\n"
+PublicObservationString() = "Scores: 0 4 0, Turn total: 0\nCurrent player: 2\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
+PrivateObservationString(2) = ""
 ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯
                       ◯◯◯◯◉◯◯◯◯◯◯
@@ -201,6 +221,10 @@ CurrentPlayer() = -1
 ObservationString(0) = "Scores: 0 4 0, Turn total: 0\nCurrent player: 2 (rolling)\n"
 ObservationString(1) = "Scores: 0 4 0, Turn total: 0\nCurrent player: 2 (rolling)\n"
 ObservationString(2) = "Scores: 0 4 0, Turn total: 0\nCurrent player: 2 (rolling)\n"
+PublicObservationString() = "Scores: 0 4 0, Turn total: 0\nCurrent player: 2 (rolling)\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
+PrivateObservationString(2) = ""
 ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯
                       ◯◯◯◯◉◯◯◯◯◯◯
@@ -232,6 +256,10 @@ CurrentPlayer() = 2
 ObservationString(0) = "Scores: 0 4 0, Turn total: 3\nCurrent player: 2\n"
 ObservationString(1) = "Scores: 0 4 0, Turn total: 3\nCurrent player: 2\n"
 ObservationString(2) = "Scores: 0 4 0, Turn total: 3\nCurrent player: 2\n"
+PublicObservationString() = "Scores: 0 4 0, Turn total: 3\nCurrent player: 2\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
+PrivateObservationString(2) = ""
 ObservationTensor(0): ◯◯◯◉◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯
                       ◯◯◯◯◉◯◯◯◯◯◯
@@ -264,6 +292,10 @@ CurrentPlayer() = 0
 ObservationString(0) = "Scores: 0 4 3, Turn total: 0\nCurrent player: 0\n"
 ObservationString(1) = "Scores: 0 4 3, Turn total: 0\nCurrent player: 0\n"
 ObservationString(2) = "Scores: 0 4 3, Turn total: 0\nCurrent player: 0\n"
+PublicObservationString() = "Scores: 0 4 3, Turn total: 0\nCurrent player: 0\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
+PrivateObservationString(2) = ""
 ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯
                       ◯◯◯◯◉◯◯◯◯◯◯
@@ -296,6 +328,10 @@ CurrentPlayer() = 1
 ObservationString(0) = "Scores: 0 4 3, Turn total: 0\nCurrent player: 1\n"
 ObservationString(1) = "Scores: 0 4 3, Turn total: 0\nCurrent player: 1\n"
 ObservationString(2) = "Scores: 0 4 3, Turn total: 0\nCurrent player: 1\n"
+PublicObservationString() = "Scores: 0 4 3, Turn total: 0\nCurrent player: 1\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
+PrivateObservationString(2) = ""
 ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯
                       ◯◯◯◯◉◯◯◯◯◯◯
@@ -328,6 +364,10 @@ CurrentPlayer() = 2
 ObservationString(0) = "Scores: 0 4 3, Turn total: 0\nCurrent player: 2\n"
 ObservationString(1) = "Scores: 0 4 3, Turn total: 0\nCurrent player: 2\n"
 ObservationString(2) = "Scores: 0 4 3, Turn total: 0\nCurrent player: 2\n"
+PublicObservationString() = "Scores: 0 4 3, Turn total: 0\nCurrent player: 2\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
+PrivateObservationString(2) = ""
 ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯
                       ◯◯◯◯◉◯◯◯◯◯◯
@@ -360,6 +400,10 @@ CurrentPlayer() = -1
 ObservationString(0) = "Scores: 0 4 3, Turn total: 0\nCurrent player: 2 (rolling)\n"
 ObservationString(1) = "Scores: 0 4 3, Turn total: 0\nCurrent player: 2 (rolling)\n"
 ObservationString(2) = "Scores: 0 4 3, Turn total: 0\nCurrent player: 2 (rolling)\n"
+PublicObservationString() = "Scores: 0 4 3, Turn total: 0\nCurrent player: 2 (rolling)\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
+PrivateObservationString(2) = ""
 ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯
                       ◯◯◯◯◉◯◯◯◯◯◯
@@ -391,6 +435,10 @@ CurrentPlayer() = 2
 ObservationString(0) = "Scores: 0 4 3, Turn total: 4\nCurrent player: 2\n"
 ObservationString(1) = "Scores: 0 4 3, Turn total: 4\nCurrent player: 2\n"
 ObservationString(2) = "Scores: 0 4 3, Turn total: 4\nCurrent player: 2\n"
+PublicObservationString() = "Scores: 0 4 3, Turn total: 4\nCurrent player: 2\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
+PrivateObservationString(2) = ""
 ObservationTensor(0): ◯◯◯◯◉◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯
                       ◯◯◯◯◉◯◯◯◯◯◯
@@ -423,6 +471,10 @@ CurrentPlayer() = 0
 ObservationString(0) = "Scores: 0 4 7, Turn total: 0\nCurrent player: 0\n"
 ObservationString(1) = "Scores: 0 4 7, Turn total: 0\nCurrent player: 0\n"
 ObservationString(2) = "Scores: 0 4 7, Turn total: 0\nCurrent player: 0\n"
+PublicObservationString() = "Scores: 0 4 7, Turn total: 0\nCurrent player: 0\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
+PrivateObservationString(2) = ""
 ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯
                       ◯◯◯◯◉◯◯◯◯◯◯
@@ -455,6 +507,10 @@ CurrentPlayer() = -4
 ObservationString(0) = "Scores: 0 4 7, Turn total: 0\nCurrent player: 0 (rolling)\n"
 ObservationString(1) = "Scores: 0 4 7, Turn total: 0\nCurrent player: 0 (rolling)\n"
 ObservationString(2) = "Scores: 0 4 7, Turn total: 0\nCurrent player: 0 (rolling)\n"
+PublicObservationString() = "Scores: 0 4 7, Turn total: 0\nCurrent player: 0 (rolling)\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
+PrivateObservationString(2) = ""
 ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯
                       ◯◯◯◯◉◯◯◯◯◯◯
