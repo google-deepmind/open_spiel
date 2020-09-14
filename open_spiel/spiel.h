@@ -786,7 +786,10 @@ class Game : public std::enable_shared_from_this<Game> {
   }
 
   // Returns an Observer, used to obtain observations of the game state.
-  // See `spiel_observer.h` for further information.
+  // The observations are created according to requested observation type.
+  // Games can include additional observation fields when requested by
+  // `params`.
+  // See `observer.h` for further information.
   virtual std::shared_ptr<Observer> MakeObserver(
       absl::optional<IIGObservationType> iig_obs_type,
       const GameParameters& params) const;
