@@ -71,10 +71,12 @@ ideal to first be aware of the general API (see `spiel.h`).
 8.  Once done, rebuild and rerun the tests to ensure everything passes
     (including your new game’s test!).
 9.  Update Python integration tests:
-    *   Run `./scripts/generate_new_playthrough.sh new_game` to generate some
-        random games, to be used by integration tests to prevent any regression.
+    *   Run `./scripts/generate_new_playthrough.sh new_game` to generate a
+        random game, to be used by integration tests to prevent any regression.
         `open_spiel/integration_tests/playthrough_test.py` will automatically
         load the playthroughs and compare them to newly generated playthroughs.
+    *   If you have made a change that affects playthroughs, run
+        `./scripts/regenerate_playthroughs.sh` to update them.
 
 ## Conditional dependencies
 
@@ -103,3 +105,11 @@ When you add a new conditional dependency, you need to touch:
 -   change `install.sh` to make sure the dependency is installed
 -   use constructs like `if (${BUILD_WITH_HANABI})` in CMake to optionally add
     the targets to build.
+
+## Debugging tools
+
+For complex games it may be tricky to get all the details right. Reading through
+the playthrough You can visualize small game trees using
+`[open_spiel/python/examples/treeviz_example.py](https://github.com/deepmind/open_spiel/blob/master/open_spiel/python/examples/treeviz_example.py)` or for large
+games there is an interactive viewer for OpenSpiel games called
+[SpielViz](https://github.com/michalsustr/spielviz).
