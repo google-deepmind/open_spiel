@@ -215,12 +215,11 @@ release!). Contributions are certainly not limited to these suggestions!
     Harvest from [Ref3](https://arxiv.org/abs/1812.07019)
     [Ref4](https://arxiv.org/abs/1810.08647).
 
--   **Single-Agent Games and Environments**. There are currently no
-    single-player (i.e. solitaire) games or traditional RL environments
+-   **Single-Agent Games and Environments**. Aside from klondike solitaire, 
+    there are no single-player games or traditional RL environments
     implemented (in C++, accessible to the entire code base) despite the API
     supporting the use case. Games that fit into the category, such as
     [Morpion](https://en.wikipedia.org/wiki/Join_Five) and
-    [Klondike](https://en.wikipedia.org/wiki/Klondike_\(solitaire\)), and
     traditional RL environments such as grid worlds, that have been used
     commonly in AI research, would be welcome contributions.
 
