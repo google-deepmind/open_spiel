@@ -798,26 +798,28 @@ std::vector<int> TarokState::ScoresInKlop() const {
 std::vector<int> TarokState::ScoresInNormalContracts() const {
   auto [collected_cards, opposite_collected_cards] =
       SplitCollectedCardsPerTeams();
-  // calculate bonuses
-  int bonuses;
+
+  int score;
   if (collected_cards.size() == 48) {
     // valat won
-    bonuses = 250;
+    score = 250;
   } else if (opposite_collected_cards.size() == 48) {
     // valat lost
-    bonuses = -250;
+    score = -250;
   } else {
-    // other bonuses that could be positive, negative or 0
-    bonuses = NonValatBonuses(collected_cards, opposite_collected_cards);
+    int card_points =
+        CardPoints(collected_cards, tarok_parent_game_->card_deck_);
+    score = card_points - 35;
+
+    if (card_points > 35)
+      score += selected_contract_->score;
+    else
+      score -= selected_contract_->score;
+
+    // bonuses could be positive, negative or 0
+    int bonuses = NonValatBonuses(collected_cards, opposite_collected_cards);
+    score += bonuses;
   }
-  // calculate final scores
-  int card_points = CardPoints(collected_cards, tarok_parent_game_->card_deck_);
-  int score = card_points - 35;
-  if (card_points > 35)
-    score += selected_contract_->score;
-  else
-    score -= selected_contract_->score;
-  score += bonuses;
 
   std::vector<int> scores(num_players_, 0);
   scores.at(declarer_) = score;
@@ -846,6 +848,7 @@ int TarokState::NonValatBonuses(
     const std::vector<Action>& collected_cards,
     const std::vector<Action>& opposite_collected_cards) const {
   int bonuses = 0;
+
   // last trick winner is the current player
   auto const& last_trick_winner_cards =
       players_collected_cards_.at(current_player_);
@@ -862,6 +865,7 @@ int TarokState::NonValatBonuses(
     // pagat ultimo
     ultimo_bonus = 25;
   }
+
   if (ultimo_bonus > 0 &&
       (current_player_ == declarer_ || current_player_ == declarer_partner_)) {
     bonuses = ultimo_bonus;
@@ -874,6 +878,7 @@ int TarokState::NonValatBonuses(
       CollectedKingsAndOrTrula(collected_cards);
   auto [opposite_collected_kings, opposite_collected_trula] =
       CollectedKingsAndOrTrula(opposite_collected_cards);
+
   if (collected_kings)
     bonuses += 10;
   else if (opposite_collected_kings)
