@@ -71,7 +71,7 @@ ideal to first be aware of the general API (see `spiel.h`).
 8.  Once done, rebuild and rerun the tests to ensure everything passes
     (including your new game’s test!).
 9.  Update Python integration tests:
-    *   Run `./scripts/generate_new_playthrough.sh new_game` to generate a
+    *   Run `./open_spiel/scripts/generate_new_playthrough.sh new_game` to generate a
         random game, to be used by integration tests to prevent any regression.
         `open_spiel/integration_tests/playthrough_test.py` will automatically
         load the playthroughs and compare them to newly generated playthroughs.
