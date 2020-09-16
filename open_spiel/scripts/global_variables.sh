@@ -52,6 +52,9 @@ export BUILD_WITH_ROSHAMBO=${BUILD_WITH_ROSHAMBO:-$DEFAULT_OPTIONAL_DEPENDENCY}
 # > latency or deployment requirements), the C++ frontend to PyTorch provides
 # > an API that is approximately as convenient, flexible, friendly and intuitive
 # > as its Python counterpart.
+#
+# You can find examples of how to use C++ API at
+# https://github.com/pytorch/examples/tree/master/cpp
 export BUILD_WITH_LIBTORCH="${BUILD_WITH_LIBTORCH:-OFF}"
 
 # Turn off public states as it is Work-In-Progress.
