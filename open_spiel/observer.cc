@@ -173,13 +173,24 @@ class TrackingVectorAllocator : public Allocator {
   std::vector<float> data;
 };
 
+std::pair<std::vector<TensorInfo>, int> CollectTensorInfo(
+    const Game& game, std::shared_ptr<Observer> observer) {
+  auto state = game.NewInitialState();
+  TrackingVectorAllocator allocator;
+  observer->WriteTensor(*state, /*player=*/kDefaultPlayerId, &allocator);
+  return {
+      std::move(allocator.tensors),
+      allocator.data.size()
+  };
+}
+
 Observation::Observation(const Game& game, std::shared_ptr<Observer> observer)
     : observer_(std::move(observer)) {
   // Get an observation of the initial state to set up.
   if (HasTensor()) {
     auto state = game.NewInitialState();
     TrackingVectorAllocator allocator;
-    observer_->WriteTensor(*state, /*player=*/0, &allocator);
+    observer_->WriteTensor(*state, /*player=*/kDefaultPlayerId, &allocator);
     buffer_ = std::move(allocator.data);
     tensors_ = std::move(allocator.tensors);
   }
