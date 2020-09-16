@@ -118,14 +118,25 @@ std::shared_ptr<Observer> Game::MakeObserver(
 
   // Perfect information games provide public information regardless
   // of requested PrivateInfoType (as they have no private information).
-  if (GetType().information == GameType::Information::kPerfectInformation &&
-      !iig_obs_type->perfect_recall &&
-      (game_type_.provides_observation_tensor ||
-       game_type_.provides_observation_string)) {
-    if (iig_obs_type->public_info) {
-      return absl::make_unique<DefaultObserver>(*this);
-    } else {
+  if (GetType().information == GameType::Information::kPerfectInformation) {
+    // Handle the dummy case, where we do not use any public information.
+    // The game will just have empty private observations.
+    if (!iig_obs_type->public_info) {
       return absl::make_unique<NoPrivateObserver>(*this);
+    }
+
+    // Distinguish two variants:
+    // Provide observer with or without perfect recall.
+    SPIEL_CHECK_TRUE(iig_obs_type->public_info);
+    if (iig_obs_type->perfect_recall &&
+        (game_type_.provides_information_state_tensor
+            || game_type_.provides_information_state_string)) {
+      return absl::make_unique<InformationStateObserver>(*this);
+    }
+    if (!iig_obs_type->perfect_recall &&
+        (game_type_.provides_observation_tensor
+          || game_type_.provides_observation_string)) {
+      return absl::make_unique<DefaultObserver>(*this);
     }
   }
 
