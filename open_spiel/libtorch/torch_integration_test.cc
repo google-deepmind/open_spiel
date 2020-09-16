@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "//third_party/open_spiel/spiel_utils.h"
-#include "<torch/torch.h>"
+#include "open_spiel/spiel_utils.h"
+#include "torch/torch.h"
 
 namespace {
 
