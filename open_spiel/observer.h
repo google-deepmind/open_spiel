@@ -188,6 +188,18 @@ inline constexpr IIGObservationType kInfoStateObsType{
     .perfect_recall = true,
     .private_info = PrivateInfoType::kSinglePlayer};
 
+// Incremental public observation, mainly used for imperfect information games.
+inline constexpr IIGObservationType kPublicObsType{
+    .public_info = true,
+    .perfect_recall = false,
+    .private_info = PrivateInfoType::kNone};
+
+// Complete public observation, mainly used for imperfect information games.
+inline constexpr IIGObservationType kPublicStateObsType{
+    .public_info = true,
+    .perfect_recall = true,
+    .private_info = PrivateInfoType::kNone};
+
 // An Observer is something which can produce an observation of a State,
 // e.g. a Tensor or collection of Tensors or a string.
 // Observers are game-specific. They are created by a Game object, and
