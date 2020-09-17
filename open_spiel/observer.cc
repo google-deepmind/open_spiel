@@ -174,10 +174,10 @@ class TrackingVectorAllocator : public Allocator {
 };
 
 std::pair<std::vector<TensorInfo>, int> CollectTensorInfo(
-    const Game& game, Observer* observer) {
+    const Game& game, const Observer& observer) {
   auto state = game.NewInitialState();
   TrackingVectorAllocator allocator;
-  observer->WriteTensor(*state, /*player=*/kDefaultPlayerId, &allocator);
+  observer.WriteTensor(*state, /*player=*/kDefaultPlayerId, &allocator);
   return {
       std::move(allocator.tensors),
       allocator.data.size()
