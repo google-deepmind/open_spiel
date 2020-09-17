@@ -234,7 +234,7 @@ struct TensorInfo {
 // This is similar to what Observation does, but without holding the observation
 // data.
 std::pair<std::vector<TensorInfo>, int> CollectTensorInfo(
-    const Game& game, std::shared_ptr<Observer> observer);
+    const Game& game, Observer* observer);
 
 // Holds an Observer and a vector for it to write values into.
 class Observation {
