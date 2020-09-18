@@ -53,8 +53,7 @@ export BUILD_WITH_ROSHAMBO=${BUILD_WITH_ROSHAMBO:-$DEFAULT_OPTIONAL_DEPENDENCY}
 # > an API that is approximately as convenient, flexible, friendly and intuitive
 # > as its Python counterpart.
 #
-# You can find examples of how to use C++ API at
-# https://github.com/pytorch/examples/tree/master/cpp
+# You can find an example usage in open_spiel/libtorch/torch_integration_test.cc
 export BUILD_WITH_LIBTORCH="${BUILD_WITH_LIBTORCH:-OFF}"
 
 # Turn off public states as it is Work-In-Progress.
