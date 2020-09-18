@@ -71,7 +71,7 @@ This process has been written for Windows 10, and tested on Windows 10 build
     ```bash
     mkdir build
     cd build
-    CXX=g++ cmake -DPython3_EXECUTABLE=$(which python3) -DCMAKE_CXX_COMPILER=g++ ../open_spiel
+    CXX=clang++ cmake -DPython3_EXECUTABLE=$(which python3) -DCMAKE_CXX_COMPILER=clang++ ../open_spiel
     make -j12 # The 12 here is the number of parallel processes used to build
     ctest -j12 # Run the tests to verify that the installation succeeded
     ```
