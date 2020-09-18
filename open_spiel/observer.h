@@ -172,6 +172,8 @@ struct IIGObservationType {
 
   // Which players' private information to include in the observation.
   PrivateInfoType private_info;
+
+  bool operator==(const IIGObservationType&);
 };
 
 // Default observation type for imperfect information games.

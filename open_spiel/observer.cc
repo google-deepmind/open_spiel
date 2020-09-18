@@ -132,14 +132,12 @@ std::shared_ptr<Observer> Game::MakeObserver(
   // TODO(author11) Reinstate this check
   // SPIEL_CHECK_EQ(GetType().information,
   //                GameType::Information::kImperfectInformation);
-  if (iig_obs_type->public_info && !iig_obs_type->perfect_recall &&
-      iig_obs_type->private_info == PrivateInfoType::kSinglePlayer) {
+  if (iig_obs_type.value() == kDefaultObsType) {
     if (game_type_.provides_observation_tensor ||
         game_type_.provides_observation_string)
       return absl::make_unique<DefaultObserver>(*this);
   }
-  if (iig_obs_type->public_info && iig_obs_type->perfect_recall &&
-      iig_obs_type->private_info == PrivateInfoType::kSinglePlayer) {
+  if (iig_obs_type.value() == kInfoStateObsType) {
     if (game_type_.provides_information_state_tensor ||
         game_type_.provides_information_state_string)
       return absl::make_unique<InformationStateObserver>(*this);
@@ -268,6 +266,12 @@ void Observation::Decompress(absl::string_view compressed) {
       SpielFatalError(absl::StrCat("Unrecognized compression scheme in '",
                                    compressed, "'"));
   }
+}
+
+bool IIGObservationType::operator==(const IIGObservationType& other) {
+  return public_info == other.public_info
+      && perfect_recall == other.perfect_recall
+      && private_info == other.private_info;
 }
 
 }  // namespace open_spiel
