@@ -215,14 +215,12 @@ release!). Contributions are certainly not limited to these suggestions!
     Harvest from [Ref3](https://arxiv.org/abs/1812.07019)
     [Ref4](https://arxiv.org/abs/1810.08647).
 
--   **Single-Agent Games and Environments**. There are currently no
-    single-player (i.e. solitaire) games or traditional RL environments
-    implemented (in C++, accessible to the entire code base) despite the API
-    supporting the use case. Games that fit into the category, such as
-    [Morpion](https://en.wikipedia.org/wiki/Join_Five) and
-    [Klondike](https://en.wikipedia.org/wiki/Klondike_\(solitaire\)), and
-    traditional RL environments such as grid worlds, that have been used
-    commonly in AI research, would be welcome contributions.
+-   **Single-Agent Games and Environments**. There are only a few single-player
+    games or traditional RL environments (Klondike solitaire, catch, Deep Sea),
+    despite the API supporting the use case. Games that fit into the category,
+    such as [Morpion](https://en.wikipedia.org/wiki/Join_Five), Blackjack, and
+    traditional RL environments such as grid worlds and others used to learn RL
+    would be welcome contributions.
 
 -   **Structured Action Spaces**. Currently, actions are integers between 0 and
     some value. There is no easy way to interpret what each action means in a
