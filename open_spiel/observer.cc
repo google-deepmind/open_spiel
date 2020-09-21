@@ -91,6 +91,21 @@ class DefaultObserver : public Observer {
   int size_;
 };
 
+std::string PrivateInfoTypeToString(const PrivateInfoType& type) {
+  if (type == PrivateInfoType::kNone) return "kNone";
+  if (type == PrivateInfoType::kSinglePlayer) return "kSinglePlayer";
+  if (type == PrivateInfoType::kAllPlayers) return "kAllPlayers";
+  SpielFatalError("Unknown PrivateInfoType!");
+}
+
+std::string IIGObservationTypeToString(const IIGObservationType& obs_type) {
+  return absl::StrCat(
+      "IIGObservationType",
+      "{perfect_recall=", obs_type.perfect_recall ? "true" : "false",
+      ", public_info=", obs_type.public_info ? "true" : "false",
+      ", private_info=", PrivateInfoTypeToString(obs_type.private_info), "}");
+}
+
 // A dummy class that provides private observations for games with perfect
 // information. As these games have no private information, we return dummy
 // values.
@@ -104,7 +119,6 @@ class NoPrivateObserver : public Observer {
     return kNothingPrivateObservation;
   }
 };
-
 }  // namespace
 
 std::shared_ptr<Observer> Game::MakeObserver(
@@ -144,7 +158,8 @@ std::shared_ptr<Observer> Game::MakeObserver(
         game_type_.provides_information_state_string)
       return absl::make_unique<InformationStateObserver>(*this);
   }
-  SpielFatalError("Requested Observer type not available.");
+  SpielFatalError(absl::StrCat("Requested Observer type not available: ",
+                               IIGObservationTypeToString(*iig_obs_type)));
 }
 
 class TrackingVectorAllocator : public Allocator {
