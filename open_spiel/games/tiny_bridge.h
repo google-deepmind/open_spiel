@@ -87,6 +87,8 @@ class TinyBridgeGame2p : public Game {
   double MinUtility() const override { return -40; }  // Bid 2NT, 0 tricks
   double MaxUtility() const override { return 35; }   // Bid 2NT, 2 tricks
   int MaxGameLength() const override { return 8; }
+  // TODO() make a tighter bound.
+  int MaxChanceNodesInHistory() const override { return MaxGameLength(); }
   int MaxChanceOutcomes() const override { return kNumPrivates; }
   std::vector<int> InformationStateTensorShape() const override {
     return {(is_abstracted_ ? kNumAbstractHands : kDeckSize) +
@@ -111,6 +113,8 @@ class TinyBridgeGame4p : public Game {
   double UtilitySum() const override { return 0; }
   double MaxUtility() const override { return 160; }
   int MaxGameLength() const override { return 57; }
+  // TODO() make a tighter bound.
+  int MaxChanceNodesInHistory() const override { return MaxGameLength(); }
   int MaxChanceOutcomes() const override { return kNumPrivates; }
   std::vector<int> InformationStateTensorShape() const override {
     return {kDeckSize + (kNumBids * 3 + 1) * NumPlayers()};
@@ -130,6 +134,8 @@ class TinyBridgePlayGame : public Game {
   double MinUtility() const override { return 0; }
   double MaxUtility() const override { return kNumTricks; }
   int MaxGameLength() const override { return 8; }
+  // There aren't chance nodes in this game.
+  int MaxChanceNodesInHistory() const override { return 0; }
 };
 
 // State of an in-progress auction, either 2p or 4p.

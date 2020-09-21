@@ -109,6 +109,8 @@ class PentagoGame : public Game {
     // Increase this by one if swap is ever implemented.
     return kBoardPositions;
   }
+  // There aren't chance nodes in this game.
+  int MaxChanceNodesInHistory() const override { return 0; }
 
  private:
   const bool ansi_color_output_ = false;

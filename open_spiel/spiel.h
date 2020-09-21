@@ -757,6 +757,30 @@ class Game : public std::enable_shared_from_this<Game> {
   // of chance nodes are not included in this length.
   virtual int MaxGameLength() const = 0;
 
+  // The maximum number of chance nodes occurring in any history of the game.
+  // This is typically something like the number of times dice are rolled.
+  virtual int MaxChanceNodesInHistory() const = 0;
+
+  // The maximum number of moves in the game. The value State::MoveNumber()
+  // must never be higher than this value.
+  virtual int MaxMoveNumber() const {
+    return MaxGameLength() + MaxChanceNodesInHistory();
+  }
+
+  // The maximum length of any history in the game.
+  // The value State::History().size() must never be higher than this value.
+  virtual int MaxHistoryLength() const {
+    if (GetType().dynamics == GameType::Dynamics::kSimultaneous) {
+      // The history of simultaneous move games is flattened, so count number
+      // of actions of each player.
+      return MaxGameLength() * NumPlayers() + MaxChanceNodesInHistory();
+    }
+    if (GetType().dynamics == GameType::Dynamics::kSequential) {
+      return MaxGameLength() + MaxChanceNodesInHistory();
+    }
+    SpielFatalError("Unknown game dynamics.");
+  }
+
   // A string representation of the game, which can be passed to
   // DeserializeGame. The difference with Game::ToString is that it also
   // serializes internal RNG state used with sampled stochastic game

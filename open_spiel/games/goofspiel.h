@@ -140,6 +140,8 @@ class GoofspielGame : public Game {
   std::vector<int> InformationStateTensorShape() const override;
   std::vector<int> ObservationTensorShape() const override;
   int MaxGameLength() const override { return num_cards_; }
+  // TODO() make a tighter bound.
+  int MaxChanceNodesInHistory() const override { return MaxGameLength(); }
 
  private:
   int num_cards_;    // The K in Goofspiel(K)

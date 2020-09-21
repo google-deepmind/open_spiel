@@ -242,6 +242,8 @@ class ChessGame : public Game {
     return chess::ObservationTensorShape();
   }
   int MaxGameLength() const override { return chess::MaxGameLength(); }
+  // There aren't chance nodes in this game.
+  int MaxChanceNodesInHistory() const override { return 0; }
 };
 
 }  // namespace chess

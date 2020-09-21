@@ -104,6 +104,8 @@ class LewisSignalingGame : public Game {
   int MaxChanceOutcomes() const override { return num_states_; }
 
   int MaxGameLength() const override { return 2; }
+  // TODO() make a tighter bound.
+  int MaxChanceNodesInHistory() const override { return MaxGameLength(); }
 
   int NumPlayers() const override { return kDefaultNumPlayers; }
   double MaxUtility() const override {

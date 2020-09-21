@@ -69,7 +69,7 @@ const GameType kGameType{
     /*short_name=*/"coop_box_pushing",
     /*long_name=*/"Cooperative Box Pushing",
     GameType::Dynamics::kSimultaneous,
-    GameType::ChanceMode::kDeterministic,
+    GameType::ChanceMode::kExplicitStochastic,
     GameType::Information::kImperfectInformation,
     GameType::Utility::kIdentical,
     GameType::RewardModel::kRewards,

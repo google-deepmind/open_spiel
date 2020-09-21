@@ -100,6 +100,7 @@ class LiarsDiceGame : public Game {
   std::vector<int> InformationStateTensorShape() const override;
   std::vector<int> ObservationTensorShape() const override;
   int MaxGameLength() const override;
+  int MaxChanceNodesInHistory() const override;
 
   // Returns the maximum among how many dice each player has. For example,
   // if player 1 has 3 dice and player 2 has 2 dice, returns 3.

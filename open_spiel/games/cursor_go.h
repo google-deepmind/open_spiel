@@ -166,6 +166,8 @@ class CursorGoGame : public Game {
   int MaxGameLength() const override {
     return cursor_go::MaxGameLength(board_size_) * (1 + max_cursor_moves_);
   }
+  // There aren't chance nodes in this game.
+  int MaxChanceNodesInHistory() const override { return 0; }
 
  private:
   const float komi_;

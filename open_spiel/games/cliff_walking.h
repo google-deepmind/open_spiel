@@ -133,6 +133,8 @@ class CliffWalkingGame : public Game {
   double MaxUtility() const override { return -width_ - 1; }
   double MinUtility() const override { return -horizon_ + 1 - 100; }
   int MaxGameLength() const override { return horizon_; }
+  // There aren't chance nodes in this game.
+  int MaxChanceNodesInHistory() const override { return 0; }
   int Height() const { return height_; }
   int Width() const { return width_; }
 

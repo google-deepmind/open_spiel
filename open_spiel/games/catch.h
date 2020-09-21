@@ -107,6 +107,8 @@ class CatchGame : public Game {
   double MaxUtility() const override { return 1; }
   double MinUtility() const override { return -1; }
   int MaxGameLength() const override { return num_rows_; }
+  // There is only initial chance.
+  int MaxChanceNodesInHistory() const override { return 1; }
   int NumRows() const { return num_rows_; }
   int NumColumns() const { return num_columns_; }
 

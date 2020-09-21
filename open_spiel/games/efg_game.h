@@ -119,6 +119,9 @@ class EFGGame : public Game {
   double UtilitySum() const override;
   double MaxUtility() const override;
   int MaxGameLength() const override;
+  int MaxChanceNodesInHistory() const override;
+  int MaxMoveNumber() const override;
+  int MaxHistoryLength() const override;
 
   // Gets the player / decision node action associated to this label.
   Action GetAction(const std::string& label) const {

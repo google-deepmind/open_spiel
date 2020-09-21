@@ -89,6 +89,8 @@ class PigGame : public Game {
 
   // There is arbitrarily chosen number to ensure the game is finite.
   int MaxGameLength() const override { return horizon_; }
+  // TODO() make a tighter bound.
+  int MaxChanceNodesInHistory() const override { return MaxGameLength(); }
 
   int NumPlayers() const override { return num_players_; }
   double MinUtility() const override { return -1; }

@@ -79,6 +79,7 @@ class PenniesGame : public Game {
   double MaxUtility() const override { return 1; };
   double UtilitySum() const override { return 0; }
   int MaxGameLength() const override { return 2; }
+  int MaxChanceNodesInHistory() const override { return 1; }
 
   // New Observation API
   std::shared_ptr<Observer> MakeObserver(

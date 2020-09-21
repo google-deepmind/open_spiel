@@ -87,6 +87,8 @@ class TinyHanabiGame : public Game {
   double MinUtility() const override { return payoff_.MinUtility(); }
   double MaxUtility() const override { return payoff_.MaxUtility(); }
   int MaxGameLength() const override { return payoff_.NumPlayers(); }
+  // TODO() make a tighter bound.
+  int MaxChanceNodesInHistory() const override { return MaxGameLength(); }
   int MaxChanceOutcomes() const override { return payoff_.NumChance(); }
   std::vector<int> InformationStateTensorShape() const override {
     return {payoff_.NumChance() + payoff_.NumActions() * payoff_.NumPlayers()};

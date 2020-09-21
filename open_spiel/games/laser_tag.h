@@ -144,6 +144,8 @@ class LaserTagGame : public SimMoveGame {
   double UtilitySum() const override { return 0; }
   std::vector<int> ObservationTensorShape() const override;
   int MaxGameLength() const override { return horizon_; }
+  // TODO() make a tighter bound.
+  int MaxChanceNodesInHistory() const override { return MaxGameLength(); }
 
  private:
   Grid grid_;

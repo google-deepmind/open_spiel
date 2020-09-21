@@ -225,6 +225,8 @@ class UncontestedBiddingGame : public Game {
     return {kStateSize};
   }
   int MaxGameLength() const override { return kNumActions; }
+  // TODO() make a tighter bound.
+  int MaxChanceNodesInHistory() const override { return MaxGameLength(); }
   std::unique_ptr<State> DeserializeState(
       const std::string& str) const override;
   std::string GetRNGState() const;

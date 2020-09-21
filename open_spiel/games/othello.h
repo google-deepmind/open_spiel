@@ -153,6 +153,8 @@ class OthelloGame : public Game {
     return {kCellStates, kNumRows, kNumCols};
   }
   int MaxGameLength() const override { return kNumCells; }
+  // There aren't chance nodes in this game.
+  int MaxChanceNodesInHistory() const override { return 0; }
 };
 
 }  // namespace othello

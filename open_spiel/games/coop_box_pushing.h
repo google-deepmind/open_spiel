@@ -145,6 +145,8 @@ class CoopBoxPushingGame : public SimMoveGame {
   double MaxUtility() const override;
   std::vector<int> ObservationTensorShape() const override;
   int MaxGameLength() const override { return horizon_; }
+  // TODO() make a tighter bound.
+  int MaxChanceNodesInHistory() const override { return MaxGameLength(); }
 
  private:
   int horizon_;

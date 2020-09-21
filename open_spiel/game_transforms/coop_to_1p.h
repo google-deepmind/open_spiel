@@ -163,6 +163,8 @@ class CoopTo1pGame : public Game {
   int NumPlayers() const override { return 1; }
   std::vector<int> ObservationTensorShape() const override;
   int MaxGameLength() const override;
+  // TODO() make a tighter bound.
+  int MaxChanceNodesInHistory() const override { return MaxGameLength(); }
 
   int NumDistinctActions() const override {
     return game_->NumDistinctActions();

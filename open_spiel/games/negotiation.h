@@ -167,6 +167,8 @@ class NegotiationGame : public Game {
 
   // There is arbitrarily chosen number to ensure the game is finite.
   int MaxGameLength() const override;
+  // TODO() make a tighter bound.
+  int MaxChanceNodesInHistory() const override { return MaxGameLength(); }
 
   int NumPlayers() const override { return kNumPlayers; }
   double MaxUtility() const override {

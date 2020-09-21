@@ -109,6 +109,7 @@ class KuhnGame : public Game {
   std::vector<int> InformationStateTensorShape() const override;
   std::vector<int> ObservationTensorShape() const override;
   int MaxGameLength() const override { return num_players_ * 2 - 1; }
+  int MaxChanceNodesInHistory() const override { return num_players_; }
   std::shared_ptr<Observer> MakeObserver(
       absl::optional<IIGObservationType> iig_obs_type,
       const GameParameters& params) const override;

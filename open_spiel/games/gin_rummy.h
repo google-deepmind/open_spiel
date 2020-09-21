@@ -202,6 +202,8 @@ class GinRummyGame : public Game {
   }
   // All games should terminate before reaching this upper bound.
   int MaxGameLength() const override { return 300; }
+  // TODO() make a tighter bound.
+  int MaxChanceNodesInHistory() const override { return MaxGameLength(); }
 
  private:
   const bool oklahoma_;

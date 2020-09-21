@@ -172,6 +172,8 @@ class OwareGame : public Game {
   double MaxUtility() const override { return 1; }
 
   int MaxGameLength() const override { return kMaxGameLength; }
+  // There aren't chance nodes in this game.
+  int MaxChanceNodesInHistory() const override { return 0; }
   std::vector<int> ObservationTensorShape() const override;
 
  private:

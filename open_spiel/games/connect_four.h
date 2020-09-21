@@ -109,6 +109,8 @@ class ConnectFourGame : public Game {
     return {kCellStates, kRows, kCols};
   }
   int MaxGameLength() const override { return kNumCells; }
+  // There aren't chance nodes in this game.
+  int MaxChanceNodesInHistory() const override { return 0; }
 };
 
 inline std::ostream& operator<<(std::ostream& stream, const CellState& state) {

@@ -50,6 +50,8 @@ class OpenSpielHanabiGame : public Game {
   double MaxUtility() const override;
   std::vector<int> ObservationTensorShape() const override;
   int MaxGameLength() const override;
+  // TODO() make a tighter bound.
+  int MaxChanceNodesInHistory() const override { return MaxGameLength(); }
 
   const hanabi_learning_env::ObservationEncoder& Encoder() const {
     return encoder_;

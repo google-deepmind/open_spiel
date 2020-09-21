@@ -65,6 +65,8 @@ class RepeatedGame : public SimMoveGame {
                const GameParameters& params);
   std::unique_ptr<State> NewInitialState() const override;
   int MaxGameLength() const override { return num_repetitions_; }
+  // There aren't chance nodes in this game.
+  int MaxChanceNodesInHistory() const override { return 0; }
   int NumPlayers() const override { return stage_game_->NumPlayers(); }
   int NumDistinctActions() const override {
     return stage_game_->NumDistinctActions();

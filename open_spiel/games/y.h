@@ -189,6 +189,8 @@ class YGame : public Game {
     // Increase this by one if swap is ever implemented.
     return board_size_ * (board_size_ + 1) / 2;
   }
+  // There aren't chance nodes in this game.
+  int MaxChanceNodesInHistory() const override { return 0; }
 
  private:
   const int board_size_;
