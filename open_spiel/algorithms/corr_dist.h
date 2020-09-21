@@ -37,14 +37,14 @@ namespace algorithms {
 // samples a joint policy, then lets the players decide to follow or not follow
 // the recommendations.
 //
-// The definition we use here is closely in line with the field of AI's
-// interpretation of EFCEs, which allows for the alternative definition based on
-// causal deviations, described in (Gordon, Greenwald, and Marks '08),
-// (Dudik & Gordon '09), and (Farina & Sandholm '19). Specifically: if players
-// follow recommendations, they continue to receive recommendations. If a player
-// deviates, that player stops receiving recommendations from then on. The
-// incentive for a player to deviate toward a best response can be computed by
-// the existing best response algorithm in this new game.
+// The definition we use matches the common interpretation of EFCE's within AI
+// papers which are based on causal deviations described in (Gordon, Greenwald,
+// and Marks '08), (Dudik & Gordon '09), and (Farina & Sandholm '19).
+// Specifically: if players follow recommendations, they continue to receive
+// recommendations. If a player deviates, that player stops receiving
+// recommendations from then on. The incentive for a player to deviate toward a
+// best response can be computed by the existing best response algorithm in this
+// new game.
 //
 // In both cases of EFCE and EFCCE, the algorithms compute the normal-form
 // equivalents, and two wrapper functions are provided specifically for the
