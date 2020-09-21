@@ -106,7 +106,7 @@ void CFRShapleysCorrDistTest() {
     TabularPolicy current_policy =
         static_cast<CFRCurrentPolicy*>(solver.CurrentPolicy().get())
             ->AsTabular();
-    cd_builder.AddSampledJointPolicy(current_policy, 100);
+    cd_builder.AddMixedJointPolicy(current_policy);
     if (i % 10 == 0) {
       CorrelationDevice mu = cd_builder.GetCorrelationDevice();
       double afcce_dist = AFCCEDist(*game, config, mu);
