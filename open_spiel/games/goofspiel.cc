@@ -683,8 +683,8 @@ int GoofspielGame::MaxChanceOutcomes() const {
 std::vector<int> GoofspielGame::InformationStateTensorShape() const {
   if (impinfo_) {
     return {// 1-hot bit vector for point total per player; upper bound is 1 +
-        // 2 + ... + K = K*(K+1) / 2, but must add one to include 0 points.
-        num_players_ * ((num_cards_ * (num_cards_ + 1)) / 2 + 1) +
+            // 2 + ... + K = K*(K+1) / 2, but must add one to include 0 points.
+            num_players_ * ((num_cards_ * (num_cards_ + 1)) / 2 + 1) +
             // Bit vector for my remaining cards:
             num_cards_ +
             // A sequence of 1-hot bit vectors encoding the player who won that
@@ -696,8 +696,8 @@ std::vector<int> GoofspielGame::InformationStateTensorShape() const {
             num_cards_ * num_cards_};
   } else {
     return {// 1-hot bit vector for point total per player; upper bound is 1 +
-        // 2 + ... + K = K*(K+1) / 2, but must add one to include 0 points.
-        num_players_ * ((num_cards_ * (num_cards_ + 1)) / 2 + 1) +
+            // 2 + ... + K = K*(K+1) / 2, but must add one to include 0 points.
+            num_players_ * ((num_cards_ * (num_cards_ + 1)) / 2 + 1) +
             // A sequence of 1-hot bit vectors encoding the point card sequence
             num_cards_ * num_cards_ +
             // Bit vector for each card per player
@@ -717,7 +717,7 @@ std::vector<int> GoofspielGame::ObservationTensorShape() const {
   //   - current win sequence
   if (impinfo_) {
     return {// 1-hot bit to encode the current point card
-        num_cards_ +
+            num_cards_ +
             // 1-hot bit vector for point total per player; upper bound is 1 +
             // 2 + ... + K = K*(K+1) / 2, but must add one to include 0 points.
             num_players_ * ((num_cards_ * (num_cards_ + 1)) / 2 + 1) +
@@ -728,7 +728,7 @@ std::vector<int> GoofspielGame::ObservationTensorShape() const {
             num_cards_ * num_players_};
   } else {
     return {// 1-hot bit to encode the current point card
-        num_cards_ +
+            num_cards_ +
             // 1-hot bit vector for point total per player; upper bound is 1 +
             // 2 + ... + K = K*(K+1) / 2, but must add one to include 0 points.
             num_players_ * ((num_cards_ * (num_cards_ + 1)) / 2 + 1) +
