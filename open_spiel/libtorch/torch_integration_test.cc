@@ -16,8 +16,8 @@
 // - https://github.com/pytorch/examples/tree/master/cpp
 // - https://github.com/prabhuomkar/pytorch-cpp
 
-#include "//third_party/open_spiel/spiel_utils.h"
-#include "<torch/torch.h>"
+#include "open_spiel/spiel_utils.h"
+#include "torch/torch.h"
 
 namespace {
 
