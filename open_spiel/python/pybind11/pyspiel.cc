@@ -555,6 +555,7 @@ PYBIND11_MODULE(pyspiel, m) {
   // exceptions - the process will be terminated instead.
   open_spiel::SetErrorHandler(
       [](const std::string& string) { throw SpielException(string); });
+  py::register_exception<SpielException>(m, "SpielError", PyExc_RuntimeError);
 
   // Register other bits of the API.
   init_pyspiel_bots(m);                   // Bots and bot-related algorithms.

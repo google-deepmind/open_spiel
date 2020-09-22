@@ -148,7 +148,7 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None):
   default_observation = None
   try:
     default_observation = make_observation(game)
-  except (RuntimeError, ValueError):
+  except (pyspiel.SpielError, ValueError):
     pass
 
   infostate_observation = None
@@ -158,7 +158,7 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None):
   try:
     infostate_observation = make_observation(
         game, pyspiel.IIGObservationType(perfect_recall=True))
-  except (RuntimeError, ValueError):
+  except (pyspiel.SpielError, ValueError):
     pass
 
   public_observation = None
@@ -169,7 +169,7 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None):
             public_info=True,
             perfect_recall=False,
             private_info=pyspiel.PrivateInfoType.NONE))
-  except (RuntimeError, ValueError):
+  except (pyspiel.SpielError, ValueError):
     pass
 
   private_observation = None
@@ -180,7 +180,7 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None):
             public_info=False,
             perfect_recall=False,
             private_info=pyspiel.PrivateInfoType.SINGLE_PLAYER))
-  except (RuntimeError, ValueError):
+  except (pyspiel.SpielError, ValueError):
     pass
 
   add_line("")
@@ -220,7 +220,7 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None):
   add_line("MaxUtility() = {:.5}".format(game.max_utility()))
   try:
     utility_sum = game.utility_sum()
-  except RuntimeError:
+  except pyspiel.SpielError:
     utility_sum = None
   add_line("UtilitySum() = {}".format(utility_sum))
   if infostate_observation and infostate_observation.tensor is not None:
