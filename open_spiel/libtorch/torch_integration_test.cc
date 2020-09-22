@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Examples of how to use the C++ API:
+// - https://github.com/pytorch/examples/tree/master/cpp
+// - https://github.com/prabhuomkar/pytorch-cpp
+
 #include "//third_party/open_spiel/spiel_utils.h"
 #include "<torch/torch.h>"
 
