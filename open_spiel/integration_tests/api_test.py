@@ -179,7 +179,7 @@ class EnforceAPIOnFullTreeBase(parameterized.TestCase):
   def test_information_state_no_argument_raises_on_terminal_nodes(self):
     for state in self.all_states:
       if state.is_terminal():
-        with self.assertRaises(pyspiel.SpielError):
+        with self.assertRaises(RuntimeError):
           state.information_state_string()
 
   def test_game_is_perfect_recall(self):
@@ -221,9 +221,9 @@ class EnforceAPIOnFullTreeBase(parameterized.TestCase):
     def _assert_information_state_on_chance_nodes_raises(state):
 
       if state.is_chance_node():
-        with self.assertRaises(pyspiel.SpielError):
+        with self.assertRaises(RuntimeError):
           state.information_state_string()
-        with self.assertRaises(pyspiel.SpielError):
+        with self.assertRaises(RuntimeError):
           state.information_state_tensor()
 
     for state in self.all_states:
@@ -295,9 +295,9 @@ class EnforceAPIOnPartialTreeBase(parameterized.TestCase):
         for p in range(num_players):
           state.information_state_string(p)
         msg = f"information_state_string did not raise an error for {game_name}"
-        with self.assertRaisesRegex(pyspiel.SpielError, "player >= 0", msg=msg):
+        with self.assertRaisesRegex(RuntimeError, "player >= 0", msg=msg):
           state.information_state_string(-1)
-        with self.assertRaisesRegex(pyspiel.SpielError, "player <", msg=msg):
+        with self.assertRaisesRegex(RuntimeError, "player <", msg=msg):
           state.information_state_string(num_players + 1)
 
       if game_type.provides_information_state_tensor:
@@ -305,9 +305,9 @@ class EnforceAPIOnPartialTreeBase(parameterized.TestCase):
           v = state.information_state_tensor(p)
           self.assertLen(v, game.information_state_tensor_size())
         msg = f"information_state_tensor did not raise an error for {game_name}"
-        with self.assertRaisesRegex(pyspiel.SpielError, "player >= 0", msg=msg):
+        with self.assertRaisesRegex(RuntimeError, "player >= 0", msg=msg):
           state.information_state_tensor(-1)
-        with self.assertRaisesRegex(pyspiel.SpielError, "player <", msg=msg):
+        with self.assertRaisesRegex(RuntimeError, "player <", msg=msg):
           state.information_state_tensor(num_players + 1)
 
       if game_type.provides_observation_tensor:
@@ -315,18 +315,18 @@ class EnforceAPIOnPartialTreeBase(parameterized.TestCase):
           v = state.observation_tensor(p)
           self.assertLen(v, game.observation_tensor_size())
         msg = f"observation_tensor did not raise an error for {game_name}"
-        with self.assertRaisesRegex(pyspiel.SpielError, "player >= 0", msg=msg):
+        with self.assertRaisesRegex(RuntimeError, "player >= 0", msg=msg):
           state.observation_tensor(-1)
-        with self.assertRaisesRegex(pyspiel.SpielError, "player <", msg=msg):
+        with self.assertRaisesRegex(RuntimeError, "player <", msg=msg):
           state.observation_tensor(num_players + 1)
 
       if game_type.provides_observation_string:
         for p in range(num_players):
           state.observation_string(p)
         msg = f"observation_string did not raise an error for {game_name}"
-        with self.assertRaisesRegex(pyspiel.SpielError, "player >= 0", msg=msg):
+        with self.assertRaisesRegex(RuntimeError, "player >= 0", msg=msg):
           state.observation_string(-1)
-        with self.assertRaisesRegex(pyspiel.SpielError, "player <", msg=msg):
+        with self.assertRaisesRegex(RuntimeError, "player <", msg=msg):
           state.observation_string(num_players + 1)
 
   def test_legal_actions_returns_empty_list_on_opponent(self):
@@ -368,7 +368,7 @@ class EnforceAPIOnPartialTreeBase(parameterized.TestCase):
               public_info=False,
               perfect_recall=False,
               private_info=pyspiel.PrivateInfoType.SINGLE_PLAYER))
-    except (pyspiel.SpielError, ValueError):
+    except (RuntimeError, ValueError):
       return
 
     player_has_private_info = [False] * self.game.num_players()
@@ -395,7 +395,7 @@ class EnforceAPIOnPartialTreeBase(parameterized.TestCase):
               public_info=True,
               perfect_recall=False,
               private_info=pyspiel.PrivateInfoType.NONE))
-    except (ValueError, pyspiel.SpielError):
+    except (ValueError, RuntimeError):
       return
 
     for state in self.some_states:
