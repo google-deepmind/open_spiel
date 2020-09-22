@@ -84,7 +84,7 @@ int GetBeliefHistorySize(HistoryDistribution* beliefs) {
   for (int i = 0; i < beliefs->first.size(); ++i) {
     belief_history_size =
         std::max(belief_history_size,
-                 static_cast<int>(beliefs->first[i]->History().size()));
+                 static_cast<int>(beliefs->first[i]->FullHistory().size()));
   }
   return belief_history_size;
 }

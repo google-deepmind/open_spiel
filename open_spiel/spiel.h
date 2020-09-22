@@ -352,7 +352,7 @@ class State {
   }
 
   // The full (player, action) history.
-  std::vector<PlayerAction> FullHistory() const { return history_; }
+  const std::vector<PlayerAction>& FullHistory() const { return history_; }
 
   // A string representation for the history. There should be a one to one
   // mapping between histories (i.e. sequences of actions for all players,
