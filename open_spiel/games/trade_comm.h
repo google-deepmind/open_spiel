@@ -97,7 +97,7 @@ class TradeCommGame : public Game {
   int MaxChanceOutcomes() const override { return num_items_ * num_items_; }
 
   int MaxGameLength() const override { return 4; }
-  // TODO() make a tighter bound.
+  // TODO: verify whether this bound is tight and/or tighten it.
   int MaxChanceNodesInHistory() const override { return MaxGameLength(); }
 
   int NumPlayers() const override { return kDefaultNumPlayers; }

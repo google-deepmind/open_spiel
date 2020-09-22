@@ -87,7 +87,7 @@ class TinyBridgeGame2p : public Game {
   double MinUtility() const override { return -40; }  // Bid 2NT, 0 tricks
   double MaxUtility() const override { return 35; }   // Bid 2NT, 2 tricks
   int MaxGameLength() const override { return 8; }
-  // TODO() make a tighter bound.
+  // TODO: verify whether this bound is tight and/or tighten it.
   int MaxChanceNodesInHistory() const override { return MaxGameLength(); }
   int MaxChanceOutcomes() const override { return kNumPrivates; }
   std::vector<int> InformationStateTensorShape() const override {
@@ -113,7 +113,7 @@ class TinyBridgeGame4p : public Game {
   double UtilitySum() const override { return 0; }
   double MaxUtility() const override { return 160; }
   int MaxGameLength() const override { return 57; }
-  // TODO() make a tighter bound.
+  // TODO: verify whether this bound is tight and/or tighten it.
   int MaxChanceNodesInHistory() const override { return MaxGameLength(); }
   int MaxChanceOutcomes() const override { return kNumPrivates; }
   std::vector<int> InformationStateTensorShape() const override {

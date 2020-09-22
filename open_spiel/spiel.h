@@ -759,7 +759,11 @@ class Game : public std::enable_shared_from_this<Game> {
 
   // The maximum number of chance nodes occurring in any history of the game.
   // This is typically something like the number of times dice are rolled.
-  virtual int MaxChanceNodesInHistory() const = 0;
+  virtual int MaxChanceNodesInHistory() const {
+    // This function is not a pure virtual like MaxGameLength()
+    // for compatibility reasons.
+    SpielFatalError("MaxChanceNodesInHistory() is not implemented");
+  }
 
   // The maximum number of moves in the game. The value State::MoveNumber()
   // must never be higher than this value.

@@ -218,7 +218,7 @@ class SkatGame : public Game {
   double MaxUtility() const override { return  1.0; }
   double UtilitySum() const override { return 0; }
   int MaxGameLength() const override { return kNumCards + kNumPlayers; }
-  // TODO() make a tighter bound.
+  // TODO: verify whether this bound is tight and/or tighten it.
   int MaxChanceNodesInHistory() const override { return MaxGameLength(); }
   int MaxChanceOutcomes() const override { return kNumCards; }
   std::vector<int> ObservationTensorShape() const override {
