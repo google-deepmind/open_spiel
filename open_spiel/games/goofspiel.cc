@@ -131,63 +131,39 @@ class GoofspielObserver : public Observer {
     SPIEL_CHECK_LT(player, game.NumPlayers());
     std::string result;
 
-    if (game.IsImpInfo()
-        && iig_obs_type_.private_info == PrivateInfoType::kSinglePlayer) {
-      // Only my hand
-      absl::StrAppend(&result, "P", player, " hand: ");
-      for (int c = 0; c < game.NumCards(); ++c) {
-        if (state.player_hands_[player][c])
-          absl::StrAppend(&result, c + 1, " ");
-      }
-      absl::StrAppend(&result, "\n");
+    // List all predicates.
+    const bool imp_info = game.IsImpInfo();
+    const bool pub_info = iig_obs_type_.public_info;
+    const bool perf_rec = iig_obs_type_.perfect_recall;
+    const bool priv_one =
+        iig_obs_type_.private_info == PrivateInfoType::kSinglePlayer;
 
-      if (iig_obs_type_.perfect_recall) {
-        // Also show the player's sequence. We need this to ensure perfect
-        // recall because two betting sequences can lead to the same hand and
-        // outcomes if the opponent chooses differently.
-        absl::StrAppend(&result, "P", player, " action sequence: ");
-        for (int i = 0; i < state.actions_history_.size(); ++i) {
-          absl::StrAppend(&result, state.actions_history_[i][player], " ");
-        }
-        absl::StrAppend(&result, "\n");
-      }
+    // Conditionally write each field.
+    // This is done in a backwards-compatible way.
+    if (imp_info && priv_one && perf_rec) {  // InformationState
+      StringPlayerHand(game, state, player, &result);
+      StringActionSequence(game, state, player, &result);
+      StringPointCardSequence(state, &result);
+      StringWinSequence(state, &result);
+      StringPoints(game, state, &result);
+      return result;
+    }
+    if (imp_info && priv_one && !perf_rec) {  // Observation
+      StringCurrentPointCard(state, &result);
+      StringPoints(game, state, &result);
+      StringPlayerHand(game, state, player, &result);
+      StringWinSequence(state, &result);
+      return result;
     }
 
-    if (iig_obs_type_.public_info) {
-      if (iig_obs_type_.perfect_recall) {
-        absl::StrAppend(&result, "Point card sequence: ");
-        for (int i = 0; i < state.point_card_sequence_.size(); ++i) {
-          absl::StrAppend(&result, 1 + state.point_card_sequence_[i], " ");
-        }
-        absl::StrAppend(&result, "\n");
-      } else {
-        absl::StrAppend(&result, "Current point card: ",
-                        state.CurrentPointValue(), "\n");
-      }
-
-      if (!game.IsImpInfo()) {
-        // Show the hands in the perfect info case.
-        for (auto p = Player{0}; p < game.NumPlayers(); ++p) {
-          absl::StrAppend(&result, "P", p, " hand: ");
-          for (int c = 0; c < game.NumCards(); ++c) {
-            if (state.player_hands_[p][c])
-              absl::StrAppend(&result, c + 1, " ");
-          }
-          absl::StrAppend(&result, "\n");
-        }
-      }
-
-      absl::StrAppend(&result, "Win sequence: ");
-      for (int i = 0; i < state.win_sequence_.size(); ++i) {
-        absl::StrAppend(&result, state.win_sequence_[i], " ");
-      }
-      absl::StrAppend(&result, "\n");
-
-      absl::StrAppend(&result, "Points: ");
-      for (auto p = Player{0}; p < game.NumPlayers(); ++p) {
-        absl::StrAppend(&result, state.points_[p], " ");
-      }
-      absl::StrAppend(&result, "\n");
+    // Remaining public observation requests.
+    if (pub_info && perf_rec)
+      StringPointCardSequence(state, &result);
+    if (pub_info && !perf_rec) StringCurrentPointCard(state, &result);
+    if (pub_info && !imp_info) StringPlayersHands(game, state, &result);
+    if (pub_info) {
+      StringWinSequence(state, &result);
+      StringPoints(game, state, &result);
     }
     return result;
   }
@@ -272,6 +248,74 @@ class GoofspielObserver : public Observer {
     for (int round = 0; round < state.actions_history_.size(); ++round) {
       out.at(round, state.actions_history_[round][player]) = 1.0;
     }
+  }
+
+  void StringPlayerHand(const GoofspielGame& game, const GoofspielState& state,
+                        int player, std::string* result) const {
+    // Only my hand
+    absl::StrAppend(result, "P", player, " hand: ");
+    for (int c = 0; c < game.NumCards(); ++c) {
+      if (state.player_hands_[player][c])
+        absl::StrAppend(result, c + 1, " ");
+    }
+    absl::StrAppend(result, "\n");
+  }
+
+  void StringActionSequence(const GoofspielGame& game,
+                            const GoofspielState& state,
+                            int player, std::string* result) const {
+    // Also show the player's sequence. We need this to ensure perfect
+    // recall because two betting sequences can lead to the same hand and
+    // outcomes if the opponent chooses differently.
+    absl::StrAppend(result, "P", player, " action sequence: ");
+    for (int i = 0; i < state.actions_history_.size(); ++i) {
+      absl::StrAppend(result, state.actions_history_[i][player], " ");
+    }
+    absl::StrAppend(result, "\n");
+
+  }
+  void StringPointCardSequence(const GoofspielState& state,
+                               std::string* result) const {
+    absl::StrAppend(result, "Point card sequence: ");
+    for (int i = 0; i < state.point_card_sequence_.size(); ++i) {
+      absl::StrAppend(result, 1 + state.point_card_sequence_[i], " ");
+    }
+    absl::StrAppend(result, "\n");
+  }
+  void StringCurrentPointCard(const GoofspielState& state,
+                              std::string* result) const {
+    absl::StrAppend(result, "Current point card: ",
+                    state.CurrentPointValue(), "\n");
+
+  }
+  void StringPlayersHands(const GoofspielGame& game,
+                          const GoofspielState& state,
+                          std::string* result) const {
+    // Show the hands in the perfect info case.
+    for (auto p = Player{0}; p < game.NumPlayers(); ++p) {
+      absl::StrAppend(result, "P", p, " hand: ");
+      for (int c = 0; c < game.NumCards(); ++c) {
+        if (state.player_hands_[p][c])
+          absl::StrAppend(result, c + 1, " ");
+      }
+      absl::StrAppend(result, "\n");
+    }
+  }
+  void StringWinSequence(const GoofspielState& state,
+                         std::string* result) const {
+    absl::StrAppend(result, "Win sequence: ");
+    for (int i = 0; i < state.win_sequence_.size(); ++i) {
+      absl::StrAppend(result, state.win_sequence_[i], " ");
+    }
+    absl::StrAppend(result, "\n");
+  }
+  void StringPoints(const GoofspielGame& game, const GoofspielState& state,
+                    std::string* result) const {
+    absl::StrAppend(result, "Points: ");
+    for (auto p = Player{0}; p < game.NumPlayers(); ++p) {
+      absl::StrAppend(result, state.points_[p], " ");
+    }
+    absl::StrAppend(result, "\n");
   }
 
   IIGObservationType iig_obs_type_;

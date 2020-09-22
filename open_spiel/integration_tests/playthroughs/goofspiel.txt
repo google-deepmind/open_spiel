@@ -78,11 +78,11 @@ InformationStateTensor(1).player_action_sequence: ◯◯◯◯
                                                   ◯◯◯◯
                                                   ◯◯◯◯
                                                   ◯◯◯◯
-ObservationString(0) = "P0 hand: 1 2 3 4 \nCurrent point card: 4\nWin sequence: \nPoints: 0 0 \n"
-ObservationString(1) = "P1 hand: 1 2 3 4 \nCurrent point card: 4\nWin sequence: \nPoints: 0 0 \n"
+ObservationString(0) = "Current point card: 4\nPoints: 0 0 \nP0 hand: 1 2 3 4 \nWin sequence: \n"
+ObservationString(1) = "Current point card: 4\nPoints: 0 0 \nP1 hand: 1 2 3 4 \nWin sequence: \n"
 PublicObservationString() = "Current point card: 4\nWin sequence: \nPoints: 0 0 \n"
-PrivateObservationString(0) = "P0 hand: 1 2 3 4 \n"
-PrivateObservationString(1) = "P1 hand: 1 2 3 4 \n"
+PrivateObservationString(0) = "Current point card: 4\nPoints: 0 0 \nP0 hand: 1 2 3 4 \nWin sequence: \n"
+PrivateObservationString(1) = "Current point card: 4\nPoints: 0 0 \nP1 hand: 1 2 3 4 \nWin sequence: \n"
 ObservationTensor(0).current_point_card: ◯◯◯◉
 ObservationTensor(0).point_totals: ◉◯◯◯◯◯◯◯◯◯◯
                                    ◉◯◯◯◯◯◯◯◯◯◯
@@ -154,11 +154,11 @@ InformationStateTensor(1).player_action_sequence: ◯◯◯◉
                                                   ◯◯◯◯
                                                   ◯◯◯◯
                                                   ◯◯◯◯
-ObservationString(0) = "P0 hand: 1 2 4 \nCurrent point card: 3\nWin sequence: 1 \nPoints: 0 4 \n"
-ObservationString(1) = "P1 hand: 1 2 3 \nCurrent point card: 3\nWin sequence: 1 \nPoints: 0 4 \n"
+ObservationString(0) = "Current point card: 3\nPoints: 0 4 \nP0 hand: 1 2 4 \nWin sequence: 1 \n"
+ObservationString(1) = "Current point card: 3\nPoints: 0 4 \nP1 hand: 1 2 3 \nWin sequence: 1 \n"
 PublicObservationString() = "Current point card: 3\nWin sequence: 1 \nPoints: 0 4 \n"
-PrivateObservationString(0) = "P0 hand: 1 2 4 \n"
-PrivateObservationString(1) = "P1 hand: 1 2 3 \n"
+PrivateObservationString(0) = "Current point card: 3\nPoints: 0 4 \nP0 hand: 1 2 4 \nWin sequence: 1 \n"
+PrivateObservationString(1) = "Current point card: 3\nPoints: 0 4 \nP1 hand: 1 2 3 \nWin sequence: 1 \n"
 ObservationTensor(0).current_point_card: ◯◯◉◯
 ObservationTensor(0).point_totals: ◉◯◯◯◯◯◯◯◯◯◯
                                    ◯◯◯◯◉◯◯◯◯◯◯
@@ -230,11 +230,11 @@ InformationStateTensor(1).player_action_sequence: ◯◯◯◉
                                                   ◉◯◯◯
                                                   ◯◯◯◯
                                                   ◯◯◯◯
-ObservationString(0) = "P0 hand: 1 4 \nCurrent point card: 2\nWin sequence: 1 0 \nPoints: 3 4 \n"
-ObservationString(1) = "P1 hand: 2 3 \nCurrent point card: 2\nWin sequence: 1 0 \nPoints: 3 4 \n"
+ObservationString(0) = "Current point card: 2\nPoints: 3 4 \nP0 hand: 1 4 \nWin sequence: 1 0 \n"
+ObservationString(1) = "Current point card: 2\nPoints: 3 4 \nP1 hand: 2 3 \nWin sequence: 1 0 \n"
 PublicObservationString() = "Current point card: 2\nWin sequence: 1 0 \nPoints: 3 4 \n"
-PrivateObservationString(0) = "P0 hand: 1 4 \n"
-PrivateObservationString(1) = "P1 hand: 2 3 \n"
+PrivateObservationString(0) = "Current point card: 2\nPoints: 3 4 \nP0 hand: 1 4 \nWin sequence: 1 0 \n"
+PrivateObservationString(1) = "Current point card: 2\nPoints: 3 4 \nP1 hand: 2 3 \nWin sequence: 1 0 \n"
 ObservationTensor(0).current_point_card: ◯◉◯◯
 ObservationTensor(0).point_totals: ◯◯◯◉◯◯◯◯◯◯◯
                                    ◯◯◯◯◉◯◯◯◯◯◯
@@ -306,11 +306,11 @@ InformationStateTensor(1).player_action_sequence: ◯◯◯◉
                                                   ◉◯◯◯
                                                   ◯◉◯◯
                                                   ◯◯◉◯
-ObservationString(0) = "P0 hand: \nCurrent point card: 1\nWin sequence: 1 0 0 1 \nPoints: 5 5 \n"
-ObservationString(1) = "P1 hand: \nCurrent point card: 1\nWin sequence: 1 0 0 1 \nPoints: 5 5 \n"
+ObservationString(0) = "Current point card: 1\nPoints: 5 5 \nP0 hand: \nWin sequence: 1 0 0 1 \n"
+ObservationString(1) = "Current point card: 1\nPoints: 5 5 \nP1 hand: \nWin sequence: 1 0 0 1 \n"
 PublicObservationString() = "Current point card: 1\nWin sequence: 1 0 0 1 \nPoints: 5 5 \n"
-PrivateObservationString(0) = "P0 hand: \n"
-PrivateObservationString(1) = "P1 hand: \n"
+PrivateObservationString(0) = "Current point card: 1\nPoints: 5 5 \nP0 hand: \nWin sequence: 1 0 0 1 \n"
+PrivateObservationString(1) = "Current point card: 1\nPoints: 5 5 \nP1 hand: \nWin sequence: 1 0 0 1 \n"
 ObservationTensor(0).current_point_card: ◉◯◯◯
 ObservationTensor(0).point_totals: ◯◯◯◯◯◉◯◯◯◯◯
                                    ◯◯◯◯◯◉◯◯◯◯◯
