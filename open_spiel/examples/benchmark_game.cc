@@ -24,7 +24,8 @@
 ABSL_FLAG(std::string, game, "tic_tac_toe", "The name of the game to play.");
 ABSL_FLAG(int, sims, 1000, "How many simulations to run.");
 ABSL_FLAG(int, attempts, 5, "How many sets of simulations to run.");
-ABSL_FLAG(bool, verbose, false, "How many sets of simulations to run.");
+ABSL_FLAG(bool, verbose, false,
+          "Boolean flag indicating whether to print all simulation info.");
 
 namespace open_spiel {
 
@@ -39,9 +40,12 @@ int RandomSimulation(std::mt19937* rng, const Game& game, bool verbose) {
 
   bool provides_info_state = game.GetType().provides_information_state_tensor;
   bool provides_observations = game.GetType().provides_observation_tensor;
-  std::vector<float> obs(provides_observations
-                             ? game.ObservationTensorSize()
-                             : game.InformationStateTensorSize());
+  std::vector<float> obs;
+  if (provides_info_state) {
+    obs = std::vector<float>(game.InformationStateTensorSize());
+  } else if (provides_observations) {
+    obs = std::vector<float>(game.ObservationTensorSize());
+  }
 
   int game_length = 0;
   while (!state->IsTerminal()) {
@@ -53,9 +57,16 @@ int RandomSimulation(std::mt19937* rng, const Game& game, bool verbose) {
     }
     ++game_length;
     if (state->IsChanceNode()) {
-      // Chance node; sample one according to underlying distribution
       std::vector<std::pair<Action, double>> outcomes = state->ChanceOutcomes();
-      Action action = SampleAction(outcomes, *rng).first;
+      Action action;
+      if (game.GetType().chance_mode ==
+          GameType::ChanceMode::kSampledStochastic) {
+        action = outcomes.front().first;
+      } else {
+        // Explicit chance node; sample one according to underlying
+        // distribution.
+        action = SampleAction(outcomes, *rng).first;
+      }
       if (verbose) {
         std::cout << "Sampled outcome: "
                   << state->ActionToString(kChancePlayerId, action)
