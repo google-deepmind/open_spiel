@@ -111,6 +111,6 @@ When you add a new conditional dependency, you need to touch:
 
 For complex games it may be tricky to get all the details right. Reading through
 the playthrough You can visualize small game trees using
-`[open_spiel/python/examples/treeviz_example.py](https://github.com/deepmind/open_spiel/blob/master/open_spiel/python/examples/treeviz_example.py)` or for large
+[open_spiel/python/examples/treeviz_example.py](https://github.com/deepmind/open_spiel/blob/master/open_spiel/python/examples/treeviz_example.py) or for large
 games there is an interactive viewer for OpenSpiel games called
 [SpielViz](https://github.com/michalsustr/spielviz).
