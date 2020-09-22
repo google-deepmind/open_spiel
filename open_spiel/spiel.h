@@ -972,6 +972,7 @@ DeserializeGameAndState(const std::string& serialized_state);
 std::string GameTypeToString(const GameType& game_type);
 GameType GameTypeFromString(const std::string& game_type_str);
 
+std::ostream& operator<<(std::ostream& os, const State::PlayerAction& action);
 }  // namespace open_spiel
 
 #endif  // OPEN_SPIEL_SPIEL_H_

@@ -26,6 +26,7 @@
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/abseil-cpp/absl/random/distributions.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_format.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_split.h"
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
@@ -730,6 +731,12 @@ void State::InformationStateTensor(Player player,
 
 bool State::PlayerAction::operator==(const PlayerAction& other) const {
   return player == other.player && action == other.action;
+}
+
+std::ostream& operator<<(std::ostream& os, const State::PlayerAction& action) {
+  os << absl::StreamFormat("PlayerAction(player=%i,action=%i)", action.player,
+                           action.action);
+  return os;
 }
 
 }  // namespace open_spiel
