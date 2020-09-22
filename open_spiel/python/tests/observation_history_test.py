@@ -42,9 +42,9 @@ def state_from_sequence(game, action_sequence):
 class ObservationHistoryTest(absltest.TestCase):
 
   def test_invalid_aoh_construction_raises_error(self):
-    with self.assertRaises(pyspiel.SpielError):
+    with self.assertRaises(RuntimeError):
       pyspiel.ActionObservationHistory(0, ["not tuple"])
-    with self.assertRaises(pyspiel.SpielError):
+    with self.assertRaises(RuntimeError):
       pyspiel.ActionObservationHistory(0, [("tuple", "too", "long")])
     with self.assertRaises(RuntimeError):
       pyspiel.ActionObservationHistory(0, [("not int", "obs")])
