@@ -64,11 +64,11 @@ template <typename T>
 std::ostream& operator<<(std::ostream& stream, const std::optional<T>& v);
 std::ostream& operator<<(std::ostream& stream, const std::nullopt_t& v);
 template <typename T>
-std::ostream& operator<<(std::ostream& stream, absl::Span<const T> v);
+std::ostream& operator<<(std::ostream& stream, absl::Span<T> v);
 
 // Actual template implementations.
 template <typename T>
-std::ostream& operator<<(std::ostream& stream, absl::Span<const T> v) {
+std::ostream& operator<<(std::ostream& stream, absl::Span<T> v) {
   stream << "[";
   for (const auto& element : v) {
     stream << element << " ";
@@ -76,7 +76,6 @@ std::ostream& operator<<(std::ostream& stream, absl::Span<const T> v) {
   stream << "]";
   return stream;
 }
-// Actual template implementations.
 template <typename T>
 std::ostream& operator<<(std::ostream& stream, const std::vector<T>& v) {
   return stream << absl::MakeSpan(v);
