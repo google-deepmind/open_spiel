@@ -106,8 +106,6 @@ class DeepSeaGame : public Game {
   double MaxUtility() const override { return 1 - unscaled_move_cost_; }
   double MinUtility() const override { return -unscaled_move_cost_; }
   int MaxGameLength() const override { return size_; }
-  // There aren't chance nodes in this game.
-  int MaxChanceNodesInHistory() const override { return 0; }
 
   double UnscaledMoveCost() const { return unscaled_move_cost_; }
 

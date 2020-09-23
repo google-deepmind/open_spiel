@@ -154,8 +154,6 @@ class GoGame : public Game {
   double MaxUtility() const override { return WinUtility(); }
 
   int MaxGameLength() const override { return max_game_length_; }
-  // There aren't chance nodes in this game.
-  int MaxChanceNodesInHistory() const override { return 0; }
 
  private:
   const float komi_;

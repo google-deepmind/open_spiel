@@ -95,8 +95,6 @@ class OshiZumoGame : public Game {
   double UtilitySum() const override { return 0; }
   std::vector<int> ObservationTensorShape() const override;
   int MaxGameLength() const override { return horizon_; }
-  // There aren't chance nodes in this game.
-  int MaxChanceNodesInHistory() const override { return 0; }
 
   // Access to game parameters.
   int horizon() const { return horizon_; }

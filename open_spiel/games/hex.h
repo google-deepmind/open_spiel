@@ -111,8 +111,6 @@ class HexGame : public Game {
     return {kCellStates, board_size_, board_size_};
   }
   int MaxGameLength() const override { return board_size_ * board_size_; }
-  // There aren't chance nodes in this game.
-  int MaxChanceNodesInHistory() const override { return 0; }
 
  private:
   const int board_size_;

@@ -233,8 +233,7 @@ class BridgeGame : public Game {
     return UseDoubleDummyResult() ? kMaxAuctionLength
                                   : kMaxAuctionLength + kNumCards;
   }
-  // TODO: make a tighter bound.
-  int MaxChanceNodesInHistory() const override { return MaxGameLength(); }
+  int MaxChanceNodesInHistory() const override { return kNumCards; }
 
   std::unique_ptr<State> DeserializeState(
       const std::string& str) const override;

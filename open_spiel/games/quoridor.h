@@ -172,8 +172,6 @@ class QuoridorGame : public Game {
     // all squares.
     return kMaxGameLengthFactor * board_size_ * board_size_;
   }
-  // There aren't chance nodes in this game.
-  int MaxChanceNodesInHistory() const override { return 0; }
 
  private:
   int Diameter() const { return board_size_ * 2 - 1; }

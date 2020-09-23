@@ -134,8 +134,6 @@ class TinyBridgePlayGame : public Game {
   double MinUtility() const override { return 0; }
   double MaxUtility() const override { return kNumTricks; }
   int MaxGameLength() const override { return 8; }
-  // There aren't chance nodes in this game.
-  int MaxChanceNodesInHistory() const override { return 0; }
 };
 
 // State of an in-progress auction, either 2p or 4p.

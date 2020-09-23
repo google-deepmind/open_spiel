@@ -222,8 +222,6 @@ class HavannahGame : public Game {
     return Diameter() * Diameter() - board_size_ * (board_size_ - 1) +
            allow_swap_;
   }
-  // There aren't chance nodes in this game.
-  int MaxChanceNodesInHistory() const override { return 0; }
 
  private:
   int Diameter() const { return board_size_ * 2 - 1; }

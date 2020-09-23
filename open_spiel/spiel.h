@@ -760,8 +760,9 @@ class Game : public std::enable_shared_from_this<Game> {
   // The maximum number of chance nodes occurring in any history of the game.
   // This is typically something like the number of times dice are rolled.
   virtual int MaxChanceNodesInHistory() const {
-    // This function is not a pure virtual like MaxGameLength()
-    // for compatibility reasons.
+    if (GetType().chance_mode == GameType::ChanceMode::kDeterministic) {
+      return 0;
+    }
     SpielFatalError("MaxChanceNodesInHistory() is not implemented");
   }
 

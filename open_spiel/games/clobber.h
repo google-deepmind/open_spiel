@@ -151,8 +151,6 @@ class ClobberGame : public Game {
   // piece with their last piece. Therefore, there is still one piece on
   // the board. Hence, the maximum number of moves is # of cells - 1.
   int MaxGameLength() const override { return rows_ * columns_ - 1; }
-  // There aren't chance nodes in this game.
-  int MaxChanceNodesInHistory() const override { return 0; }
 
  private:
   int rows_;

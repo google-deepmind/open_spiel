@@ -113,8 +113,6 @@ class PhantomTTTGame : public Game {
   std::vector<int> InformationStateTensorShape() const override;
   std::vector<int> ObservationTensorShape() const override;
   int MaxGameLength() const override { return kLongestSequence; }
-  // There aren't chance nodes in this game.
-  int MaxChanceNodesInHistory() const override { return 0; }
 
  private:
   std::shared_ptr<const tic_tac_toe::TicTacToeGame> game_;
