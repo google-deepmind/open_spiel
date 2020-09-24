@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPEN_SPIEL_GAMES_TAROK_TAROK_PYBIND11_H_
-#define OPEN_SPIEL_GAMES_TAROK_TAROK_PYBIND11_H_
+#ifndef OPEN_SPIEL_PYTHON_PYBIND11_GAMES_TAROK_H_
+#define OPEN_SPIEL_PYTHON_PYBIND11_GAMES_TAROK_H_
 
 #include "pybind11/include/pybind11/pybind11.h"
 
 namespace open_spiel {
 
-void init_pyspiel_tarok(::pybind11::module& m);
+void init_pyspiel_games_tarok(::pybind11::module& m);
 
 }  // namespace open_spiel
 
-#endif  // OPEN_SPIEL_GAMES_TAROK_TAROK_PYBIND11_H_
+#endif  // OPEN_SPIEL_PYTHON_PYBIND11_GAMES_TAROK_H_

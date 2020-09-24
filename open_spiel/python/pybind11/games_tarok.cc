@@ -20,7 +20,7 @@ namespace open_spiel {
 
 namespace py = ::pybind11;
 
-void init_pyspiel_tarok(py::module& m) {
+void init_pyspiel_games_tarok(py::module& m) {
   // state object
   py::class_<tarok::TarokState, State> tarok_state(m, "TarokState");
   tarok_state.def("card_action_to_string",
