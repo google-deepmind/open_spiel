@@ -5,47 +5,380 @@ we verified against known values and/or reproduced results from papers.
 
 <font color="orange"><b>~</b></font>: implemented but lightly tested.
 
-| Game                                                                                                | History     | Format             | Information           | Deterministic?   | Players   | Status                                       | Reference                                                                                                                                                                                                                                                                                                                                                        | Summary                                                                                                                                                |
-|-----------------------------------------------------------------------------------------------------|-------------|--------------------|-----------------------|------------------|-----------|----------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Backgammon                                                                                          | traditional | custom             | perfect               | no               | 2         | ![](_static/green_circ10.png "green circle") | [Wikipedia](https://en.wikipedia.org/wiki/Backgammon)                                                                                                                                                                                                                                                                                                            | Players move their pieces through the board based on the rolls of dice.                                                                                |
-| Breakthrough                                                                                        | modern      | pieces on grid     | perfect               | yes              | 2         | ![](_static/green_circ10.png "green circle") | [Wikipedia](https://en.wikipedia.org/wiki/Breakthrough_\(board_game\))                                                                                                                                                                                                                                                                                           | Simplified chess using only pawns.                                                                                                                     |
-| Bridge                                                                                              | traditional | cards              | imperfect             | no               | 4         | ![](_static/green_circ10.png "green circle") | [Wikipedia](https://en.wikipedia.org/wiki/Contract_bridge)                                                                                                                                                                                                                                                                                                       | A card game where players compete in pairs.                                                                                                            |
-| (Uncontested) Bridge bidding                                                                        | research    | cards              | imperfect             | no               | 2         | ![](_static/green_circ10.png "green circle") | [Wikipedia](https://en.wikipedia.org/wiki/Contract_bridge)                                                                                                                                                                                                                                                                                                       | Players score points by forming specific sets with the cards in their hands.                                                                           |
-| Catch                                                                                               | research    | screen             | perfect               | no               | 1         | <font color="orange"><b>~</b></font>         | [Mnih et al. 2014, Recurrent Models of Visual Attention](https://papers.nips.cc/paper/5542-recurrent-models-of-visual-attention.pdf),<br>[Osband et al '19, Behaviour Suite for Reinforcement Learning, Appendix A](https://arxiv.org/abs/1908.03568)                                                                                                            | Agent must move horizontally to 'catch' a descending ball. Designed to test basic learning.                                                            |
-| Cliff Walking                                                                                       | research    | agent on grid      | perfect               | yes              | 1         | <font color="orange"><b>~</b></font>         | [Sutton et al. '18, page 132](http://www.incompleteideas.net/book/bookdraft2018mar21.pdf)                                                                                                                                                                                                                                                                        | Agent must find goal without falling off a cliff. Designed to demonstrate exploration-with-danger.                                                     |
-| Clobber                                                                                             | research    | pieces on grid     | perfect               | yes              | 2         | <font color="orange"><b>~</b></font>         | [Wikipedia](https://en.wikipedia.org/wiki/Clobber)                                                                                                                                                                                                                                                                                                               | Simplified checkers, where tokens can capture neighbouring tokens. Designed to be amenable to combinatorial analysis.                                  |
-| Coin Game                                                                                           | research    | agent on grid      | perfect, incomplete   | no               | 2         | <font color="orange"><b>~</b></font>         | [Raileanu et al. '18, Modeling Others using Oneself in Multi-Agent Reinforcement Learning](https://arxiv.org/abs/1802.09640)                                                                                                                                                                                                                                     | Agents must collect their and their collaborator's tokens while avoiding a third kind of token. Designed to test divining of collaborator's intentions |
-| Connect Four                                                                                        | traditional | tokens on grid     | perfect               | yes              | 2         | ![](_static/green_circ10.png "green circle") | [Wikipedia](https://en.wikipedia.org/wiki/Connect_Four)                                                                                                                                                                                                                                                                                                          | Players drop tokens into columns to try and form a pattern.                                                                                            |
-| Cooperative Box-Pushing                                                                             | research    | agent on grid      | perfect               | yes              | 2         | <font color="orange"><b>~</b></font>         | [Seuken & Zilberstein '12, Improved Memory-Bounded Dynamic Programming for Decentralized POMDPs](https://arxiv.org/abs/1206.5295)                                                                                                                                                                                                                                | Agents must collaborate to push a box into the goal. Designed to test collaboration.                                                                   |
-| Chess                                                                                               | traditional | pieces on grid     | perfect               | yes              | 2         | ![](_static/green_circ10.png "green circle") | [Wikipedia](https://en.wikipedia.org/wiki/Chess)                                                                                                                                                                                                                                                                                                                 | Players move pieces around the board with the goal of eliminating the opposing pieces.                                                                 |
-| Deep Sea                                                                                            | research    | agent on grid      | perfect               | yes              | 1         | <font color="orange"><b>~</b></font>         | [Osband et al. '17, Deep Exploration via Randomized Value Functions](https://arxiv.org/abs/1703.07608)                                                                                                                                                                                                                                                           | Agent must explore to find reward (first version) or penalty (second version). Designed to test exploration.                                           |
-| First-price <br /> Sealed-bid Auction                                                               | research    | bidding            | imperfect, incomplete | no               | 2-10      | ![](_static/green_circ10.png "green circle") | [Wikipedia](https://en.wikipedia.org/wiki/First-price_sealed-bid_auction)                                                                                                                                                                                                                                                                                        | Agents submit bids simultaneously; highest bid wins, and that's the price paid.                                                                        |
-| Gin Rummy                                                                                           | traditional | cards              | imperfect             | no               | 2         | ![](_static/green_circ10.png "green circle") | [Wikipedia](https://en.wikipedia.org/wiki/Gin_rummy)                                                                                                                                                                                                                                                                                                             | Players score points by forming specific sets with the cards in their hands.                                                                           |
-| Go                                                                                                  | traditional | tokens on grid     | perfect               | yes              | 2         | ![](_static/green_circ10.png "green circle") | [Wikipedia](https://en.wikipedia.org/wiki/Go_\(game\))                                                                                                                                                                                                                                                                                                           | Players place tokens on the board with the goal of encircling territory.                                                                               |
-| Goofspiel                                                                                           | traditional | cards              | imperfect             | no               | 2-10      | ![](_static/green_circ10.png "green circle") | [Wikipedia](https://en.wikipedia.org/wiki/Goofspiel)                                                                                                                                                                                                                                                                                                             | Players bid with their cards to win other cards.                                                                                                       |
-| Hanabi (via [Hanabi Learning Environment](https://github.com/deepmind/hanabi-learning-environment)) | modern      | custom             | imperfect             | no               | 2-5       | ![](_static/green_circ10.png "green circle") | [Wikipedia](https://en.wikipedia.org/wiki/Hanabi_\(card_game\)) and [Bard et al. '19, The Hanabi Challenge: A New Frontier for AI Research](https://arxiv.org/abs/1902.00506)                                                                                                                                                                                    | Players can see only other player's pieces, and everyone must cooperate to win.                                                                        |
-| Havannah                                                                                            | modern      | tokens on hex grid | perfect               | yes              | 2         | ![](_static/green_circ10.png "green circle") | [Wikipedia](https://en.wikipedia.org/wiki/Havannah)                                                                                                                                                                                                                                                                                                              | Players add tokens to a hex grid to try and form a winning structure.                                                                                  |
-| Hearts                                                                                              | traditional | cards              | imperfect             | no               | 3-6       | <font color="orange"><b>~</b></font>         | [Wikipedia](https://en.wikipedia.org/wiki/Hearts_\(card_game\))                                                                                                                                                                                                                                                                                                  | A card game where players try to avoid playing the highest card in each round.                                                                         |
-| Hex                                                                                                 | modern      | tokens on hex grid | perfect               | yes              | 2         | <font color="orange"><b>~</b></font>         | [Wikipedia](https://en.wikipedia.org/wiki/Hex_\(board_game\))                                                                                                                                                                                                                                                                                                    | Players add tokens to a hex grid to try and link opposite sides of the board.                                                                          |
-| Kuhn poker                                                                                          | research    | cards with bidding | imperfect             | no               | 2         | ![](_static/green_circ10.png "green circle") | [Wikipedia](https://en.wikipedia.org/wiki/Kuhn_poker)                                                                                                                                                                                                                                                                                                            | Simplified poker amenable to game-theoretic analysis.                                                                                                  |
-| Laser Tag                                                                                           | research    | agent on grid      | imperfect             | no               | 2         | <font color="orange"><b>~</b></font>         | [Leibo et al. '17](https://arxiv.org/abs/1702.03037), [Lanctot et al. '17](https://arxiv.org/abs/1711.00832)                                                                                                                                                                                                                                                     | Agents see a local part of the grid, and attempt to tag eachother with beams.                                                                          |
-| Leduc poker                                                                                         | research    | cards with bidding | imperfect             | no               | 2         | ![](_static/green_circ10.png "green circle") | [Southey et al. '05, Bayes’ bluff: Opponent modelling in poker](https://arxiv.org/abs/1207.1411)                                                                                                                                                                                                                                                                 | Simplified poker amenable to game-theoretic analysis.                                                                                                  |
-| Lewis Signaling                                                                                     | research    | custom             | imperfect             | no               | 2         | <font color="orange"><b>~</b></font>         | [Wikipedia](https://en.wikipedia.org/wiki/Lewis_signaling_game)                                                                                                                                                                                                                                                                                                  | Receiver must choose an action dependent on the sender's hidden state. Designed to demonstrate the use of conventions.                                 |
-| Liar's Dice                                                                                         | traditional | dice with bidding  | imperfect             | no               | 2         | ![](_static/green_circ10.png "green circle") | [Wikipedia](https://en.wikipedia.org/wiki/Liar%27s_dice)                                                                                                                                                                                                                                                                                                         | Players bid and bluff on the state of all the dice together, given only the state of their dice.                                                       |
-| Markov Soccer                                                                                       | research    | agent on grid      | imperfect             | no               | 2         | <font color="orange"><b>~</b></font>         | [Littman '94, Markov games as a framework for multi-agent reinforcement learning](https://www2.cs.duke.edu/courses/spring07/cps296.3/littman94markov.pdf),<br>[He et al. '16, Opponent Modeling in Deep Reinforcement Learning](https://arxiv.org/abs/1609.05559)                                                                                                | Agents must take the ball to their goal, and can 'tackle' the opponent by predicting their next move.                                                  |
-| Matching Pennies <br />(three-player)                                                               | research    | custom             | imperfect             | yes              | 3         | ![](_static/green_circ10.png "green circle") | "Three problems in learning mixed-strategy Nash equilibria"                                                                                                                                                                                                                                                                                                      | Players must predict and match/oppose another player. Designed to have an unstable Nash equilibrium.                                                   |
-| Negotiation                                                                                         | research    | custom             | imperfect             | no               | 2         | ![](_static/green_circ10.png "green circle") | [Lewis et al. '17](https://arxiv.org/abs/1706.05125), [Cao et al. '18](https://arxiv.org/abs/1804.03980)                                                                                                                                                                                                                                                         | Agents with different utilities must negotiate an allocation of resources.                                                                             |
-| Oshi-Zumo                                                                                           | traditional | custom             | imperfect             | yes              | 2         | ![](_static/green_circ10.png "green circle") | [Buro, 2004. Solving the oshi-zumo game](https://link.springer.com/chapter/10.1007/978-0-387-35706-5_23) <br> [Bosansky et al. '16, Algorithms for Computing Strategies in Two-Player Simultaneous Move Games](http://mlanctot.info/files/papers/aij-2psimmove.pdf)                                                                                              | Players must repeatedly bid to push a token off the other side of the board.                                                                           |
-| Oware                                                                                               | traditional | custom             | perfect               | yes              | 2         | ![](_static/green_circ10.png "green circle") | [Wikipedia](https://en.wikipedia.org/wiki/Oware)                                                                                                                                                                                                                                                                                                                 | Players redistribute tokens from their half of the board to capture tokens in the opponent's part of the board.                                        |
-| Pentago                                                                                             | modern      | tokens on grid     | perfect               | yes              | 2         | ![](_static/green_circ10.png "green circle") | [Wikipedia](https://en.wikipedia.org/wiki/Pentago)                                                                                                                                                                                                                                                                                                               | Players place tokens on the board, then rotate part of the board to a new orientation.                                                                 |
-| Phantom Tic-Tac-Toe                                                                                 | research    | tokens on grid     | imperfect             | yes              | 2         | <font color="orange"><b>~</b></font>         | [Auger '11, Multiple Tree for Partially Observable Monte-Carlo Tree Search](https://hal.archives-ouvertes.fr/hal-00563480v2/document),<br>[Lisy '14, Alternative Selection Functions for Information Set Monte Carlo Tree Search](https://core.ac.uk/download/pdf/81646968.pdf), <br>[Lanctot '13](http://mlanctot.info/files/papers/PhD_Thesis_MarcLanctot.pdf) | Tic-tac-toe, except the opponent's tokens are hidden. Designed as a simple, imperfect-information game.                                                |
-| Pig                                                                                                 | traditional | dice               | perfect               | no               | 2-10      | ![](_static/green_circ10.png "green circle") | [Wikipedia](https://en.wikipedia.org/wiki/Pig_\(dice_game\))                                                                                                                                                                                                                                                                                                     | Each player rolls a dice until they get a 1 or they 'hold'; the rolled total is added to their score.                                                  |
-| Poker (Hold'em, via [ACPC](http://www.computerpokercompetition.org/) code base)                     | traditional | cards with bidding | imperfect             | no               | 2-10      | <font color="orange"><b>~</b></font>         | [Wikipedia](https://en.wikipedia.org/wiki/Texas_hold_%27em)                                                                                                                                                                                                                                                                                                      | Players bet on whether their hand of cards plus some communal cards will form a special set.                                                           |
-| Quoridor                                                                                            | modern      | custom on grid     | perfect               | yes              | 2-4       | ![](_static/green_circ10.png "green circle") | [Wikipedia](https://en.wikipedia.org/wiki/Quoridor)                                                                                                                                                                                                                                                                                                              | Each turn, players can either move their agent or add a small wall to the board.                                                                       |
-| Skat (simplified bidding)                                                                           | traditional | cards with bidding | imperfect             | no               | 3         | <font color="orange"><b>~</b></font>         | [Wikipedia](https://en.wikipedia.org/wiki/Skat_\(card_game\))                                                                                                                                                                                                                                                                                                    | A card game where each turn, players bid to play compete against the other two players.                                                                |
-| Solitaire (K+)                                                                                      | traditional | cards              | imperfect             | no               | 1         | <font color="orange"><b>~</b></font>         | [Wikipedia](https://en.wikipedia.org/wiki/Klondike_\(solitaire\)) and [Bjarnason et al. '07, Searching solitaire in real time](http://web.engr.oregonstate.edu/~afern/papers/solitaire.pdf)                                                                                                                                                                      | A single-player card game.                                                                                                                             |
-| Tic-Tac-Toe                                                                                         | traditional | tokens on grid     | perfect               | yes              | 2         | ![](_static/green_circ10.png "green circle") | [Wikipedia](https://en.wikipedia.org/wiki/Tic-tac-toe)                                                                                                                                                                                                                                                                                                           | Players place tokens to try and form a pattern.                                                                                                        |
-| Tiny Bridge                                                                                         | research    | cards with bidding | imperfect             | no               | 2, 4      | ![](_static/green_circ10.png "green circle") |                                                                                                                                                                                                                                                                                                                                                                  | Simplified Bridge with fewer cards and tricks.                                                                                                         |
-| Tiny Hanabi                                                                                         | research    | custom             | imperfect             | no               | 2-10      | ![](_static/green_circ10.png "green circle") | [Foerster et al 2018, Bayesian Action Decoder for Deep Multi-Agent Reinforcement Learning](https://arxiv.org/abs/1811.01458)                                                                                                                                                                                                                                     | Simplified Hanabi with just two turns.                                                                                                                 |
-| Trade Comm                                                                                          | research    | custom             | imperfect             | no               | 2         | ![](_static/green_circ10.png "green circle") | A simple emergent communication game based on trading.                                                                                                                                                                                                                                                                                                           | Players with different utilities and items communicate and then trade.                                                                                 |
-| Y                                                                                                   | modern      | tokens on hex grid | perfect               | yes              | 2         | ![](_static/green_circ10.png "green circle") | [Wikipedia](https://en.wikipedia.org/wiki/Y_\(game\))                                                                                                                                                                                                                                                                                                            | Players place tokens to try and connect sides of a triangular board.                                                                                   |
+* ![](_static/green_circ10.png "green circle") Backgammon
+  * Idiosyncratic format.
+  * Players move their pieces through the board based on the rolls of dice.
+  * Traditional game.
+  * Deterministic.
+  * Perfect information.
+  * 2 players.
+  * [Wikipedia](https://en.wikipedia.org/wiki/Backgammon)
+    
+* ![](_static/green_circ10.png "green circle") Breakthrough
+  * Uses pieces on a grid.
+  * Simplified chess using only pawns.
+  * Modern game.
+  * Deterministic.
+  * Perfect information.
+  * 2 players.
+  * [Wikipedia](https://en.wikipedia.org/wiki/Breakthrough_\(board_game\))
+    
+* ![](_static/green_circ10.png "green circle") Bridge
+  * Card game.
+  * A card game where players compete in pairs.
+  * Traditional game.
+  * Deterministic.
+  * Imperfect information.
+  * 4 players.
+  * [Wikipedia](https://en.wikipedia.org/wiki/Contract_bridge)
+    
+* ![](_static/green_circ10.png "green circle") (Uncontested) Bridge bidding
+  * Card game.
+  * Players score points by forming specific sets with the cards in their hands.
+  * Research-originated.
+  * Deterministic.
+  * Imperfect information.
+  * 2 players.
+  * [Wikipedia](https://en.wikipedia.org/wiki/Contract_bridge)
+    
+* <font color="orange"><b>~</b></font> Catch
+  * Uses an agent on a grid.
+  * Agent must move horizontally to 'catch' a descending ball. Designed to test basic learning.
+  * Research-originated.
+  * Deterministic.
+  * Perfect information.
+  * 1 players.
+  * [Mnih et al. 2014, Recurrent Models of Visual Attention](https://papers.nips.cc/paper/5542-recurrent-models-of-visual-attention.pdf),<br>[Osband et al '19, Behaviour Suite for Reinforcement Learning, Appendix A](https://arxiv.org/abs/1908.03568)
+    
+* <font color="orange"><b>~</b></font> Cliff Walking
+  * Uses an agent on a grid.
+  * Agent must find goal without falling off a cliff. Designed to demonstrate exploration-with-danger.
+  * Research-originated.
+  * Deterministic.
+  * Perfect information.
+  * 1 players.
+  * [Sutton et al. '18, page 132](http://www.incompleteideas.net/book/bookdraft2018mar21.pdf)
+    
+* <font color="orange"><b>~</b></font> Clobber
+  * Uses pieces on a grid.
+  * Simplified checkers, where tokens can capture neighbouring tokens. Designed to be amenable to combinatorial analysis.
+  * Research-originated.
+  * Deterministic.
+  * Perfect information.
+  * 2 players.
+  * [Wikipedia](https://en.wikipedia.org/wiki/Clobber)
+    
+* <font color="orange"><b>~</b></font> Coin Game
+  * Uses agents on a grid.
+  * Agents must collect their and their collaborator's tokens while avoiding a third kind of token. Designed to test divining of collaborator's intentions
+  * Research-originated.
+  * Deterministic.
+  * Perfect, incomplete information.
+  * 2 players.
+  * [Raileanu et al. '18, Modeling Others using Oneself in Multi-Agent Reinforcement Learning](https://arxiv.org/abs/1802.09640)
+    
+* ![](_static/green_circ10.png "green circle") Connect Four
+  * Uses tokens on a grid.
+  * Players drop tokens into columns to try and form a pattern.
+  * Traditional game.
+  * Deterministic.
+  * Perfect information.
+  * 2 players.
+  * [Wikipedia](https://en.wikipedia.org/wiki/Connect_Four)
+    
+* <font color="orange"><b>~</b></font> Cooperative Box-Pushing
+  * Uses agents on a grid.
+  * Agents must collaborate to push a box into the goal. Designed to test collaboration.
+  * Research-originated.
+  * Deterministic.
+  * Perfect information.
+  * 2 players.
+  * [Seuken & Zilberstein '12, Improved Memory-Bounded Dynamic Programming for Decentralized POMDPs](https://arxiv.org/abs/1206.5295)
+    
+* ![](_static/green_circ10.png "green circle") Chess
+  * Uses pieces on a grid.
+  * Players move pieces around the board with the goal of eliminating the opposing pieces.
+  * Traditional game.
+  * Deterministic.
+  * Perfect information.
+  * 2 players.
+  * [Wikipedia](https://en.wikipedia.org/wiki/Chess)
+    
+* <font color="orange"><b>~</b></font> Deep Sea
+  * Uses an agent on a grid.
+  * Agent must explore to find reward (first version) or penalty (second version). Designed to test exploration.
+  * Research-originated.
+  * Deterministic.
+  * Perfect information.
+  * 1 players.
+  * [Osband et al. '17, Deep Exploration via Randomized Value Functions](https://arxiv.org/abs/1703.07608)
+    
+* ![](_static/green_circ10.png "green circle") First-price sealed-bid Auction
+  * Idiosyncratic format.
+  * Agents submit bids simultaneously; highest bid wins, and that's the price paid.
+  * Research-originated.
+  * Deterministic.
+  * Imperfect, incomplete information.
+  * 2-10 players.
+  * [Wikipedia](https://en.wikipedia.org/wiki/First-price_sealed-bid_auction)
+    
+* ![](_static/green_circ10.png "green circle") Gin Rummy
+  * Card game.
+  * Players score points by forming specific sets with the cards in their hands.
+  * Traditional game.
+  * Deterministic.
+  * Imperfect information.
+  * 2 players.
+  * [Wikipedia](https://en.wikipedia.org/wiki/Gin_rummy)
+    
+* ![](_static/green_circ10.png "green circle") Go
+  * Uses tokens on a grid.
+  * Players place tokens on the board with the goal of encircling territory.
+  * Traditional game.
+  * Deterministic.
+  * Perfect information.
+  * 2 players.
+  * [Wikipedia](https://en.wikipedia.org/wiki/Go_\(game\))
+    
+* ![](_static/green_circ10.png "green circle") Goofspiel
+  * Card game.
+  * Players bid with their cards to win other cards.
+  * Traditional game.
+  * Deterministic.
+  * Imperfect information.
+  * 2-10 players.
+  * [Wikipedia](https://en.wikipedia.org/wiki/Goofspiel)
+    
+* ![](_static/green_circ10.png "green circle") Hanabi (via [Hanabi Learning Environment](https://github.com/deepmind/hanabi-learning-environment))
+  * Idiosyncratic format.
+  * Players can see only other player's pieces, and everyone must cooperate to win.
+  * Modern game.
+  * Deterministic.
+  * Imperfect information.
+  * 2-5 players.
+  * [Wikipedia](https://en.wikipedia.org/wiki/Hanabi_\(card_game\)) and [Bard et al. '19, The Hanabi Challenge: A New Frontier for AI Research](https://arxiv.org/abs/1902.00506)
+    
+* ![](_static/green_circ10.png "green circle") Havannah
+  * Uses tokens on a hex grid.
+  * Players add tokens to a hex grid to try and form a winning structure.
+  * Modern game.
+  * Deterministic.
+  * Perfect information.
+  * 2 players.
+  * [Wikipedia](https://en.wikipedia.org/wiki/Havannah)
+    
+* <font color="orange"><b>~</b></font> Hearts
+  * Card game.
+  * A card game where players try to avoid playing the highest card in each round.
+  * Traditional game.
+  * Deterministic.
+  * Imperfect information.
+  * 3-6 players.
+  * [Wikipedia](https://en.wikipedia.org/wiki/Hearts_\(card_game\))
+    
+* <font color="orange"><b>~</b></font> Hex
+  * Uses tokens on a hex grid.
+  * Players add tokens to a hex grid to try and link opposite sides of the board.
+  * Modern game.
+  * Deterministic.
+  * Perfect information.
+  * 2 players.
+  * [Wikipedia](https://en.wikipedia.org/wiki/Hex_\(board_game\))
+    
+* ![](_static/green_circ10.png "green circle") Kuhn poker
+  * Cards with bidding.
+  * Simplified poker amenable to game-theoretic analysis.
+  * Research-originated.
+  * Deterministic.
+  * Imperfect information.
+  * 2 players.
+  * [Wikipedia](https://en.wikipedia.org/wiki/Kuhn_poker)
+    
+* <font color="orange"><b>~</b></font> Laser Tag
+  * Uses agents on a grid.
+  * Agents see a local part of the grid, and attempt to tag eachother with beams.
+  * Research-originated.
+  * Deterministic.
+  * Imperfect information.
+  * 2 players.
+  * [Leibo et al. '17](https://arxiv.org/abs/1702.03037), [Lanctot et al. '17](https://arxiv.org/abs/1711.00832)
+    
+* ![](_static/green_circ10.png "green circle") Leduc poker
+  * Cards with bidding.
+  * Simplified poker amenable to game-theoretic analysis.
+  * Research-originated.
+  * Deterministic.
+  * Imperfect information.
+  * 2 players.
+  * [Southey et al. '05, Bayes’ bluff: Opponent modelling in poker](https://arxiv.org/abs/1207.1411)
+    
+* <font color="orange"><b>~</b></font> Lewis Signaling
+  * Idiosyncratic format.
+  * Receiver must choose an action dependent on the sender's hidden state. Designed to demonstrate the use of conventions.
+  * Research-originated.
+  * Deterministic.
+  * Imperfect information.
+  * 2 players.
+  * [Wikipedia](https://en.wikipedia.org/wiki/Lewis_signaling_game)
+    
+* ![](_static/green_circ10.png "green circle") Liar's Dice
+  * Dice with bidding.
+  * Players bid and bluff on the state of all the dice together, given only the state of their dice.
+  * Traditional game.
+  * Deterministic.
+  * Imperfect information.
+  * 2 players.
+  * [Wikipedia](https://en.wikipedia.org/wiki/Liar%27s_dice)
+    
+* <font color="orange"><b>~</b></font> Markov Soccer
+  * Uses agents on a grid.
+  * Agents must take the ball to their goal, and can 'tackle' the opponent by predicting their next move.
+  * Research-originated.
+  * Deterministic.
+  * Imperfect information.
+  * 2 players.
+  * [Littman '94, Markov games as a framework for multi-agent reinforcement learning](https://www2.cs.duke.edu/courses/spring07/cps296.3/littman94markov.pdf),<br>[He et al. '16, Opponent Modeling in Deep Reinforcement Learning](https://arxiv.org/abs/1609.05559)
+    
+* ![](_static/green_circ10.png "green circle") Matching Pennies (three-player)
+  * Idiosyncratic format.
+  * Players must predict and match/oppose another player. Designed to have an unstable Nash equilibrium.
+  * Research-originated.
+  * Deterministic.
+  * Imperfect information.
+  * 3 players.
+  * "Three problems in learning mixed-strategy Nash equilibria"
+    
+* ![](_static/green_circ10.png "green circle") Negotiation
+  * Idiosyncratic format.
+  * Agents with different utilities must negotiate an allocation of resources.
+  * Research-originated.
+  * Deterministic.
+  * Imperfect information.
+  * 2 players.
+  * [Lewis et al. '17](https://arxiv.org/abs/1706.05125), [Cao et al. '18](https://arxiv.org/abs/1804.03980)
+    
+* ![](_static/green_circ10.png "green circle") Oshi-Zumo
+  * Idiosyncratic format.
+  * Players must repeatedly bid to push a token off the other side of the board. 
+  * Traditional game.
+  * Deterministic.
+  * Imperfect information.
+  * 2 players.
+  * [Buro, 2004. Solving the oshi-zumo game](https://link.springer.com/chapter/10.1007/978-0-387-35706-5_23) <br> [Bosansky et al. '16, Algorithms for Computing Strategies in Two-Player Simultaneous Move Games](http://mlanctot.info/files/papers/aij-2psimmove.pdf)
+    
+* ![](_static/green_circ10.png "green circle") Oware
+  * Idiosyncratic format.
+  * Players redistribute tokens from their half of the board to capture tokens in the opponent's part of the board.
+  * Traditional game.
+  * Deterministic.
+  * Perfect information.
+  * 2 players.
+  * [Wikipedia](https://en.wikipedia.org/wiki/Oware)
+    
+* ![](_static/green_circ10.png "green circle") Pentago
+  * Uses tokens on a grid.
+  * Players place tokens on the board, then rotate part of the board to a new orientation.
+  * Modern game.
+  * Deterministic.
+  * Perfect information.
+  * 2 players.
+  * [Wikipedia](https://en.wikipedia.org/wiki/Pentago)
+    
+* <font color="orange"><b>~</b></font> Phantom Tic-Tac-Toe
+  * Uses tokens on a grid.
+  * Tic-tac-toe, except the opponent's tokens are hidden. Designed as a simple, imperfect-information game.
+  * Research-originated.
+  * Deterministic.
+  * Imperfect information.
+  * 2 players.
+  * [Auger '11, Multiple Tree for Partially Observable Monte-Carlo Tree Search](https://hal.archives-ouvertes.fr/hal-00563480v2/document),<br>[Lisy '14, Alternative Selection Functions for Information Set Monte Carlo Tree Search](https://core.ac.uk/download/pdf/81646968.pdf), <br>[Lanctot '13](http://mlanctot.info/files/papers/PhD_Thesis_MarcLanctot.pdf)
+    
+* ![](_static/green_circ10.png "green circle") Pig
+  * Dice game.
+  * Each player rolls a dice until they get a 1 or they 'hold'; the rolled total is added to their score.
+  * Traditional game.
+  * Deterministic.
+  * Perfect information.
+  * 2-10 players.
+  * [Wikipedia](https://en.wikipedia.org/wiki/Pig_\(dice_game\))
+    
+* <font color="orange"><b>~</b></font> Poker (Hold'em, via [ACPC](http://www.computerpokercompetition.org/) code base)
+  * Cards with bidding.
+  * Players bet on whether their hand of cards plus some communal cards will form a special set.
+  * Traditional game.
+  * Deterministic.
+  * Imperfect information.
+  * 2-10 players.
+  * [Wikipedia](https://en.wikipedia.org/wiki/Texas_hold_%27em)
+    
+* ![](_static/green_circ10.png "green circle") Quoridor
+  * Idiosyncratic format.
+  * Each turn, players can either move their agent or add a small wall to the board.
+  * Modern game.
+  * Deterministic.
+  * Perfect information.
+  * 2-4 players.
+  * [Wikipedia](https://en.wikipedia.org/wiki/Quoridor)
+    
+* <font color="orange"><b>~</b></font> Skat (simplified bidding)
+  * Cards with bidding.
+  * A card game where each turn, players bid to play compete against the other two players.
+  * Traditional game.
+  * Deterministic.
+  * Imperfect information.
+  * 3 players.
+  * [Wikipedia](https://en.wikipedia.org/wiki/Skat_\(card_game\))
+    
+* <font color="orange"><b>~</b></font> Solitaire (K+)
+  * Card game.
+  * A single-player card game.
+  * Traditional game.
+  * Deterministic.
+  * Imperfect information.
+  * 1 players.
+  * [Wikipedia](https://en.wikipedia.org/wiki/Klondike_\(solitaire\)) and [Bjarnason et al. '07, Searching solitaire in real time](http://web.engr.oregonstate.edu/~afern/papers/solitaire.pdf)
+    
+* ![](_static/green_circ10.png "green circle") Tic-Tac-Toe
+  * Uses tokens on a grid.
+  * Players place tokens to try and form a pattern.
+  * Traditional game.
+  * Deterministic.
+  * Perfect information.
+  * 2 players.
+  * [Wikipedia](https://en.wikipedia.org/wiki/Tic-tac-toe)
+    
+* ![](_static/green_circ10.png "green circle") Tiny Bridge
+  * Cards with bidding.
+  * Simplified Bridge with fewer cards and tricks.
+  * Research-originated.
+  * Deterministic.
+  * Imperfect information.
+  * 2, 4 players.
+  * 
+    
+* ![](_static/green_circ10.png "green circle") Tiny Hanabi
+  * Idiosyncratic format.
+  * Simplified Hanabi with just two turns.
+  * Research-originated.
+  * Deterministic.
+  * Imperfect information.
+  * 2-10 players.
+  * [Foerster et al 2018, Bayesian Action Decoder for Deep Multi-Agent Reinforcement Learning](https://arxiv.org/abs/1811.01458)
+    
+* ![](_static/green_circ10.png "green circle") Trade Comm
+  * Idiosyncratic format.
+  * Players with different utilities and items communicate and then trade.
+  * Research-originated.
+  * Deterministic.
+  * Imperfect information.
+  * 2 players.
+  * A simple emergent communication game based on trading.
+    
+* ![](_static/green_circ10.png "green circle") Y
+  * Tokens on hex grid.
+  * Players place tokens to try and connect sides of a triangular board.
+  * Modern game.
+  * Deterministic.
+  * Perfect information.
+  * 2 players.
+  * [Wikipedia](https://en.wikipedia.org/wiki/Y_\(game\))
