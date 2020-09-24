@@ -38,22 +38,24 @@ int RandomSimulation(std::mt19937* rng, const Game& game, bool verbose) {
               << state->ToString() << std::endl;
   }
 
-  bool provides_info_state = game.GetType().provides_information_state_tensor;
-  bool provides_observations = game.GetType().provides_observation_tensor;
+  bool provides_info_state_tensor =
+      game.GetType().provides_information_state_tensor;
+  bool provides_observations_tensor =
+      game.GetType().provides_observation_tensor;
   std::vector<float> obs;
-  if (provides_info_state) {
+  if (provides_info_state_tensor) {
     obs = std::vector<float>(game.InformationStateTensorSize());
-  } else if (provides_observations) {
+  } else if (provides_observations_tensor) {
     obs = std::vector<float>(game.ObservationTensorSize());
   }
 
   int game_length = 0;
   while (!state->IsTerminal()) {
-    if (provides_observations && state->CurrentPlayer() >= 0) {
-      state->ObservationTensor(state->CurrentPlayer(), absl::MakeSpan(obs));
-    } else if (provides_info_state && state->CurrentPlayer() >= 0) {
+    if (provides_info_state_tensor && state->CurrentPlayer() >= 0) {
       state->InformationStateTensor(state->CurrentPlayer(),
                                     absl::MakeSpan(obs));
+    } else if (provides_observations_tensor && state->CurrentPlayer() >= 0) {
+      state->ObservationTensor(state->CurrentPlayer(), absl::MakeSpan(obs));
     }
     ++game_length;
     if (state->IsChanceNode()) {
