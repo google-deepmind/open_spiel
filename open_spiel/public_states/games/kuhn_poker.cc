@@ -107,7 +107,7 @@ int KuhnPrivateInformation::NetworkIndex() const {
 bool KuhnPrivateInformation::IsStateCompatible(const State& state) const {
   const auto kuhn_state =
       open_spiel::down_cast<const base_kuhn::KuhnState&>(state);
-  if (kuhn_state.History().size() < player_ && player_card_ == kNoCardDealt)
+  if (kuhn_state.FullHistory().size() < player_ && player_card_ == kNoCardDealt)
     return true;
   if (kuhn_state.CardDealt().at(player_) == player_card_) return true;
   return false;
