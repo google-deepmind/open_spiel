@@ -112,16 +112,18 @@ void CardDeckShufflingSeedTest() {
   SPIEL_CHECK_EQ(state2->PlayerCards(0), state4->PlayerCards(0));
 }
 
-void DealtCardsSizeTest() {
-  auto [talon, players_cards] = DealCards(3, 42);
+void DealtCardsSizeTest(int num_players) {
+  auto [talon, players_cards] = DealCards(num_players, 42);
   SPIEL_CHECK_EQ(talon.size(), 6);
+  int num_cards_per_player = 48 / num_players;
   for (auto const& player_cards : players_cards) {
-    SPIEL_CHECK_EQ(player_cards.size(), 16);
+    SPIEL_CHECK_EQ(player_cards.size(), num_cards_per_player);
   }
 }
 
-void DealtCardsContentTest() {
-  auto [talon, players_cards] = DealCards(3, 42);
+void DealtCardsContentTest(int num_players) {
+  // 3 players
+  auto [talon, players_cards] = DealCards(num_players, 42);
   // flatten and sort all the dealt cards
   std::vector<int> all_dealt_cards(talon.begin(), talon.end());
   for (auto const& player_cards : players_cards) {
@@ -1400,8 +1402,10 @@ int main(int argc, char** argv) {
   open_spiel::tarok::BasicGameTests();
   // cards tests
   open_spiel::tarok::CardDeckShufflingSeedTest();
-  open_spiel::tarok::DealtCardsSizeTest();
-  open_spiel::tarok::DealtCardsContentTest();
+  open_spiel::tarok::DealtCardsSizeTest(3);
+  open_spiel::tarok::DealtCardsSizeTest(4);
+  open_spiel::tarok::DealtCardsContentTest(3);
+  open_spiel::tarok::DealtCardsContentTest(4);
   open_spiel::tarok::PlayersCardsSortedTest();
   open_spiel::tarok::CountCardsTest();
   open_spiel::tarok::CardDealingPhaseTest();
