@@ -27,6 +27,7 @@
 #include "open_spiel/abseil-cpp/absl/strings/str_format.h"
 #include "open_spiel/simultaneous_move_game.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_utils.h"
 
 namespace open_spiel::algorithms {
 namespace {
@@ -79,12 +80,12 @@ void AdvanceBeliefHistoryOneAction(HistoryDistribution* previous, Action action,
   Normalize(absl::MakeSpan(previous->second));
 }
 
-int GetBeliefHistorySize(HistoryDistribution* beliefs) {
+int GetBeliefHistorySize(const HistoryDistribution& beliefs) {
   int belief_history_size = 0;
-  for (int i = 0; i < beliefs->first.size(); ++i) {
+  for (int i = 0; i < beliefs.first.size(); ++i) {
     belief_history_size =
         std::max(belief_history_size,
-                 static_cast<int>(beliefs->first[i]->FullHistory().size()));
+                 static_cast<int>(beliefs.first[i]->FullHistory().size()));
   }
   return belief_history_size;
 }
@@ -216,38 +217,45 @@ HistoryDistribution GetStateDistribution(const State& state,
 
   // Now normalize the probs
   Normalize(absl::MakeSpan(final_probs));
-  return {std::move(final_states), std::move(final_probs)};
+  HistoryDistribution dist = {std::move(final_states), std::move(final_probs)};
+  CheckBeliefs(state, dist, state.CurrentPlayer());
+  return dist;
 }
 
 std::unique_ptr<HistoryDistribution> UpdateIncrementalStateDistribution(
     const State& state, const Policy* opponent_policy, int player_id,
     std::unique_ptr<HistoryDistribution> previous) {
-  if (previous == nullptr) previous = std::make_unique<HistoryDistribution>();
-  if (previous->first.empty()) {
+  std::unique_ptr<HistoryDistribution> dist;
+  if (previous) {
+    dist = std::move(previous);
+  }
+  // If we don't have a previous set of beliefs, create it.
+  if (!dist || dist->first.empty()) {
     // This allows for games to special case this scenario. It only works if
     // this is only called at the first decision node after chance nodes. We
     // leave it to the caller to verify this is the case.
-    std::unique_ptr<HistoryDistribution> dist =
-        state.GetHistoriesConsistentWithInfostate();
+    dist = state.GetHistoriesConsistentWithInfostate();
 
     // If the game didn't implement GetHistoriesConsistentWithInfostate, then
     // this is empty, otherwise, we're good.
-    if (dist && !dist->first.empty()) return dist;
-
-    // If the previous pair is empty, then we have to do a BFS to find all
-    // relevant nodes:
-    return std::make_unique<HistoryDistribution>(
-        GetStateDistribution(state, opponent_policy));
+    if (!dist || dist->first.empty()) {
+      // If the previous pair is empty, then we have to do a BFS to find all
+      // relevant nodes:
+      dist = absl::make_unique<HistoryDistribution>(
+          GetStateDistribution(state, opponent_policy));
+    }
   }
-  // The current state must be one action ahead of the dist ones.
+  // Now, we verify that the beliefs match the current infostate.
   const std::vector<Action> history = state.History();
-  int belief_history_size = GetBeliefHistorySize(previous.get());
+  int belief_history_size = GetBeliefHistorySize(*dist);
   while (belief_history_size < history.size()) {
-    AdvanceBeliefHistoryOneAction(previous.get(), history[belief_history_size],
+    AdvanceBeliefHistoryOneAction(dist.get(), history[belief_history_size],
                                   player_id, opponent_policy);
-    belief_history_size = GetBeliefHistorySize(previous.get());
+    belief_history_size = GetBeliefHistorySize(*dist);
   }
-  return previous;
+  SPIEL_CHECK_EQ(belief_history_size, history.size());
+  CheckBeliefs(state, *dist, player_id);
+  return dist;
 }
 
 std::string PrintBeliefs(const HistoryDistribution& beliefs) {
@@ -261,6 +269,27 @@ std::string PrintBeliefs(const HistoryDistribution& beliefs) {
     if (i < num_states - 1) absl::StrAppend(&str, ", ");
   }
   return str;
+}
+
+void CheckBeliefs(const State& ground_truth_state,
+                  const HistoryDistribution& beliefs, int player_id) {
+// We disable the checks for release builds, as otherwise they make the
+// belief code 50% slower.
+#if defined(NDEBUG)
+  const std::string infostate =
+      ground_truth_state.InformationStateString(player_id);
+  for (int i = 0; i < beliefs.first.size(); ++i) {
+    if (Near(beliefs.second[i], 0.0, 1e-5)) {
+      continue;
+    }
+    SPIEL_CHECK_EQ(ground_truth_state.FullHistory().size(),
+                   beliefs.first[i]->FullHistory().size());
+    SPIEL_CHECK_EQ(infostate,
+                   beliefs.first[i]->InformationStateString(player_id));
+    SPIEL_CHECK_EQ(ground_truth_state.FullHistory().size(),
+                   beliefs.first[i]->FullHistory().size());
+  }
+#endif  // defined(NDEBUG)
 }
 
 }  // namespace open_spiel::algorithms

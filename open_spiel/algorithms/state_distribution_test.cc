@@ -14,6 +14,7 @@
 
 #include "open_spiel/algorithms/state_distribution.h"
 
+#include "open_spiel/canonical_game_strings.h"
 #include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
@@ -98,6 +99,7 @@ void LeducStateDistributionTest() {
       UpdateIncrementalStateDistribution(*state, &uniform_policy,
                                          /*player_id=*/1, nullptr);
   std::cerr << "Comparing dists 1..." << std::endl;
+  SPIEL_CHECK_TRUE(incremental_dist);
   CompareDists(dist, *incremental_dist);
   CompareDists(dist, *CloneBeliefs(dist));
   std::cerr << "Check infostates2..." << std::endl;
@@ -169,6 +171,17 @@ void HUNLIncrementalTest() {
   CheckDistHasSameInfostate(*incremental_dist, *state, /*player_id=*/0);
 }
 
+void HunlRegressionTest() {
+  std::shared_ptr<const Game> game = LoadGame(HunlGameString("fcpa"));
+  std::unique_ptr<State> state = game->NewInitialState();
+  for (const Action action : {0, 27, 43, 44, 2}) state->ApplyAction(action);
+  UniformPolicy opponent_policy;
+  std::unique_ptr<HistoryDistribution> dist =
+      UpdateIncrementalStateDistribution(*state, &opponent_policy,
+                                         state->CurrentPlayer(), nullptr);
+  algorithms::CheckBeliefs(*state, *dist, state->CurrentPlayer());
+}
+
 
 }  // namespace
 }  // namespace algorithms
@@ -184,5 +197,6 @@ int main(int argc, char** argv) {
   if (open_spiel::IsGameRegistered(std::string(algorithms::kHUNLGameString))) {
     algorithms::HUNLIncrementalTest();
   }
+  algorithms::HunlRegressionTest();
 
 }
