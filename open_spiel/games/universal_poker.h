@@ -166,7 +166,7 @@ class UniversalPokerState : public State {
   std::string actionSequence_;
 
   BettingAbstraction betting_abstraction_;
-  card_abstraction::CardAbstraction *card_abstraction_;
+  card_abstraction::CardAbstraction* card_abstraction_;
 };
 
 class UniversalPokerGame : public Game {
@@ -199,7 +199,7 @@ class UniversalPokerGame : public Game {
   const acpc_cpp::ACPCGame acpc_game_;
   absl::optional<int> max_game_length_;
   BettingAbstraction betting_abstraction_ = BettingAbstraction::kFULLGAME;
-  card_abstraction::CardAbstraction *card_abstraction_;
+  card_abstraction::CardAbstraction* card_abstraction_;
 
  public:
   const acpc_cpp::ACPCGame *GetACPCGame() const { return &acpc_game_; }

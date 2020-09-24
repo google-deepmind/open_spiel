@@ -9,6 +9,8 @@ namespace open_spiel::universal_poker::card_abstraction {
 IsomorphicCardAbstraction::IsomorphicCardAbstraction(
     std::vector<int> cards_per_round) {
 
+    cards_per_round_.reserve(cards_per_round.size());
+
     for(int r=0; r < cards_per_round.size(); r++){
         cards_per_round_.push_back(cards_per_round[r]);
         // create indexer for this round
@@ -31,8 +33,8 @@ uint8_t from_iso_card(uint8_t iso_card) {
 std::pair<logic::CardSet, logic::CardSet>
 IsomorphicCardAbstraction::abstract(logic::CardSet hole_cards,
                                     logic::CardSet board_cards) const {
-    auto h_arr = hole_cards.ToCardArray();
-    auto b_arr = board_cards.ToCardArray();
+    std::vector<uint8_t> h_arr = hole_cards.ToCardArray();
+    std::vector<uint8_t> b_arr = board_cards.ToCardArray();
     h_arr.insert(h_arr.end(), b_arr.begin(), b_arr.end());
 
     int total_cards = h_arr.size();
@@ -47,8 +49,8 @@ IsomorphicCardAbstraction::abstract(logic::CardSet hole_cards,
         total_cards -= cards_per_round_[++round];
     }
 
-    auto indexer = indexers_[round];
-    auto index = hand_index_last(&indexer, cards);
+    hand_indexer_t indexer = indexers_[round];
+    uint64_t index = hand_index_last(&indexer, cards);
     hand_unindex(&indexer, round, index, cards);
 
     logic::CardSet r_hole_cards;

@@ -617,11 +617,10 @@ UniversalPokerGame::UniversalPokerGame(const GameParameters &params)
   if (card_abstraction == "isomorphic") {
     if (acpc_game_.NumSuitsDeck() != 4 || acpc_game_.NumRanksDeck() != 13) {
         SpielFatalError(
-            "Isomorphic card abstraction is only supported standard 52 card deck.");
+            "Isomorphic card abstraction only supports standard 52 card deck.");
     }
     std::vector<int> cards_per_round;
-    int i;
-    for( i = 0; i < acpc_game_.NumRounds(); ++i ) {
+    for(int i = 0; i < acpc_game_.NumRounds(); ++i ) {
         cards_per_round.push_back(acpc_game_.GetNbBoardCardsRequired(i));
     }
     cards_per_round[0] += cards_per_round[0] + acpc_game_.GetNbHoleCardsRequired();
@@ -629,7 +628,7 @@ UniversalPokerGame::UniversalPokerGame(const GameParameters &params)
   } else if (card_abstraction == "noop"){
     card_abstraction_ = new card_abstraction::NoopCardAbstraction();
   } else {
-    SpielFatalError(absl::StrFormat("cardAbstraction: %s not supported.",
+    SpielFatalError(absl::StrFormat("cardAbstraction: `%s` not supported.",
                                     card_abstraction));
   }
 }
@@ -735,6 +734,23 @@ int UniversalPokerGame::MaxGameLength() const {
  */
 std::string UniversalPokerGame::parseParameters(const GameParameters &map) {
   if (map.find("gamedef") != map.end()) {
+    if (map.size() != 1) {
+      std::vector<std::string> game_parameter_keys;
+      game_parameter_keys.reserve(map.size());
+      for (auto const &imap : map) {
+        if (imap.first != "cardAbstraction" || imap.first != "bettingAbstraction") {
+          game_parameter_keys.push_back(imap.first);
+        }
+      }
+      if (game_parameter_keys.size() > 1) {
+        SpielFatalError(
+          absl::StrCat("When loading a 'universal_poker' game, the 'gamedef' "
+                       "field was present, but other fields were present too: ",
+                       absl::StrJoin(game_parameter_keys, ", "),
+                       "gamedef is exclusive with other paraemters except "
+                       "cardAbstraction and bettingAbstraction."));
+      }
+    }
     return ParameterValue<std::string>("gamedef");
   }
 
