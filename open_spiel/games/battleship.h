@@ -100,7 +100,7 @@
 //                                     zero-sum iff the loss multiplier is 1.0
 //                                                            (default = 2.0)
 //
-// NOTE: The list parameters must be supplied as a list of comma-separated
+// NOTE: The list parameters must be supplied as a string of comma-separated
 // values
 //
 // References

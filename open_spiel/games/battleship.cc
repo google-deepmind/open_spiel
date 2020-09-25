@@ -356,7 +356,7 @@ Ship BattleshipState::NextShipToPlace_(const Player player) const {
 
 ShipPlacement BattleshipState::FindShipPlacement_(const Ship& ship,
                                                   const Player player) const {
-  // NOTE: for now, this function is indented to be called only after all the
+  // NOTE: for now, this function is intended to be called only after all the
   // ships have been placed.
   SPIEL_DCHECK_TRUE(AllShipsPlaced_());
 
@@ -376,7 +376,7 @@ ShipPlacement BattleshipState::FindShipPlacement_(const Ship& ship,
 
 bool BattleshipState::DidShipSink_(const Ship& ship,
                                    const Player player) const {
-  // NOTE: for now, this function is indented to be called only after all the
+  // NOTE: for now, this function is intended to be called only after all the
   // ships have been placed.
   SPIEL_DCHECK_TRUE(AllShipsPlaced_());
 
