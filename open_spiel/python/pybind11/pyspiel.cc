@@ -52,7 +52,7 @@
 #include "open_spiel/public_states/pybind11/public_states.h"
 #endif
 #if BUILD_WITH_XINXIN
-#include "open_spiel/games/hearts/xinxin_pybind11.h"
+#include "open_spiel/bots/xinxin/xinxin_pybind11.h"
 #endif
 
 // This file contains OpenSpiel's Python API. The best place to see an overview

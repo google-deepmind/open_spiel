@@ -43,8 +43,8 @@ if (BUILD_WITH_PUBLIC_STATES)
 endif()
 if (BUILD_WITH_XINXIN)
   set (PYTHON_BINDINGS ${PYTHON_BINDINGS}
-      ../games/hearts/xinxin_pybind11.h
-      ../games/hearts/xinxin_pybind11.cc
+      ../bots/xinxin/xinxin_pybind11.h
+      ../bots/xinxin/xinxin_pybind11.cc
       )
 endif()
 
