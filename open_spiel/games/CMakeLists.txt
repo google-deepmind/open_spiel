@@ -1,6 +1,10 @@
 set(GAME_SOURCES
   backgammon.cc
   backgammon.h
+  battleship.cc
+  battleship.h
+  battleship_types.h
+  battleship_types.cc
   blotto.cc
   blotto.h
   breakthrough.cc
