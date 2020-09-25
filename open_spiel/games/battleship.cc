@@ -483,7 +483,8 @@ Shot BattleshipState::DeserializeShotAction_(const Action action) const {
 
   SPIEL_DCHECK_GE(action, 0);
   SPIEL_DCHECK_LT(action, conf.board_width * conf.board_height);
-  return Shot{action / conf.board_width, action % conf.board_width};
+  return Shot{/* row = */ static_cast<int>(action / conf.board_width),
+              /* col = */ static_cast<int>(action % conf.board_width)};
 }
 
 GameMove BattleshipState::DeserializeGameMove_(const Action action) const {
