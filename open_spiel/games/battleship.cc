@@ -53,10 +53,10 @@ Player BattleshipState::CurrentPlayer() const {
     //
     // The game is over only in two cases:
     // * Both players have taken `conf.num_shots` shots; or
-    // * All ships for all players have already been sunk.
+    // * At least one player has lost all of their ships.
     if (moves_.size() == 2 * conf.ships.size() + 2 * conf.num_shots) {
       return kTerminalPlayerId;
-    } else if (AllPlayersShipsSank_(Player1) && AllPlayersShipsSank_(Player2)) {
+    } else if (AllPlayersShipsSank_(Player1) || AllPlayersShipsSank_(Player2)) {
       return kTerminalPlayerId;
     }
 
