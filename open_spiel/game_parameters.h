@@ -56,18 +56,20 @@ class GameParameter {
         string_value_(value),
         type_(Type::kString) {}
 
-  // NOTE: This is not subsumed by the previous method, even if value can be
-  //       converted to a std::string, because the [C++ standard][iso] requires
-  //       that the *standard conversion sequence* (see §13.3.3.1.1)
+  // Allows construction of a `GameParameter` from a string literal.
+  //
+  // NOTE: This method is not subsumed by the previous method, even if value can
+  //       be converted to a std::string, because the [C++ standard][iso]
+  //       requires that the *standard conversion sequence* (see §13.3.3.1.1)
   //         `(const char[]) -> const char* -> bool`
   //       take precedence over the *user-defined conversion sequence*
   //         `(const char[]) -> const char* -> std::string`
   //       defined in the standard library.
   //
-  // So, without the next method, `GameParameter("1")` would be registered as
-  // a bool game parameter instead of a string one.
+  //       So, without the next method, `GameParameter("1")` would be registered
+  //       as a bool game parameter instead of a string one.
   //
-  // Closes #380.
+  //       Closes: #380.
   //
   // [iso]: http://www.open-std.org/JTC1/SC22/WG21/docs/papers/2011/n3242.pdf
   explicit GameParameter(const char* value, bool is_mandatory = false)
