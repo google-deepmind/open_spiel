@@ -139,6 +139,8 @@ std::vector<Action> BattleshipState::LegalActions() const {
     // player is <= the number of cells in the board.
     SPIEL_DCHECK_FALSE(actions.empty());
   }
+
+  return actions;
 }
 
 std::string BattleshipState::ActionToString(Player player,
