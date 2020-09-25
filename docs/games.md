@@ -268,6 +268,7 @@ Status                                       | Game
 *   Perfect information.
 *   2 players.
 *   [Wikipedia](https://en.wikipedia.org/wiki/Hex_\(board_game\))
+*   [Hex, the full story by Ryan Hayward and Bjarne Toft](https://webdocs.cs.ualberta.ca/~hayward/hexbook/hex.html)
 
 ### Kuhn poker
 
