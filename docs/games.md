@@ -53,8 +53,8 @@ we verified against known values and/or reproduced results from papers.
 ## Details
 
 ### Backgammon
-  * Idiosyncratic format.
   * Players move their pieces through the board based on the rolls of dice.
+  * Idiosyncratic format.
   * Traditional game.
   * Deterministic.
   * Perfect information.
@@ -62,8 +62,8 @@ we verified against known values and/or reproduced results from papers.
   * [Wikipedia](https://en.wikipedia.org/wiki/Backgammon)
     
 ### Breakthrough
-  * Uses pieces on a grid.
   * Simplified chess using only pawns.
+  * Pieces on a grid.
   * Modern game.
   * Deterministic.
   * Perfect information.
@@ -71,8 +71,8 @@ we verified against known values and/or reproduced results from papers.
   * [Wikipedia](https://en.wikipedia.org/wiki/Breakthrough_\(board_game\))
     
 ### Bridge
-  * Card game.
   * A card game where players compete in pairs.
+  * Card game.
   * Traditional game.
   * Deterministic.
   * Imperfect information.
@@ -80,53 +80,53 @@ we verified against known values and/or reproduced results from papers.
   * [Wikipedia](https://en.wikipedia.org/wiki/Contract_bridge)
     
 ### (Uncontested) Bridge bidding
-  * Card game.
   * Players score points by forming specific sets with the cards in their hands.
-  * Research-originated.
+  * Card game.
+  * Research game.
   * Deterministic.
   * Imperfect information.
   * 2 players.
   * [Wikipedia](https://en.wikipedia.org/wiki/Contract_bridge)
     
 ### Catch
-  * Uses an agent on a grid.
   * Agent must move horizontally to 'catch' a descending ball. Designed to test basic learning.
-  * Research-originated.
+  * Agent on a grid.
+  * Research game.
   * Deterministic.
   * Perfect information.
   * 1 players.
   * [Mnih et al. 2014, Recurrent Models of Visual Attention](https://papers.nips.cc/paper/5542-recurrent-models-of-visual-attention.pdf),<br>[Osband et al '19, Behaviour Suite for Reinforcement Learning, Appendix A](https://arxiv.org/abs/1908.03568)
     
 ### Cliff Walking
-  * Uses an agent on a grid.
   * Agent must find goal without falling off a cliff. Designed to demonstrate exploration-with-danger.
-  * Research-originated.
+  * Agent on a grid.
+  * Research game.
   * Deterministic.
   * Perfect information.
   * 1 players.
   * [Sutton et al. '18, page 132](http://www.incompleteideas.net/book/bookdraft2018mar21.pdf)
     
 ### Clobber
-  * Uses pieces on a grid.
   * Simplified checkers, where tokens can capture neighbouring tokens. Designed to be amenable to combinatorial analysis.
-  * Research-originated.
+  * Pieces on a grid.
+  * Research game.
   * Deterministic.
   * Perfect information.
   * 2 players.
   * [Wikipedia](https://en.wikipedia.org/wiki/Clobber)
     
 ### Coin Game
-  * Uses agents on a grid.
   * Agents must collect their and their collaborator's tokens while avoiding a third kind of token. Designed to test divining of collaborator's intentions
-  * Research-originated.
+  * Agents on a grid.
+  * Research game.
   * Deterministic.
   * Perfect, incomplete information.
   * 2 players.
   * [Raileanu et al. '18, Modeling Others using Oneself in Multi-Agent Reinforcement Learning](https://arxiv.org/abs/1802.09640)
     
 ### Connect Four
-  * Uses tokens on a grid.
   * Players drop tokens into columns to try and form a pattern.
+  * Tokens on a grid.
   * Traditional game.
   * Deterministic.
   * Perfect information.
@@ -134,17 +134,17 @@ we verified against known values and/or reproduced results from papers.
   * [Wikipedia](https://en.wikipedia.org/wiki/Connect_Four)
     
 ### Cooperative Box-Pushing
-  * Uses agents on a grid.
   * Agents must collaborate to push a box into the goal. Designed to test collaboration.
-  * Research-originated.
+  * Agents on a grid.
+  * Research game.
   * Deterministic.
   * Perfect information.
   * 2 players.
   * [Seuken & Zilberstein '12, Improved Memory-Bounded Dynamic Programming for Decentralized POMDPs](https://arxiv.org/abs/1206.5295)
     
 ### Chess
-  * Uses pieces on a grid.
   * Players move pieces around the board with the goal of eliminating the opposing pieces.
+  * Pieces on a grid.
   * Traditional game.
   * Deterministic.
   * Perfect information.
@@ -152,26 +152,26 @@ we verified against known values and/or reproduced results from papers.
   * [Wikipedia](https://en.wikipedia.org/wiki/Chess)
     
 ### Deep Sea
-  * Uses an agent on a grid.
   * Agent must explore to find reward (first version) or penalty (second version). Designed to test exploration.
-  * Research-originated.
+  * Agent on a grid.
+  * Research game.
   * Deterministic.
   * Perfect information.
   * 1 players.
   * [Osband et al. '17, Deep Exploration via Randomized Value Functions](https://arxiv.org/abs/1703.07608)
     
 ### First-price Sealed-Bid Auction
-  * Idiosyncratic format.
   * Agents submit bids simultaneously; highest bid wins, and that's the price paid.
-  * Research-originated.
+  * Idiosyncratic format.
+  * Research game.
   * Deterministic.
   * Imperfect, incomplete information.
   * 2-10 players.
   * [Wikipedia](https://en.wikipedia.org/wiki/First-price_sealed-bid_auction)
     
 ### Gin Rummy
-  * Card game.
   * Players score points by forming specific sets with the cards in their hands.
+  * Card game.
   * Traditional game.
   * Deterministic.
   * Imperfect information.
@@ -179,8 +179,8 @@ we verified against known values and/or reproduced results from papers.
   * [Wikipedia](https://en.wikipedia.org/wiki/Gin_rummy)
     
 ### Go
-  * Uses tokens on a grid.
   * Players place tokens on the board with the goal of encircling territory.
+  * Tokens on a grid.
   * Traditional game.
   * Deterministic.
   * Perfect information.
@@ -188,8 +188,8 @@ we verified against known values and/or reproduced results from papers.
   * [Wikipedia](https://en.wikipedia.org/wiki/Go_\(game\))
     
 ### Goofspiel
-  * Card game.
   * Players bid with their cards to win other cards.
+  * Card game.
   * Traditional game.
   * Deterministic.
   * Imperfect information.
@@ -197,8 +197,8 @@ we verified against known values and/or reproduced results from papers.
   * [Wikipedia](https://en.wikipedia.org/wiki/Goofspiel)
     
 ### Hanabi 
-  * Idiosyncratic format.
   * Players can see only other player's pieces, and everyone must cooperate to win.
+  * Idiosyncratic format.
   * Modern game.
   * Deterministic.
   * Imperfect information.
@@ -207,8 +207,8 @@ we verified against known values and/or reproduced results from papers.
   * Implemented via [Hanabi Learning Environment](https://github.com/deepmind/hanabi-learning-environment)
     
 ### Havannah
-  * Uses tokens on a hex grid.
   * Players add tokens to a hex grid to try and form a winning structure.
+  * Tokens on a hex grid.
   * Modern game.
   * Deterministic.
   * Perfect information.
@@ -216,8 +216,8 @@ we verified against known values and/or reproduced results from papers.
   * [Wikipedia](https://en.wikipedia.org/wiki/Havannah)
     
 ### Hearts
-  * Card game.
   * A card game where players try to avoid playing the highest card in each round.
+  * Card game.
   * Traditional game.
   * Deterministic.
   * Imperfect information.
@@ -225,8 +225,8 @@ we verified against known values and/or reproduced results from papers.
   * [Wikipedia](https://en.wikipedia.org/wiki/Hearts_\(card_game\))
     
 ### Hex
-  * Uses tokens on a hex grid.
   * Players add tokens to a hex grid to try and link opposite sides of the board.
+  * Uses tokens on a hex grid.
   * Modern game.
   * Deterministic.
   * Perfect information.
@@ -234,44 +234,44 @@ we verified against known values and/or reproduced results from papers.
   * [Wikipedia](https://en.wikipedia.org/wiki/Hex_\(board_game\))
     
 ### Kuhn poker
-  * Cards with bidding.
   * Simplified poker amenable to game-theoretic analysis.
-  * Research-originated.
+  * Cards with bidding.
+  * Research game.
   * Deterministic.
   * Imperfect information.
   * 2 players.
   * [Wikipedia](https://en.wikipedia.org/wiki/Kuhn_poker)
     
 ### Laser Tag
-  * Uses agents on a grid.
   * Agents see a local part of the grid, and attempt to tag eachother with beams.
-  * Research-originated.
+  * Agents on a grid.
+  * Research game.
   * Deterministic.
   * Imperfect information.
   * 2 players.
   * [Leibo et al. '17](https://arxiv.org/abs/1702.03037), [Lanctot et al. '17](https://arxiv.org/abs/1711.00832)
     
 ### Leduc poker
-  * Cards with bidding.
   * Simplified poker amenable to game-theoretic analysis.
-  * Research-originated.
+  * Cards with bidding.
+  * Research game.
   * Deterministic.
   * Imperfect information.
   * 2 players.
   * [Southey et al. '05, Bayes’ bluff: Opponent modelling in poker](https://arxiv.org/abs/1207.1411)
     
 ### Lewis Signaling
-  * Idiosyncratic format.
   * Receiver must choose an action dependent on the sender's hidden state. Designed to demonstrate the use of conventions.
-  * Research-originated.
+  * Idiosyncratic format.
+  * Research game.
   * Deterministic.
   * Imperfect information.
   * 2 players.
   * [Wikipedia](https://en.wikipedia.org/wiki/Lewis_signaling_game)
     
 ### Liar's Dice
-  * Dice with bidding.
   * Players bid and bluff on the state of all the dice together, given only the state of their dice.
+  * Dice with bidding.
   * Traditional game.
   * Deterministic.
   * Imperfect information.
@@ -279,35 +279,35 @@ we verified against known values and/or reproduced results from papers.
   * [Wikipedia](https://en.wikipedia.org/wiki/Liar%27s_dice)
     
 ### Markov Soccer
-  * Uses agents on a grid.
   * Agents must take the ball to their goal, and can 'tackle' the opponent by predicting their next move.
-  * Research-originated.
+  * Agents on a grid.
+  * Research game.
   * Deterministic.
   * Imperfect information.
   * 2 players.
   * [Littman '94, Markov games as a framework for multi-agent reinforcement learning](https://www2.cs.duke.edu/courses/spring07/cps296.3/littman94markov.pdf),<br>[He et al. '16, Opponent Modeling in Deep Reinforcement Learning](https://arxiv.org/abs/1609.05559)
     
 ### Matching Pennies (Three-player)
-  * Idiosyncratic format.
   * Players must predict and match/oppose another player. Designed to have an unstable Nash equilibrium.
-  * Research-originated.
+  * Idiosyncratic format.
+  * Research game.
   * Deterministic.
   * Imperfect information.
   * 3 players.
   * "Three problems in learning mixed-strategy Nash equilibria"
     
 ### Negotiation
-  * Idiosyncratic format.
   * Agents with different utilities must negotiate an allocation of resources.
-  * Research-originated.
+  * Idiosyncratic format.
+  * Research game.
   * Deterministic.
   * Imperfect information.
   * 2 players.
   * [Lewis et al. '17](https://arxiv.org/abs/1706.05125), [Cao et al. '18](https://arxiv.org/abs/1804.03980)
     
 ### Oshi-Zumo
-  * Idiosyncratic format.
   * Players must repeatedly bid to push a token off the other side of the board. 
+  * Idiosyncratic format.
   * Traditional game.
   * Deterministic.
   * Imperfect information.
@@ -315,8 +315,8 @@ we verified against known values and/or reproduced results from papers.
   * [Buro, 2004. Solving the oshi-zumo game](https://link.springer.com/chapter/10.1007/978-0-387-35706-5_23) <br> [Bosansky et al. '16, Algorithms for Computing Strategies in Two-Player Simultaneous Move Games](http://mlanctot.info/files/papers/aij-2psimmove.pdf)
     
 ### Oware
-  * Idiosyncratic format.
   * Players redistribute tokens from their half of the board to capture tokens in the opponent's part of the board.
+  * Idiosyncratic format.
   * Traditional game.
   * Deterministic.
   * Perfect information.
@@ -324,8 +324,8 @@ we verified against known values and/or reproduced results from papers.
   * [Wikipedia](https://en.wikipedia.org/wiki/Oware)
     
 ### Pentago
-  * Uses tokens on a grid.
   * Players place tokens on the board, then rotate part of the board to a new orientation.
+  * Uses tokens on a grid.
   * Modern game.
   * Deterministic.
   * Perfect information.
@@ -333,17 +333,17 @@ we verified against known values and/or reproduced results from papers.
   * [Wikipedia](https://en.wikipedia.org/wiki/Pentago)
     
 ### Phantom Tic-Tac-Toe
-  * Uses tokens on a grid.
   * Tic-tac-toe, except the opponent's tokens are hidden. Designed as a simple, imperfect-information game.
-  * Research-originated.
+  * Uses tokens on a grid.
+  * Research game.
   * Deterministic.
   * Imperfect information.
   * 2 players.
   * [Auger '11, Multiple Tree for Partially Observable Monte-Carlo Tree Search](https://hal.archives-ouvertes.fr/hal-00563480v2/document),<br>[Lisy '14, Alternative Selection Functions for Information Set Monte Carlo Tree Search](https://core.ac.uk/download/pdf/81646968.pdf), <br>[Lanctot '13](http://mlanctot.info/files/papers/PhD_Thesis_MarcLanctot.pdf)
     
 ### Pig
-  * Dice game.
   * Each player rolls a dice until they get a 1 or they 'hold'; the rolled total is added to their score.
+  * Dice game.
   * Traditional game.
   * Deterministic.
   * Perfect information.
@@ -351,8 +351,8 @@ we verified against known values and/or reproduced results from papers.
   * [Wikipedia](https://en.wikipedia.org/wiki/Pig_\(dice_game\))
     
 ### Poker (Hold 'em)
-  * Cards with bidding.
   * Players bet on whether their hand of cards plus some communal cards will form a special set.
+  * Cards with bidding.
   * Traditional game.
   * Deterministic.
   * Imperfect information.
@@ -361,8 +361,8 @@ we verified against known values and/or reproduced results from papers.
   * Implemented via [ACPC](http://www.computerpokercompetition.org/).
     
 ### Quoridor
-  * Idiosyncratic format.
   * Each turn, players can either move their agent or add a small wall to the board.
+  * Idiosyncratic format.
   * Modern game.
   * Deterministic.
   * Perfect information.
@@ -370,8 +370,8 @@ we verified against known values and/or reproduced results from papers.
   * [Wikipedia](https://en.wikipedia.org/wiki/Quoridor)
     
 ### Skat (simplified bidding)
+  * Each turn, players bid to compete against the other two players.
   * Cards with bidding.
-  * A card game where each turn, players bid to play compete against the other two players.
   * Traditional game.
   * Deterministic.
   * Imperfect information.
@@ -379,8 +379,8 @@ we verified against known values and/or reproduced results from papers.
   * [Wikipedia](https://en.wikipedia.org/wiki/Skat_\(card_game\))
     
 ### Solitaire (K+)
-  * Card game.
   * A single-player card game.
+  * Card game.
   * Traditional game.
   * Deterministic.
   * Imperfect information.
@@ -388,8 +388,8 @@ we verified against known values and/or reproduced results from papers.
   * [Wikipedia](https://en.wikipedia.org/wiki/Klondike_\(solitaire\)) and [Bjarnason et al. '07, Searching solitaire in real time](http://web.engr.oregonstate.edu/~afern/papers/solitaire.pdf)
     
 ### Tic-Tac-Toe
-  * Uses tokens on a grid.
   * Players place tokens to try and form a pattern.
+  * Uses tokens on a grid.
   * Traditional game.
   * Deterministic.
   * Perfect information.
@@ -397,35 +397,35 @@ we verified against known values and/or reproduced results from papers.
   * [Wikipedia](https://en.wikipedia.org/wiki/Tic-tac-toe)
     
 ### Tiny Bridge
-  * Cards with bidding.
   * Simplified Bridge with fewer cards and tricks.
-  * Research-originated.
+  * Cards with bidding.
+  * Research game.
   * Deterministic.
   * Imperfect information.
   * 2, 4 players.
   * See implementation for details. 
     
 ### Tiny Hanabi
-  * Idiosyncratic format.
   * Simplified Hanabi with just two turns.
-  * Research-originated.
+  * Idiosyncratic format.
+  * Research game.
   * Deterministic.
   * Imperfect information.
   * 2-10 players.
   * [Foerster et al 2018, Bayesian Action Decoder for Deep Multi-Agent Reinforcement Learning](https://arxiv.org/abs/1811.01458)
     
 ### Trade Comm
-  * Idiosyncratic format.
   * Players with different utilities and items communicate and then trade.
-  * Research-originated.
+  * Idiosyncratic format.
+  * Research game.
   * Deterministic.
   * Imperfect information.
   * 2 players.
   * A simple emergent communication game based on trading.
     
 ### Y
-  * Tokens on hex grid.
   * Players place tokens to try and connect sides of a triangular board.
+  * Tokens on hex grid.
   * Modern game.
   * Deterministic.
   * Perfect information.
