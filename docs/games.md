@@ -5,7 +5,54 @@ we verified against known values and/or reproduced results from papers.
 
 <font color="orange"><b>~</b></font>: implemented but lightly tested.
 
-* ![](_static/green_circ10.png "green circle") Backgammon
+| Status                                       | Game                                                                |
+|----------------------------------------------|---------------------------------------------------------------------|
+| ![](_static/green_circ10.png "green circle") | [Backgammon](#backgammon)                                           |
+| ![](_static/green_circ10.png "green circle") | [Breakthrough](#breakthrough)                                       |
+| ![](_static/green_circ10.png "green circle") | [Bridge](#bridge)                                                   |
+| ![](_static/green_circ10.png "green circle") | [(Uncontested) Bridge bidding](#uncontested-bridge-bidding)       |
+| <font color="orange"><b>~</b></font>         | [Catch](#catch)                                                     |
+| <font color="orange"><b>~</b></font>         | [Cliff Walking](#cliff-walking)                                     |
+| <font color="orange"><b>~</b></font>         | [Clobber](#clobber)                                                 |
+| <font color="orange"><b>~</b></font>         | [Coin Game](#coin-game)                                             |
+| ![](_static/green_circ10.png "green circle") | [Connect Four](#connect-four)                                       |
+| <font color="orange"><b>~</b></font>         | [Cooperative Box-Pushing](#cooperative-box-pushing)                 |
+| ![](_static/green_circ10.png "green circle") | [Chess](#chess)                                                     |
+| <font color="orange"><b>~</b></font>         | [Deep Sea](#deep-sea)                                               |
+| ![](_static/green_circ10.png "green circle") | [First-price Sealed-Bid Auction](#first-price-sealed-bid-auction)   |
+| ![](_static/green_circ10.png "green circle") | [Gin Rummy](#gin-rummy)                                             |
+| ![](_static/green_circ10.png "green circle") | [Go](#go)                                                           |
+| ![](_static/green_circ10.png "green circle") | [Goofspiel](#goofspiel)                                             |
+| ![](_static/green_circ10.png "green circle") | [Hanabi](#hanabi)                                                   |
+| ![](_static/green_circ10.png "green circle") | [Havannah](#havannah)                                               |
+| <font color="orange"><b>~</b></font>         | [Hearts](#hearts)                                                   |
+| <font color="orange"><b>~</b></font>         | [Hex](#hex)                                                         |
+| ![](_static/green_circ10.png "green circle") | [Kuhn poker](#kuhn-poker)                                           |
+| <font color="orange"><b>~</b></font>         | [Laser Tag](#laser-tag)                                             |
+| ![](_static/green_circ10.png "green circle") | [Leduc poker](#leduc-poker)                                         |
+| <font color="orange"><b>~</b></font>         | [Lewis Signaling](#lewis-signaling)                                 |
+| ![](_static/green_circ10.png "green circle") | [Liar's Dice](#liar's-dice)                                         |
+| <font color="orange"><b>~</b></font>         | [Markov Soccer](#markov-soccer)                                     |
+| ![](_static/green_circ10.png "green circle") | [Matching Pennies (Three-player)](#matching-pennies-three-player) |
+| ![](_static/green_circ10.png "green circle") | [Negotiation](#negotiation)                                         |
+| ![](_static/green_circ10.png "green circle") | [Oshi-Zumo](#oshi-zumo)                                             |
+| ![](_static/green_circ10.png "green circle") | [Oware](#oware)                                                     |
+| ![](_static/green_circ10.png "green circle") | [Pentago](#pentago)                                                 |
+| <font color="orange"><b>~</b></font>         | [Phantom Tic-Tac-Toe](#phantom-tic-tac-toe)                         |
+| ![](_static/green_circ10.png "green circle") | [Pig](#pig)                                                         |
+| <font color="orange"><b>~</b></font>         | [Poker (Hold 'em)](#poker-hold-'em)                               |
+| ![](_static/green_circ10.png "green circle") | [Quoridor](#quoridor)                                               |
+| <font color="orange"><b>~</b></font>         | [Skat (simplified bidding)](#skat-simplified-bidding)             |
+| <font color="orange"><b>~</b></font>         | [Solitaire (K+)](#solitaire-k)                                   |
+| ![](_static/green_circ10.png "green circle") | [Tic-Tac-Toe](#tic-tac-toe)                                         |
+| ![](_static/green_circ10.png "green circle") | [Tiny Bridge](#tiny-bridge)                                         |
+| ![](_static/green_circ10.png "green circle") | [Tiny Hanabi](#tiny-hanabi)                                         |
+| ![](_static/green_circ10.png "green circle") | [Trade Comm](#trade-comm)                                           |
+| ![](_static/green_circ10.png "green circle") | [Y](#y)                                                             |
+
+## Details
+
+### Backgammon
   * Idiosyncratic format.
   * Players move their pieces through the board based on the rolls of dice.
   * Traditional game.
@@ -14,7 +61,7 @@ we verified against known values and/or reproduced results from papers.
   * 2 players.
   * [Wikipedia](https://en.wikipedia.org/wiki/Backgammon)
     
-* ![](_static/green_circ10.png "green circle") Breakthrough
+### Breakthrough
   * Uses pieces on a grid.
   * Simplified chess using only pawns.
   * Modern game.
@@ -23,7 +70,7 @@ we verified against known values and/or reproduced results from papers.
   * 2 players.
   * [Wikipedia](https://en.wikipedia.org/wiki/Breakthrough_\(board_game\))
     
-* ![](_static/green_circ10.png "green circle") Bridge
+### Bridge
   * Card game.
   * A card game where players compete in pairs.
   * Traditional game.
@@ -32,7 +79,7 @@ we verified against known values and/or reproduced results from papers.
   * 4 players.
   * [Wikipedia](https://en.wikipedia.org/wiki/Contract_bridge)
     
-* ![](_static/green_circ10.png "green circle") (Uncontested) Bridge bidding
+### (Uncontested) Bridge bidding
   * Card game.
   * Players score points by forming specific sets with the cards in their hands.
   * Research-originated.
@@ -41,7 +88,7 @@ we verified against known values and/or reproduced results from papers.
   * 2 players.
   * [Wikipedia](https://en.wikipedia.org/wiki/Contract_bridge)
     
-* <font color="orange"><b>~</b></font> Catch
+### Catch
   * Uses an agent on a grid.
   * Agent must move horizontally to 'catch' a descending ball. Designed to test basic learning.
   * Research-originated.
@@ -50,7 +97,7 @@ we verified against known values and/or reproduced results from papers.
   * 1 players.
   * [Mnih et al. 2014, Recurrent Models of Visual Attention](https://papers.nips.cc/paper/5542-recurrent-models-of-visual-attention.pdf),<br>[Osband et al '19, Behaviour Suite for Reinforcement Learning, Appendix A](https://arxiv.org/abs/1908.03568)
     
-* <font color="orange"><b>~</b></font> Cliff Walking
+### Cliff Walking
   * Uses an agent on a grid.
   * Agent must find goal without falling off a cliff. Designed to demonstrate exploration-with-danger.
   * Research-originated.
@@ -59,7 +106,7 @@ we verified against known values and/or reproduced results from papers.
   * 1 players.
   * [Sutton et al. '18, page 132](http://www.incompleteideas.net/book/bookdraft2018mar21.pdf)
     
-* <font color="orange"><b>~</b></font> Clobber
+### Clobber
   * Uses pieces on a grid.
   * Simplified checkers, where tokens can capture neighbouring tokens. Designed to be amenable to combinatorial analysis.
   * Research-originated.
@@ -68,7 +115,7 @@ we verified against known values and/or reproduced results from papers.
   * 2 players.
   * [Wikipedia](https://en.wikipedia.org/wiki/Clobber)
     
-* <font color="orange"><b>~</b></font> Coin Game
+### Coin Game
   * Uses agents on a grid.
   * Agents must collect their and their collaborator's tokens while avoiding a third kind of token. Designed to test divining of collaborator's intentions
   * Research-originated.
@@ -77,7 +124,7 @@ we verified against known values and/or reproduced results from papers.
   * 2 players.
   * [Raileanu et al. '18, Modeling Others using Oneself in Multi-Agent Reinforcement Learning](https://arxiv.org/abs/1802.09640)
     
-* ![](_static/green_circ10.png "green circle") Connect Four
+### Connect Four
   * Uses tokens on a grid.
   * Players drop tokens into columns to try and form a pattern.
   * Traditional game.
@@ -86,7 +133,7 @@ we verified against known values and/or reproduced results from papers.
   * 2 players.
   * [Wikipedia](https://en.wikipedia.org/wiki/Connect_Four)
     
-* <font color="orange"><b>~</b></font> Cooperative Box-Pushing
+### Cooperative Box-Pushing
   * Uses agents on a grid.
   * Agents must collaborate to push a box into the goal. Designed to test collaboration.
   * Research-originated.
@@ -95,7 +142,7 @@ we verified against known values and/or reproduced results from papers.
   * 2 players.
   * [Seuken & Zilberstein '12, Improved Memory-Bounded Dynamic Programming for Decentralized POMDPs](https://arxiv.org/abs/1206.5295)
     
-* ![](_static/green_circ10.png "green circle") Chess
+### Chess
   * Uses pieces on a grid.
   * Players move pieces around the board with the goal of eliminating the opposing pieces.
   * Traditional game.
@@ -104,7 +151,7 @@ we verified against known values and/or reproduced results from papers.
   * 2 players.
   * [Wikipedia](https://en.wikipedia.org/wiki/Chess)
     
-* <font color="orange"><b>~</b></font> Deep Sea
+### Deep Sea
   * Uses an agent on a grid.
   * Agent must explore to find reward (first version) or penalty (second version). Designed to test exploration.
   * Research-originated.
@@ -113,7 +160,7 @@ we verified against known values and/or reproduced results from papers.
   * 1 players.
   * [Osband et al. '17, Deep Exploration via Randomized Value Functions](https://arxiv.org/abs/1703.07608)
     
-* ![](_static/green_circ10.png "green circle") First-price sealed-bid Auction
+### First-price Sealed-Bid Auction
   * Idiosyncratic format.
   * Agents submit bids simultaneously; highest bid wins, and that's the price paid.
   * Research-originated.
@@ -122,7 +169,7 @@ we verified against known values and/or reproduced results from papers.
   * 2-10 players.
   * [Wikipedia](https://en.wikipedia.org/wiki/First-price_sealed-bid_auction)
     
-* ![](_static/green_circ10.png "green circle") Gin Rummy
+### Gin Rummy
   * Card game.
   * Players score points by forming specific sets with the cards in their hands.
   * Traditional game.
@@ -131,7 +178,7 @@ we verified against known values and/or reproduced results from papers.
   * 2 players.
   * [Wikipedia](https://en.wikipedia.org/wiki/Gin_rummy)
     
-* ![](_static/green_circ10.png "green circle") Go
+### Go
   * Uses tokens on a grid.
   * Players place tokens on the board with the goal of encircling territory.
   * Traditional game.
@@ -140,7 +187,7 @@ we verified against known values and/or reproduced results from papers.
   * 2 players.
   * [Wikipedia](https://en.wikipedia.org/wiki/Go_\(game\))
     
-* ![](_static/green_circ10.png "green circle") Goofspiel
+### Goofspiel
   * Card game.
   * Players bid with their cards to win other cards.
   * Traditional game.
@@ -149,7 +196,7 @@ we verified against known values and/or reproduced results from papers.
   * 2-10 players.
   * [Wikipedia](https://en.wikipedia.org/wiki/Goofspiel)
     
-* ![](_static/green_circ10.png "green circle") Hanabi (via [Hanabi Learning Environment](https://github.com/deepmind/hanabi-learning-environment))
+### Hanabi 
   * Idiosyncratic format.
   * Players can see only other player's pieces, and everyone must cooperate to win.
   * Modern game.
@@ -157,8 +204,9 @@ we verified against known values and/or reproduced results from papers.
   * Imperfect information.
   * 2-5 players.
   * [Wikipedia](https://en.wikipedia.org/wiki/Hanabi_\(card_game\)) and [Bard et al. '19, The Hanabi Challenge: A New Frontier for AI Research](https://arxiv.org/abs/1902.00506)
+  * Implemented via [Hanabi Learning Environment](https://github.com/deepmind/hanabi-learning-environment)
     
-* ![](_static/green_circ10.png "green circle") Havannah
+### Havannah
   * Uses tokens on a hex grid.
   * Players add tokens to a hex grid to try and form a winning structure.
   * Modern game.
@@ -167,7 +215,7 @@ we verified against known values and/or reproduced results from papers.
   * 2 players.
   * [Wikipedia](https://en.wikipedia.org/wiki/Havannah)
     
-* <font color="orange"><b>~</b></font> Hearts
+### Hearts
   * Card game.
   * A card game where players try to avoid playing the highest card in each round.
   * Traditional game.
@@ -176,7 +224,7 @@ we verified against known values and/or reproduced results from papers.
   * 3-6 players.
   * [Wikipedia](https://en.wikipedia.org/wiki/Hearts_\(card_game\))
     
-* <font color="orange"><b>~</b></font> Hex
+### Hex
   * Uses tokens on a hex grid.
   * Players add tokens to a hex grid to try and link opposite sides of the board.
   * Modern game.
@@ -185,7 +233,7 @@ we verified against known values and/or reproduced results from papers.
   * 2 players.
   * [Wikipedia](https://en.wikipedia.org/wiki/Hex_\(board_game\))
     
-* ![](_static/green_circ10.png "green circle") Kuhn poker
+### Kuhn poker
   * Cards with bidding.
   * Simplified poker amenable to game-theoretic analysis.
   * Research-originated.
@@ -194,7 +242,7 @@ we verified against known values and/or reproduced results from papers.
   * 2 players.
   * [Wikipedia](https://en.wikipedia.org/wiki/Kuhn_poker)
     
-* <font color="orange"><b>~</b></font> Laser Tag
+### Laser Tag
   * Uses agents on a grid.
   * Agents see a local part of the grid, and attempt to tag eachother with beams.
   * Research-originated.
@@ -203,7 +251,7 @@ we verified against known values and/or reproduced results from papers.
   * 2 players.
   * [Leibo et al. '17](https://arxiv.org/abs/1702.03037), [Lanctot et al. '17](https://arxiv.org/abs/1711.00832)
     
-* ![](_static/green_circ10.png "green circle") Leduc poker
+### Leduc poker
   * Cards with bidding.
   * Simplified poker amenable to game-theoretic analysis.
   * Research-originated.
@@ -212,7 +260,7 @@ we verified against known values and/or reproduced results from papers.
   * 2 players.
   * [Southey et al. '05, Bayes’ bluff: Opponent modelling in poker](https://arxiv.org/abs/1207.1411)
     
-* <font color="orange"><b>~</b></font> Lewis Signaling
+### Lewis Signaling
   * Idiosyncratic format.
   * Receiver must choose an action dependent on the sender's hidden state. Designed to demonstrate the use of conventions.
   * Research-originated.
@@ -221,7 +269,7 @@ we verified against known values and/or reproduced results from papers.
   * 2 players.
   * [Wikipedia](https://en.wikipedia.org/wiki/Lewis_signaling_game)
     
-* ![](_static/green_circ10.png "green circle") Liar's Dice
+### Liar's Dice
   * Dice with bidding.
   * Players bid and bluff on the state of all the dice together, given only the state of their dice.
   * Traditional game.
@@ -230,7 +278,7 @@ we verified against known values and/or reproduced results from papers.
   * 2 players.
   * [Wikipedia](https://en.wikipedia.org/wiki/Liar%27s_dice)
     
-* <font color="orange"><b>~</b></font> Markov Soccer
+### Markov Soccer
   * Uses agents on a grid.
   * Agents must take the ball to their goal, and can 'tackle' the opponent by predicting their next move.
   * Research-originated.
@@ -239,7 +287,7 @@ we verified against known values and/or reproduced results from papers.
   * 2 players.
   * [Littman '94, Markov games as a framework for multi-agent reinforcement learning](https://www2.cs.duke.edu/courses/spring07/cps296.3/littman94markov.pdf),<br>[He et al. '16, Opponent Modeling in Deep Reinforcement Learning](https://arxiv.org/abs/1609.05559)
     
-* ![](_static/green_circ10.png "green circle") Matching Pennies (three-player)
+### Matching Pennies (Three-player)
   * Idiosyncratic format.
   * Players must predict and match/oppose another player. Designed to have an unstable Nash equilibrium.
   * Research-originated.
@@ -248,7 +296,7 @@ we verified against known values and/or reproduced results from papers.
   * 3 players.
   * "Three problems in learning mixed-strategy Nash equilibria"
     
-* ![](_static/green_circ10.png "green circle") Negotiation
+### Negotiation
   * Idiosyncratic format.
   * Agents with different utilities must negotiate an allocation of resources.
   * Research-originated.
@@ -257,7 +305,7 @@ we verified against known values and/or reproduced results from papers.
   * 2 players.
   * [Lewis et al. '17](https://arxiv.org/abs/1706.05125), [Cao et al. '18](https://arxiv.org/abs/1804.03980)
     
-* ![](_static/green_circ10.png "green circle") Oshi-Zumo
+### Oshi-Zumo
   * Idiosyncratic format.
   * Players must repeatedly bid to push a token off the other side of the board. 
   * Traditional game.
@@ -266,7 +314,7 @@ we verified against known values and/or reproduced results from papers.
   * 2 players.
   * [Buro, 2004. Solving the oshi-zumo game](https://link.springer.com/chapter/10.1007/978-0-387-35706-5_23) <br> [Bosansky et al. '16, Algorithms for Computing Strategies in Two-Player Simultaneous Move Games](http://mlanctot.info/files/papers/aij-2psimmove.pdf)
     
-* ![](_static/green_circ10.png "green circle") Oware
+### Oware
   * Idiosyncratic format.
   * Players redistribute tokens from their half of the board to capture tokens in the opponent's part of the board.
   * Traditional game.
@@ -275,7 +323,7 @@ we verified against known values and/or reproduced results from papers.
   * 2 players.
   * [Wikipedia](https://en.wikipedia.org/wiki/Oware)
     
-* ![](_static/green_circ10.png "green circle") Pentago
+### Pentago
   * Uses tokens on a grid.
   * Players place tokens on the board, then rotate part of the board to a new orientation.
   * Modern game.
@@ -284,7 +332,7 @@ we verified against known values and/or reproduced results from papers.
   * 2 players.
   * [Wikipedia](https://en.wikipedia.org/wiki/Pentago)
     
-* <font color="orange"><b>~</b></font> Phantom Tic-Tac-Toe
+### Phantom Tic-Tac-Toe
   * Uses tokens on a grid.
   * Tic-tac-toe, except the opponent's tokens are hidden. Designed as a simple, imperfect-information game.
   * Research-originated.
@@ -293,7 +341,7 @@ we verified against known values and/or reproduced results from papers.
   * 2 players.
   * [Auger '11, Multiple Tree for Partially Observable Monte-Carlo Tree Search](https://hal.archives-ouvertes.fr/hal-00563480v2/document),<br>[Lisy '14, Alternative Selection Functions for Information Set Monte Carlo Tree Search](https://core.ac.uk/download/pdf/81646968.pdf), <br>[Lanctot '13](http://mlanctot.info/files/papers/PhD_Thesis_MarcLanctot.pdf)
     
-* ![](_static/green_circ10.png "green circle") Pig
+### Pig
   * Dice game.
   * Each player rolls a dice until they get a 1 or they 'hold'; the rolled total is added to their score.
   * Traditional game.
@@ -302,7 +350,7 @@ we verified against known values and/or reproduced results from papers.
   * 2-10 players.
   * [Wikipedia](https://en.wikipedia.org/wiki/Pig_\(dice_game\))
     
-* <font color="orange"><b>~</b></font> Poker (Hold'em, via [ACPC](http://www.computerpokercompetition.org/) code base)
+### Poker (Hold 'em)
   * Cards with bidding.
   * Players bet on whether their hand of cards plus some communal cards will form a special set.
   * Traditional game.
@@ -310,8 +358,9 @@ we verified against known values and/or reproduced results from papers.
   * Imperfect information.
   * 2-10 players.
   * [Wikipedia](https://en.wikipedia.org/wiki/Texas_hold_%27em)
+  * Implemented via [ACPC](http://www.computerpokercompetition.org/).
     
-* ![](_static/green_circ10.png "green circle") Quoridor
+### Quoridor
   * Idiosyncratic format.
   * Each turn, players can either move their agent or add a small wall to the board.
   * Modern game.
@@ -320,7 +369,7 @@ we verified against known values and/or reproduced results from papers.
   * 2-4 players.
   * [Wikipedia](https://en.wikipedia.org/wiki/Quoridor)
     
-* <font color="orange"><b>~</b></font> Skat (simplified bidding)
+### Skat (simplified bidding)
   * Cards with bidding.
   * A card game where each turn, players bid to play compete against the other two players.
   * Traditional game.
@@ -329,7 +378,7 @@ we verified against known values and/or reproduced results from papers.
   * 3 players.
   * [Wikipedia](https://en.wikipedia.org/wiki/Skat_\(card_game\))
     
-* <font color="orange"><b>~</b></font> Solitaire (K+)
+### Solitaire (K+)
   * Card game.
   * A single-player card game.
   * Traditional game.
@@ -338,7 +387,7 @@ we verified against known values and/or reproduced results from papers.
   * 1 players.
   * [Wikipedia](https://en.wikipedia.org/wiki/Klondike_\(solitaire\)) and [Bjarnason et al. '07, Searching solitaire in real time](http://web.engr.oregonstate.edu/~afern/papers/solitaire.pdf)
     
-* ![](_static/green_circ10.png "green circle") Tic-Tac-Toe
+### Tic-Tac-Toe
   * Uses tokens on a grid.
   * Players place tokens to try and form a pattern.
   * Traditional game.
@@ -347,16 +396,16 @@ we verified against known values and/or reproduced results from papers.
   * 2 players.
   * [Wikipedia](https://en.wikipedia.org/wiki/Tic-tac-toe)
     
-* ![](_static/green_circ10.png "green circle") Tiny Bridge
+### Tiny Bridge
   * Cards with bidding.
   * Simplified Bridge with fewer cards and tricks.
   * Research-originated.
   * Deterministic.
   * Imperfect information.
   * 2, 4 players.
-  * 
+  * See implementation for details. 
     
-* ![](_static/green_circ10.png "green circle") Tiny Hanabi
+### Tiny Hanabi
   * Idiosyncratic format.
   * Simplified Hanabi with just two turns.
   * Research-originated.
@@ -365,7 +414,7 @@ we verified against known values and/or reproduced results from papers.
   * 2-10 players.
   * [Foerster et al 2018, Bayesian Action Decoder for Deep Multi-Agent Reinforcement Learning](https://arxiv.org/abs/1811.01458)
     
-* ![](_static/green_circ10.png "green circle") Trade Comm
+### Trade Comm
   * Idiosyncratic format.
   * Players with different utilities and items communicate and then trade.
   * Research-originated.
@@ -374,7 +423,7 @@ we verified against known values and/or reproduced results from papers.
   * 2 players.
   * A simple emergent communication game based on trading.
     
-* ![](_static/green_circ10.png "green circle") Y
+### Y
   * Tokens on hex grid.
   * Players place tokens to try and connect sides of a triangular board.
   * Modern game.
