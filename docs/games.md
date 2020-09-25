@@ -56,7 +56,7 @@ we verified against known values and/or reproduced results from papers.
   * Players move their pieces through the board based on the rolls of dice.
   * Idiosyncratic format.
   * Traditional game.
-  * Deterministic.
+  * Non-deterministic.
   * Perfect information.
   * 2 players.
   * [Wikipedia](https://en.wikipedia.org/wiki/Backgammon)
@@ -74,7 +74,7 @@ we verified against known values and/or reproduced results from papers.
   * A card game where players compete in pairs.
   * Card game.
   * Traditional game.
-  * Deterministic.
+  * Non-deterministic.
   * Imperfect information.
   * 4 players.
   * [Wikipedia](https://en.wikipedia.org/wiki/Contract_bridge)
@@ -83,7 +83,7 @@ we verified against known values and/or reproduced results from papers.
   * Players score points by forming specific sets with the cards in their hands.
   * Card game.
   * Research game.
-  * Deterministic.
+  * Non-deterministic.
   * Imperfect information.
   * 2 players.
   * [Wikipedia](https://en.wikipedia.org/wiki/Contract_bridge)
@@ -92,7 +92,7 @@ we verified against known values and/or reproduced results from papers.
   * Agent must move horizontally to 'catch' a descending ball. Designed to test basic learning.
   * Agent on a grid.
   * Research game.
-  * Deterministic.
+  * Non-deterministic.
   * Perfect information.
   * 1 players.
   * [Mnih et al. 2014, Recurrent Models of Visual Attention](https://papers.nips.cc/paper/5542-recurrent-models-of-visual-attention.pdf),<br>[Osband et al '19, Behaviour Suite for Reinforcement Learning, Appendix A](https://arxiv.org/abs/1908.03568)
@@ -119,7 +119,7 @@ we verified against known values and/or reproduced results from papers.
   * Agents must collect their and their collaborator's tokens while avoiding a third kind of token. Designed to test divining of collaborator's intentions
   * Agents on a grid.
   * Research game.
-  * Deterministic.
+  * Non-deterministic.
   * Perfect, incomplete information.
   * 2 players.
   * [Raileanu et al. '18, Modeling Others using Oneself in Multi-Agent Reinforcement Learning](https://arxiv.org/abs/1802.09640)
@@ -164,7 +164,7 @@ we verified against known values and/or reproduced results from papers.
   * Agents submit bids simultaneously; highest bid wins, and that's the price paid.
   * Idiosyncratic format.
   * Research game.
-  * Deterministic.
+  * Non-deterministic.
   * Imperfect, incomplete information.
   * 2-10 players.
   * [Wikipedia](https://en.wikipedia.org/wiki/First-price_sealed-bid_auction)
@@ -173,7 +173,7 @@ we verified against known values and/or reproduced results from papers.
   * Players score points by forming specific sets with the cards in their hands.
   * Card game.
   * Traditional game.
-  * Deterministic.
+  * Non-deterministic.
   * Imperfect information.
   * 2 players.
   * [Wikipedia](https://en.wikipedia.org/wiki/Gin_rummy)
@@ -182,7 +182,7 @@ we verified against known values and/or reproduced results from papers.
   * Players place tokens on the board with the goal of encircling territory.
   * Tokens on a grid.
   * Traditional game.
-  * Deterministic.
+  * Non-deterministic.
   * Perfect information.
   * 2 players.
   * [Wikipedia](https://en.wikipedia.org/wiki/Go_\(game\))
@@ -191,7 +191,7 @@ we verified against known values and/or reproduced results from papers.
   * Players bid with their cards to win other cards.
   * Card game.
   * Traditional game.
-  * Deterministic.
+  * Non-deterministic.
   * Imperfect information.
   * 2-10 players.
   * [Wikipedia](https://en.wikipedia.org/wiki/Goofspiel)
@@ -200,7 +200,7 @@ we verified against known values and/or reproduced results from papers.
   * Players can see only other player's pieces, and everyone must cooperate to win.
   * Idiosyncratic format.
   * Modern game.
-  * Deterministic.
+  * Non-deterministic.
   * Imperfect information.
   * 2-5 players.
   * [Wikipedia](https://en.wikipedia.org/wiki/Hanabi_\(card_game\)) and [Bard et al. '19, The Hanabi Challenge: A New Frontier for AI Research](https://arxiv.org/abs/1902.00506)
@@ -219,7 +219,7 @@ we verified against known values and/or reproduced results from papers.
   * A card game where players try to avoid playing the highest card in each round.
   * Card game.
   * Traditional game.
-  * Deterministic.
+  * Non-deterministic.
   * Imperfect information.
   * 3-6 players.
   * [Wikipedia](https://en.wikipedia.org/wiki/Hearts_\(card_game\))
@@ -237,7 +237,7 @@ we verified against known values and/or reproduced results from papers.
   * Simplified poker amenable to game-theoretic analysis.
   * Cards with bidding.
   * Research game.
-  * Deterministic.
+  * Non-deterministic.
   * Imperfect information.
   * 2 players.
   * [Wikipedia](https://en.wikipedia.org/wiki/Kuhn_poker)
@@ -246,7 +246,7 @@ we verified against known values and/or reproduced results from papers.
   * Agents see a local part of the grid, and attempt to tag eachother with beams.
   * Agents on a grid.
   * Research game.
-  * Deterministic.
+  * Non-deterministic.
   * Imperfect information.
   * 2 players.
   * [Leibo et al. '17](https://arxiv.org/abs/1702.03037), [Lanctot et al. '17](https://arxiv.org/abs/1711.00832)
@@ -255,7 +255,7 @@ we verified against known values and/or reproduced results from papers.
   * Simplified poker amenable to game-theoretic analysis.
   * Cards with bidding.
   * Research game.
-  * Deterministic.
+  * Non-deterministic.
   * Imperfect information.
   * 2 players.
   * [Southey et al. '05, Bayes’ bluff: Opponent modelling in poker](https://arxiv.org/abs/1207.1411)
@@ -264,7 +264,7 @@ we verified against known values and/or reproduced results from papers.
   * Receiver must choose an action dependent on the sender's hidden state. Designed to demonstrate the use of conventions.
   * Idiosyncratic format.
   * Research game.
-  * Deterministic.
+  * Non-deterministic.
   * Imperfect information.
   * 2 players.
   * [Wikipedia](https://en.wikipedia.org/wiki/Lewis_signaling_game)
@@ -273,7 +273,7 @@ we verified against known values and/or reproduced results from papers.
   * Players bid and bluff on the state of all the dice together, given only the state of their dice.
   * Dice with bidding.
   * Traditional game.
-  * Deterministic.
+  * Non-deterministic.
   * Imperfect information.
   * 2 players.
   * [Wikipedia](https://en.wikipedia.org/wiki/Liar%27s_dice)
@@ -282,7 +282,7 @@ we verified against known values and/or reproduced results from papers.
   * Agents must take the ball to their goal, and can 'tackle' the opponent by predicting their next move.
   * Agents on a grid.
   * Research game.
-  * Deterministic.
+  * Non-deterministic.
   * Imperfect information.
   * 2 players.
   * [Littman '94, Markov games as a framework for multi-agent reinforcement learning](https://www2.cs.duke.edu/courses/spring07/cps296.3/littman94markov.pdf),<br>[He et al. '16, Opponent Modeling in Deep Reinforcement Learning](https://arxiv.org/abs/1609.05559)
@@ -300,7 +300,7 @@ we verified against known values and/or reproduced results from papers.
   * Agents with different utilities must negotiate an allocation of resources.
   * Idiosyncratic format.
   * Research game.
-  * Deterministic.
+  * Non-deterministic.
   * Imperfect information.
   * 2 players.
   * [Lewis et al. '17](https://arxiv.org/abs/1706.05125), [Cao et al. '18](https://arxiv.org/abs/1804.03980)
@@ -345,7 +345,7 @@ we verified against known values and/or reproduced results from papers.
   * Each player rolls a dice until they get a 1 or they 'hold'; the rolled total is added to their score.
   * Dice game.
   * Traditional game.
-  * Deterministic.
+  * Non-deterministic.
   * Perfect information.
   * 2-10 players.
   * [Wikipedia](https://en.wikipedia.org/wiki/Pig_\(dice_game\))
@@ -354,7 +354,7 @@ we verified against known values and/or reproduced results from papers.
   * Players bet on whether their hand of cards plus some communal cards will form a special set.
   * Cards with bidding.
   * Traditional game.
-  * Deterministic.
+  * Non-deterministic.
   * Imperfect information.
   * 2-10 players.
   * [Wikipedia](https://en.wikipedia.org/wiki/Texas_hold_%27em)
@@ -373,7 +373,7 @@ we verified against known values and/or reproduced results from papers.
   * Each turn, players bid to compete against the other two players.
   * Cards with bidding.
   * Traditional game.
-  * Deterministic.
+  * Non-deterministic.
   * Imperfect information.
   * 3 players.
   * [Wikipedia](https://en.wikipedia.org/wiki/Skat_\(card_game\))
@@ -382,7 +382,7 @@ we verified against known values and/or reproduced results from papers.
   * A single-player card game.
   * Card game.
   * Traditional game.
-  * Deterministic.
+  * Non-deterministic.
   * Imperfect information.
   * 1 players.
   * [Wikipedia](https://en.wikipedia.org/wiki/Klondike_\(solitaire\)) and [Bjarnason et al. '07, Searching solitaire in real time](http://web.engr.oregonstate.edu/~afern/papers/solitaire.pdf)
@@ -400,7 +400,7 @@ we verified against known values and/or reproduced results from papers.
   * Simplified Bridge with fewer cards and tricks.
   * Cards with bidding.
   * Research game.
-  * Deterministic.
+  * Non-deterministic.
   * Imperfect information.
   * 2, 4 players.
   * See implementation for details. 
@@ -409,7 +409,7 @@ we verified against known values and/or reproduced results from papers.
   * Simplified Hanabi with just two turns.
   * Idiosyncratic format.
   * Research game.
-  * Deterministic.
+  * Non-deterministic.
   * Imperfect information.
   * 2-10 players.
   * [Foerster et al 2018, Bayesian Action Decoder for Deep Multi-Agent Reinforcement Learning](https://arxiv.org/abs/1811.01458)
@@ -418,7 +418,7 @@ we verified against known values and/or reproduced results from papers.
   * Players with different utilities and items communicate and then trade.
   * Idiosyncratic format.
   * Research game.
-  * Deterministic.
+  * Non-deterministic.
   * Imperfect information.
   * 2 players.
   * A simple emergent communication game based on trading.
