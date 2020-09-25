@@ -13,15 +13,15 @@
 // limitations under the License.
 
 
-#ifndef OPEN_SPIEL_GAMES_HEARTS_XINXIN_BOT_H_
-#define OPEN_SPIEL_GAMES_HEARTS_XINXIN_BOT_H_
+#ifndef OPEN_SPIEL_BOTS_XINXIN_XINXIN_BOT_H_
+#define OPEN_SPIEL_BOTS_XINXIN_XINXIN_BOT_H_
 
 #include <memory>
 #include <string>
 #include <vector>
 
-#include "open_spiel/games/hearts/hearts/Hearts.h"
-#include "open_spiel/games/hearts/hearts/iiMonteCarlo.h"
+#include "open_spiel/bots/xinxin/hearts/Hearts.h"
+#include "open_spiel/bots/xinxin/hearts/iiMonteCarlo.h"
 #include "open_spiel/games/hearts.h"
 #include "open_spiel/spiel_bots.h"
 
@@ -82,4 +82,4 @@ std::unique_ptr<Bot> MakeXinxinBot(GameParameters params, int uct_num_runs = 50,
 }  // namespace hearts
 }  // namespace open_spiel
 
-#endif  // OPEN_SPIEL_GAMES_HEARTS_XINXIN_BOT_H_
+#endif  // OPEN_SPIEL_BOTS_XINXIN_XINXIN_BOT_H_
