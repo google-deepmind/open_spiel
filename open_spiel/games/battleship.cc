@@ -72,77 +72,81 @@ Player BattleshipState::CurrentPlayer() const {
 }
 
 std::vector<Action> BattleshipState::LegalActions() const {
-  SPIEL_CHECK_FALSE(IsTerminal());
-  const Player player = CurrentPlayer();
-  const BattleshipConfiguration& conf = bs_game_->configuration;
-
-  std::vector<Action> actions;
-  actions.reserve(NumDistinctActions());
-
-  if (!AllShipsPlaced()) {
-    // If we are here, we still have some ships to place on the board.
-    //
-    // First, we find the first ship that hasn't been placed on the board yet.
-    const Ship next_ship = NextShipToPlace(player);
-
-    // Horizontal placement.
-    if (next_ship.length <= conf.board_width) {
-      for (int row = 0; row < conf.board_height; ++row) {
-        for (int col = 0; col < conf.board_width - next_ship.length + 1;
-             ++col) {
-          const ShipPlacement placement(ShipPlacement::Direction::Horizontal,
-                                        /* ship = */ next_ship,
-                                        /* tl_corner = */ Cell{row, col});
-          actions.push_back(SerializeShipPlacementAction(placement));
-        }
-      }
-    }
-
-    // Vertical placement.
-    //
-    // NOTE: vertical placement is defined only for ships with length more than
-    // one. This avoids duplicating placement actions for 1x1 ships.
-    if (next_ship.length > 1 && next_ship.length <= conf.board_height) {
-      for (int row = 0; row < conf.board_height; ++row) {
-        for (int col = 0; col < conf.board_width - next_ship.length + 1;
-             ++col) {
-          const ShipPlacement placement(ShipPlacement::Direction::Vertical,
-                                        /* ship = */ next_ship,
-                                        /* tl_corner = */ Cell{row, col});
-          actions.push_back(SerializeShipPlacementAction(placement));
-        }
-      }
-    }
-
-    // FIXME(gfarina): It would be better to have a check of this time at game
-    // construction time.
-    if (actions.empty()) {
-      SpielFatalError(
-          "Battleship: it is NOT possible to fit all the ships on the board!");
-    }
+  if (IsTerminal()) {
+    return {};
   } else {
-    // In this case, the only thing the player can do is to shoot on a cell
-    //
-    // Depending on whether repeated shots are allowed or not, we might filter
-    // out some cells.
-    for (int row = 0; row < conf.board_height; ++row) {
-      for (int col = 0; col < conf.board_width; ++col) {
-        if (!conf.allow_repeated_shots &&
-            AlreadyShot(Cell{row, col}, CurrentPlayer())) {
-          // We do not duplicate the shot, so nothing to do here...
-        } else {
-          actions.push_back(SerializeShotAction(Shot{row, col}));
+    const Player player = CurrentPlayer();
+    const BattleshipConfiguration& conf = bs_game_->configuration;
+
+    std::vector<Action> actions;
+    actions.reserve(NumDistinctActions());
+
+    if (!AllShipsPlaced()) {
+      // If we are here, we still have some ships to place on the board.
+      //
+      // First, we find the first ship that hasn't been placed on the board yet.
+      const Ship next_ship = NextShipToPlace(player);
+
+      // Horizontal placement.
+      if (next_ship.length <= conf.board_width) {
+        for (int row = 0; row < conf.board_height; ++row) {
+          for (int col = 0; col < conf.board_width - next_ship.length + 1;
+               ++col) {
+            const ShipPlacement placement(ShipPlacement::Direction::Horizontal,
+                                          /* ship = */ next_ship,
+                                          /* tl_corner = */ Cell{row, col});
+            actions.push_back(SerializeShipPlacementAction(placement));
+          }
         }
       }
+
+      // Vertical placement.
+      //
+      // NOTE: vertical placement is defined only for ships with length more
+      // than one. This avoids duplicating placement actions for 1x1 ships.
+      if (next_ship.length > 1 && next_ship.length <= conf.board_height) {
+        for (int row = 0; row < conf.board_height; ++row) {
+          for (int col = 0; col < conf.board_width - next_ship.length + 1;
+               ++col) {
+            const ShipPlacement placement(ShipPlacement::Direction::Vertical,
+                                          /* ship = */ next_ship,
+                                          /* tl_corner = */ Cell{row, col});
+            actions.push_back(SerializeShipPlacementAction(placement));
+          }
+        }
+      }
+
+      // FIXME(gfarina): It would be better to have a check of this time at game
+      // construction time.
+      if (actions.empty()) {
+        SpielFatalError(
+            "Battleship: it is NOT possible to fit all the ships on the "
+            "board!");
+      }
+    } else {
+      // In this case, the only thing the player can do is to shoot on a cell
+      //
+      // Depending on whether repeated shots are allowed or not, we might filter
+      // out some cells.
+      for (int row = 0; row < conf.board_height; ++row) {
+        for (int col = 0; col < conf.board_width; ++col) {
+          if (!conf.allow_repeated_shots &&
+              AlreadyShot(Cell{row, col}, CurrentPlayer())) {
+            // We do not duplicate the shot, so nothing to do here...
+          } else {
+            actions.push_back(SerializeShotAction(Shot{row, col}));
+          }
+        }
+      }
+
+      // SAFETY: The assert below can never fail, because when
+      // allow_repeated_shot is false, we check at game construction time that
+      // the number of shots per player is <= the number of cells in the board.
+      SPIEL_DCHECK_FALSE(actions.empty());
     }
 
-    // SAFETY: The assert below can never fail, because when allow_repeated_shot
-    // is false, we check at game construction time that the number of shots per
-    // player is <= the number of cells in the board.
-    SPIEL_DCHECK_FALSE(actions.empty());
+    return actions;
   }
-
-  return actions;
 }
 
 std::string BattleshipState::ActionToString(Player player,
