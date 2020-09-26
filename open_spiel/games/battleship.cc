@@ -650,11 +650,6 @@ BattleshipGame::BattleshipGame(const GameParameters& params)
                    configuration.board_width * configuration.board_height);
   }
 
-  // FIXME(gfarina): It would make sense to be a bit lenient with respect to the
-  // type of loss_multiplier. For example, if an int has been supplied, we
-  // should simply cast the int to double.
-  //
-  // Currently, `ValidateParams` throws.
   configuration.loss_multiplier = ParameterValue<double>("loss_multiplier");
 
   if (std::abs(configuration.loss_multiplier - 1.0) < kFloatTolerance) {
