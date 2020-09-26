@@ -29,6 +29,7 @@
 #include "open_spiel/observer.h"
 #include "open_spiel/python/pybind11/algorithms_trajectories.h"
 #include "open_spiel/python/pybind11/bots.h"
+#include "open_spiel/python/pybind11/games.h"
 #include "open_spiel/python/pybind11/game_transforms.h"
 #include "open_spiel/python/pybind11/games_bridge.h"
 #include "open_spiel/python/pybind11/games_negotiation.h"
@@ -557,6 +558,7 @@ PYBIND11_MODULE(pyspiel, m) {
       [](const std::string& string) { throw SpielException(string); });
 
   // Register other bits of the API.
+  init_pyspiel_game_specific_api(m);      // Expose game-specific methods.
   init_pyspiel_bots(m);                   // Bots and bot-related algorithms.
   init_pyspiel_observation_histories(m);  // Histories related to observations.
   init_pyspiel_policy(m);           // Policies and policy-related algorithms.
