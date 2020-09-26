@@ -97,7 +97,9 @@ std::vector<Action> BattleshipState::LegalActions() const {
             const ShipPlacement placement(ShipPlacement::Direction::Horizontal,
                                           /* ship = */ next_ship,
                                           /* tl_corner = */ Cell{row, col});
-            actions.push_back(SerializeShipPlacementAction(placement));
+            if (PlacementDoesNotOverlap(placement, player)) {
+              actions.push_back(SerializeShipPlacementAction(placement));
+            }
           }
         }
       }
@@ -105,15 +107,17 @@ std::vector<Action> BattleshipState::LegalActions() const {
       // Vertical placement.
       //
       // NOTE: vertical placement is defined only for ships with length more
-      // than one. This avoids duplicating placement actions for 1x1 ships.
+      //     than one. This avoids duplicating placement actions for 1x1 ships.
       if (next_ship.length > 1 && next_ship.length <= conf.board_height) {
-        for (int row = 0; row < conf.board_height; ++row) {
-          for (int col = 0; col < conf.board_width - next_ship.length + 1;
-               ++col) {
+        for (int row = 0; row < conf.board_height - next_ship.length + 1;
+             ++row) {
+          for (int col = 0; col < conf.board_width - next_ship.length; ++col) {
             const ShipPlacement placement(ShipPlacement::Direction::Vertical,
                                           /* ship = */ next_ship,
                                           /* tl_corner = */ Cell{row, col});
-            actions.push_back(SerializeShipPlacementAction(placement));
+            if (PlacementDoesNotOverlap(placement, player)) {
+              actions.push_back(SerializeShipPlacementAction(placement));
+            }
           }
         }
       }
@@ -395,6 +399,34 @@ ShipPlacement BattleshipState::FindShipPlacement(const Ship& ship,
     }
   }
   SPIEL_DCHECK_TRUE(false);  // Unreachable!
+}
+
+bool BattleshipState::PlacementDoesNotOverlap(const ShipPlacement& proposed,
+                                              const Player player) const {
+  const BattleshipConfiguration& conf = bs_game_->configuration;
+
+  SPIEL_DCHECK_GE(proposed.TopLeftCorner().row, 0);
+  SPIEL_DCHECK_LT(proposed.TopLeftCorner().row, conf.board_height);
+  SPIEL_DCHECK_GE(proposed.TopLeftCorner().col, 0);
+  SPIEL_DCHECK_LT(proposed.TopLeftCorner().col, conf.board_width);
+
+  SPIEL_DCHECK_GE(proposed.BottomRightCorner().row, 0);
+  SPIEL_DCHECK_LT(proposed.BottomRightCorner().row, conf.board_height);
+  SPIEL_DCHECK_GE(proposed.BottomRightCorner().col, 0);
+  SPIEL_DCHECK_LT(proposed.BottomRightCorner().col, conf.board_width);
+
+  for (const auto& move : moves_) {
+    if (move.player == player &&
+        absl::holds_alternative<ShipPlacement>(move.action)) {
+      const ShipPlacement& prior_placement =
+          absl::get<ShipPlacement>(move.action);
+
+      if (proposed.OverlapsWith(prior_placement)) {
+        return false;
+      }
+    }
+  }
+  return true;
 }
 
 bool BattleshipState::DidShipSink(const Ship& ship, const Player player) const {

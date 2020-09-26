@@ -65,7 +65,7 @@ class ShipPlacement final {
   Cell BottomRightCorner() const;
 
   // Checks whether two ship placements intersect on at least one cell.
-  bool Overlaps(const ShipPlacement& other) const;
+  bool OverlapsWith(const ShipPlacement& other) const;
 
   // Gives a string representation of the ship placement, useful to the
   // ActionToString method.

@@ -194,6 +194,11 @@ class BattleshipState final : public State {
   // the ship on the board.
   ShipPlacement FindShipPlacement(const Ship& ship, const Player player) const;
 
+  // Checks whether the proposed ship placement would overlap with the ships
+  // that the player has placed so far.
+  bool PlacementDoesNotOverlap(const ShipPlacement& proposed,
+                               const Player player) const;
+
   // Sunken ship methods
   // ===================
 

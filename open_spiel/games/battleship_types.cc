@@ -46,6 +46,23 @@ Cell ShipPlacement::BottomRightCorner() const {
   }
 }
 
+bool ShipPlacement::OverlapsWith(const ShipPlacement& other) const {
+  if (other.BottomRightCorner().row < TopLeftCorner().row) {
+    // `other` is completely above `this`.
+    return false;
+  } else if (other.TopLeftCorner().row > BottomRightCorner().row) {
+    // `other` is completely below `this`.
+    return false;
+  } else if (other.BottomRightCorner().col < TopLeftCorner().col) {
+    // `other` is completely to the left of `this`.
+    return false;
+  } else if (other.TopLeftCorner().col > BottomRightCorner().col) {
+    // `other` is completely to the right of `this`.
+    return false;
+  }
+  return true;
+}
+
 std::string ShipPlacement::ToString() const {
   const char direction_char = direction == Direction::Horizontal ? 'h' : 'v';
 
