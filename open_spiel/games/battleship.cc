@@ -312,7 +312,119 @@ std::string BattleshipState::ObservationString(Player player) const {
   //     "player >= 0" when the method fails because an invalid player was
   //     supplied. That's why the redundant check is appended to the end.
   SPIEL_CHECK_TRUE(player >= Player1 && player <= Player2 && player >= 0);
-  return InformationStateString(player);
+
+  const Player opponent = (player == Player1) ? Player2 : Player1;
+  const BattleshipConfiguration& conf = bs_game_->configuration;
+
+  // We keep the two boards in memory as vectors of strings. Initially, all
+  // strings only contain whitespace.
+  std::vector<std::string> player_board(conf.board_height,
+                                        std::string(conf.board_width, ' '));
+  std::vector<std::string> opponent_board = player_board;  // Deep copy.
+
+  // We start by drawing the ships on the player's board. For now, we do
+  // not include any information about where the opponent shot.
+  char ship_id = 'a';
+  for (const auto& move : moves_) {
+    if (move.player == player &&
+        absl::holds_alternative<ShipPlacement>(move.action)) {
+      const ShipPlacement& placement = absl::get<ShipPlacement>(move.action);
+
+      // We now iterate over all the cells that the ship covers on the board
+      // and fill in the `player_board` string representation.
+      Cell cell = placement.TopLeftCorner();
+      for (int i = 0; i < placement.ship.length; ++i) {
+        SPIEL_DCHECK_TRUE(cell.row >= 0 && cell.row < conf.board_height);
+        SPIEL_DCHECK_TRUE(cell.col >= 0 && cell.col < conf.board_width);
+
+        player_board[cell.row][cell.col] = ship_id;
+
+        if (placement.direction == ShipPlacement::Direction::Horizontal) {
+          ++cell.col;
+        } else {
+          SPIEL_DCHECK_TRUE(placement.direction ==
+                            ShipPlacement::Direction::Vertical);
+          ++cell.row;
+        }
+      }
+
+      ++ship_id;
+    }
+  }
+  // It is impossible that the player placed more ships than they own.
+  SPIEL_DCHECK_LE(ship_id, 'a' + conf.ships.size());
+
+  // We now include the opponent's shots on the player's board.
+  for (const auto& move : moves_) {
+    if (move.player == opponent && absl::holds_alternative<Shot>(move.action)) {
+      const Shot& shot = absl::get<Shot>(move.action);
+
+      if (player_board[shot.row][shot.col] == ' ') {
+        player_board[shot.row][shot.col] = '*';
+      } else {
+        // The shot hit one of the ships. In this case, we use the uppercase
+        // letter corresponding to the ship.
+        player_board[shot.row][shot.col] =
+            std::toupper(player_board[shot.row][shot.col]);
+      }
+    }
+  }
+
+  // Finally, we fill in the baord that represents the outcome of the player's
+  // shots.
+  //
+  // We start by adding a '@' to all the positions where the player shot.
+  // That corresponds to marking all shots as 'misses'. We will promote them to
+  // ship-hit marks '#' in a shortly.
+  for (const auto& move : moves_) {
+    if (move.player == player && absl::holds_alternative<Shot>(move.action)) {
+      const Shot& shot = absl::get<Shot>(move.action);
+
+      SPIEL_DCHECK_EQ(opponent_board[shot.row][shot.col], ' ');
+      opponent_board[shot.row][shot.col] = '@';
+    }
+  }
+
+  // Now, we iterate through the ship placements of the opponent. If a ship has
+  // been hit, then we will promote '@' to '#'.
+  for (const auto& move : moves_) {
+    if (move.player == opponent &&
+        absl::holds_alternative<ShipPlacement>(move.action)) {
+      const ShipPlacement& placement = absl::get<ShipPlacement>(move.action);
+
+      // We now iterate over all the cells that the ship covers on the board
+      // and fill in the `player_board` string representation.
+      Cell cell = placement.TopLeftCorner();
+      for (int i = 0; i < placement.ship.length; ++i) {
+        SPIEL_DCHECK_TRUE(cell.row >= 0 && cell.row < conf.board_height);
+        SPIEL_DCHECK_TRUE(cell.col >= 0 && cell.col < conf.board_width);
+
+        if (opponent_board[cell.row][cell.col] == '@') {
+          opponent_board[cell.row][cell.col] = '#';
+        } else {
+          // Ships cannot intersect, so it's impossible that we would go over a
+          // '#'.
+          std::cout << "(" << cell.row << ", " << cell.col << ") -> '"
+                    << opponent_board[cell.row][cell.col] << "'\n";
+          SPIEL_DCHECK_EQ(opponent_board[cell.row][cell.col], ' ');
+        }
+
+        if (placement.direction == ShipPlacement::Direction::Horizontal) {
+          ++cell.col;
+        } else {
+          SPIEL_DCHECK_TRUE(placement.direction ==
+                            ShipPlacement::Direction::Vertical);
+          ++cell.row;
+        }
+      }
+    }
+  }
+
+  std::string output = "State of player's ships:\n";
+  for (const auto& row : player_board) absl::StrAppend(&output, row, "\n");
+  absl::StrAppend(&output, "\nPlayer's shot outcomes:\n");
+  for (const auto& row : opponent_board) absl::StrAppend(&output, row, "\n");
+  return output;
 }
 
 void BattleshipState::UndoAction(Player player, Action action) {
@@ -640,6 +752,11 @@ BattleshipGame::BattleshipGame(const GameParameters& params)
     configuration.ships.push_back(ship);
   }
   SPIEL_CHECK_GT(configuration.ships.size(), 0);
+
+  // XXX(gfarina): The next restriction is not really intrinsic in the game,
+  //     but we need it to pretty print the board status in `ObservationString`,
+  //     since we use ASCII letters (a-z) to identify the ships.
+  SPIEL_CHECK_LE(configuration.ships.size(), 26);
 
   configuration.num_shots = ParameterValue<int>("num_shots");
   SPIEL_CHECK_GT(configuration.num_shots, 0);
