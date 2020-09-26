@@ -29,7 +29,7 @@
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/tests/basic_tests.h"
 
-// XXX(maintainers): If this is useful enough, consider moving to the header
+// XXX: If this is useful enough, consider moving to the header
 //     where all the other SPIEL_CHECK_* macros are defined.
 #define SPIEL_CHECK_THROWS(expr, exception)     \
   try {                                         \
@@ -268,7 +268,7 @@ void GameParametersTest() {
 
   // Parsing from string
   //
-  // XXX(maintainers): Game parameter parsing from string is a bit quirky at the
+  // XXX: Game parameter parsing from string is a bit quirky at the
   //     moment. For example, the strings "+" or "-" make the parser
   //     throw since the parses eagerly tries to parse those as integers and
   //     passes them to std::stoi.

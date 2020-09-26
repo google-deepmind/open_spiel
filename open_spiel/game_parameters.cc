@@ -58,18 +58,18 @@ std::string GameParameter::ToString() const {
     case Type::kInt:
       return absl::StrCat(int_value());
     case Type::kDouble: {
-      // XXX(maintainers): We make sure to include a '.0' for doubles that hold
-      //      integer values to avoid deserializing them as integers (see
-      //      implementation in `GameParameterFromString`).
+      // XXX: We make sure to include a '.0' for doubles that hold
+      //     integer values to avoid deserializing them as integers (see
+      //     implementation in `GameParameterFromString`).
       //
-      //      See also: #382.
+      //     See also: #382.
       //
       //
       // We cannot use StrCat as that would default to exponential notation
       // sometimes. For example, the default format of 10^-9 is the string
       // "1e-9". For that reason, we use std::stringstream here.
       //
-      // FIXME(maintainers): Avoid hardcoding the number of digits after the
+      // TODO: Avoid hardcoding the number of digits after the
       //     point if possible?
       std::stringstream ss;
       ss << std::fixed << std::setprecision(10) << double_value();
