@@ -34,6 +34,7 @@ class GameParameter;
 
 using GameParameters = std::map<std::string, GameParameter>;
 std::string GameParametersToString(const GameParameters& game_params);
+GameParameter GameParameterFromString(const std::string& game_string);
 GameParameters GameParametersFromString(const std::string& game_string);
 
 class GameParameter {

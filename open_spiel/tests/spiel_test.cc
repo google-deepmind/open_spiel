@@ -29,6 +29,16 @@
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/tests/basic_tests.h"
 
+// XXX(maintainers): If this is useful enough, consider moving to the header
+//     where all the other SPIEL_CHECK_* macros are defined.
+#define SPIEL_CHECK_THROWS(expr, exception)     \
+  try {                                         \
+    { expr; }                                   \
+    SPIEL_CHECK_FALSE(#expr " did not throw!"); \
+  } catch (const exception& e) {                \
+    SPIEL_CHECK_TRUE("Did throw as expected");  \
+  }
+
 namespace open_spiel {
 namespace testing {
 namespace {
@@ -247,6 +257,56 @@ void GameParametersTest() {
   SPIEL_CHECK_TRUE(GameParameter(true).has_bool_value());
   SPIEL_CHECK_TRUE(GameParameter(std::string("1")).has_string_value());
   SPIEL_CHECK_TRUE(GameParameter("1").has_string_value());  // See issue #380.
+
+  // Writing to string
+  SPIEL_CHECK_EQ(GameParameter("1").ToString(), "1");
+  SPIEL_CHECK_EQ(GameParameter(1).ToString(), "1");
+  // -- Currently we serialize doubles with 10 digits after the point.
+  SPIEL_CHECK_EQ(GameParameter(1.0).ToString(), "1.0000000000");
+  SPIEL_CHECK_EQ(GameParameter(1.5).ToString(), "1.5000000000");
+  SPIEL_CHECK_EQ(GameParameter(1e-9).ToString(), "0.0000000010");
+
+  // Parsing from string
+  //
+  // XXX(maintainers): Game parameter parsing from string is a bit quirky at the
+  //     moment. For example, the strings "+" or "-" make the parser
+  //     throw since the parses eagerly tries to parse those as integers and
+  //     passes them to std::stoi.
+  //
+  //     Similarly, "." would be parsed using std::stod with a similar outcome.
+  //
+  //     Doubles must contain a point . inside, or they would be parsed as
+  //     integer, and exponential notation is not allowed for now.
+  //
+  //     Leading or trailing whitespace is not stripped before parsing, so " 1"
+  //     would be parsed as a string instead of an integer.
+  //
+  //     See also: #382.
+  //
+  //
+  // The next few tests are not always intended to check the long term desired
+  // behavior, but rather that no accidental regression is introduced in the
+  // current behavior.
+
+  // -- Quirks
+  SPIEL_CHECK_THROWS(GameParameterFromString("+"), std::invalid_argument);
+  SPIEL_CHECK_THROWS(GameParameterFromString("---"), std::invalid_argument);
+  SPIEL_CHECK_THROWS(GameParameterFromString("."), std::invalid_argument);
+  SPIEL_CHECK_THROWS(GameParameterFromString("..."), std::invalid_argument);
+  SPIEL_CHECK_TRUE(GameParameterFromString("1.2e-1").has_string_value());
+
+  // -- Whitespace related
+  SPIEL_CHECK_TRUE(GameParameterFromString(" 1").has_string_value());
+  SPIEL_CHECK_TRUE(GameParameterFromString("1 ").has_string_value());
+
+  // -- Intended behavior
+  SPIEL_CHECK_TRUE(GameParameterFromString("true").has_bool_value());
+  SPIEL_CHECK_TRUE(GameParameterFromString("True").has_bool_value());
+  SPIEL_CHECK_TRUE(GameParameterFromString("false").has_bool_value());
+  SPIEL_CHECK_TRUE(GameParameterFromString("False").has_bool_value());
+  SPIEL_CHECK_TRUE(GameParameterFromString("1").has_int_value());
+  SPIEL_CHECK_TRUE(GameParameterFromString("1.0").has_double_value());
+  SPIEL_CHECK_TRUE(GameParameterFromString("1. 0").has_string_value());
 
   // Bare name
   auto params = GameParametersFromString("game_one");
