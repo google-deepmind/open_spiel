@@ -499,8 +499,8 @@ GameMove BattleshipState::DeserializeGameMove(const Action action) const {
 
 // Facts about the game
 //
-// FIXME(gfarina): Is there a way to tell OpenSpiel that the game would be
-// general sum or zero sum depending on the parameters? Does it matter?
+// NOTE: The utility type is overridden in the game constructor and set to
+//       `kZeroSum` when the loss multiplier is 1.0.
 const GameType kGameType{
     /* short_name = */ "battleship",
     /* long_name = */ "Battleship",
@@ -523,6 +523,7 @@ const GameType kGameType{
      {"num_shots", GameParameter(kDefaultNumShots)},
      {"allow_repeated_shots", GameParameter(kDefaultAllowRepeatedShots)},
      {"loss_multiplier", GameParameter(kDefaultLossMultiplier)}}};
+
 constexpr int kMaxDimension = 10;
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
