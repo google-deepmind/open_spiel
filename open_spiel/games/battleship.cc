@@ -37,10 +37,10 @@ Player BattleshipState::CurrentPlayer() const {
   // once or not for correlated equilibria purposes. This is because in
   // correlated equilibria, the recommender can stop issuing recommendations
   // after a player deviates from a recommended *action*.
-  if (!AllShipsPlaced_()) {
+  if (!AllShipsPlaced()) {
     // In this case, if an even number (possibly 0) of ships have been placed,
     // then it is Player 1's turn to act next. Else, it is Player 2's.
-    if (NumShipsPlaced_() % 2 == 0) {
+    if (NumShipsPlaced() % 2 == 0) {
       return Player1;
     } else {
       return Player2;
@@ -56,7 +56,7 @@ Player BattleshipState::CurrentPlayer() const {
     // * At least one player has lost all of their ships.
     if (moves_.size() == 2 * conf.ships.size() + 2 * conf.num_shots) {
       return kTerminalPlayerId;
-    } else if (AllPlayersShipsSank_(Player1) || AllPlayersShipsSank_(Player2)) {
+    } else if (AllPlayersShipsSank(Player1) || AllPlayersShipsSank(Player2)) {
       return kTerminalPlayerId;
     }
 
@@ -77,11 +77,11 @@ std::vector<Action> BattleshipState::LegalActions() const {
   std::vector<Action> actions;
   actions.reserve(NumDistinctActions());
 
-  if (!AllShipsPlaced_()) {
+  if (!AllShipsPlaced()) {
     // If we are here, we still have some ships to place on the board.
     //
     // First, we find the first ship that hasn't been placed on the board yet.
-    const Ship next_ship = NextShipToPlace_(player);
+    const Ship next_ship = NextShipToPlace(player);
 
     // Horizontal placement.
     if (next_ship.length <= conf.board_width) {
@@ -91,7 +91,7 @@ std::vector<Action> BattleshipState::LegalActions() const {
           const ShipPlacement placement(ShipPlacement::Direction::Horizontal,
                                         /* ship = */ next_ship,
                                         /* tl_corner = */ Cell{row, col});
-          actions.push_back(SerializeShipPlacementAction_(placement));
+          actions.push_back(SerializeShipPlacementAction(placement));
         }
       }
     }
@@ -107,7 +107,7 @@ std::vector<Action> BattleshipState::LegalActions() const {
           const ShipPlacement placement(ShipPlacement::Direction::Vertical,
                                         /* ship = */ next_ship,
                                         /* tl_corner = */ Cell{row, col});
-          actions.push_back(SerializeShipPlacementAction_(placement));
+          actions.push_back(SerializeShipPlacementAction(placement));
         }
       }
     }
@@ -126,10 +126,10 @@ std::vector<Action> BattleshipState::LegalActions() const {
     for (int row = 0; row < conf.board_height; ++row) {
       for (int col = 0; col < conf.board_width; ++col) {
         if (!conf.allow_repeated_shots &&
-            AlreadyShot_(Cell{row, col}, CurrentPlayer())) {
+            AlreadyShot(Cell{row, col}, CurrentPlayer())) {
           // We do not duplicate the shot, so nothing to do here...
         } else {
-          actions.push_back(SerializeShotAction_(Shot{row, col}));
+          actions.push_back(SerializeShotAction(Shot{row, col}));
         }
       }
     }
@@ -152,16 +152,15 @@ std::string BattleshipState::ActionToString(Player player,
   // action id is contingent on the current state.
   SPIEL_CHECK_EQ(player, CurrentPlayer());
 
-  if (!AllShipsPlaced_()) {
+  if (!AllShipsPlaced()) {
     // If we are here, we still have some ships to place on the board.
     //
     // First, we find the first ship that hasn't been placed on the board yet.
-    const ShipPlacement ship_placement =
-        DeserializeShipPlacementAction_(action);
+    const ShipPlacement ship_placement = DeserializeShipPlacementAction(action);
     return ship_placement.ToString();
   } else {
     // In this case, the only thing the player can do is to shoot on a cell
-    const Shot shot = DeserializeShotAction_(action);
+    const Shot shot = DeserializeShotAction(action);
     return shot.ToString();
   }
 }
@@ -201,8 +200,8 @@ std::vector<double> BattleshipState::Returns() const {
   double damage_pl1 = 0.0;
   double damage_pl2 = 0.0;
   for (const Ship& ship : conf.ships) {
-    if (DidShipSink_(ship, Player1)) damage_pl1 += ship.value;
-    if (DidShipSink_(ship, Player2)) damage_pl2 += ship.value;
+    if (DidShipSink(ship, Player1)) damage_pl1 += ship.value;
+    if (DidShipSink(ship, Player2)) damage_pl2 += ship.value;
   }
 
   return {damage_pl2 - loss_multiplier * damage_pl1,
@@ -250,7 +249,7 @@ std::string BattleshipState::InformationStateString(Player player) const {
         // If the shot came from the opponent, the player has seen it.
         absl::StrAppend(&information_state, "/oppshot_", shot.ToString());
       } else {
-        const int cell_index = SerializeShotAction_(shot);
+        const int cell_index = SerializeShotAction(shot);
 
         char shot_outcome = 'W';  // For 'water'.
         for (int ship_index = 0; ship_index < conf.ships.size(); ++ship_index) {
@@ -259,7 +258,7 @@ std::string BattleshipState::InformationStateString(Player player) const {
           // SAFETY: the call to FindShipPlacement_ is safe, because if we are
           // here it means that all ships have been placed.
           const ShipPlacement ship_placement =
-              FindShipPlacement_(ship, opponent);
+              FindShipPlacement(ship, opponent);
 
           if (ship_placement.CoversCell(shot)) {
             if (!cell_hit[cell_index]) {
@@ -280,10 +279,7 @@ std::string BattleshipState::InformationStateString(Player player) const {
         // shot hit the water, hit a ship (but did not sink it), or sank a
         // ship.
         absl::StrAppend(&information_state, "/shot_", shot.ToString(), ":");
-
-        // XXX(gfarina): Apparently appending chars to a string is not a thing
-        // in Abseil?
-        information_state += shot_outcome;
+        information_state.push_back(shot_outcome);
       }
     }
   }
@@ -317,24 +313,24 @@ void BattleshipState::DoApplyAction(Action action) {
   // onto `LegalActions`.
   SPIEL_CHECK_EQ(std::count(legal_actions.begin(), legal_actions.end(), action),
                  1);
-  moves_.emplace_back(DeserializeGameMove_(action));
+  moves_.emplace_back(DeserializeGameMove(action));
 }
 
-int BattleshipState::NumShipsPlaced_() const {
+int BattleshipState::NumShipsPlaced() const {
   return static_cast<int>(
       std::count_if(moves_.begin(), moves_.end(), [](const GameMove& move) {
         return absl::holds_alternative<ShipPlacement>(move.action);
       }));
 }
 
-bool BattleshipState::AllShipsPlaced_() const {
+bool BattleshipState::AllShipsPlaced() const {
   const BattleshipConfiguration& conf = bs_game_->configuration;
 
-  return NumShipsPlaced_() == 2 * conf.ships.size();
+  return NumShipsPlaced() == 2 * conf.ships.size();
 }
 
-bool BattleshipState::IsShipPlaced_(const Ship& ship,
-                                    const Player player) const {
+bool BattleshipState::IsShipPlaced(const Ship& ship,
+                                   const Player player) const {
   for (const auto& move : moves_) {
     if (move.player == player &&
         absl::holds_alternative<ShipPlacement>(move.action) &&
@@ -345,22 +341,22 @@ bool BattleshipState::IsShipPlaced_(const Ship& ship,
   return false;
 }
 
-Ship BattleshipState::NextShipToPlace_(const Player player) const {
+Ship BattleshipState::NextShipToPlace(const Player player) const {
   const BattleshipConfiguration& conf = bs_game_->configuration;
   const auto next_ship = std::find_if_not(
       conf.ships.begin(), conf.ships.end(), [this, player](const Ship& ship) {
-        return this->IsShipPlaced_(ship, player);
+        return this->IsShipPlaced(ship, player);
       });
 
   SPIEL_DCHECK_TRUE(next_ship != conf.ships.end());
   return *next_ship;
 }
 
-ShipPlacement BattleshipState::FindShipPlacement_(const Ship& ship,
-                                                  const Player player) const {
+ShipPlacement BattleshipState::FindShipPlacement(const Ship& ship,
+                                                 const Player player) const {
   // NOTE: for now, this function is intended to be called only after all the
   // ships have been placed.
-  SPIEL_DCHECK_TRUE(AllShipsPlaced_());
+  SPIEL_DCHECK_TRUE(AllShipsPlaced());
 
   // We iterate through the moves of the player, filtering those that belong
   // to the requested one. We match ships based on their unique id.
@@ -376,18 +372,17 @@ ShipPlacement BattleshipState::FindShipPlacement_(const Ship& ship,
   SPIEL_DCHECK_TRUE(false);  // Unreachable!
 }
 
-bool BattleshipState::DidShipSink_(const Ship& ship,
-                                   const Player player) const {
+bool BattleshipState::DidShipSink(const Ship& ship, const Player player) const {
   // NOTE: for now, this function is intended to be called only after all the
   // ships have been placed.
-  SPIEL_DCHECK_TRUE(AllShipsPlaced_());
+  SPIEL_DCHECK_TRUE(AllShipsPlaced());
 
   const BattleshipConfiguration& conf = bs_game_->configuration;
 
   // We go through the history of shots by the opponent, and filter those that
   // intersect with the ship.
   std::vector<Cell> hits;
-  const ShipPlacement placement = FindShipPlacement_(ship, player);
+  const ShipPlacement placement = FindShipPlacement(ship, player);
   for (const auto& move : moves_) {
     if (absl::holds_alternative<Shot>(move.action)) {
       const Shot& shot = absl::get<Shot>(move.action);
@@ -410,17 +405,16 @@ bool BattleshipState::DidShipSink_(const Ship& ship,
   return num_unique_shots == ship.length;
 }
 
-bool BattleshipState::AllPlayersShipsSank_(const Player player) const {
+bool BattleshipState::AllPlayersShipsSank(const Player player) const {
   const BattleshipConfiguration& conf = bs_game_->configuration;
 
   for (const Ship& ship : conf.ships) {
-    if (!DidShipSink_(ship, player)) return false;
+    if (!DidShipSink(ship, player)) return false;
   }
   return true;
 }
 
-bool BattleshipState::AlreadyShot_(const Shot& shot,
-                                   const Player player) const {
+bool BattleshipState::AlreadyShot(const Shot& shot, const Player player) const {
   return std::find_if(moves_.begin(), moves_.end(),
                       [player, shot](const GameMove& move) {
                         return move.player == player &&
@@ -429,7 +423,7 @@ bool BattleshipState::AlreadyShot_(const Shot& shot,
                       }) != moves_.end();
 }
 
-Action BattleshipState::SerializeShipPlacementAction_(
+Action BattleshipState::SerializeShipPlacementAction(
     const ShipPlacement& ship_placement) const {
   const BattleshipConfiguration& conf = bs_game_->configuration;
 
@@ -438,10 +432,10 @@ Action BattleshipState::SerializeShipPlacementAction_(
     shift = conf.board_width * conf.board_height;
   }
 
-  return shift + SerializeShotAction_(ship_placement.TopLeftCorner());
+  return shift + SerializeShotAction(ship_placement.TopLeftCorner());
 }
 
-Action BattleshipState::SerializeShotAction_(const Shot& shot) const {
+Action BattleshipState::SerializeShotAction(const Shot& shot) const {
   const BattleshipConfiguration& conf = bs_game_->configuration;
 
   SPIEL_DCHECK_GE(shot.row, 0);
@@ -451,7 +445,7 @@ Action BattleshipState::SerializeShotAction_(const Shot& shot) const {
   return shot.row * conf.board_width + shot.col;
 }
 
-ShipPlacement BattleshipState::DeserializeShipPlacementAction_(
+ShipPlacement BattleshipState::DeserializeShipPlacementAction(
     const Action action) const {
   const BattleshipConfiguration& conf = bs_game_->configuration;
 
@@ -459,7 +453,7 @@ ShipPlacement BattleshipState::DeserializeShipPlacementAction_(
   SPIEL_DCHECK_LT(action, 2 * conf.board_width * conf.board_height);
 
   const Player player = CurrentPlayer();
-  const Ship ship = NextShipToPlace_(player);
+  const Ship ship = NextShipToPlace(player);
 
   // FIXME(gfarina): Here we are exploiting the detail that Shot == Cell as
   // a type. Perhaps it would be better to avoid this trick.
@@ -468,17 +462,17 @@ ShipPlacement BattleshipState::DeserializeShipPlacementAction_(
   if (action >= conf.board_width * conf.board_height) {
     direction = ShipPlacement::Direction::Vertical;
     tl_corner =
-        DeserializeShotAction_(action - conf.board_width * conf.board_height);
+        DeserializeShotAction(action - conf.board_width * conf.board_height);
   } else {
     direction = ShipPlacement::Direction::Horizontal;
-    tl_corner = DeserializeShotAction_(action);
+    tl_corner = DeserializeShotAction(action);
   }
 
   return ShipPlacement(/* direction */ direction, /* ship = */ ship,
                        /* tl_corner = */ tl_corner);
 }
 
-Shot BattleshipState::DeserializeShotAction_(const Action action) const {
+Shot BattleshipState::DeserializeShotAction(const Action action) const {
   const BattleshipConfiguration& conf = bs_game_->configuration;
 
   SPIEL_DCHECK_GE(action, 0);
@@ -487,13 +481,13 @@ Shot BattleshipState::DeserializeShotAction_(const Action action) const {
               /* col = */ static_cast<int>(action % conf.board_width)};
 }
 
-GameMove BattleshipState::DeserializeGameMove_(const Action action) const {
-  if (!AllShipsPlaced_()) {
+GameMove BattleshipState::DeserializeGameMove(const Action action) const {
+  if (!AllShipsPlaced()) {
     // If we are here, the action represents a `ShipPlacement`.
-    return GameMove{CurrentPlayer(), DeserializeShipPlacementAction_(action)};
+    return GameMove{CurrentPlayer(), DeserializeShipPlacementAction(action)};
   } else {
     // Otherwise, the action is a `Shot`.
-    return GameMove{CurrentPlayer(), DeserializeShotAction_(action)};
+    return GameMove{CurrentPlayer(), DeserializeShotAction(action)};
   }
 }
 

@@ -170,14 +170,14 @@ class BattleshipState final : public State {
   // ======================
 
   // Returns how many ships have been placed collectively by the two player.
-  int NumShipsPlaced_() const;
+  int NumShipsPlaced() const;
 
   // Checks whether both players have placed all of their ships.
-  bool AllShipsPlaced_() const;
+  bool AllShipsPlaced() const;
 
   // Checks whether the given ship has already been placed on the board by the
   // given player.
-  bool IsShipPlaced_(const Ship& ship, const Player player) const;
+  bool IsShipPlaced(const Ship& ship, const Player player) const;
 
   // Returns the ship that the given player should place on the board next.
   // Ships are placed in the order they are defined in the
@@ -185,13 +185,13 @@ class BattleshipState final : public State {
   //
   // NOTE: assumes (and checks in debug mode) that the player has not yet placed
   // all of their ships on the board.
-  Ship NextShipToPlace_(const Player player) const;
+  Ship NextShipToPlace(const Player player) const;
 
   // Returns the placement associated with the given ship of the given player.
   //
   // NOTE: assumes (and checks in debug mode) that the player has already placed
   // the ship on the board.
-  ShipPlacement FindShipPlacement_(const Ship& ship, const Player player) const;
+  ShipPlacement FindShipPlacement(const Ship& ship, const Player player) const;
 
   // Sunken ship methods
   // ===================
@@ -201,19 +201,19 @@ class BattleshipState final : public State {
   //
   // NOTE: assumes (and checks in debug mode) that *all* ships (of both players)
   // have already been placed.
-  bool DidShipSink_(const Ship& ship, const Player player) const;
+  bool DidShipSink(const Ship& ship, const Player player) const;
   // Checks whether all of the given player's ships have been sunk by the
   // opponent.
   //
   // NOTE: assumes (and checks in debug mode) that *all* ships (of both players)
   // have already been placed.
-  bool AllPlayersShipsSank_(const Player player) const;
+  bool AllPlayersShipsSank(const Player player) const;
 
   // Shot methods
   // ============
 
   // Checks whether the given player has already shot the given cell.
-  bool AlreadyShot_(const Shot& shot, const Player player) const;
+  bool AlreadyShot(const Shot& shot, const Player player) const;
 
   // Action (de)serialization routines
   // =================================
@@ -232,26 +232,26 @@ class BattleshipState final : public State {
   // by OpenSpiel's interface.
   //
   // See above for details about our serialization scheme.
-  Action SerializeShipPlacementAction_(
+  Action SerializeShipPlacementAction(
       const ShipPlacement& ship_placement) const;
 
   // Converts a `Shot` action into a unique action number, as required
   // by OpenSpiel's interface.
-  Action SerializeShotAction_(const Shot& shot) const;
+  Action SerializeShotAction(const Shot& shot) const;
 
   // Converts an action number to a `ShipPlacement`
   //
   // See above for details about our serialization scheme.
-  ShipPlacement DeserializeShipPlacementAction_(const Action action) const;
+  ShipPlacement DeserializeShipPlacementAction(const Action action) const;
 
   // Converts an action number to a `ShipPlacement`
   //
   // See above for details about our serialization scheme.
-  Shot DeserializeShotAction_(const Action action) const;
+  Shot DeserializeShotAction(const Action action) const;
 
   // Converts an action number to the unique move it represents at this state of
   // the game.
-  GameMove DeserializeGameMove_(const Action action) const;
+  GameMove DeserializeGameMove(const Action action) const;
 
   // Members
   // =======
