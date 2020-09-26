@@ -540,13 +540,20 @@ BattleshipGame::BattleshipGame(const GameParameters& params)
   SPIEL_CHECK_GE(configuration.board_height, 0);
   SPIEL_CHECK_LE(configuration.board_height, kMaxDimension);
 
-  configuration.num_shots = ParameterValue<int>("num_shots");
-  SPIEL_CHECK_GE(configuration.num_shots, 0);
+  // NOTE: It is *very* important to clone ship_sizes and ship_values onto the
+  //       stack, otherwise we would run into undefined behavior without
+  //       warning, because ParameterValue() returns a temporary without
+  //       storage, and absl::string_view would amount to a fat pointer to a
+  //       temporary.
+  const std::string ship_sizes_param =
+      ParameterValue<std::string>("ship_sizes");
+  const std::string ship_values_param =
+      ParameterValue<std::string>("ship_values");
 
   const std::vector<absl::string_view> ship_sizes =
-      absl::StrSplit(ParameterValue<std::string>("ship_sizes"), ',');
+      absl::StrSplit(ship_sizes_param, ',');
   const std::vector<absl::string_view> ship_values =
-      absl::StrSplit(ParameterValue<std::string>("ship_values"), ',');
+      absl::StrSplit(ship_values_param, ',');
   SPIEL_CHECK_EQ(ship_sizes.size(), ship_values.size());
 
   for (size_t ship_index = 0; ship_index < ship_sizes.size(); ++ship_index) {
@@ -559,7 +566,13 @@ BattleshipGame::BattleshipGame(const GameParameters& params)
     SPIEL_CHECK_TRUE(ship.length < configuration.board_width ||
                      ship.length <= configuration.board_height);
     SPIEL_CHECK_GE(ship.value, 0.0);
+
+    configuration.ships.push_back(ship);
   }
+  SPIEL_CHECK_GT(configuration.ships.size(), 0);
+
+  configuration.num_shots = ParameterValue<int>("num_shots");
+  SPIEL_CHECK_GT(configuration.num_shots, 0);
 
   configuration.allow_repeated_shots =
       ParameterValue<bool>("allow_repeated_shots");
