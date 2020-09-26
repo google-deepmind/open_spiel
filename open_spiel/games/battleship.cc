@@ -14,9 +14,11 @@
 
 #include "open_spiel/games/battleship.h"
 
+#include "open_spiel/abseil-cpp/absl/strings/ascii.h"
 #include "open_spiel/abseil-cpp/absl/strings/numbers.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_split.h"
 #include "open_spiel/abseil-cpp/absl/strings/string_view.h"
+#include "open_spiel/abseil-cpp/absl/strings/strip.h"
 
 namespace open_spiel {
 namespace battleship {
@@ -546,15 +548,26 @@ BattleshipGame::BattleshipGame(const GameParameters& params)
   //       warning, because ParameterValue() returns a temporary without
   //       storage, and absl::string_view would amount to a fat pointer to a
   //       temporary.
-  const std::string ship_sizes_param =
+  const std::string ship_sizes_param_str =
       ParameterValue<std::string>("ship_sizes");
-  const std::string ship_values_param =
+  const std::string ship_values_param_str =
       ParameterValue<std::string>("ship_values");
 
+  // First, we check that the list starts with '[' and ends with ']'.
+  absl::string_view ship_sizes_param =
+      absl::StripAsciiWhitespace(ship_sizes_param_str);
+  SPIEL_CHECK_TRUE(absl::ConsumePrefix(&ship_sizes_param, "["));
+  SPIEL_CHECK_TRUE(absl::ConsumeSuffix(&ship_sizes_param, "]"));
+
+  absl::string_view ship_values_param =
+      absl::StripAsciiWhitespace(ship_values_param_str);
+  SPIEL_CHECK_TRUE(absl::ConsumePrefix(&ship_values_param, "["));
+  SPIEL_CHECK_TRUE(absl::ConsumeSuffix(&ship_values_param, "]"));
+
   const std::vector<absl::string_view> ship_sizes =
-      absl::StrSplit(ship_sizes_param, ',');
+      absl::StrSplit(ship_sizes_param, ';');
   const std::vector<absl::string_view> ship_values =
-      absl::StrSplit(ship_values_param, ',');
+      absl::StrSplit(ship_values_param, ';');
   SPIEL_CHECK_EQ(ship_sizes.size(), ship_values.size());
 
   for (size_t ship_index = 0; ship_index < ship_sizes.size(); ++ship_index) {

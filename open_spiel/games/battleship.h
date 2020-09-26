@@ -100,8 +100,9 @@
 //                                     zero-sum iff the loss multiplier is 1.0
 //                                                            (default = 2.0)
 //
-// NOTE: The list parameters must be supplied as a string of comma-separated
-// values
+// NOTE: The list parameters must be supplied as a string of semicolon-separated
+//       values, wrapped in square brackets. For example: "[1;2]" is a list with
+//       elements `1` and `2`. "[1]" is a list with only one element.
 //
 // References
 // ==========
@@ -138,8 +139,8 @@ namespace battleship {
 
 constexpr int kDefaultBoardWidth = 2;
 constexpr int kDefaultBoardHeight = 2;
-constexpr const char* kDefaultShipSizes = "2";
-constexpr const char* kDefaultShipValues = "1.0";
+constexpr const char* kDefaultShipSizes = "[2]";
+constexpr const char* kDefaultShipValues = "[1.0]";
 constexpr int kDefaultNumShots = 2;
 constexpr bool kDefaultAllowRepeatedShots = false;
 constexpr double kDefaultLossMultiplier = 2.0;
