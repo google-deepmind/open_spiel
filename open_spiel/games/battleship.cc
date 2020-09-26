@@ -526,7 +526,7 @@ const GameType kGameType{
 constexpr int kMaxDimension = 10;
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
-  return std::shared_ptr<const Game>(new BattleshipGame(params));
+  return std::make_shared<const BattleshipGame>(params);
 }
 REGISTER_SPIEL_GAME(kGameType, Factory);
 
