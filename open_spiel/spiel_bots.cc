@@ -32,8 +32,13 @@ class UniformRandomBot : public Bot {
  public:
   UniformRandomBot(Player player_id, int seed)
       : player_id_(player_id), rng_(seed) {}
+  explicit UniformRandomBot(GameParameters params)
+      : Bot(std::move(params)),
+        player_id_(ParameterValue<int>("player", 0)),
+        rng_(ParameterValue<int>("seed", 0)) {}
   ~UniformRandomBot() = default;
 
+  bool CanPlayGame(const Game& game) override { return true; }
   void RestartAt(const State&) override {}
   Action Step(const State& state) override {
     return StepWithPolicy(state).second;
@@ -127,12 +132,29 @@ class PolicyBot : public Bot {
   std::shared_ptr<Policy> policy_;
 };
 
+std::vector<Action> ActionsFromStr(const absl::string_view& str,
+                                   const std::string_view& delim) {
+  std::vector<Action> actions;
+  for (absl::string_view token : absl::StrSplit(str, delim)) {
+    int v;
+    SPIEL_CHECK_TRUE(absl::SimpleAtoi(token, &v));
+    actions.push_back(v);
+  }
+  return actions;
+}
+
 class FixedActionPreferenceBot : public Bot {
  public:
   FixedActionPreferenceBot(Player player_id, const std::vector<Action>& actions)
-      : Bot(), player_id_(player_id), actions_(actions) {}
+      : player_id_(player_id), actions_(actions) {}
+  explicit FixedActionPreferenceBot(GameParameters params)
+      : Bot(std::move(params)),
+        player_id_(ParameterValue<int>("player", 0)),
+        actions_(ActionsFromStr(
+            ParameterValue<std::string>("actions", "0:1:2:3:4:5:6:7"), ":")) {}
   ~FixedActionPreferenceBot() = default;
 
+  bool CanPlayGame(const Game& game) override { return true; }
   void RestartAt(const State&) override {}
   Action Step(const State& state) override {
     return StepWithPolicy(state).second;
@@ -167,6 +189,12 @@ class FixedActionPreferenceBot : public Bot {
 std::unique_ptr<Bot> MakeUniformRandomBot(Player player_id, int seed) {
   return std::make_unique<UniformRandomBot>(player_id, seed);
 }
+namespace {
+std::unique_ptr<Bot> UniformRandomBotFactory(const GameParameters& params) {
+  return std::make_unique<UniformRandomBot>(params);
+}
+REGISTER_SPIEL_BOT("uniform_random", UniformRandomBotFactory);
+}  // namespace
 
 // A bot that samples from a policy.
 std::unique_ptr<Bot> MakePolicyBot(const Game& game, Player player_id, int seed,
@@ -179,10 +207,77 @@ std::unique_ptr<Bot> MakeFixedActionPreferenceBot(
     Player player_id, const std::vector<Action>& actions) {
   return std::make_unique<FixedActionPreferenceBot>(player_id, actions);
 }
+namespace {
+std::unique_ptr<Bot> FixedActionPreferenceFactory(
+    const GameParameters& params) {
+  return std::make_unique<FixedActionPreferenceBot>(params);
+}
+REGISTER_SPIEL_BOT("fixed_action_preference", FixedActionPreferenceFactory);
+}  // namespace
 
 std::unique_ptr<Bot> MakeStatefulRandomBot(const Game& game, Player player_id,
                                            int seed) {
   return std::make_unique<StatefulRandomBot>(game, player_id, seed);
+}
+
+BotRegisterer::BotRegisterer(const std::string& bot_name,
+                             BotRegisterer::CreateFunc creator) {
+  RegisterBot(bot_name, creator);
+}
+std::unique_ptr<Bot> BotRegisterer::CreateByName(
+    const std::string& bot_name, const GameParameters& params) {
+  auto iter = factories().find(bot_name);
+  if (iter == factories().end()) {
+    SpielFatalError(absl::StrCat("Unknown bot '", bot_name,
+                                 "'. Available bots are:\n",
+                                 absl::StrJoin(RegisteredBots(), "\n")));
+
+  } else {
+    return (iter->second)(params);
+  }
+}
+void BotRegisterer::RegisterBot(const std::string& bot_name,
+    BotRegisterer::CreateFunc creator) {
+  factories()[bot_name] = creator;
+}
+std::vector<std::string> BotRegisterer::RegisteredBots() {
+  std::vector<std::string> names;
+  for (const auto& key_val : factories()) names.push_back(key_val.first);
+  return names;
+}
+std::vector<std::string> RegisteredBots() {
+  return BotRegisterer::RegisteredBots();
+}
+bool BotRegisterer::IsBotRegistered(const std::string& bot_name) {
+  return factories().find(bot_name) != factories().end();
+}
+bool IsBotRegistered(const std::string& bot_name) {
+  return BotRegisterer::IsBotRegistered(bot_name);
+}
+std::unique_ptr<Bot> LoadBot(const std::string& bot_name) {
+  return LoadBot(bot_name, GameParametersFromString(bot_name));
+}
+std::unique_ptr<Bot> LoadBot(const std::string& bot_name,
+                             const GameParameters& params) {
+  std::unique_ptr<Bot> result =
+      BotRegisterer::CreateByName(bot_name, params);
+  if (result == nullptr) {
+    SpielFatalError(absl::StrCat("Unable to create bot: ", bot_name));
+  }
+  return result;
+}
+std::vector<std::string> BotsThatCanPlayGame(const Game& game) {
+  return BotsThatCanPlayGame(game, {});
+}
+std::vector<std::string> BotsThatCanPlayGame(const Game& game,
+                                             const GameParameters& params) {
+  std::vector<std::string> filtered_bots;
+  for (const std::string& bot_name : RegisteredBots()) {
+    std::unique_ptr<Bot> throwaway_bot = LoadBot(bot_name, params);
+    if (throwaway_bot->CanPlayGame(game))
+      filtered_bots.push_back(bot_name);
+  }
+  return filtered_bots;
 }
 
 }  // namespace open_spiel

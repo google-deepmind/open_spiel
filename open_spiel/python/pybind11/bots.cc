@@ -167,6 +167,29 @@ void init_pyspiel_bots(py::module& m) {
       .def("get_policy", &Bot::GetPolicy)
       .def("step_with_policy", &Bot::StepWithPolicy);
 
+  m.def("load_bot",
+        py::overload_cast<const std::string&>(&open_spiel::LoadBot),
+        "Returns a new bot object for the specified bot name using default "
+        "parameters");
+  m.def("load_bot",
+        py::overload_cast<const std::string&, const GameParameters&>(
+            &open_spiel::LoadBot),
+        "Returns a new bot object for the specified bot name using given "
+        "parameters");
+  m.def("is_bot_registered", &IsBotRegistered,
+        "Checks if a bot under the given name is registered.");
+  m.def("registered_bots", &RegisteredBots,
+        "Returns a list of registered bot names.");
+  m.def("bots_that_can_play_game",
+        py::overload_cast<const Game&>(&open_spiel::BotsThatCanPlayGame),
+        "Returns a list of bot names that can play specified game, "
+        "while using default parameters for the bots.");
+  m.def("bots_that_can_play_game",
+        py::overload_cast<const Game&, const GameParameters&>(
+            &open_spiel::BotsThatCanPlayGame),
+        "Returns a list of bot names that can play specified game, "
+        "while using the provided parameters.");
+
   py::class_<algorithms::Evaluator,
              std::shared_ptr<algorithms::Evaluator>> mcts_evaluator(
                  m, "Evaluator");
