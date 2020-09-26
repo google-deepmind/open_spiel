@@ -611,10 +611,14 @@ double BattleshipGame::MinUtility() const {
   // That condition is checked at game construction time. However, we allow for
   // a negative loss_multiplier.
   double min_utility = 0.0;
-  for (const Ship& ship : configuration.ships) {
-    min_utility -= configuration.loss_multiplier * ship.value;
+  if (configuration.loss_multiplier > 0.0) {
+    for (const Ship& ship : configuration.ships) {
+      SPIEL_DCHECK_GE(ship.value, 0.0);
+      min_utility -= configuration.loss_multiplier * ship.value;
+    }
   }
-  return std::min(0.0, min_utility);
+
+  return min_utility;
 }
 
 double BattleshipGame::MaxUtility() const {
@@ -629,6 +633,7 @@ double BattleshipGame::MaxUtility() const {
   // a negative loss_multiplier.
   double max_utility = 0.0;
   for (const Ship& ship : configuration.ships) {
+    SPIEL_DCHECK_GE(ship.value, 0.0);
     max_utility += ship.value;
   }
 
