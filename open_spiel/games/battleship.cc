@@ -153,6 +153,8 @@ std::vector<Action> BattleshipState::LegalActions() const {
 
 std::string BattleshipState::ActionToString(Player player,
                                             Action action) const {
+  SPIEL_DCHECK_TRUE(player == Player1 || player == Player2);
+
   // FIXME(gfarina): It was not clear to me from the documentation whether
   // the next condition is always guaranteed.
   //
@@ -221,6 +223,11 @@ std::unique_ptr<State> BattleshipState::Clone() const {
 }
 
 std::string BattleshipState::InformationStateString(Player player) const {
+  // XXX(gfarina): It looks like `api_test.py` wants to see the substring
+  //     "player >= 0" when the method fails because an invalid player was
+  //     supplied. That's why the redundant check is appended to the end.
+  SPIEL_CHECK_TRUE(player >= Player1 && player <= Player2 && player >= 0);
+
   const BattleshipConfiguration& conf = bs_game_->configuration;
   const Player opponent = (player == Player1) ? Player2 : Player1;
 
@@ -296,6 +303,10 @@ std::string BattleshipState::InformationStateString(Player player) const {
 }
 
 std::string BattleshipState::ObservationString(Player player) const {
+  // XXX(gfarina): It looks like `api_test.py` wants to see the substring
+  //     "player >= 0" when the method fails because an invalid player was
+  //     supplied. That's why the redundant check is appended to the end.
+  SPIEL_CHECK_TRUE(player >= Player1 && player <= Player2 && player >= 0);
   return InformationStateString(player);
 }
 
@@ -339,6 +350,8 @@ bool BattleshipState::AllShipsPlaced() const {
 
 bool BattleshipState::IsShipPlaced(const Ship& ship,
                                    const Player player) const {
+  SPIEL_DCHECK_TRUE(player == Player1 || player == Player2);
+
   for (const auto& move : moves_) {
     if (move.player == player &&
         absl::holds_alternative<ShipPlacement>(move.action) &&
@@ -350,6 +363,8 @@ bool BattleshipState::IsShipPlaced(const Ship& ship,
 }
 
 Ship BattleshipState::NextShipToPlace(const Player player) const {
+  SPIEL_DCHECK_TRUE(player == Player1 || player == Player2);
+
   const BattleshipConfiguration& conf = bs_game_->configuration;
   const auto next_ship = std::find_if_not(
       conf.ships.begin(), conf.ships.end(), [this, player](const Ship& ship) {
@@ -362,6 +377,8 @@ Ship BattleshipState::NextShipToPlace(const Player player) const {
 
 ShipPlacement BattleshipState::FindShipPlacement(const Ship& ship,
                                                  const Player player) const {
+  SPIEL_DCHECK_TRUE(player == Player1 || player == Player2);
+
   // NOTE: for now, this function is intended to be called only after all the
   // ships have been placed.
   SPIEL_DCHECK_TRUE(AllShipsPlaced());
@@ -381,6 +398,8 @@ ShipPlacement BattleshipState::FindShipPlacement(const Ship& ship,
 }
 
 bool BattleshipState::DidShipSink(const Ship& ship, const Player player) const {
+  SPIEL_DCHECK_TRUE(player == Player1 || player == Player2);
+
   // NOTE: for now, this function is intended to be called only after all the
   // ships have been placed.
   SPIEL_DCHECK_TRUE(AllShipsPlaced());
@@ -414,6 +433,8 @@ bool BattleshipState::DidShipSink(const Ship& ship, const Player player) const {
 }
 
 bool BattleshipState::AllPlayersShipsSank(const Player player) const {
+  SPIEL_DCHECK_TRUE(player == Player1 || player == Player2);
+
   const BattleshipConfiguration& conf = bs_game_->configuration;
 
   for (const Ship& ship : conf.ships) {
@@ -423,6 +444,8 @@ bool BattleshipState::AllPlayersShipsSank(const Player player) const {
 }
 
 bool BattleshipState::AlreadyShot(const Shot& shot, const Player player) const {
+  SPIEL_DCHECK_TRUE(player == Player1 || player == Player2);
+
   return std::find_if(moves_.begin(), moves_.end(),
                       [player, shot](const GameMove& move) {
                         return move.player == player &&
