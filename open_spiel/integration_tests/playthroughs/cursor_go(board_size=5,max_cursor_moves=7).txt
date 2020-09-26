@@ -19,7 +19,7 @@ GameType.utility = Utility.ZERO_SUM
 NumDistinctActions() = 6
 PolicyTensorShape() = [6]
 MaxChanceOutcomes() = 0
-GetParameters() = {board_size=5,handicap=0,komi=7.5,max_cursor_moves=7}
+GetParameters() = {board_size=5,handicap=0,komi=7.5000000000,max_cursor_moves=7}
 NumPlayers() = 2
 MinUtility() = -1.0
 MaxUtility() = 1.0

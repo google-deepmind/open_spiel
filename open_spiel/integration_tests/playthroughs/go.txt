@@ -19,7 +19,7 @@ GameType.utility = Utility.ZERO_SUM
 NumDistinctActions() = 50
 PolicyTensorShape() = [50]
 MaxChanceOutcomes() = 0
-GetParameters() = {board_size=7,handicap=0,komi=4.5,max_game_length=98}
+GetParameters() = {board_size=7,handicap=0,komi=4.5000000000,max_game_length=98}
 NumPlayers() = 2
 MinUtility() = -1.0
 MaxUtility() = 1.0
@@ -28,7 +28,7 @@ ObservationTensorShape() = [4, 7, 7]
 ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 196
 MaxGameLength() = 98
-ToString() = "go(board_size=7,komi=4.5)"
+ToString() = "go(board_size=7,komi=4.5000000000)"
 
 # State 0
 # GoState(komi=4.5, to_play=B, history.size()=0)
