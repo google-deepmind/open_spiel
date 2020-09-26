@@ -362,6 +362,8 @@ std::string BattleshipState::ObservationString(Player player) const {
       if (player_board[shot.row][shot.col] == ' ') {
         player_board[shot.row][shot.col] = '*';
       } else {
+        SPIEL_DCHECK_TRUE(std::isalpha(player_board[shot.row][shot.col]));
+
         // The shot hit one of the ships. In this case, we use the uppercase
         // letter corresponding to the ship.
         player_board[shot.row][shot.col] =
@@ -370,7 +372,7 @@ std::string BattleshipState::ObservationString(Player player) const {
     }
   }
 
-  // Finally, we fill in the baord that represents the outcome of the player's
+  // Finally, we fill in the board that represents the outcome of the player's
   // shots.
   //
   // We start by adding a '@' to all the positions where the player shot.
