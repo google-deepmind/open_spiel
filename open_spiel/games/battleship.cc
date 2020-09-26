@@ -123,7 +123,7 @@ std::vector<Action> BattleshipState::LegalActions() const {
       }
 
       // FIXME(gfarina): It would be better to have a check of this time at game
-      // construction time.
+      //     construction time.
       if (actions.empty()) {
         SpielFatalError(
             "Battleship: it is NOT possible to fit all the ships on the "
@@ -146,8 +146,9 @@ std::vector<Action> BattleshipState::LegalActions() const {
       }
 
       // SAFETY: The assert below can never fail, because when
-      // allow_repeated_shot is false, we check at game construction time that
-      // the number of shots per player is <= the number of cells in the board.
+      //     allow_repeated_shot is false, we check at game construction time
+      //     that the number of shots per player is <= the number of cells in
+      //     the board.
       SPIEL_DCHECK_FALSE(actions.empty());
     }
 
@@ -160,10 +161,10 @@ std::string BattleshipState::ActionToString(Player player,
   SPIEL_DCHECK_TRUE(player == Player1 || player == Player2);
 
   // FIXME(gfarina): It was not clear to me from the documentation whether
-  // the next condition is always guaranteed.
+  //     the next condition is always guaranteed.
   //
-  // Action ids are reused at different states, so the meaning of the same
-  // action id is contingent on the current state.
+  //     Action ids are reused at different states, so the meaning of the same
+  //     action id is contingent on the current state.
   SPIEL_CHECK_EQ(player, CurrentPlayer());
 
   if (!AllShipsPlaced()) {
@@ -317,8 +318,8 @@ std::string BattleshipState::ObservationString(Player player) const {
 void BattleshipState::UndoAction(Player player, Action action) {
   SPIEL_CHECK_GT(moves_.size(), 0);
   // XXX(gfarina): It looks like SPIEL_CHECK_EQ wants to print a PlayerAction
-  // on failure, but std::cout was not overloaded. For now I moved to a
-  // SPIEL_CHECK_TRUE.
+  //     on failure, but std::cout was not overloaded. For now I moved to a
+  //     SPIEL_CHECK_TRUE.
   SPIEL_CHECK_TRUE((history_.back() == PlayerAction{player, action}));
 
   history_.pop_back();
@@ -384,7 +385,7 @@ ShipPlacement BattleshipState::FindShipPlacement(const Ship& ship,
   SPIEL_DCHECK_TRUE(player == Player1 || player == Player2);
 
   // NOTE: for now, this function is intended to be called only after all the
-  // ships have been placed.
+  //     ships have been placed.
   SPIEL_DCHECK_TRUE(AllShipsPlaced());
 
   // We iterate through the moves of the player, filtering those that belong
@@ -433,7 +434,7 @@ bool BattleshipState::DidShipSink(const Ship& ship, const Player player) const {
   SPIEL_DCHECK_TRUE(player == Player1 || player == Player2);
 
   // NOTE: for now, this function is intended to be called only after all the
-  // ships have been placed.
+  //     ships have been placed.
   SPIEL_DCHECK_TRUE(AllShipsPlaced());
 
   const BattleshipConfiguration& conf = bs_game_->configuration;
@@ -519,7 +520,7 @@ ShipPlacement BattleshipState::DeserializeShipPlacementAction(
   const Ship ship = NextShipToPlace(player);
 
   // FIXME(gfarina): Here we are exploiting the detail that Shot == Cell as
-  // a type. Perhaps it would be better to avoid this trick.
+  //     a type. Perhaps it would be better to avoid this trick.
   ShipPlacement::Direction direction;
   Cell tl_corner;
   if (action >= conf.board_width * conf.board_height) {
@@ -557,7 +558,7 @@ GameMove BattleshipState::DeserializeGameMove(const Action action) const {
 // Facts about the game
 //
 // NOTE: The utility type is overridden in the game constructor and set to
-//       `kZeroSum` when the loss multiplier is 1.0.
+//     `kZeroSum` when the loss multiplier is 1.0.
 const GameType kGameType{
     /* short_name = */ "battleship",
     /* long_name = */ "Battleship",
@@ -599,10 +600,10 @@ BattleshipGame::BattleshipGame(const GameParameters& params)
   SPIEL_CHECK_LE(configuration.board_height, kMaxDimension);
 
   // NOTE: It is *very* important to clone ship_sizes and ship_values onto the
-  //       stack, otherwise we would run into undefined behavior without
-  //       warning, because ParameterValue() returns a temporary without
-  //       storage, and absl::string_view would amount to a fat pointer to a
-  //       temporary.
+  //     stack, otherwise we would run into undefined behavior without
+  //     warning, because ParameterValue() returns a temporary without
+  //     storage, and absl::string_view would amount to a fat pointer to a
+  //     temporary.
   const std::string ship_sizes_param_str =
       ParameterValue<std::string>("ship_sizes");
   const std::string ship_values_param_str =
