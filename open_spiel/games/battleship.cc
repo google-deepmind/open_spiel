@@ -21,6 +21,8 @@
 namespace open_spiel {
 namespace battleship {
 
+const double kFloatTolerance = 1e-9;
+
 const Player Player1 = Player{0};
 const Player Player2 = Player{1};
 
@@ -581,6 +583,10 @@ BattleshipGame::BattleshipGame(const GameParameters& params)
   //
   // Currently, `ValidateParams` throws.
   configuration.loss_multiplier = ParameterValue<double>("loss_multiplier");
+
+  if (std::abs(configuration.loss_multiplier - 1.0) < kFloatTolerance) {
+    game_type_.utility = GameType::Utility::kZeroSum;
+  }
 }
 
 int BattleshipGame::NumDistinctActions() const {
@@ -639,7 +645,7 @@ double BattleshipGame::MaxUtility() const {
 }
 
 double BattleshipGame::UtilitySum() const {
-  if (configuration.loss_multiplier) {
+  if (std::abs(configuration.loss_multiplier - 1.0) < kFloatTolerance) {
     return 0.0;
   } else {
     SpielFatalError(
