@@ -329,6 +329,8 @@ std::string BattleshipState::ObservationString(Player player) const {
         SPIEL_DCHECK_TRUE(cell.row >= 0 && cell.row < conf.board_height);
         SPIEL_DCHECK_TRUE(cell.col >= 0 && cell.col < conf.board_width);
 
+        // The ships do not overlap.
+        SPIEL_DCHECK_EQ(player_board[cell.row][cell.col], ' ');
         player_board[cell.row][cell.col] = ship_id;
 
         if (placement.direction == ShipPlacement::Direction::Horizontal) {
