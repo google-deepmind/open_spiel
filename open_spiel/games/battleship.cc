@@ -433,9 +433,6 @@ std::string BattleshipState::ShotsBoardString(const Player player) const {
           // Ships cannot intersect, so it's impossible that we would go over
           // a '#'.
           SPIEL_DCHECK_EQ(shots_board[cell.row][cell.col], ' ');
-
-          std::cout << "(" << cell.row << ", " << cell.col << ") -> '"
-                    << shots_board[cell.row][cell.col] << "'\n";
         }
 
         if (placement.direction == ShipPlacement::Direction::Horizontal) {
