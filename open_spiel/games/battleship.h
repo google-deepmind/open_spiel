@@ -163,6 +163,59 @@ class BattleshipState final : public State {
   std::string ObservationString(Player player) const override;
   void UndoAction(Player player, Action action) override;
 
+  // Draws the board of a player.
+  //
+  // The board is drawn as a rectangular grid of characters, with the following
+  // conventions:
+  // - Ships are identified with letters, starting from 'a'. For each ship, we
+  //   mark all of the cells it occupies with the same letter.
+  //   - Lowercase letters denote that the cell was never hit by the opponent.
+  //   - Uppercase letters denote that the cell was hit by the opponent.
+  // - Cells marked with '*' denote shots by the opponent, that hit water.
+  // - All other cells are empty, that is, filled with a space ' ' character.
+  //
+  //
+  // Example
+  // -------
+  //
+  // This is what a typical 3x5 board string might looks like after 4 shots by
+  // the opponent.
+  //
+  // ```
+  // +------+
+  // |*a    |
+  // | A*   |
+  // |   bbB|
+  // +------+
+  // ```
+  std::string OwnBoardString(const Player player) const;
+
+  // Draws the state of the player's shots for far.
+  // This corresponds to the incremental board that the player builds over time
+  // by shooting at the opponent.
+  //
+  // The board is drawn as a rectangular grid of characters, with the following
+  // conventions:
+  // - Shots that hit a ship are marked with '#'.
+  // - Shots that hit the water are marked with '@'.
+  // - All other cells are empty, that is, filled with a space ' ' character.
+  //
+  //
+  // Example
+  // -------
+  //
+  // This is what the opponent player to the example provided in
+  // `OwnBoardString` will see:
+  //
+  // ```
+  // +------+
+  // |*a    |
+  // | @*   |
+  // |   bbB|
+  // +------+
+  // ```
+  std::string ShotsBoardString(const Player player) const;
+
  protected:
   void DoApplyAction(Action action) override;
 

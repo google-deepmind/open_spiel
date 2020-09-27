@@ -231,21 +231,21 @@ std::string BattleshipState::InformationStateString(Player player) const {
   const BattleshipConfiguration& conf = bs_game_->configuration;
   const Player opponent = (player == Player{0}) ? Player{1} : Player{0};
 
-  // We will need to figure out whether each of the player's shots
-  // (i) hit the water, (ii) damaged but did not sink yet one of the opponent's
-  // ships, or (iii) damaged and sank one of the opponent's ships.
+  // We will need to figure out whether each of the player's shots (i) hit the
+  // water, (ii) damaged but did not sink yet one of the opponent's ships, or
+  // (iii) damaged and sank one of the opponent's ships.
   //
   // To be able to figure that out, we will keep track of the damage that each
   // of the opponent's ship has received so far. The vector `ship_damage`
-  // contains and updates this information as each player's shot is processed in
-  // order. Position i corresponds to the damage that the opponent's ship in
-  // position i of bs_game->configuration.ships has suffered.
+  // contains and updates this information as each player's shot is processed
+  // in order. Position i corresponds to the damage that the opponent's ship
+  // in position i of bs_game->configuration.ships has suffered.
   std::vector<int> ship_damage(conf.ships.size(), 0);
   // Since in general we might have repeated shots, we cannot simply increase
   // the ship damage every time a shot hits a ship. For that, we keep track of
   // whether a cell was already hit in the past. We reuse the
-  // serialization/deserialization routines for shots to map from (r, c) to cell
-  // index r * board_width + c.
+  // serialization/deserialization routines for shots to map from (r, c) to
+  // cell index r * board_width + c.
   std::vector<bool> cell_hit(conf.board_width * conf.board_height, false);
 
   std::string information_state;
@@ -277,8 +277,8 @@ std::string BattleshipState::InformationStateString(Player player) const {
 
           if (ship_placement.CoversCell(shot)) {
             if (!cell_hit[cell_index]) {
-              // This is a new hit: we have to increas the ship damage and mark
-              // the cell as already hit.
+              // This is a new hit: we have to increas the ship damage and
+              // mark the cell as already hit.
               ++ship_damage.at(ship_index);
               cell_hit.at(cell_index) = true;
             }
@@ -302,20 +302,19 @@ std::string BattleshipState::InformationStateString(Player player) const {
   return information_state;
 }
 
-std::string BattleshipState::ObservationString(Player player) const {
+std::string BattleshipState::OwnBoardString(const Player player) const {
   SPIEL_CHECK_TRUE(player >= 0 && player < NumPlayers());
 
   const Player opponent = (player == Player{0}) ? Player{1} : Player{0};
   const BattleshipConfiguration& conf = bs_game_->configuration;
 
-  // We keep the two boards in memory as vectors of strings. Initially, all
-  // strings only contain whitespace.
+  // We keep the board in memory as vectors of strings. Initially, all strings
+  // only contain whitespace.
   std::vector<std::string> player_board(conf.board_height,
                                         std::string(conf.board_width, ' '));
-  std::vector<std::string> opponent_board = player_board;  // Deep copy.
 
-  // We start by drawing the ships on the player's board. For now, we do
-  // not include any information about where the opponent shot.
+  // We start by drawing the ships on the player's board. For now, we do not
+  // include any information about where the opponent shot.
   char ship_id = 'a';
   for (const auto& move : moves_) {
     if (move.player == player &&
@@ -366,23 +365,43 @@ std::string BattleshipState::ObservationString(Player player) const {
     }
   }
 
-  // Finally, we fill in the board that represents the outcome of the player's
+  std::string output;
+  absl::StrAppend(&output, "+", std::string(conf.board_width, '-'), "+\n");
+  for (const auto& row : player_board) {
+    absl::StrAppend(&output, "|", row, "|\n");
+  }
+  absl::StrAppend(&output, "+", std::string(conf.board_width, '-'), "+\n");
+  return output;
+}
+
+std::string BattleshipState::ShotsBoardString(const Player player) const {
+  SPIEL_CHECK_TRUE(player >= 0 && player < NumPlayers());
+
+  const Player opponent = (player == Player{0}) ? Player{1} : Player{0};
+  const BattleshipConfiguration& conf = bs_game_->configuration;
+
+  // We keep the board in memory as vectors of strings. Initially, all strings
+  // only contain whitespace.
+  std::vector<std::string> shots_board(conf.board_height,
+                                       std::string(conf.board_width, ' '));
+
+  // We fill in the board that represents the outcome of the player's
   // shots.
   //
   // We start by adding a '@' to all the positions where the player shot.
-  // That corresponds to marking all shots as 'misses'. We will promote them to
-  // ship-hit marks '#' in a shortly.
+  // That corresponds to marking all shots as 'misses'. We will promote them
+  // to ship-hit marks '#' in a shortly.
   for (const auto& move : moves_) {
     if (move.player == player && absl::holds_alternative<Shot>(move.action)) {
       const Shot& shot = absl::get<Shot>(move.action);
 
-      SPIEL_DCHECK_EQ(opponent_board[shot.row][shot.col], ' ');
-      opponent_board[shot.row][shot.col] = '@';
+      SPIEL_DCHECK_EQ(shots_board[shot.row][shot.col], ' ');
+      shots_board[shot.row][shot.col] = '@';
     }
   }
 
-  // Now, we iterate through the ship placements of the opponent. If a ship has
-  // been hit, then we will promote '@' to '#'.
+  // Now, we iterate through the ship placements of the opponent. If a ship
+  // has been hit, then we will promote '@' to '#'.
   for (const auto& move : moves_) {
     if (move.player == opponent &&
         absl::holds_alternative<ShipPlacement>(move.action)) {
@@ -395,14 +414,15 @@ std::string BattleshipState::ObservationString(Player player) const {
         SPIEL_DCHECK_TRUE(cell.row >= 0 && cell.row < conf.board_height);
         SPIEL_DCHECK_TRUE(cell.col >= 0 && cell.col < conf.board_width);
 
-        if (opponent_board[cell.row][cell.col] == '@') {
-          opponent_board[cell.row][cell.col] = '#';
+        if (shots_board[cell.row][cell.col] == '@') {
+          shots_board[cell.row][cell.col] = '#';
         } else {
-          // Ships cannot intersect, so it's impossible that we would go over a
-          // '#'.
+          // Ships cannot intersect, so it's impossible that we would go over
+          // a '#'.
+          SPIEL_DCHECK_EQ(shots_board[cell.row][cell.col], ' ');
+
           std::cout << "(" << cell.row << ", " << cell.col << ") -> '"
-                    << opponent_board[cell.row][cell.col] << "'\n";
-          SPIEL_DCHECK_EQ(opponent_board[cell.row][cell.col], ' ');
+                    << shots_board[cell.row][cell.col] << "'\n";
         }
 
         if (placement.direction == ShipPlacement::Direction::Horizontal) {
@@ -416,10 +436,20 @@ std::string BattleshipState::ObservationString(Player player) const {
     }
   }
 
+  std::string output;
+  absl::StrAppend(&output, "+", std::string(conf.board_width, '-'), "+\n");
+  for (const auto& row : shots_board) {
+    absl::StrAppend(&output, "|", row, "|\n");
+  }
+  absl::StrAppend(&output, "+", std::string(conf.board_width, '-'), "+\n");
+  return output;
+}
+
+std::string BattleshipState::ObservationString(Player player) const {
   std::string output = "State of player's ships:\n";
-  for (const auto& row : player_board) absl::StrAppend(&output, row, "\n");
+  absl::StrAppend(&output, OwnBoardString(player));
   absl::StrAppend(&output, "\nPlayer's shot outcomes:\n");
-  for (const auto& row : opponent_board) absl::StrAppend(&output, row, "\n");
+  absl::StrAppend(&output, ShotsBoardString(player));
   return output;
 }
 
@@ -750,8 +780,9 @@ BattleshipGame::BattleshipGame(const GameParameters& params)
   SPIEL_CHECK_GT(configuration.ships.size(), 0);
 
   // XXX(gfarina): The next restriction is not really intrinsic in the game,
-  //     but we need it to pretty print the board status in `ObservationString`,
-  //     since we use ASCII letters (a-z) to identify the ships.
+  //     but we need it to pretty print the board status in
+  //     `ObservationString`, since we use ASCII letters (a-z) to identify the
+  //     ships.
   SPIEL_CHECK_LE(configuration.ships.size(), 26);
 
   configuration.num_shots = ParameterValue<int>("num_shots");
@@ -789,9 +820,9 @@ double BattleshipGame::MinUtility() const {
   // So, here we take the worst possible case: we destroy no ship and all of
   // our ships are destroyed.
   //
-  // Note: the implementation below is only correct if the ship values are >= 0.
-  // That condition is checked at game construction time. However, we allow for
-  // a negative loss_multiplier.
+  // Note: the implementation below is only correct if the ship values are >=
+  // 0. That condition is checked at game construction time. However, we allow
+  // for a negative loss_multiplier.
   double min_utility = 0.0;
   if (configuration.loss_multiplier > 0.0) {
     for (const Ship& ship : configuration.ships) {
@@ -810,9 +841,9 @@ double BattleshipGame::MaxUtility() const {
   // So, here we take the best possible case: we destroy all of the opponent's
   // ship and have none of ours sunk.
   //
-  // Note: the implementation below is only correct if the ship values are >= 0.
-  // That condition is checked at game construction time. However, we allow for
-  // a negative loss_multiplier.
+  // Note: the implementation below is only correct if the ship values are >=
+  // 0. That condition is checked at game construction time. However, we allow
+  // for a negative loss_multiplier.
   double max_utility = 0.0;
   for (const Ship& ship : configuration.ships) {
     SPIEL_DCHECK_GE(ship.value, 0.0);
@@ -837,8 +868,8 @@ double BattleshipGame::UtilitySum() const {
 }
 
 int BattleshipGame::MaxGameLength() const {
-  // Each player has to place their ships, plus potentially as many turns as the
-  // number of shots
+  // Each player has to place their ships, plus potentially as many turns as
+  // the number of shots
   return 2 * (configuration.ships.size() + configuration.num_shots);
 }
 }  // namespace battleship
