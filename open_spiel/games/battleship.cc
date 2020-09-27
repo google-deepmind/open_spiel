@@ -182,9 +182,9 @@ std::string BattleshipState::ToString() const {
   std::string state_str;
   for (const auto& move : moves_) {
     if (move.player == Player{0}) {
-      absl::StrAppend(&state_str, "/1:");
+      absl::StrAppend(&state_str, "/0:");
     } else {
-      absl::StrAppend(&state_str, "/2:");
+      absl::StrAppend(&state_str, "/1:");
     }
     if (absl::holds_alternative<ShipPlacement>(move.action)) {
       absl::StrAppend(&state_str,
@@ -194,6 +194,19 @@ std::string BattleshipState::ToString() const {
       absl::StrAppend(&state_str, absl::get<Shot>(move.action).ToString());
     }
   }
+  return state_str;
+}
+
+std::string BattleshipState::ToPrettyString() const {
+  std::string state_str;
+
+  absl::StrAppend(&state_str, "Player 0's board:\n");
+  absl::StrAppend(&state_str, OwnBoardString(Player{0}));
+  absl::StrAppend(&state_str, "Player 1's board:\n");
+  absl::StrAppend(&state_str, OwnBoardString(Player{1}));
+  // NOTE: It is not necessary to also include the boards of the players' shots,
+  //     since those can be inferred from the two ship boards.
+
   return state_str;
 }
 
