@@ -25,9 +25,6 @@ namespace battleship {
 
 const double kFloatTolerance = 1e-9;
 
-const Player Player1 = Player{0};
-const Player Player2 = Player{1};
-
 BattleshipState::BattleshipState(
     const std::shared_ptr<const BattleshipGame> bs_game)
     : State(bs_game), bs_game_(bs_game) {}
@@ -45,9 +42,9 @@ Player BattleshipState::CurrentPlayer() const {
     // In this case, if an even number (possibly 0) of ships have been placed,
     // then it is Player 1's turn to act next. Else, it is Player 2's.
     if (NumShipsPlaced() % 2 == 0) {
-      return Player1;
+      return Player{0};
     } else {
-      return Player2;
+      return Player{1};
     }
   } else {
     // In this case, all ships have been placed. The players can take turns for
@@ -60,15 +57,16 @@ Player BattleshipState::CurrentPlayer() const {
     // * At least one player has lost all of their ships.
     if (moves_.size() == 2 * conf.ships.size() + 2 * conf.num_shots) {
       return kTerminalPlayerId;
-    } else if (AllPlayersShipsSank(Player1) || AllPlayersShipsSank(Player2)) {
+    } else if (AllPlayersShipsSank(Player{0}) ||
+               AllPlayersShipsSank(Player{1})) {
       return kTerminalPlayerId;
     }
 
     // If we are here, the game is not over yet.
     if (moves_.size() % 2 == 0) {
-      return Player1;
+      return Player{0};
     } else {
-      return Player2;
+      return Player{1};
     }
   }
 }
@@ -158,7 +156,7 @@ std::vector<Action> BattleshipState::LegalActions() const {
 
 std::string BattleshipState::ActionToString(Player player,
                                             Action action) const {
-  SPIEL_DCHECK_TRUE(player == Player1 || player == Player2);
+  SPIEL_DCHECK_TRUE(player == Player{0} || player == Player{1});
 
   // FIXME(gfarina): It was not clear to me from the documentation whether
   //     the next condition is always guaranteed.
@@ -183,7 +181,7 @@ std::string BattleshipState::ActionToString(Player player,
 std::string BattleshipState::ToString() const {
   std::string state_str;
   for (const auto& move : moves_) {
-    if (move.player == Player1) {
+    if (move.player == Player{0}) {
       absl::StrAppend(&state_str, "/1:");
     } else {
       absl::StrAppend(&state_str, "/2:");
@@ -215,8 +213,8 @@ std::vector<double> BattleshipState::Returns() const {
   double damage_pl1 = 0.0;
   double damage_pl2 = 0.0;
   for (const Ship& ship : conf.ships) {
-    if (DidShipSink(ship, Player1)) damage_pl1 += ship.value;
-    if (DidShipSink(ship, Player2)) damage_pl2 += ship.value;
+    if (DidShipSink(ship, Player{0})) damage_pl1 += ship.value;
+    if (DidShipSink(ship, Player{1})) damage_pl2 += ship.value;
   }
 
   return {damage_pl2 - loss_multiplier * damage_pl1,
@@ -228,13 +226,10 @@ std::unique_ptr<State> BattleshipState::Clone() const {
 }
 
 std::string BattleshipState::InformationStateString(Player player) const {
-  // XXX(gfarina): It looks like `api_test.py` wants to see the substring
-  //     "player >= 0" when the method fails because an invalid player was
-  //     supplied. That's why the redundant check is appended to the end.
-  SPIEL_CHECK_TRUE(player >= Player1 && player <= Player2 && player >= 0);
+  SPIEL_CHECK_TRUE(player >= 0 && player < NumPlayers());
 
   const BattleshipConfiguration& conf = bs_game_->configuration;
-  const Player opponent = (player == Player1) ? Player2 : Player1;
+  const Player opponent = (player == Player{0}) ? Player{1} : Player{0};
 
   // We will need to figure out whether each of the player's shots
   // (i) hit the water, (ii) damaged but did not sink yet one of the opponent's
@@ -308,12 +303,9 @@ std::string BattleshipState::InformationStateString(Player player) const {
 }
 
 std::string BattleshipState::ObservationString(Player player) const {
-  // XXX(gfarina): It looks like `api_test.py` wants to see the substring
-  //     "player >= 0" when the method fails because an invalid player was
-  //     supplied. That's why the redundant check is appended to the end.
-  SPIEL_CHECK_TRUE(player >= Player1 && player <= Player2 && player >= 0);
+  SPIEL_CHECK_TRUE(player >= 0 && player < NumPlayers());
 
-  const Player opponent = (player == Player1) ? Player2 : Player1;
+  const Player opponent = (player == Player{0}) ? Player{1} : Player{0};
   const BattleshipConfiguration& conf = bs_game_->configuration;
 
   // We keep the two boards in memory as vectors of strings. Initially, all
@@ -469,7 +461,7 @@ bool BattleshipState::AllShipsPlaced() const {
 
 bool BattleshipState::IsShipPlaced(const Ship& ship,
                                    const Player player) const {
-  SPIEL_DCHECK_TRUE(player == Player1 || player == Player2);
+  SPIEL_DCHECK_TRUE(player == Player{0} || player == Player{1});
 
   for (const auto& move : moves_) {
     if (move.player == player &&
@@ -482,7 +474,7 @@ bool BattleshipState::IsShipPlaced(const Ship& ship,
 }
 
 Ship BattleshipState::NextShipToPlace(const Player player) const {
-  SPIEL_DCHECK_TRUE(player == Player1 || player == Player2);
+  SPIEL_DCHECK_TRUE(player == Player{0} || player == Player{1});
 
   const BattleshipConfiguration& conf = bs_game_->configuration;
   const auto next_ship = std::find_if_not(
@@ -496,7 +488,7 @@ Ship BattleshipState::NextShipToPlace(const Player player) const {
 
 ShipPlacement BattleshipState::FindShipPlacement(const Ship& ship,
                                                  const Player player) const {
-  SPIEL_DCHECK_TRUE(player == Player1 || player == Player2);
+  SPIEL_DCHECK_TRUE(player == Player{0} || player == Player{1});
 
   // NOTE: for now, this function is intended to be called only after all the
   //     ships have been placed.
@@ -545,7 +537,7 @@ bool BattleshipState::PlacementDoesNotOverlap(const ShipPlacement& proposed,
 }
 
 bool BattleshipState::DidShipSink(const Ship& ship, const Player player) const {
-  SPIEL_DCHECK_TRUE(player == Player1 || player == Player2);
+  SPIEL_DCHECK_TRUE(player == Player{0} || player == Player{1});
 
   // NOTE: for now, this function is intended to be called only after all the
   //     ships have been placed.
@@ -580,7 +572,7 @@ bool BattleshipState::DidShipSink(const Ship& ship, const Player player) const {
 }
 
 bool BattleshipState::AllPlayersShipsSank(const Player player) const {
-  SPIEL_DCHECK_TRUE(player == Player1 || player == Player2);
+  SPIEL_DCHECK_TRUE(player == Player{0} || player == Player{1});
 
   const BattleshipConfiguration& conf = bs_game_->configuration;
 
@@ -591,7 +583,7 @@ bool BattleshipState::AllPlayersShipsSank(const Player player) const {
 }
 
 bool BattleshipState::AlreadyShot(const Shot& shot, const Player player) const {
-  SPIEL_DCHECK_TRUE(player == Player1 || player == Player2);
+  SPIEL_DCHECK_TRUE(player == Player{0} || player == Player{1});
 
   return std::find_if(moves_.begin(), moves_.end(),
                       [player, shot](const GameMove& move) {
