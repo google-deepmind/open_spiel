@@ -550,7 +550,8 @@ ShipPlacement BattleshipState::FindShipPlacement(const Ship& ship,
       }
     }
   }
-  SPIEL_DCHECK_TRUE(false);  // Unreachable!
+
+  SPIEL_DCHECK_FALSE("Unreachable");
 }
 
 bool BattleshipState::PlacementDoesNotOverlap(const ShipPlacement& proposed,
