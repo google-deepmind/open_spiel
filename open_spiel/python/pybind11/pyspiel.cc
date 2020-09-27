@@ -336,6 +336,7 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("policy_tensor_shape", &Game::PolicyTensorShape)
       .def("deserialize_state", &Game::DeserializeState)
       .def("max_game_length", &Game::MaxGameLength)
+      .def("action_to_string", &Game::ActionToString)
       .def("make_observer", &Game::MakeObserver,
            py::arg("imperfect_information_observation_type") = absl::nullopt,
            py::arg("params") = GameParameters())

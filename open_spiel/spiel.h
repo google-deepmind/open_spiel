@@ -794,6 +794,12 @@ class Game : public std::enable_shared_from_this<Game> {
       absl::optional<IIGObservationType> iig_obs_type,
       const GameParameters& params) const;
 
+  // Returns a string representation of the specified action for the player,
+  // independent of the state.
+  virtual std::string ActionToString(Player player, Action action_id) const {
+    return absl::StrCat("Action(id=", action_id, ", player=", player, ")");
+  }
+
  protected:
   Game(GameType game_type, GameParameters game_parameters)
       : game_type_(game_type), game_parameters_(game_parameters) {}
