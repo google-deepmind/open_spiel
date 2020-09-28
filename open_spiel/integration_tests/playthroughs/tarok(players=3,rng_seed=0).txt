@@ -1,0 +1,276 @@
+game: tarok(players=3,rng_seed=0)
+
+GameType.chance_mode = ChanceMode.SAMPLED_STOCHASTIC
+GameType.dynamics = Dynamics.SEQUENTIAL
+GameType.information = Information.IMPERFECT_INFORMATION
+GameType.long_name = "Slovenian Tarok"
+GameType.max_num_players = 4
+GameType.min_num_players = 3
+GameType.parameter_specification = ["players", "rng_seed"]
+GameType.provides_information_state_string = True
+GameType.provides_information_state_tensor = False
+GameType.provides_observation_string = False
+GameType.provides_observation_tensor = False
+GameType.provides_factored_observation_string = False
+GameType.reward_model = RewardModel.TERMINAL
+GameType.short_name = "tarok"
+GameType.utility = Utility.GENERAL_SUM
+
+NumDistinctActions() = 54
+PolicyTensorShape() = [54]
+MaxChanceOutcomes() = 1
+GetParameters() = {players=3,rng_seed=0}
+NumPlayers() = 3
+MinUtility() = -500.0
+MaxUtility() = 500.0
+UtilitySum() = None
+MaxGameLength() = 65
+ToString() = "tarok(players=3,rng_seed=0)"
+
+# State 0
+# Game phase: Card dealing
+# Selected contract: Not selected
+# Current player: -1
+IsTerminal() = False
+History() = []
+HistoryString() = ""
+IsChanceNode() = True
+IsSimultaneousNode() = False
+CurrentPlayer() = -1
+InformationStateString(0) = ""
+InformationStateString(1) = ""
+InformationStateString(2) = ""
+SerializeState() = ""
+ChanceOutcomes() = [{0, 1.000000000000}]
+LegalActions() = [0]
+StringLegalActions() = ["Deal"]
+
+# Apply action "Deal"
+action: 0
+
+# State 1
+# Game phase: Bidding
+# Selected contract: Not selected
+# Current player: 1
+# Player cards: 0,1,6,7,12,18,20,22,23,24,30,36,37,40,42,45
+IsTerminal() = False
+History() = [0]
+HistoryString() = "0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "9,10,15,17,19,21,28,32,35,39,43,46,48,49,51,53;"
+InformationStateString(1) = "0,1,6,7,12,18,20,22,23,24,30,36,37,40,42,45;"
+InformationStateString(2) = "2,3,4,5,13,14,16,25,26,29,31,34,38,41,44,50;"
+SerializeState() = "-1937831252"
+Rewards() = [0.0, 0.0, 0.0]
+Returns() = [0.0, 0.0, 0.0]
+LegalActions() = [0, 3, 4, 8, 9, 10, 11, 12]
+StringLegalActions() = ["Pass", "Two", "One", "Beggar", "Solo without", "Open beggar", "Colour valat without", "Valat without"]
+
+# Apply action "Open beggar"
+action: 10
+
+# State 2
+# Game phase: Bidding
+# Selected contract: Not selected
+# Current player: 2
+# Player cards: 2,3,4,5,13,14,16,25,26,29,31,34,38,41,44,50
+IsTerminal() = False
+History() = [0, 10]
+HistoryString() = "0 10"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 2
+InformationStateString(0) = "9,10,15,17,19,21,28,32,35,39,43,46,48,49,51,53;10,"
+InformationStateString(1) = "0,1,6,7,12,18,20,22,23,24,30,36,37,40,42,45;10,"
+InformationStateString(2) = "2,3,4,5,13,14,16,25,26,29,31,34,38,41,44,50;10,"
+SerializeState() = "-1937831252\n10"
+Rewards() = [0.0, 0.0, 0.0]
+Returns() = [0.0, 0.0, 0.0]
+LegalActions() = [0, 11, 12]
+StringLegalActions() = ["Pass", "Colour valat without", "Valat without"]
+
+# Apply action "Valat without"
+action: 12
+
+# State 3
+# Game phase: Bidding
+# Selected contract: Not selected
+# Current player: 0
+# Player cards: 9,10,15,17,19,21,28,32,35,39,43,46,48,49,51,53
+IsTerminal() = False
+History() = [0, 10, 12]
+HistoryString() = "0 10 12"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "9,10,15,17,19,21,28,32,35,39,43,46,48,49,51,53;10,12,"
+InformationStateString(1) = "0,1,6,7,12,18,20,22,23,24,30,36,37,40,42,45;10,12,"
+InformationStateString(2) = "2,3,4,5,13,14,16,25,26,29,31,34,38,41,44,50;10,12,"
+SerializeState() = "-1937831252\n10\n12"
+Rewards() = [0.0, 0.0, 0.0]
+Returns() = [0.0, 0.0, 0.0]
+LegalActions() = [0, 12]
+StringLegalActions() = ["Pass", "Valat without"]
+
+# Apply action "Valat without"
+action: 12
+
+# State 4
+# Game phase: Bidding
+# Selected contract: Not selected
+# Current player: 1
+# Player cards: 0,1,6,7,12,18,20,22,23,24,30,36,37,40,42,45
+IsTerminal() = False
+History() = [0, 10, 12, 12]
+HistoryString() = "0 10 12 12"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "9,10,15,17,19,21,28,32,35,39,43,46,48,49,51,53;10,12,12,"
+InformationStateString(1) = "0,1,6,7,12,18,20,22,23,24,30,36,37,40,42,45;10,12,12,"
+InformationStateString(2) = "2,3,4,5,13,14,16,25,26,29,31,34,38,41,44,50;10,12,12,"
+SerializeState() = "-1937831252\n10\n12\n12"
+Rewards() = [0.0, 0.0, 0.0]
+Returns() = [0.0, 0.0, 0.0]
+LegalActions() = [0]
+StringLegalActions() = ["Pass"]
+
+# Apply action "Pass"
+action: 0
+
+# State 5
+# Game phase: Bidding
+# Selected contract: Not selected
+# Current player: 2
+# Player cards: 2,3,4,5,13,14,16,25,26,29,31,34,38,41,44,50
+IsTerminal() = False
+History() = [0, 10, 12, 12, 0]
+HistoryString() = "0 10 12 12 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 2
+InformationStateString(0) = "9,10,15,17,19,21,28,32,35,39,43,46,48,49,51,53;10,12,12,0,"
+InformationStateString(1) = "0,1,6,7,12,18,20,22,23,24,30,36,37,40,42,45;10,12,12,0,"
+InformationStateString(2) = "2,3,4,5,13,14,16,25,26,29,31,34,38,41,44,50;10,12,12,0,"
+SerializeState() = "-1937831252\n10\n12\n12\n0"
+Rewards() = [0.0, 0.0, 0.0]
+Returns() = [0.0, 0.0, 0.0]
+LegalActions() = [0]
+StringLegalActions() = ["Pass"]
+
+# Apply action "Pass"
+action: 0
+
+# State 6
+# Game phase: Bidding
+# Selected contract: Not selected
+# Current player: 0
+# Player cards: 9,10,15,17,19,21,28,32,35,39,43,46,48,49,51,53
+IsTerminal() = False
+History() = [0, 10, 12, 12, 0, 0]
+HistoryString() = "0 10 12 12 0 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "9,10,15,17,19,21,28,32,35,39,43,46,48,49,51,53;10,12,12,0,0,"
+InformationStateString(1) = "0,1,6,7,12,18,20,22,23,24,30,36,37,40,42,45;10,12,12,0,0,"
+InformationStateString(2) = "2,3,4,5,13,14,16,25,26,29,31,34,38,41,44,50;10,12,12,0,0,"
+SerializeState() = "-1937831252\n10\n12\n12\n0\n0"
+Rewards() = [0.0, 0.0, 0.0]
+Returns() = [0.0, 0.0, 0.0]
+LegalActions() = [12]
+StringLegalActions() = ["Valat without"]
+
+# Apply action "Valat without"
+action: 12
+
+# State 7
+# Game phase: Tricks playing
+# Selected contract: Valat without
+# Current player: 0
+# Player cards: 9,10,15,17,19,21,28,32,35,39,43,46,48,49,51,53
+# Trick cards:
+IsTerminal() = False
+History() = [0, 10, 12, 12, 0, 0, 12]
+HistoryString() = "0 10 12 12 0 0 12"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "9,10,15,17,19,21,28,32,35,39,43,46,48,49,51,53;10,12,12,0,0,12;"
+InformationStateString(1) = "0,1,6,7,12,18,20,22,23,24,30,36,37,40,42,45;10,12,12,0,0,12;"
+InformationStateString(2) = "2,3,4,5,13,14,16,25,26,29,31,34,38,41,44,50;10,12,12,0,0,12;"
+SerializeState() = "-1937831252\n10\n12\n12\n0\n0\n12"
+Rewards() = [0.0, 0.0, 0.0]
+Returns() = [0.0, 0.0, 0.0]
+LegalActions() = [9, 10, 15, 17, 19, 21, 28, 32, 35, 39, 43, 46, 48, 49, 51, 53]
+StringLegalActions() = ["X", "XI", "XVI", "XVIII", "XX", "Skis", "Queen of Hearts", "2 of Diamonds", "Knight of Diamonds", "8 of Spades", "Knight of Spades", "7 of Clubs", "9 of Clubs", "10 of Clubs", "Knight of Clubs", "King of Clubs"]
+
+# Apply action "King of Clubs"
+action: 53
+
+# State 8
+# Game phase: Tricks playing
+# Selected contract: Valat without
+# Current player: 1
+# Player cards: 0,1,6,7,12,18,20,22,23,24,30,36,37,40,42,45
+# Trick cards: 53
+IsTerminal() = False
+History() = [0, 10, 12, 12, 0, 0, 12, 53]
+HistoryString() = "0 10 12 12 0 0 12 53"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "9,10,15,17,19,21,28,32,35,39,43,46,48,49,51,53;10,12,12,0,0,12;53,"
+InformationStateString(1) = "0,1,6,7,12,18,20,22,23,24,30,36,37,40,42,45;10,12,12,0,0,12;53,"
+InformationStateString(2) = "2,3,4,5,13,14,16,25,26,29,31,34,38,41,44,50;10,12,12,0,0,12;53,"
+SerializeState() = "-1937831252\n10\n12\n12\n0\n0\n12\n53"
+Rewards() = [0.0, 0.0, 0.0]
+Returns() = [0.0, 0.0, 0.0]
+LegalActions() = [0, 1, 6, 7, 12, 18, 20]
+StringLegalActions() = ["Pagat", "II", "VII", "VIII", "XIII", "XIX", "Mond"]
+
+# Apply action "Pagat"
+action: 0
+
+# State 9
+# Game phase: Tricks playing
+# Selected contract: Valat without
+# Current player: 2
+# Player cards: 2,3,4,5,13,14,16,25,26,29,31,34,38,41,44,50
+# Trick cards: 53,0
+IsTerminal() = False
+History() = [0, 10, 12, 12, 0, 0, 12, 53, 0]
+HistoryString() = "0 10 12 12 0 0 12 53 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 2
+InformationStateString(0) = "9,10,15,17,19,21,28,32,35,39,43,46,48,49,51,53;10,12,12,0,0,12;53,0,"
+InformationStateString(1) = "0,1,6,7,12,18,20,22,23,24,30,36,37,40,42,45;10,12,12,0,0,12;53,0,"
+InformationStateString(2) = "2,3,4,5,13,14,16,25,26,29,31,34,38,41,44,50;10,12,12,0,0,12;53,0,"
+SerializeState() = "-1937831252\n10\n12\n12\n0\n0\n12\n53\n0"
+Rewards() = [0.0, 0.0, 0.0]
+Returns() = [0.0, 0.0, 0.0]
+LegalActions() = [50]
+StringLegalActions() = ["Jack of Clubs"]
+
+# Apply action "Jack of Clubs"
+action: 50
+
+# State 10
+# Game phase: Finished
+# Selected contract: Valat without
+# Current player: -4
+IsTerminal() = True
+History() = [0, 10, 12, 12, 0, 0, 12, 53, 0, 50]
+HistoryString() = "0 10 12 12 0 0 12 53 0 50"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = -4
+InformationStateString(0) = "9,10,15,17,19,21,28,32,35,39,43,46,48,49,51,53;10,12,12,0,0,12;53,0,50"
+InformationStateString(1) = "0,1,6,7,12,18,20,22,23,24,30,36,37,40,42,45;10,12,12,0,0,12;53,0,50"
+InformationStateString(2) = "2,3,4,5,13,14,16,25,26,29,31,34,38,41,44,50;10,12,12,0,0,12;53,0,50"
+SerializeState() = "-1937831252\n10\n12\n12\n0\n0\n12\n53\n0\n50"
+Rewards() = [-500.0, 0.0, 0.0]
+Returns() = [-500.0, 0.0, 0.0]

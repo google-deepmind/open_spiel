@@ -96,6 +96,12 @@ set(GAME_SOURCES
   skat.h
   solitaire.cc
   solitaire.h
+  tarok.cc
+  tarok.h
+  tarok/cards.cc
+  tarok/cards.h
+  tarok/contracts.cc
+  tarok/contracts.h
   tic_tac_toe.cc
   tic_tac_toe.h
   tiny_bridge.cc
@@ -120,7 +126,7 @@ add_library (games OBJECT ${GAME_SOURCES})
 target_include_directories (games PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 if (${BUILD_WITH_HANABI})
-  add_subdirectory (hanabi)
+  add_subdirectory(hanabi)
 endif()
 if (${BUILD_WITH_ACPC})
   add_subdirectory(universal_poker)
@@ -373,6 +379,10 @@ add_test(skat_test skat_test)
 add_executable(solitaire_test solitaire_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(solitaire_test solitaire_test)
+
+add_executable(tarok_test tarok_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(tarok_test tarok_test)
 
 add_executable(tic_tac_toe_test tic_tac_toe_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
