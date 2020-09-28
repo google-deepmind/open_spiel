@@ -241,6 +241,13 @@ void LeducPokerDeserializeTest() {
 }
 
 void GameParametersTest() {
+  // Basic types
+  SPIEL_CHECK_TRUE(GameParameter(1).has_int_value());
+  SPIEL_CHECK_TRUE(GameParameter(1.0).has_double_value());
+  SPIEL_CHECK_TRUE(GameParameter(true).has_bool_value());
+  SPIEL_CHECK_TRUE(GameParameter(std::string("1")).has_string_value());
+  SPIEL_CHECK_TRUE(GameParameter("1").has_string_value());  // See issue #380.
+
   // Bare name
   auto params = GameParametersFromString("game_one");
   SPIEL_CHECK_EQ(params.size(), 1);
