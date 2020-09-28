@@ -41,8 +41,8 @@ HistoryString() = ""
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
-InformationStateString(0) = "??"
-InformationStateString(1) = "??"
+InformationStateString(0) = "T0 ??"
+InformationStateString(1) = "T0 ??"
 InformationStateTensor(0): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(1): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationString(0) = "??"
@@ -64,8 +64,8 @@ HistoryString() = "15"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
-InformationStateString(0) = "SJHJ SJHK SJHQ SKHJ SKHK SKHQ SQHJ SQHK SQHQ"
-InformationStateString(1) = "??"
+InformationStateString(0) = "T1 SJHJ SJHK SJHQ SKHJ SKHK SKHQ SQHJ SQHK SQHQ"
+InformationStateString(1) = "T1 ??"
 InformationStateTensor(0): ◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(1): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationString(0) = "SJHJ SJHK SJHQ SKHJ SKHK SKHQ SQHJ SQHK SQHQ"
@@ -87,8 +87,8 @@ HistoryString() = "15 14"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "SJHJ SJHK SJHQ SKHJ SKHK SKHQ SQHJ SQHK SQHQ"
-InformationStateString(1) = "SQSJ"
+InformationStateString(0) = "T2 SJHJ SJHK SJHQ SKHJ SKHK SKHQ SQHJ SQHK SQHQ"
+InformationStateString(1) = "T2 SQSJ"
 InformationStateTensor(0): ◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(1): ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationString(0) = "SJHJ SJHK SJHQ SKHJ SKHK SKHQ SQHJ SQHK SQHQ"
@@ -111,8 +111,8 @@ HistoryString() = "15 14 5"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "SJHJ SJHK SJHQ SKHJ SKHK SKHQ SQHJ SQHK SQHQ Us 2S"
-InformationStateString(1) = "SQSJ Pd 2S"
+InformationStateString(0) = "T3 SJHJ SJHK SJHQ SKHJ SKHK SKHQ SQHJ SQHK SQHQ Us 2S"
+InformationStateString(1) = "T3 SQSJ Pd 2S"
 InformationStateTensor(0): ◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯
 InformationStateTensor(1): ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯
 ObservationString(0) = "SJHJ SJHK SJHQ SKHJ SKHK SKHQ SQHJ SQHK SQHQ 2S:Us"
@@ -135,8 +135,8 @@ HistoryString() = "15 14 5 6"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "SJHJ SJHK SJHQ SKHJ SKHK SKHQ SQHJ SQHK SQHQ Us 2S-2NT"
-InformationStateString(1) = "SQSJ Pd 2S-2NT"
+InformationStateString(0) = "T4 SJHJ SJHK SJHQ SKHJ SKHK SKHQ SQHJ SQHK SQHQ Us 2S-2NT"
+InformationStateString(1) = "T4 SQSJ Pd 2S-2NT"
 InformationStateTensor(0): ◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◉
 InformationStateTensor(1): ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◉◯
 ObservationString(0) = "SJHJ SJHK SJHQ SKHJ SKHK SKHQ SQHJ SQHK SQHQ 2NT:Pd"
@@ -159,8 +159,8 @@ HistoryString() = "15 14 5 6 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
-InformationStateString(0) = "SJHJ SJHK SJHQ SKHJ SKHK SKHQ SQHJ SQHK SQHQ Us 2S-2NT-Pass"
-InformationStateString(1) = "SQSJ Pd 2S-2NT-Pass"
+InformationStateString(0) = "T5 SJHJ SJHK SJHQ SKHJ SKHK SKHQ SQHJ SQHK SQHQ Us 2S-2NT-Pass"
+InformationStateString(1) = "T5 SQSJ Pd 2S-2NT-Pass"
 InformationStateTensor(0): ◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◉◯◯◉
 InformationStateTensor(1): ◯◯◯◯◯◯◯◯◯◯◯◉◯◉◯◯◯◯◯◯◯◯◯◉◉◯
 ObservationString(0) = "SJHJ SJHK SJHQ SKHJ SKHK SKHQ SQHJ SQHK SQHQ 2NT:Pd"

@@ -41,8 +41,8 @@ HistoryString() = ""
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
-InformationStateString(0) = "p0"
-InformationStateString(1) = "p1"
+InformationStateString(0) = "T0p0"
+InformationStateString(1) = "T0p1"
 InformationStateTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationString(0) = ""
@@ -64,8 +64,8 @@ HistoryString() = "9"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
-InformationStateString(0) = "p0 val 9"
-InformationStateString(1) = "p1"
+InformationStateString(0) = "T1p0 val 9"
+InformationStateString(1) = "T1p1"
 InformationStateTensor(0): ◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationString(0) = "9"
@@ -87,8 +87,8 @@ HistoryString() = "9 10"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "p0 val 9"
-InformationStateString(1) = "p1 val 10"
+InformationStateString(0) = "T2p0 val 9"
+InformationStateString(1) = "T2p1 val 10"
 InformationStateTensor(0): ◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯
 ObservationString(0) = "9"
@@ -111,8 +111,8 @@ HistoryString() = "9 10 3"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "p0 val 9 bid 3"
-InformationStateString(1) = "p1 val 10"
+InformationStateString(0) = "T3p0 val 9 bid 3"
+InformationStateString(1) = "T3p1 val 10"
 InformationStateTensor(0): ◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯
 InformationStateTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯
 ObservationString(0) = "9"
@@ -135,8 +135,8 @@ HistoryString() = "9 10 3 5"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
-InformationStateString(0) = "p0 val 9 bid 3"
-InformationStateString(1) = "p1 val 10 bid 5"
+InformationStateString(0) = "T4p0 val 9 bid 3"
+InformationStateString(1) = "T4p1 val 10 bid 5"
 InformationStateTensor(0): ◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯
 InformationStateTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯
 ObservationString(0) = "9"
@@ -158,8 +158,8 @@ HistoryString() = "9 10 3 5 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
-InformationStateString(0) = "p0 val 9 bid 3"
-InformationStateString(1) = "p1 val 10 bid 5"
+InformationStateString(0) = "T5p0 val 9 bid 3"
+InformationStateString(1) = "T5p1 val 10 bid 5"
 InformationStateTensor(0): ◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯
 InformationStateTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯
 ObservationString(0) = "9"

@@ -47,8 +47,8 @@ HistoryString() = ""
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
-InformationStateString(0) = "[Round 1][Player: -1][Pot: 2][Money: 99 99[Private: -10000]][Round1]: [Public: -10000]\nRound 2 sequence: "
-InformationStateString(1) = "[Round 1][Player: -1][Pot: 2][Money: 99 99[Private: -10000]][Round1]: [Public: -10000]\nRound 2 sequence: "
+InformationStateString(0) = "T0 [Round 1][Player: -1][Pot: 2][Money: 99 99[Private: -10000]][Round1]: [Public: -10000]\nRound 2 sequence: "
+InformationStateString(1) = "T0 [Round 1][Player: -1][Pot: 2][Money: 99 99[Private: -10000]][Round1]: [Public: -10000]\nRound 2 sequence: "
 InformationStateTensor(0).player: ◉◯
 InformationStateTensor(0).private_card: ◯◯◯◯◯◯
 InformationStateTensor(0).community_card: ◯◯◯◯◯◯
@@ -65,11 +65,11 @@ InformationStateTensor(1).betting:
 ◯◯  ◯◯
 ◯◯  ◯◯
 ◯◯  ◯◯
-ObservationString(0) = "[Round 1][Player: -1][Pot: 2][Money: 99 99[Private: -10000][Ante: 1 1]"
-ObservationString(1) = "[Round 1][Player: -1][Pot: 2][Money: 99 99[Private: -10000][Ante: 1 1]"
-PublicObservationString() = "[Round 1][Player: -1][Pot: 2][Money: 99 99[Ante: 1 1]"
-PrivateObservationString(0) = "[Private: -10000]"
-PrivateObservationString(1) = "[Private: -10000]"
+ObservationString(0) = "T0 [Round 1][Player: -1][Pot: 2][Money: 99 99[Private: -10000][Ante: 1 1]"
+ObservationString(1) = "T0 [Round 1][Player: -1][Pot: 2][Money: 99 99[Private: -10000][Ante: 1 1]"
+PublicObservationString() = "T0 [Round 1][Player: -1][Pot: 2][Money: 99 99[Ante: 1 1]"
+PrivateObservationString(0) = "T0 [Private: -10000]"
+PrivateObservationString(1) = "T0 [Private: -10000]"
 ObservationTensor(0).player: ◉◯
 ObservationTensor(0).private_card: ◯◯◯◯◯◯
 ObservationTensor(0).community_card: ◯◯◯◯◯◯
@@ -99,8 +99,8 @@ HistoryString() = "0"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
-InformationStateString(0) = "[Round 1][Player: -1][Pot: 2][Money: 99 99[Private: 0]][Round1]: [Public: -10000]\nRound 2 sequence: "
-InformationStateString(1) = "[Round 1][Player: -1][Pot: 2][Money: 99 99[Private: -10000]][Round1]: [Public: -10000]\nRound 2 sequence: "
+InformationStateString(0) = "T1 [Round 1][Player: -1][Pot: 2][Money: 99 99[Private: 0]][Round1]: [Public: -10000]\nRound 2 sequence: "
+InformationStateString(1) = "T1 [Round 1][Player: -1][Pot: 2][Money: 99 99[Private: -10000]][Round1]: [Public: -10000]\nRound 2 sequence: "
 InformationStateTensor(0).player: ◉◯
 InformationStateTensor(0).private_card: ◉◯◯◯◯◯
 InformationStateTensor(0).community_card: ◯◯◯◯◯◯
@@ -117,11 +117,11 @@ InformationStateTensor(1).betting:
 ◯◯  ◯◯
 ◯◯  ◯◯
 ◯◯  ◯◯
-ObservationString(0) = "[Round 1][Player: -1][Pot: 2][Money: 99 99[Private: 0][Ante: 1 1]"
-ObservationString(1) = "[Round 1][Player: -1][Pot: 2][Money: 99 99[Private: -10000][Ante: 1 1]"
-PublicObservationString() = "[Round 1][Player: -1][Pot: 2][Money: 99 99[Ante: 1 1]"
-PrivateObservationString(0) = "[Private: 0]"
-PrivateObservationString(1) = "[Private: -10000]"
+ObservationString(0) = "T1 [Round 1][Player: -1][Pot: 2][Money: 99 99[Private: 0][Ante: 1 1]"
+ObservationString(1) = "T1 [Round 1][Player: -1][Pot: 2][Money: 99 99[Private: -10000][Ante: 1 1]"
+PublicObservationString() = "T1 [Round 1][Player: -1][Pot: 2][Money: 99 99[Ante: 1 1]"
+PrivateObservationString(0) = "T1 [Private: 0]"
+PrivateObservationString(1) = "T1 [Private: -10000]"
 ObservationTensor(0).player: ◉◯
 ObservationTensor(0).private_card: ◉◯◯◯◯◯
 ObservationTensor(0).community_card: ◯◯◯◯◯◯
@@ -151,8 +151,8 @@ HistoryString() = "0 3"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "[Round 1][Player: 0][Pot: 2][Money: 99 99[Private: 0]][Round1]: [Public: -10000]\nRound 2 sequence: "
-InformationStateString(1) = "[Round 1][Player: 0][Pot: 2][Money: 99 99[Private: 3]][Round1]: [Public: -10000]\nRound 2 sequence: "
+InformationStateString(0) = "T2 [Round 1][Player: 0][Pot: 2][Money: 99 99[Private: 0]][Round1]: [Public: -10000]\nRound 2 sequence: "
+InformationStateString(1) = "T2 [Round 1][Player: 0][Pot: 2][Money: 99 99[Private: 3]][Round1]: [Public: -10000]\nRound 2 sequence: "
 InformationStateTensor(0).player: ◉◯
 InformationStateTensor(0).private_card: ◉◯◯◯◯◯
 InformationStateTensor(0).community_card: ◯◯◯◯◯◯
@@ -169,11 +169,11 @@ InformationStateTensor(1).betting:
 ◯◯  ◯◯
 ◯◯  ◯◯
 ◯◯  ◯◯
-ObservationString(0) = "[Round 1][Player: 0][Pot: 2][Money: 99 99[Private: 0][Ante: 1 1]"
-ObservationString(1) = "[Round 1][Player: 0][Pot: 2][Money: 99 99[Private: 3][Ante: 1 1]"
-PublicObservationString() = "[Round 1][Player: 0][Pot: 2][Money: 99 99[Ante: 1 1]"
-PrivateObservationString(0) = "[Private: 0]"
-PrivateObservationString(1) = "[Private: 3]"
+ObservationString(0) = "T2 [Round 1][Player: 0][Pot: 2][Money: 99 99[Private: 0][Ante: 1 1]"
+ObservationString(1) = "T2 [Round 1][Player: 0][Pot: 2][Money: 99 99[Private: 3][Ante: 1 1]"
+PublicObservationString() = "T2 [Round 1][Player: 0][Pot: 2][Money: 99 99[Ante: 1 1]"
+PrivateObservationString(0) = "T2 [Private: 0]"
+PrivateObservationString(1) = "T2 [Private: 3]"
 ObservationTensor(0).player: ◉◯
 ObservationTensor(0).private_card: ◉◯◯◯◯◯
 ObservationTensor(0).community_card: ◯◯◯◯◯◯
@@ -204,8 +204,8 @@ HistoryString() = "0 3 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "[Round 1][Player: 1][Pot: 4][Money: 97 99[Private: 0]][Round1]: 2[Public: -10000]\nRound 2 sequence: "
-InformationStateString(1) = "[Round 1][Player: 1][Pot: 4][Money: 97 99[Private: 3]][Round1]: 2[Public: -10000]\nRound 2 sequence: "
+InformationStateString(0) = "T3 [Round 1][Player: 1][Pot: 4][Money: 97 99[Private: 0]][Round1]: 2[Public: -10000]\nRound 2 sequence: "
+InformationStateString(1) = "T3 [Round 1][Player: 1][Pot: 4][Money: 97 99[Private: 3]][Round1]: 2[Public: -10000]\nRound 2 sequence: "
 InformationStateTensor(0).player: ◉◯
 InformationStateTensor(0).private_card: ◉◯◯◯◯◯
 InformationStateTensor(0).community_card: ◯◯◯◯◯◯
@@ -222,11 +222,11 @@ InformationStateTensor(1).betting:
 ◯◯  ◯◯
 ◯◯  ◯◯
 ◯◯  ◯◯
-ObservationString(0) = "[Round 1][Player: 1][Pot: 4][Money: 97 99[Private: 0][Ante: 3 1]"
-ObservationString(1) = "[Round 1][Player: 1][Pot: 4][Money: 97 99[Private: 3][Ante: 3 1]"
-PublicObservationString() = "[Round 1][Player: 1][Pot: 4][Money: 97 99[Ante: 3 1]"
-PrivateObservationString(0) = "[Private: 0]"
-PrivateObservationString(1) = "[Private: 3]"
+ObservationString(0) = "T3 [Round 1][Player: 1][Pot: 4][Money: 97 99[Private: 0][Ante: 3 1]"
+ObservationString(1) = "T3 [Round 1][Player: 1][Pot: 4][Money: 97 99[Private: 3][Ante: 3 1]"
+PublicObservationString() = "T3 [Round 1][Player: 1][Pot: 4][Money: 97 99[Ante: 3 1]"
+PrivateObservationString(0) = "T3 [Private: 0]"
+PrivateObservationString(1) = "T3 [Private: 3]"
 ObservationTensor(0).player: ◉◯
 ObservationTensor(0).private_card: ◉◯◯◯◯◯
 ObservationTensor(0).community_card: ◯◯◯◯◯◯
@@ -257,8 +257,8 @@ HistoryString() = "0 3 2 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
-InformationStateString(0) = "[Round 1][Player: 1][Pot: 0][Money: 101 99[Private: 0]][Round1]: 2 0[Public: -10000]\nRound 2 sequence: "
-InformationStateString(1) = "[Round 1][Player: 1][Pot: 0][Money: 101 99[Private: 3]][Round1]: 2 0[Public: -10000]\nRound 2 sequence: "
+InformationStateString(0) = "T4 [Round 1][Player: 1][Pot: 0][Money: 101 99[Private: 0]][Round1]: 2 0[Public: -10000]\nRound 2 sequence: "
+InformationStateString(1) = "T4 [Round 1][Player: 1][Pot: 0][Money: 101 99[Private: 3]][Round1]: 2 0[Public: -10000]\nRound 2 sequence: "
 InformationStateTensor(0).player: ◉◯
 InformationStateTensor(0).private_card: ◉◯◯◯◯◯
 InformationStateTensor(0).community_card: ◯◯◯◯◯◯
@@ -275,11 +275,11 @@ InformationStateTensor(1).betting:
 ◯◯  ◯◯
 ◯◯  ◯◯
 ◯◯  ◯◯
-ObservationString(0) = "[Round 1][Player: 1][Pot: 0][Money: 101 99[Private: 0][Ante: 3 1]"
-ObservationString(1) = "[Round 1][Player: 1][Pot: 0][Money: 101 99[Private: 3][Ante: 3 1]"
-PublicObservationString() = "[Round 1][Player: 1][Pot: 0][Money: 101 99[Ante: 3 1]"
-PrivateObservationString(0) = "[Private: 0]"
-PrivateObservationString(1) = "[Private: 3]"
+ObservationString(0) = "T4 [Round 1][Player: 1][Pot: 0][Money: 101 99[Private: 0][Ante: 3 1]"
+ObservationString(1) = "T4 [Round 1][Player: 1][Pot: 0][Money: 101 99[Private: 3][Ante: 3 1]"
+PublicObservationString() = "T4 [Round 1][Player: 1][Pot: 0][Money: 101 99[Ante: 3 1]"
+PrivateObservationString(0) = "T4 [Private: 0]"
+PrivateObservationString(1) = "T4 [Private: 3]"
 ObservationTensor(0).player: ◉◯
 ObservationTensor(0).private_card: ◉◯◯◯◯◯
 ObservationTensor(0).community_card: ◯◯◯◯◯◯

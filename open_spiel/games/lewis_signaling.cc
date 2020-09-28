@@ -98,7 +98,7 @@ std::string LewisSignalingState::ObservationString(Player player) const {
   std::string str = "";
 
   // Whose turn is it?
-  absl::StrAppend(&str, "Current turn: ", cur_player_, "\n");
+  absl::StrAppend(&str, "T", MoveNumber(), " Current turn: ", cur_player_, "\n");
 
   // Show state to the sender, message to the receiver
   if (static_cast<Players>(cur_player_) == Players::kSender) {

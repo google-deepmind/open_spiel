@@ -119,7 +119,7 @@ std::string HeartsState::InformationStateString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   if (IsTerminal()) return ToString();
-  std::string rv = "Pass Direction: ";
+  std::string rv = absl::StrCat("T", MoveNumber(), " Pass Direction: ");
   absl::StrAppend(&rv, pass_dir_str[static_cast<int>(pass_dir_)], "\n\n");
   absl::StrAppend(&rv, "Hand: \n");
   auto cards = FormatHand(player, /*mark_voids=*/true);

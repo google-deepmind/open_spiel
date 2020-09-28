@@ -40,12 +40,12 @@ HistoryString() = ""
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
-InformationStateString(0) = "p0"
-InformationStateString(1) = "p1"
+InformationStateString(0) = "T0p0"
+InformationStateString(1) = "T0p1"
 InformationStateTensor(0): ◯◯◯◯◯◯◯◯
 InformationStateTensor(1): ◯◯◯◯◯◯◯◯
-ObservationString(0) = "p0"
-ObservationString(1) = "p1"
+ObservationString(0) = "T0p0"
+ObservationString(1) = "T0p1"
 ObservationTensor(0): ◯◯◯◯◯◯◯◯
 ObservationTensor(1): ◯◯◯◯◯◯◯◯
 ChanceOutcomes() = [{0, 0.500000000000}, {1, 0.500000000000}]
@@ -63,12 +63,12 @@ HistoryString() = "1"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
-InformationStateString(0) = "p0:d1"
-InformationStateString(1) = "p1"
+InformationStateString(0) = "T1p0:d1"
+InformationStateString(1) = "T1p1"
 InformationStateTensor(0): ◯◉◯◯◯◯◯◯
 InformationStateTensor(1): ◯◯◯◯◯◯◯◯
-ObservationString(0) = "p0:d1"
-ObservationString(1) = "p1"
+ObservationString(0) = "T1p0:d1"
+ObservationString(1) = "T1p1"
 ObservationTensor(0): ◯◉◯◯◯◯◯◯
 ObservationTensor(1): ◯◯◯◯◯◯◯◯
 ChanceOutcomes() = [{0, 0.500000000000}, {1, 0.500000000000}]
@@ -86,12 +86,12 @@ HistoryString() = "1 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "p0:d1"
-InformationStateString(1) = "p1:d1"
+InformationStateString(0) = "T2p0:d1"
+InformationStateString(1) = "T2p1:d1"
 InformationStateTensor(0): ◯◉◯◯◯◯◯◯
 InformationStateTensor(1): ◯◉◯◯◯◯◯◯
-ObservationString(0) = "p0:d1"
-ObservationString(1) = "p1:d1"
+ObservationString(0) = "T2p0:d1"
+ObservationString(1) = "T2p1:d1"
 ObservationTensor(0): ◯◉◯◯◯◯◯◯
 ObservationTensor(1): ◯◉◯◯◯◯◯◯
 Rewards() = [0.0, 0.0]
@@ -110,12 +110,12 @@ HistoryString() = "1 1 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "p0:d1 p0:a2"
-InformationStateString(1) = "p1:d1 p0:a2"
+InformationStateString(0) = "T3p0:d1 p0:a2"
+InformationStateString(1) = "T3p1:d1 p0:a2"
 InformationStateTensor(0): ◯◉◯◯◉◯◯◯
 InformationStateTensor(1): ◯◉◯◯◉◯◯◯
-ObservationString(0) = "p0:d1 p0:a2"
-ObservationString(1) = "p1:d1 p0:a2"
+ObservationString(0) = "T3p0:d1 p0:a2"
+ObservationString(1) = "T3p1:d1 p0:a2"
 ObservationTensor(0): ◯◉◯◯◉◯◯◯
 ObservationTensor(1): ◯◉◯◯◉◯◯◯
 Rewards() = [0.0, 0.0]
@@ -134,12 +134,12 @@ HistoryString() = "1 1 2 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
-InformationStateString(0) = "p0:d1 p0:a2 p1:a0"
-InformationStateString(1) = "p1:d1 p0:a2 p1:a0"
+InformationStateString(0) = "T4p0:d1 p0:a2 p1:a0"
+InformationStateString(1) = "T4p1:d1 p0:a2 p1:a0"
 InformationStateTensor(0): ◯◉◯◯◉◉◯◯
 InformationStateTensor(1): ◯◉◯◯◉◉◯◯
-ObservationString(0) = "p0:d1 p0:a2 p1:a0"
-ObservationString(1) = "p1:d1 p0:a2 p1:a0"
+ObservationString(0) = "T4p0:d1 p0:a2 p1:a0"
+ObservationString(1) = "T4p1:d1 p0:a2 p1:a0"
 ObservationTensor(0): ◯◉◯◯◉◉◯◯
 ObservationTensor(1): ◯◉◯◯◉◉◯◯
 Rewards() = [10.0, 10.0]

@@ -49,73 +49,73 @@ Returns() = [0.0, 0.0, 0.0]
 LegalActions(0) = [0, 1, 2, 3, 4, 5]
 LegalActions(1) = [0, 1, 2, 3, 4, 5]
 LegalActions(2) = [0, 1, 2, 3, 4, 5]
-StringLegalActions(0) = ["p0 val 1  ---  action = 0
-p0 val 2  ---  action = 0
-p0 val 3  ---  action = 0
-", "p0 val 1  ---  action = 0
-p0 val 2  ---  action = 1
-p0 val 3  ---  action = 0
-", "p0 val 1  ---  action = 0
-p0 val 2  ---  action = 0
-p0 val 3  ---  action = 1
-", "p0 val 1  ---  action = 0
-p0 val 2  ---  action = 1
-p0 val 3  ---  action = 1
-", "p0 val 1  ---  action = 0
-p0 val 2  ---  action = 0
-p0 val 3  ---  action = 2
-", "p0 val 1  ---  action = 0
-p0 val 2  ---  action = 1
-p0 val 3  ---  action = 2
+StringLegalActions(0) = ["T3p0 val 1  ---  action = 0
+T3p0 val 2  ---  action = 0
+T3p0 val 3  ---  action = 0
+", "T3p0 val 1  ---  action = 0
+T3p0 val 2  ---  action = 1
+T3p0 val 3  ---  action = 0
+", "T3p0 val 1  ---  action = 0
+T3p0 val 2  ---  action = 0
+T3p0 val 3  ---  action = 1
+", "T3p0 val 1  ---  action = 0
+T3p0 val 2  ---  action = 1
+T3p0 val 3  ---  action = 1
+", "T3p0 val 1  ---  action = 0
+T3p0 val 2  ---  action = 0
+T3p0 val 3  ---  action = 2
+", "T3p0 val 1  ---  action = 0
+T3p0 val 2  ---  action = 1
+T3p0 val 3  ---  action = 2
 "]
-StringLegalActions(1) = ["p1 val 1  ---  action = 0
-p1 val 2  ---  action = 0
-p1 val 3  ---  action = 0
-", "p1 val 1  ---  action = 0
-p1 val 2  ---  action = 1
-p1 val 3  ---  action = 0
-", "p1 val 1  ---  action = 0
-p1 val 2  ---  action = 0
-p1 val 3  ---  action = 1
-", "p1 val 1  ---  action = 0
-p1 val 2  ---  action = 1
-p1 val 3  ---  action = 1
-", "p1 val 1  ---  action = 0
-p1 val 2  ---  action = 0
-p1 val 3  ---  action = 2
-", "p1 val 1  ---  action = 0
-p1 val 2  ---  action = 1
-p1 val 3  ---  action = 2
+StringLegalActions(1) = ["T4p1 val 1  ---  action = 0
+T4p1 val 2  ---  action = 0
+T4p1 val 3  ---  action = 0
+", "T4p1 val 1  ---  action = 0
+T4p1 val 2  ---  action = 1
+T4p1 val 3  ---  action = 0
+", "T4p1 val 1  ---  action = 0
+T4p1 val 2  ---  action = 0
+T4p1 val 3  ---  action = 1
+", "T4p1 val 1  ---  action = 0
+T4p1 val 2  ---  action = 1
+T4p1 val 3  ---  action = 1
+", "T4p1 val 1  ---  action = 0
+T4p1 val 2  ---  action = 0
+T4p1 val 3  ---  action = 2
+", "T4p1 val 1  ---  action = 0
+T4p1 val 2  ---  action = 1
+T4p1 val 3  ---  action = 2
 "]
-StringLegalActions(2) = ["p2 val 1  ---  action = 0
-p2 val 2  ---  action = 0
-p2 val 3  ---  action = 0
-", "p2 val 1  ---  action = 0
-p2 val 2  ---  action = 1
-p2 val 3  ---  action = 0
-", "p2 val 1  ---  action = 0
-p2 val 2  ---  action = 0
-p2 val 3  ---  action = 1
-", "p2 val 1  ---  action = 0
-p2 val 2  ---  action = 1
-p2 val 3  ---  action = 1
-", "p2 val 1  ---  action = 0
-p2 val 2  ---  action = 0
-p2 val 3  ---  action = 2
-", "p2 val 1  ---  action = 0
-p2 val 2  ---  action = 1
-p2 val 3  ---  action = 2
+StringLegalActions(2) = ["T5p2 val 1  ---  action = 0
+T5p2 val 2  ---  action = 0
+T5p2 val 3  ---  action = 0
+", "T5p2 val 1  ---  action = 0
+T5p2 val 2  ---  action = 1
+T5p2 val 3  ---  action = 0
+", "T5p2 val 1  ---  action = 0
+T5p2 val 2  ---  action = 0
+T5p2 val 3  ---  action = 1
+", "T5p2 val 1  ---  action = 0
+T5p2 val 2  ---  action = 1
+T5p2 val 3  ---  action = 1
+", "T5p2 val 1  ---  action = 0
+T5p2 val 2  ---  action = 0
+T5p2 val 3  ---  action = 2
+", "T5p2 val 1  ---  action = 0
+T5p2 val 2  ---  action = 1
+T5p2 val 3  ---  action = 2
 "]
 
-# Apply joint action ["p0 val 1  ---  action = 0
-p0 val 2  ---  action = 0
-p0 val 3  ---  action = 0
-", "p1 val 1  ---  action = 0
-p1 val 2  ---  action = 0
-p1 val 3  ---  action = 0
-", "p2 val 1  ---  action = 0
-p2 val 2  ---  action = 0
-p2 val 3  ---  action = 1
+# Apply joint action ["T3p0 val 1  ---  action = 0
+T3p0 val 2  ---  action = 0
+T3p0 val 3  ---  action = 0
+", "T4p1 val 1  ---  action = 0
+T4p1 val 2  ---  action = 0
+T4p1 val 3  ---  action = 0
+", "T5p2 val 1  ---  action = 0
+T5p2 val 2  ---  action = 0
+T5p2 val 3  ---  action = 1
 "]
 actions: [0, 0, 2]
 

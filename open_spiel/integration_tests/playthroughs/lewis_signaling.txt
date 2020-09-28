@@ -64,12 +64,12 @@ HistoryString() = "2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "Current turn: 0\nState: 2\n"
-InformationStateString(1) = "Current turn: 0\nState: 2\n"
+InformationStateString(0) = "T1 Current turn: 0\nState: 2\n"
+InformationStateString(1) = "T1 Current turn: 0\nState: 2\n"
 InformationStateTensor(0): ◉◯◯◯◯◉
 InformationStateTensor(1): ◉◯◯◯◯◉
-ObservationString(0) = "Current turn: 0\nState: 2\n"
-ObservationString(1) = "Current turn: 0\nState: 2\n"
+ObservationString(0) = "T1 Current turn: 0\nState: 2\n"
+ObservationString(1) = "T1 Current turn: 0\nState: 2\n"
 ObservationTensor(0): ◉◯◯◯◯◉
 ObservationTensor(1): ◉◯◯◯◯◉
 Rewards() = [0.0, 0.0]
@@ -88,12 +88,12 @@ HistoryString() = "2 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "Current turn: 1\nMessage: 2\n"
-InformationStateString(1) = "Current turn: 1\nMessage: 2\n"
+InformationStateString(0) = "T2 Current turn: 1\nMessage: 2\n"
+InformationStateString(1) = "T2 Current turn: 1\nMessage: 2\n"
 InformationStateTensor(0): ◯◉◯◯◯◉
 InformationStateTensor(1): ◯◉◯◯◯◉
-ObservationString(0) = "Current turn: 1\nMessage: 2\n"
-ObservationString(1) = "Current turn: 1\nMessage: 2\n"
+ObservationString(0) = "T2 Current turn: 1\nMessage: 2\n"
+ObservationString(1) = "T2 Current turn: 1\nMessage: 2\n"
 ObservationTensor(0): ◯◉◯◯◯◉
 ObservationTensor(1): ◯◉◯◯◯◉
 Rewards() = [0.0, 0.0]
@@ -112,12 +112,12 @@ HistoryString() = "2 2 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
-InformationStateString(0) = "Current turn: 1\nMessage: 2\n"
-InformationStateString(1) = "Current turn: 1\nMessage: 2\n"
+InformationStateString(0) = "T3 Current turn: 1\nMessage: 2\n"
+InformationStateString(1) = "T3 Current turn: 1\nMessage: 2\n"
 InformationStateTensor(0): ◯◉◉◯◯◉
 InformationStateTensor(1): ◯◉◉◯◯◉
-ObservationString(0) = "Current turn: 1\nMessage: 2\n"
-ObservationString(1) = "Current turn: 1\nMessage: 2\n"
+ObservationString(0) = "T3 Current turn: 1\nMessage: 2\n"
+ObservationString(1) = "T3 Current turn: 1\nMessage: 2\n"
 ObservationTensor(0): ◯◉◉◯◯◉
 ObservationTensor(1): ◯◉◉◯◯◉
 Rewards() = [1.0, 1.0]

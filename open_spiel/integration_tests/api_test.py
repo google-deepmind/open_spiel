@@ -464,10 +464,10 @@ class EnforceAPIOnPartialTreeBase(parameterized.TestCase):
 
     # TODO(author13): Following games need to be fixed -- they currently
     # do not pass the observation consistency test.
+    # They fail the constraint that 'information_state_string' partitions
+    # the game tree in the same way as 'action_observation_history'.
     broken_games = [
-        "first_sealed_auction", "hearts", "kuhn_poker", "leduc_poker",
-        "lewis_signaling", "liars_dice", "pentago", "phantom_ttt",
-        "tiny_bridge_2p", "tiny_bridge_4p", "tiny_hanabi", "universal_poker"
+        "lewis_signaling", "pentago", "phantom_ttt", "universal_poker"
     ]
     if self.game_name in broken_games:
       return

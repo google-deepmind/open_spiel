@@ -41,8 +41,8 @@ HistoryString() = ""
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
-InformationStateString(0) = "-1"
-InformationStateString(1) = "-1"
+InformationStateString(0) = "T0-1"
+InformationStateString(1) = "T0-1"
 InformationStateTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -62,8 +62,8 @@ HistoryString() = "1"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
-InformationStateString(0) = "2"
-InformationStateString(1) = "-1"
+InformationStateString(0) = "T12"
+InformationStateString(1) = "T1-1"
 InformationStateTensor(0): ◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(0): ◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -83,8 +83,8 @@ HistoryString() = "1 4"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "2"
-InformationStateString(1) = "5"
+InformationStateString(0) = "T22"
+InformationStateString(1) = "T25"
 InformationStateTensor(0): ◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(1): ◯◉◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(0): ◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -105,8 +105,8 @@ HistoryString() = "1 4 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "2 1-2"
-InformationStateString(1) = "5 1-2"
+InformationStateString(0) = "T32 1-2"
+InformationStateString(1) = "T35 1-2"
 InformationStateTensor(0): ◉◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(1): ◯◉◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(0): ◉◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
@@ -127,8 +127,8 @@ HistoryString() = "1 4 1 4"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "2 1-2 1-5"
-InformationStateString(1) = "5 1-2 1-5"
+InformationStateString(0) = "T42 1-2 1-5"
+InformationStateString(1) = "T45 1-2 1-5"
 InformationStateTensor(0): ◉◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯
 InformationStateTensor(1): ◯◉◯◯◯◯◉◯◯◉◯◯◉◯◯◯◯◯◯◯◯
 ObservationTensor(0): ◉◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯
@@ -149,8 +149,8 @@ HistoryString() = "1 4 1 4 8"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "2 1-2 1-5 2-3"
-InformationStateString(1) = "5 1-2 1-5 2-3"
+InformationStateString(0) = "T52 1-2 1-5 2-3"
+InformationStateString(1) = "T55 1-2 1-5 2-3"
 InformationStateTensor(0): ◉◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◉◯◯◯◯
 InformationStateTensor(1): ◯◉◯◯◯◯◉◯◯◉◯◯◉◯◯◯◉◯◯◯◯
 ObservationTensor(0): ◉◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯
@@ -171,8 +171,8 @@ HistoryString() = "1 4 1 4 8 12"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
-InformationStateString(0) = "2 1-2 1-5 2-3 Liar"
-InformationStateString(1) = "5 1-2 1-5 2-3 Liar"
+InformationStateString(0) = "T62 1-2 1-5 2-3 Liar"
+InformationStateString(1) = "T65 1-2 1-5 2-3 Liar"
 InformationStateTensor(0): ◉◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◉◯◯◯◉
 InformationStateTensor(1): ◯◉◯◯◯◯◉◯◯◉◯◯◉◯◯◯◉◯◯◯◉
 ObservationTensor(0): ◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◉

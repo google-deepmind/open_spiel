@@ -41,10 +41,10 @@ HistoryString() = ""
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
-InformationStateString(0) = "??"
-InformationStateString(1) = "??"
-InformationStateString(2) = "??"
-InformationStateString(3) = "??"
+InformationStateString(0) = "T0 ??"
+InformationStateString(1) = "T0 ??"
+InformationStateString(2) = "T0 ??"
+InformationStateString(3) = "T0 ??"
 InformationStateTensor(0): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(1): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(2): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -72,10 +72,10 @@ HistoryString() = "21"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
-InformationStateString(0) = "SAHJ"
-InformationStateString(1) = "??"
-InformationStateString(2) = "??"
-InformationStateString(3) = "??"
+InformationStateString(0) = "T1 SAHJ"
+InformationStateString(1) = "T1 ??"
+InformationStateString(2) = "T1 ??"
+InformationStateString(3) = "T1 ??"
 InformationStateTensor(0): ◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(1): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(2): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -103,10 +103,10 @@ HistoryString() = "21 4"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
-InformationStateString(0) = "SAHJ"
-InformationStateString(1) = "HAHQ"
-InformationStateString(2) = "??"
-InformationStateString(3) = "??"
+InformationStateString(0) = "T2 SAHJ"
+InformationStateString(1) = "T2 HAHQ"
+InformationStateString(2) = "T2 ??"
+InformationStateString(3) = "T2 ??"
 InformationStateTensor(0): ◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(1): ◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(2): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -134,10 +134,10 @@ HistoryString() = "21 4 17"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
-InformationStateString(0) = "SAHJ"
-InformationStateString(1) = "HAHQ"
-InformationStateString(2) = "SKHK"
-InformationStateString(3) = "??"
+InformationStateString(0) = "T3 SAHJ"
+InformationStateString(1) = "T3 HAHQ"
+InformationStateString(2) = "T3 SKHK"
+InformationStateString(3) = "T3 ??"
 InformationStateTensor(0): ◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(1): ◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(2): ◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -165,10 +165,10 @@ HistoryString() = "21 4 17 14"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "SAHJ"
-InformationStateString(1) = "HAHQ"
-InformationStateString(2) = "SKHK"
-InformationStateString(3) = "SQSJ"
+InformationStateString(0) = "T4 SAHJ"
+InformationStateString(1) = "T4 HAHQ"
+InformationStateString(2) = "T4 SKHK"
+InformationStateString(3) = "T4 SQSJ"
 InformationStateTensor(0): ◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(1): ◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(2): ◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -197,10 +197,10 @@ HistoryString() = "21 4 17 14 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "SAHJ Us Pass"
-InformationStateString(1) = "HAHQ RH Pass"
-InformationStateString(2) = "SKHK Pd Pass"
-InformationStateString(3) = "SQSJ LH Pass"
+InformationStateString(0) = "T5 SAHJ Us Pass"
+InformationStateString(1) = "T5 HAHQ RH Pass"
+InformationStateString(2) = "T5 SKHK Pd Pass"
+InformationStateString(3) = "T5 SQSJ LH Pass"
 InformationStateTensor(0): ◉◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(1): ◯◉◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(2): ◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -229,10 +229,10 @@ HistoryString() = "21 4 17 14 0 4"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 2
-InformationStateString(0) = "SAHJ Us Pass-2H"
-InformationStateString(1) = "HAHQ RH Pass-2H"
-InformationStateString(2) = "SKHK Pd Pass-2H"
-InformationStateString(3) = "SQSJ LH Pass-2H"
+InformationStateString(0) = "T6 SAHJ Us Pass-2H"
+InformationStateString(1) = "T6 HAHQ RH Pass-2H"
+InformationStateString(2) = "T6 SKHK Pd Pass-2H"
+InformationStateString(3) = "T6 SQSJ LH Pass-2H"
 InformationStateTensor(0): ◉◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(1): ◯◉◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(2): ◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -261,10 +261,10 @@ HistoryString() = "21 4 17 14 0 4 5"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 3
-InformationStateString(0) = "SAHJ Us Pass-2H-2S"
-InformationStateString(1) = "HAHQ RH Pass-2H-2S"
-InformationStateString(2) = "SKHK Pd Pass-2H-2S"
-InformationStateString(3) = "SQSJ LH Pass-2H-2S"
+InformationStateString(0) = "T7 SAHJ Us Pass-2H-2S"
+InformationStateString(1) = "T7 HAHQ RH Pass-2H-2S"
+InformationStateString(2) = "T7 SKHK Pd Pass-2H-2S"
+InformationStateString(3) = "T7 SQSJ LH Pass-2H-2S"
 InformationStateTensor(0): ◉◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(1): ◯◉◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(2): ◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -293,10 +293,10 @@ HistoryString() = "21 4 17 14 0 4 5 6"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "SAHJ Us Pass-2H-2S-2NT"
-InformationStateString(1) = "HAHQ RH Pass-2H-2S-2NT"
-InformationStateString(2) = "SKHK Pd Pass-2H-2S-2NT"
-InformationStateString(3) = "SQSJ LH Pass-2H-2S-2NT"
+InformationStateString(0) = "T8 SAHJ Us Pass-2H-2S-2NT"
+InformationStateString(1) = "T8 HAHQ RH Pass-2H-2S-2NT"
+InformationStateString(2) = "T8 SKHK Pd Pass-2H-2S-2NT"
+InformationStateString(3) = "T8 SQSJ LH Pass-2H-2S-2NT"
 InformationStateTensor(0): ◉◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◉
 InformationStateTensor(1): ◯◉◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◉◯
 InformationStateTensor(2): ◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯
@@ -325,10 +325,10 @@ HistoryString() = "21 4 17 14 0 4 5 6 7"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "SAHJ Us Pass-2H-2S-2NT-Dbl"
-InformationStateString(1) = "HAHQ RH Pass-2H-2S-2NT-Dbl"
-InformationStateString(2) = "SKHK Pd Pass-2H-2S-2NT-Dbl"
-InformationStateString(3) = "SQSJ LH Pass-2H-2S-2NT-Dbl"
+InformationStateString(0) = "T9 SAHJ Us Pass-2H-2S-2NT-Dbl"
+InformationStateString(1) = "T9 HAHQ RH Pass-2H-2S-2NT-Dbl"
+InformationStateString(2) = "T9 SKHK Pd Pass-2H-2S-2NT-Dbl"
+InformationStateString(3) = "T9 SQSJ LH Pass-2H-2S-2NT-Dbl"
 InformationStateTensor(0): ◉◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◉◯◉◯◯◯◯◯◯◯◯◯◯◉
 InformationStateTensor(1): ◯◉◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◉◯
 InformationStateTensor(2): ◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯
@@ -357,10 +357,10 @@ HistoryString() = "21 4 17 14 0 4 5 6 7 8"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 2
-InformationStateString(0) = "SAHJ Us Pass-2H-2S-2NT-Dbl-RDbl"
-InformationStateString(1) = "HAHQ RH Pass-2H-2S-2NT-Dbl-RDbl"
-InformationStateString(2) = "SKHK Pd Pass-2H-2S-2NT-Dbl-RDbl"
-InformationStateString(3) = "SQSJ LH Pass-2H-2S-2NT-Dbl-RDbl"
+InformationStateString(0) = "T10 SAHJ Us Pass-2H-2S-2NT-Dbl-RDbl"
+InformationStateString(1) = "T10 HAHQ RH Pass-2H-2S-2NT-Dbl-RDbl"
+InformationStateString(2) = "T10 SKHK Pd Pass-2H-2S-2NT-Dbl-RDbl"
+InformationStateString(3) = "T10 SQSJ LH Pass-2H-2S-2NT-Dbl-RDbl"
 InformationStateTensor(0): ◉◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◉◯◉◯◯◯◯◉◯◯◯◯◯◉
 InformationStateTensor(1): ◯◉◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◉◯
 InformationStateTensor(2): ◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◉◯◯
@@ -389,10 +389,10 @@ HistoryString() = "21 4 17 14 0 4 5 6 7 8 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 3
-InformationStateString(0) = "SAHJ Us Pass-2H-2S-2NT-Dbl-RDbl-Pass"
-InformationStateString(1) = "HAHQ RH Pass-2H-2S-2NT-Dbl-RDbl-Pass"
-InformationStateString(2) = "SKHK Pd Pass-2H-2S-2NT-Dbl-RDbl-Pass"
-InformationStateString(3) = "SQSJ LH Pass-2H-2S-2NT-Dbl-RDbl-Pass"
+InformationStateString(0) = "T11 SAHJ Us Pass-2H-2S-2NT-Dbl-RDbl-Pass"
+InformationStateString(1) = "T11 HAHQ RH Pass-2H-2S-2NT-Dbl-RDbl-Pass"
+InformationStateString(2) = "T11 SKHK Pd Pass-2H-2S-2NT-Dbl-RDbl-Pass"
+InformationStateString(3) = "T11 SQSJ LH Pass-2H-2S-2NT-Dbl-RDbl-Pass"
 InformationStateTensor(0): ◉◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◉◯◉◯◯◯◯◉◯◯◯◯◯◉
 InformationStateTensor(1): ◯◉◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◉◯
 InformationStateTensor(2): ◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◉◯◯
@@ -421,10 +421,10 @@ HistoryString() = "21 4 17 14 0 4 5 6 7 8 0 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "SAHJ Us Pass-2H-2S-2NT-Dbl-RDbl-Pass-Pass"
-InformationStateString(1) = "HAHQ RH Pass-2H-2S-2NT-Dbl-RDbl-Pass-Pass"
-InformationStateString(2) = "SKHK Pd Pass-2H-2S-2NT-Dbl-RDbl-Pass-Pass"
-InformationStateString(3) = "SQSJ LH Pass-2H-2S-2NT-Dbl-RDbl-Pass-Pass"
+InformationStateString(0) = "T12 SAHJ Us Pass-2H-2S-2NT-Dbl-RDbl-Pass-Pass"
+InformationStateString(1) = "T12 HAHQ RH Pass-2H-2S-2NT-Dbl-RDbl-Pass-Pass"
+InformationStateString(2) = "T12 SKHK Pd Pass-2H-2S-2NT-Dbl-RDbl-Pass-Pass"
+InformationStateString(3) = "T12 SQSJ LH Pass-2H-2S-2NT-Dbl-RDbl-Pass-Pass"
 InformationStateTensor(0): ◉◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◉◯◉◯◯◯◯◉◯◯◯◯◯◉
 InformationStateTensor(1): ◯◉◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◉◯
 InformationStateTensor(2): ◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◉◯◯
@@ -453,10 +453,10 @@ HistoryString() = "21 4 17 14 0 4 5 6 7 8 0 0 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
-InformationStateString(0) = "SAHJ Us Pass-2H-2S-2NT-Dbl-RDbl-Pass-Pass-Pass"
-InformationStateString(1) = "HAHQ RH Pass-2H-2S-2NT-Dbl-RDbl-Pass-Pass-Pass"
-InformationStateString(2) = "SKHK Pd Pass-2H-2S-2NT-Dbl-RDbl-Pass-Pass-Pass"
-InformationStateString(3) = "SQSJ LH Pass-2H-2S-2NT-Dbl-RDbl-Pass-Pass-Pass"
+InformationStateString(0) = "T13 SAHJ Us Pass-2H-2S-2NT-Dbl-RDbl-Pass-Pass-Pass"
+InformationStateString(1) = "T13 HAHQ RH Pass-2H-2S-2NT-Dbl-RDbl-Pass-Pass-Pass"
+InformationStateString(2) = "T13 SKHK Pd Pass-2H-2S-2NT-Dbl-RDbl-Pass-Pass-Pass"
+InformationStateString(3) = "T13 SQSJ LH Pass-2H-2S-2NT-Dbl-RDbl-Pass-Pass-Pass"
 InformationStateTensor(0): ◉◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◉◯◉◯◯◯◯◉◯◯◯◯◯◉
 InformationStateTensor(1): ◯◉◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◉◯
 InformationStateTensor(2): ◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◉◯◯

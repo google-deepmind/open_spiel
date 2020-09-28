@@ -551,13 +551,14 @@ std::string TinyBridgeAuctionState::InformationStateString(
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
+  std::string move_number = absl::StrCat("T", MoveNumber());
   std::string hand = PlayerHandString(player, is_abstracted_);
   std::string dealer = RelativeSeatString(Seat::kWest, PlayerToSeat(player));
   std::string auction = AuctionString();
   if (!auction.empty())
-    return absl::StrCat(hand, " ", dealer, " ", auction);
+    return absl::StrCat(move_number, " ", hand, " ", dealer, " ", auction);
   else
-    return hand;
+    return absl::StrCat(move_number, " ", hand);
 }
 
 // Observation string is the player's cards plus the most recent bid,

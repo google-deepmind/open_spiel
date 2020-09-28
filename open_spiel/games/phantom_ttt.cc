@@ -147,9 +147,11 @@ std::string PhantomTTTState::ActionSequenceToString(Player player) const {
 std::string PhantomTTTState::InformationStateString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
-  return ViewToString(player) + "\n"
-      + std::to_string(history_.size()) + "\n"
-      + ActionSequenceToString(player);
+  return absl::StrCat(
+      "T", MoveNumber(), " ",
+      ViewToString(player), "\n",
+      history_.size(), "\n",
+      ActionSequenceToString(player));
 }
 
 void PhantomTTTState::InformationStateTensor(Player player,

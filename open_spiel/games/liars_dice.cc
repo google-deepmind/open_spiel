@@ -222,7 +222,8 @@ std::string LiarsDiceState::InformationStateString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  std::string result = absl::StrJoin(dice_outcomes_[player], "");
+  std::string result = absl::StrCat("T", MoveNumber());
+  absl::StrAppend(&result, absl::StrJoin(dice_outcomes_[player], ""));
   for (int b = 0; b < bidseq_.size(); b++) {
     if (bidseq_[b] == total_num_dice_ * kDiceSides) {
       absl::StrAppend(&result, " Liar");

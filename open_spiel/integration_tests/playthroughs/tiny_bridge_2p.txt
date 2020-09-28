@@ -41,8 +41,8 @@ HistoryString() = ""
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
-InformationStateString(0) = "??"
-InformationStateString(1) = "??"
+InformationStateString(0) = "T0 ??"
+InformationStateString(1) = "T0 ??"
 InformationStateTensor(0): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(1): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationString(0) = "??"
@@ -64,8 +64,8 @@ HistoryString() = "5"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
-InformationStateString(0) = "HAHK"
-InformationStateString(1) = "??"
+InformationStateString(0) = "T1 HAHK"
+InformationStateString(1) = "T1 ??"
 InformationStateTensor(0): ◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(1): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationString(0) = "HAHK"
@@ -87,8 +87,8 @@ HistoryString() = "5 25"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "HAHK"
-InformationStateString(1) = "SASJ"
+InformationStateString(0) = "T2 HAHK"
+InformationStateString(1) = "T2 SASJ"
 InformationStateTensor(0): ◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(1): ◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationString(0) = "HAHK"
@@ -111,8 +111,8 @@ HistoryString() = "5 25 5"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "HAHK Us 2S"
-InformationStateString(1) = "SASJ Pd 2S"
+InformationStateString(0) = "T3 HAHK Us 2S"
+InformationStateString(1) = "T3 SASJ Pd 2S"
 InformationStateTensor(0): ◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯
 InformationStateTensor(1): ◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯
 ObservationString(0) = "HAHK 2S:Us"
@@ -135,8 +135,8 @@ HistoryString() = "5 25 5 6"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "HAHK Us 2S-2NT"
-InformationStateString(1) = "SASJ Pd 2S-2NT"
+InformationStateString(0) = "T4 HAHK Us 2S-2NT"
+InformationStateString(1) = "T4 SASJ Pd 2S-2NT"
 InformationStateTensor(0): ◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◉
 InformationStateTensor(1): ◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◉◯
 ObservationString(0) = "HAHK 2NT:Pd"
@@ -159,8 +159,8 @@ HistoryString() = "5 25 5 6 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
-InformationStateString(0) = "HAHK Us 2S-2NT-Pass"
-InformationStateString(1) = "SASJ Pd 2S-2NT-Pass"
+InformationStateString(0) = "T5 HAHK Us 2S-2NT-Pass"
+InformationStateString(1) = "T5 SASJ Pd 2S-2NT-Pass"
 InformationStateTensor(0): ◯◯◉◉◯◯◯◯◉◯◯◯◯◯◯◯◯◯◉◯◯◉
 InformationStateTensor(1): ◯◯◯◯◉◯◯◉◯◉◯◯◯◯◯◯◯◯◯◉◉◯
 ObservationString(0) = "HAHK 2NT:Pd"

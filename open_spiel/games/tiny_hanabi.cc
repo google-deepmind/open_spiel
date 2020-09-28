@@ -155,7 +155,7 @@ std::string TinyHanabiState::InformationStateString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  std::string rv = absl::StrCat("p", player);
+  std::string rv = absl::StrCat("T", MoveNumber(), "p", player);
   if (history_.size() > player)
     absl::StrAppend(&rv, ":d", history_[player].action);
   for (int i = payoff_.NumPlayers(); i < history_.size(); ++i) {

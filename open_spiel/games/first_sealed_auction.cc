@@ -138,10 +138,11 @@ void FPSBAState::DoApplyAction(Action action_id) {
 std::string FPSBAState::InformationStateString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
-  if (valuations_.size() <= player) return absl::StrCat("p", player);
+  if (valuations_.size() <= player)
+    return absl::StrCat("T", MoveNumber(), "p", player);
   if (bids_.size() <= player)
-    return absl::StrCat("p", player, " val ", valuations_[player]);
-  return absl::StrCat("p", player, " val ", valuations_[player], " bid ",
+    return absl::StrCat("T", MoveNumber(), "p", player, " val ", valuations_[player]);
+  return absl::StrCat("T", MoveNumber(), "p", player, " val ", valuations_[player], " bid ",
                       bids_[player]);
 }
 
