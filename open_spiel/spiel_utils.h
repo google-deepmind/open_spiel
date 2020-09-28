@@ -168,6 +168,11 @@ absl::optional<std::string> FindFile(const std::string& filename, int levels);
 // Normalizes the span.
 void Normalize(absl::Span<double> weights);
 
+// Format in decimal format, with at most 15 places for the fractional part,
+// adding ".0" for integer values, and removing any additional trailing zeroes
+// after the first decimal place.
+std::string FormatDouble(double value);
+
 // Returns whether the absolute difference between floating point values a and
 // b is less than or equal to FloatingPointThresholdRatio() * max(|a|, |b|).
 template <typename T>

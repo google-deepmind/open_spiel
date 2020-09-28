@@ -248,6 +248,59 @@ void GameParametersTest() {
   SPIEL_CHECK_TRUE(GameParameter(std::string("1")).has_string_value());
   SPIEL_CHECK_TRUE(GameParameter("1").has_string_value());  // See issue #380.
 
+  // Writing to string
+  SPIEL_CHECK_EQ(GameParameter("1").ToString(), "1");
+  SPIEL_CHECK_EQ(GameParameter(1).ToString(), "1");
+  // -- Currently we serialize doubles with 10 digits after the point.
+  SPIEL_CHECK_EQ(GameParameter(1.0).ToString(), "1.0");
+  SPIEL_CHECK_EQ(GameParameter(1.).ToString(), "1.0");
+  SPIEL_CHECK_EQ(GameParameter(1.5).ToString(), "1.5");
+  SPIEL_CHECK_EQ(GameParameter(001.0485760000).ToString(), "1.048576");
+  SPIEL_CHECK_EQ(GameParameter(1e-9).ToString(), "0.000000001");
+
+  // Parsing from string
+  //
+  // XXX: Game parameter parsing from string is a bit quirky at the
+  //     moment. For example, the strings "+" or "-" make the parser
+  //     throw since the parses eagerly tries to parse those as integers and
+  //     passes them to std::stoi.
+  //
+  //     Similarly, "." would be parsed using std::stod with a similar outcome.
+  //
+  //     Doubles must contain a point . inside, or they would be parsed as
+  //     integer, and exponential notation is not allowed for now.
+  //
+  //     Leading or trailing whitespace is not stripped before parsing, so " 1"
+  //     would be parsed as a string instead of an integer.
+  //
+  //     See also: #382.
+  //
+  //
+  // The next few tests are not always intended to check the long term desired
+  // behavior, but rather that no accidental regression is introduced in the
+  // current behavior.
+
+  // -- Quirks
+  // TODO: find a way to test the failures. These four fail (on purpose).
+  // GameParameterFromString("+");
+  // GameParameterFromString("---");
+  // GameParameterFromString(".");
+  // GameParameterFromString("...");
+  SPIEL_CHECK_TRUE(GameParameterFromString("1.2e-1").has_string_value());
+
+  // -- Whitespace related
+  SPIEL_CHECK_TRUE(GameParameterFromString(" 1").has_string_value());
+  SPIEL_CHECK_TRUE(GameParameterFromString("1 ").has_string_value());
+
+  // -- Intended behavior
+  SPIEL_CHECK_TRUE(GameParameterFromString("true").has_bool_value());
+  SPIEL_CHECK_TRUE(GameParameterFromString("True").has_bool_value());
+  SPIEL_CHECK_TRUE(GameParameterFromString("false").has_bool_value());
+  SPIEL_CHECK_TRUE(GameParameterFromString("False").has_bool_value());
+  SPIEL_CHECK_TRUE(GameParameterFromString("1").has_int_value());
+  SPIEL_CHECK_TRUE(GameParameterFromString("1.0").has_double_value());
+  SPIEL_CHECK_TRUE(GameParameterFromString("1. 0").has_string_value());
+
   // Bare name
   auto params = GameParametersFromString("game_one");
   SPIEL_CHECK_EQ(params.size(), 1);

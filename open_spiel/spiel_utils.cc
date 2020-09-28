@@ -19,7 +19,10 @@
 #include <iostream>
 #include <string>
 #include <vector>
+
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_format.h"
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
 
 
@@ -91,6 +94,24 @@ absl::optional<std::string> FindFile(const std::string& filename, int levels) {
     }
   }
   return std::nullopt;
+}
+
+std::string FormatDouble(double value) {
+  // We cannot use StrCat as that would default to exponential notation
+  // sometimes. For example, the default format of 10^-9 is the string
+  // "1e-9". For that reason, we use StrFormat with %f explicitly, and add
+  // the .0 if necessary (to clarify that it's a double value).
+  std::string double_str = absl::StrFormat("%.15f", value);
+  size_t idx = double_str.find('.');
+  if (double_str.find('.') == string::npos) {
+    absl::StrAppend(&double_str, ".0");
+  } else {
+    // Remove the extra trailing zeros, if there are any.
+    while (double_str.length() > idx + 2 && double_str.back() == '0') {
+      double_str.pop_back();
+    }
+  }
+  return double_str;
 }
 
 void SpielDefaultErrorHandler(const std::string& error_msg) {
