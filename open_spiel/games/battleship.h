@@ -271,6 +271,7 @@ class BattleshipState final : public State {
   // NOTE: assumes (and checks in debug mode) that *all* ships (of both players)
   // have already been placed.
   bool DidShipSink(const Ship& ship, const Player player) const;
+
   // Checks whether all of the given player's ships have been sunk by the
   // opponent.
   //
