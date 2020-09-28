@@ -215,23 +215,26 @@ bool BattleshipState::IsTerminal() const {
 }
 
 std::vector<double> BattleshipState::Returns() const {
-  SPIEL_CHECK_TRUE(IsTerminal());
-  const BattleshipConfiguration& conf = bs_game_->configuration;
+  if (!IsTerminal()) {
+    return {0.0, 0.0};
+  } else {
+    const BattleshipConfiguration& conf = bs_game_->configuration;
 
-  // The description of the game in the header file contains more details
-  // about how the payoffs for the players are computed at the end of the
-  // game, as well as the meaning of the `loss_multiplier`.
-  const double loss_multiplier = conf.loss_multiplier;
+    // The description of the game in the header file contains more details
+    // about how the payoffs for the players are computed at the end of the
+    // game, as well as the meaning of the `loss_multiplier`.
+    const double loss_multiplier = conf.loss_multiplier;
 
-  double damage_pl1 = 0.0;
-  double damage_pl2 = 0.0;
-  for (const Ship& ship : conf.ships) {
-    if (DidShipSink(ship, Player{0})) damage_pl1 += ship.value;
-    if (DidShipSink(ship, Player{1})) damage_pl2 += ship.value;
+    double damage_pl1 = 0.0;
+    double damage_pl2 = 0.0;
+    for (const Ship& ship : conf.ships) {
+      if (DidShipSink(ship, Player{0})) damage_pl1 += ship.value;
+      if (DidShipSink(ship, Player{1})) damage_pl2 += ship.value;
+    }
+
+    return {damage_pl2 - loss_multiplier * damage_pl1,
+            damage_pl1 - loss_multiplier * damage_pl2};
   }
-
-  return {damage_pl2 - loss_multiplier * damage_pl1,
-          damage_pl1 - loss_multiplier * damage_pl2};
 }
 
 std::unique_ptr<State> BattleshipState::Clone() const {
