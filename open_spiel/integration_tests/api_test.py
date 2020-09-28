@@ -490,7 +490,7 @@ class EnforceAPIOnPartialTreeBase(parameterized.TestCase):
     # TODO(author13): Following games need to be fixed -- they currently
     # do not pass the observation consistency test.
     broken_games = [
-        "battleship", "first_sealed_auction", "hearts", "kuhn_poker", "leduc_poker",
+        "first_sealed_auction", "hearts", "kuhn_poker", "leduc_poker",
         "lewis_signaling", "liars_dice", "pentago", "phantom_ttt",
         "tiny_bridge_2p", "tiny_bridge_4p", "tiny_hanabi", "universal_poker"
     ]
