@@ -152,6 +152,9 @@ constexpr absl::string_view kHUNLGameString =
      "1,raiseSize=100 100 100 100)");
 
 void HUNLIncrementalTest() {
+  // universal_poker requires ACPC, which is an optional dependency.
+  // Skip this test if the game is not registered.
+  if (!IsGameRegistered(std::string(kHUNLGameString))) { return; }
   std::shared_ptr<const Game> game = LoadGame(std::string(kHUNLGameString));
   std::unique_ptr<State> state = game->NewInitialState();
   state->ApplyAction(14);  // p0 card: 5h
@@ -172,6 +175,9 @@ void HUNLIncrementalTest() {
 }
 
 void HunlRegressionTest() {
+  // universal_poker requires ACPC, which is an optional dependency.
+  // Skip this test if the game is not registered.
+  if (!IsGameRegistered(HunlGameString("fcpa"))) { return; }
   std::shared_ptr<const Game> game = LoadGame(HunlGameString("fcpa"));
   std::unique_ptr<State> state = game->NewInitialState();
   for (const Action action : {0, 27, 43, 44, 2}) state->ApplyAction(action);
@@ -192,11 +198,7 @@ namespace algorithms = open_spiel::algorithms;
 int main(int argc, char** argv) {
   algorithms::KuhnStateDistributionTest();
   algorithms::LeducStateDistributionTest();
-
-  // ACPC is an optional dependency. Only test HUNL if it is registered.
-  if (open_spiel::IsGameRegistered(std::string(algorithms::kHUNLGameString))) {
-    algorithms::HUNLIncrementalTest();
-  }
+  algorithms::HUNLIncrementalTest();
   algorithms::HunlRegressionTest();
 
 }
