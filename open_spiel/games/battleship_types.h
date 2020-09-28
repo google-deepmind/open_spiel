@@ -41,7 +41,7 @@ struct Cell {
 using Shot = Cell;
 
 struct Ship {
-  int id;  // Unique identifier of the ship
+  int id;  // Globally unique identifier of the ship
   int length;
   double value;
 };

@@ -261,7 +261,7 @@ std::string BattleshipState::InformationStateString(Player player) const {
   // cell index r * board_width + c.
   std::vector<bool> cell_hit(conf.board_width * conf.board_height, false);
 
-  std::string information_state;
+  std::string information_state = absl::StrCat("T=", MoveNumber(), " ");
   for (const auto& move : moves_) {
     if (absl::holds_alternative<ShipPlacement>(move.action)) {
       // The player observed *their own* ship placements.
