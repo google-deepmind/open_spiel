@@ -109,7 +109,7 @@ std::vector<Action> BattleshipState::LegalActions() const {
       if (next_ship.length > 1 && next_ship.length <= conf.board_height) {
         for (int row = 0; row < conf.board_height - next_ship.length + 1;
              ++row) {
-          for (int col = 0; col < conf.board_width - next_ship.length; ++col) {
+          for (int col = 0; col < conf.board_width; ++col) {
             const ShipPlacement placement(ShipPlacement::Direction::Vertical,
                                           /* ship = */ next_ship,
                                           /* tl_corner = */ Cell{row, col});
