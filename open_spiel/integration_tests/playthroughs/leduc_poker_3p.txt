@@ -344,7 +344,7 @@ action: 1
 # Pot: 3
 # Money (p1 p2 ...): 99 99 99
 # Cards (public p1 p2 ...): -10000 4 2 3
-# Round 1 sequence: 1
+# Round 1 sequence: Call
 # Round 2 sequence:
 IsTerminal() = False
 History() = [4, 2, 3, 1]
@@ -421,7 +421,7 @@ action: 2
 # Pot: 5
 # Money (p1 p2 ...): 99 97 99
 # Cards (public p1 p2 ...): -10000 4 2 3
-# Round 1 sequence: 1 2
+# Round 1 sequence: Call, Raise
 # Round 2 sequence:
 IsTerminal() = False
 History() = [4, 2, 3, 1, 2]
@@ -498,7 +498,7 @@ action: 1
 # Pot: 7
 # Money (p1 p2 ...): 99 97 97
 # Cards (public p1 p2 ...): -10000 4 2 3
-# Round 1 sequence: 1 2 1
+# Round 1 sequence: Call, Raise, Call
 # Round 2 sequence:
 IsTerminal() = False
 History() = [4, 2, 3, 1, 2, 1]
@@ -575,7 +575,7 @@ action: 0
 # Pot: 7
 # Money (p1 p2 ...): 99 97 97
 # Cards (public p1 p2 ...): -10000 4 2 3
-# Round 1 sequence: 1 2 1 0
+# Round 1 sequence: Call, Raise, Call, Fold
 # Round 2 sequence:
 IsTerminal() = False
 History() = [4, 2, 3, 1, 2, 1, 0]
@@ -651,7 +651,7 @@ action: 1
 # Pot: 7
 # Money (p1 p2 ...): 99 97 97
 # Cards (public p1 p2 ...): 1 4 2 3
-# Round 1 sequence: 1 2 1 0
+# Round 1 sequence: Call, Raise, Call, Fold
 # Round 2 sequence:
 IsTerminal() = False
 History() = [4, 2, 3, 1, 2, 1, 0, 1]
@@ -728,8 +728,8 @@ action: 2
 # Pot: 11
 # Money (p1 p2 ...): 99 93 97
 # Cards (public p1 p2 ...): 1 4 2 3
-# Round 1 sequence: 1 2 1 0
-# Round 2 sequence: 2
+# Round 1 sequence: Call, Raise, Call, Fold
+# Round 2 sequence: Raise
 IsTerminal() = False
 History() = [4, 2, 3, 1, 2, 1, 0, 1, 2]
 HistoryString() = "4 2 3 1 2 1 0 1 2"
@@ -805,8 +805,8 @@ action: 1
 # Pot: 0
 # Money (p1 p2 ...): 99 100.5 100.5
 # Cards (public p1 p2 ...): 1 4 2 3
-# Round 1 sequence: 1 2 1 0
-# Round 2 sequence: 2 1
+# Round 1 sequence: Call, Raise, Call, Fold
+# Round 2 sequence: Raise, Call
 IsTerminal() = True
 History() = [4, 2, 3, 1, 2, 1, 0, 1, 2, 1]
 HistoryString() = "4 2 3 1 2 1 0 1 2 1"
