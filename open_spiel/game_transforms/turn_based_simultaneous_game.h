@@ -109,6 +109,9 @@ class TurnBasedSimultaneousGame : public Game {
   int MaxGameLength() const override {
     return game_->MaxGameLength() * NumPlayers();
   }
+  int MaxChanceNodesInHistory() const override {
+    return game_->MaxChanceNodesInHistory();
+  }
 
  private:
   std::shared_ptr<const Game> game_;

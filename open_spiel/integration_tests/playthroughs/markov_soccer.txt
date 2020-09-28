@@ -1,6 +1,6 @@
 game: markov_soccer(horizon=20)
 
-GameType.chance_mode = ChanceMode.DETERMINISTIC
+GameType.chance_mode = ChanceMode.EXPLICIT_STOCHASTIC
 GameType.dynamics = Dynamics.SIMULTANEOUS
 GameType.information = Information.PERFECT_INFORMATION
 GameType.long_name = "Markov Soccer"

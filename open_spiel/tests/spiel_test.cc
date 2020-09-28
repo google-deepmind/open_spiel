@@ -70,6 +70,7 @@ class FlatJointActionTestGame : public SimMoveGame {
   double MaxUtility() const override { return 10; }
   std::vector<int> InformationStateTensorShape() const override { return {}; }
   int MaxGameLength() const override { return 1; }
+  int MaxChanceNodesInHistory() const override { return 0; }
 };
 
 // Dummy state to test flat joint action logic.

@@ -32,7 +32,7 @@ constexpr int kDefaultHorizon = 1000;
 const GameType kGameType{/*short_name=*/"markov_soccer",
                          /*long_name=*/"Markov Soccer",
                          GameType::Dynamics::kSimultaneous,
-                         GameType::ChanceMode::kDeterministic,
+                         GameType::ChanceMode::kExplicitStochastic,
                          GameType::Information::kPerfectInformation,
                          GameType::Utility::kZeroSum,
                          GameType::RewardModel::kTerminal,

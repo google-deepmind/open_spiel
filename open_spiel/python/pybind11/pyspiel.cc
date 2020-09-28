@@ -240,6 +240,10 @@ PYBIND11_MODULE(pyspiel, m) {
       .value("HWC", open_spiel::TensorLayout::kHWC)
       .value("CHW", open_spiel::TensorLayout::kCHW);
 
+  py::class_<State::PlayerAction> player_action(m, "PlayerAction");
+  player_action.def_readonly("player", &State::PlayerAction::player)
+      .def_readonly("action", &State::PlayerAction::action);
+
   py::class_<State> state(m, "State");
   state.def("current_player", &State::CurrentPlayer)
       .def("apply_action", &State::ApplyAction)
@@ -275,6 +279,7 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("is_player_node", &State::IsPlayerNode)
       .def("history", &State::History)
       .def("history_str", &State::HistoryString)
+      .def("full_history", &State::FullHistory)
       .def("information_state_string",
            (std::string(State::*)(int) const) & State::InformationStateString)
       .def("information_state_string",
@@ -337,6 +342,9 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("deserialize_state", &Game::DeserializeState)
       .def("max_game_length", &Game::MaxGameLength)
       .def("action_to_string", &Game::ActionToString)
+      .def("max_chance_nodes_in_history", &Game::MaxChanceNodesInHistory)
+      .def("max_move_number", &Game::MaxMoveNumber)
+      .def("max_history_length", &Game::MaxHistoryLength)
       .def("make_observer", &Game::MakeObserver,
            py::arg("imperfect_information_observation_type") = absl::nullopt,
            py::arg("params") = GameParameters())

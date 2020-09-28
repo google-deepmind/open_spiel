@@ -125,6 +125,9 @@ class WrappedGame : public Game {
   }
 
   int MaxGameLength() const override { return game_->MaxGameLength(); }
+  int MaxChanceNodesInHistory() const override {
+    return game_->MaxChanceNodesInHistory();
+  }
 
  protected:
   std::shared_ptr<const Game> game_;

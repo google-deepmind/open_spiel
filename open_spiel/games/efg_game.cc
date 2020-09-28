@@ -213,6 +213,12 @@ double EFGGame::MaxUtility() const { return max_util_.value(); }
 
 int EFGGame::MaxGameLength() const { return max_depth_; }
 
+int EFGGame::MaxChanceNodesInHistory() const { return num_chance_nodes_; }
+
+int EFGGame::MaxMoveNumber() const { return max_depth_; }
+
+int EFGGame::MaxHistoryLength() const { return max_depth_; }
+
 EFGGame::EFGGame(const GameParameters& params)
     : Game(kGameType, params),
       filename_(ParameterValue<std::string>("filename")),

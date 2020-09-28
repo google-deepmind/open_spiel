@@ -196,6 +196,7 @@ class LeducGame : public Game {
     // 2 rounds.
     return 2 * MaxBetsPerRound();
   }
+  int MaxChanceNodesInHistory() const override { return 3; }
   int NumObservableCards() const {
     return suit_isomorphism_ ? total_cards_ / 2 : total_cards_;
   }

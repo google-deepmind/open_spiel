@@ -226,6 +226,8 @@ class HeartsGame : public Game {
   int MaxGameLength() const override {
     return (kNumCardsInPass * kNumPlayers) + kNumCards;
   }
+  // TODO: verify whether this bound is tight and/or tighten it.
+  int MaxChanceNodesInHistory() const override { return MaxGameLength(); }
 
  private:
   const bool pass_cards_;

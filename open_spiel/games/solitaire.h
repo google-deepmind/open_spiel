@@ -240,6 +240,8 @@ class SolitaireGame : public Game {
   // Overridden Methods
   int NumDistinctActions() const override;
   int MaxGameLength() const override;
+  // TODO: verify whether this bound is tight and/or tighten it.
+  int MaxChanceNodesInHistory() const override { return MaxGameLength(); }
   int MaxChanceOutcomes() const override;
   int NumPlayers() const override;
   double MinUtility() const override;

@@ -113,6 +113,7 @@ class BreakthroughGame : public Game {
   int MaxGameLength() const override {
     return (2 * (2 * rows_ - 3) * cols_) + 1;
   }
+
   std::unique_ptr<State> DeserializeState(
       const std::string& str) const override;
 

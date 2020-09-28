@@ -159,6 +159,8 @@ class GoofspielGame : public Game {
   std::shared_ptr<GoofspielObserver> info_state_observer_;
   std::shared_ptr<GoofspielObserver> public_observer_;
   std::shared_ptr<GoofspielObserver> private_observer_;
+  // TODO: verify whether this bound is tight and/or tighten it.
+  int MaxChanceNodesInHistory() const override { return MaxGameLength(); }
 
  private:
   int num_cards_;    // The K in Goofspiel(K)
