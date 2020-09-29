@@ -1,4 +1,4 @@
-// swift-tools-version:4.2
+// swift-tools-version:5.2
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 // Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
@@ -20,6 +20,7 @@ import PackageDescription
 
 let package = Package(
   name: "OpenSpiel",
+  platforms: [.macOS(.v10_13)],
   products: [
     .library(
       name: "OpenSpiel",
@@ -35,7 +36,7 @@ let package = Package(
       targets: ["TexasHoldemBenchmark"]),
   ],
   dependencies: [
-    .package(url: "https://github.com/google/swift-benchmark.git", .branch("master")),
+    .package(name: "Benchmark", url: "https://github.com/google/swift-benchmark.git", .branch("master")),
   ],
   targets: [
     .target(
