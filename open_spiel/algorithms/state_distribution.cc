@@ -32,54 +32,6 @@
 namespace open_spiel::algorithms {
 namespace {
 
-void AdvanceBeliefHistoryOneAction(HistoryDistribution* previous, Action action,
-                                   Player player_id,
-                                   const Policy* opponent_policy) {
-  for (int i = 0; i < previous->first.size(); ++i) {
-    std::unique_ptr<State>& parent = previous->first[i];
-    double& prob = previous->second[i];
-    if (Near(prob, 0.)) continue;
-    switch (parent->GetType()) {
-      case StateType::kChance: {
-        open_spiel::ActionsAndProbs outcomes = parent->ChanceOutcomes();
-        // If we can't find the action in the policy, then set it to 0.
-        const double action_prob = GetProb(outcomes, action);
-
-        // If we don't find the chance outcome, then the state we're in is
-        // impossible, so we set it to zero.
-        if (action_prob < 0) {
-          prob = 0;
-          continue;
-        }
-        SPIEL_CHECK_PROB(action_prob);
-        prob *= action_prob;
-        break;
-      }
-      case StateType::kDecision: {
-        if (parent->CurrentPlayer() == player_id) break;
-        open_spiel::ActionsAndProbs policy =
-            opponent_policy->GetStatePolicy(*parent);
-        // If we can't find the action in the policy, then set it to 0.
-        const double action_prob = GetProb(policy, action);
-        if (action_prob < 0) {
-          prob = 0;
-          continue;
-        }
-        SPIEL_CHECK_PROB(action_prob);
-        prob *= action_prob;
-        break;
-      }
-      case StateType::kTerminal:
-        ABSL_FALLTHROUGH_INTENDED;
-      default:
-        SpielFatalError("Unknown state type.");
-    }
-    if (prob == 0) continue;
-    parent->ApplyAction(action);
-  }
-  Normalize(absl::MakeSpan(previous->second));
-}
-
 int GetBeliefHistorySize(const HistoryDistribution& beliefs) {
   int belief_history_size = 0;
   for (int i = 0; i < beliefs.first.size(); ++i) {
@@ -88,6 +40,90 @@ int GetBeliefHistorySize(const HistoryDistribution& beliefs) {
                  static_cast<int>(beliefs.first[i]->FullHistory().size()));
   }
   return belief_history_size;
+}
+
+std::unique_ptr<HistoryDistribution> AdvanceBeliefHistoryOneAction(
+    std::unique_ptr<HistoryDistribution> previous, Action action,
+    Player player_id, const Policy* opponent_policy) {
+  auto dist = absl::make_unique<HistoryDistribution>();
+  for (int i = 0; i < previous->first.size(); ++i) {
+    std::unique_ptr<State>& state = previous->first[i];
+    const double& prob = previous->second[i];
+    if (Near(prob, 0.)) continue;
+    switch (state->GetType()) {
+      case StateType::kChance: {
+        // If we can't find the action in the policy, then set it to 0.
+        const double action_prob = GetProb(state->ChanceOutcomes(), action);
+
+        // Then, skip all actions with 0 probability, as they don't matter
+        // moving forward.
+        if (Near(std::max(action_prob, 0.0), 0.0)) continue;
+        SPIEL_CHECK_PROB(action_prob);
+
+        // If we don't find the chance outcome, then the state we're in is
+        // impossible, so we set it to zero.
+        state->ApplyAction(action);
+
+        dist->first.push_back(std::move(state));
+        dist->second.push_back(prob * std::max(0.0, action_prob));
+        break;
+      }
+      case StateType::kDecision: {
+        if (state->CurrentPlayer() == player_id) {
+          state->ApplyAction(action);
+          dist->first.push_back(std::move(state));
+          dist->second.push_back(prob);
+        } else {
+          // We have to add all actions as we don't know if the opponent is
+          // taking a private or public action.
+          // TODO(author1): Add method to open_spiel::State that lets us
+          // only loop over the actions that are consistent with a given private
+          // action.
+          for (const auto& [candidate, action_prob] :
+               opponent_policy->GetStatePolicy(*state)) {
+            if (Near(std::max(0.0, action_prob), 0.0)) continue;
+            SPIEL_CHECK_PROB(action_prob);
+            std::unique_ptr<State> child = state->Child(candidate);
+            if (child->IsTerminal()) continue;
+            dist->first.push_back(std::move(child));
+            dist->second.push_back(prob * action_prob);
+          }
+        }
+        break;
+      }
+      case StateType::kTerminal:
+        // If the state is terminal, and we have to advance by an action, we
+        // discard the terminal histories from our beliefs.
+        continue;
+        // SpielFatalError("State is terminal, should not call
+        // AdvanceBeliefs.");
+      default:
+        SpielFatalError(absl::StrCat("Unknown state type: ", state->GetType(),
+                                     ", state: ", state->ToString()));
+    }
+  }
+  return dist;
+}
+
+// Filters out all beliefs that do not belong to infostate.
+std::unique_ptr<HistoryDistribution> FilterOutBeliefs(
+    const State& state, std::unique_ptr<HistoryDistribution> dist,
+    int player_id) {
+  const std::string infostate = state.InformationStateString(player_id);
+  auto new_dist = absl::make_unique<HistoryDistribution>();
+  std::vector<int> good_indices;
+  for (int i = 0; i < dist->first.size(); ++i) {
+    if (dist->first[i]->InformationStateString(player_id) == infostate) {
+      good_indices.push_back(i);
+    }
+  }
+  new_dist->first.reserve(good_indices.size());
+  new_dist->second.reserve(good_indices.size());
+  for (int i : good_indices) {
+    new_dist->first.push_back(std::move(dist->first[i]));
+    new_dist->second.push_back(dist->second[i]);
+  }
+  return new_dist;
 }
 
 }  // namespace
@@ -218,7 +254,9 @@ HistoryDistribution GetStateDistribution(const State& state,
   // Now normalize the probs
   Normalize(absl::MakeSpan(final_probs));
   HistoryDistribution dist = {std::move(final_states), std::move(final_probs)};
-  CheckBeliefs(state, dist, state.CurrentPlayer());
+
+  // Note: We do not call CheckBeliefs here as the beliefs are _wrong_ until we
+  // perform the filter step.
   return dist;
 }
 
@@ -246,15 +284,32 @@ std::unique_ptr<HistoryDistribution> UpdateIncrementalStateDistribution(
     }
   }
   // Now, we verify that the beliefs match the current infostate.
-  const std::vector<Action> history = state.History();
+  const std::vector<State::PlayerAction>& history = state.FullHistory();
   int belief_history_size = GetBeliefHistorySize(*dist);
+  std::unique_ptr<State> new_state = state.GetGame()->NewInitialState();
+  for (int i = 0; i < belief_history_size; ++i) {
+    new_state->ApplyAction(history[i].action);
+  }
+  SPIEL_DCHECK_TRUE(CheckBeliefs(*new_state, *dist, player_id));
   while (belief_history_size < history.size()) {
-    AdvanceBeliefHistoryOneAction(dist.get(), history[belief_history_size],
-                                  player_id, opponent_policy);
-    belief_history_size = GetBeliefHistorySize(*dist);
+    dist = AdvanceBeliefHistoryOneAction(std::move(dist),
+                                         history[belief_history_size].action,
+                                         player_id, opponent_policy);
+    new_state->ApplyAction(history[belief_history_size].action);
+    dist = FilterOutBeliefs(*new_state, std::move(dist), player_id);
+    if (!new_state->IsChanceNode()) {
+      SPIEL_DCHECK_TRUE(CheckBeliefs(*new_state, *dist, player_id));
+    }
+    int new_belief_history_size = GetBeliefHistorySize(*dist);
+    belief_history_size = new_belief_history_size;
   }
   SPIEL_CHECK_EQ(belief_history_size, history.size());
-  CheckBeliefs(state, *dist, player_id);
+  dist = FilterOutBeliefs(state, std::move(dist), player_id);
+
+  // We only normalize after filtering out invalid infostates.
+  Normalize(absl::MakeSpan(dist->second));
+
+  SPIEL_DCHECK_TRUE(CheckBeliefs(state, *dist, player_id));
   return dist;
 }
 
@@ -271,11 +326,8 @@ std::string PrintBeliefs(const HistoryDistribution& beliefs) {
   return str;
 }
 
-void CheckBeliefs(const State& ground_truth_state,
+bool CheckBeliefs(const State& ground_truth_state,
                   const HistoryDistribution& beliefs, int player_id) {
-// We disable the checks for release builds, as otherwise they make the
-// belief code 50% slower.
-#if defined(NDEBUG)
   const std::string infostate =
       ground_truth_state.InformationStateString(player_id);
   for (int i = 0; i < beliefs.first.size(); ++i) {
@@ -289,7 +341,7 @@ void CheckBeliefs(const State& ground_truth_state,
     SPIEL_CHECK_EQ(ground_truth_state.FullHistory().size(),
                    beliefs.first[i]->FullHistory().size());
   }
-#endif  // defined(NDEBUG)
+  return true;
 }
 
 }  // namespace open_spiel::algorithms

@@ -739,4 +739,18 @@ std::ostream& operator<<(std::ostream& os, const State::PlayerAction& action) {
   return os;
 }
 
+std::vector<std::string> ActionsToStrings(const State& state,
+                                          const std::vector<Action>& actions) {
+  std::vector<std::string> out;
+  out.reserve(actions.size());
+  for (Action action : actions) out.push_back(state.ActionToString(action));
+  return out;
+}
+
+std::string ActionsToString(const State& state,
+                            const std::vector<Action>& actions) {
+  return absl::StrCat(
+      "[", absl::StrJoin(ActionsToStrings(state, actions), ", "), "]");
+}
+
 }  // namespace open_spiel

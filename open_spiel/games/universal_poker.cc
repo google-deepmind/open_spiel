@@ -386,21 +386,24 @@ std::string UniversalPokerState::InformationStateString(Player player) const {
   SPIEL_CHECK_LT(player, acpc_game_->GetNbPlayers());
   const uint32_t pot = acpc_state_.MaxSpend() *
                        (acpc_game_->GetNbPlayers() - acpc_state_.NumFolded());
-  std::vector<int> money;
+  std::string money;
+  money.reserve(acpc_game_->GetNbPlayers() * 2);
   for (auto p = Player{0}; p < acpc_game_->GetNbPlayers(); p++) {
-    money.emplace_back(acpc_state_.Money(p));
+    if (p != Player{0}) absl::StrAppend(&money, " ");
+    absl::StrAppend(&money, acpc_state_.Money(p));
   }
-  std::vector<std::string> sequences;
+  std::string sequences;
+  sequences.reserve(acpc_state_.GetRound() * 2);
   for (auto r = 0; r <= acpc_state_.GetRound(); r++) {
-    sequences.emplace_back(acpc_state_.BettingSequence(r));
+    if (r != 0) absl::StrAppend(&sequences, "|");
+    absl::StrAppend(&sequences, acpc_state_.BettingSequence(r));
   }
 
   return absl::StrFormat(
       "[Round %i][Player: %i][Pot: %i][Money: %s][Private: %s][Public: "
       "%s][Sequences: %s]",
-      acpc_state_.GetRound(), CurrentPlayer(), pot, absl::StrJoin(money, " "),
-      HoleCards(player).ToString(), BoardCards().ToString(),
-      absl::StrJoin(sequences, "|"));
+      acpc_state_.GetRound(), CurrentPlayer(), pot, money,
+      HoleCards(player).ToString(), BoardCards().ToString(), sequences);
 }
 
 std::string UniversalPokerState::ObservationString(Player player) const {

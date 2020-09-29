@@ -65,8 +65,9 @@ std::unique_ptr<HistoryDistribution> UpdateIncrementalStateDistribution(
 std::string PrintBeliefs(const HistoryDistribution& beliefs);
 
 // Runs a bunch of sanity checks on the beliefs verifying that they hold certain
-// properties that we want.
-void CheckBeliefs(const State& ground_truth_state,
+// properties that we want. Returns true if the checks pass; otherwise, dies
+// with a CHECK failure.
+bool CheckBeliefs(const State& ground_truth_state,
                   const HistoryDistribution& beliefs, int player_id);
 
 }  // namespace algorithms
