@@ -54,7 +54,7 @@ InformationStateTensor(1).betting: ◯◯
                                    ◯◯
 ObservationString(0) = "T0 "
 ObservationString(1) = "T0 "
-PublicObservationString() = "T0 start game"
+PublicObservationString() = "start game"
 PrivateObservationString(0) = "T0 "
 PrivateObservationString(1) = "T0 "
 ObservationTensor(0).player: ◉◯
@@ -92,7 +92,7 @@ InformationStateTensor(1).betting: ◯◯
                                    ◯◯
 ObservationString(0) = "T1 111"
 ObservationString(1) = "T1 "
-PublicObservationString() = "T1 Deal to player 0"
+PublicObservationString() = "Deal to player 0"
 PrivateObservationString(0) = "T1 Received card 1"
 PrivateObservationString(1) = "T1 "
 ObservationTensor(0).player: ◉◯
@@ -116,8 +116,8 @@ HistoryString() = "1 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "T2 1"
-InformationStateString(1) = "T2 2"
+InformationStateString(0) = "1"
+InformationStateString(1) = "2"
 InformationStateTensor(0).player: ◉◯
 InformationStateTensor(0).private_card: ◯◉◯
 InformationStateTensor(0).betting: ◯◯
@@ -128,11 +128,11 @@ InformationStateTensor(1).private_card: ◯◯◉
 InformationStateTensor(1).betting: ◯◯
                                    ◯◯
                                    ◯◯
-ObservationString(0) = "T2 111"
-ObservationString(1) = "T2 211"
-PublicObservationString() = "T2 Deal to player 1"
-PrivateObservationString(0) = "T2 "
-PrivateObservationString(1) = "T2 Received card 2"
+ObservationString(0) = "111"
+ObservationString(1) = "211"
+PublicObservationString() = "Deal to player 1"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = "Received card 2"
 ObservationTensor(0).player: ◉◯
 ObservationTensor(0).private_card: ◯◉◯
 ObservationTensor(0).pot_contribution: ◉◉
@@ -155,8 +155,8 @@ HistoryString() = "1 2 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "T3 1p"
-InformationStateString(1) = "T3 2p"
+InformationStateString(0) = "1p"
+InformationStateString(1) = "2p"
 InformationStateTensor(0).player: ◉◯
 InformationStateTensor(0).private_card: ◯◉◯
 InformationStateTensor(0).betting: ◉◯
@@ -167,11 +167,11 @@ InformationStateTensor(1).private_card: ◯◯◉
 InformationStateTensor(1).betting: ◉◯
                                    ◯◯
                                    ◯◯
-ObservationString(0) = "T3 111"
-ObservationString(1) = "T3 211"
-PublicObservationString() = "T3 Pass"
-PrivateObservationString(0) = "T3 "
-PrivateObservationString(1) = "T3 "
+ObservationString(0) = "111"
+ObservationString(1) = "211"
+PublicObservationString() = "Pass"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0).player: ◉◯
 ObservationTensor(0).private_card: ◯◉◯
 ObservationTensor(0).pot_contribution: ◉◉
@@ -194,8 +194,8 @@ HistoryString() = "1 2 0 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
-InformationStateString(0) = "T4 1pp"
-InformationStateString(1) = "T4 2pp"
+InformationStateString(0) = "1pp"
+InformationStateString(1) = "2pp"
 InformationStateTensor(0).player: ◉◯
 InformationStateTensor(0).private_card: ◯◉◯
 InformationStateTensor(0).betting: ◉◯
@@ -206,11 +206,11 @@ InformationStateTensor(1).private_card: ◯◯◉
 InformationStateTensor(1).betting: ◉◯
                                    ◉◯
                                    ◯◯
-ObservationString(0) = "T4 111"
-ObservationString(1) = "T4 211"
-PublicObservationString() = "T4 Pass"
-PrivateObservationString(0) = "T4 "
-PrivateObservationString(1) = "T4 "
+ObservationString(0) = "111"
+ObservationString(1) = "211"
+PublicObservationString() = "Pass"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0).player: ◉◯
 ObservationTensor(0).private_card: ◯◉◯
 ObservationTensor(0).pot_contribution: ◉◉

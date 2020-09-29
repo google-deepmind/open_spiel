@@ -110,7 +110,12 @@ class KuhnObserver : public Observer {
         open_spiel::down_cast<const KuhnState&>(observed_state);
     SPIEL_CHECK_GE(player, 0);
     SPIEL_CHECK_LT(player, state.num_players_);
-    std::string result = absl::StrCat("T", observed_state.MoveNumber(), " ");
+    std::string result;
+    if (iig_obs_type_.private_info == PrivateInfoType::kSinglePlayer
+        && state.IsChanceNode()) {
+      // Make sure players can track time when chance is dealing cards.
+      result = absl::StrCat("T", state.MoveNumber(), " ");
+    }
 
     // Private card
     if (iig_obs_type_.private_info == PrivateInfoType::kSinglePlayer) {

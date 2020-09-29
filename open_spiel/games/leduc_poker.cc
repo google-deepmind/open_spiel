@@ -144,7 +144,12 @@ class LeducObserver : public Observer {
         open_spiel::down_cast<const LeducState&>(observed_state);
     SPIEL_CHECK_GE(player, 0);
     SPIEL_CHECK_LT(player, state.num_players_);
-    std::string result = absl::StrCat("T", observed_state.MoveNumber(), " ");
+    std::string result;
+    if (iig_obs_type_.private_info == PrivateInfoType::kSinglePlayer
+        && state.IsChanceNode()) {
+      // Make sure players can track time when chance is dealing cards.
+      result = absl::StrCat("T", state.MoveNumber(), " ");
+    }
     // Public info.
     if (iig_obs_type_.public_info) {
       absl::StrAppend(&result, "[Round ", state.round_,
