@@ -216,16 +216,6 @@ class BattleshipState final : public State {
   // ```
   std::string ShotsBoardString(const Player player) const;
 
-  // OUtputs a pretty representation of the boards of the two players. This can
-  // be used as a more expensive (but readable) alternative to `ToString`.
-  //
-  // FIXME(gfarina): Decide is this should take the place of `ToString`.
-  //     @michalsustr suggested that would be a good idea. The only worry is
-  //     that it would create way longer state strings, and if implemented
-  //     algorithms keep internal maps keyed on state strings, that could lead
-  //     to performance issues.
-  std::string ToPrettyString() const;
-
  protected:
   void DoApplyAction(Action action) override;
 
