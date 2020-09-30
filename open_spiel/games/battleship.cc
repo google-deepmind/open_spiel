@@ -1,4 +1,4 @@
-// Copyright 2020 DeepMind Technologies Ltd. All rights reserved.
+// Copyright 2020 DeepMind Technologies Ltd.All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,7 +32,8 @@ BattleshipState::BattleshipState(
 Player BattleshipState::CurrentPlayer() const {
   const BattleshipConfiguration& conf = bs_game_->configuration;
 
-  // The players place the ships on the board in turns, starting from Player 1.
+  // The players place the ships on the board in turns, starting from
+  // Player 1.
   //
   // NOTE: It is important whether or not the players place all their ships at
   // once or not for correlated equilibria purposes. This is because in
@@ -47,8 +48,8 @@ Player BattleshipState::CurrentPlayer() const {
       return Player{1};
     }
   } else {
-    // In this case, all ships have been placed. The players can take turns for
-    // their next moves, starting from Player 1.
+    // In this case, all ships have been placed. The players can take turns
+    // for their next moves, starting from Player 1.
 
     // First, we check whether the game is over.
     //
@@ -84,7 +85,8 @@ std::vector<Action> BattleshipState::LegalActions() const {
     if (!AllShipsPlaced()) {
       // If we are here, we still have some ships to place on the board.
       //
-      // First, we find the first ship that hasn't been placed on the board yet.
+      // First, we find the first ship that hasn't been placed on the board
+      // yet.
       const Ship next_ship = NextShipToPlace(player);
 
       // Horizontal placement.
@@ -105,7 +107,8 @@ std::vector<Action> BattleshipState::LegalActions() const {
       // Vertical placement.
       //
       // NOTE: vertical placement is defined only for ships with length more
-      //     than one. This avoids duplicating placement actions for 1x1 ships.
+      //     than one. This avoids duplicating placement actions for 1x1
+      //     ships.
       if (next_ship.length > 1 && next_ship.length <= conf.board_height) {
         for (int row = 0; row < conf.board_height - next_ship.length + 1;
              ++row) {
@@ -120,7 +123,8 @@ std::vector<Action> BattleshipState::LegalActions() const {
         }
       }
 
-      // FIXME(gfarina): It would be better to have a check of this time at game
+      // FIXME(gfarina): It would be better to have a check of this time at
+      // game
       //     construction time.
       if (actions.empty()) {
         SpielFatalError(
@@ -130,8 +134,8 @@ std::vector<Action> BattleshipState::LegalActions() const {
     } else {
       // In this case, the only thing the player can do is to shoot on a cell
       //
-      // Depending on whether repeated shots are allowed or not, we might filter
-      // out some cells.
+      // Depending on whether repeated shots are allowed or not, we might
+      // filter out some cells.
       for (int row = 0; row < conf.board_height; ++row) {
         for (int col = 0; col < conf.board_width; ++col) {
           if (!conf.allow_repeated_shots &&
@@ -185,7 +189,8 @@ std::string BattleshipState::ToString() const {
   absl::StrAppend(&state_str, OwnBoardString(Player{0}));
   absl::StrAppend(&state_str, "\nPlayer 1's board:\n");
   absl::StrAppend(&state_str, OwnBoardString(Player{1}));
-  // NOTE: It is not necessary to also include the boards of the players' shots,
+  // NOTE: It is not necessary to also include the boards of the players'
+  // shots,
   //     since those can be inferred from the two ship boards.
 
   return state_str;
@@ -245,6 +250,15 @@ std::string BattleshipState::InformationStateString(Player player) const {
   // cell index r * board_width + c.
   std::vector<bool> cell_hit(conf.board_width * conf.board_height, false);
 
+  // NOTE: OpenSpiel's automatic observation consistency checks require that
+  //     agents be able to distinguish that someone else has moved (though the
+  //     move itself might not be observed). So, the information_state string
+  //     we return has to be able to distinguish between, e.g., "Player 1
+  //     still hasn't placed the first ship" and "Player 1 has placed the ship
+  //     and it's now my turn" in the first two moves.
+  //
+  //     For that reason, we prepend the move number in the information state to
+  //     resolve the ambiguity.
   std::string information_state = absl::StrCat("T=", MoveNumber(), " ");
   for (const auto& move : moves_) {
     if (absl::holds_alternative<ShipPlacement>(move.action)) {
