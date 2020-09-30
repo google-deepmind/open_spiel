@@ -178,7 +178,7 @@ class BattleshipState final : public State {
   // Example
   // -------
   //
-  // This is what a typical 3x5 board string might looks like after 4 shots by
+  // This is what a typical 3x6 board string might looks like after 4 shots by
   // the opponent.
   //
   // ```
