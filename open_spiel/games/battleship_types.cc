@@ -17,6 +17,94 @@
 namespace open_spiel {
 namespace battleship {
 
+namespace {
+bool IsOverlappingPlacement(const std::vector<ShipPlacement>& placement) {
+  for (int index = 1; index < placement.size(); ++index) {
+    for (int other = 0; other < index; ++other) {
+      if (placement.at(index).OverlapsWith(placement.at(other))) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+}  // namespace
+
+bool ExistsFeasiblePlacement(const BattleshipConfiguration& conf,
+                             std::vector<ShipPlacement>* partial_placement) {
+  // Debug-time check of preconditions.
+  SPIEL_DCHECK_LE(partial_placement->size(), conf.ships.size());
+  SPIEL_DCHECK_FALSE(IsOverlappingPlacement(*partial_placement));
+  for (int index = 0; index < partial_placement->size(); ++index) {
+    const ShipPlacement& placement = partial_placement->at(index);
+
+    SPIEL_CHECK_EQ(placement.ship.id, conf.ships.at(index).id);
+    SPIEL_CHECK_TRUE(
+        placement.IsWithinBounds(conf.board_width, conf.board_height));
+  }
+
+  if (partial_placement->size() == conf.ships.size()) {
+    // All ships have been placed. The placement is valid because of the
+    // precondition.
+    return true;
+  } else {
+    // We try to place the next ship in the board. We start by trying to place
+    // the ship horizontally.
+    //
+    // Because of the precondition, partial_placement is a placement of a prefix
+    // of the ships in conf.ships. Hence, the next ship that needs to be placed
+    // is simply:
+    const Ship& ship = conf.ships.at(partial_placement->size());
+
+    // -- Horizontal placement.
+    for (int row = 0; row < conf.board_height; ++row) {
+      for (int col = 0; col < conf.board_width - ship.length + 1; ++col) {
+        // First, we append the placement of the next ship to the partial
+        // placement vector.
+        partial_placement->push_back({ShipPlacement::Direction::Horizontal,
+                                      /* ship = */ ship,
+                                      /* tl_corner = */ Cell{row, col}});
+        if (!IsOverlappingPlacement(*partial_placement) &&
+            ExistsFeasiblePlacement(conf, partial_placement)) {
+          // The new partial placement led to a solution. We honor the
+          // postcondition and early-return sucess.
+          partial_placement->pop_back();
+          return true;
+        } else {
+          // The new partial placement does not lead to a solution. We remove
+          // the placement and continue with the next placement.
+          partial_placement->pop_back();
+        }
+      }
+    }
+
+    // -- Vertical placement.
+    for (int row = 0; row < conf.board_height - ship.length + 1; ++row) {
+      for (int col = 0; col < conf.board_width; ++col) {
+        // First, we append the placement of the next ship to the partial
+        // placement vector.
+        partial_placement->push_back({ShipPlacement::Direction::Vertical,
+                                      /* ship = */ ship,
+                                      /* tl_corner = */ Cell{row, col}});
+        if (!IsOverlappingPlacement(*partial_placement) &&
+            ExistsFeasiblePlacement(conf, partial_placement)) {
+          // The new partial placement led to a solution. We honor the
+          // postcondition and early-return sucess.
+          partial_placement->pop_back();
+          return true;
+        } else {
+          // The new partial placement does not lead to a solution. We remove
+          // the placement and continue with the next placement.
+          partial_placement->pop_back();
+        }
+      }
+    }
+  }
+
+  return false;
+}
+
 ShipPlacement::ShipPlacement(const Direction direction, const Ship& ship,
                              const Cell& tl_corner)
     : direction(direction), ship(ship), tl_corner_(tl_corner) {
@@ -61,6 +149,17 @@ bool ShipPlacement::OverlapsWith(const ShipPlacement& other) const {
     return false;
   }
   return true;
+}
+
+bool ShipPlacement::IsWithinBounds(const int board_width,
+                                   const int board_height) const {
+  const Cell tl_corner = TopLeftCorner();
+  const Cell br_corner = BottomRightCorner();
+
+  return (tl_corner.row >= 0 && tl_corner.row < board_height) &&
+         (br_corner.row >= 0 && br_corner.row < board_height) &&
+         (tl_corner.col >= 0 && tl_corner.col < board_width) &&
+         (br_corner.col >= 0 && br_corner.col < board_width);
 }
 
 std::string ShipPlacement::ToString() const {

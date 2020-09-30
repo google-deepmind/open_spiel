@@ -67,6 +67,10 @@ class ShipPlacement final {
   // Checks whether two ship placements intersect on at least one cell.
   bool OverlapsWith(const ShipPlacement& other) const;
 
+  // Checkes whether the ship placement fits within a board of given heigth and
+  // width.
+  bool IsWithinBounds(const int board_width, const int board_height) const;
+
   // Gives a string representation of the ship placement, useful to the
   // ActionToString method.
   //
@@ -105,6 +109,31 @@ struct BattleshipConfiguration {
   // the payoffs of the players are computed.
   double loss_multiplier;
 };
+
+// Returns whether there is still enough space to finish placing ships in a
+// partially-filled-in board.
+//
+// This method receives a vector of current ship placements, and
+// returns `true` if and only if there is at least one way to place the
+// remaining ship on the board without overlapping ships.
+//
+// This method is used when deciding the set of placement actions a player has
+// a given point in time, as well as to validate at construction time whether
+// the given Battleship configuration is feasible.
+//
+//
+// Inductive contract
+// ------------------
+//
+// The correcteness of this method relies on the following inductive contract.
+// The preconditions are checked in debug mode.
+// - Precondition: partial_placement contains a valid (that is, within the
+//     bounds of the board, and non-overlapping) placement of a prefix of ships
+//     defined in `conf.ships`.
+// - Postcondition: by the time the function returns, partial_placement is
+//     exactly the same vector as at the time of entering the call.
+bool ExistsFeasiblePlacement(const BattleshipConfiguration& conf,
+                             std::vector<ShipPlacement>* partial_placement);
 }  // namespace battleship
 }  // namespace open_spiel
 

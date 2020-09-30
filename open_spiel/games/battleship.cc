@@ -83,6 +83,14 @@ std::vector<Action> BattleshipState::LegalActions() const {
     actions.reserve(NumDistinctActions());
 
     if (!AllShipsPlaced()) {
+      std::vector<ShipPlacement> partial_placement;
+      for (const auto& move : moves_) {
+        if (move.player == player &&
+            absl::holds_alternative<ShipPlacement>(move.action)) {
+          partial_placement.push_back(absl::get<ShipPlacement>(move.action));
+        }
+      }
+
       // If we are here, we still have some ships to place on the board.
       //
       // First, we find the first ship that hasn't been placed on the board
@@ -97,9 +105,12 @@ std::vector<Action> BattleshipState::LegalActions() const {
             const ShipPlacement placement(ShipPlacement::Direction::Horizontal,
                                           /* ship = */ next_ship,
                                           /* tl_corner = */ Cell{row, col});
-            if (PlacementDoesNotOverlap(placement, player)) {
+            partial_placement.push_back(placement);
+            if (PlacementDoesNotOverlap(placement, player) &&
+                ExistsFeasiblePlacement(conf, &partial_placement)) {
               actions.push_back(SerializeShipPlacementAction(placement));
             }
+            partial_placement.pop_back();
           }
         }
       }
@@ -116,21 +127,22 @@ std::vector<Action> BattleshipState::LegalActions() const {
             const ShipPlacement placement(ShipPlacement::Direction::Vertical,
                                           /* ship = */ next_ship,
                                           /* tl_corner = */ Cell{row, col});
-            if (PlacementDoesNotOverlap(placement, player)) {
+            partial_placement.push_back(placement);
+            if (PlacementDoesNotOverlap(placement, player) &&
+                ExistsFeasiblePlacement(conf, &partial_placement)) {
               actions.push_back(SerializeShipPlacementAction(placement));
             }
+            partial_placement.pop_back();
           }
         }
       }
 
-      // FIXME(gfarina): It would be better to have a check of this time at
-      // game
-      //     construction time.
-      if (actions.empty()) {
-        SpielFatalError(
-            "Battleship: it is NOT possible to fit all the ships on the "
-            "board!");
-      }
+      // Since the constructor of the game checks that there exists a feasible
+      // placement of ships for each player, and since we only consider
+      // placement actions that preserve feasibility, it is impossible that all
+      // of a sudden we find ourselves painted in a corner where no placement
+      // can be performed.
+      SPIEL_CHECK_GT(actions.size(), 0);
     } else {
       // In this case, the only thing the player can do is to shoot on a cell
       //
@@ -794,6 +806,13 @@ BattleshipGame::BattleshipGame(const GameParameters& params)
   //     ships.
   SPIEL_CHECK_LE(configuration.ships.size(), 26);
 
+  std::vector<ShipPlacement> partial_placement;
+  if (!ExistsFeasiblePlacement(configuration, &partial_placement)) {
+    SpielFatalError(
+        "Battleship: it is NOT possible to fit all the ships on the "
+        "board!");
+  }
+
   configuration.num_shots = ParameterValue<int>("num_shots");
   SPIEL_CHECK_GT(configuration.num_shots, 0);
 
@@ -881,5 +900,6 @@ int BattleshipGame::MaxGameLength() const {
   // the number of shots
   return 2 * (configuration.ships.size() + configuration.num_shots);
 }
+
 }  // namespace battleship
 }  // namespace open_spiel
