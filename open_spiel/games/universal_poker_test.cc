@@ -456,6 +456,22 @@ void ChanceDealRegressionTest() {
       "Spent: [P0: 500  P1: 1000  P2: 2000  ]\n\n"
       "Action Sequence: ddddddcccdddccppppcdd");
 }
+
+void HulhMaxUtilityIsCorrect() {
+  // More generic version of the previous code.
+  std::shared_ptr<const Game> game =
+      LoadGame(HulhGameString(/*betting_abstraction=*/"fullgame"));
+  const auto* up_game = dynamic_cast<const UniversalPokerGame*>(game.get());
+  int max_utility = up_game->big_blind();
+  const auto& acpc_game = up_game->GetACPCGame()->Game();
+  for (int i = 0; i < up_game->GetACPCGame()->NumRounds(); ++i) {
+    max_utility += acpc_game.maxRaises[i] * acpc_game.raiseSize[i];
+  }
+  SPIEL_CHECK_EQ(max_utility, 240);
+  SPIEL_CHECK_EQ(game->MaxUtility(), max_utility);
+  SPIEL_CHECK_EQ(game->MinUtility(), -max_utility);
+}
+
 }  // namespace
 }  // namespace universal_poker
 }  // namespace open_spiel
@@ -474,4 +490,5 @@ int main(int argc, char **argv) {
   open_spiel::universal_poker::FullNLBettingTest1();
   open_spiel::universal_poker::FullNLBettingTest2();
   open_spiel::universal_poker::FullNLBettingTest3();
+  open_spiel::universal_poker::HulhMaxUtilityIsCorrect();
 }

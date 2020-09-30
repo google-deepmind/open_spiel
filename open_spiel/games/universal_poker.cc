@@ -663,23 +663,40 @@ std::vector<int> UniversalPokerGame::ObservationTensorShape() const {
   return {2 * (num_players + total_num_cards)};
 }
 
+double UniversalPokerGame::MaxCommitment() const {
+  int max_commit = 0;
+  if (acpc_game_.IsLimitGame()) {
+    // The most a player can put into the pot is the raise amounts on each round
+    // times the maximum number of raises, plus the original chips they put in
+    // to play, which has the big blind as an upper bound.
+    const auto &acpc_game = acpc_game_.Game();
+    max_commit = big_blind();
+    for (int i = 0; i < acpc_game_.NumRounds(); ++i) {
+      max_commit += acpc_game.maxRaises[i] * acpc_game.raiseSize[i];
+    }
+  } else {
+    // In No-Limit games, this isn't true, as there is no maximum raise value,
+    // so the limit is the number of chips that the player has.
+    max_commit = acpc_game_.StackSize(0);
+  }
+  return static_cast<double>(max_commit);
+}
+
 double UniversalPokerGame::MaxUtility() const {
   // In poker, the utility is defined as the money a player has at the end of
   // the game minus then money the player had before starting the game.
   // The most a player can win *per opponent* is the most each player can put
-  // into the pot, which is the raise amounts on each round times the maximum
-  // number raises, plus the original chip they put in to play.
-
-  return (double)acpc_game_.StackSize(0) * (acpc_game_.GetNbPlayers() - 1);
+  // into the pot,
+  // The maximum amount of money a player can win is the maximum bet any player
+  // can make, times the number of players (excluding the original player).
+  return MaxCommitment() * (acpc_game_.GetNbPlayers() - 1);
 }
 
 double UniversalPokerGame::MinUtility() const {
   // In poker, the utility is defined as the money a player has at the end of
-  // the game minus then money the player had before starting the game.
-  // The most any single player can lose is the maximum number of raises per
-  // round times the amounts of each of the raises, plus the original chip they
-  // put in to play.
-  return -1. * (double)acpc_game_.StackSize(0);
+  // the game minus then money the player had before starting the game. As such,
+  // the most a player can lose is the maximum amount they can bet.
+  return -1 * MaxCommitment();
 }
 
 int UniversalPokerGame::MaxChanceOutcomes() const {

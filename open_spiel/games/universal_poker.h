@@ -187,6 +187,7 @@ class UniversalPokerGame : public Game {
   int starting_stack_big_blinds() const { return starting_stack_big_blinds_; }
 
  private:
+  double MaxCommitment() const;
   std::string gameDesc_;
   const acpc_cpp::ACPCGame acpc_game_;
   absl::optional<int> max_game_length_;
