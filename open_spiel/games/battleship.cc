@@ -792,7 +792,7 @@ BattleshipGame::BattleshipGame(const GameParameters& params)
     SPIEL_CHECK_TRUE(absl::SimpleAtoi(ship_sizes.at(ship_index), &ship.length));
     SPIEL_CHECK_TRUE(absl::SimpleAtod(ship_values.at(ship_index), &ship.value));
 
-    SPIEL_CHECK_TRUE(ship.length < configuration.board_width ||
+    SPIEL_CHECK_TRUE(ship.length <= configuration.board_width ||
                      ship.length <= configuration.board_height);
     SPIEL_CHECK_GE(ship.value, 0.0);
 
