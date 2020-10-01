@@ -191,6 +191,7 @@ class BattleshipState final : public State {
   std::string OwnBoardString(const Player player) const;
 
   // Draws the state of the player's shots for far.
+  //
   // This corresponds to the incremental board that the player builds over time
   // by shooting at the opponent.
   //
@@ -234,6 +235,7 @@ class BattleshipState final : public State {
   bool IsShipPlaced(const Ship& ship, const Player player) const;
 
   // Returns the ship that the given player should place on the board next.
+  //
   // Ships are placed in the order they are defined in the
   // `BattleshipConfiguration` object.
   //
@@ -299,12 +301,12 @@ class BattleshipState final : public State {
   // by OpenSpiel's interface.
   Action SerializeShotAction(const Shot& shot) const;
 
-  // Converts an action number to a `ShipPlacement`
+  // Converts an action number to a `ShipPlacement` action.
   //
   // See above for details about our serialization scheme.
   ShipPlacement DeserializeShipPlacementAction(const Action action) const;
 
-  // Converts an action number to a `ShipPlacement`
+  // Converts an action number to a `Shot` action.
   //
   // See above for details about our serialization scheme.
   Shot DeserializeShotAction(const Action action) const;
