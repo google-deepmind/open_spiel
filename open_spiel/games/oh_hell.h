@@ -221,6 +221,10 @@ class OhHellGame : public Game {
     if (num_tricks_fixed_ > 0) return num_tricks_fixed_ + kMadeBidBonus;
     return MaxNumTricks() + kMadeBidBonus;
   }
+  // select dealer and number of tricks (kNumPreDealChanceActions)
+  // deal (MaxNumTricks() * num_players + kNumTrumpDeal)
+  // bidding (num_players)
+  // play (MaxNumTricks() * num_players)
   int MaxGameLength() const override {
     return 2 * MaxNumTricks() * num_players_ + num_players_
              + kNumPreDealChanceActions + kNumTrumpDeal;
