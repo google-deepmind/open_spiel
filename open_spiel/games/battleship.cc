@@ -375,7 +375,13 @@ std::string BattleshipState::OwnBoardString(const Player player) const {
     if (move.player == opponent && absl::holds_alternative<Shot>(move.action)) {
       const Shot& shot = absl::get<Shot>(move.action);
 
-      if (player_board[shot.row][shot.col] == ' ') {
+      if (player_board[shot.row][shot.col] == ' ' ||
+          player_board[shot.row][shot.col] == '*') {
+        // If the cell contains a '*' it means that we have already shot at that
+        // cell before. That can only happen if repeated shots are allowed.
+        SPIEL_DCHECK_TRUE(conf.allow_repeated_shots ||
+                          player_board[shot.row][shot.col] == ' ');
+
         player_board[shot.row][shot.col] = '*';
       } else {
         SPIEL_DCHECK_TRUE(std::isalpha(player_board[shot.row][shot.col]));
@@ -418,7 +424,12 @@ std::string BattleshipState::ShotsBoardString(const Player player) const {
     if (move.player == player && absl::holds_alternative<Shot>(move.action)) {
       const Shot& shot = absl::get<Shot>(move.action);
 
-      SPIEL_DCHECK_EQ(shots_board[shot.row][shot.col], ' ');
+      if (conf.allow_repeated_shots) {
+        SPIEL_DCHECK_TRUE(shots_board[shot.row][shot.col] == ' ' ||
+                          shots_board[shot.row][shot.col] == '@');
+      } else {
+        SPIEL_DCHECK_EQ(shots_board[shot.row][shot.col], ' ');
+      }
       shots_board[shot.row][shot.col] = '@';
     }
   }
@@ -603,9 +614,9 @@ bool BattleshipState::DidShipSink(const Ship& ship, const Player player) const {
   std::vector<Cell> hits;
   const ShipPlacement placement = FindShipPlacement(ship, player);
   for (const auto& move : moves_) {
-    if (absl::holds_alternative<Shot>(move.action)) {
+    if (move.player != player && absl::holds_alternative<Shot>(move.action)) {
       const Shot& shot = absl::get<Shot>(move.action);
-      if (move.player != player && placement.CoversCell(shot)) {
+      if (placement.CoversCell(shot)) {
         hits.push_back(shot);
       }
     }
