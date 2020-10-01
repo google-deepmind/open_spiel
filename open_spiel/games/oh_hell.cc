@@ -165,6 +165,10 @@ std::string OhHellState::FormatDealer() const {
   return absl::StrFormat("Dealer: %d\n", dealer_);
 }
 
+std::string OhHellState::FormatNumCardsDealt() const {
+  return absl::StrFormat("Num Cards Dealt: %d\n", num_cards_dealt_);
+}
+
 std::string OhHellState::FormatDeal() const {
   std::string rv;
   for (Player player = 0; player < num_players_; ++player) {
@@ -425,8 +429,13 @@ void OhHellState::ComputeScore() {
 std::string OhHellState::InformationStateString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
+  std::string rv = "";
   if (IsTerminal()) return ToString();
-  std::string rv = absl::StrCat(FormatChooseNumTricks(), FormatDealer());
+  if (phase_ == Phase::kChooseNumTricks) return rv;
+  absl::StrAppend(&rv, FormatChooseNumTricks());
+  if (phase_ == Phase::kDealer) return rv;
+  absl::StrAppend(&rv, FormatDealer());
+  absl::StrAppend(&rv, FormatNumCardsDealt());
   if (num_cards_dealt_ > num_players_ * num_tricks_) {
     absl::StrAppend(&rv, FormatTrump());
   }

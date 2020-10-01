@@ -175,6 +175,7 @@ class OhHellState : public State {
   std::string FormatPhase() const;
   std::string FormatChooseNumTricks() const;
   std::string FormatDealer() const;
+  std::string FormatNumCardsDealt() const;
   std::string FormatDeal() const;
   std::string FormatTrump() const;
   std::string FormatBids() const;

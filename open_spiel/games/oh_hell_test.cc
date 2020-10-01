@@ -150,6 +150,10 @@ std::string InformationStateTensorToString(Player player,
   // Now build InformationStateString.
   std::string rv = absl::StrFormat("Num Total Tricks: %d\n", num_tricks);
   absl::StrAppendFormat(&rv, "Dealer: %d\n", dealer);
+  // guaranteed to be in kPlay or kBid phase, so all chance nodes have already
+  // occured
+  absl::StrAppendFormat(&rv, "Num Cards Dealt: %d\n",
+                        num_tricks * num_players + 1);
   absl::StrAppendFormat(&rv, "Trump: %s\n", deck_props.CardString(trump));
   absl::StrAppendFormat(&rv, "Player: %d\n", player);
   for (int suit = 0; suit < deck_props.NumSuits(); ++suit) {
