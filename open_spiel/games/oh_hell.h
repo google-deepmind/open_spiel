@@ -42,6 +42,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <map>
 
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/spiel.h"
@@ -72,6 +73,9 @@ enum class Suit {
 };
 constexpr char kRankChar[] = "23456789TJQKA";
 constexpr char kSuitChar[] = "CDSH";
+inline std::map<int, std::string> kPhaseStr = {
+    {0, "ChooseNumTricks"}, {1, "ChooseDealer"}, {2, "Deal"}, {3, "Bid"},
+    {4, "Play"}, {5, "GameOver"}};
 
 // helper class to allow different numbers of cards / suits
 class DeckProperties {
@@ -168,6 +172,7 @@ class OhHellState : public State {
     return tricks_[num_cards_played_ / num_players_];
   }
   std::string FormatHand(int player) const;
+  std::string FormatPhase() const;
   std::string FormatChooseNumTricks() const;
   std::string FormatDealer() const;
   std::string FormatDeal() const;

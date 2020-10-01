@@ -110,7 +110,8 @@ OhHellState::OhHellState(std::shared_ptr<const Game> game, int num_players,
 }
 
 std::string OhHellState::ToString() const {
-  std::string rv = absl::StrCat(FormatChooseNumTricks(), FormatDealer());
+  std::string rv = absl::StrCat(FormatPhase(), FormatChooseNumTricks());
+  absl::StrAppend(&rv, FormatDealer());
   absl::StrAppend(&rv, FormatDeal());
   if (num_cards_dealt_ > num_players_ * num_tricks_) {
     absl::StrAppend(&rv, FormatTrump());
@@ -150,6 +151,10 @@ std::string OhHellState::FormatHand(int player) const {
     absl::StrAppend(&rv, "\n");
   }
   return rv;
+}
+
+std::string OhHellState::FormatPhase() const {
+  return absl::StrFormat("Phase: %s\n", kPhaseStr[static_cast<int>(phase_)]);
 }
 
 std::string OhHellState::FormatChooseNumTricks() const {
