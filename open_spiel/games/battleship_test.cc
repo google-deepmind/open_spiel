@@ -218,6 +218,10 @@ void TestNashEquilibriumInSmallBoard() {
   // We check that this joint policy is a best response, by computing the Nash
   // gap.
   SPIEL_CHECK_FLOAT_NEAR(algorithms::NashConv(*game, policy), 0.0, 1e-9);
+
+  // TODO(gfarina): When OpenSpiel implements algorithms for optimal
+  //     EFCE/EFCCE/NFCCE,finish checking that we exactly replicate the same
+  //     results as [1] in this game.
 }
 }  // namespace
 }  // namespace battleship
