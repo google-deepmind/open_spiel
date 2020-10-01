@@ -15,8 +15,12 @@
 #include "open_spiel/games/battleship.h"
 
 #include <iostream>
+#include <limits>
 
+#include "open_spiel/algorithms/expected_returns.h"
 #include "open_spiel/algorithms/get_all_states.h"
+#include "open_spiel/algorithms/tabular_exploitability.h"
+#include "open_spiel/policy.h"
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/tests/basic_tests.h"
 
@@ -173,13 +177,57 @@ void TestTightLayout2() {
 
   SPIEL_CHECK_FALSE(state->IsTerminal());
 }
+
+void TestNashEquilibriumInSmallBoard() {
+  // We replicate the same setting as page 7 of [1].
+  //
+  // There, each player has a 1x3 board with a single ship of size 1 and value
+  // 1.0. Each player has two shots available. The loss multiplier is 2.0, so
+  // this is a *general-sum* game.
+  //
+  // The only Nash equilibrium of the game is for all players to place their
+  // ship at random, and then shoot at random.
+  //
+  //
+  // [1]:
+  // https://papers.nips.cc/paper/9122-correlation-in-extensive-form-games-saddle-point-formulation-and-benchmarks.pdf#page=7
+
+  const auto game =
+      LoadGame("battleship", {{"board_width", GameParameter(3)},
+                              {"board_height", GameParameter(1)},
+                              {"ship_sizes", GameParameter("[1]")},
+                              {"ship_values", GameParameter("[1.0]")},
+                              {"num_shots", GameParameter(2)},
+                              {"loss_multiplier", GameParameter(2.0)}});
+  SPIEL_CHECK_EQ(game->GetType().utility, GameType::Utility::kGeneralSum);
+
+  const TabularPolicy policy = GetUniformPolicy(*game);
+  const std::vector<double> expected_utilities = algorithms::ExpectedReturns(
+      *game->NewInitialState(), policy,
+      /* depth_limit = */ std::numeric_limits<int>::max());
+
+  // Under the uniformly random policy, we expect that Player 0 and Player 1
+  // will sink their opponent's ship with probability 5/9 and 1/3, respectively.
+  //
+  // Correspondingly, Player 0's expected utility is 5/9 - 2 * 1/3 = -1/9 (the 2
+  // comes from the loss multiplier), while Player 1's expected utility is 1/3 -
+  // 2 * 5/9 = -7/9.
+  SPIEL_CHECK_FLOAT_EQ(expected_utilities[Player{0}], -1.0 / 9);
+  SPIEL_CHECK_FLOAT_EQ(expected_utilities[Player{1}], -7.0 / 9);
+
+  // We check that this joint policy is a best response, by computing the Nash
+  // gap.
+  SPIEL_CHECK_FLOAT_NEAR(algorithms::NashConv(*game, policy), 0.0, 1e-9);
+}
 }  // namespace
 }  // namespace battleship
 }  // namespace open_spiel
 
 int main(int argc, char **argv) {
+  open_spiel::testing::LoadGameTest("battleship");
   open_spiel::battleship::BasicBattleshipTest();
   open_spiel::battleship::TestZeroSumTrait();
   open_spiel::battleship::TestTightLayout1();
   open_spiel::battleship::TestTightLayout2();
+  open_spiel::battleship::TestNashEquilibriumInSmallBoard();
 }
