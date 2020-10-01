@@ -31,10 +31,7 @@ namespace {
 namespace testing = open_spiel::testing;
 
 void BasicBattleshipTest() {
-  testing::LoadGameTest("battleship");
-  testing::NoChanceOutcomesTest(*LoadGame("battleship"));
-  testing::RandomSimTestWithUndo(*LoadGame("battleship"), 100);
-
+  // Some basic tests on a small 2x2 instance.
   for (int num_shots = 1; num_shots <= 3; ++num_shots) {
     const auto game =
         LoadGame("battleship", {{"board_width", GameParameter(2)},
@@ -50,10 +47,8 @@ void BasicBattleshipTest() {
 }
 
 void RandomTestsOnLargeBoards() {
-  testing::LoadGameTest("battleship");
-  testing::NoChanceOutcomesTest(*LoadGame("battleship"));
-
-  const auto game =
+  // Allow repeated shots.
+  auto game =
       LoadGame("battleship", {{"board_width", GameParameter(10)},
                               {"board_height", GameParameter(10)},
                               {"ship_sizes", GameParameter("[2;3;3;4;5]")},
@@ -61,6 +56,17 @@ void RandomTestsOnLargeBoards() {
                               {"num_shots", GameParameter(50)},
                               {"allow_repeated_shots", GameParameter(true)},
                               {"loss_multiplier", GameParameter(1.0)}});
+  testing::NoChanceOutcomesTest(*game);
+  testing::RandomSimTestWithUndo(*game, 100);
+
+  // Repeated shots not allowed.
+  game = LoadGame("battleship", {{"board_width", GameParameter(10)},
+                                 {"board_height", GameParameter(10)},
+                                 {"ship_sizes", GameParameter("[2;3;3;4;5]")},
+                                 {"ship_values", GameParameter("[1;1;1;1;1]")},
+                                 {"num_shots", GameParameter(50)},
+                                 {"allow_repeated_shots", GameParameter(false)},
+                                 {"loss_multiplier", GameParameter(1.0)}});
   testing::NoChanceOutcomesTest(*game);
   testing::RandomSimTestWithUndo(*game, 100);
 }
@@ -214,6 +220,7 @@ void TestNashEquilibriumInSmallBoard() {
                               {"ship_sizes", GameParameter("[1]")},
                               {"ship_values", GameParameter("[1.0]")},
                               {"num_shots", GameParameter(2)},
+                              {"allow_repeated_shots", GameParameter(false)},
                               {"loss_multiplier", GameParameter(2.0)}});
   SPIEL_CHECK_EQ(game->GetType().utility, GameType::Utility::kGeneralSum);
 

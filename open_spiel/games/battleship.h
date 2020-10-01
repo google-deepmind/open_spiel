@@ -84,21 +84,21 @@
 //
 // Parameters
 //     "board_width"           int     Number of columns of the game board for
-//                                     each player            (default = 2)
+//                                     each player            (default = 10)
 //     "board_height"          int     Number of rows of the game board for
-//                                     each player            (default = 2)
+//                                     each player            (default = 10)
 //     "ship_sizes"          [int]     Length of the ships each player has
-//                                                            (default = [2])
+//                                                      (default = [2,3,3,4,5])
 //     "ship_values"      [double]     Value of the ships each player has
-//                                                            (default = [1.0])
+//                                                      (default = [1,1,1,1,1])
 //     "num_shots"             int     Number of shots available to each
-//                                     player                 (default = 2)
+//                                     player                 (default = 50)
 //     "allow_repeated_shots" bool     If false, the players will be prevented
 //                                     from shooting multiple times at the same
-//                                     cell of the board      (default = false)
+//                                     cell of the board      (default = true)
 //     "loss_multiplier"    double     Loss multiplier (see above). The game is
 //                                     zero-sum iff the loss multiplier is 1.0
-//                                                            (default = 2.0)
+//                                                            (default = 1.0)
 //
 // NOTE: The list parameters must be supplied as a string of semicolon-separated
 //       values, wrapped in square brackets. For example: "[1;2]" is a list with
@@ -137,13 +137,13 @@
 namespace open_spiel {
 namespace battleship {
 
-constexpr int kDefaultBoardWidth = 2;
-constexpr int kDefaultBoardHeight = 2;
-constexpr const char* kDefaultShipSizes = "[2]";
-constexpr const char* kDefaultShipValues = "[1.0]";
-constexpr int kDefaultNumShots = 2;
-constexpr bool kDefaultAllowRepeatedShots = false;
-constexpr double kDefaultLossMultiplier = 2.0;
+constexpr int kDefaultBoardWidth = 10;
+constexpr int kDefaultBoardHeight = 10;
+constexpr const char* kDefaultShipSizes = "[2;3;3;4;5]";
+constexpr const char* kDefaultShipValues = "[1.0;1.0;1.0;1.0;1.0]";
+constexpr int kDefaultNumShots = 50;
+constexpr bool kDefaultAllowRepeatedShots = true;
+constexpr double kDefaultLossMultiplier = 1.0;
 
 class BattleshipGame;
 class BattleshipState final : public State {
