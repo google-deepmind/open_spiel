@@ -45,8 +45,24 @@ void BasicBattleshipTest() {
                                 {"allow_repeated_shots", GameParameter(false)},
                                 {"loss_multiplier", GameParameter(2.0)}});
     testing::RandomSimTestWithUndo(*game, 100);
-    return;
+    testing::NoChanceOutcomesTest(*game);
   }
+}
+
+void RandomTestsOnLargeBoards() {
+  testing::LoadGameTest("battleship");
+  testing::NoChanceOutcomesTest(*LoadGame("battleship"));
+
+  const auto game =
+      LoadGame("battleship", {{"board_width", GameParameter(10)},
+                              {"board_height", GameParameter(10)},
+                              {"ship_sizes", GameParameter("[2;3;3;4;5]")},
+                              {"ship_values", GameParameter("[1;1;1;1;1]")},
+                              {"num_shots", GameParameter(50)},
+                              {"allow_repeated_shots", GameParameter(true)},
+                              {"loss_multiplier", GameParameter(1.0)}});
+  testing::NoChanceOutcomesTest(*game);
+  testing::RandomSimTestWithUndo(*game, 100);
 }
 
 void TestZeroSumTrait() {
@@ -230,6 +246,7 @@ void TestNashEquilibriumInSmallBoard() {
 int main(int argc, char **argv) {
   open_spiel::testing::LoadGameTest("battleship");
   open_spiel::battleship::BasicBattleshipTest();
+  open_spiel::battleship::RandomTestsOnLargeBoards();
   open_spiel::battleship::TestZeroSumTrait();
   open_spiel::battleship::TestTightLayout1();
   open_spiel::battleship::TestTightLayout2();
