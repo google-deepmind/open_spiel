@@ -31,6 +31,10 @@ void GameConfigSimTest() {
           params["players"] = GameParameter(players);
           params["num_suits"] = GameParameter(suits);
           params["num_cards_per_suit"] = GameParameter(cps);
+          // test with a randomly selected number of tricks
+          testing::RandomSimTest(*LoadGame("oh_hell", params), 1);
+          // test with a fixed number of tricks
+          params["num_tricks_fixed"] = GameParameter(1);
           testing::RandomSimTest(*LoadGame("oh_hell", params), 1);
         }
       }
