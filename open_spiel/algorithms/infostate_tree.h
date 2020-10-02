@@ -74,15 +74,21 @@ template<class Contents>
 class InfostateNode {
  public:
   InfostateNode(InfostateNode* parent, State* originating_state,
-                Player acting_player, absl::Span<float> tensor)
+                Player acting_player, absl::Span<float> tensor,
+                double terminal_value = 0)
       : parent_(parent),
         type_(GetInfostateNodeType(originating_state, acting_player)),
         // Copy the tensor.
-        tensor_(tensor.begin(), tensor.end()) {}
+        tensor_(tensor.begin(), tensor.end()),
+        terminal_value_(terminal_value) {}
 
+  InfostateNode* Parent() const { return parent_; }
   const InfostateNodeType& Type() const { return type_; }
   absl::Span<const float> Tensor() const { return tensor_; }
-  InfostateNode* Parent() const { return parent_; }
+  double TerminalValue() {
+    SPIEL_CHECK_EQ(type_, kTerminalNode);
+    return terminal_value_;
+  }
   InfostateNode* AddChild(std::unique_ptr<InfostateNode> child) {
     children_.push_back(std::move(child));
     return children_.back().get();
@@ -109,9 +115,10 @@ class InfostateNode {
 
  private:
   Contents content_;
-  InfostateNode* parent_ = nullptr;
-  InfostateNodeType type_;
-  std::vector<float> tensor_;
+  const InfostateNode* parent_;
+  const InfostateNodeType type_;
+  const std::vector<float> tensor_;
+  const double terminal_value_;
   std::vector<std::unique_ptr<InfostateNode>> children_;
 };
 
@@ -210,13 +217,14 @@ using CFRNode = InfostateNode</*Contents=*/CFRInfoStateValues>;
 // of CFRInfoStateValues differently for decision nodes.
 template<> CFRNode::InfostateNode(
     CFRNode *parent, State* originating_state, Player acting_player,
-    absl::Span<float> tensor) :
+    absl::Span<float> tensor, double terminal_value) :
   content_(originating_state && originating_state->IsPlayerActing(acting_player)
            ? CFRInfoStateValues(originating_state->LegalActions(acting_player))
            : CFRInfoStateValues()),
   parent_(parent),
   type_(GetInfostateNodeType(originating_state, acting_player)),
-  tensor_(tensor.begin(), tensor.end()) {}
+  tensor_(tensor.begin(), tensor.end()),
+  terminal_value_(terminal_value) {}
 
 }  // namespace algorithms
 }  // namespace open_spiel
