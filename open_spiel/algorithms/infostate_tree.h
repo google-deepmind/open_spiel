@@ -49,11 +49,9 @@ namespace algorithms {
 // as the player may have discovered something as a result of its action
 // in the previous decision node.
 //
-// Additionally, we use _terminal nodes_, which do not necessarily correspond
-// to a single State terminal history, but can span a number of them.
-// This is useful for aggregating over terminal histories in games like Poker,
-// where players may not learn what were the exact card combinations when
-// a player folds.
+// Additionally, we use _terminal nodes_, which correspond to a single State
+// terminal history. The player's utility is multiplied by chance reach
+// probability to get an expected value of the terminal history.
 //
 // [Predictive CFR] https://arxiv.org/pdf/2007.14358.pdf.
 enum InfostateNodeType {
