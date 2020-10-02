@@ -32,10 +32,9 @@
 // for some acting player, starting at some histories in the game.
 //
 // The identification of infostates is based on tensors from an information
-// state observer. In general, the implementation is not restricted to only
-// this observer type.
+// state observer.
 //
-// As infostate node may need contain arbitrary values, it is implemented
+// As infostate node may need to contain arbitrary values, it is implemented
 // with templates. The common usage for CFR is provided under a CFRTree
 // and CFRNode respectively.
 
@@ -73,11 +72,11 @@ InfostateNodeType GetInfostateNodeType(State* state, Player player) {
 template<class Contents>
 class InfostateNode {
  public:
-  InfostateNode(InfostateNode* parent, State* originating_state,
-                Player acting_player, absl::Span<float> tensor,
-                double terminal_value = 0)
+  InfostateNode(InfostateNode* parent, InfostateNodeType type,
+                absl::Span<float> tensor, double terminal_value,
+                const State* originating_state, Player infostate_tree_player)
       : parent_(parent),
-        type_(GetInfostateNodeType(originating_state, acting_player)),
+        type_(type),
         // Copy the tensor.
         tensor_(tensor.begin(), tensor.end()),
         terminal_value_(terminal_value) {}
@@ -93,6 +92,13 @@ class InfostateNode {
     children_.push_back(std::move(child));
     return children_.back().get();
   }
+  InfostateNode* GetChild(absl::Span<float> tensor) {
+    for (const std::unique_ptr<InfostateNode>& child : children_) {
+      if (child->Tensor() == tensor) return child.get();
+    }
+    return nullptr;
+  }
+  InfostateNode* ChildAt(int i) { return children_.at(i).get(); }
 
   // Provide a convenient way to access the Content
   // without calling some getter.
@@ -114,11 +120,11 @@ class InfostateNode {
   iterator end() const { return iterator(children_, children_.size()); }
 
  private:
-  Contents content_;
   const InfostateNode* parent_;
   const InfostateNodeType type_;
   const std::vector<float> tensor_;
   const double terminal_value_;
+  Contents content_;
   std::vector<std::unique_ptr<InfostateNode>> children_;
 };
 
@@ -134,36 +140,56 @@ class InfostateTree {
   // The root node is a dummy observation node, so that we can have one
   // infostate tree instead of a forest of infostate trees.
   InfostateTree(
-      std::vector<std::unique_ptr<State>> start_states,
+      absl::Span<const State*> start_states,
+      absl::Span<const double> chance_reach_probs,
       std::shared_ptr<Observer> infostate_observer, Player acting_player,
       int max_depth_limit = 1000) :
       player_(acting_player),
       infostate_observer_(std::move(infostate_observer)),
-      observation_(std::move(CreateObservation(*start_states.at(0)))),
       // Root is just a dummy node, and has a tensor full of zeros.
       // It cannot be retrieved via Get* methods, only by using the Root()
       // method.
-      root_(/*parent=*/nullptr, /*originating_state=*/nullptr,
-            /*acting_player=*/player_, /*tensor=*/observation_.Tensor()) {
+      root_(/*parent=*/nullptr, /*type=*/kObservationNode,
+            /*tensor=*/{}, /*terminal_value=*/0,
+            /*originating_state=*/nullptr, /*acting_player=*/player_),
+      observation_(std::move(CreateObservation(*start_states.at(0)))) {
+    SPIEL_CHECK_EQ(start_states.size(), chance_reach_probs.size());
 
     int start_max_depth = 0;
-    for (const std::unique_ptr<State>& start_state : start_states) {
+    for (const State* start_state : start_states) {
       start_max_depth = std::max(start_max_depth, start_state->MoveNumber());
     }
 
-    for (std::unique_ptr<State>& start_state : start_states) {
-      RecursivelyBuildTree(&root_, std::move(start_state),
-                           start_max_depth + max_depth_limit);
+    for (int i = 0; i < start_states.size(); ++i) {
+      RecursivelyBuildTree(
+          &root_, *start_states[i],
+          start_max_depth + max_depth_limit,
+          chance_reach_probs[i]);
     }
+  }
+
+  InfostateTree(const Game& game, Player acting_player,
+                int max_depth_limit = 1000)
+    : player_(acting_player),
+      infostate_observer_(game.MakeObserver(kInfoStateObsType, {})),
+      root_(/*parent=*/nullptr, /*type=*/kObservationNode,
+            /*tensor=*/{}, /*terminal_value=*/0,
+            /*originating_state=*/nullptr, /*acting_player=*/player_),
+      observation_(std::move(CreateObservation(game))) {
+    std::unique_ptr<State> root_state = game.NewInitialState();
+    RecursivelyBuildTree(&root_, *root_state,
+                         max_depth_limit, 1.);
   }
 
   Node* Root() { return &root_; }
 
+  // Convenient methods to directly access decision nodes by observation
+  // or State. This is useful for looking up solved policy, but not neccessary
+  // for the infostate tree construction or running CFR iterations.
   Node* GetByCompressed(const std::string& observation) const {
     auto it = lookup_table_.find(observation);
     return it == lookup_table_.end() ? nullptr : it->second;
   }
-
   Node* GetByState(const State& state) {
     observation_.SetFrom(state, player_);
     std::string compressed = observation_.Compress();
@@ -171,10 +197,10 @@ class InfostateTree {
   }
 
  private:
-  Player player_;
-  std::shared_ptr<Observer> infostate_observer_;
-  Observation observation_;
+  const Player player_;
+  const std::shared_ptr<Observer> infostate_observer_;
   Node root_;
+  Observation observation_;
   // Store compressed observations for fast lookup in the lookup table.
   std::unordered_map<std::string, Node*> lookup_table_;
 
@@ -187,24 +213,104 @@ class InfostateTree {
     SPIEL_CHECK_LT(player_, game->NumPlayers());
     return Observation(*game, infostate_observer_);
   }
+  Observation CreateObservation(const Game& game) const {
+    SPIEL_CHECK_GE(player_, 0);
+    SPIEL_CHECK_LT(player_, game.NumPlayers());
+    return Observation(game, infostate_observer_);
+  }
 
-  void RecursivelyBuildTree(Node* parent, std::unique_ptr<State> state,
-                            int move_limit) {
-    observation_.SetFrom(*state, player_);
-    std::string compressed = observation_.Compress();
-    Node* node = GetByCompressed(compressed);
-    if (!node) {
-      node = parent->AddChild(std::make_unique<Node>(
-          parent, state.get(), player_, observation_.Tensor()));
-      lookup_table_.insert({std::move(compressed), node});
+  void RecursivelyBuildTree(Node* parent, const State& state,
+                            int move_limit, double chance_reach_prob) {
+    observation_.SetFrom(state, player_);
+
+    // Create terminal nodes.
+    if (state.IsTerminal()) {
+      double terminal_value = state.Returns()[player_] * chance_reach_prob;
+      parent->AddChild(std::make_unique<Node>(
+          parent, kTerminalNode, observation_.Tensor(), terminal_value,
+          &state, player_));
+      return;
     }
 
-    // Do not build deeper.
-    if (state->MoveNumber() >= move_limit)
+    // Create decision nodes.
+    if (state.IsPlayerActing(player_)) {
+      Node* decision_node = parent->GetChild(observation_.Tensor());
+
+      if (decision_node) {
+        // The decision node has been already constructed along with
+        // its observation children -- only go deeper recursively.
+        SPIEL_DCHECK_EQ(decision_node->Type(), kDecisionNode);
+
+        if (state.MoveNumber() >= move_limit)  // Do not build deeper.
+          return;
+
+        std::vector<Action> legal_actions = state.LegalActions();
+        for (int i = 0; i < legal_actions.size(); ++i) {
+          Node* observation_node = decision_node->ChildAt(i);
+          SPIEL_DCHECK_EQ(observation_node->Type(), kObservationNode);
+          std::unique_ptr<State> child = state.Child(legal_actions.at(i));
+          RecursivelyBuildTree(observation_node, *child,
+                               move_limit, chance_reach_prob);
+        }
+      } else {
+        decision_node = parent->AddChild(std::make_unique<Node>(
+            parent, kDecisionNode,
+            observation_.Tensor(), 0,
+            &state, player_));
+
+        std::string compressed = observation_.Compress();
+        lookup_table_.insert({std::move(compressed), decision_node});
+
+        if (state.MoveNumber() >= move_limit)  // Do not build deeper.
+          return;
+
+        // Build observation nodes right after away after the decision node.
+        // This is because the player might be acting multiple times in a row,
+        // and each time it might get some observations that branch the infostate
+        // tree.
+        for (Action a : state.LegalActions()) {
+          std::unique_ptr<State> child = state.Child(a);
+          observation_.SetFrom(*child, player_);
+          Node* observation_node =
+              decision_node->AddChild(std::make_unique<Node>(
+                  parent, kObservationNode,
+                  observation_.Tensor(), 0,
+                  child.get(), player_));
+          RecursivelyBuildTree(observation_node, *child,
+                               move_limit, chance_reach_prob);
+        }
+      }
+      return;
+    }
+
+    // Finally, create observation nodes.
+    SPIEL_DCHECK_TRUE(state.IsChanceNode()
+                          || !state.IsPlayerActing(player_));
+    Node* observation_node = parent->GetChild(observation_.Tensor());
+    if (!observation_node) {
+      observation_node = parent->AddChild(std::make_unique<Node>(
+          parent, kObservationNode,
+          observation_.Tensor(), 0,
+          &state, player_));
+    }
+    SPIEL_DCHECK_EQ(observation_node->Type(), kObservationNode);
+
+    if (state.MoveNumber() >= move_limit)  // Do not build deeper.
       return;
 
-    for (Action a : state->LegalActions()) {
-      RecursivelyBuildTree(node, state->Child(a), move_limit);
+    if (state.IsChanceNode()) {
+      for (std::pair<Action, double> action_prob : state.ChanceOutcomes()) {
+        std::unique_ptr<State> child = state.Child(action_prob.first);
+        RecursivelyBuildTree(observation_node, *child,
+                             move_limit,
+                             chance_reach_prob * action_prob.second);
+      }
+    } else {
+      for (Action a : state.LegalActions()) {
+        std::unique_ptr<State> child = state.Child(a);
+        RecursivelyBuildTree(observation_node, *child,
+                             move_limit, chance_reach_prob);
+      }
     }
   }
 };
@@ -216,15 +322,16 @@ using CFRNode = InfostateNode</*Contents=*/CFRInfoStateValues>;
 // Specialize CFRNode, because we construct the content
 // of CFRInfoStateValues differently for decision nodes.
 template<> CFRNode::InfostateNode(
-    CFRNode *parent, State* originating_state, Player acting_player,
-    absl::Span<float> tensor, double terminal_value) :
-  content_(originating_state && originating_state->IsPlayerActing(acting_player)
-           ? CFRInfoStateValues(originating_state->LegalActions(acting_player))
-           : CFRInfoStateValues()),
+    CFRNode* parent, InfostateNodeType type,
+    absl::Span<float> tensor, double terminal_value,
+    const State* originating_state, Player player) :
   parent_(parent),
-  type_(GetInfostateNodeType(originating_state, acting_player)),
+  type_(type),
   tensor_(tensor.begin(), tensor.end()),
-  terminal_value_(terminal_value) {}
+  terminal_value_(terminal_value),
+  content_(originating_state && originating_state->IsPlayerActing(player)
+    ? CFRInfoStateValues(originating_state->LegalActions(player))
+    : CFRInfoStateValues()) {}
 
 }  // namespace algorithms
 }  // namespace open_spiel

@@ -42,73 +42,114 @@ std::string ComputeCertificate(CFRNode& node) {
   }
 
   if (node.Type() == kTerminalNode)
-    return "()";
+    return "{}";
 
   std::vector<std::string> certificates;
   for (CFRNode& child : node) {
     certificates.push_back(ComputeCertificate(child));
   }
   std::sort(certificates.begin(), certificates.end());
+
+  std::string open, close;
+  if (node.Type() == kDecisionNode) {
+    open = "[";
+    close = "]";
+  } else if (node.Type() == kObservationNode) {
+    open = "(";
+    close = ")";
+  }
+
   return absl::StrCat(
-      "(",
+      open,
       absl::StrJoin(certificates.begin(), certificates.end(), ""),
-      ")");
+      close);
 }
 
 std::string CertificateFromStartHistories(
     const std::string& game_name, Player player_id,
-    const std::vector<std::vector<Action>>& start_histories) {
+    const std::vector<std::vector<Action>>& start_histories,
+    const std::vector<double>& start_reaches) {
   const std::shared_ptr<const Game> game = LoadGame(game_name);
   std::vector<std::unique_ptr<State>> start_states;
+  std::vector<const State*> start_state_ptrs;
   for (const std::vector<Action>& history : start_histories) {
     std::unique_ptr<State> rollout = game->NewInitialState();
     for (const Action& a : history) rollout->ApplyAction(a);
     start_states.push_back(std::move(rollout));
+    start_state_ptrs.push_back(start_states.back().get());
   }
 
   std::shared_ptr<Observer> infostate_observer =
       game->MakeObserver(kInfoStateObsType, {});
 
-  CFRTree tree(std::move(start_states), infostate_observer, player_id);
+  CFRTree tree(absl::MakeSpan(start_state_ptrs), absl::MakeSpan(start_reaches),
+               infostate_observer, player_id);
   return ComputeCertificate(*tree.Root());
 }
 
 std::string RootCertificate(const std::string& game_name, Player player_id) {
-  return CertificateFromStartHistories(game_name, player_id,
-                                       /*start_histories=*/{{}});
+  CFRTree tree(*LoadGame(game_name), player_id);
+  return ComputeCertificate(*tree.Root());
 }
 
 
 void TestRootCertificates() {
   {
     std::string expected_certificate =
-      "("  // <dummy root node>
-        "("  // <distributing card>
-          "("  // <card J>
-            "((()())())"  // pbp pbb pp
-            "(()())"      // bp bb
-          ")"  // </card J>
-          "("  // <card Q>
-            "((()())())"  // pbp pbb pp
-            "(()())"      // bp bb
-          ")"  // </card Q>
-          "("  // <card K>
-            "((()())())"  // pbp pbb pp
-            "(()())"      // bp bb
-          ")"  // </card K>
-        ")"  // </distributing card>
-      ")";  // </dummy root node>
+      "("  // <dummy>
+        "("  // 1st is getting a card
+          "("  // 2nd is getting card
+            "["  // 1st acts
+              "("  // 1st passed
+                "("  // 2nd acts
+                  "["  // 1st acts (2nd bet)
+                      "({}{})({}{})"
+                  "]"
+                  // 2nd passed too
+                  "{}"
+                  "{}"
+                ")"
+              ")"
+              "("  // 1st bet
+                "("  // 2nd acts
+                  "{}{}{}{}"  // 2nd bet too or passed.
+                ")"
+              ")"
+            "]"
+          ")"
+          // Repeat the same for the two other cards.
+          "([(([({}{})({}{})]{}{}))(({}{}{}{}))])"
+          "([(([({}{})({}{})]{}{}))(({}{}{}{}))])"
+        ")"
+      ")";  // </dummy>
     SPIEL_CHECK_EQ(RootCertificate("kuhn_poker", 0), expected_certificate);
+  }
+  {
+    std::string expected_certificate =
+      "((("  // Dummy, distribute cards.
+        "("  // 1st acts
+          // 1st passed
+          "["
+            "(({}{}{}{}))"  // 2nd bets.
+            "({}{})"  // 2nd passes.
+          "]"
+          // 1st bet
+          "[({}{})({}{})]"
+        ")"
+        // Repeat the same for the two other cards.
+        "([(({}{}{}{}))({}{})][({}{})({}{})])"
+        "([(({}{}{}{}))({}{})][({}{})({}{})])"
+      ")))";
     SPIEL_CHECK_EQ(RootCertificate("kuhn_poker", 1), expected_certificate);
   }
   {
     std::string expected_certificate =
-        "(("
-          "()"  // draw 1,1
-          "()"  // lose 1,2
-          "()"  // win  2,1
-          "()"  // draw 2,2
-        "))";
+      "(["
+        "({})"  // draw 1,1
+        "({})"  // lose 1,2
+        "({})"  // win  2,1
+        "({})"  // draw 2,2
+      "])";
     std::string iigs2 = "goofspiel("
                           "num_cards=2,"
                           "imp_info=True,"
@@ -119,54 +160,60 @@ void TestRootCertificates() {
   }
   {
     std::string expected_certificate =
-        "(("
-          "()"  // No additional observation about the terminal.
-        "))";
+      "(["
+        "({})"  // HH
+        "({})"  // HT
+        "({})"  // TH
+        "({})"  // TT
+      "])";
     SPIEL_CHECK_EQ(RootCertificate("matrix_mp", 0), expected_certificate);
     SPIEL_CHECK_EQ(RootCertificate("matrix_mp", 1), expected_certificate);
-    // FIXME: I think players should get additional observations about
-    //        the terminals in NFGs -- they should get a tensor which indicates
-    //        which action they have selected. So in Matching Pennies,
-    //        the certificate should be (( () () )).
-    //        If you think it should not be so, feel free to remove this
-    //        comment.
   }
 }
 
 void TestCertificatesFromStartHistories() {
   {
     std::string expected_certificate =
-        "("  // <dummy root node>
-          "("  // <card J>
-            "((()())())"  // pbp pbb pp
-            "(()())"      // bp bb
-          ")"  // </card J>
-          "("  // <card K>
-            "((()())())"  // pbp pbb pp
-            "(()())"      // bp bb
-          ")"  // </card K>
-        ")";  // </dummy root node>
+      "("
+        "([(([({}{})({}{})]{}{}))(({}{}{}{}))])"
+        "([(([({}{})({}{})]{}{}))(({}{}{}{}))])"
+      ")";
     SPIEL_CHECK_EQ(
-        CertificateFromStartHistories("kuhn_poker", 0, {{0}, {2}}),
-        expected_certificate);
-    SPIEL_CHECK_EQ(
-        CertificateFromStartHistories("kuhn_poker", 1, {{1, 0}, {1, 2}}),
+        CertificateFromStartHistories("kuhn_poker", 0,
+            {{0}, {2}}, {1/3., 1/3.}),
         expected_certificate);
   }
   {
     std::string expected_certificate =
-        "("  // <dummy root node>
-          "("  // <card J>
-            "((()())())"  // pbp pbb pp
-            "(()())"      // bp bb
-          ")"  // </card J>
-          "(()())"  // card K, pb
-        ")";  // </dummy root node>
+      "("
+        "([(({}{}))({})][({})({})])"
+        "([(({}{}))({})][({})({})])"
+      ")";
     SPIEL_CHECK_EQ(
-        CertificateFromStartHistories("kuhn_poker", 0, {{0}, {2, 1, 0, 1}}),
+        CertificateFromStartHistories("kuhn_poker", 1,
+            {{1, 0}, {1, 2}}, {1/6., 1/6.}),
         expected_certificate);
+  }
+  {
+    std::string expected_certificate =
+      "("
+        "([(([({}{})({}{})]{}{}))(({}{}{}{}))])"
+        "[({})({})]"
+      ")";
     SPIEL_CHECK_EQ(
-        CertificateFromStartHistories("kuhn_poker", 1, {{1, 0}, {1, 2, 0, 1}}),
+        CertificateFromStartHistories("kuhn_poker", 0,
+            {{0}, {2, 1, 0, 1}}, {1/3., 1/6.}),
+        expected_certificate);
+  }
+  {
+    std::string expected_certificate =
+      "("
+        "([(({}{}))({})][({})({})])"
+        "({}{})"
+      ")";
+    SPIEL_CHECK_EQ(
+        CertificateFromStartHistories("kuhn_poker", 1,
+            {{1, 0}, {1, 2, 0, 1}}, {1/6., 1/6.}),
         expected_certificate);
   }
 }
