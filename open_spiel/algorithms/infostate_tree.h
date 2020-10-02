@@ -62,13 +62,6 @@ enum InfostateNodeType {
   kTerminalNode
 };
 
-InfostateNodeType GetInfostateNodeType(State* state, Player player) {
-  if (!state) return kObservationNode;  // i.e. dummy root node.
-  if (state->IsTerminal()) return kTerminalNode;
-  if (state->IsPlayerActing(player)) return kDecisionNode;
-  return kObservationNode;
-}
-
 template<class Contents>
 class InfostateNode {
  public:
@@ -79,7 +72,10 @@ class InfostateNode {
         type_(type),
         // Copy the tensor.
         tensor_(tensor.begin(), tensor.end()),
-        terminal_value_(terminal_value) {}
+        terminal_value_(terminal_value) {
+    if (type == kDecisionNode)
+      legal_actions_ = originating_state->LegalActions();
+  }
 
   InfostateNode* Parent() const { return parent_; }
   const InfostateNodeType& Type() const { return type_; }
@@ -87,6 +83,10 @@ class InfostateNode {
   double TerminalValue() {
     SPIEL_CHECK_EQ(type_, kTerminalNode);
     return terminal_value_;
+  }
+  absl::Span<const Action> LegalActions() const {
+    SPIEL_CHECK_EQ(type_, kDecisionNode);
+    return absl::MakeSpan(legal_actions_);
   }
   InfostateNode* AddChild(std::unique_ptr<InfostateNode> child) {
     children_.push_back(std::move(child));
@@ -124,6 +124,7 @@ class InfostateNode {
   const InfostateNodeType type_;
   const std::vector<float> tensor_;
   const double terminal_value_;
+  std::vector<Action> legal_actions_;
   Contents content_;
   std::vector<std::unique_ptr<InfostateNode>> children_;
 };
@@ -331,7 +332,15 @@ template<> CFRNode::InfostateNode(
   terminal_value_(terminal_value),
   content_(originating_state && originating_state->IsPlayerActing(player)
     ? CFRInfoStateValues(originating_state->LegalActions(player))
-    : CFRInfoStateValues()) {}
+    : CFRInfoStateValues()) {
+    // Do not save legal actions, as they are already saved
+    // within CFRInfoStateValues. Instead, change the LegalActions
+    // implementation to refer to these values directly.
+  }
+template<> absl::Span<const Action> CFRNode::LegalActions() const {
+  SPIEL_CHECK_EQ(type_, kDecisionNode);
+  return content_.legal_actions;
+}
 
 }  // namespace algorithms
 }  // namespace open_spiel
