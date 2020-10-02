@@ -65,11 +65,11 @@ enum InfostateNodeType {
 template<class Contents>
 class InfostateNode {
  public:
-  InfostateNode(InfostateNode* parent, InfostateNodeType type,
-                absl::Span<float> tensor, double terminal_value,
-                const State* originating_state, Player infostate_tree_player)
-      : parent_(parent),
-        type_(type),
+  InfostateNode(InfostateNode* parent, int incoming_index,
+                InfostateNodeType type, absl::Span<float> tensor,
+                double terminal_value, const State* originating_state,
+                Player infostate_tree_player)
+      : parent_(parent), incoming_index_(incoming_index), type_(type),
         // Copy the tensor.
         tensor_(tensor.begin(), tensor.end()),
         terminal_value_(terminal_value) {
@@ -100,6 +100,18 @@ class InfostateNode {
   }
   InfostateNode* ChildAt(int i) { return children_.at(i).get(); }
 
+  long NumChildren() const { return children_.size(); }
+
+  std::vector<int> GetSequence() const {
+    std::vector<int> sequence;
+    InfostateNode* parent = parent_;
+    while(parent) {
+      sequence.push_back(incoming_index_);
+      parent = parent->parent_;
+    }
+    return sequence;
+  }
+
   // Provide a convenient way to access the Content
   // without calling some getter.
   Contents* operator->() { return &content_; }
@@ -121,6 +133,7 @@ class InfostateNode {
 
  private:
   const InfostateNode* parent_;
+  const int incoming_index_;
   const InfostateNodeType type_;
   const std::vector<float> tensor_;
   const double terminal_value_;
@@ -144,15 +157,15 @@ class InfostateTree {
       absl::Span<const State*> start_states,
       absl::Span<const double> chance_reach_probs,
       std::shared_ptr<Observer> infostate_observer, Player acting_player,
-      int max_depth_limit = 1000) :
-      player_(acting_player),
-      infostate_observer_(std::move(infostate_observer)),
-      // Root is just a dummy node, and has a tensor full of zeros.
-      // It cannot be retrieved via Get* methods, only by using the Root()
-      // method.
-      root_(/*parent=*/nullptr, /*type=*/kObservationNode,
-            /*tensor=*/{}, /*terminal_value=*/0,
-            /*originating_state=*/nullptr, /*acting_player=*/player_),
+      int max_depth_limit = 1000)
+      : player_(acting_player),
+        infostate_observer_(std::move(infostate_observer)),
+        // Root is just a dummy node, and has a tensor full of zeros.
+        // It cannot be retrieved via Get* methods, only by using the Root()
+        // method.
+        root_(/*parent=*/nullptr, /*incoming_index=*/0,
+              /*type=*/kObservationNode, /*tensor=*/{}, /*terminal_value=*/0,
+              /*originating_state=*/nullptr, /*acting_player=*/player_),
       observation_(std::move(CreateObservation(*start_states.at(0)))) {
     SPIEL_CHECK_EQ(start_states.size(), chance_reach_probs.size());
 
@@ -173,7 +186,7 @@ class InfostateTree {
                 int max_depth_limit = 1000)
     : player_(acting_player),
       infostate_observer_(game.MakeObserver(kInfoStateObsType, {})),
-      root_(/*parent=*/nullptr, /*type=*/kObservationNode,
+      root_(/*parent=*/nullptr, /*incoming_index=*/0, /*type=*/kObservationNode,
             /*tensor=*/{}, /*terminal_value=*/0,
             /*originating_state=*/nullptr, /*acting_player=*/player_),
       observation_(std::move(CreateObservation(game))) {
@@ -230,8 +243,8 @@ class InfostateTree {
     if (state.IsTerminal()) {
       double terminal_value = state.Returns()[player_] * chance_reach_prob;
       parent->AddChild(std::make_unique<Node>(
-          parent, kTerminalNode, observation_.Tensor(), terminal_value,
-          &state, player_));
+          parent, parent->NumChildren(), kTerminalNode, observation_.Tensor(),
+          terminal_value, &state, player_));
       return;
     }
 
@@ -257,9 +270,8 @@ class InfostateTree {
         }
       } else {
         decision_node = parent->AddChild(std::make_unique<Node>(
-            parent, kDecisionNode,
-            observation_.Tensor(), 0,
-            &state, player_));
+            parent, parent->NumChildren(), kDecisionNode,
+            observation_.Tensor(), 0, &state, player_));
         lookup_table_.insert({observation_.Compress(), decision_node});
 
         if (state.MoveNumber() >= move_limit)  // Do not build deeper.
@@ -274,9 +286,8 @@ class InfostateTree {
           observation_.SetFrom(*child, player_);
           Node* observation_node =
               decision_node->AddChild(std::make_unique<Node>(
-                  parent, kObservationNode,
-                  observation_.Tensor(), 0,
-                  child.get(), player_));
+                  parent, parent->NumChildren(), kObservationNode,
+                  observation_.Tensor(), 0, child.get(), player_));
           RecursivelyBuildTree(observation_node, *child,
                                move_limit, chance_reach_prob);
         }
@@ -290,9 +301,8 @@ class InfostateTree {
     Node* observation_node = parent->GetChild(observation_.Tensor());
     if (!observation_node) {
       observation_node = parent->AddChild(std::make_unique<Node>(
-          parent, kObservationNode,
-          observation_.Tensor(), 0,
-          &state, player_));
+          parent, parent->NumChildren(), kObservationNode,
+          observation_.Tensor(), 0, &state, player_));
     }
     SPIEL_DCHECK_EQ(observation_node->Type(), kObservationNode);
 
@@ -323,11 +333,10 @@ using CFRNode = InfostateNode</*Contents=*/CFRInfoStateValues>;
 // Specialize CFRNode, because we construct the content
 // of CFRInfoStateValues differently for decision nodes.
 template<> CFRNode::InfostateNode(
-    CFRNode* parent, InfostateNodeType type,
+    CFRNode* parent, int incoming_index, InfostateNodeType type,
     absl::Span<float> tensor, double terminal_value,
     const State* originating_state, Player player) :
-  parent_(parent),
-  type_(type),
+  parent_(parent), incoming_index_(incoming_index), type_(type),
   tensor_(tensor.begin(), tensor.end()),
   terminal_value_(terminal_value),
   content_(originating_state && type == kDecisionNode
