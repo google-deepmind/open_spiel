@@ -74,7 +74,7 @@ class InfostateNode {
         tensor_(tensor.begin(), tensor.end()),
         terminal_value_(terminal_value) {
     if (type == kDecisionNode)
-      legal_actions_ = originating_state->LegalActions();
+      legal_actions_ = originating_state->LegalActions(infostate_tree_player);
   }
 
   InfostateNode* Parent() const { return parent_; }
@@ -192,6 +192,7 @@ class InfostateTree {
     return it == lookup_table_.end() ? nullptr : it->second;
   }
   Node* GetByState(const State& state) {
+    SPIEL_CHECK_TRUE(state.IsPlayerActing(player_));
     observation_.SetFrom(state, player_);
     std::string compressed = observation_.Compress();
     return GetByCompressed(compressed);
@@ -202,7 +203,8 @@ class InfostateTree {
   const std::shared_ptr<Observer> infostate_observer_;
   Node root_;
   Observation observation_;
-  // Store compressed observations for fast lookup in the lookup table.
+  // Store compressed observations for fast lookup of decision nodes
+  // in the lookup table.
   std::unordered_map<std::string, Node*> lookup_table_;
 
   // Create observation here, so that we can run a number of checks,
@@ -258,17 +260,15 @@ class InfostateTree {
             parent, kDecisionNode,
             observation_.Tensor(), 0,
             &state, player_));
-
-        std::string compressed = observation_.Compress();
-        lookup_table_.insert({std::move(compressed), decision_node});
+        lookup_table_.insert({observation_.Compress(), decision_node});
 
         if (state.MoveNumber() >= move_limit)  // Do not build deeper.
           return;
 
         // Build observation nodes right after away after the decision node.
         // This is because the player might be acting multiple times in a row,
-        // and each time it might get some observations that branch the infostate
-        // tree.
+        // and each time it might get some observations that branch the
+        // infostate tree.
         for (Action a : state.LegalActions()) {
           std::unique_ptr<State> child = state.Child(a);
           observation_.SetFrom(*child, player_);
@@ -330,12 +330,15 @@ template<> CFRNode::InfostateNode(
   type_(type),
   tensor_(tensor.begin(), tensor.end()),
   terminal_value_(terminal_value),
-  content_(originating_state && originating_state->IsPlayerActing(player)
+  content_(originating_state && type == kDecisionNode
     ? CFRInfoStateValues(originating_state->LegalActions(player))
     : CFRInfoStateValues()) {
     // Do not save legal actions, as they are already saved
     // within CFRInfoStateValues. Instead, change the LegalActions
     // implementation to refer to these values directly.
+    SPIEL_DCHECK_TRUE(
+       !(originating_state && type == kDecisionNode)
+       || originating_state->IsPlayerActing(player));
   }
 template<> absl::Span<const Action> CFRNode::LegalActions() const {
   SPIEL_CHECK_EQ(type_, kDecisionNode);
