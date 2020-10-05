@@ -119,7 +119,7 @@ fi
 
 # This GitHub repository contains Nathan Sturtevant's state of the art
 # Hearts program xinxin.
-DIR="open_spiel/games/hearts/hearts"
+DIR="open_spiel/bots/xinxin/hearts"
 if [[ ${BUILD_WITH_XINXIN:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; then
   git clone -b 'master' --single-branch --depth 1  https://github.com/nathansttt/hearts.git ${DIR}
 fi

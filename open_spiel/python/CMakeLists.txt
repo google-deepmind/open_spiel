@@ -45,8 +45,8 @@ if (BUILD_WITH_PUBLIC_STATES)
 endif()
 if (BUILD_WITH_XINXIN)
   set (PYTHON_BINDINGS ${PYTHON_BINDINGS}
-      ../games/hearts/xinxin_pybind11.h
-      ../games/hearts/xinxin_pybind11.cc
+      ../bots/xinxin/xinxin_pybind11.h
+      ../bots/xinxin/xinxin_pybind11.cc
       )
 endif()
 
@@ -74,7 +74,7 @@ if (BUILD_WITH_PUBLIC_STATES)
     ../integration_tests/public_states_api_test.py)
 endif()
 if (BUILD_WITH_XINXIN)
-  set(PYTHON_TESTS ${PYTHON_TESTS} ../games/hearts/xinxin_bot_test.py)
+  set(PYTHON_TESTS ${PYTHON_TESTS} ../bots/xinxin/xinxin_bot_test.py)
 endif()
 if (BUILD_WITH_GAMUT)
   set(PYTHON_TESTS ${PYTHON_TESTS} ../games/gamut/gamut_test.py)

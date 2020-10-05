@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "open_spiel/games/hearts/xinxin_bot.h"
+#include "open_spiel/bots/xinxin/xinxin_bot.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
