@@ -168,7 +168,7 @@ class InfostateTree {
         // Root is just a dummy node, and has a tensor full of zeros.
         // It cannot be retrieved via Get* methods, only by using the Root()
         // method.
-        root_(/*parent=*/nullptr, /*incoming_index=*/0,
+        root_(/*tree=*/this, /*parent=*/nullptr, /*incoming_index=*/0,
               /*type=*/kObservationNode, /*tensor=*/{}, /*terminal_value=*/0,
               /*originating_state=*/nullptr, /*acting_player=*/player_),
       observation_(std::move(CreateObservation(*start_states.at(0)))) {
@@ -191,8 +191,8 @@ class InfostateTree {
                 int max_depth_limit = 1000)
     : player_(acting_player),
       infostate_observer_(game.MakeObserver(kInfoStateObsType, {})),
-      root_(/*parent=*/nullptr, /*incoming_index=*/0, /*type=*/kObservationNode,
-            /*tensor=*/{}, /*terminal_value=*/0,
+      root_(/*tree=*/this, /*parent=*/nullptr, /*incoming_index=*/0,
+            /*type=*/kObservationNode, /*tensor=*/{}, /*terminal_value=*/0,
             /*originating_state=*/nullptr, /*acting_player=*/player_),
       observation_(std::move(CreateObservation(game))) {
     std::unique_ptr<State> root_state = game.NewInitialState();
@@ -240,6 +240,15 @@ class InfostateTree {
     return Observation(game, infostate_observer_);
   }
 
+  // Call this function whenever we create a new node for the tree.
+  std::unique_ptr<Node> MakeNode(
+      Node* parent, InfostateNodeType type, absl::Span<float> tensor,
+      double terminal_value, const State* originating_state) {
+    return std::make_unique<Node>(
+        this, parent, parent->NumChildren(), type,
+        tensor, terminal_value, originating_state, player_);
+  }
+
   void RecursivelyBuildTree(Node* parent, const State& state,
                             int move_limit, double chance_reach_prob) {
     observation_.SetFrom(state, player_);
@@ -247,9 +256,8 @@ class InfostateTree {
     // Create terminal nodes.
     if (state.IsTerminal()) {
       double terminal_value = state.Returns()[player_] * chance_reach_prob;
-      parent->AddChild(std::make_unique<Node>(
-          parent, parent->NumChildren(), kTerminalNode, observation_.Tensor(),
-          terminal_value, &state, player_));
+      parent->AddChild(MakeNode(parent, kTerminalNode, observation_.Tensor(),
+                                terminal_value, &state));
       return;
     }
 
@@ -274,9 +282,8 @@ class InfostateTree {
                                move_limit, chance_reach_prob);
         }
       } else {
-        decision_node = parent->AddChild(std::make_unique<Node>(
-            parent, parent->NumChildren(), kDecisionNode,
-            observation_.Tensor(), 0, &state, player_));
+        decision_node = parent->AddChild(MakeNode(
+            parent, kDecisionNode, observation_.Tensor(), 0, &state));
         lookup_table_.insert({observation_.Compress(), decision_node});
 
         if (state.MoveNumber() >= move_limit)  // Do not build deeper.
@@ -289,10 +296,9 @@ class InfostateTree {
         for (Action a : state.LegalActions()) {
           std::unique_ptr<State> child = state.Child(a);
           observation_.SetFrom(*child, player_);
-          Node* observation_node =
-              decision_node->AddChild(std::make_unique<Node>(
-                  parent, parent->NumChildren(), kObservationNode,
-                  observation_.Tensor(), 0, child.get(), player_));
+          Node* observation_node = decision_node->AddChild(MakeNode(
+              parent, kObservationNode, observation_.Tensor(),
+              /*terminal_value=*/0, child.get()));
           RecursivelyBuildTree(observation_node, *child,
                                move_limit, chance_reach_prob);
         }
@@ -305,9 +311,8 @@ class InfostateTree {
                           || !state.IsPlayerActing(player_));
     Node* observation_node = parent->GetChild(observation_.Tensor());
     if (!observation_node) {
-      observation_node = parent->AddChild(std::make_unique<Node>(
-          parent, parent->NumChildren(), kObservationNode,
-          observation_.Tensor(), 0, &state, player_));
+      observation_node = parent->AddChild(MakeNode(
+          parent, kObservationNode, observation_.Tensor(), 0, &state));
     }
     SPIEL_DCHECK_EQ(observation_node->Type(), kObservationNode);
 

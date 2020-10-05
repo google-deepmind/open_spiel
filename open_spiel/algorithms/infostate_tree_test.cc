@@ -41,8 +41,10 @@ std::string ComputeCertificate(CFRNode& node) {
     SPIEL_CHECK_EQ(node->current_policy.size(), 0);
   }
 
-  if (node.Type() == kTerminalNode)
+  if (node.Type() == kTerminalNode) {
+    SPIEL_CHECK_EQ(node.NumChildren(), 0);
     return "{}";
+  }
 
   std::vector<std::string> certificates;
   for (CFRNode& child : node) {
