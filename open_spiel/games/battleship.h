@@ -80,8 +80,40 @@
 // Note that currently no partial credit is awarded to a player that hit but did
 // not sink a ship.
 //
+// Game size
+// ---------
 //
-// Parameters
+// The number of states / information sets / sequences in Battleship is
+// exponential in the number of cells on the boards, as well as in the number of
+// turns.
+//
+// For example, on a 10x10 board, each player has 100^{number of turns} possible
+// actions. On the game with default parameters (see below), the number of
+// states is in the order of (at least) 10^200.
+//
+//
+// Even apparently small games are very complex and exhibit a large number of
+// states. For example, using allow_repeated_shots = False:
+//
+// +-------+-------+---------+-----------------+----------------+----------+
+// |  Grid | Shots |   Ship  |  Num sequences  |  Num infosets  | Terminal |
+// |       |       | lengths |   pl 1 |   pl 2 |  pl 1 |   pl 2 |  states  |
+// +-------+-------+---------+--------+--------+-------+--------+----------+
+// | 2 x 2 |     2 |     [1] |    165 |    341 |    53 |    109 |     1072 |
+// | 2 x 2 |     3 |     [1] |    741 |    917 |   341 |    397 |     2224 |
+// | 2 x 2 |     2 |   [1;2] |   1197 |   3597 |   397 |   1189 |     9216 |
+// | 2 x 2 |     3 |   [1;2] |   6541 |  22029 |  6541 |  10405 |    32256 |
+// +-------+-------+---------+--------+--------+-------+--------+----------+
+// | 2 x 3 |     2 |     [1] |    943 |   3787 |   187 |    751 |    19116 |
+// | 2 x 3 |     3 |     [1] |  15343 |  46987 |  3787 |  11551 |   191916 |
+// | 2 x 3 |     4 |     [1] | 144943 | 306187 | 46987 |  97951 |   969516 |
+// +-------+-------+---------+--------+--------+-------+--------+----------+
+//
+//
+//
+// Game parameters
+// ===============
+//
 //     "board_width"           int     Number of columns of the game board for
 //                                     each player            (default = 10)
 //     "board_height"          int     Number of rows of the game board for
