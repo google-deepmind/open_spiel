@@ -202,8 +202,7 @@ std::string BattleshipState::ToString() const {
   absl::StrAppend(&state_str, "\nPlayer 1's board:\n");
   absl::StrAppend(&state_str, OwnBoardString(Player{1}));
   // NOTE: It is not necessary to also include the boards of the players'
-  // shots,
-  //     since those can be inferred from the two ship boards.
+  //     shots, since those can be inferred from the two ship boards.
 
   return state_str;
 }
@@ -689,8 +688,6 @@ ShipPlacement BattleshipState::DeserializeShipPlacementAction(
   const Player player = CurrentPlayer();
   const Ship ship = NextShipToPlace(player);
 
-  // FIXME(gfarina): Here we are exploiting the detail that Shot == Cell as
-  //     a type. Perhaps it would be better to avoid this trick.
   ShipPlacement::Direction direction;
   Cell tl_corner;
   if (action >= conf.board_width * conf.board_height) {
