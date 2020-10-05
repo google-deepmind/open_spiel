@@ -152,6 +152,22 @@ class InfostateTree {
   using Node = InfostateNode<NodeContents>;
 
  public:
+
+  // Creates an infostate tree for a player based on initial state of a game
+  // up to some depth limit.
+  InfostateTree(const Game& game, Player acting_player,
+                int max_depth_limit = 1000)
+      : player_(acting_player),
+        infostate_observer_(game.MakeObserver(kInfoStateObsType, {})),
+        root_(/*tree=*/this, /*parent=*/nullptr, /*incoming_index=*/0,
+              /*type=*/kObservationNode, /*tensor=*/{}, /*terminal_value=*/0,
+              /*originating_state=*/nullptr, /*acting_player=*/player_),
+        observation_(std::move(CreateObservation(game))) {
+    std::unique_ptr<State> root_state = game.NewInitialState();
+    RecursivelyBuildTree(&root_, *root_state,
+                         max_depth_limit, 1.);
+  }
+
   // Create an infostate tree for a player based on some start states,
   // using an infostate observer to provide tensor observations,
   // up to some depth limit from the deepest start state.
@@ -185,19 +201,6 @@ class InfostateTree {
           start_max_depth + max_depth_limit,
           chance_reach_probs[i]);
     }
-  }
-
-  InfostateTree(const Game& game, Player acting_player,
-                int max_depth_limit = 1000)
-    : player_(acting_player),
-      infostate_observer_(game.MakeObserver(kInfoStateObsType, {})),
-      root_(/*tree=*/this, /*parent=*/nullptr, /*incoming_index=*/0,
-            /*type=*/kObservationNode, /*tensor=*/{}, /*terminal_value=*/0,
-            /*originating_state=*/nullptr, /*acting_player=*/player_),
-      observation_(std::move(CreateObservation(game))) {
-    std::unique_ptr<State> root_state = game.NewInitialState();
-    RecursivelyBuildTree(&root_, *root_state,
-                         max_depth_limit, 1.);
   }
 
   Node* Root() { return &root_; }
@@ -266,8 +269,9 @@ class InfostateTree {
       Node* decision_node = parent->GetChild(observation_.Tensor());
 
       if (decision_node) {
-        // The decision node has been already constructed along with
-        // its observation children -- only go deeper recursively.
+        // The decision node has been already constructed along with children
+        // for each action: these are observation nodes.
+        // Fetches the observation child and goes deeper recursively.
         SPIEL_DCHECK_EQ(decision_node->Type(), kDecisionNode);
 
         if (state.MoveNumber() >= move_limit)  // Do not build deeper.
@@ -289,10 +293,10 @@ class InfostateTree {
         if (state.MoveNumber() >= move_limit)  // Do not build deeper.
           return;
 
-        // Build observation nodes right after away after the decision node.
-        // This is because the player might be acting multiple times in a row,
-        // and each time it might get some observations that branch the
-        // infostate tree.
+        // Build observation nodes right away after the decision node.
+        // This is because the player might be acting multiple times in a row:
+        // each time it might get some observations that branch the infostate
+        // tree.
         for (Action a : state.LegalActions()) {
           std::unique_ptr<State> child = state.Child(a);
           observation_.SetFrom(*child, player_);
