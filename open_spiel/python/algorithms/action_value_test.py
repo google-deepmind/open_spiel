@@ -29,12 +29,14 @@ import pyspiel
 
 class ActionValuesTest(parameterized.TestCase):
 
-  @parameterized.parameters(["kuhn_poker", "leduc_poker"])
-  def test_runs_with_uniform_policies(self, game_name):
-    game = pyspiel.load_game(game_name)
+  @parameterized.parameters([["kuhn_poker", 2], ["kuhn_poker", 3],
+                             ["leduc_poker", 2]])
+  def test_runs_with_uniform_policies(self, game_name, num_players):
+    game = pyspiel.load_game(game_name, {"players": pyspiel.GameParameter(
+        num_players)})
     calc = action_value.TreeWalkCalculator(game)
     uniform_policy = policy.TabularPolicy(game)
-    calc.compute_all_states_action_values([uniform_policy, uniform_policy])
+    calc.compute_all_states_action_values([uniform_policy] * num_players)
 
   def test_kuhn_poker_always_pass_p0(self):
     game = pyspiel.load_game("kuhn_poker")
