@@ -33,10 +33,9 @@
 // Ship placement phase
 // --------------------
 //
-// During the ship placement phase, each player
-// secretly arranges their ships on their grid. For the purposes of this
-// generator, we assume that the players place one ship at a time, without
-// revealing their position.
+// During the ship placement phase, each player secretly arranges their ships
+// on their grid. The players alternate placing one ship at a time, without
+// revealing the ships' positions.
 //
 // Each ship occupies a number of consecutive squares on the grid, arranged
 // either horizontally or vertically. The number of squares for each ship is
@@ -137,13 +136,13 @@
 namespace open_spiel {
 namespace battleship {
 
-constexpr int kDefaultBoardWidth = 10;
-constexpr int kDefaultBoardHeight = 10;
-constexpr const char* kDefaultShipSizes = "[2;3;3;4;5]";
-constexpr const char* kDefaultShipValues = "[1.0;1.0;1.0;1.0;1.0]";
-constexpr int kDefaultNumShots = 50;
-constexpr bool kDefaultAllowRepeatedShots = true;
-constexpr double kDefaultLossMultiplier = 1.0;
+inline constexpr int kDefaultBoardWidth = 10;
+inline constexpr int kDefaultBoardHeight = 10;
+inline constexpr const char* kDefaultShipSizes = "[2;3;3;4;5]";
+inline constexpr const char* kDefaultShipValues = "[1.0;1.0;1.0;1.0;1.0]";
+inline constexpr int kDefaultNumShots = 50;
+inline constexpr bool kDefaultAllowRepeatedShots = true;
+inline constexpr double kDefaultLossMultiplier = 1.0;
 
 class BattleshipGame;
 class BattleshipState final : public State {

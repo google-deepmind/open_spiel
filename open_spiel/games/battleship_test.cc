@@ -33,7 +33,7 @@ namespace testing = open_spiel::testing;
 void BasicBattleshipTest() {
   // Some basic tests on a small 2x2 instance.
   for (int num_shots = 1; num_shots <= 3; ++num_shots) {
-    const auto game =
+    const std::shared_ptr<const Game> game =
         LoadGame("battleship", {{"board_width", GameParameter(2)},
                                 {"board_height", GameParameter(2)},
                                 {"ship_sizes", GameParameter("[1;2]")},
@@ -48,7 +48,7 @@ void BasicBattleshipTest() {
 
 void RandomTestsOnLargeBoards() {
   // Allow repeated shots.
-  auto game =
+  std::shared_ptr<const Game> game =
       LoadGame("battleship", {{"board_width", GameParameter(10)},
                               {"board_height", GameParameter(10)},
                               {"ship_sizes", GameParameter("[2;3;3;4;5]")},
@@ -74,7 +74,8 @@ void RandomTestsOnLargeBoards() {
 void TestZeroSumTrait() {
   // We check that when the loss multiplier is 1.0, the game is registered as
   // zero sum.
-  auto game = LoadGame("battleship", {{"loss_multiplier", GameParameter(2.0)}});
+  std::shared_ptr<const Game> game =
+      LoadGame("battleship", {{"loss_multiplier", GameParameter(2.0)}});
   SPIEL_CHECK_EQ(game->GetType().utility, GameType::Utility::kGeneralSum);
 
   game = LoadGame("battleship", {{"loss_multiplier", GameParameter(1.0)}});
@@ -85,15 +86,15 @@ void TestTightLayout1() {
   // We construct a 4x1 grid with 2 ships of length 2 each. We want to make sure
   // that the the first ship is not placed at the center of the board.
 
-  const auto game =
+  const std::shared_ptr<const Game> game =
       LoadGame("battleship", {{"board_width", GameParameter(4)},
                               {"board_height", GameParameter(1)},
                               {"ship_sizes", GameParameter("[2;2]")},
                               {"ship_values", GameParameter("[1;1]")}});
-  auto state = game->NewInitialState();
+  std::unique_ptr<State> state = game->NewInitialState();
   SPIEL_CHECK_EQ(state->CurrentPlayer(), Player{0});
   {
-    const auto actions = state->LegalActions();
+    const std::vector<Action> actions = state->LegalActions();
     SPIEL_CHECK_EQ(actions, std::vector<Action>({0, 2}));
     SPIEL_CHECK_EQ(state->ActionToString(actions[0]), "h_0_0");
     SPIEL_CHECK_EQ(state->ActionToString(actions[1]), "h_0_2");
@@ -106,7 +107,7 @@ void TestTightLayout1() {
   // We repeat the check for Player 1.
   SPIEL_CHECK_EQ(state->CurrentPlayer(), Player{1});
   {
-    const auto actions = state->LegalActions();
+    const std::vector<Action> actions = state->LegalActions();
     SPIEL_CHECK_EQ(actions, std::vector<Action>({0, 2}));
     SPIEL_CHECK_EQ(state->ActionToString(actions[0]), "h_0_0");
     SPIEL_CHECK_EQ(state->ActionToString(actions[1]), "h_0_2");
@@ -119,7 +120,7 @@ void TestTightLayout1() {
   // place the second ship to the right.
   SPIEL_CHECK_EQ(state->CurrentPlayer(), Player{0});
   {
-    const auto actions = state->LegalActions();
+    const std::vector<Action> actions = state->LegalActions();
     SPIEL_CHECK_EQ(actions, std::vector<Action>({2}));
     SPIEL_CHECK_EQ(state->ActionToString(actions[0]), "h_0_2");
   }
@@ -129,7 +130,7 @@ void TestTightLayout1() {
   // left.
   SPIEL_CHECK_EQ(state->CurrentPlayer(), Player{1});
   {
-    const auto actions = state->LegalActions();
+    const std::vector<Action> actions = state->LegalActions();
     SPIEL_CHECK_EQ(actions, std::vector<Action>({0}));
     SPIEL_CHECK_EQ(state->ActionToString(actions[0]), "h_0_0");
   }
@@ -143,15 +144,15 @@ void TestTightLayout2() {
   // want to make sure that the the first ship is not placed anywhere
   // vertically.
 
-  const auto game =
+  const std::shared_ptr<const Game> game =
       LoadGame("battleship", {{"board_width", GameParameter(3)},
                               {"board_height", GameParameter(2)},
                               {"ship_sizes", GameParameter("[2;3]")},
                               {"ship_values", GameParameter("[1;1]")}});
-  auto state = game->NewInitialState();
+  std::unique_ptr<State> state = game->NewInitialState();
   SPIEL_CHECK_EQ(state->CurrentPlayer(), Player{0});
   {
-    const auto actions = state->LegalActions();
+    const std::vector<Action> actions = state->LegalActions();
     SPIEL_CHECK_EQ(actions, std::vector<Action>({0, 1, 3, 4}));
     SPIEL_CHECK_EQ(state->ActionToString(actions[0]), "h_0_0");
     SPIEL_CHECK_EQ(state->ActionToString(actions[1]), "h_0_1");
@@ -166,7 +167,7 @@ void TestTightLayout2() {
   // We repeat the check for Player 1.
   SPIEL_CHECK_EQ(state->CurrentPlayer(), Player{1});
   {
-    const auto actions = state->LegalActions();
+    const std::vector<Action> actions = state->LegalActions();
     SPIEL_CHECK_EQ(actions, std::vector<Action>({0, 1, 3, 4}));
     SPIEL_CHECK_EQ(state->ActionToString(actions[0]), "h_0_0");
     SPIEL_CHECK_EQ(state->ActionToString(actions[1]), "h_0_1");
@@ -181,7 +182,7 @@ void TestTightLayout2() {
   // place the second ship on the second row.
   SPIEL_CHECK_EQ(state->CurrentPlayer(), Player{0});
   {
-    const auto actions = state->LegalActions();
+    const std::vector<Action> actions = state->LegalActions();
     SPIEL_CHECK_EQ(actions, std::vector<Action>({3}));
     SPIEL_CHECK_EQ(state->ActionToString(actions[0]), "h_1_0");
   }
@@ -191,7 +192,7 @@ void TestTightLayout2() {
   // on the first row.
   SPIEL_CHECK_EQ(state->CurrentPlayer(), Player{1});
   {
-    const auto actions = state->LegalActions();
+    const std::vector<Action> actions = state->LegalActions();
     SPIEL_CHECK_EQ(actions, std::vector<Action>({0}));
     SPIEL_CHECK_EQ(state->ActionToString(actions[0]), "h_0_0");
   }
@@ -214,7 +215,7 @@ void TestNashEquilibriumInSmallBoard() {
   // [1]:
   // https://papers.nips.cc/paper/9122-correlation-in-extensive-form-games-saddle-point-formulation-and-benchmarks.pdf#page=7
 
-  const auto game =
+  const std::shared_ptr<const Game> game =
       LoadGame("battleship", {{"board_width", GameParameter(3)},
                               {"board_height", GameParameter(1)},
                               {"ship_sizes", GameParameter("[1]")},
