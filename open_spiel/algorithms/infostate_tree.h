@@ -60,14 +60,19 @@ enum InfostateNodeType {
   kTerminalNode
 };
 
+// Forward declarations.
+template<class NodeContents> class InfostateTree;
+template<class Contents> class InfostateNode;
+
 template<class Contents>
 class InfostateNode {
  public:
-  InfostateNode(InfostateNode* parent, int incoming_index,
-                InfostateNodeType type, absl::Span<float> tensor,
-                double terminal_value, const State* originating_state,
-                Player infostate_tree_player)
-      : parent_(parent), incoming_index_(incoming_index), type_(type),
+  InfostateNode(InfostateTree<Contents>* tree, InfostateNode* parent,
+                int incoming_index, InfostateNodeType type,
+                absl::Span<float> tensor, double terminal_value,
+                const State* originating_state, Player infostate_tree_player)
+      : tree_(tree), parent_(parent),
+        incoming_index_(incoming_index), type_(type),
         // Copy the tensor.
         tensor_(tensor.begin(), tensor.end()),
         terminal_value_(terminal_value) {
@@ -76,6 +81,7 @@ class InfostateNode {
   }
 
   InfostateNode* Parent() const { return parent_; }
+  InfostateTree<Contents>* Tree() const { return tree_; }
   const InfostateNodeType& Type() const { return type_; }
   absl::Span<const float> Tensor() const { return tensor_; }
   double TerminalValue() {
@@ -130,6 +136,7 @@ class InfostateNode {
   iterator end() const { return iterator(children_, children_.size()); }
 
  private:
+  const InfostateTree<Contents>* tree_;
   const InfostateNode* parent_;
   const int incoming_index_;
   const InfostateNodeType type_;
@@ -194,7 +201,7 @@ class InfostateTree {
   }
 
   Node* Root() { return &root_; }
-
+  Player GetPlayer() { return player_; }
   // Convenient methods to directly access decision nodes by observation
   // or State. This is useful for looking up solved policy, but not neccessary
   // for the infostate tree construction or running CFR iterations.
@@ -331,10 +338,10 @@ using CFRNode = InfostateNode</*Contents=*/CFRInfoStateValues>;
 // Specialize CFRNode, because we construct the content
 // of CFRInfoStateValues differently for decision nodes.
 template<> CFRNode::InfostateNode(
-    CFRNode* parent, int incoming_index, InfostateNodeType type,
+    CFRTree* tree, CFRNode* parent, int incoming_index, InfostateNodeType type,
     absl::Span<float> tensor, double terminal_value,
     const State* originating_state, Player player) :
-  parent_(parent), incoming_index_(incoming_index), type_(type),
+  tree_(tree), parent_(parent), incoming_index_(incoming_index), type_(type),
   tensor_(tensor.begin(), tensor.end()),
   terminal_value_(terminal_value),
   content_(originating_state && type == kDecisionNode
