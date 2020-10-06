@@ -96,7 +96,7 @@ std::string InformationStateTensorToString(Player player,
   ptr += deck_props.NumCards();
   // bids
   for (Player p = 0; p < num_players; ++p) {
-    for (int i = 0; i <= max_num_tricks; ++i) {
+    for (int i = 0; i <= max_num_tricks + 1; ++i) {
       if (ptr[i] == 1) {
         // account for no bid yet
         bids[p] = i - 1;
