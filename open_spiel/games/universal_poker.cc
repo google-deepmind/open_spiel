@@ -482,9 +482,10 @@ std::vector<Action> UniversalPokerState::LegalActions() const {
     int32_t min_bet_size = 0;
     int32_t max_bet_size = 0;
     if (acpc_state_.RaiseIsValid(&min_bet_size, &max_bet_size)) {
-      for (int i = min_bet_size; i <= max_bet_size; i++) {
-        legal_actions.push_back(i);
-      }
+      const int original_size = legal_actions.size();
+      legal_actions.resize(original_size + max_bet_size - min_bet_size + 1);
+      std::iota(legal_actions.begin() + original_size,
+                legal_actions.end(), min_bet_size);
     }
   }
   return legal_actions;
