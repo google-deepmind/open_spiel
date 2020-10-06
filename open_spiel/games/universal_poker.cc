@@ -211,10 +211,7 @@ std::string UniversalPokerState::ActionToString(Player player,
     move_str = "Call";
   } else if (betting_abstraction_ == BettingAbstraction::kFULLGAME) {
     SPIEL_CHECK_GE(move, 2);
-    const int big_blind =
-        static_cast<const UniversalPokerGame *>(GetGame().get())->big_blind();
-    const int raise_size = (move - 1) * big_blind;
-    move_str = absl::StrCat("Bet", raise_size);
+    move_str = absl::StrCat("Bet", move);
   } else if (static_cast<ActionType>(move) == ActionType::kBet) {
     SPIEL_CHECK_EQ(betting_abstraction_, BettingAbstraction::kFCPA);
     move_str = "Bet";
@@ -484,14 +481,9 @@ std::vector<Action> UniversalPokerState::LegalActions() const {
     }
     int32_t min_bet_size = 0;
     int32_t max_bet_size = 0;
-    bool valid_to_raise =
-        acpc_state_.RaiseIsValid(&min_bet_size, &max_bet_size);
-    if (valid_to_raise) {
-      const int big_blind =
-          static_cast<const UniversalPokerGame *>(GetGame().get())->big_blind();
-      SPIEL_CHECK_EQ(min_bet_size % big_blind, 0);
-      for (int i = min_bet_size; i <= max_bet_size; i += big_blind) {
-        legal_actions.push_back(1 + i / big_blind);
+    if (acpc_state_.RaiseIsValid(&min_bet_size, &max_bet_size)) {
+      for (int i = min_bet_size; i <= max_bet_size; i++) {
+        legal_actions.push_back(i);
       }
     }
   }
@@ -556,9 +548,7 @@ void UniversalPokerState::DoApplyAction(Action action_id) {
           State::ActionToString(action_id)));
     }
     if (action_int >= 2 && action_int <= NumDistinctActions()) {
-      const int big_blind =
-          static_cast<const UniversalPokerGame *>(GetGame().get())->big_blind();
-      ApplyChoiceAction(ACTION_BET, (action_int - 1) * big_blind);
+      ApplyChoiceAction(ACTION_BET, action_int);
       return;
     }
     SpielFatalError(absl::StrFormat("Action not recognized: %i", action_id));
@@ -707,8 +697,8 @@ int UniversalPokerGame::NumPlayers() const { return acpc_game_.GetNbPlayers(); }
 
 int UniversalPokerGame::NumDistinctActions() const {
   if (betting_abstraction_ == BettingAbstraction::kFULLGAME) {
-    // fold, check/call, bet/raise some multiple of BBs
-    return starting_stack_big_blinds_ + 2;
+    // 0 -> fold, 1 -> check/call, N -> bet size
+    return max_stack_size_ + 1;
   } else {
     return GetMaxBettingActions(acpc_game_);
   }
@@ -807,12 +797,24 @@ std::string UniversalPokerGame::parseParameters(const GameParameters &map) {
 
   std::vector<std::string> blinds =
       absl::StrSplit(ParameterValue<std::string>("blind"), ' ');
+  big_blind_ = 0;
+  for (std::string blind : blinds) {
+    big_blind_ = std::max(big_blind_, std::stoi(blind));
+  }
+  // By requiring a blind/ante of at least a single chip, we're able to
+  // structure the action space more intuitively in the kFULLGAME setting.
+  // Specifically, action 0 -> fold, 1 -> call, and N -> raise to N chips.
+  // While the ACPC server does not require it, in practice poker is always
+  // played with a blind or ante, so this is a minor restriction.
+  if (big_blind_ <= 0) {
+    SpielFatalError("Must have a blind of at least one chip.");
+  }
   std::vector<std::string> stacks =
       absl::StrSplit(ParameterValue<std::string>("stack"), ' ');
-  big_blind_ = std::max(std::stoi(blinds[0]), std::stoi(blinds[1]));
-  starting_stack_big_blinds_ =
-      std::stoi(stacks[0]);  // assumes all stack sizes are equal
-
+  max_stack_size_ = 0;
+  for (std::string stack : stacks) {
+    max_stack_size_ = std::max(max_stack_size_, std::stoi(stack));
+  }
   return generated_gamedef;
 }
 
