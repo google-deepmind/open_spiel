@@ -185,14 +185,14 @@ class BattleshipState final : public State {
   // Virtual functions inherited by OpenSpiel's `State` interface
   Player CurrentPlayer() const override;
   std::vector<Action> LegalActions() const override;
-  std::string ActionToString(Player player, Action action) const override;
+  std::string ActionToString(Player player, Action action_id) const override;
   std::string ToString() const override;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
   std::unique_ptr<State> Clone() const override;
   std::string InformationStateString(Player player) const override;
   std::string ObservationString(Player player) const override;
-  void UndoAction(Player player, Action action) override;
+  void UndoAction(Player player, Action action_id) override;
 
   // Draws the board of a player.
   //
@@ -249,7 +249,7 @@ class BattleshipState final : public State {
   std::string ShotsBoardString(const Player player) const;
 
  protected:
-  void DoApplyAction(Action action) override;
+  void DoApplyAction(Action action_id) override;
 
  private:
   // Ship placement methods
@@ -308,44 +308,6 @@ class BattleshipState final : public State {
   // Checks whether the given player has already shot the given cell.
   bool AlreadyShot(const Shot& shot, const Player player) const;
 
-  // Action (de)serialization routines
-  // =================================
-  //
-  // A cell (r, c) is serialized to action r * board_width + c.
-  // A ship placement with top-left corner (r, c) and direction d is serialized
-  // as follows:
-  //   * If d is horizontal, then we serialize cell (r, c)
-  //   * If d is vertical, then we serialize cell (r, c) and add shift
-  //       board_width * board_height.
-  //
-  // This means that the highes possible action number is
-  //   2 * board_width * board_height
-
-  // Converts a `ShipPlacement` action into a unique action number, as required
-  // by OpenSpiel's interface.
-  //
-  // See above for details about our serialization scheme.
-  Action SerializeShipPlacementAction(
-      const ShipPlacement& ship_placement) const;
-
-  // Converts a `Shot` action into a unique action number, as required
-  // by OpenSpiel's interface.
-  Action SerializeShotAction(const Shot& shot) const;
-
-  // Converts an action number to a `ShipPlacement` action.
-  //
-  // See above for details about our serialization scheme.
-  ShipPlacement DeserializeShipPlacementAction(const Action action) const;
-
-  // Converts an action number to a `Shot` action.
-  //
-  // See above for details about our serialization scheme.
-  Shot DeserializeShotAction(const Action action) const;
-
-  // Converts an action number to the unique move it represents at this state of
-  // the game.
-  GameMove DeserializeGameMove(const Action action) const;
-
   // Members
   // =======
 
@@ -370,7 +332,6 @@ class BattleshipGame final : public Game {
   explicit BattleshipGame(const GameParameters& params);
 
   // Virtual functions inherited by OpenSpiel's `Game` interface
-
   int NumDistinctActions() const override;
   std::unique_ptr<State> NewInitialState() const override;
   int MaxChanceOutcomes() const override { return 0; }
@@ -379,8 +340,55 @@ class BattleshipGame final : public Game {
   double MaxUtility() const override;
   double UtilitySum() const override;
   int MaxGameLength() const override;
+  std::string ActionToString(Player player, Action action_id) const override;
 
-  BattleshipConfiguration configuration;
+  // Action (de)serialization routines
+  // =================================
+  //
+  // A cell (r, c) is serialized to action_id r * board_width + c.
+  // A ship placement with top-left corner (r, c) and direction d is serialized
+  // as follows:
+  //   * If d is horizontal, then we serialize cell (r, c) and add shift
+  //       board_width * board_height.
+  //   * If d is vertical, then we serialize cell (r, c) and add shift
+  //       2 * board_width * board_height.
+  // Since the ship placement action serialization does not depend on the
+  // specific ship that is being placed, the serialization/deserialization
+  // routines take in and return `CellAndDirection` objects.
+  //
+  // This means that the highes possible action_id is
+  //   3 * board_width * board_height
+
+  // Converts a `ShipPlacement` action into a unique action_id, as required
+  // by OpenSpiel's interface.
+  //
+  // See above for details about our serialization scheme.
+  Action SerializeShipPlacementAction(
+      const CellAndDirection& ship_placement) const;
+
+  // Converts a `Shot` action into a unique action_id, as required
+  // by OpenSpiel's interface.
+  Action SerializeShotAction(const Shot& shot) const;
+
+  // Converts an action id to the action (Ship Placement or Shot) it represents.
+  absl::variant<CellAndDirection, Shot> DeserializeAction(
+      const Action action_id) const;
+
+  // Members
+  // =======
+
+  BattleshipConfiguration conf;
+
+ private:
+  // Converts an action_id to a `CellAndDirection` action.
+  //
+  // See above for details about our serialization scheme.
+  CellAndDirection DeserializeShipPlacementAction(const Action action_id) const;
+
+  // Converts an action_id to a `Shot` action.
+  //
+  // See above for details about our serialization scheme.
+  Shot DeserializeShotAction(const Action action_id) const;
 };
 
 }  // namespace battleship

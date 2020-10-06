@@ -95,46 +95,58 @@ void TestTightLayout1() {
   SPIEL_CHECK_EQ(state->CurrentPlayer(), Player{0});
   {
     const std::vector<Action> actions = state->LegalActions();
-    SPIEL_CHECK_EQ(actions, std::vector<Action>({0, 2}));
-    SPIEL_CHECK_EQ(state->ActionToString(actions[0]), "h_0_0");
-    SPIEL_CHECK_EQ(state->ActionToString(actions[1]), "h_0_2");
+    SPIEL_CHECK_EQ(actions, std::vector<Action>({4, 6}));
+    SPIEL_CHECK_EQ(
+        state->ActionToString(actions[0]),
+        "Pl0: place ship horizontally with top-left corner in (0, 0)");
+    SPIEL_CHECK_EQ(
+        state->ActionToString(actions[1]),
+        "Pl0: place ship horizontally with top-left corner in (0, 2)");
   }
 
   // We now place the first ship to the left, which corresponds to the
-  // serialized index 0 as checked above.
-  state->ApplyAction(0);
+  // serialized id 4 as checked above.
+  state->ApplyAction(4);
 
   // We repeat the check for Player 1.
   SPIEL_CHECK_EQ(state->CurrentPlayer(), Player{1});
   {
     const std::vector<Action> actions = state->LegalActions();
-    SPIEL_CHECK_EQ(actions, std::vector<Action>({0, 2}));
-    SPIEL_CHECK_EQ(state->ActionToString(actions[0]), "h_0_0");
-    SPIEL_CHECK_EQ(state->ActionToString(actions[1]), "h_0_2");
+    SPIEL_CHECK_EQ(actions, std::vector<Action>({4, 6}));
+    SPIEL_CHECK_EQ(
+        state->ActionToString(actions[0]),
+        "Pl1: place ship horizontally with top-left corner in (0, 0)");
+    SPIEL_CHECK_EQ(
+        state->ActionToString(actions[1]),
+        "Pl1: place ship horizontally with top-left corner in (0, 2)");
   }
 
   // We place Player 1's ship to the right.
-  state->ApplyAction(Action{2});
+  state->ApplyAction(Action{6});
 
   // Now, we need to check that the only remaining action for Player 0 is to
   // place the second ship to the right.
   SPIEL_CHECK_EQ(state->CurrentPlayer(), Player{0});
   {
     const std::vector<Action> actions = state->LegalActions();
-    SPIEL_CHECK_EQ(actions, std::vector<Action>({2}));
-    SPIEL_CHECK_EQ(state->ActionToString(actions[0]), "h_0_2");
+    SPIEL_CHECK_EQ(actions, std::vector<Action>({6}));
+    SPIEL_CHECK_EQ(
+        state->ActionToString(actions[0]),
+        "Pl0: place ship horizontally with top-left corner in (0, 2)");
   }
-  state->ApplyAction(Action{2});
+  state->ApplyAction(Action{6});
 
   //... While for Player 1 the only remaining action is to place the ship to the
   // left.
   SPIEL_CHECK_EQ(state->CurrentPlayer(), Player{1});
   {
     const std::vector<Action> actions = state->LegalActions();
-    SPIEL_CHECK_EQ(actions, std::vector<Action>({0}));
-    SPIEL_CHECK_EQ(state->ActionToString(actions[0]), "h_0_0");
+    SPIEL_CHECK_EQ(actions, std::vector<Action>({4}));
+    SPIEL_CHECK_EQ(
+        state->ActionToString(actions[0]),
+        "Pl1: place ship horizontally with top-left corner in (0, 0)");
   }
-  state->ApplyAction(Action{0});
+  state->ApplyAction(Action{4});
 
   SPIEL_CHECK_FALSE(state->IsTerminal());
 }
@@ -153,50 +165,74 @@ void TestTightLayout2() {
   SPIEL_CHECK_EQ(state->CurrentPlayer(), Player{0});
   {
     const std::vector<Action> actions = state->LegalActions();
-    SPIEL_CHECK_EQ(actions, std::vector<Action>({0, 1, 3, 4}));
-    SPIEL_CHECK_EQ(state->ActionToString(actions[0]), "h_0_0");
-    SPIEL_CHECK_EQ(state->ActionToString(actions[1]), "h_0_1");
-    SPIEL_CHECK_EQ(state->ActionToString(actions[2]), "h_1_0");
-    SPIEL_CHECK_EQ(state->ActionToString(actions[3]), "h_1_1");
+    SPIEL_CHECK_EQ(actions, std::vector<Action>({6, 7, 9, 10}));
+
+    SPIEL_CHECK_EQ(
+        state->ActionToString(actions[0]),
+        "Pl0: place ship horizontally with top-left corner in (0, 0)");
+    SPIEL_CHECK_EQ(
+        state->ActionToString(actions[1]),
+        "Pl0: place ship horizontally with top-left corner in (0, 1)");
+    SPIEL_CHECK_EQ(
+        state->ActionToString(actions[2]),
+        "Pl0: place ship horizontally with top-left corner in (1, 0)");
+    SPIEL_CHECK_EQ(
+        state->ActionToString(actions[3]),
+        "Pl0: place ship horizontally with top-left corner in (1, 1)");
   }
 
   // We now place the first ship to the right on the first row, which
   // corresponds to the serialized index 1 as checked above.
-  state->ApplyAction(Action{1});
+  state->ApplyAction(Action{7});
 
   // We repeat the check for Player 1.
   SPIEL_CHECK_EQ(state->CurrentPlayer(), Player{1});
   {
     const std::vector<Action> actions = state->LegalActions();
-    SPIEL_CHECK_EQ(actions, std::vector<Action>({0, 1, 3, 4}));
-    SPIEL_CHECK_EQ(state->ActionToString(actions[0]), "h_0_0");
-    SPIEL_CHECK_EQ(state->ActionToString(actions[1]), "h_0_1");
-    SPIEL_CHECK_EQ(state->ActionToString(actions[2]), "h_1_0");
-    SPIEL_CHECK_EQ(state->ActionToString(actions[3]), "h_1_1");
+    SPIEL_CHECK_EQ(actions, std::vector<Action>({6, 7, 9, 10}));
+
+    SPIEL_CHECK_EQ(
+        state->ActionToString(actions[0]),
+        "Pl1: place ship horizontally with top-left corner in (0, 0)");
+    SPIEL_CHECK_EQ(
+        state->ActionToString(actions[1]),
+        "Pl1: place ship horizontally with top-left corner in (0, 1)");
+    SPIEL_CHECK_EQ(
+        state->ActionToString(actions[2]),
+        "Pl1: place ship horizontally with top-left corner in (1, 0)");
+    SPIEL_CHECK_EQ(
+        state->ActionToString(actions[3]),
+        "Pl1: place ship horizontally with top-left corner in (1, 1)");
   }
 
   // We place Player 1's ship to the left on the second row.
-  state->ApplyAction(Action{3});
+  state->ApplyAction(Action{9});
 
   // Now, we need to check that the only remaining action for Player 0 is to
   // place the second ship on the second row.
   SPIEL_CHECK_EQ(state->CurrentPlayer(), Player{0});
   {
     const std::vector<Action> actions = state->LegalActions();
-    SPIEL_CHECK_EQ(actions, std::vector<Action>({3}));
-    SPIEL_CHECK_EQ(state->ActionToString(actions[0]), "h_1_0");
+    SPIEL_CHECK_EQ(actions, std::vector<Action>({9}));
+
+    SPIEL_CHECK_EQ(
+        state->ActionToString(actions[0]),
+        "Pl0: place ship horizontally with top-left corner in (1, 0)");
   }
-  state->ApplyAction(Action{3});
+  state->ApplyAction(Action{9});
 
   //... While for Player 1 the only remaining action is to place the second ship
   // on the first row.
   SPIEL_CHECK_EQ(state->CurrentPlayer(), Player{1});
   {
     const std::vector<Action> actions = state->LegalActions();
-    SPIEL_CHECK_EQ(actions, std::vector<Action>({0}));
-    SPIEL_CHECK_EQ(state->ActionToString(actions[0]), "h_0_0");
+    SPIEL_CHECK_EQ(actions, std::vector<Action>({6}));
+
+    SPIEL_CHECK_EQ(
+        state->ActionToString(actions[0]),
+        "Pl1: place ship horizontally with top-left corner in (0, 0)");
   }
-  state->ApplyAction(Action{0});
+  state->ApplyAction(Action{6});
 
   SPIEL_CHECK_FALSE(state->IsTerminal());
 }

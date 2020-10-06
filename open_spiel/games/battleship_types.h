@@ -46,14 +46,26 @@ struct Ship {
   double value;
 };
 
+class CellAndDirection {
+ public:
+  enum Direction { Horizontal = 0, Vertical = 1 };
+
+  CellAndDirection(const Direction direction, const Cell& tl_corner);
+  Cell TopLeftCorner() const { return tl_corner_; }
+  Direction direction;
+
+ protected:
+  Cell tl_corner_;
+};
+
 // Represents the placement of a ship.
 //
 // Ships can be placed either horizontal or vertical on the board. When the ship
 // is placed horizontally, we store the *leftmost* cell of the placement as the
 // corner. When the ship is placed vertically, the corner is the *topmost*.
-class ShipPlacement final {
+class ShipPlacement final : public CellAndDirection {
  public:
-  enum Direction { Horizontal = 0, Vertical = 1 };
+  using CellAndDirection::Direction;
 
   ShipPlacement(const Direction direction, const Ship& ship,
                 const Cell& tl_corner);
@@ -61,7 +73,8 @@ class ShipPlacement final {
   // Returns true if the the ship falls over a specific cell.
   bool CoversCell(const Cell& cell) const;
 
-  Cell TopLeftCorner() const;
+  // Returns the bottom-right corner of the ship when placed according to this
+  // placement.
   Cell BottomRightCorner() const;
 
   // Checks whether two ship placements intersect on at least one cell.
@@ -79,11 +92,7 @@ class ShipPlacement final {
   // character is a `v` instead of an `h`.
   std::string ToString() const;
 
-  Direction direction;
   Ship ship;
-
- private:
-  Cell tl_corner_;
 };
 
 struct GameMove {

@@ -105,11 +105,16 @@ bool ExistsFeasiblePlacement(const BattleshipConfiguration& conf,
   return false;
 }
 
-ShipPlacement::ShipPlacement(const Direction direction, const Ship& ship,
-                             const Cell& tl_corner)
-    : direction(direction), ship(ship), tl_corner_(tl_corner) {
+CellAndDirection::CellAndDirection(const Direction direction,
+                                   const Cell& tl_corner)
+    : direction(direction), tl_corner_(tl_corner) {
   SPIEL_CHECK_GE(tl_corner.row, 0);
   SPIEL_CHECK_GE(tl_corner.col, 0);
+}
+
+ShipPlacement::ShipPlacement(const Direction direction, const Ship& ship,
+                             const Cell& tl_corner)
+    : CellAndDirection(direction, tl_corner), ship(ship) {
   SPIEL_CHECK_GE(ship.length, 1);
 }
 
@@ -124,7 +129,6 @@ bool ShipPlacement::CoversCell(const Cell& cell) const {
   }
 }
 
-Cell ShipPlacement::TopLeftCorner() const { return tl_corner_; }
 Cell ShipPlacement::BottomRightCorner() const {
   if (direction == Direction::Horizontal) {
     return Cell{tl_corner_.row, tl_corner_.col + ship.length - 1};
