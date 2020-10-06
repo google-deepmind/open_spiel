@@ -94,6 +94,20 @@ std::unique_ptr<CFRTree> MakeTree(
       infostate_observer, player_id);
 }
 
+bool IsNodeBalanced(const CFRNode& node, int height, int current_depth = 0) {
+  if (node.NumChildren() == 0) return height == current_depth;
+
+  for (const CFRNode& child : node)
+    if (!IsNodeBalanced(child, height, current_depth + 1))
+      return false;
+
+  return true;
+}
+
+bool RecomputeBalance(const CFRTree& tree) {
+  return IsNodeBalanced(tree.Root(), tree.TreeHeight());
+}
+
 void TestRootCertificates() {
   {
     std::string expected_certificate =
@@ -126,6 +140,7 @@ void TestRootCertificates() {
     std::unique_ptr<CFRTree> tree = MakeTree("kuhn_poker", 0);
     SPIEL_CHECK_EQ(ComputeCertificate(tree->Root()), expected_certificate);
     SPIEL_CHECK_FALSE(tree->IsBalanced());
+    SPIEL_CHECK_FALSE(RecomputeBalance(*tree));
   }
   {
     std::string expected_certificate =
@@ -146,6 +161,7 @@ void TestRootCertificates() {
     std::unique_ptr<CFRTree> tree = MakeTree("kuhn_poker", 1);
     SPIEL_CHECK_EQ(ComputeCertificate(tree->Root()), expected_certificate);
     SPIEL_CHECK_FALSE(tree->IsBalanced());
+    SPIEL_CHECK_FALSE(RecomputeBalance(*tree));
   }
   {
     std::string expected_certificate =
@@ -164,6 +180,7 @@ void TestRootCertificates() {
       std::unique_ptr<CFRTree> tree = MakeTree(iigs2, i);
       SPIEL_CHECK_EQ(ComputeCertificate(tree->Root()), expected_certificate);
       SPIEL_CHECK_TRUE(tree->IsBalanced());
+      SPIEL_CHECK_TRUE(RecomputeBalance(*tree));
     }
   }
   {
@@ -178,6 +195,7 @@ void TestRootCertificates() {
       std::unique_ptr<CFRTree> tree = MakeTree("matrix_mp", i);
       SPIEL_CHECK_EQ(ComputeCertificate(tree->Root()), expected_certificate);
       SPIEL_CHECK_TRUE(tree->IsBalanced());
+      SPIEL_CHECK_TRUE(RecomputeBalance(*tree));
     }
   }
 }
@@ -193,6 +211,7 @@ void TestCertificatesFromStartHistories() {
                                              {{0}, {2}}, {1/3., 1/3.});
     SPIEL_CHECK_EQ(ComputeCertificate(tree->Root()), expected_certificate);
     SPIEL_CHECK_FALSE(tree->IsBalanced());
+    SPIEL_CHECK_FALSE(RecomputeBalance(*tree));
   }
   {
     std::string expected_certificate =
@@ -204,6 +223,7 @@ void TestCertificatesFromStartHistories() {
                                              {{1, 0}, {1, 2}}, {1/6., 1/6.});
     SPIEL_CHECK_EQ(ComputeCertificate(tree->Root()), expected_certificate);
     SPIEL_CHECK_FALSE(tree->IsBalanced());
+    SPIEL_CHECK_FALSE(RecomputeBalance(*tree));
   }
   {
     std::string expected_certificate =
@@ -215,6 +235,7 @@ void TestCertificatesFromStartHistories() {
                                              {{0}, {2, 1, 0, 1}}, {1/3., 1/6.});
     SPIEL_CHECK_EQ(ComputeCertificate(tree->Root()), expected_certificate);
     SPIEL_CHECK_FALSE(tree->IsBalanced());
+    SPIEL_CHECK_FALSE(RecomputeBalance(*tree));
   }
   {
     std::string expected_certificate =
@@ -227,6 +248,7 @@ void TestCertificatesFromStartHistories() {
                                              {1/6., 1/6.});
     SPIEL_CHECK_EQ(ComputeCertificate(tree->Root()), expected_certificate);
     SPIEL_CHECK_FALSE(tree->IsBalanced());
+    SPIEL_CHECK_FALSE(RecomputeBalance(*tree));
   }
   {
     std::string expected_certificate =
@@ -238,6 +260,7 @@ void TestCertificatesFromStartHistories() {
                                              {1/6., 1/6.});
     SPIEL_CHECK_EQ(ComputeCertificate(tree->Root()), expected_certificate);
     SPIEL_CHECK_TRUE(tree->IsBalanced());
+    SPIEL_CHECK_TRUE(RecomputeBalance(*tree));
   }
   {
     std::string expected_certificate =
@@ -250,6 +273,7 @@ void TestCertificatesFromStartHistories() {
                                              {1/6., 1/6.});
     SPIEL_CHECK_EQ(ComputeCertificate(tree->Root()), expected_certificate);
     SPIEL_CHECK_TRUE(tree->IsBalanced());
+    SPIEL_CHECK_TRUE(RecomputeBalance(*tree));
   }
 }
 
