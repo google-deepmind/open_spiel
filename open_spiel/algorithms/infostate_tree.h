@@ -205,7 +205,7 @@ class InfostateTree {
     }
   }
 
-  Node* Root() { return &root_; }
+  const Node& Root() const { return root_; }
   Player GetPlayer() const { return player_; }
   int TreeHeight() const { return tree_height_; }
   bool IsBalanced() const { return is_tree_balanced_; }
