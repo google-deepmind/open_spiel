@@ -277,6 +277,84 @@ void TestCertificatesFromStartHistories() {
   }
 }
 
+
+void TestTreeRebalancing() {
+  {  // Identity test -- no rebalancing is applied.
+    std::string expected_certificate =
+      "(["
+        "({})"  // HH
+        "({})"  // HT
+        "({})"  // TH
+        "({})"  // TT
+      "])";
+    for (int i = 0; i < 2; ++i) {
+      std::unique_ptr<CFRTree> tree = MakeTree("matrix_mp", i);
+      SPIEL_CHECK_EQ(ComputeCertificate(tree->Root()), expected_certificate);
+      SPIEL_CHECK_TRUE(RecomputeBalance(*tree));
+
+      tree->Rebalance();
+      SPIEL_CHECK_EQ(ComputeCertificate(tree->Root()), expected_certificate);
+      SPIEL_CHECK_TRUE(RecomputeBalance(*tree));
+    }
+  }
+  {  // Rebalance test: when 2nd player passes, we add dummy observation nodes.
+    std::unique_ptr<CFRTree> tree = MakeTree("kuhn_poker", 0,
+                                             {{0, 1, 0}}, {1/6.});
+    std::string expected_certificate =
+        "(("
+        "[({})({})]"  // 2nd player bets
+        "{}"          // 2nd player passes
+        "))";
+    SPIEL_CHECK_EQ(ComputeCertificate(tree->Root()), expected_certificate);
+    SPIEL_CHECK_FALSE(tree->IsBalanced());
+    SPIEL_CHECK_FALSE(RecomputeBalance(*tree));
+
+    tree->Rebalance();
+
+    // The order is swapped only in the certificate computation, but not in
+    // the actual tree.
+    std::string expected_rebalanced_certificate =
+        "(("
+        "(({}))"      // 2nd player passes
+        "[({})({})]"  // 2nd player bets
+        "))";
+    SPIEL_CHECK_EQ(ComputeCertificate(tree->Root()), expected_rebalanced_certificate);
+    SPIEL_CHECK_TRUE(tree->IsBalanced());
+    SPIEL_CHECK_TRUE(RecomputeBalance(*tree));
+  }
+  {  // Rebalance test: simultaneous move games.
+    std::string iigs3 = "goofspiel("
+                          "num_cards=3,"
+                          "imp_info=True,"
+                          "points_order=ascending"
+                        ")";
+    std::unique_ptr<CFRTree> tree = MakeTree(iigs3, 0,
+                                             {{0  /* = 0 0 */},
+                                              {1  /* = 1 0 */,
+                                               3  /* = 2 2 */}},
+                                             {1., 1.});
+
+    std::string expected_certificate =
+        "("
+        "[({})({})({})({})]"
+        "{}"
+        ")";
+    SPIEL_CHECK_EQ(ComputeCertificate(tree->Root()), expected_certificate);
+    SPIEL_CHECK_FALSE(tree->IsBalanced());
+    SPIEL_CHECK_FALSE(RecomputeBalance(*tree));
+
+    tree->Rebalance();
+    std::string expected_rebalanced_certificate =
+      "("
+        "(({}))"
+        "[({})({})({})({})]"
+      ")";
+    SPIEL_CHECK_EQ(ComputeCertificate(tree->Root()), expected_rebalanced_certificate);
+    SPIEL_CHECK_TRUE(tree->IsBalanced());
+    SPIEL_CHECK_TRUE(RecomputeBalance(*tree));
+  }
+}
+
 }  // namespace
 }  // namespace algorithms
 }  // namespace open_spiel
@@ -284,4 +362,5 @@ void TestCertificatesFromStartHistories() {
 int main(int argc, char** argv) {
   open_spiel::algorithms::TestRootCertificates();
   open_spiel::algorithms::TestCertificatesFromStartHistories();
+  open_spiel::algorithms::TestTreeRebalancing();
 }

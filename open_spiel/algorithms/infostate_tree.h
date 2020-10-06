@@ -67,7 +67,7 @@ template<class Contents> class InfostateNode;
 template<class Contents>
 class InfostateNode {
  public:
-  InfostateNode(InfostateTree<Contents>* tree, InfostateNode* parent,
+  InfostateNode(const InfostateTree<Contents>* tree, InfostateNode* parent,
                 int incoming_index, InfostateNodeType type,
                 absl::Span<float> tensor, double terminal_value,
                 const State* originating_state, Player infostate_tree_player)
@@ -80,8 +80,9 @@ class InfostateNode {
       legal_actions_ = originating_state->LegalActions(infostate_tree_player);
   }
 
-  InfostateNode* Parent() const { return parent_; }
   InfostateTree<Contents>* Tree() const { return tree_; }
+  InfostateNode* Parent() { return parent_; }
+  int IncomingIndex() const { return incoming_index_; }
   const InfostateNodeType& Type() const { return type_; }
   absl::Span<const float> Tensor() const { return tensor_; }
   double TerminalValue() {
@@ -137,9 +138,66 @@ class InfostateNode {
   iterator begin() const { return iterator(children_); }
   iterator end() const { return iterator(children_, children_.size()); }
 
+  void Rebalance(int max_depth, int current_depth) {
+    SPIEL_DCHECK_LE(current_depth, max_depth);
+    if (NumChildren() == 0 && max_depth != current_depth) {
+      // Prepare the chain of dummy observations.
+      std::unique_ptr<InfostateNode> node = Release();
+      InfostateNode* node_parent = node->Parent();
+      int position_in_leaf_parent = node->IncomingIndex();
+      std::unique_ptr<InfostateNode> chain_head =
+          std::unique_ptr<InfostateNode>(new InfostateNode(
+              /*tree=*/tree_, /*parent=*/nullptr,
+              /*incoming_index=*/position_in_leaf_parent, kObservationNode,
+              /*tensor=*/{}, /*terminal_value=*/0,
+              /*originating_state=*/nullptr, tree_->GetPlayer()));
+      InfostateNode* chain_tail = chain_head.get();
+      for (int i = 1; i < max_depth - current_depth; ++i) {
+        chain_tail = chain_tail->AddChild(
+            std::unique_ptr<InfostateNode>(new InfostateNode(
+                /*tree=*/tree_, /*parent=*/chain_tail,
+                /*incoming_index=*/0, kObservationNode,
+                /*tensor=*/{}, /*terminal_value=*/0,
+                /*originating_state=*/nullptr, tree_->GetPlayer())));
+      }
+      chain_tail->children_.push_back(nullptr);
+
+      // First put the node to the chain. If we did it in reverse order,
+      // i.e chain to parent and then node to the chain, the node would
+      // become freed.
+      node->SwapParent(std::move(node), /*target=*/chain_tail, 0);
+      chain_head->SwapParent(std::move(chain_head), /*target=*/node_parent,
+                             position_in_leaf_parent);
+    }
+
+    for (std::unique_ptr<InfostateNode>& child : children_) {
+      child->Rebalance(max_depth, current_depth + 1);
+    }
+  }
+
  private:
+  // Get the unique_ptr for this node. The usage is intended only for tree
+  // balance manipulation.
+  std::unique_ptr<InfostateNode> Release() {
+    SPIEL_DCHECK_TRUE(parent_);
+    SPIEL_DCHECK_TRUE(parent_->children_.at(incoming_index_).get() == this);
+    return std::move(parent_->children_.at(incoming_index_));
+  }
+
+  // Change the parent of this node by inserting it at at index
+  // of the new parent. The node at the existing position will be freed.
+  // We pass the unique ptr of itself, because calling Release might be
+  // undefined: the node we want to swap a parent for can be root of a subtree.
+  void SwapParent(std::unique_ptr<InfostateNode> self,
+                  InfostateNode* target, int at_index) {
+    // This node is still who it thinks it is :)
+    SPIEL_DCHECK_TRUE(self.get() == this);
+    target->children_.at(at_index) = std::move(self);
+    this->parent_ = target;
+  }
+
   const InfostateTree<Contents>* tree_;
-  const InfostateNode* parent_;
+  InfostateNode* parent_;
   const int incoming_index_;
   const InfostateNodeType type_;
   const std::vector<float> tensor_;
@@ -221,6 +279,15 @@ class InfostateTree {
     observation_.SetFrom(state, player_);
     std::string compressed = observation_.Compress();
     return GetByCompressed(compressed);
+  }
+
+  // Makes sure that all tree leaves are at the same height.
+  // It inserts a linked list of dummy observation nodes with approriate length
+  // to balance all the leaves. In the worst case this makes the tree about 2x
+  // as large (in the number of nodes).
+  void Rebalance() {
+    root_.Rebalance(TreeHeight(), 0);
+    is_tree_balanced_ = true;
   }
 
  private:
@@ -366,7 +433,7 @@ using CFRNode = InfostateNode</*Contents=*/CFRInfoStateValues>;
 // Specialize CFRNode, because we construct the content
 // of CFRInfoStateValues differently for decision nodes.
 template<> CFRNode::InfostateNode(
-    CFRTree* tree, CFRNode* parent, int incoming_index, InfostateNodeType type,
+    const CFRTree* tree, CFRNode* parent, int incoming_index, InfostateNodeType type,
     absl::Span<float> tensor, double terminal_value,
     const State* originating_state, Player player) :
   tree_(tree), parent_(parent), incoming_index_(incoming_index), type_(type),
