@@ -118,13 +118,14 @@ class TreeWalkCalculator(object):
     current_player = state.current_player()
     is_chance = state.is_chance_node()
 
-    # We exclude both the current and the chance players.
-    opponent_probability = (np.prod(reach_probabilities[:current_player]) *
-                            np.prod(reach_probabilities[current_player + 1:-1]))
     if not is_chance:
       key = (current_player, state.information_state_string())
       reach_prob = np.prod(reach_probabilities)
 
+      # We exclude both the current and the chance players.
+      opponent_probability = (
+          np.prod(reach_probabilities[:current_player]) *
+          np.prod(reach_probabilities[current_player + 1:-1]))
       self.info_state_cf_prob[key] += (
           reach_probabilities[-1] * opponent_probability)
       self.info_state_prob[key] += reach_prob
