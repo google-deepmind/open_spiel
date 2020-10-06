@@ -119,6 +119,8 @@ class InfostateNode {
   // Provide a convenient way to access the Contents
   // without calling some getter.
   Contents* operator->() { return &content_; }
+  // Provide a const getter as well.
+  const Contents& contents() const { return content_; }
 
   // Iterate over children.
   class iterator {

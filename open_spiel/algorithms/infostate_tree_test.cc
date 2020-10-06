@@ -28,17 +28,17 @@ namespace {
 
 // To make sure we can easily test infostate tree structures, we compute their
 // certificate (string representation) that we can easily compare.
-std::string ComputeCertificate(CFRNode& node) {
+std::string ComputeCertificate(const CFRNode& node) {
   if (node.Type() == kDecisionNode) {
-    SPIEL_CHECK_GT(node->legal_actions.size(), 0);
-    SPIEL_CHECK_GT(node->cumulative_regrets.size(), 0);
-    SPIEL_CHECK_GT(node->cumulative_policy.size(), 0);
-    SPIEL_CHECK_GT(node->current_policy.size(), 0);
+    SPIEL_CHECK_GT(node.contents().legal_actions.size(), 0);
+    SPIEL_CHECK_GT(node.contents().cumulative_regrets.size(), 0);
+    SPIEL_CHECK_GT(node.contents().cumulative_policy.size(), 0);
+    SPIEL_CHECK_GT(node.contents().current_policy.size(), 0);
   } else {
-    SPIEL_CHECK_EQ(node->legal_actions.size(), 0);
-    SPIEL_CHECK_EQ(node->cumulative_regrets.size(), 0);
-    SPIEL_CHECK_EQ(node->cumulative_policy.size(), 0);
-    SPIEL_CHECK_EQ(node->current_policy.size(), 0);
+    SPIEL_CHECK_EQ(node.contents().legal_actions.size(), 0);
+    SPIEL_CHECK_EQ(node.contents().cumulative_regrets.size(), 0);
+    SPIEL_CHECK_EQ(node.contents().cumulative_policy.size(), 0);
+    SPIEL_CHECK_EQ(node.contents().current_policy.size(), 0);
   }
 
   if (node.Type() == kTerminalNode) {
