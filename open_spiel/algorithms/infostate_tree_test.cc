@@ -353,6 +353,37 @@ void TestTreeRebalancing() {
     SPIEL_CHECK_TRUE(tree->IsBalanced());
     SPIEL_CHECK_TRUE(RecomputeBalance(*tree));
   }
+  {  // Full Kuhn rebalancing test.
+    std::unique_ptr<CFRTree> tree = MakeTree("kuhn_poker", 0);
+    tree->Rebalance();
+
+    std::string expected_rebalanced_certificate =
+      "(("
+        "(["
+          "(("
+          // Notice all terminals are at the same depth (same indentation).
+            "(({}))"
+            "(({}))"
+            "(({}))"
+            "(({}))"
+          "))"
+          "(("
+            "(({}))"
+            "(({}))"
+            "[({}"
+              "{})"
+             "({}"
+              "{})]"
+          "))"
+        "])"
+        // Just 2 more copies.
+        "([(((({}))(({}))(({}))(({}))))(((({}))(({}))[({}{})({}{})]))])"
+        "([(((({}))(({}))(({}))(({}))))(((({}))(({}))[({}{})({}{})]))])"
+      "))";
+    SPIEL_CHECK_EQ(ComputeCertificate(tree->Root()), expected_rebalanced_certificate);
+    SPIEL_CHECK_TRUE(tree->IsBalanced());
+    SPIEL_CHECK_TRUE(RecomputeBalance(*tree));
+  }
 }
 
 }  // namespace
