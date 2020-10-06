@@ -116,7 +116,7 @@ class InfostateNode {
     return sequence;
   }
 
-  // Provide a convenient way to access the Content
+  // Provide a convenient way to access the Contents
   // without calling some getter.
   Contents* operator->() { return &content_; }
 
@@ -164,8 +164,8 @@ class InfostateTree {
               /*originating_state=*/nullptr, /*acting_player=*/player_),
         observation_(std::move(CreateObservation(game))) {
     std::unique_ptr<State> root_state = game.NewInitialState();
-    RecursivelyBuildTree(&root_, *root_state,
-                         max_depth_limit, 1.);
+    RecursivelyBuildTree(&root_, /*depth=*/1, *root_state,
+                         max_depth_limit, /*chance_reach_prob=*/1.);
   }
 
   // Create an infostate tree for a player based on some start states,
@@ -197,14 +197,16 @@ class InfostateTree {
 
     for (int i = 0; i < start_states.size(); ++i) {
       RecursivelyBuildTree(
-          &root_, *start_states[i],
+          &root_, /*depth=*/1, *start_states[i],
           start_max_depth + max_depth_limit,
           chance_reach_probs[i]);
     }
   }
 
   Node* Root() { return &root_; }
-  Player GetPlayer() { return player_; }
+  Player GetPlayer() const { return player_; }
+  int TreeHeight() const { return tree_height_; }
+  bool IsBalanced() const { return is_tree_balanced_; }
   // Convenient methods to directly access decision nodes by observation
   // or State. This is useful for looking up solved policy, but not neccessary
   // for the infostate tree construction or running CFR iterations.
@@ -224,6 +226,13 @@ class InfostateTree {
   const std::shared_ptr<Observer> infostate_observer_;
   Node root_;
   Observation observation_;
+
+  // A value that helps to determine if the tree is balanced.
+  int tree_height_ = -1;
+  // We call an infostate tree balanced if all terminal nodes
+  // are in the same depth.
+  bool is_tree_balanced_ = true;
+
   // Store compressed observations for fast lookup of decision nodes
   // in the lookup table.
   std::unordered_map<std::string, Node*> lookup_table_;
@@ -252,7 +261,15 @@ class InfostateTree {
         tensor, terminal_value, originating_state, player_);
   }
 
-  void RecursivelyBuildTree(Node* parent, const State& state,
+  void UpdateBalanceInfo(int leaf_depth) {
+    // Track information about tree balance.
+    if (tree_height_ != -1 && is_tree_balanced_) {
+      is_tree_balanced_ = tree_height_ == leaf_depth;
+    }
+    tree_height_ = std::max(tree_height_, leaf_depth);
+  }
+
+  void RecursivelyBuildTree(Node* parent, int depth, const State& state,
                             int move_limit, double chance_reach_prob) {
     observation_.SetFrom(state, player_);
 
@@ -261,7 +278,7 @@ class InfostateTree {
       double terminal_value = state.Returns()[player_] * chance_reach_prob;
       parent->AddChild(MakeNode(parent, kTerminalNode, observation_.Tensor(),
                                 terminal_value, &state));
-      return;
+      return UpdateBalanceInfo(depth);
     }
 
     // Create decision nodes.
@@ -275,14 +292,14 @@ class InfostateTree {
         SPIEL_DCHECK_EQ(decision_node->Type(), kDecisionNode);
 
         if (state.MoveNumber() >= move_limit)  // Do not build deeper.
-          return;
+          return UpdateBalanceInfo(depth);
 
         std::vector<Action> legal_actions = state.LegalActions();
         for (int i = 0; i < legal_actions.size(); ++i) {
           Node* observation_node = decision_node->ChildAt(i);
           SPIEL_DCHECK_EQ(observation_node->Type(), kObservationNode);
           std::unique_ptr<State> child = state.Child(legal_actions.at(i));
-          RecursivelyBuildTree(observation_node, *child,
+          RecursivelyBuildTree(observation_node, depth + 2, *child,
                                move_limit, chance_reach_prob);
         }
       } else {
@@ -291,7 +308,7 @@ class InfostateTree {
         lookup_table_.insert({observation_.Compress(), decision_node});
 
         if (state.MoveNumber() >= move_limit)  // Do not build deeper.
-          return;
+          return UpdateBalanceInfo(depth);
 
         // Build observation nodes right away after the decision node.
         // This is because the player might be acting multiple times in a row:
@@ -303,7 +320,7 @@ class InfostateTree {
           Node* observation_node = decision_node->AddChild(MakeNode(
               parent, kObservationNode, observation_.Tensor(),
               /*terminal_value=*/0, child.get()));
-          RecursivelyBuildTree(observation_node, *child,
+          RecursivelyBuildTree(observation_node, depth + 2, *child,
                                move_limit, chance_reach_prob);
         }
       }
@@ -321,19 +338,19 @@ class InfostateTree {
     SPIEL_DCHECK_EQ(observation_node->Type(), kObservationNode);
 
     if (state.MoveNumber() >= move_limit)  // Do not build deeper.
-      return;
+      return UpdateBalanceInfo(depth);
 
     if (state.IsChanceNode()) {
       for (std::pair<Action, double> action_prob : state.ChanceOutcomes()) {
         std::unique_ptr<State> child = state.Child(action_prob.first);
-        RecursivelyBuildTree(observation_node, *child,
+        RecursivelyBuildTree(observation_node, depth + 1, *child,
                              move_limit,
                              chance_reach_prob * action_prob.second);
       }
     } else {
       for (Action a : state.LegalActions()) {
         std::unique_ptr<State> child = state.Child(a);
-        RecursivelyBuildTree(observation_node, *child,
+        RecursivelyBuildTree(observation_node, depth + 1, *child,
                              move_limit, chance_reach_prob);
       }
     }

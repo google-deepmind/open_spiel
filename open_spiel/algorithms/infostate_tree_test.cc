@@ -67,7 +67,12 @@ std::string ComputeCertificate(CFRNode& node) {
       close);
 }
 
-std::string CertificateFromStartHistories(
+std::unique_ptr<CFRTree> MakeTree(
+    const std::string& game_name, Player player_id) {
+  return std::make_unique<CFRTree>(*LoadGame(game_name), player_id);
+}
+
+std::unique_ptr<CFRTree> MakeTree(
     const std::string& game_name, Player player_id,
     const std::vector<std::vector<Action>>& start_histories,
     const std::vector<double>& start_reaches) {
@@ -84,16 +89,10 @@ std::string CertificateFromStartHistories(
   std::shared_ptr<Observer> infostate_observer =
       game->MakeObserver(kInfoStateObsType, {});
 
-  CFRTree tree(absl::MakeSpan(start_state_ptrs), absl::MakeSpan(start_reaches),
-               infostate_observer, player_id);
-  return ComputeCertificate(*tree.Root());
+  return std::make_unique<CFRTree>(
+      absl::MakeSpan(start_state_ptrs), absl::MakeSpan(start_reaches),
+      infostate_observer, player_id);
 }
-
-std::string RootCertificate(const std::string& game_name, Player player_id) {
-  CFRTree tree(*LoadGame(game_name), player_id);
-  return ComputeCertificate(*tree.Root());
-}
-
 
 void TestRootCertificates() {
   {
@@ -124,7 +123,9 @@ void TestRootCertificates() {
           "([(([({}{})({}{})]{}{}))(({}{}{}{}))])"
         ")"
       ")";  // </dummy>
-    SPIEL_CHECK_EQ(RootCertificate("kuhn_poker", 0), expected_certificate);
+    std::unique_ptr<CFRTree> tree = MakeTree("kuhn_poker", 0);
+    SPIEL_CHECK_EQ(ComputeCertificate(*tree->Root()), expected_certificate);
+    SPIEL_CHECK_FALSE(tree->IsBalanced());
   }
   {
     std::string expected_certificate =
@@ -142,7 +143,9 @@ void TestRootCertificates() {
         "([(({}{}{}{}))({}{})][({}{})({}{})])"
         "([(({}{}{}{}))({}{})][({}{})({}{})])"
       ")))";
-    SPIEL_CHECK_EQ(RootCertificate("kuhn_poker", 1), expected_certificate);
+    std::unique_ptr<CFRTree> tree = MakeTree("kuhn_poker", 1);
+    SPIEL_CHECK_EQ(ComputeCertificate(*tree->Root()), expected_certificate);
+    SPIEL_CHECK_FALSE(tree->IsBalanced());
   }
   {
     std::string expected_certificate =
@@ -157,8 +160,11 @@ void TestRootCertificates() {
                           "imp_info=True,"
                           "points_order=ascending"
                         ")";
-    SPIEL_CHECK_EQ(RootCertificate(iigs2, 0), expected_certificate);
-    SPIEL_CHECK_EQ(RootCertificate(iigs2, 1), expected_certificate);
+    for (int i = 0; i < 2; ++i) {
+      std::unique_ptr<CFRTree> tree = MakeTree(iigs2, i);
+      SPIEL_CHECK_EQ(ComputeCertificate(*tree->Root()), expected_certificate);
+      SPIEL_CHECK_TRUE(tree->IsBalanced());
+    }
   }
   {
     std::string expected_certificate =
@@ -168,8 +174,11 @@ void TestRootCertificates() {
         "({})"  // TH
         "({})"  // TT
       "])";
-    SPIEL_CHECK_EQ(RootCertificate("matrix_mp", 0), expected_certificate);
-    SPIEL_CHECK_EQ(RootCertificate("matrix_mp", 1), expected_certificate);
+    for (int i = 0; i < 2; ++i) {
+      std::unique_ptr<CFRTree> tree = MakeTree("matrix_mp", i);
+      SPIEL_CHECK_EQ(ComputeCertificate(*tree->Root()), expected_certificate);
+      SPIEL_CHECK_TRUE(tree->IsBalanced());
+    }
   }
 }
 
@@ -180,10 +189,10 @@ void TestCertificatesFromStartHistories() {
         "([(([({}{})({}{})]{}{}))(({}{}{}{}))])"
         "([(([({}{})({}{})]{}{}))(({}{}{}{}))])"
       ")";
-    SPIEL_CHECK_EQ(
-        CertificateFromStartHistories("kuhn_poker", 0,
-            {{0}, {2}}, {1/3., 1/3.}),
-        expected_certificate);
+    std::unique_ptr<CFRTree> tree = MakeTree("kuhn_poker", 0,
+                                             {{0}, {2}}, {1/3., 1/3.});
+    SPIEL_CHECK_EQ(ComputeCertificate(*tree->Root()), expected_certificate);
+    SPIEL_CHECK_FALSE(tree->IsBalanced());
   }
   {
     std::string expected_certificate =
@@ -191,10 +200,10 @@ void TestCertificatesFromStartHistories() {
         "([(({}{}))({})][({})({})])"
         "([(({}{}))({})][({})({})])"
       ")";
-    SPIEL_CHECK_EQ(
-        CertificateFromStartHistories("kuhn_poker", 1,
-            {{1, 0}, {1, 2}}, {1/6., 1/6.}),
-        expected_certificate);
+    std::unique_ptr<CFRTree> tree = MakeTree("kuhn_poker", 1,
+                                             {{1, 0}, {1, 2}}, {1/6., 1/6.});
+    SPIEL_CHECK_EQ(ComputeCertificate(*tree->Root()), expected_certificate);
+    SPIEL_CHECK_FALSE(tree->IsBalanced());
   }
   {
     std::string expected_certificate =
@@ -202,10 +211,10 @@ void TestCertificatesFromStartHistories() {
         "([(([({}{})({}{})]{}{}))(({}{}{}{}))])"
         "[({})({})]"
       ")";
-    SPIEL_CHECK_EQ(
-        CertificateFromStartHistories("kuhn_poker", 0,
-            {{0}, {2, 1, 0, 1}}, {1/3., 1/6.}),
-        expected_certificate);
+    std::unique_ptr<CFRTree> tree = MakeTree("kuhn_poker", 0,
+                                             {{0}, {2, 1, 0, 1}}, {1/3., 1/6.});
+    SPIEL_CHECK_EQ(ComputeCertificate(*tree->Root()), expected_certificate);
+    SPIEL_CHECK_FALSE(tree->IsBalanced());
   }
   {
     std::string expected_certificate =
@@ -213,10 +222,34 @@ void TestCertificatesFromStartHistories() {
         "([(({}{}))({})][({})({})])"
         "({}{})"
       ")";
-    SPIEL_CHECK_EQ(
-        CertificateFromStartHistories("kuhn_poker", 1,
-            {{1, 0}, {1, 2, 0, 1}}, {1/6., 1/6.}),
-        expected_certificate);
+    std::unique_ptr<CFRTree> tree = MakeTree("kuhn_poker", 1,
+                                             {{1, 0}, {1, 2, 0, 1}},
+                                             {1/6., 1/6.});
+    SPIEL_CHECK_EQ(ComputeCertificate(*tree->Root()), expected_certificate);
+    SPIEL_CHECK_FALSE(tree->IsBalanced());
+  }
+  {
+    std::string expected_certificate =
+      "("
+        "[({}{})({}{})]"
+      ")";
+    std::unique_ptr<CFRTree> tree = MakeTree("kuhn_poker", 0,
+                                             {{0, 1, 0, 1}, {0, 2, 0, 1}},
+                                             {1/6., 1/6.});
+    SPIEL_CHECK_EQ(ComputeCertificate(*tree->Root()), expected_certificate);
+    SPIEL_CHECK_TRUE(tree->IsBalanced());
+  }
+  {
+    std::string expected_certificate =
+      "("
+        "({}{})"
+        "({}{})"
+      ")";
+    std::unique_ptr<CFRTree> tree = MakeTree("kuhn_poker", 1,
+                                             {{0, 1, 0, 1}, {0, 2, 0, 1}},
+                                             {1/6., 1/6.});
+    SPIEL_CHECK_EQ(ComputeCertificate(*tree->Root()), expected_certificate);
+    SPIEL_CHECK_TRUE(tree->IsBalanced());
   }
 }
 
