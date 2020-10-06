@@ -67,20 +67,20 @@ template<class Contents> class InfostateNode;
 template<class Contents>
 class InfostateNode {
  public:
-  InfostateNode(const InfostateTree<Contents>* tree, InfostateNode* parent,
+  InfostateNode(const InfostateTree<Contents>& tree, InfostateNode* parent,
                 int incoming_index, InfostateNodeType type,
                 absl::Span<float> tensor, double terminal_value,
-                const State* originating_state, Player infostate_tree_player)
+                const State* originating_state)
       : tree_(tree), parent_(parent),
         incoming_index_(incoming_index), type_(type),
         // Copy the tensor.
         tensor_(tensor.begin(), tensor.end()),
         terminal_value_(terminal_value) {
     if (type == kDecisionNode)
-      legal_actions_ = originating_state->LegalActions(infostate_tree_player);
+      legal_actions_ = originating_state->LegalActions(tree_.GetPlayer());
   }
 
-  InfostateTree<Contents>* Tree() const { return tree_; }
+  const InfostateTree<Contents>& Tree() const { return tree_; }
   InfostateNode* Parent() { return parent_; }
   int IncomingIndex() const { return incoming_index_; }
   const InfostateNodeType& Type() const { return type_; }
@@ -104,8 +104,7 @@ class InfostateNode {
     return nullptr;
   }
   InfostateNode* ChildAt(int i) { return children_.at(i).get(); }
-
-  long NumChildren() const { return children_.size(); }
+  int NumChildren() const { return children_.size(); }
 
   std::vector<int> GetSequence() const {
     std::vector<int> sequence;
@@ -150,7 +149,7 @@ class InfostateNode {
               /*tree=*/tree_, /*parent=*/nullptr,
               /*incoming_index=*/position_in_leaf_parent, kObservationNode,
               /*tensor=*/{}, /*terminal_value=*/0,
-              /*originating_state=*/nullptr, tree_->GetPlayer()));
+              /*originating_state=*/nullptr));
       InfostateNode* chain_tail = chain_head.get();
       for (int i = 1; i < max_depth - current_depth; ++i) {
         chain_tail = chain_tail->AddChild(
@@ -158,7 +157,7 @@ class InfostateNode {
                 /*tree=*/tree_, /*parent=*/chain_tail,
                 /*incoming_index=*/0, kObservationNode,
                 /*tensor=*/{}, /*terminal_value=*/0,
-                /*originating_state=*/nullptr, tree_->GetPlayer())));
+                /*originating_state=*/nullptr)));
       }
       chain_tail->children_.push_back(nullptr);
 
@@ -196,7 +195,7 @@ class InfostateNode {
     this->parent_ = target;
   }
 
-  const InfostateTree<Contents>* tree_;
+  const InfostateTree<Contents>& tree_;
   InfostateNode* parent_;
   const int incoming_index_;
   const InfostateNodeType type_;
@@ -219,9 +218,9 @@ class InfostateTree {
                 int max_depth_limit = 1000)
       : player_(acting_player),
         infostate_observer_(game.MakeObserver(kInfoStateObsType, {})),
-        root_(/*tree=*/this, /*parent=*/nullptr, /*incoming_index=*/0,
+        root_(/*tree=*/*this, /*parent=*/nullptr, /*incoming_index=*/0,
               /*type=*/kObservationNode, /*tensor=*/{}, /*terminal_value=*/0,
-              /*originating_state=*/nullptr, /*acting_player=*/player_),
+              /*originating_state=*/nullptr),
         observation_(std::move(CreateObservation(game))) {
     std::unique_ptr<State> root_state = game.NewInitialState();
     RecursivelyBuildTree(&root_, /*depth=*/1, *root_state,
@@ -244,9 +243,9 @@ class InfostateTree {
         // Root is just a dummy node, and has a tensor full of zeros.
         // It cannot be retrieved via Get* methods, only by using the Root()
         // method.
-        root_(/*tree=*/this, /*parent=*/nullptr, /*incoming_index=*/0,
+        root_(/*tree=*/*this, /*parent=*/nullptr, /*incoming_index=*/0,
               /*type=*/kObservationNode, /*tensor=*/{}, /*terminal_value=*/0,
-              /*originating_state=*/nullptr, /*acting_player=*/player_),
+              /*originating_state=*/nullptr),
       observation_(std::move(CreateObservation(*start_states.at(0)))) {
     SPIEL_CHECK_EQ(start_states.size(), chance_reach_probs.size());
 
@@ -267,19 +266,6 @@ class InfostateTree {
   Player GetPlayer() const { return player_; }
   int TreeHeight() const { return tree_height_; }
   bool IsBalanced() const { return is_tree_balanced_; }
-  // Convenient methods to directly access decision nodes by observation
-  // or State. This is useful for looking up solved policy, but not neccessary
-  // for the infostate tree construction or running CFR iterations.
-  Node* GetByCompressed(const std::string& observation) const {
-    auto it = lookup_table_.find(observation);
-    return it == lookup_table_.end() ? nullptr : it->second;
-  }
-  Node* GetByState(const State& state) {
-    SPIEL_CHECK_TRUE(state.IsPlayerActing(player_));
-    observation_.SetFrom(state, player_);
-    std::string compressed = observation_.Compress();
-    return GetByCompressed(compressed);
-  }
 
   // Makes sure that all tree leaves are at the same height.
   // It inserts a linked list of dummy observation nodes with approriate length
@@ -298,13 +284,8 @@ class InfostateTree {
 
   // A value that helps to determine if the tree is balanced.
   int tree_height_ = -1;
-  // We call an infostate tree balanced if all terminal nodes
-  // are in the same depth.
+  // We call a tree balanced if all leaves are in the same depth.
   bool is_tree_balanced_ = true;
-
-  // Store compressed observations for fast lookup of decision nodes
-  // in the lookup table.
-  std::unordered_map<std::string, Node*> lookup_table_;
 
   // Create observation here, so that we can run a number of checks,
   // which cannot be done in the initialization list.
@@ -326,12 +307,12 @@ class InfostateTree {
       Node* parent, InfostateNodeType type, absl::Span<float> tensor,
       double terminal_value, const State* originating_state) {
     return std::make_unique<Node>(
-        this, parent, parent->NumChildren(), type,
-        tensor, terminal_value, originating_state, player_);
+        *this, parent, parent->NumChildren(), type,
+        tensor, terminal_value, originating_state);
   }
 
+  // Track and update information about tree balance.
   void UpdateBalanceInfo(int leaf_depth) {
-    // Track information about tree balance.
     if (tree_height_ != -1 && is_tree_balanced_) {
       is_tree_balanced_ = tree_height_ == leaf_depth;
     }
@@ -374,7 +355,6 @@ class InfostateTree {
       } else {
         decision_node = parent->AddChild(MakeNode(
             parent, kDecisionNode, observation_.Tensor(), 0, &state));
-        lookup_table_.insert({observation_.Compress(), decision_node});
 
         if (state.MoveNumber() >= move_limit)  // Do not build deeper.
           return UpdateBalanceInfo(depth);
@@ -433,21 +413,21 @@ using CFRNode = InfostateNode</*Contents=*/CFRInfoStateValues>;
 // Specialize CFRNode, because we construct the content
 // of CFRInfoStateValues differently for decision nodes.
 template<> CFRNode::InfostateNode(
-    const CFRTree* tree, CFRNode* parent, int incoming_index, InfostateNodeType type,
-    absl::Span<float> tensor, double terminal_value,
-    const State* originating_state, Player player) :
+    const CFRTree& tree, CFRNode* parent, int incoming_index,
+    InfostateNodeType type, absl::Span<float> tensor, double terminal_value,
+    const State* originating_state) :
   tree_(tree), parent_(parent), incoming_index_(incoming_index), type_(type),
   tensor_(tensor.begin(), tensor.end()),
   terminal_value_(terminal_value),
   content_(originating_state && type == kDecisionNode
-    ? CFRInfoStateValues(originating_state->LegalActions(player))
+    ? CFRInfoStateValues(originating_state->LegalActions(tree.GetPlayer()))
     : CFRInfoStateValues()) {
     // Do not save legal actions, as they are already saved
     // within CFRInfoStateValues. Instead, change the LegalActions
     // implementation to refer to these values directly.
     SPIEL_DCHECK_TRUE(
        !(originating_state && type == kDecisionNode)
-       || originating_state->IsPlayerActing(player));
+       || originating_state->IsPlayerActing(tree.GetPlayer()));
   }
 template<> absl::Span<const Action> CFRNode::LegalActions() const {
   SPIEL_CHECK_EQ(type_, kDecisionNode);
