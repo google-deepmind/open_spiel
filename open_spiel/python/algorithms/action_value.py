@@ -252,3 +252,65 @@ class TreeWalkCalculator(object):
     """
     self.compute_all_states_action_values(policies)
     return self.get_tabular_statistics(tabular_policy)
+
+  def get_root_node_values(self, policies):
+    """Gets root values only.
+
+    This speeds up calculation in two ways:
+
+    1. It only searches nodes with positive probability.
+    2. It does not populate a large dictionary of meta information.
+
+    Args:
+      policies: List of `policy.Policy` objects, one per player.
+
+    Returns:
+      A numpy array of shape [num_players] of the root value.
+    """
+    return self._get_action_values_only(
+        self._game.new_initial_state(),
+        policies,
+        reach_probabilities=np.ones(self._num_players + 1))
+
+  def _get_action_values_only(self, state, policies, reach_probabilities):
+    """Computes the value of the state given the policies for both players.
+
+    Args:
+      state: The state to start analysis from.
+      policies: List of `policy.Policy` objects, one per player.
+      reach_probabilities: A numpy array of shape `[num_players + 1]`.
+        reach_probabilities[i] is the product of the player i action
+        probabilities along the current trajectory. Note that
+        reach_probabilities[-1] corresponds to the chance player. Initially, it
+        should be called with np.ones(self._num_players + 1) at the root node.
+
+    Returns:
+      A numpy array of shape [num_players] of the root value.
+    """
+    if state.is_terminal():
+      return np.array(state.returns())
+
+    current_player = state.current_player()
+    is_chance = state.is_chance_node()
+
+    value = np.zeros(len(policies))
+    if is_chance:
+      action_to_prob = dict(state.chance_outcomes())
+    else:
+      action_to_prob = policies[current_player].action_probabilities(state)
+
+    for action in state.legal_actions():
+      prob = action_to_prob.get(action, 0)
+
+      # Do not follow tree down if there is zero probability.
+      if prob == 0.0:
+        continue
+
+      new_reach_probabilities = reach_probabilities.copy()
+      new_reach_probabilities[current_player] *= prob
+
+      child = state.child(action)
+      child_value = self._get_action_values_only(
+          child, policies, reach_probabilities=new_reach_probabilities)
+      value += child_value * prob
+    return value

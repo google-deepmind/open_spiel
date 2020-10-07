@@ -45,6 +45,10 @@ class ActionValuesTest(parameterized.TestCase):
     always_pass_policy = policy.FirstActionPolicy(game).to_tabular()
     returned_values = calc([always_pass_policy, uniform_policy],
                            always_pass_policy)
+    root_node_values = calc.get_root_node_values(
+        [always_pass_policy, uniform_policy])
+    self.assertTrue(
+        np.allclose(root_node_values, returned_values.root_node_values))
 
     # Action 0 == Pass. Action 1 == Bet
     # Some values are 0 because the states are not reached, thus the expected
