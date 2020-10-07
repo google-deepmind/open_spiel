@@ -23,9 +23,12 @@ namespace oh_hell {
 namespace {
 
 void GameConfigSimTest() {
-  for (int players = kMinNumPlayers; players <= kMaxNumPlayers; ++players) {
+    // only test with 2, 7, and 12 cards per suit and 3, 5, or 7 players
+    // to reduce test output size for CI
+  for (int players = kMinNumPlayers; players <= kMaxNumPlayers; players += 2) {
     for (int suits = kMinNumSuits; suits <= kMaxNumSuits; ++suits) {
-      for (int cps = kMinNumCardsPerSuit; cps <= kMaxNumCardsPerSuit; ++cps) {
+      for (int cps = kMinNumCardsPerSuit; cps <= kMaxNumCardsPerSuit;
+           cps += 5) {
         if (suits * cps - 1 >= players) {
           open_spiel::GameParameters params;
           params["players"] = GameParameter(players);
@@ -96,7 +99,7 @@ std::string InformationStateTensorToString(Player player,
   ptr += deck_props.NumCards();
   // bids
   for (Player p = 0; p < num_players; ++p) {
-    for (int i = 0; i <= max_num_tricks; ++i) {
+    for (int i = 0; i <= max_num_tricks + 1; ++i) {
       if (ptr[i] == 1) {
         // account for no bid yet
         bids[p] = i - 1;
