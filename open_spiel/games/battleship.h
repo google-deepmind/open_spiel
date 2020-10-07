@@ -248,6 +248,9 @@ class BattleshipState final : public State {
   // ```
   std::string ShotsBoardString(const Player player) const;
 
+  // Outputs a pretty representation of the boards of the two players.
+  std::string ToPrettyString() const;
+
  protected:
   void DoApplyAction(Action action_id) override;
 

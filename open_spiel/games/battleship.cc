@@ -178,15 +178,28 @@ std::string BattleshipState::ActionToString(Player player,
 }
 
 std::string BattleshipState::ToString() const {
-  std::string state_str;
+  std::string state_str = ToPrettyString();
 
-  absl::StrAppend(&state_str, "Player 0's board:\n");
-  absl::StrAppend(&state_str, OwnBoardString(Player{0}));
-  absl::StrAppend(&state_str, "\nPlayer 1's board:\n");
-  absl::StrAppend(&state_str, OwnBoardString(Player{1}));
-  // NOTE: It is not necessary to also include the boards of the players'
-  //     shots, since those can be inferred from the two ship boards.
+  // The board representation returned by `ToPrettyString` does not distinguish
+  // between the order of moves. To disambiguate and have ToString fully capture
+  // the state, we also include the order of the moves in a separate line.
 
+  absl::StrAppend(&state_str, "\nFull history: ");
+  for (const auto& move : moves_) {
+    if (move.player == Player{0}) {
+      absl::StrAppend(&state_str, "/0:");
+    } else {
+      absl::StrAppend(&state_str, "/1:");
+    }
+    if (absl::holds_alternative<ShipPlacement>(move.action)) {
+      absl::StrAppend(&state_str,
+                      absl::get<ShipPlacement>(move.action).ToString());
+    } else {
+      SPIEL_DCHECK_TRUE(absl::holds_alternative<Shot>(move.action));
+      absl::StrAppend(&state_str, absl::get<Shot>(move.action).ToString());
+    }
+  }
+  absl::StrAppend(&state_str, "\n");
   return state_str;
 }
 
@@ -305,6 +318,26 @@ std::string BattleshipState::InformationStateString(Player player) const {
   }
 
   return information_state;
+}
+
+std::string BattleshipState::ObservationString(Player player) const {
+  std::string output = "State of player's ships:\n";
+  absl::StrAppend(&output, OwnBoardString(player));
+  absl::StrAppend(&output, "\nPlayer's shot outcomes:\n");
+  absl::StrAppend(&output, ShotsBoardString(player));
+  return output;
+}
+
+void BattleshipState::UndoAction(Player player, Action action_id) {
+  SPIEL_CHECK_GT(moves_.size(), 0);
+  // XXX(gfarina): It looks like SPIEL_CHECK_EQ wants to print a PlayerAction
+  //     on failure, but std::cout was not overloaded. For now I moved to a
+  //     SPIEL_CHECK_TRUE.
+  SPIEL_CHECK_TRUE((history_.back() == PlayerAction{player, action_id}));
+
+  history_.pop_back();
+  moves_.pop_back();
+  --move_number_;
 }
 
 std::string BattleshipState::OwnBoardString(const Player player) const {
@@ -458,24 +491,15 @@ std::string BattleshipState::ShotsBoardString(const Player player) const {
   return output;
 }
 
-std::string BattleshipState::ObservationString(Player player) const {
-  std::string output = "State of player's ships:\n";
-  absl::StrAppend(&output, OwnBoardString(player));
-  absl::StrAppend(&output, "\nPlayer's shot outcomes:\n");
-  absl::StrAppend(&output, ShotsBoardString(player));
-  return output;
-}
+std::string BattleshipState::ToPrettyString() const {
+  std::string state_str;
 
-void BattleshipState::UndoAction(Player player, Action action_id) {
-  SPIEL_CHECK_GT(moves_.size(), 0);
-  // XXX(gfarina): It looks like SPIEL_CHECK_EQ wants to print a PlayerAction
-  //     on failure, but std::cout was not overloaded. For now I moved to a
-  //     SPIEL_CHECK_TRUE.
-  SPIEL_CHECK_TRUE((history_.back() == PlayerAction{player, action_id}));
+  absl::StrAppend(&state_str, "Player 0's board:\n");
+  absl::StrAppend(&state_str, OwnBoardString(Player{0}));
+  absl::StrAppend(&state_str, "\nPlayer 1's board:\n");
+  absl::StrAppend(&state_str, OwnBoardString(Player{1}));
 
-  history_.pop_back();
-  moves_.pop_back();
-  --move_number_;
+  return state_str;
 }
 
 void BattleshipState::DoApplyAction(Action action_id) {
