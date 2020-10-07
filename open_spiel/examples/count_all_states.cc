@@ -40,7 +40,7 @@ int main(int argc, char** argv) {
     int num_terminal_states = 0;
     int num_chance_nodes = 0;
     for (const auto& [_, state] : all_states) {
-      if (state->CurrentPlayer() > 0) {
+      if (state->CurrentPlayer() >= 0) {
         all_infostates.insert(state->InformationStateString());
       }
       if (state->IsTerminal()) ++num_terminal_states;
