@@ -249,36 +249,33 @@ void FullNLBettingTest1() {
                       "stack=20 20,"
                       "bettingAbstraction=fullgame)");
   std::unique_ptr<State> state = game->NewInitialState();
+  SPIEL_CHECK_EQ(game->NumDistinctActions(), 21);
   while (state->IsChanceNode())
     state->ApplyAction(state->LegalActions()[0]);  // deal hole cards
-  // assert all raise increments are valid
-  for (int i = 3; i < 12; ++i)
-    SPIEL_CHECK_TRUE(absl::c_linear_search(state->LegalActions(), i));
-  SPIEL_CHECK_FALSE(absl::c_linear_search(state->LegalActions(), 12));
+  // check valid raise actions, smallest valid raise is double the big blind
+  SPIEL_CHECK_FALSE(absl::c_binary_search(state->LegalActions(), 3));
+  for (int i = 4; i <= 20; ++i)
+    SPIEL_CHECK_TRUE(absl::c_binary_search(state->LegalActions(), i));
+  SPIEL_CHECK_FALSE(absl::c_binary_search(state->LegalActions(), 21));
   state->ApplyAction(1);  // call big blind
   state->ApplyAction(1);  // check big blind
   for (int i = 0; i < 3; ++i)
     state->ApplyAction(state->LegalActions()[0]);  // deal flop
-  // assert all raise increments are valid
-  for (int i = 3; i < 12; ++i)
-    SPIEL_CHECK_TRUE(absl::c_linear_search(state->LegalActions(), i));
+  // check valid raise actions, smallest valid raise is double the big blind
+  SPIEL_CHECK_FALSE(absl::c_binary_search(state->LegalActions(), 3));
+  for (int i = 4; i <= 20; ++i)
+    SPIEL_CHECK_TRUE(absl::c_binary_search(state->LegalActions(), i));
+  SPIEL_CHECK_FALSE(absl::c_binary_search(state->LegalActions(), 21));
   // each player keeps min raising until one is all in
-  for (int i = 3; i < 12; ++i)
-    state->ApplyAction(i);
+  for (int i = 4; i <= 20; i += 2) state->ApplyAction(i);
   state->ApplyAction(1);  // call last raise
   state->ApplyAction(state->LegalActions()[0]);  // deal turn
   state->ApplyAction(state->LegalActions()[0]);  // deal river
   SPIEL_CHECK_EQ(state->Returns()[0], state->Returns()[1]);  // hand is a draw
-  std::string state_str = state->ToString();
-  if (!absl::StrContains(state_str,
-                         "ACPC State: STATE:0:cc/r4r6r8r10r12r14r16r18r20c//"
-                         ":2c2d|2h2s/3c3d3h/3s/4c")) {
-    std::cout << "history: " << state->HistoryString() << std::endl;
-    SpielFatalError(
-        absl::StrCat("State str: ", state_str, " should contain ",
-                     "ACPC State: STATE:0:cc/r4r6r8r10r12r14r16r18r20c//"
-                     ":2c2d|2h2s/3c3d3h/3s/4c"));
-  }
+  SPIEL_CHECK_TRUE(
+      absl::StrContains(state->ToString(),
+                        "ACPC State: STATE:0:cc/r4r6r8r10r12r14r16r18r20c//"
+                        ":2c2d|2h2s/3c3d3h/3s/4c"));
 }
 
 // Checks that raises must double previous bet within the same round but
@@ -297,53 +294,51 @@ void FullNLBettingTest2() {
                       "stack=10000 10000,"
                       "bettingAbstraction=fullgame)");
   std::unique_ptr<State> state = game->NewInitialState();
-  while (state->IsChanceNode()) {
+  SPIEL_CHECK_EQ(game->NumDistinctActions(), 10001);
+  while (state->IsChanceNode())
     state->ApplyAction(state->LegalActions()[0]);  // deal hole cards
-  }
-  // assert all raise increments are valid
-  for (int i = 3; i < 102; ++i) {
-    SPIEL_CHECK_TRUE(absl::c_linear_search(state->LegalActions(), i));
-  }
-  SPIEL_CHECK_FALSE(absl::c_linear_search(state->LegalActions(), 102));
-  state->ApplyAction(52);  // bet just over half stack
+  // check valid raise actions
+  std::vector<Action> legal_actions = state->LegalActions();
+  SPIEL_CHECK_FALSE(absl::c_binary_search(legal_actions, 199));
+  for (int i = 200; i <= 10000; ++i)
+    SPIEL_CHECK_TRUE(absl::c_binary_search(legal_actions, i));
+  SPIEL_CHECK_FALSE(absl::c_binary_search(legal_actions, 10001));
+  state->ApplyAction(5100);  // bet just over half stack
   // raise must double the size of the bet
   // only legal actions now are fold, call, raise all-in
   SPIEL_CHECK_EQ(state->LegalActions().size(), 3);
+  SPIEL_CHECK_EQ(state->LegalActions().back(), 10000);
   state->ApplyAction(1);  // call
-  for (int i = 0; i < 3; ++i) {
+  for (int i = 0; i < 3; ++i)
     state->ApplyAction(state->LegalActions()[0]);  // deal flop
-  }
   // new round of betting so we can bet as small as the big blind
-  for (int i = 53; i < 102; ++i) {
-    SPIEL_CHECK_TRUE(absl::c_linear_search(state->LegalActions(), i));
-  }
-  state->ApplyAction(53);  // min bet
+  legal_actions = state->LegalActions();
+  SPIEL_CHECK_FALSE(absl::c_binary_search(legal_actions, 5199));
+  for (int i = 5200; i <= 10000; ++i)
+    SPIEL_CHECK_TRUE(absl::c_binary_search(legal_actions, i));
+  state->ApplyAction(5200);  // min bet
   // now we can raise as small as the big blind or as big as an all-in
-  for (int i = 54; i < 102; ++i) {
-    SPIEL_CHECK_TRUE(absl::c_linear_search(state->LegalActions(), i));
-  }
+  legal_actions = state->LegalActions();
+  for (int i = 5300; i <= 10000; ++i)
+    SPIEL_CHECK_TRUE(absl::c_binary_search(legal_actions, i));
   state->ApplyAction(1);  // opt just to call
   state->ApplyAction(state->LegalActions()[0]);  // deal turn
-  // new round of betting so we can bet as small as the big blind
-  for (int i = 55; i < 102; ++i) {
-    SPIEL_CHECK_TRUE(absl::c_linear_search(state->LegalActions(), i));
-  }
-  state->ApplyAction(55);  // min bet 1 big blind
-  state->ApplyAction(57);  // raise to 3 big blinds
-  // now a reraise must at least double this raise to 5 big blinds
-  SPIEL_CHECK_FALSE(absl::c_linear_search(state->LegalActions(), 58));
-  SPIEL_CHECK_TRUE(absl::c_linear_search(state->LegalActions(), 59));
-  state->ApplyAction(60);  // reraise to 6 big blinds
-  // now a reraise must at least double this raise to 9 big blinds
-  SPIEL_CHECK_FALSE(absl::c_linear_search(state->LegalActions(), 62));
-  SPIEL_CHECK_TRUE(absl::c_linear_search(state->LegalActions(), 63));
+  state->ApplyAction(5400);                      // bet 2 big blinds
+  state->ApplyAction(5600);                      // raise to 4 big blinds
+  state->ApplyAction(5900);                      // reraise to 7 big blinds
+  // now a reraise must increase by at least 3 more big blinds
+  legal_actions = state->LegalActions();
+  SPIEL_CHECK_FALSE(absl::c_binary_search(legal_actions, 6199));
+  for (int i = 6200; i <= 10000; ++i)
+    SPIEL_CHECK_TRUE(absl::c_binary_search(legal_actions, i));
   state->ApplyAction(1);  // opt to just call
   state->ApplyAction(state->LegalActions()[0]);  // deal river
   // new round of betting so we can bet as small as the big blind
-  for (int i = 61; i < 102; ++i) {
-    SPIEL_CHECK_TRUE(absl::c_linear_search(state->LegalActions(), i));
-  }
-  state->ApplyAction(101);  // all-in!
+  legal_actions = state->LegalActions();
+  SPIEL_CHECK_FALSE(absl::c_binary_search(legal_actions, 5999));
+  for (int i = 6000; i <= 10000; ++i)
+    SPIEL_CHECK_TRUE(absl::c_binary_search(legal_actions, i));
+  state->ApplyAction(10000);  // all-in!
   state->ApplyAction(0);  // fold
   SPIEL_CHECK_EQ(state->Returns()[0], 5900);
   SPIEL_CHECK_EQ(state->Returns()[1], -5900);
@@ -368,47 +363,50 @@ void FullNLBettingTest3() {
                       "stack=500 1000 2000,"
                       "bettingAbstraction=fullgame)");
   std::unique_ptr<State> state = game->NewInitialState();
-  while (state->IsChanceNode()) {
-    state->ApplyAction(state->LegalActions()[0]);
-  }
+  SPIEL_CHECK_EQ(game->NumDistinctActions(), 2001);
+  while (state->IsChanceNode()) state->ApplyAction(state->LegalActions()[0]);
   state->ApplyAction(1);  // call big blind
   state->ApplyAction(1);  // call big blind
   state->ApplyAction(1);  // check big blind
-  for (int i = 0; i < 3; ++i) {
+  for (int i = 0; i < 3; ++i)
     state->ApplyAction(state->LegalActions()[0]);  // deal flop
-  }
   // assert all raise increments are valid
-  for (int i = 3; i < 7; ++i) {
-    SPIEL_CHECK_TRUE(absl::c_linear_search(state->LegalActions(), i));
-  }
-  SPIEL_CHECK_FALSE(absl::c_linear_search(state->LegalActions(), 7));
+  std::vector<Action> legal_actions = state->LegalActions();
+  SPIEL_CHECK_FALSE(absl::c_binary_search(legal_actions, 199));
+  for (int i = 200; i <= 500; ++i)
+    SPIEL_CHECK_TRUE(absl::c_binary_search(legal_actions, i));
+  SPIEL_CHECK_FALSE(absl::c_binary_search(legal_actions, 501));
   state->ApplyAction(1);  // check
-  for (int i = 3; i < 12; ++i) {
-    SPIEL_CHECK_TRUE(absl::c_linear_search(state->LegalActions(), i));
-  }
-  SPIEL_CHECK_FALSE(absl::c_linear_search(state->LegalActions(), 12));
+  legal_actions = state->LegalActions();
+  SPIEL_CHECK_FALSE(absl::c_binary_search(legal_actions, 199));
+  for (int i = 200; i <= 1000; ++i)
+    SPIEL_CHECK_TRUE(absl::c_binary_search(legal_actions, i));
+  SPIEL_CHECK_FALSE(absl::c_binary_search(legal_actions, 1001));
   state->ApplyAction(1);  // check
-  for (int i = 3; i < 22; ++i) {
-    SPIEL_CHECK_TRUE(absl::c_linear_search(state->LegalActions(), i));
-  }
-  SPIEL_CHECK_FALSE(absl::c_linear_search(state->LegalActions(), 22));
-  state->ApplyAction(3);  // min raise
-  for (int i = 4; i < 7; ++i) {
-    SPIEL_CHECK_TRUE(absl::c_linear_search(state->LegalActions(), i));
-  }
-  SPIEL_CHECK_FALSE(absl::c_linear_search(state->LegalActions(), 7));
-  state->ApplyAction(6);  // short stack goes all-in
-  for (int i = 9; i < 12; ++i) {
-    SPIEL_CHECK_TRUE(absl::c_linear_search(state->LegalActions(), i));
-  }
-  SPIEL_CHECK_FALSE(absl::c_linear_search(state->LegalActions(), 12));
-  state->ApplyAction(9);  // min raise
-  for (int i = 12; i < 22; ++i) {
-    SPIEL_CHECK_TRUE(absl::c_linear_search(state->LegalActions(), i));
-  }
-  SPIEL_CHECK_FALSE(absl::c_linear_search(state->LegalActions(), 22));
-  state->ApplyAction(21);  // all-in
-  SPIEL_CHECK_EQ(state->LegalActions().size(), 2);
+  legal_actions = state->LegalActions();
+  SPIEL_CHECK_FALSE(absl::c_binary_search(legal_actions, 199));
+  for (int i = 200; i <= 2000; ++i)
+    SPIEL_CHECK_TRUE(absl::c_binary_search(legal_actions, i));
+  SPIEL_CHECK_FALSE(absl::c_binary_search(legal_actions, 2001));
+  state->ApplyAction(200);  // min raise
+  legal_actions = state->LegalActions();
+  for (int i = 300; i <= 500; ++i)
+    SPIEL_CHECK_TRUE(absl::c_binary_search(legal_actions, i));
+  SPIEL_CHECK_FALSE(absl::c_binary_search(legal_actions, 501));
+  state->ApplyAction(500);  // short stack goes all-in
+  legal_actions = state->LegalActions();
+  SPIEL_CHECK_FALSE(absl::c_binary_search(legal_actions, 799));
+  for (int i = 800; i <= 1000; ++i)
+    SPIEL_CHECK_TRUE(absl::c_binary_search(legal_actions, i));
+  SPIEL_CHECK_FALSE(absl::c_binary_search(legal_actions, 1001));
+  state->ApplyAction(800);  // min raise
+  legal_actions = state->LegalActions();
+  SPIEL_CHECK_FALSE(absl::c_binary_search(legal_actions, 1099));
+  for (int i = 1100; i <= 2000; ++i)
+    SPIEL_CHECK_TRUE(absl::c_binary_search(legal_actions, i));
+  SPIEL_CHECK_FALSE(absl::c_binary_search(legal_actions, 2001));
+  state->ApplyAction(2000);                         // all-in
+  SPIEL_CHECK_EQ(state->LegalActions().size(), 2);  // can only fold or call
   state->ApplyAction(1);  // call
   state->ApplyAction(state->LegalActions()[0]);  // deal turn
   state->ApplyAction(state->LegalActions()[0]);  // deal river
@@ -434,8 +432,8 @@ void ChanceDealRegressionTest() {
       "stack=500 1000 2000,"
       "bettingAbstraction=fullgame)");
   std::unique_ptr<State> state = game->NewInitialState();
-  for (Action action :
-       {0, 1, 2, 3, 4, 5, 1, 1, 1, 6, 7, 8, 1, 1, 3, 6, 9, 21, 1, 9, 10}) {
+  for (Action action : {0, 1, 2, 3,   4,   5,   1,    1, 1, 6, 7,
+                        8, 1, 1, 200, 500, 800, 2000, 1, 9, 10}) {
     state->ApplyAction(action);
   }
   SPIEL_CHECK_EQ(
