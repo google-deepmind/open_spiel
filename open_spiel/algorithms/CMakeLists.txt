@@ -58,6 +58,10 @@ add_library (algorithms OBJECT
 )
 target_include_directories (algorithms PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
+if (${BUILD_WITH_ORTOOLS})
+  add_subdirectory (ortools)
+endif()
+
 add_executable(best_response_test best_response_test.cc
         $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})
 add_test(best_response_test best_response_test)
