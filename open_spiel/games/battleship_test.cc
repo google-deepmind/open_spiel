@@ -17,6 +17,7 @@
 #include <iostream>
 #include <limits>
 
+#include "open_spiel/abseil-cpp/absl/container/flat_hash_set.h"
 #include "open_spiel/algorithms/expected_returns.h"
 #include "open_spiel/algorithms/get_all_states.h"
 #include "open_spiel/algorithms/tabular_exploitability.h"
@@ -283,11 +284,157 @@ void TestNashEquilibriumInSmallBoard() {
   //     EFCE/EFCCE/NFCCE,finish checking that we exactly replicate the same
   //     results as [1] in this game.
 }
+
+struct GameSize {
+  uint32_t num_sequences[2] = {0, 0};   // Layout: [Pl.0, Pl.1].
+  uint32_t num_infostates[2] = {0, 0};  // Layout: [Pl.0, Pl.1].
+  uint32_t num_terminal_states = 0;
+};
+
+GameSize ComputeGameSize(const std::shared_ptr<const Game> game) {
+  std::map<std::string, std::unique_ptr<open_spiel::State>> all_states =
+      open_spiel::algorithms::GetAllStates(
+          *game, /* depth_limit = */ std::numeric_limits<int>::max(),
+          /* include_terminals = */ true,
+          /* include_chance_states = */ false);
+
+  GameSize size;
+
+  // Account for empty sequence.
+  size.num_sequences[Player{0}] = 1;
+  size.num_sequences[Player{1}] = 1;
+
+  absl::flat_hash_set<std::string> infosets;
+  for (const auto& [_, state] : all_states) {
+    if (state->IsTerminal()) {
+      ++size.num_terminal_states;
+    } else {
+      const Player player = state->CurrentPlayer();
+      SPIEL_CHECK_TRUE(player == Player{0} || player == Player{1});
+
+      // NOTE: there is no requirement that infostates strings be unique across
+      //     players. So, we disambiguate the player by prepending it.
+      const std::string infostate_string =
+          absl::StrCat(player, state->InformationStateString());
+
+      if (infosets.insert(infostate_string).second) {
+        // The infostate string was not present in the hash set. We update the
+        // tally of infosets and sequences for the player.
+        size.num_infostates[player] += 1;
+        size.num_sequences[player] += state->LegalActions().size();
+      }
+    }
+  }
+
+  return size;
+}
+
+void TestGameSizes() {
+  // We expect these game sizes when using allow_repeated_shots = False:
+  //
+  // +-------+-------+-------+-----------------+----------------+----------+
+  // |  Grid | Shots |  Ship |  Num sequences  |  Num infosets  | Terminal |
+  // |       |       | sizes |   pl 0 |   pl 1 |  pl 0 |   pl 1 |  states  |
+  // +-------+-------+-------+--------+--------+-------+--------+----------+
+  // | 2 x 2 |     2 |   [1] |    165 |    341 |    53 |    109 |     1072 |
+  // | 2 x 2 |     3 |   [1] |    741 |    917 |   341 |    397 |     2224 |
+  // | 2 x 2 |     2 | [1;2] |   1197 |   3597 |   397 |   1189 |     9216 |
+  // | 2 x 2 |     3 | [1;2] |  13485 |  22029 |  6541 |  10405 |    32256 |
+  // +-------+-------+-------+--------+--------+-------+--------+----------+
+  // | 2 x 3 |     2 |   [1] |    943 |   3787 |   187 |    751 |    19116 |
+  // | 2 x 3 |     3 |   [1] |  15343 |  46987 |  3787 |  11551 |   191916 |
+  // | 2 x 3 |     4 |   [1] | 144943 | 306187 | 46987 |  97951 |   969516 |
+  // +-------+-------+-------+--------+--------+-------+--------+----------+
+
+  // To simplify the construction of game instance we introduce a lambda.
+  //
+  // Since the value of the ships and the loss multiplier do not affect the game
+  // size, the lambda fills those parameters with 2
+  const auto ConstructInstance =
+      [](const std::string& grid, const int num_shots,
+         const std::string& ship_sizes_str) -> std::shared_ptr<const Game> {
+    std::vector<std::string> grid_dimensions = absl::StrSplit(grid, 'x');
+    SPIEL_CHECK_EQ(grid_dimensions.size(), 2);
+
+    const GameParameter board_width(std::stoi(grid_dimensions[1]));
+    const GameParameter board_height(std::stoi(grid_dimensions[0]));
+    const GameParameter ship_sizes(ship_sizes_str);
+
+    // We reuse the ship sizes as ship values. The values of the ships do not
+    // affect the game size.
+    const GameParameter ship_values(ship_sizes_str);
+
+    return LoadGame("battleship",
+                    {{"board_width", board_width},
+                     {"board_height", board_height},
+                     {"ship_sizes", ship_sizes},
+                     {"ship_values", ship_values},
+                     {"num_shots", GameParameter(num_shots)},
+                     {"allow_repeated_shots", GameParameter(false)},
+                     {"loss_multiplier", GameParameter(2.0)}});
+  };
+
+  // 2x2 grid, 2 shots, ships sizes [1].
+  GameSize size = ComputeGameSize(ConstructInstance("2x2", 2, "[1]"));
+  SPIEL_CHECK_EQ(size.num_sequences[Player{0}], 165);
+  SPIEL_CHECK_EQ(size.num_sequences[Player{1}], 341);
+  SPIEL_CHECK_EQ(size.num_infostates[Player{0}], 53);
+  SPIEL_CHECK_EQ(size.num_infostates[Player{1}], 109);
+  SPIEL_CHECK_EQ(size.num_terminal_states, 1072);
+
+  // 2x2 grid, 3 shots, ships sizes [1].
+  size = ComputeGameSize(ConstructInstance("2x2", 3, "[1]"));
+  SPIEL_CHECK_EQ(size.num_sequences[Player{0}], 741);
+  SPIEL_CHECK_EQ(size.num_sequences[Player{1}], 917);
+  SPIEL_CHECK_EQ(size.num_infostates[Player{0}], 341);
+  SPIEL_CHECK_EQ(size.num_infostates[Player{1}], 397);
+  SPIEL_CHECK_EQ(size.num_terminal_states, 2224);
+
+  // 2x2 grid, 2 shots, ships sizes [1;2].
+  size = ComputeGameSize(ConstructInstance("2x2", 2, "[1;2]"));
+  SPIEL_CHECK_EQ(size.num_sequences[Player{0}], 1197);
+  SPIEL_CHECK_EQ(size.num_sequences[Player{1}], 3597);
+  SPIEL_CHECK_EQ(size.num_infostates[Player{0}], 397);
+  SPIEL_CHECK_EQ(size.num_infostates[Player{1}], 1189);
+  SPIEL_CHECK_EQ(size.num_terminal_states, 9216);
+
+  // 2x2 grid, 3 shots, ships sizes [1;2].
+  size = ComputeGameSize(ConstructInstance("2x2", 3, "[1;2]"));
+  SPIEL_CHECK_EQ(size.num_sequences[Player{0}], 13485);
+  SPIEL_CHECK_EQ(size.num_sequences[Player{1}], 22029);
+  SPIEL_CHECK_EQ(size.num_infostates[Player{0}], 6541);
+  SPIEL_CHECK_EQ(size.num_infostates[Player{1}], 10405);
+  SPIEL_CHECK_EQ(size.num_terminal_states, 32256);
+
+  // 2x3 grid, 2 shots, ships sizes [1].
+  size = ComputeGameSize(ConstructInstance("2x3", 2, "[1]"));
+  SPIEL_CHECK_EQ(size.num_sequences[Player{0}], 943);
+  SPIEL_CHECK_EQ(size.num_sequences[Player{1}], 3787);
+  SPIEL_CHECK_EQ(size.num_infostates[Player{0}], 187);
+  SPIEL_CHECK_EQ(size.num_infostates[Player{1}], 751);
+  SPIEL_CHECK_EQ(size.num_terminal_states, 19116);
+
+  // 2x3 grid, 3 shots, ships sizes [1].
+  size = ComputeGameSize(ConstructInstance("2x3", 3, "[1]"));
+  SPIEL_CHECK_EQ(size.num_sequences[Player{0}], 15343);
+  SPIEL_CHECK_EQ(size.num_sequences[Player{1}], 46987);
+  SPIEL_CHECK_EQ(size.num_infostates[Player{0}], 3787);
+  SPIEL_CHECK_EQ(size.num_infostates[Player{1}], 11551);
+  SPIEL_CHECK_EQ(size.num_terminal_states, 191916);
+
+  // 2x2 grid, 4 shots, ships sizes [1].
+  size = ComputeGameSize(ConstructInstance("2x3", 4, "[1]"));
+  SPIEL_CHECK_EQ(size.num_sequences[Player{0}], 144943);
+  SPIEL_CHECK_EQ(size.num_sequences[Player{1}], 306187);
+  SPIEL_CHECK_EQ(size.num_infostates[Player{0}], 46987);
+  SPIEL_CHECK_EQ(size.num_infostates[Player{1}], 97951);
+  SPIEL_CHECK_EQ(size.num_terminal_states, 969516);
+}
 }  // namespace
 }  // namespace battleship
 }  // namespace open_spiel
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   open_spiel::testing::LoadGameTest("battleship");
   open_spiel::battleship::BasicBattleshipTest();
   open_spiel::battleship::RandomTestsOnLargeBoards();
@@ -295,4 +442,5 @@ int main(int argc, char **argv) {
   open_spiel::battleship::TestTightLayout1();
   open_spiel::battleship::TestTightLayout2();
   open_spiel::battleship::TestNashEquilibriumInSmallBoard();
+  open_spiel::battleship::TestGameSizes();
 }
