@@ -106,6 +106,22 @@ class TensorGame : public NormalFormGame {
     return true;
   }
 
+  std::vector<double> GetUtilities(const std::vector<Action>& joint_action)
+      const override {
+    int idx = index(joint_action);
+    std::vector<double> utilities;
+    utilities.reserve(NumPlayers());
+    for (Player p = 0; p < NumPlayers(); ++p) {
+      utilities.push_back(utilities_[p][idx]);
+    }
+    return utilities;
+  }
+
+  double GetUtility(Player player, const std::vector<Action>& joint_action)
+      const override {
+    return PlayerUtility(player, joint_action);
+  }
+
  private:
   const int index(const std::vector<Action>& args) const {
     int ind = 0;

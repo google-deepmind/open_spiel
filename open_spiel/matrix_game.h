@@ -113,6 +113,17 @@ class MatrixGame : public NormalFormGame {
     return col_action_names_[col];
   }
 
+  std::vector<double> GetUtilities(const std::vector<Action>& joint_action)
+      const override {
+    int index = Index(joint_action[0], joint_action[1]);
+    return {row_utilities_[index], col_utilities_[index]};
+  }
+
+  double GetUtility(Player player, const std::vector<Action>& joint_action)
+      const override {
+    return PlayerUtility(player, joint_action[0], joint_action[1]);
+  }
+
   bool operator==(const Game& other_game) const override {
     const auto& other = down_cast<const MatrixGame&>(other_game);
     return (row_action_names_.size() == other.row_action_names_.size() &&
