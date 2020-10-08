@@ -14,7 +14,10 @@
 
 #include "open_spiel/algorithms/ortools/lp_solver.h"
 
+#include <numeric>
+
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/algorithms/corr_dist.h"
 #include "open_spiel/spiel.h"
 #include "ortools/linear_solver/linear_solver.h"
 
@@ -85,6 +88,7 @@ ZeroSumGameSolution SolveZeroSumMatrixGame(
   std::vector<opres::MPVariable*> p0_vars;
   auto [p0_v, p0_objective] = SetupVariablesAndObjective(
       &p0_solver, &p0_vars, num_rows, min_utility, max_utility);
+
   // Utility constriants
   for (int c = 0; c < num_cols; ++c) {
     opres::MPConstraint* const constraint = p0_solver.MakeRowConstraint();
@@ -126,6 +130,109 @@ ZeroSumGameSolution SolveZeroSumMatrixGame(
   }
 
   return solution;
+}
+
+NormalFormCorrelationDevice ComputeCorrelatedEquilibrium(
+    const NormalFormGame& normal_form_game, CorrEqObjType obj_type,
+    double social_welfare_lower_bound) {
+  // Implements an LP solver as explained in Section 4.6 of Shoham and
+  // Leyton-Brown '09: http://masfoundations.org/
+
+  // The NormalFormState inherits from SimultaneousGame, which conveniently
+  // provides a flattened joint action space, which is useful for setting up
+  // the LP.
+  std::unique_ptr<State> initial_state = normal_form_game.NewInitialState();
+  NFGState* nfg_state = static_cast<NFGState*>(initial_state.get());
+  std::vector<Action> flat_joint_actions = nfg_state->LegalActions();
+
+  opres::MPSolver solver("solver", opres::MPSolver::GLOP_LINEAR_PROGRAMMING);
+  std::vector<opres::MPVariable*> variables;
+  variables.reserve(flat_joint_actions.size());
+
+  // Probability and distribution constraints.
+  opres::MPConstraint* const sum_to_one =
+      solver.MakeRowConstraint(1.0, 1.0, "sum_to_one");
+  for (int i = 0; i < flat_joint_actions.size(); ++i) {
+    variables.push_back(solver.MakeNumVar(0.0, 1.0, absl::StrCat("var ", i)));
+    sum_to_one->SetCoefficient(variables[i], 1.0);
+  }
+
+  // Utility constraints.
+  for (Player p = 0; p < normal_form_game.NumPlayers(); ++p) {
+    // This player's legal actions a_i
+    for (Action a_i : nfg_state->LegalActions(p)) {
+      // This player's alternative legal actions a_i'
+      for (Action a_ip : nfg_state->LegalActions(p)) {
+        // Consider only alternatives a_i' != a_i
+        if (a_ip == a_i) {
+          continue;
+        }
+
+        // Now add the constraint:
+        // \sum_{a \in A | a_i \in a} [u_i(a) - u_i(a_i', a_{-i})] p(a) >= 0.
+        opres::MPConstraint* const constraint = solver.MakeRowConstraint();
+        constraint->SetLB(0.0);
+
+        for (int ja_idx = 0; ja_idx < flat_joint_actions.size(); ++ja_idx) {
+          std::vector<Action> joint_action =
+              nfg_state->FlatJointActionToActions(flat_joint_actions[ja_idx]);
+          // Skip this joint action if a_i is not taken for this player.
+          if (joint_action[p] != a_i) {
+            continue;
+          }
+
+          std::vector<Action> alternative_joint_action = joint_action;
+          alternative_joint_action[p] = a_ip;
+
+          double coeff =
+              normal_form_game.GetUtility(p, joint_action) -
+              normal_form_game.GetUtility(p, alternative_joint_action);
+          constraint->SetCoefficient(variables[ja_idx], coeff);
+        }
+      }
+    }
+  }
+
+  opres::MPObjective* objective = solver.MutableObjective();
+  objective->SetMaximization();
+
+  // Objective depends on the type.
+  if (obj_type == CorrEqObjType::kSocialWelfareAtLeast) {
+    // Add constraint expected SW >= k.
+    opres::MPConstraint* constraint = solver.MakeRowConstraint();
+    constraint->SetLB(social_welfare_lower_bound);
+    for (int i = 0; i < variables.size(); ++i) {
+      std::vector<Action> joint_action =
+          nfg_state->FlatJointActionToActions(flat_joint_actions[i]);
+      std::vector<double> utilities =
+          normal_form_game.GetUtilities(joint_action);
+      constraint->SetCoefficient(
+          variables[i],
+          std::accumulate(utilities.begin(), utilities.end(), 0.0));
+    }
+  } else if (obj_type == CorrEqObjType::kSocialWelfareMax) {
+    // Set the objective to the max social welfare
+    for (int i = 0; i < variables.size(); ++i) {
+      std::vector<Action> joint_action =
+          nfg_state->FlatJointActionToActions(flat_joint_actions[i]);
+      std::vector<double> utilities =
+          normal_form_game.GetUtilities(joint_action);
+      objective->SetCoefficient(
+          variables[i],
+          std::accumulate(utilities.begin(), utilities.end(), 0.0));
+    }
+  }
+
+  solver.Solve();
+
+  NormalFormCorrelationDevice mu;
+  mu.reserve(variables.size());
+  for (int i = 0; i < variables.size(); ++i) {
+    mu.push_back({variables[i]->solution_value(),  // probability, actions
+                  nfg_state->FlatJointActionToActions(flat_joint_actions[i])});
+  }
+
+  return mu;
 }
 
 }  // namespace ortools

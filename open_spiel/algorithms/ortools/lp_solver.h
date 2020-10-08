@@ -17,6 +17,7 @@
 
 #include <vector>
 
+#include "open_spiel/algorithms/corr_dist.h"
 #include "open_spiel/matrix_game.h"
 
 namespace open_spiel {
@@ -28,8 +29,18 @@ struct ZeroSumGameSolution {
   std::vector<std::vector<double>> strategies;
 };
 
+enum class CorrEqObjType {
+  kAny,
+  kSocialWelfareMax,
+  kSocialWelfareAtLeast,
+};
+
 ZeroSumGameSolution SolveZeroSumMatrixGame(
     const matrix_game::MatrixGame& matrix_game);
+
+NormalFormCorrelationDevice ComputeCorrelatedEquilibrium(
+    const NormalFormGame& normal_form_game, CorrEqObjType obj_type,
+    double social_welfare_lower_bound);
 
 }  // namespace ortools
 }  // namespace algorithms
