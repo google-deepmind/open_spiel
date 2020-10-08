@@ -69,39 +69,10 @@ namespace open_spiel {
 //    return True
 //  def force_action(self, state, action):
 //    ...
-//
-// If you register the bot using REGISTER_SPIEL_BOT() macro, make sure that
-// the bot is constructable with default parameters. It should have little
-// overhead, as it can be just asked whether it can play a specified game.
-// If needed, you can make an expensive bot initialization in the Restart()
-// method.
 class Bot {
- protected:
-  GameParameters bot_parameters_;
-
-  Bot() : bot_parameters_({}) {}
-  explicit Bot(GameParameters bot_parameters)
-      : bot_parameters_(std::move(bot_parameters)) {}
-
-  // Access to bot parameters. Returns the value provided by the user or the
-  // default value.
-  template <typename T>
-  T ParameterValue(const std::string& key, T default_value) const {
-    // Return the value if found.
-    auto iter = bot_parameters_.find(key);
-    if (iter != bot_parameters_.end()) {
-      return iter->second.value<T>();
-    } else {
-      return default_value;
-    }
-  }
-
  public:
   // Constructs a Bot that only supports `Step` and `Restart` (maybe RestartAt).
   virtual ~Bot() = default;
-
-  // Asks the bot whether it can play the game.
-  virtual bool CanPlayGame(const Game& game) { return false; }
 
   // Asks the bot to decide on an action to play. The bot should be able to
   // safely assumes the action was played.
@@ -172,6 +143,19 @@ class Bot {
   }
 };
 
+class BotFactory {
+ public:
+  // Asks the bot whether it can play the game as the given player.
+  virtual bool CanPlayGame(const Game& game, Player player_id,
+                           const GameParameters& bot_params) const = 0;
+
+  // Creates an instance of the bot for a given game and a player
+  // for which it should play.
+  virtual std::unique_ptr<Bot> Create(
+      std::shared_ptr<const Game> game, Player player_id,
+      const GameParameters& bot_params) const = 0;
+};
+
 // A uniform random bot, for test purposes.
 std::unique_ptr<Bot> MakeUniformRandomBot(Player player_id, int seed);
 
@@ -191,30 +175,32 @@ std::unique_ptr<Bot> MakeFixedActionPreferenceBot(
 
 
 #define REGISTER_SPIEL_BOT(info, factory) \
-  BotRegisterer CONCAT(bot, __COUNTER__)(info, factory);
+  BotRegisterer CONCAT(bot, __COUNTER__)(info, std::make_unique<factory>());
 
 
 class BotRegisterer {
  public:
-  using CreateFunc =
-  std::function<std::unique_ptr<Bot>(const GameParameters& params)>;
+  BotRegisterer(const std::string& bot_name,
+                std::unique_ptr<BotFactory> factory);
 
-  BotRegisterer(const std::string& bot_name, CreateFunc creator);
-
-  static std::unique_ptr<Bot> CreateByName(const std::string& bot_name,
-                                           const GameParameters& params);
+  static std::unique_ptr<Bot> CreateByName(
+      const std::string& bot_name, std::shared_ptr<const Game> game,
+      Player player_id, const GameParameters& params);
+  static std::vector<std::string> CanPlayGame(
+      const Game& game, Player player_id, const GameParameters& params);
 
   static std::vector<std::string> RegisteredBots();
   static bool IsBotRegistered(const std::string& bot_name);
-  static void RegisterBot(const std::string& bot_name, CreateFunc creator);
+  static void RegisterBot(const std::string& bot_name,
+      std::unique_ptr<BotFactory> factory);
 
  private:
   // Returns a "global" map of registrations (i.e. an object that lives from
   // initialization to the end of the program). Note that we do not just use
   // a static data member, as we want the map to be initialized before first
   // use.
-  static std::map<std::string, CreateFunc>& factories() {
-    static std::map<std::string, CreateFunc> impl;
+  static std::map<std::string, std::unique_ptr<BotFactory>>& factories() {
+    static std::map<std::string, std::unique_ptr<BotFactory>> impl;
     return impl;
   }
 };
@@ -226,18 +212,22 @@ bool IsBotRegistered(const std::string& bot_name);
 std::vector<std::string> RegisteredBots();
 
 // Returns a list of registered bots' short names that can play specified game.
-std::vector<std::string> BotsThatCanPlayGame(const Game& game);
-
+std::vector<std::string> BotsThatCanPlayGame(const Game& game, Player player_id,
+                                             const GameParameters& params);
 std::vector<std::string> BotsThatCanPlayGame(const Game& game,
-    const GameParameters& params);
+                                             Player player_id);
 
-// Returns a new game object from the specified string, which is the short
+// Returns a new bot object from the specified string, which is the short
 // name plus optional parameters, e.g. "fixed_action_preference(action_list=0;1;2;3)"
-std::unique_ptr<Bot> LoadBot(const std::string& bot_name);
+std::unique_ptr<Bot> LoadBot(const std::string& bot_name,
+                             const std::shared_ptr<const Game>& game,
+                             Player player_id);
 
 // Returns a new game object with the specified parameters.
 std::unique_ptr<Bot> LoadBot(const std::string& bot_name,
-                             const GameParameters& params);
+                             const std::shared_ptr<const Game>& game,
+                             Player player_id,
+                             const GameParameters& bot_params);
 
 }  // namespace open_spiel
 

@@ -168,12 +168,17 @@ void init_pyspiel_bots(py::module& m) {
       .def("step_with_policy", &Bot::StepWithPolicy);
 
   m.def("load_bot",
-        py::overload_cast<const std::string&>(&open_spiel::LoadBot),
+        py::overload_cast<
+            const std::string&, const std::shared_ptr<const Game>&, Player>(
+                &open_spiel::LoadBot),
+        py::arg("bot_name"), py::arg("game"), py::arg("player"),
         "Returns a new bot object for the specified bot name using default "
         "parameters");
   m.def("load_bot",
-        py::overload_cast<const std::string&, const GameParameters&>(
-            &open_spiel::LoadBot),
+        py::overload_cast<
+            const std::string&, const std::shared_ptr<const Game>&, Player,
+            const GameParameters&>(&open_spiel::LoadBot),
+        py::arg("bot_name"), py::arg("game"), py::arg("player"), py::arg("params"),
         "Returns a new bot object for the specified bot name using given "
         "parameters");
   m.def("is_bot_registered", &IsBotRegistered,
@@ -181,12 +186,14 @@ void init_pyspiel_bots(py::module& m) {
   m.def("registered_bots", &RegisteredBots,
         "Returns a list of registered bot names.");
   m.def("bots_that_can_play_game",
-        py::overload_cast<const Game&>(&open_spiel::BotsThatCanPlayGame),
+        py::overload_cast<const Game&, Player>(&open_spiel::BotsThatCanPlayGame),
+         py::arg("game"), py::arg("player"),
         "Returns a list of bot names that can play specified game, "
         "while using default parameters for the bots.");
   m.def("bots_that_can_play_game",
-        py::overload_cast<const Game&, const GameParameters&>(
+        py::overload_cast<const Game&, Player, const GameParameters&>(
             &open_spiel::BotsThatCanPlayGame),
+        py::arg("game"), py::arg("player"), py::arg("params"),
         "Returns a list of bot names that can play specified game, "
         "while using the provided parameters.");
 

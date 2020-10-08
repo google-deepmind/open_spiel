@@ -25,7 +25,12 @@ import numpy as np
 from open_spiel.python.bots import uniform_random
 import pyspiel
 
-SPIEL_BOTS_LIST = pyspiel.registered_bots()
+# Specify bot names in alphabetical order, to make it easier to read.
+SPIEL_BOTS_LIST = [
+  "fixed_action_preference",
+  "uniform_random",
+]
+
 
 class BotTest(absltest.TestCase):
 
@@ -43,31 +48,20 @@ class BotTest(absltest.TestCase):
     np.testing.assert_allclose(average_results, [0.125, -0.125], atol=0.1)
 
   def test_registered_bots(self):
-    # Specify bot names in alphabetical order, to make the test easier to read.
-    expected = set([
-      "fixed_action_preference",
-      "uniform_random",
-    ])
-    expected = sorted(list(expected))
-    self.assertCountEqual(SPIEL_BOTS_LIST, expected)
+    self.assertEqual(sorted(pyspiel.registered_bots()), sorted(SPIEL_BOTS_LIST))
 
   def test_can_play_game(self):
     game = pyspiel.load_game("kuhn_poker")
-    self.assertTrue("uniform_random" in pyspiel.bots_that_can_play_game(game))
-
-  def test_bots_can_be_constructed_with_default_params(self):
-    for bot_name in SPIEL_BOTS_LIST:
-      pyspiel.load_bot(bot_name)
+    self.assertTrue("uniform_random" in
+                    pyspiel.bots_that_can_play_game(game, 0))
 
   def test_passing_params(self):
     game = pyspiel.load_game("tic_tac_toe")
     bots = [
-      pyspiel.load_bot("fixed_action_preference",
-                       {"player": pyspiel.GameParameter(0),
-                        "actions": pyspiel.GameParameter("0:1:2")}),
-      pyspiel.load_bot("fixed_action_preference",
-                       {"player": pyspiel.GameParameter(1),
-                        "actions": pyspiel.GameParameter("3:4")}),
+      pyspiel.load_bot("fixed_action_preference", game, player=0,
+                       params={"actions": pyspiel.GameParameter("0:1:2")}),
+      pyspiel.load_bot("fixed_action_preference", game, player=1,
+                       params={"actions": pyspiel.GameParameter("3:4")}),
     ]
     result = pyspiel.evaluate_bots(game.new_initial_state(), bots, seed=0)
     self.assertEqual(result, [1, -1])  # Player 0 wins.
