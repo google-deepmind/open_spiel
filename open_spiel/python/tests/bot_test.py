@@ -52,8 +52,7 @@ class BotTest(absltest.TestCase):
 
   def test_can_play_game(self):
     game = pyspiel.load_game("kuhn_poker")
-    self.assertTrue("uniform_random" in
-                    pyspiel.bots_that_can_play_game(game, 0))
+    self.assertTrue("uniform_random" in pyspiel.bots_that_can_play_game(game))
 
   def test_passing_params(self):
     game = pyspiel.load_game("tic_tac_toe")

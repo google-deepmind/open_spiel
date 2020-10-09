@@ -187,6 +187,7 @@ class BotRegisterer {
       Player player_id, const GameParameters& params);
   static std::vector<std::string> CanPlayGame(
       const Game& game, Player player_id);
+  static std::vector<std::string> CanPlayGame(const Game& game);
 
   static std::vector<std::string> RegisteredBots();
   static bool IsBotRegistered(const std::string& bot_name);
@@ -210,9 +211,14 @@ bool IsBotRegistered(const std::string& bot_name);
 // Returns a list of registered bots' short names.
 std::vector<std::string> RegisteredBots();
 
-// Returns a list of registered bots' short names that can play specified game.
+// Returns a list of registered bots' short names that can play specified game
+// for a given player.
 std::vector<std::string> BotsThatCanPlayGame(const Game& game,
                                              Player player_id);
+
+// Returns a list of registered bots' short names that can play specified game
+// for any player.
+std::vector<std::string> BotsThatCanPlayGame(const Game& game);
 
 // Returns a new bot object from the specified string, which is the short
 // name plus optional parameters, e.g. "fixed_action_preference(action_list=0;1;2;3)"

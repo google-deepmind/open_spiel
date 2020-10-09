@@ -188,7 +188,13 @@ void init_pyspiel_bots(py::module& m) {
   m.def("bots_that_can_play_game",
         py::overload_cast<const Game&, Player>(&open_spiel::BotsThatCanPlayGame),
          py::arg("game"), py::arg("player"),
-        "Returns a list of bot names that can play specified game for the given player.");
+        "Returns a list of bot names that can play specified game for the "
+        "given player.");
+  m.def("bots_that_can_play_game",
+        py::overload_cast<const Game&>(&open_spiel::BotsThatCanPlayGame),
+        py::arg("game"),
+        "Returns a list of bot names that can play specified game for any "
+        "player.");
 
   py::class_<algorithms::Evaluator,
              std::shared_ptr<algorithms::Evaluator>> mcts_evaluator(

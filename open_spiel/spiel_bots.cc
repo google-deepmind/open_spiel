@@ -264,6 +264,20 @@ std::vector<std::string> BotRegisterer::CanPlayGame(
   }
   return bot_names;
 }
+std::vector<std::string> BotRegisterer::CanPlayGame(const Game& game) {
+  std::vector<std::string> bot_names;
+  for (const auto& key_val : factories()) {
+    bool can_play_for_all = true;
+    for (int player_id = 0; player_id < game.NumPlayers(); ++player_id) {
+      if (!key_val.second->CanPlayGame(game, player_id)) {
+        can_play_for_all = false;
+        break;
+      }
+    }
+    if (can_play_for_all) bot_names.push_back(key_val.first);
+  }
+  return bot_names;
+}
 void BotRegisterer::RegisterBot(const std::string& bot_name,
                                 std::unique_ptr<BotFactory> creator) {
   factories()[bot_name] = std::move(creator);
@@ -300,6 +314,9 @@ std::unique_ptr<Bot> LoadBot(const std::string& bot_name,
 std::vector<std::string> BotsThatCanPlayGame(const Game& game,
                                              Player player_id) {
   return BotRegisterer::CanPlayGame(game, player_id);
+}
+std::vector<std::string> BotsThatCanPlayGame(const Game& game) {
+  return BotRegisterer::CanPlayGame(game);
 }
 
 }  // namespace open_spiel
