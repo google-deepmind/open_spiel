@@ -39,6 +39,10 @@ int main(int argc, char** argv) {
     const int num_histories = all_states.size();
     int num_terminal_states = 0;
     int num_chance_nodes = 0;
+    // TODO: Fix counting of information states for some games after having a
+    // GetAllHistories. Right now the counting of information states will not
+    // be correct for perfect information games. See this issue for details:
+    // https://github.com/deepmind/open_spiel/issues/401
     for (const auto& [_, state] : all_states) {
       if (state->CurrentPlayer() >= 0) {
         all_infostates.insert(state->InformationStateString());
