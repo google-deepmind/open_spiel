@@ -171,8 +171,7 @@ std::unique_ptr<Bot> MakeUniformRandomBot(Player player_id, int seed) {
 namespace {
 class UniformRandomBotFactory : public BotFactory {
  public:
-  bool CanPlayGame(const Game& game, Player player_id,
-                   const GameParameters& bot_params) const override {
+  bool CanPlayGame(const Game& game, Player player_id) const override {
     return true;
   }
   std::unique_ptr<Bot> Create(
@@ -215,8 +214,7 @@ std::vector<Action> ActionsFromStr(const absl::string_view& str,
 
 class FixedActionPreferenceFactory : public BotFactory {
  public:
-  bool CanPlayGame(const Game& game, Player player_id,
-                   const GameParameters& bot_params) const override {
+  bool CanPlayGame(const Game& game, Player player_id) const override {
     return true;
   }
   std::unique_ptr<Bot> Create(
@@ -257,10 +255,10 @@ std::unique_ptr<Bot> BotRegisterer::CreateByName(
   }
 }
 std::vector<std::string> BotRegisterer::CanPlayGame(
-    const Game& game, Player player_id, const GameParameters& params) {
+    const Game& game, Player player_id) {
   std::vector<std::string> bot_names;
   for (const auto& key_val : factories()) {
-    if (key_val.second->CanPlayGame(game, player_id, params)) {
+    if (key_val.second->CanPlayGame(game, player_id)) {
       bot_names.push_back(key_val.first);
     }
   }
@@ -301,11 +299,7 @@ std::unique_ptr<Bot> LoadBot(const std::string& bot_name,
 }
 std::vector<std::string> BotsThatCanPlayGame(const Game& game,
                                              Player player_id) {
-  return BotRegisterer::CanPlayGame(game, player_id, {});
-}
-std::vector<std::string> BotsThatCanPlayGame(const Game& game, Player player_id,
-                                             const GameParameters& params) {
-  return BotRegisterer::CanPlayGame(game, player_id, params);
+  return BotRegisterer::CanPlayGame(game, player_id);
 }
 
 }  // namespace open_spiel

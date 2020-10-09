@@ -146,8 +146,7 @@ class Bot {
 class BotFactory {
  public:
   // Asks the bot whether it can play the game as the given player.
-  virtual bool CanPlayGame(const Game& game, Player player_id,
-                           const GameParameters& bot_params) const = 0;
+  virtual bool CanPlayGame(const Game& game, Player player_id) const = 0;
 
   // Creates an instance of the bot for a given game and a player
   // for which it should play.
@@ -187,7 +186,7 @@ class BotRegisterer {
       const std::string& bot_name, std::shared_ptr<const Game> game,
       Player player_id, const GameParameters& params);
   static std::vector<std::string> CanPlayGame(
-      const Game& game, Player player_id, const GameParameters& params);
+      const Game& game, Player player_id);
 
   static std::vector<std::string> RegisteredBots();
   static bool IsBotRegistered(const std::string& bot_name);
@@ -212,8 +211,6 @@ bool IsBotRegistered(const std::string& bot_name);
 std::vector<std::string> RegisteredBots();
 
 // Returns a list of registered bots' short names that can play specified game.
-std::vector<std::string> BotsThatCanPlayGame(const Game& game, Player player_id,
-                                             const GameParameters& params);
 std::vector<std::string> BotsThatCanPlayGame(const Game& game,
                                              Player player_id);
 
