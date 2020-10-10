@@ -25,6 +25,8 @@ add_library (algorithms OBJECT
   expected_returns.h
   external_sampling_mccfr.cc
   external_sampling_mccfr.h
+  get_all_histories.cc
+  get_all_histories.h
   get_all_states.cc
   get_all_states.h
   get_legal_actions_map.cc
@@ -89,6 +91,10 @@ add_test(evaluate_bots_test evaluate_bots_test)
 add_executable(external_sampling_mccfr_test external_sampling_mccfr_test.cc
     $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})
 add_test(external_sampling_mccfr_test external_sampling_mccfr_test)
+
+add_executable(get_all_histories_test get_all_histories_test.cc
+    $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})
+add_test(get_all_histories_test get_all_histories_test)
 
 add_executable(get_all_states_test get_all_states_test.cc
     $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})
