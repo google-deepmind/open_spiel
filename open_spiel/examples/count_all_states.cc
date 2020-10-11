@@ -16,7 +16,7 @@
 
 #include "open_spiel/abseil-cpp/absl/container/flat_hash_set.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_format.h"
-#include "open_spiel/algorithms/get_all_states.h"
+#include "open_spiel/algorithms/get_all_histories.h"
 #include "open_spiel/canonical_game_strings.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
@@ -31,15 +31,15 @@ int main(int argc, char** argv) {
         open_spiel::TurnBasedGoofspielGameString(6)}) {
     std::shared_ptr<const open_spiel::Game> game =
         open_spiel::LoadGame(std::string(game_name));
-    std::map<std::string, std::unique_ptr<open_spiel::State>> all_states =
-        open_spiel::algorithms::GetAllStates(*game, /*depth_limit=*/-1,
-                                             /*include_terminals=*/true,
-                                             /*include_chance_states=*/true);
+    std::vector<std::unique_ptr<open_spiel::State>> all_histories =
+        open_spiel::algorithms::GetAllHistories(*game, /*depth_limit=*/-1,
+                                                /*include_terminals=*/true,
+                                                /*include_chance_states=*/true);
     absl::flat_hash_set<std::string> all_infostates;
-    const int num_histories = all_states.size();
+    const int num_histories = all_histories.size();
     int num_terminal_states = 0;
     int num_chance_nodes = 0;
-    for (const auto& [_, state] : all_states) {
+    for (const auto& state : all_histories) {
       if (state->CurrentPlayer() > 0) {
         all_infostates.insert(state->InformationStateString());
       }
