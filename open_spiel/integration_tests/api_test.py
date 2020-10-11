@@ -98,10 +98,6 @@ PERFECT_RECALL_NUM_STATES = {
     "nf_auction": 2,
 }
 
-# Some tests run for a fixed time budget.
-# This specified approximately how many seconds they should run.
-TIMEABLE_TEST_RUNTIME = 1
-
 
 class EnforceAPIOnFullTreeBase(parameterized.TestCase):
   """Test properties on the full game tree, instantiating the tree only once.
@@ -276,12 +272,8 @@ class EnforceAPIOnPartialTreeBase(parameterized.TestCase):
   def setUpClass(cls):
     super(EnforceAPIOnPartialTreeBase, cls).setUpClass()
 
-    cls.some_states = set(
-        sample_some_states.sample_some_states(
-            cls.game,
-            max_states=-1,  # Limit only by time.
-            time_limit=TIMEABLE_TEST_RUNTIME,
-            depth_limit=7).values())
+    cls.some_states = sample_some_states.sample_some_states(cls.game,
+                                                            max_states=400)
     cls.game_type = cls.game.get_type()
 
   def test_sequence_lengths(self):
