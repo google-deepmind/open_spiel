@@ -76,8 +76,24 @@ class InfostateNode {
         // Copy the tensor.
         tensor_(tensor.begin(), tensor.end()),
         terminal_value_(terminal_value) {
-    if (type == kDecisionNode)
+
+    // Implications for kTerminalNode
+    SPIEL_DCHECK_TRUE(type != kTerminalNode || originating_state);
+    SPIEL_DCHECK_TRUE(type != kTerminalNode || parent);
+    SPIEL_DCHECK_FALSE(type != kTerminalNode || tensor.empty());
+    // Implications for kDecisionNode
+    SPIEL_DCHECK_TRUE(type != kDecisionNode || originating_state);
+    SPIEL_DCHECK_TRUE(type != kDecisionNode || parent);
+    SPIEL_DCHECK_FALSE(type != kDecisionNode || tensor.empty());
+    // Implications for kObservationNode
+    SPIEL_DCHECK_TRUE(
+      !(type == kObservationNode && parent && parent->Type() == kDecisionNode)
+      || (incoming_index >= 0 && incoming_index < parent->LegalActions().size())
+    );
+
+    if (type == kDecisionNode) {
       legal_actions_ = originating_state->LegalActions(tree_.GetPlayer());
+    }
   }
   InfostateNode(InfostateNode&&) = default;
   virtual ~InfostateNode() = default;
