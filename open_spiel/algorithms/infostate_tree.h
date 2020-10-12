@@ -361,7 +361,7 @@ class InfostateTree final {
         if (state.MoveNumber() >= move_limit)  // Do not build deeper.
           return UpdateBalanceInfo(depth);
 
-        std::vector<Action> legal_actions = state.LegalActions();
+        std::vector<Action> legal_actions = state.LegalActions(player_);
         for (int i = 0; i < legal_actions.size(); ++i) {
           Node* observation_node = decision_node->ChildAt(i);
           SPIEL_DCHECK_EQ(observation_node->Type(), kObservationNode);
@@ -384,7 +384,7 @@ class InfostateTree final {
           std::unique_ptr<State> child = state.Child(a);
           observation_.SetFrom(*child, player_);
           Node* observation_node = decision_node->AddChild(MakeNode(
-              parent, kObservationNode, observation_.Tensor(),
+              decision_node, kObservationNode, observation_.Tensor(),
               /*terminal_value=*/0, child.get()));
           RecursivelyBuildTree(observation_node, depth + 2, *child,
                                move_limit, chance_reach_prob);
