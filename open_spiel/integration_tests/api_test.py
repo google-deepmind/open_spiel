@@ -751,3 +751,9 @@ def load_tests(loader, tests, pattern):  # pylint: disable=invalid-name,g-doc-ar
 
 if __name__ == "__main__":
   absltest.main()
+
+# TODO checks
+# - tensor consistency (def. broken now)
+# - public leafs have only terminals, public inner nodes do not have terminals
+# - infostates that correspond to simultaneous nodes never coorespond
+#   to sequential nodes

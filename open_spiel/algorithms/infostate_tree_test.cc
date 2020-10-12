@@ -25,6 +25,16 @@ namespace open_spiel {
 namespace algorithms {
 namespace {
 
+std::string iigs2 = "goofspiel("
+                      "num_cards=2,"
+                      "imp_info=True,"
+                      "points_order=ascending"
+                    ")";
+std::string iigs3 = "goofspiel("
+                      "num_cards=3,"
+                      "imp_info=True,"
+                      "points_order=ascending"
+                    ")";
 
 // To make sure we can easily test infostate tree structures, we compute their
 // certificate (string representation) that we can easily compare.
@@ -166,16 +176,9 @@ void TestRootCertificates() {
   {
     std::string expected_certificate =
       "(["
-        "({})"  // draw 1,1
-        "({})"  // lose 1,2
-        "({})"  // win  2,1
-        "({})"  // draw 2,2
+        "({}{})"  // Play 1: draw 1,1  lose 1,2
+        "({}{})"  // Play 2: win  2,1  draw 2,2
       "])";
-    std::string iigs2 = "goofspiel("
-                          "num_cards=2,"
-                          "imp_info=True,"
-                          "points_order=ascending"
-                        ")";
     for (int i = 0; i < 2; ++i) {
       std::unique_ptr<CFRTree> tree = MakeTree(iigs2, i);
       SPIEL_CHECK_EQ(ComputeCertificate(tree->Root()), expected_certificate);
@@ -186,10 +189,32 @@ void TestRootCertificates() {
   {
     std::string expected_certificate =
       "(["
-        "({})"  // HH
-        "({})"  // HT
-        "({})"  // TH
-        "({})"  // TT
+        "(" // Play 2
+          "[({}{})({}{})]"
+          "[({}{})({}{})]"
+          "[({}{})({}{})]"
+        ")"
+        "(" // Play 1
+          "[({}{})({}{})]"
+          "[({}{}{}{})({}{}{}{})]"
+        ")"
+        "(" // Play 3
+          "[({}{})({}{})]"
+          "[({}{}{}{})({}{}{}{})]"
+        ")"
+      "])";
+    for (int i = 0; i < 2; ++i) {
+      std::unique_ptr<CFRTree> tree = MakeTree(iigs3, i);
+      SPIEL_CHECK_EQ(ComputeCertificate(tree->Root()), expected_certificate);
+      SPIEL_CHECK_TRUE(tree->IsBalanced());
+      SPIEL_CHECK_TRUE(RecomputeBalance(*tree));
+    }
+  }
+  {
+    std::string expected_certificate =
+      "(["
+        "({}{})"  // Play Heads: HH, HT
+        "({}{})"  // Play Tails: TH, TT
       "])";
     for (int i = 0; i < 2; ++i) {
       std::unique_ptr<CFRTree> tree = MakeTree("matrix_mp", i);
@@ -282,10 +307,8 @@ void TestTreeRebalancing() {
   {  // Identity test -- no rebalancing is applied.
     std::string expected_certificate =
       "(["
-        "({})"  // HH
-        "({})"  // HT
-        "({})"  // TH
-        "({})"  // TT
+        "({}{})"  // Play Heads: HH, HT
+        "({}{})"  // Play Tails: TH, TT
       "])";
     for (int i = 0; i < 2; ++i) {
       std::unique_ptr<CFRTree> tree = MakeTree("matrix_mp", i);
@@ -323,21 +346,18 @@ void TestTreeRebalancing() {
     SPIEL_CHECK_TRUE(RecomputeBalance(*tree));
   }
   {  // Rebalance test: simultaneous move games.
-    std::string iigs3 = "goofspiel("
-                          "num_cards=3,"
-                          "imp_info=True,"
-                          "points_order=ascending"
-                        ")";
     std::unique_ptr<CFRTree> tree = MakeTree(iigs3, 0,
-                                             {{0  /* = 0 0 */},
+                                             /*start_histories=*/{
+                                              {0  /* = 0 0 */},
                                               {1  /* = 1 0 */,
-                                               3  /* = 2 2 */}},
-                                             {1., 1.});
+                                               3  /* = 2 2 */}
+                                             },
+                                             /*start_reaches=*/{1., 1.});
 
     std::string expected_certificate =
         "("
-        "[({})({})({})({})]"
-        "{}"
+          "[({}{})({}{})]"
+          "{}"
         ")";
     SPIEL_CHECK_EQ(ComputeCertificate(tree->Root()), expected_certificate);
     SPIEL_CHECK_FALSE(tree->IsBalanced());
@@ -347,7 +367,7 @@ void TestTreeRebalancing() {
     std::string expected_rebalanced_certificate =
       "("
         "(({}))"
-        "[({})({})({})({})]"
+        "[({}{})({}{})]"
       ")";
     SPIEL_CHECK_EQ(ComputeCertificate(tree->Root()), expected_rebalanced_certificate);
     SPIEL_CHECK_TRUE(tree->IsBalanced());
