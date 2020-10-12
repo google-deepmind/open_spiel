@@ -24,6 +24,7 @@ from absl import flags
 from open_spiel.python.algorithms import outcome_sampling_mccfr as outcome_mccfr
 from open_spiel.python.algorithms import external_sampling_mccfr as external_mccfr
 from open_spiel.python.algorithms import exploitability
+from open_spiel.python import policy
 import pyspiel
 
 FLAGS = flags.FLAGS
@@ -44,15 +45,16 @@ def main(_):
     game = pyspiel.load_game(FLAGS.game,
                              {"players": pyspiel.GameParameter(FLAGS.players)})
     if FLAGS.sampling == 'external':
-        cfr_solver = external_mccfr.ExternalSamplingSolver(game)
+        cfr_solver = external_mccfr.ExternalSamplingSolver(game, 'k_full')
     else:
         cfr_solver = outcome_mccfr.OutcomeSamplingSolver(game)
     for i in range(FLAGS.iterations):
         cfr_solver.iteration()
         if i % FLAGS.print_freq == 0:
-            # conv = exploitability.exploitability(game, cfr_solver.average_policy())
-            # print("Iteration {} exploitability {}".format(i, conv))
-            print("Iteration {}".format(i))
+            conv = exploitability.nash_conv(game,
+                                            policy.tabular_policy_from_callable(game, cfr_solver.callable_avg_policy()))
+            print("Iteration {} exploitability {}".format(i, conv))
+
 
 if __name__ == "__main__":
     app.run(main)

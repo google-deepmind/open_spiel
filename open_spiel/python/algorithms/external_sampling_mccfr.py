@@ -65,10 +65,10 @@ class ExternalSamplingSolver(object):
         An iteration consists of one episode for each player as the update player.
         """
         for player in range(self._num_players):
-            state = self._game.new_initial_state()
-            self._update_regrets(state, player)
+            self._update_regrets(self._game.new_initial_state(), player)
         if self._average_type == 'k_full':
-            raise NotImplementedError
+            reach_probs = np.ones(self._num_players, dtype=np.float64)
+            self._full_update_average(self._game.new_initial_state(), reach_probs)
 
     def _lookup_infostate_info(self, info_state_key, num_legal_actions):
         """Looks up an information set table for the given key.
@@ -138,6 +138,38 @@ class ExternalSamplingSolver(object):
             return np.ones(num_legal_actions, dtype=np.float64) / num_legal_actions
         else:
             return positive_regrets / sum_pos_regret
+
+    def _full_update_average(self, state, reach_probs):
+        if state.is_terminal():
+            return
+        if state.is_chance_node():
+            for action in state.legal_actions():
+                self._full_update_average(state.child(action), reach_probs)
+            return
+
+        # If all the probs are zero, no need to keep going.
+        sum_reach_probs = np.sum(reach_probs)
+        if sum_reach_probs == 0:
+            return
+
+        cur_player = state.current_player()
+        info_state_key = state.information_state_string(cur_player)
+        legal_actions = state.legal_actions()
+        num_legal_actions = len(legal_actions)
+
+        infostate_info = self._lookup_infostate_info(info_state_key,
+                                                     num_legal_actions)
+        policy = self._regret_matching(infostate_info[_REGRET_INDEX],
+                                       num_legal_actions)
+
+        for action_idx in range(num_legal_actions):
+            new_reach_probs = np.copy(reach_probs)
+            new_reach_probs[cur_player] *= policy[action_idx]
+            self._full_update_average(state.child(legal_actions[action_idx]), new_reach_probs)
+
+        # Now update the cumulative policy
+        for action_idx in range(num_legal_actions):
+            self._add_avstrat(info_state_key, action_idx, reach_probs[cur_player] * policy[action_idx])
 
     def _update_regrets(self, state, player):
         """Runs an episode of external sampling.
