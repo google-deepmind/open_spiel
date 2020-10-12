@@ -274,6 +274,7 @@ class InfostateTree final {
   const Node& Root() const { return root_; }
   Node* MutableRoot() { return &root_; }
   Player GetPlayer() const { return player_; }
+  const Observer& GetObserver() const { return *infostate_observer_; }
   int TreeHeight() const { return tree_height_; }
   bool IsBalanced() const { return is_tree_balanced_; }
 
@@ -427,10 +428,10 @@ class CFRNode;
 using CFRTree = InfostateTree<CFRNode>;
 
 class CFRNode : public InfostateNode</*Self=*/CFRNode> {
- public:
-  std::vector<Action> terminal_history_;
   CFRInfoStateValues values_;
-
+  std::vector<Action> terminal_history_;
+  std::string infostate_string_;
+ public:
   CFRNode(const CFRTree& tree, CFRNode* parent, int incoming_index,
           InfostateNodeType type, absl::Span<float> tensor,
           double terminal_value, const State* originating_state) :
@@ -444,6 +445,8 @@ class CFRNode : public InfostateNode</*Self=*/CFRNode> {
       if(type_ == kDecisionNode) {
         values_ = CFRInfoStateValues(
             originating_state->LegalActions(tree.GetPlayer()));
+        infostate_string_ = Tree().GetObserver().StringFrom(
+            *originating_state, Tree().GetPlayer());
       }
       if (type_ == kTerminalNode) {
         terminal_history_ = originating_state->History();
@@ -455,6 +458,22 @@ class CFRNode : public InfostateNode</*Self=*/CFRNode> {
   CFRInfoStateValues* operator->() { return &values_; }
   // Provide a const getter as well.
   const CFRInfoStateValues& values() const { return values_; }
+
+  absl::Span<const Action> TerminalHistory() const {
+    SPIEL_DCHECK_EQ(type_, kTerminalNode);
+    return absl::MakeSpan(terminal_history_);
+  }
+
+  CFRNode const* FindNodeByStr(const std::string& string_lookup) const {
+    if (infostate_string_ == string_lookup)
+      return this;
+    for (CFRNode& child : *this) {
+      if (CFRNode const* node = child.FindNodeByStr(string_lookup)) {
+        return node;
+      }
+    }
+    return nullptr;
+  }
 };
 
 
