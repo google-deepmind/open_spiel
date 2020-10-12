@@ -35,8 +35,8 @@
 // state observer.
 //
 // As infostate node may need to contain arbitrary values, it is implemented
-// with templates. The common usage for CFR is provided under a CFRTree
-// and CFRNode respectively.
+// with curiously recurring template pattern (CRTP). The common usage for CFR
+// is provided under a CFRTree and CFRNode respectively.
 
 namespace open_spiel {
 namespace algorithms {
@@ -61,13 +61,13 @@ enum InfostateNodeType {
 };
 
 // Forward declarations.
-template<class NodeContents> class InfostateTree;
-template<class Contents> class InfostateNode;
+template<class Node> class InfostateTree;
+template<class Self> class InfostateNode;
 
-template<class Contents>
+template<class Self>
 class InfostateNode {
  public:
-  InfostateNode(const InfostateTree<Contents>& tree, InfostateNode* parent,
+  InfostateNode(const InfostateTree<Self>& tree, Self* parent,
                 int incoming_index, InfostateNodeType type,
                 absl::Span<float> tensor, double terminal_value,
                 const State* originating_state)
@@ -79,12 +79,20 @@ class InfostateNode {
     if (type == kDecisionNode)
       legal_actions_ = originating_state->LegalActions(tree_.GetPlayer());
   }
+  InfostateNode(InfostateNode&&) = default;
+  virtual ~InfostateNode() = default;
 
-  const InfostateTree<Contents>& Tree() const { return tree_; }
-  InfostateNode* Parent() { return parent_; }
+
+  const InfostateTree<Self>& Tree() const { return tree_; }
+  Self* Parent() { return parent_; }
   int IncomingIndex() const { return incoming_index_; }
   const InfostateNodeType& Type() const { return type_; }
-  absl::Span<const float> Tensor() const { return tensor_; }
+  absl::Span<const float> Tensor() const {
+    // Avoid working with empty tensors. Use HasTensor() first to check.
+    SPIEL_CHECK_FALSE(tensor_.empty());
+    return tensor_;
+  }
+  bool HasTensor() const { return !tensor_.empty(); }
   double TerminalValue() {
     SPIEL_CHECK_EQ(type_, kTerminalNode);
     return terminal_value_;
@@ -93,22 +101,32 @@ class InfostateNode {
     SPIEL_CHECK_EQ(type_, kDecisionNode);
     return absl::MakeSpan(legal_actions_);
   }
-  InfostateNode* AddChild(std::unique_ptr<InfostateNode> child) {
+  Self* AddChild(std::unique_ptr<Self> child) {
     children_.push_back(std::move(child));
     return children_.back().get();
   }
-  InfostateNode* GetChild(absl::Span<float> tensor) {
-    for (const std::unique_ptr<InfostateNode>& child : children_) {
+  Self* GetChild(absl::Span<float> tensor) {
+    for (const std::unique_ptr<Self>& child : children_) {
       if (child->Tensor() == tensor) return child.get();
     }
     return nullptr;
   }
-  InfostateNode* ChildAt(int i) { return children_.at(i).get(); }
+  Self* ChildAt(int i) { return children_.at(i).get(); }
   int NumChildren() const { return children_.size(); }
+  Self const* FindNode(absl::Span<float> tensor_lookup) const {
+    if (tensor_ == tensor_lookup)
+      return open_spiel::down_cast<Self const*>(this);
+    for (Self& child : *this) {
+      if (Self const* node = child.FindNode(tensor_lookup)) {
+        return node;
+      }
+    }
+    return nullptr;
+  }
 
   std::vector<int> GetSequence() const {
     std::vector<int> sequence;
-    InfostateNode* parent = parent_;
+    Self* parent = parent_;
     while(parent) {
       sequence.push_back(incoming_index_);
       parent = parent->parent_;
@@ -116,23 +134,17 @@ class InfostateNode {
     return sequence;
   }
 
-  // Provide a convenient way to access the Contents
-  // without calling some getter.
-  Contents* operator->() { return &content_; }
-  // Provide a const getter as well.
-  const Contents& contents() const { return content_; }
-
   // Iterate over children.
   class iterator {
     long pos_;
-    const std::vector<std::unique_ptr<InfostateNode>>& children_;
+    const std::vector<std::unique_ptr<Self>>& children_;
    public:
-    iterator(const std::vector<std::unique_ptr<InfostateNode>>& children,
+    iterator(const std::vector<std::unique_ptr<Self>>& children,
              long pos = 0) : pos_(pos), children_(children) {}
     iterator& operator++() { pos_++; return *this; }
     bool operator==(iterator other) const { return pos_ == other.pos_; }
     bool operator!=(iterator other) const { return !(*this == other); }
-    InfostateNode& operator*() { return *children_[pos_]; }
+    Self& operator*() { return *children_[pos_]; }
   };
   iterator begin() const { return iterator(children_); }
   iterator end() const { return iterator(children_, children_.size()); }
@@ -141,19 +153,19 @@ class InfostateNode {
     SPIEL_DCHECK_LE(current_depth, max_depth);
     if (NumChildren() == 0 && max_depth != current_depth) {
       // Prepare the chain of dummy observations.
-      std::unique_ptr<InfostateNode> node = Release();
-      InfostateNode* node_parent = node->Parent();
+      std::unique_ptr<Self> node = Release();
+      Self* node_parent = node->Parent();
       int position_in_leaf_parent = node->IncomingIndex();
-      std::unique_ptr<InfostateNode> chain_head =
-          std::unique_ptr<InfostateNode>(new InfostateNode(
+      std::unique_ptr<Self> chain_head =
+          std::unique_ptr<Self>(new Self(
               /*tree=*/tree_, /*parent=*/nullptr,
               /*incoming_index=*/position_in_leaf_parent, kObservationNode,
               /*tensor=*/{}, /*terminal_value=*/0,
               /*originating_state=*/nullptr));
-      InfostateNode* chain_tail = chain_head.get();
+      Self* chain_tail = chain_head.get();
       for (int i = 1; i < max_depth - current_depth; ++i) {
         chain_tail = chain_tail->AddChild(
-            std::unique_ptr<InfostateNode>(new InfostateNode(
+            std::unique_ptr<Self>(new Self(
                 /*tree=*/tree_, /*parent=*/chain_tail,
                 /*incoming_index=*/0, kObservationNode,
                 /*tensor=*/{}, /*terminal_value=*/0,
@@ -169,15 +181,15 @@ class InfostateNode {
                              position_in_leaf_parent);
     }
 
-    for (std::unique_ptr<InfostateNode>& child : children_) {
+    for (std::unique_ptr<Self>& child : children_) {
       child->Rebalance(max_depth, current_depth + 1);
     }
   }
 
- private:
+ protected:
   // Get the unique_ptr for this node. The usage is intended only for tree
   // balance manipulation.
-  std::unique_ptr<InfostateNode> Release() {
+  std::unique_ptr<Self> Release() {
     SPIEL_DCHECK_TRUE(parent_);
     SPIEL_DCHECK_TRUE(parent_->children_.at(incoming_index_).get() == this);
     return std::move(parent_->children_.at(incoming_index_));
@@ -187,29 +199,26 @@ class InfostateNode {
   // of the new parent. The node at the existing position will be freed.
   // We pass the unique ptr of itself, because calling Release might be
   // undefined: the node we want to swap a parent for can be root of a subtree.
-  void SwapParent(std::unique_ptr<InfostateNode> self,
-                  InfostateNode* target, int at_index) {
+  void SwapParent(std::unique_ptr<Self> self,
+                  Self* target, int at_index) {
     // This node is still who it thinks it is :)
     SPIEL_DCHECK_TRUE(self.get() == this);
     target->children_.at(at_index) = std::move(self);
     this->parent_ = target;
   }
 
-  const InfostateTree<Contents>& tree_;
-  InfostateNode* parent_;
+  const InfostateTree<Self>& tree_;
+  Self* parent_;
   const int incoming_index_;
   const InfostateNodeType type_;
   const std::vector<float> tensor_;
   const double terminal_value_;
   std::vector<Action> legal_actions_;
-  Contents content_;
-  std::vector<std::unique_ptr<InfostateNode>> children_;
+  std::vector<std::unique_ptr<Self>> children_;
 };
 
-template<class NodeContents>
-class InfostateTree {
-  using Node = InfostateNode<NodeContents>;
-
+template<class Node>
+class InfostateTree final {
  public:
 
   // Creates an infostate tree for a player based on initial state of a game
@@ -263,9 +272,16 @@ class InfostateTree {
   }
 
   const Node& Root() const { return root_; }
+  Node* MutableRoot() { return &root_; }
   Player GetPlayer() const { return player_; }
   int TreeHeight() const { return tree_height_; }
   bool IsBalanced() const { return is_tree_balanced_; }
+
+  // Identify node that corresponds to this tensor observation.
+  // If the node is not found, returns a nullptr.
+  Node const* FindNode(absl::Span<float> tensor_lookup) const {
+    return root_.FindNode(tensor_lookup);
+  }
 
   // Makes sure that all tree leaves are at the same height.
   // It inserts a linked list of dummy observation nodes with approriate length
@@ -407,32 +423,40 @@ class InfostateTree {
 };
 
 // Provide convenient types for usage in CFR-based algorithms.
-using CFRTree = InfostateTree</*NodeContents=*/CFRInfoStateValues>;
-using CFRNode = InfostateNode</*Contents=*/CFRInfoStateValues>;
+class CFRNode;
+using CFRTree = InfostateTree<CFRNode>;
 
-// Specialize CFRNode, because we construct the content
-// of CFRInfoStateValues differently for decision nodes.
-template<> CFRNode::InfostateNode(
-    const CFRTree& tree, CFRNode* parent, int incoming_index,
-    InfostateNodeType type, absl::Span<float> tensor, double terminal_value,
-    const State* originating_state) :
-  tree_(tree), parent_(parent), incoming_index_(incoming_index), type_(type),
-  tensor_(tensor.begin(), tensor.end()),
-  terminal_value_(terminal_value),
-  content_(originating_state && type == kDecisionNode
-    ? CFRInfoStateValues(originating_state->LegalActions(tree.GetPlayer()))
-    : CFRInfoStateValues()) {
-    // Do not save legal actions, as they are already saved
-    // within CFRInfoStateValues. Instead, change the LegalActions
-    // implementation to refer to these values directly.
+class CFRNode : public InfostateNode</*Self=*/CFRNode> {
+ public:
+  std::vector<Action> terminal_history_;
+  CFRInfoStateValues values_;
+
+  CFRNode(const CFRTree& tree, CFRNode* parent, int incoming_index,
+          InfostateNodeType type, absl::Span<float> tensor,
+          double terminal_value, const State* originating_state) :
+      InfostateNode<CFRNode>(
+          tree, parent, incoming_index, type, tensor, terminal_value,
+          originating_state)  {
     SPIEL_DCHECK_TRUE(
-       !(originating_state && type == kDecisionNode)
-       || originating_state->IsPlayerActing(tree.GetPlayer()));
+        !(originating_state && type == kDecisionNode)
+            || originating_state->IsPlayerActing(tree.GetPlayer()));
+    if (originating_state) {
+      if(type_ == kDecisionNode) {
+        values_ = CFRInfoStateValues(
+            originating_state->LegalActions(tree.GetPlayer()));
+      }
+      if (type_ == kTerminalNode) {
+        terminal_history_ = originating_state->History();
+      }
+    }
   }
-template<> absl::Span<const Action> CFRNode::LegalActions() const {
-  SPIEL_CHECK_EQ(type_, kDecisionNode);
-  return content_.legal_actions;
-}
+
+  // Provide a convenient operator to access the values.
+  CFRInfoStateValues* operator->() { return &values_; }
+  // Provide a const getter as well.
+  const CFRInfoStateValues& values() const { return values_; }
+};
+
 
 }  // namespace algorithms
 }  // namespace open_spiel

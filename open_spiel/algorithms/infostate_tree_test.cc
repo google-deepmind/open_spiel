@@ -30,15 +30,15 @@ namespace {
 // certificate (string representation) that we can easily compare.
 std::string ComputeCertificate(const CFRNode& node) {
   if (node.Type() == kDecisionNode) {
-    SPIEL_CHECK_GT(node.contents().legal_actions.size(), 0);
-    SPIEL_CHECK_GT(node.contents().cumulative_regrets.size(), 0);
-    SPIEL_CHECK_GT(node.contents().cumulative_policy.size(), 0);
-    SPIEL_CHECK_GT(node.contents().current_policy.size(), 0);
+    SPIEL_CHECK_GT(node.values().legal_actions.size(), 0);
+    SPIEL_CHECK_GT(node.values().cumulative_regrets.size(), 0);
+    SPIEL_CHECK_GT(node.values().cumulative_policy.size(), 0);
+    SPIEL_CHECK_GT(node.values().current_policy.size(), 0);
   } else {
-    SPIEL_CHECK_EQ(node.contents().legal_actions.size(), 0);
-    SPIEL_CHECK_EQ(node.contents().cumulative_regrets.size(), 0);
-    SPIEL_CHECK_EQ(node.contents().cumulative_policy.size(), 0);
-    SPIEL_CHECK_EQ(node.contents().current_policy.size(), 0);
+    SPIEL_CHECK_EQ(node.values().legal_actions.size(), 0);
+    SPIEL_CHECK_EQ(node.values().cumulative_regrets.size(), 0);
+    SPIEL_CHECK_EQ(node.values().cumulative_policy.size(), 0);
+    SPIEL_CHECK_EQ(node.values().current_policy.size(), 0);
   }
 
   if (node.Type() == kTerminalNode) {
