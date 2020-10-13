@@ -351,7 +351,7 @@ class DeepCFRSolver(policy.Policy):
       if cumulative_regret > 0.:
         matched_regrets[action] = advantages[action] / cumulative_regret
       else:
-        matched_regrets[action] = 1 / self._num_actions
+        matched_regrets[action] = 1 / len(legal_actions)
     return advantages, matched_regrets
 
   def action_probabilities(self, state):
