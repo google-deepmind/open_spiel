@@ -60,7 +60,7 @@ class ExternalSamplingSolver(object):
                 "using turn_based_simultaneous_game.")
 
     def iteration(self):
-        """Performs one iteration of outcome sampling.
+        """Performs one iteration of external sampling.
 
         An iteration consists of one episode for each player as the update player.
         """
@@ -140,6 +140,13 @@ class ExternalSamplingSolver(object):
             return positive_regrets / sum_pos_regret
 
     def _full_update_average(self, state, reach_probs):
+        """Performs a full update average.
+
+        Args:
+          state: the open spiel state to run from
+          reach_probs: array containing the probability of reaching the state
+          from the players point of view
+        """
         if state.is_terminal():
             return
         if state.is_chance_node():
@@ -175,11 +182,13 @@ class ExternalSamplingSolver(object):
         """Runs an episode of external sampling.
 
         Args:
-          state: the open spiel state to run from (will be modified in-place).
+          state: the open spiel state to run from
           player: the player to update regrets for
 
         Returns:
           value: is the value of the state in the game
+          obtained as the weighted average of the values
+          of the children
         """
         if state.is_terminal():
             return state.player_return(player)

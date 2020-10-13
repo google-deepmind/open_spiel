@@ -35,7 +35,7 @@ flags.DEFINE_enum(
     ["external", "outcome"],
     "Sampling for the MCCFR solver",
 )
-flags.DEFINE_integer("iterations", 100000, "Number of iterations")
+flags.DEFINE_integer("iterations", 10000, "Number of iterations")
 flags.DEFINE_string("game", "kuhn_poker", "Name of the game")
 flags.DEFINE_integer("players", 2, "Number of players")
 flags.DEFINE_integer("print_freq", 1000, "How often to print the exploitability")
@@ -45,7 +45,7 @@ def main(_):
     game = pyspiel.load_game(FLAGS.game,
                              {"players": pyspiel.GameParameter(FLAGS.players)})
     if FLAGS.sampling == 'external':
-        cfr_solver = external_mccfr.ExternalSamplingSolver(game, 'k_full')
+        cfr_solver = external_mccfr.ExternalSamplingSolver(game, 'k_simple')
     else:
         cfr_solver = outcome_mccfr.OutcomeSamplingSolver(game)
     for i in range(FLAGS.iterations):
