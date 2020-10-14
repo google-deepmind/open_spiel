@@ -30,14 +30,14 @@
 #include "open_spiel/utils/action_view.h"
 
 // This file contains an utility algorithm that builds an infostate tree
-// for some acting player, starting at some histories in the game.
+// for specified acting player, starting at some histories in the game.
 //
 // The identification of infostates is based on tensors from an information
 // state observer.
 //
-// As infostate node may need to contain arbitrary values, it is implemented
-// with curiously recurring template pattern (CRTP). The common usage for CFR
-// is provided under a CFRTree and CFRNode respectively.
+// As infostate node can be extended to contain arbitrary values, it is
+// implemented with curiously recurring template pattern (CRTP). The common
+// usage for CFR is provided under a CFRTree and CFRNode respectively.
 
 namespace open_spiel {
 namespace algorithms {
@@ -48,16 +48,17 @@ namespace algorithms {
 // The _observation nodes_ can correspond to State that is a chance node,
 // opponent's node, but importantly, also to the acting player's node,
 // as the player may have discovered something as a result of its action
-// in the previous decision node.
+// in the previous decision node. Additionally, we use _terminal nodes_,
+// which correspond to a single State terminal history.
 //
-// Additionally, we use _terminal nodes_, which correspond to a single State
-// terminal history. The player's utility is multiplied by chance reach
-// probability to get an expected value of the terminal history.
+// You can retrieve observation tensors for decision nodes via Tensor() method.
+// The terminal nodes store player's utility as well as cumulative chance reach
+// probability.
 //
 // [Predictive CFR] https://arxiv.org/pdf/2007.14358.pdf.
 enum InfostateNodeType {
   kDecisionNode,
-  kObservationNode,  // rename: outcome nodes
+  kObservationNode,
   kTerminalNode
 };
 
@@ -100,9 +101,8 @@ class InfostateNode {
   InfostateNode(InfostateNode&&) = default;
   virtual ~InfostateNode() = default;
 
-
-  const InfostateTree<Self>& Tree() const { return tree_; }
-  Self* Parent() { return parent_; }
+  [[nodiscard]] const InfostateTree<Self>& Tree() const { return tree_; }
+  [[nodiscard]] Self* Parent() { return parent_; }
   int IncomingIndex() const { return incoming_index_; }
   const InfostateNodeType& Type() const { return type_; }
   absl::Span<const float> Tensor() const {
@@ -123,19 +123,20 @@ class InfostateNode {
     SPIEL_CHECK_EQ(type_, kDecisionNode);
     return absl::MakeSpan(legal_actions_);
   }
-  Self* AddChild(std::unique_ptr<Self> child) {
+  [[nodiscard]] Self* AddChild(std::unique_ptr<Self> child) {
+    SPIEL_CHECK_EQ(child->parent_, this);
     children_.push_back(std::move(child));
     return children_.back().get();
   }
-  Self* GetChild(absl::Span<float> tensor) {
+  [[nodiscard]] Self* GetChild(absl::Span<float> tensor) {
     for (const std::unique_ptr<Self>& child : children_) {
       if (child->Tensor() == tensor) return child.get();
     }
     return nullptr;
   }
-  Self* ChildAt(int i) { return children_.at(i).get(); }
+  [[nodiscard]] Self* ChildAt(int i) { return children_.at(i).get(); }
   int NumChildren() const { return children_.size(); }
-  Self const* FindNode(absl::Span<float> tensor_lookup) const {
+  [[nodiscard]] Self const* FindNode(absl::Span<float> tensor_lookup) const {
     if (tensor_ == tensor_lookup)
       return open_spiel::down_cast<Self const*>(this);
     for (Self& child : *this) {
@@ -144,16 +145,6 @@ class InfostateNode {
       }
     }
     return nullptr;
-  }
-
-  std::vector<int> GetSequence() const {
-    std::vector<int> sequence;
-    Self* parent = parent_;
-    while(parent) {
-      sequence.push_back(incoming_index_);
-      parent = parent->parent_;
-    }
-    return sequence;
   }
 
   // Iterate over children.
@@ -166,7 +157,7 @@ class InfostateNode {
     iterator& operator++() { pos_++; return *this; }
     bool operator==(iterator other) const { return pos_ == other.pos_; }
     bool operator!=(iterator other) const { return !(*this == other); }
-    Self& operator*() { return *children_[pos_]; }
+    [[nodiscard]] Self& operator*() { return *children_[pos_]; }
   };
   iterator begin() const { return iterator(children_); }
   iterator end() const { return iterator(children_, children_.size()); }
@@ -209,7 +200,7 @@ class InfostateNode {
     }
   }
 
- protected:
+ private:
   // Get the unique_ptr for this node. The usage is intended only for tree
   // balance manipulation.
   std::unique_ptr<Self> Release() {
@@ -230,8 +221,13 @@ class InfostateNode {
     this->parent_ = target;
   }
 
+ protected:
   const InfostateTree<Self>& tree_;
   Self* parent_;
+  // Position of this node in the parent's children, i.e. it should hold that
+  //   parent_->children_.at(incoming_index_).get() == this.
+  // For decision nodes this corresponds also to the
+  //   State::LegalActions(player_).at(incoming_index_)
   const int incoming_index_;
   const InfostateNodeType type_;
   const std::vector<float> tensor_;
@@ -245,8 +241,8 @@ template<class Node>
 class InfostateTree final {
  public:
 
-  // Creates an infostate tree for a player based on initial state of a game
-  // up to some depth limit.
+  // Creates an infostate tree for a player based on the initial state of
+  // the game, up to some depth limit.
   InfostateTree(const Game& game, Player acting_player,
                 int max_depth_limit = 1000)
       : player_(acting_player),
@@ -297,8 +293,8 @@ class InfostateTree final {
     }
   }
 
-  const Node& Root() const { return root_; }
-  Node* MutableRoot() { return &root_; }
+  [[nodiscard]] const Node& Root() const { return root_; }
+  [[nodiscard]] Node* MutableRoot() { return &root_; }
   Player GetPlayer() const { return player_; }
   const Observer& GetObserver() const { return *infostate_observer_; }
   int TreeHeight() const { return tree_height_; }
@@ -306,12 +302,12 @@ class InfostateTree final {
 
   // Identify node that corresponds to this tensor observation.
   // If the node is not found, returns a nullptr.
-  Node const* FindNode(absl::Span<float> tensor_lookup) const {
+  [[nodiscard]] Node const* FindNode(absl::Span<float> tensor_lookup) const {
     return root_.FindNode(tensor_lookup);
   }
 
   // Makes sure that all tree leaves are at the same height.
-  // It inserts a linked list of dummy observation nodes with approriate length
+  // It inserts a linked list of dummy observation nodes with appropriate length
   // to balance all the leaves. In the worst case this makes the tree about 2x
   // as large (in the number of nodes).
   void Rebalance() {
@@ -345,7 +341,7 @@ class InfostateTree final {
     return Observation(game, infostate_observer_);
   }
 
-  // Call this function whenever we create a new node for the tree.
+  // Utility function whenever we create a new node for the tree.
   std::unique_ptr<Node> MakeNode(
       Node* parent, InfostateNodeType type, absl::Span<float> tensor,
       double terminal_value, double terminal_ch_reach_prob,
@@ -413,7 +409,8 @@ class InfostateTree final {
         }
       } else {  // The decision node was not found yet.
         decision_node = parent->AddChild(MakeNode(
-            parent, kDecisionNode, observation_.Tensor(), NAN, NAN, &state));
+            parent, kDecisionNode, observation_.Tensor(),
+            /*terminal_value=*/NAN, /*chance_reach_prob=*/NAN, &state));
 
         if (state.MoveNumber() >= move_limit)  // Do not build deeper.
           return UpdateBalanceInfo(depth);
@@ -450,7 +447,8 @@ class InfostateTree final {
             observation_.SetFrom(*child, player_);
             Node* observation_node = decision_node->AddChild(MakeNode(
                 decision_node, kObservationNode, observation_.Tensor(),
-                /*terminal_value=*/NAN, /*chance_reach_prob=*/NAN, child.get()));
+                /*terminal_value=*/NAN, /*chance_reach_prob=*/NAN,
+                child.get()));
             RecursivelyBuildTree(observation_node, depth + 2, *child,
                                  move_limit, chance_reach_prob);
           }
@@ -510,7 +508,7 @@ class CFRNode : public InfostateNode</*Self=*/CFRNode> {
         !(originating_state && type == kDecisionNode)
             || originating_state->IsPlayerActing(tree.GetPlayer()));
     if (originating_state) {
-      if(type_ == kDecisionNode) {
+      if (type_ == kDecisionNode) {
         values_ = CFRInfoStateValues(
             originating_state->LegalActions(tree.GetPlayer()));
         infostate_string_ = Tree().GetObserver().StringFrom(
