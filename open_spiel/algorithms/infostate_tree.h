@@ -71,12 +71,13 @@ class InfostateNode {
   InfostateNode(const InfostateTree<Self>& tree, Self* parent,
                 int incoming_index, InfostateNodeType type,
                 absl::Span<float> tensor, double terminal_value,
-                const State* originating_state)
+                double terminal_ch_reach_prob, const State* originating_state)
       : tree_(tree), parent_(parent),
         incoming_index_(incoming_index), type_(type),
         // Copy the tensor.
         tensor_(tensor.begin(), tensor.end()),
-        terminal_value_(terminal_value) {
+        terminal_value_(terminal_value),
+        terminal_chn_reach_prob_(terminal_ch_reach_prob) {
 
     // Implications for kTerminalNode
     SPIEL_DCHECK_TRUE(type != kTerminalNode || originating_state);
@@ -110,9 +111,13 @@ class InfostateNode {
     return tensor_;
   }
   bool HasTensor() const { return !tensor_.empty(); }
-  double TerminalValue() {
+  double TerminalValue() const {
     SPIEL_CHECK_EQ(type_, kTerminalNode);
     return terminal_value_;
+  }
+  double TerminalChanceReachProb() const {
+    SPIEL_CHECK_EQ(type_, kTerminalNode);
+    return terminal_chn_reach_prob_;
   }
   absl::Span<const Action> LegalActions() const {
     SPIEL_CHECK_EQ(type_, kDecisionNode);
@@ -177,15 +182,16 @@ class InfostateNode {
           std::unique_ptr<Self>(new Self(
               /*tree=*/tree_, /*parent=*/nullptr,
               /*incoming_index=*/position_in_leaf_parent, kObservationNode,
-              /*tensor=*/{}, /*terminal_value=*/0,
-              /*originating_state=*/nullptr));
+              /*tensor=*/{}, /*terminal_value=*/NAN,
+              /*terminal_ch_reach_prob=*/NAN, /*originating_state=*/nullptr));
       Self* chain_tail = chain_head.get();
       for (int i = 1; i < max_depth - current_depth; ++i) {
         chain_tail = chain_tail->AddChild(
             std::unique_ptr<Self>(new Self(
                 /*tree=*/tree_, /*parent=*/chain_tail,
                 /*incoming_index=*/0, kObservationNode,
-                /*tensor=*/{}, /*terminal_value=*/0,
+                /*tensor=*/{}, /*terminal_value=*/NAN,
+                /*terminal_ch_reach_prob=*/NAN,
                 /*originating_state=*/nullptr)));
       }
       chain_tail->children_.push_back(nullptr);
@@ -230,6 +236,7 @@ class InfostateNode {
   const InfostateNodeType type_;
   const std::vector<float> tensor_;
   const double terminal_value_;
+  const double terminal_chn_reach_prob_;
   std::vector<Action> legal_actions_;
   std::vector<std::unique_ptr<Self>> children_;
 };
@@ -245,7 +252,8 @@ class InfostateTree final {
       : player_(acting_player),
         infostate_observer_(game.MakeObserver(kInfoStateObsType, {})),
         root_(/*tree=*/*this, /*parent=*/nullptr, /*incoming_index=*/0,
-              /*type=*/kObservationNode, /*tensor=*/{}, /*terminal_value=*/0,
+              /*type=*/kObservationNode, /*tensor=*/{},
+              /*terminal_value=*/NAN, /*chance_reach_prob=*/NAN,
               /*originating_state=*/nullptr),
         observation_(std::move(CreateObservation(game))) {
     std::unique_ptr<State> root_state = game.NewInitialState();
@@ -270,7 +278,8 @@ class InfostateTree final {
         // It cannot be retrieved via Get* methods, only by using the Root()
         // method.
         root_(/*tree=*/*this, /*parent=*/nullptr, /*incoming_index=*/0,
-              /*type=*/kObservationNode, /*tensor=*/{}, /*terminal_value=*/0,
+              /*type=*/kObservationNode, /*tensor=*/{},
+              /*terminal_value=*/NAN, /*chance_reach_prob=*/NAN,
               /*originating_state=*/nullptr),
       observation_(std::move(CreateObservation(*start_states.at(0)))) {
     SPIEL_CHECK_EQ(start_states.size(), chance_reach_probs.size());
@@ -339,10 +348,11 @@ class InfostateTree final {
   // Call this function whenever we create a new node for the tree.
   std::unique_ptr<Node> MakeNode(
       Node* parent, InfostateNodeType type, absl::Span<float> tensor,
-      double terminal_value, const State* originating_state) {
+      double terminal_value, double terminal_ch_reach_prob,
+      const State* originating_state) {
     return std::make_unique<Node>(
         *this, parent, parent->NumChildren(), type,
-        tensor, terminal_value, originating_state);
+        tensor, terminal_value, terminal_ch_reach_prob, originating_state);
   }
 
   // Track and update information about tree balance.
@@ -359,9 +369,9 @@ class InfostateTree final {
 
     // Create terminal nodes.
     if (state.IsTerminal()) {
-      double terminal_value = state.Returns()[player_] * chance_reach_prob;
+      double terminal_value = state.Returns()[player_];
       parent->AddChild(MakeNode(parent, kTerminalNode, observation_.Tensor(),
-                                terminal_value, &state));
+                                terminal_value, chance_reach_prob, &state));
       return UpdateBalanceInfo(depth);
     }
 
@@ -403,7 +413,7 @@ class InfostateTree final {
         }
       } else {  // The decision node was not found yet.
         decision_node = parent->AddChild(MakeNode(
-            parent, kDecisionNode, observation_.Tensor(), 0, &state));
+            parent, kDecisionNode, observation_.Tensor(), NAN, NAN, &state));
 
         if (state.MoveNumber() >= move_limit)  // Do not build deeper.
           return UpdateBalanceInfo(depth);
@@ -423,7 +433,8 @@ class InfostateTree final {
             // all the actions).
             Node* observation_node = decision_node->AddChild(MakeNode(
                 decision_node, kObservationNode, /*tensor=*/{},
-                /*terminal_value=*/0, /*originating_state=*/nullptr));
+                /*terminal_value=*/NAN, /*chance_reach_prob=*/NAN,
+                /*originating_state=*/nullptr));
 
             for (Action flat_actions : action_view.fixed_action(player_, i)) {
               // Only now we can advance the state, when we have all actions.
@@ -439,7 +450,7 @@ class InfostateTree final {
             observation_.SetFrom(*child, player_);
             Node* observation_node = decision_node->AddChild(MakeNode(
                 decision_node, kObservationNode, observation_.Tensor(),
-                /*terminal_value=*/0, child.get()));
+                /*terminal_value=*/NAN, /*chance_reach_prob=*/NAN, child.get()));
             RecursivelyBuildTree(observation_node, depth + 2, *child,
                                  move_limit, chance_reach_prob);
           }
@@ -454,7 +465,8 @@ class InfostateTree final {
     Node* observation_node = parent->GetChild(observation_.Tensor());
     if (!observation_node) {
       observation_node = parent->AddChild(MakeNode(
-          parent, kObservationNode, observation_.Tensor(), 0, &state));
+          parent, kObservationNode, observation_.Tensor(),
+          /*terminal_value=*/NAN, /*chance_reach_prob=*/NAN, &state));
     }
     SPIEL_DCHECK_EQ(observation_node->Type(), kObservationNode);
 
@@ -483,16 +495,17 @@ class CFRNode;
 using CFRTree = InfostateTree<CFRNode>;
 
 class CFRNode : public InfostateNode</*Self=*/CFRNode> {
+ public:
   CFRInfoStateValues values_;
   std::vector<Action> terminal_history_;
   std::string infostate_string_;
- public:
   CFRNode(const CFRTree& tree, CFRNode* parent, int incoming_index,
           InfostateNodeType type, absl::Span<float> tensor,
-          double terminal_value, const State* originating_state) :
+          double terminal_value, double terminal_chn_reach_prob,
+          const State* originating_state) :
       InfostateNode<CFRNode>(
           tree, parent, incoming_index, type, tensor, terminal_value,
-          originating_state)  {
+          terminal_chn_reach_prob, originating_state)  {
     SPIEL_DCHECK_TRUE(
         !(originating_state && type == kDecisionNode)
             || originating_state->IsPlayerActing(tree.GetPlayer()));
@@ -510,10 +523,15 @@ class CFRNode : public InfostateNode</*Self=*/CFRNode> {
   }
 
   // Provide a convenient operator to access the values.
-  CFRInfoStateValues* operator->() { return &values_; }
+  CFRInfoStateValues* operator->() {
+    SPIEL_DCHECK_EQ(type_, kDecisionNode);
+    return &values_;
+  }
   // Provide a const getter as well.
-  const CFRInfoStateValues& values() const { return values_; }
-
+  const CFRInfoStateValues& values() const {
+    SPIEL_DCHECK_EQ(type_, kDecisionNode);
+    return values_;
+  }
   absl::Span<const Action> TerminalHistory() const {
     SPIEL_DCHECK_EQ(type_, kTerminalNode);
     return absl::MakeSpan(terminal_history_);
