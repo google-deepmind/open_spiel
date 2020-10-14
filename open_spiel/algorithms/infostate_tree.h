@@ -364,109 +364,119 @@ class InfostateTree final {
   void RecursivelyBuildTree(Node* parent, int depth, const State& state,
                             int move_limit, double chance_reach_prob) {
     observation_.SetFrom(state, player_);
-    const bool is_leaf_node = state.IsTerminal()
-        || state.MoveNumber() >= move_limit;
 
-    // Create terminal nodes.
-    if (state.IsTerminal()) {
-      double terminal_value = state.Returns()[player_];
-      parent->AddChild(MakeNode(parent, kTerminalInfostateNode,
-                                observation_.Tensor(), terminal_value,
-                                chance_reach_prob, &state));
-      return UpdateBalanceInfo(depth);
-    }
+    if (state.IsTerminal())
+      return BuildTerminalNode(parent, depth, state, chance_reach_prob);
+    else if (state.IsPlayerActing(player_))
+      return BuildDecisionNode(parent, depth, state, move_limit,
+                               chance_reach_prob);
+    else
+      return BuildObservationNode(parent, depth, state, move_limit,
+                                  chance_reach_prob);
+  }
 
-    // Create decision nodes.
-    if (state.IsPlayerActing(player_)) {
-      SPIEL_DCHECK_EQ(parent->Type(), kObservationInfostateNode);
-      Node* decision_node = parent->GetChild(observation_.Tensor());
+  void BuildTerminalNode(Node* parent, int depth, const State& state,
+                         double chance_reach_prob) {
+    const double terminal_value = state.Returns()[player_];
+    parent->AddChild(MakeNode(parent, kTerminalInfostateNode,
+                              observation_.Tensor(), terminal_value,
+                              chance_reach_prob, &state));
+    UpdateBalanceInfo(depth);
+  }
 
-      if (decision_node) {
-        // The decision node has been already constructed along with children
-        // for each action: these are observation nodes.
-        // Fetches the observation child and goes deeper recursively.
-        SPIEL_DCHECK_EQ(decision_node->Type(), kDecisionInfostateNode);
+  void BuildDecisionNode(Node* parent, int depth, const State& state,
+                         int move_limit, double chance_reach_prob) {
+    SPIEL_DCHECK_EQ(parent->Type(), kObservationInfostateNode);
+    Node* decision_node = parent->GetChild(observation_.Tensor());
+    const bool is_leaf_node = state.MoveNumber() >= move_limit;
 
-        if (state.MoveNumber() >= move_limit)  // Do not build deeper.
-          return UpdateBalanceInfo(depth);
+    if (decision_node) {
+      // The decision node has been already constructed along with children
+      // for each action: these are observation nodes.
+      // Fetches the observation child and goes deeper recursively.
+      SPIEL_DCHECK_EQ(decision_node->Type(), kDecisionInfostateNode);
 
-        if (state.IsSimultaneousNode()) {
-          const ActionView action_view(state);
-          for (int i = 0; i < action_view.legal_actions[player_].size(); ++i) {
-            Node* observation_node = decision_node->ChildAt(i);
-            SPIEL_DCHECK_EQ(observation_node->Type(),
-                            kObservationInfostateNode);
+      if (is_leaf_node)  // Do not build deeper.
+        return UpdateBalanceInfo(depth);
 
-            for (Action flat_actions : action_view.fixed_action(player_, i)) {
-              std::unique_ptr<State> child = state.Child(flat_actions);
-              RecursivelyBuildTree(observation_node, depth + 2, *child,
-                                   move_limit, chance_reach_prob);
-            }
-          }
-        } else {
-          std::vector<Action> legal_actions = state.LegalActions(player_);
-          for (int i = 0; i < legal_actions.size(); ++i) {
-            Node* observation_node = decision_node->ChildAt(i);
-            SPIEL_DCHECK_EQ(observation_node->Type(),
-                            kObservationInfostateNode);
-            std::unique_ptr<State> child = state.Child(legal_actions.at(i));
+      if (state.IsSimultaneousNode()) {
+        const ActionView action_view(state);
+        for (int i = 0; i < action_view.legal_actions[player_].size(); ++i) {
+          Node* observation_node = decision_node->ChildAt(i);
+          SPIEL_DCHECK_EQ(observation_node->Type(),
+                          kObservationInfostateNode);
+
+          for (Action flat_actions : action_view.fixed_action(player_, i)) {
+            std::unique_ptr<State> child = state.Child(flat_actions);
             RecursivelyBuildTree(observation_node, depth + 2, *child,
                                  move_limit, chance_reach_prob);
           }
         }
-      } else {  // The decision node was not found yet.
-        decision_node = parent->AddChild(MakeNode(
-            parent, kDecisionInfostateNode, observation_.Tensor(),
-            /*terminal_value=*/NAN, /*chance_reach_prob=*/NAN, &state));
-
-        if (is_leaf_node)  // Do not build deeper.
-          return UpdateBalanceInfo(depth);
-
-        // Build observation nodes right away after the decision node.
-        // This is because the player might be acting multiple times in a row:
-        // each time it might get some observations that branch the infostate
-        // tree.
-
-        if (state.IsSimultaneousNode()) {
-          ActionView action_view(state);
-          for (int i = 0; i < action_view.legal_actions[player_].size(); ++i) {
-            // We build a dummy observation node.
-            // We can't ask for a proper tensor or an originating state, because
-            // such a thing is not properly defined after only a partial
-            // application of actions for the sim move state (We need to supply
-            // all the actions).
-            Node* observation_node = decision_node->AddChild(MakeNode(
-                decision_node, kObservationInfostateNode, /*tensor=*/{},
-                /*terminal_value=*/NAN, /*chance_reach_prob=*/NAN,
-                /*originating_state=*/nullptr));
-
-            for (Action flat_actions : action_view.fixed_action(player_, i)) {
-              // Only now we can advance the state, when we have all actions.
-              std::unique_ptr<State> child = state.Child(flat_actions);
-              RecursivelyBuildTree(observation_node, depth + 2, *child,
-                                   move_limit, chance_reach_prob);
-            }
-
-          }
-        } else {  // Not a sim move node.
-          for (Action a : state.LegalActions()) {
-            std::unique_ptr<State> child = state.Child(a);
-            observation_.SetFrom(*child, player_);
-            Node* observation_node = decision_node->AddChild(MakeNode(
-                decision_node, kObservationInfostateNode, observation_.Tensor(),
-                /*terminal_value=*/NAN, /*chance_reach_prob=*/NAN,
-                child.get()));
-            RecursivelyBuildTree(observation_node, depth + 2, *child,
-                                 move_limit, chance_reach_prob);
-          }
+      } else {
+        std::vector<Action> legal_actions = state.LegalActions(player_);
+        for (int i = 0; i < legal_actions.size(); ++i) {
+          Node* observation_node = decision_node->ChildAt(i);
+          SPIEL_DCHECK_EQ(observation_node->Type(),
+                          kObservationInfostateNode);
+          std::unique_ptr<State> child = state.Child(legal_actions.at(i));
+          RecursivelyBuildTree(observation_node, depth + 2, *child,
+                               move_limit, chance_reach_prob);
         }
       }
-      return;
-    }
+    } else {  // The decision node was not found yet.
+      decision_node = parent->AddChild(MakeNode(
+          parent, kDecisionInfostateNode, observation_.Tensor(),
+          /*terminal_value=*/NAN, /*chance_reach_prob=*/NAN, &state));
 
-    // Finally, create observation nodes.
-    SPIEL_DCHECK_TRUE(state.IsChanceNode()
-                          || !state.IsPlayerActing(player_));
+      if (is_leaf_node)  // Do not build deeper.
+        return UpdateBalanceInfo(depth);
+
+      // Build observation nodes right away after the decision node.
+      // This is because the player might be acting multiple times in a row:
+      // each time it might get some observations that branch the infostate
+      // tree.
+
+      if (state.IsSimultaneousNode()) {
+        ActionView action_view(state);
+        for (int i = 0; i < action_view.legal_actions[player_].size(); ++i) {
+          // We build a dummy observation node.
+          // We can't ask for a proper tensor or an originating state, because
+          // such a thing is not properly defined after only a partial
+          // application of actions for the sim move state (We need to supply
+          // all the actions).
+          Node* observation_node = decision_node->AddChild(MakeNode(
+              decision_node, kObservationInfostateNode, /*tensor=*/{},
+              /*terminal_value=*/NAN, /*chance_reach_prob=*/NAN,
+              /*originating_state=*/nullptr));
+
+          for (Action flat_actions : action_view.fixed_action(player_, i)) {
+            // Only now we can advance the state, when we have all actions.
+            std::unique_ptr<State> child = state.Child(flat_actions);
+            RecursivelyBuildTree(observation_node, depth + 2, *child,
+                                 move_limit, chance_reach_prob);
+          }
+
+        }
+      } else {  // Not a sim move node.
+        for (Action a : state.LegalActions()) {
+          std::unique_ptr<State> child = state.Child(a);
+          observation_.SetFrom(*child, player_);
+          Node* observation_node = decision_node->AddChild(MakeNode(
+              decision_node, kObservationInfostateNode, observation_.Tensor(),
+              /*terminal_value=*/NAN, /*chance_reach_prob=*/NAN,
+              child.get()));
+          RecursivelyBuildTree(observation_node, depth + 2, *child,
+                               move_limit, chance_reach_prob);
+        }
+      }
+    }
+  }
+
+  void BuildObservationNode(Node* parent, int depth, const State& state,
+                            int move_limit, double chance_reach_prob) {
+    SPIEL_DCHECK_TRUE(state.IsChanceNode() || !state.IsPlayerActing(player_));
+    const bool is_leaf_node = state.MoveNumber() >= move_limit;
+
     Node* observation_node = parent->GetChild(observation_.Tensor());
     if (!observation_node) {
       observation_node = parent->AddChild(MakeNode(
