@@ -364,6 +364,8 @@ class InfostateTree final {
   void RecursivelyBuildTree(Node* parent, int depth, const State& state,
                             int move_limit, double chance_reach_prob) {
     observation_.SetFrom(state, player_);
+    const bool is_leaf_node = state.IsTerminal()
+        || state.MoveNumber() >= move_limit;
 
     // Create terminal nodes.
     if (state.IsTerminal()) {
@@ -389,7 +391,7 @@ class InfostateTree final {
           return UpdateBalanceInfo(depth);
 
         if (state.IsSimultaneousNode()) {
-          ActionView action_view(state);
+          const ActionView action_view(state);
           for (int i = 0; i < action_view.legal_actions[player_].size(); ++i) {
             Node* observation_node = decision_node->ChildAt(i);
             SPIEL_DCHECK_EQ(observation_node->Type(),
@@ -417,7 +419,7 @@ class InfostateTree final {
             parent, kDecisionInfostateNode, observation_.Tensor(),
             /*terminal_value=*/NAN, /*chance_reach_prob=*/NAN, &state));
 
-        if (state.MoveNumber() >= move_limit)  // Do not build deeper.
+        if (is_leaf_node)  // Do not build deeper.
           return UpdateBalanceInfo(depth);
 
         // Build observation nodes right away after the decision node.
@@ -473,7 +475,7 @@ class InfostateTree final {
     }
     SPIEL_DCHECK_EQ(observation_node->Type(), kObservationInfostateNode);
 
-    if (state.MoveNumber() >= move_limit)  // Do not build deeper.
+    if (is_leaf_node)  // Do not build deeper.
       return UpdateBalanceInfo(depth);
 
     if (state.IsChanceNode()) {
@@ -527,12 +529,12 @@ class CFRNode : public InfostateNode</*Self=*/CFRNode> {
 
   // Provide a convenient operator to access the values.
   CFRInfoStateValues* operator->() {
-    SPIEL_DCHECK_EQ(type_, kDecisionInfostateNode);
+    SPIEL_CHECK_EQ(type_, kDecisionInfostateNode);
     return &values_;
   }
   // Provide a const getter as well.
   const CFRInfoStateValues& values() const {
-    SPIEL_DCHECK_EQ(type_, kDecisionInfostateNode);
+    SPIEL_CHECK_EQ(type_, kDecisionInfostateNode);
     return values_;
   }
   absl::Span<const Action> TerminalHistory() const {
