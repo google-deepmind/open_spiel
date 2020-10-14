@@ -222,7 +222,7 @@ int main(int argc, char** argv) {
   algorithms::TestImplementationsHaveSameIterations();
 
   // These are disabled, as they are not tests.
-  // Useful for future reference.
+  // Useful for future reference. Compiled using BUILD_TYPE=Release
 
   //             Vec         Str         Speedup
   //  Start:     0.00137985  0.00143035  1.0366
