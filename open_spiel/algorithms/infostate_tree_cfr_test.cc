@@ -197,8 +197,8 @@ void BenchmarkImplementations(const std::string& game_name) {
         solver.EvaluateAndUpdatePolicy();
       }
     };
-    str_make_time = Benchmark(1, make_tree);
-    str_run_time = Benchmark(1, run_solver);
+    str_make_time = Benchmark(benchmark_reps, make_tree);
+    str_run_time = Benchmark(benchmark_reps, run_solver);
   }
 
   std::cout << "Game:      " << game_name << "\n"
