@@ -39,19 +39,7 @@ std::string iigs3 = "goofspiel("
 // To make sure we can easily test infostate tree structures, we compute their
 // certificate (string representation) that we can easily compare.
 std::string ComputeCertificate(const CFRNode& node) {
-  if (node.Type() == kDecisionNode) {
-    SPIEL_CHECK_GT(node.values().legal_actions.size(), 0);
-    SPIEL_CHECK_GT(node.values().cumulative_regrets.size(), 0);
-    SPIEL_CHECK_GT(node.values().cumulative_policy.size(), 0);
-    SPIEL_CHECK_GT(node.values().current_policy.size(), 0);
-  } else {
-    SPIEL_CHECK_EQ(node.values().legal_actions.size(), 0);
-    SPIEL_CHECK_EQ(node.values().cumulative_regrets.size(), 0);
-    SPIEL_CHECK_EQ(node.values().cumulative_policy.size(), 0);
-    SPIEL_CHECK_EQ(node.values().current_policy.size(), 0);
-  }
-
-  if (node.Type() == kTerminalNode) {
+  if (node.Type() == kTerminalInfostateNode) {
     SPIEL_CHECK_EQ(node.NumChildren(), 0);
     return "{}";
   }
@@ -63,10 +51,10 @@ std::string ComputeCertificate(const CFRNode& node) {
   std::sort(certificates.begin(), certificates.end());
 
   std::string open, close;
-  if (node.Type() == kDecisionNode) {
+  if (node.Type() == kDecisionInfostateNode) {
     open = "[";
     close = "]";
-  } else if (node.Type() == kObservationNode) {
+  } else if (node.Type() == kObservationInfostateNode) {
     open = "(";
     close = ")";
   }
@@ -341,7 +329,8 @@ void TestTreeRebalancing() {
         "(({}))"      // 2nd player passes
         "[({})({})]"  // 2nd player bets
         "))";
-    SPIEL_CHECK_EQ(ComputeCertificate(tree->Root()), expected_rebalanced_certificate);
+    SPIEL_CHECK_EQ(ComputeCertificate(tree->Root()),
+                   expected_rebalanced_certificate);
     SPIEL_CHECK_TRUE(tree->IsBalanced());
     SPIEL_CHECK_TRUE(RecomputeBalance(*tree));
   }
@@ -369,7 +358,8 @@ void TestTreeRebalancing() {
         "(({}))"
         "[({}{})({}{})]"
       ")";
-    SPIEL_CHECK_EQ(ComputeCertificate(tree->Root()), expected_rebalanced_certificate);
+    SPIEL_CHECK_EQ(ComputeCertificate(tree->Root()),
+                   expected_rebalanced_certificate);
     SPIEL_CHECK_TRUE(tree->IsBalanced());
     SPIEL_CHECK_TRUE(RecomputeBalance(*tree));
   }
@@ -400,7 +390,8 @@ void TestTreeRebalancing() {
         "([(((({}))(({}))(({}))(({}))))(((({}))(({}))[({}{})({}{})]))])"
         "([(((({}))(({}))(({}))(({}))))(((({}))(({}))[({}{})({}{})]))])"
       "))";
-    SPIEL_CHECK_EQ(ComputeCertificate(tree->Root()), expected_rebalanced_certificate);
+    SPIEL_CHECK_EQ(ComputeCertificate(tree->Root()),
+                   expected_rebalanced_certificate);
     SPIEL_CHECK_TRUE(tree->IsBalanced());
     SPIEL_CHECK_TRUE(RecomputeBalance(*tree));
   }

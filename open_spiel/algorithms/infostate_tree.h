@@ -57,9 +57,9 @@ namespace algorithms {
 //
 // [Predictive CFR] https://arxiv.org/pdf/2007.14358.pdf.
 enum InfostateNodeType {
-  kDecisionNode,
-  kObservationNode,
-  kTerminalNode
+  kDecisionInfostateNode,
+  kObservationInfostateNode,
+  kTerminalInfostateNode
 };
 
 // Forward declarations.
@@ -81,20 +81,21 @@ class InfostateNode {
         terminal_chn_reach_prob_(terminal_ch_reach_prob) {
 
     // Implications for kTerminalNode
-    SPIEL_DCHECK_TRUE(type != kTerminalNode || originating_state);
-    SPIEL_DCHECK_TRUE(type != kTerminalNode || parent);
-    SPIEL_DCHECK_TRUE(type != kTerminalNode || !tensor.empty());
+    SPIEL_DCHECK_TRUE(type != kTerminalInfostateNode || originating_state);
+    SPIEL_DCHECK_TRUE(type != kTerminalInfostateNode || parent);
+    SPIEL_DCHECK_TRUE(type != kTerminalInfostateNode || !tensor.empty());
     // Implications for kDecisionNode
-    SPIEL_DCHECK_TRUE(type != kDecisionNode || originating_state);
-    SPIEL_DCHECK_TRUE(type != kDecisionNode || parent);
-    SPIEL_DCHECK_TRUE(type != kDecisionNode || !tensor.empty());
+    SPIEL_DCHECK_TRUE(type != kDecisionInfostateNode || originating_state);
+    SPIEL_DCHECK_TRUE(type != kDecisionInfostateNode || parent);
+    SPIEL_DCHECK_TRUE(type != kDecisionInfostateNode || !tensor.empty());
     // Implications for kObservationNode
     SPIEL_DCHECK_TRUE(
-      !(type == kObservationNode && parent && parent->Type() == kDecisionNode)
+      !(type == kObservationInfostateNode && parent
+          && parent->Type() == kDecisionInfostateNode)
       || (incoming_index >= 0 && incoming_index < parent->LegalActions().size())
     );
 
-    if (type == kDecisionNode) {
+    if (type == kDecisionInfostateNode) {
       legal_actions_ = originating_state->LegalActions(tree_.GetPlayer());
     }
   }
@@ -112,15 +113,15 @@ class InfostateNode {
   }
   bool HasTensor() const { return !tensor_.empty(); }
   double TerminalValue() const {
-    SPIEL_CHECK_EQ(type_, kTerminalNode);
+    SPIEL_CHECK_EQ(type_, kTerminalInfostateNode);
     return terminal_value_;
   }
   double TerminalChanceReachProb() const {
-    SPIEL_CHECK_EQ(type_, kTerminalNode);
+    SPIEL_CHECK_EQ(type_, kTerminalInfostateNode);
     return terminal_chn_reach_prob_;
   }
   absl::Span<const Action> LegalActions() const {
-    SPIEL_CHECK_EQ(type_, kDecisionNode);
+    SPIEL_CHECK_EQ(type_, kDecisionInfostateNode);
     return absl::MakeSpan(legal_actions_);
   }
   [[nodiscard]] Self* AddChild(std::unique_ptr<Self> child) {
@@ -172,7 +173,8 @@ class InfostateNode {
       std::unique_ptr<Self> chain_head =
           std::unique_ptr<Self>(new Self(
               /*tree=*/tree_, /*parent=*/nullptr,
-              /*incoming_index=*/position_in_leaf_parent, kObservationNode,
+              /*incoming_index=*/position_in_leaf_parent,
+              kObservationInfostateNode,
               /*tensor=*/{}, /*terminal_value=*/NAN,
               /*terminal_ch_reach_prob=*/NAN, /*originating_state=*/nullptr));
       Self* chain_tail = chain_head.get();
@@ -180,7 +182,7 @@ class InfostateNode {
         chain_tail = chain_tail->AddChild(
             std::unique_ptr<Self>(new Self(
                 /*tree=*/tree_, /*parent=*/chain_tail,
-                /*incoming_index=*/0, kObservationNode,
+                /*incoming_index=*/0, kObservationInfostateNode,
                 /*tensor=*/{}, /*terminal_value=*/NAN,
                 /*terminal_ch_reach_prob=*/NAN,
                 /*originating_state=*/nullptr)));
@@ -248,7 +250,7 @@ class InfostateTree final {
       : player_(acting_player),
         infostate_observer_(game.MakeObserver(kInfoStateObsType, {})),
         root_(/*tree=*/*this, /*parent=*/nullptr, /*incoming_index=*/0,
-              /*type=*/kObservationNode, /*tensor=*/{},
+              /*type=*/kObservationInfostateNode, /*tensor=*/{},
               /*terminal_value=*/NAN, /*chance_reach_prob=*/NAN,
               /*originating_state=*/nullptr),
         observation_(std::move(CreateObservation(game))) {
@@ -274,7 +276,7 @@ class InfostateTree final {
         // It cannot be retrieved via Get* methods, only by using the Root()
         // method.
         root_(/*tree=*/*this, /*parent=*/nullptr, /*incoming_index=*/0,
-              /*type=*/kObservationNode, /*tensor=*/{},
+              /*type=*/kObservationInfostateNode, /*tensor=*/{},
               /*terminal_value=*/NAN, /*chance_reach_prob=*/NAN,
               /*originating_state=*/nullptr),
       observation_(std::move(CreateObservation(*start_states.at(0)))) {
@@ -366,21 +368,22 @@ class InfostateTree final {
     // Create terminal nodes.
     if (state.IsTerminal()) {
       double terminal_value = state.Returns()[player_];
-      parent->AddChild(MakeNode(parent, kTerminalNode, observation_.Tensor(),
-                                terminal_value, chance_reach_prob, &state));
+      parent->AddChild(MakeNode(parent, kTerminalInfostateNode,
+                                observation_.Tensor(), terminal_value,
+                                chance_reach_prob, &state));
       return UpdateBalanceInfo(depth);
     }
 
     // Create decision nodes.
     if (state.IsPlayerActing(player_)) {
-      SPIEL_DCHECK_EQ(parent->Type(), kObservationNode);
+      SPIEL_DCHECK_EQ(parent->Type(), kObservationInfostateNode);
       Node* decision_node = parent->GetChild(observation_.Tensor());
 
       if (decision_node) {
         // The decision node has been already constructed along with children
         // for each action: these are observation nodes.
         // Fetches the observation child and goes deeper recursively.
-        SPIEL_DCHECK_EQ(decision_node->Type(), kDecisionNode);
+        SPIEL_DCHECK_EQ(decision_node->Type(), kDecisionInfostateNode);
 
         if (state.MoveNumber() >= move_limit)  // Do not build deeper.
           return UpdateBalanceInfo(depth);
@@ -389,7 +392,8 @@ class InfostateTree final {
           ActionView action_view(state);
           for (int i = 0; i < action_view.legal_actions[player_].size(); ++i) {
             Node* observation_node = decision_node->ChildAt(i);
-            SPIEL_DCHECK_EQ(observation_node->Type(), kObservationNode);
+            SPIEL_DCHECK_EQ(observation_node->Type(),
+                            kObservationInfostateNode);
 
             for (Action flat_actions : action_view.fixed_action(player_, i)) {
               std::unique_ptr<State> child = state.Child(flat_actions);
@@ -401,7 +405,8 @@ class InfostateTree final {
           std::vector<Action> legal_actions = state.LegalActions(player_);
           for (int i = 0; i < legal_actions.size(); ++i) {
             Node* observation_node = decision_node->ChildAt(i);
-            SPIEL_DCHECK_EQ(observation_node->Type(), kObservationNode);
+            SPIEL_DCHECK_EQ(observation_node->Type(),
+                            kObservationInfostateNode);
             std::unique_ptr<State> child = state.Child(legal_actions.at(i));
             RecursivelyBuildTree(observation_node, depth + 2, *child,
                                  move_limit, chance_reach_prob);
@@ -409,7 +414,7 @@ class InfostateTree final {
         }
       } else {  // The decision node was not found yet.
         decision_node = parent->AddChild(MakeNode(
-            parent, kDecisionNode, observation_.Tensor(),
+            parent, kDecisionInfostateNode, observation_.Tensor(),
             /*terminal_value=*/NAN, /*chance_reach_prob=*/NAN, &state));
 
         if (state.MoveNumber() >= move_limit)  // Do not build deeper.
@@ -429,7 +434,7 @@ class InfostateTree final {
             // application of actions for the sim move state (We need to supply
             // all the actions).
             Node* observation_node = decision_node->AddChild(MakeNode(
-                decision_node, kObservationNode, /*tensor=*/{},
+                decision_node, kObservationInfostateNode, /*tensor=*/{},
                 /*terminal_value=*/NAN, /*chance_reach_prob=*/NAN,
                 /*originating_state=*/nullptr));
 
@@ -446,7 +451,7 @@ class InfostateTree final {
             std::unique_ptr<State> child = state.Child(a);
             observation_.SetFrom(*child, player_);
             Node* observation_node = decision_node->AddChild(MakeNode(
-                decision_node, kObservationNode, observation_.Tensor(),
+                decision_node, kObservationInfostateNode, observation_.Tensor(),
                 /*terminal_value=*/NAN, /*chance_reach_prob=*/NAN,
                 child.get()));
             RecursivelyBuildTree(observation_node, depth + 2, *child,
@@ -463,10 +468,10 @@ class InfostateTree final {
     Node* observation_node = parent->GetChild(observation_.Tensor());
     if (!observation_node) {
       observation_node = parent->AddChild(MakeNode(
-          parent, kObservationNode, observation_.Tensor(),
+          parent, kObservationInfostateNode, observation_.Tensor(),
           /*terminal_value=*/NAN, /*chance_reach_prob=*/NAN, &state));
     }
-    SPIEL_DCHECK_EQ(observation_node->Type(), kObservationNode);
+    SPIEL_DCHECK_EQ(observation_node->Type(), kObservationInfostateNode);
 
     if (state.MoveNumber() >= move_limit)  // Do not build deeper.
       return UpdateBalanceInfo(depth);
@@ -505,16 +510,16 @@ class CFRNode : public InfostateNode</*Self=*/CFRNode> {
           tree, parent, incoming_index, type, tensor, terminal_value,
           terminal_chn_reach_prob, originating_state)  {
     SPIEL_DCHECK_TRUE(
-        !(originating_state && type == kDecisionNode)
+        !(originating_state && type == kDecisionInfostateNode)
             || originating_state->IsPlayerActing(tree.GetPlayer()));
     if (originating_state) {
-      if (type_ == kDecisionNode) {
+      if (type_ == kDecisionInfostateNode) {
         values_ = CFRInfoStateValues(
             originating_state->LegalActions(tree.GetPlayer()));
         infostate_string_ = Tree().GetObserver().StringFrom(
             *originating_state, Tree().GetPlayer());
       }
-      if (type_ == kTerminalNode) {
+      if (type_ == kTerminalInfostateNode) {
         terminal_history_ = originating_state->History();
       }
     }
@@ -522,16 +527,16 @@ class CFRNode : public InfostateNode</*Self=*/CFRNode> {
 
   // Provide a convenient operator to access the values.
   CFRInfoStateValues* operator->() {
-    SPIEL_DCHECK_EQ(type_, kDecisionNode);
+    SPIEL_DCHECK_EQ(type_, kDecisionInfostateNode);
     return &values_;
   }
   // Provide a const getter as well.
   const CFRInfoStateValues& values() const {
-    SPIEL_DCHECK_EQ(type_, kDecisionNode);
+    SPIEL_DCHECK_EQ(type_, kDecisionInfostateNode);
     return values_;
   }
   absl::Span<const Action> TerminalHistory() const {
-    SPIEL_DCHECK_EQ(type_, kTerminalNode);
+    SPIEL_DCHECK_EQ(type_, kTerminalInfostateNode);
     return absl::MakeSpan(terminal_history_);
   }
 
