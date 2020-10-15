@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPEN_SPIEL_ALGORITHMS_INFOSTATE_TREE_CFR_H_
-#define OPEN_SPIEL_ALGORITHMS_INFOSTATE_TREE_CFR_H_
+#ifndef OPEN_SPIEL_ALGORITHMS_INFOSTATE_CFR_H_
+#define OPEN_SPIEL_ALGORITHMS_INFOSTATE_CFR_H_
 
 #include <map>
 #include <memory>
@@ -145,4 +145,4 @@ class InfostateCFR {
 }  // namespace algorithms
 }  // namespace open_spiel
 
-#endif  // OPEN_SPIEL_ALGORITHMS_INFOSTATE_TREE_CFR_H_
+#endif  // OPEN_SPIEL_ALGORITHMS_INFOSTATE_CFR_H_

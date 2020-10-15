@@ -13,7 +13,7 @@
 // limitations under the License.
 
 
-#include "open_spiel/algorithms/infostate_tree_cfr.h"
+#include "open_spiel/algorithms/infostate_cfr.h"
 
 
 namespace open_spiel {

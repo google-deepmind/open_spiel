@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "open_spiel/algorithms/infostate_tree_cfr.h"
+#include "open_spiel/algorithms/infostate_cfr.h"
 
 #include <cmath>
 #include <iostream>
