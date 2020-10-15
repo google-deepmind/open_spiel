@@ -180,7 +180,7 @@ class InfostateNode {
 
   void Rebalance(int max_depth, int current_depth) {
     SPIEL_DCHECK_LE(current_depth, max_depth);
-    if (NumChildren() == 0 && max_depth != current_depth) {
+    if (IsLeafNode() && max_depth != current_depth) {
       // Prepare the chain of dummy observations.
       std::unique_ptr<Self> node = Release();
       Self* node_parent = node->Parent();
@@ -230,8 +230,7 @@ class InfostateNode {
   // of the new parent. The node at the existing position will be freed.
   // We pass the unique ptr of itself, because calling Release might be
   // undefined: the node we want to swap a parent for can be root of a subtree.
-  void SwapParent(std::unique_ptr<Self> self,
-                  Self* target, int at_index) {
+  void SwapParent(std::unique_ptr<Self> self, Self* target, int at_index) {
     // This node is still who it thinks it is :)
     SPIEL_DCHECK_TRUE(self.get() == this);
     target->children_.at(at_index) = std::move(self);
@@ -268,9 +267,8 @@ class InfostateNode {
 template<class Node>
 class InfostateTree final {
  public:
-
-  // Creates an infostate tree for a player based on the initial state of
-  // the game, up to some depth limit.
+  // Creates an infostate tree for a player based on the initial state
+  // of the game, up to some move limit.
   InfostateTree(const Game& game, Player acting_player,
                 int max_move_limit = 1000)
       : player_(acting_player),
@@ -285,12 +283,9 @@ class InfostateTree final {
                          max_move_limit, /*chance_reach_prob=*/1.);
   }
 
-  // Create an infostate tree for a player based on some start states,
+  // Creates an infostate tree for a player based on some start states,
   // using an infostate observer to provide tensor observations,
-  // up to some depth limit from the deepest start state.
-  //
-  // The root node is a dummy observation node, so that we can have one
-  // infostate tree instead of a forest of infostate trees.
+  // up to some move limit from the deepest start state.
   InfostateTree(
       absl::Span<State const*> start_states,
       absl::Span<const double> chance_reach_probs,

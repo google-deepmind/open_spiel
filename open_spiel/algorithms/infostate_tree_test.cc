@@ -95,7 +95,7 @@ std::unique_ptr<CFRTree> MakeTree(
 }
 
 bool IsNodeBalanced(const CFRNode& node, int height, int current_depth = 0) {
-  if (node.NumChildren() == 0) return height == current_depth;
+  if (node.IsLeafNode()) return height == current_depth;
 
   for (const CFRNode& child : node.child_iterator())
     if (!IsNodeBalanced(child, height, current_depth + 1))

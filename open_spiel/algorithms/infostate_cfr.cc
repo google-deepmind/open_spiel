@@ -19,7 +19,6 @@
 namespace open_spiel {
 namespace algorithms {
 
-
 ActionsAndProbs InfostateCFR::InfostateCFRAveragePolicy::GetStatePolicy(
     const std::string& info_state) const {
   const CFRInfoStateValues& vs = *infostate_table_.at(info_state);
@@ -156,15 +155,13 @@ void InfostateTreeValuePropagator::BottomUp() {
     SPIEL_DCHECK_EQ(left_offset, nodes_at_depth[d + 1].size());
   }
 }
-void
-InfostateTreeValuePropagator::CollectTreeStructure(CFRNode* node, int depth,
-                                                   std::vector<std::vector<
-                                                       double>>* depth_branching,
-                                                   std::vector<std::vector<
-                                                       CFRNode*>>* nodes_at_depth) {
+void InfostateTreeValuePropagator::CollectTreeStructure(
+    CFRNode* node, int depth,
+    std::vector<std::vector<double>>* depth_branching,
+    std::vector<std::vector<CFRNode*>>* nodes_at_depth) {
   // This CFR variant works only with leaf nodes being terminal nodes.
-  SPIEL_CHECK_TRUE(node->NumChildren() > 0
-                       || node->Type() == kTerminalInfostateNode);
+  SPIEL_CHECK_TRUE(
+      !node->IsLeafNode() || node->Type() == kTerminalInfostateNode);
   (*depth_branching)[depth].push_back(node->NumChildren());
   (*nodes_at_depth)[depth].push_back(node);
 
@@ -225,7 +222,7 @@ void InfostateCFR::RunAlternatingIterations(int iterations) {
 
   for (int t = 0; t < iterations; ++t) {
     for (int i = 0; i < 2; ++i) {
-      propagators_[1-i].TopDown();
+      propagators_[1 - i].TopDown();
       EvaluateLeaves(i);
       propagators_[i].BottomUp();
     }
@@ -246,7 +243,7 @@ void InfostateCFR::EvaluateLeaves(Player pl) {
   if (pl == 0) {
     for (int i = 0; i < prop[0].cf_values.size(); ++i) {
       const int j = terminal_permutation_[i];
-      prop[0].cf_values[i] =   terminal_values_[i] * prop[1].reach_probs[j];
+      prop[0].cf_values[i] = terminal_values_[i] * prop[1].reach_probs[j];
     }
   } else {
     for (int i = 0; i < prop[0].cf_values.size(); ++i) {
