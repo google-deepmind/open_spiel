@@ -106,6 +106,7 @@ class InfostateNode {
   [[nodiscard]] Self* Parent() { return parent_; }
   int IncomingIndex() const { return incoming_index_; }
   const InfostateNodeType& Type() const { return type_; }
+  bool IsLeafNode() const { return children_.empty(); }
   absl::Span<const float> Tensor() const {
     // Avoid working with empty tensors. Use HasTensor() first to check.
     SPIEL_CHECK_FALSE(tensor_.empty());
