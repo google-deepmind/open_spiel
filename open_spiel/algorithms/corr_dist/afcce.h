@@ -120,7 +120,9 @@ class AFCCETabularPolicy : public TabularPolicy {
     SpielFatalError("GetStatePolicy(const std::string&) should not be called.");
     return TabularPolicy::GetStatePolicy(info_state);
   }
-
+  ActionsAndProbs GetStatePolicy(const State& state, Player pl) const override {
+    return GetStatePolicy(state);
+  }
   ActionsAndProbs GetStatePolicy(const State& state) const override;
 
  private:
