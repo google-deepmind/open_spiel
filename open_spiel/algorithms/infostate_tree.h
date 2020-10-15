@@ -124,6 +124,9 @@ class InfostateNode {
     SPIEL_CHECK_EQ(type_, kDecisionInfostateNode);
     return absl::MakeSpan(legal_actions_);
   }
+  const std::vector<std::unique_ptr<State>>& CorrespondingStates() const {
+    return corresponding_states_;
+  }
   [[nodiscard]] Self* AddChild(std::unique_ptr<Self> child) {
     SPIEL_CHECK_EQ(child->parent_, this);
     children_.push_back(std::move(child));
@@ -224,6 +227,8 @@ class InfostateNode {
   }
 
  protected:
+  friend class InfostateTree<Self>;
+
   const InfostateTree<Self>& tree_;
   Self* parent_;
   // Position of this node in the parent's children, i.e. it should hold that
@@ -235,8 +240,12 @@ class InfostateNode {
   const std::vector<float> tensor_;
   const double terminal_value_;
   const double terminal_chn_reach_prob_;
+  // Only for decision nodes.
   std::vector<Action> legal_actions_;
+  // Children infostate nodes. Notice the node owns its children.
   std::vector<std::unique_ptr<Self>> children_;
+  // Optionally store States that correspond to this infostate node.
+  std::vector<std::unique_ptr<State>> corresponding_states_;
 };
 
 template<class Node>
@@ -354,11 +363,12 @@ class InfostateTree final {
   }
 
   // Track and update information about tree balance.
-  void UpdateBalanceInfo(int leaf_depth) {
+  void UpdateLeafNode(Node* node, const State& state, int leaf_depth) {
     if (tree_height_ != -1 && is_tree_balanced_) {
       is_tree_balanced_ = tree_height_ == leaf_depth;
     }
     tree_height_ = std::max(tree_height_, leaf_depth);
+    node->corresponding_states_.push_back(state.Clone());
   }
 
   void RecursivelyBuildTree(Node* parent, int depth, const State& state,
@@ -378,10 +388,10 @@ class InfostateTree final {
   void BuildTerminalNode(Node* parent, int depth, const State& state,
                          double chance_reach_prob) {
     const double terminal_value = state.Returns()[player_];
-    parent->AddChild(MakeNode(parent, kTerminalInfostateNode,
-                              observation_.Tensor(), terminal_value,
-                              chance_reach_prob, &state));
-    UpdateBalanceInfo(depth);
+    Node* terminal_node = parent->AddChild(MakeNode(
+        parent, kTerminalInfostateNode, observation_.Tensor(), terminal_value,
+        chance_reach_prob, &state));
+    UpdateLeafNode(terminal_node, state, depth);
   }
 
   void BuildDecisionNode(Node* parent, int depth, const State& state,
@@ -397,7 +407,7 @@ class InfostateTree final {
       SPIEL_DCHECK_EQ(decision_node->Type(), kDecisionInfostateNode);
 
       if (is_leaf_node)  // Do not build deeper.
-        return UpdateBalanceInfo(depth);
+        return UpdateLeafNode(decision_node, state, depth);
 
       if (state.IsSimultaneousNode()) {
         const ActionView action_view(state);
@@ -429,7 +439,7 @@ class InfostateTree final {
           /*terminal_value=*/NAN, /*chance_reach_prob=*/NAN, &state));
 
       if (is_leaf_node)  // Do not build deeper.
-        return UpdateBalanceInfo(depth);
+        return UpdateLeafNode(decision_node, state, depth);
 
       // Build observation nodes right away after the decision node.
       // This is because the player might be acting multiple times in a row:
@@ -486,7 +496,7 @@ class InfostateTree final {
     SPIEL_DCHECK_EQ(observation_node->Type(), kObservationInfostateNode);
 
     if (is_leaf_node)  // Do not build deeper.
-      return UpdateBalanceInfo(depth);
+      return UpdateLeafNode(observation_node, state, depth);
 
     if (state.IsChanceNode()) {
       for (std::pair<Action, double> action_prob : state.ChanceOutcomes()) {
