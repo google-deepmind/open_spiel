@@ -268,7 +268,7 @@ class InfostateTree final {
   // Creates an infostate tree for a player based on the initial state of
   // the game, up to some depth limit.
   InfostateTree(const Game& game, Player acting_player,
-                int max_depth_limit = 1000)
+                int max_move_limit = 1000)
       : player_(acting_player),
         infostate_observer_(game.MakeObserver(kInfoStateObsType, {})),
         root_(/*tree=*/*this, /*parent=*/nullptr, /*incoming_index=*/0,
@@ -278,7 +278,7 @@ class InfostateTree final {
         observation_(std::move(CreateObservation(game))) {
     std::unique_ptr<State> root_state = game.NewInitialState();
     RecursivelyBuildTree(&root_, /*depth=*/1, *root_state,
-                         max_depth_limit, /*chance_reach_prob=*/1.);
+                         max_move_limit, /*chance_reach_prob=*/1.);
   }
 
   // Create an infostate tree for a player based on some start states,
@@ -291,7 +291,7 @@ class InfostateTree final {
       absl::Span<State const*> start_states,
       absl::Span<const double> chance_reach_probs,
       std::shared_ptr<Observer> infostate_observer, Player acting_player,
-      int max_depth_limit = 1000)
+      int max_move_ahead_limit = 1000)
       : player_(acting_player),
         infostate_observer_(std::move(infostate_observer)),
         // Root is just a dummy node, and has a tensor full of zeros.
@@ -304,15 +304,16 @@ class InfostateTree final {
       observation_(std::move(CreateObservation(*start_states.at(0)))) {
     SPIEL_CHECK_EQ(start_states.size(), chance_reach_probs.size());
 
-    int start_max_depth = 0;
+    int start_max_move_number = 0;
     for (const State* start_state : start_states) {
-      start_max_depth = std::max(start_max_depth, start_state->MoveNumber());
+      start_max_move_number = std::max(start_max_move_number,
+                                       start_state->MoveNumber());
     }
 
     for (int i = 0; i < start_states.size(); ++i) {
       RecursivelyBuildTree(
           &root_, /*depth=*/1, *start_states[i],
-          start_max_depth + max_depth_limit,
+          start_max_move_number + max_move_ahead_limit,
           chance_reach_probs[i]);
     }
   }
