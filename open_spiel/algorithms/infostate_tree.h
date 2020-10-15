@@ -551,17 +551,6 @@ class CFRNode : public InfostateNode</*Self=*/CFRNode> {
     SPIEL_DCHECK_EQ(type_, kTerminalInfostateNode);
     return absl::MakeSpan(terminal_history_);
   }
-
-  CFRNode const* FindNodeByStr(const std::string& string_lookup) const {
-    if (infostate_string_ == string_lookup)
-      return this;
-    for (CFRNode& child : *this) {
-      if (CFRNode const* node = child.FindNodeByStr(string_lookup)) {
-        return node;
-      }
-    }
-    return nullptr;
-  }
 };
 
 
