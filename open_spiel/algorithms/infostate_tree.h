@@ -276,7 +276,7 @@ class InfostateTree final {
   // The root node is a dummy observation node, so that we can have one
   // infostate tree instead of a forest of infostate trees.
   InfostateTree(
-      absl::Span<const State*> start_states,
+      absl::Span<State const*> start_states,
       absl::Span<const double> chance_reach_probs,
       std::shared_ptr<Observer> infostate_observer, Player acting_player,
       int max_depth_limit = 1000)
