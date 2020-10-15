@@ -185,9 +185,9 @@ class BotRegisterer {
   static std::unique_ptr<Bot> CreateByName(
       const std::string& bot_name, std::shared_ptr<const Game> game,
       Player player_id, const GameParameters& params);
-  static std::vector<std::string> CanPlayGame(
+  static std::vector<std::string> BotsThatCanPlayGame(
       const Game& game, Player player_id);
-  static std::vector<std::string> CanPlayGame(const Game& game);
+  static std::vector<std::string> BotsThatCanPlayGame(const Game& game);
 
   static std::vector<std::string> RegisteredBots();
   static bool IsBotRegistered(const std::string& bot_name);

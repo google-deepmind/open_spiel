@@ -254,7 +254,7 @@ std::unique_ptr<Bot> BotRegisterer::CreateByName(
     return factory->Create(std::move(game), player_id, params);
   }
 }
-std::vector<std::string> BotRegisterer::CanPlayGame(
+std::vector<std::string> BotRegisterer::BotsThatCanPlayGame(
     const Game& game, Player player_id) {
   std::vector<std::string> bot_names;
   for (const auto& key_val : factories()) {
@@ -264,7 +264,7 @@ std::vector<std::string> BotRegisterer::CanPlayGame(
   }
   return bot_names;
 }
-std::vector<std::string> BotRegisterer::CanPlayGame(const Game& game) {
+std::vector<std::string> BotRegisterer::BotsThatCanPlayGame(const Game& game) {
   std::vector<std::string> bot_names;
   for (const auto& key_val : factories()) {
     bool can_play_for_all = true;
@@ -313,10 +313,10 @@ std::unique_ptr<Bot> LoadBot(const std::string& bot_name,
 }
 std::vector<std::string> BotsThatCanPlayGame(const Game& game,
                                              Player player_id) {
-  return BotRegisterer::CanPlayGame(game, player_id);
+  return BotRegisterer::BotsThatCanPlayGame(game, player_id);
 }
 std::vector<std::string> BotsThatCanPlayGame(const Game& game) {
-  return BotRegisterer::CanPlayGame(game);
+  return BotRegisterer::BotsThatCanPlayGame(game);
 }
 
 }  // namespace open_spiel
