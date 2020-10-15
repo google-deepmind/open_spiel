@@ -103,10 +103,11 @@ class InfostateNode {
   virtual ~InfostateNode() = default;
 
   [[nodiscard]] const InfostateTree<Self>& Tree() const { return tree_; }
-  [[nodiscard]] Self* Parent() { return parent_; }
+  [[nodiscard]] Self* Parent() const { return parent_; }
   int IncomingIndex() const { return incoming_index_; }
   const InfostateNodeType& Type() const { return type_; }
   bool IsLeafNode() const { return children_.empty(); }
+  bool IsRootNode() const { return !parent_; }
   absl::Span<const float> Tensor() const {
     // Avoid working with empty tensors. Use HasTensor() first to check.
     SPIEL_CHECK_TRUE(HasTensor());
@@ -133,13 +134,13 @@ class InfostateNode {
     children_.push_back(std::move(child));
     return children_.back().get();
   }
-  [[nodiscard]] Self* GetChild(absl::Span<float> tensor) {
+  [[nodiscard]] Self* GetChild(absl::Span<float> tensor) const {
     for (const std::unique_ptr<Self>& child : children_) {
       if (child->Tensor() == tensor) return child.get();
     }
     return nullptr;
   }
-  [[nodiscard]] Self* ChildAt(int i) { return children_.at(i).get(); }
+  [[nodiscard]] Self* ChildAt(int i) const { return children_.at(i).get(); }
   int NumChildren() const { return children_.size(); }
   [[nodiscard]] Self const* FindNode(absl::Span<float> tensor_lookup) const {
     if (tensor_ == tensor_lookup)
@@ -150,6 +151,12 @@ class InfostateNode {
       }
     }
     return nullptr;
+  }
+  // Intended only for debug purposes.
+  std::string ToString() const {
+    if (!parent_) return "";
+    if (!parent_->parent_) return std::to_string(incoming_index_);
+    return absl::StrCat(parent_->ToString(), ",", incoming_index_);
   }
 
   // Iterate over children.
@@ -225,18 +232,23 @@ class InfostateNode {
     SPIEL_DCHECK_TRUE(self.get() == this);
     target->children_.at(at_index) = std::move(self);
     this->parent_ = target;
+    this->incoming_index_ = at_index;
   }
 
  protected:
+  // Needed for adding corresponding_states_ during tree traversal.
   friend class InfostateTree<Self>;
 
   const InfostateTree<Self>& tree_;
+  // Pointer to the parent node.
+  // This is not const so that we can change it when we SwapParent().
   Self* parent_;
   // Position of this node in the parent's children, i.e. it should hold that
   //   parent_->children_.at(incoming_index_).get() == this.
   // For decision nodes this corresponds also to the
   //   State::LegalActions(player_).at(incoming_index_)
-  const int incoming_index_;
+  // This is not const so that we can change it when we SwapParent().
+  int incoming_index_;
   const InfostateNodeType type_;
   const std::vector<float> tensor_;
   const double terminal_value_;
@@ -325,6 +337,52 @@ class InfostateTree final {
   void Rebalance() {
     root_.Rebalance(TreeHeight(), 0);
     is_tree_balanced_ = true;
+  }
+
+  // Iterate over all leaves.
+  class LeavesIterator {
+    Node const* current_;
+   public:
+    LeavesIterator(Node const* current) : current_(current) {
+      SPIEL_CHECK_TRUE(current_);
+      SPIEL_CHECK_TRUE(current_->IsLeafNode() || current_->IsRootNode());
+    }
+    LeavesIterator& operator++() {
+      if (!current_->parent_) SpielFatalError("All leaves have been iterated!");
+      SPIEL_CHECK_TRUE(current_->IsLeafNode());
+      int child_idx;
+      do {  // Find some parent that was not fully traversed.
+        SPIEL_DCHECK_EQ(current_->Parent()->ChildAt(current_->IncomingIndex()),
+                        current_);
+        child_idx = current_->IncomingIndex();
+        current_ = current_->Parent();
+      } while (current_->Parent()
+            && child_idx + 1 == current_->NumChildren());
+      // We traversed the whole tree and we got the root node.
+      if (!current_->Parent()) return *this;
+      // Choose the next sibling node.
+      current_ = current_->ChildAt(child_idx + 1);
+      // Find the first leaf.
+      while (!current_->IsLeafNode()) {
+        current_ = current_->ChildAt(0);
+      }
+      return *this;
+    }
+    bool operator==(LeavesIterator other) const {
+      return current_ == other.current_;
+    }
+    bool operator!=(LeavesIterator other) const { return !(*this == other); }
+    [[nodiscard]] Node const* operator*() { return current_; }
+    LeavesIterator begin() const { return *this; }
+    LeavesIterator end() const {
+      return LeavesIterator(&(current_->Tree().Root()));
+    }
+  };
+  LeavesIterator leaves_iterator() const {
+    // Find the first leaf.
+    Node const* node = &root_;
+    while (!node->IsLeafNode()) node = node->ChildAt(0);
+    return LeavesIterator(node);
   }
 
  private:
