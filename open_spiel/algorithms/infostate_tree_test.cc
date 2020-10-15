@@ -399,6 +399,56 @@ void TestTreeRebalancing() {
   }
 }
 
+void CheckTreeLeaves(const CFRTree& tree, int move_limit) {
+  for (CFRNode const* leaf_node : tree.leaves_iterator()) {
+    SPIEL_CHECK_TRUE(leaf_node->IsLeafNode());
+    SPIEL_CHECK_TRUE(leaf_node->HasTensor());
+    SPIEL_CHECK_FALSE(leaf_node->CorrespondingStates().empty());
+
+    // Check MoveNumber() for all corresponding states.
+    //
+    // The conditions are following:
+    // - either all states are terminal, and have the same MoveNumber() that
+    //   is less or equal to move_limit,
+    // - or all states are non-terminal and the MoveNumber() == move_limit.
+
+    const int num_states = leaf_node->CorrespondingStates().size();
+    int terminal_cnt = 0;
+    int max_move_number = std::numeric_limits<int>::min();
+    int min_move_number = std::numeric_limits<int>::max();
+    for (const std::unique_ptr<State>
+          & state : leaf_node->CorrespondingStates()) {
+      if (state->IsTerminal()) terminal_cnt++;
+      max_move_number = std::max(max_move_number, state->MoveNumber());
+      min_move_number = std::min(min_move_number, state->MoveNumber());
+    }
+    SPIEL_CHECK_TRUE(terminal_cnt == 0 || terminal_cnt == num_states);
+    SPIEL_CHECK_TRUE(max_move_number == min_move_number);
+    if (terminal_cnt == 0) {
+      SPIEL_CHECK_EQ(max_move_number, move_limit);
+    } else {
+      SPIEL_CHECK_LE(max_move_number, move_limit);
+    }
+
+  }
+}
+
+void BuildAllDepths(const std::string& game_name) {
+  std::shared_ptr<const Game> game = LoadGame(game_name);
+  const int max_moves = game->MaxMoveNumber();
+
+  for (int move_limit = 0; move_limit < max_moves; ++move_limit) {
+    for (int pl = 0; pl < game->NumPlayers(); ++pl) {
+      std::unique_ptr<CFRTree> tree = MakeTree(game_name, pl, move_limit);
+      SPIEL_CHECK_EQ(tree->IsBalanced(), RecomputeBalance(*tree));
+      CheckTreeLeaves(*tree, move_limit);
+      tree->Rebalance();
+      SPIEL_CHECK_TRUE(RecomputeBalance(*tree));
+      CheckTreeLeaves(*tree, move_limit);
+    }
+  }
+}
+
 void TestDepthLimitedTrees() {
   {
     std::string expected_certificate =
@@ -419,14 +469,22 @@ void TestDepthLimitedTrees() {
     SPIEL_CHECK_TRUE(tree->IsBalanced());
     SPIEL_CHECK_TRUE(RecomputeBalance(*tree));
 
-    for (int i = 0; i < 3; ++i) {
-      CFRNode* acting = tree->MutableRoot()->ChildAt(0)->ChildAt(i)->ChildAt(0);
+    for (CFRNode const* acting : tree->leaves_iterator()) {
       SPIEL_CHECK_TRUE(acting->IsLeafNode());
       SPIEL_CHECK_EQ(acting->Type(), kDecisionInfostateNode);
       SPIEL_CHECK_EQ(acting->CorrespondingStates().size(), 2);
       SPIEL_CHECK_TRUE(acting->HasTensor());
     }
   }
+
+  // Check that arbitrary depth-limited trees always have tensors,
+  // and the corresponding states have correct MoveNumber().
+  // This must hold even after rebalancing the trees.
+  BuildAllDepths("kuhn_poker");
+  BuildAllDepths("kuhn_poker(players=3)");
+  BuildAllDepths("leduc_poker");
+  BuildAllDepths("goofspiel(players=2,num_cards=3,imp_info=True)");
+  BuildAllDepths("goofspiel(players=3,num_cards=3,imp_info=True)");
 }
 
 }  // namespace
