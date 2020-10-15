@@ -109,7 +109,7 @@ class InfostateNode {
   bool IsLeafNode() const { return children_.empty(); }
   absl::Span<const float> Tensor() const {
     // Avoid working with empty tensors. Use HasTensor() first to check.
-    SPIEL_CHECK_FALSE(tensor_.empty());
+    SPIEL_CHECK_TRUE(HasTensor());
     return tensor_;
   }
   bool HasTensor() const { return !tensor_.empty(); }

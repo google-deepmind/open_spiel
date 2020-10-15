@@ -40,7 +40,7 @@ std::string iigs3 = "goofspiel("
 // certificate (string representation) that we can easily compare.
 std::string ComputeCertificate(const CFRNode& node) {
   if (node.Type() == kTerminalInfostateNode) {
-    SPIEL_CHECK_EQ(node.NumChildren(), 0);
+    SPIEL_CHECK_TRUE(node.IsLeafNode());
     return "{}";
   }
 
@@ -65,9 +65,11 @@ std::string ComputeCertificate(const CFRNode& node) {
       close);
 }
 
-std::unique_ptr<CFRTree> MakeTree(
-    const std::string& game_name, Player player_id) {
-  return std::make_unique<CFRTree>(*LoadGame(game_name), player_id);
+std::unique_ptr<CFRTree> MakeTree(const std::string& game_name,
+                                  Player player_id,
+                                  int max_depth_limit = 1000) {
+  return std::make_unique<CFRTree>(*LoadGame(game_name), player_id,
+                                   max_depth_limit);
 }
 
 std::unique_ptr<CFRTree> MakeTree(
@@ -397,6 +399,36 @@ void TestTreeRebalancing() {
   }
 }
 
+void TestDepthLimitedTrees() {
+  {
+    std::string expected_certificate =
+      "("  // <dummy>
+        "("  // 1st is getting a card
+          "("  // 2nd is getting card
+            "["  // 1st acts - Node J
+                 // Depth cutoff.
+            "]"
+          ")"
+          // Repeat the same for the two other cards.
+          "([])" // Node Q
+          "([])" // Node K
+        ")"
+      ")";  // </dummy>
+    std::unique_ptr<CFRTree> tree = MakeTree("kuhn_poker", 0, 2);
+    SPIEL_CHECK_EQ(ComputeCertificate(tree->Root()), expected_certificate);
+    SPIEL_CHECK_TRUE(tree->IsBalanced());
+    SPIEL_CHECK_TRUE(RecomputeBalance(*tree));
+
+    for (int i = 0; i < 3; ++i) {
+      CFRNode* acting = tree->MutableRoot()->ChildAt(0)->ChildAt(i)->ChildAt(0);
+      SPIEL_CHECK_TRUE(acting->IsLeafNode());
+      SPIEL_CHECK_EQ(acting->Type(), kDecisionInfostateNode);
+      SPIEL_CHECK_EQ(acting->CorrespondingStates().size(), 2);
+      SPIEL_CHECK_TRUE(acting->HasTensor());
+    }
+  }
+}
+
 }  // namespace
 }  // namespace algorithms
 }  // namespace open_spiel
@@ -405,4 +437,5 @@ int main(int argc, char** argv) {
   open_spiel::algorithms::TestRootCertificates();
   open_spiel::algorithms::TestCertificatesFromStartHistories();
   open_spiel::algorithms::TestTreeRebalancing();
+  open_spiel::algorithms::TestDepthLimitedTrees();
 }
