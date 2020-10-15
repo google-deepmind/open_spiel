@@ -168,7 +168,7 @@ InfostateTreeValuePropagator::CollectTreeStructure(CFRNode* node, int depth,
   (*depth_branching)[depth].push_back(node->NumChildren());
   (*nodes_at_depth)[depth].push_back(node);
 
-  for (CFRNode& child : *node)
+  for (CFRNode& child : node->child_iterator())
     CollectTreeStructure(&child, depth + 1, depth_branching, nodes_at_depth);
 }
 InfostateTreeValuePropagator::InfostateTreeValuePropagator(CFRTree t)
@@ -313,13 +313,13 @@ double InfostateCFR::TerminalReachProbSum() {
   }
   return reach_sum;
 }
-void InfostateCFR::CollectTable(const CFRNode& node,
-                                std::unordered_map<std::string,
-                                                   const CFRInfoStateValues*>* out) const {
+void InfostateCFR::CollectTable(
+    const CFRNode& node,
+    std::unordered_map<std::string, const CFRInfoStateValues*>* out) const {
   if (node.Type() == kDecisionInfostateNode) {
     (*out)[node.infostate_string_] = &node.values();
   }
-  for (const auto& child : node) CollectTable(child, out);
+  for (const CFRNode& child : node.child_iterator()) CollectTable(child, out);
 }
 }  // namespace algorithms
 }  // namespace open_spiel

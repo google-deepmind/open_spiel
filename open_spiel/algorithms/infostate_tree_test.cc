@@ -45,7 +45,7 @@ std::string ComputeCertificate(const CFRNode& node) {
   }
 
   std::vector<std::string> certificates;
-  for (CFRNode& child : node) {
+  for (CFRNode& child : node.child_iterator()) {
     certificates.push_back(ComputeCertificate(child));
   }
   std::sort(certificates.begin(), certificates.end());
@@ -97,7 +97,7 @@ std::unique_ptr<CFRTree> MakeTree(
 bool IsNodeBalanced(const CFRNode& node, int height, int current_depth = 0) {
   if (node.NumChildren() == 0) return height == current_depth;
 
-  for (const CFRNode& child : node)
+  for (const CFRNode& child : node.child_iterator())
     if (!IsNodeBalanced(child, height, current_depth + 1))
       return false;
 

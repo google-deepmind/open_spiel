@@ -159,20 +159,24 @@ class InfostateNode {
     return absl::StrCat(parent_->ToString(), ",", incoming_index_);
   }
 
-  // Iterate over children.
-  class iterator {
-    long pos_;
+  // Iterate over children and expose references to the children
+  // (instead of unique_ptrs).
+  class ChildIterator {
+    int pos_;
     const std::vector<std::unique_ptr<Self>>& children_;
    public:
-    iterator(const std::vector<std::unique_ptr<Self>>& children,
-             long pos = 0) : pos_(pos), children_(children) {}
-    iterator& operator++() { pos_++; return *this; }
-    bool operator==(iterator other) const { return pos_ == other.pos_; }
-    bool operator!=(iterator other) const { return !(*this == other); }
+    ChildIterator(const std::vector<std::unique_ptr<Self>>& children,
+                  int pos = 0) : pos_(pos), children_(children) {}
+    ChildIterator& operator++() { pos_++; return *this; }
+    bool operator==(ChildIterator other) const { return pos_ == other.pos_; }
+    bool operator!=(ChildIterator other) const { return !(*this == other); }
     [[nodiscard]] Self& operator*() { return *children_[pos_]; }
+    ChildIterator begin() const { return *this; }
+    ChildIterator end() const {
+      return ChildIterator(children_, children_.size());
+    }
   };
-  iterator begin() const { return iterator(children_); }
-  iterator end() const { return iterator(children_, children_.size()); }
+  ChildIterator child_iterator() const { return ChildIterator(children_); }
 
   void Rebalance(int max_depth, int current_depth) {
     SPIEL_DCHECK_LE(current_depth, max_depth);
