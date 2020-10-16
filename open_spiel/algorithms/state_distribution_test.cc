@@ -193,6 +193,28 @@ void LeducRegressionTest() {
   algorithms::CheckBeliefs(*state, *dist, player_id);
 }
 
+void LeducRegressionTestPerPlayer(int player_id) {
+  std::shared_ptr<const Game> game = LoadGame("leduc_poker");
+  std::unique_ptr<State> state = game->NewInitialState();
+  UniformPolicy opponent_policy;
+  std::unique_ptr<HistoryDistribution> dist;
+
+  // The first two actions are chance actions, then both players call. This was
+  // found to cause CheckBeliefs to fail previously, so we add a test verifying
+  // that doesn't happen.
+  for (const Action action : {4, 0, 2, 2}) {
+    if (state->CurrentPlayer() == player_id) {
+      dist = UpdateIncrementalStateDistribution(*state, &opponent_policy,
+                                                player_id, std::move(dist));
+      algorithms::CheckBeliefs(*state, *dist, player_id);
+    }
+    state->ApplyAction(action);
+  }
+  dist = UpdateIncrementalStateDistribution(*state, &opponent_policy, player_id,
+                                            std::move(dist));
+  algorithms::CheckBeliefs(*state, *dist, player_id);
+}
+
 void HunlRegressionTest() {
   // universal_poker requires ACPC, which is an optional dependency.
   // Skip this test if the game is not registered.
@@ -238,5 +260,7 @@ int main(int argc, char** argv) {
   algorithms::HunlRegressionTest();
   algorithms::GoofspielDistributionTest();
   algorithms::LeducRegressionTest();
+  algorithms::LeducRegressionTestPerPlayer(/*player_id=*/0);
+  algorithms::LeducRegressionTestPerPlayer(/*player_id=*/1);
 
 }

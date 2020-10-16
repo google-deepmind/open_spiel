@@ -297,14 +297,18 @@ std::unique_ptr<HistoryDistribution> UpdateIncrementalStateDistribution(
                                          player_id, opponent_policy);
     new_state->ApplyAction(history[belief_history_size].action);
     dist = FilterOutBeliefs(*new_state, std::move(dist), player_id);
+    SPIEL_CHECK_FALSE(dist->first.empty());
     if (!new_state->IsChanceNode()) {
       SPIEL_DCHECK_TRUE(CheckBeliefs(*new_state, *dist, player_id));
     }
-    int new_belief_history_size = GetBeliefHistorySize(*dist);
+    const int new_belief_history_size = GetBeliefHistorySize(*dist);
+    SPIEL_CHECK_LT(belief_history_size, new_belief_history_size);
     belief_history_size = new_belief_history_size;
   }
   SPIEL_CHECK_EQ(belief_history_size, history.size());
+  SPIEL_CHECK_EQ(new_state->FullHistory(), state.FullHistory());
   dist = FilterOutBeliefs(state, std::move(dist), player_id);
+  SPIEL_CHECK_FALSE(dist->first.empty());
 
   // We only normalize after filtering out invalid infostates.
   Normalize(absl::MakeSpan(dist->second));
@@ -340,6 +344,8 @@ bool CheckBeliefs(const State& ground_truth_state,
                    beliefs.first[i]->InformationStateString(player_id));
     SPIEL_CHECK_EQ(ground_truth_state.FullHistory().size(),
                    beliefs.first[i]->FullHistory().size());
+    SPIEL_CHECK_EQ(ground_truth_state.IsTerminal(),
+                   beliefs.first[i]->IsTerminal());
   }
   return true;
 }
