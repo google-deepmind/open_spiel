@@ -142,11 +142,11 @@ class InfostateNode {
   }
   [[nodiscard]] Self* ChildAt(int i) const { return children_.at(i).get(); }
   int NumChildren() const { return children_.size(); }
-  [[nodiscard]] Self const* FindNode(absl::Span<float> tensor_lookup) const {
+  [[nodiscard]] const Self* FindNode(absl::Span<float> tensor_lookup) const {
     if (tensor_ == tensor_lookup)
-      return open_spiel::down_cast<Self const*>(this);
+      return open_spiel::down_cast<const Self*>(this);
     for (Self& child : *this) {
-      if (Self const* node = child.FindNode(tensor_lookup)) {
+      if (const Self* node = child.FindNode(tensor_lookup)) {
         return node;
       }
     }
@@ -287,7 +287,7 @@ class InfostateTree final {
   // using an infostate observer to provide tensor observations,
   // up to some move limit from the deepest start state.
   InfostateTree(
-      absl::Span<State const*> start_states,
+      absl::Span<const State*> start_states,
       absl::Span<const double> chance_reach_probs,
       std::shared_ptr<Observer> infostate_observer, Player acting_player,
       int max_move_ahead_limit = 1000)
@@ -326,7 +326,7 @@ class InfostateTree final {
 
   // Identify node that corresponds to this tensor observation.
   // If the node is not found, returns a nullptr.
-  [[nodiscard]] Node const* FindNode(absl::Span<float> tensor_lookup) const {
+  [[nodiscard]] const Node* FindNode(absl::Span<float> tensor_lookup) const {
     return root_.FindNode(tensor_lookup);
   }
 
@@ -341,17 +341,21 @@ class InfostateTree final {
 
   // Iterate over all leaves.
   class LeavesIterator {
-    Node const* current_;
+    const InfostateTree* tree_;
+    const Node* current_;
    public:
-    LeavesIterator(Node const* current) : current_(current) {
+    LeavesIterator(const InfostateTree* tree, const Node* current)
+    : tree_(tree), current_(current) {
       SPIEL_CHECK_TRUE(current_);
       SPIEL_CHECK_TRUE(current_->IsLeafNode() || current_->IsRootNode());
     }
     LeavesIterator& operator++() {
-      if (!current_->parent_) SpielFatalError("All leaves have been iterated!");
+      if (!current_->Parent()) SpielFatalError("All leaves have been iterated!");
       SPIEL_CHECK_TRUE(current_->IsLeafNode());
       int child_idx;
       do {  // Find some parent that was not fully traversed.
+        SPIEL_DCHECK_LT(current_->IncomingIndex(),
+                        current_->Parent()->NumChildren());
         SPIEL_DCHECK_EQ(current_->Parent()->ChildAt(current_->IncomingIndex()),
                         current_);
         child_idx = current_->IncomingIndex();
@@ -372,17 +376,17 @@ class InfostateTree final {
       return current_ == other.current_;
     }
     bool operator!=(LeavesIterator other) const { return !(*this == other); }
-    [[nodiscard]] Node const* operator*() { return current_; }
+    [[nodiscard]] const Node& operator*() { return *current_; }
     LeavesIterator begin() const { return *this; }
     LeavesIterator end() const {
-      return LeavesIterator(&(current_->Tree().Root()));
+      return LeavesIterator(tree_, &(current_->Tree().Root()));
     }
   };
   LeavesIterator leaves_iterator() const {
     // Find the first leaf.
-    Node const* node = &root_;
+    const Node* node = &root_;
     while (!node->IsLeafNode()) node = node->ChildAt(0);
-    return LeavesIterator(node);
+    return LeavesIterator(this, node);
   }
 
  private:
@@ -621,6 +625,17 @@ class CFRNode : public InfostateNode</*Self=*/CFRNode> {
     return absl::MakeSpan(terminal_history_);
   }
 };
+
+inline void CollectInfostateLookupTable(
+    const CFRNode& node,
+    std::unordered_map<std::string, const CFRInfoStateValues*>* out) {
+  if (node.Type() == kDecisionInfostateNode) {
+    (*out)[node.infostate_string_] = &node.values();
+  }
+  for (const CFRNode& child : node.child_iterator()) {
+    CollectInfostateLookupTable(child, out);
+  }
+}
 
 
 }  // namespace algorithms

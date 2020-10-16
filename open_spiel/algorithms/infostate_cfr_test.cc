@@ -126,7 +126,7 @@ void TestImplementationsHaveSameIterations() {
                                   /*linear_averaging=*/false,
                                   /*regret_matching_plus=*/false);
 
-  std::unordered_map<std::string, CFRInfoStateValues const*> vec_ptable =
+  std::unordered_map<std::string, const CFRInfoStateValues*> vec_ptable =
       vec_solver.InfoStateValuesPtrTable();
   std::unordered_map<std::string, CFRInfoStateValues>& str_table =
       str_solver.InfoStateValuesTable();

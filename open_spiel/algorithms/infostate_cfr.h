@@ -60,7 +60,7 @@ namespace algorithms {
 struct InfostateTreeValuePropagator {
   // Tree and the tree structure information. These must not change!
   // TODO: make some const kung-fu so we can't modify these after construction.
-  /*const*/ CFRTree tree;
+  /*const*/ std::unique_ptr<CFRTree> tree;
   /*const*/ std::vector<std::vector<double>> depth_branching;
   /*const*/ std::vector<std::vector<CFRNode*>> nodes_at_depth;
 
@@ -76,7 +76,7 @@ struct InfostateTreeValuePropagator {
  public:
   // Construct the value propagator, so we can use vectorized top-down
   // and bottom-up passes.
-  InfostateTreeValuePropagator(CFRTree t);
+  InfostateTreeValuePropagator(std::unique_ptr<CFRTree> t);
 
   // Make a top-down pass, using the current policy stored in the tree nodes.
   // This computes the reach_probs_ buffer for storing cumulative product
@@ -137,9 +137,6 @@ class InfostateCFR {
 
   void PrepareTerminals();
   double TerminalReachProbSum();
-  void CollectTable(
-      const CFRNode& node,
-      std::unordered_map<std::string, CFRInfoStateValues const*>* out) const;
 };
 
 }  // namespace algorithms

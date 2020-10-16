@@ -168,17 +168,17 @@ void InfostateTreeValuePropagator::CollectTreeStructure(
   for (CFRNode& child : node->child_iterator())
     CollectTreeStructure(&child, depth + 1, depth_branching, nodes_at_depth);
 }
-InfostateTreeValuePropagator::InfostateTreeValuePropagator(CFRTree t)
-    : tree(std::move(t)) {
+InfostateTreeValuePropagator::InfostateTreeValuePropagator(
+    std::unique_ptr<CFRTree> t) : tree(std::move(t)) {
   // We need to make sure that all terminals are at the same depth so that
   // we can propagate the computation of reach probs / cf values in a single
   // vector. This requirement is typically satisfied by most domains already
   // during the tree construction anyway.
-  if (!tree.IsBalanced()) tree.Rebalance();
+  if (!tree->IsBalanced()) tree->Rebalance();
 
-  depth_branching.resize(tree.TreeHeight() + 1);
-  nodes_at_depth.resize(tree.TreeHeight() + 1);
-  CollectTreeStructure(tree.MutableRoot(), 0,
+  depth_branching.resize(tree->TreeHeight() + 1);
+  nodes_at_depth.resize(tree->TreeHeight() + 1);
+  CollectTreeStructure(tree->MutableRoot(), 0,
                        &depth_branching, &nodes_at_depth);
 
   const int max_nodes_across_depths = nodes_at_depth.back().size();
@@ -186,18 +186,19 @@ InfostateTreeValuePropagator::InfostateTreeValuePropagator(CFRTree t)
   reach_probs = std::vector<double>(max_nodes_across_depths);
 }
 InfostateCFR::InfostateCFR(const Game& game, int max_depth_limit)
-    : propagators_({CFRTree(game, 0, max_depth_limit),
-                    CFRTree(game, 1, max_depth_limit)}) {
+    : propagators_({std::make_unique<CFRTree>(game, 0, max_depth_limit),
+                    std::make_unique<CFRTree>(game, 1, max_depth_limit)}) {
   PrepareTerminals();
 }
 InfostateCFR::InfostateCFR(absl::Span<const State*> start_states,
                            absl::Span<const double> chance_reach_probs,
                            const std::shared_ptr<Observer>& infostate_observer,
                            int max_depth_limit)
-    : propagators_({CFRTree(start_states, chance_reach_probs,
-                            infostate_observer, 0, max_depth_limit),
-                    CFRTree(start_states, chance_reach_probs,
-                            infostate_observer, 1, max_depth_limit)}) {
+    : propagators_({
+        std::make_unique<CFRTree>(start_states, chance_reach_probs,
+                                  infostate_observer, 0, max_depth_limit),
+        std::make_unique<CFRTree>(start_states, chance_reach_probs,
+                                  infostate_observer, 1, max_depth_limit)}) {
   PrepareTerminals();
 }
 void InfostateCFR::RunSimultaneousIterations(int iterations) {
@@ -252,11 +253,11 @@ void InfostateCFR::EvaluateLeaves(Player pl) {
     }
   }
 }
-std::unordered_map<std::string, CFRInfoStateValues const*>
+std::unordered_map<std::string, const CFRInfoStateValues*>
 InfostateCFR::InfoStateValuesPtrTable() const {
-  std::unordered_map<std::string, CFRInfoStateValues const*> vec_ptable;
-  CollectTable(propagators_[0].tree.Root(), &vec_ptable);
-  CollectTable(propagators_[1].tree.Root(), &vec_ptable);
+  std::unordered_map<std::string, const CFRInfoStateValues*> vec_ptable;
+  CollectInfostateLookupTable(propagators_[0].tree->Root(), &vec_ptable);
+  CollectInfostateLookupTable(propagators_[1].tree->Root(), &vec_ptable);
   return vec_ptable;
 }
 void InfostateCFR::PrepareTerminals() {
@@ -278,12 +279,12 @@ void InfostateCFR::PrepareTerminals() {
   SPIEL_CHECK_EQ(player1_map.size(), leaf_nodes[1].size());
 
   for (int i = 0; i < num_terminals; ++i) {
-    const CFRNode const* a = leaf_nodes[0][i];
+    const CFRNode* const a = leaf_nodes[0][i];
     const int permutation_index = player1_map.at(a->TerminalHistory());
-    const CFRNode const* b = leaf_nodes[1][permutation_index];
+    const CFRNode* const b = leaf_nodes[1][permutation_index];
     SPIEL_DCHECK_EQ(a->TerminalHistory(), b->TerminalHistory());
 
-    const CFRNode const* leaf = leaf_nodes[0][i];
+    const CFRNode* const leaf = leaf_nodes[0][i];
     const double v = leaf->TerminalValue();
     const double chn = leaf->TerminalChanceReachProb();
     terminal_values_.push_back(v * chn);
@@ -310,13 +311,6 @@ double InfostateCFR::TerminalReachProbSum() {
   }
   return reach_sum;
 }
-void InfostateCFR::CollectTable(
-    const CFRNode& node,
-    std::unordered_map<std::string, const CFRInfoStateValues*>* out) const {
-  if (node.Type() == kDecisionInfostateNode) {
-    (*out)[node.infostate_string_] = &node.values();
-  }
-  for (const CFRNode& child : node.child_iterator()) CollectTable(child, out);
-}
+
 }  // namespace algorithms
 }  // namespace open_spiel

@@ -400,10 +400,10 @@ void TestTreeRebalancing() {
 }
 
 void CheckTreeLeaves(const CFRTree& tree, int move_limit) {
-  for (CFRNode const* leaf_node : tree.leaves_iterator()) {
-    SPIEL_CHECK_TRUE(leaf_node->IsLeafNode());
-    SPIEL_CHECK_TRUE(leaf_node->HasTensor());
-    SPIEL_CHECK_FALSE(leaf_node->CorrespondingStates().empty());
+  for (const CFRNode& leaf_node : tree.leaves_iterator()) {
+    SPIEL_CHECK_TRUE(leaf_node.IsLeafNode());
+    SPIEL_CHECK_TRUE(leaf_node.HasTensor());
+    SPIEL_CHECK_FALSE(leaf_node.CorrespondingStates().empty());
 
     // Check MoveNumber() for all corresponding states.
     //
@@ -412,12 +412,12 @@ void CheckTreeLeaves(const CFRTree& tree, int move_limit) {
     //   is less or equal to move_limit,
     // - or all states are non-terminal and the MoveNumber() == move_limit.
 
-    const int num_states = leaf_node->CorrespondingStates().size();
+    const int num_states = leaf_node.CorrespondingStates().size();
     int terminal_cnt = 0;
     int max_move_number = std::numeric_limits<int>::min();
     int min_move_number = std::numeric_limits<int>::max();
     for (const std::unique_ptr<State>
-          & state : leaf_node->CorrespondingStates()) {
+          & state : leaf_node.CorrespondingStates()) {
       if (state->IsTerminal()) terminal_cnt++;
       max_move_number = std::max(max_move_number, state->MoveNumber());
       min_move_number = std::min(min_move_number, state->MoveNumber());
@@ -469,11 +469,11 @@ void TestDepthLimitedTrees() {
     SPIEL_CHECK_TRUE(tree->IsBalanced());
     SPIEL_CHECK_TRUE(RecomputeBalance(*tree));
 
-    for (CFRNode const* acting : tree->leaves_iterator()) {
-      SPIEL_CHECK_TRUE(acting->IsLeafNode());
-      SPIEL_CHECK_EQ(acting->Type(), kDecisionInfostateNode);
-      SPIEL_CHECK_EQ(acting->CorrespondingStates().size(), 2);
-      SPIEL_CHECK_TRUE(acting->HasTensor());
+    for (const CFRNode& acting : tree->leaves_iterator()) {
+      SPIEL_CHECK_TRUE(acting.IsLeafNode());
+      SPIEL_CHECK_EQ(acting.Type(), kDecisionInfostateNode);
+      SPIEL_CHECK_EQ(acting.CorrespondingStates().size(), 2);
+      SPIEL_CHECK_TRUE(acting.HasTensor());
     }
   }
 
