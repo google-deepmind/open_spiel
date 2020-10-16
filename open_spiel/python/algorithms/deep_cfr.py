@@ -352,7 +352,7 @@ class DeepCFRSolver(policy.Policy):
       for action in legal_actions:
         matched_regrets[action] = advantages[action] / cumulative_regret
     else:
-      matched_regrets[max(legal_actions), key=lambda a: _advantages[a]] = 1
+      matched_regrets[max(legal_actions, key=lambda a: _advantages[a])] = 1
     
     return advantages, matched_regrets
 
