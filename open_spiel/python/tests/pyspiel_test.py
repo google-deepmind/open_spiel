@@ -83,6 +83,7 @@ EXPECTED_GAMES = set([
     "skat",
     "start_at",
     "solitaire",
+    "stones_and_gems",
     "tarok",
     "tic_tac_toe",
     "tiny_bridge_2p",

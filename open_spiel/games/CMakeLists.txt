@@ -102,6 +102,8 @@ set(GAME_SOURCES
   skat.h
   solitaire.cc
   solitaire.h
+  stones_and_gems.cc
+  stones_and_gems.h
   tarok.cc
   tarok.h
   tarok/cards.cc
@@ -390,6 +392,11 @@ add_test(skat_test skat_test)
 add_executable(solitaire_test solitaire_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(solitaire_test solitaire_test)
+
+add_executable(stones_and_gems_test stones_and_gems_test.cc
+               ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(stones_and_gems_test stones_and_gems_test)
 
 add_executable(tarok_test tarok_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
