@@ -61,16 +61,16 @@ struct InfostateTreeValuePropagator {
   // Tree and the tree structure information. These must not change!
   // TODO: make some const kung-fu so we can't modify these after construction.
   /*const*/ std::unique_ptr<CFRTree> tree;
-  /*const*/ std::vector<std::vector<double>> depth_branching;
+  /*const*/ std::vector<std::vector<int>> depth_branching;
   /*const*/ std::vector<std::vector<CFRNode*>> nodes_at_depth;
 
   // Mutable values to keep track of.
-  std::vector<double> reach_probs;
-  std::vector<double> cf_values;
+  std::vector<float> reach_probs;
+  std::vector<float> cf_values;
 
   static void CollectTreeStructure(
       CFRNode* node, int depth,
-      std::vector<std::vector<double>>* depth_branching,
+      std::vector<std::vector<int>>* depth_branching,
       std::vector<std::vector<CFRNode*>>* nodes_at_depth);
 
  public:
@@ -88,6 +88,8 @@ struct InfostateTreeValuePropagator {
   // in the buffer. This loopss over all depths from the bottom.
   // The leaf values must be provided externally.
   void BottomUp();
+
+  int RootBranchingFactor() const { return depth_branching[0][0]; }
 };
 
 class InfostateCFR {
@@ -97,7 +99,7 @@ class InfostateCFR {
 
   // Run CFR only at specific start states.
   InfostateCFR(absl::Span<const State*> start_states,
-               absl::Span<const double> chance_reach_probs,
+               absl::Span<const float> chance_reach_probs,
                const std::shared_ptr<Observer>& infostate_observer,
                int max_depth_limit = 1000);
 
@@ -135,12 +137,12 @@ class InfostateCFR {
   // Map from player 1 index (key) to player 0 (value).
   std::vector<int> terminal_permutation_;
   // Chance reach probs.
-  std::vector<double> terminal_ch_reaches_;
+  std::vector<float> terminal_ch_reaches_;
   // For the player 0 and already multiplied by chance reach probs.
-  std::vector<double> terminal_values_;
+  std::vector<float> terminal_values_;
 
   void PrepareTerminals();
-  double TerminalReachProbSum();
+  float TerminalReachProbSum();
 };
 
 }  // namespace algorithms

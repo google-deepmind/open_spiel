@@ -22,7 +22,7 @@ namespace algorithms {
 ActionsAndProbs InfostateCFR::InfostateCFRAveragePolicy::GetStatePolicy(
     const std::string& info_state) const {
   const CFRInfoStateValues& vs = *infostate_table_.at(info_state);
-  double sum_prob = 0.0;
+  float sum_prob = 0.0;
   for (int i = 0; i < vs.num_actions(); ++i) {
     sum_prob += vs.cumulative_policy[i];
   }
@@ -63,7 +63,7 @@ void InfostateTreeValuePropagator::TopDown() {
     int right_offset = nodes_at_depth[d].size();
     for (int parent_idx = nodes_at_depth[d - 1].size() - 1;
          parent_idx >= 0; parent_idx--) {
-      const double current_reach = reach_probs[parent_idx];
+      const float current_reach = reach_probs[parent_idx];
       const int num_children = depth_branching[d - 1][parent_idx];
       right_offset -= num_children;
       CFRNode& node = *(nodes_at_depth[d - 1][parent_idx]);
@@ -162,7 +162,7 @@ void InfostateTreeValuePropagator::BottomUp() {
 }
 void InfostateTreeValuePropagator::CollectTreeStructure(
     CFRNode* node, int depth,
-    std::vector<std::vector<double>>* depth_branching,
+    std::vector<std::vector<int>>* depth_branching,
     std::vector<std::vector<CFRNode*>>* nodes_at_depth) {
   // This CFR variant works only with leaf nodes being terminal nodes.
   SPIEL_CHECK_TRUE(
@@ -187,8 +187,8 @@ InfostateTreeValuePropagator::InfostateTreeValuePropagator(
                        &depth_branching, &nodes_at_depth);
 
   const int max_nodes_across_depths = nodes_at_depth.back().size();
-  cf_values = std::vector<double>(max_nodes_across_depths);
-  reach_probs = std::vector<double>(max_nodes_across_depths);
+  cf_values = std::vector<float>(max_nodes_across_depths);
+  reach_probs = std::vector<float>(max_nodes_across_depths);
 }
 InfostateCFR::InfostateCFR(const Game& game, int max_depth_limit)
     : propagators_({std::make_unique<CFRTree>(game, 0, max_depth_limit),
@@ -196,7 +196,7 @@ InfostateCFR::InfostateCFR(const Game& game, int max_depth_limit)
   PrepareTerminals();
 }
 InfostateCFR::InfostateCFR(absl::Span<const State*> start_states,
-                           absl::Span<const double> chance_reach_probs,
+                           absl::Span<const float> chance_reach_probs,
                            const std::shared_ptr<Observer>& infostate_observer,
                            int max_depth_limit)
     : propagators_({
@@ -211,14 +211,14 @@ void InfostateCFR::RunSimultaneousIterations(int iterations) {
     PrepareReachProbs();
     propagators_[0].TopDown();
     propagators_[1].TopDown();
-    SPIEL_DCHECK_TRUE(fabs(TerminalReachProbSum() - 1.0) < 1e-10);
+    SPIEL_DCHECK_TRUE(fabs(TerminalReachProbSum() - 1.0) < 1e-6);
 
     EvaluateLeaves();
     propagators_[0].BottomUp();
     propagators_[1].BottomUp();
     SPIEL_DCHECK_TRUE(
         fabs(propagators_[0].cf_values[0] + propagators_[1].cf_values[0])
-            < 1e-10);
+            < 1e-6);
   }
 }
 void InfostateCFR::RunAlternatingIterations(int iterations) {
@@ -247,8 +247,7 @@ void InfostateCFR::PrepareReachProbs(Player pl) {
   auto& prop = propagators_;
   SPIEL_DCHECK_EQ(prop[0].reach_probs.size(), prop[1].reach_probs.size());
   // Put reach probs of 1. for all depth 1 nodes.
-  int depth1_nodes = prop[pl].depth_branching[0][0];
-  for (int i = 0; i < depth1_nodes; ++i) {
+  for (int i = 0; i < prop[pl].RootBranchingFactor(); ++i) {
     prop[pl].reach_probs[i] = 1.;
   }
 }
@@ -322,12 +321,12 @@ void InfostateCFR::PrepareTerminals() {
                       terminal_permutation_.end(), 0),
       num_terminals * (num_terminals - 1) / 2);
 }
-double InfostateCFR::TerminalReachProbSum() {
+float InfostateCFR::TerminalReachProbSum() {
   const int num_terminals = terminal_values_.size();
-  double reach_sum = 0.;
+  float reach_sum = 0.;
   for (int i = 0; i < num_terminals; ++i) {
     const int j = terminal_permutation_[i];
-    const double leaf_reach = terminal_ch_reaches_[i]
+    const float leaf_reach = terminal_ch_reaches_[i]
         * propagators_[0].reach_probs[i]
         * propagators_[1].reach_probs[j];
     SPIEL_CHECK_LE(leaf_reach, 1.0);

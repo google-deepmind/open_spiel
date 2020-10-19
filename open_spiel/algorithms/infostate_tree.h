@@ -292,7 +292,7 @@ class InfostateTree final {
   // up to some move limit from the deepest start state.
   InfostateTree(
       absl::Span<const State*> start_states,
-      absl::Span<const double> chance_reach_probs,
+      absl::Span<const float> chance_reach_probs,
       std::shared_ptr<Observer> infostate_observer, Player acting_player,
       int max_move_ahead_limit = 1000)
       : player_(acting_player),
@@ -590,7 +590,7 @@ using CFRTree = InfostateTree<CFRNode>;
 
 class CFRNode : public InfostateNode</*Self=*/CFRNode> {
  public:
-  CFRInfoStateValues values_;
+  CFRInfoStateValues values_;  // TODO: use just floats.
   std::vector<Action> terminal_history_;
   std::string infostate_string_;
   CFRNode(const CFRTree& tree, CFRNode* parent, int incoming_index,

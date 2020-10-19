@@ -143,7 +143,7 @@ void TestImplementationsHaveSameIterations() {
       // Check regrets.
       for (int j = 0; j < vec_values.num_actions(); ++j) {
         SPIEL_CHECK_TRUE(fabs(vec_values.cumulative_regrets[j]
-                              - str_values.cumulative_regrets[j]) < 1e-10);
+                              - str_values.cumulative_regrets[j]) < 1e-6);
       }
       // Cumulative policy is more tricky: we need to normalize it first.
       double str_cumul_sum = 0, vec_cumul_sum = 0;
@@ -154,7 +154,7 @@ void TestImplementationsHaveSameIterations() {
       for (int j = 0; j < vec_values.num_actions(); ++j) {
         SPIEL_CHECK_TRUE(fabs(
             vec_values.cumulative_policy[j] / vec_cumul_sum
-            - str_values.cumulative_policy[j] / str_cumul_sum) < 1e-10);
+            - str_values.cumulative_policy[j] / str_cumul_sum) < 1e-6);
       }
     }
   }
