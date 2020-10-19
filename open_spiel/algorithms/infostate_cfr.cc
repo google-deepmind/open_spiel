@@ -153,7 +153,14 @@ void InfostateTreeValuePropagator::BottomUp() {
         }
       }
 
-      cf_values[parent_idx] = node_sum;
+      if (d == 0) {
+        // Do not overwrite cf_values, because we might want to use them
+        // through RootCfValues()
+        SPIEL_DCHECK_EQ(parent_idx, 0);
+        root_cf_value = node_sum;
+      } else {
+        cf_values[parent_idx] = node_sum;
+      }
       left_offset += num_children;
     }
     // Check that we passed over all of the children.
@@ -190,6 +197,18 @@ InfostateTreeValuePropagator::InfostateTreeValuePropagator(
   cf_values = std::vector<float>(max_nodes_across_depths);
   reach_probs = std::vector<float>(max_nodes_across_depths);
 }
+int InfostateTreeValuePropagator::RootBranchingFactor() const {
+  SPIEL_CHECK_EQ(depth_branching[0][0], tree->Root().NumChildren());
+  return depth_branching[0][0];
+}
+absl::Span<const float> InfostateTreeValuePropagator::RootCfValues() const {
+  return absl::MakeSpan(/*ptr=*/&cf_values[0],
+      /*size=*/RootBranchingFactor());
+}
+absl::Span<float> InfostateTreeValuePropagator::RootReachProbs() {
+  return absl::MakeSpan(/*ptr=*/&reach_probs[0],
+      /*size=*/RootBranchingFactor());
+}
 InfostateCFR::InfostateCFR(const Game& game, int max_depth_limit)
     : propagators_({std::make_unique<CFRTree>(game, 0, max_depth_limit),
                     std::make_unique<CFRTree>(game, 1, max_depth_limit)}) {
@@ -217,7 +236,7 @@ void InfostateCFR::RunSimultaneousIterations(int iterations) {
     propagators_[0].BottomUp();
     propagators_[1].BottomUp();
     SPIEL_DCHECK_TRUE(
-        fabs(propagators_[0].cf_values[0] + propagators_[1].cf_values[0])
+        fabs(propagators_[0].root_cf_value + propagators_[1].root_cf_value)
             < 1e-6);
   }
 }
@@ -246,9 +265,9 @@ void InfostateCFR::PrepareReachProbs() {
 void InfostateCFR::PrepareReachProbs(Player pl) {
   auto& prop = propagators_;
   SPIEL_DCHECK_EQ(prop[0].reach_probs.size(), prop[1].reach_probs.size());
-  // Put reach probs of 1. for all depth 1 nodes.
-  for (int i = 0; i < prop[pl].RootBranchingFactor(); ++i) {
-    prop[pl].reach_probs[i] = 1.;
+  absl::Span<float> root_reaches = prop[pl].RootReachProbs();
+  for (int i = 0; i < root_reaches.size(); ++i) {
+    root_reaches[i] = 1.;
   }
 }
 

@@ -67,6 +67,7 @@ struct InfostateTreeValuePropagator {
   // Mutable values to keep track of.
   std::vector<float> reach_probs;
   std::vector<float> cf_values;
+  float root_cf_value;
 
   static void CollectTreeStructure(
       CFRNode* node, int depth,
@@ -89,7 +90,12 @@ struct InfostateTreeValuePropagator {
   // The leaf values must be provided externally.
   void BottomUp();
 
-  int RootBranchingFactor() const { return depth_branching[0][0]; }
+  // Return the branching factor of the root node.
+  int RootBranchingFactor() const;
+  // Return view-only root counterfactual values.
+  absl::Span<const float> RootCfValues() const;
+  // Return writeable-only root reach probabilities.
+  absl::Span<float> RootReachProbs();
 };
 
 class InfostateCFR {
