@@ -35,7 +35,6 @@ matrix:
   - os: osx
     osx_image: xcode10.3  # macOS 10.14 (Mojave), release on March 25, 2019.
     env:
-      - OS_PYTHON_VERSION=3.6
       - DEFAULT_OPTIONAL_DEPENDENCY="ON"
 
   ## Tests using PIP
