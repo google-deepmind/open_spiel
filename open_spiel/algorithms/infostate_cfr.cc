@@ -227,7 +227,7 @@ InfostateCFR::InfostateCFR(absl::Span<const State*> start_states,
 }
 void InfostateCFR::RunSimultaneousIterations(int iterations) {
   for (int t = 0; t < iterations; ++t) {
-    PrepareReachProbs();
+    PrepareRootReachProbs();
     propagators_[0].TopDown();
     propagators_[1].TopDown();
     SPIEL_DCHECK_TRUE(fabs(TerminalReachProbSum() - 1.0) < 1e-6);
@@ -242,13 +242,13 @@ void InfostateCFR::RunSimultaneousIterations(int iterations) {
 }
 void InfostateCFR::RunAlternatingIterations(int iterations) {
   // Warm up reach probs buffers.
-  PrepareReachProbs();
+  PrepareRootReachProbs();
   propagators_[0].TopDown();
   propagators_[1].TopDown();
 
   for (int t = 0; t < iterations; ++t) {
     for (int i = 0; i < 2; ++i) {
-      PrepareReachProbs(1 - i);
+      PrepareRootReachProbs(1 - i);
       propagators_[1 - i].TopDown();
       EvaluateLeaves(i);
       propagators_[i].BottomUp();
@@ -256,13 +256,13 @@ void InfostateCFR::RunAlternatingIterations(int iterations) {
   }
 }
 
-void InfostateCFR::PrepareReachProbs() {
+void InfostateCFR::PrepareRootReachProbs() {
   auto& prop = propagators_;
   SPIEL_DCHECK_EQ(prop[0].reach_probs.size(), prop[1].reach_probs.size());
-  for (int pl = 0; pl < 2; ++pl) PrepareReachProbs(pl);
+  for (int pl = 0; pl < 2; ++pl) PrepareRootReachProbs(pl);
 }
 
-void InfostateCFR::PrepareReachProbs(Player pl) {
+void InfostateCFR::PrepareRootReachProbs(Player pl) {
   auto& prop = propagators_;
   SPIEL_DCHECK_EQ(prop[0].reach_probs.size(), prop[1].reach_probs.size());
   absl::Span<float> root_reaches = prop[pl].RootReachProbs();

@@ -112,8 +112,8 @@ class InfostateCFR {
   void RunSimultaneousIterations(int iterations);
   void RunAlternatingIterations(int iterations);
 
-  void PrepareReachProbs();
-  void PrepareReachProbs(Player pl);
+  void PrepareRootReachProbs();
+  void PrepareRootReachProbs(Player pl);
   void EvaluateLeaves();
   void EvaluateLeaves(Player pl);
 
