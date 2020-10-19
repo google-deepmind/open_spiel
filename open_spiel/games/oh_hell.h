@@ -37,6 +37,10 @@
 // number of tricks they bid. In this implementation, a player scores 1 point
 // for every trick won and an additional 10 points if they won the exact number
 // bid.
+//
+// There are known problems with this game; there seem to be nondeterministic
+// failures in the basic tests, so they have been disabled until we can fix
+// them. See https://github.com/deepmind/open_spiel/issues/412 for details.
 
 #include <memory>
 #include <string>

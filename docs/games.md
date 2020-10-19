@@ -5,6 +5,8 @@ we verified against known values and/or reproduced results from papers.
 
 <font color="orange"><b>~</b></font>: implemented but lightly tested.
 
+<font color="red"<b>X</b></font>: known issues (see code for details).
+
 Status                                       | Game
 -------------------------------------------- | ----
 ![](_static/green_circ10.png "green circle") | [Backgammon](#backgammon)
@@ -36,7 +38,7 @@ Status                                       | Game
 <font color="orange"><b>~</b></font>         | [Markov Soccer](#markov-soccer)
 ![](_static/green_circ10.png "green circle") | [Matching Pennies (Three-player)](#matching-pennies-three-player)
 ![](_static/green_circ10.png "green circle") | [Negotiation](#negotiation)
-<font color="orange"><b>~</b></font>         | [Oh Hell](#oh-hell)
+<font color="red"><b>X</b></font>            | [Oh Hell](#oh-hell)
 ![](_static/green_circ10.png "green circle") | [Oshi-Zumo](#oshi-zumo)
 ![](_static/green_circ10.png "green circle") | [Oware](#oware)
 ![](_static/green_circ10.png "green circle") | [Pentago](#pentago)
