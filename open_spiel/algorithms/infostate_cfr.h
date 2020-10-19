@@ -101,13 +101,12 @@ struct InfostateTreeValuePropagator {
 class InfostateCFR {
  public:
   // Basic constructor for the whole game.
-  InfostateCFR(const Game& game, int max_depth_limit = 1000);
+  InfostateCFR(const Game& game);
 
   // Run CFR only at specific start states.
   InfostateCFR(absl::Span<const State*> start_states,
                absl::Span<const float> chance_reach_probs,
-               const std::shared_ptr<Observer>& infostate_observer,
-               int max_depth_limit = 1000);
+               const std::shared_ptr<Observer>& infostate_observer);
 
   void RunSimultaneousIterations(int iterations);
   void RunAlternatingIterations(int iterations);

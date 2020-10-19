@@ -171,9 +171,6 @@ void InfostateTreeValuePropagator::CollectTreeStructure(
     CFRNode* node, int depth,
     std::vector<std::vector<int>>* depth_branching,
     std::vector<std::vector<CFRNode*>>* nodes_at_depth) {
-  // This CFR variant works only with leaf nodes being terminal nodes.
-  SPIEL_CHECK_TRUE(
-      !node->IsLeafNode() || node->Type() == kTerminalInfostateNode);
   (*depth_branching)[depth].push_back(node->NumChildren());
   (*nodes_at_depth)[depth].push_back(node);
 
@@ -209,20 +206,19 @@ absl::Span<float> InfostateTreeValuePropagator::RootReachProbs() {
   return absl::MakeSpan(/*ptr=*/&reach_probs[0],
       /*size=*/RootBranchingFactor());
 }
-InfostateCFR::InfostateCFR(const Game& game, int max_depth_limit)
-    : propagators_({std::make_unique<CFRTree>(game, 0, max_depth_limit),
-                    std::make_unique<CFRTree>(game, 1, max_depth_limit)}) {
+InfostateCFR::InfostateCFR(const Game& game)
+    : propagators_({std::make_unique<CFRTree>(game, 0),
+                    std::make_unique<CFRTree>(game, 1)}) {
   PrepareTerminals();
 }
 InfostateCFR::InfostateCFR(absl::Span<const State*> start_states,
                            absl::Span<const float> chance_reach_probs,
-                           const std::shared_ptr<Observer>& infostate_observer,
-                           int max_depth_limit)
+                           const std::shared_ptr<Observer>& infostate_observer)
     : propagators_({
         std::make_unique<CFRTree>(start_states, chance_reach_probs,
-                                  infostate_observer, 0, max_depth_limit),
+                                  infostate_observer, 0),
         std::make_unique<CFRTree>(start_states, chance_reach_probs,
-                                  infostate_observer, 1, max_depth_limit)}) {
+                                  infostate_observer, 1)}) {
   PrepareTerminals();
 }
 void InfostateCFR::RunSimultaneousIterations(int iterations) {
@@ -321,9 +317,12 @@ void InfostateCFR::PrepareTerminals() {
   SPIEL_CHECK_EQ(player1_map.size(), leaf_nodes[1].size());
 
   for (int i = 0; i < num_terminals; ++i) {
+    // This CFR variant works only with leaf nodes being terminal nodes.
     const CFRNode* const a = leaf_nodes[0][i];
+    SPIEL_CHECK_TRUE(a->Type() == kTerminalInfostateNode);
     const int permutation_index = player1_map.at(a->TerminalHistory());
     const CFRNode* const b = leaf_nodes[1][permutation_index];
+    SPIEL_CHECK_TRUE(b->Type() == kTerminalInfostateNode);
     SPIEL_DCHECK_EQ(a->TerminalHistory(), b->TerminalHistory());
 
     const CFRNode* const leaf = leaf_nodes[0][i];
