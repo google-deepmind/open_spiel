@@ -81,6 +81,7 @@ struct InfostateTreeValuePropagator {
   // Make a top-down pass, using the current policy stored in the tree nodes.
   // This computes the reach_probs_ buffer for storing cumulative product
   // of reach probabilities for leaf nodes.
+  // The starting values at depth 1 must be provided externally.
   void TopDown();
 
   // Make a bottom-up pass, starting with the current cf_values stored
@@ -102,6 +103,9 @@ class InfostateCFR {
 
   void RunSimultaneousIterations(int iterations);
   void RunAlternatingIterations(int iterations);
+
+  void PrepareReachProbs();
+  void PrepareReachProbs(Player pl);
   void EvaluateLeaves();
   void EvaluateLeaves(Player pl);
 

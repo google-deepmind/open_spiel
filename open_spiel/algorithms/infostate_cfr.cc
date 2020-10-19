@@ -45,9 +45,14 @@ ActionsAndProbs InfostateCFR::InfostateCFRAveragePolicy::GetStatePolicy(
 void InfostateTreeValuePropagator::TopDown() {
   SPIEL_CHECK_EQ(nodes_at_depth.size(), depth_branching.size());
   const int tree_depth = nodes_at_depth.size();
-  reach_probs[0] = 1.;  // Root reach probability of the player.
-  // Loop over all depths, except for the initial one.
-  for (int d = 1; d < tree_depth; d++) {
+  // Loop over all depths, except for the first two depths:
+  // - Depth 0: corresponds to the dummy observation node, which is used mainly
+  //   for computing the sum of all cf values. As it is not a decision node,
+  //   it is not involved in the calculation of reach probs and can be skipped.
+  // - Depth 1: now there may be some first decision nodes. The caller must fill
+  //   reach probs for this depth. This is done so that we can support arbitrary
+  //   depth-limited infostate trees.
+  for (int d = 2; d < tree_depth; d++) {
     // Loop over all parents of current nodes.
     // We do it in reverse, i.e. from the last parent index to the first one.
     // As we update reach probs, we overwrite the same buffer so we lose the
@@ -203,12 +208,12 @@ InfostateCFR::InfostateCFR(absl::Span<const State*> start_states,
 }
 void InfostateCFR::RunSimultaneousIterations(int iterations) {
   for (int t = 0; t < iterations; ++t) {
+    PrepareReachProbs();
     propagators_[0].TopDown();
     propagators_[1].TopDown();
     SPIEL_DCHECK_TRUE(fabs(TerminalReachProbSum() - 1.0) < 1e-10);
 
     EvaluateLeaves();
-
     propagators_[0].BottomUp();
     propagators_[1].BottomUp();
     SPIEL_DCHECK_TRUE(
@@ -218,17 +223,36 @@ void InfostateCFR::RunSimultaneousIterations(int iterations) {
 }
 void InfostateCFR::RunAlternatingIterations(int iterations) {
   // Warm up reach probs buffers.
+  PrepareReachProbs();
   propagators_[0].TopDown();
   propagators_[1].TopDown();
 
   for (int t = 0; t < iterations; ++t) {
     for (int i = 0; i < 2; ++i) {
+      PrepareReachProbs(1 - i);
       propagators_[1 - i].TopDown();
       EvaluateLeaves(i);
       propagators_[i].BottomUp();
     }
   }
 }
+
+void InfostateCFR::PrepareReachProbs() {
+  auto& prop = propagators_;
+  SPIEL_DCHECK_EQ(prop[0].reach_probs.size(), prop[1].reach_probs.size());
+  for (int pl = 0; pl < 2; ++pl) PrepareReachProbs(pl);
+}
+
+void InfostateCFR::PrepareReachProbs(Player pl) {
+  auto& prop = propagators_;
+  SPIEL_DCHECK_EQ(prop[0].reach_probs.size(), prop[1].reach_probs.size());
+  // Put reach probs of 1. for all depth 1 nodes.
+  int depth1_nodes = prop[pl].depth_branching[0][0];
+  for (int i = 0; i < depth1_nodes; ++i) {
+    prop[pl].reach_probs[i] = 1.;
+  }
+}
+
 void InfostateCFR::EvaluateLeaves() {
   auto& prop = propagators_;
   SPIEL_DCHECK_EQ(prop[0].cf_values.size(), prop[1].cf_values.size());
