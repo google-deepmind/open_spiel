@@ -87,7 +87,7 @@ fi
   open_spiel/games/bridge/double_dummy_solver
 
 if [[ ! -d open_spiel/abseil-cpp ]]; then
-  git clone -b '20200225.1' --single-branch --depth 1 https://github.com/abseil/abseil-cpp.git open_spiel/abseil-cpp
+  git clone -b '20200923.1' --single-branch --depth 1 https://github.com/abseil/abseil-cpp.git open_spiel/abseil-cpp
 fi
 
 # Optional dependencies.
