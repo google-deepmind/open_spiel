@@ -5,7 +5,7 @@ we verified against known values and/or reproduced results from papers.
 
 <font color="orange"><b>~</b></font>: implemented but lightly tested.
 
-<font color="red"<b>X</b></font>: known issues (see code for details).
+<font color="red"><b>X</b></font>: known issues (see code for details).
 
 Status                                       | Game
 -------------------------------------------- | ----
