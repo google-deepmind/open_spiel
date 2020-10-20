@@ -38,7 +38,7 @@ Status                                       | Game
 <font color="orange"><b>~</b></font>         | [Markov Soccer](#markov-soccer)
 ![](_static/green_circ10.png "green circle") | [Matching Pennies (Three-player)](#matching-pennies-three-player)
 ![](_static/green_circ10.png "green circle") | [Negotiation](#negotiation)
-<font color="red"><b>X</b></font>            | [Oh Hell](#oh-hell)
+<font color="orange"><b>X</b></font>         | [Oh Hell](#oh-hell)
 ![](_static/green_circ10.png "green circle") | [Oshi-Zumo](#oshi-zumo)
 ![](_static/green_circ10.png "green circle") | [Oware](#oware)
 ![](_static/green_circ10.png "green circle") | [Pentago](#pentago)

@@ -60,7 +60,7 @@ std::string InformationStateTensorToString(Player player,
   int num_tricks;
   Player dealer;
   int trump;
-  std::vector<bool> hand(max_num_tricks);
+  std::vector<int> hand(deck_props.NumCards());
   std::vector<int> bids(num_players);
   std::vector<int> tricks_won(num_players);
   std::vector<Trick> tricks(max_num_tricks);
@@ -94,7 +94,7 @@ std::string InformationStateTensorToString(Player player,
   ptr += deck_props.NumCards();
   // Current hand
   for (int i = 0; i < deck_props.NumCards(); ++i) {
-    if (ptr[i] == 1) hand[i] = true;
+    if (ptr[i] == 1) hand[i] = 1;
   }
   ptr += deck_props.NumCards();
   // bids
@@ -246,12 +246,7 @@ void InformationStateTensorTest(int num_games = 10) {
 }  // namespace open_spiel
 
 int main(int argc, char** argv) {
-  /*
-  There are nondeterministic errors with this test that sometimes fail on
-  Travis marking the build as failing on github. Disabling them until we find
-  the cause and fix. See https://github.com/deepmind/open_spiel/issues/412
   open_spiel::oh_hell::BasicGameTests();
   open_spiel::oh_hell::GameConfigSimTest();
   open_spiel::oh_hell::InformationStateTensorTest();
-  */
 }
