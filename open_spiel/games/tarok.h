@@ -29,9 +29,9 @@
 namespace open_spiel {
 namespace tarok {
 
-static constexpr int kDefaultNumPLayers = 3;
+inline constexpr int kDefaultNumPLayers = 3;
 // seed for shuffling the cards, -1 means seeded by clock
-static constexpr int kDefaultSeed = -1;
+inline constexpr int kDefaultSeed = -1;
 
 enum class GamePhase {
   kCardDealing,

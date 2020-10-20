@@ -26,12 +26,12 @@ namespace tarok {
 
 // a subset of bidding actions that are used throughout the codebase and add to
 // readability, for more info see TarokState::LegalActionsInBidding()
-static constexpr int kInvalidBidAction = -1;
-static constexpr int kBidPassAction = 0;
-static constexpr int kBidKlopAction = 1;
-static constexpr int kBidThreeAction = 2;
-static constexpr int kBidSoloThreeAction = 5;
-static constexpr int kBidSoloOneAction = 7;
+inline constexpr int kInvalidBidAction = -1;
+inline constexpr int kBidPassAction = 0;
+inline constexpr int kBidKlopAction = 1;
+inline constexpr int kBidThreeAction = 2;
+inline constexpr int kBidSoloThreeAction = 5;
+inline constexpr int kBidSoloOneAction = 7;
 
 enum class ContractName {
   kKlop,

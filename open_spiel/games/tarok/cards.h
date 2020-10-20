@@ -27,13 +27,13 @@ namespace tarok {
 
 // a subset of card actions that are used throughout the codebase and add to
 // readability, for more info see TarokState::LegalActions()
-static constexpr int kPagatAction = 0;
-static constexpr int kMondAction = 20;
-static constexpr int kSkisAction = 21;
-static constexpr int kKingOfHeartsAction = 29;
-static constexpr int kKingOfDiamondsAction = 37;
-static constexpr int kKingOfSpadesAction = 45;
-static constexpr int kKingOfClubsAction = 53;
+inline constexpr int kPagatAction = 0;
+inline constexpr int kMondAction = 20;
+inline constexpr int kSkisAction = 21;
+inline constexpr int kKingOfHeartsAction = 29;
+inline constexpr int kKingOfDiamondsAction = 37;
+inline constexpr int kKingOfSpadesAction = 45;
+inline constexpr int kKingOfClubsAction = 53;
 
 enum class CardSuit { kHearts, kDiamonds, kSpades, kClubs, kTaroks };
 
