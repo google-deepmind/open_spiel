@@ -47,6 +47,17 @@ struct CFRInfoStateValues {
         current_policy(la.size(), 1.0 / la.size()) {}
   CFRInfoStateValues(std::vector<Action> la) : CFRInfoStateValues(la, 0) {}
 
+  // For randomized initial regrets.
+  CFRInfoStateValues(std::vector<Action> la,
+                     std::mt19937* rng,
+                     double magnitude_scale) : CFRInfoStateValues(la, 0) {
+    for (int i = 0; i < cumulative_policy.size(); ++i) {
+      cumulative_regrets[i] = magnitude_scale *
+          absl::Uniform<double>(*rng, 0.0, 1.0);
+    }
+    ApplyRegretMatching();
+  }
+
   // Fills current_policy according to the standard application of the
   // regret-matching algorithm in the CFR papers.
   void ApplyRegretMatching();
