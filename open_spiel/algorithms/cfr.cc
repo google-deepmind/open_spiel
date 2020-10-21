@@ -19,7 +19,6 @@
 #include <random>
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
-#include "open_spiel/abseil-cpp/absl/random/distributions.h"
 #include "open_spiel/abseil-cpp/absl/strings/charconv.h"
 #include "open_spiel/abseil-cpp/absl/strings/numbers.h"
 #include "open_spiel/spiel_utils.h"
