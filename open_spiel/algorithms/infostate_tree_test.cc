@@ -67,15 +67,16 @@ std::string ComputeCertificate(const CFRNode& node) {
 
 std::unique_ptr<CFRTree> MakeTree(const std::string& game_name,
                                   Player player_id,
-                                  int max_depth_limit = 1000) {
+                                  int max_move_limit = 1000) {
   return std::make_unique<CFRTree>(*LoadGame(game_name), player_id,
-                                   max_depth_limit);
+                                   max_move_limit);
 }
 
 std::unique_ptr<CFRTree> MakeTree(
     const std::string& game_name, Player player_id,
     const std::vector<std::vector<Action>>& start_histories,
-    const std::vector<double>& start_reaches) {
+    const std::vector<float>& start_reaches,
+    int max_move_limit = 1000) {
   const std::shared_ptr<const Game> game = LoadGame(game_name);
   std::vector<std::unique_ptr<State>> start_states;
   std::vector<const State*> start_state_ptrs;
@@ -91,7 +92,7 @@ std::unique_ptr<CFRTree> MakeTree(
 
   return std::make_unique<CFRTree>(
       absl::MakeSpan(start_state_ptrs), absl::MakeSpan(start_reaches),
-      infostate_observer, player_id);
+      infostate_observer, player_id, max_move_limit);
 }
 
 bool IsNodeBalanced(const CFRNode& node, int height, int current_depth = 0) {
@@ -487,6 +488,37 @@ void TestDepthLimitedTrees() {
   BuildAllDepths("goofspiel(players=3,num_cards=3,imp_info=True)");
 }
 
+void TestDepthLimitedSubgames() {
+  {
+    std::array<std::string, 4> expected_certificates = {
+      "(()()())",
+      "(([][])([][])([][]))",
+      "("
+        "([(())({}{})][({}{})({}{})])"
+        "([(())({}{})][({}{})({}{})])"
+        "([(())({}{})][({}{})({}{})])"
+      ")",
+      "("
+        "([(({}{}{}{}))({}{})][({}{})({}{})])"
+        "([(({}{}{}{}))({}{})][({}{})({}{})])"
+        "([(({}{}{}{}))({}{})][({}{})({}{})])"
+      ")"
+    };
+    std::array<int, 4> expected_leaf_counts = {3, 6, 21, 30};
+
+    for (int move_limit = 0; move_limit < 4; ++move_limit) {
+      std::unique_ptr<CFRTree> tree = MakeTree(
+          "kuhn_poker", /*player_id=*/1,
+          {{0, 1}, {0, 2}, {1, 0}, {1, 2}, {2, 0}, {2, 1}},
+          {1/6., 1/6., 1/6., 1/6., 1/6., 1/6.},
+          /*max_move_limit=*/move_limit);
+      SPIEL_CHECK_EQ(ComputeCertificate(tree->Root()),
+                     expected_certificates[move_limit]);
+      SPIEL_CHECK_EQ(tree->CountLeaves(), expected_leaf_counts[move_limit]);
+    }
+  }
+}
+
 }  // namespace
 }  // namespace algorithms
 }  // namespace open_spiel
@@ -496,4 +528,5 @@ int main(int argc, char** argv) {
   open_spiel::algorithms::TestCertificatesFromStartHistories();
   open_spiel::algorithms::TestTreeRebalancing();
   open_spiel::algorithms::TestDepthLimitedTrees();
+  open_spiel::algorithms::TestDepthLimitedSubgames();
 }

@@ -367,7 +367,8 @@ class InfostateTree final {
       } while (current_->Parent()
             && child_idx + 1 == current_->NumChildren());
       // We traversed the whole tree and we got the root node.
-      if (!current_->Parent()) return *this;
+      if (!current_->Parent() && child_idx + 1 == current_->NumChildren())
+        return *this;
       // Choose the next sibling node.
       current_ = current_->ChildAt(child_idx + 1);
       // Find the first leaf.
@@ -380,7 +381,7 @@ class InfostateTree final {
       return current_ == other.current_;
     }
     bool operator!=(LeavesIterator other) const { return !(*this == other); }
-    [[nodiscard]] const Node& operator*() { return *current_; }
+    [[nodiscard]] const Node& operator*() const { return *current_; }
     LeavesIterator begin() const { return *this; }
     LeavesIterator end() const {
       return LeavesIterator(tree_, &(current_->Tree().Root()));
@@ -391,6 +392,12 @@ class InfostateTree final {
     const Node* node = &root_;
     while (!node->IsLeafNode()) node = node->ChildAt(0);
     return LeavesIterator(this, node);
+  }
+  // Expensive. Use only for debugging.
+  int CountLeaves() const {
+    int cnt = 0;
+    for (const Node& n : leaves_iterator()) cnt++;
+    return cnt;
   }
 
  private:
