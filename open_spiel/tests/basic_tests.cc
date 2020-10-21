@@ -255,35 +255,45 @@ void CheckObservables(const Game& game, const State& state) {
 }
 
 void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
-                      bool serialize) {
+                      bool serialize, bool verbose) {
   std::vector<HistoryItem> history;
   std::vector<double> episode_returns(game.NumPlayers(), 0);
 
   int infostate_vector_size = game.GetType().provides_information_state_tensor
                                   ? game.InformationStateTensorSize()
                                   : 0;
-  std::cout << "Information state vector size: " << infostate_vector_size
-            << std::endl;
+  if (verbose) {
+    std::cout << "Information state vector size: " << infostate_vector_size
+              << std::endl;
+  }
 
   int observation_vector_size = game.GetType().provides_observation_tensor
                                     ? game.ObservationTensorSize()
                                     : 0;
-  std::cout << "Observation vector size: " << observation_vector_size
-            << std::endl;
+  if (verbose) {
+    std::cout << "Observation vector size: " << observation_vector_size
+              << std::endl;
+  }
 
   SPIEL_CHECK_TRUE(game.MinUtility() < game.MaxUtility());
-  std::cout << "Utility range: " << game.MinUtility() << " "
-            << game.MaxUtility() << std::endl;
+  if (verbose) {
+    std::cout << "Utility range: " << game.MinUtility() << " "
+              << game.MaxUtility() << std::endl;
 
-  std::cout << "Starting new game.." << std::endl;
+    std::cout << "Starting new game.." << std::endl;
+  }
   std::unique_ptr<open_spiel::State> state = game.NewInitialState();
 
-  std::cout << "Initial state:" << std::endl;
-  std::cout << "State:" << std::endl << state->ToString() << std::endl;
+  if (verbose) {
+    std::cout << "Initial state:" << std::endl;
+    std::cout << "State:" << std::endl << state->ToString() << std::endl;
+  }
   int game_length = 0;
 
   while (!state->IsTerminal()) {
-    std::cout << "player " << state->CurrentPlayer() << std::endl;
+    if (verbose) {
+      std::cout << "player " << state->CurrentPlayer() << std::endl;
+    }
 
     LegalActionsIsEmptyForOtherPlayers(game, *state);
     LegalActionsAreSorted(game, *state);
@@ -304,9 +314,11 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
       std::vector<std::pair<Action, double>> outcomes = state->ChanceOutcomes();
       Action action = open_spiel::SampleAction(outcomes, *rng).first;
 
-      std::cout << "sampled outcome: "
-                << state->ActionToString(kChancePlayerId, action) << std::endl;
-
+      if (verbose) {
+        std::cout << "sampled outcome: "
+                  << state->ActionToString(kChancePlayerId, action)
+                  << std::endl;
+      }
       history.emplace_back(state->Clone(), kChancePlayerId, action);
       state->ApplyAction(action);
 
@@ -316,7 +328,9 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
     } else if (state->CurrentPlayer() == open_spiel::kSimultaneousPlayerId) {
       std::vector<double> rewards = state->Rewards();
       SPIEL_CHECK_EQ(rewards.size(), game.NumPlayers());
-      std::cout << "Rewards: " << absl::StrJoin(rewards, " ") << std::endl;
+      if (verbose) {
+        std::cout << "Rewards: " << absl::StrJoin(rewards, " ") << std::endl;
+      }
       for (auto p = Player{0}; p < game.NumPlayers(); ++p) {
         episode_returns[p] += rewards[p];
       }
@@ -336,9 +350,10 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
         } else {
           history.emplace_back(nullptr, kInvalidHistoryPlayer, action);
         }
-        std::cout << "player " << p << " chose "
-                  << state->ActionToString(p, action) << std::endl;
-
+        if (verbose) {
+          std::cout << "player " << p << " chose "
+                    << state->ActionToString(p, action) << std::endl;
+        }
         CheckObservables(game, *state);
       }
 
@@ -347,7 +362,9 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
     } else {
       std::vector<double> rewards = state->Rewards();
       SPIEL_CHECK_EQ(rewards.size(), game.NumPlayers());
-      std::cout << "Rewards: " << absl::StrJoin(rewards, " ") << std::endl;
+      if (verbose) {
+        std::cout << "Rewards: " << absl::StrJoin(rewards, " ") << std::endl;
+      }
       for (auto p = Player{0}; p < game.NumPlayers(); ++p) {
         episode_returns[p] += rewards[p];
       }
@@ -367,9 +384,10 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
       std::uniform_int_distribution<int> dis(0, actions.size() - 1);
       Action action = actions[dis(*rng)];
 
-      std::cout << "chose action: " << action << " ("
-                << state->ActionToString(player, action) << ")" << std::endl;
-
+      if (verbose) {
+        std::cout << "chose action: " << action << " ("
+                  << state->ActionToString(player, action) << ")" << std::endl;
+      }
       history.emplace_back(state->Clone(), player, action);
       ApplyActionTestClone(game, state.get(), action);
       game_length++;
@@ -379,15 +397,21 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
       }
     }
 
-    std::cout << "State: " << std::endl << state->ToString() << std::endl;
+    if (verbose) {
+      std::cout << "State: " << std::endl << state->ToString() << std::endl;
+    }
   }
 
   SPIEL_CHECK_LE(game_length, game.MaxGameLength());
 
-  std::cout << "Reached a terminal state!" << std::endl;
+  if (verbose) {
+    std::cout << "Reached a terminal state!" << std::endl;
+  }
   SPIEL_CHECK_EQ(state->CurrentPlayer(), kTerminalPlayerId);
   std::vector<double> rewards = state->Rewards();
-  std::cout << "Rewards: " << absl::StrJoin(rewards, " ") << std::endl;
+  if (verbose) {
+    std::cout << "Rewards: " << absl::StrJoin(rewards, " ") << std::endl;
+  }
 
   history.emplace_back(state->Clone(), kTerminalPlayerId,
                        kInvalidHistoryAction);
@@ -408,20 +432,26 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
     SPIEL_CHECK_FLOAT_EQ(final_return, state->PlayerReturn(player));
     SPIEL_CHECK_GE(final_return, game.MinUtility());
     SPIEL_CHECK_LE(final_return, game.MaxUtility());
-    std::cout << "Final return to player " << player << " is " << final_return
-              << std::endl;
+    if (verbose) {
+      std::cout << "Final return to player " << player << " is " << final_return
+                << std::endl;
+    }
     episode_returns[player] += rewards[player];
     SPIEL_CHECK_TRUE(Near(episode_returns[player], final_return));
   }
 }
 
 // Perform sims random simulations of the specified game.
-void RandomSimTest(const Game& game, int num_sims) {
+void RandomSimTest(const Game& game, int num_sims, bool serialize,
+                   bool verbose) {
   std::mt19937 rng;
-  std::cout << "\nRandomSimTest, game = " << game.GetType().short_name
-            << ", num_sims = " << num_sims << std::endl;
+  if (verbose) {
+    std::cout << "\nRandomSimTest, game = " << game.GetType().short_name
+              << ", num_sims = " << num_sims << std::endl;
+  }
   for (int sim = 0; sim < num_sims; ++sim) {
-    RandomSimulation(&rng, game, /*undo=*/false, /*serialize=*/true);
+    RandomSimulation(&rng, game, /*undo=*/false, /*serialize=*/serialize,
+                     verbose);
   }
 }
 
@@ -430,7 +460,8 @@ void RandomSimTestWithUndo(const Game& game, int num_sims) {
   std::cout << "RandomSimTestWithUndo, game = " << game.GetType().short_name
             << ", num_sims = " << num_sims << std::endl;
   for (int sim = 0; sim < num_sims; ++sim) {
-    RandomSimulation(&rng, game, /*undo=*/true, /*serialize=*/true);
+    RandomSimulation(&rng, game, /*undo=*/true, /*serialize=*/true,
+                     /*verbose=*/true);
   }
 }
 
@@ -439,7 +470,8 @@ void RandomSimTestNoSerialize(const Game& game, int num_sims) {
   std::cout << "RandomSimTestNoSerialize, game = " << game.GetType().short_name
             << ", num_sims = " << num_sims << std::endl;
   for (int sim = 0; sim < num_sims; ++sim) {
-    RandomSimulation(&rng, game, /*undo=*/false, /*serialize=*/false);
+    RandomSimulation(&rng, game, /*undo=*/false, /*serialize=*/false,
+                     /*verbose=*/true);
   }
 }
 
