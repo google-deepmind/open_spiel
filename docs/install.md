@@ -1,7 +1,11 @@
 # Installation
 
 The instructions here are for Linux and MacOS. For installation on Windows, see
-[these separate installation instructions](windows.md).
+[these separate installation instructions](windows.md). On Linux, we recommend
+Ubuntu 20.04 (or 19.10), Debian 10, or later versions. There are
+[known issues](https://github.com/deepmind/open_spiel/issues/407) with default
+compilers on Ubuntu on 18.04, and `clang-10` must be installed separately. On
+MacOS, we recommend XCode 11 or newer.
 
 Currently there are two installation methods:
 
