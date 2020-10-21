@@ -28,9 +28,9 @@ import pyspiel
 SEED = 39823987
 
 
-class OutcomeSamplingMCCFRTest(absltest.TestCase):
+class ExternalSamplingMCCFRTest(absltest.TestCase):
 
-    def test_outcome_sampling_leduc_2p_simple(self):
+    def test_external_sampling_leduc_2p_simple(self):
         np.random.seed(SEED)
         game = pyspiel.load_game("leduc_poker")
         os_solver = external_sampling_mccfr.ExternalSamplingSolver(game, 'k_simple')
@@ -43,7 +43,7 @@ class OutcomeSamplingMCCFRTest(absltest.TestCase):
         print("Leduc2P, conv = {}".format(conv))
         self.assertLess(conv, 2.5)
 
-    def test_outcome_sampling_leduc_2p_full(self):
+    def test_external_sampling_leduc_2p_full(self):
         np.random.seed(SEED)
         game = pyspiel.load_game("leduc_poker")
         os_solver = external_sampling_mccfr.ExternalSamplingSolver(game, 'k_full')
@@ -56,7 +56,7 @@ class OutcomeSamplingMCCFRTest(absltest.TestCase):
         print("Leduc2P, conv = {}".format(conv))
         self.assertLess(conv, 2.5)
 
-    def test_outcome_sampling_kuhn_2p_simple(self):
+    def test_external_sampling_kuhn_2p_simple(self):
         np.random.seed(SEED)
         game = pyspiel.load_game("kuhn_poker")
         os_solver = external_sampling_mccfr.ExternalSamplingSolver(game, 'k_simple')
@@ -69,7 +69,7 @@ class OutcomeSamplingMCCFRTest(absltest.TestCase):
         print("Kuhn2P, conv = {}".format(conv))
         self.assertLess(conv, 0.05)
 
-    def test_outcome_sampling_kuhn_2p_full(self):
+    def test_external_sampling_kuhn_2p_full(self):
         np.random.seed(SEED)
         game = pyspiel.load_game("kuhn_poker")
         os_solver = external_sampling_mccfr.ExternalSamplingSolver(game, 'k_full')
@@ -82,7 +82,7 @@ class OutcomeSamplingMCCFRTest(absltest.TestCase):
         print("Kuhn2P, conv = {}".format(conv))
         self.assertLess(conv, 0.05)
 
-    def test_outcome_sampling_liars_dice_2p_simple(self):
+    def test_external_sampling_liars_dice_2p_simple(self):
         np.random.seed(SEED)
         game = pyspiel.load_game("liars_dice")
         os_solver = external_sampling_mccfr.ExternalSamplingSolver(game, 'k_simple')
@@ -95,7 +95,7 @@ class OutcomeSamplingMCCFRTest(absltest.TestCase):
         print("Kuhn2P, conv = {}".format(conv))
         self.assertLess(conv, 1.6)
 
-    def test_outcome_sampling_liars_dice_2p_full(self):
+    def test_external_sampling_liars_dice_2p_full(self):
         np.random.seed(SEED)
         game = pyspiel.load_game("liars_dice")
         os_solver = external_sampling_mccfr.ExternalSamplingSolver(game, 'k_full')
@@ -108,7 +108,7 @@ class OutcomeSamplingMCCFRTest(absltest.TestCase):
         print("Kuhn2P, conv = {}".format(conv))
         self.assertLess(conv, 1.6)
 
-    def test_outcome_sampling_kuhn_3p_simple(self):
+    def test_external_sampling_kuhn_3p_simple(self):
         np.random.seed(SEED)
         game = pyspiel.load_game("kuhn_poker",
                                  {"players": pyspiel.GameParameter(3)})
@@ -122,7 +122,7 @@ class OutcomeSamplingMCCFRTest(absltest.TestCase):
         print("Kuhn3P, conv = {}".format(conv))
         self.assertLess(conv, 0.1)
 
-    def test_outcome_sampling_kuhn_3p_full(self):
+    def test_external_sampling_kuhn_3p_full(self):
         np.random.seed(SEED)
         game = pyspiel.load_game("kuhn_poker",
                                  {"players": pyspiel.GameParameter(3)})
