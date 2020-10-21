@@ -5,6 +5,8 @@ set(GAME_SOURCES
   battleship.h
   battleship_types.h
   battleship_types.cc
+  blackjack.cc
+  blackjack.h
   blotto.cc
   blotto.h
   breakthrough.cc
@@ -216,6 +218,10 @@ add_test(backgammon_test backgammon_test)
 add_executable(battleship_test battleship_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(battleship_test battleship_test)
+
+add_executable(blackjack_test blackjack_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(blackjack_test blackjack_test)
 
 add_executable(blotto_test blotto_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)

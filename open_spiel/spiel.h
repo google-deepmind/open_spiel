@@ -236,7 +236,7 @@ class State {
   // The representation may depend on the current state of the game, e.g.
   // for chess the string "Nf3" would correspond to different starting squares
   // in different states (and hence probably different action ids).
-  // This method will format chance outcomes if player == kChancePlayer
+  // This method will format chance outcomes if player == kChancePlayerId
   virtual std::string ActionToString(Player player, Action action_id) const = 0;
   std::string ActionToString(Action action_id) const {
     return ActionToString(CurrentPlayer(), action_id);

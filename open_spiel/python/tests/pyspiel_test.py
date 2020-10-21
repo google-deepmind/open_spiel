@@ -29,6 +29,7 @@ import pyspiel
 EXPECTED_GAMES = set([
     "backgammon",
     "battleship",
+    "blackjack",
     "blotto",
     "breakthrough",
     "bridge",

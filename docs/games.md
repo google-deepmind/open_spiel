@@ -11,6 +11,7 @@ Status                                       | Game
 -------------------------------------------- | ----
 ![](_static/green_circ10.png "green circle") | [Backgammon](#backgammon)
 <font color="orange"><b>~</b></font>         | [Battleship](#battleship)
+<font color="orange"><b>~</b></font>         | [Blackjack](#blackjack)
 ![](_static/green_circ10.png "green circle") | [Breakthrough](#breakthrough)
 ![](_static/green_circ10.png "green circle") | [Bridge](#bridge)
 ![](_static/green_circ10.png "green circle") | [(Uncontested) Bridge bidding](#uncontested-bridge-bidding)
@@ -81,6 +82,15 @@ Status                                       | Game
     Benchmarks](https://papers.nips.cc/paper/9122-correlation-in-extensive-form-games-saddle-point-formulation-and-benchmarks.pdf).
     Based on the original game
     [(wikipedia)](https://en.wikipedia.org/wiki/Battleship_\(game\))
+
+### Blackjack
+
+*   Simplified version of blackjack, with only HIT/STAND moves.
+*   Traditional game.
+*   Non-deterministic.
+*   Imperfect information.
+*   1 player.
+*   [Wikipedia](https://en.wikipedia.org/wiki/Blackjack)
 
 ### Breakthrough
 
