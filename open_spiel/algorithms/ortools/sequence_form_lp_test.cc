@@ -13,6 +13,8 @@
 // limitations under the License.
 
 #include "open_spiel/algorithms/ortools/sequence_form_lp.h"
+#include "open_spiel/algorithms/tabular_exploitability.h"
+#include "open_spiel/game_transforms/turn_based_simultaneous_game.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
@@ -20,13 +22,18 @@ namespace algorithms {
 namespace ortools {
 namespace {
 
-constexpr double kErrorTolerance = 1e-8;
+constexpr double kErrorTolerance = 1e-16;
 
-void TestCheckGameValue(const std::string& game_name,
-                        double expected_game_value) {
-  const std::shared_ptr<const Game> game = LoadGame(game_name);
+void TestGameValueAndExploitability(const std::string& game_name,
+                                    double expected_game_value) {
+  std::shared_ptr<const Game> game = LoadGame(game_name);
   ZeroSumSequentialGameSolution solution = SolveZeroSumSequentialGame(*game);
   SPIEL_CHECK_FLOAT_NEAR(solution.game_value, expected_game_value,
+                         kErrorTolerance);
+
+  if (game->GetType().dynamics == GameType::Dynamics::kSimultaneous)
+    return;
+  SPIEL_CHECK_FLOAT_NEAR(Exploitability(*game, solution.policy), 0,
                          kErrorTolerance);
 }
 
@@ -38,8 +45,8 @@ void TestCheckGameValue(const std::string& game_name,
 namespace algorithms = open_spiel::algorithms;
 
 int main(int argc, char **argv) {
-  algorithms::ortools::TestCheckGameValue("matrix_mp", 0.);
-  algorithms::ortools::TestCheckGameValue("kuhn_poker", -1/18.);
-  algorithms::ortools::TestCheckGameValue(
+  algorithms::ortools::TestGameValueAndExploitability("matrix_mp", 0.);
+  algorithms::ortools::TestGameValueAndExploitability("kuhn_poker", -1 / 18.);
+  algorithms::ortools::TestGameValueAndExploitability(
       "goofspiel(players=2,num_cards=3,imp_info=True)", 0.);
 }
