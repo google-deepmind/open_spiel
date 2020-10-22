@@ -101,6 +101,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   algorithms/expected_game_score_test.py
   algorithms/exploitability_descent_test.py
   algorithms/exploitability_test.py
+  algorithms/external_sampling_mccfr_test.py
   algorithms/fictitious_play_test.py
   algorithms/gambit_test.py
   algorithms/generate_playthrough_test.py
