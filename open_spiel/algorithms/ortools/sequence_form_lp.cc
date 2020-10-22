@@ -36,14 +36,14 @@ using SolverTree = InfostateTree<SolverNode>;
 
 class SolverNode : public InfostateNode</*Self=*/SolverNode> {
  public:
-  // Variable needed for solving the LP. We will create these variables later.
+  // Variables needed for solving the LP. We will create these later.
   // Doing this in the constructor would require dependecy injection of the
   // solver through the tree, which is unnecessarily complicated.
   // The pointers may become obsolete by design: they should be accessed only
-  // by the solver.
+  // during the computation of the solution.
   operations_research::MPVariable* var_cf_value_ = nullptr;
   operations_research::MPVariable* var_reach_prob_ = nullptr;
-  // Store the solver solution for use once the solver goes out of scope.
+  // Store the solver solutions for use once the solver goes out of scope.
   double sol_cf_value_;
   double sol_reach_prob_;
 
@@ -70,7 +70,6 @@ class SolverNode : public InfostateNode</*Self=*/SolverNode> {
       }
     }
   }
-
   absl::Span<const Action> TerminalHistory() const {
     SPIEL_DCHECK_EQ(type_, kTerminalInfostateNode);
     return absl::MakeSpan(terminal_history_);
@@ -115,7 +114,6 @@ BijectiveContainer<const Node*> ConnectTerminals(
   }
   return out;
 }
-
 
 void SpecifyReachProbs(opres::MPSolver* solver, SolverNode* node) {
   node->var_reach_prob_ = solver->MakeNumVar(
@@ -211,6 +209,7 @@ void CollectCfValuesSolutions(SolverNode* node) {
   }
 }
 
+// Useful for debugging.
 void PrintProblemSpecification(const opres::MPSolver& solver) {
   const std::vector<opres::MPVariable*>& variables = solver.variables();
   const std::vector<opres::MPConstraint*>& constraints = solver.constraints();
@@ -286,6 +285,7 @@ void SolveForPlayer(
       solver_trees[1 - pl]->MutableRoot()->var_cf_value_, 1);
   objective->SetMaximization();
 
+  // Keeping this around for debugging.
 //  PrintProblemSpecification(solver);
   opres::MPSolver::ResultStatus status = solver.Solve();
   SPIEL_CHECK_EQ(status, opres::MPSolver::ResultStatus::OPTIMAL);
@@ -330,7 +330,6 @@ ZeroSumSequentialGameSolution SolveZeroSumSequentialGame(
     std::optional<int> solve_only_player,
     bool collect_tabular_policy,
     bool collect_root_cfvs) {
-
 
   // 1. Construct infoset trees for the game.
   std::array<std::unique_ptr<SolverTree>, 2> solver_trees;

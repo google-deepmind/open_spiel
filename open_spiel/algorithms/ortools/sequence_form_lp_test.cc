@@ -22,7 +22,8 @@ namespace {
 
 constexpr double kErrorTolerance = 1e-8;
 
-void TestCheckGameValue(const std::string& game_name, double expected_game_value) {
+void TestCheckGameValue(const std::string& game_name,
+                        double expected_game_value) {
   const std::shared_ptr<const Game> game = LoadGame(game_name);
   ZeroSumSequentialGameSolution solution = SolveZeroSumSequentialGame(*game);
   SPIEL_CHECK_FLOAT_NEAR(solution.game_value, expected_game_value,
