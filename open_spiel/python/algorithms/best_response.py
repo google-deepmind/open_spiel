@@ -79,7 +79,8 @@ def compute_states_and_info_states_if_none(game,
 class BestResponsePolicy(openspiel_policy.Policy):
   """Computes the best response to a specified strategy."""
 
-  def __init__(self, game, player_id, policy, root_state=None):
+  def __init__(self, game, player_id, policy, root_state=None,
+               cut_threshold=0.0):
     """Initializes the best-response calculation.
 
     Args:
@@ -88,6 +89,8 @@ class BestResponsePolicy(openspiel_policy.Policy):
       policy: A `policy.Policy` object.
       root_state: The state of the game at which to start analysis. If `None`,
         the game root state is used.
+      cut_threshold: The probability to cut when calculating the value.
+        Increasing this value will trade off accuracy for speed.
     """
     self._num_players = game.num_players()
     self._player_id = player_id
@@ -96,6 +99,8 @@ class BestResponsePolicy(openspiel_policy.Policy):
       root_state = game.new_initial_state()
     self._root_state = root_state
     self.infosets = self.info_sets(root_state)
+
+    self._cut_threshold = cut_threshold
 
   def info_sets(self, state):
     """Returns a dict of infostatekey to list of (state, cf_probability)."""
@@ -114,7 +119,7 @@ class BestResponsePolicy(openspiel_policy.Policy):
           yield (state, p_state * p_action)
 
   def transitions(self, state):
-    """Returns a list of (action, cf_prob) pairs from the specifed state."""
+    """Returns a list of (action, cf_prob) pairs from the specified state."""
     if state.current_player() == self._player_id:
       # Counterfactual reach probabilities exclude the best-responder's actions,
       # hence return probability 1.0 for every action.
@@ -134,7 +139,8 @@ class BestResponsePolicy(openspiel_policy.Policy):
           state.information_state_string(self._player_id))
       return self.q_value(state, action)
     else:
-      return sum(p * self.q_value(state, a) for a, p in self.transitions(state))
+      return sum(p * self.q_value(state, a) for a, p in self.transitions(state)
+                 if p > self._cut_threshold)
 
   def q_value(self, state, action):
     """Returns the value of the (state, action) to the best-responder."""
@@ -181,7 +187,8 @@ class CPPBestResponsePolicy(openspiel_policy.Policy):
                policy,
                all_states=None,
                state_to_information_state=None,
-               best_response_processor=None):
+               best_response_processor=None,
+               cut_threshold=0.0):
     """Constructor.
 
     Args:
@@ -197,6 +204,8 @@ class CPPBestResponsePolicy(openspiel_policy.Policy):
         performance.
       best_response_processor: A TabularBestResponse object, used for processing
         the best response actions.
+      cut_threshold: The probability to cut when calculating the value.
+        Increasing this value will trade off accuracy for speed.
     """
     (self.all_states, self.state_to_information_state) = (
         compute_states_and_info_states_if_none(
@@ -218,6 +227,51 @@ class CPPBestResponsePolicy(openspiel_policy.Policy):
     self.best_responder_id = best_responder_id
     self.tabular_best_response_map = (
         best_response_processor.get_best_response_actions())
+
+    self._cut_threshold = cut_threshold
+
+  def decision_nodes(self, parent_state):
+    """Yields a (state, cf_prob) pair for each descendant decision node."""
+    if not parent_state.is_terminal():
+      if parent_state.current_player() == self.best_responder_id:
+        yield (parent_state, 1.0)
+      for action, p_action in self.transitions(parent_state):
+        for state, p_state in self.decision_nodes(parent_state.child(action)):
+          yield (state, p_state * p_action)
+
+  def transitions(self, state):
+    """Returns a list of (action, cf_prob) pairs from the specified state."""
+    if state.current_player() == self.best_responder_id:
+      # Counterfactual reach probabilities exclude the best-responder's actions,
+      # hence return probability 1.0 for every action.
+      return [(action, 1.0) for action in state.legal_actions()]
+    elif state.is_chance_node():
+      return state.chance_outcomes()
+    else:
+      return list(self._policy.action_probabilities(state).items())
+
+  @_memoize_method
+  def value(self, state):
+    """Returns the value of the specified state to the best-responder."""
+    if state.is_terminal():
+      return state.player_return(self.best_responder_id)
+    elif state.current_player() == self.best_responder_id:
+      action = self.best_response_action(
+          state.information_state_string(self.best_responder_id))
+      return self.q_value(state, action)
+    else:
+      return sum(p * self.q_value(state, a) for a, p in self.transitions(state)
+                 if p > self._cut_threshold)
+
+  def q_value(self, state, action):
+    """Returns the value of the (state, action) to the best-responder."""
+    return self.value(state.child(action))
+
+  @_memoize_method
+  def best_response_action(self, infostate):
+    """Returns the best response for this information state."""
+    action = self.tabular_best_response_map[infostate]
+    return action
 
   def action_probabilities(self, state, player_id=None):
     """Returns the policy for a player in a state.

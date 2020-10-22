@@ -71,8 +71,6 @@ class TreeWalkCalculator(object):
   """
 
   def __init__(self, game):
-    if game.num_players() != 2:
-      raise ValueError("Only supports 2-player games.")
     if not game.get_type().provides_information_state_string:
       raise ValueError("Only game which provide the information_state_string "
                        "are supported, as this is being used in the key to "
@@ -124,11 +122,10 @@ class TreeWalkCalculator(object):
       key = (current_player, state.information_state_string())
       reach_prob = np.prod(reach_probabilities)
 
-      # For a more general approach, for multi players, we could use:
-      # counterfactual_reach_prob = (
-      #     np.prod(reach_probabilities[:current_player]) *
-      #     np.prod(reach_probabilities[current_player + 1:]))
-      opponent_probability = reach_probabilities[1 - current_player]
+      # We exclude both the current and the chance players.
+      opponent_probability = (
+          np.prod(reach_probabilities[:current_player]) *
+          np.prod(reach_probabilities[current_player + 1:-1]))
       self.info_state_cf_prob[key] += (
           reach_probabilities[-1] * opponent_probability)
       self.info_state_prob[key] += reach_prob
@@ -154,8 +151,8 @@ class TreeWalkCalculator(object):
       if not is_chance:
         self.weighted_action_values[key][action] += child_value * reach_prob
         self.info_state_cf_prob_by_q_sum[key][action] += (
-            child_value[current_player] *
-            reach_probabilities[1 - current_player] * reach_probabilities[-1])
+            child_value[current_player] * opponent_probability *
+            reach_probabilities[-1])
       value += child_value * prob
     return value
 
@@ -176,7 +173,7 @@ class TreeWalkCalculator(object):
 
     # Compute action values
     self.weighted_action_values = collections.defaultdict(
-        lambda: collections.defaultdict(lambda: np.zeros(2)))
+        lambda: collections.defaultdict(lambda: np.zeros(self._num_players)))
     self.info_state_prob = collections.defaultdict(float)
     self.info_state_player_prob = collections.defaultdict(float)
     self.info_state_cf_prob = collections.defaultdict(float)
@@ -230,10 +227,11 @@ class TreeWalkCalculator(object):
 
     Args:
       tabular_policy: A `policy.TabularPolicy` object, used to get the ordering
-        of the states i nthe tabular numpy array.
+        of the states in the tabular numpy array.
     """
-    keys = ([(0, s) for s in tabular_policy.states_per_player[0]] +
-            [(1, s) for s in tabular_policy.states_per_player[1]])
+    keys = []
+    for player_id, player_states in enumerate(tabular_policy.states_per_player):
+      keys += [(player_id, s) for s in player_states]
     return self._get_tabular_statistics(keys)
 
   def __call__(self, policies, tabular_policy):
@@ -254,3 +252,65 @@ class TreeWalkCalculator(object):
     """
     self.compute_all_states_action_values(policies)
     return self.get_tabular_statistics(tabular_policy)
+
+  def get_root_node_values(self, policies):
+    """Gets root values only.
+
+    This speeds up calculation in two ways:
+
+    1. It only searches nodes with positive probability.
+    2. It does not populate a large dictionary of meta information.
+
+    Args:
+      policies: List of `policy.Policy` objects, one per player.
+
+    Returns:
+      A numpy array of shape [num_players] of the root value.
+    """
+    return self._get_action_values_only(
+        self._game.new_initial_state(),
+        policies,
+        reach_probabilities=np.ones(self._num_players + 1))
+
+  def _get_action_values_only(self, state, policies, reach_probabilities):
+    """Computes the value of the state given the policies for both players.
+
+    Args:
+      state: The state to start analysis from.
+      policies: List of `policy.Policy` objects, one per player.
+      reach_probabilities: A numpy array of shape `[num_players + 1]`.
+        reach_probabilities[i] is the product of the player i action
+        probabilities along the current trajectory. Note that
+        reach_probabilities[-1] corresponds to the chance player. Initially, it
+        should be called with np.ones(self._num_players + 1) at the root node.
+
+    Returns:
+      A numpy array of shape [num_players] of the root value.
+    """
+    if state.is_terminal():
+      return np.array(state.returns())
+
+    current_player = state.current_player()
+    is_chance = state.is_chance_node()
+
+    value = np.zeros(len(policies))
+    if is_chance:
+      action_to_prob = dict(state.chance_outcomes())
+    else:
+      action_to_prob = policies[current_player].action_probabilities(state)
+
+    for action in state.legal_actions():
+      prob = action_to_prob.get(action, 0)
+
+      # Do not follow tree down if there is zero probability.
+      if prob == 0.0:
+        continue
+
+      new_reach_probabilities = reach_probabilities.copy()
+      new_reach_probabilities[current_player] *= prob
+
+      child = state.child(action)
+      child_value = self._get_action_values_only(
+          child, policies, reach_probabilities=new_reach_probabilities)
+      value += child_value * prob
+    return value

@@ -25,7 +25,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#include "open_spiel/games/hearts/xinxin_bot.h"
+#include "open_spiel/bots/xinxin/xinxin_bot.h"
 
 #include <iostream>
 #include <limits>
@@ -33,7 +33,7 @@
 #include "open_spiel/abseil-cpp/absl/random/distributions.h"
 #include "open_spiel/abseil-cpp/absl/time/clock.h"
 #include "open_spiel/abseil-cpp/absl/time/time.h"
-#include "open_spiel/games/hearts/hearts/Hearts.h"
+#include "open_spiel/bots/xinxin/hearts/Hearts.h"
 #include "open_spiel/algorithms/evaluate_bots.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_bots.h"

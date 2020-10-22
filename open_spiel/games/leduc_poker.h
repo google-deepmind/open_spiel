@@ -201,6 +201,7 @@ class LeducGame : public Game {
     return suit_isomorphism_ ? total_cards_ / 2 : total_cards_;
   }
 
+  std::string ActionToString(Player player, Action action) const override;
   // New Observation API
   std::shared_ptr<Observer> MakeObserver(
       absl::optional<IIGObservationType> iig_obs_type,

@@ -145,6 +145,7 @@ class GoofspielObserver : public Observer {
       StringPointCardSequence(state, &result);
       StringWinSequence(state, &result);
       StringPoints(game, state, &result);
+      StringIsTerminal(state, &result);
       return result;
     }
     if (imp_info && priv_one && !perf_rec) {  // Observation
@@ -307,6 +308,10 @@ class GoofspielObserver : public Observer {
       absl::StrAppend(result, state.points_[p], " ");
     }
     absl::StrAppend(result, "\n");
+  }
+  void StringIsTerminal(const GoofspielState& state,
+                        std::string* result) const {
+    absl::StrAppend(result, "Terminal?: ", state.IsTerminal(), "\n");
   }
 
   IIGObservationType iig_obs_type_;

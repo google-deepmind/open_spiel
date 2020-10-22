@@ -174,6 +174,47 @@ void HUNLIncrementalTest() {
   CheckDistHasSameInfostate(*incremental_dist, *state, /*player_id=*/0);
 }
 
+void LeducRegressionTest() {
+  std::shared_ptr<const Game> game = LoadGame("leduc_poker");
+  std::unique_ptr<State> state = game->NewInitialState();
+  UniformPolicy opponent_policy;
+  const int player_id = 1;
+  std::unique_ptr<HistoryDistribution> dist;
+  for (const Action action : {0, 5, 1, 2, 1, 4}) {
+    if (state->CurrentPlayer() == player_id) {
+      dist = UpdateIncrementalStateDistribution(*state, &opponent_policy,
+                                                player_id, std::move(dist));
+      algorithms::CheckBeliefs(*state, *dist, player_id);
+    }
+    state->ApplyAction(action);
+  }
+  dist = UpdateIncrementalStateDistribution(*state, &opponent_policy,
+                                              player_id, std::move(dist));
+  algorithms::CheckBeliefs(*state, *dist, player_id);
+}
+
+void LeducRegressionTestPerPlayer(int player_id) {
+  std::shared_ptr<const Game> game = LoadGame("leduc_poker");
+  std::unique_ptr<State> state = game->NewInitialState();
+  UniformPolicy opponent_policy;
+  std::unique_ptr<HistoryDistribution> dist;
+
+  // The first two actions are chance actions, then both players call. This was
+  // found to cause CheckBeliefs to fail previously, so we add a test verifying
+  // that doesn't happen.
+  for (const Action action : {4, 0, 2, 2}) {
+    if (state->CurrentPlayer() == player_id) {
+      dist = UpdateIncrementalStateDistribution(*state, &opponent_policy,
+                                                player_id, std::move(dist));
+      algorithms::CheckBeliefs(*state, *dist, player_id);
+    }
+    state->ApplyAction(action);
+  }
+  dist = UpdateIncrementalStateDistribution(*state, &opponent_policy, player_id,
+                                            std::move(dist));
+  algorithms::CheckBeliefs(*state, *dist, player_id);
+}
+
 void HunlRegressionTest() {
   // universal_poker requires ACPC, which is an optional dependency.
   // Skip this test if the game is not registered.
@@ -188,6 +229,23 @@ void HunlRegressionTest() {
   algorithms::CheckBeliefs(*state, *dist, state->CurrentPlayer());
 }
 
+void GoofspielDistributionTest() {
+  std::shared_ptr<const Game> game =
+      LoadGame(TurnBasedGoofspielGameString(/*num_cards=*/4));
+  std::unique_ptr<State> state = game->NewInitialState();
+  std::unique_ptr<HistoryDistribution> dist;
+  UniformPolicy opponent_policy;
+  for (const Action action : {3, 3, 2, 1, 1}) {
+    dist = UpdateIncrementalStateDistribution(*state, &opponent_policy,
+                                              /*player_id=*/0, std::move(dist));
+    algorithms::CheckBeliefs(*state, *dist, state->CurrentPlayer());
+    state->ApplyAction(action);
+  }
+  dist = UpdateIncrementalStateDistribution(*state, &opponent_policy,
+                                            /*player_id=*/0, std::move(dist));
+  algorithms::CheckBeliefs(*state, *dist, /*player_id=*/0);
+}
+
 
 }  // namespace
 }  // namespace algorithms
@@ -200,5 +258,9 @@ int main(int argc, char** argv) {
   algorithms::LeducStateDistributionTest();
   algorithms::HUNLIncrementalTest();
   algorithms::HunlRegressionTest();
+  algorithms::GoofspielDistributionTest();
+  algorithms::LeducRegressionTest();
+  algorithms::LeducRegressionTestPerPlayer(/*player_id=*/0);
+  algorithms::LeducRegressionTestPerPlayer(/*player_id=*/1);
 
 }

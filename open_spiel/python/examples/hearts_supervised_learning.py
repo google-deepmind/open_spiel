@@ -16,7 +16,7 @@
 """Train a policy net on Hearts actions based given a dataset of trajectories.
 
 Trajectories from the Hearts bot Xinxin can be generated using
-open_spiel/games/hearts/xinxin_game_generator.cc.
+open_spiel/bots/xinxin/xinxin_game_generator.cc.
 """
 
 import os

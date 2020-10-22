@@ -12,23 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "open_spiel/games/hearts/xinxin_bot.h"
-#include "open_spiel/spiel_bots.h"
-#include "pybind11/include/pybind11/functional.h"
-#include "pybind11/include/pybind11/numpy.h"
-#include "pybind11/include/pybind11/operators.h"
+#ifndef OPEN_SPIEL_BOTS_XINXIN_XINXIN_PYBIND11_H_
+#define OPEN_SPIEL_BOTS_XINXIN_XINXIN_PYBIND11_H_
+
 #include "pybind11/include/pybind11/pybind11.h"
-#include "pybind11/include/pybind11/stl.h"
 
 namespace open_spiel {
-
-namespace py = ::pybind11;
-
-void init_pyspiel_xinxin(::pybind11::module& m) {
-  m.def("make_xinxin_bot", open_spiel::hearts::MakeXinxinBot, py::arg("params"),
-        py::arg("uct_num_runs") = 50, py::arg("uct_c_val") = 0.4,
-        py::arg("iimc_num_worlds") = 20, py::arg("use_threads") = true,
-        "Make the XinXin bot.");
-}
-
+void init_pyspiel_xinxin(::pybind11::module& m);
 }  // namespace open_spiel
+
+#endif  // OPEN_SPIEL_BOTS_XINXIN_XINXIN_PYBIND11_H_

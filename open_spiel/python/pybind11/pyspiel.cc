@@ -53,7 +53,7 @@
 #include "open_spiel/public_states/pybind11/public_states.h"
 #endif
 #if BUILD_WITH_XINXIN
-#include "open_spiel/games/hearts/xinxin_pybind11.h"
+#include "open_spiel/bots/xinxin/xinxin_pybind11.h"
 #endif
 
 // This file contains OpenSpiel's Python API. The best place to see an overview
@@ -366,17 +366,19 @@ PYBIND11_MODULE(pyspiel, m) {
 
   py::class_<NormalFormGame, std::shared_ptr<NormalFormGame>> normal_form_game(
       m, "NormalFormGame", game);
-  normal_form_game.def(py::pickle(                      // Pickle support
-      [](std::shared_ptr<const NormalFormGame> game) {  // __getstate__
-        return game->ToString();
-      },
-      [](const std::string& data) {  // __setstate__
-        // Have to remove the const here for this to compile, presumably
-        // because the holder type is non-const. But seems like you can't
-        // set the holder type to std::shared_ptr<const Game> either.
-        return std::const_pointer_cast<NormalFormGame>(
-            std::static_pointer_cast<const NormalFormGame>(LoadGame(data)));
-      }));
+  normal_form_game.def("get_utilities", &NormalFormGame::GetUtilities)
+      .def("get_utility", &NormalFormGame::GetUtility)
+      .def(py::pickle(                      // Pickle support
+          [](std::shared_ptr<const NormalFormGame> game) {  // __getstate__
+            return game->ToString();
+          },
+          [](const std::string& data) {  // __setstate__
+            // Have to remove the const here for this to compile, presumably
+            // because the holder type is non-const. But seems like you can't
+            // set the holder type to std::shared_ptr<const Game> either.
+            return std::const_pointer_cast<NormalFormGame>(
+                std::static_pointer_cast<const NormalFormGame>(LoadGame(data)));
+          }));
 
   py::class_<MatrixGame, std::shared_ptr<MatrixGame>> matrix_game(
       m, "MatrixGame", normal_form_game);

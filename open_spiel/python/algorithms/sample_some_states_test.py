@@ -23,46 +23,29 @@ import pyspiel
 class SampleSomeStatesTest(absltest.TestCase):
 
   def test_sampling_in_simple_games(self):
-    # The tests that have explicit time limit
-    # can fail with very small probability.
-
-    matrix_mp_num_states = 1+2+4
+    matrix_mp_num_states = 1 + 2 + 4
     game = pyspiel.load_game_as_turn_based("matrix_mp")
-    for n in range(1, matrix_mp_num_states+1):
+    for n in range(1, matrix_mp_num_states + 1):
       states = sample_some_states.sample_some_states(game, max_states=n)
       self.assertLen(states, n)
 
-    states = sample_some_states.sample_some_states(
-        game, max_states=1, depth_limit=0)
+    states = sample_some_states.sample_some_states(game, max_states=1)
     self.assertLen(states, 1)
 
     states = sample_some_states.sample_some_states(
-        game, max_states=matrix_mp_num_states+1, time_limit=0.1)
+        game, max_states=matrix_mp_num_states + 1)
     self.assertLen(states, matrix_mp_num_states)
 
-    states = sample_some_states.sample_some_states(
-        game, include_terminals=False,
-        time_limit=0.1, max_states=matrix_mp_num_states)
-    self.assertLen(states, 3)
-
-    states = sample_some_states.sample_some_states(
-        game, depth_limit=1, time_limit=0.1, max_states=matrix_mp_num_states)
-    self.assertLen(states, 3)
-
-    coordinated_mp_num_states = 1+2+4+8
+    coordinated_mp_num_states = 1 + 2 + 4 + 8
     game = pyspiel.load_game_as_turn_based("coordinated_mp")
-    for n in range(1, coordinated_mp_num_states+1):
+    for n in range(1, coordinated_mp_num_states + 1):
       states = sample_some_states.sample_some_states(game, max_states=n)
       self.assertLen(states, n)
 
     states = sample_some_states.sample_some_states(
-        game, max_states=coordinated_mp_num_states+1, time_limit=0.1)
+        game, max_states=coordinated_mp_num_states + 1)
     self.assertLen(states, coordinated_mp_num_states)
 
-    states = sample_some_states.sample_some_states(
-        game, max_states=coordinated_mp_num_states,
-        include_chance_states=False, time_limit=0.1)
-    self.assertLen(states, coordinated_mp_num_states-2)
 
 if __name__ == "__main__":
   absltest.main()

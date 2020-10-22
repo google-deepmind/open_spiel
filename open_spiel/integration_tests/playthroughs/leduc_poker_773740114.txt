@@ -196,7 +196,7 @@ action: 2
 # Pot: 4
 # Money (p1 p2 ...): 97 99
 # Cards (public p1 p2 ...): -10000 0 3
-# Round 1 sequence: 2
+# Round 1 sequence: Raise
 # Round 2 sequence:
 IsTerminal() = False
 History() = [0, 3, 2]
@@ -249,7 +249,7 @@ action: 0
 # Pot: 0
 # Money (p1 p2 ...): 101 99
 # Cards (public p1 p2 ...): -10000 0 3
-# Round 1 sequence: 2 0
+# Round 1 sequence: Raise, Fold
 # Round 2 sequence:
 IsTerminal() = True
 History() = [0, 3, 2, 0]

@@ -35,8 +35,6 @@ matrix:
   - os: osx
     osx_image: xcode10.3  # macOS 10.14 (Mojave), release on March 25, 2019.
     env:
-      # Unfortunately, the build fails on MacOs for universal poker.
-      - BUILD_WITH_ACPC="OFF"
       - DEFAULT_OPTIONAL_DEPENDENCY="ON"
 
   ## Tests using PIP

@@ -5,9 +5,12 @@ we verified against known values and/or reproduced results from papers.
 
 <font color="orange"><b>~</b></font>: implemented but lightly tested.
 
+<font color="red"<b>X</b></font>: known issues (see code for details).
+
 Status                                       | Game
 -------------------------------------------- | ----
 ![](_static/green_circ10.png "green circle") | [Backgammon](#backgammon)
+<font color="orange"><b>~</b></font>         | [Battleship](#battleship)
 ![](_static/green_circ10.png "green circle") | [Breakthrough](#breakthrough)
 ![](_static/green_circ10.png "green circle") | [Bridge](#bridge)
 ![](_static/green_circ10.png "green circle") | [(Uncontested) Bridge bidding](#uncontested-bridge-bidding)
@@ -31,18 +34,19 @@ Status                                       | Game
 <font color="orange"><b>~</b></font>         | [Laser Tag](#laser-tag)
 ![](_static/green_circ10.png "green circle") | [Leduc poker](#leduc-poker)
 <font color="orange"><b>~</b></font>         | [Lewis Signaling](#lewis-signaling)
-![](_static/green_circ10.png "green circle") | [Liar's Dice](#liar's-dice)
+![](_static/green_circ10.png "green circle") | [Liar's Dice](#liars-dice)
 <font color="orange"><b>~</b></font>         | [Markov Soccer](#markov-soccer)
 ![](_static/green_circ10.png "green circle") | [Matching Pennies (Three-player)](#matching-pennies-three-player)
 ![](_static/green_circ10.png "green circle") | [Negotiation](#negotiation)
+<font color="red"><b>X</b></font>            | [Oh Hell](#oh-hell)
 ![](_static/green_circ10.png "green circle") | [Oshi-Zumo](#oshi-zumo)
 ![](_static/green_circ10.png "green circle") | [Oware](#oware)
 ![](_static/green_circ10.png "green circle") | [Pentago](#pentago)
 <font color="orange"><b>~</b></font>         | [Phantom Tic-Tac-Toe](#phantom-tic-tac-toe)
 ![](_static/green_circ10.png "green circle") | [Pig](#pig)
-<font color="orange"><b>~</b></font>         | [Poker (Hold 'em)](#poker-hold-'em)
+<font color="orange"><b>~</b></font>         | [Poker (Hold 'em)](#poker-hold-em)
 ![](_static/green_circ10.png "green circle") | [Quoridor](#quoridor)
-<font color="orange"><b>~</b></font>         | [Slovenian Tarok](#tarok)
+<font color="orange"><b>~</b></font>         | [Slovenian Tarok](#slovenian-tarok)
 <font color="orange"><b>~</b></font>         | [Skat (simplified bidding)](#skat-simplified-bidding)
 <font color="orange"><b>~</b></font>         | [Solitaire (K+)](#solitaire-k)
 ![](_static/green_circ10.png "green circle") | [Tic-Tac-Toe](#tic-tac-toe)
@@ -62,6 +66,21 @@ Status                                       | Game
 *   Perfect information.
 *   2 players.
 *   [Wikipedia](https://en.wikipedia.org/wiki/Backgammon)
+
+### Battleship
+
+*   Players place ships and shoot at each other in turns.
+*   Pieces on a board.
+*   Traditional game.
+*   Deterministic.
+*   Imperfect information.
+*   2 players.
+*   Good for correlated equilibria.
+*   [Farina et al. '19, Correlation in Extensive-Form Games: Saddle-Point
+    Formulation and
+    Benchmarks](https://papers.nips.cc/paper/9122-correlation-in-extensive-form-games-saddle-point-formulation-and-benchmarks.pdf).
+    Based on the original game
+    [(wikipedia)](https://en.wikipedia.org/wiki/Battleship_\(game\))
 
 ### Breakthrough
 
@@ -356,6 +375,16 @@ Status                                       | Game
 *   2 players.
 *   [Lewis et al. '17](https://arxiv.org/abs/1706.05125),
     [Cao et al. '18](https://arxiv.org/abs/1804.03980)
+
+### Oh Hell
+
+*   A card game where players try to win exactly a declared number of tricks. 
+*   Card game.
+*   Traditional game.
+*   Non-deterministic.
+*   Imperfect information.
+*   3-7 players.
+*   [Wikipedia](https://en.wikipedia.org/wiki/Oh_Hell)
 
 ### Oshi-Zumo
 

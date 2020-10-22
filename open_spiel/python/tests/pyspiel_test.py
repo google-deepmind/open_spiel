@@ -28,6 +28,7 @@ import pyspiel
 # Specify game names in alphabetical order, to make the test easier to read.
 EXPECTED_GAMES = set([
     "backgammon",
+    "battleship",
     "blotto",
     "breakthrough",
     "bridge",
@@ -70,6 +71,7 @@ EXPECTED_GAMES = set([
     "negotiation",
     "nfg_game",
     "normal_form_extensive_game",
+    "oh_hell",
     "oshi_zumo",
     "othello",
     "oware",
@@ -81,6 +83,7 @@ EXPECTED_GAMES = set([
     "skat",
     "start_at",
     "solitaire",
+    "stones_and_gems",
     "tarok",
     "tic_tac_toe",
     "tiny_bridge_2p",

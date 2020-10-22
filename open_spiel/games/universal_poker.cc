@@ -211,10 +211,7 @@ std::string UniversalPokerState::ActionToString(Player player,
     move_str = "Call";
   } else if (betting_abstraction_ == BettingAbstraction::kFULLGAME) {
     SPIEL_CHECK_GE(move, 2);
-    const int big_blind =
-        static_cast<const UniversalPokerGame *>(GetGame().get())->big_blind();
-    const int raise_size = (move - 1) * big_blind;
-    move_str = absl::StrCat("Bet", raise_size);
+    move_str = absl::StrCat("Bet", move);
   } else if (static_cast<ActionType>(move) == ActionType::kBet) {
     SPIEL_CHECK_EQ(betting_abstraction_, BettingAbstraction::kFCPA);
     move_str = "Bet";
@@ -386,21 +383,24 @@ std::string UniversalPokerState::InformationStateString(Player player) const {
   SPIEL_CHECK_LT(player, acpc_game_->GetNbPlayers());
   const uint32_t pot = acpc_state_.MaxSpend() *
                        (acpc_game_->GetNbPlayers() - acpc_state_.NumFolded());
-  std::vector<int> money;
+  std::string money;
+  money.reserve(acpc_game_->GetNbPlayers() * 2);
   for (auto p = Player{0}; p < acpc_game_->GetNbPlayers(); p++) {
-    money.emplace_back(acpc_state_.Money(p));
+    if (p != Player{0}) absl::StrAppend(&money, " ");
+    absl::StrAppend(&money, acpc_state_.Money(p));
   }
-  std::vector<std::string> sequences;
+  std::string sequences;
+  sequences.reserve(acpc_state_.GetRound() * 2);
   for (auto r = 0; r <= acpc_state_.GetRound(); r++) {
-    sequences.emplace_back(acpc_state_.BettingSequence(r));
+    if (r != 0) absl::StrAppend(&sequences, "|");
+    absl::StrAppend(&sequences, acpc_state_.BettingSequence(r));
   }
 
   return absl::StrFormat(
       "[Round %i][Player: %i][Pot: %i][Money: %s][Private: %s][Public: "
       "%s][Sequences: %s]",
-      acpc_state_.GetRound(), CurrentPlayer(), pot, absl::StrJoin(money, " "),
-      HoleCards(player).ToString(), BoardCards().ToString(),
-      absl::StrJoin(sequences, "|"));
+      acpc_state_.GetRound(), CurrentPlayer(), pot, money,
+      HoleCards(player).ToString(), BoardCards().ToString(), sequences);
 }
 
 std::string UniversalPokerState::ObservationString(Player player) const {
@@ -481,15 +481,11 @@ std::vector<Action> UniversalPokerState::LegalActions() const {
     }
     int32_t min_bet_size = 0;
     int32_t max_bet_size = 0;
-    bool valid_to_raise =
-        acpc_state_.RaiseIsValid(&min_bet_size, &max_bet_size);
-    if (valid_to_raise) {
-      const int big_blind =
-          static_cast<const UniversalPokerGame *>(GetGame().get())->big_blind();
-      SPIEL_CHECK_EQ(min_bet_size % big_blind, 0);
-      for (int i = min_bet_size; i <= max_bet_size; i += big_blind) {
-        legal_actions.push_back(1 + i / big_blind);
-      }
+    if (acpc_state_.RaiseIsValid(&min_bet_size, &max_bet_size)) {
+      const int original_size = legal_actions.size();
+      legal_actions.resize(original_size + max_bet_size - min_bet_size + 1);
+      std::iota(legal_actions.begin() + original_size, legal_actions.end(),
+                min_bet_size);
     }
   }
   return legal_actions;
@@ -553,9 +549,7 @@ void UniversalPokerState::DoApplyAction(Action action_id) {
           State::ActionToString(action_id)));
     }
     if (action_int >= 2 && action_int <= NumDistinctActions()) {
-      const int big_blind =
-          static_cast<const UniversalPokerGame *>(GetGame().get())->big_blind();
-      ApplyChoiceAction(ACTION_BET, (action_int - 1) * big_blind);
+      ApplyChoiceAction(ACTION_BET, action_int);
       return;
     }
     SpielFatalError(absl::StrFormat("Action not recognized: %i", action_id));
@@ -660,23 +654,40 @@ std::vector<int> UniversalPokerGame::ObservationTensorShape() const {
   return {2 * (num_players + total_num_cards)};
 }
 
+double UniversalPokerGame::MaxCommitment() const {
+  int max_commit = 0;
+  if (acpc_game_.IsLimitGame()) {
+    // The most a player can put into the pot is the raise amounts on each round
+    // times the maximum number of raises, plus the original chips they put in
+    // to play, which has the big blind as an upper bound.
+    const auto &acpc_game = acpc_game_.Game();
+    max_commit = big_blind();
+    for (int i = 0; i < acpc_game_.NumRounds(); ++i) {
+      max_commit += acpc_game.maxRaises[i] * acpc_game.raiseSize[i];
+    }
+  } else {
+    // In No-Limit games, this isn't true, as there is no maximum raise value,
+    // so the limit is the number of chips that the player has.
+    max_commit = acpc_game_.StackSize(0);
+  }
+  return static_cast<double>(max_commit);
+}
+
 double UniversalPokerGame::MaxUtility() const {
   // In poker, the utility is defined as the money a player has at the end of
   // the game minus then money the player had before starting the game.
   // The most a player can win *per opponent* is the most each player can put
-  // into the pot, which is the raise amounts on each round times the maximum
-  // number raises, plus the original chip they put in to play.
-
-  return (double)acpc_game_.StackSize(0) * (acpc_game_.GetNbPlayers() - 1);
+  // into the pot,
+  // The maximum amount of money a player can win is the maximum bet any player
+  // can make, times the number of players (excluding the original player).
+  return MaxCommitment() * (acpc_game_.GetNbPlayers() - 1);
 }
 
 double UniversalPokerGame::MinUtility() const {
   // In poker, the utility is defined as the money a player has at the end of
-  // the game minus then money the player had before starting the game.
-  // The most any single player can lose is the maximum number of raises per
-  // round times the amounts of each of the raises, plus the original chip they
-  // put in to play.
-  return -1. * (double)acpc_game_.StackSize(0);
+  // the game minus then money the player had before starting the game. As such,
+  // the most a player can lose is the maximum amount they can bet.
+  return -1 * MaxCommitment();
 }
 
 int UniversalPokerGame::MaxChanceOutcomes() const {
@@ -687,8 +698,8 @@ int UniversalPokerGame::NumPlayers() const { return acpc_game_.GetNbPlayers(); }
 
 int UniversalPokerGame::NumDistinctActions() const {
   if (betting_abstraction_ == BettingAbstraction::kFULLGAME) {
-    // fold, check/call, bet/raise some multiple of BBs
-    return starting_stack_big_blinds_ + 2;
+    // 0 -> fold, 1 -> check/call, N -> bet size
+    return max_stack_size_ + 1;
   } else {
     return GetMaxBettingActions(acpc_game_);
   }
@@ -787,12 +798,24 @@ std::string UniversalPokerGame::parseParameters(const GameParameters &map) {
 
   std::vector<std::string> blinds =
       absl::StrSplit(ParameterValue<std::string>("blind"), ' ');
+  big_blind_ = 0;
+  for (const std::string &blind : blinds) {
+    big_blind_ = std::max(big_blind_, std::stoi(blind));
+  }
+  // By requiring a blind/ante of at least a single chip, we're able to
+  // structure the action space more intuitively in the kFULLGAME setting.
+  // Specifically, action 0 -> fold, 1 -> call, and N -> raise to N chips.
+  // While the ACPC server does not require it, in practice poker is always
+  // played with a blind or ante, so this is a minor restriction.
+  if (big_blind_ <= 0) {
+    SpielFatalError("Must have a blind of at least one chip.");
+  }
   std::vector<std::string> stacks =
       absl::StrSplit(ParameterValue<std::string>("stack"), ' ');
-  big_blind_ = std::max(std::stoi(blinds[0]), std::stoi(blinds[1]));
-  starting_stack_big_blinds_ =
-      std::stoi(stacks[0]);  // assumes all stack sizes are equal
-
+  max_stack_size_ = 0;
+  for (const std::string &stack : stacks) {
+    max_stack_size_ = std::max(max_stack_size_, std::stoi(stack));
+  }
   return generated_gamedef;
 }
 

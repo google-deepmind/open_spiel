@@ -45,8 +45,8 @@ if (BUILD_WITH_PUBLIC_STATES)
 endif()
 if (BUILD_WITH_XINXIN)
   set (PYTHON_BINDINGS ${PYTHON_BINDINGS}
-      ../games/hearts/xinxin_pybind11.h
-      ../games/hearts/xinxin_pybind11.cc
+      ../bots/xinxin/xinxin_pybind11.h
+      ../bots/xinxin/xinxin_pybind11.cc
       )
 endif()
 
@@ -74,7 +74,7 @@ if (BUILD_WITH_PUBLIC_STATES)
     ../integration_tests/public_states_api_test.py)
 endif()
 if (BUILD_WITH_XINXIN)
-  set(PYTHON_TESTS ${PYTHON_TESTS} ../games/hearts/xinxin_bot_test.py)
+  set(PYTHON_TESTS ${PYTHON_TESTS} ../bots/xinxin/xinxin_bot_test.py)
 endif()
 if (BUILD_WITH_GAMUT)
   set(PYTHON_TESTS ${PYTHON_TESTS} ../games/gamut/gamut_test.py)
@@ -120,8 +120,6 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   algorithms/projected_replicator_dynamics_test.py
   algorithms/psro_v2/best_response_oracle_test.py
   algorithms/psro_v2/strategy_selectors_test.py
-  algorithms/psro_variations/generalized_psro_test.py
-  algorithms/psro_variations/rectified_nash_response_test.py
   algorithms/random_agent_test.py
   algorithms/rcfr_test.py
   algorithms/sequence_form_lp_test.py

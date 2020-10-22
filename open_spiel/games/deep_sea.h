@@ -121,4 +121,4 @@ class DeepSeaGame : public Game {
 }  // namespace deep_sea
 }  // namespace open_spiel
 
-#endif  // OPEN_SPIEL_GAMES_CATCH_H_
+#endif  // OPEN_SPIEL_GAMES_DEEP_SEA_H_

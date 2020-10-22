@@ -54,11 +54,17 @@ export BUILD_WITH_ROSHAMBO=${BUILD_WITH_ROSHAMBO:-$DEFAULT_OPTIONAL_DEPENDENCY}
 # > as its Python counterpart.
 #
 # You can find an example usage in open_spiel/libtorch/torch_integration_test.cc
-export BUILD_WITH_LIBTORCH="${BUILD_WITH_LIBTORCH:-OFF}"
+export BUILD_WITH_LIBTORCH="${BUILD_WITH_LIBTORCH:-"OFF"}"
 
 # Turn off public states as it is Work-In-Progress.
-export BUILD_WITH_PUBLIC_STATES="${BUILD_WITH_PUBLIC_STATES:-OFF}"
+export BUILD_WITH_PUBLIC_STATES="${BUILD_WITH_PUBLIC_STATES:-"OFF"}"
 
 # Enable integration with GAMUT game generator (see games/gamut).
 # Requires java and GAMUT, so disabled by default.
-export BUILD_WITH_GAMUT="${BUILD_WITH_GAMUT:-OFF}"
+export BUILD_WITH_GAMUT="${BUILD_WITH_GAMUT:-"OFF"}"
+
+# Flag to enable building with OR-Tools to get C++ optimization routines.
+# Disabled by default as it requires installation of third party software.
+# See algorithms/ortools/CMakeLists.txt for specific instructions.
+export BUILD_WITH_ORTOOLS="${BUILD_WITH_ORTOOLS:-"OFF"}"
+

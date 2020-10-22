@@ -18,6 +18,8 @@
 from absl.testing import absltest
 from absl.testing import parameterized
 
+import numpy as np
+
 from open_spiel.python import policy
 from open_spiel.python.algorithms import best_response
 from open_spiel.python.algorithms import get_all_states
@@ -99,6 +101,23 @@ class BestResponseTest(parameterized.TestCase, absltest.TestCase):
             self.assertEqual(value, cpp_dict.get(key, 0.))
           for key, value in cpp_dict.items():
             self.assertEqual(value, py_dict.get(key, 0.))
+
+  @parameterized.parameters(("kuhn_poker", 2), ("kuhn_poker", 3))
+  def test_cpp_and_python_value_are_identical(self, game_name, num_players):
+    game = pyspiel.load_game(game_name,
+                             {"players": pyspiel.GameParameter(num_players)})
+    test_policy = policy.TabularPolicy(game)
+    root_state = game.new_initial_state()
+    for i_player in range(num_players):
+      best_resp_py_backend = best_response.BestResponsePolicy(
+          game, i_player, test_policy)
+      best_resp_cpp_backend = best_response.CPPBestResponsePolicy(
+          game, i_player, test_policy)
+
+      value_py_backend = best_resp_py_backend.value(root_state)
+      value_cpp_backend = best_resp_cpp_backend.value(root_state)
+
+      self.assertTrue(np.allclose(value_py_backend, value_cpp_backend))
 
 
 if __name__ == "__main__":

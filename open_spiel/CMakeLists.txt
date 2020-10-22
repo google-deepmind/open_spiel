@@ -116,6 +116,8 @@ openspiel_optional_dependency(BUILD_WITH_ROSHAMBO       OFF
   "Build against RoShamBo bots.")
 openspiel_optional_dependency(BUILD_WITH_GAMUT          OFF
   "Build with GAMUT generator integration.")
+openspiel_optional_dependency(BUILD_WITH_ORTOOLS        OFF
+  "Build with C++ optimization library OR-Tools.")
 
 # Needed to disable Abseil tests.
 set (BUILD_TESTING OFF)
@@ -229,6 +231,16 @@ endif()
 if (BUILD_WITH_GAMUT)
   set(OPEN_SPIEL_OBJECTS ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:gamut>)
 endif()
+if (BUILD_WITH_ORTOOLS)
+  # set(ORTOOLS_HOME $ENV{HOME}/or-tools)
+  # list(APPEND CMAKE_PREFIX_PATH "${ORTOOLS_HOME}")
+  # find_package(ortools CONFIG REQUIRED)
+  # link_libraries(open_spiel_core ortools::ortools)
+  # set(OPEN_SPIEL_OBJECTS $<TARGET_OBJECTS:open_spiel_ortools> ${OPEN_SPIEL_OBJECTS})
+  # Use the following to link your_target_executable with OR-Tools libraries:
+  # target_link_libraries (your_target_executable ortools::ortools)
+endif()
+
 
 
 # We have the parent of this directory in the include path, so that we can

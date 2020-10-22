@@ -1,6 +1,10 @@
 set(GAME_SOURCES
   backgammon.cc
   backgammon.h
+  battleship.cc
+  battleship.h
+  battleship_types.h
+  battleship_types.cc
   blotto.cc
   blotto.h
   breakthrough.cc
@@ -76,6 +80,8 @@ set(GAME_SOURCES
   negotiation.h
   nfg_game.cc
   nfg_game.h
+  oh_hell.cc
+  oh_hell.h
   oshi_zumo.cc
   oshi_zumo.h
   othello.cc
@@ -96,6 +102,8 @@ set(GAME_SOURCES
   skat.h
   solitaire.cc
   solitaire.h
+  stones_and_gems.cc
+  stones_and_gems.h
   tarok.cc
   tarok.h
   tarok/cards.cc
@@ -130,9 +138,6 @@ if (${BUILD_WITH_HANABI})
 endif()
 if (${BUILD_WITH_ACPC})
   add_subdirectory(universal_poker)
-endif()
-if (${BUILD_WITH_XINXIN})
-  add_subdirectory(hearts)
 endif()
 if (${BUILD_WITH_GAMUT})
   add_subdirectory(gamut)
@@ -207,6 +212,10 @@ target_compile_definitions(bridge_double_dummy_solver PUBLIC DDS_NO_STATIC_INIT)
 add_executable(backgammon_test backgammon_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(backgammon_test backgammon_test)
+
+add_executable(battleship_test battleship_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(battleship_test battleship_test)
 
 add_executable(blotto_test blotto_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
@@ -342,6 +351,10 @@ add_executable(nfg_game_test nfg_game_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:algorithms>)
 add_test(nfg_game_test nfg_game_test)
 
+add_executable(oh_hell_test oh_hell_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(oh_hell_test oh_hell_test)
+
 add_executable(oshi_zumo_test oshi_zumo_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>
                $<TARGET_OBJECTS:algorithms>)
@@ -379,6 +392,11 @@ add_test(skat_test skat_test)
 add_executable(solitaire_test solitaire_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(solitaire_test solitaire_test)
+
+add_executable(stones_and_gems_test stones_and_gems_test.cc
+               ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(stones_and_gems_test stones_and_gems_test)
 
 add_executable(tarok_test tarok_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
