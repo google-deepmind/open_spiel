@@ -20,17 +20,17 @@
 namespace open_spiel {
 namespace tarok {
 
-static constexpr int kDealCardsAction = 0;
-static constexpr int kBidTwoAction = 3;
-static constexpr int kBidOneAction = 4;
-static constexpr int kBidSoloTwoAction = 6;
-static constexpr int kBidBeggarAction = 8;
-static constexpr int kBidSoloWithoutAction = 9;
-static constexpr int kBidOpenBeggarAction = 10;
-static constexpr int kBidColourValatAction = 11;
-static constexpr int kBidValatWithoutAction = 12;
+constexpr int kDealCardsAction = 0;
+constexpr int kBidTwoAction = 3;
+constexpr int kBidOneAction = 4;
+constexpr int kBidSoloTwoAction = 6;
+constexpr int kBidBeggarAction = 8;
+constexpr int kBidSoloWithoutAction = 9;
+constexpr int kBidOpenBeggarAction = 10;
+constexpr int kBidColourValatAction = 11;
+constexpr int kBidValatWithoutAction = 12;
 
-static inline const std::array<Card, 54> card_deck = InitializeCardDeck();
+const std::array<Card, 54> card_deck = InitializeCardDeck();
 
 // helper methods
 std::shared_ptr<const TarokGame> NewTarokGame(const GameParameters& params) {
