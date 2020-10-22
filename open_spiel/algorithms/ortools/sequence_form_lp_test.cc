@@ -22,7 +22,7 @@ namespace algorithms {
 namespace ortools {
 namespace {
 
-constexpr double kErrorTolerance = 1e-16;
+constexpr double kErrorTolerance = 1e-14;
 
 void TestGameValueAndExploitability(const std::string& game_name,
                                     double expected_game_value) {
@@ -33,7 +33,7 @@ void TestGameValueAndExploitability(const std::string& game_name,
 
   if (game->GetType().dynamics == GameType::Dynamics::kSimultaneous)
     return;
-  SPIEL_CHECK_FLOAT_NEAR(Exploitability(*game, solution.policy), 0,
+  SPIEL_CHECK_FLOAT_NEAR(Exploitability(*game, solution.policy), 0.,
                          kErrorTolerance);
 }
 
@@ -47,6 +47,8 @@ namespace algorithms = open_spiel::algorithms;
 int main(int argc, char **argv) {
   algorithms::ortools::TestGameValueAndExploitability("matrix_mp", 0.);
   algorithms::ortools::TestGameValueAndExploitability("kuhn_poker", -1 / 18.);
+  algorithms::ortools::TestGameValueAndExploitability(
+      "leduc_poker", -0.085606424078);
   algorithms::ortools::TestGameValueAndExploitability(
       "goofspiel(players=2,num_cards=3,imp_info=True)", 0.);
 }

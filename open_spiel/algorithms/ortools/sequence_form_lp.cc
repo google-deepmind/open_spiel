@@ -308,9 +308,16 @@ void CollectTabularPolicy(TabularPolicy* policy, const SolverNode& node) {
       rp_sum += node.ChildAt(i)->sol_reach_prob_;
     }
     for (int i = 0; i < actions.size(); ++i) {
-      state_policy.push_back({  // May result in NANs in unreachable subtrees.
-                                 actions[i],
-                                 node.ChildAt(i)->sol_reach_prob_ / rp_sum});
+      double prob;
+      if (rp_sum) {
+        prob = node.ChildAt(i)->sol_reach_prob_ / rp_sum;
+      } else {
+        // If the infostate is unreachable, the strategy is not defined.
+        // However some code in the library may require having the strategy,
+        // so we just put an uniform strategy here.
+        prob = 1. / actions.size();
+      }
+      state_policy.push_back({actions[i], prob});
     }
     policy->SetStatePolicy(node.infostate_string_, state_policy);
   }
