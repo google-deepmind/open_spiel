@@ -17,15 +17,23 @@ set(ORTOOLS_LIBS z rt pthread ortools)
 add_library(open_spiel_ortools OBJECT
   lp_solver.cc
   lp_solver.h
+  sequence_form_lp.cc
+  sequence_form_lp.h
 )
 set_target_properties(open_spiel_ortools PROPERTIES POSITION_INDEPENDENT_CODE ON)
 target_include_directories(open_spiel_ortools PUBLIC ${ORTOOLS_INC_DIRS})
 link_directories(open_spiel_ortools ${ORTOOLS_LIB_DIRS})
 target_link_libraries(open_spiel_ortools ${ORTOOLS_LIBS})
+
 add_executable(lp_solver_test lp_solver_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests> $<TARGET_OBJECTS:open_spiel_ortools>)
 target_link_libraries(lp_solver_test ${ORTOOLS_LIBS})
 add_test(lp_solver_test lp_solver_test)
+
+add_executable(sequence_form_lp_test sequence_form_lp_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests> $<TARGET_OBJECTS:open_spiel_ortools>)
+target_link_libraries(sequence_form_lp_test ${ORTOOLS_LIBS})
+add_test(sequence_form_lp_test sequence_form_lp_test)
 
 # Build OR-Tools from source option: compile with OR-Tools from source. Assumes
 # the source in a subdirectory or-tools (or sym linked). Disable the above to
