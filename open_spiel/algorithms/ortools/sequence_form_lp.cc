@@ -162,7 +162,7 @@ void SpecifyCfValues(
       SpecifyCfValues(solver, &child, terminal_map);
       opres::MPConstraint* ct = solver->MakeRowConstraint(
           absl::StrCat("cf_", node->ToString(), "_", child.ToString()));
-      ct->SetLB(0.);
+      ct->SetUB(0.);
       ct->SetCoefficient(node->var_cf_value_, -1);
       ct->SetCoefficient(child.var_cf_value_, 1);
     }
@@ -171,20 +171,20 @@ void SpecifyCfValues(
 
   opres::MPConstraint* ct = solver->MakeRowConstraint(
       absl::StrCat("cf_", node->ToString()));
-  ct->SetLB(0.);
+  ct->SetUB(0.);
   ct->SetCoefficient(node->var_cf_value_, -1);
 
   if (node->Type() == kTerminalInfostateNode) {
     const SolverNode* opponent_node = terminal_map.at(node);
-    const double value = opponent_node->TerminalValue()
-        * opponent_node->TerminalChanceReachProb();
+    const double value =
+        node->TerminalValue() * node->TerminalChanceReachProb();
     // Terminal value constraint comes from the opponent.
     ct->SetCoefficient(opponent_node->var_reach_prob_, value);
     return;
   }
   if (node->Type() == kObservationInfostateNode) {
     // Value constraint: sum of children = parent
-    ct->SetUB(0.);
+    ct->SetLB(0.);
     for (SolverNode& child : node->child_iterator()) {
       SpecifyCfValues(solver, &child, terminal_map);
       ct->SetCoefficient(child.var_cf_value_, 1);
@@ -257,10 +257,6 @@ void SolveForPlayer(
     const std::array<std::unique_ptr<SolverTree>, 2>& solver_trees,
     const std::map<const SolverNode*, const SolverNode*>& terminal_map,
     absl::Span<const float> player_ranges) {
-  // Make sure player ranges are a valid prob. distribution.
-  SPIEL_CHECK_FLOAT_NEAR(
-      std::accumulate(player_ranges.begin(), player_ranges.end(), 0.), 1.,
-      kErrorTolerance);
   // Make sure player ranges are over all the root nodes.
   SPIEL_CHECK_EQ(solver_trees[pl]->Root().NumChildren(), player_ranges.size());
 
@@ -272,10 +268,10 @@ void SolveForPlayer(
   SpecifyCfValues(&solver, solver_trees[1 - pl]->MutableRoot(), terminal_map);
   // Add constraints for ranges.
   int i = 0;
-  for (SolverNode
-        & root_node : solver_trees[pl]->MutableRoot()->child_iterator()) {
-    opres::MPConstraint* ct = solver.MakeRowConstraint(/*lb=*/1., /*ub=*/1.);
-    ct->SetCoefficient(root_node.var_reach_prob_, player_ranges[i]);
+  for (SolverNode& root_node :
+      solver_trees[pl]->MutableRoot()->child_iterator()) {
+    root_node.var_reach_prob_->SetLB(player_ranges[i]);
+    root_node.var_reach_prob_->SetUB(player_ranges[i]);
     i++;
   }
 
@@ -283,7 +279,7 @@ void SolveForPlayer(
   opres::MPObjective* const objective = solver.MutableObjective();
   objective->SetCoefficient(
       solver_trees[1 - pl]->MutableRoot()->var_cf_value_, 1);
-  objective->SetMaximization();
+  objective->SetMinimization();
 
   // Keeping this around for debugging.
 //  PrintProblemSpecification(solver);
@@ -361,17 +357,16 @@ ZeroSumSequentialGameSolution SolveZeroSumSequentialGame(
                      player_ranges[pl]);
     }
     // Check zero-sum-ness of the root values.
-    SPIEL_CHECK_TRUE(fabs(
-        solver_trees[0]->Root().sol_cf_value_
-            + solver_trees[1]->Root().sol_cf_value_) < 1e-10);
+    SPIEL_CHECK_FLOAT_NEAR(
+        solver_trees[0]->Root().sol_cf_value_,
+        - solver_trees[1]->Root().sol_cf_value_,
+        kErrorTolerance);
   }
 
   // 4. Collect the requested results.
   ZeroSumSequentialGameSolution sol;
   // Always collect game value.
-  // Normally this is for player 0, but we are maximizing over opponent's cf
-  // values, so we request the opponent's tree for the value.
-  sol.game_value = solver_trees[1]->Root().sol_cf_value_;
+  sol.game_value = solver_trees[0]->Root().sol_cf_value_;
   if (collect_tabular_policy) {
     if (solve_only_player) {
       int pl = solve_only_player.value();
@@ -385,9 +380,9 @@ ZeroSumSequentialGameSolution SolveZeroSumSequentialGame(
   if (collect_root_cfvs) {
     SPIEL_CHECK_FALSE(solve_only_player);
     for (int pl = 0; pl < 2; ++pl) {
-      sol.root_cfvs[pl].reserve(solver_trees[1 - pl]->Root().NumChildren());
+      sol.root_cfvs[pl].reserve(solver_trees[pl]->Root().NumChildren());
       for (const SolverNode& root_node :
-          solver_trees[1 - pl]->Root().child_iterator()) {
+          solver_trees[pl]->Root().child_iterator()) {
         sol.root_cfvs[pl].push_back(root_node.sol_cf_value_);
       }
     }
