@@ -56,7 +56,7 @@ set -e  # exit when any command fails
 MYDIR="$(dirname "$(realpath "$0")")"
 source "${MYDIR}/global_variables.sh"
 
-CXX=`which clang++`
+CXX=`which clang++-8`
 if [ ! -x $CXX ]
 then
   echo -n "clang++ not found in the path (the clang C++ compiler is needed to "
@@ -184,7 +184,7 @@ else
   export PYTHONPATH=$PYTHONPATH:$pwd/python  # For pyspiel bindings
 
   # Build in testing, so that we can run tests fast.
-  cmake -DPython3_EXECUTABLE=${PYBIN} \
+  ~/cmake-3.13.4-Linux-x86_64/bin/cmake -DPython3_EXECUTABLE=${PYBIN} \
         -DCMAKE_CXX_COMPILER=${CXX}                  \
         -DCMAKE_PREFIX_PATH=${LIBCXXWRAP_JULIA_DIR}  \
         -DBUILD_TYPE=Testing                         \

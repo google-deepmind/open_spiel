@@ -68,7 +68,7 @@ enum class PieceType : int8_t {
 
 static inline constexpr std::array<PieceType, 6> kPieceTypes = {
     {PieceType::kKing, PieceType::kQueen, PieceType::kRook, PieceType::kBishop,
-     PieceType::kKnight, PieceType::kPawn}};
+        PieceType::kKnight, PieceType::kPawn}};
 
 // In case all the pieces are represented in the same plane, these values are
 // used to represent each piece type.
@@ -131,10 +131,11 @@ inline constexpr std::array<Offset, 8> kKnightOffsets = {
 absl::optional<Square> SquareFromString(const std::string& s);
 
 // Forward declare ChessBoard here because it's needed in Move::ToSAN.
-template <uint32_t kBoardSize>
+template <uint32_t kBoardSize, bool kAllowCheck>
 class ChessBoard;
 
-using StandardChessBoard = ChessBoard<8>;
+using StandardChessBoard = ChessBoard<8, false>;
+using StandardDarkChessBoard = ChessBoard<8, true>;
 
 struct Move {
   Square from;
@@ -206,7 +207,8 @@ struct Move {
   //              resulting in checkmate in a surprisingly good move)
   // * O-O-O!!N+/- (a surprisingly good long castle that is a theoretical
   //                novelty that gives white a clear but not winning advantage)
-  std::string ToSAN(const StandardChessBoard& board) const;
+  template<bool kAllowCheck>
+  std::string ToSAN(const ChessBoard<8, kAllowCheck>& board);
 
   bool operator==(const Move& other) const {
     return from == other.from && to == other.to && piece == other.piece &&
@@ -223,9 +225,9 @@ bool IsMoveCharacter(char c);
 
 std::pair<std::string, std::string> SplitAnnotations(const std::string& move);
 
-template <uint32_t kBoardSize>
+template <uint32_t kBoardSize, bool kAllowCheck>
 class ChessBoard {
- public:
+public:
   ChessBoard();
 
   static absl::optional<ChessBoard> BoardFromFEN(const std::string& fen);
@@ -361,7 +363,7 @@ class ChessBoard {
 
   std::string ToFEN() const;
 
- private:
+private:
   static size_t SquareToIndex_(Square sq) { return sq.y * kBoardSize + sq.x; }
 
   /* Generate*Destinations functions call yield(sq) for every potential
@@ -446,9 +448,9 @@ class ChessBoard {
   uint64_t zobrist_hash_;
 };
 
-template <uint32_t kBoardSize>
+template <uint32_t kBoardSize, bool kAllowCheck>
 inline std::ostream& operator<<(std::ostream& stream,
-                                const ChessBoard<kBoardSize>& board) {
+                                const ChessBoard<kBoardSize, kAllowCheck>& board) {
   return stream << board.DebugString();
 }
 
@@ -457,6 +459,7 @@ inline std::ostream& operator<<(std::ostream& stream, const PieceType& pt) {
 }
 
 StandardChessBoard MakeDefaultBoard();
+StandardDarkChessBoard MakeDefaultDarkChessBoard();
 
 }  // namespace chess
 }  // namespace open_spiel

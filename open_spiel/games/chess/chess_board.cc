@@ -181,7 +181,8 @@ std::string Move::ToLAN() const {
   return absl::StrCat(SquareToString(from), SquareToString(to), promotion);
 }
 
-std::string Move::ToSAN(const StandardChessBoard &board) const {
+template<bool kAllowCheck>
+std::string Move::ToSAN(const ChessBoard<8, kAllowCheck> &board) {
   std::string move_text;
   PieceType piece_type = board.at(from).type;
   if (is_castling) {
@@ -311,9 +312,11 @@ std::string Move::ToSAN(const StandardChessBoard &board) const {
 
   return move_text;
 }
+template std::string Move::ToSAN<false>(const ChessBoard<8, false> &board);
+template std::string Move::ToSAN<true>(const ChessBoard<8, true> &board);
 
-template <uint32_t kBoardSize>
-ChessBoard<kBoardSize>::ChessBoard()
+template <uint32_t kBoardSize, bool kAllowCheck>
+ChessBoard<kBoardSize, kAllowCheck>::ChessBoard()
     : to_play_(Color::kWhite),
       ep_square_(InvalidSquare()),
       irreversible_move_counter_(0),
@@ -323,9 +326,9 @@ ChessBoard<kBoardSize>::ChessBoard()
   board_.fill(kEmptyPiece);
 }
 
-template <uint32_t kBoardSize>
-/*static*/ absl::optional<ChessBoard<kBoardSize>>
-ChessBoard<kBoardSize>::BoardFromFEN(const std::string &fen) {
+template <uint32_t kBoardSize, bool kAllowCheck>
+/*static*/ absl::optional<ChessBoard<kBoardSize, kAllowCheck>>
+ChessBoard<kBoardSize, kAllowCheck>::BoardFromFEN(const std::string &fen) {
   /* An FEN string includes a board position, side to play, castling
    * rights, ep square, 50 moves clock, and full move number. In that order.
    *
@@ -437,8 +440,8 @@ ChessBoard<kBoardSize>::BoardFromFEN(const std::string &fen) {
   return board;
 }
 
-template <uint32_t kBoardSize>
-Square ChessBoard<kBoardSize>::find(const Piece &piece) const {
+template <uint32_t kBoardSize, bool kAllowCheck>
+Square ChessBoard<kBoardSize, kAllowCheck>::find(const Piece &piece) const {
   for (int8_t y = 0; y < kBoardSize; ++y) {
     for (int8_t x = 0; x < kBoardSize; ++x) {
       Square sq{x, y};
@@ -451,30 +454,36 @@ Square ChessBoard<kBoardSize>::find(const Piece &piece) const {
   return InvalidSquare();
 }
 
-template <uint32_t kBoardSize>
-void ChessBoard<kBoardSize>::GenerateLegalMoves(
+template <uint32_t kBoardSize, bool kAllowCheck>
+void ChessBoard<kBoardSize, kAllowCheck>::GenerateLegalMoves(
     const MoveYieldFn &yield) const {
-  auto king_square = find(Piece{to_play_, PieceType::kKing});
 
-  GeneratePseudoLegalMoves([this, &king_square, &yield](const Move &move) {
-    // See if the move is legal by applying, checking whether the king is
-    // under attack, and undoing the move.
-    // TODO: Optimize this.
-    auto board_copy = *this;
-    board_copy.ApplyMove(move);
+  if (kAllowCheck) {
+    GeneratePseudoLegalMoves(yield);
+  }
+  else {
+    auto king_square = find(Piece{to_play_, PieceType::kKing});
 
-    auto ks = at(move.from).type == PieceType::kKing ? move.to : king_square;
+    GeneratePseudoLegalMoves([this, &king_square, &yield](const Move &move) {
+      // See if the move is legal by applying, checking whether the king is
+      // under attack, and undoing the move.
+      // TODO: Optimize this.
+      auto board_copy = *this;
+      board_copy.ApplyMove(move);
 
-    if (board_copy.UnderAttack(ks, to_play_)) {
-      return true;
-    } else {
-      return yield(move);
-    }
-  });
+      auto ks = at(move.from).type == PieceType::kKing ? move.to : king_square;
+
+      if (board_copy.UnderAttack(ks, to_play_)) {
+        return true;
+      } else {
+        return yield(move);
+      }
+    });
+  }
 }
 
-template <uint32_t kBoardSize>
-void ChessBoard<kBoardSize>::GeneratePseudoLegalMoves(
+template <uint32_t kBoardSize, bool kAllowCheck>
+void ChessBoard<kBoardSize, kAllowCheck>::GeneratePseudoLegalMoves(
     const MoveYieldFn &yield) const {
   bool generating = true;
 
@@ -566,13 +575,17 @@ void ChessBoard<kBoardSize>::GeneratePseudoLegalMoves(
 #undef YIELD
 }
 
-template <uint32_t kBoardSize>
-bool ChessBoard<kBoardSize>::HasSufficientMaterial() const {
+template <uint32_t kBoardSize, bool kAllowCheck>
+bool ChessBoard<kBoardSize, kAllowCheck>::HasSufficientMaterial() const {
   // Try to detect these 4 conditions.
   // 1. K vs K
   // 2. K+B vs K
   // 3. K+N vs K
   // 4. K+B* vs K+B* (all bishops on same coloured squares)
+
+  if (kAllowCheck) {
+    return true;
+  }
 
   // Indexed by colour.
   int knights[2] = {0, 0};
@@ -645,8 +658,8 @@ bool ChessBoard<kBoardSize>::HasSufficientMaterial() const {
   return dark_bishop_exists && light_bishop_exists;
 }
 
-template <uint32_t kBoardSize>
-absl::optional<Move> ChessBoard<kBoardSize>::ParseMove(
+template <uint32_t kBoardSize, bool kAllowCheck>
+absl::optional<Move> ChessBoard<kBoardSize, kAllowCheck>::ParseMove(
     const std::string &move) const {
   // First see if they are in the long form -
   // "anan" (eg. "e2e4") or "anana" (eg. "f7f8q")
@@ -666,8 +679,8 @@ absl::optional<Move> ChessBoard<kBoardSize>::ParseMove(
   return std::nullopt;
 }
 
-template <uint32_t kBoardSize>
-absl::optional<Move> ChessBoard<kBoardSize>::ParseSANMove(
+template <uint32_t kBoardSize, bool kAllowCheck>
+absl::optional<Move> ChessBoard<kBoardSize, kAllowCheck>::ParseSANMove(
     const std::string &move_str) const {
   std::string move = move_str;
 
@@ -775,7 +788,7 @@ absl::optional<Move> ChessBoard<kBoardSize>::ParseSANMove(
 
   std::vector<Move> candidates;
   GenerateLegalMoves([&candidates, destination_square, piece_type, source_file,
-                      source_rank, promotion_type, this](const Move &move) {
+                         source_rank, promotion_type, this](const Move &move) {
     PieceType moving_piece_type = at(move.from).type;
     if (move.to == destination_square && moving_piece_type == piece_type &&
         (!source_file || move.from.x == *source_file) &&
@@ -792,8 +805,8 @@ absl::optional<Move> ChessBoard<kBoardSize>::ParseSANMove(
   return absl::optional<Move>();
 }
 
-template <uint32_t kBoardSize>
-absl::optional<Move> ChessBoard<kBoardSize>::ParseLANMove(
+template <uint32_t kBoardSize, bool kAllowCheck>
+absl::optional<Move> ChessBoard<kBoardSize, kAllowCheck>::ParseLANMove(
     const std::string &move) const {
   SPIEL_CHECK_FALSE(move.empty());
 
@@ -854,8 +867,8 @@ absl::optional<Move> ChessBoard<kBoardSize>::ParseLANMove(
   return std::nullopt;
 }
 
-template <uint32_t kBoardSize>
-void ChessBoard<kBoardSize>::ApplyMove(const Move &move) {
+template <uint32_t kBoardSize, bool kAllowCheck>
+void ChessBoard<kBoardSize, kAllowCheck>::ApplyMove(const Move &move) {
   // Most moves are simple - we remove the moving piece from the original
   // square, and put it on the destination square, overwriting whatever was
   // there before, update the 50 move counter, and update castling rights.
@@ -996,16 +1009,16 @@ void ChessBoard<kBoardSize>::ApplyMove(const Move &move) {
   SetToPlay(OppColor(to_play_));
 }
 
-template <uint32_t kBoardSize>
-bool ChessBoard<kBoardSize>::TestApplyMove(const Move &move) {
+template <uint32_t kBoardSize, bool kAllowCheck>
+bool ChessBoard<kBoardSize, kAllowCheck>::TestApplyMove(const Move &move) {
   Color color = to_play_;
   ApplyMove(move);
   return !UnderAttack(find(Piece{color, PieceType::kKing}), color);
 }
 
-template <uint32_t kBoardSize>
-bool ChessBoard<kBoardSize>::UnderAttack(const Square &sq,
-                                         Color our_color) const {
+template <uint32_t kBoardSize, bool kAllowCheck>
+bool ChessBoard<kBoardSize, kAllowCheck>::UnderAttack(const Square &sq,
+                                                      Color our_color) const {
   SPIEL_CHECK_NE(sq, InvalidSquare());
 
   bool under_attack = false;
@@ -1078,8 +1091,8 @@ bool ChessBoard<kBoardSize>::UnderAttack(const Square &sq,
   return false;
 }
 
-template <uint32_t kBoardSize>
-std::string ChessBoard<kBoardSize>::DebugString() const {
+template <uint32_t kBoardSize, bool kAllowCheck>
+std::string ChessBoard<kBoardSize, kAllowCheck>::DebugString() const {
   std::string s;
   s = absl::StrCat("FEN: ", ToFEN(), "\n");
   absl::StrAppend(&s, "\n  ---------------------------------\n");
@@ -1125,9 +1138,9 @@ std::string ChessBoard<kBoardSize>::DebugString() const {
 }
 
 // King moves without castling.
-template <uint32_t kBoardSize>
+template <uint32_t kBoardSize, bool kAllowCheck>
 template <typename YieldFn>
-void ChessBoard<kBoardSize>::GenerateKingDestinations_(
+void ChessBoard<kBoardSize, kAllowCheck>::GenerateKingDestinations_(
     Square sq, Color color, const YieldFn &yield) const {
   static const std::array<Offset, 8> kOffsets = {
       {{1, 0}, {1, 1}, {1, -1}, {0, 1}, {0, -1}, {-1, 1}, {-1, 0}, {-1, -1}}};
@@ -1140,9 +1153,9 @@ void ChessBoard<kBoardSize>::GenerateKingDestinations_(
   }
 }
 
-template <uint32_t kBoardSize>
+template <uint32_t kBoardSize, bool kAllowCheck>
 template <typename YieldFn>
-void ChessBoard<kBoardSize>::GenerateCastlingDestinations_(
+void ChessBoard<kBoardSize, kAllowCheck>::GenerateCastlingDestinations_(
     Square sq, Color color, const YieldFn &yield) const {
   // There are 8 conditions for castling -
   // 1. The rook involved must not have moved.
@@ -1198,44 +1211,44 @@ void ChessBoard<kBoardSize>::GenerateCastlingDestinations_(
 
   const auto check_castling_conditions =
       [this, &sq, &color, &check_squares_between](int8_t direction) -> bool {
-    // First we need to find the rook.
-    Square rook_sq = sq + Offset{direction, 0};
-    bool rook_found = false;
+        // First we need to find the rook.
+        Square rook_sq = sq + Offset{direction, 0};
+        bool rook_found = false;
 
-    // Yes, we do actually have to check colour -
-    // https://github.com/official-stockfish/Stockfish/issues/356
-    for (; InBoardArea(rook_sq); rook_sq.x += direction) {
-      if (at(rook_sq) == Piece{color, PieceType::kRook}) {
-        rook_found = true;
-        break;
-      }
-    }
+        // Yes, we do actually have to check colour -
+        // https://github.com/official-stockfish/Stockfish/issues/356
+        for (; InBoardArea(rook_sq); rook_sq.x += direction) {
+          if (at(rook_sq) == Piece{color, PieceType::kRook}) {
+            rook_found = true;
+            break;
+          }
+        }
 
-    if (!rook_found) {
-      std::cerr << "Where did our rook go?" << *this << "\n"
-                << "Square: " << SquareToString(sq) << std::endl;
-      SpielFatalError("Rook not found");
-    }
+        if (!rook_found) {
+          std::cerr << "Where did our rook go?" << *this << "\n"
+                    << "Square: " << SquareToString(sq) << std::endl;
+          SpielFatalError("Rook not found");
+        }
 
-    static_assert(kBoardSize == 8,
-                  "This is not boardsize-independent! What does castling "
-                  "mean for other boardsizes?");
-    int8_t rook_final_x = direction == -1 ? 3 /* d-file */ : 5 /* f-file */;
-    Square rook_final_sq = Square{rook_final_x, sq.y};
-    int8_t king_final_x = direction == -1 ? 2 /* c-file */ : 6 /* g-file */;
-    Square king_final_sq = Square{king_final_x, sq.y};
+        static_assert(kBoardSize == 8,
+                      "This is not boardsize-independent! What does castling "
+                      "mean for other boardsizes?");
+        int8_t rook_final_x = direction == -1 ? 3 /* d-file */ : 5 /* f-file */;
+        Square rook_final_sq = Square{rook_final_x, sq.y};
+        int8_t king_final_x = direction == -1 ? 2 /* c-file */ : 6 /* g-file */;
+        Square king_final_sq = Square{king_final_x, sq.y};
 
-    // 4. 5. 6. All squares the king and rook jump over, including the final
-    // squares, must be empty. Squares king jumps over must additionally be
-    // safe.
-    if (!IsEmpty(rook_final_sq) || !IsEmpty(king_final_sq) ||
-        !check_squares_between(rook_sq, rook_final_sq, false) ||
-        !check_squares_between(sq, king_final_sq, true)) {
-      return false;
-    }
+        // 4. 5. 6. All squares the king and rook jump over, including the final
+        // squares, must be empty. Squares king jumps over must additionally be
+        // safe.
+        if (!IsEmpty(rook_final_sq) || !IsEmpty(king_final_sq) ||
+            !check_squares_between(rook_sq, rook_final_sq, false) ||
+            !check_squares_between(sq, king_final_sq, !kAllowCheck)) {
+          return false;
+        }
 
-    return true;
-  };
+        return true;
+      };
 
   // 1. 2. 3. Moving the king, moving the rook, or the rook getting captured
   // will reset the flag.
@@ -1246,7 +1259,7 @@ void ChessBoard<kBoardSize>::GenerateCastlingDestinations_(
 
   if (can_left_castle || can_right_castle) {
     // 7. No castling to escape from check.
-    if (UnderAttack(sq, color)) {
+    if (UnderAttack(sq, color) && !kAllowCheck) {
       return;
     }
 
@@ -1263,17 +1276,17 @@ void ChessBoard<kBoardSize>::GenerateCastlingDestinations_(
   }
 }
 
-template <uint32_t kBoardSize>
+template <uint32_t kBoardSize, bool kAllowCheck>
 template <typename YieldFn>
-void ChessBoard<kBoardSize>::GenerateQueenDestinations_(
+void ChessBoard<kBoardSize, kAllowCheck>::GenerateQueenDestinations_(
     Square sq, Color color, const YieldFn &yield) const {
   GenerateRookDestinations_(sq, color, yield);
   GenerateBishopDestinations_(sq, color, yield);
 }
 
-template <uint32_t kBoardSize>
+template <uint32_t kBoardSize, bool kAllowCheck>
 template <typename YieldFn>
-void ChessBoard<kBoardSize>::GenerateRookDestinations_(
+void ChessBoard<kBoardSize, kAllowCheck>::GenerateRookDestinations_(
     Square sq, Color color, const YieldFn &yield) const {
   GenerateRayDestinations_(sq, color, {1, 0}, yield);
   GenerateRayDestinations_(sq, color, {-1, 0}, yield);
@@ -1281,9 +1294,9 @@ void ChessBoard<kBoardSize>::GenerateRookDestinations_(
   GenerateRayDestinations_(sq, color, {0, -1}, yield);
 }
 
-template <uint32_t kBoardSize>
+template <uint32_t kBoardSize, bool kAllowCheck>
 template <typename YieldFn>
-void ChessBoard<kBoardSize>::GenerateBishopDestinations_(
+void ChessBoard<kBoardSize, kAllowCheck>::GenerateBishopDestinations_(
     Square sq, Color color, const YieldFn &yield) const {
   GenerateRayDestinations_(sq, color, {1, 1}, yield);
   GenerateRayDestinations_(sq, color, {-1, 1}, yield);
@@ -1291,9 +1304,9 @@ void ChessBoard<kBoardSize>::GenerateBishopDestinations_(
   GenerateRayDestinations_(sq, color, {-1, -1}, yield);
 }
 
-template <uint32_t kBoardSize>
+template <uint32_t kBoardSize, bool kAllowCheck>
 template <typename YieldFn>
-void ChessBoard<kBoardSize>::GenerateKnightDestinations_(
+void ChessBoard<kBoardSize, kAllowCheck>::GenerateKnightDestinations_(
     Square sq, Color color, const YieldFn &yield) const {
   for (const auto &offset : kKnightOffsets) {
     Square dest = sq + offset;
@@ -1304,9 +1317,9 @@ void ChessBoard<kBoardSize>::GenerateKnightDestinations_(
 }
 
 // Pawn moves without captures.
-template <uint32_t kBoardSize>
+template <uint32_t kBoardSize, bool kAllowCheck>
 template <typename YieldFn>
-void ChessBoard<kBoardSize>::GeneratePawnDestinations_(
+void ChessBoard<kBoardSize, kAllowCheck>::GeneratePawnDestinations_(
     Square sq, Color color, const YieldFn &yield) const {
   int8_t y_direction = color == Color::kWhite ? 1 : -1;
   Square dest = sq + Offset{0, y_direction};
@@ -1324,9 +1337,9 @@ void ChessBoard<kBoardSize>::GeneratePawnDestinations_(
 }
 
 // Pawn capture destinations, with or without en passant.
-template <uint32_t kBoardSize>
+template <uint32_t kBoardSize, bool kAllowCheck>
 template <typename YieldFn>
-void ChessBoard<kBoardSize>::GeneratePawnCaptureDestinations_(
+void ChessBoard<kBoardSize, kAllowCheck>::GeneratePawnCaptureDestinations_(
     Square sq, Color color, bool include_ep, const YieldFn &yield) const {
   int8_t y_direction = color == Color::kWhite ? 1 : -1;
   Square dest = sq + Offset{1, y_direction};
@@ -1342,9 +1355,9 @@ void ChessBoard<kBoardSize>::GeneratePawnCaptureDestinations_(
   }
 }
 
-template <uint32_t kBoardSize>
+template <uint32_t kBoardSize, bool kAllowCheck>
 template <typename YieldFn>
-void ChessBoard<kBoardSize>::GenerateRayDestinations_(
+void ChessBoard<kBoardSize, kAllowCheck>::GenerateRayDestinations_(
     Square sq, Color color, Offset offset_step, const YieldFn &yield) const {
   for (Square dest = sq + offset_step; InBoardArea(dest); dest += offset_step) {
     if (IsEmpty(dest)) {
@@ -1359,8 +1372,8 @@ void ChessBoard<kBoardSize>::GenerateRayDestinations_(
   }
 }
 
-template <uint32_t kBoardSize>
-std::string ChessBoard<kBoardSize>::ToUnicodeString() const {
+template <uint32_t kBoardSize, bool kAllowCheck>
+std::string ChessBoard<kBoardSize, kAllowCheck>::ToUnicodeString() const {
   std::string out = "\n";
   for (int8_t rank = kBoardSize - 1; rank >= 0; --rank) {
     out += std::to_string(rank + 1);
@@ -1377,8 +1390,8 @@ std::string ChessBoard<kBoardSize>::ToUnicodeString() const {
   return out;
 }
 
-template <uint32_t kBoardSize>
-std::string ChessBoard<kBoardSize>::ToFEN() const {
+template <uint32_t kBoardSize, bool kAllowCheck>
+std::string ChessBoard<kBoardSize, kAllowCheck>::ToFEN() const {
   // Example FEN: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
   std::string fen;
 
@@ -1440,8 +1453,8 @@ std::string ChessBoard<kBoardSize>::ToFEN() const {
   return fen;
 }
 
-template <uint32_t kBoardSize>
-void ChessBoard<kBoardSize>::set_square(Square sq, Piece piece) {
+template <uint32_t kBoardSize, bool kAllowCheck>
+void ChessBoard<kBoardSize, kAllowCheck>::set_square(Square sq, Piece piece) {
   static const ZobristTableU64<kBoardSize * kBoardSize, 3, 7> kZobristValues(
       /*seed=*/2765481);
 
@@ -1450,18 +1463,18 @@ void ChessBoard<kBoardSize>::set_square(Square sq, Piece piece) {
   auto current_piece = at(sq);
   zobrist_hash_ ^=
       kZobristValues[position][static_cast<int>(current_piece.color)]
-                    [static_cast<int>(current_piece.type)];
+      [static_cast<int>(current_piece.type)];
 
   // Then add the new piece
   zobrist_hash_ ^= kZobristValues[position][static_cast<int>(piece.color)]
-                                 [static_cast<int>(piece.type)];
+  [static_cast<int>(piece.type)];
 
   board_[position] = piece;
 }
 
-template <uint32_t kBoardSize>
-bool ChessBoard<kBoardSize>::CastlingRight(Color side,
-                                           CastlingDirection direction) const {
+template <uint32_t kBoardSize, bool kAllowCheck>
+bool ChessBoard<kBoardSize, kAllowCheck>::CastlingRight(Color side,
+                                                        CastlingDirection direction) const {
   switch (direction) {
     case CastlingDirection::kLeft:
       return castling_rights_[ToInt(side)].left_castle;
@@ -1485,15 +1498,15 @@ int ToInt(CastlingDirection direction) {
   }
 }
 
-template <uint32_t kBoardSize>
-void ChessBoard<kBoardSize>::SetCastlingRight(Color side,
-                                              CastlingDirection direction,
-                                              bool can_castle) {
+template <uint32_t kBoardSize, bool kAllowCheck>
+void ChessBoard<kBoardSize,  kAllowCheck>::SetCastlingRight(Color side,
+                                                            CastlingDirection direction,
+                                                            bool can_castle) {
   static const ZobristTableU64<2, 2, 2> kZobristValues(/*seed=*/876387212);
 
   // Remove old value from hash.
   zobrist_hash_ ^= kZobristValues[ToInt(side)][ToInt(direction)]
-                                 [CastlingRight(side, direction)];
+  [CastlingRight(side, direction)];
 
   // Then add the new value.
   zobrist_hash_ ^= kZobristValues[ToInt(side)][ToInt(direction)][can_castle];
@@ -1507,8 +1520,8 @@ void ChessBoard<kBoardSize>::SetCastlingRight(Color side,
   }
 }
 
-template <uint32_t kBoardSize>
-void ChessBoard<kBoardSize>::SetToPlay(Color c) {
+template <uint32_t kBoardSize, bool kAllowCheck>
+void ChessBoard<kBoardSize, kAllowCheck>::SetToPlay(Color c) {
   static const ZobristTableU64<2> kZobristValues(/*seed=*/284628);
 
   // Remove old color and add new to play.
@@ -1517,18 +1530,18 @@ void ChessBoard<kBoardSize>::SetToPlay(Color c) {
   to_play_ = c;
 }
 
-template <uint32_t kBoardSize>
-void ChessBoard<kBoardSize>::SetIrreversibleMoveCounter(int c) {
+template <uint32_t kBoardSize, bool kAllowCheck>
+void ChessBoard<kBoardSize, kAllowCheck>::SetIrreversibleMoveCounter(int c) {
   irreversible_move_counter_ = c;
 }
 
-template <uint32_t kBoardSize>
-void ChessBoard<kBoardSize>::SetMovenumber(int move_number) {
+template <uint32_t kBoardSize, bool kAllowCheck>
+void ChessBoard<kBoardSize, kAllowCheck>::SetMovenumber(int move_number) {
   move_number_ = move_number;
 }
 
-template <uint32_t kBoardSize>
-void ChessBoard<kBoardSize>::SetEpSquare(Square sq) {
+template <uint32_t kBoardSize, bool kAllowCheck>
+void ChessBoard<kBoardSize, kAllowCheck>::SetEpSquare(Square sq) {
   static const ZobristTableU64<kBoardSize, kBoardSize> kZobristValues(
       /*seed=*/837261);
 
@@ -1544,10 +1557,18 @@ void ChessBoard<kBoardSize>::SetEpSquare(Square sq) {
 }
 
 // Explicit instantiations for all board sizes we care about.
-template class ChessBoard<8>;
+template class ChessBoard<8, false>;
+template class ChessBoard<8, true>;
 
 StandardChessBoard MakeDefaultBoard() {
   auto maybe_board = StandardChessBoard::BoardFromFEN(
+      "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+  SPIEL_CHECK_TRUE(maybe_board);
+  return *maybe_board;
+}
+
+StandardDarkChessBoard  MakeDefaultDarkChessBoard() {
+  auto maybe_board = StandardDarkChessBoard ::BoardFromFEN(
       "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
   SPIEL_CHECK_TRUE(maybe_board);
   return *maybe_board;
