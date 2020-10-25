@@ -68,7 +68,7 @@ enum class PieceType : int8_t {
 
 static inline constexpr std::array<PieceType, 6> kPieceTypes = {
     {PieceType::kKing, PieceType::kQueen, PieceType::kRook, PieceType::kBishop,
-        PieceType::kKnight, PieceType::kPawn}};
+     PieceType::kKnight, PieceType::kPawn}};
 
 // In case all the pieces are represented in the same plane, these values are
 // used to represent each piece type.
@@ -227,7 +227,7 @@ std::pair<std::string, std::string> SplitAnnotations(const std::string& move);
 
 template <uint32_t kBoardSize, bool kAllowCheck>
 class ChessBoard {
-public:
+ public:
   ChessBoard();
 
   static absl::optional<ChessBoard> BoardFromFEN(const std::string& fen);
@@ -363,7 +363,7 @@ public:
 
   std::string ToFEN() const;
 
-private:
+ private:
   static size_t SquareToIndex_(Square sq) { return sq.y * kBoardSize + sq.x; }
 
   /* Generate*Destinations functions call yield(sq) for every potential

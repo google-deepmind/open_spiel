@@ -94,7 +94,7 @@ chess::Move ActionToMove(const Action &action, const chess::StandardDarkChessBoa
 
 // State of an in-play game.
 class DarkChessState : public State {
-public:
+ public:
   // Constructs a chess state at the standard start position.
   DarkChessState(std::shared_ptr<const Game> game);
 
@@ -135,10 +135,10 @@ public:
   std::vector<chess::Move>& MovesHistory() { return moves_history_; }
   const std::vector<chess::Move>& MovesHistory() const { return moves_history_; }
 
-protected:
+ protected:
   void DoApplyAction(Action action) override;
 
-private:
+ private:
   // Draw can be claimed under the FIDE 3-fold repetition rule (the current
   // board position has already appeared twice in the history).
   bool IsRepetitionDraw() const;
@@ -165,10 +165,10 @@ private:
   // We are already indexing by board hash, so there is no need to hash that
   // hash again, so we use a custom passthrough hasher.
   class PassthroughHash {
-  public:
-      std::size_t operator()(uint64_t x) const {
-        return static_cast<std::size_t>(x);
-      }
+   public:
+    std::size_t operator()(uint64_t x) const {
+      return static_cast<std::size_t>(x);
+    }
   };
   using RepetitionTable = absl::flat_hash_map<uint64_t, int, PassthroughHash>;
   RepetitionTable repetitions_;
@@ -177,7 +177,7 @@ private:
 
 // Game object.
 class DarkChessGame : public Game {
-public:
+ public:
   explicit DarkChessGame(const GameParameters& params);
   int NumDistinctActions() const override {
     return chess::NumDistinctActions();

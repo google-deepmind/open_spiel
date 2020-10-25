@@ -788,7 +788,7 @@ absl::optional<Move> ChessBoard<kBoardSize, kAllowCheck>::ParseSANMove(
 
   std::vector<Move> candidates;
   GenerateLegalMoves([&candidates, destination_square, piece_type, source_file,
-                         source_rank, promotion_type, this](const Move &move) {
+                      source_rank, promotion_type, this](const Move &move) {
     PieceType moving_piece_type = at(move.from).type;
     if (move.to == destination_square && moving_piece_type == piece_type &&
         (!source_file || move.from.x == *source_file) &&
@@ -1211,44 +1211,44 @@ void ChessBoard<kBoardSize, kAllowCheck>::GenerateCastlingDestinations_(
 
   const auto check_castling_conditions =
       [this, &sq, &color, &check_squares_between](int8_t direction) -> bool {
-        // First we need to find the rook.
-        Square rook_sq = sq + Offset{direction, 0};
-        bool rook_found = false;
+    // First we need to find the rook.
+    Square rook_sq = sq + Offset{direction, 0};
+    bool rook_found = false;
 
-        // Yes, we do actually have to check colour -
-        // https://github.com/official-stockfish/Stockfish/issues/356
-        for (; InBoardArea(rook_sq); rook_sq.x += direction) {
-          if (at(rook_sq) == Piece{color, PieceType::kRook}) {
-            rook_found = true;
-            break;
-          }
-        }
+    // Yes, we do actually have to check colour -
+    // https://github.com/official-stockfish/Stockfish/issues/356
+    for (; InBoardArea(rook_sq); rook_sq.x += direction) {
+      if (at(rook_sq) == Piece{color, PieceType::kRook}) {
+        rook_found = true;
+        break;
+      }
+    }
 
-        if (!rook_found) {
-          std::cerr << "Where did our rook go?" << *this << "\n"
-                    << "Square: " << SquareToString(sq) << std::endl;
-          SpielFatalError("Rook not found");
-        }
+    if (!rook_found) {
+      std::cerr << "Where did our rook go?" << *this << "\n"
+                << "Square: " << SquareToString(sq) << std::endl;
+      SpielFatalError("Rook not found");
+    }
 
-        static_assert(kBoardSize == 8,
-                      "This is not boardsize-independent! What does castling "
-                      "mean for other boardsizes?");
-        int8_t rook_final_x = direction == -1 ? 3 /* d-file */ : 5 /* f-file */;
-        Square rook_final_sq = Square{rook_final_x, sq.y};
-        int8_t king_final_x = direction == -1 ? 2 /* c-file */ : 6 /* g-file */;
-        Square king_final_sq = Square{king_final_x, sq.y};
+    static_assert(kBoardSize == 8,
+                  "This is not boardsize-independent! What does castling "
+                  "mean for other boardsizes?");
+    int8_t rook_final_x = direction == -1 ? 3 /* d-file */ : 5 /* f-file */;
+    Square rook_final_sq = Square{rook_final_x, sq.y};
+    int8_t king_final_x = direction == -1 ? 2 /* c-file */ : 6 /* g-file */;
+    Square king_final_sq = Square{king_final_x, sq.y};
 
-        // 4. 5. 6. All squares the king and rook jump over, including the final
-        // squares, must be empty. Squares king jumps over must additionally be
-        // safe.
-        if (!IsEmpty(rook_final_sq) || !IsEmpty(king_final_sq) ||
-            !check_squares_between(rook_sq, rook_final_sq, false) ||
-            !check_squares_between(sq, king_final_sq, !kAllowCheck)) {
-          return false;
-        }
+    // 4. 5. 6. All squares the king and rook jump over, including the final
+    // squares, must be empty. Squares king jumps over must additionally be
+    // safe.
+    if (!IsEmpty(rook_final_sq) || !IsEmpty(king_final_sq) ||
+        !check_squares_between(rook_sq, rook_final_sq, false) ||
+        !check_squares_between(sq, king_final_sq, !kAllowCheck)) {
+      return false;
+    }
 
-        return true;
-      };
+    return true;
+  };
 
   // 1. 2. 3. Moving the king, moving the rook, or the rook getting captured
   // will reset the flag.
@@ -1463,11 +1463,11 @@ void ChessBoard<kBoardSize, kAllowCheck>::set_square(Square sq, Piece piece) {
   auto current_piece = at(sq);
   zobrist_hash_ ^=
       kZobristValues[position][static_cast<int>(current_piece.color)]
-      [static_cast<int>(current_piece.type)];
+                    [static_cast<int>(current_piece.type)];
 
   // Then add the new piece
   zobrist_hash_ ^= kZobristValues[position][static_cast<int>(piece.color)]
-  [static_cast<int>(piece.type)];
+                                 [static_cast<int>(piece.type)];
 
   board_[position] = piece;
 }
@@ -1506,7 +1506,7 @@ void ChessBoard<kBoardSize,  kAllowCheck>::SetCastlingRight(Color side,
 
   // Remove old value from hash.
   zobrist_hash_ ^= kZobristValues[ToInt(side)][ToInt(direction)]
-  [CastlingRight(side, direction)];
+                                 [CastlingRight(side, direction)];
 
   // Then add the new value.
   zobrist_hash_ ^= kZobristValues[ToInt(side)][ToInt(direction)][can_castle];
