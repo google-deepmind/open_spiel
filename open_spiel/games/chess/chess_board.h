@@ -134,8 +134,8 @@ absl::optional<Square> SquareFromString(const std::string& s);
 template <uint32_t kBoardSize, bool kAllowCheck>
 class ChessBoard;
 
-using StandardChessBoard = ChessBoard<8, false>;
-using StandardDarkChessBoard = ChessBoard<8, true>;
+using StandardChessBoard = ChessBoard<8, /*kAllowCheck=*/false>;
+using StandardDarkChessBoard = ChessBoard<8, /*kAllowCheck=*/true>;
 
 struct Move {
   Square from;
