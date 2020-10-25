@@ -299,8 +299,8 @@ absl::optional<std::vector<double>> DarkChessState::MaybeFinalReturns() const {
     returns[chess::ColorToPlayer(to_play_color)] = LossUtility();
     returns[chess::ColorToPlayer(opp_color)] = WinUtility();
     return returns;
-  }
-  else if (Board().find(opp_king) == chess::InvalidSquare()) {
+
+  } else if (Board().find(opp_king) == chess::InvalidSquare()) {
 
     std::vector<double> returns(NumPlayers());
     returns[chess::ColorToPlayer(to_play_color)] = WinUtility();

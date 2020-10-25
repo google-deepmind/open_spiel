@@ -460,8 +460,7 @@ void ChessBoard<kBoardSize, kAllowCheck>::GenerateLegalMoves(
 
   if (kAllowCheck) {
     GeneratePseudoLegalMoves(yield);
-  }
-  else {
+  } else {
     auto king_square = find(Piece{to_play_, PieceType::kKing});
 
     GeneratePseudoLegalMoves([this, &king_square, &yield](const Move &move) {
