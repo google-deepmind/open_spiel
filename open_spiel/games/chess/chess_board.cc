@@ -1556,8 +1556,8 @@ void ChessBoard<kBoardSize, kAllowCheck>::SetEpSquare(Square sq) {
 }
 
 // Explicit instantiations for all board sizes we care about.
-template class ChessBoard<8, false>;
-template class ChessBoard<8, true>;
+template class ChessBoard<8, /*kAllowCheck=*/false>;
+template class ChessBoard<8, /*kAllowCheck=*/true>;
 
 StandardChessBoard MakeDefaultBoard() {
   auto maybe_board = StandardChessBoard::BoardFromFEN(
