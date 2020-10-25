@@ -29,7 +29,7 @@
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
-// Simple game of Noughts and Crosses:
+// Dark chess - imperfect information version of chess:
 // https://en.wikipedia.org/wiki/Dark_chess
 //
 // Parameters: none
