@@ -305,17 +305,19 @@ class DeepCFRSolver(policy.Policy):
       for action in state.legal_actions():
         expected_payoff[action] = self._traverse_game_tree(
             state.child(action), player)
+      cfv = 0
+      for a_ in state.legal_actions():
+        cfv += strategy[a_] * expected_payoff[a_]
       for action in state.legal_actions():
         sampled_regret[action] = expected_payoff[action]
-        for a_ in state.legal_actions():
-          sampled_regret[action] -= strategy[a_] * expected_payoff[a_]
+        sampled_regret[action] -= cfv
       sampled_regret_arr = [0] * self._num_actions
       for action in sampled_regret:
         sampled_regret_arr[action] = sampled_regret[action]
       self._advantage_memories[player].add(
           AdvantageMemory(state.information_state_tensor(), self._iteration,
                           sampled_regret_arr, action))
-      return max(expected_payoff.values())
+      return cfv
     else:
       other_player = state.current_player()
       _, strategy = self._sample_action_from_advantage(state, other_player)
