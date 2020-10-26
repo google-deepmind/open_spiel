@@ -792,11 +792,11 @@ def compute(payoff_tables,
 
   return rhos, rho_m, pi, num_profiles, num_strats_per_population
 
-def suggest_alpha(payoff_tables):
+def suggest_alpha(payoff_tables, tol=.1):
   """Suggests an alpha for use in alpha-rank. 
 
   The suggested alpha is approximately the smallest possible alpha such that 
-  the ranking has 'settled out'. It is calculated as 2/min_gap_between_payoffs. 
+  the ranking has 'settled out'. It is calculated as -ln(tol)/min_gap_between_payoffs. 
 
   Args:
     payoff_tables: List of game payoff tables, one for each agent identity. Each
@@ -806,8 +806,10 @@ def suggest_alpha(payoff_tables):
   Returns:
     A suggested alpha.
   """ 
+  payoffs_are_hpt_format = utils.check_payoffs_are_hpt(payoff_tables)
+
   num_strats_per_population =\
-    utils.get_num_strats_per_population(payoff_tables, False)
+    utils.get_num_strats_per_population(payoff_tables, payoffs_are_hpt_format)
   num_profiles = utils.get_num_profiles(num_strats_per_population)
 
   gap = np.inf
@@ -820,12 +822,12 @@ def suggest_alpha(payoff_tables):
 
     for index_population_that_changed, col_profile in next_profile_gen:
       payoff_table_k = payoff_tables[index_population_that_changed]
-      f_r = _get_payoff(payoff_table_k, False, col_profile, 
+      f_r = _get_payoff(payoff_table_k, payoffs_are_hpt_format, col_profile, 
                           index_population_that_changed)
-      f_s = _get_payoff(payoff_table_k, False, row_profile, 
+      f_s = _get_payoff(payoff_table_k, payoffs_are_hpt_format, row_profile, 
                           index_population_that_changed)
       if f_r > f_s:
         gap = min(gap, f_r - f_s)
 
-  return 2/gap
+  return -np.log(tol)/gap
 
