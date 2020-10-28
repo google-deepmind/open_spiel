@@ -194,14 +194,14 @@ class CFRSolverBase {
   // The returned policy instance should only be used during the lifetime of
   // the CFRSolver object.
   std::shared_ptr<Policy> AveragePolicy() const {
-    return std::shared_ptr<Policy>(new CFRAveragePolicy(info_states_, nullptr));
+    return std::make_shared<CFRAveragePolicy>(info_states_, nullptr);
   }
 
   // Computes the current policy, containing the policy for all players.
   // The returned policy instance should only be used during the lifetime of
   // the CFRSolver object.
   std::shared_ptr<Policy> CurrentPolicy() const {
-    return std::shared_ptr<Policy>(new CFRCurrentPolicy(info_states_, nullptr));
+    return std::make_shared<CFRCurrentPolicy>(info_states_, nullptr);
   }
 
   CFRInfoStateValuesTable& InfoStateValuesTable() { return info_states_; }
