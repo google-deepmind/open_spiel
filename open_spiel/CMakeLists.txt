@@ -231,17 +231,6 @@ endif()
 if (BUILD_WITH_GAMUT)
   set(OPEN_SPIEL_OBJECTS ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:gamut>)
 endif()
-if (BUILD_WITH_ORTOOLS)
-  # set(ORTOOLS_HOME $ENV{HOME}/or-tools)
-  # list(APPEND CMAKE_PREFIX_PATH "${ORTOOLS_HOME}")
-  # find_package(ortools CONFIG REQUIRED)
-  # link_libraries(open_spiel_core ortools::ortools)
-  # set(OPEN_SPIEL_OBJECTS $<TARGET_OBJECTS:open_spiel_ortools> ${OPEN_SPIEL_OBJECTS})
-  # Use the following to link your_target_executable with OR-Tools libraries:
-  # target_link_libraries (your_target_executable ortools::ortools)
-endif()
-
-
 
 # We have the parent of this directory in the include path, so that we can
 # include for example "open_spiel/spiel.h" (assuming this directory is named
@@ -264,6 +253,25 @@ add_subdirectory (utils)
 
 if (BUILD_WITH_JULIA)
   add_subdirectory (julia)
+endif()
+
+if (BUILD_WITH_ORTOOLS)
+  # Compile with OR-Tools headers and link against binary distribution,
+  # downloaded from https://developers.google.com/optimization/install/cpp/linux
+  # and assumed to be in $HOME/or-tools.
+  # The flags were taken from the compilation of linear_programming.cc after
+  # running make test_cc.
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DUSE_BOP -DUSE_GLOP -DUSE_CBC -DUSE_CLP -DUSE_SCIP")
+  set(ORTOOLS_HOME $ENV{HOME}/or-tools)
+  set(ORTOOLS_INC_DIRS ${ORTOOLS_HOME} ${ORTOOLS_HOME}/include)
+  set(ORTOOLS_LIB_DIRS ${ORTOOLS_HOME}/lib ${ORTOOLS_HOME}/lib64)
+  set(ORTOOLS_LIBS z rt pthread ortools)
+  set_target_properties(open_spiel_core PROPERTIES POSITION_INDEPENDENT_CODE ON)
+  include_directories(${ORTOOLS_INC_DIRS})
+  link_directories(${ORTOOLS_LIB_DIRS})
+  set(OPEN_SPIEL_OBJECTS ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:open_spiel_ortools>)
+
+  add_subdirectory(algorithms/ortools)
 endif()
 
 # Build a shared library, i.e. libopen_spiel.so. We generally only enable this
