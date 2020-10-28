@@ -798,10 +798,24 @@ def suggest_alpha(payoff_tables, tol=.1):
   The suggested alpha is approximately the smallest possible alpha such that 
   the ranking has 'settled out'. It is calculated as -ln(tol)/min_gap_between_payoffs. 
 
+  The logic behind this settling out is that the fixation probabilities can be 
+  expanded as a series, and the relative size of each term in this series
+  changes with alpha. As alpha gets larger and larger, one of the terms in 
+  this series comes to dominate, and this causes the ranking to settle 
+  down. Just how fast this domination happens is easy to calculate, and this 
+  function uses it to estimate the alpha by which the ranking has settled.
+
+  You can find further discussion at the PR:
+
+  https://github.com/deepmind/open_spiel/pull/403
+
   Args:
     payoff_tables: List of game payoff tables, one for each agent identity. Each
       payoff_table may be either a numpy array, or a _PayoffTableInterface
       object.
+    tol: the desired gap between the first and second terms in the fixation 
+      probability expansion. A smaller tolerance leads to a larger alpha, and 
+      a 'more settled out' ranking.  
   
   Returns:
     A suggested alpha.
