@@ -28,10 +28,5 @@ attrs == 19.3.0
 jax == 0.1.67
 jaxlib == 0.1.47
 dm-haiku == 0.0.1
-dataclasses==0.6
-future==0.18.2
 hypothesis==5.38.0
-numpy==1.18.5
-sortedcontainers==2.2.2
 torch==1.7.0
-typing-extensions==3.7.4.3
