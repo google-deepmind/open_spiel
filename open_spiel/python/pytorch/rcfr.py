@@ -1,3 +1,42 @@
+# Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""Regression counterfactual regret minimization (RCFR) [Waugh et al., 2015; Morrill, 2016].
+
+In contrast to (tabular) counterfactual regret minimization (CFR)
+[Zinkevich et al., 2007], RCFR replaces the table of regrets that generate the
+current policy profile with a profile of regression models. The average
+policy is still tracked exactly with a full game-size table. The exploitability
+of the average policy in zero-sum games decreases as the model accuracy and
+the number of iterations increase [Waugh et al., 2015; Morrill, 2016]. As long
+as the regression model errors decrease across iterations, the average policy
+converges toward a Nash equilibrium in zero-sum games.
+
+# References
+
+Dustin Morrill. Using Regret Estimation to Solve Games Compactly.
+    M.Sc. thesis, Computing Science Department, University of Alberta,
+    Apr 1, 2016, Edmonton Alberta, Canada.
+Kevin Waugh, Dustin Morrill, J. Andrew Bagnell, and Michael Bowling.
+    Solving Games with Functional Regret Estimation. At the Twenty-Ninth AAAI
+    Conference on Artificial Intelligence, January 25-29, 2015, Austin Texas,
+    USA. Pages 2138-2145.
+Martin Zinkevich, Michael Johanson, Michael Bowling, and Carmelo Piccione.
+    Regret Minimization in Games with Incomplete Information.
+    At Advances in Neural Information Processing Systems 20 (NeurIPS). 2007.
+"""
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
