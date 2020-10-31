@@ -51,7 +51,10 @@ class MatrixGame : public NormalFormGame {
         row_action_names_(row_action_names),
         col_action_names_(col_action_names),
         row_utilities_(row_utilities),
-        col_utilities_(col_utilities) {}
+        col_utilities_(col_utilities) {
+
+      utility_sum_ = ComputeUtilitySum();
+  }
 
   MatrixGame(GameType game_type, GameParameters game_parameters,
              std::vector<std::string> row_action_names,
@@ -62,7 +65,10 @@ class MatrixGame : public NormalFormGame {
         row_action_names_(row_action_names),
         col_action_names_(col_action_names),
         row_utilities_(FlattenMatrix(row_utilities)),
-        col_utilities_(FlattenMatrix(col_utilities)) {}
+        col_utilities_(FlattenMatrix(col_utilities)) {
+
+      utility_sum_ = ComputeUtilitySum();
+  }
 
   // Implemwentation of Game interface
   int NumDistinctActions() const override {
@@ -113,6 +119,10 @@ class MatrixGame : public NormalFormGame {
     return col_action_names_[col];
   }
 
+  double UtilitySum() const {
+    return utility_sum_;
+  }
+
   std::vector<double> GetUtilities(const std::vector<Action>& joint_action)
       const override {
     int index = Index(joint_action[0], joint_action[1]);
@@ -142,10 +152,20 @@ class MatrixGame : public NormalFormGame {
 
  private:
   int Index(int row, int col) const { return row * NumCols() + col; }
+  double ComputeUtilitySum() const {
+        double utility_sum = 0.0;
+      for (int row = 0; row < NumRows(); row++) {
+          for (int col = 0; col < NumCols(); col++) {
+              utility_sum += RowUtility(row, col) + ColUtility(row, col);
+          }
+      }
+      return utility_sum;
+  };
   std::vector<std::string> row_action_names_;
   std::vector<std::string> col_action_names_;
   std::vector<double> row_utilities_;
   std::vector<double> col_utilities_;
+  double utility_sum_;
 };
 
 class MatrixState : public NFGState {
