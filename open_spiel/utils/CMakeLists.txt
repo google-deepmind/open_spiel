@@ -1,4 +1,6 @@
 add_library (utils OBJECT
+  action_view.h
+  action_view.cc
   circular_buffer.h
   combinatorics.h
   combinatorics.cc
