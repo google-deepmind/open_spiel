@@ -119,7 +119,7 @@ class MatrixGame : public NormalFormGame {
     return col_action_names_[col];
   }
 
-  double UtilitySum() const {
+  double UtilitySum() const override {
     return utility_sum_;
   }
 
