@@ -129,7 +129,11 @@ class CFRAveragePolicy : public Policy {
   // return a uniform policy.
   CFRAveragePolicy(const CFRInfoStateValuesTable& info_states,
                    std::shared_ptr<Policy> default_policy);
-  ActionsAndProbs GetStatePolicy(const State& state) const override;
+  ActionsAndProbs GetStatePolicy(const State& state) const override {
+    return GetStatePolicy(state, state.CurrentPlayer());
+  };
+  ActionsAndProbs GetStatePolicy(const State& state,
+                                 Player player) const override;
   ActionsAndProbs GetStatePolicy(const std::string& info_state) const override;
 
  private:
@@ -149,7 +153,11 @@ class CFRCurrentPolicy : public Policy {
   // to not use a default policy).
   CFRCurrentPolicy(const CFRInfoStateValuesTable& info_states,
                    std::shared_ptr<Policy> default_policy);
-  ActionsAndProbs GetStatePolicy(const State& state) const override;
+  ActionsAndProbs GetStatePolicy(const State& state) const override {
+    return GetStatePolicy(state, state.CurrentPlayer());
+  };
+  ActionsAndProbs GetStatePolicy(const State& state,
+                                 Player player) const override;
   ActionsAndProbs GetStatePolicy(const std::string& info_state) const override;
   TabularPolicy AsTabular() const;
 

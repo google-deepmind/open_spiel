@@ -257,7 +257,9 @@ std::unique_ptr<TabularPolicy> DeserializeTabularPolicy(
 // tabular version, except that this works for large games.
 class UniformPolicy : public Policy {
  public:
-  ActionsAndProbs GetStatePolicy(const State& state) const override {
+  ActionsAndProbs GetStatePolicy(
+      const State& state, Player player) const override {
+    SPIEL_CHECK_TRUE(state.IsPlayerActing(player));
     return UniformStatePolicy(state);
   }
 

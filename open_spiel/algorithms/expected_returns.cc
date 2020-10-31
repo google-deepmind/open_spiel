@@ -216,7 +216,7 @@ std::vector<double> ExpectedReturns(const State& state,
     return ExpectedReturnsImpl(
         state,
         [&policies](Player player, const State& state) {
-          return policies[player]->GetStatePolicy(state);
+          return policies[player]->GetStatePolicy(state, player);
         },
         depth_limit);
   }
@@ -236,7 +236,7 @@ std::vector<double> ExpectedReturns(const State& state,
     return ExpectedReturnsImpl(
         state,
         [&joint_policy](Player player, const State& state) {
-          return joint_policy.GetStatePolicy(state);
+          return joint_policy.GetStatePolicy(state, player);
         },
         depth_limit);
   }
