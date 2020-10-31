@@ -70,7 +70,7 @@ class MatrixGame : public NormalFormGame {
       utility_sum_ = ComputeUtilitySum();
   }
 
-  // Implemwentation of Game interface
+  // Implementation of Game interface
   int NumDistinctActions() const override {
     return std::max(NumRows(), NumCols());
   }
