@@ -106,6 +106,21 @@ class NormalFormGame : public SimMoveGame {
     return GetUtilities(joint_action)[player];
   }
 
+  virtual double UtilitySum () const override {
+      if (game_type_.utility == GameType::Utility::kZeroSum) {
+          return 0.0;
+      } else if (game_type_.utility == GameType::Utility::kConstantSum) {
+          double utility_sum = 0.0;
+          int num_players = NumPlayers();
+          std::vector<Action> joint_action(num_players, 0);
+          for (Player p = 0; p < num_players; p++) {
+            utility_sum += GetUtility(p, joint_action);
+          }
+          return utility_sum;
+      }
+      SpielFatalError("No appropriate UtilitySum value for general-sum or identical utility games");
+  }
+
  protected:
   NormalFormGame(GameType game_type, GameParameters game_parameters)
       : SimMoveGame(game_type, game_parameters) {}
