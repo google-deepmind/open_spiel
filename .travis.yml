@@ -60,6 +60,16 @@ matrix:
       - DEFAULT_OPTIONAL_DEPENDENCY="ON"
       - TRAVIS_USE_NOX=1
 
+  # Build and run tests for building a shared library with linkable
+  # third party dependencies in place.
+  - os: linux
+    dist: bionic # Ubuntu 18.04.2 LTS released on 26 April 2018
+    env:
+      - OS_PYTHON_VERSION=3.6
+      - BUILD_SHARED_LIB="ON"
+      - DEFAULT_OPTIONAL_DEPENDENCY="ON"
+      - BUILD_WITH_ORTOOLS="ON"
+
 script:
   - pwd
   - chmod +x install.sh
