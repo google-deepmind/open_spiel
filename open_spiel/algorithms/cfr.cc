@@ -68,12 +68,13 @@ CFRAveragePolicy::CFRAveragePolicy(const CFRInfoStateValuesTable& info_states,
                                    std::shared_ptr<Policy> default_policy)
     : info_states_(info_states), default_policy_(default_policy) {}
 
-ActionsAndProbs CFRAveragePolicy::GetStatePolicy(const State& state) const {
+ActionsAndProbs CFRAveragePolicy::GetStatePolicy(
+    const State& state, Player player) const {
   ActionsAndProbs actions_and_probs;
-  auto entry = info_states_.find(state.InformationStateString());
+  auto entry = info_states_.find(state.InformationStateString(player));
   if (entry == info_states_.end()) {
     if (default_policy_) {
-      return default_policy_->GetStatePolicy(state);
+      return default_policy_->GetStatePolicy(state, player);
     } else {
       return actions_and_probs;
     }
@@ -124,12 +125,13 @@ CFRCurrentPolicy::CFRCurrentPolicy(const CFRInfoStateValuesTable& info_states,
                                    std::shared_ptr<Policy> default_policy)
     : info_states_(info_states), default_policy_(default_policy) {}
 
-ActionsAndProbs CFRCurrentPolicy::GetStatePolicy(const State& state) const {
+ActionsAndProbs CFRCurrentPolicy::GetStatePolicy(
+    const State& state, Player player) const {
   ActionsAndProbs actions_and_probs;
-  auto entry = info_states_.find(state.InformationStateString());
+  auto entry = info_states_.find(state.InformationStateString(player));
   if (entry == info_states_.end()) {
     if (default_policy_) {
-      return default_policy_->GetStatePolicy(state);
+      return default_policy_->GetStatePolicy(state, player);
     } else {
       return actions_and_probs;
     }
