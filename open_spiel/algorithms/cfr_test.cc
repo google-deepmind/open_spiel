@@ -159,6 +159,12 @@ void CFRTest_OneShotGameTest(int iterations, std::string one_shot_game,
       std::shared_ptr<Policy> average_policy = solver.AveragePolicy();
       nash_conv = NashConv(*game, *average_policy);
       std::cout << "iter " << i << ", nashconv = " << nash_conv << std::endl;
+
+      if (game->GetType().utility == GameType::Utility::kConstantSum ||
+          game->GetType().utility == GameType::Utility::kZeroSum) {
+        double expl = Exploitability(*game, *average_policy);
+        SPIEL_CHECK_FLOAT_NEAR(expl, nash_conv / game->NumPlayers(), 1e-10);
+      }
     }
   }
   SPIEL_CHECK_LE(nash_conv, nashconv_upper_bound);

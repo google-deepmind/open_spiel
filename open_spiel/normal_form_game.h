@@ -16,6 +16,7 @@
 #define OPEN_SPIEL_NORMAL_FORM_GAME_H_
 
 #include <memory>
+#include <numeric>
 #include <string>
 #include <vector>
 
@@ -104,6 +105,18 @@ class NormalFormGame : public SimMoveGame {
   virtual double GetUtility(Player player,
                             const std::vector<Action>& joint_action) const {
     return GetUtilities(joint_action)[player];
+  }
+
+  double UtilitySum() const override {
+    if (game_type_.utility == GameType::Utility::kZeroSum) {
+      return 0.0;
+    } else if (game_type_.utility == GameType::Utility::kConstantSum) {
+      std::vector<Action> joint_action(NumPlayers(), 0);
+      std::vector<double> utilities = GetUtilities(joint_action);
+      return std::accumulate(utilities.begin(), utilities.end(), 0.0);
+    }
+    SpielFatalError(absl::StrCat("No appropriate UtilitySum value for ",
+                                 "general-sum or identical utility games."));
   }
 
  protected:
