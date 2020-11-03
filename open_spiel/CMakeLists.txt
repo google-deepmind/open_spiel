@@ -238,7 +238,7 @@ if (BUILD_WITH_ORTOOLS)
   # The flags were taken from the compilation of linear_programming.cc after
   # running make test_cc.
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DUSE_BOP -DUSE_GLOP -DUSE_CBC -DUSE_CLP -DUSE_SCIP")
-  set(ORTOOLS_HOME $ENV{HOME}/or-tools)
+  set(ORTOOLS_HOME "${CMAKE_CURRENT_SOURCE_DIR}/ortools")
   set(ORTOOLS_INC_DIRS ${ORTOOLS_HOME} ${ORTOOLS_HOME}/include)
   set(ORTOOLS_LIB_DIRS ${ORTOOLS_HOME}/lib ${ORTOOLS_HOME}/lib64)
   set(ORTOOLS_LIBS z rt pthread ortools)

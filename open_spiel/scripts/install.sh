@@ -150,6 +150,23 @@ if [[ ${BUILD_WITH_LIBTORCH:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; then
   unzip "${DOWNLOAD_FILE}" -d "open_spiel/libtorch/"
 fi
 
+# Add OrTools
+# This downloads the precompiled binaries available from the official website.
+# https://developers.google.com/optimization/install/cpp/
+DIR="open_spiel/ortools"
+if [[ ${BUILD_WITH_ORTOOLS:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; then
+  # You may want to replace this URL according to your system.
+  #
+  # Use version 8 at minimum, due to compatibility between absl library versions
+  # used in OpenSpiel and in OrTools.
+  DOWNLOAD_URL="https://github.com/google/or-tools/releases/download/v8.0/or-tools_ubuntu-18.04_v8.0.8283.tar.gz"
+
+  DOWNLOAD_FILE="${DOWNLOAD_CACHE_DIR}/ortools.tar.gz"
+  [[ -f "${DOWNLOAD_FILE}" ]] || wget --show-progress -O "${DOWNLOAD_FILE}" "$DOWNLOAD_URL"
+  mkdir "$DIR"
+  tar -xzvf "${DOWNLOAD_FILE}" --strip 1 -C "$DIR"
+fi
+
 # 2. Install other required system-wide dependencies
 
 # Install Julia if required and not present already.
