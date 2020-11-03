@@ -277,7 +277,7 @@ class PolicyGradient(rl_agent.AbstractAgent):
     elif loss_str == "a2c":
       return rl_losses.BatchA2CLoss
 
-  def _act(self, info_state, legal_actions):
+  def _act(self, info_state, legal_actions, is_deterministic=False):
     # Make a singleton batch for NN compatibility: [1, info_state_size]
     info_state = np.reshape(info_state, [1, -1])
     policy_probs = self._session.run(
@@ -290,10 +290,15 @@ class PolicyGradient(rl_agent.AbstractAgent):
       probs /= sum(probs)
     else:
       probs[legal_actions] = 1 / len(legal_actions)
-    action = np.random.choice(len(probs), p=probs)
+
+    action = None 
+    if is_deterministic:
+      action = np.argmax(probs)
+    else:
+      action = np.random.choice(len(probs), p=probs)
     return action, probs
 
-  def step(self, time_step, is_evaluation=False):
+  def step(self, time_step, is_evaluation=False, is_deterministic=False):
     """Returns the action to be taken and updates the network if needed.
 
     Args:
@@ -309,7 +314,7 @@ class PolicyGradient(rl_agent.AbstractAgent):
         self.player_id == time_step.current_player()):
       info_state = time_step.observations["info_state"][self.player_id]
       legal_actions = time_step.observations["legal_actions"][self.player_id]
-      action, probs = self._act(info_state, legal_actions)
+      action, probs = self._act(info_state, legal_actions, is_deterministic=is_deterministic)
     else:
       action = None
       probs = []
@@ -354,6 +359,7 @@ class PolicyGradient(rl_agent.AbstractAgent):
 
   def save(self, checkpoint_dir):
     for name, saver in self._savers:
+      print("\t", name)
       path = saver.save(
           self._session,
           self._full_checkpoint_name(checkpoint_dir, name),
@@ -371,6 +377,7 @@ class PolicyGradient(rl_agent.AbstractAgent):
 
   def restore(self, checkpoint_dir):
     for name, saver in self._savers:
+      print("\t", name)
       full_checkpoint_dir = self._full_checkpoint_name(checkpoint_dir, name)
       logging.info("Restoring checkpoint: %s", (full_checkpoint_dir))
       saver.restore(self._session, full_checkpoint_dir)
