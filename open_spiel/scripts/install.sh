@@ -164,7 +164,7 @@ if [[ ${BUILD_WITH_ORTOOLS:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; then
   DOWNLOAD_FILE="${DOWNLOAD_CACHE_DIR}/ortools.tar.gz"
   [[ -f "${DOWNLOAD_FILE}" ]] || wget --show-progress -O "${DOWNLOAD_FILE}" "$DOWNLOAD_URL"
   mkdir "$DIR"
-  tar -xzvf "${DOWNLOAD_FILE}" --strip 1 -C "$DIR"
+  tar -xzf "${DOWNLOAD_FILE}" --strip 1 -C "$DIR"
 fi
 
 # 2. Install other required system-wide dependencies
