@@ -159,7 +159,15 @@ if [[ ${BUILD_WITH_ORTOOLS:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; then
   #
   # Use version 8 at minimum, due to compatibility between absl library versions
   # used in OpenSpiel and in OrTools.
-  DOWNLOAD_URL="https://github.com/google/or-tools/releases/download/v8.0/or-tools_ubuntu-18.04_v8.0.8283.tar.gz"
+  if [[ "$OSTYPE" == "linux-gnu" ]]; then
+    DOWNLOAD_URL="https://github.com/google/or-tools/releases/download/v8.0/or-tools_ubuntu-18.04_v8.0.8283.tar.gz"
+  elif [[ "$OSTYPE" == "darwin"* ]]; then  # Mac OSX
+    DOWNLOAD_URL="https://github.com/google/or-tools/releases/download/v8.0/or-tools_MacOsX-10.15.7_v8.0.8283.tar.gz"
+  else
+    echo "The OS '$OSTYPE' is not supported (Only Linux and MacOS is). " \
+         "Feel free to contribute the install for a new OS."
+    exit 1
+  fi
 
   DOWNLOAD_FILE="${DOWNLOAD_CACHE_DIR}/ortools.tar.gz"
   [[ -f "${DOWNLOAD_FILE}" ]] || wget --show-progress -O "${DOWNLOAD_FILE}" "$DOWNLOAD_URL"
