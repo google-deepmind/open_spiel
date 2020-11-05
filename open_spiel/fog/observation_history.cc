@@ -14,10 +14,10 @@
 
 #include "open_spiel/fog/observation_history.h"
 
-#include <optional>
 #include <string>
 
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/observer.h"
 #include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
