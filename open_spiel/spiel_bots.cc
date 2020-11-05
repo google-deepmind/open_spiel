@@ -22,6 +22,7 @@
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/random/uniform_int_distribution.h"
+#include "open_spiel/abseil-cpp/absl/strings/string_view.h"
 #include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
@@ -203,7 +204,7 @@ std::unique_ptr<Bot> MakeFixedActionPreferenceBot(
 }
 namespace {
 std::vector<Action> ActionsFromStr(const absl::string_view& str,
-                                   const std::string_view& delim) {
+                                   const absl::string_view& delim) {
   std::vector<Action> actions;
   for (absl::string_view token : absl::StrSplit(str, delim)) {
     int v;
