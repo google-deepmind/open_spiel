@@ -23,53 +23,75 @@
 
 namespace open_spiel {
 
-// Provides a number of iterators that are useful for dealing 
+class FixedActionsIterator {
+  const int fixed_action_;
+  const int num_actions_;
+  const int prod_before_;
+  const int prod_after_;
+  int i_;  // Outer loop
+  int j_;  // Inner loop
+ public:
+  FixedActionsIterator(int fixed_action, int num_actions, int prod_before,
+                       int prod_after, int i, int j);
+  FixedActionsIterator& operator++();
+  Action operator*() const;
+  bool operator==(const FixedActionsIterator& rhs) const;
+  bool operator!=(const FixedActionsIterator& rhs) const;
+};
+
+struct FixedActions {
+  const int fixed_action;
+  const int num_actions;
+  const int prod_before;
+  const int prod_after;
+  FixedActionsIterator begin() const;
+  FixedActionsIterator end() const;
+};
+
+class FlatJointActionsIterator {
+  int current_action_;
+ public:
+  FlatJointActionsIterator(int current_action);
+  FlatJointActionsIterator& operator++();
+  bool operator==(FlatJointActionsIterator other) const;
+  bool operator!=(FlatJointActionsIterator other) const;
+  Action operator*() const;
+};
+
+struct FlatJointActions {
+  const int num_flat_joint_actions;
+  FlatJointActionsIterator begin() const;
+  FlatJointActionsIterator end() const;
+};
+
+// Provides a number of iterators that are useful for dealing
 // with simultaneous move nodes.
 struct ActionView {
   const Player current_player;
   const std::vector<std::vector<Action>> legal_actions;
   // Collects legal actions at the specified state.
-  ActionView(const State& state);
-
+  explicit ActionView(const State& state);
+  // Construct a custom action view.
   ActionView(const Player current_player,
              const std::vector<std::vector<Action>> legal_actions);
 
   int num_players() const { return legal_actions.size(); }
   int num_actions(Player pl) const { return legal_actions.at(pl).size(); }
 
-  // Provides an iterator over flattened actions where we fix an action
-  // for the specified player.
-  struct FixedActions {
-    int fixed_action;
-    int prod_before;
-    int num_actions;
-    int prod_after;
-    int i = 0;  // Outer loop
-    int j = 0;  // Inner loop
-
-    FixedActions begin() const;
-    FixedActions end() const;
-    FixedActions& operator++();
-    Action operator*() const;
-    bool operator==(const FixedActions& rhs) const;
-    bool operator!=(const FixedActions& rhs) const;
-  };
-  FixedActions fixed_action(Player player, int action_index) const;
-
-  // Provides an iterator over flattened actions. This is equivalent to calling
-  // SimMoveState::LegalFlatJointActions() and iterating over the result, but it
-  // does not allocate memory for the whole cartesian product of the actions.
-  struct FlatJointActions {
-    int prod;
-    int current_action = 0;
-    FlatJointActions begin() const;
-    FlatJointActions end() const;
-    FlatJointActions& operator++();
-    bool operator==(FlatJointActions other) const;
-    bool operator!=(FlatJointActions other) const;
-    Action operator*() const;
-  };
+  // Provides an iterator over all flattened joint actions.
+  //
+  // It computes the number of possible joint actions = \prod #actions(i)
+  // over all the players with any legal actions available.
+  // The possible joint actions are just numbered 0, 1, 2, .... and can be
+  // decomposed into the individual actions of the players.
+  //
+  // As this is an iterator, it does not allocate memory for the whole cartesian
+  // product of the actions.
   FlatJointActions flat_joint_actions() const;
+
+  // Provides an iterator over flattened actions, while we fix one action
+  // for the specified player.
+  FixedActions fixed_action(Player player, int action_index) const;
 };
 
 }  // namespace open_spiel
