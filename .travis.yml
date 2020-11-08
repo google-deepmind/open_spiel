@@ -69,6 +69,7 @@ matrix:
       - BUILD_SHARED_LIB="ON"
       - DEFAULT_OPTIONAL_DEPENDENCY="ON"
       - BUILD_WITH_ORTOOLS="ON"
+      - BUILD_WITH_ORTOOLS_DOWNLOAD_URL="https://github.com/google/or-tools/releases/download/v8.0/or-tools_ubuntu-18.04_v8.0.8283.tar.gz"
 
 script:
   - pwd

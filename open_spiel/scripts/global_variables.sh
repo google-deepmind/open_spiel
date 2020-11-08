@@ -67,4 +67,7 @@ export BUILD_WITH_GAMUT="${BUILD_WITH_GAMUT:-"OFF"}"
 # Disabled by default as it requires installation of third party software.
 # See algorithms/ortools/CMakeLists.txt for specific instructions.
 export BUILD_WITH_ORTOOLS="${BUILD_WITH_ORTOOLS:-"OFF"}"
-
+# You may want to replace this URL according to your system.
+# Use version 8 at minimum, due to compatibility between absl library versions
+# used in OpenSpiel and in OrTools.
+export BUILD_WITH_ORTOOLS_DOWNLOAD_URL="${BUILD_WITH_ORTOOLS_DOWNLOAD_URL:-"https://github.com/google/or-tools/releases/download/v8.0/or-tools_ubuntu-18.04_v8.0.8283.tar.gz"}"
