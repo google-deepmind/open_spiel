@@ -31,6 +31,12 @@ struct ActionView {
   // Collects legal actions at the specified state.
   ActionView(const State& state);
 
+  ActionView(const Player current_player,
+             const std::vector<std::vector<Action>> legal_actions);
+
+  int num_players() const { return legal_actions.size(); }
+  int num_actions(Player pl) const { return legal_actions.at(pl).size(); }
+
   // Provides an iterator over flattened actions where we fix an action
   // for the specified player.
   struct FixedActions {
@@ -55,7 +61,7 @@ struct ActionView {
   // does not allocate memory for the whole cartesian product of the actions.
   struct FlatJointActions {
     int prod;
-    int pos = 0;
+    int current_action = 0;
     FlatJointActions begin() const;
     FlatJointActions end() const;
     FlatJointActions& operator++();

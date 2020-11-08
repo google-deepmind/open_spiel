@@ -34,18 +34,22 @@ std::vector<std::vector<Action>> CollectActions(const State& state) {
   return legal_actions;
 }
 
+ActionView::ActionView(const Player current_player,
+                       const std::vector<std::vector<Action>> legal_actions)
+    : current_player(current_player),
+      legal_actions(std::move(legal_actions)) {}
+
 ActionView::ActionView(const State& state)
-    : current_player(state.CurrentPlayer()),
-      legal_actions(CollectActions(state)) {}
+    : ActionView(state.CurrentPlayer(), CollectActions(state)) {}
 
 // FlatJointActions
 
 ActionView::FlatJointActions ActionView::flat_joint_actions() const {
-  int prod = 1;
+  int num_flat_actions = 1;
   for (const std::vector<Action>& actions : legal_actions) {
-    if (actions.size() > 0) prod *= actions.size();
+    if (!actions.empty()) num_flat_actions *= actions.size();
   }
-  return FlatJointActions{prod};
+  return FlatJointActions{num_flat_actions};
 }
 
 ActionView::FlatJointActions ActionView::FlatJointActions::begin() const {
@@ -55,18 +59,20 @@ ActionView::FlatJointActions ActionView::FlatJointActions::end() const {
   return FlatJointActions{prod, prod};
 }
 ActionView::FlatJointActions& ActionView::FlatJointActions::operator++() {
-  pos++;
+  current_action++;
   return *this;
 }
 bool ActionView::FlatJointActions::operator==(
     ActionView::FlatJointActions other) const {
-  return pos == other.pos && prod == other.prod;
+  return current_action == other.current_action && prod == other.prod;
 }
 bool ActionView::FlatJointActions::operator!=(
     ActionView::FlatJointActions other) const {
   return !(*this == other);
 }
-Action ActionView::FlatJointActions::operator*() const { return pos; }
+Action ActionView::FlatJointActions::operator*() const {
+  return current_action;
+}
 
 // FixedActions
 
