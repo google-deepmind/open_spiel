@@ -126,6 +126,8 @@ set (BUILD_TESTING OFF)
 enable_testing()
 
 set (OPEN_SPIEL_CORE_FILES
+  action_view.h
+  action_view.cc
   canonical_game_strings.cc
   canonical_game_strings.h
   fog/fog_constants.h

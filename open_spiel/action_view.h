@@ -12,14 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPEN_SPIEL_UTILS_ACTION_VIEW_
-#define OPEN_SPIEL_UTILS_ACTION_VIEW_
+#ifndef OPEN_SPIEL_ACTION_VIEW_
+#define OPEN_SPIEL_ACTION_VIEW_
 
 #include <vector>
 
 #include "open_spiel/spiel.h"
-#include "open_spiel/spiel_utils.h"
 
+// ActionView provides a number of iterators that are useful for dealing
+// with simultaneous move nodes.
 
 namespace open_spiel {
 
@@ -96,4 +97,4 @@ struct ActionView {
 
 }  // namespace open_spiel
 
-#endif OPEN_SPIEL_UTILS_ACTION_VIEW_
+#endif OPEN_SPIEL_ACTION_VIEW_

@@ -16,7 +16,7 @@
 
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
-#include "open_spiel/utils/action_view.h"
+#include "open_spiel/action_view.h"
 
 
 namespace open_spiel {

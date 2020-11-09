@@ -1,6 +1,4 @@
 add_library (utils OBJECT
-  action_view.h
-  action_view.cc
   circular_buffer.h
   combinatorics.h
   combinatorics.cc
@@ -27,10 +25,6 @@ add_library (utils OBJECT
   threaded_queue.h
 )
 target_include_directories (utils PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-
-add_executable(action_view_test action_view_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(action_view_test action_view_test)
 
 add_executable(circular_buffer_test circular_buffer_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)

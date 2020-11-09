@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "open_spiel/utils/action_view.h"
+#include "open_spiel/action_view.h"
 
 #include "open_spiel/spiel_utils.h"
 
