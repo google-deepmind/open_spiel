@@ -51,7 +51,8 @@ void SimMoveState::ApplyFlatJointAction(Action flat_action) {
 std::vector<Action> SimMoveState::LegalFlatJointActions() const {
   ActionView view(*this);
   FlatJointActions flat_joint_actions = view.flat_joint_actions();
-  std::vector<Action> joint_actions(flat_joint_actions.num_flat_joint_actions);
+  std::vector<Action> joint_actions;
+  joint_actions.reserve(flat_joint_actions.num_flat_joint_actions);
   for (Action flat_joint_action : flat_joint_actions) {
     joint_actions.push_back(flat_joint_action);
   }
