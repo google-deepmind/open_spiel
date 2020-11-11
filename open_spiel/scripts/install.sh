@@ -150,6 +150,17 @@ if [[ ${BUILD_WITH_LIBTORCH:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; then
   unzip "${DOWNLOAD_FILE}" -d "open_spiel/libtorch/"
 fi
 
+# Add OrTools
+# This downloads the precompiled binaries available from the official website.
+# https://developers.google.com/optimization/install/cpp/
+DIR="open_spiel/ortools"
+if [[ ${BUILD_WITH_ORTOOLS:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; then
+  DOWNLOAD_FILE="${DOWNLOAD_CACHE_DIR}/ortools.tar.gz"
+  [[ -f "${DOWNLOAD_FILE}" ]] || wget --show-progress -O "${DOWNLOAD_FILE}" "${BUILD_WITH_ORTOOLS_DOWNLOAD_URL}"
+  mkdir "$DIR"
+  tar -xzf "${DOWNLOAD_FILE}" --strip 1 -C "$DIR"
+fi
+
 # 2. Install other required system-wide dependencies
 
 # Install Julia if required and not present already.

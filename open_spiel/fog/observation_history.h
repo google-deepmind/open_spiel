@@ -20,6 +20,7 @@
 #include <utility>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/fog/fog_constants.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_globals.h"
@@ -50,7 +51,7 @@ class ActionObservationHistory {
   const Player player_;
 
   // Actual Action-Observation history.
-  std::vector<std::pair<std::optional<Action>, std::string>> history_;
+  std::vector<std::pair<absl::optional<Action>, std::string>> history_;
 
  public:
   // Constructs an Action-Observation history for a given player at the target
@@ -68,12 +69,12 @@ class ActionObservationHistory {
   // Constructs an Action-Observation history "manually" from history vector.
   ActionObservationHistory(
       Player player,
-      std::vector<std::pair<std::optional<Action>, std::string>> history);
+      std::vector<std::pair<absl::optional<Action>, std::string>> history);
 
   ActionObservationHistory(const ActionObservationHistory&) = default;
   ~ActionObservationHistory() = default;
 
-  const std::vector<std::pair<std::optional<Action>, std::string>>& History()
+  const std::vector<std::pair<absl::optional<Action>, std::string>>& History()
       const { return history_; }
   Player GetPlayer() const { return player_; }
 
@@ -88,7 +89,7 @@ class ActionObservationHistory {
 
   // Returns the action at the given time.
   // If player was not acting at requested time, returns a nullopt.
-  std::optional<Action> ActionAt(int time) const;
+  absl::optional<Action> ActionAt(int time) const;
 
   // Does the Action-Observation history correspond to the initial state?
   bool CorrespondsToInitialState() const { return MoveNumber() == 0; }

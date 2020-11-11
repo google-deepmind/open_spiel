@@ -22,6 +22,7 @@
 #include <tuple>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/games/tarok/cards.h"
 #include "open_spiel/games/tarok/contracts.h"
 #include "open_spiel/spiel.h"
@@ -148,7 +149,7 @@ class TarokState : public State {
 
   std::vector<Action> TakeSuitFromPlayerCardsInNegativeContracts(
       CardSuit suit) const;
-  std::optional<Action> ActionToBeatInNegativeContracts(CardSuit suit) const;
+  absl::optional<Action> ActionToBeatInNegativeContracts(CardSuit suit) const;
   std::vector<Action> RemovePagatIfNeeded(
       const std::vector<Action>& actions) const;
   std::vector<Action> TakeSuitFromPlayerCardsInPositiveContracts(

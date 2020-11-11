@@ -64,7 +64,7 @@ class MatrixGame : public NormalFormGame {
         row_utilities_(FlattenMatrix(row_utilities)),
         col_utilities_(FlattenMatrix(col_utilities)) {}
 
-  // Implemwentation of Game interface
+  // Implementation of Game interface
   int NumDistinctActions() const override {
     return std::max(NumRows(), NumCols());
   }
