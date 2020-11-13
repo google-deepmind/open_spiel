@@ -138,7 +138,7 @@ class CFRAveragePolicy : public Policy {
 
  private:
   const CFRInfoStateValuesTable& info_states_;
-  bool default_to_uniform_;
+  UniformPolicy uniform_policy_;
   std::shared_ptr<Policy> default_policy_;
   void GetStatePolicyFromInformationStateValues(
       const CFRInfoStateValues& is_vals,
@@ -203,6 +203,11 @@ class CFRSolverBase {
   // the CFRSolver object.
   std::shared_ptr<Policy> AveragePolicy() const {
     return std::make_shared<CFRAveragePolicy>(info_states_, nullptr);
+  }
+  // Note: This can be quite large.
+  TabularPolicy TabularAveragePolicy() const {
+    CFRAveragePolicy policy(info_states_, nullptr);
+    return TabularPolicy(*game_, policy);
   }
 
   // Computes the current policy, containing the policy for all players.
@@ -352,7 +357,7 @@ struct PartiallyDeserializedCFRSolver {
   PartiallyDeserializedCFRSolver(std::shared_ptr<const Game> game,
                                  std::string solver_type,
                                  std::string solver_specific_state,
-                                 std::string_view serialized_cfr_values_table)
+                                 absl::string_view serialized_cfr_values_table)
       : game(game),
         solver_type(solver_type),
         solver_specific_state(solver_specific_state),
