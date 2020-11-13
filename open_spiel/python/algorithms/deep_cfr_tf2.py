@@ -40,6 +40,8 @@ from tensorflow import keras
 
 from open_spiel.python import policy
 import pyspiel
+import os
+from contextlib import ExitStack
 
 
 # TODO(author3) Refactor into data structures lib.
@@ -109,6 +111,10 @@ class SkipDense(keras.layers.Layer):
 
 
 class PolicyNetwork(keras.Model):
+  """Implements the policy network as a MLP with skip connections in adjacent layers with the same
+  number of units, except for the last hidden connection where a layer normalization is applied.
+  Expects an infostate and legal_action mask as inputs, returns action probabilities.
+  """
   def __init__(self, input_size, policy_network_layers, num_actions, activation="leakyrelu", **kwargs):
     super().__init__(**kwargs)
     self._input_size = input_size
@@ -152,6 +158,10 @@ class PolicyNetwork(keras.Model):
 
 
 class AdvantageNetwork(keras.Model):
+  """Implements the advantage network as a MLP with skip connections in adjacent layers with the same
+  number of units, except for the last hidden connection where a layer normalization is applied.
+  Expects an infostate and legal_action mask as inputs, returns the counterfactual regret for each action.
+  """
   def __init__(self, input_size, adv_network_layers, num_actions, activation="leakyrelu", **kwargs):
     super().__init__(**kwargs)
     self._input_size = input_size
@@ -213,7 +223,11 @@ class DeepCFRSolver(policy.Policy):
                memory_capacity: int = int(1e6),
                policy_network_train_steps: int = 5000,
                advantage_network_train_steps: int = 750,
-               reinitialize_advantage_networks: bool = True):
+               reinitialize_advantage_networks: bool = True,
+               save_advantage_networks: str = None,
+               save_strategy_memories: str = None,
+               infer_device = 'cpu',
+               train_device = 'cpu'):
     """Initialize the Deep CFR algorithm.
 
     Args:
@@ -229,11 +243,21 @@ class DeepCFRSolver(policy.Policy):
         memories.
       memory_capacity: Number of samples that can be stored in memory.
       policy_network_train_steps: Number of policy network training steps (one
-        policy training step at the end).
+        policy training iteration at the end).
       advantage_network_train_steps: Number of advantage network training steps
         (per iteration).
       reinitialize_advantage_networks: Whether to re-initialize the
         advantage network before training on each iteration.
+      save_advantage_networks: If provided, all advantage network itearations
+        are saved in the given folder. This can be useful to implement SD-CFR
+        https://arxiv.org/abs/1901.07621
+      save_strategy_memories: saves the collected strategy memories as a
+        tfrecords file in the given location. This is not affected by
+        memory_capacity. All memories are saved to disk and not kept in memory
+      infer_device: device used for TF-operations in the traversal branch.
+        Format is anything accepted by tf.device
+      train_device: device used for TF-operations in the NN training steps.
+        Format is anything accepted by tf.device
     """
     all_players = list(range(game.num_players()))
     super(DeepCFRSolver, self).__init__(game, all_players)
@@ -256,31 +280,51 @@ class DeepCFRSolver(policy.Policy):
     self._num_actions = game.num_distinct_actions()
     self._iteration = 1
     self._learning_rate = learning_rate
+    self._save_advantage_networks = save_advantage_networks
+    self._save_strategy_memories = save_strategy_memories
+    self._infer_device = infer_device
+    self._train_device = train_device
 
+    #initialize file save locations
+    if self._save_advantage_networks:
+      os.makedirs(self._save_advantage_networks, exist_ok=True)
+
+    if self._save_strategy_memories:
+      if os.path.isdir(self._save_strategy_memories):
+        self._memories_tfrecordpath = os.path.join(self._save_strategy_memories, "strategy_memories.tfrecord")
+      else:
+        os.makedirs(os.path.split(self._save_strategy_memories)[0], exist_ok=True)
+        self._memories_tfrecordpath = self._save_strategy_memories
+
+    #initialize policy network, loss, optmizer
     self._reinitialize_policy_network()
+
+    #initialize advantage networks, losses, optmizers
     self._adv_networks = []
-    for _ in range(self._num_players):
-      self._adv_networks.append(AdvantageNetwork(self._embedding_size, self._advantage_network_layers, self._num_actions))
-
-    self._create_memories(memory_capacity)
-
-    self._loss_policy = keras.losses.MeanSquaredError()
-
+    self._adv_networks_train = []
     self._loss_advantages = []
     self._optimizer_advantages = []
     for _ in range(self._num_players):
-      self._loss_advantages.append(keras.losses.MeanSquaredError())
-      self._optimizer_advantages.append(keras.optimizers.Adam(learning_rate=learning_rate))
+      self._adv_networks.append(AdvantageNetwork(self._embedding_size, self._advantage_network_layers, self._num_actions))
+      with tf.device(self._train_device):
+        self._adv_networks_train.append(AdvantageNetwork(self._embedding_size, self._advantage_network_layers, self._num_actions))
+        self._loss_advantages.append(keras.losses.MeanSquaredError())
+        self._optimizer_advantages.append(keras.optimizers.Adam(learning_rate=learning_rate))
+
+    self._create_memories(memory_capacity)
 
   def _reinitialize_policy_network(self):
-    """Reinitalize policy network and optimizer."""
-    self._policy_network = PolicyNetwork(self._embedding_size, self._policy_network_layers, self._num_actions)
-    self._optimizer_policy = keras.optimizers.Adam(learning_rate=self._learning_rate)
+    """Reinitalize policy network and optimizer for training."""
+    with tf.device(self._train_device):
+      self._policy_network = PolicyNetwork(self._embedding_size, self._policy_network_layers, self._num_actions)
+      self._optimizer_policy = keras.optimizers.Adam(learning_rate=self._learning_rate)
+      self._loss_policy = keras.losses.MeanSquaredError()
 
   def _reinitialize_advantage_network(self, player):
-    """Reinitalize player's advantage network and optimizer."""
-    self._adv_networks[player] = AdvantageNetwork(self._embedding_size, self._advantage_network_layers, self._num_actions)
-    self._optimizer_advantages[player] = keras.optimizers.Adam(learning_rate=self._learning_rate)
+    """Reinitalize player's advantage network and optimizer for training."""
+    with tf.device(self._train_device):
+      self._adv_networks_train[player] = AdvantageNetwork(self._embedding_size, self._advantage_network_layers, self._num_actions)
+      self._optimizer_advantages[player] = keras.optimizers.Adam(learning_rate=self._learning_rate)
 
   @property
   def advantage_buffers(self):
@@ -318,17 +362,56 @@ class DeepCFRSolver(policy.Policy):
   def solve(self):
     """Solution logic for Deep CFR."""
     advantage_losses = collections.defaultdict(list)
-    for it in range(self._num_iterations):
-      for p in range(self._num_players):
-        for _ in range(self._num_traversals):
-          self._traverse_game_tree(self._root_node, p)
-        if self._reinitialize_advantage_networks:
-          # Re-initialize advantage network for player and train from scratch.
-          self._reinitialize_advantage_network(p)
-        advantage_losses[p].append(self._learn_advantage_network(p))
-      self._iteration += 1
+    with tf.device(self._infer_device):
+      with ExitStack() as stack:
+        if self._save_strategy_memories:
+          self._memories_tfrecordfile = stack.enter_context(tf.io.TFRecordWriter(self._memories_tfrecordpath))
+        for it in range(self._num_iterations):
+          for p in range(self._num_players):
+            for _ in range(self._num_traversals):
+              self._traverse_game_tree(self._root_node, p)
+            if self._reinitialize_advantage_networks:
+              # Re-initialize advantage network for player and train from scratch.
+              self._reinitialize_advantage_network(p)
+            advantage_losses[p].append(self._learn_advantage_network(p))
+            if self._save_advantage_networks:
+              os.makedirs(self._save_advantage_networks, exist_ok=True)
+              self._adv_networks[p].save(os.path.join(self._save_advantage_networks, 
+                  f'advnet_p{p}_it{self._iteration:04}'))
+          self._iteration += 1
+    # Train policy network.
     policy_loss = self._learn_strategy_network()
     return self._policy_network, advantage_losses, policy_loss
+
+  def save_policy_network(self, outputfolder):
+    """saves the policy network to the given folder"""
+    os.makedirs(outputfolder, exist_ok=True)
+    self._policy_network.save(outputfolder)
+
+  def train_policy_network_from_file(self, tfrecordpath, iteration=None, batch_size_strategy=None, 
+                                policy_network_train_steps=None, reinitialize_policy_network=True):
+    """trains the policy network from a previously stored tfrecords-file with strategy memories"""
+    self._memories_tfrecordpath = tfrecordpath
+    if iteration:
+      self._iteration = iteration
+    if batch_size_strategy:
+      self._batch_size_strategy = batch_size_strategy
+    if policy_network_train_steps:
+      self._policy_network_train_steps = policy_network_train_steps
+    if reinitialize_policy_network:
+      self._reinitialize_policy_network()
+    policy_loss = self._learn_strategy_network()
+    return policy_loss
+
+  def _add_to_strategy_memory(self, info_state, iteration, strategy_action_probs, legal_actions_mask):
+    serialized_example = self._serialize_strategy_memory(info_state, iteration,
+              strategy_action_probs, legal_actions_mask)
+    """adds the given strategy data to the memory. Uses either a tfrecordsfile on disk if provided,
+    or a reservoir buffer"""
+    if self._save_strategy_memories:
+      self._memories_tfrecordfile.write(serialized_example)
+    else:
+      self._strategy_memories.add(serialized_example)
 
   def _serialize_strategy_memory(self, info_state, iteration, strategy_action_probs, legal_actions_mask):
     """Create serialized example to store a strategy entry."""
@@ -367,7 +450,7 @@ class DeepCFRSolver(policy.Policy):
                 }
             )
         )
-    return tf.constant(example.SerializeToString())
+    return example.SerializeToString()
 
   def _deserialize_advantage_memory(self, serialized):
     """Deserializes a batch of advantage examples for the train step."""
@@ -412,9 +495,8 @@ class DeepCFRSolver(policy.Policy):
       probs = strategy
       probs /= probs.sum()
       sampled_action = np.random.choice(range(self._num_actions), p=probs)
-      self._strategy_memories.add(
-          self._serialize_strategy_memory(state.information_state_tensor(other_player), self._iteration,
-              strategy, state.legal_actions_mask(other_player)))
+      self._add_to_strategy_memory(state.information_state_tensor(other_player), self._iteration,
+              strategy, state.legal_actions_mask(other_player))
       return self._traverse_game_tree(state.child(sampled_action), player)
 
   def _sample_action_from_advantage(self, state, player):
@@ -451,6 +533,16 @@ class DeepCFRSolver(policy.Policy):
     probs = probs.numpy()
     return {action: probs[0][action] for action in legal_actions}
 
+  def _get_advantage_dataset(self, player):
+    """returns the collected regrets for the given player as a dataset"""
+    random.shuffle(self._advantage_memories[player]._data)
+    data = tf.data.Dataset.from_tensor_slices(self._advantage_memories[player]._data)
+    data = data.shuffle(100000)
+    data = data.batch(self._batch_size_advantage, drop_remainder=True)
+    data = data.map(self._deserialize_advantage_memory)
+    data = data.repeat()
+    data = data.prefetch(10)
+    return data
 
   def _learn_advantage_network(self, player):
     """Compute the loss on sampled transitions and perform a Q-network update.
@@ -463,9 +555,10 @@ class DeepCFRSolver(policy.Policy):
     Returns:
       The average loss over the advantage network of the last batch.
     """
+    
     @tf.function
     def train_step(info_states, advantages, iterations, masks):
-      model = self._adv_networks[player]
+      model = self._adv_networks_train[player]
       with tf.GradientTape() as tape:
         preds = model((info_states, masks), training=True)
         main_loss = self._loss_advantages[player](advantages, preds, sample_weight=iterations*2/self._iteration)
@@ -474,25 +567,26 @@ class DeepCFRSolver(policy.Policy):
       self._optimizer_advantages[player].apply_gradients(zip(gradients, model.trainable_variables))
       return main_loss
 
-    if self._batch_size_strategy > len(self._advantage_memories[player]):
-        ## Skip if there aren't enough samples
-        return None
+    with tf.device(self._train_device):
+      data = self._get_advantage_dataset(player)
+      for d in data.take(self._advantage_network_train_steps):
+          main_loss = train_step(*d)
 
-    random.shuffle(self._advantage_memories[player]._data)
-    data = tf.data.Dataset.from_tensor_slices(self._advantage_memories[player]._data)
-    data = data.shuffle(100000)
-    data = data.batch(self._batch_size_advantage, drop_remainder=True)
-    data = data.map(self._deserialize_advantage_memory)
+    self._adv_networks[player].set_weights(self._adv_networks_train[player].get_weights())
+    return main_loss
+
+  def _get_strategy_dataset(self):
+    """returns the collected strategy memories as a dataset"""
+    if self._memories_tfrecordpath:
+      data = tf.data.TFRecordDataset(self._memories_tfrecordpath)
+    else:
+      data = tf.data.Dataset.from_tensor_slices(self._strategy_memories._data)
+    data = data.shuffle(1000000)
+    data = data.batch(self._batch_size_strategy, drop_remainder=True)
+    data = data.map(self._deserialize_strategy_memory)
     data = data.repeat()
     data = data.prefetch(10)
-    
-    step = 0
-    for d in data:
-        main_loss = train_step(*d)
-        step += 1
-        if step == self._advantage_network_train_steps:
-            break
-    return main_loss
+    return data
 
   def _learn_strategy_network(self):
     """Compute the loss over the strategy network.
@@ -500,6 +594,7 @@ class DeepCFRSolver(policy.Policy):
     Returns:
       The average loss obtained on the last training batch of transitions or `None`.
     """
+    
     @tf.function
     def train_step(info_states, action_probs, iterations, masks):
       model = self._policy_network
@@ -510,23 +605,10 @@ class DeepCFRSolver(policy.Policy):
       gradients = tape.gradient(loss, model.trainable_variables)
       self._optimizer_policy.apply_gradients(zip(gradients, model.trainable_variables))
       return main_loss
+      
+    with tf.device(self._train_device):
+      data = self._get_strategy_dataset()
+      for d in data.take(self._policy_network_train_steps):
+          main_loss = train_step(*d)
 
-    if self._batch_size_strategy > len(self._strategy_memories):
-        ## Skip if there aren't enough samples
-        return None
-    
-    random.shuffle(self._strategy_memories._data)
-    data = tf.data.Dataset.from_tensor_slices(self._strategy_memories._data)
-    data = data.shuffle(100000)
-    data = data.batch(self._batch_size_strategy, drop_remainder=True)
-    data = data.map(self._deserialize_strategy_memory)
-    data = data.repeat()
-    data = data.prefetch(10)
-    
-    step = 0
-    for d in data:
-        main_loss = train_step(*d)
-        step += 1
-        if step == self._policy_network_train_steps:
-            break
     return main_loss
