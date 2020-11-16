@@ -53,72 +53,72 @@ ChanceOutcomes() = [{0, 0.333333333333}, {1, 0.333333333333}, {2, 0.333333333333
 LegalActions() = [0, 1, 2]
 StringLegalActions() = ["State 0", "State 1", "State 2"]
 
-# Apply action "State 2"
-action: 2
+# Apply action "State 0"
+action: 0
 
 # State 1
-# State 2
+# State 0
 IsTerminal() = False
-History() = [2]
-HistoryString() = "2"
+History() = [0]
+HistoryString() = "0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "Current turn: 0\nState: 2\n"
-InformationStateString(1) = "Current turn: 0\nState: 2\n"
-InformationStateTensor(0): ◉◯◯◯◯◉
-InformationStateTensor(1): ◉◯◯◯◯◉
-ObservationString(0) = "Current turn: 0\nState: 2\n"
-ObservationString(1) = "Current turn: 0\nState: 2\n"
-ObservationTensor(0): ◉◯◯◯◯◉
-ObservationTensor(1): ◉◯◯◯◯◉
+InformationStateString(0) = "Current turn: 0\nState: 0\n"
+InformationStateString(1) = "Current turn: 0\nMessage: -1\n"
+InformationStateTensor(0): ◉◯◯◉◯◯
+InformationStateTensor(1): ◉◯◯◯◯◯
+ObservationString(0) = "Current turn: 0\nState: 0\n"
+ObservationString(1) = "Current turn: 0\nMessage: -1\n"
+ObservationTensor(0): ◉◯◯◉◯◯
+ObservationTensor(1): ◉◯◯◯◯◯
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [0, 1, 2]
 StringLegalActions() = ["Message 0", "Message 1", "Message 2"]
 
-# Apply action "Message 2"
-action: 2
+# Apply action "Message 1"
+action: 1
 
 # State 2
-# State 2, Message 2
+# State 0, Message 1
 IsTerminal() = False
-History() = [2, 2]
-HistoryString() = "2 2"
+History() = [0, 1]
+HistoryString() = "0 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "Current turn: 1\nMessage: 2\n"
-InformationStateString(1) = "Current turn: 1\nMessage: 2\n"
-InformationStateTensor(0): ◯◉◯◯◯◉
-InformationStateTensor(1): ◯◉◯◯◯◉
-ObservationString(0) = "Current turn: 1\nMessage: 2\n"
-ObservationString(1) = "Current turn: 1\nMessage: 2\n"
-ObservationTensor(0): ◯◉◯◯◯◉
-ObservationTensor(1): ◯◉◯◯◯◉
+InformationStateString(0) = "Current turn: 1\nState: 0\n"
+InformationStateString(1) = "Current turn: 1\nMessage: 1\n"
+InformationStateTensor(0): ◯◉◯◉◯◯
+InformationStateTensor(1): ◯◉◯◯◉◯
+ObservationString(0) = "Current turn: 1\nState: 0\n"
+ObservationString(1) = "Current turn: 1\nMessage: 1\n"
+ObservationTensor(0): ◯◉◯◉◯◯
+ObservationTensor(1): ◯◉◯◯◉◯
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [0, 1, 2]
 StringLegalActions() = ["Action 0", "Action 1", "Action 2"]
 
-# Apply action "Action 2"
-action: 2
+# Apply action "Action 0"
+action: 0
 
 # State 3
-# State 2, Message 2, Action 2
+# State 0, Message 1, Action 0
 IsTerminal() = True
-History() = [2, 2, 2]
-HistoryString() = "2 2 2"
+History() = [0, 1, 0]
+HistoryString() = "0 1 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
-InformationStateString(0) = "Current turn: 1\nMessage: 2\n"
-InformationStateString(1) = "Current turn: 1\nMessage: 2\n"
-InformationStateTensor(0): ◯◉◉◯◯◉
-InformationStateTensor(1): ◯◉◉◯◯◉
-ObservationString(0) = "Current turn: 1\nMessage: 2\n"
-ObservationString(1) = "Current turn: 1\nMessage: 2\n"
-ObservationTensor(0): ◯◉◉◯◯◉
-ObservationTensor(1): ◯◉◉◯◯◉
+InformationStateString(0) = "Current turn: 1\nState: 0\n"
+InformationStateString(1) = "Current turn: 1\nMessage: 1\n"
+InformationStateTensor(0): ◯◉◉◉◯◯
+InformationStateTensor(1): ◯◉◉◯◉◯
+ObservationString(0) = "Current turn: 1\nState: 0\n"
+ObservationString(1) = "Current turn: 1\nMessage: 1\n"
+ObservationTensor(0): ◯◉◉◉◯◯
+ObservationTensor(1): ◯◉◉◯◉◯
 Rewards() = [1.0, 1.0]
 Returns() = [1.0, 1.0]
