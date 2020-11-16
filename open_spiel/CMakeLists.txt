@@ -106,6 +106,8 @@ openspiel_optional_dependency(BUILD_WITH_JULIA          OFF
   "Build binary for Julia.")
 openspiel_optional_dependency(BUILD_WITH_LIBTORCH       OFF
   "Build with support for libtorch.")
+openspiel_optional_dependency(BUILD_WITH_TENSORFLOW_CC  OFF
+  "Build with support for Tensorflow C++ API.")
 openspiel_optional_dependency(BUILD_WITH_PUBLIC_STATES  OFF
   "Build with support for public states in C++.")
 openspiel_optional_dependency(BUILD_WITH_PYTHON         ON
@@ -248,8 +250,10 @@ if (BUILD_WITH_ORTOOLS)
   # Use following to link your_target_executable with OrTools libraries:
   # target_link_libraries(your_target_executable ${ORTOOLS_LIBS})
 endif()
-
-
+if (BUILD_WITH_TENSORFLOW_CC)
+  add_compile_definitions(BUILD_WITH_TENSORFLOW_CC)
+  find_package(TensorflowCC REQUIRED)
+endif()
 
 # We have the parent of this directory in the include path, so that we can
 # include for example "open_spiel/spiel.h" (assuming this directory is named
@@ -262,6 +266,7 @@ add_subdirectory (examples)
 add_subdirectory (fog)
 add_subdirectory (games)
 add_subdirectory (game_transforms)
+add_subdirectory (contrib)
 
 if (BUILD_WITH_PYTHON)
   add_subdirectory (python)
