@@ -56,7 +56,9 @@ export BUILD_WITH_ROSHAMBO=${BUILD_WITH_ROSHAMBO:-$DEFAULT_OPTIONAL_DEPENDENCY}
 # You can find an example usage in open_spiel/libtorch/torch_integration_test.cc
 export BUILD_WITH_LIBTORCH="${BUILD_WITH_LIBTORCH:-"OFF"}"
 
-export BUILD_WITH_TENSORFLOW_CC="${BUILD_WITH_TENSORFLOW_CC:-OFF}"
+# TensorflowCC is a CMake interface to the Tensorflow C++ API. It is used in
+# C++ AlphaZero. See: https://github.com/deepmind/open_spiel/blob/master/docs/alpha_zero.md
+export BUILD_WITH_TENSORFLOW_CC="${BUILD_WITH_TENSORFLOW_CC:-"OFF"}"
 
 # Turn off public states as it is Work-In-Progress.
 export BUILD_WITH_PUBLIC_STATES="${BUILD_WITH_PUBLIC_STATES:-"OFF"}"
