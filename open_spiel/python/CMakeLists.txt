@@ -93,6 +93,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   algorithms/cfr_br_test.py
   algorithms/cfr_test.py
   algorithms/deep_cfr_test.py
+  algorithms/deep_cfr_test_tf2.py
   algorithms/discounted_cfr_test.py
   algorithms/double_oracle_test.py
   algorithms/dqn_test.py
