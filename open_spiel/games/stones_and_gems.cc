@@ -20,6 +20,7 @@
 #include <unordered_map>
 #include <utility>
 
+#include "open_spiel/abseil-cpp/absl/container/node_hash_map.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
@@ -377,7 +378,7 @@ const std::unordered_map<Element, Element, ElementHash> kKeyToGate{
 };
 
 // Stationary to falling
-const std::unordered_map<Element, Element, ElementHash> kElToFalling{
+const absl::node_hash_map<Element, Element, ElementHash> kElToFalling{
     {kElDiamond, kElDiamondFalling},
     {kElStone, kElStoneFalling},
     {kElNut, kElNutFalling},
