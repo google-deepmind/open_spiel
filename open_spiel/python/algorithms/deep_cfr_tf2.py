@@ -361,7 +361,6 @@ class DeepCFRSolver(policy.Policy):
         'legal_actions': tf.io.FixedLenFeature([self._num_actions], tf.float32)
     }
 
-
   def solve(self):
     """Solution logic for Deep CFR."""
     advantage_losses = collections.defaultdict(list)
@@ -498,6 +497,19 @@ class DeepCFRSolver(policy.Policy):
               strategy, state.legal_actions_mask(other_player))
       return self._traverse_game_tree(state.child(sampled_action), player)
 
+  @tf.function
+  def _get_matched_regrets(self, info_state, legal_actions_mask, player):
+    """TF-Graph to calculate regret matching"""
+    advs = self._adv_networks[player]((tf.expand_dims(info_state, axis=0), legal_actions_mask), training=False)[0]
+    advs = advs * legal_actions_mask
+    advantages = tf.maximum(advs, 0)
+    cumulative_regret = tf.reduce_sum(advantages)
+    if cumulative_regret > 0:
+      matched_regrets = advantages / cumulative_regret
+    else:
+      matched_regrets = tf.one_hot(tf.argmax( tf.where(legal_actions_mask==1, advs, -10e20)), self._num_actions)
+    return advantages, matched_regrets
+
   def _sample_action_from_advantage(self, state, player):
     """Returns an info state policy by applying regret-matching.
 
@@ -510,14 +522,7 @@ class DeepCFRSolver(policy.Policy):
     """
     info_state = tf.constant(state.information_state_tensor(player), dtype=tf.float32)
     legal_actions_mask = tf.constant(state.legal_actions_mask(player), dtype=tf.float32)
-    advs = self._adv_networks[player]((tf.expand_dims(info_state, axis=0), legal_actions_mask), training=False)[0]
-    advs = advs * legal_actions_mask
-    advantages = tf.maximum(advs, 0)
-    cumulative_regret = tf.reduce_sum(advantages)
-    if cumulative_regret > 0:
-      matched_regrets = advantages / cumulative_regret
-    else:
-      matched_regrets = tf.one_hot(tf.argmax( tf.where(legal_actions_mask==1, advs, -10e20)), self._num_actions)
+    advantages, matched_regrets = self._get_matched_regrets(info_state, legal_actions_mask, player)
     return advantages.numpy(), matched_regrets.numpy()
 
   def action_probabilities(self, state):
@@ -540,7 +545,7 @@ class DeepCFRSolver(policy.Policy):
     data = data.repeat()
     data = data.batch(self._batch_size_advantage)
     data = data.map(self._deserialize_advantage_memory)
-    data = data.prefetch(10)
+    data = data.prefetch(tf.data.experimental.AUTOTUNE)
     return data
 
   def _get_advantage_train_graph(self, player):
@@ -588,7 +593,7 @@ class DeepCFRSolver(policy.Policy):
     data = data.repeat()
     data = data.batch(self._batch_size_strategy)
     data = data.map(self._deserialize_strategy_memory)
-    data = data.prefetch(10)
+    data = data.prefetch(tf.data.experimental.AUTOTUNE)
     return data
 
   def _learn_strategy_network(self):
