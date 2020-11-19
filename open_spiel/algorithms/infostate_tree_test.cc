@@ -66,7 +66,7 @@ std::shared_ptr<InfostateTree> MakeTree(
 std::shared_ptr<InfostateTree> MakeTree(
     const std::string& game_name, Player player,
     const std::vector<std::vector<Action>>& start_histories,
-    const std::vector<float>& start_reaches, int max_move_limit = 1000) {
+    const std::vector<double>& start_reaches, int max_move_limit = 1000) {
   const std::shared_ptr<const Game> game = LoadGame(game_name);
   std::vector<std::unique_ptr<State>> start_states;
   std::vector<const State*> start_state_ptrs;
@@ -309,6 +309,52 @@ void CheckTreeLeaves(const InfostateTree& tree, int move_limit) {
   }
 }
 
+void CheckContinuation(const InfostateTree& tree) {
+  const std::vector<InfostateNode*>& leaves =
+      tree.nodes_at_depth(tree.tree_height());
+  std::shared_ptr<InfostateTree> continuation = MakeInfostateTree(leaves);
+
+  SPIEL_CHECK_EQ(continuation->root_branching_factor(), leaves.size());
+  for (int i = 0; i < leaves.size(); ++i) {
+    const InfostateNode* leaf_node = leaves[i];
+    const InfostateNode* root_node = continuation->root().child_at(i);
+    SPIEL_CHECK_TRUE(leaf_node->is_leaf_node());
+    if (leaf_node->type() != kTerminalInfostateNode) {
+      SPIEL_CHECK_EQ(leaf_node->type(), root_node->type());
+      SPIEL_CHECK_EQ(leaf_node->has_infostate_string(),
+                     root_node->has_infostate_string());
+      if (leaf_node->has_infostate_string()) {
+        SPIEL_CHECK_EQ(leaf_node->infostate_string(),
+                       root_node->infostate_string());
+      }
+    } else {
+      // If the leaf node is terminal, the continuation might put this node
+      // deeper than in the root due to tree balancing with other leaf
+      // non-terminal nodes. Therefore we check whether (the possibly occurring)
+      // chain of dummy observations leads to this terminal node.
+      InfostateNode* terminal_continuation = continuation->root().child_at(i);
+      while (terminal_continuation->type() == kObservationInfostateNode) {
+        SPIEL_CHECK_FALSE(terminal_continuation->is_leaf_node());
+        SPIEL_CHECK_EQ(terminal_continuation->num_children(), 1);
+        terminal_continuation = terminal_continuation->child_at(0);
+      }
+      SPIEL_CHECK_EQ(terminal_continuation->type(), kTerminalInfostateNode);
+      SPIEL_CHECK_EQ(leaf_node->has_infostate_string(),
+                     terminal_continuation->has_infostate_string());
+      if (leaf_node->has_infostate_string()) {
+        SPIEL_CHECK_EQ(leaf_node->infostate_string(),
+                       terminal_continuation->infostate_string());
+      }
+      SPIEL_CHECK_EQ(leaf_node->terminal_utility(),
+                     terminal_continuation->terminal_utility());
+      SPIEL_CHECK_EQ(leaf_node->terminal_chance_reach_prob(),
+                     terminal_continuation->terminal_chance_reach_prob());
+      SPIEL_CHECK_EQ(leaf_node->TerminalHistory(),
+                     terminal_continuation->TerminalHistory());
+    }
+  }
+}
+
 void BuildAllDepths(const std::string& game_name) {
   std::shared_ptr<const Game> game = LoadGame(game_name);
   const int max_moves = game->MaxMoveNumber();
@@ -316,6 +362,7 @@ void BuildAllDepths(const std::string& game_name) {
     for (int pl = 0; pl < game->NumPlayers(); ++pl) {
       std::shared_ptr<InfostateTree> tree = MakeTree(game_name, pl, move_limit);
       CheckTreeLeaves(*tree, move_limit);
+      CheckContinuation(*tree);
     }
   }
 }

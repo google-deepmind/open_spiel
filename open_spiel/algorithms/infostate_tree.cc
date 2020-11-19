@@ -82,13 +82,19 @@ const std::vector<Action>& InfostateNode::legal_actions() const {
   return legal_actions_;
 }
 
+size_t InfostateNode::corresponding_states_size() const {
+  return corresponding_states_.size();
+}
+
 const std::vector<std::unique_ptr<State>>& InfostateNode::corresponding_states()
 const {
+  SPIEL_CHECK_TRUE(is_leaf_node());
   return corresponding_states_;
 }
 
 const std::vector<double>& InfostateNode::corresponding_chance_reach_probs()
 const {
+  SPIEL_CHECK_TRUE(is_leaf_node());
   return corresponding_ch_reaches_;
 }
 
@@ -213,7 +219,7 @@ void InfostateNode::SwapParent(std::unique_ptr<InfostateNode> self,
 
 InfostateTree::InfostateTree(
     const std::vector<const State*>& start_states,
-    const std::vector<float>& chance_reach_probs,
+    const std::vector<double>& chance_reach_probs,
     std::shared_ptr<Observer> infostate_observer, Player acting_player,
     int max_move_ahead_limit)
     : acting_player_(acting_player),
@@ -244,12 +250,6 @@ InfostateTree::InfostateTree(
   CollectNodesAtDepth(mutable_root(), 0);
   LabelNodesWithIds();
 }
-
-InfostateTree::InfostateTree(const Game& game, Player acting_player,
-                             int max_move_limit)
-    : InfostateTree({game.NewInitialState().get()}, /*chance_reach_probs=*/{1.},
-                    game.MakeObserver(kInfoStateObsType, {}),
-                    acting_player, max_move_limit) {}
 
 void InfostateTree::RebalanceTree() {
   root_->RebalanceSubtree(tree_height(), 0);
@@ -491,12 +491,49 @@ std::shared_ptr<InfostateTree> MakeInfostateTree(
     const Game& game, Player acting_player,
     int max_move_limit) {
   return std::shared_ptr<InfostateTree>(new InfostateTree(
-      game, acting_player, max_move_limit));
+      {game.NewInitialState().get()}, /*chance_reach_probs=*/{1.},
+      game.MakeObserver(kInfoStateObsType, {}),
+      acting_player, max_move_limit));
+}
+
+std::shared_ptr<InfostateTree> MakeInfostateTree(
+    const std::vector<InfostateNode*>& start_nodes,
+    int max_move_ahead_limit) {
+  SPIEL_CHECK_FALSE(start_nodes.empty());
+  const InfostateNode* some_node = start_nodes[0];
+  const InfostateTree& originating_tree = some_node->tree();
+  SPIEL_DCHECK_TRUE([&](){
+    for (const InfostateNode* node : start_nodes) {
+      if (!node) return false;
+      if (!node->is_leaf_node()) return false;
+      if (node->depth() != some_node->depth()) return false;
+      if (&node->tree() != &originating_tree) return false;
+    }
+    return true;
+  }());
+
+  std::vector<const State*> start_states;
+  start_states.reserve(start_nodes.size() * 8);
+  std::vector<double> chance_reach_probs;
+  chance_reach_probs.reserve(start_nodes.size() * 8);
+
+  for (const InfostateNode* node : start_nodes) {
+    for (int i = 0; i < node->corresponding_states_size(); ++i) {
+      start_states.push_back(node->corresponding_states()[i].get());
+      chance_reach_probs.push_back(node->corresponding_chance_reach_probs()[i]);
+    }
+  }
+
+  return std::shared_ptr<InfostateTree>(new InfostateTree(
+      start_states, chance_reach_probs,
+      originating_tree.infostate_observer_,
+      originating_tree.acting_player_,
+      max_move_ahead_limit));
 }
 
 std::shared_ptr<InfostateTree> MakeInfostateTree(
     const std::vector<const State*>& start_states,
-    const std::vector<float>& chance_reach_probs,
+    const std::vector<double>& chance_reach_probs,
     std::shared_ptr<Observer> infostate_observer, Player acting_player,
     int max_move_ahead_limit) {
   return std::shared_ptr<InfostateTree>(new InfostateTree(

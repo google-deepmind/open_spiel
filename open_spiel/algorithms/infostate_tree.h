@@ -249,6 +249,9 @@ class Range {
   RangeIterator<Id> end() const { return RangeIterator<Id>(end_, tree_); }
 };
 
+// Forward declaration.
+class InfostateNode;
+
 // Creates an infostate tree for a player based on the initial state
 // of the game, up to some move limit.
 std::shared_ptr<InfostateTree> MakeInfostateTree(
@@ -259,12 +262,16 @@ std::shared_ptr<InfostateTree> MakeInfostateTree(
 // up to some move limit from the deepest start state.
 std::shared_ptr<InfostateTree> MakeInfostateTree(
     const std::vector<const State*>& start_states,
-    const std::vector<float>& chance_reach_probs,
+    const std::vector<double>& chance_reach_probs,
     std::shared_ptr<Observer> infostate_observer, Player acting_player,
     int max_move_ahead_limit = 1000);
 
-// Forward declaration.
-class InfostateNode;
+// Creates an infostate tree based on some leaf infostate nodes coming from
+// another infostate tree, up to some move limit.
+std::shared_ptr<InfostateTree> MakeInfostateTree(
+    const std::vector<InfostateNode*>& start_nodes,
+    int max_move_ahead_limit = 1000);
+
 
 class InfostateTree final {
   // Note that only MakeInfostateTree is allowed to call the constructor
@@ -272,19 +279,19 @@ class InfostateTree final {
   // the collected pointers are valid throughout the tree's lifetime even if
   // they are moved around.
  private:
-  InfostateTree(const Game& game, Player acting_player,
-                int max_move_limit = 1000);
   InfostateTree(
       const std::vector<const State*>& start_states,
-      const std::vector<float>& chance_reach_probs,
+      const std::vector<double>& chance_reach_probs,
       std::shared_ptr<Observer> infostate_observer, Player acting_player,
       int max_move_ahead_limit = 1000);
   // Friend factories.
   friend std::shared_ptr<InfostateTree> MakeInfostateTree(
       const Game&, Player, int);
   friend std::shared_ptr<InfostateTree> MakeInfostateTree(
-      const std::vector<const State*>&, const std::vector<float>&,
+      const std::vector<const State*>&, const std::vector<double>&,
       std::shared_ptr<Observer>, Player, int);
+  friend std::shared_ptr<InfostateTree> MakeInfostateTree(
+      const std::vector<InfostateNode*>&, int);
 
  public:
   // -- Root accessors ---------------------------------------------------------
@@ -523,6 +530,7 @@ class InfostateNode final {
   bool is_leaf_node() const { return children_.empty(); }
   double terminal_utility() const;
   double terminal_chance_reach_prob() const;
+  size_t corresponding_states_size() const;
   const std::vector<std::unique_ptr<State>>& corresponding_states() const;
   const std::vector<double>& corresponding_chance_reach_probs() const;
   const std::vector<Action>& TerminalHistory() const;
