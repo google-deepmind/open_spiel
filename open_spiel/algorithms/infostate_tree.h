@@ -269,6 +269,13 @@ std::shared_ptr<InfostateTree> MakeInfostateTree(
 // Creates an infostate tree based on some leaf infostate nodes coming from
 // another infostate tree, up to some move limit.
 std::shared_ptr<InfostateTree> MakeInfostateTree(
+    const std::vector<const InfostateNode*>& start_nodes,
+    int max_move_ahead_limit = 1000);
+
+// C++17 does not allow implicit conversion of non-const pointers to const
+// pointers within a vector - explanation: https://stackoverflow.com/a/2102415
+// This just adds const to the pointers and calls the other MakeInfostateTree.
+std::shared_ptr<InfostateTree> MakeInfostateTree(
     const std::vector<InfostateNode*>& start_nodes,
     int max_move_ahead_limit = 1000);
 
@@ -283,7 +290,7 @@ class InfostateTree final {
       const std::vector<const State*>& start_states,
       const std::vector<double>& chance_reach_probs,
       std::shared_ptr<Observer> infostate_observer, Player acting_player,
-      int max_move_ahead_limit = 1000);
+      int max_move_ahead_limit);
   // Friend factories.
   friend std::shared_ptr<InfostateTree> MakeInfostateTree(
       const Game&, Player, int);
@@ -291,7 +298,7 @@ class InfostateTree final {
       const std::vector<const State*>&, const std::vector<double>&,
       std::shared_ptr<Observer>, Player, int);
   friend std::shared_ptr<InfostateTree> MakeInfostateTree(
-      const std::vector<InfostateNode*>&, int);
+      const std::vector<const InfostateNode*>&, int);
 
  public:
   // -- Root accessors ---------------------------------------------------------

@@ -499,6 +499,14 @@ std::shared_ptr<InfostateTree> MakeInfostateTree(
 std::shared_ptr<InfostateTree> MakeInfostateTree(
     const std::vector<InfostateNode*>& start_nodes,
     int max_move_ahead_limit) {
+  std::vector<const InfostateNode*> const_nodes(
+      start_nodes.begin(), start_nodes.end());
+  return MakeInfostateTree(const_nodes, max_move_ahead_limit);
+}
+
+std::shared_ptr<InfostateTree> MakeInfostateTree(
+    const std::vector<const InfostateNode*>& start_nodes,
+    int max_move_ahead_limit) {
   SPIEL_CHECK_FALSE(start_nodes.empty());
   const InfostateNode* some_node = start_nodes[0];
   const InfostateTree& originating_tree = some_node->tree();
