@@ -21,6 +21,7 @@ import re
 from typing import Callable, Dict, List, Tuple
 import unittest
 
+from absl import app
 from absl import flags
 from absl.testing import absltest
 from absl.testing import parameterized
@@ -741,5 +742,10 @@ def load_tests(loader, tests, pattern):  # pylint: disable=invalid-name,g-doc-ar
   return unittest.TestSuite(tests=tests)
 
 
-if __name__ == "__main__":
+def main(_):
   absltest.main()
+
+
+if __name__ == "__main__":
+  # Necessary to run main via app.run for internal tests.
+  app.run(main)
