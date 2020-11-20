@@ -15,6 +15,9 @@ add_test(matrix_example_test matrix_example)
 add_executable(mcts_example mcts_example.cc ${OPEN_SPIEL_OBJECTS})
 add_test(mcts_example_test mcts_example)
 
+add_executable(policy_iteration_example policy_iteration_example.cc ${OPEN_SPIEL_OBJECTS})
+add_test(policy_iteration_example_test policy_iteration_example)
+
 add_executable(value_iteration_example value_iteration_example.cc ${OPEN_SPIEL_OBJECTS})
 add_test(value_iteration_example_test value_iteration_example)
 
