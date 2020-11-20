@@ -694,13 +694,12 @@ std::pair<double, SfStrategy> InfostateTree::BestResponse(
     double max_value = init_value;
     SequenceId max_id = current;
     const InfostateNode* node = observation_infostate(current);
-    current = node->start_sequence_id();
-    while (current != node->end_sequence_id()) {
+    for (current = node->start_sequence_id();
+         current != node->end_sequence_id(); current.next()) {
       if (gradient[current] > max_value) {
         max_value = gradient[current];
         max_id = current;
       }
-      current.next();
     }
     if (init_value != max_value) {
       gradient[node->sequence_id()] += max_value;

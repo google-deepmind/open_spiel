@@ -112,7 +112,7 @@ void TestRootCertificates() {
   }
   {  // Full Kuhn test.
     std::shared_ptr<InfostateTree> tree = MakeTree("kuhn_poker", /*player=*/0);
-    std::string expected_rebalanced_certificate =
+    std::string expected_certificate =
       // Notice all terminals are at the same depth (same indentation).
       "((" // Root node, 1st is getting a card
         "("  // 2nd is getting card
@@ -139,8 +139,7 @@ void TestRootCertificates() {
         "([(((({}))(({}))(({}))(({}))))(((({}))(({}))[({}{})({}{})]))])"
         "([(((({}))(({}))(({}))(({}))))(((({}))(({}))[({}{})({}{})]))])"
       "))";
-    SPIEL_CHECK_EQ(tree->root().MakeCertificate(),
-                   expected_rebalanced_certificate);
+    SPIEL_CHECK_EQ(tree->root().MakeCertificate(), expected_certificate);
   }
   {
     std::string expected_certificate =
@@ -186,13 +185,12 @@ void TestCertificatesFromStartHistories() {
   {
     std::shared_ptr<InfostateTree> tree = MakeTree(
         "kuhn_poker", /*player=*/0, /*start_histories=*/{{0, 1, 0}}, {1 / 6.});
-    std::string expected_rebalanced_certificate =
+    std::string expected_certificate =
       "(("
         "(({}))"      // 2nd player passes
         "[({})({})]"  // 2nd player bets
       "))";
-    SPIEL_CHECK_EQ(tree->root().MakeCertificate(),
-                   expected_rebalanced_certificate);
+    SPIEL_CHECK_EQ(tree->root().MakeCertificate(), expected_certificate);
   }
   {
     std::string expected_certificate =
