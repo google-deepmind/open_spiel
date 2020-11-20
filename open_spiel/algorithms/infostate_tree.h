@@ -323,10 +323,18 @@ class InfostateTree final {
 
   // -- Sequence operations ----------------------------------------------------
   SequenceId empty_sequence() const;
-  InfostateNode* observation_infostate(const SequenceId& sequence_id);
+  InfostateNode* observation_infostate(const SequenceId& sequence_id) {
+    SPIEL_DCHECK_TRUE(sequence_id.BelongsToTree(this));
+    return sequences_.at(sequence_id.id());
+  }
   const InfostateNode* observation_infostate(
-      const SequenceId& sequence_id) const;
-  Range<SequenceId> AllSequenceIds() const;
+      const SequenceId& sequence_id) const {
+    SPIEL_DCHECK_TRUE(sequence_id.BelongsToTree(this));
+    return sequences_.at(sequence_id.id());
+  }
+  Range<SequenceId> AllSequenceIds() const {
+    return Range<SequenceId>(0, sequences_.size(), this);
+  }
   // Returns all DecisionIds which can be found in a subtree of given sequence.
   std::vector<DecisionId> DecisionIdsWithParentSeq(const SequenceId&) const;
   // Returns `None` if the sequence is the empty sequence.
@@ -337,18 +345,37 @@ class InfostateTree final {
   bool IsLeafSequence(const SequenceId&) const;
 
   // -- Decision operations ----------------------------------------------------
-  InfostateNode* decision_infostate(const DecisionId& decision_id);
-  const InfostateNode* decision_infostate(const DecisionId& decision_id) const;
-  const std::vector<InfostateNode*>& AllDecisionInfostates() const;
-  Range<DecisionId> AllDecisionIds() const;
+  InfostateNode* decision_infostate(const DecisionId& decision_id) {
+    SPIEL_DCHECK_TRUE(decision_id.BelongsToTree(this));
+    return decision_infostates_.at(decision_id.id());
+  }
+  const InfostateNode* decision_infostate(const DecisionId& decision_id) const {
+    SPIEL_DCHECK_TRUE(decision_id.BelongsToTree(this));
+    return decision_infostates_.at(decision_id.id());
+  }
+  const std::vector<InfostateNode*>& AllDecisionInfostates() const {
+    return decision_infostates_;
+  }
+  Range<DecisionId> AllDecisionIds() const {
+    return Range<DecisionId>(0, decision_infostates_.size(), this);
+  }
   DecisionId DecisionIdFromInfostateString(
       const std::string& infostate_string) const;
 
   // -- Leaf operations --------------------------------------------------------
-  const std::vector<InfostateNode*>& leaf_nodes() const;
-  InfostateNode* leaf_node(const LeafId& leaf_id) const;
-  const std::vector<std::vector<InfostateNode*>>& nodes_at_depths() const;
-  const std::vector<InfostateNode*>& nodes_at_depth(size_t depth) const;
+  const std::vector<InfostateNode*>& leaf_nodes() const {
+    return nodes_at_depths_.back();
+  }
+  InfostateNode* leaf_node(const LeafId& leaf_id) const {
+    SPIEL_DCHECK_TRUE(leaf_id.BelongsToTree(this));
+    return leaf_nodes().at(leaf_id.id());
+  }
+  const std::vector<std::vector<InfostateNode*>>& nodes_at_depths() const {
+    return nodes_at_depths_;
+  }
+  const std::vector<InfostateNode*>& nodes_at_depth(size_t depth) const {
+    return nodes_at_depths_.at(depth);
+  }
 
   // -- Tree operations --------------------------------------------------------
   // Compute best response and value based on gradient from opponents.
@@ -515,32 +542,77 @@ class InfostateNode final {
   const InfostateNodeType& type() const { return type_; }
   size_t depth() const { return depth_; }
   bool is_root_node() const { return !parent_; }
-  bool has_infostate_string() const;
-  const std::string& infostate_string() const;
+  bool has_infostate_string() const {
+    return infostate_string_ != kFillerInfostate
+        && infostate_string_ != kDummyRootNodeInfostate;
+  }
+  const std::string& infostate_string() const {
+    // Avoid working with empty infostate strings.
+    SPIEL_DCHECK_TRUE(has_infostate_string());
+    return infostate_string_;
+  }
 
   // -- Children accessors. ----------------------------------------------------
   InfostateNode* child_at(int i) const { return children_.at(i).get(); }
   int num_children() const { return children_.size(); }
-  VecWithUniquePtrsIterator<InfostateNode> child_iterator() const;
+  VecWithUniquePtrsIterator<InfostateNode> child_iterator() const {
+    return VecWithUniquePtrsIterator(children_);
+  }
 
   // -- Sequence operations. ---------------------------------------------------
-  const SequenceId sequence_id() const;
-  const SequenceId start_sequence_id() const;
-  const SequenceId end_sequence_id() const;
-  Range<SequenceId> AllSequenceIds() const;
+  const SequenceId sequence_id() const {
+    SPIEL_CHECK_FALSE(sequence_id_.is_undefined());
+    return sequence_id_;
+  }
+  const SequenceId start_sequence_id() const {
+    SPIEL_CHECK_FALSE(start_sequence_id_.is_undefined());
+    return start_sequence_id_;
+  }
+  const SequenceId end_sequence_id() const {
+    SPIEL_CHECK_FALSE(end_sequence_id_.is_undefined());
+    return end_sequence_id_;
+  }
+  Range<SequenceId> AllSequenceIds() const {
+    return Range<SequenceId>(start_sequence_id_.id(),
+                             end_sequence_id_.id(), &tree_);
+  }
 
   // -- Decision operations. ---------------------------------------------------
-  const DecisionId decision_id() const;
-  const std::vector<Action>& legal_actions() const;
+  const DecisionId decision_id() const {
+    SPIEL_CHECK_EQ(type_, kDecisionInfostateNode);
+    SPIEL_CHECK_FALSE(decision_id_.is_undefined());
+    return decision_id_;
+  }
+  const std::vector<Action>& legal_actions() const {
+    SPIEL_CHECK_EQ(type_, kDecisionInfostateNode);
+    return legal_actions_;
+  }
 
   // -- Leaf operations. -------------------------------------------------------
   bool is_leaf_node() const { return children_.empty(); }
-  double terminal_utility() const;
-  double terminal_chance_reach_prob() const;
-  size_t corresponding_states_size() const;
-  const std::vector<std::unique_ptr<State>>& corresponding_states() const;
-  const std::vector<double>& corresponding_chance_reach_probs() const;
-  const std::vector<Action>& TerminalHistory() const;
+  double terminal_utility() const {
+    SPIEL_CHECK_EQ(type_, kTerminalInfostateNode);
+    return terminal_utility_;
+  }
+  double terminal_chance_reach_prob() const {
+    SPIEL_CHECK_EQ(type_, kTerminalInfostateNode);
+    return terminal_chn_reach_prob_;
+  }
+  size_t corresponding_states_size() const {
+    return corresponding_states_.size();
+  }
+  const std::vector<std::unique_ptr<State>>& corresponding_states() const {
+    SPIEL_CHECK_TRUE(is_leaf_node());
+    return corresponding_states_;
+  }
+  const std::vector<double>& corresponding_chance_reach_probs() const {
+    SPIEL_CHECK_TRUE(is_leaf_node());
+    return corresponding_ch_reaches_;
+  }
+  const std::vector<Action>& TerminalHistory() const {
+    SPIEL_DCHECK_EQ(type_, kTerminalInfostateNode);
+    return terminal_history_;
+  }
 
   // -- For debugging. ---------------------------------------------------------
   std::ostream& operator<<(std::ostream& os) const;
