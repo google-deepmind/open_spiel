@@ -494,9 +494,6 @@ class InfostateNode final {
   friend class InfostateTree;
 
  public:
-  InfostateNode(InfostateNode&&) noexcept = default;
-  virtual ~InfostateNode() = default;
-
   // -- Node accessors. --------------------------------------------------------
   const InfostateTree& tree() const { return tree_; }
   InfostateNode* parent() const { return parent_; }
