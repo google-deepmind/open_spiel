@@ -268,6 +268,7 @@ std::shared_ptr<InfostateTree> MakeInfostateTree(
 
 // Creates an infostate tree based on some leaf infostate nodes coming from
 // another infostate tree, up to some move limit.
+// This is useful for easily constructing (depth-limited) tree continuations.
 std::shared_ptr<InfostateTree> MakeInfostateTree(
     const std::vector<const InfostateNode*>& start_nodes,
     int max_move_ahead_limit = 1000);

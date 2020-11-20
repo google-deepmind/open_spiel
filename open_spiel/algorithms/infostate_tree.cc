@@ -416,6 +416,8 @@ int InfostateTree::root_branching_factor() const {
 std::shared_ptr<InfostateTree> MakeInfostateTree(
     const Game& game, Player acting_player,
     int max_move_limit) {
+  // Uses new instead of make_shared, because shared_ptr is not a friend and
+  // can't call private constructors.
   return std::shared_ptr<InfostateTree>(new InfostateTree(
       {game.NewInitialState().get()}, /*chance_reach_probs=*/{1.},
       game.MakeObserver(kInfoStateObsType, {}),
@@ -446,6 +448,8 @@ std::shared_ptr<InfostateTree> MakeInfostateTree(
     return true;
   }());
 
+  // We reserve a larger number of states, as infostate nodes typically contain
+  // a large number of States. (8 is an arbitrary choice though).
   std::vector<const State*> start_states;
   start_states.reserve(start_nodes.size() * 8);
   std::vector<double> chance_reach_probs;
@@ -458,6 +462,8 @@ std::shared_ptr<InfostateTree> MakeInfostateTree(
     }
   }
 
+  // Uses new instead of make_shared, because shared_ptr is not a friend and
+  // can't call private constructors.
   return std::shared_ptr<InfostateTree>(new InfostateTree(
       start_states, chance_reach_probs,
       originating_tree.infostate_observer_,
