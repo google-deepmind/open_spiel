@@ -153,6 +153,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   utils/lru_cache_test.py
   utils/spawn_test.py
   pytorch/rcfr_pytorch_test.py
+  pytorch/dqn_test.py
 )
 
 
