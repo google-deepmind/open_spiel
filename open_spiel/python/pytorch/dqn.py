@@ -109,6 +109,7 @@ class MLP(nn.Module):
     # Hidden layers
     for size in hidden_sizes:
       self._layers.append(nn.Linear(in_features=input_size, out_features=size))
+      self._layers.append(nn.ReLU())
       input_size = size
     # Output layer
     self._layers.append(
@@ -120,7 +121,7 @@ class MLP(nn.Module):
       
     self.model = nn.ModuleList(self._layers)
 
-  def __call__(self, x):
+  def forward(self, x):
     for layer in self.model:
       x = layer(x)
     return x
@@ -298,7 +299,7 @@ class DQN(rl_agent.AbstractAgent):
       probs[legal_actions] = 1.0 / len(legal_actions)
     else:
       info_state = torch.Tensor(np.reshape(info_state, [1, -1]))
-      q_values = self._q_network(info_state)[0]
+      q_values = self._q_network(info_state).detach()[0]
       legal_q_values = q_values[legal_actions]
       action = legal_actions[torch.argmax(legal_q_values)]
       probs[action] = 1.0

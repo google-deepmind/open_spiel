@@ -74,24 +74,23 @@ class DQNTest(TestCase):
     state_size = env.observation_spec()["info_state"][0]
     num_actions = env.action_spec()["num_actions"]
 
-    with self.session() as sess:
-      agents = [
-          dqn.DQN(  # pylint: disable=g-complex-comprehension
-              player_id,
-              state_representation_size=state_size,
-              num_actions=num_actions,
-              hidden_layers_sizes=[16],
-              replay_buffer_capacity=10,
-              batch_size=5) for player_id in range(num_players)
-      ]
-      time_step = env.reset()
-      while not time_step.last():
-        current_player = time_step.observations["current_player"]
-        agent_output = [agent.step(time_step) for agent in agents]
-        time_step = env.step([agent_output[current_player].action])
+    agents = [
+        dqn.DQN(  # pylint: disable=g-complex-comprehension
+            player_id,
+            state_representation_size=state_size,
+            num_actions=num_actions,
+            hidden_layers_sizes=[16],
+            replay_buffer_capacity=10,
+            batch_size=5) for player_id in range(num_players)
+    ]
+    time_step = env.reset()
+    while not time_step.last():
+      current_player = time_step.observations["current_player"]
+      agent_output = [agent.step(time_step) for agent in agents]
+      time_step = env.step([agent_output[current_player].action])
 
-      for agent in agents:
-        agent.step(time_step)
+    for agent in agents:
+      agent.step(time_step)
         
         
 class ReplayBufferTest(TestCase):
