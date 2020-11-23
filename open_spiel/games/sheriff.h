@@ -178,7 +178,6 @@ class SheriffState final : public State {
   std::vector<double> Returns() const override;
   std::unique_ptr<State> Clone() const override;
   std::string InformationStateString(Player player) const override;
-  std::string ObservationString(Player player) const override;
   void UndoAction(Player player, Action action_id) override;
 
  protected:

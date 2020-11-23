@@ -170,7 +170,7 @@ std::string SheriffState::InformationStateString(Player player) const {
 
   std::string infostring = absl::StrCat("T=", MoveNumber(), " ");
   if (player == kSMUGGLER) {
-    infostring = "num_illegal_items=";
+    infostring = "num_illegal_items:";
     if (num_illegal_items_) {
       absl::StrAppend(&infostring, *num_illegal_items_);
     } else {
@@ -181,7 +181,7 @@ std::string SheriffState::InformationStateString(Player player) const {
   SPIEL_CHECK_GE(inspection_feedback_.size() + 1, bribes_.size());
   SPIEL_CHECK_LE(inspection_feedback_.size(), bribes_.size());
   for (size_t index = 0; index < bribes_.size(); ++index) {
-    absl::StrAppend(&infostring, "/bribe", bribes_.at(index));
+    absl::StrAppend(&infostring, "/bribe:", bribes_.at(index));
 
     if (index < inspection_feedback_.size()) {
       absl::StrAppend(&infostring,
@@ -190,12 +190,6 @@ std::string SheriffState::InformationStateString(Player player) const {
   }
 
   return infostring;
-}
-
-std::string SheriffState::ObservationString(Player player) const {
-  // XXX(gfarina): Is it OK to have the observation match the information state
-  //     in this case?
-  return InformationStateString(player);
 }
 
 void SheriffState::UndoAction(Player player, Action action_id) {
@@ -256,7 +250,7 @@ const GameType kGameType{
     /* min_num_players = */ 2,
     /* provides_information_state_string = */ true,
     /* provides_information_state_tensor = */ false,
-    /* provides_observation_string = */ true,
+    /* provides_observation_string = */ false,
     /* provides_observation_tensor = */ false,
     /* parameter_specification = */
     {{"item_penalty", GameParameter(kDefaultItemPenalty)},
