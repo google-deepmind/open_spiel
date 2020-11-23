@@ -81,6 +81,7 @@ EXPECTED_GAMES = set([
     "pig",
     "quoridor",
     "repeated_game",
+    "sheriff",
     "skat",
     "start_at",
     "solitaire",
