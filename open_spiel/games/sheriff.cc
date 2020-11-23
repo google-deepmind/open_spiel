@@ -149,14 +149,15 @@ std::vector<double> SheriffState::Returns() const {
     if (sheriff_inspects) {
       if (num_illegal_items > 0) {
         // The smuggler was caught red-handed.
-        return {-num_illegal_items * conf.item_penalty,
-                num_illegal_items * conf.item_penalty};
+        return {-static_cast<double>(num_illegal_items) * conf.item_penalty,
+                static_cast<double>(num_illegal_items) * conf.item_penalty};
       } else {
         // The sheriff must pay up for inspecting a legal cargo.
         return {conf.sheriff_penalty, -conf.sheriff_penalty};
       }
     } else {
-      return {num_illegal_items * conf.item_value - bribe, bribe};
+      return {static_cast<double>(num_illegal_items) * conf.item_value - bribe,
+              bribe};
     }
   }
 }
@@ -297,12 +298,15 @@ std::unique_ptr<State> SheriffGame::NewInitialState() const {
 }
 
 double SheriffGame::MinUtility() const {
-  return std::min(-static_cast<double>(conf.max_items) * conf.item_penalty,
-                  -static_cast<double>(conf.max_bribe));
+  return std::min({-static_cast<double>(conf.max_items) * conf.item_penalty,
+                   -static_cast<double>(conf.max_bribe),
+                   -conf.sheriff_penalty});
 }
 
 double SheriffGame::MaxUtility() const {
-  return std::max(conf.sheriff_penalty, conf.max_items * conf.item_value);
+  return std::max({conf.sheriff_penalty, static_cast<double>(conf.max_bribe),
+                   static_cast<double>(conf.max_items) * conf.item_value,
+                   static_cast<double>(conf.max_items) * conf.item_penalty});
 }
 
 double SheriffGame::UtilitySum() const {
