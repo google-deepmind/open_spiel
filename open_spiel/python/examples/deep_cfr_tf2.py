@@ -34,7 +34,7 @@ import pyspiel
 FLAGS = flags.FLAGS
 
 flags.DEFINE_integer("num_iterations", 100, "Number of iterations")
-flags.DEFINE_integer("num_traversals", 1500, "Number of traversals/games")
+flags.DEFINE_integer("num_traversals", 150, "Number of traversals/games")
 flags.DEFINE_string("game_name", "leduc_poker", "Name of the game")
 
 
@@ -52,8 +52,10 @@ def main(unused_argv):
       batch_size_strategy=2048,
       memory_capacity=1e6,
       policy_network_train_steps=5000,
-      advantage_network_train_steps=750,
-      reinitialize_advantage_networks=True)
+      advantage_network_train_steps=500,
+      reinitialize_advantage_networks=True,
+      infer_device='cpu',
+      train_device='cpu')
   _, advantage_losses, policy_loss = deep_cfr_solver.solve()
   for player, losses in six.iteritems(advantage_losses):
     logging.info("Advantage for player %d: %s", player,
@@ -73,9 +75,7 @@ def main(unused_argv):
   average_policy_values = expected_game_score.policy_value(
       game.new_initial_state(), [average_policy] * 2)
   print("Computed player 0 value: {}".format(average_policy_values[0]))
-  print("Expected player 0 value: {}".format(-1 / 18))
   print("Computed player 1 value: {}".format(average_policy_values[1]))
-  print("Expected player 1 value: {}".format(1 / 18))
 
 
 if __name__ == "__main__":
