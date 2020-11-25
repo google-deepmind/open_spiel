@@ -96,13 +96,13 @@ Linux versions).
 Option 1 (Basic, 3.13GB):
 
 ```bash
-docker build --target base -t openspiel . --rm
+docker build --target base -t openspiel -f Dockerfile.base --rm
 ```
 
 Option 2 (Slim, 2.26GB):
 
 ```bash
-docker build --target python-slim -t openspiel . --rm
+docker build --target python-slim -t openspiel -f Dockerfile.base --rm
 ```
 
 If you are only interested in developing in Python, use the second image. You
@@ -118,6 +118,18 @@ Finally you can run examples using:
 docker run openspiel python3 python/examples/matrix_game_example.py
 docker run openspiel python3 python/examples/example.py
 ```
+
+
+Option 3 (Jupyter Notebook):
+
+Installs OpenSpiel with an additional Jupyter Notebook environment.
+
+```bash
+docker build -t openspiel-notebook -f Dockerfile.jupyter --rm
+docker run -it --rm -p 8888:8888 openspiel-notebook
+```
+
+_More info_: https://jupyter-docker-stacks.readthedocs.io/en/latest/
 
 ## Running the first examples
 
