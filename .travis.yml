@@ -10,6 +10,7 @@
 # Travis CI or another service (CircleCI, etc).
 
 language: c
+compiler: clang
 
 cache: pip
 git:
@@ -32,6 +33,7 @@ matrix:
     env:
       - OS_PYTHON_VERSION=3.8
       - TRAVIS_USE_NOX=0
+      - CC=/usr/bin/clang
       - CXX=/usr/bin/clang++
   # Build and run tests with all optional dependencies, including building a
   # shared library with linkable third party dependencies in place.
@@ -41,6 +43,7 @@ matrix:
       - OS_PYTHON_VERSION=3.8
       - DEFAULT_OPTIONAL_DEPENDENCY="ON"
       - TRAVIS_USE_NOX=0
+      - CC=/usr/bin/clang
       - CXX=/usr/bin/clang++
       - BUILD_SHARED_LIB="ON"
       - BUILD_WITH_ORTOOLS="ON"
@@ -60,6 +63,7 @@ matrix:
     env:
       - OS_PYTHON_VERSION=3.8
       - TRAVIS_USE_NOX=1
+      - CC=/usr/bin/clang
       - CXX=/usr/bin/clang++
   # Build and test on MacOS. We use a single target, with all dependencies and
   # use nox.
