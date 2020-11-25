@@ -30,7 +30,7 @@ matrix:
   # Build and run tests with all optional dependencies, including building a
   # shared library with linkable third party dependencies in place.
   - os: linux
-    dist: bionic # Ubuntu 18.04.2 LTS released on 26 April 2018
+    dist: focal # Ubuntu 20.04 LTS
     env:
       - OS_PYTHON_VERSION=3.6
       - DEFAULT_OPTIONAL_DEPENDENCY="ON"
@@ -49,7 +49,7 @@ matrix:
   # Build and run tests without all optional dependencies (default behavior) and
   # use nox
   - os: linux
-    dist: bionic # Ubuntu 18.04.2 LTS released on 26 April 2018
+    dist: focal # Ubuntu 20.04 LTS
     env:
       - OS_PYTHON_VERSION=3.6
       - TRAVIS_USE_NOX=1
