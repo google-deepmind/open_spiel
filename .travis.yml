@@ -37,7 +37,7 @@ matrix:
       - TRAVIS_USE_NOX=0
       - BUILD_SHARED_LIB="ON"
       - BUILD_WITH_ORTOOLS="ON"
-      - BUILD_WITH_ORTOOLS_DOWNLOAD_URL="https://github.com/google/or-tools/releases/download/v8.0/or-tools_ubuntu-18.04_v8.0.8283.tar.gz"
+      - BUILD_WITH_ORTOOLS_DOWNLOAD_URL="https://github.com/google/or-tools/releases/download/v8.0/or-tools_ubuntu-20.04_v8.0.8283.tar.gz"
   # Build and test on MacOS. We use a single target, with all dependencies.
   - os: osx
     osx_image: xcode10.3  # macOS 10.14 (Mojave), release on March 25, 2019.
