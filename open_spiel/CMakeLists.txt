@@ -28,7 +28,6 @@ set (CMAKE_CXX_STANDARD 17)
 
 # Use libc++
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++ -lc++abi")
 
 # Set default build type.
 if(NOT BUILD_TYPE)
