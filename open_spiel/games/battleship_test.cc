@@ -32,12 +32,18 @@
 #include <limits>
 
 #include "open_spiel/abseil-cpp/absl/container/flat_hash_set.h"
+#include "open_spiel/abseil-cpp/absl/flags/flag.h"
+#include "open_spiel/abseil-cpp/absl/flags/parse.h"
 #include "open_spiel/algorithms/expected_returns.h"
 #include "open_spiel/algorithms/get_all_states.h"
 #include "open_spiel/algorithms/tabular_exploitability.h"
 #include "open_spiel/policy.h"
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/tests/basic_tests.h"
+
+ABSL_FLAG(int, num_sims, 20, "Number of simulations in the basic tests.");
+ABSL_FLAG(bool, enable_game_sizes_test, false,
+          "Whether to test the game sizes.");
 
 namespace open_spiel {
 namespace battleship {
@@ -56,7 +62,7 @@ void BasicBattleshipTest() {
                                 {"num_shots", GameParameter(num_shots)},
                                 {"allow_repeated_shots", GameParameter(false)},
                                 {"loss_multiplier", GameParameter(2.0)}});
-    testing::RandomSimTestWithUndo(*game, 100);
+    testing::RandomSimTestWithUndo(*game, absl::GetFlag(FLAGS_num_sims));
     testing::NoChanceOutcomesTest(*game);
   }
 }
@@ -72,7 +78,7 @@ void RandomTestsOnLargeBoards() {
                               {"allow_repeated_shots", GameParameter(true)},
                               {"loss_multiplier", GameParameter(1.0)}});
   testing::NoChanceOutcomesTest(*game);
-  testing::RandomSimTestWithUndo(*game, 100);
+  testing::RandomSimTestWithUndo(*game, absl::GetFlag(FLAGS_num_sims));
 
   // Repeated shots not allowed.
   game = LoadGame("battleship", {{"board_width", GameParameter(10)},
@@ -83,7 +89,7 @@ void RandomTestsOnLargeBoards() {
                                  {"allow_repeated_shots", GameParameter(false)},
                                  {"loss_multiplier", GameParameter(1.0)}});
   testing::NoChanceOutcomesTest(*game);
-  testing::RandomSimTestWithUndo(*game, 100);
+  testing::RandomSimTestWithUndo(*game, absl::GetFlag(FLAGS_num_sims));
 }
 
 void TestZeroSumTrait() {
@@ -449,6 +455,8 @@ void TestGameSizes() {
 }  // namespace open_spiel
 
 int main(int argc, char** argv) {
+  absl::ParseCommandLine(argc, argv);
+
   open_spiel::testing::LoadGameTest("battleship");
   open_spiel::battleship::BasicBattleshipTest();
   open_spiel::battleship::RandomTestsOnLargeBoards();
@@ -456,5 +464,8 @@ int main(int argc, char** argv) {
   open_spiel::battleship::TestTightLayout1();
   open_spiel::battleship::TestTightLayout2();
   open_spiel::battleship::TestNashEquilibriumInSmallBoard();
-  open_spiel::battleship::TestGameSizes();
+
+  if (absl::GetFlag(FLAGS_enable_game_sizes_test)) {
+    open_spiel::battleship::TestGameSizes();
+  }
 }
