@@ -35,7 +35,6 @@ source ./venv/bin/activate
 python3 --version
 pip3 install --upgrade -r requirements.txt -q
 
-# Use libc++
-CXX_FLAGS="-stdlib=libc++" ./open_spiel/scripts/build_and_run_tests.sh
+./open_spiel/scripts/build_and_run_tests.sh
 
 deactivate
