@@ -42,6 +42,8 @@ from __future__ import division
 from __future__ import print_function
 
 import numpy as np
+from six.moves import range
+from six.moves import zip
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -490,7 +492,7 @@ def all_states(initial_state,
 def sequence_weights_to_tabular_profile(root, policy_fn):
   """Returns the `dict` of `list`s of action-prob pairs-form of `policy_fn`."""
   tabular_policy = {}
-  players = range(root.num_players())
+  players = list(range(root.num_players()))
   for state in all_states(root):
     for player in players:
       legal_actions = state.legal_actions(player)
