@@ -28,6 +28,8 @@ matrix:
     env:
       - OS_PYTHON_VERSION=3.6
       - TRAVIS_USE_NOX=0
+      - CC=/usr/local/clang-7.0.0/bin/clang
+      - CXX=/usr/local/clang-7.0.0/bin/clang++
   - os: linux
     dist: focal # Ubuntu 20.04 LTS
     env:
