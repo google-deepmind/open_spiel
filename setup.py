@@ -57,18 +57,22 @@ class BuildExt(build_ext):
       self.build_extension(ext)
 
   def build_extension(self, ext):
+    compiler = "clang++"
+    if os.environ.get("CXX") is not None:
+      compiler = os.environ.get("CXX")
     extension_dir = os.path.abspath(
         os.path.dirname(self.get_ext_fullpath(ext.name)))
     cmake_args = [
         f"-DPython3_EXECUTABLE={sys.executable}",
-        "-DCMAKE_CXX_COMPILER=clang++",
+        "-DCMAKE_CXX_COMPILER=" + compiler,
         f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={extension_dir}",
     ]
     if not os.path.exists(self.build_temp):
       os.makedirs(self.build_temp)
-    subprocess.check_call(
-        ["cmake", ext.sourcedir] + cmake_args, cwd=self.build_temp)
     env = os.environ.copy()
+    subprocess.check_call(
+        ["cmake", ext.sourcedir] + cmake_args,
+        cwd=self.build_temp, env=env)
     subprocess.check_call(["make", f"-j{os.cpu_count()}"],
                           cwd=self.build_temp,
                           env=env)
