@@ -19,6 +19,7 @@
 #include <iostream>
 #include <unordered_set>
 
+#include "open_spiel/abseil-cpp/absl/container/node_hash_set.h"
 #include "open_spiel/algorithms/minimax.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/games/goofspiel.h"
@@ -219,8 +220,8 @@ void TestGetAllInfoSetsMatchesInfoStates() {
         std::unordered_set<Action> child_actions(child_actions_vector.begin(),
                                                  child_actions_vector.end());
         std::vector<Action> legal_actions_vector = node_state->LegalActions();
-        std::unordered_set<Action> legal_actions(legal_actions_vector.begin(),
-                                                 legal_actions_vector.end());
+        absl::node_hash_set<Action> legal_actions(legal_actions_vector.begin(),
+                                                  legal_actions_vector.end());
         for (const auto& child_action : child_actions) {
           if (legal_actions.count(child_action) == 0) {
             SpielFatalError("Child action found that's not a legal action.");
