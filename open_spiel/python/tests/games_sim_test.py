@@ -57,7 +57,7 @@ SPIEL_MULTIPLAYER_GAMES_LIST = [
     if g.max_num_players > 2 and g.max_num_players > g.min_num_players and
     g.short_name != "tiny_hanabi"  # default payoff only works for 2p
     # cannot change the number of players without changing other parameters
-    and g.short_name != "universal_poker"
+    and g.short_name != "universal_poker" and g.short_name != "scotland_yard"
 ]
 assert len(SPIEL_MULTIPLAYER_GAMES_LIST) >= 35, len(
     SPIEL_MULTIPLAYER_GAMES_LIST)
