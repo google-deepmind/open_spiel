@@ -66,6 +66,14 @@ matrix:
       - TRAVIS_USE_NOX=1
       - CC=/usr/bin/clang
       - CXX=/usr/bin/clang++
+  # Ubuntu 18.04
+  - os: linux
+    dist: bionic # Ubuntu 18.04
+    env:
+      - OS_PYTHON_VERSION=3.6
+      - TRAVIS_USE_NOX=1
+      - CC=/usr/local/clang-7.0.0/bin/clang
+      - CXX=/usr/local/clang-7.0.0/bin/clang++
   # Build and test on MacOS. We use a single target, with all dependencies and
   # use nox.
   - os: osx
