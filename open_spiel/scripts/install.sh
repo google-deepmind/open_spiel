@@ -14,7 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 # The following should be easy to setup as a submodule:
 # https://git-scm.com/docs/git-submodule
 
