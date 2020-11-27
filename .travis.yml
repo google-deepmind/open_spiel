@@ -10,7 +10,6 @@
 # Travis CI or another service (CircleCI, etc).
 
 language: c
-compiler: clang
 
 cache: pip
 git:
