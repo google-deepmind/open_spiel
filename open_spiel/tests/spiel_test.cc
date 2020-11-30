@@ -302,8 +302,13 @@ void GameParametersTest() {
   SPIEL_CHECK_TRUE(GameParameterFromString("1.0").has_double_value());
   SPIEL_CHECK_TRUE(GameParameterFromString("1. 0").has_string_value());
 
+  // Tests for GameParametersFromString
+  // Empty string
+  auto params = GameParametersFromString("");
+  SPIEL_CHECK_TRUE(params.empty());
+
   // Bare name
-  auto params = GameParametersFromString("game_one");
+  params = GameParametersFromString("game_one");
   SPIEL_CHECK_EQ(params.size(), 1);
   SPIEL_CHECK_EQ(params["name"].string_value(), "game_one");
 
