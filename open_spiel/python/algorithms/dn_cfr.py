@@ -12,20 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Implements Deep CFR Algorithm.
+"""Implements DN CFR Algorithm.
 
-See https://arxiv.org/abs/1811.00164.
-
-The algorithm defines an `advantage` and `strategy` networks that compute
-advantages used to do regret matching across information sets and to approximate
-the strategy profiles of the game. To train these networks a reservoir buffer
-(other data structures may be used) memory is used to accumulate samples to
-train the networks.
-
-This implementation uses skip connections as described in the paper if two
-consecutive layers of the advantage or policy network have the same number
-of units, except for the last connection. Before the last hidden layer
-a layer normalization is applied.
+https://arxiv.org/abs/1812.10607
 """
 
 from __future__ import absolute_import
@@ -368,8 +357,6 @@ class DeepCFRSolver(policy.Policy):
                       self._advantage_network_layers, self._num_actions))
         self._optimizer_advantages.append(tf.keras.optimizers.Adam(
                       learning_rate=self._learning_rate))
-        #self._advantage_train_step = \
-        #              self._get_advantage_train_graph()
         self._loss_advantages.append(tf.keras.losses.MeanSquaredError())
 
   @property
@@ -502,16 +489,6 @@ class DeepCFRSolver(policy.Policy):
     )
     return example.SerializeToString()
 
-  def _get_cfr(self, prev_regret, sampled_regret, iteration):
-    #return (iteration-1) / (iteration+1) * prev_regret + 2/(iteration+1) * sampled_regret
-    #return 1/iteration *((iteration-1)*prev_regret + sampled_regret)
-    value = 1/np.sqrt(iteration) * (np.sqrt(iteration-1)*prev_regret + sampled_regret)
-    if np.isnan(value).any():
-      print('ups')
-    return value
-    #return sampled_regret
-    #pass
-
   def _add_to_strategy_memory(self, info_state, iteration,
                     strategy_action_probs, legal_actions_mask):
     """adds the given strategy data to the memory. Uses either a tfrecordsfile
@@ -562,7 +539,6 @@ class DeepCFRSolver(policy.Policy):
             reach_i*strategy[action], reach_i_samp)
       ev = np.sum(exp_payoff * strategy)
       samp_regret = (exp_payoff - ev) * state.legal_actions_mask(player)
-      #new_cfr = self._get_cfr(advs, samp_regret, self._iteration)
       y_strategy = reach_i * strategy
       # self._advantage_memories.append(
       #   self._serialize_advantage_memory(state.information_state_tensor(),
@@ -656,39 +632,20 @@ class DeepCFRSolver(policy.Policy):
 
   def _get_advantage_dataset(self):
     """returns the collected regrets for the given player as a dataset"""
-    #sum up values
-    # sumsas = []
-    # for d in self._advantage_memories.values():
-    #     if len(d) == 1:
-    #         sumsas.append(d[0])
-    #     elif len(d) > 1:
-    #         summed_up = np.sum([x[3] for x in d], axis=0)
-    #         sumsas.append((d[0][0], d[0][1], d[0][2], summed_up, d[0][4]))
-
-    # def gen():
-    #   for s in sumsas:
-    #     yield (s[0], self._get_cumm_regret(s[2], s[3], s[1]), s[4])
 
     info_states, iterations, advs, samp_regret, masks, y_values = [], [], [], [], [], []
     for d in self._advantage_memories.values():
       summed_up = np.sum([x[3] for x in d], axis=0)/self._num_traversals
-      #sumsas.append((d[0][0], d[0][1], d[0][2], summed_up, d[0][4]))
       info_states.append(d[0][0])
-      iterations.append(d[0][1])
-      advs.append(d[0][2])
-      samp_regret.append(summed_up)
       masks.append(d[0][4])
       y_values.append(self._get_cumm_regret(d[0][2], summed_up, d[0][1]))
 
-    #data = tf.data.Dataset.from_generator(gen, (tf.float32, tf.float32, tf.float32))
     data = tf.data.Dataset.from_tensor_slices((info_states, y_values, masks))
     data = data.map(lambda a,b,c: (tf.cast(a, tf.float32),
               tf.cast(b, tf.float32),
               tf.cast(c, tf.float32)))
     data = data.shuffle(len(info_states))
-    #data = data.repeat()
     data = data.batch(self._batch_size_advantage)
-    #data = data.map(self._deserialize_advantage_memory)
     data = data.prefetch(tf.data.experimental.AUTOTUNE)
     return data
 
@@ -722,7 +679,6 @@ class DeepCFRSolver(policy.Policy):
       return main_loss
 
     with tf.device(self._train_device):
-      #tfit = tf.constant(self._iteration, dtype=tf.float32)
       data = self._get_advantage_dataset()
       
       for epoch in range(1000):
@@ -783,13 +739,8 @@ class DeepCFRSolver(policy.Policy):
                       zip(gradients, model.trainable_variables))
       return main_loss
 
-    # with tf.device(self._train_device):
-    #   data = self._get_strategy_dataset()
-    #   for d in data.take(self._policy_network_train_steps):
-    #     main_loss = train_step(*d)
 
     with tf.device(self._train_device):
-      #tfit = tf.constant(self._iteration, dtype=tf.float32)
       data = self._get_strategy_dataset()
       for epoch in range(1000):
         loss = []
