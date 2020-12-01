@@ -34,23 +34,23 @@ import os
 from datetime import datetime
 #tf.config.set_visible_devices([], 'GPU')
 
-gpus = tf.config.experimental.list_physical_devices('GPU')
-if gpus:
-  # Restrict TensorFlow to only allocate 1GB of memory on the first GPU
-  try:
-    tf.config.experimental.set_virtual_device_configuration(
-        gpus[0],
-        [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=1024)])
-    logical_gpus = tf.config.experimental.list_logical_devices('GPU')
-    print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
-  except RuntimeError as e:
-    # Virtual devices must be set before GPUs have been initialized
-    print(e)
+# gpus = tf.config.experimental.list_physical_devices('GPU')
+# if gpus:
+#   # Restrict TensorFlow to only allocate 1GB of memory on the first GPU
+#   try:
+#     tf.config.experimental.set_virtual_device_configuration(
+#         gpus[0],
+#         [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=1024)])
+#     logical_gpus = tf.config.experimental.list_logical_devices('GPU')
+#     print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
+#   except RuntimeError as e:
+#     # Virtual devices must be set before GPUs have been initialized
+#     print(e)
 
 FLAGS = flags.FLAGS
 
 flags.DEFINE_integer("num_iterations", 100, "Number of iterations")
-flags.DEFINE_integer("num_traversals", 1500, "Number of traversals/games")
+flags.DEFINE_integer("num_traversals", 1000, "Number of traversals/games")
 flags.DEFINE_string("game_name", "leduc_poker", "Name of the game")
 
 
@@ -61,8 +61,10 @@ def main(unused_argv):
   os.makedirs(pathname)
   deep_cfr_solver = dn_cfr.DeepCFRSolver(
       game,
-      policy_network_layers=(64,64,64,64),
-      advantage_network_layers=(64,64,64,64),
+      #policy_network_layers=(32,32),
+      #advantage_network_layers=(32,32),
+      policy_network_layers=(64,64),
+      advantage_network_layers=(64,64,64),
       num_iterations=FLAGS.num_iterations,
       num_traversals=FLAGS.num_traversals,
       learning_rate=1e-3,
