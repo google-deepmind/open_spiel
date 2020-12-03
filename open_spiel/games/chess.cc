@@ -54,10 +54,10 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 // Adds a plane to the information state vector corresponding to the presence
 // and absence of the given piece type and colour at each square.
 void AddPieceTypePlane(Color color, PieceType piece_type,
-                       const StandardChessBoard& board,
+                       const ChessBoard& board,
                        absl::Span<float>::iterator& value_it) {
-  for (int8_t y = 0; y < BoardSize(); ++y) {
-    for (int8_t x = 0; x < BoardSize(); ++x) {
+  for (int8_t y = 0; y < kMaxBoardSize; ++y) {
+    for (int8_t x = 0; x < kMaxBoardSize; ++x) {
       Piece piece_on_board = board.at(Square{x, y});
       *value_it++ =
           (piece_on_board.color == color && piece_on_board.type == piece_type
@@ -72,7 +72,7 @@ template <typename T>
 void AddScalarPlane(T val, T min, T max,
                     absl::Span<float>::iterator& value_it) {
   double normalized_val = static_cast<double>(val - min) / (max - min);
-  for (int i = 0; i < BoardSize() * BoardSize(); ++i)
+  for (int i = 0; i < kMaxBoardSize * kMaxBoardSize; ++i)
     *value_it++ = normalized_val;
 }
 
@@ -90,11 +90,10 @@ ChessState::ChessState(std::shared_ptr<const Game> game)
 }
 
 ChessState::ChessState(std::shared_ptr<const Game> game, const std::string& fen)
-    : State(game) {
-  auto maybe_board = StandardChessBoard::BoardFromFEN(fen);
-  SPIEL_CHECK_TRUE(maybe_board);
-  start_board_ = *maybe_board;
-  current_board_ = start_board_;
+    : State(game),
+    start_board_(*ChessBoard::BoardFromFEN(fen)),
+    current_board_(start_board_){
+  SPIEL_CHECK_TRUE(&start_board_);
   repetitions_[current_board_.HashValue()] = 1;
 }
 
@@ -110,7 +109,7 @@ void ChessState::MaybeGenerateLegalActions() const {
   if (!cached_legal_actions_) {
     cached_legal_actions_ = std::vector<Action>();
     Board().GenerateLegalMoves([this](const Move& move) -> bool {
-      cached_legal_actions_->push_back(MoveToAction(move));
+      cached_legal_actions_->push_back(MoveToAction(move, kMaxBoardSize));
       return true;
     });
     absl::c_sort(*cached_legal_actions_);
@@ -139,14 +138,14 @@ Color PlayerToColor(Player p) {
   return static_cast<Color>(p);
 }
 
-Action MoveToAction(const Move& move) {
+Action MoveToAction(const Move& move, const int boardSize) {
   Color color = move.piece.color;
   // We rotate the move to be from player p's perspective.
   Move player_move(move);
 
   // Rotate move to be from player p's perspective.
-  player_move.from.y = ReflectRank(color, BoardSize(), player_move.from.y);
-  player_move.to.y = ReflectRank(color, BoardSize(), player_move.to.y);
+  player_move.from.y = ReflectRank(color, boardSize, player_move.from.y);
+  player_move.to.y = ReflectRank(color, boardSize, player_move.to.y);
 
   // For each starting square, we enumerate 73 actions:
   // - 9 possible underpromotions
@@ -157,7 +156,7 @@ Action MoveToAction(const Move& move) {
   // moves actually available from each starting square this could still be
   // reduced a little to 1816 indices.
   int starting_index =
-      EncodeMove(player_move.from, 0, BoardSize(), kNumActionDestinations);
+      EncodeMove(player_move.from, 0, kMaxBoardSize, kNumActionDestinations);
   int8_t x_diff = player_move.to.x - player_move.from.x;
   int8_t y_diff = player_move.to.y - player_move.from.y;
   Offset offset{x_diff, y_diff};
@@ -171,8 +170,8 @@ Action MoveToAction(const Move& move) {
     // possible piece types.
     SPIEL_CHECK_EQ(move.piece.type, PieceType::kPawn);
     SPIEL_CHECK_TRUE((move.piece.color == color &&
-                      player_move.from.y == BoardSize() - 2 &&
-                      player_move.to.y == BoardSize() - 1) ||
+                      player_move.from.y == boardSize - 2 &&
+                      player_move.to.y == boardSize - 1) ||
                      (move.piece.color == OppColor(color) &&
                       player_move.from.y == 1 && player_move.to.y == 0));
 
@@ -198,7 +197,7 @@ Action MoveToAction(const Move& move) {
   } else {
     // For the normal moves, we simply encode starting and destination square.
     int destination_index =
-        OffsetToDestinationIndex(offset, kKnightOffsets, BoardSize());
+        OffsetToDestinationIndex(offset, kKnightOffsets, kMaxBoardSize);
     SPIEL_CHECK_TRUE(destination_index >= 0 && destination_index < 64);
     return starting_index + kNumUnderPromotions + destination_index;
   }
@@ -217,16 +216,17 @@ std::pair<Square, int> ActionToDestination(int action, int board_size,
   return {Square{x, y}, destination_index};
 }
 
-Move ActionToMove(const Action& action, const StandardChessBoard& board) {
+Move ActionToMove(const Action& action, const ChessBoard& board) {
   SPIEL_CHECK_GE(action, 0);
   SPIEL_CHECK_LT(action, NumDistinctActions());
 
   // The encoded action represents an action encoded from color's perspective.
   Color color = board.ToPlay();
+  int boardSize = board.BoardSize();
   PieceType promotion_type = PieceType::kEmpty;
   bool is_castling = false;
   auto [from_square, destination_index] =
-      ActionToDestination(action, BoardSize(), kNumActionDestinations);
+      ActionToDestination(action, kMaxBoardSize, kNumActionDestinations);
   SPIEL_CHECK_LT(destination_index, kNumActionDestinations);
 
   bool is_under_promotion = destination_index < kNumUnderPromotions;
@@ -239,20 +239,20 @@ Move ActionToMove(const Action& action, const StandardChessBoard& board) {
   } else {
     destination_index -= kNumUnderPromotions;
     offset = DestinationIndexToOffset(destination_index, kKnightOffsets,
-                                      BoardSize());
+                                      kMaxBoardSize);
   }
   Square to_square = from_square + offset;
 
-  from_square.y = ReflectRank(color, BoardSize(), from_square.y);
-  to_square.y = ReflectRank(color, BoardSize(), to_square.y);
+  from_square.y = ReflectRank(color, boardSize, from_square.y);
+  to_square.y = ReflectRank(color, boardSize, to_square.y);
 
   // This uses the current state to infer the piece type.
   Piece piece = {board.ToPlay(), board.at(from_square).type};
 
   // Check for queen promotion.
   if (!is_under_promotion && piece.type == PieceType::kPawn &&
-      ReflectRank(color, BoardSize(), from_square.y) == BoardSize() - 2 &&
-      ReflectRank(color, BoardSize(), to_square.y) == BoardSize() - 1) {
+      ReflectRank(color, boardSize, from_square.y) == boardSize - 2 &&
+      ReflectRank(color, boardSize, to_square.y) == boardSize - 1) {
     promotion_type = PieceType::kQueen;
   }
 

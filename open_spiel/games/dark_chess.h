@@ -42,7 +42,6 @@ inline constexpr int NumPlayers() { return 2; }
 inline constexpr double LossUtility() { return -1; }
 inline constexpr double DrawUtility() { return 0; }
 inline constexpr double WinUtility() { return 1; }
-inline constexpr int BoardSize() { return 8; }
 
 // See action encoding below.
 inline constexpr int NumDistinctActions() { return 4672; }
@@ -55,7 +54,7 @@ inline const std::vector<int> &ObservationTensorShape() {
       13 /* piece types * colours + empty */ + 1 /* repetition count */ +
       1 /* side to move */ + 1 /* irreversible move counter */ +
       4 /* castling rights */,
-      BoardSize(), BoardSize()};
+      chess::kMaxBoardSize, chess::kMaxBoardSize};
   return shape;
 }
 
@@ -77,6 +76,11 @@ enum class PromotionTypeEncoding {
   kKnight = 4
 };
 
+enum class DarkChessBoardSize {
+  kStandard = 0,
+  kSmall = 1
+};
+
 inline constexpr std::array<chess::PieceType, 3> kUnderPromotionIndexToType = {
     chess::PieceType::kRook, chess::PieceType::kBishop, chess::PieceType::kKnight};
 inline constexpr std::array<chess::Offset, 3> kUnderPromotionDirectionToOffset = {
@@ -89,18 +93,14 @@ inline constexpr int kNumActionDestinations = 73;
 std::pair<chess::Square, int> ActionToDestination(int action, int board_size,
                                            int num_actions_destinations);
 
-chess::Move ActionToMove(const Action &action, const chess::StandardDarkChessBoard &board);
-
 
 // State of an in-play game.
 class DarkChessState : public State {
  public:
-  // Constructs a chess state at the standard start position.
-  DarkChessState(std::shared_ptr<const Game> game);
 
   // Constructs a chess state at the given position in Forsyth-Edwards Notation.
   // https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
-  DarkChessState(std::shared_ptr<const Game> game, const std::string& fen);
+  DarkChessState(std::shared_ptr<const Game> game, int board_size, const std::string& fen);
   DarkChessState(const DarkChessState&) = default;
 
   DarkChessState& operator=(const DarkChessState&) = default;
@@ -125,12 +125,12 @@ class DarkChessState : public State {
   void UndoAction(Player player, Action action) override;
 
   // Current board.
-  chess::StandardDarkChessBoard& Board() { return current_board_; }
-  const chess::StandardDarkChessBoard& Board() const { return current_board_; }
+  chess::ChessBoard& Board() { return current_board_; }
+  const chess::ChessBoard& Board() const { return current_board_; }
 
   // Starting board.
-  chess::StandardDarkChessBoard& StartBoard() { return start_board_; }
-  const chess::StandardDarkChessBoard& StartBoard() const { return start_board_; }
+  chess::ChessBoard& StartBoard() { return start_board_; }
+  const chess::ChessBoard& StartBoard() const { return start_board_; }
 
   std::vector<chess::Move>& MovesHistory() { return moves_history_; }
   const std::vector<chess::Move>& MovesHistory() const { return moves_history_; }
@@ -156,9 +156,9 @@ class DarkChessState : public State {
   std::vector<chess::Move> moves_history_;
   // We store the start board for history to support games not starting
   // from the start position.
-  chess::StandardDarkChessBoard start_board_;
+  chess::ChessBoard start_board_;
   // We store the current board position as an optimization.
-  chess::StandardDarkChessBoard current_board_;
+  chess::ChessBoard current_board_;
 
   // RepetitionTable records how many times the given hash exists in the history
   // stack (including the current board).
@@ -182,12 +182,8 @@ class DarkChessGame : public Game {
   int NumDistinctActions() const override {
     return chess::NumDistinctActions();
   }
-  std::unique_ptr<State> NewInitialState(
-      const std::string& fen) const override {
-    return absl::make_unique<DarkChessState>(shared_from_this(), fen);
-  }
   std::unique_ptr<State> NewInitialState() const override {
-    return absl::make_unique<DarkChessState>(shared_from_this());
+    return absl::make_unique<DarkChessState>(shared_from_this(), board_size_, fen_);
   }
   int NumPlayers() const override { return chess::NumPlayers(); }
   double MinUtility() const override { return LossUtility(); }
@@ -197,6 +193,10 @@ class DarkChessGame : public Game {
     return chess::ObservationTensorShape();
   }
   int MaxGameLength() const override { return chess::MaxGameLength(); }
+
+ private:
+  const int board_size_;
+  const std::string fen_;
 };
 
 }  // namespace dark_chess

@@ -131,11 +131,7 @@ inline constexpr std::array<Offset, 8> kKnightOffsets = {
 absl::optional<Square> SquareFromString(const std::string& s);
 
 // Forward declare ChessBoard here because it's needed in Move::ToSAN.
-template <uint32_t kBoardSize, bool kAllowCheck>
 class ChessBoard;
-
-using StandardChessBoard = ChessBoard<8, /*kAllowCheck=*/false>;
-using StandardDarkChessBoard = ChessBoard<8, /*kAllowCheck=*/true>;
 
 struct Move {
   Square from;
@@ -207,8 +203,7 @@ struct Move {
   //              resulting in checkmate in a surprisingly good move)
   // * O-O-O!!N+/- (a surprisingly good long castle that is a theoretical
   //                novelty that gives white a clear but not winning advantage)
-  template<bool kAllowCheck>
-  std::string ToSAN(const ChessBoard<8, kAllowCheck>& board);
+  std::string ToSAN(const ChessBoard& board) const;
 
   bool operator==(const Move& other) const {
     return from == other.from && to == other.to && piece == other.piece &&
@@ -225,18 +220,22 @@ bool IsMoveCharacter(char c);
 
 std::pair<std::string, std::string> SplitAnnotations(const std::string& move);
 
-template <uint32_t kBoardSize, bool kAllowCheck>
+inline constexpr int kMaxBoardSize = 8;
+inline const std::string kDefaultStandardFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+inline const std::string kDefaultSmallFen = "r1kr/pppp/PPPP/R1KR w - - 0 1";
+
 class ChessBoard {
  public:
-  ChessBoard();
+  ChessBoard(int board_size, bool king_in_check_allowed);
 
-  static absl::optional<ChessBoard> BoardFromFEN(const std::string& fen);
+  static absl::optional<ChessBoard> BoardFromFEN(const std::string& fen) { return BoardFromFEN(fen, 8, false); };
+  static absl::optional<ChessBoard> BoardFromFEN(const std::string& fen, int boardSize, bool kingAllowedInCheck);
 
   const Piece& at(Square sq) const { return board_[SquareToIndex_(sq)]; }
 
   void set_square(Square sq, Piece p);
 
-  const std::array<Piece, kBoardSize * kBoardSize>& pieces() const {
+  const std::array<Piece, kMaxBoardSize * kMaxBoardSize>& pieces() const {
     return board_;
   }
 
@@ -310,8 +309,8 @@ class ChessBoard {
   // for actually applying the move.
   bool TestApplyMove(const Move& move);
 
-  static bool InBoardArea(const Square& sq) {
-    return sq.x >= 0 && sq.x < kBoardSize && sq.y >= 0 && sq.y < kBoardSize;
+  bool InBoardArea(const Square& sq) const {
+    return sq.x >= 0 && sq.x < board_size_ && sq.y >= 0 && sq.y < board_size_;
   }
 
   bool IsEmpty(const Square& sq) const {
@@ -335,15 +334,15 @@ class ChessBoard {
   }
 
   /* Whether the square is on the pawn starting rank for our_color. */
-  static bool IsPawnStartingRank(const Square& sq, Color our_color) {
+  bool IsPawnStartingRank(const Square& sq, Color our_color) const {
     return ((our_color == Color::kWhite && sq.y == 1) ||
-            (our_color == Color::kBlack && sq.y == (kBoardSize - 2)));
+            (our_color == Color::kBlack && sq.y == (board_size_ - 2)));
   }
 
-  static bool IsPawnPromotionRank(const Square& sq) {
+  bool IsPawnPromotionRank(const Square& sq) const {
     // No need to test for color here because a pawn can't be on the "wrong"
     // promotion rank.
-    return sq.y == 0 || sq.y == (kBoardSize - 1);
+    return sq.y == 0 || sq.y == (board_size_ - 1);
   }
 
   /* Whether the sq is under attack by the opponent. */
@@ -353,7 +352,9 @@ class ChessBoard {
     return UnderAttack(find(Piece{to_play_, PieceType::kKing}), to_play_);
   }
 
-  int BoardSize() const { return kBoardSize; }
+  int BoardSize() const { return board_size_; }
+
+  bool KingInCheckAllowed() const { return king_in_check_allowed_; }
 
   uint64_t HashValue() const { return zobrist_hash_; }
 
@@ -364,7 +365,7 @@ class ChessBoard {
   std::string ToFEN() const;
 
  private:
-  static size_t SquareToIndex_(Square sq) { return sq.y * kBoardSize + sq.x; }
+  size_t SquareToIndex_(Square sq) const { return sq.y * board_size_ + sq.x; }
 
   /* Generate*Destinations functions call yield(sq) for every potential
    * destination generated.
@@ -431,7 +432,10 @@ class ChessBoard {
   void SetIrreversibleMoveCounter(int c);
   void SetMovenumber(int move_number);
 
-  std::array<Piece, kBoardSize * kBoardSize> board_;
+  int board_size_;
+  bool king_in_check_allowed_;
+
+  std::array<Piece, kMaxBoardSize * kMaxBoardSize> board_;
   Color to_play_;
   Square ep_square_;
   int32_t irreversible_move_counter_;
@@ -448,9 +452,8 @@ class ChessBoard {
   uint64_t zobrist_hash_;
 };
 
-template <uint32_t kBoardSize, bool kAllowCheck>
 inline std::ostream& operator<<(std::ostream& stream,
-                                const ChessBoard<kBoardSize, kAllowCheck>& board) {
+                                const ChessBoard& board) {
   return stream << board.DebugString();
 }
 
@@ -458,8 +461,7 @@ inline std::ostream& operator<<(std::ostream& stream, const PieceType& pt) {
   return stream << PieceTypeToString(pt);
 }
 
-StandardChessBoard MakeDefaultBoard();
-StandardDarkChessBoard MakeDefaultDarkChessBoard();
+ChessBoard MakeDefaultBoard();
 
 }  // namespace chess
 }  // namespace open_spiel

@@ -27,10 +27,20 @@ void BasicDarkChessTests() {
   testing::RandomSimTest(*LoadGame("dark_chess"), 100);
 }
 
+void SmallBoardDarkChessTests() {
+  GameParameters params;
+  params["board_size"] = GameParameter(4);
+
+  testing::LoadGameTest("dark_chess");
+  testing::NoChanceOutcomesTest(*LoadGame("dark_chess", params));
+  testing::RandomSimTest(*LoadGame("dark_chess", params), 200);
+}
+
 }  // namespace
 }  // namespace dark_chess
 }  // namespace open_spiel
 
 int main(int argc, char** argv) {
   open_spiel::dark_chess::BasicDarkChessTests();
+  open_spiel::dark_chess::SmallBoardDarkChessTests();
 }

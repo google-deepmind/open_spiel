@@ -42,8 +42,10 @@ const GameType kGameType{
     /*provides_information_state_string=*/true,
     /*provides_information_state_tensor=*/false,
     /*provides_observation_string=*/true,
-    /*provides_observation_tensor=*/true,
-    /*parameter_specification=*/{}  // no parameters
+    /*provides_observation_tensor=*/false,
+    /*parameter_specification=*/{
+      {"board_size", GameParameter(8)},
+      {"fen", GameParameter(GameParameter::Type::kString, false)}}
 };
 
 std::shared_ptr<const Game> Factory(const GameParameters &params) {
@@ -55,10 +57,10 @@ REGISTER_SPIEL_GAME(kGameType, Factory)
 // Adds a plane to the information state vector corresponding to the presence
 // and absence of the given piece type and colour at each square.
 void AddPieceTypePlane(chess::Color color, chess::PieceType piece_type,
-                       const chess::StandardDarkChessBoard& board,
+                       const chess::ChessBoard& board,
                        absl::Span<float>::iterator& value_it) {
-  for (int8_t y = 0; y < BoardSize(); ++y) {
-    for (int8_t x = 0; x < BoardSize(); ++x) {
+  for (int8_t y = 0; y < chess::kMaxBoardSize; ++y) {
+    for (int8_t x = 0; x < chess::kMaxBoardSize; ++x) {
       chess::Piece piece_on_board = board.at(chess::Square{x, y});
       *value_it++ =
           (piece_on_board.color == color && piece_on_board.type == piece_type
@@ -73,7 +75,7 @@ template <typename T>
 void AddScalarPlane(T val, T min, T max,
                     absl::Span<float>::iterator& value_it) {
   double normalized_val = static_cast<double>(val - min) / (max - min);
-  for (int i = 0; i < BoardSize() * BoardSize(); ++i)
+  for (int i = 0; i < chess::kMaxBoardSize * chess::kMaxBoardSize; ++i)
     *value_it++ = normalized_val;
 }
 
@@ -85,19 +87,11 @@ void AddBinaryPlane(bool val, absl::Span<float>::iterator& value_it) {
 }  // namespace
 
 
-DarkChessState::DarkChessState(std::shared_ptr<const Game> game)
+DarkChessState::DarkChessState(std::shared_ptr<const Game> game, int boardSize, const std::string& fen)
     : State(game),
-      start_board_(chess::MakeDefaultDarkChessBoard()),
+      start_board_(*chess::ChessBoard::BoardFromFEN(fen, boardSize, false)),
       current_board_(start_board_) {
-  repetitions_[current_board_.HashValue()] = 1;
-}
-
-DarkChessState::DarkChessState(std::shared_ptr<const Game> game, const std::string& fen)
-    : State(game) {
-  auto maybe_board = chess::StandardDarkChessBoard::BoardFromFEN(fen);
-  SPIEL_CHECK_TRUE(maybe_board);
-  start_board_ = *maybe_board;
-  current_board_ = start_board_;
+  SPIEL_CHECK_TRUE(&current_board_);
   repetitions_[current_board_.HashValue()] = 1;
 }
 
@@ -113,7 +107,7 @@ void DarkChessState::MaybeGenerateLegalActions() const {
   if (!cached_legal_actions_) {
     cached_legal_actions_ = std::vector<Action>();
     Board().GenerateLegalMoves([this](const chess::Move& move) -> bool {
-      cached_legal_actions_->push_back(MoveToAction(move));
+      cached_legal_actions_->push_back(MoveToAction(move, Board().BoardSize()));
       return true;
     });
     absl::c_sort(*cached_legal_actions_);
@@ -127,7 +121,7 @@ std::vector<Action> DarkChessState::LegalActions() const {
 }
 
 std::pair<chess::Square, int> ActionToDestination(int action, int board_size,
-                                           int num_actions_destinations) {
+                                                  int num_actions_destinations) {
   const int xy = action / num_actions_destinations;
   SPIEL_CHECK_GE(xy, 0);
   SPIEL_CHECK_LT(xy, board_size * board_size);
@@ -139,59 +133,9 @@ std::pair<chess::Square, int> ActionToDestination(int action, int board_size,
   return {chess::Square{x, y}, destination_index};
 }
 
-chess::Move ActionToMove(const Action& action, const chess::StandardDarkChessBoard& board) {
-  SPIEL_CHECK_GE(action, 0);
-  SPIEL_CHECK_LT(action, NumDistinctActions());
-
-  // The encoded action represents an action encoded from color's perspective.
-  chess::Color color = board.ToPlay();
-  chess::PieceType promotion_type = chess::PieceType::kEmpty;
-  bool is_castling = false;
-  auto [from_square, destination_index] =
-  ActionToDestination(action, BoardSize(), kNumActionDestinations);
-  SPIEL_CHECK_LT(destination_index, kNumActionDestinations);
-
-  bool is_under_promotion = destination_index < kNumUnderPromotions;
-  chess::Offset offset;
-  if (is_under_promotion) {
-    int promotion_index = destination_index / 3;
-    int direction_index = destination_index % 3;
-    promotion_type = kUnderPromotionIndexToType[promotion_index];
-    offset = kUnderPromotionDirectionToOffset[direction_index];
-  } else {
-    destination_index -= kNumUnderPromotions;
-    offset = DestinationIndexToOffset(destination_index, chess::kKnightOffsets,
-                                      BoardSize());
-  }
-  chess::Square to_square = from_square + offset;
-
-  from_square.y = ReflectRank(color, BoardSize(), from_square.y);
-  to_square.y = ReflectRank(color, BoardSize(), to_square.y);
-
-  // This uses the current state to infer the piece type.
-  chess::Piece piece = {board.ToPlay(), board.at(from_square).type};
-
-  // Check for queen promotion.
-  if (!is_under_promotion && piece.type == chess::PieceType::kPawn &&
-      ReflectRank(color, BoardSize(), from_square.y) == BoardSize() - 2 &&
-      ReflectRank(color, BoardSize(), to_square.y) == BoardSize() - 1) {
-    promotion_type = chess::PieceType::kQueen;
-  }
-
-  // Check for castling which is defined here just as king moves horizontally
-  // by 2 spaces.
-  // TODO(b/149092677): Chess no longer supports chess960. Distinguish between
-  // left/right castle.
-  if (piece.type == chess::PieceType::kKing && std::abs(offset.x_offset) == 2) {
-    is_castling = true;
-  }
-  chess::Move move(from_square, to_square, piece, promotion_type, is_castling);
-  return move;
-}
-
 std::string DarkChessState::ActionToString(Player player, Action action) const {
   chess::Move move = ActionToMove(action, Board());
-  return "a";
+  return move.ToSAN(Board());
 }
 
 std::string DarkChessState::ToString() const { return Board().ToFEN(); }
@@ -334,7 +278,17 @@ absl::optional<std::vector<double>> DarkChessState::MaybeFinalReturns() const {
   return std::nullopt;
 }
 
-DarkChessGame::DarkChessGame(const GameParameters& params) : Game(kGameType, params) {}
+std::string DefaultFen(int boardSize) {
+  if (boardSize == 8) return chess::kDefaultStandardFen;
+  else if (boardSize == 4) return chess::kDefaultSmallFen;
+  else throw std::runtime_error("Only board sizes 4 and 8 have their default chessboards. For other sizes, you have to define fen");
+}
+
+DarkChessGame::DarkChessGame(const GameParameters &params)
+    : Game(kGameType, params),
+      board_size_(ParameterValue<int>("board_size")),
+      fen_(ParameterValue<std::string>("fen", DefaultFen(board_size_))) {
+}
 
 
 
