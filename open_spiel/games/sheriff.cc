@@ -21,9 +21,37 @@
 
 namespace open_spiel {
 namespace sheriff {
+inline constexpr const Player kSmuggler = Player{0};
+inline constexpr const Player kSheriff = Player{1};
+
 namespace {
-inline constexpr const Player kSMUGGLER = Player{0};
-inline constexpr const Player kSHERIFF = Player{1};
+// Facts about the game
+const GameType kGameType{
+    /* short_name = */ "sheriff",
+    /* long_name = */ "Sheriff",
+    GameType::Dynamics::kSequential,
+    GameType::ChanceMode::kDeterministic,
+    GameType::Information::kImperfectInformation,
+    GameType::Utility::kGeneralSum,
+    GameType::RewardModel::kTerminal,
+    /* max_num_players = */ 2,
+    /* min_num_players = */ 2,
+    /* provides_information_state_string = */ true,
+    /* provides_information_state_tensor = */ false,
+    /* provides_observation_string = */ false,
+    /* provides_observation_tensor = */ false,
+    /* parameter_specification = */
+    {{"item_penalty", GameParameter(kDefaultItemPenalty)},
+     {"item_value", GameParameter(kDefaultItemValue)},
+     {"sheriff_penalty", GameParameter(kDefaultSheriffPenalty)},
+     {"max_bribe", GameParameter(kDefaultMaxBribe)},
+     {"max_items", GameParameter(kDefaultMaxItems)},
+     {"num_rounds", GameParameter(kDefaultNumRounds)}}};
+
+std::shared_ptr<const Game> Factory(const GameParameters& params) {
+  return std::make_shared<const SheriffGame>(params);
+}
+REGISTER_SPIEL_GAME(kGameType, Factory);
 
 template <typename T>
 void StrAppendVector(std::string* s, const std::vector<T>& v) {
@@ -44,7 +72,7 @@ Player SheriffState::CurrentPlayer() const {
   if (!num_illegal_items_) {
     // The smuggler still hasn't decided the number of illegal items to
     // place in the cargo. The game has just begun.
-    return kSMUGGLER;
+    return kSmuggler;
   } else if (bribes_.size() == inspection_feedback_.size()) {
     // The smuggler has received feedback for all the bribes.
     //
@@ -54,11 +82,11 @@ Player SheriffState::CurrentPlayer() const {
       return kTerminalPlayerId;
     } else {
       // Otherwise, a new bribing round begins.
-      return kSMUGGLER;
+      return kSmuggler;
     }
   } else {
     // The smuggles has made a bribe, but no feedback has been given out yet.
-    return kSHERIFF;
+    return kSheriff;
   }
 }
 
@@ -92,7 +120,7 @@ std::vector<Action> SheriffState::LegalActions() const {
     //   (action id: 1).
     const Player player = CurrentPlayer();
 
-    if (player == kSMUGGLER) {
+    if (player == kSmuggler) {
       action_ids.reserve(conf.max_bribe + 1);
       for (uint32_t bribe = 0; bribe <= conf.max_bribe; ++bribe) {
         action_ids.push_back(sheriff_game_->SerializeBribe(bribe));
@@ -170,8 +198,8 @@ std::string SheriffState::InformationStateString(Player player) const {
   SPIEL_CHECK_TRUE(player >= 0 && player < NumPlayers());
 
   std::string infostring = absl::StrCat("T=", MoveNumber(), " ");
-  if (player == kSMUGGLER) {
-    infostring = "num_illegal_items:";
+  if (player == kSmuggler) {
+    absl::StrAppend(&infostring, "num_illegal_items:");
     if (num_illegal_items_) {
       absl::StrAppend(&infostring, *num_illegal_items_);
     } else {
@@ -223,49 +251,21 @@ void SheriffState::DoApplyAction(Action action_id) {
     // The action must represent the selection of the number of illegal items in
     // the cargo.
 
-    SPIEL_CHECK_EQ(CurrentPlayer(), kSMUGGLER);
+    SPIEL_CHECK_EQ(CurrentPlayer(), kSmuggler);
     num_illegal_items_ =
         sheriff_game_->DeserializeItemPlacementAction(action_id);
   } else if (bribes_.size() == inspection_feedback_.size()) {
     // The action must represent a new bribe made by the smuggler.
-    SPIEL_CHECK_EQ(CurrentPlayer(), kSMUGGLER);
+    SPIEL_CHECK_EQ(CurrentPlayer(), kSmuggler);
     bribes_.push_back(sheriff_game_->DeserializeBribe(action_id));
   } else {
     // The action must represent the inspection feedback returned by the
     // sheriff.
-    SPIEL_CHECK_EQ(CurrentPlayer(), kSHERIFF);
+    SPIEL_CHECK_EQ(CurrentPlayer(), kSheriff);
     inspection_feedback_.push_back(
         sheriff_game_->DeserializeInspectionFeedback(action_id));
   }
 }
-
-// Facts about the game
-const GameType kGameType{
-    /* short_name = */ "sheriff",
-    /* long_name = */ "Sheriff",
-    GameType::Dynamics::kSequential,
-    GameType::ChanceMode::kDeterministic,
-    GameType::Information::kImperfectInformation,
-    GameType::Utility::kGeneralSum,
-    GameType::RewardModel::kTerminal,
-    /* max_num_players = */ 2,
-    /* min_num_players = */ 2,
-    /* provides_information_state_string = */ true,
-    /* provides_information_state_tensor = */ false,
-    /* provides_observation_string = */ false,
-    /* provides_observation_tensor = */ false,
-    /* parameter_specification = */
-    {{"item_penalty", GameParameter(kDefaultItemPenalty)},
-     {"item_value", GameParameter(kDefaultItemValue)},
-     {"sheriff_penalty", GameParameter(kDefaultSheriffPenalty)},
-     {"max_bribe", GameParameter(kDefaultMaxBribe)},
-     {"max_items", GameParameter(kDefaultMaxItems)},
-     {"num_rounds", GameParameter(kDefaultNumRounds)}}};
-
-std::shared_ptr<const Game> Factory(const GameParameters& params) {
-  return std::make_shared<const SheriffGame>(params);
-}
-REGISTER_SPIEL_GAME(kGameType, Factory);
 
 SheriffGame::SheriffGame(const GameParameters& params)
     : Game(kGameType, params) {
@@ -320,7 +320,7 @@ std::string SheriffGame::ActionToString(Player player, Action action_id) const {
   std::string action_string;
 
   if (action_id < 2) {
-    SPIEL_CHECK_EQ(player, kSHERIFF);
+    SPIEL_CHECK_EQ(player, kSheriff);
     const bool feedback = DeserializeInspectionFeedback(action_id);
     if (!feedback) {
       action_string = "InspectionFeedback(will_inspect=False)";
@@ -328,14 +328,14 @@ std::string SheriffGame::ActionToString(Player player, Action action_id) const {
       action_string = "InspectionFeedback(will_inspect=True)";
     }
   } else if (action_id < 3 + conf.max_items) {
-    SPIEL_CHECK_EQ(player, kSMUGGLER);
+    SPIEL_CHECK_EQ(player, kSmuggler);
 
     const uint32_t num_illegal_items =
         DeserializeItemPlacementAction(action_id);
     absl::StrAppend(&action_string, "PlaceIllegalItems(num=", num_illegal_items,
                     ")");
   } else {
-    SPIEL_CHECK_EQ(player, kSMUGGLER);
+    SPIEL_CHECK_EQ(player, kSmuggler);
 
     const uint32_t bribe = DeserializeBribe(action_id);
     absl::StrAppend(&action_string, "Bribe(amount=", bribe, ")");

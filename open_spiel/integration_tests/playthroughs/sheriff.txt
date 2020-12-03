@@ -35,7 +35,7 @@ HistoryString() = ""
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "num_illegal_items:none"
+InformationStateString(0) = "T=0 num_illegal_items:none"
 InformationStateString(1) = "T=0 "
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
@@ -55,7 +55,7 @@ HistoryString() = "3"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "num_illegal_items:1"
+InformationStateString(0) = "T=1 num_illegal_items:1"
 InformationStateString(1) = "T=1 "
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
@@ -75,7 +75,7 @@ HistoryString() = "3 9"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "num_illegal_items:1/bribe:3"
+InformationStateString(0) = "T=2 num_illegal_items:1/bribe:3"
 InformationStateString(1) = "T=2 /bribe:3"
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
@@ -95,28 +95,28 @@ HistoryString() = "3 9 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "num_illegal_items:1/bribe:3/feedback:1"
+InformationStateString(0) = "T=3 num_illegal_items:1/bribe:3/feedback:1"
 InformationStateString(1) = "T=3 /bribe:3/feedback:1"
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [6, 7, 8, 9]
 StringLegalActions() = ["Bribe(amount=0)", "Bribe(amount=1)", "Bribe(amount=2)", "Bribe(amount=3)"]
 
-# Apply action "Bribe(amount=2)"
-action: 8
+# Apply action "Bribe(amount=3)"
+action: 9
 
 # State 4
 # Num illegal items in cargo: 1
-# Bribes  : [3,2]
+# Bribes  : [3,3]
 # Feedback: [1]
 IsTerminal() = False
-History() = [3, 9, 1, 8]
-HistoryString() = "3 9 1 8"
+History() = [3, 9, 1, 9]
+HistoryString() = "3 9 1 9"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "num_illegal_items:1/bribe:3/feedback:1/bribe:2"
-InformationStateString(1) = "T=4 /bribe:3/feedback:1/bribe:2"
+InformationStateString(0) = "T=4 num_illegal_items:1/bribe:3/feedback:1/bribe:3"
+InformationStateString(1) = "T=4 /bribe:3/feedback:1/bribe:3"
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [0, 1]
@@ -127,76 +127,36 @@ action: 0
 
 # State 5
 # Num illegal items in cargo: 1
-# Bribes  : [3,2]
+# Bribes  : [3,3]
 # Feedback: [1,0]
 IsTerminal() = False
-History() = [3, 9, 1, 8, 0]
-HistoryString() = "3 9 1 8 0"
+History() = [3, 9, 1, 9, 0]
+HistoryString() = "3 9 1 9 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "num_illegal_items:1/bribe:3/feedback:1/bribe:2/feedback:0"
-InformationStateString(1) = "T=5 /bribe:3/feedback:1/bribe:2/feedback:0"
+InformationStateString(0) = "T=5 num_illegal_items:1/bribe:3/feedback:1/bribe:3/feedback:0"
+InformationStateString(1) = "T=5 /bribe:3/feedback:1/bribe:3/feedback:0"
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [6, 7, 8, 9]
 StringLegalActions() = ["Bribe(amount=0)", "Bribe(amount=1)", "Bribe(amount=2)", "Bribe(amount=3)"]
 
-# Apply action "Bribe(amount=3)"
-action: 9
+# Apply action "Bribe(amount=2)"
+action: 8
 
 # State 6
 # Num illegal items in cargo: 1
-# Bribes  : [3,2,3]
+# Bribes  : [3,3,2]
 # Feedback: [1,0]
 IsTerminal() = False
-History() = [3, 9, 1, 8, 0, 9]
-HistoryString() = "3 9 1 8 0 9"
+History() = [3, 9, 1, 9, 0, 8]
+HistoryString() = "3 9 1 9 0 8"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "num_illegal_items:1/bribe:3/feedback:1/bribe:2/feedback:0/bribe:3"
-InformationStateString(1) = "T=6 /bribe:3/feedback:1/bribe:2/feedback:0/bribe:3"
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
-LegalActions() = [0, 1]
-StringLegalActions() = ["InspectionFeedback(will_inspect=False)", "InspectionFeedback(will_inspect=True)"]
-
-# Apply action "InspectionFeedback(will_inspect=True)"
-action: 1
-
-# State 7
-# Num illegal items in cargo: 1
-# Bribes  : [3,2,3]
-# Feedback: [1,0,1]
-IsTerminal() = False
-History() = [3, 9, 1, 8, 0, 9, 1]
-HistoryString() = "3 9 1 8 0 9 1"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-InformationStateString(0) = "num_illegal_items:1/bribe:3/feedback:1/bribe:2/feedback:0/bribe:3/feedback:1"
-InformationStateString(1) = "T=7 /bribe:3/feedback:1/bribe:2/feedback:0/bribe:3/feedback:1"
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
-LegalActions() = [6, 7, 8, 9]
-StringLegalActions() = ["Bribe(amount=0)", "Bribe(amount=1)", "Bribe(amount=2)", "Bribe(amount=3)"]
-
-# Apply action "Bribe(amount=0)"
-action: 6
-
-# State 8
-# Num illegal items in cargo: 1
-# Bribes  : [3,2,3,0]
-# Feedback: [1,0,1]
-IsTerminal() = False
-History() = [3, 9, 1, 8, 0, 9, 1, 6]
-HistoryString() = "3 9 1 8 0 9 1 6"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 1
-InformationStateString(0) = "num_illegal_items:1/bribe:3/feedback:1/bribe:2/feedback:0/bribe:3/feedback:1/bribe:0"
-InformationStateString(1) = "T=8 /bribe:3/feedback:1/bribe:2/feedback:0/bribe:3/feedback:1/bribe:0"
+InformationStateString(0) = "T=6 num_illegal_items:1/bribe:3/feedback:1/bribe:3/feedback:0/bribe:2"
+InformationStateString(1) = "T=6 /bribe:3/feedback:1/bribe:3/feedback:0/bribe:2"
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [0, 1]
@@ -205,17 +165,57 @@ StringLegalActions() = ["InspectionFeedback(will_inspect=False)", "InspectionFee
 # Apply action "InspectionFeedback(will_inspect=False)"
 action: 0
 
+# State 7
+# Num illegal items in cargo: 1
+# Bribes  : [3,3,2]
+# Feedback: [1,0,0]
+IsTerminal() = False
+History() = [3, 9, 1, 9, 0, 8, 0]
+HistoryString() = "3 9 1 9 0 8 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "T=7 num_illegal_items:1/bribe:3/feedback:1/bribe:3/feedback:0/bribe:2/feedback:0"
+InformationStateString(1) = "T=7 /bribe:3/feedback:1/bribe:3/feedback:0/bribe:2/feedback:0"
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [6, 7, 8, 9]
+StringLegalActions() = ["Bribe(amount=0)", "Bribe(amount=1)", "Bribe(amount=2)", "Bribe(amount=3)"]
+
+# Apply action "Bribe(amount=3)"
+action: 9
+
+# State 8
+# Num illegal items in cargo: 1
+# Bribes  : [3,3,2,3]
+# Feedback: [1,0,0]
+IsTerminal() = False
+History() = [3, 9, 1, 9, 0, 8, 0, 9]
+HistoryString() = "3 9 1 9 0 8 0 9"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "T=8 num_illegal_items:1/bribe:3/feedback:1/bribe:3/feedback:0/bribe:2/feedback:0/bribe:3"
+InformationStateString(1) = "T=8 /bribe:3/feedback:1/bribe:3/feedback:0/bribe:2/feedback:0/bribe:3"
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1]
+StringLegalActions() = ["InspectionFeedback(will_inspect=False)", "InspectionFeedback(will_inspect=True)"]
+
+# Apply action "InspectionFeedback(will_inspect=True)"
+action: 1
+
 # State 9
 # Num illegal items in cargo: 1
-# Bribes  : [3,2,3,0]
-# Feedback: [1,0,1,0]
+# Bribes  : [3,3,2,3]
+# Feedback: [1,0,0,1]
 IsTerminal() = True
-History() = [3, 9, 1, 8, 0, 9, 1, 6, 0]
-HistoryString() = "3 9 1 8 0 9 1 6 0"
+History() = [3, 9, 1, 9, 0, 8, 0, 9, 1]
+HistoryString() = "3 9 1 9 0 8 0 9 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
-InformationStateString(0) = "num_illegal_items:1/bribe:3/feedback:1/bribe:2/feedback:0/bribe:3/feedback:1/bribe:0/feedback:0"
-InformationStateString(1) = "T=9 /bribe:3/feedback:1/bribe:2/feedback:0/bribe:3/feedback:1/bribe:0/feedback:0"
-Rewards() = [1.0, 0.0]
-Returns() = [1.0, 0.0]
+InformationStateString(0) = "T=9 num_illegal_items:1/bribe:3/feedback:1/bribe:3/feedback:0/bribe:2/feedback:0/bribe:3/feedback:1"
+InformationStateString(1) = "T=9 /bribe:3/feedback:1/bribe:3/feedback:0/bribe:2/feedback:0/bribe:3/feedback:1"
+Rewards() = [-2.0, 2.0]
+Returns() = [-2.0, 2.0]
