@@ -19,7 +19,7 @@ for TensorFlow community at
 ## Building
 
 To use Swift OpenSpiel, download a recent Swift for TensorFlow toolchain following these
-[installation instructions](https://github.com/tensorflow/swift/blob/master/Installation.md)
+[installation instructions](https://github.com/tensorflow/swift/blob/main/Installation.md)
 (available for macOS and Ubuntu currently). Swift OpenSpiel currently builds
 with the latest stable toolchains.
 
