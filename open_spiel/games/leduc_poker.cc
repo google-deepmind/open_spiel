@@ -794,7 +794,16 @@ double LeducGame::MinUtility() const {
 std::shared_ptr<Observer> LeducGame::MakeObserver(
     absl::optional<IIGObservationType> iig_obs_type,
     const GameParameters& params) const {
-  if (!params.empty()) SpielFatalError("Observation params not supported");
+  auto iter = params.find("name");
+  if (iter != params.end()) {
+    auto name = iter->second.string_value();
+    if (name == "single_tensor") {
+      // Fall back to the old observations / infostates as a single tensor.
+      return Game::MakeObserver(iig_obs_type, GameParameters());
+    }
+    SpielFatalError(absl::StrCat("Unknown observation specification '",
+                                 iter->second.string_value(), "'"));
+  }
   return std::make_shared<LeducObserver>(
       iig_obs_type.value_or(kDefaultObsType));
 }

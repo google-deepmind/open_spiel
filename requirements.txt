@@ -28,3 +28,6 @@ attrs == 19.3.0
 jax == 0.1.67
 jaxlib == 0.1.47
 dm-haiku == 0.0.1
+dataclasses == 0.7; python_version < "3.7"
+hypothesis==5.38.0
+torch==1.7.0

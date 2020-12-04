@@ -138,9 +138,18 @@ c "ROOT" 1 "c1" { "g" 1/2 "b" 1/2 } 0
       t "B Y_B r_Y" 8 "Outcome B Y_B r_Y" { 0.0 6.0 }
 )###";
 
+const char* kSimpleForkEFGData = R"###(
+EFG 2 R "Simple single-agent problem" { "Player 1" } ""
+
+p "ROOT" 1 1 "ROOT" { "L" "R" } 0
+  t "L" 1 "Outcome L" { -1.0 }
+  t "R" 2 "Outcome R" { 1.0 }
+)###";
+
 std::string GetSampleEFGData() { return std::string(kSampleEFGData); }
 std::string GetKuhnPokerEFGData() { return std::string(kKuhnEFGData); }
 std::string GetSignalingEFGData() { return std::string(kSignalingEFGData); }
+std::string GetSimpleForkEFGData() { return std::string(kSimpleForkEFGData); }
 
 }  // namespace efg_game
 }  // namespace open_spiel

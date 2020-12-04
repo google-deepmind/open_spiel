@@ -123,6 +123,7 @@ void LegalActionsMaskTest(const Game& game, const State& state, int player,
   std::vector<int> legal_actions_mask = state.LegalActionsMask(player);
   int expected_length = state.IsChanceNode() ? game.MaxChanceOutcomes()
                                              : game.NumDistinctActions();
+  std::cout << "is_chance? " << state.IsChanceNode() << std::endl;
   SPIEL_CHECK_EQ(legal_actions_mask.size(), expected_length);
   for (Action action : legal_actions) {
     SPIEL_CHECK_GE(action, 0);

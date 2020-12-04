@@ -82,6 +82,10 @@ ActionsAndProbs UniformStatePolicy(const State& state) {
   return actions_and_probs;
 }
 
+ActionsAndProbs FirstActionStatePolicy(const State& state) {
+  return {{state.LegalActions()[0], 1.0}};
+}
+
 std::unique_ptr<Policy> DeserializePolicy(const std::string& serialized,
                                           std::string delimiter) {
   // Class’s identity is the very first line, see Policy::Serialize

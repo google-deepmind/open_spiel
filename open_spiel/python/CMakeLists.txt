@@ -93,6 +93,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   algorithms/cfr_br_test.py
   algorithms/cfr_test.py
   algorithms/deep_cfr_test.py
+  algorithms/deep_cfr_tf2_test.py
   algorithms/discounted_cfr_test.py
   algorithms/double_oracle_test.py
   algorithms/dqn_test.py
@@ -152,6 +153,8 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   utils/file_logger_test.py
   utils/lru_cache_test.py
   utils/spawn_test.py
+  pytorch/rcfr_pytorch_test.py
+  pytorch/dqn_pytorch_test.py
 )
 
 

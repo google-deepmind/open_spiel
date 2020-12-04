@@ -88,6 +88,24 @@ class ObservationTest(absltest.TestCase):
         "[Round 2][Player: 0][Pot: 6][Money: 97 97[Private: 1]]"
         "[Round1]: 2 1[Public: 3]\nRound 2 sequence: ")
 
+  def test_leduc_info_state_as_single_tensor(self):
+    game = pyspiel.load_game("leduc_poker")
+    observation = make_observation(
+        game, INFO_STATE_OBS_TYPE,
+        pyspiel.game_parameters_from_string("single_tensor"))
+    state = game.new_initial_state()
+    state.apply_action(1)  # Deal 1
+    state.apply_action(2)  # Deal 2
+    state.apply_action(2)  # Bet
+    state.apply_action(1)  # Call
+    state.apply_action(3)  # Deal 3
+    observation.set_from(state, player=0)
+    self.assertEqual(list(observation.dict), ["info_state"])
+    np.testing.assert_array_equal(observation.dict["info_state"], [
+        1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0
+    ])
+
   def test_leduc_all_player_privates(self):
     game = pyspiel.load_game("leduc_poker")
     observation = make_observation(

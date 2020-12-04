@@ -108,6 +108,9 @@ PYBIND11_MODULE(pyspiel, m) {
         return value2 && value.ToReprString() == value2->ToReprString();
       });
 
+  m.def("game_parameters_from_string", GameParametersFromString,
+        "Parses a string as a GameParameter dictionary.");
+
   py::enum_<PrivateInfoType>(m, "PrivateInfoType")
       .value("ALL_PLAYERS", PrivateInfoType::kAllPlayers)
       .value("NONE", PrivateInfoType::kNone)

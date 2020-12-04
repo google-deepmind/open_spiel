@@ -56,10 +56,10 @@ set -e  # exit when any command fails
 MYDIR="$(dirname "$(realpath "$0")")"
 source "${MYDIR}/global_variables.sh"
 
-CXX=`which clang++`
+CXX=${CXX:-`which clang++`}
 if [ ! -x $CXX ]
 then
-  echo -n "clang++ not found in the path (the clang C++ compiler is needed to "
+  echo -n "clang++ not found (the clang C++ compiler is needed to "
   echo "compile OpenSpiel). Exiting..."
   exit 1
 fi

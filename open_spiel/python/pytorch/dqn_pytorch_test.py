@@ -18,14 +18,12 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import tensorflow.compat.v1 as tf
+from torch.testing._internal.common_utils import run_tests
+from torch.testing._internal.common_utils import TestCase
 
 from open_spiel.python import rl_environment
-from open_spiel.python.algorithms import dqn
 import pyspiel
-
-# Temporarily disable TF2 behavior until code is updated.
-tf.disable_v2_behavior()
+from open_spiel.python.pytorch import dqn
 
 # A simple two-action game encoded as an EFG game. Going left gets -1, going
 # right gets a +1.
@@ -37,59 +35,54 @@ SIMPLE_EFG_DATA = """
 """
 
 
-class DQNTest(tf.test.TestCase):
+class DQNTest(TestCase):
 
   def test_simple_game(self):
     game = pyspiel.load_efg_game(SIMPLE_EFG_DATA)
     env = rl_environment.Environment(game=game)
-    with self.session() as sess:
-      agent = dqn.DQN(sess, 0,
-                      state_representation_size=
-                      game.information_state_tensor_shape()[0],
-                      num_actions=game.num_distinct_actions(),
-                      hidden_layers_sizes=[16],
-                      replay_buffer_capacity=100,
-                      batch_size=5,
-                      epsilon_start=0.02,
-                      epsilon_end=0.01)
-      total_reward = 0
-      sess.run(tf.global_variables_initializer())
+    agent = dqn.DQN(0,
+                    state_representation_size=
+                    game.information_state_tensor_shape()[0],
+                    num_actions=game.num_distinct_actions(),
+                    hidden_layers_sizes=[16],
+                    replay_buffer_capacity=100,
+                    batch_size=5,
+                    epsilon_start=0.02,
+                    epsilon_end=0.01)
+    total_reward = 0
 
-      for _ in range(100):
-        time_step = env.reset()
-        while not time_step.last():
-          agent_output = agent.step(time_step)
-          time_step = env.step([agent_output.action])
-          total_reward += time_step.rewards[0]
-        agent.step(time_step)
-      self.assertGreaterEqual(total_reward, 75)
+    for _ in range(100):
+      time_step = env.reset()
+      while not time_step.last():
+        agent_output = agent.step(time_step)
+        time_step = env.step([agent_output.action])
+        total_reward += time_step.rewards[0]
+      agent.step(time_step)
+    self.assertGreaterEqual(total_reward, 75)
 
   def test_run_tic_tac_toe(self):
     env = rl_environment.Environment("tic_tac_toe")
     state_size = env.observation_spec()["info_state"][0]
     num_actions = env.action_spec()["num_actions"]
 
-    with self.session() as sess:
-      agents = [
-          dqn.DQN(  # pylint: disable=g-complex-comprehension
-              sess,
-              player_id,
-              state_representation_size=state_size,
-              num_actions=num_actions,
-              hidden_layers_sizes=[16],
-              replay_buffer_capacity=10,
-              batch_size=5) for player_id in [0, 1]
-      ]
-      sess.run(tf.global_variables_initializer())
-      time_step = env.reset()
-      while not time_step.last():
-        current_player = time_step.observations["current_player"]
-        current_agent = agents[current_player]
-        agent_output = current_agent.step(time_step)
-        time_step = env.step([agent_output.action])
+    agents = [
+        dqn.DQN(  # pylint: disable=g-complex-comprehension
+            player_id,
+            state_representation_size=state_size,
+            num_actions=num_actions,
+            hidden_layers_sizes=[16],
+            replay_buffer_capacity=10,
+            batch_size=5) for player_id in [0, 1]
+    ]
+    time_step = env.reset()
+    while not time_step.last():
+      current_player = time_step.observations["current_player"]
+      current_agent = agents[current_player]
+      agent_output = current_agent.step(time_step)
+      time_step = env.step([agent_output.action])
 
-      for agent in agents:
-        agent.step(time_step)
+    for agent in agents:
+      agent.step(time_step)
 
   def test_run_hanabi(self):
     # Hanabi is an optional game, so check we have it before running the test.
@@ -111,29 +104,26 @@ class DQNTest(tf.test.TestCase):
     state_size = env.observation_spec()["info_state"][0]
     num_actions = env.action_spec()["num_actions"]
 
-    with self.session() as sess:
-      agents = [
-          dqn.DQN(  # pylint: disable=g-complex-comprehension
-              sess,
-              player_id,
-              state_representation_size=state_size,
-              num_actions=num_actions,
-              hidden_layers_sizes=[16],
-              replay_buffer_capacity=10,
-              batch_size=5) for player_id in range(num_players)
-      ]
-      sess.run(tf.global_variables_initializer())
-      time_step = env.reset()
-      while not time_step.last():
-        current_player = time_step.observations["current_player"]
-        agent_output = [agent.step(time_step) for agent in agents]
-        time_step = env.step([agent_output[current_player].action])
+    agents = [
+        dqn.DQN(  # pylint: disable=g-complex-comprehension
+            player_id,
+            state_representation_size=state_size,
+            num_actions=num_actions,
+            hidden_layers_sizes=[16],
+            replay_buffer_capacity=10,
+            batch_size=5) for player_id in range(num_players)
+    ]
+    time_step = env.reset()
+    while not time_step.last():
+      current_player = time_step.observations["current_player"]
+      agent_output = [agent.step(time_step) for agent in agents]
+      time_step = env.step([agent_output[current_player].action])
 
-      for agent in agents:
-        agent.step(time_step)
+    for agent in agents:
+      agent.step(time_step)
 
 
-class ReplayBufferTest(tf.test.TestCase):
+class ReplayBufferTest(TestCase):
 
   def test_replay_buffer_add(self):
     replay_buffer = dqn.ReplayBuffer(replay_buffer_capacity=10)
@@ -170,4 +160,4 @@ class ReplayBufferTest(tf.test.TestCase):
 
 
 if __name__ == "__main__":
-  tf.test.main()
+  run_tests()
