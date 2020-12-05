@@ -155,6 +155,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   utils/spawn_test.py
   pytorch/rcfr_pytorch_test.py
   pytorch/dqn_pytorch_test.py
+  pytorch/nfsp_pytorch_test.py
 )
 
 

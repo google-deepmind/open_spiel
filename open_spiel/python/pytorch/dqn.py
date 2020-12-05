@@ -19,8 +19,10 @@ from __future__ import division
 from __future__ import print_function
 
 import collections
+import math
 import random
 import numpy as np
+from scipy.stats import truncnorm
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -87,6 +89,40 @@ class ReplayBuffer(object):
     return iter(self._data)
 
 
+class SonnetLinear(nn.Module):
+  """A Sonnet linear module.
+
+  Always includes biases and only supports ReLU activations.
+  """
+
+  def __init__(self, in_size, out_size, activate_relu=True):
+    """Creates a Sonnet linear layer.
+
+    Args:
+      in_size: (int) number of inputs
+      out_size: (int) number of outputs
+      activate_relu: (bool) whether to include a ReLU activation layer
+    """
+    super(SonnetLinear, self).__init__()
+    self._activate_relu = activate_relu
+    stddev = 1.0 / math.sqrt(in_size)
+    mean = 0
+    lower = (-2 * stddev - mean) / stddev
+    upper = (2 * stddev - mean) / stddev
+    # Weight initialization inspired by Sonnet's Linear layer,
+    # which cites https://arxiv.org/abs/1502.03167v3
+    # pytorch default: initialized from
+    # uniform(-sqrt(1/in_features), sqrt(1/in_features))
+    self._weight = nn.Parameter(torch.Tensor(
+        truncnorm.rvs(lower, upper, loc=mean, scale=stddev,
+                      size=[out_size, in_size])))
+    self._bias = nn.Parameter(torch.zeros([out_size]))
+
+  def forward(self, tensor):
+    y = F.linear(tensor, self._weight, self._bias)
+    return F.relu(y) if self._activate_relu else y
+
+
 class MLP(nn.Module):
   """A simple network built from nn.linear layers."""
 
@@ -108,14 +144,14 @@ class MLP(nn.Module):
     self._layers = []
     # Hidden layers
     for size in hidden_sizes:
-      self._layers.append(nn.Linear(in_features=input_size, out_features=size))
-      self._layers.append(nn.ReLU())
+      self._layers.append(SonnetLinear(in_size=input_size, out_size=size))
       input_size = size
     # Output layer
     self._layers.append(
-        nn.Linear(in_features=input_size, out_features=output_size))
-    if activate_final:
-      self._layers.append(nn.ReLU())
+        SonnetLinear(
+            in_size=input_size,
+            out_size=output_size,
+            activate_relu=activate_final))
 
     self.model = nn.ModuleList(self._layers)
 
