@@ -281,7 +281,7 @@ absl::optional<std::vector<double>> DarkChessState::MaybeFinalReturns() const {
 std::string DefaultFen(int boardSize) {
   if (boardSize == 8) return chess::kDefaultStandardFen;
   else if (boardSize == 4) return chess::kDefaultSmallFen;
-  else throw std::runtime_error("Only board sizes 4 and 8 have their default chessboards. For other sizes, you have to define fen");
+  else SpielFatalError("Only board sizes 4 and 8 have their default chessboards. For other sizes, you have to define fen");
 }
 
 DarkChessGame::DarkChessGame(const GameParameters &params)

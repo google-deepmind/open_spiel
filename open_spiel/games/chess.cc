@@ -138,14 +138,14 @@ Color PlayerToColor(Player p) {
   return static_cast<Color>(p);
 }
 
-Action MoveToAction(const Move& move, const int boardSize) {
+Action MoveToAction(const Move& move, const int board_size) {
   Color color = move.piece.color;
   // We rotate the move to be from player p's perspective.
   Move player_move(move);
 
   // Rotate move to be from player p's perspective.
-  player_move.from.y = ReflectRank(color, boardSize, player_move.from.y);
-  player_move.to.y = ReflectRank(color, boardSize, player_move.to.y);
+  player_move.from.y = ReflectRank(color, board_size, player_move.from.y);
+  player_move.to.y = ReflectRank(color, board_size, player_move.to.y);
 
   // For each starting square, we enumerate 73 actions:
   // - 9 possible underpromotions
@@ -170,8 +170,8 @@ Action MoveToAction(const Move& move, const int boardSize) {
     // possible piece types.
     SPIEL_CHECK_EQ(move.piece.type, PieceType::kPawn);
     SPIEL_CHECK_TRUE((move.piece.color == color &&
-                      player_move.from.y == boardSize - 2 &&
-                      player_move.to.y == boardSize - 1) ||
+                      player_move.from.y == board_size - 2 &&
+                      player_move.to.y == board_size - 1) ||
                      (move.piece.color == OppColor(color) &&
                       player_move.from.y == 1 && player_move.to.y == 0));
 

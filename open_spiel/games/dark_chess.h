@@ -76,11 +76,6 @@ enum class PromotionTypeEncoding {
   kKnight = 4
 };
 
-enum class DarkChessBoardSize {
-  kStandard = 0,
-  kSmall = 1
-};
-
 inline constexpr std::array<chess::PieceType, 3> kUnderPromotionIndexToType = {
     chess::PieceType::kRook, chess::PieceType::kBishop, chess::PieceType::kKnight};
 inline constexpr std::array<chess::Offset, 3> kUnderPromotionDirectionToOffset = {
