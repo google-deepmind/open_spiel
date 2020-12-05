@@ -100,6 +100,8 @@ set(GAME_SOURCES
   pig.h
   quoridor.cc
   quoridor.h
+  sheriff.cc
+  sheriff.h
   skat.cc
   skat.h
   solitaire.cc
@@ -390,6 +392,10 @@ add_test(pig_test pig_test)
 add_executable(quoridor_test quoridor_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(quoridor_test quoridor_test)
+
+add_executable(sheriff_test sheriff_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(sheriff_test sheriff_test)
 
 add_executable(skat_test skat_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
