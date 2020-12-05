@@ -24,10 +24,11 @@ from __future__ import print_function
 import collections
 import contextlib
 import enum
+import numpy as np
 import os
 import random
 from absl import logging
-import numpy as np
+
 
 import torch
 import torch.nn as nn
@@ -234,7 +235,7 @@ class NFSP(rl_agent.AbstractAgent):
 
     transitions = self._reservoir_buffer.sample(self._batch_size)
     info_states = torch.Tensor([t.info_state for t in transitions])
-    action_probs = torch.LongTensor([t.action_probs for t in transitions])
+    action_probs = torch.Tensor([t.action_probs for t in transitions])
     legal_actions_mask = torch.Tensor([t.legal_actions_mask for t in transitions])
 
     self.optimizer.zero_grad()
