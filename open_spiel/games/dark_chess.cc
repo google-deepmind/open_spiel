@@ -43,7 +43,7 @@ const GameType kGameType{
     /*provides_information_state_string=*/true,
     /*provides_information_state_tensor=*/false,
     /*provides_observation_string=*/true,
-    /*provides_observation_tensor=*/false,
+    /*provides_observation_tensor=*/true,
     /*parameter_specification=*/{
       {"board_size", GameParameter(8)},
       {"fen", GameParameter(GameParameter::Type::kString, false)}}
@@ -59,15 +59,25 @@ REGISTER_SPIEL_GAME(kGameType, Factory)
 // and absence of the given piece type and colour at each square.
 void AddPieceTypePlane(chess::Color color, chess::PieceType piece_type,
                        const chess::ChessBoard& board,
+                       std::array<bool, chess::kMaxBoardSize * chess::kMaxBoardSize>& observability_table,
                        absl::Span<float>::iterator& value_it) {
   for (int8_t y = 0; y < chess::kMaxBoardSize; ++y) {
     for (int8_t x = 0; x < chess::kMaxBoardSize; ++x) {
-      chess::Piece piece_on_board = board.at(chess::Square{x, y});
+      auto square = chess::Square{x, y};
+      chess::Piece piece_on_board = board.at(square);
       *value_it++ =
-          (piece_on_board.color == color && piece_on_board.type == piece_type
+          (piece_on_board.color == color && piece_on_board.type == piece_type && observability_table[chess::SquareToIndex(square, board.BoardSize())]
            ? 1.0
            : 0.0);
     }
+  }
+}
+
+// Adds a plane to the information state vector corresponding to the observability of given square
+void AddUnknownSquarePlane(std::array<bool, chess::kMaxBoardSize * chess::kMaxBoardSize>& observability_table,
+                           absl::Span<float>::iterator& value_it) {
+  for (int i = 0; i < chess::kMaxBoardSize * chess::kMaxBoardSize; ++i) {
+    *value_it++ = observability_table[i] ? 0.0 : 1.0;
   }
 }
 
@@ -179,17 +189,40 @@ void DarkChessState::ObservationTensor(Player player,
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
+  auto board = Board();
+  int board_size = board.BoardSize();
+  chess::Color color = chess::PlayerToColor(player);
+  std::array<bool, chess::kMaxBoardSize * chess::kMaxBoardSize> observability_table{false};
+  board.GenerateLegalMoves([&](const chess::Move &move) -> bool {
+
+    size_t from_index = chess::SquareToIndex(move.from, board_size);
+    size_t to_index = chess::SquareToIndex(move.to, board_size);
+
+    observability_table[from_index] = true;
+    observability_table[to_index] = true;
+    chess::Square to = move.to;
+
+    if (to == board.EpSquare() && move.piece.type == chess::PieceType::kPawn) {
+      int8_t reversed_y_direction = color == chess::Color::kWhite ? -1 : 1;
+      chess::Square en_passant_capture = move.to + chess::Offset{0, reversed_y_direction};
+      size_t index = chess::SquareToIndex(en_passant_capture, board_size);
+      observability_table[index] = true;
+    }
+    return true;
+  });
+
   auto value_it = values.begin();
 
-  // Piece cconfiguration.
+  // Piece configuration.
   for (const auto& piece_type : chess::kPieceTypes) {
-    AddPieceTypePlane(chess::Color::kWhite, piece_type, Board(), value_it);
-    AddPieceTypePlane(chess::Color::kBlack, piece_type, Board(), value_it);
+    AddPieceTypePlane(chess::Color::kWhite, piece_type, board, observability_table, value_it);
+    AddPieceTypePlane(chess::Color::kBlack, piece_type, board, observability_table, value_it);
   }
 
-  AddPieceTypePlane(chess::Color::kEmpty, chess::PieceType::kEmpty, Board(), value_it);
+  AddPieceTypePlane(chess::Color::kEmpty, chess::PieceType::kEmpty, board, observability_table, value_it);
+  AddUnknownSquarePlane(observability_table, value_it);
 
-  const auto entry = repetitions_.find(Board().HashValue());
+  const auto entry = repetitions_.find(board.HashValue());
   SPIEL_CHECK_FALSE(entry == repetitions_.end());
   int repetitions = entry->second;
 
@@ -197,25 +230,27 @@ void DarkChessState::ObservationTensor(Player player,
   AddScalarPlane(repetitions, 1, 3, value_it);
 
   // Side to play.
-  AddScalarPlane(ColorToPlayer(Board().ToPlay()), 0, 1, value_it);
+  AddScalarPlane(ColorToPlayer(board.ToPlay()), 0, 1, value_it);
 
   // Irreversible move counter.
-  AddScalarPlane(Board().IrreversibleMoveCounter(), 0, 101, value_it);
+  AddScalarPlane(board.IrreversibleMoveCounter(), 0, 101, value_it);
 
   // Castling rights.
-  AddBinaryPlane(Board().CastlingRight(chess::Color::kWhite, chess::CastlingDirection::kLeft),
-                 value_it);
+  if (color == chess::Color::kWhite) {
+    AddBinaryPlane(board.CastlingRight(chess::Color::kWhite, chess::CastlingDirection::kLeft),
+                   value_it);
 
-  AddBinaryPlane(
-      Board().CastlingRight(chess::Color::kWhite, chess::CastlingDirection::kRight),
-      value_it);
+    AddBinaryPlane(
+        board.CastlingRight(chess::Color::kWhite, chess::CastlingDirection::kRight),
+        value_it);
+  } else {
+    AddBinaryPlane(board.CastlingRight(chess::Color::kBlack, chess::CastlingDirection::kLeft),
+                   value_it);
 
-  AddBinaryPlane(Board().CastlingRight(chess::Color::kBlack, chess::CastlingDirection::kLeft),
-                 value_it);
-
-  AddBinaryPlane(
-      Board().CastlingRight(chess::Color::kBlack, chess::CastlingDirection::kRight),
-      value_it);
+    AddBinaryPlane(
+        board.CastlingRight(chess::Color::kBlack, chess::CastlingDirection::kRight),
+        value_it);
+  }
 
   SPIEL_CHECK_EQ(value_it, values.end());
 }

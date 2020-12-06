@@ -109,8 +109,8 @@ inline void SetField(int offset, int length, uint8_t value, Action* action) {
 
 // Returns index (0 ... BoardSize*BoardSize-1) of a square
 // ({0, 0} ... {BoardSize-1, BoardSize-1}).
-inline uint8_t SquareToIndex(const Square& square) {
-  return square.y * kMaxBoardSize + square.x;
+inline uint8_t SquareToIndex(const Square& square, const int board_size) {
+  return square.y * board_size + square.x;
 }
 
 // Returns square ({0, 0} ... {BoardSize-1, BoardSize-1}) from an index

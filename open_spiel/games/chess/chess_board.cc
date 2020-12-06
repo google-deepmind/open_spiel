@@ -1433,21 +1433,21 @@ std::string ChessBoard::ToFEN() const {
 std::string ChessBoard::ToDarkFEN(Color color) const {
   std::string fen;
 
-  std::array<bool, 8*8> observable{false};
+  std::array<bool, kMaxBoardSize * kMaxBoardSize> observability_table{false};
   GenerateLegalMoves([&](const chess::Move &move) -> bool {
 
     size_t from_index = SquareToIndex_(move.from);
     size_t to_index = SquareToIndex_(move.to);
 
-    observable[from_index] = true;
-    observable[to_index] = true;
+    observability_table[from_index] = true;
+    observability_table[to_index] = true;
     Square to = move.to;
 
     if (to == EpSquare() && move.piece.type == PieceType::kPawn) {
       int8_t reversed_y_direction = color == Color::kWhite ? -1 : 1;
       Square en_passant_capture = move.to + Offset{0, reversed_y_direction};
       size_t index = SquareToIndex_(en_passant_capture);
-      observable[index] = true;
+      observability_table[index] = true;
     }
     return true;
   });
@@ -1458,7 +1458,7 @@ std::string ChessBoard::ToDarkFEN(Color color) const {
     for (int8_t file = 0; file < board_size_; ++file) {
 
       size_t index = SquareToIndex_(chess::Square{file, rank});
-      if (!observable[index]) {
+      if (!observability_table[index]) {
         if (num_empty > 0) {
           fen += std::to_string(num_empty);
           num_empty = 0;

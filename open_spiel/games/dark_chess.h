@@ -52,9 +52,9 @@ inline constexpr int MaxGameLength() { return 17695; }
 
 inline const std::vector<int> &ObservationTensorShape() {
   static std::vector<int> shape{
-      13 /* piece types * colours + empty */ + 1 /* repetition count */ +
+      14 /* piece types * colours + empty + unknown */ + 1 /* repetition count */ +
       1 /* side to move */ + 1 /* irreversible move counter */ +
-      4 /* castling rights */,
+      2 /* castling rights */,
       chess::kMaxBoardSize, chess::kMaxBoardSize};
   return shape;
 }
