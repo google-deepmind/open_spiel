@@ -90,7 +90,7 @@ void AddBinaryPlane(bool val, absl::Span<float>::iterator& value_it) {
 
 DarkChessState::DarkChessState(std::shared_ptr<const Game> game, int boardSize, const std::string& fen)
     : State(game),
-      start_board_(*chess::ChessBoard::BoardFromFEN(fen, boardSize, false)),
+      start_board_(*chess::ChessBoard::BoardFromFEN(fen, boardSize, true)),
       current_board_(start_board_) {
   SPIEL_CHECK_TRUE(&current_board_);
   repetitions_[current_board_.HashValue()] = 1;

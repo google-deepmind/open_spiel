@@ -291,21 +291,23 @@ std::string Move::ToSAN(const ChessBoard &board) const {
   }
 
   // Figure out if this is a check / checkmating move or not.
-  auto board_copy = board;
-  board_copy.ApplyMove(*this);
-  if (board_copy.InCheck()) {
-    bool has_escape = false;
-    board_copy.GenerateLegalMoves([&](const Move &) -> bool {
-      has_escape = true;
-      return false;  // No need to keep generating moves.
-    });
+  if (!board.KingInCheckAllowed()) {
+    auto board_copy = board;
+    board_copy.ApplyMove(*this);
+    if (board_copy.InCheck()) {
+      bool has_escape = false;
+      board_copy.GenerateLegalMoves([&](const Move &) -> bool {
+        has_escape = true;
+        return false;  // No need to keep generating moves.
+      });
 
-    if (has_escape) {
-      // Check.
-      absl::StrAppend(&move_text, "+");
-    } else {
-      // Checkmate.
-      absl::StrAppend(&move_text, "#");
+      if (has_escape) {
+        // Check.
+        absl::StrAppend(&move_text, "+");
+      } else {
+        // Checkmate.
+        absl::StrAppend(&move_text, "#");
+      }
     }
   }
 
@@ -1007,7 +1009,7 @@ bool ChessBoard::TestApplyMove(const Move &move) {
 }
 
 bool ChessBoard::UnderAttack(const Square &sq,
-                                         Color our_color) const {
+                             Color our_color) const {
   SPIEL_CHECK_NE(sq, InvalidSquare());
 
   bool under_attack = false;
