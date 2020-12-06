@@ -1442,13 +1442,8 @@ std::string ChessBoard::ToDarkFEN(Color color) const {
     observable[from_index] = true;
     observable[to_index] = true;
     Square to = move.to;
-    bool a = to == EpSquare();
-    Piece piece = move.piece;
-    PieceType type = piece.type;
-    bool b = type == PieceType::kPawn;
-    bool c = a && b;
 
-    if (c) {
+    if (to == EpSquare() && move.piece.type == PieceType::kPawn) {
       int8_t reversed_y_direction = color == Color::kWhite ? -1 : 1;
       Square en_passant_capture = move.to + Offset{0, reversed_y_direction};
       size_t index = SquareToIndex_(en_passant_capture);
