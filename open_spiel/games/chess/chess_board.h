@@ -264,8 +264,9 @@ class ChessBoard {
   // For performance reasons, we do not guarantee that no more moves will be
   // generated if yield returns false. It is only for optimization.
   using MoveYieldFn = std::function<bool(const Move&)>;
-  void GenerateLegalMoves(const MoveYieldFn& yield) const;
-  void GeneratePseudoLegalMoves(const MoveYieldFn& yield) const;
+  void GenerateLegalMoves(const MoveYieldFn& yield) const { GenerateLegalMoves(yield, to_play_); };
+  void GenerateLegalMoves(const MoveYieldFn& yield, Color color) const;
+  void GeneratePseudoLegalMoves(const MoveYieldFn& yield, Color color) const;
 
   bool HasLegalMoves() const {
     bool found = false;
@@ -377,7 +378,8 @@ class ChessBoard {
    * 3) en passant square is only shown if the observer is capable of performing an en passant capture
    *
    */
-  std::string ToDarkFEN(Color color) const;
+  std::string ToDarkFEN(const std::array<bool, kMaxBoardSize * kMaxBoardSize>& observability_table,
+                        Color color) const;
 
  private:
   size_t SquareToIndex_(Square sq) const { return sq.y * board_size_ + sq.x; }

@@ -189,7 +189,7 @@ class DarkChessGame : public Game {
   double UtilitySum() const override { return DrawUtility(); }
   double MaxUtility() const override { return WinUtility(); }
   std::vector<int> ObservationTensorShape() const override {
-    return chess::ObservationTensorShape();
+    return dark_chess::ObservationTensorShape();
   }
   int MaxGameLength() const override { return chess::MaxGameLength(); }
 

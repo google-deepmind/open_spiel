@@ -453,15 +453,15 @@ Square ChessBoard::find(const Piece &piece) const {
 }
 
 void ChessBoard::GenerateLegalMoves(
-    const MoveYieldFn &yield) const {
+    const MoveYieldFn &yield, Color color) const {
 
   // We do not need to filter moves that would result for King to move / stay in check, so we can yield all pseudo legal moves
   if (king_in_check_allowed_) {
-    GeneratePseudoLegalMoves(yield);
+    GeneratePseudoLegalMoves(yield, color);
   } else {
-    auto king_square = find(Piece{to_play_, PieceType::kKing});
+    auto king_square = find(Piece{color, PieceType::kKing});
 
-    GeneratePseudoLegalMoves([this, &king_square, &yield](const Move &move) {
+    GeneratePseudoLegalMoves([this, &king_square, &yield, color](const Move &move) {
       // See if the move is legal by applying, checking whether the king is
       // under attack, and undoing the move.
       // TODO: Optimize this.
@@ -470,17 +470,17 @@ void ChessBoard::GenerateLegalMoves(
 
       auto ks = at(move.from).type == PieceType::kKing ? move.to : king_square;
 
-      if (board_copy.UnderAttack(ks, to_play_)) {
+      if (board_copy.UnderAttack(ks, color)) {
         return true;
       } else {
         return yield(move);
       }
-    });
+    }, color);
   }
 }
 
 void ChessBoard::GeneratePseudoLegalMoves(
-    const MoveYieldFn &yield) const {
+    const MoveYieldFn &yield, Color color) const {
   bool generating = true;
 
 #define YIELD(move)     \
@@ -492,51 +492,51 @@ void ChessBoard::GeneratePseudoLegalMoves(
     for (int8_t x = 0; x < board_size_ && generating; ++x) {
       Square sq{x, y};
       auto &piece = at(sq);
-      if (piece.type != PieceType::kEmpty && piece.color == to_play_) {
+      if (piece.type != PieceType::kEmpty && piece.color == color) {
         switch (piece.type) {
           case PieceType::kKing:
             GenerateKingDestinations_(
-                sq, to_play_,
+                sq, color,
                 [&yield, &piece, &sq, &generating](const Square &to) {
                   YIELD(Move(sq, to, piece));
                 });
             GenerateCastlingDestinations_(
-                sq, to_play_,
+                sq, color,
                 [&yield, &piece, &sq, &generating](const Square &to) {
                   YIELD(Move(sq, to, piece, PieceType::kEmpty, true));
                 });
             break;
           case PieceType::kQueen:
             GenerateQueenDestinations_(
-                sq, to_play_,
+                sq, color,
                 [&yield, &sq, &piece, &generating](const Square &to) {
                   YIELD(Move(sq, to, piece));
                 });
             break;
           case PieceType::kRook:
             GenerateRookDestinations_(
-                sq, to_play_,
+                sq, color,
                 [&yield, &sq, &piece, &generating](const Square &to) {
                   YIELD(Move(sq, to, piece));
                 });
             break;
           case PieceType::kBishop:
             GenerateBishopDestinations_(
-                sq, to_play_,
+                sq, color,
                 [&yield, &sq, &piece, &generating](const Square &to) {
                   YIELD(Move(sq, to, piece));
                 });
             break;
           case PieceType::kKnight:
             GenerateKnightDestinations_(
-                sq, to_play_,
+                sq, color,
                 [&yield, &sq, &piece, &generating](const Square &to) {
                   YIELD(Move(sq, to, piece));
                 });
             break;
           case PieceType::kPawn:
             GeneratePawnDestinations_(
-                sq, to_play_,
+                sq, color,
                 [&yield, &sq, &piece, &generating, this](const Square &to) {
                   if (IsPawnPromotionRank(to)) {
                     YIELD(Move(sq, to, piece, PieceType::kQueen));
@@ -548,7 +548,7 @@ void ChessBoard::GeneratePseudoLegalMoves(
                   }
                 });
             GeneratePawnCaptureDestinations_(
-                sq, to_play_, true, /* include enpassant */
+                sq, color, true, /* include enpassant */
                 [&yield, &sq, &piece, &generating, this](const Square &to) {
                   if (IsPawnPromotionRank(to)) {
                     YIELD(Move(sq, to, piece, PieceType::kQueen));
@@ -1430,27 +1430,9 @@ std::string ChessBoard::ToFEN() const {
   return fen;
 }
 
-std::string ChessBoard::ToDarkFEN(Color color) const {
+std::string ChessBoard::ToDarkFEN(const std::array<bool, kMaxBoardSize * kMaxBoardSize>& observability_table,
+                                  Color color) const {
   std::string fen;
-
-  std::array<bool, kMaxBoardSize * kMaxBoardSize> observability_table{false};
-  GenerateLegalMoves([&](const chess::Move &move) -> bool {
-
-    size_t from_index = SquareToIndex_(move.from);
-    size_t to_index = SquareToIndex_(move.to);
-
-    observability_table[from_index] = true;
-    observability_table[to_index] = true;
-    Square to = move.to;
-
-    if (to == EpSquare() && move.piece.type == PieceType::kPawn) {
-      int8_t reversed_y_direction = color == Color::kWhite ? -1 : 1;
-      Square en_passant_capture = move.to + Offset{0, reversed_y_direction};
-      size_t index = SquareToIndex_(en_passant_capture);
-      observability_table[index] = true;
-    }
-    return true;
-  });
 
   // 1. encode the board.
   for (int8_t rank = board_size_ - 1; rank >= 0; --rank) {
