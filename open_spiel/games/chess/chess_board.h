@@ -221,13 +221,15 @@ bool IsMoveCharacter(char c);
 std::pair<std::string, std::string> SplitAnnotations(const std::string& move);
 
 inline constexpr int kMaxBoardSize = 8;
-inline const std::string kDefaultStandardFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-inline const std::string kDefaultSmallFen = "r1kr/pppp/PPPP/R1KR w - - 0 1";
+inline const std::string kDefaultStandardFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+inline const std::string kDefaultSmallFEN = "r1kr/pppp/PPPP/R1KR w - - 0 1";
 
 class ChessBoard {
  public:
   ChessBoard(int board_size, bool king_in_check_allowed);
 
+  // Constructs a chess board at the given position in Forsyth-Edwards Notation.
+  // https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
   static absl::optional<ChessBoard> BoardFromFEN(const std::string& fen) { return BoardFromFEN(fen, 8, false); };
   static absl::optional<ChessBoard> BoardFromFEN(const std::string& fen, int boardSize, bool kingAllowedInCheck);
 
@@ -362,7 +364,20 @@ class ChessBoard {
 
   std::string ToUnicodeString() const;
 
+  // Constructs a string describing the chess board position in Forsyth-Edwards Notation.
+  // https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
   std::string ToFEN() const;
+
+  /* Constructs a string describing the dark chess board position in a notation similar to Forsyth-Edwards Notation.
+   * https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
+   *
+   * There are several key differences to FEN:
+   * 1) Only observable squares are shown. Squares invisible to the observer are represented by the character '?'
+   * 2) Only observer's castling rights are shown
+   * 3) en passant square is only shown if the observer is capable of performing an en passant capture
+   *
+   */
+  std::string ToDarkFEN(Color color) const;
 
  private:
   size_t SquareToIndex_(Square sq) const { return sq.y * board_size_ + sq.x; }

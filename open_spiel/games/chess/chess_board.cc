@@ -1428,6 +1428,114 @@ std::string ChessBoard::ToFEN() const {
   return fen;
 }
 
+std::string ChessBoard::ToDarkFEN(Color color) const {
+  std::string fen;
+
+  std::array<bool, 8*8> observable{false};
+  GenerateLegalMoves([&](const chess::Move &move) -> bool {
+
+    size_t from_index = SquareToIndex_(move.from);
+    size_t to_index = SquareToIndex_(move.to);
+
+    observable[from_index] = true;
+    observable[to_index] = true;
+    Square to = move.to;
+    bool a = to == EpSquare();
+    Piece piece = move.piece;
+    PieceType type = piece.type;
+    bool b = type == PieceType::kPawn;
+    bool c = a && b;
+
+    if (c) {
+      int8_t reversed_y_direction = color == Color::kWhite ? -1 : 1;
+      Square en_passant_capture = move.to + Offset{0, reversed_y_direction};
+      size_t index = SquareToIndex_(en_passant_capture);
+      observable[index] = true;
+    }
+    return true;
+  });
+
+  // 1. encode the board.
+  for (int8_t rank = board_size_ - 1; rank >= 0; --rank) {
+    int num_empty = 0;
+    for (int8_t file = 0; file < board_size_; ++file) {
+
+      size_t index = SquareToIndex_(chess::Square{file, rank});
+      if (!observable[index]) {
+        if (num_empty > 0) {
+          fen += std::to_string(num_empty);
+          num_empty = 0;
+        }
+        fen += '?';
+      } else {
+        auto piece = at(chess::Square{file, rank});
+        if (piece == chess::kEmptyPiece) {
+          ++num_empty;
+        } else {
+          if (num_empty > 0) {
+            fen += std::to_string(num_empty);
+            num_empty = 0;
+          }
+          fen += piece.ToString();
+        }
+      }
+    }
+    if (num_empty > 0) {
+      fen += std::to_string(num_empty);
+    }
+    if (rank > 0) {
+      fen += "/";
+    }
+  }
+
+  // 2. color to play.
+  fen += " " + (ToPlay() == chess::Color::kWhite ? std::string("w") : std::string("b"));
+
+  // 3. by castling rights.
+  fen += " ";
+  std::string castling_rights;
+  if (color == chess::Color::kWhite) {
+    if (CastlingRight(chess::Color::kWhite, chess::CastlingDirection::kRight)) {
+      castling_rights += "K";
+    }
+    if (CastlingRight(chess::Color::kWhite, chess::CastlingDirection::kLeft)) {
+      castling_rights += "Q";
+    }
+  } else {
+    if (CastlingRight(chess::Color::kBlack, chess::CastlingDirection::kRight)) {
+      castling_rights += "k";
+    }
+    if (CastlingRight(chess::Color::kBlack, chess::CastlingDirection::kLeft)) {
+      castling_rights += "q";
+    }
+  }
+  fen += castling_rights.empty() ? std::string("-") : castling_rights;
+
+  // 4. en passant square
+  std::string ep_square = "-";
+  int8_t reversed_y_direction = color == Color::kWhite ? -1 : 1;
+  Square from = EpSquare() + Offset{1, reversed_y_direction};
+  Piece piece = at(from);
+  if (piece.color == color && piece.type == PieceType::kPawn) {
+    ep_square = SquareToString(EpSquare());
+  } else {
+    from = EpSquare() + Offset{-1, reversed_y_direction};
+    piece = at(from);
+    if (piece.color == color && piece.type == PieceType::kPawn) {
+      ep_square = SquareToString(EpSquare());
+    }
+  }
+  fen += " " + ep_square;
+
+  // 5. half-move clock for 50-move rule
+  fen += " " + std::to_string(IrreversibleMoveCounter());
+
+  // 6. full-move clock
+  fen += " " + std::to_string(move_number_);
+
+  return fen;
+}
+
 void ChessBoard::set_square(Square sq, Piece piece) {
   static const ZobristTableU64<kMaxBoardSize * kMaxBoardSize, 3, 7> kZobristValues(
       /*seed=*/2765481);
@@ -1525,7 +1633,7 @@ void ChessBoard::SetEpSquare(Square sq) {
 }
 
 ChessBoard MakeDefaultBoard() {
-  auto maybe_board = ChessBoard::BoardFromFEN(kDefaultStandardFen);
+  auto maybe_board = ChessBoard::BoardFromFEN(kDefaultStandardFEN);
   SPIEL_CHECK_TRUE(maybe_board);
   return *maybe_board;
 }

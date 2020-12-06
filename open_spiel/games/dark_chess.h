@@ -21,6 +21,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <open_spiel/fog/observation_history.h>
 
 #include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
@@ -154,6 +155,9 @@ class DarkChessState : public State {
   chess::ChessBoard start_board_;
   // We store the current board position as an optimization.
   chess::ChessBoard current_board_;
+
+  // cached ActionObservationHistory for each player
+  std::vector<open_spiel::ActionObservationHistory> aohs_;
 
   // RepetitionTable records how many times the given hash exists in the history
   // stack (including the current board).

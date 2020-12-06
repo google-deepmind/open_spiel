@@ -18,6 +18,7 @@
 #include <memory>
 #include <utility>
 #include <vector>
+#include <open_spiel/fog/observation_history.h>
 
 #include "open_spiel/spiel_utils.h"
 
@@ -34,7 +35,7 @@ const GameType kGameType{
     /*long_name=*/"Dark Chess",
     GameType::Dynamics::kSequential,
     GameType::ChanceMode::kDeterministic,
-    GameType::Information::kPerfectInformation,
+    GameType::Information::kImperfectInformation,
     GameType::Utility::kZeroSum,
     GameType::RewardModel::kTerminal,
     /*max_num_players=*/2,
@@ -93,6 +94,13 @@ DarkChessState::DarkChessState(std::shared_ptr<const Game> game, int boardSize, 
       current_board_(start_board_) {
   SPIEL_CHECK_TRUE(&current_board_);
   repetitions_[current_board_.HashValue()] = 1;
+
+  aohs_.reserve(2);
+  for (Player player = 0; player < NumPlayers(); ++player) {
+    std::vector<std::pair<std::optional<Action>, std::string>> aoh;
+    aoh.push_back({static_cast<std::optional<Action>>(std::nullopt), ObservationString(player)});
+    aohs_.push_back(open_spiel::ActionObservationHistory(player, aoh));
+  }
 }
 
 void DarkChessState::DoApplyAction(Action action) {
@@ -101,6 +109,11 @@ void DarkChessState::DoApplyAction(Action action) {
   Board().ApplyMove(move);
   ++repetitions_[current_board_.HashValue()];
   cached_legal_actions_.reset();
+
+  for (Player player = 0; player < NumPlayers(); ++player) {
+    auto a = CurrentPlayer() == player ? action : static_cast<std::optional<Action>>(std::nullopt);
+    aohs_[player].Extend(a, ObservationString(player));
+  }
 }
 
 void DarkChessState::MaybeGenerateLegalActions() const {
@@ -152,13 +165,13 @@ std::vector<double> DarkChessState::Returns() const {
 std::string DarkChessState::InformationStateString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
-  return HistoryString();
+  return aohs_[player].ToString();
 }
 
 std::string DarkChessState::ObservationString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
-  return ToString();
+  return Board().ToDarkFEN(chess::PlayerToColor(player));
 }
 
 void DarkChessState::ObservationTensor(Player player,
@@ -221,6 +234,9 @@ void DarkChessState::UndoAction(Player player, Action action) {
   for (const chess::Move& move : moves_history_) {
     current_board_.ApplyMove(move);
   }
+  for (Player player = 0; player < NumPlayers(); ++player) {
+    aohs_[player].RemoveLast();
+  }
 }
 
 bool DarkChessState::IsRepetitionDraw() const {
@@ -279,8 +295,8 @@ absl::optional<std::vector<double>> DarkChessState::MaybeFinalReturns() const {
 }
 
 std::string DefaultFen(int boardSize) {
-  if (boardSize == 8) return chess::kDefaultStandardFen;
-  else if (boardSize == 4) return chess::kDefaultSmallFen;
+  if (boardSize == 8) return chess::kDefaultStandardFEN;
+  else if (boardSize == 4) return chess::kDefaultSmallFEN;
   else SpielFatalError("Only board sizes 4 and 8 have their default chessboards. For other sizes, you have to define fen");
 }
 

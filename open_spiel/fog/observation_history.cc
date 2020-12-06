@@ -142,6 +142,15 @@ bool ActionObservationHistory::IsExtensionOf(Player pl,
   return CheckStateCorrespondenceInSimulation(pl, state, state.MoveNumber());
 }
 
+void ActionObservationHistory::Extend(const std::optional<Action> action, const std::string& observation_string) {
+  history_.push_back({action, observation_string});
+}
+
+void ActionObservationHistory::RemoveLast() {
+  SPIEL_CHECK_GT(history_.size(), 0);
+  history_.pop_back();
+}
+
 bool ActionObservationHistory::CheckStateCorrespondenceInSimulation(
     Player pl, const State& state, int until_time) const {
   const std::vector<State::PlayerAction>& state_history = state.FullHistory();
