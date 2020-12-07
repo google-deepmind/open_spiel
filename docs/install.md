@@ -1,6 +1,6 @@
 # Installation
 
-## Python-only Installation via pip
+## Python-only installation via pip
 
 If you plan to only use the Python API, then the easiest way to install
 OpenSpiel is to use pip. As only source distribution is currently supported,
