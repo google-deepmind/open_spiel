@@ -1,5 +1,55 @@
 # Installation
 
+## Python-only Installation via pip
+
+If you plan to only use the Python API, then the easiest way to install
+OpenSpiel is to use pip. As only source distribution is currently supported,
+CMake, Clang and Python 3 development files are requires to build the Python
+extension.
+
+E.g. on Ubuntu or Debian:
+
+```bash
+# Check to see if you have the necessary tools for building OpenSpiel:
+cmake --version        # Must be >= 3.12
+clang++ --version      # Must be >= 7.0.0
+python3-config --help
+
+# If not, run this line to install them.
+# On older Linux distros, the package might be called clang-9 or clang-10
+sudo apt-get install cmake clang python3-dev
+
+# On older Linux distros, the versions may be too old.
+# E.g. on Ubuntu 18.04, there are a few extra steps:
+# sudo apt-get install clang-10
+# pip3 install cmake  # You might need to relogin to get the new CMake version
+# export CXX=clang++-10
+
+# Recommended: Install pip dependencies and run under virtualenv.
+sudo apt-get install virtualenv python3-virtualenv
+virtualenv -p python3 venv
+source venv/bin/activate
+
+# Finally, install OpenSpiel and its dependencies:
+pip3 install --upgrade setuptools pip
+pip3 install open_spiel
+
+# To exit the virtual env
+deactivate
+
+## **IMPORTANT NOTE**. If the build fails, please first make sure you have the
+## required versions of the tools above and that you followed the recommended
+## option. Then, open an issue: https://github.com/deepmind/open_spiel/issues
+```
+
+Note that the build could take several minutes.
+
+On MacOS, you can install the dependencies via `brew install cmake python3`. For
+clang, you need to install or upgrade XCode and install the command-line
+developer tools.
+
+## Installation from Source
+
 The instructions here are for Linux and MacOS. For installation on Windows, see
 [these separate installation instructions](windows.md). On Linux, we recommend
 Ubuntu 20.04 (or 19.10), Debian 10, or later versions. There are
