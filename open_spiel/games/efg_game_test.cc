@@ -36,6 +36,15 @@ const char* kLeducFilename = "open_spiel/games/efg/leduc_poker.efg";
 const char* kSignalingFilename =
     "open_spiel/games/efg/signaling_vonstengel_forges_2008.efg";
 
+// Example games from Morrill et al.
+// "Hindsight and Sequential Rationality of Correlated Play"
+const char* kExtendedBosFilename =
+    "open_spiel/games/efg/extended_bos.efg";
+const char* kExtendedMPFilename =
+    "open_spiel/games/efg/extended_mp.efg";
+const char* kExtendedShapleysFilename =
+    "open_spiel/games/efg/extended_shapleys.efg";
+
 void EFGGameSimTestsSampleFromData() {
   std::shared_ptr<const Game> game = LoadEFGGame(GetSampleEFGData());
   SPIEL_CHECK_TRUE(game != nullptr);
@@ -153,6 +162,27 @@ void EFGGameSimTestsSignalingFromFile() {
   }
 }
 
+void EFGGameSimTestsExtendedFromFile() {
+  for (const char* filename : { kExtendedBosFilename,
+                                kExtendedMPFilename,
+                                kExtendedShapleysFilename}) {
+    absl::optional<std::string> file = FindFile(filename, 2);
+    if (file != absl::nullopt) {
+      std::cout << "Found file: " << file.value() << "; running sim test.";
+      std::shared_ptr<const Game> game =
+          LoadGame("efg_game", {{"filename", GameParameter(file.value())}});
+      SPIEL_CHECK_TRUE(game != nullptr);
+      GameType type = game->GetType();
+      SPIEL_CHECK_EQ(type.dynamics, GameType::Dynamics::kSequential);
+      SPIEL_CHECK_EQ(type.information,
+                     GameType::Information::kImperfectInformation);
+      SPIEL_CHECK_EQ(type.chance_mode,
+                     GameType::ChanceMode::kDeterministic);
+      testing::RandomSimTest(*game, 1);
+    }
+  }
+}
+
 }  // namespace
 }  // namespace efg_game
 }  // namespace open_spiel
@@ -166,5 +196,6 @@ int main(int argc, char** argv) {
   open_spiel::efg_game::EFGGameSimTestsLeducFromFile();
   open_spiel::efg_game::EFGGameSimTestsSignalingFromData();
   open_spiel::efg_game::EFGGameSimTestsSignalingFromFile();
+  open_spiel::efg_game::EFGGameSimTestsExtendedFromFile();
   open_spiel::efg_game::EFGGameSimpleForkFromData();
 }
