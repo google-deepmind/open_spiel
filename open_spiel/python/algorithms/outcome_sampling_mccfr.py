@@ -74,8 +74,8 @@ class OutcomeSamplingSolver(object):
         # Start with a small amount of regret and total accumulation, to give a
         # uniform policy: this will get erased fast.
         self._infostates[info_state_key] = [
-            np.ones(num_legal_actions, dtype=np.float64) / 1000.0,
-            np.ones(num_legal_actions, dtype=np.float64) / 1000.0,
+            np.ones(num_legal_actions, dtype=np.float64) / 1e6,
+            np.ones(num_legal_actions, dtype=np.float64) / 1e6,
         ]
         return self._infostates[info_state_key]
 
