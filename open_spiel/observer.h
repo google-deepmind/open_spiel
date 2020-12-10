@@ -19,6 +19,28 @@
 // Each Game object has a MakeObserver() method which returns an Observer
 // object given a specification of the required observation type.
 
+// To access observation from C++, first initialize an observer and observation
+// for the game (one time only).
+//
+//    auto observer = game->MakeObserver(iig_obs_type, params);
+//    Observation observation(*game, observer);
+//
+// Then for states in a trajectory, get a tensor observation using:
+//
+//    observation.SetFrom(state, player);   // populates observation.Tensor()
+//
+// The resultant tensor is accessible from observation.Tensor(). Note that
+// the decomposition of the tensor into named pieces is not currently available
+// through this API (it is available in Python).
+//
+// To obtain a string observation:
+//
+//    std::string string_obs = observation.StringFrom(state, player);
+//
+// Access from Python follows a similar pattern, with the addition of support
+// for accessing pieces of the observation tensor by name. See `observation.py`
+// and `observation_test.py`.
+
 #include <memory>
 #include <string>
 #include <vector>
