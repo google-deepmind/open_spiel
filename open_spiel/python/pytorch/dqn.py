@@ -22,7 +22,7 @@ import collections
 import math
 import random
 import numpy as np
-from scipy.stats import truncnorm
+from scipy import stats
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -113,9 +113,11 @@ class SonnetLinear(nn.Module):
     # which cites https://arxiv.org/abs/1502.03167v3
     # pytorch default: initialized from
     # uniform(-sqrt(1/in_features), sqrt(1/in_features))
-    self._weight = nn.Parameter(torch.Tensor(
-        truncnorm.rvs(lower, upper, loc=mean, scale=stddev,
-                      size=[out_size, in_size])))
+    self._weight = nn.Parameter(
+        torch.Tensor(
+            stats.truncnorm.rvs(
+                lower, upper, loc=mean, scale=stddev, size=[out_size,
+                                                            in_size])))
     self._bias = nn.Parameter(torch.zeros([out_size]))
 
   def forward(self, tensor):
