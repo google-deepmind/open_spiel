@@ -52,6 +52,17 @@ class TabularBestResponse {
   // best_responder.
   Action BestResponseAction(const std::string& infostate);
 
+  // Returns all the actions that maximize utility for the agent at the given
+  // infostate. The infostate must correspond to a decision node for
+  // best_responder.
+  std::vector<Action> BestResponseActions(const std::string& infostate,
+                                          double tolerance);
+
+  // Returns the values of all actions at this info state. The infostate must
+  // correspond to a decision node for best_responder.
+  std::vector<std::pair<Action, double>> BestResponseActionValues(
+      const std::string& infostate);
+
   // Returns a map of infostates to best responses, for all information states
   // that have been calculated so far. If no best responses have been
   // calculated, then we calculate them for every state in the game.
