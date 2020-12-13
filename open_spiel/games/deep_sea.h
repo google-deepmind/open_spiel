@@ -96,9 +96,6 @@ class DeepSeaGame : public Game {
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(new DeepSeaState(shared_from_this()));
   }
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<Game>(new DeepSeaGame(*this));
-  }
   std::vector<int> ObservationTensorShape() const override {
     return {size_, size_};
   }
@@ -124,4 +121,4 @@ class DeepSeaGame : public Game {
 }  // namespace deep_sea
 }  // namespace open_spiel
 
-#endif  // OPEN_SPIEL_GAMES_CATCH_H_
+#endif  // OPEN_SPIEL_GAMES_DEEP_SEA_H_

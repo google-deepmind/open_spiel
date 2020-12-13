@@ -56,10 +56,10 @@ set -e  # exit when any command fails
 MYDIR="$(dirname "$(realpath "$0")")"
 source "${MYDIR}/global_variables.sh"
 
-CXX=`which clang++`
+CXX=${CXX:-`which clang++`}
 if [ ! -x $CXX ]
 then
-  echo -n "clang++ not found in the path (the clang C++ compiler is needed to "
+  echo -n "clang++ not found (the clang C++ compiler is needed to "
   echo "compile OpenSpiel). Exiting..."
   exit 1
 fi
@@ -161,6 +161,11 @@ function print_skipping_tests {
   echo -e "\033[32m*** Skipping to run tests.\e[0m"
 }
 
+function execute_export_graph {
+  echo "Running tf_trajectories_example preliminary Python script"
+  python ../open_spiel/contrib/python/export_graph.py
+}
+
 # Build / install everything and run tests (C++, Python, optionally Julia).
 if [[ $ARG_build_with_pip == "true" ]]; then
   # TODO(author2): We probably want to use `python3 -m pip install .` directly
@@ -184,7 +189,7 @@ else
   export PYTHONPATH=$PYTHONPATH:$pwd/python  # For pyspiel bindings
 
   # Build in testing, so that we can run tests fast.
-  cmake -DPython_TARGET_VERSION=${PYVERSION}         \
+  cmake -DPython3_EXECUTABLE=${PYBIN} \
         -DCMAKE_CXX_COMPILER=${CXX}                  \
         -DCMAKE_PREFIX_PATH=${LIBCXXWRAP_JULIA_DIR}  \
         -DBUILD_TYPE=Testing                         \
@@ -207,8 +212,12 @@ else
     fi
 
     if [[ $ARG_build_only == "true" ]]; then
-      echo -e "\033[32m*** Skipping runing tests as build_only is $(ARG_build_only) \e[0m"
+      echo -e "\033[32m*** Skipping runing tests as build_only is ${ARG_build_only} \e[0m"
     else
+      if [[ ${BUILD_WITH_TENSORFLOW_CC:-"OFF"} == "ON" && $ARG_test_only =~ "tf_trajectories_example" ]]; then
+        execute_export_graph
+      fi
+
       if ctest -j$TEST_NUM_PROCS --output-on-failure -R "^$ARG_test_only\$" ../open_spiel; then
         print_tests_passed
       else
@@ -221,10 +230,15 @@ else
     make -j$MAKE_NUM_PROCS
 
     if [[ $ARG_build_only == "true" ]]; then
-      echo -e "\033[32m*** Skipping runing tests as build_only is $(ARG_build_only) \e[0m"
+      echo -e "\033[32m*** Skipping runing tests as build_only is ${ARG_build_only} \e[0m"
     else
       # Test everything
       echo "Running all tests"
+
+      if [[ ${BUILD_WITH_TENSORFLOW_CC:-"OFF"} == "ON" ]]; then
+        execute_export_graph
+      fi
+
       if ctest -j$TEST_NUM_PROCS --output-on-failure ../open_spiel; then
         print_tests_passed
       else

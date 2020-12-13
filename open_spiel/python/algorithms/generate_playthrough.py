@@ -274,11 +274,13 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None):
         if s is not None:
           add_line(f'ObservationString({player}) = "{_escape(s)}"')
     if public_observation:
-      add_line('PublicObservationString() = "{}"'.format(
-          _escape(public_observation.string_from(state, 0))))
+      s = public_observation.string_from(state, 0)
+      if s is not None:
+        add_line('PublicObservationString() = "{}"'.format(_escape(s)))
       for player in players:
-        add_line('PrivateObservationString({}) = "{}"'.format(
-            player, _escape(private_observation.string_from(state, player))))
+        s = private_observation.string_from(state, player)
+        if s is not None:
+          add_line(f'PrivateObservationString({player}) = "{_escape(s)}"')
     if default_observation and default_observation.tensor is not None:
       for player in players:
         default_observation.set_from(state, player)
@@ -375,11 +377,17 @@ def _playthrough_params(lines):
   raise ValueError("Could not find params")
 
 
-def replay(filename):
-  """Re-runs the playthrough in the specified file. Returns (original, new)."""
+def _read_playthrough(filename):
+  """Returns the content and the parsed arguments of a playthrough file."""
   with open(filename, "r", encoding="utf-8") as f:
     original = f.read()
   kwargs = _playthrough_params(original.splitlines())
+  return original, kwargs
+
+
+def replay(filename):
+  """Re-runs the playthrough in the specified file. Returns (original, new)."""
+  original, kwargs = _read_playthrough(filename)
   return (original, playthrough(**kwargs))
 
 
@@ -387,9 +395,17 @@ def update_path(path, shard_index=0, num_shards=1):
   """Regenerates all playthroughs in the path."""
   for filename in sorted(os.listdir(path))[shard_index::num_shards]:
     try:
-      original, new = replay(os.path.join(path, filename))
+      original, kwargs = _read_playthrough(os.path.join(path, filename))
+      try:
+        _load_game(kwargs["game_string"])
+      except pyspiel.SpielError as e:
+        if "Unknown game" in str(e):
+          print("[Skipped] Skipping game ", filename, " as ",
+                kwargs["game_string"], " is not available.")
+          continue
+      new = playthrough(**kwargs)
       if original == new:
-        print("        {}".format(filename))
+        print("          {}".format(filename))
       else:
         with open(os.path.join(path, filename), "w") as f:
           f.write(new)

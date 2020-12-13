@@ -103,7 +103,14 @@ void init_pyspiel_policy(py::module& m) {
       .def("evaluate_and_update_policy",
            &open_spiel::algorithms::CFRSolver::EvaluateAndUpdatePolicy)
       .def("current_policy", &open_spiel::algorithms::CFRSolver::CurrentPolicy)
-      .def("average_policy", &open_spiel::algorithms::CFRSolver::AveragePolicy);
+      .def("average_policy", &open_spiel::algorithms::CFRSolver::AveragePolicy)
+      .def(py::pickle(
+          [](const open_spiel::algorithms::CFRSolver& solver) {  // __getstate__
+            return solver.Serialize();
+          },
+          [](const std::string& serialized) {  // __setstate__
+            return open_spiel::algorithms::DeserializeCFRSolver(serialized);
+          }));
 
   py::class_<open_spiel::algorithms::CFRPlusSolver>(m, "CFRPlusSolver")
       .def(py::init<const Game&>())
@@ -111,7 +118,15 @@ void init_pyspiel_policy(py::module& m) {
            &open_spiel::algorithms::CFRPlusSolver::EvaluateAndUpdatePolicy)
       .def("current_policy", &open_spiel::algorithms::CFRSolver::CurrentPolicy)
       .def("average_policy",
-           &open_spiel::algorithms::CFRPlusSolver::AveragePolicy);
+           &open_spiel::algorithms::CFRPlusSolver::AveragePolicy)
+      .def(py::pickle(
+          [](const open_spiel::algorithms::CFRPlusSolver&
+                 solver) {  // __getstate__
+            return solver.Serialize();
+          },
+          [](const std::string& serialized) {  // __setstate__
+            return open_spiel::algorithms::DeserializeCFRPlusSolver(serialized);
+          }));
 
   py::class_<open_spiel::algorithms::CFRBRSolver>(m, "CFRBRSolver")
       .def(py::init<const Game&>())
@@ -119,7 +134,15 @@ void init_pyspiel_policy(py::module& m) {
            &open_spiel::algorithms::CFRPlusSolver::EvaluateAndUpdatePolicy)
       .def("current_policy", &open_spiel::algorithms::CFRSolver::CurrentPolicy)
       .def("average_policy",
-           &open_spiel::algorithms::CFRPlusSolver::AveragePolicy);
+           &open_spiel::algorithms::CFRPlusSolver::AveragePolicy)
+      .def(py::pickle(
+          [](const open_spiel::algorithms::CFRBRSolver&
+                 solver) {  // __getstate__
+            return solver.Serialize();
+          },
+          [](const std::string& serialized) {  // __setstate__
+            return open_spiel::algorithms::DeserializeCFRBRSolver(serialized);
+          }));
 
   py::enum_<open_spiel::algorithms::AverageType>(m, "MCCFRAverageType")
       .value("SIMPLE", open_spiel::algorithms::AverageType::kSimple)
@@ -134,7 +157,16 @@ void init_pyspiel_policy(py::module& m) {
            py::overload_cast<>(&open_spiel::algorithms::
                                    ExternalSamplingMCCFRSolver::RunIteration))
       .def("average_policy",
-           &open_spiel::algorithms::ExternalSamplingMCCFRSolver::AveragePolicy);
+           &open_spiel::algorithms::ExternalSamplingMCCFRSolver::AveragePolicy)
+      .def(py::pickle(
+          [](const open_spiel::algorithms::ExternalSamplingMCCFRSolver&
+                 solver) {  // __getstate__
+            return solver.Serialize();
+          },
+          [](const std::string& serialized) {  // __setstate__
+            return open_spiel::algorithms::
+                DeserializeExternalSamplingMCCFRSolver(serialized);
+          }));
 
   py::class_<open_spiel::algorithms::OutcomeSamplingMCCFRSolver>(
       m, "OutcomeSamplingMCCFRSolver")
@@ -146,7 +178,16 @@ void init_pyspiel_policy(py::module& m) {
            py::overload_cast<>(&open_spiel::algorithms::
                                    OutcomeSamplingMCCFRSolver::RunIteration))
       .def("average_policy",
-           &open_spiel::algorithms::OutcomeSamplingMCCFRSolver::AveragePolicy);
+           &open_spiel::algorithms::OutcomeSamplingMCCFRSolver::AveragePolicy)
+      .def(py::pickle(
+          [](const open_spiel::algorithms::OutcomeSamplingMCCFRSolver&
+                 solver) {  // __getstate__
+            return solver.Serialize();
+          },
+          [](const std::string& serialized) {  // __setstate__
+            return open_spiel::algorithms::
+                DeserializeOutcomeSamplingMCCFRSolver(serialized);
+          }));
 
   m.def("expected_returns",
         py::overload_cast<const State&, const std::vector<const Policy*>&, int,

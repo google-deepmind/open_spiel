@@ -81,6 +81,12 @@ std::int64_t File::Length() {
   return length;
 }
 
+std::string ReadContentsFromFile(const std::string& filename,
+                                 const std::string& mode) {
+  File f(filename, mode);
+  return f.ReadContents();
+}
+
 bool Exists(const std::string& path) {
   struct stat info;
   return stat(path.c_str(), &info) == 0;
@@ -124,8 +130,8 @@ bool Remove(const std::string& path) {
 }
 
 std::string GetEnv(const std::string& key, const std::string& default_value) {
-    char* val = std::getenv(key.c_str());
-    return ((val != nullptr) ? std::string(val) : default_value);
+  char* val = std::getenv(key.c_str());
+  return ((val != nullptr) ? std::string(val) : default_value);
 }
 
 std::string GetTmpDir() { return GetEnv("TMPDIR", "/tmp"); }

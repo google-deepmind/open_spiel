@@ -14,7 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 # The following should be easy to setup as a submodule:
 # https://git-scm.com/docs/git-submodule
 
@@ -87,7 +86,7 @@ fi
   open_spiel/games/bridge/double_dummy_solver
 
 if [[ ! -d open_spiel/abseil-cpp ]]; then
-  git clone -b '20200225.1' --single-branch --depth 1 https://github.com/abseil/abseil-cpp.git open_spiel/abseil-cpp
+  git clone -b '20200923.1' --single-branch --depth 1 https://github.com/abseil/abseil-cpp.git open_spiel/abseil-cpp
 fi
 
 # Optional dependencies.
@@ -119,7 +118,7 @@ fi
 
 # This GitHub repository contains Nathan Sturtevant's state of the art
 # Hearts program xinxin.
-DIR="open_spiel/games/hearts/hearts"
+DIR="open_spiel/bots/xinxin/hearts"
 if [[ ${BUILD_WITH_XINXIN:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; then
   git clone -b 'master' --single-branch --depth 1  https://github.com/nathansttt/hearts.git ${DIR}
 fi
@@ -150,6 +149,17 @@ if [[ ${BUILD_WITH_LIBTORCH:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; then
   unzip "${DOWNLOAD_FILE}" -d "open_spiel/libtorch/"
 fi
 
+# Add OrTools
+# This downloads the precompiled binaries available from the official website.
+# https://developers.google.com/optimization/install/cpp/
+DIR="open_spiel/ortools"
+if [[ ${BUILD_WITH_ORTOOLS:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; then
+  DOWNLOAD_FILE="${DOWNLOAD_CACHE_DIR}/ortools.tar.gz"
+  [[ -f "${DOWNLOAD_FILE}" ]] || wget --show-progress -O "${DOWNLOAD_FILE}" "${BUILD_WITH_ORTOOLS_DOWNLOAD_URL}"
+  mkdir "$DIR"
+  tar -xzf "${DOWNLOAD_FILE}" --strip 1 -C "$DIR"
+fi
+
 # 2. Install other required system-wide dependencies
 
 # Install Julia if required and not present already.
@@ -176,12 +186,17 @@ if [[ ${BUILD_WITH_JULIA:-"OFF"} == "ON" ]]; then
     # Now install Julia
     JULIA_INSTALLER="open_spiel/scripts/jill.sh"
     if [[ ! -f $JULIA_INSTALLER ]]; then
-    curl https://raw.githubusercontent.com/abelsiqueira/jill/master/jill.sh -o jill.sh
-    mv jill.sh $JULIA_INSTALLER
+      curl https://raw.githubusercontent.com/abelsiqueira/jill/master/jill.sh -o jill.sh
+      mv jill.sh $JULIA_INSTALLER
     fi
     JULIA_VERSION=1.3.1 bash $JULIA_INSTALLER -y
     # Should install in $HOME/.local/bin which was added to the path above
     [[ -x `which julia` ]] || die "julia not found PATH after install."
+    # This is needed on Ubuntu 19.10 and above, see:
+    # https://github.com/deepmind/open_spiel/issues/201
+    if [[ -f /usr/lib/x86_64-linux-gnu/libstdc++.so.6 ]]; then
+      cp /usr/lib/x86_64-linux-gnu/libstdc++.so.6 $HOME/packages/julias/julia-1.3.1/lib/julia
+    fi
   fi
 
   # Install dependencies.
@@ -208,8 +223,8 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
     echo -e "\e[33mSystem wide packages already installed, skipping their installation.\e[0m"
   else
     echo "System wide packages missing. Installing them..."
-    sudo apt-get update
-    sudo apt-get install $EXT_DEPS
+    sudo apt-get -y update
+    sudo apt-get -y install $EXT_DEPS
   fi
 
   if [[ "$TRAVIS" ]]; then

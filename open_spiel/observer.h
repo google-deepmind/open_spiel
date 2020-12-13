@@ -16,8 +16,8 @@
 #define OPEN_SPIEL_OBSERVER_H_
 
 // This class is the primary method for getting observations from games.
-// Each Game object have a MakeObserver() method which returns one of these
-// objects given a specification of the required observation type.
+// Each Game object has a MakeObserver() method which returns an Observer
+// object given a specification of the required observation type.
 
 #include <memory>
 #include <string>
@@ -69,7 +69,7 @@ class Allocator {
  public:
   // Returns zero-initialized memory into which the data should be written.
   // `name` is the name of this piece of the tensor; the allocator may
-  // make use it to label the tensor when accessed by clients
+  // use it to label the tensor when accessed by the clients.
   virtual DimensionedSpan Get(absl::string_view name,
                               const absl::InlinedVector<int, 4>& shape) = 0;
 
@@ -94,17 +94,17 @@ class ContiguousAllocator : public Allocator {
 
 // Specification of which players' private information we get to see.
 enum class PrivateInfoType {
-  kNone,          // No private information
+  kNone,          // No private information.
   kSinglePlayer,  // Private information for the observing player only (i.e.
-                  // the player passed to WriteTensor / StringFrom)
-  kAllPlayers     // Private information for all players
+                  // the player passed to WriteTensor / StringFrom).
+  kAllPlayers     // Private information for all players.
 };
 
 // Observation types for imperfect-information games.
 
 // The public / private observations factorize observations into their
-// (mostly) non-overlapping public and private parts (they overlap only for
-// the start of the game and time). See also fog/ directory for details.
+// (mostly) non-overlapping public and private parts. They may overlap only for
+// the start of the game and time. See also fog/ directory for details.
 //
 // The public observations correspond to information that all the players know
 // that all the players know, like upward-facing cards on a table.
@@ -112,14 +112,14 @@ enum class PrivateInfoType {
 //
 // All games have non-empty public observations. The minimum public
 // information is time: we assume that all the players can perceive absolute
-// time (which can be accessed via the MoveNumber method). The implemented
+// time (which can be accessed via the MoveNumber() method). The implemented
 // games must be 1-timeable, a property that is trivially satisfied with all
 // human-played board games, so you typically don't have to worry about this.
 // (You'd have to knock players out / consider Einstein's time-relativistic
 // effects to make non-timeable games.).
 //
-// The public observations are used to create a list of observations:
-// a public observation history. Because of the list structure, when you
+// The public observations are used to create a sequence of observations:
+// a public observation history. Because of the sequential structure, when you
 // return any non-empty public observation, you implicitly encode time as well
 // within this sequence.
 //
@@ -138,13 +138,9 @@ enum class PrivateInfoType {
 // In the initial state this function must return
 // kStartOfGamePublicObservation. If there is no public observation available
 // except time, the implementation must return kClockTickObservation. Note
-// that empty strings for observations are forbidden - they correspond
+// that empty strings for public observations are forbidden - they correspond
 // to kInvalidPublicObservation.
 
-// The public / private observations factorize observations into their
-// (mostly) non-overlapping public and private parts (they overlap only for
-// the start of the game and time). See also fog/ directory for details.
-//
 // The private observations correspond to the part of the observation that
 // is not public. In Poker, this would be the cards the player holds in his
 // hand. Note that this does not imply that other players don't have access
@@ -169,28 +165,42 @@ struct IIGObservationType {
   // If true, include public information in the observation.
   bool public_info;
 
-  // Whether the observation is perfect recall (info state).
-  // If true, observation must be sufficient to  reconstruct the complete
-  // history of actions and observations for the observing player
+  // Whether the observation is perfect recall (identical to an info state).
+  // If true, the observation must be sufficient to reconstruct the complete
+  // history of actions and observations for the observing player.
   bool perfect_recall;
 
-  // Which players' private information to include in the observation
+  // Which players' private information to include in the observation.
   PrivateInfoType private_info;
+
+  bool operator==(const IIGObservationType&);
 };
 
 // Default observation type for imperfect information games.
-// Corresponds to the ObservationTensor method.
+// Corresponds to the ObservationTensor / ObservationString methods.
 inline constexpr IIGObservationType kDefaultObsType{
     .public_info = true,
     .perfect_recall = false,
     .private_info = PrivateInfoType::kSinglePlayer};
 
 // Default observation type for imperfect information games.
-// Corresponds to the InformationStateTensor method.
+// Corresponds to the InformationStateTensor / InformationStateString methods.
 inline constexpr IIGObservationType kInfoStateObsType{
     .public_info = true,
     .perfect_recall = true,
     .private_info = PrivateInfoType::kSinglePlayer};
+
+// Incremental public observation, mainly used for imperfect information games.
+inline constexpr IIGObservationType kPublicObsType{
+    .public_info = true,
+    .perfect_recall = false,
+    .private_info = PrivateInfoType::kNone};
+
+// Complete public observation, mainly used for imperfect information games.
+inline constexpr IIGObservationType kPublicStateObsType{
+    .public_info = true,
+    .perfect_recall = true,
+    .private_info = PrivateInfoType::kNone};
 
 // An Observer is something which can produce an observation of a State,
 // e.g. a Tensor or collection of Tensors or a string.

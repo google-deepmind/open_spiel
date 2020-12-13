@@ -197,14 +197,13 @@ class GinRummyGame : public Game {
         new GinRummyState(shared_from_this(), oklahoma_, knock_card_,
                           gin_bonus_, undercut_bonus_));
   }
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new GinRummyGame(*this));
-  }
   std::vector<int> ObservationTensorShape() const override {
     return {kObservationTensorSize};
   }
   // All games should terminate before reaching this upper bound.
   int MaxGameLength() const override { return 300; }
+  // TODO: verify whether this bound is tight and/or tighten it.
+  int MaxChanceNodesInHistory() const override { return MaxGameLength(); }
 
  private:
   const bool oklahoma_;

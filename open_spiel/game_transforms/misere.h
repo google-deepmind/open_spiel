@@ -62,10 +62,6 @@ class MisereGame : public WrappedGame {
         new MisereState(shared_from_this(), game_->NewInitialState()));
   }
 
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new MisereGame(*this));
-  }
-
   double MinUtility() const override { return -game_->MaxUtility(); }
   double MaxUtility() const override { return -game_->MinUtility(); }
   double UtilitySum() const override { return -game_->UtilitySum(); }

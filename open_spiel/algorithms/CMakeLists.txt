@@ -25,6 +25,8 @@ add_library (algorithms OBJECT
   expected_returns.h
   external_sampling_mccfr.cc
   external_sampling_mccfr.h
+  get_all_histories.cc
+  get_all_histories.h
   get_all_states.cc
   get_all_states.h
   get_legal_actions_map.cc
@@ -45,6 +47,8 @@ add_library (algorithms OBJECT
   oos.cc
   outcome_sampling_mccfr.cc
   outcome_sampling_mccfr.h
+  policy_iteration.cc
+  policy_iteration.h
   state_distribution.cc
   state_distribution.h
   tabular_exploitability.cc
@@ -57,6 +61,10 @@ add_library (algorithms OBJECT
   value_iteration.h
 )
 target_include_directories (algorithms PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
+if (${BUILD_WITH_ORTOOLS})
+  add_subdirectory (ortools)
+endif()
 
 add_executable(best_response_test best_response_test.cc
         $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})
@@ -89,6 +97,10 @@ add_test(evaluate_bots_test evaluate_bots_test)
 add_executable(external_sampling_mccfr_test external_sampling_mccfr_test.cc
     $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})
 add_test(external_sampling_mccfr_test external_sampling_mccfr_test)
+
+add_executable(get_all_histories_test get_all_histories_test.cc
+    $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})
+add_test(get_all_histories_test get_all_histories_test)
 
 add_executable(get_all_states_test get_all_states_test.cc
     $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})

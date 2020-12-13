@@ -19,6 +19,7 @@ from __future__ import division
 from __future__ import print_function
 
 import pickle
+from absl import app
 from absl.testing import absltest
 from absl.testing import parameterized
 import numpy as np
@@ -56,7 +57,7 @@ SPIEL_MULTIPLAYER_GAMES_LIST = [
     if g.max_num_players > 2 and g.max_num_players > g.min_num_players and
     g.short_name != "tiny_hanabi"  # default payoff only works for 2p
     # cannot change the number of players without changing other parameters
-    and g.short_name != "universal_poker"
+    and g.short_name != "universal_poker" and g.short_name != "scotland_yard"
 ]
 assert len(SPIEL_MULTIPLAYER_GAMES_LIST) >= 35, len(
     SPIEL_MULTIPLAYER_GAMES_LIST)
@@ -248,5 +249,10 @@ class GamesSimTest(parameterized.TestCase):
         self.sim_game(game)
 
 
-if __name__ == "__main__":
+def main(_):
   absltest.main()
+
+
+if __name__ == "__main__":
+  # Necessary to run main via app.run for internal tests.
+  app.run(main)

@@ -511,18 +511,6 @@ NegotiationGame::NegotiationGame(const GameParameters& params)
   ConstructLegalUtterances();
 }
 
-// Need to provide a custom copy constructor to clone the RNG.
-NegotiationGame::NegotiationGame(const NegotiationGame& other)
-    : Game(other),
-      enable_proposals_(other.enable_proposals_),
-      enable_utterances_(other.enable_utterances_),
-      num_items_(other.num_items_),
-      num_symbols_(other.num_symbols_),
-      utterance_dim_(other.utterance_dim_),
-      seed_(other.seed_),
-      legal_utterances_(other.legal_utterances_),
-      rng_(new std::mt19937(*other.rng_)) {}
-
 void NegotiationGame::ConstructLegalUtterances() {
   if (enable_utterances_) {
     legal_utterances_.resize(NumDistinctUtterances());
@@ -584,8 +572,12 @@ std::unique_ptr<State> NegotiationGame::DeserializeState(
     std::unique_ptr<State> state = NewInitialState();
     SPIEL_CHECK_EQ(lines.size(), 5);
     NegotiationState& nstate = static_cast<NegotiationState&>(*state);
-    // Take the chance action, but then reset the quantities.
+    // Take the chance action, but then reset the quantities. Make sure game's
+    // RNG state is not advanced during deserialization so copy it beforehand
+    // in order to be able to restore after the chance action.
+    std::unique_ptr<std::mt19937> rng = std::make_unique<std::mt19937>(*rng_);
     nstate.ApplyAction(0);
+    rng_ = std::move(rng);
     nstate.ItemPool().clear();
     nstate.AgentUtils().clear();
     // Max steps
@@ -615,6 +607,18 @@ std::unique_ptr<State> NegotiationGame::DeserializeState(
     }
     return state;
   }
+}
+
+std::string NegotiationGame::GetRNGState() const {
+  std::ostringstream rng_stream;
+  rng_stream << *rng_;
+  return rng_stream.str();
+}
+
+void NegotiationGame::SetRNGState(const std::string& rng_state) const {
+  if (rng_state.empty()) return;
+  std::istringstream rng_stream(rng_state);
+  rng_stream >> *rng_;
 }
 
 }  // namespace negotiation

@@ -22,7 +22,6 @@
 #include <cstdint>
 #include <limits>
 #include <locale>
-#include <optional>
 #include <random>
 #include <sstream>
 #include <string>
@@ -61,14 +60,14 @@ std::ostream& operator<<(std::ostream& stream, const std::vector<T>& v);
 template <typename T, std::size_t N>
 std::ostream& operator<<(std::ostream& stream, const std::array<T, N>& v);
 template <typename T>
-std::ostream& operator<<(std::ostream& stream, const std::optional<T>& v);
-std::ostream& operator<<(std::ostream& stream, const std::nullopt_t& v);
+std::ostream& operator<<(std::ostream& stream, const absl::optional<T>& v);
+std::ostream& operator<<(std::ostream& stream, const absl::nullopt_t& v);
 template <typename T>
-std::ostream& operator<<(std::ostream& stream, absl::Span<const T> v);
+std::ostream& operator<<(std::ostream& stream, absl::Span<T> v);
 
 // Actual template implementations.
 template <typename T>
-std::ostream& operator<<(std::ostream& stream, absl::Span<const T> v) {
+std::ostream& operator<<(std::ostream& stream, absl::Span<T> v) {
   stream << "[";
   for (const auto& element : v) {
     stream << element << " ";
@@ -76,7 +75,6 @@ std::ostream& operator<<(std::ostream& stream, absl::Span<const T> v) {
   stream << "]";
   return stream;
 }
-// Actual template implementations.
 template <typename T>
 std::ostream& operator<<(std::ostream& stream, const std::vector<T>& v) {
   return stream << absl::MakeSpan(v);
@@ -95,7 +93,7 @@ std::ostream& operator<<(std::ostream& stream, const std::unique_ptr<T>& v) {
   return stream << *v;
 }
 template <typename T>
-std::ostream& operator<<(std::ostream& stream, const std::optional<T>& v) {
+std::ostream& operator<<(std::ostream& stream, const absl::optional<T>& v) {
   return stream << *v;
 }
 template <typename T, typename U>
@@ -162,9 +160,17 @@ int PreviousPlayerRoundRobin(Player player, int nplayers);
 
 // Finds a file by looking up a number of directories. For example: if levels is
 // 3 and filename is my.txt, it will look for ./my.txt, ../my.txt, ../../my.txt,
-// and ../../../my.txt, return the first file found or std::nullopt if not
+// and ../../../my.txt, return the first file found or absl::nullopt if not
 // found.
 absl::optional<std::string> FindFile(const std::string& filename, int levels);
+
+// Normalizes the span.
+void Normalize(absl::Span<double> weights);
+
+// Format in decimal format, with at most 15 places for the fractional part,
+// adding ".0" for integer values, and removing any additional trailing zeroes
+// after the first decimal place.
+std::string FormatDouble(double value);
 
 // Returns whether the absolute difference between floating point values a and
 // b is less than or equal to FloatingPointThresholdRatio() * max(|a|, |b|).
@@ -182,6 +188,20 @@ bool Near(T a, T b, T epsilon) {
   static_assert(std::is_floating_point<T>::value,
                 "Near() is only for floating point args.");
   return fabs(a - b) <= epsilon;
+}
+
+template <typename T>
+bool AllNear(const std::vector<T>& vector1, const std::vector<T>& vector2,
+             T epsilon) {
+  if (vector1.size() != vector2.size()) {
+    return false;
+  }
+  for (int i = 0; i < vector1.size(); ++i) {
+    if (!Near(vector1[i], vector2[i], epsilon)) {
+      return false;
+    }
+  }
+  return true;
 }
 
 // Macros to check for error conditions.

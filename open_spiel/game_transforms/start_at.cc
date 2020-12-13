@@ -91,10 +91,6 @@ StartAtTransformationGame::StartAtTransformationGame(
           game,
           HistoryFromString(game_parameters.at("history").string_value()))) {}
 
-StartAtTransformationGame::StartAtTransformationGame(
-    const StartAtTransformationGame& other)
-    : WrappedGame(other), start_state_(other.start_state_->Clone()) {}
-
 std::unique_ptr<State> StartAtTransformationGame::NewInitialState() const {
   return std::make_unique<StartAtTransformationState>(shared_from_this(),
                                                       start_state_->Clone());

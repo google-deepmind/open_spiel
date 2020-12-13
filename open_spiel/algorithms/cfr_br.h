@@ -34,16 +34,25 @@ namespace algorithms {
 class CFRBRSolver : public CFRSolverBase {
  public:
   explicit CFRBRSolver(const Game& game);
+  // The constructor below is used for deserialization purposes.
+  CFRBRSolver(std::shared_ptr<const Game> game, int iteration);
 
   void EvaluateAndUpdatePolicy() override;
 
+ protected:
+  std::string SerializeThisType() const { return "CFRBRSolver"; }
+
  private:
+  void InitializeBestResponseComputers();
   // Policies that are used instead of the current policy for some of the
   // opponent players.
   std::vector<const Policy*> policy_overrides_;
   UniformPolicy uniform_policy_;
   std::vector<std::unique_ptr<TabularBestResponse>> best_response_computers_;
 };
+
+std::unique_ptr<CFRBRSolver> DeserializeCFRBRSolver(
+    const std::string& serialized, std::string delimiter = "<~>");
 
 }  // namespace algorithms
 }  // namespace open_spiel

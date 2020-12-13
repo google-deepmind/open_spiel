@@ -186,8 +186,8 @@ std::shared_ptr<const Game> CreateRepeatedGame(const Game& stage_game,
                  GameType::Dynamics::kSimultaneous);
   SPIEL_CHECK_EQ(stage_game.GetType().chance_mode,
                  GameType::ChanceMode::kDeterministic);
-  return std::shared_ptr<const RepeatedGame>(
-      new RepeatedGame(stage_game.Clone(), params));
+  return std::make_shared<const RepeatedGame>(stage_game.shared_from_this(),
+                                              params);
 }
 
 std::shared_ptr<const Game> CreateRepeatedGame(

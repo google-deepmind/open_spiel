@@ -60,6 +60,19 @@ std::shared_ptr<const Game> Factory(const GameParameters& params) {
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
 
+std::string StatelessActionToString(Action action) {
+  if (action == ActionType::kFold) {
+    return "Fold";
+  } else if (action == ActionType::kCall) {
+    return "Call";
+  } else if (action == ActionType::kRaise) {
+    return "Raise";
+  } else {
+    SpielFatalError(absl::StrCat("Unknown action: ", action));
+    return "Will not return.";
+  }
+}
+
 }  // namespace
 
 class LeducObserver : public Observer {
@@ -398,19 +411,7 @@ std::vector<Action> LeducState::LegalActions() const {
 }
 
 std::string LeducState::ActionToString(Player player, Action move) const {
-  if (player == kChancePlayerId)
-    return absl::StrCat("Chance outcome:", move);
-  else if (move == ActionType::kFold)
-    return "Fold";
-  else if (move == ActionType::kCall)
-    return "Call";
-  else if (move == ActionType::kRaise)
-    return "Raise";
-  else
-    SpielFatalError(
-        absl::StrCat("Error in LeducState::ActionToString(). Available actions "
-                     "are 0, 1, 2, not ",
-                     move));
+  return GetGame()->ActionToString(player, move);
 }
 
 std::string LeducState::ToString() const {
@@ -427,11 +428,17 @@ std::string LeducState::ToString() const {
   }
 
   absl::StrAppend(&result, "\nRound 1 sequence: ");
-  absl::StrAppend(&result, absl::StrJoin(round1_sequence_, " "));
-
+  for (int i = 0; i < round1_sequence_.size(); ++i) {
+    Action action = round1_sequence_[i];
+    if (i > 0) absl::StrAppend(&result, ", ");
+    absl::StrAppend(&result, StatelessActionToString(action));
+  }
   absl::StrAppend(&result, "\nRound 2 sequence: ");
-  absl::StrAppend(&result, absl::StrJoin(round2_sequence_, " "));
-
+  for (int i = 0; i < round2_sequence_.size(); ++i) {
+    Action action = round2_sequence_[i];
+    if (i > 0) absl::StrAppend(&result, ", ");
+    absl::StrAppend(&result, StatelessActionToString(action));
+  }
   absl::StrAppend(&result, "\n");
 
   return result;
@@ -787,9 +794,26 @@ double LeducGame::MinUtility() const {
 std::shared_ptr<Observer> LeducGame::MakeObserver(
     absl::optional<IIGObservationType> iig_obs_type,
     const GameParameters& params) const {
-  if (!params.empty()) SpielFatalError("Observation params not supported");
+  auto iter = params.find("name");
+  if (iter != params.end()) {
+    auto name = iter->second.string_value();
+    if (name == "single_tensor") {
+      // Fall back to the old observations / infostates as a single tensor.
+      return Game::MakeObserver(iig_obs_type, GameParameters());
+    }
+    SpielFatalError(absl::StrCat("Unknown observation specification '",
+                                 iter->second.string_value(), "'"));
+  }
   return std::make_shared<LeducObserver>(
       iig_obs_type.value_or(kDefaultObsType));
+}
+
+std::string LeducGame::ActionToString(Player player, Action action) const {
+  if (player == kChancePlayerId) {
+    return absl::StrCat("Chance outcome:", action);
+  } else {
+    return StatelessActionToString(action);
+  }
 }
 
 }  // namespace leduc_poker

@@ -88,10 +88,10 @@ class FPSBAGame : public Game {
   int NumPlayers() const override { return num_players_; }
   double MinUtility() const override { return 0; }
   double MaxUtility() const override { return max_value_; }
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new FPSBAGame(*this));
-  }
   int MaxGameLength() const override { return num_players_; }
+  // TODO: it seems like there is a chance node with a single action before
+  //       terminals. Not sure why.
+  int MaxChanceNodesInHistory() const override { return num_players_ + 1; }
   std::vector<int> InformationStateTensorShape() const override {
     return {max_value_ * 2 + num_players_};
   };

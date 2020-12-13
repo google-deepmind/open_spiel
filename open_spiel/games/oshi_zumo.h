@@ -93,9 +93,6 @@ class OshiZumoGame : public Game {
   double MinUtility() const override { return -1; }
   double MaxUtility() const override { return +1; }
   double UtilitySum() const override { return 0; }
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new OshiZumoGame(*this));
-  }
   std::vector<int> ObservationTensorShape() const override;
   int MaxGameLength() const override { return horizon_; }
 

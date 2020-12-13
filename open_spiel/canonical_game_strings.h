@@ -32,6 +32,9 @@ namespace open_spiel {
 std::string HunlGameString(const std::string &betting_abstraction);
 std::string HulhGameString(const std::string &betting_abstraction);
 
+// Turn based goofspiel w/ imperfect information and descending points order.
+std::string TurnBasedGoofspielGameString(int num_cards);
+
 }  // namespace open_spiel
 
 #endif  // OPEN_SPIEL_SPIEL_H_

@@ -51,8 +51,6 @@ namespace leduc_poker {
 
 // Default parameters.
 
-// TODO(b/127425075): Use std::optional instead of sentinel values once absl is
-// added as a dependency.
 inline constexpr int kInvalidCard = -10000;
 inline constexpr int kDefaultPlayers = 2;
 inline constexpr int kNumSuits = 2;
@@ -61,8 +59,9 @@ inline constexpr int kSecondRaiseAmount = 4;
 inline constexpr int kTotalRaisesPerRound = 2;
 inline constexpr int kMaxRaises = 2;
 inline constexpr int kStartingMoney = 100;
-inline constexpr int kNumInfoStates =
-    936;  // Number of info states in the 2P game with default params.
+
+// Number of info states in the 2P game with default params.
+inline constexpr int kNumInfoStates = 936;
 
 class LeducGame;
 class LeducObserver;
@@ -184,9 +183,6 @@ class LeducGame : public Game {
   double MinUtility() const override;
   double MaxUtility() const override;
   double UtilitySum() const override { return 0; }
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new LeducGame(*this));
-  }
   std::vector<int> InformationStateTensorShape() const override;
   std::vector<int> ObservationTensorShape() const override;
   constexpr int MaxBetsPerRound() const {
@@ -199,10 +195,12 @@ class LeducGame : public Game {
     // 2 rounds.
     return 2 * MaxBetsPerRound();
   }
+  int MaxChanceNodesInHistory() const override { return 3; }
   int NumObservableCards() const {
     return suit_isomorphism_ ? total_cards_ / 2 : total_cards_;
   }
 
+  std::string ActionToString(Player player, Action action) const override;
   // New Observation API
   std::shared_ptr<Observer> MakeObserver(
       absl::optional<IIGObservationType> iig_obs_type,

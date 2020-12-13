@@ -282,7 +282,7 @@ void InformationStateTensorTest(int num_games = 100) {
         SPIEL_CHECK_EQ(infostate_string, rebuilt_infostate_string);
 
         std::vector<open_spiel::Action> actions = state->LegalActions();
-        absl::uniform_int_distribution<> dis(0, actions.size() - 1);
+        std::uniform_int_distribution<> dis(0, actions.size() - 1);
         auto action = actions[dis(rng)];
         state->ApplyAction(action);
       }

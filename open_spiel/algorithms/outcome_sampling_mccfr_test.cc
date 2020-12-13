@@ -37,11 +37,39 @@ void MCCFR_2PGameTest(const std::string& game_name, std::mt19937* rng,
   for (int i = 0; i < iterations; i++) {
     solver.RunIteration(rng);
   }
-  const std::unique_ptr<Policy> average_policy = solver.AveragePolicy();
+  const std::shared_ptr<Policy> average_policy = solver.AveragePolicy();
   double nash_conv = NashConv(*game, *average_policy, true);
   std::cout << "Game: " << game_name << ", iters = " << iterations
             << ", NashConv: " << nash_conv << std::endl;
   SPIEL_CHECK_LE(nash_conv, nashconv_upperbound);
+}
+
+void MCCFR_SerializationTest() {
+  auto game = LoadGame("kuhn_poker");
+  OutcomeSamplingMCCFRSolver solver = OutcomeSamplingMCCFRSolver(*game);
+  double exploitability0 = Exploitability(*game, *solver.AveragePolicy());
+
+  for (int i = 0; i < 500; i++) {
+    solver.RunIteration();
+  }
+  double exploitability1 = Exploitability(*game, *solver.AveragePolicy());
+  SPIEL_CHECK_GT(exploitability0, exploitability1);
+
+  std::string serialized = solver.Serialize();
+  std::unique_ptr<OutcomeSamplingMCCFRSolver> deserialized_solver =
+      DeserializeOutcomeSamplingMCCFRSolver(serialized);
+  SPIEL_CHECK_EQ(solver.InfoStateValuesTable().size(),
+                 deserialized_solver->InfoStateValuesTable().size());
+  double exploitability2 =
+      Exploitability(*game, *deserialized_solver->AveragePolicy());
+  SPIEL_CHECK_FLOAT_NEAR(exploitability1, exploitability2, 1e-15);
+
+  for (int i = 0; i < 500; i++) {
+    deserialized_solver->RunIteration();
+  }
+  double exploitability3 =
+      Exploitability(*game, *deserialized_solver->AveragePolicy());
+  SPIEL_CHECK_GT(exploitability2, exploitability3);
 }
 
 }  // namespace
@@ -58,4 +86,5 @@ int main(int argc, char** argv) {
   algorithms::MCCFR_2PGameTest("kuhn_poker", &rng, 10000, 0.04);
   algorithms::MCCFR_2PGameTest("leduc_poker", &rng, 10000, 3);
   algorithms::MCCFR_2PGameTest("liars_dice", &rng, 1000, 1.7);
+  algorithms::MCCFR_SerializationTest();
 }

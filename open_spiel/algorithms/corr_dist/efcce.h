@@ -95,10 +95,6 @@ class EFCCEGame : public WrappedGame {
                                         FollowAction(), DefectAction());
   }
 
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new EFCCEGame(*this));
-  }
-
   int NumDistinctActions() const override {
     // 2 extra actions: cooperate/follow or defect
     return orig_num_distinct_actions_ + 2;
@@ -124,7 +120,10 @@ class EFCCETabularPolicy : public TabularPolicy {
     SpielFatalError("GetStatePolicy(const std::string&) should not be called.");
     return TabularPolicy::GetStatePolicy(info_state);
   }
-
+  ActionsAndProbs GetStatePolicy(const State& state, Player pl) const override {
+    SPIEL_CHECK_EQ(state.CurrentPlayer(), pl);
+    return GetStatePolicy(state);
+  }
   ActionsAndProbs GetStatePolicy(const State& state) const override;
 
  private:

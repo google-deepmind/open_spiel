@@ -15,6 +15,7 @@
 #ifndef OPEN_SPIEL_GAMES_UNIVERSAL_POKER_H_
 #define OPEN_SPIEL_GAMES_UNIVERSAL_POKER_H_
 
+#include <algorithm>
 #include <array>
 #include <memory>
 #include <string>
@@ -22,6 +23,7 @@
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
+#include "open_spiel/abseil-cpp/absl/container/flat_hash_set.h"
 #include "open_spiel/games/universal_poker/acpc_cpp/acpc_game.h"
 #include "open_spiel/games/universal_poker/logic/card_set.h"
 #include "open_spiel/policy.h"
@@ -173,70 +175,67 @@ class UniversalPokerGame : public Game {
   double MaxUtility() const override;
   int MaxChanceOutcomes() const override;
   double UtilitySum() const override { return 0; }
-  std::shared_ptr<const Game> Clone() const override;
   std::vector<int> InformationStateTensorShape() const override;
   std::vector<int> ObservationTensorShape() const override;
   int MaxGameLength() const override;
+  // TODO: verify whether this bound is tight and/or tighten it.
+  int MaxChanceNodesInHistory() const override { return MaxGameLength(); }
   BettingAbstraction betting_abstraction() const {
     return betting_abstraction_;
   }
 
   int big_blind() const { return big_blind_; }
-  int starting_stack_big_blinds() const { return starting_stack_big_blinds_; }
 
  private:
+  double MaxCommitment() const;
   std::string gameDesc_;
   const acpc_cpp::ACPCGame acpc_game_;
   absl::optional<int> max_game_length_;
   BettingAbstraction betting_abstraction_ = BettingAbstraction::kFULLGAME;
+  int big_blind_;
+  int max_stack_size_;
 
  public:
   const acpc_cpp::ACPCGame *GetACPCGame() const { return &acpc_game_; }
-
   std::string parseParameters(const GameParameters &map);
-  int big_blind_;
-  int starting_stack_big_blinds_;
 };
 
 // Only supported for UniversalPoker. Randomly plays an action from a fixed list
-// of actions. If none of the actions are legal, selects uniformly from the
-// list of legal actions.
+// of actions. If none of the actions are legal, checks/calls.
 class UniformRestrictedActions : public Policy {
  public:
   // Actions will be restricted to this list when legal. If no such action is
-  // legal, uniform random over all legal actions will be returned.
-  explicit UniformRestrictedActions(std::vector<ActionType> actions)
-      : actions_(std::move(actions)) {}
+  // legal, checks/calls.
+  explicit UniformRestrictedActions(absl::Span<const ActionType> actions)
+      : actions_(actions.begin(), actions.end()),
+        max_action_(*absl::c_max_element(actions)) {}
 
   ActionsAndProbs GetStatePolicy(const State &state) const {
     ActionsAndProbs policy;
-    std::vector<Action> legal_actions = state.LegalActions();
+    policy.reserve(actions_.size());
+    const std::vector<Action> legal_actions = state.LegalActions();
     for (Action action : legal_actions) {
-      if (absl::c_find(actions_, action) != actions_.end()) {
+      if (actions_.contains(static_cast<ActionType>(action))) {
         policy.emplace_back(action, 1.);
       }
+      if (policy.size() >= actions_.size() || action > max_action_) break;
+    }
+
+    // It is always legal to check/call.
+    if (policy.empty()) {
+      SPIEL_DCHECK_TRUE(absl::c_find(legal_actions, ActionType::kCall) !=
+                        legal_actions.end());
+      policy.push_back({static_cast<Action>(ActionType::kCall), 1.});
     }
 
     // If we have a non-empty policy, normalize it!
-    if (!policy.empty()) {
-      const double size = static_cast<double>(policy.size());
-      absl::c_for_each(policy, [size](std::pair<Action, double> &a_and_p) {
-        a_and_p.second /= size;
-      });
-      return policy;
-    }
-
-    // Otherwise, we return uniform random.
-    policy.reserve(legal_actions.size());
-    absl::c_for_each(legal_actions, [&policy, &legal_actions](Action a) {
-      policy.push_back({a, 1. / static_cast<double>(legal_actions.size())});
-    });
-    SPIEL_CHECK_EQ(policy.size(), legal_actions.size());
+    if (policy.size() > 1) NormalizePolicy(&policy);
     return policy;
   }
 
  private:
-  std::vector<ActionType> actions_;
+  const absl::flat_hash_set<ActionType> actions_;
+  const ActionType max_action_;
 };
 
 std::ostream &operator<<(std::ostream &os, const BettingAbstraction &betting);

@@ -7,6 +7,8 @@ add_library (utils OBJECT
   file.h
   file.cc
   functional.h
+  init.h
+  init.cc
   json.h
   json.cc
   logger.h
@@ -15,6 +17,7 @@ add_library (utils OBJECT
   random.cc
   run_python.h
   run_python.cc
+  serialization.h
   stats.h
   tensor_view.h
   thread.h

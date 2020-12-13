@@ -220,15 +220,14 @@ class HeartsGame : public Game {
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override { return kMinScore; }
   double MaxUtility() const override { return kMaxScore; }
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new HeartsGame(*this));
-  }
   std::vector<int> InformationStateTensorShape() const override {
     return {kInformationStateTensorSize};
   }
   int MaxGameLength() const override {
     return (kNumCardsInPass * kNumPlayers) + kNumCards;
   }
+  // TODO: verify whether this bound is tight and/or tighten it.
+  int MaxChanceNodesInHistory() const override { return MaxGameLength(); }
 
  private:
   const bool pass_cards_;

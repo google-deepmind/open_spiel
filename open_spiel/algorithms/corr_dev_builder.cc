@@ -48,6 +48,50 @@ void CorrDevBuilder::AddSampledJointPolicy(const TabularPolicy& policy,
   }
 }
 
+void CorrDevBuilder::AddMixedJointPolicy(const TabularPolicy& policy) {
+  std::vector<int> action_indices(policy.PolicyTable().size(), 0);
+  bool done = false;
+  double total_prob = 0.0;
+
+  while (!done) {
+    // Construct the joint policy and add it.
+    TabularPolicy deterministic_policy;
+    double prob = 1.0;
+    int info_state_idx = 0;
+    for (const auto& iter : policy.PolicyTable()) {
+      Action action = iter.second[action_indices[info_state_idx]].first;
+      prob *= GetProb(iter.second, action);
+      if (prob == 0.0) {
+        break;
+      }
+      deterministic_policy.SetStatePolicy(
+          iter.first, ToDeterministicPolicy(iter.second, action));
+      info_state_idx++;
+    }
+
+    SPIEL_CHECK_PROB(prob);
+    if (prob > 0.0) {
+      AddDeterminsticJointPolicy(deterministic_policy, prob);
+      total_prob += prob;
+    }
+
+    // Now, try to move to the next joint policy.
+    info_state_idx = 0;
+    done = true;
+    for (const auto& iter : policy.PolicyTable()) {
+      if (++action_indices[info_state_idx] < iter.second.size()) {
+        done = false;
+        break;
+      } else {
+        action_indices[info_state_idx] = 0;
+      }
+      info_state_idx++;
+    }
+  }
+
+  SPIEL_CHECK_TRUE(Near(total_prob, 1.0, 1e-10));
+}
+
 CorrelationDevice CorrDevBuilder::GetCorrelationDevice() const {
   SPIEL_CHECK_GT(total_weight_, 0);
   CorrelationDevice corr_dev;

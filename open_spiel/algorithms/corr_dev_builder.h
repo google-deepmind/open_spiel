@@ -45,12 +45,21 @@ class CorrDevBuilder {
                                   double weight = 1.0);
 
   // Take a number of sampled joint policies and add each one with a weight
-  // of 1.0 / num_samples.
+  // of 1.0 / num_samples. The mixed policy should be complete: a policy should
+  // be defined for every information state, otherwise the distribution will not
+  // be properly built (joint policies will be incomplete).
   void AddSampledJointPolicy(const TabularPolicy& policy, int num_samples);
 
-  // TODO(author5): add a function here that applies NF-Reconstruct-Strategy
-  // from Celli et al. '19 (https://arxiv.org/abs/1910.06228) on each player and
-  // adds the resulting distribution over joint policies.
+  // This function adds a mixed joint policy to the correlation device. It does
+  // so by computing the probability of each deterministic joint policy by
+  // enumerating all possible actions that the policy is mixing over and
+  // computing the weight of each joint policy as a product of these
+  // probabilities. The mixed policy should be complete: a policy should be
+  // defined for every information state, otherwise the distribution will not
+  // be properly built (joint policies will be incomplete).
+  // Important note: this is computationally expensive and should only be used
+  // for small games. For larger games, used the sampled version above.
+  void AddMixedJointPolicy(const TabularPolicy& policy);
 
   // Return the correlation device represented by this builder.
   CorrelationDevice GetCorrelationDevice() const;

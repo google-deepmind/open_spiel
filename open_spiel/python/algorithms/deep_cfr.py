@@ -305,17 +305,19 @@ class DeepCFRSolver(policy.Policy):
       for action in state.legal_actions():
         expected_payoff[action] = self._traverse_game_tree(
             state.child(action), player)
+      cfv = 0
+      for a_ in state.legal_actions():
+        cfv += strategy[a_] * expected_payoff[a_]
       for action in state.legal_actions():
         sampled_regret[action] = expected_payoff[action]
-        for a_ in state.legal_actions():
-          sampled_regret[action] -= strategy[a_] * expected_payoff[a_]
+        sampled_regret[action] -= cfv
       sampled_regret_arr = [0] * self._num_actions
       for action in sampled_regret:
         sampled_regret_arr[action] = sampled_regret[action]
       self._advantage_memories[player].add(
           AdvantageMemory(state.information_state_tensor(), self._iteration,
                           sampled_regret_arr, action))
-      return max(expected_payoff.values())
+      return cfv
     else:
       other_player = state.current_player()
       _, strategy = self._sample_action_from_advantage(state, other_player)
@@ -341,17 +343,19 @@ class DeepCFRSolver(policy.Policy):
     """
     info_state = state.information_state_tensor(player)
     legal_actions = state.legal_actions(player)
-    advantages = self._session.run(
+    advantages_full = self._session.run(
         self._advantage_outputs[player],
         feed_dict={self._info_state_ph: np.expand_dims(info_state, axis=0)})[0]
-    advantages = [max(0., advantage) for advantage in advantages]
+    advantages = [max(0., advantage) for advantage in advantages_full]
     cumulative_regret = np.sum([advantages[action] for action in legal_actions])
     matched_regrets = np.array([0.] * self._num_actions)
-    for action in legal_actions:
-      if cumulative_regret > 0.:
+
+    if cumulative_regret > 0.:
+      for action in legal_actions:
         matched_regrets[action] = advantages[action] / cumulative_regret
-      else:
-        matched_regrets[action] = 1 / self._num_actions
+    else:
+      matched_regrets[max(legal_actions, key=lambda a: advantages_full[a])] = 1
+
     return advantages, matched_regrets
 
   def action_probabilities(self, state):

@@ -418,6 +418,7 @@ int LiarsDiceGame::MaxGameLength() const {
   // A bet for each side and number of total dice, plus "liar" action.
   return total_num_dice_ * kDiceSides + 1;
 }
+int LiarsDiceGame::MaxChanceNodesInHistory() const { return total_num_dice_; }
 
 std::vector<int> LiarsDiceGame::InformationStateTensorShape() const {
   // One-hot encoding for the player number.

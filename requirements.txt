@@ -14,16 +14,21 @@
 # We do pick the latest version for Tensorflow and Jax on purpose.
 pip >= 20.0.2
 absl-py == 0.9.0
-tensorflow == 2.2.0
+tensorflow == 2.2.1
 IPython == 5.8.0
 tensorflow-probability < 0.8.0, >= 0.7.0
 cvxopt == 1.2.5
 networkx == 2.4
 mock == 4.0.2
+optax == 0.0.2
+chex == 0.0.3
 matplotlib == 3.2.2
 nashpy == 0.0.19
 scipy == 1.4.1
 attrs == 19.3.0
-jax == 0.1.67
-jaxlib == 0.1.47
-dm-haiku == 0.0.1
+jax == 0.2.7
+jaxlib == 0.1.57
+dm-haiku == 0.0.3
+dataclasses == 0.7; python_version < "3.7"
+hypothesis==5.38.0
+torch==1.7.0

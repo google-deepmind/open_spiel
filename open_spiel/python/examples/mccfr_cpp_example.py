@@ -23,6 +23,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import pickle
 from absl import app
 from absl import flags
 
@@ -40,6 +41,8 @@ flags.DEFINE_integer("iterations", 50, "Number of iterations")
 flags.DEFINE_string("game", "kuhn_poker", "Name of the game")
 flags.DEFINE_integer("players", 2, "Number of players")
 
+MODEL_FILE_NAME = "{}_sampling_mccfr_solver.pickle"
+
 
 def main(_):
   game = pyspiel.load_game(
@@ -55,10 +58,26 @@ def main(_):
   elif FLAGS.sampling == "outcome":
     solver = pyspiel.OutcomeSamplingMCCFRSolver(game)
 
-  for i in range(FLAGS.iterations):
+  for i in range(int(FLAGS.iterations / 2)):
     solver.run_iteration()
     print("Iteration {} exploitability: {:.6f}".format(
         i, pyspiel.exploitability(game, solver.average_policy())))
+
+  print("Persisting the model...")
+  with open(MODEL_FILE_NAME.format(FLAGS.sampling), "wb") as file:
+    pickle.dump(solver, file, pickle.HIGHEST_PROTOCOL)
+
+  print("Loading the model...")
+  with open(MODEL_FILE_NAME.format(FLAGS.sampling), "rb") as file:
+    loaded_solver = pickle.load(file)
+  print("Exploitability of the loaded model: {:.6f}".format(
+      pyspiel.exploitability(game, loaded_solver.average_policy())))
+
+  for i in range(int(FLAGS.iterations / 2)):
+    solver.run_iteration()
+    print("Iteration {} exploitability: {:.6f}".format(
+        int(FLAGS.iterations / 2) + i,
+        pyspiel.exploitability(game, solver.average_policy())))
 
 
 if __name__ == "__main__":

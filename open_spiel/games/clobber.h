@@ -143,9 +143,6 @@ class ClobberGame : public Game {
   double MinUtility() const override { return -1; }
   double UtilitySum() const override { return 0; }
   double MaxUtility() const override { return 1; }
-  std::shared_ptr<const Game> Clone() const override {
-    return std::make_shared<ClobberGame>(*this);
-  }
   std::vector<int> ObservationTensorShape() const override {
     return {kNumPlayers + 1, rows_, columns_};
   }

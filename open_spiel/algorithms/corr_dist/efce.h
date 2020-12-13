@@ -105,10 +105,6 @@ class EFCEGame : public WrappedGame {
                                        game_->NewInitialState(), config_, mu_);
   }
 
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new EFCEGame(*this));
-  }
-
  protected:
   const CorrDistConfig config_;
   const CorrelationDevice& mu_;
@@ -122,7 +118,10 @@ class EFCETabularPolicy : public TabularPolicy {
     SpielFatalError("GetStatePolicy(const std::string&) should not be called.");
     return TabularPolicy::GetStatePolicy(info_state);
   }
-
+  ActionsAndProbs GetStatePolicy(const State& state, Player pl) const override {
+    SPIEL_CHECK_EQ(state.CurrentPlayer(), pl);
+    return GetStatePolicy(state);
+  }
   ActionsAndProbs GetStatePolicy(const State& state) const override;
 
  private:

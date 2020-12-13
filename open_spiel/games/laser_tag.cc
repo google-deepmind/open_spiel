@@ -36,7 +36,7 @@ const GameType kGameTypeGeneralSum{
     /*short_name=*/"laser_tag",
     /*long_name=*/"Laser Tag",
     GameType::Dynamics::kSimultaneous,
-    GameType::ChanceMode::kDeterministic,
+    GameType::ChanceMode::kExplicitStochastic,
     GameType::Information::kPerfectInformation,
     GameType::Utility::kGeneralSum,
     GameType::RewardModel::kRewards,

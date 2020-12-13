@@ -109,9 +109,6 @@ class PhantomTTTGame : public Game {
   double UtilitySum() const override { return game_->UtilitySum(); }
   double MaxUtility() const override { return game_->MaxUtility(); }
 
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new PhantomTTTGame(*this));
-  }
   // These will depend on the obstype parameter.
   std::vector<int> InformationStateTensorShape() const override;
   std::vector<int> ObservationTensorShape() const override;

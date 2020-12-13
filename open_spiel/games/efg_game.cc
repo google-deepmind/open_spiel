@@ -26,6 +26,7 @@
 #include "open_spiel/abseil-cpp/absl/strings/str_split.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
+#include "open_spiel/utils/file.h"
 
 namespace open_spiel {
 namespace efg_game {
@@ -45,7 +46,7 @@ const GameType kGameType{/*short_name=*/"efg_game",
                          /*max_num_players=*/2,
                          /*min_num_players=*/2,
                          /*provides_information_state_string=*/true,
-                         /*provides_information_state_tensor=*/false,
+                         /*provides_information_state_tensor=*/true,
                          /*provides_observation_string=*/true,
                          /*provides_observation_tensor=*/false,
                          /*parameter_specification=*/
@@ -141,6 +142,42 @@ std::string EFGState::InformationStateString(Player player) const {
                                    cur_node_->infoset_name);
 }
 
+void EFGState::InformationStateTensor(Player player,
+                                      absl::Span<float> values) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+  std::fill(values.begin(), values.end(), 0.0);
+  int offset = 0;
+  int index = 0;
+
+  // Current player, or terminal.
+  if (cur_node_->type == NodeType::kTerminal) {
+    index = offset + num_players_;
+  } else {
+    index = offset + cur_node_->player_number - 1;
+  }
+  SPIEL_CHECK_GE(index, 0);
+  SPIEL_CHECK_LT(index, values.size());
+  values[index] = 1.0;
+  offset += num_players_ + 1;
+
+  // Observing player.
+  index = offset + player;
+  SPIEL_CHECK_GE(index, 0);
+  SPIEL_CHECK_LT(index, values.size());
+  values[index] = 1.0;
+  offset += num_players_;
+
+  // Infostate number.
+  index = offset + cur_node_->infoset_number - 1;
+  SPIEL_CHECK_GE(index, 0);
+  SPIEL_CHECK_LT(index, values.size());
+  values[index] = 1.0;
+
+  offset += static_cast<const EFGGame*>(game_.get())->NumInfoStates(player);
+  SPIEL_CHECK_LE(offset, values.size());
+}
+
 std::string EFGState::ObservationString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
@@ -212,9 +249,30 @@ double EFGGame::MaxUtility() const { return max_util_.value(); }
 
 int EFGGame::MaxGameLength() const { return max_depth_; }
 
+int EFGGame::MaxChanceNodesInHistory() const { return num_chance_nodes_; }
+
+int EFGGame::MaxMoveNumber() const { return max_depth_; }
+
+int EFGGame::MaxHistoryLength() const { return max_depth_; }
+
+std::vector<int> EFGGame::InformationStateTensorShape() const {
+  int max_player_infosets = 0;
+  for (Player p = 0; p < num_players_; ++p) {
+    max_player_infosets = std::max<int>(max_player_infosets,
+                                        infoset_num_to_states_count_[p].size());
+  }
+
+  return {
+    num_players_ + 1 +    // Current player (plus special for terminal).
+    num_players_ +        // Current observing player.
+    max_player_infosets   // Information set number (for the current player).
+  };
+}
+
 EFGGame::EFGGame(const GameParameters& params)
     : Game(kGameType, params),
-      string_data_(""),
+      filename_(ParameterValue<std::string>("filename")),
+      string_data_(file::ReadContentsFromFile(filename_, "r")),
       pos_(0),
       num_chance_nodes_(0),
       max_actions_(0),
@@ -223,23 +281,6 @@ EFGGame::EFGGame(const GameParameters& params)
       identical_payoffs_(true),
       general_sum_(true),
       perfect_information_(true) {
-  filename_ = ParameterValue<std::string>("filename");
-
-  std::ifstream file;
-  file.open(filename_.c_str());
-  if (!file.is_open()) {
-    SpielFatalError(absl::StrCat("Could not open input file: ", filename_));
-  }
-
-  string_data_ = "";
-  char buffer[kBuffSize];
-  while (!file.eof()) {
-    memset(buffer, 0, kBuffSize);
-    file.read(buffer, kBuffSize - 1);
-    absl::StrAppend(&string_data_, buffer);
-  }
-  file.close();
-
   SPIEL_CHECK_GT(string_data_.size(), 0);
 
   // Now parse the string data into a data structure.
@@ -745,6 +786,20 @@ void EFGGame::ParseGame() {
 
   game_type_.max_num_players = num_players_;
   game_type_.min_num_players = num_players_;
+
+  // Check infoset number consistency. Currently they must start at 1 and end
+  // at n_i for each player i. The InformationStateTensor currently requires
+  // this to implement a proper info state tensor.
+  for (Player p = 0; p < num_players_; ++p) {
+    int max_value = 0;
+    for (const auto& number_and_count : infoset_num_to_states_count_[p]) {
+      SPIEL_CHECK_GE(number_and_count.first, 1);
+      SPIEL_CHECK_LE(number_and_count.first,
+                     infoset_num_to_states_count_[p].size());
+      max_value = std::max<int>(max_value, number_and_count.first);
+    }
+    SPIEL_CHECK_EQ(max_value, infoset_num_to_states_count_[p].size());
+  }
 }
 
 TabularPolicy EFGGameTabularPolicy(

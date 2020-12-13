@@ -15,8 +15,14 @@
 # Lint as: python3
 """Tests for open_spiel.integration_tests.api."""
 
+import collections
+import enum
+import re
+from typing import Callable, Dict, List, Tuple
 import unittest
 
+from absl import app
+from absl import flags
 from absl.testing import absltest
 from absl.testing import parameterized
 import numpy as np
@@ -25,6 +31,10 @@ from open_spiel.python.algorithms import get_all_states
 from open_spiel.python.algorithms import sample_some_states
 from open_spiel.python.observation import make_observation
 import pyspiel
+
+FLAGS = flags.FLAGS
+flags.DEFINE_string("test_only_games", ".*",
+                    "Test only selected games (regex). Defaults to all.")
 
 _ALL_GAMES = pyspiel.registered_games()
 
@@ -88,10 +98,6 @@ PERFECT_RECALL_NUM_STATES = {
     "tiny_hanabi": 8,
     "nf_auction": 2,
 }
-
-# Some tests run for a fixed time budget.
-# This specified approximately how many seconds they should run.
-TIMEABLE_TEST_RUNTIME = 1
 
 
 class EnforceAPIOnFullTreeBase(parameterized.TestCase):
@@ -255,6 +261,11 @@ class EnforceAPIOnFullTreeBase(parameterized.TestCase):
       self.assertLen(union, sum([len(x) for x in information_sets_per_player]))
 
 
+class Relation(enum.Enum):
+  SUBSET_OR_EQUALS = 1
+  EQUALS = 2
+
+
 class EnforceAPIOnPartialTreeBase(parameterized.TestCase):
   """This only partially test some properties."""
 
@@ -262,13 +273,34 @@ class EnforceAPIOnPartialTreeBase(parameterized.TestCase):
   def setUpClass(cls):
     super(EnforceAPIOnPartialTreeBase, cls).setUpClass()
 
-    cls.some_states = set(
-        sample_some_states.sample_some_states(
-            cls.game,
-            max_states=-1,  # Limit only by time.
-            time_limit=TIMEABLE_TEST_RUNTIME,
-            depth_limit=7).values())
+    cls.some_states = sample_some_states.sample_some_states(cls.game,
+                                                            max_states=400)
     cls.game_type = cls.game.get_type()
+
+  def test_sequence_lengths(self):
+    try:
+      max_history_len = self.game.max_history_length()
+      max_move_number = self.game.max_move_number()
+      max_chance_nodes_in_history = self.game.max_chance_nodes_in_history()
+    except RuntimeError:
+      return  # The function is likely not implemented, so skip the test.
+
+    self.assertGreater(max_history_len, 0)
+    self.assertGreater(max_move_number, 0)
+    if self.game_type.chance_mode == pyspiel.GameType.ChanceMode.DETERMINISTIC:
+      self.assertEqual(max_chance_nodes_in_history, 0)
+    else:
+      self.assertGreater(max_chance_nodes_in_history, 0)
+
+    for state in self.some_states:
+      self.assertLessEqual(len(state.full_history()), max_history_len)
+      self.assertLessEqual(state.move_number(), max_move_number)
+
+      chance_nodes_in_history = 0
+      for item in state.full_history():
+        if item.player == pyspiel.PlayerId.CHANCE:
+          chance_nodes_in_history += 1
+      self.assertLessEqual(chance_nodes_in_history, max_chance_nodes_in_history)
 
   def test_observations_raises_error_on_invalid_player(self):
     game = self.game
@@ -278,8 +310,9 @@ class EnforceAPIOnPartialTreeBase(parameterized.TestCase):
 
     for state in self.some_states:
       if game_type.provides_information_state_string:
-        for p in range(num_players):
-          state.information_state_string(p)
+        if not state.is_chance_node():
+          for p in range(num_players):
+            state.information_state_string(p)
         msg = f"information_state_string did not raise an error for {game_name}"
         with self.assertRaisesRegex(RuntimeError, "player >= 0", msg=msg):
           state.information_state_string(-1)
@@ -287,9 +320,10 @@ class EnforceAPIOnPartialTreeBase(parameterized.TestCase):
           state.information_state_string(num_players + 1)
 
       if game_type.provides_information_state_tensor:
-        for p in range(num_players):
-          v = state.information_state_tensor(p)
-          self.assertLen(v, game.information_state_tensor_size())
+        if not state.is_chance_node():
+          for p in range(num_players):
+            v = state.information_state_tensor(p)
+            self.assertLen(v, game.information_state_tensor_size())
         msg = f"information_state_tensor did not raise an error for {game_name}"
         with self.assertRaisesRegex(RuntimeError, "player >= 0", msg=msg):
           state.information_state_tensor(-1)
@@ -297,9 +331,10 @@ class EnforceAPIOnPartialTreeBase(parameterized.TestCase):
           state.information_state_tensor(num_players + 1)
 
       if game_type.provides_observation_tensor:
-        for p in range(num_players):
-          v = state.observation_tensor(p)
-          self.assertLen(v, game.observation_tensor_size())
+        if not state.is_chance_node():
+          for p in range(num_players):
+            v = state.observation_tensor(p)
+            self.assertLen(v, game.observation_tensor_size())
         msg = f"observation_tensor did not raise an error for {game_name}"
         with self.assertRaisesRegex(RuntimeError, "player >= 0", msg=msg):
           state.observation_tensor(-1)
@@ -307,8 +342,9 @@ class EnforceAPIOnPartialTreeBase(parameterized.TestCase):
           state.observation_tensor(num_players + 1)
 
       if game_type.provides_observation_string:
-        for p in range(num_players):
-          state.observation_string(p)
+        if not state.is_chance_node():
+          for p in range(num_players):
+            state.observation_string(p)
         msg = f"observation_string did not raise an error for {game_name}"
         with self.assertRaisesRegex(RuntimeError, "player >= 0", msg=msg):
           state.observation_string(-1)
@@ -388,6 +424,114 @@ class EnforceAPIOnPartialTreeBase(parameterized.TestCase):
       self.assertNotEqual(
           public_observation.string_from(state, 0),
           pyspiel.PublicObservation.INVALID)
+
+  def _check_partition_consistency(
+      self, partition_callbacks: Dict[str, Callable[[int, pyspiel.State], str]],
+      partition_relations: List[Tuple[str, Relation, str]]):
+
+    for player in range(self.game.num_players()):
+      states_representations = collections.defaultdict(dict)
+      partitioned_sets = {
+          name: collections.defaultdict(set)
+          for name in partition_callbacks.keys()
+      }
+      for state in self.some_states:
+        history = state.history_str()
+        for name, callback in partition_callbacks.items():
+          representation = callback(player, state)
+          states_representations[history][name] = representation
+          partitioned_sets[name][representation].add(history)
+
+      for x, relation, y in partition_relations:
+        for state in self.some_states:
+          history = state.history_str()
+          rep_x = states_representations[history][x]
+          rep_y = states_representations[history][y]
+          histories_x = partitioned_sets[x][rep_x]
+          histories_y = partitioned_sets[y][rep_y]
+          if relation == Relation.EQUALS:
+            if histories_x != histories_y:
+              self.assertEqual(
+                  histories_x, histories_y,
+                  self._show_error(player, state, x, relation, y, rep_x, rep_y,
+                                   histories_x, histories_y))
+          elif relation == Relation.SUBSET_OR_EQUALS:
+            if not histories_x.issubset(histories_y):
+              self.assertTrue(
+                  histories_x.issubset(histories_y),
+                  self._show_error(player, state, x, relation, y, rep_x, rep_y,
+                                   histories_x, histories_y))
+          else:
+            raise RuntimeError(f"Unknown relation {relation}")
+
+  def _show_error(self, pl, state, x, relation, y, rep_x, rep_y, histories_x,
+                  histories_y):
+    s = "Observation consistency failed.\n"
+    s += f"It should hold that partition of '{x}' is {relation} of '{y}'\n"
+    s += "Problem occurred while evaluating action history "
+    s += f"'{state.history_str()}' for player {pl}.\n"
+    s += f"The state representation is:\n{state}\n"
+    s += "-" * 80
+    s += "\nDetailed information:\n"
+    s += f"The set of histories that have the same '{x}':\n{histories_x}\n"
+    s += f"The set of histories that have the same '{y}':\n{histories_y}\n"
+    s += f"The set difference is:\n{histories_y - histories_x}\n"
+    s += f"The problematic {x} is '{rep_x}'\n"
+    s += f"The problematic {y} is '{rep_y}'\n"
+    return s
+
+  def test_observation_consistency(self):
+    if self.game_type.dynamics != pyspiel.GameType.Dynamics.SEQUENTIAL:
+      return  # TODO(author13): support also other types of games.
+
+    # TODO(author13): Following games need to be fixed -- they currently
+    # do not pass the observation consistency test.
+    broken_games = [
+        "first_sealed_auction", "hearts", "kuhn_poker", "leduc_poker",
+        "lewis_signaling", "liars_dice", "pentago", "phantom_ttt",
+        "tiny_bridge_2p", "tiny_bridge_4p", "tiny_hanabi", "universal_poker"
+    ]
+    if self.game_name in broken_games:
+      return
+
+    callbacks = dict()
+    callbacks["move_number"] = lambda _, state: str(state.move_number())
+    # pylint: disable=g-long-lambda
+    if self.game_type.provides_information_state_string:
+      callbacks["information_state_string"] = lambda player, state: \
+        state.information_state_string(player)
+    if self.game_type.provides_observation_string:
+      callbacks["action_observation_history"] = lambda player, state: \
+        str(pyspiel.ActionObservationHistory(player, state))
+    if self.game_type.provides_factored_observation_string:
+      callbacks["public_observation_history"] = lambda player, state: \
+        str(pyspiel.PublicObservationHistory(state))
+
+    # TODO(author13): Add testing of tensor variants.
+
+    relations = []
+
+    def add_relation(x, relation, y):
+      if x in callbacks and y in callbacks:
+        relations.append((x, relation, y))
+
+    # All observations should be subsets of move_number.
+    add_relation("information_state_string", Relation.SUBSET_OR_EQUALS,
+                 "move_number")
+    add_relation("public_observation_history", Relation.SUBSET_OR_EQUALS,
+                 "move_number")
+    add_relation("action_observation_history", Relation.SUBSET_OR_EQUALS,
+                 "move_number")
+
+    # Other relations:
+    add_relation("information_state_string", Relation.EQUALS,
+                 "action_observation_history")
+    add_relation("information_state_string", Relation.SUBSET_OR_EQUALS,
+                 "public_observation_history")
+    add_relation("action_observation_history", Relation.SUBSET_OR_EQUALS,
+                 "public_observation_history")
+
+    self._check_partition_consistency(callbacks, relations)
 
 
 def _assert_properties_recursive(state, assert_functions):
@@ -568,6 +712,8 @@ def _assert_is_perfect_recall_recursive(state, current_history,
 def _create_test_case_classes():
   """Yields one Testing class per game to test."""
   for game_name, game_string in _GAMES_FULL_TREE_TRAVERSAL_TESTS:
+    if not re.match(FLAGS.test_only_games, game_string):
+      continue
     game = pyspiel.load_game(game_string)
     new_class = type("EnforceAPIFullTree_{}_Test".format(game_name),
                      (EnforceAPIOnFullTreeBase,), {})
@@ -576,6 +722,8 @@ def _create_test_case_classes():
     yield new_class
 
   for game_name in _GAMES_TO_TEST:
+    if not re.match(FLAGS.test_only_games, game_name):
+      continue
     game = pyspiel.load_game(game_name)
     new_class = type("EnforceAPIPartialTree_{}_Test".format(game_name),
                      (EnforceAPIOnPartialTreeBase,), {})
@@ -598,5 +746,10 @@ def load_tests(loader, tests, pattern):  # pylint: disable=invalid-name,g-doc-ar
   return unittest.TestSuite(tests=tests)
 
 
-if __name__ == "__main__":
+def main(_):
   absltest.main()
+
+
+if __name__ == "__main__":
+  # Necessary to run main via app.run for internal tests.
+  app.run(main)

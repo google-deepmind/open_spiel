@@ -22,6 +22,7 @@
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/tests/basic_tests.h"
+#include "open_spiel/utils/init.h"
 
 namespace open_spiel {
 namespace efg_game {
@@ -75,9 +76,18 @@ void EFGGameSimTestsSignalingFromData() {
   testing::RandomSimTestNoSerialize(*game, 100);
 }
 
+void EFGGameSimpleForkFromData() {
+  std::shared_ptr<const Game> game = LoadEFGGame(GetSimpleForkEFGData());
+  SPIEL_CHECK_TRUE(game != nullptr);
+
+  // EFG games loaded directly via string cannot be properly deserialized
+  // because there is no way to pass the data back vai the game string.
+  testing::RandomSimTestNoSerialize(*game, 100);
+}
+
 void EFGGameSimTestsSampleFromFile() {
   absl::optional<std::string> file = FindFile(kSampleFilename, 2);
-  if (file != std::nullopt) {
+  if (file != absl::nullopt) {
     std::cout << "Found file: " << file.value() << "; running sim test.";
     std::shared_ptr<const Game> game =
         LoadGame("efg_game", {{"filename", GameParameter(file.value())}});
@@ -88,7 +98,7 @@ void EFGGameSimTestsSampleFromFile() {
 
 void EFGGameSimTestsKuhnFromFile() {
   absl::optional<std::string> file = FindFile(kKuhnFilename, 2);
-  if (file != std::nullopt) {
+  if (file != absl::nullopt) {
     std::cout << "Found file: " << file.value() << "; running sim test.";
     std::shared_ptr<const Game> game =
         LoadGame("efg_game", {{"filename", GameParameter(file.value())}});
@@ -107,7 +117,7 @@ void EFGGameSimTestsKuhnFromFile() {
 
 void EFGGameSimTestsLeducFromFile() {
   absl::optional<std::string> file = FindFile(kLeducFilename, 2);
-  if (file != std::nullopt) {
+  if (file != absl::nullopt) {
     std::cout << "Found file: " << file.value() << "; running sim test.";
     std::shared_ptr<const Game> game =
         LoadGame("efg_game", {{"filename", GameParameter(file.value())}});
@@ -126,7 +136,7 @@ void EFGGameSimTestsLeducFromFile() {
 
 void EFGGameSimTestsSignalingFromFile() {
   absl::optional<std::string> file = FindFile(kSignalingFilename, 2);
-  if (file != std::nullopt) {
+  if (file != absl::nullopt) {
     std::cout << "Found file: " << file.value() << "; running sim test.";
     std::shared_ptr<const Game> game =
         LoadGame("efg_game", {{"filename", GameParameter(file.value())}});
@@ -148,6 +158,7 @@ void EFGGameSimTestsSignalingFromFile() {
 }  // namespace open_spiel
 
 int main(int argc, char** argv) {
+  open_spiel::Init("", &argc, &argv, true);
   open_spiel::efg_game::EFGGameSimTestsSampleFromData();
   open_spiel::efg_game::EFGGameSimTestsKuhnFromData();
   open_spiel::efg_game::EFGGameSimTestsSampleFromFile();
@@ -155,4 +166,5 @@ int main(int argc, char** argv) {
   open_spiel::efg_game::EFGGameSimTestsLeducFromFile();
   open_spiel::efg_game::EFGGameSimTestsSignalingFromData();
   open_spiel::efg_game::EFGGameSimTestsSignalingFromFile();
+  open_spiel::efg_game::EFGGameSimpleForkFromData();
 }

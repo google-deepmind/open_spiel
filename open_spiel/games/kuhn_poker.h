@@ -106,12 +106,10 @@ class KuhnGame : public Game {
   double MinUtility() const override;
   double MaxUtility() const override;
   double UtilitySum() const override { return 0; }
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new KuhnGame(*this));
-  }
   std::vector<int> InformationStateTensorShape() const override;
   std::vector<int> ObservationTensorShape() const override;
   int MaxGameLength() const override { return num_players_ * 2 - 1; }
+  int MaxChanceNodesInHistory() const override { return num_players_; }
   std::shared_ptr<Observer> MakeObserver(
       absl::optional<IIGObservationType> iig_obs_type,
       const GameParameters& params) const override;

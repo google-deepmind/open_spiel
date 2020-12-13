@@ -87,10 +87,9 @@ class TinyBridgeGame2p : public Game {
   double MinUtility() const override { return -40; }  // Bid 2NT, 0 tricks
   double MaxUtility() const override { return 35; }   // Bid 2NT, 2 tricks
   int MaxGameLength() const override { return 8; }
+  // TODO: verify whether this bound is tight and/or tighten it.
+  int MaxChanceNodesInHistory() const override { return MaxGameLength(); }
   int MaxChanceOutcomes() const override { return kNumPrivates; }
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new TinyBridgeGame2p(*this));
-  }
   std::vector<int> InformationStateTensorShape() const override {
     return {(is_abstracted_ ? kNumAbstractHands : kDeckSize) +
             kNumActions2p * 2};
@@ -114,10 +113,9 @@ class TinyBridgeGame4p : public Game {
   double UtilitySum() const override { return 0; }
   double MaxUtility() const override { return 160; }
   int MaxGameLength() const override { return 57; }
+  // TODO: verify whether this bound is tight and/or tighten it.
+  int MaxChanceNodesInHistory() const override { return MaxGameLength(); }
   int MaxChanceOutcomes() const override { return kNumPrivates; }
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new TinyBridgeGame4p(*this));
-  }
   std::vector<int> InformationStateTensorShape() const override {
     return {kDeckSize + (kNumBids * 3 + 1) * NumPlayers()};
   }
@@ -136,9 +134,6 @@ class TinyBridgePlayGame : public Game {
   double MinUtility() const override { return 0; }
   double MaxUtility() const override { return kNumTricks; }
   int MaxGameLength() const override { return 8; }
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new TinyBridgePlayGame(*this));
-  }
 };
 
 // State of an in-progress auction, either 2p or 4p.

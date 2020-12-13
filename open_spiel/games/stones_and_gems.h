@@ -257,7 +257,7 @@ class StonesNGemsState : public State {
                    int magic_wall_steps, bool magic_active, int blob_max_size,
                    int blob_size, int blob_chance, Element blob_swap,
                    bool blob_enclosed, int gems_required, int gems_collected,
-                   int current_reward, int sum_reward, Grid grid, int rng_seed,
+                   int current_reward, int sum_reward, Grid grid,
                    bool obs_show_ids, int id_counter, Player player);
 
   Player CurrentPlayer() const override;
@@ -280,6 +280,8 @@ class StonesNGemsState : public State {
   void DoApplyAction(Action move_id) override;
 
  private:
+  std::mt19937* rng();
+
   int IndexFromAction(int index, int action) const;
   bool InBounds(int index, int action = Directions::kNone) const;
   bool IsType(int index, Element element, int action = Directions::kNone) const;
@@ -320,22 +322,21 @@ class StonesNGemsState : public State {
   void StartScan();
   void EndScan();
 
-  int steps_remaining_;       // Max steps before game over
-  int magic_wall_steps_;      // steps before magic wall expire (after active)
-  bool magic_active_;         // flag for magic wall state
-  int blob_max_size_;         // size before blobs collapse
-  int blob_size_;             // current number of blobs
-  int blob_chance_;           // Chance to spawn another blob (out of 256)
-  Element blob_swap_;         // Element which blobs swap to
-  bool blob_enclosed_;        // internal flag to check if blob trapped
-  int gems_required_;         // gems required to open exit
-  int gems_collected_;        // gems collected thus far
-  int current_reward_;        // reset at every step
-  int sum_reward_;            // cumulative reward
-  Grid grid_;                 // grid representing elements/positions
-  mutable std::mt19937 rng_;  // Internal rng
-  bool obs_show_ids_;         // Flag to show IDs in observation tensor
-  int id_counter_;            // Next ID tracker
+  int steps_remaining_;   // Max steps before game over
+  int magic_wall_steps_;  // steps before magic wall expire (after active)
+  bool magic_active_;     // flag for magic wall state
+  int blob_max_size_;     // size before blobs collapse
+  int blob_size_;         // current number of blobs
+  int blob_chance_;       // Chance to spawn another blob (out of 256)
+  Element blob_swap_;     // Element which blobs swap to
+  bool blob_enclosed_;    // internal flag to check if blob trapped
+  int gems_required_;     // gems required to open exit
+  int gems_collected_;    // gems collected thus far
+  int current_reward_;    // reset at every step
+  int sum_reward_;        // cumulative reward
+  Grid grid_;             // grid representing elements/positions
+  bool obs_show_ids_;     // Flag to show IDs in observation tensor
+  int id_counter_;        // Next ID tracker
 
   Player cur_player_ = -1;  // Player to play.
 };
@@ -349,32 +350,34 @@ class StonesNGemsGame : public Game {
     return std::unique_ptr<State>(new StonesNGemsState(
         shared_from_this(), max_steps_, magic_wall_steps_, false,
         blob_max_size_, 0, blob_chance_, kNullElement, true, gems_required_, 0,
-        0, 0, grid_, ++rng_seed_, obs_show_ids_, 0, 0));
+        0, 0, grid_, obs_show_ids_, 0, 0));
   }
   int MaxGameLength() const override;
   int NumPlayers() const override;
   int MaxChanceOutcomes() const override { return 1; }
   double MinUtility() const override;
   double MaxUtility() const override;
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new StonesNGemsGame(*this));
-  }
   std::vector<int> ObservationTensorShape() const override;
   std::unique_ptr<State> DeserializeState(
       const std::string& str) const override;
+  std::string GetRNGState() const override;
+  void SetRNGState(const std::string& rng_state) const override;
+
+  std::mt19937* rng() const { return &rng_; }
 
  protected:
   Grid ParseGrid(const std::string& grid_string, double blob_max_percentage);
 
  private:
-  bool obs_show_ids_;     // Flag to show IDs in observation tensor
-  int magic_wall_steps_;  // steps before magic wall expire (after active)
-  int blob_chance_;       // Chance to spawn another blob (out of 256)
-  mutable int rng_seed_;  // Seed for stochastic element transitions
-  Grid grid_;             // grid representing elements/positions
-  int max_steps_;         // Max steps before game over
-  int gems_required_;     // gems required to open exit
-  int blob_max_size_;     // size before blobs collapse
+  bool obs_show_ids_;         // Flag to show IDs in observation tensor
+  int magic_wall_steps_;      // steps before magic wall expire (after active)
+  int blob_chance_;           // Chance to spawn another blob (out of 256)
+  mutable int rng_seed_;      // Seed for stochastic element transitions
+  mutable std::mt19937 rng_;  // Internal rng
+  Grid grid_;                 // grid representing elements/positions
+  int max_steps_;             // Max steps before game over
+  int gems_required_;         // gems required to open exit
+  int blob_max_size_;         // size before blobs collapse
 };
 
 }  // namespace stones_and_gems

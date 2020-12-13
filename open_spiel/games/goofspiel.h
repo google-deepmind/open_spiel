@@ -77,6 +77,8 @@ enum class ReturnsType {
 
 inline constexpr const int kInvalidCard = -1;
 
+class GoofspielObserver;
+
 class GoofspielState : public SimMoveState {
  public:
   explicit GoofspielState(std::shared_ptr<const Game> game, int num_cards,
@@ -105,6 +107,7 @@ class GoofspielState : public SimMoveState {
   void DoApplyActions(const std::vector<Action>& actions) override;
 
  private:
+  friend class GoofspielObserver;
   // Increments the count and increments the player mod num_players_.
   void NextPlayer(int* count, Player* player) const;
   void DealPointCard(int point_card);
@@ -122,7 +125,7 @@ class GoofspielState : public SimMoveState {
   std::vector<int> points_;
   std::vector<std::vector<bool>> player_hands_;  // true if card is in hand.
   std::vector<int> point_card_sequence_;
-  std::vector<int> win_sequence_;  // Which player won
+  std::vector<Player> win_sequence_;  // Which player won, kInvalidPlayer if tie
   std::vector<std::vector<Action>> actions_history_;
 };
 
@@ -137,12 +140,27 @@ class GoofspielGame : public Game {
   double MinUtility() const override;
   double MaxUtility() const override;
   double UtilitySum() const override { return 0; }
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new GoofspielGame(*this));
-  }
   std::vector<int> InformationStateTensorShape() const override;
   std::vector<int> ObservationTensorShape() const override;
   int MaxGameLength() const override { return num_cards_; }
+  std::shared_ptr<Observer> MakeObserver(
+      absl::optional<IIGObservationType> iig_obs_type,
+      const GameParameters& params) const override;
+
+  int NumCards() const { return num_cards_; }
+  int NumRounds() const { return num_cards_; }
+  PointsOrder GetPointsOrder() const { return points_order_; }
+  ReturnsType GetReturnsType() const { return returns_type_; }
+  bool IsImpInfo() const { return impinfo_; }
+  int MaxPointSlots() const { return (NumCards() * (NumCards() + 1)) / 2 + 1; }
+
+  // Used to implement the old observation API.
+  std::shared_ptr<GoofspielObserver> default_observer_;
+  std::shared_ptr<GoofspielObserver> info_state_observer_;
+  std::shared_ptr<GoofspielObserver> public_observer_;
+  std::shared_ptr<GoofspielObserver> private_observer_;
+  // TODO: verify whether this bound is tight and/or tighten it.
+  int MaxChanceNodesInHistory() const override { return MaxGameLength(); }
 
  private:
   int num_cards_;    // The K in Goofspiel(K)

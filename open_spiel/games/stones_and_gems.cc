@@ -17,9 +17,9 @@
 #include <sys/types.h>
 
 #include <algorithm>  // std::find, min
-#include <unordered_map>
 #include <utility>
 
+#include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
@@ -190,7 +190,7 @@ struct ElementHash {
 
 // ----- Conversion maps -----
 // Swap map for DeserializeState
-const std::unordered_map<int, Element> kCellTypeToElement{
+const absl::flat_hash_map<int, Element> kCellTypeToElement{
     {static_cast<int>(HiddenCellType::kNull), kNullElement},
     {static_cast<int>(HiddenCellType::kAgent), kElAgent},
     {static_cast<int>(HiddenCellType::kEmpty), kElEmpty},
@@ -242,7 +242,7 @@ const std::unordered_map<int, Element> kCellTypeToElement{
 };
 
 // Rotate actions right
-const std::unordered_map<int, int> kRotateRight{
+const absl::flat_hash_map<int, int> kRotateRight{
     {Directions::kUp, Directions::kRight},
     {Directions::kRight, Directions::kDown},
     {Directions::kDown, Directions::kLeft},
@@ -251,7 +251,7 @@ const std::unordered_map<int, int> kRotateRight{
 };
 
 // Rotate actions left
-const std::unordered_map<int, int> kRotateLeft{
+const absl::flat_hash_map<int, int> kRotateLeft{
     {Directions::kUp, Directions::kLeft},
     {Directions::kLeft, Directions::kDown},
     {Directions::kDown, Directions::kRight},
@@ -260,14 +260,14 @@ const std::unordered_map<int, int> kRotateLeft{
 };
 
 // actions to strings
-const std::unordered_map<int, std::string> kActionsToString{
+const absl::flat_hash_map<int, std::string> kActionsToString{
     {Directions::kUp, "up"},     {Directions::kLeft, "left"},
     {Directions::kDown, "down"}, {Directions::kRight, "right"},
     {Directions::kNone, "none"},
 };
 
 // directions to offsets (col, row)
-const std::unordered_map<int, std::pair<int, int>> kDirectionOffsets{
+const absl::flat_hash_map<int, std::pair<int, int>> kDirectionOffsets{
     {Directions::kUp, {0, -1}},   {Directions::kUpLeft, {-1, -1}},
     {Directions::kLeft, {-1, 0}}, {Directions::kDownLeft, {-1, 1}},
     {Directions::kDown, {0, 1}},  {Directions::kDownRight, {1, 1}},
@@ -276,7 +276,7 @@ const std::unordered_map<int, std::pair<int, int>> kDirectionOffsets{
 };
 
 // Directions to fireflys
-const std::unordered_map<int, Element> kDirectionToFirefly{
+const absl::flat_hash_map<int, Element> kDirectionToFirefly{
     {Directions::kUp, kElFireflyUp},
     {Directions::kLeft, kElFireflyLeft},
     {Directions::kDown, kElFireflyDown},
@@ -284,7 +284,7 @@ const std::unordered_map<int, Element> kDirectionToFirefly{
 };
 
 // Firefly to directions
-const std::unordered_map<Element, int, ElementHash> kFireflyToDirection{
+const absl::flat_hash_map<Element, int, ElementHash> kFireflyToDirection{
     {kElFireflyUp, Directions::kUp},
     {kElFireflyLeft, Directions::kLeft},
     {kElFireflyDown, Directions::kDown},
@@ -292,7 +292,7 @@ const std::unordered_map<Element, int, ElementHash> kFireflyToDirection{
 };
 
 // Directions to butterflys
-const std::unordered_map<int, Element> kDirectionToButterfly{
+const absl::flat_hash_map<int, Element> kDirectionToButterfly{
     {Directions::kUp, kElButterflyUp},
     {Directions::kLeft, kElButterflyLeft},
     {Directions::kDown, kElButterflyDown},
@@ -300,7 +300,7 @@ const std::unordered_map<int, Element> kDirectionToButterfly{
 };
 
 // Butterfly to directions
-const std::unordered_map<Element, int, ElementHash> kButterflyToDirection{
+const absl::flat_hash_map<Element, int, ElementHash> kButterflyToDirection{
     {kElButterflyUp, Directions::kUp},
     {kElButterflyLeft, Directions::kLeft},
     {kElButterflyDown, Directions::kDown},
@@ -308,7 +308,7 @@ const std::unordered_map<Element, int, ElementHash> kButterflyToDirection{
 };
 
 // Orange to directions
-const std::unordered_map<Element, int, ElementHash> kOrangeToDirection{
+const absl::flat_hash_map<Element, int, ElementHash> kOrangeToDirection{
     {kElOrangeUp, Directions::kUp},
     {kElOrangeLeft, Directions::kLeft},
     {kElOrangeDown, Directions::kDown},
@@ -316,7 +316,7 @@ const std::unordered_map<Element, int, ElementHash> kOrangeToDirection{
 };
 
 // Direction to Orange
-const std::unordered_map<int, Element> kDirectionToOrange{
+const absl::flat_hash_map<int, Element> kDirectionToOrange{
     {Directions::kUp, kElOrangeUp},
     {Directions::kLeft, kElOrangeLeft},
     {Directions::kDown, kElOrangeDown},
@@ -324,7 +324,7 @@ const std::unordered_map<int, Element> kDirectionToOrange{
 };
 
 // Element explosion maps
-const std::unordered_map<Element, Element, ElementHash> kElementToExplosion{
+const absl::flat_hash_map<Element, Element, ElementHash> kElementToExplosion{
     {kElFireflyUp, kElExplosionEmpty},
     {kElFireflyLeft, kElExplosionEmpty},
     {kElFireflyDown, kElExplosionEmpty},
@@ -343,33 +343,33 @@ const std::unordered_map<Element, Element, ElementHash> kElementToExplosion{
 };
 
 // Explosions back to elements
-const std::unordered_map<Element, Element, ElementHash> kExplosionToElement{
+const absl::flat_hash_map<Element, Element, ElementHash> kExplosionToElement{
     {kElExplosionDiamond, kElDiamond},
     {kElExplosionBoulder, kElStone},
     {kElExplosionEmpty, kElEmpty},
 };
 
 // Magic wall conversion map
-const std::unordered_map<Element, Element, ElementHash> kMagicWallConversion{
+const absl::flat_hash_map<Element, Element, ElementHash> kMagicWallConversion{
     {kElStoneFalling, kElDiamondFalling},
     {kElDiamondFalling, kElStoneFalling},
 };
 
 // Gem point maps
-const std::unordered_map<Element, int, ElementHash> kGemPoints{
+const absl::flat_hash_map<Element, int, ElementHash> kGemPoints{
     {kElDiamond, 10},
     {kElDiamondFalling, 10},
 };
 
 // Gate open conversion map
-const std::unordered_map<Element, Element, ElementHash> kGateOpenMap{
+const absl::flat_hash_map<Element, Element, ElementHash> kGateOpenMap{
     {kElGateRedClosed, kElGateRedOpen},
     {kElGateBlueClosed, kElGateBlueOpen},
     {kElGateGreenClosed, kElGateGreenOpen},
     {kElGateYellowClosed, kElGateYellowOpen},
 };
 // Gate key map
-const std::unordered_map<Element, Element, ElementHash> kKeyToGate{
+const absl::flat_hash_map<Element, Element, ElementHash> kKeyToGate{
     {kElKeyRed, kElGateRedClosed},
     {kElKeyBlue, kElGateBlueClosed},
     {kElKeyGreen, kElGateGreenClosed},
@@ -377,7 +377,7 @@ const std::unordered_map<Element, Element, ElementHash> kKeyToGate{
 };
 
 // Stationary to falling
-const std::unordered_map<Element, Element, ElementHash> kElToFalling{
+const absl::flat_hash_map<Element, Element, ElementHash> kElToFalling{
     {kElDiamond, kElDiamondFalling},
     {kElStone, kElStoneFalling},
     {kElNut, kElNutFalling},
@@ -491,6 +491,10 @@ void StonesNGemsState::ObservationTensor(Player player,
 
 int StonesNGemsState::CurrentPlayer() const {
   return IsTerminal() ? kTerminalPlayerId : cur_player_;
+}
+
+std::mt19937 *StonesNGemsState::rng() {
+  return static_cast<const StonesNGemsGame *>(game_.get())->rng();
 }
 
 // Element helper functions
@@ -938,7 +942,7 @@ void StonesNGemsState::UpdateOrange(int index, int action) {
     }
     // Roll available directions
     if (!open_dirs.empty()) {
-      int new_dir = open_dirs[rng_() % open_dirs.size()];
+      int new_dir = open_dirs[(*rng())() % open_dirs.size()];
       SetItem(index, kDirectionToOrange.at(new_dir), grid_.ids[index]);
     }
   }
@@ -967,8 +971,8 @@ void StonesNGemsState::UpdateBlob(int index) {
     blob_enclosed_ = false;
   }
   // Roll if to grow and direction
-  bool will_grow = (rng_() % 256) < blob_chance_;
-  int grow_dir = rng_() % kNumActions;
+  bool will_grow = ((*rng())() % 256) < blob_chance_;
+  int grow_dir = (*rng())() % kNumActions;
   if (will_grow &&
       (IsType(index, kElEmpty, grow_dir) || IsType(index, kElDirt, grow_dir))) {
     SetItem(index, kElBlob, grow_dir, ++id_counter_);
@@ -1144,7 +1148,7 @@ StonesNGemsState::StonesNGemsState(
     bool magic_active, int blob_max_size, int blob_size, int blob_chance,
     Element blob_swap, bool blob_enclosed, int gems_required,
     int gems_collected, int current_reward, int sum_reward, Grid grid,
-    int rng_seed, bool obs_show_ids, int id_counter, Player player)
+    bool obs_show_ids, int id_counter, Player player)
     : State(game),
       steps_remaining_(steps_remaining),
       magic_wall_steps_(magic_wall_steps),
@@ -1159,7 +1163,6 @@ StonesNGemsState::StonesNGemsState(
       current_reward_(current_reward),
       sum_reward_(sum_reward),
       grid_(grid),
-      rng_(rng_seed),
       obs_show_ids_(obs_show_ids),
       id_counter_(id_counter),
       cur_player_(player) {
@@ -1245,7 +1248,19 @@ std::unique_ptr<State> StonesNGemsGame::DeserializeState(
       shared_from_this(), steps_remaining, magic_wall_steps, magic_active,
       blob_max_size, blob_size, blob_chance, blob_swap, blob_enclosed,
       gems_required, gems_collected, current_reward, sum_reward, grid,
-      ++rng_seed_, obs_show_ids, id_counter, cur_player));
+      obs_show_ids, id_counter, cur_player));
+}
+
+std::string StonesNGemsGame::GetRNGState() const {
+  std::ostringstream rng_stream;
+  rng_stream << rng_;
+  return rng_stream.str();
+}
+
+void StonesNGemsGame::SetRNGState(const std::string &rng_state) const {
+  if (rng_state.empty()) return;
+  std::istringstream rng_stream(rng_state);
+  rng_stream >> rng_;
 }
 
 int StonesNGemsGame::NumDistinctActions() const { return kNumActions; }

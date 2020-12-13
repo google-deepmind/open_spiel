@@ -103,15 +103,12 @@ class WrappedGame : public Game {
   WrappedGame(std::shared_ptr<const Game> game, GameType game_type,
               GameParameters game_parameters)
       : Game(game_type, game_parameters), game_(game) {}
-  WrappedGame(const WrappedGame& other)
-      : Game(other), game_(other.game_->Clone()) {}
 
   int NumDistinctActions() const override {
     return game_->NumDistinctActions();
   }
 
   std::unique_ptr<State> NewInitialState() const override = 0;
-  std::shared_ptr<const Game> Clone() const override = 0;
 
   int MaxChanceOutcomes() const override { return game_->MaxChanceOutcomes(); }
   int NumPlayers() const override { return game_->NumPlayers(); }
@@ -128,6 +125,9 @@ class WrappedGame : public Game {
   }
 
   int MaxGameLength() const override { return game_->MaxGameLength(); }
+  int MaxChanceNodesInHistory() const override {
+    return game_->MaxChanceNodesInHistory();
+  }
 
  protected:
   std::shared_ptr<const Game> game_;

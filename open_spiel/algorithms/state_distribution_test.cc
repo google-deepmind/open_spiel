@@ -14,6 +14,7 @@
 
 #include "open_spiel/algorithms/state_distribution.h"
 
+#include "open_spiel/canonical_game_strings.h"
 #include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
@@ -98,6 +99,7 @@ void LeducStateDistributionTest() {
       UpdateIncrementalStateDistribution(*state, &uniform_policy,
                                          /*player_id=*/1, nullptr);
   std::cerr << "Comparing dists 1..." << std::endl;
+  SPIEL_CHECK_TRUE(incremental_dist);
   CompareDists(dist, *incremental_dist);
   CompareDists(dist, *CloneBeliefs(dist));
   std::cerr << "Check infostates2..." << std::endl;
@@ -150,6 +152,9 @@ constexpr absl::string_view kHUNLGameString =
      "1,raiseSize=100 100 100 100)");
 
 void HUNLIncrementalTest() {
+  // universal_poker requires ACPC, which is an optional dependency.
+  // Skip this test if the game is not registered.
+  if (!IsGameRegistered(std::string(kHUNLGameString))) { return; }
   std::shared_ptr<const Game> game = LoadGame(std::string(kHUNLGameString));
   std::unique_ptr<State> state = game->NewInitialState();
   state->ApplyAction(14);  // p0 card: 5h
@@ -169,6 +174,78 @@ void HUNLIncrementalTest() {
   CheckDistHasSameInfostate(*incremental_dist, *state, /*player_id=*/0);
 }
 
+void LeducRegressionTest() {
+  std::shared_ptr<const Game> game = LoadGame("leduc_poker");
+  std::unique_ptr<State> state = game->NewInitialState();
+  UniformPolicy opponent_policy;
+  const int player_id = 1;
+  std::unique_ptr<HistoryDistribution> dist;
+  for (const Action action : {0, 5, 1, 2, 1, 4}) {
+    if (state->CurrentPlayer() == player_id) {
+      dist = UpdateIncrementalStateDistribution(*state, &opponent_policy,
+                                                player_id, std::move(dist));
+      algorithms::CheckBeliefs(*state, *dist, player_id);
+    }
+    state->ApplyAction(action);
+  }
+  dist = UpdateIncrementalStateDistribution(*state, &opponent_policy,
+                                              player_id, std::move(dist));
+  algorithms::CheckBeliefs(*state, *dist, player_id);
+}
+
+void LeducRegressionTestPerPlayer(int player_id) {
+  std::shared_ptr<const Game> game = LoadGame("leduc_poker");
+  std::unique_ptr<State> state = game->NewInitialState();
+  UniformPolicy opponent_policy;
+  std::unique_ptr<HistoryDistribution> dist;
+
+  // The first two actions are chance actions, then both players call. This was
+  // found to cause CheckBeliefs to fail previously, so we add a test verifying
+  // that doesn't happen.
+  for (const Action action : {4, 0, 2, 2}) {
+    if (state->CurrentPlayer() == player_id) {
+      dist = UpdateIncrementalStateDistribution(*state, &opponent_policy,
+                                                player_id, std::move(dist));
+      algorithms::CheckBeliefs(*state, *dist, player_id);
+    }
+    state->ApplyAction(action);
+  }
+  dist = UpdateIncrementalStateDistribution(*state, &opponent_policy, player_id,
+                                            std::move(dist));
+  algorithms::CheckBeliefs(*state, *dist, player_id);
+}
+
+void HunlRegressionTest() {
+  // universal_poker requires ACPC, which is an optional dependency.
+  // Skip this test if the game is not registered.
+  if (!IsGameRegistered(HunlGameString("fcpa"))) { return; }
+  std::shared_ptr<const Game> game = LoadGame(HunlGameString("fcpa"));
+  std::unique_ptr<State> state = game->NewInitialState();
+  for (const Action action : {0, 27, 43, 44, 2}) state->ApplyAction(action);
+  UniformPolicy opponent_policy;
+  std::unique_ptr<HistoryDistribution> dist =
+      UpdateIncrementalStateDistribution(*state, &opponent_policy,
+                                         state->CurrentPlayer(), nullptr);
+  algorithms::CheckBeliefs(*state, *dist, state->CurrentPlayer());
+}
+
+void GoofspielDistributionTest() {
+  std::shared_ptr<const Game> game =
+      LoadGame(TurnBasedGoofspielGameString(/*num_cards=*/4));
+  std::unique_ptr<State> state = game->NewInitialState();
+  std::unique_ptr<HistoryDistribution> dist;
+  UniformPolicy opponent_policy;
+  for (const Action action : {3, 3, 2, 1, 1}) {
+    dist = UpdateIncrementalStateDistribution(*state, &opponent_policy,
+                                              /*player_id=*/0, std::move(dist));
+    algorithms::CheckBeliefs(*state, *dist, state->CurrentPlayer());
+    state->ApplyAction(action);
+  }
+  dist = UpdateIncrementalStateDistribution(*state, &opponent_policy,
+                                            /*player_id=*/0, std::move(dist));
+  algorithms::CheckBeliefs(*state, *dist, /*player_id=*/0);
+}
+
 
 }  // namespace
 }  // namespace algorithms
@@ -179,10 +256,11 @@ namespace algorithms = open_spiel::algorithms;
 int main(int argc, char** argv) {
   algorithms::KuhnStateDistributionTest();
   algorithms::LeducStateDistributionTest();
-
-  // ACPC is an optional dependency. Only test HUNL if it is registered.
-  if (open_spiel::IsGameRegistered(std::string(algorithms::kHUNLGameString))) {
-    algorithms::HUNLIncrementalTest();
-  }
+  algorithms::HUNLIncrementalTest();
+  algorithms::HunlRegressionTest();
+  algorithms::GoofspielDistributionTest();
+  algorithms::LeducRegressionTest();
+  algorithms::LeducRegressionTestPerPlayer(/*player_id=*/0);
+  algorithms::LeducRegressionTestPerPlayer(/*player_id=*/1);
 
 }

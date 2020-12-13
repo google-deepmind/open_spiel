@@ -1,4 +1,4 @@
-FROM ubuntu:18.04 as base
+FROM ubuntu:20.04 as base
 RUN apt update
 RUN dpkg --add-architecture i386 && apt update
 RUN apt-get -y install \
@@ -19,15 +19,16 @@ RUN sudo pip3 install matplotlib
 
 # install
 COPY . .
+RUN DEBIAN_FRONTEND="noninteractive" apt-get -y install tzdata
 RUN ./install.sh
-RUN pip3 install --upgrade setuptools testresources 
+RUN pip3 install --upgrade setuptools testresources
 RUN pip3 install --upgrade -r requirements.txt
 RUN pip3 install --upgrade cmake
 
 # build and test
 RUN mkdir -p build
 WORKDIR /repo/build
-RUN cmake -DPython_TARGET_VERSION=${PYVERSION} -DCMAKE_CXX_COMPILER=`which clang++` ../open_spiel 
+RUN cmake -DPython3_EXECUTABLE=`which python3` -DCMAKE_CXX_COMPILER=`which clang++` ../open_spiel
 RUN make -j12
 ENV PYTHONPATH=${PYTHONPATH}:/repo
 ENV PYTHONPATH=${PYTHONPATH}:/repo/build/python

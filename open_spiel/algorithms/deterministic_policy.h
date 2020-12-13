@@ -82,7 +82,7 @@ class DeterministicTabularPolicy : public Policy {
   // Returns the current deterministic policy as a TabularPolicy.
   TabularPolicy GetTabularPolicy() const;
 
-  // Determinstic policies are ordered. First, we define some order to the
+  // Deterministic policies are ordered. First, we define some order to the
   // information states (which is the order defined by the legal_actions_map
   // for the game). Then the total order over policies is defined in a
   // "counting order according to their associated tuple (

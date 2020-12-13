@@ -1,6 +1,6 @@
 game: laser_tag(horizon=20)
 
-GameType.chance_mode = ChanceMode.DETERMINISTIC
+GameType.chance_mode = ChanceMode.EXPLICIT_STOCHASTIC
 GameType.dynamics = Dynamics.SIMULTANEOUS
 GameType.information = Information.PERFECT_INFORMATION
 GameType.long_name = "Laser Tag"
@@ -48,6 +48,9 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = ".......\n.......\n..*.*..\n.**.**.\n..*.*..\n.......\n.......\nOrientations: 1 1\nChance Node"
 ObservationString(1) = ".......\n.......\n..*.*..\n.**.**.\n..*.*..\n.......\n.......\nOrientations: 1 1\nChance Node"
+PublicObservationString() = ".......\n.......\n..*.*..\n.**.**.\n..*.*..\n.......\n.......\nOrientations: 1 1\nChance Node"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
@@ -89,6 +92,9 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "......B\n.......\n..*.*..\n.**.**.\n..*.*..\n.......\n.......\nOrientations: 1 1\nChance Node"
 ObservationString(1) = "......B\n.......\n..*.*..\n.**.**.\n..*.*..\n.......\n.......\nOrientations: 1 1\nChance Node"
+PublicObservationString() = "......B\n.......\n..*.*..\n.**.**.\n..*.*..\n.......\n.......\nOrientations: 1 1\nChance Node"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◉  ◉◉◉◉◉◉◯  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
@@ -129,6 +135,9 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "......B\n.......\n..*.*..\n.**.**.\n..*.*..\n.......\n......A\nOrientations: 1 1\n"
 ObservationString(1) = "......B\n.......\n..*.*..\n.**.**.\n..*.*..\n.......\n......A\nOrientations: 1 1\n"
+PublicObservationString() = "......B\n.......\n..*.*..\n.**.**.\n..*.*..\n.......\n......A\nOrientations: 1 1\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◉  ◉◉◉◉◉◉◯  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
@@ -173,6 +182,9 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "......B\n.......\n..*.*..\n.**.**.\n..*.*..\n.......\n......A\nOrientations: 1 1\nChance Node"
 ObservationString(1) = "......B\n.......\n..*.*..\n.**.**.\n..*.*..\n.......\n......A\nOrientations: 1 1\nChance Node"
+PublicObservationString() = "......B\n.......\n..*.*..\n.**.**.\n..*.*..\n.......\n......A\nOrientations: 1 1\nChance Node"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◉  ◉◉◉◉◉◉◯  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
@@ -213,6 +225,9 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = ".......\n......B\n..*.*..\n.**.**.\n..*.*..\n.......\n......A\nOrientations: 1 3\n"
 ObservationString(1) = ".......\n......B\n..*.*..\n.**.**.\n..*.*..\n.......\n......A\nOrientations: 1 3\n"
+PublicObservationString() = ".......\n......B\n..*.*..\n.**.**.\n..*.*..\n.......\n......A\nOrientations: 1 3\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◉  ◉◉◉◉◉◉◯  ◯◯◯◯◯◯◯
@@ -257,6 +272,9 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = ".......\n......B\n..*.*..\n.**.**.\n..*.*..\n.......\n......A\nOrientations: 1 3\nChance Node"
 ObservationString(1) = ".......\n......B\n..*.*..\n.**.**.\n..*.*..\n.......\n......A\nOrientations: 1 3\nChance Node"
+PublicObservationString() = ".......\n......B\n..*.*..\n.**.**.\n..*.*..\n.......\n......A\nOrientations: 1 3\nChance Node"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◉  ◉◉◉◉◉◉◯  ◯◯◯◯◯◯◯
@@ -297,6 +315,9 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = ".......\n.......\n..*.*.B\n.**.**.\n..*.*..\n......A\n.......\nOrientations: 1 3\n"
 ObservationString(1) = ".......\n.......\n..*.*.B\n.**.**.\n..*.*..\n......A\n.......\nOrientations: 1 3\n"
+PublicObservationString() = ".......\n.......\n..*.*.B\n.**.**.\n..*.*..\n......A\n.......\nOrientations: 1 3\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
@@ -341,6 +362,9 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = ".......\n.......\n..*.*.B\n.**.**.\n..*.*..\n......A\n.......\nOrientations: 1 3\nChance Node"
 ObservationString(1) = ".......\n.......\n..*.*.B\n.**.**.\n..*.*..\n......A\n.......\nOrientations: 1 3\nChance Node"
+PublicObservationString() = ".......\n.......\n..*.*.B\n.**.**.\n..*.*..\n......A\n.......\nOrientations: 1 3\nChance Node"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
@@ -381,6 +405,9 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = ".......\n.......\n..*.*.B\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 1 3\n"
 ObservationString(1) = ".......\n.......\n..*.*.B\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 1 3\n"
+PublicObservationString() = ".......\n.......\n..*.*.B\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 1 3\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
@@ -425,6 +452,9 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = ".......\n.......\n..*.*.B\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 1 3\nChance Node"
 ObservationString(1) = ".......\n.......\n..*.*.B\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 1 3\nChance Node"
+PublicObservationString() = ".......\n.......\n..*.*.B\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 1 3\nChance Node"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
@@ -465,6 +495,9 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = ".......\n......B\n..*.*..\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 1 3\n"
 ObservationString(1) = ".......\n......B\n..*.*..\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 1 3\n"
+PublicObservationString() = ".......\n......B\n..*.*..\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 1 3\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◉  ◉◉◉◉◉◉◯  ◯◯◯◯◯◯◯
@@ -509,6 +542,9 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = ".......\n......B\n..*.*..\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 1 3\nChance Node"
 ObservationString(1) = ".......\n......B\n..*.*..\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 1 3\nChance Node"
+PublicObservationString() = ".......\n......B\n..*.*..\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 1 3\nChance Node"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◉  ◉◉◉◉◉◉◯  ◯◯◯◯◯◯◯
@@ -549,6 +585,9 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = ".......\n.....B.\n..*.*..\n.**.**.\n..*.*A.\n.......\n.......\nOrientations: 1 3\n"
 ObservationString(1) = ".......\n.....B.\n..*.*..\n.**.**.\n..*.*A.\n.......\n.......\nOrientations: 1 3\n"
+PublicObservationString() = ".......\n.....B.\n..*.*..\n.**.**.\n..*.*A.\n.......\n.......\nOrientations: 1 3\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
@@ -593,6 +632,9 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = ".......\n.....B.\n..*.*..\n.**.**.\n..*.*A.\n.......\n.......\nOrientations: 1 3\nChance Node"
 ObservationString(1) = ".......\n.....B.\n..*.*..\n.**.**.\n..*.*A.\n.......\n.......\nOrientations: 1 3\nChance Node"
+PublicObservationString() = ".......\n.....B.\n..*.*..\n.**.**.\n..*.*A.\n.......\n.......\nOrientations: 1 3\nChance Node"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
@@ -633,6 +675,9 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 1 3\n"
 ObservationString(1) = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 1 3\n"
+PublicObservationString() = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 1 3\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
@@ -677,6 +722,9 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 1 3\nChance Node"
 ObservationString(1) = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 1 3\nChance Node"
+PublicObservationString() = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 1 3\nChance Node"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
@@ -717,6 +765,9 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n.......\n.....A.\nOrientations: 1 3\n"
 ObservationString(1) = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n.......\n.....A.\nOrientations: 1 3\n"
+PublicObservationString() = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n.......\n.....A.\nOrientations: 1 3\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
@@ -761,6 +812,9 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n.......\n.....A.\nOrientations: 1 3\nChance Node"
 ObservationString(1) = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n.......\n.....A.\nOrientations: 1 3\nChance Node"
+PublicObservationString() = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n.......\n.....A.\nOrientations: 1 3\nChance Node"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
@@ -801,6 +855,9 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = ".......\n.......\n..*.*.B\n.**.**.\n..*.*..\n.......\n.....A.\nOrientations: 1 3\n"
 ObservationString(1) = ".......\n.......\n..*.*.B\n.**.**.\n..*.*..\n.......\n.....A.\nOrientations: 1 3\n"
+PublicObservationString() = ".......\n.......\n..*.*.B\n.**.**.\n..*.*..\n.......\n.....A.\nOrientations: 1 3\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
@@ -845,6 +902,9 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = ".......\n.......\n..*.*.B\n.**.**.\n..*.*..\n.......\n.....A.\nOrientations: 1 3\nChance Node"
 ObservationString(1) = ".......\n.......\n..*.*.B\n.**.**.\n..*.*..\n.......\n.....A.\nOrientations: 1 3\nChance Node"
+PublicObservationString() = ".......\n.......\n..*.*.B\n.**.**.\n..*.*..\n.......\n.....A.\nOrientations: 1 3\nChance Node"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
@@ -885,6 +945,9 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = ".......\n.......\n..*.*.B\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 1 0\n"
 ObservationString(1) = ".......\n.......\n..*.*.B\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 1 0\n"
+PublicObservationString() = ".......\n.......\n..*.*.B\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 1 0\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
@@ -929,6 +992,9 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = ".......\n.......\n..*.*.B\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 1 0\nChance Node"
 ObservationString(1) = ".......\n.......\n..*.*.B\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 1 0\nChance Node"
+PublicObservationString() = ".......\n.......\n..*.*.B\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 1 0\nChance Node"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
@@ -969,6 +1035,9 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n......A\n.......\nOrientations: 1 0\n"
 ObservationString(1) = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n......A\n.......\nOrientations: 1 0\n"
+PublicObservationString() = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n......A\n.......\nOrientations: 1 0\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
@@ -1013,6 +1082,9 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n......A\n.......\nOrientations: 1 0\nChance Node"
 ObservationString(1) = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n......A\n.......\nOrientations: 1 0\nChance Node"
+PublicObservationString() = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n......A\n.......\nOrientations: 1 0\nChance Node"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
@@ -1053,6 +1125,9 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n......A\n.......\nOrientations: 1 2\n"
 ObservationString(1) = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n......A\n.......\nOrientations: 1 2\n"
+PublicObservationString() = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n......A\n.......\nOrientations: 1 2\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
@@ -1097,6 +1172,9 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n......A\n.......\nOrientations: 1 2\nChance Node"
 ObservationString(1) = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n......A\n.......\nOrientations: 1 2\nChance Node"
+PublicObservationString() = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n......A\n.......\nOrientations: 1 2\nChance Node"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
@@ -1137,6 +1215,9 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n......A\n.......\nOrientations: 3 2\n"
 ObservationString(1) = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n......A\n.......\nOrientations: 3 2\n"
+PublicObservationString() = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n......A\n.......\nOrientations: 3 2\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
@@ -1181,6 +1262,9 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n......A\n.......\nOrientations: 3 2\nChance Node"
 ObservationString(1) = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n......A\n.......\nOrientations: 3 2\nChance Node"
+PublicObservationString() = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n......A\n.......\nOrientations: 3 2\nChance Node"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
@@ -1221,6 +1305,9 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n......A\n.......\nOrientations: 3 2\n"
 ObservationString(1) = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n......A\n.......\nOrientations: 3 2\n"
+PublicObservationString() = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n......A\n.......\nOrientations: 3 2\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
@@ -1265,6 +1352,9 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n......A\n.......\nOrientations: 3 2\nChance Node"
 ObservationString(1) = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n......A\n.......\nOrientations: 3 2\nChance Node"
+PublicObservationString() = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n......A\n.......\nOrientations: 3 2\nChance Node"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
@@ -1305,6 +1395,9 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 0 2\n"
 ObservationString(1) = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 0 2\n"
+PublicObservationString() = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 0 2\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
@@ -1349,6 +1442,9 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 0 2\nChance Node"
 ObservationString(1) = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 0 2\nChance Node"
+PublicObservationString() = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 0 2\nChance Node"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
@@ -1389,6 +1485,9 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = ".......\n.....B.\n..*.*..\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 0 2\n"
 ObservationString(1) = ".......\n.....B.\n..*.*..\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 0 2\n"
+PublicObservationString() = ".......\n.....B.\n..*.*..\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 0 2\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
@@ -1433,6 +1532,9 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = ".......\n.....B.\n..*.*..\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 0 2\nChance Node"
 ObservationString(1) = ".......\n.....B.\n..*.*..\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 0 2\nChance Node"
+PublicObservationString() = ".......\n.....B.\n..*.*..\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 0 2\nChance Node"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
@@ -1473,6 +1575,9 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = ".......\n......B\n..*.*..\n.**.**.\n..*.*..\n.......\n.....A.\nOrientations: 0 1\n"
 ObservationString(1) = ".......\n......B\n..*.*..\n.**.**.\n..*.*..\n.......\n.....A.\nOrientations: 0 1\n"
+PublicObservationString() = ".......\n......B\n..*.*..\n.**.**.\n..*.*..\n.......\n.....A.\nOrientations: 0 1\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◉  ◉◉◉◉◉◉◯  ◯◯◯◯◯◯◯
@@ -1517,6 +1622,9 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = ".......\n......B\n..*.*..\n.**.**.\n..*.*..\n.......\n.....A.\nOrientations: 0 1\nChance Node"
 ObservationString(1) = ".......\n......B\n..*.*..\n.**.**.\n..*.*..\n.......\n.....A.\nOrientations: 0 1\nChance Node"
+PublicObservationString() = ".......\n......B\n..*.*..\n.**.**.\n..*.*..\n.......\n.....A.\nOrientations: 0 1\nChance Node"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◉  ◉◉◉◉◉◉◯  ◯◯◯◯◯◯◯
@@ -1557,6 +1665,9 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = ".......\n......B\n..*.*..\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 2 2\n"
 ObservationString(1) = ".......\n......B\n..*.*..\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 2 2\n"
+PublicObservationString() = ".......\n......B\n..*.*..\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 2 2\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◉  ◉◉◉◉◉◉◯  ◯◯◯◯◯◯◯
@@ -1601,6 +1712,9 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = ".......\n......B\n..*.*..\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 2 2\nChance Node"
 ObservationString(1) = ".......\n......B\n..*.*..\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 2 2\nChance Node"
+PublicObservationString() = ".......\n......B\n..*.*..\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 2 2\nChance Node"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◉  ◉◉◉◉◉◉◯  ◯◯◯◯◯◯◯
@@ -1641,6 +1755,9 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = ".......\n.....B.\n..*.*..\n.**.**.\n..*.*A.\n.......\n.......\nOrientations: 2 2\n"
 ObservationString(1) = ".......\n.....B.\n..*.*..\n.**.**.\n..*.*A.\n.......\n.......\nOrientations: 2 2\n"
+PublicObservationString() = ".......\n.....B.\n..*.*..\n.**.**.\n..*.*A.\n.......\n.......\nOrientations: 2 2\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
@@ -1685,6 +1802,9 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = ".......\n.....B.\n..*.*..\n.**.**.\n..*.*A.\n.......\n.......\nOrientations: 2 2\nChance Node"
 ObservationString(1) = ".......\n.....B.\n..*.*..\n.**.**.\n..*.*A.\n.......\n.......\nOrientations: 2 2\nChance Node"
+PublicObservationString() = ".......\n.....B.\n..*.*..\n.**.**.\n..*.*A.\n.......\n.......\nOrientations: 2 2\nChance Node"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
@@ -1725,6 +1845,9 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = ".....B.\n.......\n..*.*..\n.**.**.\n..*.*A.\n.......\n.......\nOrientations: 2 2\n"
 ObservationString(1) = ".....B.\n.......\n..*.*..\n.**.**.\n..*.*A.\n.......\n.......\nOrientations: 2 2\n"
+PublicObservationString() = ".....B.\n.......\n..*.*..\n.**.**.\n..*.*A.\n.......\n.......\nOrientations: 2 2\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
@@ -1769,6 +1892,9 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = ".....B.\n.......\n..*.*..\n.**.**.\n..*.*A.\n.......\n.......\nOrientations: 2 2\nChance Node"
 ObservationString(1) = ".....B.\n.......\n..*.*..\n.**.**.\n..*.*A.\n.......\n.......\nOrientations: 2 2\nChance Node"
+PublicObservationString() = ".....B.\n.......\n..*.*..\n.**.**.\n..*.*A.\n.......\n.......\nOrientations: 2 2\nChance Node"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
@@ -1809,6 +1935,9 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -4
 ObservationString(0) = ".....B.\n.......\n..*.*..\n.**.**.\n..*.*A.\n.......\n.......\nOrientations: 0 2\n"
 ObservationString(1) = ".....B.\n.......\n..*.*..\n.**.**.\n..*.*A.\n.......\n.......\nOrientations: 0 2\n"
+PublicObservationString() = ".....B.\n.......\n..*.*..\n.**.**.\n..*.*A.\n.......\n.......\nOrientations: 0 2\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯

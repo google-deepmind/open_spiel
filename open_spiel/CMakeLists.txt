@@ -24,13 +24,7 @@ if(NOT WIN32)
   set(BoldWhite   "${Esc}[1;37m")
 endif()
 
-set (Python_TARGET_VERSION "" CACHE STRING "Specify a target Python version. \
-Any Python library found with CMake modules FindPython2/FindPython3 that \
-agrees  with the major version and is at least as high for minor version and \
-patch number is accepted. If the variable is not set, we use the FindPython \
-module which favours Python 3 over Python 2 if both are available.")
-
-set (CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 17)
 
 # Set default build type.
 if(NOT BUILD_TYPE)
@@ -94,6 +88,11 @@ macro(openspiel_optional_dependency DEP_NAME DEP_DEFAULT DEP_DESCRIPTION)
   endif()
   set (${DEP_NAME} $ENV{${DEP_NAME}})
   message("${BoldYellow}${DEP_NAME}: ${${DEP_NAME}} ${ColourReset}")
+  # If the dependency is on, pass in compiler flags to enable conditional code,
+  # e.g. #if BUILD_WITH_...
+  if (${DEP_NAME})
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D${DEP_NAME}")
+  endif()
 endmacro()
 
 # List of all optional dependencies:
@@ -107,6 +106,8 @@ openspiel_optional_dependency(BUILD_WITH_JULIA          OFF
   "Build binary for Julia.")
 openspiel_optional_dependency(BUILD_WITH_LIBTORCH       OFF
   "Build with support for libtorch.")
+openspiel_optional_dependency(BUILD_WITH_TENSORFLOW_CC  OFF
+  "Build with support for Tensorflow C++ API.")
 openspiel_optional_dependency(BUILD_WITH_PUBLIC_STATES  OFF
   "Build with support for public states in C++.")
 openspiel_optional_dependency(BUILD_WITH_PYTHON         ON
@@ -115,6 +116,10 @@ openspiel_optional_dependency(BUILD_WITH_XINXIN         OFF
   "Build against xinxin Hearts program.")
 openspiel_optional_dependency(BUILD_WITH_ROSHAMBO       OFF
   "Build against RoShamBo bots.")
+openspiel_optional_dependency(BUILD_WITH_GAMUT          OFF
+  "Build with GAMUT generator integration.")
+openspiel_optional_dependency(BUILD_WITH_ORTOOLS        OFF
+  "Build with C++ optimization library OR-Tools.")
 
 # Needed to disable Abseil tests.
 set (BUILD_TESTING OFF)
@@ -123,6 +128,8 @@ set (BUILD_TESTING OFF)
 enable_testing()
 
 set (OPEN_SPIEL_CORE_FILES
+  action_view.h
+  action_view.cc
   canonical_game_strings.cc
   canonical_game_strings.h
   fog/fog_constants.h
@@ -221,8 +228,33 @@ if (BUILD_WITH_LIBTORCH)
   list(APPEND CMAKE_PREFIX_PATH "${CMAKE_CURRENT_SOURCE_DIR}/libtorch/libtorch")
   find_package(Torch REQUIRED)
   add_subdirectory(libtorch)
+  include_directories(${TORCH_INCLUDE_DIRS})
   # Use following to link your_target_executable with torch libraries:
   # target_link_libraries(your_target_executable ${TORCH_LIBRARIES})
+endif()
+if (BUILD_WITH_GAMUT)
+  set(OPEN_SPIEL_OBJECTS ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:gamut>)
+endif()
+if (BUILD_WITH_ORTOOLS)
+  # Compile with OR-Tools headers and link against binary distribution,
+  # downloaded from https://developers.google.com/optimization/install/cpp/linux
+  # and assumed to be in $HOME/or-tools.
+  # The flags were taken from the compilation of linear_programming.cc after
+  # running make test_cc.
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DUSE_BOP -DUSE_GLOP -DUSE_CBC -DUSE_CLP -DUSE_SCIP")
+  set(ORTOOLS_HOME "${CMAKE_CURRENT_SOURCE_DIR}/ortools")
+  set(ORTOOLS_INC_DIRS ${ORTOOLS_HOME} ${ORTOOLS_HOME}/include)
+  set(ORTOOLS_LIB_DIRS ${ORTOOLS_HOME}/lib ${ORTOOLS_HOME}/lib64)
+  set(ORTOOLS_LIBS z rt pthread ortools)
+  set_target_properties(open_spiel_core PROPERTIES POSITION_INDEPENDENT_CODE ON)
+  include_directories(${ORTOOLS_INC_DIRS})
+  link_directories(${ORTOOLS_LIB_DIRS})
+  # Use following to link your_target_executable with OrTools libraries:
+  # target_link_libraries(your_target_executable ${ORTOOLS_LIBS})
+endif()
+if (BUILD_WITH_TENSORFLOW_CC)
+  add_compile_definitions(BUILD_WITH_TENSORFLOW_CC)
+  find_package(TensorflowCC REQUIRED)
 endif()
 
 # We have the parent of this directory in the include path, so that we can
@@ -236,7 +268,7 @@ add_subdirectory (examples)
 add_subdirectory (fog)
 add_subdirectory (games)
 add_subdirectory (game_transforms)
-add_subdirectory (tests)
+add_subdirectory (contrib)
 
 if (BUILD_WITH_PYTHON)
   add_subdirectory (python)
@@ -259,7 +291,11 @@ if(NOT DEFINED ENV{BUILD_SHARED_LIB})
 endif()
 set (BUILD_SHARED_LIB $ENV{BUILD_SHARED_LIB})
 if (BUILD_SHARED_LIB)
-  add_library(open_spiel SHARED ${OPEN_SPIEL_OBJECTS})
+  add_library(open_spiel SHARED ${OPEN_SPIEL_OBJECTS}
+    # Optionally include files that use external dependencies, for example
+    # linear program specification for finding Nash equilibria.
+    $<TARGET_OBJECTS:open_spiel_ortools>
+  )
   target_include_directories(open_spiel PUBLIC
       ${CMAKE_CURRENT_SOURCE_DIR} abseil-cpp)
   target_link_libraries(open_spiel PUBLIC
@@ -270,5 +306,10 @@ if (BUILD_SHARED_LIB)
     absl::str_format
     absl::strings
     absl::time
+    # Optionally link external dependencies, for example OrTools for solving
+    # linear programs.
+    ${ORTOOLS_LIBS}
   )
 endif()
+
+add_subdirectory (tests)

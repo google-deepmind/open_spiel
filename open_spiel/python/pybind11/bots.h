@@ -15,9 +15,7 @@
 #ifndef OPEN_SPIEL_PYTHON_PYBIND11_BOTS_H_
 #define OPEN_SPIEL_PYTHON_PYBIND11_BOTS_H_
 
-namespace pybind11 {
-class module;
-}
+#include "pybind11/include/pybind11/pybind11.h"
 
 // Python bindings for bots.
 namespace open_spiel {

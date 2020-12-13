@@ -221,15 +221,15 @@ class UncontestedBiddingGame : public Game {
   double MaxUtility() const override {
     return reference_contracts_.empty() ? kMaxScore : 0;
   }
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new UncontestedBiddingGame(*this));
-  }
   std::vector<int> InformationStateTensorShape() const override {
     return {kStateSize};
   }
   int MaxGameLength() const override { return kNumActions; }
+  int MaxChanceNodesInHistory() const override { return 1; }
   std::unique_ptr<State> DeserializeState(
       const std::string& str) const override;
+  std::string GetRNGState() const;
+  void SetRNGState(const std::string& rng_state) const;
 
  private:
   std::vector<Contract> reference_contracts_;

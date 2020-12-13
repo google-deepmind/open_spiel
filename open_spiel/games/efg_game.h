@@ -52,7 +52,7 @@ struct Node {
   NodeType type;
   int id;
   std::string name;
-  int infoset_number;
+  int infoset_number;  // Must starting at 1 for each player.
   int player_number;
   std::string infoset_name;
   std::string outcome_name;
@@ -90,6 +90,8 @@ class EFGState : public State {
   std::vector<double> Returns() const override;
   std::string InformationStateString(Player player) const override;
   std::string ObservationString(Player player) const override;
+  void InformationStateTensor(Player player,
+                              absl::Span<float> values) const override;
   std::unique_ptr<State> Clone() const override;
   void UndoAction(Player player, Action action) override;
   std::vector<Action> LegalActions() const override;
@@ -119,14 +121,10 @@ class EFGGame : public Game {
   double UtilitySum() const override;
   double MaxUtility() const override;
   int MaxGameLength() const override;
-
-  std::shared_ptr<const Game> Clone() const override {
-    if (!filename_.empty()) {
-      return LoadGame("efg_game", {{"filename", GameParameter(filename_)}});
-    } else {
-      return LoadEFGGame(string_data_);
-    }
-  }
+  int MaxChanceNodesInHistory() const override;
+  int MaxMoveNumber() const override;
+  int MaxHistoryLength() const override;
+  std::vector<int> InformationStateTensorShape() const override;
 
   // Gets the player / decision node action associated to this label.
   Action GetAction(const std::string& label) const {
@@ -172,6 +170,11 @@ class EFGGame : public Game {
                                               const std::string& name) const;
   std::string GetInformationStateStringByNumber(Player player,
                                                 int number) const;
+
+  // Return the number of information states for the specified player.
+  int NumInfoStates(Player player) const {
+    return infoset_num_to_states_count_[player].size();
+  }
 
  private:
   std::unique_ptr<Node> NewNode() const;

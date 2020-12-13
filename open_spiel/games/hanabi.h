@@ -48,9 +48,10 @@ class OpenSpielHanabiGame : public Game {
   int NumPlayers() const override;
   double MinUtility() const override;
   double MaxUtility() const override;
-  std::shared_ptr<const Game> Clone() const override;
   std::vector<int> ObservationTensorShape() const override;
   int MaxGameLength() const override;
+  // TODO: verify whether this bound is tight and/or tighten it.
+  int MaxChanceNodesInHistory() const override { return MaxGameLength(); }
 
   const hanabi_learning_env::ObservationEncoder& Encoder() const {
     return encoder_;

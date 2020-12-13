@@ -14,12 +14,16 @@
 
 #include "open_spiel/game_parameters.h"
 
+#include <iomanip>
 #include <list>
 #include <map>
+#include <sstream>
 #include <string>
 #include <utility>
 
+#include "open_spiel/abseil-cpp/absl/strings/numbers.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_format.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_replace.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_split.h"
 #include "open_spiel/spiel_utils.h"
@@ -56,7 +60,7 @@ std::string GameParameter::ToString() const {
     case Type::kInt:
       return absl::StrCat(int_value());
     case Type::kDouble:
-      return absl::StrCat(double_value());
+      return FormatDouble(double_value());
     case Type::kString:
       return string_value();
     case Type::kBool:
@@ -149,6 +153,7 @@ GameParameters DeserializeGameParameters(
 
 inline std::string GameParametersToString(const GameParameters& game_params) {
   std::string str;
+  if (game_params.empty()) return "";
   if (game_params.count("name")) str = game_params.at("name").string_value();
   str.push_back('(');
   bool first = true;
@@ -166,22 +171,30 @@ inline std::string GameParametersToString(const GameParameters& game_params) {
 }
 
 GameParameter GameParameterFromString(const std::string& str) {
-  if (str == "True" || str == "true")
+  if (str == "True" || str == "true") {
     return GameParameter(true);
-  else if (str == "False" || str == "false")
+  } else if (str == "False" || str == "false") {
     return GameParameter(false);
-  else if (str.find_first_not_of("+-0123456789") == std::string::npos)
-    return GameParameter(stoi(str));
-  else if (str.find_first_not_of("+-0123456789.") == std::string::npos)
-    return GameParameter(stod(str));
-  else if (str.back() == ')')
+  } else if (str.find_first_not_of("+-0123456789") == std::string::npos) {
+    int value;
+    bool success = absl::SimpleAtoi(str, &value);
+    SPIEL_CHECK_TRUE(success);
+    return GameParameter(value);
+  } else if (str.find_first_not_of("+-0123456789.") == std::string::npos) {
+    double value;
+    bool success = absl::SimpleAtod(str, &value);
+    SPIEL_CHECK_TRUE(success);
+    return GameParameter(value);
+  } else if (str.back() == ')') {
     return GameParameter(GameParametersFromString(str));
-  else
+  } else {
     return GameParameter(str);
+  }
 }
 
 GameParameters GameParametersFromString(const std::string& game_string) {
   GameParameters params;
+  if (game_string.empty()) return params;
   int first_paren = game_string.find('(');
   if (first_paren == std::string::npos) {
     params["name"] = GameParameter(game_string);

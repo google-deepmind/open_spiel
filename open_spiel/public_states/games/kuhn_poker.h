@@ -92,6 +92,11 @@ class KuhnPublicState : public PublicState {
       const PrivateInformation& information) const override;
   std::unique_ptr<State> GetWorldState(
       const std::vector<PrivateInformation*>& informations) const override;
+  std::vector<Action> GetPrivateActions(
+      const PrivateInformation& information) const override;
+  std::unique_ptr<PrivateInformation> GetPrivateInformation(
+      const State& state, Player p) const override;
+
 
   // Fetch a random subset from a perspective
   std::unique_ptr<State> ResampleFromPublicSet(Random* random) const override;
@@ -100,8 +105,7 @@ class KuhnPublicState : public PublicState {
 
   // Traversal of public state
   std::vector<PublicTransition> LegalTransitions() const override;
-  std::vector<std::vector<Action>> GetPrivateActions(
-      Player player) const override;
+  std::vector<int> CountPrivateActions(Player player) const override;
   void UndoTransition(const PublicTransition& transition) override;
 
   // Public state types
@@ -109,16 +113,17 @@ class KuhnPublicState : public PublicState {
   bool IsTerminal() const override;
   bool IsPlayer() const override;
   std::vector<Player> ActingPlayers() const override;
+  bool IsPlayerActing(Player) const override;
 
   // CFR-related computations
   ReachProbs ComputeReachProbs(const PublicTransition& transition,
-                               const std::vector<VectorXd>& strategy,
-                               ReachProbs reach_probs) override;
-  std::vector<CfPrivValues> TerminalCfValues(
-      const std::vector<ReachProbs>& reach_probs) const override;
+                               const std::vector<ArrayXd>& strategy,
+                               ReachProbs reach_probs) const override;
+  CfPrivValues TerminalCfValues(
+      const std::vector<ReachProbs>& reach_probs, Player player) const override;
   CfPrivValues ComputeCfPrivValues(
       const std::vector<CfActionValues>& children_values,
-      const std::vector<VectorXd>& privates_policies) const override;
+      const std::vector<ArrayXd>& privates_policies) const override;
   std::vector<CfActionValues> ComputeCfActionValues(
       const std::vector<CfPrivValues>& children_values) const override;
 
@@ -128,7 +133,8 @@ class KuhnPublicState : public PublicState {
   // Miscellaneous
   std::unique_ptr<PublicState> Clone() const override;
 
-  bool PlayerHasSeenHisCard(Player p) const;
+  bool PlayerReceivesItsCard(Player p) const;
+  bool PlayerHasSeenItsCard(Player p) const;
   bool AllPlayerHaveSeenTheirCards() const;
   int NumPlayers() const;
   int NumCards() const;

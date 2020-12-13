@@ -76,17 +76,16 @@ class KuhnObserver : public Observer {
     const int num_players = state.num_players_;
     const int num_cards = num_players + 1;
 
-    // Observing player.
-    {
-      auto out = allocator->Get("player", {num_players});
-      out.at(player) = 1;
-    }
-
-    // The player's card, if one has been dealt.
     if (iig_obs_type_.private_info == PrivateInfoType::kSinglePlayer) {
-      auto out = allocator->Get("private_card", {num_cards});
-      if (state.history_.size() > player)
-        out.at(state.history_[player].action) = 1;
+      {  // Observing player.
+        auto out = allocator->Get("player", {num_players});
+        out.at(player) = 1;
+      }
+      {  // The player's card, if one has been dealt.
+        auto out = allocator->Get("private_card", {num_cards});
+        if (state.history_.size() > player)
+          out.at(state.history_[player].action) = 1;
+      }
     }
 
     // Betting sequence.

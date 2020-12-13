@@ -144,7 +144,8 @@ double EFCEDist(const Game& game, CorrDistConfig config,
   // Check for proper probability distribution.
   CheckCorrelationDeviceProbDist(mu);
 
-  std::shared_ptr<const Game> efce_game(new EFCEGame(game.Clone(), config, mu));
+  auto efce_game =
+      std::make_shared<EFCEGame>(game.shared_from_this(), config, mu);
 
   // Note that the policies are already inside the game via the correlation
   // device, mu. So this is a simple wrapper policy that simply follows the
@@ -161,8 +162,8 @@ double EFCCEDist(const Game& game, CorrDistConfig config,
   // Check for proper probability distribution.
   CheckCorrelationDeviceProbDist(mu);
 
-  std::shared_ptr<const EFCCEGame> efcce_game(
-      new EFCCEGame(game.Clone(), config, mu));
+  auto efcce_game =
+      std::make_shared<EFCCEGame>(game.shared_from_this(), config, mu);
 
   // Note that the policies are already inside the game via the correlation
   // device, mu. So this is a simple wrapper policy that simply follows the
@@ -180,7 +181,8 @@ double AFCEDist(const Game& game, CorrDistConfig config,
   // Check for proper probability distribution.
   CheckCorrelationDeviceProbDist(mu);
 
-  std::shared_ptr<const Game> afce_game(new AFCEGame(game.Clone(), config, mu));
+  auto afce_game =
+      std::make_shared<AFCEGame>(game.shared_from_this(), config, mu);
 
   // Note that the policies are already inside the game via the correlation
   // device, mu. So this is a simple wrapper policy that simply follows the
@@ -197,8 +199,8 @@ double AFCCEDist(const Game& game, CorrDistConfig config,
   // Check for proper probability distribution.
   CheckCorrelationDeviceProbDist(mu);
 
-  std::shared_ptr<const AFCCEGame> afcce_game(
-      new AFCCEGame(game.Clone(), config, mu));
+  auto afcce_game =
+      std::make_shared<AFCCEGame>(game.shared_from_this(), config, mu);
 
   // Note that the policies are already inside the game via the correlation
   // device, mu. So this is a simple wrapper policy that simply follows the

@@ -2,6 +2,7 @@
 include_directories(../..)
 
 set(PUBLIC_STATES_CORE_FILES
+  policy.h
   public_states.h
   public_states.cc
   )

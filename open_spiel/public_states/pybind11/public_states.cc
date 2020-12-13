@@ -118,7 +118,7 @@ void init_pyspiel_public_states(::pybind11::module& m) {
       .def("reach_probs_tensor", &ps::PublicState::ReachProbsTensor)
       .def("to_tensor", &ps::PublicState::ToTensor)
       .def("to_string", &ps::PublicState::ToString)
-      .def("get_depth", &ps::PublicState::GetDepth)
+      .def("move_number", &ps::PublicState::MoveNumber)
       .def("is_root", &ps::PublicState::IsRoot)
       .def("clone", &ps::PublicState::Clone)
       .def("serialize", &ps::PublicState::Serialize)

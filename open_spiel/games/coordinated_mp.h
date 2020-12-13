@@ -78,10 +78,8 @@ class PenniesGame : public Game {
   double MinUtility() const override { return -1; };
   double MaxUtility() const override { return 1; };
   double UtilitySum() const override { return 0; }
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new PenniesGame(*this));
-  }
   int MaxGameLength() const override { return 2; }
+  int MaxChanceNodesInHistory() const override { return 1; }
 
   // New Observation API
   std::shared_ptr<Observer> MakeObserver(

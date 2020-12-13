@@ -52,7 +52,30 @@ export BUILD_WITH_ROSHAMBO=${BUILD_WITH_ROSHAMBO:-$DEFAULT_OPTIONAL_DEPENDENCY}
 # > latency or deployment requirements), the C++ frontend to PyTorch provides
 # > an API that is approximately as convenient, flexible, friendly and intuitive
 # > as its Python counterpart.
-export BUILD_WITH_LIBTORCH="${BUILD_WITH_LIBTORCH:-OFF}"
+#
+# You can find an example usage in open_spiel/libtorch/torch_integration_test.cc
+export BUILD_WITH_LIBTORCH="${BUILD_WITH_LIBTORCH:-"OFF"}"
+
+# TensorflowCC is a CMake interface to the Tensorflow C++ API. It is used in
+# C++ AlphaZero. See: https://github.com/deepmind/open_spiel/blob/master/docs/alpha_zero.md
+export BUILD_WITH_TENSORFLOW_CC="${BUILD_WITH_TENSORFLOW_CC:-"OFF"}"
 
 # Turn off public states as it is Work-In-Progress.
-export BUILD_WITH_PUBLIC_STATES="${BUILD_WITH_PUBLIC_STATES:-OFF}"
+export BUILD_WITH_PUBLIC_STATES="${BUILD_WITH_PUBLIC_STATES:-"OFF"}"
+
+# Enable integration with GAMUT game generator (see games/gamut).
+# Requires java and GAMUT, so disabled by default.
+export BUILD_WITH_GAMUT="${BUILD_WITH_GAMUT:-"OFF"}"
+
+# Flag to enable building with OR-Tools to get C++ optimization routines.
+# Disabled by default as it requires installation of third party software.
+# See algorithms/ortools/CMakeLists.txt for specific instructions.
+export BUILD_WITH_ORTOOLS="${BUILD_WITH_ORTOOLS:-"OFF"}"
+# You may want to replace this URL according to your system.
+# Use version 8 at minimum, due to compatibility between absl library versions
+# used in OpenSpiel and in OrTools.
+# Other v8 URLs are:
+# https://github.com/google/or-tools/releases/download/v8.0/or-tools_ubuntu-20.04_v8.0.8283.tar.gz
+# https://github.com/google/or-tools/releases/download/v8.0/or-tools_debian-10_v8.0.8283.tar.gz
+# https://github.com/google/or-tools/releases/download/v8.0/or-tools_MacOsX-10.15.7_v8.0.8283.tar.gz
+export BUILD_WITH_ORTOOLS_DOWNLOAD_URL="${BUILD_WITH_ORTOOLS_DOWNLOAD_URL:-"https://github.com/google/or-tools/releases/download/v8.0/or-tools_ubuntu-18.04_v8.0.8283.tar.gz"}"

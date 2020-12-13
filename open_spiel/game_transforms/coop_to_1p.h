@@ -159,16 +159,14 @@ class CoopTo1pGame : public Game {
  public:
   CoopTo1pGame(std::shared_ptr<const Game> game, GameType game_type,
                GameParameters game_parameters);
-  CoopTo1pGame(const CoopTo1pGame& other)
-      : Game(other), game_(other.game_->Clone()) {}
   std::unique_ptr<State> NewInitialState() const override;
   int NumPlayers() const override { return 1; }
   std::vector<int> ObservationTensorShape() const override;
   int MaxGameLength() const override;
-
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new CoopTo1pGame(*this));
+  int MaxChanceNodesInHistory() const override {
+    return game_->MaxGameLength();
   }
+
   int NumDistinctActions() const override {
     return game_->NumDistinctActions();
   }

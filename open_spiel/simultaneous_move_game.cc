@@ -19,6 +19,7 @@
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/action_view.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
@@ -48,17 +49,13 @@ void SimMoveState::ApplyFlatJointAction(Action flat_action) {
 }
 
 std::vector<Action> SimMoveState::LegalFlatJointActions() const {
-  // Compute the number of possible joint actions = \prod #actions(i)
-  // over all players with any legal actions available.
-  int number_joint_actions = 1;
-  for (auto player = Player{0}; player < num_players_; ++player) {
-    int num_actions = LegalActions(player).size();
-    if (num_actions > 1) number_joint_actions *= num_actions;
+  ActionView view(*this);
+  FlatJointActions flat_joint_actions = view.flat_joint_actions();
+  std::vector<Action> joint_actions;
+  joint_actions.reserve(flat_joint_actions.num_flat_joint_actions);
+  for (Action flat_joint_action : flat_joint_actions) {
+    joint_actions.push_back(flat_joint_action);
   }
-  // The possible joint actions are just numbered 0, 1, 2, ....
-  // So build a vector of the right size containing consecutive integers.
-  std::vector<Action> joint_actions(number_joint_actions);
-  std::iota(joint_actions.begin(), joint_actions.end(), 0);
   return joint_actions;
 }
 

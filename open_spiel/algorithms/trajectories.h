@@ -117,7 +117,7 @@ class TrajectoryRecorder {
   TrajectoryRecorder(const Game& game,
                      const std::unordered_map<std::string, int>& state_to_index,
                      int seed)
-      : game_(game.Clone()),
+      : game_(game.shared_from_this()),
         state_to_index_(state_to_index),
         rng_(std::mt19937(seed)) {}
 

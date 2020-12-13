@@ -33,6 +33,10 @@ namespace algorithms {
 // policy, where the best responder plays as player_id.
 // This only works for two player, zero- or constant-sum sequential games, and
 // raises a SpielFatalError if an incompatible game is passed to it.
+//
+// This implementation requires games have perfect recall, and that the game's
+// State::ToString is a unique key for storing the value of a state. Otherwise,
+// the algorithm will still run, but the value returned will be wrong.
 class TabularBestResponse {
  public:
   TabularBestResponse(const Game& game, Player best_responder,

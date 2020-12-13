@@ -37,7 +37,7 @@ void MCCFR_2PGameTest(const std::string& game_name, std::mt19937* rng,
   for (int i = 0; i < iterations; i++) {
     solver.RunIteration(rng);
   }
-  const std::unique_ptr<Policy> average_policy = solver.AveragePolicy();
+  const std::shared_ptr<Policy> average_policy = solver.AveragePolicy();
   double nash_conv = NashConv(*game, *average_policy, true);
   std::cout << "Game: " << game_name << ", iters = " << iterations
             << ", NashConv: " << nash_conv << std::endl;
@@ -50,7 +50,7 @@ void MCCFR_KuhnPoker3PTest(std::mt19937* rng) {
   for (int i = 0; i < 100; i++) {
     solver.RunIteration(rng);
   }
-  const std::unique_ptr<Policy> average_policy = solver.AveragePolicy();
+  const std::shared_ptr<Policy> average_policy = solver.AveragePolicy();
   std::cout << "Kuhn 3P (standard averaging) NashConv = "
             << NashConv(*game, *average_policy, true) << std::endl;
 
@@ -61,6 +61,34 @@ void MCCFR_KuhnPoker3PTest(std::mt19937* rng) {
   auto full_average_policy = full_solver.AveragePolicy();
   std::cout << "Kuhn 3P (full averaging) NashConv = "
             << NashConv(*game, *full_average_policy) << std::endl;
+}
+
+void MCCFR_SerializationTest() {
+  auto game = LoadGame("kuhn_poker");
+  ExternalSamplingMCCFRSolver solver = ExternalSamplingMCCFRSolver(*game);
+  double exploitability0 = Exploitability(*game, *solver.AveragePolicy());
+
+  for (int i = 0; i < 200; i++) {
+    solver.RunIteration();
+  }
+  double exploitability1 = Exploitability(*game, *solver.AveragePolicy());
+  SPIEL_CHECK_GT(exploitability0, exploitability1);
+
+  std::string serialized = solver.Serialize();
+  std::unique_ptr<ExternalSamplingMCCFRSolver> deserialized_solver =
+      DeserializeExternalSamplingMCCFRSolver(serialized);
+  SPIEL_CHECK_EQ(solver.InfoStateValuesTable().size(),
+                 deserialized_solver->InfoStateValuesTable().size());
+  double exploitability2 =
+      Exploitability(*game, *deserialized_solver->AveragePolicy());
+  SPIEL_CHECK_FLOAT_NEAR(exploitability1, exploitability2, 1e-15);
+
+  for (int i = 0; i < 200; i++) {
+    deserialized_solver->RunIteration();
+  }
+  double exploitability3 =
+      Exploitability(*game, *deserialized_solver->AveragePolicy());
+  SPIEL_CHECK_GT(exploitability2, exploitability3);
 }
 
 }  // namespace
@@ -78,4 +106,5 @@ int main(int argc, char** argv) {
   algorithms::MCCFR_2PGameTest("leduc_poker", &rng, 1000, 2.5);
   algorithms::MCCFR_2PGameTest("liars_dice", &rng, 100, 1.6);
   algorithms::MCCFR_KuhnPoker3PTest(&rng);
+  algorithms::MCCFR_SerializationTest();
 }

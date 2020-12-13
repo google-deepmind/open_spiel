@@ -56,6 +56,10 @@ import numpy as np
 import pyspiel
 
 
+# Corresponds to the old information_state_XXX methods.
+INFO_STATE_OBS_TYPE = pyspiel.IIGObservationType(perfect_recall=True)
+
+
 class _Observation:
   """Contains an observation from a game."""
 

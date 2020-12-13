@@ -29,7 +29,7 @@
 //     "diceoutcomes"  int    number of outcomes of the dice  (default = 6)
 //     "horizon"       int    max number of moves before draw (default = 1000)
 //     "players"       int    number of players               (default = 2)
-//     "winscore"      int    number of point needed to win   (default = 100)
+//     "winscore"      int    number of points needed to win   (default = 100)
 
 namespace open_spiel {
 namespace pig {
@@ -70,7 +70,7 @@ class PigState : public State {
   int total_moves_ = -1;    // Total num moves taken during the game.
   Player cur_player_ = -1;  // Player to play.
   int turn_player_ = -1;    // Whose actual turn is it. At chance nodes, we need
-                            // to remember whose is playing for next turns
+                            // to remember whose is playing for next turn.
                             // (cur_player will be the chance player's id.)
   std::vector<int> scores_;  // Score for each player.
   int turn_total_ = -1;
@@ -89,14 +89,13 @@ class PigGame : public Game {
 
   // There is arbitrarily chosen number to ensure the game is finite.
   int MaxGameLength() const override { return horizon_; }
+  // TODO: verify whether this bound is tight and/or tighten it.
+  int MaxChanceNodesInHistory() const override { return MaxGameLength(); }
 
   int NumPlayers() const override { return num_players_; }
   double MinUtility() const override { return -1; }
   double UtilitySum() const override { return 0; }
   double MaxUtility() const override { return +1; }
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new PigGame(*this));
-  }
   std::vector<int> ObservationTensorShape() const override;
 
  private:

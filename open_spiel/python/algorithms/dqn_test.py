@@ -27,8 +27,42 @@ import pyspiel
 # Temporarily disable TF2 behavior until code is updated.
 tf.disable_v2_behavior()
 
+# A simple two-action game encoded as an EFG game. Going left gets -1, going
+# right gets a +1.
+SIMPLE_EFG_DATA = """
+  EFG 2 R "Simple single-agent problem" { "Player 1" } ""
+  p "ROOT" 1 1 "ROOT" { "L" "R" } 0
+    t "L" 1 "Outcome L" { -1.0 }
+    t "R" 2 "Outcome R" { 1.0 }
+"""
+
 
 class DQNTest(tf.test.TestCase):
+
+  def test_simple_game(self):
+    game = pyspiel.load_efg_game(SIMPLE_EFG_DATA)
+    env = rl_environment.Environment(game=game)
+    with self.session() as sess:
+      agent = dqn.DQN(sess, 0,
+                      state_representation_size=
+                      game.information_state_tensor_shape()[0],
+                      num_actions=game.num_distinct_actions(),
+                      hidden_layers_sizes=[16],
+                      replay_buffer_capacity=100,
+                      batch_size=5,
+                      epsilon_start=0.02,
+                      epsilon_end=0.01)
+      total_reward = 0
+      sess.run(tf.global_variables_initializer())
+
+      for _ in range(100):
+        time_step = env.reset()
+        while not time_step.last():
+          agent_output = agent.step(time_step)
+          time_step = env.step([agent_output.action])
+          total_reward += time_step.rewards[0]
+        agent.step(time_step)
+      self.assertGreaterEqual(total_reward, 75)
 
   def test_run_tic_tac_toe(self):
     env = rl_environment.Environment("tic_tac_toe")

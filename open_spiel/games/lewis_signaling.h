@@ -45,6 +45,7 @@ constexpr int kDefaultNumStates = 3;
 constexpr int kDefaultNumMessages = 3;
 constexpr int kDefaultNumPlayers = 2;
 constexpr const char* kDefaultPayoffs = "1, 0, 0, 0, 1, 0, 0, 0, 1";
+constexpr int kUnassignedValue = -1;
 
 enum class Players {
   kSender,
@@ -104,6 +105,8 @@ class LewisSignalingGame : public Game {
   int MaxChanceOutcomes() const override { return num_states_; }
 
   int MaxGameLength() const override { return 2; }
+  // TODO: verify whether this bound is tight and/or tighten it.
+  int MaxChanceNodesInHistory() const override { return MaxGameLength(); }
 
   int NumPlayers() const override { return kDefaultNumPlayers; }
   double MaxUtility() const override {
@@ -111,9 +114,6 @@ class LewisSignalingGame : public Game {
   }
   double MinUtility() const override {
     return *std::min_element(payoffs_.begin(), payoffs_.end());
-  }
-  std::shared_ptr<const Game> Clone() const override {
-    return std::make_shared<const LewisSignalingGame>(*this);
   }
   std::vector<int> ObservationTensorShape() const override;
   std::vector<int> InformationStateTensorShape() const override {

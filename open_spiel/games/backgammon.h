@@ -264,14 +264,14 @@ class BackgammonGame : public Game {
 
   // There is arbitrarily chosen number to ensure the game is finite.
   int MaxGameLength() const override { return 1000; }
+  // It is possible to have only chance nodes in the game. As the game
+  // is limited, apply the same limit.
+  int MaxChanceNodesInHistory() const override { return MaxGameLength(); }
 
   int NumPlayers() const override { return 2; }
   double MinUtility() const override { return -MaxUtility(); }
   double UtilitySum() const override { return 0; }
   double MaxUtility() const override;
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new BackgammonGame(*this));
-  }
 
   std::vector<int> ObservationTensorShape() const override {
     // Encode each point on the board as four doubles:

@@ -97,9 +97,6 @@ class CatchGame : public Game {
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(new CatchState(shared_from_this()));
   }
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new CatchGame(*this));
-  }
   std::vector<int> ObservationTensorShape() const override {
     return {num_rows_, num_columns_};
   }
@@ -110,6 +107,8 @@ class CatchGame : public Game {
   double MaxUtility() const override { return 1; }
   double MinUtility() const override { return -1; }
   int MaxGameLength() const override { return num_rows_; }
+  // There is only initial chance.
+  int MaxChanceNodesInHistory() const override { return 1; }
   int NumRows() const { return num_rows_; }
   int NumColumns() const { return num_columns_; }
 

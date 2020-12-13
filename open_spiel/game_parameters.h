@@ -24,16 +24,22 @@
 
 namespace open_spiel {
 
-// A GameParameter can be used in 2 contexts:
+// A GameParameter can be used in 3 contexts:
 // - when defining the parameters for a game, with their optional default value
 //   and whether they are mandatory or not.
 // - when specifying in Python a parameter value.
+// - when passing a parametrization of additional Observer fields.
 //
 class GameParameter;
 
 using GameParameters = std::map<std::string, GameParameter>;
 std::string GameParametersToString(const GameParameters& game_params);
+GameParameter GameParameterFromString(const std::string& str);
 GameParameters GameParametersFromString(const std::string& game_string);
+
+inline constexpr const char* kDefaultNameDelimiter = "=";
+inline constexpr const char* kDefaultParameterDelimiter = "|||";
+inline constexpr const char* kDefaultInternalDelimiter = "***";
 
 class GameParameter {
  public:
@@ -51,6 +57,20 @@ class GameParameter {
         type_(Type::kDouble) {}
 
   explicit GameParameter(std::string value, bool is_mandatory = false)
+      : is_mandatory_(is_mandatory),
+        string_value_(value),
+        type_(Type::kString) {}
+
+  // Allows construction of a `GameParameter` from a string literal. This method
+  // is not subsumed by the previous method, even if value can be converted to a
+  // std::string, because the [C++ standard][iso] requires that the *standard
+  // conversion sequence* (see §13.3.3.1.1)
+  // `(const char[]) -> const char* -> bool` take precedence over the
+  // *user-defined conversion sequence*
+  // `(const char[]) -> const char* -> std::string` defined in the standard
+  // library.
+  // [iso]: http://www.open-std.org/JTC1/SC22/WG21/docs/papers/2011/n3242.pdf
+  explicit GameParameter(const char* value, bool is_mandatory = false)
       : is_mandatory_(is_mandatory),
         string_value_(value),
         type_(Type::kString) {}
@@ -82,8 +102,9 @@ class GameParameter {
   std::string ToReprString() const;
 
   // Everything necessary to reconstruct the parameter in string form:
-  // type/value/is_mandatory.
-  std::string Serialize(const std::string& delimiter = "/") const;
+  // type <delimiter> value <delimiter> is_mandatory.
+  std::string Serialize(
+      const std::string& delimiter = kDefaultInternalDelimiter) const;
 
   int int_value() const {
     SPIEL_CHECK_TRUE(type_ == Type::kInt);
@@ -110,6 +131,56 @@ class GameParameter {
     return game_value_;
   }
 
+  // Access values via param.value<T>().
+  template <typename T>
+  T value() const;
+  template <>
+  int value() const {
+    return int_value();
+  }
+  template <>
+  double value() const {
+    return double_value();
+  }
+  template <>
+  const std::string& value() const {
+    return string_value();
+  }
+  template <>
+  std::string value() const {
+    return string_value();
+  }
+  template <>
+  bool value() const {
+    return bool_value();
+  }
+  template <>
+  const std::map<std::string, GameParameter>& value() const {
+    return game_value();
+  }
+  template <>
+  std::map<std::string, GameParameter> value() const {
+    return game_value();
+  }
+
+  bool operator==(const GameParameter& rhs) const {
+    switch (type_) {
+      case Type::kInt:
+        return rhs.has_int_value() && int_value_ == rhs.int_value();
+      case Type::kDouble:
+        return rhs.has_double_value() && double_value_ == rhs.double_value();
+      case Type::kString:
+        return rhs.has_string_value() && string_value_ == rhs.string_value();
+      case Type::kBool:
+        return rhs.has_bool_value() && bool_value_ == rhs.bool_value();
+      case Type::kGame:
+        return rhs.has_game_value() && game_value_ == rhs.game_value();
+      case Type::kUnset:
+        return rhs.type_ == Type::kUnset;
+    }
+  }
+  bool operator!=(const GameParameter& rhs) const { return !(*this == rhs); }
+
  private:
   bool is_mandatory_;
 
@@ -134,13 +205,16 @@ std::string GameParameterTypeToString(const GameParameter::Type& type);
 // param_name=type/value/is_mandatory|param_name_2=type2/value2/is_mandatory2
 // assumes none of the delimeters appears in the string values
 std::string SerializeGameParameters(
-    const GameParameters& game_params, const std::string& name_delimiter = "=",
-    const std::string& parameter_delimeter = "|");
+    const GameParameters& game_params,
+    const std::string& name_delimiter = kDefaultNameDelimiter,
+    const std::string& parameter_delimeter = kDefaultParameterDelimiter);
 GameParameters DeserializeGameParameters(
-    const std::string& data, const std::string& name_delimiter = "=",
-    const std::string& parameter_delimeter = "|");
-GameParameter DeserializeGameParameter(const std::string& data,
-                                       const std::string& delimiter = "/");
+    const std::string& data,
+    const std::string& name_delimiter = kDefaultNameDelimiter,
+    const std::string& parameter_delimeter = kDefaultParameterDelimiter);
+GameParameter DeserializeGameParameter(
+    const std::string& data,
+    const std::string& delimiter = kDefaultInternalDelimiter);
 
 inline bool IsParameterSpecified(const GameParameters& table,
                                  const std::string& key) {

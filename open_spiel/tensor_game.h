@@ -69,10 +69,6 @@ class TensorGame : public NormalFormGame {
 
   double MaxUtility() const override { return max_utility_; }
 
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new TensorGame(*this));
-  }
-
   const std::vector<int>& Shape() const { return shape_; }
   const double PlayerUtility(const Player player,
                              const std::vector<Action>& actions) const {
@@ -90,6 +86,40 @@ class TensorGame : public NormalFormGame {
     SPIEL_CHECK_GE(player, 0);
     SPIEL_CHECK_LT(player, NumPlayers());
     return action_names_[player][action];
+  }
+
+  bool operator==(const Game& other_game) const override {
+    const auto& other = down_cast<const TensorGame&>(other_game);
+    return (shape_ == other.shape_ && utilities_ == other.utilities_);
+  }
+
+  bool ApproxEqual(const Game& other_game, double tolerance) const {
+    const auto& other = down_cast<const TensorGame&>(other_game);
+    if (shape_ != other.shape_) {
+      return false;
+    }
+    for (Player p = 0; p < NumPlayers(); ++p) {
+      if (!AllNear(utilities_[p], other.utilities_[p], tolerance)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  std::vector<double> GetUtilities(const std::vector<Action>& joint_action)
+      const override {
+    int idx = index(joint_action);
+    std::vector<double> utilities;
+    utilities.reserve(NumPlayers());
+    for (Player p = 0; p < NumPlayers(); ++p) {
+      utilities.push_back(utilities_[p][idx]);
+    }
+    return utilities;
+  }
+
+  double GetUtility(Player player, const std::vector<Action>& joint_action)
+      const override {
+    return PlayerUtility(player, joint_action);
   }
 
  private:

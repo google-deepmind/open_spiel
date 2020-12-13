@@ -23,7 +23,7 @@
 #include "open_spiel/normal_form_game.h"
 
 // An implementation of the Blotto: https://en.wikipedia.org/wiki/Blotto_game
-// This version is supports n>2 players. Each player distributes M coins on N
+// This version supports n >= 2 players. Each player distributes M coins on N
 // fields. Each field is won by at most one player: the one with the most
 // coins on the specific field; if there is a draw, the field is considered
 // drawn (not won by any player), and hence ignored in the scoring. The winner
@@ -70,16 +70,6 @@ class BlottoState : public NFGState {
 class BlottoGame : public NormalFormGame {
  public:
   explicit BlottoGame(const GameParameters& params);
-  BlottoGame(const BlottoGame& other)
-      : NormalFormGame(other),
-        num_distinct_actions_(other.num_distinct_actions_),
-        coins_(other.coins_),
-        fields_(other.fields_),
-        players_(other.players_),
-        action_map_(
-            std::unique_ptr<ActionMap>(new ActionMap(*other.action_map_))),
-        legal_actions_(std::unique_ptr<std::vector<Action>>(
-            new std::vector<Action>(*other.legal_actions_))) {}
 
   int NumDistinctActions() const override;
   std::unique_ptr<State> NewInitialState() const override {
@@ -92,9 +82,6 @@ class BlottoGame : public NormalFormGame {
   double MinUtility() const override { return -1; }
   double UtilitySum() const override { return 0; }
   double MaxUtility() const override { return +1; }
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new BlottoGame(*this));
-  }
 
  private:
   void CreateActionMapRec(int* count, int coins_left,

@@ -741,7 +741,7 @@ std::unique_ptr<State> HeartsState::ResampleFromInfostate(
     clone->ApplyAction(history_.at(i).action);
   }
 
-  SPIEL_CHECK_EQ(History().size(), clone->History().size());
+  SPIEL_CHECK_EQ(FullHistory().size(), clone->FullHistory().size());
   SPIEL_CHECK_EQ(InformationStateString(player_id),
                  clone->InformationStateString(player_id));
   return clone;

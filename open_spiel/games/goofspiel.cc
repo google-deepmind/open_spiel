@@ -48,7 +48,9 @@ const GameType kGameType{
      {"points_order",
       GameParameter(static_cast<std::string>(kDefaultPointsOrder))},
      {"returns_type",
-      GameParameter(static_cast<std::string>(kDefaultReturnsType))}}};
+      GameParameter(static_cast<std::string>(kDefaultReturnsType))}},
+    /*default_loadable=*/true,
+    /*provides_factored_observation_string=*/true};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new GoofspielGame(params));
@@ -83,6 +85,237 @@ ReturnsType ParseReturnsType(const std::string& returns_type_str) {
 }
 
 }  // namespace
+
+class GoofspielObserver : public Observer {
+ public:
+  explicit GoofspielObserver(IIGObservationType iig_obs_type)
+      : Observer(/*has_string=*/true, /*has_tensor=*/true),
+        iig_obs_type_(iig_obs_type) {}
+
+  void WriteTensor(const State& observed_state, int player,
+                   Allocator* allocator) const override {
+    const GoofspielState& state =
+        open_spiel::down_cast<const GoofspielState&>(observed_state);
+    const GoofspielGame& game =
+        open_spiel::down_cast<const GoofspielGame&>(*state.GetGame());
+    SPIEL_CHECK_GE(player, 0);
+    SPIEL_CHECK_LT(player, game.NumPlayers());
+
+    // List all predicates.
+    const bool imp_info = game.IsImpInfo();
+    const bool pub_info = iig_obs_type_.public_info;
+    const bool perf_rec = iig_obs_type_.perfect_recall;
+    const bool priv_one =
+        iig_obs_type_.private_info == PrivateInfoType::kSinglePlayer;
+
+    // Conditionally write each field.
+    if (pub_info && !perf_rec) WriteCurrentPointCard(game, state, allocator);
+    if (pub_info) WritePointsTotal(game, state, player, allocator);
+    if (imp_info && priv_one) WritePlayerHand(game, state, player, allocator);
+    if (imp_info && pub_info) WriteWinSequence(game, state, allocator);
+    if (pub_info && perf_rec) WritePointCardSequence(game, state, allocator);
+    if (imp_info && perf_rec && priv_one)
+      WritePlayerActionSequence(game, state, player, allocator);
+    if (!imp_info && pub_info)
+      WriteAllPlayersHands(game, state, player, allocator);
+  }
+
+  std::string StringFrom(const State& observed_state,
+                         int player) const override {
+    const GoofspielState& state =
+        open_spiel::down_cast<const GoofspielState&>(observed_state);
+    const GoofspielGame& game =
+        open_spiel::down_cast<const GoofspielGame&>(*state.GetGame());
+    SPIEL_CHECK_GE(player, 0);
+    SPIEL_CHECK_LT(player, game.NumPlayers());
+    std::string result;
+
+    // List all predicates.
+    const bool imp_info = game.IsImpInfo();
+    const bool pub_info = iig_obs_type_.public_info;
+    const bool perf_rec = iig_obs_type_.perfect_recall;
+    const bool priv_one =
+        iig_obs_type_.private_info == PrivateInfoType::kSinglePlayer;
+
+    // Conditionally write each field.
+    // This is done in a backwards-compatible way.
+    if (imp_info && priv_one && perf_rec) {  // InformationState
+      StringPlayerHand(game, state, player, &result);
+      StringActionSequence(game, state, player, &result);
+      StringPointCardSequence(state, &result);
+      StringWinSequence(state, &result);
+      StringPoints(game, state, &result);
+      StringIsTerminal(state, &result);
+      return result;
+    }
+    if (imp_info && priv_one && !perf_rec) {  // Observation
+      StringCurrentPointCard(state, &result);
+      StringPoints(game, state, &result);
+      StringPlayerHand(game, state, player, &result);
+      StringWinSequence(state, &result);
+      return result;
+    }
+
+    // Remaining public observation requests.
+    if (pub_info && perf_rec) StringPointCardSequence(state, &result);
+    if (pub_info && !perf_rec) StringCurrentPointCard(state, &result);
+    if (pub_info && !imp_info) StringPlayersHands(game, state, &result);
+    if (pub_info) {
+      StringWinSequence(state, &result);
+      StringPoints(game, state, &result);
+    }
+    return result;
+  }
+
+ private:
+  // Point totals: one-hot vector encoding points, per player.
+  // Writes this public information from the perspective
+  // of the requesting player.
+  void WritePointsTotal(const GoofspielGame& game, const GoofspielState& state,
+                        int player, Allocator* allocator) const {
+    auto out = allocator->Get("point_totals",
+                              {game.NumPlayers(), game.MaxPointSlots()});
+    Player p = player;
+    for (int n = 0; n < game.NumPlayers(); state.NextPlayer(&n, &p)) {
+      out.at(n, state.points_[p]) = 1.0;
+    }
+  }
+
+  // Bit vectors encoding all players' hands.
+  // Writes this public information from the perspective
+  // of the requesting player.
+  void WriteAllPlayersHands(const GoofspielGame& game,
+                            const GoofspielState& state, int player,
+                            Allocator* allocator) const {
+    auto out =
+        allocator->Get("player_hands", {game.NumPlayers(), game.NumCards()});
+    Player p = player;
+    for (int n = 0; n < game.NumPlayers(); state.NextPlayer(&n, &p)) {
+      for (int c = 0; c < game.NumCards(); ++c) {
+        out.at(n, c) = state.player_hands_[p][c];
+      }
+    }
+  }
+
+  // Sequence of who won each trick.
+  void WriteWinSequence(const GoofspielGame& game, const GoofspielState& state,
+                        Allocator* allocator) const {
+    auto out =
+        allocator->Get("win_sequence", {game.NumRounds(), game.NumPlayers()});
+    for (int i = 0; i < state.win_sequence_.size(); ++i) {
+      if (state.win_sequence_[i] != kInvalidPlayer)
+        out.at(i, state.win_sequence_[i]) = 1.0;
+    }
+  }
+
+  void WritePointCardSequence(const GoofspielGame& game,
+                              const GoofspielState& state,
+                              Allocator* allocator) const {
+    auto out = allocator->Get("point_card_sequence",
+                              {game.NumRounds(), game.NumCards()});
+    for (int round = 0; round < state.point_card_sequence_.size(); ++round) {
+      out.at(round, state.point_card_sequence_[round]) = 1.0;
+    }
+  }
+
+  void WriteCurrentPointCard(const GoofspielGame& game,
+                             const GoofspielState& state,
+                             Allocator* allocator) const {
+    auto out = allocator->Get("current_point_card", {game.NumCards()});
+    if (!state.point_card_sequence_.empty())
+      out.at(state.point_card_sequence_.back()) = 1.0;
+  }
+
+  // Bit vector of observing player's hand.
+  void WritePlayerHand(const GoofspielGame& game, const GoofspielState& state,
+                       int player, Allocator* allocator) const {
+    auto out = allocator->Get("player_hand", {game.NumCards()});
+    for (int c = 0; c < game.NumCards(); ++c) {
+      out.at(c) = state.player_hands_[player][c];
+    }
+  }
+
+  // The observing player's action sequence.
+  void WritePlayerActionSequence(const GoofspielGame& game,
+                                 const GoofspielState& state, int player,
+                                 Allocator* allocator) const {
+    auto out = allocator->Get("player_action_sequence",
+                              {game.NumRounds(), game.NumCards()});
+    for (int round = 0; round < state.actions_history_.size(); ++round) {
+      out.at(round, state.actions_history_[round][player]) = 1.0;
+    }
+  }
+
+  void StringPlayerHand(const GoofspielGame& game, const GoofspielState& state,
+                        int player, std::string* result) const {
+    // Only my hand
+    absl::StrAppend(result, "P", player, " hand: ");
+    for (int c = 0; c < game.NumCards(); ++c) {
+      if (state.player_hands_[player][c]) absl::StrAppend(result, c + 1, " ");
+    }
+    absl::StrAppend(result, "\n");
+  }
+
+  void StringActionSequence(const GoofspielGame& game,
+                            const GoofspielState& state, int player,
+                            std::string* result) const {
+    // Also show the player's sequence. We need this to ensure perfect
+    // recall because two betting sequences can lead to the same hand and
+    // outcomes if the opponent chooses differently.
+    absl::StrAppend(result, "P", player, " action sequence: ");
+    for (int i = 0; i < state.actions_history_.size(); ++i) {
+      absl::StrAppend(result, state.actions_history_[i][player], " ");
+    }
+    absl::StrAppend(result, "\n");
+  }
+  void StringPointCardSequence(const GoofspielState& state,
+                               std::string* result) const {
+    absl::StrAppend(result, "Point card sequence: ");
+    for (int i = 0; i < state.point_card_sequence_.size(); ++i) {
+      absl::StrAppend(result, 1 + state.point_card_sequence_[i], " ");
+    }
+    absl::StrAppend(result, "\n");
+  }
+  void StringCurrentPointCard(const GoofspielState& state,
+                              std::string* result) const {
+    absl::StrAppend(result, "Current point card: ", state.CurrentPointValue(),
+                    "\n");
+  }
+  void StringPlayersHands(const GoofspielGame& game,
+                          const GoofspielState& state,
+                          std::string* result) const {
+    // Show the hands in the perfect info case.
+    for (auto p = Player{0}; p < game.NumPlayers(); ++p) {
+      absl::StrAppend(result, "P", p, " hand: ");
+      for (int c = 0; c < game.NumCards(); ++c) {
+        if (state.player_hands_[p][c]) absl::StrAppend(result, c + 1, " ");
+      }
+      absl::StrAppend(result, "\n");
+    }
+  }
+  void StringWinSequence(const GoofspielState& state,
+                         std::string* result) const {
+    absl::StrAppend(result, "Win sequence: ");
+    for (int i = 0; i < state.win_sequence_.size(); ++i) {
+      absl::StrAppend(result, state.win_sequence_[i], " ");
+    }
+    absl::StrAppend(result, "\n");
+  }
+  void StringPoints(const GoofspielGame& game, const GoofspielState& state,
+                    std::string* result) const {
+    absl::StrAppend(result, "Points: ");
+    for (auto p = Player{0}; p < game.NumPlayers(); ++p) {
+      absl::StrAppend(result, state.points_[p], " ");
+    }
+    absl::StrAppend(result, "\n");
+  }
+  void StringIsTerminal(const GoofspielState& state,
+                        std::string* result) const {
+    absl::StrAppend(result, "Terminal?: ", state.IsTerminal(), "\n");
+  }
+
+  IIGObservationType iig_obs_type_;
+};
 
 GoofspielState::GoofspielState(std::shared_ptr<const Game> game, int num_cards,
                                PointsOrder points_order, bool impinfo,
@@ -364,120 +597,15 @@ std::vector<double> GoofspielState::Returns() const {
 }
 
 std::string GoofspielState::InformationStateString(Player player) const {
-  SPIEL_CHECK_GE(player, 0);
-  SPIEL_CHECK_LT(player, num_players_);
-
-  if (impinfo_) {
-    std::string points_line = "Points: ";
-    std::string win_sequence = "Win sequence: ";
-    std::string result = "";
-
-    // Show the points for all players.
-    // Only know the observing player's hand.
-    // Only know the observing player's action sequence.
-    // Know the win-loss outcome of each step.
-    // Show the point card sequence from the start.
-
-    for (auto p = Player{0}; p < num_players_; ++p) {
-      absl::StrAppend(&points_line, points_[p]);
-      absl::StrAppend(&points_line, " ");
-
-      if (p == player) {
-        // Only show this player's hand
-        absl::StrAppend(&result, "P");
-        absl::StrAppend(&result, p);
-        absl::StrAppend(&result, " hand: ");
-        for (int c = 0; c < num_cards_; ++c) {
-          if (player_hands_[p][c]) {
-            absl::StrAppend(&result, c + 1);
-            absl::StrAppend(&result, " ");
-          }
-        }
-        absl::StrAppend(&result, "\n");
-
-        // Also show the player's sequence. We need this to ensure perfect
-        // recall because two betting sequences can lead to the same hand and
-        // outcomes if the opponent chooses differently.
-        absl::StrAppend(&result, "P");
-        absl::StrAppend(&result, p);
-        absl::StrAppend(&result, " action sequence: ");
-        for (int i = 0; i < actions_history_.size(); ++i) {
-          absl::StrAppend(&result, actions_history_[i][p]);
-          absl::StrAppend(&result, " ");
-        }
-        absl::StrAppend(&result, "\n");
-      }
-    }
-
-    for (int i = 0; i < win_sequence_.size(); ++i) {
-      absl::StrAppend(&win_sequence, win_sequence_[i]);
-      win_sequence.push_back(' ');
-    }
-
-    absl::StrAppend(&result, "Point card sequence: ");
-    for (int i = 0; i < point_card_sequence_.size(); ++i) {
-      absl::StrAppend(&result, 1 + point_card_sequence_[i], " ");
-    }
-    absl::StrAppend(&result, "\n");
-
-    return result + win_sequence + "\n" + points_line + "\n";
-  } else {
-    // All the information is public.
-    return ToString();
-  }
+  const GoofspielGame& game =
+      open_spiel::down_cast<const GoofspielGame&>(*game_);
+  return game.info_state_observer_->StringFrom(*this, player);
 }
 
 std::string GoofspielState::ObservationString(Player player) const {
-  SPIEL_CHECK_GE(player, 0);
-  SPIEL_CHECK_LT(player, num_players_);
-
-  // Perfect info case, show:
-  //   - current point card
-  //   - everyone's current points
-  //   - everyone's current hands
-  // Imperfect info case, show:
-  //   - current point card
-  //   - everyone's current points
-  //   - my current hand
-  //   - current win sequence
-  std::string current_trick =
-      absl::StrCat("Current point card: ", CurrentPointValue());
-  std::string points_line = "Points: ";
-  std::string hands = "";
-  std::string win_seq = "Win Sequence: ";
-  for (auto p = Player{0}; p < num_players_; ++p) {
-    absl::StrAppend(&points_line, points_[p], " ");
-  }
-
-  if (impinfo_) {
-    // Only my hand
-    absl::StrAppend(&hands, "P", player, " hand: ");
-    for (int c = 0; c < num_cards_; ++c) {
-      if (player_hands_[player][c]) {
-        absl::StrAppend(&hands, c + 1, " ");
-      }
-    }
-    absl::StrAppend(&hands, "\n");
-
-    // Show the win sequence.
-    for (int i = 0; i < win_sequence_.size(); ++i) {
-      absl::StrAppend(&win_seq, win_sequence_[i], " ");
-    }
-    return absl::StrCat(current_trick, "\n", points_line, "\n", hands, win_seq,
-                        "\n");
-  } else {
-    // Show the hands in the perfect info case.
-    for (auto p = Player{0}; p < num_players_; ++p) {
-      absl::StrAppend(&hands, "P", p, " hand: ");
-      for (int c = 0; c < num_cards_; ++c) {
-        if (player_hands_[p][c]) {
-          absl::StrAppend(&hands, c + 1, " ");
-        }
-      }
-      absl::StrAppend(&hands, "\n");
-    }
-    return absl::StrCat(current_trick, "\n", points_line, "\n", hands);
-  }
+  const GoofspielGame& game =
+      open_spiel::down_cast<const GoofspielGame&>(*game_);
+  return game.default_observer_->StringFrom(*this, player);
 }
 
 void GoofspielState::NextPlayer(int* count, Player* player) const {
@@ -487,144 +615,18 @@ void GoofspielState::NextPlayer(int* count, Player* player) const {
 
 void GoofspielState::InformationStateTensor(Player player,
                                             absl::Span<float> values) const {
-  SPIEL_CHECK_GE(player, 0);
-  SPIEL_CHECK_LT(player, num_players_);
-
-  SPIEL_CHECK_EQ(values.size(), game_->InformationStateTensorSize());
-  auto value_it = values.begin();
-
-  // Point totals: one-hot vector encoding points, per player.
-  Player p = player;
-  for (int n = 0; n < num_players_; NextPlayer(&n, &p)) {
-    // Cards numbered 1 .. K
-    int max_points_slots = (num_cards_ * (num_cards_ + 1)) / 2 + 1;
-    for (int i = 0; i < max_points_slots; ++i) {
-      *value_it++ = (i == points_[p]);
-    }
-  }
-
-  if (impinfo_) {
-    // Bit vector of observing player's hand.
-    for (int c = 0; c < num_cards_; ++c) {
-      *value_it++ = (player_hands_[player][c]);
-    }
-
-    // Sequence of who won each trick.
-    for (int i = 0; i < win_sequence_.size(); ++i) {
-      for (auto p = Player{0}; p < num_players_; ++p) {
-        *value_it++ = (win_sequence_[i] == p);
-      }
-    }
-
-    // Padding for future tricks
-    int future_tricks = num_cards_ - win_sequence_.size();
-    for (int i = 0; i < future_tricks * num_players_; ++i) *value_it++ = (0);
-
-    // Point card sequence.
-    for (int i = 0; i < point_card_sequence_.size(); ++i) {
-      for (int j = 0; j < num_cards_; ++j) {
-        *value_it++ = (point_card_sequence_[i] == j);
-      }
-    }
-
-    // Padding for future tricks
-    future_tricks = num_cards_ - point_card_sequence_.size();
-    for (int i = 0; i < future_tricks * num_cards_; ++i) *value_it++ = (0);
-
-    // The observing player's action sequence.
-    for (int i = 0; i < num_cards_; ++i) {
-      for (int c = 0; c < num_cards_; ++c) {
-        *value_it++ =
-            (i < actions_history_.size() && actions_history_[i][player] == c
-                 ? 1
-                 : 0);
-      }
-    }
-
-  } else {
-    // Point card sequence.
-    for (int i = 0; i < point_card_sequence_.size(); ++i) {
-      for (int j = 0; j < num_cards_; ++j) {
-        *value_it++ = (point_card_sequence_[i] == j);
-      }
-    }
-
-    // Padding for future tricks
-    int future_tricks = num_cards_ - point_card_sequence_.size();
-    for (int i = 0; i < future_tricks * num_cards_; ++i) *value_it++ = (0);
-
-    // Bit vectors encoding all players' hands.
-    p = player;
-    for (int n = 0; n < num_players_; NextPlayer(&n, &p)) {
-      for (int c = 0; c < num_cards_; ++c) {
-        *value_it++ = (player_hands_[p][c]);
-      }
-    }
-  }
-
-  SPIEL_CHECK_EQ(value_it, values.end());
+  ContiguousAllocator allocator(values);
+  const GoofspielGame& game =
+      open_spiel::down_cast<const GoofspielGame&>(*game_);
+  game.info_state_observer_->WriteTensor(*this, player, &allocator);
 }
 
 void GoofspielState::ObservationTensor(Player player,
                                        absl::Span<float> values) const {
-  SPIEL_CHECK_GE(player, 0);
-  SPIEL_CHECK_LT(player, num_players_);
-
-  SPIEL_CHECK_EQ(values.size(), game_->ObservationTensorSize());
-  auto value_it = values.begin();
-
-  // Perfect info case, show:
-  //   - one-hot encoding the current point card
-  //   - everyone's current points
-  //   - everyone's current hands
-  // Imperfect info case, show:
-  //   - one-hot encoding the current point card
-  //   - everyone's current points
-  //   - my current hand
-  //   - current win sequence
-
-  // Current point card.
-  for (int i = 0; i < num_cards_; ++i) {
-    *value_it++ = (i == point_card_);
-  }
-
-  // Point totals: one-hot vector encoding points, per player.
-  Player p = player;
-  for (int n = 0; n < num_players_; NextPlayer(&n, &p)) {
-    // Cards numbered 1 .. K
-    int max_points_slots = (num_cards_ * (num_cards_ + 1)) / 2 + 1;
-    for (int i = 0; i < max_points_slots; ++i) {
-      *value_it++ = (i == points_[p]);
-    }
-  }
-
-  if (impinfo_) {
-    // Bit vector of observing player's hand.
-    for (int c = 0; c < num_cards_; ++c) {
-      *value_it++ = (player_hands_[player][c]);
-    }
-
-    // Sequence of who won each trick.
-    for (int i = 0; i < win_sequence_.size(); ++i) {
-      for (auto p = Player{0}; p < num_players_; ++p) {
-        *value_it++ = (win_sequence_[i] == p);
-      }
-    }
-
-    // Padding for future tricks
-    int future_tricks = num_cards_ - win_sequence_.size();
-    for (int i = 0; i < future_tricks * num_players_; ++i) *value_it++ = (0);
-  } else {
-    // Bit vectors encoding all players' hands.
-    p = player;
-    for (int n = 0; n < num_players_; NextPlayer(&n, &p)) {
-      for (int c = 0; c < num_cards_; ++c) {
-        *value_it++ = (player_hands_[p][c]);
-      }
-    }
-  }
-
-  SPIEL_CHECK_EQ(value_it, values.end());
+  ContiguousAllocator allocator(values);
+  const GoofspielGame& game =
+      open_spiel::down_cast<const GoofspielGame&>(*game_);
+  game.default_observer_->WriteTensor(*this, player, &allocator);
 }
 
 std::unique_ptr<State> GoofspielState::Clone() const {
@@ -648,6 +650,17 @@ GoofspielGame::GoofspielGame(const GameParameters& params)
   if (impinfo_) {
     game_type_.information = GameType::Information::kImperfectInformation;
   }
+
+  default_observer_ = std::make_shared<GoofspielObserver>(kDefaultObsType);
+  info_state_observer_ = std::make_shared<GoofspielObserver>(kInfoStateObsType);
+  private_observer_ = std::make_shared<GoofspielObserver>(
+      IIGObservationType{.public_info = false,
+                         .perfect_recall = false,
+                         .private_info = PrivateInfoType::kSinglePlayer});
+  public_observer_ = std::make_shared<GoofspielObserver>(
+      IIGObservationType{.public_info = true,
+                         .perfect_recall = false,
+                         .private_info = PrivateInfoType::kNone});
 }
 
 std::unique_ptr<State> GoofspielGame::NewInitialState() const {
@@ -747,6 +760,13 @@ double GoofspielGame::MaxUtility() const {
   } else {
     SpielFatalError("Unrecognized returns type.");
   }
+}
+std::shared_ptr<Observer> GoofspielGame::MakeObserver(
+    absl::optional<IIGObservationType> iig_obs_type,
+    const GameParameters& params) const {
+  if (!params.empty()) SpielFatalError("Observation params not supported");
+  return std::make_shared<GoofspielObserver>(
+      iig_obs_type.value_or(kDefaultObsType));
 }
 
 }  // namespace goofspiel

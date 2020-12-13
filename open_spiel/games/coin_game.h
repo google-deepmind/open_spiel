@@ -129,8 +129,9 @@ class CoinGame : public Game {
   int NumPlayers() const override { return num_players_; }
   double MaxUtility() const override;
   double MinUtility() const override;
-  std::shared_ptr<const Game> Clone() const override;
   int MaxGameLength() const override;
+  // TODO: verify whether this bound is tight and/or tighten it.
+  int MaxChanceNodesInHistory() const override { return MaxGameLength(); }
 
   int NumRows() const { return num_rows_; }
   int NumColumns() const { return num_columns_; }
