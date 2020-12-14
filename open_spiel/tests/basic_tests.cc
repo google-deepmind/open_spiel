@@ -234,7 +234,10 @@ void CheckReturnsSum(const Game& game, const State& state) {
 //
 // These functions should crash on invalid players: this is tested in
 // api_test.py as it's simpler to catch the error from Python.
-void CheckObservables(const Game& game, const State& state) {
+void CheckObservables(const Game& game,
+                      const State& state,
+                      Observation* observation  // Can be nullptr
+                     ) {
   for (auto p = Player{0}; p < game.NumPlayers(); ++p) {
     if (game.GetType().provides_information_state_tensor) {
       std::vector<float> v = state.InformationStateTensor(p);
@@ -252,11 +255,21 @@ void CheckObservables(const Game& game, const State& state) {
       // Checking it does not have errors.
       state.ObservationString(p);
     }
+
+    if (observation != nullptr) {
+      if (observation->HasString()) observation->StringFrom(state, p);
+      if (observation->HasTensor()) observation->SetFrom(state, p);
+    }
   }
 }
 
 void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
-                      bool serialize, bool verbose) {
+                      bool serialize, bool verbose,
+                      std::shared_ptr<Observer> observer  // Can be nullptr
+                     ) {
+  std::unique_ptr<Observation> observation =
+      observer == nullptr ? nullptr
+                          : std::make_unique<Observation>(game, observer);
   std::vector<HistoryItem> history;
   std::vector<double> episode_returns(game.NumPlayers(), 0);
 
@@ -355,7 +368,7 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
           std::cout << "player " << p << " chose "
                     << state->ActionToString(p, action) << std::endl;
         }
-        CheckObservables(game, *state);
+        CheckObservables(game, *state, observation.get());
       }
 
       ApplyActionTestClone(game, state.get(), joint_action);
@@ -373,7 +386,7 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
       // Decision node.
       Player player = state->CurrentPlayer();
 
-      CheckObservables(game, *state);
+      CheckObservables(game, *state, observation.get());
 
       // Sample an action uniformly.
       std::vector<Action> actions = state->LegalActions();
@@ -420,7 +433,7 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
 
   // Check the information state of the terminal, too. This is commonly needed,
   // for example, as a final observation in an RL environment.
-  CheckObservables(game, *state);
+  CheckObservables(game, *state, observation.get());
 
   // Check that the returns satisfy the constraints based on the game type.
   CheckReturnsSum(game, *state);
@@ -452,7 +465,7 @@ void RandomSimTest(const Game& game, int num_sims, bool serialize,
   }
   for (int sim = 0; sim < num_sims; ++sim) {
     RandomSimulation(&rng, game, /*undo=*/false, /*serialize=*/serialize,
-                     verbose);
+                     verbose, nullptr);
   }
 }
 
@@ -462,7 +475,7 @@ void RandomSimTestWithUndo(const Game& game, int num_sims) {
             << ", num_sims = " << num_sims << std::endl;
   for (int sim = 0; sim < num_sims; ++sim) {
     RandomSimulation(&rng, game, /*undo=*/true, /*serialize=*/true,
-                     /*verbose=*/true);
+                     /*verbose=*/true, nullptr);
   }
 }
 
@@ -472,8 +485,15 @@ void RandomSimTestNoSerialize(const Game& game, int num_sims) {
             << ", num_sims = " << num_sims << std::endl;
   for (int sim = 0; sim < num_sims; ++sim) {
     RandomSimulation(&rng, game, /*undo=*/false, /*serialize=*/false,
-                     /*verbose=*/true);
+                     /*verbose=*/true, nullptr);
   }
+}
+
+void RandomSimTestCustomObserver(const Game& game,
+                                 const std::shared_ptr<Observer> observer) {
+  std::mt19937 rng;
+  RandomSimulation(&rng, game, /*undo=*/false, /*serialize=*/false,
+                   /*verbose=*/false, observer);
 }
 
 // Format chance outcomes as a string, for error messages.

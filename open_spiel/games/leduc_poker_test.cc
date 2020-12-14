@@ -34,6 +34,10 @@ void BasicLeducTests() {
         *LoadGame("leduc_poker", {{"players", GameParameter(players)}}), 100);
   }
   testing::ResampleInfostateTest(*LoadGame("leduc_poker"), /*num_sims=*/100);
+  auto observer = LoadGame("leduc_poker")
+                      ->MakeObserver(kDefaultObsType,
+                                     GameParametersFromString("single_tensor"));
+  testing::RandomSimTestCustomObserver(*LoadGame("leduc_poker"), observer);
 }
 
 }  // namespace
