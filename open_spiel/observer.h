@@ -114,6 +114,32 @@ class ContiguousAllocator : public Allocator {
   int offset_;
 };
 
+
+// Information about a tensor (shape and type).
+struct TensorInfo {
+  std::string name;
+  std::vector<int> shape;
+
+  std::string DebugString() const {
+    return absl::StrCat("TensorInfo(name='", name, "', shape=(",
+                        absl::StrJoin(shape, ","), ")");
+  }
+};
+
+// Allocates new memory for each allocation request and keeps track
+// of tensor names and shapes. This is intended to use when it's not yet
+// known how much memory an observation consumes.
+class TrackingVectorAllocator : public Allocator {
+ public:
+  TrackingVectorAllocator() {}
+  DimensionedSpan Get(absl::string_view name,
+                      const absl::InlinedVector<int, 4>& shape);
+  bool IsNameUnique(absl::string_view name);
+
+  std::vector<TensorInfo> tensors;
+  std::vector<float> data;
+};
+
 // Specification of which players' private information we get to see.
 enum class PrivateInfoType {
   kNone,          // No private information.
@@ -253,17 +279,6 @@ class Observer {
   // TODO(author11) Remove when all games support both types of observations
   bool has_string_;
   bool has_tensor_;
-};
-
-// Information about a tensor (shape and type).
-struct TensorInfo {
-  std::string name;
-  std::vector<int> shape;
-
-  std::string DebugString() const {
-    return absl::StrCat("TensorInfo(name='", name, "', shape=(",
-                        absl::StrJoin(shape, ","), ")");
-  }
 };
 
 // Holds an Observer and a vector for it to write values into.
