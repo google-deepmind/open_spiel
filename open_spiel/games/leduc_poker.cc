@@ -73,6 +73,16 @@ std::string StatelessActionToString(Action action) {
   }
 }
 
+// Provides the observations / infostates as defined on the state
+// as a single tensor.
+std::shared_ptr<Observer> MakeSingleTensorObserver(
+    const Game& game, absl::optional<IIGObservationType> iig_obs_type,
+    const GameParameters& params) {
+  return std::shared_ptr<Observer>(game.MakeBuiltInObserver(iig_obs_type));
+}
+
+ObserverRegisterer single_tensor(
+    kGameType.short_name, "single_tensor", MakeSingleTensorObserver);
 }  // namespace
 
 // The Observer class is responsible for creating representations of the game
@@ -836,18 +846,12 @@ double LeducGame::MinUtility() const {
 std::shared_ptr<Observer> LeducGame::MakeObserver(
     absl::optional<IIGObservationType> iig_obs_type,
     const GameParameters& params) const {
-  auto iter = params.find("name");
-  if (iter != params.end()) {
-    auto name = iter->second.string_value();
-    if (name == "single_tensor") {
-      // Fall back to the old observations / infostates as a single tensor.
-      return Game::MakeObserver(iig_obs_type, GameParameters());
-    }
-    SpielFatalError(absl::StrCat("Unknown observation specification '",
-                                 iter->second.string_value(), "'"));
+  if (params.empty()) {
+    return std::make_shared<LeducObserver>(
+        iig_obs_type.value_or(kDefaultObsType));
+  } else {
+    return MakeRegisteredObserver(iig_obs_type, params);
   }
-  return std::make_shared<LeducObserver>(
-      iig_obs_type.value_or(kDefaultObsType));
 }
 
 std::string LeducGame::ActionToString(Player player, Action action) const {

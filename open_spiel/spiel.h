@@ -837,6 +837,15 @@ class Game : public std::enable_shared_from_this<Game> {
     return absl::StrCat("Action(id=", action_id, ", player=", player, ")");
   }
 
+  // Returns an observer that was registered, based on its name.
+  std::shared_ptr<Observer> MakeRegisteredObserver(
+      absl::optional<IIGObservationType> iig_obs_type,
+      const GameParameters& params) const;
+  // Returns an observer that uses the observation or informationstate tensor
+  // or string as defined directly on the state.
+  std::shared_ptr<Observer> MakeBuiltInObserver(
+      absl::optional<IIGObservationType> iig_obs_type) const;
+
  protected:
   Game(GameType game_type, GameParameters game_parameters)
       : game_type_(game_type), game_parameters_(game_parameters) {}
