@@ -14,7 +14,7 @@
 # We do pick the latest version for Tensorflow and Jax on purpose.
 pip >= 20.0.2
 absl-py == 0.10.0
-tensorflow == 2.4.0rc3
+tensorflow == 2.4.0
 IPython == 5.8.0
 tensorflow-probability < 0.8.0, >= 0.7.0
 cvxopt == 1.2.5
