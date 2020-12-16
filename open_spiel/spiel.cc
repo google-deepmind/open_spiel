@@ -25,6 +25,7 @@
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/abseil-cpp/absl/random/distributions.h"
+#include "open_spiel/abseil-cpp/absl/strings/match.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_format.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
@@ -642,7 +643,7 @@ std::string GameTypeToString(const GameType& game_type) {
   // Check that there are no newlines in the serialized params.
   std::string serialized_params =
       SerializeGameParameters(game_type.parameter_specification);
-  SPIEL_CHECK_TRUE(serialized_params.find("\n") == std::string::npos);
+  SPIEL_CHECK_TRUE(!absl::StrContains(serialized_params, '\n'));
   absl::StrAppend(&str, "parameter_specification: ", serialized_params);
 
   return str;
