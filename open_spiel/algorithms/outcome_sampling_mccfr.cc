@@ -31,7 +31,7 @@ namespace algorithms {
 // method for more info.
 constexpr const int kSerializationVersion = 1;
 constexpr const char* kSerializeSolverRNGSectionHeader = "[SolverRNG]";
-constexpr const char* kSerializeSolverScalarsSectionHeader = "[SolverScalars]";
+constexpr const char* kSerializeSolverEpsilonSectionHeader = "[SolverEpsilon]";
 constexpr const char* kSerializeSolverDefaultPolicySectionHeader =
     "[SolverDefaultPolicy]";
 
@@ -44,16 +44,14 @@ OutcomeSamplingMCCFRSolver::OutcomeSamplingMCCFRSolver(
     const Game& game, std::shared_ptr<Policy> default_policy, double epsilon,
     int seed)
     : OutcomeSamplingMCCFRSolver(
-          game.shared_from_this(), default_policy, epsilon, -1,
+          game.shared_from_this(), default_policy, epsilon,
           std::mt19937(seed >= 0 ? seed : std::mt19937::default_seed)) {}
 
 OutcomeSamplingMCCFRSolver::OutcomeSamplingMCCFRSolver(
     std::shared_ptr<const Game> game, std::shared_ptr<Policy> default_policy,
-    double epsilon, int update_player, std::mt19937 rng)
+    double epsilon, std::mt19937 rng)
     : game_(game),
       epsilon_(epsilon),
-      num_players_(game->NumPlayers()),
-      update_player_(update_player),
       rng_(rng),
       dist_(0.0, 1.0),
       default_policy_(default_policy) {
@@ -66,9 +64,11 @@ OutcomeSamplingMCCFRSolver::OutcomeSamplingMCCFRSolver(
 }
 
 void OutcomeSamplingMCCFRSolver::RunIteration(std::mt19937* rng) {
-  update_player_ = (update_player_ + 1) % num_players_;
-  std::unique_ptr<State> state = game_->NewInitialState();
-  SampleEpisode(state.get(), rng, 1.0, 1.0, 1.0);
+  // for (Player update_player = Player{0}; update_player < game_->NumPlayers(); ++update_player) {
+  for (Player p = Player{0}; p < game_->NumPlayers(); ++p) {
+    std::unique_ptr<State> state = game_->NewInitialState();
+    SampleEpisode(state.get(), p, rng, 1.0, 1.0, 1.0);
+  }
 }
 
 std::string OutcomeSamplingMCCFRSolver::Serialize(int double_precision,
@@ -94,10 +94,9 @@ std::string OutcomeSamplingMCCFRSolver::Serialize(int double_precision,
   std::ostringstream rng_stream;
   rng_stream << rng_;
   absl::StrAppend(&str, rng_stream.str(), "\n");
-  // Epsilon and number of players (scalar values) section
-  absl::StrAppend(&str, kSerializeSolverScalarsSectionHeader, "\n");
+  // Epsilon section
+  absl::StrAppend(&str, kSerializeSolverEpsilonSectionHeader, "\n");
   absl::StrAppend(&str, epsilon_, "\n");
-  absl::StrAppend(&str, update_player_, "\n");
   // Default policy section
   absl::StrAppend(&str, kSerializeSolverDefaultPolicySectionHeader, "\n");
   absl::StrAppend(&str, default_policy_->Serialize(double_precision, delimiter),
@@ -137,19 +136,20 @@ double OutcomeSamplingMCCFRSolver::BaselineCorrectedChildValue(
 }
 
 double OutcomeSamplingMCCFRSolver::SampleEpisode(State* state,
+                                                 Player update_player,
                                                  std::mt19937* rng,
                                                  double my_reach,
                                                  double opp_reach,
                                                  double sample_reach) {
   if (state->IsTerminal()) {
-    return state->PlayerReturn(update_player_);
+    return state->PlayerReturn(update_player);
   } else if (state->IsChanceNode()) {
     std::pair<Action, double> outcome_and_prob =
         SampleAction(state->ChanceOutcomes(), dist_(*rng));
     SPIEL_CHECK_PROB(outcome_and_prob.second);
     SPIEL_CHECK_GT(outcome_and_prob.second, 0);
     state->ApplyAction(outcome_and_prob.first);
-    return SampleEpisode(state, rng, my_reach,
+    return SampleEpisode(state, update_player, rng, my_reach,
                          outcome_and_prob.second * opp_reach,
                          outcome_and_prob.second * sample_reach);
   } else if (state->IsSimultaneousNode()) {
@@ -173,7 +173,7 @@ double OutcomeSamplingMCCFRSolver::SampleEpisode(State* state,
   info_state_copy.ApplyRegretMatching();
 
   const std::vector<double>& sample_policy =
-      (player == update_player_ ? SamplePolicy(info_state_copy)
+      (player == update_player ? SamplePolicy(info_state_copy)
                                 : info_state_copy.current_policy);
 
   absl::discrete_distribution<int> action_dist(sample_policy.begin(),
@@ -184,11 +184,11 @@ double OutcomeSamplingMCCFRSolver::SampleEpisode(State* state,
 
   state->ApplyAction(legal_actions[sampled_aidx]);
   double child_value = SampleEpisode(
-      state, rng,
-      player == update_player_
+      state, update_player, rng,
+      player == update_player
           ? my_reach * info_state_copy.current_policy[sampled_aidx]
           : my_reach,
-      player == update_player_
+      player == update_player
           ? opp_reach
           : opp_reach * info_state_copy.current_policy[sampled_aidx],
       sample_reach * sample_policy[sampled_aidx]);
@@ -208,7 +208,7 @@ double OutcomeSamplingMCCFRSolver::SampleEpisode(State* state,
         info_state_copy.current_policy[sampled_aidx] * child_values[aidx];
   }
 
-  if (player == update_player_) {
+  if (player == update_player) {
     // Now the regret and avg strategy updates.
     CFRInfoStateValues& info_state = info_states_[is_key];
     info_state.ApplyRegretMatching();
@@ -248,7 +248,12 @@ DeserializeOutcomeSamplingMCCFRSolver(const std::string& serialized,
   auto partial = PartiallyDeserializeCFRSolver(serialized);
   SPIEL_CHECK_EQ(partial.solver_type, "OutcomeSamplingMCCFRSolver");
 
-  enum Section { kInvalid = -1, kRNG = 0, kScalars = 1, kDefaultPolicy = 2 };
+  enum Section { 
+    kInvalid = -1, 
+    kRNG = 0, 
+    kEpsilon = 1,
+    kDefaultPolicy = 2 
+  };
   std::array<std::string, 3> section_strings = {"", "", ""};
   Section current_section = kInvalid;
 
@@ -258,11 +263,11 @@ DeserializeOutcomeSamplingMCCFRSolver(const std::string& serialized,
     if (lines[i] == kSerializeSolverRNGSectionHeader) {
       SPIEL_CHECK_EQ(current_section, kInvalid);
       current_section = kRNG;
-    } else if (lines[i] == kSerializeSolverScalarsSectionHeader) {
+    } else if (lines[i] == kSerializeSolverEpsilonSectionHeader) {
       SPIEL_CHECK_EQ(current_section, kRNG);
-      current_section = kScalars;
+      current_section = kEpsilon;
     } else if (lines[i] == kSerializeSolverDefaultPolicySectionHeader) {
-      SPIEL_CHECK_EQ(current_section, kScalars);
+      SPIEL_CHECK_EQ(current_section, kEpsilon);
       current_section = kDefaultPolicy;
     } else {
       SPIEL_CHECK_NE(current_section, kInvalid);
@@ -278,13 +283,13 @@ DeserializeOutcomeSamplingMCCFRSolver(const std::string& serialized,
   std::mt19937 rng = std::mt19937();
   std::istringstream rng_stream(section_strings[kRNG]);
   rng_stream >> rng;
-  // Fist scalar is epsilon, second is update_player
-  std::pair<std::string, std::string> scalars =
-      absl::StrSplit(section_strings[kScalars], '\n');
+
+  // First scalar is epsilon, second is update_player
+  std::string epsilon = section_strings[kEpsilon];
 
   auto solver = std::make_unique<OutcomeSamplingMCCFRSolver>(
       partial.game, DeserializePolicy(section_strings[kDefaultPolicy]),
-      std::stod(scalars.first), std::stoi(scalars.second), rng);
+      std::stod(epsilon), rng);
   DeserializeCFRInfoStateValuesTable(partial.serialized_cfr_values_table,
                                      &solver->InfoStateValuesTable(),
                                      delimiter);
