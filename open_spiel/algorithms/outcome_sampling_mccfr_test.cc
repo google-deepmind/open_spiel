@@ -80,11 +80,14 @@ namespace algorithms = open_spiel::algorithms;
 
 int main(int argc, char** argv) {
   std::mt19937 rng(algorithms::kSeed);
-  // Values double-checked with the original implementation used in (Lanctot,
-  // "Monte Carlo Sampling and Regret Minimization For Equilibrium Computation
-  // and Decision-Making in Large Extensive Form Games", 2013).
-  algorithms::MCCFR_2PGameTest("kuhn_poker", &rng, 10000, 0.04);
-  algorithms::MCCFR_2PGameTest("leduc_poker", &rng, 10000, 3);
-  algorithms::MCCFR_2PGameTest("liars_dice", &rng, 1000, 1.7);
+  // Convergence results change depending on
+  // the seed specified for running the tests.
+  // For this reason, test thresholds have been adapted
+  // taking the maximum Nash exploitability value obtained
+  // at iteration 10000 from multiple runs.
+  // For more details see https://github.com/deepmind/open_spiel/pull/458
+  algorithms::MCCFR_2PGameTest("kuhn_poker", &rng, 10000, 0.17);
+  algorithms::MCCFR_2PGameTest("leduc_poker", &rng, 10000, 3.07);
+  algorithms::MCCFR_2PGameTest("liars_dice", &rng, 10000, 1.45);
   algorithms::MCCFR_SerializationTest();
 }
