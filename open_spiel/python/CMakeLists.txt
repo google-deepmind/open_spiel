@@ -13,6 +13,8 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
   pybind11/algorithms_trajectories.h
   pybind11/bots.cc
   pybind11/bots.h
+  pybind11/games_backgammon.cc
+  pybind11/games_backgammon.h
   pybind11/games_bridge.cc
   pybind11/games_bridge.h
   pybind11/games_negotiation.cc
@@ -155,6 +157,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   utils/spawn_test.py
   pytorch/rcfr_pytorch_test.py
   pytorch/dqn_pytorch_test.py
+  pytorch/nfsp_pytorch_test.py
 )
 
 

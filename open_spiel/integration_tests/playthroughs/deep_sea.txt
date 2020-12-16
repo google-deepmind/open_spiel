@@ -43,7 +43,7 @@ HistoryString() = ""
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-ObservationString(0) = "x........................"
+ObservationString(0) = "x............................."
 ObservationTensor(0): ◉◯◯◯◯
                       ◯◯◯◯◯
                       ◯◯◯◯◯
@@ -70,7 +70,7 @@ HistoryString() = "0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-ObservationString(0) = ".....x..................."
+ObservationString(0) = ".....x........................"
 ObservationTensor(0): ◯◯◯◯◯
                       ◉◯◯◯◯
                       ◯◯◯◯◯
@@ -97,7 +97,7 @@ HistoryString() = "0 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-ObservationString(0) = "...........x............."
+ObservationString(0) = "...........x.................."
 ObservationTensor(0): ◯◯◯◯◯
                       ◯◯◯◯◯
                       ◯◉◯◯◯
@@ -124,7 +124,7 @@ HistoryString() = "0 1 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-ObservationString(0) = "...............x........."
+ObservationString(0) = "...............x.............."
 ObservationTensor(0): ◯◯◯◯◯
                       ◯◯◯◯◯
                       ◯◯◯◯◯
@@ -151,7 +151,7 @@ HistoryString() = "0 1 0 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-ObservationString(0) = ".....................x..."
+ObservationString(0) = ".....................x........"
 ObservationTensor(0): ◯◯◯◯◯
                       ◯◯◯◯◯
                       ◯◯◯◯◯
@@ -178,7 +178,7 @@ HistoryString() = "0 1 0 1 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
-ObservationString(0) = "........................."
+ObservationString(0) = "...........................x.."
 ObservationTensor(0): ◯◯◯◯◯
                       ◯◯◯◯◯
                       ◯◯◯◯◯

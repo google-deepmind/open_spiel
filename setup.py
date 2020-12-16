@@ -104,6 +104,7 @@ class BuildExt(build_ext):
     cxx = "clang++"
     if os.environ.get("CXX") is not None:
       cxx = os.environ.get("CXX")
+    env = os.environ.copy()
     cmake_args = [
         f"-DPython3_EXECUTABLE={sys.executable}",
         f"-DCMAKE_CXX_COMPILER={cxx}",
@@ -112,8 +113,8 @@ class BuildExt(build_ext):
     if not os.path.exists(self.build_temp):
       os.makedirs(self.build_temp)
     subprocess.check_call(
-        ["cmake", ext.sourcedir] + cmake_args, cwd=self.build_temp)
-    env = os.environ.copy()
+        ["cmake", ext.sourcedir] + cmake_args, cwd=self.build_temp,
+        env=env)
     if os.environ.get("OPEN_SPIEL_BUILD_ALL") is not None:
       # Build everything (necessary for nox tests)
       subprocess.check_call(["make", f"-j{os.cpu_count()}"],
@@ -153,7 +154,7 @@ else:
 
 setuptools.setup(
     name="open_spiel",
-    version="0.2.0",
+    version="0.2.0rc4",
     license="Apache 2.0",
     author="The OpenSpiel authors",
     author_email="open_spiel@google.com",
@@ -162,7 +163,9 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/deepmind/open_spiel",
     install_requires=_get_requirements(req_file),
+    python_requires=">=3",
     ext_modules=[CMakeExtension("pyspiel", sourcedir="open_spiel")],
     cmdclass={"build_ext": BuildExt},
     zip_safe=False,
+    packages=setuptools.find_packages(include=["open_spiel", "open_spiel.*"])
 )

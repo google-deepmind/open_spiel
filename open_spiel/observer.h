@@ -19,6 +19,28 @@
 // Each Game object has a MakeObserver() method which returns an Observer
 // object given a specification of the required observation type.
 
+// To access observation from C++, first initialize an observer and observation
+// for the game (one time only).
+//
+//    auto observer = game->MakeObserver(iig_obs_type, params);
+//    Observation observation(*game, observer);
+//
+// Then for states in a trajectory, get a tensor observation using:
+//
+//    observation.SetFrom(state, player);   // populates observation.Tensor()
+//
+// The resultant tensor is accessible from observation.Tensor(). Note that
+// the decomposition of the tensor into named pieces is not currently available
+// through this API (it is available in Python).
+//
+// To obtain a string observation:
+//
+//    std::string string_obs = observation.StringFrom(state, player);
+//
+// Access from Python follows a similar pattern, with the addition of support
+// for accessing pieces of the observation tensor by name. See `observation.py`
+// and `observation_test.py`.
+
 #include <memory>
 #include <string>
 #include <vector>
@@ -90,6 +112,32 @@ class ContiguousAllocator : public Allocator {
  private:
   absl::Span<float> data_;
   int offset_;
+};
+
+
+// Information about a tensor (shape and type).
+struct TensorInfo {
+  std::string name;
+  std::vector<int> shape;
+
+  std::string DebugString() const {
+    return absl::StrCat("TensorInfo(name='", name, "', shape=(",
+                        absl::StrJoin(shape, ","), ")");
+  }
+};
+
+// Allocates new memory for each allocation request and keeps track
+// of tensor names and shapes. This is intended to use when it's not yet
+// known how much memory an observation consumes.
+class TrackingVectorAllocator : public Allocator {
+ public:
+  TrackingVectorAllocator() {}
+  DimensionedSpan Get(absl::string_view name,
+                      const absl::InlinedVector<int, 4>& shape);
+  bool IsNameUnique(absl::string_view name);
+
+  std::vector<TensorInfo> tensors;
+  std::vector<float> data;
 };
 
 // Specification of which players' private information we get to see.
@@ -231,17 +279,6 @@ class Observer {
   // TODO(author11) Remove when all games support both types of observations
   bool has_string_;
   bool has_tensor_;
-};
-
-// Information about a tensor (shape and type).
-struct TensorInfo {
-  std::string name;
-  std::vector<int> shape;
-
-  std::string DebugString() const {
-    return absl::StrCat("TensorInfo(name='", name, "', shape=(",
-                        absl::StrJoin(shape, ","), ")");
-  }
 };
 
 // Holds an Observer and a vector for it to write values into.

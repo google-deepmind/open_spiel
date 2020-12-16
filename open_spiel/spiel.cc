@@ -251,12 +251,17 @@ std::pair<Action, double> SampleAction(const ActionsAndProbs& outcomes,
   SPIEL_CHECK_GE(z, 0);
   SPIEL_CHECK_LT(z, 1);
 
+  // Special case for one-item lists.
+  if (outcomes.size() == 1) {
+    SPIEL_CHECK_FLOAT_EQ(outcomes[0].second, 1.0);
+    return outcomes[0];
+  }
+
   // First do a check that this is indeed a proper discrete distribution.
   double sum = 0;
   for (const std::pair<Action, double>& outcome : outcomes) {
     double prob = outcome.second;
-    SPIEL_CHECK_GE(prob, 0);
-    SPIEL_CHECK_LE(prob, 1);
+    SPIEL_CHECK_PROB(prob);
     sum += prob;
   }
   SPIEL_CHECK_FLOAT_EQ(sum, 1.0);

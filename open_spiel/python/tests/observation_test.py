@@ -52,8 +52,8 @@ class ObservationTest(absltest.TestCase):
     np.testing.assert_array_equal(observation.dict["pot_contribution"], [3, 3])
     self.assertEqual(
         observation.string_from(state, 0),
-        "[Round 2][Player: 0][Pot: 6][Money: 97 97[Private: 1]"
-        "[Ante: 3 3][Public: 3]")
+        "[Observer: 0][Private: 1][Round 2][Player: 0][Pot: 6]"
+        "[Money: 97 97][Public: 3][Ante: 3 3]")
 
   def test_leduc_info_state(self):
     game = pyspiel.load_game("leduc_poker")
@@ -85,8 +85,8 @@ class ObservationTest(absltest.TestCase):
         ])
     self.assertEqual(
         observation.string_from(state, 0),
-        "[Round 2][Player: 0][Pot: 6][Money: 97 97[Private: 1]]"
-        "[Round1]: 2 1[Public: 3]\nRound 2 sequence: ")
+        "[Observer: 0][Private: 1][Round 2][Player: 0][Pot: 6]"
+        "[Money: 97 97][Public: 3][Round1: 2 1][Round2: ]")
 
   def test_leduc_info_state_as_single_tensor(self):
     game = pyspiel.load_game("leduc_poker")
@@ -195,7 +195,7 @@ class ObservationTest(absltest.TestCase):
         obs2.decompress(compressed)
         np.testing.assert_array_equal(obs1.tensor, obs2.tensor)
     expected_freq = {
-        3: 840,     # Compressible states take 3 bytes
+        3: 840,  # Compressible states take 3 bytes
         65: 17760,  # Uncompressible states take 65 bytes
     }
     self.assertEqual(freq, expected_freq)

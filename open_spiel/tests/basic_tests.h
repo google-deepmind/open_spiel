@@ -56,6 +56,8 @@ void CheckChanceOutcomes(const Game& game);
 // mode kSampledStochastic).
 void RandomSimTestNoSerialize(const Game& game, int num_sims);
 
+void RandomSimTestCustomObserver(const Game& game,
+                                 const std::shared_ptr<Observer> observer);
 // Verifies that ResampleFromInfostate is correctly implemented.
 void ResampleInfostateTest(const Game& game, int num_sims);
 

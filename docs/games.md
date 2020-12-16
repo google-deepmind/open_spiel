@@ -47,6 +47,7 @@ Status                                       | Game
 ![](_static/green_circ10.png "green circle") | [Pig](#pig)
 <font color="orange"><b>~</b></font>         | [Poker (Hold 'em)](#poker-hold-em)
 ![](_static/green_circ10.png "green circle") | [Quoridor](#quoridor)
+<font color="orange"><b>~</b></font>         | [Sheriff](#sheriff)
 <font color="orange"><b>~</b></font>         | [Slovenian Tarok](#slovenian-tarok)
 <font color="orange"><b>~</b></font>         | [Skat (simplified bidding)](#skat-simplified-bidding)
 <font color="orange"><b>~</b></font>         | [Solitaire (K+)](#solitaire-k)
@@ -472,6 +473,19 @@ Status                                       | Game
 *   Perfect information.
 *   2-4 players.
 *   [Wikipedia](https://en.wikipedia.org/wiki/Quoridor)
+
+### Sheriff
+
+*   Bargaining game.
+*   Deterministic.
+*   Imperfect information.
+*   2 players.
+*   Good for correlated equilibria.
+*   [Farina et al. '19, Correlation in Extensive-Form Games: Saddle-Point
+    Formulation and
+    Benchmarks](https://papers.nips.cc/paper/9122-correlation-in-extensive-form-games-saddle-point-formulation-and-benchmarks.pdf).
+*   Based on the board game "Sheriff of Nottingham"
+    [(bbg)](https://boardgamegeek.com/boardgame/157969/sheriff-nottingham)
 
 ### Slovenian Tarok
 
