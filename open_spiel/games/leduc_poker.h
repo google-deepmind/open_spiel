@@ -133,6 +133,7 @@ class LeducState : public State {
   void Ante(Player player, int amount);
   void SetPrivate(Player player, Action move);
   int NumObservableCards() const;
+  int MaxBetsPerRound() const;
 
   // Fields sets to bad/invalid values. Use Game::NewInitialState().
   Player cur_player_;

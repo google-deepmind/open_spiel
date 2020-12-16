@@ -36,7 +36,7 @@ let package = Package(
       targets: ["TexasHoldemBenchmark"]),
   ],
   dependencies: [
-    .package(name: "Benchmark", url: "https://github.com/google/swift-benchmark.git", .branch("master")),
+    .package(name: "Benchmark", url: "https://github.com/google/swift-benchmark.git", from: "0.1.0"),
   ],
   targets: [
     .target(

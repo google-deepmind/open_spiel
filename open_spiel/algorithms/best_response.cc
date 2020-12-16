@@ -198,5 +198,61 @@ Action TabularBestResponse::BestResponseAction(const std::string& infostate) {
   return best_action;
 }
 
+std::vector<Action> TabularBestResponse::BestResponseActions(
+    const std::string& infostate, double tolerance) {
+  std::vector<Action> best_actions;
+  std::vector<std::pair<HistoryNode*, double>> infoset =
+      infosets_.at(infostate);
+
+  double best_value = std::numeric_limits<double>::lowest();
+  // The legal actions are the same for all children, so we arbitrarily pick the
+  // first one to get the legal actions from.
+  for (const Action& action : infoset[0].first->GetChildActions()) {
+    double value = 0;
+    // Prob here is the counterfactual reach-weighted probability.
+    for (const auto& [state_node, prob]  : infoset) {
+      HistoryNode* child_node = state_node->GetChild(action).second;
+      SPIEL_CHECK_TRUE(child_node != nullptr);
+      value += prob * Value(child_node->GetHistory());
+    }
+    if (value > best_value + tolerance) {
+      best_value = value;
+      best_actions.clear();
+      best_actions.push_back(action);
+    } else if (value > best_value - tolerance) {
+      best_actions.push_back(action);
+    }
+  }
+  if (best_actions.empty()) SpielFatalError("No action was chosen.");
+  return best_actions;
+}
+
+std::vector<std::pair<Action, double>>
+TabularBestResponse::BestResponseActionValues(const std::string& infostate) {
+  std::vector<std::pair<Action, double>> action_values;
+  std::vector<std::pair<HistoryNode*, double>> infoset =
+      infosets_.at(infostate);
+
+  action_values.reserve(infoset[0].first->GetChildActions().size());
+  for (const auto& action : infoset[0].first->GetChildActions()) {
+    double value = 0;
+    double normalizer = 0;
+
+    // Prob here is the counterfactual reach-weighted probability.
+    for (const auto& state_and_prob : infoset) {
+      HistoryNode* state_node = state_and_prob.first;
+      HistoryNode* child_node = state_node->GetChild(action).second;
+      SPIEL_CHECK_TRUE(child_node != nullptr);
+      value += state_and_prob.second * Value(child_node->GetHistory());
+      normalizer += state_and_prob.second;
+    }
+
+    SPIEL_CHECK_GT(normalizer, 0);
+    action_values.push_back({action, value / normalizer});
+  }
+
+  return action_values;
+}
+
 }  // namespace algorithms
 }  // namespace open_spiel

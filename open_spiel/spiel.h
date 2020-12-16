@@ -391,8 +391,8 @@ class State {
   // is returned in a form they support. For example, InformationState()
   // could simply return the history for a perfect information game.
 
-  // The InformationState must be returned at terminal states, since this is
-  // required in some applications (e.g. final observation in an RL
+  // A valid InformationStateString must be returned at terminal states, since
+  // this is required in some applications (e.g. final observation in an RL
   // environment).
 
   // The information state should be perfect-recall, i.e. if two states
@@ -406,15 +406,15 @@ class State {
   // consistent for all the players (even the non-acting player(s)).
   // By consistency we mean that when you maintain an Action-Observation
   // history (AOH) for different ground states, the (in)equality of two AOHs
-  // implies the (in)equality of two InformationStates.
-  // In other words, AOH is a factored representation of InformationState.
+  // implies the (in)equality of two InformationStates. In other words, AOH is a
+  // factored representation of InformationState.
   //
   // For details, see Section 3.1 of https://arxiv.org/abs/1908.09453
   // or Section 2.1 of https://arxiv.org/abs/1906.11110
 
   // There are currently no use-case for calling this function with
-  // `kChancePlayerId` or `kTerminalPlayerId`. Thus, games are expected to raise
-  // an error in those cases using (and it's tested in api_test.py):
+  // `kChancePlayerId`. Thus, games are expected to raise an error in those
+  // cases using (and it's tested in api_test.py). Use this:
   //   SPIEL_CHECK_GE(player, 0);
   //   SPIEL_CHECK_LT(player, num_players_);
   virtual std::string InformationStateString(Player player) const {
@@ -430,9 +430,13 @@ class State {
   // (0,0,0), (0,0,1), (0,0,2), (0,1,0), ... , (1,3,2).
   // This function should resize the supplied vector if required.
 
+  // A valid InformationStateTensor must be returned at terminal states, since
+  // this is required in some applications (e.g. final observation in an RL
+  // environment).
+
   // There are currently no use-case for calling this function with
-  // `kChancePlayerId` or `kTerminalPlayerId`. Thus, games are expected to raise
-  // an error in those cases.
+  // `kChancePlayerId`. Thus, games are expected to raise an error in those
+  // cases.
   //
   // Implementations should start with (and it's tested in api_test.py):
   //   SPIEL_CHECK_GE(player, 0);
@@ -464,6 +468,10 @@ class State {
   // Observations should cover all observations: a combination of both public
   // and private observations. They are not factored into these individual
   // constituent parts.
+  //
+  // A valid observation must be returned at terminal states, since this is
+  // required in some applications (e.g. final observation in an RL
+  // environment).
   //
   // Implementations should start with (and it's tested in api_test.py):
   //   SPIEL_CHECK_GE(player, 0);
@@ -835,7 +843,7 @@ class Game : public std::enable_shared_from_this<Game> {
 
   // Access to game parameters. Returns the value provided by the user. If not:
   // - Defaults to the value stored as the default in
-  // game_type.parameter_specification if the `default_value` is std::nullopt
+  // game_type.parameter_specification if the `default_value` is absl::nullopt
   // - Returns `default_value` if provided.
   template <typename T>
   T ParameterValue(const std::string& key,

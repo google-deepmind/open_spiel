@@ -33,6 +33,8 @@ add_library (algorithms OBJECT
   get_legal_actions_map.h
   history_tree.cc
   history_tree.h
+  infostate_tree.h
+  infostate_tree.cc
   is_mcts.cc
   is_mcts.h
   matrix_game_utils.cc
@@ -47,6 +49,8 @@ add_library (algorithms OBJECT
   oos.cc
   outcome_sampling_mccfr.cc
   outcome_sampling_mccfr.h
+  policy_iteration.cc
+  policy_iteration.h
   state_distribution.cc
   state_distribution.h
   tabular_exploitability.cc
@@ -111,6 +115,10 @@ add_test(get_legal_actions_map_test get_legal_actions_map_test)
 add_executable(history_tree_test history_tree_test.cc
         $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})
 add_test(history_tree_test history_tree_test)
+
+add_executable(infostate_tree_test   infostate_tree_test.cc
+        $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})
+add_test(infostate_tree_test infostate_tree_test)
 
 add_executable(is_mcts_test is_mcts_test.cc
         $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})

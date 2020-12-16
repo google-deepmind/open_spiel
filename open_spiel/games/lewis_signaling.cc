@@ -101,9 +101,9 @@ std::string LewisSignalingState::ObservationString(Player player) const {
   absl::StrAppend(&str, "Current turn: ", cur_player_, "\n");
 
   // Show state to the sender, message to the receiver
-  if (static_cast<Players>(cur_player_) == Players::kSender) {
+  if (static_cast<Players>(player) == Players::kSender) {
     absl::StrAppend(&str, "State: ", state_, "\n");
-  } else if (static_cast<Players>(cur_player_) == Players::kReceiver) {
+  } else if (static_cast<Players>(player) == Players::kReceiver) {
     absl::StrAppend(&str, "Message: ", message_, "\n");
   } else {
     SpielFatalError("Invalid player");
@@ -135,12 +135,16 @@ void LewisSignalingState::ObservationTensor(Player player,
   offset += 1;
 
   // one-hot vector for the state/message
-  if (static_cast<Players>(cur_player_) == Players::kSender) {
-    values[offset + state_] = 1;
-    offset += num_states_;
-  } else if (static_cast<Players>(cur_player_) == Players::kReceiver) {
-    values[offset + message_] = 1;
-    offset += num_messages_;
+  if (static_cast<Players>(player) == Players::kSender) {
+    if (state_ != kUnassignedValue) {
+      values[offset + state_] = 1;
+      offset += num_states_;
+    }
+  } else if (static_cast<Players>(player) == Players::kReceiver) {
+    if (message_ != kUnassignedValue) {
+      values[offset + message_] = 1;
+      offset += num_messages_;
+    }
   } else {
     SpielFatalError("Invalid player");
   }
@@ -154,9 +158,9 @@ LewisSignalingState::LewisSignalingState(std::shared_ptr<const Game> game,
       num_messages_(num_messages),
       payoffs_(payoffs),
       cur_player_(kChancePlayerId),
-      state_(-1),
-      message_(-1),
-      action_(-1) {}
+      state_(kUnassignedValue),
+      message_(kUnassignedValue),
+      action_(kUnassignedValue) {}
 
 int LewisSignalingState::CurrentPlayer() const {
   return IsTerminal() ? kTerminalPlayerId : cur_player_;

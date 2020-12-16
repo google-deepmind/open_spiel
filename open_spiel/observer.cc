@@ -160,31 +160,24 @@ std::shared_ptr<Observer> Game::MakeObserver(
                                IIGObservationTypeToString(*iig_obs_type)));
 }
 
-class TrackingVectorAllocator : public Allocator {
- public:
-  TrackingVectorAllocator() {}
-  DimensionedSpan Get(absl::string_view name,
-                      const absl::InlinedVector<int, 4>& shape) {
-    SPIEL_DCHECK_TRUE(IsNameUnique(name));
-    tensors.push_back(
-        TensorInfo{std::string(name), {shape.begin(), shape.end()}});
-    const int begin_size = data.size();
-    const int size = absl::c_accumulate(shape, 1, std::multiplies<int>());
-    data.resize(begin_size + size);
-    return DimensionedSpan(absl::MakeSpan(data).subspan(begin_size, size),
-                           shape);
-  }
+DimensionedSpan TrackingVectorAllocator::Get(absl::string_view name,
+                    const absl::InlinedVector<int, 4>& shape) {
+  SPIEL_DCHECK_TRUE(IsNameUnique(name));
+  tensors.push_back(
+      TensorInfo{std::string(name), {shape.begin(), shape.end()}});
+  const int begin_size = data.size();
+  const int size = absl::c_accumulate(shape, 1, std::multiplies<int>());
+  data.resize(begin_size + size);
+  return DimensionedSpan(absl::MakeSpan(data).subspan(begin_size, size),
+                         shape);
+}
 
-  bool IsNameUnique(absl::string_view name) {
-    for (const TensorInfo& tensor : tensors) {
-      if (tensor.name == name) return false;
-    }
-    return true;
+bool TrackingVectorAllocator::IsNameUnique(absl::string_view name) {
+  for (const TensorInfo& tensor : tensors) {
+    if (tensor.name == name) return false;
   }
-
-  std::vector<TensorInfo> tensors;
-  std::vector<float> data;
-};
+  return true;
+}
 
 Observation::Observation(const Game& game, std::shared_ptr<Observer> observer)
     : observer_(std::move(observer)) {

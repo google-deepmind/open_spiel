@@ -153,6 +153,7 @@ GameParameters DeserializeGameParameters(
 
 inline std::string GameParametersToString(const GameParameters& game_params) {
   std::string str;
+  if (game_params.empty()) return "";
   if (game_params.count("name")) str = game_params.at("name").string_value();
   str.push_back('(');
   bool first = true;
@@ -193,6 +194,7 @@ GameParameter GameParameterFromString(const std::string& str) {
 
 GameParameters GameParametersFromString(const std::string& game_string) {
   GameParameters params;
+  if (game_string.empty()) return params;
   int first_paren = game_string.find('(');
   if (first_paren == std::string::npos) {
     params["name"] = GameParameter(game_string);

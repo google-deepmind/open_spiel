@@ -13,6 +13,8 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
   pybind11/algorithms_trajectories.h
   pybind11/bots.cc
   pybind11/bots.h
+  pybind11/games_backgammon.cc
+  pybind11/games_backgammon.h
   pybind11/games_bridge.cc
   pybind11/games_bridge.h
   pybind11/games_negotiation.cc
@@ -93,6 +95,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   algorithms/cfr_br_test.py
   algorithms/cfr_test.py
   algorithms/deep_cfr_test.py
+  algorithms/deep_cfr_tf2_test.py
   algorithms/discounted_cfr_test.py
   algorithms/double_oracle_test.py
   algorithms/dqn_test.py
@@ -152,6 +155,9 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   utils/file_logger_test.py
   utils/lru_cache_test.py
   utils/spawn_test.py
+  pytorch/rcfr_pytorch_test.py
+  pytorch/dqn_pytorch_test.py
+  pytorch/nfsp_pytorch_test.py
 )
 
 

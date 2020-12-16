@@ -1,0 +1,30 @@
+EFG 2 R "Modified Shapley's Game in Morrill et al., Hindsight and Sequential Rationality of Correlated Play" { "Player 1" "Player 2" } ""
+
+p "ROOT" 1 1 "Root infoset" { "R" "P" "S" } 0
+  p "R" 1 2 "P1 R" { "PR" "PNR" } 0
+    p "R PR" 2 1 "P2 Infoset" { "r" "p" "s" } 0
+      t "R PR r" 1 "Outcome R PR r" { 0.003 0.0 }
+      t "R PR p" 2 "Outcome R PR p" { 0.0 1.0 }
+      t "R PR s" 3 "Outcome R PR s" { 1.0 0.0 }
+    p "R PNR" 2 1 "P2 Infoset" { "r" "p" "s" } 0
+      t "R PNR r" 4 "Outcome R PNR r" { 0.0 0.0 }
+      t "R PNR p" 5 "Outcome R PNR p" { 0.001 1.0 }
+      t "R PNR s" 6 "Outcome R PNR s" { 1.001 0.0 }
+  p "P" 1 3 "P1 P" { "PR" "PNR" } 0
+    p "P PR" 2 1 "P2 Infoset" { "r" "p" "s" } 0
+      t "P PR r" 7 "Outcome P PR r" { 1.003 0.0 }
+      t "P PR p" 8 "Outcome P PR p" { 0.0 0.0 }
+      t "P PR s" 9 "Outcome P PR s" { 0.0 1.0 }
+    p "P PNR" 2 1 "P2 Infoset" { "r" "p" "s" } 0
+      t "P PNR r" 10 "Outcome P PNR r" { 1.0 0.0 }
+      t "P PNR p" 11 "Outcome P PNR p" { 0.001 0.0 }
+      t "P PNR s" 12 "Outcome P PNR s" { 0.001 1.0 }
+  p "S" 1 4 "P1 S" { "PR" "PNR" } 0
+    p "S PR" 2 1 "P2 Infoset" { "r" "p" "s" } 0
+      t "S PR r" 13 "Outcome S PR r" { 0.003 1.0 }
+      t "S PR p" 14 "Outcome S PR p" { 1.0 0.0 }
+      t "S PR s" 15 "Outcome S PR s" { 0.0 0.0 }
+    p "S PNR" 2 1 "P2 Infoset" { "r" "p" "s" } 0
+      t "S PNR r" 16 "Outcome S PNR r" { 0.0 1.0 }
+      t "S PNR p" 17 "Outcome S PNR p" { 1.001 0.0 }
+      t "S PNR s" 18 "Outcome S PNR s" { 0.001 0.0 }

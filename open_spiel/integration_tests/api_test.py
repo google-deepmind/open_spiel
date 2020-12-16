@@ -21,6 +21,7 @@ import re
 from typing import Callable, Dict, List, Tuple
 import unittest
 
+from absl import app
 from absl import flags
 from absl.testing import absltest
 from absl.testing import parameterized
@@ -309,8 +310,9 @@ class EnforceAPIOnPartialTreeBase(parameterized.TestCase):
 
     for state in self.some_states:
       if game_type.provides_information_state_string:
-        for p in range(num_players):
-          state.information_state_string(p)
+        if not state.is_chance_node():
+          for p in range(num_players):
+            state.information_state_string(p)
         msg = f"information_state_string did not raise an error for {game_name}"
         with self.assertRaisesRegex(RuntimeError, "player >= 0", msg=msg):
           state.information_state_string(-1)
@@ -318,9 +320,10 @@ class EnforceAPIOnPartialTreeBase(parameterized.TestCase):
           state.information_state_string(num_players + 1)
 
       if game_type.provides_information_state_tensor:
-        for p in range(num_players):
-          v = state.information_state_tensor(p)
-          self.assertLen(v, game.information_state_tensor_size())
+        if not state.is_chance_node():
+          for p in range(num_players):
+            v = state.information_state_tensor(p)
+            self.assertLen(v, game.information_state_tensor_size())
         msg = f"information_state_tensor did not raise an error for {game_name}"
         with self.assertRaisesRegex(RuntimeError, "player >= 0", msg=msg):
           state.information_state_tensor(-1)
@@ -328,9 +331,10 @@ class EnforceAPIOnPartialTreeBase(parameterized.TestCase):
           state.information_state_tensor(num_players + 1)
 
       if game_type.provides_observation_tensor:
-        for p in range(num_players):
-          v = state.observation_tensor(p)
-          self.assertLen(v, game.observation_tensor_size())
+        if not state.is_chance_node():
+          for p in range(num_players):
+            v = state.observation_tensor(p)
+            self.assertLen(v, game.observation_tensor_size())
         msg = f"observation_tensor did not raise an error for {game_name}"
         with self.assertRaisesRegex(RuntimeError, "player >= 0", msg=msg):
           state.observation_tensor(-1)
@@ -338,8 +342,9 @@ class EnforceAPIOnPartialTreeBase(parameterized.TestCase):
           state.observation_tensor(num_players + 1)
 
       if game_type.provides_observation_string:
-        for p in range(num_players):
-          state.observation_string(p)
+        if not state.is_chance_node():
+          for p in range(num_players):
+            state.observation_string(p)
         msg = f"observation_string did not raise an error for {game_name}"
         with self.assertRaisesRegex(RuntimeError, "player >= 0", msg=msg):
           state.observation_string(-1)
@@ -741,5 +746,10 @@ def load_tests(loader, tests, pattern):  # pylint: disable=invalid-name,g-doc-ar
   return unittest.TestSuite(tests=tests)
 
 
-if __name__ == "__main__":
+def main(_):
   absltest.main()
+
+
+if __name__ == "__main__":
+  # Necessary to run main via app.run for internal tests.
+  app.run(main)

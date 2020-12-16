@@ -317,15 +317,17 @@ std::unique_ptr<HistoryDistribution> UpdateIncrementalStateDistribution(
   return dist;
 }
 
-std::string PrintBeliefs(const HistoryDistribution& beliefs) {
+std::string PrintBeliefs(const HistoryDistribution& beliefs, int player_id) {
   const int num_states = beliefs.first.size();
   SPIEL_CHECK_EQ(num_states, beliefs.second.size());
   std::string str;
   for (int i = 0; i < num_states; ++i) {
     absl::StrAppend(
-        &str, absl::StrFormat("(%s, %f)", beliefs.first[i]->HistoryString(),
-                              beliefs.second[i]));
-    if (i < num_states - 1) absl::StrAppend(&str, ", ");
+        &str,
+        absl::StrFormat("(%s, %f)",
+                        beliefs.first[i]->InformationStateString(player_id),
+                        beliefs.second[i]));
+    if (i < num_states - 1) absl::StrAppend(&str, "\n");
   }
   return str;
 }

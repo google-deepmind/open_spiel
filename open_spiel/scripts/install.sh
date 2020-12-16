@@ -14,7 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 # The following should be easy to setup as a submodule:
 # https://git-scm.com/docs/git-submodule
 
@@ -187,12 +186,17 @@ if [[ ${BUILD_WITH_JULIA:-"OFF"} == "ON" ]]; then
     # Now install Julia
     JULIA_INSTALLER="open_spiel/scripts/jill.sh"
     if [[ ! -f $JULIA_INSTALLER ]]; then
-    curl https://raw.githubusercontent.com/abelsiqueira/jill/master/jill.sh -o jill.sh
-    mv jill.sh $JULIA_INSTALLER
+      curl https://raw.githubusercontent.com/abelsiqueira/jill/master/jill.sh -o jill.sh
+      mv jill.sh $JULIA_INSTALLER
     fi
     JULIA_VERSION=1.3.1 bash $JULIA_INSTALLER -y
     # Should install in $HOME/.local/bin which was added to the path above
     [[ -x `which julia` ]] || die "julia not found PATH after install."
+    # This is needed on Ubuntu 19.10 and above, see:
+    # https://github.com/deepmind/open_spiel/issues/201
+    if [[ -f /usr/lib/x86_64-linux-gnu/libstdc++.so.6 ]]; then
+      cp /usr/lib/x86_64-linux-gnu/libstdc++.so.6 $HOME/packages/julias/julia-1.3.1/lib/julia
+    fi
   fi
 
   # Install dependencies.

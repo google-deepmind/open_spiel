@@ -57,7 +57,7 @@ SPIEL_MULTIPLAYER_GAMES_LIST = [
     if g.max_num_players > 2 and g.max_num_players > g.min_num_players and
     g.short_name != "tiny_hanabi"  # default payoff only works for 2p
     # cannot change the number of players without changing other parameters
-    and g.short_name != "universal_poker"
+    and g.short_name != "universal_poker" and g.short_name != "scotland_yard"
 ]
 assert len(SPIEL_MULTIPLAYER_GAMES_LIST) >= 35, len(
     SPIEL_MULTIPLAYER_GAMES_LIST)
@@ -247,6 +247,23 @@ class GamesSimTest(parameterized.TestCase):
       game = pyspiel.load_game("efg_game(filename=" + filename + ")")
       for _ in range(0, 100):
         self.sim_game(game)
+
+  def test_backgammon_checker_moves(self):
+    game = pyspiel.load_game("backgammon")
+    state = game.new_initial_state()
+    state.apply_action(0)  # Roll 12 and X starts
+    action = state.legal_actions()[0]  # First legal action
+    # X has player id 0.
+    checker_moves = state.spiel_move_to_checker_moves(0, action)
+    print("Checker moves:")
+    for i in range(2):
+      print("pos {}, num {}, hit? {}".format(checker_moves[i].pos,
+                                             checker_moves[i].num,
+                                             checker_moves[i].hit))
+    action2 = state.checker_moves_to_spiel_move(checker_moves)
+    self.assertEqual(action, action2)
+    action3 = state.translate_action(0, 0, True)  # 0->2, 0->1
+    self.assertEqual(action3, 0)
 
 
 def main(_):
