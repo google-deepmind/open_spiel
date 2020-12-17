@@ -234,17 +234,16 @@ TabularBestResponse::BestResponseActionValues(const std::string& infostate) {
       infosets_.at(infostate);
 
   action_values.reserve(infoset[0].first->GetChildActions().size());
-  for (const auto& action : infoset[0].first->GetChildActions()) {
+  for (Action action : infoset[0].first->GetChildActions()) {
     double value = 0;
     double normalizer = 0;
 
     // Prob here is the counterfactual reach-weighted probability.
-    for (const auto& state_and_prob : infoset) {
-      HistoryNode* state_node = state_and_prob.first;
+    for (const auto& [state_node, prob] : infoset) {
       HistoryNode* child_node = state_node->GetChild(action).second;
       SPIEL_CHECK_TRUE(child_node != nullptr);
-      value += state_and_prob.second * Value(child_node->GetHistory());
-      normalizer += state_and_prob.second;
+      value += prob * Value(child_node->GetHistory());
+      normalizer += prob;
     }
 
     SPIEL_CHECK_GT(normalizer, 0);

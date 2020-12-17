@@ -136,8 +136,8 @@ class Calculator(object):
       self._best_responder[player].set_policy(tabular_policy)
 
     # Computing the value at the root calculates best responses everywhere.
-    history = str(self.game.new_initial_state())
-    best_response_value = self._best_responder[player].value(history)
+    best_response_value = self._best_responder[player].value_from_state(
+        self.game.new_initial_state())
     best_response_actions = self._best_responder[
         player].get_best_response_actions()
 

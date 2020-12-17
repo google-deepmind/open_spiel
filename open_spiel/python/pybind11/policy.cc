@@ -52,7 +52,10 @@ void init_pyspiel_policy(py::module& m) {
                     const std::unordered_map<std::string,
                                              open_spiel::ActionsAndProbs>&>())
       .def(py::init<const open_spiel::Game&, int, const open_spiel::Policy*>())
-      .def("value", &TabularBestResponse::Value)
+      .def("value",
+           py::overload_cast<const std::string&>(&TabularBestResponse::Value))
+      .def("value_from_state", py::overload_cast<const open_spiel::State&>(
+                                   &TabularBestResponse::Value))
       .def("get_best_response_policy",
            &TabularBestResponse::GetBestResponsePolicy)
       .def("get_best_response_actions",

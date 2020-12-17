@@ -21,6 +21,7 @@
 #include <utility>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
 #include "open_spiel/algorithms/history_tree.h"
 #include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"
@@ -34,9 +35,9 @@ namespace algorithms {
 // This only works for two player, zero- or constant-sum sequential games, and
 // raises a SpielFatalError if an incompatible game is passed to it.
 //
-// This implementation requires games have perfect recall, and that the game's
-// State::ToString is a unique key for storing the value of a state. Otherwise,
-// the algorithm will still run, but the value returned will be wrong.
+// This implementation requires that InformationStateString for the game has
+// perfect recall. Otherwise, the algorithm will still run, but the value
+// returned will be wrong.
 class TabularBestResponse {
  public:
   TabularBestResponse(const Game& game, Player best_responder,
@@ -51,17 +52,33 @@ class TabularBestResponse {
   // infostate. The infostate must correspond to a decision node for
   // best_responder.
   Action BestResponseAction(const std::string& infostate);
+  Action BestResponseAction(const State& state) {
+    SPIEL_CHECK_EQ(state.CurrentPlayer(), best_responder_);
+    return BestResponseAction(state.InformationStateString(best_responder_));
+  }
 
   // Returns all the actions that maximize utility for the agent at the given
   // infostate. The infostate must correspond to a decision node for
   // best_responder.
   std::vector<Action> BestResponseActions(const std::string& infostate,
                                           double tolerance);
+  std::vector<Action> BestResponseActions(const State& state,
+                                          double tolerance) {
+    SPIEL_CHECK_EQ(state.CurrentPlayer(), best_responder_);
+    return BestResponseActions(state.InformationStateString(best_responder_),
+                               tolerance);
+  }
 
   // Returns the values of all actions at this info state. The infostate must
   // correspond to a decision node for best_responder.
   std::vector<std::pair<Action, double>> BestResponseActionValues(
       const std::string& infostate);
+  std::vector<std::pair<Action, double>> BestResponseActionValues(
+      const State& state) {
+    SPIEL_CHECK_EQ(state.CurrentPlayer(), best_responder_);
+    return BestResponseActionValues(
+        state.InformationStateString(best_responder_));
+  }
 
   // Returns a map of infostates to best responses, for all information states
   // that have been calculated so far. If no best responses have been
@@ -71,7 +88,7 @@ class TabularBestResponse {
   std::unordered_map<std::string, Action> GetBestResponseActions() {
     // If the best_response_actions_ cache is empty, we fill it by calculating
     // all best responses, starting at the root.
-    if (best_response_actions_.empty()) Value(root_->ToString());
+    if (best_response_actions_.empty()) Value(*root_);
     return best_response_actions_;
   }
 
@@ -84,6 +101,7 @@ class TabularBestResponse {
   // Returns the expected utility for best_responder when playing the game
   // beginning at history.
   double Value(const std::string& history);
+  double Value(const State& state) { return Value(state.HistoryString()); }
 
   // Changes the policy that we are calculating a best response to. This is
   // useful as a large amount of the data structures can be reused, causing
@@ -141,7 +159,7 @@ class TabularBestResponse {
   // definition of counter-factual probability. Finally, if the information
   // state is a decision node for a player other than best_responder, the
   // probabilities come from their policy (i.e. policy_).
-  std::unordered_map<std::string, std::vector<std::pair<HistoryNode*, double>>>
+  absl::flat_hash_map<std::string, std::vector<std::pair<HistoryNode*, double>>>
       infosets_;
 
   // Caches all best responses calculated so far (for each infostate).

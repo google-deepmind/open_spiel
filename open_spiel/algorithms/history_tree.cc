@@ -27,7 +27,7 @@ namespace {
 
 std::unique_ptr<HistoryNode> RecursivelyBuildGameTree(
     std::unique_ptr<State> state, Player player_id,
-    std::unordered_map<std::string, HistoryNode*>* state_to_node) {
+    absl::flat_hash_map<std::string, HistoryNode*>* state_to_node) {
   std::unique_ptr<HistoryNode> node(
       new HistoryNode(player_id, std::move(state)));
   if (state_to_node == nullptr) SpielFatalError("state_to_node is null.");
@@ -36,9 +36,7 @@ std::unique_ptr<HistoryNode> RecursivelyBuildGameTree(
   switch (node->GetType()) {
     case StateType::kChance: {
       double probability_sum = 0;
-      for (const auto& outcome_and_prob : state_ptr->ChanceOutcomes()) {
-        Action outcome = outcome_and_prob.first;
-        double prob = outcome_and_prob.second;
+      for (const auto& [outcome, prob] : state_ptr->ChanceOutcomes()) {
         std::unique_ptr<State> child = state_ptr->Child(outcome);
         if (child == nullptr) {
           SpielFatalError("Can't add child; child is null.");
@@ -80,7 +78,7 @@ std::unique_ptr<HistoryNode> RecursivelyBuildGameTree(
 
 HistoryNode::HistoryNode(Player player_id, std::unique_ptr<State> game_state)
     : state_(std::move(game_state)),
-      history_(state_->ToString()),
+      history_(state_->HistoryString()),
       type_(state_->GetType()) {
   // Unless it's the opposing player's turn, we always view the game from the
   // view of player player_id.
@@ -96,9 +94,7 @@ HistoryNode::HistoryNode(Player player_id, std::unique_ptr<State> game_state)
   // Compute & store the legal actions so we can check that all actions we're
   // adding are legal.
   for (Action action : state_->LegalActions()) legal_actions_.insert(action);
-  if (type_ == StateType::kTerminal) {
-    value_ = state_->PlayerReturn(player_id);
-  }
+  if (type_ == StateType::kTerminal) value_ = state_->PlayerReturn(player_id);
 }
 
 void HistoryNode::AddChild(
@@ -138,24 +134,22 @@ std::pair<double, HistoryNode*> HistoryNode::GetChild(Action outcome) {
 std::vector<Action> HistoryNode::GetChildActions() const {
   std::vector<Action> actions;
   actions.reserve(child_info_.size());
-  for (const auto& kv : child_info_) actions.push_back(kv.first);
+  for (const auto& [action, _] : child_info_) actions.push_back(action);
   return actions;
 }
 
 HistoryNode* HistoryTree::GetByHistory(const std::string& history) {
-  HistoryNode* node = state_to_node_[history];
-  if (node == nullptr) {
+  auto it = state_to_node_.find(history);
+  if (it == state_to_node_.end()) {
     SpielFatalError(absl::StrCat("Node is null for history: '", history, "'"));
   }
-  return node;
+  return it->second;
 }
 
 std::vector<std::string> HistoryTree::GetHistories() {
   std::vector<std::string> histories;
   histories.reserve(state_to_node_.size());
-  for (const auto& kv : state_to_node_) {
-    histories.push_back(kv.first);
-  }
+  for (const auto& [history, _] : state_to_node_) histories.push_back(history);
   return histories;
 }
 
@@ -214,36 +208,33 @@ std::vector<std::pair<std::unique_ptr<State>, double>> DecisionNodes(
     // this is fine for now.
     std::vector<std::pair<std::unique_ptr<State>, double>> children =
         DecisionNodes(*child, best_responder, policy);
-    const double prob = GetProb(actions_and_probs, action);
-    SPIEL_CHECK_GE(prob, 0);
-    for (auto& state_and_prob : children) {
+    const double policy_prob = GetProb(actions_and_probs, action);
+    SPIEL_CHECK_GE(policy_prob, 0);
+    for (auto& [state, prob] : children) {
       states_and_probs.push_back(
-          {std::move(state_and_prob.first),
+          {std::move(state),
            // We weight the child probabilities by the probability of taking
            // the action that would lead to them.
-           prob * state_and_prob.second});
+           policy_prob * prob});
     }
   }
   return states_and_probs;
 }
 
-std::unordered_map<std::string, std::vector<std::pair<HistoryNode*, double>>>
+absl::flat_hash_map<std::string, std::vector<std::pair<HistoryNode*, double>>>
 GetAllInfoSets(std::unique_ptr<State> state, Player best_responder,
                const Policy* policy, HistoryTree* tree) {
-  std::unordered_map<std::string, std::vector<std::pair<HistoryNode*, double>>>
+  absl::flat_hash_map<std::string, std::vector<std::pair<HistoryNode*, double>>>
       infosets;
   // We only need decision nodes, as there's no decision to be made at chance
   // nodes (we randomly sample from the different outcomes there).
   std::vector<std::pair<std::unique_ptr<State>, double>> states_and_probs =
       DecisionNodes(*state, best_responder, policy);
   infosets.reserve(states_and_probs.size());
-  for (const auto& state_and_prob : states_and_probs) {
+  for (const auto& [state, prob] : states_and_probs) {
     // We look at each decision from the perspective of the best_responder.
-    std::string infostate =
-        state_and_prob.first->InformationStateString(best_responder);
-    infosets[infostate].push_back(
-        {tree->GetByHistory(state_and_prob.first->ToString()),
-         state_and_prob.second});
+    std::string infostate = state->InformationStateString(best_responder);
+    infosets[infostate].push_back({tree->GetByHistory(*state), prob});
   }
   return infosets;
 }
