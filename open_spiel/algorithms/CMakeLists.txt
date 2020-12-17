@@ -156,7 +156,4 @@ add_executable(trajectories_test trajectories_test.cc
     $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})
 add_test(trajectories_test trajectories_test)
 
-add_executable(os_mccfr_multiple_runs os_mccfr_multiple_runs.cpp
-    $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})
-
 add_subdirectory (alpha_zero)
