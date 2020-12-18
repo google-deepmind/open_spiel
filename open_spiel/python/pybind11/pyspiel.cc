@@ -271,6 +271,7 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("string_to_action",
            (Action(State::*)(const std::string&) const) & State::StringToAction)
       .def("__str__", &State::ToString)
+      .def("__repr__", &State::ToString)
       .def("is_terminal", &State::IsTerminal)
       .def("is_initial_state", &State::IsInitialState)
       .def("move_number", &State::MoveNumber)
@@ -353,6 +354,7 @@ PYBIND11_MODULE(pyspiel, m) {
            py::arg("imperfect_information_observation_type") = absl::nullopt,
            py::arg("params") = GameParameters())
       .def("__str__", &Game::ToString)
+      .def("__repr__", &Game::ToString)
       .def("__eq__",
            [](const Game& value, Game* value2) {
              return value2 && value.ToString() == value2->ToString();
