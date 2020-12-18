@@ -643,7 +643,7 @@ std::string GameTypeToString(const GameType& game_type) {
   // Check that there are no newlines in the serialized params.
   std::string serialized_params =
       SerializeGameParameters(game_type.parameter_specification);
-  SPIEL_CHECK_TRUE(!absl::StrContains(serialized_params, '\n'));
+  SPIEL_CHECK_TRUE(!absl::StrContains(serialized_params, "\n"));
   absl::StrAppend(&str, "parameter_specification: ", serialized_params);
 
   return str;
