@@ -21,9 +21,7 @@ from __future__ import print_function
 from absl.testing import parameterized
 
 from open_spiel.python import rl_environment
-#from open_spiel.python.pytorch import eva
-import eva
-print(eva.__file__)
+from open_spiel.python.pytorch import eva
 
 from torch.testing._internal.common_utils import TestCase, run_tests
 
