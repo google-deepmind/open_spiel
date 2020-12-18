@@ -24,7 +24,7 @@ For Python you have:
 *   `open_spiel/python/examples`: The Python examples.
 *   `open_spiel/python/algorithms/`: The Python algorithms.
 
-## CPP and Python implementations.
+## C++ and Python implementations.
 
 Some objects (e.g. `Policy`, `CFRSolver`, `BestResponse`) are available both in
 C++ and Python. The goal is to be able to use C++ objects in place of Python
