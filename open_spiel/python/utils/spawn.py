@@ -64,8 +64,12 @@ class Process(object):
         target=target, args=args, kwargs=kwargs)
     self._process.start()
 
-  def join(self):
-    return self._process.join()
+  def join(self, *args):
+    return self._process.join(*args)
+
+  @property
+  def exitcode(self):
+    return self._process.exitcode
 
   @property
   def queue(self):
@@ -102,3 +106,11 @@ class _ProcessQueue(object):
 
   def put_nowait(self, obj):
     return self.put(obj, False)
+
+  @property
+  def q_in(self):
+    return self._q_in
+
+  @property
+  def q_out(self):
+    return self._q_out

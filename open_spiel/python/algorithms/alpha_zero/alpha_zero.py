@@ -535,5 +535,12 @@ def alpha_zero(config: Config):
     print("Caught a KeyboardInterrupt, stopping early.")
   finally:
     broadcast("")
-    for proc in actors + evaluators:
+    # for actor processes to join we have to make sure that their q_in is empty,
+    # including backed up items
+    for proc in actors:
+      while proc.exitcode==None:
+        while proc.queue.q_in.empty()==False:
+          proc.queue.q_in.get(False)
+        proc.join(0.001)
+    for proc in evaluators:
       proc.join()
