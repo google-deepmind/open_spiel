@@ -106,11 +106,3 @@ class _ProcessQueue(object):
 
   def put_nowait(self, obj):
     return self.put(obj, False)
-
-  @property
-  def q_in(self):
-    return self._q_in
-
-  @property
-  def q_out(self):
-    return self._q_out

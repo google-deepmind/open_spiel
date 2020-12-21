@@ -538,9 +538,9 @@ def alpha_zero(config: Config):
     # for actor processes to join we have to make sure that their q_in is empty,
     # including backed up items
     for proc in actors:
-      while proc.exitcode==None:
-        while proc.queue.q_in.empty()==False:
-          proc.queue.q_in.get(False)
+      while proc.exitcode == None:
+        while proc.queue.empty() == False:
+          proc.queue.get_nowait()
         proc.join(0.001)
     for proc in evaluators:
       proc.join()
