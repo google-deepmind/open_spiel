@@ -35,11 +35,10 @@ namespace algorithms {
 // Currently only works for sequential games.
 //
 // Note: negative depth limit means no limit, 0 means only root, etc..
-
-std::vector<std::unique_ptr<State>> GetAllHistories(const Game& game,
-                                                    int depth_limit,
-                                                    bool include_terminals,
-                                                    bool include_chance_states);
+// The default arguments will return all decision nodes in the game.
+std::vector<std::unique_ptr<State>> GetAllHistories(
+    const Game& game, int depth_limit = -1, bool include_terminals = false,
+    bool include_chance_states = false);
 
 }  // namespace algorithms
 }  // namespace open_spiel
