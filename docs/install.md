@@ -4,7 +4,7 @@
 
 If you plan to only use the Python API, then the easiest way to install
 OpenSpiel is to use pip. As only source distribution is currently supported,
-CMake, Clang and Python 3 development files are requires to build the Python
+CMake, Clang and Python 3 development files are required to build the Python
 extension.
 
 E.g. on Ubuntu or Debian:
