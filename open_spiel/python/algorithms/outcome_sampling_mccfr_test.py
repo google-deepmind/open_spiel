@@ -25,6 +25,12 @@ from open_spiel.python.algorithms import exploitability
 from open_spiel.python.algorithms import outcome_sampling_mccfr
 import pyspiel
 
+# Convergence results change depending on
+# the seed specified for running the tests.
+# For this reason, test thresholds have been adapted
+# taking the maximum Nash exploitability value obtained
+# from multiple runs.
+# For more details see https://github.com/deepmind/open_spiel/pull/458
 SEED = 39823987
 
 
@@ -34,44 +40,42 @@ class OutcomeSamplingMCCFRTest(absltest.TestCase):
     np.random.seed(SEED)
     game = pyspiel.load_game("leduc_poker")
     os_solver = outcome_sampling_mccfr.OutcomeSamplingSolver(game)
-    for _ in range(1000):
+    for _ in range(10000):
       os_solver.iteration()
     conv = exploitability.nash_conv(
         game,
         policy.tabular_policy_from_callable(game,
                                             os_solver.callable_avg_policy()))
     print("Leduc2P, conv = {}".format(conv))
-    self.assertGreater(conv, 4.5)
-    self.assertLess(conv, 4.6)
+
+    self.assertLess(conv, 3.07)
 
   def test_outcome_sampling_kuhn_2p(self):
     np.random.seed(SEED)
     game = pyspiel.load_game("kuhn_poker")
     os_solver = outcome_sampling_mccfr.OutcomeSamplingSolver(game)
-    for _ in range(1000):
+    for _ in range(10000):
       os_solver.iteration()
     conv = exploitability.nash_conv(
         game,
         policy.tabular_policy_from_callable(game,
                                             os_solver.callable_avg_policy()))
     print("Kuhn2P, conv = {}".format(conv))
-    self.assertGreater(conv, 0.2)
-    self.assertLess(conv, 0.3)
+    self.assertLess(conv, 0.17)
 
   def test_outcome_sampling_kuhn_3p(self):
     np.random.seed(SEED)
     game = pyspiel.load_game("kuhn_poker",
                              {"players": pyspiel.GameParameter(3)})
     os_solver = outcome_sampling_mccfr.OutcomeSamplingSolver(game)
-    for _ in range(1000):
+    for _ in range(10000):
       os_solver.iteration()
     conv = exploitability.nash_conv(
         game,
         policy.tabular_policy_from_callable(game,
                                             os_solver.callable_avg_policy()))
     print("Kuhn3P, conv = {}".format(conv))
-    self.assertGreater(conv, 0.3)
-    self.assertLess(conv, 0.4)
+    self.assertLess(conv, 0.22)
 
 
 if __name__ == "__main__":

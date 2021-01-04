@@ -27,15 +27,7 @@ _AVG_POLICY_INDEX = 1
 
 
 class OutcomeSamplingSolver(object):
-  """An implementation of outcome sampling MCCFR.
-
-  Uses stochastically-weighted averaging.
-
-  For details, see Chapter 4 (p. 49) of:
-  http://mlanctot.info/files/papers/PhD_Thesis_MarcLanctot.pdf
-  (Lanctot, 2013. "Monte Carlo Sampling and Regret Minimization for Equilibrium
-  Computation and Decision-Making in Games")
-  """
+  """An implementation of outcome sampling MCCFR."""
 
   def __init__(self, game):
     self._game = game
@@ -54,7 +46,8 @@ class OutcomeSamplingSolver(object):
   def iteration(self):
     """Performs one iteration of outcome sampling.
 
-    An iteration consists of one episode for each player as the update player.
+    An iteration consists of one episode for each player as the update
+    player.
     """
     for update_player in range(self._num_players):
       state = self._game.new_initial_state()
@@ -71,7 +64,8 @@ class OutcomeSamplingSolver(object):
     Returns:
       A list of:
         - the average regrets as a numpy array of shape [num_legal_actions]
-        - the average strategy as a numpy array of shape [num_legal_actions].
+        - the average strategy as a numpy array of shape
+        [num_legal_actions].
           The average is weighted using `my_reach`
     """
     retrieved_infostate = self._infostates.get(info_state_key, None)
@@ -81,8 +75,8 @@ class OutcomeSamplingSolver(object):
     # Start with a small amount of regret and total accumulation, to give a
     # uniform policy: this will get erased fast.
     self._infostates[info_state_key] = [
-        np.ones(num_legal_actions, dtype=np.float64) / 1000.0,
-        np.ones(num_legal_actions, dtype=np.float64) / 1000.0,
+        np.ones(num_legal_actions, dtype=np.float64) / 1e6,
+        np.ones(num_legal_actions, dtype=np.float64) / 1e6,
     ]
     return self._infostates[info_state_key]
 
@@ -130,33 +124,42 @@ class OutcomeSamplingSolver(object):
     else:
       return positive_regrets / sum_pos_regret
 
+  def _baseline(self, state, info_state, aidx):  # pylint: disable=unused-argument
+    # Default to vanilla outcome sampling
+    return 0
+
+  def _baseline_corrected_child_value(self, state, info_state, sampled_aidx,
+                                      aidx, child_value, sample_prob):
+    # Applies Eq. 9 of Schmid et al. '19
+    baseline = self._baseline(state, info_state, aidx)
+    if aidx == sampled_aidx:
+      return baseline + (child_value - baseline) / sample_prob
+    else:
+      return baseline
+
   def _episode(self, state, update_player, my_reach, opp_reach, sample_reach):
     """Runs an episode of outcome sampling.
 
     Args:
       state: the open spiel state to run from (will be modified in-place).
-      update_player: the player to update regrets for (the other players update
-        average strategies)
+      update_player: the player to update regrets for (the other players
+        update average strategies)
       my_reach: reach probability of the update player
       opp_reach: reach probability of all the opponents (including chance)
       sample_reach: reach probability of the sampling (behavior) policy
 
     Returns:
-      A tuple of (util, reach_tail), where:
-        - util is the utility of the update player divided by the sample reach
-          of the trajectory, and
-        - reach_tail is the product of all players' reach probabilities
-          to the terminal state (from the state that was passed in).
+      util is a real value representing the utility of the update player
     """
     if state.is_terminal():
-      return state.player_return(update_player) / sample_reach, 1.0
+      return state.player_return(update_player)
 
     if state.is_chance_node():
       outcomes, probs = zip(*state.chance_outcomes())
-      outcome = np.random.choice(outcomes, p=probs)
-      state.apply_action(outcome)
-      return self._episode(state, update_player, my_reach, opp_reach,
-                           sample_reach)
+      aidx = np.random.choice(range(len(outcomes)), p=probs)
+      state.apply_action(outcomes[aidx])
+      return self._episode(state, update_player, my_reach,
+                           probs[aidx] * opp_reach, probs[aidx] * sample_reach)
 
     cur_player = state.current_player()
     info_state_key = state.information_state_string(cur_player)
@@ -169,38 +172,55 @@ class OutcomeSamplingSolver(object):
     if cur_player == update_player:
       uniform_policy = (
           np.ones(num_legal_actions, dtype=np.float64) / num_legal_actions)
-      sampling_policy = (
-          self._expl * uniform_policy + (1.0 - self._expl) * policy)
+      sample_policy = self._expl * uniform_policy + (1.0 - self._expl) * policy
     else:
-      sampling_policy = policy
-    sampled_action_idx = np.random.choice(
-        np.arange(num_legal_actions), p=sampling_policy)
+      sample_policy = policy
+    sampled_aidx = np.random.choice(range(num_legal_actions), p=sample_policy)
+    state.apply_action(legal_actions[sampled_aidx])
     if cur_player == update_player:
-      new_my_reach = my_reach * policy[sampled_action_idx]
+      new_my_reach = my_reach * policy[sampled_aidx]
       new_opp_reach = opp_reach
     else:
       new_my_reach = my_reach
-      new_opp_reach = opp_reach * policy[sampled_action_idx]
-    new_sample_reach = sample_reach * sampling_policy[sampled_action_idx]
-    state.apply_action(legal_actions[sampled_action_idx])
-    util, reach_tail = self._episode(state, update_player, new_my_reach,
-                                     new_opp_reach, new_sample_reach)
-    new_reach_tail = policy[sampled_action_idx] * reach_tail
-    # The following updates are based on equations 4.9 - 4.15 (Sec 4.2) of
-    # http://mlanctot.info/files/papers/PhD_Thesis_MarcLanctot.pdf
+      new_opp_reach = opp_reach * policy[sampled_aidx]
+    new_sample_reach = sample_reach * sample_policy[sampled_aidx]
+    child_value = self._episode(state, update_player, new_my_reach,
+                                new_opp_reach, new_sample_reach)
+
+    # Compute each of the child estimated values.
+    child_values = np.zeros(num_legal_actions, dtype=np.float64)
+    for aidx in range(num_legal_actions):
+      child_values[aidx] = self._baseline_corrected_child_value(
+          state, infostate_info, sampled_aidx, aidx, child_value,
+          sample_policy[aidx])
+    value_estimate = 0
+    for aidx in range(num_legal_actions):
+      value_estimate += policy[sampled_aidx] * child_values[aidx]
+
     if cur_player == update_player:
-      # update regrets. Note the w here already includes the sample reach of the
-      # trajectory (from root to terminal) in util due to the base case above.
-      w = util * opp_reach
-      for action_idx in range(num_legal_actions):
-        if action_idx == sampled_action_idx:
-          self._add_regret(info_state_key, action_idx,
-                           w * (reach_tail - new_reach_tail))
-        else:
-          self._add_regret(info_state_key, action_idx, -w * new_reach_tail)
-    else:
-      # update avg strat
-      for action_idx in range(num_legal_actions):
-        self._add_avstrat(info_state_key, action_idx,
-                          opp_reach * policy[action_idx] / sample_reach)
-    return util, new_reach_tail
+      # Now the regret and avg strategy updates.
+      policy = self._regret_matching(infostate_info[_REGRET_INDEX],
+                                     num_legal_actions)
+
+      # Estimate for the counterfactual value of the policy.
+      cf_value = value_estimate * opp_reach / sample_reach
+
+      # Update regrets.
+      #
+      # Note: different from Chapter 4 of Lanctot '13 thesis, the utilities
+      # coming back from the recursion are already multiplied by the players'
+      # tail reaches and divided by the sample tail reach. So when adding
+      # regrets to the table, we need only multiply by the opponent reach and
+      # divide by the sample reach to this point.
+      for aidx in range(num_legal_actions):
+        # Estimate for the counterfactual value of the policy replaced by always
+        # choosing sampled_aidx at this information state.
+        cf_action_value = child_values[aidx] * opp_reach / sample_reach
+        self._add_regret(info_state_key, aidx, cf_action_value - cf_value)
+
+      # update the average policy
+      for aidx in range(num_legal_actions):
+        increment = my_reach * policy[aidx] / sample_reach
+        self._add_avstrat(info_state_key, aidx, increment)
+
+    return value_estimate
