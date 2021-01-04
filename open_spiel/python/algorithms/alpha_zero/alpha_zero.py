@@ -55,6 +55,9 @@ from open_spiel.python.utils import file_logger
 from open_spiel.python.utils import spawn
 from open_spiel.python.utils import stats
 
+# Time to wait for processes to join.
+JOIN_WAIT_DELAY = 0.001
+
 
 class TrajectoryState(object):
   """A particular point along a trajectory."""
@@ -535,5 +538,12 @@ def alpha_zero(config: Config):
     print("Caught a KeyboardInterrupt, stopping early.")
   finally:
     broadcast("")
-    for proc in actors + evaluators:
+    # for actor processes to join we have to make sure that their q_in is empty,
+    # including backed up items
+    for proc in actors:
+      while proc.exitcode is None:
+        while not proc.queue.empty():
+          proc.queue.get_nowait()
+        proc.join(JOIN_WAIT_DELAY)
+    for proc in evaluators:
       proc.join()
