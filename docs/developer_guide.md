@@ -14,7 +14,7 @@ Some top level directories are special:
 For example, we have for C++:
 
 *   `open_spiel/`: Contains the game abstract C++ API.
-*   `open_spiel/games`: Contains the games ++ implementations.
+*   `open_spiel/games`: Contains the games C++ implementations.
 *   `open_spiel/algorithms`: The C++ algorithms implemented in OpenSpiel.
 *   `open_spiel/examples`: The C++ examples.
 *   `open_spiel/tests`: The C++ common test utilities.
@@ -24,7 +24,7 @@ For Python you have:
 *   `open_spiel/python/examples`: The Python examples.
 *   `open_spiel/python/algorithms/`: The Python algorithms.
 
-## CPP and Python implementations.
+## C++ and Python implementations.
 
 Some objects (e.g. `Policy`, `CFRSolver`, `BestResponse`) are available both in
 C++ and Python. The goal is to be able to use C++ objects in place of Python
