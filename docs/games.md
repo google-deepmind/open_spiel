@@ -238,7 +238,7 @@ Status                                       | Game
 *   Players place tokens on the board with the goal of encircling territory.
 *   Tokens on a grid.
 *   Traditional game.
-*   Non-deterministic.
+*   Deterministic.
 *   Perfect information.
 *   2 players.
 *   [Wikipedia](https://en.wikipedia.org/wiki/Go_\(game\))
