@@ -121,9 +121,8 @@ void LegalActionsAreSorted(const Game& game, State& state) {
 void LegalActionsMaskTest(const Game& game, const State& state, int player,
                           const std::vector<Action>& legal_actions) {
   std::vector<int> legal_actions_mask = state.LegalActionsMask(player);
-  int expected_length = state.IsChanceNode() ? game.MaxChanceOutcomes()
+  const int expected_length = state.IsChanceNode() ? game.MaxChanceOutcomes()
                                              : game.NumDistinctActions();
-  std::cout << "is_chance? " << state.IsChanceNode() << std::endl;
   SPIEL_CHECK_EQ(legal_actions_mask.size(), expected_length);
   for (Action action : legal_actions) {
     SPIEL_CHECK_GE(action, 0);
@@ -134,9 +133,7 @@ void LegalActionsMaskTest(const Game& game, const State& state, int player,
   int num_ones = 0;
   for (int i = 0; i < expected_length; ++i) {
     SPIEL_CHECK_TRUE(legal_actions_mask[i] == 0 || legal_actions_mask[i] == 1);
-    if (legal_actions_mask[i] == 1) {
-      num_ones++;
-    }
+    num_ones += legal_actions_mask[i];
   }
 
   SPIEL_CHECK_EQ(num_ones, legal_actions.size());
