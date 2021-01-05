@@ -28,8 +28,8 @@
 //
 // Each player has a valuation of the target object from 1 to K, according to a
 // uniform distribution, and places bids from 0 to (valuation - 1). The highest
-// bidder gets reward (valuation - bid); the others get 0. (The reward is split
-// in case of ties.)
+// bidder gets reward (valuation - bid); the others get 0. In the case of a
+// tie, the winner is randomly determined amongst the highest bidders.
 //
 // Parameters:
 //  "max_value"   int    maximum valuation (default = 10)
@@ -89,8 +89,8 @@ class FPSBAGame : public Game {
   double MinUtility() const override { return 0; }
   double MaxUtility() const override { return max_value_; }
   int MaxGameLength() const override { return num_players_; }
-  // TODO: it seems like there is a chance node with a single action before
-  //       terminals. Not sure why.
+  // There is an additional chance node after all the bids to determine a winner
+  // in the case of a tie.
   int MaxChanceNodesInHistory() const override { return num_players_ + 1; }
   std::vector<int> InformationStateTensorShape() const override {
     return {max_value_ * 2 + num_players_};
