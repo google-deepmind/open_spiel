@@ -173,6 +173,7 @@ class DeepCFRSolver(policy.Policy):
     self._reinitialize_advantage_networks = reinitialize_advantage_networks
     self._num_actions = game.num_distinct_actions()
     self._iteration = 1
+    self._environment_steps = 0
 
     # Create required TensorFlow placeholders to perform the Q-network updates.
     self._info_state_ph = tf.placeholder(
@@ -279,6 +280,9 @@ class DeepCFRSolver(policy.Policy):
     policy_loss = self._learn_strategy_network()
     return self._policy_network, advantage_losses, policy_loss
 
+  def get_environment_steps(self):
+    return self._environment_steps
+
   def _traverse_game_tree(self, state, player):
     """Performs a traversal of the game tree.
 
@@ -290,6 +294,7 @@ class DeepCFRSolver(policy.Policy):
     Returns:
       Recursively returns expected payoffs for each action.
     """
+    self._environment_steps += 1
     expected_payoff = collections.defaultdict(float)
     if state.is_terminal():
       # Terminal state get returns.
