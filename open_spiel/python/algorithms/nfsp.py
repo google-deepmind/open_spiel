@@ -148,6 +148,9 @@ class NFSP(rl_agent.AbstractAgent):
     yield
     self._mode = previous_mode
 
+  def get_step_counter(self):
+    return self._step_counter
+
   def _sample_episode_policy(self):
     if np.random.rand() < self._anticipatory_param:
       self._mode = MODE.best_response
