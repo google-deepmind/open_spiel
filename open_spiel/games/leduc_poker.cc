@@ -27,6 +27,7 @@
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/observer.h"
+#include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
@@ -860,6 +861,24 @@ std::string LeducGame::ActionToString(Player player, Action action) const {
   } else {
     return StatelessActionToString(action);
   }
+}
+
+TabularPolicy GetAlwaysFoldPolicy(const Game& game) {
+  SPIEL_CHECK_TRUE(
+      dynamic_cast<LeducGame*>(const_cast<Game*>(&game)) != nullptr);
+  return GetPrefActionPolicy(game, {ActionType::kFold, ActionType::kCall});
+}
+
+TabularPolicy GetAlwaysCallPolicy(const Game& game) {
+  SPIEL_CHECK_TRUE(
+      dynamic_cast<LeducGame*>(const_cast<Game*>(&game)) != nullptr);
+  return GetPrefActionPolicy(game, {ActionType::kCall});
+}
+
+TabularPolicy GetAlwaysRaisePolicy(const Game& game) {
+  SPIEL_CHECK_TRUE(
+      dynamic_cast<LeducGame*>(const_cast<Game*>(&game)) != nullptr);
+  return GetPrefActionPolicy(game, {ActionType::kRaise, ActionType::kCall});
 }
 
 }  // namespace leduc_poker

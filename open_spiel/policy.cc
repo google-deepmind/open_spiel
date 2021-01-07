@@ -25,6 +25,7 @@
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
+#include "open_spiel/abseil-cpp/absl/container/flat_hash_set.h"
 #include "open_spiel/abseil-cpp/absl/strings/charconv.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_format.h"
@@ -267,7 +268,7 @@ TabularPolicy GetFirstActionPolicy(const Game& game) {
     SpielFatalError("Game is not sequential.");
     return TabularPolicy(policy);
   }
-  std::list<std::unique_ptr<State>> to_visit;
+  std::vector<std::unique_ptr<State>> to_visit;
   to_visit.push_back(game.NewInitialState());
   while (!to_visit.empty()) {
     std::unique_ptr<State> state = std::move(to_visit.back());
@@ -300,11 +301,68 @@ TabularPolicy GetFirstActionPolicy(const Game& game) {
       if (infostate_policy.empty()) {
         SpielFatalError("State has zero legal actions.");
       }
-      policy.insert({state->InformationStateString(), infostate_policy});
+      policy[state->InformationStateString()] = std::move(infostate_policy);
     }
   }
   return TabularPolicy(policy);
 }
+
+TabularPolicy GetPrefActionPolicy(
+    const Game& game, const std::vector<Action>& pref_actions) {
+  std::unordered_map<std::string, ActionsAndProbs> policy;
+  if (game.GetType().dynamics != GameType::Dynamics::kSequential) {
+    SpielFatalError("Game is not sequential.");
+  }
+  // Consider using GetAllHistories here instead of custom DFS to ensure that
+  // all edge cases are properly handled. Please see version control for a full
+  // discussion.
+  std::vector<std::unique_ptr<State>> to_visit;
+  to_visit.push_back(game.NewInitialState());
+  while (!to_visit.empty()) {
+    std::unique_ptr<State> state = std::move(to_visit.back());
+    to_visit.pop_back();
+    if (state->IsTerminal()) {
+      continue;
+    }
+    if (state->IsChanceNode()) {
+      for (const auto& [outcome, _] : state->ChanceOutcomes()) {
+        to_visit.emplace_back(state->Child(outcome));
+      }
+    } else {
+      std::vector<Action> legal_actions = state->LegalActions();
+      const int num_legal_actions = legal_actions.size();
+      SPIEL_CHECK_FALSE(legal_actions.empty());
+
+      absl::optional<Action> legal_pref_action;
+      absl::flat_hash_set<Action> pref_actions_set(
+          pref_actions.begin(), pref_actions.end());
+      for (Action legal_action : legal_actions) {
+        if (pref_actions_set.contains(legal_action)) {
+          legal_pref_action = legal_action;
+          break;
+        }
+      }
+      if (!legal_pref_action) SpielFatalError("Legal pref action not found.");
+
+      ActionsAndProbs infostate_policy;
+      infostate_policy.reserve(num_legal_actions);
+      for (Action action : legal_actions) {
+        to_visit.push_back(state->Child(action));
+        if (action == legal_pref_action) {
+          infostate_policy.push_back({action, 1.});
+        } else {
+          infostate_policy.push_back({action, 0.});
+        }
+      }
+      if (infostate_policy.empty()) {
+        SpielFatalError("State has zero legal actions.");
+      }
+      policy[state->InformationStateString()] = std::move(infostate_policy);
+    }
+  }
+  return TabularPolicy(policy);
+}
+
 
 std::string PrintPolicy(const ActionsAndProbs& policy) {
   std::string policy_string;

@@ -601,5 +601,58 @@ void ResampleInfostateTest(const Game& game, int num_sims) {
   }
 }
 
+void TestPoliciesCanPlay(TabularPolicyGenerator policy_generator,
+                         const Game& game, int numSims) {
+  TabularPolicy policy = policy_generator(game);
+  std::mt19937 rng(0);
+  for (int i = 0; i < numSims; ++i) {
+    std::unique_ptr<State> state = game.NewInitialState();
+    while (!state->IsTerminal()) {
+      ActionsAndProbs outcomes;
+      if (state->IsChanceNode()) {
+        outcomes = state->ChanceOutcomes();
+      } else {
+        outcomes = policy.GetStatePolicy(state->InformationStateString());
+      }
+      state->ApplyAction(open_spiel::SampleAction(outcomes, rng).first);
+    }
+  }
+}
+
+void TestPoliciesCanPlay(const Policy& policy, const Game& game, int numSims) {
+  std::mt19937 rng(0);
+  for (int i = 0; i < numSims; ++i) {
+    std::unique_ptr<State> state = game.NewInitialState();
+    while (!state->IsTerminal()) {
+      ActionsAndProbs outcomes;
+      if (state->IsChanceNode()) {
+        outcomes = state->ChanceOutcomes();
+      } else {
+        outcomes = policy.GetStatePolicy(*state);
+      }
+      state->ApplyAction(open_spiel::SampleAction(outcomes, rng).first);
+    }
+  }
+}
+
+void TestEveryInfostateInPolicy(TabularPolicyGenerator policy_generator,
+                                const Game& game) {
+  TabularPolicy policy = policy_generator(game);
+  std::vector<std::unique_ptr<State>> to_visit;
+  to_visit.push_back(game.NewInitialState());
+  while (!to_visit.empty()) {
+    std::unique_ptr<State> state = std::move(to_visit.back());
+    to_visit.pop_back();
+    for (Action action : state->LegalActions()) {
+      to_visit.push_back(state->Child(action));
+    }
+    if (!state->IsChanceNode() && !state->IsTerminal()) {
+      SPIEL_CHECK_EQ(
+          policy.GetStatePolicy(state->InformationStateString()).size(),
+          state->LegalActions().size());
+    }
+  }
+}
+
 }  // namespace testing
 }  // namespace open_spiel

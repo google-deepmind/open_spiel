@@ -23,6 +23,7 @@
 #include "open_spiel/fog/fog_constants.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/observer.h"
+#include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
@@ -427,6 +428,18 @@ std::shared_ptr<Observer> KuhnGame::MakeObserver(
     const GameParameters& params) const {
   if (!params.empty()) SpielFatalError("Observation params not supported");
   return std::make_shared<KuhnObserver>(iig_obs_type.value_or(kDefaultObsType));
+}
+
+TabularPolicy GetAlwaysPassPolicy(const Game& game) {
+  SPIEL_CHECK_TRUE(
+      dynamic_cast<KuhnGame*>(const_cast<Game*>(&game)) != nullptr);
+  return GetPrefActionPolicy(game, {ActionType::kPass});
+}
+
+TabularPolicy GetAlwaysBetPolicy(const Game& game) {
+  SPIEL_CHECK_TRUE(
+      dynamic_cast<KuhnGame*>(const_cast<Game*>(&game)) != nullptr);
+  return GetPrefActionPolicy(game, {ActionType::kBet});
 }
 
 }  // namespace kuhn_poker

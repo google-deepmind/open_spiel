@@ -19,10 +19,13 @@
 #include <string>
 
 #include "open_spiel/game_parameters.h"
+#include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"
 
 namespace open_spiel {
 namespace testing {
+
+constexpr int kDefaultNumSimsForPolicyTests = 10;
 
 // Checks that the game can be loaded.
 void LoadGameTest(const std::string& game_name);
@@ -60,6 +63,17 @@ void RandomSimTestCustomObserver(const Game& game,
                                  const std::shared_ptr<Observer> observer);
 // Verifies that ResampleFromInfostate is correctly implemented.
 void ResampleInfostateTest(const Game& game, int num_sims);
+
+using TabularPolicyGenerator = std::function<TabularPolicy(const Game&)>;
+
+void TestPoliciesCanPlay(
+    TabularPolicyGenerator policy_generator, const Game& game,
+    int numSims = kDefaultNumSimsForPolicyTests);
+void TestPoliciesCanPlay(
+    const Policy& policy, const Game& game,
+    int numSims = kDefaultNumSimsForPolicyTests);
+void TestEveryInfostateInPolicy(TabularPolicyGenerator policy_generator,
+    const Game& game);
 
 }  // namespace testing
 }  // namespace open_spiel

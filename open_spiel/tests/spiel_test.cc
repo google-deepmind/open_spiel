@@ -131,60 +131,6 @@ void FlatJointactionTest() {
 
 using PolicyGenerator = std::function<TabularPolicy(const Game& game)>;
 
-constexpr int kNumSimulations = 10;
-
-void TestPoliciesCanPlay(PolicyGenerator policy_generator, const Game& game) {
-  TabularPolicy policy = policy_generator(game);
-  std::mt19937 rng(0);
-  for (int i = 0; i < kNumSimulations; ++i) {
-    std::unique_ptr<State> state = game.NewInitialState();
-    while (!state->IsTerminal()) {
-      ActionsAndProbs outcomes;
-      if (state->IsChanceNode()) {
-        outcomes = state->ChanceOutcomes();
-      } else {
-        outcomes = policy.GetStatePolicy(state->InformationStateString());
-      }
-      state->ApplyAction(open_spiel::SampleAction(outcomes, rng).first);
-    }
-  }
-}
-
-void TestPoliciesCanPlay(const Policy& policy, const Game& game) {
-  std::mt19937 rng(0);
-  for (int i = 0; i < kNumSimulations; ++i) {
-    std::unique_ptr<State> state = game.NewInitialState();
-    while (!state->IsTerminal()) {
-      ActionsAndProbs outcomes;
-      if (state->IsChanceNode()) {
-        outcomes = state->ChanceOutcomes();
-      } else {
-        outcomes = policy.GetStatePolicy(*state);
-      }
-      state->ApplyAction(open_spiel::SampleAction(outcomes, rng).first);
-    }
-  }
-}
-
-void TestEveryInfostateInPolicy(PolicyGenerator policy_generator,
-                                const Game& game) {
-  TabularPolicy policy = policy_generator(game);
-  std::vector<std::unique_ptr<State>> to_visit;
-  to_visit.push_back(game.NewInitialState());
-  while (!to_visit.empty()) {
-    std::unique_ptr<State> state = std::move(to_visit.back());
-    to_visit.pop_back();
-    for (Action action : state->LegalActions()) {
-      to_visit.push_back(state->Child(action));
-    }
-    if (!state->IsChanceNode() && !state->IsTerminal()) {
-      SPIEL_CHECK_EQ(
-          policy.GetStatePolicy(state->InformationStateString()).size(),
-          state->LegalActions().size());
-    }
-  }
-}
-
 void PolicyTest() {
   auto random_policy_default_seed = [](const Game& game) {
     return GetRandomPolicy(game);

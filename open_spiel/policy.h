@@ -295,6 +295,17 @@ TabularPolicy GetUniformPolicy(const Game& game);
 TabularPolicy GetRandomPolicy(const Game& game, int seed = 0);
 TabularPolicy GetFirstActionPolicy(const Game& game);
 
+// Returns a deterministic policy with which takes legal actions in order of
+// preference specified by pref_actions. The function will check-fail if none
+// of the pref_action elements are legal for a state.
+//
+// For example, GetPrefActionPolicy(leduc, {kRaise, kCall}) will return a policy
+// that always raises and only falls back to call if raise is not a legal
+// action. If it is possible for nethier raise nor call to be valid actions in a
+// state in leduc, the function will fail.
+TabularPolicy GetPrefActionPolicy(
+    const Game& game, const std::vector<Action>& pref_action);
+
 std::string PrintPolicy(const ActionsAndProbs& policy);
 
 }  // namespace open_spiel
