@@ -169,6 +169,9 @@ class GamesSimTest(parameterized.TestCase):
         self.assertEmpty(state.legal_actions(player))
       # Print utilities for each player.
       utilities = state.returns()
+      # Check that player returns are correct
+      for player in range(game.num_players()):
+        self.assertEqual(state.player_return(player), utilities[player])
       # Check that each one is in range
       for utility in utilities:
         self.assertGreaterEqual(utility, game.min_utility())

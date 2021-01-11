@@ -167,7 +167,7 @@ class TicTacToeState(object):
   def player_reward(self, player):
     return self.rewards()[player]
 
-  def player_returns(self, player):
+  def player_return(self, player):
     return self.returns()[player]
 
   def is_chance_node(self):
@@ -221,7 +221,7 @@ class TicTacToeState(object):
 class TicTacToeGame(object):
   """A python-only version of the Tic-Tac-Toe game.
 
-  This class implements all the pyspiel.Gae API functions. Please see spiel.h
+  This class implements all the pyspiel.Game API functions. Please see spiel.h
   for more thorough documentation of each function.
 
   Note that this class does not inherit from pyspiel.Game since pickle
