@@ -51,6 +51,8 @@ add_library (algorithms OBJECT
   outcome_sampling_mccfr.h
   policy_iteration.cc
   policy_iteration.h
+  sarsa.cc
+  sarsa.h
   state_distribution.cc
   state_distribution.h
   tabular_exploitability.cc

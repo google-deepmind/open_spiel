@@ -21,6 +21,9 @@ add_test(policy_iteration_example_test policy_iteration_example)
 add_executable(value_iteration_example value_iteration_example.cc ${OPEN_SPIEL_OBJECTS})
 add_test(value_iteration_example_test value_iteration_example)
 
+add_executable(sarsa_example sarsa_example.cc ${OPEN_SPIEL_OBJECTS})
+add_test(sarsa_example_test sarsa_example)
+
 add_executable(count_all_states count_all_states.cc ${OPEN_SPIEL_OBJECTS})
 
 if (BUILD_WITH_TENSORFLOW_CC)
