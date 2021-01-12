@@ -19,7 +19,8 @@ add_executable(lp_solver_test lp_solver_test.cc ${OPEN_SPIEL_OBJECTS}
 target_link_libraries(lp_solver_test ${ORTOOLS_LIBS})
 add_test(lp_solver_test lp_solver_test)
 
-add_executable(sequence_form_lp_test sequence_form_lp_test.cc ${OPEN_SPIEL_OBJECTS}
+add_executable(sequence_form_lp_test sequence_form_lp_test.cc
+               ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests> $<TARGET_OBJECTS:open_spiel_ortools>)
 target_link_libraries(sequence_form_lp_test ${ORTOOLS_LIBS})
 add_test(sequence_form_lp_test sequence_form_lp_test)
