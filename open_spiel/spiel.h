@@ -374,7 +374,7 @@ class State {
   // Different ground states can yield the same information state for a player
   // when the only part of the state that differs is not observable by that
   // player (e.g. opponents' cards in Poker.)
-
+  //
   // The identifiers must be unique across all players.
   // This allows an algorithm to maintain a single table of identifiers
   // instead of maintaining a table per player to avoid name collisions.
@@ -384,24 +384,24 @@ class State {
   // well, like P1Jack and P2Jack. However prefixing by player number is not
   // a requirement. The only thing that is necessary is that it is unambiguous
   // who is the observer.
-
+  //
   // Games that do not have imperfect information do not need to implement
   // these methods, but most algorithms intended for imperfect information
   // games will work on perfect information games provided the InformationState
   // is returned in a form they support. For example, InformationState()
   // could simply return the history for a perfect information game.
-
+  //
   // A valid InformationStateString must be returned at terminal states, since
   // this is required in some applications (e.g. final observation in an RL
   // environment).
-
+  //
   // The information state should be perfect-recall, i.e. if two states
   // have a different InformationState, then all successors of one must have
   // a different InformationState to all successors of the other.
   // For example, in tic-tac-toe, the current state of the board would not be
   // a perfect-recall representation, but the sequence of moves played would
   // be.
-
+  //
   // If you implement both InformationState and Observation, the two must be
   // consistent for all the players (even the non-acting player(s)).
   // By consistency we mean that when you maintain an Action-Observation
@@ -429,11 +429,11 @@ class State {
   // with values in lexicographic order. E.g. for 2x4x3, order would be:
   // (0,0,0), (0,0,1), (0,0,2), (0,1,0), ... , (1,3,2).
   // This function should resize the supplied vector if required.
-
+  //
   // A valid InformationStateTensor must be returned at terminal states, since
   // this is required in some applications (e.g. final observation in an RL
   // environment).
-
+  //
   // There are currently no use-case for calling this function with
   // `kChancePlayerId`. Thus, games are expected to raise an error in those
   // cases.
