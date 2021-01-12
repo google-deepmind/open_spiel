@@ -158,6 +158,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   pytorch/rcfr_pytorch_test.py
   pytorch/dqn_pytorch_test.py
   pytorch/nfsp_pytorch_test.py
+  pytorch/eva_pytorch_test.py
 )
 
 
