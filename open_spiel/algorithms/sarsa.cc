@@ -16,6 +16,7 @@
 
 #include <algorithm>
 #include <random>
+#include <string>
 
 #include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
 #include "open_spiel/abseil-cpp/absl/random/distributions.h"
@@ -113,7 +114,7 @@ void SarsaSolver::RunIteration() {
         next_state, player, min_utility, max_utility);
 
     // Update action value
-    string key = curr_state->ToString();
+    std::string key = curr_state->ToString();
     double prev_q_val = values_[{key, curr_action}];
     double new_q_val =
         prev_q_val +
