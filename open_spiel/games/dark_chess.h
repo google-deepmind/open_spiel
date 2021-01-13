@@ -60,6 +60,7 @@ inline const std::vector<int> &ObservationTensorShape() {
 }
 
 class DarkChessGame;
+class DarkChessObserver;
 
 // Action encoding (must be changed to support larger boards):
 // bits 0-5: from square (0-64)
@@ -135,6 +136,9 @@ class DarkChessState : public State {
   void DoApplyAction(Action action) override;
 
  private:
+
+  friend class DarkChessObserver;
+
   // Draw can be claimed under the FIDE 3-fold repetition rule (the current
   // board position has already appeared twice in the history).
   bool IsRepetitionDraw() const;
@@ -192,6 +196,9 @@ class DarkChessGame : public Game {
     return dark_chess::ObservationTensorShape();
   }
   int MaxGameLength() const override { return chess::MaxGameLength(); }
+
+  std::shared_ptr<DarkChessObserver> default_observer_;
+  std::shared_ptr<DarkChessObserver> info_state_observer_;
 
  private:
   const int board_size_;

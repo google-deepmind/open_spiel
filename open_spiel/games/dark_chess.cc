@@ -87,47 +87,156 @@ std::array<bool, chess::kMaxBoardSize * chess::kMaxBoardSize> ComputeObservabili
   return observability_table;
 }
 
-// Adds a plane to the information state vector corresponding to the presence
-// and absence of the given piece type and colour at each square.
-void AddPieceTypePlane(chess::Color color, chess::PieceType piece_type,
-                       const chess::ChessBoard& board,
-                       std::array<bool, chess::kMaxBoardSize * chess::kMaxBoardSize>& observability_table,
-                       absl::Span<float>::iterator& value_it) {
-  for (int8_t y = 0; y < chess::kMaxBoardSize; ++y) {
-    for (int8_t x = 0; x < chess::kMaxBoardSize; ++x) {
-      auto square = chess::Square{x, y};
-      chess::Piece piece_on_board = board.at(square);
-      *value_it++ =
-          (piece_on_board.color == color && piece_on_board.type == piece_type && observability_table[chess::SquareToIndex(square, board.BoardSize())]
-           ? 1.0
-           : 0.0);
+}  // namespace
+
+
+class DarkChessObserver : public Observer {
+ public:
+  explicit DarkChessObserver(IIGObservationType iig_obs_type)
+      : Observer(/*has_string=*/true, /*has_tensor=*/true),
+        iig_obs_type_(iig_obs_type) {}
+
+  void WriteTensor(const State& observed_state, int player, Allocator* allocator) const override {
+    const auto& state = open_spiel::down_cast<const DarkChessState&>(observed_state);
+    const auto& game = open_spiel::down_cast<const DarkChessGame&>(*state.GetGame());
+    SPIEL_CHECK_GE(player, 0);
+    SPIEL_CHECK_LT(player, game.NumPlayers());
+
+    if (iig_obs_type_.perfect_recall) {
+      SpielFatalError("Dark chess observer tensor with perfect recall not implemented");
+    }
+
+    if (iig_obs_type_.public_info) {
+      WritePublicInfoTensor(state, allocator);
+    }
+    if (iig_obs_type_.private_info == PrivateInfoType::kSinglePlayer) {
+      WritePrivateInfoTensor(state, player, allocator);
+    } else if (iig_obs_type_.private_info == PrivateInfoType::kAllPlayers) {
+      for (int i = 0; i < chess::NumPlayers(); ++i) {
+        WritePrivateInfoTensor(state, player, allocator);
+      }
     }
   }
-}
 
-// Adds a plane to the information state vector corresponding to the observability of given square
-void AddUnknownSquarePlane(std::array<bool, chess::kMaxBoardSize * chess::kMaxBoardSize>& observability_table,
-                           absl::Span<float>::iterator& value_it) {
-  for (int i = 0; i < chess::kMaxBoardSize * chess::kMaxBoardSize; ++i) {
-    *value_it++ = observability_table[i] ? 0.0 : 1.0;
+  std::string StringFrom(const State& observed_state, int player) const override {
+    const auto& state = open_spiel::down_cast<const DarkChessState&>(observed_state);
+    const auto& game = open_spiel::down_cast<const DarkChessGame&>(*state.GetGame());
+    SPIEL_CHECK_GE(player, 0);
+    SPIEL_CHECK_LT(player, game.NumPlayers());
+    std::string result;
+
+    if (iig_obs_type_.perfect_recall) {
+      if (iig_obs_type_.public_info && iig_obs_type_.private_info == PrivateInfoType::kSinglePlayer) {
+        return state.aohs_[player].ToString();
+      } else {
+        SpielFatalError("Dark chess observer string with perfect recall implemented only for the default info state observation type");
+      }
+    }
+
+    if (iig_obs_type_.public_info && iig_obs_type_.private_info == PrivateInfoType::kSinglePlayer) {
+      chess::Color color = chess::PlayerToColor(player);
+      auto observability_table = ComputeObservabilityTable(state.Board(), color);
+      return state.Board().ToDarkFEN(observability_table, color);
+    }
+    else {
+      SpielFatalError("Dark chess observer string with imperfect recall implemented only for the default observation type");
+    }
+
   }
-}
 
-// Adds a uniform scalar plane scaled with min and max.
-template <typename T>
-void AddScalarPlane(T val, T min, T max,
-                    absl::Span<float>::iterator& value_it) {
-  double normalized_val = static_cast<double>(val - min) / (max - min);
-  for (int i = 0; i < chess::kMaxBoardSize * chess::kMaxBoardSize; ++i)
-    *value_it++ = normalized_val;
-}
+ private:
+
+  void WritePieces(chess::Color color, chess::PieceType piece_type,
+                         const chess::ChessBoard &board,
+                         std::array<bool, chess::kMaxBoardSize * chess::kMaxBoardSize> &observability_table,
+                         Allocator* allocator) const {
+
+    std::string typeString = color == chess::Color::kEmpty ? "empty" : chess::PieceTypeToString(piece_type,color == chess::Color::kWhite);
+
+    auto out = allocator->Get(typeString + "_pieces", {chess::kMaxBoardSize, chess::kMaxBoardSize});
+    for (int8_t y = 0; y < chess::kMaxBoardSize; ++y) {
+      for (int8_t x = 0; x < chess::kMaxBoardSize; ++x) {
+        auto square = chess::Square{x, y};
+        chess::Piece piece_on_board = board.at(square);
+        out.at(x ,y) =
+            (piece_on_board.color == color && piece_on_board.type == piece_type && observability_table[chess::SquareToIndex(square, board.BoardSize())]
+             ? 1.0f
+             : 0.0f);
+      }
+    }
+  }
+
+  void WriteUnknownSquares(const chess::ChessBoard &board,
+                           std::array<bool, chess::kMaxBoardSize * chess::kMaxBoardSize> &observability_table,
+                           Allocator *allocator) const {
+
+    auto out = allocator->Get("unknown_squares", {chess::kMaxBoardSize, chess::kMaxBoardSize});
+    for (int8_t y = 0; y < chess::kMaxBoardSize; ++y) {
+      for (int8_t x = 0; x < chess::kMaxBoardSize; ++x) {
+        auto square = chess::Square{x, y};
+        out.at(x, y) = observability_table[chess::SquareToIndex(square, board.BoardSize())] ? 0.0 : 1.0;
+      }
+    }
+  }
+
+  template <typename T>
+  void WriteScalar(T val, T min, T max, Allocator *allocator, const std::string &name) const {
+
+    double normalized_val = static_cast<double>(val - min) / (max - min);
+    auto out = allocator->Get(name, {chess::kMaxBoardSize, chess::kMaxBoardSize});
+    for (int8_t y = 0; y < chess::kMaxBoardSize; ++y) {
+      for (int8_t x = 0; x < chess::kMaxBoardSize; ++x) {
+        out.at(x, y) = normalized_val;
+      }
+    }
+  }
 
 // Adds a binary scalar plane.
-void AddBinaryPlane(bool val, absl::Span<float>::iterator& value_it) {
-  AddScalarPlane<int>(val ? 1 : 0, 0, 1, value_it);
-}
+  void WriteBinary(bool val, Allocator *allocator, const std::string &name) const {
+    WriteScalar<int>(val ? 1 : 0, 0, 1, allocator, name);
+  }
 
-}  // namespace
+  void WritePrivateInfoTensor(const DarkChessState& state, int player, Allocator* allocator) const {
+    chess::Color color = chess::PlayerToColor(player);
+
+    auto observability_table = ComputeObservabilityTable(state.Board(), color);
+
+    // Piece configuration.
+    for (const auto& piece_type : chess::kPieceTypes) {
+      WritePieces(chess::Color::kWhite, piece_type, state.Board(), observability_table, allocator);
+      WritePieces(chess::Color::kBlack, piece_type, state.Board(), observability_table, allocator);
+    }
+
+    WritePieces(chess::Color::kEmpty, chess::PieceType::kEmpty, state.Board(), observability_table, allocator);
+    WriteUnknownSquares(state.Board(), observability_table, allocator);
+
+    // Castling rights.
+    WriteBinary(state.Board().CastlingRight(color, chess::CastlingDirection::kLeft),
+                allocator, "left_castling");
+
+    WriteBinary(state.Board().CastlingRight(color, chess::CastlingDirection::kRight),
+                allocator, "right_castling");
+  }
+
+  void WritePublicInfoTensor(const DarkChessState& state, Allocator* allocator) const {
+
+    const auto entry = state.repetitions_.find(state.Board().HashValue());
+    SPIEL_CHECK_FALSE(entry == state.repetitions_.end());
+    int repetitions = entry->second;
+
+    // Num repetitions for the current board.
+    WriteScalar(repetitions, 1, 3, allocator, "repetitions");
+
+    // Side to play.
+    WriteScalar(ColorToPlayer(state.Board().ToPlay()), 0, 1, allocator, "side_to_play");
+
+    // Irreversible move counter.
+    WriteScalar(state.Board().IrreversibleMoveCounter(), 0, 101, allocator, "move_number");
+  }
+
+  IIGObservationType iig_obs_type_;
+};
+
 
 
 DarkChessState::DarkChessState(std::shared_ptr<const Game> game, int boardSize, const std::string& fen)
@@ -206,69 +315,19 @@ std::vector<double> DarkChessState::Returns() const {
 }
 
 std::string DarkChessState::InformationStateString(Player player) const {
-  SPIEL_CHECK_GE(player, 0);
-  SPIEL_CHECK_LT(player, num_players_);
-  return aohs_[player].ToString();
+  const auto& game = open_spiel::down_cast<const DarkChessGame&>(*game_);
+  return game.info_state_observer_->StringFrom(*this, player);
 }
 
 std::string DarkChessState::ObservationString(Player player) const {
-  SPIEL_CHECK_GE(player, 0);
-  SPIEL_CHECK_LT(player, num_players_);
-  chess::Color color = chess::PlayerToColor(player);
-  auto observability_table = ComputeObservabilityTable(Board(), color);
-  return Board().ToDarkFEN(observability_table, color);
+  const auto& game = open_spiel::down_cast<const DarkChessGame&>(*game_);
+  return game.default_observer_->StringFrom(*this, player);
 }
 
-void DarkChessState::ObservationTensor(Player player,
-                                       absl::Span<float> values) const {
-  SPIEL_CHECK_GE(player, 0);
-  SPIEL_CHECK_LT(player, num_players_);
-
-  chess::Color color = chess::PlayerToColor(player);
-
-  auto value_it = values.begin();
-  auto observability_table = ComputeObservabilityTable(Board(), color);
-
-  // Piece configuration.
-  for (const auto& piece_type : chess::kPieceTypes) {
-    AddPieceTypePlane(chess::Color::kWhite, piece_type, Board(), observability_table, value_it);
-    AddPieceTypePlane(chess::Color::kBlack, piece_type, Board(), observability_table, value_it);
-  }
-
-  AddPieceTypePlane(chess::Color::kEmpty, chess::PieceType::kEmpty, Board(), observability_table, value_it);
-  AddUnknownSquarePlane(observability_table, value_it);
-
-  const auto entry = repetitions_.find(Board().HashValue());
-  SPIEL_CHECK_FALSE(entry == repetitions_.end());
-  int repetitions = entry->second;
-
-  // Num repetitions for the current board.
-  AddScalarPlane(repetitions, 1, 3, value_it);
-
-  // Side to play.
-  AddScalarPlane(ColorToPlayer(Board().ToPlay()), 0, 1, value_it);
-
-  // Irreversible move counter.
-  AddScalarPlane(Board().IrreversibleMoveCounter(), 0, 101, value_it);
-
-  // Castling rights.
-  if (color == chess::Color::kWhite) {
-    AddBinaryPlane(Board().CastlingRight(chess::Color::kWhite, chess::CastlingDirection::kLeft),
-                   value_it);
-
-    AddBinaryPlane(
-        Board().CastlingRight(chess::Color::kWhite, chess::CastlingDirection::kRight),
-        value_it);
-  } else {
-    AddBinaryPlane(Board().CastlingRight(chess::Color::kBlack, chess::CastlingDirection::kLeft),
-                   value_it);
-
-    AddBinaryPlane(
-        Board().CastlingRight(chess::Color::kBlack, chess::CastlingDirection::kRight),
-        value_it);
-  }
-
-  SPIEL_CHECK_EQ(value_it, values.end());
+void DarkChessState::ObservationTensor(Player player, absl::Span<float> values) const {
+  ContiguousAllocator allocator(values);
+  const auto& game = open_spiel::down_cast<const DarkChessGame&>(*game_);
+  game.default_observer_->WriteTensor(*this, player, &allocator);
 }
 
 std::unique_ptr<State> DarkChessState::Clone() const {
@@ -355,6 +414,8 @@ DarkChessGame::DarkChessGame(const GameParameters &params)
     : Game(kGameType, params),
       board_size_(ParameterValue<int>("board_size")),
       fen_(ParameterValue<std::string>("fen", DefaultFen(board_size_))) {
+  default_observer_ = std::make_shared<DarkChessObserver>(kDefaultObsType);
+  info_state_observer_ = std::make_shared<DarkChessObserver>(kInfoStateObsType);
 }
 
 
