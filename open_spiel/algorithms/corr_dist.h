@@ -73,6 +73,11 @@ namespace algorithms {
 // Monte Carlo sampling of deterministic joint policies from the mixtures.
 using CorrelationDevice = std::vector<std::pair<double, TabularPolicy>>;
 
+// Helper function to return a correlation device that is a uniform distribution
+// over the vector of tabular policies.
+CorrelationDevice UniformCorrelationDevice(
+    std::vector<TabularPolicy>& policies);
+
 // Return a string representation of the correlation device.
 std::string ToString(const CorrelationDevice& corr_dev);
 
@@ -137,6 +142,11 @@ double AFCCEDist(const Game& game, CorrDistConfig config,
 // game.
 double CEDist(const Game& game, const NormalFormCorrelationDevice& mu);
 double CCEDist(const Game& game, const NormalFormCorrelationDevice& mu);
+
+// Distance to coarse-correlated in an extensive-form game. Note: this function
+// requires enumerating over each player's deterministic policies, and will be
+// prohibitively expensive for large games.
+double CCEDist(const Game& game, const CorrelationDevice& mu);
 
 }  // namespace algorithms
 }  // namespace open_spiel

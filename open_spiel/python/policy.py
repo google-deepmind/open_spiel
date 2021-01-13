@@ -398,3 +398,8 @@ def python_policy_to_pyspiel_policy(python_tabular_policy):
         action_probs.append((action, prob))
     infostates_to_probabilities[infostate] = action_probs
   return pyspiel.TabularPolicy(infostates_to_probabilities)
+
+
+def python_policies_to_pyspiel_policies(policies):
+  """Same conversion of TabularPolicy to pyspiel.TabularPolicy (list ver.)."""
+  return [python_policy_to_pyspiel_policy(p) for p in policies]

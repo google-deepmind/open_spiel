@@ -27,6 +27,7 @@
 #include "open_spiel/algorithms/corr_dist/afce.h"
 #include "open_spiel/algorithms/corr_dist/efcce.h"
 #include "open_spiel/algorithms/corr_dist/efce.h"
+#include "open_spiel/algorithms/deterministic_policy.h"
 #include "open_spiel/algorithms/expected_returns.h"
 #include "open_spiel/algorithms/tabular_exploitability.h"
 #include "open_spiel/game_transforms/turn_based_simultaneous_game.h"
@@ -97,6 +98,18 @@ CorrelationDevice ConvertCorrelationDevice(
   return new_mu;
 }
 }  // namespace
+
+// Helper function to return a correlation device that is a uniform distribution
+// over the vector of tabular policies.
+CorrelationDevice UniformCorrelationDevice(
+    std::vector<TabularPolicy>& policies) {
+  CorrelationDevice mu;
+  mu.reserve(policies.size());
+  for (const TabularPolicy& policy : policies) {
+    mu.push_back({1.0 / policies.size(), policy});
+  }
+  return mu;
+}
 
 // Return a string representation of the correlation device.
 std::string ToString(const CorrelationDevice& corr_dev) {
@@ -236,6 +249,26 @@ double CCEDist(const Game& game, const NormalFormCorrelationDevice& mu) {
     CorrDistConfig config;
     return EFCCEDist(game, config, converted_mu);
   }
+}
+
+double CCEDist(const Game& game, const CorrelationDevice& mu) {
+  std::vector<double> values = ExpectedValues(game, mu);
+  double cce_dist = 0;
+  for (Player player = 0; player < game.NumPlayers(); ++player) {
+    double max_incentive = 0;
+    DeterministicTabularPolicy policy_enumerator(game, player);
+    do {
+      TabularPolicy policy = policy_enumerator.GetTabularPolicy();
+      CorrelationDevice mu_prime = mu;
+      for (std::pair<double, TabularPolicy>& item : mu_prime) {
+        item.second.ImportPolicy(policy);
+      }
+      double value = ExpectedValues(game, mu_prime)[player];
+      max_incentive = std::max(max_incentive, value - values[player]);
+    } while (policy_enumerator.NextPolicy());
+    cce_dist += max_incentive;
+  }
+  return cce_dist;
 }
 
 }  // namespace algorithms

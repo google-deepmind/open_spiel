@@ -122,6 +122,23 @@ class CFRTest(parameterized.TestCase, absltest.TestCase):
     np.testing.assert_allclose(
         average_policy_values, [-1 / 18, 1 / 18], atol=1e-3)
 
+  def test_cfr_cce_dist_goofspiel(self):
+    """Copy of the TestCCEDistCFRGoofSpiel in corr_dist_test.cc."""
+    game = pyspiel.load_game(
+        "turn_based_simultaneous_game(game=goofspiel(num_cards=3,points_order="
+        "descending,returns_type=total_points))")
+    for num_iterations in [1, 10, 100]:
+      policies = []
+      cfr_solver = cfr.CFRSolver(game)
+      for _ in range(num_iterations):
+        cfr_solver.evaluate_and_update_policy()
+        policies.append(
+            policy.python_policy_to_pyspiel_policy(cfr_solver.current_policy()))
+      mu = pyspiel.uniform_correlation_device(policies)
+      cce_dist = pyspiel.cce_dist(game, mu)
+      print("goofspiel, cce test num_iterations: {}, cce_dist: {}".format(
+          num_iterations, cce_dist))
+
   @parameterized.parameters(
       list(itertools.product([True, False], [True, False], [True, False])))
   def test_cfr_kuhn_poker_runs_with_multiple_players(self, linear_averaging,

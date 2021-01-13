@@ -27,6 +27,7 @@
 #include "open_spiel/matrix_game.h"
 #include "open_spiel/normal_form_game.h"
 #include "open_spiel/observer.h"
+#include "open_spiel/python/pybind11/algorithms_corr_dist.h"
 #include "open_spiel/python/pybind11/algorithms_trajectories.h"
 #include "open_spiel/python/pybind11/bots.h"
 #include "open_spiel/python/pybind11/game_transforms.h"
@@ -579,8 +580,9 @@ PYBIND11_MODULE(pyspiel, m) {
   init_pyspiel_bots(m);                   // Bots and bot-related algorithms.
   init_pyspiel_observation_histories(m);  // Histories related to observations.
   init_pyspiel_policy(m);           // Policies and policy-related algorithms.
-  init_pyspiel_game_transforms(m);  // Game transformations.
+  init_pyspiel_algorithms_corr_dist(m);     // Correlated eq. distance funcs
   init_pyspiel_algorithms_trajectories(m);  // Trajectories.
+  init_pyspiel_game_transforms(m);          // Game transformations.
   init_pyspiel_games_backgammon(m);         // Backgammon game.
   init_pyspiel_games_bridge(m);  // Game-specific functions for bridge.
   init_pyspiel_games_negotiation(m);  // Negotiation game.

@@ -17,9 +17,11 @@
 #include <numeric>
 #include <unordered_map>
 
+#include "open_spiel/algorithms/cfr.h"
 #include "open_spiel/game_transforms/turn_based_simultaneous_game.h"
 #include "open_spiel/games/efg_game.h"
 #include "open_spiel/games/efg_game_data.h"
+#include "open_spiel/games/goofspiel.h"
 #include "open_spiel/matrix_game.h"
 #include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"
@@ -244,7 +246,7 @@ void Test1PInOutGame() {
 
 void TestGreenwaldSarfatiExample1() {
   absl::optional<std::string> file = FindFile(kGreenwaldSarfatiEg1File, 2);
-  if (file != std::nullopt) {
+  if (file.has_value()) {
     std::shared_ptr<const Game> efg_game =
         LoadGame(absl::StrCat("efg_game(filename=", file.value(), ")"));
     const efg_game::EFGGame* example_game =
@@ -280,7 +282,7 @@ void TestGreenwaldSarfatiExample1() {
 
 void TestGreenwaldSarfatiExample2() {
   absl::optional<std::string> file = FindFile(kGreenwaldSarfatiEg2File, 2);
-  if (file != std::nullopt) {
+  if (file.has_value()) {
     std::shared_ptr<const Game> efg_game =
         LoadGame(absl::StrCat("efg_game(filename=", file.value(), ")"));
     const efg_game::EFGGame* example_game =
@@ -339,6 +341,31 @@ void TestGreenwaldSarfatiExample2() {
   SPIEL_CHECK_GT(CEDist(*eg2_matrix_game, mu_nfg), 0.0);
 }
 
+void TestCCEDistCFRGoofSpiel() {
+  std::shared_ptr<const Game> game = LoadGame(
+      "turn_based_simultaneous_game(game=goofspiel(num_cards=3,points_order="
+      "descending,returns_type=total_points))");
+  for (int num_iterations : {1, 10, 100}) {
+    std::vector<TabularPolicy> policies;
+    policies.reserve(num_iterations);
+    CFRSolverBase solver(*game,
+                         /*alternating_updates=*/true,
+                         /*linear_averaging=*/false,
+                         /*regret_matching_plus=*/false,
+                         /*random_initial_regrets*/ false);
+    for (int i = 0; i < num_iterations; i++) {
+      solver.EvaluateAndUpdatePolicy();
+      TabularPolicy current_policy =
+          static_cast<CFRCurrentPolicy*>(solver.CurrentPolicy().get())
+              ->AsTabular();
+      policies.push_back(current_policy);
+    }
+
+    double cce_dist = CCEDist(*game, UniformCorrelationDevice(policies));
+    std::cout << "num_iterations: " << num_iterations
+              << ", cce_dist: " << cce_dist << std::endl;
+  }
+}
 }  // namespace
 }  // namespace algorithms
 }  // namespace open_spiel
@@ -355,4 +382,5 @@ int main(int argc, char** argv) {
   algorithms::Test1PInOutGame();
   algorithms::TestGreenwaldSarfatiExample1();
   algorithms::TestGreenwaldSarfatiExample2();
+  algorithms::TestCCEDistCFRGoofSpiel();
 }

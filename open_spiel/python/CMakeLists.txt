@@ -9,6 +9,8 @@ endif()
 
 # List of all Python bindings to add to pyspiel.
 set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
+  pybind11/algorithms_corr_dist.cc
+  pybind11/algorithms_corr_dist.h
   pybind11/algorithms_trajectories.cc
   pybind11/algorithms_trajectories.h
   pybind11/bots.cc

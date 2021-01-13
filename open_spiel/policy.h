@@ -219,6 +219,16 @@ class TabularPolicy : public Policy {
     return str;
   }
 
+  // Set (overwrite) all the state policies contained in another policy within
+  // this policy. Does not change other state policies not contained in this
+  // policy.
+  void ImportPolicy(const TabularPolicy& other_policy) {
+    for (const auto& [info_state, actions_and_probs] :
+         other_policy.policy_table_) {
+      SetStatePolicy(info_state, actions_and_probs);
+    }
+  }
+
   // Set the probability for action at the info state. If the info state is not
   // in the policy, it is added. If the action is not in the info state policy,
   // it is added. Otherwise it is modified.
