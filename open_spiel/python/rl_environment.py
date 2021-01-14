@@ -376,6 +376,11 @@ class Environment(object):
         dtype=int,
     )
 
+  # Environment properties
+  @property
+  def use_observation(self):
+    return self._use_observation
+
   # Game properties
   @property
   def name(self):
