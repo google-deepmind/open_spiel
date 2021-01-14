@@ -135,9 +135,16 @@ class CFRTest(parameterized.TestCase, absltest.TestCase):
         policies.append(
             policy.python_policy_to_pyspiel_policy(cfr_solver.current_policy()))
       mu = pyspiel.uniform_correlation_device(policies)
-      cce_dist = pyspiel.cce_dist(game, mu)
+      cce_dist1 = pyspiel.cce_dist(game, mu)
       print("goofspiel, cce test num_iterations: {}, cce_dist: {}".format(
-          num_iterations, cce_dist))
+          num_iterations, cce_dist1))
+      # Assemble the same correlation device manually, just as an example for
+      # how to do non-uniform distributions of them and to test the python
+      # bindings for lists of tuples works properly
+      uniform_prob = 1.0 / len(policies)
+      mu2 = [(uniform_prob, policy) for policy in policies]
+      cce_dist2 = pyspiel.cce_dist(game, mu2)
+      self.assertAlmostEqual(cce_dist1, cce_dist2)
 
   @parameterized.parameters(
       list(itertools.product([True, False], [True, False], [True, False])))

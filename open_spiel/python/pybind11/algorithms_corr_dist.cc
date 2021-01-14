@@ -33,8 +33,10 @@ using open_spiel::algorithms::CorrelationDevice;
 void init_pyspiel_algorithms_corr_dist(py::module& m) {
   m.def("uniform_correlation_device",
         &open_spiel::algorithms::UniformCorrelationDevice,
-        "Returns a uniform correlation device over a set of joint policies");
+        "Returns a uniform correlation device over a set of joint policies.");
 
+  // TODO(author5): expose the rest of the functions. I'd like to get rid of
+  // the unnecessary CorrDistConfig first.
   m.def("cce_dist",
         py::overload_cast<const Game&, const CorrelationDevice&>(
             &open_spiel::algorithms::CCEDist),

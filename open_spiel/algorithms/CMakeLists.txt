@@ -15,6 +15,8 @@ add_library (algorithms OBJECT
   corr_dist/efcce.h
   corr_dist/efce.cc
   corr_dist/efce.h
+  corr_dist/cce.cc
+  corr_dist/cce.h
   corr_dev_builder.cc
   corr_dev_builder.h
   deterministic_policy.cc

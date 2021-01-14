@@ -25,9 +25,9 @@
 #include "open_spiel/algorithms/best_response.h"
 #include "open_spiel/algorithms/corr_dist/afcce.h"
 #include "open_spiel/algorithms/corr_dist/afce.h"
+#include "open_spiel/algorithms/corr_dist/cce.h"
 #include "open_spiel/algorithms/corr_dist/efcce.h"
 #include "open_spiel/algorithms/corr_dist/efce.h"
-#include "open_spiel/algorithms/deterministic_policy.h"
 #include "open_spiel/algorithms/expected_returns.h"
 #include "open_spiel/algorithms/tabular_exploitability.h"
 #include "open_spiel/game_transforms/turn_based_simultaneous_game.h"
@@ -252,23 +252,41 @@ double CCEDist(const Game& game, const NormalFormCorrelationDevice& mu) {
 }
 
 double CCEDist(const Game& game, const CorrelationDevice& mu) {
-  std::vector<double> values = ExpectedValues(game, mu);
-  double cce_dist = 0;
-  for (Player player = 0; player < game.NumPlayers(); ++player) {
-    double max_incentive = 0;
-    DeterministicTabularPolicy policy_enumerator(game, player);
-    do {
-      TabularPolicy policy = policy_enumerator.GetTabularPolicy();
-      CorrelationDevice mu_prime = mu;
-      for (std::pair<double, TabularPolicy>& item : mu_prime) {
-        item.second.ImportPolicy(policy);
-      }
-      double value = ExpectedValues(game, mu_prime)[player];
-      max_incentive = std::max(max_incentive, value - values[player]);
-    } while (policy_enumerator.NextPolicy());
-    cce_dist += max_incentive;
+  // Check for proper probability distribution.
+  CheckCorrelationDeviceProbDist(mu);
+
+  CorrDistConfig config;
+
+  auto cce_game =
+      std::make_shared<CCEGame>(game.shared_from_this(), config, mu);
+
+  // Note: cannot simply call NashConv here as in the other examples. Because
+  // this auxiliary game does not have the "follow" action, it is possible that
+  // a best response against the correlated distribution is *negative* (i.e.
+  // the best deterministic policy is not as good as simply following the
+  // correlated recommendations), but the NashConv function has a check that the
+  // incentive is >= zero, so it would fail.
+
+  CCETabularPolicy policy;
+
+  std::unique_ptr<State> root = cce_game->NewInitialState();
+  std::vector<double> best_response_values(cce_game->NumPlayers());
+  for (auto p = Player{0}; p < cce_game->NumPlayers(); ++p) {
+    TabularBestResponse best_response(*cce_game, p, &policy);
+    best_response_values[p] = best_response.Value(*root);
   }
-  return cce_dist;
+  std::vector<double> on_policy_values =
+      ExpectedReturns(*root, policy, -1, false);
+  SPIEL_CHECK_EQ(best_response_values.size(), on_policy_values.size());
+  double nash_conv = 0;
+  for (auto p = Player{0}; p < cce_game->NumPlayers(); ++p) {
+    // For reasons indicated in comment at the top of this funciton, we have
+    // max(0, ...) here.
+    double deviation_incentive =
+        std::max(0.0, best_response_values[p] - on_policy_values[p]);
+    nash_conv += deviation_incentive;
+  }
+  return nash_conv;
 }
 
 }  // namespace algorithms

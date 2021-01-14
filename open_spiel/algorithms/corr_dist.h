@@ -143,10 +143,13 @@ double AFCCEDist(const Game& game, CorrDistConfig config,
 double CEDist(const Game& game, const NormalFormCorrelationDevice& mu);
 double CCEDist(const Game& game, const NormalFormCorrelationDevice& mu);
 
-// Distance to coarse-correlated in an extensive-form game. Note: this function
-// requires enumerating over each player's deterministic policies, and will be
-// prohibitively expensive for large games.
+// Distance to coarse-correlated in an extensive-form game. Builds a simpler
+// auxiliary game similar to the *FCCE where there is one chance node that
+// determines which policies the opponents follow (never revealed). Note that
+// the policies in this correlation device *can* be mixed.
 double CCEDist(const Game& game, const CorrelationDevice& mu);
+
+// TODO(author5): provide a similar function CEDist for extensive-form games.
 
 }  // namespace algorithms
 }  // namespace open_spiel
