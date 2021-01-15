@@ -66,7 +66,11 @@ struct DimensionedSpan {
   absl::Span<float> data;
 
   DimensionedSpan(absl::Span<float> data, absl::InlinedVector<int, 4> shape)
-      : shape(std::move(shape)), data(data) {}
+      : shape(std::move(shape)), data(data) {
+    int m = std::accumulate(
+        this->shape.begin(), this->shape.end(), 1, std::multiplies<int>());
+    SPIEL_CHECK_EQ(m, data.size());
+  }
 
   float& at(int idx) const {
     SPIEL_DCHECK_EQ(shape.size(), 1);
@@ -84,7 +88,7 @@ struct DimensionedSpan {
   }
 
   float& at(int idx1, int idx2, int idx3, int idx4) const {
-    SPIEL_DCHECK_EQ(shape.size(), 3);
+    SPIEL_DCHECK_EQ(shape.size(), 4);
     return data[((idx1 * shape[1] + idx2) * shape[2] + idx3) * shape[3] + idx4];
   }
 };
