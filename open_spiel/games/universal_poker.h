@@ -84,6 +84,10 @@ class UniversalPokerState : public State {
   // Used to make UpdateIncrementalStateDistribution much faster.
   std::unique_ptr<HistoryDistribution> GetHistoriesConsistentWithInfostate(
       int player_id) const override;
+  std::vector<Action> ActionsConsistentWithInformationFrom(
+      Action action) const override {
+    return {action};
+  }
 
  protected:
   void DoApplyAction(Action action_id) override;

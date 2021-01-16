@@ -608,6 +608,18 @@ class State {
     return GetHistoriesConsistentWithInfostate(CurrentPlayer());
   }
 
+  // Returns a vector of all actions that are consistent with the information
+  // revealed by taking action. E.g. in Poker, this does nothing but return the
+  // current action as poker only has public actions. In a game like Battleship,
+  // where the placement phase is hidden, this would return all possible
+  // placements.
+  virtual std::vector<Action> ActionsConsistentWithInformationFrom(
+      Action action) const {
+    SpielFatalError(
+        "ActionsConsistentWithInformationFrom has not been implemented.");
+    return {};
+  }
+
  protected:
   // See ApplyAction.
   virtual void DoApplyAction(Action action_id) {

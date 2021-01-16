@@ -103,6 +103,11 @@ class LeducState : public State {
   std::unique_ptr<State> ResampleFromInfostate(
       int player_id, std::function<double()> rng) const override;
 
+  std::vector<Action> ActionsConsistentWithInformationFrom(
+      Action action) const override {
+    return {action};
+  }
+
  protected:
   // The meaning of `action_id` varies:
   // - At decision nodes, one of ActionType::{kFold, kCall, kRaise}.
