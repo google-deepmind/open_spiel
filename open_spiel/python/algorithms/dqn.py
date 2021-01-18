@@ -226,6 +226,9 @@ class DQN(rl_agent.AbstractAgent):
     self._learn_step = self._optimizer.minimize(self._loss)
     self._initialize()
 
+  def get_step_counter(self):
+    return self._step_counter
+
   def step(self, time_step, is_evaluation=False, add_transition_record=True):
     """Returns the action to be taken and updates the Q-network if needed.
 
