@@ -234,6 +234,7 @@ class RLOracle(optimization_oracle.AbstractOracle):
         else:
           new_pol = self._best_response_class(self._env, player,
                                               **self._best_response_kwargs)
+          new_pol.unfreeze()
         new_pols.append(new_pol)
       new_policies.append(new_pols)
     return new_policies
