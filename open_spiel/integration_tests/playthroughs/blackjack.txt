@@ -63,7 +63,7 @@ action: 15
 # Non-Ace Total: 5 0 Num Aces: 0 0, Chance Player
 IsTerminal() = False
 History() = [1, 15]
-HistoryString() = "1 15"
+HistoryString() = "1, 15"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -79,7 +79,7 @@ action: 45
 # Non-Ace Total: 5 7 Num Aces: 0 0, Chance Player
 IsTerminal() = False
 History() = [1, 15, 45]
-HistoryString() = "1 15 45"
+HistoryString() = "1, 15, 45"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -95,7 +95,7 @@ action: 38
 # Non-Ace Total: 5 17 Num Aces: 0 0, Player's Turn
 IsTerminal() = False
 History() = [1, 15, 45, 38]
-HistoryString() = "1 15 45 38"
+HistoryString() = "1, 15, 45, 38"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -112,7 +112,7 @@ action: 0
 # Non-Ace Total: 5 17 Num Aces: 0 0, Chance Player
 IsTerminal() = False
 History() = [1, 15, 45, 38, 0]
-HistoryString() = "1 15 45 38 0"
+HistoryString() = "1, 15, 45, 38, 0"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -128,7 +128,7 @@ action: 49
 # Non-Ace Total: 15 17 Num Aces: 0 0, Player's Turn
 IsTerminal() = False
 History() = [1, 15, 45, 38, 0, 49]
-HistoryString() = "1 15 45 38 0 49"
+HistoryString() = "1, 15, 45, 38, 0, 49"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -145,7 +145,7 @@ action: 1
 # Non-Ace Total: 15 17 Num Aces: 0 0, Player's Turn
 IsTerminal() = False
 History() = [1, 15, 45, 38, 0, 49, 1]
-HistoryString() = "1 15 45 38 0 49 1"
+HistoryString() = "1, 15, 45, 38, 0, 49, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -162,7 +162,7 @@ action: 0
 # Non-Ace Total: 15 17 Num Aces: 0 0, Chance Player
 IsTerminal() = False
 History() = [1, 15, 45, 38, 0, 49, 1, 0]
-HistoryString() = "1 15 45 38 0 49 1 0"
+HistoryString() = "1, 15, 45, 38, 0, 49, 1, 0"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -178,7 +178,7 @@ action: 5
 # Non-Ace Total: 15 23 Num Aces: 0 0, Player's Turn
 IsTerminal() = True
 History() = [1, 15, 45, 38, 0, 49, 1, 0, 5]
-HistoryString() = "1 15 45 38 0 49 1 0 5"
+HistoryString() = "1, 15, 45, 38, 0, 49, 1, 0, 5"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4

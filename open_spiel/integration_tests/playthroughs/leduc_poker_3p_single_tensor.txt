@@ -178,7 +178,7 @@ action: 2
 # Round 2 sequence:
 IsTerminal() = False
 History() = [4, 2]
-HistoryString() = "4 2"
+HistoryString() = "4, 2"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -245,7 +245,7 @@ action: 3
 # Round 2 sequence:
 IsTerminal() = False
 History() = [4, 2, 3]
-HistoryString() = "4 2 3"
+HistoryString() = "4, 2, 3"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -313,7 +313,7 @@ action: 1
 # Round 2 sequence:
 IsTerminal() = False
 History() = [4, 2, 3, 1]
-HistoryString() = "4 2 3 1"
+HistoryString() = "4, 2, 3, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -381,7 +381,7 @@ action: 2
 # Round 2 sequence:
 IsTerminal() = False
 History() = [4, 2, 3, 1, 2]
-HistoryString() = "4 2 3 1 2"
+HistoryString() = "4, 2, 3, 1, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 2
@@ -449,7 +449,7 @@ action: 1
 # Round 2 sequence:
 IsTerminal() = False
 History() = [4, 2, 3, 1, 2, 1]
-HistoryString() = "4 2 3 1 2 1"
+HistoryString() = "4, 2, 3, 1, 2, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -517,7 +517,7 @@ action: 0
 # Round 2 sequence:
 IsTerminal() = False
 History() = [4, 2, 3, 1, 2, 1, 0]
-HistoryString() = "4 2 3 1 2 1 0"
+HistoryString() = "4, 2, 3, 1, 2, 1, 0"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -584,7 +584,7 @@ action: 1
 # Round 2 sequence:
 IsTerminal() = False
 History() = [4, 2, 3, 1, 2, 1, 0, 1]
-HistoryString() = "4 2 3 1 2 1 0 1"
+HistoryString() = "4, 2, 3, 1, 2, 1, 0, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -652,7 +652,7 @@ action: 2
 # Round 2 sequence: Raise
 IsTerminal() = False
 History() = [4, 2, 3, 1, 2, 1, 0, 1, 2]
-HistoryString() = "4 2 3 1 2 1 0 1 2"
+HistoryString() = "4, 2, 3, 1, 2, 1, 0, 1, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 2
@@ -720,7 +720,7 @@ action: 1
 # Round 2 sequence: Raise, Call
 IsTerminal() = True
 History() = [4, 2, 3, 1, 2, 1, 0, 1, 2, 1]
-HistoryString() = "4 2 3 1 2 1 0 1 2 1"
+HistoryString() = "4, 2, 3, 1, 2, 1, 0, 1, 2, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4

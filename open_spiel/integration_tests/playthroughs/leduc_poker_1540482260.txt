@@ -147,7 +147,7 @@ action: 1
 # Round 2 sequence:
 IsTerminal() = False
 History() = [5, 1]
-HistoryString() = "5 1"
+HistoryString() = "5, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -200,7 +200,7 @@ action: 2
 # Round 2 sequence:
 IsTerminal() = False
 History() = [5, 1, 2]
-HistoryString() = "5 1 2"
+HistoryString() = "5, 1, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -253,7 +253,7 @@ action: 0
 # Round 2 sequence:
 IsTerminal() = True
 History() = [5, 1, 2, 0]
-HistoryString() = "5 1 2 0"
+HistoryString() = "5, 1, 2, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4

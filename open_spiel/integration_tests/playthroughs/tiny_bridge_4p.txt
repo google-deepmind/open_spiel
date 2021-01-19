@@ -99,7 +99,7 @@ action: 4
 # W:SAHJ N:HAHQ E:?? S:??
 IsTerminal() = False
 History() = [21, 4]
-HistoryString() = "21 4"
+HistoryString() = "21, 4"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -130,7 +130,7 @@ action: 17
 # W:SAHJ N:HAHQ E:SKHK S:??
 IsTerminal() = False
 History() = [21, 4, 17]
-HistoryString() = "21 4 17"
+HistoryString() = "21, 4, 17"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -161,7 +161,7 @@ action: 14
 # W:SAHJ N:HAHQ E:SKHK S:SQSJ
 IsTerminal() = False
 History() = [21, 4, 17, 14]
-HistoryString() = "21 4 17 14"
+HistoryString() = "21, 4, 17, 14"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -193,7 +193,7 @@ action: 0
 # W:SAHJ N:HAHQ E:SKHK S:SQSJ Pass
 IsTerminal() = False
 History() = [21, 4, 17, 14, 0]
-HistoryString() = "21 4 17 14 0"
+HistoryString() = "21, 4, 17, 14, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -225,7 +225,7 @@ action: 4
 # W:SAHJ N:HAHQ E:SKHK S:SQSJ Pass-2H
 IsTerminal() = False
 History() = [21, 4, 17, 14, 0, 4]
-HistoryString() = "21 4 17 14 0 4"
+HistoryString() = "21, 4, 17, 14, 0, 4"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 2
@@ -257,7 +257,7 @@ action: 5
 # W:SAHJ N:HAHQ E:SKHK S:SQSJ Pass-2H-2S
 IsTerminal() = False
 History() = [21, 4, 17, 14, 0, 4, 5]
-HistoryString() = "21 4 17 14 0 4 5"
+HistoryString() = "21, 4, 17, 14, 0, 4, 5"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 3
@@ -289,7 +289,7 @@ action: 6
 # W:SAHJ N:HAHQ E:SKHK S:SQSJ Pass-2H-2S-2NT
 IsTerminal() = False
 History() = [21, 4, 17, 14, 0, 4, 5, 6]
-HistoryString() = "21 4 17 14 0 4 5 6"
+HistoryString() = "21, 4, 17, 14, 0, 4, 5, 6"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -321,7 +321,7 @@ action: 7
 # W:SAHJ N:HAHQ E:SKHK S:SQSJ Pass-2H-2S-2NT-Dbl
 IsTerminal() = False
 History() = [21, 4, 17, 14, 0, 4, 5, 6, 7]
-HistoryString() = "21 4 17 14 0 4 5 6 7"
+HistoryString() = "21, 4, 17, 14, 0, 4, 5, 6, 7"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -353,7 +353,7 @@ action: 8
 # W:SAHJ N:HAHQ E:SKHK S:SQSJ Pass-2H-2S-2NT-Dbl-RDbl
 IsTerminal() = False
 History() = [21, 4, 17, 14, 0, 4, 5, 6, 7, 8]
-HistoryString() = "21 4 17 14 0 4 5 6 7 8"
+HistoryString() = "21, 4, 17, 14, 0, 4, 5, 6, 7, 8"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 2
@@ -385,7 +385,7 @@ action: 0
 # W:SAHJ N:HAHQ E:SKHK S:SQSJ Pass-2H-2S-2NT-Dbl-RDbl-Pass
 IsTerminal() = False
 History() = [21, 4, 17, 14, 0, 4, 5, 6, 7, 8, 0]
-HistoryString() = "21 4 17 14 0 4 5 6 7 8 0"
+HistoryString() = "21, 4, 17, 14, 0, 4, 5, 6, 7, 8, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 3
@@ -417,7 +417,7 @@ action: 0
 # W:SAHJ N:HAHQ E:SKHK S:SQSJ Pass-2H-2S-2NT-Dbl-RDbl-Pass-Pass
 IsTerminal() = False
 History() = [21, 4, 17, 14, 0, 4, 5, 6, 7, 8, 0, 0]
-HistoryString() = "21 4 17 14 0 4 5 6 7 8 0 0"
+HistoryString() = "21, 4, 17, 14, 0, 4, 5, 6, 7, 8, 0, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -449,7 +449,7 @@ action: 0
 # W:SAHJ N:HAHQ E:SKHK S:SQSJ Pass-2H-2S-2NT-Dbl-RDbl-Pass-Pass-Pass
 IsTerminal() = True
 History() = [21, 4, 17, 14, 0, 4, 5, 6, 7, 8, 0, 0, 0]
-HistoryString() = "21 4 17 14 0 4 5 6 7 8 0 0 0"
+HistoryString() = "21, 4, 17, 14, 0, 4, 5, 6, 7, 8, 0, 0, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4

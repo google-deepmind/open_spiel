@@ -336,12 +336,12 @@ void TestGetAllInfoSetsHasRightCounterFactualProbsUniformPolicyPid0() {
   // literature. Do not change these values without an extremely good reason.
   // These values are known to be correct.
   absl::flat_hash_map<std::string, double> histories_and_probs = {
-      {"0 1", 0.166666667}, {"0 1 0 1", 0.083333333},
-      {"0 2", 0.166666667}, {"0 2 0 1", 0.083333333},
-      {"1 0", 0.166666667}, {"1 0 0 1", 0.083333333},
-      {"1 2", 0.166666667}, {"1 2 0 1", 0.083333333},
-      {"2 0", 0.166666667}, {"2 0 0 1", 0.083333333},
-      {"2 1", 0.166666667}, {"2 1 0 1", 0.083333333}};
+      {"0, 1", 0.166666667}, {"0, 1, 0, 1", 0.083333333},
+      {"0, 2", 0.166666667}, {"0, 2, 0, 1", 0.083333333},
+      {"1, 0", 0.166666667}, {"1, 0, 0, 1", 0.083333333},
+      {"1, 2", 0.166666667}, {"1, 2, 0, 1", 0.083333333},
+      {"2, 0", 0.166666667}, {"2, 0, 0, 1", 0.083333333},
+      {"2, 1", 0.166666667}, {"2, 1, 0, 1", 0.083333333}};
   std::shared_ptr<const Game> game = LoadGame("kuhn_poker");
   TabularPolicy policy = GetUniformPolicy(*game);
   CheckCounterFactualProbs(*game, policy, histories_and_probs,
@@ -355,10 +355,12 @@ void TestGetAllInfoSetsHasRightCounterFactualProbsUniformPolicyPid1() {
   // These values come from running the existing implementation against the
   // uniform policy.
   absl::flat_hash_map<std::string, double> histories_and_probs = {
-      {"0 1 0", 0.083333333}, {"0 1 1", 0.083333333}, {"0 2 0", 0.083333333},
-      {"0 2 1", 0.083333333}, {"1 0 0", 0.083333333}, {"1 0 1", 0.083333333},
-      {"1 2 0", 0.083333333}, {"1 2 1", 0.083333333}, {"2 0 0", 0.083333333},
-      {"2 0 1", 0.083333333}, {"2 1 0", 0.083333333}, {"2 1 1", 0.083333333}};
+      {"0, 1, 0", 0.083333333}, {"0, 1, 1", 0.083333333},
+      {"0, 2, 0", 0.083333333}, {"0, 2, 1", 0.083333333},
+      {"1, 0, 0", 0.083333333}, {"1, 0, 1", 0.083333333},
+      {"1, 2, 0", 0.083333333}, {"1, 2, 1", 0.083333333},
+      {"2, 0, 0", 0.083333333}, {"2, 0, 1", 0.083333333},
+      {"2, 1, 0", 0.083333333}, {"2, 1, 1", 0.083333333}};
   std::shared_ptr<const Game> game = LoadGame("kuhn_poker");
   TabularPolicy policy = GetUniformPolicy(*game);
   CheckCounterFactualProbs(*game, policy, histories_and_probs,
@@ -372,12 +374,12 @@ void TestGetAllInfoSetsHasRightCounterFactualProbsAlwaysFoldPid0() {
   // These values come from running the existing implementation against the
   // AlwaysFold policy.
   absl::flat_hash_map<std::string, double> histories_and_probs = {
-      {"0 1", 0.166666667}, {"0 1 0 1", 0.000000000},
-      {"0 2", 0.166666667}, {"0 2 0 1", 0.000000000},
-      {"1 0", 0.166666667}, {"1 0 0 1", 0.000000000},
-      {"1 2", 0.166666667}, {"1 2 0 1", 0.000000000},
-      {"2 0", 0.166666667}, {"2 0 0 1", 0.000000000},
-      {"2 1", 0.166666667}, {"2 1 0 1", 0.000000000}};
+      {"0, 1", 0.166666667}, {"0, 1, 0, 1", 0.000000000},
+      {"0, 2", 0.166666667}, {"0, 2, 0, 1", 0.000000000},
+      {"1, 0", 0.166666667}, {"1, 0, 0, 1", 0.000000000},
+      {"1, 2", 0.166666667}, {"1, 2, 0, 1", 0.000000000},
+      {"2, 0", 0.166666667}, {"2, 0, 0, 1", 0.000000000},
+      {"2, 1", 0.166666667}, {"2, 1, 0, 1", 0.000000000}};
   std::shared_ptr<const Game> game = LoadGame("kuhn_poker");
   TabularPolicy policy = GetFirstActionPolicy(*game);
   CheckCounterFactualProbs(*game, policy, histories_and_probs,
@@ -391,10 +393,12 @@ void TestGetAllInfoSetsHasRightCounterFactualProbsAlwaysFoldPid1() {
   // These values come from running the existing implementation against the
   // AlwaysFold policy.
   absl::flat_hash_map<std::string, double> histories_and_probs = {
-      {"0 1 0", 0.166666667}, {"0 1 1", 0.000000000}, {"0 2 0", 0.166666667},
-      {"0 2 1", 0.000000000}, {"1 0 0", 0.166666667}, {"1 0 1", 0.000000000},
-      {"1 2 0", 0.166666667}, {"1 2 1", 0.000000000}, {"2 0 0", 0.166666667},
-      {"2 0 1", 0.000000000}, {"2 1 0", 0.166666667}, {"2 1 1", 0.000000000}};
+      {"0, 1, 0", 0.166666667}, {"0, 1, 1", 0.000000000},
+      {"0, 2, 0", 0.166666667}, {"0, 2, 1", 0.000000000},
+      {"1, 0, 0", 0.166666667}, {"1, 0, 1", 0.000000000},
+      {"1, 2, 0", 0.166666667}, {"1, 2, 1", 0.000000000},
+      {"2, 0, 0", 0.166666667}, {"2, 0, 1", 0.000000000},
+      {"2, 1, 0", 0.166666667}, {"2, 1, 1", 0.000000000}};
   std::shared_ptr<const Game> game = LoadGame("kuhn_poker");
   TabularPolicy policy = GetFirstActionPolicy(*game);
   CheckCounterFactualProbs(*game, policy, histories_and_probs,
@@ -432,12 +436,12 @@ void TestGetAllInfoSetsHasRightCounterFactualProbsOptimalPid0() {
   // These values come from running the existing implementation against the
   // Optimal policy for Kuhn with alpha = 0.2.
   absl::flat_hash_map<std::string, double> histories_and_probs = {
-      {"0 1", 0.166666667}, {"0 1 0 1", 0.000000000},
-      {"0 2", 0.166666667}, {"0 2 0 1", 0.166666667},
-      {"1 0", 0.166666667}, {"1 0 0 1", 0.055555556},
-      {"1 2", 0.166666667}, {"1 2 0 1", 0.166666667},
-      {"2 0", 0.166666667}, {"2 0 0 1", 0.055555556},
-      {"2 1", 0.166666667}, {"2 1 0 1", 0.000000000}};
+      {"0, 1", 0.166666667}, {"0, 1, 0, 1", 0.000000000},
+      {"0, 2", 0.166666667}, {"0, 2, 0, 1", 0.166666667},
+      {"1, 0", 0.166666667}, {"1, 0, 0, 1", 0.055555556},
+      {"1, 2", 0.166666667}, {"1, 2, 0, 1", 0.166666667},
+      {"2, 0", 0.166666667}, {"2, 0, 0, 1", 0.055555556},
+      {"2, 1", 0.166666667}, {"2, 1, 0, 1", 0.000000000}};
   std::shared_ptr<const Game> game = LoadGame("kuhn_poker");
   TabularPolicy policy = GetOptimalKuhnPolicy(/*alpha=*/0.2);
   CheckCounterFactualProbs(*game, policy, histories_and_probs,
@@ -451,10 +455,12 @@ void TestGetAllInfoSetsHasRightCounterFactualProbsOptimalPid1() {
   // These values come from running the existing implementation against the
   // Optimal policy for Kuhn with alpha = 0.2.
   absl::flat_hash_map<std::string, double> histories_and_probs = {
-      {"0 1 0", 0.133333333}, {"0 1 1", 0.033333333}, {"0 2 0", 0.133333333},
-      {"0 2 1", 0.033333333}, {"1 0 0", 0.166666667}, {"1 0 1", 0.000000000},
-      {"1 2 0", 0.166666667}, {"1 2 1", 0.000000000}, {"2 0 0", 0.066666667},
-      {"2 0 1", 0.100000000}, {"2 1 0", 0.066666667}, {"2 1 1", 0.100000000}};
+      {"0, 1, 0", 0.133333333}, {"0, 1, 1", 0.033333333},
+      {"0, 2, 0", 0.133333333}, {"0, 2, 1", 0.033333333},
+      {"1, 0, 0", 0.166666667}, {"1, 0, 1", 0.000000000},
+      {"1, 2, 0", 0.166666667}, {"1, 2, 1", 0.000000000},
+      {"2, 0, 0", 0.066666667}, {"2, 0, 1", 0.100000000},
+      {"2, 1, 0", 0.066666667}, {"2, 1, 1", 0.100000000}};
   std::shared_ptr<const Game> game = LoadGame("kuhn_poker");
   TabularPolicy policy = GetOptimalKuhnPolicy(/*alpha=*/0.2);
   CheckCounterFactualProbs(*game, policy, histories_and_probs,

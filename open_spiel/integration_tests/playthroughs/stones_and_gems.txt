@@ -279,7 +279,7 @@ action: 0
 # time left: 599, gems required: 4, gems collectred: 0
 IsTerminal() = False
 History() = [4, 0]
-HistoryString() = "4 0"
+HistoryString() = "4, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -390,7 +390,7 @@ action: 1
 # chance node
 IsTerminal() = False
 History() = [4, 0, 1]
-HistoryString() = "4 0 1"
+HistoryString() = "4, 0, 1"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -512,7 +512,7 @@ action: 0
 # time left: 598, gems required: 4, gems collectred: 0
 IsTerminal() = False
 History() = [4, 0, 1, 0]
-HistoryString() = "4 0 1 0"
+HistoryString() = "4, 0, 1, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -623,7 +623,7 @@ action: 0
 # chance node
 IsTerminal() = False
 History() = [4, 0, 1, 0, 0]
-HistoryString() = "4 0 1 0 0"
+HistoryString() = "4, 0, 1, 0, 0"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -745,7 +745,7 @@ action: 0
 # time left: 597, gems required: 4, gems collectred: 0
 IsTerminal() = False
 History() = [4, 0, 1, 0, 0, 0]
-HistoryString() = "4 0 1 0 0 0"
+HistoryString() = "4, 0, 1, 0, 0, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -856,7 +856,7 @@ action: 3
 # chance node
 IsTerminal() = False
 History() = [4, 0, 1, 0, 0, 0, 3]
-HistoryString() = "4 0 1 0 0 0 3"
+HistoryString() = "4, 0, 1, 0, 0, 0, 3"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -978,7 +978,7 @@ action: 0
 # time left: 596, gems required: 4, gems collectred: 0
 IsTerminal() = False
 History() = [4, 0, 1, 0, 0, 0, 3, 0]
-HistoryString() = "4 0 1 0 0 0 3 0"
+HistoryString() = "4, 0, 1, 0, 0, 0, 3, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -1089,7 +1089,7 @@ action: 4
 # chance node
 IsTerminal() = False
 History() = [4, 0, 1, 0, 0, 0, 3, 0, 4]
-HistoryString() = "4 0 1 0 0 0 3 0 4"
+HistoryString() = "4, 0, 1, 0, 0, 0, 3, 0, 4"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -1211,7 +1211,7 @@ action: 0
 # time left: 595, gems required: 4, gems collectred: 0
 IsTerminal() = True
 History() = [4, 0, 1, 0, 0, 0, 3, 0, 4, 0]
-HistoryString() = "4 0 1 0 0 0 3 0 4 0"
+HistoryString() = "4, 0, 1, 0, 0, 0, 3, 0, 4, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4

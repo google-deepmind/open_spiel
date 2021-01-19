@@ -146,12 +146,12 @@ action: 43
 #   a b c d e f g h
 IsTerminal() = False
 History() = [44, 43]
-HistoryString() = "44 43"
+HistoryString() = "44, 43"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "44 43"
-InformationStateString(1) = "44 43"
+InformationStateString(0) = "44, 43"
+InformationStateString(1) = "44, 43"
 ObservationString(0) = "Black (x) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - - - - 2\n3 - - - - - - - - 3\n4 - - - o x - - - 4\n5 - - - o x - - - 5\n6 - - - o x - - - 6\n7 - - - - - - - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
 ObservationString(1) = "Black (x) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - - - - 2\n3 - - - - - - - - 3\n4 - - - o x - - - 4\n5 - - - o x - - - 5\n6 - - - o x - - - 6\n7 - - - - - - - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
 PublicObservationString() = "Black (x) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - - - - 2\n3 - - - - - - - - 3\n4 - - - o x - - - 4\n5 - - - o x - - - 5\n6 - - - o x - - - 6\n7 - - - - - - - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
@@ -197,12 +197,12 @@ action: 26
 #   a b c d e f g h
 IsTerminal() = False
 History() = [44, 43, 26]
-HistoryString() = "44 43 26"
+HistoryString() = "44, 43, 26"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "44 43 26"
-InformationStateString(1) = "44 43 26"
+InformationStateString(0) = "44, 43, 26"
+InformationStateString(1) = "44, 43, 26"
 ObservationString(0) = "White (o) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - - - - 2\n3 - - - - - - - - 3\n4 - - x x x - - - 4\n5 - - - x x - - - 5\n6 - - - o x - - - 6\n7 - - - - - - - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
 ObservationString(1) = "White (o) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - - - - 2\n3 - - - - - - - - 3\n4 - - x x x - - - 4\n5 - - - x x - - - 5\n6 - - - o x - - - 6\n7 - - - - - - - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
 PublicObservationString() = "White (o) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - - - - 2\n3 - - - - - - - - 3\n4 - - x x x - - - 4\n5 - - - x x - - - 5\n6 - - - o x - - - 6\n7 - - - - - - - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
@@ -248,12 +248,12 @@ action: 29
 #   a b c d e f g h
 IsTerminal() = False
 History() = [44, 43, 26, 29]
-HistoryString() = "44 43 26 29"
+HistoryString() = "44, 43, 26, 29"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "44 43 26 29"
-InformationStateString(1) = "44 43 26 29"
+InformationStateString(0) = "44, 43, 26, 29"
+InformationStateString(1) = "44, 43, 26, 29"
 ObservationString(0) = "Black (x) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - - - - 2\n3 - - - - - - - - 3\n4 - - x x x o - - 4\n5 - - - x o - - - 5\n6 - - - o x - - - 6\n7 - - - - - - - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
 ObservationString(1) = "Black (x) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - - - - 2\n3 - - - - - - - - 3\n4 - - x x x o - - 4\n5 - - - x o - - - 5\n6 - - - o x - - - 6\n7 - - - - - - - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
 PublicObservationString() = "Black (x) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - - - - 2\n3 - - - - - - - - 3\n4 - - x x x o - - 4\n5 - - - x o - - - 5\n6 - - - o x - - - 6\n7 - - - - - - - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
@@ -299,12 +299,12 @@ action: 45
 #   a b c d e f g h
 IsTerminal() = False
 History() = [44, 43, 26, 29, 45]
-HistoryString() = "44 43 26 29 45"
+HistoryString() = "44, 43, 26, 29, 45"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "44 43 26 29 45"
-InformationStateString(1) = "44 43 26 29 45"
+InformationStateString(0) = "44, 43, 26, 29, 45"
+InformationStateString(1) = "44, 43, 26, 29, 45"
 ObservationString(0) = "White (o) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - - - - 2\n3 - - - - - - - - 3\n4 - - x x x o - - 4\n5 - - - x x - - - 5\n6 - - - o x x - - 6\n7 - - - - - - - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
 ObservationString(1) = "White (o) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - - - - 2\n3 - - - - - - - - 3\n4 - - x x x o - - 4\n5 - - - x x - - - 5\n6 - - - o x x - - 6\n7 - - - - - - - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
 PublicObservationString() = "White (o) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - - - - 2\n3 - - - - - - - - 3\n4 - - x x x o - - 4\n5 - - - x x - - - 5\n6 - - - o x x - - 6\n7 - - - - - - - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
@@ -350,12 +350,12 @@ action: 25
 #   a b c d e f g h
 IsTerminal() = False
 History() = [44, 43, 26, 29, 45, 25]
-HistoryString() = "44 43 26 29 45 25"
+HistoryString() = "44, 43, 26, 29, 45, 25"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "44 43 26 29 45 25"
-InformationStateString(1) = "44 43 26 29 45 25"
+InformationStateString(0) = "44, 43, 26, 29, 45, 25"
+InformationStateString(1) = "44, 43, 26, 29, 45, 25"
 ObservationString(0) = "Black (x) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - - - - 2\n3 - - - - - - - - 3\n4 - o o o o o - - 4\n5 - - - x x - - - 5\n6 - - - o x x - - 6\n7 - - - - - - - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
 ObservationString(1) = "Black (x) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - - - - 2\n3 - - - - - - - - 3\n4 - o o o o o - - 4\n5 - - - x x - - - 5\n6 - - - o x x - - 6\n7 - - - - - - - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
 PublicObservationString() = "Black (x) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - - - - 2\n3 - - - - - - - - 3\n4 - o o o o o - - 4\n5 - - - x x - - - 5\n6 - - - o x x - - 6\n7 - - - - - - - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
@@ -401,12 +401,12 @@ action: 17
 #   a b c d e f g h
 IsTerminal() = False
 History() = [44, 43, 26, 29, 45, 25, 17]
-HistoryString() = "44 43 26 29 45 25 17"
+HistoryString() = "44, 43, 26, 29, 45, 25, 17"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "44 43 26 29 45 25 17"
-InformationStateString(1) = "44 43 26 29 45 25 17"
+InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17"
+InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17"
 ObservationString(0) = "White (o) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - - - - 2\n3 - x - - - - - - 3\n4 - o x o o o - - 4\n5 - - - x x - - - 5\n6 - - - o x x - - 6\n7 - - - - - - - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
 ObservationString(1) = "White (o) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - - - - 2\n3 - x - - - - - - 3\n4 - o x o o o - - 4\n5 - - - x x - - - 5\n6 - - - o x x - - 6\n7 - - - - - - - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
 PublicObservationString() = "White (o) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - - - - 2\n3 - x - - - - - - 3\n4 - o x o o o - - 4\n5 - - - x x - - - 5\n6 - - - o x x - - 6\n7 - - - - - - - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
@@ -452,12 +452,12 @@ action: 52
 #   a b c d e f g h
 IsTerminal() = False
 History() = [44, 43, 26, 29, 45, 25, 17, 52]
-HistoryString() = "44 43 26 29 45 25 17 52"
+HistoryString() = "44, 43, 26, 29, 45, 25, 17, 52"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "44 43 26 29 45 25 17 52"
-InformationStateString(1) = "44 43 26 29 45 25 17 52"
+InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17, 52"
+InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17, 52"
 ObservationString(0) = "Black (x) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - - - - 2\n3 - x - - - - - - 3\n4 - o x o o o - - 4\n5 - - - x o - - - 5\n6 - - - o o x - - 6\n7 - - - - o - - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
 ObservationString(1) = "Black (x) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - - - - 2\n3 - x - - - - - - 3\n4 - o x o o o - - 4\n5 - - - x o - - - 5\n6 - - - o o x - - 6\n7 - - - - o - - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
 PublicObservationString() = "Black (x) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - - - - 2\n3 - x - - - - - - 3\n4 - o x o o o - - 4\n5 - - - x o - - - 5\n6 - - - o o x - - 6\n7 - - - - o - - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
@@ -503,12 +503,12 @@ action: 21
 #   a b c d e f g h
 IsTerminal() = False
 History() = [44, 43, 26, 29, 45, 25, 17, 52, 21]
-HistoryString() = "44 43 26 29 45 25 17 52 21"
+HistoryString() = "44, 43, 26, 29, 45, 25, 17, 52, 21"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "44 43 26 29 45 25 17 52 21"
-InformationStateString(1) = "44 43 26 29 45 25 17 52 21"
+InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17, 52, 21"
+InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17, 52, 21"
 ObservationString(0) = "White (o) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - - - - 2\n3 - x - - - x - - 3\n4 - o x o x o - - 4\n5 - - - x o - - - 5\n6 - - - o o x - - 6\n7 - - - - o - - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
 ObservationString(1) = "White (o) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - - - - 2\n3 - x - - - x - - 3\n4 - o x o x o - - 4\n5 - - - x o - - - 5\n6 - - - o o x - - 6\n7 - - - - o - - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
 PublicObservationString() = "White (o) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - - - - 2\n3 - x - - - x - - 3\n4 - o x o x o - - 4\n5 - - - x o - - - 5\n6 - - - o o x - - 6\n7 - - - - o - - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
@@ -554,12 +554,12 @@ action: 13
 #   a b c d e f g h
 IsTerminal() = False
 History() = [44, 43, 26, 29, 45, 25, 17, 52, 21, 13]
-HistoryString() = "44 43 26 29 45 25 17 52 21 13"
+HistoryString() = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "44 43 26 29 45 25 17 52 21 13"
-InformationStateString(1) = "44 43 26 29 45 25 17 52 21 13"
+InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13"
+InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13"
 ObservationString(0) = "Black (x) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - o - - 2\n3 - x - - - o - - 3\n4 - o x o x o - - 4\n5 - - - x o - - - 5\n6 - - - o o x - - 6\n7 - - - - o - - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
 ObservationString(1) = "Black (x) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - o - - 2\n3 - x - - - o - - 3\n4 - o x o x o - - 4\n5 - - - x o - - - 5\n6 - - - o o x - - 6\n7 - - - - o - - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
 PublicObservationString() = "Black (x) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - o - - 2\n3 - x - - - o - - 3\n4 - o x o x o - - 4\n5 - - - x o - - - 5\n6 - - - o o x - - 6\n7 - - - - o - - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
@@ -605,12 +605,12 @@ action: 37
 #   a b c d e f g h
 IsTerminal() = False
 History() = [44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37]
-HistoryString() = "44 43 26 29 45 25 17 52 21 13 37"
+HistoryString() = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "44 43 26 29 45 25 17 52 21 13 37"
-InformationStateString(1) = "44 43 26 29 45 25 17 52 21 13 37"
+InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37"
+InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37"
 ObservationString(0) = "White (o) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - o - - 2\n3 - x - - - o - - 3\n4 - o x o x o - - 4\n5 - - - x x x - - 5\n6 - - - o o x - - 6\n7 - - - - o - - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
 ObservationString(1) = "White (o) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - o - - 2\n3 - x - - - o - - 3\n4 - o x o x o - - 4\n5 - - - x x x - - 5\n6 - - - o o x - - 6\n7 - - - - o - - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
 PublicObservationString() = "White (o) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - o - - 2\n3 - x - - - o - - 3\n4 - o x o x o - - 4\n5 - - - x x x - - 5\n6 - - - o o x - - 6\n7 - - - - o - - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
@@ -656,12 +656,12 @@ action: 42
 #   a b c d e f g h
 IsTerminal() = False
 History() = [44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42]
-HistoryString() = "44 43 26 29 45 25 17 52 21 13 37 42"
+HistoryString() = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "44 43 26 29 45 25 17 52 21 13 37 42"
-InformationStateString(1) = "44 43 26 29 45 25 17 52 21 13 37 42"
+InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42"
+InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42"
 ObservationString(0) = "Black (x) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - o - - 2\n3 - x - - - o - - 3\n4 - o x o o o - - 4\n5 - - - o x x - - 5\n6 - - o o o x - - 6\n7 - - - - o - - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
 ObservationString(1) = "Black (x) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - o - - 2\n3 - x - - - o - - 3\n4 - o x o o o - - 4\n5 - - - o x x - - 5\n6 - - o o o x - - 6\n7 - - - - o - - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
 PublicObservationString() = "Black (x) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - o - - 2\n3 - x - - - o - - 3\n4 - o x o o o - - 4\n5 - - - o x x - - 5\n6 - - o o o x - - 6\n7 - - - - o - - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
@@ -707,12 +707,12 @@ action: 41
 #   a b c d e f g h
 IsTerminal() = False
 History() = [44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41]
-HistoryString() = "44 43 26 29 45 25 17 52 21 13 37 42 41"
+HistoryString() = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "44 43 26 29 45 25 17 52 21 13 37 42 41"
-InformationStateString(1) = "44 43 26 29 45 25 17 52 21 13 37 42 41"
+InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41"
+InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41"
 ObservationString(0) = "White (o) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - o - - 2\n3 - x - - - o - - 3\n4 - o x o o o - - 4\n5 - - - o x x - - 5\n6 - x x x x x - - 6\n7 - - - - o - - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
 ObservationString(1) = "White (o) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - o - - 2\n3 - x - - - o - - 3\n4 - o x o o o - - 4\n5 - - - o x x - - 5\n6 - x x x x x - - 6\n7 - - - - o - - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
 PublicObservationString() = "White (o) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - o - - 2\n3 - x - - - o - - 3\n4 - o x o o o - - 4\n5 - - - o x x - - 5\n6 - x x x x x - - 6\n7 - - - - o - - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
@@ -758,12 +758,12 @@ action: 53
 #   a b c d e f g h
 IsTerminal() = False
 History() = [44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53]
-HistoryString() = "44 43 26 29 45 25 17 52 21 13 37 42 41 53"
+HistoryString() = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53"
-InformationStateString(1) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53"
+InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53"
+InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53"
 ObservationString(0) = "Black (x) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - o - - 2\n3 - x - - - o - - 3\n4 - o x o o o - - 4\n5 - - - o x o - - 5\n6 - x x x o o - - 6\n7 - - - - o o - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
 ObservationString(1) = "Black (x) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - o - - 2\n3 - x - - - o - - 3\n4 - o x o o o - - 4\n5 - - - o x o - - 5\n6 - x x x o o - - 6\n7 - - - - o o - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
 PublicObservationString() = "Black (x) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - o - - 2\n3 - x - - - o - - 3\n4 - o x o o o - - 4\n5 - - - o x o - - 5\n6 - x x x o o - - 6\n7 - - - - o o - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
@@ -809,12 +809,12 @@ action: 34
 #   a b c d e f g h
 IsTerminal() = False
 History() = [44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34]
-HistoryString() = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34"
+HistoryString() = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34"
-InformationStateString(1) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34"
+InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34"
+InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34"
 ObservationString(0) = "White (o) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - o - - 2\n3 - x - - - o - - 3\n4 - o x o o o - - 4\n5 - - x x x o - - 5\n6 - x x x o o - - 6\n7 - - - - o o - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
 ObservationString(1) = "White (o) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - o - - 2\n3 - x - - - o - - 3\n4 - o x o o o - - 4\n5 - - x x x o - - 5\n6 - x x x o o - - 6\n7 - - - - o o - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
 PublicObservationString() = "White (o) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - o - - 2\n3 - x - - - o - - 3\n4 - o x o o o - - 4\n5 - - x x x o - - 5\n6 - x x x o o - - 6\n7 - - - - o o - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
@@ -860,12 +860,12 @@ action: 8
 #   a b c d e f g h
 IsTerminal() = False
 History() = [44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8]
-HistoryString() = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8"
+HistoryString() = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8"
-InformationStateString(1) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8"
+InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8"
+InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8"
 ObservationString(0) = "Black (x) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 o - - - - o - - 2\n3 - o - - - o - - 3\n4 - o o o o o - - 4\n5 - - x o x o - - 5\n6 - x x x o o - - 6\n7 - - - - o o - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
 ObservationString(1) = "Black (x) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 o - - - - o - - 2\n3 - o - - - o - - 3\n4 - o o o o o - - 4\n5 - - x o x o - - 5\n6 - x x x o o - - 6\n7 - - - - o o - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
 PublicObservationString() = "Black (x) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 o - - - - o - - 2\n3 - o - - - o - - 3\n4 - o o o o o - - 4\n5 - - x o x o - - 5\n6 - x x x o o - - 6\n7 - - - - o o - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
@@ -911,12 +911,12 @@ action: 16
 #   a b c d e f g h
 IsTerminal() = False
 History() = [44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16]
-HistoryString() = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16"
+HistoryString() = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16"
-InformationStateString(1) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16"
+InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16"
+InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16"
 ObservationString(0) = "White (o) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 o - - - - o - - 2\n3 x o - - - o - - 3\n4 - x o o o o - - 4\n5 - - x o x o - - 5\n6 - x x x o o - - 6\n7 - - - - o o - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
 ObservationString(1) = "White (o) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 o - - - - o - - 2\n3 x o - - - o - - 3\n4 - x o o o o - - 4\n5 - - x o x o - - 5\n6 - x x x o o - - 6\n7 - - - - o o - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
 PublicObservationString() = "White (o) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 o - - - - o - - 2\n3 x o - - - o - - 3\n4 - x o o o o - - 4\n5 - - x o x o - - 5\n6 - x x x o o - - 6\n7 - - - - o o - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
@@ -962,12 +962,12 @@ action: 50
 #   a b c d e f g h
 IsTerminal() = False
 History() = [44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50]
-HistoryString() = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50"
+HistoryString() = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50"
-InformationStateString(1) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50"
+InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50"
+InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50"
 ObservationString(0) = "Black (x) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 o - - - - o - - 2\n3 x o - - - o - - 3\n4 - x o o o o - - 4\n5 - - o o o o - - 5\n6 - x o o o o - - 6\n7 - - o - o o - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
 ObservationString(1) = "Black (x) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 o - - - - o - - 2\n3 x o - - - o - - 3\n4 - x o o o o - - 4\n5 - - o o o o - - 5\n6 - x o o o o - - 6\n7 - - o - o o - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
 PublicObservationString() = "Black (x) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 o - - - - o - - 2\n3 x o - - - o - - 3\n4 - x o o o o - - 4\n5 - - o o o o - - 5\n6 - x o o o o - - 6\n7 - - o - o o - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
@@ -1013,12 +1013,12 @@ action: 0
 #   a b c d e f g h
 IsTerminal() = False
 History() = [44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0]
-HistoryString() = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0"
+HistoryString() = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0"
-InformationStateString(1) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0"
+InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0"
+InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0"
 ObservationString(0) = "White (o) to play:\n  a b c d e f g h  \n1 x - - - - - - - 1\n2 x - - - - o - - 2\n3 x o - - - o - - 3\n4 - x o o o o - - 4\n5 - - o o o o - - 5\n6 - x o o o o - - 6\n7 - - o - o o - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
 ObservationString(1) = "White (o) to play:\n  a b c d e f g h  \n1 x - - - - - - - 1\n2 x - - - - o - - 2\n3 x o - - - o - - 3\n4 - x o o o o - - 4\n5 - - o o o o - - 5\n6 - x o o o o - - 6\n7 - - o - o o - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
 PublicObservationString() = "White (o) to play:\n  a b c d e f g h  \n1 x - - - - - - - 1\n2 x - - - - o - - 2\n3 x o - - - o - - 3\n4 - x o o o o - - 4\n5 - - o o o o - - 5\n6 - x o o o o - - 6\n7 - - o - o o - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
@@ -1064,12 +1064,12 @@ action: 48
 #   a b c d e f g h
 IsTerminal() = False
 History() = [44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48]
-HistoryString() = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48"
+HistoryString() = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48"
-InformationStateString(1) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48"
+InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48"
+InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48"
 ObservationString(0) = "Black (x) to play:\n  a b c d e f g h  \n1 x - - - - - - - 1\n2 x - - - - o - - 2\n3 x o - - - o - - 3\n4 - x o o o o - - 4\n5 - - o o o o - - 5\n6 - o o o o o - - 6\n7 o - o - o o - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
 ObservationString(1) = "Black (x) to play:\n  a b c d e f g h  \n1 x - - - - - - - 1\n2 x - - - - o - - 2\n3 x o - - - o - - 3\n4 - x o o o o - - 4\n5 - - o o o o - - 5\n6 - o o o o o - - 6\n7 o - o - o o - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
 PublicObservationString() = "Black (x) to play:\n  a b c d e f g h  \n1 x - - - - - - - 1\n2 x - - - - o - - 2\n3 x o - - - o - - 3\n4 - x o o o o - - 4\n5 - - o o o o - - 5\n6 - o o o o o - - 6\n7 o - o - o o - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
@@ -1115,12 +1115,12 @@ action: 61
 #   a b c d e f g h
 IsTerminal() = False
 History() = [44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61]
-HistoryString() = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61"
+HistoryString() = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61"
-InformationStateString(1) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61"
+InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61"
+InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61"
 ObservationString(0) = "White (o) to play:\n  a b c d e f g h  \n1 x - - - - - - - 1\n2 x - - - - o - - 2\n3 x o - - - o - - 3\n4 - x o o o o - - 4\n5 - - x o o o - - 5\n6 - o o x o o - - 6\n7 o - o - x o - - 7\n8 - - - - - x - - 8\n  a b c d e f g h  "
 ObservationString(1) = "White (o) to play:\n  a b c d e f g h  \n1 x - - - - - - - 1\n2 x - - - - o - - 2\n3 x o - - - o - - 3\n4 - x o o o o - - 4\n5 - - x o o o - - 5\n6 - o o x o o - - 6\n7 o - o - x o - - 7\n8 - - - - - x - - 8\n  a b c d e f g h  "
 PublicObservationString() = "White (o) to play:\n  a b c d e f g h  \n1 x - - - - - - - 1\n2 x - - - - o - - 2\n3 x o - - - o - - 3\n4 - x o o o o - - 4\n5 - - x o o o - - 5\n6 - o o x o o - - 6\n7 o - o - x o - - 7\n8 - - - - - x - - 8\n  a b c d e f g h  "
@@ -1166,12 +1166,12 @@ action: 60
 #   a b c d e f g h
 IsTerminal() = False
 History() = [44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60]
-HistoryString() = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60"
+HistoryString() = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60"
-InformationStateString(1) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60"
+InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60"
+InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60"
 ObservationString(0) = "Black (x) to play:\n  a b c d e f g h  \n1 x - - - - - - - 1\n2 x - - - - o - - 2\n3 x o - - - o - - 3\n4 - x o o o o - - 4\n5 - - x o o o - - 5\n6 - o o x o o - - 6\n7 o - o - o o - - 7\n8 - - - - o x - - 8\n  a b c d e f g h  "
 ObservationString(1) = "Black (x) to play:\n  a b c d e f g h  \n1 x - - - - - - - 1\n2 x - - - - o - - 2\n3 x o - - - o - - 3\n4 - x o o o o - - 4\n5 - - x o o o - - 5\n6 - o o x o o - - 6\n7 o - o - o o - - 7\n8 - - - - o x - - 8\n  a b c d e f g h  "
 PublicObservationString() = "Black (x) to play:\n  a b c d e f g h  \n1 x - - - - - - - 1\n2 x - - - - o - - 2\n3 x o - - - o - - 3\n4 - x o o o o - - 4\n5 - - x o o o - - 5\n6 - o o x o o - - 6\n7 o - o - o o - - 7\n8 - - - - o x - - 8\n  a b c d e f g h  "
@@ -1217,12 +1217,12 @@ action: 59
 #   a b c d e f g h
 IsTerminal() = False
 History() = [44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59]
-HistoryString() = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59"
+HistoryString() = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59"
-InformationStateString(1) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59"
+InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59"
+InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59"
 ObservationString(0) = "White (o) to play:\n  a b c d e f g h  \n1 x - - - - - - - 1\n2 x - - - - o - - 2\n3 x o - - - o - - 3\n4 - x o o o o - - 4\n5 - - x o o o - - 5\n6 - o o x o o - - 6\n7 o - o - o o - - 7\n8 - - - x x x - - 8\n  a b c d e f g h  "
 ObservationString(1) = "White (o) to play:\n  a b c d e f g h  \n1 x - - - - - - - 1\n2 x - - - - o - - 2\n3 x o - - - o - - 3\n4 - x o o o o - - 4\n5 - - x o o o - - 5\n6 - o o x o o - - 6\n7 o - o - o o - - 7\n8 - - - x x x - - 8\n  a b c d e f g h  "
 PublicObservationString() = "White (o) to play:\n  a b c d e f g h  \n1 x - - - - - - - 1\n2 x - - - - o - - 2\n3 x o - - - o - - 3\n4 - x o o o o - - 4\n5 - - x o o o - - 5\n6 - o o x o o - - 6\n7 o - o - o o - - 7\n8 - - - x x x - - 8\n  a b c d e f g h  "
@@ -1268,12 +1268,12 @@ action: 33
 #   a b c d e f g h
 IsTerminal() = False
 History() = [44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33]
-HistoryString() = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33"
+HistoryString() = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33"
-InformationStateString(1) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33"
+InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33"
+InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33"
 ObservationString(0) = "Black (x) to play:\n  a b c d e f g h  \n1 x - - - - - - - 1\n2 x - - - - o - - 2\n3 x o - - - o - - 3\n4 - o o o o o - - 4\n5 - o o o o o - - 5\n6 - o o x o o - - 6\n7 o - o - o o - - 7\n8 - - - x x x - - 8\n  a b c d e f g h  "
 ObservationString(1) = "Black (x) to play:\n  a b c d e f g h  \n1 x - - - - - - - 1\n2 x - - - - o - - 2\n3 x o - - - o - - 3\n4 - o o o o o - - 4\n5 - o o o o o - - 5\n6 - o o x o o - - 6\n7 o - o - o o - - 7\n8 - - - x x x - - 8\n  a b c d e f g h  "
 PublicObservationString() = "Black (x) to play:\n  a b c d e f g h  \n1 x - - - - - - - 1\n2 x - - - - o - - 2\n3 x o - - - o - - 3\n4 - o o o o o - - 4\n5 - o o o o o - - 5\n6 - o o x o o - - 6\n7 o - o - o o - - 7\n8 - - - x x x - - 8\n  a b c d e f g h  "
@@ -1319,12 +1319,12 @@ action: 18
 #   a b c d e f g h
 IsTerminal() = False
 History() = [44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18]
-HistoryString() = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18"
+HistoryString() = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18"
-InformationStateString(1) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18"
+InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18"
+InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18"
 ObservationString(0) = "White (o) to play:\n  a b c d e f g h  \n1 x - - - - - - - 1\n2 x - - - - o - - 2\n3 x x x - - o - - 3\n4 - o o o o o - - 4\n5 - o o o o o - - 5\n6 - o o x o o - - 6\n7 o - o - o o - - 7\n8 - - - x x x - - 8\n  a b c d e f g h  "
 ObservationString(1) = "White (o) to play:\n  a b c d e f g h  \n1 x - - - - - - - 1\n2 x - - - - o - - 2\n3 x x x - - o - - 3\n4 - o o o o o - - 4\n5 - o o o o o - - 5\n6 - o o x o o - - 6\n7 o - o - o o - - 7\n8 - - - x x x - - 8\n  a b c d e f g h  "
 PublicObservationString() = "White (o) to play:\n  a b c d e f g h  \n1 x - - - - - - - 1\n2 x - - - - o - - 2\n3 x x x - - o - - 3\n4 - o o o o o - - 4\n5 - o o o o o - - 5\n6 - o o x o o - - 6\n7 o - o - o o - - 7\n8 - - - x x x - - 8\n  a b c d e f g h  "
@@ -1370,12 +1370,12 @@ action: 51
 #   a b c d e f g h
 IsTerminal() = False
 History() = [44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51]
-HistoryString() = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51"
+HistoryString() = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51"
-InformationStateString(1) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51"
+InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51"
+InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51"
 ObservationString(0) = "Black (x) to play:\n  a b c d e f g h  \n1 x - - - - - - - 1\n2 x - - - - o - - 2\n3 x x x - - o - - 3\n4 - o o o o o - - 4\n5 - o o o o o - - 5\n6 - o o o o o - - 6\n7 o - o o o o - - 7\n8 - - - x x x - - 8\n  a b c d e f g h  "
 ObservationString(1) = "Black (x) to play:\n  a b c d e f g h  \n1 x - - - - - - - 1\n2 x - - - - o - - 2\n3 x x x - - o - - 3\n4 - o o o o o - - 4\n5 - o o o o o - - 5\n6 - o o o o o - - 6\n7 o - o o o o - - 7\n8 - - - x x x - - 8\n  a b c d e f g h  "
 PublicObservationString() = "Black (x) to play:\n  a b c d e f g h  \n1 x - - - - - - - 1\n2 x - - - - o - - 2\n3 x x x - - o - - 3\n4 - o o o o o - - 4\n5 - o o o o o - - 5\n6 - o o o o o - - 6\n7 o - o o o o - - 7\n8 - - - x x x - - 8\n  a b c d e f g h  "
@@ -1421,12 +1421,12 @@ action: 58
 #   a b c d e f g h
 IsTerminal() = False
 History() = [44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58]
-HistoryString() = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58"
+HistoryString() = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58"
-InformationStateString(1) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58"
+InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58"
+InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58"
 ObservationString(0) = "White (o) to play:\n  a b c d e f g h  \n1 x - - - - - - - 1\n2 x - - - - o - - 2\n3 x x x - - o - - 3\n4 - o x o o o - - 4\n5 - o x o o o - - 5\n6 - o x o o o - - 6\n7 o - x o o o - - 7\n8 - - x x x x - - 8\n  a b c d e f g h  "
 ObservationString(1) = "White (o) to play:\n  a b c d e f g h  \n1 x - - - - - - - 1\n2 x - - - - o - - 2\n3 x x x - - o - - 3\n4 - o x o o o - - 4\n5 - o x o o o - - 5\n6 - o x o o o - - 6\n7 o - x o o o - - 7\n8 - - x x x x - - 8\n  a b c d e f g h  "
 PublicObservationString() = "White (o) to play:\n  a b c d e f g h  \n1 x - - - - - - - 1\n2 x - - - - o - - 2\n3 x x x - - o - - 3\n4 - o x o o o - - 4\n5 - o x o o o - - 5\n6 - o x o o o - - 6\n7 o - x o o o - - 7\n8 - - x x x x - - 8\n  a b c d e f g h  "
@@ -1472,12 +1472,12 @@ action: 9
 #   a b c d e f g h
 IsTerminal() = False
 History() = [44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9]
-HistoryString() = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9"
+HistoryString() = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9"
-InformationStateString(1) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9"
+InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9"
+InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9"
 ObservationString(0) = "Black (x) to play:\n  a b c d e f g h  \n1 x - - - - - - - 1\n2 x o - - - o - - 2\n3 x o o - - o - - 3\n4 - o x o o o - - 4\n5 - o x o o o - - 5\n6 - o x o o o - - 6\n7 o - x o o o - - 7\n8 - - x x x x - - 8\n  a b c d e f g h  "
 ObservationString(1) = "Black (x) to play:\n  a b c d e f g h  \n1 x - - - - - - - 1\n2 x o - - - o - - 2\n3 x o o - - o - - 3\n4 - o x o o o - - 4\n5 - o x o o o - - 5\n6 - o x o o o - - 6\n7 o - x o o o - - 7\n8 - - x x x x - - 8\n  a b c d e f g h  "
 PublicObservationString() = "Black (x) to play:\n  a b c d e f g h  \n1 x - - - - - - - 1\n2 x o - - - o - - 2\n3 x o o - - o - - 3\n4 - o x o o o - - 4\n5 - o x o o o - - 5\n6 - o x o o o - - 6\n7 o - x o o o - - 7\n8 - - x x x x - - 8\n  a b c d e f g h  "
@@ -1523,12 +1523,12 @@ action: 2
 #   a b c d e f g h
 IsTerminal() = False
 History() = [44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2]
-HistoryString() = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2"
+HistoryString() = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2"
-InformationStateString(1) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2"
+InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2"
+InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2"
 ObservationString(0) = "White (o) to play:\n  a b c d e f g h  \n1 x - x - - - - - 1\n2 x x - - - o - - 2\n3 x o o - - o - - 3\n4 - o x o o o - - 4\n5 - o x o o o - - 5\n6 - o x o o o - - 6\n7 o - x o o o - - 7\n8 - - x x x x - - 8\n  a b c d e f g h  "
 ObservationString(1) = "White (o) to play:\n  a b c d e f g h  \n1 x - x - - - - - 1\n2 x x - - - o - - 2\n3 x o o - - o - - 3\n4 - o x o o o - - 4\n5 - o x o o o - - 5\n6 - o x o o o - - 6\n7 o - x o o o - - 7\n8 - - x x x x - - 8\n  a b c d e f g h  "
 PublicObservationString() = "White (o) to play:\n  a b c d e f g h  \n1 x - x - - - - - 1\n2 x x - - - o - - 2\n3 x o o - - o - - 3\n4 - o x o o o - - 4\n5 - o x o o o - - 5\n6 - o x o o o - - 6\n7 o - x o o o - - 7\n8 - - x x x x - - 8\n  a b c d e f g h  "
@@ -1574,12 +1574,12 @@ action: 49
 #   a b c d e f g h
 IsTerminal() = False
 History() = [44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49]
-HistoryString() = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49"
+HistoryString() = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49"
-InformationStateString(1) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49"
+InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49"
+InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49"
 ObservationString(0) = "Black (x) to play:\n  a b c d e f g h  \n1 x - x - - - - - 1\n2 x x - - - o - - 2\n3 x o o - - o - - 3\n4 - o x o o o - - 4\n5 - o x o o o - - 5\n6 - o o o o o - - 6\n7 o o o o o o - - 7\n8 - - x x x x - - 8\n  a b c d e f g h  "
 ObservationString(1) = "Black (x) to play:\n  a b c d e f g h  \n1 x - x - - - - - 1\n2 x x - - - o - - 2\n3 x o o - - o - - 3\n4 - o x o o o - - 4\n5 - o x o o o - - 5\n6 - o o o o o - - 6\n7 o o o o o o - - 7\n8 - - x x x x - - 8\n  a b c d e f g h  "
 PublicObservationString() = "Black (x) to play:\n  a b c d e f g h  \n1 x - x - - - - - 1\n2 x x - - - o - - 2\n3 x o o - - o - - 3\n4 - o x o o o - - 4\n5 - o x o o o - - 5\n6 - o o o o o - - 6\n7 o o o o o o - - 7\n8 - - x x x x - - 8\n  a b c d e f g h  "
@@ -1625,12 +1625,12 @@ action: 62
 #   a b c d e f g h
 IsTerminal() = False
 History() = [44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62]
-HistoryString() = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62"
+HistoryString() = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62"
-InformationStateString(1) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62"
+InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62"
+InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62"
 ObservationString(0) = "White (o) to play:\n  a b c d e f g h  \n1 x - x - - - - - 1\n2 x x - - - o - - 2\n3 x o o - - o - - 3\n4 - o x o o o - - 4\n5 - o x x o o - - 5\n6 - o o o x o - - 6\n7 o o o o o x - - 7\n8 - - x x x x x - 8\n  a b c d e f g h  "
 ObservationString(1) = "White (o) to play:\n  a b c d e f g h  \n1 x - x - - - - - 1\n2 x x - - - o - - 2\n3 x o o - - o - - 3\n4 - o x o o o - - 4\n5 - o x x o o - - 5\n6 - o o o x o - - 6\n7 o o o o o x - - 7\n8 - - x x x x x - 8\n  a b c d e f g h  "
 PublicObservationString() = "White (o) to play:\n  a b c d e f g h  \n1 x - x - - - - - 1\n2 x x - - - o - - 2\n3 x o o - - o - - 3\n4 - o x o o o - - 4\n5 - o x x o o - - 5\n6 - o o o x o - - 6\n7 o o o o o x - - 7\n8 - - x x x x x - 8\n  a b c d e f g h  "
@@ -1676,12 +1676,12 @@ action: 1
 #   a b c d e f g h
 IsTerminal() = False
 History() = [44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1]
-HistoryString() = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1"
+HistoryString() = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1"
-InformationStateString(1) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1"
+InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1"
+InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1"
 ObservationString(0) = "Black (x) to play:\n  a b c d e f g h  \n1 x o x - - - - - 1\n2 x o - - - o - - 2\n3 x o o - - o - - 3\n4 - o x o o o - - 4\n5 - o x x o o - - 5\n6 - o o o x o - - 6\n7 o o o o o x - - 7\n8 - - x x x x x - 8\n  a b c d e f g h  "
 ObservationString(1) = "Black (x) to play:\n  a b c d e f g h  \n1 x o x - - - - - 1\n2 x o - - - o - - 2\n3 x o o - - o - - 3\n4 - o x o o o - - 4\n5 - o x x o o - - 5\n6 - o o o x o - - 6\n7 o o o o o x - - 7\n8 - - x x x x x - 8\n  a b c d e f g h  "
 PublicObservationString() = "Black (x) to play:\n  a b c d e f g h  \n1 x o x - - - - - 1\n2 x o - - - o - - 2\n3 x o o - - o - - 3\n4 - o x o o o - - 4\n5 - o x x o o - - 5\n6 - o o o x o - - 6\n7 o o o o o x - - 7\n8 - - x x x x x - 8\n  a b c d e f g h  "
@@ -1727,12 +1727,12 @@ action: 40
 #   a b c d e f g h
 IsTerminal() = False
 History() = [44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40]
-HistoryString() = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40"
+HistoryString() = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40"
-InformationStateString(1) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40"
+InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40"
+InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40"
 ObservationString(0) = "White (o) to play:\n  a b c d e f g h  \n1 x o x - - - - - 1\n2 x o - - - o - - 2\n3 x o o - - o - - 3\n4 - o x o o o - - 4\n5 - x x x o o - - 5\n6 x x x x x o - - 6\n7 o x o o o x - - 7\n8 - - x x x x x - 8\n  a b c d e f g h  "
 ObservationString(1) = "White (o) to play:\n  a b c d e f g h  \n1 x o x - - - - - 1\n2 x o - - - o - - 2\n3 x o o - - o - - 3\n4 - o x o o o - - 4\n5 - x x x o o - - 5\n6 x x x x x o - - 6\n7 o x o o o x - - 7\n8 - - x x x x x - 8\n  a b c d e f g h  "
 PublicObservationString() = "White (o) to play:\n  a b c d e f g h  \n1 x o x - - - - - 1\n2 x o - - - o - - 2\n3 x o o - - o - - 3\n4 - o x o o o - - 4\n5 - x x x o o - - 5\n6 x x x x x o - - 6\n7 o x o o o x - - 7\n8 - - x x x x x - 8\n  a b c d e f g h  "
@@ -1778,12 +1778,12 @@ action: 54
 #   a b c d e f g h
 IsTerminal() = False
 History() = [44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54]
-HistoryString() = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54"
+HistoryString() = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54"
-InformationStateString(1) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54"
+InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54"
+InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54"
 ObservationString(0) = "Black (x) to play:\n  a b c d e f g h  \n1 x o x - - - - - 1\n2 x o - - - o - - 2\n3 x o o - - o - - 3\n4 - o x o o o - - 4\n5 - x x x o o - - 5\n6 x x x x x o - - 6\n7 o x o o o o o - 7\n8 - - x x x x x - 8\n  a b c d e f g h  "
 ObservationString(1) = "Black (x) to play:\n  a b c d e f g h  \n1 x o x - - - - - 1\n2 x o - - - o - - 2\n3 x o o - - o - - 3\n4 - o x o o o - - 4\n5 - x x x o o - - 5\n6 x x x x x o - - 6\n7 o x o o o o o - 7\n8 - - x x x x x - 8\n  a b c d e f g h  "
 PublicObservationString() = "Black (x) to play:\n  a b c d e f g h  \n1 x o x - - - - - 1\n2 x o - - - o - - 2\n3 x o o - - o - - 3\n4 - o x o o o - - 4\n5 - x x x o o - - 5\n6 x x x x x o - - 6\n7 o x o o o o o - 7\n8 - - x x x x x - 8\n  a b c d e f g h  "
@@ -1829,12 +1829,12 @@ action: 56
 #   a b c d e f g h
 IsTerminal() = False
 History() = [44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56]
-HistoryString() = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56"
+HistoryString() = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56"
-InformationStateString(1) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56"
+InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56"
+InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56"
 ObservationString(0) = "White (o) to play:\n  a b c d e f g h  \n1 x o x - - - - - 1\n2 x o - - - o - - 2\n3 x o o - - o - - 3\n4 - o x o o o - - 4\n5 - x x x o o - - 5\n6 x x x x x o - - 6\n7 x x o o o o o - 7\n8 x - x x x x x - 8\n  a b c d e f g h  "
 ObservationString(1) = "White (o) to play:\n  a b c d e f g h  \n1 x o x - - - - - 1\n2 x o - - - o - - 2\n3 x o o - - o - - 3\n4 - o x o o o - - 4\n5 - x x x o o - - 5\n6 x x x x x o - - 6\n7 x x o o o o o - 7\n8 x - x x x x x - 8\n  a b c d e f g h  "
 PublicObservationString() = "White (o) to play:\n  a b c d e f g h  \n1 x o x - - - - - 1\n2 x o - - - o - - 2\n3 x o o - - o - - 3\n4 - o x o o o - - 4\n5 - x x x o o - - 5\n6 x x x x x o - - 6\n7 x x o o o o o - 7\n8 x - x x x x x - 8\n  a b c d e f g h  "
@@ -1880,12 +1880,12 @@ action: 32
 #   a b c d e f g h
 IsTerminal() = False
 History() = [44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32]
-HistoryString() = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32"
+HistoryString() = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32"
-InformationStateString(1) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32"
+InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32"
+InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32"
 ObservationString(0) = "Black (x) to play:\n  a b c d e f g h  \n1 x o x - - - - - 1\n2 x o - - - o - - 2\n3 x o o - - o - - 3\n4 - o x o o o - - 4\n5 o o o o o o - - 5\n6 x o x x x o - - 6\n7 x x o o o o o - 7\n8 x - x x x x x - 8\n  a b c d e f g h  "
 ObservationString(1) = "Black (x) to play:\n  a b c d e f g h  \n1 x o x - - - - - 1\n2 x o - - - o - - 2\n3 x o o - - o - - 3\n4 - o x o o o - - 4\n5 o o o o o o - - 5\n6 x o x x x o - - 6\n7 x x o o o o o - 7\n8 x - x x x x x - 8\n  a b c d e f g h  "
 PublicObservationString() = "Black (x) to play:\n  a b c d e f g h  \n1 x o x - - - - - 1\n2 x o - - - o - - 2\n3 x o o - - o - - 3\n4 - o x o o o - - 4\n5 o o o o o o - - 5\n6 x o x x x o - - 6\n7 x x o o o o o - 7\n8 x - x x x x x - 8\n  a b c d e f g h  "
@@ -1931,12 +1931,12 @@ action: 22
 #   a b c d e f g h
 IsTerminal() = False
 History() = [44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22]
-HistoryString() = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22"
+HistoryString() = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22"
-InformationStateString(1) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22"
+InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22"
+InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22"
 ObservationString(0) = "White (o) to play:\n  a b c d e f g h  \n1 x o x - - - - - 1\n2 x o - - - o - - 2\n3 x o o - - o x - 3\n4 - o x o o x - - 4\n5 o o o o x o - - 5\n6 x o x x x o - - 6\n7 x x o o o o o - 7\n8 x - x x x x x - 8\n  a b c d e f g h  "
 ObservationString(1) = "White (o) to play:\n  a b c d e f g h  \n1 x o x - - - - - 1\n2 x o - - - o - - 2\n3 x o o - - o x - 3\n4 - o x o o x - - 4\n5 o o o o x o - - 5\n6 x o x x x o - - 6\n7 x x o o o o o - 7\n8 x - x x x x x - 8\n  a b c d e f g h  "
 PublicObservationString() = "White (o) to play:\n  a b c d e f g h  \n1 x o x - - - - - 1\n2 x o - - - o - - 2\n3 x o o - - o x - 3\n4 - o x o o x - - 4\n5 o o o o x o - - 5\n6 x o x x x o - - 6\n7 x x o o o o o - 7\n8 x - x x x x x - 8\n  a b c d e f g h  "
@@ -1982,12 +1982,12 @@ action: 57
 #   a b c d e f g h
 IsTerminal() = False
 History() = [44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57]
-HistoryString() = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57"
+HistoryString() = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57"
-InformationStateString(1) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57"
+InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57"
+InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57"
 ObservationString(0) = "Black (x) to play:\n  a b c d e f g h  \n1 x o x - - - - - 1\n2 x o - - - o - - 2\n3 x o o - - o x - 3\n4 - o x o o x - - 4\n5 o o o o x o - - 5\n6 x o x x x o - - 6\n7 x o o o o o o - 7\n8 x o x x x x x - 8\n  a b c d e f g h  "
 ObservationString(1) = "Black (x) to play:\n  a b c d e f g h  \n1 x o x - - - - - 1\n2 x o - - - o - - 2\n3 x o o - - o x - 3\n4 - o x o o x - - 4\n5 o o o o x o - - 5\n6 x o x x x o - - 6\n7 x o o o o o o - 7\n8 x o x x x x x - 8\n  a b c d e f g h  "
 PublicObservationString() = "Black (x) to play:\n  a b c d e f g h  \n1 x o x - - - - - 1\n2 x o - - - o - - 2\n3 x o o - - o x - 3\n4 - o x o o x - - 4\n5 o o o o x o - - 5\n6 x o x x x o - - 6\n7 x o o o o o o - 7\n8 x o x x x x x - 8\n  a b c d e f g h  "
@@ -2033,12 +2033,12 @@ action: 38
 #   a b c d e f g h
 IsTerminal() = False
 History() = [44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38]
-HistoryString() = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38"
+HistoryString() = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38"
-InformationStateString(1) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38"
+InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38"
+InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38"
 ObservationString(0) = "White (o) to play:\n  a b c d e f g h  \n1 x o x - - - - - 1\n2 x o - - - o - - 2\n3 x o o - - o x - 3\n4 - o x o o x - - 4\n5 o o o o x x x - 5\n6 x o x x x x - - 6\n7 x o o o x o o - 7\n8 x o x x x x x - 8\n  a b c d e f g h  "
 ObservationString(1) = "White (o) to play:\n  a b c d e f g h  \n1 x o x - - - - - 1\n2 x o - - - o - - 2\n3 x o o - - o x - 3\n4 - o x o o x - - 4\n5 o o o o x x x - 5\n6 x o x x x x - - 6\n7 x o o o x o o - 7\n8 x o x x x x x - 8\n  a b c d e f g h  "
 PublicObservationString() = "White (o) to play:\n  a b c d e f g h  \n1 x o x - - - - - 1\n2 x o - - - o - - 2\n3 x o o - - o x - 3\n4 - o x o o x - - 4\n5 o o o o x x x - 5\n6 x o x x x x - - 6\n7 x o o o x o o - 7\n8 x o x x x x x - 8\n  a b c d e f g h  "
@@ -2084,12 +2084,12 @@ action: 3
 #   a b c d e f g h
 IsTerminal() = False
 History() = [44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3]
-HistoryString() = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3"
+HistoryString() = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3"
-InformationStateString(1) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3"
+InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3"
+InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3"
 ObservationString(0) = "Black (x) to play:\n  a b c d e f g h  \n1 x o o o - - - - 1\n2 x o - - - o - - 2\n3 x o o - - o x - 3\n4 - o x o o x - - 4\n5 o o o o x x x - 5\n6 x o x x x x - - 6\n7 x o o o x o o - 7\n8 x o x x x x x - 8\n  a b c d e f g h  "
 ObservationString(1) = "Black (x) to play:\n  a b c d e f g h  \n1 x o o o - - - - 1\n2 x o - - - o - - 2\n3 x o o - - o x - 3\n4 - o x o o x - - 4\n5 o o o o x x x - 5\n6 x o x x x x - - 6\n7 x o o o x o o - 7\n8 x o x x x x x - 8\n  a b c d e f g h  "
 PublicObservationString() = "Black (x) to play:\n  a b c d e f g h  \n1 x o o o - - - - 1\n2 x o - - - o - - 2\n3 x o o - - o x - 3\n4 - o x o o x - - 4\n5 o o o o x x x - 5\n6 x o x x x x - - 6\n7 x o o o x o o - 7\n8 x o x x x x x - 8\n  a b c d e f g h  "
@@ -2135,12 +2135,12 @@ action: 14
 #   a b c d e f g h
 IsTerminal() = False
 History() = [44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14]
-HistoryString() = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14"
+HistoryString() = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14"
-InformationStateString(1) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14"
+InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14"
+InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14"
 ObservationString(0) = "White (o) to play:\n  a b c d e f g h  \n1 x o o o - - - - 1\n2 x o - - - o x - 2\n3 x o o - - x x - 3\n4 - o x o x x - - 4\n5 o o o x x x x - 5\n6 x o x x x x - - 6\n7 x o o o x o o - 7\n8 x o x x x x x - 8\n  a b c d e f g h  "
 ObservationString(1) = "White (o) to play:\n  a b c d e f g h  \n1 x o o o - - - - 1\n2 x o - - - o x - 2\n3 x o o - - x x - 3\n4 - o x o x x - - 4\n5 o o o x x x x - 5\n6 x o x x x x - - 6\n7 x o o o x o o - 7\n8 x o x x x x x - 8\n  a b c d e f g h  "
 PublicObservationString() = "White (o) to play:\n  a b c d e f g h  \n1 x o o o - - - - 1\n2 x o - - - o x - 2\n3 x o o - - x x - 3\n4 - o x o x x - - 4\n5 o o o x x x x - 5\n6 x o x x x x - - 6\n7 x o o o x o o - 7\n8 x o x x x x x - 8\n  a b c d e f g h  "
@@ -2186,12 +2186,12 @@ action: 19
 #   a b c d e f g h
 IsTerminal() = False
 History() = [44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19]
-HistoryString() = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19"
+HistoryString() = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19"
-InformationStateString(1) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19"
+InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19"
+InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19"
 ObservationString(0) = "Black (x) to play:\n  a b c d e f g h  \n1 x o o o - - - - 1\n2 x o - - - o x - 2\n3 x o o o - x x - 3\n4 - o o o x x - - 4\n5 o o o x x x x - 5\n6 x o x x x x - - 6\n7 x o o o x o o - 7\n8 x o x x x x x - 8\n  a b c d e f g h  "
 ObservationString(1) = "Black (x) to play:\n  a b c d e f g h  \n1 x o o o - - - - 1\n2 x o - - - o x - 2\n3 x o o o - x x - 3\n4 - o o o x x - - 4\n5 o o o x x x x - 5\n6 x o x x x x - - 6\n7 x o o o x o o - 7\n8 x o x x x x x - 8\n  a b c d e f g h  "
 PublicObservationString() = "Black (x) to play:\n  a b c d e f g h  \n1 x o o o - - - - 1\n2 x o - - - o x - 2\n3 x o o o - x x - 3\n4 - o o o x x - - 4\n5 o o o x x x x - 5\n6 x o x x x x - - 6\n7 x o o o x o o - 7\n8 x o x x x x x - 8\n  a b c d e f g h  "
@@ -2237,12 +2237,12 @@ action: 12
 #   a b c d e f g h
 IsTerminal() = False
 History() = [44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12]
-HistoryString() = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19 12"
+HistoryString() = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19 12"
-InformationStateString(1) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19 12"
+InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12"
+InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12"
 ObservationString(0) = "White (o) to play:\n  a b c d e f g h  \n1 x o o o - - - - 1\n2 x o - - x x x - 2\n3 x o o x - x x - 3\n4 - o x o x x - - 4\n5 o x o x x x x - 5\n6 x o x x x x - - 6\n7 x o o o x o o - 7\n8 x o x x x x x - 8\n  a b c d e f g h  "
 ObservationString(1) = "White (o) to play:\n  a b c d e f g h  \n1 x o o o - - - - 1\n2 x o - - x x x - 2\n3 x o o x - x x - 3\n4 - o x o x x - - 4\n5 o x o x x x x - 5\n6 x o x x x x - - 6\n7 x o o o x o o - 7\n8 x o x x x x x - 8\n  a b c d e f g h  "
 PublicObservationString() = "White (o) to play:\n  a b c d e f g h  \n1 x o o o - - - - 1\n2 x o - - x x x - 2\n3 x o o x - x x - 3\n4 - o x o x x - - 4\n5 o x o x x x x - 5\n6 x o x x x x - - 6\n7 x o o o x o o - 7\n8 x o x x x x x - 8\n  a b c d e f g h  "
@@ -2288,12 +2288,12 @@ action: 63
 #   a b c d e f g h
 IsTerminal() = False
 History() = [44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63]
-HistoryString() = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19 12 63"
+HistoryString() = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19 12 63"
-InformationStateString(1) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19 12 63"
+InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63"
+InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63"
 ObservationString(0) = "Black (x) to play:\n  a b c d e f g h  \n1 x o o o - - - - 1\n2 x o - - x x x - 2\n3 x o o x - x x - 3\n4 - o x o x x - - 4\n5 o x o x x x x - 5\n6 x o x x x x - - 6\n7 x o o o x o o - 7\n8 x o o o o o o o 8\n  a b c d e f g h  "
 ObservationString(1) = "Black (x) to play:\n  a b c d e f g h  \n1 x o o o - - - - 1\n2 x o - - x x x - 2\n3 x o o x - x x - 3\n4 - o x o x x - - 4\n5 o x o x x x x - 5\n6 x o x x x x - - 6\n7 x o o o x o o - 7\n8 x o o o o o o o 8\n  a b c d e f g h  "
 PublicObservationString() = "Black (x) to play:\n  a b c d e f g h  \n1 x o o o - - - - 1\n2 x o - - x x x - 2\n3 x o o x - x x - 3\n4 - o x o x x - - 4\n5 o x o x x x x - 5\n6 x o x x x x - - 6\n7 x o o o x o o - 7\n8 x o o o o o o o 8\n  a b c d e f g h  "
@@ -2339,12 +2339,12 @@ action: 20
 #   a b c d e f g h
 IsTerminal() = False
 History() = [44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20]
-HistoryString() = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19 12 63 20"
+HistoryString() = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19 12 63 20"
-InformationStateString(1) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19 12 63 20"
+InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20"
+InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20"
 ObservationString(0) = "White (o) to play:\n  a b c d e f g h  \n1 x o o o - - - - 1\n2 x o - - x x x - 2\n3 x o o x x x x - 3\n4 - o x x x x - - 4\n5 o x x x x x x - 5\n6 x x x x x x - - 6\n7 x o o o x o o - 7\n8 x o o o o o o o 8\n  a b c d e f g h  "
 ObservationString(1) = "White (o) to play:\n  a b c d e f g h  \n1 x o o o - - - - 1\n2 x o - - x x x - 2\n3 x o o x x x x - 3\n4 - o x x x x - - 4\n5 o x x x x x x - 5\n6 x x x x x x - - 6\n7 x o o o x o o - 7\n8 x o o o o o o o 8\n  a b c d e f g h  "
 PublicObservationString() = "White (o) to play:\n  a b c d e f g h  \n1 x o o o - - - - 1\n2 x o - - x x x - 2\n3 x o o x x x x - 3\n4 - o x x x x - - 4\n5 o x x x x x x - 5\n6 x x x x x x - - 6\n7 x o o o x o o - 7\n8 x o o o o o o o 8\n  a b c d e f g h  "
@@ -2390,12 +2390,12 @@ action: 31
 #   a b c d e f g h
 IsTerminal() = False
 History() = [44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31]
-HistoryString() = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19 12 63 20 31"
+HistoryString() = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19 12 63 20 31"
-InformationStateString(1) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19 12 63 20 31"
+InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31"
+InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31"
 ObservationString(0) = "Black (x) to play:\n  a b c d e f g h  \n1 x o o o - - - - 1\n2 x o - - x x x - 2\n3 x o o x x x x - 3\n4 - o x x x x - o 4\n5 o x x x x x o - 5\n6 x x x x x o - - 6\n7 x o o o o o o - 7\n8 x o o o o o o o 8\n  a b c d e f g h  "
 ObservationString(1) = "Black (x) to play:\n  a b c d e f g h  \n1 x o o o - - - - 1\n2 x o - - x x x - 2\n3 x o o x x x x - 3\n4 - o x x x x - o 4\n5 o x x x x x o - 5\n6 x x x x x o - - 6\n7 x o o o o o o - 7\n8 x o o o o o o o 8\n  a b c d e f g h  "
 PublicObservationString() = "Black (x) to play:\n  a b c d e f g h  \n1 x o o o - - - - 1\n2 x o - - x x x - 2\n3 x o o x x x x - 3\n4 - o x x x x - o 4\n5 o x x x x x o - 5\n6 x x x x x o - - 6\n7 x o o o o o o - 7\n8 x o o o o o o o 8\n  a b c d e f g h  "
@@ -2441,12 +2441,12 @@ action: 39
 #   a b c d e f g h
 IsTerminal() = False
 History() = [44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31, 39]
-HistoryString() = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19 12 63 20 31 39"
+HistoryString() = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31, 39"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19 12 63 20 31 39"
-InformationStateString(1) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19 12 63 20 31 39"
+InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31, 39"
+InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31, 39"
 ObservationString(0) = "White (o) to play:\n  a b c d e f g h  \n1 x o o o - - - - 1\n2 x o - - x x x - 2\n3 x o o x x x x - 3\n4 - o x x x x - o 4\n5 o x x x x x x x 5\n6 x x x x x o - - 6\n7 x o o o o o o - 7\n8 x o o o o o o o 8\n  a b c d e f g h  "
 ObservationString(1) = "White (o) to play:\n  a b c d e f g h  \n1 x o o o - - - - 1\n2 x o - - x x x - 2\n3 x o o x x x x - 3\n4 - o x x x x - o 4\n5 o x x x x x x x 5\n6 x x x x x o - - 6\n7 x o o o o o o - 7\n8 x o o o o o o o 8\n  a b c d e f g h  "
 PublicObservationString() = "White (o) to play:\n  a b c d e f g h  \n1 x o o o - - - - 1\n2 x o - - x x x - 2\n3 x o o x x x x - 3\n4 - o x x x x - o 4\n5 o x x x x x x x 5\n6 x x x x x o - - 6\n7 x o o o o o o - 7\n8 x o o o o o o o 8\n  a b c d e f g h  "
@@ -2492,12 +2492,12 @@ action: 24
 #   a b c d e f g h
 IsTerminal() = False
 History() = [44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31, 39, 24]
-HistoryString() = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19 12 63 20 31 39 24"
+HistoryString() = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31, 39, 24"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19 12 63 20 31 39 24"
-InformationStateString(1) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19 12 63 20 31 39 24"
+InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31, 39, 24"
+InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31, 39, 24"
 ObservationString(0) = "Black (x) to play:\n  a b c d e f g h  \n1 x o o o - - - - 1\n2 x o - - x x x - 2\n3 x o o x x x x - 3\n4 o o x x x x - o 4\n5 o o x x x x x x 5\n6 x x o x x o - - 6\n7 x o o o o o o - 7\n8 x o o o o o o o 8\n  a b c d e f g h  "
 ObservationString(1) = "Black (x) to play:\n  a b c d e f g h  \n1 x o o o - - - - 1\n2 x o - - x x x - 2\n3 x o o x x x x - 3\n4 o o x x x x - o 4\n5 o o x x x x x x 5\n6 x x o x x o - - 6\n7 x o o o o o o - 7\n8 x o o o o o o o 8\n  a b c d e f g h  "
 PublicObservationString() = "Black (x) to play:\n  a b c d e f g h  \n1 x o o o - - - - 1\n2 x o - - x x x - 2\n3 x o o x x x x - 3\n4 o o x x x x - o 4\n5 o o x x x x x x 5\n6 x x o x x o - - 6\n7 x o o o o o o - 7\n8 x o o o o o o o 8\n  a b c d e f g h  "
@@ -2543,12 +2543,12 @@ action: 23
 #   a b c d e f g h
 IsTerminal() = False
 History() = [44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31, 39, 24, 23]
-HistoryString() = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19 12 63 20 31 39 24 23"
+HistoryString() = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31, 39, 24, 23"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19 12 63 20 31 39 24 23"
-InformationStateString(1) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19 12 63 20 31 39 24 23"
+InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31, 39, 24, 23"
+InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31, 39, 24, 23"
 ObservationString(0) = "White (o) to play:\n  a b c d e f g h  \n1 x o o o - - - - 1\n2 x o - - x x x - 2\n3 x o o x x x x x 3\n4 o o x x x x - x 4\n5 o o x x x x x x 5\n6 x x o x x o - - 6\n7 x o o o o o o - 7\n8 x o o o o o o o 8\n  a b c d e f g h  "
 ObservationString(1) = "White (o) to play:\n  a b c d e f g h  \n1 x o o o - - - - 1\n2 x o - - x x x - 2\n3 x o o x x x x x 3\n4 o o x x x x - x 4\n5 o o x x x x x x 5\n6 x x o x x o - - 6\n7 x o o o o o o - 7\n8 x o o o o o o o 8\n  a b c d e f g h  "
 PublicObservationString() = "White (o) to play:\n  a b c d e f g h  \n1 x o o o - - - - 1\n2 x o - - x x x - 2\n3 x o o x x x x x 3\n4 o o x x x x - x 4\n5 o o x x x x x x 5\n6 x x o x x o - - 6\n7 x o o o o o o - 7\n8 x o o o o o o o 8\n  a b c d e f g h  "
@@ -2594,12 +2594,12 @@ action: 11
 #   a b c d e f g h
 IsTerminal() = False
 History() = [44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31, 39, 24, 23, 11]
-HistoryString() = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19 12 63 20 31 39 24 23 11"
+HistoryString() = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31, 39, 24, 23, 11"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19 12 63 20 31 39 24 23 11"
-InformationStateString(1) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19 12 63 20 31 39 24 23 11"
+InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31, 39, 24, 23, 11"
+InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31, 39, 24, 23, 11"
 ObservationString(0) = "Black (x) to play:\n  a b c d e f g h  \n1 x o o o - - - - 1\n2 x o - o x x x - 2\n3 x o o o x x x x 3\n4 o o x o x x - x 4\n5 o o x o x x x x 5\n6 x x o o x o - - 6\n7 x o o o o o o - 7\n8 x o o o o o o o 8\n  a b c d e f g h  "
 ObservationString(1) = "Black (x) to play:\n  a b c d e f g h  \n1 x o o o - - - - 1\n2 x o - o x x x - 2\n3 x o o o x x x x 3\n4 o o x o x x - x 4\n5 o o x o x x x x 5\n6 x x o o x o - - 6\n7 x o o o o o o - 7\n8 x o o o o o o o 8\n  a b c d e f g h  "
 PublicObservationString() = "Black (x) to play:\n  a b c d e f g h  \n1 x o o o - - - - 1\n2 x o - o x x x - 2\n3 x o o o x x x x 3\n4 o o x o x x - x 4\n5 o o x o x x x x 5\n6 x x o o x o - - 6\n7 x o o o o o o - 7\n8 x o o o o o o o 8\n  a b c d e f g h  "
@@ -2645,12 +2645,12 @@ action: 46
 #   a b c d e f g h
 IsTerminal() = False
 History() = [44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31, 39, 24, 23, 11, 46]
-HistoryString() = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19 12 63 20 31 39 24 23 11 46"
+HistoryString() = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31, 39, 24, 23, 11, 46"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19 12 63 20 31 39 24 23 11 46"
-InformationStateString(1) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19 12 63 20 31 39 24 23 11 46"
+InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31, 39, 24, 23, 11, 46"
+InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31, 39, 24, 23, 11, 46"
 ObservationString(0) = "White (o) to play:\n  a b c d e f g h  \n1 x o o o - - - - 1\n2 x o - o x x x - 2\n3 x o o o x x x x 3\n4 o o x o x x - x 4\n5 o o x o x x x x 5\n6 x x o o x x x - 6\n7 x o o o o o o - 7\n8 x o o o o o o o 8\n  a b c d e f g h  "
 ObservationString(1) = "White (o) to play:\n  a b c d e f g h  \n1 x o o o - - - - 1\n2 x o - o x x x - 2\n3 x o o o x x x x 3\n4 o o x o x x - x 4\n5 o o x o x x x x 5\n6 x x o o x x x - 6\n7 x o o o o o o - 7\n8 x o o o o o o o 8\n  a b c d e f g h  "
 PublicObservationString() = "White (o) to play:\n  a b c d e f g h  \n1 x o o o - - - - 1\n2 x o - o x x x - 2\n3 x o o o x x x x 3\n4 o o x o x x - x 4\n5 o o x o x x x x 5\n6 x x o o x x x - 6\n7 x o o o o o o - 7\n8 x o o o o o o o 8\n  a b c d e f g h  "
@@ -2696,12 +2696,12 @@ action: 30
 #   a b c d e f g h
 IsTerminal() = False
 History() = [44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31, 39, 24, 23, 11, 46, 30]
-HistoryString() = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19 12 63 20 31 39 24 23 11 46 30"
+HistoryString() = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31, 39, 24, 23, 11, 46, 30"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19 12 63 20 31 39 24 23 11 46 30"
-InformationStateString(1) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19 12 63 20 31 39 24 23 11 46 30"
+InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31, 39, 24, 23, 11, 46, 30"
+InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31, 39, 24, 23, 11, 46, 30"
 ObservationString(0) = "Black (x) to play:\n  a b c d e f g h  \n1 x o o o - - - - 1\n2 x o - o o x x - 2\n3 x o o o x o x x 3\n4 o o x o o o o x 4\n5 o o x o x o o x 5\n6 x x o o o x o - 6\n7 x o o o o o o - 7\n8 x o o o o o o o 8\n  a b c d e f g h  "
 ObservationString(1) = "Black (x) to play:\n  a b c d e f g h  \n1 x o o o - - - - 1\n2 x o - o o x x - 2\n3 x o o o x o x x 3\n4 o o x o o o o x 4\n5 o o x o x o o x 5\n6 x x o o o x o - 6\n7 x o o o o o o - 7\n8 x o o o o o o o 8\n  a b c d e f g h  "
 PublicObservationString() = "Black (x) to play:\n  a b c d e f g h  \n1 x o o o - - - - 1\n2 x o - o o x x - 2\n3 x o o o x o x x 3\n4 o o x o o o o x 4\n5 o o x o x o o x 5\n6 x x o o o x o - 6\n7 x o o o o o o - 7\n8 x o o o o o o o 8\n  a b c d e f g h  "
@@ -2747,12 +2747,12 @@ action: 10
 #   a b c d e f g h
 IsTerminal() = False
 History() = [44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31, 39, 24, 23, 11, 46, 30, 10]
-HistoryString() = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19 12 63 20 31 39 24 23 11 46 30 10"
+HistoryString() = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31, 39, 24, 23, 11, 46, 30, 10"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19 12 63 20 31 39 24 23 11 46 30 10"
-InformationStateString(1) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19 12 63 20 31 39 24 23 11 46 30 10"
+InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31, 39, 24, 23, 11, 46, 30, 10"
+InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31, 39, 24, 23, 11, 46, 30, 10"
 ObservationString(0) = "White (o) to play:\n  a b c d e f g h  \n1 x o o o - - - - 1\n2 x x x x x x x - 2\n3 x o x o x o x x 3\n4 o o x o o o o x 4\n5 o o x o x o o x 5\n6 x x o o o x o - 6\n7 x o o o o o o - 7\n8 x o o o o o o o 8\n  a b c d e f g h  "
 ObservationString(1) = "White (o) to play:\n  a b c d e f g h  \n1 x o o o - - - - 1\n2 x x x x x x x - 2\n3 x o x o x o x x 3\n4 o o x o o o o x 4\n5 o o x o x o o x 5\n6 x x o o o x o - 6\n7 x o o o o o o - 7\n8 x o o o o o o o 8\n  a b c d e f g h  "
 PublicObservationString() = "White (o) to play:\n  a b c d e f g h  \n1 x o o o - - - - 1\n2 x x x x x x x - 2\n3 x o x o x o x x 3\n4 o o x o o o o x 4\n5 o o x o x o o x 5\n6 x x o o o x o - 6\n7 x o o o o o o - 7\n8 x o o o o o o o 8\n  a b c d e f g h  "
@@ -2798,12 +2798,12 @@ action: 15
 #   a b c d e f g h
 IsTerminal() = False
 History() = [44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31, 39, 24, 23, 11, 46, 30, 10, 15]
-HistoryString() = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19 12 63 20 31 39 24 23 11 46 30 10 15"
+HistoryString() = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31, 39, 24, 23, 11, 46, 30, 10, 15"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19 12 63 20 31 39 24 23 11 46 30 10 15"
-InformationStateString(1) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19 12 63 20 31 39 24 23 11 46 30 10 15"
+InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31, 39, 24, 23, 11, 46, 30, 10, 15"
+InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31, 39, 24, 23, 11, 46, 30, 10, 15"
 ObservationString(0) = "Black (x) to play:\n  a b c d e f g h  \n1 x o o o - - - - 1\n2 x x x x x x x o 2\n3 x o x o x o o x 3\n4 o o x o o o o x 4\n5 o o x o x o o x 5\n6 x x o o o x o - 6\n7 x o o o o o o - 7\n8 x o o o o o o o 8\n  a b c d e f g h  "
 ObservationString(1) = "Black (x) to play:\n  a b c d e f g h  \n1 x o o o - - - - 1\n2 x x x x x x x o 2\n3 x o x o x o o x 3\n4 o o x o o o o x 4\n5 o o x o x o o x 5\n6 x x o o o x o - 6\n7 x o o o o o o - 7\n8 x o o o o o o o 8\n  a b c d e f g h  "
 PublicObservationString() = "Black (x) to play:\n  a b c d e f g h  \n1 x o o o - - - - 1\n2 x x x x x x x o 2\n3 x o x o x o o x 3\n4 o o x o o o o x 4\n5 o o x o x o o x 5\n6 x x o o o x o - 6\n7 x o o o o o o - 7\n8 x o o o o o o o 8\n  a b c d e f g h  "
@@ -2849,12 +2849,12 @@ action: 47
 #   a b c d e f g h
 IsTerminal() = False
 History() = [44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31, 39, 24, 23, 11, 46, 30, 10, 15, 47]
-HistoryString() = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19 12 63 20 31 39 24 23 11 46 30 10 15 47"
+HistoryString() = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31, 39, 24, 23, 11, 46, 30, 10, 15, 47"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19 12 63 20 31 39 24 23 11 46 30 10 15 47"
-InformationStateString(1) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19 12 63 20 31 39 24 23 11 46 30 10 15 47"
+InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31, 39, 24, 23, 11, 46, 30, 10, 15, 47"
+InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31, 39, 24, 23, 11, 46, 30, 10, 15, 47"
 ObservationString(0) = "White (o) to play:\n  a b c d e f g h  \n1 x o o o - - - - 1\n2 x x x x x x x o 2\n3 x o x o x o o x 3\n4 o o x o o x o x 4\n5 o o x o x o x x 5\n6 x x o o o x x x 6\n7 x o o o o o o - 7\n8 x o o o o o o o 8\n  a b c d e f g h  "
 ObservationString(1) = "White (o) to play:\n  a b c d e f g h  \n1 x o o o - - - - 1\n2 x x x x x x x o 2\n3 x o x o x o o x 3\n4 o o x o o x o x 4\n5 o o x o x o x x 5\n6 x x o o o x x x 6\n7 x o o o o o o - 7\n8 x o o o o o o o 8\n  a b c d e f g h  "
 PublicObservationString() = "White (o) to play:\n  a b c d e f g h  \n1 x o o o - - - - 1\n2 x x x x x x x o 2\n3 x o x o x o o x 3\n4 o o x o o x o x 4\n5 o o x o x o x x 5\n6 x x o o o x x x 6\n7 x o o o o o o - 7\n8 x o o o o o o o 8\n  a b c d e f g h  "
@@ -2900,12 +2900,12 @@ action: 5
 #   a b c d e f g h
 IsTerminal() = False
 History() = [44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31, 39, 24, 23, 11, 46, 30, 10, 15, 47, 5]
-HistoryString() = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19 12 63 20 31 39 24 23 11 46 30 10 15 47 5"
+HistoryString() = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31, 39, 24, 23, 11, 46, 30, 10, 15, 47, 5"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19 12 63 20 31 39 24 23 11 46 30 10 15 47 5"
-InformationStateString(1) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19 12 63 20 31 39 24 23 11 46 30 10 15 47 5"
+InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31, 39, 24, 23, 11, 46, 30, 10, 15, 47, 5"
+InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31, 39, 24, 23, 11, 46, 30, 10, 15, 47, 5"
 ObservationString(0) = "Black (x) to play:\n  a b c d e f g h  \n1 x o o o - o - - 1\n2 x x x x o o x o 2\n3 x o x o x o o x 3\n4 o o x o o x o x 4\n5 o o x o x o x x 5\n6 x x o o o x x x 6\n7 x o o o o o o - 7\n8 x o o o o o o o 8\n  a b c d e f g h  "
 ObservationString(1) = "Black (x) to play:\n  a b c d e f g h  \n1 x o o o - o - - 1\n2 x x x x o o x o 2\n3 x o x o x o o x 3\n4 o o x o o x o x 4\n5 o o x o x o x x 5\n6 x x o o o x x x 6\n7 x o o o o o o - 7\n8 x o o o o o o o 8\n  a b c d e f g h  "
 PublicObservationString() = "Black (x) to play:\n  a b c d e f g h  \n1 x o o o - o - - 1\n2 x x x x o o x o 2\n3 x o x o x o o x 3\n4 o o x o o x o x 4\n5 o o x o x o x x 5\n6 x x o o o x x x 6\n7 x o o o o o o - 7\n8 x o o o o o o o 8\n  a b c d e f g h  "
@@ -2951,12 +2951,12 @@ action: 6
 #   a b c d e f g h
 IsTerminal() = False
 History() = [44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31, 39, 24, 23, 11, 46, 30, 10, 15, 47, 5, 6]
-HistoryString() = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19 12 63 20 31 39 24 23 11 46 30 10 15 47 5 6"
+HistoryString() = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31, 39, 24, 23, 11, 46, 30, 10, 15, 47, 5, 6"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19 12 63 20 31 39 24 23 11 46 30 10 15 47 5 6"
-InformationStateString(1) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19 12 63 20 31 39 24 23 11 46 30 10 15 47 5 6"
+InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31, 39, 24, 23, 11, 46, 30, 10, 15, 47, 5, 6"
+InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31, 39, 24, 23, 11, 46, 30, 10, 15, 47, 5, 6"
 ObservationString(0) = "White (o) to play:\n  a b c d e f g h  \n1 x o o o - o x - 1\n2 x x x x o x x o 2\n3 x o x o x o o x 3\n4 o o x o o x o x 4\n5 o o x o x o x x 5\n6 x x o o o x x x 6\n7 x o o o o o o - 7\n8 x o o o o o o o 8\n  a b c d e f g h  "
 ObservationString(1) = "White (o) to play:\n  a b c d e f g h  \n1 x o o o - o x - 1\n2 x x x x o x x o 2\n3 x o x o x o o x 3\n4 o o x o o x o x 4\n5 o o x o x o x x 5\n6 x x o o o x x x 6\n7 x o o o o o o - 7\n8 x o o o o o o o 8\n  a b c d e f g h  "
 PublicObservationString() = "White (o) to play:\n  a b c d e f g h  \n1 x o o o - o x - 1\n2 x x x x o x x o 2\n3 x o x o x o o x 3\n4 o o x o o x o x 4\n5 o o x o x o x x 5\n6 x x o o o x x x 6\n7 x o o o o o o - 7\n8 x o o o o o o o 8\n  a b c d e f g h  "
@@ -3002,12 +3002,12 @@ action: 4
 #   a b c d e f g h
 IsTerminal() = False
 History() = [44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31, 39, 24, 23, 11, 46, 30, 10, 15, 47, 5, 6, 4]
-HistoryString() = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19 12 63 20 31 39 24 23 11 46 30 10 15 47 5 6 4"
+HistoryString() = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31, 39, 24, 23, 11, 46, 30, 10, 15, 47, 5, 6, 4"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19 12 63 20 31 39 24 23 11 46 30 10 15 47 5 6 4"
-InformationStateString(1) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19 12 63 20 31 39 24 23 11 46 30 10 15 47 5 6 4"
+InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31, 39, 24, 23, 11, 46, 30, 10, 15, 47, 5, 6, 4"
+InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31, 39, 24, 23, 11, 46, 30, 10, 15, 47, 5, 6, 4"
 ObservationString(0) = "Black (x) to play:\n  a b c d e f g h  \n1 x o o o o o x - 1\n2 x x x o o o x o 2\n3 x o o o x o o x 3\n4 o o x o o x o x 4\n5 o o x o x o x x 5\n6 x x o o o x x x 6\n7 x o o o o o o - 7\n8 x o o o o o o o 8\n  a b c d e f g h  "
 ObservationString(1) = "Black (x) to play:\n  a b c d e f g h  \n1 x o o o o o x - 1\n2 x x x o o o x o 2\n3 x o o o x o o x 3\n4 o o x o o x o x 4\n5 o o x o x o x x 5\n6 x x o o o x x x 6\n7 x o o o o o o - 7\n8 x o o o o o o o 8\n  a b c d e f g h  "
 PublicObservationString() = "Black (x) to play:\n  a b c d e f g h  \n1 x o o o o o x - 1\n2 x x x o o o x o 2\n3 x o o o x o o x 3\n4 o o x o o x o x 4\n5 o o x o x o x x 5\n6 x x o o o x x x 6\n7 x o o o o o o - 7\n8 x o o o o o o o 8\n  a b c d e f g h  "
@@ -3053,12 +3053,12 @@ action: 7
 #   a b c d e f g h
 IsTerminal() = False
 History() = [44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31, 39, 24, 23, 11, 46, 30, 10, 15, 47, 5, 6, 4, 7]
-HistoryString() = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19 12 63 20 31 39 24 23 11 46 30 10 15 47 5 6 4 7"
+HistoryString() = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31, 39, 24, 23, 11, 46, 30, 10, 15, 47, 5, 6, 4, 7"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19 12 63 20 31 39 24 23 11 46 30 10 15 47 5 6 4 7"
-InformationStateString(1) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19 12 63 20 31 39 24 23 11 46 30 10 15 47 5 6 4 7"
+InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31, 39, 24, 23, 11, 46, 30, 10, 15, 47, 5, 6, 4, 7"
+InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31, 39, 24, 23, 11, 46, 30, 10, 15, 47, 5, 6, 4, 7"
 ObservationString(0) = "White (o) to play:\n  a b c d e f g h  \n1 x o o o o o x x 1\n2 x x x o o o x x 2\n3 x o o o x o o x 3\n4 o o x o o x o x 4\n5 o o x o x o x x 5\n6 x x o o o x x x 6\n7 x o o o o o o - 7\n8 x o o o o o o o 8\n  a b c d e f g h  "
 ObservationString(1) = "White (o) to play:\n  a b c d e f g h  \n1 x o o o o o x x 1\n2 x x x o o o x x 2\n3 x o o o x o o x 3\n4 o o x o o x o x 4\n5 o o x o x o x x 5\n6 x x o o o x x x 6\n7 x o o o o o o - 7\n8 x o o o o o o o 8\n  a b c d e f g h  "
 PublicObservationString() = "White (o) to play:\n  a b c d e f g h  \n1 x o o o o o x x 1\n2 x x x o o o x x 2\n3 x o o o x o o x 3\n4 o o x o o x o x 4\n5 o o x o x o x x 5\n6 x x o o o x x x 6\n7 x o o o o o o - 7\n8 x o o o o o o o 8\n  a b c d e f g h  "
@@ -3104,12 +3104,12 @@ action: 55
 #   a b c d e f g h
 IsTerminal() = True
 History() = [44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31, 39, 24, 23, 11, 46, 30, 10, 15, 47, 5, 6, 4, 7, 55]
-HistoryString() = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19 12 63 20 31 39 24 23 11 46 30 10 15 47 5 6 4 7 55"
+HistoryString() = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31, 39, 24, 23, 11, 46, 30, 10, 15, 47, 5, 6, 4, 7, 55"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
-InformationStateString(0) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19 12 63 20 31 39 24 23 11 46 30 10 15 47 5 6 4 7 55"
-InformationStateString(1) = "44 43 26 29 45 25 17 52 21 13 37 42 41 53 34 8 16 50 0 48 61 60 59 33 18 51 58 9 2 49 62 1 40 54 56 32 22 57 38 3 14 19 12 63 20 31 39 24 23 11 46 30 10 15 47 5 6 4 7 55"
+InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31, 39, 24, 23, 11, 46, 30, 10, 15, 47, 5, 6, 4, 7, 55"
+InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31, 39, 24, 23, 11, 46, 30, 10, 15, 47, 5, 6, 4, 7, 55"
 ObservationString(0) = "Terminal State:\n  a b c d e f g h  \n1 x o o o o o x x 1\n2 x x x o o o x x 2\n3 x o o o x o o x 3\n4 o o x o o x o x 4\n5 o o x o x o x x 5\n6 x x o o o x o x 6\n7 x o o o o o o o 7\n8 x o o o o o o o 8\n  a b c d e f g h  "
 ObservationString(1) = "Terminal State:\n  a b c d e f g h  \n1 x o o o o o x x 1\n2 x x x o o o x x 2\n3 x o o o x o o x 3\n4 o o x o o x o x 4\n5 o o x o x o x x 5\n6 x x o o o x o x 6\n7 x o o o o o o o 7\n8 x o o o o o o o 8\n  a b c d e f g h  "
 PublicObservationString() = "Terminal State:\n  a b c d e f g h  \n1 x o o o o o x x 1\n2 x x x o o o x x 2\n3 x o o o x o o x 3\n4 o o x o o x o x 4\n5 o o x o x o x x 5\n6 x x o o o x o x 6\n7 x o o o o o o o 7\n8 x o o o o o o o 8\n  a b c d e f g h  "

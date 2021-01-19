@@ -118,7 +118,7 @@ action: 1
 # ..x..
 IsTerminal() = False
 History() = [1, 1]
-HistoryString() = "1 1"
+HistoryString() = "1, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -156,7 +156,7 @@ action: 0
 # .x...
 IsTerminal() = False
 History() = [1, 1, 0]
-HistoryString() = "1 1 0"
+HistoryString() = "1, 1, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -194,7 +194,7 @@ action: 0
 # x....
 IsTerminal() = False
 History() = [1, 1, 0, 0]
-HistoryString() = "1 1 0 0"
+HistoryString() = "1, 1, 0, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -232,7 +232,7 @@ action: 1
 # x....
 IsTerminal() = False
 History() = [1, 1, 0, 0, 1]
-HistoryString() = "1 1 0 0 1"
+HistoryString() = "1, 1, 0, 0, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -270,7 +270,7 @@ action: 1
 # x....
 IsTerminal() = False
 History() = [1, 1, 0, 0, 1, 1]
-HistoryString() = "1 1 0 0 1 1"
+HistoryString() = "1, 1, 0, 0, 1, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -308,7 +308,7 @@ action: 0
 # x....
 IsTerminal() = False
 History() = [1, 1, 0, 0, 1, 1, 0]
-HistoryString() = "1 1 0 0 1 1 0"
+HistoryString() = "1, 1, 0, 0, 1, 1, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -346,7 +346,7 @@ action: 0
 # x....
 IsTerminal() = False
 History() = [1, 1, 0, 0, 1, 1, 0, 0]
-HistoryString() = "1 1 0 0 1 1 0 0"
+HistoryString() = "1, 1, 0, 0, 1, 1, 0, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -384,7 +384,7 @@ action: 2
 # .x...
 IsTerminal() = False
 History() = [1, 1, 0, 0, 1, 1, 0, 0, 2]
-HistoryString() = "1 1 0 0 1 1 0 0 2"
+HistoryString() = "1, 1, 0, 0, 1, 1, 0, 0, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -422,7 +422,7 @@ action: 1
 # .x...
 IsTerminal() = True
 History() = [1, 1, 0, 0, 1, 1, 0, 0, 2, 1]
-HistoryString() = "1 1 0 0 1 1 0 0 2 1"
+HistoryString() = "1, 1, 0, 0, 1, 1, 0, 0, 2, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4

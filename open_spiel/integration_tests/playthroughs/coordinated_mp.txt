@@ -75,7 +75,7 @@ action: 0
 # TT
 IsTerminal() = False
 History() = [1, 0]
-HistoryString() = "1 0"
+HistoryString() = "1, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -98,7 +98,7 @@ action: 1
 # TTT
 IsTerminal() = True
 History() = [1, 0, 1]
-HistoryString() = "1 0 1"
+HistoryString() = "1, 0, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4

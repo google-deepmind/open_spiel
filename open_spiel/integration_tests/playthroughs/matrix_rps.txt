@@ -60,7 +60,7 @@ actions: [2, 0]
 
 # State 1
 # Terminal? true
-# History: 2 0
+# History: 2, 0
 # Returns: -1,1
 # Row actions:
 # Col actions:
@@ -70,12 +70,12 @@ actions: [2, 0]
 # -1,1 1,-1 0,0
 IsTerminal() = True
 History() = [2, 0]
-HistoryString() = "2 0"
+HistoryString() = "2, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
-InformationStateString(0) = "Observing player: 0. Terminal. History string: 2 0"
-InformationStateString(1) = "Observing player: 1. Terminal. History string: 2 0"
+InformationStateString(0) = "Observing player: 0. Terminal. History string: 2, 0"
+InformationStateString(1) = "Observing player: 1. Terminal. History string: 2, 0"
 InformationStateTensor(0): ◉
 InformationStateTensor(1): ◉
 Rewards() = [-1.0, 1.0]

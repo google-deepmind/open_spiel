@@ -84,7 +84,7 @@ action: 1
 # State 0, Message 1
 IsTerminal() = False
 History() = [0, 1]
-HistoryString() = "0 1"
+HistoryString() = "0, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -108,7 +108,7 @@ action: 0
 # State 0, Message 1, Action 0
 IsTerminal() = True
 History() = [0, 1, 0]
-HistoryString() = "0 1 0"
+HistoryString() = "0, 1, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4

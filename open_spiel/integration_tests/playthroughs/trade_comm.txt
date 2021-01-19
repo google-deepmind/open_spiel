@@ -79,7 +79,7 @@ action: 8
 # Trade history:
 IsTerminal() = False
 History() = [90, 8]
-HistoryString() = "90 8"
+HistoryString() = "90, 8"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -102,7 +102,7 @@ action: 2
 # Trade history:
 IsTerminal() = False
 History() = [90, 8, 2]
-HistoryString() = "90 8 2"
+HistoryString() = "90, 8, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -125,7 +125,7 @@ action: 51
 # Trade history: 4:1
 IsTerminal() = False
 History() = [90, 8, 2, 51]
-HistoryString() = "90 8 2 51"
+HistoryString() = "90, 8, 2, 51"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -148,7 +148,7 @@ action: 38
 # Trade history: 4:1 2:8
 IsTerminal() = True
 History() = [90, 8, 2, 51, 38]
-HistoryString() = "90 8 2 51 38"
+HistoryString() = "90, 8, 2, 51, 38"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4

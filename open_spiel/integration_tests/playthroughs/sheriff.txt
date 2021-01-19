@@ -71,7 +71,7 @@ action: 9
 # Feedback: []
 IsTerminal() = False
 History() = [3, 9]
-HistoryString() = "3 9"
+HistoryString() = "3, 9"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -91,7 +91,7 @@ action: 1
 # Feedback: [1]
 IsTerminal() = False
 History() = [3, 9, 1]
-HistoryString() = "3 9 1"
+HistoryString() = "3, 9, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -111,7 +111,7 @@ action: 9
 # Feedback: [1]
 IsTerminal() = False
 History() = [3, 9, 1, 9]
-HistoryString() = "3 9 1 9"
+HistoryString() = "3, 9, 1, 9"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -131,7 +131,7 @@ action: 0
 # Feedback: [1,0]
 IsTerminal() = False
 History() = [3, 9, 1, 9, 0]
-HistoryString() = "3 9 1 9 0"
+HistoryString() = "3, 9, 1, 9, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -151,7 +151,7 @@ action: 8
 # Feedback: [1,0]
 IsTerminal() = False
 History() = [3, 9, 1, 9, 0, 8]
-HistoryString() = "3 9 1 9 0 8"
+HistoryString() = "3, 9, 1, 9, 0, 8"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -171,7 +171,7 @@ action: 0
 # Feedback: [1,0,0]
 IsTerminal() = False
 History() = [3, 9, 1, 9, 0, 8, 0]
-HistoryString() = "3 9 1 9 0 8 0"
+HistoryString() = "3, 9, 1, 9, 0, 8, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -191,7 +191,7 @@ action: 9
 # Feedback: [1,0,0]
 IsTerminal() = False
 History() = [3, 9, 1, 9, 0, 8, 0, 9]
-HistoryString() = "3 9 1 9 0 8 0 9"
+HistoryString() = "3, 9, 1, 9, 0, 8, 0, 9"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -211,7 +211,7 @@ action: 1
 # Feedback: [1,0,0,1]
 IsTerminal() = True
 History() = [3, 9, 1, 9, 0, 8, 0, 9, 1]
-HistoryString() = "3 9 1 9 0 8 0 9 1"
+HistoryString() = "3, 9, 1, 9, 0, 8, 0, 9, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4

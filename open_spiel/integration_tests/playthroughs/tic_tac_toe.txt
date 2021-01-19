@@ -102,12 +102,12 @@ action: 3
 # ..x
 IsTerminal() = False
 History() = [8, 3]
-HistoryString() = "8 3"
+HistoryString() = "8, 3"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "8 3"
-InformationStateString(1) = "8 3"
+InformationStateString(0) = "8, 3"
+InformationStateString(1) = "8, 3"
 ObservationString(0) = "...\no..\n..x"
 ObservationString(1) = "...\no..\n..x"
 PublicObservationString() = "...\no..\n..x"
@@ -135,12 +135,12 @@ action: 6
 # x.x
 IsTerminal() = False
 History() = [8, 3, 6]
-HistoryString() = "8 3 6"
+HistoryString() = "8, 3, 6"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "8 3 6"
-InformationStateString(1) = "8 3 6"
+InformationStateString(0) = "8, 3, 6"
+InformationStateString(1) = "8, 3, 6"
 ObservationString(0) = "...\no..\nx.x"
 ObservationString(1) = "...\no..\nx.x"
 PublicObservationString() = "...\no..\nx.x"
@@ -168,12 +168,12 @@ action: 0
 # x.x
 IsTerminal() = False
 History() = [8, 3, 6, 0]
-HistoryString() = "8 3 6 0"
+HistoryString() = "8, 3, 6, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "8 3 6 0"
-InformationStateString(1) = "8 3 6 0"
+InformationStateString(0) = "8, 3, 6, 0"
+InformationStateString(1) = "8, 3, 6, 0"
 ObservationString(0) = "o..\no..\nx.x"
 ObservationString(1) = "o..\no..\nx.x"
 PublicObservationString() = "o..\no..\nx.x"
@@ -201,12 +201,12 @@ action: 2
 # x.x
 IsTerminal() = False
 History() = [8, 3, 6, 0, 2]
-HistoryString() = "8 3 6 0 2"
+HistoryString() = "8, 3, 6, 0, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "8 3 6 0 2"
-InformationStateString(1) = "8 3 6 0 2"
+InformationStateString(0) = "8, 3, 6, 0, 2"
+InformationStateString(1) = "8, 3, 6, 0, 2"
 ObservationString(0) = "o.x\no..\nx.x"
 ObservationString(1) = "o.x\no..\nx.x"
 PublicObservationString() = "o.x\no..\nx.x"
@@ -234,12 +234,12 @@ action: 1
 # x.x
 IsTerminal() = False
 History() = [8, 3, 6, 0, 2, 1]
-HistoryString() = "8 3 6 0 2 1"
+HistoryString() = "8, 3, 6, 0, 2, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "8 3 6 0 2 1"
-InformationStateString(1) = "8 3 6 0 2 1"
+InformationStateString(0) = "8, 3, 6, 0, 2, 1"
+InformationStateString(1) = "8, 3, 6, 0, 2, 1"
 ObservationString(0) = "oox\no..\nx.x"
 ObservationString(1) = "oox\no..\nx.x"
 PublicObservationString() = "oox\no..\nx.x"
@@ -267,12 +267,12 @@ action: 5
 # x.x
 IsTerminal() = True
 History() = [8, 3, 6, 0, 2, 1, 5]
-HistoryString() = "8 3 6 0 2 1 5"
+HistoryString() = "8, 3, 6, 0, 2, 1, 5"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
-InformationStateString(0) = "8 3 6 0 2 1 5"
-InformationStateString(1) = "8 3 6 0 2 1 5"
+InformationStateString(0) = "8, 3, 6, 0, 2, 1, 5"
+InformationStateString(1) = "8, 3, 6, 0, 2, 1, 5"
 ObservationString(0) = "oox\no.x\nx.x"
 ObservationString(1) = "oox\no.x\nx.x"
 PublicObservationString() = "oox\no.x\nx.x"
