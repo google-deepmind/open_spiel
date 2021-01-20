@@ -175,27 +175,30 @@ class RcfrTest(parameterized.TestCase, TestCase):
 
     expected_terminal_values = {}
     no_call_histories_p1_win = [
-        '2 0 0 0', '2 0 1 0', '0 1 1 0', '1 2 1 0', '1 0 1 0', '1 0 0 0',
-        '2 1 1 0', '2 1 0 0', '0 2 1 0'
+        '2, 0, 0, 0', '2, 0, 1, 0', '0, 1, 1, 0', '1, 2, 1, 0', '1, 0, 1, 0',
+        '1, 0, 0, 0', '2, 1, 1, 0', '2, 1, 0, 0', '0, 2, 1, 0'
     ]
     for h in no_call_histories_p1_win:
       expected_terminal_values[h] = [1., -1.]
 
     no_call_histories_p2_win = [
-        '0 2 0 1 0', '0 1 0 0', '0 1 0 1 0', '0 2 0 0', '1 2 0 0', '2 0 0 1 0',
-        '1 2 0 1 0', '2 1 0 1 0', '1 0 0 1 0'
+        '0, 2, 0, 1, 0', '0, 1, 0, 0', '0, 1, 0, 1, 0', '0, 2, 0, 0',
+        '1, 2, 0, 0', '2, 0, 0, 1, 0', '1, 2, 0, 1, 0', '2, 1, 0, 1, 0',
+        '1, 0, 0, 1, 0'
     ]
     for h in no_call_histories_p2_win:
       expected_terminal_values[h] = [-1., 1.]
 
     call_histories_p1_win = [
-        '1 0 1 1', '2 1 1 1', '2 1 0 1 1', '2 0 0 1 1', '1 0 0 1 1', '2 0 1 1'
+        '1, 0, 1, 1', '2, 1, 1, 1', '2, 1, 0, 1, 1', '2, 0, 0, 1, 1',
+        '1, 0, 0, 1, 1', '2, 0, 1, 1'
     ]
     for h in call_histories_p1_win:
       expected_terminal_values[h] = [2., -2.]
 
     call_histories_p2_win = [
-        '0 2 0 1 1', '0 1 0 1 1', '0 1 1 1', '1 2 1 1', '1 2 0 1 1', '0 2 1 1'
+        '0, 2, 0, 1, 1', '0, 1, 0, 1, 1', '0, 1, 1, 1', '1, 2, 1, 1',
+        '1, 2, 0, 1, 1', '0, 2, 1, 1'
     ]
     for h in call_histories_p2_win:
       expected_terminal_values[h] = [-2., 2.]
