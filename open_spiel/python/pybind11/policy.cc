@@ -239,8 +239,13 @@ void init_pyspiel_policy(py::module& m) {
       "for a Nash equilibrium, this value is 0).");
 
   m.def("num_deterministic_policies",
-        open_spiel::algorithms::NumDeterministicPolicies,
+        &open_spiel::algorithms::NumDeterministicPolicies,
         "Returns number of determinstic policies in this game for a player, "
         "or -1 if there are more than 2^64 - 1 policies.");
+
+  m.def("to_joint_tabular_policy", &open_spiel::ToJointTabularPolicy,
+        "Returns a merged tabular policy from a list of TabularPolicy. The "
+        "second argument is a bool which, if true, checks that there is no "
+        "overlap among all the policies.");
 }
 }  // namespace open_spiel

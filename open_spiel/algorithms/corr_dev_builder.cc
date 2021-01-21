@@ -36,7 +36,7 @@ void CorrDevBuilder::AddDeterminsticJointPolicy(const TabularPolicy& policy,
 }
 
 void CorrDevBuilder::AddSampledJointPolicy(const TabularPolicy& policy,
-                                           int num_samples) {
+                                           int num_samples, double weight) {
   for (int sample = 0; sample < num_samples; ++sample) {
     TabularPolicy sampled_policy;
     for (const auto& iter : policy.PolicyTable()) {
@@ -44,11 +44,12 @@ void CorrDevBuilder::AddSampledJointPolicy(const TabularPolicy& policy,
       sampled_policy.SetStatePolicy(
           iter.first, ToDeterministicPolicy(iter.second, sampled_action));
     }
-    AddDeterminsticJointPolicy(sampled_policy, 1.0 / num_samples);
+    AddDeterminsticJointPolicy(sampled_policy, 1.0 / num_samples * weight);
   }
 }
 
-void CorrDevBuilder::AddMixedJointPolicy(const TabularPolicy& policy) {
+void CorrDevBuilder::AddMixedJointPolicy(const TabularPolicy& policy,
+                                         double weight) {
   std::vector<int> action_indices(policy.PolicyTable().size(), 0);
   bool done = false;
   double total_prob = 0.0;
@@ -71,7 +72,7 @@ void CorrDevBuilder::AddMixedJointPolicy(const TabularPolicy& policy) {
 
     SPIEL_CHECK_PROB(prob);
     if (prob > 0.0) {
-      AddDeterminsticJointPolicy(deterministic_policy, prob);
+      AddDeterminsticJointPolicy(deterministic_policy, prob * weight);
       total_prob += prob;
     }
 
@@ -103,6 +104,23 @@ CorrelationDevice CorrDevBuilder::GetCorrelationDevice() const {
   }
   SPIEL_CHECK_TRUE(Near(sum_weight, total_weight_));
   return corr_dev;
+}
+
+CorrelationDevice SampledDeterminizeCorrDev(const CorrelationDevice& corr_dev,
+                                            int num_samples_per_policy) {
+  CorrDevBuilder cdb;
+  for (const std::pair<double, TabularPolicy>& item : corr_dev) {
+    cdb.AddSampledJointPolicy(item.second, num_samples_per_policy, item.first);
+  }
+  return cdb.GetCorrelationDevice();
+}
+
+CorrelationDevice DeterminizeCorrDev(const CorrelationDevice& corr_dev) {
+  CorrDevBuilder cdb;
+  for (const std::pair<double, TabularPolicy>& item : corr_dev) {
+    cdb.AddMixedJointPolicy(item.second, item.first);
+  }
+  return cdb.GetCorrelationDevice();
 }
 
 }  // namespace algorithms

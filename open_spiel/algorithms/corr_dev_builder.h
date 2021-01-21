@@ -48,7 +48,8 @@ class CorrDevBuilder {
   // of 1.0 / num_samples. The mixed policy should be complete: a policy should
   // be defined for every information state, otherwise the distribution will not
   // be properly built (joint policies will be incomplete).
-  void AddSampledJointPolicy(const TabularPolicy& policy, int num_samples);
+  void AddSampledJointPolicy(const TabularPolicy& policy, int num_samples,
+                             double weight = 1.0);
 
   // This function adds a mixed joint policy to the correlation device. It does
   // so by computing the probability of each deterministic joint policy by
@@ -59,7 +60,7 @@ class CorrDevBuilder {
   // be properly built (joint policies will be incomplete).
   // Important note: this is computationally expensive and should only be used
   // for small games. For larger games, used the sampled version above.
-  void AddMixedJointPolicy(const TabularPolicy& policy);
+  void AddMixedJointPolicy(const TabularPolicy& policy, double weight = 1.0);
 
   // Return the correlation device represented by this builder.
   CorrelationDevice GetCorrelationDevice() const;
@@ -73,6 +74,16 @@ class CorrDevBuilder {
   absl::flat_hash_map<std::string, double> policy_weights_;
   absl::flat_hash_map<std::string, TabularPolicy> policy_map_;
 };
+
+// Helper functions to extract a distribution over deterministic strategies
+// given a distribution over pure strategies by invoking the CorrDevBuilder
+// functions above. The first one is the sample-based version that drawns
+// a number of samples per policy (CorrDevBuilder::AddSampledJointPolicy).
+// The second one does the exact costly version
+// (CorrDevBuilder::AddMixedJointPolicy).
+CorrelationDevice SampledDeterminizeCorrDev(const CorrelationDevice& corr_dev,
+                                            int num_samples_per_policy);
+CorrelationDevice DeterminizeCorrDev(const CorrelationDevice& corr_dev);
 
 }  // namespace algorithms
 }  // namespace open_spiel

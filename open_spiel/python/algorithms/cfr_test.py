@@ -122,7 +122,7 @@ class CFRTest(parameterized.TestCase, absltest.TestCase):
     np.testing.assert_allclose(
         average_policy_values, [-1 / 18, 1 / 18], atol=1e-3)
 
-  def test_cfr_cce_dist_goofspiel(self):
+  def test_cfr_cce_ce_dist_goofspiel(self):
     """Copy of the TestCCEDistCFRGoofSpiel in corr_dist_test.cc."""
     game = pyspiel.load_game(
         "turn_based_simultaneous_game(game=goofspiel(num_cards=3,points_order="
@@ -135,16 +135,25 @@ class CFRTest(parameterized.TestCase, absltest.TestCase):
         policies.append(
             policy.python_policy_to_pyspiel_policy(cfr_solver.current_policy()))
       mu = pyspiel.uniform_correlation_device(policies)
-      cce_dist1 = pyspiel.cce_dist(game, mu)
-      print("goofspiel, cce test num_iterations: {}, cce_dist: {}".format(
-          num_iterations, cce_dist1))
+      cce_dists = pyspiel.cce_dist_per_player(game, mu)
+      print("goofspiel, cce test num_iters: {}, cce_dist: {}, per player: {}"
+            .format(num_iterations, sum(cce_dists), cce_dists))
       # Assemble the same correlation device manually, just as an example for
       # how to do non-uniform distributions of them and to test the python
       # bindings for lists of tuples works properly
       uniform_prob = 1.0 / len(policies)
       mu2 = [(uniform_prob, policy) for policy in policies]
       cce_dist2 = pyspiel.cce_dist(game, mu2)
-      self.assertAlmostEqual(cce_dist1, cce_dist2)
+      self.assertAlmostEqual(cce_dist2, sum(cce_dists))
+      # Test the CEDist function too, why not. Disable the exact one, as it
+      # takes too long for a test.
+      # ce_dist = pyspiel.ce_dist(game,
+      #                           pyspiel.determinize_corr_dev(mu))
+      ce_dists = pyspiel.ce_dist_per_player(
+          game, pyspiel.sampled_determinize_corr_dev(mu, 100))
+      ce_dist = sum(ce_dists)
+      print("goofspiel, ce test num_iters: {}, ce_dist: {}, per player: {}"
+            .format(num_iterations, ce_dist, ce_dists))
 
   @parameterized.parameters(
       list(itertools.product([True, False], [True, False], [True, False])))

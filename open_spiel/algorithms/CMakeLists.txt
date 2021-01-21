@@ -17,6 +17,8 @@ add_library (algorithms OBJECT
   corr_dist/efce.h
   corr_dist/cce.cc
   corr_dist/cce.h
+  corr_dist/ce.cc
+  corr_dist/ce.h
   corr_dev_builder.cc
   corr_dev_builder.h
   deterministic_policy.cc
@@ -29,6 +31,8 @@ add_library (algorithms OBJECT
   external_sampling_mccfr.h
   get_all_histories.cc
   get_all_histories.h
+  get_all_infostates.cc
+  get_all_infostates.h
   get_all_states.cc
   get_all_states.h
   get_legal_actions_map.cc

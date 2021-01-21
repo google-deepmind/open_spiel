@@ -363,13 +363,27 @@ TabularPolicy GetPrefActionPolicy(
   return TabularPolicy(policy);
 }
 
-
 std::string PrintPolicy(const ActionsAndProbs& policy) {
   std::string policy_string;
   for (auto [a, p] : policy) {
     absl::StrAppend(&policy_string, absl::StrFormat("(%i, %f), ", a, p));
   }
   return policy_string;
+}
+
+TabularPolicy ToJointTabularPolicy(const std::vector<TabularPolicy>& policies,
+                                   bool check_no_overlap) {
+  TabularPolicy joint_policy;
+  for (const TabularPolicy& policy : policies) {
+    if (check_no_overlap) {
+      for (const auto& key_and_val : policy.PolicyTable()) {
+        SPIEL_CHECK_TRUE(joint_policy.PolicyTable().find(key_and_val.first) ==
+                         joint_policy.PolicyTable().end());
+      }
+    }
+    joint_policy.ImportPolicy(policy);
+  }
+  return joint_policy;
 }
 
 }  // namespace open_spiel

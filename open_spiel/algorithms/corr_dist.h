@@ -146,10 +146,25 @@ double CCEDist(const Game& game, const NormalFormCorrelationDevice& mu);
 // Distance to coarse-correlated in an extensive-form game. Builds a simpler
 // auxiliary game similar to the *FCCE where there is one chance node that
 // determines which policies the opponents follow (never revealed). Note that
-// the policies in this correlation device *can* be mixed.
+// the policies in this correlation device *can* be mixed. If values is
+// non-null, then it is filled with the deviation incentive of each player.
 double CCEDist(const Game& game, const CorrelationDevice& mu);
 
-// TODO(author5): provide a similar function CEDist for extensive-form games.
+// Distance to a correlated equilibrium in an extensive-form game. Builds a
+// simpler auxiliary game similar to the *FCE ones where there is a chance node
+// that determines the joint recommendation strategies. The correlation device
+// must be a distribution over deterministic policies; if you have distribution
+// over mixed policies, then first convert the correlation device using the
+// helper functions DeterminizeCorrDev or SampledDeterminizeCorrDev in
+// corr_dev_builder.h. If values is non-null, then it is filled with the
+// deviation incentive of each player.
+double CEDist(const Game& game, const CorrelationDevice& mu);
+// Same as the functions above except return per-player incentives to deviate.
+
+std::vector<double> CCEDistPerPlayer(const Game& game,
+                                     const CorrelationDevice& mu);
+std::vector<double> CEDistPerPlayer(const Game& game,
+                                    const CorrelationDevice& mu);
 
 }  // namespace algorithms
 }  // namespace open_spiel

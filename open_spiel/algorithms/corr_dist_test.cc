@@ -18,6 +18,7 @@
 #include <unordered_map>
 
 #include "open_spiel/algorithms/cfr.h"
+#include "open_spiel/algorithms/corr_dev_builder.h"
 #include "open_spiel/game_transforms/turn_based_simultaneous_game.h"
 #include "open_spiel/games/efg_game.h"
 #include "open_spiel/games/efg_game_data.h"
@@ -341,7 +342,7 @@ void TestGreenwaldSarfatiExample2() {
   SPIEL_CHECK_GT(CEDist(*eg2_matrix_game, mu_nfg), 0.0);
 }
 
-void TestCCEDistCFRGoofSpiel() {
+void TestCCECEDistCFRGoofSpiel() {
   std::shared_ptr<const Game> game = LoadGame(
       "turn_based_simultaneous_game(game=goofspiel(num_cards=3,points_order="
       "descending,returns_type=total_points))");
@@ -361,9 +362,18 @@ void TestCCEDistCFRGoofSpiel() {
       policies.push_back(current_policy);
     }
 
-    double cce_dist = CCEDist(*game, UniformCorrelationDevice(policies));
+    CorrelationDevice mu = UniformCorrelationDevice(policies);
+    double cce_dist = CCEDist(*game, mu);
     std::cout << "num_iterations: " << num_iterations
               << ", cce_dist: " << cce_dist << std::endl;
+
+    // Disabled in test because it's really slow.
+    // double ce_dist = CEDist(*game, DeterminizeCorrDev(mu));
+    // std::cout << "num_iterations: " << num_iterations
+    //          << ", approximate ce_dist: " << ce_dist << std::endl;
+    double ce_dist = CEDist(*game, SampledDeterminizeCorrDev(mu, 100));
+    std::cout << "num_iterations: " << num_iterations
+              << ", approximate ce_dist: " << ce_dist << std::endl;
   }
 }
 }  // namespace
@@ -382,5 +392,5 @@ int main(int argc, char** argv) {
   algorithms::Test1PInOutGame();
   algorithms::TestGreenwaldSarfatiExample1();
   algorithms::TestGreenwaldSarfatiExample2();
-  algorithms::TestCCEDistCFRGoofSpiel();
+  algorithms::TestCCECEDistCFRGoofSpiel();
 }

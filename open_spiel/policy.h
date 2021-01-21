@@ -318,6 +318,12 @@ TabularPolicy GetPrefActionPolicy(
 
 std::string PrintPolicy(const ActionsAndProbs& policy);
 
+// Takes many tabular policy and merges them into one. If check_no_overlap is
+// set, then a check is done to ensure that there is no intersection among the
+// policies (slow: involves iterating over each).
+TabularPolicy ToJointTabularPolicy(const std::vector<TabularPolicy>& policies,
+                                   bool check_no_overlap);
+
 }  // namespace open_spiel
 
 #endif  // OPEN_SPIEL_POLICY_H_
