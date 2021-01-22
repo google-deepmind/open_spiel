@@ -28,27 +28,30 @@ namespace {
 constexpr int kDefaultPlayers = 2;
 constexpr int kDefaultNumDice = 1;
 constexpr int kDefaultDiceSides = 6;  // Number of sides on the dice.
+constexpr const char* kDefaultBiddingRule = "reset-face";
 constexpr int kInvalidOutcome = -1;
 constexpr int kInvalidBid = -1;
 
 // Facts about the game
-const GameType kGameType{/*short_name=*/"liars_dice",
-                         /*long_name=*/"Liars Dice",
-                         GameType::Dynamics::kSequential,
-                         GameType::ChanceMode::kExplicitStochastic,
-                         GameType::Information::kImperfectInformation,
-                         GameType::Utility::kZeroSum,
-                         GameType::RewardModel::kTerminal,
-                         /*max_num_players=*/kDefaultPlayers,
-                         /*min_num_players=*/kDefaultPlayers,
-                         /*provides_information_state_string=*/true,
-                         /*provides_information_state_tensor=*/true,
-                         /*provides_observation_string=*/false,
-                         /*provides_observation_tensor=*/true,
-                         /*parameter_specification=*/
-                         {{"players", GameParameter(kDefaultPlayers)},
-                          {"numdice", GameParameter(kDefaultNumDice)},
-                          {"dice_sides", GameParameter(kDefaultDiceSides)}}};
+const GameType kGameType{
+    /*short_name=*/"liars_dice",
+    /*long_name=*/"Liars Dice",
+    GameType::Dynamics::kSequential,
+    GameType::ChanceMode::kExplicitStochastic,
+    GameType::Information::kImperfectInformation,
+    GameType::Utility::kZeroSum,
+    GameType::RewardModel::kTerminal,
+    /*max_num_players=*/kDefaultPlayers,
+    /*min_num_players=*/kDefaultPlayers,
+    /*provides_information_state_string=*/true,
+    /*provides_information_state_tensor=*/true,
+    /*provides_observation_string=*/false,
+    /*provides_observation_tensor=*/true,
+    /*parameter_specification=*/
+    {{"players", GameParameter(kDefaultPlayers)},
+     {"numdice", GameParameter(kDefaultNumDice)},
+     {"dice_sides", GameParameter(kDefaultDiceSides)},
+     {"bidding_rule", GameParameter(kDefaultBiddingRule)}}};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new LiarsDiceGame(params));
@@ -59,7 +62,8 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 
 LiarsDiceState::LiarsDiceState(std::shared_ptr<const Game> game,
                                int total_num_dice, int max_dice_per_player,
-                               const std::vector<int>& num_dice, int dice_sides)
+                               const std::vector<int>& num_dice, int dice_sides,
+                               BiddingRule bidding_rule)
     : State(game),
       cur_player_(kChancePlayerId),  // chance starts
       cur_roller_(0),                // first player starts rolling
@@ -75,6 +79,7 @@ LiarsDiceState::LiarsDiceState(std::shared_ptr<const Game> game,
       num_dice_(num_dice),
       num_dice_rolled_(game->NumPlayers(), 0),
       dice_sides_(dice_sides),
+      bidding_rule_(bidding_rule),
       bidseq_(),
       bidseq_str_() {
   for (int const& num_dices : num_dice_) {
@@ -371,31 +376,57 @@ std::pair<int, int> LiarsDiceState::GetQuantityFace(int bidnum) const {
   SPIEL_CHECK_NE(bidnum, kInvalidBid);
   SPIEL_CHECK_GE(bidnum, 0);
   SPIEL_CHECK_LT(bidnum, dice_sides_ * total_num_dice_);
-  // Bids have the form <face>-<quantity>
-  //
-  // So, in a two-player game where each die has 6 faces, we have
-  //
-  // Bid ID    Quantity   Face
-  // 0         1          1
-  // 1         2          1
-  // 2         1          2
-  // 3         2          2
-  // ...
-  // 9         2          5
-  // 10        1          6
-  // 11        2          6
-  //
-  // Bid ID #dice * #num faces encodes the special "liar" action.
-  //
-  // This particular encoding scheme allows for very cheap comparison of bids:
-  // a bid is stronger if it is encoded to a higher ID.
 
-  // The quantity occupies the lower bits, so it can be extracted using a
-  // modulo operation.
-  bid.first = 1 + (bidnum % total_num_dice_);
-  // The face occupies the higher bits, so it can be extracted using an integer
-  // division.
-  bid.second = bidnum / total_num_dice_ + 1;
+  if (bidding_rule_ == BiddingRule::kResetFace) {
+    // Bids have the form <quantity>-<face>
+    //
+    // So, in a two-player game where each die has 6 faces, we have
+    //
+    // Bid ID    Quantity   Face
+    // 0         1          1
+    // 1         1          2
+    // ...
+    // 5         1          6
+    // 6         2          1
+    // ...
+    // 11        2          6
+    //
+    // Bid ID #dice * #num faces encodes the special "liar" action.
+
+    // The quantity occupies the higher bits, so it can be extracted using an
+    // integer division operation.
+    bid.first = bidnum / dice_sides_ + 1;
+    // The face occupies the lower bits, so it can be extraced using a modulo
+    // operation.
+    bid.second = 1 + (bidnum % dice_sides_);
+  } else {
+    SPIEL_CHECK_EQ(bidding_rule_, BiddingRule::kResetQuantity);
+    // Bids have the form <face>-<quantity>
+    //
+    // So, in a two-player game where each die has 6 faces, we have
+    //
+    // Bid ID    Quantity   Face
+    // 0         1          1
+    // 1         2          1
+    // 2         1          2
+    // 3         2          2
+    // ...
+    // 9         2          5
+    // 10        1          6
+    // 11        2          6
+    //
+    // Bid ID #dice * #num faces encodes the special "liar" action.
+    //
+    // This particular encoding scheme allows for very cheap comparison of bids:
+    // a bid is stronger if it is encoded to a higher ID.
+
+    // The quantity occupies the lower bits, so it can be extracted using a
+    // modulo operation.
+    bid.first = 1 + (bidnum % total_num_dice_);
+    // The face occupies the higher bits, so it can be extracted using an
+    // integer division.
+    bid.second = bidnum / total_num_dice_ + 1;
+  }
 
   SPIEL_CHECK_GE(bid.first, 1);
   // It doesn't make sense to bid more dice than the number of dice in the game.
@@ -443,6 +474,15 @@ LiarsDiceGame::LiarsDiceGame(const GameParameters& params)
       max_dice_per_player_ = nd;
     }
   }
+
+  std::string bidding_rule_str = ParameterValue<std::string>("bidding_rule");
+  SPIEL_CHECK_TRUE(bidding_rule_str == "reset-face" ||
+                   bidding_rule_str == "reset-quantity");
+  if (bidding_rule_str == "reset-face") {
+    bidding_rule_ = BiddingRule::kResetFace;
+  } else {
+    bidding_rule_ = BiddingRule::kResetQuantity;
+  }
 }
 
 int LiarsDiceGame::NumDistinctActions() const {
@@ -455,7 +495,8 @@ std::unique_ptr<State> LiarsDiceGame::NewInitialState() const {
                          /*total_num_dice=*/total_num_dice_,
                          /*max_dice_per_player=*/max_dice_per_player_,
                          /*num_dice=*/num_dice_,
-                         /*dice_sides=*/dice_sides_));
+                         /*dice_sides=*/dice_sides_,
+                         /*bidding_rule=*/bidding_rule_));
   return state;
 }
 

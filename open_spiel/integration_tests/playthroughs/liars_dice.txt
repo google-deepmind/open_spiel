@@ -6,7 +6,7 @@ GameType.information = Information.IMPERFECT_INFORMATION
 GameType.long_name = "Liars Dice"
 GameType.max_num_players = 2
 GameType.min_num_players = 2
-GameType.parameter_specification = ["dice_sides", "numdice", "players"]
+GameType.parameter_specification = ["bidding_rule", "dice_sides", "numdice", "players"]
 GameType.provides_information_state_string = True
 GameType.provides_information_state_tensor = True
 GameType.provides_observation_string = False
@@ -19,7 +19,7 @@ GameType.utility = Utility.ZERO_SUM
 NumDistinctActions() = 13
 PolicyTensorShape() = [13]
 MaxChanceOutcomes() = 6
-GetParameters() = {dice_sides=6,numdice=1,players=2}
+GetParameters() = {bidding_rule=reset-face,dice_sides=6,numdice=1,players=2}
 NumPlayers() = 2
 MinUtility() = -1.0
 MaxUtility() = 1.0
@@ -51,66 +51,88 @@ ChanceOutcomes() = [{0, 0.166666666667}, {1, 0.166666666667}, {2, 0.166666666667
 LegalActions() = [0, 1, 2, 3, 4, 5]
 StringLegalActions() = ["Roll 1", "Roll 2", "Roll 3", "Roll 4", "Roll 5", "Roll 6"]
 
-# Apply action "Roll 6"
-action: 5
+# Apply action "Roll 2"
+action: 1
 
 # State 1
-# 6 -1 - chance node, current roller is player 1
+# 2 -1 - chance node, current roller is player 1
 IsTerminal() = False
-History() = [5]
-HistoryString() = "5"
+History() = [1]
+HistoryString() = "1"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
-InformationStateString(0) = "6"
+InformationStateString(0) = "2"
 InformationStateString(1) = "-1"
-InformationStateTensor(0): ◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(0): ◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(0): ◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(0): ◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ChanceOutcomes() = [{0, 0.166666666667}, {1, 0.166666666667}, {2, 0.166666666667}, {3, 0.166666666667}, {4, 0.166666666667}, {5, 0.166666666667}]
 LegalActions() = [0, 1, 2, 3, 4, 5]
 StringLegalActions() = ["Roll 1", "Roll 2", "Roll 3", "Roll 4", "Roll 5", "Roll 6"]
 
-# Apply action "Roll 1"
-action: 0
+# Apply action "Roll 2"
+action: 1
 
 # State 2
-# 6 1
+# 2 2
 IsTerminal() = False
-History() = [5, 0]
-HistoryString() = "5 0"
+History() = [1, 1]
+HistoryString() = "1 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "6"
-InformationStateString(1) = "1"
-InformationStateTensor(0): ◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯
-InformationStateTensor(1): ◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(0): ◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(1): ◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateString(0) = "2"
+InformationStateString(1) = "2"
+InformationStateTensor(0): ◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(1): ◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(0): ◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(1): ◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
-StringLegalActions() = ["1-1", "2-1", "1-2", "2-2", "1-3", "2-3", "1-4", "2-4", "1-5", "2-5", "1-6", "2-6"]
+StringLegalActions() = ["1-1", "1-2", "1-3", "1-4", "1-5", "1-6", "2-1", "2-2", "2-3", "2-4", "2-5", "2-6"]
 
-# Apply action "1-6"
-action: 10
+# Apply action "1-2"
+action: 1
 
 # State 3
-# 6 1 1-6
+# 2 2 1-2
 IsTerminal() = False
-History() = [5, 0, 10]
-HistoryString() = "5 0 10"
+History() = [1, 1, 1]
+HistoryString() = "1 1 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "6 1-6"
-InformationStateString(1) = "1 1-6"
-InformationStateTensor(0): ◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◯◯
-InformationStateTensor(1): ◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯
-ObservationTensor(0): ◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◯◯
-ObservationTensor(1): ◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯
+InformationStateString(0) = "2 1-2"
+InformationStateString(1) = "2 1-2"
+InformationStateTensor(0): ◉◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(1): ◯◉◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(0): ◉◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(1): ◯◉◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+StringLegalActions() = ["1-3", "1-4", "1-5", "1-6", "2-1", "2-2", "2-3", "2-4", "2-5", "2-6", "Liar"]
+
+# Apply action "2-5"
+action: 10
+
+# State 4
+# 2 2 1-2 2-5
+IsTerminal() = False
+History() = [1, 1, 1, 10]
+HistoryString() = "1 1 1 10"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "2 1-2 2-5"
+InformationStateString(1) = "2 1-2 2-5"
+InformationStateTensor(0): ◉◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯
+InformationStateTensor(1): ◯◉◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯
+ObservationTensor(0): ◉◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯
+ObservationTensor(1): ◯◉◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [11, 12]
@@ -119,20 +141,20 @@ StringLegalActions() = ["2-6", "Liar"]
 # Apply action "2-6"
 action: 11
 
-# State 4
-# 6 1 1-6 2-6
+# State 5
+# 2 2 1-2 2-5 2-6
 IsTerminal() = False
-History() = [5, 0, 10, 11]
-HistoryString() = "5 0 10 11"
+History() = [1, 1, 1, 10, 11]
+HistoryString() = "1 1 1 10 11"
 IsChanceNode() = False
 IsSimultaneousNode() = False
-CurrentPlayer() = 0
-InformationStateString(0) = "6 1-6 2-6"
-InformationStateString(1) = "1 1-6 2-6"
-InformationStateTensor(0): ◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◉◯
-InformationStateTensor(1): ◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯
-ObservationTensor(0): ◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◉◯
-ObservationTensor(1): ◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯
+CurrentPlayer() = 1
+InformationStateString(0) = "2 1-2 2-5 2-6"
+InformationStateString(1) = "2 1-2 2-5 2-6"
+InformationStateTensor(0): ◉◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◉◯
+InformationStateTensor(1): ◯◉◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◉◯
+ObservationTensor(0): ◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯
+ObservationTensor(1): ◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [12]
@@ -141,19 +163,19 @@ StringLegalActions() = ["Liar"]
 # Apply action "Liar"
 action: 12
 
-# State 5
-# 6 1 1-6 2-6 Liar
+# State 6
+# 2 2 1-2 2-5 2-6 Liar
 IsTerminal() = True
-History() = [5, 0, 10, 11, 12]
-HistoryString() = "5 0 10 11 12"
+History() = [1, 1, 1, 10, 11, 12]
+HistoryString() = "1 1 1 10 11 12"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
-InformationStateString(0) = "6 1-6 2-6 Liar"
-InformationStateString(1) = "1 1-6 2-6 Liar"
-InformationStateTensor(0): ◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◉◉
-InformationStateTensor(1): ◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉
-ObservationTensor(0): ◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◉
-ObservationTensor(1): ◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉
-Rewards() = [1.0, -1.0]
-Returns() = [1.0, -1.0]
+InformationStateString(0) = "2 1-2 2-5 2-6 Liar"
+InformationStateString(1) = "2 1-2 2-5 2-6 Liar"
+InformationStateTensor(0): ◉◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◉◉
+InformationStateTensor(1): ◯◉◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◉◉
+ObservationTensor(0): ◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉
+ObservationTensor(1): ◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉
+Rewards() = [-1.0, 1.0]
+Returns() = [-1.0, 1.0]

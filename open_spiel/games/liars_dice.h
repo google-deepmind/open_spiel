@@ -36,13 +36,26 @@
 namespace open_spiel {
 namespace liars_dice {
 
+enum BiddingRule {
+  // The player may bid a higher quantity of any particular face, or the same
+  // quantity of a higher face (allowing a player to "re-assert" a face value
+  // they believe prevalent if another player increased the face value on their
+  // bid).
+  kResetFace = 1,
+
+  // The player may bid a higher quantity of the same face, or any particular
+  // quantity of a higher face (allowing a player to "reset" the quantity).
+  kResetQuantity = 2
+};
+
 class LiarsDiceGame;
 
 class LiarsDiceState : public State {
  public:
   explicit LiarsDiceState(std::shared_ptr<const Game> game, int total_num_dice,
                           int max_dice_per_player,
-                          const std::vector<int>& num_dice, int dice_sides);
+                          const std::vector<int>& num_dice, int dice_sides,
+                          BiddingRule bidding_rule);
   LiarsDiceState(const LiarsDiceState&) = default;
 
   void Reset(const GameParameters& params);
@@ -87,6 +100,7 @@ class LiarsDiceState : public State {
   std::vector<int> num_dice_;         // How many dice each player has.
   std::vector<int> num_dice_rolled_;  // Number of dice currently rolled.
   int dice_sides_;                    // Number of faces on each die.
+  BiddingRule bidding_rule_;
 
   // Used to encode the information state.
   std::vector<int> bidseq_;
@@ -125,6 +139,7 @@ class LiarsDiceGame : public Game {
   std::vector<int> num_dice_;  // How many dice each player has.
   int max_dice_per_player_;    // Maximum value in num_dice_ vector.
   int dice_sides_;             // Number of faces on each die.
+  BiddingRule bidding_rule_;
 };
 }  // namespace liars_dice
 }  // namespace open_spiel
