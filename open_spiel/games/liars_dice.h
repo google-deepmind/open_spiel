@@ -31,6 +31,7 @@
 //   "players"     int    number of players                      (default = 2)
 //   "numdice"     int    number of dice per player              (default = 1)
 //   "numdiceX"    int    overridden number of dice for player X (default = 1)
+//   "dice_sides"  int    number of sides on each die            (default = 6)
 
 namespace open_spiel {
 namespace liars_dice {
@@ -41,7 +42,7 @@ class LiarsDiceState : public State {
  public:
   explicit LiarsDiceState(std::shared_ptr<const Game> game, int total_num_dice,
                           int max_dice_per_player,
-                          const std::vector<int>& num_dice);
+                          const std::vector<int>& num_dice, int dice_sides);
   LiarsDiceState(const LiarsDiceState&) = default;
 
   void Reset(const GameParameters& params);
@@ -65,6 +66,10 @@ class LiarsDiceState : public State {
  private:
   void ResolveWinner();
 
+  // Get the quantity and face of the bid from an integer.
+  // The bids starts at 0 and go to total_dice*dice_sides-1 (inclusive).
+  std::pair<int, int> GetQuantityFace(int bid) const;
+
   // Initialized to invalid values. Use Game::NewInitialState().
   Player cur_player_;  // Player whose turn it is.
   int cur_roller_;     // Player currently rolling dice.
@@ -81,6 +86,7 @@ class LiarsDiceState : public State {
   std::vector<std::vector<int>> dice_outcomes_;
   std::vector<int> num_dice_;         // How many dice each player has.
   std::vector<int> num_dice_rolled_;  // Number of dice currently rolled.
+  int dice_sides_;                    // Number of faces on each die.
 
   // Used to encode the information state.
   std::vector<int> bidseq_;
@@ -109,10 +115,6 @@ class LiarsDiceGame : public Game {
   // Return the total number of dice in the game.
   int total_num_dice() const { return total_num_dice_; }
 
-  // Get the quantity and face of the bid from an integer.
-  // The bids starts at 1 and go to total_dice*6+1.
-  static std::pair<int, int> GetQuantityFace(int bid, int total_dice);
-
  private:
   // Number of players.
   int num_players_;
@@ -122,8 +124,8 @@ class LiarsDiceGame : public Game {
 
   std::vector<int> num_dice_;  // How many dice each player has.
   int max_dice_per_player_;    // Maximum value in num_dice_ vector.
+  int dice_sides_;             // Number of faces on each die.
 };
-
 }  // namespace liars_dice
 }  // namespace open_spiel
 
