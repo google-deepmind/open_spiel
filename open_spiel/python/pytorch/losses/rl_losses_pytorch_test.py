@@ -27,7 +27,6 @@ from torch.testing._internal.common_utils import run_tests, TestCase
 import rl_losses
 
 
-
 class RLLossesTest(parameterized.TestCase, TestCase):
 
   @parameterized.named_parameters(('no_entropy_cost', 0.),
@@ -101,7 +100,6 @@ class RLLossesTest(parameterized.TestCase, TestCase):
     expected_policy_loss = (-0.3662 + 0.04746) / 2
     expected_total_loss = (
         expected_policy_loss + entropy_cost * expected_policy_entropy)
-    
     np.testing.assert_allclose(
           total_loss, expected_total_loss, atol=1e-4)
 

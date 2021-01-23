@@ -47,7 +47,7 @@ def _assert_rank_and_shape_compatibility(tensors, rank):
 def compute_baseline(policy, action_values):
   # V = pi * Q, backprop through pi but not Q.
   return torch.sum(
-      torch.mul(policy, action_values.detach()), axis=1)
+      torch.mul(policy, action_values.detach()), dim=1)
 
 
 def compute_regrets(policy_logits, action_values):
@@ -60,7 +60,7 @@ def compute_regrets(policy_logits, action_values):
   baseline = compute_baseline(policy, action_values)
 
   regrets = torch.sum(
-      F.relu(action_values - torch.unsqueeze(baseline, 1)), axis=1)
+      F.relu(action_values - torch.unsqueeze(baseline, 1)), dim=1)
 
   return regrets
 
@@ -80,20 +80,20 @@ def compute_advantages(policy_logits, action_values, use_relu=False):
 
   # Compute advantage weighted by policy.
   policy_advantages = -torch.mul(policy, advantages.detach())
-  return torch.sum(policy_advantages, axis=1)
+  return torch.sum(policy_advantages, dim=1)
 
 
 def compute_a2c_loss(policy_logits, actions, advantages):
-  cross_entropy = F.cross_entropy(policy_logits, actions)
+  cross_entropy = F.cross_entropy(policy_logits, actions, reduction='none')
   advantages = advantages.detach()
-  #if advantages.shape != cross_entropy.shape:
-  #  raise ValueError("Shapes %s and %s are not compatible" % (advantages.shape, cross_entropy.shape))
+  if advantages.ndim != cross_entropy.ndim:
+    raise ValueError("Shapes %s and %s are not compatible" % (advantages.ndim, cross_entropy.ndim))
   return torch.mul(cross_entropy, advantages)
 
 
 def compute_entropy(policy_logits):
   return torch.sum(
-      -F.softmax(policy_logits) * F.log_softmax(policy_logits), axis=-1)
+      -F.softmax(policy_logits, dim=1) * F.log_softmax(policy_logits, dim=1), dim=-1)
 
 
 class BatchQPGLoss(object):
@@ -116,7 +116,7 @@ class BatchQPGLoss(object):
     _assert_rank_and_shape_compatibility([policy_logits, action_values], 2)
     advantages = compute_advantages(policy_logits, action_values)
     _assert_rank_and_shape_compatibility([advantages], 1)
-    total_adv = torch.mean(advantages, axis=0)
+    total_adv = torch.mean(advantages, dim=0)
 
     total_loss = total_adv
     if self._entropy_cost:
@@ -148,7 +148,7 @@ class BatchRMLoss(object):
     _assert_rank_and_shape_compatibility([policy_logits, action_values], 2)
     advantages = compute_advantages(policy_logits, action_values, use_relu=True)
     _assert_rank_and_shape_compatibility([advantages], 1)
-    total_adv = torch.mean(advantages, axis=0)
+    total_adv = torch.mean(advantages, dim=0)
 
     total_loss = total_adv
     if self._entropy_cost:
@@ -181,7 +181,7 @@ class BatchRPGLoss(object):
     _assert_rank_and_shape_compatibility([policy_logits, action_values], 2)
     regrets = compute_regrets(policy_logits, action_values)
     _assert_rank_and_shape_compatibility([regrets], 1)
-    total_regret = torch.mean(regrets, axis=0)
+    total_regret = torch.mean(regrets, dim=0)
 
     total_loss = total_regret
     if self._entropy_cost:
@@ -218,7 +218,7 @@ class BatchA2CLoss(object):
     advantages = returns - baseline
 
     policy_loss = compute_a2c_loss(policy_logits, actions, advantages)
-    total_loss = torch.mean(policy_loss, axis=0)
+    total_loss = torch.mean(policy_loss, dim=0)
     if self._entropy_cost:
       policy_entropy = torch.mean(compute_entropy(policy_logits))
       entropy_loss = torch.mul(
