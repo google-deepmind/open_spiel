@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for open_spiel.python.algorithms.losses.rl_losses."""
+"""Tests for open_spiel.python.pytorch.losses.rl_losses."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -23,8 +23,7 @@ import numpy as np
 import torch
 from torch.testing._internal.common_utils import run_tests, TestCase
 
-#from open_spiel.python.pytorch.losses import rl_losses
-import rl_losses
+from open_spiel.python.pytorch.losses import rl_losses
 
 
 class RLLossesTest(parameterized.TestCase, TestCase):
@@ -78,7 +77,7 @@ class RLLossesTest(parameterized.TestCase, TestCase):
     expected_policy_loss = (1.0 + 1.0) / 2
     expected_total_loss = (
         expected_policy_loss + entropy_cost * expected_policy_entropy)
-    
+
     np.testing.assert_allclose(
           total_loss, expected_total_loss, atol=1e-4)
 

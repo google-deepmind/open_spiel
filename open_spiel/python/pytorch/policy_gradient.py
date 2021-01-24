@@ -65,7 +65,7 @@ The algorithm can be found in the textbook:
 https://incompleteideas.net/book/RLbook2018.pdf under the chapter on
 `Policy Gradients`.
 
-See  open_spiel/python/algorithms/losses/rl_losses_test.py for an example of the
+See  open_spiel/python/pytorch/losses/rl_losses_test.py for an example of the
 loss computation.
 """
 
@@ -83,8 +83,7 @@ import torch.optim as optim
 
 from open_spiel.python import rl_agent
 from open_spiel.python.pytorch.dqn import SonnetLinear
-#from open_spiel.python.pytorch.losses import rl_losses
-from losses import rl_losses
+from open_spiel.python.pytorch.losses import rl_losses
 
 
 
@@ -121,30 +120,8 @@ class MLPTorso(nn.Module):
       x = layer(x)
     return x
 
-class Sequential(nn.Module):
-  """A simple sequential module.
-
-  Always includes biases and only supports ReLU activations.
-  """
-
-  def __init__(self, layers):
-    """Creates a model from successively applying layers.
-
-    Args:
-      layers: Iterable[nn.Module] that can be applied.
-    """
-
-    super(Sequential, self).__init__()
-    self._layers = layers
-
-  def forward(self, tensor):
-    for layer in self._layers:
-      tensor = layer(tensor)
-    return tensor
-
-
 class PolicyGradient(rl_agent.AbstractAgent):
-  """RPG Agent implementation in TensorFlow.
+  """RPG Agent implementation in PyTorch.
 
   See open_spiel/python/examples/single_agent_catch.py for an usage example.
   """
@@ -231,8 +208,8 @@ class PolicyGradient(rl_agent.AbstractAgent):
         activate_relu=False)
     # Do not remove policy_logits_network. Even if it's not used directly here,
     # other code outside this file refers to it.
-    self.policy_logits_network = Sequential(
-        [self._net_torso, self._policy_logits_layer])
+    self.policy_logits_network = nn.Sequential(
+        self._net_torso, self._policy_logits_layer)
 
     self._savers = []
 
@@ -247,23 +224,23 @@ class PolicyGradient(rl_agent.AbstractAgent):
     if loss_class.__name__ == "BatchA2CLoss":
       self._baseline_layer = SonnetLinear(
           torso_out_size, 1, activate_relu=False)
-      self._critic_network = self._net_torso.model.append(
-          self._baseline_layer)
+      self._critic_network = nn.Sequential(
+        self._net_torso, self._baseline_layer)
     else:
       self._q_values_layer = SonnetLinear(
           torso_out_size,
           self._num_actions,
           activate_relu=False)
-      self._critic_network = self._net_torso.model.append(
-          self._q_values_layer)
+      self._critic_network = nn.Sequential(
+        self._net_torso, self._q_values_layer)
 
-    self._critic_optimizer(
+    self._critic_optimizer = self._critic_optimizer(
         self._critic_network.parameters(), lr=critic_learning_rate)
 
     # Pi loss
     self.pg_class = loss_class(entropy_cost=entropy_cost)
-    self._pi_network = self._net_torso.model.append(
-        self._policy_logits_layer)
+    self._pi_network = nn.Sequential(
+        self._net_torso, self._policy_logits_layer)
     if optimizer_str == "adam":
       self._pi_optimizer = optim.Adam(
           self._pi_network.parameters(),
@@ -297,7 +274,7 @@ class PolicyGradient(rl_agent.AbstractAgent):
     info_state = torch.Tensor(np.reshape(info_state, [1, -1]))
     torso_out = self._net_torso(info_state)
     self._policy_logits = self._policy_logits_layer(torso_out)
-    policy_probs = F.softmax(self._policy_logits).detach()
+    policy_probs = F.softmax(self._policy_logits, dim=1).detach()
 
     # Remove illegal actions, re-normalize probs
     probs = np.zeros(self._num_actions)
@@ -369,27 +346,23 @@ class PolicyGradient(rl_agent.AbstractAgent):
     return checkpoint_filename + "_latest"
 
   def save(self, checkpoint_dir):
-    for name, saver in self._savers:
-      path = saver.save(
-          self._session,
-          self._full_checkpoint_name(checkpoint_dir, name),
-          latest_filename=self._latest_checkpoint_filename(name))
-      logging.info("saved to path: %s", path)
+    for name, model in self._savers:
+      path = self._full_checkpoint_name(checkpoint_dir, name)
+      torch.save(model.state_dict(), path)
+      logging.info("Saved to path: %s", path)
 
   def has_checkpoint(self, checkpoint_dir):
     for name, _ in self._savers:
-      if tf.train.latest_checkpoint(
-          self._full_checkpoint_name(checkpoint_dir, name),
-          os.path.join(checkpoint_dir,
-                       self._latest_checkpoint_filename(name))) is None:
-        return False
-    return True
+      path = self._full_checkpoint_name(checkpoint_dir, name)
+      if os.path.exists(path):
+        return True
+    return False
 
   def restore(self, checkpoint_dir):
-    for name, saver in self._savers:
+    for name, model in self._savers:
       full_checkpoint_dir = self._full_checkpoint_name(checkpoint_dir, name)
       logging.info("Restoring checkpoint: %s", full_checkpoint_dir)
-      saver.restore(self._session, full_checkpoint_dir)
+      model.load_state_dict(torch.load(full_checkpoint_dir))
 
   @property
   def loss(self):
@@ -449,7 +422,7 @@ class PolicyGradient(rl_agent.AbstractAgent):
     action = torch.LongTensor(self._dataset["actions"])
     return_ =  torch.Tensor(self._dataset["returns"])
     torso_out = self._net_torso(info_state)
-    
+
 
     # Critic loss
     # Baseline loss in case of A2C
@@ -488,7 +461,8 @@ class PolicyGradient(rl_agent.AbstractAgent):
     action = torch.LongTensor(self._dataset["actions"])
     return_ =  torch.Tensor(self._dataset["returns"])
     torso_out = self._net_torso(info_state)
-    
+    self._policy_logits = self._policy_logits_layer(torso_out)
+
     if self._loss_class.__name__ == "BatchA2CLoss":
       baseline = torch.squeeze(self._baseline_layer(torso_out), dim=1)
       pi_loss = self.pg_class.loss(
@@ -508,50 +482,17 @@ class PolicyGradient(rl_agent.AbstractAgent):
           self._q_values_layer,
           self._pi_optimizer,
           pi_loss)
-
     self._last_pi_loss_value = pi_loss
     return pi_loss
 
   def get_weights(self):
-    variables = [self._session.run(self._net_torso.variables)]
-    variables.append(self._session.run(self._policy_logits_layer.variables))
+    variables = [m.weight for m in self._net_torso.model]
+    variables.append(self._policy_logits_layer.weight)
     if self._loss_class.__name__ == "BatchA2CLoss":
-      variables.append(self._session.run(self._baseline_layer.variables))
+      variables.append(self._baseline_layer.weight)
     else:
-      variables.append(self._session.run(self._q_values_layer.variables))
+      variables.append(self._q_values_layer.weight)
     return variables
-
-  def _initialize(self):
-    initialization_torso = tf.group(
-        *[var.initializer for var in self._net_torso.variables])
-    initialization_logit = tf.group(
-        *[var.initializer for var in self._policy_logits_layer.variables])
-    if self._loss_class.__name__ == "BatchA2CLoss":
-      initialization_baseline_or_q_val = tf.group(
-          *[var.initializer for var in self._baseline_layer.variables])
-    else:
-      initialization_baseline_or_q_val = tf.group(
-          *[var.initializer for var in self._q_values_layer.variables])
-    initialization_crit_opt = tf.group(
-        *[var.initializer for var in self._critic_optimizer.variables()])
-    initialization_pi_opt = tf.group(
-        *[var.initializer for var in self._pi_optimizer.variables()])
-
-    self._session.run(
-        tf.group(*[
-            initialization_torso, initialization_logit,
-            initialization_baseline_or_q_val, initialization_crit_opt,
-            initialization_pi_opt
-        ]))
-    self._savers = [("torso", tf.train.Saver(self._net_torso.variables)),
-                    ("policy_head",
-                     tf.train.Saver(self._policy_logits_layer.variables))]
-    if self._loss_class.__name__ == "BatchA2CLoss":
-      self._savers.append(
-          ("baseline", tf.train.Saver(self._baseline_layer.variables)))
-    else:
-      self._savers.append(
-          ("q_head", tf.train.Saver(self._q_values_layer.variables)))
 
   def copy_with_noise(self, sigma=0.0, copy_weights=True):
     """Copies the object and perturbates its network's weights with noise.
@@ -577,34 +518,16 @@ class PolicyGradient(rl_agent.AbstractAgent):
       baseline_layer = getattr(copied_object, "_baseline_layer")
 
     if copy_weights:
-      copy_mlp_weights = tf.group(*[
-          va.assign(vb * (1 + sigma * tf.random.normal(vb.shape)))
-          for va, vb in zip(net_torso.variables, self._net_torso.variables)
-      ])
-      self._session.run(copy_mlp_weights)
+      with torch.no_grad():
+        for layer in net_torso.model:
+          layer.weight *= (1 + sigma * torch.randn(layer.weight.shape))
 
-      copy_logit_weights = tf.group(*[
-          va.assign(vb * (1 + sigma * tf.random.normal(vb.shape)))
-          for va, vb in zip(policy_logits_layer.variables,
-                            self._policy_logits_layer.variables)
-      ])
-      self._session.run(copy_logit_weights)
-      if hasattr(copied_object, "_q_values_layer"):
-        copy_q_value_weights = tf.group(*[
-            va.assign(vb * (1 + sigma * tf.random.normal(vb.shape))) for va, vb
-            in zip(q_values_layer.variables, self._q_values_layer.variables)
-        ])
-        self._session.run(copy_q_value_weights)
-      if hasattr(copied_object, "_baseline_layer"):
-        copy_baseline_weights = tf.group(*[
-            va.assign(vb * (1 + sigma * tf.random.normal(vb.shape))) for va, vb
-            in zip(baseline_layer.variables, self._baseline_layer.variables)
-        ])
-        self._session.run(copy_baseline_weights)
+        policy_logits_layer.weight *= (1 + sigma * torch.randn(policy_logits_layer.weight.shape))
 
-    for var in getattr(copied_object, "_critic_optimizer").variables():
-      self._session.run(var.initializer)
-    for var in getattr(copied_object, "_pi_optimizer").variables():
-      self._session.run(var.initializer)
+        if hasattr(copied_object, "_q_values_layer"):
+          q_values_layer.weight *= (1 + sigma * torch.randn(q_values_layer.weight.shape))
+
+        if hasattr(copied_object, "_baseline_layer"):
+          baseline_layer.weight *= (1 + sigma * torch.randn(baseline_layer.weight.shape))
 
     return copied_object

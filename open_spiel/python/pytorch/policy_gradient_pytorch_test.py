@@ -21,16 +21,12 @@ from __future__ import print_function
 import itertools
 
 from absl.testing import parameterized
-import torch
-from torch.testing._internal.common_utils import run_tests
-from torch.testing._internal.common_utils import TestCase
+from torch.testing._internal.common_utils import run_tests, TestCase
 
 
 from open_spiel.python import rl_environment
-#from open_spiel.python.algorithms import policy_gradient
-#from open_spiel.python.pytorch.losses import rl_losses
-from losses import rl_losses
-import policy_gradient
+from open_spiel.python.pytorch import policy_gradient
+from open_spiel.python.pytorch.losses import rl_losses
 import pyspiel
 
 
@@ -44,7 +40,6 @@ class PolicyGradientTest(parameterized.TestCase, TestCase):
     info_state_size = env.observation_spec()["info_state"][0]
     num_actions = env.action_spec()["num_actions"]
 
-    
     agents = [
         policy_gradient.PolicyGradient(  # pylint: disable=g-complex-comprehension
             player_id=player_id,
@@ -90,7 +85,7 @@ class PolicyGradientTest(parameterized.TestCase, TestCase):
     info_state_size = env.observation_spec()["info_state"][0]
     num_actions = env.action_spec()["num_actions"]
 
-    
+
     agents = [
         policy_gradient.PolicyGradient(  # pylint: disable=g-complex-comprehension
             player_id=player_id,
@@ -135,12 +130,8 @@ class PolicyGradientTest(parameterized.TestCase, TestCase):
           loss_str=None,
           loss_class=loss_class)
 
-      self.assertEqual(agent_by_str._pi_loss.shape,
-                        agent_by_class._pi_loss.shape)
-      self.assertEqual(agent_by_str._pi_loss.dtype,
-                        agent_by_class._pi_loss.dtype)
-      self.assertEqual(agent_by_str._pi_loss.op.type,
-                        agent_by_class._pi_loss.op.type)
+      self.assertEqual(agent_by_str._loss_class,
+                        agent_by_class._loss_class)
 
 
 if __name__ == "__main__":
