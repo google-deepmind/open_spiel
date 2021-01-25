@@ -132,36 +132,11 @@ class GameParameter {
   }
 
   // Access values via param.value<T>().
+  // There are explicit specializations of this function that call the
+  // ***_value() functions above, however they are defined in game_parameters.cc
+  // to avoid compilation problems on some older compilers.
   template <typename T>
   T value() const;
-  template <>
-  int value() const {
-    return int_value();
-  }
-  template <>
-  double value() const {
-    return double_value();
-  }
-  template <>
-  const std::string& value() const {
-    return string_value();
-  }
-  template <>
-  std::string value() const {
-    return string_value();
-  }
-  template <>
-  bool value() const {
-    return bool_value();
-  }
-  template <>
-  const std::map<std::string, GameParameter>& value() const {
-    return game_value();
-  }
-  template <>
-  std::map<std::string, GameParameter> value() const {
-    return game_value();
-  }
 
   bool operator==(const GameParameter& rhs) const {
     switch (type_) {

@@ -243,4 +243,33 @@ std::string GameParameterTypeToString(const GameParameter::Type& type) {
   }
 }
 
+template <>
+int GameParameter::value() const {
+  return int_value();
+}
+template <>
+double GameParameter::value() const {
+  return double_value();
+}
+template <>
+const std::string& GameParameter::value() const {
+  return string_value();
+}
+template <>
+std::string GameParameter::value() const {
+  return string_value();
+}
+template <>
+bool GameParameter::value() const {
+  return bool_value();
+}
+template <>
+const std::map<std::string, GameParameter>& GameParameter::value() const {
+  return game_value();
+}
+template <>
+std::map<std::string, GameParameter> GameParameter::value() const {
+  return game_value();
+}
+
 }  // namespace open_spiel
