@@ -42,7 +42,7 @@ const GameType kGameType{/*short_name=*/"trade_comm",
                          GameType::RewardModel::kTerminal,
                          /*max_num_players=*/2,
                          /*min_num_players=*/2,
-                         /*provides_information_state_string=*/false,
+                         /*provides_information_state_string=*/true,
                          /*provides_information_state_tensor=*/false,
                          /*provides_observation_string=*/true,
                          /*provides_observation_tensor=*/true,
@@ -131,6 +131,12 @@ std::string TradeCommState::ObservationString(Player player) const {
   absl::StrAppend(&str, "Trade history size: ", trade_history_.size());
 
   return str;
+}
+
+std::string TradeCommState::InformationStateString(Player player) const {
+  // Warning: This assumes that the game is one step.
+  SPIEL_CHECK_LE(game_->MaxGameLength(), 4);
+  return TradeCommState::ObservationString(player);
 }
 
 void TradeCommState::ObservationTensor(Player player,
