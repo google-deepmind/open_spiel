@@ -137,7 +137,9 @@ std::ostream& operator<<(std::ostream& stream, const absl::nullopt_t& v) {
 }
 
 void Normalize(absl::Span<double> weights) {
+  SPIEL_CHECK_FALSE(weights.empty());
   const double normalizer = absl::c_accumulate(weights, 0.);
+  SPIEL_CHECK_FALSE(std::isnan(normalizer));
   const double uniform_prob = 1.0 / weights.size();
   absl::c_for_each(weights, [&](double& w) {
     w = (normalizer == 0.0 ? uniform_prob : w / normalizer);
