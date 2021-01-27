@@ -131,14 +131,20 @@ std::string TradeCommState::ObservationString(Player player) const {
   // can work out what trading round they're on.
   absl::StrAppend(&str, "Trade history size: ", trade_history_.size(), "\n");
 
-  // At terminals, all players can see the trades.
+  // Players can see their own trades if they were made.
+  if (player < trade_history_.size()) {
+    absl::StrAppend(&str, "Observer's trade offer: ");
+    std::pair<int, int> trade = DecodeTrade(trade_history_[player], num_items_);
+    absl::StrAppend(&str, " ", trade.first, ":", trade.second, "\n");
+  }
+
+  // Players can see the other trade offers after the round.
   if (IsTerminal()) {
-    absl::StrAppend(&str, "Terminal. Trade History: ");
-    for (Action trade_action : trade_history_) {
-      std::pair<int, int> trade = DecodeTrade(trade_action, num_items_);
-      absl::StrAppend(&str, " ", trade.first, ":", trade.second);
-    }
-    absl::StrAppend(&str, "\n");
+    SPIEL_CHECK_LT(1-player, trade_history_.size());
+    absl::StrAppend(&str, "Other players's trade offer: ");
+    std::pair<int, int> trade = DecodeTrade(trade_history_[1-player],
+                                            num_items_);
+    absl::StrAppend(&str, " ", trade.first, ":", trade.second, "\n");
   }
 
   return str;
