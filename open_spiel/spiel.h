@@ -727,8 +727,7 @@ class Game : public std::enable_shared_from_this<Game> {
   int InformationStateTensorSize() const {
     std::vector<int> shape = InformationStateTensorShape();
     return shape.empty() ? 0
-                         : std::accumulate(shape.begin(), shape.end(), 1,
-                                           std::multiplies<double>());
+                         : absl::c_accumulate(shape, 1, std::multiplies<int>());
   }
 
   // Describes the structure of the observation representation in a
@@ -748,8 +747,7 @@ class Game : public std::enable_shared_from_this<Game> {
   int ObservationTensorSize() const {
     std::vector<int> shape = ObservationTensorShape();
     return shape.empty() ? 0
-                         : std::accumulate(shape.begin(), shape.end(), 1,
-                                           std::multiplies<double>());
+                         : absl::c_accumulate(shape, 1, std::multiplies<int>());
   }
 
   // Describes the structure of the policy representation in a
