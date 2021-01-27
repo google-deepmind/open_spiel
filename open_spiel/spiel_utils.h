@@ -172,6 +172,9 @@ void Normalize(absl::Span<double> weights);
 // after the first decimal place.
 std::string FormatDouble(double value);
 
+// Converts a bool to either "true" or "false".
+std::string BoolToStr(bool b);
+
 // Returns whether the absolute difference between floating point values a and
 // b is less than or equal to FloatingPointThresholdRatio() * max(|a|, |b|).
 template <typename T>

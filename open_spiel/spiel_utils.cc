@@ -146,4 +146,6 @@ void Normalize(absl::Span<double> weights) {
   });
 }
 
+std::string BoolToStr(bool b) { return b ? "true" : "false"; }
+
 }  // namespace open_spiel
