@@ -44,7 +44,7 @@ int GetBeliefHistorySize(const HistoryDistribution& beliefs) {
 
 std::unique_ptr<HistoryDistribution> AdvanceBeliefHistoryOneAction(
     std::unique_ptr<HistoryDistribution> previous, Action action,
-    Player player_id, const Policy* opponent_policy) {
+    Player player_id, const Policy& opponent_policy) {
   auto dist = absl::make_unique<HistoryDistribution>();
   for (int i = 0; i < previous->first.size(); ++i) {
     std::unique_ptr<State>& state = previous->first[i];
@@ -80,7 +80,7 @@ std::unique_ptr<HistoryDistribution> AdvanceBeliefHistoryOneAction(
           // only loop over the actions that are consistent with a given private
           // action.
           for (const auto& [candidate, action_prob] :
-               opponent_policy->GetStatePolicy(*state)) {
+               opponent_policy.GetStatePolicy(*state)) {
             if (Near(std::max(0.0, action_prob), 0.0)) continue;
             SPIEL_CHECK_PROB(action_prob);
             std::unique_ptr<State> child = state->Child(candidate);
@@ -138,9 +138,8 @@ std::unique_ptr<open_spiel::HistoryDistribution> CloneBeliefs(
   return beliefs_copy;
 }
 
-
 HistoryDistribution GetStateDistribution(const State& state,
-                                         const Policy* opponent_policy) {
+                                         const Policy& opponent_policy) {
   std::shared_ptr<const Game> game = state.GetGame();
   GameType game_type = game->GetType();
   if (game_type.information == GameType::Information::kPerfectInformation) {
@@ -207,9 +206,8 @@ HistoryDistribution GetStateDistribution(const State& state,
         // At opponent nodes, similar to chance nodes but get the probability
         // from the policy instead.
         std::string opp_infostate_str = states[idx]->InformationStateString();
-        SPIEL_CHECK_TRUE(opponent_policy != nullptr);
         ActionsAndProbs state_policy =
-            opponent_policy->GetStatePolicy(*states[idx]);
+            opponent_policy.GetStatePolicy(*states[idx]);
         for (Action action : states[idx]->LegalActions()) {
           double action_prob = GetProb(state_policy, action);
           states.push_back(states[idx]->Child(action));
@@ -261,7 +259,7 @@ HistoryDistribution GetStateDistribution(const State& state,
 }
 
 std::unique_ptr<HistoryDistribution> UpdateIncrementalStateDistribution(
-    const State& state, const Policy* opponent_policy, int player_id,
+    const State& state, const Policy& opponent_policy, int player_id,
     std::unique_ptr<HistoryDistribution> previous) {
   std::unique_ptr<HistoryDistribution> dist;
   if (previous) {
