@@ -124,11 +124,22 @@ std::string TradeCommState::ObservationString(Player player) const {
   for (int comm : comm_history_) {
     absl::StrAppend(&str, " ", comm);
   }
+  absl::StrAppend(&str, "\n");
 
   // Trade proposals are treated as simultaneous, so not included in the
   // observation, but we do mark how many trade actions have happened to agents
   // can work out what trading round they're on.
-  absl::StrAppend(&str, "Trade history size: ", trade_history_.size());
+  absl::StrAppend(&str, "Trade history size: ", trade_history_.size(), "\n");
+
+  // At terminals, all players can see the trades.
+  if (IsTerminal()) {
+    absl::StrAppend(&str, "Terminal. Trade History: ");
+    for (Action trade_action : trade_history_) {
+      std::pair<int, int> trade = DecodeTrade(trade_action, num_items_);
+      absl::StrAppend(&str, " ", trade.first, ":", trade.second);
+    }
+    absl::StrAppend(&str, "\n");
+  }
 
   return str;
 }
