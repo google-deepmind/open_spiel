@@ -73,6 +73,16 @@ ActionsAndProbs ToDeterministicPolicy(const ActionsAndProbs& actions_and_probs,
   return new_policy;
 }
 
+ActionsAndProbs GetDeterministicPolicy(const std::vector<Action>& legal_actions,
+                                       Action action) {
+  ActionsAndProbs new_policy;
+  new_policy.reserve(legal_actions.size());
+  for (Action legal_action : legal_actions) {
+    new_policy.push_back({legal_action, legal_action == action ? 1.0 : 0.0});
+  }
+  return new_policy;
+}
+
 ActionsAndProbs UniformStatePolicy(const State& state) {
   ActionsAndProbs actions_and_probs;
   std::vector<Action> actions = state.LegalActions();
@@ -307,60 +317,53 @@ TabularPolicy GetFirstActionPolicy(const Game& game) {
   return TabularPolicy(policy);
 }
 
-TabularPolicy GetPrefActionPolicy(
-    const Game& game, const std::vector<Action>& pref_actions) {
-  std::unordered_map<std::string, ActionsAndProbs> policy;
-  if (game.GetType().dynamics != GameType::Dynamics::kSequential) {
-    SpielFatalError("Game is not sequential.");
+ActionsAndProbs PreferredActionPolicy::GetStatePolicy(const State& state,
+                                                      Player player) const {
+  std::vector<Action> legal_actions = state.LegalActions(player);
+  for (Action action : preference_order_) {
+    if (absl::c_find(legal_actions, action) != legal_actions.end()) {
+      return GetDeterministicPolicy(legal_actions, action);
+    }
   }
-  // Consider using GetAllHistories here instead of custom DFS to ensure that
-  // all edge cases are properly handled. Please see version control for a full
-  // discussion.
+  SpielFatalError("No preferred action found in the legal actions!");
+}
+
+TabularPolicy ToTabularPolicy(const Game& game, const Policy* policy) {
+  TabularPolicy tabular_policy;
   std::vector<std::unique_ptr<State>> to_visit;
   to_visit.push_back(game.NewInitialState());
-  while (!to_visit.empty()) {
-    std::unique_ptr<State> state = std::move(to_visit.back());
-    to_visit.pop_back();
+  for (int idx = 0; idx < to_visit.size(); ++idx) {
+    const State* state = to_visit[idx].get();
     if (state->IsTerminal()) {
       continue;
     }
-    if (state->IsChanceNode()) {
-      for (const auto& [outcome, _] : state->ChanceOutcomes()) {
-        to_visit.emplace_back(state->Child(outcome));
-      }
-    } else {
-      std::vector<Action> legal_actions = state->LegalActions();
-      const int num_legal_actions = legal_actions.size();
-      SPIEL_CHECK_FALSE(legal_actions.empty());
 
-      absl::optional<Action> legal_pref_action;
-      absl::flat_hash_set<Action> pref_actions_set(
-          pref_actions.begin(), pref_actions.end());
-      for (Action legal_action : legal_actions) {
-        if (pref_actions_set.contains(legal_action)) {
-          legal_pref_action = legal_action;
-          break;
-        }
+    if (!state->IsChanceNode()) {
+      std::vector<Player> players(game.NumPlayers());
+      if (state->IsSimultaneousNode()) {
+        absl::c_iota(players, 0);
+      } else {
+        players = {state->CurrentPlayer()};
       }
-      if (!legal_pref_action) SpielFatalError("Legal pref action not found.");
 
-      ActionsAndProbs infostate_policy;
-      infostate_policy.reserve(num_legal_actions);
-      for (Action action : legal_actions) {
-        to_visit.push_back(state->Child(action));
-        if (action == legal_pref_action) {
-          infostate_policy.push_back({action, 1.});
-        } else {
-          infostate_policy.push_back({action, 0.});
-        }
+      for (Player player : players) {
+        ActionsAndProbs state_policy = policy->GetStatePolicy(*state);
+        tabular_policy.SetStatePolicy(state->InformationStateString(player),
+                                      state_policy);
       }
-      if (infostate_policy.empty()) {
-        SpielFatalError("State has zero legal actions.");
-      }
-      policy[state->InformationStateString()] = std::move(infostate_policy);
+    }
+
+    for (Action action : state->LegalActions()) {
+      to_visit.push_back(state->Child(action));
     }
   }
-  return TabularPolicy(policy);
+  return tabular_policy;
+}
+
+TabularPolicy GetPrefActionPolicy(const Game& game,
+                                  const std::vector<Action>& pref_actions) {
+  PreferredActionPolicy policy(pref_actions);
+  return ToTabularPolicy(game, &policy);
 }
 
 std::string PrintPolicy(const ActionsAndProbs& policy) {

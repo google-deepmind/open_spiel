@@ -101,6 +101,13 @@ void init_pyspiel_policy(py::module& m) {
       .def(py::init<>())
       .def("get_state_policy", &open_spiel::UniformPolicy::GetStatePolicy);
 
+  py::class_<open_spiel::PreferredActionPolicy,
+             std::shared_ptr<open_spiel::PreferredActionPolicy>,
+             open_spiel::Policy>(m, "PreferredActionPolicy")
+      .def(py::init<const std::vector<Action>&>())
+      .def("get_state_policy",
+           &open_spiel::PreferredActionPolicy::GetStatePolicy);
+
   py::class_<open_spiel::algorithms::CFRSolver>(m, "CFRSolver")
       .def(py::init<const Game&>())
       .def("evaluate_and_update_policy",
