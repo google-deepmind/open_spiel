@@ -24,6 +24,7 @@ from absl.testing import absltest
 from absl.testing import parameterized
 import numpy as np
 
+from open_spiel.python.games import kuhn_poker  # pylint: disable=unused-import
 from open_spiel.python.games import tic_tac_toe  # pylint: disable=unused-import
 import pyspiel
 from open_spiel.python.utils import file_utils

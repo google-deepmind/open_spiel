@@ -145,6 +145,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   environments/catch_test.py
   environments/cliff_walking_test.py
   games/data_test.py
+  games/kuhn_poker_test.py
   games/tic_tac_toe_test.py
   tests/bot_test.py
   tests/games_bridge_test.py
