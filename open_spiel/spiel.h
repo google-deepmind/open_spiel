@@ -137,6 +137,38 @@ struct GameType {
   bool provides_factored_observation_string = false;
 };
 
+// Information about a concrete Game instantiation.
+// This information may depend on the game parameters, and hence cannot
+// be part of `GameType`.
+struct GameInfo {
+  // The size of the action space. See `Game` for a full description.
+  int num_distinct_actions;
+
+  // Maximum number of distinct chance outcomes for chance nodes in the game.
+  int max_chance_outcomes;
+
+  // The number of players in this instantiation of the game.
+  // Does not include the chance-player.
+  int num_players;
+
+  // Utility range. These functions define the lower and upper bounds on the
+  // values returned by State::PlayerReturn(Player player) over all valid player
+  // numbers. This range should be as tight as possible; the intention is to
+  // give some information to algorithms that require it, and so their
+  // performance may suffer if the range is not tight. Loss/draw/win outcomes
+  // are common among games and should use the standard values of {-1,0,1}.
+  double min_utility;
+  double max_utility;
+
+  // The total utility for all players, if this is a constant-sum-utility game.
+  // Should be zero if the game is zero-sum.
+  double utility_sum;
+
+  // The maximum number of player decisions in a game. Does not include chance
+  // events.
+  int max_game_length;
+};
+
 std::ostream& operator<<(std::ostream& os, const StateType& type);
 
 std::ostream& operator<<(std::ostream& stream, GameType::Dynamics value);

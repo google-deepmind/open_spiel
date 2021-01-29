@@ -22,17 +22,9 @@ import os
 import re
 import numpy as np
 
-from open_spiel.python.games import tic_tac_toe
+from open_spiel.python.games import tic_tac_toe  # pylint: disable=unused-import
 from open_spiel.python.observation import make_observation
 import pyspiel
-
-
-def _load_game(game_string):
-  """Loads a game, including special-cases for Python-implemented games."""
-  if game_string == "python_tic_tac_toe":
-    return tic_tac_toe.TicTacToeGame()
-  else:
-    return pyspiel.load_game(game_string)
 
 
 def _escape(x):
@@ -147,7 +139,7 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None,
   else:
     add_line = lines.append
 
-  game = _load_game(game_string)
+  game = pyspiel.load_game(game_string)
   add_line("game: {}".format(game_string))
   if observation_params_string:
     add_line("observation_params: {}".format(observation_params_string))
@@ -414,7 +406,7 @@ def update_path(path, shard_index=0, num_shards=1):
     try:
       original, kwargs = _read_playthrough(os.path.join(path, filename))
       try:
-        _load_game(kwargs["game_string"])
+        pyspiel.load_game(kwargs["game_string"])
       except pyspiel.SpielError as e:
         if "Unknown game" in str(e):
           print("[Skipped] Skipping game ", filename, " as ",
