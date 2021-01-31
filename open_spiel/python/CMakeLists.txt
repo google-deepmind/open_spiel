@@ -161,6 +161,8 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   pytorch/dqn_pytorch_test.py
   pytorch/nfsp_pytorch_test.py
   pytorch/eva_pytorch_test.py
+  pytorch/losses/rl_losses_pytorch_test.py
+  pytorch/policy_gradient_pytorch_test.py
 )
 
 
