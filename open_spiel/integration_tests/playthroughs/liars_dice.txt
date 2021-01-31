@@ -6,7 +6,7 @@ GameType.information = Information.IMPERFECT_INFORMATION
 GameType.long_name = "Liars Dice"
 GameType.max_num_players = 2
 GameType.min_num_players = 2
-GameType.parameter_specification = ["numdice", "players"]
+GameType.parameter_specification = ["bidding_rule", "dice_sides", "numdice", "players"]
 GameType.provides_information_state_string = True
 GameType.provides_information_state_tensor = True
 GameType.provides_observation_string = False
@@ -19,7 +19,7 @@ GameType.utility = Utility.ZERO_SUM
 NumDistinctActions() = 13
 PolicyTensorShape() = [13]
 MaxChanceOutcomes() = 6
-GetParameters() = {numdice=1,players=2}
+GetParameters() = {bidding_rule=reset-face,dice_sides=6,numdice=1,players=2}
 NumPlayers() = 2
 MinUtility() = -1.0
 MaxUtility() = 1.0
