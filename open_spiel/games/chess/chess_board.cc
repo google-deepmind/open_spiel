@@ -314,20 +314,20 @@ std::string Move::ToSAN(const ChessBoard &board) const {
   return move_text;
 }
 
-ChessBoard::ChessBoard(int boardSize, bool kingInCheckAllowed)
+ChessBoard::ChessBoard(int board_size, bool king_in_check_allowed)
     : to_play_(Color::kWhite),
       ep_square_(InvalidSquare()),
       irreversible_move_counter_(0),
       move_number_(1),
       castling_rights_{{true, true}, {true, true}},
       zobrist_hash_(0),
-      board_size_(boardSize),
-      king_in_check_allowed_(kingInCheckAllowed){
+      board_size_(board_size),
+      king_in_check_allowed_(king_in_check_allowed){
   board_.fill(kEmptyPiece);
 }
 
 /*static*/ absl::optional<ChessBoard>
-ChessBoard::BoardFromFEN(const std::string &fen, int boardSize, bool kingInCheckAllowed) {
+ChessBoard::BoardFromFEN(const std::string &fen, int board_size, bool king_in_check_allowed) {
   /* An FEN string includes a board position, side to play, castling
    * rights, ep square, 50 moves clock, and full move number. In that order.
    *
@@ -339,7 +339,7 @@ ChessBoard::BoardFromFEN(const std::string &fen, int boardSize, bool kingInCheck
    *
    * Many FEN strings don't have the last two fields.
    */
-  ChessBoard board(boardSize, kingInCheckAllowed);
+  ChessBoard board(board_size, king_in_check_allowed);
 
   for (auto color : {Color::kBlack, Color::kWhite}) {
     for (auto dir : {CastlingDirection::kLeft, CastlingDirection::kRight}) {
@@ -371,11 +371,11 @@ ChessBoard::BoardFromFEN(const std::string &fen, int boardSize, bool kingInCheck
   std::vector<std::string> piece_config_by_rank =
       absl::StrSplit(piece_configuration, '/');
 
-  for (int8_t current_y = boardSize - 1; current_y >= 0; --current_y) {
-    std::string &rank = piece_config_by_rank[boardSize - current_y - 1];
+  for (int8_t current_y = board_size - 1; current_y >= 0; --current_y) {
+    std::string &rank = piece_config_by_rank[board_size - current_y - 1];
     int8_t current_x = 0;
     for (char c : rank) {
-      if (current_x >= boardSize) {
+      if (current_x >= board_size) {
         std::cerr << "Too many things on FEN rank: " << rank << std::endl;
         return std::nullopt;
       }
@@ -578,8 +578,8 @@ bool ChessBoard::HasSufficientMaterial() const {
   // 3. K+N vs K
   // 4. K+B* vs K+B* (all bishops on same coloured squares)
 
-  // If king is allowed to move to/stay in check, any material is sufficient material
-  // And if there is no material, then there is also no king and that means the game had already ended
+  // If king is allowed to move to/stay in check, any material is sufficient material.
+  // If there is no material, then there is also no opponent king and that means the game had already ended.
   if (king_in_check_allowed_) {
     return true;
   }

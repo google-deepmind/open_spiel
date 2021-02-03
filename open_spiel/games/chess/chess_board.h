@@ -231,7 +231,7 @@ class ChessBoard {
   // Constructs a chess board at the given position in Forsyth-Edwards Notation.
   // https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
   static absl::optional<ChessBoard> BoardFromFEN(const std::string& fen) { return BoardFromFEN(fen, 8, false); };
-  static absl::optional<ChessBoard> BoardFromFEN(const std::string& fen, int boardSize, bool kingAllowedInCheck);
+  static absl::optional<ChessBoard> BoardFromFEN(const std::string& fen, int board_size, bool king_in_check_allowed);
 
   const Piece& at(Square sq) const { return board_[SquareToIndex_(sq)]; }
 

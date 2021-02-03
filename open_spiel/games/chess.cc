@@ -138,7 +138,7 @@ Color PlayerToColor(Player p) {
   return static_cast<Color>(p);
 }
 
-Action MoveToAction(const Move& move, const int board_size) {
+Action MoveToAction(const Move& move, int board_size) {
   Color color = move.piece.color;
   // We rotate the move to be from player p's perspective.
   Move player_move(move);
@@ -222,7 +222,7 @@ Move ActionToMove(const Action& action, const ChessBoard& board) {
 
   // The encoded action represents an action encoded from color's perspective.
   Color color = board.ToPlay();
-  int boardSize = board.BoardSize();
+  int board_size = board.BoardSize();
   PieceType promotion_type = PieceType::kEmpty;
   bool is_castling = false;
   auto [from_square, destination_index] =
@@ -243,16 +243,16 @@ Move ActionToMove(const Action& action, const ChessBoard& board) {
   }
   Square to_square = from_square + offset;
 
-  from_square.y = ReflectRank(color, boardSize, from_square.y);
-  to_square.y = ReflectRank(color, boardSize, to_square.y);
+  from_square.y = ReflectRank(color, board_size, from_square.y);
+  to_square.y = ReflectRank(color, board_size, to_square.y);
 
   // This uses the current state to infer the piece type.
   Piece piece = {board.ToPlay(), board.at(from_square).type};
 
   // Check for queen promotion.
   if (!is_under_promotion && piece.type == PieceType::kPawn &&
-      ReflectRank(color, boardSize, from_square.y) == boardSize - 2 &&
-      ReflectRank(color, boardSize, to_square.y) == boardSize - 1) {
+      ReflectRank(color, board_size, from_square.y) == board_size - 2 &&
+      ReflectRank(color, board_size, to_square.y) == board_size - 1) {
     promotion_type = PieceType::kQueen;
   }
 

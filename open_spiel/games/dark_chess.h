@@ -50,15 +50,6 @@ inline constexpr int NumDistinctActions() { return 4672; }
 // https://math.stackexchange.com/questions/194008/how-many-turns-can-a-chess-game-take-at-maximum
 inline constexpr int MaxGameLength() { return 17695; }
 
-inline const std::vector<int> &ObservationTensorShape() {
-  static std::vector<int> shape{
-      14 /* piece types * colours + empty + unknown */ + 1 /* repetition count */ +
-      1 /* side to move */ + 1 /* irreversible move counter */ +
-      2 /* castling rights */,
-      chess::kMaxBoardSize, chess::kMaxBoardSize};
-  return shape;
-}
-
 class DarkChessGame;
 class DarkChessObserver;
 
@@ -84,12 +75,6 @@ inline constexpr std::array<chess::Offset, 3> kUnderPromotionDirectionToOffset =
     {{0, 1}, {1, 1}, {-1, 1}}};
 inline constexpr int kNumUnderPromotions =
     kUnderPromotionIndexToType.size() * kUnderPromotionDirectionToOffset.size();
-
-inline constexpr int kNumActionDestinations = 73;
-
-std::pair<chess::Square, int> ActionToDestination(int action, int board_size,
-                                           int num_actions_destinations);
-
 
 // State of an in-play game.
 class DarkChessState : public State {
@@ -193,7 +178,15 @@ class DarkChessGame : public Game {
   double UtilitySum() const override { return DrawUtility(); }
   double MaxUtility() const override { return WinUtility(); }
   std::vector<int> ObservationTensorShape() const override {
-    return dark_chess::ObservationTensorShape();
+    std::vector<int> shape{
+        14 /* piece types * colours + empty + unknown - private info*/ +
+        13 /* piece types * colours + empty - public info*/ +
+        1 /* repetition count */ +
+        1 /* side to move */ +
+        1 /* irreversible move counter */ +
+        2 /* castling rights */,
+        board_size_, board_size_};
+    return shape;
   }
   int MaxGameLength() const override { return chess::MaxGameLength(); }
 
