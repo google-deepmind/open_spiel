@@ -255,6 +255,7 @@ add_subdirectory (fog)
 add_subdirectory (games)
 add_subdirectory (game_transforms)
 add_subdirectory (tests)
+add_subdirectory (stockfish)
 
 if (BUILD_WITH_PYTHON)
   add_subdirectory (python)
