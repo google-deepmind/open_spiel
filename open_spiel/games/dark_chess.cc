@@ -88,7 +88,82 @@ std::array<bool, chess::kMaxBoardSize * chess::kMaxBoardSize> ComputePrivateInfo
   return observability_table;
 }
 
-// Computes which squares are common knowledge. It does not recognize all of them. Only squares of two opponent
+// Checks whether the from_piece at from_square is under attack from to_piece at to_square
+// when we know that to_square is under attack from from_piece at from_square
+bool IsUnderAttack(const chess::Square from_square, const chess::Piece from_piece, const chess::Square to_square, const chess::Piece to_piece) {
+
+  if (from_piece.type == to_piece.type) {
+    return true;
+  }
+  if (to_piece.type == chess::PieceType::kEmpty || from_piece.type == chess::PieceType::kKnight) {
+    return false;
+  }
+
+  if (from_piece.type == chess::PieceType::kPawn) {
+    return to_piece.type == chess::PieceType::kBishop
+           || to_piece.type == chess::PieceType::kQueen
+           || to_piece.type == chess::PieceType::kKing;
+  }
+  if (from_piece.type == chess::PieceType::kKing) {
+    if (to_piece.type == chess::PieceType::kQueen) {
+      return true;
+    }
+    if (to_piece.type == chess::PieceType::kBishop) {
+      return abs(to_square.x - from_square.x) >= 1 && abs(to_square.y - from_square.y) >= 1;
+    }
+    if (to_piece.type == chess::PieceType::kRook) {
+      return abs(to_square.x - from_square.x) == 0 || abs(to_square.y - from_square.y) == 0;
+    }
+    if (to_piece.type == chess::PieceType::kPawn) {
+      int8_t y_direction = to_piece.color == chess::Color::kWhite ? 1 : -1;
+      return from_square == to_square + chess::Offset{1, y_direction}
+             || from_square == to_square + chess::Offset{-1, y_direction};
+    }
+    return false;
+  }
+  if (from_piece.type == chess::PieceType::kRook) {
+    if (to_piece.type == chess::PieceType::kQueen) {
+      return true;
+    }
+    if (to_piece.type == chess::PieceType::kKing) {
+      return abs(to_square.x - from_square.x) <= 1 && abs(to_square.y - from_square.y) <= 1;
+    }
+    return false;
+  }
+  if (from_piece.type == chess::PieceType::kBishop) {
+    if (to_piece.type == chess::PieceType::kQueen) {
+      return true;
+    }
+    if (to_piece.type == chess::PieceType::kKing) {
+      return abs(to_square.x - from_square.x) <= 1 && abs(to_square.y - from_square.y) <= 1;
+    }
+    if (to_piece.type == chess::PieceType::kPawn) {
+      int8_t y_direction = to_piece.color == chess::Color::kWhite ? 1 : -1;
+      return from_square == to_square + chess::Offset{1, y_direction}
+             || from_square == to_square + chess::Offset{-1, y_direction};
+    }
+    return false;
+  }
+  if (from_piece.type == chess::PieceType::kQueen) {
+    if (to_piece.type == chess::PieceType::kBishop) {
+      return abs(to_square.x - from_square.x) >= 1 && abs(to_square.y - from_square.y) >= 1;
+    }
+    if (to_piece.type == chess::PieceType::kRook) {
+      return abs(to_square.x - from_square.x) == 0 || abs(to_square.y - from_square.y) == 0;
+    }
+    if (to_piece.type == chess::PieceType::kKing) {
+      return abs(to_square.x - from_square.x) <= 1 && abs(to_square.y - from_square.y) <= 1;
+    }
+    if (to_piece.type == chess::PieceType::kPawn) {
+      int8_t y_direction = to_piece.color == chess::Color::kWhite ? 1 : -1;
+      return from_square == to_square + chess::Offset{1, y_direction}
+             || from_square == to_square + chess::Offset{-1, y_direction};
+    }
+    return false;
+  }
+}
+
+// Computes which squares are public information. It does not recognize all of them. Only squares of two opponent
 // pieces of the same type attacking each other
 std::array<bool, chess::kMaxBoardSize * chess::kMaxBoardSize> ComputePublicInfoTable(const chess::ChessBoard& board) {
   int board_size = board.BoardSize();
@@ -98,7 +173,7 @@ std::array<bool, chess::kMaxBoardSize * chess::kMaxBoardSize> ComputePublicInfoT
     auto from_piece = board.at(move.from);
     auto to_piece = board.at(move.to);
 
-    if (from_piece.type != chess::PieceType::kEmpty && from_piece.type == to_piece.type) {
+    if (IsUnderAttack(move.from, from_piece, move.to, to_piece)) {
 
       size_t from_index = chess::SquareToIndex(move.from, board_size);
       observability_table[from_index] = true;
