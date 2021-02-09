@@ -130,6 +130,12 @@ if [[ ${BUILD_WITH_ROSHAMBO:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; then
   git clone -b 'open_spiel' --single-branch --depth 1  https://github.com/jhtschultz/roshambo.git ${DIR}
 fi
 
+# This GitHub repository contains Stockfish chess engine
+DIR="open_spiel/bots/stockfish/stockfish"
+if [[ ${BUILD_WITH_STOCKFISH:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; then
+  git clone -b 'sf_12' --single-branch --depth 1  https://github.com/official-stockfish/Stockfish.git ${DIR}
+fi
+
 # Add libtorch (PyTorch C++ API).
 # This downloads the precompiled binaries available from the pytorch website.
 DIR="open_spiel/libtorch/libtorch"
