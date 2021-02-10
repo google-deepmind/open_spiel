@@ -88,76 +88,76 @@ std::array<bool, chess::kMaxBoardSize * chess::kMaxBoardSize> ComputePrivateInfo
   return observability_table;
 }
 
-// Checks whether the from_piece at from_square is under attack from to_piece at to_square
-// when we know that to_square is under attack from from_piece at from_square
-bool IsUnderAttack(const chess::Square from_square, const chess::Piece from_piece, const chess::Square to_square, const chess::Piece to_piece) {
+// Checks whether the defender is under attack from the attacker when we know that attacker is under attack from the defender
+bool IsUnderAttack(const chess::Square defender_square, const chess::Piece defender_piece,
+                   const chess::Square attacker_square, const chess::Piece attacker_piece) {
 
-  if (from_piece.type == to_piece.type) {
+  if (defender_piece.type == attacker_piece.type) {
     return true;
   }
-  if (to_piece.type == chess::PieceType::kEmpty || from_piece.type == chess::PieceType::kKnight) {
+  if (attacker_piece.type == chess::PieceType::kEmpty || defender_piece.type == chess::PieceType::kKnight) {
     return false;
   }
 
-  if (from_piece.type == chess::PieceType::kPawn) {
-    return to_piece.type == chess::PieceType::kBishop
-           || to_piece.type == chess::PieceType::kQueen
-           || to_piece.type == chess::PieceType::kKing;
+  if (defender_piece.type == chess::PieceType::kPawn) {
+    return attacker_piece.type == chess::PieceType::kBishop
+           || attacker_piece.type == chess::PieceType::kQueen
+           || attacker_piece.type == chess::PieceType::kKing;
   }
-  if (from_piece.type == chess::PieceType::kKing) {
-    if (to_piece.type == chess::PieceType::kQueen) {
+  if (defender_piece.type == chess::PieceType::kKing) {
+    if (attacker_piece.type == chess::PieceType::kQueen) {
       return true;
     }
-    if (to_piece.type == chess::PieceType::kBishop) {
-      return abs(to_square.x - from_square.x) >= 1 && abs(to_square.y - from_square.y) >= 1;
+    if (attacker_piece.type == chess::PieceType::kBishop) {
+      return abs(attacker_square.x - defender_square.x) >= 1 && abs(attacker_square.y - defender_square.y) >= 1;
     }
-    if (to_piece.type == chess::PieceType::kRook) {
-      return abs(to_square.x - from_square.x) == 0 || abs(to_square.y - from_square.y) == 0;
+    if (attacker_piece.type == chess::PieceType::kRook) {
+      return abs(attacker_square.x - defender_square.x) == 0 || abs(attacker_square.y - defender_square.y) == 0;
     }
-    if (to_piece.type == chess::PieceType::kPawn) {
-      int8_t y_direction = to_piece.color == chess::Color::kWhite ? 1 : -1;
-      return from_square == to_square + chess::Offset{1, y_direction}
-             || from_square == to_square + chess::Offset{-1, y_direction};
+    if (attacker_piece.type == chess::PieceType::kPawn) {
+      int8_t y_direction = attacker_piece.color == chess::Color::kWhite ? 1 : -1;
+      return defender_square == attacker_square + chess::Offset{1, y_direction}
+             || defender_square == attacker_square + chess::Offset{-1, y_direction};
     }
     return false;
   }
-  if (from_piece.type == chess::PieceType::kRook) {
-    if (to_piece.type == chess::PieceType::kQueen) {
+  if (defender_piece.type == chess::PieceType::kRook) {
+    if (attacker_piece.type == chess::PieceType::kQueen) {
       return true;
     }
-    if (to_piece.type == chess::PieceType::kKing) {
-      return abs(to_square.x - from_square.x) <= 1 && abs(to_square.y - from_square.y) <= 1;
+    if (attacker_piece.type == chess::PieceType::kKing) {
+      return abs(attacker_square.x - defender_square.x) <= 1 && abs(attacker_square.y - defender_square.y) <= 1;
     }
     return false;
   }
-  if (from_piece.type == chess::PieceType::kBishop) {
-    if (to_piece.type == chess::PieceType::kQueen) {
+  if (defender_piece.type == chess::PieceType::kBishop) {
+    if (attacker_piece.type == chess::PieceType::kQueen) {
       return true;
     }
-    if (to_piece.type == chess::PieceType::kKing) {
-      return abs(to_square.x - from_square.x) <= 1 && abs(to_square.y - from_square.y) <= 1;
+    if (attacker_piece.type == chess::PieceType::kKing) {
+      return abs(attacker_square.x - defender_square.x) <= 1 && abs(attacker_square.y - defender_square.y) <= 1;
     }
-    if (to_piece.type == chess::PieceType::kPawn) {
-      int8_t y_direction = to_piece.color == chess::Color::kWhite ? 1 : -1;
-      return from_square == to_square + chess::Offset{1, y_direction}
-             || from_square == to_square + chess::Offset{-1, y_direction};
+    if (attacker_piece.type == chess::PieceType::kPawn) {
+      int8_t y_direction = attacker_piece.color == chess::Color::kWhite ? 1 : -1;
+      return defender_square == attacker_square + chess::Offset{1, y_direction}
+             || defender_square == attacker_square + chess::Offset{-1, y_direction};
     }
     return false;
   }
-  if (from_piece.type == chess::PieceType::kQueen) {
-    if (to_piece.type == chess::PieceType::kBishop) {
-      return abs(to_square.x - from_square.x) >= 1 && abs(to_square.y - from_square.y) >= 1;
+  if (defender_piece.type == chess::PieceType::kQueen) {
+    if (attacker_piece.type == chess::PieceType::kBishop) {
+      return abs(attacker_square.x - defender_square.x) >= 1 && abs(attacker_square.y - defender_square.y) >= 1;
     }
-    if (to_piece.type == chess::PieceType::kRook) {
-      return abs(to_square.x - from_square.x) == 0 || abs(to_square.y - from_square.y) == 0;
+    if (attacker_piece.type == chess::PieceType::kRook) {
+      return abs(attacker_square.x - defender_square.x) == 0 || abs(attacker_square.y - defender_square.y) == 0;
     }
-    if (to_piece.type == chess::PieceType::kKing) {
-      return abs(to_square.x - from_square.x) <= 1 && abs(to_square.y - from_square.y) <= 1;
+    if (attacker_piece.type == chess::PieceType::kKing) {
+      return abs(attacker_square.x - defender_square.x) <= 1 && abs(attacker_square.y - defender_square.y) <= 1;
     }
-    if (to_piece.type == chess::PieceType::kPawn) {
-      int8_t y_direction = to_piece.color == chess::Color::kWhite ? 1 : -1;
-      return from_square == to_square + chess::Offset{1, y_direction}
-             || from_square == to_square + chess::Offset{-1, y_direction};
+    if (attacker_piece.type == chess::PieceType::kPawn) {
+      int8_t y_direction = attacker_piece.color == chess::Color::kWhite ? 1 : -1;
+      return defender_square == attacker_square + chess::Offset{1, y_direction}
+             || defender_square == attacker_square + chess::Offset{-1, y_direction};
     }
     return false;
   }
