@@ -40,9 +40,6 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = ""
 ObservationString(1) = ""
-PublicObservationString() = ""
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0): ◯◯◯◯◯◯
 ObservationTensor(1): ◯◯◯◯◯◯
 Rewards() = [0.0, 0.0]
@@ -68,9 +65,6 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "Rock Rock "
 ObservationString(1) = "Rock Rock "
-PublicObservationString() = "Rock Rock "
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0): ◉◯◯◉◯◯
 ObservationTensor(1): ◉◯◯◉◯◯
 Rewards() = [0.0, 0.0]
@@ -99,9 +93,6 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "Scissors Scissors "
 ObservationString(1) = "Scissors Scissors "
-PublicObservationString() = "Scissors Scissors "
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0): ◯◯◉◯◯◉
 ObservationTensor(1): ◯◯◉◯◯◉
 Rewards() = [0.0, 0.0]
@@ -133,9 +124,6 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "Paper Rock "
 ObservationString(1) = "Paper Rock "
-PublicObservationString() = "Paper Rock "
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0): ◯◉◯◉◯◯
 ObservationTensor(1): ◯◉◯◉◯◯
 Rewards() = [1.0, -1.0]
@@ -170,9 +158,6 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "Paper Paper "
 ObservationString(1) = "Paper Paper "
-PublicObservationString() = "Paper Paper "
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0): ◯◉◯◯◉◯
 ObservationTensor(1): ◯◉◯◯◉◯
 Rewards() = [0.0, 0.0]
@@ -210,9 +195,6 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "Paper Paper "
 ObservationString(1) = "Paper Paper "
-PublicObservationString() = "Paper Paper "
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0): ◯◉◯◯◉◯
 ObservationTensor(1): ◯◉◯◯◉◯
 Rewards() = [0.0, 0.0]
@@ -253,9 +235,6 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "Rock Paper "
 ObservationString(1) = "Rock Paper "
-PublicObservationString() = "Rock Paper "
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0): ◉◯◯◯◉◯
 ObservationTensor(1): ◉◯◯◯◉◯
 Rewards() = [-1.0, 1.0]
@@ -299,9 +278,6 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "Rock Scissors "
 ObservationString(1) = "Rock Scissors "
-PublicObservationString() = "Rock Scissors "
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0): ◉◯◯◯◯◉
 ObservationTensor(1): ◉◯◯◯◯◉
 Rewards() = [1.0, -1.0]
@@ -348,9 +324,6 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "Rock Scissors "
 ObservationString(1) = "Rock Scissors "
-PublicObservationString() = "Rock Scissors "
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0): ◉◯◯◯◯◉
 ObservationTensor(1): ◉◯◯◯◯◉
 Rewards() = [1.0, -1.0]
@@ -400,9 +373,6 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "Rock Rock "
 ObservationString(1) = "Rock Rock "
-PublicObservationString() = "Rock Rock "
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0): ◉◯◯◉◯◯
 ObservationTensor(1): ◉◯◯◉◯◯
 Rewards() = [0.0, 0.0]
@@ -455,9 +425,6 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -4
 ObservationString(0) = "Rock Scissors "
 ObservationString(1) = "Rock Scissors "
-PublicObservationString() = "Rock Scissors "
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0): ◉◯◯◯◯◉
 ObservationTensor(1): ◉◯◯◯◯◉
 Rewards() = [1.0, -1.0]

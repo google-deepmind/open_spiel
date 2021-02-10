@@ -138,30 +138,36 @@ std::shared_ptr<Observer> Game::MakeBuiltInObserver(
     absl::optional<IIGObservationType> iig_obs_type) const {
   if (!iig_obs_type) return absl::make_unique<DefaultObserver>(*this);
 
-  // Perfect information games provide public information regardless
+  const bool perfect_info_game =
+      game_type_.information == GameType::Information::kPerfectInformation;
+  const bool provides_information_state =
+      game_type_.provides_information_state_tensor ||
+      game_type_.provides_information_state_string;
+  const bool provides_observation =
+      game_type_.provides_information_state_tensor ||
+      game_type_.provides_information_state_string;
+
+  // Perfect information games can provide public information regardless
   // of requested PrivateInfoType (as they have no private information).
-  if (GetType().information == GameType::Information::kPerfectInformation &&
-      !iig_obs_type->perfect_recall &&
-      (game_type_.provides_observation_tensor ||
-       game_type_.provides_observation_string)) {
-    if (iig_obs_type->public_info) {
-      return absl::make_unique<DefaultObserver>(*this);
-    } else {
+  if (perfect_info_game) {
+    // Handle the dummy case, where we do not use any public information.
+    // The game will just have empty private observations.
+    if (!iig_obs_type->public_info)
       return absl::make_unique<NoPrivateObserver>(*this);
-    }
+    if (provides_information_state && iig_obs_type->perfect_recall)
+      return absl::make_unique<InformationStateObserver>(*this);
+    if (provides_observation && !iig_obs_type->perfect_recall)
+      return absl::make_unique<DefaultObserver>(*this);
   }
 
   // TODO(author11) Reinstate this check
   // SPIEL_CHECK_EQ(GetType().information,
   //                GameType::Information::kImperfectInformation);
   if (iig_obs_type.value() == kDefaultObsType) {
-    if (game_type_.provides_observation_tensor ||
-        game_type_.provides_observation_string)
-      return absl::make_unique<DefaultObserver>(*this);
+    if (provides_observation) return absl::make_unique<DefaultObserver>(*this);
   }
   if (iig_obs_type.value() == kInfoStateObsType) {
-    if (game_type_.provides_information_state_tensor ||
-        game_type_.provides_information_state_string)
+    if (provides_information_state)
       return absl::make_unique<InformationStateObserver>(*this);
   }
   SpielFatalError(absl::StrCat("Requested Observer type not available: ",

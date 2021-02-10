@@ -51,8 +51,6 @@ IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
 ObservationString(0) = "SSSSSSSSSSSSSSSSSSSS\nSo..o....o.....o...S\nS.@...... .........S\nS...*......o.......S\nSHHHHHHHHHHHHH...o.S\nS.....*............S\nS..o.......*..o..  S\nS..o...o......... FS\nS.....HHHHHHHHHHHHHS\nS..*......*o..o..o.S\nS.............o....C\nSSSSSSSSSSSSSSSSSSSS\ntime left: 600, gems required: 4, gems collectred: 0"
-PublicObservationString() = "SSSSSSSSSSSSSSSSSSSS\nSo..o....o.....o...S\nS.@...... .........S\nS...*......o.......S\nSHHHHHHHHHHHHH...o.S\nS.....*............S\nS..o.......*..o..  S\nS..o...o......... FS\nS.....HHHHHHHHHHHHHS\nS..*......*o..o..o.S\nS.............o....C\nSSSSSSSSSSSSSSSSSSSS\ntime left: 600, gems required: 4, gems collectred: 0"
-PrivateObservationString(0) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◉◉◯◉◉◉◉◯◉◉◉◉◉◯◉◉◉◯  ◯◉◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -162,8 +160,6 @@ IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "ChanceNode -- no observation"
-PublicObservationString() = "ChanceNode -- no observation"
-PrivateObservationString(0) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -284,8 +280,6 @@ IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
 ObservationString(0) = "SSSSSSSSSSSSSSSSSSSS\nSo..o.... .....o...S\nS@ ......o.........S\nS...*......o.......S\nSHHHHHHHHHHHHH...o.S\nS.....*............S\nS..o.......*..o..  S\nS..o...o.........F S\nS.....HHHHHHHHHHHHHS\nS..*......*o..o..o.S\nS.............o....C\nSSSSSSSSSSSSSSSSSSSS\ntime left: 599, gems required: 4, gems collectred: 0"
-PublicObservationString() = "SSSSSSSSSSSSSSSSSSSS\nSo..o.... .....o...S\nS@ ......o.........S\nS...*......o.......S\nSHHHHHHHHHHHHH...o.S\nS.....*............S\nS..o.......*..o..  S\nS..o...o.........F S\nS.....HHHHHHHHHHHHHS\nS..*......*o..o..o.S\nS.............o....C\nSSSSSSSSSSSSSSSSSSSS\ntime left: 599, gems required: 4, gems collectred: 0"
-PrivateObservationString(0) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯  ◯◯◉◉◯◉◉◉◉◯◉◉◉◉◉◯◉◉◉◯  ◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -395,8 +389,6 @@ IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "ChanceNode -- no observation"
-PublicObservationString() = "ChanceNode -- no observation"
-PrivateObservationString(0) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -517,8 +509,6 @@ IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
 ObservationString(0) = "SSSSSSSSSSSSSSSSSSSS\nSo..o.... .....o...S\nS@ ......o.........S\nS...*......o.......S\nSHHHHHHHHHHHHH...o.S\nS.....*............S\nS..o.......*..o..  S\nS..o...o.........F S\nS.....HHHHHHHHHHHHHS\nS..*......*o..o..o.S\nS.............o....C\nSSSSSSSSSSSSSSSSSSSS\ntime left: 598, gems required: 4, gems collectred: 0"
-PublicObservationString() = "SSSSSSSSSSSSSSSSSSSS\nSo..o.... .....o...S\nS@ ......o.........S\nS...*......o.......S\nSHHHHHHHHHHHHH...o.S\nS.....*............S\nS..o.......*..o..  S\nS..o...o.........F S\nS.....HHHHHHHHHHHHHS\nS..*......*o..o..o.S\nS.............o....C\nSSSSSSSSSSSSSSSSSSSS\ntime left: 598, gems required: 4, gems collectred: 0"
-PrivateObservationString(0) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯  ◯◯◉◉◯◉◉◉◉◯◉◉◉◉◉◯◉◉◉◯  ◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -628,8 +618,6 @@ IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "ChanceNode -- no observation"
-PublicObservationString() = "ChanceNode -- no observation"
-PrivateObservationString(0) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -750,8 +738,6 @@ IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
 ObservationString(0) = "SSSSSSSSSSSSSSSSSSSS\nSo..o.... .....o...S\nS@ ......o.........S\nS...*......o.......S\nSHHHHHHHHHHHHH...o.S\nS.....*............S\nS..o.......*..o..F S\nS..o...o.........  S\nS.....HHHHHHHHHHHHHS\nS..*......*o..o..o.S\nS.............o....C\nSSSSSSSSSSSSSSSSSSSS\ntime left: 597, gems required: 4, gems collectred: 0"
-PublicObservationString() = "SSSSSSSSSSSSSSSSSSSS\nSo..o.... .....o...S\nS@ ......o.........S\nS...*......o.......S\nSHHHHHHHHHHHHH...o.S\nS.....*............S\nS..o.......*..o..F S\nS..o...o.........  S\nS.....HHHHHHHHHHHHHS\nS..*......*o..o..o.S\nS.............o....C\nSSSSSSSSSSSSSSSSSSSS\ntime left: 597, gems required: 4, gems collectred: 0"
-PrivateObservationString(0) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯  ◯◯◉◉◯◉◉◉◉◯◉◉◉◉◉◯◉◉◉◯  ◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -861,8 +847,6 @@ IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "ChanceNode -- no observation"
-PublicObservationString() = "ChanceNode -- no observation"
-PrivateObservationString(0) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -983,8 +967,6 @@ IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
 ObservationString(0) = "SSSSSSSSSSSSSSSSSSSS\nS ..o.... .....o...S\nSo ......o.........S\nS@..*......o.......S\nSHHHHHHHHHHHHH...o.S\nS.....*............S\nS..o.......*..o..F S\nS..o...o.........  S\nS.....HHHHHHHHHHHHHS\nS..*......*o..o..o.S\nS.............o....C\nSSSSSSSSSSSSSSSSSSSS\ntime left: 596, gems required: 4, gems collectred: 0"
-PublicObservationString() = "SSSSSSSSSSSSSSSSSSSS\nS ..o.... .....o...S\nSo ......o.........S\nS@..*......o.......S\nSHHHHHHHHHHHHH...o.S\nS.....*............S\nS..o.......*..o..F S\nS..o...o.........  S\nS.....HHHHHHHHHHHHHS\nS..*......*o..o..o.S\nS.............o....C\nSSSSSSSSSSSSSSSSSSSS\ntime left: 596, gems required: 4, gems collectred: 0"
-PrivateObservationString(0) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯  ◯◯◉◉◯◉◉◉◉◯◉◉◉◉◉◯◉◉◉◯  ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -1094,8 +1076,6 @@ IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "ChanceNode -- no observation"
-PublicObservationString() = "ChanceNode -- no observation"
-PrivateObservationString(0) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -1216,8 +1196,6 @@ IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
 ObservationString(0) = "SSSSSSSSSSSSSSSSSSSS\nS ..o.... .....o...S\nSEE......o.........S\nSEE.*......o.......S\nSEEHHHHHHHHHHH...o.S\nS.....*............S\nS..o.......*..o.. FS\nS..o...o.........  S\nS.....HHHHHHHHHHHHHS\nS..*......*o..o..o.S\nS.............o....C\nSSSSSSSSSSSSSSSSSSSS\ntime left: 595, gems required: 4, gems collectred: 0"
-PublicObservationString() = "SSSSSSSSSSSSSSSSSSSS\nS ..o.... .....o...S\nSEE......o.........S\nSEE.*......o.......S\nSEEHHHHHHHHHHH...o.S\nS.....*............S\nS..o.......*..o.. FS\nS..o...o.........  S\nS.....HHHHHHHHHHHHHS\nS..*......*o..o..o.S\nS.............o....C\nSSSSSSSSSSSSSSSSSSSS\ntime left: 595, gems required: 4, gems collectred: 0"
-PrivateObservationString(0) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯  ◯◯◉◉◯◉◉◉◉◯◉◉◉◉◉◯◉◉◉◯  ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯

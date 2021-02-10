@@ -48,9 +48,6 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 0
 ObservationString(0) = "8bbbbbbbb\n7bbbbbbbb\n6........\n5........\n4........\n3........\n2wwwwwwww\n1wwwwwwww\n abcdefgh\n"
 ObservationString(1) = "8bbbbbbbb\n7bbbbbbbb\n6........\n5........\n4........\n3........\n2wwwwwwww\n1wwwwwwww\n abcdefgh\n"
-PublicObservationString() = "8bbbbbbbb\n7bbbbbbbb\n6........\n5........\n4........\n3........\n2wwwwwwww\n1wwwwwwww\n abcdefgh\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯
 ◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯
@@ -95,9 +92,6 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 1
 ObservationString(0) = "8bbbbbbbb\n7bb.bbbbb\n6...b....\n5........\n4........\n3........\n2wwwwwwww\n1wwwwwwww\n abcdefgh\n"
 ObservationString(1) = "8bbbbbbbb\n7bb.bbbbb\n6...b....\n5........\n4........\n3........\n2wwwwwwww\n1wwwwwwww\n abcdefgh\n"
-PublicObservationString() = "8bbbbbbbb\n7bb.bbbbb\n6...b....\n5........\n4........\n3........\n2wwwwwwww\n1wwwwwwww\n abcdefgh\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯
 ◉◉◯◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯◯
@@ -142,9 +136,6 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 0
 ObservationString(0) = "8bbbbbbbb\n7bb.bbbbb\n6...b....\n5........\n4........\n3...w....\n2www.wwww\n1wwwwwwww\n abcdefgh\n"
 ObservationString(1) = "8bbbbbbbb\n7bb.bbbbb\n6...b....\n5........\n4........\n3...w....\n2www.wwww\n1wwwwwwww\n abcdefgh\n"
-PublicObservationString() = "8bbbbbbbb\n7bb.bbbbb\n6...b....\n5........\n4........\n3...w....\n2www.wwww\n1wwwwwwww\n abcdefgh\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯
 ◉◉◯◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯◯
@@ -189,9 +180,6 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 1
 ObservationString(0) = "8bbbbbbbb\n7bb.bb.bb\n6...bb...\n5........\n4........\n3...w....\n2www.wwww\n1wwwwwwww\n abcdefgh\n"
 ObservationString(1) = "8bbbbbbbb\n7bb.bb.bb\n6...bb...\n5........\n4........\n3...w....\n2www.wwww\n1wwwwwwww\n abcdefgh\n"
-PublicObservationString() = "8bbbbbbbb\n7bb.bb.bb\n6...bb...\n5........\n4........\n3...w....\n2www.wwww\n1wwwwwwww\n abcdefgh\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯
 ◉◉◯◉◉◯◉◉  ◯◯◯◯◯◯◯◯  ◯◯◉◯◯◉◯◯
@@ -236,9 +224,6 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 0
 ObservationString(0) = "8bbbbbbbb\n7bb.bb.bb\n6...bb...\n5........\n4........\n3...ww...\n2www.w.ww\n1wwwwwwww\n abcdefgh\n"
 ObservationString(1) = "8bbbbbbbb\n7bb.bb.bb\n6...bb...\n5........\n4........\n3...ww...\n2www.w.ww\n1wwwwwwww\n abcdefgh\n"
-PublicObservationString() = "8bbbbbbbb\n7bb.bb.bb\n6...bb...\n5........\n4........\n3...ww...\n2www.w.ww\n1wwwwwwww\n abcdefgh\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯
 ◉◉◯◉◉◯◉◉  ◯◯◯◯◯◯◯◯  ◯◯◉◯◯◉◯◯
@@ -283,9 +268,6 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 1
 ObservationString(0) = "8b.bbbbbb\n7bbbbb.bb\n6...bb...\n5........\n4........\n3...ww...\n2www.w.ww\n1wwwwwwww\n abcdefgh\n"
 ObservationString(1) = "8b.bbbbbb\n7bbbbb.bb\n6...bb...\n5........\n4........\n3...ww...\n2www.w.ww\n1wwwwwwww\n abcdefgh\n"
-PublicObservationString() = "8b.bbbbbb\n7bbbbb.bb\n6...bb...\n5........\n4........\n3...ww...\n2www.w.ww\n1wwwwwwww\n abcdefgh\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◉◯◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◉◯◯◯◯◯◯
 ◉◉◉◉◉◯◉◉  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯◯
@@ -330,9 +312,6 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 0
 ObservationString(0) = "8b.bbbbbb\n7bbbbb.bb\n6...bb...\n5........\n4........\n3.w.ww...\n2w.w.w.ww\n1wwwwwwww\n abcdefgh\n"
 ObservationString(1) = "8b.bbbbbb\n7bbbbb.bb\n6...bb...\n5........\n4........\n3.w.ww...\n2w.w.w.ww\n1wwwwwwww\n abcdefgh\n"
-PublicObservationString() = "8b.bbbbbb\n7bbbbb.bb\n6...bb...\n5........\n4........\n3.w.ww...\n2w.w.w.ww\n1wwwwwwww\n abcdefgh\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◉◯◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◉◯◯◯◯◯◯
 ◉◉◉◉◉◯◉◉  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯◯
@@ -377,9 +356,6 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 1
 ObservationString(0) = "8b.bbbbbb\n7bbbbb.bb\n6....b...\n5...b....\n4........\n3.w.ww...\n2w.w.w.ww\n1wwwwwwww\n abcdefgh\n"
 ObservationString(1) = "8b.bbbbbb\n7bbbbb.bb\n6....b...\n5...b....\n4........\n3.w.ww...\n2w.w.w.ww\n1wwwwwwww\n abcdefgh\n"
-PublicObservationString() = "8b.bbbbbb\n7bbbbb.bb\n6....b...\n5...b....\n4........\n3.w.ww...\n2w.w.w.ww\n1wwwwwwww\n abcdefgh\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◉◯◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◉◯◯◯◯◯◯
 ◉◉◉◉◉◯◉◉  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯◯
@@ -424,9 +400,6 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 0
 ObservationString(0) = "8b.bbbbbb\n7bbbbb.bb\n6....b...\n5...b....\n4........\n3.w.ww...\n2w.w.wwww\n1wwwwww.w\n abcdefgh\n"
 ObservationString(1) = "8b.bbbbbb\n7bbbbb.bb\n6....b...\n5...b....\n4........\n3.w.ww...\n2w.w.wwww\n1wwwwww.w\n abcdefgh\n"
-PublicObservationString() = "8b.bbbbbb\n7bbbbb.bb\n6....b...\n5...b....\n4........\n3.w.ww...\n2w.w.wwww\n1wwwwww.w\n abcdefgh\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◉◯◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◉◯◯◯◯◯◯
 ◉◉◉◉◉◯◉◉  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯◯
@@ -471,9 +444,6 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 1
 ObservationString(0) = "8b.bbb.bb\n7bbbbbbbb\n6....b...\n5...b....\n4........\n3.w.ww...\n2w.w.wwww\n1wwwwww.w\n abcdefgh\n"
 ObservationString(1) = "8b.bbb.bb\n7bbbbbbbb\n6....b...\n5...b....\n4........\n3.w.ww...\n2w.w.wwww\n1wwwwww.w\n abcdefgh\n"
-PublicObservationString() = "8b.bbb.bb\n7bbbbbbbb\n6....b...\n5...b....\n4........\n3.w.ww...\n2w.w.wwww\n1wwwwww.w\n abcdefgh\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◉◯◉◉◉◯◉◉  ◯◯◯◯◯◯◯◯  ◯◉◯◯◯◉◯◯
 ◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯
@@ -518,9 +488,6 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 0
 ObservationString(0) = "8b.bbb.bb\n7bbbbbbbb\n6....b...\n5...b....\n4........\n3.w.ww..w\n2w.w.www.\n1wwwwww.w\n abcdefgh\n"
 ObservationString(1) = "8b.bbb.bb\n7bbbbbbbb\n6....b...\n5...b....\n4........\n3.w.ww..w\n2w.w.www.\n1wwwwww.w\n abcdefgh\n"
-PublicObservationString() = "8b.bbb.bb\n7bbbbbbbb\n6....b...\n5...b....\n4........\n3.w.ww..w\n2w.w.www.\n1wwwwww.w\n abcdefgh\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◉◯◉◉◉◯◉◉  ◯◯◯◯◯◯◯◯  ◯◉◯◯◯◉◯◯
 ◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯
@@ -565,9 +532,6 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 1
 ObservationString(0) = "8b.bbb.bb\n7b.bbbbbb\n6b...b...\n5...b....\n4........\n3.w.ww..w\n2w.w.www.\n1wwwwww.w\n abcdefgh\n"
 ObservationString(1) = "8b.bbb.bb\n7b.bbbbbb\n6b...b...\n5...b....\n4........\n3.w.ww..w\n2w.w.www.\n1wwwwww.w\n abcdefgh\n"
-PublicObservationString() = "8b.bbb.bb\n7b.bbbbbb\n6b...b...\n5...b....\n4........\n3.w.ww..w\n2w.w.www.\n1wwwwww.w\n abcdefgh\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◉◯◉◉◉◯◉◉  ◯◯◯◯◯◯◯◯  ◯◉◯◯◯◉◯◯
 ◉◯◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◉◯◯◯◯◯◯
@@ -612,9 +576,6 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 0
 ObservationString(0) = "8b.bbb.bb\n7b.bbbbbb\n6b...b...\n5...b....\n4.......w\n3.w.ww...\n2w.w.www.\n1wwwwww.w\n abcdefgh\n"
 ObservationString(1) = "8b.bbb.bb\n7b.bbbbbb\n6b...b...\n5...b....\n4.......w\n3.w.ww...\n2w.w.www.\n1wwwwww.w\n abcdefgh\n"
-PublicObservationString() = "8b.bbb.bb\n7b.bbbbbb\n6b...b...\n5...b....\n4.......w\n3.w.ww...\n2w.w.www.\n1wwwwww.w\n abcdefgh\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◉◯◉◉◉◯◉◉  ◯◯◯◯◯◯◯◯  ◯◉◯◯◯◉◯◯
 ◉◯◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◉◯◯◯◯◯◯
@@ -659,9 +620,6 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 1
 ObservationString(0) = "8b.bbb.bb\n7b.b.bbbb\n6b.b.b...\n5...b....\n4.......w\n3.w.ww...\n2w.w.www.\n1wwwwww.w\n abcdefgh\n"
 ObservationString(1) = "8b.bbb.bb\n7b.b.bbbb\n6b.b.b...\n5...b....\n4.......w\n3.w.ww...\n2w.w.www.\n1wwwwww.w\n abcdefgh\n"
-PublicObservationString() = "8b.bbb.bb\n7b.b.bbbb\n6b.b.b...\n5...b....\n4.......w\n3.w.ww...\n2w.w.www.\n1wwwwww.w\n abcdefgh\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◉◯◉◉◉◯◉◉  ◯◯◯◯◯◯◯◯  ◯◉◯◯◯◉◯◯
 ◉◯◉◯◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◉◯◉◯◯◯◯
@@ -706,9 +664,6 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 0
 ObservationString(0) = "8b.bbb.bb\n7b.b.bbbb\n6b.b.b...\n5...b....\n4.......w\n3.w.ww...\n2www.www.\n1.wwwww.w\n abcdefgh\n"
 ObservationString(1) = "8b.bbb.bb\n7b.b.bbbb\n6b.b.b...\n5...b....\n4.......w\n3.w.ww...\n2www.www.\n1.wwwww.w\n abcdefgh\n"
-PublicObservationString() = "8b.bbb.bb\n7b.b.bbbb\n6b.b.b...\n5...b....\n4.......w\n3.w.ww...\n2www.www.\n1.wwwww.w\n abcdefgh\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◉◯◉◉◉◯◉◉  ◯◯◯◯◯◯◯◯  ◯◉◯◯◯◉◯◯
 ◉◯◉◯◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◉◯◉◯◯◯◯
@@ -753,9 +708,6 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 1
 ObservationString(0) = "8b.bbb.bb\n7b.b.bb.b\n6b.b.b.b.\n5...b....\n4.......w\n3.w.ww...\n2www.www.\n1.wwwww.w\n abcdefgh\n"
 ObservationString(1) = "8b.bbb.bb\n7b.b.bb.b\n6b.b.b.b.\n5...b....\n4.......w\n3.w.ww...\n2www.www.\n1.wwwww.w\n abcdefgh\n"
-PublicObservationString() = "8b.bbb.bb\n7b.b.bb.b\n6b.b.b.b.\n5...b....\n4.......w\n3.w.ww...\n2www.www.\n1.wwwww.w\n abcdefgh\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◉◯◉◉◉◯◉◉  ◯◯◯◯◯◯◯◯  ◯◉◯◯◯◉◯◯
 ◉◯◉◯◉◉◯◉  ◯◯◯◯◯◯◯◯  ◯◉◯◉◯◯◉◯
@@ -800,9 +752,6 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 0
 ObservationString(0) = "8b.bbb.bb\n7b.b.bb.b\n6b.b.b.b.\n5...b....\n4.....w.w\n3.w.w....\n2www.www.\n1.wwwww.w\n abcdefgh\n"
 ObservationString(1) = "8b.bbb.bb\n7b.b.bb.b\n6b.b.b.b.\n5...b....\n4.....w.w\n3.w.w....\n2www.www.\n1.wwwww.w\n abcdefgh\n"
-PublicObservationString() = "8b.bbb.bb\n7b.b.bb.b\n6b.b.b.b.\n5...b....\n4.....w.w\n3.w.w....\n2www.www.\n1.wwwww.w\n abcdefgh\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◉◯◉◉◉◯◉◉  ◯◯◯◯◯◯◯◯  ◯◉◯◯◯◉◯◯
 ◉◯◉◯◉◉◯◉  ◯◯◯◯◯◯◯◯  ◯◉◯◉◯◯◉◯
@@ -847,9 +796,6 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 1
 ObservationString(0) = "8b.bbb.bb\n7b.b..b.b\n6b.b.bbb.\n5...b....\n4.....w.w\n3.w.w....\n2www.www.\n1.wwwww.w\n abcdefgh\n"
 ObservationString(1) = "8b.bbb.bb\n7b.b..b.b\n6b.b.bbb.\n5...b....\n4.....w.w\n3.w.w....\n2www.www.\n1.wwwww.w\n abcdefgh\n"
-PublicObservationString() = "8b.bbb.bb\n7b.b..b.b\n6b.b.bbb.\n5...b....\n4.....w.w\n3.w.w....\n2www.www.\n1.wwwww.w\n abcdefgh\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◉◯◉◉◉◯◉◉  ◯◯◯◯◯◯◯◯  ◯◉◯◯◯◉◯◯
 ◉◯◉◯◯◉◯◉  ◯◯◯◯◯◯◯◯  ◯◉◯◉◉◯◉◯
@@ -894,9 +840,6 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 0
 ObservationString(0) = "8b.bbb.bb\n7b.b..b.b\n6b.b.bbb.\n5...b....\n4.w...w.w\n3...w....\n2www.www.\n1.wwwww.w\n abcdefgh\n"
 ObservationString(1) = "8b.bbb.bb\n7b.b..b.b\n6b.b.bbb.\n5...b....\n4.w...w.w\n3...w....\n2www.www.\n1.wwwww.w\n abcdefgh\n"
-PublicObservationString() = "8b.bbb.bb\n7b.b..b.b\n6b.b.bbb.\n5...b....\n4.w...w.w\n3...w....\n2www.www.\n1.wwwww.w\n abcdefgh\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◉◯◉◉◉◯◉◉  ◯◯◯◯◯◯◯◯  ◯◉◯◯◯◉◯◯
 ◉◯◉◯◯◉◯◉  ◯◯◯◯◯◯◯◯  ◯◉◯◉◉◯◉◯
@@ -941,9 +884,6 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 1
 ObservationString(0) = "8b.bb..bb\n7b.bb.b.b\n6b.b.bbb.\n5...b....\n4.w...w.w\n3...w....\n2www.www.\n1.wwwww.w\n abcdefgh\n"
 ObservationString(1) = "8b.bb..bb\n7b.bb.b.b\n6b.b.bbb.\n5...b....\n4.w...w.w\n3...w....\n2www.www.\n1.wwwww.w\n abcdefgh\n"
-PublicObservationString() = "8b.bb..bb\n7b.bb.b.b\n6b.b.bbb.\n5...b....\n4.w...w.w\n3...w....\n2www.www.\n1.wwwww.w\n abcdefgh\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◉◯◉◉◯◯◉◉  ◯◯◯◯◯◯◯◯  ◯◉◯◯◉◉◯◯
 ◉◯◉◉◯◉◯◉  ◯◯◯◯◯◯◯◯  ◯◉◯◯◉◯◉◯
@@ -988,9 +928,6 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 0
 ObservationString(0) = "8b.bb..bb\n7b.bb.b.b\n6b.b.bbb.\n5...b....\n4.w...w.w\n3w..w....\n2.ww.www.\n1.wwwww.w\n abcdefgh\n"
 ObservationString(1) = "8b.bb..bb\n7b.bb.b.b\n6b.b.bbb.\n5...b....\n4.w...w.w\n3w..w....\n2.ww.www.\n1.wwwww.w\n abcdefgh\n"
-PublicObservationString() = "8b.bb..bb\n7b.bb.b.b\n6b.b.bbb.\n5...b....\n4.w...w.w\n3w..w....\n2.ww.www.\n1.wwwww.w\n abcdefgh\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◉◯◉◉◯◯◉◉  ◯◯◯◯◯◯◯◯  ◯◉◯◯◉◉◯◯
 ◉◯◉◉◯◉◯◉  ◯◯◯◯◯◯◯◯  ◯◉◯◯◉◯◉◯
@@ -1035,9 +972,6 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 1
 ObservationString(0) = "8b.bb..bb\n7b.bb.b.b\n6b.b.bb..\n5...b..b.\n4.w...w.w\n3w..w....\n2.ww.www.\n1.wwwww.w\n abcdefgh\n"
 ObservationString(1) = "8b.bb..bb\n7b.bb.b.b\n6b.b.bb..\n5...b..b.\n4.w...w.w\n3w..w....\n2.ww.www.\n1.wwwww.w\n abcdefgh\n"
-PublicObservationString() = "8b.bb..bb\n7b.bb.b.b\n6b.b.bb..\n5...b..b.\n4.w...w.w\n3w..w....\n2.ww.www.\n1.wwwww.w\n abcdefgh\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◉◯◉◉◯◯◉◉  ◯◯◯◯◯◯◯◯  ◯◉◯◯◉◉◯◯
 ◉◯◉◉◯◉◯◉  ◯◯◯◯◯◯◯◯  ◯◉◯◯◉◯◉◯
@@ -1082,9 +1016,6 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 0
 ObservationString(0) = "8b.bb..bb\n7b.bb.b.b\n6b.b.bb..\n5...b..b.\n4.w...w.w\n3w..w..w.\n2.ww.ww..\n1.wwwww.w\n abcdefgh\n"
 ObservationString(1) = "8b.bb..bb\n7b.bb.b.b\n6b.b.bb..\n5...b..b.\n4.w...w.w\n3w..w..w.\n2.ww.ww..\n1.wwwww.w\n abcdefgh\n"
-PublicObservationString() = "8b.bb..bb\n7b.bb.b.b\n6b.b.bb..\n5...b..b.\n4.w...w.w\n3w..w..w.\n2.ww.ww..\n1.wwwww.w\n abcdefgh\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◉◯◉◉◯◯◉◉  ◯◯◯◯◯◯◯◯  ◯◉◯◯◉◉◯◯
 ◉◯◉◉◯◉◯◉  ◯◯◯◯◯◯◯◯  ◯◉◯◯◉◯◉◯
@@ -1129,9 +1060,6 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 1
 ObservationString(0) = "8b.bb..b.\n7b.bb.bbb\n6b.b.bb..\n5...b..b.\n4.w...w.w\n3w..w..w.\n2.ww.ww..\n1.wwwww.w\n abcdefgh\n"
 ObservationString(1) = "8b.bb..b.\n7b.bb.bbb\n6b.b.bb..\n5...b..b.\n4.w...w.w\n3w..w..w.\n2.ww.ww..\n1.wwwww.w\n abcdefgh\n"
-PublicObservationString() = "8b.bb..b.\n7b.bb.bbb\n6b.b.bb..\n5...b..b.\n4.w...w.w\n3w..w..w.\n2.ww.ww..\n1.wwwww.w\n abcdefgh\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◉◯◉◉◯◯◉◯  ◯◯◯◯◯◯◯◯  ◯◉◯◯◉◉◯◉
 ◉◯◉◉◯◉◉◉  ◯◯◯◯◯◯◯◯  ◯◉◯◯◉◯◯◯
@@ -1176,9 +1104,6 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 0
 ObservationString(0) = "8b.bb..b.\n7b.bb.bbb\n6b.b.bb..\n5w..b..b.\n4.....w.w\n3w..w..w.\n2.ww.ww..\n1.wwwww.w\n abcdefgh\n"
 ObservationString(1) = "8b.bb..b.\n7b.bb.bbb\n6b.b.bb..\n5w..b..b.\n4.....w.w\n3w..w..w.\n2.ww.ww..\n1.wwwww.w\n abcdefgh\n"
-PublicObservationString() = "8b.bb..b.\n7b.bb.bbb\n6b.b.bb..\n5w..b..b.\n4.....w.w\n3w..w..w.\n2.ww.ww..\n1.wwwww.w\n abcdefgh\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◉◯◉◉◯◯◉◯  ◯◯◯◯◯◯◯◯  ◯◉◯◯◉◉◯◉
 ◉◯◉◉◯◉◉◉  ◯◯◯◯◯◯◯◯  ◯◉◯◯◉◯◯◯
@@ -1223,9 +1148,6 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 1
 ObservationString(0) = "8b.bb..b.\n7b..b.bbb\n6b.bbbb..\n5w..b..b.\n4.....w.w\n3w..w..w.\n2.ww.ww..\n1.wwwww.w\n abcdefgh\n"
 ObservationString(1) = "8b.bb..b.\n7b..b.bbb\n6b.bbbb..\n5w..b..b.\n4.....w.w\n3w..w..w.\n2.ww.ww..\n1.wwwww.w\n abcdefgh\n"
-PublicObservationString() = "8b.bb..b.\n7b..b.bbb\n6b.bbbb..\n5w..b..b.\n4.....w.w\n3w..w..w.\n2.ww.ww..\n1.wwwww.w\n abcdefgh\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◉◯◉◉◯◯◉◯  ◯◯◯◯◯◯◯◯  ◯◉◯◯◉◉◯◉
 ◉◯◯◉◯◉◉◉  ◯◯◯◯◯◯◯◯  ◯◉◉◯◉◯◯◯
@@ -1270,9 +1192,6 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 0
 ObservationString(0) = "8b.bb..b.\n7b..b.bbb\n6b.bbbb..\n5w..b..b.\n4.....w.w\n3w..w..w.\n2.ww.www.\n1.wwwww..\n abcdefgh\n"
 ObservationString(1) = "8b.bb..b.\n7b..b.bbb\n6b.bbbb..\n5w..b..b.\n4.....w.w\n3w..w..w.\n2.ww.www.\n1.wwwww..\n abcdefgh\n"
-PublicObservationString() = "8b.bb..b.\n7b..b.bbb\n6b.bbbb..\n5w..b..b.\n4.....w.w\n3w..w..w.\n2.ww.www.\n1.wwwww..\n abcdefgh\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◉◯◉◉◯◯◉◯  ◯◯◯◯◯◯◯◯  ◯◉◯◯◉◉◯◉
 ◉◯◯◉◯◉◉◉  ◯◯◯◯◯◯◯◯  ◯◉◉◯◉◯◯◯
@@ -1317,9 +1236,6 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 1
 ObservationString(0) = "8b.bb..b.\n7b..b.b.b\n6b.bbbbb.\n5w..b..b.\n4.....w.w\n3w..w..w.\n2.ww.www.\n1.wwwww..\n abcdefgh\n"
 ObservationString(1) = "8b.bb..b.\n7b..b.b.b\n6b.bbbbb.\n5w..b..b.\n4.....w.w\n3w..w..w.\n2.ww.www.\n1.wwwww..\n abcdefgh\n"
-PublicObservationString() = "8b.bb..b.\n7b..b.b.b\n6b.bbbbb.\n5w..b..b.\n4.....w.w\n3w..w..w.\n2.ww.www.\n1.wwwww..\n abcdefgh\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◉◯◉◉◯◯◉◯  ◯◯◯◯◯◯◯◯  ◯◉◯◯◉◉◯◉
 ◉◯◯◉◯◉◯◉  ◯◯◯◯◯◯◯◯  ◯◉◉◯◉◯◉◯
@@ -1364,9 +1280,6 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 0
 ObservationString(0) = "8b.bb..b.\n7b..b.b.b\n6b.bbbbb.\n5w..b..w.\n4.....w..\n3w..w..w.\n2.ww.www.\n1.wwwww..\n abcdefgh\n"
 ObservationString(1) = "8b.bb..b.\n7b..b.b.b\n6b.bbbbb.\n5w..b..w.\n4.....w..\n3w..w..w.\n2.ww.www.\n1.wwwww..\n abcdefgh\n"
-PublicObservationString() = "8b.bb..b.\n7b..b.b.b\n6b.bbbbb.\n5w..b..w.\n4.....w..\n3w..w..w.\n2.ww.www.\n1.wwwww..\n abcdefgh\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◉◯◉◉◯◯◉◯  ◯◯◯◯◯◯◯◯  ◯◉◯◯◉◉◯◉
 ◉◯◯◉◯◉◯◉  ◯◯◯◯◯◯◯◯  ◯◉◉◯◉◯◉◯
@@ -1411,9 +1324,6 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 1
 ObservationString(0) = "8b.bb..b.\n7b..b.b.b\n6b.b.bbb.\n5w.bb..w.\n4.....w..\n3w..w..w.\n2.ww.www.\n1.wwwww..\n abcdefgh\n"
 ObservationString(1) = "8b.bb..b.\n7b..b.b.b\n6b.b.bbb.\n5w.bb..w.\n4.....w..\n3w..w..w.\n2.ww.www.\n1.wwwww..\n abcdefgh\n"
-PublicObservationString() = "8b.bb..b.\n7b..b.b.b\n6b.b.bbb.\n5w.bb..w.\n4.....w..\n3w..w..w.\n2.ww.www.\n1.wwwww..\n abcdefgh\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◉◯◉◉◯◯◉◯  ◯◯◯◯◯◯◯◯  ◯◉◯◯◉◉◯◉
 ◉◯◯◉◯◉◯◉  ◯◯◯◯◯◯◯◯  ◯◉◉◯◉◯◉◯
@@ -1458,9 +1368,6 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 0
 ObservationString(0) = "8b.bb..b.\n7b..b.b.b\n6b.b.bwb.\n5w.bb....\n4.....w..\n3w..w..w.\n2.ww.www.\n1.wwwww..\n abcdefgh\n"
 ObservationString(1) = "8b.bb..b.\n7b..b.b.b\n6b.b.bwb.\n5w.bb....\n4.....w..\n3w..w..w.\n2.ww.www.\n1.wwwww..\n abcdefgh\n"
-PublicObservationString() = "8b.bb..b.\n7b..b.b.b\n6b.b.bwb.\n5w.bb....\n4.....w..\n3w..w..w.\n2.ww.www.\n1.wwwww..\n abcdefgh\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◉◯◉◉◯◯◉◯  ◯◯◯◯◯◯◯◯  ◯◉◯◯◉◉◯◉
 ◉◯◯◉◯◉◯◉  ◯◯◯◯◯◯◯◯  ◯◉◉◯◉◯◉◯
@@ -1505,9 +1412,6 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 1
 ObservationString(0) = "8b.bb..b.\n7b..b.b.b\n6b.b.bwb.\n5w..b....\n4...b.w..\n3w..w..w.\n2.ww.www.\n1.wwwww..\n abcdefgh\n"
 ObservationString(1) = "8b.bb..b.\n7b..b.b.b\n6b.b.bwb.\n5w..b....\n4...b.w..\n3w..w..w.\n2.ww.www.\n1.wwwww..\n abcdefgh\n"
-PublicObservationString() = "8b.bb..b.\n7b..b.b.b\n6b.b.bwb.\n5w..b....\n4...b.w..\n3w..w..w.\n2.ww.www.\n1.wwwww..\n abcdefgh\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◉◯◉◉◯◯◉◯  ◯◯◯◯◯◯◯◯  ◯◉◯◯◉◉◯◉
 ◉◯◯◉◯◉◯◉  ◯◯◯◯◯◯◯◯  ◯◉◉◯◉◯◉◯
@@ -1552,9 +1456,6 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 0
 ObservationString(0) = "8b.bb..b.\n7b..bwb.b\n6b.b.b.b.\n5w..b....\n4...b.w..\n3w..w..w.\n2.ww.www.\n1.wwwww..\n abcdefgh\n"
 ObservationString(1) = "8b.bb..b.\n7b..bwb.b\n6b.b.b.b.\n5w..b....\n4...b.w..\n3w..w..w.\n2.ww.www.\n1.wwwww..\n abcdefgh\n"
-PublicObservationString() = "8b.bb..b.\n7b..bwb.b\n6b.b.b.b.\n5w..b....\n4...b.w..\n3w..w..w.\n2.ww.www.\n1.wwwww..\n abcdefgh\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◉◯◉◉◯◯◉◯  ◯◯◯◯◯◯◯◯  ◯◉◯◯◉◉◯◉
 ◉◯◯◉◯◉◯◉  ◯◯◯◯◉◯◯◯  ◯◉◉◯◯◯◉◯
@@ -1599,9 +1500,6 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 1
 ObservationString(0) = "8b.bb..b.\n7b..bw..b\n6b.b.bbb.\n5w..b....\n4...b.w..\n3w..w..w.\n2.ww.www.\n1.wwwww..\n abcdefgh\n"
 ObservationString(1) = "8b.bb..b.\n7b..bw..b\n6b.b.bbb.\n5w..b....\n4...b.w..\n3w..w..w.\n2.ww.www.\n1.wwwww..\n abcdefgh\n"
-PublicObservationString() = "8b.bb..b.\n7b..bw..b\n6b.b.bbb.\n5w..b....\n4...b.w..\n3w..w..w.\n2.ww.www.\n1.wwwww..\n abcdefgh\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◉◯◉◉◯◯◉◯  ◯◯◯◯◯◯◯◯  ◯◉◯◯◉◉◯◉
 ◉◯◯◉◯◯◯◉  ◯◯◯◯◉◯◯◯  ◯◉◉◯◯◉◉◯
@@ -1646,9 +1544,6 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 0
 ObservationString(0) = "8b.bb..b.\n7b..bw..b\n6b.b.bbb.\n5w..b....\n4...b.w.w\n3w..w....\n2.ww.www.\n1.wwwww..\n abcdefgh\n"
 ObservationString(1) = "8b.bb..b.\n7b..bw..b\n6b.b.bbb.\n5w..b....\n4...b.w.w\n3w..w....\n2.ww.www.\n1.wwwww..\n abcdefgh\n"
-PublicObservationString() = "8b.bb..b.\n7b..bw..b\n6b.b.bbb.\n5w..b....\n4...b.w.w\n3w..w....\n2.ww.www.\n1.wwwww..\n abcdefgh\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◉◯◉◉◯◯◉◯  ◯◯◯◯◯◯◯◯  ◯◉◯◯◉◉◯◉
 ◉◯◯◉◯◯◯◉  ◯◯◯◯◉◯◯◯  ◯◉◉◯◯◉◉◯
@@ -1693,9 +1588,6 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 1
 ObservationString(0) = "8b.bb..b.\n7b..bw..b\n6b.b.b.b.\n5w..b.b..\n4...b.w.w\n3w..w....\n2.ww.www.\n1.wwwww..\n abcdefgh\n"
 ObservationString(1) = "8b.bb..b.\n7b..bw..b\n6b.b.b.b.\n5w..b.b..\n4...b.w.w\n3w..w....\n2.ww.www.\n1.wwwww..\n abcdefgh\n"
-PublicObservationString() = "8b.bb..b.\n7b..bw..b\n6b.b.b.b.\n5w..b.b..\n4...b.w.w\n3w..w....\n2.ww.www.\n1.wwwww..\n abcdefgh\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◉◯◉◉◯◯◉◯  ◯◯◯◯◯◯◯◯  ◯◉◯◯◉◉◯◉
 ◉◯◯◉◯◯◯◉  ◯◯◯◯◉◯◯◯  ◯◉◉◯◯◉◉◯
@@ -1740,9 +1632,6 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 0
 ObservationString(0) = "8b.bb..b.\n7b..bw..b\n6b.b.b.b.\n5w..b.b..\n4..wb.w.w\n3w.......\n2.ww.www.\n1.wwwww..\n abcdefgh\n"
 ObservationString(1) = "8b.bb..b.\n7b..bw..b\n6b.b.b.b.\n5w..b.b..\n4..wb.w.w\n3w.......\n2.ww.www.\n1.wwwww..\n abcdefgh\n"
-PublicObservationString() = "8b.bb..b.\n7b..bw..b\n6b.b.b.b.\n5w..b.b..\n4..wb.w.w\n3w.......\n2.ww.www.\n1.wwwww..\n abcdefgh\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◉◯◉◉◯◯◉◯  ◯◯◯◯◯◯◯◯  ◯◉◯◯◉◉◯◉
 ◉◯◯◉◯◯◯◉  ◯◯◯◯◉◯◯◯  ◯◉◉◯◯◉◉◯
@@ -1787,9 +1676,6 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 1
 ObservationString(0) = "8b.bb..b.\n7b..bw..b\n6b.b.b.b.\n5w..b.b..\n4..w..w.w\n3w...b...\n2.ww.www.\n1.wwwww..\n abcdefgh\n"
 ObservationString(1) = "8b.bb..b.\n7b..bw..b\n6b.b.b.b.\n5w..b.b..\n4..w..w.w\n3w...b...\n2.ww.www.\n1.wwwww..\n abcdefgh\n"
-PublicObservationString() = "8b.bb..b.\n7b..bw..b\n6b.b.b.b.\n5w..b.b..\n4..w..w.w\n3w...b...\n2.ww.www.\n1.wwwww..\n abcdefgh\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◉◯◉◉◯◯◉◯  ◯◯◯◯◯◯◯◯  ◯◉◯◯◉◉◯◉
 ◉◯◯◉◯◯◯◉  ◯◯◯◯◉◯◯◯  ◯◉◉◯◯◉◉◯
@@ -1834,9 +1720,6 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -4
 ObservationString(0) = "8b.bbw.b.\n7b..b...b\n6b.b.b.b.\n5w..b.b..\n4..w..w.w\n3w...b...\n2.ww.www.\n1.wwwww..\n abcdefgh\n"
 ObservationString(1) = "8b.bbw.b.\n7b..b...b\n6b.b.b.b.\n5w..b.b..\n4..w..w.w\n3w...b...\n2.ww.www.\n1.wwwww..\n abcdefgh\n"
-PublicObservationString() = "8b.bbw.b.\n7b..b...b\n6b.b.b.b.\n5w..b.b..\n4..w..w.w\n3w...b...\n2.ww.www.\n1.wwwww..\n abcdefgh\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◉◯◉◉◯◯◉◯  ◯◯◯◯◉◯◯◯  ◯◉◯◯◯◉◯◉
 ◉◯◯◉◯◯◯◉  ◯◯◯◯◯◯◯◯  ◯◉◉◯◉◉◉◯
