@@ -20,7 +20,6 @@ add_library(stockfish OBJECT
         stockfish/src/position.cpp
         stockfish/src/position.h
         stockfish/src/psqt.cpp
-        stockfish/src/psqt.h
         stockfish/src/search.cpp
         stockfish/src/search.h
         stockfish/src/thread.cpp

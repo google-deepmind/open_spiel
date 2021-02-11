@@ -12,15 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "open_spiel/bots/stockfish/stockfish/src/bitboard.h"
+#include "open_spiel/bots/stockfish/stockfish/src/endgame.h"
+#include "open_spiel/bots/stockfish/stockfish/src/position.h"
 #include "open_spiel/bots/stockfish/stockfish/src/search.h"
-#include "open_spiel/bots/stockfish/stockfish/src/uci.h"
 #include "open_spiel/bots/stockfish/stockfish/src/thread.h"
+#include "open_spiel/bots/stockfish/stockfish/src/tt.h"
+#include "open_spiel/bots/stockfish/stockfish/src/uci.h"
+#include "open_spiel/bots/stockfish/stockfish/src/syzygy/tbprobe.h"
 #include "open_spiel/bots/stockfish/stockfish/src/types.h"
 #include "open_spiel/bots/stockfish/stockfish_bot.h"
 #include "open_spiel/spiel_utils.h"
 
 #include "open_spiel/games/chess.h"
-#include "open_spiel/games/chess/chess_common.h"
 
 namespace open_spiel {
 namespace stockfish {
@@ -46,13 +50,11 @@ StockfishBot::StockfishBot(int argc, char **argv, int move_time) :
   Endgames::init();
   Threads.set(size_t(Options["Threads"]));
   Search::clear(); // After threads are up
-  Eval::NNUE::init();
+  Eval::init_NNUE();
 
   if (Options.count("Use NNUE")) {
     Options["Use NNUE"] = std::string("false");
   }
-
-  Search::clear(); // ucinewgame command
 }
 
 void StockfishBot::Restart() {

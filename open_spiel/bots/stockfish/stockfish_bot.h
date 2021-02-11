@@ -23,6 +23,11 @@
 #include "open_spiel/spiel_bots.h"
 #include "open_spiel/games/chess.h"
 #include "open_spiel/bots/stockfish/stockfish/src/types.h"
+#include "open_spiel/bots/stockfish/stockfish/src/thread.h"
+
+namespace PSQT {
+void init();
+}
 
 namespace open_spiel {
 namespace stockfish {
@@ -30,6 +35,7 @@ namespace stockfish {
 class StockfishBot : public Bot {
  public:
   explicit StockfishBot(int argc, char **argv, int move_time);
+  virtual ~StockfishBot() { Threads.set(0); };
 
   Action Step(const State& state) override;
   void InformAction(const State& state, Player player_id,
