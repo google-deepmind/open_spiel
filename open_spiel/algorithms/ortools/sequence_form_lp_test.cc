@@ -42,7 +42,7 @@ void TestGameValueAndExploitability(const std::string& game_name,
                          kErrorTolerance);
   TabularPolicy policy1 = specification.OptimalPolicy(1);
 
-  // Test exploitability -- this is implemented only for simultaneous games.
+  // Test exploitability -- this is implemented only for turn-based games.
   if (game->GetType().dynamics == GameType::Dynamics::kSimultaneous) return;
 
   // Merge the two tables.
