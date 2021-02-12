@@ -29,6 +29,7 @@
 namespace open_spiel {
 namespace py = ::pybind11;
 
+using open_spiel::algorithms::CorrDistInfo;
 using open_spiel::algorithms::CorrelationDevice;
 
 void init_pyspiel_algorithms_corr_dist(py::module& m) {
@@ -45,6 +46,15 @@ void init_pyspiel_algorithms_corr_dist(py::module& m) {
         "Returns an exact correlation device over deterministic policies "
         "equivalent to this correlation device. Warning: very costly!");
 
+  py::class_<CorrDistInfo> corr_dist_info(m, "CorrDistInfo");
+  corr_dist_info.def_readonly("dist_value", &CorrDistInfo::dist_value)
+      .def_readonly("on_policy_values", &CorrDistInfo::on_policy_values)
+      .def_readonly("deviation_incentives", &CorrDistInfo::deviation_incentives)
+      .def_readonly("best_response_policies",
+                    &CorrDistInfo::best_response_policies)
+      .def_readonly("conditional_best_response_policies",
+                    &CorrDistInfo::conditional_best_response_policies);
+
   m.def("cce_dist",
         py::overload_cast<const Game&, const CorrelationDevice&>(
             &open_spiel::algorithms::CCEDist),
@@ -54,16 +64,6 @@ void init_pyspiel_algorithms_corr_dist(py::module& m) {
         py::overload_cast<const Game&, const CorrelationDevice&>(
             &open_spiel::algorithms::CEDist),
         "Returns the distance to a correlated equilibrium.");
-
-  m.def("cce_dist_per_player",
-        py::overload_cast<const Game&, const CorrelationDevice&>(
-            &open_spiel::algorithms::CCEDistPerPlayer),
-        "Returns a list of incentives to deviate for each player.");
-
-  m.def("ce_dist_per_player",
-        py::overload_cast<const Game&, const CorrelationDevice&>(
-            &open_spiel::algorithms::CEDistPerPlayer),
-        "Returns a list of incentives to deviate for each player.");
 
   // TODO(author5): expose the rest of the functions.
 }

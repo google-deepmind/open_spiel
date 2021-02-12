@@ -143,12 +143,24 @@ double AFCCEDist(const Game& game, CorrDistConfig config,
 double CEDist(const Game& game, const NormalFormCorrelationDevice& mu);
 double CCEDist(const Game& game, const NormalFormCorrelationDevice& mu);
 
+struct CorrDistInfo {
+  double dist_value;
+  std::vector<double> on_policy_values;
+  std::vector<double> deviation_incentives;
+
+  // One per player
+  std::vector<TabularPolicy> best_response_policies;
+
+  // Several per player. Only used in the CE dist case.
+  std::vector<std::vector<TabularPolicy>> conditional_best_response_policies;
+};
+
 // Distance to coarse-correlated in an extensive-form game. Builds a simpler
 // auxiliary game similar to the *FCCE where there is one chance node that
 // determines which policies the opponents follow (never revealed). Note that
 // the policies in this correlation device *can* be mixed. If values is
 // non-null, then it is filled with the deviation incentive of each player.
-double CCEDist(const Game& game, const CorrelationDevice& mu);
+CorrDistInfo CCEDist(const Game& game, const CorrelationDevice& mu);
 
 // Distance to a correlated equilibrium in an extensive-form game. Builds a
 // simpler auxiliary game similar to the *FCE ones where there is a chance node
@@ -158,13 +170,7 @@ double CCEDist(const Game& game, const CorrelationDevice& mu);
 // helper functions DeterminizeCorrDev or SampledDeterminizeCorrDev in
 // corr_dev_builder.h. If values is non-null, then it is filled with the
 // deviation incentive of each player.
-double CEDist(const Game& game, const CorrelationDevice& mu);
-// Same as the functions above except return per-player incentives to deviate.
-
-std::vector<double> CCEDistPerPlayer(const Game& game,
-                                     const CorrelationDevice& mu);
-std::vector<double> CEDistPerPlayer(const Game& game,
-                                    const CorrelationDevice& mu);
+CorrDistInfo CEDist(const Game& game, const CorrelationDevice& mu);
 
 }  // namespace algorithms
 }  // namespace open_spiel
