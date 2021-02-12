@@ -73,6 +73,11 @@ class OutcomeSamplingMCCFRSolver {
   std::shared_ptr<Policy> AveragePolicy() const {
     return std::make_shared<CFRAveragePolicy>(info_states_, default_policy_);
   }
+  // Note: This can be quite large.
+  TabularPolicy TabularAveragePolicy() const {
+    CFRAveragePolicy policy(info_states_, nullptr);
+    return TabularPolicy(*game_, policy);
+  }
 
   // See comments above CFRInfoStateValues::Serialize(double_precision) for
   // notes about the double_precision parameter.
