@@ -423,7 +423,7 @@ void CFRSolverBase::GetInfoStatePolicyFromPolicy(
 // - alternating_player: Optionally only update this player.
 // - reach_probabilities: The reach probabilities of this state.
 // - current_player: Either a player or chance_player_.
-// - action_probs: The action probabilities to use frp this state.
+// - action_probs: The action probabilities to use for this state.
 // - child_values_out: optional output parameter which is filled with the child
 //           utilities for each action, for current_player.
 // Returns:
