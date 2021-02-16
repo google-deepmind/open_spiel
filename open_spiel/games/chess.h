@@ -171,6 +171,7 @@ class ChessState : public State {
   // Current board.
   ChessBoard& Board() { return current_board_; }
   const ChessBoard& Board() const { return current_board_; }
+  int BoardSize() const { return current_board_.BoardSize(); }
 
   // Starting board.
   ChessBoard& StartBoard() { return start_board_; }

@@ -72,7 +72,7 @@ template <typename T>
 void AddScalarPlane(T val, T min, T max,
                     absl::Span<float>::iterator& value_it) {
   double normalized_val = static_cast<double>(val - min) / (max - min);
-  for (int i = 0; i < kMaxBoardSize * kMaxBoardSize; ++i)
+  for (int i = 0; i < k2dMaxBoardSize; ++i)
     *value_it++ = normalized_val;
 }
 
@@ -90,10 +90,11 @@ ChessState::ChessState(std::shared_ptr<const Game> game)
 }
 
 ChessState::ChessState(std::shared_ptr<const Game> game, const std::string& fen)
-    : State(game),
-    start_board_(*ChessBoard::BoardFromFEN(fen)),
-    current_board_(start_board_){
-  SPIEL_CHECK_TRUE(&start_board_);
+    : State(game) {
+  auto maybe_board = ChessBoard::BoardFromFEN(fen);
+  SPIEL_CHECK_TRUE(maybe_board);
+  start_board_ = *maybe_board;
+  current_board_ = start_board_;
   repetitions_[current_board_.HashValue()] = 1;
 }
 

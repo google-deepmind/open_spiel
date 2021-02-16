@@ -56,11 +56,11 @@ std::shared_ptr<const Game> Factory(const GameParameters &params) {
 REGISTER_SPIEL_GAME(kGameType, Factory)
 
 
-std::array<bool, chess::kMaxBoardSize * chess::kMaxBoardSize> ComputePrivateInfoTable(const chess::ChessBoard& board,
+std::array<bool, chess::k2dMaxBoardSize> ComputePrivateInfoTable(const chess::ChessBoard& board,
                                                                                       chess::Color color,
-                                                                                      std::array<bool, chess::kMaxBoardSize * chess::kMaxBoardSize> &publicInfoTable) {
+                                                                                      std::array<bool, chess::k2dMaxBoardSize> &publicInfoTable) {
   int board_size = board.BoardSize();
-  std::array<bool, chess::kMaxBoardSize * chess::kMaxBoardSize> observability_table{false};
+  std::array<bool, chess::k2dMaxBoardSize> observability_table{false};
   board.GenerateLegalMoves([&](const chess::Move &move) -> bool {
 
     size_t to_index = chess::SquareToIndex(move.to, board_size);
@@ -165,9 +165,9 @@ bool IsUnderAttack(const chess::Square defender_square, const chess::Piece defen
 
 // Computes which squares are public information. It does not recognize all of them. Only squares of two opponent
 // pieces of the same type attacking each other
-std::array<bool, chess::kMaxBoardSize * chess::kMaxBoardSize> ComputePublicInfoTable(const chess::ChessBoard& board) {
+std::array<bool, chess::k2dMaxBoardSize> ComputePublicInfoTable(const chess::ChessBoard& board) {
   int board_size = board.BoardSize();
-  std::array<bool, chess::kMaxBoardSize * chess::kMaxBoardSize> observability_table{false};
+  std::array<bool, chess::k2dMaxBoardSize> observability_table{false};
   board.GenerateLegalMoves([&](const chess::Move &move) -> bool {
 
     auto from_piece = board.at(move.from);
@@ -257,7 +257,7 @@ class DarkChessObserver : public Observer {
 
     if (iig_obs_type_.public_info && iig_obs_type_.private_info == PrivateInfoType::kSinglePlayer) {
       chess::Color color = chess::PlayerToColor(player);
-      std::array<bool, chess::kMaxBoardSize * chess::kMaxBoardSize> empty_public_info_table{};
+      std::array<bool, chess::k2dMaxBoardSize> empty_public_info_table{};
       auto observability_table = ComputePrivateInfoTable(state.Board(), color, empty_public_info_table);
       return state.Board().ToDarkFEN(observability_table, color);
     }
@@ -272,7 +272,7 @@ class DarkChessObserver : public Observer {
   void WritePieces(chess::Color color,
                    chess::PieceType piece_type,
                    const chess::ChessBoard &board,
-                   std::array<bool, chess::kMaxBoardSize * chess::kMaxBoardSize> &observability_table,
+                   std::array<bool, chess::k2dMaxBoardSize> &observability_table,
                    std::string prefix,
                    Allocator *allocator) const {
 
@@ -292,7 +292,7 @@ class DarkChessObserver : public Observer {
   }
 
   void WriteUnknownSquares(const chess::ChessBoard &board,
-                           std::array<bool, chess::kMaxBoardSize * chess::kMaxBoardSize> &observability_table,
+                           std::array<bool, chess::k2dMaxBoardSize> &observability_table,
                            Allocator *allocator) const {
 
     auto out = allocator->Get("unknown_squares", {board.BoardSize(), board.BoardSize()});
@@ -322,7 +322,7 @@ class DarkChessObserver : public Observer {
   }
 
   void WritePrivateInfoTensor(const DarkChessState& state,
-                              std::array<bool, chess::kMaxBoardSize * chess::kMaxBoardSize> &common_knowledge_table,
+                              std::array<bool, chess::k2dMaxBoardSize> &common_knowledge_table,
                               int player,
                               Allocator* allocator) const {
     chess::Color color = chess::PlayerToColor(player);
@@ -339,15 +339,15 @@ class DarkChessObserver : public Observer {
     WriteUnknownSquares(state.Board(), private_info_table, allocator);
 
     // Castling rights.
-    WriteBinary(state.Board().BoardSize(), state.Board().CastlingRight(color, chess::CastlingDirection::kLeft),
+    WriteBinary(state.BoardSize(), state.Board().CastlingRight(color, chess::CastlingDirection::kLeft),
                 allocator, "left_castling");
 
-    WriteBinary(state.Board().BoardSize(), state.Board().CastlingRight(color, chess::CastlingDirection::kRight),
+    WriteBinary(state.BoardSize(), state.Board().CastlingRight(color, chess::CastlingDirection::kRight),
                 allocator, "right_castling");
   }
 
   void WritePublicInfoTensor(const DarkChessState &state,
-                             std::array<bool, chess::kMaxBoardSize * chess::kMaxBoardSize> &public_info_table,
+                             std::array<bool, chess::k2dMaxBoardSize> &public_info_table,
                              Allocator *allocator) const {
 
     const auto entry = state.repetitions_.find(state.Board().HashValue());
@@ -362,13 +362,13 @@ class DarkChessObserver : public Observer {
     WritePieces(chess::Color::kEmpty, chess::PieceType::kEmpty, state.Board(), public_info_table, "public", allocator);
 
     // Num repetitions for the current board.
-    WriteScalar(state.Board().BoardSize(), repetitions, 1, 3, allocator, "repetitions");
+    WriteScalar(state.BoardSize(), repetitions, 1, 3, allocator, "repetitions");
 
     // Side to play.
     WriteScalar(state.Board().BoardSize(), ColorToPlayer(state.Board().ToPlay()), 0, 1, allocator, "side_to_play");
 
     // Irreversible move counter.
-    WriteScalar(state.Board().BoardSize(), state.Board().IrreversibleMoveCounter(), 0, 101, allocator, "move_number");
+    WriteScalar(state.BoardSize(), state.Board().IrreversibleMoveCounter(), 0, 101, allocator, "move_number");
   }
 
   IIGObservationType iig_obs_type_;
@@ -409,7 +409,7 @@ void DarkChessState::MaybeGenerateLegalActions() const {
   if (!cached_legal_actions_) {
     cached_legal_actions_ = std::vector<Action>();
     Board().GenerateLegalMoves([this](const chess::Move& move) -> bool {
-      cached_legal_actions_->push_back(MoveToAction(move, Board().BoardSize()));
+      cached_legal_actions_->push_back(MoveToAction(move, BoardSize()));
       return true;
     });
     absl::c_sort(*cached_legal_actions_);

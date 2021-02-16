@@ -1430,7 +1430,7 @@ std::string ChessBoard::ToFEN() const {
   return fen;
 }
 
-std::string ChessBoard::ToDarkFEN(const std::array<bool, kMaxBoardSize * kMaxBoardSize>& observability_table,
+std::string ChessBoard::ToDarkFEN(const std::array<bool, k2dMaxBoardSize>& observability_table,
                                   Color color) const {
   std::string fen;
 
@@ -1516,7 +1516,7 @@ std::string ChessBoard::ToDarkFEN(const std::array<bool, kMaxBoardSize * kMaxBoa
 }
 
 void ChessBoard::set_square(Square sq, Piece piece) {
-  static const ZobristTableU64<kMaxBoardSize * kMaxBoardSize, 3, 7> kZobristValues(
+  static const ZobristTableU64<k2dMaxBoardSize, 3, 7> kZobristValues(
       /*seed=*/2765481);
 
   // First, remove the current piece from the hash.

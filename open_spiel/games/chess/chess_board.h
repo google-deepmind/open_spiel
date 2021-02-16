@@ -221,6 +221,7 @@ bool IsMoveCharacter(char c);
 std::pair<std::string, std::string> SplitAnnotations(const std::string& move);
 
 inline constexpr int kMaxBoardSize = 8;
+inline constexpr int k2dMaxBoardSize = kMaxBoardSize * kMaxBoardSize;
 inline const std::string kDefaultStandardFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 inline const std::string kDefaultSmallFEN = "r1kr/pppp/PPPP/R1KR w - - 0 1";
 
@@ -236,7 +237,7 @@ class ChessBoard {
 
   void set_square(Square sq, Piece p);
 
-  const std::array<Piece, kMaxBoardSize * kMaxBoardSize>& pieces() const {
+  const std::array<Piece, k2dMaxBoardSize>& pieces() const {
     return board_;
   }
 
@@ -377,7 +378,7 @@ class ChessBoard {
    * 3) en passant square is only shown if the observer is capable of performing an en passant capture
    *
    */
-  std::string ToDarkFEN(const std::array<bool, kMaxBoardSize * kMaxBoardSize>& observability_table,
+  std::string ToDarkFEN(const std::array<bool, k2dMaxBoardSize>& observability_table,
                         Color color) const;
 
  private:
@@ -451,7 +452,7 @@ class ChessBoard {
   int board_size_;
   bool king_in_check_allowed_;
 
-  std::array<Piece, kMaxBoardSize * kMaxBoardSize> board_;
+  std::array<Piece, k2dMaxBoardSize> board_;
   Color to_play_;
   Square ep_square_;
   int32_t irreversible_move_counter_;

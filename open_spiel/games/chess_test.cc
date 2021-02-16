@@ -43,7 +43,7 @@ void CheckUndo(const char* fen, const char* move_san, const char* fen_after) {
   Player player = state.CurrentPlayer();
   absl::optional<Move> maybe_move = state.Board().ParseSANMove(move_san);
   SPIEL_CHECK_TRUE(maybe_move);
-  Action action = MoveToAction(*maybe_move, state.Board().BoardSize());
+  Action action = MoveToAction(*maybe_move, state.BoardSize());
   state.ApplyAction(action);
   SPIEL_CHECK_EQ(state.Board().ToFEN(), fen_after);
   state.UndoAction(player, action);
@@ -53,7 +53,7 @@ void CheckUndo(const char* fen, const char* move_san, const char* fen_after) {
 void ApplySANMove(const char* move_san, ChessState* state) {
   absl::optional<Move> maybe_move = state->Board().ParseSANMove(move_san);
   SPIEL_CHECK_TRUE(maybe_move);
-  state->ApplyAction(MoveToAction(*maybe_move, state->Board().BoardSize()));
+  state->ApplyAction(MoveToAction(*maybe_move, state->BoardSize()));
 }
 
 void BasicChessTests() {
@@ -228,7 +228,7 @@ void MoveConversionTests() {
       int action_index = dist(rng);
       Action action = legal_actions[action_index];
       Move move = ActionToMove(action, chess_state->Board());
-      Action action_from_move = MoveToAction(move, chess_state->Board().BoardSize());
+      Action action_from_move = MoveToAction(move, chess_state->BoardSize());
       SPIEL_CHECK_EQ(action, action_from_move);
       const ChessBoard& board = chess_state->Board();
       ChessBoard fresh_board = chess_state->StartBoard();

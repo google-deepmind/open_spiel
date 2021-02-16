@@ -89,6 +89,7 @@ class DarkChessState : public State {
   // Current board.
   chess::ChessBoard& Board() { return current_board_; }
   const chess::ChessBoard& Board() const { return current_board_; }
+  int BoardSize() const { return current_board_.BoardSize(); }
 
   // Starting board.
   chess::ChessBoard& StartBoard() { return start_board_; }
