@@ -109,15 +109,15 @@ inline void SetField(int offset, int length, uint8_t value, Action* action) {
 
 // Returns index (0 ... BoardSize*BoardSize-1) of a square
 // ({0, 0} ... {BoardSize-1, BoardSize-1}).
-inline uint8_t SquareToIndex(const Square& square, const int board_size) {
+inline uint8_t SquareToIndex(const Square& square, int board_size) {
   return square.y * board_size + square.x;
 }
 
 // Returns square ({0, 0} ... {BoardSize-1, BoardSize-1}) from an index
 // (0 ... BoardSize*BoardSize-1).
-inline Square IndexToSquare(uint8_t index) {
-  return Square{static_cast<int8_t>(index % kMaxBoardSize),
-                static_cast<int8_t>(index / kMaxBoardSize)};
+inline Square IndexToSquare(uint8_t index, int board_size) {
+  return Square{static_cast<int8_t>(index % board_size),
+                static_cast<int8_t>(index / board_size)};
 }
 
 int EncodeMove(const Square& from_square, int destination_index, int board_size,

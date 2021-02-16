@@ -226,12 +226,11 @@ inline const std::string kDefaultSmallFEN = "r1kr/pppp/PPPP/R1KR w - - 0 1";
 
 class ChessBoard {
  public:
-  ChessBoard(int board_size, bool king_in_check_allowed);
+  ChessBoard(int board_size=8, bool king_in_check_allowed=false);
 
   // Constructs a chess board at the given position in Forsyth-Edwards Notation.
   // https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
-  static absl::optional<ChessBoard> BoardFromFEN(const std::string& fen) { return BoardFromFEN(fen, 8, false); };
-  static absl::optional<ChessBoard> BoardFromFEN(const std::string& fen, int board_size, bool king_in_check_allowed);
+  static absl::optional<ChessBoard> BoardFromFEN(const std::string& fen, int board_size=8, bool king_in_check_allowed=false);
 
   const Piece& at(Square sq) const { return board_[SquareToIndex_(sq)]; }
 

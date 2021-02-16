@@ -33,7 +33,10 @@
 // Dark chess - imperfect information version of chess:
 // https://en.wikipedia.org/wiki/Dark_chess
 //
-// Parameters: none
+// Parameters:
+//   "board_size"    int      Number of squares in each row and column (default: 8)
+//   "fen"           string   String describing the chess board position in Forsyth-Edwards Notation.
+//                            The FEN has to match the board size. Default values are available for board sizes 4 and 8.
 
 namespace open_spiel {
 namespace dark_chess {
@@ -52,29 +55,6 @@ inline constexpr int MaxGameLength() { return 17695; }
 
 class DarkChessGame;
 class DarkChessObserver;
-
-// Action encoding (must be changed to support larger boards):
-// bits 0-5: from square (0-64)
-// bits 6-11: to square (0-64)
-// bits 12-14: promotion type (0 if not promotion)
-// bits 15: is castling (we need to record this because just from and to squares
-//   can be ambiguous in chess960).
-//
-// Promotion type:
-enum class PromotionTypeEncoding {
-  kNotPromotion = 0,
-  kQueen = 1,
-  kRook = 2,
-  kBishop = 3,
-  kKnight = 4
-};
-
-inline constexpr std::array<chess::PieceType, 3> kUnderPromotionIndexToType = {
-    chess::PieceType::kRook, chess::PieceType::kBishop, chess::PieceType::kKnight};
-inline constexpr std::array<chess::Offset, 3> kUnderPromotionDirectionToOffset = {
-    {{0, 1}, {1, 1}, {-1, 1}}};
-inline constexpr int kNumUnderPromotions =
-    kUnderPromotionIndexToType.size() * kUnderPromotionDirectionToOffset.size();
 
 // State of an in-play game.
 class DarkChessState : public State {

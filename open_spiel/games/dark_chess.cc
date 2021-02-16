@@ -455,7 +455,7 @@ void DarkChessState::ObservationTensor(Player player, absl::Span<float> values) 
 }
 
 std::unique_ptr<State> DarkChessState::Clone() const {
-  return std::unique_ptr<State>(new DarkChessState(*this));
+  return std::make_unique<DarkChessState>(*this);
 }
 
 void DarkChessState::UndoAction(Player player, Action action) {
@@ -528,9 +528,9 @@ absl::optional<std::vector<double>> DarkChessState::MaybeFinalReturns() const {
   return std::nullopt;
 }
 
-std::string DefaultFen(int boardSize) {
-  if (boardSize == 8) return chess::kDefaultStandardFEN;
-  else if (boardSize == 4) return chess::kDefaultSmallFEN;
+std::string DefaultFen(int board_size) {
+  if (board_size == 8) return chess::kDefaultStandardFEN;
+  else if (board_size == 4) return chess::kDefaultSmallFEN;
   else SpielFatalError("Only board sizes 4 and 8 have their default chessboards. For other sizes, you have to define fen");
 }
 
