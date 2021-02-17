@@ -122,8 +122,8 @@ class TabularPolicy(Policy):
   code for users of this class, i.e. `action_probability_array` contains
   states for player 0 first, followed by states for player 1, etc.
 
-  The policy uses `state.information_state` as the keys if available, otherwise
-  `state.observation`.
+  The policy uses `state.information_state_string` as the keys if available,
+  otherwise `state.observation_string`.
 
   Usages:
 
