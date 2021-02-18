@@ -1,0 +1,249 @@
+// Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#include "open_spiel/games/phantom_hex.h"
+
+#include <memory> // Note where we use it ?
+#include <utility> // Note where we use it ?
+#include <vector>
+
+#include "./hex.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/spiel_utils.h"
+
+namespace open_spiel {
+  namespace phantom_hex {
+    namespace {
+      // Define the vars needed on the scope 'using' ?
+      using hex::kCellStates;
+      using hex::kDefaultBoardSize;
+
+      using hex::CellState;
+
+      using hex::StateToString;
+      using hex::PlayerToState;
+
+      // Game Facts
+      const GameType kGameType{
+        /*short_name=*/"phantom_hex",
+        /*long_name=*/"Phantom Hex",
+        GameType::Dynamics::kSequential,
+        GameType::ChanceMode::kDeterministic,
+        GameType::Information::kImperfectInformation,
+        GameType::Utility::kZeroSum,
+        GameType::RewardModel::kTerminal,
+        /*max_num_players=*/2,
+        /*min_num_players=*/2,
+        /*provides_information_state_string=*/true,
+        /*provides_information_state_tensor=*/true,
+        /*provides_observation_string=*/true,
+        /*provides_observation_tensor=*/true,
+        /*parameter_specification=*/
+        {{"obstype", GameParameter(static_cast<std::string>(kDefaultObsType))}}
+      };
+      std::shared_ptr<const Game> Factory(const GameParameters& params){
+        return std::shared_ptr<const Game>(
+          new PhantomHexGame(params)
+        );
+      }
+
+      REGISTER_SPIEL_GAME(kGameType, Factory);
+    }
+    // Check obs_type_ and obs_type , Imight have confused ??
+    PhantomHexState::PhantomHexState(std::shared_ptr<const Game> game,
+                                     ObservationType obs_type)
+        : State(game), state_(game), obs_type_(obs_type) {
+      std::fill(begin(black_view_), end(black_view_), CellState::kEmpty);
+      std::fill(begin(white_view_), end(white_view_), CellState::kEmpty);
+    }
+
+    void PhantomHexState::DoApplyAction(Action move) {
+      Player cur_player = CurrentPlayer();//current player
+      auto& cur_view = (cur_player == Player(0) ? black_view_ : white_view_);
+
+      // Either occupied or not
+      if (state_.BoardAt(move) == CellState::kEmpty) {
+        state_.ApplyAction(move);
+      } else {}
+
+      SPIEL_CHECK_EQ(cur_view[move], CellState::kEmpty);
+      cur_view[move] = state_.BoardAt(move);
+      action_sequence_.push_back(std::pair<int,Action>(cur_player, move));
+    }
+
+    std::vector<Action> PhantomHexState::LegalActions() const {
+      if (IsTerminal()) return {};
+      std::vector<Action> moves;
+      const Player player = CurrentPlayer();
+      const auto& cur_view = (player == Player{0} ? black_view_ : white_view_);
+
+      for (Action move = 0; move < kNumOfCells; ++move){
+        if (cur_view[move] == CellState::kEmpty){
+          moves.push_back(move);
+        }
+      }
+
+      return moves;
+    }
+
+    std::string PhantomHexState::ViewToString(Player player) const {
+      const auto& cur_view = (player == Player{0} ? black_view_ : white_view_);
+      std::string str;
+
+      // TODO: ??
+      // Change here for row & cols after customizing for x, y
+      int num_rows = kDefaultBoardSize, num_cols = kDefaultBoardSize;
+      for (int r = 0; r < num_rows; ++r){
+        for (int c = 0; c < num_cols; ++c){
+          absl::StrAppend(&str, StateToString(cur_view[r * num_cols + c]));
+        }
+        if (r < (num_rows - 1)) absl::StrAppend(&str, "\n");
+      }
+      return str;
+    }
+
+    std::string PhantomHexState::ActionSequenceToString(Player player) const {
+      SPIEL_CHECK_GE(player, 0);
+      SPIEL_CHECK_LT(player, num_players_);
+
+      std::string str;
+      for (const auto& player_with_action: action_sequence_) {
+        if (player_with_action.first == player) {
+          str.append(std::to_string(player_with_action.first));
+          str.push_back(',');
+          str.append(std::to_string(player_with_action.second));
+          str.push_back(' ');
+        } else if (obs_type == ObservationType::kRevealNumTurns) {
+          str.append(std::to_string(player_with_action.first));
+          str.append(",? ");
+        } else {
+          SPIEL_CHECK_EQ(obs_type, ObservationType::kRevealNothing);
+        }
+      }
+      return str;
+    }
+
+    std::string PhantomHexState::InformationStateString(Player player) const {
+      SPIEL_CHECK_GE(player, 0);
+      SPIEL_CHECK_LT(player, num_players_);
+      return ViewToString(player) + "\n"
+          + std::to_string(history_.size()) + "\n"
+          + ActionSequenceToString(player);
+    }
+
+    void PhantomHexState::InformationStateTensor(Player player,
+                                                        absl::Span<float> values) const {
+      SPIEL_CHECK_GE(player, 0);
+      SPIEL_CHECK_LT(player, num_players_);
+
+      // Didnt write these very carefully check again ??
+      const auto& player_view = (player == Player{0} ? black_view_ : white_view_);
+      SPIEL_CHECK_EQ(values.size(), kNumOfCells * kCellStates +
+                                    kLongestSequence * (1 + kBitsPerAction));
+      std::fill(values.begin(), values.end(), 0.);
+      for (int cell = 0; cell < kNumOfCells; ++cell) {
+        values[kNumOfCells * static_cast<int>(player_view[cell]) + cell] = 1.0; // what is this line ??
+      }
+
+      // Encoding the sequence
+      int offset = kNumOfCells * kCellStates;
+      // check auto& ??
+      for (const auto& player_with_action: action_sequence_) {
+        if (player_with_action.first == player) {
+          values[offset] = player_with_action.first;
+          values[offset + 1 + player_with_action.second] = 1.0; // Check this lines purpose ??
+        } else if (obs_type == ObservationType::kRevealNumTurns) {
+          values[offset] = player_with_action.first;
+          values[offset + 1 + 10] = 1.0; // again ??
+        } else {
+          SPIEL_CHECK_EQ(obs_type, ObservationType::kRevealNothing);
+        }
+        offset += (1 + kBitsPerAction);
+      }
+    }
+
+    std::string PhantomHexState::ObservationString(Player player) const {
+      SPIEL_CHECK_GE(player, 0);
+      SPIEL_CHECK_LT(player, num_players_);
+      std::string observation = ViewToString(player);
+      if (obs_type == ObservationType::kRevealNumTurns){
+        absl::StrAppend(&observation, "\nTotal turns: ", action_sequence_.size());
+      }
+      return observation;
+    }  
+
+    void PhantomHexState::ObservationTensor(Player player,
+                                                        absl::Span<float> values) const {
+      SPIEL_CHECK_GE(player, 0);
+      SPIEL_CHECK_LT(player, num_players_);
+      SPIEL_CHECK_EQ(values.size(), game_->ObservationTensorSize());
+      std::fill(values.begin(), values.end(), 0.);
+      
+      const auto& player_view = (player == Player{0} ? black_view_ : white_view_);
+      for (int cell = 0; cell < kNumOfCells; ++cell) {
+        values[kNumOfCells * static_cast<int>(player_view[cell]) + cell] = 1.0; // check this static_cast ??
+      }
+
+      if (obs_type == ObservationType::kRevealNumTurns) {
+        values[kNumOfCells * kCellStates + action_sequence_.size()] = 1.0;
+      }
+    }  
+
+    std::unique_ptr<State> PhantomHexState::Clone() const {
+      return std::unique_ptr<State>(new PhantomHexState(*this));
+    }
+
+    void PhantomHexState::UndoAction(Player player, Action move) {
+      Action last_move = action_sequence_.back().second;
+      SPIEL_CHECK_EQ(last_move, move);
+
+      if (state_.BoardAt(move) == PlayerToState(player)) {
+        state_.UndoAction(player, move);
+      } else { }
+
+      auto& player_view = (player == Player{0} ? black_view_ : white_view_);
+      player_view[move] = CellState::kEmpty;
+      action_sequence_.pop_back();
+
+      history_.pop_back();
+    }
+
+    PhantomHexGame::PhantomHexGame(const GameParameters& params)
+          : Game(kGameType, params),
+            game_(std::static_pointer_cast<const hex::HexGame>(
+              LoadGame("hex"))) { // Check the game naming  ??
+      std::string obs_type = ParameterValue<std::string>("obstype");
+      if (obs_type == "reveal-nothing") {
+        obs_type_ = ObservationType::kRevealNothing;
+      } else if (obs_type == "reveal-numturns") {
+        obs_type_ = ObservationType::kRevealNumTurns;
+      } else {
+        SpielFatalError(absl::StrCat("Unrecognized observation type: ", obs_type));
+      }
+    }
+    std::vector<int> PhantomHexGame::InformationStateTensorShape() const {
+      return {1, kNumOfCells * kCellStates + kLongestSequence * (1 + kBitsPerAction)};
+    }
+
+    std::vector<int> PhantomHexGame::ObservationTensorShape() const {
+      if (obs_type_ == ObservationType::kRevealNothing) {
+        return {kNumOfCells * kCellStates};
+      } else if (obs_type_ == ObservationType::kRevealNumTurns) {
+        return {kNumOfCells * kCellStates + kLongestSequence};
+      } else {
+        SpielFatalError("Uknown observation type");
+      }
+    }
+  }
+}

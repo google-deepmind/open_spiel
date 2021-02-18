@@ -52,6 +52,18 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 
 }  // namespace
 
+CellState PlayerToState(Player player){
+  switch (player){
+  case 0:
+    return CellState::kBlack;
+  case 1:
+    return CellState::kWhite;
+  default:
+    SpielFatalError(absl::StrCat("Invalid player id ", player));
+    return CellState::kEmpty;
+  }
+}
+
 CellState HexState::PlayerAndActionToState(Player player, Action move) const {
   // This function returns the CellState resulting from the given move.
   // The cell state tells us:

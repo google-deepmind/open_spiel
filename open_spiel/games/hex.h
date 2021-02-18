@@ -66,6 +66,7 @@ class HexState : public State {
   HexState(std::shared_ptr<const Game> game, int board_size);
 
   HexState(const HexState&) = default;
+  HexState& operator=(const HexState&) = default;
 
   Player CurrentPlayer() const override {
     return IsTerminal() ? kTerminalPlayerId : current_player_;
@@ -116,6 +117,7 @@ class HexGame : public Game {
   const int board_size_;
 };
 
+CellState PlayerToState(Player player);
 std::string StateToString(CellState state);
 
 inline std::ostream& operator<<(std::ostream& stream, const CellState& state) {
