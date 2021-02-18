@@ -23,6 +23,7 @@
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_format.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
+#include "open_spiel/games/universal_poker/acpc/project_acpc_server/game.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/games/universal_poker/logic/card_set.h"
 #include "open_spiel/spiel.h"
@@ -430,7 +431,7 @@ std::string UniversalPokerState::ObservationString(Player player) const {
 }
 
 std::unique_ptr<State> UniversalPokerState::Clone() const {
-  return std::unique_ptr<State>(new UniversalPokerState(*this));
+  return absl::make_unique<UniversalPokerState>(*this);
 }
 
 std::vector<std::pair<Action, double>> UniversalPokerState::ChanceOutcomes()
@@ -548,7 +549,8 @@ void UniversalPokerState::DoApplyAction(Action action_id) {
           "abstraction. Action: ",
           State::ActionToString(action_id)));
     }
-    if (action_int >= 2 && action_int <= NumDistinctActions()) {
+    if (action_int >= static_cast<int>(kBet) &&
+        action_int <= NumDistinctActions()) {
       ApplyChoiceAction(ACTION_BET, action_int);
       return;
     }
@@ -935,6 +937,25 @@ void UniversalPokerState::_CalculateActionsAndNodeType() {
 const int UniversalPokerState::GetPossibleActionCount() const {
   // _builtin_popcount(int) function is used to count the number of one's
   return __builtin_popcount(possibleActions_);
+}
+
+open_spiel::Action ACPCActionToOpenSpielAction(
+    const universal_poker::acpc_cpp::ACPCState::ACPCActionType &type,
+    int32_t size) {
+  switch (type) {
+    case universal_poker::acpc_cpp::ACPCState::ACPCActionType::ACPC_FOLD:
+      return ActionType::kFold;
+    case universal_poker::acpc_cpp::ACPCState::ACPCActionType::ACPC_CALL:
+      return ActionType::kCall;
+    case universal_poker::acpc_cpp::ACPCState::ACPCActionType::ACPC_RAISE:
+      return ActionType::kBet + size;
+    case universal_poker::acpc_cpp::ACPCState::ACPCActionType::ACPC_INVALID:
+      SpielFatalError("Invalid action type.");
+    default:
+      SpielFatalError(absl::StrCat("Type not found. Type: ", type));
+  }
+  // Will never get called.
+  return kInvalidAction;
 }
 
 std::ostream &operator<<(std::ostream &os, const BettingAbstraction &betting) {

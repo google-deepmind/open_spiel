@@ -17,9 +17,10 @@
 #include <memory>
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
+#include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
-#include "open_spiel/canonical_game_strings.h"
 #include "open_spiel/algorithms/evaluate_bots.h"
+#include "open_spiel/canonical_game_strings.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
@@ -470,6 +471,32 @@ void HulhMaxUtilityIsCorrect() {
   SPIEL_CHECK_EQ(game->MinUtility(), -max_utility);
 }
 
+void CanConvertActionsCorrectly() {
+  absl::flat_hash_map<
+      open_spiel::Action,
+      std::pair<universal_poker::acpc_cpp::ACPCState::ACPCActionType, int32_t>>
+      results = {
+          {static_cast<open_spiel::Action>(ActionType::kFold),
+           {acpc_cpp::ACPCState::ACPCActionType::ACPC_FOLD, 0}},
+          {static_cast<open_spiel::Action>(ActionType::kCall),
+           {acpc_cpp::ACPCState::ACPCActionType::ACPC_CALL, 0}},
+          {static_cast<open_spiel::Action>(ActionType::kBet),
+           {acpc_cpp::ACPCState::ACPCActionType::ACPC_RAISE, 0}},
+          {static_cast<open_spiel::Action>(ActionType::kBet) + 1,
+           {acpc_cpp::ACPCState::ACPCActionType::ACPC_RAISE, 1}},
+          {static_cast<open_spiel::Action>(ActionType::kBet) + 2,
+           {acpc_cpp::ACPCState::ACPCActionType::ACPC_RAISE, 2}},
+          {static_cast<open_spiel::Action>(ActionType::kBet) + 8,
+           {acpc_cpp::ACPCState::ACPCActionType::ACPC_RAISE, 8}},
+      };
+  for (const auto& [action, result] : results) {
+    std::cout << "type: " << result.first << ", size: " << result.second
+              << std::endl;
+    SPIEL_CHECK_EQ(action,
+                   ACPCActionToOpenSpielAction(result.first, result.second));
+  }
+}
+
 }  // namespace
 }  // namespace universal_poker
 }  // namespace open_spiel
@@ -489,4 +516,5 @@ int main(int argc, char **argv) {
   open_spiel::universal_poker::FullNLBettingTest2();
   open_spiel::universal_poker::FullNLBettingTest3();
   open_spiel::universal_poker::HulhMaxUtilityIsCorrect();
+  open_spiel::universal_poker::CanConvertActionsCorrectly();
 }

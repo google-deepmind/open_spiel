@@ -126,6 +126,9 @@ class ACPCState {
   // A showdown is still in game.NumRounds()-1, not a separate round
   int GetRound() const { return acpcState_.round; }
 
+  const ACPCGame* game() const { return game_; }
+  const RawACPCState& raw_state() const { return acpcState_; }
+
  private:
   std::string ActionToString(const project_acpc_server::Action& action) const;
 

@@ -89,6 +89,8 @@ class UniversalPokerState : public State {
     return {action};
   }
 
+  const acpc_cpp::ACPCState &acpc_state() const { return acpc_state_; }
+
  protected:
   void DoApplyAction(Action action_id) override;
 
@@ -241,6 +243,11 @@ class UniformRestrictedActions : public Policy {
   const absl::flat_hash_set<ActionType> actions_;
   const ActionType max_action_;
 };
+
+// Converts an ACPC action into one that's compatible with UniversalPokerGame.
+open_spiel::Action ACPCActionToOpenSpielAction(
+    const universal_poker::acpc_cpp::ACPCState::ACPCActionType &type,
+    int32_t size);
 
 std::ostream &operator<<(std::ostream &os, const BettingAbstraction &betting);
 }  // namespace universal_poker
