@@ -940,19 +940,18 @@ const int UniversalPokerState::GetPossibleActionCount() const {
 }
 
 open_spiel::Action ACPCActionToOpenSpielAction(
-    const universal_poker::acpc_cpp::ACPCState::ACPCActionType &type,
-    int32_t size) {
-  switch (type) {
-    case universal_poker::acpc_cpp::ACPCState::ACPCActionType::ACPC_FOLD:
+    const project_acpc_server::Action &action) {
+  switch (action.type) {
+    case project_acpc_server::ActionType::a_fold:
       return ActionType::kFold;
-    case universal_poker::acpc_cpp::ACPCState::ACPCActionType::ACPC_CALL:
+    case project_acpc_server::ActionType::a_call:
       return ActionType::kCall;
-    case universal_poker::acpc_cpp::ACPCState::ACPCActionType::ACPC_RAISE:
-      return ActionType::kBet + size;
-    case universal_poker::acpc_cpp::ACPCState::ACPCActionType::ACPC_INVALID:
+    case project_acpc_server::ActionType::a_raise:
+      return ActionType::kBet + action.size;
+    case project_acpc_server::ActionType::a_invalid:
       SpielFatalError("Invalid action type.");
     default:
-      SpielFatalError(absl::StrCat("Type not found. Type: ", type));
+      SpielFatalError(absl::StrCat("Type not found. Type: ", action.type));
   }
   // Will never get called.
   return kInvalidAction;

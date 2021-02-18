@@ -246,8 +246,7 @@ class UniformRestrictedActions : public Policy {
 
 // Converts an ACPC action into one that's compatible with UniversalPokerGame.
 open_spiel::Action ACPCActionToOpenSpielAction(
-    const universal_poker::acpc_cpp::ACPCState::ACPCActionType &type,
-    int32_t size);
+    const project_acpc_server::Action &action);
 
 std::ostream &operator<<(std::ostream &os, const BettingAbstraction &betting);
 }  // namespace universal_poker

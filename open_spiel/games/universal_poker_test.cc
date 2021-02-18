@@ -472,28 +472,23 @@ void HulhMaxUtilityIsCorrect() {
 }
 
 void CanConvertActionsCorrectly() {
-  absl::flat_hash_map<
-      open_spiel::Action,
-      std::pair<universal_poker::acpc_cpp::ACPCState::ACPCActionType, int32_t>>
-      results = {
+  absl::flat_hash_map<open_spiel::Action, project_acpc_server::Action> results =
+      {
           {static_cast<open_spiel::Action>(ActionType::kFold),
-           {acpc_cpp::ACPCState::ACPCActionType::ACPC_FOLD, 0}},
+           {project_acpc_server::ActionType::a_fold, 0}},
           {static_cast<open_spiel::Action>(ActionType::kCall),
-           {acpc_cpp::ACPCState::ACPCActionType::ACPC_CALL, 0}},
+           {project_acpc_server::ActionType::a_call, 0}},
           {static_cast<open_spiel::Action>(ActionType::kBet),
-           {acpc_cpp::ACPCState::ACPCActionType::ACPC_RAISE, 0}},
+           {project_acpc_server::ActionType::a_raise, 0}},
           {static_cast<open_spiel::Action>(ActionType::kBet) + 1,
-           {acpc_cpp::ACPCState::ACPCActionType::ACPC_RAISE, 1}},
+           {project_acpc_server::ActionType::a_raise, 1}},
           {static_cast<open_spiel::Action>(ActionType::kBet) + 2,
-           {acpc_cpp::ACPCState::ACPCActionType::ACPC_RAISE, 2}},
+           {project_acpc_server::ActionType::a_raise, 2}},
           {static_cast<open_spiel::Action>(ActionType::kBet) + 8,
-           {acpc_cpp::ACPCState::ACPCActionType::ACPC_RAISE, 8}},
+           {project_acpc_server::ActionType::a_raise, 8}},
       };
-  for (const auto& [action, result] : results) {
-    std::cout << "type: " << result.first << ", size: " << result.second
-              << std::endl;
-    SPIEL_CHECK_EQ(action,
-                   ACPCActionToOpenSpielAction(result.first, result.second));
+  for (const auto& [os_action, acpc_action] : results) {
+    SPIEL_CHECK_EQ(os_action, ACPCActionToOpenSpielAction(acpc_action));
   }
 }
 
