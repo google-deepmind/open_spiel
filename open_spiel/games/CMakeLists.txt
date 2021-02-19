@@ -39,6 +39,8 @@ set(GAME_SOURCES
   coordinated_mp.h
   cursor_go.cc
   cursor_go.h
+  dark_hex.cc
+  dark_hex.h
   deep_sea.cc
   deep_sea.h
   efg_game.cc

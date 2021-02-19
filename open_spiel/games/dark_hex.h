@@ -15,8 +15,8 @@
 // ?? - for question i have - or to check later
 // xx - to remove before submission
 
-#ifndef OPEN_SPIEL_GAMES_PHANTOM_HEX_H_
-#define OPEN_SPIEL_GAMES_PHANTOM_HEX_H_  // What r these for ??
+#ifndef OPEN_SPIEL_GAMES_DARK_HEX_H_
+#define OPEN_SPIEL_GAMES_DARK_HEX_H_  // What r these for ??
 
 #include <array>
 #include <map>
@@ -30,7 +30,7 @@
 // Game description insert ??
 
 namespace open_spiel {
-  namespace phantom_hex {
+  namespace dark_hex {
   
     // kDefaultObsType decide if we will reveal any info. to other player xx
     inline constexpr const char* kDefaultObsType = "reveal-nothing"; 
@@ -50,11 +50,11 @@ namespace open_spiel {
       kRevealNumTurns, // how many turns have passed ??
     };
 
-    class PhantomHexState: public State { // why do we need the public here ??
+    class DarkHexState: public State { // why do we need the public here ??
       public: 
         // Constructor created. shared_ptr was needed to instanciate the game, 
         // not really sure why ?? 
-        PhantomHexState(std::shared_ptr<const Game> game, ObservationType obs_type);
+        DarkHexState(std::shared_ptr<const Game> game, int board_size, ObservationType obs_type);
 
         // Basically we are just pulling the hex board and redefiningg all the methods
         // same as that on this class xx
@@ -75,7 +75,7 @@ namespace open_spiel {
         void ObservationTensor(Player player,
                                absl::Span<float> values) const override;
         
-        // Phantom games funcs.
+        // Dark games funcs.
         std::string InformationStateString(Player player) const override;
         void InformationStateTensor (Player player,
                                 absl::Span<float> values) const override;
@@ -92,7 +92,7 @@ namespace open_spiel {
         std::string ActionSequenceToString(Player player) const;
 
         hex::HexState state_; // game state - from reg hex board xx
-        ObservationType obs_type;  // observation types stored var xx
+        ObservationType obs_type_;  // observation types stored var xx
 
         // make sure u change this to _history on base class after all
         std::vector<std::pair<int, Action>> action_sequence_;
@@ -100,12 +100,12 @@ namespace open_spiel {
         std::array<hex::CellState, kNumOfCells> white_view_;
     };
 
-    class PhantomHexGame: public Game {
+    class DarkHexGame: public Game {
       public:
-        explicit PhantomHexGame(const GameParameters& params);
+        explicit DarkHexGame(const GameParameters& params);
         std::unique_ptr<State> NewInitialState() const override {
           return std::unique_ptr<State>(
-            new PhantomHexState(shared_from_this(), obs_type_)
+            new DarkHexState(shared_from_this(), board_size_, obs_type_)
           );
         }
         int NumDistinctActions() const override {
@@ -122,8 +122,9 @@ namespace open_spiel {
         int MaxGameLength() const override {return kLongestSequence;}
         
       private:
-        std::shared_ptr<hex::HexGame> game_;
+        std::shared_ptr<const hex::HexGame> game_;
         ObservationType obs_type_;
+        const int board_size_;
     };
 
     // Whats the point on having inline here, calling switch will

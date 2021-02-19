@@ -16,15 +16,15 @@
 #include "open_spiel/tests/basic_tests.h"
 
 namespace open_spiel {
-    namespace phantom_hex {
+    namespace dark_hex {
         namespace {
 
             namespace testing = open_spiel::testing;
 
-            void BasicPhantomHexTests() {
-            testing::LoadGameTest("phantom_hex");
-            testing::NoChanceOutcomesTest(*LoadGame("phantom_hex"));
-            testing::RandomSimTest(*LoadGame("phantom_hex"), 5);
+            void BasicDarkHexTests() {
+            testing::LoadGameTest("dark_hex(board_size=3)");
+            testing::NoChanceOutcomesTest(*LoadGame("dark_hex(board_size=3)"));
+            testing::RandomSimTest(*LoadGame("dark_hex(board_size=3)"), 5);
             }
 
         }
@@ -32,5 +32,5 @@ namespace open_spiel {
 }
 
 int main(int argc, char** argv) {
-  open_spiel::phantom_hex::BasicPhantomHexTests();
+  open_spiel::dark_hex::BasicDarkHexTests();
 }

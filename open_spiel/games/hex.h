@@ -103,7 +103,7 @@ class HexGame : public Game {
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(
         new HexState(shared_from_this(), board_size_));
-  }
+  } 
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override { return -1; }
   double UtilitySum() const override { return 0; }
