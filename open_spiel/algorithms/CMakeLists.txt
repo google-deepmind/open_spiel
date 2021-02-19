@@ -63,6 +63,8 @@ add_library (algorithms OBJECT
   state_distribution.h
   tabular_exploitability.cc
   tabular_exploitability.h
+  tabular_q_learning.cc
+  tabular_q_learning.h
   tensor_game_utils.cc
   tensor_game_utils.h
   trajectories.cc
