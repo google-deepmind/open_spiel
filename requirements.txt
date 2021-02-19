@@ -33,4 +33,4 @@ dataclasses == 0.7; python_version < "3.7"
 hypothesis==5.38.0
 torch==1.7.0
 six==1.15.0
-testresources=2.0.1
+testresources==2.0.1
