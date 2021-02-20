@@ -30,6 +30,7 @@ namespace open_spiel {
       using hex::kDefaultBoardSize;
 
       using hex::CellState;
+      using hex::kMinValueCellState;
 
       using hex::StateToString;
       using hex::PlayerToState;
@@ -145,7 +146,7 @@ namespace open_spiel {
     }
 
     void DarkHexState::InformationStateTensor(Player player,
-                                                        absl::Span<float> values) const {
+                                              absl::Span<float> values) const {
       SPIEL_CHECK_GE(player, 0);
       SPIEL_CHECK_LT(player, num_players_);
 
@@ -155,7 +156,11 @@ namespace open_spiel {
                                     kLongestSequence * (1 + kBitsPerAction));
       std::fill(values.begin(), values.end(), 0.);
       for (int cell = 0; cell < kNumOfCells; ++cell) {
-        values[kNumOfCells * static_cast<int>(player_view[cell]) + cell] = 1.0; // what is this line ??
+        if (values.size() <= kNumOfCells *  (static_cast<int>(player_view[cell]) - kMinValueCellState) + cell) {
+          std::cout << "values full size:\t\t" << values.size() << std::endl;
+          std::cout << "values indexed here:\t\t" << kNumOfCells << " " <<  (static_cast<int>(player_view[cell]) - kMinValueCellState) << " " << cell << std::endl;
+        }
+        values[kNumOfCells * (static_cast<int>(player_view[cell]) - kMinValueCellState) + cell] = 1.0;
       }
 
       // Encoding the sequence
@@ -163,9 +168,21 @@ namespace open_spiel {
       // check auto& ??
       for (const auto& player_with_action: action_sequence_) {
         if (player_with_action.first == player) {
+          // if (values.size() <= offset || values.size() <= offset + 1 + player_with_action.second) {
+          //   std::cout << "CHECK 2" << std::endl;
+          //   std::cout << "values full size:\t\t" << values.size() << std::endl;
+          //   std::cout << "values indexed here:\t\t" << offset << std::endl;
+          //   std::cout << "values indexed here again:\t\t" << offset + 1 + player_with_action.second << std::endl;
+          // }
           values[offset] = player_with_action.first;
           values[offset + 1 + player_with_action.second] = 1.0; // Check this lines purpose ??
         } else if (obs_type_ == ObservationType::kRevealNumTurns) {
+          // if (values.size() <= offset || values.size() <= offset + 1 + 10) {
+          //   std::cout << "CHECK 3" << std::endl;
+          //   std::cout << "values full size:\t\t" << values.size() << std::endl;
+          //   std::cout << "values indexed here:\t\t" << offset << std::endl;
+          //   std::cout << "values indexed here again:\t\t" << offset + 1 + 10 << std::endl;
+          // }
           values[offset] = player_with_action.first;
           values[offset + 1 + 10] = 1.0; // again ??
         } else {
@@ -194,10 +211,18 @@ namespace open_spiel {
       
       const auto& player_view = (player == Player{0} ? black_view_ : white_view_);
       for (int cell = 0; cell < kNumOfCells; ++cell) {
-        values[kNumOfCells * static_cast<int>(player_view[cell]) + cell] = 1.0; // check this static_cast ??
+        // if (values.size() <= kNumOfCells * static_cast<int>(player_view[cell]) + cell) {
+        //   std::cout << "values full size:\t\t" << values.size() << std::endl;
+        //   std::cout << "values indexed here:\t\t" << kNumOfCells * static_cast<int>(player_view[cell]) + cell << std::endl;
+        // }
+        values[kNumOfCells * (static_cast<int>(player_view[cell]) - kMinValueCellState) + cell] = 1.0; // check this static_cast ??
       }
 
       if (obs_type_ == ObservationType::kRevealNumTurns) {
+        // if (values.size() <= kNumOfCells * kCellStates + action_sequence_.size()) {
+        //   std::cout << "values full size:\t\t" << values.size() << std::endl;
+        //   std::cout << "values indexed here:\t\t" << kNumOfCells * kCellStates + action_sequence_.size() << std::endl;
+        // }
         values[kNumOfCells * kCellStates + action_sequence_.size()] = 1.0;
       }
     }  
@@ -234,6 +259,7 @@ namespace open_spiel {
         SpielFatalError(absl::StrCat("Unrecognized observation type: ", obs_type));
       }
     }
+
     std::vector<int> DarkHexGame::InformationStateTensorShape() const {
       return {1, kNumOfCells * kCellStates + kLongestSequence * (1 + kBitsPerAction)};
     }
