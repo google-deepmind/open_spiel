@@ -280,6 +280,10 @@ add_executable(cursor_go_test cursor_go_test.cc
                $<TARGET_OBJECTS:tests>)
 add_test(cursor_go_test cursor_go_test)
 
+add_executable(dark_hex_test dark_hex_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(dark_hex_test dark_hex_test)
+
 add_executable(deep_sea_test deep_sea_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(deep_sea_test deep_sea_test)
