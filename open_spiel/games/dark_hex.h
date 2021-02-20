@@ -46,10 +46,7 @@
 namespace open_spiel {
   namespace dark_hex {
   
-    // kDefaultObsType decide if we will reveal any info. to other player xx
     inline constexpr const char* kDefaultObsType = "reveal-nothing"; 
-    // do we need inline & constexpr here ? I feel like it's not 
-    // necessary as they dont add any value here ??
 
     inline const int kNumOfCells = hex::kDefaultBoardSize * hex::kDefaultBoardSize;
     // EDIT Hex, to have x, y as board size not x, x
