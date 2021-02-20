@@ -48,10 +48,8 @@ namespace dark_hex {
 
 inline constexpr const char* kDefaultObsType = "reveal-nothing"; 
 
-inline const int kNumOfCells = hex::kDefaultBoardSize * hex::kDefaultBoardSize;
-// EDIT Hex, to have x, y as board size not x, x
-inline constexpr int kLongestSequence = 2 * kNumOfCells - 1;
-inline constexpr int kBitsPerAction = 10;
+// int kLongestSequence = 2 * kNumCells - 1;
+inline constexpr int kBitsPerAction = 13*13 + 1; // Fix this ??
 
 // Add here if anything else is needed to be revealed
 enum class ObservationType {
@@ -95,10 +93,13 @@ class DarkHexState: public State {
     hex::HexState state_;
     ObservationType obs_type_;  
 
+    const int board_size_;
+    const int kNumCells = board_size_ * board_size_;
+
     // Change this to _history on base class
     std::vector<std::pair<int, Action>> action_sequence_;
-    std::array<hex::CellState, kNumOfCells> black_view_;
-    std::array<hex::CellState, kNumOfCells> white_view_;
+    std::array<hex::CellState, kNumCells> black_view_;
+    std::array<hex::CellState, kNumCells> white_view_;
 };
 
 class DarkHexGame: public Game {
@@ -120,11 +121,12 @@ class DarkHexGame: public Game {
     // These will depend on the obstype
     std::vector<int> InformationStateTensorShape() const override;
     std::vector<int> ObservationTensorShape() const override;
-    int MaxGameLength() const override {return kLongestSequence;}
+    int MaxGameLength() const override {return board_size_ * 2 - 1;}
     
   private:
     std::shared_ptr<const hex::HexGame> game_;
     ObservationType obs_type_;
+    const int kNumCells = board_size_ * board_size_;
     const int board_size_;
 };
 

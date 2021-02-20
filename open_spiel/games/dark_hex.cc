@@ -94,7 +94,7 @@ std::vector<Action> DarkHexState::LegalActions() const {
   const Player player = CurrentPlayer();
   const auto& cur_view = (player == Player{0} ? black_view_ : white_view_);
 
-  for (Action move = 0; move < kNumOfCells; ++move){
+  for (Action move = 0; move < kNumCells; ++move){
     if (cur_view[move] == CellState::kEmpty){
       moves.push_back(move);
     }
@@ -109,7 +109,7 @@ std::string DarkHexState::ViewToString(Player player) const {
 
   // TODO: ??
   // Change here for row & cols after customizing for x, y
-  int num_rows = kDefaultBoardSize, num_cols = kDefaultBoardSize;
+  int num_rows = board_size_, num_cols = board_size_;
   for (int r = 0; r < num_rows; ++r){
     for (int c = 0; c < num_cols; ++c){
       absl::StrAppend(&str, StateToString(cur_view[r * num_cols + c]));
@@ -154,26 +154,22 @@ void DarkHexState::InformationStateTensor(Player player,
   SPIEL_CHECK_LT(player, num_players_);
 
   const auto& player_view = (player == Player{0} ? black_view_ : white_view_);
-  SPIEL_CHECK_EQ(values.size(), kNumOfCells * kCellStates +
-                                kLongestSequence * (1 + kBitsPerAction));
+  SPIEL_CHECK_EQ(values.size(), kNumCells * kCellStates +
+                                (board_size_ * 2 - 1) * (1 + kBitsPerAction));
   std::fill(values.begin(), values.end(), 0.);
-  for (int cell = 0; cell < kNumOfCells; ++cell) {
-    if (values.size() <= kNumOfCells *  (static_cast<int>(player_view[cell]) - kMinValueCellState) + cell) {
-      std::cout << "values full size:\t\t" << values.size() << std::endl;
-      std::cout << "values indexed here:\t\t" << kNumOfCells << " " <<  (static_cast<int>(player_view[cell]) - kMinValueCellState) << " " << cell << std::endl;
-    }
-    values[kNumOfCells * (static_cast<int>(player_view[cell]) - kMinValueCellState) + cell] = 1.0;
+  for (int cell = 0; cell < kNumCells; ++cell) {
+    values[kNumCells * (static_cast<int>(player_view[cell]) - kMinValueCellState) + cell] = 1.0;
   }
 
   // Encoding the sequence
-  int offset = kNumOfCells * kCellStates;
+  int offset = kNumCells * kCellStates;
   for (const auto& player_with_action: action_sequence_) {
     if (player_with_action.first == player) {
       values[offset] = player_with_action.first;
       values[offset + 1 + player_with_action.second] = 1.0;
     } else if (obs_type_ == ObservationType::kRevealNumTurns) {
       values[offset] = player_with_action.first;
-      values[offset + 1 + 10] = 1.0;
+      values[offset + 2 + kNumCells] = 1.0;
     } else {
       SPIEL_CHECK_EQ(obs_type_, ObservationType::kRevealNothing);
     }
@@ -199,12 +195,12 @@ void DarkHexState::ObservationTensor(Player player,
   std::fill(values.begin(), values.end(), 0.);
   
   const auto& player_view = (player == Player{0} ? black_view_ : white_view_);
-  for (int cell = 0; cell < kNumOfCells; ++cell) {
-    values[kNumOfCells * (static_cast<int>(player_view[cell]) - kMinValueCellState) + cell] = 1.0;
+  for (int cell = 0; cell < kNumCells; ++cell) {
+    values[kNumCells * (static_cast<int>(player_view[cell]) - kMinValueCellState) + cell] = 1.0;
   }
 
   if (obs_type_ == ObservationType::kRevealNumTurns) {
-    values[kNumOfCells * kCellStates + action_sequence_.size()] = 1.0;
+    values[kNumCells * kCellStates + action_sequence_.size()] = 1.0;
   }
 }  
 
@@ -242,14 +238,14 @@ DarkHexGame::DarkHexGame(const GameParameters& params)
 }
 
 std::vector<int> DarkHexGame::InformationStateTensorShape() const {
-  return {1, kNumOfCells * kCellStates + kLongestSequence * (1 + kBitsPerAction)};
+  return {1, kNumCells * kCellStates + (board_size_ * 2 - 1) * (1 + kBitsPerAction)};
 }
 
 std::vector<int> DarkHexGame::ObservationTensorShape() const {
   if (obs_type_ == ObservationType::kRevealNothing) {
-    return {kNumOfCells * kCellStates};
+    return {kNumCells * kCellStates};
   } else if (obs_type_ == ObservationType::kRevealNumTurns) {
-    return {kNumOfCells * kCellStates + kLongestSequence};
+    return {kNumCells * kCellStates + (board_size_ * 2 - 1)};
   } else {
     SpielFatalError("Uknown observation type");
   }
