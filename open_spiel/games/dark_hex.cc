@@ -14,18 +14,17 @@
 
 #include "open_spiel/games/dark_hex.h"
 
-#include <memory> // Note where we use it ?
-#include <utility> // Note where we use it ?
+#include <memory>
+#include <utility>
 #include <vector>
 
-#include "./hex.h"
+#include "open_spiel/games/hex.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
   namespace dark_hex {
     namespace {
-      // Define the vars needed on the scope 'using' ?
       using hex::kCellStates;
       using hex::kDefaultBoardSize;
 
@@ -72,7 +71,7 @@ namespace open_spiel {
     }
 
     void DarkHexState::DoApplyAction(Action move) {
-      Player cur_player = CurrentPlayer();//current player
+      Player cur_player = CurrentPlayer(); //current player
       auto& cur_view = (cur_player == Player(0) ? black_view_ : white_view_);
 
       // Either occupied or not
@@ -150,7 +149,6 @@ namespace open_spiel {
       SPIEL_CHECK_GE(player, 0);
       SPIEL_CHECK_LT(player, num_players_);
 
-      // Didnt write these very carefully check again ??
       const auto& player_view = (player == Player{0} ? black_view_ : white_view_);
       SPIEL_CHECK_EQ(values.size(), kNumOfCells * kCellStates +
                                     kLongestSequence * (1 + kBitsPerAction));
@@ -165,26 +163,13 @@ namespace open_spiel {
 
       // Encoding the sequence
       int offset = kNumOfCells * kCellStates;
-      // check auto& ??
       for (const auto& player_with_action: action_sequence_) {
         if (player_with_action.first == player) {
-          // if (values.size() <= offset || values.size() <= offset + 1 + player_with_action.second) {
-          //   std::cout << "CHECK 2" << std::endl;
-          //   std::cout << "values full size:\t\t" << values.size() << std::endl;
-          //   std::cout << "values indexed here:\t\t" << offset << std::endl;
-          //   std::cout << "values indexed here again:\t\t" << offset + 1 + player_with_action.second << std::endl;
-          // }
           values[offset] = player_with_action.first;
-          values[offset + 1 + player_with_action.second] = 1.0; // Check this lines purpose ??
+          values[offset + 1 + player_with_action.second] = 1.0;
         } else if (obs_type_ == ObservationType::kRevealNumTurns) {
-          // if (values.size() <= offset || values.size() <= offset + 1 + 10) {
-          //   std::cout << "CHECK 3" << std::endl;
-          //   std::cout << "values full size:\t\t" << values.size() << std::endl;
-          //   std::cout << "values indexed here:\t\t" << offset << std::endl;
-          //   std::cout << "values indexed here again:\t\t" << offset + 1 + 10 << std::endl;
-          // }
           values[offset] = player_with_action.first;
-          values[offset + 1 + 10] = 1.0; // again ??
+          values[offset + 1 + 10] = 1.0;
         } else {
           SPIEL_CHECK_EQ(obs_type_, ObservationType::kRevealNothing);
         }
@@ -211,18 +196,10 @@ namespace open_spiel {
       
       const auto& player_view = (player == Player{0} ? black_view_ : white_view_);
       for (int cell = 0; cell < kNumOfCells; ++cell) {
-        // if (values.size() <= kNumOfCells * static_cast<int>(player_view[cell]) + cell) {
-        //   std::cout << "values full size:\t\t" << values.size() << std::endl;
-        //   std::cout << "values indexed here:\t\t" << kNumOfCells * static_cast<int>(player_view[cell]) + cell << std::endl;
-        // }
-        values[kNumOfCells * (static_cast<int>(player_view[cell]) - kMinValueCellState) + cell] = 1.0; // check this static_cast ??
+        values[kNumOfCells * (static_cast<int>(player_view[cell]) - kMinValueCellState) + cell] = 1.0;
       }
 
       if (obs_type_ == ObservationType::kRevealNumTurns) {
-        // if (values.size() <= kNumOfCells * kCellStates + action_sequence_.size()) {
-        //   std::cout << "values full size:\t\t" << values.size() << std::endl;
-        //   std::cout << "values indexed here:\t\t" << kNumOfCells * kCellStates + action_sequence_.size() << std::endl;
-        // }
         values[kNumOfCells * kCellStates + action_sequence_.size()] = 1.0;
       }
     }  

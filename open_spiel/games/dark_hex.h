@@ -11,23 +11,37 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
-// ?? - for question i have - or to check later
-// xx - to remove before submission
-
 #ifndef OPEN_SPIEL_GAMES_DARK_HEX_H_
-#define OPEN_SPIEL_GAMES_DARK_HEX_H_  // What r these for ??
+#define OPEN_SPIEL_GAMES_DARK_HEX_H_
 
 #include <array>
 #include <map>
 #include <memory>
 #include <string>
-#include <vector> // Make sure to check what r we importingg each for ??
+#include <vector>
 
 #include "open_spiel/games/hex.h"
-#include "open_spiel/spiel.h" // base functions etc. for the game xx
+#include "open_spiel/spiel.h"
 
-// Game description insert ??
+// Dark Hex (Some versions also called Phantom Hex or Kriegspiel Hex) is an imperfect
+// information version of the classic game of Hex. Players are not exposed to oppsite
+// sides piece information. Only a refree has the full information of the board. When
+// a move fails due to collision the player gets the information of the cell (stone
+// exists), and is allowed to make another move until success. 
+// 
+// There are slightly different versions of the game exists depending on the level of
+// information being exposed to the opponent and what happens in the event of a
+// collision. Right now we only have the Classic Dark Hex (Phantom Hex) implemented 
+// with player:
+//        - Replays after a collision
+//        - Exposed(information on opponent) only to number of turns or nothing
+//
+// Common phantom games include Kriegspiel (Phantom chess), e.g. see
+// https://en.wikipedia.org/wiki/Kriegspiel_(chess), and Phantom Go.
+// See also http://mlanctot.info/files/papers/PhD_Thesis_MarcLanctot.pdf, Ch 3.
+//
+// Parameters:
+///    "obstype", string, "reveal-nothing" (default) or "reveal-numturns"
 
 namespace open_spiel {
   namespace dark_hex {
@@ -37,32 +51,24 @@ namespace open_spiel {
     // do we need inline & constexpr here ? I feel like it's not 
     // necessary as they dont add any value here ??
 
-    // longest sequence xx
-    // For hex longest sequence needs to be determined using board size ??
     inline const int kNumOfCells = hex::kDefaultBoardSize * hex::kDefaultBoardSize;
-    // EDIT Hex, to have x, y as board size not x, x ??
+    // EDIT Hex, to have x, y as board size not x, x
     inline constexpr int kLongestSequence = 2 * kNumOfCells - 1;
-    inline constexpr int kBitsPerAction = 10; // Not sure why this is 10 ??
+    inline constexpr int kBitsPerAction = 10;
 
-    // Add here if anything else is needed to be revealed ??
+    // Add here if anything else is needed to be revealed
     enum class ObservationType {
       kRevealNothing,
-      kRevealNumTurns, // how many turns have passed ??
+      kRevealNumTurns,
     };
 
-    class DarkHexState: public State { // why do we need the public here ??
+    class DarkHexState: public State {
       public: 
-        // Constructor created. shared_ptr was needed to instanciate the game, 
-        // not really sure why ?? 
-        DarkHexState(std::shared_ptr<const Game> game, int board_size, ObservationType obs_type);
+        DarkHexState(std::shared_ptr<const Game> game, int board_size, 
+                     ObservationType obs_type);
 
-        // Basically we are just pulling the hex board and redefiningg all the methods
-        // same as that on this class xx
-        // returning the current player, we will use this for updating the actions
-        // etc xx
         Player CurrentPlayer() const override {return state_.CurrentPlayer(); }
 
-        // im not sure why do we have action_id ??
         std::string ActionToString(Player player, Action action_id) const override {
           return state_.ActionToString(player, action_id);
         }
@@ -70,8 +76,6 @@ namespace open_spiel {
         bool IsTerminal() const override {return state_.IsTerminal();}
         std::vector<double> Returns() const override {return state_.Returns();}
         std::string ObservationString(Player player) const override;
-        // Span<T> is something like a vector, Im not sure if I got the difference
-        // Try to check what it is ??
         void ObservationTensor(Player player,
                                absl::Span<float> values) const override;
         
@@ -91,10 +95,10 @@ namespace open_spiel {
         std::string ViewToString(Player player) const;
         std::string ActionSequenceToString(Player player) const;
 
-        hex::HexState state_; // game state - from reg hex board xx
-        ObservationType obs_type_;  // observation types stored var xx
+        hex::HexState state_;
+        ObservationType obs_type_;  
 
-        // make sure u change this to _history on base class after all
+        // Change this to _history on base class
         std::vector<std::pair<int, Action>> action_sequence_;
         std::array<hex::CellState, kNumOfCells> black_view_;
         std::array<hex::CellState, kNumOfCells> white_view_;
@@ -127,10 +131,6 @@ namespace open_spiel {
         const int board_size_;
     };
 
-    // Whats the point on having inline here, calling switch will
-    // force quit inline ??
-
-    // Im  not sure whhat this line is for ??
     inline std::ostream& operator << (std::ostream& stream,
                                       const ObservationType& obs_type) {
       switch (obs_type) {
