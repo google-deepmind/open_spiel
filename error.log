@@ -1,0 +1,1596 @@
+\e[33mRunning ./open_spiel/scripts/build_and_run_tests.sh from /Users/mustafatapkan/Desktop/GitHub/open_spiel\e[0m
+\e[33mReusing virtualenv from ./venv.\e[0m
+\e[33mSkipping installation of requirements.txt.\e[0m
+Building and testing in /Users/mustafatapkan/Desktop/GitHub/open_spiel/build using 'python' (version 3.8.5).
+[1;33mCurrent build type is: Testing[m
+[1;33mBUILD_WITH_ACPC: OFF [m
+[1;33mBUILD_WITH_EIGEN: OFF [m
+[1;33mBUILD_WITH_HANABI: OFF [m
+[1;33mBUILD_WITH_JULIA: OFF [m
+[1;33mBUILD_WITH_LIBTORCH: OFF [m
+[1;33mBUILD_WITH_TENSORFLOW_CC: OFF [m
+[1;33mBUILD_WITH_PUBLIC_STATES: OFF [m
+[1;33mBUILD_WITH_PYTHON: ON [m
+[1;33mBUILD_WITH_XINXIN: OFF [m
+[1;33mBUILD_WITH_ROSHAMBO: OFF [m
+[1;33mBUILD_WITH_GAMUT: OFF [m
+[1;33mBUILD_WITH_ORTOOLS: OFF [m
+Python include dirs: /Users/mustafatapkan/anaconda3/include/python3.8
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /Users/mustafatapkan/Desktop/GitHub/open_spiel/build
+Building project
+[  0%] Built target absl_spinlock_wait
+[  0%] Built target absl_log_severity
+[  1%] Built target absl_exponential_biased
+[  1%] Built target absl_strerror
+[  3%] Built target absl_time_zone
+[  5%] Built target open_spiel_core
+[  5%] Built target absl_leak_check
+[  5%] Built target absl_civil_time
+[  7%] Built target absl_int128
+[  7%] Built target absl_leak_check_disable
+[  7%] Built target absl_flags_commandlineflag_internal
+[  7%] Built target absl_city
+[  8%] Built target absl_random_internal_platform
+[ 10%] Built target absl_raw_logging_internal
+[ 10%] Built target absl_random_seed_gen_exception
+[ 10%] Built target absl_periodic_sampler
+[ 10%] Built target absl_bad_any_cast_impl
+[ 10%] Built target absl_random_internal_randen_slow
+[ 11%] Built target absl_random_internal_randen_hwaes_impl
+[ 12%] Built target absl_scoped_set_env
+[ 12%] Built target absl_debugging_internal
+[ 13%] Built target absl_bad_optional_access
+[ 13%] Built target absl_throw_delegate
+[ 13%] Built target absl_strings_internal
+[ 14%] Built target absl_base
+[ 14%] Built target absl_random_internal_randen_hwaes
+[ 15%] Built target absl_demangle_internal
+[ 17%] Built target absl_malloc_internal
+[ 17%] Built target absl_bad_variant_access
+[ 17%] Built target absl_stacktrace
+[ 20%] Built target absl_strings
+[ 22%] Built target absl_graphcycles_internal
+[ 22%] Built target absl_random_internal_randen
+[ 23%] Built target absl_symbolize
+[ 23%] Built target absl_flags_commandlineflag
+[ 25%] Built target absl_str_format_internal
+[ 25%] Built target absl_time
+[ 25%] Built target absl_hash
+[ 26%] Built target absl_cord
+[ 27%] Built target absl_random_distributions
+[ 27%] Built target absl_random_internal_seed_material
+[ 27%] Built target absl_statusor
+[ 27%] Built target absl_examine_stack
+[ 27%] Built target absl_flags_marshalling
+[ 28%] Built target absl_synchronization
+[ 28%] Built target absl_random_internal_pool_urbg
+[ 29%] Built target absl_random_internal_distribution_test_util
+[ 30%] Built target absl_flags_private_handle_accessor
+[ 30%] Built target absl_status
+[ 30%] Built target absl_failure_signal_handler
+[ 30%] Built target absl_random_seed_sequences
+[ 30%] Built target absl_flags_program_name
+[ 30%] Built target absl_hashtablez_sampler
+[ 30%] Built target absl_flags_config
+[ 30%] Built target absl_raw_hash_set
+[ 31%] Built target absl_flags_internal
+[ 32%] Built target absl_flags_reflection
+[ 32%] Built target absl_flags
+[ 32%] Built target absl_flags_usage_internal
+[ 32%] Built target absl_flags_usage
+[ 32%] Built target absl_flags_parse
+[ 32%] Built target tests
+[ 35%] Built target utils
+[ 39%] Built target bridge_double_dummy_solver
+[ 40%] Built target game_transforms
+[ 41%] Built target matrix_example
+[ 47%] Built target algorithms
+[ 59%] Built target games
+[ 59%] Built target state_distribution_test
+[ 59%] Built target infostate_tree_test
+[ 60%] Built target cfr_br_test
+[ 60%] Built target tensor_game_utils_test
+[ 60%] Built target trajectories_test
+[ 60%] Built target tabular_exploitability_test
+[ 60%] Built target minimax_test
+[ 61%] Built target outcome_sampling_mccfr_test
+[ 61%] Built target matrix_game_utils_test
+[ 62%] Built target is_mcts_test
+[ 62%] Built target get_all_histories_test
+[ 63%] Built target corr_dev_builder_test
+[ 63%] Built target get_legal_actions_map_test
+[ 64%] Built target best_response_test
+[ 64%] Built target external_sampling_mccfr_test
+[ 64%] Built target deterministic_policy_test
+[ 64%] Built target corr_dist_test
+[ 64%] Built target evaluate_bots_test
+[ 65%] Built target get_all_states_test
+[ 66%] Built target cfr_test
+[ 67%] Built target value_iteration_example
+[ 67%] Built target oos_test
+[ 67%] Built target sarsa_example
+[ 67%] Built target history_tree_test
+[ 68%] Built target mcts_example
+[ 70%] Built target example
+[ 70%] Built target policy_iteration_example
+[ 70%] Built target cfr_example
+[ 70%] Built target count_all_states
+[ 70%] Built target cfr_multi_equilibria_example
+[ 70%] Built target benchmark_game
+[ 70%] Built target observation_history_test
+[ 70%] Built target tiny_hanabi_test
+[ 70%] Built target tiny_bridge_test
+[ 70%] Built target gtp
+[ 71%] Built target tarok_test
+[ 71%] Built target solitaire_test
+[ 72%] Built target skat_test
+[ 72%] Built target kuhn_poker_test
+[ 72%] Built target pig_test
+[ 73%] Built target sheriff_test
+[ 73%] Built target quoridor_test
+[ 73%] Built target oware_test
+[ 74%] Built target y_test
+[ 74%] Built target othello_test
+[ 74%] Built target oh_hell_test
+[ 76%] Built target first_sealed_auction_test
+[ 76%] Built target pentago_test
+[ 76%] Built target nfg_game_test
+[ 76%] Built target hearts_test
+[ 77%] Built target laser_tag_test
+[ 78%] Built target negotiation_test
+[ 78%] Built target connect_four_test
+[ 78%] Built target matrix_games_test
+[ 79%] Built target tic_tac_toe_test
+[ 80%] Built target go_test
+[ 81%] Built target matching_pennies_3p_test
+[ 81%] Built target havannah_test
+[ 82%] Built target efg_game_test
+[ 82%] Built target lewis_signaling_test
+[ 82%] Built target goofspiel_test
+[ 84%] Built target coop_box_pushing_test
+[ 84%] Built target stones_and_gems_test
+[ 85%] Built target liars_dice_test
+[ 85%] Built target battleship_test
+[ 86%] Built target cursor_go_test
+[ 87%] Built target deep_sea_test
+[ 87%] Built target backgammon_test
+[ 87%] Built target coordinated_mp_test
+[ 88%] Built target oshi_zumo_test
+[ 88%] Built target coin_game_test
+[ 88%] Built target markov_soccer_test
+[ 88%] Built target cliff_walking_test
+[ 88%] Built target phantom_ttt_test
+[ 88%] Built target catch_test
+[ 88%] Built target blotto_test
+[ 88%] Built target chess_test
+[ 89%] Built target trade_comm_test
+[ 89%] Built target dark_hex_test
+[ 89%] Built target gin_rummy_test
+[ 89%] Built target blackjack_test
+[ 90%] Built target bridge_test
+[ 90%] Built target hex_test
+[ 90%] Built target clobber_test
+[ 90%] Built target efg_writer_test
+[ 91%] Built target coop_to_1p_test
+[ 91%] Built target start_at_test
+[ 91%] Built target repeated_game_test
+[ 91%] Built target leduc_poker_test
+[ 92%] Built target breakthrough_test
+[ 92%] Built target misere_test
+[ 92%] Built target stats_test
+[ 92%] Built target tensor_view_test
+[ 92%] Built target turn_based_simultaneous_game_test
+[ 93%] Built target normal_form_extensive_game_test
+[ 93%] Built target random_test
+[ 93%] Built target functional_test
+[ 93%] Built target logger_test
+[ 95%] Built target json_test
+[ 96%] Built target lru_cache_test
+[ 96%] Built target pyspiel
+[ 96%] Built target combinatorics_test
+[ 97%] Built target file_test
+[ 97%] Built target threaded_queue_test
+[ 98%] Built target data_logger_test
+[ 98%] Built target circular_buffer_test
+[ 99%] Built target thread_test
+[100%] Built target run_python_test
+[100%] Built target action_view_test
+[100%] Built target spiel_test
+Running all tests
+Test project /Users/mustafatapkan/Desktop/GitHub/open_spiel/build
+        Start  47: dark_hex_test
+        Start  92: python_api_test
+        Start  93: python_playthrough_test
+        Start 162: python_spawn_test
+        Start   2: cfr_test
+        Start  80: laser_tag_test
+        Start  22: trajectories_test
+        Start 100: python_cfr_test
+        Start   3: cfr_br_test
+        Start  99: python_cfr_br_test
+        Start 112: python_fictitious_play_test
+        Start  89: normal_form_extensive_game_test
+        Start  18: outcome_sampling_mccfr_test
+        Start 134: python_value_iteration_test
+        Start 124: python_outcome_sampling_mccfr_test
+        Start   8: external_sampling_mccfr_test
+        Start  17: oos_test
+        Start 109: python_exploitability_descent_test
+        Start 156: python_pyspiel_test
+        Start 155: python_policy_test
+        Start 185: spiel_test
+        Start 102: python_deep_cfr_tf2_test
+        Start 158: python_sampled_stochastic_games_test
+        Start  33: battleship_test
+  1/186 Test  #47: dark_hex_test .....................................***Failed    0.19 sec
+NoChanceOutcomesTest, game = dark_hex
+
+RandomSimTest, game = dark_hex, num_sims = 5
+Information state vector size: 10
+Observation vector size: 0
+Utility range: -1 1
+Starting new game..
+Initial state:
+State:
+. . . 
+ . . . 
+  . . . 
+player 0
+Rewards: 0 0
+Spiel Fatal Error: /Users/mustafatapkan/Desktop/GitHub/open_spiel/open_spiel/games/dark_hex.cc:160 values.size() == kNumCells * kCellStates + (board_size_ * 2 - 1) * (1 + kBitsPerAction)
+values.size() = 10, kNumCells * kCellStates + (board_size_ * 2 - 1) * (1 + kBitsPerAction) = 136
+
+
+        Start  97: python_model_test
+  2/186 Test #162: python_spawn_test .................................***Failed    0.55 sec
+Running tests under Python 3.8.5: /Users/mustafatapkan/Desktop/GitHub/open_spiel/venv/bin/python3
+[ RUN      ] SpawnTest.test_spawn_works
+[  FAILED  ] SpawnTest.test_spawn_works
+======================================================================
+ERROR: test_spawn_works (__main__.SpawnTest)
+SpawnTest.test_spawn_works
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/mustafatapkan/Desktop/GitHub/open_spiel/open_spiel/python/utils/spawn_test.py", line 42, in test_spawn_works
+    workers = [spawn.Process(worker_fn, kwargs={"worker_id": i})
+  File "/Users/mustafatapkan/Desktop/GitHub/open_spiel/open_spiel/python/utils/spawn_test.py", line 42, in <listcomp>
+    workers = [spawn.Process(worker_fn, kwargs={"worker_id": i})
+  File "/Users/mustafatapkan/Desktop/GitHub/open_spiel/open_spiel/python/utils/spawn.py", line 65, in __init__
+    self._process.start()
+  File "/Users/mustafatapkan/anaconda3/lib/python3.8/multiprocessing/process.py", line 121, in start
+    self._popen = self._Popen(self)
+  File "/Users/mustafatapkan/anaconda3/lib/python3.8/multiprocessing/context.py", line 224, in _Popen
+    return _default_context.get_context().Process._Popen(process_obj)
+  File "/Users/mustafatapkan/anaconda3/lib/python3.8/multiprocessing/context.py", line 284, in _Popen
+    return Popen(process_obj)
+  File "/Users/mustafatapkan/anaconda3/lib/python3.8/multiprocessing/popen_spawn_posix.py", line 32, in __init__
+    super().__init__(process_obj)
+  File "/Users/mustafatapkan/anaconda3/lib/python3.8/multiprocessing/popen_fork.py", line 19, in __init__
+    self._launch(process_obj)
+  File "/Users/mustafatapkan/anaconda3/lib/python3.8/multiprocessing/popen_spawn_posix.py", line 47, in _launch
+    reduction.dump(process_obj, fp)
+  File "/Users/mustafatapkan/anaconda3/lib/python3.8/multiprocessing/reduction.py", line 60, in dump
+    ForkingPickler(file, protocol).dump(obj)
+AttributeError: Can't pickle local object 'SpawnTest.test_spawn_works.<locals>.worker_fn'
+
+----------------------------------------------------------------------
+Ran 1 test in 0.031s
+
+FAILED (errors=1)
+
+        Start  84: y_test
+  3/186 Test  #93: python_playthrough_test ...........................Child aborted***Exception:  54.09 sec
+Running tests under Python 3.8.5: /Users/mustafatapkan/Desktop/GitHub/open_spiel/venv/bin/python3
+[ RUN      ] PlaythroughTest.test_playthrough_backgammon(hyper_backgammon=true).txt
+[       OK ] PlaythroughTest.test_playthrough_backgammon(hyper_backgammon=true).txt
+[ RUN      ] PlaythroughTest.test_playthrough_backgammon.txt
+[       OK ] PlaythroughTest.test_playthrough_backgammon.txt
+[ RUN      ] PlaythroughTest.test_playthrough_battleship.txt
+[       OK ] PlaythroughTest.test_playthrough_battleship.txt
+[ RUN      ] PlaythroughTest.test_playthrough_blackjack.txt
+[       OK ] PlaythroughTest.test_playthrough_blackjack.txt
+[ RUN      ] PlaythroughTest.test_playthrough_blotto.txt
+[       OK ] PlaythroughTest.test_playthrough_blotto.txt
+[ RUN      ] PlaythroughTest.test_playthrough_breakthrough.txt
+[       OK ] PlaythroughTest.test_playthrough_breakthrough.txt
+[ RUN      ] PlaythroughTest.test_playthrough_bridge(use_double_dummy_result=false).txt
+[       OK ] PlaythroughTest.test_playthrough_bridge(use_double_dummy_result=false).txt
+[ RUN      ] PlaythroughTest.test_playthrough_bridge.txt
+[       OK ] PlaythroughTest.test_playthrough_bridge.txt
+[ RUN      ] PlaythroughTest.test_playthrough_bridge_uncontested_bidding-2NT.txt
+[       OK ] PlaythroughTest.test_playthrough_bridge_uncontested_bidding-2NT.txt
+[ RUN      ] PlaythroughTest.test_playthrough_bridge_uncontested_bidding.txt
+[       OK ] PlaythroughTest.test_playthrough_bridge_uncontested_bidding.txt
+[ RUN      ] PlaythroughTest.test_playthrough_catch.txt
+[       OK ] PlaythroughTest.test_playthrough_catch.txt
+[ RUN      ] PlaythroughTest.test_playthrough_chess.txt
+[       OK ] PlaythroughTest.test_playthrough_chess.txt
+[ RUN      ] PlaythroughTest.test_playthrough_cliff_walking.txt
+[       OK ] PlaythroughTest.test_playthrough_cliff_walking.txt
+[ RUN      ] PlaythroughTest.test_playthrough_clobber.txt
+[       OK ] PlaythroughTest.test_playthrough_clobber.txt
+[ RUN      ] PlaythroughTest.test_playthrough_coin_game.txt
+[       OK ] PlaythroughTest.test_playthrough_coin_game.txt
+[ RUN      ] PlaythroughTest.test_playthrough_connect_four.txt
+[       OK ] PlaythroughTest.test_playthrough_connect_four.txt
+[ RUN      ] PlaythroughTest.test_playthrough_coop_box_pushing.txt
+[       OK ] PlaythroughTest.test_playthrough_coop_box_pushing.txt
+[ RUN      ] PlaythroughTest.test_playthrough_coop_to_1p(game=tiny_bridge_2p()).txt
+[       OK ] PlaythroughTest.test_playthrough_coop_to_1p(game=tiny_bridge_2p()).txt
+[ RUN      ] PlaythroughTest.test_playthrough_coop_to_1p(game=tiny_hanabi()).txt
+[       OK ] PlaythroughTest.test_playthrough_coop_to_1p(game=tiny_hanabi()).txt
+[ RUN      ] PlaythroughTest.test_playthrough_coordinated_mp.txt
+[       OK ] PlaythroughTest.test_playthrough_coordinated_mp.txt
+[ RUN      ] PlaythroughTest.test_playthrough_cursor_go(board_size=5,max_cursor_moves=7).txt
+[       OK ] PlaythroughTest.test_playthrough_cursor_go(board_size=5,max_cursor_moves=7).txt
+[ RUN      ] PlaythroughTest.test_playthrough_dark_hex.txt
+Assertion failed: (false && "i < size()"), function operator(), file /Users/mustafatapkan/Desktop/GitHub/open_spiel/open_spiel/../open_spiel/abseil-cpp/absl/types/span.h, line 278.
+Fatal Python error: Aborted
+
+Current thread 0x0000000118c12e00 (most recent call first):
+  File "/Users/mustafatapkan/Desktop/GitHub/open_spiel/open_spiel/python/observation.py", line 68 in __init__
+  File "/Users/mustafatapkan/Desktop/GitHub/open_spiel/open_spiel/python/observation.py", line 101 in make_observation
+  File "/Users/mustafatapkan/Desktop/GitHub/open_spiel/open_spiel/python/algorithms/generate_playthrough.py", line 154 in playthrough_lines
+  File "/Users/mustafatapkan/Desktop/GitHub/open_spiel/open_spiel/python/algorithms/generate_playthrough.py", line 106 in playthrough
+  File "/Users/mustafatapkan/Desktop/GitHub/open_spiel/open_spiel/python/algorithms/generate_playthrough.py", line 401 in replay
+  File "/Users/mustafatapkan/Desktop/GitHub/open_spiel/open_spiel/python/../integration_tests/playthrough_test.py", line 63 in run_test
+  File "/Users/mustafatapkan/Desktop/GitHub/open_spiel/open_spiel/python/../integration_tests/playthrough_test.py", line 80 in <lambda>
+  File "/Users/mustafatapkan/anaconda3/lib/python3.8/unittest/case.py", line 633 in _callTestMethod
+  File "/Users/mustafatapkan/anaconda3/lib/python3.8/unittest/case.py", line 676 in run
+  File "/Users/mustafatapkan/anaconda3/lib/python3.8/unittest/case.py", line 736 in __call__
+  File "/Users/mustafatapkan/anaconda3/lib/python3.8/unittest/suite.py", line 122 in run
+  File "/Users/mustafatapkan/anaconda3/lib/python3.8/unittest/suite.py", line 84 in __call__
+  File "/Users/mustafatapkan/anaconda3/lib/python3.8/unittest/suite.py", line 122 in run
+  File "/Users/mustafatapkan/anaconda3/lib/python3.8/unittest/suite.py", line 84 in __call__
+  File "/Users/mustafatapkan/anaconda3/lib/python3.8/unittest/runner.py", line 176 in run
+  File "/Users/mustafatapkan/Desktop/GitHub/open_spiel/venv/lib/python3.8/site-packages/absl/testing/_pretty_print_reporter.py", line 87 in run
+  File "/Users/mustafatapkan/anaconda3/lib/python3.8/unittest/main.py", line 271 in runTests
+  File "/Users/mustafatapkan/anaconda3/lib/python3.8/unittest/main.py", line 101 in __init__
+  File "/Users/mustafatapkan/Desktop/GitHub/open_spiel/venv/lib/python3.8/site-packages/absl/testing/absltest.py", line 2401 in _run_and_get_tests_result
+  File "/Users/mustafatapkan/Desktop/GitHub/open_spiel/venv/lib/python3.8/site-packages/absl/testing/absltest.py", line 2430 in run_tests
+  File "/Users/mustafatapkan/Desktop/GitHub/open_spiel/venv/lib/python3.8/site-packages/absl/testing/absltest.py", line 2114 in main_function
+  File "/Users/mustafatapkan/Desktop/GitHub/open_spiel/venv/lib/python3.8/site-packages/absl/app.py", line 251 in _run_main
+  File "/Users/mustafatapkan/Desktop/GitHub/open_spiel/venv/lib/python3.8/site-packages/absl/app.py", line 300 in run
+  File "/Users/mustafatapkan/Desktop/GitHub/open_spiel/venv/lib/python3.8/site-packages/absl/testing/absltest.py", line 2116 in _run_in_app
+  File "/Users/mustafatapkan/Desktop/GitHub/open_spiel/venv/lib/python3.8/site-packages/absl/testing/absltest.py", line 1999 in main
+  File "/Users/mustafatapkan/Desktop/GitHub/open_spiel/open_spiel/python/../integration_tests/playthrough_test.py", line 87 in <module>
+
+        Start 115: python_get_all_states_test
+  4/186 Test  #84: y_test ............................................   Passed  103.89 sec
+        Start  12: history_tree_test
+  5/186 Test  #97: python_model_test .................................   Passed  111.22 sec
+        Start  77: stones_and_gems_test
+  6/186 Test  #33: battleship_test ...................................   Passed  115.40 sec
+        Start 132: python_rcfr_test
+  7/186 Test #102: python_deep_cfr_tf2_test ..........................   Passed  117.73 sec
+        Start  72: pig_test
+  8/186 Test #158: python_sampled_stochastic_games_test ..............   Passed  135.30 sec
+        Start  39: chess_test
+  9/186 Test #155: python_policy_test ................................   Passed  145.36 sec
+        Start 110: python_exploitability_test
+ 10/186 Test #156: python_pyspiel_test ...............................   Passed  147.18 sec
+        Start  73: quoridor_test
+ 11/186 Test #109: python_exploitability_descent_test ................   Passed  147.37 sec
+        Start 128: python_projected_replicator_dynamics_test
+ 12/186 Test #115: python_get_all_states_test ........................   Passed   93.90 sec
+        Start 129: python_best_response_oracle_test
+ 13/186 Test #185: spiel_test ........................................   Passed  167.88 sec
+        Start 103: python_discounted_cfr_test
+ 14/186 Test  #17: oos_test ..........................................   Passed  168.01 sec
+        Start  54: havannah_test
+ 15/186 Test #132: python_rcfr_test ..................................   Passed   56.99 sec
+        Start  76: solitaire_test
+ 16/186 Test  #72: pig_test ..........................................   Passed   63.10 sec
+        Start 111: python_external_sampling_mccfr_test
+ 17/186 Test   #8: external_sampling_mccfr_test ......................   Passed  186.00 sec
+        Start   5: corr_dev_builder_test
+ 18/186 Test  #89: normal_form_extensive_game_test ...................   Passed  193.26 sec
+        Start 159: python_tensor_game_utils_test
+ 19/186 Test  #12: history_tree_test .................................   Passed   90.21 sec
+        Start   4: corr_dist_test
+ 20/186 Test  #39: chess_test ........................................   Passed   60.24 sec
+        Start  50: first_sealed_auction_test
+ 21/186 Test  #77: stones_and_gems_test ..............................   Passed   85.69 sec
+        Start 170: python_examples_bridge_supervised_learning
+ 22/186 Test #124: python_outcome_sampling_mccfr_test ................   Passed  199.20 sec
+        Start  49: efg_game_test
+ 23/186 Test #129: python_best_response_oracle_test ..................   Passed   51.29 sec
+        Start 149: python_tic_tac_toe_test
+ 24/186 Test  #18: outcome_sampling_mccfr_test .......................   Passed  200.25 sec
+        Start 137: python_is_mcts_test
+ 25/186 Test #110: python_exploitability_test ........................   Passed   54.90 sec
+        Start 127: python_policy_gradient_test
+ 26/186 Test #128: python_projected_replicator_dynamics_test .........   Passed   54.49 sec
+        Start 152: python_games_sim_test
+ 27/186 Test  #73: quoridor_test .....................................   Passed   57.04 sec
+        Start  13: infostate_tree_test
+ 28/186 Test #112: python_fictitious_play_test .......................   Passed  208.81 sec
+        Start 101: python_deep_cfr_test
+ 29/186 Test  #99: python_cfr_br_test ................................   Passed  214.68 sec
+        Start 119: python_mcts_test
+ 30/186 Test #103: python_discounted_cfr_test ........................   Passed   52.74 sec
+        Start  88: efg_writer_test
+ 31/186 Test  #54: havannah_test .....................................   Passed   52.95 sec
+        Start  28: policy_iteration_example_test
+ 32/186 Test  #76: solitaire_test ....................................   Passed   50.61 sec
+        Start   7: evaluate_bots_test
+ 33/186 Test #134: python_value_iteration_test .......................   Passed  226.88 sec
+        Start  20: tabular_exploitability_test
+ 34/186 Test #111: python_external_sampling_mccfr_test ...............   Passed   46.86 sec
+        Start 107: python_evaluate_bots_test
+ 35/186 Test #152: python_games_sim_test .............................   Passed   28.07 sec
+        Start  32: backgammon_test
+ 36/186 Test #159: python_tensor_game_utils_test .....................   Passed   40.82 sec
+        Start  14: is_mcts_test
+ 37/186 Test #149: python_tic_tac_toe_test ...........................   Passed   35.38 sec
+        Start 117: python_lp_solver_test
+ 38/186 Test #127: python_policy_gradient_test .......................   Passed   37.17 sec
+        Start  85: turn_based_simultaneous_game_test
+ 39/186 Test #137: python_is_mcts_test ...............................   Passed   37.55 sec
+        Start 163: python_rcfr_pytorch_test
+ 40/186 Test #170: python_examples_bridge_supervised_learning ........   Passed   42.30 sec
+        Start  81: tiny_bridge_test
+ 41/186 Test  #50: first_sealed_auction_test .........................   Passed   45.41 sec
+        Start 106: python_eva_test
+ 42/186 Test   #5: corr_dev_builder_test .............................   Passed   55.29 sec
+        Start  44: coop_box_pushing_test
+ 43/186 Test  #49: efg_game_test .....................................   Passed   42.59 sec
+        Start  29: value_iteration_example_test
+ 44/186 Test #101: python_deep_cfr_test ..............................   Passed   33.40 sec
+        Start  37: bridge_test
+ 45/186 Test  #13: infostate_tree_test ...............................   Passed   38.57 sec
+        Start  61: markov_soccer_test
+ 46/186 Test #119: python_mcts_test ..................................   Passed   28.95 sec
+        Start 121: python_neurd_test
+ 47/186 Test   #4: corr_dist_test ....................................   Passed   50.03 sec
+        Start 167: python_eva_pytorch_test
+ 48/186 Test  #28: policy_iteration_example_test .....................   Passed   29.94 sec
+        Start 122: python_nfsp_test
+ 49/186 Test #117: python_lp_solver_test .............................   Passed   19.52 sec
+        Start 166: python_deep_cfr_pytorch_test
+ 50/186 Test  #20: tabular_exploitability_test .......................   Passed   27.44 sec
+        Start 133: python_sequence_form_lp_test
+ 51/186 Test  #88: efg_writer_test ...................................   Passed   34.05 sec
+        Start  96: python_evaluator_test
+ 52/186 Test #163: python_rcfr_pytorch_test ..........................   Passed   17.09 sec
+        Start  55: hearts_test
+ 53/186 Test #107: python_evaluate_bots_test .........................   Passed   27.04 sec
+        Start  21: tensor_game_utils_test
+ 54/186 Test  #32: backgammon_test ...................................   Passed   25.31 sec
+        Start 118: python_masked_softmax_test
+ 55/186 Test   #7: evaluate_bots_test ................................   Passed   34.53 sec
+        Start 105: python_dqn_test
+ 56/186 Test  #81: tiny_bridge_test ..................................   Passed   19.20 sec
+        Start 130: python_strategy_selectors_test
+ 57/186 Test  #14: is_mcts_test ......................................   Passed   24.68 sec
+        Start  98: python_best_response_test
+ 58/186 Test #167: python_eva_pytorch_test ...........................   Passed   14.51 sec
+        Start  64: negotiation_test
+ 59/186 Test  #37: bridge_test .......................................   Passed   17.33 sec
+        Start  10: get_all_states_test
+ 60/186 Test  #85: turn_based_simultaneous_game_test .................   Passed   22.27 sec
+        Start  53: goofspiel_test
+ 61/186 Test  #29: value_iteration_example_test ......................   Passed   18.42 sec
+        Start 151: python_games_bridge_test
+ 62/186 Test #121: python_neurd_test .................................   Passed   16.96 sec
+        Start   9: get_all_histories_test
+ 63/186 Test  #44: coop_box_pushing_test .............................   Passed   19.54 sec
+        Start  68: othello_test
+ 64/186 Test #106: python_eva_test ...................................   Passed   19.78 sec
+        Start  74: sheriff_test
+ 65/186 Test  #61: markov_soccer_test ................................   Passed   18.82 sec
+        Start  58: leduc_poker_test
+ 66/186 Test #118: python_masked_softmax_test ........................   Passed   11.13 sec
+        Start 116: python_rl_losses_test
+ 67/186 Test  #21: tensor_game_utils_test ............................   Passed   12.51 sec
+        Start 186: action_view_test
+ 68/186 Test #122: python_nfsp_test ..................................   Passed   16.61 sec
+        Start  52: go_test
+ 69/186 Test #186: action_view_test ..................................   Passed    0.20 sec
+        Start  38: catch_test
+ 70/186 Test #166: python_deep_cfr_pytorch_test ......................   Passed   13.51 sec
+        Start 153: python_matrix_game_utils_test
+ 71/186 Test  #55: hearts_test .......................................   Passed   14.39 sec
+        Start 144: python_visualization_test
+ 72/186 Test #133: python_sequence_form_lp_test ......................   Passed   15.31 sec
+        Start 126: python_policy_aggregator_test
+ 73/186 Test  #96: python_evaluator_test .............................   Passed   15.31 sec
+        Start  41: clobber_test
+ 74/186 Test  #74: sheriff_test ......................................   Passed    9.72 sec
+        Start  36: breakthrough_test
+ 75/186 Test #130: python_strategy_selectors_test ....................   Passed   12.22 sec
+        Start  24: cfr_example_test
+ 76/186 Test  #53: goofspiel_test ....................................   Passed   10.93 sec
+        Start 169: python_policy_gradient_pytorch_test
+ 77/186 Test #105: python_dqn_test ...................................   Passed   13.50 sec
+        Start 165: python_nfsp_pytorch_test
+ 78/186 Test #151: python_games_bridge_test ..........................   Passed   11.51 sec
+        Start  27: mcts_example_test
+ 79/186 Test  #64: negotiation_test ..................................   Passed   12.56 sec
+        Start  66: oh_hell_test
+ 80/186 Test  #58: leduc_poker_test ..................................   Passed   10.23 sec
+        Start  94: python_action_value_test
+ 81/186 Test  #68: othello_test ......................................   Passed   11.59 sec
+        Start  15: matrix_game_utils_test
+ 82/186 Test  #98: python_best_response_test .........................   Passed   13.94 sec
+        Start 164: python_dqn_pytorch_test
+ 83/186 Test  #10: get_all_states_test ...............................   Passed   13.90 sec
+        Start  78: tarok_test
+ 84/186 Test  #24: cfr_example_test ..................................   Passed    3.20 sec
+        Start  42: coin_game_test
+ 85/186 Test   #9: get_all_histories_test ............................   Passed   13.73 sec
+        Start  25: example_test
+ 86/186 Test  #25: example_test ......................................   Passed    0.19 sec
+        Start 125: python_policy_aggregator_joint_test
+ 87/186 Test  #27: mcts_example_test .................................   Passed    3.47 sec
+        Start  51: gin_rummy_test
+ 88/186 Test  #52: go_test ...........................................   Passed    7.80 sec
+        Start  70: pentago_test
+ 89/186 Test  #38: catch_test ........................................   Passed    8.10 sec
+        Start  23: benchmark_game_test
+ 90/186 Test  #15: matrix_game_utils_test ............................   Passed    3.37 sec
+        Start  19: state_distribution_test
+ 91/186 Test  #23: benchmark_game_test ...............................   Passed    0.21 sec
+        Start 150: python_bot_test
+ 92/186 Test #153: python_matrix_game_utils_test .....................   Passed    8.82 sec
+        Start  57: kuhn_poker_test
+ 93/186 Test  #19: state_distribution_test ...........................   Passed    0.71 sec
+        Start 104: python_double_oracle_test
+ 94/186 Test  #78: tarok_test ........................................   Passed    3.35 sec
+        Start  87: coop_to_1p_test
+ 95/186 Test  #41: clobber_test ......................................   Passed    6.87 sec
+        Start 180: run_python_test
+ 96/186 Test #116: python_rl_losses_test .............................   Passed   10.66 sec
+        Start  16: minimax_test
+ 97/186 Test  #16: minimax_test ......................................   Passed    0.27 sec
+        Start  71: phantom_ttt_test
+ 98/186 Test #169: python_policy_gradient_pytorch_test ...............   Passed    6.54 sec
+        Start  26: matrix_example_test
+ 99/186 Test  #26: matrix_example_test ...............................   Passed    0.01 sec
+        Start  75: skat_test
+100/186 Test #164: python_dqn_pytorch_test ...........................   Passed    4.88 sec
+        Start  86: misere_test
+101/186 Test  #87: coop_to_1p_test ...................................   Passed    0.95 sec
+        Start  67: oshi_zumo_test
+102/186 Test  #66: oh_hell_test ......................................   Passed    5.90 sec
+        Start  43: connect_four_test
+103/186 Test  #36: breakthrough_test .................................   Passed    7.16 sec
+        Start 179: random_test
+104/186 Test #165: python_nfsp_pytorch_test ..........................   Passed    6.54 sec
+        Start  11: get_legal_actions_map_test
+105/186 Test #179: random_test .......................................   Passed    0.22 sec
+        Start  83: trade_comm_test
+106/186 Test #180: run_python_test ...................................   Passed    1.11 sec
+        Start  69: oware_test
+107/186 Test  #75: skat_test .........................................   Passed    0.79 sec
+        Start 120: python_minimax_test
+108/186 Test #144: python_visualization_test .........................   Passed    9.06 sec
+        Start 176: json_test
+109/186 Test  #71: phantom_ttt_test ..................................   Passed    0.96 sec
+        Start  63: matrix_games_test
+110/186 Test  #11: get_legal_actions_map_test ........................   Passed    0.71 sec
+        Start 181: stats_test
+111/186 Test #176: json_test .........................................   Passed    0.18 sec
+        Start 139: python_alpharank_test
+112/186 Test  #83: trade_comm_test ...................................   Passed    0.56 sec
+        Start  91: start_at_test
+113/186 Test  #86: misere_test .......................................   Passed    0.99 sec
+        Start  82: tiny_hanabi_test
+114/186 Test  #57: kuhn_poker_test ...................................   Passed    2.09 sec
+        Start 182: tensor_view_test
+115/186 Test #181: stats_test ........................................   Passed    0.23 sec
+        Start 183: thread_test
+116/186 Test  #51: gin_rummy_test ....................................   Passed    3.53 sec
+        Start  46: cursor_go_test
+117/186 Test #182: tensor_view_test ..................................   Passed    0.21 sec
+        Start  56: hex_test
+118/186 Test #126: python_policy_aggregator_test .....................   Passed    9.27 sec
+        Start  65: nfg_game_test
+119/186 Test #183: thread_test .......................................   Passed    0.22 sec
+        Start 168: python_rl_losses_pytorch_test
+120/186 Test  #91: start_at_test .....................................   Passed    0.45 sec
+        Start 178: lru_cache_test
+121/186 Test  #63: matrix_games_test .................................   Passed    0.70 sec
+        Start 177: logger_test
+122/186 Test  #82: tiny_hanabi_test ..................................   Passed    0.51 sec
+        Start  34: blackjack_test
+123/186 Test  #70: pentago_test ......................................   Passed    3.68 sec
+        Start  35: blotto_test
+124/186 Test #178: lru_cache_test ....................................   Passed    0.19 sec
+        Start  40: cliff_walking_test
+125/186 Test  #94: python_action_value_test ..........................   Passed    7.17 sec
+        Start  30: sarsa_example_test
+126/186 Test  #43: connect_four_test .................................   Passed    1.49 sec
+        Start 184: threaded_queue_test
+127/186 Test #177: logger_test .......................................   Passed    0.24 sec
+        Start  79: tic_tac_toe_test
+128/186 Test  #30: sarsa_example_test ................................   Passed    0.23 sec
+        Start  31: observation_history_test
+129/186 Test  #42: coin_game_test ....................................   Passed    5.40 sec
+        Start 140: python_alpharank_visualizer_test
+130/186 Test #184: threaded_queue_test ...............................   Passed    0.23 sec
+        Start   6: deterministic_policy_test
+131/186 Test  #31: observation_history_test ..........................   Passed    0.20 sec
+        Start  48: deep_sea_test
+132/186 Test  #69: oware_test ........................................   Passed    1.62 sec
+        Start 173: data_logger_test
+133/186 Test  #34: blackjack_test ....................................   Passed    0.73 sec
+        Start  59: lewis_signaling_test
+134/186 Test  #40: cliff_walking_test ................................   Passed    0.70 sec
+        Start  60: liars_dice_test
+135/186 Test  #79: tic_tac_toe_test ..................................   Passed    0.62 sec
+        Start 172: combinatorics_test
+136/186 Test #173: data_logger_test ..................................   Passed    0.22 sec
+        Start 174: file_test
+137/186 Test #172: combinatorics_test ................................   Passed    0.20 sec
+        Start  90: repeated_game_test
+138/186 Test #174: file_test .........................................   Passed    0.21 sec
+        Start 171: circular_buffer_test
+139/186 Test  #65: nfg_game_test .....................................   Passed    1.27 sec
+        Start  62: matching_pennies_3p_test
+140/186 Test  #46: cursor_go_test ....................................   Passed    1.47 sec
+        Start  45: coordinated_mp_test
+141/186 Test  #59: lewis_signaling_test ..............................   Passed    0.40 sec
+        Start 175: functional_test
+142/186 Test  #48: deep_sea_test .....................................   Passed    0.61 sec
+        Start   1: best_response_test
+143/186 Test #171: circular_buffer_test ..............................   Passed    0.24 sec
+        Start 123: python_noisy_policy_test
+144/186 Test #175: functional_test ...................................   Passed    0.22 sec
+        Start 114: python_generate_playthrough_test
+145/186 Test   #6: deterministic_policy_test .........................   Passed    0.99 sec
+        Start 148: python_kuhn_poker_test
+146/186 Test  #90: repeated_game_test ................................   Passed    0.36 sec
+        Start 113: python_gambit_test
+147/186 Test  #62: matching_pennies_3p_test ..........................   Passed    0.31 sec
+        Start 157: python_rl_environment_test
+148/186 Test  #60: liars_dice_test ...................................   Passed    0.64 sec
+        Start 143: python_utils_test
+149/186 Test  #45: coordinated_mp_test ...............................   Passed    0.38 sec
+        Start 147: python_data_test
+150/186 Test   #1: best_response_test ................................   Passed    0.39 sec
+        Start  95: python_action_value_vs_best_response_test
+151/186 Test  #35: blotto_test .......................................   Passed    1.58 sec
+        Start 141: python_dynamics_test
+152/186 Test #125: python_policy_aggregator_joint_test ...............   Passed    6.52 sec
+        Start 146: python_cliff_walking_test
+153/186 Test #150: python_bot_test ...................................   Passed    5.53 sec
+        Start 108: python_expected_game_score_test
+154/186 Test  #67: oshi_zumo_test ....................................   Passed    3.85 sec
+        Start 145: python_catch_test
+155/186 Test #120: python_minimax_test ...............................   Passed    3.38 sec
+        Start 142: python_heuristic_payoff_table_test
+156/186 Test  #56: hex_test ..........................................   Passed    3.03 sec
+        Start 131: python_random_agent_test
+157/186 Test #104: python_double_oracle_test .........................   Passed    5.36 sec
+        Start 154: python_observation_history_test
+158/186 Test #113: python_gambit_test ................................   Passed    1.59 sec
+        Start 138: python_uniform_random_test
+159/186 Test #114: python_generate_playthrough_test ..................   Passed    1.68 sec
+        Start 136: python_bluechip_bridge_uncontested_bidding_test
+160/186 Test #168: python_rl_losses_pytorch_test .....................   Passed    3.23 sec
+        Start 135: python_bluechip_bridge_test
+161/186 Test #157: python_rl_environment_test ........................   Passed    1.76 sec
+        Start 160: python_file_logger_test
+162/186 Test #123: python_noisy_policy_test ..........................   Passed    1.89 sec
+        Start 161: python_lru_cache_test
+163/186 Test #141: python_dynamics_test ..............................   Passed    1.67 sec
+164/186 Test #147: python_data_test ..................................   Passed    1.84 sec
+165/186 Test  #95: python_action_value_vs_best_response_test .........   Passed    1.76 sec
+166/186 Test #143: python_utils_test .................................   Passed    1.97 sec
+167/186 Test #146: python_cliff_walking_test .........................   Passed    1.58 sec
+168/186 Test #139: python_alpharank_test .............................   Passed    4.14 sec
+169/186 Test #148: python_kuhn_poker_test ............................   Passed    2.24 sec
+170/186 Test #160: python_file_logger_test ...........................   Passed    0.46 sec
+171/186 Test #161: python_lru_cache_test .............................   Passed    0.44 sec
+172/186 Test #108: python_expected_game_score_test ...................   Passed    1.41 sec
+173/186 Test #145: python_catch_test .................................   Passed    1.37 sec
+174/186 Test #154: python_observation_history_test ...................   Passed    1.03 sec
+175/186 Test #138: python_uniform_random_test ........................   Passed    0.92 sec
+176/186 Test #142: python_heuristic_payoff_table_test ................   Passed    1.34 sec
+177/186 Test #136: python_bluechip_bridge_uncontested_bidding_test ...   Passed    0.91 sec
+178/186 Test #140: python_alpharank_visualizer_test ..................   Passed    3.55 sec
+179/186 Test #135: python_bluechip_bridge_test .......................   Passed    0.88 sec
+180/186 Test #131: python_random_agent_test ..........................   Passed    1.20 sec
+181/186 Test   #3: cfr_br_test .......................................   Passed  284.13 sec
+182/186 Test  #22: trajectories_test .................................   Passed  300.69 sec
+183/186 Test #100: python_cfr_test ...................................   Passed  301.59 sec
+184/186 Test  #92: python_api_test ...................................***Failed  321.76 sec
+Running tests under Python 3.8.5: /Users/mustafatapkan/Desktop/GitHub/open_spiel/venv/bin/python3
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_cliff_walking_Test.test_constant_sum
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_cliff_walking_Test.test_constant_sum
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_cliff_walking_Test.test_current_player_infosets_no_overlap_between_players
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_cliff_walking_Test.test_current_player_infosets_no_overlap_between_players
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_cliff_walking_Test.test_current_player_returns_terminal_player_on_terminal_nodes
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_cliff_walking_Test.test_current_player_returns_terminal_player_on_terminal_nodes
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_cliff_walking_Test.test_game_is_perfect_recall
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_cliff_walking_Test.test_game_is_perfect_recall
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_cliff_walking_Test.test_information_state_functions_raises_on_chance_nodes
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_cliff_walking_Test.test_information_state_functions_raises_on_chance_nodes
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_cliff_walking_Test.test_information_state_no_argument_raises_on_terminal_nodes
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_cliff_walking_Test.test_information_state_no_argument_raises_on_terminal_nodes
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_cliff_walking_Test.test_legal_actions_empty
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_cliff_walking_Test.test_legal_actions_empty
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_cliff_walking_Test.test_number_of_nodes
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_cliff_walking_Test.test_number_of_nodes
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_kuhn_poker_Test.test_constant_sum
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_kuhn_poker_Test.test_constant_sum
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_kuhn_poker_Test.test_current_player_infosets_no_overlap_between_players
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_kuhn_poker_Test.test_current_player_infosets_no_overlap_between_players
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_kuhn_poker_Test.test_current_player_returns_terminal_player_on_terminal_nodes
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_kuhn_poker_Test.test_current_player_returns_terminal_player_on_terminal_nodes
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_kuhn_poker_Test.test_game_is_perfect_recall
+/Users/mustafatapkan/Desktop/GitHub/open_spiel/venv/lib/python3.8/site-packages/numpy/core/_asarray.py:83: VisibleDeprecationWarning: Creating an ndarray from ragged nested sequences (which is a list-or-tuple of lists-or-tuples-or ndarrays with different lengths or shapes) is deprecated. If you meant to do this, you must specify 'dtype=object' when creating the ndarray
+  return array(a, dtype, copy=False, order=order)
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_kuhn_poker_Test.test_game_is_perfect_recall
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_kuhn_poker_Test.test_information_state_functions_raises_on_chance_nodes
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_kuhn_poker_Test.test_information_state_functions_raises_on_chance_nodes
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_kuhn_poker_Test.test_information_state_no_argument_raises_on_terminal_nodes
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_kuhn_poker_Test.test_information_state_no_argument_raises_on_terminal_nodes
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_kuhn_poker_Test.test_legal_actions_empty
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_kuhn_poker_Test.test_legal_actions_empty
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_kuhn_poker_Test.test_number_of_nodes
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_kuhn_poker_Test.test_number_of_nodes
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_leduc_poker_Test.test_constant_sum
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_leduc_poker_Test.test_constant_sum
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_leduc_poker_Test.test_current_player_infosets_no_overlap_between_players
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_leduc_poker_Test.test_current_player_infosets_no_overlap_between_players
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_leduc_poker_Test.test_current_player_returns_terminal_player_on_terminal_nodes
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_leduc_poker_Test.test_current_player_returns_terminal_player_on_terminal_nodes
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_leduc_poker_Test.test_game_is_perfect_recall
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_leduc_poker_Test.test_game_is_perfect_recall
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_leduc_poker_Test.test_information_state_functions_raises_on_chance_nodes
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_leduc_poker_Test.test_information_state_functions_raises_on_chance_nodes
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_leduc_poker_Test.test_information_state_no_argument_raises_on_terminal_nodes
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_leduc_poker_Test.test_information_state_no_argument_raises_on_terminal_nodes
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_leduc_poker_Test.test_legal_actions_empty
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_leduc_poker_Test.test_legal_actions_empty
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_leduc_poker_Test.test_number_of_nodes
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_leduc_poker_Test.test_number_of_nodes
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_iigoofspiel4_Test.test_constant_sum
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_iigoofspiel4_Test.test_constant_sum
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_iigoofspiel4_Test.test_current_player_infosets_no_overlap_between_players
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_iigoofspiel4_Test.test_current_player_infosets_no_overlap_between_players
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_iigoofspiel4_Test.test_current_player_returns_terminal_player_on_terminal_nodes
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_iigoofspiel4_Test.test_current_player_returns_terminal_player_on_terminal_nodes
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_iigoofspiel4_Test.test_game_is_perfect_recall
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_iigoofspiel4_Test.test_game_is_perfect_recall
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_iigoofspiel4_Test.test_information_state_functions_raises_on_chance_nodes
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_iigoofspiel4_Test.test_information_state_functions_raises_on_chance_nodes
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_iigoofspiel4_Test.test_information_state_no_argument_raises_on_terminal_nodes
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_iigoofspiel4_Test.test_information_state_no_argument_raises_on_terminal_nodes
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_iigoofspiel4_Test.test_legal_actions_empty
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_iigoofspiel4_Test.test_legal_actions_empty
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_iigoofspiel4_Test.test_number_of_nodes
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_iigoofspiel4_Test.test_number_of_nodes
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_kuhn_poker3p_Test.test_constant_sum
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_kuhn_poker3p_Test.test_constant_sum
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_kuhn_poker3p_Test.test_current_player_infosets_no_overlap_between_players
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_kuhn_poker3p_Test.test_current_player_infosets_no_overlap_between_players
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_kuhn_poker3p_Test.test_current_player_returns_terminal_player_on_terminal_nodes
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_kuhn_poker3p_Test.test_current_player_returns_terminal_player_on_terminal_nodes
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_kuhn_poker3p_Test.test_game_is_perfect_recall
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_kuhn_poker3p_Test.test_game_is_perfect_recall
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_kuhn_poker3p_Test.test_information_state_functions_raises_on_chance_nodes
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_kuhn_poker3p_Test.test_information_state_functions_raises_on_chance_nodes
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_kuhn_poker3p_Test.test_information_state_no_argument_raises_on_terminal_nodes
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_kuhn_poker3p_Test.test_information_state_no_argument_raises_on_terminal_nodes
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_kuhn_poker3p_Test.test_legal_actions_empty
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_kuhn_poker3p_Test.test_legal_actions_empty
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_kuhn_poker3p_Test.test_number_of_nodes
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_kuhn_poker3p_Test.test_number_of_nodes
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_first_sealed_auction_Test.test_constant_sum
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_first_sealed_auction_Test.test_constant_sum
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_first_sealed_auction_Test.test_current_player_infosets_no_overlap_between_players
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_first_sealed_auction_Test.test_current_player_infosets_no_overlap_between_players
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_first_sealed_auction_Test.test_current_player_returns_terminal_player_on_terminal_nodes
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_first_sealed_auction_Test.test_current_player_returns_terminal_player_on_terminal_nodes
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_first_sealed_auction_Test.test_game_is_perfect_recall
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_first_sealed_auction_Test.test_game_is_perfect_recall
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_first_sealed_auction_Test.test_information_state_functions_raises_on_chance_nodes
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_first_sealed_auction_Test.test_information_state_functions_raises_on_chance_nodes
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_first_sealed_auction_Test.test_information_state_no_argument_raises_on_terminal_nodes
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_first_sealed_auction_Test.test_information_state_no_argument_raises_on_terminal_nodes
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_first_sealed_auction_Test.test_legal_actions_empty
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_first_sealed_auction_Test.test_legal_actions_empty
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_first_sealed_auction_Test.test_number_of_nodes
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_first_sealed_auction_Test.test_number_of_nodes
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_tiny_hanabi_Test.test_constant_sum
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_tiny_hanabi_Test.test_constant_sum
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_tiny_hanabi_Test.test_current_player_infosets_no_overlap_between_players
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_tiny_hanabi_Test.test_current_player_infosets_no_overlap_between_players
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_tiny_hanabi_Test.test_current_player_returns_terminal_player_on_terminal_nodes
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_tiny_hanabi_Test.test_current_player_returns_terminal_player_on_terminal_nodes
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_tiny_hanabi_Test.test_game_is_perfect_recall
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_tiny_hanabi_Test.test_game_is_perfect_recall
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_tiny_hanabi_Test.test_information_state_functions_raises_on_chance_nodes
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_tiny_hanabi_Test.test_information_state_functions_raises_on_chance_nodes
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_tiny_hanabi_Test.test_information_state_no_argument_raises_on_terminal_nodes
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_tiny_hanabi_Test.test_information_state_no_argument_raises_on_terminal_nodes
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_tiny_hanabi_Test.test_legal_actions_empty
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_tiny_hanabi_Test.test_legal_actions_empty
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_tiny_hanabi_Test.test_number_of_nodes
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_tiny_hanabi_Test.test_number_of_nodes
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_nf_auction_Test.test_constant_sum
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_nf_auction_Test.test_constant_sum
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_nf_auction_Test.test_current_player_infosets_no_overlap_between_players
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_nf_auction_Test.test_current_player_infosets_no_overlap_between_players
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_nf_auction_Test.test_current_player_returns_terminal_player_on_terminal_nodes
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_nf_auction_Test.test_current_player_returns_terminal_player_on_terminal_nodes
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_nf_auction_Test.test_game_is_perfect_recall
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_nf_auction_Test.test_game_is_perfect_recall
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_nf_auction_Test.test_information_state_functions_raises_on_chance_nodes
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_nf_auction_Test.test_information_state_functions_raises_on_chance_nodes
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_nf_auction_Test.test_information_state_no_argument_raises_on_terminal_nodes
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_nf_auction_Test.test_information_state_no_argument_raises_on_terminal_nodes
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_nf_auction_Test.test_legal_actions_empty
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_nf_auction_Test.test_legal_actions_empty
+[ RUN      ] absl.testing.parameterized.EnforceAPIFullTree_nf_auction_Test.test_number_of_nodes
+[       OK ] absl.testing.parameterized.EnforceAPIFullTree_nf_auction_Test.test_number_of_nodes
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_othello_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_othello_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_othello_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_othello_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_othello_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_othello_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_othello_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_othello_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_othello_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_othello_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_othello_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_othello_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_chess_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_chess_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_chess_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_chess_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_chess_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_chess_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_chess_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_chess_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_chess_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_chess_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_chess_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_chess_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_kuhn_poker_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_kuhn_poker_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_kuhn_poker_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_kuhn_poker_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_kuhn_poker_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_kuhn_poker_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_kuhn_poker_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_kuhn_poker_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_kuhn_poker_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_kuhn_poker_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_kuhn_poker_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_kuhn_poker_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_y_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_y_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_y_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_y_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_y_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_y_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_y_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_y_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_y_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_y_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_y_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_y_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_backgammon_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_backgammon_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_backgammon_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_backgammon_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_backgammon_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_backgammon_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_backgammon_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_backgammon_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_backgammon_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_backgammon_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_backgammon_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_backgammon_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_clobber_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_clobber_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_clobber_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_clobber_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_clobber_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_clobber_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_clobber_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_clobber_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_clobber_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_clobber_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_clobber_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_clobber_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_oh_hell_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_oh_hell_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_oh_hell_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_oh_hell_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_oh_hell_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_oh_hell_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_oh_hell_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_oh_hell_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_oh_hell_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_oh_hell_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_oh_hell_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_oh_hell_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_hex_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_hex_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_hex_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_hex_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_hex_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_hex_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_hex_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_hex_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_hex_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_hex_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_hex_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_hex_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_trade_comm_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_trade_comm_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_trade_comm_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_trade_comm_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_trade_comm_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_trade_comm_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_trade_comm_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_trade_comm_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_trade_comm_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_trade_comm_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_trade_comm_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_trade_comm_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_battleship_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_battleship_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_battleship_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_battleship_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_battleship_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_battleship_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_battleship_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_battleship_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_battleship_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_battleship_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_battleship_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_battleship_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_matching_pennies_3p_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_matching_pennies_3p_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_matching_pennies_3p_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_matching_pennies_3p_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_matching_pennies_3p_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_matching_pennies_3p_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_matching_pennies_3p_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_matching_pennies_3p_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_matching_pennies_3p_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_matching_pennies_3p_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_matching_pennies_3p_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_matching_pennies_3p_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_hearts_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_hearts_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_hearts_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_hearts_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_hearts_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_hearts_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_hearts_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_hearts_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_hearts_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_hearts_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_hearts_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_hearts_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_cursor_go_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_cursor_go_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_cursor_go_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_cursor_go_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_cursor_go_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_cursor_go_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_cursor_go_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_cursor_go_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_cursor_go_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_cursor_go_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_cursor_go_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_cursor_go_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_oshi_zumo_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_oshi_zumo_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_oshi_zumo_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_oshi_zumo_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_oshi_zumo_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_oshi_zumo_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_oshi_zumo_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_oshi_zumo_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_oshi_zumo_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_oshi_zumo_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_oshi_zumo_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_oshi_zumo_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_pd_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_pd_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_pd_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_pd_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_pd_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_pd_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_pd_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_pd_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_pd_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_pd_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_pd_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_pd_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_lewis_signaling_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_lewis_signaling_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_lewis_signaling_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_lewis_signaling_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_lewis_signaling_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_lewis_signaling_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_lewis_signaling_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_lewis_signaling_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_lewis_signaling_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_lewis_signaling_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_lewis_signaling_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_lewis_signaling_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_rps_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_rps_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_rps_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_rps_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_rps_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_rps_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_rps_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_rps_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_rps_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_rps_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_rps_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_rps_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_shapleys_game_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_shapleys_game_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_shapleys_game_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_shapleys_game_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_shapleys_game_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_shapleys_game_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_shapleys_game_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_shapleys_game_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_shapleys_game_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_shapleys_game_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_shapleys_game_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_shapleys_game_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_connect_four_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_connect_four_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_connect_four_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_connect_four_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_connect_four_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_connect_four_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_connect_four_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_connect_four_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_connect_four_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_connect_four_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_connect_four_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_connect_four_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_stones_and_gems_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_stones_and_gems_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_stones_and_gems_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_stones_and_gems_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_stones_and_gems_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_stones_and_gems_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_stones_and_gems_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_stones_and_gems_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_stones_and_gems_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_stones_and_gems_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_stones_and_gems_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_stones_and_gems_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_mp_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_mp_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_mp_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_mp_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_mp_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_mp_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_mp_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_mp_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_mp_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_mp_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_mp_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_mp_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_markov_soccer_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_markov_soccer_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_markov_soccer_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_markov_soccer_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_markov_soccer_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_markov_soccer_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_markov_soccer_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_markov_soccer_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_markov_soccer_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_markov_soccer_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_markov_soccer_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_markov_soccer_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_cliff_walking_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_cliff_walking_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_cliff_walking_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_cliff_walking_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_cliff_walking_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_cliff_walking_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_cliff_walking_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_cliff_walking_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_cliff_walking_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_cliff_walking_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_cliff_walking_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_cliff_walking_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_oware_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_oware_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_oware_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_oware_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_oware_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_oware_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_oware_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_oware_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_oware_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_oware_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_oware_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_oware_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_goofspiel_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_goofspiel_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_goofspiel_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_goofspiel_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_goofspiel_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_goofspiel_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_goofspiel_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_goofspiel_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_goofspiel_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_goofspiel_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_goofspiel_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_goofspiel_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_pentago_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_pentago_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_pentago_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_pentago_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_pentago_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_pentago_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_pentago_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_pentago_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_pentago_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_pentago_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_pentago_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_pentago_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_skat_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_skat_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_skat_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_skat_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_skat_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_skat_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_skat_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_skat_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_skat_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_skat_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_skat_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_skat_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_bridge_uncontested_bidding_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_bridge_uncontested_bidding_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_bridge_uncontested_bidding_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_bridge_uncontested_bidding_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_bridge_uncontested_bidding_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_bridge_uncontested_bidding_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_bridge_uncontested_bidding_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_bridge_uncontested_bidding_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_bridge_uncontested_bidding_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_bridge_uncontested_bidding_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_bridge_uncontested_bidding_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_bridge_uncontested_bidding_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_tarok_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_tarok_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_tarok_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_tarok_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_tarok_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_tarok_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_tarok_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_tarok_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_tarok_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_tarok_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_tarok_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_tarok_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_tiny_bridge_2p_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_tiny_bridge_2p_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_tiny_bridge_2p_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_tiny_bridge_2p_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_tiny_bridge_2p_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_tiny_bridge_2p_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_tiny_bridge_2p_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_tiny_bridge_2p_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_tiny_bridge_2p_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_tiny_bridge_2p_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_tiny_bridge_2p_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_tiny_bridge_2p_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_coin_game_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_coin_game_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_coin_game_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_coin_game_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_coin_game_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_coin_game_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_coin_game_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_coin_game_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_coin_game_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_coin_game_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_coin_game_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_coin_game_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_blotto_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_blotto_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_blotto_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_blotto_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_blotto_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_blotto_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_blotto_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_blotto_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_blotto_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_blotto_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_blotto_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_blotto_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_sh_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_sh_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_sh_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_sh_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_sh_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_sh_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_sh_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_sh_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_sh_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_sh_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_sh_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_sh_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_sheriff_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_sheriff_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_sheriff_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_sheriff_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_sheriff_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_sheriff_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_sheriff_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_sheriff_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_sheriff_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_sheriff_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_sheriff_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_sheriff_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_blackjack_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_blackjack_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_blackjack_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_blackjack_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_blackjack_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_blackjack_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_blackjack_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_blackjack_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_blackjack_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_blackjack_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_blackjack_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_blackjack_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_bridge_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_bridge_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_bridge_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_bridge_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_bridge_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_bridge_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_bridge_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_bridge_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_bridge_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_bridge_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_bridge_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_bridge_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_coop_to_1p_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_coop_to_1p_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_coop_to_1p_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_coop_to_1p_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_coop_to_1p_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_coop_to_1p_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_coop_to_1p_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_coop_to_1p_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_coop_to_1p_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_coop_to_1p_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_coop_to_1p_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_coop_to_1p_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_breakthrough_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_breakthrough_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_breakthrough_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_breakthrough_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_breakthrough_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_breakthrough_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_breakthrough_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_breakthrough_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_breakthrough_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_breakthrough_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_breakthrough_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_breakthrough_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_dark_hex_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_dark_hex_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_dark_hex_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_dark_hex_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_dark_hex_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_dark_hex_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_dark_hex_Test.test_observations_raises_error_on_invalid_player
+[  FAILED  ] absl.testing.parameterized.EnforceAPIPartialTree_dark_hex_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_dark_hex_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_dark_hex_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_dark_hex_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_dark_hex_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_coordinated_mp_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_coordinated_mp_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_coordinated_mp_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_coordinated_mp_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_coordinated_mp_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_coordinated_mp_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_coordinated_mp_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_coordinated_mp_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_coordinated_mp_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_coordinated_mp_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_coordinated_mp_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_coordinated_mp_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_liars_dice_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_liars_dice_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_liars_dice_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_liars_dice_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_liars_dice_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_liars_dice_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_liars_dice_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_liars_dice_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_liars_dice_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_liars_dice_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_liars_dice_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_liars_dice_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_quoridor_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_quoridor_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_quoridor_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_quoridor_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_quoridor_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_quoridor_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_quoridor_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_quoridor_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_quoridor_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_quoridor_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_quoridor_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_quoridor_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_negotiation_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_negotiation_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_negotiation_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_negotiation_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_negotiation_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_negotiation_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_negotiation_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_negotiation_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_negotiation_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_negotiation_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_negotiation_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_negotiation_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_phantom_ttt_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_phantom_ttt_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_phantom_ttt_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_phantom_ttt_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_phantom_ttt_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_phantom_ttt_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_phantom_ttt_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_phantom_ttt_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_phantom_ttt_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_phantom_ttt_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_phantom_ttt_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_phantom_ttt_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_leduc_poker_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_leduc_poker_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_leduc_poker_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_leduc_poker_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_leduc_poker_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_leduc_poker_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_leduc_poker_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_leduc_poker_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_leduc_poker_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_leduc_poker_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_leduc_poker_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_leduc_poker_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_solitaire_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_solitaire_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_solitaire_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_solitaire_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_solitaire_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_solitaire_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_solitaire_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_solitaire_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_solitaire_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_solitaire_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_solitaire_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_solitaire_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_tic_tac_toe_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_tic_tac_toe_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_tic_tac_toe_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_tic_tac_toe_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_tic_tac_toe_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_tic_tac_toe_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_tic_tac_toe_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_tic_tac_toe_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_tic_tac_toe_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_tic_tac_toe_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_tic_tac_toe_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_tic_tac_toe_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_gin_rummy_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_gin_rummy_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_gin_rummy_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_gin_rummy_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_gin_rummy_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_gin_rummy_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_gin_rummy_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_gin_rummy_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_gin_rummy_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_gin_rummy_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_gin_rummy_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_gin_rummy_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_coordination_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_coordination_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_coordination_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_coordination_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_coordination_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_coordination_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_coordination_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_coordination_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_coordination_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_coordination_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_coordination_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_coordination_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_catch_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_catch_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_catch_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_catch_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_catch_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_catch_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_catch_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_catch_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_catch_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_catch_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_catch_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_catch_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_laser_tag_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_laser_tag_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_laser_tag_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_laser_tag_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_laser_tag_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_laser_tag_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_laser_tag_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_laser_tag_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_laser_tag_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_laser_tag_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_laser_tag_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_laser_tag_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_havannah_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_havannah_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_havannah_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_havannah_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_havannah_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_havannah_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_havannah_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_havannah_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_havannah_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_havannah_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_havannah_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_havannah_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_first_sealed_auction_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_first_sealed_auction_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_first_sealed_auction_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_first_sealed_auction_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_first_sealed_auction_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_first_sealed_auction_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_first_sealed_auction_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_first_sealed_auction_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_first_sealed_auction_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_first_sealed_auction_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_first_sealed_auction_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_first_sealed_auction_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_rpsw_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_rpsw_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_rpsw_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_rpsw_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_rpsw_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_rpsw_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_rpsw_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_rpsw_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_rpsw_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_rpsw_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_rpsw_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_rpsw_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_tiny_hanabi_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_tiny_hanabi_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_tiny_hanabi_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_tiny_hanabi_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_tiny_hanabi_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_tiny_hanabi_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_tiny_hanabi_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_tiny_hanabi_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_tiny_hanabi_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_tiny_hanabi_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_tiny_hanabi_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_tiny_hanabi_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_coop_box_pushing_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_coop_box_pushing_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_coop_box_pushing_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_coop_box_pushing_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_coop_box_pushing_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_coop_box_pushing_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_coop_box_pushing_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_coop_box_pushing_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_coop_box_pushing_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_coop_box_pushing_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_coop_box_pushing_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_coop_box_pushing_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_deep_sea_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_deep_sea_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_deep_sea_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_deep_sea_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_deep_sea_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_deep_sea_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_deep_sea_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_deep_sea_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_deep_sea_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_deep_sea_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_deep_sea_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_deep_sea_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_tiny_bridge_4p_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_tiny_bridge_4p_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_tiny_bridge_4p_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_tiny_bridge_4p_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_tiny_bridge_4p_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_tiny_bridge_4p_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_tiny_bridge_4p_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_tiny_bridge_4p_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_tiny_bridge_4p_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_tiny_bridge_4p_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_tiny_bridge_4p_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_tiny_bridge_4p_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_go_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_go_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_go_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_go_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_go_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_go_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_go_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_go_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_go_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_go_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_go_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_go_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_cd_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_cd_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_cd_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_cd_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_cd_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_cd_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_cd_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_cd_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_cd_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_cd_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_cd_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_matrix_cd_Test.test_sequence_lengths
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_pig_Test.test_legal_actions_returns_empty_list_on_opponent
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_pig_Test.test_legal_actions_returns_empty_list_on_opponent
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_pig_Test.test_no_invalid_public_observations
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_pig_Test.test_no_invalid_public_observations
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_pig_Test.test_observation_consistency
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_pig_Test.test_observation_consistency
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_pig_Test.test_observations_raises_error_on_invalid_player
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_pig_Test.test_observations_raises_error_on_invalid_player
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_pig_Test.test_private_information_contents
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_pig_Test.test_private_information_contents
+[ RUN      ] absl.testing.parameterized.EnforceAPIPartialTree_pig_Test.test_sequence_lengths
+[       OK ] absl.testing.parameterized.EnforceAPIPartialTree_pig_Test.test_sequence_lengths
+======================================================================
+ERROR: test_observations_raises_error_on_invalid_player (absl.testing.parameterized.EnforceAPIPartialTree_dark_hex_Test)
+absl.testing.parameterized.EnforceAPIPartialTree_dark_hex_Test.test_observations_raises_error_on_invalid_player
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/mustafatapkan/Desktop/GitHub/open_spiel/open_spiel/python/../integration_tests/api_test.py", line 325, in test_observations_raises_error_on_invalid_player
+    v = state.information_state_tensor(p)
+ValueError: vector
+
+----------------------------------------------------------------------
+Ran 430 tests in 320.229s
+
+FAILED (errors=1)
+
+185/186 Test   #2: cfr_test ..........................................   Passed  326.19 sec
+186/186 Test  #80: laser_tag_test ....................................   Passed  332.77 sec
+
+98% tests passed, 4 tests failed out of 186
+
+Total Test time (real) = 332.92 sec
+
+The following tests FAILED:
+	 47 - dark_hex_test (Failed)
+	 92 - python_api_test (Failed)
+	 93 - python_playthrough_test (Child aborted)
+	162 - python_spawn_test (Failed)
+Errors while running CTest
+[31mAt least one test failed.\e[0m
+If this is the first time you have run these tests, try:
+pip3 install -r requirements.txt
+Note that outside a virtualenv, you will need to install the system 
+wide matplotlib: sudo apt-get install python-matplotlib
+Exiting virtualenv
