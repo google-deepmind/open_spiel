@@ -69,9 +69,11 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 
 DarkHexState::DarkHexState(std::shared_ptr<const Game> game, int board_size,
                                   ObservationType obs_type)
-    : State(game), state_(game, board_size), obs_type_(obs_type) {
-  std::fill(begin(black_view_), end(black_view_), CellState::kEmpty);
-  std::fill(begin(white_view_), end(white_view_), CellState::kEmpty);
+    : State(game), state_(game, board_size), board_size_(board_size), obs_type_(obs_type) {
+  black_view_.resize(board_size * board_size, CellState::kEmpty);
+  white_view_.resize(board_size * board_size, CellState::kEmpty);
+  kNumCells = board_size_ * board_size_;
+  kBitsPerAction = kNumCells + 1;
 }
 
 void DarkHexState::DoApplyAction(Action move) {
@@ -227,6 +229,8 @@ DarkHexGame::DarkHexGame(const GameParameters& params)
       : Game(kGameType, params),
         game_(std::static_pointer_cast<const hex::HexGame>(LoadGame("hex"))),
         board_size_(ParameterValue<int>("board_size")) {
+  // kNumCells = board_size_ * board_size_;
+  kBitsPerAction = kNumCells + 1;
   std::string obs_type = ParameterValue<std::string>("obstype");
   if (obs_type == "reveal-nothing") {
     obs_type_ = ObservationType::kRevealNothing;

@@ -48,9 +48,6 @@ namespace dark_hex {
 
 inline constexpr const char* kDefaultObsType = "reveal-nothing"; 
 
-// int kLongestSequence = 2 * kNumCells - 1;
-inline constexpr int kBitsPerAction = 13*13 + 1; // Fix this ??
-
 // Add here if anything else is needed to be revealed
 enum class ObservationType {
   kRevealNothing,
@@ -92,14 +89,15 @@ class DarkHexState: public State {
 
     hex::HexState state_;
     ObservationType obs_type_;  
-
     const int board_size_;
-    const int kNumCells = board_size_ * board_size_;
+    
+    int kNumCells;
+    int kBitsPerAction;
 
     // Change this to _history on base class
     std::vector<std::pair<int, Action>> action_sequence_;
-    std::array<hex::CellState, kNumCells> black_view_;
-    std::array<hex::CellState, kNumCells> white_view_;
+    std::vector<hex::CellState> black_view_; // change the sizes later ??
+    std::vector<hex::CellState> white_view_;
 };
 
 class DarkHexGame: public Game {
@@ -126,8 +124,10 @@ class DarkHexGame: public Game {
   private:
     std::shared_ptr<const hex::HexGame> game_;
     ObservationType obs_type_;
-    const int kNumCells = board_size_ * board_size_;
     const int board_size_;
+    
+    int kNumCells;
+    int kBitsPerAction;
 };
 
 inline std::ostream& operator << (std::ostream& stream,
