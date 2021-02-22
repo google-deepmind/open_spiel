@@ -93,6 +93,7 @@ class DarkHexState: public State {
     
     int kNumCells;
     int kBitsPerAction;
+    int kLongestSequence;
 
     // Change this to _history on base class
     std::vector<std::pair<int, Action>> action_sequence_;
@@ -119,7 +120,7 @@ class DarkHexGame: public Game {
     // These will depend on the obstype
     std::vector<int> InformationStateTensorShape() const override;
     std::vector<int> ObservationTensorShape() const override;
-    int MaxGameLength() const override {return board_size_ * 2 - 1;}
+    int MaxGameLength() const override {return board_size_ * board_size_ * 2 - 1;}
     
   private:
     std::shared_ptr<const hex::HexGame> game_;
@@ -128,6 +129,7 @@ class DarkHexGame: public Game {
     
     int kNumCells;
     int kBitsPerAction;
+    int kLongestSequence;
 };
 
 inline std::ostream& operator << (std::ostream& stream,

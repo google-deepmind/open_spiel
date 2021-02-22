@@ -72,8 +72,10 @@ DarkHexState::DarkHexState(std::shared_ptr<const Game> game, int board_size,
     : State(game), state_(game, board_size), board_size_(board_size), obs_type_(obs_type) {
   black_view_.resize(board_size * board_size, CellState::kEmpty);
   white_view_.resize(board_size * board_size, CellState::kEmpty);
+
   kNumCells = board_size_ * board_size_;
   kBitsPerAction = kNumCells + 1;
+  kLongestSequence = kNumCells * 2 - 1;
 }
 
 void DarkHexState::DoApplyAction(Action move) {
@@ -157,7 +159,7 @@ void DarkHexState::InformationStateTensor(Player player,
 
   const auto& player_view = (player == Player{0} ? black_view_ : white_view_);
   SPIEL_CHECK_EQ(values.size(), kNumCells * kCellStates +
-                                (board_size_ * 2 - 1) * (1 + kBitsPerAction));
+                                kLongestSequence * (1 + kBitsPerAction));
   std::fill(values.begin(), values.end(), 0.);
   for (int cell = 0; cell < kNumCells; ++cell) {
     values[kNumCells * (static_cast<int>(player_view[cell]) - kMinValueCellState) + cell] = 1.0;
@@ -190,7 +192,7 @@ std::string DarkHexState::ObservationString(Player player) const {
 }  
 
 void DarkHexState::ObservationTensor(Player player,
-                                                    absl::Span<float> values) const {
+                                     absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   SPIEL_CHECK_EQ(values.size(), game_->ObservationTensorSize());
@@ -229,8 +231,10 @@ DarkHexGame::DarkHexGame(const GameParameters& params)
       : Game(kGameType, params),
         game_(std::static_pointer_cast<const hex::HexGame>(LoadGame("hex"))),
         board_size_(ParameterValue<int>("board_size")) {
-  // kNumCells = board_size_ * board_size_;
+  kNumCells = board_size_ * board_size_;
   kBitsPerAction = kNumCells + 1;
+  kLongestSequence = kNumCells * 2 - 1;
+
   std::string obs_type = ParameterValue<std::string>("obstype");
   if (obs_type == "reveal-nothing") {
     obs_type_ = ObservationType::kRevealNothing;
@@ -242,14 +246,14 @@ DarkHexGame::DarkHexGame(const GameParameters& params)
 }
 
 std::vector<int> DarkHexGame::InformationStateTensorShape() const {
-  return {1, kNumCells * kCellStates + (board_size_ * 2 - 1) * (1 + kBitsPerAction)};
+  return {1, kNumCells * kCellStates + kLongestSequence * (1 + kBitsPerAction)};
 }
 
 std::vector<int> DarkHexGame::ObservationTensorShape() const {
   if (obs_type_ == ObservationType::kRevealNothing) {
     return {kNumCells * kCellStates};
   } else if (obs_type_ == ObservationType::kRevealNumTurns) {
-    return {kNumCells * kCellStates + (board_size_ * 2 - 1)};
+    return {kNumCells * kCellStates + kLongestSequence};
   } else {
     SpielFatalError("Uknown observation type");
   }
