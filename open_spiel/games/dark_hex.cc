@@ -46,10 +46,10 @@ const GameType kGameType{
   GameType::RewardModel::kTerminal,
   /*max_num_players=*/2,
   /*min_num_players=*/2,
-  /*provides_information_state_string=*/false,
-  /*provides_information_state_tensor=*/false,
-  /*provides_observation_string=*/false,
-  /*provides_observation_tensor=*/false,
+  /*provides_information_state_string=*/true,
+  /*provides_information_state_tensor=*/true,
+  /*provides_observation_string=*/true,
+  /*provides_observation_tensor=*/true,
   /*parameter_specification=*/
   {
     {"obstype", GameParameter(static_cast<std::string>(kDefaultObsType))},
@@ -145,72 +145,72 @@ std::string DarkHexState::ActionSequenceToString(Player player) const {
   return str;
 }
 
-// std::string DarkHexState::InformationStateString(Player player) const {
-//   SPIEL_CHECK_GE(player, 0);
-//   SPIEL_CHECK_LT(player, num_players_);
-//   return ViewToString(player) + "\n"
-//       + std::to_string(history_.size()) + "\n"
-//       + ActionSequenceToString(player);
-// }
+std::string DarkHexState::InformationStateString(Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+  return ViewToString(player) + "\n"
+      + std::to_string(history_.size()) + "\n"
+      + ActionSequenceToString(player);
+}
 
-// void DarkHexState::InformationStateTensor(Player player,
-//                                           absl::Span<float> values) const {
-//   SPIEL_CHECK_GE(player, 0);
-//   SPIEL_CHECK_LT(player, num_players_);
+void DarkHexState::InformationStateTensor(Player player,
+                                          absl::Span<float> values) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
 
-//   const auto& player_view = (player == Player{0} ? black_view_ : white_view_);
+  const auto& player_view = (player == Player{0} ? black_view_ : white_view_);
 
-//   SPIEL_CHECK_EQ(values.size(), kNumCells * kCellStates +
-//                                 kLongestSequence * (1 + kBitsPerAction));
-//   std::fill(values.begin(), values.end(), 0.);
-//   for (int cell = 0; cell < kNumCells; ++cell) {
-//     values[kNumCells * (static_cast<int>(player_view[cell]) 
-//                         - kMinValueCellState) + cell] = 1.0;
-//   }
+  SPIEL_CHECK_EQ(values.size(), kNumCells * kCellStates +
+                                kLongestSequence * (1 + kBitsPerAction));
+  std::fill(values.begin(), values.end(), 0.);
+  for (int cell = 0; cell < kNumCells; ++cell) {
+    values[kNumCells * (static_cast<int>(player_view[cell]) 
+                        - kMinValueCellState) + cell] = 1.0;
+  }
 
-//   // Encoding the sequence
-//   int offset = kNumCells * kCellStates;
-//   for (const auto& player_with_action: action_sequence_) {
-//     if (player_with_action.first == player) {
-//       values[offset] = player_with_action.first;
-//       values[offset + 1 + player_with_action.second] = 1.0;
-//     } else if (obs_type_ == ObservationType::kRevealNumTurns) {
-//       values[offset] = player_with_action.first;
-//       values[offset + 1 + kNumCells + 1] = 1.0;
-//     } else {
-//       SPIEL_CHECK_EQ(obs_type_, ObservationType::kRevealNothing);
-//     }
-//     offset += (1 + kBitsPerAction);
-//   }
-// }
+  // Encoding the sequence
+  int offset = kNumCells * kCellStates;
+  for (const auto& player_with_action: action_sequence_) {
+    if (player_with_action.first == player) {
+      values[offset] = player_with_action.first;
+      values[offset + 1 + player_with_action.second] = 1.0;
+    } else if (obs_type_ == ObservationType::kRevealNumTurns) {
+      values[offset] = player_with_action.first;
+      values[offset + 1 + kNumCells + 1] = 1.0;
+    } else {
+      SPIEL_CHECK_EQ(obs_type_, ObservationType::kRevealNothing);
+    }
+    offset += (1 + kBitsPerAction);
+  }
+}
 
-// std::string DarkHexState::ObservationString(Player player) const {
-//   SPIEL_CHECK_GE(player, 0);
-//   SPIEL_CHECK_LT(player, num_players_);
-//   std::string observation = ViewToString(player);
-//   if (obs_type_ == ObservationType::kRevealNumTurns){
-//     absl::StrAppend(&observation, "\nTotal turns: ", action_sequence_.size());
-//   }
-//   return observation;
-// }  
+std::string DarkHexState::ObservationString(Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+  std::string observation = ViewToString(player);
+  if (obs_type_ == ObservationType::kRevealNumTurns){
+    absl::StrAppend(&observation, "\nTotal turns: ", action_sequence_.size());
+  }
+  return observation;
+}  
 
-// void DarkHexState::ObservationTensor(Player player,
-//                                      absl::Span<float> values) const {
-//   SPIEL_CHECK_GE(player, 0);
-//   SPIEL_CHECK_LT(player, num_players_);
-//   SPIEL_CHECK_EQ(values.size(), game_->ObservationTensorSize());
-//   std::fill(values.begin(), values.end(), 0.);
+void DarkHexState::ObservationTensor(Player player,
+                                     absl::Span<float> values) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+  SPIEL_CHECK_EQ(values.size(), game_->ObservationTensorSize());
+  std::fill(values.begin(), values.end(), 0.);
   
-//   const auto& player_view = (player == Player{0} ? black_view_ : white_view_);
-//   for (int cell = 0; cell < kNumCells; ++cell) {
-//     values[kNumCells * (static_cast<int>(player_view[cell])
-//                         - kMinValueCellState) + cell] = 1.0;
-//   }
+  const auto& player_view = (player == Player{0} ? black_view_ : white_view_);
+  for (int cell = 0; cell < kNumCells; ++cell) {
+    values[kNumCells * (static_cast<int>(player_view[cell])
+                        - kMinValueCellState) + cell] = 1.0;
+  }
 
-//   if (obs_type_ == ObservationType::kRevealNumTurns) {
-//     values[kNumCells * kCellStates + action_sequence_.size()] = 1.0;
-//   }
-// }  
+  if (obs_type_ == ObservationType::kRevealNumTurns) {
+    values[kNumCells * kCellStates + action_sequence_.size()] = 1.0;
+  }
+}  
 
 std::unique_ptr<State> DarkHexState::Clone() const {
   return std::unique_ptr<State>(new DarkHexState(*this));
@@ -249,23 +249,19 @@ DarkHexGame::DarkHexGame(const GameParameters& params)
   }
 }
 
-// std::vector<int> DarkHexGame::InformationStateTensorShape() const {
-//   std::cout << kNumCells << ' * ' << kCellStates << ' + ' << kLongestSequence 
-//   << ' * (1 + ' << kBitsPerAction << ') = ' << kNumCells * kCellStates 
-//   + kLongestSequence * (1 + kBitsPerAction) << std::endl;
-  
-//   return {1, kNumCells * kCellStates + kLongestSequence * (1 + kBitsPerAction)};
-// }
+std::vector<int> DarkHexGame::InformationStateTensorShape() const {
+  return {1, kNumCells * kCellStates + kLongestSequence * (1 + kBitsPerAction)};
+}
 
-// std::vector<int> DarkHexGame::ObservationTensorShape() const {
-//   if (obs_type_ == ObservationType::kRevealNothing) {
-//     return {kNumCells * kCellStates};
-//   } else if (obs_type_ == ObservationType::kRevealNumTurns) {
-//     return {kNumCells * kCellStates + kLongestSequence};
-//   } else {
-//     SpielFatalError("Uknown observation type");
-//   }
-// }
+std::vector<int> DarkHexGame::ObservationTensorShape() const {
+  if (obs_type_ == ObservationType::kRevealNothing) {
+    return {kNumCells * kCellStates};
+  } else if (obs_type_ == ObservationType::kRevealNumTurns) {
+    return {kNumCells * kCellStates + kLongestSequence};
+  } else {
+    SpielFatalError("Uknown observation type");
+  }
+}
 
 } // namespace dark_hex
 } // namespace open_spiel

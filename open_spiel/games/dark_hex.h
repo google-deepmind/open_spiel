@@ -70,14 +70,14 @@ class DarkHexState: public State {
     std::string ToString() const override {return state_.ToString();}
     bool IsTerminal() const override {return state_.IsTerminal();}
     std::vector<double> Returns() const override {return state_.Returns();}
-    // std::string ObservationString(Player player) const override;
-    // void ObservationTensor(Player player,
-    //                         absl::Span<float> values) const override;
+    std::string ObservationString(Player player) const override;
+    void ObservationTensor(Player player,
+                            absl::Span<float> values) const override;
     
-    // // Dark games funcs.
-    // std::string InformationStateString(Player player) const override;
-    // void InformationStateTensor (Player player,
-    //                         absl::Span<float> values) const override;
+    // Dark games funcs.
+    std::string InformationStateString(Player player) const override;
+    void InformationStateTensor (Player player,
+                            absl::Span<float> values) const override;
 
     std::unique_ptr<State> Clone() const override;
     void UndoAction(Player player, Action move) override;
@@ -120,9 +120,8 @@ class DarkHexGame: public Game {
     double UtilitySum() const override {return game_->UtilitySum();}
     double MaxUtility() const override {return game_->MaxUtility();}
 
-    // These will depend on the obstype
-    // std::vector<int> InformationStateTensorShape() const override;
-    // std::vector<int> ObservationTensorShape() const override;
+    std::vector<int> InformationStateTensorShape() const override;
+    std::vector<int> ObservationTensorShape() const override;
     int MaxGameLength() const override {return board_size_ * board_size_ * 2 - 1;}
     
   private:
