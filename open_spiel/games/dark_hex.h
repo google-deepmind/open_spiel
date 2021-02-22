@@ -48,6 +48,9 @@ namespace dark_hex {
 
 inline constexpr const char* kDefaultObsType = "reveal-nothing"; 
 
+// black - white - empty
+inline constexpr int kPosStates = hex::kNumPlayers + 1; 
+
 // Add here if anything else is needed to be revealed
 enum class ObservationType {
   kRevealNothing,
@@ -97,7 +100,7 @@ class DarkHexState: public State {
 
     // Change this to _history on base class
     std::vector<std::pair<int, Action>> action_sequence_;
-    std::vector<hex::CellState> black_view_; // change the sizes later ??
+    std::vector<hex::CellState> black_view_;
     std::vector<hex::CellState> white_view_;
 };
 
