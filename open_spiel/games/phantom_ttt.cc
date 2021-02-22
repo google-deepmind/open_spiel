@@ -269,7 +269,7 @@ std::vector<int> PhantomTTTGame::InformationStateTensorShape() const {
 std::vector<int> PhantomTTTGame::ObservationTensorShape() const {
   if (obs_type_ == ObservationType::kRevealNothing) {
     return {kNumCells * kCellStates};
-  } else if (obs_type_ == ObservationType::kRevealNumTurns) { 
+  } else if (obs_type_ == ObservationType::kRevealNumTurns) {
     return {kNumCells * kCellStates + kLongestSequence};
   } else {
     SpielFatalError("Uknown observation type");
