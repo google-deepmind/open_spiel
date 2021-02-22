@@ -727,13 +727,14 @@ int UniversalPokerGame::MaxGameLength() const {
     maxStack =
         acpc_game_.StackSize(p) > maxStack ? acpc_game_.StackSize(p) : maxStack;
     maxBlind =
-        acpc_game_.BlindSize(p) > maxStack ? acpc_game_.BlindSize(p) : maxBlind;
+        acpc_game_.BlindSize(p) > maxBlind ? acpc_game_.BlindSize(p) : maxBlind;
   }
 
   while (maxStack > maxBlind) {
     maxStack /= 2.0;         // You have always to bet the pot size
     length += NumPlayers();  // Each player has to react
   }
+  length += 7;
   return length;
 }
 
