@@ -86,7 +86,7 @@ void DarkHexState::DoApplyAction(Action move) {
   // Either occupied or not
   if (state_.BoardAt(move) == CellState::kEmpty) {
     state_.ApplyAction(move);
-  } else {}
+  }
 
   SPIEL_CHECK_EQ(cur_view[move], CellState::kEmpty);
   cur_view[move] = state_.BoardAt(move);
@@ -97,7 +97,7 @@ std::vector<Action> DarkHexState::LegalActions() const {
   if (IsTerminal()) return {};
   std::vector<Action> moves;
   const Player player = CurrentPlayer();
-  const auto& cur_view = (player == Player{0} ? black_view_ : white_view_);
+  const auto& cur_view = (player == 0 ? black_view_ : white_view_);
 
   for (Action move = 0; move < kNumCells; ++move){
     if (cur_view[move] == CellState::kEmpty){
@@ -109,11 +109,12 @@ std::vector<Action> DarkHexState::LegalActions() const {
 }
 
 std::string DarkHexState::ViewToString(Player player) const {
-  const auto& cur_view = (player == Player{0} ? black_view_ : white_view_);
+  const auto& cur_view = (player == 0 ? black_view_ : white_view_);
   std::string str;
 
-  // TODO: ??
-  // Change here for row & cols after customizing for x, y
+  // TODO: Hex - Dark-Hex Research sometimes experiments on different sized columns
+  // and rows for the game board. Therefore we need to add c-r option instead of
+  // board_size only.
   int num_rows = board_size_, num_cols = board_size_;
   for (int r = 0; r < num_rows; ++r){
     for (int c = 0; c < num_cols; ++c){
@@ -131,13 +132,10 @@ std::string DarkHexState::ActionSequenceToString(Player player) const {
   std::string str;
   for (const auto& player_with_action: action_sequence_) {
     if (player_with_action.first == player) {
-      str.append(std::to_string(player_with_action.first));
-      str.push_back(',');
-      str.append(std::to_string(player_with_action.second));
-      str.push_back(' ');
+      absl::StrAppend(&str, player_with_action.first, ","); 
+      absl::StrAppend(&str, player_with_action.second, " ");
     } else if (obs_type_ == ObservationType::kRevealNumTurns) {
-      str.append(std::to_string(player_with_action.first));
-      str.append(",? ");
+      absl::StrAppend(&str, player_with_action.first, ",? ");
     } else {
       SPIEL_CHECK_EQ(obs_type_, ObservationType::kRevealNothing);
     }
@@ -148,9 +146,11 @@ std::string DarkHexState::ActionSequenceToString(Player player) const {
 std::string DarkHexState::InformationStateString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
-  return ViewToString(player) + "\n"
-      + std::to_string(history_.size()) + "\n"
-      + ActionSequenceToString(player);
+  std::string str;
+  absl::StrAppend(&str, ViewToString(player), "\n");
+  absl::StrAppend(&str, history_.size(), "\n");
+  absl::StrAppend(&str, ActionSequenceToString(player));
+  return str; 
 }
 
 void DarkHexState::InformationStateTensor(Player player,
@@ -158,7 +158,7 @@ void DarkHexState::InformationStateTensor(Player player,
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  const auto& player_view = (player == Player{0} ? black_view_ : white_view_);
+  const auto& player_view = (player == 0 ? black_view_ : white_view_);
 
   SPIEL_CHECK_EQ(values.size(), kNumCells * kCellStates +
                                 kLongestSequence * (1 + kBitsPerAction));
@@ -201,7 +201,7 @@ void DarkHexState::ObservationTensor(Player player,
   SPIEL_CHECK_EQ(values.size(), game_->ObservationTensorSize());
   std::fill(values.begin(), values.end(), 0.);
   
-  const auto& player_view = (player == Player{0} ? black_view_ : white_view_);
+  const auto& player_view = (player == 0 ? black_view_ : white_view_);
   for (int cell = 0; cell < kNumCells; ++cell) {
     values[kNumCells * (static_cast<int>(player_view[cell])
                         - kMinValueCellState) + cell] = 1.0;
@@ -224,7 +224,7 @@ void DarkHexState::UndoAction(Player player, Action move) {
     state_.UndoAction(player, move);
   } else { }
 
-  auto& player_view = (player == Player{0} ? black_view_ : white_view_);
+  auto& player_view = (player == 0 ? black_view_ : white_view_);
   player_view[move] = CellState::kEmpty;
   action_sequence_.pop_back();
 

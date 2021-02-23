@@ -41,7 +41,12 @@
 // See also http://mlanctot.info/files/papers/PhD_Thesis_MarcLanctot.pdf, Ch 3.
 //
 // Parameters:
-///    "obstype", string, "reveal-nothing" (default) or "reveal-numturns"
+//    "obstype"       string      If the player is informed of the      
+//                                number of moves attempted
+//    (default "reveal-nothing")  ['reveal-nothing', 'reveal-numturns']
+//
+//    "board_size"    int         Size of the board
+//    (default 11)
 
 namespace open_spiel {
 namespace dark_hex {
