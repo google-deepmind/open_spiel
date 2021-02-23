@@ -119,7 +119,7 @@ void TabularQLearningSolver::RunIteration() {
         GetBestActionValue(*(next_state.get()), min_utility);
 
     // Update action value
-    string key = curr_state->ToString();
+    std::string key = curr_state->ToString();
     double prev_q_val = values_[{key, curr_action}];
     double new_q_val =
         prev_q_val +
