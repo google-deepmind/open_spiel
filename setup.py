@@ -152,6 +152,12 @@ if os.path.exists("requirements.txt"):
 else:
   req_file = "../requirements.txt"
 
+requirements = None
+# Requirements are commented our by default so that they aren't automatically installed by setup.py.
+# This fork of OpenSpiel is dependency of a larger codebase, and python package dependencies are tracked elsewhere.
+# requirements = _get_requirements(req_file)
+
+
 setuptools.setup(
     name="open_spiel",
     version="0.2.0rc4",
@@ -162,7 +168,7 @@ setuptools.setup(
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
     url="https://github.com/deepmind/open_spiel",
-    install_requires=_get_requirements(req_file),
+    install_requires=requirements,
     python_requires=">=3",
     ext_modules=[CMakeExtension("pyspiel", sourcedir="open_spiel")],
     cmdclass={"build_ext": BuildExt},
