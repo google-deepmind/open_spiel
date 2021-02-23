@@ -37,10 +37,7 @@ class ExternalSamplingMCCFRTest(absltest.TestCase):
         game, external_sampling_mccfr.AverageType.SIMPLE)
     for _ in range(10):
       es_solver.iteration()
-    conv = exploitability.nash_conv(
-        game,
-        policy.tabular_policy_from_callable(game,
-                                            es_solver.callable_avg_policy()))
+    conv = exploitability.nash_conv(game, es_solver.average_policy())
     print("Leduc2P, conv = {}".format(conv))
     self.assertLess(conv, 5)
 
@@ -51,10 +48,7 @@ class ExternalSamplingMCCFRTest(absltest.TestCase):
         game, external_sampling_mccfr.AverageType.FULL)
     for _ in range(10):
       es_solver.iteration()
-    conv = exploitability.nash_conv(
-        game,
-        policy.tabular_policy_from_callable(game,
-                                            es_solver.callable_avg_policy()))
+    conv = exploitability.nash_conv(game, es_solver.average_policy())
     print("Leduc2P, conv = {}".format(conv))
     self.assertLess(conv, 5)
 
@@ -65,10 +59,7 @@ class ExternalSamplingMCCFRTest(absltest.TestCase):
         game, external_sampling_mccfr.AverageType.SIMPLE)
     for _ in range(10):
       es_solver.iteration()
-    conv = exploitability.nash_conv(
-        game,
-        policy.tabular_policy_from_callable(game,
-                                            es_solver.callable_avg_policy()))
+    conv = exploitability.nash_conv(game, es_solver.average_policy())
     print("Kuhn2P, conv = {}".format(conv))
     self.assertLess(conv, 1)
 
@@ -79,10 +70,7 @@ class ExternalSamplingMCCFRTest(absltest.TestCase):
         game, external_sampling_mccfr.AverageType.FULL)
     for _ in range(10):
       es_solver.iteration()
-    conv = exploitability.nash_conv(
-        game,
-        policy.tabular_policy_from_callable(game,
-                                            es_solver.callable_avg_policy()))
+    conv = exploitability.nash_conv(game, es_solver.average_policy())
     print("Kuhn2P, conv = {}".format(conv))
     self.assertLess(conv, 1)
 
@@ -95,10 +83,7 @@ class ExternalSamplingMCCFRTest(absltest.TestCase):
         game, external_sampling_mccfr.AverageType.SIMPLE)
     for _ in range(1):
       es_solver.iteration()
-    conv = exploitability.nash_conv(
-        game,
-        policy.tabular_policy_from_callable(game,
-                                            es_solver.callable_avg_policy()))
+    conv = exploitability.nash_conv(game, es_solver.average_policy())
     print("Liar's dice, conv = {}".format(conv))
     self.assertLess(conv, 2)
 
@@ -110,10 +95,7 @@ class ExternalSamplingMCCFRTest(absltest.TestCase):
         game, external_sampling_mccfr.AverageType.SIMPLE)
     for _ in range(10):
       es_solver.iteration()
-    conv = exploitability.nash_conv(
-        game,
-        policy.tabular_policy_from_callable(game,
-                                            es_solver.callable_avg_policy()))
+    conv = exploitability.nash_conv(game, es_solver.average_policy())
     print("Kuhn3P, conv = {}".format(conv))
     self.assertLess(conv, 2)
 
@@ -125,10 +107,7 @@ class ExternalSamplingMCCFRTest(absltest.TestCase):
         game, external_sampling_mccfr.AverageType.FULL)
     for _ in range(10):
       es_solver.iteration()
-    conv = exploitability.nash_conv(
-        game,
-        policy.tabular_policy_from_callable(game,
-                                            es_solver.callable_avg_policy()))
+    conv = exploitability.nash_conv(game, es_solver.average_policy())
     print("Kuhn3P, conv = {}".format(conv))
     self.assertLess(conv, 2)
 

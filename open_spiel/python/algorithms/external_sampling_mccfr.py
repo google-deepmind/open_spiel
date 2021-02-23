@@ -21,6 +21,7 @@ from __future__ import print_function
 import enum
 import numpy as np
 import pyspiel
+from open_spiel.python import policy
 
 # Indices in the information sets for the regrets and average policy sums.
 _REGRET_INDEX = 0
@@ -30,6 +31,41 @@ _AVG_POLICY_INDEX = 1
 class AverageType(enum.Enum):
   SIMPLE = 0
   FULL = 1
+
+class AveragePolicy(policy.Policy):
+
+  def __init__(self, infostates):
+    # Do not create a copy of the dictionary
+    # and work on the same object
+    self._infostates = infostates
+
+  def action_probabilities(self, state, player_id=None):
+    """Returns the MCCFR average policy for a player in a state.
+    If the policy is not defined for the provided state, a uniform
+    random policy is returned.
+
+    Args:
+      state: A `pyspiel.State` object.
+      player_id: Optional, the player id for which we want an action. Optional
+        unless this is a simultaneous state at which multiple players can act.
+
+    Returns:
+      A `dict` of `{action: probability}` for the specified player in the
+      supplied state. If the policy is defined for the state, this
+      will contain the average MCCFR strategy defined for that state.
+      Otherwise, it will contain all legal actions, each with the same
+      probability, equal to 1 / num_legal_actions.
+    """
+    if player_id is None:
+      player_id = state.current_player()
+    legal_actions = state.legal_actions()
+    info_state_key = state.information_state_string(player_id)
+    retrieved_infostate = self._infostates.get(info_state_key, None)
+    if retrieved_infostate is None:
+      return {a: 1 / len(legal_actions) for a in legal_actions}
+    avstrat = (retrieved_infostate[_AVG_POLICY_INDEX] /
+               retrieved_infostate[_AVG_POLICY_INDEX].sum())
+    return {legal_actions[i]: avstrat[i] for i in range(len(legal_actions))}
 
 
 class ExternalSamplingSolver(object):
@@ -107,24 +143,12 @@ class ExternalSamplingSolver(object):
   def _add_avstrat(self, info_state_key, action_idx, amount):
     self._infostates[info_state_key][_AVG_POLICY_INDEX][action_idx] += amount
 
-  def callable_avg_policy(self):
-    """Returns the average joint policy as a callable.
-
-    The callable has a signature of the form string (information
-    state key) -> list of (action, prob).
+  def average_policy(self):
+    """Computes the average policy, containing the policy for all players.
+    The returned policy instance should only be used during
+    the lifetime of solver object
     """
-
-    def wrap(state):
-      info_state_key = state.information_state_string(state.current_player())
-      legal_actions = state.legal_actions()
-      infostate_info = self._lookup_infostate_info(info_state_key,
-                                                   len(legal_actions))
-      avstrat = (
-          infostate_info[_AVG_POLICY_INDEX] /
-          infostate_info[_AVG_POLICY_INDEX].sum())
-      return [(legal_actions[i], avstrat[i]) for i in range(len(legal_actions))]
-
-    return wrap
+    return AveragePolicy(self._infostates)
 
   def _regret_matching(self, regrets, num_legal_actions):
     """Applies regret matching to get a policy.
