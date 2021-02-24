@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "open_spiel/algorithms/sarsa.h"
+#include "open_spiel/algorithms/tabular_sarsa.h"
 
 #include <algorithm>
+#include <memory>
 #include <random>
 #include <string>
 
@@ -29,22 +30,15 @@ namespace algorithms {
 
 using std::vector;
 
-Action SarsaSolver::GetBestAction(const std::unique_ptr<State>& state,
-                                  const Player& player,
-                                  const double& min_utility,
-                                  const double& max_utility) {
-  vector<Action> legal_actions = state->LegalActions();
+Action TabularSarsaSolver::GetBestAction(const State& state,
+                                         double min_utility) {
+  vector<Action> legal_actions = state.LegalActions();
   Action optimal_action = kInvalidAction;
 
-  // Initialize value to be the minimum utility if current player
-  // is the maximizing player (i.e. player 0), and to maximum utility
-  // if current player is the minimizing player (i.e. player 1).
-  double value = (player == Player{0}) ? min_utility : max_utility;
+  double value = min_utility;
   for (const Action& action : legal_actions) {
-    double q_val = values_[{state->ToString(), action}];
-    bool is_best_so_far = (player == Player{0} && q_val >= value) ||
-                          (player == Player{1} && q_val <= value);
-    if (is_best_so_far) {
+    double q_val = values_[{state.ToString(), action}];
+    if (q_val >= value) {
       value = q_val;
       optimal_action = action;
     }
@@ -52,10 +46,9 @@ Action SarsaSolver::GetBestAction(const std::unique_ptr<State>& state,
   return optimal_action;
 }
 
-Action SarsaSolver::SampleActionFromEpsilonGreedyPolicy(
-    const std::unique_ptr<State>& state, const Player& player,
-    const double& min_utility, const double& max_utility) {
-  vector<Action> legal_actions = state->LegalActions();
+Action TabularSarsaSolver::SampleActionFromEpsilonGreedyPolicy(
+    const State& state, double min_utility) {
+  vector<Action> legal_actions = state.LegalActions();
   if (legal_actions.empty()) {
     return kInvalidAction;
   }
@@ -65,16 +58,15 @@ Action SarsaSolver::SampleActionFromEpsilonGreedyPolicy(
     return legal_actions[absl::Uniform<int>(rng_, 0, legal_actions.size())];
   }
   // Choose the best action
-  return GetBestAction(state, player, min_utility, max_utility);
+  return GetBestAction(state, min_utility);
 }
 
-SarsaSolver::SarsaSolver(const Game& game) {
-  game_ = game.shared_from_this();
-  depth_limit_ = kDefaultDepthLimit;
-  epsilon_ = kDefaultEpsilon;
-  learning_rate_ = kDefaultLearningRate;
-  discount_factor_ = kDefaultDiscountFactor;
-
+TabularSarsaSolver::TabularSarsaSolver(std::shared_ptr<const Game> game)
+    : game_(game),
+      depth_limit_(kDefaultDepthLimit),
+      epsilon_(kDefaultEpsilon),
+      learning_rate_(kDefaultLearningRate),
+      discount_factor_(kDefaultDiscountFactor) {
   // Currently only supports 1-player or 2-player zero sum games
   SPIEL_CHECK_TRUE(game_->NumPlayers() == 1 || game_->NumPlayers() == 2);
   if (game_->NumPlayers() == 2) {
@@ -88,40 +80,46 @@ SarsaSolver::SarsaSolver(const Game& game) {
                  GameType::Information::kPerfectInformation);
 }
 
-absl::flat_hash_map<std::pair<std::string, Action>, double>
-SarsaSolver::GetQValueTable() {
+const absl::flat_hash_map<std::pair<std::string, Action>, double>&
+TabularSarsaSolver::GetQValueTable() const {
   return values_;
 }
 
-void SarsaSolver::RunIteration() {
+void TabularSarsaSolver::RunIteration() {
   double min_utility = game_->MinUtility();
-  double max_utility = game_->MaxUtility();
   // Choose start state
   std::unique_ptr<State> curr_state = game_->NewInitialState();
 
   Player player = curr_state->CurrentPlayer();
   // Sample action from the state using an epsilon-greedy policy
-  Action curr_action = SampleActionFromEpsilonGreedyPolicy(
-      curr_state, player, min_utility, max_utility);
+  Action curr_action =
+      SampleActionFromEpsilonGreedyPolicy(*(curr_state.get()), min_utility);
 
   while (!curr_state->IsTerminal()) {
     std::unique_ptr<State> next_state = curr_state->Child(curr_action);
-    double reward = next_state->Rewards()[player == Player{0} ? 0 : 1];
+    // Repeatedly sample while chance node, so that we end up at a decision node
+    while (next_state->IsChanceNode() && !next_state->IsTerminal()) {
+      vector<Action> legal_actions = next_state->LegalActions();
+      next_state->ApplyAction(
+          legal_actions[absl::Uniform<int>(rng_, 0, legal_actions.size())]);
+    }
+    const double reward = next_state->Rewards()[player];
 
-    // Sample next action from the state using an epsilon-greedy policy
-    player = next_state->CurrentPlayer();
-    Action next_action = SampleActionFromEpsilonGreedyPolicy(
-        next_state, player, min_utility, max_utility);
+    const Action next_action =
+        SampleActionFromEpsilonGreedyPolicy(*(next_state.get()), min_utility);
 
     // Update action value
     std::string key = curr_state->ToString();
-    double prev_q_val = values_[{key, curr_action}];
+    const double prev_q_val = values_[{key, curr_action}];
+    // Next q-value in perspective of player to play at curr_state (important
+    // note: exploits property of two-player zero-sum)
+    const double next_q_value =
+        (player != next_state->CurrentPlayer() ? -1 : 1) *
+        values_[{next_state->ToString(), next_action}];
     double new_q_val =
         prev_q_val +
         learning_rate_ *
-            (reward +
-             discount_factor_ * values_[{next_state->ToString(), next_action}] -
-             prev_q_val);
+            (reward + discount_factor_ * next_q_value - prev_q_val);
 
     values_[{key, curr_action}] = new_q_val;
 
