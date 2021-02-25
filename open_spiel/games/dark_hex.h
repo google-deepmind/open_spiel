@@ -97,7 +97,7 @@ class DarkHexState: public State {
 
     hex::HexState state_;
     ObservationType obs_type_;  
-    const int board_size_;
+    int board_size_;
     
     int kNumCells;
     int kBitsPerAction;
@@ -132,7 +132,7 @@ class DarkHexGame: public Game {
   private:
     std::shared_ptr<const hex::HexGame> game_;
     ObservationType obs_type_;
-    const int board_size_;
+    int board_size_;
     
     int kNumCells;
     int kBitsPerAction;

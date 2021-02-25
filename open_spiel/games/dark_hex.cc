@@ -52,7 +52,7 @@ const GameType kGameType{
   /*provides_observation_tensor=*/true,
   /*parameter_specification=*/
   {
-    {"obstype", GameParameter(static_cast<std::string>(kDefaultObsType))},
+    {"obstype", GameParameter(std::string(kDefaultObsType))},
     {"board_size", GameParameter(hex::kDefaultBoardSize)},
   }
 };
@@ -81,7 +81,7 @@ DarkHexState::DarkHexState(std::shared_ptr<const Game> game, int board_size,
 
 void DarkHexState::DoApplyAction(Action move) {
   Player cur_player = CurrentPlayer(); //current player
-  auto& cur_view = (cur_player == Player(0) ? black_view_ : white_view_);
+  auto& cur_view = (cur_player == 0 ? black_view_ : white_view_);
 
   // Either occupied or not
   if (state_.BoardAt(move) == CellState::kEmpty) {
@@ -233,7 +233,8 @@ void DarkHexState::UndoAction(Player player, Action move) {
 
 DarkHexGame::DarkHexGame(const GameParameters& params)
       : Game(kGameType, params),
-        game_(std::static_pointer_cast<const hex::HexGame>(LoadGame("hex"))),
+        game_(std::static_pointer_cast<const hex::HexGame>(LoadGame("hex",
+        {{"board_size", GameParameter(ParameterValue<int>("board_size"))}}))),
         board_size_(ParameterValue<int>("board_size")) {
   kNumCells = board_size_ * board_size_;
   kBitsPerAction = kNumCells + 1;

@@ -54,13 +54,13 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 
 CellState PlayerToState(Player player){
   switch (player){
-  case 0:
-    return CellState::kBlack;
-  case 1:
-    return CellState::kWhite;
-  default:
-    SpielFatalError(absl::StrCat("Invalid player id ", player));
-    return CellState::kEmpty;
+    case 0:
+      return CellState::kBlack;
+    case 1:
+      return CellState::kWhite;
+    default:
+      SpielFatalError(absl::StrCat("Invalid player id ", player));
+      return CellState::kEmpty;
   }
 }
 

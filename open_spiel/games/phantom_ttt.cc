@@ -52,7 +52,10 @@ const GameType kGameType{
     /*provides_observation_string=*/true,
     /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
-    {{"obstype", GameParameter(static_cast<std::string>(kDefaultObsType))}}};
+    {
+      {"obstype", GameParameter(std::string(kDefaultObsType))}
+    }
+  };
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new PhantomTTTGame(params));
