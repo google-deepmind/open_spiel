@@ -53,6 +53,7 @@ const GameType kGameType{
   /*parameter_specification=*/
   {
     {"obstype", GameParameter(std::string(kDefaultObsType))},
+    {"gameversion", GameParameter(std::string(kDefaultGameVersion))},
     {"board_size", GameParameter(hex::kDefaultBoardSize)},
   }
 };
@@ -67,9 +68,13 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 
 } // namespace
 
-DarkHexState::DarkHexState(std::shared_ptr<const Game> game, int board_size,
+DarkHexState::DarkHexState(std::shared_ptr<const Game> game, 
+                                  int board_size,
+                                  GameVersion game_version,
                                   ObservationType obs_type)
-    : State(game), state_(game, board_size), board_size_(board_size), 
+    : State(game), state_(game, board_size), 
+                          board_size_(board_size), 
+                          game_version_(game_version),
                           obs_type_(obs_type) {
   black_view_.resize(board_size * board_size, CellState::kEmpty);
   white_view_.resize(board_size * board_size, CellState::kEmpty);
@@ -80,12 +85,27 @@ DarkHexState::DarkHexState(std::shared_ptr<const Game> game, int board_size,
 }
 
 void DarkHexState::DoApplyAction(Action move) {
+  std::cout << "DOAPPLY CALLED\n";
   Player cur_player = CurrentPlayer(); //current player
   auto& cur_view = (cur_player == 0 ? black_view_ : white_view_);
 
   // Either occupied or not
-  if (state_.BoardAt(move) == CellState::kEmpty) {
-    state_.ApplyAction(move);
+  if (game_version_ == GameVersion::kClassicalDH){
+    if (state_.BoardAt(move) == CellState::kEmpty) {
+      state_.ApplyAction(move);
+    }
+  } else {
+    std::cout << "ELSE ENTERED\n";
+    SPIEL_CHECK_EQ(game_version_, GameVersion::kAbruptDH);
+    if (state_.BoardAt(move) == CellState::kEmpty) {
+      state_.ApplyAction(move);
+    } else {
+      // switch the current player
+      std::cout << "ANOTHER ELSE ENTERED\n";
+      std::cout << "current player: " << CurrentPlayer() << std::endl;
+      state_.ChangePlayer();
+      std::cout << "current player: " << CurrentPlayer() << std::endl;
+    }
   }
 
   SPIEL_CHECK_EQ(cur_view[move], CellState::kEmpty);
@@ -222,7 +242,7 @@ void DarkHexState::UndoAction(Player player, Action move) {
 
   if (state_.BoardAt(move) == PlayerToState(player)) {
     state_.UndoAction(player, move);
-  } else { }
+  }
 
   auto& player_view = (player == 0 ? black_view_ : white_view_);
   player_view[move] = CellState::kEmpty;
@@ -247,6 +267,15 @@ DarkHexGame::DarkHexGame(const GameParameters& params)
     obs_type_ = ObservationType::kRevealNumTurns;
   } else {
     SpielFatalError(absl::StrCat("Unrecognized observation type: ", obs_type));
+  }
+
+  std::string game_version = ParameterValue<std::string>("gameversion");
+  if (game_version == "cdh") {
+    game_version_ = GameVersion::kClassicalDH;
+  } else if (game_version == "adh") {
+    game_version_ = GameVersion::kAbruptDH;
+  } else {
+    SpielFatalError(absl::StrCat("Unrecognized game version: ", game_version));
   }
 }
 

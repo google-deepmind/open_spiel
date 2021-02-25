@@ -93,7 +93,7 @@ void GameBlackWinsMaximumCollisions() {
   SPIEL_CHECK_EQ(state->PlayerReturn(1), -1.0);
 }
 
-void BasicDarkHexTests() {
+void ClassicalDarkHexTests() {
   testing::LoadGameTest("dark_hex");
   testing::NoChanceOutcomesTest(*LoadGame("dark_hex"));
   testing::RandomSimTest(*LoadGame("dark_hex(board_size=5)"), 3);
@@ -102,10 +102,42 @@ void BasicDarkHexTests() {
   GameBlackWinsMaximumCollisions();
 }
 
+void AbruptDHCustomTest() {
+  std::shared_ptr<const Game> game = LoadGame("dark_hex",
+                              {
+                                {"board_size", GameParameter(2)}, 
+                                {"gameversion", GameParameter("adh")}
+                              });
+  std::unique_ptr<State> state = game->NewInitialState();
+  state->ApplyAction(0);
+  std::cout << "HERE 0\n" <<state->ObservationString(0) << std::endl;
+  std::cout << "HERE 1\n" <<state->ObservationString(1) << std::endl;
+  std::cout << "whose turn: " << state->CurrentPlayer() << std::endl;
+  std::cout << "MOVE 0 TRIED" << std::endl;
+  state->ApplyAction(0);
+  std::cout << "whose turn: " << state->CurrentPlayer() << std::endl;
+  std::cout << "HERE 0\n" << state->ObservationString(0) << std::endl;
+  std::cout << "HERE 1\n" << state->ObservationString(1) << std::endl;
+  state->ApplyAction(2);
+  // Black wins
+  SPIEL_CHECK_TRUE(state->IsTerminal());
+  SPIEL_CHECK_EQ(state->PlayerReturn(0), 1.0);
+  SPIEL_CHECK_EQ(state->PlayerReturn(1), -1.0);
+}
+
+void AbruptDarkHexTests(){
+  testing::LoadGameTest("dark_hex(gameversion=adh)");
+  testing::NoChanceOutcomesTest(*LoadGame("dark_hex(gameversion=adh)"));
+  testing::RandomSimTest(
+        *LoadGame("dark_hex(board_size=3,gameversion=adh)"), 3);
+  AbruptDHCustomTest();
+}
+
 } // namespace
 } // namespace dark_hex
 } // namespace open_spiel
 
 int main(int argc, char** argv) {
-  open_spiel::dark_hex::BasicDarkHexTests();
+  open_spiel::dark_hex::ClassicalDarkHexTests();
+  open_spiel::dark_hex::AbruptDarkHexTests();
 }

@@ -70,6 +70,10 @@ class HexState : public State {
   Player CurrentPlayer() const override {
     return IsTerminal() ? kTerminalPlayerId : current_player_;
   }
+  void ChangePlayer() {
+    current_player_ = current_player_ == 0 ? 1 : 0;
+  }
+
   std::string ActionToString(Player player, Action action_id) const override;
   std::string ToString() const override;
   bool IsTerminal() const override;

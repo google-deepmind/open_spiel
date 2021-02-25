@@ -26,21 +26,30 @@
 // Dark Hex (Some versions also called Phantom Hex or Kriegspiel Hex) is an imperfect
 // information version of the classic game of Hex. Players are not exposed to oppsite
 // sides piece information. Only a refree has the full information of the board. When
-// a move fails due to collision the player gets the information of the cell (stone
-// exists), and is allowed to make another move until success. 
+// a move fails due to collision/rejection the player gets some information of the cell
+// (i.e. stone exists), and is allowed to make another move until success. 
 // 
 // There are slightly different versions of the game exists depending on the level of
-// information being exposed to the opponent and what happens in the event of a
-// collision. Right now we only have the Classic Dark Hex (Phantom Hex) implemented 
-// with player:
-//        - Replays after a collision
-//        - Exposed(information on opponent) only to number of turns or nothing
+// information being exposed to the opponent and what happens in the event of an attempt
+// to move to an occupied cell. We have two different versions of Dark Hex (Phantom Hex) 
+// implemented:
+//        - Classical Dark Hex (cdh)
+//            Player:
+//              -> Replays after the attempt to move to an occupied cell (Rejection)        
+//        - Abrupt Dark Hex (adh)
+//            Player:
+//              -> No replay after the attempt to move to an occupied cell (Collusion)
+//
+// For classical dark hex we do allow specifying 'obstype'. It specifies if the player is 
+// exposed to number of turns that has passed or not.
 //
 // Common phantom games include Kriegspiel (Phantom chess), e.g. see
 // https://en.wikipedia.org/wiki/Kriegspiel_(chess), and Phantom Go.
 // See also http://mlanctot.info/files/papers/PhD_Thesis_MarcLanctot.pdf, Ch 3.
 //
 // Parameters:
+//    "gameversion"   string      Which version of the game to activate
+//    (default "cdh")             ['cdh', 'adh']
 //    "obstype"       string      If the player is informed of the      
 //                                number of moves attempted
 //    (default "reveal-nothing")  ['reveal-nothing', 'reveal-numturns']
@@ -52,6 +61,7 @@ namespace open_spiel {
 namespace dark_hex {
 
 inline constexpr const char* kDefaultObsType = "reveal-nothing"; 
+inline constexpr const char* kDefaultGameVersion = "cdh"; 
 
 // black - white - empty
 inline constexpr int kPosStates = hex::kNumPlayers + 1; 
@@ -62,9 +72,16 @@ enum class ObservationType {
   kRevealNumTurns,
 };
 
+enum class GameVersion {
+  kAbruptDH,
+  kClassicalDH,
+};
+
 class DarkHexState: public State {
   public: 
-    DarkHexState(std::shared_ptr<const Game> game, int board_size, 
+    DarkHexState(std::shared_ptr<const Game> game, 
+                  int board_size, 
+                  GameVersion game_version,
                   ObservationType obs_type);
 
     Player CurrentPlayer() const override {return state_.CurrentPlayer(); }
@@ -97,6 +114,7 @@ class DarkHexState: public State {
 
     hex::HexState state_;
     ObservationType obs_type_;  
+    GameVersion game_version_;
     int board_size_;
     
     int kNumCells;
@@ -114,7 +132,8 @@ class DarkHexGame: public Game {
     explicit DarkHexGame(const GameParameters& params);
     std::unique_ptr<State> NewInitialState() const override {
       return std::unique_ptr<State>(
-        new DarkHexState(shared_from_this(), board_size_, obs_type_)
+        new DarkHexState(shared_from_this(), board_size_, 
+                         game_version_, obs_type_)
       );
     }
     int NumDistinctActions() const override {
@@ -132,6 +151,7 @@ class DarkHexGame: public Game {
   private:
     std::shared_ptr<const hex::HexGame> game_;
     ObservationType obs_type_;
+    GameVersion game_version_;
     int board_size_;
     
     int kNumCells;
@@ -148,6 +168,18 @@ inline std::ostream& operator << (std::ostream& stream,
       return stream << "Reveal Num Turns";
     default:
       SpielFatalError("Unknown observation type");
+  }
+}
+
+inline std::ostream& operator << (std::ostream& stream,
+                                  const GameVersion& game_version) {
+  switch (game_version) {
+    case GameVersion::kClassicalDH:
+      return stream << "Classical Dark Hex";
+    case GameVersion::kAbruptDH:
+      return stream << "Abrupt Dark Hex";
+    default:
+      SpielFatalError("Unknown game version");
   }
 }
 
