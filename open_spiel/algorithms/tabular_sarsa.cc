@@ -61,6 +61,15 @@ Action TabularSarsaSolver::SampleActionFromEpsilonGreedyPolicy(
   return GetBestAction(state, min_utility);
 }
 
+void TabularSarsaSolver::SampleUntilNextStateOrTerminal(State* state) {
+  // Repeatedly sample while chance node, so that we end up at a decision node
+  while (state->IsChanceNode() && !state->IsTerminal()) {
+    vector<Action> legal_actions = state->LegalActions();
+    state->ApplyAction(
+        legal_actions[absl::Uniform<int>(rng_, 0, legal_actions.size())]);
+  }
+}
+
 TabularSarsaSolver::TabularSarsaSolver(std::shared_ptr<const Game> game)
     : game_(game),
       depth_limit_(kDefaultDepthLimit),
@@ -89,6 +98,7 @@ void TabularSarsaSolver::RunIteration() {
   double min_utility = game_->MinUtility();
   // Choose start state
   std::unique_ptr<State> curr_state = game_->NewInitialState();
+  SampleUntilNextStateOrTerminal(curr_state.get());
 
   Player player = curr_state->CurrentPlayer();
   // Sample action from the state using an epsilon-greedy policy
@@ -97,12 +107,7 @@ void TabularSarsaSolver::RunIteration() {
 
   while (!curr_state->IsTerminal()) {
     std::unique_ptr<State> next_state = curr_state->Child(curr_action);
-    // Repeatedly sample while chance node, so that we end up at a decision node
-    while (next_state->IsChanceNode() && !next_state->IsTerminal()) {
-      vector<Action> legal_actions = next_state->LegalActions();
-      next_state->ApplyAction(
-          legal_actions[absl::Uniform<int>(rng_, 0, legal_actions.size())]);
-    }
+    SampleUntilNextStateOrTerminal(curr_state.get());
     const double reward = next_state->Rewards()[player];
 
     const Action next_action =

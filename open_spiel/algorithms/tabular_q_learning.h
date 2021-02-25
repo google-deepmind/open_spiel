@@ -62,6 +62,10 @@ class TabularQLearningSolver {
   Action SampleActionFromEpsilonGreedyPolicy(const State& state,
                                              double min_utility);
 
+  // Moves a chance node to the next decision/terminal node by sampling from
+  // the legal actions repeatedly
+  void SampleUntilNextStateOrTerminal(State* state);
+
   std::shared_ptr<const Game> game_;
   int depth_limit_;
   double epsilon_;

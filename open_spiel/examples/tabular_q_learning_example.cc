@@ -68,7 +68,34 @@ void SolveTicTacToe() {
   SPIEL_CHECK_EQ(state->Rewards()[1], 0);
 }
 
+void SolveCatch() {
+  std::shared_ptr<const Game> game = open_spiel::LoadGame("catch");
+  open_spiel::algorithms::TabularQLearningSolver tabular_q_learning_solver(
+      game);
+
+  int training_iter = 100000;
+  while (training_iter-- > 0) {
+    tabular_q_learning_solver.RunIteration();
+  }
+  const absl::flat_hash_map<std::pair<std::string, Action>, double>& q_values =
+      tabular_q_learning_solver.GetQValueTable();
+
+  int eval_iter = 1000;
+  int total_reward = 0;
+  while (eval_iter-- > 0) {
+    std::unique_ptr<State> state = game->NewInitialState();
+    while (!state->IsTerminal()) {
+      Action optimal_action = GetOptimalAction(q_values, state);
+      state->ApplyAction(optimal_action);
+      total_reward += state->Rewards()[0];
+    }
+  }
+
+  SPIEL_CHECK_GT(total_reward, 0);
+}
+
 int main(int argc, char** argv) {
   SolveTicTacToe();
+  SolveCatch();
   return 0;
 }
