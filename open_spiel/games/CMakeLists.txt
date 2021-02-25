@@ -39,6 +39,8 @@ set(GAME_SOURCES
   coordinated_mp.h
   cursor_go.cc
   cursor_go.h
+  dark_hex.cc
+  dark_hex.h
   deep_sea.cc
   deep_sea.h
   efg_game.cc
@@ -277,6 +279,10 @@ add_executable(cursor_go_test cursor_go_test.cc
                ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(cursor_go_test cursor_go_test)
+
+add_executable(dark_hex_test dark_hex_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(dark_hex_test dark_hex_test)
 
 add_executable(deep_sea_test deep_sea_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
