@@ -14,6 +14,7 @@
 
 #include "open_spiel/spiel.h"
 #include "open_spiel/tests/basic_tests.h"
+#include <stdlib.h>
 
 namespace open_spiel {
 namespace dark_hex {
@@ -110,14 +111,7 @@ void AbruptDHCustomTest() {
                               });
   std::unique_ptr<State> state = game->NewInitialState();
   state->ApplyAction(0);
-  std::cout << "HERE 0\n" <<state->ObservationString(0) << std::endl;
-  std::cout << "HERE 1\n" <<state->ObservationString(1) << std::endl;
-  std::cout << "whose turn: " << state->CurrentPlayer() << std::endl;
-  std::cout << "MOVE 0 TRIED" << std::endl;
   state->ApplyAction(0);
-  std::cout << "whose turn: " << state->CurrentPlayer() << std::endl;
-  std::cout << "HERE 0\n" << state->ObservationString(0) << std::endl;
-  std::cout << "HERE 1\n" << state->ObservationString(1) << std::endl;
   state->ApplyAction(2);
   // Black wins
   SPIEL_CHECK_TRUE(state->IsTerminal());

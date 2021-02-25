@@ -85,7 +85,6 @@ DarkHexState::DarkHexState(std::shared_ptr<const Game> game,
 }
 
 void DarkHexState::DoApplyAction(Action move) {
-  std::cout << "DOAPPLY CALLED\n";
   Player cur_player = CurrentPlayer(); //current player
   auto& cur_view = (cur_player == 0 ? black_view_ : white_view_);
 
@@ -95,16 +94,12 @@ void DarkHexState::DoApplyAction(Action move) {
       state_.ApplyAction(move);
     }
   } else {
-    std::cout << "ELSE ENTERED\n";
     SPIEL_CHECK_EQ(game_version_, GameVersion::kAbruptDH);
     if (state_.BoardAt(move) == CellState::kEmpty) {
       state_.ApplyAction(move);
     } else {
       // switch the current player
-      std::cout << "ANOTHER ELSE ENTERED\n";
-      std::cout << "current player: " << CurrentPlayer() << std::endl;
       state_.ChangePlayer();
-      std::cout << "current player: " << CurrentPlayer() << std::endl;
     }
   }
 
