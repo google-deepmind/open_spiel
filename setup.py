@@ -88,16 +88,6 @@ class BuildExt(build_ext):
       ) from e
     print("Found C++ compiler: {}".format(cxx))
 
-    try:
-      subprocess.check_call(["python3-config", "--help"])
-    except OSError as e:
-      ext_names = ", ".join(e.name for e in self.extensions)
-      raise RuntimeError(
-          "Python3 development files (python3-dev) must be installed to build"
-          + "the following extensions: {}".format(ext_names)
-      ) from e
-    print("Found python3 dev files.")
-
   def build_extension(self, ext):
     extension_dir = os.path.abspath(
         os.path.dirname(self.get_ext_fullpath(ext.name)))
@@ -154,7 +144,7 @@ else:
 
 setuptools.setup(
     name="open_spiel",
-    version="0.2.0rc4",
+    version="0.3.0",
     license="Apache 2.0",
     author="The OpenSpiel authors",
     author_email="open_spiel@google.com",
