@@ -165,13 +165,13 @@ fi
 # Install Julia if required and not present already.
 if [[ ${BUILD_WITH_JULIA:-"OFF"} == "ON" ]]; then
   # Check that Julia is in the path.
-  if [[ ! -x `which julia` ]]
+  if [[ ! -x `which julia` ]] || [ "$(julia -e 'println(VERSION >= v"1.6.0-rc1")')" == "false" ]
   then
-    echo -e "\e[33mWarning: julia not in your PATH. Trying \$HOME/.local/bin\e[0m"
-    PATH=${PATH}:${HOME}/.local/bin
+    echo -e "\e[33mWarning: julia not in your PATH or its too old. Trying \$HOME/.local/bin\e[0m"
+    PATH=${HOME}/.local/bin:${PATH}
   fi
 
-  if which julia >/dev/null; then
+  if which julia >/dev/null && [ "$(julia -e 'println(VERSION >= v"1.6.0-rc1")')" == "true" ] ; then
     JULIA_VERSION_INFO=`julia --version`
     echo -e "\e[33m$JULIA_VERSION_INFO is already installed.\e[0m"
   else
@@ -189,14 +189,9 @@ if [[ ${BUILD_WITH_JULIA:-"OFF"} == "ON" ]]; then
       curl https://raw.githubusercontent.com/abelsiqueira/jill/master/jill.sh -o jill.sh
       mv jill.sh $JULIA_INSTALLER
     fi
-    JULIA_VERSION=1.3.1 bash $JULIA_INSTALLER -y
+    JULIA_VERSION=1.6.0-rc1 bash $JULIA_INSTALLER -y
     # Should install in $HOME/.local/bin which was added to the path above
-    [[ -x `which julia` ]] || die "julia not found PATH after install."
-    # This is needed on Ubuntu 19.10 and above, see:
-    # https://github.com/deepmind/open_spiel/issues/201
-    if [[ -f /usr/lib/x86_64-linux-gnu/libstdc++.so.6 ]]; then
-      cp /usr/lib/x86_64-linux-gnu/libstdc++.so.6 $HOME/packages/julias/julia-1.3.1/lib/julia
-    fi
+    [[ -x `which julia` ]] && [ "$(julia -e 'println(VERSION >= v"1.6.0-rc1")')" == "true" ] || die "julia not found PATH after install."
   fi
 
   # Install dependencies.

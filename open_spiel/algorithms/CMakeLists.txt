@@ -57,12 +57,14 @@ add_library (algorithms OBJECT
   outcome_sampling_mccfr.h
   policy_iteration.cc
   policy_iteration.h
-  sarsa.cc
-  sarsa.h
   state_distribution.cc
   state_distribution.h
   tabular_exploitability.cc
   tabular_exploitability.h
+  tabular_q_learning.cc
+  tabular_q_learning.h
+  tabular_sarsa.cc
+  tabular_sarsa.h
   tensor_game_utils.cc
   tensor_game_utils.h
   trajectories.cc

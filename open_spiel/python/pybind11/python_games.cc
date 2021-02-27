@@ -237,7 +237,7 @@ void StateDeleter::operator()(State* state) {
 void RegisterPyGame(const GameType& game_type, py::function creator) {
   GameRegisterer::RegisterGame(
       game_type, [game_type, creator](const GameParameters& game_parameters) {
-        auto py_game = creator();
+        auto py_game = creator(game_parameters);
         // TODO(author11) Fix leak
         // (circular reference between C++ Game and Python Game)
         return py::cast<std::shared_ptr<Game>>(py_game);

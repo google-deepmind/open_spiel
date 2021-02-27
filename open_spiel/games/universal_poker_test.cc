@@ -472,6 +472,10 @@ void HulhMaxUtilityIsCorrect() {
 }
 
 void CanConvertActionsCorrectly() {
+  std::shared_ptr<const Game> game =
+      LoadGame(HunlGameString(/*betting_abstraction=*/"fullgame"));
+  std::unique_ptr<State> state = game->NewInitialState();
+  const auto& up_state = static_cast<const UniversalPokerState&>(*state);
   absl::flat_hash_map<open_spiel::Action, project_acpc_server::Action> results =
       {
           {static_cast<open_spiel::Action>(ActionType::kFold),
@@ -488,7 +492,8 @@ void CanConvertActionsCorrectly() {
            {project_acpc_server::ActionType::a_raise, 8}},
       };
   for (const auto& [os_action, acpc_action] : results) {
-    SPIEL_CHECK_EQ(os_action, ACPCActionToOpenSpielAction(acpc_action));
+    SPIEL_CHECK_EQ(os_action,
+                   ACPCActionToOpenSpielAction(acpc_action, up_state));
   }
 }
 

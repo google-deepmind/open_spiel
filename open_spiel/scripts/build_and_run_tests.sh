@@ -133,11 +133,11 @@ mkdir -p $BUILD_DIR
 # Configure Julia compilation if required.
 if [[ ${BUILD_WITH_JULIA:-"OFF"} == "ON" ]]; then
   # Check that Julia is in the path.
-  if [[ ! -x `which julia` ]]
+  if [[ ! -x `which julia` ]] || [[ "$(julia -e 'println(VERSION >= v"1.6.0-rc1")')" == "false" ]]
   then
-    echo -e "\e[33mWarning: julia not in your PATH. Trying \$HOME/.local/bin\e[0m"
-    PATH=${PATH}:${HOME}/.local/bin
-    [[ -x `which julia` ]] || die "could not find julia command. Please add it to PATH and rerun."
+    echo -e "\e[33mWarning: julia not in your PATH or it's too old. Trying \$HOME/.local/bin\e[0m"
+    PATH=${HOME}/.local/bin:${PATH}
+    [[ -x `which julia` ]] && [[ "$(julia -e 'println(VERSION >= v"1.6.0-rc1")')" == "true" ]] || die "could not find julia command. Please add it to PATH and rerun."
   fi
   LIBCXXWRAP_JULIA_DIR=`julia --project=${MYDIR}/../julia -e 'using CxxWrap; print(dirname(dirname(CxxWrap.CxxWrapCore.libcxxwrap_julia_jll.libcxxwrap_julia_path)))'`
   JULIA_VERSION_INFO=`julia --version`

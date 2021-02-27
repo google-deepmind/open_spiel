@@ -44,6 +44,7 @@ EXPECTED_GAMES = set([
     "coop_to_1p",
     "coordinated_mp",
     "cursor_go",
+    "dark_hex",
     "deep_sea",
     "efg_game",
     "first_sealed_auction",
@@ -205,6 +206,20 @@ class PyspielTest(absltest.TestCase):
     param2 = pyspiel.GameParameter("two")
     self.assertEqual(param1, param1_again)
     self.assertNotEqual(param1, param2)
+
+  def test_game_parameter_can_access_value(self):
+    self.assertEqual(pyspiel.GameParameter(True).value(), True)
+    self.assertEqual(pyspiel.GameParameter(42).value(), 42)
+    self.assertEqual(pyspiel.GameParameter(3.141).value(), 3.141)
+    self.assertEqual(pyspiel.GameParameter("spqr").value(), "spqr")
+    self.assertEqual(
+        pyspiel.GameParameter({
+            "a": pyspiel.GameParameter(1.23),
+            "b": pyspiel.GameParameter(True)
+        }).value(), {
+            "a": 1.23,
+            "b": True
+        })
 
   def test_game_parameters_from_string_empty(self):
     self.assertEqual(pyspiel.game_parameters_from_string(""), {})

@@ -89,6 +89,29 @@ class SpielException : public std::exception {
   std::string message_;
 };
 
+// Python representation of GameParameter objects
+namespace {
+py::object GameParameterToPython(const GameParameter& gp) {
+  if (gp.has_bool_value()) {
+    return py::bool_(gp.bool_value());
+  } else if (gp.has_double_value()) {
+    return py::float_(gp.double_value());
+  } else if (gp.has_string_value()) {
+    return py::str(gp.string_value());
+  } else if (gp.has_int_value()) {
+    return py::int_(gp.int_value());
+  } else if (gp.has_game_value()) {
+    py::dict dict;
+    for (const auto& [k, v] : gp.game_value()) {
+      dict[py::str(k)] = GameParameterToPython(v);
+    }
+    return dict;
+  } else {
+    return py::none();
+  }
+}
+}  // namespace
+
 // Definintion of our Python module.
 PYBIND11_MODULE(pyspiel, m) {
   m.doc() = "Open Spiel";
@@ -107,6 +130,7 @@ PYBIND11_MODULE(pyspiel, m) {
       .def(py::init<int>())
       .def(py::init<GameParameters>())
       .def("is_mandatory", &GameParameter::is_mandatory)
+      .def("value", &GameParameterToPython)
       .def("__str__", &GameParameter::ToString)
       .def("__repr__", &GameParameter::ToReprString)
       .def("__eq__", [](const GameParameter& value, GameParameter* value2) {
