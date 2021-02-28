@@ -322,12 +322,14 @@ ChessBoard::ChessBoard(int board_size, bool king_in_check_allowed)
       castling_rights_{{true, true}, {true, true}},
       zobrist_hash_(0),
       board_size_(board_size),
-      king_in_check_allowed_(king_in_check_allowed){
+      king_in_check_allowed_(king_in_check_allowed) {
   board_.fill(kEmptyPiece);
 }
 
 /*static*/ absl::optional<ChessBoard>
-ChessBoard::BoardFromFEN(const std::string &fen, int board_size, bool king_in_check_allowed) {
+ChessBoard::BoardFromFEN(const std::string &fen,
+                         int board_size,
+                         bool king_in_check_allowed) {
   /* An FEN string includes a board position, side to play, castling
    * rights, ep square, 50 moves clock, and full move number. In that order.
    *
@@ -455,13 +457,15 @@ Square ChessBoard::find(const Piece &piece) const {
 void ChessBoard::GenerateLegalMoves(
     const MoveYieldFn &yield, Color color) const {
 
-  // We do not need to filter moves that would result for King to move / stay in check, so we can yield all pseudo legal moves
+  // We do not need to filter moves that would result for King to move / stay
+  // in check, so we can yield all pseudo legal moves
   if (king_in_check_allowed_) {
     GeneratePseudoLegalMoves(yield, color);
   } else {
     auto king_square = find(Piece{color, PieceType::kKing});
 
-    GeneratePseudoLegalMoves([this, &king_square, &yield, color](const Move &move) {
+    GeneratePseudoLegalMoves([this, &king_square, &yield, color]
+                             (const Move &move) {
       // See if the move is legal by applying, checking whether the king is
       // under attack, and undoing the move.
       // TODO: Optimize this.
@@ -578,8 +582,9 @@ bool ChessBoard::HasSufficientMaterial() const {
   // 3. K+N vs K
   // 4. K+B* vs K+B* (all bishops on same coloured squares)
 
-  // If king is allowed to move to/stay in check, any material is sufficient material.
-  // If there is no material, then there is also no opponent king and that means the game had already ended.
+  // If king is allowed to move to/stay in check, any material is sufficient
+  // material. If there is no material, then there is also no opponent king and
+  // that means the game had already ended.
   if (king_in_check_allowed_) {
     return true;
   }
@@ -1430,7 +1435,7 @@ std::string ChessBoard::ToFEN() const {
   return fen;
 }
 
-std::string ChessBoard::ToDarkFEN(const std::array<bool, k2dMaxBoardSize>& observability_table,
+std::string ChessBoard::ToDarkFEN(const ObservationTable& observability_table,
                                   Color color) const {
   std::string fen;
 
@@ -1468,7 +1473,8 @@ std::string ChessBoard::ToDarkFEN(const std::array<bool, k2dMaxBoardSize>& obser
   }
 
   // 2. color to play.
-  fen += " " + (ToPlay() == chess::Color::kWhite ? std::string("w") : std::string("b"));
+  fen += " " + (ToPlay() == chess::Color::kWhite
+      ? std::string("w") : std::string("b"));
 
   // 3. by castling rights.
   fen += " ";

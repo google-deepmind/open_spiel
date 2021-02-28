@@ -34,9 +34,11 @@
 // https://en.wikipedia.org/wiki/Dark_chess
 //
 // Parameters:
-//   "board_size"    int      Number of squares in each row and column (default: 8)
-//   "fen"           string   String describing the chess board position in Forsyth-Edwards Notation.
-//                            The FEN has to match the board size. Default values are available for board sizes 4 and 8.
+//   "board_size"  int     Number of squares in each row and column (default: 8)
+//   "fen"         string  String describing the chess board position in
+//                         Forsyth-Edwards Notation. The FEN has to match
+//                         the board size. Default values are available for
+//                         board sizes 4 and 8.
 
 namespace open_spiel {
 namespace dark_chess {
@@ -62,7 +64,8 @@ class DarkChessState : public State {
 
   // Constructs a chess state at the given position in Forsyth-Edwards Notation.
   // https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
-  DarkChessState(std::shared_ptr<const Game> game, int board_size, const std::string& fen);
+  DarkChessState(std::shared_ptr<const Game> game,
+                 int board_size, const std::string& fen);
   DarkChessState(const DarkChessState&) = default;
 
   DarkChessState& operator=(const DarkChessState&) = default;
@@ -96,7 +99,9 @@ class DarkChessState : public State {
   const chess::ChessBoard& StartBoard() const { return start_board_; }
 
   std::vector<chess::Move>& MovesHistory() { return moves_history_; }
-  const std::vector<chess::Move>& MovesHistory() const { return moves_history_; }
+  const std::vector<chess::Move>& MovesHistory() const {
+    return moves_history_;
+  }
 
  protected:
   void DoApplyAction(Action action) override;
@@ -152,7 +157,8 @@ class DarkChessGame : public Game {
     return chess::NumDistinctActions();
   }
   std::unique_ptr<State> NewInitialState() const override {
-    return absl::make_unique<DarkChessState>(shared_from_this(), board_size_, fen_);
+    return absl::make_unique<DarkChessState>(shared_from_this(),
+                                             board_size_, fen_);
   }
   int NumPlayers() const override { return chess::NumPlayers(); }
   double MinUtility() const override { return LossUtility(); }

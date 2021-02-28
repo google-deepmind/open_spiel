@@ -222,16 +222,21 @@ std::pair<std::string, std::string> SplitAnnotations(const std::string& move);
 
 inline constexpr int kMaxBoardSize = 8;
 inline constexpr int k2dMaxBoardSize = kMaxBoardSize * kMaxBoardSize;
-inline const std::string kDefaultStandardFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+inline const std::string kDefaultStandardFEN =
+    "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 inline const std::string kDefaultSmallFEN = "r1kr/pppp/PPPP/R1KR w - - 0 1";
+
+using ObservationTable = std::array<bool, k2dMaxBoardSize>;
 
 class ChessBoard {
  public:
-  ChessBoard(int board_size=8, bool king_in_check_allowed=false);
+  ChessBoard(int board_size = 8, bool king_in_check_allowed = false);
 
   // Constructs a chess board at the given position in Forsyth-Edwards Notation.
   // https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
-  static absl::optional<ChessBoard> BoardFromFEN(const std::string& fen, int board_size=8, bool king_in_check_allowed=false);
+  static absl::optional<ChessBoard> BoardFromFEN(const std::string& fen,
+                                                 int board_size = 8,
+                                                 bool king_in_check_allowed = false);
 
   const Piece& at(Square sq) const { return board_[SquareToIndex_(sq)]; }
 
@@ -264,7 +269,9 @@ class ChessBoard {
   // For performance reasons, we do not guarantee that no more moves will be
   // generated if yield returns false. It is only for optimization.
   using MoveYieldFn = std::function<bool(const Move&)>;
-  void GenerateLegalMoves(const MoveYieldFn& yield) const { GenerateLegalMoves(yield, to_play_); };
+  void GenerateLegalMoves(const MoveYieldFn& yield) const {
+    GenerateLegalMoves(yield, to_play_);
+  };
   void GenerateLegalMoves(const MoveYieldFn& yield, Color color) const;
   void GeneratePseudoLegalMoves(const MoveYieldFn& yield, Color color) const;
 
@@ -365,20 +372,23 @@ class ChessBoard {
 
   std::string ToUnicodeString() const;
 
-  // Constructs a string describing the chess board position in Forsyth-Edwards Notation.
-  // https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
+  // Constructs a string describing the chess board position in Forsyth-Edwards
+  // Notation. https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
   std::string ToFEN() const;
 
-  /* Constructs a string describing the dark chess board position in a notation similar to Forsyth-Edwards Notation.
+  /* Constructs a string describing the dark chess board position in a notation
+   * similar to Forsyth-Edwards Notation.
    * https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
    *
    * There are several key differences to FEN:
-   * 1) Only observable squares are shown. Squares invisible to the observer are represented by the character '?'
+   * 1) Only observable squares are shown. Squares invisible to the observer are
+   *    represented by the character '?'
    * 2) Only observer's castling rights are shown
-   * 3) en passant square is only shown if the observer is capable of performing an en passant capture
+   * 3) en passant square is only shown if the observer is capable of performing
+   *    an en passant capture
    *
    */
-  std::string ToDarkFEN(const std::array<bool, k2dMaxBoardSize>& observability_table,
+  std::string ToDarkFEN(const ObservationTable& observability_table,
                         Color color) const;
 
  private:
