@@ -20,48 +20,9 @@ from __future__ import print_function
 
 import numpy as np
 import pyspiel
-from open_spiel.python import policy
+import open_spiel.python.algorithms.mccfr as mccfr
 
 # Indices in the information sets for the regrets and average policy sums.
-_REGRET_INDEX = 0
-_AVG_POLICY_INDEX = 1
-
-
-class AveragePolicy(policy.Policy):
-
-  def __init__(self, infostates):
-    # Do not create a copy of the dictionary
-    # and work on the same object
-    self._infostates = infostates
-
-  def action_probabilities(self, state, player_id=None):
-    """Returns the MCCFR average policy for a player in a state.
-    If the policy is not defined for the provided state, a uniform
-    random policy is returned.
-
-    Args:
-      state: A `pyspiel.State` object.
-      player_id: Optional, the player id for which we want an action. Optional
-        unless this is a simultaneous state at which multiple players can act.
-
-    Returns:
-      A `dict` of `{action: probability}` for the specified player in the
-      supplied state. If the policy is defined for the state, this
-      will contain the average MCCFR strategy defined for that state.
-      Otherwise, it will contain all legal actions, each with the same
-      probability, equal to 1 / num_legal_actions.
-    """
-    if player_id is None:
-      player_id = state.current_player()
-    legal_actions = state.legal_actions()
-    info_state_key = state.information_state_string(player_id)
-    retrieved_infostate = self._infostates.get(info_state_key, None)
-    if retrieved_infostate is None:
-      return {a: 1 / len(legal_actions) for a in legal_actions}
-    avstrat = (retrieved_infostate[_AVG_POLICY_INDEX] /
-               retrieved_infostate[_AVG_POLICY_INDEX].sum())
-    return {legal_actions[i]: avstrat[i] for i in range(len(legal_actions))}
-
 
 class OutcomeSamplingSolver(object):
   """An implementation of outcome sampling MCCFR."""
@@ -118,17 +79,17 @@ class OutcomeSamplingSolver(object):
     return self._infostates[info_state_key]
 
   def _add_regret(self, info_state_key, action_idx, amount):
-    self._infostates[info_state_key][_REGRET_INDEX][action_idx] += amount
+    self._infostates[info_state_key][mccfr._REGRET_INDEX][action_idx] += amount
 
   def _add_avstrat(self, info_state_key, action_idx, amount):
-    self._infostates[info_state_key][_AVG_POLICY_INDEX][action_idx] += amount
+    self._infostates[info_state_key][mccfr._AVG_POLICY_INDEX][action_idx] += amount
 
   def average_policy(self):
     """Computes the average policy, containing the policy for all players.
     The returned policy instance should only be used during
     the lifetime of solver object
     """
-    return AveragePolicy(self._infostates)
+    return mccfr.AveragePolicy(self._infostates)
 
   def _regret_matching(self, regrets, num_legal_actions):
     """Applies regret matching to get a policy.
@@ -192,7 +153,7 @@ class OutcomeSamplingSolver(object):
     num_legal_actions = len(legal_actions)
     infostate_info = self._lookup_infostate_info(info_state_key,
                                                  num_legal_actions)
-    policy = self._regret_matching(infostate_info[_REGRET_INDEX],
+    policy = self._regret_matching(infostate_info[mccfr._REGRET_INDEX],
                                    num_legal_actions)
     if cur_player == update_player:
       uniform_policy = (
@@ -224,7 +185,7 @@ class OutcomeSamplingSolver(object):
 
     if cur_player == update_player:
       # Now the regret and avg strategy updates.
-      policy = self._regret_matching(infostate_info[_REGRET_INDEX],
+      policy = self._regret_matching(infostate_info[mccfr._REGRET_INDEX],
                                      num_legal_actions)
 
       # Estimate for the counterfactual value of the policy.

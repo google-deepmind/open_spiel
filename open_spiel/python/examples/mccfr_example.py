@@ -31,7 +31,7 @@ FLAGS = flags.FLAGS
 
 flags.DEFINE_enum(
     "sampling",
-    "external",
+    "outcome",
     ["external", "outcome"],
     "Sampling for the MCCFR solver",
 )
