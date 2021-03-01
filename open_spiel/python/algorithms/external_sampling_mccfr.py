@@ -20,11 +20,8 @@ from __future__ import print_function
 
 import enum
 import numpy as np
+import open_spiel.python.algorithms.mccfr as mccfr
 import pyspiel
-
-# Indices in the information sets for the regrets and average policy sums.
-_REGRET_INDEX = 0
-_AVG_POLICY_INDEX = 1
 
 
 class AverageType(enum.Enum):
@@ -102,29 +99,20 @@ class ExternalSamplingSolver(object):
     return self._infostates[info_state_key]
 
   def _add_regret(self, info_state_key, action_idx, amount):
-    self._infostates[info_state_key][_REGRET_INDEX][action_idx] += amount
+    self._infostates[info_state_key][mccfr.REGRET_INDEX][action_idx] += amount
 
   def _add_avstrat(self, info_state_key, action_idx, amount):
-    self._infostates[info_state_key][_AVG_POLICY_INDEX][action_idx] += amount
+    self._infostates[info_state_key][
+        mccfr.AVG_POLICY_INDEX][action_idx] += amount
 
-  def callable_avg_policy(self):
-    """Returns the average joint policy as a callable.
+  def average_policy(self):
+    """Computes the average policy, containing the policy for all players.
 
-    The callable has a signature of the form string (information
-    state key) -> list of (action, prob).
+    Returns:
+      An average policy instance that should only be used during
+      the lifetime of solver object.
     """
-
-    def wrap(state):
-      info_state_key = state.information_state_string(state.current_player())
-      legal_actions = state.legal_actions()
-      infostate_info = self._lookup_infostate_info(info_state_key,
-                                                   len(legal_actions))
-      avstrat = (
-          infostate_info[_AVG_POLICY_INDEX] /
-          infostate_info[_AVG_POLICY_INDEX].sum())
-      return [(legal_actions[i], avstrat[i]) for i in range(len(legal_actions))]
-
-    return wrap
+    return mccfr.AveragePolicy(self._infostates)
 
   def _regret_matching(self, regrets, num_legal_actions):
     """Applies regret matching to get a policy.
@@ -172,7 +160,7 @@ class ExternalSamplingSolver(object):
 
     infostate_info = self._lookup_infostate_info(info_state_key,
                                                  num_legal_actions)
-    policy = self._regret_matching(infostate_info[_REGRET_INDEX],
+    policy = self._regret_matching(infostate_info[mccfr.REGRET_INDEX],
                                    num_legal_actions)
 
     for action_idx in range(num_legal_actions):
@@ -213,7 +201,7 @@ class ExternalSamplingSolver(object):
 
     infostate_info = self._lookup_infostate_info(info_state_key,
                                                  num_legal_actions)
-    policy = self._regret_matching(infostate_info[_REGRET_INDEX],
+    policy = self._regret_matching(infostate_info[mccfr.REGRET_INDEX],
                                    num_legal_actions)
 
     value = 0
