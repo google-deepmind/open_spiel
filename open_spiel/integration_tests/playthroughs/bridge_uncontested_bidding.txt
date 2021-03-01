@@ -74,7 +74,7 @@ action: 16
 # T8643.KQ983.K2.A K972.AJT6.64.853 4C
 IsTerminal() = False
 History() = [0, 16]
-HistoryString() = "0 16"
+HistoryString() = "0, 16"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -95,7 +95,7 @@ action: 33
 # T8643.KQ983.K2.A K972.AJT6.64.853 4C-7H
 IsTerminal() = False
 History() = [0, 16, 33]
-HistoryString() = "0 16 33"
+HistoryString() = "0, 16, 33"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -116,7 +116,7 @@ action: 34
 # T8643.KQ983.K2.A K972.AJT6.64.853 4C-7H-7S
 IsTerminal() = False
 History() = [0, 16, 33, 34]
-HistoryString() = "0 16 33 34"
+HistoryString() = "0, 16, 33, 34"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -137,7 +137,7 @@ action: 0
 # T8643.KQ983.K2.A K972.AJT6.64.853 4C-7H-7S-Pass Score:-150 Passed Out:0 1C N:-150 1C E:-150 1D N:-150 1D E:-150 1H N:170 1H E:170 1S N:170 1S E:170 1N N:-50 1N E:-50 3N N:-150 3N E:-150 4H N:420 4H E:420 4S N:420 4S E:420 5C N:-350 5C E:-350 5D N:-350 5D E:-350 6C N:-400 6C E:-400 6D N:-400 6D E:-400 6H N:-100 6H E:-100 6S N:-100 6S E:-100 6N N:-300 6N E:-300 7C N:-450 7C E:-450 7D N:-450 7D E:-450 7H N:-150 7H E:-150 7S N:-150 7S E:-150 7N N:-350 7N E:-350
 IsTerminal() = True
 History() = [0, 16, 33, 34, 0]
-HistoryString() = "0 16 33 34 0"
+HistoryString() = "0, 16, 33, 34, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4

@@ -50,7 +50,9 @@ def export_gambit(game):
   chance_idx = 1
 
   # We will keep separate infoset idx per each player.
-  infoset_idx = [1] * game.num_players()
+  # Note that gambit infosets start at 1, but we start them here at 0 because
+  # they get incremented when accessed from infoset_tables below.
+  infoset_idx = [0] * game.num_players()
 
   def infoset_next_id(player):
     nonlocal infoset_idx

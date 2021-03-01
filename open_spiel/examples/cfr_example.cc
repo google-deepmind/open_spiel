@@ -31,7 +31,7 @@ int main(int argc, char** argv) {
   std::shared_ptr<const open_spiel::Game> game =
       open_spiel::LoadGame(absl::GetFlag(FLAGS_game_name));
   open_spiel::algorithms::CFRSolver solver(*game);
-  std::cerr << "Starting CFR and CFR+ on " << game->GetType().short_name
+  std::cerr << "Starting CFR on " << game->GetType().short_name
             << "..." << std::endl;
 
   for (int i = 0; i < absl::GetFlag(FLAGS_num_iters); ++i) {

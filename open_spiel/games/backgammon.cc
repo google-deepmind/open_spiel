@@ -165,9 +165,21 @@ int BackgammonState::AugmentCheckerMove(CheckerMove* cmove, int player,
 std::string BackgammonState::ActionToString(Player player,
                                             Action move_id) const {
   if (player == kChancePlayerId) {
-    return absl::StrCat("chance outcome ", move_id,
-                        " (roll: ", kChanceOutcomeValues[move_id][0],
-                        kChanceOutcomeValues[move_id][1], ")");
+    if (turns_ >= 0) {
+      // Normal chance roll.
+      return absl::StrCat("chance outcome ", move_id,
+                          " (roll: ", kChanceOutcomeValues[move_id][0],
+                          kChanceOutcomeValues[move_id][1], ")");
+    } else {
+      // Initial roll to determine who starts.
+      const char* starter = (move_id < 15 ? "X starts" : "O starts");
+      if (move_id >= 15) {
+        move_id -= 15;
+      }
+      return absl::StrCat("chance outcome ", move_id, " ", starter, ", ",
+                          "(roll: ", kChanceOutcomeValues[move_id][0],
+                          kChanceOutcomeValues[move_id][1], ")");
+    }
   } else {
     // Assemble a human-readable string representation of the move using
     // standard backgammon notation:
@@ -399,42 +411,17 @@ void BackgammonState::DoApplyAction(Action move) {
                                                  dice_, move, double_turn_,
                                                  false, false));
 
-    if (turns_ == -1 && dice_.size() < 4) {
-      // Initial dice roll to determine who starts.
-      RollDice(move);
-      return;
-    } else if (turns_ == -1 && dice_.size() == 4) {
-      // Start of game: see who won the toss (on a single dice).
-      if (dice_[0] == dice_[2]) {
-        // Tie. Start again!
-        dice_.clear();
-        RollDice(move);
-        return;
-      }
-      // Using the 3rd outcome to get 2 unbiased numbers for the first move.
-      RollDice(move);
-      if (dice_[4] == dice_[5]) {
-        // Tie. Start again! We should not start with doubles.
-        dice_.clear();
-        return;
-      }
-      // The dice_[0] vs dice_[2] will determine the starting player.
-      // The dice_[4] and dice_[5] will be be used for the first move,
-      // because they include a lower number and a higher number.
-      if (dice_[0] > dice_[2]) {
+    if (turns_ == -1) {
+      SPIEL_CHECK_TRUE(dice_.empty());
+      if (move < 15) {
         // X starts.
         cur_player_ = prev_player_ = kXPlayerId;
-      } else if (dice_[0] < dice_[2]) {
-        // O starts.
+      } else {
+        // O Starts
         cur_player_ = prev_player_ = kOPlayerId;
+        move -= 15;
       }
-      // Keeping just the 3rd outcome.
-      dice_[0] = dice_[4];
-      dice_[1] = dice_[5];
-      dice_.pop_back();
-      dice_.pop_back();
-      dice_.pop_back();
-      dice_.pop_back();
+      RollDice(move);
       turns_ = 0;
       return;
     } else {
@@ -1148,7 +1135,19 @@ std::vector<Action> BackgammonState::LegalActions() const {
 
 std::vector<std::pair<Action, double>> BackgammonState::ChanceOutcomes() const {
   SPIEL_CHECK_TRUE(IsChanceNode());
-  return kChanceOutcomes;
+  if (turns_ == -1) {
+    // Doubles not allowed for the initial roll to determine who goes first.
+    // Range 0-14: X goes first, range 15-29: O goes first.
+    std::vector<std::pair<Action, double>> outcomes;
+    outcomes.reserve(30);
+    const double uniform_prob = 1.0 / 30.0;
+    for (Action action = 0; action < 30; ++action) {
+      outcomes.push_back({action, uniform_prob});
+    }
+    return outcomes;
+  } else {
+    return kChanceOutcomes;
+  }
 }
 
 std::string BackgammonState::ToString() const {

@@ -78,7 +78,7 @@ action: 10
 # Player cards: 2,3,4,5,13,14,16,25,26,29,31,34,38,41,44,50
 IsTerminal() = False
 History() = [0, 10]
-HistoryString() = "0 10"
+HistoryString() = "0, 10"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 2
@@ -101,7 +101,7 @@ action: 12
 # Player cards: 9,10,15,17,19,21,28,32,35,39,43,46,48,49,51,53
 IsTerminal() = False
 History() = [0, 10, 12]
-HistoryString() = "0 10 12"
+HistoryString() = "0, 10, 12"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -124,7 +124,7 @@ action: 12
 # Player cards: 0,1,6,7,12,18,20,22,23,24,30,36,37,40,42,45
 IsTerminal() = False
 History() = [0, 10, 12, 12]
-HistoryString() = "0 10 12 12"
+HistoryString() = "0, 10, 12, 12"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -147,7 +147,7 @@ action: 0
 # Player cards: 2,3,4,5,13,14,16,25,26,29,31,34,38,41,44,50
 IsTerminal() = False
 History() = [0, 10, 12, 12, 0]
-HistoryString() = "0 10 12 12 0"
+HistoryString() = "0, 10, 12, 12, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 2
@@ -170,7 +170,7 @@ action: 0
 # Player cards: 9,10,15,17,19,21,28,32,35,39,43,46,48,49,51,53
 IsTerminal() = False
 History() = [0, 10, 12, 12, 0, 0]
-HistoryString() = "0 10 12 12 0 0"
+HistoryString() = "0, 10, 12, 12, 0, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -194,7 +194,7 @@ action: 12
 # Trick cards:
 IsTerminal() = False
 History() = [0, 10, 12, 12, 0, 0, 12]
-HistoryString() = "0 10 12 12 0 0 12"
+HistoryString() = "0, 10, 12, 12, 0, 0, 12"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -218,7 +218,7 @@ action: 53
 # Trick cards: 53
 IsTerminal() = False
 History() = [0, 10, 12, 12, 0, 0, 12, 53]
-HistoryString() = "0 10 12 12 0 0 12 53"
+HistoryString() = "0, 10, 12, 12, 0, 0, 12, 53"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -242,7 +242,7 @@ action: 0
 # Trick cards: 53,0
 IsTerminal() = False
 History() = [0, 10, 12, 12, 0, 0, 12, 53, 0]
-HistoryString() = "0 10 12 12 0 0 12 53 0"
+HistoryString() = "0, 10, 12, 12, 0, 0, 12, 53, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 2
@@ -264,7 +264,7 @@ action: 50
 # Current player: -4
 IsTerminal() = True
 History() = [0, 10, 12, 12, 0, 0, 12, 53, 0, 50]
-HistoryString() = "0 10 12 12 0 0 12 53 0 50"
+HistoryString() = "0, 10, 12, 12, 0, 0, 12, 53, 0, 50"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4

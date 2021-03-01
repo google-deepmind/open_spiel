@@ -148,6 +148,9 @@ class NFSP(rl_agent.AbstractAgent):
     yield
     self._mode = previous_mode
 
+  def get_step_counter(self):
+    return self._step_counter
+
   def _sample_episode_policy(self):
     if np.random.rand() < self._anticipatory_param:
       self._mode = MODE.best_response
@@ -315,7 +318,7 @@ class NFSP(rl_agent.AbstractAgent):
     """
     for name, saver in self._savers:
       full_checkpoint_dir = self._full_checkpoint_name(checkpoint_dir, name)
-      logging.info("Restoring checkpoint: %s", (full_checkpoint_dir))
+      logging.info("Restoring checkpoint: %s", full_checkpoint_dir)
       saver.restore(self._session, full_checkpoint_dir)
 
 

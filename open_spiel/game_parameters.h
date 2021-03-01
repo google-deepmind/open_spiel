@@ -37,6 +37,10 @@ std::string GameParametersToString(const GameParameters& game_params);
 GameParameter GameParameterFromString(const std::string& str);
 GameParameters GameParametersFromString(const std::string& game_string);
 
+inline constexpr const char* kDefaultNameDelimiter = "=";
+inline constexpr const char* kDefaultParameterDelimiter = "|||";
+inline constexpr const char* kDefaultInternalDelimiter = "***";
+
 class GameParameter {
  public:
   enum class Type { kUnset = -1, kInt, kDouble, kString, kBool, kGame };
@@ -98,8 +102,9 @@ class GameParameter {
   std::string ToReprString() const;
 
   // Everything necessary to reconstruct the parameter in string form:
-  // type/value/is_mandatory.
-  std::string Serialize(const std::string& delimiter = "/") const;
+  // type <delimiter> value <delimiter> is_mandatory.
+  std::string Serialize(
+      const std::string& delimiter = kDefaultInternalDelimiter) const;
 
   int int_value() const {
     SPIEL_CHECK_TRUE(type_ == Type::kInt);
@@ -127,36 +132,11 @@ class GameParameter {
   }
 
   // Access values via param.value<T>().
+  // There are explicit specializations of this function that call the
+  // ***_value() functions above, however they are defined in game_parameters.cc
+  // to avoid compilation problems on some older compilers.
   template <typename T>
   T value() const;
-  template <>
-  int value() const {
-    return int_value();
-  }
-  template <>
-  double value() const {
-    return double_value();
-  }
-  template <>
-  const std::string& value() const {
-    return string_value();
-  }
-  template <>
-  std::string value() const {
-    return string_value();
-  }
-  template <>
-  bool value() const {
-    return bool_value();
-  }
-  template <>
-  const std::map<std::string, GameParameter>& value() const {
-    return game_value();
-  }
-  template <>
-  std::map<std::string, GameParameter> value() const {
-    return game_value();
-  }
 
   bool operator==(const GameParameter& rhs) const {
     switch (type_) {
@@ -200,13 +180,16 @@ std::string GameParameterTypeToString(const GameParameter::Type& type);
 // param_name=type/value/is_mandatory|param_name_2=type2/value2/is_mandatory2
 // assumes none of the delimeters appears in the string values
 std::string SerializeGameParameters(
-    const GameParameters& game_params, const std::string& name_delimiter = "=",
-    const std::string& parameter_delimeter = "|");
+    const GameParameters& game_params,
+    const std::string& name_delimiter = kDefaultNameDelimiter,
+    const std::string& parameter_delimeter = kDefaultParameterDelimiter);
 GameParameters DeserializeGameParameters(
-    const std::string& data, const std::string& name_delimiter = "=",
-    const std::string& parameter_delimeter = "|");
-GameParameter DeserializeGameParameter(const std::string& data,
-                                       const std::string& delimiter = "/");
+    const std::string& data,
+    const std::string& name_delimiter = kDefaultNameDelimiter,
+    const std::string& parameter_delimeter = kDefaultParameterDelimiter);
+GameParameter DeserializeGameParameter(
+    const std::string& data,
+    const std::string& delimiter = kDefaultInternalDelimiter);
 
 inline bool IsParameterSpecified(const GameParameters& table,
                                  const std::string& key) {

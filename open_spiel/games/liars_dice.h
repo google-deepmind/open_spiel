@@ -28,12 +28,27 @@
 // Currently only supports a single round and two players.
 //
 // Parameters:
-//   "players"     int    number of players                      (default = 2)
-//   "numdice"     int    number of dice per player              (default = 1)
-//   "numdiceX"    int    overridden number of dice for player X (default = 1)
+//   "bidding_rule" string   bidding variants ("reset-face" or
+//                           ("reset-quantity")              (def. "reset-face")
+//   "dice_sides"   int      number of sides on each die            (def. = 6)
+//   "numdice"      int      number of dice per player              (def. = 1)
+//   "numdiceX"     int      overridden number of dice for player X (def. = 1)
+//   "players"      int      number of players                      (def. = 2)
 
 namespace open_spiel {
 namespace liars_dice {
+
+enum BiddingRule {
+  // The player may bid a higher quantity of any particular face, or the same
+  // quantity of a higher face (allowing a player to "re-assert" a face value
+  // they believe prevalent if another player increased the face value on their
+  // bid).
+  kResetFace = 1,
+
+  // The player may bid a higher quantity of the same face, or any particular
+  // quantity of a higher face (allowing a player to "reset" the quantity).
+  kResetQuantity = 2
+};
 
 class LiarsDiceGame;
 
@@ -64,6 +79,17 @@ class LiarsDiceState : public State {
 
  private:
   void ResolveWinner();
+
+  // Get the quantity and face of the bid from an integer. The format of the
+  // return depends on the bidding rule.
+  // The bids starts at 0 and go to total_dice*dice_sides-1 (inclusive).
+  std::pair<int, int> UnrankBid(int bid) const;
+
+  // Return number of sides on the dice.
+  const int dice_sides() const;
+
+  // Return the bidding rule used by the game.
+  const BiddingRule bidding_rule() const;
 
   // Initialized to invalid values. Use Game::NewInitialState().
   Player cur_player_;  // Player whose turn it is.
@@ -109,9 +135,8 @@ class LiarsDiceGame : public Game {
   // Return the total number of dice in the game.
   int total_num_dice() const { return total_num_dice_; }
 
-  // Get the quantity and face of the bid from an integer.
-  // The bids starts at 1 and go to total_dice*6+1.
-  static std::pair<int, int> GetQuantityFace(int bid, int total_dice);
+  const int dice_sides() const { return dice_sides_; }
+  const BiddingRule bidding_rule() const { return bidding_rule_; }
 
  private:
   // Number of players.
@@ -122,8 +147,9 @@ class LiarsDiceGame : public Game {
 
   std::vector<int> num_dice_;  // How many dice each player has.
   int max_dice_per_player_;    // Maximum value in num_dice_ vector.
+  const int dice_sides_;       // Number of faces on each die.
+  const BiddingRule bidding_rule_;
 };
-
 }  // namespace liars_dice
 }  // namespace open_spiel
 

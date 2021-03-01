@@ -31,14 +31,14 @@ _TIC_TAC_TOE_STATES = [
         # ...
         # xoo
         # ..x
-        "state": "3 4 8 5",
+        "state": "3, 4, 8, 5",
         "legal_actions": (0, 1, 2, 6, 7)
     },
     {
         # xo.
         # oxx
         # o..
-        "state": "4 1 0 3 5 6",
+        "state": "4, 1, 0, 3, 5, 6",
         "legal_actions": (2, 7, 8)
     },
     {

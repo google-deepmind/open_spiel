@@ -69,6 +69,7 @@ class TradeCommState : public State {
   std::string ObservationString(Player player) const override;
   void ObservationTensor(Player player,
                          absl::Span<float> values) const override;
+  std::string InformationStateString(Player player) const override;
 
   std::unique_ptr<State> Clone() const override;
   std::vector<Action> LegalActions() const override;

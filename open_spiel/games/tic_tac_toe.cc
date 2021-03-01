@@ -141,9 +141,9 @@ bool TicTacToeState::IsTerminal() const {
 }
 
 std::vector<double> TicTacToeState::Returns() const {
-  if (outcome_ == Player{0}) {
+  if (HasLine(Player{0})) {
     return {1.0, -1.0};
-  } else if (outcome_ == Player{1}) {
+  } else if (HasLine(Player{1})) {
     return {-1.0, 1.0};
   } else {
     return {0.0, 0.0};

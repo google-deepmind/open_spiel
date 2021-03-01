@@ -45,8 +45,16 @@ constexpr uint8_t kMaxUniversalPokerPlayers = 10;
 
 // This is the mapping from int to action. E.g. the legal action "0" is fold,
 // the legal action "1" is check/call, etc.
-enum ActionType { kFold = 0, kCall = 1, kBet = 2, kAllIn = 3, kDeal = 4 };
-enum BettingAbstraction { kFCPA = 0, kFC = 1, kFULLGAME = 2 };
+enum ActionType {
+  kFold = 0,
+  kCall = 1,
+  kBet = 2,
+  kAllIn = 3,
+  kDeal = 4,
+  kHalfPot = 5
+};
+
+enum BettingAbstraction { kFCPA = 0, kFC = 1, kFULLGAME = 2, kFCHPA = 3 };
 
 enum StateActionType {
   ACTION_DEAL = 1,
@@ -84,6 +92,21 @@ class UniversalPokerState : public State {
   // Used to make UpdateIncrementalStateDistribution much faster.
   std::unique_ptr<HistoryDistribution> GetHistoriesConsistentWithInfostate(
       int player_id) const override;
+  std::vector<Action> ActionsConsistentWithInformationFrom(
+      Action action) const override {
+    return {action};
+  }
+
+  const acpc_cpp::ACPCState &acpc_state() const { return acpc_state_; }
+  const BettingAbstraction &betting() const { return betting_abstraction_; }
+
+  // TODO(author1): If this is slow, cache it.
+  // Returns the raise-to size of a pot bet. Multiple determines the size; e.g.
+  // a double pot bet would have multiple = 2.
+  int PotSize(double multiple = 1.) const;
+
+  // Returns the raise-to size of the current player going all-in.
+  int AllInSize() const;
 
  protected:
   void DoApplyAction(Action action_id) override;
@@ -157,8 +180,6 @@ class UniversalPokerState : public State {
   // The current player >= 0 otherwise.
   Player cur_player_;
   uint32_t possibleActions_;
-  int32_t potSize_ = 0;
-  int32_t allInSize_ = 0;
   std::string actionSequence_;
 
   BettingAbstraction betting_abstraction_;
@@ -237,6 +258,11 @@ class UniformRestrictedActions : public Policy {
   const absl::flat_hash_set<ActionType> actions_;
   const ActionType max_action_;
 };
+
+// Converts an ACPC action into one that's compatible with UniversalPokerGame.
+open_spiel::Action ACPCActionToOpenSpielAction(
+    const project_acpc_server::Action &action,
+    const UniversalPokerState &state);
 
 std::ostream &operator<<(std::ostream &os, const BettingAbstraction &betting);
 }  // namespace universal_poker

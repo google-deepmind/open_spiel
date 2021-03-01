@@ -128,7 +128,9 @@ std::string DeepSeaState::ObservationString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  std::string str(size_ * size_, '.');
+  // We need to account for the possibility that `player_row == size_` at
+  // terminal states, so that's why we add the +1.
+  std::string str((size_ + 1) * size_, '.');
   str[player_row_ * size_ + player_col_] = 'x';
   return str;
 }

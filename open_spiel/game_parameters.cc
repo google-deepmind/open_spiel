@@ -153,6 +153,7 @@ GameParameters DeserializeGameParameters(
 
 inline std::string GameParametersToString(const GameParameters& game_params) {
   std::string str;
+  if (game_params.empty()) return "";
   if (game_params.count("name")) str = game_params.at("name").string_value();
   str.push_back('(');
   bool first = true;
@@ -193,6 +194,7 @@ GameParameter GameParameterFromString(const std::string& str) {
 
 GameParameters GameParametersFromString(const std::string& game_string) {
   GameParameters params;
+  if (game_string.empty()) return params;
   int first_paren = game_string.find('(');
   if (first_paren == std::string::npos) {
     params["name"] = GameParameter(game_string);
@@ -239,6 +241,35 @@ std::string GameParameterTypeToString(const GameParameter::Type& type) {
     default:
       SpielFatalError("Invalid GameParameter");
   }
+}
+
+template <>
+int GameParameter::value() const {
+  return int_value();
+}
+template <>
+double GameParameter::value() const {
+  return double_value();
+}
+template <>
+const std::string& GameParameter::value() const {
+  return string_value();
+}
+template <>
+std::string GameParameter::value() const {
+  return string_value();
+}
+template <>
+bool GameParameter::value() const {
+  return bool_value();
+}
+template <>
+const std::map<std::string, GameParameter>& GameParameter::value() const {
+  return game_value();
+}
+template <>
+std::map<std::string, GameParameter> GameParameter::value() const {
+  return game_value();
 }
 
 }  // namespace open_spiel

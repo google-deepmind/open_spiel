@@ -12,6 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
 # Lint as: python3
 """An integration test building and testing open_spiel wheel."""
 import os
@@ -30,8 +44,10 @@ def get_distutils_tempdir():
 @nox.session(python="3")
 def tests(session):
   session.install("-r", "requirements.txt")
-  session.run("python3", "setup.py", "build")
-  session.run("python3", "setup.py", "install")
+  child_env = os.environ.copy()
+  child_env["OPEN_SPIEL_BUILD_ALL"] = "ON"
+  session.run("python3", "setup.py", "build", env=child_env)
+  session.run("python3", "setup.py", "install", env=child_env)
   session.cd(os.path.join("build", get_distutils_tempdir()))
   session.run(
       "ctest", f"-j{4*os.cpu_count()}", "--output-on-failure", external=True)

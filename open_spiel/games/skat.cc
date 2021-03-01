@@ -223,7 +223,7 @@ int Trick::Points() const {
 std::string Trick::ToString() const {
   std::string result = absl::StrFormat("Leader: %d, ", leader_);
   for (auto& card : cards_) {
-    if (card >= 0 < kNumCards)
+    if (card >= 0 && card < kNumCards)
       absl::StrAppendFormat(&result, "%s ", ToCardSymbol(card));
     else
       absl::StrAppendFormat(&result, "%s ", kEmptyCardSymbol);

@@ -35,7 +35,7 @@ void KuhnStateDistributionTest() {
   state->ApplyAction(1);  // player 0 bet
   SPIEL_CHECK_EQ(state->CurrentPlayer(), 1);
   SPIEL_CHECK_EQ(state->InformationStateString(), "1b");
-  HistoryDistribution dist = GetStateDistribution(*state, &uniform_policy);
+  HistoryDistribution dist = GetStateDistribution(*state, uniform_policy);
 
   SPIEL_CHECK_EQ(dist.first.size(), 2);
   SPIEL_CHECK_EQ(dist.second.size(), 2);
@@ -91,12 +91,12 @@ void LeducStateDistributionTest() {
   std::string info_state_string = state->InformationStateString();
   std::string state_history_string = state->HistoryString();
   SPIEL_CHECK_EQ(state->CurrentPlayer(), 1);
-  HistoryDistribution dist = GetStateDistribution(*state, &uniform_policy);
+  HistoryDistribution dist = GetStateDistribution(*state, uniform_policy);
   std::cerr << "Check infostates..." << std::endl;
   CheckDistHasSameInfostate(dist, *state, /*player_id=*/1);
 
   std::unique_ptr<HistoryDistribution> incremental_dist =
-      UpdateIncrementalStateDistribution(*state, &uniform_policy,
+      UpdateIncrementalStateDistribution(*state, uniform_policy,
                                          /*player_id=*/1, nullptr);
   std::cerr << "Comparing dists 1..." << std::endl;
   SPIEL_CHECK_TRUE(incremental_dist);
@@ -128,14 +128,14 @@ void LeducStateDistributionTest() {
   // Now, it's a chance node...
   state->ApplyAction(state->LegalActions()[0]);
   incremental_dist = UpdateIncrementalStateDistribution(
-      *state, &uniform_policy,
+      *state, uniform_policy,
       /*player_id=*/1, std::move(incremental_dist));
   std::cerr << "Check infostates2a..." << std::endl;
   CheckDistHasSameInfostate(*incremental_dist, *state, /*player_id=*/1);
   state->ApplyAction(state->LegalActions()[0]);
-  dist = GetStateDistribution(*state, &uniform_policy);
+  dist = GetStateDistribution(*state, uniform_policy);
   incremental_dist = UpdateIncrementalStateDistribution(
-      *state, &uniform_policy,
+      *state, uniform_policy,
       /*player_id=*/1, std::move(incremental_dist));
   std::cerr << "Check infostates3..." << std::endl;
   CheckDistHasSameInfostate(*incremental_dist, *state, /*player_id=*/1);
@@ -164,13 +164,13 @@ void HUNLIncrementalTest() {
   UniformPolicy uniform_policy;
   std::cerr << "Checking first call..." << std::endl;
   std::unique_ptr<HistoryDistribution> incremental_dist =
-      UpdateIncrementalStateDistribution(*state, &uniform_policy,
+      UpdateIncrementalStateDistribution(*state, uniform_policy,
                                          /*player_id=*/0, /*previous=*/nullptr);
   CheckDistHasSameInfostate(*incremental_dist, *state, /*player_id=*/0);
   std::cerr << "First call passed!" << std::endl;
   state->ApplyAction(1);  // p0 bets pot.
   incremental_dist = UpdateIncrementalStateDistribution(
-      *state, &uniform_policy, /*player_id=*/0, std::move(incremental_dist));
+      *state, uniform_policy, /*player_id=*/0, std::move(incremental_dist));
   CheckDistHasSameInfostate(*incremental_dist, *state, /*player_id=*/0);
 }
 
@@ -182,14 +182,14 @@ void LeducRegressionTest() {
   std::unique_ptr<HistoryDistribution> dist;
   for (const Action action : {0, 5, 1, 2, 1, 4}) {
     if (state->CurrentPlayer() == player_id) {
-      dist = UpdateIncrementalStateDistribution(*state, &opponent_policy,
+      dist = UpdateIncrementalStateDistribution(*state, opponent_policy,
                                                 player_id, std::move(dist));
       algorithms::CheckBeliefs(*state, *dist, player_id);
     }
     state->ApplyAction(action);
   }
-  dist = UpdateIncrementalStateDistribution(*state, &opponent_policy,
-                                              player_id, std::move(dist));
+  dist = UpdateIncrementalStateDistribution(*state, opponent_policy, player_id,
+                                            std::move(dist));
   algorithms::CheckBeliefs(*state, *dist, player_id);
 }
 
@@ -204,13 +204,13 @@ void LeducRegressionTestPerPlayer(int player_id) {
   // that doesn't happen.
   for (const Action action : {4, 0, 2, 2}) {
     if (state->CurrentPlayer() == player_id) {
-      dist = UpdateIncrementalStateDistribution(*state, &opponent_policy,
+      dist = UpdateIncrementalStateDistribution(*state, opponent_policy,
                                                 player_id, std::move(dist));
       algorithms::CheckBeliefs(*state, *dist, player_id);
     }
     state->ApplyAction(action);
   }
-  dist = UpdateIncrementalStateDistribution(*state, &opponent_policy, player_id,
+  dist = UpdateIncrementalStateDistribution(*state, opponent_policy, player_id,
                                             std::move(dist));
   algorithms::CheckBeliefs(*state, *dist, player_id);
 }
@@ -224,7 +224,7 @@ void HunlRegressionTest() {
   for (const Action action : {0, 27, 43, 44, 2}) state->ApplyAction(action);
   UniformPolicy opponent_policy;
   std::unique_ptr<HistoryDistribution> dist =
-      UpdateIncrementalStateDistribution(*state, &opponent_policy,
+      UpdateIncrementalStateDistribution(*state, opponent_policy,
                                          state->CurrentPlayer(), nullptr);
   algorithms::CheckBeliefs(*state, *dist, state->CurrentPlayer());
 }
@@ -236,12 +236,12 @@ void GoofspielDistributionTest() {
   std::unique_ptr<HistoryDistribution> dist;
   UniformPolicy opponent_policy;
   for (const Action action : {3, 3, 2, 1, 1}) {
-    dist = UpdateIncrementalStateDistribution(*state, &opponent_policy,
+    dist = UpdateIncrementalStateDistribution(*state, opponent_policy,
                                               /*player_id=*/0, std::move(dist));
     algorithms::CheckBeliefs(*state, *dist, state->CurrentPlayer());
     state->ApplyAction(action);
   }
-  dist = UpdateIncrementalStateDistribution(*state, &opponent_policy,
+  dist = UpdateIncrementalStateDistribution(*state, opponent_policy,
                                             /*player_id=*/0, std::move(dist));
   algorithms::CheckBeliefs(*state, *dist, /*player_id=*/0);
 }

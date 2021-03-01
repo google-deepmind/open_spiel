@@ -115,7 +115,7 @@ action: 13
 # Action Sequence: dd
 IsTerminal() = False
 History() = [12, 13]
-HistoryString() = "12 13"
+HistoryString() = "12, 13"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -149,7 +149,7 @@ action: 1
 # Action Sequence: ddc
 IsTerminal() = False
 History() = [12, 13, 1]
-HistoryString() = "12 13 1"
+HistoryString() = "12, 13, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -183,7 +183,7 @@ action: 2
 # Action Sequence: ddcp
 IsTerminal() = False
 History() = [12, 13, 1, 2]
-HistoryString() = "12 13 1 2"
+HistoryString() = "12, 13, 1, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -219,7 +219,7 @@ action: 0
 # Action Sequence: ddcpf
 IsTerminal() = True
 History() = [12, 13, 1, 2, 0]
-HistoryString() = "12 13 1 2 0"
+HistoryString() = "12, 13, 1, 2, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4

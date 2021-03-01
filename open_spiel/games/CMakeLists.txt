@@ -5,6 +5,8 @@ set(GAME_SOURCES
   battleship.h
   battleship_types.h
   battleship_types.cc
+  blackjack.cc
+  blackjack.h
   blotto.cc
   blotto.h
   breakthrough.cc
@@ -39,6 +41,8 @@ set(GAME_SOURCES
   cursor_go.h
   dark_chess.cc
   dark_chess.h
+  dark_hex.cc
+  dark_hex.h
   deep_sea.cc
   deep_sea.h
   efg_game.cc
@@ -100,6 +104,8 @@ set(GAME_SOURCES
   pig.h
   quoridor.cc
   quoridor.h
+  sheriff.cc
+  sheriff.h
   skat.cc
   skat.h
   solitaire.cc
@@ -219,6 +225,10 @@ add_executable(battleship_test battleship_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(battleship_test battleship_test)
 
+add_executable(blackjack_test blackjack_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(blackjack_test blackjack_test)
+
 add_executable(blotto_test blotto_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(blotto_test blotto_test)
@@ -275,6 +285,10 @@ add_test(cursor_go_test cursor_go_test)
 add_executable(dark_chess_test dark_chess_test.cc ${OPEN_SPIEL_OBJECTS}
         $<TARGET_OBJECTS:tests>)
 add_test(dark_chess_test dark_chess_test)
+
+add_executable(dark_hex_test dark_hex_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(dark_hex_test dark_hex_test)
 
 add_executable(deep_sea_test deep_sea_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
@@ -390,6 +404,10 @@ add_test(pig_test pig_test)
 add_executable(quoridor_test quoridor_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(quoridor_test quoridor_test)
+
+add_executable(sheriff_test sheriff_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(sheriff_test sheriff_test)
 
 add_executable(skat_test skat_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)

@@ -74,7 +74,7 @@ action: 1
 # Player 1 possible: d0 d1
 IsTerminal() = False
 History() = [0, 1]
-HistoryString() = "0 1"
+HistoryString() = "0, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -97,7 +97,7 @@ action: 2
 # Player 1 possible: d0 d1
 IsTerminal() = False
 History() = [0, 1, 2]
-HistoryString() = "0 1 2"
+HistoryString() = "0, 1, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -120,7 +120,7 @@ action: 1
 # Player 1 unassigned: d0 d1
 IsTerminal() = False
 History() = [0, 1, 2, 1]
-HistoryString() = "0 1 2 1"
+HistoryString() = "0, 1, 2, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -143,7 +143,7 @@ action: 2
 # Player 1 unassigned: d1
 IsTerminal() = False
 History() = [0, 1, 2, 1, 2]
-HistoryString() = "0 1 2 1 2"
+HistoryString() = "0, 1, 2, 1, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -163,7 +163,7 @@ action: 2
 # Player 1 possible: d0 d1
 IsTerminal() = True
 History() = [0, 1, 2, 1, 2, 2]
-HistoryString() = "0 1 2 1 2 2"
+HistoryString() = "0, 1, 2, 1, 2, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
