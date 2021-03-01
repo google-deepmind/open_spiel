@@ -22,30 +22,23 @@ namespace {
 
 namespace testing = open_spiel::testing;
 
-void BasicDarkChessTests() {
-  testing::LoadGameTest("dark_chess");
-  testing::NoChanceOutcomesTest(*LoadGame("dark_chess"));
-  testing::RandomSimTest(*LoadGame("dark_chess"), 100);
-}
-
-void SmallBoardDarkChessTests() {
+void BasicDarkChessTests(int board_size) {
   GameParameters params;
-  params["board_size"] = GameParameter(4);
+  params["board_size"] = GameParameter(board_size);
 
   testing::LoadGameTest("dark_chess");
   testing::NoChanceOutcomesTest(*LoadGame("dark_chess", params));
-  testing::RandomSimTest(*LoadGame("dark_chess", params), 200);
+  testing::RandomSimTest(*LoadGame("dark_chess", params), 100);
 }
 
-void ChessBoardTest(bool king_in_check_allowed) {
-  auto tested_move = chess::Move({3, 0},
-                                 {2, 0},
+void ChessBoardFlagPropagationTest(bool flag_king_in_check_allowed) {
+  auto tested_move = chess::Move(/*from=*/{3, 0}, /*to=*/{2, 0},
                                  {chess::Color::kWhite,
                                   chess::PieceType::kKing});
 
   auto board = chess::ChessBoard::BoardFromFEN("1kr1/4/4/3K w - - 0 1",
-                                               4,
-                                               king_in_check_allowed);
+                                               /*board_size=*/4,
+                                               flag_king_in_check_allowed);
   bool move_allowed = false;
   board->GenerateLegalMoves([&move_allowed, tested_move]
                                 (const chess::Move&found_move) {
@@ -56,7 +49,7 @@ void ChessBoardTest(bool king_in_check_allowed) {
     return true;
   });
 
-  SPIEL_CHECK_EQ(move_allowed, king_in_check_allowed);
+  SPIEL_CHECK_EQ(move_allowed, flag_king_in_check_allowed);
 }
 
 }  // namespace
@@ -64,8 +57,11 @@ void ChessBoardTest(bool king_in_check_allowed) {
 }  // namespace open_spiel
 
 int main(int argc, char** argv) {
-  open_spiel::dark_chess::BasicDarkChessTests();
-  open_spiel::dark_chess::SmallBoardDarkChessTests();
-  open_spiel::dark_chess::ChessBoardTest(true);
-  open_spiel::dark_chess::ChessBoardTest(false);
+  open_spiel::dark_chess::BasicDarkChessTests(/*board_size=*/4);
+  open_spiel::dark_chess::BasicDarkChessTests(/*board_size=*/8);
+
+  open_spiel::dark_chess::ChessBoardFlagPropagationTest(
+      /*flag_king_in_check_allowed=*/true);
+  open_spiel::dark_chess::ChessBoardFlagPropagationTest(
+      /*flag_king_in_check_allowed=*/false);
 }
