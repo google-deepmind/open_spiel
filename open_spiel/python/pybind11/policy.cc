@@ -226,13 +226,18 @@ void init_pyspiel_policy(py::module& m) {
       "games, and raises a SpielFatalError if an incompatible game is passed "
       "to it.");
 
-  m.def("nash_conv", py::overload_cast<const Game&, const Policy&>(&NashConv),
-        "Returns the sum of the utility that a best responder wins when when "
-        "playing against 1) the player 0 policy contained in `policy` and 2) "
-        "the player 1 policy contained in `policy`."
-        "This only works for two player, zero- or constant-sum sequential "
-        "games, and raises a SpielFatalError if an incompatible game is passed "
-        "to it.");
+  m.def("nash_conv",
+        py::overload_cast<const Game&, const Policy&, bool>(&NashConv),
+        "Calculates a measure of how far the given policy is from a Nash "
+        "equilibrium by returning the sum of the improvements in the value "
+        "that each player could obtain by unilaterally changing their strategy "
+        "while the opposing player maintains their current strategy (which "
+        "for a Nash equilibrium, this value is 0). The third parameter is to "
+        "indicate whether to use the Policy::GetStatePolicy(const State&) "
+        "instead of Policy::GetStatePolicy(const std::string& info_state) for "
+        "computation of the on-policy expected values.",
+        py::arg("game"), py::arg("policy"),
+        py::arg("use_state_get_policy") = false);
 
   m.def(
       "nash_conv",
