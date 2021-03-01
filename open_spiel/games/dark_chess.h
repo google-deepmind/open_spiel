@@ -166,16 +166,21 @@ class DarkChessGame : public Game {
   double MaxUtility() const override { return WinUtility(); }
   std::vector<int> ObservationTensorShape() const override {
     std::vector<int> shape{
-        14 /* piece types * colours + empty + unknown - private info*/ +
-        13 /* piece types * colours + empty - public info*/ +
-        1 /* repetition count */ +
-        1 /* side to move */ +
-        1 /* irreversible move counter */ +
-        2 /* castling rights */,
-        board_size_, board_size_};
+        (13 + // public boards:  piece types * colours + empty
+         14 ) // private boards: piece types * colours + empty + unknown
+         * board_size_ * board_size_ +
+        3 + // public: repetitions count, one-hot encoding
+        2 + // public: side to play
+        1 + // public: irreversible move counter -- a fraction of $n over 100
+        2*2 // private: left/right castling rights, one-hot encoded.
+    };
     return shape;
   }
   int MaxGameLength() const override { return chess::MaxGameLength(); }
+  std::shared_ptr<Observer> MakeObserver(
+      absl::optional<IIGObservationType> iig_obs_type,
+      const GameParameters& params) const;
+
 
   std::shared_ptr<DarkChessObserver> default_observer_;
   std::shared_ptr<DarkChessObserver> info_state_observer_;

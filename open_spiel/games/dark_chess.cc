@@ -55,124 +55,125 @@ std::shared_ptr<const Game> Factory(const GameParameters &params) {
 
 REGISTER_SPIEL_GAME(kGameType, Factory)
 
-chess::ObservationTable ComputePrivateInfoTable(const chess::ChessBoard&board,
-                                                chess::Color color,
-                                                chess::ObservationTable
-                                                &publicInfoTable) {
-  int board_size = board.BoardSize();
+chess::ObservationTable ComputePrivateInfoTable(
+    const chess::ChessBoard& board, chess::Color color,
+    const chess::ObservationTable& public_info_table) {
+  const int board_size = board.BoardSize();
   chess::ObservationTable observability_table{false};
-  board.GenerateLegalMoves([&](const chess::Move &move) -> bool {
+  board.GenerateLegalMoves([&](const chess::Move& move) -> bool {
 
-    size_t to_index = chess::SquareToIndex(move.to, board_size);
-    if (!publicInfoTable[to_index]) observability_table[to_index] = true;
+      size_t to_index = chess::SquareToIndex(move.to, board_size);
+      if (!public_info_table[to_index]) observability_table[to_index] = true;
 
-    if (move.to == board.EpSquare()
-    && move.piece.type == chess::PieceType::kPawn) {
-      int8_t reversed_y_direction = color == chess::Color::kWhite ? -1 : 1;
-      chess::Square en_passant_capture =
-          move.to + chess::Offset{0, reversed_y_direction};
-      size_t index = chess::SquareToIndex(en_passant_capture, board_size);
-      if (!publicInfoTable[index]) observability_table[index] = true;
-    }
-    return true;
+      if (move.to == board.EpSquare()
+          && move.piece.type == chess::PieceType::kPawn) {
+        int8_t reversed_y_direction = color == chess::Color::kWhite ? -1 : 1;
+        chess::Square en_passant_capture =
+            move.to + chess::Offset{0, reversed_y_direction};
+        size_t index = chess::SquareToIndex(en_passant_capture, board_size);
+        if (!public_info_table[index]) observability_table[index] = true;
+      }
+      return true;
   }, color);
 
   for (int8_t y = 0; y < board_size; ++y) {
     for (int8_t x = 0; x < board_size; ++x) {
       chess::Square sq{x, y};
-      auto &piece = board.at(sq);
+      const auto& piece = board.at(sq);
       if (piece.color == color) {
         size_t index = chess::SquareToIndex(sq, board_size);
-        if (!publicInfoTable[index]) observability_table[index] = true;
+        if (!public_info_table[index]) observability_table[index] = true;
       }
     }
   }
   return observability_table;
 }
 
-// Checks whether the defender is under attack from the attacker when we know
-// that attacker is under attack from the defender
+// Checks whether the defender is under attack from the attacker,
+// for the special case when we already know that attacker is under attack
+// from the defender.
+// I.e.  D -> A, but D <-? A  (where arrow is the "under attack relation")
+// This is used for computation of the public info table.
 bool IsUnderAttack(const chess::Square defender_sq,
                    const chess::Piece defender_piece,
                    const chess::Square attacker_sq,
                    const chess::Piece attacker_piece) {
-
+  // Identity: i.e. we only check distinct piece types from now on.
   if (defender_piece.type == attacker_piece.type) {
     return true;
   }
-  if (attacker_piece.type == chess::PieceType::kEmpty
-      || defender_piece.type == chess::PieceType::kKnight) {
+  // No need to check empty attackers from now on.
+  if (attacker_piece.type == chess::PieceType::kEmpty) {
     return false;
   }
 
-  if (defender_piece.type == chess::PieceType::kPawn) {
-    return attacker_piece.type == chess::PieceType::kBishop
-           || attacker_piece.type == chess::PieceType::kQueen
-           || attacker_piece.type == chess::PieceType::kKing;
-  }
-  if (defender_piece.type == chess::PieceType::kKing) {
-    if (attacker_piece.type == chess::PieceType::kQueen) {
-      return true;
-    }
-    if (attacker_piece.type == chess::PieceType::kBishop) {
-      return abs(attacker_sq.x - defender_sq.x) >= 1
-             && abs(attacker_sq.y - defender_sq.y) >= 1;
-    }
-    if (attacker_piece.type == chess::PieceType::kRook) {
+  const auto pawn_attack = [&]() {
+      int8_t y_dir = attacker_piece.color == chess::Color::kWhite ? 1 : -1;
+      return defender_sq == attacker_sq + chess::Offset{1, y_dir}
+          || defender_sq == attacker_sq + chess::Offset{-1, y_dir};
+  };
+  const auto king_attack = [&]() {
+      return abs(attacker_sq.x - defender_sq.x) <= 1
+          && abs(attacker_sq.y - defender_sq.y) <= 1;
+  };
+  const auto rook_attack = [&]() {
       return abs(attacker_sq.x - defender_sq.x) == 0
-             || abs(attacker_sq.y - defender_sq.y) == 0;
-    }
-    if (attacker_piece.type == chess::PieceType::kPawn) {
-      int8_t y_dir = attacker_piece.color == chess::Color::kWhite ? 1 : -1;
-      return defender_sq == attacker_sq + chess::Offset{1, y_dir}
-             || defender_sq == attacker_sq + chess::Offset{-1, y_dir};
-    }
-    return false;
-  }
-  if (defender_piece.type == chess::PieceType::kRook) {
-    if (attacker_piece.type == chess::PieceType::kQueen) {
-      return true;
-    }
-    if (attacker_piece.type == chess::PieceType::kKing) {
-      return abs(attacker_sq.x - defender_sq.x) <= 1
-             && abs(attacker_sq.y - defender_sq.y) <= 1;
-    }
-    return false;
-  }
-  if (defender_piece.type == chess::PieceType::kBishop) {
-    if (attacker_piece.type == chess::PieceType::kQueen) {
-      return true;
-    }
-    if (attacker_piece.type == chess::PieceType::kKing) {
-      return abs(attacker_sq.x - defender_sq.x) <= 1
-             && abs(attacker_sq.y - defender_sq.y) <= 1;
-    }
-    if (attacker_piece.type == chess::PieceType::kPawn) {
-      int8_t y_dir = attacker_piece.color == chess::Color::kWhite ? 1 : -1;
-      return defender_sq == attacker_sq + chess::Offset{1, y_dir}
-             || defender_sq == attacker_sq + chess::Offset{-1, y_dir};
-    }
-    return false;
-  }
-  if (defender_piece.type == chess::PieceType::kQueen) {
-    if (attacker_piece.type == chess::PieceType::kBishop) {
+          || abs(attacker_sq.y - defender_sq.y) == 0;
+  };
+  const auto bishop_attack = [&]() {
       return abs(attacker_sq.x - defender_sq.x) >= 1
-             && abs(attacker_sq.y - defender_sq.y) >= 1;
-    }
-    if (attacker_piece.type == chess::PieceType::kRook) {
-      return abs(attacker_sq.x - defender_sq.x) == 0
-             || abs(attacker_sq.y - defender_sq.y) == 0;
-    }
-    if (attacker_piece.type == chess::PieceType::kKing) {
-      return abs(attacker_sq.x - defender_sq.x) <= 1
-             && abs(attacker_sq.y - defender_sq.y) <= 1;
-    }
-    if (attacker_piece.type == chess::PieceType::kPawn) {
-      int8_t y_dir = attacker_piece.color == chess::Color::kWhite ? 1 : -1;
-      return defender_sq == attacker_sq + chess::Offset{1, y_dir}
-             || defender_sq == attacker_sq + chess::Offset{-1, y_dir};
-    }
-    return false;
+          && abs(attacker_sq.y - defender_sq.y) >= 1;
+  };
+
+  switch (defender_piece.type) {
+    case chess::PieceType::kEmpty:
+      SpielFatalError("Empty squares cannot be already attacking.");
+
+    case chess::PieceType::kKing:
+      switch (attacker_piece.type) {
+        case chess::PieceType::kQueen:   return true;
+        case chess::PieceType::kRook:    return rook_attack();
+        case chess::PieceType::kBishop:  return bishop_attack();
+        case chess::PieceType::kKnight:  return false;
+        case chess::PieceType::kPawn:    return pawn_attack();
+        default:                         SpielFatalError("Exhausted match");
+      }
+
+    case chess::PieceType::kQueen:
+      switch (attacker_piece.type) {
+        case chess::PieceType::kKing:    return king_attack();
+        case chess::PieceType::kRook:    return rook_attack();
+        case chess::PieceType::kBishop:  return bishop_attack();
+        case chess::PieceType::kKnight:  return false;
+        case chess::PieceType::kPawn:    return pawn_attack();
+        default:                         SpielFatalError("Exhausted match");
+      }
+
+    case chess::PieceType::kRook:
+      switch (attacker_piece.type) {
+        case chess::PieceType::kKing:    return king_attack();
+        case chess::PieceType::kQueen:   return true;
+        default:                         return false;
+      }
+
+    case chess::PieceType::kBishop:
+      switch (attacker_piece.type) {
+        case chess::PieceType::kKing:    return king_attack();
+        case chess::PieceType::kQueen:   return true;
+        case chess::PieceType::kPawn:    return pawn_attack();
+        default:                         return false;
+      }
+
+    case chess::PieceType::kKnight:      return false;
+
+    case chess::PieceType::kPawn:
+      return attacker_piece.type == chess::PieceType::kKing
+          || attacker_piece.type == chess::PieceType::kQueen
+          || attacker_piece.type == chess::PieceType::kBishop;
+
+    default:
+      // This should not happen, we cover all the possibilities.
+      SpielFatalError("Exhausted pattern match in dark_chess::IsUnderAttack()");
   }
 }
 
@@ -180,12 +181,12 @@ bool IsUnderAttack(const chess::Square defender_sq,
 // them. Only squares of two opponent pieces of the same type attacking each
 // other.
 chess::ObservationTable ComputePublicInfoTable(const chess::ChessBoard &board) {
-  int board_size = board.BoardSize();
+  const int board_size = board.BoardSize();
   std::array<bool, chess::k2dMaxBoardSize> observability_table{false};
   board.GenerateLegalMoves([&](const chess::Move &move) -> bool {
 
-    auto from_piece = board.at(move.from);
-    auto to_piece = board.at(move.to);
+    const chess::Piece& from_piece = board.at(move.from);
+    const chess::Piece& to_piece = board.at(move.to);
 
     if (IsUnderAttack(move.from, from_piece, move.to, to_piece)) {
 
@@ -195,6 +196,7 @@ chess::ObservationTable ComputePublicInfoTable(const chess::ChessBoard &board) {
       size_t to_index = chess::SquareToIndex(move.to, board_size);
       observability_table[to_index] = true;
 
+      // Fill the table also between the indices.
       if (from_piece.type != chess::PieceType::kKnight) {
         int offset_x = 0;
         int offset_y = 0;
@@ -244,16 +246,20 @@ class DarkChessObserver : public Observer {
           "Dark chess observer tensor with perfect recall not implemented");
     }
 
-    auto common_knowledge_table = ComputePublicInfoTable(state.Board());
+    const auto public_info_table = ComputePublicInfoTable(state.Board());
 
     if (iig_obs_type_.public_info) {
-      WritePublicInfoTensor(state, common_knowledge_table, allocator);
+      WritePublicInfoTensor(state, public_info_table, allocator);
     }
     if (iig_obs_type_.private_info == PrivateInfoType::kSinglePlayer) {
-      WritePrivateInfoTensor(state, common_knowledge_table, player, allocator);
+      std::string prefix = "private";
+      WritePrivateInfoTensor(state, public_info_table, player,
+                             prefix, allocator);
     } else if (iig_obs_type_.private_info == PrivateInfoType::kAllPlayers) {
       for (int i = 0; i < chess::NumPlayers(); ++i) {
-        WritePrivateInfoTensor(state, common_knowledge_table, i, allocator);
+        chess::Color color = chess::PlayerToColor(player);
+        std::string prefix = chess::ColorToString(color);
+        WritePrivateInfoTensor(state, public_info_table, i, prefix, allocator);
       }
     }
   }
@@ -264,16 +270,15 @@ class DarkChessObserver : public Observer {
     auto &game = open_spiel::down_cast<const DarkChessGame &>(*state.GetGame());
     SPIEL_CHECK_GE(player, 0);
     SPIEL_CHECK_LT(player, game.NumPlayers());
-    std::string result;
 
     if (iig_obs_type_.perfect_recall) {
       if (iig_obs_type_.public_info
           && iig_obs_type_.private_info == PrivateInfoType::kSinglePlayer) {
         return state.aohs_[player].ToString();
       } else {
-        SpielFatalError("Dark chess observer string with perfect recall is"
-                        "implemented only for the default info state"
-                        "observation type");
+        SpielFatalError(
+            "DarkChessObserver: string with perfect recall is implemented only"
+            " for the (default) info state observation type.");
       }
     }
 
@@ -286,8 +291,8 @@ class DarkChessObserver : public Observer {
       return state.Board().ToDarkFEN(obs_table, color);
     } else {
       SpielFatalError(
-          "Dark chess observer string with imperfect recall is implemented only"
-          "for the default observation type");
+          "DarkChessObserver: string with imperfect recall is implemented only"
+          " for the (default) observation type.");
     }
 
   }
@@ -296,115 +301,94 @@ class DarkChessObserver : public Observer {
 
   void WritePieces(chess::Color color,
                    chess::PieceType piece_type,
-                   const chess::ChessBoard &board,
-                   chess::ObservationTable &observability_table,
-                   std::string prefix,
-                   Allocator *allocator) const {
+                   const chess::ChessBoard& board,
+                   const chess::ObservationTable& observability_table,
+                   const std::string& prefix,
+                   Allocator* allocator) const {
 
-    std::string type_string =
-        color == chess::Color::kEmpty ? "empty" : chess::PieceTypeToString(
-            piece_type,color == chess::Color::kWhite);
+    const std::string type_string = color == chess::Color::kEmpty
+        ? "empty"
+        : chess::PieceTypeToString(piece_type,
+                                   /*uppercase=*/color == chess::Color::kWhite);
+    const int board_size = board.BoardSize();
 
-    auto out = allocator->Get(prefix + "_ " + type_string + "_pieces",
-                              {board.BoardSize(), board.BoardSize()});
-    for (int8_t y = 0; y < board.BoardSize(); ++y) {
-      for (int8_t x = 0; x < board.BoardSize(); ++x) {
-        auto square = chess::Square{x, y};
-        chess::Piece piece_on_board = board.at(square);
-        out.at(x, y) = (piece_on_board.color == color
-                        && piece_on_board.type == piece_type
-                        && observability_table[
-                            chess::SquareToIndex(square, board.BoardSize())]
-                        ? 1.0f
-                        : 0.0f);
-      }
-    }
-  }
-
-  void WriteUnknownSquares(const chess::ChessBoard &board,
-                           chess::ObservationTable &observability_table,
-                           Allocator *allocator) const {
-
-    auto out = allocator->Get("unknown_squares",
-                              {board.BoardSize(), board.BoardSize()});
-    for (int8_t y = 0; y < board.BoardSize(); ++y) {
-      for (int8_t x = 0; x < board.BoardSize(); ++x) {
-        auto square = chess::Square{x, y};
-        out.at(x, y) =
-            observability_table[chess::SquareToIndex(square, board.BoardSize())]
-            ? 0.0 : 1.0;
-      }
-    }
-  }
-
-  template <typename T>
-  void WriteScalar(int board_size, T val, T min, T max, Allocator *allocator,
-                   const std::string &name) const {
-
-    double normalized_val = static_cast<double>(val - min) / (max - min);
-    auto out = allocator->Get(name, {board_size, board_size});
+    auto out = allocator->Get(prefix + "_" + type_string + "_pieces",
+                              {board_size, board_size});
     for (int8_t y = 0; y < board_size; ++y) {
       for (int8_t x = 0; x < board_size; ++x) {
-        out.at(x, y) = normalized_val;
+        const chess::Square square{x, y};
+        const chess::Piece& piece_on_board = board.at(square);
+        const bool write_square = piece_on_board.color == color
+            && piece_on_board.type == piece_type
+            && observability_table[chess::SquareToIndex(square, board_size)];
+        out.at(x, y) = write_square ? 1.0f : 0.0f;
       }
     }
   }
 
-// Adds a binary scalar plane.
-  void WriteBinary(int board_size, bool val, Allocator *allocator,
-                   const std::string &name) const {
-    WriteScalar<int>(board_size, val ? 1 : 0, 0, 1, allocator, name);
+  void WriteUnknownSquares(const chess::ChessBoard& board,
+                           chess::ObservationTable& observability_table,
+                           const std::string& prefix,
+                           Allocator* allocator) const {
+
+    const int board_size = board.BoardSize();
+    auto out = allocator->Get(prefix + "_unknown_squares",
+                              {board.BoardSize(), board.BoardSize()});
+    for (int8_t y = 0; y < board_size; ++y) {
+      for (int8_t x = 0; x < board_size; ++x) {
+        const chess::Square square{x, y};
+        const bool write_square =
+            observability_table[chess::SquareToIndex(square, board_size)];
+        out.at(x, y) = write_square ? 0.0f : 1.0f;
+      }
+    }
+  }
+
+  void WriteScalar(int val, int min, int max, const std::string& field_name,
+                   Allocator* allocator) const {
+    SPIEL_DCHECK_LT(min, max);
+    SPIEL_DCHECK_GE(val, min);
+    SPIEL_DCHECK_LE(val, max);
+    auto out = allocator->Get(field_name, {max - min + 1});
+    out.at( val - min ) = 1;
+  }
+
+  // Adds a binary scalar plane.
+  void WriteBinary(bool val, const std::string& field_name,
+                   Allocator* allocator) const {
+    WriteScalar(val ? 1 : 0, 0, 1, field_name, allocator);
   }
 
   void WritePrivateInfoTensor(const DarkChessState &state,
-                              chess::ObservationTable &public_info_table,
-                              int player,
+                              const chess::ObservationTable &public_info_table,
+                              int player, const std::string& prefix,
                               Allocator *allocator) const {
     chess::Color color = chess::PlayerToColor(player);
-    std::string color_string = chess::ColorToString(color);
-
-    auto private_info_table =
+    chess::ObservationTable private_info_table =
         ComputePrivateInfoTable(state.Board(), color, public_info_table);
 
     // Piece configuration.
-    for (const auto &piece_type : chess::kPieceTypes) {
-      WritePieces(chess::Color::kWhite,
-                  piece_type,
-                  state.Board(),
-                  private_info_table,
-                  color_string + "_private",
-                  allocator);
-      WritePieces(chess::Color::kBlack,
-                  piece_type,
-                  state.Board(),
-                  private_info_table,
-                  color_string + "_private",
-                  allocator);
+    for (const chess::PieceType& piece_type : chess::kPieceTypes) {
+      WritePieces(chess::Color::kWhite, piece_type, state.Board(),
+                  private_info_table, prefix, allocator);
+      WritePieces(chess::Color::kBlack, piece_type, state.Board(),
+                  private_info_table, prefix, allocator);
     }
-    WritePieces(chess::Color::kEmpty,
-                chess::PieceType::kEmpty,
-                state.Board(),
-                private_info_table,
-                color_string + "_private",
-                allocator);
-    WriteUnknownSquares(state.Board(), private_info_table, allocator);
+    WritePieces(chess::Color::kEmpty, chess::PieceType::kEmpty, state.Board(),
+                private_info_table, prefix, allocator);
+    WriteUnknownSquares(state.Board(), private_info_table, prefix, allocator);
 
     // Castling rights.
-    WriteBinary(state.BoardSize(),
-                state.Board().CastlingRight(color,
-                                            chess::CastlingDirection::kLeft),
-                allocator,
-                "left_castling");
-
-    WriteBinary(state.BoardSize(),
-                state.Board().CastlingRight(color,
-                                            chess::CastlingDirection::kRight),
-                allocator,
-                "right_castling");
+    WriteBinary(
+        state.Board().CastlingRight(color, chess::CastlingDirection::kLeft),
+        prefix + "_left_castling", allocator);
+    WriteBinary(
+        state.Board().CastlingRight(color, chess::CastlingDirection::kRight),
+        prefix + "_right_castling", allocator);
   }
 
   void WritePublicInfoTensor(const DarkChessState &state,
-                             chess::ObservationTable &public_info_table,
+                             const chess::ObservationTable &public_info_table,
                              Allocator *allocator) const {
 
     const auto entry = state.repetitions_.find(state.Board().HashValue());
@@ -412,45 +396,27 @@ class DarkChessObserver : public Observer {
     int repetitions = entry->second;
 
     // Piece configuration.
-    for (const auto &piece_type : chess::kPieceTypes) {
-      WritePieces(chess::Color::kWhite,
-                  piece_type,
-                  state.Board(),
-                  public_info_table,
-                  "public",
-                  allocator);
-      WritePieces(chess::Color::kBlack,
-                  piece_type,
-                  state.Board(),
-                  public_info_table,
-                  "public",
-                  allocator);
+    std::string prefix = "public";
+    for (const chess::PieceType &piece_type : chess::kPieceTypes) {
+      WritePieces(chess::Color::kWhite, piece_type, state.Board(),
+                  public_info_table, prefix, allocator);
+      WritePieces(chess::Color::kBlack, piece_type, state.Board(),
+                  public_info_table, prefix, allocator);
     }
-    WritePieces(chess::Color::kEmpty,
-                chess::PieceType::kEmpty,
-                state.Board(),
-                public_info_table,
-                "public",
-                allocator);
+    WritePieces(chess::Color::kEmpty, chess::PieceType::kEmpty, state.Board(),
+                public_info_table, prefix, allocator);
 
     // Num repetitions for the current board.
-    WriteScalar(state.BoardSize(), repetitions, 1, 3, allocator, "repetitions");
+    WriteScalar(/*val=*/repetitions, /*min=*/1, /*max=*/3, "repetitions",
+                allocator);
 
     // Side to play.
-    WriteScalar(state.Board().BoardSize(),
-                ColorToPlayer(state.Board().ToPlay()),
-                0,
-                1,
-                allocator,
-                "side_to_play");
+    WriteScalar(/*val=*/ColorToPlayer(state.Board().ToPlay()),
+                /*min=*/0, /*max=*/1, "side_to_play", allocator);
 
     // Irreversible move counter.
-    WriteScalar(state.BoardSize(),
-                state.Board().IrreversibleMoveCounter(),
-                0,
-                101,
-                allocator,
-                "move_number");
+    auto out = allocator->Get("irreversible_move_counter", {1});
+    out.at(0) = state.Board().IrreversibleMoveCounter() / 100.;
   }
 
   IIGObservationType iig_obs_type_;
@@ -482,8 +448,8 @@ void DarkChessState::DoApplyAction(Action action) {
   cached_legal_actions_.reset();
 
   for (Player player = 0; player < NumPlayers(); ++player) {
-    auto a = current_player == player ? action : static_cast<std::optional<
-        Action>>(std::nullopt);
+    std::optional<Action> a = {};
+    if (current_player == player) a = action;
     aohs_[player].Extend(a, ObservationString(player));
   }
 }
@@ -565,11 +531,13 @@ bool DarkChessState::IsRepetitionDraw() const {
 
 absl::optional<std::vector<double>> DarkChessState::MaybeFinalReturns() const {
 
-  auto to_play_color = Board().ToPlay();
-  auto opp_color = chess::OppColor(to_play_color);
+  const auto to_play_color = Board().ToPlay();
+  const auto opp_color = chess::OppColor(to_play_color);
 
-  auto to_play_king = chess::Piece{to_play_color, chess::PieceType::kKing};
-  auto opp_king = chess::Piece{opp_color, chess::PieceType::kKing};
+  const auto to_play_king =
+      chess::Piece{to_play_color, chess::PieceType::kKing};
+  const auto opp_king =
+      chess::Piece{opp_color, chess::PieceType::kKing};
 
   if (Board().find(to_play_king) == chess::InvalidSquare()) {
 
@@ -596,7 +564,7 @@ absl::optional<std::vector<double>> DarkChessState::MaybeFinalReturns() const {
   // Compute and cache the legal actions.
   MaybeGenerateLegalActions();
   SPIEL_CHECK_TRUE(cached_legal_actions_);
-  bool have_legal_moves = !cached_legal_actions_->empty();
+  const bool have_legal_moves = !cached_legal_actions_->empty();
 
   // If we don't have legal moves we are stalemated
   if (!have_legal_moves) {
@@ -617,8 +585,8 @@ std::string DefaultFen(int board_size) {
   else if (board_size == 4) return chess::kDefaultSmallFEN;
   else
     SpielFatalError(
-        "Only board sizes 4 and 8 have their default chessboards. For other"
-        "sizes, you have to define fen");
+        "Only board sizes 4 and 8 have their default chessboards. "
+        "For other sizes, you have to pass your own FEN.");
 }
 
 DarkChessGame::DarkChessGame(const GameParameters &params)
@@ -627,6 +595,14 @@ DarkChessGame::DarkChessGame(const GameParameters &params)
       fen_(ParameterValue<std::string>("fen", DefaultFen(board_size_))) {
   default_observer_ = std::make_shared<DarkChessObserver>(kDefaultObsType);
   info_state_observer_ = std::make_shared<DarkChessObserver>(kInfoStateObsType);
+}
+
+std::shared_ptr<Observer> DarkChessGame::MakeObserver(
+    absl::optional<IIGObservationType> iig_obs_type,
+    const GameParameters& params) const {
+  if (!params.empty()) SpielFatalError("Observation params not supported");
+  return std::make_shared<DarkChessObserver>(
+      iig_obs_type.value_or(kDefaultObsType));
 }
 
 }  // namespace dark_chess
