@@ -224,21 +224,22 @@ chess::ObservationTable ComputePublicInfoTable(const chess::ChessBoard &board) {
   return observability_table;
 }
 
+bool ObserverHasString(IIGObservationType iig_obs_type) {
+  return iig_obs_type.public_info
+      && iig_obs_type.private_info == PrivateInfoType::kSinglePlayer;
+}
+bool ObserverHasTensor(IIGObservationType iig_obs_type) {
+  return !iig_obs_type.perfect_recall;
+}
+
 }  // namespace
 
 
 class DarkChessObserver : public Observer {
-  bool HasString(IIGObservationType iig_obs_type) {
-    return iig_obs_type.public_info
-        && iig_obs_type.private_info == PrivateInfoType::kSinglePlayer;
-  }
-  bool HasTensor(IIGObservationType iig_obs_type) {
-    return !iig_obs_type_.perfect_recall;
-  }
  public:
   explicit DarkChessObserver(IIGObservationType iig_obs_type)
-      : Observer(/*has_string=*/HasString(iig_obs_type),
-                 /*has_tensor=*/HasTensor(iig_obs_type)),
+      : Observer(/*has_string=*/ObserverHasString(iig_obs_type),
+                 /*has_tensor=*/ObserverHasTensor(iig_obs_type)),
         iig_obs_type_(iig_obs_type) {}
 
   void WriteTensor(const State &observed_state,
