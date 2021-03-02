@@ -207,8 +207,8 @@ class PSRO(object):
         self._update_policy(self._root_node, [[], []])
         self._iterations = 0
 
-    def evaluate(self, num_episodes):
-        self._get_new_meta_nash_probs(num_episodes=num_episodes)
+    def evaluate(self):
+        self._get_new_meta_nash_probs()
         self._update_policy(self._root_node, [[i for i in range(len(self._br_list[0]))],
                                               [i for i in range(len(self._br_list[2]))]])
 
