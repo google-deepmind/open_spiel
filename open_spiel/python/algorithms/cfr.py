@@ -172,6 +172,7 @@ class _CFRSolverBase(object):
     self._average_policy = self._current_policy.__copy__()
 
     self._info_state_nodes = {}
+    self.num_infostates_expanded = 0
     self._initialize_info_state_nodes(self._root_node)
 
     self._iteration = 0  # For possible linear-averaging.
@@ -194,6 +195,7 @@ class _CFRSolverBase(object):
 
     if state.is_chance_node():
       for action, unused_action_prob in state.chance_outcomes():
+        self.num_infostates_expanded += 1
         self._initialize_info_state_nodes(state.child(action))
       return
 
@@ -209,6 +211,7 @@ class _CFRSolverBase(object):
       self._info_state_nodes[info_state] = info_state_node
 
     for action in info_state_node.legal_actions:
+      self.num_infostates_expanded += 1
       self._initialize_info_state_nodes(state.child(action))
 
   def current_policy(self):
@@ -273,6 +276,7 @@ class _CFRSolverBase(object):
         new_state = state.child(action)
         new_reach_probabilities = reach_probabilities.copy()
         new_reach_probabilities[-1] *= action_prob
+        self.num_infostates_expanded += 1
         state_value += action_prob * self._compute_counterfactual_regret_for_player(
             new_state, policies, new_reach_probabilities, player)
       return state_value
@@ -306,6 +310,7 @@ class _CFRSolverBase(object):
       new_state = state.child(action)
       new_reach_probabilities = reach_probabilities.copy()
       new_reach_probabilities[current_player] *= action_prob
+      self.num_infostates_expanded += 1
       child_utility = self._compute_counterfactual_regret_for_player(
           new_state,
           policies=policies,
