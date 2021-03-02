@@ -14,6 +14,11 @@
 
 # Lint as python3
 """Implementations of classical fictitious play.
+using list of pure strategies (br_list).
+The only legal actions available when computing the best response
+ are the actions that are suggested by at least one of the
+pure strategies. This can be used in the inner loop of XDO.
+
 
 See https://en.wikipedia.org/wiki/Fictitious_play.
 """

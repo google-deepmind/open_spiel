@@ -12,7 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Computes a Best-Response policy.
+"""Computes a Best-Response policy using list of pure strategies (br_list).
+The only legal actions available when computing the best response
+ are the actions that are suggested by at least one of the
+pure strategies
+
+When two BR actions have same payoff, randomly select one of them.
 
 The goal if this file is to be the main entry-point for BR APIs in Python.
 

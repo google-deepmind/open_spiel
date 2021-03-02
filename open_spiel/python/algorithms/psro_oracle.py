@@ -12,6 +12,11 @@ from open_spiel.python.algorithms import exploitability
 from open_spiel.python.algorithms import lp_solver
 from numpy import array
 
+"""
+Implements PSRO with an oracle best response
+"""
+
+
 @attr.s
 class _InfoStateNode(object):
     """An object wrapping values associated to an information state."""

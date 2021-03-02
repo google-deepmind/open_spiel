@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Python implementation of the counterfactual regret minimization algorithm.
+"""Python implementation of CFR restricted to a restricted game given
+by a list of pure strategies (br_list).
+This is used in the inner loop to solve the restricted game for XDO
+when using CFR as inner loop solver
 
 One iteration of CFR consists of:
 1) Compute current strategy from regrets (e.g. using Regret Matching).
@@ -20,6 +23,13 @@ One iteration of CFR consists of:
 3) Compute regrets from these values
 
 The average policy is what converges to a Nash Equilibrium.
+
+This version uses a list of pure strategies (br_list).
+The only legal actions available when computing the best response
+ are the actions that are suggested by at least one of the
+pure strategies
+
+
 """
 
 from __future__ import absolute_import
