@@ -228,9 +228,17 @@ chess::ObservationTable ComputePublicInfoTable(const chess::ChessBoard &board) {
 
 
 class DarkChessObserver : public Observer {
+  bool HasString(IIGObservationType iig_obs_type) {
+    return iig_obs_type.public_info
+        && iig_obs_type.private_info == PrivateInfoType::kSinglePlayer;
+  }
+  bool HasTensor(IIGObservationType iig_obs_type) {
+    return !iig_obs_type_.perfect_recall;
+  }
  public:
   explicit DarkChessObserver(IIGObservationType iig_obs_type)
-      : Observer(/*has_string=*/true, /*has_tensor=*/true),
+      : Observer(/*has_string=*/HasString(iig_obs_type),
+                 /*has_tensor=*/HasTensor(iig_obs_type)),
         iig_obs_type_(iig_obs_type) {}
 
   void WriteTensor(const State &observed_state,
@@ -243,7 +251,7 @@ class DarkChessObserver : public Observer {
 
     if (iig_obs_type_.perfect_recall) {
       SpielFatalError(
-          "Dark chess observer tensor with perfect recall not implemented");
+          "DarkChessObserver: tensor with perfect recall not implemented.");
     }
 
     const auto public_info_table = ComputePublicInfoTable(state.Board());
