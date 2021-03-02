@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Reinforcement Learning (RL) Environment for Open Spiel.
+This version only allows legal actions to be actions that are from
+a population of pure strategies (br_list).
 
 This module wraps Open Spiel Python interface providing an RL-friendly API. It
 covers both turn-based and simultaneous move games. Interactions between agents
