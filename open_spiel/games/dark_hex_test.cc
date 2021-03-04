@@ -23,12 +23,11 @@ namespace {
 namespace testing = open_spiel::testing;
 
 void GameBlackWinWithCollisionAndObs() {
-  std::shared_ptr<const Game> game = LoadGame("dark_hex", {
-                                {"board_size", GameParameter(3)}, 
-                                {"obstype", GameParameter("reveal-numturns")}
-                              });
+  std::shared_ptr<const Game> game = 
+      LoadGame("dark_hex", {{"board_size", GameParameter(3)}, 
+                            {"obstype", GameParameter("reveal-numturns")}});
   std::unique_ptr<State> state = game->NewInitialState();
-  std::vector<Action> lm = state->LegalActions(); // initial legal moves
+  std::vector<Action> lm = state->LegalActions();  // initial legal moves
   // . . .
   //  . . .
   //   . . .
@@ -79,13 +78,13 @@ void GameBlackWinsMaximumCollisions() {
   // B . .   R . .   B W .   B R .   B W B   
   //  . . .   . . .   . . .   . . .   . . .    ...
   //   . . .   . . .   . . .   . . .   . . .
-  std::shared_ptr<const Game> game = LoadGame("dark_hex",
-                                {{"board_size", GameParameter(3)}});
+  std::shared_ptr<const Game> game = 
+      LoadGame("dark_hex", {{"board_size", GameParameter(3)}});
   std::unique_ptr<State> state = game->NewInitialState();
-  std::array play_seq = {0, 1, 4, 2, 7, 5, 8, 6}; // 3 is the terminal move
-  for(int i = 0; i < play_seq.size(); ++i){
-    state->ApplyAction(play_seq[i]); // player moves
-    state->ApplyAction(play_seq[i]); // other player tries to move
+  std::array play_seq = {0, 1, 4, 2, 7, 5, 8, 6};  // 3 is the terminal move
+  for(int i = 0; i < play_seq.size(); ++i) {
+    state->ApplyAction(play_seq[i]);  // player moves
+    state->ApplyAction(play_seq[i]);  // other player tries to move
   }
   state->ApplyAction(3);
   // Black wins
@@ -97,7 +96,7 @@ void GameBlackWinsMaximumCollisions() {
 void ClassicalDarkHexTests() {
   testing::LoadGameTest("dark_hex");
   testing::NoChanceOutcomesTest(*LoadGame("dark_hex"));
-  testing::RandomSimTest(*LoadGame("dark_hex(board_size=5)"), 3);
+  testing::RandomSimTest(*LoadGame("dark_hex(board_size=5)"), 10);
   testing::LoadGameTest("dark_hex(obstype=reveal-numturns)");
   GameBlackWinWithCollisionAndObs();
   GameBlackWinsMaximumCollisions();

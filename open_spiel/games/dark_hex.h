@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 #ifndef OPEN_SPIEL_GAMES_DARK_HEX_H_
 #define OPEN_SPIEL_GAMES_DARK_HEX_H_
 
@@ -64,7 +65,7 @@ inline constexpr const char* kDefaultObsType = "reveal-nothing";
 inline constexpr const char* kDefaultGameVersion = "cdh"; 
 
 // black - white - empty
-inline constexpr int kPosStates = hex::kNumPlayers + 1; 
+inline constexpr int kPosStates = hex::kNumPlayers + 1;
 
 // Add here if anything else is needed to be revealed
 enum class ObservationType {
@@ -77,29 +78,28 @@ enum class GameVersion {
   kClassicalDH,
 };
 
-class DarkHexState: public State {
-  public: 
-    DarkHexState(std::shared_ptr<const Game> game, 
-                  int board_size, 
-                  GameVersion game_version,
-                  ObservationType obs_type);
+class DarkHexState : public State {
+  public:
+    DarkHexState(std::shared_ptr<const Game> game, int board_size,
+                GameVersion game_version,
+                ObservationType obs_type);
 
-    Player CurrentPlayer() const override {return state_.CurrentPlayer(); }
+    Player CurrentPlayer() const override { return state_.CurrentPlayer(); }
 
     std::string ActionToString(Player player, Action action_id) const override {
       return state_.ActionToString(player, action_id);
     }
-    std::string ToString() const override {return state_.ToString();}
-    bool IsTerminal() const override {return state_.IsTerminal();}
-    std::vector<double> Returns() const override {return state_.Returns();}
+    std::string ToString() const override { return state_.ToString(); }
+    bool IsTerminal() const override { return state_.IsTerminal(); }
+    std::vector<double> Returns() const override { return state_.Returns(); }
     std::string ObservationString(Player player) const override;
     void ObservationTensor(Player player,
-                            absl::Span<float> values) const override;
-    
+                          absl::Span<float> values) const override;
+
     // Dark games funcs.
     std::string InformationStateString(Player player) const override;
-    void InformationStateTensor (Player player,
-                            absl::Span<float> values) const override;
+    void InformationStateTensor(Player player,
+                                absl::Span<float> values) const override;
 
     std::unique_ptr<State> Clone() const override;
     void UndoAction(Player player, Action move) override;
@@ -113,54 +113,53 @@ class DarkHexState: public State {
     std::string ActionSequenceToString(Player player) const;
 
     hex::HexState state_;
-    ObservationType obs_type_;  
+    ObservationType obs_type_;
     GameVersion game_version_;
-    int board_size_;
-    
-    int kNumCells;
-    int kBitsPerAction;
-    int kLongestSequence;
+    const int board_size_;
+    const int num_cells_;
+    const int bits_per_action_;
+    const int longest_sequence_;
 
     // Change this to _history on base class
     std::vector<std::pair<int, Action>> action_sequence_;
     std::vector<hex::CellState> black_view_;
     std::vector<hex::CellState> white_view_;
-};
+  };
 
-class DarkHexGame: public Game {
+  class DarkHexGame : public Game {
   public:
     explicit DarkHexGame(const GameParameters& params);
     std::unique_ptr<State> NewInitialState() const override {
       return std::unique_ptr<State>(
-        new DarkHexState(shared_from_this(), board_size_, 
-                         game_version_, obs_type_)
-      );
+          new DarkHexState(shared_from_this(), board_size_, 
+                           game_version_, obs_type_)
     }
     int NumDistinctActions() const override {
-      return game_ -> NumDistinctActions();
+      return game_->NumDistinctActions();
     }
-    int NumPlayers() const override {return game_->NumPlayers();}
-    double MinUtility() const override {return game_->MinUtility();}
-    double UtilitySum() const override {return game_->UtilitySum();}
-    double MaxUtility() const override {return game_->MaxUtility();}
+    int NumPlayers() const override { return game_->NumPlayers(); }
+    double MinUtility() const override { return game_->MinUtility(); }
+    double UtilitySum() const override { return game_->UtilitySum(); }
+    double MaxUtility() const override { return game_->MaxUtility(); }
 
     std::vector<int> InformationStateTensorShape() const override;
     std::vector<int> ObservationTensorShape() const override;
-    int MaxGameLength() const override {return board_size_ * board_size_ * 2 - 1;}
-    
+    int MaxGameLength() const override {
+      return board_size_ * board_size_ * 2 - 1;
+    }
+
   private:
     std::shared_ptr<const hex::HexGame> game_;
     ObservationType obs_type_;
     GameVersion game_version_;
-    int board_size_;
-    
-    int kNumCells;
-    int kBitsPerAction;
-    int kLongestSequence;
+    const int board_size_;
+    const int num_cells_;
+    const int bits_per_action_;
+    const int longest_sequence_;
 };
 
-inline std::ostream& operator << (std::ostream& stream,
-                                  const ObservationType& obs_type) {
+inline std::ostream& operator<<(std::ostream& stream,
+                                const ObservationType& obs_type) {
   switch (obs_type) {
     case ObservationType::kRevealNothing:
       return stream << "Reveal Nothing";
@@ -183,7 +182,7 @@ inline std::ostream& operator << (std::ostream& stream,
   }
 }
 
-} // namespace dark_hex
-} // namespace open_spiel
+}  // namespace dark_hex
+}  // namespace open_spiel
 
 #endif
