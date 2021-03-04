@@ -42,7 +42,7 @@ const GameType kGameType{/*short_name=*/"trade_comm",
                          GameType::RewardModel::kTerminal,
                          /*max_num_players=*/2,
                          /*min_num_players=*/2,
-                         /*provides_information_state_string=*/false,
+                         /*provides_information_state_string=*/true,
                          /*provides_information_state_tensor=*/false,
                          /*provides_observation_string=*/true,
                          /*provides_observation_tensor=*/true,
@@ -124,13 +124,36 @@ std::string TradeCommState::ObservationString(Player player) const {
   for (int comm : comm_history_) {
     absl::StrAppend(&str, " ", comm);
   }
+  absl::StrAppend(&str, "\n");
 
   // Trade proposals are treated as simultaneous, so not included in the
   // observation, but we do mark how many trade actions have happened to agents
   // can work out what trading round they're on.
-  absl::StrAppend(&str, "Trade history size: ", trade_history_.size());
+  absl::StrAppend(&str, "Trade history size: ", trade_history_.size(), "\n");
+
+  // Players can see their own trades if they were made.
+  if (player < trade_history_.size()) {
+    absl::StrAppend(&str, "Observer's trade offer: ");
+    std::pair<int, int> trade = DecodeTrade(trade_history_[player], num_items_);
+    absl::StrAppend(&str, " ", trade.first, ":", trade.second, "\n");
+  }
+
+  // Players can see the other trade offers after the round.
+  if (IsTerminal()) {
+    SPIEL_CHECK_LT(1-player, trade_history_.size());
+    absl::StrAppend(&str, "Other players's trade offer: ");
+    std::pair<int, int> trade = DecodeTrade(trade_history_[1-player],
+                                            num_items_);
+    absl::StrAppend(&str, " ", trade.first, ":", trade.second, "\n");
+  }
 
   return str;
+}
+
+std::string TradeCommState::InformationStateString(Player player) const {
+  // Warning: This assumes that the game is one step.
+  SPIEL_CHECK_LE(game_->MaxGameLength(), 4);
+  return TradeCommState::ObservationString(player);
 }
 
 void TradeCommState::ObservationTensor(Player player,

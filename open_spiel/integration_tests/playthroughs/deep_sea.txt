@@ -43,7 +43,7 @@ HistoryString() = ""
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-ObservationString(0) = "x........................"
+ObservationString(0) = "x............................."
 ObservationTensor(0): ◉◯◯◯◯
                       ◯◯◯◯◯
                       ◯◯◯◯◯
@@ -70,7 +70,7 @@ HistoryString() = "0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-ObservationString(0) = ".....x..................."
+ObservationString(0) = ".....x........................"
 ObservationTensor(0): ◯◯◯◯◯
                       ◉◯◯◯◯
                       ◯◯◯◯◯
@@ -93,11 +93,11 @@ action: 1
 # ......
 IsTerminal() = False
 History() = [0, 1]
-HistoryString() = "0 1"
+HistoryString() = "0, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-ObservationString(0) = "...........x............."
+ObservationString(0) = "...........x.................."
 ObservationTensor(0): ◯◯◯◯◯
                       ◯◯◯◯◯
                       ◯◉◯◯◯
@@ -120,11 +120,11 @@ action: 0
 # ......
 IsTerminal() = False
 History() = [0, 1, 0]
-HistoryString() = "0 1 0"
+HistoryString() = "0, 1, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-ObservationString(0) = "...............x........."
+ObservationString(0) = "...............x.............."
 ObservationTensor(0): ◯◯◯◯◯
                       ◯◯◯◯◯
                       ◯◯◯◯◯
@@ -147,11 +147,11 @@ action: 1
 # ......
 IsTerminal() = False
 History() = [0, 1, 0, 1]
-HistoryString() = "0 1 0 1"
+HistoryString() = "0, 1, 0, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-ObservationString(0) = ".....................x..."
+ObservationString(0) = ".....................x........"
 ObservationTensor(0): ◯◯◯◯◯
                       ◯◯◯◯◯
                       ◯◯◯◯◯
@@ -174,11 +174,11 @@ action: 0
 # ..x...
 IsTerminal() = True
 History() = [0, 1, 0, 1, 0]
-HistoryString() = "0 1 0 1 0"
+HistoryString() = "0, 1, 0, 1, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
-ObservationString(0) = "........................."
+ObservationString(0) = "...........................x.."
 ObservationTensor(0): ◯◯◯◯◯
                       ◯◯◯◯◯
                       ◯◯◯◯◯

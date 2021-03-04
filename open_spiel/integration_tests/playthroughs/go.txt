@@ -139,12 +139,12 @@ action: 17
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17]
-HistoryString() = "24 17"
+HistoryString() = "24, 17"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "24 17"
-InformationStateString(1) = "24 17"
+InformationStateString(0) = "24, 17"
+InformationStateString(1) = "24, 17"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=2)\n\n 7 +++++++\n 6 +++++++\n 5 +++++++\n 4 +++X+++\n 3 +++O+++\n 2 +++++++\n 1 +++++++\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=2)\n\n 7 +++++++\n 6 +++++++\n 5 +++++++\n 4 +++X+++\n 3 +++O+++\n 2 +++++++\n 1 +++++++\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=2)\n\n 7 +++++++\n 6 +++++++\n 5 +++++++\n 4 +++X+++\n 3 +++O+++\n 2 +++++++\n 1 +++++++\n   ABCDEFG\n"
@@ -187,12 +187,12 @@ action: 8
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8]
-HistoryString() = "24 17 8"
+HistoryString() = "24, 17, 8"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "24 17 8"
-InformationStateString(1) = "24 17 8"
+InformationStateString(0) = "24, 17, 8"
+InformationStateString(1) = "24, 17, 8"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=3)\n\n 7 +++++++\n 6 +++++++\n 5 +++++++\n 4 +++X+++\n 3 +++O+++\n 2 +X+++++\n 1 +++++++\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=3)\n\n 7 +++++++\n 6 +++++++\n 5 +++++++\n 4 +++X+++\n 3 +++O+++\n 2 +X+++++\n 1 +++++++\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=3)\n\n 7 +++++++\n 6 +++++++\n 5 +++++++\n 4 +++X+++\n 3 +++O+++\n 2 +X+++++\n 1 +++++++\n   ABCDEFG\n"
@@ -235,12 +235,12 @@ action: 29
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29]
-HistoryString() = "24 17 8 29"
+HistoryString() = "24, 17, 8, 29"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "24 17 8 29"
-InformationStateString(1) = "24 17 8 29"
+InformationStateString(0) = "24, 17, 8, 29"
+InformationStateString(1) = "24, 17, 8, 29"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=4)\n\n 7 +++++++\n 6 +++++++\n 5 +O+++++\n 4 +++X+++\n 3 +++O+++\n 2 +X+++++\n 1 +++++++\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=4)\n\n 7 +++++++\n 6 +++++++\n 5 +O+++++\n 4 +++X+++\n 3 +++O+++\n 2 +X+++++\n 1 +++++++\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=4)\n\n 7 +++++++\n 6 +++++++\n 5 +O+++++\n 4 +++X+++\n 3 +++O+++\n 2 +X+++++\n 1 +++++++\n   ABCDEFG\n"
@@ -283,12 +283,12 @@ action: 41
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41]
-HistoryString() = "24 17 8 29 41"
+HistoryString() = "24, 17, 8, 29, 41"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "24 17 8 29 41"
-InformationStateString(1) = "24 17 8 29 41"
+InformationStateString(0) = "24, 17, 8, 29, 41"
+InformationStateString(1) = "24, 17, 8, 29, 41"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=5)\n\n 7 +++++++\n 6 ++++++X\n 5 +O+++++\n 4 +++X+++\n 3 +++O+++\n 2 +X+++++\n 1 +++++++\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=5)\n\n 7 +++++++\n 6 ++++++X\n 5 +O+++++\n 4 +++X+++\n 3 +++O+++\n 2 +X+++++\n 1 +++++++\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=5)\n\n 7 +++++++\n 6 ++++++X\n 5 +O+++++\n 4 +++X+++\n 3 +++O+++\n 2 +X+++++\n 1 +++++++\n   ABCDEFG\n"
@@ -331,12 +331,12 @@ action: 2
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2]
-HistoryString() = "24 17 8 29 41 2"
+HistoryString() = "24, 17, 8, 29, 41, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "24 17 8 29 41 2"
-InformationStateString(1) = "24 17 8 29 41 2"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=6)\n\n 7 +++++++\n 6 ++++++X\n 5 +O+++++\n 4 +++X+++\n 3 +++O+++\n 2 +X+++++\n 1 ++O++++\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=6)\n\n 7 +++++++\n 6 ++++++X\n 5 +O+++++\n 4 +++X+++\n 3 +++O+++\n 2 +X+++++\n 1 ++O++++\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=6)\n\n 7 +++++++\n 6 ++++++X\n 5 +O+++++\n 4 +++X+++\n 3 +++O+++\n 2 +X+++++\n 1 ++O++++\n   ABCDEFG\n"
@@ -379,12 +379,12 @@ action: 42
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42]
-HistoryString() = "24 17 8 29 41 2 42"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "24 17 8 29 41 2 42"
-InformationStateString(1) = "24 17 8 29 41 2 42"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=7)\n\n 7 X++++++\n 6 ++++++X\n 5 +O+++++\n 4 +++X+++\n 3 +++O+++\n 2 +X+++++\n 1 ++O++++\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=7)\n\n 7 X++++++\n 6 ++++++X\n 5 +O+++++\n 4 +++X+++\n 3 +++O+++\n 2 +X+++++\n 1 ++O++++\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=7)\n\n 7 X++++++\n 6 ++++++X\n 5 +O+++++\n 4 +++X+++\n 3 +++O+++\n 2 +X+++++\n 1 ++O++++\n   ABCDEFG\n"
@@ -427,12 +427,12 @@ action: 37
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37]
-HistoryString() = "24 17 8 29 41 2 42 37"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "24 17 8 29 41 2 42 37"
-InformationStateString(1) = "24 17 8 29 41 2 42 37"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=8)\n\n 7 X++++++\n 6 ++O+++X\n 5 +O+++++\n 4 +++X+++\n 3 +++O+++\n 2 +X+++++\n 1 ++O++++\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=8)\n\n 7 X++++++\n 6 ++O+++X\n 5 +O+++++\n 4 +++X+++\n 3 +++O+++\n 2 +X+++++\n 1 ++O++++\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=8)\n\n 7 X++++++\n 6 ++O+++X\n 5 +O+++++\n 4 +++X+++\n 3 +++O+++\n 2 +X+++++\n 1 ++O++++\n   ABCDEFG\n"
@@ -475,12 +475,12 @@ action: 18
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18]
-HistoryString() = "24 17 8 29 41 2 42 37 18"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=9)\n\n 7 X++++++\n 6 ++O+++X\n 5 +O+++++\n 4 +++X+++\n 3 +++OX++\n 2 +X+++++\n 1 ++O++++\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=9)\n\n 7 X++++++\n 6 ++O+++X\n 5 +O+++++\n 4 +++X+++\n 3 +++OX++\n 2 +X+++++\n 1 ++O++++\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=9)\n\n 7 X++++++\n 6 ++O+++X\n 5 +O+++++\n 4 +++X+++\n 3 +++OX++\n 2 +X+++++\n 1 ++O++++\n   ABCDEFG\n"
@@ -523,12 +523,12 @@ action: 4
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=10)\n\n 7 X++++++\n 6 ++O+++X\n 5 +O+++++\n 4 +++X+++\n 3 +++OX++\n 2 +X+++++\n 1 ++O+O++\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=10)\n\n 7 X++++++\n 6 ++O+++X\n 5 +O+++++\n 4 +++X+++\n 3 +++OX++\n 2 +X+++++\n 1 ++O+O++\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=10)\n\n 7 X++++++\n 6 ++O+++X\n 5 +O+++++\n 4 +++X+++\n 3 +++OX++\n 2 +X+++++\n 1 ++O+O++\n   ABCDEFG\n"
@@ -571,12 +571,12 @@ action: 47
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=11)\n\n 7 X++++X+\n 6 ++O+++X\n 5 +O+++++\n 4 +++X+++\n 3 +++OX++\n 2 +X+++++\n 1 ++O+O++\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=11)\n\n 7 X++++X+\n 6 ++O+++X\n 5 +O+++++\n 4 +++X+++\n 3 +++OX++\n 2 +X+++++\n 1 ++O+O++\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=11)\n\n 7 X++++X+\n 6 ++O+++X\n 5 +O+++++\n 4 +++X+++\n 3 +++OX++\n 2 +X+++++\n 1 ++O+O++\n   ABCDEFG\n"
@@ -619,12 +619,12 @@ action: 0
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47 0"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=12)\n\n 7 X++++X+\n 6 ++O+++X\n 5 +O+++++\n 4 +++X+++\n 3 +++OX++\n 2 +X+++++\n 1 O+O+O++\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=12)\n\n 7 X++++X+\n 6 ++O+++X\n 5 +O+++++\n 4 +++X+++\n 3 +++OX++\n 2 +X+++++\n 1 O+O+O++\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=12)\n\n 7 X++++X+\n 6 ++O+++X\n 5 +O+++++\n 4 +++X+++\n 3 +++OX++\n 2 +X+++++\n 1 O+O+O++\n   ABCDEFG\n"
@@ -667,12 +667,12 @@ action: 16
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47 0 16"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=13)\n\n 7 X++++X+\n 6 ++O+++X\n 5 +O+++++\n 4 +++X+++\n 3 ++XOX++\n 2 +X+++++\n 1 O+O+O++\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=13)\n\n 7 X++++X+\n 6 ++O+++X\n 5 +O+++++\n 4 +++X+++\n 3 ++XOX++\n 2 +X+++++\n 1 O+O+O++\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=13)\n\n 7 X++++X+\n 6 ++O+++X\n 5 +O+++++\n 4 +++X+++\n 3 ++XOX++\n 2 +X+++++\n 1 O+O+O++\n   ABCDEFG\n"
@@ -715,12 +715,12 @@ action: 23
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47 0 16 23"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=14)\n\n 7 X++++X+\n 6 ++O+++X\n 5 +O+++++\n 4 ++OX+++\n 3 ++XOX++\n 2 +X+++++\n 1 O+O+O++\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=14)\n\n 7 X++++X+\n 6 ++O+++X\n 5 +O+++++\n 4 ++OX+++\n 3 ++XOX++\n 2 +X+++++\n 1 O+O+O++\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=14)\n\n 7 X++++X+\n 6 ++O+++X\n 5 +O+++++\n 4 ++OX+++\n 3 ++XOX++\n 2 +X+++++\n 1 O+O+O++\n   ABCDEFG\n"
@@ -763,12 +763,12 @@ action: 34
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=15)\n\n 7 X++++X+\n 6 ++O+++X\n 5 +O++++X\n 4 ++OX+++\n 3 ++XOX++\n 2 +X+++++\n 1 O+O+O++\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=15)\n\n 7 X++++X+\n 6 ++O+++X\n 5 +O++++X\n 4 ++OX+++\n 3 ++XOX++\n 2 +X+++++\n 1 O+O+O++\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=15)\n\n 7 X++++X+\n 6 ++O+++X\n 5 +O++++X\n 4 ++OX+++\n 3 ++XOX++\n 2 +X+++++\n 1 O+O+O++\n   ABCDEFG\n"
@@ -811,12 +811,12 @@ action: 20
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=16)\n\n 7 X++++X+\n 6 ++O+++X\n 5 +O++++X\n 4 ++OX+++\n 3 ++XOX+O\n 2 +X+++++\n 1 O+O+O++\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=16)\n\n 7 X++++X+\n 6 ++O+++X\n 5 +O++++X\n 4 ++OX+++\n 3 ++XOX+O\n 2 +X+++++\n 1 O+O+O++\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=16)\n\n 7 X++++X+\n 6 ++O+++X\n 5 +O++++X\n 4 ++OX+++\n 3 ++XOX+O\n 2 +X+++++\n 1 O+O+O++\n   ABCDEFG\n"
@@ -859,12 +859,12 @@ action: 39
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=17)\n\n 7 X++++X+\n 6 ++O+X+X\n 5 +O++++X\n 4 ++OX+++\n 3 ++XOX+O\n 2 +X+++++\n 1 O+O+O++\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=17)\n\n 7 X++++X+\n 6 ++O+X+X\n 5 +O++++X\n 4 ++OX+++\n 3 ++XOX+O\n 2 +X+++++\n 1 O+O+O++\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=17)\n\n 7 X++++X+\n 6 ++O+X+X\n 5 +O++++X\n 4 ++OX+++\n 3 ++XOX+O\n 2 +X+++++\n 1 O+O+O++\n   ABCDEFG\n"
@@ -907,12 +907,12 @@ action: 5
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=18)\n\n 7 X++++X+\n 6 ++O+X+X\n 5 +O++++X\n 4 ++OX+++\n 3 ++XOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=18)\n\n 7 X++++X+\n 6 ++O+X+X\n 5 +O++++X\n 4 ++OX+++\n 3 ++XOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=18)\n\n 7 X++++X+\n 6 ++O+X+X\n 5 +O++++X\n 4 ++OX+++\n 3 ++XOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
@@ -955,12 +955,12 @@ action: 26
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=19)\n\n 7 X++++X+\n 6 ++O+X+X\n 5 +O++++X\n 4 ++OX+X+\n 3 ++XOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=19)\n\n 7 X++++X+\n 6 ++O+X+X\n 5 +O++++X\n 4 ++OX+X+\n 3 ++XOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=19)\n\n 7 X++++X+\n 6 ++O+X+X\n 5 +O++++X\n 4 ++OX+X+\n 3 ++XOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
@@ -1003,12 +1003,12 @@ action: 21
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=20)\n\n 7 X++++X+\n 6 ++O+X+X\n 5 +O++++X\n 4 O+OX+X+\n 3 ++XOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=20)\n\n 7 X++++X+\n 6 ++O+X+X\n 5 +O++++X\n 4 O+OX+X+\n 3 ++XOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=20)\n\n 7 X++++X+\n 6 ++O+X+X\n 5 +O++++X\n 4 O+OX+X+\n 3 ++XOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
@@ -1051,12 +1051,12 @@ action: 49
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=21)\n\n 7 X++++X+\n 6 ++O+X+X\n 5 +O++++X\n 4 O+OX+X+\n 3 ++XOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=21)\n\n 7 X++++X+\n 6 ++O+X+X\n 5 +O++++X\n 4 O+OX+X+\n 3 ++XOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=21)\n\n 7 X++++X+\n 6 ++O+X+X\n 5 +O++++X\n 4 O+OX+X+\n 3 ++XOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
@@ -1099,12 +1099,12 @@ action: 15
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=22)\n\n 7 X++++X+\n 6 ++O+X+X\n 5 +O++++X\n 4 O+OX+X+\n 3 +OXOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=22)\n\n 7 X++++X+\n 6 ++O+X+X\n 5 +O++++X\n 4 O+OX+X+\n 3 +OXOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=22)\n\n 7 X++++X+\n 6 ++O+X+X\n 5 +O++++X\n 4 O+OX+X+\n 3 +OXOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
@@ -1147,12 +1147,12 @@ action: 28
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=23)\n\n 7 X++++X+\n 6 ++O+X+X\n 5 XO++++X\n 4 O+OX+X+\n 3 +OXOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=23)\n\n 7 X++++X+\n 6 ++O+X+X\n 5 XO++++X\n 4 O+OX+X+\n 3 +OXOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=23)\n\n 7 X++++X+\n 6 ++O+X+X\n 5 XO++++X\n 4 O+OX+X+\n 3 +OXOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
@@ -1195,12 +1195,12 @@ action: 38
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=24)\n\n 7 X++++X+\n 6 ++OOX+X\n 5 XO++++X\n 4 O+OX+X+\n 3 +OXOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=24)\n\n 7 X++++X+\n 6 ++OOX+X\n 5 XO++++X\n 4 O+OX+X+\n 3 +OXOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=24)\n\n 7 X++++X+\n 6 ++OOX+X\n 5 XO++++X\n 4 O+OX+X+\n 3 +OXOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
@@ -1243,12 +1243,12 @@ action: 36
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=25)\n\n 7 X++++X+\n 6 +XOOX+X\n 5 XO++++X\n 4 O+OX+X+\n 3 +OXOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=25)\n\n 7 X++++X+\n 6 +XOOX+X\n 5 XO++++X\n 4 O+OX+X+\n 3 +OXOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=25)\n\n 7 X++++X+\n 6 +XOOX+X\n 5 XO++++X\n 4 O+OX+X+\n 3 +OXOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
@@ -1291,12 +1291,12 @@ action: 31
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=26)\n\n 7 X++++X+\n 6 +XOOX+X\n 5 XO+O++X\n 4 O+OX+X+\n 3 +OXOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=26)\n\n 7 X++++X+\n 6 +XOOX+X\n 5 XO+O++X\n 4 O+OX+X+\n 3 +OXOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=26)\n\n 7 X++++X+\n 6 +XOOX+X\n 5 XO+O++X\n 4 O+OX+X+\n 3 +OXOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
@@ -1339,12 +1339,12 @@ action: 46
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=27)\n\n 7 X+++XX+\n 6 +XOOX+X\n 5 XO+O++X\n 4 O+OX+X+\n 3 +OXOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=27)\n\n 7 X+++XX+\n 6 +XOOX+X\n 5 XO+O++X\n 4 O+OX+X+\n 3 +OXOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=27)\n\n 7 X+++XX+\n 6 +XOOX+X\n 5 XO+O++X\n 4 O+OX+X+\n 3 +OXOX+O\n 2 +X+++++\n 1 O+O+OO+\n   ABCDEFG\n"
@@ -1387,12 +1387,12 @@ action: 1
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=28)\n\n 7 X+++XX+\n 6 +XOOX+X\n 5 XO+O++X\n 4 O+OX+X+\n 3 +OXOX+O\n 2 +X+++++\n 1 OOO+OO+\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=28)\n\n 7 X+++XX+\n 6 +XOOX+X\n 5 XO+O++X\n 4 O+OX+X+\n 3 +OXOX+O\n 2 +X+++++\n 1 OOO+OO+\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=28)\n\n 7 X+++XX+\n 6 +XOOX+X\n 5 XO+O++X\n 4 O+OX+X+\n 3 +OXOX+O\n 2 +X+++++\n 1 OOO+OO+\n   ABCDEFG\n"
@@ -1435,12 +1435,12 @@ action: 32
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=29)\n\n 7 X+++XX+\n 6 +XOOX+X\n 5 XO+OX+X\n 4 O+OX+X+\n 3 +OXOX+O\n 2 +X+++++\n 1 OOO+OO+\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=29)\n\n 7 X+++XX+\n 6 +XOOX+X\n 5 XO+OX+X\n 4 O+OX+X+\n 3 +OXOX+O\n 2 +X+++++\n 1 OOO+OO+\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=29)\n\n 7 X+++XX+\n 6 +XOOX+X\n 5 XO+OX+X\n 4 O+OX+X+\n 3 +OXOX+O\n 2 +X+++++\n 1 OOO+OO+\n   ABCDEFG\n"
@@ -1483,12 +1483,12 @@ action: 25
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=30)\n\n 7 X+++XX+\n 6 +XOOX+X\n 5 XO+OX+X\n 4 O+O+OX+\n 3 +OXOX+O\n 2 +X+++++\n 1 OOO+OO+\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=30)\n\n 7 X+++XX+\n 6 +XOOX+X\n 5 XO+OX+X\n 4 O+O+OX+\n 3 +OXOX+O\n 2 +X+++++\n 1 OOO+OO+\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=30)\n\n 7 X+++XX+\n 6 +XOOX+X\n 5 XO+OX+X\n 4 O+O+OX+\n 3 +OXOX+O\n 2 +X+++++\n 1 OOO+OO+\n   ABCDEFG\n"
@@ -1531,12 +1531,12 @@ action: 43
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=31)\n\n 7 XX++XX+\n 6 +XOOX+X\n 5 XO+OX+X\n 4 O+O+OX+\n 3 +OXOX+O\n 2 +X+++++\n 1 OOO+OO+\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=31)\n\n 7 XX++XX+\n 6 +XOOX+X\n 5 XO+OX+X\n 4 O+O+OX+\n 3 +OXOX+O\n 2 +X+++++\n 1 OOO+OO+\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=31)\n\n 7 XX++XX+\n 6 +XOOX+X\n 5 XO+OX+X\n 4 O+O+OX+\n 3 +OXOX+O\n 2 +X+++++\n 1 OOO+OO+\n   ABCDEFG\n"
@@ -1579,12 +1579,12 @@ action: 24
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=32)\n\n 7 XX++XX+\n 6 +XOOX+X\n 5 XO+OX+X\n 4 O+OOOX+\n 3 +OXOX+O\n 2 +X+++++\n 1 OOO+OO+\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=32)\n\n 7 XX++XX+\n 6 +XOOX+X\n 5 XO+OX+X\n 4 O+OOOX+\n 3 +OXOX+O\n 2 +X+++++\n 1 OOO+OO+\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=32)\n\n 7 XX++XX+\n 6 +XOOX+X\n 5 XO+OX+X\n 4 O+OOOX+\n 3 +OXOX+O\n 2 +X+++++\n 1 OOO+OO+\n   ABCDEFG\n"
@@ -1627,12 +1627,12 @@ action: 14
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=33)\n\n 7 XX++XX+\n 6 +XOOX+X\n 5 XO+OX+X\n 4 O+OOOX+\n 3 XOXOX+O\n 2 +X+++++\n 1 OOO+OO+\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=33)\n\n 7 XX++XX+\n 6 +XOOX+X\n 5 XO+OX+X\n 4 O+OOOX+\n 3 XOXOX+O\n 2 +X+++++\n 1 OOO+OO+\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=33)\n\n 7 XX++XX+\n 6 +XOOX+X\n 5 XO+OX+X\n 4 O+OOOX+\n 3 XOXOX+O\n 2 +X+++++\n 1 OOO+OO+\n   ABCDEFG\n"
@@ -1675,12 +1675,12 @@ action: 6
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=34)\n\n 7 XX++XX+\n 6 +XOOX+X\n 5 XO+OX+X\n 4 O+OOOX+\n 3 XOXOX+O\n 2 +X+++++\n 1 OOO+OOO\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=34)\n\n 7 XX++XX+\n 6 +XOOX+X\n 5 XO+OX+X\n 4 O+OOOX+\n 3 XOXOX+O\n 2 +X+++++\n 1 OOO+OOO\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=34)\n\n 7 XX++XX+\n 6 +XOOX+X\n 5 XO+OX+X\n 4 O+OOOX+\n 3 XOXOX+O\n 2 +X+++++\n 1 OOO+OOO\n   ABCDEFG\n"
@@ -1723,12 +1723,12 @@ action: 12
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=35)\n\n 7 XX++XX+\n 6 +XOOX+X\n 5 XO+OX+X\n 4 O+OOOX+\n 3 XOXOX+O\n 2 +X+++X+\n 1 OOO+OOO\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=35)\n\n 7 XX++XX+\n 6 +XOOX+X\n 5 XO+OX+X\n 4 O+OOOX+\n 3 XOXOX+O\n 2 +X+++X+\n 1 OOO+OOO\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=35)\n\n 7 XX++XX+\n 6 +XOOX+X\n 5 XO+OX+X\n 4 O+OOOX+\n 3 XOXOX+O\n 2 +X+++X+\n 1 OOO+OOO\n   ABCDEFG\n"
@@ -1771,12 +1771,12 @@ action: 9
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=36)\n\n 7 XX++XX+\n 6 +XOOX+X\n 5 XO+OX+X\n 4 O+OOOX+\n 3 XO+OX+O\n 2 +XO++X+\n 1 OOO+OOO\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=36)\n\n 7 XX++XX+\n 6 +XOOX+X\n 5 XO+OX+X\n 4 O+OOOX+\n 3 XO+OX+O\n 2 +XO++X+\n 1 OOO+OOO\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=36)\n\n 7 XX++XX+\n 6 +XOOX+X\n 5 XO+OX+X\n 4 O+OOOX+\n 3 XO+OX+O\n 2 +XO++X+\n 1 OOO+OOO\n   ABCDEFG\n"
@@ -1819,12 +1819,12 @@ action: 40
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=37)\n\n 7 XX++XX+\n 6 +XOOXXX\n 5 XO+OX+X\n 4 O+OOOX+\n 3 XO+OX+O\n 2 +XO++X+\n 1 OOO+OOO\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=37)\n\n 7 XX++XX+\n 6 +XOOXXX\n 5 XO+OX+X\n 4 O+OOOX+\n 3 XO+OX+O\n 2 +XO++X+\n 1 OOO+OOO\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=37)\n\n 7 XX++XX+\n 6 +XOOXXX\n 5 XO+OX+X\n 4 O+OOOX+\n 3 XO+OX+O\n 2 +XO++X+\n 1 OOO+OOO\n   ABCDEFG\n"
@@ -1867,12 +1867,12 @@ action: 49
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=38)\n\n 7 XX++XX+\n 6 +XOOXXX\n 5 XO+OX+X\n 4 O+OOOX+\n 3 XO+OX+O\n 2 +XO++X+\n 1 OOO+OOO\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=38)\n\n 7 XX++XX+\n 6 +XOOXXX\n 5 XO+OX+X\n 4 O+OOOX+\n 3 XO+OX+O\n 2 +XO++X+\n 1 OOO+OOO\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=38)\n\n 7 XX++XX+\n 6 +XOOXXX\n 5 XO+OX+X\n 4 O+OOOX+\n 3 XO+OX+O\n 2 +XO++X+\n 1 OOO+OOO\n   ABCDEFG\n"
@@ -1915,12 +1915,12 @@ action: 19
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=39)\n\n 7 XX++XX+\n 6 +XOOXXX\n 5 XO+OX+X\n 4 O+OOOX+\n 3 XO+OXXO\n 2 +XO++X+\n 1 OOO+OOO\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=39)\n\n 7 XX++XX+\n 6 +XOOXXX\n 5 XO+OX+X\n 4 O+OOOX+\n 3 XO+OXXO\n 2 +XO++X+\n 1 OOO+OOO\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=39)\n\n 7 XX++XX+\n 6 +XOOXXX\n 5 XO+OX+X\n 4 O+OOOX+\n 3 XO+OXXO\n 2 +XO++X+\n 1 OOO+OOO\n   ABCDEFG\n"
@@ -1963,12 +1963,12 @@ action: 27
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=40)\n\n 7 XX++XX+\n 6 +XOOXXX\n 5 XO+OX+X\n 4 O+OOOXO\n 3 XO+OXXO\n 2 +XO++X+\n 1 OOO+OOO\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=40)\n\n 7 XX++XX+\n 6 +XOOXXX\n 5 XO+OX+X\n 4 O+OOOXO\n 3 XO+OXXO\n 2 +XO++X+\n 1 OOO+OOO\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=40)\n\n 7 XX++XX+\n 6 +XOOXXX\n 5 XO+OX+X\n 4 O+OOOXO\n 3 XO+OXXO\n 2 +XO++X+\n 1 OOO+OOO\n   ABCDEFG\n"
@@ -2011,12 +2011,12 @@ action: 45
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=41)\n\n 7 XX+XXX+\n 6 +XOOXXX\n 5 XO+OX+X\n 4 O+OOOXO\n 3 XO+OXXO\n 2 +XO++X+\n 1 OOO+OOO\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=41)\n\n 7 XX+XXX+\n 6 +XOOXXX\n 5 XO+OX+X\n 4 O+OOOXO\n 3 XO+OXXO\n 2 +XO++X+\n 1 OOO+OOO\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=41)\n\n 7 XX+XXX+\n 6 +XOOXXX\n 5 XO+OX+X\n 4 O+OOOXO\n 3 XO+OXXO\n 2 +XO++X+\n 1 OOO+OOO\n   ABCDEFG\n"
@@ -2059,12 +2059,12 @@ action: 7
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=42)\n\n 7 XX+XXX+\n 6 +XOOXXX\n 5 XO+OX+X\n 4 O+OOOXO\n 3 +O+OXXO\n 2 O+O++X+\n 1 OOO+OOO\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=42)\n\n 7 XX+XXX+\n 6 +XOOXXX\n 5 XO+OX+X\n 4 O+OOOXO\n 3 +O+OXXO\n 2 O+O++X+\n 1 OOO+OOO\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=42)\n\n 7 XX+XXX+\n 6 +XOOXXX\n 5 XO+OX+X\n 4 O+OOOXO\n 3 +O+OXXO\n 2 O+O++X+\n 1 OOO+OOO\n   ABCDEFG\n"
@@ -2107,12 +2107,12 @@ action: 3
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=43)\n\n 7 XX+XXX+\n 6 +XOOXXX\n 5 XO+OX+X\n 4 O+OOOXO\n 3 +O+OXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=43)\n\n 7 XX+XXX+\n 6 +XOOXXX\n 5 XO+OX+X\n 4 O+OOOXO\n 3 +O+OXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=43)\n\n 7 XX+XXX+\n 6 +XOOXXX\n 5 XO+OX+X\n 4 O+OOOXO\n 3 +O+OXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
@@ -2155,12 +2155,12 @@ action: 35
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=44)\n\n 7 XX+XXX+\n 6 OXOOXXX\n 5 +O+OX+X\n 4 O+OOOXO\n 3 +O+OXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=44)\n\n 7 XX+XXX+\n 6 OXOOXXX\n 5 +O+OX+X\n 4 O+OOOXO\n 3 +O+OXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=44)\n\n 7 XX+XXX+\n 6 OXOOXXX\n 5 +O+OX+X\n 4 O+OOOXO\n 3 +O+OXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
@@ -2203,12 +2203,12 @@ action: 49
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=45)\n\n 7 XX+XXX+\n 6 OXOOXXX\n 5 +O+OX+X\n 4 O+OOOXO\n 3 +O+OXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=45)\n\n 7 XX+XXX+\n 6 OXOOXXX\n 5 +O+OX+X\n 4 O+OOOXO\n 3 +O+OXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=45)\n\n 7 XX+XXX+\n 6 OXOOXXX\n 5 +O+OX+X\n 4 O+OOOXO\n 3 +O+OXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
@@ -2251,12 +2251,12 @@ action: 44
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=46)\n\n 7 ++OXXX+\n 6 O+OOXXX\n 5 +O+OX+X\n 4 O+OOOXO\n 3 +O+OXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=46)\n\n 7 ++OXXX+\n 6 O+OOXXX\n 5 +O+OX+X\n 4 O+OOOXO\n 3 +O+OXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=46)\n\n 7 ++OXXX+\n 6 O+OOXXX\n 5 +O+OX+X\n 4 O+OOOXO\n 3 +O+OXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
@@ -2299,12 +2299,12 @@ action: 43
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=47)\n\n 7 +XOXXX+\n 6 O+OOXXX\n 5 +O+OX+X\n 4 O+OOOXO\n 3 +O+OXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=47)\n\n 7 +XOXXX+\n 6 O+OOXXX\n 5 +O+OX+X\n 4 O+OOOXO\n 3 +O+OXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=47)\n\n 7 +XOXXX+\n 6 O+OOXXX\n 5 +O+OX+X\n 4 O+OOOXO\n 3 +O+OXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
@@ -2347,12 +2347,12 @@ action: 30
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=48)\n\n 7 +XOXXX+\n 6 O+OOXXX\n 5 +OOOX+X\n 4 O+OOOXO\n 3 +O+OXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=48)\n\n 7 +XOXXX+\n 6 O+OOXXX\n 5 +OOOX+X\n 4 O+OOOXO\n 3 +O+OXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=48)\n\n 7 +XOXXX+\n 6 O+OOXXX\n 5 +OOOX+X\n 4 O+OOOXO\n 3 +O+OXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
@@ -2395,12 +2395,12 @@ action: 36
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=49)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 +OOOX+X\n 4 O+OOOXO\n 3 +O+OXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=49)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 +OOOX+X\n 4 O+OOOXO\n 3 +O+OXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=49)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 +OOOX+X\n 4 O+OOOXO\n 3 +O+OXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
@@ -2443,12 +2443,12 @@ action: 16
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=50)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 +OOOX+X\n 4 O+OOOXO\n 3 +OOOXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=50)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 +OOOX+X\n 4 O+OOOXO\n 3 +OOOXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=50)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 +OOOX+X\n 4 O+OOOXO\n 3 +OOOXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
@@ -2491,12 +2491,12 @@ action: 49
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=51)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 +OOOX+X\n 4 O+OOOXO\n 3 +OOOXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=51)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 +OOOX+X\n 4 O+OOOXO\n 3 +OOOXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=51)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 +OOOX+X\n 4 O+OOOXO\n 3 +OOOXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
@@ -2539,12 +2539,12 @@ action: 14
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=52)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 +OOOX+X\n 4 O+OOOXO\n 3 OOOOXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=52)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 +OOOX+X\n 4 O+OOOXO\n 3 OOOOXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=52)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 +OOOX+X\n 4 O+OOOXO\n 3 OOOOXXO\n 2 O+O++X+\n 1 OOOXOOO\n   ABCDEFG\n"
@@ -2587,12 +2587,12 @@ action: 10
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=53)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 +OOOX+X\n 4 O+OOOXO\n 3 OOOOXXO\n 2 O+OX+X+\n 1 OOOXOOO\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=53)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 +OOOX+X\n 4 O+OOOXO\n 3 OOOOXXO\n 2 O+OX+X+\n 1 OOOXOOO\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=53)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 +OOOX+X\n 4 O+OOOXO\n 3 OOOOXXO\n 2 O+OX+X+\n 1 OOOXOOO\n   ABCDEFG\n"
@@ -2635,12 +2635,12 @@ action: 8
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=54)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 +OOOX+X\n 4 O+OOOXO\n 3 OOOOXXO\n 2 OOOX+X+\n 1 OOOXOOO\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=54)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 +OOOX+X\n 4 O+OOOXO\n 3 OOOOXXO\n 2 OOOX+X+\n 1 OOOXOOO\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=54)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 +OOOX+X\n 4 O+OOOXO\n 3 OOOOXXO\n 2 OOOX+X+\n 1 OOOXOOO\n   ABCDEFG\n"
@@ -2683,12 +2683,12 @@ action: 13
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=55)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 +OOOX+X\n 4 O+OOOX+\n 3 OOOOXX+\n 2 OOOX+XX\n 1 OOOXOOO\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=55)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 +OOOX+X\n 4 O+OOOX+\n 3 OOOOXX+\n 2 OOOX+XX\n 1 OOOXOOO\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=55)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 +OOOX+X\n 4 O+OOOX+\n 3 OOOOXX+\n 2 OOOX+XX\n 1 OOOXOOO\n   ABCDEFG\n"
@@ -2731,12 +2731,12 @@ action: 28
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13, 28]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13 28"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13, 28"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13 28"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13 28"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13, 28"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13, 28"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=56)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 OOOOX+X\n 4 O+OOOX+\n 3 OOOOXX+\n 2 OOOX+XX\n 1 OOOXOOO\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=56)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 OOOOX+X\n 4 O+OOOX+\n 3 OOOOXX+\n 2 OOOX+XX\n 1 OOOXOOO\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=56)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 OOOOX+X\n 4 O+OOOX+\n 3 OOOOXX+\n 2 OOOX+XX\n 1 OOOXOOO\n   ABCDEFG\n"
@@ -2779,12 +2779,12 @@ action: 33
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13, 28, 33]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13 28 33"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13, 28, 33"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13 28 33"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13 28 33"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13, 28, 33"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13, 28, 33"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=57)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXX+\n 2 OOOX+XX\n 1 OOOXOOO\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=57)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXX+\n 2 OOOX+XX\n 1 OOOXOOO\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=57)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXX+\n 2 OOOX+XX\n 1 OOOXOOO\n   ABCDEFG\n"
@@ -2827,12 +2827,12 @@ action: 20
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13, 28, 33, 20]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13 28 33 20"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13, 28, 33, 20"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13 28 33 20"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13 28 33 20"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13, 28, 33, 20"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13, 28, 33, 20"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=58)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOX+XX\n 1 OOOXOOO\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=58)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOX+XX\n 1 OOOXOOO\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=58)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOX+XX\n 1 OOOXOOO\n   ABCDEFG\n"
@@ -2875,12 +2875,12 @@ action: 49
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13, 28, 33, 20, 49]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13 28 33 20 49"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13, 28, 33, 20, 49"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13 28 33 20 49"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13 28 33 20 49"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13, 28, 33, 20, 49"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13, 28, 33, 20, 49"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=59)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOX+XX\n 1 OOOXOOO\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=59)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOX+XX\n 1 OOOXOOO\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=59)\n\n 7 +XOXXX+\n 6 OXOOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOX+XX\n 1 OOOXOOO\n   ABCDEFG\n"
@@ -2923,12 +2923,12 @@ action: 42
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13, 28, 33, 20, 49, 42]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13 28 33 20 49 42"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13, 28, 33, 20, 49, 42"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13 28 33 20 49 42"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13 28 33 20 49 42"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13, 28, 33, 20, 49, 42"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13, 28, 33, 20, 49, 42"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=60)\n\n 7 O+OXXX+\n 6 O+OOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOX+XX\n 1 OOOXOOO\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=60)\n\n 7 O+OXXX+\n 6 O+OOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOX+XX\n 1 OOOXOOO\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=60)\n\n 7 O+OXXX+\n 6 O+OOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOX+XX\n 1 OOOXOOO\n   ABCDEFG\n"
@@ -2971,12 +2971,12 @@ action: 11
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13, 28, 33, 20, 49, 42, 11]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13 28 33 20 49 42 11"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13, 28, 33, 20, 49, 42, 11"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13 28 33 20 49 42 11"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13 28 33 20 49 42 11"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13, 28, 33, 20, 49, 42, 11"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13, 28, 33, 20, 49, 42, 11"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=61)\n\n 7 O+OXXX+\n 6 O+OOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOXXXX\n 1 OOOX+++\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=61)\n\n 7 O+OXXX+\n 6 O+OOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOXXXX\n 1 OOOX+++\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=61)\n\n 7 O+OXXX+\n 6 O+OOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOXXXX\n 1 OOOX+++\n   ABCDEFG\n"
@@ -3019,12 +3019,12 @@ action: 36
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13, 28, 33, 20, 49, 42, 11, 36]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13 28 33 20 49 42 11 36"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13, 28, 33, 20, 49, 42, 11, 36"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13 28 33 20 49 42 11 36"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13 28 33 20 49 42 11 36"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13, 28, 33, 20, 49, 42, 11, 36"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13, 28, 33, 20, 49, 42, 11, 36"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=62)\n\n 7 O+OXXX+\n 6 OOOOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOXXXX\n 1 OOOX+++\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=62)\n\n 7 O+OXXX+\n 6 OOOOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOXXXX\n 1 OOOX+++\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=62)\n\n 7 O+OXXX+\n 6 OOOOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOXXXX\n 1 OOOX+++\n   ABCDEFG\n"
@@ -3067,12 +3067,12 @@ action: 4
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13, 28, 33, 20, 49, 42, 11, 36, 4]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13 28 33 20 49 42 11 36 4"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13, 28, 33, 20, 49, 42, 11, 36, 4"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13 28 33 20 49 42 11 36 4"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13 28 33 20 49 42 11 36 4"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13, 28, 33, 20, 49, 42, 11, 36, 4"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13, 28, 33, 20, 49, 42, 11, 36, 4"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=63)\n\n 7 O+OXXX+\n 6 OOOOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOXXXX\n 1 OOOXX++\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=63)\n\n 7 O+OXXX+\n 6 OOOOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOXXXX\n 1 OOOXX++\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=63)\n\n 7 O+OXXX+\n 6 OOOOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOXXXX\n 1 OOOXX++\n   ABCDEFG\n"
@@ -3115,12 +3115,12 @@ action: 6
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13, 28, 33, 20, 49, 42, 11, 36, 4, 6]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13 28 33 20 49 42 11 36 4 6"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13, 28, 33, 20, 49, 42, 11, 36, 4, 6"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13 28 33 20 49 42 11 36 4 6"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13 28 33 20 49 42 11 36 4 6"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13, 28, 33, 20, 49, 42, 11, 36, 4, 6"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13, 28, 33, 20, 49, 42, 11, 36, 4, 6"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=64)\n\n 7 O+OXXX+\n 6 OOOOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOXXXX\n 1 OOOXX+O\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=64)\n\n 7 O+OXXX+\n 6 OOOOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOXXXX\n 1 OOOXX+O\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=64)\n\n 7 O+OXXX+\n 6 OOOOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOXXXX\n 1 OOOXX+O\n   ABCDEFG\n"
@@ -3163,12 +3163,12 @@ action: 48
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13, 28, 33, 20, 49, 42, 11, 36, 4, 6, 48]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13 28 33 20 49 42 11 36 4 6 48"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13, 28, 33, 20, 49, 42, 11, 36, 4, 6, 48"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13 28 33 20 49 42 11 36 4 6 48"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13 28 33 20 49 42 11 36 4 6 48"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13, 28, 33, 20, 49, 42, 11, 36, 4, 6, 48"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13, 28, 33, 20, 49, 42, 11, 36, 4, 6, 48"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=65)\n\n 7 O+OXXXX\n 6 OOOOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOXXXX\n 1 OOOXX+O\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=65)\n\n 7 O+OXXXX\n 6 OOOOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOXXXX\n 1 OOOXX+O\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=65)\n\n 7 O+OXXXX\n 6 OOOOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOXXXX\n 1 OOOXX+O\n   ABCDEFG\n"
@@ -3211,12 +3211,12 @@ action: 49
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13, 28, 33, 20, 49, 42, 11, 36, 4, 6, 48, 49]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13 28 33 20 49 42 11 36 4 6 48 49"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13, 28, 33, 20, 49, 42, 11, 36, 4, 6, 48, 49"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13 28 33 20 49 42 11 36 4 6 48 49"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13 28 33 20 49 42 11 36 4 6 48 49"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13, 28, 33, 20, 49, 42, 11, 36, 4, 6, 48, 49"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13, 28, 33, 20, 49, 42, 11, 36, 4, 6, 48, 49"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=66)\n\n 7 O+OXXXX\n 6 OOOOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOXXXX\n 1 OOOXX+O\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=66)\n\n 7 O+OXXXX\n 6 OOOOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOXXXX\n 1 OOOXX+O\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=66)\n\n 7 O+OXXXX\n 6 OOOOXXX\n 5 OOOOXXX\n 4 O+OOOX+\n 3 OOOOXXO\n 2 OOOXXXX\n 1 OOOXX+O\n   ABCDEFG\n"
@@ -3259,12 +3259,12 @@ action: 27
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13, 28, 33, 20, 49, 42, 11, 36, 4, 6, 48, 49, 27]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13 28 33 20 49 42 11 36 4 6 48 49 27"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13, 28, 33, 20, 49, 42, 11, 36, 4, 6, 48, 49, 27"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13 28 33 20 49 42 11 36 4 6 48 49 27"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13 28 33 20 49 42 11 36 4 6 48 49 27"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13, 28, 33, 20, 49, 42, 11, 36, 4, 6, 48, 49, 27"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13, 28, 33, 20, 49, 42, 11, 36, 4, 6, 48, 49, 27"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=67)\n\n 7 O+OXXXX\n 6 OOOOXXX\n 5 OOOOXXX\n 4 O+OOOXX\n 3 OOOOXX+\n 2 OOOXXXX\n 1 OOOXX+O\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=67)\n\n 7 O+OXXXX\n 6 OOOOXXX\n 5 OOOOXXX\n 4 O+OOOXX\n 3 OOOOXX+\n 2 OOOXXXX\n 1 OOOXX+O\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=67)\n\n 7 O+OXXXX\n 6 OOOOXXX\n 5 OOOOXXX\n 4 O+OOOXX\n 3 OOOOXX+\n 2 OOOXXXX\n 1 OOOXX+O\n   ABCDEFG\n"
@@ -3307,12 +3307,12 @@ action: 49
 #    ABCDEFG
 IsTerminal() = False
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13, 28, 33, 20, 49, 42, 11, 36, 4, 6, 48, 49, 27, 49]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13 28 33 20 49 42 11 36 4 6 48 49 27 49"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13, 28, 33, 20, 49, 42, 11, 36, 4, 6, 48, 49, 27, 49"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13 28 33 20 49 42 11 36 4 6 48 49 27 49"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13 28 33 20 49 42 11 36 4 6 48 49 27 49"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13, 28, 33, 20, 49, 42, 11, 36, 4, 6, 48, 49, 27, 49"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13, 28, 33, 20, 49, 42, 11, 36, 4, 6, 48, 49, 27, 49"
 ObservationString(0) = "GoState(komi=4.5, to_play=B, history.size()=68)\n\n 7 O+OXXXX\n 6 OOOOXXX\n 5 OOOOXXX\n 4 O+OOOXX\n 3 OOOOXX+\n 2 OOOXXXX\n 1 OOOXX+O\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=B, history.size()=68)\n\n 7 O+OXXXX\n 6 OOOOXXX\n 5 OOOOXXX\n 4 O+OOOXX\n 3 OOOOXX+\n 2 OOOXXXX\n 1 OOOXX+O\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=B, history.size()=68)\n\n 7 O+OXXXX\n 6 OOOOXXX\n 5 OOOOXXX\n 4 O+OOOXX\n 3 OOOOXX+\n 2 OOOXXXX\n 1 OOOXX+O\n   ABCDEFG\n"
@@ -3355,12 +3355,12 @@ action: 49
 #    ABCDEFG
 IsTerminal() = True
 History() = [24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13, 28, 33, 20, 49, 42, 11, 36, 4, 6, 48, 49, 27, 49, 49]
-HistoryString() = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13 28 33 20 49 42 11 36 4 6 48 49 27 49 49"
+HistoryString() = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13, 28, 33, 20, 49, 42, 11, 36, 4, 6, 48, 49, 27, 49, 49"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
-InformationStateString(0) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13 28 33 20 49 42 11 36 4 6 48 49 27 49 49"
-InformationStateString(1) = "24 17 8 29 41 2 42 37 18 4 47 0 16 23 34 20 39 5 26 21 49 15 28 38 36 31 46 1 32 25 43 24 14 6 12 9 40 49 19 27 45 7 3 35 49 44 43 30 36 16 49 14 10 8 13 28 33 20 49 42 11 36 4 6 48 49 27 49 49"
+InformationStateString(0) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13, 28, 33, 20, 49, 42, 11, 36, 4, 6, 48, 49, 27, 49, 49"
+InformationStateString(1) = "24, 17, 8, 29, 41, 2, 42, 37, 18, 4, 47, 0, 16, 23, 34, 20, 39, 5, 26, 21, 49, 15, 28, 38, 36, 31, 46, 1, 32, 25, 43, 24, 14, 6, 12, 9, 40, 49, 19, 27, 45, 7, 3, 35, 49, 44, 43, 30, 36, 16, 49, 14, 10, 8, 13, 28, 33, 20, 49, 42, 11, 36, 4, 6, 48, 49, 27, 49, 49"
 ObservationString(0) = "GoState(komi=4.5, to_play=W, history.size()=69)\n\n 7 O+OXXXX\n 6 OOOOXXX\n 5 OOOOXXX\n 4 O+OOOXX\n 3 OOOOXX+\n 2 OOOXXXX\n 1 OOOXX+O\n   ABCDEFG\n"
 ObservationString(1) = "GoState(komi=4.5, to_play=W, history.size()=69)\n\n 7 O+OXXXX\n 6 OOOOXXX\n 5 OOOOXXX\n 4 O+OOOXX\n 3 OOOOXX+\n 2 OOOXXXX\n 1 OOOXX+O\n   ABCDEFG\n"
 PublicObservationString() = "GoState(komi=4.5, to_play=W, history.size()=69)\n\n 7 O+OXXXX\n 6 OOOOXXX\n 5 OOOOXXX\n 4 O+OOOXX\n 3 OOOOXX+\n 2 OOOXXXX\n 1 OOOXX+O\n   ABCDEFG\n"

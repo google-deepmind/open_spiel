@@ -9,10 +9,14 @@ endif()
 
 # List of all Python bindings to add to pyspiel.
 set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
+  pybind11/algorithms_corr_dist.cc
+  pybind11/algorithms_corr_dist.h
   pybind11/algorithms_trajectories.cc
   pybind11/algorithms_trajectories.h
   pybind11/bots.cc
   pybind11/bots.h
+  pybind11/games_backgammon.cc
+  pybind11/games_backgammon.h
   pybind11/games_bridge.cc
   pybind11/games_bridge.h
   pybind11/games_negotiation.cc
@@ -28,6 +32,8 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
   pybind11/policy.cc
   pybind11/policy.h
   pybind11/pyspiel.cc
+  pybind11/python_games.cc
+  pybind11/python_games.h
   )
 
 # Optional pyspiel sub-modules, which can specify their python bindings.
@@ -93,6 +99,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   algorithms/cfr_br_test.py
   algorithms/cfr_test.py
   algorithms/deep_cfr_test.py
+  algorithms/deep_cfr_tf2_test.py
   algorithms/discounted_cfr_test.py
   algorithms/double_oracle_test.py
   algorithms/dqn_test.py
@@ -101,6 +108,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   algorithms/expected_game_score_test.py
   algorithms/exploitability_descent_test.py
   algorithms/exploitability_test.py
+  algorithms/external_sampling_mccfr_test.py
   algorithms/fictitious_play_test.py
   algorithms/gambit_test.py
   algorithms/generate_playthrough_test.py
@@ -137,6 +145,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   environments/catch_test.py
   environments/cliff_walking_test.py
   games/data_test.py
+  games/kuhn_poker_test.py
   games/tic_tac_toe_test.py
   tests/bot_test.py
   tests/games_bridge_test.py
@@ -151,6 +160,13 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   utils/file_logger_test.py
   utils/lru_cache_test.py
   utils/spawn_test.py
+  pytorch/rcfr_pytorch_test.py
+  pytorch/dqn_pytorch_test.py
+  pytorch/nfsp_pytorch_test.py
+  pytorch/deep_cfr_pytorch_test.py
+  pytorch/eva_pytorch_test.py
+  pytorch/losses/rl_losses_pytorch_test.py
+  pytorch/policy_gradient_pytorch_test.py
 )
 
 

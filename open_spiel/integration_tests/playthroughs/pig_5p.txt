@@ -44,12 +44,6 @@ ObservationString(1) = "Scores: 0 0 0 0 0, Turn total: 0\nCurrent player: 0\n"
 ObservationString(2) = "Scores: 0 0 0 0 0, Turn total: 0\nCurrent player: 0\n"
 ObservationString(3) = "Scores: 0 0 0 0 0, Turn total: 0\nCurrent player: 0\n"
 ObservationString(4) = "Scores: 0 0 0 0 0, Turn total: 0\nCurrent player: 0\n"
-PublicObservationString() = "Scores: 0 0 0 0 0, Turn total: 0\nCurrent player: 0\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-PrivateObservationString(2) = ""
-PrivateObservationString(3) = ""
-PrivateObservationString(4) = ""
 ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -102,12 +96,6 @@ ObservationString(1) = "Scores: 0 0 0 0 0, Turn total: 0\nCurrent player: 1\n"
 ObservationString(2) = "Scores: 0 0 0 0 0, Turn total: 0\nCurrent player: 1\n"
 ObservationString(3) = "Scores: 0 0 0 0 0, Turn total: 0\nCurrent player: 1\n"
 ObservationString(4) = "Scores: 0 0 0 0 0, Turn total: 0\nCurrent player: 1\n"
-PublicObservationString() = "Scores: 0 0 0 0 0, Turn total: 0\nCurrent player: 1\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-PrivateObservationString(2) = ""
-PrivateObservationString(3) = ""
-PrivateObservationString(4) = ""
 ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -151,7 +139,7 @@ action: 0
 # Current player: 1 (rolling)
 IsTerminal() = False
 History() = [1, 0]
-HistoryString() = "1 0"
+HistoryString() = "1, 0"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -160,12 +148,6 @@ ObservationString(1) = "Scores: 0 0 0 0 0, Turn total: 0\nCurrent player: 1 (rol
 ObservationString(2) = "Scores: 0 0 0 0 0, Turn total: 0\nCurrent player: 1 (rolling)\n"
 ObservationString(3) = "Scores: 0 0 0 0 0, Turn total: 0\nCurrent player: 1 (rolling)\n"
 ObservationString(4) = "Scores: 0 0 0 0 0, Turn total: 0\nCurrent player: 1 (rolling)\n"
-PublicObservationString() = "Scores: 0 0 0 0 0, Turn total: 0\nCurrent player: 1 (rolling)\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-PrivateObservationString(2) = ""
-PrivateObservationString(3) = ""
-PrivateObservationString(4) = ""
 ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -208,7 +190,7 @@ action: 1
 # Current player: 1
 IsTerminal() = False
 History() = [1, 0, 1]
-HistoryString() = "1 0 1"
+HistoryString() = "1, 0, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -217,12 +199,6 @@ ObservationString(1) = "Scores: 0 0 0 0 0, Turn total: 2\nCurrent player: 1\n"
 ObservationString(2) = "Scores: 0 0 0 0 0, Turn total: 2\nCurrent player: 1\n"
 ObservationString(3) = "Scores: 0 0 0 0 0, Turn total: 2\nCurrent player: 1\n"
 ObservationString(4) = "Scores: 0 0 0 0 0, Turn total: 2\nCurrent player: 1\n"
-PublicObservationString() = "Scores: 0 0 0 0 0, Turn total: 2\nCurrent player: 1\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-PrivateObservationString(2) = ""
-PrivateObservationString(3) = ""
-PrivateObservationString(4) = ""
 ObservationTensor(0): ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -266,7 +242,7 @@ action: 1
 # Current player: 2
 IsTerminal() = False
 History() = [1, 0, 1, 1]
-HistoryString() = "1 0 1 1"
+HistoryString() = "1, 0, 1, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 2
@@ -275,12 +251,6 @@ ObservationString(1) = "Scores: 0 2 0 0 0, Turn total: 0\nCurrent player: 2\n"
 ObservationString(2) = "Scores: 0 2 0 0 0, Turn total: 0\nCurrent player: 2\n"
 ObservationString(3) = "Scores: 0 2 0 0 0, Turn total: 0\nCurrent player: 2\n"
 ObservationString(4) = "Scores: 0 2 0 0 0, Turn total: 0\nCurrent player: 2\n"
-PublicObservationString() = "Scores: 0 2 0 0 0, Turn total: 0\nCurrent player: 2\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-PrivateObservationString(2) = ""
-PrivateObservationString(3) = ""
-PrivateObservationString(4) = ""
 ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -324,7 +294,7 @@ action: 1
 # Current player: 3
 IsTerminal() = False
 History() = [1, 0, 1, 1, 1]
-HistoryString() = "1 0 1 1 1"
+HistoryString() = "1, 0, 1, 1, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 3
@@ -333,12 +303,6 @@ ObservationString(1) = "Scores: 0 2 0 0 0, Turn total: 0\nCurrent player: 3\n"
 ObservationString(2) = "Scores: 0 2 0 0 0, Turn total: 0\nCurrent player: 3\n"
 ObservationString(3) = "Scores: 0 2 0 0 0, Turn total: 0\nCurrent player: 3\n"
 ObservationString(4) = "Scores: 0 2 0 0 0, Turn total: 0\nCurrent player: 3\n"
-PublicObservationString() = "Scores: 0 2 0 0 0, Turn total: 0\nCurrent player: 3\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-PrivateObservationString(2) = ""
-PrivateObservationString(3) = ""
-PrivateObservationString(4) = ""
 ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -382,7 +346,7 @@ action: 1
 # Current player: 4
 IsTerminal() = False
 History() = [1, 0, 1, 1, 1, 1]
-HistoryString() = "1 0 1 1 1 1"
+HistoryString() = "1, 0, 1, 1, 1, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 4
@@ -391,12 +355,6 @@ ObservationString(1) = "Scores: 0 2 0 0 0, Turn total: 0\nCurrent player: 4\n"
 ObservationString(2) = "Scores: 0 2 0 0 0, Turn total: 0\nCurrent player: 4\n"
 ObservationString(3) = "Scores: 0 2 0 0 0, Turn total: 0\nCurrent player: 4\n"
 ObservationString(4) = "Scores: 0 2 0 0 0, Turn total: 0\nCurrent player: 4\n"
-PublicObservationString() = "Scores: 0 2 0 0 0, Turn total: 0\nCurrent player: 4\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-PrivateObservationString(2) = ""
-PrivateObservationString(3) = ""
-PrivateObservationString(4) = ""
 ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -440,7 +398,7 @@ action: 0
 # Current player: 4 (rolling)
 IsTerminal() = False
 History() = [1, 0, 1, 1, 1, 1, 0]
-HistoryString() = "1 0 1 1 1 1 0"
+HistoryString() = "1, 0, 1, 1, 1, 1, 0"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -449,12 +407,6 @@ ObservationString(1) = "Scores: 0 2 0 0 0, Turn total: 0\nCurrent player: 4 (rol
 ObservationString(2) = "Scores: 0 2 0 0 0, Turn total: 0\nCurrent player: 4 (rolling)\n"
 ObservationString(3) = "Scores: 0 2 0 0 0, Turn total: 0\nCurrent player: 4 (rolling)\n"
 ObservationString(4) = "Scores: 0 2 0 0 0, Turn total: 0\nCurrent player: 4 (rolling)\n"
-PublicObservationString() = "Scores: 0 2 0 0 0, Turn total: 0\nCurrent player: 4 (rolling)\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-PrivateObservationString(2) = ""
-PrivateObservationString(3) = ""
-PrivateObservationString(4) = ""
 ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -497,7 +449,7 @@ action: 1
 # Current player: 4
 IsTerminal() = False
 History() = [1, 0, 1, 1, 1, 1, 0, 1]
-HistoryString() = "1 0 1 1 1 1 0 1"
+HistoryString() = "1, 0, 1, 1, 1, 1, 0, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 4
@@ -506,12 +458,6 @@ ObservationString(1) = "Scores: 0 2 0 0 0, Turn total: 2\nCurrent player: 4\n"
 ObservationString(2) = "Scores: 0 2 0 0 0, Turn total: 2\nCurrent player: 4\n"
 ObservationString(3) = "Scores: 0 2 0 0 0, Turn total: 2\nCurrent player: 4\n"
 ObservationString(4) = "Scores: 0 2 0 0 0, Turn total: 2\nCurrent player: 4\n"
-PublicObservationString() = "Scores: 0 2 0 0 0, Turn total: 2\nCurrent player: 4\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-PrivateObservationString(2) = ""
-PrivateObservationString(3) = ""
-PrivateObservationString(4) = ""
 ObservationTensor(0): ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -555,7 +501,7 @@ action: 0
 # Current player: 4 (rolling)
 IsTerminal() = False
 History() = [1, 0, 1, 1, 1, 1, 0, 1, 0]
-HistoryString() = "1 0 1 1 1 1 0 1 0"
+HistoryString() = "1, 0, 1, 1, 1, 1, 0, 1, 0"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -564,12 +510,6 @@ ObservationString(1) = "Scores: 0 2 0 0 0, Turn total: 2\nCurrent player: 4 (rol
 ObservationString(2) = "Scores: 0 2 0 0 0, Turn total: 2\nCurrent player: 4 (rolling)\n"
 ObservationString(3) = "Scores: 0 2 0 0 0, Turn total: 2\nCurrent player: 4 (rolling)\n"
 ObservationString(4) = "Scores: 0 2 0 0 0, Turn total: 2\nCurrent player: 4 (rolling)\n"
-PublicObservationString() = "Scores: 0 2 0 0 0, Turn total: 2\nCurrent player: 4 (rolling)\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-PrivateObservationString(2) = ""
-PrivateObservationString(3) = ""
-PrivateObservationString(4) = ""
 ObservationTensor(0): ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -612,7 +552,7 @@ action: 2
 # Current player: 4
 IsTerminal() = False
 History() = [1, 0, 1, 1, 1, 1, 0, 1, 0, 2]
-HistoryString() = "1 0 1 1 1 1 0 1 0 2"
+HistoryString() = "1, 0, 1, 1, 1, 1, 0, 1, 0, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 4
@@ -621,12 +561,6 @@ ObservationString(1) = "Scores: 0 2 0 0 0, Turn total: 5\nCurrent player: 4\n"
 ObservationString(2) = "Scores: 0 2 0 0 0, Turn total: 5\nCurrent player: 4\n"
 ObservationString(3) = "Scores: 0 2 0 0 0, Turn total: 5\nCurrent player: 4\n"
 ObservationString(4) = "Scores: 0 2 0 0 0, Turn total: 5\nCurrent player: 4\n"
-PublicObservationString() = "Scores: 0 2 0 0 0, Turn total: 5\nCurrent player: 4\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-PrivateObservationString(2) = ""
-PrivateObservationString(3) = ""
-PrivateObservationString(4) = ""
 ObservationTensor(0): ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -670,7 +604,7 @@ action: 0
 # Current player: 4 (rolling)
 IsTerminal() = False
 History() = [1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0]
-HistoryString() = "1 0 1 1 1 1 0 1 0 2 0"
+HistoryString() = "1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -679,12 +613,6 @@ ObservationString(1) = "Scores: 0 2 0 0 0, Turn total: 5\nCurrent player: 4 (rol
 ObservationString(2) = "Scores: 0 2 0 0 0, Turn total: 5\nCurrent player: 4 (rolling)\n"
 ObservationString(3) = "Scores: 0 2 0 0 0, Turn total: 5\nCurrent player: 4 (rolling)\n"
 ObservationString(4) = "Scores: 0 2 0 0 0, Turn total: 5\nCurrent player: 4 (rolling)\n"
-PublicObservationString() = "Scores: 0 2 0 0 0, Turn total: 5\nCurrent player: 4 (rolling)\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-PrivateObservationString(2) = ""
-PrivateObservationString(3) = ""
-PrivateObservationString(4) = ""
 ObservationTensor(0): ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -727,7 +655,7 @@ action: 0
 # Current player: 0
 IsTerminal() = False
 History() = [1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0]
-HistoryString() = "1 0 1 1 1 1 0 1 0 2 0 0"
+HistoryString() = "1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -736,12 +664,6 @@ ObservationString(1) = "Scores: 0 2 0 0 0, Turn total: 0\nCurrent player: 0\n"
 ObservationString(2) = "Scores: 0 2 0 0 0, Turn total: 0\nCurrent player: 0\n"
 ObservationString(3) = "Scores: 0 2 0 0 0, Turn total: 0\nCurrent player: 0\n"
 ObservationString(4) = "Scores: 0 2 0 0 0, Turn total: 0\nCurrent player: 0\n"
-PublicObservationString() = "Scores: 0 2 0 0 0, Turn total: 0\nCurrent player: 0\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-PrivateObservationString(2) = ""
-PrivateObservationString(3) = ""
-PrivateObservationString(4) = ""
 ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -785,7 +707,7 @@ action: 1
 # Current player: 1
 IsTerminal() = False
 History() = [1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1]
-HistoryString() = "1 0 1 1 1 1 0 1 0 2 0 0 1"
+HistoryString() = "1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -794,12 +716,6 @@ ObservationString(1) = "Scores: 0 2 0 0 0, Turn total: 0\nCurrent player: 1\n"
 ObservationString(2) = "Scores: 0 2 0 0 0, Turn total: 0\nCurrent player: 1\n"
 ObservationString(3) = "Scores: 0 2 0 0 0, Turn total: 0\nCurrent player: 1\n"
 ObservationString(4) = "Scores: 0 2 0 0 0, Turn total: 0\nCurrent player: 1\n"
-PublicObservationString() = "Scores: 0 2 0 0 0, Turn total: 0\nCurrent player: 1\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-PrivateObservationString(2) = ""
-PrivateObservationString(3) = ""
-PrivateObservationString(4) = ""
 ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -843,7 +759,7 @@ action: 1
 # Current player: 2
 IsTerminal() = False
 History() = [1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1]
-HistoryString() = "1 0 1 1 1 1 0 1 0 2 0 0 1 1"
+HistoryString() = "1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 2
@@ -852,12 +768,6 @@ ObservationString(1) = "Scores: 0 2 0 0 0, Turn total: 0\nCurrent player: 2\n"
 ObservationString(2) = "Scores: 0 2 0 0 0, Turn total: 0\nCurrent player: 2\n"
 ObservationString(3) = "Scores: 0 2 0 0 0, Turn total: 0\nCurrent player: 2\n"
 ObservationString(4) = "Scores: 0 2 0 0 0, Turn total: 0\nCurrent player: 2\n"
-PublicObservationString() = "Scores: 0 2 0 0 0, Turn total: 0\nCurrent player: 2\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-PrivateObservationString(2) = ""
-PrivateObservationString(3) = ""
-PrivateObservationString(4) = ""
 ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -901,7 +811,7 @@ action: 0
 # Current player: 2 (rolling)
 IsTerminal() = False
 History() = [1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0]
-HistoryString() = "1 0 1 1 1 1 0 1 0 2 0 0 1 1 0"
+HistoryString() = "1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -910,12 +820,6 @@ ObservationString(1) = "Scores: 0 2 0 0 0, Turn total: 0\nCurrent player: 2 (rol
 ObservationString(2) = "Scores: 0 2 0 0 0, Turn total: 0\nCurrent player: 2 (rolling)\n"
 ObservationString(3) = "Scores: 0 2 0 0 0, Turn total: 0\nCurrent player: 2 (rolling)\n"
 ObservationString(4) = "Scores: 0 2 0 0 0, Turn total: 0\nCurrent player: 2 (rolling)\n"
-PublicObservationString() = "Scores: 0 2 0 0 0, Turn total: 0\nCurrent player: 2 (rolling)\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-PrivateObservationString(2) = ""
-PrivateObservationString(3) = ""
-PrivateObservationString(4) = ""
 ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -958,7 +862,7 @@ action: 5
 # Current player: 2
 IsTerminal() = False
 History() = [1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5]
-HistoryString() = "1 0 1 1 1 1 0 1 0 2 0 0 1 1 0 5"
+HistoryString() = "1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 2
@@ -967,12 +871,6 @@ ObservationString(1) = "Scores: 0 2 0 0 0, Turn total: 6\nCurrent player: 2\n"
 ObservationString(2) = "Scores: 0 2 0 0 0, Turn total: 6\nCurrent player: 2\n"
 ObservationString(3) = "Scores: 0 2 0 0 0, Turn total: 6\nCurrent player: 2\n"
 ObservationString(4) = "Scores: 0 2 0 0 0, Turn total: 6\nCurrent player: 2\n"
-PublicObservationString() = "Scores: 0 2 0 0 0, Turn total: 6\nCurrent player: 2\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-PrivateObservationString(2) = ""
-PrivateObservationString(3) = ""
-PrivateObservationString(4) = ""
 ObservationTensor(0): ◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -1016,7 +914,7 @@ action: 0
 # Current player: 2 (rolling)
 IsTerminal() = False
 History() = [1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0]
-HistoryString() = "1 0 1 1 1 1 0 1 0 2 0 0 1 1 0 5 0"
+HistoryString() = "1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -1025,12 +923,6 @@ ObservationString(1) = "Scores: 0 2 0 0 0, Turn total: 6\nCurrent player: 2 (rol
 ObservationString(2) = "Scores: 0 2 0 0 0, Turn total: 6\nCurrent player: 2 (rolling)\n"
 ObservationString(3) = "Scores: 0 2 0 0 0, Turn total: 6\nCurrent player: 2 (rolling)\n"
 ObservationString(4) = "Scores: 0 2 0 0 0, Turn total: 6\nCurrent player: 2 (rolling)\n"
-PublicObservationString() = "Scores: 0 2 0 0 0, Turn total: 6\nCurrent player: 2 (rolling)\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-PrivateObservationString(2) = ""
-PrivateObservationString(3) = ""
-PrivateObservationString(4) = ""
 ObservationTensor(0): ◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -1073,7 +965,7 @@ action: 1
 # Current player: 2
 IsTerminal() = False
 History() = [1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1]
-HistoryString() = "1 0 1 1 1 1 0 1 0 2 0 0 1 1 0 5 0 1"
+HistoryString() = "1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 2
@@ -1082,12 +974,6 @@ ObservationString(1) = "Scores: 0 2 0 0 0, Turn total: 8\nCurrent player: 2\n"
 ObservationString(2) = "Scores: 0 2 0 0 0, Turn total: 8\nCurrent player: 2\n"
 ObservationString(3) = "Scores: 0 2 0 0 0, Turn total: 8\nCurrent player: 2\n"
 ObservationString(4) = "Scores: 0 2 0 0 0, Turn total: 8\nCurrent player: 2\n"
-PublicObservationString() = "Scores: 0 2 0 0 0, Turn total: 8\nCurrent player: 2\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-PrivateObservationString(2) = ""
-PrivateObservationString(3) = ""
-PrivateObservationString(4) = ""
 ObservationTensor(0): ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -1131,7 +1017,7 @@ action: 1
 # Current player: 3
 IsTerminal() = False
 History() = [1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1]
-HistoryString() = "1 0 1 1 1 1 0 1 0 2 0 0 1 1 0 5 0 1 1"
+HistoryString() = "1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 3
@@ -1140,12 +1026,6 @@ ObservationString(1) = "Scores: 0 2 8 0 0, Turn total: 0\nCurrent player: 3\n"
 ObservationString(2) = "Scores: 0 2 8 0 0, Turn total: 0\nCurrent player: 3\n"
 ObservationString(3) = "Scores: 0 2 8 0 0, Turn total: 0\nCurrent player: 3\n"
 ObservationString(4) = "Scores: 0 2 8 0 0, Turn total: 0\nCurrent player: 3\n"
-PublicObservationString() = "Scores: 0 2 8 0 0, Turn total: 0\nCurrent player: 3\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-PrivateObservationString(2) = ""
-PrivateObservationString(3) = ""
-PrivateObservationString(4) = ""
 ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -1189,7 +1069,7 @@ action: 0
 # Current player: 3 (rolling)
 IsTerminal() = False
 History() = [1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0]
-HistoryString() = "1 0 1 1 1 1 0 1 0 2 0 0 1 1 0 5 0 1 1 0"
+HistoryString() = "1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -1198,12 +1078,6 @@ ObservationString(1) = "Scores: 0 2 8 0 0, Turn total: 0\nCurrent player: 3 (rol
 ObservationString(2) = "Scores: 0 2 8 0 0, Turn total: 0\nCurrent player: 3 (rolling)\n"
 ObservationString(3) = "Scores: 0 2 8 0 0, Turn total: 0\nCurrent player: 3 (rolling)\n"
 ObservationString(4) = "Scores: 0 2 8 0 0, Turn total: 0\nCurrent player: 3 (rolling)\n"
-PublicObservationString() = "Scores: 0 2 8 0 0, Turn total: 0\nCurrent player: 3 (rolling)\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-PrivateObservationString(2) = ""
-PrivateObservationString(3) = ""
-PrivateObservationString(4) = ""
 ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -1246,7 +1120,7 @@ action: 3
 # Current player: 3
 IsTerminal() = False
 History() = [1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3]
-HistoryString() = "1 0 1 1 1 1 0 1 0 2 0 0 1 1 0 5 0 1 1 0 3"
+HistoryString() = "1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 3
@@ -1255,12 +1129,6 @@ ObservationString(1) = "Scores: 0 2 8 0 0, Turn total: 4\nCurrent player: 3\n"
 ObservationString(2) = "Scores: 0 2 8 0 0, Turn total: 4\nCurrent player: 3\n"
 ObservationString(3) = "Scores: 0 2 8 0 0, Turn total: 4\nCurrent player: 3\n"
 ObservationString(4) = "Scores: 0 2 8 0 0, Turn total: 4\nCurrent player: 3\n"
-PublicObservationString() = "Scores: 0 2 8 0 0, Turn total: 4\nCurrent player: 3\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-PrivateObservationString(2) = ""
-PrivateObservationString(3) = ""
-PrivateObservationString(4) = ""
 ObservationTensor(0): ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -1304,7 +1172,7 @@ action: 1
 # Current player: 4
 IsTerminal() = False
 History() = [1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1]
-HistoryString() = "1 0 1 1 1 1 0 1 0 2 0 0 1 1 0 5 0 1 1 0 3 1"
+HistoryString() = "1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 4
@@ -1313,12 +1181,6 @@ ObservationString(1) = "Scores: 0 2 8 4 0, Turn total: 0\nCurrent player: 4\n"
 ObservationString(2) = "Scores: 0 2 8 4 0, Turn total: 0\nCurrent player: 4\n"
 ObservationString(3) = "Scores: 0 2 8 4 0, Turn total: 0\nCurrent player: 4\n"
 ObservationString(4) = "Scores: 0 2 8 4 0, Turn total: 0\nCurrent player: 4\n"
-PublicObservationString() = "Scores: 0 2 8 4 0, Turn total: 0\nCurrent player: 4\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-PrivateObservationString(2) = ""
-PrivateObservationString(3) = ""
-PrivateObservationString(4) = ""
 ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -1362,7 +1224,7 @@ action: 0
 # Current player: 4 (rolling)
 IsTerminal() = False
 History() = [1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0]
-HistoryString() = "1 0 1 1 1 1 0 1 0 2 0 0 1 1 0 5 0 1 1 0 3 1 0"
+HistoryString() = "1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -1371,12 +1233,6 @@ ObservationString(1) = "Scores: 0 2 8 4 0, Turn total: 0\nCurrent player: 4 (rol
 ObservationString(2) = "Scores: 0 2 8 4 0, Turn total: 0\nCurrent player: 4 (rolling)\n"
 ObservationString(3) = "Scores: 0 2 8 4 0, Turn total: 0\nCurrent player: 4 (rolling)\n"
 ObservationString(4) = "Scores: 0 2 8 4 0, Turn total: 0\nCurrent player: 4 (rolling)\n"
-PublicObservationString() = "Scores: 0 2 8 4 0, Turn total: 0\nCurrent player: 4 (rolling)\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-PrivateObservationString(2) = ""
-PrivateObservationString(3) = ""
-PrivateObservationString(4) = ""
 ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -1419,7 +1275,7 @@ action: 2
 # Current player: 4
 IsTerminal() = False
 History() = [1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2]
-HistoryString() = "1 0 1 1 1 1 0 1 0 2 0 0 1 1 0 5 0 1 1 0 3 1 0 2"
+HistoryString() = "1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 4
@@ -1428,12 +1284,6 @@ ObservationString(1) = "Scores: 0 2 8 4 0, Turn total: 3\nCurrent player: 4\n"
 ObservationString(2) = "Scores: 0 2 8 4 0, Turn total: 3\nCurrent player: 4\n"
 ObservationString(3) = "Scores: 0 2 8 4 0, Turn total: 3\nCurrent player: 4\n"
 ObservationString(4) = "Scores: 0 2 8 4 0, Turn total: 3\nCurrent player: 4\n"
-PublicObservationString() = "Scores: 0 2 8 4 0, Turn total: 3\nCurrent player: 4\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-PrivateObservationString(2) = ""
-PrivateObservationString(3) = ""
-PrivateObservationString(4) = ""
 ObservationTensor(0): ◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -1477,7 +1327,7 @@ action: 0
 # Current player: 4 (rolling)
 IsTerminal() = False
 History() = [1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2, 0]
-HistoryString() = "1 0 1 1 1 1 0 1 0 2 0 0 1 1 0 5 0 1 1 0 3 1 0 2 0"
+HistoryString() = "1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2, 0"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -1486,12 +1336,6 @@ ObservationString(1) = "Scores: 0 2 8 4 0, Turn total: 3\nCurrent player: 4 (rol
 ObservationString(2) = "Scores: 0 2 8 4 0, Turn total: 3\nCurrent player: 4 (rolling)\n"
 ObservationString(3) = "Scores: 0 2 8 4 0, Turn total: 3\nCurrent player: 4 (rolling)\n"
 ObservationString(4) = "Scores: 0 2 8 4 0, Turn total: 3\nCurrent player: 4 (rolling)\n"
-PublicObservationString() = "Scores: 0 2 8 4 0, Turn total: 3\nCurrent player: 4 (rolling)\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-PrivateObservationString(2) = ""
-PrivateObservationString(3) = ""
-PrivateObservationString(4) = ""
 ObservationTensor(0): ◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -1534,7 +1378,7 @@ action: 4
 # Current player: 4
 IsTerminal() = False
 History() = [1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2, 0, 4]
-HistoryString() = "1 0 1 1 1 1 0 1 0 2 0 0 1 1 0 5 0 1 1 0 3 1 0 2 0 4"
+HistoryString() = "1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2, 0, 4"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 4
@@ -1543,12 +1387,6 @@ ObservationString(1) = "Scores: 0 2 8 4 0, Turn total: 8\nCurrent player: 4\n"
 ObservationString(2) = "Scores: 0 2 8 4 0, Turn total: 8\nCurrent player: 4\n"
 ObservationString(3) = "Scores: 0 2 8 4 0, Turn total: 8\nCurrent player: 4\n"
 ObservationString(4) = "Scores: 0 2 8 4 0, Turn total: 8\nCurrent player: 4\n"
-PublicObservationString() = "Scores: 0 2 8 4 0, Turn total: 8\nCurrent player: 4\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-PrivateObservationString(2) = ""
-PrivateObservationString(3) = ""
-PrivateObservationString(4) = ""
 ObservationTensor(0): ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -1592,7 +1430,7 @@ action: 0
 # Current player: 4 (rolling)
 IsTerminal() = False
 History() = [1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2, 0, 4, 0]
-HistoryString() = "1 0 1 1 1 1 0 1 0 2 0 0 1 1 0 5 0 1 1 0 3 1 0 2 0 4 0"
+HistoryString() = "1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2, 0, 4, 0"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -1601,12 +1439,6 @@ ObservationString(1) = "Scores: 0 2 8 4 0, Turn total: 8\nCurrent player: 4 (rol
 ObservationString(2) = "Scores: 0 2 8 4 0, Turn total: 8\nCurrent player: 4 (rolling)\n"
 ObservationString(3) = "Scores: 0 2 8 4 0, Turn total: 8\nCurrent player: 4 (rolling)\n"
 ObservationString(4) = "Scores: 0 2 8 4 0, Turn total: 8\nCurrent player: 4 (rolling)\n"
-PublicObservationString() = "Scores: 0 2 8 4 0, Turn total: 8\nCurrent player: 4 (rolling)\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-PrivateObservationString(2) = ""
-PrivateObservationString(3) = ""
-PrivateObservationString(4) = ""
 ObservationTensor(0): ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -1649,7 +1481,7 @@ action: 2
 # Current player: 4
 IsTerminal() = False
 History() = [1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2, 0, 4, 0, 2]
-HistoryString() = "1 0 1 1 1 1 0 1 0 2 0 0 1 1 0 5 0 1 1 0 3 1 0 2 0 4 0 2"
+HistoryString() = "1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2, 0, 4, 0, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 4
@@ -1658,12 +1490,6 @@ ObservationString(1) = "Scores: 0 2 8 4 0, Turn total: 11\nCurrent player: 4\n"
 ObservationString(2) = "Scores: 0 2 8 4 0, Turn total: 11\nCurrent player: 4\n"
 ObservationString(3) = "Scores: 0 2 8 4 0, Turn total: 11\nCurrent player: 4\n"
 ObservationString(4) = "Scores: 0 2 8 4 0, Turn total: 11\nCurrent player: 4\n"
-PublicObservationString() = "Scores: 0 2 8 4 0, Turn total: 11\nCurrent player: 4\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-PrivateObservationString(2) = ""
-PrivateObservationString(3) = ""
-PrivateObservationString(4) = ""
 ObservationTensor(0): ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -1707,7 +1533,7 @@ action: 1
 # Current player: 0
 IsTerminal() = False
 History() = [1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2, 0, 4, 0, 2, 1]
-HistoryString() = "1 0 1 1 1 1 0 1 0 2 0 0 1 1 0 5 0 1 1 0 3 1 0 2 0 4 0 2 1"
+HistoryString() = "1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2, 0, 4, 0, 2, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -1716,12 +1542,6 @@ ObservationString(1) = "Scores: 0 2 8 4 11, Turn total: 0\nCurrent player: 0\n"
 ObservationString(2) = "Scores: 0 2 8 4 11, Turn total: 0\nCurrent player: 0\n"
 ObservationString(3) = "Scores: 0 2 8 4 11, Turn total: 0\nCurrent player: 0\n"
 ObservationString(4) = "Scores: 0 2 8 4 11, Turn total: 0\nCurrent player: 0\n"
-PublicObservationString() = "Scores: 0 2 8 4 11, Turn total: 0\nCurrent player: 0\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-PrivateObservationString(2) = ""
-PrivateObservationString(3) = ""
-PrivateObservationString(4) = ""
 ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -1765,7 +1585,7 @@ action: 0
 # Current player: 0 (rolling)
 IsTerminal() = False
 History() = [1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2, 0, 4, 0, 2, 1, 0]
-HistoryString() = "1 0 1 1 1 1 0 1 0 2 0 0 1 1 0 5 0 1 1 0 3 1 0 2 0 4 0 2 1 0"
+HistoryString() = "1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2, 0, 4, 0, 2, 1, 0"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -1774,12 +1594,6 @@ ObservationString(1) = "Scores: 0 2 8 4 11, Turn total: 0\nCurrent player: 0 (ro
 ObservationString(2) = "Scores: 0 2 8 4 11, Turn total: 0\nCurrent player: 0 (rolling)\n"
 ObservationString(3) = "Scores: 0 2 8 4 11, Turn total: 0\nCurrent player: 0 (rolling)\n"
 ObservationString(4) = "Scores: 0 2 8 4 11, Turn total: 0\nCurrent player: 0 (rolling)\n"
-PublicObservationString() = "Scores: 0 2 8 4 11, Turn total: 0\nCurrent player: 0 (rolling)\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-PrivateObservationString(2) = ""
-PrivateObservationString(3) = ""
-PrivateObservationString(4) = ""
 ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -1822,7 +1636,7 @@ action: 4
 # Current player: 0
 IsTerminal() = False
 History() = [1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2, 0, 4, 0, 2, 1, 0, 4]
-HistoryString() = "1 0 1 1 1 1 0 1 0 2 0 0 1 1 0 5 0 1 1 0 3 1 0 2 0 4 0 2 1 0 4"
+HistoryString() = "1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2, 0, 4, 0, 2, 1, 0, 4"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -1831,12 +1645,6 @@ ObservationString(1) = "Scores: 0 2 8 4 11, Turn total: 5\nCurrent player: 0\n"
 ObservationString(2) = "Scores: 0 2 8 4 11, Turn total: 5\nCurrent player: 0\n"
 ObservationString(3) = "Scores: 0 2 8 4 11, Turn total: 5\nCurrent player: 0\n"
 ObservationString(4) = "Scores: 0 2 8 4 11, Turn total: 5\nCurrent player: 0\n"
-PublicObservationString() = "Scores: 0 2 8 4 11, Turn total: 5\nCurrent player: 0\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-PrivateObservationString(2) = ""
-PrivateObservationString(3) = ""
-PrivateObservationString(4) = ""
 ObservationTensor(0): ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -1880,7 +1688,7 @@ action: 1
 # Current player: 1
 IsTerminal() = False
 History() = [1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2, 0, 4, 0, 2, 1, 0, 4, 1]
-HistoryString() = "1 0 1 1 1 1 0 1 0 2 0 0 1 1 0 5 0 1 1 0 3 1 0 2 0 4 0 2 1 0 4 1"
+HistoryString() = "1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2, 0, 4, 0, 2, 1, 0, 4, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -1889,12 +1697,6 @@ ObservationString(1) = "Scores: 5 2 8 4 11, Turn total: 0\nCurrent player: 1\n"
 ObservationString(2) = "Scores: 5 2 8 4 11, Turn total: 0\nCurrent player: 1\n"
 ObservationString(3) = "Scores: 5 2 8 4 11, Turn total: 0\nCurrent player: 1\n"
 ObservationString(4) = "Scores: 5 2 8 4 11, Turn total: 0\nCurrent player: 1\n"
-PublicObservationString() = "Scores: 5 2 8 4 11, Turn total: 0\nCurrent player: 1\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-PrivateObservationString(2) = ""
-PrivateObservationString(3) = ""
-PrivateObservationString(4) = ""
 ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
                       ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -1938,7 +1740,7 @@ action: 0
 # Current player: 1 (rolling)
 IsTerminal() = False
 History() = [1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2, 0, 4, 0, 2, 1, 0, 4, 1, 0]
-HistoryString() = "1 0 1 1 1 1 0 1 0 2 0 0 1 1 0 5 0 1 1 0 3 1 0 2 0 4 0 2 1 0 4 1 0"
+HistoryString() = "1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2, 0, 4, 0, 2, 1, 0, 4, 1, 0"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -1947,12 +1749,6 @@ ObservationString(1) = "Scores: 5 2 8 4 11, Turn total: 0\nCurrent player: 1 (ro
 ObservationString(2) = "Scores: 5 2 8 4 11, Turn total: 0\nCurrent player: 1 (rolling)\n"
 ObservationString(3) = "Scores: 5 2 8 4 11, Turn total: 0\nCurrent player: 1 (rolling)\n"
 ObservationString(4) = "Scores: 5 2 8 4 11, Turn total: 0\nCurrent player: 1 (rolling)\n"
-PublicObservationString() = "Scores: 5 2 8 4 11, Turn total: 0\nCurrent player: 1 (rolling)\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-PrivateObservationString(2) = ""
-PrivateObservationString(3) = ""
-PrivateObservationString(4) = ""
 ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
                       ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -1995,7 +1791,7 @@ action: 5
 # Current player: 1
 IsTerminal() = False
 History() = [1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2, 0, 4, 0, 2, 1, 0, 4, 1, 0, 5]
-HistoryString() = "1 0 1 1 1 1 0 1 0 2 0 0 1 1 0 5 0 1 1 0 3 1 0 2 0 4 0 2 1 0 4 1 0 5"
+HistoryString() = "1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2, 0, 4, 0, 2, 1, 0, 4, 1, 0, 5"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -2004,12 +1800,6 @@ ObservationString(1) = "Scores: 5 2 8 4 11, Turn total: 6\nCurrent player: 1\n"
 ObservationString(2) = "Scores: 5 2 8 4 11, Turn total: 6\nCurrent player: 1\n"
 ObservationString(3) = "Scores: 5 2 8 4 11, Turn total: 6\nCurrent player: 1\n"
 ObservationString(4) = "Scores: 5 2 8 4 11, Turn total: 6\nCurrent player: 1\n"
-PublicObservationString() = "Scores: 5 2 8 4 11, Turn total: 6\nCurrent player: 1\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-PrivateObservationString(2) = ""
-PrivateObservationString(3) = ""
-PrivateObservationString(4) = ""
 ObservationTensor(0): ◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯
                       ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
                       ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -2053,7 +1843,7 @@ action: 0
 # Current player: 1 (rolling)
 IsTerminal() = False
 History() = [1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2, 0, 4, 0, 2, 1, 0, 4, 1, 0, 5, 0]
-HistoryString() = "1 0 1 1 1 1 0 1 0 2 0 0 1 1 0 5 0 1 1 0 3 1 0 2 0 4 0 2 1 0 4 1 0 5 0"
+HistoryString() = "1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2, 0, 4, 0, 2, 1, 0, 4, 1, 0, 5, 0"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -2062,12 +1852,6 @@ ObservationString(1) = "Scores: 5 2 8 4 11, Turn total: 6\nCurrent player: 1 (ro
 ObservationString(2) = "Scores: 5 2 8 4 11, Turn total: 6\nCurrent player: 1 (rolling)\n"
 ObservationString(3) = "Scores: 5 2 8 4 11, Turn total: 6\nCurrent player: 1 (rolling)\n"
 ObservationString(4) = "Scores: 5 2 8 4 11, Turn total: 6\nCurrent player: 1 (rolling)\n"
-PublicObservationString() = "Scores: 5 2 8 4 11, Turn total: 6\nCurrent player: 1 (rolling)\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-PrivateObservationString(2) = ""
-PrivateObservationString(3) = ""
-PrivateObservationString(4) = ""
 ObservationTensor(0): ◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯
                       ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
                       ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -2110,7 +1894,7 @@ action: 4
 # Current player: 1
 IsTerminal() = False
 History() = [1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2, 0, 4, 0, 2, 1, 0, 4, 1, 0, 5, 0, 4]
-HistoryString() = "1 0 1 1 1 1 0 1 0 2 0 0 1 1 0 5 0 1 1 0 3 1 0 2 0 4 0 2 1 0 4 1 0 5 0 4"
+HistoryString() = "1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2, 0, 4, 0, 2, 1, 0, 4, 1, 0, 5, 0, 4"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -2119,12 +1903,6 @@ ObservationString(1) = "Scores: 5 2 8 4 11, Turn total: 11\nCurrent player: 1\n"
 ObservationString(2) = "Scores: 5 2 8 4 11, Turn total: 11\nCurrent player: 1\n"
 ObservationString(3) = "Scores: 5 2 8 4 11, Turn total: 11\nCurrent player: 1\n"
 ObservationString(4) = "Scores: 5 2 8 4 11, Turn total: 11\nCurrent player: 1\n"
-PublicObservationString() = "Scores: 5 2 8 4 11, Turn total: 11\nCurrent player: 1\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-PrivateObservationString(2) = ""
-PrivateObservationString(3) = ""
-PrivateObservationString(4) = ""
 ObservationTensor(0): ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
                       ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
                       ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -2168,7 +1946,7 @@ action: 0
 # Current player: 1 (rolling)
 IsTerminal() = False
 History() = [1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2, 0, 4, 0, 2, 1, 0, 4, 1, 0, 5, 0, 4, 0]
-HistoryString() = "1 0 1 1 1 1 0 1 0 2 0 0 1 1 0 5 0 1 1 0 3 1 0 2 0 4 0 2 1 0 4 1 0 5 0 4 0"
+HistoryString() = "1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2, 0, 4, 0, 2, 1, 0, 4, 1, 0, 5, 0, 4, 0"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -2177,12 +1955,6 @@ ObservationString(1) = "Scores: 5 2 8 4 11, Turn total: 11\nCurrent player: 1 (r
 ObservationString(2) = "Scores: 5 2 8 4 11, Turn total: 11\nCurrent player: 1 (rolling)\n"
 ObservationString(3) = "Scores: 5 2 8 4 11, Turn total: 11\nCurrent player: 1 (rolling)\n"
 ObservationString(4) = "Scores: 5 2 8 4 11, Turn total: 11\nCurrent player: 1 (rolling)\n"
-PublicObservationString() = "Scores: 5 2 8 4 11, Turn total: 11\nCurrent player: 1 (rolling)\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-PrivateObservationString(2) = ""
-PrivateObservationString(3) = ""
-PrivateObservationString(4) = ""
 ObservationTensor(0): ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
                       ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
                       ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -2225,7 +1997,7 @@ action: 3
 # Current player: 1
 IsTerminal() = False
 History() = [1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2, 0, 4, 0, 2, 1, 0, 4, 1, 0, 5, 0, 4, 0, 3]
-HistoryString() = "1 0 1 1 1 1 0 1 0 2 0 0 1 1 0 5 0 1 1 0 3 1 0 2 0 4 0 2 1 0 4 1 0 5 0 4 0 3"
+HistoryString() = "1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2, 0, 4, 0, 2, 1, 0, 4, 1, 0, 5, 0, 4, 0, 3"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -2234,12 +2006,6 @@ ObservationString(1) = "Scores: 5 2 8 4 11, Turn total: 15\nCurrent player: 1\n"
 ObservationString(2) = "Scores: 5 2 8 4 11, Turn total: 15\nCurrent player: 1\n"
 ObservationString(3) = "Scores: 5 2 8 4 11, Turn total: 15\nCurrent player: 1\n"
 ObservationString(4) = "Scores: 5 2 8 4 11, Turn total: 15\nCurrent player: 1\n"
-PublicObservationString() = "Scores: 5 2 8 4 11, Turn total: 15\nCurrent player: 1\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-PrivateObservationString(2) = ""
-PrivateObservationString(3) = ""
-PrivateObservationString(4) = ""
 ObservationTensor(0): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
                       ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
                       ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -2283,7 +2049,7 @@ action: 1
 # Current player: 2
 IsTerminal() = True
 History() = [1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2, 0, 4, 0, 2, 1, 0, 4, 1, 0, 5, 0, 4, 0, 3, 1]
-HistoryString() = "1 0 1 1 1 1 0 1 0 2 0 0 1 1 0 5 0 1 1 0 3 1 0 2 0 4 0 2 1 0 4 1 0 5 0 4 0 3 1"
+HistoryString() = "1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2, 0, 4, 0, 2, 1, 0, 4, 1, 0, 5, 0, 4, 0, 3, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
@@ -2292,12 +2058,6 @@ ObservationString(1) = "Scores: 5 17 8 4 11, Turn total: 0\nCurrent player: 2\n"
 ObservationString(2) = "Scores: 5 17 8 4 11, Turn total: 0\nCurrent player: 2\n"
 ObservationString(3) = "Scores: 5 17 8 4 11, Turn total: 0\nCurrent player: 2\n"
 ObservationString(4) = "Scores: 5 17 8 4 11, Turn total: 0\nCurrent player: 2\n"
-PublicObservationString() = "Scores: 5 17 8 4 11, Turn total: 0\nCurrent player: 2\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-PrivateObservationString(2) = ""
-PrivateObservationString(3) = ""
-PrivateObservationString(4) = ""
 ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
                       ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉

@@ -52,8 +52,8 @@ class ObservationTest(absltest.TestCase):
     np.testing.assert_array_equal(observation.dict["pot_contribution"], [3, 3])
     self.assertEqual(
         observation.string_from(state, 0),
-        "[Round 2][Player: 0][Pot: 6][Money: 97 97[Private: 1]"
-        "[Ante: 3 3][Public: 3]")
+        "[Observer: 0][Private: 1][Round 2][Player: 0][Pot: 6]"
+        "[Money: 97 97][Public: 3][Ante: 3 3]")
 
   def test_leduc_info_state(self):
     game = pyspiel.load_game("leduc_poker")
@@ -85,8 +85,26 @@ class ObservationTest(absltest.TestCase):
         ])
     self.assertEqual(
         observation.string_from(state, 0),
-        "[Round 2][Player: 0][Pot: 6][Money: 97 97[Private: 1]]"
-        "[Round1]: 2 1[Public: 3]\nRound 2 sequence: ")
+        "[Observer: 0][Private: 1][Round 2][Player: 0][Pot: 6]"
+        "[Money: 97 97][Public: 3][Round1: 2 1][Round2: ]")
+
+  def test_leduc_info_state_as_single_tensor(self):
+    game = pyspiel.load_game("leduc_poker")
+    observation = make_observation(
+        game, INFO_STATE_OBS_TYPE,
+        pyspiel.game_parameters_from_string("single_tensor"))
+    state = game.new_initial_state()
+    state.apply_action(1)  # Deal 1
+    state.apply_action(2)  # Deal 2
+    state.apply_action(2)  # Bet
+    state.apply_action(1)  # Call
+    state.apply_action(3)  # Deal 3
+    observation.set_from(state, player=0)
+    self.assertEqual(list(observation.dict), ["info_state"])
+    np.testing.assert_array_equal(observation.dict["info_state"], [
+        1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0
+    ])
 
   def test_leduc_all_player_privates(self):
     game = pyspiel.load_game("leduc_poker")
@@ -177,7 +195,7 @@ class ObservationTest(absltest.TestCase):
         obs2.decompress(compressed)
         np.testing.assert_array_equal(obs1.tensor, obs2.tensor)
     expected_freq = {
-        3: 840,     # Compressible states take 3 bytes
+        3: 840,  # Compressible states take 3 bytes
         65: 17760,  # Uncompressible states take 65 bytes
     }
     self.assertEqual(freq, expected_freq)

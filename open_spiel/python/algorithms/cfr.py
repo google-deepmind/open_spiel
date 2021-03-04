@@ -165,8 +165,6 @@ class _CFRSolverBase(object):
     self._num_players = game.num_players()
     self._root_node = self._game.new_initial_state()
 
-    self._root_node = self._game.new_initial_state()
-
     # This is for returning the current policy and average policy to a caller
     self._current_policy = policy.TabularPolicy(game)
     self._average_policy = self._current_policy.__copy__()

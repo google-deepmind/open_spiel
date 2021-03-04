@@ -20,7 +20,7 @@ for TensorFlow community at
 
 To use Swift OpenSpiel, simply download a recent Swift for TensorFlow toolchain
 by following the
-[installation instructions](https://github.com/tensorflow/swift/blob/master/Installation.md)
+[installation instructions](https://github.com/tensorflow/swift/blob/main/Installation.md)
 (available for macOS and Linux currently). Currently, OpenSpiel builds with the
 latest stable toolchains.
 
@@ -35,7 +35,8 @@ swift test   # runs all unit tests
 ```
 
 A simple example of using the OpenSpiel package:
-```
+
+```swift
 import OpenSpiel
 
 let game = TicTacToe()
@@ -47,13 +48,16 @@ print(state)
 ## Using XCode
 
 To use OpenSpiel as a dependency for an XCode project, you need to use the [Swift Package Manager](https://swift.org/package-manager/) and use it to generate an XCode project. Create an executable package called `foo`:
-```
+
+```bash
 mkdir foo
 cd foo
 swift package init --type executable
 ```
+
 Now open the file `Package.swift` that was generated, and add OpenSpiel as a dependency. The contents are now:
-```
+
+```swift
 // swift-tools-version:5.1
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
@@ -74,12 +78,18 @@ let package = Package(
     ]
 )
 ```
+
 An XCode project can be generated from this package:
-```
+
+```bash
 swift package generate-xcodeproj
 open foo.xcodeproj
 ```
-Set the build system to the Legacy Build System (File → Project Settings → Build System) required by [Swift for Tensorflow](https://github.com/tensorflow/swift/blob/master/Installation.md#installation), and you are ready to build using XCode.
+
+Set the build system to the Legacy Build System (File → Project Settings → Build
+System) required by
+[Swift for Tensorflow](https://github.com/tensorflow/swift/blob/main/Installation.md#installation),
+and you are ready to build using XCode.
 
 ## A tour through the code
 

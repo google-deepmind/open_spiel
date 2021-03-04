@@ -100,7 +100,7 @@ action: 1
 # Discards:
 IsTerminal() = False
 History() = [3, 1]
-HistoryString() = "3 1"
+HistoryString() = "3, 1"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -131,7 +131,7 @@ action: 4
 # Discards:
 IsTerminal() = False
 History() = [3, 1, 4]
-HistoryString() = "3 1 4"
+HistoryString() = "3, 1, 4"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -163,7 +163,7 @@ action: 4
 # Discards:
 IsTerminal() = False
 History() = [3, 1, 4, 4]
-HistoryString() = "3 1 4 4"
+HistoryString() = "3, 1, 4, 4"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -196,7 +196,7 @@ action: 2
 # Discards:
 IsTerminal() = False
 History() = [3, 1, 4, 4, 2]
-HistoryString() = "3 1 4 4 2"
+HistoryString() = "3, 1, 4, 4, 2"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -230,7 +230,7 @@ action: 3
 # Discards:
 IsTerminal() = False
 History() = [3, 1, 4, 4, 2, 3]
-HistoryString() = "3 1 4 4 2 3"
+HistoryString() = "3, 1, 4, 4, 2, 3"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -265,7 +265,7 @@ action: 0
 # Discards:
 IsTerminal() = False
 History() = [3, 1, 4, 4, 2, 3, 0]
-HistoryString() = "3 1 4 4 2 3 0"
+HistoryString() = "3, 1, 4, 4, 2, 3, 0"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -301,7 +301,7 @@ action: 1
 # Discards:
 IsTerminal() = False
 History() = [3, 1, 4, 4, 2, 3, 0, 1]
-HistoryString() = "3 1 4 4 2 3 0 1"
+HistoryString() = "3, 1, 4, 4, 2, 3, 0, 1"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -339,7 +339,7 @@ action: 3
 # Discards:
 IsTerminal() = False
 History() = [3, 1, 4, 4, 2, 3, 0, 1, 3]
-HistoryString() = "3 1 4 4 2 3 0 1 3"
+HistoryString() = "3, 1, 4, 4, 2, 3, 0, 1, 3"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -378,7 +378,7 @@ action: 14
 # Discards:
 IsTerminal() = False
 History() = [3, 1, 4, 4, 2, 3, 0, 1, 3, 14]
-HistoryString() = "3 1 4 4 2 3 0 1 3 14"
+HistoryString() = "3, 1, 4, 4, 2, 3, 0, 1, 3, 14"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -417,7 +417,7 @@ action: 13
 # Discards:
 IsTerminal() = False
 History() = [3, 1, 4, 4, 2, 3, 0, 1, 3, 14, 13]
-HistoryString() = "3 1 4 4 2 3 0 1 3 14 13"
+HistoryString() = "3, 1, 4, 4, 2, 3, 0, 1, 3, 14, 13"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 2
@@ -456,7 +456,7 @@ action: 15
 # Discards:
 IsTerminal() = False
 History() = [3, 1, 4, 4, 2, 3, 0, 1, 3, 14, 13, 15]
-HistoryString() = "3 1 4 4 2 3 0 1 3 14 13 15"
+HistoryString() = "3, 1, 4, 4, 2, 3, 0, 1, 3, 14, 13, 15"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -493,7 +493,7 @@ action: 0
 # Discards: Y1
 IsTerminal() = False
 History() = [3, 1, 4, 4, 2, 3, 0, 1, 3, 14, 13, 15, 0]
-HistoryString() = "3 1 4 4 2 3 0 1 3 14 13 15 0"
+HistoryString() = "3, 1, 4, 4, 2, 3, 0, 1, 3, 14, 13, 15, 0"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -531,7 +531,7 @@ action: 5
 # Discards: Y1
 IsTerminal() = False
 History() = [3, 1, 4, 4, 2, 3, 0, 1, 3, 14, 13, 15, 0, 5]
-HistoryString() = "3 1 4 4 2 3 0 1 3 14 13 15 0 5"
+HistoryString() = "3, 1, 4, 4, 2, 3, 0, 1, 3, 14, 13, 15, 0, 5"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -570,7 +570,7 @@ action: 8
 # Discards: Y1
 IsTerminal() = False
 History() = [3, 1, 4, 4, 2, 3, 0, 1, 3, 14, 13, 15, 0, 5, 8]
-HistoryString() = "3 1 4 4 2 3 0 1 3 14 13 15 0 5 8"
+HistoryString() = "3, 1, 4, 4, 2, 3, 0, 1, 3, 14, 13, 15, 0, 5, 8"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 2
@@ -607,7 +607,7 @@ action: 5
 # Discards: Y1
 IsTerminal() = False
 History() = [3, 1, 4, 4, 2, 3, 0, 1, 3, 14, 13, 15, 0, 5, 8, 5]
-HistoryString() = "3 1 4 4 2 3 0 1 3 14 13 15 0 5 8 5"
+HistoryString() = "3, 1, 4, 4, 2, 3, 0, 1, 3, 14, 13, 15, 0, 5, 8, 5"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -645,7 +645,7 @@ action: 0
 # Discards: Y1
 IsTerminal() = False
 History() = [3, 1, 4, 4, 2, 3, 0, 1, 3, 14, 13, 15, 0, 5, 8, 5, 0]
-HistoryString() = "3 1 4 4 2 3 0 1 3 14 13 15 0 5 8 5 0"
+HistoryString() = "3, 1, 4, 4, 2, 3, 0, 1, 3, 14, 13, 15, 0, 5, 8, 5, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -682,7 +682,7 @@ action: 4
 # Discards: Y1
 IsTerminal() = False
 History() = [3, 1, 4, 4, 2, 3, 0, 1, 3, 14, 13, 15, 0, 5, 8, 5, 0, 4]
-HistoryString() = "3 1 4 4 2 3 0 1 3 14 13 15 0 5 8 5 0 4"
+HistoryString() = "3, 1, 4, 4, 2, 3, 0, 1, 3, 14, 13, 15, 0, 5, 8, 5, 0, 4"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -720,7 +720,7 @@ action: 0
 # Discards: Y1
 IsTerminal() = False
 History() = [3, 1, 4, 4, 2, 3, 0, 1, 3, 14, 13, 15, 0, 5, 8, 5, 0, 4, 0]
-HistoryString() = "3 1 4 4 2 3 0 1 3 14 13 15 0 5 8 5 0 4 0"
+HistoryString() = "3, 1, 4, 4, 2, 3, 0, 1, 3, 14, 13, 15, 0, 5, 8, 5, 0, 4, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -759,7 +759,7 @@ action: 9
 # Discards: Y1
 IsTerminal() = False
 History() = [3, 1, 4, 4, 2, 3, 0, 1, 3, 14, 13, 15, 0, 5, 8, 5, 0, 4, 0, 9]
-HistoryString() = "3 1 4 4 2 3 0 1 3 14 13 15 0 5 8 5 0 4 0 9"
+HistoryString() = "3, 1, 4, 4, 2, 3, 0, 1, 3, 14, 13, 15, 0, 5, 8, 5, 0, 4, 0, 9"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 2
@@ -798,7 +798,7 @@ action: 11
 # Discards: Y1
 IsTerminal() = False
 History() = [3, 1, 4, 4, 2, 3, 0, 1, 3, 14, 13, 15, 0, 5, 8, 5, 0, 4, 0, 9, 11]
-HistoryString() = "3 1 4 4 2 3 0 1 3 14 13 15 0 5 8 5 0 4 0 9 11"
+HistoryString() = "3, 1, 4, 4, 2, 3, 0, 1, 3, 14, 13, 15, 0, 5, 8, 5, 0, 4, 0, 9, 11"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -836,7 +836,7 @@ action: 2
 # Discards: Y1 R1
 IsTerminal() = True
 History() = [3, 1, 4, 4, 2, 3, 0, 1, 3, 14, 13, 15, 0, 5, 8, 5, 0, 4, 0, 9, 11, 2]
-HistoryString() = "3 1 4 4 2 3 0 1 3 14 13 15 0 5 8 5 0 4 0 9 11 2"
+HistoryString() = "3, 1, 4, 4, 2, 3, 0, 1, 3, 14, 13, 15, 0, 5, 8, 5, 0, 4, 0, 9, 11, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4

@@ -17,6 +17,7 @@
 #include <memory>
 #include <string>
 
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/fog/observation_history.h"
 #include "pybind11/include/pybind11/pybind11.h"
 #include "pybind11/include/pybind11/stl.h"
@@ -28,13 +29,13 @@ namespace py = ::pybind11;
 std::unique_ptr<ActionObservationHistory> ActionObservationHistoryFromPyList(
     const Player& player, const py::list& xs) {
   SPIEL_CHECK_GT(xs.size(), 0);
-  std::vector<std::pair<std::optional<Action>, std::string>> history;
+  std::vector<std::pair<absl::optional<Action>, std::string>> history;
   for (const auto& x : xs) {
     py::tuple act_obs_tuple = x.cast<py::tuple>();
     SPIEL_CHECK_EQ(act_obs_tuple.size(), 2);
 
-    std::optional<Action> action = std::nullopt;
-    if (!py::cast<py::none>(act_obs_tuple[0]).is_none()) {
+    absl::optional<Action> action = absl::nullopt;
+    if (!act_obs_tuple[0].is_none()) {
       action = act_obs_tuple[0].cast<int>();
     }
 

@@ -14,6 +14,7 @@
 
 #include "open_spiel/games/stones_and_gems.h"
 
+#include "open_spiel/abseil-cpp/absl/container/node_hash_map.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/tests/basic_tests.h"
 #include "unordered_map"
@@ -83,7 +84,7 @@ void ExtendedStonesNGemsTest() {
 
   // observation tensor index along with corresponding IDs
   const int offset = 6 * 7;
-  const std::unordered_map<int, int> obs_ids_init{
+  const absl::node_hash_map<int, int> obs_ids_init{
       {0 * offset + 25, 26},  {1 * offset + 7, 8},    {1 * offset + 8, 9},
       {1 * offset + 9, 10},   {1 * offset + 15, 16},  {1 * offset + 16, 17},
       {1 * offset + 19, 20},  {1 * offset + 20, 21},  {1 * offset + 21, 22},
@@ -100,7 +101,7 @@ void ExtendedStonesNGemsTest() {
       {11 * offset + 39, 40}, {11 * offset + 40, 41}, {11 * offset + 41, 42},
   };
 
-  const std::unordered_map<int, int> obs_ids_after{
+  const absl::node_hash_map<int, int> obs_ids_after{
       {0 * offset + 31, 26},  {1 * offset + 7, 8},    {1 * offset + 8, 9},
       {1 * offset + 9, 10},   {1 * offset + 15, 16},  {1 * offset + 19, 20},
       {1 * offset + 20, 21},  {1 * offset + 21, 22},  {1 * offset + 27, 28},

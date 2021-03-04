@@ -191,7 +191,7 @@ actions: [0, 0]
 # Points: 0 0
 IsTerminal() = False
 History() = [3, 0, 0]
-HistoryString() = "3 0 0"
+HistoryString() = "3, 0, 0"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -264,7 +264,7 @@ action: 1
 # Points: 0 0
 IsTerminal() = False
 History() = [3, 0, 0, 1]
-HistoryString() = "3 0 0 1"
+HistoryString() = "3, 0, 0, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = True
 CurrentPlayer() = -2
@@ -340,7 +340,7 @@ actions: [2, 1]
 # Points: 2 0
 IsTerminal() = False
 History() = [3, 0, 0, 1, 2, 1]
-HistoryString() = "3 0 0 1 2 1"
+HistoryString() = "3, 0, 0, 1, 2, 1"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -413,7 +413,7 @@ action: 0
 # Points: 2 0
 IsTerminal() = False
 History() = [3, 0, 0, 1, 2, 1, 0]
-HistoryString() = "3 0 0 1 2 1 0"
+HistoryString() = "3, 0, 0, 1, 2, 1, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = True
 CurrentPlayer() = -2
@@ -489,7 +489,7 @@ actions: [3, 2]
 # Points: 3 3
 IsTerminal() = True
 History() = [3, 0, 0, 1, 2, 1, 0, 3, 2]
-HistoryString() = "3 0 0 1 2 1 0 3 2"
+HistoryString() = "3, 0, 0, 1, 2, 1, 0, 3, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4

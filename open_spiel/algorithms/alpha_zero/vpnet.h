@@ -17,7 +17,7 @@
 
 #include "open_spiel/spiel.h"
 #include "tensorflow/core/framework/tensor.h"
-#include "tensorflow/core/protobuf/meta_graph.proto.h"
+#include "tensorflow/core/protobuf/meta_graph.pb.h"
 #include "tensorflow/core/public/session.h"
 
 namespace open_spiel {

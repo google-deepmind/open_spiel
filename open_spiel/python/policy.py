@@ -122,8 +122,8 @@ class TabularPolicy(Policy):
   code for users of this class, i.e. `action_probability_array` contains
   states for player 0 first, followed by states for player 1, etc.
 
-  The policy uses `state.information_state` as the keys if available, otherwise
-  `state.observation`.
+  The policy uses `state.information_state_string` as the keys if available,
+  otherwise `state.observation_string`.
 
   Usages:
 
@@ -385,6 +385,16 @@ def tabular_policy_from_callable(game, callable_policy, players=None):
   return tabular_policy
 
 
+def pyspiel_policy_to_python_policy(game, pyspiel_tabular_policy):
+  policy = TabularPolicy(game)
+  for item in pyspiel_tabular_policy.policy_table().items():
+    info_state_str, actions_probs = item
+    state_policy = policy.policy_for_key(info_state_str)
+    for action, prob in actions_probs:
+      state_policy[action] = prob
+  return policy
+
+
 def python_policy_to_pyspiel_policy(python_tabular_policy):
   """Converts a TabularPolicy to a pyspiel.TabularPolicy."""
   infostates_to_probabilities = dict()
@@ -398,3 +408,15 @@ def python_policy_to_pyspiel_policy(python_tabular_policy):
         action_probs.append((action, prob))
     infostates_to_probabilities[infostate] = action_probs
   return pyspiel.TabularPolicy(infostates_to_probabilities)
+
+
+def python_policies_to_pyspiel_policies(policies):
+  """Same conversion as above (list version).
+
+  Args:
+    policies: a list of python.TabularPolicy
+
+  Returns:
+    a list of pyspiel.TabularPolicy.
+  """
+  return [python_policy_to_pyspiel_policy(p) for p in policies]

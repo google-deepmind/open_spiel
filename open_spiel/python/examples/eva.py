@@ -73,8 +73,8 @@ def main(unused_argv):
               epsilon_end=0.1,
               epsilon_decay_duration=int(1e6)))
     sess.run(tf.global_variables_initializer())
-    time_step = env.reset()
     for _ in range(FLAGS.num_episodes):
+      time_step = env.reset()
       while not time_step.last():
         current_player = time_step.observations["current_player"]
         current_agent = eva_agents[current_player]

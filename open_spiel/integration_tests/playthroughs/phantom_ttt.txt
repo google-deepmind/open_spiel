@@ -91,7 +91,7 @@ action: 7
 # xo.
 IsTerminal() = False
 History() = [6, 7]
-HistoryString() = "6 7"
+HistoryString() = "6, 7"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -117,7 +117,7 @@ action: 8
 # xox
 IsTerminal() = False
 History() = [6, 7, 8]
-HistoryString() = "6 7 8"
+HistoryString() = "6, 7, 8"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -143,7 +143,7 @@ action: 8
 # xox
 IsTerminal() = False
 History() = [6, 7, 8, 8]
-HistoryString() = "6 7 8 8"
+HistoryString() = "6, 7, 8, 8"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -169,7 +169,7 @@ action: 2
 # xox
 IsTerminal() = False
 History() = [6, 7, 8, 8, 2]
-HistoryString() = "6 7 8 8 2"
+HistoryString() = "6, 7, 8, 8, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -195,7 +195,7 @@ action: 3
 # xox
 IsTerminal() = False
 History() = [6, 7, 8, 8, 2, 3]
-HistoryString() = "6 7 8 8 2 3"
+HistoryString() = "6, 7, 8, 8, 2, 3"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -221,7 +221,7 @@ action: 6
 # xox
 IsTerminal() = False
 History() = [6, 7, 8, 8, 2, 3, 6]
-HistoryString() = "6 7 8 8 2 3 6"
+HistoryString() = "6, 7, 8, 8, 2, 3, 6"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -247,7 +247,7 @@ action: 5
 # xox
 IsTerminal() = False
 History() = [6, 7, 8, 8, 2, 3, 6, 5]
-HistoryString() = "6 7 8 8 2 3 6 5"
+HistoryString() = "6, 7, 8, 8, 2, 3, 6, 5"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -273,7 +273,7 @@ action: 7
 # xox
 IsTerminal() = False
 History() = [6, 7, 8, 8, 2, 3, 6, 5, 7]
-HistoryString() = "6 7 8 8 2 3 6 5 7"
+HistoryString() = "6, 7, 8, 8, 2, 3, 6, 5, 7"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -299,7 +299,7 @@ action: 2
 # xox
 IsTerminal() = False
 History() = [6, 7, 8, 8, 2, 3, 6, 5, 7, 2]
-HistoryString() = "6 7 8 8 2 3 6 5 7 2"
+HistoryString() = "6, 7, 8, 8, 2, 3, 6, 5, 7, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -325,7 +325,7 @@ action: 0
 # xox
 IsTerminal() = True
 History() = [6, 7, 8, 8, 2, 3, 6, 5, 7, 2, 0]
-HistoryString() = "6 7 8 8 2 3 6 5 7 2 0"
+HistoryString() = "6, 7, 8, 8, 2, 3, 6, 5, 7, 2, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4

@@ -29,6 +29,7 @@ namespace efg_game {
 std::string GetSampleEFGData();
 std::string GetKuhnPokerEFGData();
 std::string GetSignalingEFGData();
+std::string GetSimpleForkEFGData();
 
 }  // namespace efg_game
 }  // namespace open_spiel
