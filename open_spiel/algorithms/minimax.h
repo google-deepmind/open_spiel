@@ -31,9 +31,9 @@ namespace algorithms {
 //   game: The game to analyze, as returned by `LoadGame`.
 //   state: The state to start from. If nullptr, starts from initial state.
 //   value_function: An optional function mapping a Spiel `State` to a
-//     numerical value, to be used as the value for a node when we reach
-//     `maximum_depth` and the node is not terminal. Use `nullptr` for no value
-//     function.
+//     numerical value to the maximizing player, to be used as the value for a
+//     node when we reach `maximum_depth` and the node is not terminal. Use
+//     `nullptr` for no value function.
 //   maximum_depth: The maximum depth to search over. When this depth is
 //     reached, an exception will be raised.
 //   maximizing_player_id: The id of the MAX player. The other player is assumed
