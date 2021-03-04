@@ -132,7 +132,7 @@ class DarkHexState : public State {
     std::unique_ptr<State> NewInitialState() const override {
       return std::unique_ptr<State>(
           new DarkHexState(shared_from_this(), board_size_, 
-                           game_version_, obs_type_)
+                           game_version_, obs_type_));
     }
     int NumDistinctActions() const override {
       return game_->NumDistinctActions();
