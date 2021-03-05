@@ -164,18 +164,21 @@ void DarkHexState::InformationStateTensor(Player player,
                                     longest_sequence_ * (1 + bits_per_action_));
   std::fill(values.begin(), values.end(), 0.);
   for (int cell = 0; cell < num_cells_; ++cell) {
-    values[num_cells_ *
-               (static_cast<int>(player_view[cell]) - kMinValueCellState) +
-           cell] = 1.0;
+    values[cell * kCellStates +
+           (static_cast<int>(player_view[cell]) - kMinValueCellState)] = 1.0;
   }
 
   // Encoding the sequence
   int offset = num_cells_ * kCellStates;
   for (const auto& player_with_action : action_sequence_) {
     if (player_with_action.first == player) {
+      // Always include the observing player's actions.
       values[offset] = player_with_action.first;
       values[offset + 1 + player_with_action.second] = 1.0;
     } else if (obs_type_ == ObservationType::kRevealNumTurns) {
+      // If the number of turns are revealed, then each of the other player's
+      // actions will show up as unknowns. Here, num_cells_ + 1 is used to
+      // encode "unknown".
       values[offset] = player_with_action.first;
       values[offset + 1 + num_cells_ + 1] = 1.0;
     } else {
@@ -204,9 +207,8 @@ void DarkHexState::ObservationTensor(Player player,
 
   const auto& player_view = (player == 0 ? black_view_ : white_view_);
   for (int cell = 0; cell < num_cells_; ++cell) {
-    values[num_cells_ *
-               (static_cast<int>(player_view[cell]) - kMinValueCellState) +
-           cell] = 1.0;
+    values[cell * kCellStates +
+           (static_cast<int>(player_view[cell]) - kMinValueCellState)] = 1.0;
   }
 
   if (obs_type_ == ObservationType::kRevealNumTurns) {
