@@ -29,13 +29,13 @@ namespace {
 
 uint_fast32_t Seed() { return absl::ToUnixMicros(absl::Now()); }
 
-void TestStockfish(Bot *opponent_bot, int argc, char **argv) {
+void TestStockfish(Bot *opponent_bot) {
   std::mt19937 rng(Seed());
   auto game = open_spiel::LoadGame("chess");
   std::vector<std::unique_ptr<open_spiel::Bot>> bots;
   std::vector<Bot *> bot_ptrs;
 
-  bots.push_back(stockfish::MakeStockfishBot(argc, argv, 30));
+  bots.push_back(stockfish::MakeStockfishBot(30, false));
   bot_ptrs.push_back(bots.back().get());
 
   bot_ptrs.push_back(opponent_bot);
@@ -46,20 +46,26 @@ void TestStockfish(Bot *opponent_bot, int argc, char **argv) {
   std::cout << returns << std::endl;
 }
 
-void TestStockfishAgainstUniformRandom(int argc, char **argv) {
+void TestStockfishAgainstUniformRandom() {
   auto opponent_bot = MakeUniformRandomBot(1, Seed());
-  TestStockfish(opponent_bot.get(), argc, argv);
+  TestStockfish(opponent_bot.get());
 }
 
-void TestStockfishAgainstStockfish(int argc, char **argv) {
-  auto opponent_bot = stockfish::MakeStockfishBot(argc, argv, 30);
-  TestStockfish(opponent_bot.get(), argc, argv);
+void TestStockfishAgainstStockfish() {
+
+  uci::Options options = stockfish::MakeStockfishOptionsBuilder()
+      ->WithUCI_LimitStrength(true)
+      ->WithUCI_Elo(1500)
+      ->Build();
+
+  auto opponent_bot = stockfish::MakeStockfishBot(30, true, options);
+  TestStockfish(opponent_bot.get());
 }
 
 }  // namespace
 }  // namespace open_spiel
 
 int main(int argc, char **argv) {
-  open_spiel::TestStockfishAgainstUniformRandom(argc, argv);
-  open_spiel::TestStockfishAgainstStockfish(argc, argv);
+  open_spiel::TestStockfishAgainstUniformRandom();
+  open_spiel::TestStockfishAgainstStockfish();
 }

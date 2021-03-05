@@ -184,6 +184,7 @@ set (OPEN_SPIEL_OBJECTS
   $<TARGET_OBJECTS:bridge_double_dummy_solver>
   $<TARGET_OBJECTS:algorithms>
   $<TARGET_OBJECTS:utils>
+  $<TARGET_OBJECTS:uci>
 )
 if (BUILD_WITH_HANABI)
   set(OPEN_SPIEL_OBJECTS ${OPEN_SPIEL_OBJECTS}

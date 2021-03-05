@@ -12,126 +12,186 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "open_spiel/bots/stockfish/stockfish/src/bitboard.h"
-#include "open_spiel/bots/stockfish/stockfish/src/endgame.h"
-#include "open_spiel/bots/stockfish/stockfish/src/position.h"
-#include "open_spiel/bots/stockfish/stockfish/src/search.h"
-#include "open_spiel/bots/stockfish/stockfish/src/thread.h"
-#include "open_spiel/bots/stockfish/stockfish/src/tt.h"
-#include "open_spiel/bots/stockfish/stockfish/src/uci.h"
-#include "open_spiel/bots/stockfish/stockfish/src/syzygy/tbprobe.h"
 #include "open_spiel/bots/stockfish/stockfish/src/types.h"
 #include "open_spiel/bots/stockfish/stockfish_bot.h"
-#include "open_spiel/spiel_utils.h"
-
-#include "open_spiel/games/chess.h"
 
 namespace open_spiel {
 namespace stockfish {
-namespace {
 
-// FEN string of the initial position, normal chess
-const char* StartFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+StockfishOptionsBuilder *StockfishOptionsBuilder::WithDebugLogFile(
+    const std::string &debug_log_file) {
+  options_["Log File"] = debug_log_file;
+  return this;
+}
 
+StockfishOptionsBuilder *StockfishOptionsBuilder::WithContempt(int contempt) {
+  SPIEL_CHECK_GE(contempt, -100);
+  SPIEL_CHECK_LE(contempt, 100);
+  options_["Contempt"] = std::to_string(contempt);
+  return this;
+}
 
-}  // namespace
+StockfishOptionsBuilder *StockfishOptionsBuilder::WithAnalysisContempt(
+    StockfishAnalysisContempt analysis_contempt) {
+  std::string str_val;
+  switch (analysis_contempt) {
+    case StockfishAnalysisContempt::kBoth:
+      str_val = "Both";
+      break;
+    case StockfishAnalysisContempt::kOff:
+      str_val = "Off";
+      break;
+    case StockfishAnalysisContempt::kWhite:
+      str_val = "White";
+      break;
+    case StockfishAnalysisContempt::kBlack:
+      str_val = "Black";
+      break;
+    default:
+      SpielFatalError("Unknown stockfish analysis contempt");
 
-StockfishBot::StockfishBot(int argc, char **argv, int move_time) :
-  move_time_(move_time) {
-
-
-  CommandLine::init(argc, argv);
-  UCI::init(Options);
-  Tune::init();
-  PSQT::init();
-  Bitboards::init();
-  Position::init();
-  Bitbases::init();
-  Endgames::init();
-  Threads.set(size_t(Options["Threads"]));
-  Search::clear(); // After threads are up
-  Eval::init_NNUE();
-
-  if (Options.count("Use NNUE")) {
-    Options["Use NNUE"] = std::string("false");
   }
+  options_["Analysis Contempt"] = str_val;
+  return this;
 }
 
-void StockfishBot::Restart() {
-  Search::clear(); // ucinewgame command
+StockfishOptionsBuilder *StockfishOptionsBuilder::WithThreads(int threads) {
+  SPIEL_CHECK_GE(threads, 1);
+  SPIEL_CHECK_LE(threads, 512);
+  options_["Threads"] = std::to_string(threads);
+  return this;
 }
 
-void StockfishBot::RestartAt(const State& state) {
-  Restart();
+StockfishOptionsBuilder *StockfishOptionsBuilder::WithHash(int hash) {
+  SPIEL_CHECK_GE(hash, 1);
+  SPIEL_CHECK_LE(hash, 33554432);
+  options_["Hash"] = std::to_string(hash);
+  return this;
 }
 
-
-Action StockfishBot::Step(const State& state) {
-
-  auto chess_state = dynamic_cast<const chess::ChessState *>(&state);
-
-  Position pos;
-  auto sf_states_ = StateListPtr(new std::deque<StateInfo>(1)); // Drop old and create a new one
-  pos.set(state.ToString(), false, &sf_states_->back(), Threads.main());
-
-
-  Search::LimitsType limits;
-  limits.startTime = now();
-  limits.movetime = move_time_;
-
-  Threads.start_thinking(pos, sf_states_, limits, false);
-
-  Threads.main()->wait_for_search_finished();
-
-  Thread* bestThread = Threads.get_best_thread();
-
-  // Send again PV info if we have a new best thread
-  if (bestThread != Threads.main())
-    sync_cout << UCI::pv(bestThread->rootPos, bestThread->completedDepth, -VALUE_INFINITE, VALUE_INFINITE) << sync_endl;
-
-  sync_cout << "bestmove " << UCI::move(bestThread->rootMoves[0].pv[0], false);
-
-  std::cout << sync_endl;
-
-  Move best_move = bestThread->rootMoves[0].pv[0];
-
-  chess::Move move = MoveFromStockfishMove(best_move, chess_state->Board());
-
-  return chess::MoveToAction(move);
+StockfishOptionsBuilder *StockfishOptionsBuilder::WithPonder(bool ponder) {
+  options_["Ponder"] = ponder ? "true" : "false";
+  return this;
 }
 
-chess::Move StockfishBot::MoveFromStockfishMove(Move move, const chess::StandardChessBoard &board) {
-  Square from = from_sq(move);
-  Square to = to_sq(move);
-
-  std::string from_str = UCI::square(from);
-  std::string to_str = UCI::square(to);
-
-  auto from_sq = chess::SquareFromString(from_str);
-  auto to_sq = chess::SquareFromString(to_str);
-  if (!from_sq || !to_sq) {
-    SpielFatalError("Conversion of move from stockfish to openspiel failed");
-  }
-
-  std::optional<chess::PieceType> promotion_piece_type = chess::PieceType::kEmpty;
-  if (type_of(move) == PROMOTION) {
-    const char promotion_str = " pnbrqk"[promotion_type(move)];
-    promotion_piece_type = chess::PieceTypeFromChar(promotion_str);
-    if (!promotion_piece_type) {
-      SpielFatalError("Conversion of move from stockfish to openspiel failed");
-    }
-  }
-
-  return chess::Move(*from_sq, *to_sq, board.at(*from_sq), *promotion_piece_type, type_of(move) == CASTLING);
+StockfishOptionsBuilder *StockfishOptionsBuilder::WithMultiPV(int multi_pv) {
+  SPIEL_CHECK_GE(multi_pv, 1);
+  SPIEL_CHECK_LE(multi_pv, 500);
+  options_["MultiPV"] = std::to_string(multi_pv);
+  return this;
 }
 
-void StockfishBot::InformAction(const State& state, Player player_id,
-                                Action action) {
-
+StockfishOptionsBuilder *StockfishOptionsBuilder::WithSkillLevel(
+    int skill_level) {
+  SPIEL_CHECK_GE(skill_level, 0);
+  SPIEL_CHECK_LE(skill_level, 20);
+  options_["Skill Level"] = std::to_string(skill_level);
+  return this;
 }
 
-std::unique_ptr<Bot> stockfish::MakeStockfishBot(int argc, char **argv, int move_time) {
-  return std::make_unique<StockfishBot>(argc, argv, move_time);
+StockfishOptionsBuilder *StockfishOptionsBuilder::WithMoveOverHead(
+    int move_overhead) {
+  SPIEL_CHECK_GE(move_overhead, 0);
+  SPIEL_CHECK_LE(move_overhead, 5000);
+  options_["Move Overhead"] = std::to_string(move_overhead);
+  return this;
 }
+
+StockfishOptionsBuilder *StockfishOptionsBuilder::WithSlowMover(
+    int slow_mover) {
+  SPIEL_CHECK_GE(slow_mover, 10);
+  SPIEL_CHECK_LE(slow_mover, 1000);
+  options_["Slow Mover"] = std::to_string(slow_mover);
+  return this;
+}
+
+StockfishOptionsBuilder *StockfishOptionsBuilder::WithNodesTime(
+    int nodes_time) {
+  SPIEL_CHECK_GE(nodes_time, 0);
+  SPIEL_CHECK_LE(nodes_time, 10000);
+  options_["nodestime"] = std::to_string(nodes_time);
+  return this;
+}
+
+StockfishOptionsBuilder *StockfishOptionsBuilder::WithUCI_Chess960(
+    bool chess960) {
+  options_["UCI_Chess960"] = chess960 ? "true" : "false";
+  return this;
+}
+
+StockfishOptionsBuilder *StockfishOptionsBuilder::WithUCI_AnalyseMode(
+    bool analyse_mode) {
+  options_["UCI_AnalyseMode"] = analyse_mode ? "true" : "false";
+  return this;
+}
+
+StockfishOptionsBuilder *StockfishOptionsBuilder::WithUCI_LimitStrength(
+    bool limit_strength) {
+  options_["UCI_LimitStrength"] = limit_strength ? "true" : "false";
+  return this;
+}
+
+StockfishOptionsBuilder *StockfishOptionsBuilder::WithUCI_Elo(int elo) {
+  SPIEL_CHECK_GE(elo, 1350);
+  SPIEL_CHECK_LE(elo, 2850);
+  options_["UCI_Elo"] = std::to_string(elo);
+  return this;
+}
+
+StockfishOptionsBuilder *StockfishOptionsBuilder::WithUCI_ShowWDL(
+    bool show_wdl) {
+  options_["UCI_ShowWDL"] = show_wdl ? "true" : "false";
+  return this;
+}
+
+StockfishOptionsBuilder *StockfishOptionsBuilder::WithSyzygyPath(
+    const std::string &syzygy_path) {
+  options_["SyzygyPath"] = syzygy_path;
+  return this;
+}
+
+StockfishOptionsBuilder *StockfishOptionsBuilder::WithSyzygyProbeDepth(
+    int syzygy_probe_depth) {
+  SPIEL_CHECK_GE(syzygy_probe_depth, 1);
+  SPIEL_CHECK_LE(syzygy_probe_depth, 100);
+  options_["SyzygyProbeDepth"] = std::to_string(syzygy_probe_depth);
+  return this;
+}
+
+StockfishOptionsBuilder *StockfishOptionsBuilder::WithSyzygy50MoveRule(
+    bool syzygy_50_move_rule) {
+  options_["Syzygy50MoveRule"] = syzygy_50_move_rule ? "true" : "false";
+  return this;
+}
+
+StockfishOptionsBuilder *StockfishOptionsBuilder::WithSyzygyProbeLimit(
+    int syzygy_probe_limit) {
+  SPIEL_CHECK_GE(syzygy_probe_limit, 0);
+  SPIEL_CHECK_LE(syzygy_probe_limit, 7);
+  options_["SyzygyProbeLimit"] = std::to_string(syzygy_probe_limit);
+  return this;
+}
+
+StockfishOptionsBuilder *StockfishOptionsBuilder::WithUseNNUE(bool use_nnue) {
+  options_["Use NNUE"] = use_nnue ? "true" : "false";
+  return this;
+}
+
+StockfishOptionsBuilder *StockfishOptionsBuilder::WithEvalFile(
+    const std::string &eval_file) {
+  options_["EvalFile"] = eval_file;
+  return this;
+}
+
+std::unique_ptr<StockfishOptionsBuilder> MakeStockfishOptionsBuilder() {
+return std::make_unique<StockfishOptionsBuilder>();
+};
+
+std::unique_ptr<Bot> stockfish::MakeStockfishBot(int move_time,
+                                                 bool ponder,
+                                                 const uci::Options &options) {
+  return uci::MakeUciBot("stockfish", move_time, ponder, options);
+}
+
 }  // namespace stockfish
 }  // namespace open_spiel

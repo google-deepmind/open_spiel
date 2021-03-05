@@ -22,34 +22,63 @@
 
 #include "open_spiel/spiel_bots.h"
 #include "open_spiel/games/chess.h"
-#include "open_spiel/bots/stockfish/stockfish/src/types.h"
-#include "open_spiel/bots/stockfish/stockfish/src/thread.h"
-
-namespace PSQT {
-void init();
-}
+#include "open_spiel/bots/uci/uci_bot.h"
 
 namespace open_spiel {
 namespace stockfish {
 
-class StockfishBot : public Bot {
- public:
-  explicit StockfishBot(int argc, char **argv, int move_time);
-  virtual ~StockfishBot() { Threads.set(0); };
-
-  Action Step(const State& state) override;
-  void InformAction(const State& state, Player player_id,
-                    Action action) override;
-  void Restart() override;
-  void RestartAt(const State& state) override;
-
- private:
-  static chess::Move MoveFromStockfishMove(Move move, const chess::StandardChessBoard &board);
-
-  int move_time_;
+enum StockfishAnalysisContempt {
+  kBoth,
+  kOff,
+  kWhite,
+  kBlack
 };
 
-std::unique_ptr<Bot> MakeStockfishBot(int argc, char **argv, int move_time);
+class StockfishOptionsBuilder {
+ public:
+  StockfishOptionsBuilder() { Reset(); };
+
+  StockfishOptionsBuilder *WithDebugLogFile(const std::string &debug_log_file);
+  StockfishOptionsBuilder *WithContempt(int contempt);
+  StockfishOptionsBuilder *WithAnalysisContempt(
+      StockfishAnalysisContempt analysis_contempt);
+  StockfishOptionsBuilder *WithThreads(int threads);
+  StockfishOptionsBuilder *WithHash(int hash);
+  StockfishOptionsBuilder *WithPonder(bool ponder);
+  StockfishOptionsBuilder *WithMultiPV(int multi_pv);
+  StockfishOptionsBuilder *WithSkillLevel(int skill_level);
+  StockfishOptionsBuilder *WithMoveOverHead(int move_overhead);
+  StockfishOptionsBuilder *WithSlowMover(int slow_mover);
+  StockfishOptionsBuilder *WithNodesTime(int nodes_time);
+  StockfishOptionsBuilder *WithUCI_Chess960(bool chess960);
+  StockfishOptionsBuilder *WithUCI_AnalyseMode(bool analyse_mode);
+  StockfishOptionsBuilder *WithUCI_LimitStrength(bool limit_strength);
+  StockfishOptionsBuilder *WithUCI_Elo(int elo);
+  StockfishOptionsBuilder *WithUCI_ShowWDL(bool show_wdl);
+  StockfishOptionsBuilder *WithSyzygyPath(const std::string &syzygy_path);
+  StockfishOptionsBuilder *WithSyzygyProbeDepth(int syzygy_probe_depth);
+  StockfishOptionsBuilder *WithSyzygy50MoveRule(bool syzygy_50_move_rule);
+  StockfishOptionsBuilder *WithSyzygyProbeLimit(int syzygy_probe_limit);
+  StockfishOptionsBuilder *WithUseNNUE(bool use_nnue);
+  StockfishOptionsBuilder *WithEvalFile(const std::string &eval_file);
+
+  uci::Options Build() {
+    return options_;
+  }
+
+  void Reset() {
+    options_ = {};
+  }
+
+ private:
+  uci::Options options_;
+};
+
+std::unique_ptr<StockfishOptionsBuilder> MakeStockfishOptionsBuilder();
+
+std::unique_ptr<Bot> MakeStockfishBot(int move_time,
+                                      bool ponder = false,
+                                      const uci::Options &options = {});
 
 }  // namespace stockfish
 }  // namespace open_spiel
