@@ -19,6 +19,9 @@
 #include <cstdint>
 #include <utility>
 
+#include <stdio.h>
+
+
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_format.h"
@@ -721,20 +724,26 @@ int UniversalPokerGame::MaxGameLength() const {
   length += (NumPlayers() * acpc_game_.NumRounds());
 
   // Bet Actions
-  double maxStack = 0;
-  double maxBlind = 0;
-  for (uint32_t p = 0; p < NumPlayers(); p++) {
-    maxStack =
-        acpc_game_.StackSize(p) > maxStack ? acpc_game_.StackSize(p) : maxStack;
-    maxBlind =
-        acpc_game_.BlindSize(p) > maxBlind ? acpc_game_.BlindSize(p) : maxBlind;
-  }
+//  double maxStack = 0;
+//  double maxBlind = 0;
+//  for (uint32_t p = 0; p < NumPlayers(); p++) {
+//    maxStack =
+//        acpc_game_.StackSize(p) > maxStack ? acpc_game_.StackSize(p) : maxStack;
+//    maxBlind =
+//        acpc_game_.BlindSize(p) > maxBlind ? acpc_game_.BlindSize(p) : maxBlind;
+//  }
 
-  while (maxStack > maxBlind) {
-    maxStack /= 2.0;         // You have always to bet the pot size
-    length += NumPlayers();  // Each player has to react
-  }
-  length += 7;
+  length += acpc_game_.Game().maxRaises[0] * acpc_game_.NumRounds();
+
+//
+//  for (uint32_t p = 0; p < acpc_game_.NumRounds(); p++) {
+//    printf("Max raises index %d is %d", p, acpc_game_.Game().maxRaises[p]);
+//  }
+//  while (maxStack > maxBlind) {
+//    maxStack /= 2;         // You have always to bet the pot size
+//    length += NumPlayers();  // Each player has to react
+//  }
+
   return length;
 }
 
