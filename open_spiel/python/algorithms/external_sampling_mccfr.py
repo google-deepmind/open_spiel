@@ -112,7 +112,7 @@ class ExternalSamplingSolver(object):
       An average policy instance that should only be used during
       the lifetime of solver object.
     """
-    return mccfr.AveragePolicy(self._infostates)
+    return mccfr.AveragePolicy(self._game, list(range(self._num_players)), self._infostates)
 
   def _regret_matching(self, regrets, num_legal_actions):
     """Applies regret matching to get a policy.

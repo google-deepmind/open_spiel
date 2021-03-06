@@ -39,6 +39,10 @@ class ExternalSamplingMCCFRTest(absltest.TestCase):
     conv = exploitability.nash_conv(game, es_solver.average_policy())
     print("Leduc2P, conv = {}".format(conv))
     self.assertLess(conv, 5)
+    # ensure that to_tabular() works on the returned policy and the tabular policy is equivalent
+    tabular_policy = es_solver.average_policy().to_tabular()
+    conv2 = exploitability.nash_conv(game, tabular_policy)
+    self.assertEqual(conv, conv2)
 
   def test_external_sampling_leduc_2p_full(self):
     np.random.seed(SEED)
