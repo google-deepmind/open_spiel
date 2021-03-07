@@ -63,15 +63,18 @@ class PolicyBot(pyspiel.Bot):
     """
     policy = self._policy.action_probabilities(state, self._player_id)
 
+    if self._legal_only:
+      # Normalize policy probabilities over legal actions
+      legal_actions = state.legal_actions(self._player_id)
+      new_probs = [policy[action] if action in policy else 0 for action in legal_actions]
+      denom = sum(new_probs)
+      policy = { legal_actions[idx]: new_probs[idx] / (denom + 1e-40) for idx in range(len(legal_actions)) }
+    
     action_list = list(policy.keys())
     if not any(action_list):
       return [], pyspiel.INVALID_ACTION
 
     action = self._rng.choice(action_list, p=list(policy.values()))
-    
-    if self._legal_only and action not in state.legal_actions(self._player_id):
-      return [], pyspiel.INVALID_ACTION
-        
     return list(policy.items()), action
 
   def step(self, state):
