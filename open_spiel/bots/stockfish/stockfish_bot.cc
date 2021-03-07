@@ -190,7 +190,7 @@ return std::make_unique<StockfishOptionsBuilder>();
 std::unique_ptr<Bot> stockfish::MakeStockfishBot(int move_time,
                                                  bool ponder,
                                                  const uci::Options &options) {
-  return uci::MakeUciBot("stockfish", move_time, ponder, options);
+  return uci::MakeUCIBot("stockfish", move_time, ponder, options);
 }
 
 }  // namespace stockfish

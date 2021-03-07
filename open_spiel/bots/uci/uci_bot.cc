@@ -23,7 +23,7 @@
 namespace open_spiel {
 namespace uci {
 
-UciBot::UciBot(const std::string &path,
+UCIBot::UCIBot(const std::string &path,
                int move_time,
                bool ponder,
                const Options &options) :
@@ -43,7 +43,7 @@ UciBot::UciBot(const std::string &path,
   UciNewGame();
 }
 
-UciBot::~UciBot() {
+UCIBot::~UCIBot() {
   Quit();
   int status;
   while (waitpid(pid_, &status, 0) == -1);
@@ -52,7 +52,7 @@ UciBot::~UciBot() {
   }
 }
 
-Action UciBot::Step(const State &state) {
+Action UCIBot::Step(const State &state) {
   std::string move_str;
   auto chess_state = down_cast<const chess::ChessState&>(state);
   if (ponder_ && ponder_move_) {
@@ -82,20 +82,20 @@ Action UciBot::Step(const State &state) {
   return action;
 }
 
-void UciBot::Restart() {
+void UCIBot::Restart() {
   ponder_move_ = std::nullopt;
   was_ponder_hit_ = false;
   UciNewGame();
 }
 
-void UciBot::RestartAt(const State&state) {
+void UCIBot::RestartAt(const State&state) {
   ponder_move_ = std::nullopt;
   was_ponder_hit_ = false;
   auto chess_state = down_cast<const chess::ChessState&>(state);
   Position(chess_state.Board().ToFEN());
 }
 
-void UciBot::InformAction(const State &state,
+void UCIBot::InformAction(const State &state,
                           Player player_id,
                           Action action) {
   auto chess_state = down_cast<const chess::ChessState&>(state);
@@ -107,7 +107,7 @@ void UciBot::InformAction(const State &state,
   }
 }
 
-void UciBot::StartProcess(const std::string &path) {
+void UCIBot::StartProcess(const std::string &path) {
 
   int output_pipe[2];
   int input_pipe[2];
@@ -144,7 +144,7 @@ void UciBot::StartProcess(const std::string &path) {
 
 }
 
-void UciBot::Uci() {
+void UCIBot::Uci() {
   Write("uci");
   while (true) {
     auto response = Read(false);
@@ -160,16 +160,16 @@ void UciBot::Uci() {
 
 }
 
-void UciBot::SetOption(const std::string&name, const std::string&value) {
+void UCIBot::SetOption(const std::string&name, const std::string&value) {
   std::string msg = "setoption name " + name + " value " + value;
   Write(msg);
 }
 
-void UciBot::UciNewGame() {
+void UCIBot::UciNewGame() {
   Write("ucinewgame");
 }
 
-void UciBot::IsReady() {
+void UCIBot::IsReady() {
   Write("isready");
 
   while (true) {
@@ -185,7 +185,7 @@ void UciBot::IsReady() {
   }
 }
 
-void UciBot::Position(const std::string &fen,
+void UCIBot::Position(const std::string &fen,
                       const std::vector<std::string> &moves) {
   std::string msg = "position fen " + fen;
 
@@ -196,29 +196,29 @@ void UciBot::Position(const std::string &fen,
   Write(msg);
 }
 
-std::pair<std::string, std::optional<std::string>> UciBot::Go() {
+std::pair<std::string, std::optional<std::string>> UCIBot::Go() {
   Write("go movetime " + std::to_string(move_time_));
   return ReadBestMove();
 }
 
-void UciBot::GoPonder() {
+void UCIBot::GoPonder() {
   Write("go ponder movetime " + std::to_string(move_time_));
 }
 
-void UciBot::PonderHit() {
+void UCIBot::PonderHit() {
   Write("ponderhit");
 }
 
-std::pair<std::string, std::optional<std::string>> UciBot::Stop() {
+std::pair<std::string, std::optional<std::string>> UCIBot::Stop() {
   Write("stop");
   return ReadBestMove();
 }
 
-void UciBot::Quit() {
+void UCIBot::Quit() {
   Write("quit");
 }
 
-std::pair<std::string, std::optional<std::string>> UciBot::ReadBestMove() {
+std::pair<std::string, std::optional<std::string>> UCIBot::ReadBestMove() {
   while (true) {
     auto response = Read(true);
     std::istringstream response_stream(response);
@@ -245,13 +245,13 @@ std::pair<std::string, std::optional<std::string>> UciBot::ReadBestMove() {
   SpielFatalError("Wrong response to go");
 }
 
-void UciBot::Write(const std::string &msg) const {
+void UCIBot::Write(const std::string &msg) const {
   if (write(output_fd_, (msg + "\n").c_str(), msg.size() + 1) != msg.size() + 1) {
     SpielFatalError("Sending a command to uci sub-process failed");
   }
 }
 
-std::string UciBot::Read(bool wait) const {
+std::string UCIBot::Read(bool wait) const {
   char *buff;
   int count = 0;
   std::string response;
@@ -286,11 +286,11 @@ std::string UciBot::Read(bool wait) const {
   return response;
 }
 
-std::unique_ptr<Bot> uci::MakeUciBot(const std::string &path,
+std::unique_ptr<Bot> uci::MakeUCIBot(const std::string &path,
                                      int move_time,
                                      bool ponder,
                                      const Options &options) {
-  return std::make_unique<UciBot>(path, move_time, ponder, options);
+  return std::make_unique<UCIBot>(path, move_time, ponder, options);
 }
 }  // namespace uci
 }  // namespace open_spiel

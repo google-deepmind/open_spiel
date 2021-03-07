@@ -25,13 +25,13 @@ namespace uci {
 
 using Options = std::map<std::string, std::string>;
 
-class UciBot : public Bot {
+class UCIBot : public Bot {
  public:
-  explicit UciBot(const std::string &path,
+  explicit UCIBot(const std::string &path,
                   int move_time,
                   bool ponder,
                   const Options &options);
-  ~UciBot() override;
+  ~UCIBot() override;
 
   Action Step(const State& state) override;
   void Restart() override;
@@ -68,7 +68,7 @@ class UciBot : public Bot {
   bool ponder_;
 };
 
-std::unique_ptr<Bot> MakeUciBot(const std::string &path,
+std::unique_ptr<Bot> MakeUCIBot(const std::string &path,
                                 int move_time,
                                 bool ponder = false,
                                 const Options &options = {});
