@@ -55,6 +55,7 @@ EXPECTED_GAMES = set([
     "havannah",
     "hex",
     "hearts",
+    "kriegspiel",
     "kuhn_poker",
     "laser_tag",
     "lewis_signaling",

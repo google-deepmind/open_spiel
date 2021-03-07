@@ -67,6 +67,8 @@ set(GAME_SOURCES
   hearts.h
   hex.cc
   hex.h
+  kriegspiel.cc
+  kriegspiel.h
   kuhn_poker.cc
   kuhn_poker.h
   laser_tag.cc
@@ -326,6 +328,10 @@ add_test(hearts_test hearts_test)
 add_executable(hex_test hex_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(hex_test hex_test)
+
+add_executable(kriegspiel_test kriegspiel_test.cc ${OPEN_SPIEL_OBJECTS}
+        $<TARGET_OBJECTS:tests>)
+add_test(kriegspiel_test kriegspiel_test)
 
 add_executable(kuhn_poker_test kuhn_poker_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>
