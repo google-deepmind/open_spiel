@@ -24,7 +24,7 @@ import pyspiel
 class PolicyBot(pyspiel.Bot):
   """Samples an action from action probabilities based on a policy."""
 
-  def __init__(self, player_id, rng, policy):
+  def __init__(self, player_id, rng, policy, legal_only=False):
     """Initializes a policy bot.
 
     Args:
@@ -33,11 +33,14 @@ class PolicyBot(pyspiel.Bot):
       rng: A random number generator supporting a `choice` method, e.g.
         `np.random`
       policy: A policy to get action distributions
+      legal_only: If true, check that Bot actions are also legal actions and 
+        return `pyspiel.INVALID_ACTION` if chosen action is not legal.
     """
     pyspiel.Bot.__init__(self)
     self._player_id = player_id
     self._rng = rng
     self._policy = policy
+    self._legal_only = legal_only
 
   def player_id(self):
     return self._player_id
@@ -56,13 +59,19 @@ class PolicyBot(pyspiel.Bot):
       `(action, probability)` pairs for each legal action, with
       `probability` defined by the policy action probabilities.
       The `action` is sampled from the distribution,
-      or `pyspiel.INVALID_ACTION` if there are no legal actions available.
+      or `pyspiel.INVALID_ACTION` if there are no actions available.
     """
-    legal_actions = state.legal_actions(self._player_id)
-    if not legal_actions:
-      return [], pyspiel.INVALID_ACTION
     policy = self._policy.action_probabilities(state, self._player_id)
-    action = self._rng.choice(legal_actions, p=list(policy.values()))
+
+    action_list = list(policy.keys())
+    if not any(action_list):
+      return [], pyspiel.INVALID_ACTION
+
+    action = self._rng.choice(action_list, p=list(policy.values()))
+    
+    if self._legal_only and action not in state.legal_actions(self._player_id):
+      return [], pyspiel.INVALID_ACTION
+        
     return list(policy.items()), action
 
   def step(self, state):
